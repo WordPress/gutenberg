@@ -95,24 +95,14 @@ export const Default: Story = {
 			<Menu.Root>
 				<Menu.Trigger>Open menu</Menu.Trigger>
 				<Menu.Popup>
-					<Menu.Item
-						prefix={
-							<Icon icon={ archive } size={ 24 } aria-hidden />
-						}
-					>
+					<Menu.Item prefix={ <Icon icon={ archive } /> }>
 						Rename…
 					</Menu.Item>
-					<Menu.Item
-						prefix={
-							<Icon icon={ archive } size={ 24 } aria-hidden />
-						}
-					>
+					<Menu.Item prefix={ <Icon icon={ archive } /> }>
 						Archive
 					</Menu.Item>
 					<Menu.Item
-						prefix={
-							<Icon icon={ archive } size={ 24 } aria-hidden />
-						}
+						prefix={ <Icon icon={ archive } /> }
 						shortcut={ SHORTCUTS.save }
 						suffix="Draft"
 					>
@@ -160,13 +150,7 @@ export const Default: Story = {
 							<Menu.GroupLabel>View</Menu.GroupLabel>
 							<Menu.RadioItem
 								value="list"
-								prefix={
-									<Icon
-										icon={ archive }
-										size={ 24 }
-										aria-hidden
-									/>
-								}
+								prefix={ <Icon icon={ archive } /> }
 							>
 								<Menu.ItemLabel>List</Menu.ItemLabel>
 								<Menu.ItemDescription>
@@ -175,13 +159,7 @@ export const Default: Story = {
 							</Menu.RadioItem>
 							<Menu.RadioItem
 								value="grid"
-								prefix={
-									<Icon
-										icon={ archive }
-										size={ 24 }
-										aria-hidden
-									/>
-								}
+								prefix={ <Icon icon={ archive } /> }
 							>
 								<Menu.ItemLabel>Grid</Menu.ItemLabel>
 								<Menu.ItemDescription>
@@ -203,15 +181,7 @@ export const Default: Story = {
 						</Menu.SubmenuTrigger>
 						<Menu.Popup>
 							<Menu.Item>Favorites</Menu.Item>
-							<Menu.Item
-								prefix={
-									<Icon
-										icon={ archive }
-										size={ 24 }
-										aria-hidden
-									/>
-								}
-							>
+							<Menu.Item prefix={ <Icon icon={ archive } /> }>
 								Archive
 							</Menu.Item>
 							<Menu.SubmenuRoot>
@@ -293,9 +263,7 @@ export const RichItems: Story = {
 						</Menu.ItemDescription>
 					</Menu.Item>
 					<Menu.Item
-						prefix={
-							<Icon icon={ archive } size={ 24 } aria-hidden />
-						}
+						prefix={ <Icon icon={ archive } /> }
 						shortcut={ SHORTCUTS.save }
 						suffix="Modified"
 					>
@@ -325,24 +293,14 @@ export const GroupedItems: Story = {
 				<Menu.Popup>
 					<Menu.Group>
 						<Menu.GroupLabel>File</Menu.GroupLabel>
-						<Menu.Item
-							prefix={
-								<Icon icon={ create } size={ 24 } aria-hidden />
-							}
-						>
+						<Menu.Item prefix={ <Icon icon={ create } /> }>
 							<Menu.ItemLabel>New draft</Menu.ItemLabel>
 							<Menu.ItemDescription>
 								Create a new draft document.
 							</Menu.ItemDescription>
 						</Menu.Item>
 						<Menu.Item
-							prefix={
-								<Icon
-									icon={ archive }
-									size={ 24 }
-									aria-hidden
-								/>
-							}
+							prefix={ <Icon icon={ archive } /> }
 							shortcut={ SHORTCUTS.save }
 						>
 							Save
@@ -358,13 +316,7 @@ export const GroupedItems: Story = {
 					<Menu.Group>
 						<Menu.GroupLabel>Organize</Menu.GroupLabel>
 						<Menu.Item
-							prefix={
-								<Icon
-									icon={ archive }
-									size={ 24 }
-									aria-hidden
-								/>
-							}
+							prefix={ <Icon icon={ archive } /> }
 							shortcut={ SHORTCUTS.move }
 							suffix="3"
 						>
@@ -374,13 +326,7 @@ export const GroupedItems: Story = {
 							</Menu.ItemDescription>
 						</Menu.Item>
 						<Menu.Item
-							prefix={
-								<Icon
-									icon={ archive }
-									size={ 24 }
-									aria-hidden
-								/>
-							}
+							prefix={ <Icon icon={ archive } /> }
 							suffix="12"
 						>
 							Archive
@@ -467,13 +413,7 @@ export const CheckboxItems: Story = {
 						<Menu.CheckboxItem
 							checked={ archived }
 							onCheckedChange={ setArchived }
-							prefix={
-								<Icon
-									icon={ archive }
-									size={ 24 }
-									aria-hidden
-								/>
-							}
+							prefix={ <Icon icon={ archive } /> }
 						>
 							<Menu.ItemLabel>Archived</Menu.ItemLabel>
 							<Menu.ItemDescription>
@@ -483,13 +423,7 @@ export const CheckboxItems: Story = {
 						<Menu.CheckboxItem
 							checked={ shared }
 							onCheckedChange={ setShared }
-							prefix={
-								<Icon
-									icon={ archive }
-									size={ 24 }
-									aria-hidden
-								/>
-							}
+							prefix={ <Icon icon={ archive } /> }
 							shortcut={ SHORTCUTS.shared }
 						>
 							<Menu.ItemLabel>Shared</Menu.ItemLabel>
@@ -522,25 +456,19 @@ export const RadioItems: Story = {
 						>
 							<Menu.RadioItem
 								value="left"
-								prefix={
-									<Icon icon={ alignLeft } aria-hidden />
-								}
+								prefix={ <Icon icon={ alignLeft } /> }
 							>
 								<Menu.ItemLabel>Left</Menu.ItemLabel>
 							</Menu.RadioItem>
 							<Menu.RadioItem
 								value="center"
-								prefix={
-									<Icon icon={ alignCenter } aria-hidden />
-								}
+								prefix={ <Icon icon={ alignCenter } /> }
 							>
 								<Menu.ItemLabel>Center</Menu.ItemLabel>
 							</Menu.RadioItem>
 							<Menu.RadioItem
 								value="right"
-								prefix={
-									<Icon icon={ alignRight } aria-hidden />
-								}
+								prefix={ <Icon icon={ alignRight } /> }
 							>
 								<Menu.ItemLabel>Right</Menu.ItemLabel>
 							</Menu.RadioItem>

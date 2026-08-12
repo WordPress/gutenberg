@@ -441,6 +441,30 @@ describe( 'Menu', () => {
 		);
 	} );
 
+	it( 'hides presentational prefixes from assistive technology', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.Item prefix="Decorative prefix">Item label</Menu.Item>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+
+		const item = await screen.findByRole( 'menuitem', {
+			name: 'Item label',
+		} );
+
+		expect( queryItemPrefix( item ) ).toHaveAttribute(
+			'aria-hidden',
+			'true'
+		);
+	} );
+
 	it( 'keeps shared alignment slots outside the item-local content', async () => {
 		const user = userEvent.setup();
 

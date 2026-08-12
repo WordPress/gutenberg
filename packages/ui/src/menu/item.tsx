@@ -170,7 +170,9 @@ function ItemContent( {
 	return (
 		<>
 			{ prefix && (
-				<span className={ styles[ 'item-prefix' ] }>{ prefix }</span>
+				<span aria-hidden="true" className={ styles[ 'item-prefix' ] }>
+					{ prefix }
+				</span>
 			) }
 			<span className={ styles[ 'item-content' ] }>
 				<span className={ styles[ 'item-children' ] }>
