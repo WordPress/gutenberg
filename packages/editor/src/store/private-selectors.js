@@ -17,6 +17,7 @@ import {
 	getCurrentPost,
 	getCurrentPostType,
 	getCurrentPostId,
+	getCurrentPostAttribute,
 	getEditorSettings,
 	getCurrentPostRevisionsCount,
 } from './selectors';
@@ -603,3 +604,40 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 		);
 	}
 );
+
+/**
+ * Returns the post ID that notes on the current post should be attached to, or
+ * `undefined` when notes cannot be attached at all.
+ *
+ * Notes are stored as comments, so they need a numeric `comment_post_ID`. Posts
+ * and pages expose one directly. Templates and template parts are served by the
+ * templates REST controller, whose record ID is a `theme//slug` string; their
+ * numeric post ID lives in `wp_id`, and is only non-zero once the template has
+ * been saved to the database. A pristine, theme-provided template has no post
+ * to attach a note to, so this returns `undefined` and the Notes UI stays
+ * hidden. Under the template activation experiment templates are served by the
+ * posts controller and already have numeric IDs, so they take the first branch.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {number|undefined} Post ID to attach notes to, if there is one.
+ */
+export function getNotesPostId( state ) {
+	const postId = getCurrentPostId( state );
+
+	if ( typeof postId === 'number' && postId > 0 ) {
+		return postId;
+	}
+
+	const postType = getCurrentPostType( state );
+
+	if ( postType === 'wp_template' || postType === 'wp_template_part' ) {
+		const wpId = getCurrentPostAttribute( state, 'wp_id' );
+
+		if ( typeof wpId === 'number' && wpId > 0 ) {
+			return wpId;
+		}
+	}
+
+	return undefined;
+}

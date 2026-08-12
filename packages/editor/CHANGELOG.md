@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Notes: Enable notes on saved templates and template parts in the site editor, resolving the note's target post from the template record's `wp_id` ([#72918](https://github.com/WordPress/gutenberg/issues/72918)).
+
 ## 14.53.0 (2026-08-12)
 
 ### Internal
