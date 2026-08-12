@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Seed the root `ThemeProvider` with the admin color scheme primary color so portaled popovers and modals receive the scheme's accent colors ([#81296](https://github.com/WordPress/gutenberg/pull/81296)).
 -   Identity: Decode HTML entities in the Site Title and Site Tagline fields. ([#81269](https://github.com/WordPress/gutenberg/pull/81269))
 
 ## 7.0.0 (2026-07-14)
