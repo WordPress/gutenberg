@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509))
+
 ## 0.5.0 (2026-08-12)
 
 ### New Features
