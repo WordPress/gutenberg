@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.8.0 (2026-08-12)
+
 ### Bug Fixes
 
 -   `Breadcrumbs`: reset the list item margin that wp-admin's `common.css` applies, which left the trail misaligned with the rest of the page header ([#81134](https://github.com/WordPress/gutenberg/pull/81134)).

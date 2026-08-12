@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.5.0 (2026-08-12)
+
 ### New Features
 
 -   Tile spacing is host-tunable via `--wp-widget-dashboard-tile-padding` and
