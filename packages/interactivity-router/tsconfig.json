@@ -6,7 +6,7 @@
 	"files": [],
 	"references": [
 		{ "path": "../a11y" },
-		{ "path": "../interactivity" },
+		{ "path": "../interactivity/tsconfig.build.json" },
 		{ "path": "tsconfig.main.json" },
 		{ "path": "tsconfig.full-page.json" }
 	]

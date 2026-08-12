@@ -2,8 +2,10 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"references": [
 		{ "path": "./tsconfig.build.json" },
-		{ "path": "packages/interactivity/tsconfig.test.json" },
-		{ "path": "packages/theme/tsconfig.test.json" },
+		{ "path": "packages/blob" },
+		{ "path": "packages/grid" },
+		{ "path": "packages/interactivity" },
+		{ "path": "packages/theme" },
 		{ "path": "packages/token-list" }
 	],
 	"files": []
