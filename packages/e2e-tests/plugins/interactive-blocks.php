@@ -7,6 +7,13 @@
  * @package gutenberg-test-interactive-blocks
  */
 
+/*
+ * Simulates the WordPress core feature that marks the style assets managed by
+ * the Interactivity API router, which is not available in the WordPress
+ * version bundled with `wp-env`.
+ */
+require_once __DIR__ . '/interactive-blocks/router-styles-managed/router-managed-styles.php';
+
 add_action(
 	'init',
 	function () {
