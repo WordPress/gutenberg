@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 15.4.0 (2026-08-12)
+
 ### Enhancements
 
 -   Add the `inlineImage` icon. ([#81271](https://github.com/WordPress/gutenberg/pull/81271))

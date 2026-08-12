@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 18.0.0 (2026-08-12)
+
 ### Breaking Changes
 
 -   DataForms: Remove the built-in `richtext` control, its `EditConfigRichText` type, and the package's `privateApis` export, whose only member was that control. Assembling `@wordpress/rich-text` inside a bundled package broke plugins that install DataViews from npm ([#81233](https://github.com/WordPress/gutenberg/issues/81233)), so the control moved to `@wordpress/editor`, next to its only consumer. `@wordpress/rich-text` is no longer a dependency of this package, and a rich text field now needs a custom `Edit` component ([#81430](https://github.com/WordPress/gutenberg/pull/81430)).
@@ -14,6 +16,8 @@
 -   DataForm: Internalize `ValidatedComboboxControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81449](https://github.com/WordPress/gutenberg/pull/81449)
 -   DataForm: Internalize `ValidatedNumberControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81433](https://github.com/WordPress/gutenberg/pull/81433)
 -   DataForm: Internalize `ValidatedRadioControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81434](https://github.com/WordPress/gutenberg/pull/81434)
+-   DataForm: Internalize `ValidatedFormTokenField` instead of unlocking it from the `@wordpress/components` private APIs. [#81451](https://github.com/WordPress/gutenberg/pull/81451)
+-   DataForm: Internalize `ValidatedToggleGroupControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81450](https://github.com/WordPress/gutenberg/pull/81450)
 
 ### New Features
 
