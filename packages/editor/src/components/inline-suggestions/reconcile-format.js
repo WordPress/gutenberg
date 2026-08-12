@@ -15,14 +15,7 @@
  * wired for text edits. `analyzeTextEdit` sees no text change for a format-only
  * edit, so format detection needs this separate pass.
  */
-/**
- * WordPress dependencies
- */
 import { RichTextData, create, slice, applyFormat } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import { SUGGESTION_FORMAT_NAME, SUGGESTION_TYPE_FORMAT } from './format';
 import { buildSuggestionMarkerAttributes } from './operations';
 

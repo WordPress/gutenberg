@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { select } from '@wordpress/data';
 import {
 	registerFormatType,
 	store as richTextStore,
 } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import { findMarkerRange, findMarkerText } from '../inline-markers';
 
 export const SUGGESTION_FORMAT_NAME = 'core/suggestion';

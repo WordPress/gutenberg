@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { RichTextData, create } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import { wrapInlineMarker } from '../inline-markers';
 import {
 	SUGGESTION_FORMAT_NAME,

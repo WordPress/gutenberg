@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { computeDeleteRange } from '../delete-range';
 
 describe( 'computeDeleteRange', () => {
