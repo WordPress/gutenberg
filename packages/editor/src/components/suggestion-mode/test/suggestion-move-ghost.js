@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import SuggestionMoveGhost from '../suggestion-move-ghost';
 
 // Fully isolate this presentational unit: stub the store read, the block
