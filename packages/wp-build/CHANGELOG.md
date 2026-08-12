@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a `--no-script-debug` flag that skips generating the unminified debug assets, for plugins that would rather not ship them ([#75396](https://github.com/WordPress/gutenberg/pull/75396)).
+
+### Bug Fixes
+
+-   Registration templates: fall back to the minified assets when `SCRIPT_DEBUG` is enabled but the unminified files were not built, instead of registering URLs that 404 ([#75396](https://github.com/WordPress/gutenberg/pull/75396)).
+-   Registration templates: guard `SCRIPT_DEBUG` with `defined()` in the script and style templates, which otherwise emit a warning on PHP 8 when the constant is undefined ([#75396](https://github.com/WordPress/gutenberg/pull/75396)).
+
 ## 0.21.0 (2026-08-12)
 
 ### Enhancements
