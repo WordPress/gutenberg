@@ -1,6 +1,6 @@
 import { serialize, to, HSL, sRGB } from 'colorjs.io/fn';
 import { buildRamp } from '../lib';
-import { getColorString } from '../lib/color-utils';
+import { getColorString, getContrast } from '../lib/color-utils';
 import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from '../lib/ramp-configs';
 import { DEFAULT_SEED_COLORS } from '../lib/constants';
 
@@ -8,33 +8,87 @@ const lStops = [ 100, 90, 80, 70, 60, 50, 40, 30, 20, 10 ];
 const sStops = [ 100, 80, 60, 40, 20, 0 ];
 const hStops = [ 0, 60, 120, 180, 240, 300 ];
 
-describe( 'buildRamps', () => {
-	it( 'background ramp snapshots', () => {
-		// Generate a set of HSL colors across a broad perceivable range to test
-		// support for building ramps with various combinations of lightness,
-		// saturation, and hue. Convert to a serialized string format to mirror
-		// real-world consumer usage.
-		const allBgColors: string[] = lStops.flatMap( ( l ) =>
-			sStops.flatMap( ( s ) =>
-				hStops.map( ( h ) =>
-					serialize(
-						to(
-							{
-								space: HSL,
-								coords: [ h, s, l ] as [
-									number,
-									number,
-									number,
-								],
-								alpha: 1,
-							},
-							sRGB
-						)
-					)
+// Generate a set of HSL colors across a broad perceivable range to test
+// support for building ramps with various combinations of lightness,
+// saturation, and hue. Convert to a serialized string format to mirror
+// real-world consumer usage.
+const allBgColors: string[] = lStops.flatMap( ( l ) =>
+	sStops.flatMap( ( s ) =>
+		hStops.map( ( h ) =>
+			serialize(
+				to(
+					{
+						space: HSL,
+						coords: [ h, s, l ] as [ number, number, number ],
+						alpha: 1,
+					},
+					sRGB
 				)
 			)
-		);
+		)
+	)
+);
 
+const accentOptions = [
+	{
+		pinLightness: { stepName: 'surface2', value: 0 },
+		mainDirection: 'lighter',
+	},
+	{
+		pinLightness: { stepName: 'surface2', value: 0.1 },
+		mainDirection: 'lighter',
+	},
+	{
+		pinLightness: { stepName: 'surface2', value: 0.2 },
+		mainDirection: 'lighter',
+	},
+	{
+		pinLightness: { stepName: 'surface2', value: 0.3 },
+		mainDirection: 'lighter',
+	},
+	{
+		pinLightness: { stepName: 'surface2', value: 0.4 },
+		mainDirection: 'lighter',
+	},
+	{
+		pinLightness: { stepName: 'surface2', value: 0.7 },
+		mainDirection: 'darker',
+	},
+	{
+		pinLightness: { stepName: 'surface2', value: 0.8 },
+		mainDirection: 'darker',
+	},
+	{
+		pinLightness: { stepName: 'surface2', value: 0.9 },
+		mainDirection: 'darker',
+	},
+	{
+		pinLightness: { stepName: 'surface2', value: 1 },
+		mainDirection: 'darker',
+	},
+] as const;
+
+const allPrimaryColors = [
+	...Object.values( DEFAULT_SEED_COLORS ),
+	'#52accc', // WP Admin "blue" theme accent
+	'#c7a589', // WP Admin "coffee" theme accent
+	'#a3b745', // WP Admin "ectoplasm" theme accent
+	'#dd823b', // WP Admin "sunrise" theme accent
+];
+
+function buildSupportedRamps() {
+	return [
+		...allBgColors.map( ( seed ) => buildRamp( seed, BG_RAMP_CONFIG ) ),
+		...allPrimaryColors.flatMap( ( seed ) =>
+			accentOptions.map( ( options ) =>
+				buildRamp( seed, ACCENT_RAMP_CONFIG, options )
+			)
+		),
+	];
+}
+
+describe( 'buildRamps', () => {
+	it( 'background ramp snapshots', () => {
 		expect(
 			allBgColors.map( ( bg ) => {
 				const ramp = buildRamp( bg, BG_RAMP_CONFIG );
@@ -54,56 +108,9 @@ describe( 'buildRamps', () => {
 	}, 10000 );
 
 	it( 'accent ramp snapshots', () => {
-		const options = [
-			{
-				pinLightness: { stepName: 'surface2', value: 0 },
-				mainDirection: 'lighter',
-			},
-			{
-				pinLightness: { stepName: 'surface2', value: 0.1 },
-				mainDirection: 'lighter',
-			},
-			{
-				pinLightness: { stepName: 'surface2', value: 0.2 },
-				mainDirection: 'lighter',
-			},
-			{
-				pinLightness: { stepName: 'surface2', value: 0.3 },
-				mainDirection: 'lighter',
-			},
-			{
-				pinLightness: { stepName: 'surface2', value: 0.4 },
-				mainDirection: 'lighter',
-			},
-			{
-				pinLightness: { stepName: 'surface2', value: 0.7 },
-				mainDirection: 'darker',
-			},
-			{
-				pinLightness: { stepName: 'surface2', value: 0.8 },
-				mainDirection: 'darker',
-			},
-			{
-				pinLightness: { stepName: 'surface2', value: 0.9 },
-				mainDirection: 'darker',
-			},
-			{
-				pinLightness: { stepName: 'surface2', value: 1 },
-				mainDirection: 'darker',
-			},
-		] as const;
-
-		const allPrimaryColors = [
-			...Object.values( DEFAULT_SEED_COLORS ),
-			'#52accc', // WP Admin "blue" theme accent
-			'#c7a589', // WP Admin "coffee" theme accent
-			'#a3b745', // WP Admin "ectoplasm" theme accent
-			'#dd823b', // WP Admin "sunrise" theme accent
-		];
-
 		expect(
 			allPrimaryColors.map( ( primary ) =>
-				options.map( ( o ) => {
+				accentOptions.map( ( o ) => {
 					const ramp = buildRamp( primary, ACCENT_RAMP_CONFIG, o );
 					const seedOriginal = getColorString( primary );
 					const seedComputed = getColorString( ramp.ramp.bgFill1 );
@@ -120,5 +127,31 @@ describe( 'buildRamps', () => {
 				} )
 			)
 		).toMatchSnapshot();
+	} );
+
+	it( 'keeps fgSurface4 at least 1.8:1 from fgSurface5 across the supported seed grid', () => {
+		buildSupportedRamps().forEach( ( { ramp } ) => {
+			expect(
+				getContrast( ramp.fgSurface4, ramp.fgSurface5 )
+			).toBeGreaterThanOrEqual( 1.8 );
+		} );
+	} );
+
+	it( 'keeps fgSurface4 between fgSurface3 and fgSurface5 for the default light and dark ramps', () => {
+		[ DEFAULT_SEED_COLORS.background, '#1e1e1e' ].forEach( ( seed ) => {
+			const { ramp } = buildRamp( seed, BG_RAMP_CONFIG );
+			const contrastAcrossInterval = getContrast(
+				ramp.fgSurface3,
+				ramp.fgSurface5
+			);
+			const contrastFromHighContrastStep = getContrast(
+				ramp.fgSurface4,
+				ramp.fgSurface5
+			);
+
+			expect( contrastFromHighContrastStep ).toBeLessThanOrEqual(
+				contrastAcrossInterval
+			);
+		} );
 	} );
 } );

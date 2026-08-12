@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Map active neutral foreground colors to the lighter FGS3 ramp step. ([#81537](https://github.com/WordPress/gutenberg/pull/81537))
+-   Add an intermediate FGS4 ramp step for active foreground colors. ([#81537](https://github.com/WordPress/gutenberg/pull/81537))
 
 ### Bug Fixes
 
