@@ -255,11 +255,6 @@
 			"count": 3
 		}
 	},
-	"packages/block-editor/src/components/multi-selection-inspector/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/preset-input-control/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -759,11 +754,6 @@
 	"packages/components/src/input-control/styles/input-control-styles.tsx": {
 		"no-restricted-imports": {
 			"count": 3
-		}
-	},
-	"packages/components/src/menu/stories/index.story.tsx": {
-		"no-restricted-imports": {
-			"count": 1
 		}
 	},
 	"packages/components/src/menu/styles.ts": {

@@ -11,7 +11,7 @@ test.describe( 'Keep styles on block transforms', () => {
 	} ) => {
 		await editor.openDocumentSettingsSidebar();
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '## Heading' );
 
@@ -52,7 +52,7 @@ test.describe( 'Keep styles on block transforms', () => {
 	} ) => {
 		await editor.openDocumentSettingsSidebar();
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'Line 1 to be made large' );
 		await page.keyboard.press( 'Enter' );
@@ -89,7 +89,7 @@ test.describe( 'Keep styles on block transforms', () => {
 	} ) => {
 		await editor.openDocumentSettingsSidebar();
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'Line 1 to be made large' );
 		await page.getByRole( 'radio', { name: 'Large', exact: true } ).click();
