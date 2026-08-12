@@ -13,7 +13,10 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { useDisabled } from '@wordpress/compose';
-import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import {
+	canUserEditPostContext,
+	useToolsPanelDropdownMenuProps,
+} from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
 
 const separatorDefaultValue = '/';
@@ -48,13 +51,18 @@ export default function BreadcrumbEdit( {
 				postType,
 				postId
 			);
-			const _canEditPost = postId
-				? select( coreStore ).canUser( 'update', {
+			const _canReadPost = postId
+				? select( coreStore ).canUser( 'read', {
 						kind: 'postType',
 						name: postType,
 						id: postId,
 				  } )
 				: undefined;
+			const _canEditPost = canUserEditPostContext(
+				select,
+				postType,
+				postId
+			);
 			const postTypeObject = select( coreStore ).getPostType( postType );
 			const _postTypeHasTaxonomies =
 				postTypeObject && postTypeObject.taxonomies.length;
@@ -80,12 +88,17 @@ export default function BreadcrumbEdit( {
 							return !! _post[ taxonomy.rest_base ]?.length;
 						} ),
 				isLoading:
-					// When the user can't edit the post, its record may not be
-					// readable either (the REST request can fail), so don't
-					// wait for it: the placeholder is shown instead.
+					// Wait for the post record only while it can still be
+					// expected. The record is requested with `context=edit`,
+					// so it never arrives when the user can't edit the post
+					// (`_canEditPost === false`), nor when the post isn't
+					// readable under `postType` at all
+					// (`_canReadPost === false`) — the placeholder or the
+					// server-side render is shown instead.
 					( postId &&
 						_canEditPost !== false &&
-						( ! _post || _canEditPost === undefined ) ) ||
+						_canReadPost !== false &&
+						! _post ) ||
 					! postTypeObject ||
 					( _postTypeHasTaxonomies && ! taxonomies ),
 			};
@@ -118,9 +131,12 @@ export default function BreadcrumbEdit( {
 			// The block-renderer endpoint requires `edit_post` permissions
 			// for the post referenced by `post_id`, and the `postId` block
 			// context can reference a post the current user can't edit (e.g.
-			// another author's post in a query-like block), so only forward
-			// it when the user can edit it, to avoid a 403 error.
-			post_id: canEditPost ? postId : undefined,
+			// another author's post in a query-like block), which failed with
+			// a 403 error. Withhold `post_id` only when the post is confirmed
+			// non-editable; when that can't be determined (e.g. `postId` and
+			// `postType` coming from different providers don't designate a
+			// readable post), forward it and let the server decide, as before.
+			post_id: canEditPost === false ? undefined : postId,
 			invalidationKey,
 		},
 	} );
