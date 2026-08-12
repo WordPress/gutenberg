@@ -72,7 +72,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.1/view-config-api.php';
 	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-view-config-controller-7-1.php';
 	require __DIR__ . '/compat/wordpress-7.1/notes-mentions.php';
-	require __DIR__ . '/compat/wordpress-7.1/notes-followers.php';
 	require __DIR__ . '/compat/wordpress-7.1/class-wp-icon-collections-registry.php';
 	require __DIR__ . '/compat/wordpress-7.1/class-wp-rest-icon-collections-controller.php';
 	require __DIR__ . '/compat/wordpress-7.1/rest-api.php';
@@ -81,6 +80,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.1/block-comments.php';
 
 	// WordPress 7.2 compat.
+	require __DIR__ . '/compat/wordpress-7.2/notes-followers.php';
 	require __DIR__ . '/compat/wordpress-7.2/notes-events.php';
 
 	// Real-time collaboration.

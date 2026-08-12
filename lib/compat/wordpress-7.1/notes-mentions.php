@@ -251,7 +251,7 @@ function gutenberg_send_note_notification( WP_User $user, WP_Comment $comment, ?
 	 * `$sent` reports whether wp_mail() accepted it, which is not a delivery
 	 * receipt.
 	 *
-	 * @since 7.1.0
+	 * @since 7.2.0
 	 *
 	 * @param int        $user_id Recipient user ID.
 	 * @param WP_Comment $comment The note that triggered the notification.
