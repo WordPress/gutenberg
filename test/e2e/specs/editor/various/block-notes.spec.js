@@ -413,7 +413,10 @@ test.describe( 'Block Notes', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Second block' },
 		} );
-		await editor.clickBlockOptionsMenuItem( 'Add note' );
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Add note', exact: true } )
+			.click();
 		const newNoteForm = page.getByRole( 'textbox', {
 			name: 'New note',
 			exact: true,
@@ -1316,7 +1319,10 @@ test.describe( 'Block Notes', () => {
 			await paragraph.click();
 			await blockNoteUtils.selectBlockText();
 
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
 
 			await page
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
@@ -1384,7 +1390,10 @@ test.describe( 'Block Notes', () => {
 			await paragraph.click();
 			await blockNoteUtils.selectBlockText();
 
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
 			await page
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Survive the toggle' );
@@ -1427,7 +1436,10 @@ test.describe( 'Block Notes', () => {
 			await paragraph.click();
 			await blockNoteUtils.selectBlockText();
 
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
 			await page
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Anchored to text' );
@@ -1476,7 +1488,10 @@ test.describe( 'Block Notes', () => {
 			await paragraph.click();
 			await blockNoteUtils.selectBlockText();
 
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
 			await page
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Remove my marker on delete' );
@@ -1519,7 +1534,10 @@ test.describe( 'Block Notes', () => {
 			await paragraph.click();
 			await blockNoteUtils.selectBlockText();
 
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
 			await page
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Resolve removes my marker' );
@@ -1561,7 +1579,10 @@ test.describe( 'Block Notes', () => {
 			await paragraph.click();
 			await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
 
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
 			await page
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Just this word' );
@@ -1594,7 +1615,10 @@ test.describe( 'Block Notes', () => {
 			await paragraph.click();
 			await blockNoteUtils.selectBlockText();
 
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
 			await page
 				.getByRole( 'textbox', { name: 'New note', exact: true } )
 				.fill( 'Pick me' );
@@ -1765,7 +1789,10 @@ test.describe( 'Block Notes', () => {
 					blockNoteUtils,
 				} );
 
-				await editor.clickBlockOptionsMenuItem( 'Add note' );
+				await page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Add note', exact: true } )
+					.click();
 				await page
 					.getByRole( 'textbox', { name: 'New note', exact: true } )
 					.fill( 'Align me' );
@@ -1810,7 +1837,10 @@ test.describe( 'Block Notes', () => {
 					blockNoteUtils,
 				} );
 
-				await editor.clickBlockOptionsMenuItem( 'Add note' );
+				await page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Add note', exact: true } )
+					.click();
 				// The pending form floats next to the canvas while composing;
 				// there is no marker yet, so it anchors to the selection the
 				// note will attach to (the canvas keeps its selection while
@@ -1866,7 +1896,10 @@ test.describe( 'Block Notes', () => {
 				name: 'core/paragraph',
 				attributes: { content: 'Note rich text host' },
 			} );
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
 			const textbox = page.getByRole( 'textbox', {
 				name: 'New note',
 				exact: true,
@@ -1891,7 +1924,10 @@ test.describe( 'Block Notes', () => {
 				name: 'core/paragraph',
 				attributes: { content: 'Note rich text host' },
 			} );
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
 			const textbox = page.getByRole( 'textbox', {
 				name: 'New note',
 				exact: true,
@@ -2001,7 +2037,10 @@ test.describe( 'Block Notes', () => {
 				name: 'core/paragraph',
 				attributes: { content: 'Note rich text host' },
 			} );
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
 			const textbox = page.getByRole( 'textbox', {
 				name: 'New note',
 				exact: true,
@@ -2042,7 +2081,10 @@ test.describe( 'Block Notes', () => {
 				name: 'core/paragraph',
 				attributes: { content: 'Mention host' },
 			} );
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
 			const textbox = page.getByRole( 'textbox', {
 				name: 'New note',
 				exact: true,
@@ -2098,7 +2140,10 @@ test.describe( 'Block Notes', () => {
 				name: 'core/paragraph',
 				attributes: { content: 'Mention host' },
 			} );
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
 			const textbox = page.getByRole( 'textbox', {
 				name: 'New note',
 				exact: true,
