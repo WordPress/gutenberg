@@ -100,7 +100,7 @@ export const Default: Story = {
 							<Icon icon={ archive } size={ 24 } aria-hidden />
 						}
 					>
-						Rename
+						Rename…
 					</Menu.Item>
 					<Menu.Item
 						prefix={
@@ -348,7 +348,7 @@ export const GroupedItems: Story = {
 							Save
 						</Menu.Item>
 						<Menu.Item suffix="Edited">
-							<Menu.ItemLabel>Save as copy</Menu.ItemLabel>
+							<Menu.ItemLabel>Save as copy…</Menu.ItemLabel>
 							<Menu.ItemDescription>
 								Create a duplicate from the current version.
 							</Menu.ItemDescription>
@@ -368,7 +368,7 @@ export const GroupedItems: Story = {
 							shortcut={ SHORTCUTS.move }
 							suffix="3"
 						>
-							<Menu.ItemLabel>Move to collection</Menu.ItemLabel>
+							<Menu.ItemLabel>Move to collection…</Menu.ItemLabel>
 							<Menu.ItemDescription>
 								Choose from recent destinations.
 							</Menu.ItemDescription>
@@ -398,7 +398,7 @@ export const Submenu: Story = {
 			<>
 				<Menu.Trigger>Open menu</Menu.Trigger>
 				<Menu.Popup>
-					<Menu.Item>Rename</Menu.Item>
+					<Menu.Item>Rename…</Menu.Item>
 					<Menu.SubmenuRoot>
 						<Menu.SubmenuTrigger shortcut={ SHORTCUTS.move }>
 							<Menu.ItemLabel>
@@ -421,7 +421,7 @@ export const Submenu: Story = {
 							</Menu.SubmenuRoot>
 						</Menu.Popup>
 					</Menu.SubmenuRoot>
-					<Menu.Item>Delete</Menu.Item>
+					<Menu.Item>Delete…</Menu.Item>
 				</Menu.Popup>
 			</>
 		),

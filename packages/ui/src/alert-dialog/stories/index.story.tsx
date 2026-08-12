@@ -187,7 +187,7 @@ export const MenuTrigger: Story = {
 							}
 							closeOnClick={ false }
 						>
-							Delete...
+							Delete…
 						</Menu.Item>
 						<AlertDialog.Popup
 							intent="irreversible"
