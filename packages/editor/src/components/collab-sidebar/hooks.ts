@@ -633,6 +633,7 @@ export function useNoteActions() {
 			return true;
 		} catch ( error ) {
 			onError( error );
+			return undefined;
 		}
 	};
 
@@ -714,7 +715,7 @@ export function useFloatingBoard( {
 		};
 
 		// Recalc is deferred to a rAF; back-to-back updates collapse into one paint.
-		let rafId;
+		let rafId = 0;
 		const schedule = () => {
 			window.cancelAnimationFrame( rafId );
 			rafId = window.requestAnimationFrame( () => {

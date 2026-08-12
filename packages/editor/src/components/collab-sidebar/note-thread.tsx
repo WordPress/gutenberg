@@ -122,33 +122,31 @@ export function NoteThread( {
 	 * of the thread's DOM, but their focus events still bubble here through the
 	 * React tree. It also ignores window/tab blur.
 	 */
-	const focusOutside = useFocusOutside(
-		( event: FocusEvent< HTMLElement > ) => {
-			// When another note is clicked, do nothing because the current note is automatically closed.
-			const isNoteFocused = event.relatedTarget?.closest(
-				'.editor-collab-sidebar-panel__thread'
-			);
-			if ( isNoteFocused && ! isKeyboardTabbingRef.current ) {
-				return;
-			}
-
-			// Drop the highlight, unless another note (possibly on the same block) now owns it.
-			if ( ! isNoteFocused ) {
-				// Discard a hover toggle still in flight so it can't re-highlight afterwards.
-				debouncedToggleBlockHighlight.cancel();
-				toggleBlockHighlight( note.blockClientId, false );
-			}
-
-			/*
-			 * Selection may have moved on before this deferred callback runs; only
-			 * clear it while this still owns the selection, or it would wipe out the
-			 * newly selected note.
-			 */
-			if ( getSelectedNote() === note.id ) {
-				onDeselectNote();
-			}
+	const focusOutside = useFocusOutside( ( event: FocusEvent ) => {
+		// When another note is clicked, do nothing because the current note is automatically closed.
+		const isNoteFocused = event.relatedTarget?.closest(
+			'.editor-collab-sidebar-panel__thread'
+		);
+		if ( isNoteFocused && ! isKeyboardTabbingRef.current ) {
+			return;
 		}
-	);
+
+		// Drop the highlight, unless another note (possibly on the same block) now owns it.
+		if ( ! isNoteFocused ) {
+			// Discard a hover toggle still in flight so it can't re-highlight afterwards.
+			debouncedToggleBlockHighlight.cancel();
+			toggleBlockHighlight( note.blockClientId, false );
+		}
+
+		/*
+		 * Selection may have moved on before this deferred callback runs; only
+		 * clear it while this still owns the selection, or it would wipe out the
+		 * newly selected note.
+		 */
+		if ( getSelectedNote() === note.id ) {
+			onDeselectNote();
+		}
+	} );
 
 	function onMouseEnter() {
 		debouncedToggleBlockHighlight( note.blockClientId, true );
