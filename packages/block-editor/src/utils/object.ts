@@ -302,7 +302,10 @@ export function getPerBlockAttributeUpdates(
 		for ( const [ key, change ] of changes ) {
 			update[ key ] = isPlainObject( change )
 				? cleanEmptyObject(
-						applyAttributesDiff( block.attributes?.[ key ], change )
+						applyAttributesDiff(
+							block.attributes?.[ key ] as AnyObject | undefined,
+							change
+						)
 				  )
 				: change;
 		}
