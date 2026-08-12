@@ -300,7 +300,7 @@ function gutenberg_sanitize_block_gap_value( $gap_value ) {
 			}
 			$gap_value[ $key ] = $sanitized_value;
 		}
-		return $gap_value ?: null;
+		return empty( $gap_value ) ? null : $gap_value;
 	}
 
 	if ( ( is_int( $gap_value ) || is_float( $gap_value ) ) && 0.0 === (float) $gap_value ) {

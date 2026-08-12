@@ -437,7 +437,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => '.wp-layout{gap:0.5em 2rem;}',
 			),
-			'flex layout ignores an empty block gap'        => array(
+			'flex layout ignores an empty block gap'       => array(
 				'args'            => array(
 					'selector'              => '.wp-layout',
 					'layout'                => array( 'type' => 'flex' ),
