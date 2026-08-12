@@ -1,6 +1,9 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81516](https://github.com/WordPress/gutenberg/pull/81516))
 
 ### Enhancements
 
@@ -11,7 +14,6 @@
 
 ### Internal
 
--   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81516](https://github.com/WordPress/gutenberg/pull/81516))
 -   Font Library: Use the new `@wordpress/kebab-case` package instead of unlocking the `kebabCase` utility from the `@wordpress/components` private APIs ([#81294](https://github.com/WordPress/gutenberg/pull/81294)).
 
 ### Enhancements
