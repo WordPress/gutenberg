@@ -193,7 +193,7 @@ const LibraryExample = ( {
 	);
 };
 
-export const Library: StoryObj< typeof meta > = {
+export const Library: StoryObj< LibraryArgs > = {
 	args: {
 		filter: '',
 		size: '24',
