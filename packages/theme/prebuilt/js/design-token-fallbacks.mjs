@@ -77,7 +77,7 @@ export default {
 	'--wpds-color-foreground-interactive-brand':
 		'var(--wp-admin-theme-color, #3858e9)',
 	'--wpds-color-foreground-interactive-brand-active':
-		'color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 82%, black)',
+		'color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 86%, black)',
 	'--wpds-color-foreground-interactive-brand-disabled': '#8d8d8d',
 	'--wpds-color-foreground-interactive-brand-strong': '#fff',
 	'--wpds-color-foreground-interactive-brand-strong-active': '#fff',
