@@ -346,8 +346,16 @@ describe( 'getIssueType', () => {
 } );
 
 describe( 'getIssueFeature', () => {
-	it( 'returns "Unknown" as feature if there are no labels', () => {
+	it( 'returns "Uncategorized" as feature if there are no labels', () => {
 		const result = getIssueFeature( { labels: [] } );
+
+		expect( result ).toBe( 'Uncategorized' );
+	} );
+
+	it( 'falls back to "Uncategorized" when no label can classify the issue', () => {
+		const result = getIssueFeature( {
+			labels: [ { name: 'Some Label' } ],
+		} );
 
 		expect( result ).toBe( 'Uncategorized' );
 	} );
