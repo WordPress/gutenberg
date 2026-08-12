@@ -3,6 +3,7 @@
 ## Unreleased
 ### Internal
 
+-   Point tsconfig references at split dependencies' build projects. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
 -   Split tsconfig into a build project and a default dev project; story and test declarations are no longer published to npm. ([#81509](https://github.com/WordPress/gutenberg/pull/81509))
 
 ## 0.5.0 (2026-08-12)
