@@ -68,8 +68,10 @@ describe( 'Elevation', () => {
 		await userEvent.tab();
 		expect( screen.getByTestId( 'target' ) ).toHaveFocus();
 
-		expect( getComputedStyle( elevation ).boxShadow ).not.toBe(
-			restingShadow
+		await waitFor( () =>
+			expect( getComputedStyle( elevation ).boxShadow ).not.toBe(
+				restingShadow
+			)
 		);
 	} );
 
