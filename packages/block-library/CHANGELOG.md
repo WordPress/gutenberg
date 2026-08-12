@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 10.4.0 (2026-08-12)
+
 ### Internal
 
 -   Embed: Use the new `@wordpress/kebab-case` package instead of unlocking the `kebabCase` utility from the `@wordpress/components` private APIs ([#81294](https://github.com/WordPress/gutenberg/pull/81294)).
