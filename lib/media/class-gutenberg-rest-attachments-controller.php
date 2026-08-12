@@ -276,55 +276,6 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	}
 
 	/**
-	 * Checks if a given request has access to create an attachment.
-	 *
-	 * Skips the server-side image type support check when the client
-	 * will handle image processing (generate_sub_sizes is false). Still
-	 * HEIC/HEIF uploads always skip the check, since the browser's canvas
-	 * fallback can decode them even when the server cannot.
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return true|WP_Error True if the request has access to create items, WP_Error object otherwise.
-	 */
-	public function create_item_permissions_check( $request ) {
-		$bypass_mime_check = false === $request['generate_sub_sizes'];
-
-		/*
-		 * Always allow still HEIC/HEIF uploads through even if the server's
-		 * image editor doesn't support them. The client-side canvas fallback
-		 * handles processing using the browser's native HEVC decoder.
-		 *
-		 * The '-sequence' variants (multi-frame Live Photos) are deliberately
-		 * excluded: neither the server nor the browser fallback can process
-		 * them yet, so they should fall through to the standard unsupported
-		 * mime-type error rather than be stored unprocessable.
-		 */
-		if ( ! $bypass_mime_check ) {
-			$still_heic_mime_types = array( 'image/heic', 'image/heif' );
-			$files                 = $request->get_file_params();
-
-			if (
-				! empty( $files['file']['type'] ) &&
-				in_array( $files['file']['type'], $still_heic_mime_types, true )
-			) {
-				$bypass_mime_check = true;
-			}
-		}
-
-		if ( $bypass_mime_check ) {
-			add_filter( 'wp_prevent_unsupported_mime_type_uploads', '__return_false' );
-		}
-
-		$result = parent::create_item_permissions_check( $request );
-
-		if ( $bypass_mime_check ) {
-			remove_filter( 'wp_prevent_unsupported_mime_type_uploads', '__return_false' );
-		}
-
-		return $result;
-	}
-
-	/**
 	 * Retrieves an array of endpoint arguments from the item schema for the controller.
 	 *
 	 * @param string $method Optional. HTTP method of the request. The arguments for `CREATABLE` requests are
@@ -385,246 +336,52 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	}
 
 	/**
-	 * Retrieves the attachment's schema, conforming to JSON Schema.
+	 * Checks if a given request has access to create an attachment.
 	 *
-	 * Adds exif_orientation field to the schema.
+	 * Skips the server-side image type support check when the client
+	 * will handle image processing (generate_sub_sizes is false). Still
+	 * HEIC/HEIF uploads always skip the check, since the browser's canvas
+	 * fallback can decode them even when the server cannot.
 	 *
-	 * @return array Item schema data.
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has access to create items, WP_Error object otherwise.
 	 */
-	public function get_item_schema() {
-		$schema = parent::get_item_schema();
+	public function create_item_permissions_check( $request ) {
+		$bypass_mime_check = false === $request['generate_sub_sizes'];
 
-		$schema['properties']['exif_orientation'] = array(
-			'description' => __( 'EXIF orientation value from the original image. Values 1-8 follow the EXIF specification. A value other than 1 indicates the image needs rotation.', 'gutenberg' ),
-			'type'        => 'integer',
-			'context'     => array( 'edit' ),
-			'readonly'    => true,
-		);
+		/*
+		 * Always allow still HEIC/HEIF uploads through even if the server's
+		 * image editor doesn't support them. The client-side canvas fallback
+		 * handles processing using the browser's native HEVC decoder.
+		 *
+		 * The '-sequence' variants (multi-frame Live Photos) are deliberately
+		 * excluded: neither the server nor the browser fallback can process
+		 * them yet, so they should fall through to the standard unsupported
+		 * mime-type error rather than be stored unprocessable.
+		 */
+		if ( ! $bypass_mime_check ) {
+			$still_heic_mime_types = array( 'image/heic', 'image/heif' );
+			$files                 = $request->get_file_params();
 
-		$schema['properties']['image_output_format'] = array(
-			'description' => __( 'The output MIME type this image should be converted to, based on the image_editor_output_format filter. Null if no conversion is needed.', 'gutenberg' ),
-			'type'        => array( 'string', 'null' ),
-			'context'     => array( 'edit' ),
-			'readonly'    => true,
-		);
-
-		$schema['properties']['image_save_progressive'] = array(
-			'description' => __( 'Whether to use progressive/interlaced encoding when saving this image.', 'gutenberg' ),
-			'type'        => 'boolean',
-			'context'     => array( 'edit' ),
-			'readonly'    => true,
-		);
-
-		// Enumerate the registered sub-sizes so the schema documents exactly which
-		// keys may appear under "sizes".
-		$size_quality_properties = array();
-		foreach ( array_keys( wp_get_registered_image_subsizes() ) as $size_name ) {
-			$size_quality_properties[ $size_name ] = array(
-				'type'    => 'integer',
-				'minimum' => 1,
-				'maximum' => 100,
-			);
-		}
-
-		$schema['properties']['image_quality'] = array(
-			'description' => __( 'Encode quality (1-100) from the wp_editor_set_quality filter, resolved against the output MIME type. "default" applies to the full-size image; "sizes" lists per-registered-size overrides where the filtered value differs from "default".', 'gutenberg' ),
-			'type'        => 'object',
-			'context'     => array( 'edit' ),
-			'readonly'    => true,
-			'properties'  => array(
-				'default' => array(
-					'type'    => 'integer',
-					'minimum' => 1,
-					'maximum' => 100,
-				),
-				'sizes'   => array(
-					'type'       => 'object',
-					'properties' => $size_quality_properties,
-				),
-			),
-		);
-
-		return $schema;
-	}
-
-	/**
-	 * Prepares a single attachment output for response.
-	 *
-	 * Ensures 'missing_image_sizes' is set for PDFs and not just images.
-	 * Adds 'exif_orientation' for images that need client-side rotation.
-	 *
-	 * @param WP_Post         $item    Attachment object.
-	 * @param WP_REST_Request $request Request object.
-	 * @return WP_REST_Response Response object.
-	 */
-	public function prepare_item_for_response( $item, $request ): WP_REST_Response {
-		$response = parent::prepare_item_for_response( $item, $request );
-
-		$data = $response->get_data();
-
-		$fields = $this->get_fields_for_response( $request );
-
-		// Add EXIF orientation for images.
-		if ( rest_is_field_included( 'exif_orientation', $fields ) ) {
-			if ( wp_attachment_is_image( $item ) ) {
-				$metadata = wp_get_attachment_metadata( $item->ID, true );
-
-				// Get the EXIF orientation from the image metadata.
-				// This is stored by wp_read_image_metadata() during upload.
-				// Values:
-				//   0 = undefined (no EXIF data), treat as no rotation needed
-				//   1 = normal (no rotation needed)
-				//   2-8 = various rotations/flips needed
-				$orientation = 1; // Default: no rotation needed.
-				if (
-					is_array( $metadata ) &&
-					isset( $metadata['image_meta']['orientation'] ) &&
-					(int) $metadata['image_meta']['orientation'] > 0
-				) {
-					$orientation = (int) $metadata['image_meta']['orientation'];
-				}
-
-				$data['exif_orientation'] = $orientation;
+			if (
+				! empty( $files['file']['type'] ) &&
+				in_array( $files['file']['type'], $still_heic_mime_types, true )
+			) {
+				$bypass_mime_check = true;
 			}
 		}
 
-		// Add per-file output format for images.
-		if ( rest_is_field_included( 'image_output_format', $fields ) ) {
-			if ( wp_attachment_is_image( $item ) ) {
-				$mime_type = get_post_mime_type( $item );
-				$filename  = get_attached_file( $item->ID );
-
-				/** This filter is documented in wp-includes/class-wp-image-editor.php */
-				$output_formats = apply_filters(
-					'image_editor_output_format', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-					array( $mime_type => $mime_type ),
-					$filename ? $filename : '',
-					$mime_type
-				);
-
-				$output_mime                 = $output_formats[ $mime_type ] ?? $mime_type;
-				$data['image_output_format'] = ( $output_mime !== $mime_type ) ? $output_mime : null;
-			}
+		if ( $bypass_mime_check ) {
+			add_filter( 'wp_prevent_unsupported_mime_type_uploads', '__return_false' );
 		}
 
-		// Add progressive/interlaced encoding setting for images.
-		if ( rest_is_field_included( 'image_save_progressive', $fields ) ) {
-			if ( wp_attachment_is_image( $item ) ) {
-				$mime_type = get_post_mime_type( $item );
+		$result = parent::create_item_permissions_check( $request );
 
-				/** This filter is documented in wp-includes/class-wp-image-editor-imagick.php */
-				$data['image_save_progressive'] = (bool) apply_filters(
-					'image_save_progressive', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-					false,
-					$mime_type
-				);
-			}
+		if ( $bypass_mime_check ) {
+			remove_filter( 'wp_prevent_unsupported_mime_type_uploads', '__return_false' );
 		}
 
-		// Add per-file, size-aware encode quality for images.
-		if ( rest_is_field_included( 'image_quality', $fields ) ) {
-			if ( wp_attachment_is_image( $item ) ) {
-				$mime_type = (string) get_post_mime_type( $item );
-				$filename  = get_attached_file( $item->ID );
-
-				// Resolve the output MIME type the same way core's
-				// WP_Image_Editor::set_quality() does: quality is filtered
-				// against the format the file will actually be saved as.
-				/** This filter is documented in wp-includes/class-wp-image-editor.php */
-				$output_formats = apply_filters(
-					'image_editor_output_format', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-					array( $mime_type => $mime_type ),
-					$filename ? $filename : '',
-					$mime_type
-				);
-				$output_mime    = $output_formats[ $mime_type ] ?? $mime_type;
-
-				$metadata    = wp_get_attachment_metadata( $item->ID, true );
-				$full_width  = max( 0, ( is_array( $metadata ) && isset( $metadata['width'] ) ) ? (int) $metadata['width'] : 0 );
-				$full_height = max( 0, ( is_array( $metadata ) && isset( $metadata['height'] ) ) ? (int) $metadata['height'] : 0 );
-
-				$full_quality = $this->get_image_encode_quality(
-					$output_mime,
-					array(
-						'width'  => $full_width,
-						'height' => $full_height,
-					)
-				);
-
-				$size_quality = array();
-				foreach ( wp_get_registered_image_subsizes() as $size_name => $size_data ) {
-					$quality = $this->get_image_encode_quality(
-						$output_mime,
-						array(
-							'width'  => (int) $size_data['width'],
-							'height' => (int) $size_data['height'],
-						)
-					);
-
-					// Only report sizes that diverge from the full-size value
-					// to keep the response payload small.
-					if ( $quality !== $full_quality ) {
-						$size_quality[ $size_name ] = $quality;
-					}
-				}
-
-				$data['image_quality'] = array(
-					'default' => $full_quality,
-					'sizes'   => $size_quality,
-				);
-			}
-		}
-
-		if (
-			rest_is_field_included( 'missing_image_sizes', $fields ) &&
-			empty( $data['missing_image_sizes'] )
-		) {
-			$mime_type = get_post_mime_type( $item );
-
-			if ( 'application/pdf' === $mime_type ) {
-				$metadata = wp_get_attachment_metadata( $item->ID, true );
-
-				if ( ! is_array( $metadata ) ) {
-					$metadata = array();
-				}
-
-				$metadata['sizes'] = $metadata['sizes'] ?? array();
-
-				$fallback_sizes = array(
-					'thumbnail',
-					'medium',
-					'large',
-				);
-
-				// The filter might have been added by ::create_item().
-				remove_filter( 'fallback_intermediate_image_sizes', '__return_empty_array', 100 );
-
-				/** This filter is documented in wp-admin/includes/image.php */
-				$fallback_sizes = apply_filters( 'fallback_intermediate_image_sizes', $fallback_sizes, $metadata ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-
-				$registered_sizes = wp_get_registered_image_subsizes();
-				$merged_sizes     = array_keys( array_intersect_key( $registered_sizes, array_flip( $fallback_sizes ) ) );
-
-				$missing_image_sizes         = array_diff( $merged_sizes, array_keys( $metadata['sizes'] ) );
-				$data['missing_image_sizes'] = $missing_image_sizes;
-			}
-		}
-
-		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
-		$data    = $this->add_additional_fields_to_object( $data, $request );
-		$data    = $this->filter_response_by_context( $data, $context );
-
-		$links = $response->get_links();
-
-		$response = rest_ensure_response( $data );
-
-		foreach ( $links as $rel => $rel_links ) {
-			foreach ( $rel_links as $link ) {
-				$response->add_link( $rel, $link['href'], $link['attributes'] );
-			}
-		}
-
-		return $response;
+		return $result;
 	}
 
 	/**
@@ -809,396 +566,246 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	}
 
 	/**
-	 * Validates the `sub_sizes` file names against what this attachment produced.
+	 * Prepares a single attachment output for response.
 	 *
-	 * The {@see self::finalize_item()} method stores the client-supplied `file`
-	 * and `original_image` values in the attachment metadata, where they are
-	 * later resolved within the attachment's upload directory and read or deleted
-	 * (for example by {@see wp_get_original_image_path()}, {@see wp_getimagesize()},
-	 * and {@see wp_delete_attachment_files()}).
+	 * Ensures 'missing_image_sizes' is set for PDFs and not just images.
+	 * Adds 'exif_orientation' for images that need client-side rotation.
 	 *
-	 * Every file the sideload endpoint creates is recorded under
-	 * {@see self::META_KEY_SIDELOAD_FILE_NAME} as it is produced, using
-	 * server-generated names. finalize accepts a `file` or `original_image`
-	 * value only when it matches one of those recorded names (or the
-	 * attachment's own attached file, which it definitionally owns).
-	 *
-	 * @param int   $attachment_id The attachment being finalized.
-	 * @param array $sub_sizes     Sub-size metadata collected from sideloads.
-	 * @return true|WP_Error True if every file name was produced here, WP_Error otherwise.
-	 *
-	 * @phpstan-param list<Image_Sub_Size> $sub_sizes
+	 * @param WP_Post         $item    Attachment object.
+	 * @param WP_REST_Request $request Request object.
+	 * @return WP_REST_Response Response object.
 	 */
-	protected function validate_sub_size_provenance( int $attachment_id, array $sub_sizes ) {
-		$allowed = $this->get_sideloaded_file_names( $attachment_id );
+	public function prepare_item_for_response( $item, $request ): WP_REST_Response {
+		$response = parent::prepare_item_for_response( $item, $request );
 
-		foreach ( $sub_sizes as $sub_size ) {
-			foreach ( array( 'file', 'original_image' ) as $key ) {
-				/*
-				 * Every value that was sent is checked, no matter how unlikely
-				 * a name it looks. A loose emptiness test would wave through
-				 * '0', which is a valid one-character name as far as the schema
-				 * is concerned and is stored like any other. A value the schema
-				 * types as a string but which arrives as something else is
-				 * rejected rather than skipped, so a subclass which widens the
-				 * schema cannot pass an unchecked value on to the metadata.
-				 */
-				if ( ! isset( $sub_size[ $key ] ) ) {
-					continue;
+		$data = $response->get_data();
+
+		$fields = $this->get_fields_for_response( $request );
+
+		// Add EXIF orientation for images.
+		if ( rest_is_field_included( 'exif_orientation', $fields ) ) {
+			if ( wp_attachment_is_image( $item ) ) {
+				$metadata = wp_get_attachment_metadata( $item->ID, true );
+
+				// Get the EXIF orientation from the image metadata.
+				// This is stored by wp_read_image_metadata() during upload.
+				// Values:
+				//   0 = undefined (no EXIF data), treat as no rotation needed
+				//   1 = normal (no rotation needed)
+				//   2-8 = various rotations/flips needed
+				$orientation = 1; // Default: no rotation needed.
+				if (
+					is_array( $metadata ) &&
+					isset( $metadata['image_meta']['orientation'] ) &&
+					(int) $metadata['image_meta']['orientation'] > 0
+				) {
+					$orientation = (int) $metadata['image_meta']['orientation'];
 				}
 
-				if ( ! is_string( $sub_size[ $key ] ) || ! in_array( $sub_size[ $key ], $allowed, true ) ) {
-					return new WP_Error(
-						'rest_invalid_sub_size_file',
-						__( 'Invalid sub-size file name. File names must have been produced by a prior sideload for this attachment.', 'gutenberg' ),
-						array( 'status' => 400 )
-					);
-				}
+				$data['exif_orientation'] = $orientation;
 			}
 		}
 
-		return true;
-	}
+		// Add per-file output format for images.
+		if ( rest_is_field_included( 'image_output_format', $fields ) ) {
+			if ( wp_attachment_is_image( $item ) ) {
+				$mime_type = get_post_mime_type( $item );
+				$filename  = get_attached_file( $item->ID );
 
-	/**
-	 * Returns the file names which a finalize request may store for an attachment.
-	 *
-	 * The set is the file names the sideload endpoint recorded as it produced
-	 * them (ref. {@see self::META_KEY_SIDELOAD_FILE_NAME}), plus the attachment's own
-	 * attached file - accepted in both its uploads-relative and basename form so
-	 * a scaled main-file pointer validates regardless of which the client
-	 * echoes - plus the names already stored in the attachment's own metadata.
-	 *
-	 * @param int  $attachment_id      The attachment being finalized.
-	 * @param bool $include_provenance Whether to include the sideload provenance rows.
-	 *                                 Pass false to get only the names recoverable from
-	 *                                 the attached file and stored metadata, e.g. to decide
-	 *                                 whether a provenance row is still needed. Default true.
-	 * @return string[] File names that may appear in the finalize submission.
-	 *
-	 * @phpstan-return list<string>
-	 */
-	protected function get_sideloaded_file_names( int $attachment_id, bool $include_provenance = true ): array {
-		$allowed = array();
+				/** This filter is documented in wp-includes/class-wp-image-editor.php */
+				$output_formats = apply_filters(
+					'image_editor_output_format', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+					array( $mime_type => $mime_type ),
+					$filename ? $filename : '',
+					$mime_type
+				);
 
-		if ( $include_provenance ) {
-			foreach ( (array) get_post_meta( $attachment_id, self::META_KEY_SIDELOAD_FILE_NAME ) as $name ) {
-				if ( is_string( $name ) && '' !== $name ) {
-					$allowed[] = $name;
-				}
+				$output_mime                 = $output_formats[ $mime_type ] ?? $mime_type;
+				$data['image_output_format'] = ( $output_mime !== $mime_type ) ? $output_mime : null;
 			}
 		}
 
-		$attached_file = get_post_meta( $attachment_id, '_wp_attached_file', true );
-		if ( is_string( $attached_file ) && strlen( $attached_file ) > 0 ) {
-			$allowed[] = $attached_file;
-			$allowed[] = wp_basename( $attached_file );
-		}
+		// Add progressive/interlaced encoding setting for images.
+		if ( rest_is_field_included( 'image_save_progressive', $fields ) ) {
+			if ( wp_attachment_is_image( $item ) ) {
+				$mime_type = get_post_mime_type( $item );
 
-		/*
-		 * Names already stored in this attachment's metadata passed this same
-		 * check when they were written, so accepting them again introduces
-		 * nothing new.
-		 */
-		$metadata = wp_get_attachment_metadata( $attachment_id, true );
-		if ( is_array( $metadata ) ) {
-			$stored = array(
-				$metadata['file'] ?? null,
-				$metadata['original_image'] ?? null,
-				$metadata[ self::META_KEY_SOURCE_IMAGE ] ?? null,
-				$metadata['animated_video'] ?? null,
-				$metadata['animated_video_poster'] ?? null,
-			);
-
-			if ( ! empty( $metadata['sizes'] ) && is_array( $metadata['sizes'] ) ) {
-				foreach ( $metadata['sizes'] as $size ) {
-					$stored[] = is_array( $size ) ? ( $size['file'] ?? null ) : null;
-				}
-			}
-
-			foreach ( $stored as $name ) {
-				if ( is_string( $name ) && '' !== $name ) {
-					$allowed[] = $name;
-					$allowed[] = wp_basename( $name );
-				}
-			}
-		}
-
-		return array_values( array_unique( $allowed ) );
-	}
-
-	/**
-	 * Returns the uploads subdirectory an attachment is stored in.
-	 *
-	 * Used to place a sideloaded file alongside the attachment it extends. The
-	 * result is concatenated into a filesystem path by the caller, so it is
-	 * returned only when the attachment resolves inside the uploads directory
-	 * and the stored path is well formed.
-	 *
-	 * @param string $attached_file Absolute path to the attached file.
-	 * @return string|null Subdirectory beginning with a slash, an empty string when the
-	 *                     attachment sits in the base directory, or null when the
-	 *                     attachment is not inside the uploads directory.
-	 *
-	 * @phpstan-param non-empty-string $attached_file
-	 */
-	protected function get_attachment_upload_subdir( string $attached_file ): ?string {
-		$uploads = wp_get_upload_dir();
-		if ( empty( $uploads['basedir'] ) ) {
-			return null;
-		}
-
-		$basedir  = untrailingslashit( wp_normalize_path( $uploads['basedir'] ) );
-		$file_dir = wp_normalize_path( dirname( $attached_file ) );
-
-		/*
-		 * The attachment's directory must be the uploads base directory itself
-		 * or a directory inside it. The trailing slash in the prefix comparison
-		 * keeps a sibling directory that merely shares the prefix (for example
-		 * 'uploads-elsewhere' next to 'uploads') from matching.
-		 */
-		if ( $file_dir !== $basedir && ! str_starts_with( $file_dir, trailingslashit( $basedir ) ) ) {
-			return null;
-		}
-
-		$subdir = (string) substr( $file_dir, strlen( $basedir ) );
-
-		// A prefix match alone does not rule out a path that climbs back out.
-		if ( in_array( '..', explode( '/', $subdir ), true ) ) {
-			return null;
-		}
-
-		return $subdir;
-	}
-
-	/**
-	 * Finalizes an attachment after client-side media processing.
-	 *
-	 * Applies the sub-size metadata collected from sideload responses in a
-	 * single metadata update, then triggers the 'wp_generate_attachment_metadata'
-	 * filter so that server-side plugins can process the attachment after all
-	 * client-side operations (upload, thumbnail generation, sideloads) are
-	 * complete.
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return WP_REST_Response|WP_Error Response object on success, WP_Error object on failure.
-	 */
-	public function finalize_item( WP_REST_Request $request ) {
-		$attachment_id = (int) $request['id'];
-
-		$post = $this->get_post( $attachment_id );
-		if ( is_wp_error( $post ) ) {
-			return $post;
-		}
-
-		/**
-		 * Sub-size metadata collected from sideload responses. Confirm every
-		 * file name was produced by a prior sideload for this attachment before
-		 * storing it, so a client cannot make finalize record (and later read or
-		 * delete) another attachment's files.
-		 *
-		 * @var list<Image_Sub_Size> $sub_sizes
-		 */
-		$sub_sizes  = $request['sub_sizes'] ?? array();
-		$provenance = $this->validate_sub_size_provenance( $attachment_id, $sub_sizes );
-		if ( is_wp_error( $provenance ) ) {
-			return $provenance;
-		}
-
-		$metadata = wp_get_attachment_metadata( $attachment_id );
-		if ( ! is_array( $metadata ) ) {
-			$metadata = array();
-		}
-
-		// Apply all sub-size metadata collected from sideload responses.
-		foreach ( $sub_sizes as $sub_size ) {
-			$image_size = $sub_size['image_size'];
-
-			// When multiple size names share identical dimensions the client
-			// sends a single sub-size entry with an array of names. Register the
-			// same file under each name.
-			if ( is_array( $image_size ) ) {
-				/*
-				 * Arrays carry regular sizes only, as the sideload endpoint
-				 * enforces. Each special size names a single file handled by one
-				 * of the branches below, so grouping one under a shared file
-				 * would write it to the wrong place; reject rather than guess.
-				 */
-				if ( array_intersect( $image_size, self::get_special_image_sizes() ) ) {
-					return new WP_Error(
-						'rest_invalid_sub_size_name',
-						__( 'A grouped sub-size entry may only name regular image sizes.', 'gutenberg' ),
-						array( 'status' => 400 )
-					);
-				}
-
-				// As below: `file` is not required by the schema, and a size
-				// entry that names no file is not worth recording.
-				if ( empty( $sub_size['file'] ) ) {
-					continue;
-				}
-
-				$metadata['sizes'] = $metadata['sizes'] ?? array();
-
-				foreach ( $image_size as $name ) {
-					$metadata['sizes'][ $name ] = array(
-						'width'     => $sub_size['width'] ?? 0,
-						'height'    => $sub_size['height'] ?? 0,
-						'file'      => $sub_size['file'],
-						'mime-type' => $sub_size['mime_type'] ?? '',
-						'filesize'  => $sub_size['filesize'] ?? 0,
-					);
-				}
-				continue;
-			}
-
-			if ( 'original' === $image_size || 'scaled' === $image_size ) {
-				// Skip malformed entries so a bad payload cannot blank out the
-				// main file metadata.
-				if ( empty( $sub_size['file'] ) ) {
-					continue;
-				}
-
-				/*
-				 * Record the supplied full-size image (from sideload_item()) as
-				 * the main file, keeping the current attached file as
-				 * `original_image`. A 'scaled' image is downsized and an
-				 * 'original' image is rotated; both have any EXIF orientation
-				 * already applied by the client.
-				 */
-				if ( ! empty( $sub_size['original_image'] ) ) {
-					$metadata['original_image'] = $sub_size['original_image'];
-				}
-				$metadata['width']    = $sub_size['width'] ?? 0;
-				$metadata['height']   = $sub_size['height'] ?? 0;
-				$metadata['filesize'] = $sub_size['filesize'] ?? 0;
-				$metadata['file']     = $sub_size['file'];
-
-				/*
-				 * The supplied image has its orientation applied already, so
-				 * reset the stored value (from the upload) to 1, as
-				 * wp_create_image_subsizes() does for both its scale and rotate
-				 * paths. Otherwise exif_orientation would still report the
-				 * pre-rotation value and the client would rotate the image
-				 * again on a re-fetch.
-				 */
-				if ( ! empty( $metadata['image_meta']['orientation'] ) ) {
-					$metadata['image_meta']['orientation'] = 1;
-				}
-			} elseif ( self::IMAGE_SIZE_SOURCE_ORIGINAL === $image_size ) {
-				// As above: `file` is not required by the schema, and each of
-				// these sizes is nothing but the file it names.
-				if ( empty( $sub_size['file'] ) ) {
-					continue;
-				}
-
-				/*
-				 * Source-format original: stored under its own meta key so the
-				 * scaled-sideload flow (which writes 'original_image') cannot
-				 * clobber it. 'original_image' keeps pointing at the
-				 * web-viewable JPEG derivative. Cleanup on attachment delete
-				 * is handled by a delete_attachment hook that reads this key.
-				 */
-				$metadata[ self::META_KEY_SOURCE_IMAGE ] = $sub_size['file'];
-			} elseif ( self::IMAGE_SIZE_ANIMATED_VIDEO === $image_size ) {
-				if ( empty( $sub_size['file'] ) ) {
-					continue;
-				}
-
-				/*
-				 * Converted-video companion of an animated GIF. Stored under its
-				 * own meta key; 'original_image' keeps pointing at the GIF. The
-				 * editor reads this key to switch the block to a video; companion
-				 * cleanup lives in lib/media/animated-gif-to-video.php.
-				 */
-				$metadata[ self::META_KEY_ANIMATED_VIDEO ] = $sub_size['file'];
-			} elseif ( self::IMAGE_SIZE_ANIMATED_VIDEO_POSTER === $image_size ) {
-				if ( empty( $sub_size['file'] ) ) {
-					continue;
-				}
-
-				/*
-				 * Static first-frame poster for the converted video. Used as the
-				 * video block's poster and deleted alongside the video. See
-				 * lib/media/animated-gif-to-video.php.
-				 */
-				$metadata[ self::META_KEY_ANIMATED_VIDEO_POSTER ] = $sub_size['file'];
-			} else {
-				if ( empty( $sub_size['file'] ) ) {
-					continue;
-				}
-
-				$metadata['sizes'] = $metadata['sizes'] ?? array();
-
-				$metadata['sizes'][ $image_size ] = array(
-					'width'     => $sub_size['width'] ?? 0,
-					'height'    => $sub_size['height'] ?? 0,
-					'file'      => $sub_size['file'],
-					'mime-type' => $sub_size['mime_type'] ?? '',
-					'filesize'  => $sub_size['filesize'] ?? 0,
+				/** This filter is documented in wp-includes/class-wp-image-editor-imagick.php */
+				$data['image_save_progressive'] = (bool) apply_filters(
+					'image_save_progressive', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+					false,
+					$mime_type
 				);
 			}
 		}
 
-		/** This filter is documented in wp-admin/includes/image.php */
-		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-		$metadata = apply_filters( 'wp_generate_attachment_metadata', $metadata, $attachment_id, 'update' );
+		// Add per-file, size-aware encode quality for images.
+		if ( rest_is_field_included( 'image_quality', $fields ) ) {
+			if ( wp_attachment_is_image( $item ) ) {
+				$mime_type = (string) get_post_mime_type( $item );
+				$filename  = get_attached_file( $item->ID );
 
-		wp_update_attachment_metadata( $attachment_id, $metadata );
+				// Resolve the output MIME type the same way core's
+				// WP_Image_Editor::set_quality() does: quality is filtered
+				// against the format the file will actually be saved as.
+				/** This filter is documented in wp-includes/class-wp-image-editor.php */
+				$output_formats = apply_filters(
+					'image_editor_output_format', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+					array( $mime_type => $mime_type ),
+					$filename ? $filename : '',
+					$mime_type
+				);
+				$output_mime    = $output_formats[ $mime_type ] ?? $mime_type;
 
-		/*
-		 * Drop only the provenance rows this request consumed, now that the
-		 * names are recorded in the metadata itself. A row is dropped only once
-		 * its name is recoverable from the stored metadata, so a name the
-		 * 'wp_generate_attachment_metadata' filter removed - or that a failed
-		 * update never persisted - keeps its row and the retried request the
-		 * endpoint documents as idempotent still validates. Rows for sideloads
-		 * that have not been finalized yet survive for a later call, and passing
-		 * the value makes the delete a no-op when the row is already gone, so a
-		 * retried request cleans up without error. Any rows left behind by an
-		 * abandoned upload are removed with the attachment itself.
-		 *
-		 * Retrying is idempotent for the request as it was sent. A name is only
-		 * unavailable to a retry once a later finalize has overwritten the same
-		 * size with a newly sideloaded file, which drops the earlier name from
-		 * the metadata the retry recovers it from.
-		 *
-		 * The names are collected before deleting so a request which repeats
-		 * the same name across many sub-sizes still issues one query per
-		 * distinct name.
-		 */
-		$recoverable = $this->get_sideloaded_file_names( $attachment_id, false );
-		$consumed    = array();
-		foreach ( $sub_sizes as $sub_size ) {
-			foreach ( array( 'file', 'original_image' ) as $key ) {
-				// Matches the set validate_sub_size_provenance() checked, so
-				// every name a request was allowed to store is also cleaned up.
-				if (
-					isset( $sub_size[ $key ] ) &&
-					is_string( $sub_size[ $key ] ) &&
-					in_array( $sub_size[ $key ], $recoverable, true )
-				) {
-					$consumed[] = $sub_size[ $key ];
+				$metadata    = wp_get_attachment_metadata( $item->ID, true );
+				$full_width  = max( 0, ( is_array( $metadata ) && isset( $metadata['width'] ) ) ? (int) $metadata['width'] : 0 );
+				$full_height = max( 0, ( is_array( $metadata ) && isset( $metadata['height'] ) ) ? (int) $metadata['height'] : 0 );
+
+				$full_quality = $this->get_image_encode_quality(
+					$output_mime,
+					array(
+						'width'  => $full_width,
+						'height' => $full_height,
+					)
+				);
+
+				$size_quality = array();
+				foreach ( wp_get_registered_image_subsizes() as $size_name => $size_data ) {
+					$quality = $this->get_image_encode_quality(
+						$output_mime,
+						array(
+							'width'  => (int) $size_data['width'],
+							'height' => (int) $size_data['height'],
+						)
+					);
+
+					// Only report sizes that diverge from the full-size value
+					// to keep the response payload small.
+					if ( $quality !== $full_quality ) {
+						$size_quality[ $size_name ] = $quality;
+					}
 				}
+
+				$data['image_quality'] = array(
+					'default' => $full_quality,
+					'sizes'   => $size_quality,
+				);
 			}
 		}
 
-		foreach ( array_unique( $consumed ) as $file_name ) {
-			delete_post_meta( $attachment_id, self::META_KEY_SIDELOAD_FILE_NAME, wp_slash( $file_name ) );
+		if (
+			rest_is_field_included( 'missing_image_sizes', $fields ) &&
+			empty( $data['missing_image_sizes'] )
+		) {
+			$mime_type = get_post_mime_type( $item );
+
+			if ( 'application/pdf' === $mime_type ) {
+				$metadata = wp_get_attachment_metadata( $item->ID, true );
+
+				if ( ! is_array( $metadata ) ) {
+					$metadata = array();
+				}
+
+				$metadata['sizes'] = $metadata['sizes'] ?? array();
+
+				$fallback_sizes = array(
+					'thumbnail',
+					'medium',
+					'large',
+				);
+
+				// The filter might have been added by ::create_item().
+				remove_filter( 'fallback_intermediate_image_sizes', '__return_empty_array', 100 );
+
+				/** This filter is documented in wp-admin/includes/image.php */
+				$fallback_sizes = apply_filters( 'fallback_intermediate_image_sizes', $fallback_sizes, $metadata ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
+				$registered_sizes = wp_get_registered_image_subsizes();
+				$merged_sizes     = array_keys( array_intersect_key( $registered_sizes, array_flip( $fallback_sizes ) ) );
+
+				$missing_image_sizes         = array_diff( $merged_sizes, array_keys( $metadata['sizes'] ) );
+				$data['missing_image_sizes'] = $missing_image_sizes;
+			}
 		}
 
-		$response_request = new WP_REST_Request(
-			WP_REST_Server::READABLE,
-			rest_get_route_for_post( $attachment_id )
+		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
+		$data    = $this->add_additional_fields_to_object( $data, $request );
+		$data    = $this->filter_response_by_context( $data, $context );
+
+		$links = $response->get_links();
+
+		$response = rest_ensure_response( $data );
+
+		foreach ( $links as $rel => $rel_links ) {
+			foreach ( $rel_links as $link ) {
+				$response->add_link( $rel, $link['href'], $link['attributes'] );
+			}
+		}
+
+		return $response;
+	}
+
+	/**
+	 * Retrieves the attachment's schema, conforming to JSON Schema.
+	 *
+	 * Adds exif_orientation field to the schema.
+	 *
+	 * @return array Item schema data.
+	 */
+	public function get_item_schema() {
+		$schema = parent::get_item_schema();
+
+		$schema['properties']['exif_orientation'] = array(
+			'description' => __( 'EXIF orientation value from the original image. Values 1-8 follow the EXIF specification. A value other than 1 indicates the image needs rotation.', 'gutenberg' ),
+			'type'        => 'integer',
+			'context'     => array( 'edit' ),
+			'readonly'    => true,
 		);
 
-		$response_request['context'] = 'edit';
+		$schema['properties']['image_output_format'] = array(
+			'description' => __( 'The output MIME type this image should be converted to, based on the image_editor_output_format filter. Null if no conversion is needed.', 'gutenberg' ),
+			'type'        => array( 'string', 'null' ),
+			'context'     => array( 'edit' ),
+			'readonly'    => true,
+		);
 
-		if ( isset( $request['_fields'] ) ) {
-			$response_request['_fields'] = $request['_fields'];
+		$schema['properties']['image_save_progressive'] = array(
+			'description' => __( 'Whether to use progressive/interlaced encoding when saving this image.', 'gutenberg' ),
+			'type'        => 'boolean',
+			'context'     => array( 'edit' ),
+			'readonly'    => true,
+		);
+
+		// Enumerate the registered sub-sizes so the schema documents exactly which
+		// keys may appear under "sizes".
+		$size_quality_properties = array();
+		foreach ( array_keys( wp_get_registered_image_subsizes() ) as $size_name ) {
+			$size_quality_properties[ $size_name ] = array(
+				'type'    => 'integer',
+				'minimum' => 1,
+				'maximum' => 100,
+			);
 		}
 
-		return $this->prepare_item_for_response( $post, $response_request );
+		$schema['properties']['image_quality'] = array(
+			'description' => __( 'Encode quality (1-100) from the wp_editor_set_quality filter, resolved against the output MIME type. "default" applies to the full-size image; "sizes" lists per-registered-size overrides where the filtered value differs from "default".', 'gutenberg' ),
+			'type'        => 'object',
+			'context'     => array( 'edit' ),
+			'readonly'    => true,
+			'properties'  => array(
+				'default' => array(
+					'type'    => 'integer',
+					'minimum' => 1,
+					'maximum' => 100,
+				),
+				'sizes'   => array(
+					'type'       => 'object',
+					'properties' => $size_quality_properties,
+				),
+			),
+		);
+
+		return $schema;
 	}
 
 	/**
@@ -1212,57 +819,6 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 */
 	public function sideload_item_permissions_check( $request ) {
 		return $this->edit_media_item_permissions_check( $request );
-	}
-
-	/**
-	 * Filters wp_unique_filename during sideloads.
-	 *
-	 * wp_unique_filename() will always add numeric suffix if the name looks like a sub-size to avoid conflicts.
-	 * Adding this closure to the filter helps work around this safeguard.
-	 *
-	 * Example: when uploading myphoto.jpeg, WordPress normally creates myphoto-150x150.jpeg,
-	 * and when uploading myphoto-150x150.jpeg, it will be renamed to myphoto-150x150-1.jpeg
-	 * However, here it is desired not to add the suffix in order to maintain the same
-	 * naming convention as if the file was uploaded regularly.
-	 *
-	 * The suffix is only dropped when no file of that name already exists in $dir,
-	 * so this never returns a name that would overwrite one. The unsuffixed name
-	 * must also derive from the attachment's own file name, and
-	 * {@see self::sideload_item()} pins the upload to the attachment's own
-	 * directory, so any name returned here belongs to the attachment being
-	 * extended.
-	 *
-	 * @link https://github.com/WordPress/wordpress-develop/blob/30954f7ac0840cfdad464928021d7f380940c347/src/wp-includes/functions.php#L2576-L2582
-	 *
-	 * @param string      $filename            Unique file name.
-	 * @param string      $dir                 Directory path.
-	 * @param int|string  $number              The highest number that was used to make the file name unique
-	 *                                         or an empty string if unused.
-	 * @param string|null $attachment_filename Original attachment file name.
-	 * @return string Filtered file name.
-	 */
-	private static function filter_wp_unique_filename( $filename, $dir, $number, $attachment_filename ) {
-		if ( ! is_int( $number ) || ! $attachment_filename ) {
-			return $filename;
-		}
-
-		$ext       = pathinfo( $filename, PATHINFO_EXTENSION );
-		$name      = pathinfo( $filename, PATHINFO_FILENAME );
-		$orig_name = pathinfo( $attachment_filename, PATHINFO_FILENAME );
-
-		if ( ! $ext || ! $name ) {
-			return $filename;
-		}
-
-		$matches = array();
-		if ( preg_match( '/(.*)-(\d+x\d+|scaled)-' . $number . '$/', $name, $matches ) ) {
-			$filename_without_suffix = $matches[1] . '-' . $matches[2] . ".$ext";
-			if ( $matches[1] === $orig_name && ! file_exists( "$dir/$filename_without_suffix" ) ) {
-				return $filename_without_suffix;
-			}
-		}
-
-		return $filename;
 	}
 
 	/**
@@ -1339,7 +895,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 *
 	 * @phpstan-return non-empty-list<non-empty-string>
 	 */
-	private static function get_special_image_sizes() {
+	private static function get_special_image_sizes(): array {
 		return array(
 			'original',
 			'scaled',
@@ -1741,6 +1297,450 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		}
 
 		return rest_ensure_response( $sub_size_data );
+	}
+
+	/**
+	 * Filters wp_unique_filename during sideloads.
+	 *
+	 * wp_unique_filename() will always add numeric suffix if the name looks like a sub-size to avoid conflicts.
+	 * Adding this closure to the filter helps work around this safeguard.
+	 *
+	 * Example: when uploading myphoto.jpeg, WordPress normally creates myphoto-150x150.jpeg,
+	 * and when uploading myphoto-150x150.jpeg, it will be renamed to myphoto-150x150-1.jpeg
+	 * However, here it is desired not to add the suffix in order to maintain the same
+	 * naming convention as if the file was uploaded regularly.
+	 *
+	 * The suffix is only dropped when no file of that name already exists in $dir,
+	 * so this never returns a name that would overwrite one. The unsuffixed name
+	 * must also derive from the attachment's own file name, and
+	 * {@see self::sideload_item()} pins the upload to the attachment's own
+	 * directory, so any name returned here belongs to the attachment being
+	 * extended.
+	 *
+	 * @link https://github.com/WordPress/wordpress-develop/blob/30954f7ac0840cfdad464928021d7f380940c347/src/wp-includes/functions.php#L2576-L2582
+	 *
+	 * @param string      $filename            Unique file name.
+	 * @param string      $dir                 Directory path.
+	 * @param int|string  $number              The highest number that was used to make the file name unique
+	 *                                         or an empty string if unused.
+	 * @param string|null $attachment_filename Original attachment file name.
+	 * @return string Filtered file name.
+	 */
+	private static function filter_wp_unique_filename( $filename, $dir, $number, $attachment_filename ) {
+		if ( ! is_int( $number ) || ! $attachment_filename ) {
+			return $filename;
+		}
+
+		$ext       = pathinfo( $filename, PATHINFO_EXTENSION );
+		$name      = pathinfo( $filename, PATHINFO_FILENAME );
+		$orig_name = pathinfo( $attachment_filename, PATHINFO_FILENAME );
+
+		if ( ! $ext || ! $name ) {
+			return $filename;
+		}
+
+		$matches = array();
+		if ( preg_match( '/(.*)-(\d+x\d+|scaled)-' . $number . '$/', $name, $matches ) ) {
+			$filename_without_suffix = $matches[1] . '-' . $matches[2] . ".$ext";
+			if ( $matches[1] === $orig_name && ! file_exists( "$dir/$filename_without_suffix" ) ) {
+				return $filename_without_suffix;
+			}
+		}
+
+		return $filename;
+	}
+
+	/**
+	 * Validates the `sub_sizes` file names against what this attachment produced.
+	 *
+	 * The {@see self::finalize_item()} method stores the client-supplied `file`
+	 * and `original_image` values in the attachment metadata, where they are
+	 * later resolved within the attachment's upload directory and read or deleted
+	 * (for example by {@see wp_get_original_image_path()}, {@see wp_getimagesize()},
+	 * and {@see wp_delete_attachment_files()}).
+	 *
+	 * Every file the sideload endpoint creates is recorded under
+	 * {@see self::META_KEY_SIDELOAD_FILE_NAME} as it is produced, using
+	 * server-generated names. finalize accepts a `file` or `original_image`
+	 * value only when it matches one of those recorded names (or the
+	 * attachment's own attached file, which it definitionally owns).
+	 *
+	 * @param int   $attachment_id The attachment being finalized.
+	 * @param array $sub_sizes     Sub-size metadata collected from sideloads.
+	 * @return true|WP_Error True if every file name was produced here, WP_Error otherwise.
+	 *
+	 * @phpstan-param list<Image_Sub_Size> $sub_sizes
+	 */
+	protected function validate_sub_size_provenance( int $attachment_id, array $sub_sizes ) {
+		$allowed = $this->get_sideloaded_file_names( $attachment_id );
+
+		foreach ( $sub_sizes as $sub_size ) {
+			foreach ( array( 'file', 'original_image' ) as $key ) {
+				/*
+				 * Every value that was sent is checked, no matter how unlikely
+				 * a name it looks. A loose emptiness test would wave through
+				 * '0', which is a valid one-character name as far as the schema
+				 * is concerned and is stored like any other. A value the schema
+				 * types as a string but which arrives as something else is
+				 * rejected rather than skipped, so a subclass which widens the
+				 * schema cannot pass an unchecked value on to the metadata.
+				 */
+				if ( ! isset( $sub_size[ $key ] ) ) {
+					continue;
+				}
+
+				if ( ! is_string( $sub_size[ $key ] ) || ! in_array( $sub_size[ $key ], $allowed, true ) ) {
+					return new WP_Error(
+						'rest_invalid_sub_size_file',
+						__( 'Invalid sub-size file name. File names must have been produced by a prior sideload for this attachment.', 'gutenberg' ),
+						array( 'status' => 400 )
+					);
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Returns the file names which a finalize request may store for an attachment.
+	 *
+	 * The set is the file names the sideload endpoint recorded as it produced
+	 * them (ref. {@see self::META_KEY_SIDELOAD_FILE_NAME}), plus the attachment's own
+	 * attached file - accepted in both its uploads-relative and basename form so
+	 * a scaled main-file pointer validates regardless of which the client
+	 * echoes - plus the names already stored in the attachment's own metadata.
+	 *
+	 * @param int  $attachment_id      The attachment being finalized.
+	 * @param bool $include_provenance Whether to include the sideload provenance rows.
+	 *                                 Pass false to get only the names recoverable from
+	 *                                 the attached file and stored metadata, e.g. to decide
+	 *                                 whether a provenance row is still needed. Default true.
+	 * @return string[] File names that may appear in the finalize submission.
+	 *
+	 * @phpstan-return list<string>
+	 */
+	protected function get_sideloaded_file_names( int $attachment_id, bool $include_provenance = true ): array {
+		$allowed = array();
+
+		if ( $include_provenance ) {
+			foreach ( (array) get_post_meta( $attachment_id, self::META_KEY_SIDELOAD_FILE_NAME ) as $name ) {
+				if ( is_string( $name ) && '' !== $name ) {
+					$allowed[] = $name;
+				}
+			}
+		}
+
+		$attached_file = get_post_meta( $attachment_id, '_wp_attached_file', true );
+		if ( is_string( $attached_file ) && strlen( $attached_file ) > 0 ) {
+			$allowed[] = $attached_file;
+			$allowed[] = wp_basename( $attached_file );
+		}
+
+		/*
+		 * Names already stored in this attachment's metadata passed this same
+		 * check when they were written, so accepting them again introduces
+		 * nothing new.
+		 */
+		$metadata = wp_get_attachment_metadata( $attachment_id, true );
+		if ( is_array( $metadata ) ) {
+			$stored = array(
+				$metadata['file'] ?? null,
+				$metadata['original_image'] ?? null,
+				$metadata[ self::META_KEY_SOURCE_IMAGE ] ?? null,
+				$metadata['animated_video'] ?? null,
+				$metadata['animated_video_poster'] ?? null,
+			);
+
+			if ( ! empty( $metadata['sizes'] ) && is_array( $metadata['sizes'] ) ) {
+				foreach ( $metadata['sizes'] as $size ) {
+					$stored[] = is_array( $size ) ? ( $size['file'] ?? null ) : null;
+				}
+			}
+
+			foreach ( $stored as $name ) {
+				if ( is_string( $name ) && '' !== $name ) {
+					$allowed[] = $name;
+					$allowed[] = wp_basename( $name );
+				}
+			}
+		}
+
+		return array_values( array_unique( $allowed ) );
+	}
+
+	/**
+	 * Returns the uploads subdirectory an attachment is stored in.
+	 *
+	 * Used to place a sideloaded file alongside the attachment it extends. The
+	 * result is concatenated into a filesystem path by the caller, so it is
+	 * returned only when the attachment resolves inside the uploads directory
+	 * and the stored path is well formed.
+	 *
+	 * @param string $attached_file Absolute path to the attached file.
+	 * @return string|null Subdirectory beginning with a slash, an empty string when the
+	 *                     attachment sits in the base directory, or null when the
+	 *                     attachment is not inside the uploads directory.
+	 *
+	 * @phpstan-param non-empty-string $attached_file
+	 */
+	protected function get_attachment_upload_subdir( string $attached_file ): ?string {
+		$uploads = wp_get_upload_dir();
+		if ( empty( $uploads['basedir'] ) ) {
+			return null;
+		}
+
+		$basedir  = untrailingslashit( wp_normalize_path( $uploads['basedir'] ) );
+		$file_dir = wp_normalize_path( dirname( $attached_file ) );
+
+		/*
+		 * The attachment's directory must be the uploads base directory itself
+		 * or a directory inside it. The trailing slash in the prefix comparison
+		 * keeps a sibling directory that merely shares the prefix (for example
+		 * 'uploads-elsewhere' next to 'uploads') from matching.
+		 */
+		if ( $file_dir !== $basedir && ! str_starts_with( $file_dir, trailingslashit( $basedir ) ) ) {
+			return null;
+		}
+
+		$subdir = (string) substr( $file_dir, strlen( $basedir ) );
+
+		// A prefix match alone does not rule out a path that climbs back out.
+		if ( in_array( '..', explode( '/', $subdir ), true ) ) {
+			return null;
+		}
+
+		return $subdir;
+	}
+
+	/**
+	 * Finalizes an attachment after client-side media processing.
+	 *
+	 * Applies the sub-size metadata collected from sideload responses in a
+	 * single metadata update, then triggers the 'wp_generate_attachment_metadata'
+	 * filter so that server-side plugins can process the attachment after all
+	 * client-side operations (upload, thumbnail generation, sideloads) are
+	 * complete.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, WP_Error object on failure.
+	 */
+	public function finalize_item( WP_REST_Request $request ) {
+		$attachment_id = (int) $request['id'];
+
+		$post = $this->get_post( $attachment_id );
+		if ( is_wp_error( $post ) ) {
+			return $post;
+		}
+
+		/**
+		 * Sub-size metadata collected from sideload responses. Confirm every
+		 * file name was produced by a prior sideload for this attachment before
+		 * storing it, so a client cannot make finalize record (and later read or
+		 * delete) another attachment's files.
+		 *
+		 * @var list<Image_Sub_Size> $sub_sizes
+		 */
+		$sub_sizes  = $request['sub_sizes'] ?? array();
+		$provenance = $this->validate_sub_size_provenance( $attachment_id, $sub_sizes );
+		if ( is_wp_error( $provenance ) ) {
+			return $provenance;
+		}
+
+		$metadata = wp_get_attachment_metadata( $attachment_id );
+		if ( ! is_array( $metadata ) ) {
+			$metadata = array();
+		}
+
+		// Apply all sub-size metadata collected from sideload responses.
+		foreach ( $sub_sizes as $sub_size ) {
+			$image_size = $sub_size['image_size'];
+
+			// When multiple size names share identical dimensions the client
+			// sends a single sub-size entry with an array of names. Register the
+			// same file under each name.
+			if ( is_array( $image_size ) ) {
+				/*
+				 * Arrays carry regular sizes only, as the sideload endpoint
+				 * enforces. Each special size names a single file handled by one
+				 * of the branches below, so grouping one under a shared file
+				 * would write it to the wrong place; reject rather than guess.
+				 */
+				if ( array_intersect( $image_size, self::get_special_image_sizes() ) ) {
+					return new WP_Error(
+						'rest_invalid_sub_size_name',
+						__( 'A grouped sub-size entry may only name regular image sizes.', 'gutenberg' ),
+						array( 'status' => 400 )
+					);
+				}
+
+				// As below: `file` is not required by the schema, and a size
+				// entry that names no file is not worth recording.
+				if ( empty( $sub_size['file'] ) ) {
+					continue;
+				}
+
+				$metadata['sizes'] = $metadata['sizes'] ?? array();
+
+				foreach ( $image_size as $name ) {
+					$metadata['sizes'][ $name ] = array(
+						'width'     => $sub_size['width'] ?? 0,
+						'height'    => $sub_size['height'] ?? 0,
+						'file'      => $sub_size['file'],
+						'mime-type' => $sub_size['mime_type'] ?? '',
+						'filesize'  => $sub_size['filesize'] ?? 0,
+					);
+				}
+				continue;
+			}
+
+			if ( 'original' === $image_size || 'scaled' === $image_size ) {
+				// Skip malformed entries so a bad payload cannot blank out the
+				// main file metadata.
+				if ( empty( $sub_size['file'] ) ) {
+					continue;
+				}
+
+				/*
+				 * Record the supplied full-size image (from sideload_item()) as
+				 * the main file, keeping the current attached file as
+				 * `original_image`. A 'scaled' image is downsized and an
+				 * 'original' image is rotated; both have any EXIF orientation
+				 * already applied by the client.
+				 */
+				if ( ! empty( $sub_size['original_image'] ) ) {
+					$metadata['original_image'] = $sub_size['original_image'];
+				}
+				$metadata['width']    = $sub_size['width'] ?? 0;
+				$metadata['height']   = $sub_size['height'] ?? 0;
+				$metadata['filesize'] = $sub_size['filesize'] ?? 0;
+				$metadata['file']     = $sub_size['file'];
+
+				/*
+				 * The supplied image has its orientation applied already, so
+				 * reset the stored value (from the upload) to 1, as
+				 * wp_create_image_subsizes() does for both its scale and rotate
+				 * paths. Otherwise exif_orientation would still report the
+				 * pre-rotation value and the client would rotate the image
+				 * again on a re-fetch.
+				 */
+				if ( ! empty( $metadata['image_meta']['orientation'] ) ) {
+					$metadata['image_meta']['orientation'] = 1;
+				}
+			} elseif ( self::IMAGE_SIZE_SOURCE_ORIGINAL === $image_size ) {
+				// As above: `file` is not required by the schema, and each of
+				// these sizes is nothing but the file it names.
+				if ( empty( $sub_size['file'] ) ) {
+					continue;
+				}
+
+				/*
+				 * Source-format original: stored under its own meta key so the
+				 * scaled-sideload flow (which writes 'original_image') cannot
+				 * clobber it. 'original_image' keeps pointing at the
+				 * web-viewable JPEG derivative. Cleanup on attachment delete
+				 * is handled by a delete_attachment hook that reads this key.
+				 */
+				$metadata[ self::META_KEY_SOURCE_IMAGE ] = $sub_size['file'];
+			} elseif ( self::IMAGE_SIZE_ANIMATED_VIDEO === $image_size ) {
+				if ( empty( $sub_size['file'] ) ) {
+					continue;
+				}
+
+				/*
+				 * Converted-video companion of an animated GIF. Stored under its
+				 * own meta key; 'original_image' keeps pointing at the GIF. The
+				 * editor reads this key to switch the block to a video; companion
+				 * cleanup lives in lib/media/animated-gif-to-video.php.
+				 */
+				$metadata[ self::META_KEY_ANIMATED_VIDEO ] = $sub_size['file'];
+			} elseif ( self::IMAGE_SIZE_ANIMATED_VIDEO_POSTER === $image_size ) {
+				if ( empty( $sub_size['file'] ) ) {
+					continue;
+				}
+
+				/*
+				 * Static first-frame poster for the converted video. Used as the
+				 * video block's poster and deleted alongside the video. See
+				 * lib/media/animated-gif-to-video.php.
+				 */
+				$metadata[ self::META_KEY_ANIMATED_VIDEO_POSTER ] = $sub_size['file'];
+			} else {
+				if ( empty( $sub_size['file'] ) ) {
+					continue;
+				}
+
+				$metadata['sizes'] = $metadata['sizes'] ?? array();
+
+				$metadata['sizes'][ $image_size ] = array(
+					'width'     => $sub_size['width'] ?? 0,
+					'height'    => $sub_size['height'] ?? 0,
+					'file'      => $sub_size['file'],
+					'mime-type' => $sub_size['mime_type'] ?? '',
+					'filesize'  => $sub_size['filesize'] ?? 0,
+				);
+			}
+		}
+
+		/** This filter is documented in wp-admin/includes/image.php */
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		$metadata = apply_filters( 'wp_generate_attachment_metadata', $metadata, $attachment_id, 'update' );
+
+		wp_update_attachment_metadata( $attachment_id, $metadata );
+
+		/*
+		 * Drop only the provenance rows this request consumed, now that the
+		 * names are recorded in the metadata itself. A row is dropped only once
+		 * its name is recoverable from the stored metadata, so a name the
+		 * 'wp_generate_attachment_metadata' filter removed - or that a failed
+		 * update never persisted - keeps its row and the retried request the
+		 * endpoint documents as idempotent still validates. Rows for sideloads
+		 * that have not been finalized yet survive for a later call, and passing
+		 * the value makes the delete a no-op when the row is already gone, so a
+		 * retried request cleans up without error. Any rows left behind by an
+		 * abandoned upload are removed with the attachment itself.
+		 *
+		 * Retrying is idempotent for the request as it was sent. A name is only
+		 * unavailable to a retry once a later finalize has overwritten the same
+		 * size with a newly sideloaded file, which drops the earlier name from
+		 * the metadata the retry recovers it from.
+		 *
+		 * The names are collected before deleting so a request which repeats
+		 * the same name across many sub-sizes still issues one query per
+		 * distinct name.
+		 */
+		$recoverable = $this->get_sideloaded_file_names( $attachment_id, false );
+		$consumed    = array();
+		foreach ( $sub_sizes as $sub_size ) {
+			foreach ( array( 'file', 'original_image' ) as $key ) {
+				// Matches the set validate_sub_size_provenance() checked, so
+				// every name a request was allowed to store is also cleaned up.
+				if (
+					isset( $sub_size[ $key ] ) &&
+					is_string( $sub_size[ $key ] ) &&
+					in_array( $sub_size[ $key ], $recoverable, true )
+				) {
+					$consumed[] = $sub_size[ $key ];
+				}
+			}
+		}
+
+		foreach ( array_unique( $consumed ) as $file_name ) {
+			delete_post_meta( $attachment_id, self::META_KEY_SIDELOAD_FILE_NAME, wp_slash( $file_name ) );
+		}
+
+		$response_request = new WP_REST_Request(
+			WP_REST_Server::READABLE,
+			rest_get_route_for_post( $attachment_id )
+		);
+
+		$response_request['context'] = 'edit';
+
+		if ( isset( $request['_fields'] ) ) {
+			$response_request['_fields'] = $request['_fields'];
+		}
+
+		return $this->prepare_item_for_response( $post, $response_request );
 	}
 
 	/**
