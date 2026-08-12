@@ -133,6 +133,16 @@ function InputField(
 		( dragProps ) => {
 			const { distance, dragging, event, target } = dragProps;
 
+			// The drag gesture is not offered on touch devices, where there is
+			// no cursor affordance for it, and where it's easy to accidentally
+			// change the value when only meaning to tap or move the caret.
+			if (
+				event.pointerType === 'touch' ||
+				event.type.startsWith( 'touch' )
+			) {
+				return;
+			}
+
 			// The `target` prop always references the `input` element while, by
 			// default, the `dragProps.event.target` property would reference the real
 			// event target (i.e. any DOM element that the pointer is hovering while
