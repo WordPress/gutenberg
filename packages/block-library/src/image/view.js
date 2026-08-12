@@ -411,6 +411,13 @@ const { state, actions, callbacks } = store(
 					state.preloadTimers.delete( imageId );
 				}
 			},
+			handleCaptionClick: withSyncEvent( ( event ) => {
+				// Keeps clicks inside the caption (selecting text, following a
+				// link) from bubbling to the overlay, which would otherwise
+				// close the lightbox. Clicks on the image or surrounding area
+				// still close it.
+				event.stopPropagation();
+			} ),
 		},
 		callbacks: {
 			setOverlayStyles() {
