@@ -179,7 +179,7 @@ test.describe( 'Block Notes', () => {
 		).toBeVisible();
 	} );
 
-	test.skip( 'can restore a deleted block note from the snackbar', async ( {
+	test( 'can restore a deleted block note from the snackbar', async ( {
 		page,
 		blockNoteUtils,
 	} ) => {
@@ -215,7 +215,7 @@ test.describe( 'Block Notes', () => {
 		).toHaveText( 'Test comment to restore.' );
 	} );
 
-	test.skip( 'can restore a deleted block note with the undo shortcut', async ( {
+	test( 'can restore a deleted block note with the undo shortcut', async ( {
 		page,
 		pageUtils,
 		blockNoteUtils,
@@ -251,7 +251,7 @@ test.describe( 'Block Notes', () => {
 		).toBeHidden();
 	} );
 
-	test.skip( 'undoes edits made after a delete before restoring the note', async ( {
+	test( 'undoes edits made after a delete before restoring the note', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -1599,7 +1599,7 @@ test.describe( 'Block Notes', () => {
 			await expect( paragraph ).toHaveText( 'Delete the whole note.' );
 		} );
 
-		test.skip( 'restores the inline marker when a deleted note is restored', async ( {
+		test( 'restores the inline marker when a deleted note is restored', async ( {
 			editor,
 			page,
 			blockNoteUtils,
