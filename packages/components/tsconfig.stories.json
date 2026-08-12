@@ -1,19 +1,23 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.dev.base.json",
+	"extends": "../../tsconfig.base.json",
+	/*
+	 * Storybook's component meta extractor needs stories and component
+	 * sources in one project; tests stay in the dev project with jest.
+	 */
 	"compilerOptions": {
+		"noEmit": true,
+		"emitDeclarationOnly": false,
 		"types": [
-			"jest",
 			"gutenberg-env",
-			"gutenberg-test-env",
 			"react-css-custom-properties",
 			"style-imports"
 		]
 	},
-	"files": [ "global.d.ts" ],
-	"include": [ "src/**/test/**/*.ts", "src/**/test/**/*.tsx" ],
+	"files": [ "storybook.d.ts", "src/popover/test/utils/index.tsx" ],
+	// Same JS-only exclusion the package used before the split.
+	"exclude": [ "**/benchmark", "**/test/**", "src/**/stories/**/*.jsx" ],
 	"references": [
-		{ "path": "./tsconfig.build.json" },
 		{ "path": "../a11y/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../date" },
