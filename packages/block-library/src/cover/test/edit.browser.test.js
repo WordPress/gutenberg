@@ -1,5 +1,11 @@
 import { describe, expect, test } from 'vitest';
-import { screen, fireEvent, act, within } from '@testing-library/react';
+import {
+	screen,
+	fireEvent,
+	act,
+	within,
+	waitFor,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
 	initializeEditor,
@@ -130,29 +136,24 @@ describe( 'Cover block', () => {
 		test( 'content position button sets content position', async () => {
 			await setup();
 			await createAndSelectBlock();
+			const cover = screen.getByLabelText( 'Block: Cover' );
+
+			expect( cover ).not.toHaveClass( 'has-custom-content-position' );
 
 			await userEvent.click(
 				screen.getByLabelText( 'Change content position' )
 			);
-
-			expect( screen.getByLabelText( 'Block: Cover' ) ).not.toHaveClass(
-				'has-custom-content-position'
+			await userEvent.click(
+				within( screen.getByRole( 'grid' ) ).getByRole( 'gridcell', {
+					name: 'top left',
+				} )
 			);
 
-			await act( async () =>
-				within( screen.getByRole( 'grid' ) )
-					.getByRole( 'gridcell', {
-						name: 'top left',
-					} )
-					.focus()
+			await waitFor( () =>
+				expect( cover ).toHaveClass( 'has-custom-content-position' )
 			);
 
-			expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveClass(
-				'has-custom-content-position'
-			);
-			expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveClass(
-				'is-position-top-left'
-			);
+			expect( cover ).toHaveClass( 'is-position-top-left' );
 		} );
 
 		test( 'clears media when clear media button clicked', async () => {
