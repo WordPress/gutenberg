@@ -297,6 +297,15 @@ Displays a title with the number of comments.
 -	**Supports:** align, anchor, color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
 -	**Attributes:** level, levelOptions, showCommentsCount, showPostTitle
 
+## Countdown
+
+A countdown timer block with customizable options.
+
+-	**Name:** [core/countdown](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-countdown/)
+-	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
+-	**Supports:** align (full, wide), anchor, ariaLabel, color (background, text), layout, shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** actionOnEnd, actionValue, bgColor, borderColor, endTime, evergreenDays, evergreenHours, evergreenMinutes, innerBlocksBehavior, isEvergreen, showDays, showHours, showMinutes, showSeconds
+
 ## Cover
 
 Add an image or video with a text overlay.

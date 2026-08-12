@@ -4,6 +4,7 @@
 - [Archives](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-archives/) — `core/archives`: Display a date archive of your posts.
 - [Calendar](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-calendar/) — `core/calendar`: A calendar of your site’s posts.
 - [Terms List](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-categories/) — `core/categories`: Display a list of all terms of a given taxonomy.
+- [Countdown](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-countdown/) — `core/countdown`: A countdown timer block with customizable options.
 - [Form](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-form/) — `core/form`: A form.
 - [Input Field](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-form-input/) — `core/form-input`: The basic building block for forms.
 - [Form Submission Notification](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-form-submission-notification/) — `core/form-submission-notification`: Provide a notification message after the form has been submitted.
