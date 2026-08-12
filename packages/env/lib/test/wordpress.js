@@ -70,12 +70,15 @@ describe( 'getLatestWordPressVersion', () => {
 
 		dns.resolve.mockResolvedValue( [ '127.0.0.1' ] );
 		mockStableCheck( got, '6.6.0' );
-		mockMirrorTags( SimpleGit, [ '6.5.8', '6.5.9' ] ); // No 6.6.0 yet.
-		getCache.mockResolvedValue( '6.5.9' );
+		// The mirror's highest tag (6.5.9) deliberately differs from the
+		// cached value (6.4.0) so this proves the cache wins outright,
+		// rather than coincidentally matching what the mirror has.
+		mockMirrorTags( SimpleGit, [ '6.5.8', '6.5.9' ] );
+		getCache.mockResolvedValue( '6.4.0' );
 
 		const version = await getLatestWordPressVersion( cacheOptions );
 
-		expect( version ).toBe( '6.5.9' );
+		expect( version ).toBe( '6.4.0' );
 	} );
 
 	it( 'falls back to the highest version on the mirror when there is no cache at all, such as a fresh CI runner', async () => {

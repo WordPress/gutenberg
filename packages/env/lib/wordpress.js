@@ -170,7 +170,9 @@ async function getLatestWordPressVersion( options ) {
 						'latestWordPressVersion',
 						cacheOptions
 					) ) ||
-					mirrorVersions.sort( compareWordPressVersions ).pop();
+					[ ...mirrorVersions ]
+						.sort( compareWordPressVersions )
+						.pop();
 
 				CACHED_WP_VERSION = fallback;
 				await setCache(
