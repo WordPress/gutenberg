@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * Internal dependencies
- */
 import Dropdown from '..';
 import { DropdownContentWrapper } from '../dropdown-content-wrapper';
 import styles from '../style.module.scss';
