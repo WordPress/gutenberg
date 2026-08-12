@@ -44,8 +44,10 @@ const transpiledPackageNames = glob(
 
 export default defineConfig( {
 	root: ROOT_DIR,
-	esbuild: {
-		jsx: 'automatic',
+	oxc: {
+		jsx: {
+			runtime: 'automatic',
+		},
 	},
 	plugins: [
 		commonjs( {
