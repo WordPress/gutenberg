@@ -31,6 +31,7 @@ export default function useInput() {
 		getNextBlockClientId,
 		getBlockOrder,
 		getBlockEditingMode,
+		getBlockListSettings,
 	} = useSelect( blockEditorStore );
 	const {
 		replaceBlocks,
@@ -136,9 +137,18 @@ export default function useInput() {
 							'data-block'
 						) === clientId
 					) {
+						// The default block depends on context: containers
+						// such as the gallery define their own default
+						// block, which is what insertAfterBlock inserts.
+						const { defaultBlock: directInsertBlock } =
+							( rootClientId &&
+								getBlockListSettings( rootClientId ) ) ||
+							{};
+
 						if (
 							canInsertBlockType(
-								getDefaultBlockName(),
+								directInsertBlock?.name ??
+									getDefaultBlockName(),
 								rootClientId
 							)
 						) {
