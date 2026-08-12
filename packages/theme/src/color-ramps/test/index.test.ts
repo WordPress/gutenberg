@@ -129,12 +129,38 @@ describe( 'buildRamps', () => {
 		).toMatchSnapshot();
 	} );
 
-	it( 'keeps fgSurface4 at least 1.8:1 from fgSurface5 across the supported seed grid', () => {
-		buildSupportedRamps().forEach( ( { ramp } ) => {
+	it( 'keeps fgSurface4 at the theme-adjusted contrast from fgSurface5 across the supported seed grid', () => {
+		buildSupportedRamps().forEach( ( { ramp, direction } ) => {
+			const target = direction === 'darker' ? 2 : 1.5;
+
 			expect(
 				getContrast( ramp.fgSurface4, ramp.fgSurface5 )
-			).toBeGreaterThanOrEqual( 1.8 );
+			).toBeGreaterThanOrEqual( target );
 		} );
+	} );
+
+	it( 'resolves contrast targets from the ramp direction', () => {
+		const config = {
+			...BG_RAMP_CONFIG,
+			fgSurface4: {
+				...BG_RAMP_CONFIG.fgSurface4,
+				contrast: {
+					...BG_RAMP_CONFIG.fgSurface4.contrast,
+					target: ( direction: 'lighter' | 'darker' ) =>
+						direction === 'darker' ? 2 : 1.5,
+				},
+			},
+		};
+
+		const lightRamp = buildRamp( '#fcfcfc', config );
+		const darkRamp = buildRamp( '#1e1e1e', config );
+
+		expect(
+			getContrast( lightRamp.ramp.fgSurface4, lightRamp.ramp.fgSurface5 )
+		).toBeGreaterThanOrEqual( 2 );
+		expect(
+			getContrast( darkRamp.ramp.fgSurface4, darkRamp.ramp.fgSurface5 )
+		).toBeGreaterThanOrEqual( 1.5 );
 	} );
 
 	it( 'keeps fgSurface4 between fgSurface3 and fgSurface5 for the default light and dark ramps', () => {

@@ -202,7 +202,10 @@ export const BG_RAMP_CONFIG: RampConfig = {
 		contrast: {
 			reference: 'fgSurface5',
 			followDirection: 'opposite',
-			target: 1.8,
+			// Use more separation in light ramps and less in dark ramps to
+			// balance the perceived state difference between the two modes.
+			target: ( mainDirection ) =>
+				mainDirection === 'darker' ? 2 : 1.5,
 		},
 		taperChromaOptions: FG_TAPER_CHROMA,
 	},

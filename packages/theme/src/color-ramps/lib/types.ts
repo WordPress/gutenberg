@@ -52,9 +52,10 @@ export type ContrastRequirement = {
 	 */
 	preferLighter?: boolean;
 	/**
-	 * The contrast target to meet.
+	 * The contrast target to meet. A function can vary the target based on the
+	 * ramp's main direction.
 	 */
-	target: number;
+	target: number | ( ( mainDirection: RampDirection ) => number );
 	/**
 	 * When true, the algorithm won't count a failure in meeting the contrast
 	 * target as a reason to recalculate the ramp.
