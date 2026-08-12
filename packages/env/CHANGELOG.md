@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Update git sources to the latest commit when `--update` is passed. Previously, a source pointing at a branch (such as `"core": "WordPress/WordPress"`) stayed at the commit it was first cloned at, no matter how many times it was updated.
 
 ## 11.12.0 (2026-07-29)
 

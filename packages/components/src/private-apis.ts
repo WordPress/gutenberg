@@ -5,16 +5,9 @@ import { ComponentsContext } from './context/context-system-provider';
 import { Tabs } from './tabs';
 import { lock } from './lock-unlock';
 import Badge from './badge';
-import { DateCalendar, DateRangeCalendar, TZDate } from './calendar';
 import {
-	ValidatedCheckboxControl,
-	ValidatedComboboxControl,
 	ValidatedInputControl,
-	ValidatedNumberControl,
-	ValidatedSelectControl,
-	ValidatedRadioControl,
 	ValidatedContentEditableControl,
-	ValidatedTextControl,
 	ValidatedTextareaControl,
 	ValidatedToggleControl,
 	ValidatedToggleGroupControl,
@@ -30,18 +23,9 @@ lock( privateApis, {
 	Tabs,
 	Menu,
 	Badge,
-	DateCalendar,
-	DateRangeCalendar,
-	TZDate,
 	useDrag,
 	ValidatedInputControl,
-	ValidatedCheckboxControl,
-	ValidatedComboboxControl,
-	ValidatedNumberControl,
-	ValidatedSelectControl,
-	ValidatedRadioControl,
 	ValidatedContentEditableControl,
-	ValidatedTextControl,
 	ValidatedTextareaControl,
 	ValidatedToggleControl,
 	ValidatedToggleGroupControl,

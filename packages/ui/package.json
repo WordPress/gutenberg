@@ -44,6 +44,7 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@base-ui/react": "^1.6.0",
+		"@daypicker/react": "^10.0.1",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/element": "file:../element",
@@ -55,6 +56,7 @@
 		"@wordpress/style-runtime": "file:../style-runtime",
 		"@wordpress/theme": "file:../theme",
 		"clsx": "^2.1.1",
+		"date-fns": "^4.4.0",
 		"tabbable": "^6.4.0"
 	},
 	"devDependencies": {

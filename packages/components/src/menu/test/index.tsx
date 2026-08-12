@@ -2,6 +2,7 @@ import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import { Menu } from '..';
+import Modal from '../../modal';
 
 const waitForFocusedMenu = () =>
 	waitFor( () => expect( screen.getByRole( 'menu' ) ).toHaveFocus() );
@@ -11,8 +12,64 @@ const waitForFocusedMenuItem = ( name: string ) =>
 		expect( screen.getByRole( 'menuitem', { name } ) ).toHaveFocus()
 	);
 
+const waitForClosedMenu = () =>
+	waitFor( () =>
+		expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument()
+	);
+
+const openMenu = async ( user: ReturnType< typeof userEvent.setup > ) => {
+	await user.click( screen.getByRole( 'button', { name: 'Open dropdown' } ) );
+	await waitForFocusedMenu();
+};
+
+// TODO: Add browser coverage for the computed overflow once component stories
+// use interaction tests. Jest mocks stylesheet imports, so this only verifies
+// the handoff between Ariakit's inline lock and Modal's body class.
+const isBodyScrollLocked = () =>
+	document.body.style.overflow === 'hidden' ||
+	document.body.classList.contains( 'modal-open' );
+
 const resetTypeahead = () => {
 	act( () => jest.advanceTimersByTime( 500 ) );
+};
+
+const MenuWithModal = ( { nested = false }: { nested?: boolean } ) => {
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const modalItem = (
+		<Menu.Item onClick={ () => setIsModalOpen( true ) }>
+			Open modal
+		</Menu.Item>
+	);
+
+	return (
+		<>
+			<Menu>
+				<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
+				<Menu.Popover>
+					{ nested ? (
+						<Menu>
+							<Menu.SubmenuTriggerItem>
+								Open submenu
+							</Menu.SubmenuTriggerItem>
+							<Menu.Popover>{ modalItem }</Menu.Popover>
+						</Menu>
+					) : (
+						modalItem
+					) }
+				</Menu.Popover>
+			</Menu>
+			{ isModalOpen && (
+				<Modal
+					title="Modal"
+					onRequestClose={ () => setIsModalOpen( false ) }
+				>
+					<button onClick={ () => setIsModalOpen( false ) }>
+						Close modal
+					</button>
+				</Modal>
+			) }
+		</>
+	);
 };
 
 // Open dropdown => open menu
@@ -237,9 +294,31 @@ describe( 'Menu', () => {
 			// Click on the body (ie. outside of the dropdown menu)
 			await user.click( document.body );
 
-			await waitFor( () =>
-				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument()
+			await waitForClosedMenu();
+		} );
+
+		it( 'should retain outside focus when outside interaction closes a non-modal menu', async () => {
+			render(
+				<>
+					<Menu defaultOpen>
+						<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
+						<Menu.Popover modal={ false }>
+							<Menu.Item>Menu item</Menu.Item>
+						</Menu.Popover>
+					</Menu>
+					<button>Outside destination</button>
+				</>
 			);
+
+			expect( screen.getByRole( 'menu' ) ).toBeInTheDocument();
+			const outsideDestination = screen.getByRole( 'button', {
+				name: 'Outside destination',
+			} );
+
+			await user.click( outsideDestination );
+
+			await waitForClosedMenu();
+			expect( outsideDestination ).toHaveFocus();
 		} );
 
 		it( 'should close when clicking on a menu item', async () => {
@@ -262,7 +341,91 @@ describe( 'Menu', () => {
 			);
 		} );
 
-		it( 'should not close when clicking on a menu item when the `hideOnClick` prop is set to `false`', async () => {
+		it( 'should return focus to the root trigger after a modal opened by pointer closes', async () => {
+			render( <MenuWithModal /> );
+
+			const trigger = screen.getByRole( 'button', {
+				name: 'Open dropdown',
+			} );
+
+			await user.click( trigger );
+			await waitForFocusedMenu();
+			await user.click(
+				screen.getByRole( 'menuitem', { name: 'Open modal' } )
+			);
+			await waitForClosedMenu();
+			expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
+			await user.click(
+				screen.getByRole( 'button', { name: 'Close modal' } )
+			);
+
+			await waitFor( () => expect( trigger ).toHaveFocus() );
+		} );
+
+		it( 'should return focus after Enter opens a modal', async () => {
+			render( <MenuWithModal /> );
+
+			const trigger = screen.getByRole( 'button', {
+				name: 'Open dropdown',
+			} );
+			await openMenu( user );
+			await user.keyboard( '{ArrowDown}' );
+			await waitForFocusedMenuItem( 'Open modal' );
+
+			await user.keyboard( '{Enter}' );
+			await waitForClosedMenu();
+			expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
+			await user.click(
+				screen.getByRole( 'button', { name: 'Close modal' } )
+			);
+
+			await waitFor( () => expect( trigger ).toHaveFocus() );
+		} );
+
+		it( 'should return focus to the root trigger after a nested menu opens a modal', async () => {
+			render( <MenuWithModal nested /> );
+
+			const trigger = screen.getByRole( 'button', {
+				name: 'Open dropdown',
+			} );
+			await openMenu( user );
+			await user.keyboard( '{ArrowDown}' );
+			await waitForFocusedMenuItem( 'Open submenu' );
+			await user.keyboard( '{ArrowRight}' );
+			await waitForFocusedMenuItem( 'Open modal' );
+			await user.keyboard( '{Enter}' );
+			await waitForClosedMenu();
+			await user.click(
+				screen.getByRole( 'button', { name: 'Close modal' } )
+			);
+
+			await waitFor( () => expect( trigger ).toHaveFocus() );
+		} );
+
+		it( 'should keep body scroll locked while handing off to a modal', async () => {
+			render( <MenuWithModal /> );
+
+			expect( isBodyScrollLocked() ).toBe( false );
+			await openMenu( user );
+			expect( isBodyScrollLocked() ).toBe( true );
+
+			await user.click(
+				screen.getByRole( 'menuitem', { name: 'Open modal' } )
+			);
+			await waitForClosedMenu();
+			expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
+			expect( isBodyScrollLocked() ).toBe( true );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Close modal' } )
+			);
+			await waitFor( () =>
+				expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument()
+			);
+			await waitFor( () => expect( isBodyScrollLocked() ).toBe( false ) );
+		} );
+
+		it( 'should stay open when `hideOnClick` is `false`', async () => {
 			render(
 				<Menu defaultOpen>
 					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
@@ -274,7 +437,164 @@ describe( 'Menu', () => {
 
 			expect( screen.getByRole( 'menu' ) ).toBeVisible();
 
-			// Clicking a menu item will close the menu
+			await user.click( screen.getByRole( 'menuitem' ) );
+
+			expect( screen.getByRole( 'menu' ) ).toBeVisible();
+		} );
+
+		it( 'should use a `hideOnClick` callback to decide whether to close', async () => {
+			const hideOnClick = jest.fn( () => false );
+			render(
+				<Menu defaultOpen>
+					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
+					<Menu.Popover>
+						<Menu.Item hideOnClick={ hideOnClick }>
+							Menu item
+						</Menu.Item>
+					</Menu.Popover>
+				</Menu>
+			);
+
+			await user.click( screen.getByRole( 'menuitem' ) );
+
+			expect( screen.getByRole( 'menu' ) ).toBeVisible();
+			expect( hideOnClick ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'should close when a `hideOnClick` callback returns `true`', async () => {
+			const hideOnClick = jest.fn( () => true );
+			render(
+				<Menu defaultOpen>
+					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
+					<Menu.Popover>
+						<Menu.Item hideOnClick={ hideOnClick }>
+							Menu item
+						</Menu.Item>
+					</Menu.Popover>
+				</Menu>
+			);
+
+			await user.click( screen.getByRole( 'menuitem' ) );
+
+			await waitForClosedMenu();
+			expect( hideOnClick ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it.each( [ 'checkbox', 'radio' ] )(
+			'should close a %s item when `hideOnClick` is `true`',
+			async ( itemType ) => {
+				render(
+					<Menu defaultOpen>
+						<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
+						<Menu.Popover>
+							{ itemType === 'checkbox' ? (
+								<Menu.CheckboxItem
+									name="checkbox"
+									value="checkbox"
+									hideOnClick
+								>
+									Checkbox item
+								</Menu.CheckboxItem>
+							) : (
+								<Menu.RadioItem
+									name="radio"
+									value="radio"
+									hideOnClick
+								>
+									Radio item
+								</Menu.RadioItem>
+							) }
+						</Menu.Popover>
+					</Menu>
+				);
+
+				await user.click( screen.getByRole( `menuitem${ itemType }` ) );
+
+				await waitFor( () =>
+					expect(
+						screen.queryByRole( 'menu' )
+					).not.toBeInTheDocument()
+				);
+			}
+		);
+
+		it( 'should retain focus moved outside by an item click handler', async () => {
+			let outsideDestination: HTMLButtonElement | null = null;
+			render(
+				<>
+					<button
+						ref={ ( element ) => {
+							outsideDestination = element;
+						} }
+					>
+						Outside destination
+					</button>
+					<Menu defaultOpen>
+						<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
+						<Menu.Popover modal={ false }>
+							<Menu.Item
+								onClick={ () => outsideDestination?.focus() }
+							>
+								Menu item
+							</Menu.Item>
+						</Menu.Popover>
+					</Menu>
+				</>
+			);
+
+			await user.click( screen.getByRole( 'menuitem' ) );
+
+			await waitForClosedMenu();
+			expect( outsideDestination ).toHaveFocus();
+		} );
+
+		it( 'should retain focus moved outside by a `hideOnClick` callback', async () => {
+			let outsideDestination: HTMLButtonElement | null = null;
+			render(
+				<>
+					<button
+						ref={ ( element ) => {
+							outsideDestination = element;
+						} }
+					>
+						Outside destination
+					</button>
+					<Menu defaultOpen>
+						<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
+						<Menu.Popover modal={ false }>
+							<Menu.Item
+								hideOnClick={ () => {
+									outsideDestination?.focus();
+									return true;
+								} }
+							>
+								Menu item
+							</Menu.Item>
+						</Menu.Popover>
+					</Menu>
+				</>
+			);
+
+			await user.click( screen.getByRole( 'menuitem' ) );
+
+			await waitForClosedMenu();
+			expect( outsideDestination ).toHaveFocus();
+		} );
+
+		it( 'should not close when item activation is prevented', async () => {
+			render(
+				<Menu defaultOpen>
+					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
+					<Menu.Popover>
+						<Menu.Item
+							onClick={ ( event ) => event.preventDefault() }
+						>
+							Menu item
+						</Menu.Item>
+					</Menu.Popover>
+				</Menu>
+			);
+
 			await user.click( screen.getByRole( 'menuitem' ) );
 
 			expect( screen.getByRole( 'menu' ) ).toBeVisible();
@@ -505,7 +825,6 @@ describe( 'Menu', () => {
 				screen.getByRole( 'menuitemradio', { name: 'Radio item two' } )
 			).not.toBeChecked();
 
-			// Click second radio item, make sure that the callback fires
 			await user.click(
 				screen.getByRole( 'menuitemradio', { name: 'Radio item two' } )
 			);
@@ -847,7 +1166,7 @@ describe( 'Menu', () => {
 				true
 			);
 
-			// Make sure that second checkbox is unselected
+			// Make sure that second checkbox is selected
 			expect(
 				screen.getByRole( 'menuitemcheckbox', {
 					name: 'Checkbox item two',
@@ -920,7 +1239,7 @@ describe( 'Menu', () => {
 			// The outer button can be focused by pressing tab. Doing so will cause
 			// the Menu to close.
 			await user.tab();
-			expect( outerButton ).toBeVisible();
+			expect( outerButton ).toHaveFocus();
 			await waitFor( () =>
 				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument()
 			);

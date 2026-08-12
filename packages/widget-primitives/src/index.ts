@@ -28,6 +28,7 @@ export type {
 	WidgetRelevance,
 	WidgetType,
 	WidgetAction,
+	WidgetActionRecord,
 	WidgetAttributeField,
 	WidgetRenderProps,
 	ResolveWidgetModule,
