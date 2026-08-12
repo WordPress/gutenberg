@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.20.0 (2026-08-12)
+
 ### Bug Fixes
 
 -   Adjust the specificity of the responsive image default in the layout container so components can size their own images ([#80845](https://github.com/WordPress/gutenberg/pull/80845)).
