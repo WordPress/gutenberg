@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 // @ts-expect-error - No type declarations available for @wordpress/block-editor
@@ -9,10 +6,6 @@ import { privateApis as blockEditorPrivateApis, store as blockEditorStore } from
 import { useSelect } from '@wordpress/data';
 import { getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 
 const { NoteIconSlotFill } = unlock( blockEditorPrivateApis );
