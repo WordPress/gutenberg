@@ -246,11 +246,14 @@ export default {
 
 		// If a block's block.json skips serialization for spacing or spacing.blockGap,
 		// don't apply the user-defined value to the styles.
-		const blockGapValue =
+		const blockGapBoxControlValue =
 			style?.spacing?.blockGap &&
 			! shouldSkipSerialization( blockName, 'spacing', 'blockGap' )
-				? getGapCSSValue( style?.spacing?.blockGap, fallbackGapValue )
+				? getGapBoxControlValueFromStyle( style.spacing.blockGap )
 				: undefined;
+		const blockGapValue = blockGapBoxControlValue
+			? getGapCSSValue( style.spacing.blockGap, fallbackGapValue )
+			: undefined;
 		const hasBlockGapOverride =
 			! hasViewportOverrides ||
 			Object.hasOwn( style?.spacing || {}, 'blockGap' );
@@ -273,7 +276,9 @@ export default {
 			minimumColumnWidth &&
 			columnCount > 0
 		) {
-			let blockGapToUse = blockGapValue || fallbackGapValue;
+			let blockGapToUse =
+				getSpacingPresetCssVar( blockGapBoxControlValue?.left ) ||
+				fallbackGapValue;
 			// Ensure 0 values have a unit so they work in calc().
 			if ( blockGapToUse === '0' || blockGapToUse === 0 ) {
 				blockGapToUse = '0px';
