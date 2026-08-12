@@ -10,7 +10,6 @@ import {
 	ValidatedContentEditableControl,
 	ValidatedTextareaControl,
 	ValidatedToggleControl,
-	ValidatedToggleGroupControl,
 } from './validated-form-controls';
 import ContentEditableControl from './content-editable-control';
 
@@ -27,5 +26,4 @@ lock( privateApis, {
 	ValidatedContentEditableControl,
 	ValidatedTextareaControl,
 	ValidatedToggleControl,
-	ValidatedToggleGroupControl,
 } );
