@@ -13,6 +13,8 @@
 
 -   Validate the packed Vitest tooling from an isolated install
     ([#80998](https://github.com/WordPress/gutenberg/pull/80998)).
+-   Update the bundled Vite dependency to 8.2.1
+    ([#80998](https://github.com/WordPress/gutenberg/pull/80998)).
 -   Support JSX files in direct build entry naming and default unit-test lint configuration ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
 
 ## 34.1.0 (2026-08-12)

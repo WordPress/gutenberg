@@ -41,7 +41,7 @@
 		"./style-mock": "./scripts/style-mock.js"
 	},
 	"dependencies": {
-		"@swc/plugin-emotion": "^14.15.0",
+		"@swc/plugin-emotion": "^14.19.0",
 		"@vitejs/plugin-react-swc": "^4.3.3",
 		"@vitest/browser-playwright": "^4.1.10",
 		"@wordpress/vitest-console": "file:../vitest-console",
@@ -51,7 +51,7 @@
 	},
 	"devDependencies": {
 		"clsx": "^2.1.1",
-		"vite": "^7.3.2",
+		"vite": "^8.2.1",
 		"vitest": "^4.1.10"
 	},
 	"peerDependencies": {

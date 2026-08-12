@@ -84,7 +84,7 @@
 		"stylelint": "^16.26.1",
 		"terser-webpack-plugin": "^5.3.10",
 		"url-loader": "^4.1.1",
-		"vite": "^7.3.2",
+		"vite": "^8.2.1",
 		"vitest": "^4.1.10",
 		"webpack": "^5.108.1",
 		"webpack-bundle-analyzer": "^4.9.1",
