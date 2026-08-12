@@ -6,11 +6,13 @@ import {
 	mkdirSync,
 	mkdtempSync,
 	readFileSync,
+	realpathSync,
 	readdirSync,
 	rmSync,
 	writeFileSync,
 } from 'node:fs';
 import { createRequire } from 'node:module';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -20,14 +22,20 @@ const ROOT_DIR = path.resolve(
 	'../../..'
 );
 const PACKAGES = [ 'vitest-console', 'vitest-preset-default', 'scripts' ];
-const tempRoot = path.join( ROOT_DIR, 'node_modules/.cache' );
-mkdirSync( tempRoot, { recursive: true } );
-const tempDirectory = mkdtempSync(
-	path.join( tempRoot, 'wordpress-vitest-consumer-' )
+const tempDirectory = realpathSync(
+	mkdtempSync( path.join( tmpdir(), 'wordpress-vitest-consumer-' ) )
 );
-const npmCache = path.join( tempDirectory, 'npm-cache' );
 const stagedPackages = path.join( tempDirectory, 'staged-packages' );
 const installedPackages = path.join( tempDirectory, 'node_modules' );
+const CONSUMER_DEPENDENCIES = [
+	'@emotion/react',
+	'@testing-library/dom',
+	'@testing-library/jest-dom',
+	'@testing-library/react',
+	'@typescript/native',
+	'react',
+	'react-dom',
+];
 
 function run( command, args, options = {} ) {
 	const result = spawnSync( command, args, {
@@ -147,9 +155,6 @@ function packPackage( packageName, workspaceVersions ) {
 		],
 		{
 			cwd: stageDirectory,
-			env: {
-				npm_config_cache: npmCache,
-			},
 		}
 	);
 	const [ packed ] = JSON.parse( output.trim() );
@@ -173,15 +178,92 @@ function packPackage( packageName, workspaceVersions ) {
 	return { packageJson, tarballPath };
 }
 
-function installTarball( packageName, tarballPath ) {
-	const target = path.join( installedPackages, '@wordpress', packageName );
+function getInstalledVersion( packageName ) {
+	return readJson( require.resolve( `${ packageName }/package.json` ) )
+		.version;
+}
 
-	mkdirSync( target, { recursive: true } );
-	run(
-		'tar',
-		[ '-xzf', tarballPath, '--directory', target, '--strip-components=1' ],
-		{ cwd: tempDirectory }
+function getConsumerSpecifier( packageName ) {
+	const version = getInstalledVersion( packageName );
+
+	if ( packageName === '@typescript/native' ) {
+		return `npm:typescript@${ version }`;
+	}
+
+	return version;
+}
+
+function assertIsolatedResolution( isolatedRequire, packageName ) {
+	const resolvedPath = isolatedRequire.resolve(
+		`${ packageName }/package.json`
 	);
+	const relativePath = path.relative(
+		realpathSync( installedPackages ),
+		realpathSync( resolvedPath )
+	);
+
+	assert.equal(
+		path.isAbsolute( relativePath ) ||
+			relativePath === '..' ||
+			relativePath.startsWith( `..${ path.sep }` ),
+		false,
+		`${ packageName } resolved outside the isolated install: ${ resolvedPath }`
+	);
+}
+
+function installPackedPackages( packedPackages ) {
+	writeJson( path.join( tempDirectory, 'package.json' ), {
+		name: 'wordpress-vitest-packed-consumer',
+		private: true,
+		type: 'module',
+		dependencies: Object.fromEntries( [
+			...Array.from( packedPackages.values(), ( packedPackage ) => [
+				packedPackage.packageJson.name,
+				`file:${ packedPackage.tarballPath }`,
+			] ),
+			...CONSUMER_DEPENDENCIES.map( ( packageName ) => [
+				packageName,
+				getConsumerSpecifier( packageName ),
+			] ),
+		] ),
+	} );
+
+	run(
+		process.execPath,
+		[
+			process.env.npm_execpath,
+			'install',
+			'--ignore-scripts',
+			'--no-audit',
+			'--no-fund',
+			'--package-lock=false',
+		],
+		{
+			cwd: tempDirectory,
+			env: {
+				PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1',
+			},
+		}
+	);
+
+	const isolatedRequire = createRequire(
+		path.join( tempDirectory, 'package.json' )
+	);
+	for ( const packageName of [
+		...Array.from(
+			packedPackages.values(),
+			( packedPackage ) => packedPackage.packageJson.name
+		),
+		...CONSUMER_DEPENDENCIES,
+		'vite',
+		'vitest',
+	] ) {
+		assertIsolatedResolution( isolatedRequire, packageName );
+	}
+
+	// The staged source includes package self-tests which are intentionally not
+	// part of the published tarballs. Remove it before consumer test discovery.
+	rmSync( stagedPackages, { force: true, recursive: true } );
 }
 
 function runWpScripts( fixture, args, options = {} ) {
@@ -203,14 +285,7 @@ function runWpScripts( fixture, args, options = {} ) {
 }
 
 function createDefaultConsumer() {
-	const fixture = path.join( tempDirectory, 'default-consumer' );
-
-	mkdirSync( fixture );
-	writeJson( path.join( fixture, 'package.json' ), {
-		name: 'vitest-default-consumer',
-		private: true,
-		type: 'module',
-	} );
+	const fixture = tempDirectory;
 	writeFileSync(
 		path.join( fixture, 'default.test.tsx' ),
 		`import { css } from '@emotion/react';
@@ -301,14 +376,7 @@ test( 'shows useful failure output', () => {
 }
 
 function createConfiguredConsumer() {
-	const fixture = path.join( tempDirectory, 'configured-consumer' );
-
-	mkdirSync( fixture );
-	writeJson( path.join( fixture, 'package.json' ), {
-		name: 'vitest-configured-consumer',
-		private: true,
-		type: 'module',
-	} );
+	const fixture = tempDirectory;
 	writeFileSync(
 		path.join( fixture, 'vitest-unit.config.mjs' ),
 		`import wordpressConfig from '@wordpress/vitest-preset-default';
@@ -422,9 +490,7 @@ try {
 		'^20.19.0 || >=22.12.0'
 	);
 
-	for ( const [ packageName, { tarballPath } ] of packedPackages ) {
-		installTarball( packageName, tarballPath );
-	}
+	installPackedPackages( packedPackages );
 
 	createDefaultConsumer();
 	createConfiguredConsumer();
