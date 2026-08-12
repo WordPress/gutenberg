@@ -4,7 +4,7 @@
 
 ## ActionItem.Slot
 
-The props not referred below are passed to the container component.
+Renders nothing when no fill is present. The props not referred below are passed to the container component.
 
 ## Props
 
@@ -30,6 +30,20 @@ The component used as the container of the fills. Defaults to the `MenuGroup` co
 -   Required: no
 -   Default: `MenuGroup`
 
+### fillProps
+
+Props passed to every fill. An `as` among them provides the component the items render as, unless the item asks for one of its own.
+
+-   Type: `Object`
+-   Required: no
+
+### children
+
+A function receiving the rendered fills as a flat array. Use it when the container has to wrap each fill rather than just group them. Takes precedence over `as`.
+
+-   Type: `Function`
+-   Required: no
+
 ## ActionItem
 
 The props not referred below are passed to the item component.
@@ -50,8 +64,8 @@ Callback function executed when a click on the item happens.
 
 ### as
 
-The component that is going to be used to render an action item. Defaults to the `Button` component.
+The component that is going to be used to render an action item. Defaults to the `as` the slot provides through `fillProps`, or to the `MenuItem` component, so that it nests in the `MenuGroup` the slot renders by default.
 
 -   Type: `Component`
 -   Required: no
--   Default: `Button`
+-   Default: `MenuItem`
