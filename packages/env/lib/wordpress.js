@@ -61,10 +61,8 @@ async function canAccessWPORG() {
 }
 
 /**
- * Returns every stable version tag currently on the WordPress/WordPress mirror.
- * The stable-check API on WordPress.org reports a new version the moment it
- * ships, but this mirror syncs separately and can lag by hours, during which a
- * `git fetch` for that version's tag fails outright because it is not there yet.
+ * Returns every stable version tag currently on the WordPress/WordPress
+ * mirror, which is what wp-env actually fetches WordPress core from.
  *
  * @return {string[]} Every available version, like [ '6.5.8', '6.5.9' ]. Empty
  *                     if the mirror could not be queried.
@@ -89,10 +87,11 @@ async function getMirrorVersions() {
 
 /**
  * Compares two dotted-numeric WordPress version strings, like "6.5.9" and
- * "6.5.10". This only handles the plain major[.minor[.patch]] shape core
- * release tags use, not general semver -- see isWPMajorMinorVersionLower()
- * in runtime/docker/wordpress.js for the project's existing stance on
- * avoiding a full semver dependency for this kind of comparison.
+ * "6.5.10", numerically segment by segment so "6.5.10" sorts after "6.5.9".
+ * Only handles the plain major[.minor[.patch]] shape core release tags use,
+ * not general semver -- see isWPMajorMinorVersionLower() in
+ * runtime/docker/wordpress.js, which makes the same tradeoff for a different
+ * comparison.
  *
  * @param {string} a A version string.
  * @param {string} b Another version string.
@@ -113,8 +112,10 @@ function compareWordPressVersions( a, b ) {
 }
 
 /**
- * Returns the latest stable version of WordPress by requesting the stable-check
- * endpoint on WordPress.org.
+ * Returns the latest stable version of WordPress, as reported by the
+ * stable-check endpoint on WordPress.org. If the WordPress/WordPress mirror
+ * hasn't synced that version's tag yet, falls back to a version the mirror
+ * actually has, since fetching the reported version would otherwise fail.
  *
  * @param {Object} options an object with cacheDirectoryPath set to the path to the cache directory in ~/.wp-env.
  * @return {string} The latest stable version of WordPress, like "6.0.1"
@@ -160,18 +161,15 @@ async function getLatestWordPressVersion( options ) {
 				mirrorVersions.length &&
 				! mirrorVersions.includes( version )
 			) {
-				// The mirror hasn't synced this tag yet. Prefer the last known
-				// good version from a previous run; if there isn't one (e.g.
-				// the first run in a fresh CI environment), use the highest
-				// version the mirror actually has instead of a tag that is
-				// guaranteed to fail the `git fetch` that follows.
+				// The mirror hasn't synced this tag yet, so fall back instead
+				// of returning a version that's guaranteed to fail the
+				// `git fetch` that follows. Prefer the last known good
+				// version from a previous run; if there isn't one (e.g. the
+				// first run on a fresh CI runner), use the highest version
+				// the mirror actually has.
 				//
-				// This substitution is silent: `options` at this stage of
-				// config parsing carries no spinner or logger to surface it
-				// through, and this is the only function in the package that
-				// would need one introduced for a single warning. Worth a
-				// user-facing message in a follow-up if this proves confusing
-				// in practice.
+				// This fallback isn't reported to the user -- no spinner or
+				// logger reaches this point in config parsing.
 				const fallback =
 					( await getCache(
 						'latestWordPressVersion',
