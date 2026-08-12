@@ -17,6 +17,7 @@ const ROOT_DIR = path.resolve(
 	'../..'
 );
 const nodeRequire = createRequire( import.meta.url );
+const emotionPlugin = nodeRequire.resolve( '@swc/plugin-emotion' );
 const flakinessReporter = nodeRequire.resolve( '@flakiness/vitest' );
 const testMigration = JSON.parse(
 	readFileSync(
@@ -73,7 +74,7 @@ export default defineConfig( {
 		react( {
 			plugins: [
 				[
-					'@swc/plugin-emotion',
+					emotionPlugin,
 					{
 						autoLabel: 'always',
 						labelFormat: '[local]',
