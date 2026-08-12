@@ -350,7 +350,7 @@ if ( ! function_exists( 'gutenberg_route_post_author_mention_notification' ) ) {
 			return;
 		}
 
-		gutenberg_send_note_notification( $user, $comment, $post );
+		gutenberg_send_note_notification( $user, $comment, $post, 'post_author_mention' );
 
 		// Suppress core's generic post-author email for this note only; the
 		// filter stays installed but is scoped to this comment ID.
@@ -652,6 +652,9 @@ if ( ! function_exists( 'gutenberg_send_note_follower_notification' ) ) {
 		if ( $switched_locale ) {
 			restore_previous_locale();
 		}
+
+		/** This action is documented in lib/compat/wordpress-7.1/notes-mentions.php */
+		do_action( 'wp_note_notification_sent', (int) $user->ID, $comment, 'follower', $sent );
 
 		return $sent;
 	}

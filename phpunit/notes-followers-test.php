@@ -633,4 +633,84 @@ class Tests_Notes_Followers extends WP_UnitTestCase {
 		$this->assertNull( gutenberg_get_note_status_event( $note, new WP_REST_Request( 'POST', '/wp/v2/comments' ) ) );
 	}
 
+	/**
+	 * The sent action is what channels other than email hook, so it has to
+	 * report every recipient and say why they were notified.
+	 *
+	 * @covers ::gutenberg_send_note_notification
+	 * @covers ::gutenberg_send_note_follower_notification
+	 */
+	public function test_notification_sent_action_reports_every_recipient(): void {
+		$fired = array();
+		add_action(
+			'wp_note_notification_sent',
+			static function ( $user_id, $comment, $context, $sent ) use ( &$fired ): void {
+				$fired[] = array(
+					'user_id' => $user_id,
+					'context' => $context,
+					'sent'    => $sent,
+				);
+			},
+			10,
+			4
+		);
+
+		$root = $this->insert_note(
+			'Start ' . self::mention( self::$mentioned->ID ),
+			self::$commenter->ID
+		);
+		$this->fire_rest_insert( $root );
+
+		$this->assertSame(
+			array(
+				array(
+					'user_id' => self::$mentioned->ID,
+					'context' => 'mention',
+					'sent'    => true,
+				),
+			),
+			$fired
+		);
+
+		// The same user, now reached as a follower rather than a mention.
+		$fired   = array();
+		$replier = self::create_user( 'editor' );
+		$reply   = $this->insert_note( 'Following up', $replier->ID, $root->comment_ID );
+		$this->fire_rest_insert( $reply );
+
+		$this->assertContains(
+			array(
+				'user_id' => self::$mentioned->ID,
+				'context' => 'follower',
+				'sent'    => true,
+			),
+			$fired
+		);
+	}
+
+	/**
+	 * A mentioned post author is reported under their own context, so a
+	 * channel integration can tell the routed mention from a plain one.
+	 *
+	 * @covers ::gutenberg_route_post_author_mention_notification
+	 */
+	public function test_notification_sent_action_reports_the_routed_post_author_mention(): void {
+		$contexts = array();
+		add_action(
+			'wp_note_notification_sent',
+			static function ( $user_id, $comment, $context ) use ( &$contexts ): void {
+				$contexts[ $user_id ] = $context;
+			},
+			10,
+			3
+		);
+
+		$note = $this->insert_note(
+			'Hey ' . self::mention( self::$post_author->ID, '@Author' ),
+			self::$commenter->ID
+		);
+		$this->fire_rest_insert( $note );
+
+		$this->assertSame( 'post_author_mention', $contexts[ self::$post_author->ID ] ?? null );
+	}
 }
