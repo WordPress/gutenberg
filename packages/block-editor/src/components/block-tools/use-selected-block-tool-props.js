@@ -1,5 +1,6 @@
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Returns props for the selected block tools and empty block inserter.
@@ -18,7 +19,9 @@ export default function useSelectedBlockToolProps( clientId ) {
 				getBlockOrder,
 				hasMultiSelection,
 				getLastMultiSelectedBlockClientId,
-			} = select( blockEditorStore );
+				getControlsCapturingParent,
+				getParentSectionBlock,
+			} = unlock( select( blockEditorStore ) );
 
 			const blockParentsClientIds = getBlockParents( clientId );
 
@@ -28,12 +31,18 @@ export default function useSelectedBlockToolProps( clientId ) {
 					blockParentsClientIds
 				);
 
-			// Get the clientId of the topmost parent with the capture toolbars setting.
-			const capturingClientId = blockParentsClientIds.find(
-				( parentClientId ) =>
-					parentBlockListSettings[ parentClientId ]
-						?.__experimentalCaptureToolbars
-			);
+			// Get the clientId of the topmost parent with the capture
+			// toolbars setting, or of a collapsed controls-capturing block.
+			// Content-locked sections take precedence over controls capture.
+			const capturingClientId =
+				( getParentSectionBlock( clientId )
+					? undefined
+					: getControlsCapturingParent( clientId ) ) ??
+				blockParentsClientIds.find(
+					( parentClientId ) =>
+						parentBlockListSettings[ parentClientId ]
+							?.__experimentalCaptureToolbars
+				);
 
 			let isInsertionPointVisible = false;
 			if ( isBlockInsertionPointVisible() ) {
