@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add a fifth foreground surface ramp step to provide perceptual separation between resting and active neutral interactive foreground colors. ([#81531](https://github.com/WordPress/gutenberg/pull/81531))
+
 ### Bug Fixes
 
 -   `ThemeProvider`: Avoid root-level relational selectors when forwarding `cornerRadius` presets to reduce style recalculation work. ([#81457](https://github.com/WordPress/gutenberg/pull/81457))
