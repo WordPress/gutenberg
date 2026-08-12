@@ -124,7 +124,11 @@ function DuotonePanelPure( { style, setAttributes, name, clientId } ) {
 		! enableCustomDuotone ||
 		( colorPalette?.length === 0 && disableCustomColors );
 
-	if ( duotonePalette?.length === 0 && disableCustomDuotone ) {
+	// A present value keeps the panel available even when the settings
+	// hide the control, so the value can still be removed.
+	const controlsDisabled =
+		duotonePalette?.length === 0 && disableCustomDuotone;
+	if ( controlsDisabled && ! duotoneStyle ) {
 		return null;
 	}
 
@@ -136,13 +140,20 @@ function DuotonePanelPure( { style, setAttributes, name, clientId } ) {
 		duotoneStyle === 'unset' || Array.isArray( duotoneStyle )
 			? duotoneStyle
 			: getColorsFromDuotonePreset( duotoneStyle, duotonePalette );
+	// With the control disabled, a preset reference cannot be resolved
+	// against the (empty) palette; pass the raw value to the panel so it
+	// can still show and remove it. The toolbar control only ever receives
+	// resolved colors.
+	const panelDuotone =
+		duotonePresetOrColors ??
+		( controlsDisabled ? duotoneStyle : undefined );
 
 	return (
 		<>
 			<InspectorControls group="filter">
 				<StylesFiltersPanel
 					value={ {
-						filter: { duotone: duotonePresetOrColors },
+						filter: { duotone: panelDuotone },
 					} }
 					onChange={ ( newDuotone ) => {
 						const newStyle = {
@@ -159,33 +170,35 @@ function DuotonePanelPure( { style, setAttributes, name, clientId } ) {
 					inheritedValue={ inheritedValue }
 				/>
 			</InspectorControls>
-			<BlockControls group="block" __experimentalShareWithChildBlocks>
-				<DuotoneControl
-					duotonePalette={ duotonePalette }
-					colorPalette={ colorPalette }
-					disableCustomDuotone={ disableCustomDuotone }
-					disableCustomColors={ disableCustomColors }
-					value={ duotonePresetOrColors }
-					onChange={ ( newDuotone ) => {
-						const maybePreset = getDuotonePresetFromColors(
-							newDuotone,
-							duotonePalette
-						);
+			{ ! controlsDisabled && (
+				<BlockControls group="block" __experimentalShareWithChildBlocks>
+					<DuotoneControl
+						duotonePalette={ duotonePalette }
+						colorPalette={ colorPalette }
+						disableCustomDuotone={ disableCustomDuotone }
+						disableCustomColors={ disableCustomColors }
+						value={ duotonePresetOrColors }
+						onChange={ ( newDuotone ) => {
+							const maybePreset = getDuotonePresetFromColors(
+								newDuotone,
+								duotonePalette
+							);
 
-						const newStyle = {
-							...style,
-							color: {
-								...style?.color,
-								duotone: maybePreset ?? newDuotone, // use preset or fallback to custom colors.
-							},
-						};
-						setAttributes( {
-							style: cleanEmptyObject( newStyle ),
-						} );
-					} }
-					settings={ settings }
-				/>
-			</BlockControls>
+							const newStyle = {
+								...style,
+								color: {
+									...style?.color,
+									duotone: maybePreset ?? newDuotone, // use preset or fallback to custom colors.
+								},
+							};
+							setAttributes( {
+								style: cleanEmptyObject( newStyle ),
+							} );
+						} }
+						settings={ settings }
+					/>
+				</BlockControls>
+			) }
 		</>
 	);
 }

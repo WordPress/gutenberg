@@ -18,7 +18,8 @@ import TextDecorationControl from '../text-decoration-control';
 import TextIndentControl from '../text-indent-control';
 import WritingModeControl from '../writing-mode-control';
 import ColorGradientDropdownItem from './color-gradient-dropdown-item';
-import GatedValueRow from './gated-value-row';
+import GatedValueRow, { displayStyleValue } from './gated-value-row';
+import DisabledControlsNotice from './disabled-controls-notice';
 import { useHasTextPanel } from './color-panel';
 import { useColorGradientSettings } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
@@ -799,14 +800,8 @@ export default function TypographyPanel( {
 		[ hasTextColorEnabled ]
 	);
 
-	// Display form of a value whose control the settings disable: preset
-	// references reduce to their slug, anything else prints as written.
-	const displayGatedValue = ( raw ) =>
-		typeof raw === 'string' && raw.startsWith( 'var:preset|' )
-			? raw.split( '|' ).pop()
-			: String( raw );
-
-	const hasGatedValues = [
+	const hasDisabledControlValues = [
+		[ hasTextColorEnabled, hasTextColorValue ],
 		[ hasFontFamilyEnabled, hasFontFamily ],
 		[ hasFontSizeEnabled, hasFontSize ],
 		[ hasAppearanceControl, hasFontAppearance ],
@@ -827,16 +822,20 @@ export default function TypographyPanel( {
 			onChange={ onChange }
 			panelId={ panelId }
 		>
-			{ hasGatedValues && (
-				// Full-width cell; a plain child would flow into the tools
-				// panel grid as a half-width item.
-				<div style={ { gridColumn: '1 / -1' } }>
-					<Notice status="warning" isDismissible={ false }>
-						{ __(
-							'Some typography controls are disabled in this theme. Values applied earlier can be reset, but not changed.'
-						) }
-					</Notice>
-				</div>
+			{ hasDisabledControlValues && <DisabledControlsNotice /> }
+			{ ! hasTextColorEnabled && hasTextColorValue() && (
+				<InheritanceToolsPanelItem
+					label={ __( 'Color' ) }
+					hasValue={ hasTextColorValue }
+					onDeselect={ resetTextColor }
+					isShownByDefault={ defaultControls.textColor }
+					panelId={ panelId }
+				>
+					<GatedValueRow
+						value={ displayStyleValue( value?.color?.text ) }
+						onReset={ resetTextColor }
+					/>
+				</InheritanceToolsPanelItem>
 			) }
 			{ hasTextColorEnabled && (
 				<ColorGradientDropdownItem
@@ -900,7 +899,7 @@ export default function TypographyPanel( {
 						/>
 					) : (
 						<GatedValueRow
-							value={ displayGatedValue(
+							value={ displayStyleValue(
 								value?.typography?.fontFamily
 							) }
 							onReset={ resetFontFamily }
@@ -1009,7 +1008,7 @@ export default function TypographyPanel( {
 						/>
 					) : (
 						<GatedValueRow
-							value={ displayGatedValue(
+							value={ displayStyleValue(
 								value?.typography?.lineHeight
 							) }
 							onReset={ resetLineHeight }
@@ -1055,7 +1054,7 @@ export default function TypographyPanel( {
 						/>
 					) : (
 						<GatedValueRow
-							value={ displayGatedValue(
+							value={ displayStyleValue(
 								value?.typography?.letterSpacing
 							) }
 							onReset={ resetLetterSpacing }
@@ -1108,7 +1107,7 @@ export default function TypographyPanel( {
 						</>
 					) : (
 						<GatedValueRow
-							value={ displayGatedValue(
+							value={ displayStyleValue(
 								value?.typography?.textIndent
 							) }
 							onReset={ resetTextIndent }
@@ -1146,7 +1145,7 @@ export default function TypographyPanel( {
 						/>
 					) : (
 						<GatedValueRow
-							value={ displayGatedValue(
+							value={ displayStyleValue(
 								value?.typography?.textColumns
 							) }
 							onReset={ resetTextColumns }
@@ -1176,7 +1175,7 @@ export default function TypographyPanel( {
 						/>
 					) : (
 						<GatedValueRow
-							value={ displayGatedValue(
+							value={ displayStyleValue(
 								value?.typography?.textDecoration
 							) }
 							onReset={ resetTextDecoration }
@@ -1204,7 +1203,7 @@ export default function TypographyPanel( {
 						/>
 					) : (
 						<GatedValueRow
-							value={ displayGatedValue(
+							value={ displayStyleValue(
 								value?.typography?.writingMode
 							) }
 							onReset={ resetWritingMode }
@@ -1234,7 +1233,7 @@ export default function TypographyPanel( {
 						/>
 					) : (
 						<GatedValueRow
-							value={ displayGatedValue(
+							value={ displayStyleValue(
 								value?.typography?.textTransform
 							) }
 							onReset={ resetTextTransform }
@@ -1282,7 +1281,7 @@ export default function TypographyPanel( {
 						</>
 					) : (
 						<GatedValueRow
-							value={ displayGatedValue(
+							value={ displayStyleValue(
 								value?.typography?.textAlign
 							) }
 							onReset={ resetTextAlign }

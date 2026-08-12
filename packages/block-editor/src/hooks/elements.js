@@ -51,13 +51,10 @@ export function ElementsEdit( {
 	defaultControls,
 } ) {
 	const selectedState = useBlockStyleState();
-	const isEnabled = useHasColorPanel( settings );
+	const isPanelEnabled = useHasColorPanel( settings );
 
 	const { style, className } = useSelect(
 		( select ) => {
-			if ( ! isEnabled ) {
-				return {};
-			}
 			const attributes =
 				select( blockEditorStore ).getBlockAttributes( clientId );
 			return {
@@ -65,8 +62,21 @@ export function ElementsEdit( {
 				className: attributes?.className,
 			};
 		},
-		[ clientId, isEnabled ]
+		[ clientId ]
 	);
+
+	// A present value keeps the panel available even when the settings
+	// hide every control, so the value can still be removed.
+	const hasElementColorValues = Object.values( style?.elements ?? {} ).some(
+		( element ) =>
+			!! (
+				element?.color?.text ||
+				element?.color?.background ||
+				element?.color?.gradient ||
+				element?.[ ':hover' ]?.color?.text
+			)
+	);
+	const isEnabled = isPanelEnabled || hasElementColorValues;
 
 	const { value: inheritedValue } = useResolvedStyle(
 		name,

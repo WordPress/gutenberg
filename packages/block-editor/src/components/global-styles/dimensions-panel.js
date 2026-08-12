@@ -11,6 +11,11 @@ import { Icon, alignNone, stretchWide } from '@wordpress/icons';
 import { useCallback, useState } from '@wordpress/element';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
 import { useToolsPanelDropdownMenuProps } from './utils';
+import GatedValueRow, {
+	displayStyleValue,
+	displayBoxStyleValue,
+} from './gated-value-row';
+import DisabledControlsNotice from './disabled-controls-notice';
 import SpacingSizesControl from '../spacing-sizes-control';
 import DimensionControl from '../dimension-control';
 import ChildLayoutControl from '../child-layout-control';
@@ -735,6 +740,22 @@ export default function DimensionsPanel( {
 
 	const onMouseLeaveControls = () => onVisualize( false );
 
+	// Content width and wide width are not listed: their settings hold the
+	// values themselves, so there is no disabled-control state for them.
+	// Child layout is contextual to the parent block's layout rather than
+	// to a theme setting.
+	const hasDisabledControlValues =
+		( ! showPaddingControl && !! hasPaddingValue() ) ||
+		( ! showMarginControl && !! hasMarginValue() ) ||
+		( ! showGapControl && hasGapValue() ) ||
+		( ! showMinHeightControl && hasMinHeightValue() ) ||
+		( ! showMinWidthControl && hasMinWidthValue() ) ||
+		( ! showHeightControl && hasHeightValue() ) ||
+		( ! showWidthControl && hasWidthValue() ) ||
+		( ! showAspectRatioControl &&
+			! hasPseudoBlockStyleState( styleState ) &&
+			hasAspectRatioValue() );
+
 	return (
 		<Wrapper
 			resetAllFilter={ resetAllFilter }
@@ -836,14 +857,18 @@ export default function DimensionsPanel( {
 					/>
 				</InheritanceToolsPanelItem>
 			) }
-			{ showPaddingControl && (
+			{ hasDisabledControlValues && <DisabledControlsNotice /> }
+			{ ( showPaddingControl || !! hasPaddingValue() ) && (
 				<InheritanceToolsPanelItem
 					hasValue={ hasPaddingValue }
 					label={ __( 'Padding' ) }
-					hasInlineEndToggle={ hasSpacingToggle(
-						paddingSides,
-						showSpacingPresetsControl
-					) }
+					hasInlineEndToggle={
+						showPaddingControl &&
+						hasSpacingToggle(
+							paddingSides,
+							showSpacingPresetsControl
+						)
+					}
 					onDeselect={ resetPaddingValue }
 					isShownByDefault={
 						defaultControls.padding ?? DEFAULT_CONTROLS.padding
@@ -853,12 +878,20 @@ export default function DimensionsPanel( {
 						hasPaddingValue() && hasInheritedPadding,
 						{
 							'tools-panel-item-spacing':
-								showSpacingPresetsControl,
+								showPaddingControl && showSpacingPresetsControl,
 						}
 					) }
 					panelId={ panelId }
 				>
-					{ ! showSpacingPresetsControl && (
+					{ ! showPaddingControl && (
+						<GatedValueRow
+							value={ displayBoxStyleValue(
+								value?.spacing?.padding
+							) }
+							onReset={ resetPaddingValue }
+						/>
+					) }
+					{ showPaddingControl && ! showSpacingPresetsControl && (
 						<BoxControl
 							values={ localPaddingValues }
 							onChange={ setPaddingValues }
@@ -876,7 +909,7 @@ export default function DimensionsPanel( {
 							} }
 						/>
 					) }
-					{ showSpacingPresetsControl && (
+					{ showPaddingControl && showSpacingPresetsControl && (
 						<SpacingSizesControl
 							values={ paddingValues }
 							onChange={ setPaddingValues }
@@ -890,14 +923,17 @@ export default function DimensionsPanel( {
 					) }
 				</InheritanceToolsPanelItem>
 			) }
-			{ showMarginControl && (
+			{ ( showMarginControl || !! hasMarginValue() ) && (
 				<InheritanceToolsPanelItem
 					hasValue={ hasMarginValue }
 					label={ __( 'Margin' ) }
-					hasInlineEndToggle={ hasSpacingToggle(
-						marginSides,
-						showSpacingPresetsControl
-					) }
+					hasInlineEndToggle={
+						showMarginControl &&
+						hasSpacingToggle(
+							marginSides,
+							showSpacingPresetsControl
+						)
+					}
 					onDeselect={ resetMarginValue }
 					isShownByDefault={
 						defaultControls.margin ?? DEFAULT_CONTROLS.margin
@@ -907,12 +943,20 @@ export default function DimensionsPanel( {
 						hasMarginValue() && hasInheritedMargin,
 						{
 							'tools-panel-item-spacing':
-								showSpacingPresetsControl,
+								showMarginControl && showSpacingPresetsControl,
 						}
 					) }
 					panelId={ panelId }
 				>
-					{ ! showSpacingPresetsControl && (
+					{ ! showMarginControl && (
+						<GatedValueRow
+							value={ displayBoxStyleValue(
+								value?.spacing?.margin
+							) }
+							onReset={ resetMarginValue }
+						/>
+					) }
+					{ showMarginControl && ! showSpacingPresetsControl && (
 						<BoxControl
 							values={ localMarginValues }
 							onChange={ setMarginValues }
@@ -938,7 +982,7 @@ export default function DimensionsPanel( {
 							splitOnAxis={ isAxialMargin }
 						/>
 					) }
-					{ showSpacingPresetsControl && (
+					{ showMarginControl && showSpacingPresetsControl && (
 						<SpacingSizesControl
 							values={ marginValues }
 							onChange={ setMarginValues }
@@ -953,11 +997,11 @@ export default function DimensionsPanel( {
 					) }
 				</InheritanceToolsPanelItem>
 			) }
-			{ showGapControl && (
+			{ ( showGapControl || hasGapValue() ) && (
 				<InheritanceToolsPanelItem
 					hasValue={ hasGapValue }
 					label={ __( 'Block spacing' ) }
-					hasInlineEndToggle={ isAxialGap }
+					hasInlineEndToggle={ showGapControl && isAxialGap }
 					onDeselect={ resetGapValue }
 					isShownByDefault={
 						defaultControls.blockGap ?? DEFAULT_CONTROLS.blockGap
@@ -967,15 +1011,26 @@ export default function DimensionsPanel( {
 						hasGapValue() && inheritedGapRaw !== undefined,
 						{
 							'tools-panel-item-spacing':
-								showSpacingPresetsControl,
+								showGapControl && showSpacingPresetsControl,
 							'single-column':
 								// If UnitControl is used, should be single-column.
-								! showSpacingPresetsControl && ! isAxialGap,
+								showGapControl &&
+								! showSpacingPresetsControl &&
+								! isAxialGap,
 						}
 					) }
 					panelId={ panelId }
 				>
-					{ ! showSpacingPresetsControl &&
+					{ ! showGapControl && (
+						<GatedValueRow
+							value={ displayBoxStyleValue(
+								value?.spacing?.blockGap
+							) }
+							onReset={ resetGapValue }
+						/>
+					) }
+					{ showGapControl &&
+						! showSpacingPresetsControl &&
 						( isAxialGap ? (
 							<BoxControl
 								label={ __( 'Block spacing' ) }
@@ -1001,7 +1056,7 @@ export default function DimensionsPanel( {
 								}
 							/>
 						) ) }
-					{ showSpacingPresetsControl && (
+					{ showGapControl && showSpacingPresetsControl && (
 						<SpacingSizesControl
 							label={ __( 'Block spacing' ) }
 							min={ 0 }
@@ -1029,7 +1084,7 @@ export default function DimensionsPanel( {
 					}
 				/>
 			) }
-			{ showMinHeightControl && (
+			{ ( showMinHeightControl || hasMinHeightValue() ) && (
 				<InheritanceToolsPanelItem
 					{ ...inheritanceProps(
 						isMinHeightPlaceholder,
@@ -1044,27 +1099,39 @@ export default function DimensionsPanel( {
 					}
 					panelId={ panelId }
 				>
-					<DimensionControl
-						label={ __( 'Minimum height' ) }
-						// Local-then-inherited: render the inherited value as the
-						// control's value at rest so the unit parses from it
-						// (e.g. "120px" keeps its unit rather than the value
-						// string sitting behind a default px unit). It is only
-						// written to local on user change.
-						value={ localMinHeightValue ?? inheritedMinHeightValue }
-						onChange={ setMinHeightValue }
-						placeholder={
-							isMinHeightPlaceholder
-								? getNumericPlaceholder(
-										inheritedMinHeightValue
-								  )
-								: undefined
-						}
-						dimensionSizes={ dimensions?.dimensionSizes }
-					/>
+					{ ! showMinHeightControl && (
+						<GatedValueRow
+							value={ displayStyleValue(
+								value?.dimensions?.minHeight
+							) }
+							onReset={ resetMinHeightValue }
+						/>
+					) }
+					{ showMinHeightControl && (
+						<DimensionControl
+							label={ __( 'Minimum height' ) }
+							// Local-then-inherited: render the inherited value as the
+							// control's value at rest so the unit parses from it
+							// (e.g. "120px" keeps its unit rather than the value
+							// string sitting behind a default px unit). It is only
+							// written to local on user change.
+							value={
+								localMinHeightValue ?? inheritedMinHeightValue
+							}
+							onChange={ setMinHeightValue }
+							placeholder={
+								isMinHeightPlaceholder
+									? getNumericPlaceholder(
+											inheritedMinHeightValue
+									  )
+									: undefined
+							}
+							dimensionSizes={ dimensions?.dimensionSizes }
+						/>
+					) }
 				</InheritanceToolsPanelItem>
 			) }
-			{ showMinWidthControl && (
+			{ ( showMinWidthControl || hasMinWidthValue() ) && (
 				<InheritanceToolsPanelItem
 					{ ...inheritanceProps(
 						isMinWidthPlaceholder,
@@ -1079,26 +1146,38 @@ export default function DimensionsPanel( {
 					}
 					panelId={ panelId }
 				>
-					<DimensionControl
-						label={ __( 'Minimum width' ) }
-						// Local-then-inherited: render the inherited value as the
-						// control's value at rest so the unit parses from it
-						// rather than the value string sitting behind a default
-						// px unit. It is only written to local on user change.
-						value={ localMinWidthValue ?? inheritedMinWidthValue }
-						onChange={ setMinWidthValue }
-						placeholder={
-							isMinWidthPlaceholder
-								? getNumericPlaceholder(
-										inheritedMinWidthValue
-								  )
-								: undefined
-						}
-						dimensionSizes={ dimensions?.dimensionSizes }
-					/>
+					{ ! showMinWidthControl && (
+						<GatedValueRow
+							value={ displayStyleValue(
+								value?.dimensions?.minWidth
+							) }
+							onReset={ resetMinWidthValue }
+						/>
+					) }
+					{ showMinWidthControl && (
+						<DimensionControl
+							label={ __( 'Minimum width' ) }
+							// Local-then-inherited: render the inherited value as the
+							// control's value at rest so the unit parses from it
+							// rather than the value string sitting behind a default
+							// px unit. It is only written to local on user change.
+							value={
+								localMinWidthValue ?? inheritedMinWidthValue
+							}
+							onChange={ setMinWidthValue }
+							placeholder={
+								isMinWidthPlaceholder
+									? getNumericPlaceholder(
+											inheritedMinWidthValue
+									  )
+									: undefined
+							}
+							dimensionSizes={ dimensions?.dimensionSizes }
+						/>
+					) }
 				</InheritanceToolsPanelItem>
 			) }
-			{ showHeightControl && (
+			{ ( showHeightControl || hasHeightValue() ) && (
 				<InheritanceToolsPanelItem
 					{ ...inheritanceProps(
 						isHeightPlaceholder,
@@ -1112,20 +1191,30 @@ export default function DimensionsPanel( {
 					}
 					panelId={ panelId }
 				>
-					<DimensionControl
-						label={ __( 'Height' ) }
-						value={ localHeightValue }
-						onChange={ setHeightValue }
-						placeholder={
-							isHeightPlaceholder
-								? inheritedHeightValue
-								: undefined
-						}
-						dimensionSizes={ dimensions?.dimensionSizes }
-					/>
+					{ ! showHeightControl && (
+						<GatedValueRow
+							value={ displayStyleValue(
+								value?.dimensions?.height
+							) }
+							onReset={ resetHeightValue }
+						/>
+					) }
+					{ showHeightControl && (
+						<DimensionControl
+							label={ __( 'Height' ) }
+							value={ localHeightValue }
+							onChange={ setHeightValue }
+							placeholder={
+								isHeightPlaceholder
+									? inheritedHeightValue
+									: undefined
+							}
+							dimensionSizes={ dimensions?.dimensionSizes }
+						/>
+					) }
 				</InheritanceToolsPanelItem>
 			) }
-			{ showWidthControl && (
+			{ ( showWidthControl || hasWidthValue() ) && (
 				<InheritanceToolsPanelItem
 					{ ...inheritanceProps(
 						isWidthPlaceholder,
@@ -1139,15 +1228,27 @@ export default function DimensionsPanel( {
 					}
 					panelId={ panelId }
 				>
-					<DimensionControl
-						label={ __( 'Width' ) }
-						value={ localWidthValue }
-						onChange={ setWidthValue }
-						placeholder={
-							isWidthPlaceholder ? inheritedWidthValue : undefined
-						}
-						dimensionSizes={ dimensions?.dimensionSizes }
-					/>
+					{ ! showWidthControl && (
+						<GatedValueRow
+							value={ displayStyleValue(
+								value?.dimensions?.width
+							) }
+							onReset={ resetWidthValue }
+						/>
+					) }
+					{ showWidthControl && (
+						<DimensionControl
+							label={ __( 'Width' ) }
+							value={ localWidthValue }
+							onChange={ setWidthValue }
+							placeholder={
+								isWidthPlaceholder
+									? inheritedWidthValue
+									: undefined
+							}
+							dimensionSizes={ dimensions?.dimensionSizes }
+						/>
+					) }
 				</InheritanceToolsPanelItem>
 			) }
 			{ showAspectRatioControl && (
@@ -1167,6 +1268,27 @@ export default function DimensionsPanel( {
 					}
 				/>
 			) }
+			{ ! showAspectRatioControl &&
+				! hasPseudoBlockStyleState( styleState ) &&
+				hasAspectRatioValue() && (
+					<InheritanceToolsPanelItem
+						label={ __( 'Aspect ratio' ) }
+						hasValue={ hasAspectRatioValue }
+						onDeselect={ () => setAspectRatioValue( undefined ) }
+						isShownByDefault={
+							defaultControls.aspectRatio ??
+							DEFAULT_CONTROLS.aspectRatio
+						}
+						panelId={ panelId }
+					>
+						<GatedValueRow
+							value={ displayStyleValue(
+								value?.dimensions?.aspectRatio
+							) }
+							onReset={ () => setAspectRatioValue( undefined ) }
+						/>
+					</InheritanceToolsPanelItem>
+				) }
 		</Wrapper>
 	);
 }

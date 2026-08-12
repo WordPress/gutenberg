@@ -1,6 +1,9 @@
 import clsx from 'clsx';
 import { hasBlockSupport, getBlockSupport } from '@wordpress/blocks';
-import { __experimentalHasSplitBorders as hasSplitBorders } from '@wordpress/components';
+import {
+	__experimentalHasSplitBorders as hasSplitBorders,
+	__experimentalIsDefinedBorder as isDefinedBorder,
+} from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
@@ -138,13 +141,9 @@ function BordersInspectorControl( { label, children, resetAllFilter } ) {
 
 export function BorderPanel( { clientId, name, setAttributes, settings } ) {
 	const selectedState = useBlockStyleState();
-	const isEnabled = useHasBorderPanel( settings );
+	const isPanelEnabled = useHasBorderPanel( settings );
 	const { style, borderColor, className } = useSelect(
 		( select ) => {
-			// Early return to avoid subscription when disabled
-			if ( ! isEnabled ) {
-				return {};
-			}
 			const {
 				style: _style,
 				borderColor: _borderColor,
@@ -156,8 +155,21 @@ export function BorderPanel( { clientId, name, setAttributes, settings } ) {
 				className: _className,
 			};
 		},
-		[ clientId, isEnabled ]
+		[ clientId ]
 	);
+
+	// A present value keeps the panel available even when the settings
+	// hide every control, so the value can still be removed.
+	const hasBorderRadiusValue =
+		typeof style?.border?.radius === 'object'
+			? Object.values( style.border.radius ).some( Boolean )
+			: !! style?.border?.radius;
+	const isEnabled =
+		isPanelEnabled ||
+		!! borderColor ||
+		isDefinedBorder( style?.border ) ||
+		hasBorderRadiusValue ||
+		!! style?.shadow;
 
 	const { value: inheritedValue } = useResolvedStyle(
 		name,

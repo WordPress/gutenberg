@@ -18,6 +18,8 @@ import { useCallback, useMemo, useRef } from '@wordpress/element';
 import { reset as resetIcon } from '@wordpress/icons';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
 import { useToolsPanelDropdownMenuProps } from './utils';
+import GatedValueRow, { displayStyleValue } from './gated-value-row';
+import DisabledControlsNotice from './disabled-controls-notice';
 import { setImmutably } from '../../utils/object';
 import {
 	getInheritanceProps,
@@ -253,7 +255,10 @@ export default function FiltersPanel( {
 			onChange={ onChange }
 			panelId={ panelId }
 		>
-			{ hasDuotoneEnabled && (
+			{ ! hasDuotoneEnabled && hasDuotone() && (
+				<DisabledControlsNotice />
+			) }
+			{ ( hasDuotoneEnabled || hasDuotone() ) && (
 				<InheritanceToolsPanelItem
 					{ ...inheritanceProps(
 						isDuotonePlaceholder,
@@ -269,37 +274,47 @@ export default function FiltersPanel( {
 					showLocalOverrideActionsInLabel={ false }
 					panelId={ panelId }
 				>
-					<Dropdown
-						popoverProps={ popoverProps }
-						className="block-editor-global-styles-filters-panel__dropdown"
-						renderToggle={ renderToggle( duotone, {
-							hasLocalValue: hasDuotone(),
-							hasLocalOverride: hasDuotoneLocalOverride,
-							onReset: resetDuotone,
-						} ) }
-						renderContent={ () => (
-							<DropdownContentWrapper paddingSize="small">
-								<MenuGroup label={ __( 'Duotone' ) }>
-									<p>
-										{ __(
-											'Create a two-tone color effect without losing your original image.'
-										) }
-									</p>
-									<DuotonePicker
-										colorPalette={ colorPalette }
-										duotonePalette={ duotonePalette }
-										// TODO: Re-enable both when custom colors are supported for block-level styles.
-										disableCustomColors
-										disableCustomDuotone
-										value={ duotone }
-										onChange={
-											setDuotoneWithInheritedCommit
-										}
-									/>
-								</MenuGroup>
-							</DropdownContentWrapper>
-						) }
-					/>
+					{ ! hasDuotoneEnabled && (
+						<GatedValueRow
+							value={ displayStyleValue(
+								value?.filter?.duotone
+							) }
+							onReset={ resetDuotone }
+						/>
+					) }
+					{ hasDuotoneEnabled && (
+						<Dropdown
+							popoverProps={ popoverProps }
+							className="block-editor-global-styles-filters-panel__dropdown"
+							renderToggle={ renderToggle( duotone, {
+								hasLocalValue: hasDuotone(),
+								hasLocalOverride: hasDuotoneLocalOverride,
+								onReset: resetDuotone,
+							} ) }
+							renderContent={ () => (
+								<DropdownContentWrapper paddingSize="small">
+									<MenuGroup label={ __( 'Duotone' ) }>
+										<p>
+											{ __(
+												'Create a two-tone color effect without losing your original image.'
+											) }
+										</p>
+										<DuotonePicker
+											colorPalette={ colorPalette }
+											duotonePalette={ duotonePalette }
+											// TODO: Re-enable both when custom colors are supported for block-level styles.
+											disableCustomColors
+											disableCustomDuotone
+											value={ duotone }
+											onChange={
+												setDuotoneWithInheritedCommit
+											}
+										/>
+									</MenuGroup>
+								</DropdownContentWrapper>
+							) }
+						/>
+					) }
 				</InheritanceToolsPanelItem>
 			) }
 		</Wrapper>

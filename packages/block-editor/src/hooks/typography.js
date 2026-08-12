@@ -174,6 +174,8 @@ export function TypographyPanel( {
 		isPanelEnabled ||
 		!! fontSize ||
 		!! fontFamily ||
+		!! textColor ||
+		!! style?.color?.text ||
 		!! Object.keys( style?.typography ?? {} ).length;
 
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );

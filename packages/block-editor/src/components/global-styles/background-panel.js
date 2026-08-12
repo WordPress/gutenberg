@@ -3,6 +3,8 @@ import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import BackgroundImageControl from '../background-image-control';
 import ColorGradientDropdownItem from './color-gradient-dropdown-item';
+import GatedValueRow, { displayStyleValue } from './gated-value-row';
+import DisabledControlsNotice from './disabled-controls-notice';
 import { useHasBackgroundColorPanel } from './color-panel';
 import { useColorGradientSettings } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
@@ -227,11 +229,22 @@ export default function BackgroundImagePanel( {
 		]
 	);
 
+	// A value whose control is disabled keeps its panel item so it can
+	// still be removed.
+	const hasDisabledControlValues =
+		( ! showBackgroundImageControl && hasBackgroundImageValue( value ) ) ||
+		( ! showBackgroundColorControl && hasBackgroundColorValue( value ) ) ||
+		( ! showBackgroundGradientControl &&
+			! showLegacyColorGradientControl &&
+			( hasBackgroundGradientValue( value ) ||
+				hasLegacyColorGradientValue( value ) ) );
+
 	if (
 		! showBackgroundImageControl &&
 		! showBackgroundColorControl &&
 		! showBackgroundGradientControl &&
-		! showLegacyColorGradientControl
+		! showLegacyColorGradientControl &&
+		! hasDisabledControlValues
 	) {
 		return null;
 	}
@@ -341,6 +354,18 @@ export default function BackgroundImagePanel( {
 	} );
 	const hasLocalBackgroundImage = hasBackgroundImageValue( value );
 
+	// A background image whose control is disabled shows as its file name
+	// when one can be derived, otherwise as the raw value.
+	const rawBackgroundImage = value?.background?.backgroundImage;
+	const backgroundImageUrl =
+		typeof rawBackgroundImage === 'string'
+			? rawBackgroundImage
+			: rawBackgroundImage?.url;
+	const displayBackgroundImage =
+		rawBackgroundImage?.title ||
+		backgroundImageUrl?.split( '/' ).pop()?.split( '?' )[ 0 ] ||
+		displayStyleValue( backgroundImageUrl );
+
 	return (
 		<Wrapper
 			resetAllFilter={ resetAllFilter }
@@ -349,7 +374,8 @@ export default function BackgroundImagePanel( {
 			panelId={ panelId }
 			headerLabel={ headerLabel }
 		>
-			{ showBackgroundImageControl && (
+			{ hasDisabledControlValues && <DisabledControlsNotice /> }
+			{ ( showBackgroundImageControl || hasLocalBackgroundImage ) && (
 				<InheritanceToolsPanelItem
 					{ ...inheritanceProps(
 						inheritedBackgroundImage && ! hasLocalBackgroundImage,
@@ -363,17 +389,24 @@ export default function BackgroundImagePanel( {
 					isShownByDefault={ defaultControls.backgroundImage }
 					panelId={ panelId }
 				>
-					<BackgroundImageControl
-						value={ value }
-						onChange={ onChange }
-						settings={ settings }
-						inheritedValue={ inheritedValue }
-						defaultControls={ defaultControls }
-						defaultValues={ defaultValues }
-						showInheritanceLabelIndicators={
-							showInheritanceLabelIndicators
-						}
-					/>
+					{ showBackgroundImageControl ? (
+						<BackgroundImageControl
+							value={ value }
+							onChange={ onChange }
+							settings={ settings }
+							inheritedValue={ inheritedValue }
+							defaultControls={ defaultControls }
+							defaultValues={ defaultValues }
+							showInheritanceLabelIndicators={
+								showInheritanceLabelIndicators
+							}
+						/>
+					) : (
+						<GatedValueRow
+							value={ displayBackgroundImage }
+							onReset={ resetBackground }
+						/>
+					) }
 				</InheritanceToolsPanelItem>
 			) }
 			{ showBackgroundColorControl && (
@@ -423,6 +456,23 @@ export default function BackgroundImagePanel( {
 					panelId={ panelId }
 				/>
 			) }
+			{ ! showBackgroundColorControl &&
+				hasBackgroundColorValue( value ) && (
+					<InheritanceToolsPanelItem
+						label={ __( 'Color' ) }
+						hasValue={ () => hasBackgroundColorValue( value ) }
+						onDeselect={ resetBackgroundColor }
+						isShownByDefault={ defaultControls.backgroundColor }
+						panelId={ panelId }
+					>
+						<GatedValueRow
+							value={ displayStyleValue(
+								value?.color?.background
+							) }
+							onReset={ resetBackgroundColor }
+						/>
+					</InheritanceToolsPanelItem>
+				) }
 			{ showBackgroundGradientControl && (
 				<ColorGradientDropdownItem
 					label={ __( 'Gradient' ) }
@@ -513,6 +563,29 @@ export default function BackgroundImagePanel( {
 					panelId={ panelId }
 				/>
 			) }
+			{ ! showBackgroundGradientControl &&
+				! showLegacyColorGradientControl &&
+				( hasBackgroundGradientValue( value ) ||
+					hasLegacyColorGradientValue( value ) ) && (
+					<InheritanceToolsPanelItem
+						label={ __( 'Gradient' ) }
+						hasValue={ () =>
+							hasBackgroundGradientValue( value ) ||
+							hasLegacyColorGradientValue( value )
+						}
+						onDeselect={ resetGradient }
+						isShownByDefault={ defaultControls.gradient }
+						panelId={ panelId }
+					>
+						<GatedValueRow
+							value={ displayStyleValue(
+								value?.background?.gradient ??
+									value?.color?.gradient
+							) }
+							onReset={ resetGradient }
+						/>
+					</InheritanceToolsPanelItem>
+				) }
 		</Wrapper>
 	);
 }
