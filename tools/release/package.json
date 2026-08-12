@@ -35,15 +35,15 @@
 		"simple-git": "^3.32.3",
 		"sprintf-js": "^1.1.1"
 	},
-	"scripts": {
-		"cherry-pick": "node ./cherry-pick.mjs",
-		"generate-php-sync-issue": "node ./generate-php-sync-issue.mjs",
-		"log-performance-results": "node ./log-performance-results.js"
-	},
 	"devDependencies": {
 		"vitest": "^4.1.10"
 	},
 	"publishConfig": {
 		"access": "public"
+	},
+	"scripts": {
+		"cherry-pick": "node ./cherry-pick.mjs",
+		"generate-php-sync-issue": "node ./generate-php-sync-issue.mjs",
+		"log-performance-results": "node ./log-performance-results.js"
 	}
 }
