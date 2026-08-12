@@ -21,7 +21,11 @@ A mode can also be derived rather than set by the block itself. Under a `templat
 Called without an argument, the hook returns the current mode for the block. This is the most common use, and lets a block hide controls when editing is restricted:
 
 ```jsx
-import { useBlockEditingMode } from '@wordpress/block-editor';
+import {
+	BlockControls,
+	useBlockEditingMode,
+	useBlockProps,
+} from '@wordpress/block-editor';
 
 function MyBlock( { attributes, setAttributes } ) {
 	const blockEditingMode = useBlockEditingMode();
@@ -41,7 +45,10 @@ function MyBlock( { attributes, setAttributes } ) {
 Passing a mode sets it for the block:
 
 ```jsx
-import { useBlockEditingMode } from '@wordpress/block-editor';
+import {
+	useBlockEditingMode,
+	useBlockProps,
+} from '@wordpress/block-editor';
 
 function MyBlock( { attributes, setAttributes } ) {
 	useBlockEditingMode( 'disabled' );
@@ -63,7 +70,3 @@ The editing mode to set for the block. One of `'disabled'`, `'contentOnly'`, or 
 -   **Type:** `String`
 
 The current editing mode for the block.
-
-## Related components
-
-Block Editor components are components that can be used to compose the UI of your block editor. Thus, they can only be used under a [`BlockEditorProvider`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/provider/README.md) in the components tree.
