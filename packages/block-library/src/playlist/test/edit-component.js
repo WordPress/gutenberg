@@ -64,7 +64,7 @@ jest.mock( '@wordpress/blob', () => ( {
 } ) );
 
 jest.mock( '@zip.js/zip.js/lib/zip-no-worker-inflate.js', () => ( {
-	BlobReader: jest.fn(),
+	Uint8ArrayReader: jest.fn(),
 	Uint8ArrayWriter: jest.fn( function ( type ) {
 		this.type = type;
 	} ),

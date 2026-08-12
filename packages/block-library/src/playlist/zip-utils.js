@@ -1,5 +1,5 @@
 import {
-	BlobReader,
+	Uint8ArrayReader,
 	Uint8ArrayWriter,
 	ZipReader,
 } from '@zip.js/zip.js/lib/zip-no-worker-inflate.js';
@@ -244,6 +244,20 @@ async function getEntryFile( entry ) {
 	}
 }
 
+async function getZipReader( zipFile ) {
+	debugPlaylistZip( 'loading ZIP file data', {
+		zip: getPlaylistZipDebugMediaInfo( zipFile ),
+	} );
+
+	const zipData = new Uint8Array( await zipFile.arrayBuffer() );
+	debugPlaylistZip( 'loaded ZIP file data', {
+		zip: getPlaylistZipDebugMediaInfo( zipFile ),
+		byteLength: zipData.byteLength,
+	} );
+
+	return new ZipReader( new Uint8ArrayReader( zipData ) );
+}
+
 /**
  * Extract playlist media files and inferred track details from a ZIP archive.
  *
@@ -251,7 +265,7 @@ async function getEntryFile( entry ) {
  * @return {Promise<Object>} Extracted audio files, cover image, and track details.
  */
 export async function getPlaylistMediaFromZip( zipFile ) {
-	const zipReader = new ZipReader( new BlobReader( zipFile ) );
+	const zipReader = await getZipReader( zipFile );
 	debugPlaylistZip(
 		'opening ZIP file',
 		getPlaylistZipDebugMediaInfo( zipFile )
