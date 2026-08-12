@@ -14,7 +14,7 @@
  * admin-post.php, so recipients can opt out of a thread without a UI.
  *
  * @package gutenberg
- * @since   7.1.0
+ * @since   7.2.0
  */
 
 if ( ! function_exists( 'gutenberg_get_note_thread_root_id' ) ) {
@@ -25,7 +25,7 @@ if ( ! function_exists( 'gutenberg_get_note_thread_root_id' ) ) {
 	 * with replies hanging directly off it. Follower records are keyed by that
 	 * top-level note so a subscription covers the whole thread.
 	 *
-	 * @since 7.1.0
+	 * @since 7.2.0
 	 *
 	 * @param WP_Comment $comment A note comment.
 	 * @return int The top-level note ID for the thread.
@@ -52,7 +52,7 @@ if ( ! function_exists( 'gutenberg_get_note_status_event' ) ) {
 	 * fallback. That way the answer is the same whichever of the two REST
 	 * comment hooks the caller runs on.
 	 *
-	 * @since 7.1.0
+	 * @since 7.2.0
 	 *
 	 * @param WP_Comment $comment The note.
 	 * @param mixed      $request The REST request, when the caller has one.
@@ -423,7 +423,7 @@ if ( ! function_exists( 'gutenberg_notify_note_followers' ) ) {
 		/**
 		 * Filters the user IDs notified about a new note in a thread they follow.
 		 *
-		 * @since 7.1.0
+		 * @since 7.2.0
 		 *
 		 * @param int[]      $follower_ids Candidate follower user IDs.
 		 * @param WP_Comment $comment      The note that was inserted.
@@ -625,7 +625,7 @@ if ( ! function_exists( 'gutenberg_send_note_follower_notification' ) ) {
 		/**
 		 * Filters the follower notification email subject.
 		 *
-		 * @since 7.1.0
+		 * @since 7.2.0
 		 *
 		 * @param string     $subject Email subject.
 		 * @param WP_User    $user    Recipient.
@@ -636,7 +636,7 @@ if ( ! function_exists( 'gutenberg_send_note_follower_notification' ) ) {
 		/**
 		 * Filters the follower notification email body.
 		 *
-		 * @since 7.1.0
+		 * @since 7.2.0
 		 *
 		 * @param string     $body    Email body.
 		 * @param WP_User    $user    Recipient.
