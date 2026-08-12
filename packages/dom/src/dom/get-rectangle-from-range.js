@@ -100,7 +100,11 @@ export default function getRectangleFromRange( range ) {
 		range.startOffset > 0 &&
 		range.startOffset < /** @type {Text} */ ( startContainer ).length
 	) {
-		const measure = ( start, end ) => {
+		assertIsDefined( ownerDocument, 'ownerDocument' );
+		const measure = (
+			/** @type {number} */ start,
+			/** @type {number} */ end
+		) => {
 			const charRange = ownerDocument.createRange();
 			charRange.setStart( startContainer, start );
 			charRange.setEnd( startContainer, end );
