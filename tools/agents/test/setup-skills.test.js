@@ -1,5 +1,13 @@
 import { execFile } from 'node:child_process';
-import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import {
+	copyFile,
+	mkdtemp,
+	mkdir,
+	readFile,
+	realpath,
+	rm,
+	writeFile,
+} from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -7,7 +15,7 @@ import { promisify } from 'node:util';
 import { setupSkills } from '../setup-skills.mjs';
 
 const execFileAsync = promisify( execFile );
-const setupScript = path.join( __dirname, '../setup-skills.mjs' );
+const setupScriptSource = path.join( __dirname, '../setup-skills.mjs' );
 const temporaryRoots = [];
 
 afterEach( async () => {
@@ -17,8 +25,8 @@ afterEach( async () => {
 } );
 
 async function createRepository( skillNames = [ 'testing' ] ) {
-	const repositoryRoot = await mkdtemp(
-		path.join( os.tmpdir(), 'gutenberg-agent-skills-' )
+	const repositoryRoot = await realpath(
+		await mkdtemp( path.join( os.tmpdir(), 'gutenberg-agent-skills-' ) )
 	);
 	temporaryRoots.push( repositoryRoot );
 
@@ -26,7 +34,15 @@ async function createRepository( skillNames = [ 'testing' ] ) {
 		await createSkill( repositoryRoot, skillName );
 	}
 
+	const setupScript = getSetupScript( repositoryRoot );
+	await mkdir( path.dirname( setupScript ), { recursive: true } );
+	await copyFile( setupScriptSource, setupScript );
+
 	return repositoryRoot;
+}
+
+function getSetupScript( repositoryRoot ) {
+	return path.join( repositoryRoot, 'tools/agents/setup-skills.mjs' );
 }
 
 async function createSkill( repositoryRoot, skillName ) {
@@ -207,6 +223,7 @@ describe( 'setupSkills', () => {
 
 	test( 'runs the setup command when executed directly', async () => {
 		const repositoryRoot = await createRepository();
+		const setupScript = getSetupScript( repositoryRoot );
 
 		const { stdout } = await execFileAsync(
 			process.execPath,
@@ -219,6 +236,7 @@ describe( 'setupSkills', () => {
 
 	test( 'skips unmatched Claude skills when run with --if-safe', async () => {
 		const repositoryRoot = await createRepository();
+		const setupScript = getSetupScript( repositoryRoot );
 		await createFloatingSkill( repositoryRoot, 'private' );
 
 		const { stdout } = await execFileAsync(
@@ -240,6 +258,7 @@ describe( 'setupSkills', () => {
 
 	test( 'fails safely when unmatched skills need non-interactive confirmation', async () => {
 		const repositoryRoot = await createRepository();
+		const setupScript = getSetupScript( repositoryRoot );
 		await createFloatingSkill( repositoryRoot, 'private' );
 
 		await expect(
@@ -264,7 +283,7 @@ describe( 'setupSkills', () => {
 				'--input-type=module',
 				'--eval',
 				`await import( ${ JSON.stringify(
-					pathToFileURL( setupScript ).href
+					pathToFileURL( setupScriptSource ).href
 				) } );`,
 			] )
 		).resolves.toEqual( expect.objectContaining( { stdout: '' } ) );
