@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.53.0 (2026-08-12)
+
 ### Internal
 
 -   Remove unused `isAction` prop from preferences modal tab buttons (`Item` has ignored it since it was replaced by `onClick`) ([#80705](https://github.com/WordPress/gutenberg/pull/80705)).
