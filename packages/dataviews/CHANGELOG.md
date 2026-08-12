@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Internal
+
+-   DataForm: Internalize `ValidatedComboboxControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81449](https://github.com/WordPress/gutenberg/pull/81449)
+-   DataForm: Internalize `ValidatedFormTokenField` instead of unlocking it from the `@wordpress/components` private APIs. [#81451](https://github.com/WordPress/gutenberg/pull/81451)
+-   DataForm: Internalize `ValidatedToggleGroupControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81450](https://github.com/WordPress/gutenberg/pull/81450)
+
 ## 18.0.0 (2026-08-12)
 
 ### Breaking Changes
@@ -13,11 +19,8 @@
 -   DataViews: Replace the inlined `kebabCase` utility with the new `@wordpress/kebab-case` package. [#81294](https://github.com/WordPress/gutenberg/pull/81294)
 -   DataForm: Internalize `ValidatedSelectControl` and its `ControlWithError` foundation instead of unlocking them from the `@wordpress/components` private APIs. The foundation is a temporary copy slated to be replaced by the upcoming `@wordpress/ui` implementation. [#81391](https://github.com/WordPress/gutenberg/pull/81391)
 -   DataForm: Internalize `ValidatedCheckboxControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81435](https://github.com/WordPress/gutenberg/pull/81435)
--   DataForm: Internalize `ValidatedComboboxControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81449](https://github.com/WordPress/gutenberg/pull/81449)
 -   DataForm: Internalize `ValidatedNumberControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81433](https://github.com/WordPress/gutenberg/pull/81433)
 -   DataForm: Internalize `ValidatedRadioControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81434](https://github.com/WordPress/gutenberg/pull/81434)
--   DataForm: Internalize `ValidatedFormTokenField` instead of unlocking it from the `@wordpress/components` private APIs. [#81451](https://github.com/WordPress/gutenberg/pull/81451)
--   DataForm: Internalize `ValidatedToggleGroupControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81450](https://github.com/WordPress/gutenberg/pull/81450)
 
 ### New Features
 
