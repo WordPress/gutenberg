@@ -2,11 +2,11 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "../utils/theme-variables" as *;
 
-.components-validated-control {
-	%red-focus-ring {
-		--focus-color: #{ $alert-red };
-	}
+%red-focus-ring {
+	--focus-color: #{ $alert-red };
+}
 
+.components-validated-control {
 	// For components based on InputBase
 	&:has(:is(input, select):invalid[data-validity-visible])
 	.components-input-control__backdrop {
