@@ -130,8 +130,47 @@ describe( 'PlaylistEdit', () => {
 	let mediaUpload;
 	let uploadedFileCount;
 
+	function createBytes( value ) {
+		return new Uint8Array(
+			Array.from( value ).map( ( character ) =>
+				character.charCodeAt( 0 )
+			)
+		);
+	}
+
+	function createStoredZipData( entries ) {
+		const chunks = [];
+		let offset = 0;
+
+		for ( const entry of entries ) {
+			const filename = createBytes( entry.filename );
+			const data = createBytes( entry.filename );
+			const header = new Uint8Array( 30 + filename.length );
+			const headerView = new DataView( header.buffer );
+
+			headerView.setUint32( 0, 0x04034b50, true );
+			headerView.setUint16( 8, 0, true );
+			headerView.setUint32( 18, data.length, true );
+			headerView.setUint32( 22, data.length, true );
+			headerView.setUint16( 26, filename.length, true );
+			header.set( filename, 30 );
+
+			Object.assign( entry, {
+				offset,
+				compressedSize: data.length,
+				uncompressedSize: data.length,
+				compressionMethod: 0,
+			} );
+
+			chunks.push( header, data );
+			offset += header.length + data.length;
+		}
+
+		return chunks;
+	}
+
 	function createZipFile() {
-		return new File( [ 'playlist' ], 'album.zip', {
+		return new File( createStoredZipData( mockZipEntries ), 'album.zip', {
 			type: 'application/zip',
 		} );
 	}
@@ -378,6 +417,7 @@ describe( 'PlaylistEdit', () => {
 		expect(
 			replaceInnerBlocks.mock.calls[ 0 ][ 1 ][ 0 ].attributes
 		).not.toHaveProperty( 'trackNumber' );
+		expect( mockZipEntries[ 0 ].getData ).not.toHaveBeenCalled();
 	} );
 
 	it( 'fills playlist tracks from a ZIP attachment selected in the Media Library', async () => {

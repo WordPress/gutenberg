@@ -9,6 +9,9 @@ const AUDIO_FILE_EXTENSION =
 const IMAGE_FILE_EXTENSION = /\.(jpe?g|png|gif|webp)$/i;
 const COVER_FILE_NAME = /^(cover|folder|album|albumart|artwork)\./i;
 const DEBUG_STORAGE_KEY = 'wpPlaylistZipDebug';
+const ZIP_LOCAL_FILE_HEADER_SIGNATURE = 0x04034b50;
+const ZIP_LOCAL_FILE_HEADER_LENGTH = 30;
+const ZIP_COMPRESSION_METHOD_STORE = 0;
 
 function getSafeUrlDetails( url ) {
 	if ( typeof url !== 'string' ) {
@@ -80,6 +83,7 @@ function getZipEntryDebugInfo( entry ) {
 		compressedSize: entry?.compressedSize,
 		uncompressedSize: entry?.uncompressedSize,
 		encrypted: entry?.encrypted,
+		offset: entry?.offset,
 		zip64: entry?.zip64,
 		compressionMethod: entry?.compressionMethod,
 		hasGetData: typeof entry?.getData === 'function',
@@ -121,6 +125,83 @@ function getZipEntryReadDebugOptions( entryInfo ) {
 			} );
 		},
 	};
+}
+
+function getStoredZipEntryData( entry, zipData ) {
+	if (
+		entry?.encrypted ||
+		entry?.compressionMethod !== ZIP_COMPRESSION_METHOD_STORE
+	) {
+		return undefined;
+	}
+
+	const entryInfo = getZipEntryDebugInfo( entry );
+	const headerOffset = entry.offset;
+	const dataSize = entry.uncompressedSize;
+
+	if (
+		! Number.isSafeInteger( headerOffset ) ||
+		headerOffset < 0 ||
+		! Number.isSafeInteger( dataSize ) ||
+		dataSize < 0 ||
+		entry.compressedSize !== dataSize
+	) {
+		debugPlaylistZip( 'stored ZIP entry needs zip.js reader', {
+			entry: entryInfo,
+			reason: 'invalid direct read metadata',
+		} );
+		return undefined;
+	}
+
+	if ( headerOffset + ZIP_LOCAL_FILE_HEADER_LENGTH > zipData.byteLength ) {
+		debugPlaylistZip( 'stored ZIP entry needs zip.js reader', {
+			entry: entryInfo,
+			reason: 'local header outside ZIP data',
+		} );
+		return undefined;
+	}
+
+	const headerView = new DataView(
+		zipData.buffer,
+		zipData.byteOffset + headerOffset,
+		ZIP_LOCAL_FILE_HEADER_LENGTH
+	);
+
+	if ( headerView.getUint32( 0, true ) !== ZIP_LOCAL_FILE_HEADER_SIGNATURE ) {
+		debugPlaylistZip( 'stored ZIP entry needs zip.js reader', {
+			entry: entryInfo,
+			reason: 'invalid local header signature',
+		} );
+		return undefined;
+	}
+
+	const fileNameLength = headerView.getUint16( 26, true );
+	const extraFieldLength = headerView.getUint16( 28, true );
+	const dataOffset =
+		headerOffset +
+		ZIP_LOCAL_FILE_HEADER_LENGTH +
+		fileNameLength +
+		extraFieldLength;
+	const dataEnd = dataOffset + dataSize;
+
+	if ( dataEnd > zipData.byteLength ) {
+		debugPlaylistZip( 'stored ZIP entry needs zip.js reader', {
+			entry: entryInfo,
+			reason: 'entry data outside ZIP data',
+			dataOffset,
+			dataEnd,
+			byteLength: zipData.byteLength,
+		} );
+		return undefined;
+	}
+
+	debugPlaylistZip( 'read stored ZIP entry directly', {
+		entry: entryInfo,
+		dataOffset,
+		dataSize,
+	} );
+
+	return zipData.slice( dataOffset, dataEnd );
 }
 
 export function isZipFile( file ) {
@@ -207,7 +288,7 @@ function sortTracksByNumber( tracks ) {
 	} );
 }
 
-async function getEntryFile( entry ) {
+async function getEntryFile( entry, zipData ) {
 	const fileName = getFileName( entry.filename );
 	const entryInfo = getZipEntryDebugInfo( entry );
 	// Keep the MIME type unset so WordPress validates the upload by extension
@@ -218,10 +299,13 @@ async function getEntryFile( entry ) {
 	} );
 
 	try {
-		const data = await entry.getData(
-			new Uint8ArrayWriter(),
-			getZipEntryReadDebugOptions( entryInfo )
-		);
+		let data = getStoredZipEntryData( entry, zipData );
+		if ( data === undefined ) {
+			data = await entry.getData(
+				new Uint8ArrayWriter(),
+				getZipEntryReadDebugOptions( entryInfo )
+			);
+		}
 		const options = {};
 
 		if ( entry.lastModDate ) {
@@ -255,7 +339,10 @@ async function getZipReader( zipFile ) {
 		byteLength: zipData.byteLength,
 	} );
 
-	return new ZipReader( new Uint8ArrayReader( zipData ) );
+	return {
+		zipData,
+		zipReader: new ZipReader( new Uint8ArrayReader( zipData ) ),
+	};
 }
 
 /**
@@ -265,7 +352,7 @@ async function getZipReader( zipFile ) {
  * @return {Promise<Object>} Extracted audio files, cover image, and track details.
  */
 export async function getPlaylistMediaFromZip( zipFile ) {
-	const zipReader = await getZipReader( zipFile );
+	const { zipData, zipReader } = await getZipReader( zipFile );
 	debugPlaylistZip(
 		'opening ZIP file',
 		getPlaylistZipDebugMediaInfo( zipFile )
@@ -305,7 +392,7 @@ export async function getPlaylistMediaFromZip( zipFile ) {
 
 			if ( isAudio ) {
 				const details = getTrackDetails( fileName );
-				const file = await getEntryFile( entry );
+				const file = await getEntryFile( entry, zipData );
 				tracks.push( {
 					file,
 					details,
@@ -319,7 +406,7 @@ export async function getPlaylistMediaFromZip( zipFile ) {
 			}
 
 			if ( isCoverImage ) {
-				imageFile = await getEntryFile( entry );
+				imageFile = await getEntryFile( entry, zipData );
 				debugPlaylistZip( 'added ZIP cover image', {
 					entry: entryInfo,
 					file: getPlaylistZipDebugMediaInfo( imageFile ),
