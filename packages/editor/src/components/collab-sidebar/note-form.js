@@ -11,6 +11,7 @@ import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { sanitizeNoteContent } from './utils';
 import noteMentionCompleter from './note-mention-completer';
+import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 /*
  * The rich text form field wires `@wordpress/rich-text` into the presentational
