@@ -25,6 +25,7 @@ import {
 } from './utils';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { useNoteLock } from './use-note-lock';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
@@ -51,6 +52,16 @@ export function NoteThread( {
 	);
 	const floatingRef = useRef( null );
 	const isKeyboardTabbingRef = useRef( false );
+	const { lockedActions } = useNoteLock();
+
+	/*
+	 * On a resolved thread the form reopens the note rather than replying to
+	 * it, so which lock applies depends on the thread's status.
+	 */
+	const canSubmitReply =
+		'approved' === note.status
+			? ! lockedActions.has( 'resolve' )
+			: ! lockedActions.has( 'reply' );
 
 	const registerThread = floating?.registerThread;
 	const unregisterThread = floating?.unregisterThread;
@@ -214,20 +225,22 @@ export function NoteThread( {
 			aria-label={ ariaLabel }
 			aria-expanded={ isSelected }
 		>
-			<Button
-				className="editor-collab-sidebar-panel__skip-to-note"
-				variant="secondary"
-				size="compact"
-				onClick={ () => {
-					focusNoteThread(
-						note.id,
-						sidebarRef.current,
-						'[role="textbox"]'
-					);
-				} }
-			>
-				{ __( 'Add new reply' ) }
-			</Button>
+			{ canSubmitReply && (
+				<Button
+					className="editor-collab-sidebar-panel__skip-to-note"
+					variant="secondary"
+					size="compact"
+					onClick={ () => {
+						focusNoteThread(
+							note.id,
+							sidebarRef.current,
+							'[role="textbox"]'
+						);
+					} }
+				>
+					{ __( 'Add new reply' ) }
+				</Button>
+			) }
 			{ ! note.blockClientId && (
 				<p className="editor-collab-sidebar-panel__deleted-block-notice">
 					{ __( 'Original block deleted.' ) }
@@ -288,7 +301,7 @@ export function NoteThread( {
 					onDeleteNote={ onDeleteNote }
 				/>
 			) }
-			{ isSelected && (
+			{ isSelected && canSubmitReply && (
 				<NoteCard role="treeitem">
 					<NoteForm
 						onSubmit={ ( inputComment ) => {

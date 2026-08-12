@@ -12,6 +12,7 @@ import { moreVertical, published } from '@wordpress/icons';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import { unlock } from '../../lock-unlock';
+import { useNoteLock } from './use-note-lock';
 
 const { Menu } = unlock( componentsPrivateApis );
 
@@ -56,6 +57,7 @@ export function Note( {
 } ) {
 	const [ actionState, setActionState ] = useState( null );
 	const actionButtonRef = useRef( null );
+	const { lockedActions } = useNoteLock();
 
 	const commentRef = useRef( null );
 	const rawContent = note?.content?.raw;
@@ -90,26 +92,39 @@ export function Note( {
 		{
 			id: 'edit',
 			title: __( 'Edit' ),
+			action: 'edit',
 			isEligible: ( { status } ) => status !== 'approved',
 			onClick: () => setActionState( 'edit' ),
 		},
 		{
 			id: 'reopen',
 			title: _x( 'Reopen', 'Reopen note' ),
+			// Reopening runs the resolution state machine in reverse.
+			action: 'resolve',
 			isEligible: ( { status } ) => status === 'approved',
 			onClick: () => onEditNote( { id: note.id, status: 'hold' } ),
 		},
 		{
 			id: 'delete',
 			title: __( 'Delete' ),
+			action: 'delete',
 			isEligible: () => true,
 			onClick: () => setActionState( 'delete' ),
 		},
 	];
-	const availableItems =
+	const eligibleItems =
 		parentNote?.status !== 'approved'
 			? menuItems.filter( ( item ) => item.isEligible( note ) )
 			: [];
+	const availableItems = eligibleItems.filter(
+		( item ) => ! lockedActions.has( item.action )
+	);
+	/*
+	 * A menu whose every item was removed by the status rules stays as a
+	 * disabled trigger, so the affordance is still discoverable. One emptied by
+	 * a lock is dropped entirely: there is nothing to come back to.
+	 */
+	const isLockedOut = eligibleItems.length > 0 && availableItems.length === 0;
 
 	const deleteConfirmMessage =
 		note.parent === 0
@@ -187,7 +202,7 @@ export function Note( {
 
 	const actions = isSelected ? (
 		<>
-			{ canResolve && onResolve && (
+			{ canResolve && onResolve && ! lockedActions.has( 'resolve' ) && (
 				<Button
 					label={ _x( 'Resolve', 'Mark note as resolved' ) }
 					size="small"
@@ -197,10 +212,12 @@ export function Note( {
 					onClick={ onResolve }
 				/>
 			) }
-			<NoteActionsMenu
-				items={ availableItems }
-				buttonRef={ actionButtonRef }
-			/>
+			{ ! isLockedOut && (
+				<NoteActionsMenu
+					items={ availableItems }
+					buttonRef={ actionButtonRef }
+				/>
+			) }
 		</>
 	) : null;
 

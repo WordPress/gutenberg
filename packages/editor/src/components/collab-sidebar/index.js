@@ -20,6 +20,7 @@ import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { NoteHighlightStyles } from './note-highlight-styles';
 import { useGlobalStyles } from '../global-styles';
 import { useEnableFloatingSidebar, useNoteThreads } from './hooks';
+import { useNoteLock } from './use-note-lock';
 import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
@@ -62,6 +63,7 @@ function NotesSidebar( { postId } ) {
 	);
 
 	const { notes, unresolvedNotes } = useNoteThreads( postId );
+	const { lockedActions } = useNoteLock();
 
 	// Only enable the floating sidebar for large viewports.
 	const showFloatingSidebar = isLargeViewport;
@@ -132,7 +134,11 @@ function NotesSidebar( { postId } ) {
 			addNewNoteForBlock( clientId );
 		},
 		{
-			isDisabled: isDistractionFree || isClassicBlock || ! clientId,
+			isDisabled:
+				isDistractionFree ||
+				isClassicBlock ||
+				! clientId ||
+				lockedActions.has( 'create' ),
 		}
 	);
 
