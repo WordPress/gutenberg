@@ -89,6 +89,41 @@ export function uniqByProperty< T extends AnyObject >(
 }
 
 /**
+ * Recursively removes empty values from an object. A value is considered
+ * empty when it is `undefined` or an object that itself contains no
+ * non-empty values.
+ *
+ * @param object Object to clean.
+ * @return Cleaned object, or `undefined` if nothing remains.
+ */
+export const cleanEmptyObject = ( object: unknown ): unknown => {
+	if (
+		object === null ||
+		typeof object !== 'object' ||
+		Array.isArray( object )
+	) {
+		return object;
+	}
+
+	const cleanedEntries: [ string, unknown ][] = [];
+	for ( const [ key, value ] of Object.entries( object ) ) {
+		const cleanedValue = cleanEmptyObject( value );
+		if ( cleanedValue !== undefined ) {
+			cleanedEntries.push( [ key, cleanedValue ] );
+		}
+	}
+	return cleanedEntries.length
+		? Object.fromEntries( cleanedEntries )
+		: undefined;
+};
+
+function isPlainObject( value: unknown ): value is AnyObject {
+	return (
+		typeof value === 'object' && value !== null && ! Array.isArray( value )
+	);
+}
+
+/**
  * Recursively determines the differences between two objects.
  * Keys present in `original` but not in `updated` (or explicitly set to undefined) are mapped to `undefined`.
  * Returns only the changed properties.
@@ -203,4 +238,75 @@ export function applyAttributesDiff(
 	}
 
 	return result;
+}
+
+/**
+ * Distributes a `setAttributes` payload across multiple blocks, returning
+ * attribute updates keyed by client ID.
+ *
+ * The payload follows `setAttributes` merge semantics: only its top-level
+ * keys are considered, and each is compared against the primary block's
+ * attributes to determine what actually changed. Plain object values (e.g.
+ * `style`) are treated as snapshots of that attribute: their nested diff is
+ * applied to each block's own value, so distinct per-block styles are
+ * preserved while removals still propagate. Scalar, array and explicit
+ * `undefined` values are applied to every block as-is, so attribute clears
+ * propagate.
+ *
+ * @param primaryAttributes Current attributes of the primary block.
+ * @param newAttributes     The `setAttributes` payload.
+ * @param blocks            Blocks to update, including the primary block.
+ * @return Attribute updates keyed by client ID, or undefined if nothing changed.
+ */
+export function getPerBlockAttributeUpdates(
+	primaryAttributes: AnyObject | undefined,
+	newAttributes: AnyObject | undefined | null,
+	blocks: Array< { clientId: string; attributes: AnyObject } | null >
+): Record< string, AnyObject > | undefined {
+	if ( ! newAttributes ) {
+		return undefined;
+	}
+
+	const changes: Array< [ string, unknown ] > = [];
+	for ( const [ key, newValue ] of Object.entries( newAttributes ) ) {
+		const primaryValue = primaryAttributes?.[ key ];
+		if ( primaryValue === newValue ) {
+			continue;
+		}
+		if (
+			isPlainObject( newValue ) ||
+			( newValue === undefined && isPlainObject( primaryValue ) )
+		) {
+			const nestedDiff = getAttributesDiff(
+				primaryValue as AnyObject | undefined,
+				newValue as AnyObject | undefined
+			);
+			if ( nestedDiff !== undefined ) {
+				changes.push( [ key, nestedDiff ] );
+			}
+		} else {
+			changes.push( [ key, newValue ] );
+		}
+	}
+
+	if ( ! changes.length ) {
+		return undefined;
+	}
+
+	const updates: Record< string, AnyObject > = {};
+	for ( const block of blocks ) {
+		if ( ! block ) {
+			continue;
+		}
+		const update: AnyObject = {};
+		for ( const [ key, change ] of changes ) {
+			update[ key ] = isPlainObject( change )
+				? cleanEmptyObject(
+						applyAttributesDiff( block.attributes?.[ key ], change )
+				  )
+				: change;
+		}
+		updates[ block.clientId ] = update;
+	}
+	return updates;
 }
