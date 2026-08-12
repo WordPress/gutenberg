@@ -981,7 +981,7 @@ export default function TypographyPanel( {
 					{ ...inheritanceProps(
 						isLineHeightPlaceholder,
 						hasLineHeight() && inheritedLineHeight !== undefined,
-						'single-column'
+						hasLineHeightEnabled ? 'single-column' : undefined
 					) }
 					label={ __( 'Line height' ) }
 					hasValue={ hasLineHeight }
@@ -1023,7 +1023,7 @@ export default function TypographyPanel( {
 						isLetterSpacingPlaceholder,
 						hasLetterSpacing() &&
 							inheritedLetterSpacing !== undefined,
-						'single-column'
+						hasLetterSpacingControl ? 'single-column' : undefined
 					) }
 					label={ __( 'Letter spacing' ) }
 					hasValue={ hasLetterSpacing }
@@ -1121,7 +1121,7 @@ export default function TypographyPanel( {
 					{ ...inheritanceProps(
 						isTextColumnsPlaceholder,
 						hasTextColumns() && inheritedTextColumns !== undefined,
-						'single-column'
+						hasTextColumnsControl ? 'single-column' : undefined
 					) }
 					label={ __( 'Columns' ) }
 					hasValue={ hasTextColumns }
@@ -1160,7 +1160,7 @@ export default function TypographyPanel( {
 						isTextDecorationPlaceholder,
 						hasTextDecoration() &&
 							inheritedTextDecoration !== undefined,
-						'single-column'
+						hasTextDecorationControl ? 'single-column' : undefined
 					) }
 					label={ __( 'Decoration' ) }
 					hasValue={ hasTextDecoration }
@@ -1189,7 +1189,7 @@ export default function TypographyPanel( {
 					{ ...inheritanceProps(
 						isWritingModePlaceholder,
 						hasWritingMode() && inheritedWritingMode !== undefined,
-						'single-column'
+						hasWritingModeControl ? 'single-column' : undefined
 					) }
 					label={ __( 'Orientation' ) }
 					hasValue={ hasWritingMode }
