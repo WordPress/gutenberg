@@ -51,8 +51,10 @@ export default async function babelPlugin(
 				sourceMaps: sourceMap,
 			} );
 
-			if ( ! result?.code ) {
-				return null;
+			if ( typeof result?.code !== 'string' ) {
+				throw new Error(
+					`Storybook Babel: Babel produced no code for ${ filePath }.`
+				);
 			}
 
 			return { code: result.code, map: result.map };
