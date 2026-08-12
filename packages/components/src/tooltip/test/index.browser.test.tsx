@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { shortcutAriaLabel } from '@wordpress/keycodes';
 import Modal from '../../modal';
 import Tooltip, { TOOLTIP_DELAY } from '..';
@@ -440,7 +440,7 @@ describe( 'Tooltip', () => {
 			);
 
 			// Press the Escape key, Modal should request to be closed
-			fireEvent.keyDown( dialog, { code: 'Escape', key: 'Escape' } );
+			await userEvent.keyboard( '{Escape}' );
 			await waitFor( () => expect( onRequestClose ).toHaveBeenCalled() );
 
 			// Hover outside of the anchor, tooltip should hide

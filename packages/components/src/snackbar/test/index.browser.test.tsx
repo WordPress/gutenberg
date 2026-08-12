@@ -3,7 +3,7 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { act, fireEvent, render, screen, within } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -129,7 +129,7 @@ describe( 'Snackbar', () => {
 			'components-snackbar-explicit-dismiss'
 		);
 
-		fireEvent.click( snackbar );
+		await userEvent.click( snackbar );
 
 		expect( onRemove ).not.toHaveBeenCalled();
 		expect( onDismiss ).not.toHaveBeenCalled();
