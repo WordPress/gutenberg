@@ -11,12 +11,14 @@ test.describe( 'Typography controls for values the settings gate off', () => {
 			attributes: {
 				content: 'Styled',
 				fontSize: 'large',
-				style: { typography: { textAlign: 'center' } },
+				style: {
+					typography: { textAlign: 'center', letterSpacing: '2px' },
+				},
 			},
 		} );
 		await editor.canvas.locator( '[data-type="core/paragraph"]' ).click();
-		// Disable font sizes and text alignment, as a theme would through
-		// theme.json settings.
+		// Disable font sizes, letter spacing and text alignment, as a theme
+		// would through theme.json settings.
 		await page.evaluate( () => {
 			const { getSettings } =
 				window.wp.data.select( 'core/block-editor' );
@@ -29,6 +31,7 @@ test.describe( 'Typography controls for values the settings gate off', () => {
 						defaultFontSizes: false,
 						fontSizes: {},
 						customFontSize: false,
+						letterSpacing: false,
 						textAlign: false,
 					},
 				},
@@ -36,20 +39,59 @@ test.describe( 'Typography controls for values the settings gate off', () => {
 		} );
 	} );
 
-	test( 'resets an applied font size from a notice', async ( {
+	test( 'resets gated values independently from their panel rows', async ( {
 		editor,
 		page,
 	} ) => {
 		await editor.openDocumentSettingsSidebar();
 
-		const notice = page
-			.locator( '.block-editor-block-inspector' )
-			.locator( '.components-notice' );
+		const inspector = page.locator( '.block-editor-block-inspector' );
+		const notice = inspector.locator( '.components-notice' );
 		await expect( notice ).toContainText(
-			'Font size controls are disabled in this theme'
+			'Some typography controls are disabled in this theme'
 		);
 
-		await notice.getByRole( 'button', { name: 'Reset' } ).click();
+		// Each gated value keeps its own row: the applied value in a code
+		// element next to a Reset button.
+		const rowFor = ( valueText ) =>
+			inspector.locator( '.components-tools-panel-item' ).filter( {
+				has: page.locator( 'code', { hasText: valueText } ),
+			} );
+		const sizeRow = rowFor( 'large' );
+		const spacingRow = rowFor( '2px' );
+		await expect( sizeRow.locator( 'code' ) ).toHaveText( 'large' );
+		await expect( spacingRow.locator( 'code' ) ).toHaveText( '2px' );
+
+		await sizeRow.getByRole( 'button', { name: 'Reset' } ).click();
+
+		// Resetting one gated value leaves the others in place.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Styled',
+					style: {
+						typography: {
+							textAlign: 'center',
+							letterSpacing: '2px',
+						},
+					},
+				},
+			},
+		] );
+		await expect
+			.poll( () =>
+				page.evaluate(
+					() =>
+						window.wp.data
+							.select( 'core/block-editor' )
+							.getBlocks()[ 0 ].attributes.fontSize
+				)
+			)
+			.toBeUndefined();
+		await expect( sizeRow ).toBeHidden();
+
+		await spacingRow.getByRole( 'button', { name: 'Reset' } ).click();
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -66,11 +108,13 @@ test.describe( 'Typography controls for values the settings gate off', () => {
 					() =>
 						window.wp.data
 							.select( 'core/block-editor' )
-							.getBlocks()[ 0 ].attributes.fontSize
+							.getBlocks()[ 0 ].attributes.style?.typography
+							?.letterSpacing
 				)
 			)
 			.toBeUndefined();
-		await expect( notice ).toBeHidden();
+		// The gated text alignment value remains, so the notice stays.
+		await expect( notice ).toBeVisible();
 	} );
 
 	test( 'clears an applied text alignment from the reduced control', async ( {

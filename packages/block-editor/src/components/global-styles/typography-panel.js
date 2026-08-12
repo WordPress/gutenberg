@@ -6,12 +6,8 @@ import {
 	Notice,
 	ToggleControl,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
-import {
-	createInterpolateElement,
-	useCallback,
-	useMemo,
-} from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { useCallback, useMemo } from '@wordpress/element';
 import FontFamilyControl from '../font-family';
 import FontAppearanceControl from '../font-appearance-control';
 import LineHeightControl from '../line-height-control';
@@ -22,6 +18,7 @@ import TextDecorationControl from '../text-decoration-control';
 import TextIndentControl from '../text-indent-control';
 import WritingModeControl from '../writing-mode-control';
 import ColorGradientDropdownItem from './color-gradient-dropdown-item';
+import GatedValueRow from './gated-value-row';
 import { useHasTextPanel } from './color-panel';
 import { useColorGradientSettings } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
@@ -802,6 +799,27 @@ export default function TypographyPanel( {
 		[ hasTextColorEnabled ]
 	);
 
+	// Display form of a value whose control the settings disable: preset
+	// references reduce to their slug, anything else prints as written.
+	const displayGatedValue = ( raw ) =>
+		typeof raw === 'string' && raw.startsWith( 'var:preset|' )
+			? raw.split( '|' ).pop()
+			: String( raw );
+
+	const hasGatedValues = [
+		[ hasFontFamilyEnabled, hasFontFamily ],
+		[ hasFontSizeEnabled, hasFontSize ],
+		[ hasAppearanceControl, hasFontAppearance ],
+		[ hasLineHeightEnabled, hasLineHeight ],
+		[ hasLetterSpacingControl, hasLetterSpacing ],
+		[ hasTextIndentControl, hasTextIndent ],
+		[ hasTextColumnsControl, hasTextColumns ],
+		[ hasTextDecorationControl, hasTextDecoration ],
+		[ hasWritingModeControl, hasWritingMode ],
+		[ hasTextTransformControl, hasTextTransform ],
+		[ hasTextAlignmentControl, hasTextAlign ],
+	].some( ( [ enabled, has ] ) => ! enabled && has() );
+
 	return (
 		<Wrapper
 			resetAllFilter={ resetAllFilter }
@@ -809,6 +827,17 @@ export default function TypographyPanel( {
 			onChange={ onChange }
 			panelId={ panelId }
 		>
+			{ hasGatedValues && (
+				// Full-width cell; a plain child would flow into the tools
+				// panel grid as a half-width item.
+				<div style={ { gridColumn: '1 / -1' } }>
+					<Notice status="warning" isDismissible={ false }>
+						{ __(
+							'Some typography controls are disabled in this theme. Values applied earlier can be reset, but not changed.'
+						) }
+					</Notice>
+				</div>
+			) }
 			{ hasTextColorEnabled && (
 				<ColorGradientDropdownItem
 					label={ __( 'Color' ) }
@@ -851,7 +880,7 @@ export default function TypographyPanel( {
 					panelId={ panelId }
 				/>
 			) }
-			{ hasFontFamilyEnabled && (
+			{ ( hasFontFamilyEnabled || hasFontFamily() ) && (
 				<InheritanceToolsPanelItem
 					{ ...inheritanceProps(
 						isFontFamilyPlaceholder,
@@ -863,11 +892,20 @@ export default function TypographyPanel( {
 					isShownByDefault={ defaultControls.fontFamily }
 					panelId={ panelId }
 				>
-					<FontFamilyControl
-						fontFamilies={ fontFamilies }
-						value={ fontFamily }
-						onChange={ setFontFamily }
-					/>
+					{ hasFontFamilyEnabled ? (
+						<FontFamilyControl
+							fontFamilies={ fontFamilies }
+							value={ fontFamily }
+							onChange={ setFontFamily }
+						/>
+					) : (
+						<GatedValueRow
+							value={ displayGatedValue(
+								value?.typography?.fontFamily
+							) }
+							onReset={ resetFontFamily }
+						/>
+					) }
 				</InheritanceToolsPanelItem>
 			) }
 			{ ( hasFontSizeEnabled || hasFontSize() ) && (
@@ -896,43 +934,14 @@ export default function TypographyPanel( {
 							withSlider
 						/>
 					) : (
-						// The wrapper keeps the tools panel item styles from
-						// stripping the notice's own bottom padding.
-						<div>
-							<Notice
-								status="warning"
-								isDismissible={ false }
-								actions={ [
-									{
-										label: __( 'Reset' ),
-										onClick: resetFontSize,
-									},
-								] }
-							>
-								{ currentFontSizeSlug
-									? createInterpolateElement(
-											sprintf(
-												// translators: %s: the applied font size preset slug.
-												__(
-													'Font size controls are disabled in this theme, but this block sets the <code>%s</code> size preset.'
-												),
-												currentFontSizeSlug
-											),
-											{ code: <code /> }
-									  )
-									: sprintf(
-											// translators: %s: the applied font size value.
-											__(
-												'Font size controls are disabled in this theme, but this block sets a font size of %s.'
-											),
-											fontSize
-									  ) }
-							</Notice>
-						</div>
+						<GatedValueRow
+							value={ currentFontSizeSlug || fontSize }
+							onReset={ resetFontSize }
+						/>
 					) }
 				</InheritanceToolsPanelItem>
 			) }
-			{ hasAppearanceControl && (
+			{ ( hasAppearanceControl || hasFontAppearance() ) && (
 				<InheritanceToolsPanelItem
 					{ ...inheritanceProps(
 						isFontAppearancePlaceholder,
@@ -946,19 +955,28 @@ export default function TypographyPanel( {
 					isShownByDefault={ defaultControls.fontAppearance }
 					panelId={ panelId }
 				>
-					<FontAppearanceControl
-						value={ {
-							fontStyle,
-							fontWeight,
-						} }
-						onChange={ setFontAppearanceWithInheritedCommit }
-						hasFontStyles={ hasFontStyles }
-						hasFontWeights={ hasFontWeights }
-						fontFamilyFaces={ fontFamilyFaces }
-					/>
+					{ hasAppearanceControl ? (
+						<FontAppearanceControl
+							value={ {
+								fontStyle,
+								fontWeight,
+							} }
+							onChange={ setFontAppearanceWithInheritedCommit }
+							hasFontStyles={ hasFontStyles }
+							hasFontWeights={ hasFontWeights }
+							fontFamilyFaces={ fontFamilyFaces }
+						/>
+					) : (
+						<GatedValueRow
+							value={ [ fontStyle, fontWeight ]
+								.filter( Boolean )
+								.join( ' ' ) }
+							onReset={ resetFontAppearance }
+						/>
+					) }
 				</InheritanceToolsPanelItem>
 			) }
-			{ hasLineHeightEnabled && (
+			{ ( hasLineHeightEnabled || hasLineHeight() ) && (
 				<InheritanceToolsPanelItem
 					{ ...inheritanceProps(
 						isLineHeightPlaceholder,
@@ -971,26 +989,35 @@ export default function TypographyPanel( {
 					isShownByDefault={ defaultControls.lineHeight }
 					panelId={ panelId }
 				>
-					<LineHeightControl
-						__unstableInputWidth="auto"
-						value={ localLineHeight ?? inheritedLineHeight }
-						onChange={ setLineHeight }
-						// Only override the placeholder when there is an
-						// inherited value to surface. Passing `undefined` would
-						// clobber `LineHeightControl`'s own `BASE_DEFAULT_VALUE`
-						// (1.5) placeholder.
-						{ ...( isLineHeightPlaceholder
-							? {
-									placeholder:
-										getNumericPlaceholder(
-											inheritedLineHeight
-										),
-							  }
-							: {} ) }
-					/>
+					{ hasLineHeightEnabled ? (
+						<LineHeightControl
+							__unstableInputWidth="auto"
+							value={ localLineHeight ?? inheritedLineHeight }
+							onChange={ setLineHeight }
+							// Only override the placeholder when there is an
+							// inherited value to surface. Passing `undefined` would
+							// clobber `LineHeightControl`'s own `BASE_DEFAULT_VALUE`
+							// (1.5) placeholder.
+							{ ...( isLineHeightPlaceholder
+								? {
+										placeholder:
+											getNumericPlaceholder(
+												inheritedLineHeight
+											),
+								  }
+								: {} ) }
+						/>
+					) : (
+						<GatedValueRow
+							value={ displayGatedValue(
+								value?.typography?.lineHeight
+							) }
+							onReset={ resetLineHeight }
+						/>
+					) }
 				</InheritanceToolsPanelItem>
 			) }
-			{ hasLetterSpacingControl && (
+			{ ( hasLetterSpacingControl || hasLetterSpacing() ) && (
 				<InheritanceToolsPanelItem
 					{ ...inheritanceProps(
 						isLetterSpacingPlaceholder,
@@ -1004,28 +1031,39 @@ export default function TypographyPanel( {
 					isShownByDefault={ defaultControls.letterSpacing }
 					panelId={ panelId }
 				>
-					<LetterSpacingControl
-						// Local-then-inherited: render the inherited value as
-						// the control's value at rest so the unit parses from
-						// it (e.g. "0.02em" keeps the em unit rather than the
-						// value string sitting behind a default px unit). It is
-						// only written to local on user change. Matches the
-						// ToggleGroup/FontSize controls rather than the
-						// native-placeholder pattern.
-						value={ localLetterSpacing ?? inheritedLetterSpacing }
-						onChange={ setLetterSpacing }
-						__unstableInputWidth="auto"
-						placeholder={
-							isLetterSpacingPlaceholder
-								? getNumericPlaceholder(
-										inheritedLetterSpacing
-								  )
-								: undefined
-						}
-					/>
+					{ hasLetterSpacingControl ? (
+						<LetterSpacingControl
+							// Local-then-inherited: render the inherited value as
+							// the control's value at rest so the unit parses from
+							// it (e.g. "0.02em" keeps the em unit rather than the
+							// value string sitting behind a default px unit). It is
+							// only written to local on user change. Matches the
+							// ToggleGroup/FontSize controls rather than the
+							// native-placeholder pattern.
+							value={
+								localLetterSpacing ?? inheritedLetterSpacing
+							}
+							onChange={ setLetterSpacing }
+							__unstableInputWidth="auto"
+							placeholder={
+								isLetterSpacingPlaceholder
+									? getNumericPlaceholder(
+											inheritedLetterSpacing
+									  )
+									: undefined
+							}
+						/>
+					) : (
+						<GatedValueRow
+							value={ displayGatedValue(
+								value?.typography?.letterSpacing
+							) }
+							onReset={ resetLetterSpacing }
+						/>
+					) }
 				</InheritanceToolsPanelItem>
 			) }
-			{ hasTextIndentControl && (
+			{ ( hasTextIndentControl || hasTextIndent() ) && (
 				<InheritanceToolsPanelItem
 					{ ...inheritanceProps(
 						isTextIndentPlaceholder,
@@ -1037,35 +1075,48 @@ export default function TypographyPanel( {
 					isShownByDefault={ defaultControls.textIndent }
 					panelId={ panelId }
 				>
-					<TextIndentControl
-						// Local-then-inherited: render the inherited value as
-						// the control's value at rest so the UnitControl parses
-						// and shows the inherited unit (e.g. `1.5em` selects the
-						// `em` unit) instead of a raw string in the placeholder
-						// while the unit stays at the default `px`. Written to
-						// local only on user change.
-						value={ localTextIndent ?? inheritedTextIndent }
-						onChange={ setTextIndentValue }
-						__unstableInputWidth="auto"
-						withSlider
-						hasBottomMargin={ isGlobalStyles }
-						placeholder={
-							isTextIndentPlaceholder
-								? getNumericPlaceholder( inheritedTextIndent )
-								: undefined
-						}
-					/>
-					{ isGlobalStyles && (
-						<ToggleControl
-							label={ __( 'Indent all paragraphs' ) }
-							checked={ isTextIndentAll }
-							onChange={ onToggleTextIndentAll }
-							help={ textIndentHelp }
+					{ hasTextIndentControl ? (
+						<>
+							<TextIndentControl
+								// Local-then-inherited: render the inherited value as
+								// the control's value at rest so the UnitControl parses
+								// and shows the inherited unit (e.g. `1.5em` selects the
+								// `em` unit) instead of a raw string in the placeholder
+								// while the unit stays at the default `px`. Written to
+								// local only on user change.
+								value={ localTextIndent ?? inheritedTextIndent }
+								onChange={ setTextIndentValue }
+								__unstableInputWidth="auto"
+								withSlider
+								hasBottomMargin={ isGlobalStyles }
+								placeholder={
+									isTextIndentPlaceholder
+										? getNumericPlaceholder(
+												inheritedTextIndent
+										  )
+										: undefined
+								}
+							/>
+							{ isGlobalStyles && (
+								<ToggleControl
+									label={ __( 'Indent all paragraphs' ) }
+									checked={ isTextIndentAll }
+									onChange={ onToggleTextIndentAll }
+									help={ textIndentHelp }
+								/>
+							) }
+						</>
+					) : (
+						<GatedValueRow
+							value={ displayGatedValue(
+								value?.typography?.textIndent
+							) }
+							onReset={ resetTextIndent }
 						/>
 					) }
 				</InheritanceToolsPanelItem>
 			) }
-			{ hasTextColumnsControl && (
+			{ ( hasTextColumnsControl || hasTextColumns() ) && (
 				<InheritanceToolsPanelItem
 					{ ...inheritanceProps(
 						isTextColumnsPlaceholder,
@@ -1078,23 +1129,32 @@ export default function TypographyPanel( {
 					isShownByDefault={ defaultControls.textColumns }
 					panelId={ panelId }
 				>
-					<NumberControl
-						label={ __( 'Columns' ) }
-						max={ MAX_TEXT_COLUMNS }
-						min={ MIN_TEXT_COLUMNS }
-						onChange={ setTextColumns }
-						placeholder={
-							isTextColumnsPlaceholder
-								? inheritedTextColumns
-								: undefined
-						}
-						spinControls="custom"
-						value={ localTextColumns }
-						initialPosition={ 1 }
-					/>
+					{ hasTextColumnsControl ? (
+						<NumberControl
+							label={ __( 'Columns' ) }
+							max={ MAX_TEXT_COLUMNS }
+							min={ MIN_TEXT_COLUMNS }
+							onChange={ setTextColumns }
+							placeholder={
+								isTextColumnsPlaceholder
+									? inheritedTextColumns
+									: undefined
+							}
+							spinControls="custom"
+							value={ localTextColumns }
+							initialPosition={ 1 }
+						/>
+					) : (
+						<GatedValueRow
+							value={ displayGatedValue(
+								value?.typography?.textColumns
+							) }
+							onReset={ resetTextColumns }
+						/>
+					) }
 				</InheritanceToolsPanelItem>
 			) }
-			{ hasTextDecorationControl && (
+			{ ( hasTextDecorationControl || hasTextDecoration() ) && (
 				<InheritanceToolsPanelItem
 					{ ...inheritanceProps(
 						isTextDecorationPlaceholder,
@@ -1108,14 +1168,23 @@ export default function TypographyPanel( {
 					isShownByDefault={ defaultControls.textDecoration }
 					panelId={ panelId }
 				>
-					<TextDecorationControl
-						value={ textDecoration }
-						onChange={ setTextDecorationWithInheritedCommit }
-						__unstableInputWidth="auto"
-					/>
+					{ hasTextDecorationControl ? (
+						<TextDecorationControl
+							value={ textDecoration }
+							onChange={ setTextDecorationWithInheritedCommit }
+							__unstableInputWidth="auto"
+						/>
+					) : (
+						<GatedValueRow
+							value={ displayGatedValue(
+								value?.typography?.textDecoration
+							) }
+							onReset={ resetTextDecoration }
+						/>
+					) }
 				</InheritanceToolsPanelItem>
 			) }
-			{ hasWritingModeControl && (
+			{ ( hasWritingModeControl || hasWritingMode() ) && (
 				<InheritanceToolsPanelItem
 					{ ...inheritanceProps(
 						isWritingModePlaceholder,
@@ -1128,13 +1197,22 @@ export default function TypographyPanel( {
 					isShownByDefault={ defaultControls.writingMode }
 					panelId={ panelId }
 				>
-					<WritingModeControl
-						value={ writingMode }
-						onChange={ setWritingModeWithInheritedCommit }
-					/>
+					{ hasWritingModeControl ? (
+						<WritingModeControl
+							value={ writingMode }
+							onChange={ setWritingModeWithInheritedCommit }
+						/>
+					) : (
+						<GatedValueRow
+							value={ displayGatedValue(
+								value?.typography?.writingMode
+							) }
+							onReset={ resetWritingMode }
+						/>
+					) }
 				</InheritanceToolsPanelItem>
 			) }
-			{ hasTextTransformControl && (
+			{ ( hasTextTransformControl || hasTextTransform() ) && (
 				<InheritanceToolsPanelItem
 					{ ...inheritanceProps(
 						isTextTransformPlaceholder,
@@ -1147,15 +1225,24 @@ export default function TypographyPanel( {
 					isShownByDefault={ defaultControls.textTransform }
 					panelId={ panelId }
 				>
-					<TextTransformControl
-						value={ textTransform }
-						onChange={ setTextTransformWithInheritedCommit }
-						showNone
-						isBlock
-					/>
+					{ hasTextTransformControl ? (
+						<TextTransformControl
+							value={ textTransform }
+							onChange={ setTextTransformWithInheritedCommit }
+							showNone
+							isBlock
+						/>
+					) : (
+						<GatedValueRow
+							value={ displayGatedValue(
+								value?.typography?.textTransform
+							) }
+							onReset={ resetTextTransform }
+						/>
+					) }
 				</InheritanceToolsPanelItem>
 			) }
-			{ hasTextAlignmentControl && (
+			{ ( hasTextAlignmentControl || hasTextAlign() ) && (
 				<InheritanceToolsPanelItem
 					{ ...inheritanceProps(
 						isTextAlignPlaceholder,
@@ -1167,20 +1254,39 @@ export default function TypographyPanel( {
 					isShownByDefault={ defaultControls.textAlign }
 					panelId={ panelId }
 				>
-					<TextAlignmentControl
-						value={ textAlign }
-						onChange={ setTextAlignWithInheritedCommit }
-						options={ [ 'left', 'center', 'right', 'justify' ] }
-					/>
+					{ hasTextAlignmentControl ? (
+						<>
+							<TextAlignmentControl
+								value={ textAlign }
+								onChange={ setTextAlignWithInheritedCommit }
+								options={ [
+									'left',
+									'center',
+									'right',
+									'justify',
+								] }
+							/>
 
-					{ textAlign === 'justify' && (
-						<div>
-							<Notice status="warning" isDismissible={ false }>
-								{ __(
-									'Justified text can reduce readability. For better accessibility, use left-aligned text instead.'
-								) }
-							</Notice>
-						</div>
+							{ textAlign === 'justify' && (
+								<div>
+									<Notice
+										status="warning"
+										isDismissible={ false }
+									>
+										{ __(
+											'Justified text can reduce readability. For better accessibility, use left-aligned text instead.'
+										) }
+									</Notice>
+								</div>
+							) }
+						</>
+					) : (
+						<GatedValueRow
+							value={ displayGatedValue(
+								value?.typography?.textAlign
+							) }
+							onReset={ resetTextAlign }
+						/>
 					) }
 				</InheritanceToolsPanelItem>
 			) }

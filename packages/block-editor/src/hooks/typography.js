@@ -171,7 +171,10 @@ export function TypographyPanel( {
 	// A present value keeps the panel available even when the settings
 	// hide every control, so the value can still be removed.
 	const isEnabled =
-		isPanelEnabled || !! fontSize || !! style?.typography?.fontSize;
+		isPanelEnabled ||
+		!! fontSize ||
+		!! fontFamily ||
+		!! Object.keys( style?.typography ?? {} ).length;
 
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 
