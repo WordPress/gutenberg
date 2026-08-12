@@ -7,9 +7,9 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { RawHTML } from '@wordpress/element';
-import { serialize } from '@wordpress/blocks';
 import {
 	useBlockProps,
+	useInnerBlockItems,
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 } from '@wordpress/block-editor';
@@ -19,10 +19,10 @@ import {
  */
 import { mapCellsToSections } from './utils';
 
-export default function save( { attributes, innerBlocks } ) {
+export default function save( { attributes } ) {
 	const { hasFixedLayout, rows } = attributes;
 
-	if ( ! rows.length || ! innerBlocks?.length ) {
+	if ( ! rows.length ) {
 		return null;
 	}
 
@@ -31,7 +31,8 @@ export default function save( { attributes, innerBlocks } ) {
 
 	const blockProps = useBlockProps.save();
 
-	const sections = mapCellsToSections( rows, innerBlocks );
+	const items = useInnerBlockItems.save();
+	const sections = mapCellsToSections( rows, items );
 
 	return (
 		<figure { ...blockProps }>
@@ -47,11 +48,11 @@ export default function save( { attributes, innerBlocks } ) {
 						<Tag key={ section.name }>
 							{ section.rows.map( ( row, rowIndex ) => (
 								<tr key={ rowIndex }>
-									<RawHTML>
-										{ serialize( row, {
-											isInnerBlocks: true,
-										} ) }
-									</RawHTML>
+									{ row.map( ( cell ) => (
+										<RawHTML key={ cell.clientId }>
+											{ cell.html }
+										</RawHTML>
+									) ) }
 								</tr>
 							) ) }
 						</Tag>
