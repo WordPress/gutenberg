@@ -7,6 +7,7 @@ import focusStyles from '../../../utils/css/focus.module.scss';
 import * as Combobox from '../combobox';
 import { InputLayout } from '../input-layout';
 import styles from './style.module.css';
+import { warnSearchableChipSelectProps } from './dev-warnings';
 import type { Item, ItemGroup, SearchableChipSelectProps } from './types';
 import {
 	findCreatableItem,
@@ -39,6 +40,8 @@ export const SearchableChipSelect = forwardRef<
 	},
 	ref
 ) {
+	warnSearchableChipSelectProps( items, children );
+
 	const creatableItem = findCreatableItem( items );
 	const comboboxItems = normalizeRootItems( items );
 

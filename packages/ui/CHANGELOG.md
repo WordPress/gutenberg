@@ -9,6 +9,7 @@
 ### Enhancements
 
 -   `SearchableChipSelect`: Add grouped items support and export `Group`, `GroupLabel`, and `Collection` subcomponents ([#80989](https://github.com/WordPress/gutenberg/pull/80989)).
+-   `SearchableChipSelect`: Add development warnings for common misconfigurations ([#80989](https://github.com/WordPress/gutenberg/pull/80989)).
 -   Add `SearchableChipSelect` primitive ([#80779](https://github.com/WordPress/gutenberg/pull/80779)).
 -   Add `Combobox.InputGroup` primitive ([#80869](https://github.com/WordPress/gutenberg/pull/80869)).
 

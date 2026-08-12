@@ -42,25 +42,30 @@ export function isCreatableItem( item: Item ): item is CreatableItem {
 export function findCreatableItem(
 	items: Item[] | ItemGroup[] | undefined
 ): CreatableItem | undefined {
+	return findCreatableItems( items )[ 0 ];
+}
+
+export function findCreatableItems(
+	items: Item[] | ItemGroup[] | undefined
+): CreatableItem[] {
 	if ( ! items ) {
-		return undefined;
+		return [];
 	}
+
+	const creatableItems: CreatableItem[] = [];
 
 	for ( const entry of items ) {
 		if ( isItemGroup( entry ) ) {
-			const creatableItem = entry.items.find( isCreatableItem );
-			if ( creatableItem ) {
-				return creatableItem;
-			}
+			creatableItems.push( ...entry.items.filter( isCreatableItem ) );
 			continue;
 		}
 
 		if ( isCreatableItem( entry ) ) {
-			return entry;
+			creatableItems.push( entry );
 		}
 	}
 
-	return undefined;
+	return creatableItems;
 }
 
 export function hasGroupedItems(

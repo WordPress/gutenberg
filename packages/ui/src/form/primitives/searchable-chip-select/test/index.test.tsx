@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
+import warning from '@wordpress/warning';
 import {
 	GROUPED_ITEMS,
 	type FixtureGroup,
@@ -9,7 +10,15 @@ import {
 import { ITEMS } from '../stories/fixtures';
 import { SearchableChipSelect } from '../index';
 
+jest.mock( '@wordpress/warning', () => jest.fn() );
+
+const mockedWarning = warning as jest.MockedFunction< typeof warning >;
+
 describe( 'SearchableChipSelect', () => {
+	beforeEach( () => {
+		mockedWarning.mockClear();
+	} );
+
 	it( 'forwards ref', () => {
 		const ref = createRef< HTMLDivElement >();
 
@@ -275,6 +284,58 @@ describe( 'SearchableChipSelect', () => {
 					expect.objectContaining( { value: '__create__' } ),
 				] ),
 				expect.anything()
+			);
+		} );
+	} );
+
+	describe( 'development warnings', () => {
+		it( 'warns when grouped items are used without children', () => {
+			render( <SearchableChipSelect items={ GROUPED_ITEMS } /> );
+
+			expect( mockedWarning ).toHaveBeenCalledWith(
+				'SearchableChipSelect: grouped `items` require a `children` renderer. See the `Grouped` story for an example.'
+			);
+		} );
+
+		it( 'warns when multiple creatable items are provided', () => {
+			render(
+				<SearchableChipSelect
+					items={ [
+						{
+							value: '__create-a__',
+							label: 'Create A',
+							creatable: true,
+						},
+						{
+							value: '__create-b__',
+							label: 'Create B',
+							creatable: true,
+						},
+					] }
+				/>
+			);
+
+			expect( mockedWarning ).toHaveBeenCalledWith(
+				'SearchableChipSelect: expected at most one item with `creatable: true` in `items`.'
+			);
+		} );
+
+		it( 'warns when a flat creatable item is not last', () => {
+			render(
+				<SearchableChipSelect
+					items={ [
+						{
+							value: '__create__',
+							label: 'Create new item',
+							creatable: true,
+						},
+						...ITEMS.slice( 0, 2 ),
+					] }
+				/>
+			);
+
+			expect( mockedWarning ).toHaveBeenCalledWith(
+				'SearchableChipSelect: the creatable item should be last in `items` for predictable keyboard navigation.'
 			);
 		} );
 	} );
