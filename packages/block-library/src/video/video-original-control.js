@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { BlockControls } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
