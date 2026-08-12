@@ -128,6 +128,7 @@ export default defineConfig( {
 				test: {
 					name: 'node',
 					environment: 'node',
+					pool: 'threads',
 					include: vitestTests.node,
 				},
 			},
@@ -139,6 +140,7 @@ export default defineConfig( {
 				test: {
 					name: 'jsdom',
 					environment: 'jsdom',
+					pool: 'threads',
 					environmentOptions: {
 						jsdom: {
 							url: 'http://localhost/',
