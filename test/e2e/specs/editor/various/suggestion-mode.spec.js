@@ -744,7 +744,7 @@ test.describe( 'Suggestion mode', () => {
 		// Click the default block appender to insert an empty paragraph —
 		// the same path as clicking the empty space below the last block.
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 
 		const block = editor.canvas
