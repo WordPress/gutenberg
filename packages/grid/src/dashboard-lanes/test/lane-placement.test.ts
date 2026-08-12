@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { computeLanePlacements } from '../lane-placement';
 import type { LanePlacementItem } from '../lane-placement';
 

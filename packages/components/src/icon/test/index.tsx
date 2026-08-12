@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { Path, SVG } from '@wordpress/primitives';
-
-/**
- * Internal dependencies
- */
 import Icon from '..';
 
 describe( 'Icon', () => {

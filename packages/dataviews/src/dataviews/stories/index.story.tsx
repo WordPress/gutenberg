@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import DataViews from '../index';
 import LayoutActivityComponent from './layout-activity';
 import LayoutTableComponent from './layout-table';
@@ -18,7 +11,6 @@ import WithCardComponent from './with-card';
 import FreeCompositionComponent from './free-composition';
 import MinimalUIComponent from './minimal-ui';
 import EmptyComponent from './empty';
-
 import './style.css';
 
 const meta = {

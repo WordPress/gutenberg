@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -11,10 +8,6 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 

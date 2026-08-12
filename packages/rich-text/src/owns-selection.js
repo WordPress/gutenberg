@@ -16,10 +16,16 @@ export function ownsSelection( element ) {
 		return true;
 	}
 
+	// Read the `contentEditable` attribute, not `isContentEditable`: the latter
+	// computes the effective editable state and forces a style and layout tree
+	// update. Since each editable element checks this on every keystroke, that
+	// forced update would scale with the number of blocks in the post. The
+	// editing host and the editable both set the attribute explicitly, so the
+	// attribute is equivalent here.
 	if (
 		! activeElement ||
-		! activeElement.isContentEditable ||
-		! element.isContentEditable ||
+		activeElement.contentEditable !== 'true' ||
+		element.contentEditable !== 'true' ||
 		! activeElement.contains( element )
 	) {
 		return false;

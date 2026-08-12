@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useUnsupportedBlocks } from '../../utils';
 
 export default function EnhancedPaginationControl( {

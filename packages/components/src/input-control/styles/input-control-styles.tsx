@@ -1,14 +1,7 @@
-/**
- * External dependencies
- */
 import type { SerializedStyles } from '@emotion/react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import type { CSSProperties, ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../../context';
 import { Flex, FlexItem } from '../../flex';
 import { Text } from '../../text';
@@ -157,7 +150,6 @@ export const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
 		default: '13px',
 		small: '11px',
 		compact: '13px',
-		'__unstable-large': '13px',
 	};
 
 	const fontSize = sizes[ size as Size ] || sizes.default;
@@ -199,13 +191,6 @@ export const getSizeConfig = ( { inputSize: size }: InputProps ) => {
 			minHeight: 32,
 			paddingLeft: CONFIG.controlPaddingXSmall,
 			paddingRight: CONFIG.controlPaddingXSmall,
-		},
-		'__unstable-large': {
-			height: 40,
-			lineHeight: 1,
-			minHeight: 40,
-			paddingLeft: CONFIG.controlPaddingX,
-			paddingRight: CONFIG.controlPaddingX,
 		},
 	};
 
@@ -286,6 +271,18 @@ export const Input = styled.input< InputProps >`
 
 		&:-ms-input-placeholder {
 			color: ${ COLORS.ui.darkGrayPlaceholder };
+		}
+
+		&[type='date'],
+		&[type='datetime-local'],
+		&[type='month'],
+		&[type='time'],
+		&[type='week'] {
+			&::-webkit-datetime-edit {
+				display: flex;
+				align-items: center;
+				height: 100%;
+			}
 		}
 
 		&[type='email'],

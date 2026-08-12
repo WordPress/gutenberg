@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { CheckboxControl, ExternalLink } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 
 function PostPingbacks() {

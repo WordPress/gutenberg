@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import { pipe } from '@wordpress/compose';
 import { combineReducers, select } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
@@ -13,10 +6,6 @@ import {
 	store as blocksStore,
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
 import { sectionRootClientIdKey, isIsolatedEditorKey } from './private-keys';
@@ -1442,19 +1431,19 @@ export function selection( state = {}, action ) {
 				selectionEnd,
 			};
 		case 'MULTI_SELECT':
-			const { start, end } = action;
+			const nextSelection = {
+				selectionStart: { clientId: action.start },
+				selectionEnd: { clientId: action.end },
+			};
 
-			if (
-				start === state.selectionStart?.clientId &&
-				end === state.selectionEnd?.clientId
-			) {
+			// A text selection between the same blocks is not the same
+			// selection: it carries attribute keys and offsets, making it
+			// partial rather than a block multi-selection.
+			if ( fastDeepEqual( state, nextSelection ) ) {
 				return state;
 			}
 
-			return {
-				selectionStart: { clientId: start },
-				selectionEnd: { clientId: end },
-			};
+			return nextSelection;
 		case 'RESET_BLOCKS':
 			const startClientId = state?.selectionStart?.clientId;
 			const endClientId = state?.selectionEnd?.clientId;
@@ -2339,7 +2328,14 @@ export function selectedBlockStyleState( state = undefined, action ) {
 
 		case 'SELECT_BLOCK':
 		case 'SELECTION_CHANGE': {
-			if ( state?.clientId && state.clientId !== action.clientId ) {
+			const startClientId = action.clientId ?? action.start?.clientId;
+			const endClientId = action.clientId ?? action.end?.clientId;
+
+			if (
+				state?.clientId &&
+				( startClientId !== endClientId ||
+					state.clientId !== startClientId )
+			) {
 				return undefined;
 			}
 

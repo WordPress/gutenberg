@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { renderHook, act } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { useCropperReducer } from '../use-cropper-reducer';
 import { DEFAULT_STATE } from '../../../core/constants';
 
