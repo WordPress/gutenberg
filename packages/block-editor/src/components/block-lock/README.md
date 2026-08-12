@@ -1,6 +1,6 @@
 # Block Lock
 
-The `BlockLock` components render the UI for locking a block's movement, editing and removal, and the `useBlockLock` hook exposes a block's current lock state.
+The `BlockLock` components render the UI for locking a block's movement, editing and removal, and the `useBlockLock` hook exposes a block's current lock state. Movement and removal can be locked on any block; the editing option is only offered for an allowlist of block types, currently `core/navigation`.
 
 These are private components of the `@wordpress/block-editor` package. They are not exported publicly and are meant to be consumed from within the package only.
 
