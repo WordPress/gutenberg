@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import PanelColorSettings from '../';
 
 const noop = () => {};
@@ -25,6 +25,26 @@ describe( 'PanelColorSettings', () => {
 			/>
 		);
 		expect( container ).toBeEmptyDOMElement();
+	} );
+
+	it( 'should render children even if there are no colors to choose', async () => {
+		render(
+			<PanelColorSettings
+				title="Test Title"
+				colors={ [] }
+				disableCustomColors
+				colorSettings={ [
+					{
+						value: '#000',
+						onChange: noop,
+						label: 'border color',
+					},
+				] }
+			>
+				<p>Child content</p>
+			</PanelColorSettings>
+		);
+		expect( screen.getByText( 'Child content' ) ).toBeVisible();
 	} );
 
 	it( 'should render a color panel if at least one setting supports custom colors', async () => {
