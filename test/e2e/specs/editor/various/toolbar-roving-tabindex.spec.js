@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -93,9 +90,7 @@ test.describe( 'Toolbar roving tabindex', () => {
 		);
 		await ToolbarRovingTabindexUtils.wrapCurrentBlockWithGroup( 'Table' );
 		await ToolbarRovingTabindexUtils.testGroupKeyboardNavigation(
-			// ArrowRight from Group enters the table cell directly,
-			// not the Table block wrapper.
-			'Body cell text',
+			'Block: Table',
 			'Table'
 		);
 

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	getBlockDefaultClassName,
 	getBlockType,
@@ -15,10 +8,6 @@ import {
 import { withFilters } from '@wordpress/components';
 import { useRegistry, useSelect } from '@wordpress/data';
 import { useCallback, useContext, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import BlockContext from '../block-context';
 import isURLLike from '../link-control/is-url-like';
 import {

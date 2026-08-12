@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import type { ComponentType, HTMLProps, SVGProps } from 'react';
-
-/**
- * WordPress dependencies
- */
 import {
 	cloneElement,
 	createElement,
 	isValidElement,
 } from '@wordpress/element';
 import { SVG } from '@wordpress/primitives';
-
-/**
- * Internal dependencies
- */
 import Dashicon from '../dashicon';
 import type { IconKey as DashiconIconKey } from '../dashicon/types';
 

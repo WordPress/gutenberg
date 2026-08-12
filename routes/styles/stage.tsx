@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useNavigate, useSearch } from '@wordpress/route';
 import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
@@ -13,10 +10,6 @@ import { seen } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 import { useEditorSettings } from '@wordpress/lazy-editor';
 import { unlock } from '@wordpress/routes-lock-unlock';
-
-/**
- * Internal dependencies
- */
 import './style.scss';
 
 const { GlobalStylesUIWrapper, GlobalStylesActionMenu } =

@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import removeAccents from 'remove-accents';
-
-/**
- * WordPress dependencies
- */
 import {
 	RichText,
 	useBlockProps,

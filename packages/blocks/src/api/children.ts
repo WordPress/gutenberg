@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { renderToString } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import * as node from './node';
 
 /**

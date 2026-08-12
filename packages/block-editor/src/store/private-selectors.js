@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import {
 	getBlockType,
@@ -8,10 +5,6 @@ import {
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import {
 	getBlockOrder,
 	getBlockParents,

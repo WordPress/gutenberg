@@ -1,12 +1,5 @@
 'use strict';
-/**
- * External dependencies
- */
 const net = require( 'net' );
-
-/**
- * Internal dependencies
- */
 const {
 	isPortAvailable,
 	findAvailablePort,

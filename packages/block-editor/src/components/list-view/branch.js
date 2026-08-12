@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalTreeGridRow as TreeGridRow,
 	__experimentalTreeGridCell as TreeGridCell,
 } from '@wordpress/components';
 import { memo } from '@wordpress/element';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { Appender } from './appender';
 import ListViewBlock from './block';
 import { useListViewTreeState } from './context';

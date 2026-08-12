@@ -1,19 +1,14 @@
-/**
- * WordPress dependencies
- */
 import {
 	createElement,
 	isValidElement,
 	useEffect,
 	useState,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { resolveFields } from '../field-types';
 import { resolveIcon } from '../icon-resolver';
 import type {
+	WidgetAction,
+	WidgetActionRecord,
 	WidgetIcon,
 	WidgetModuleRecord,
 	WidgetName,
@@ -28,6 +23,21 @@ const pendingIcon: WidgetIcon = createElement( 'svg', {
 	viewBox: '0 0 24 24',
 } );
 
+/**
+ * Emitted actions carry only renderable icons: a wire reference resolves
+ * after the gate and patches in; anything else non-renderable drops.
+ *
+ * @param actions Declared actions, from the record or the module.
+ */
+function withRenderableIcons(
+	actions: ( WidgetAction | WidgetActionRecord )[]
+): WidgetAction[] {
+	return actions.map( ( { icon, ...action } ) => ( {
+		...action,
+		...( isValidElement( icon ) ? { icon: icon as WidgetIcon } : {} ),
+	} ) );
+}
+
 /* `true` while records or their metadata imports are still resolving; hosts
    must not treat a widget instance as missing until it is `false`. */
 type UseWidgetTypesResult = readonly [ WidgetType[], boolean ];
@@ -41,7 +51,7 @@ type UseWidgetTypesResult = readonly [ WidgetType[], boolean ];
  * registered field types reach hosts as plain DataViews fields. Icon
  * references resolve through the registered icon resolver, off the loading
  * flag: widget types emit as soon as their modules land, and each resolved
- * icon patches in afterwards.
+ * icon patches in afterwards. Action icon references resolve the same way.
  * Pass `null`/`undefined` while records are still loading.
  *
  * @param records Host-supplied records, or `null`/`undefined` while loading.
@@ -96,6 +106,8 @@ export function useWidgetTypes(
 					const icon =
 						moduleIcon ?? ( record.icon ? pendingIcon : undefined );
 
+					const actions = record.actions ?? metadata.actions;
+
 					return {
 						...metadata,
 						...( metadata.attributes
@@ -128,8 +140,8 @@ export function useWidgetTypes(
 						...( record.keywords
 							? { keywords: record.keywords }
 							: {} ),
-						...( record.actions
-							? { actions: record.actions }
+						...( actions
+							? { actions: withRenderableIcons( actions ) }
 							: {} ),
 					} as WidgetType;
 				} catch {
@@ -177,6 +189,42 @@ export function useWidgetTypes(
 						} )
 					);
 				} );
+			}
+
+			/*
+			 * Each record action's icon reference resolves off the gate
+			 * and patches into the emitted action; an unresolvable
+			 * reference leaves the action without an icon.
+			 */
+			for ( const record of records ) {
+				for ( const action of record.actions ?? [] ) {
+					if ( typeof action.icon !== 'string' ) {
+						continue;
+					}
+
+					void resolveIcon( action.icon ).then( ( resolved ) => {
+						if ( cancelled || ! resolved ) {
+							return;
+						}
+
+						setWidgetTypes( ( prev ) =>
+							prev.map( ( type ) => {
+								if ( type.name !== record.name ) {
+									return type;
+								}
+
+								return {
+									...type,
+									actions: type.actions?.map( ( entry ) =>
+										entry.id === action.id
+											? { ...entry, icon: resolved }
+											: entry
+									),
+								};
+							} )
+						);
+					} );
+				}
 			}
 		} );
 

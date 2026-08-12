@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getValueFromObjectPath } from '../utils/object';
 import { getValueFromVariable } from '../utils/common';
 import type { GlobalStylesConfig, UnresolvedValue } from '../types';

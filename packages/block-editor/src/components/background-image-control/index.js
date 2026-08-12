@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
@@ -34,10 +27,6 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
 import { isBlobURL } from '@wordpress/blob';
 import { getResolvedValue } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { hasBackgroundImageValue } from '../global-styles/background-panel';
 import {
 	InheritanceResetButton,
@@ -46,7 +35,6 @@ import {
 import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
 import { store as blockEditorStore } from '../../store';
-
 import {
 	globalStylesDataKey,
 	globalStylesLinksDataKey,

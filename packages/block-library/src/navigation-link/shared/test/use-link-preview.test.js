@@ -1,21 +1,11 @@
-/**
- * External dependencies
- */
 import { renderHook } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
-
 // Mock useRemoteUrlData from block-editor
 const mockUseRemoteUrlData = jest.fn();
-
 jest.mock( '@wordpress/block-editor', () => ( {
 	privateApis: {},
 	store: {},
 } ) );
-
 // Mock the unlock function to return useRemoteUrlData, isHashLink, and isRelativePath
 jest.mock( '../../../lock-unlock', () => ( {
 	unlock: jest.fn( () => ( {
@@ -25,10 +15,6 @@ jest.mock( '../../../lock-unlock', () => ( {
 			url?.startsWith( '/' ) && ! url?.startsWith( '//' ),
 	} ) ),
 } ) );
-
-/**
- * Internal dependencies
- */
 import {
 	computeDisplayUrl,
 	computeBadges,

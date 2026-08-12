@@ -1,8 +1,4 @@
 /* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
-
-/**
- * External dependencies
- */
 const fs = require( 'fs' );
 const path = require( 'path' );
 const { join, resolve } = path;

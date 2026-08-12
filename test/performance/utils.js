@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { existsSync, readFileSync, unlinkSync } from 'fs';
 
 export function sum( array ) {

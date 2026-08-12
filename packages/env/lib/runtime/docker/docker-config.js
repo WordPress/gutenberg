@@ -1,15 +1,8 @@
 'use strict';
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const { writeFile, mkdir } = require( 'fs' ).promises;
 const { existsSync } = require( 'fs' );
 const yaml = require( 'js-yaml' );
-
-/**
- * Internal dependencies
- */
 const { ValidationError } = require( '../../config' );
 const buildDockerComposeConfig = require( './build-docker-compose-config' );
 

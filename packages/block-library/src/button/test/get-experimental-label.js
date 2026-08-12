@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { settings } from '..';
 
 describe( 'Button block __experimentalLabel', () => {
