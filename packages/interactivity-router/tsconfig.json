@@ -1,13 +1,16 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
-		"composite": true
+		"allowJs": false,
+		"checkJs": false,
+		"strict": false
 	},
-	"files": [],
+	"files": [ "global.d.ts" ],
 	"references": [
+		{ "path": "./tsconfig.main.json" },
+		{ "path": "./tsconfig.full-page.json" },
 		{ "path": "../a11y/tsconfig.build.json" },
-		{ "path": "../interactivity/tsconfig.build.json" },
-		{ "path": "tsconfig.main.json" },
-		{ "path": "tsconfig.full-page.json" }
+		{ "path": "../interactivity/tsconfig.build.json" }
 	]
 }
