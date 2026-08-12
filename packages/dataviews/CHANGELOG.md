@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   DataForms: Fix the `date` and `datetime` controls selecting and highlighting the day next to the one clicked on a site configured with a manual UTC offset rather than a named timezone. Such a site reports no timezone the calendar can work in, so the calendar fell back to the browser's while the values stayed anchored to the site's, and the two frames can disagree on the day. Each control now keeps the calendar and its value in one frame: `datetime` in the site's when it has a named timezone — which also keeps the day marked as today the site's, matching the date picker used outside DataForm — and in the browser's otherwise, while a `date` is treated as the plain calendar day it is. [#81350](https://github.com/WordPress/gutenberg/pull/81350)
+
 ## 18.0.0 (2026-08-12)
 
 ### Breaking Changes
@@ -30,7 +34,6 @@
 
 ### Bug Fix
 
--   DataForms: Fix the `date` and `datetime` controls selecting and highlighting the day next to the one clicked. The calendar reads and reports plain `Date`s in the browser timezone, but the controls anchored them to the site timezone, which disagrees with it on any site configured with a UTC offset rather than a named timezone. [#81350](https://github.com/WordPress/gutenberg/pull/81350)
 -   DataForms: Skip validation for fields hidden through the `isVisible` API, so a hidden field with validation rules (e.g. `required`) no longer makes the form invalid. Toggling a field's visibility now clears or restores its validity accordingly. [#81377](https://github.com/WordPress/gutenberg/pull/81377)
 -   DataViews: Pass only the eligible items to a bulk action's `callback`. A bulk action is offered when any one selected item is eligible for it, so the callback could run against items it had declared, through `isEligible`, that it could not handle. [#81198](https://github.com/WordPress/gutenberg/pull/81198)
 -   DataViews: Fix the `between` date filter discarding a manually entered `From`/`To` date on blur. The control now commits an incomplete range with an unfilled bound — which neither filters nor renders a chip — instead of waiting for both dates, so a typed date survives tabbing away and a range can be entered manually at all. [#81150](https://github.com/WordPress/gutenberg/pull/81150)

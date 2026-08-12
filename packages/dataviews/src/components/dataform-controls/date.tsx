@@ -124,9 +124,11 @@ const DATE_RANGE_PRESETS = [
 ];
 
 // A `date` value is a plain calendar day with no timezone attached, and the
-// calendar reads and reports the `Date`s it is given in the browser timezone.
-// Anchoring the day there — rather than to the site timezone, which shifts it
-// onto an adjacent day — keeps the day shown the day the field holds.
+// calendar — given no `timeZone` — reads and reports the `Date`s it is given in
+// the browser timezone. Anchoring the day there, rather than to the site
+// timezone, which shifts it onto an adjacent day, keeps the day shown the day
+// the field holds. It also keeps the day marked as today the browser's, which is
+// the day the `Today` preset commits.
 const parseDate = ( dateString?: string ): Date | null => {
 	if ( ! dateString ) {
 		return null;

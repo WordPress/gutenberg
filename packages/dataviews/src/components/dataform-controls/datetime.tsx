@@ -24,28 +24,6 @@ const formatDateTime = ( value?: string ): string => {
 	return dateI18n( 'Y-m-d\\TH:i', getDate( value ) );
 };
 
-/**
- * Turns a stored value into the `Date` the calendar should work with.
- *
- * The value is an instant, but the control edits it as a wall clock in the
- * WordPress timezone, while the calendar reads and reports the plain `Date`s it
- * is given in the browser timezone. Re-anchoring the wall clock to the browser
- * timezone puts both in the same frame, so the day the calendar shows and
- * reports is the day the field holds.
- *
- * @param value Stored value, parsable by `getDate`.
- *
- * @return The calendar's date, or `null` if the value is missing or invalid.
- */
-const getCalendarDate = ( value?: string ): Date | null => {
-	const wallClock = formatDateTime( value );
-	if ( ! wallClock ) {
-		return null;
-	}
-	const date = parseISO( wallClock );
-	return isValidDate( date ) ? date : null;
-};
-
 function CalendarDateTimeControl< Item >( {
 	data,
 	field,
@@ -60,6 +38,44 @@ function CalendarDateTimeControl< Item >( {
 	const disabled = field.isDisabled( { item: data, field } );
 	const fieldValue = getValue( { item: data } );
 	const value = typeof fieldValue === 'string' ? fieldValue : undefined;
+
+	// The calendar reads and reports the `Date`s it is given in the timezone of
+	// its `timeZone` prop, falling back to the browser's when it has none, while
+	// the value is edited as a wall clock in the WordPress timezone. The two
+	// have to be kept in the same frame, or they disagree on which day a value
+	// holds and on which day was clicked.
+	//
+	// A site with a named timezone hands it to the calendar, which then works in
+	// the site frame and marks the site's today — matching the date picker used
+	// outside DataForm. A site configured with a manual UTC offset has no name to
+	// hand over: the calendar formats its labels through `Intl`, which accepts a
+	// `±HH:MM` identifier only on the newest engines, so the calendar keeps
+	// working in the browser frame and the wall clock is re-anchored to it.
+	const { timezone, l10n } = getSettings();
+	const timeZone = timezone.string || undefined;
+
+	/**
+	 * Turns a stored value into the `Date` the calendar should work with.
+	 *
+	 * @param dateTimeValue Stored value, parsable by `getDate`.
+	 *
+	 * @return The calendar's date, or `null` if the value is missing or invalid.
+	 */
+	const getCalendarDate = useCallback(
+		( dateTimeValue?: string ): Date | null => {
+			if ( ! dateTimeValue ) {
+				return null;
+			}
+			// A calendar working in the site frame re-anchors the instant
+			// itself; one working in the browser frame is handed the site wall
+			// clock re-anchored to that frame.
+			const date = timeZone
+				? getDate( dateTimeValue )
+				: parseISO( formatDateTime( dateTimeValue ) );
+			return isValidDate( date ) ? date : null;
+		},
+		[ timeZone ]
+	);
 
 	const [ calendarMonth, setCalendarMonth ] = useState< Date >( () => {
 		const parsedDate = getCalendarDate( value );
@@ -93,10 +109,12 @@ function CalendarDateTimeControl< Item >( {
 		( newDate: Date | null ) => {
 			let dateTimeValue: string | undefined;
 			if ( newDate ) {
-				// Read the day the calendar reported, rather than re-anchoring
-				// the instant to the WordPress timezone, which lands on the
-				// adjacent day whenever the two timezones disagree.
-				const wpDate = format( newDate, 'yyyy-MM-dd' );
+				// Read the day the calendar reported in the frame it reported it
+				// in — re-anchoring across frames lands on the adjacent day
+				// whenever the two disagree on the date.
+				const wpDate = timeZone
+					? dateI18n( 'Y-m-d', newDate )
+					: format( newDate, 'yyyy-MM-dd' );
 
 				// Preserve the time from the current value; a value set for the
 				// first time starts at the beginning of the day.
@@ -139,7 +157,7 @@ function CalendarDateTimeControl< Item >( {
 				}
 			}, 0 );
 		},
-		[ onChangeCallback, value ]
+		[ onChangeCallback, timeZone, value ]
 	);
 
 	const handleManualDateTimeChange = useCallback(
@@ -158,13 +176,12 @@ function CalendarDateTimeControl< Item >( {
 				onChangeCallback( undefined );
 			}
 		},
-		[ onChangeCallback ]
+		[ getCalendarDate, onChangeCallback ]
 	);
 
 	const { format: fieldFormat } = field;
 	const weekStartsOn =
-		( fieldFormat as FormatDatetime ).weekStartsOn ??
-		getSettings().l10n.startOfWeek;
+		( fieldFormat as FormatDatetime ).weekStartsOn ?? l10n.startOfWeek;
 
 	let displayLabel = label;
 	if ( isValid?.required && ! markWhenOptional && ! hideLabelFromVision ) {
@@ -211,12 +228,11 @@ function CalendarDateTimeControl< Item >( {
 				{ ! compact && (
 					<Calendar
 						style={ { width: '100%' } }
-						selected={ getCalendarDate( value ) || undefined }
-						onSelect={ onSelectDate }
-						value={ value ? parseDateTime( value ) : null }
+						value={ getCalendarDate( value ) }
 						onValueChange={ onSelectDate }
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
+						timeZone={ timeZone }
 						weekStartsOn={ weekStartsOn }
 						disabled={ disabled || disabledMatchers }
 					/>
