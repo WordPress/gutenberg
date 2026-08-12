@@ -144,7 +144,7 @@ for ( const packageName of packagesWithTypes ) {
 						`Missing reference to "${ relative(
 							resolve( repoRoot, 'packages', packageName ),
 							dependencyProject
-						) }" in packages/${ packageName }/tsconfig.json`
+						) }" in ${ relative( repoRoot, srcProject ) }`
 					);
 				}
 			}

@@ -156,6 +156,37 @@ test( 'fails when a dependency is referenced through its dev project', () => {
 	);
 } );
 
+test( 'points a split package at its build project for a missing reference', () => {
+	const result = runValidator(
+		createRepo( {
+			packages: {
+				blob: splitPackage,
+				blocks: {
+					tsconfigs: {
+						'tsconfig.json': [ './tsconfig.build.json' ],
+						'tsconfig.build.json': [],
+					},
+					dependencies: { '@wordpress/blob': 'file:../blob' },
+				},
+			},
+			build: [
+				'packages/blob/tsconfig.build.json',
+				'packages/blocks/tsconfig.build.json',
+			],
+			root: [
+				'./tsconfig.build.json',
+				'packages/blob',
+				'packages/blocks',
+			],
+		} )
+	);
+
+	expect( result.status ).not.toBe( 0 );
+	expect( result.stderr ).toContain(
+		'Missing reference to "../blob/tsconfig.build.json" in packages/blocks/tsconfig.build.json'
+	);
+} );
+
 test( 'passes when a dependency is referenced through its build project', () => {
 	const result = runValidator(
 		createRepo( {

@@ -8,6 +8,8 @@
 	},
 	"include": [
 		"${configDir}/src/**/test/**/*",
+		"${configDir}/src/**/tests/**/*",
+		"${configDir}/src/**/__tests__/**/*",
 		"${configDir}/src/**/stories/**/*",
 		"${configDir}/src/**/*.story.*"
 	],
