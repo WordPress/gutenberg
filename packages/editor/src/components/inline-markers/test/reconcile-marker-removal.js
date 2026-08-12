@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { reconcileMarkerRemoval } from '../reconcile-marker-removal';
 
 describe( 'reconcileMarkerRemoval', () => {
