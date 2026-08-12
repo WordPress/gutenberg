@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Ignore inline `on*` event handler attributes when building the vDOM, which threw a `TypeError` during client-side navigation. ([#79543](https://github.com/WordPress/gutenberg/issues/79543))
+
 ## 6.53.0 (2026-08-12)
 
 

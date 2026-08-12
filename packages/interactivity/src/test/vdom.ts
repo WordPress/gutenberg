@@ -1,4 +1,4 @@
-import { h } from 'preact';
+import { h, render } from 'preact';
 import type { VNode } from 'preact';
 import { toVdom, hydratedIslands } from '../vdom';
 
@@ -210,6 +210,41 @@ describe( 'toVdom', () => {
 			);
 
 			console.warn = originalWarn;
+		} );
+
+		it( 'should skip inline event handler attributes', () => {
+			const element = createElementFromHTML(
+				'<script src="data:text/javascript;base64,Ly8=" onload="window.init()"></script>'
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h(
+					'script' as any,
+					{ src: 'data:text/javascript;base64,Ly8=' },
+					[]
+				)
+			);
+		} );
+
+		it( 'should skip attributes that only look like event handlers', () => {
+			// Preact matches any prop starting with "on", so these break too.
+			const element = createElementFromHTML(
+				'<my-widget once="true" id="w"></my-widget>'
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h( 'my-widget' as any, { id: 'w' }, [] )
+			);
+		} );
+
+		it( 'should render an element with an inline event handler', () => {
+			const element = createElementFromHTML(
+				'<div><button onclick="window.init()">Hi</button></div>'
+			);
+			expect( () =>
+				render(
+					toVdom( element ) as VNode,
+					document.createElement( 'div' )
+				)
+			).not.toThrow();
 		} );
 
 		it( 'should convert boolean attribute "open" to true', () => {
