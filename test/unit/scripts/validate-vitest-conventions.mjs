@@ -17,6 +17,7 @@ import {
 	getVitestTestsByProject,
 	VITEST_PROJECT_NAMES,
 } from './discover-test-files.mjs';
+import { validateVitestPolicy } from './vitest-policy-rules.mjs';
 
 const { sync: glob } = globPackage;
 const require = createRequire( import.meta.url );
@@ -30,6 +31,13 @@ const migration = JSON.parse(
 		'utf8'
 	)
 );
+const policyExceptions = JSON.parse(
+	readFileSync(
+		path.join( ROOT_DIR, 'test/unit/vitest-policy-exceptions.json' ),
+		'utf8'
+	)
+);
+const renderedUiBaseline = new Set( policyExceptions.renderedUi );
 const vitestTestsByProject = getVitestTestsByProject(
 	discoverTestFiles( ROOT_DIR ),
 	migration
@@ -71,6 +79,36 @@ const environmentTokenPattern = /\.(?:browser|jsdom)\./;
 const validEnvironmentSuffixPattern =
 	/\.(?:browser|jsdom)\.test\.[cm]?[jt]sx?$/;
 const violations = [];
+
+if ( renderedUiBaseline.size !== policyExceptions.renderedUi.length ) {
+	violations.push( 'Rendered UI jsdom baseline entries must be unique' );
+}
+for ( const file of renderedUiBaseline ) {
+	if ( ! jsdomTests.has( file ) ) {
+		violations.push(
+			`${ file }: rendered UI baseline entries must be jsdom tests`
+		);
+	}
+}
+for ( const [ exceptionName, projectTests ] of [
+	[ 'browserFireEvent', browserTests ],
+	[ 'jsdomBrowserApis', jsdomTests ],
+] ) {
+	for ( const [ file, reason ] of Object.entries(
+		policyExceptions[ exceptionName ]
+	) ) {
+		if ( typeof reason !== 'string' || reason.trim().length < 12 ) {
+			violations.push(
+				`${ file }: ${ exceptionName } exceptions require a concrete reason`
+			);
+		}
+		if ( ! projectTests.has( file ) ) {
+			violations.push(
+				`${ file }: ${ exceptionName } entry does not match its Vitest project`
+			);
+		}
+	}
+}
 
 function resolvePackageBin( packageName ) {
 	const packageJsonPath = require.resolve( `${ packageName }/package.json` );
@@ -240,6 +278,27 @@ for ( const file of files ) {
 		scopeManager.globalScope?.through.map(
 			( reference ) => reference.identifier
 		) ?? []
+	);
+	let project = 'node';
+	if ( browserTests.has( file ) ) {
+		project = 'browser';
+	} else if ( jsdomTests.has( file ) ) {
+		project = 'jsdom';
+	}
+
+	violations.push(
+		...validateVitestPolicy( {
+			file,
+			source,
+			project,
+			allowBrowserFireEvent: Boolean(
+				policyExceptions.browserFireEvent[ file ]
+			),
+			allowJsdomBrowserApis: Boolean(
+				policyExceptions.jsdomBrowserApis[ file ]
+			),
+			allowRenderedUi: renderedUiBaseline.has( file ),
+		} )
 	);
 
 	traverseAst( ast, visitorKeys, {
