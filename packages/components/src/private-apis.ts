@@ -12,7 +12,6 @@ import {
 	ValidatedToggleControl,
 	ValidatedToggleGroupControl,
 } from './validated-form-controls';
-import { ValidatedFormTokenField } from './validated-form-controls/components/form-token-field';
 import ContentEditableControl from './content-editable-control';
 
 export const privateApis = {};
@@ -29,5 +28,4 @@ lock( privateApis, {
 	ValidatedTextareaControl,
 	ValidatedToggleControl,
 	ValidatedToggleGroupControl,
-	ValidatedFormTokenField,
 } );

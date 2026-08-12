@@ -1,7 +1,11 @@
 import { forwardRef, useRef } from '@wordpress/element';
-import { ControlWithError } from '../control-with-error';
+import { FormTokenField } from '@wordpress/components';
+import { ControlWithError } from './control-with-error';
 import type { ValidatedControlProps } from './types';
-import { FormTokenField } from '../../form-token-field';
+
+type FormTokenFieldProps = React.ComponentProps< typeof FormTokenField >;
+
+type ValidatedFormTokenFieldProps = FormTokenFieldProps & ValidatedControlProps;
 
 const UnforwardedValidatedFormTokenField = (
 	{
@@ -9,14 +13,14 @@ const UnforwardedValidatedFormTokenField = (
 		customValidity,
 		markWhenOptional,
 		...restProps
-	}: React.ComponentProps< typeof FormTokenField > & ValidatedControlProps,
+	}: ValidatedFormTokenFieldProps,
 	forwardedRef: React.ForwardedRef< HTMLDivElement >
 ) => {
 	const validityTargetRef = useRef< HTMLInputElement >( null );
 
 	return (
 		<div
-			className="components-validated-control__wrapper-with-error-delegate"
+			className="dataviews-validated-control__wrapper-with-error-delegate"
 			ref={ forwardedRef }
 		>
 			<ControlWithError
@@ -28,7 +32,7 @@ const UnforwardedValidatedFormTokenField = (
 				<FormTokenField { ...restProps } />
 			</ControlWithError>
 			<input
-				className="components-validated-control__error-delegate"
+				className="dataviews-validated-control__error-delegate"
 				type="text"
 				ref={ validityTargetRef }
 				required={ required }
@@ -51,7 +55,8 @@ const UnforwardedValidatedFormTokenField = (
 	);
 };
 
-export const ValidatedFormTokenField = forwardRef(
-	UnforwardedValidatedFormTokenField
-);
+export const ValidatedFormTokenField: React.ForwardRefExoticComponent<
+	React.PropsWithoutRef< ValidatedFormTokenFieldProps > &
+		React.RefAttributes< HTMLDivElement >
+> = forwardRef( UnforwardedValidatedFormTokenField );
 ValidatedFormTokenField.displayName = 'ValidatedFormTokenField';
