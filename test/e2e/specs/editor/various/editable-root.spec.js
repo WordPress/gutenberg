@@ -36,17 +36,17 @@ test.describe( 'editableRoot host mode', () => {
 			.toBe( true );
 	} );
 
-	test( 'a heading (no support) is not hosted', async ( {
+	test( 'a pullquote (no support) is not hosted', async ( {
 		editor,
 		page,
 	} ) => {
 		await editor.insertBlock( {
-			name: 'core/heading',
-			attributes: { content: 'a' },
+			name: 'core/pullquote',
+			attributes: { value: 'a' },
 		} );
 		await editor.insertBlock( {
-			name: 'core/heading',
-			attributes: { content: 'b' },
+			name: 'core/pullquote',
+			attributes: { value: 'b' },
 		} );
 		await page.keyboard.press( 'ArrowUp' );
 
