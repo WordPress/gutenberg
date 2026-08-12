@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { RectangleStencil } from '../rectangle-stencil';
 import type {
@@ -17,8 +17,6 @@ const DEFAULT_CROP_RECT: NormalizedRect = {
 const CONTAINER_SIZE: Size = { width: 600, height: 400 };
 const IMAGE_SIZE: Size = { width: 500, height: 300 };
 const CROP_BOUNDS = { minX: 0, minY: 0, maxX: 1, maxY: 1 };
-
-globalThis.wpVitest.mockPointerEvent();
 
 /**
  * Render a RectangleStencil in freeform mode with sensible defaults.
@@ -59,16 +57,6 @@ function renderStencil(
 }
 
 describe( 'RectangleStencil', () => {
-	// jsdom does not implement pointer capture, so stub it for handle drag tests.
-	beforeAll( () => {
-		if ( ! HTMLElement.prototype.setPointerCapture ) {
-			HTMLElement.prototype.setPointerCapture = vi.fn();
-		}
-		if ( ! HTMLElement.prototype.releasePointerCapture ) {
-			HTMLElement.prototype.releasePointerCapture = vi.fn();
-		}
-	} );
-
 	describe( 'tab order', () => {
 		it( 'renders handles clockwise from top-left in freeform mode', () => {
 			renderStencil();
@@ -438,17 +426,21 @@ describe( 'RectangleStencil', () => {
 				</div>
 			);
 			const [ firstHandle ] = screen.getAllByRole( 'button' );
+			const createTouch = ( identifier: number, clientX: number ) =>
+				new Touch( {
+					identifier,
+					target: firstHandle,
+					clientX,
+					clientY: 100,
+				} );
 
 			fireEvent.touchStart( firstHandle, {
-				touches: [ { clientX: 100, clientY: 100 } ],
+				touches: [ createTouch( 1, 100 ) ],
 			} );
 			expect( onTouchStart ).not.toHaveBeenCalled();
 
 			fireEvent.touchStart( firstHandle, {
-				touches: [
-					{ clientX: 100, clientY: 100 },
-					{ clientX: 160, clientY: 100 },
-				],
+				touches: [ createTouch( 1, 100 ), createTouch( 2, 160 ) ],
 			} );
 			expect( onTouchStart ).toHaveBeenCalledTimes( 1 );
 		} );

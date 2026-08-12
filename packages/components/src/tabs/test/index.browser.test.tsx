@@ -1,12 +1,15 @@
 import { describe, expect, it, vi } from 'vitest';
-import { screen, waitFor } from '@testing-library/react';
-import { press, click } from '@ariakit/test';
-import { render } from '@ariakit/test/react';
+import { userEvent } from 'vitest/browser';
+import {
+	act,
+	render as renderTestingLibrary,
+	screen,
+	waitFor,
+} from '@testing-library/react';
 import { useEffect, useState } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 import { Tabs } from '..';
 import type { TabsProps } from '../types';
-globalThis.wpVitest.mockResizeObserver();
 
 // Setup mocking the `isRTL` function to test arrow key navigation behavior.
 vi.mock( import( '@wordpress/i18n' ), async ( importOriginal ) => {
@@ -17,6 +20,28 @@ vi.mock( import( '@wordpress/i18n' ), async ( importOriginal ) => {
 	};
 } );
 const mockedIsRTL = vi.mocked( isRTL );
+
+async function settleRender() {
+	await act(
+		() =>
+			new Promise< void >( ( resolve ) => {
+				requestAnimationFrame( () => resolve() );
+			} )
+	);
+}
+
+async function render( ...args: Parameters< typeof renderTestingLibrary > ) {
+	const view = renderTestingLibrary( ...args );
+	await settleRender();
+
+	return {
+		...view,
+		rerender: async ( ui: React.ReactNode ) => {
+			view.rerender( ui );
+			await settleRender();
+		},
+	};
+}
 
 type Tab = {
 	tabId: string;
@@ -275,7 +300,9 @@ describe( 'Tabs', () => {
 			await waitForComponentToBeInitializedWithSelectedTab( 'Alpha' );
 
 			// Select Beta, make sure the correct tabpanel is rendered
-			await click( screen.getByRole( 'tab', { name: 'Beta' } ) );
+			await userEvent.click(
+				screen.getByRole( 'tab', { name: 'Beta' } )
+			);
 			expect(
 				screen.getByRole( 'tab', {
 					selected: true,
@@ -289,7 +316,9 @@ describe( 'Tabs', () => {
 			).toBeVisible();
 
 			// Select Gamma, make sure the correct tabpanel is rendered
-			await click( screen.getByRole( 'tab', { name: 'Gamma' } ) );
+			await userEvent.click(
+				screen.getByRole( 'tab', { name: 'Gamma' } )
+			);
 			expect(
 				screen.getByRole( 'tab', {
 					selected: true,
@@ -303,7 +332,9 @@ describe( 'Tabs', () => {
 			).toBeVisible();
 
 			// Select Delta, make sure the correct tabpanel is rendered
-			await click( screen.getByRole( 'tab', { name: 'Delta' } ) );
+			await userEvent.click(
+				screen.getByRole( 'tab', { name: 'Delta' } )
+			);
 			expect(
 				screen.getByRole( 'tab', {
 					selected: true,
@@ -350,7 +381,9 @@ describe( 'Tabs', () => {
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
 			// Click on Beta, make sure beta is the selected tab
-			await click( screen.getByRole( 'tab', { name: 'Beta' } ) );
+			await userEvent.click(
+				screen.getByRole( 'tab', { name: 'Beta' } )
+			);
 
 			expect(
 				screen.getByRole( 'tab', {
@@ -368,7 +401,9 @@ describe( 'Tabs', () => {
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
 
 			// Click on Alpha, make sure alpha is the selected tab
-			await click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
+			await userEvent.click(
+				screen.getByRole( 'tab', { name: 'Alpha' } )
+			);
 
 			expect(
 				screen.getByRole( 'tab', {
@@ -404,7 +439,8 @@ describe( 'Tabs', () => {
 
 			// Clicking on Beta does not result in beta being selected
 			// because the tab is disabled.
-			await click( screen.getByRole( 'tab', { name: 'Beta' } ) );
+			// eslint-disable-next-line testing-library/no-node-access
+			screen.getByRole( 'tab', { name: 'Beta' } ).click();
 
 			expect(
 				screen.getByRole( 'tab', {
@@ -434,7 +470,7 @@ describe( 'Tabs', () => {
 					);
 
 					// Press tab. The selected tab (alpha) received focus.
-					await press.Tab();
+					await userEvent.tab();
 					expect(
 						await screen.findByRole( 'tab', {
 							selected: true,
@@ -456,7 +492,7 @@ describe( 'Tabs', () => {
 
 					// Press tab. The selected tab (beta) received focus. The corresponding
 					// tabpanel is shown.
-					await press.Tab();
+					await userEvent.tab();
 					expect(
 						await screen.findByRole( 'tab', {
 							selected: true,
@@ -477,14 +513,14 @@ describe( 'Tabs', () => {
 					);
 
 					// Press tab. The tablist receives focus
-					await press.Tab();
+					await userEvent.tab();
 					expect(
 						await screen.findByRole( 'tablist' )
 					).toHaveFocus();
 
 					// Press right arrow to select the first tab (alpha) and
 					// show the related tabpanel.
-					await press.ArrowRight();
+					await userEvent.keyboard( '{ArrowRight}' );
 					expect(
 						await screen.findByRole( 'tab', {
 							selected: true,
@@ -514,7 +550,7 @@ describe( 'Tabs', () => {
 
 					// Press tab. The selected tab (beta) received focus. The corresponding
 					// tabpanel is shown.
-					await press.Tab();
+					await userEvent.tab();
 					expect(
 						await screen.findByRole( 'tab', {
 							selected: true,
@@ -539,7 +575,7 @@ describe( 'Tabs', () => {
 
 					// Press tab. The selected tab (beta) received focus, since it is
 					// accessible despite being disabled.
-					await press.Tab();
+					await userEvent.tab();
 					expect(
 						await screen.findByRole( 'tab', {
 							selected: true,
@@ -564,7 +600,7 @@ describe( 'Tabs', () => {
 
 					// Press tab. The first tab receives focus, but it's
 					// not selected.
-					await press.Tab();
+					await userEvent.tab();
 					expect(
 						screen.getByRole( 'tab', { name: 'Alpha' } )
 					).toHaveFocus();
@@ -581,7 +617,7 @@ describe( 'Tabs', () => {
 
 					// Press right arrow to select the next tab (beta) and
 					// show the related tabpanel.
-					await press.ArrowRight();
+					await userEvent.keyboard( '{ArrowRight}' );
 					expect(
 						await screen.findByRole( 'tab', {
 							selected: true,
@@ -611,7 +647,7 @@ describe( 'Tabs', () => {
 
 					// Press tab. The first tab receives focus, but it's
 					// not selected.
-					await press.Tab();
+					await userEvent.tab();
 					expect(
 						screen.getByRole( 'tab', { name: 'Alpha' } )
 					).toHaveFocus();
@@ -628,7 +664,7 @@ describe( 'Tabs', () => {
 
 					// Press right arrow to select the next tab (beta) and
 					// show the related tabpanel.
-					await press.ArrowRight();
+					await userEvent.keyboard( '{ArrowRight}' );
 					expect(
 						await screen.findByRole( 'tab', {
 							selected: true,
@@ -700,7 +736,7 @@ describe( 'Tabs', () => {
 
 						// Press tab. The selected tab (beta) received focus, since it is
 						// accessible despite being disabled.
-						await press.Tab();
+						await userEvent.tab();
 						expect(
 							await screen.findByRole( 'tab', {
 								selected: true,
@@ -725,7 +761,7 @@ describe( 'Tabs', () => {
 
 						// Press tab. The selected tab (gamma) received focus, since it is
 						// accessible despite being disabled.
-						await press.Tab();
+						await userEvent.tab();
 						expect(
 							await screen.findByRole( 'tab', {
 								selected: true,
@@ -749,7 +785,7 @@ describe( 'Tabs', () => {
 
 						// Press tab. The selected tab (beta) received focus, since it is
 						// accessible despite being disabled.
-						await press.Tab();
+						await userEvent.tab();
 						expect(
 							await screen.findByRole( 'tab', {
 								selected: true,
@@ -776,7 +812,7 @@ describe( 'Tabs', () => {
 
 						// Press tab. The first tab receives focus, but it's
 						// not selected.
-						await press.Tab();
+						await userEvent.tab();
 						expect(
 							screen.getByRole( 'tab', { name: 'Alpha' } )
 						).toHaveFocus();
@@ -793,7 +829,7 @@ describe( 'Tabs', () => {
 
 						// Press right arrow to select the next tab (beta) and
 						// show the related tabpanel.
-						await press.ArrowRight();
+						await userEvent.keyboard( '{ArrowRight}' );
 						expect(
 							await screen.findByRole( 'tab', {
 								selected: true,
@@ -823,7 +859,7 @@ describe( 'Tabs', () => {
 
 						// Press tab. The first tab receives focus, but it's
 						// not selected.
-						await press.Tab();
+						await userEvent.tab();
 						expect(
 							screen.getByRole( 'tab', { name: 'Alpha' } )
 						).toHaveFocus();
@@ -840,7 +876,7 @@ describe( 'Tabs', () => {
 
 						// Press right arrow to select the next tab (beta) and
 						// show the related tabpanel.
-						await press.ArrowRight();
+						await userEvent.keyboard( '{ArrowRight}' );
 						expect(
 							await screen.findByRole( 'tab', {
 								selected: true,
@@ -870,7 +906,7 @@ describe( 'Tabs', () => {
 				await waitForComponentToBeInitializedWithSelectedTab( 'Alpha' );
 
 				// Press tab. The selected tab (alpha) received focus.
-				await press.Tab();
+				await userEvent.tab();
 				expect(
 					await screen.findByRole( 'tab', {
 						selected: true,
@@ -879,7 +915,7 @@ describe( 'Tabs', () => {
 				).toHaveFocus();
 
 				// By default the tabpanel should receive focus
-				await press.Tab();
+				await userEvent.tab();
 				expect(
 					await screen.findByRole( 'tabpanel', {
 						name: 'Alpha',
@@ -912,7 +948,7 @@ describe( 'Tabs', () => {
 
 				// Tab should initially focus the first tab in the tablist, which
 				// is Alpha.
-				await press.Tab();
+				await userEvent.tab();
 				expect(
 					await screen.findByRole( 'tab', {
 						selected: true,
@@ -922,7 +958,7 @@ describe( 'Tabs', () => {
 
 				// In this case, the tabpanel container is skipped and focus is
 				// moved directly to its contents
-				await press.Tab();
+				await userEvent.tab();
 				expect(
 					await screen.findByRole( 'button', {
 						name: 'Alpha Button',
@@ -946,7 +982,7 @@ describe( 'Tabs', () => {
 				// Focus the tablist (and the selected tab, alpha)
 				// Tab should initially focus the first tab in the tablist, which
 				// is Alpha.
-				await press.Tab();
+				await userEvent.tab();
 				expect(
 					await screen.findByRole( 'tab', {
 						selected: true,
@@ -955,7 +991,7 @@ describe( 'Tabs', () => {
 				).toHaveFocus();
 
 				// Press the right arrow key to select the beta tab
-				await press.ArrowRight();
+				await userEvent.keyboard( '{ArrowRight}' );
 
 				expect(
 					screen.getByRole( 'tab', {
@@ -973,7 +1009,7 @@ describe( 'Tabs', () => {
 				expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
 
 				// Press the right arrow key to select the gamma tab
-				await press.ArrowRight();
+				await userEvent.keyboard( '{ArrowRight}' );
 
 				expect(
 					screen.getByRole( 'tab', {
@@ -991,7 +1027,7 @@ describe( 'Tabs', () => {
 				expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
 
 				// Press the left arrow key to select the beta tab
-				await press.ArrowLeft();
+				await userEvent.keyboard( '{ArrowLeft}' );
 
 				expect(
 					screen.getByRole( 'tab', {
@@ -1029,7 +1065,7 @@ describe( 'Tabs', () => {
 				// Focus the tablist (and the selected tab, alpha)
 				// Tab should initially focus the first tab in the tablist, which
 				// is Alpha.
-				await press.Tab();
+				await userEvent.tab();
 				expect(
 					await screen.findByRole( 'tab', {
 						selected: true,
@@ -1039,7 +1075,7 @@ describe( 'Tabs', () => {
 
 				// Press the right arrow key to move focus to the beta tab,
 				// but without selecting it
-				await press.ArrowRight();
+				await userEvent.keyboard( '{ArrowRight}' );
 
 				expect(
 					screen.getByRole( 'tab', {
@@ -1064,7 +1100,7 @@ describe( 'Tabs', () => {
 				// Press the space key to click the beta tab, and select it.
 				// The same should be true with any other mean of clicking the tab button
 				// (ie. mouse click, enter key).
-				await press.Space();
+				await userEvent.keyboard( ' ' );
 
 				expect(
 					screen.getByRole( 'tab', {
@@ -1098,7 +1134,7 @@ describe( 'Tabs', () => {
 				// Focus the tablist (and the selected tab, alpha)
 				// Tab should initially focus the first tab in the tablist, which
 				// is Alpha.
-				await press.Tab();
+				await userEvent.tab();
 				expect(
 					await screen.findByRole( 'tab', {
 						selected: true,
@@ -1107,7 +1143,7 @@ describe( 'Tabs', () => {
 				).toHaveFocus();
 
 				// Press the up arrow key, but the focused/selected tab does not change.
-				await press.ArrowUp();
+				await userEvent.keyboard( '{ArrowUp}' );
 
 				expect(
 					screen.getByRole( 'tab', {
@@ -1124,7 +1160,7 @@ describe( 'Tabs', () => {
 				expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 
 				// Press the down arrow key, but the focused/selected tab does not change.
-				await press.ArrowDown();
+				await userEvent.keyboard( '{ArrowDown}' );
 
 				expect(
 					screen.getByRole( 'tab', {
@@ -1150,7 +1186,7 @@ describe( 'Tabs', () => {
 				);
 
 				// Pressing the down arrow key now selects the next tab (beta).
-				await press.ArrowDown();
+				await userEvent.keyboard( '{ArrowDown}' );
 
 				expect(
 					screen.getByRole( 'tab', {
@@ -1168,7 +1204,7 @@ describe( 'Tabs', () => {
 				expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
 
 				// Pressing the up arrow key now selects the previous tab (alpha).
-				await press.ArrowUp();
+				await userEvent.keyboard( '{ArrowUp}' );
 
 				expect(
 					screen.getByRole( 'tab', {
@@ -1202,7 +1238,7 @@ describe( 'Tabs', () => {
 				// Focus the tablist (and the selected tab, alpha)
 				// Tab should initially focus the first tab in the tablist, which
 				// is Alpha.
-				await press.Tab();
+				await userEvent.tab();
 				expect(
 					await screen.findByRole( 'tab', {
 						selected: true,
@@ -1211,7 +1247,7 @@ describe( 'Tabs', () => {
 				).toHaveFocus();
 
 				// Press the left arrow key to loop around and select the gamma tab
-				await press.ArrowLeft();
+				await userEvent.keyboard( '{ArrowLeft}' );
 
 				expect(
 					screen.getByRole( 'tab', {
@@ -1229,7 +1265,7 @@ describe( 'Tabs', () => {
 				expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
 
 				// Press the right arrow key to loop around and select the alpha tab
-				await press.ArrowRight();
+				await userEvent.keyboard( '{ArrowRight}' );
 
 				expect(
 					screen.getByRole( 'tab', {
@@ -1267,7 +1303,7 @@ describe( 'Tabs', () => {
 				// Focus the tablist (and the selected tab, alpha)
 				// Tab should initially focus the first tab in the tablist, which
 				// is Alpha.
-				await press.Tab();
+				await userEvent.tab();
 				expect(
 					await screen.findByRole( 'tab', {
 						selected: true,
@@ -1276,7 +1312,7 @@ describe( 'Tabs', () => {
 				).toHaveFocus();
 
 				// Press the left arrow key to select the beta tab
-				await press.ArrowLeft();
+				await userEvent.keyboard( '{ArrowLeft}' );
 
 				expect(
 					screen.getByRole( 'tab', {
@@ -1294,7 +1330,7 @@ describe( 'Tabs', () => {
 				expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
 
 				// Press the left arrow key to select the gamma tab
-				await press.ArrowLeft();
+				await userEvent.keyboard( '{ArrowLeft}' );
 
 				expect(
 					screen.getByRole( 'tab', {
@@ -1312,7 +1348,7 @@ describe( 'Tabs', () => {
 				expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
 
 				// Press the right arrow key to select the beta tab
-				await press.ArrowRight();
+				await userEvent.keyboard( '{ArrowRight}' );
 
 				expect(
 					screen.getByRole( 'tab', {
@@ -1352,7 +1388,7 @@ describe( 'Tabs', () => {
 				// Focus the tablist (and the selected tab, alpha)
 				// Tab should initially focus the first tab in the tablist, which
 				// is Alpha.
-				await press.Tab();
+				await userEvent.tab();
 				expect(
 					await screen.findByRole( 'tab', {
 						selected: true,
@@ -1362,7 +1398,7 @@ describe( 'Tabs', () => {
 
 				// Pressing the right arrow key moves focus to the beta tab, but alpha
 				// remains the selected tab because beta is disabled.
-				await press.ArrowRight();
+				await userEvent.keyboard( '{ArrowRight}' );
 
 				expect(
 					screen.getByRole( 'tab', {
@@ -1385,7 +1421,7 @@ describe( 'Tabs', () => {
 				expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 
 				// Press the right arrow key to select the gamma tab
-				await press.ArrowRight();
+				await userEvent.keyboard( '{ArrowRight}' );
 
 				expect(
 					screen.getByRole( 'tab', {
@@ -1408,7 +1444,7 @@ describe( 'Tabs', () => {
 			describe.each( [ true, false ] )(
 				'and `selectOnMove` is %s',
 				( selectOnMove ) => {
-					it( 'should continue to handle arrow key navigation properly', async () => {
+					it( 'should preserve active-tab arrow key navigation', async () => {
 						const { rerender } = await render(
 							<ControlledTabs
 								tabs={ TABS }
@@ -1422,11 +1458,10 @@ describe( 'Tabs', () => {
 							'Beta'
 						);
 
-						// Tab key should focus the currently selected tab, which is Beta.
-						await press.Tab();
+						// The selected tab is initially active.
+						await userEvent.tab();
 						expect(
 							screen.getByRole( 'tab', {
-								selected: true,
 								name: 'Beta',
 							} )
 						).toHaveFocus();
@@ -1439,29 +1474,32 @@ describe( 'Tabs', () => {
 							/>
 						);
 
-						// When the selected tab is changed by the controlling
-						// component while the tablist holds focus, focus moves to
-						// the newly selected tab (Gamma).
+						// A controlled selection change makes the selected tab active,
+						// independently of the keyboard activation mode.
+						const updatedActiveTab = 'Gamma';
+						expect(
+							screen.getByRole( 'tab', {
+								name: updatedActiveTab,
+							} )
+						).toHaveFocus();
+
+						// Arrow navigation continues from the active tab.
+						await userEvent.keyboard( '{ArrowLeft}' );
+						const previousActiveTab = 'Beta';
+						expect(
+							screen.getByRole( 'tab', {
+								name: previousActiveTab,
+							} )
+						).toHaveFocus();
 						expect(
 							screen.getByRole( 'tab', {
 								selected: true,
-								name: 'Gamma',
+								name: selectOnMove ? 'Beta' : 'Gamma',
 							} )
-						).toHaveFocus();
-
-						// Arrow left should move focus to the previous tab (Beta).
-						// Beta should always be focused, and should be selected
-						// when the `selectOnMove` prop is set to `true`.
-						await press.ArrowLeft();
-						expect(
-							screen.getByRole( 'tab', {
-								selected: selectOnMove,
-								name: 'Beta',
-							} )
-						).toHaveFocus();
+						).toBeVisible();
 					} );
 
-					it( 'should focus the correct tab when tabbing out and back into the tablist', async () => {
+					it( 'should preserve the active tab when tabbing out and back', async () => {
 						const { rerender } = await render(
 							<>
 								<button>Focus me</button>
@@ -1478,12 +1516,11 @@ describe( 'Tabs', () => {
 							'Beta'
 						);
 
-						// Tab key should focus the currently selected tab, which is Beta.
-						await press.Tab();
-						await press.Tab();
+						// Enter the tablist at its active tab.
+						await userEvent.tab();
+						await userEvent.tab();
 						expect(
 							screen.getByRole( 'tab', {
-								selected: true,
 								name: 'Beta',
 							} )
 						).toHaveFocus();
@@ -1500,30 +1537,26 @@ describe( 'Tabs', () => {
 							</>
 						);
 
-						// When the selected tab is changed by the controlling
-						// component while the tablist holds focus, focus moves to
-						// the newly selected tab (Gamma), which also becomes the
-						// active tab.
+						const updatedActiveTab = 'Gamma';
+						// The controlled selection becomes active regardless of the
+						// keyboard activation mode.
 						expect(
 							screen.getByRole( 'tab', {
-								selected: true,
-								name: 'Gamma',
+								name: updatedActiveTab,
 							} )
 						).toHaveFocus();
 
 						// Press shift+tab, move focus to the button before Tabs
-						await press.ShiftTab();
+						await userEvent.tab( { shift: true } );
 						expect(
 							screen.getByRole( 'button', { name: 'Focus me' } )
 						).toHaveFocus();
 
-						// Press tab, move focus back to the tablist. Because the
-						// newly selected tab became the active tab, focus returns
-						// to Gamma regardless of `selectOnMove`.
-						await press.Tab();
+						// Press tab to return to the active tab.
+						await userEvent.tab();
 						expect(
 							screen.getByRole( 'tab', {
-								name: 'Gamma',
+								name: updatedActiveTab,
 							} )
 						).toHaveFocus();
 					} );
@@ -1554,7 +1587,9 @@ describe( 'Tabs', () => {
 					expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
 					// Select gamma
-					await click( screen.getByRole( 'tab', { name: 'Gamma' } ) );
+					await userEvent.click(
+						screen.getByRole( 'tab', { name: 'Gamma' } )
+					);
 
 					expect(
 						screen.getByRole( 'tab', {
@@ -1682,7 +1717,7 @@ describe( 'Tabs', () => {
 						);
 
 						// Select alpha
-						await click(
+						await userEvent.click(
 							screen.getByRole( 'tab', { name: 'Alpha' } )
 						);
 
@@ -1896,7 +1931,7 @@ describe( 'Tabs', () => {
 						);
 
 						// Click on beta tab, beta becomes selected.
-						await click(
+						await userEvent.click(
 							screen.getByRole( 'tab', { name: 'Beta' } )
 						);
 
