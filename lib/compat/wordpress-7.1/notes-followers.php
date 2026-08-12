@@ -36,6 +36,46 @@ if ( ! function_exists( 'gutenberg_get_note_thread_root_id' ) ) {
 	}
 }
 
+if ( ! function_exists( 'gutenberg_get_note_status_event' ) ) {
+	/**
+	 * Returns the thread event a note records, if it records one.
+	 *
+	 * Resolving or reopening a thread posts a child note carrying a
+	 * `_wp_note_status` meta value of `resolved` or `reopen` (see the `onEdit`
+	 * handler in packages/editor/src/components/collab-sidebar/hooks.js). Those
+	 * notes are bookkeeping rather than conversation - the resolve one has no
+	 * content at all - so notification handlers treat them as thread events
+	 * instead of replies.
+	 *
+	 * `rest_insert_comment` fires before WP_REST_Comments_Controller saves the
+	 * meta, so the request is consulted first and the stored meta only as a
+	 * fallback. That way the answer is the same whichever of the two REST
+	 * comment hooks the caller runs on.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param WP_Comment $comment The note.
+	 * @param mixed      $request The REST request, when the caller has one.
+	 * @return string|null 'resolved' or 'reopen', or null for a regular note.
+	 */
+	function gutenberg_get_note_status_event( WP_Comment $comment, $request = null ): ?string {
+		$event = null;
+
+		if ( $request instanceof WP_REST_Request ) {
+			$meta = $request['meta'];
+			if ( is_array( $meta ) && isset( $meta['_wp_note_status'] ) ) {
+				$event = $meta['_wp_note_status'];
+			}
+		}
+
+		if ( null === $event ) {
+			$event = get_comment_meta( $comment->comment_ID, '_wp_note_status', true );
+		}
+
+		return in_array( $event, array( 'resolved', 'reopen' ), true ) ? (string) $event : null;
+	}
+}
+
 if ( ! function_exists( 'gutenberg_get_note_followers' ) ) {
 	/**
 	 * Returns the user IDs following a note thread.
@@ -337,17 +377,25 @@ if ( ! function_exists( 'gutenberg_notify_note_followers' ) ) {
 	 * about this note.
 	 *
 	 * @param WP_Comment $comment  The note that was just inserted.
-	 * @param mixed      $request  The REST request (unused).
+	 * @param mixed      $request  The REST request, used to recognize system notes.
 	 * @param bool       $creating Whether this is a create (true) or update (false).
 	 */
 	function gutenberg_notify_note_followers( WP_Comment $comment, $request = null, bool $creating = true ): void {
-		unset( $request );
-
 		if ( ! $creating || 'note' !== $comment->comment_type ) {
 			return;
 		}
 
 		if ( ! get_option( 'wp_notes_notify', 1 ) ) {
+			return;
+		}
+
+		/*
+		 * Resolving or reopening a thread posts a system note. That is a thread
+		 * event rather than a reply, and announcing it as "added a note" would
+		 * mail followers a body with nothing in it, since resolve notes have no
+		 * content. Whoever announces thread events owns this case.
+		 */
+		if ( null !== gutenberg_get_note_status_event( $comment, $request ) ) {
 			return;
 		}
 

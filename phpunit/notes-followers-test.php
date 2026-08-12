@@ -563,4 +563,74 @@ class Tests_Notes_Followers extends WP_UnitTestCase {
 		$this->assertSame( 201, $response->get_status() );
 		$this->assertContains( self::$mentioned->user_email, $this->sent_to );
 	}
+
+	/**
+	 * Resolving or reopening a thread posts a system note. Announcing it as a
+	 * reply would mail followers a body with nothing in it, since resolve
+	 * notes carry no content.
+	 *
+	 * @covers ::gutenberg_notify_note_followers
+	 * @covers ::gutenberg_get_note_status_event
+	 */
+	public function test_system_notes_do_not_send_the_follower_email(): void {
+		$root = $this->insert_note(
+			'Start ' . self::mention( self::$mentioned->ID ),
+			self::$commenter->ID
+		);
+		$this->fire_rest_insert( $root );
+
+		$this->sent    = array();
+		$this->sent_to = array();
+
+		$resolver = self::create_user( 'editor' );
+		$system   = $this->insert_note( '', $resolver->ID, $root->comment_ID );
+		update_comment_meta( $system->comment_ID, '_wp_note_status', 'resolved' );
+		$this->fire_rest_insert( $system );
+
+		$this->assertEmpty( $this->emails_to( self::$mentioned->user_email ) );
+	}
+
+	/**
+	 * The controller saves comment meta after `rest_insert_comment` fires, so
+	 * a system note has to be recognized from the request that created it.
+	 *
+	 * @covers ::gutenberg_get_note_status_event
+	 */
+	public function test_system_notes_are_recognized_before_their_meta_is_saved(): void {
+		$root = $this->insert_note(
+			'Start ' . self::mention( self::$mentioned->ID ),
+			self::$commenter->ID
+		);
+		$this->fire_rest_insert( $root );
+
+		$this->sent    = array();
+		$this->sent_to = array();
+
+		$resolver = self::create_user( 'editor' );
+		$system   = $this->insert_note( 'Reopening this', $resolver->ID, $root->comment_ID );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->set_param( 'meta', array( '_wp_note_status' => 'reopen' ) );
+
+		// No meta row exists yet, exactly as during a real create.
+		$this->assertSame( '', get_comment_meta( $system->comment_ID, '_wp_note_status', true ) );
+		$this->assertSame( 'reopen', gutenberg_get_note_status_event( $system, $request ) );
+
+		do_action( 'rest_insert_comment', $system, $request, true );
+
+		$this->assertEmpty( $this->emails_to( self::$mentioned->user_email ) );
+	}
+
+	/**
+	 * A regular reply is not mistaken for a thread event.
+	 *
+	 * @covers ::gutenberg_get_note_status_event
+	 */
+	public function test_regular_notes_record_no_thread_event(): void {
+		$note = $this->insert_note( 'Just a note', self::$commenter->ID );
+
+		$this->assertNull( gutenberg_get_note_status_event( $note ) );
+		$this->assertNull( gutenberg_get_note_status_event( $note, new WP_REST_Request( 'POST', '/wp/v2/comments' ) ) );
+	}
+
 }
