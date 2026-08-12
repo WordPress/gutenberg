@@ -644,7 +644,10 @@ if ( ! function_exists( 'gutenberg_send_note_follower_notification' ) ) {
 		 */
 		$body = apply_filters( 'wp_note_follower_notification_text', $body, $user, $comment );
 
-		$sent = wp_mail( $user->user_email, wp_specialchars_decode( $subject ), $body );
+		// Declared explicitly so a filtered default cannot turn the message into HTML.
+		$headers = 'Content-Type: text/plain; charset="' . get_option( 'blog_charset' ) . '"';
+
+		$sent = wp_mail( $user->user_email, $subject, $body, $headers );
 
 		if ( $switched_locale ) {
 			restore_previous_locale();
