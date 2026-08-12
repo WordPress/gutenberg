@@ -91,12 +91,12 @@ export interface WidgetAction {
 	label: string;
 
 	/**
-	 * Icon for the action. Declared as a registered icon name
-	 * (`collection/icon-name`); `useWidgetTypes` resolves references, so
-	 * hosts receive a renderable element, or nothing when the reference
-	 * does not resolve.
+	 * Icon for the action, a rendered element. On the wire an action
+	 * declares a registered icon name instead (`WidgetActionRecord`);
+	 * `useWidgetTypes` resolves it, so hosts only receive renderable
+	 * elements.
 	 */
-	icon?: WidgetIconReference | WidgetIcon;
+	icon?: WidgetIcon;
 
 	/**
 	 * How relevant the action is among the widget's actions. Hosts may
@@ -121,6 +121,18 @@ export interface WidgetAction {
 	 * Link only. Whether the destination opens in a new browser tab.
 	 */
 	openInNewTab?: boolean;
+}
+
+/**
+ * Wire form of a `WidgetAction`, as carried by a `WidgetModuleRecord`:
+ * the same envelope and fulfillment, with `icon` as a registered icon
+ * name rather than a rendered element.
+ */
+export interface WidgetActionRecord extends Omit< WidgetAction, 'icon' > {
+	/**
+	 * Registered icon name (`collection/icon-name`); never an element.
+	 */
+	icon?: WidgetIconReference;
 }
 
 /**
@@ -312,7 +324,6 @@ type WidgetModuleRecordOverrides = {
 		| 'category'
 		| 'presentation'
 		| 'keywords'
-		| 'actions'
 	> ]?: WidgetTypeMetadata[ K ] | null;
 };
 
@@ -342,4 +353,10 @@ export interface WidgetModuleRecord extends WidgetModuleRecordOverrides {
 	 * `null`/absent means the module's icon stands.
 	 */
 	icon?: WidgetIconReference | null;
+
+	/**
+	 * Declarative actions in wire form, icons as registered icon names.
+	 * `null`/absent means the module's actions stand.
+	 */
+	actions?: WidgetActionRecord[] | null;
 }

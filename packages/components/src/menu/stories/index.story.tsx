@@ -1,9 +1,7 @@
 import type { StoryObj, Meta } from '@storybook/react-vite';
-import { css } from '@emotion/react';
 import { fn } from 'storybook/test';
 import { customLink, formatCapitalize } from '@wordpress/icons';
 import { useState, useMemo, useContext } from '@wordpress/element';
-import { useCx } from '../../utils';
 import { Menu } from '..';
 import Icon from '../../icon';
 import Button from '../../button';
@@ -390,19 +388,9 @@ export const WithRadios: StoryObj< typeof Menu > = {
 	},
 };
 
-const modalOnTopOfMenuPopover = css`
-	&& {
-		z-index: 1000000;
-	}
-`;
-
-export const WithModals: StoryObj< typeof Menu > = {
-	render: function WithModals( props: Props ) {
-		const [ isOuterModalOpen, setOuterModalOpen ] = useState( false );
-		const [ isInnerModalOpen, setInnerModalOpen ] = useState( false );
-
-		const cx = useCx();
-		const modalOverlayClassName = cx( modalOnTopOfMenuPopover );
+export const WithModal: StoryObj< typeof Menu > = {
+	render: function WithModal( props: Props ) {
+		const [ isModalOpen, setModalOpen ] = useState( false );
 
 		return (
 			<>
@@ -415,42 +403,15 @@ export const WithModals: StoryObj< typeof Menu > = {
 						Open menu
 					</Menu.TriggerButton>
 					<Menu.Popover>
-						<Menu.Item
-							onClick={ () => setOuterModalOpen( true ) }
-							hideOnClick={ false }
-						>
-							<Menu.ItemLabel>Open outer modal</Menu.ItemLabel>
+						<Menu.Item onClick={ () => setModalOpen( true ) }>
+							<Menu.ItemLabel>Open modal</Menu.ItemLabel>
 						</Menu.Item>
-						<Menu.Item
-							onClick={ () => setInnerModalOpen( true ) }
-							hideOnClick={ false }
-						>
-							<Menu.ItemLabel>Open inner modal</Menu.ItemLabel>
-						</Menu.Item>
-						{ isInnerModalOpen && (
-							<Modal
-								onRequestClose={ () =>
-									setInnerModalOpen( false )
-								}
-								overlayClassName={ modalOverlayClassName }
-							>
-								Modal&apos;s contents
-								<button
-									onClick={ () => setInnerModalOpen( false ) }
-								>
-									Close
-								</button>
-							</Modal>
-						) }
 					</Menu.Popover>
 				</Menu>
-				{ isOuterModalOpen && (
-					<Modal
-						onRequestClose={ () => setOuterModalOpen( false ) }
-						overlayClassName={ modalOverlayClassName }
-					>
+				{ isModalOpen && (
+					<Modal onRequestClose={ () => setModalOpen( false ) }>
 						Modal&apos;s contents
-						<button onClick={ () => setOuterModalOpen( false ) }>
+						<button onClick={ () => setModalOpen( false ) }>
 							Close
 						</button>
 					</Modal>
