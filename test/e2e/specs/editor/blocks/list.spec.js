@@ -230,9 +230,8 @@ test.describe( 'List (@firefox)', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
-			.click();
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '* ' );
 		await expect(
 			editor.canvas.locator( '[data-type="core/list"]' )
@@ -405,7 +404,9 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.press( 'Enter' );
 		await editor.clickBlockToolbarButton( 'Indent' );
 		await page.keyboard.type( 'two' );
-		await pageUtils.pressKeys( 'ArrowUp', { times: 4 } );
+		// Select all escalates: text → block → siblings → parent, repeat
+		// until the top-level list block is selected.
+		await pageUtils.pressKeys( 'primary+a', { times: 5 } );
 		await editor.transformBlockTo( 'core/paragraph' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -589,7 +590,6 @@ test.describe( 'List (@firefox)', () => {
 		}
 
 		// Move the caret in front of "1" in the first list item.
-		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Backspace' );
 
@@ -889,11 +889,7 @@ test.describe( 'List (@firefox)', () => {
 		);
 	} );
 
-	test( 'should outdent with children', async ( {
-		editor,
-		page,
-		pageUtils,
-	} ) => {
+	test( 'should outdent with children', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/list' } );
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'Enter' );
@@ -919,7 +915,7 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:list -->`
 		);
 
-		await pageUtils.pressKeys( 'ArrowUp', { times: 3 } );
+		await page.keyboard.press( 'ArrowUp' );
 		await editor.clickBlockToolbarButton( 'Outdent' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -1106,7 +1102,6 @@ test.describe( 'List (@firefox)', () => {
 	test( 'should place the caret in the right place with nested list', async ( {
 		editor,
 		page,
-		pageUtils,
 	} ) => {
 		await editor.canvas
 			.locator( 'role=document[name="Add default block"i]' )
@@ -1114,7 +1109,7 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.type( '* 1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( ' a' );
-		await pageUtils.pressKeys( 'ArrowUp', { times: 2 } );
+		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'Enter' );
 		// The caret should land in the second item.
 		await page.keyboard.type( '2' );
@@ -1540,10 +1535,7 @@ test.describe( 'List (@firefox)', () => {
 		test( 'Backspace', async ( { editor, page } ) => {
 			await editor.insertBlock( start );
 
-			// Navigate to the start of the third item.
-			await page.keyboard.press( 'ArrowDown' );
-			await page.keyboard.press( 'ArrowDown' );
-			await page.keyboard.press( 'ArrowDown' );
+			// Navigate to the start of item "2".
 			await page.keyboard.press( 'ArrowDown' );
 			await page.keyboard.press( 'ArrowDown' );
 			await page.keyboard.press( 'ArrowDown' );
@@ -1559,9 +1551,6 @@ test.describe( 'List (@firefox)', () => {
 		test( 'Delete (forward)', async ( { editor, page } ) => {
 			await editor.insertBlock( start );
 
-			// Navigate to the end of the second item.
-			await page.keyboard.press( 'ArrowDown' );
-			await page.keyboard.press( 'ArrowDown' );
 			await page.keyboard.press( 'ArrowDown' );
 			await page.keyboard.press( 'ArrowDown' );
 			await page.keyboard.press( 'ArrowRight' );
@@ -2497,7 +2486,6 @@ test.describe( 'List (@firefox)', () => {
 
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'Backspace' );
 
 		expect( await editor.getBlocks() ).toMatchObject( [
@@ -2555,7 +2543,6 @@ test.describe( 'List (@firefox)', () => {
 		} );
 
 		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'Backspace' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -2598,7 +2585,6 @@ test.describe( 'List (@firefox)', () => {
 			],
 		} );
 
-		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Backspace' );

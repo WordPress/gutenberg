@@ -14,7 +14,7 @@ test.describe( 'Block Switcher', () => {
 			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '- List content' );
-		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeys( 'primary+a', { times: 2 } );
 		await pageUtils.pressKeys( 'alt+F10' );
 
 		const blockSwitcher = page
@@ -61,7 +61,7 @@ test.describe( 'Block Switcher', () => {
 			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '- List content' );
-		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeys( 'primary+a', { times: 2 } );
 		await pageUtils.pressKeys( 'alt+F10' );
 
 		const blockSwitcher = page

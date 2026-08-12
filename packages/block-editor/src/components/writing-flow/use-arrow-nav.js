@@ -6,10 +6,12 @@ import {
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
 	isRTL,
+	isFormElement,
 } from '@wordpress/dom';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
+import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import {
 	getBlockClientId,
 	getSelectionEditableElement,
@@ -120,6 +122,26 @@ export function getClosestTabbable(
 			node.firstElementChild.getAttribute( 'contenteditable' ) === 'true'
 		) {
 			return;
+		}
+
+		// Wrappers that merge with the text flow dissolve into it: their
+		// content is the better candidate. Any other container is a
+		// boundary the caret stops on.
+		const blockType = getBlockType( node.getAttribute( 'data-type' ) );
+		if (
+			node.contentEditable !== 'true' &&
+			getBlockClientId( node ) &&
+			blockType &&
+			( blockType.merge ||
+				hasBlockSupport( blockType, '__experimentalOnMerge' ) ) &&
+			focus.focusable
+				.find( node )
+				// Exclude form elements for now because primary+a cannot be
+				// used to select the parent element.
+				.filter( ( element ) => ! isFormElement( element ) ).length !==
+				0
+		) {
+			return false;
 		}
 
 		// Not a candidate if the node is not tabbable.

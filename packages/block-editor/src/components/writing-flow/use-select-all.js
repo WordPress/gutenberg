@@ -3,7 +3,11 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
-import { getSelectionEditableElement } from '../../utils/dom';
+import {
+	isInsideRootBlock,
+	getBlockClientId,
+	getSelectionEditableElement,
+} from '../../utils/dom';
 
 export default function useSelectAll() {
 	const { getBlockOrder, getSelectedBlockClientIds, getBlockRootClientId } =
@@ -56,6 +60,25 @@ export default function useSelectAll() {
 			event.preventDefault();
 
 			const [ firstSelectedClientId ] = selectedClientIds;
+			const activeClientId = getBlockClientId(
+				ownerDocument.activeElement
+			);
+
+			// Handle the case when an appender is selected.
+			if (
+				activeClientId &&
+				activeClientId !== firstSelectedClientId &&
+				! isInsideRootBlock(
+					ownerDocument.getElementById(
+						'block-' + firstSelectedClientId
+					),
+					ownerDocument.activeElement
+				)
+			) {
+				selectBlock( activeClientId );
+				return;
+			}
+
 			const rootClientId = getBlockRootClientId( firstSelectedClientId );
 			const blockClientIds = getBlockOrder( rootClientId );
 
