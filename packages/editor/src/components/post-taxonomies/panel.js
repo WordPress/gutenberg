@@ -16,20 +16,28 @@ import PostTaxonomiesCheck from './check';
 function TaxonomyPanel( { taxonomy, children } ) {
 	const slug = taxonomy?.slug;
 	const panelName = slug ? `taxonomy-panel-${ slug }` : '';
-	const { isEnabled, isOpened } = useSelect(
+	const { isEnabled, isOpened, hasAssignAction } = useSelect(
 		( select ) => {
-			const { isEditorPanelEnabled, isEditorPanelOpened } =
-				select( editorStore );
+			const {
+				getCurrentPost,
+				isEditorPanelEnabled,
+				isEditorPanelOpened,
+			} = select( editorStore );
+			const post = getCurrentPost();
+			const restBase = taxonomy?.rest_base;
 			return {
 				isEnabled: slug ? isEditorPanelEnabled( panelName ) : false,
 				isOpened: slug ? isEditorPanelOpened( panelName ) : false,
+				hasAssignAction: restBase
+					? post?._links?.[ 'wp:action-assign-' + restBase ] ?? false
+					: false,
 			};
 		},
-		[ panelName, slug ]
+		[ panelName, slug, taxonomy?.rest_base ]
 	);
 	const { toggleEditorPanelOpened } = useDispatch( editorStore );
 
-	if ( ! isEnabled ) {
+	if ( ! isEnabled || ! hasAssignAction ) {
 		return null;
 	}
 
