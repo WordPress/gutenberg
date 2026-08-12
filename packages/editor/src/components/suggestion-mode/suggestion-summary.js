@@ -21,18 +21,11 @@
  *                        and de-duplicated by `joinLabels` so multiple span
  *                        edits don't list the same format twice.
  */
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { __experimentalText as WCText } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { useMemo } from '@wordpress/element';
 import { __unstableStripHTML as wpStripHTML } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import { wordDiff, MAX_DIFF_LENGTH } from './word-diff';
 
 /**

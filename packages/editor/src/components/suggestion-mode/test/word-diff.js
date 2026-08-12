@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { wordDiff, MAX_DIFF_TOKENS } from '../word-diff';
 
 describe( 'wordDiff', () => {
