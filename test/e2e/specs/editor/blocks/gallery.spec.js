@@ -196,6 +196,48 @@ test.describe( 'Gallery', () => {
 			);
 	} );
 
+	test( "the gallery's Add control is shared with a selected child image", async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			innerBlocks: [
+				{
+					name: 'core/image',
+					attributes: {
+						id: uploadedMedia.id,
+						url: uploadedMedia.source_url,
+					},
+				},
+			],
+		} );
+
+		const galleryImage = editor.canvas.locator(
+			'role=document[name="Block: Gallery"i] >> role=document[name="Block: Image"i]'
+		);
+		await expect( galleryImage ).toBeVisible();
+		await galleryImage.click();
+
+		await editor.showBlockToolbar();
+		const blockToolbar = page.locator(
+			'role=toolbar[name="Block tools"i]'
+		);
+
+		// The toolbar is still the child image's own toolbar…
+		await expect(
+			blockToolbar.locator( 'role=button[name="Replace"i]' )
+		).toBeVisible();
+
+		// …but it also exposes the parent gallery's "Add" control, so an image
+		// can be added without first selecting the gallery.
+		await expect(
+			blockToolbar.locator( 'role=button[name="Add"i]' )
+		).toBeVisible();
+	} );
+
 	test( 'when initially added the media library shows the Create Gallery view', async ( {
 		admin,
 		editor,

@@ -20,6 +20,7 @@ import { useResizeObserver } from '@wordpress/compose';
 import { getProtocol, prependHTTPS } from '@wordpress/url';
 import { store as uploadStore } from '@wordpress/upload-media';
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
+import AddImagesToolbarControl from '../gallery/add-images-toolbar-control';
 import Image from './image';
 import { isValidFileType } from './utils';
 import { useMaxWidthObserver } from './use-max-width-observer';
@@ -138,6 +139,25 @@ export function ImageEdit( {
 		canInsertBlockType,
 	} = useSelect( blockEditorStore );
 	const blockEditingMode = useBlockEditingMode();
+
+	// A gallery's "Add" control is only reachable by first selecting the gallery
+	// itself, which is hard to discover when the obvious thing to click is one
+	// of the images. Surface it on the selected image too, acting on the parent.
+	// See https://github.com/WordPress/gutenberg/issues/47200.
+	const galleryClientId = useSelect(
+		( select ) => {
+			const {
+				getBlockRootClientId: _getBlockRootClientId,
+				getBlockName: _getBlockName,
+			} = select( blockEditorStore );
+			const rootClientId = _getBlockRootClientId( clientId );
+
+			return _getBlockName( rootClientId ) === 'core/gallery'
+				? rootClientId
+				: undefined;
+		},
+		[ clientId ]
+	);
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
@@ -460,6 +480,14 @@ export function ImageEdit( {
 
 	return (
 		<>
+			{ /*
+			 * Rendered ahead of the figure so that the gallery's "Add" fill
+			 * registers before the image's own "Replace" fill, placing the two
+			 * in that order within the toolbar's `other` group.
+			 */ }
+			{ isSingleSelected && !! galleryClientId && (
+				<AddImagesToolbarControl clientId={ galleryClientId } />
+			) }
 			<figure { ...blockProps }>
 				<Image
 					temporaryURL={ temporaryURL }

@@ -20,14 +20,11 @@ import {
 	useInnerBlocksProps,
 	useBlockEditingMode,
 	BlockControls,
-	MediaReplaceFlow,
 	useSettings,
 } from '@wordpress/block-editor';
 import { useEffect, useMemo } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { createBlock } from '@wordpress/blocks';
-import { createBlobURL } from '@wordpress/blob';
 import { store as noticesStore } from '@wordpress/notices';
 import {
 	link as linkIcon,
@@ -51,7 +48,10 @@ import {
 	LINK_DESTINATION_NONE,
 	LINK_DESTINATION_LIGHTBOX,
 	DEFAULT_MEDIA_SIZE_SLUG,
+	ALLOWED_MEDIA_TYPES,
 } from './constants';
+import AddImagesToolbarControl from './add-images-toolbar-control';
+import useUpdateImages from './use-update-images';
 import useImageSizes from './use-image-sizes';
 import useGetNewImages from './use-get-new-images';
 import useGetMedia from './use-get-media';
@@ -102,8 +102,6 @@ const NAVIGATION_BUTTON_TYPE_OPTIONS = [
 		value: 'both',
 	},
 ];
-const ALLOWED_MEDIA_TYPES = [ 'image' ];
-
 const PLACEHOLDER_TEXT = __(
 	'Drag and drop images, upload, or choose from your library.'
 );
@@ -160,12 +158,8 @@ export default function GalleryEdit( props ) {
 		aspectRatio,
 	} = attributes;
 
-	const {
-		__unstableMarkNextChangeAsNotPersistent,
-		replaceInnerBlocks,
-		updateBlockAttributes,
-		selectBlock,
-	} = useDispatch( blockEditorStore );
+	const { __unstableMarkNextChangeAsNotPersistent, updateBlockAttributes } =
+		useDispatch( blockEditorStore );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
@@ -345,105 +339,7 @@ export default function GalleryEdit( props ) {
 		};
 	}
 
-	function isValidFileType( file ) {
-		const mediaTypeSelector = file.type;
-
-		return (
-			ALLOWED_MEDIA_TYPES.some(
-				( mediaType ) => mediaTypeSelector?.indexOf( mediaType ) === 0
-			) || file.blob
-		);
-	}
-
-	function updateImages( selectedImages ) {
-		const newFileUploads =
-			Object.prototype.toString.call( selectedImages ) ===
-			'[object FileList]';
-
-		const imageArray = newFileUploads
-			? Array.from( selectedImages ).map( ( file ) => {
-					if ( ! file.url ) {
-						return {
-							blob: createBlobURL( file ),
-						};
-					}
-
-					return file;
-			  } )
-			: selectedImages;
-
-		if ( ! imageArray.every( isValidFileType ) ) {
-			createErrorNotice(
-				__(
-					'If uploading to a gallery all files need to be image formats'
-				),
-				{ id: 'gallery-upload-invalid-file', type: 'snackbar' }
-			);
-		}
-
-		const processedImages = imageArray
-			.filter( ( file ) => file.url || isValidFileType( file ) )
-			.map( ( file ) => {
-				if ( ! file.url ) {
-					return {
-						blob: file.blob || createBlobURL( file ),
-					};
-				}
-
-				return file;
-			} );
-
-		// Because we are reusing existing innerImage blocks any reordering
-		// done in the media library will be lost so we need to reapply that ordering
-		// once the new image blocks are merged in with existing.
-		const newOrderMap = processedImages.reduce(
-			( result, image, index ) => (
-				( result[ image.id ] = index ), result
-			),
-			{}
-		);
-
-		const existingImageBlocks = ! newFileUploads
-			? innerBlockImages.filter( ( block ) =>
-					processedImages.find(
-						( img ) => img.id === block.attributes.id
-					)
-			  )
-			: innerBlockImages;
-
-		const newImageList = processedImages.filter(
-			( img ) =>
-				! existingImageBlocks.find(
-					( existingImg ) => img.id === existingImg.attributes.id
-				)
-		);
-
-		const newBlocks = newImageList.map( ( image ) => {
-			return createBlock( 'core/image', {
-				id: image.id,
-				blob: image.blob,
-				url: image.url,
-				caption: image.caption,
-				alt: image.alt,
-			} );
-		} );
-
-		replaceInnerBlocks(
-			clientId,
-			existingImageBlocks
-				.concat( newBlocks )
-				.sort(
-					( a, b ) =>
-						newOrderMap[ a.attributes.id ] -
-						newOrderMap[ b.attributes.id ]
-				)
-		);
-
-		// Select the first block to scroll into view when new blocks are added.
-		if ( newBlocks?.length > 0 ) {
-			selectBlock( newBlocks[ 0 ].clientId );
-		}
-	}
+	const updateImages = useUpdateImages( clientId );
 
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
@@ -602,7 +498,6 @@ export default function GalleryEdit( props ) {
 		}
 	}, [ linkTo ] );
 
-	const hasImageIds = hasImages && images.some( ( image ) => !! image.id );
 	const imagesUploading = images.some(
 		( img ) => ! img.id && img.url?.indexOf( 'blob:' ) === 0
 	);
@@ -915,20 +810,7 @@ export default function GalleryEdit( props ) {
 			</BlockControls>
 			<>
 				{ ! multiGallerySelection && ! isDynamic && (
-					<BlockControls group="other">
-						<MediaReplaceFlow
-							allowedTypes={ ALLOWED_MEDIA_TYPES }
-							handleUpload={ false }
-							onSelect={ updateImages }
-							name={ __( 'Add' ) }
-							multiple
-							mediaIds={ images
-								.filter( ( image ) => image.id )
-								.map( ( image ) => image.id ) }
-							addToGallery={ hasImageIds }
-							variant="toolbar"
-						/>
-					</BlockControls>
+					<AddImagesToolbarControl clientId={ clientId } />
 				) }
 				<GalleryGapCustomProperties
 					style={ attributes.style }
