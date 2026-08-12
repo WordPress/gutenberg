@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { _x } from '@wordpress/i18n';
 import { create, RichTextData, toHTMLString } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';

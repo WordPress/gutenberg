@@ -1174,7 +1174,7 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/collab-sidebar/note-card.js": {
+	"packages/editor/src/components/collab-sidebar/note-card.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
