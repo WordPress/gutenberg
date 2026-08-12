@@ -13,6 +13,8 @@
 
 ### Bug Fixes
 
+-   `Modal`: Prevent background page scrolling without relying on WordPress global styles when using the default `bodyOpenClassName` ([#81164](https://github.com/WordPress/gutenberg/pull/81164)).
+-   `Menu`: Return focus to the root trigger after closing a legacy `Modal` opened from a menu item, while preserving the menu-to-Modal scroll-lock handoff ([#81164](https://github.com/WordPress/gutenberg/pull/81164)).
 -   `Button`: Suppress the browser focus ring when keyboard-focused and pressed ([#81113](https://github.com/WordPress/gutenberg/pull/81113)).
 -   `ToolsPanel`: Migrate styles from Emotion to an SCSS Module and restore the header heading typography after the `View` migration. ([#80445](https://github.com/WordPress/gutenberg/pull/80445)).
 -   `Autocomplete`: Expose the suggestions list to assistive technology with `aria-controls` and `aria-haspopup`, both required alongside `aria-autocomplete="list"` ([#80403](https://github.com/WordPress/gutenberg/pull/80403)).
