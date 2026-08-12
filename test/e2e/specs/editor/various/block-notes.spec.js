@@ -2187,6 +2187,99 @@ test.describe( 'Block Notes', () => {
 		} );
 	} );
 
+	test.describe( 'Canvas dimming', () => {
+		/**
+		 * Reads the two halves of the spotlight treatment at once: the class
+		 * that switches it on, and the opacity it fades unselected blocks to.
+		 * Asserting both means the test still fails if the fade is ever moved
+		 * off `.is-focus-mode` onto some other hook.
+		 *
+		 * @param {import('@wordpress/e2e-test-utils-playwright').Editor} editor    Editor fixture.
+		 * @param {import('@playwright/test').Locator}                    unrelated A block that carries no note.
+		 * @return {Promise<Object>} `focusMode` and the block's computed `opacity`.
+		 */
+		async function readDimming( editor, unrelated ) {
+			const focusMode = await editor.canvas
+				.locator( '.is-root-container' )
+				.evaluate( ( el ) => el.classList.contains( 'is-focus-mode' ) );
+			const opacity = await unrelated.evaluate(
+				( el ) => window.getComputedStyle( el ).opacity
+			);
+			return { focusMode, opacity };
+		}
+
+		async function insertTwoParagraphs( editor ) {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Move this before the previous one.' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'The paragraph the note is about.' },
+			} );
+		}
+
+		test( 'selecting a note leaves every other block at full opacity', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await insertTwoParagraphs( editor );
+
+			// The note goes on the second paragraph, so the first is the one a
+			// spotlight would fade. It is also the one the note is most likely
+			// to be *about* - "move this before the previous one" is unreadable
+			// if the previous one is dimmed. See #72860.
+			await blockNoteUtils.addNote( 'Needs the paragraph above it' );
+
+			const unrelated = editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.first();
+
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', {
+					name: 'Note: Needs the paragraph above it',
+				} )
+				.click();
+
+			// The noted block is marked by its own outline, not by fading
+			// everything else.
+			await expect(
+				editor.canvas
+					.getByRole( 'document', { name: 'Block: Paragraph' } )
+					.nth( 1 )
+			).toHaveClass( /is-highlighted/ );
+			expect( await readDimming( editor, unrelated ) ).toEqual( {
+				focusMode: false,
+				opacity: '1',
+			} );
+		} );
+
+		test( 'opening the add-note form leaves every other block at full opacity', async ( {
+			editor,
+			page,
+		} ) => {
+			await insertTwoParagraphs( editor );
+
+			const unrelated = editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.first();
+
+			// The composer is its own surface: #72870 spotlighted it separately
+			// from note selection, so it needs its own guard.
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await expect(
+				page.getByRole( 'textbox', { name: 'New note', exact: true } )
+			).toBeFocused();
+
+			expect( await readDimming( editor, unrelated ) ).toEqual( {
+				focusMode: false,
+				opacity: '1',
+			} );
+		} );
+	} );
+
 	test.describe( 'Rich text formatting in the note form', () => {
 		test( 'Cmd+B toggles bold in the new note textbox', async ( {
 			editor,
