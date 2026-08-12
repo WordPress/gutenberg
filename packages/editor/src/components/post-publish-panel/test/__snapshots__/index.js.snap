@@ -133,7 +133,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
             class="post-publish-panel__postpublish-buttons"
           >
             <a
-              class="components-button is-next-40px-default-size is-primary has-icon has-icon-right"
+              class="components-button is-next-40px-default-size is-primary has-text has-icon has-icon-right"
               href="https://wordpress.local/sample-page/"
               target="_blank"
             >

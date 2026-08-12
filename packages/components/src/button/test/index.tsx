@@ -95,6 +95,57 @@ describe( 'Button', () => {
 			);
 		} );
 
+		it( 'should render a button element with has-text when the text is not the first child', () => {
+			const isBusy = false;
+
+			render(
+				<Button icon={ plusCircle } isBusy={ isBusy }>
+					{ isBusy && 'Saving…' }
+					{ ! isBusy && 'Save' }
+				</Button>
+			);
+
+			expect( screen.getByRole( 'button' ) ).toHaveClass( 'has-text' );
+		} );
+
+		it( 'should render a button element with has-text when children are wrapped in an element', () => {
+			render(
+				<Button icon={ plusCircle }>
+					<span>Children</span>
+				</Button>
+			);
+
+			expect( screen.getByRole( 'button' ) ).toHaveClass( 'has-text' );
+		} );
+
+		it( 'should render a button element with has-text when children are wrapped in a fragment', () => {
+			render(
+				<Button icon={ plusCircle }>
+					<>Children</>
+				</Button>
+			);
+
+			expect( screen.getByRole( 'button' ) ).toHaveClass( 'has-text' );
+		} );
+
+		it( 'should render a button element without has-text when every child is falsy', () => {
+			const isBusy: boolean = false;
+
+			render(
+				<Button icon={ plusCircle }>
+					{ isBusy && 'Generating…' }
+					{ null }
+					{ /* See: https://github.com/jsx-eslint/eslint-plugin-react/issues/3995 */ }
+					{ /* eslint-disable-next-line react/jsx-curly-brace-presence */ }
+					{ '' }
+				</Button>
+			);
+
+			expect( screen.getByRole( 'button' ) ).not.toHaveClass(
+				'has-text'
+			);
+		} );
+
 		it( 'should render a button element without has-text when a button wrapped in Tooltip', () => {
 			render(
 				<Tooltip text="Help text">
