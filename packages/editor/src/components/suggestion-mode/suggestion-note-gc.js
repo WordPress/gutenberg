@@ -28,18 +28,10 @@
  * and the note's local record must still be pending (`status: 'hold'`, no
  * `_wp_suggestion_status`) at collection time.
  */
-
-/**
- * WordPress dependencies
- */
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { useSuggestionOverlay } from './overlay-context';
 import {
 	findInlineOp,

@@ -12,10 +12,6 @@
  *   - Un-accepted insertions never render on the public front end (the
  *     type-aware render_block strip), while pending removals still do.
  */
-
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 async function switchIntent( page, intentLabel ) {

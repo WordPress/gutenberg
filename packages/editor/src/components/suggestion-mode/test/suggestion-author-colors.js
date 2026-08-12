@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { buildSuggestionAuthorColorCss } from '../suggestion-author-colors';
 
 const inlineThread = ( id, author ) => ( {

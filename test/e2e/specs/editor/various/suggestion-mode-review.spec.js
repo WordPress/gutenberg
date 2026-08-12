@@ -17,10 +17,6 @@
  * live block, so a post author sees the pending treatment and the sidebar
  * decision buttons without entering Suggest mode themselves.
  */
-
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 async function switchIntent( page, intentLabel ) {

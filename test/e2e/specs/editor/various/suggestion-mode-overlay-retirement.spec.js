@@ -29,10 +29,6 @@
  * `suggestion-mode.spec.js` (the "style golden path" and the heading-level
  * tests) and serve as the oracle for those categories.
  */
-
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const SUGGESTION_MARK = 'mark.wp-suggestion';

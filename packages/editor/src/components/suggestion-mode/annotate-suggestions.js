@@ -13,17 +13,9 @@
  * The bespoke overlay-diff layer still renders the older before/after
  * suggestions in parallel; the two coexist until that layer is retired.
  */
-
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import {
 	findSuggestionRange,
 	useAnnotateSuggestions,

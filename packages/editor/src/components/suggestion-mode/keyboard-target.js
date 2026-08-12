@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { create } from '@wordpress/rich-text';
 
 /**

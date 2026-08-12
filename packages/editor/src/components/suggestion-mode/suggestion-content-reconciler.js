@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useSuggestionOverlay } from './overlay-context';
 import { INLINE_OP_TYPE, useSuggestionsProvider } from './provider';
 import {

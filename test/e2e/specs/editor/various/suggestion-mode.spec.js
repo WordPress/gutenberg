@@ -8,10 +8,6 @@
  * `<mark class="wp-suggestion">` markers) live with the inline-suggestions
  * layer, which owns that rendering.
  */
-
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 async function switchIntent( page, intentLabel ) {

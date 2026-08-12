@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { RichTextData } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import { sliceValueToHTML } from '../suggestion-deletion-keyboard';
 
 describe( 'sliceValueToHTML', () => {

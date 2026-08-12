@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { useStyleOverride } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import { useNoteThreads } from '../collab-sidebar/hooks';
 import { parseSuggestionPayload } from './provider';

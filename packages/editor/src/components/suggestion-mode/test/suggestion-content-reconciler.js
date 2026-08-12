@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render, act } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useEffect } from '@wordpress/element';
 import { createRegistry, RegistryProvider, select } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -18,10 +11,6 @@ import {
 	unregisterFormatType,
 	store as richTextStore,
 } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import SuggestionContentReconciler, {
 	contentKey,
 } from '../suggestion-content-reconciler';

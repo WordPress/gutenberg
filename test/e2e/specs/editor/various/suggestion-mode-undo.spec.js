@@ -22,10 +22,6 @@
  * history transactions — for both, undo withdraws the pending suggestion
  * as a single unit.
  */
-
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const SUGGESTION_MARK = 'mark.wp-suggestion';
