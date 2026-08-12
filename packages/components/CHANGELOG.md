@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `InputControl`: Vertically center the value of date and time inputs in Safari ([#81361](https://github.com/WordPress/gutenberg/pull/81361)).
+-   `ControlWithError`: Re-read the target's validation message when an `invalid` event is received, so a message that changed without a re-render in between (e.g. a programmatic value change followed by a synthetic `invalid` event) is not revealed stale or empty. While a `validating` custom validity is pending, the message is left untouched so the pending indicator keeps showing ([#81440](https://github.com/WordPress/gutenberg/pull/81440)).
+
+### Internal
+
+-   Remove `ValidatedComboboxControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81449](https://github.com/WordPress/gutenberg/pull/81449)).
+-   Remove `ValidatedFormTokenField` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81451](https://github.com/WordPress/gutenberg/pull/81451)).
+-   Remove `ValidatedToggleGroupControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81450](https://github.com/WordPress/gutenberg/pull/81450)).
+
+## 39.0.0 (2026-08-12)
+
 ### Breaking Changes
 
 -   `ValidatedTextControl`: Remove from private APIs. Use `ValidatedInputControl` instead ([#80680](https://github.com/WordPress/gutenberg/pull/80680)).
@@ -38,6 +51,9 @@
 
 ### Internal
 
+-   Remove `ValidatedCheckboxControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81435](https://github.com/WordPress/gutenberg/pull/81435)).
+-   Remove `ValidatedNumberControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81433](https://github.com/WordPress/gutenberg/pull/81433)).
+-   Remove `ValidatedRadioControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81434](https://github.com/WordPress/gutenberg/pull/81434)).
 -   Remove `ValidatedSelectControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81391](https://github.com/WordPress/gutenberg/pull/81391)).
 -   Move `withIgnoreIMEEvents` to `@wordpress/keycodes`, where it is now a public API, and remove it from this package's private APIs ([#81343](https://github.com/WordPress/gutenberg/pull/81343)).
 -   Extract the private `kebabCase` utility to the new `@wordpress/kebab-case` package and remove it from the private APIs; all consumers now use the package directly ([#81294](https://github.com/WordPress/gutenberg/pull/81294)).

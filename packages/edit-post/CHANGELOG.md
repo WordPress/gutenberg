@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.53.0 (2026-08-12)
+
 ### Enhancements
 
 -   Wrap the post editor layout in `ThemeProvider`, seeded with the active admin color scheme primary color ([#81112](https://github.com/WordPress/gutenberg/pull/81112)).

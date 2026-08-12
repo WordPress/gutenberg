@@ -8,7 +8,7 @@ export type RootContextValue = {
 };
 
 /**
- * `react-day-picker` only accepts custom components through its `components`
+ * `@daypicker/react` only accepts custom components through its `components`
  * prop, which needs to be referentially stable across renders — a new component
  * type would remount the whole calendar on every render, losing focus.
  *

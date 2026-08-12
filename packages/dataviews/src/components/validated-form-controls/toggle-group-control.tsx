@@ -1,7 +1,14 @@
 import { forwardRef, useId, useRef } from '@wordpress/element';
-import { ControlWithError } from '../control-with-error';
+import { __experimentalToggleGroupControl as ToggleGroupControl } from '@wordpress/components';
+import { ControlWithError } from './control-with-error';
 import type { ValidatedControlProps } from './types';
-import { ToggleGroupControl } from '../../toggle-group-control';
+
+type ToggleGroupControlProps = React.ComponentProps<
+	typeof ToggleGroupControl
+>;
+
+type ValidatedToggleGroupControlProps = ToggleGroupControlProps &
+	ValidatedControlProps;
 
 const UnforwardedValidatedToggleGroupControl = (
 	{
@@ -9,8 +16,7 @@ const UnforwardedValidatedToggleGroupControl = (
 		customValidity,
 		markWhenOptional,
 		...restProps
-	}: React.ComponentProps< typeof ToggleGroupControl > &
-		ValidatedControlProps,
+	}: ValidatedToggleGroupControlProps,
 	forwardedRef: React.ForwardedRef< HTMLInputElement >
 ) => {
 	const validityTargetRef = useRef< HTMLInputElement >( null );
@@ -18,7 +24,7 @@ const UnforwardedValidatedToggleGroupControl = (
 	const nameAttr = useId();
 
 	return (
-		<div className="components-validated-control__wrapper-with-error-delegate">
+		<div className="dataviews-validated-control__wrapper-with-error-delegate">
 			<ControlWithError
 				required={ required }
 				markWhenOptional={ markWhenOptional }
@@ -28,7 +34,7 @@ const UnforwardedValidatedToggleGroupControl = (
 				<ToggleGroupControl ref={ forwardedRef } { ...restProps } />
 			</ControlWithError>
 			<input
-				className="components-validated-control__error-delegate"
+				className="dataviews-validated-control__error-delegate"
 				type="radio"
 				ref={ validityTargetRef }
 				required={ required }
@@ -49,7 +55,8 @@ const UnforwardedValidatedToggleGroupControl = (
 	);
 };
 
-export const ValidatedToggleGroupControl = forwardRef(
-	UnforwardedValidatedToggleGroupControl
-);
+export const ValidatedToggleGroupControl: React.ForwardRefExoticComponent<
+	React.PropsWithoutRef< ValidatedToggleGroupControlProps > &
+		React.RefAttributes< HTMLInputElement >
+> = forwardRef( UnforwardedValidatedToggleGroupControl );
 ValidatedToggleGroupControl.displayName = 'ValidatedToggleGroupControl';
