@@ -273,6 +273,18 @@ export const Input = styled.input< InputProps >`
 			color: ${ COLORS.ui.darkGrayPlaceholder };
 		}
 
+		&[type='date'],
+		&[type='datetime-local'],
+		&[type='month'],
+		&[type='time'],
+		&[type='week'] {
+			&::-webkit-datetime-edit {
+				display: flex;
+				align-items: center;
+				height: 100%;
+			}
+		}
+
 		&[type='email'],
 		&[type='url'] {
 			/* rtl:ignore */

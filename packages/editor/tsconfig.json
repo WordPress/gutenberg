@@ -29,6 +29,7 @@
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
+		{ "path": "../kebab-case" },
 		{ "path": "../keycodes" },
 		{ "path": "../keyboard-shortcuts" },
 		{ "path": "../media-editor" },

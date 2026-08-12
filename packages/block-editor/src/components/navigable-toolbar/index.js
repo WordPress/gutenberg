@@ -2,6 +2,7 @@ import { NavigableMenu, Toolbar } from '@wordpress/components';
 import {
 	useState,
 	useRef,
+	useContext,
 	useLayoutEffect,
 	useEffect,
 	useCallback,
@@ -12,6 +13,7 @@ import { focus } from '@wordpress/dom';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { ESCAPE } from '@wordpress/keycodes';
 import { store as blockEditorStore } from '../../store';
+import { BlockRefs } from '../provider/block-refs-provider';
 import { unlock } from '../../lock-unlock';
 
 function hasOnlyToolbarItem( elements ) {
@@ -108,6 +110,11 @@ function useToolbarFocus( {
 	const [ initialFocusOnMount ] = useState( focusOnMount );
 	const [ initialIndex ] = useState( defaultIndex );
 
+	const { getLastFocus, getSelectedBlockClientId } = unlock(
+		useSelect( blockEditorStore )
+	);
+	const { refsMap } = useContext( BlockRefs );
+
 	const focusToolbar = useCallback( () => {
 		focusFirstTabbableIn( toolbarRef.current );
 	}, [ toolbarRef ] );
@@ -169,31 +176,42 @@ function useToolbarFocus( {
 		};
 	}, [ initialIndex, initialFocusOnMount, onIndexChange, toolbarRef ] );
 
-	const { getLastFocus } = unlock( useSelect( blockEditorStore ) );
 	/**
 	 * Handles returning focus to the block editor canvas when pressing escape.
 	 */
 	useEffect( () => {
-		const navigableToolbarRef = toolbarRef.current;
-
-		if ( focusEditorOnEscape ) {
-			const handleKeyDown = ( event ) => {
-				const lastFocus = getLastFocus();
-				if ( event.keyCode === ESCAPE && lastFocus?.current ) {
-					// Focus the last focused element when pressing escape.
-					event.preventDefault();
-					lastFocus.current.focus();
-				}
-			};
-			navigableToolbarRef.addEventListener( 'keydown', handleKeyDown );
-			return () => {
-				navigableToolbarRef.removeEventListener(
-					'keydown',
-					handleKeyDown
-				);
-			};
+		if ( ! focusEditorOnEscape ) {
+			return;
 		}
-	}, [ focusEditorOnEscape, getLastFocus, toolbarRef ] );
+
+		const navigableToolbar = toolbarRef.current;
+		const handleKeyDown = ( event ) => {
+			if ( event.keyCode !== ESCAPE ) {
+				return;
+			}
+			// The last focused element is only recorded once focus has left
+			// the canvas, so fall back to the selected block. Without it
+			// escape leaves focus stranded in the toolbar, with no way back
+			// to the canvas by keyboard.
+			const target =
+				getLastFocus()?.current ??
+				refsMap.get( getSelectedBlockClientId() );
+			if ( target ) {
+				event.preventDefault();
+				target.focus();
+			}
+		};
+		navigableToolbar.addEventListener( 'keydown', handleKeyDown );
+		return () => {
+			navigableToolbar.removeEventListener( 'keydown', handleKeyDown );
+		};
+	}, [
+		focusEditorOnEscape,
+		getLastFocus,
+		getSelectedBlockClientId,
+		refsMap,
+		toolbarRef,
+	] );
 }
 
 export default function NavigableToolbar( {

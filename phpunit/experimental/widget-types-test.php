@@ -341,6 +341,49 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Envelope extras: a well-formed icon name and a known relevance ride
+	 * along; malformed values drop the key, never the action.
+	 */
+	public function test_sanitize_widget_actions_envelope_extras() {
+		$actions = gutenberg_sanitize_widget_actions(
+			array(
+				array(
+					'id'        => 'report',
+					'label'     => 'Open report',
+					'href'      => 'https://example.com/report',
+					'icon'      => 'core/chart-bar',
+					'relevance' => 'high',
+				),
+				array(
+					'id'        => 'about',
+					'label'     => 'About',
+					'href'      => 'https://example.com/about',
+					'icon'      => 'Not A Name',
+					'relevance' => 'primary',
+				),
+			)
+		);
+
+		$this->assertSame(
+			array(
+				array(
+					'id'        => 'report',
+					'label'     => 'Open report',
+					'href'      => 'https://example.com/report',
+					'icon'      => 'core/chart-bar',
+					'relevance' => 'high',
+				),
+				array(
+					'id'    => 'about',
+					'label' => 'About',
+					'href'  => 'https://example.com/about',
+				),
+			),
+			$actions
+		);
+	}
+
+	/**
 	 * An empty or non-array actions list normalizes to null.
 	 */
 	public function test_sanitize_widget_actions_requires_entries() {
