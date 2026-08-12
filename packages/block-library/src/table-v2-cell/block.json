@@ -38,14 +38,33 @@
 		"reusable": false,
 		"inserter": false,
 		"typography": {
-			"textAlign": true
+			"textAlign": true,
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
 		},
 		"color": {
 			"text": true,
 			"background": true,
+			"gradients": true,
+			"link": true,
 			"__experimentalDefaultControls": {
 				"text": true,
 				"background": true
+			}
+		},
+		"spacing": {
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"padding": false
 			}
 		},
 		"__experimentalBorder": {
