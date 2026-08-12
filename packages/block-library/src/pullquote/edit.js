@@ -1,50 +1,19 @@
-/**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-import {
-	AlignmentControl,
-	BlockControls,
-	RichText,
-	useBlockProps,
-} from '@wordpress/block-editor';
+import { RichText, useBlockProps } from '@wordpress/block-editor';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { Figure } from './figure';
 import { BlockQuote } from './blockquote';
+import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
-function PullQuoteEdit( {
-	attributes,
-	setAttributes,
-	isSelected,
-	insertBlocksAfter,
-} ) {
-	const { textAlign, citation, value } = attributes;
-	const blockProps = useBlockProps( {
-		className: clsx( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
+function PullQuoteEdit( props ) {
+	const { attributes, setAttributes, isSelected, insertBlocksAfter } = props;
+	useDeprecatedTextAlign( props );
+	const { citation, value } = attributes;
+	const blockProps = useBlockProps();
 	const shouldShowCitation = ! RichText.isEmpty( citation ) || isSelected;
 
 	return (
 		<>
-			<BlockControls group="block">
-				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-			</BlockControls>
 			<Figure { ...blockProps }>
 				<BlockQuote>
 					<RichText
@@ -79,10 +48,15 @@ function PullQuoteEdit( {
 								} )
 							}
 							className="wp-block-pullquote__citation"
-							__unstableOnSplitAtEnd={ () =>
-								insertBlocksAfter(
-									createBlock( getDefaultBlockName() )
-								)
+							__unstableOnSplitAtEnd={
+								insertBlocksAfter
+									? () =>
+											insertBlocksAfter(
+												createBlock(
+													getDefaultBlockName()
+												)
+											)
+									: undefined
 							}
 						/>
 					) }

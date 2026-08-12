@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useCallback,
 	useEffect,
@@ -8,7 +5,6 @@ import {
 	useMemo,
 } from '@wordpress/element';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
 import {
 	EntityProvider,
 	useEntityBlockEditor,
@@ -22,12 +18,9 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import { createBlock } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import withRegistryProvider from './with-registry-provider';
 import { store as editorStore } from '../../store';
+import useAutosaveNotice from './use-autosave-notice';
 import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
 import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
@@ -325,8 +318,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			},
 			[ editEntityRecord, post.type, post.id ]
 		);
-		const { createWarningNotice, removeNotice } =
-			useDispatch( noticesStore );
+		const { removeNotice } = useDispatch( noticesStore );
 
 		// Ideally this should be synced on each change and not just something you do once.
 		useLayoutEffect( () => {
@@ -343,27 +335,16 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			if ( ! registry.select( editorStore ).__unstableIsEditorReady() ) {
 				setupEditor( post, initialEdits, settings.template );
 			}
-			if ( settings.autosave ) {
-				createWarningNotice(
-					__(
-						'There is an autosave of this post that is more recent than the version below.'
-					),
-					{
-						id: 'autosave-exists',
-						actions: [
-							{
-								label: __( 'View the autosave' ),
-								url: settings.autosave.editLink,
-							},
-						],
-					}
-				);
-			}
 
 			// The dependencies of the hook are omitted deliberately
 			// We only want to run setupEditor (with initialEdits) only once per post.
 			// A better solution in the future would be to split this effect into multiple ones.
 		}, [] );
+
+		// Manages the "more recent autosave" notice. Called after the mount
+		// effect above so that its own mount effect runs once `setupEditor`
+		// has populated the current post.
+		useAutosaveNotice( { post, recovery, settings } );
 
 		// Synchronizes the active post with the state
 		useEffect( () => {
@@ -380,7 +361,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		}, [ post.type, post.id, setEditedPost, removeNotice ] );
 
 		// Synchronize the editor settings as they change.
-		useEffect( () => {
+		// Do it as a layout effect so that rendered UI with outdated settings is not painted.
+		useLayoutEffect( () => {
 			updateEditorSettings( settings );
 		}, [ settings, updateEditorSettings ] );
 

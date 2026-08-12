@@ -1,9 +1,9 @@
 .banner {
-	--banner-bg: var(--wpds-color-bg-interactive-neutral-strong);
-	--banner-fg: var(--wpds-color-fg-interactive-neutral-strong);
-	--banner-accent-brand: var(--wpds-color-bg-interactive-brand-strong);
-	--banner-accent-warm: color-mix(in srgb, var(--wpds-color-stroke-surface-warning) 60%, var(--wpds-color-bg-surface-neutral-strong));
-	--banner-accent-dark: var(--wpds-color-fg-content-neutral);
+	--banner-bg: var(--wpds-color-background-interactive-neutral-strong);
+	--banner-fg: var(--wpds-color-foreground-interactive-neutral-strong);
+	--banner-accent-brand: var(--wpds-color-background-interactive-brand-strong);
+	--banner-accent-warm: color-mix(in srgb, var(--wpds-color-stroke-surface-warning) 60%, var(--wpds-color-background-surface-neutral-strong));
+	--banner-accent-dark: var(--wpds-color-foreground-content-neutral);
 	--banner-glint: color-mix(in srgb, var(--banner-fg) 80%, var(--banner-accent-warm));
 
 	position: relative;

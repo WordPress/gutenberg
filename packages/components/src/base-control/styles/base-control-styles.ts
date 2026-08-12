@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
-
-/**
- * Internal dependencies
- */
 import { baseLabelTypography, boxSizingReset, font, COLORS } from '../../utils';
 import { space } from '../../utils/space';
 
@@ -45,6 +38,7 @@ export const StyledHelp = styled.p`
 	font-size: ${ font( 'helpText.fontSize' ) };
 	font-style: normal;
 	color: ${ COLORS.gray[ 700 ] };
+	text-wrap: pretty;
 `;
 
 export const StyledVisualLabel = styled.span`

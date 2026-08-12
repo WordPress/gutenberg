@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useBlockProps,
 	useInnerBlocksProps,
@@ -32,13 +29,12 @@ export default function Edit( { attributes, context, clientId, isSelected } ) {
 		[ clientId, isSelected, openByDefault ]
 	);
 	const blockProps = useBlockProps( {
-		'aria-hidden': ! hasSelection,
+		hidden: ! hasSelection,
 		role: 'region',
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks,
-		template: [ [ 'core/paragraph', {} ] ],
 		templateLock,
 	} );
 

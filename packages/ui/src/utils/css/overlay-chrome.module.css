@@ -41,8 +41,7 @@
 			gap: var(--wpds-dimension-gap-sm);
 			padding-block: var(--wpds-dimension-padding-2xl) var(--wpds-dimension-gap-lg);
 			padding-inline: var(--wpds-dimension-padding-2xl);
-			/* TODO: refactor to a DS element size token when available. */
-			min-height: 32px;
+			min-height: var(--wpds-dimension-size-md);
 		}
 
 		.footer {
@@ -62,8 +61,8 @@
 		 * `<h2>` rendered via `Text`.
 		 */
 		.title {
-			color: var(--wpds-color-fg-content-neutral);
-			--_gcd-heading-color: var(--wpds-color-fg-content-neutral);
+			color: var(--wpds-color-foreground-content-neutral);
+			--_gcd-heading-color: var(--wpds-color-foreground-content-neutral);
 
 			margin-inline-end: auto;
 			--_gcd-heading-margin: 0 auto 0 0;
@@ -96,17 +95,11 @@
 
 			/*
 			 * The shared `outset-ring--focus-visible` utility (composed by
-			 * the Content components) uses an `outline-offset` of `+1px`,
-			 * which for this scroll container would put the ring outside
-			 * the popup's rounded corners and have it clipped by the
-			 * popup's `overflow: hidden`. Inset the ring by the focus
-			 * width instead, so it sits flush inside the content box.
-			 *
-			 * The shared utility's transition shorthand (`transition:
-			 * outline …`) only animates outline-color and outline-width,
-			 * not outline-offset, so the negative offset applied here is
-			 * static — visually, the ring still fades in/out via color
-			 * change while the offset stays put.
+			 * the Content components) uses a positive `outline-offset`,
+			 * which for this scroll container would put the ring outside the
+			 * popup's rounded corners and have it clipped by the popup's
+			 * `overflow: hidden`. Inset the ring by the focus width instead,
+			 * so it sits flush inside the content box.
 			 */
 			&:focus-visible {
 				outline-offset: calc(var(--wpds-border-width-focus) * -1);

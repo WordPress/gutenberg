@@ -3,9 +3,9 @@
 }
 
 .icon {
-	color: var(--wpds-color-fg-content-success);
+	color: var(--wpds-color-foreground-content-success);
 	border-color: var(--wpds-color-stroke-surface-success);
-	background-color: var(--wpds-color-bg-surface-success-weak);
+	background-color: var(--wpds-color-background-surface-success-weak);
 }
 
 /*
@@ -19,5 +19,5 @@
  * dedicated link component lands (https://github.com/WordPress/gutenberg/issues/77098).
  */
 .continueLink {
-	color: var(--wpds-color-fg-interactive-brand-strong);
+	color: var(--wpds-color-foreground-interactive-brand-strong);
 }

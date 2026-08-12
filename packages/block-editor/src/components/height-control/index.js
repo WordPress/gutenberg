@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import {
 	BaseControl,
@@ -14,10 +11,6 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { useSettings } from '../use-settings';
 
 const RANGE_CONTROL_CUSTOM_SETTINGS = {
@@ -164,7 +157,6 @@ export default function HeightControl( {
 						onChange={ onChange }
 						onUnitChange={ handleUnitChange }
 						min={ 0 }
-						size="__unstable-large"
 						label={ label }
 						hideLabelFromVision
 					/>
@@ -172,7 +164,6 @@ export default function HeightControl( {
 				<FlexItem isBlock>
 					<Spacer marginX={ 2 } marginBottom={ 0 }>
 						<RangeControl
-							__next40pxDefaultSize
 							value={ customRangeValue }
 							min={ 0 }
 							max={

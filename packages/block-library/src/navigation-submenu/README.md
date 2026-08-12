@@ -29,6 +29,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `title` | `string` | — | — |
 | `kind` | `string` | — | — |
 | `isTopLevelItem` | `boolean` | — | — |
+| `isParentSubmenu` | `boolean` | `true` | — |
 
 ## Supports
 
@@ -64,6 +65,10 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 - `openSubmenusOnClick`
 - `submenuVisibility`
 - `style`
+
+**Provides context:**
+
+- `core/isInsideSubmenu` → attribute `isParentSubmenu`
 
 ## Block Markup
 

@@ -67,9 +67,12 @@
 
 .edit-site-page-patterns-dataviews {
 	.dataviews-view-grid__badge-fields {
-		.dataviews-view-grid__field-value:has(.edit-site-patterns__field-sync-status-fully) {
+		.dataviews-view-grid__field-value:has(.fields-field__pattern-sync-status-fully) {
 			background: rgba(var(--wp-block-synced-color--rgb), 0.04);
 			color: var(--wp-block-synced-color);
+			// Override the neutral border the badge's `none` intent applies,
+			// so the outline matches the synced text rather than staying gray.
+			border-color: currentColor;
 		}
 	}
 }
@@ -92,7 +95,7 @@
 		box-shadow: 0 0 0.5px 0.5px var(--wp-admin-theme-color);
 		box-sizing: border-box;
 		z-index: 1;
-		background-color: var(--wpds-color-bg-surface-neutral-strong);
+		background-color: var(--wpds-color-background-surface-neutral-strong);
 		width: calc(100% + 2px); // Account for the border width of the token field.
 		left: -1px;
 		min-width: initial;

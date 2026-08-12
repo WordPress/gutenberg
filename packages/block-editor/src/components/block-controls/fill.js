@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalStyleProvider as StyleProvider,
 	ToolbarGroup,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import useBlockControlsFill from './hook';
 
 export default function BlockControlsFill( {

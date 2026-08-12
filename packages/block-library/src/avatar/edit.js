@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	InspectorControls,
 	useBlockProps,
@@ -20,10 +13,6 @@ import {
 } from '@wordpress/components';
 import { __, isRTL } from '@wordpress/i18n';
 import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { useCommentAvatar, useUserAvatar } from './hooks';
 import UserControl from './user-control';
@@ -56,7 +45,6 @@ const AvatarInspectorControls = ( {
 					onDeselect={ () => setAttributes( { size: 96 } ) }
 				>
 					<RangeControl
-						__next40pxDefaultSize
 						label={ __( 'Image size' ) }
 						onChange={ ( newSize ) =>
 							setAttributes( {

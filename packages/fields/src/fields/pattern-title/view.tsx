@@ -1,18 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { Icon, lockSmall } from '@wordpress/icons';
-// @ts-ignore
+// @ts-expect-error `@wordpress/patterns` is not typed yet.
 import { privateApis as patternPrivateApis } from '@wordpress/patterns';
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { Tooltip, VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { CommonPost } from '../../types';
-
 import { BaseTitleView } from '../title/view';
 import { unlock } from '../../lock-unlock';
 

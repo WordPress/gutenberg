@@ -54,8 +54,9 @@ function generatePrimitiveColorTokens() {
 			} ) );
 
 		// Convert the ramp values in a DTCG compatible format.
-		// Note: the background seed maps to the `bg` design token group. The
-		// design system token naming intentionally keeps the `bg` convention.
+		// Note: the background seed maps to the `bg` primitive ramp group,
+		// whose name is kept abbreviated even though the semantic tokens it
+		// feeds are exposed under the spelled-out `background` group.
 		[
 			{
 				scaleName: 'bg',

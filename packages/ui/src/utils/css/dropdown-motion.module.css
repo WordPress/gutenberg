@@ -25,24 +25,36 @@
 				will-change: transform, opacity;
 			}
 
-			opacity: 0;
+			&[data-instant] {
+				transition: none;
+			}
 
-			&[data-side="bottom"] {
+			opacity: 1;
+			transform: translate(0);
+
+			&[data-starting-style],
+			&[data-ending-style] {
+				opacity: 0;
+			}
+
+			&[data-side="bottom"][data-starting-style],
+			&[data-side="bottom"][data-ending-style] {
 				transform: translateY(calc(-1 * var(--wp-ui-dropdown-slide-distance)));
 			}
-			&[data-side="top"] {
+
+			&[data-side="top"][data-starting-style],
+			&[data-side="top"][data-ending-style] {
 				transform: translateY(var(--wp-ui-dropdown-slide-distance));
 			}
-			&[data-side="left"] {
+
+			&[data-side="left"][data-starting-style],
+			&[data-side="left"][data-ending-style] {
 				transform: translateX(var(--wp-ui-dropdown-slide-distance));
 			}
-			&[data-side="right"] {
-				transform: translateX(calc(-1 * var(--wp-ui-dropdown-slide-distance)));
-			}
 
-			&[data-open]:not([data-starting-style]) {
-				opacity: 1;
-				transform: translate(0);
+			&[data-side="right"][data-starting-style],
+			&[data-side="right"][data-ending-style] {
+				transform: translateX(calc(-1 * var(--wp-ui-dropdown-slide-distance)));
 			}
 		}
 	}

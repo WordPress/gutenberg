@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { createRoot, StrictMode } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { CommandMenu } from '@wordpress/commands';
-
-/**
- * Internal dependencies
- */
 import { useAdminNavigationCommands } from './admin-navigation-commands';
 import { useSiteEditorNavigationCommands } from './site-editor-navigation-commands';
 import { unlock } from './lock-unlock';

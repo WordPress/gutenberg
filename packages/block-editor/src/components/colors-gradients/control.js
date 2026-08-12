@@ -1,23 +1,13 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	BaseControl,
 	__experimentalVStack as VStack,
 	ColorPalette,
 	GradientPicker,
+	Notice,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import { useSettings } from '../use-settings';
 import { unlock } from '../../lock-unlock';
 
@@ -44,10 +34,12 @@ function ColorGradientControlInner( {
 	colorValue,
 	colorSlug,
 	gradientValue,
+	gradientSlug,
 	clearable,
 	showTitle = true,
 	enableAlpha,
 	headingLevel,
+	noticeProps,
 } ) {
 	const canChooseAColor =
 		onColorChange &&
@@ -67,31 +59,48 @@ function ColorGradientControlInner( {
 		  }
 		: ( newColor, _index, newSlug ) => onColorChange( newColor, newSlug );
 
+	const colorPalette = (
+		<ColorPalette
+			value={ colorValue }
+			selectedSlug={ colorSlug }
+			onChange={ colorPaletteOnChange }
+			{ ...{ colors, disableCustomColors } }
+			__experimentalIsRenderedInSidebar={
+				__experimentalIsRenderedInSidebar
+			}
+			clearable={ clearable }
+			enableAlpha={ enableAlpha }
+			headingLevel={ headingLevel }
+		/>
+	);
+
 	const tabPanels = {
+		// The `ColorPalette` must stay at a stable position in the tree whether
+		// or not a notice is present. Wrapping it in a `VStack` only when a
+		// notice appears remounts it, which resets the custom color picker back
+		// to the swatch view mid-edit. Keep `ColorPalette` first and toggle only
+		// the trailing notice after it, so the palette holds a stable index and
+		// the notice sits at the bottom of the popover.
 		[ TAB_IDS.color ]: (
-			<ColorPalette
-				value={ colorValue }
-				selectedSlug={ colorSlug }
-				onChange={ colorPaletteOnChange }
-				{ ...{ colors, disableCustomColors } }
-				__experimentalIsRenderedInSidebar={
-					__experimentalIsRenderedInSidebar
-				}
-				clearable={ clearable }
-				enableAlpha={ enableAlpha }
-				headingLevel={ headingLevel }
-			/>
+			<>
+				{ colorPalette }
+				{ noticeProps && (
+					<Notice isDismissible={ false } { ...noticeProps } />
+				) }
+			</>
 		),
 		[ TAB_IDS.gradient ]: (
 			<GradientPicker
 				value={ gradientValue }
+				selectedSlug={ gradientSlug }
 				onChange={
 					canChooseAColor
-						? ( newGradient ) => {
-								onGradientChange( newGradient );
+						? ( newGradient, _index, newSlug ) => {
+								onGradientChange( newGradient, newSlug );
 								onColorChange();
 						  }
-						: onGradientChange
+						: ( newGradient, _index, newSlug ) =>
+								onGradientChange( newGradient, newSlug )
 				}
 				{ ...{ gradients, disableCustomGradients } }
 				__experimentalIsRenderedInSidebar={

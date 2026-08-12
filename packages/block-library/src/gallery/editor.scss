@@ -17,10 +17,6 @@
 		flex: 0 0 100%;
 	}
 
-	> .blocks-gallery-media-placeholder-wrapper {
-		flex-basis: 100%;
-	}
-
 	// @todo this deserves a refactor, by being moved to the toolbar.
 	.block-editor-media-placeholder.is-appender {
 		.components-placeholder__label {
@@ -117,4 +113,36 @@
 	display: flex;
 	justify-content: flex-end;
 	gap: $grid-unit-15;
+}
+
+// The Source controls are a plain (non-ToolsPanelItem) child of the Source
+// ToolsPanel, so they span both grid columns. The description sits above the
+// button so the button is the last element, keeping the same vertical rhythm to
+// the next control (control -> grid row-gap -> next label) as the other rows.
+.wp-block-gallery__source-settings {
+	grid-column: 1 / -1;
+	display: flex;
+	flex-direction: column;
+	gap: $grid-unit-10;
+
+	// Muted help-text styling for the source description.
+	.wp-block-gallery__source-description {
+		margin: 0;
+		color: $gray-700;
+		font-size: $helptext-font-size;
+	}
+
+	// Full-width action button, matching other inspector buttons (e.g. the
+	// "Apply globally" control).
+	.components-button {
+		justify-content: center;
+		width: 100%;
+	}
+}
+
+// The "showing the first N" notice is a plain (non-ToolsPanelItem) child of the
+// Source ToolsPanel, so span both grid columns rather than defaulting to one.
+.wp-block-gallery__source-notice {
+	grid-column: 1 / -1;
+	margin: 0;
 }

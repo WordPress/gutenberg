@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { SelectControl } from '@wordpress/components';
 import { Stack, VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
 import MediaEditorImageControls from '../media-editor-image-controls';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
@@ -61,7 +54,6 @@ export default function MediaEditorCropPanel( {
 			</VisuallyHidden>
 			{ showTransformControls && <MediaEditorImageControls withLabels /> }
 			<SelectControl
-				__next40pxDefaultSize
 				label={ __( 'Aspect ratio' ) }
 				value={ aspectRatioValue }
 				onChange={ onAspectRatioChange }

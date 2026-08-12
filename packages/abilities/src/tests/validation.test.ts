@@ -1,10 +1,6 @@
 /**
  * Tests for schema validation utilities.
  */
-
-/**
- * Internal dependencies
- */
 import { validateValueFromSchema } from '../validation';
 
 describe( 'validateValueFromSchema', () => {
@@ -247,6 +243,16 @@ describe( 'validateValueFromSchema', () => {
 			);
 			expect( validateValueFromSchema( 'not a hostname!', schema ) ).toBe(
 				' is not a valid hostname.'
+			);
+		} );
+
+		it( 'should validate URI format', () => {
+			const schema = { type: 'string', format: 'uri' };
+			expect(
+				validateValueFromSchema( 'https://example.com/path', schema )
+			).toBe( true );
+			expect( validateValueFromSchema( 'not a uri', schema ) ).toBe(
+				' is not a valid URI.'
 			);
 		} );
 	} );

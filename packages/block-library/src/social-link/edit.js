@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { DELETE, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -33,10 +26,6 @@ import { useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { keyboardReturn } from '@wordpress/icons';
 import { store as blocksStore } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { getSocialService } from './social-list';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
@@ -191,7 +180,6 @@ const SocialLinkEdit = ( {
 						) }
 						renderContent={ () => (
 							<TextControl
-								__next40pxDefaultSize
 								className="wp-block-social-link__toolbar_content_text"
 								label={ __( 'Text' ) }
 								help={ __(
@@ -224,7 +212,6 @@ const SocialLinkEdit = ( {
 						} }
 					>
 						<TextControl
-							__next40pxDefaultSize
 							label={ __( 'Text' ) }
 							help={ __(
 								'The text is visible when enabled from the parent Social Icons block.'
@@ -240,7 +227,6 @@ const SocialLinkEdit = ( {
 			</InspectorControls>
 			<InspectorControls group="advanced">
 				<TextControl
-					__next40pxDefaultSize
 					label={ __( 'Link relation' ) }
 					help={ createInterpolateElement(
 						__(

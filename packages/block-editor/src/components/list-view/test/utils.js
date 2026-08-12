@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getCommonDepthClientIds, getDragDisplacementValues } from '../utils';
 
 describe( 'getCommonDepthClientIds', () => {

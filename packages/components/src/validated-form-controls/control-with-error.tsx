@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	cloneElement,
@@ -9,10 +6,6 @@ import {
 	useId,
 	useState,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { ValidatedControlProps } from './components/types';
 import { ValidityIndicator } from './validity-indicator';
 
@@ -109,13 +102,20 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 	useEffect( () => {
 		const validityTarget = getValidityTarget();
 		const handler = () => {
+			// Re-read the message: the target's validity may have changed
+			// since it was last sampled, without a re-render in between.
+			// While async validation is pending, keep its indicator instead
+			// of showing a message its result may supersede.
+			if ( customValidity?.type !== 'validating' ) {
+				setErrorMessage( validityTarget?.validationMessage );
+			}
 			setShowMessage( true );
 			validityTarget?.setAttribute( VALIDITY_VISIBLE_ATTRIBUTE, '' );
 		};
 
 		validityTarget?.addEventListener( 'invalid', handler );
 		return () => validityTarget?.removeEventListener( 'invalid', handler );
-	}, [ getValidityTarget ] );
+	}, [ customValidity?.type, getValidityTarget ] );
 
 	// Suppress the native error popover, while keeping the focus behavior intact.
 	useEffect( () => {
@@ -123,6 +123,15 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 
 		const suppressNativePopover = ( event: Event ) => {
 			event.preventDefault();
+
+			// Only trusted `invalid` events (a form submission or a
+			// `reportValidity()` call) mirror the native focus behavior.
+			// Consumers may dispatch a synthetic `invalid` event to reveal
+			// this control's error message without disturbing the user's
+			// place in the form, so it must not move focus.
+			if ( ! event.isTrusted ) {
+				return;
+			}
 
 			const target = event.target as ValidityTarget;
 			const firstErrorInForm = Array.from(
@@ -310,7 +319,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 				),
 				required,
 			} ) }
-			<div aria-live="polite">{ visibleMessage }</div>
+			{ visibleMessage }
 		</div>
 	);
 }
