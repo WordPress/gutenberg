@@ -14,6 +14,10 @@
 -   Term Description: Apply the term description display filters when rendering with term context inside a Terms Query loop, so multi-paragraph descriptions keep their paragraphs and match the taxonomy archive rendering ([#81290](https://github.com/WordPress/gutenberg/pull/81290)).
 -   Accordion: Resolve the URL fragment with the `:target` pseudo-class instead of decoding `window.location.hash`, so a hash containing malformed percent-encoding no longer throws a `URIError` when a panel is opened ([#81780](https://github.com/WordPress/gutenberg/pull/81780)).
 
+### Enhancements
+
+-   Image: Show the image caption inside the lightbox ("Enlarge on click"), for both single images and gallery images.
+
 ## 10.4.0 (2026-08-12)
 
 ### Internal

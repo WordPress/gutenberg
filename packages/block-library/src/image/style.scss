@@ -344,6 +344,31 @@
 		opacity: 0.9;
 	}
 
+	// POC placeholder styling for the lightbox caption. This only makes the
+	// carried-over caption visible so the concept can be verified; the final
+	// appearance is a separate design pass. The caption lives at the overlay
+	// level (not inside `.lightbox-image-container`, which clips and transforms
+	// its contents during the zoom animation).
+	.wp-lightbox-caption {
+		position: absolute;
+		z-index: 2000002;
+		left: 50%;
+		bottom: calc(env(safe-area-inset-bottom) + 16px);
+		transform: translateX(-50%);
+		width: min(90vw, 640px);
+		margin: 0;
+		padding: 8px 12px;
+
+		// Do not set `text-align` here. The element carries the
+		// `wp-element-caption` class, so caption alignment defined in
+		// `theme.json` (`styles.elements.caption`) — which targets
+		// `.wp-element-caption` — is inherited automatically.
+
+		&[hidden] {
+			display: none;
+		}
+	}
+
 	// When fading, make the image come in slightly slower
 	// or faster than the scrim to give a sense of depth.
 	&.active {

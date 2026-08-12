@@ -706,6 +706,25 @@ const { state, actions, callbacks } = store(
 				const { ref } = getElement();
 				state.metadata[ imageId ].buttonRef = ref;
 			},
+			setCaption() {
+				// The caption is injected imperatively rather than through a
+				// `data-wp-bind--innerHTML` binding: Preact reconciles the
+				// element's children and won't apply a plain `innerHTML` prop,
+				// so a binding leaves the node empty. This runs in a
+				// `data-wp-watch`, so it re-applies whenever the selected image
+				// (and therefore its caption) changes while navigating a
+				// gallery. The value was sanitized with `wp_kses_post()` on the
+				// server and is the same markup already shown as the on-page
+				// caption.
+				const { ref } = getElement();
+				if ( ! ref ) {
+					return;
+				}
+				const caption = state.selectedImage?.caption || '';
+				if ( ref.innerHTML !== caption ) {
+					ref.innerHTML = caption;
+				}
+			},
 		},
 	},
 	{ lock: true }

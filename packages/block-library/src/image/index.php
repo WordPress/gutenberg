@@ -230,6 +230,25 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 	$figure_class_names = $processor->get_attribute( 'class' );
 	$figure_styles      = $processor->get_attribute( 'style' );
 
+	/*
+	 * Extract the caption so it can be shown inside the lightbox overlay.
+	 *
+	 * The lightbox duplicates the image into a shared overlay but not the
+	 * surrounding markup, so the caption has to be carried over explicitly. The
+	 * rendered content is read here (rather than the block's `caption`
+	 * attribute) so that all sources are covered with one code path: single
+	 * image blocks, static gallery images, and dynamic gallery images whose
+	 * caption comes from the attachment's `post_excerpt`. By this point the
+	 * render filter has already stripped an empty `<figcaption>`, so a match
+	 * here is a real caption. `wp_kses_post()` keeps the stored value safe to
+	 * inject as HTML regardless of what upstream filters produced; the same
+	 * markup is already rendered visibly as the on-page caption.
+	 */
+	$caption = '';
+	if ( preg_match( '/<figcaption[^>]*>(.*)<\/figcaption>/s', $block_content, $caption_match ) ) {
+		$caption = wp_kses_post( $caption_match[1] );
+	}
+
 	// Create unique id and set the image metadata in the state.
 	$unique_image_id = uniqid();
 	wp_interactivity_state(
@@ -247,6 +266,7 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 					'targetHeight'           => $img_height,
 					'scaleAttr'              => $block['attrs']['scale'] ?? false,
 					'alt'                    => $alt,
+					'caption'                => $caption,
 					'galleryId'              => $block_instance->context['galleryId'] ?? null,
 					'customAriaLabel'        => $custom_aria_label ?? null,
 					'navigationButtonType'   => $block_instance->context['navigationButtonType'] ?? 'icon',
@@ -394,6 +414,11 @@ function block_core_image_print_lightbox_overlay() {
 						>
 					</figure>
 				</div>
+				<div
+					class="wp-element-caption wp-lightbox-caption"
+					data-wp-bind--hidden="!state.selectedImage.caption"
+					data-wp-watch="callbacks.setCaption"
+				></div>
 				<button type="button" style="fill:{$close_button_color}" class="wp-lightbox-navigation-button wp-lightbox-navigation-button-next" data-wp-bind--hidden="!state.hasNavigation" data-wp-on--click="actions.showNextImage" data-wp-bind--aria-label="state.nextButtonAriaLabel">
 					<span class="wp-lightbox-navigation-text" data-wp-bind--hidden="!state.hasNavigationText">{$next_button_text}</span>
 					<span class="wp-lightbox-navigation-icon" data-wp-bind--hidden="!state.hasNavigationIcon">{$next_button_icon}</span>
