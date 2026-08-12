@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 10.4.0 (2026-08-12)
+
 ### Internal
 
 -   Embed: Use the new `@wordpress/kebab-case` package instead of unlocking the `kebabCase` utility from the `@wordpress/components` private APIs ([#81294](https://github.com/WordPress/gutenberg/pull/81294)).
@@ -13,11 +15,14 @@
 -   Playlist: Allow selecting audio tracks individually in the Media Library without holding Shift or Command, transform multiple Audio blocks into a Playlist, and transform a one-track Playlist into Audio. ([#80926](https://github.com/WordPress/gutenberg/pull/80926))
 -   Page List: Rename the "Edit" action to "Detach", and confirm it in a dialog explaining that the list will keep its current pages but stop adding new ones automatically, matching the Gallery block ([#80847](https://github.com/WordPress/gutenberg/pull/80847)).
 -   Tabs: Start new tabs with an empty label showing a "Tab title" placeholder instead of a generic "Tab" ([#81009](https://github.com/WordPress/gutenberg/pull/81009)).
+-   Tab Panel: Show the tab's title in the Document Overview instead of the generic block title, so tabs can be told apart ([#81427](https://github.com/WordPress/gutenberg/pull/81427)).
 
 ### Bug Fixes
 
 -   Footnotes: Treat unreadable `footnotes` post meta as no footnotes instead of throwing, so the block shows its placeholder rather than the block crash warning ([#81201](https://github.com/WordPress/gutenberg/pull/81201)).
 -   Playlist: Improve handling of declarative waveform player configuration ([#81342](https://github.com/WordPress/gutenberg/pull/81342)).
+-   Cover: Pass `'full'` instead of `null` as the featured image size for parallax and repeated backgrounds, so a null array offset is no longer reached on PHP 8.5 ([#81444](https://github.com/WordPress/gutenberg/pull/81444)).
+-   Icon: Apply only padding to the inner SVG in the editor, so margin is no longer applied twice compared to the front end ([#81292](https://github.com/WordPress/gutenberg/pull/81292)).
 
 ### Internal
 
@@ -32,6 +37,7 @@
 
 ### Bug Fixes
 
+-   Navigation Overlay Close: Inherit typography and color from the overlay, so the button follows the theme font instead of the browser default button styles ([#80751](https://github.com/WordPress/gutenberg/pull/80751)).
 -   Playlist: Update `@arraypress/waveform-player` to `^1.23.0`, which no longer sets `crossorigin="anonymous"` on its audio element, fixing playback of tracks served without CORS headers such as media offloaded to a CDN ([#80533](https://github.com/WordPress/gutenberg/pull/80533)).
 -   Post Content: Restrict the wrapper tag to the supported values offered in the editor.
 -   Post Date: Escape date values and link URLs before rendering the block.
