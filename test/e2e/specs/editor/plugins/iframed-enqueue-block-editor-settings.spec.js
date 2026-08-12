@@ -21,7 +21,7 @@ test.describe( 'iframed block editor settings styles', () => {
 		editor,
 		page,
 	} ) => {
-		const defaultBlock = editor.canvas.getByRole( 'button', {
+		const defaultBlock = editor.canvas.getByRole( 'document', {
 			name: 'Add default block',
 		} );
 
@@ -55,7 +55,7 @@ test.describe( 'iframed block editor settings styles', () => {
 		editor,
 		page,
 	} ) => {
-		const defaultBlock = editor.canvas.getByRole( 'button', {
+		const defaultBlock = editor.canvas.getByRole( 'document', {
 			name: 'Add default block',
 		} );
 
