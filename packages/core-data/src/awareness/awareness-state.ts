@@ -162,6 +162,8 @@ export abstract class AwarenessState<
 
 		this.hasSetupRun = true;
 
+		this.onSetUp();
+
 		this.on(
 			'change',
 			( { added, removed, updated }: AwarenessStateChange ) => {
@@ -183,8 +185,6 @@ export abstract class AwarenessState<
 				this.updateSubscribers();
 			}
 		);
-
-		this.onSetUp();
 	};
 
 	/**
@@ -274,6 +274,10 @@ export abstract class AwarenessState<
 	 * @param forceUpdate - Whether to force an update.
 	 */
 	protected updateSubscribers( forceUpdate = false ): void {
+		if ( ! this.stateSubscriptions.length ) {
+			return;
+		}
+
 		const states = this.getStates();
 
 		this.seenStates = new Map< number, State >( [

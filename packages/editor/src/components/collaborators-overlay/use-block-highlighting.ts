@@ -89,6 +89,7 @@ export function useBlockHighlighting(
 		type BlockEntry = {
 			blockId: string;
 			clientId: number;
+			userId: number;
 			color: string;
 			userName: string;
 			avatarUrl: string | undefined;
@@ -115,6 +116,7 @@ export function useBlockHighlighting(
 				// Cast to any: the selection union type is narrowed by the
 				// filter above, but TypeScript cannot infer that after .flatMap.
 				const selection = userState.editorState?.selection as any;
+
 				if ( selection.type === SelectionType.WholeBlock ) {
 					let localClientId: string | null;
 					try {
@@ -129,7 +131,10 @@ export function useBlockHighlighting(
 						{
 							blockId: localClientId,
 							clientId: userState.clientId,
-							color: getAvatarBorderColor( userState.clientId ),
+							userId: userState.collaboratorInfo.id,
+							color: getAvatarBorderColor(
+								userState.collaboratorInfo.id
+							),
 							userName: userState.collaboratorInfo.name,
 							avatarUrl: getAvatarUrl(
 								userState.collaboratorInfo.avatar_urls
@@ -166,7 +171,9 @@ export function useBlockHighlighting(
 				}
 
 				const { firstId, lastId, middleEls, sameContainer } = range;
-				const color = getAvatarBorderColor( userState.clientId );
+				const color = getAvatarBorderColor(
+					userState.collaboratorInfo.id
+				);
 				const userName = userState.collaboratorInfo.name;
 				const avatarUrl = getAvatarUrl(
 					userState.collaboratorInfo.avatar_urls
@@ -178,6 +185,7 @@ export function useBlockHighlighting(
 						{
 							blockId: firstId,
 							clientId: userState.clientId,
+							userId: userState.collaboratorInfo.id,
 							color,
 							userName,
 							avatarUrl,
@@ -194,6 +202,7 @@ export function useBlockHighlighting(
 					( blockId ) => ( {
 						blockId,
 						clientId: userState.clientId,
+						userId: userState.collaboratorInfo.id,
 						color,
 						userName,
 						avatarUrl,
@@ -236,9 +245,10 @@ export function useBlockHighlighting(
 		const results: BlockHighlightData[] = [];
 		const overlayRect = overlayElement?.getBoundingClientRect() ?? null;
 
-		// Track which collaboration sessions already have an avatar placed. Blocks
-		// arrive in document order, so the first is the topmost visible one.
-		const collaboratorsWithAvatar = new Set< number >();
+		// Track which users already have an avatar placed. Fallback collaborators
+		// use their Yjs client ID as their user ID, so anonymous sessions remain
+		// distinct while multiple sessions for a named user stay grouped.
+		const usersWithAvatar = new Set< number >();
 
 		blocksToHighlight.forEach( ( block ) => {
 			const { color, blockId, userName, avatarUrl } = block;
@@ -274,11 +284,8 @@ export function useBlockHighlighting(
 				currentHighlightedIds.add( blockId );
 			}
 
-			if (
-				overlayRect &&
-				! collaboratorsWithAvatar.has( block.clientId )
-			) {
-				collaboratorsWithAvatar.add( block.clientId );
+			if ( overlayRect && ! usersWithAvatar.has( block.userId ) ) {
+				usersWithAvatar.add( block.userId );
 				const blockRect = blockElement.getBoundingClientRect();
 				results.push( {
 					blockId,

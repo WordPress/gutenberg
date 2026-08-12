@@ -490,7 +490,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 				isMe: false,
 				collaboratorInfo: {
 					id: 2,
-					name: 'Anonymous Capybara · 2',
+					name: 'Anonymous User',
 					slug: 'anonymous-2',
 					avatar_urls: {},
 					browserType: 'Firefox',
@@ -509,7 +509,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 				'User One'
 			);
 			expect( result.current[ 1 ].collaboratorInfo.name ).toBe(
-				'Anonymous Capybara · 2'
+				'Anonymous User'
 			);
 		} );
 

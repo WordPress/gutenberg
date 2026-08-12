@@ -151,7 +151,7 @@ export function useCollaboratorNotifications(
 						collaborator.collaboratorInfo.name
 					),
 					{
-						id: `${ NOTIFICATION_TYPE.COLLAB_USER_ENTERED }-${ collaborator.clientId }`,
+						id: `${ NOTIFICATION_TYPE.COLLAB_USER_ENTERED }-${ collaborator.collaboratorInfo.id }`,
 						type: 'snackbar',
 						isDismissible: false,
 					}
@@ -178,7 +178,7 @@ export function useCollaboratorNotifications(
 						collaborator.collaboratorInfo.name
 					),
 					{
-						id: `${ NOTIFICATION_TYPE.COLLAB_USER_EXITED }-${ collaborator.clientId }`,
+						id: `${ NOTIFICATION_TYPE.COLLAB_USER_EXITED }-${ collaborator.collaboratorInfo.id }`,
 						type: 'snackbar',
 						isDismissible: false,
 					}
@@ -221,7 +221,7 @@ export function useCollaboratorNotifications(
 				);
 
 				void createNotice( 'info', message, {
-					id: `${ NOTIFICATION_TYPE.COLLAB_POST_UPDATED }-${ saver.clientId }`,
+					id: `${ NOTIFICATION_TYPE.COLLAB_POST_UPDATED }-${ saver.collaboratorInfo.id }`,
 					type: 'snackbar',
 					isDismissible: false,
 				} );

@@ -92,7 +92,7 @@ test.describe( 'Collaboration - Presence', () => {
 
 		const fallbackName = page2.locator(
 			'.editor-collaborators-presence__list-item-name',
-			{ hasText: /^Anonymous \S+ · [0-9A-Z]+$/ }
+			{ hasText: 'Anonymous User' }
 		);
 		const fallbackItem = page2
 			.locator( '.editor-collaborators-presence__list-item' )
@@ -100,13 +100,13 @@ test.describe( 'Collaboration - Presence', () => {
 		await expect( fallbackItem ).toBeVisible();
 
 		const fallbackAvatar = fallbackItem.getByRole( 'img', {
-			name: /^Anonymous \S+ · [0-9A-Z]+$/,
+			name: 'Anonymous User',
 		} );
 		await expect( fallbackAvatar ).toBeVisible();
 		await expect( fallbackAvatar.locator( 'img' ) ).toHaveCount( 0 );
 		await expect(
 			fallbackAvatar.locator( '.editor-avatar__image' )
-		).toHaveText( /^A[A-Z]$/ );
+		).toHaveText( 'AU' );
 	} );
 
 	test( 'A collaborator whose user profile request fails can still exchange edits with a named collaborator', async ( {

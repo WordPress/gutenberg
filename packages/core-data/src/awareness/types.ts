@@ -6,16 +6,7 @@ export type CollaboratorInfo = Pick< User< 'view' >, 'name' | 'slug' > & {
 	avatar_urls: Partial< User< 'view' >[ 'avatar_urls' ] >;
 	browserType: string;
 	enteredAt: number;
-	/**
-	 * Stable numeric identity used by existing consumers. This is the WordPress
-	 * user ID when resolved, or the Yjs client ID for a fallback collaborator.
-	 */
 	id: User< 'view' >[ 'id' ];
-	/**
-	 * The resolved WordPress user ID, or null for a fallback collaborator.
-	 * Optional because awareness data from older peers does not include it.
-	 */
-	wpUserId?: User< 'view' >[ 'id' ] | null;
 };
 
 /**

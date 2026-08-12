@@ -841,21 +841,20 @@ describe( 'PostEditorAwareness', () => {
 					browserType: 'Chrome',
 					enteredAt: 123,
 					id: 456,
-					name: 'Anonymous Fox · CO',
+					name: 'Anonymous User',
 					slug: 'anonymous-456',
-					wpUserId: null,
 				},
 			} );
 
 			expect( awareness.getDebugData().collaboratorMap ).toEqual( {
 				456: {
-					name: 'Anonymous Fox · CO',
+					name: 'Anonymous User',
 					wpUserId: null,
 				},
 			} );
 		} );
 
-		test( 'should use the existing ID for debug data from older peers', () => {
+		test( 'should use the existing ID for named collaborators', () => {
 			const awareness = new PostEditorAwareness(
 				doc,
 				'postType',
@@ -869,7 +868,7 @@ describe( 'PostEditorAwareness', () => {
 					enteredAt: 123,
 					id: 42,
 					name: 'Test User',
-					slug: 'test-user',
+					slug: 'anonymous-456',
 				},
 			} );
 

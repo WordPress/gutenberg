@@ -353,25 +353,29 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		);
 
 		// Build collaboratorMap from awareness store (all collaborators seen this session)
-		const collaboratorMap: Record< string, DebugCollaboratorData > = {};
-		for ( const [ clientId, collaboratorState ] of this.getSeenStates() ) {
-			const { collaboratorInfo } = collaboratorState;
-			if ( ! hasPresentableCollaboratorInfo( collaboratorInfo ) ) {
-				continue;
-			}
-
-			collaboratorMap[ clientId ] = {
-				name: collaboratorInfo.name,
-				// Peers running an older version do not send `wpUserId`. Their
-				// established `id` field is a WordPress user ID, so use it only
-				// when the explicit WordPress ID field is absent. Preserve null for
-				// fallback collaborators.
-				wpUserId:
-					collaboratorInfo.wpUserId === undefined
-						? collaboratorInfo.id
-						: collaboratorInfo.wpUserId,
-			};
-		}
+		const collaboratorMapData = new Map< string, DebugCollaboratorData >(
+			Array.from( this.getSeenStates().entries() )
+				.filter( ( [ , collaboratorState ] ) =>
+					hasPresentableCollaboratorInfo(
+						collaboratorState.collaboratorInfo
+					)
+				)
+				.map( ( [ clientId, collaboratorState ] ) => [
+					String( clientId ),
+					{
+						name: collaboratorState.collaboratorInfo.name,
+						// Fallback identities use the awareness client ID in both
+						// fields; it must not be exported as a WordPress user ID.
+						wpUserId:
+							collaboratorState.collaboratorInfo.id ===
+								clientId &&
+							collaboratorState.collaboratorInfo.slug ===
+								`anonymous-${ clientId }`
+								? null
+								: collaboratorState.collaboratorInfo.id,
+					},
+				] )
+		);
 
 		// Serialize Yjs client items to avoid deep nesting
 		const serializableClientItems: Record<
@@ -411,7 +415,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		return {
 			doc: docData,
 			clients: serializableClientItems,
-			collaboratorMap,
+			collaboratorMap: Object.fromEntries( collaboratorMapData ),
 		};
 	}
 }

@@ -97,8 +97,12 @@ function makeCollaborator(
 const me = makeCollaborator( 1, 'Me', BASE_ENTERED_AT + 5000, {
 	isMe: true,
 } );
-const alice = makeCollaborator( 100, 'Alice', BASE_ENTERED_AT + 1000 );
-const bob = makeCollaborator( 200, 'Bob', BASE_ENTERED_AT + 10000 );
+const alice = makeCollaborator( 100, 'Alice', BASE_ENTERED_AT + 1000, {
+	clientId: 1000,
+} );
+const bob = makeCollaborator( 200, 'Bob', BASE_ENTERED_AT + 10000, {
+	clientId: 2000,
+} );
 
 // --- Setup ---
 
@@ -193,7 +197,7 @@ describe( 'useCollaboratorNotifications', () => {
 				collaboratorInfo: {
 					...bob.collaboratorInfo,
 					id: 321,
-					name: 'Anonymous Rabbit · 8X',
+					name: 'Anonymous User',
 				},
 			};
 			renderNotifications();
@@ -202,7 +206,7 @@ describe( 'useCollaboratorNotifications', () => {
 
 			expect( mockCreateNotice ).toHaveBeenCalledWith(
 				'info',
-				'Anonymous Rabbit · 8X has joined the post.',
+				'Anonymous User has joined the post.',
 				expect.objectContaining( {
 					id: 'collab-user-entered-321',
 				} )

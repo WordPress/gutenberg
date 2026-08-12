@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   Keep collaboration awareness available with a uniquely labeled fallback identity based on the Yjs client ID, replacing it with WordPress user information when resolution succeeds.
+-   Keep collaboration awareness available with an anonymous fallback identity based on the Yjs client ID when WordPress user information is unavailable.
 -   Footnotes: Treat unreadable `footnotes` post meta as no footnotes instead of throwing. Malformed JSON, or valid JSON that is not an array, threw inside a store subscriber where no error boundary catches it, so the edit was dropped and the post silently stopped saving ([#81201](https://github.com/WordPress/gutenberg/pull/81201)).
 -   Ensure revision resolvers finish after fetched revisions are stored.
 

@@ -85,12 +85,17 @@ describe( 'BaseAwareness', () => {
 			expect( resolveSelect ).toHaveBeenCalledTimes( 1 );
 		} );
 
-		test( 'replaces the fallback identity when the current user resolves', async () => {
+		test( 'publishes the resolved WordPress identity once', async () => {
 			const awareness = new BaseAwareness( doc );
+			const setLocalStateField = jest.spyOn(
+				awareness,
+				'setLocalStateField'
+			);
 
 			awareness.setUp();
-			const enteredAt =
-				awareness.getLocalStateField( 'collaboratorInfo' )?.enteredAt;
+			expect(
+				awareness.getLocalStateField( 'collaboratorInfo' )
+			).toBeNull();
 
 			// Wait for async operations
 			await Promise.resolve();
@@ -99,34 +104,10 @@ describe( 'BaseAwareness', () => {
 				awareness.getLocalStateField( 'collaboratorInfo' );
 			expect( collaboratorInfo ).toBeDefined();
 			expect( collaboratorInfo?.id ).toBe( 1 );
-			expect( collaboratorInfo?.wpUserId ).toBe( 1 );
 			expect( collaboratorInfo?.name ).toBe( 'Test User' );
 			expect( collaboratorInfo?.browserType ).toBe( 'Chrome' );
-			expect( collaboratorInfo?.enteredAt ).toBe( enteredAt );
-		} );
-
-		test( 'publishes a fallback identity while the current user is pending', () => {
-			const awareness = new BaseAwareness( doc );
-
-			awareness.setUp();
-
-			const collaboratorInfo =
-				awareness.getLocalStateField( 'collaboratorInfo' );
-			expect( collaboratorInfo ).toMatchObject( {
-				avatar_urls: {},
-				id: doc.clientID,
-				slug: `anonymous-${ doc.clientID }`,
-				wpUserId: null,
-			} );
-			expect( collaboratorInfo?.name ).toMatch(
-				/^Anonymous \S+ · [0-9A-Z]+$/
-			);
-			expect( awareness.getCurrentState() ).toEqual( [
-				expect.objectContaining( {
-					clientId: doc.clientID,
-					collaboratorInfo,
-				} ),
-			] );
+			expect( collaboratorInfo?.enteredAt ).toBe( 1704067200000 );
+			expect( setLocalStateField ).toHaveBeenCalledTimes( 1 );
 		} );
 
 		test( 'keeps the fallback identity when user resolution fails', async () => {
@@ -143,12 +124,9 @@ describe( 'BaseAwareness', () => {
 			expect( collaboratorInfo ).toMatchObject( {
 				avatar_urls: {},
 				id: doc.clientID,
+				name: 'Anonymous User',
 				slug: `anonymous-${ doc.clientID }`,
-				wpUserId: null,
 			} );
-			expect( collaboratorInfo?.name ).toMatch(
-				/^Anonymous \S+ · [0-9A-Z]+$/
-			);
 		} );
 
 		test( 'keeps the fallback identity for an invalid user response', async () => {
@@ -164,6 +142,7 @@ describe( 'BaseAwareness', () => {
 				awareness.getLocalStateField( 'collaboratorInfo' )
 			).toMatchObject( {
 				id: doc.clientID,
+				name: 'Anonymous User',
 			} );
 		} );
 	} );
