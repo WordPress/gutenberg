@@ -5,10 +5,10 @@
 ### Enhancements
 
 -   Validated form controls: Align invalid focus styling for `ComboboxControl` and `FormTokenField` with the design system ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
+-   DataViews filters: Align filter search input focus styling with `outset-ring__focus` ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
 
 ### Bug Fix
 
--   DataViews filters: Remove the duplicate inset focus ring from the filter search input now that `input-control` uses `outset-ring__focus` ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
 -   DataForm: Send a single update per calendar interaction in the `datetime` control instead of two identical ones. Selecting or clearing a date now reveals the validation message by firing a synthetic `invalid` event on the input, rather than briefly moving focus into it and re-sending the value, and announces it to screen readers since focus stays on the calendar. [#81440](https://github.com/WordPress/gutenberg/pull/81440)
 
 ### Internal
