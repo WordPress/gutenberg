@@ -80,6 +80,7 @@ describe( 'Waveform Player dependency', () => {
 		jest.useRealTimers();
 		jest.resetModules();
 		document.body.innerHTML = '';
+		document.documentElement.removeAttribute( 'data-waveform-autoinit' );
 		delete window.WaveformPlayer;
 
 		if ( originalReadyState ) {
@@ -174,13 +175,22 @@ describe( 'Waveform Player dependency', () => {
 		).not.toBeNull();
 	} );
 
-	it( 'initializes declarative players only after an explicit request', () => {
-		const element = createDeclarativePlayer();
+	it( 'initializes declarative players only after an explicit request from the Playlist utility', () => {
+		const element = createDeclarativePlayer( {
+			'data-play-icon':
+				'<img src="invalid" onerror="window.__waveformXss = true">',
+		} );
 
-		WaveformPlayer = loadWaveformPlayer();
+		jest.isolateModules( () => {
+			require( '../waveform-utils' );
+			WaveformPlayer = window.WaveformPlayer;
+		} );
 
 		expect( element ).not.toHaveAttribute( 'data-waveform-initialized' );
 		expect( element ).toBeEmptyDOMElement();
+		expect( document.documentElement ).not.toHaveAttribute(
+			'data-waveform-autoinit'
+		);
 
 		WaveformPlayer.init();
 
@@ -191,5 +201,22 @@ describe( 'Waveform Player dependency', () => {
 		expect(
 			element.querySelector( '.waveform-player-inner' )
 		).not.toBeNull();
+	} );
+
+	it( 'preserves the page auto-init setting after loading the Playlist utility', () => {
+		document.documentElement.setAttribute(
+			'data-waveform-autoinit',
+			'application-value'
+		);
+
+		jest.isolateModules( () => {
+			require( '../waveform-utils' );
+			WaveformPlayer = window.WaveformPlayer;
+		} );
+
+		expect( document.documentElement ).toHaveAttribute(
+			'data-waveform-autoinit',
+			'application-value'
+		);
 	} );
 } );
