@@ -79,15 +79,45 @@ describe( 'Waveform Player dependency', () => {
 		jsdomStubs.forEach( ( stub ) => stub.mockRestore() );
 		jest.useRealTimers();
 		jest.resetModules();
+		jest.dontMock( '@arraypress/waveform-player' );
 		document.body.innerHTML = '';
 		document.documentElement.removeAttribute( 'data-waveform-autoinit' );
 		delete window.WaveformPlayer;
+		WaveformPlayer = undefined;
 
 		if ( originalReadyState ) {
 			Object.defineProperty( document, 'readyState', originalReadyState );
 		} else {
 			delete document.readyState;
 		}
+	} );
+
+	it( 'disables dependency auto-init before loading the Playlist utility', () => {
+		const observedAutoinitValues = [];
+
+		jest.isolateModules( () => {
+			jest.doMock( '@arraypress/waveform-player', () => {
+				observedAutoinitValues.push(
+					document.documentElement.getAttribute(
+						'data-waveform-autoinit'
+					)
+				);
+
+				class MockWaveformPlayer {}
+
+				return {
+					__esModule: true,
+					default: MockWaveformPlayer,
+				};
+			} );
+
+			require( '../waveform-utils' );
+		} );
+
+		expect( observedAutoinitValues ).toEqual( [ 'false' ] );
+		expect( document.documentElement ).not.toHaveAttribute(
+			'data-waveform-autoinit'
+		);
 	} );
 
 	it( 'uses the default alignment when a declarative alignment value is unsupported', () => {
