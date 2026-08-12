@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81517](https://github.com/WordPress/gutenberg/pull/81517))
+
 ### Breaking Changes
 
 -   Flaky tests are no longer reported to GitHub issues, and are no longer reported on pushes. The action now only comments the detected tests, together with their errors, on the pull request. The `label` input has been removed as a result.
