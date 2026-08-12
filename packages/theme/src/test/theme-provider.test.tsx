@@ -226,7 +226,11 @@ describe( 'ThemeProvider', () => {
 			iframeDoc.body.appendChild( mount );
 
 			const { unmount } = render(
-				<ThemeProvider isRoot color={ { primary: PRIMARY } }>
+				<ThemeProvider
+					isRoot
+					color={ { primary: PRIMARY } }
+					cornerRadius="moderate"
+				>
 					<div>x</div>
 				</ThemeProvider>,
 				{ container: mount }
@@ -235,7 +239,21 @@ describe( 'ThemeProvider', () => {
 			expect( readProp( iframeDoc.documentElement, BRAND_BG ) ).toBe(
 				PRIMARY
 			);
+			expect( iframeDoc.documentElement ).toHaveAttribute(
+				'data-wpds-root-provider',
+				'true'
+			);
+			expect( iframeDoc.documentElement ).toHaveAttribute(
+				'data-wpds-corner-radius',
+				'moderate'
+			);
 			expect( readProp( document.documentElement, BRAND_BG ) ).toBe( '' );
+			expect( document.documentElement ).not.toHaveAttribute(
+				'data-wpds-root-provider'
+			);
+			expect( document.documentElement ).not.toHaveAttribute(
+				'data-wpds-corner-radius'
+			);
 
 			unmount();
 			iframe.remove();
@@ -280,10 +298,10 @@ describe( 'ThemeProvider', () => {
 			warn.mockRestore();
 		} );
 
-		// `cornerRadius` forwards to `:root` through the prebuilt CSS's
-		// `:root:has( [data-wpds-root-provider='true']… )` rule (not the JS
-		// mirror used for color/cursor), so load that stylesheet to exercise
-		// it. Scoped to this block since it also defines base `:root` tokens.
+		// `cornerRadius` resolves through the prebuilt CSS after the root
+		// provider mirrors its preset attributes to the document element.
+		// Load that stylesheet to exercise the complete forwarding behavior.
+		// It is scoped to this block since it also defines base `:root` tokens.
 		describe( 'cornerRadius forwarding', () => {
 			let prebuiltStyle: HTMLStyleElement;
 
@@ -303,7 +321,7 @@ describe( 'ThemeProvider', () => {
 				prebuiltStyle.remove();
 			} );
 
-			it( 'forwards the preset to the document root when isRoot is set', () => {
+			it( 'forwards the preset attributes and tokens to the document root when isRoot is set', () => {
 				render(
 					<ThemeProvider isRoot cornerRadius="moderate">
 						<div data-testid="child">x</div>
@@ -318,11 +336,83 @@ describe( 'ThemeProvider', () => {
 					BORDER_RADIUS_SM
 				);
 
+				expect( document.documentElement ).toHaveAttribute(
+					'data-wpds-root-provider',
+					'true'
+				);
+				expect( document.documentElement ).toHaveAttribute(
+					'data-wpds-corner-radius',
+					'moderate'
+				);
+
 				// `:root` resolves to the same `moderate` value as the provider.
 				expect( forwarded ).toBeTruthy();
 				expect( forwarded ).toBe(
 					readProp( provider, BORDER_RADIUS_SM )
 				);
+			} );
+
+			it( 'updates the document-root attributes when the preset changes', () => {
+				const { rerender } = render(
+					<ThemeProvider isRoot cornerRadius="moderate">
+						<div>x</div>
+					</ThemeProvider>
+				);
+
+				rerender(
+					<ThemeProvider isRoot cornerRadius="pronounced">
+						<div>x</div>
+					</ThemeProvider>
+				);
+
+				expect( document.documentElement ).toHaveAttribute(
+					'data-wpds-root-provider',
+					'true'
+				);
+				expect( document.documentElement ).toHaveAttribute(
+					'data-wpds-corner-radius',
+					'pronounced'
+				);
+			} );
+
+			it( 'restores previous document-root attributes on unmount', () => {
+				const root = document.documentElement;
+				root.setAttribute( 'data-wpds-root-provider', 'previous' );
+				root.setAttribute( 'data-wpds-corner-radius', 'none' );
+				let unmount: undefined | ( () => void );
+
+				try {
+					( { unmount } = render(
+						<ThemeProvider isRoot cornerRadius="moderate">
+							<div>x</div>
+						</ThemeProvider>
+					) );
+
+					expect( root ).toHaveAttribute(
+						'data-wpds-root-provider',
+						'true'
+					);
+					expect( root ).toHaveAttribute(
+						'data-wpds-corner-radius',
+						'moderate'
+					);
+
+					unmount();
+					unmount = undefined;
+
+					expect( root ).toHaveAttribute(
+						'data-wpds-root-provider',
+						'previous'
+					);
+					expect( root ).toHaveAttribute(
+						'data-wpds-corner-radius',
+						'none'
+					);
+				} finally {
+					unmount?.();
+					root.removeAttribute( 'data-wpds-root-provider' );
+					root.removeAttribute( 'data-wpds-corner-radius' );
+				}
 			} );
 
 			it( 'does not forward the preset to the document root by default', () => {
@@ -341,6 +431,12 @@ describe( 'ThemeProvider', () => {
 				expect(
 					readProp( document.documentElement, BORDER_RADIUS_SM )
 				).not.toBe( readProp( provider, BORDER_RADIUS_SM ) );
+				expect( document.documentElement ).not.toHaveAttribute(
+					'data-wpds-root-provider'
+				);
+				expect( document.documentElement ).not.toHaveAttribute(
+					'data-wpds-corner-radius'
+				);
 			} );
 		} );
 	} );

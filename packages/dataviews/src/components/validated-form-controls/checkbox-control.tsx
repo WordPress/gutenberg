@@ -1,8 +1,13 @@
-import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useRef } from '@wordpress/element';
-import { ControlWithError } from '../control-with-error';
+import { useMergeRefs } from '@wordpress/compose';
+import { CheckboxControl } from '@wordpress/components';
+import { ControlWithError } from './control-with-error';
 import type { ValidatedControlProps } from './types';
-import CheckboxControl from '../../checkbox-control';
+
+type CheckboxControlProps = React.ComponentProps< typeof CheckboxControl >;
+
+type ValidatedCheckboxControlProps = CheckboxControlProps &
+	ValidatedControlProps;
 
 const UnforwardedValidatedCheckboxControl = (
 	{
@@ -10,7 +15,7 @@ const UnforwardedValidatedCheckboxControl = (
 		customValidity,
 		markWhenOptional,
 		...restProps
-	}: React.ComponentProps< typeof CheckboxControl > & ValidatedControlProps,
+	}: ValidatedCheckboxControlProps,
 	forwardedRef: React.ForwardedRef< HTMLInputElement >
 ) => {
 	const validityTargetRef = useRef< HTMLDivElement >( null );
@@ -36,7 +41,8 @@ const UnforwardedValidatedCheckboxControl = (
 	);
 };
 
-export const ValidatedCheckboxControl = forwardRef(
-	UnforwardedValidatedCheckboxControl
-);
+export const ValidatedCheckboxControl: React.ForwardRefExoticComponent<
+	React.PropsWithoutRef< ValidatedCheckboxControlProps > &
+		React.RefAttributes< HTMLInputElement >
+> = forwardRef( UnforwardedValidatedCheckboxControl );
 ValidatedCheckboxControl.displayName = 'ValidatedCheckboxControl';

@@ -1,5 +1,5 @@
 import { useRender } from '@base-ui/react';
-import type { CalendarDay, RootProps, ChevronProps } from 'react-day-picker';
+import type { CalendarDay, RootProps, ChevronProps } from '@daypicker/react';
 import { useContext } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
@@ -143,7 +143,7 @@ export function Day(
 export function Root( { rootRef, ...props }: RootProps ) {
 	const { render, ref } = useContext( RootContext );
 
-	// `rootRef` is only set by `react-day-picker` when `animate` is enabled.
+	// `rootRef` is only set by `@daypicker/react` when `animate` is enabled.
 	const mergedRef = useMergeRefs( [ rootRef ?? null, ref ?? null ] );
 
 	return useRender( {
@@ -170,7 +170,7 @@ export function Chevron( { orientation, className }: ChevronProps ) {
 /**
  * Render a month navigation button.
  *
- * `react-day-picker` marks the button as `aria-disabled` (rather than
+ * `@daypicker/react` marks the button as `aria-disabled` (rather than
  * `disabled`) when there is no month to navigate to, so that it stays
  * discoverable. `Button`'s `focusableWhenDisabled` produces the same DOM.
  * @see https://daypicker.dev/guides/custom-components

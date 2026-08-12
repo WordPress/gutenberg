@@ -1,8 +1,16 @@
-import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useEffect, useRef } from '@wordpress/element';
-import { ControlWithError } from '../control-with-error';
+import { useMergeRefs } from '@wordpress/compose';
+import { ComboboxControl } from '@wordpress/components';
+import { ControlWithError } from './control-with-error';
 import type { ValidatedControlProps } from './types';
-import ComboboxControl from '../../combobox-control';
+
+type ComboboxControlProps = React.ComponentProps< typeof ComboboxControl >;
+
+type ValidatedComboboxControlProps = Omit<
+	ComboboxControlProps,
+	'__next40pxDefaultSize'
+> &
+	ValidatedControlProps;
 
 const UnforwardedValidatedComboboxControl = (
 	{
@@ -10,11 +18,7 @@ const UnforwardedValidatedComboboxControl = (
 		customValidity,
 		markWhenOptional,
 		...restProps
-	}: Omit<
-		React.ComponentProps< typeof ComboboxControl >,
-		'__next40pxDefaultSize'
-	> &
-		ValidatedControlProps,
+	}: ValidatedComboboxControlProps,
 	forwardedRef: React.ForwardedRef< HTMLInputElement >
 ) => {
 	const validityTargetRef = useRef< HTMLInputElement >( null );
@@ -50,7 +54,8 @@ const UnforwardedValidatedComboboxControl = (
 	);
 };
 
-export const ValidatedComboboxControl = forwardRef(
-	UnforwardedValidatedComboboxControl
-);
+export const ValidatedComboboxControl: React.ForwardRefExoticComponent<
+	React.PropsWithoutRef< ValidatedComboboxControlProps > &
+		React.RefAttributes< HTMLInputElement >
+> = forwardRef( UnforwardedValidatedComboboxControl );
 ValidatedComboboxControl.displayName = 'ValidatedComboboxControl';

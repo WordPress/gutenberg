@@ -1,8 +1,12 @@
-import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useRef } from '@wordpress/element';
-import { ControlWithError } from '../control-with-error';
+import { useMergeRefs } from '@wordpress/compose';
+import { RadioControl } from '@wordpress/components';
+import { ControlWithError } from './control-with-error';
 import type { ValidatedControlProps } from './types';
-import RadioControl from '../../radio-control';
+
+type RadioControlProps = React.ComponentProps< typeof RadioControl >;
+
+type ValidatedRadioControlProps = RadioControlProps & ValidatedControlProps;
 
 const UnforwardedValidatedRadioControl = (
 	{
@@ -10,7 +14,7 @@ const UnforwardedValidatedRadioControl = (
 		customValidity,
 		markWhenOptional,
 		...restProps
-	}: React.ComponentProps< typeof RadioControl > & ValidatedControlProps,
+	}: ValidatedRadioControlProps,
 	forwardedRef: React.ForwardedRef< HTMLDivElement >
 ) => {
 	const validityTargetRef = useRef< HTMLDivElement >( null );
@@ -34,7 +38,8 @@ const UnforwardedValidatedRadioControl = (
 	);
 };
 
-export const ValidatedRadioControl = forwardRef(
-	UnforwardedValidatedRadioControl
-);
+export const ValidatedRadioControl: React.ForwardRefExoticComponent<
+	React.PropsWithoutRef< ValidatedRadioControlProps > &
+		React.RefAttributes< HTMLDivElement >
+> = forwardRef( UnforwardedValidatedRadioControl );
 ValidatedRadioControl.displayName = 'ValidatedRadioControl';

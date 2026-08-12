@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.6.0 (2026-08-12)
+
 ### Enhancements
 
 -   `useFixedWindowList`: Only re-render when the rendered window is missing items, avoiding a second style recalculation before the list is first painted ([#80935](https://github.com/WordPress/gutenberg/pull/80935)).

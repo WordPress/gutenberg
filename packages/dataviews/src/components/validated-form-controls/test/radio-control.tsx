@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ValidatedRadioControl } from '../components';
+import { ValidatedRadioControl } from '../radio-control';
 
 describe( 'ValidatedRadioControl', () => {
 	const options = [
