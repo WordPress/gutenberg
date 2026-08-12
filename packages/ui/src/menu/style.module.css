@@ -96,7 +96,7 @@
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-xs);
 			font-weight: var(--wpds-typography-font-weight-emphasis);
-			line-height: var(--wpds-typography-line-height-sm);
+			line-height: var(--wpds-typography-line-height-xs);
 			color: var(--wpds-color-foreground-content-neutral-weak);
 			text-transform: uppercase;
 		}
@@ -114,7 +114,7 @@
 		}
 
 		.item {
-			--wp-ui-menu-item-height: var(--wpds-dimension-size-lg);
+			--wp-ui-menu-item-height: var(--wpds-dimension-size-md);
 			--wp-ui-menu-item-padding-block: var(--wpds-dimension-padding-xs);
 
 			display: grid;
@@ -236,9 +236,7 @@
 
 		.item-label {
 			min-width: 0;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
+			overflow-wrap: anywhere;
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-md);
 			line-height: var(--wpds-typography-line-height-sm);

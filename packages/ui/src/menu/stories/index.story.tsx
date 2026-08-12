@@ -284,7 +284,8 @@ export const RichItems: Story = {
 					</Menu.Item>
 					<Menu.Item>
 						<Menu.ItemLabel>
-							Label with a long description
+							A long menu item label that wraps onto multiple
+							lines
 						</Menu.ItemLabel>
 						<Menu.ItemDescription>
 							The menu item description wraps within the popup
