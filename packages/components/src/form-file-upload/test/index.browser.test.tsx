@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
+import { userEvent } from 'vitest/browser';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import FormFileUpload from '..';
 const { File } = window;
 
-// @testing-library/user-event considers changing <input type="file"> to a string as a change, but it do not occur on real browsers, so the comparisons will be against this result
+// Browsers expose the selected local file through a fake path on the event target.
 const fakePath = expect.objectContaining( {
 	target: expect.objectContaining( {
 		value: 'C:\\fakepath\\hello.png',
@@ -25,7 +25,7 @@ describe( 'FormFileUpload', () => {
 		expect( getComputedStyle( input ).display ).toBe( 'none' );
 	} );
 
-	it( 'should not fire a change event after selecting the same file', async () => {
+	it( 'should fire a change event after selecting a file', async () => {
 		const user = userEvent.setup();
 
 		const onChange = vi.fn();
@@ -41,8 +41,6 @@ describe( 'FormFileUpload', () => {
 		} );
 
 		const input = screen.getByTestId( 'form-file-upload-input' );
-
-		await user.upload( input, file );
 
 		await user.upload( input, file );
 

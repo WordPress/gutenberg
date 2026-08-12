@@ -1,6 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { userEvent } from 'vitest/browser';
+import {
+	act,
+	fireEvent,
+	render,
+	screen,
+	waitFor,
+} from '@testing-library/react';
 import { useState } from '@wordpress/element';
 import CustomGradientPicker from '../';
 
@@ -34,7 +40,7 @@ describe( 'CustomGradientPicker', () => {
 				'.components-custom-gradient-picker__insert-point-dropdown'
 			) as HTMLElement;
 			expect( insertButton ).toBeTruthy();
-			fireEvent.click( insertButton );
+			await act( async () => insertButton.click() );
 
 			const colorSlider = screen.getByRole( 'slider', { name: 'Color' } );
 			const sliderBounds = colorSlider.getBoundingClientRect();
@@ -68,11 +74,7 @@ describe( 'CustomGradientPicker', () => {
 			// while the gradient parent keeps updating (#80110 / #80205).
 			colorSlider.focus();
 			for ( let i = 0; i < 20; i++ ) {
-				fireEvent.keyDown( colorSlider, {
-					key: 'ArrowDown',
-					keyCode: 40,
-					which: 40,
-				} );
+				await userEvent.keyboard( '{ArrowDown}' );
 			}
 
 			expect(
@@ -84,7 +86,7 @@ describe( 'CustomGradientPicker', () => {
 
 			// Close the portaled popover so later tests are not affected by
 			// asynchronous Popover position updates.
-			fireEvent.click( insertButton );
+			await act( async () => insertButton.click() );
 			await waitFor( () => {
 				expect(
 					screen.queryByRole( 'slider', { name: 'Color' } )

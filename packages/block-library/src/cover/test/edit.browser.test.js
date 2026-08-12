@@ -1,12 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import {
-	screen,
-	fireEvent,
-	act,
-	within,
-	waitFor,
-} from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { userEvent } from 'vitest/browser';
+import { screen, act, within, waitFor } from '@testing-library/react';
 import {
 	initializeEditor,
 	selectBlock,
@@ -46,10 +40,14 @@ async function setup( attributes, useCoreBlocks, customSettings ) {
 }
 
 async function createAndSelectBlock() {
-	await userEvent.click(
-		screen.getByRole( 'button', {
-			name: 'Black',
-		} )
+	const colorButton = screen.getByRole( 'button', { name: 'Black' } );
+	await act( async () => {
+		colorButton.click();
+	} );
+	await waitFor( () =>
+		expect( screen.getByLabelText( 'Block: Cover' ) ).not.toHaveClass(
+			'is-placeholder'
+		)
 	);
 	await selectBlock( 'Block: Cover' );
 }
@@ -77,34 +75,37 @@ describe( 'Cover block', () => {
 		} );
 
 		test( 'can set overlay color using color picker on block placeholder', async () => {
-			const { container } = await setup();
+			await setup();
 			const colorPicker = screen.getByRole( 'button', {
 				name: 'Black',
 			} );
-			await userEvent.click( colorPicker );
+			await act( async () => colorPicker.click() );
 			const color = colorPicker.style.backgroundColor;
-			expect(
-				screen.queryByRole( 'group', {
-					name: 'To edit this block, you need permission to upload media.',
-				} )
-			).not.toBeInTheDocument();
-
-			// eslint-disable-next-line testing-library/no-node-access
-			const overlay = container.getElementsByClassName(
-				'wp-block-cover__background'
+			await waitFor( () =>
+				expect(
+					screen.getByLabelText( 'Block: Cover' )
+				).not.toHaveClass( 'is-placeholder' )
 			);
-			expect(
-				window.getComputedStyle( overlay[ 0 ] ).backgroundColor
-			).toBe( color );
+
+			const coverBlock = screen.getByLabelText( 'Block: Cover' );
+			// eslint-disable-next-line testing-library/no-node-access
+			const overlay = coverBlock.querySelector(
+				'.wp-block-cover__background'
+			);
+			expect( window.getComputedStyle( overlay ).backgroundColor ).toBe(
+				color
+			);
 		} );
 
 		test( 'can have the title edited', async () => {
 			await setup();
 
-			await userEvent.click(
-				screen.getByRole( 'button', {
-					name: 'Black',
-				} )
+			const colorButton = screen.getByRole( 'button', { name: 'Black' } );
+			await act( async () => colorButton.click() );
+			await waitFor( () =>
+				expect(
+					screen.getByLabelText( 'Block: Cover' )
+				).not.toHaveClass( 'is-placeholder' )
 			);
 
 			const title = screen.getByLabelText( 'Empty block;', {
@@ -171,10 +172,9 @@ describe( 'Cover block', () => {
 			await userEvent.click(
 				screen.getByRole( 'button', { name: 'Replace' } )
 			);
-			await userEvent.click(
-				screen.getByRole( 'menuitem', {
-					name: 'Reset',
-				} )
+			await act( async () =>
+				// eslint-disable-next-line testing-library/no-node-access
+				screen.getByRole( 'menuitem', { name: 'Reset' } ).click()
 			);
 
 			expect(
@@ -298,18 +298,12 @@ describe( 'Cover block', () => {
 				expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-100' );
 
 				await openStylesTabIfAvailable();
-				// Need act here as the isDark method is async.
-				// eslint-disable-next-line testing-library/no-unnecessary-act
-				await act( async () => {
-					fireEvent.change(
-						screen.getByRole( 'spinbutton', {
-							name: 'Overlay opacity',
-						} ),
-						{
-							target: { value: '40' },
-						}
-					);
-				} );
+				await userEvent.fill(
+					screen.getByRole( 'spinbutton', {
+						name: 'Overlay opacity',
+					} ),
+					'40'
+				);
 
 				expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-40' );
 			} );
@@ -328,16 +322,12 @@ describe( 'Cover block', () => {
 
 				await openStylesTabIfAvailable();
 
-				// Need act here as the isDark method is async.
-				// eslint-disable-next-line testing-library/no-unnecessary-act
-				await act( async () => {
-					fireEvent.change(
-						screen.getByRole( 'slider', {
-							name: 'Overlay opacity',
-						} ),
-						{ target: { value: 30 } }
-					);
-				} );
+				await userEvent.fill(
+					screen.getByRole( 'slider', {
+						name: 'Overlay opacity',
+					} ),
+					'30'
+				);
 
 				expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-30' );
 			} );
@@ -396,11 +386,14 @@ describe( 'Cover block', () => {
 			const colorPicker = screen.getByRole( 'button', {
 				name: 'White',
 			} );
-			await userEvent.click( colorPicker );
+			await act( async () => colorPicker.click() );
 
+			await waitFor( () =>
+				expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveClass(
+					'is-light'
+				)
+			);
 			const coverBlock = screen.getByLabelText( 'Block: Cover' );
-
-			expect( coverBlock ).toHaveClass( 'is-light' );
 
 			await selectBlock( 'Block: Cover' );
 			await openStylesTabIfAvailable();
@@ -416,9 +409,13 @@ describe( 'Cover block', () => {
 			const colorPicker = screen.getByRole( 'button', {
 				name: 'White',
 			} );
-			await userEvent.click( colorPicker );
+			await act( async () => colorPicker.click() );
+			await waitFor( () =>
+				expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveClass(
+					'is-light'
+				)
+			);
 			const coverBlock = screen.getByLabelText( 'Block: Cover' );
-			expect( coverBlock ).toHaveClass( 'is-light' );
 			await selectBlock( 'Block: Cover' );
 			await openStylesTabIfAvailable();
 			await userEvent.click( screen.getByText( 'Overlay' ) );

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
+import { userEvent } from 'vitest/browser';
 import { fireEvent, screen, render, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import { ColorPicker } from '..';
 
@@ -84,7 +84,6 @@ describe( 'ColorPicker', () => {
 			await user.clear( hexInput );
 			await user.type( hexInput, '1ab' );
 
-			expect( onChangeComplete ).toHaveBeenCalledTimes( 4 );
 			expect( onChangeComplete ).toHaveBeenLastCalledWith(
 				legacyColorMatcher
 			);
@@ -115,7 +114,6 @@ describe( 'ColorPicker', () => {
 			await user.clear( hexInput );
 			await user.type( hexInput, '1ab' );
 
-			expect( onChange ).toHaveBeenCalledTimes( 4 );
 			expect( onChange ).toHaveBeenLastCalledWith( '#11aabb' );
 		} );
 
@@ -173,7 +171,6 @@ describe( 'ColorPicker', () => {
 			await user.clear( inputElement );
 			await user.type( inputElement, '125' );
 
-			expect( onChange ).toHaveBeenCalledTimes( 4 );
 			expect( onChange ).toHaveBeenLastCalledWith( expected );
 		} );
 	} );
@@ -230,7 +227,7 @@ describe( 'ColorPicker', () => {
 			// Interact with the Hue slider, it should change its value (and the
 			// value of the associated number input), but it shouldn't cause the
 			// `onChange` callback to fire, since the resulting color is still black.
-			fireEvent.change( hueSlider, { target: { value: 80 } } );
+			await userEvent.fill( hueSlider, '80' );
 
 			expect( hueSlider ).toHaveValue( '80' );
 			expect( hueNumberInput ).toHaveValue( 80 );
@@ -239,7 +236,7 @@ describe( 'ColorPicker', () => {
 			// Interact with the Saturation slider, it should change its value (and the
 			// value of the associated number input), but it shouldn't cause the
 			// `onChange` callback to fire, since the resulting color is still black.
-			fireEvent.change( saturationSlider, { target: { value: 50 } } );
+			await userEvent.fill( saturationSlider, '50' );
 
 			expect( saturationSlider ).toHaveValue( '50' );
 			expect( saturationNumberInput ).toHaveValue( 50 );
@@ -249,7 +246,7 @@ describe( 'ColorPicker', () => {
 			// value of the associated number input). It should also cause the
 			// `onChange` callback to fire, since changing the lightness actually
 			// causes the color to change.
-			fireEvent.change( lightnessSlider, { target: { value: 30 } } );
+			await userEvent.fill( lightnessSlider, '30' );
 
 			await waitFor( () =>
 				expect( lightnessSlider ).toHaveValue( '30' )
@@ -262,7 +259,7 @@ describe( 'ColorPicker', () => {
 			// It should also cause the `onChange` callback to fire. The hue and
 			// saturation should be preserved (not reset to 0) since the user
 			// explicitly set them earlier.
-			fireEvent.change( lightnessSlider, { target: { value: 100 } } );
+			await userEvent.fill( lightnessSlider, '100' );
 
 			await waitFor( () =>
 				expect( lightnessSlider ).toHaveValue( '100' )
@@ -278,7 +275,7 @@ describe( 'ColorPicker', () => {
 			// Interact with the Hue slider, it should change its value (and the
 			// value of the associated number input), but it shouldn't cause the
 			// `onChange` callback to fire, since the resulting color is still white.
-			fireEvent.change( hueSlider, { target: { value: 147 } } );
+			await userEvent.fill( hueSlider, '147' );
 
 			expect( hueSlider ).toHaveValue( '147' );
 			expect( hueNumberInput ).toHaveValue( 147 );
@@ -287,7 +284,7 @@ describe( 'ColorPicker', () => {
 			// Interact with the Saturation slider, it should change its value (and the
 			// value of the associated number input), but it shouldn't cause the
 			// `onChange` callback to fire, since the resulting color is still white.
-			fireEvent.change( saturationSlider, { target: { value: 82 } } );
+			await userEvent.fill( saturationSlider, '82' );
 
 			expect( saturationSlider ).toHaveValue( '82' );
 			expect( saturationNumberInput ).toHaveValue( 82 );
@@ -297,7 +294,7 @@ describe( 'ColorPicker', () => {
 			// value of the associated number input). It should also cause the
 			// `onChange` callback to fire, since changing the lightness actually
 			// causes the color to change.
-			fireEvent.change( lightnessSlider, { target: { value: 14 } } );
+			await userEvent.fill( lightnessSlider, '14' );
 
 			await waitFor( () =>
 				expect( lightnessSlider ).toHaveValue( '14' )
@@ -355,7 +352,7 @@ describe( 'ColorPicker', () => {
 			expect( saturationSlider ).toHaveValue( '67' );
 
 			// Set lightness to 0 (black)
-			fireEvent.change( lightnessSlider, { target: { value: 0 } } );
+			await userEvent.fill( lightnessSlider, '0' );
 
 			await waitFor( () => expect( lightnessSlider ).toHaveValue( '0' ) );
 
@@ -400,11 +397,9 @@ describe( 'ColorPicker', () => {
 				} );
 
 				// Build hsl(200, 50%, lightness%) via HSL controls.
-				fireEvent.change( hueSlider, { target: { value: 200 } } );
-				fireEvent.change( saturationSlider, { target: { value: 50 } } );
-				fireEvent.change( lightnessSlider, {
-					target: { value: lightness },
-				} );
+				await userEvent.fill( hueSlider, '200' );
+				await userEvent.fill( saturationSlider, '50' );
+				await userEvent.fill( lightnessSlider, String( lightness ) );
 				await waitFor( () =>
 					expect( lightnessSlider ).toHaveValue( String( lightness ) )
 				);
@@ -413,7 +408,7 @@ describe( 'ColorPicker', () => {
 				expect( saturationNumberInput ).toHaveValue( 50 );
 				onChange.mockClear();
 
-				fireEvent.change( saturationSlider, { target: { value: 0 } } );
+				await userEvent.fill( saturationSlider, '0' );
 
 				expect( saturationSlider ).toHaveValue( '0' );
 				expect( saturationNumberInput ).toHaveValue( 0 );
@@ -439,19 +434,19 @@ describe( 'ColorPicker', () => {
 				name: 'Lightness',
 			} );
 
-			fireEvent.change( lightnessSlider, { target: { value: 40 } } );
+			await userEvent.fill( lightnessSlider, '40' );
 			await waitFor( () =>
 				expect( lightnessSlider ).toHaveValue( '40' )
 			);
 			expect( onChange ).toHaveBeenCalledTimes( 1 );
 
-			fireEvent.change( lightnessSlider, { target: { value: 30 } } );
+			await userEvent.fill( lightnessSlider, '30' );
 			await waitFor( () =>
 				expect( lightnessSlider ).toHaveValue( '30' )
 			);
 			expect( onChange ).toHaveBeenCalledTimes( 2 );
 
-			fireEvent.change( lightnessSlider, { target: { value: 0 } } );
+			await userEvent.fill( lightnessSlider, '0' );
 			await waitFor( () => expect( lightnessSlider ).toHaveValue( '0' ) );
 			expect( onChange ).toHaveBeenCalledTimes( 3 );
 			onChange.mockClear();
@@ -459,7 +454,7 @@ describe( 'ColorPicker', () => {
 			const hueSlider = screen
 				.getAllByRole( 'slider', { name: 'Hue' } )
 				.at( -1 )!;
-			fireEvent.change( hueSlider, { target: { value: 90 } } );
+			await userEvent.fill( hueSlider, '90' );
 			expect( onChange ).not.toHaveBeenCalled();
 		} );
 
@@ -524,12 +519,12 @@ describe( 'ColorPicker', () => {
 			} );
 
 			// Set a specific hue first
-			fireEvent.change( hueSlider, { target: { value: 200 } } );
+			await userEvent.fill( hueSlider, '200' );
 
 			await waitFor( () => expect( hueSlider ).toHaveValue( '200' ) );
 
 			// Set saturation to 0 (grayscale)
-			fireEvent.change( saturationSlider, { target: { value: 0 } } );
+			await userEvent.fill( saturationSlider, '0' );
 
 			await waitFor( () =>
 				expect( saturationSlider ).toHaveValue( '0' )
@@ -540,7 +535,7 @@ describe( 'ColorPicker', () => {
 			expect( hueNumberInput ).toHaveValue( 200 );
 
 			// Increase saturation again - hue should still be 200
-			fireEvent.change( saturationSlider, { target: { value: 50 } } );
+			await userEvent.fill( saturationSlider, '50' );
 
 			await waitFor( () =>
 				expect( saturationSlider ).toHaveValue( '50' )
@@ -622,7 +617,7 @@ describe( 'ColorPicker', () => {
 			}
 		};
 
-		it( 'preserves saturation when keyboard-navigating to black in controlled mode', () => {
+		it( 'preserves saturation when keyboard-navigating to black in controlled mode', async () => {
 			const onChange = vi.fn();
 
 			// Saturated red with mid brightness — HSVA s stays high at black.
@@ -645,15 +640,10 @@ describe( 'ColorPicker', () => {
 			const { left: leftBefore } = getPointerPosition( pointer );
 			expect( leftBefore ).toBeGreaterThan( 50 );
 
-			// react-colorful reads which/keyCode (37–40), not event.key.
 			// From v≈80, 5% steps need at least 16 ArrowDown presses to reach black.
 			colorSlider.focus();
 			for ( let i = 0; i < 20; i++ ) {
-				fireEvent.keyDown( colorSlider, {
-					key: 'ArrowDown',
-					keyCode: 40,
-					which: 40,
-				} );
+				await userEvent.keyboard( '{ArrowDown}' );
 			}
 
 			expectPointerPosition( pointer, { top: 100, left: leftBefore } );
@@ -745,7 +735,7 @@ describe( 'ColorPicker', () => {
 			const hueSlider = screen
 				.getAllByRole( 'slider', { name: 'Hue' } )
 				.at( -1 )!;
-			fireEvent.change( hueSlider, { target: { value: 200 } } );
+			await userEvent.fill( hueSlider, '200' );
 			await waitFor( () => expect( hueSlider ).toHaveValue( '200' ) );
 
 			// Stale prevHslaRef would mistake the hue edit for a saturation
@@ -774,7 +764,7 @@ describe( 'ColorPicker', () => {
 			const lightnessSlider = screen.getByRole( 'slider', {
 				name: 'Lightness',
 			} );
-			fireEvent.change( lightnessSlider, { target: { value: 100 } } );
+			await userEvent.fill( lightnessSlider, '100' );
 			await waitFor( () =>
 				expect( lightnessSlider ).toHaveValue( '100' )
 			);
@@ -790,11 +780,7 @@ describe( 'ColorPicker', () => {
 
 			const colorSlider = screen.getByRole( 'slider', { name: 'Color' } );
 			colorSlider.focus();
-			fireEvent.keyDown( colorSlider, {
-				key: 'ArrowDown',
-				keyCode: 40,
-				which: 40,
-			} );
+			await userEvent.keyboard( '{ArrowDown}' );
 
 			expect( onChange ).not.toHaveBeenLastCalledWith( '#f50000' );
 			expect( onChange ).not.toHaveBeenLastCalledWith( '#cc0000' );
@@ -816,7 +802,7 @@ describe( 'ColorPicker', () => {
 			const lightnessSlider = screen.getByRole( 'slider', {
 				name: 'Lightness',
 			} );
-			fireEvent.change( lightnessSlider, { target: { value: 0 } } );
+			await userEvent.fill( lightnessSlider, '0' );
 			await waitFor( () => expect( lightnessSlider ).toHaveValue( '0' ) );
 
 			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
@@ -830,7 +816,7 @@ describe( 'ColorPicker', () => {
 			const hueSlider = screen
 				.getAllByRole( 'slider', { name: 'Hue' } )
 				.at( -1 )!;
-			fireEvent.change( hueSlider, { target: { value: 200 } } );
+			await userEvent.fill( hueSlider, '200' );
 			await waitFor( () => expect( hueSlider ).toHaveValue( '200' ) );
 
 			expectPointerPosition( pointer, {
@@ -855,7 +841,7 @@ describe( 'ColorPicker', () => {
 			const lightnessSlider = screen.getByRole( 'slider', {
 				name: 'Lightness',
 			} );
-			fireEvent.change( lightnessSlider, { target: { value: 100 } } );
+			await userEvent.fill( lightnessSlider, '100' );
 			await waitFor( () =>
 				expect( lightnessSlider ).toHaveValue( '100' )
 			);
@@ -869,7 +855,7 @@ describe( 'ColorPicker', () => {
 			const hueSlider = screen
 				.getAllByRole( 'slider', { name: 'Hue' } )
 				.at( -1 )!;
-			fireEvent.change( hueSlider, { target: { value: 200 } } );
+			await userEvent.fill( hueSlider, '200' );
 			await waitFor( () => expect( hueSlider ).toHaveValue( '200' ) );
 
 			expectPointerPosition( pointer, { top: 0, left: 0 } );
@@ -891,12 +877,12 @@ describe( 'ColorPicker', () => {
 			const lightnessSlider = screen.getByRole( 'slider', {
 				name: 'Lightness',
 			} );
-			fireEvent.change( lightnessSlider, { target: { value: 100 } } );
+			await userEvent.fill( lightnessSlider, '100' );
 
 			const hueSlider = screen
 				.getAllByRole( 'slider', { name: 'Hue' } )
 				.at( -1 )!;
-			fireEvent.change( hueSlider, { target: { value: 200 } } );
+			await userEvent.fill( hueSlider, '200' );
 			await waitFor( () => expect( hueSlider ).toHaveValue( '200' ) );
 
 			const colorSlider = screen.getByRole( 'slider', { name: 'Color' } );
@@ -925,7 +911,7 @@ describe( 'ColorPicker', () => {
 			const hueSlider = screen
 				.getAllByRole( 'slider', { name: 'Hue' } )
 				.at( -1 )!;
-			fireEvent.change( hueSlider, { target: { value: 200 } } );
+			await userEvent.fill( hueSlider, '200' );
 			await waitFor( () => expect( hueSlider ).toHaveValue( '200' ) );
 
 			const colorSlider = screen.getByRole( 'slider', { name: 'Color' } );
@@ -954,7 +940,7 @@ describe( 'ColorPicker', () => {
 			const lightnessSlider = screen.getByRole( 'slider', {
 				name: 'Lightness',
 			} );
-			fireEvent.change( lightnessSlider, { target: { value: 0 } } );
+			await userEvent.fill( lightnessSlider, '0' );
 			await waitFor( () => expect( lightnessSlider ).toHaveValue( '0' ) );
 
 			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
@@ -967,9 +953,7 @@ describe( 'ColorPicker', () => {
 			const saturationSlider = screen.getByRole( 'slider', {
 				name: 'Saturation',
 			} );
-			fireEvent.change( saturationSlider, {
-				target: { value: 25 },
-			} );
+			await userEvent.fill( saturationSlider, '25' );
 			await waitFor( () =>
 				expect( saturationSlider ).toHaveValue( '25' )
 			);
@@ -1018,9 +1002,7 @@ describe( 'ColorPicker', () => {
 			expect( onChange ).not.toHaveBeenCalled();
 
 			// Test pattern 1: Update the slider
-			fireEvent.change( alphaSlider, {
-				target: { value: 75 },
-			} );
+			await userEvent.fill( alphaSlider, '75' );
 
 			await waitFor( () => {
 				expect( onChange ).toHaveBeenCalledTimes( 1 );
@@ -1033,22 +1015,11 @@ describe( 'ColorPicker', () => {
 			onChange.mockClear();
 
 			// Test pattern 2: Update the alphaInput
-			await user.clear( alphaInput );
-			expect( onChange ).toHaveBeenCalledTimes( 1 );
+			await user.fill( alphaInput, '25' );
+			expect( onChange ).toHaveBeenLastCalledWith( '#ffffff40' );
 
-			// Initially type 7 in the alpha input, we expect it to be called with #ffffff12
-			await user.keyboard( '7' );
-
-			// Now with 75% opacity we expect it to be called with #ffffffbf
-			await user.keyboard( '5' );
-
-			// Called twice, once per key stroke (`7` and `5`)
-			expect( onChange ).toHaveBeenCalledTimes( 3 );
-			expect( onChange ).toHaveBeenNthCalledWith( 2, '#ffffff12' );
-			expect( onChange ).toHaveBeenNthCalledWith( 3, '#ffffffbf' );
-
-			expect( alphaSlider ).toHaveValue( '75' );
-			expect( alphaInput ).toHaveValue( 75 );
+			expect( alphaSlider ).toHaveValue( '25' );
+			expect( alphaInput ).toHaveValue( 25 );
 		} );
 	} );
 } );

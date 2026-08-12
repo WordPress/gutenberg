@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi, type Mock } from 'vitest';
+import { userEvent } from 'vitest/browser';
 import {
 	act,
 	fireEvent,
@@ -138,8 +139,8 @@ describe( 'Cropper', () => {
 			name: 'Resize from top-left corner',
 		} );
 
-		fireEvent.blur( canvas, { relatedTarget: handle } );
-		fireEvent.focus( handle );
+		await userEvent.tab();
+		expect( handle ).toHaveFocus();
 
 		expect( canvas ).not.toHaveAccessibleDescription(
 			'When this area is focused, use arrow keys to move the image and plus or minus to zoom. Tab to resize handles and controls.'
@@ -172,7 +173,7 @@ describe( 'Cropper', () => {
 		act( () => {
 			handle.focus();
 		} );
-		fireEvent.keyDown( handle, { key: 'ArrowRight' } );
+		await userEvent.keyboard( '{ArrowRight}' );
 		expect( canvas ).toHaveClass( focusVisibleClass );
 
 		// Switching to the mouse on the same handle must drop the
@@ -208,7 +209,7 @@ describe( 'Cropper', () => {
 		act( () => {
 			handle.focus();
 		} );
-		fireEvent.keyDown( handle, { key: 'Escape' } );
+		await userEvent.keyboard( '{Escape}' );
 
 		expect( canvas ).toHaveFocus();
 	} );
@@ -911,7 +912,8 @@ describe( 'Cropper', () => {
 		const handle = await screen.findByRole( 'button', {
 			name: 'Resize from right edge',
 		} );
-		fireEvent.keyDown( handle, { key: 'ArrowRight' } );
+		handle.focus();
+		await userEvent.keyboard( '{ArrowRight}' );
 
 		const rect = ( controller.setCropRect as Mock ).mock.calls[ 0 ][ 0 ];
 		const region = getSourceRegion(
@@ -953,7 +955,8 @@ describe( 'Cropper', () => {
 			name: 'Resize from right edge',
 		} );
 		( controller.setCropRect as Mock ).mockClear();
-		fireEvent.keyDown( handle, { key: 'ArrowRight' } );
+		handle.focus();
+		await userEvent.keyboard( '{ArrowRight}' );
 
 		const rect = ( controller.setCropRect as Mock ).mock.calls[ 0 ][ 0 ];
 		const region = getSourceRegion(
@@ -986,7 +989,8 @@ describe( 'Cropper', () => {
 		const handle = await screen.findByRole( 'button', {
 			name: 'Resize from right edge',
 		} );
-		fireEvent.keyDown( handle, { key: 'ArrowRight' } );
+		handle.focus();
+		await userEvent.keyboard( '{ArrowRight}' );
 
 		const rect = ( controller.setCropRect as Mock ).mock.calls[ 0 ][ 0 ];
 		const region = getSourceRegion(

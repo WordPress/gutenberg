@@ -1,6 +1,6 @@
 import { describe, expect, it, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { useState } from '@wordpress/element';
 import FontSizePicker from '../';
 import type { FontSize } from '../types';
@@ -724,9 +724,7 @@ describe( 'FontSizePicker', () => {
 			const sliderInput = screen.getByRole( 'slider', {
 				name: 'Font size',
 			} );
-			fireEvent.change( sliderInput, {
-				target: { value: 80 },
-			} );
+			await user.fill( sliderInput, '80' );
 			expect( onChange ).toHaveBeenCalledTimes( 1 );
 			expect( onChange ).toHaveBeenCalledWith( '80px' );
 		} );

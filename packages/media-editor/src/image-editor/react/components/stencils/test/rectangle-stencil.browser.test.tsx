@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { userEvent } from 'vitest/browser';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { RectangleStencil } from '../rectangle-stencil';
 import type {
@@ -103,7 +104,7 @@ describe( 'RectangleStencil', () => {
 	} );
 
 	describe( 'keyboard — Escape', () => {
-		it( 'handles Escape on a handle without bubbling', () => {
+		it( 'handles Escape on a handle without bubbling', async () => {
 			const onKeyDown = vi.fn();
 			const onEscape = vi.fn();
 			render(
@@ -122,17 +123,19 @@ describe( 'RectangleStencil', () => {
 			);
 			const [ firstHandle ] = screen.getAllByRole( 'button' );
 
-			fireEvent.keyDown( firstHandle, { key: 'Escape' } );
+			firstHandle.focus();
+			await userEvent.keyboard( '{Escape}' );
 
 			expect( onEscape ).toHaveBeenCalledTimes( 1 );
 			expect( onKeyDown ).not.toHaveBeenCalled();
 		} );
 
-		it( 'does not call onCropChange when Escape is pressed', () => {
+		it( 'does not call onCropChange when Escape is pressed', async () => {
 			const { onCropChange, onEscape } = renderStencil();
 			const [ firstHandle ] = screen.getAllByRole( 'button' );
 
-			fireEvent.keyDown( firstHandle, { key: 'Escape' } );
+			firstHandle.focus();
+			await userEvent.keyboard( '{Escape}' );
 
 			expect( onEscape ).toHaveBeenCalledTimes( 1 );
 			expect( onCropChange ).not.toHaveBeenCalled();
@@ -159,15 +162,13 @@ describe( 'RectangleStencil', () => {
 			vi.useRealTimers();
 		} );
 
-		it( 'moves the right edge right by KEYBOARD_STEP on ArrowRight (no Shift)', () => {
+		it( 'moves the right edge right by KEYBOARD_STEP on ArrowRight (no Shift)', async () => {
 			const { onCropChange } = renderStencil();
 			// 'e' handle is the 4th button in clockwise order (nw, n, ne, e).
 			const eHandle = screen.getAllByRole( 'button' )[ 3 ];
 
-			fireEvent.keyDown( eHandle, {
-				key: 'ArrowRight',
-				shiftKey: false,
-			} );
+			eHandle.focus();
+			await userEvent.keyboard( '{ArrowRight}' );
 
 			expect( onCropChange ).toHaveBeenCalledTimes( 1 );
 			const newRect: NormalizedRect = onCropChange.mock.calls[ 0 ][ 0 ];
@@ -176,15 +177,13 @@ describe( 'RectangleStencil', () => {
 			expect( newRect.x ).toBeCloseTo( 0.1, 5 );
 		} );
 
-		it( 'moves the bottom edge down by KEYBOARD_STEP on ArrowDown (no Shift)', () => {
+		it( 'moves the bottom edge down by KEYBOARD_STEP on ArrowDown (no Shift)', async () => {
 			const { onCropChange } = renderStencil();
 			// 's' handle is the 6th button (nw, n, ne, e, se, s).
 			const sHandle = screen.getAllByRole( 'button' )[ 5 ];
 
-			fireEvent.keyDown( sHandle, {
-				key: 'ArrowDown',
-				shiftKey: false,
-			} );
+			sHandle.focus();
+			await userEvent.keyboard( '{ArrowDown}' );
 
 			expect( onCropChange ).toHaveBeenCalledTimes( 1 );
 			const newRect: NormalizedRect = onCropChange.mock.calls[ 0 ][ 0 ];
@@ -193,7 +192,7 @@ describe( 'RectangleStencil', () => {
 			expect( newRect.y ).toBeCloseTo( 0.1, 5 );
 		} );
 
-		it( 'applies snapCropRect to freeform resize output', () => {
+		it( 'applies snapCropRect to freeform resize output', async () => {
 			const snapCropRect = vi.fn<
 				(
 					rect: NormalizedRect,
@@ -206,10 +205,8 @@ describe( 'RectangleStencil', () => {
 			const { onCropChange } = renderStencil( { snapCropRect } );
 			const eHandle = screen.getAllByRole( 'button' )[ 3 ];
 
-			fireEvent.keyDown( eHandle, {
-				key: 'ArrowRight',
-				shiftKey: false,
-			} );
+			eHandle.focus();
+			await userEvent.keyboard( '{ArrowRight}' );
 
 			expect( snapCropRect ).toHaveBeenCalledTimes( 1 );
 			expect( snapCropRect.mock.calls[ 0 ][ 0 ].width ).toBeCloseTo(
@@ -223,7 +220,7 @@ describe( 'RectangleStencil', () => {
 			);
 		} );
 
-		it( 'shrinks a locked-ratio crop from a corner handle', () => {
+		it( 'shrinks a locked-ratio crop from a corner handle', async () => {
 			const { onCropChange } = renderStencil( {
 				aspectRatio: 1,
 				containerSize: { width: 500, height: 500 },
@@ -233,10 +230,8 @@ describe( 'RectangleStencil', () => {
 				name: 'Resize from top-left corner',
 			} );
 
-			fireEvent.keyDown( nwHandle, {
-				key: 'ArrowRight',
-				shiftKey: false,
-			} );
+			nwHandle.focus();
+			await userEvent.keyboard( '{ArrowRight}' );
 
 			expect( onCropChange ).toHaveBeenCalledTimes( 1 );
 			const newRect: NormalizedRect = onCropChange.mock.calls[ 0 ][ 0 ];
@@ -260,11 +255,12 @@ describe( 'RectangleStencil', () => {
 	} );
 
 	describe( 'keyboard — arrow keys (coarse step with Shift)', () => {
-		it( 'moves the right edge right by KEYBOARD_STEP_SHIFT on Shift+ArrowRight', () => {
+		it( 'moves the right edge right by KEYBOARD_STEP_SHIFT on Shift+ArrowRight', async () => {
 			const { onCropChange } = renderStencil();
 			const eHandle = screen.getAllByRole( 'button' )[ 3 ];
 
-			fireEvent.keyDown( eHandle, { key: 'ArrowRight', shiftKey: true } );
+			eHandle.focus();
+			await userEvent.keyboard( '{Shift>}{ArrowRight}{/Shift}' );
 
 			expect( onCropChange ).toHaveBeenCalledTimes( 1 );
 			const newRect: NormalizedRect = onCropChange.mock.calls[ 0 ][ 0 ];
@@ -272,20 +268,18 @@ describe( 'RectangleStencil', () => {
 			expect( newRect.width ).toBeCloseTo( 0.9, 5 );
 		} );
 
-		it( 'step is 10x larger with Shift than without', () => {
+		it( 'step is 10x larger with Shift than without', async () => {
 			const { onCropChange } = renderStencil();
 			const eHandle = screen.getAllByRole( 'button' )[ 3 ];
 
-			fireEvent.keyDown( eHandle, {
-				key: 'ArrowRight',
-				shiftKey: false,
-			} );
+			eHandle.focus();
+			await userEvent.keyboard( '{ArrowRight}' );
 			const fineRect: NormalizedRect = onCropChange.mock.calls[ 0 ][ 0 ];
 			const fineDelta = fineRect.width - DEFAULT_CROP_RECT.width;
 
 			onCropChange.mockClear();
 
-			fireEvent.keyDown( eHandle, { key: 'ArrowRight', shiftKey: true } );
+			await userEvent.keyboard( '{Shift>}{ArrowRight}{/Shift}' );
 			const coarseRect: NormalizedRect =
 				onCropChange.mock.calls[ 0 ][ 0 ];
 			const coarseDelta = coarseRect.width - DEFAULT_CROP_RECT.width;
@@ -293,17 +287,15 @@ describe( 'RectangleStencil', () => {
 			expect( coarseDelta / fineDelta ).toBeCloseTo( 10, 0 );
 		} );
 
-		it( 'does not apply snapCropRect while resizing a locked aspect ratio', () => {
+		it( 'does not apply snapCropRect while resizing a locked aspect ratio', async () => {
 			const snapCropRect = vi.fn( ( rect: NormalizedRect ) => rect );
 			renderStencil( { aspectRatio: 1, snapCropRect } );
 			const nwHandle = screen.getByRole( 'button', {
 				name: 'Resize from top-left corner',
 			} );
 
-			fireEvent.keyDown( nwHandle, {
-				key: 'ArrowRight',
-				shiftKey: false,
-			} );
+			nwHandle.focus();
+			await userEvent.keyboard( '{ArrowRight}' );
 
 			expect( snapCropRect ).not.toHaveBeenCalled();
 		} );
