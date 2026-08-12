@@ -19,6 +19,10 @@ export enum ErrorCode {
 	GIF_TRANSCODING_ERROR = 'GIF_TRANSCODING_ERROR',
 	VIDEO_TRANSCODING_ERROR = 'VIDEO_TRANSCODING_ERROR',
 
+	// Server-side commit error: the client-side files uploaded, but the
+	// server failed to finalize the attachment (write its metadata).
+	MEDIA_FINALIZE_ERROR = 'MEDIA_FINALIZE_ERROR',
+
 	// Generic fallback
 	GENERAL = 'GENERAL',
 }

@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import {
 	DndContext,
 	DragOverlay,
@@ -16,10 +13,6 @@ import {
 } from '@dnd-kit/sortable';
 import type { DragMoveEvent, DragStartEvent } from '@dnd-kit/core';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useResizeObserver, useEvent, useMergeRefs } from '@wordpress/compose';
 import {
 	forwardRef,
@@ -31,10 +24,6 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { GridItem } from './grid-item';
 import { GridOverlay } from '../shared/grid-overlay';
 import { gridSpanToPixelSize } from '../shared/resize-snap';

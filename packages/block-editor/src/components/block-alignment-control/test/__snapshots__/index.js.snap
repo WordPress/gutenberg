@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`BlockAlignmentUI should match snapshot when controls are hidden 1`] = `
 <div>
@@ -9,7 +9,7 @@ exports[`BlockAlignmentUI should match snapshot when controls are hidden 1`] = `
     <button
       aria-expanded="false"
       aria-haspopup="true"
-      aria-label="Align"
+      aria-label="Align block"
       class="components-button components-dropdown-menu__toggle has-icon"
       data-toolbar-item="true"
       type="button"
@@ -37,7 +37,7 @@ exports[`BlockAlignmentUI should match snapshot when controls are visible 1`] = 
   <div
     class="components-toolbar"
     icon="[object Object]"
-    label="Align"
+    label="Align block"
   >
     <div>
       <button

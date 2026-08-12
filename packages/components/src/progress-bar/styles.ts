@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import styled from '@emotion/styled';
 import { css, keyframes } from '@emotion/react';
-
-/**
- * WordPress dependencies
- */
 import { isRTL } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { COLORS, CONFIG } from '../utils';
 
 function animateProgressBar( isRtl = false ) {

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -8,15 +5,8 @@ import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { mapMarker } from '@wordpress/icons';
 import { Icon, Link, Stack, EmptyState } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
-import {
-	EventsList,
-	type EventsWidgetAttributes,
-	type WPEvent,
-} from './components';
+import { EventsList, type WPEvent } from './components';
+import type { EventsWidgetAttributes } from './types';
 import styles from './style.module.css';
 
 interface WPEventsResponse {

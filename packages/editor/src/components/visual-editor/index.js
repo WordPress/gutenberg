@@ -1,29 +1,21 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	BlockList,
 	store as blockEditorStore,
 	__unstableUseTypewriter as useTypewriter,
-	__unstableUseTypingObserver as useTypingObserver,
 	useSettings,
 	RecursionProvider,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { useEffect, useRef, useMemo } from '@wordpress/element';
+import { useEffect, useRef, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { parse } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
-import { useMergeRefs, useViewportMatch } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
+import {
+	useMergeRefs,
+	useResizeObserver,
+	useViewportMatch,
+} from '@wordpress/compose';
 import PostTitle from '../post-title';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
@@ -90,10 +82,44 @@ function checkForPostContentAtRootLevel( blocks ) {
 	return false;
 }
 
+const CANVAS_MIN_WIDTH = 300;
+const CANVAS_TARGET_ASPECT_RATIO = 9 / 16;
+
+/**
+ * Returns the canvas height, keeping the aspect ratio of the available space
+ * without exceeding it.
+ *
+ * @param {number} width         The canvas width in pixels.
+ * @param {Object} containerSize The available space, as `{ width, height }` in pixels.
+ * @return {number} The canvas height in pixels.
+ */
+export function getCanvasHeight( width, containerSize ) {
+	const lerp = ( a, b, amount ) => a + ( b - a ) * amount;
+
+	// The narrower the canvas within the available space, the closer to the
+	// target aspect ratio.
+	const lerpFactor =
+		1 -
+		Math.max(
+			0,
+			Math.min(
+				1,
+				( width - CANVAS_MIN_WIDTH ) /
+					( containerSize.width - CANVAS_MIN_WIDTH )
+			)
+		);
+	const aspectRatio = lerp(
+		containerSize.width / containerSize.height,
+		CANVAS_TARGET_ASPECT_RATIO,
+		lerpFactor
+	);
+
+	return Math.min( Math.round( width / aspectRatio ), containerSize.height );
+}
+
 function VisualEditor( {
 	// Ideally as we unify post and site editors, we won't need these props.
 	autoFocus,
-	disableIframe = false,
 	iframeProps,
 	contentRef,
 	className,
@@ -112,6 +138,7 @@ function VisualEditor( {
 		isPreview,
 		styles,
 		hasCanvasWidth,
+		canvasWidth,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostId,
@@ -137,6 +164,7 @@ function VisualEditor( {
 		const supportsTemplateMode = editorSettings.supportsTemplateMode;
 		const postTypeObject = getPostType( postTypeSlug );
 		const currentTemplateId = getCurrentTemplateId();
+		const _canvasWidth = getCanvasWidth();
 		const template = currentTemplateId
 			? getEditedEntityRecord(
 					'postType',
@@ -162,7 +190,8 @@ function VisualEditor( {
 			postType: postTypeSlug,
 			isPreview: editorSettings.isPreviewMode,
 			styles: editorSettings.styles,
-			hasCanvasWidth: getCanvasWidth() !== undefined,
+			hasCanvasWidth: _canvasWidth !== undefined,
+			canvasWidth: _canvasWidth,
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -188,6 +217,16 @@ function VisualEditor( {
 
 	const localRef = useRef();
 	const [ globalLayoutSettings ] = useSettings( 'layout' );
+
+	const [ containerSize, setContainerSize ] = useState();
+	const containerRef = useResizeObserver( ( entries ) => {
+		const { width, height } = entries[ 0 ].contentRect;
+		setContainerSize( ( size ) =>
+			size?.width === width && size?.height === height
+				? size
+				: { width, height }
+		);
+	} );
 
 	// fallbackLayout is used if there is no Post Content,
 	// and for Post Title.
@@ -304,7 +343,6 @@ function VisualEditor( {
 		blockListLayout?.type === 'default' && ! hasPostContentAtRootLevel
 			? fallbackLayout
 			: blockListLayout;
-	const observeTypingRef = useTypingObserver();
 	const titleRef = useRef();
 	useEffect( () => {
 		if ( ! autoFocus || ! isCleanNewPost() ) {
@@ -319,12 +357,14 @@ function VisualEditor( {
 		.is-root-container.alignfull { max-width: none; margin-left: auto; margin-right: auto;}
 		.is-root-container.alignfull:where(.is-layout-flow) > :not(.alignleft):not(.alignright) { max-width: none;}`;
 
+	const isResizablePostType = [
+		NAVIGATION_POST_TYPE,
+		TEMPLATE_PART_POST_TYPE,
+		PATTERN_POST_TYPE,
+	].includes( postType );
+
 	const enableResizing =
-		( [
-			NAVIGATION_POST_TYPE,
-			TEMPLATE_PART_POST_TYPE,
-			PATTERN_POST_TYPE,
-		].includes( postType ) &&
+		( isResizablePostType &&
 			// Disable in previews / view mode.
 			! isPreview &&
 			// Disable resizing in mobile viewport.
@@ -340,7 +380,18 @@ function VisualEditor( {
 		! isPreview && renderingMode === 'post-only' && ! isDesignPostType
 	);
 
+	const shouldConstrainCanvasHeight =
+		enableResizing &&
+		canvasWidth &&
+		containerSize?.height > 0 &&
+		containerSize?.width > CANVAS_MIN_WIDTH;
+	const canvasHeight = shouldConstrainCanvasHeight
+		? getCanvasHeight( canvasWidth, containerSize )
+		: '100%';
+
 	const centerContentCSS = `display:flex;align-items:center;justify-content:center;`;
+	const iframeBodyMinHeightCSS =
+		hasCanvasWidth && ! isResizablePostType ? 'min-height:100vh;' : '';
 
 	const iframeStyles = useMemo( () => {
 		return [
@@ -359,7 +410,7 @@ function VisualEditor( {
 				${ paddingStyle ? paddingStyle : '' }
 				${
 					enableResizing
-						? `.block-editor-iframe__html{background:var(--wp-editor-canvas-background);min-height:100vh;${ centerContentCSS }}.block-editor-iframe__body{width:100%;}`
+						? `.block-editor-iframe__html{background:var(--wp-editor-canvas-background);min-height:100vh;${ centerContentCSS }}.block-editor-iframe__body{width:100%;${ iframeBodyMinHeightCSS }}`
 						: ''
 				}${
 					isNavigationPreview
@@ -371,7 +422,14 @@ function VisualEditor( {
 				// The CSS for isNavigationPreview centers the body content vertically and horizontally when the navigation is in preview mode.
 			},
 		];
-	}, [ styles, enableResizing, isNavigationPreview, paddingStyle ] );
+	}, [
+		styles,
+		enableResizing,
+		centerContentCSS,
+		iframeBodyMinHeightCSS,
+		isNavigationPreview,
+		paddingStyle,
+	] );
 
 	const typewriterRef = useTypewriter();
 	contentRef = useMergeRefs( [
@@ -391,6 +449,7 @@ function VisualEditor( {
 
 	return (
 		<div
+			ref={ containerRef }
 			className={ clsx(
 				'editor-visual-editor',
 				// this class is here for backward compatibility reasons.
@@ -403,14 +462,19 @@ function VisualEditor( {
 					// Horizontal padding leaves room for the resize handles
 					// that appear on the left/right of a resizable canvas.
 					'has-horizontal-padding': isFocusedEntity || enableResizing,
-					'is-iframed': ! disableIframe,
 				}
 			) }
 		>
 			<SyncConnectionErrorModal />
-			<ResizableEditor enableResizing={ enableResizing } height="100%">
+			<ResizableEditor
+				enableResizing={ enableResizing }
+				width={
+					enableResizing && canvasWidth ? canvasWidth + 'px' : '100%'
+				}
+				height={ canvasHeight }
+			>
 				<BlockCanvas
-					shouldIframe={ ! disableIframe }
+					shouldIframe
 					contentRef={ contentRef }
 					styles={ iframeStyles }
 					height="100%"
@@ -454,10 +518,9 @@ function VisualEditor( {
 								}
 							) }
 							contentEditable={ false }
-							ref={ observeTypingRef }
 							style={ {
-								// This is using inline styles
-								// so it's applied for both iframed and non iframed editors.
+								// This is using inline styles so it's applied
+								// within the editor iframe.
 								marginTop: '4rem',
 							} }
 						>
@@ -484,11 +547,10 @@ function VisualEditor( {
 							) }
 							layout={ blockListLayout }
 							dropZoneElement={
-								// When iframed, pass in the html element of the iframe to
-								// ensure the drop zone extends to the edges of the iframe.
-								disableIframe
-									? localRef.current
-									: localRef.current?.parentNode
+								// Pass in the html element of the iframe to
+								// ensure the drop zone extends to the edges of
+								// the iframe.
+								localRef.current?.parentNode
 							}
 							__unstableDisableDropZone={
 								// In template preview mode, disable drop zones at the root of the template.

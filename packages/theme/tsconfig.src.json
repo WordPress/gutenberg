@@ -10,8 +10,7 @@
 			"react-css-custom-properties"
 		]
 	},
-	"exclude": [],
-	"files": [ "global.d.ts" ],
+	"exclude": [ "**/stories/**", "**/test/**", "**/*.story.*" ],
 	"references": [
 		{ "path": "../compose" },
 		{ "path": "../deprecated" },

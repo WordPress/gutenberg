@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useViewportMatch } from '@wordpress/compose';
 
 export function useToolsPanelDropdownMenuProps() {

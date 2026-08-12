@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
@@ -12,10 +9,6 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useView, useViewConfig } from '@wordpress/views';
 import { useSelect } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import {
 	PATTERN_TYPES,
 	TEMPLATE_PART_POST_TYPE,

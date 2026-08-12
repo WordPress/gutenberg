@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { NavigableRegion, getAdminThemeColors } from '@wordpress/admin-ui';
 import {
 	__unstableMotion as motion,
@@ -34,10 +27,6 @@ import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { Tooltip } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { SiteHubMobile } from '../site-hub';
 import ResizableFrame from '../resizable-frame';
 import { unlock } from '../../lock-unlock';
@@ -95,6 +84,7 @@ function Layout() {
 			( desktopToggle ?? mobileToggleRef.current )?.focus();
 		}
 		// Should not depend on the previous canvas mode value but the next.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ canvas ] );
 
 	return (
@@ -103,7 +93,6 @@ function Layout() {
 			{ canvas === 'view' && <SaveKeyboardShortcut /> }
 			<div
 				{ ...navigateRegionsProps }
-				ref={ navigateRegionsProps.ref }
 				className={ clsx(
 					'edit-site-layout',
 					navigateRegionsProps.className,
@@ -174,9 +163,6 @@ function Layout() {
 										{ showMobileSiteHub && (
 											<SiteHubMobile
 												ref={ mobileToggleRef }
-												isTransparent={
-													isResizableFrameOversized
-												}
 											/>
 										) }
 										{ areas.mobileContent ? (

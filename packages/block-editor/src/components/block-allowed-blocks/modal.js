@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	Flex,
@@ -12,10 +9,6 @@ import {
 import { useState } from '@wordpress/element';
 import { _x, __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import BlockManager from '../block-manager';
 

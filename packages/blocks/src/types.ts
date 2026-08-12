@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { ComponentType, ReactElement } from 'react';
 
 /**
@@ -291,6 +288,19 @@ export interface BlockType<
 	 * Allowed child block types.
 	 */
 	allowedBlocks?: string[];
+	/**
+	 * Initial child blocks created when an empty block of this type
+	 * is inserted, as a list of `[ name, attributes, innerTemplate ]`
+	 * items.
+	 */
+	template?: Array<
+		[ string, Record< string, unknown >?, Array< unknown >? ]
+	>;
+	/**
+	 * Whether the selection should move into the first block created from
+	 * the template when it is inserted.
+	 */
+	templateInsertUpdatesSelection?: boolean;
 	/**
 	 * Context provided for available access by descendants of
 	 * blocks of this type, in the form of an object which maps
@@ -840,8 +850,17 @@ export interface TypographyProps {
 export interface SpacingProps {
 	/**
 	 * Enable block gap control.
+	 *
+	 * The object form declares the sides the control applies to, and the gap
+	 * value to fall back to when neither the theme nor the user has set one.
 	 */
-	blockGap: boolean | AxialDirection[];
+	blockGap:
+		| boolean
+		| AxialDirection[]
+		| {
+				__experimentalDefault?: string;
+				sides?: AxialDirection[];
+		  };
 
 	/**
 	 * Enable margin control UI for all or specified element directions.

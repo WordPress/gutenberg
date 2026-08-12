@@ -1,13 +1,7 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * Internal dependencies
- */
 import SelectControl from '..';
+import { InputControlPrefixWrapper } from '../../input-control/input-prefix-wrapper';
 
 describe( 'SelectControl', () => {
 	it( 'should not render when no options or children are provided', () => {
@@ -225,4 +219,40 @@ describe( 'SelectControl', () => {
 		} );
 	} );
 	/* eslint-enable jest/expect-expect */
+
+	describe( 'Legacy size support', () => {
+		it( 'treats __unstable-large the same as default', () => {
+			const prefix = (
+				<InputControlPrefixWrapper>$</InputControlPrefixWrapper>
+			);
+			const options = [ { value: 'one', label: 'One' } ];
+
+			render(
+				<SelectControl
+					label="Test"
+					options={ options }
+					prefix={ prefix }
+				/>
+			);
+			render(
+				<SelectControl
+					label="Test"
+					options={ options }
+					prefix={ prefix }
+					// @ts-expect-error testing legacy runtime support for removed size type
+					size="__unstable-large"
+				/>
+			);
+
+			const [ defaultPrefixWrapper, legacyPrefixWrapper ] =
+				screen.getAllByText( '$' );
+			const [ defaultSelect, legacySelect ] =
+				screen.getAllByRole( 'combobox' );
+
+			expect( legacyPrefixWrapper ).toMatchStyleDiffSnapshot(
+				defaultPrefixWrapper
+			);
+			expect( legacySelect ).toMatchStyleDiffSnapshot( defaultSelect );
+		} );
+	} );
 } );

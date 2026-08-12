@@ -403,6 +403,9 @@ class WP_Theme_JSON_Gutenberg {
 			'backgroundSize'  => null,
 			'gradient'        => null,
 		),
+		'blockVisibility'               => array(
+			'allowEditing' => true,
+		),
 		'border'                        => array(
 			'color'       => null,
 			'radius'      => null,
@@ -1305,7 +1308,9 @@ class WP_Theme_JSON_Gutenberg {
 		 */
 		foreach ( $valid_block_names as $block ) {
 			$schema_settings_blocks[ $block ] = static::VALID_SETTINGS;
+			// `viewport` and `blockVisibility` are global-only settings and cannot be set per block for now.
 			unset( $schema_settings_blocks[ $block ]['viewport'] );
+			unset( $schema_settings_blocks[ $block ]['blockVisibility'] );
 			$schema_styles_blocks[ $block ]             = $styles_non_top_level;
 			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
 
@@ -1465,7 +1470,7 @@ class WP_Theme_JSON_Gutenberg {
 		 * there should be no way for a comma to mean anything other than a
 		 * comma token. The exception are syntax errors, which are not handled here.
 		 *
-		 * @see https://www.w3.org/TR/css-syntax-3/#parse-comma-separated-list-of-component-values
+		 * @link https://www.w3.org/TR/css-syntax-3/#parse-comma-separated-list-of-component-values
 		 */
 		if ( strlen( $selector ) === strcspn( $selector, '/\'"(<\\' ) ) {
 			return str_replace( ',', $to_append . ',', $selector ) . $to_append;
@@ -1514,7 +1519,7 @@ class WP_Theme_JSON_Gutenberg {
 		 * there should be no way for a comma to mean anything other than a
 		 * comma token. The exception are syntax errors, which are not handled here.
 		 *
-		 * @see https://www.w3.org/TR/css-syntax-3/#parse-comma-separated-list-of-component-values
+		 * @link https://www.w3.org/TR/css-syntax-3/#parse-comma-separated-list-of-component-values
 		 */
 		if ( strlen( $selector ) === strcspn( $selector, '/\'"(<\\' ) ) {
 			return $to_prepend . str_replace( ',', ',' . $to_prepend, $selector );
@@ -1560,8 +1565,8 @@ class WP_Theme_JSON_Gutenberg {
 	 *     // Comments stay with the selector they follow.
 	 *     array( '.a /* a, the first *\/', '.b' ) === self::split_selector_list( '.a /* a, the first *\/,.b' );
 	 *
-	 * @see https://www.w3.org/TR/selectors/#parse-selector
-	 * @see https://www.w3.org/TR/css-syntax-3/
+	 * @link https://www.w3.org/TR/selectors/#parse-selector
+	 * @link https://www.w3.org/TR/css-syntax-3/
 	 *
 	 * @param string $selector CSS selector list.
 	 * @return string[] Selectors.
@@ -1666,8 +1671,8 @@ class WP_Theme_JSON_Gutenberg {
 				 * > not included in this definition, as they are converted
 				 * > to U+000A LINE FEED during preprocessing.
 				 *
-				 * @see https://www.w3.org/TR/css-syntax/#whitespace
-				 * @see https://www.w3.org/TR/css-syntax/#newline
+				 * @link https://www.w3.org/TR/css-syntax/#whitespace
+				 * @link https://www.w3.org/TR/css-syntax/#newline
 				 */
 				$selectors[] = trim( substr( $selector, $was_at, $next_at - $was_at ), " \t\n" );
 				$at          = $next_at + 1;
@@ -2420,7 +2425,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *     background: value;
 	 *   }
 	 *
-	 *   p.has-value-gradient-background {
+	 *   :where(p).has-value-gradient-background {
 	 *     background: value;
 	 *   }
 	 *
@@ -2623,8 +2628,16 @@ class WP_Theme_JSON_Gutenberg {
 					$css_var    = static::replace_slug_in_string( $preset_metadata['css_vars'], $slug );
 					$class_name = static::replace_slug_in_string( $class, $slug );
 
-					// $selector is often empty, so we can save ourselves the `append_to_selector()` call then.
-					$new_selector = '' === $selector ? $class_name : static::append_to_selector( $selector, $class_name );
+					/*
+					 * $selector is often empty (root-level presets), in which case the
+					 * bare class is used. For block-level presets the block selector is
+					 * wrapped in `:where()` so the class keeps the same 0-1-0 specificity
+					 * as a root-level preset. Without this, block-level palette rules
+					 * (e.g. `p.has-x-color`) out-rank equally-important rules that also
+					 * target the same property at 0-1-0, such as per-instance responsive
+					 * state styles.
+					 */
+					$new_selector = '' === $selector ? $class_name : ':where(' . $selector . ')' . $class_name;
 					$stylesheet  .= static::to_ruleset(
 						$new_selector,
 						array(
@@ -3690,22 +3703,45 @@ class WP_Theme_JSON_Gutenberg {
 					}
 				}
 			}
-			if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'] ) ) {
-				foreach ( $theme_json['styles']['blocks'][ $name ]['elements'] as $element => $node ) {
+			/*
+			 * Elements can be styled outside any breakpoint, inside one, or both,
+			 * so collect the names from all of those places before looping. An
+			 * element styled only inside a breakpoint still needs a node.
+			 */
+			$block_node    = $theme_json['styles']['blocks'][ $name ] ?? array();
+			$element_names = array_keys( $block_node['elements'] ?? array() );
+			foreach ( array_keys( $responsive_media_queries ) as $breakpoint ) {
+				$element_names = array_merge(
+					$element_names,
+					array_keys( $block_node[ $breakpoint ]['elements'] ?? array() )
+				);
+			}
+			$element_names = array_unique( $element_names );
+
+			if ( ! empty( $element_names ) ) {
+				foreach ( $element_names as $element ) {
 					$element_path = array( 'styles', 'blocks', $name, 'elements', $element );
 					if ( $include_node_paths_only ) {
-						$nodes[] = array(
-							'path' => $element_path,
-						);
+						if ( isset( $block_node['elements'][ $element ] ) ) {
+							$nodes[] = array(
+								'path' => $element_path,
+							);
+						}
+						continue;
+					}
+
+					if ( ! isset( $selectors[ $name ]['elements'][ $element ] ) ) {
 						continue;
 					}
 
 					$element_selector = $selectors[ $name ]['elements'][ $element ];
 
-					$nodes[] = array(
-						'path'     => $element_path,
-						'selector' => $element_selector,
-					);
+					if ( isset( $block_node['elements'][ $element ] ) ) {
+						$nodes[] = array(
+							'path'     => $element_path,
+							'selector' => $element_selector,
+						);
+					}
 
 					// Responsive element nodes: one node per breakpoint that has
 					// styles for this element. Cascade: a{} → @media{a{}}
@@ -3722,42 +3758,26 @@ class WP_Theme_JSON_Gutenberg {
 					// Handle any pseudo selectors for the element.
 					if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] ) ) {
 						foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $pseudo_selector ) {
-							// Create element pseudo node if default or any responsive breakpoint has the pseudo.
-							$has_element_pseudo = isset( $theme_json['styles']['blocks'][ $name ]['elements'][ $element ][ $pseudo_selector ] );
-							if ( ! $has_element_pseudo ) {
-								foreach ( array_keys( $responsive_media_queries ) as $bp ) {
-									if ( isset( $theme_json['styles']['blocks'][ $name ][ $bp ]['elements'][ $element ][ $pseudo_selector ] ) ) {
-										$has_element_pseudo = true;
-										break;
-									}
-								}
-							}
-
-							if ( $has_element_pseudo ) {
-								$element_pseudo_path = array( 'styles', 'blocks', $name, 'elements', $element );
-								if ( $include_node_paths_only ) {
-									$nodes[] = array(
-										'path' => $element_pseudo_path,
-									);
-									continue;
-								}
-
+							// Emit the default pseudo node only when the default state styles
+							// the pseudo. Otherwise get_styles_for_block() falls back to the
+							// element's base styles, outputting a rule the theme never defined.
+							if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'][ $element ][ $pseudo_selector ] ) ) {
 								$nodes[] = array(
-									'path'     => $element_pseudo_path,
+									'path'     => array( 'styles', 'blocks', $name, 'elements', $element ),
 									'selector' => static::append_to_selector( $element_selector, $pseudo_selector ),
 								);
+							}
 
-								// Responsive element pseudo nodes: one node per breakpoint
-								// that has this pseudo state for this element.
-								// Cascade: a:hover{} → @media{a:hover{}}
-								foreach ( array_keys( $responsive_media_queries ) as $breakpoint ) {
-									if ( isset( $theme_json['styles']['blocks'][ $name ][ $breakpoint ]['elements'][ $element ][ $pseudo_selector ] ) ) {
-										$nodes[] = array(
-											'path'        => array( 'styles', 'blocks', $name, $breakpoint, 'elements', $element ),
-											'selector'    => static::append_to_selector( $element_selector, $pseudo_selector ),
-											'media_query' => $responsive_media_queries[ $breakpoint ],
-										);
-									}
+							// Responsive element pseudo nodes: one node per breakpoint
+							// that has this pseudo state for this element.
+							// Cascade: a:hover{} → @media{a:hover{}}
+							foreach ( array_keys( $responsive_media_queries ) as $breakpoint ) {
+								if ( isset( $theme_json['styles']['blocks'][ $name ][ $breakpoint ]['elements'][ $element ][ $pseudo_selector ] ) ) {
+									$nodes[] = array(
+										'path'        => array( 'styles', 'blocks', $name, $breakpoint, 'elements', $element ),
+										'selector'    => static::append_to_selector( $element_selector, $pseudo_selector ),
+										'media_query' => $responsive_media_queries[ $breakpoint ],
+									);
 								}
 							}
 						}
@@ -5662,6 +5682,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * For example, `var:preset|color|vivid-green-cyan` becomes `var(--wp--preset--color--vivid-green-cyan)`.
 	 *
 	 * @since 6.3.0
+	 * @since 7.2.0 Preset reference slugs are kebab-cased to match the generated custom properties.
 	 * @param string $value The variable such as var:preset|color|vivid-green-cyan to convert.
 	 * @return string The converted variable.
 	 */
@@ -5671,12 +5692,29 @@ class WP_Theme_JSON_Gutenberg {
 		$token_in   = '|';
 		$token_out  = '--';
 		if ( str_starts_with( $value, $prefix ) ) {
-			$unwrapped_name = str_replace(
-				$token_in,
-				$token_out,
-				substr( $value, $prefix_len )
-			);
-			$value          = "var(--wp--$unwrapped_name)";
+			$parts = explode( $token_in, substr( $value, $prefix_len ) );
+
+			/*
+			 * The slug of a preset reference is kebab-cased so the resulting
+			 * custom property matches the one generated from the preset,
+			 * whose slug is also kebab-cased (see `get_settings_values_by_slug()`).
+			 * For slugs that are not already kebab-cased (e.g. `n27`), a verbatim
+			 * conversion produces a reference to a custom property that does
+			 * not exist (`--wp--preset--font-family--n27` instead of the
+			 * generated `--wp--preset--font-family--n-27`).
+			 *
+			 * Duotone is the exception: its custom properties are generated by
+			 * `WP_Duotone_Gutenberg` from the presets it registers in
+			 * `get_all_global_styles_presets()`. Duotone references are
+			 * kebab-cased all the same: the editor and the JS style engine
+			 * kebab-case the references of every preset type, and
+			 * `WP_Duotone_Gutenberg` looks up presets by kebab-cased filter ID.
+			 */
+			if ( 3 === count( $parts ) && 'preset' === $parts[0] ) {
+				$parts[2] = _wp_to_kebab_case( $parts[2] );
+			}
+
+			$value = 'var(--wp--' . implode( $token_out, $parts ) . ')';
 		}
 
 		return $value;

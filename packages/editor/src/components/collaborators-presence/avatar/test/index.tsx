@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { Tooltip } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import Avatar from '..';
 
 /**

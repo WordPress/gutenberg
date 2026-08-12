@@ -24,13 +24,6 @@ $swatch-gap: 12px;
 	min-width: 0;
 }
 
-.block-editor-panel-color-gradient-settings.block-editor-panel-color-gradient-settings {
-	&,
-	& > div:not(:first-of-type) {
-		display: block;
-	}
-}
-
 .block-editor-panel-color-gradient-settings {
 	@media screen and (min-width: $break-medium) {
 		.components-circular-option-picker__swatches {
@@ -46,6 +39,23 @@ $swatch-gap: 12px;
 		margin-bottom: inherit;
 	}
 
+	/* Increased specificity required to remove the slot wrapper's row gap */
+	&#{&} {
+		.block-editor-panel-color-gradient-settings__inner-wrapper {
+			// `ToolsPanel` spans the inner wrapper across its grid via a
+			// positional selector that assumes a header is present. This panel
+			// can render without one (`showTitle={ false }`), so span it here.
+			grid-column: 1 / -1;
+			row-gap: 0;
+
+			// Unlike the other panels using an inner wrapper, this component
+			// accepts arbitrary children. Those carry no `ToolsPanelItem`
+			// class, so they'd otherwise be auto-placed into a single column.
+			> * {
+				grid-column: 1 / -1;
+			}
+		}
+	}
 }
 
 .block-editor-panel-color-gradient-settings__dropdown-content {
