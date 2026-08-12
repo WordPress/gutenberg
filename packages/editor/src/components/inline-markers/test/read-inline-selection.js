@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { readInlineSelection } from '../read-inline-selection';
 
 /**

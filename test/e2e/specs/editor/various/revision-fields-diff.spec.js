@@ -11,7 +11,7 @@ test.describe( 'Revision Fields Diff Panel', () => {
 	} ) => {
 		// Revision 1: paragraph with footnote "alpha".
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'Paragraph one' );
 		await editor.showBlockToolbar();

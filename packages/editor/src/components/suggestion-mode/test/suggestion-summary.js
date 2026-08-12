@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { summarizeOperations } from '../suggestion-summary';
 
 describe( 'summarizeOperations', () => {

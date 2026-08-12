@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { useAnnotateRanges } from '../inline-markers';
 import { SUGGESTION_ANNOTATION_SOURCE } from './format';
 

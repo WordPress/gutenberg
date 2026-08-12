@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render, act } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import {
 	createRegistry,
 	createReduxStore,
@@ -26,10 +19,6 @@ import {
 	unregisterFormatType,
 	store as richTextStore,
 } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import {
 	SUGGESTION_FORMAT_NAME,
 	suggestionFormat,

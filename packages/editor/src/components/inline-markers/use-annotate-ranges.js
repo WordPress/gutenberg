@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as annotationsStore } from '@wordpress/annotations';

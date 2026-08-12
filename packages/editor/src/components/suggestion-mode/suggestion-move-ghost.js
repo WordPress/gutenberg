@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { BlockIcon, store as blockEditorStore } from '@wordpress/block-editor';
 import { getBlockType } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import { VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 
 /**

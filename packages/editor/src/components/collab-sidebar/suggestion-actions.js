@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import {
@@ -12,10 +9,6 @@ import { Stack } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { check, closeSmall } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import {
 	hasAttributeConflict,
 	parseSuggestionPayload,

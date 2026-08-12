@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	RichTextData,
 	create,
@@ -9,10 +6,6 @@ import {
 	removeFormat,
 	applyFormat,
 } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import {
 	SUGGESTION_FORMAT_NAME,
 	SUGGESTION_ID_ATTRIBUTE,

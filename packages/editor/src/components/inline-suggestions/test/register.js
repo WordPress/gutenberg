@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { select } from '@wordpress/data';
 import {
 	store as richTextStore,
 	unregisterFormatType,
 } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import {
 	registerSuggestionFormat,
 	SUGGESTION_FORMAT_NAME,

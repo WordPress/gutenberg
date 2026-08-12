@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { createSuggestionWriteQueue } from '../suggestion-write-queue';
 
 /** Create a promise whose resolution the test controls. */

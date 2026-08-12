@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { buildMoveGhostIndex } from '../move-ghost-index';
 
 const resolvers = ( existingIds, siblingsByParent ) => ( {

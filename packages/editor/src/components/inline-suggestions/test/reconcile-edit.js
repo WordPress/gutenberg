@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import {
 	RichTextData,
 	store as richTextStore,
 	unregisterFormatType,
 } from '@wordpress/rich-text';
 import { select } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import {
 	analyzeTextEdit,
 	planEditMarkers,
