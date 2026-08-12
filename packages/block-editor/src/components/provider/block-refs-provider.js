@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createContext, useMemo } from '@wordpress/element';
 import { observableMap } from '@wordpress/compose';
 

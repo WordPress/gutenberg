@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { contextConnect, useContextSystem } from '../context';
 import { DropdownContentWrapperDiv } from './styles';

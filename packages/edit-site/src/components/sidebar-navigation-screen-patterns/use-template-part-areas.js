@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
-
-/**
- * Internal dependencies
- */
 import {
 	TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
 	TEMPLATE_PART_POST_TYPE,

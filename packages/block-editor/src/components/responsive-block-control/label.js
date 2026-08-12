@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { VisuallyHidden } from '@wordpress/ui';
 import { _x, sprintf } from '@wordpress/i18n';

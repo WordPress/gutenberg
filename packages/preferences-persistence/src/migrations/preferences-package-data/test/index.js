@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import convertPreferencesPackageData from '../';
 
 const input = {

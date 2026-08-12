@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	Icon as WCIcon,
@@ -22,10 +15,6 @@ import {
 	arrowLeft,
 } from '@wordpress/icons';
 import { getBlockType } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';

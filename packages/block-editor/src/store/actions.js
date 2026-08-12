@@ -1,7 +1,4 @@
 /* eslint no-console: [ 'error', { allow: [ 'error', 'warn' ] } ] */
-/**
- * WordPress dependencies
- */
 import {
 	cloneBlock,
 	cloneSanitizedBlock,
@@ -22,10 +19,6 @@ import { store as noticesStore } from '@wordpress/notices';
 import { create, insert, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import {
 	retrieveSelectedAttribute,
 	findRichTextAttributeKey,
@@ -36,6 +29,7 @@ import {
 	privateRemoveBlocks,
 	editContentOnlySection,
 } from './private-actions';
+import { getSiblingBlockAttributes } from '../utils/sibling-block-attributes';
 
 /** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
 
@@ -328,13 +322,31 @@ export const multiSelect =
 		} );
 
 		const blockCount = select.getSelectedBlockCount();
+		const nestedBlockCount = select.getClientIdsOfDescendants(
+			select.getMultiSelectedBlockClientIds()
+		).length;
 
 		speak(
-			sprintf(
-				/* translators: %s: number of selected blocks */
-				_n( '%s block selected.', '%s blocks selected.', blockCount ),
-				blockCount
-			),
+			nestedBlockCount
+				? sprintf(
+						/* translators: 1: number of selected blocks. 2: number of blocks including nested blocks. */
+						_n(
+							'%1$s block selected, %2$s including nested blocks.',
+							'%1$s blocks selected, %2$s including nested blocks.',
+							blockCount
+						),
+						blockCount,
+						blockCount + nestedBlockCount
+				  )
+				: sprintf(
+						/* translators: %s: number of selected blocks */
+						_n(
+							'%s block selected.',
+							'%s blocks selected.',
+							blockCount
+						),
+						blockCount
+				  ),
 			'assertive'
 		);
 	};
@@ -1058,14 +1070,19 @@ export const __unstableSplitSelection =
 			else if ( ! select.getBlockOrder( selectionA.clientId ).length ) {
 				function createEmpty() {
 					const defaultBlockName = getDefaultBlockName();
-					return select.canInsertBlockType(
-						defaultBlockName,
-						anchorRootClientId
-					)
-						? createBlock( defaultBlockName )
-						: createBlock(
-								select.getBlockName( selectionA.clientId )
-						  );
+					if (
+						select.canInsertBlockType(
+							defaultBlockName,
+							anchorRootClientId
+						)
+					) {
+						return createBlock( defaultBlockName );
+					}
+					const name = select.getBlockName( selectionA.clientId );
+					return createBlock(
+						name,
+						getSiblingBlockAttributes( name, blockAttributes )
+					);
 				}
 
 				const length = blockAttributes[ attributeKeyA ].length;
@@ -1902,19 +1919,14 @@ export const insertBeforeBlock =
 			return dispatch.insertDefaultBlock( {}, rootClientId, blockIndex );
 		}
 
-		const copiedAttributes = {};
-		if ( directInsertBlock.attributesToCopy ) {
-			const attributes = select.getBlockAttributes( clientId );
-			directInsertBlock.attributesToCopy.forEach( ( key ) => {
-				if ( attributes[ key ] ) {
-					copiedAttributes[ key ] = attributes[ key ];
-				}
-			} );
-		}
-
 		const block = createBlock( directInsertBlock.name, {
 			...directInsertBlock.attributes,
-			...copiedAttributes,
+			...( select.getBlockName( clientId ) === directInsertBlock.name
+				? getSiblingBlockAttributes(
+						directInsertBlock.name,
+						select.getBlockAttributes( clientId )
+				  )
+				: {} ),
 		} );
 		return dispatch.insertBlock( block, blockIndex, rootClientId );
 	};
@@ -1945,19 +1957,14 @@ export const insertAfterBlock =
 			);
 		}
 
-		const copiedAttributes = {};
-		if ( directInsertBlock.attributesToCopy ) {
-			const attributes = select.getBlockAttributes( clientId );
-			directInsertBlock.attributesToCopy.forEach( ( key ) => {
-				if ( attributes[ key ] ) {
-					copiedAttributes[ key ] = attributes[ key ];
-				}
-			} );
-		}
-
 		const block = createBlock( directInsertBlock.name, {
 			...directInsertBlock.attributes,
-			...copiedAttributes,
+			...( select.getBlockName( clientId ) === directInsertBlock.name
+				? getSiblingBlockAttributes(
+						directInsertBlock.name,
+						select.getBlockAttributes( clientId )
+				  )
+				: {} ),
 		} );
 		return dispatch.insertBlock( block, blockIndex + 1, rootClientId );
 	};

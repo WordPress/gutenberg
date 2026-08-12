@@ -1,22 +1,11 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { Spinner } from '@wordpress/components';
 import { Component, Suspense } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Card, Notice, Stack, VisuallyHidden } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
-
-/**
- * Internal dependencies
- */
 import { WidgetHeader } from '../widget-header';
 import { WidgetRender } from '../widget-render';
 import styles from './widget-frame.module.css';

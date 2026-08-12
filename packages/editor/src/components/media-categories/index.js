@@ -5,17 +5,9 @@
  * In the future we could consider creating an Openvese package that can be used in both `editor` and `site-editor`.
  * The rest of the settings would still need to be in sync though.
  */
-
-/**
- * WordPress dependencies
- */
 import { __, sprintf, _x } from '@wordpress/i18n';
 import { dispatch, resolveSelect, select, subscribe } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 
 /** @typedef {import('@wordpress/block-editor').InserterMediaRequest} InserterMediaRequest */

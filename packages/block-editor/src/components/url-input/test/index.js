@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { speak } from '@wordpress/a11y';
 import { useState } from '@wordpress/element';
 import { dispatch } from '@wordpress/data';
 import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import URLInput from '../';
 import { store as blockEditorStore } from '../../../store';
 

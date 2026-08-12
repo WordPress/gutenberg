@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	BaseControl,
 	__experimentalHStack as HStack,
@@ -8,10 +5,6 @@ import {
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { _x, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import useSpacingSizes from './hooks/use-spacing-sizes';
 import AxialInputControls from './input-controls/axial';
 import SeparatedInputControls from './input-controls/separated';
@@ -132,8 +125,8 @@ export default function SpacingSizesControl( {
 		ALL_SIDES.includes( view ) && showSideInLabel ? LABELS[ view ] : '';
 
 	const label = sprintf(
-		// translators: 1: The side of the block being modified (top, bottom, left etc.). 2. Type of spacing being modified (padding, margin, etc).
-		_x( '%1$s %2$s', 'spacing' ),
+		// translators: 1: Type of spacing being modified (Padding, Margin, etc.). 2: The side of the block being modified (Top, Bottom, Left, etc.).
+		_x( '%1$s %2$s', 'spacing control label' ),
 		labelProp,
 		sideLabel
 	).trim();

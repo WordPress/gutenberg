@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import { usePrevious } from '@wordpress/compose';
 import { useEffect, useState, useCallback } from '@wordpress/element';
 import type { Y } from '@wordpress/sync';
-
-/**
- * Internal dependencies
- */
 import { getSyncManager } from '../sync';
 import { usePostContentBlocks } from '../awareness/block-lookup';
 import type { EditorStoreBlock } from '../awareness/block-lookup';

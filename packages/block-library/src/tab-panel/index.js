@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { tabPanel as icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
 import edit from './edit';
 import save from './save';
@@ -28,6 +21,20 @@ export { metadata, name };
 export const settings = {
 	icon,
 	template: TEMPLATE,
+	__experimentalLabel( attributes, { context } ) {
+		const { label } = attributes;
+
+		const customName = attributes?.metadata?.name;
+		const hasLabel = label?.trim().length > 0;
+
+		if ( context === 'list-view' && ( customName || hasLabel ) ) {
+			return customName || label;
+		}
+
+		if ( context === 'breadcrumb' && customName ) {
+			return customName;
+		}
+	},
 	edit,
 	save,
 };

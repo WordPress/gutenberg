@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { canvasConvertToJpeg } from '../canvas-utils';
 import { getHeicUnsupportedMessage } from '../heic-support';
 
