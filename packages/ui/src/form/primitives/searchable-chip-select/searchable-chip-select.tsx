@@ -8,7 +8,12 @@ import * as Combobox from '../combobox';
 import { InputLayout } from '../input-layout';
 import styles from './style.module.css';
 import type { Item, ItemGroup, SearchableChipSelectProps } from './types';
-import { isItem } from './types';
+import {
+	findCreatableItem,
+	isItem,
+	normalizeRootItems,
+	shouldSkipCollectionEntry,
+} from './types';
 
 /**
  * A searchable multi-selection component with chips, with support for
@@ -20,7 +25,6 @@ export const SearchableChipSelect = forwardRef<
 >( function SearchableChipSelect(
 	{
 		children,
-		creatableItem,
 		disabled,
 		emptyContent = __( 'No results found.' ),
 		items,
@@ -35,9 +39,12 @@ export const SearchableChipSelect = forwardRef<
 	},
 	ref
 ) {
+	const creatableItem = findCreatableItem( items );
+	const comboboxItems = normalizeRootItems( items );
+
 	return (
 		<Combobox.Root
-			items={ items }
+			items={ comboboxItems }
 			multiple
 			disabled={ disabled }
 			{ ...restProps }
@@ -113,21 +120,34 @@ export const SearchableChipSelect = forwardRef<
 				<Combobox.List>
 					<Combobox.ListBody>
 						<Combobox.Collection>
-							{ children ??
-								( ( item: Item | ItemGroup ) => {
-									if ( ! isItem( item ) ) {
-										return null;
-									}
-									return (
-										<Combobox.Item
-											key={ item.value }
-											value={ item }
-											disabled={ item.disabled }
-										>
-											{ item.label }
-										</Combobox.Item>
-									);
-								} ) }
+							{ ( entry: Item | ItemGroup, ...args ) => {
+								if (
+									shouldSkipCollectionEntry(
+										entry,
+										creatableItem
+									)
+								) {
+									return null;
+								}
+
+								if ( children ) {
+									return children( entry, ...args );
+								}
+
+								if ( ! isItem( entry ) ) {
+									return null;
+								}
+
+								return (
+									<Combobox.Item
+										key={ entry.value }
+										value={ entry }
+										disabled={ entry.disabled }
+									>
+										{ entry.label }
+									</Combobox.Item>
+								);
+							} }
 						</Combobox.Collection>
 					</Combobox.ListBody>
 					{ creatableItem && (

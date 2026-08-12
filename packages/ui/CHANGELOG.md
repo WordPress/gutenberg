@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   `SearchableChipSelect`: The `creatableItem` prop is now render-only. Include the same item in `items`, exclude it from the main list via `children`, and handle selection in `onValueChange`. See the `Creatable` and `GroupedCreatable` stories for examples ([#80989](https://github.com/WordPress/gutenberg/pull/80989)).
+-   `SearchableChipSelect`: Remove the `creatableItem` prop. Mark a creatable action with `creatable: true` on an item in `items` instead. The item renders in the list footer and is excluded from the main list automatically. Handle selection in `onValueChange`. See the `Creatable` and `GroupedCreatable` stories for examples ([#80989](https://github.com/WordPress/gutenberg/pull/80989)).
 
 ### Enhancements
 

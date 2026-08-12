@@ -169,26 +169,14 @@ describe( 'SearchableChipSelect', () => {
 		const creatableItem = {
 			value: '__create__',
 			label: 'Create new item',
+			creatable: true as const,
 		};
 
-		it( 'renders the creatable item in the list footer when included in items', async () => {
+		it( 'renders the creatable item in the list footer using the default renderer', async () => {
 			const user = userEvent.setup();
 
 			render(
-				<SearchableChipSelect
-					items={ [ ...ITEMS, creatableItem ] }
-					creatableItem={ creatableItem }
-					children={ ( item: ( typeof ITEMS )[ 0 ] ) =>
-						item.value !== creatableItem.value && (
-							<SearchableChipSelect.Item
-								key={ item.value }
-								value={ item }
-							>
-								{ item.label }
-							</SearchableChipSelect.Item>
-						)
-					}
-				/>
+				<SearchableChipSelect items={ [ ...ITEMS, creatableItem ] } />
 			);
 
 			await user.click( screen.getByRole( 'combobox' ) );
@@ -202,12 +190,40 @@ describe( 'SearchableChipSelect', () => {
 			).toHaveLength( 1 );
 		} );
 
+		it( 'renders only one creatable option when custom flat children are used', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<SearchableChipSelect
+					items={ [ ...ITEMS, creatableItem ] }
+					children={ ( item: ( typeof ITEMS )[ 0 ] ) => (
+						<SearchableChipSelect.Item
+							key={ item.value }
+							value={ item }
+						>
+							{ item.label }
+						</SearchableChipSelect.Item>
+					) }
+				/>
+			);
+
+			await user.click( screen.getByRole( 'combobox' ) );
+
+			await waitFor( () => {
+				expect( screen.getByText( 'Create new item' ) ).toBeVisible();
+			} );
+			expect(
+				screen.getAllByRole( 'option', { name: 'Create new item' } )
+			).toHaveLength( 1 );
+		} );
+
 		it( 'selects the creatable item by keyboard when grouped children are used', async () => {
 			const user = userEvent.setup();
 			const onValueChange = jest.fn();
 			const groupedCreatableItem = {
 				value: '__create__',
 				label: 'Create new item: zzzzz',
+				creatable: true as const,
 			};
 			const items = [
 				...GROUPED_ITEMS,
@@ -217,38 +233,28 @@ describe( 'SearchableChipSelect', () => {
 			render(
 				<SearchableChipSelect
 					items={ items }
-					creatableItem={ groupedCreatableItem }
 					inputValue="zzzzz"
 					onValueChange={ onValueChange }
-					children={ ( group: FixtureGroup ) => {
-						if (
-							group.items[ 0 ]?.value ===
-							groupedCreatableItem.value
-						) {
-							return null;
-						}
-
-						return (
-							<SearchableChipSelect.Group
-								key={ group.label }
-								items={ group.items }
-							>
-								<SearchableChipSelect.GroupLabel>
-									{ group.label }
-								</SearchableChipSelect.GroupLabel>
-								<SearchableChipSelect.Collection>
-									{ ( item: FixtureItem ) => (
-										<SearchableChipSelect.Item
-											key={ item.value }
-											value={ item }
-										>
-											{ item.label }
-										</SearchableChipSelect.Item>
-									) }
-								</SearchableChipSelect.Collection>
-							</SearchableChipSelect.Group>
-						);
-					} }
+					children={ ( group: FixtureGroup ) => (
+						<SearchableChipSelect.Group
+							key={ group.label }
+							items={ group.items }
+						>
+							<SearchableChipSelect.GroupLabel>
+								{ group.label }
+							</SearchableChipSelect.GroupLabel>
+							<SearchableChipSelect.Collection>
+								{ ( item: FixtureItem ) => (
+									<SearchableChipSelect.Item
+										key={ item.value }
+										value={ item }
+									>
+										{ item.label }
+									</SearchableChipSelect.Item>
+								) }
+							</SearchableChipSelect.Collection>
+						</SearchableChipSelect.Group>
+					) }
 				/>
 			);
 

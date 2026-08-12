@@ -44,9 +44,9 @@ export const Default: Story = {
 };
 
 /**
- * The `creatableItem` prop renders a creatable action in the list footer.
- * The same item must also be included in `items`, excluded from the main
- * list via `children`, and handled in `onValueChange`.
+ * Mark a creatable action with `creatable: true` on an item in `items`.
+ * It renders in the list footer and is excluded from the main list
+ * automatically. Handle creation in `onValueChange`.
  */
 export const Creatable: Story = {
 	args: {
@@ -62,13 +62,13 @@ export const Creatable: Story = {
 			value: '__create__',
 			label:
 				'Create new item' + ( inputValue ? `: ${ inputValue }` : '' ),
+			creatable: true as const,
 		};
 
 		return (
 			<SearchableChipSelect
 				{ ...args }
 				items={ [ ...ITEMS, creatableItem ] }
-				creatableItem={ creatableItem }
 				inputValue={ inputValue }
 				onInputValueChange={ setInputValue }
 				value={ value }
@@ -90,16 +90,6 @@ export const Creatable: Story = {
 					}
 					args.onValueChange?.( values, event );
 				} }
-				children={ ( item: ( typeof ITEMS )[ 0 ] ) =>
-					item.value !== creatableItem.value && (
-						<SearchableChipSelect.Item
-							key={ item.value }
-							value={ item }
-						>
-							{ item.label }
-						</SearchableChipSelect.Item>
-					)
-				}
 			/>
 		);
 	},
@@ -183,8 +173,7 @@ export const Grouped: Story = {
 
 /**
  * Grouped items with a creatable footer item. Include the creatable item in
- * `items` as a group, exclude it from the main list in `children`, and handle
- * creation in `onValueChange`.
+ * `items` as a creatable-only group and handle creation in `onValueChange`.
  */
 export const GroupedCreatable: Story = {
 	render: function Template( args ) {
@@ -197,6 +186,7 @@ export const GroupedCreatable: Story = {
 			value: '__create__',
 			label:
 				'Create new item' + ( inputValue ? `: ${ inputValue }` : '' ),
+			creatable: true as const,
 		};
 		const items = [
 			...GROUPED_ITEMS,
@@ -207,7 +197,6 @@ export const GroupedCreatable: Story = {
 			<SearchableChipSelect
 				{ ...args }
 				items={ items }
-				creatableItem={ creatableItem }
 				inputValue={ inputValue }
 				onInputValueChange={ setInputValue }
 				value={ value }
@@ -229,32 +218,26 @@ export const GroupedCreatable: Story = {
 					}
 					args.onValueChange?.( values, event );
 				} }
-				children={ ( group: FixtureGroup ) => {
-					if ( group.items[ 0 ]?.value === creatableItem.value ) {
-						return null;
-					}
-
-					return (
-						<SearchableChipSelect.Group
-							key={ group.label }
-							items={ group.items }
-						>
-							<SearchableChipSelect.GroupLabel>
-								{ group.label }
-							</SearchableChipSelect.GroupLabel>
-							<SearchableChipSelect.Collection>
-								{ ( item: FixtureItem ) => (
-									<SearchableChipSelect.Item
-										key={ item.value }
-										value={ item }
-									>
-										{ item.label }
-									</SearchableChipSelect.Item>
-								) }
-							</SearchableChipSelect.Collection>
-						</SearchableChipSelect.Group>
-					);
-				} }
+				children={ ( group: FixtureGroup ) => (
+					<SearchableChipSelect.Group
+						key={ group.label }
+						items={ group.items }
+					>
+						<SearchableChipSelect.GroupLabel>
+							{ group.label }
+						</SearchableChipSelect.GroupLabel>
+						<SearchableChipSelect.Collection>
+							{ ( item: FixtureItem ) => (
+								<SearchableChipSelect.Item
+									key={ item.value }
+									value={ item }
+								>
+									{ item.label }
+								</SearchableChipSelect.Item>
+							) }
+						</SearchableChipSelect.Collection>
+					</SearchableChipSelect.Group>
+				) }
 			/>
 		);
 	},
