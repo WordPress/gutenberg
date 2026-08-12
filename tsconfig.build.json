@@ -67,7 +67,7 @@
 		{ "path": "packages/project-management-automation" },
 		{ "path": "packages/react-i18n" },
 		{ "path": "packages/redux-routine" },
-		{ "path": "packages/report-flaky-tests" },
+		{ "path": "packages/report-flaky-tests/tsconfig.build.json" },
 		{ "path": "packages/rich-text" },
 		{ "path": "packages/route" },
 		{ "path": "packages/router" },
