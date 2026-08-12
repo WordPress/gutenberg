@@ -261,14 +261,14 @@
 			grid-column: suffix-start / suffix-end;
 			display: flex;
 			align-items: center;
-			margin-inline-start: var(--wpds-dimension-gap-lg);
+			margin-inline-start: var(--wpds-dimension-gap-md);
 			gap: var(--wpds-dimension-gap-xs);
 			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
 		.item-shortcut {
 			grid-column: shortcut-start / shortcut-end;
-			margin-inline-start: var(--wpds-dimension-gap-lg);
+			margin-inline-start: var(--wpds-dimension-gap-md);
 			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
@@ -276,8 +276,12 @@
 			grid-column: trailing-start / trailing-end;
 			display: flex;
 			align-items: center;
-			margin-inline-start: var(--wpds-dimension-gap-lg);
+			margin-inline-start: var(--wpds-dimension-gap-md);
 			color: var(--wpds-color-foreground-content-neutral-weak);
+		}
+
+		.item-children + :is(.item-suffix, .item-shortcut, .item-trailing) {
+			margin-inline-start: var(--wpds-dimension-gap-xl);
 		}
 
 		.item-shortcut + .item-trailing {
