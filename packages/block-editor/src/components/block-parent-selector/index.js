@@ -2,8 +2,11 @@ import { ToolbarButton } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
+import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
+import { plus } from '@wordpress/icons';
 import useBlockDisplayInformation from '../use-block-display-information';
 import BlockIcon from '../block-icon';
+import Inserter from '../inserter';
 import { useShowHoveredOrFocusedGestures } from '../block-toolbar/utils';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
@@ -16,23 +19,54 @@ import { unlock } from '../../lock-unlock';
  */
 export default function BlockParentSelector() {
 	const { selectBlock } = useDispatch( blockEditorStore );
-	const { parentClientId } = useSelect( ( select ) => {
-		const {
-			getBlockParents,
-			getSelectedBlockClientIds,
-			getParentSectionBlock,
-		} = unlock( select( blockEditorStore ) );
-		// Not getSelectedBlockClientId: a text selection crossing into a
-		// nested block resolves to the ancestor alone, but its selection
-		// start and end differ.
-		const [ selectedBlockClientId ] = getSelectedBlockClientIds();
-		const parentSection = getParentSectionBlock( selectedBlockClientId );
-		const parents = getBlockParents( selectedBlockClientId );
-		const _parentClientId = parentSection ?? parents[ parents.length - 1 ];
-		return {
-			parentClientId: _parentClientId,
-		};
-	}, [] );
+	const { parentClientId, nextSiblingClientId, showInserter } = useSelect(
+		( select ) => {
+			const {
+				getBlockParents,
+				getSelectedBlockClientIds,
+				getParentSectionBlock,
+				getBlockName,
+				getBlockIndex,
+				getBlockOrder,
+			} = unlock( select( blockEditorStore ) );
+			// Not getSelectedBlockClientId: a text selection crossing into a
+			// nested block resolves to the ancestor alone, but its selection
+			// start and end differ.
+			const [ selectedBlockClientId ] = getSelectedBlockClientIds();
+			const parentSection = getParentSectionBlock(
+				selectedBlockClientId
+			);
+			const parents = getBlockParents( selectedBlockClientId );
+			const _parentClientId =
+				parentSection ?? parents[ parents.length - 1 ];
+			const parentBlockType = getBlockType(
+				getBlockName( _parentClientId )
+			);
+			// The child of the parent on the selection's path: the selected
+			// block itself unless the parent is a section further up.
+			const childClientId =
+				parents[ parents.indexOf( _parentClientId ) + 1 ] ??
+				selectedBlockClientId;
+			return {
+				parentClientId: _parentClientId,
+				nextSiblingClientId:
+					getBlockOrder( _parentClientId )[
+						getBlockIndex( childClientId ) + 1
+					],
+				// A parent that merges with the text flow (quote, list) grows
+				// by typing: Enter appends. Only parents outside the text
+				// flow need an explicit affordance to add another child.
+				showInserter:
+					!! parentBlockType &&
+					! parentBlockType.merge &&
+					! hasBlockSupport(
+						parentBlockType,
+						'__experimentalOnMerge'
+					),
+			};
+		},
+		[]
+	);
 	const blockInformation = useBlockDisplayInformation( parentClientId );
 
 	// Allows highlighting the parent block outline when focusing or hovering
@@ -61,6 +95,40 @@ export default function BlockParentSelector() {
 				showTooltip
 				icon={ <BlockIcon icon={ blockInformation?.icon } /> }
 			/>
+			{ showInserter && (
+				<Inserter
+					position="bottom center"
+					rootClientId={ parentClientId }
+					clientId={ nextSiblingClientId }
+					isAppender={ ! nextSiblingClientId }
+					__experimentalIsQuick
+					renderToggle={ ( {
+						onToggle,
+						isOpen,
+						disabled,
+						blockTitle,
+						hasSingleBlockType,
+					} ) => (
+						<ToolbarButton
+							className="block-editor-block-parent-selector__button block-editor-block-parent-selector__inserter"
+							onClick={ onToggle }
+							aria-expanded={ isOpen }
+							disabled={ disabled }
+							label={
+								hasSingleBlockType
+									? sprintf(
+											/* translators: %s: title of the block to be added. */
+											__( 'Add %s' ),
+											blockTitle
+									  )
+									: __( 'Add block' )
+							}
+							showTooltip
+							icon={ plus }
+						/>
+					) }
+				/>
+			) }
 		</div>
 	);
 }

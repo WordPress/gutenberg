@@ -119,6 +119,15 @@
 				margin-left: 0;
 			}
 		}
+
+		// Make room for the second button when the parent selector also
+		// carries an inserter.
+		&.has-parent:has(.block-editor-block-parent-selector__inserter) {
+			margin-left: calc(2 * #{$grid-unit-60} + #{$grid-unit-10} + #{$grid-unit-05});
+			.show-icon-labels & {
+				margin-left: 0;
+			}
+		}
 	}
 
 	.block-editor-block-toolbar {
@@ -148,6 +157,12 @@
 	.block-editor-block-parent-selector {
 		position: absolute;
 		left: calc(-#{$grid-unit-60} - #{$grid-unit-10} - #{$border-width});
+
+		&:has(.block-editor-block-parent-selector__inserter) {
+			left: calc(-2 * #{$grid-unit-60} - #{$grid-unit-10} - #{$grid-unit-05} - #{$border-width});
+			display: flex;
+			gap: $grid-unit-05;
+		}
 
 		&::before {
 			content: "";
