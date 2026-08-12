@@ -61,27 +61,55 @@ async function canAccessWPORG() {
 }
 
 /**
- * Checks whether a given version tag has been mirrored to the WordPress/WordPress
- * git repository yet. The stable-check API on WordPress.org is updated the moment
- * a release ships, but the git mirror syncs separately and can lag behind by a
- * few hours, during which the tag this function checks for does not exist yet.
+ * Returns every stable version tag currently on the WordPress/WordPress mirror.
+ * The stable-check API on WordPress.org reports a new version the moment it
+ * ships, but this mirror syncs separately and can lag by hours, during which a
+ * `git fetch` for that version's tag fails outright because it is not there yet.
  *
- * @param {string} version The WordPress version to look for, like "6.0.1".
- * @return {boolean} True if the tag exists on the mirror, false otherwise.
+ * @return {string[]} Every available version, like [ '6.5.8', '6.5.9' ]. Empty
+ *                     if the mirror could not be queried.
  */
-async function isVersionAvailableOnMirror( version ) {
+async function getMirrorVersions() {
 	try {
 		const output = await SimpleGit().listRemote( [
 			'--tags',
 			WORDPRESS_MIRROR_URL,
-			version,
 		] );
-		return output.trim().length > 0;
+		return output
+			.split( '\n' )
+			.map( ( line ) =>
+				line.match( /refs\/tags\/(\d+\.\d+(?:\.\d+)?)$/ )
+			)
+			.filter( Boolean )
+			.map( ( match ) => match[ 1 ] );
 	} catch {
-		// If the check itself fails (e.g. no network), don't treat that as
-		// confirmation the tag is missing -- fall through to the normal path.
-		return true;
+		return [];
 	}
+}
+
+/**
+ * Compares two dotted-numeric WordPress version strings, like "6.5.9" and
+ * "6.5.10". This only handles the plain major[.minor[.patch]] shape core
+ * release tags use, not general semver -- see isWPMajorMinorVersionLower()
+ * in runtime/docker/wordpress.js for the project's existing stance on
+ * avoiding a full semver dependency for this kind of comparison.
+ *
+ * @param {string} a A version string.
+ * @param {string} b Another version string.
+ * @return {number} Negative if a < b, positive if a > b, zero if equal.
+ */
+function compareWordPressVersions( a, b ) {
+	const partsA = a.split( '.' ).map( Number );
+	const partsB = b.split( '.' ).map( Number );
+
+	for ( let i = 0; i < Math.max( partsA.length, partsB.length ); i++ ) {
+		const diff = ( partsA[ i ] || 0 ) - ( partsB[ i ] || 0 );
+		if ( diff !== 0 ) {
+			return diff;
+		}
+	}
+
+	return 0;
 }
 
 /**
@@ -123,18 +151,34 @@ async function getLatestWordPressVersion( options ) {
 
 	for ( const [ version, status ] of Object.entries( versions ) ) {
 		if ( status === 'latest' ) {
-			// The stable-check API can report a version before the
-			// WordPress/WordPress git mirror has synced its tag. Fetching
-			// that tag would fail outright, so fall back to the last known
-			// good version until the mirror catches up.
-			if ( ! ( await isVersionAvailableOnMirror( version ) ) ) {
-				const lastKnownGoodVersion = await getCache(
+			const mirrorVersions = await getMirrorVersions();
+
+			// If the mirror listing failed, mirrorVersions is empty and this
+			// is skipped -- that isn't confirmation the tag is missing, so
+			// fall through to using the reported version as before.
+			if (
+				mirrorVersions.length &&
+				! mirrorVersions.includes( version )
+			) {
+				// The mirror hasn't synced this tag yet. Prefer the last known
+				// good version from a previous run; if there isn't one (e.g.
+				// the first run in a fresh CI environment), use the highest
+				// version the mirror actually has instead of a tag that is
+				// guaranteed to fail the `git fetch` that follows.
+				const fallback =
+					( await getCache(
+						'latestWordPressVersion',
+						cacheOptions
+					) ) ||
+					mirrorVersions.sort( compareWordPressVersions ).pop();
+
+				CACHED_WP_VERSION = fallback;
+				await setCache(
 					'latestWordPressVersion',
+					fallback,
 					cacheOptions
 				);
-				if ( lastKnownGoodVersion ) {
-					return lastKnownGoodVersion;
-				}
+				return fallback;
 			}
 
 			CACHED_WP_VERSION = version;

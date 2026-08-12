@@ -23,10 +23,12 @@ function mockStableCheck( got, version ) {
 	} );
 }
 
-function mockMirrorHasTag( SimpleGit, hasTag ) {
+function mockMirrorTags( SimpleGit, tags ) {
 	SimpleGit.mockReturnValue( {
 		listRemote: () =>
-			Promise.resolve( hasTag ? 'abc123\trefs/tags/x.y.z\n' : '' ),
+			Promise.resolve(
+				tags.map( ( tag ) => `abc\trefs/tags/${ tag }` ).join( '\n' )
+			),
 	} );
 }
 
@@ -47,7 +49,7 @@ describe( 'getLatestWordPressVersion', () => {
 
 		dns.resolve.mockResolvedValue( [ '127.0.0.1' ] );
 		mockStableCheck( got, '6.6.0' );
-		mockMirrorHasTag( SimpleGit, true );
+		mockMirrorTags( SimpleGit, [ '6.5.9', '6.6.0' ] );
 
 		const version = await getLatestWordPressVersion( cacheOptions );
 
@@ -63,38 +65,47 @@ describe( 'getLatestWordPressVersion', () => {
 		const dns = require( 'dns' ).promises;
 		const got = require( 'got' );
 		const SimpleGit = require( 'simple-git' );
-		const { getCache, setCache } = require( '../cache' );
-		const { getLatestWordPressVersion } = require( '../wordpress' );
-
-		dns.resolve.mockResolvedValue( [ '127.0.0.1' ] );
-		mockStableCheck( got, '6.6.0' );
-		mockMirrorHasTag( SimpleGit, false );
-		getCache.mockResolvedValue( '6.5.9' );
-
-		const version = await getLatestWordPressVersion( cacheOptions );
-
-		expect( version ).toBe( '6.5.9' );
-		expect( setCache ).not.toHaveBeenCalled();
-	} );
-
-	it( 'uses the reported version anyway when the mirror is missing it and there is no cached fallback', async () => {
-		const dns = require( 'dns' ).promises;
-		const got = require( 'got' );
-		const SimpleGit = require( 'simple-git' );
 		const { getCache } = require( '../cache' );
 		const { getLatestWordPressVersion } = require( '../wordpress' );
 
 		dns.resolve.mockResolvedValue( [ '127.0.0.1' ] );
 		mockStableCheck( got, '6.6.0' );
-		mockMirrorHasTag( SimpleGit, false );
+		mockMirrorTags( SimpleGit, [ '6.5.8', '6.5.9' ] ); // No 6.6.0 yet.
+		getCache.mockResolvedValue( '6.5.9' );
+
+		const version = await getLatestWordPressVersion( cacheOptions );
+
+		expect( version ).toBe( '6.5.9' );
+	} );
+
+	it( 'falls back to the highest version on the mirror when there is no cache at all, such as a fresh CI runner', async () => {
+		const dns = require( 'dns' ).promises;
+		const got = require( 'got' );
+		const SimpleGit = require( 'simple-git' );
+		const { getCache, setCache } = require( '../cache' );
+		const { getLatestWordPressVersion } = require( '../wordpress' );
+
+		dns.resolve.mockResolvedValue( [ '127.0.0.1' ] );
+		mockStableCheck( got, '6.6.0' );
+		mockMirrorTags( SimpleGit, [
+			'6.5.8',
+			'6.5.10',
+			'6.5.9',
+			'not-a-version',
+		] );
 		getCache.mockResolvedValue( undefined );
 
 		const version = await getLatestWordPressVersion( cacheOptions );
 
-		expect( version ).toBe( '6.6.0' );
+		expect( version ).toBe( '6.5.10' );
+		expect( setCache ).toHaveBeenCalledWith(
+			'latestWordPressVersion',
+			'6.5.10',
+			expect.anything()
+		);
 	} );
 
-	it( 'does not fail the whole lookup if the mirror check itself errors', async () => {
+	it( 'uses the reported version anyway when the mirror listing itself fails', async () => {
 		const dns = require( 'dns' ).promises;
 		const got = require( 'got' );
 		const SimpleGit = require( 'simple-git' );
