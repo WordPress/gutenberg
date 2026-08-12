@@ -86,7 +86,15 @@ function BlockEditTextAlignmentToolbarControlsPure( {
 		[ clientId ]
 	);
 
-	if ( ! hasTextAlignControl || blockEditingMode !== 'default' ) {
+	const stateStyle = getStyleForState( style, selectedState );
+	// A present value keeps the control available even when the setting
+	// hides it, so the alignment can still be removed.
+	const hasTextAlignValue = !! stateStyle?.typography?.textAlign;
+
+	if (
+		( ! hasTextAlignControl && ! hasTextAlignValue ) ||
+		blockEditingMode !== 'default'
+	) {
 		return null;
 	}
 
@@ -98,9 +106,12 @@ function BlockEditTextAlignmentToolbarControlsPure( {
 	}
 
 	const textAlignmentControls = TEXT_ALIGNMENT_OPTIONS.filter( ( control ) =>
-		validTextAlignments.includes( control.align )
+		hasTextAlignControl
+			? validTextAlignments.includes( control.align )
+			: // With the control disabled by the settings, the value can
+			  // only be removed: clicking the active alignment clears it.
+			  control.align === stateStyle.typography.textAlign
 	);
-	const stateStyle = getStyleForState( style, selectedState );
 	const controlsGroup = getTextAlignControlGroup(
 		isResponsiveEditing,
 		selectedState

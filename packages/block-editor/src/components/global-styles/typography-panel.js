@@ -6,8 +6,12 @@ import {
 	Notice,
 	ToggleControl,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { useCallback, useMemo } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
+import {
+	createInterpolateElement,
+	useCallback,
+	useMemo,
+} from '@wordpress/element';
 import FontFamilyControl from '../font-family';
 import FontAppearanceControl from '../font-appearance-control';
 import LineHeightControl from '../line-height-control';
@@ -866,7 +870,7 @@ export default function TypographyPanel( {
 					/>
 				</InheritanceToolsPanelItem>
 			) }
-			{ hasFontSizeEnabled && (
+			{ ( hasFontSizeEnabled || hasFontSize() ) && (
 				<InheritanceToolsPanelItem
 					{ ...inheritanceProps(
 						isFontSizePlaceholder,
@@ -879,15 +883,53 @@ export default function TypographyPanel( {
 					isShownByDefault={ defaultControls.fontSize }
 					panelId={ panelId }
 				>
-					<FontSizePicker
-						value={ currentFontSizeSlug || fontSize }
-						valueMode={ currentFontSizeSlug ? 'slug' : 'literal' }
-						onChange={ setFontSizeWithInheritedCommit }
-						fontSizes={ mergedFontSizes }
-						disableCustomFontSizes={ disableCustomFontSizes }
-						withReset={ false }
-						withSlider
-					/>
+					{ hasFontSizeEnabled ? (
+						<FontSizePicker
+							value={ currentFontSizeSlug || fontSize }
+							valueMode={
+								currentFontSizeSlug ? 'slug' : 'literal'
+							}
+							onChange={ setFontSizeWithInheritedCommit }
+							fontSizes={ mergedFontSizes }
+							disableCustomFontSizes={ disableCustomFontSizes }
+							withReset={ false }
+							withSlider
+						/>
+					) : (
+						// The wrapper keeps the tools panel item styles from
+						// stripping the notice's own bottom padding.
+						<div>
+							<Notice
+								status="warning"
+								isDismissible={ false }
+								actions={ [
+									{
+										label: __( 'Reset' ),
+										onClick: resetFontSize,
+									},
+								] }
+							>
+								{ currentFontSizeSlug
+									? createInterpolateElement(
+											sprintf(
+												// translators: %s: the applied font size preset slug.
+												__(
+													'Font size controls are disabled in this theme, but this block sets the <code>%s</code> size preset.'
+												),
+												currentFontSizeSlug
+											),
+											{ code: <code /> }
+									  )
+									: sprintf(
+											// translators: %s: the applied font size value.
+											__(
+												'Font size controls are disabled in this theme, but this block sets a font size of %s.'
+											),
+											fontSize
+									  ) }
+							</Notice>
+						</div>
+					) }
 				</InheritanceToolsPanelItem>
 			) }
 			{ hasAppearanceControl && (
