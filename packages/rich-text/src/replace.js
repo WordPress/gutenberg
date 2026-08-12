@@ -56,7 +56,7 @@ export function replace(
 				replacements.slice( offset + match.length )
 			);
 
-		if ( start ) {
+		if ( start !== undefined ) {
 			start = end = offset + newText.length;
 		}
 

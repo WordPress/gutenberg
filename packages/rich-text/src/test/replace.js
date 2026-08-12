@@ -27,6 +27,39 @@ describe( 'replace', () => {
 		expect( getSparseArrayLength( result.formats ) ).toBe( 1 );
 	} );
 
+	it( 'should move a selection at the start of the value', () => {
+		const record = {
+			formats: [ , , , ],
+			replacements: [ , , , ],
+			text: 'abc',
+			start: 0,
+			end: 0,
+		};
+		const expected = {
+			formats: [ , , , , ],
+			replacements: [ , , , , ],
+			text: 'XYbc',
+			start: 2,
+			end: 2,
+		};
+
+		expect( replace( deepFreeze( record ), 'a', 'XY' ) ).toEqual(
+			expected
+		);
+	} );
+
+	it( 'should leave a value without a selection alone', () => {
+		const record = {
+			formats: [ , , , ],
+			replacements: [ , , , ],
+			text: 'abc',
+		};
+		const result = replace( deepFreeze( record ), 'a', 'XY' );
+
+		expect( result.start ).toBeUndefined();
+		expect( result.end ).toBeUndefined();
+	} );
+
 	it( 'should replace string to record', () => {
 		const record = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],

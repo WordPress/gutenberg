@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `replace`: Move the selection past the replacement when it starts at the beginning of the value, instead of treating index `0` as no selection ([#81527](https://github.com/WordPress/gutenberg/pull/81527)).
+
 ## 7.53.0 (2026-08-12)
 
 
