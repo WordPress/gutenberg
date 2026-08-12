@@ -1,13 +1,17 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
+	type ParserOptions,
+	transformAsync as transformWithBabel,
+} from '@babel/core';
+import {
+	createFilter,
 	type InlineConfig,
 	type PluginOption,
 	mergeConfig,
 	transformWithOxc,
 } from 'vite';
 import react from '@vitejs/plugin-react';
-import babel from '@rolldown/plugin-babel';
 import type { StorybookConfig } from '@storybook/react-vite';
 import dsTokenFallbacks from '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks';
 import dsTokenFallbacksJs from '@wordpress/theme/vite-plugins/vite-ds-token-fallbacks';
@@ -22,6 +26,7 @@ function getAbsolutePath( packageName: string ) {
 }
 
 const { NODE_ENV = 'development' } = process.env;
+const shouldTransformWithBabel = createFilter( /\.[jt]sx?$/, /node_modules/ );
 
 const stories = [
 	'./stories/playground/**/*.story.@(jsx|tsx)',
@@ -128,9 +133,59 @@ const config: StorybookConfig = {
 			plugins: [
 				dsTokenFallbacksJs(),
 				react() as PluginOption,
-				babel( {
-					plugins: [ getAbsolutePath( '@emotion/babel-plugin' ) ],
-				} ) as PluginOption,
+				// @rolldown/plugin-babel requires Node 22, but Gutenberg still
+				// supports Node 20. Run the existing Emotion transform directly.
+				{
+					name: 'transform-emotion-with-babel',
+					async transform( code: string, id: string ) {
+						const [ filePath ] = id.split( '?' );
+						if (
+							! shouldTransformWithBabel( filePath ) ||
+							! code.includes( '@emotion/' )
+						) {
+							return null;
+						}
+
+						const parserPlugins: NonNullable<
+							ParserOptions[ 'plugins' ]
+						> = [];
+						if ( ! filePath.endsWith( '.ts' ) ) {
+							parserPlugins.push( 'jsx' );
+						}
+						if ( /\.tsx?$/.test( filePath ) ) {
+							parserPlugins.push( 'typescript' );
+						}
+
+						const result = await transformWithBabel( code, {
+							babelrc: false,
+							configFile: false,
+							filename: id,
+							generatorOpts: {
+								decoratorsBeforeExport: true,
+								importAttributesKeyword: 'with',
+							},
+							parserOpts: {
+								allowAwaitOutsideFunction: true,
+								plugins: parserPlugins,
+								sourceType: 'module',
+							},
+							plugins: [
+								getAbsolutePath( '@emotion/babel-plugin' ),
+							],
+							retainLines:
+								NODE_ENV !== 'production' &&
+								filePath.endsWith( 'x' ),
+							sourceFileName: filePath,
+							sourceMaps: true,
+						} );
+
+						if ( ! result?.code ) {
+							return null;
+						}
+
+						return { code: result.code, map: result.map };
+					},
+				},
 				{
 					name: 'load-js-files-as-jsx',
 					enforce: 'pre',

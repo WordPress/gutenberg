@@ -24,16 +24,17 @@
 		"./preview": "./preview.jsx"
 	},
 	"devDependencies": {
+		"@babel/core": "^7.25.7",
 		"@emotion/babel-plugin": "^11.13.5",
 		"@emotion/is-prop-valid": "^1.4.0",
 		"@emotion/react": "^11.14.0",
 		"@emotion/styled": "^11.14.1",
-		"@rolldown/plugin-babel": "^0.2.3",
 		"@storybook/addon-a11y": "^10.4.3",
 		"@storybook/addon-docs": "^10.4.3",
 		"@storybook/icons": "^2.0.1",
 		"@storybook/react-vite": "^10.4.3",
 		"@storybook/test-runner": "^0.24.2",
+		"@types/babel__core": "^7.20.5",
 		"@types/js-yaml": "^3.12.10",
 		"@types/react": "^18.3.27",
 		"@vitejs/plugin-react": "^6.0.5",
