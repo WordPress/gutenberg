@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Map active neutral foreground colors to the lighter FGS3 ramp step. ([#81537](https://github.com/WordPress/gutenberg/pull/81537))
+
 ### Bug Fixes
 
 -   `ThemeProvider`: Avoid root-level relational selectors when forwarding `cornerRadius` presets to reduce style recalculation work. ([#81457](https://github.com/WordPress/gutenberg/pull/81457))
