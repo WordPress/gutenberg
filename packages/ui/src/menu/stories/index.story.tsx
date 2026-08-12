@@ -1,6 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
-import { archive } from '@wordpress/icons';
+import {
+	archive,
+	create,
+	alignLeft,
+	alignCenter,
+	alignRight,
+} from '@wordpress/icons';
 import {
 	ariaKeyShortcut,
 	displayShortcut,
@@ -320,14 +326,13 @@ export const GroupedItems: Story = {
 						<Menu.GroupLabel>File</Menu.GroupLabel>
 						<Menu.Item
 							prefix={
-								<Icon
-									icon={ archive }
-									size={ 32 }
-									aria-hidden
-								/>
+								<Icon icon={ create } size={ 24 } aria-hidden />
 							}
 						>
-							New draft
+							<Menu.ItemLabel>New draft</Menu.ItemLabel>
+							<Menu.ItemDescription>
+								Create a new draft document.
+							</Menu.ItemDescription>
 						</Menu.Item>
 						<Menu.Item
 							prefix={
@@ -500,49 +505,46 @@ export const CheckboxItems: Story = {
 
 export const RadioItems: Story = {
 	render: function Render() {
-		const [ sort, setSort ] = useState( 'name' );
+		const [ alignment, setAlignment ] = useState( 'left' );
 		const [ density, setDensity ] = useState( 'comfortable' );
 
 		return (
 			<Menu.Root>
-				<Menu.Trigger>Sort</Menu.Trigger>
+				<Menu.Trigger>View options</Menu.Trigger>
 				<Menu.Popup>
 					<Menu.Group>
-						<Menu.GroupLabel>Sort by</Menu.GroupLabel>
-						<Menu.Item
-							prefix={
-								<Icon
-									icon={ archive }
-									size={ 32 }
-									aria-hidden
-								/>
-							}
-						>
-							Reset sorting
-						</Menu.Item>
+						<Menu.GroupLabel>Alignment</Menu.GroupLabel>
+
 						<Menu.RadioGroup
-							value={ sort }
-							onValueChange={ setSort }
+							value={ alignment }
+							onValueChange={ setAlignment }
 						>
-							<Menu.RadioItem value="name">
-								<Menu.ItemLabel>Name</Menu.ItemLabel>
-								<Menu.ItemDescription>
-									Sort alphabetically.
-								</Menu.ItemDescription>
+							<Menu.RadioItem
+								value="left"
+								prefix={
+									<Icon icon={ alignLeft } aria-hidden />
+								}
+							>
+								<Menu.ItemLabel>Left</Menu.ItemLabel>
 							</Menu.RadioItem>
-							<Menu.RadioItem value="date">
-								<Menu.ItemLabel>Date</Menu.ItemLabel>
-								<Menu.ItemDescription>
-									Sort by most recent activity.
-								</Menu.ItemDescription>
+							<Menu.RadioItem
+								value="center"
+								prefix={
+									<Icon icon={ alignCenter } aria-hidden />
+								}
+							>
+								<Menu.ItemLabel>Center</Menu.ItemLabel>
 							</Menu.RadioItem>
-							<Menu.RadioItem value="manual">
-								<Menu.ItemLabel>Manual</Menu.ItemLabel>
-								<Menu.ItemDescription>
-									Keep the current custom order.
-								</Menu.ItemDescription>
+							<Menu.RadioItem
+								value="right"
+								prefix={
+									<Icon icon={ alignRight } aria-hidden />
+								}
+							>
+								<Menu.ItemLabel>Right</Menu.ItemLabel>
 							</Menu.RadioItem>
 						</Menu.RadioGroup>
+						<Menu.Item>Reset alignment</Menu.Item>
 					</Menu.Group>
 					<Menu.Separator />
 					<Menu.RadioGroup
@@ -551,16 +553,7 @@ export const RadioItems: Story = {
 					>
 						<Menu.Group>
 							<Menu.GroupLabel>Density</Menu.GroupLabel>
-							<Menu.RadioItem
-								value="compact"
-								prefix={
-									<Icon
-										icon={ archive }
-										size={ 24 }
-										aria-hidden
-									/>
-								}
-							>
+							<Menu.RadioItem value="compact">
 								<Menu.ItemLabel>Compact</Menu.ItemLabel>
 								<Menu.ItemDescription>
 									Show shorter rows.
@@ -568,13 +561,6 @@ export const RadioItems: Story = {
 							</Menu.RadioItem>
 							<Menu.RadioItem
 								value="comfortable"
-								prefix={
-									<Icon
-										icon={ archive }
-										size={ 24 }
-										aria-hidden
-									/>
-								}
 								shortcut={ SHORTCUTS.comfortableDensity }
 							>
 								<Menu.ItemLabel>Comfortable</Menu.ItemLabel>
@@ -582,16 +568,7 @@ export const RadioItems: Story = {
 									Show more spacing between rows.
 								</Menu.ItemDescription>
 							</Menu.RadioItem>
-							<Menu.RadioItem
-								value="spacious"
-								prefix={
-									<Icon
-										icon={ archive }
-										size={ 24 }
-										aria-hidden
-									/>
-								}
-							>
+							<Menu.RadioItem value="spacious">
 								<Menu.ItemLabel>Spacious</Menu.ItemLabel>
 								<Menu.ItemDescription>
 									Show the largest row spacing.
