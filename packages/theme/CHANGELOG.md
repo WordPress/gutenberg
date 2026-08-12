@@ -1,6 +1,9 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+### Internal
+
+-   Collapse the `tsconfig.src.json`/`tsconfig.bin.json`/`tsconfig.test.json` projects into the repository-standard split of `tsconfig.build.json` and a default dev `tsconfig.json`. ([#81509](https://github.com/WordPress/gutenberg/pull/81509))
 
 ### Bug Fixes
 
@@ -15,7 +18,6 @@
 ### Internal
 
 -   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
--   Collapse the `tsconfig.src.json`/`tsconfig.bin.json`/`tsconfig.test.json` projects into the repository-standard split of `tsconfig.build.json` and a default dev `tsconfig.json`. ([#81509](https://github.com/WordPress/gutenberg/pull/81509))
 
 ## 1.1.0 (2026-07-29)
 

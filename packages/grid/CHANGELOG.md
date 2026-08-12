@@ -1,13 +1,15 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+### Internal
+
+-   Split tsconfig into a build project and a default dev project; story and test declarations are no longer published to npm. ([#81509](https://github.com/WordPress/gutenberg/pull/81509))
 
 ## 0.5.0 (2026-08-12)
 
 ### Internal
 
 -   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
--   Split tsconfig into a build project and a default dev project; story and test declarations are no longer published to npm. ([#81509](https://github.com/WordPress/gutenberg/pull/81509))
 
 ## 0.4.0 (2026-07-29)
 
