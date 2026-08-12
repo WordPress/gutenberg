@@ -20,6 +20,7 @@
 
 -   Device Preview: Keep tablet and mobile iframe widths inside their responsive breakpoints so media queries remain accurate at browser zoom levels.
 -   Document tools: Fix icon button focus styles to use the design system `outset-ring__focus` mixin ([#81115](https://github.com/WordPress/gutenberg/pull/81115)).
+-   Update the admin bar's site icon when the Site Icon is saved, instead of showing the previous icon until the page is reloaded. Saving the icon also refetches the site's base data, which holds the icon URL derived from it ([#81483](https://github.com/WordPress/gutenberg/issues/81483)).
 
 ## 14.52.0 (2026-07-29)
 

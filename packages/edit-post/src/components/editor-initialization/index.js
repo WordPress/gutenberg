@@ -1,4 +1,8 @@
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useUpdatePostLinkListener } from './listener-hooks';
+import { unlock } from '../../lock-unlock';
+
+const { useSyncAdminBarSiteIcon } = unlock( editorPrivateApis );
 
 /**
  * Data component used for initializing the editor and re-initializes
@@ -8,5 +12,6 @@ import { useUpdatePostLinkListener } from './listener-hooks';
  */
 export default function EditorInitialization() {
 	useUpdatePostLinkListener();
+	useSyncAdminBarSiteIcon();
 	return null;
 }

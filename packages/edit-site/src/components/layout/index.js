@@ -38,12 +38,15 @@ import SaveHub from '../save-hub';
 import SavePanel from '../save-panel';
 
 const { useLocation } = unlock( routerPrivateApis );
-const { useStyle, UploadProgressSnackbar } = unlock( editorPrivateApis );
+const { useStyle, UploadProgressSnackbar, useSyncAdminBarSiteIcon } =
+	unlock( editorPrivateApis );
 
 const ANIMATION_DURATION = 0.3;
 const CONTENT_COLOR = { background: '#ffffff' };
 
 function Layout() {
+	useSyncAdminBarSiteIcon();
+
 	const { query, name: routeKey, areas, widths } = useLocation();
 	// Force canvas to 'view' on notfound route to show the error message and allow navigation.
 	const canvas = routeKey === 'notfound' ? 'view' : query?.canvas ?? 'view';

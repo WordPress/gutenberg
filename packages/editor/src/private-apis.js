@@ -21,6 +21,7 @@ import { StyleBookPreview } from './components/style-book';
 import { useGlobalStyles, useStyle } from './components/global-styles/hooks';
 import { GlobalStylesActionMenu } from './components/global-styles/menu';
 import UploadProgressSnackbar from './components/upload-progress-snackbar';
+import useSyncAdminBarSiteIcon from './hooks/use-sync-admin-bar-site-icon';
 
 const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 
@@ -40,6 +41,7 @@ lock( privateApis, {
 	ViewMoreMenuGroup,
 	ResizableEditor,
 	UploadProgressSnackbar,
+	useSyncAdminBarSiteIcon,
 	registerCoreBlockBindingsSources,
 	// Global Styles
 	GlobalStylesUIWrapper,
