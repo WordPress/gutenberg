@@ -31,6 +31,7 @@ export const PanelColorGradientSettingsInner = ( {
 	const panelId = useInstanceId( PanelColorGradientSettingsInner );
 	const { batch } = useRegistry();
 	if (
+		! children &&
 		( ! colors || colors.length === 0 ) &&
 		( ! gradients || gradients.length === 0 ) &&
 		disableCustomColors &&
