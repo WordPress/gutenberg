@@ -58,6 +58,10 @@ jobs:
                   fetch-depth: ${{ matrix.annotations && github.event_name == 'pull_request' && 2 || 1 }}
                   persist-credentials: false
 
+            - name: Validate labeler config
+              if: ${{ matrix.annotations }}
+              run: .github/scripts/validate-labeler-config.sh
+
             - name: Use desired version of Node.js
               uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
               with:
@@ -137,12 +141,3 @@ jobs:
 
             - name: License compatibility
               run: npm run other:check-licenses
-
-    labeler-config:
-        name: Validate labeler config
-        runs-on: ubuntu-24.04
-        permissions:
-            contents: read
-        steps:
-            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-            - run: .github/scripts/validate-labeler-config.sh
