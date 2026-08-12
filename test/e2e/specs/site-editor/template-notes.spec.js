@@ -34,6 +34,9 @@ test.describe( 'Notes in the site editor', () => {
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
+		// Opening the notes sidebar persists it as the active complementary
+		// area, which would follow the admin user into other specs.
+		await requestUtils.resetPreferences();
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
@@ -71,6 +74,12 @@ test.describe( 'Notes in the site editor', () => {
 			postType: 'wp_template',
 			canvas: 'edit',
 		} );
+
+		// A fresh load opens the settings panel, so switch back to the notes one.
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'All notes', exact: true } )
+			.click();
 
 		await expect(
 			page
@@ -184,7 +193,14 @@ test.describe( 'Notes in the site editor', () => {
 			canvas: 'edit',
 		} );
 
-		await editor.canvas.getByRole( 'document' ).first().click();
+		// Inserting a block does not create the template post; only saving does.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Unsaved content' },
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
 
 		await editor.clickBlockToolbarButton( 'Options' );
 		await expect(
