@@ -22,6 +22,7 @@ const RAMP_TOKENS_ORDER: { tokenName: keyof Ramp; abbr: string }[] = [
 	{ tokenName: 'fgSurface2', abbr: 'FGS2' },
 	{ tokenName: 'fgSurface3', abbr: 'FGS3' },
 	{ tokenName: 'fgSurface4', abbr: 'FGS4' },
+	{ tokenName: 'fgSurface5', abbr: 'FGS5' },
 	{ tokenName: 'fgFill', abbr: 'FGF' },
 	{ tokenName: 'fgFillInverted', abbr: 'FGFI' },
 	{ tokenName: 'fgFillDark', abbr: 'FGFD' },
@@ -151,6 +152,13 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 												<span
 													style={ {
 														color: ramp.fgSurface4,
+													} }
+												>
+													Aa
+												</span>
+												<span
+													style={ {
+														color: ramp.fgSurface5,
 													} }
 												>
 													Aa
