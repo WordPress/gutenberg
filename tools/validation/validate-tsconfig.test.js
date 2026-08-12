@@ -206,3 +206,58 @@ test( 'passes when a dependency is referenced through its build project', () => 
 
 	expect( result.status ).toBe( 0 );
 } );
+
+test( 'fails when a dependency is referenced only by the dev project', () => {
+	const result = runValidator(
+		createRepo( {
+			packages: {
+				blob: splitPackage,
+				blocks: {
+					tsconfigs: {
+						'tsconfig.json': [
+							'./tsconfig.build.json',
+							'../blob/tsconfig.build.json',
+						],
+						'tsconfig.build.json': [],
+					},
+					dependencies: { '@wordpress/blob': 'file:../blob' },
+				},
+			},
+			build: [
+				'packages/blob/tsconfig.build.json',
+				'packages/blocks/tsconfig.build.json',
+			],
+			root: [
+				'./tsconfig.build.json',
+				'packages/blob',
+				'packages/blocks',
+			],
+		} )
+	);
+
+	expect( result.status ).not.toBe( 0 );
+	expect( result.stderr ).toContain(
+		'Missing reference to "../blob/tsconfig.build.json" in packages/blocks/tsconfig.build.json'
+	);
+} );
+
+test( 'passes when a package solution reaches the dependency through a sub project', () => {
+	const result = runValidator(
+		createRepo( {
+			packages: {
+				blob: splitPackage,
+				theme: {
+					tsconfigs: {
+						'tsconfig.json': [ './tsconfig.src.json' ],
+						'tsconfig.src.json': [ '../blob/tsconfig.build.json' ],
+					},
+					dependencies: { '@wordpress/blob': 'file:../blob' },
+				},
+			},
+			build: [ 'packages/blob/tsconfig.build.json', 'packages/theme' ],
+			root: [ './tsconfig.build.json', 'packages/blob' ],
+		} )
+	);
+
+	expect( result.status ).toBe( 0 );
+} );

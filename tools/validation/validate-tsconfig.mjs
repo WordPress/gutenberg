@@ -82,6 +82,34 @@ function packageProjects( packageName ) {
 	};
 }
 
+/**
+ * Returns every project the src project reaches, following the references it
+ * makes to other projects of the same package, as package solutions do.
+ *
+ * @param {string} srcProject  Absolute path of the src project.
+ * @param {string} packageName Package directory name.
+ * @return {Set<string>} Absolute paths of the referenced projects.
+ */
+function srcProjectReferences( srcProject, packageName ) {
+	const packageDir = resolve( repoRoot, 'packages', packageName );
+	const collected = new Set();
+	const pending = [ srcProject ];
+
+	while ( pending.length > 0 ) {
+		for ( const reference of referencedProjects( pending.pop() ) ) {
+			if ( collected.has( reference ) ) {
+				continue;
+			}
+			collected.add( reference );
+			if ( ! relative( packageDir, reference ).startsWith( '..' ) ) {
+				pending.push( reference );
+			}
+		}
+	}
+
+	return collected;
+}
+
 for ( const packageName of packagesWithTypes ) {
 	const { srcProject, devProject } = packageProjects( packageName );
 
@@ -118,14 +146,11 @@ for ( const packageName of packagesWithTypes ) {
 		throw e;
 	}
 
-	const tsconfigs = glob.sync( `packages/${ packageName }/tsconfig*.json`, {
-		cwd: repoRoot,
-	} );
-	const references = new Set(
-		tsconfigs.flatMap( ( tsconfigPath ) => [
-			...referencedProjects( resolve( repoRoot, tsconfigPath ) ),
-		] )
-	);
+	/*
+	 * Only what the src project reaches counts: a reference that lives in
+	 * the dev project alone leaves the package build without it.
+	 */
+	const references = srcProjectReferences( srcProject, packageName );
 
 	if ( packageJson.dependencies ) {
 		for ( const dependency of Object.keys( packageJson.dependencies ) ) {
