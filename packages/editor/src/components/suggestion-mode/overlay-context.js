@@ -28,9 +28,6 @@
  * The orphan prune runs whenever the live block tree shrinks; it skips when
  * the block-editor store isn't registered (tests, standalone consumers).
  */
-/**
- * WordPress dependencies
- */
 import {
 	createContext,
 	useCallback,
@@ -41,10 +38,6 @@ import {
 	useRef,
 } from '@wordpress/element';
 import { useRegistry, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { createSuggestionWriteQueue } from './suggestion-write-queue';
 
 // Referenced by name to keep the provider runnable in tests and standalone
