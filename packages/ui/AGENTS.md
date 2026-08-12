@@ -1,28 +1,11 @@
-## Status
+## About this package
 
-`@wordpress/ui` is the home for design system components. The package includes many common UI components, though equivalents may still live in `@wordpress/components`; see the [`use-recommended-components` ESLint rule](../eslint-plugin/rules/use-recommended-components.js) for which to use.
+This directory is [`@wordpress/ui`](./README.md), the WordPress Design System's library of low-level React UI components built on the [`@wordpress/theme`](../theme/) foundation with token-driven styling and consistent patterns.
 
-Full guidance lives in [CONTRIBUTING.md](./CONTRIBUTING.md). The points below summarize how code in this package should be written.
+The WordPress Design System is a collection of reusable components, design tokens, and guidelines that work together across multiple packages for building the WordPress administrative dashboard. For how foundational packages (`@wordpress/theme`, `@wordpress/ui`, `@wordpress/icons`) and compositional packages (including `@wordpress/dataviews`, `@wordpress/admin-ui`) relate to one another, see [Design System/Introduction](../../../storybook/stories/design-system/introduction.mdx).
 
-## Scope
+[`@wordpress/components`](../components/) is a separate collection of UI components that grew organically over time. It is not the design system, though it remains maintained and contains components which either have no stable alternatives in `@wordpress/ui` yet or serve a niche use-case of the WordPress editors and aren't broadly reusable for building administrative interfaces. See the [`use-recommended-components` ESLint rule](../eslint-plugin/rules/use-recommended-components.js) for the canonical source of component status.
 
--   Add a component here only when it is generic and reusable in building admin interfaces. If it can live in a higher-level package or one scoped to a particular feature (`admin-ui`, `block-editor`, `dataviews`, etc.), it should.
--   Prefer composing existing `@wordpress/ui` components over bespoke markup and styles.
+## Guidance
 
-## Styling
-
--   Use semantic `--wpds-*` tokens for visual values; avoid hardcoded colors, spacing, and arbitrary consumer-facing value props. See [Design principles](./CONTRIBUTING.md#design-principles).
--   Match token families to semantics: `interactive` for clickable UI, `content` for static text; use state variants (`-active`, `-disabled`) rather than mixing tones across states.
--   Do not ship outer margins on component roots. Consumers should provide their own spacing.
--   Follow the [CSS layer pattern](./CONTRIBUTING.md#css-layers) and the [custom property / state rules](./CONTRIBUTING.md#custom-properties-and-state-styles).
--   Style disabled states with `[data-disabled]` for Base UI components. See [Disabled state styling](./CONTRIBUTING.md#disabled-state-styling).
--   Respect `prefers-reduced-motion` when adding motion animation. See [Design principles](./CONTRIBUTING.md#design-principles).
--   Apply [global CSS defense](./CONTRIBUTING.md#global-css-defense-wp-admin) classes when rendering native elements affected by wp-admin global styling.
-
-## Code conventions
-
--   Follow the [folder structure](./CONTRIBUTING.md#folder-structure) and [public API rules](./CONTRIBUTING.md#public-apis).
--   Use [compound components](./CONTRIBUTING.md#compound-components) and the [`render` prop patterns](./CONTRIBUTING.md#render-prop-and-ref-forwarding).
--   Use `ComponentProps` from `../utils/types` for wp-ui components; do not export prop types — use `React.ComponentProps< typeof Component >`.
--   Use `forwardRef`, named function expressions, and `displayName` on subcomponents.
--   Add Storybook stories under `Design System/Components/`.
+Read [CONTRIBUTING.md](./CONTRIBUTING.md) before adding or changing code here. It is the canonical guidance for this package, including [design principles](./CONTRIBUTING.md#design-principles), folder structure, styling, and APIs.
