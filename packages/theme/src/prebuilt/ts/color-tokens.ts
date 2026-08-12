@@ -91,12 +91,12 @@ export default {
 	'bg-fgSurface4': [
 		'foreground-content-neutral',
 		'foreground-interactive-neutral',
-		'foreground-interactive-neutral-active',
-		'foreground-interactive-neutral-weak-active',
 	],
 	'bg-fgSurface3': [
 		'foreground-content-neutral-weak',
+		'foreground-interactive-neutral-active',
 		'foreground-interactive-neutral-weak',
+		'foreground-interactive-neutral-weak-active',
 	],
 	'bg-fgSurface2': [
 		'foreground-interactive-brand-disabled',

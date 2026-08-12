@@ -22,6 +22,12 @@ jest.mock( '../style.module.css', () => ( {
 // round-trip. Ramp generation itself is covered by the color-ramps tests.)
 const BRAND_BG = '--wpds-color-background-interactive-brand-strong';
 const SURFACE_BG = '--wpds-color-background-surface-neutral';
+const FOREGROUND_NEUTRAL_WEAK =
+	'--wpds-color-foreground-interactive-neutral-weak';
+const FOREGROUND_NEUTRAL_ACTIVE =
+	'--wpds-color-foreground-interactive-neutral-active';
+const FOREGROUND_NEUTRAL_WEAK_ACTIVE =
+	'--wpds-color-foreground-interactive-neutral-weak-active';
 const CURSOR_CONTROL = '--wpds-cursor-control';
 const BORDER_RADIUS_SM = '--wpds-border-radius-sm';
 const PRIMARY = '#1e90ff';
@@ -111,6 +117,24 @@ describe( 'ThemeProvider', () => {
 		const provider = getScopingProvider( screen.getByTestId( 'child' ) );
 		expect( readProp( provider, BRAND_BG ) ).toBe( PRIMARY );
 		expect( readProp( provider, SURFACE_BG ) ).toBe( BACKGROUND );
+	} );
+
+	it( 'maps active neutral foreground tokens to the lighter foreground surface step', () => {
+		render(
+			<ThemeProvider color={ { background: BACKGROUND } }>
+				<div data-testid="child">x</div>
+			</ThemeProvider>
+		);
+
+		const provider = getScopingProvider( screen.getByTestId( 'child' ) );
+		const lighterForeground = readProp( provider, FOREGROUND_NEUTRAL_WEAK );
+
+		expect( readProp( provider, FOREGROUND_NEUTRAL_ACTIVE ) ).toBe(
+			lighterForeground
+		);
+		expect( readProp( provider, FOREGROUND_NEUTRAL_WEAK_ACTIVE ) ).toBe(
+			lighterForeground
+		);
 	} );
 
 	it( 'does not define color tokens if neither customized nor inherited', () => {
