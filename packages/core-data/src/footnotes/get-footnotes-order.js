@@ -3,6 +3,10 @@ import getRichTextValuesCached from './get-rich-text-values-cached';
 const cache = new WeakMap();
 
 function getBlockFootnotesOrder( block ) {
+	if ( block.name === 'core/table-v2' ) {
+		return [];
+	}
+
 	if ( ! cache.has( block ) ) {
 		const order = [];
 		for ( const value of getRichTextValuesCached( block ) ) {
