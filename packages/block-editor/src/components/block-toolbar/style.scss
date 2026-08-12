@@ -74,7 +74,12 @@
 	// we need to remove the double border from the penultimate one.
 	&:has(> :last-child:empty) > :nth-last-child(2),
 	&:has(> :last-child:empty) > :nth-last-child(2) .components-toolbar-group,
-	&:has(> :last-child:empty) > :nth-last-child(2) .components-toolbar {
+	&:has(> :last-child:empty) > :nth-last-child(2) .components-toolbar,
+	// The captured block selector renders detached at the end of the
+	// toolbar, so the group before it is the visual last child.
+	& > :has(+ .block-editor-captured-block-selector),
+	& > :has(+ .block-editor-captured-block-selector) .components-toolbar-group,
+	& > :has(+ .block-editor-captured-block-selector) .components-toolbar {
 		border-right: none;
 	}
 
