@@ -2,7 +2,7 @@ import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { _n, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useRef } from '@wordpress/element';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -199,6 +199,13 @@ function useInsertionPoint( {
 		]
 	);
 
+	// The insertion cue is global state shared with other components, notably
+	// the in-between inserter, which mounts its own inserter inside the cue's
+	// popover. Track whether this inserter is the one that showed the cue so it
+	// only ever hides its own, instead of tearing down another component's UI.
+	// See https://github.com/WordPress/gutenberg/issues/72297.
+	const hasShownInsertionPointRef = useRef( false );
+
 	const onToggleInsertionPoint = useCallback(
 		( item ) => {
 			if ( item && ! isBlockInsertionPointVisible() ) {
@@ -217,9 +224,11 @@ function useInsertionPoint( {
 							registry,
 						} )
 					);
+					hasShownInsertionPointRef.current = true;
 				}
-			} else {
+			} else if ( hasShownInsertionPointRef.current ) {
 				hideInsertionPoint();
+				hasShownInsertionPointRef.current = false;
 			}
 		},
 		[

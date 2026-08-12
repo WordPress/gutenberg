@@ -52,6 +52,12 @@ export default function QuickInserter( {
 
 	const showSearch = hasSearch && blockTypes.length > SEARCH_THRESHOLD;
 
+	useEffect( () => {
+		if ( setInserterIsOpened ) {
+			setInserterIsOpened( false );
+		}
+	}, [ setInserterIsOpened ] );
+
 	// When clicking Browse All select the appropriate block so as
 	// the insertion point can work as expected.
 	const onBrowseAll = () => {
