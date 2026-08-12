@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `InputControl`, `SelectControl`, `CustomSelectControl`: Align focus rings with the design system. ([#80417](https://github.com/WordPress/gutenberg/pull/80417)).
+-   `InputControl`, `SelectControl`, `CustomSelectControl`: Align focus rings with the design system ([#80417](https://github.com/WordPress/gutenberg/pull/80417)).
 
 ### Bug Fixes
 
