@@ -33,6 +33,7 @@ import WidthHeightTool from './width-height-tool';
  * @property {SelectControlProps[]}       [aspectRatioOptions] Aspect ratio options.
  * @property {SelectControlProps[]}       [scaleOptions]       Scale options.
  * @property {WPUnitControlUnit[]}        [unitsOptions]       Units options.
+ * @property {boolean}                    [hasImplicitWidth]   Whether the element is sized to its container when no width is set.
  */
 
 /**
@@ -52,6 +53,7 @@ function DimensionsTool( {
 	defaultScale = 'cover',
 	unitsOptions, // Default options handled by UnitControl.
 	tools = [ 'aspectRatio', 'widthHeight', 'scale' ],
+	hasImplicitWidth = false,
 } ) {
 	// Coerce undefined and CSS default values to be null.
 	const width =
@@ -100,7 +102,11 @@ function DimensionsTool( {
 	// as a custom aspect ratio.
 	const aspectRatioValue = hasCustomAspectRatio ? 'custom' : aspectRatio;
 
-	const showScaleControl = aspectRatio || ( width && height );
+	// Scale only does something once the box can differ from the image's own
+	// ratio, which needs a width as well as a height unless the element already
+	// fills its container.
+	const showScaleControl =
+		aspectRatio || ( height && ( width || hasImplicitWidth ) );
 
 	return (
 		<>
@@ -181,6 +187,7 @@ function DimensionsTool( {
 						// Auto-update scale.
 						if (
 							! lastAspectRatioRef.current &&
+							! ( hasImplicitWidth && nextHeight ) &&
 							!! nextWidth !== !! nextHeight
 						) {
 							delete nextValue.scale;
