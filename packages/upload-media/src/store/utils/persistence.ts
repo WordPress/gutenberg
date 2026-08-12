@@ -6,10 +6,6 @@
  * functions degrade to no-ops when IndexedDB is unavailable (private mode,
  * older environments) so the in-memory pipeline keeps working.
  */
-
-/**
- * Internal dependencies
- */
 import type { PersistedQueueItem, QueueItem, QueueItemId } from '../types';
 import { ItemStatus } from '../types';
 

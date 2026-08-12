@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getItemByUploadId, getResumableItems } from '../private-selectors';
 import { ItemStatus } from '../types';
 

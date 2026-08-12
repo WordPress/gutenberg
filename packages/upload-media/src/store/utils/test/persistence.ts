@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { buildIndexedDBMock } from './fixtures/build-idb-mock';
 import {
 	isPersistenceAvailable,
