@@ -143,7 +143,7 @@ jobs:
             - name: Run the Vitest Browser project
               env:
                   FK_ENV_NODEJS: '20'
-              run: npm run test:unit:vitest -- --project=browser
+              run: npm run test:unit -- --project=browser
 
     unit-js-date:
         name: JavaScript Date Tests (Node.js ${{ matrix.node }})
