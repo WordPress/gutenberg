@@ -1605,11 +1605,13 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		// Wait for the color picker to appear and click white
 		await page.getByRole( 'option', { name: 'White' } ).click();
 
-		// Check that the blocks have the white text color but kept their original backgrounds
+		// Check that the blocks have the white text color but kept their
+		// original backgrounds and content.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: {
+					content: 'First',
 					textColor: 'white',
 					style: { color: { background: '#ff0000' } },
 				},
@@ -1617,6 +1619,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			{
 				name: 'core/paragraph',
 				attributes: {
+					content: 'Second',
 					textColor: 'white',
 					style: { color: { background: '#00ff00' } },
 				},
@@ -1624,11 +1627,45 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			{
 				name: 'core/paragraph',
 				attributes: {
+					content: 'Third',
 					textColor: 'white',
 					style: { color: { background: '#0000ff' } },
 				},
 			},
 		] );
+
+		// Clicking the active color again clears the text color on all
+		// selected blocks, while the distinct backgrounds remain.
+		await page.getByRole( 'option', { name: 'White' } ).click();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'First',
+					style: { color: { background: '#ff0000' } },
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Second',
+					style: { color: { background: '#00ff00' } },
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Third',
+					style: { color: { background: '#0000ff' } },
+				},
+			},
+		] );
+
+		const blocksAfterClear = await editor.getBlocks();
+		expect(
+			blocksAfterClear.map( ( block ) => block.attributes.textColor )
+		).toEqual( [ undefined, undefined, undefined ] );
 	} );
 
 	test.describe( 'shift+click multi-selection', () => {
