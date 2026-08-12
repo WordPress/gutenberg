@@ -5,7 +5,7 @@
 		"types": [ "style-imports" ]
 	},
 	"references": [
-		{ "path": "../dataviews" },
+		{ "path": "../dataviews/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" }
 	]
 }

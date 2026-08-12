@@ -1,17 +1,14 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.dev.base.json",
+	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"types": [
-			"jest",
-			"node",
+			"gutenberg-env",
 			"style-imports",
 			"react-css-custom-properties"
 		]
 	},
-	"files": [ "global.d.ts" ],
 	"references": [
-		{ "path": "./tsconfig.build.json" },
 		{ "path": "../a11y/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
@@ -22,5 +19,6 @@
 		{ "path": "../private-apis" },
 		{ "path": "../style-runtime" },
 		{ "path": "../theme/tsconfig.build.json" }
-	]
+	],
+	"exclude": [ "**/benchmark", "**/test/**", "**/stories/**", "**/*.story.*" ]
 }
