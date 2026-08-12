@@ -9,7 +9,7 @@ import save from './save';
 import transforms from './transforms';
 import { unlock } from '../lock-unlock';
 
-const { fieldsKey, formKey } = unlock( blocksPrivateApis );
+const { fieldsKey, formKey, editableRootKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -17,6 +17,7 @@ export { metadata, name };
 
 export const settings = {
 	icon,
+	[ editableRootKey ]: true,
 	edit,
 	save,
 	merge( attributes, attributesToMerge ) {
