@@ -465,21 +465,6 @@ export function resetZoomLevel() {
 }
 
 /**
- * Action that toggles the spotlighted block state.
- *
- * @param {string}  clientId          The block's clientId.
- * @param {boolean} hasBlockSpotlight The spotlight state.
- * @return {Object} Action object.
- */
-export function toggleBlockSpotlight( clientId, hasBlockSpotlight ) {
-	return {
-		type: 'TOGGLE_BLOCK_SPOTLIGHT',
-		clientId,
-		hasBlockSpotlight,
-	};
-}
-
-/**
  * Opens the list view content panel popover.
  *
  * @return {Object} Action object.
