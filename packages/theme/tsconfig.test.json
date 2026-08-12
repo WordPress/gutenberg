@@ -6,7 +6,7 @@
 		"noEmit": true,
 		"rootDir": ".",
 		"types": [
-			"gutenberg-vitest-test-env",
+			"jest",
 			"node",
 			"style-imports",
 			"react-css-custom-properties"

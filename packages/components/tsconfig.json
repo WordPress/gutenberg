@@ -4,7 +4,9 @@
 	"compilerOptions": {
 		"types": [
 			"gutenberg-env",
+			"gutenberg-test-env",
 			"gutenberg-vitest-test-env",
+			"jest",
 			"react-css-custom-properties",
 			"style-imports"
 		]

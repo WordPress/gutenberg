@@ -2,4 +2,10 @@
 // type definitions found in the specified directories.
 // To ensure that global types are included, we need to
 // explicitly reference them here.
-import '@testing-library/jest-dom/vitest';
+import '@testing-library/jest-dom';
+
+declare global {
+	var wpVitest: {
+		mockResizeObserver: () => void;
+	};
+}
