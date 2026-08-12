@@ -20,13 +20,13 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
-	"publishConfig": {
-		"access": "public"
-	},
 	"scripts": {
 		"setup": "node ./setup-skills.mjs"
 	},
 	"devDependencies": {
 		"vitest": "^4.1.10"
+	},
+	"publishConfig": {
+		"access": "public"
 	}
 }

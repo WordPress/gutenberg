@@ -35,9 +35,6 @@
 		"simple-git": "^3.32.3",
 		"sprintf-js": "^1.1.1"
 	},
-	"publishConfig": {
-		"access": "public"
-	},
 	"scripts": {
 		"cherry-pick": "node ./cherry-pick.mjs",
 		"generate-php-sync-issue": "node ./generate-php-sync-issue.mjs",
@@ -45,5 +42,8 @@
 	},
 	"devDependencies": {
 		"vitest": "^4.1.10"
+	},
+	"publishConfig": {
+		"access": "public"
 	}
 }
