@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
@@ -19,10 +16,6 @@ import {
 } from '@wordpress/components';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
@@ -73,8 +66,13 @@ export default function SiteTitleEdit( props ) {
 				onChange={ setTitle }
 				allowedFormats={ [] }
 				disableLineBreaks
-				__unstableOnSplitAtEnd={ () =>
-					insertBlocksAfter( createBlock( getDefaultBlockName() ) )
+				__unstableOnSplitAtEnd={
+					insertBlocksAfter
+						? () =>
+								insertBlocksAfter(
+									createBlock( getDefaultBlockName() )
+								)
+						: undefined
 				}
 			/>
 		</TagName>

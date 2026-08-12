@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Page } from '@wordpress/admin-ui';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -16,11 +13,10 @@ import {
 	useWidgetTypes,
 	type WidgetModuleRecord,
 } from '@wordpress/widget-primitives';
-
-/**
- * Internal dependencies
- */
+import { registerDashboardFieldTypes } from './field-types';
 import { useDashboardGridSettings, useDashboardLayout } from './hooks';
+
+registerDashboardFieldTypes();
 
 function Dashboard() {
 	const [ layout, setLayout, resetLayout ] = useDashboardLayout(

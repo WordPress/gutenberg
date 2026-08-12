@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import { renderHook } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { addFilter, removeFilter } from '@wordpress/hooks';
 import {
 	getBlockTypes,
 	registerBlockType,
 	unregisterBlockType,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import _fontSize from '../font-size';
 
 const noop = () => {};

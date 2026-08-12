@@ -171,18 +171,31 @@ export function useThemeProviderStyles( {
 } = {} ) {
 	const { resolvedSettings: inheritedSettings } = useContext( ThemeContext );
 
+	// Color styles are only emitted when seeds are either applied locally or
+	// inherited from an ancestor. Otherwise, the expectation is that static CSS
+	// stylesheet, build fallbacks, or CSS properties defined elsewhere apply
+	// (e.g. `@wordpress/base-styles`). Inherited seed values must always be
+	// reapplied so portaled subtrees retain the values.
+	const hasColor =
+		color.primary !== undefined ||
+		color.background !== undefined ||
+		inheritedSettings.color?.primary !== undefined ||
+		inheritedSettings.color?.background !== undefined;
+
 	// Compute settings:
 	// - used provided prop value;
-	// - otherwise, use inherited value from parent instance;
-	// - otherwise, use fallback value (where applicable).
-	const primary =
-		color.primary ??
-		inheritedSettings.color?.primary ??
-		DEFAULT_SEED_COLORS.primary;
-	const background =
-		color.background ??
-		inheritedSettings.color?.background ??
-		DEFAULT_SEED_COLORS.background;
+	// - otherwise, if a parent instance exists, use its inherited value or default;
+	// - otherwise, omit.
+	const primary = hasColor
+		? color.primary ??
+		  inheritedSettings.color?.primary ??
+		  DEFAULT_SEED_COLORS.primary
+		: undefined;
+	const background = hasColor
+		? color.background ??
+		  inheritedSettings.color?.background ??
+		  DEFAULT_SEED_COLORS.background
+		: undefined;
 	const cursorControl = cursor?.control ?? inheritedSettings.cursor?.control;
 	const cornerRadiusPreset =
 		cornerRadius ?? inheritedSettings.cornerRadius ?? 'subtle';
@@ -200,6 +213,10 @@ export function useThemeProviderStyles( {
 	);
 
 	const colorStyles = useMemo( () => {
+		if ( primary === undefined || background === undefined ) {
+			return {};
+		}
+
 		// Determine which seeds are needed for generating ramps.
 		const seeds = {
 			...DEFAULT_SEED_COLORS,

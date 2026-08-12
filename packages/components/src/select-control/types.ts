@@ -1,18 +1,9 @@
-/**
- * External dependencies
- */
 import type { ChangeEvent, ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { InputBaseProps } from '../input-control/types';
 import type { BaseControlProps } from '../base-control/types';
 
 type SelectControlBaseProps< V extends string > = Pick<
 	InputBaseProps,
-	| '__next36pxDefaultSize'
-	| '__shouldNotWarnDeprecated36pxSize'
 	| 'disabled'
 	| 'hideLabelFromVision'
 	| 'label'
@@ -22,6 +13,14 @@ type SelectControlBaseProps< V extends string > = Pick<
 	| 'suffix'
 > &
 	Pick< BaseControlProps, '__nextHasNoMarginBottom' | 'help' > & {
+		/**
+		 * Deprecated. Use `__next40pxDefaultSize` instead.
+		 *
+		 * @default false
+		 * @deprecated
+		 * @ignore
+		 */
+		__next36pxDefaultSize?: boolean;
 		/**
 		 * Start opting into the larger default height that will become the default size in a future version.
 		 *

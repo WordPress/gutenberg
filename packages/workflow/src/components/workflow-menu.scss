@@ -138,7 +138,7 @@
 .workflows-workflow-menu__item mark {
 	color: inherit;
 	background: unset;
-	font-weight: 600;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 }
 
 .workflows-workflow-menu__output {
@@ -153,7 +153,7 @@
 	h3 {
 		margin: 0 0 $grid-unit-05;
 		font-size: 16px;
-		font-weight: 600;
+		font-weight: var(--wpds-typography-font-weight-emphasis);
 		color: $gray-900;
 	}
 }

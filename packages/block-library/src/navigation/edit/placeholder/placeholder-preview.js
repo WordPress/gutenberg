@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Icon, navigation } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 

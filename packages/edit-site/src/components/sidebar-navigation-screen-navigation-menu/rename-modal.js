@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,

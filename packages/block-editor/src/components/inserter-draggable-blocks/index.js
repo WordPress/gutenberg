@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { Draggable } from '@wordpress/components';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import BlockDraggableChip from '../block-draggable/draggable-chip';
 import { INSERTER_PATTERN_TYPES } from '../inserter/block-patterns-tab/utils';
 import { store as blockEditorStore } from '../../store';

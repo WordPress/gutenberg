@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalUseSlotFills as useSlotFills } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import AdvancedControls from './advanced-controls-panel';
 import { default as InspectorControls } from '../inspector-controls';
 import groups from '../inspector-controls/groups';

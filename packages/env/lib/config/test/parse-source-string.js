@@ -1,14 +1,7 @@
 'use strict';
 /* eslint-disable jest/no-conditional-expect */
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const { homedir } = require( 'os' );
-
-/**
- * Internal dependencies
- */
 const { ValidationError } = require( '../validate-config' );
 const { parseSourceString } = require( '../parse-source-string' );
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { _n, __, sprintf } from '@wordpress/i18n';
@@ -10,10 +7,6 @@ import { check } from '@wordpress/icons';
 import { EntitiesSavedStates } from '@wordpress/editor';
 import { Button, Modal } from '@wordpress/components';
 import { Tooltip } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import './style.scss';
 import useSaveShortcut from '../save-panel/use-save-shortcut';
 

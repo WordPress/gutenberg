@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { isModalActive } from '../selectors';
 
 describe( 'selectors', () => {

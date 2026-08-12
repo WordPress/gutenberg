@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import RawHTML from '../raw-html';
 
 describe( 'RawHTML', () => {

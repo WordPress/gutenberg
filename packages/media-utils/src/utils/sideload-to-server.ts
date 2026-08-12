@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import type { CreateSideloadFile, RestAttachment, SubSizeData } from './types';
 import { flattenFormData } from './flatten-form-data';
 

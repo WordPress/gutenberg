@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useState, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { debounce } from '@wordpress/compose';
@@ -16,10 +9,6 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import PreviewBlockPopover from '../block-switcher/preview-block-popover';
 import useStylesForBlocks from './use-styles-for-block';
 import { useToolsPanelDropdownMenuProps } from '../global-styles/utils';

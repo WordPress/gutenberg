@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { renameFile, cloneFile } from '../utils';
 
 describe( 'renameFile', () => {

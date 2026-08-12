@@ -135,3 +135,27 @@ function gutenberg_allow_extended_gradient_backgrounds( $allow_css, $css_test_st
 }
 
 add_filter( 'safecss_filter_attr_allow_css', 'gutenberg_allow_extended_gradient_backgrounds', 10, 2 );
+
+/**
+ * Allows the `tabindex` attribute on elements that support global attributes.
+ *
+ * `tabindex` is a global HTML attribute, but KSES strips it from post content.
+ * The Tab Panel block saves it to keep the panel focusable.
+ *
+ * @param array[] $tags Array of allowed HTML tags and their allowed attributes.
+ * @return array[] Modified array of allowed HTML tags.
+ */
+function gutenberg_add_tabindex_to_kses_allowed_html( $tags ) {
+	if ( ! is_array( $tags ) ) {
+		return $tags;
+	}
+
+	foreach ( $tags as $tag => $attributes ) {
+		if ( is_array( $attributes ) ) {
+			$tags[ $tag ]['tabindex'] = true;
+		}
+	}
+
+	return $tags;
+}
+add_filter( 'wp_kses_allowed_html', 'gutenberg_add_tabindex_to_kses_allowed_html' );

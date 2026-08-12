@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { FlexItem, Flex, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { styles, seen, backup } from '@wordpress/icons';
@@ -10,10 +7,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { useViewportMatch, usePrevious } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as interfaceStore } from '@wordpress/interface';
-
-/**
- * Internal dependencies
- */
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import GlobalStylesUI from '../global-styles';
 import { GlobalStylesActionMenu } from '../global-styles/menu';
 import { store as editorStore } from '../../store';
@@ -30,6 +24,7 @@ export default function GlobalStylesSidebar() {
 		hasRevisions,
 		activeComplementaryArea,
 		editorSettings,
+		styleStateViewport,
 	} = useSelect( ( select ) => {
 		const { getActiveComplementaryArea } = select( interfaceStore );
 		const { getStylesPath, getShowStylebook } = unlock(
@@ -62,6 +57,9 @@ export default function GlobalStylesSidebar() {
 			activeComplementaryArea:
 				select( interfaceStore ).getActiveComplementaryArea( 'core' ),
 			editorSettings: select( editorStore ).getEditorSettings(),
+			styleStateViewport: unlock(
+				select( blockEditorStore )
+			).getStyleStateViewport(),
 		};
 	}, [] );
 	const { setStylesPath, setShowStylebook, resetStylesNavigation } = unlock(
@@ -172,6 +170,8 @@ export default function GlobalStylesSidebar() {
 					path={ stylesPath }
 					onPathChange={ setStylesPath }
 					settings={ editorSettings }
+					selectedViewport={ styleStateViewport }
+					showResponsiveStateControls={ false }
 				/>
 			</DefaultSidebar>
 			<WelcomeGuideStyles />

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { forwardRef, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { View } from '../../view';
 import { useControlledValue } from '../../utils';
 import type { WordPressComponentProps } from '../../context';

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalUnitControl as UnitControl,
@@ -19,10 +16,6 @@ import {
 	justifyRight,
 } from '@wordpress/icons';
 import { getCSSRules } from '@wordpress/style-engine';
-
-/**
- * Internal dependencies
- */
 import { useSettings } from '../components/use-settings';
 import { appendSelectors, getBlockGapCSS, getAlignmentsInfo } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
@@ -219,6 +212,7 @@ export default {
 		layout = {},
 		onChange,
 		layoutBlockSupport,
+		controlsGroup = 'block',
 	} ) {
 		const { allowJustification = true } = layoutBlockSupport;
 
@@ -226,7 +220,10 @@ export default {
 			return null;
 		}
 		return (
-			<BlockControls group="block" __experimentalShareWithChildBlocks>
+			<BlockControls
+				group={ controlsGroup }
+				__experimentalShareWithChildBlocks
+			>
 				<DefaultLayoutJustifyContentControl
 					layout={ layout }
 					onChange={ onChange }

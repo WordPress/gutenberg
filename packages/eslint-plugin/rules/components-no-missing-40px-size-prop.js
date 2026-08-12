@@ -15,7 +15,6 @@ const COMPONENTS_REQUIRING_40PX = new Set( [
 	'Button',
 	'ClipboardButton',
 	'IconButton',
-	'InputControl',
 ] );
 
 module.exports = {

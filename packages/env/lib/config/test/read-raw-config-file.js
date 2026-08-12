@@ -1,13 +1,6 @@
 'use strict';
 /* eslint-disable jest/no-conditional-expect */
-/**
- * External dependencies
- */
 const { readFile } = require( 'fs' ).promises;
-
-/**
- * Internal dependencies
- */
 const readRawConfigFile = require( '../read-raw-config-file' );
 const { ValidationError } = require( '../validate-config' );
 

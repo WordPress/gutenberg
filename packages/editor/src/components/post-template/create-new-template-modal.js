@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { paramCase as kebabCase } from 'change-case';
-
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { serialize, createBlock } from '@wordpress/blocks';
@@ -17,10 +10,6 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 

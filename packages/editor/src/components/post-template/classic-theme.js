@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { SelectControl, Dropdown, Button, Notice } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -9,10 +6,6 @@ import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '
 import { useState, useMemo } from '@wordpress/element';
 import { addTemplate } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import CreateNewTemplateModal from './create-new-template-modal';
 import { useAllowSwitchingTemplates } from './hooks';

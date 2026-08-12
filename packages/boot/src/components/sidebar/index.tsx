@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { Button } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __, isRTL } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import Navigation from '../navigation';
 import SaveButton from '../save-button';
 import { store as bootStore } from '../../store';

@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { __, isRTL } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
 import { undo as undoIcon, redo as redoIcon } from '@wordpress/icons';
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 
 function EditorHistoryUndo( props, ref ) {
