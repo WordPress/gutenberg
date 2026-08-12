@@ -307,10 +307,10 @@ function gutenberg_e2e_activity_feed_card( $post, $identity = 'data-wp-key' ) {
 	if ( ! in_array( $identity, array( 'data-wp-key', 'id', 'none' ), true ) ) {
 		$identity = 'data-wp-key';
 	}
-	$post_id   = (int) $post['id'];
-	$title     = $post['title'] ?? 'Untitled';
-	$text      = $post['text'] ?? '';
-	$comments  = $post['comments'] ?? array();
+	$post_id  = (int) $post['id'];
+	$title    = $post['title'] ?? 'Untitled';
+	$text     = $post['text'] ?? '';
+	$comments = $post['comments'] ?? array();
 
 	// The key attribute for a named element: `data-wp-key` (user key),
 	// `id` (`renderHTML`'s fallback), or nothing (synthetic at splice
