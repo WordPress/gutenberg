@@ -30,7 +30,12 @@ import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { WaveformPlayer } from '../utils/waveform-player';
 import { PlaylistContext } from './context';
 import { getTrackAttributes, getTrackImageAttributes } from './utils';
-import { getPlaylistMediaFromZip, isZipFile } from './zip-utils';
+import {
+	debugPlaylistZip,
+	getPlaylistMediaFromZip,
+	getPlaylistZipDebugMediaInfo,
+	isZipFile,
+} from './zip-utils';
 
 const ALLOWED_PLAYLIST_MEDIA_TYPES = [
 	'audio',
@@ -120,23 +125,47 @@ function getZipFileName( media ) {
 
 async function getZipFile( media ) {
 	if ( isFile( media ) ) {
+		debugPlaylistZip(
+			'using selected ZIP file object',
+			getPlaylistZipDebugMediaInfo( media )
+		);
 		return media;
 	}
 
 	const mediaUrl = getMediaUrl( media );
 	if ( ! mediaUrl ) {
+		debugPlaylistZip( 'selected ZIP attachment is missing a URL', {
+			media: getPlaylistZipDebugMediaInfo( media ),
+		} );
 		throw new Error( __( 'The ZIP file is missing a URL.' ) );
 	}
 
+	debugPlaylistZip( 'fetching selected ZIP attachment', {
+		media: getPlaylistZipDebugMediaInfo( media ),
+	} );
 	const response = await window.fetch( mediaUrl );
 	if ( ! response.ok ) {
+		debugPlaylistZip( 'selected ZIP attachment fetch failed', {
+			status: response.status,
+			statusText: response.statusText,
+			media: getPlaylistZipDebugMediaInfo( media ),
+		} );
 		throw new Error( response.statusText );
 	}
 
 	const blob = await response.blob();
-	return new File( [ blob ], getZipFileName( media ).split( /[/\\]/ ).pop(), {
-		type: blob.type || getMediaMimeType( media ) || 'application/zip',
+	const file = new File(
+		[ blob ],
+		getZipFileName( media ).split( /[/\\]/ ).pop(),
+		{
+			type: blob.type || getMediaMimeType( media ) || 'application/zip',
+		}
+	);
+	debugPlaylistZip( 'fetched selected ZIP attachment', {
+		media: getPlaylistZipDebugMediaInfo( media ),
+		file: getPlaylistZipDebugMediaInfo( file ),
 	} );
+	return file;
 }
 
 const PlaylistEdit = ( {
@@ -291,7 +320,13 @@ const PlaylistEdit = ( {
 	const uploadZipMediaFile = useCallback(
 		( file ) =>
 			new Promise( ( resolve, reject ) => {
+				debugPlaylistZip( 'uploading extracted ZIP file', {
+					file: getPlaylistZipDebugMediaInfo( file ),
+				} );
 				if ( ! mediaUpload ) {
+					debugPlaylistZip( 'extracted ZIP file upload unavailable', {
+						file: getPlaylistZipDebugMediaInfo( file ),
+					} );
 					reject(
 						__(
 							'The ZIP file could not be uploaded because media uploads are unavailable.'
@@ -302,6 +337,12 @@ const PlaylistEdit = ( {
 
 				let isComplete = false;
 				const resolveWhenComplete = ( attachments ) => {
+					debugPlaylistZip( 'extracted ZIP file upload changed', {
+						file: getPlaylistZipDebugMediaInfo( file ),
+						attachments: Array.isArray( attachments )
+							? attachments.map( getPlaylistZipDebugMediaInfo )
+							: attachments,
+					} );
 					if ( isComplete ) {
 						return;
 					}
@@ -313,6 +354,14 @@ const PlaylistEdit = ( {
 					const attachment = attachments.find( ( item ) => item?.id );
 					if ( attachment ) {
 						isComplete = true;
+						debugPlaylistZip(
+							'extracted ZIP file upload resolved',
+							{
+								file: getPlaylistZipDebugMediaInfo( file ),
+								attachment:
+									getPlaylistZipDebugMediaInfo( attachment ),
+							}
+						);
 						resolve( attachment );
 					}
 				};
@@ -323,11 +372,16 @@ const PlaylistEdit = ( {
 					multiple: false,
 					onFileChange: resolveWhenComplete,
 					onSuccess: resolveWhenComplete,
-					onError: ( message ) =>
+					onError: ( message ) => {
+						debugPlaylistZip( 'extracted ZIP file upload failed', {
+							file: getPlaylistZipDebugMediaInfo( file ),
+							message,
+						} );
 						reject(
 							message ||
 								__( 'The ZIP file could not be uploaded.' )
-						),
+						);
+					},
 				} );
 			} ),
 		[ mediaUpload ]
@@ -350,6 +404,15 @@ const PlaylistEdit = ( {
 				}
 			}
 
+			debugPlaylistZip( 'extracted ZIP file upload batch complete', {
+				fileCount: filesList.length,
+				uploadedCount: attachments.filter( Boolean ).length,
+				errors: errors.map( ( error ) => ( {
+					file: getPlaylistZipDebugMediaInfo( error.file ),
+					message: error.message,
+				} ) ),
+			} );
+
 			return { attachments, errors };
 		},
 		[ uploadZipMediaFile ]
@@ -359,11 +422,28 @@ const PlaylistEdit = ( {
 		async ( zipFile ) => {
 			let zipMedia;
 			try {
+				debugPlaylistZip( 'creating playlist tracks from ZIP', {
+					zip: getPlaylistZipDebugMediaInfo( zipFile ),
+				} );
 				zipMedia = await getPlaylistMediaFromZip(
 					await getZipFile( zipFile )
 				);
+				debugPlaylistZip( 'parsed ZIP playlist media', {
+					trackCount: zipMedia.tracks.length,
+					tracks: zipMedia.tracks.map( ( track ) => ( {
+						file: getPlaylistZipDebugMediaInfo( track.file ),
+						details: track.details,
+					} ) ),
+					imageFile: getPlaylistZipDebugMediaInfo(
+						zipMedia.imageFile
+					),
+				} );
 			} catch ( error ) {
 				const message = getErrorMessage( error );
+				debugPlaylistZip( 'reading ZIP failed', {
+					zip: getPlaylistZipDebugMediaInfo( zipFile ),
+					message,
+				} );
 				onUploadError(
 					message
 						? sprintf(
@@ -377,6 +457,9 @@ const PlaylistEdit = ( {
 			}
 
 			if ( zipMedia.tracks.length === 0 ) {
+				debugPlaylistZip( 'ZIP contained no audio tracks', {
+					zip: getPlaylistZipDebugMediaInfo( zipFile ),
+				} );
 				onUploadError(
 					__( 'The ZIP file does not contain any audio files.' )
 				);
@@ -420,8 +503,20 @@ const PlaylistEdit = ( {
 					coverImage = getTrackImageAttributes(
 						await uploadZipMediaFile( zipMedia.imageFile )
 					);
+					debugPlaylistZip( 'uploaded ZIP cover image', {
+						imageFile: getPlaylistZipDebugMediaInfo(
+							zipMedia.imageFile
+						),
+						coverImage,
+					} );
 				} catch ( error ) {
 					const message = getErrorMessage( error );
+					debugPlaylistZip( 'ZIP cover image upload failed', {
+						imageFile: getPlaylistZipDebugMediaInfo(
+							zipMedia.imageFile
+						),
+						message,
+					} );
 					onUploadError(
 						message
 							? sprintf(
@@ -442,6 +537,17 @@ const PlaylistEdit = ( {
 				.map( ( track, index ) => {
 					const attachment = attachments[ index ];
 					if ( ! attachment ) {
+						debugPlaylistZip(
+							'skipped ZIP track without uploaded attachment',
+							{
+								track: {
+									file: getPlaylistZipDebugMediaInfo(
+										track.file
+									),
+									details: track.details,
+								},
+							}
+						);
 						return null;
 					}
 
@@ -461,12 +567,32 @@ const PlaylistEdit = ( {
 	const createTrackBlocksFromMedia = useCallback(
 		async ( media ) => {
 			const mediaItems = getMediaItems( media );
+			const mediaItemsWithType = mediaItems.map( ( mediaItem ) => ( {
+				mediaItem,
+				isZip: isZipFile( mediaItem ),
+			} ) );
+			debugPlaylistZip( 'selected playlist media', {
+				items: mediaItemsWithType.map( ( { mediaItem, isZip } ) => ( {
+					media: getPlaylistZipDebugMediaInfo( mediaItem ),
+					isZip,
+					isAudio: isFile( mediaItem )
+						? isAudioFile( mediaItem )
+						: isAudioMediaItem( mediaItem ),
+				} ) ),
+			} );
 			const blocks = createTrackBlocks(
-				mediaItems.filter( ( mediaItem ) => ! isZipFile( mediaItem ) )
+				mediaItemsWithType
+					.filter( ( { isZip } ) => ! isZip )
+					.map( ( { mediaItem } ) => mediaItem )
 			);
-			const zipFiles = mediaItems.filter( isZipFile );
+			const zipFiles = mediaItemsWithType
+				.filter( ( { isZip } ) => isZip )
+				.map( ( { mediaItem } ) => mediaItem );
 
 			if ( zipFiles.length === 0 ) {
+				debugPlaylistZip( 'selected media had no ZIP files', {
+					blockCount: blocks.length,
+				} );
 				return blocks;
 			}
 
@@ -474,7 +600,13 @@ const PlaylistEdit = ( {
 				zipFiles.map( createTrackBlocksFromZip )
 			);
 
-			return [ ...blocks, ...zipBlocks.flat() ];
+			const newBlocks = [ ...blocks, ...zipBlocks.flat() ];
+			debugPlaylistZip( 'created playlist blocks from selected media', {
+				blockCount: newBlocks.length,
+				zipBlockCount: zipBlocks.flat().length,
+				regularBlockCount: blocks.length,
+			} );
+			return newBlocks;
 		},
 		[ createTrackBlocks, createTrackBlocksFromZip ]
 	);

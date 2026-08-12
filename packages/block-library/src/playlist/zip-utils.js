@@ -8,6 +8,66 @@ const AUDIO_FILE_EXTENSION =
 	/\.(aac|aif|aiff|flac|m4a|m4b|mp3|oga|ogg|opus|wav|weba)$/i;
 const IMAGE_FILE_EXTENSION = /\.(jpe?g|png|gif|webp)$/i;
 const COVER_FILE_NAME = /^(cover|folder|album|albumart|artwork)\./i;
+const DEBUG_STORAGE_KEY = 'wpPlaylistZipDebug';
+
+function getSafeUrlDetails( url ) {
+	if ( typeof url !== 'string' ) {
+		return undefined;
+	}
+
+	try {
+		const parsedUrl = new URL( url, 'https://example.invalid' );
+		return {
+			pathname: parsedUrl.pathname,
+			hasSearch: parsedUrl.search !== '',
+			hasHash: parsedUrl.hash !== '',
+		};
+	} catch {
+		return { value: url.replace( /[?#].*$/, '' ) };
+	}
+}
+
+function isPlaylistZipDebugEnabled() {
+	if ( typeof window === 'undefined' ) {
+		return false;
+	}
+
+	if ( window.__wpPlaylistZipDebug === true ) {
+		return true;
+	}
+
+	try {
+		return window.localStorage?.getItem( DEBUG_STORAGE_KEY ) === '1';
+	} catch {
+		return false;
+	}
+}
+
+export function getPlaylistZipDebugMediaInfo( media ) {
+	const mediaUrl = media?.url ?? media?.source_url;
+
+	return {
+		name: media?.name,
+		filename: media?.filename,
+		file: typeof media?.file === 'string' ? media.file : undefined,
+		type: media?.type,
+		mime: media?.mime,
+		mimeType: media?.mime_type,
+		subtype: media?.subtype,
+		size: media?.size,
+		hasUrl: !! mediaUrl,
+		url: getSafeUrlDetails( mediaUrl ),
+	};
+}
+
+export function debugPlaylistZip( message, details ) {
+	if ( ! isPlaylistZipDebugEnabled() ) {
+		return;
+	}
+
+	// eslint-disable-next-line no-console
+	console.debug( '[Playlist ZIP]', message, details );
+}
 
 export function isZipFile( file ) {
 	const mimeTypes = [ file?.mime_type, file?.mime, file?.type ].filter(
@@ -16,7 +76,7 @@ export function isZipFile( file ) {
 	const hasZipFileExtension = ( value ) =>
 		typeof value === 'string' && /\.zip(?:[?#].*)?$/i.test( value );
 
-	return (
+	const isZip =
 		hasZipFileExtension( file?.name ) ||
 		hasZipFileExtension( file?.filename ) ||
 		hasZipFileExtension( file?.file ) ||
@@ -28,8 +88,15 @@ export function isZipFile( file ) {
 				mimeType === 'application/zip' ||
 				mimeType === 'application/x-zip' ||
 				mimeType === 'application/x-zip-compressed'
-		)
-	);
+		);
+
+	debugPlaylistZip( 'checked ZIP file candidate', {
+		media: getPlaylistZipDebugMediaInfo( file ),
+		mimeTypes,
+		isZip,
+	} );
+
+	return isZip;
 }
 
 function getFileName( path = '' ) {
@@ -108,11 +175,22 @@ async function getEntryFile( entry ) {
  */
 export async function getPlaylistMediaFromZip( zipFile ) {
 	const zipReader = new ZipReader( new BlobReader( zipFile ) );
+	debugPlaylistZip(
+		'opening ZIP file',
+		getPlaylistZipDebugMediaInfo( zipFile )
+	);
 
 	try {
 		const entries = await zipReader.getEntries();
 		const tracks = [];
 		let imageFile;
+		debugPlaylistZip( 'read ZIP entries', {
+			count: entries.length,
+			entries: entries.map( ( entry ) => ( {
+				filename: entry.filename,
+				directory: entry.directory,
+			} ) ),
+		} );
 
 		for ( const entry of entries ) {
 			if ( entry.directory ) {
@@ -142,6 +220,7 @@ export async function getPlaylistMediaFromZip( zipFile ) {
 			imageFile,
 		};
 	} finally {
+		debugPlaylistZip( 'closing ZIP file' );
 		await zipReader.close();
 	}
 }
