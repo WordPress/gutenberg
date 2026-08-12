@@ -2232,9 +2232,10 @@ test.describe( 'List (@firefox)', () => {
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 
 		// The endpoints are promoted to the top level items, which are
-		// multi-selected as blocks.
+		// multi-selected as blocks. The announcement discloses the list
+		// nested in the second item.
 		await expect( page.locator( '[aria-live="assertive"]' ) ).toHaveText(
-			'2 blocks selected.'
+			'2 blocks selected, 4 including nested blocks.'
 		);
 
 		// Both items, including the nested one, are removed, and with
