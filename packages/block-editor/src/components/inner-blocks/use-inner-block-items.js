@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, AsyncModeProvider } from '@wordpress/data';
 import { __unstableGetInnerBlocks as getInnerBlocks } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { useBlockEditContext } from '../block-edit/context';
 import { LayoutProvider, defaultLayout } from '../block-list/layout';

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	BlockControls,
 	RichText,
@@ -26,10 +23,6 @@ import {
 	tableRowBefore,
 	tableRowDelete,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import {
 	deleteColumn,
 	deleteRow,

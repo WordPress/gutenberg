@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { RawHTML } from '@wordpress/element';
 import { serialize } from '@wordpress/blocks';
 import {
@@ -14,10 +7,6 @@ import {
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { mapCellsToSections } from './utils';
 
 export default function save( { attributes } ) {

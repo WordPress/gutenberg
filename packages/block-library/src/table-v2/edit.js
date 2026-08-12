@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useState, useMemo } from '@wordpress/element';
 import {
 	InspectorControls,
@@ -29,10 +22,6 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { blockTable as icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import {
 	createTable,
 	getCellRectangleClientIds,
