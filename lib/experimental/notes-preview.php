@@ -16,3 +16,5 @@
  */
 
 require_once __DIR__ . '/notes-preview/capabilities.php';
+require_once __DIR__ . '/notes-preview/class-gutenberg-rest-comments-controller-notes.php';
+require_once __DIR__ . '/notes-preview/rest-api.php';
