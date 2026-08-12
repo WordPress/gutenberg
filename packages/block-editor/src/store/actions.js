@@ -1280,15 +1280,23 @@ export const mergeBlocks =
 			return;
 		}
 
-		// When the two blocks have different types and blockA is empty, merging
-		// would transform blockB into blockA's type (e.g. paragraph → heading).
-		// Instead, just remove the empty blockA and keep blockB as-is.
+		// Merging into an empty block of a different type would transform
+		// the content block into the empty block's type (a paragraph deleted
+		// into an empty heading became a heading). Nothing of the empty
+		// block is worth preserving, so remove it instead, exactly like the
+		// unmodified default block above it.
 		if (
 			blockA.name !== blockB.name &&
 			isUnmodifiedBlock( blockA, 'content' )
 		) {
-			dispatch.removeBlock( clientIdA, false );
-			dispatch.selectBlock( clientIdB );
+			if ( select.isBlockSelected( clientIdA ) ) {
+				registry.batch( () => {
+					dispatch.removeBlock( clientIdA, false );
+					dispatch.selectBlock( clientIdB, 0 );
+				} );
+			} else {
+				dispatch.removeBlock( clientIdA, false );
+			}
 			return;
 		}
 

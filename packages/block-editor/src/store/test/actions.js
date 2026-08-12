@@ -842,7 +842,7 @@ describe( 'actions', () => {
 			} );
 		} );
 
-		it( 'should remove blockA and focus blockB if blockA has a merge function but empty content and a different type than blockB', () => {
+		it( 'should remove an empty blockA instead of merging blockB into its type', () => {
 			registerBlockType( 'core/test-block', {
 				apiVersion: 3,
 				attributes: {
@@ -862,15 +862,26 @@ describe( 'actions', () => {
 				category: 'text',
 				title: 'test block',
 			} );
-			// blockA is empty (no content attribute set).
+			registerBlockType( 'core/test-block-b', {
+				apiVersion: 3,
+				attributes: {
+					content: {
+						type: 'rich-text',
+						role: 'content',
+					},
+				},
+				save: noop,
+				category: 'text',
+				title: 'test block b',
+			} );
+			// blockA is empty apart from bookkeeping: no content attribute.
 			const blockA = deepFreeze( {
 				clientId: 'chicken',
 				name: 'core/test-block',
 				attributes: {},
 				innerBlocks: [],
 			} );
-			// blockB is a different block type — the guard only fires when types differ,
-			// because same-type merges never transform blockB's type.
+			// A different type: a same-type merge never transforms blockB.
 			const blockB = deepFreeze( {
 				clientId: 'ribs',
 				name: 'core/test-block-b',
@@ -882,25 +893,25 @@ describe( 'actions', () => {
 				getBlock: ( clientId ) =>
 					[ blockA, blockB ].find( ( b ) => b.clientId === clientId ),
 				getBlockEditingMode: () => 'default',
-				isBlockSelected: () => true,
+				isBlockSelected: ( clientId ) => clientId === 'chicken',
 			};
 			const dispatch = Object.assign( jest.fn(), {
 				selectBlock: jest.fn(),
 				removeBlock: jest.fn(),
 			} );
+			const registry = { batch: ( callback ) => callback() };
 
 			mergeBlocks(
 				blockA.clientId,
 				blockB.clientId
-			)( { select, dispatch } );
+			)( { registry, select, dispatch } );
 
-			// Should remove the empty blockA without selecting previous.
 			expect( dispatch.removeBlock ).toHaveBeenCalledWith(
 				'chicken',
 				false
 			);
-			// Should focus blockB so it remains unchanged.
-			expect( dispatch.selectBlock ).toHaveBeenCalledWith( 'ribs' );
+			// The caret lands at the start of the untouched blockB.
+			expect( dispatch.selectBlock ).toHaveBeenCalledWith( 'ribs', 0 );
 		} );
 
 		it( 'should only focus the blockA if the blockA has no merge function and the content of blockB is modified', () => {
