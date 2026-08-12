@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.53.0 (2026-08-12)
+
 ### Enhancements
 
 -   Improve error reporting in private action `saveDirtyEntities` ([#81151](https://github.com/WordPress/gutenberg/pull/81151)).
