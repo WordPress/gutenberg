@@ -7,7 +7,7 @@
 		"types": [ "jest" ]
 	},
 	"references": [ { "path": "./tsconfig.json" } ],
-	"files": [ "src/test/types.ts" ],
+	"files": [ "src/test/types.jsdom.test.ts" ],
 	"include": [],
 	"exclude": []
 }
