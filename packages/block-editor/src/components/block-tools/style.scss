@@ -166,9 +166,13 @@
 			border: $border-width solid $gray-900;
 			border-radius: $radius-small;
 			background-color: $white;
+			box-sizing: border-box;
+			height: $grid-unit-60;
 
 			.block-editor-block-parent-selector__button {
 				border: none;
+				min-height: 0;
+				height: 100%;
 			}
 		}
 
