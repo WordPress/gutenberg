@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Internal
+
+-   Point tsconfig references at split dependencies' build projects. ([#81515](https://github.com/WordPress/gutenberg/pull/81515))
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
 ### Bug Fixes
 
 -   `getAdminThemeColors`: Fix the primary color of the Fresh scheme ([#81618](https://github.com/WordPress/gutenberg/pull/81618)).

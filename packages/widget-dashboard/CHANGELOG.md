@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Internal
+
+-   Point tsconfig references at split dependencies' build projects. ([#81515](https://github.com/WordPress/gutenberg/pull/81515))
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+-   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509))
+
 ### New Features
 
 -   Widget chrome footer: `relevance: 'high'` actions mount as leading text
