@@ -168,6 +168,7 @@
 			background-color: $white;
 			box-sizing: border-box;
 			height: $grid-unit-60;
+			padding-right: $grid-unit-15;
 
 			.block-editor-block-parent-selector__button {
 				border: none;
@@ -178,7 +179,6 @@
 
 		.block-editor-block-parent-selector__inserter.components-button.has-icon {
 			@include inserter-toggle;
-			margin-right: $grid-unit-10;
 		}
 
 		&::before {
