@@ -1,13 +1,9 @@
 import { describe, expect, it, test, vi } from 'vitest';
-import { screen, fireEvent } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { render } from '@ariakit/test/react';
+import { userEvent } from 'vitest/browser';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { useState } from '@wordpress/element';
 import FontSizePicker from '../';
 import type { FontSize } from '../types';
-globalThis.wpVitest.mockMatchMedia();
-globalThis.wpVitest.mockResizeObserver();
-
 const ControlledFontSizePicker = ( {
 	onChange,
 	...props
@@ -36,7 +32,7 @@ describe( 'FontSizePicker', () => {
 	] )(
 		'should call onChange( $expectedValue ) after user types 80 when value is $value',
 		async ( { value, expectedValue } ) => {
-			const user = userEvent.setup();
+			const user = userEvent;
 			const onChange = vi.fn();
 			await render(
 				<FontSizePicker value={ value } onChange={ onChange } />
@@ -59,7 +55,7 @@ describe( 'FontSizePicker', () => {
 	] )(
 		'should call onChange( $expectedValue ) after user types 80 when first font size is $firstFontSize',
 		async ( { firstFontSize, expectedValue } ) => {
-			const user = userEvent.setup();
+			const user = userEvent;
 			const onChange = vi.fn();
 			await render(
 				<FontSizePicker
@@ -114,7 +110,7 @@ describe( 'FontSizePicker', () => {
 		];
 
 		it( 'displays a select control', async () => {
-			const user = userEvent.setup();
+			const user = userEvent;
 			await render( <FontSizePicker fontSizes={ fontSizes } /> );
 			await user.click(
 				screen.getByRole( 'combobox', { name: 'Font size' } )
@@ -144,7 +140,7 @@ describe( 'FontSizePicker', () => {
 		] )(
 			'calls onChange( $expectedArguments ) when $option is selected',
 			async ( { option, value, expectedArguments } ) => {
-				const user = userEvent.setup();
+				const user = userEvent;
 				const onChange = vi.fn();
 				await render(
 					<FontSizePicker
@@ -202,7 +198,7 @@ describe( 'FontSizePicker', () => {
 		];
 
 		it( 'displays a select control', async () => {
-			const user = userEvent.setup();
+			const user = userEvent;
 			await render( <FontSizePicker fontSizes={ fontSizes } /> );
 			await user.click(
 				screen.getByRole( 'combobox', { name: 'Font size' } )
@@ -266,7 +262,7 @@ describe( 'FontSizePicker', () => {
 		] )(
 			'calls onChange( $expectedValue ) when $option is selected',
 			async ( { option, value, expectedArguments } ) => {
-				const user = userEvent.setup();
+				const user = userEvent;
 				const onChange = vi.fn();
 				await render(
 					<FontSizePicker
@@ -335,7 +331,7 @@ describe( 'FontSizePicker', () => {
 		} );
 
 		it( 'calls onChange when a font size is selected', async () => {
-			const user = userEvent.setup();
+			const user = userEvent;
 			const onChange = vi.fn();
 			await render(
 				<FontSizePicker fontSizes={ fontSizes } onChange={ onChange } />
@@ -493,7 +489,7 @@ describe( 'FontSizePicker', () => {
 		] )(
 			'calls onChange( $expectedArguments ) when $radio is selected',
 			async ( { radio, expectedArguments } ) => {
-				const user = userEvent.setup();
+				const user = userEvent;
 				const onChange = vi.fn();
 				await render(
 					<FontSizePicker
@@ -648,7 +644,7 @@ describe( 'FontSizePicker', () => {
 		} );
 
 		it( 'allows custom values by default', async () => {
-			const user = userEvent.setup();
+			const user = userEvent;
 			const onChange = vi.fn();
 			await render(
 				<FontSizePicker fontSizes={ fontSizes } onChange={ onChange } />
@@ -665,7 +661,7 @@ describe( 'FontSizePicker', () => {
 		} );
 
 		it( 'allows switching between custom and predef inputs when pressing the dedicated toggle', async () => {
-			const user = userEvent.setup();
+			const user = userEvent;
 
 			await render(
 				<ControlledFontSizePicker fontSizes={ fontSizes } />
@@ -702,7 +698,7 @@ describe( 'FontSizePicker', () => {
 		} );
 
 		it( 'does not display a slider by default', async () => {
-			const user = userEvent.setup();
+			const user = userEvent;
 			await render( <FontSizePicker fontSizes={ fontSizes } /> );
 			await user.click(
 				screen.getByRole( 'button', { name: 'Set custom size' } )
@@ -713,7 +709,7 @@ describe( 'FontSizePicker', () => {
 		} );
 
 		it( 'allows a slider to be used when withSlider is set', async () => {
-			const user = userEvent.setup();
+			const user = userEvent;
 			const onChange = vi.fn();
 			await render(
 				<FontSizePicker
@@ -736,7 +732,7 @@ describe( 'FontSizePicker', () => {
 		} );
 
 		it( 'allows reset by default', async () => {
-			const user = userEvent.setup();
+			const user = userEvent;
 			const onChange = vi.fn();
 			await render(
 				<FontSizePicker
@@ -754,7 +750,7 @@ describe( 'FontSizePicker', () => {
 		} );
 
 		it( 'does not allow reset when withReset is false', async () => {
-			const user = userEvent.setup();
+			const user = userEvent;
 			await render(
 				<FontSizePicker
 					fontSizes={ fontSizes }
@@ -771,7 +767,7 @@ describe( 'FontSizePicker', () => {
 		} );
 
 		it( 'applies custom units to custom font size control', async () => {
-			const user = userEvent.setup();
+			const user = userEvent;
 
 			await render(
 				<FontSizePicker
@@ -844,7 +840,7 @@ describe( 'FontSizePicker', () => {
 			} );
 
 			it( 'should call onChange with size value and FontSize object when valueMode is literal', async () => {
-				const user = userEvent.setup();
+				const user = userEvent;
 				const onChange = vi.fn();
 				await render(
 					<FontSizePicker
@@ -882,7 +878,7 @@ describe( 'FontSizePicker', () => {
 			} );
 
 			it( 'should call onChange with size value and FontSize object when valueMode is slug', async () => {
-				const user = userEvent.setup();
+				const user = userEvent;
 				const onChange = vi.fn();
 				await render(
 					<FontSizePicker
@@ -1033,7 +1029,7 @@ describe( 'FontSizePicker', () => {
 		];
 
 		it( 'should call onChange with FontSize object as second parameter for select control', async () => {
-			const user = userEvent.setup();
+			const user = userEvent;
 			const onChange = vi.fn();
 			await render(
 				<FontSizePicker fontSizes={ fontSizes } onChange={ onChange } />
@@ -1048,7 +1044,7 @@ describe( 'FontSizePicker', () => {
 		} );
 
 		it( 'should call onChange with undefined as second parameter for default option', async () => {
-			const user = userEvent.setup();
+			const user = userEvent;
 			const onChange = vi.fn();
 			await render(
 				<FontSizePicker
@@ -1067,7 +1063,7 @@ describe( 'FontSizePicker', () => {
 		} );
 
 		it( 'should call onChange with FontSize object as second parameter for toggle group control', async () => {
-			const user = userEvent.setup();
+			const user = userEvent;
 			const onChange = vi.fn();
 			// Use fewer font sizes to trigger toggle group (≤ 5)
 			const toggleGroupFontSizes = [

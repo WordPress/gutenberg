@@ -1,28 +1,16 @@
 import { describe, expect, it, test, vi } from 'vitest';
+import { userEvent } from 'vitest/browser';
 import { render, screen, waitFor, within } from '@testing-library/react';
-import { click, type, press } from '@ariakit/test';
-
-/**
- * Internal dependencies
- */
 import PaletteEdit, {
 	getNameAndSlugForPosition,
 	deduplicateElementSlugs,
 } from '..';
 import type { PaletteElement } from '../types';
 
-globalThis.wpVitest.mockMatchMedia();
-
 const noop = () => {};
 
 async function clearInput( input: HTMLInputElement ) {
-	await click( input );
-
-	// Press backspace as many times as the input's current value
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	for ( const _ of Array( input.value.length ) ) {
-		await press.Backspace();
-	}
+	await userEvent.clear( input );
 }
 
 describe( 'getNameAndSlugForPosition', () => {
@@ -293,7 +281,7 @@ describe( 'PaletteEdit', () => {
 			expect( swatch.tagName ).toBe( 'BUTTON' );
 			expect( swatch ).not.toHaveAttribute( 'aria-pressed' );
 
-			await click( swatch );
+			await userEvent.click( swatch );
 			expect(
 				screen.getByRole( editorRole, { name: editorName } )
 			).toBeVisible();
@@ -307,10 +295,10 @@ describe( 'PaletteEdit', () => {
 		const secondary = screen.getByRole( 'button', { name: 'Secondary' } );
 		primary.focus();
 
-		await press.Tab();
+		await userEvent.tab();
 		expect( secondary ).toHaveFocus();
 
-		await press.Space();
+		await userEvent.keyboard( '{Space}' );
 		expect(
 			screen.getByRole( 'textbox', { name: 'Hex color' } )
 		).toBeVisible();
@@ -320,7 +308,7 @@ describe( 'PaletteEdit', () => {
 		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
 
 		screen.getByRole( 'button', { name: 'Primary' } ).focus();
-		await press.Enter();
+		await userEvent.keyboard( '{Enter}' );
 
 		expect(
 			screen.getByRole( 'textbox', { name: 'Hex color' } )
@@ -341,7 +329,7 @@ describe( 'PaletteEdit', () => {
 	it( 'shows an option to remove all colors', async () => {
 		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
 
-		await click(
+		await userEvent.click(
 			screen.getByRole( 'button', {
 				name: 'Color options',
 			} )
@@ -361,7 +349,7 @@ describe( 'PaletteEdit', () => {
 			<PaletteEdit { ...defaultProps } colors={ colors } canReset />
 		);
 
-		await click(
+		await userEvent.click(
 			screen.getByRole( 'button', {
 				name: 'Color options',
 			} )
@@ -378,7 +366,7 @@ describe( 'PaletteEdit', () => {
 	it( 'does not show a reset colors option when `canReset` is disabled', async () => {
 		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
 
-		await click(
+		await userEvent.click(
 			screen.getByRole( 'button', {
 				name: 'Color options',
 			} )
@@ -401,7 +389,7 @@ describe( 'PaletteEdit', () => {
 			/>
 		);
 
-		await click(
+		await userEvent.click(
 			screen.getByRole( 'button', {
 				name: 'Add color',
 			} )
@@ -430,7 +418,7 @@ describe( 'PaletteEdit', () => {
 			/>
 		);
 
-		await click(
+		await userEvent.click(
 			screen.getByRole( 'button', {
 				name: 'Add gradient',
 			} )
@@ -461,7 +449,7 @@ describe( 'PaletteEdit', () => {
 			/>
 		);
 
-		await click(
+		await userEvent.click(
 			screen.getByRole( 'button', {
 				name: 'Add duotone',
 			} )
@@ -503,7 +491,7 @@ describe( 'PaletteEdit', () => {
 			/>
 		);
 
-		await click(
+		await userEvent.click(
 			screen.getByRole( 'button', {
 				name: 'Add duotone',
 			} )
@@ -539,7 +527,7 @@ describe( 'PaletteEdit', () => {
 			/>
 		);
 
-		await click(
+		await userEvent.click(
 			screen.getByRole( 'button', {
 				name: 'Add duotone',
 			} )
@@ -568,7 +556,7 @@ describe( 'PaletteEdit', () => {
 			/>
 		);
 
-		await click(
+		await userEvent.click(
 			screen.getByRole( 'button', {
 				name: 'Add duotone',
 			} )
@@ -607,18 +595,20 @@ describe( 'PaletteEdit', () => {
 			/>
 		);
 
-		await click(
+		await userEvent.click(
 			screen.getByRole( 'button', {
 				name: 'Color options',
 			} )
 		);
-		await click(
+		await userEvent.click(
 			screen.getByRole( 'button', {
 				name: 'Show details',
 			} )
 		);
-		await click( screen.getByRole( 'button', { name: 'Edit: Primary' } ) );
-		await click(
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Edit: Primary' } )
+		);
+		await userEvent.click(
 			screen.getByRole( 'button', {
 				name: 'Remove color: Primary',
 			} )
@@ -640,22 +630,24 @@ describe( 'PaletteEdit', () => {
 			/>
 		);
 
-		await click(
+		await userEvent.click(
 			screen.getByRole( 'button', {
 				name: 'Color options',
 			} )
 		);
-		await click(
+		await userEvent.click(
 			screen.getByRole( 'button', {
 				name: 'Show details',
 			} )
 		);
-		await click( screen.getByRole( 'button', { name: 'Edit: Primary' } ) );
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Edit: Primary' } )
+		);
 		const nameInput = screen.getByDisplayValue( 'Primary' );
 
 		await clearInput( nameInput as HTMLInputElement );
 
-		await type( 'Primary Updated' );
+		await userEvent.keyboard( 'Primary Updated' );
 
 		await waitFor( () => {
 			expect( onChange ).toHaveBeenCalledWith( [
@@ -680,14 +672,14 @@ describe( 'PaletteEdit', () => {
 			/>
 		);
 
-		await click( screen.getByLabelText( 'Primary' ) );
+		await userEvent.click( screen.getByLabelText( 'Primary' ) );
 		const hexInput = screen.getByRole( 'textbox', {
 			name: 'Hex color',
 		} );
 
 		await clearInput( hexInput as HTMLInputElement );
 
-		await type( '000000' );
+		await userEvent.keyboard( '000000' );
 
 		await waitFor( () => {
 			expect( onChange ).toHaveBeenCalledWith( [
@@ -711,15 +703,15 @@ describe( 'PaletteEdit', () => {
 			/>
 		);
 
-		await click( screen.getByLabelText( 'Gradient: Pale ocean' ) );
+		await userEvent.click(
+			screen.getByLabelText( 'Gradient: Pale ocean' )
+		);
 
 		// Select radial gradient option
-		await click(
-			screen.getByRole( 'combobox', {
-				name: 'Type',
-			} )
+		await userEvent.selectOptions(
+			screen.getByRole( 'combobox', { name: 'Type' } ),
+			'radial-gradient'
 		);
-		await click( screen.getByRole( 'option', { name: 'Radial' } ) );
 
 		await waitFor( () => {
 			expect( onChange ).toHaveBeenCalledWith( [
@@ -745,9 +737,15 @@ describe( 'PaletteEdit', () => {
 			/>
 		);
 
-		await click( screen.getByLabelText( 'Duotone: Blue and red' ) );
-		await click( screen.getByRole( 'button', { name: /Shadows/ } ) );
-		await click( screen.getByRole( 'option', { name: 'Primary' } ) );
+		await userEvent.click(
+			screen.getByLabelText( 'Duotone: Blue and red' )
+		);
+		await userEvent.click(
+			screen.getByRole( 'button', { name: /Shadows/ } )
+		);
+		await userEvent.click(
+			screen.getByRole( 'option', { name: 'Primary' } )
+		);
 
 		await waitFor( () => {
 			expect( onChange ).toHaveBeenCalledWith( [
@@ -786,15 +784,21 @@ describe( 'PaletteEdit', () => {
 			/>
 		);
 
-		await click( screen.getByLabelText( 'Duotone: Blue and red' ) );
-		await click( screen.getByRole( 'button', { name: /Shadows/ } ) );
+		await userEvent.click(
+			screen.getByLabelText( 'Duotone: Blue and red' )
+		);
+		await userEvent.click(
+			screen.getByRole( 'button', { name: /Shadows/ } )
+		);
 
 		// The unusable color must not be offered at all.
 		expect(
 			screen.queryByRole( 'option', { name: 'Contrast overlay' } )
 		).not.toBeInTheDocument();
 
-		await click( screen.getByRole( 'option', { name: 'Named black' } ) );
+		await userEvent.click(
+			screen.getByRole( 'option', { name: 'Named black' } )
+		);
 
 		await waitFor( () => {
 			expect( onChange ).toHaveBeenCalledWith( [
@@ -831,9 +835,13 @@ describe( 'PaletteEdit', () => {
 			/>
 		);
 
-		await click( screen.getByLabelText( 'Duotone: Second' ) );
-		await click( screen.getByRole( 'button', { name: /Shadows/ } ) );
-		await click( screen.getByRole( 'option', { name: 'Primary' } ) );
+		await userEvent.click( screen.getByLabelText( 'Duotone: Second' ) );
+		await userEvent.click(
+			screen.getByRole( 'button', { name: /Shadows/ } )
+		);
+		await userEvent.click(
+			screen.getByRole( 'option', { name: 'Primary' } )
+		);
 
 		await waitFor( () => {
 			expect( onChange ).toHaveBeenCalledWith( [

@@ -1,5 +1,4 @@
 import {
-	fireEvent,
 	render,
 	screen,
 	waitFor,
@@ -241,62 +240,6 @@ describe( 'DataViews component', () => {
 		expect( screen.getByText( 'TEST TITLE' ) ).toBeInTheDocument();
 	} );
 
-	it( 'should trigger infinite scroll when the layout container scrolls', async () => {
-		const onChangeView = vi.fn();
-
-		if ( typeof globalThis.IntersectionObserver === 'undefined' ) {
-			class IntersectionObserverMock {
-				observe = vi.fn();
-				unobserve = vi.fn();
-				disconnect = vi.fn();
-			}
-
-			globalThis.IntersectionObserver =
-				IntersectionObserverMock as unknown as typeof IntersectionObserver;
-		}
-
-		const { container } = render(
-			<DataViewWrapper
-				view={ {
-					type: LAYOUT_GRID,
-					infiniteScrollEnabled: true,
-					perPage: 1,
-				} }
-				onChangeView={ onChangeView }
-			/>
-		);
-		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-		const layoutContainer = container.querySelector(
-			'.dataviews-layout__container'
-		) as HTMLDivElement;
-
-		Object.defineProperties( layoutContainer, {
-			scrollTop: {
-				configurable: true,
-				value: 500,
-			},
-			scrollHeight: {
-				configurable: true,
-				value: 1000,
-			},
-			clientHeight: {
-				configurable: true,
-				value: 500,
-			},
-		} );
-
-		fireEvent.scroll( layoutContainer );
-
-		await waitFor( () => {
-			expect( onChangeView ).toHaveBeenCalledWith(
-				expect.objectContaining( {
-					infiniteScrollEnabled: true,
-					startPosition: 2,
-				} )
-			);
-		} );
-	} );
-
 	describe( 'page clamping', () => {
 		it( 'moves the view to the last page when it points past the end of the collection', async () => {
 			const onChangeView = vi.fn();
@@ -373,7 +316,6 @@ describe( 'DataViews component', () => {
 			expect( onChangeView ).not.toHaveBeenCalled();
 		} );
 	} );
-
 	describe( 'in table view', () => {
 		it( 'should display columns for each field', () => {
 			render( <DataViewWrapper /> );

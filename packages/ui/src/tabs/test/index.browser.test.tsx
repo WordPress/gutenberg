@@ -1,4 +1,3 @@
-import process from 'node:process';
 import {
 	afterEach,
 	describe,
@@ -7,14 +6,12 @@ import {
 	vi,
 	type MockedFunction,
 } from 'vitest';
+import { userEvent } from 'vitest/browser';
 import { act, render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { useEffect, useState, createRef } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 import { Tabs } from '../..';
 import type { TabRootProps } from '../types';
-globalThis.wpVitest.mockResizeObserver();
-globalThis.wpVitest.mockPointerEvent();
 vi.mock( import( '@wordpress/i18n' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
 	isRTL: vi.fn( () => false ),
@@ -264,8 +261,7 @@ describe( 'Tabs', () => {
 
 		it( 'should associate each `tab` with the correct `tabpanel`, even if they are not rendered in the same order', async () => {
 			const TABS_WITH_DELTA_REVERSED = [ ...TABS_WITH_DELTA ].reverse();
-
-			const user = userEvent.setup();
+			const user = userEvent;
 
 			render(
 				<Tabs.Root defaultValue="alpha">
@@ -391,7 +387,7 @@ describe( 'Tabs', () => {
 		it( 'should select a tab when clicked', async () => {
 			const mockOnValueChange = vi.fn();
 
-			const user = userEvent.setup();
+			const user = userEvent;
 
 			render(
 				<UncontrolledTabs
@@ -449,8 +445,6 @@ describe( 'Tabs', () => {
 		it( 'should not select a disabled tab when clicked', async () => {
 			const mockOnValueChange = vi.fn();
 
-			const user = userEvent.setup();
-
 			render(
 				<UncontrolledTabs
 					tabs={ TABS_WITH_BETA_DISABLED }
@@ -464,7 +458,10 @@ describe( 'Tabs', () => {
 
 			// Clicking on Beta does not result in beta being selected
 			// because the tab is disabled.
-			await user.click( screen.getByRole( 'tab', { name: 'Beta' } ) );
+			// Playwright correctly refuses to interact with an aria-disabled
+			// control. Dispatch a native click to verify the component ignores it.
+			// eslint-disable-next-line testing-library/no-node-access
+			screen.getByRole( 'tab', { name: 'Beta' } ).click();
 
 			expect(
 				screen.getByRole( 'tab', {
@@ -488,7 +485,7 @@ describe( 'Tabs', () => {
 				it( 'should choose the first tab as selected', async () => {
 					const mockOnValueChange = vi.fn();
 
-					const user = userEvent.setup();
+					const user = userEvent;
 
 					render(
 						<UncontrolledTabs
@@ -523,7 +520,7 @@ describe( 'Tabs', () => {
 				it( 'should choose the first non-disabled tab if the first tab is disabled', async () => {
 					const mockOnValueChange = vi.fn();
 
-					const user = userEvent.setup();
+					const user = userEvent;
 
 					render(
 						<UncontrolledTabs
@@ -559,7 +556,7 @@ describe( 'Tabs', () => {
 			} );
 			describe( 'when `null` [Controlled]', () => {
 				it( 'should not have a selected tab nor show any tabpanels, make the tablist tabbable and still allow selecting tabs', async () => {
-					const user = userEvent.setup();
+					const user = userEvent;
 
 					render( <ControlledTabs tabs={ TABS } value={ null } /> );
 
@@ -590,7 +587,7 @@ describe( 'Tabs', () => {
 		describe( 'when a selected tab id is specified', () => {
 			describe( 'through the `defaultValue` prop [Uncontrolled]', () => {
 				it( 'should select the initial tab matching the `defaultValue` prop', async () => {
-					const user = userEvent.setup();
+					const user = userEvent;
 
 					render(
 						<UncontrolledTabs tabs={ TABS } defaultValue="beta" />
@@ -613,7 +610,7 @@ describe( 'Tabs', () => {
 				} );
 
 				it( 'should select the initial tab matching the `defaultValue` prop even if the tab is disabled', async () => {
-					const user = userEvent.setup();
+					const user = userEvent;
 					render(
 						<UncontrolledTabs
 							tabs={ TABS_WITH_BETA_DISABLED }
@@ -639,7 +636,7 @@ describe( 'Tabs', () => {
 				} );
 
 				it( 'should select the first tab and allow tabbing to it when `defaultValue` prop does not match any known tab', async () => {
-					const user = userEvent.setup();
+					const user = userEvent;
 
 					render(
 						<UncontrolledTabs
@@ -675,7 +672,7 @@ describe( 'Tabs', () => {
 				} );
 
 				it( 'should select the first non-disabled tab and allow tabbing to it when `defaultValue` prop does not match any known tab', async () => {
-					const user = userEvent.setup();
+					const user = userEvent;
 					render(
 						<UncontrolledTabs
 							tabs={ TABS_WITH_ALPHA_DISABLED }
@@ -760,7 +757,7 @@ describe( 'Tabs', () => {
 			describe( 'through the `value` prop [Controlled]', () => {
 				describe( 'when the `value` matches an existing tab', () => {
 					it( 'should choose the initial tab matching the `value`', async () => {
-						const user = userEvent.setup();
+						const user = userEvent;
 
 						render( <ControlledTabs tabs={ TABS } value="beta" /> );
 
@@ -781,7 +778,7 @@ describe( 'Tabs', () => {
 					} );
 
 					it( 'should choose the initial tab matching the `value` even if a `defaultValue` is passed', async () => {
-						const user = userEvent.setup();
+						const user = userEvent;
 
 						render(
 							<ControlledTabs
@@ -807,7 +804,7 @@ describe( 'Tabs', () => {
 					} );
 
 					it( 'should choose the initial tab matching the `value` even if the tab is disabled', async () => {
-						const user = userEvent.setup();
+						const user = userEvent;
 
 						render(
 							<ControlledTabs
@@ -835,7 +832,7 @@ describe( 'Tabs', () => {
 
 				describe( "when the `value` doesn't match an existing tab", () => {
 					it( 'should not have a selected tab nor show any tabpanels, but allow tabbing to the first tab', async () => {
-						const user = userEvent.setup();
+						const user = userEvent;
 
 						render(
 							<ControlledTabs
@@ -867,7 +864,7 @@ describe( 'Tabs', () => {
 					} );
 
 					it( 'should not have a selected tab nor show any tabpanels, but allow tabbing to the first tab even when disabled', async () => {
-						const user = userEvent.setup();
+						const user = userEvent;
 
 						render(
 							<ControlledTabs
@@ -926,7 +923,7 @@ describe( 'Tabs', () => {
 			[ 'Controlled', ControlledTabs ],
 		] )( '[`%s`]', ( _mode, Component ) => {
 			it( 'should handle the tablist as one tab stop', async () => {
-				const user = userEvent.setup();
+				const user = userEvent;
 
 				const valueProps =
 					_mode === 'Uncontrolled'
@@ -957,7 +954,7 @@ describe( 'Tabs', () => {
 			} );
 
 			it( 'should not focus the tabpanel container when it is not tabbable', async () => {
-				const user = userEvent.setup();
+				const user = userEvent;
 
 				const valueProps =
 					_mode === 'Uncontrolled'
@@ -1009,7 +1006,7 @@ describe( 'Tabs', () => {
 
 			it( 'should select tabs in the tablist when using the left and right arrow keys when automatic tab activation is enabled', async () => {
 				const mockOnValueChange = vi.fn();
-				const user = userEvent.setup();
+				const user = userEvent;
 
 				const valueProps =
 					_mode === 'Uncontrolled'
@@ -1110,7 +1107,7 @@ describe( 'Tabs', () => {
 			it( 'should not automatically select tabs in the tablist when pressing the left and right arrow keys by default (manual tab activation)', async () => {
 				const mockOnValueChange = vi.fn();
 
-				const user = userEvent.setup();
+				const user = userEvent;
 
 				const valueProps =
 					_mode === 'Uncontrolled'
@@ -1196,7 +1193,7 @@ describe( 'Tabs', () => {
 			it( 'should not select tabs in the tablist when using the up and down arrow keys, unless the `orientation` prop is set to `vertical`', async () => {
 				const mockOnValueChange = vi.fn();
 
-				const user = userEvent.setup();
+				const user = userEvent;
 
 				const valueProps =
 					_mode === 'Uncontrolled'
@@ -1321,7 +1318,7 @@ describe( 'Tabs', () => {
 			it( 'should loop tab focus at the end of the tablist when using arrow keys', async () => {
 				const mockOnValueChange = vi.fn();
 
-				const user = userEvent.setup();
+				const user = userEvent;
 
 				const valueProps =
 					_mode === 'Uncontrolled'
@@ -1402,7 +1399,7 @@ describe( 'Tabs', () => {
 			it( 'should swap the left and right arrow keys when selecting tabs if the writing direction is set to RTL', async () => {
 				const mockOnValueChange = vi.fn();
 
-				const user = userEvent.setup();
+				const user = userEvent;
 				mockedIsRTL.mockReturnValue( true );
 
 				const valueProps =
@@ -1506,7 +1503,7 @@ describe( 'Tabs', () => {
 			it( 'should focus tabs in the tablist even if disabled', async () => {
 				const mockOnValueChange = vi.fn();
 
-				const user = userEvent.setup();
+				const user = userEvent;
 
 				const valueProps =
 					_mode === 'Uncontrolled'
@@ -1593,7 +1590,7 @@ describe( 'Tabs', () => {
 				'and automatic tab activation is %s',
 				( selectOnMove ) => {
 					it( 'should continue to handle arrow key navigation properly', async () => {
-						const user = userEvent.setup();
+						const user = userEvent;
 
 						const { rerender } = render(
 							<ControlledTabs
@@ -1653,7 +1650,7 @@ describe( 'Tabs', () => {
 					} );
 
 					it( 'should focus the correct tab when tabbing out and back into the tablist', async () => {
-						const user = userEvent.setup();
+						const user = userEvent;
 
 						const { rerender } = render(
 							<>
@@ -1732,7 +1729,7 @@ describe( 'Tabs', () => {
 				it( 'should not select a new tab when the selected tab is removed', async () => {
 					const mockOnValueChange = vi.fn();
 
-					const user = userEvent.setup();
+					const user = userEvent;
 
 					const { rerender } = render(
 						<UncontrolledTabs
@@ -1926,7 +1923,7 @@ describe( 'Tabs', () => {
 							onValueChange: mockOnValueChange,
 						};
 
-						const user = userEvent.setup();
+						const user = userEvent;
 
 						const { rerender } = render(
 							<Component { ...initialComponentProps } />
@@ -2267,7 +2264,7 @@ describe( 'Tabs', () => {
 					it( 'should handle the user-selected tab becoming disabled', async () => {
 						const mockOnValueChange = vi.fn();
 
-						const user = userEvent.setup();
+						const user = userEvent;
 
 						const initialComponentProps = {
 							tabs: TABS,
@@ -2405,18 +2402,19 @@ describe( 'Tabs', () => {
 	describe( 'Development mode validation', () => {
 		function collectUncaughtErrors() {
 			const errors: Error[] = [];
+			const consoleErrorSpy = vi
+				.spyOn( console, 'error' )
+				.mockImplementation( () => {} );
 			const windowHandler = ( event: ErrorEvent ) => {
 				event.preventDefault();
 				errors.push( event.error );
 			};
-			const processHandler = ( error: Error ) => errors.push( error );
 			window.addEventListener( 'error', windowHandler );
-			process.on( 'uncaughtException', processHandler );
 			return {
 				errors,
 				cleanup: () => {
 					window.removeEventListener( 'error', windowHandler );
-					process.off( 'uncaughtException', processHandler );
+					consoleErrorSpy.mockRestore();
 				},
 			};
 		}
