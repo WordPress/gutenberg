@@ -26,8 +26,7 @@ export default function BlockParentSelector() {
 				getSelectedBlockClientIds,
 				getParentSectionBlock,
 				getBlockName,
-				getBlockIndex,
-				getBlockOrder,
+				getNextBlockClientId,
 			} = unlock( select( blockEditorStore ) );
 			// Not getSelectedBlockClientId: a text selection crossing into a
 			// nested block resolves to the ancestor alone, but its selection
@@ -56,10 +55,7 @@ export default function BlockParentSelector() {
 				selectedBlockClientId;
 			return {
 				parentClientId: _parentClientId,
-				nextSiblingClientId:
-					getBlockOrder( _parentClientId )[
-						getBlockIndex( childClientId ) + 1
-					],
+				nextSiblingClientId: getNextBlockClientId( childClientId ),
 				showInserter: !! _parentClientId && ! isTextFlowWrapper,
 			};
 		},
