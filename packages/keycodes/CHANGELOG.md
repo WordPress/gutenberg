@@ -1,6 +1,9 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
 
 ## 4.53.0 (2026-08-12)
 
@@ -9,7 +12,6 @@
 -   Add `withIgnoreIMEEvents`, a helper that wraps a keydown handler so it ignores events fired during an IME composition. Previously a private API of `@wordpress/components` ([#81343](https://github.com/WordPress/gutenberg/pull/81343)).
 ### Internal
 
--   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
 
 ## 4.52.0 (2026-07-29)
 

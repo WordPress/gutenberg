@@ -1,12 +1,14 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
 
 ## 4.53.0 (2026-08-12)
 
 ### Internal
 
--   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
 -   Migrate the HTML entity decoding tests to Vitest. ([#81037](https://github.com/WordPress/gutenberg/pull/81037))
 
 ## 4.52.0 (2026-07-29)
