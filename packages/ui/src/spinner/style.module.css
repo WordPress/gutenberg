@@ -27,9 +27,9 @@
 			stroke-linecap: round;
 			transform-origin: 50% 50%;
 
-			@media not ( prefers-reduced-motion ) {
-				animation: spinner-spin 1.4s linear infinite both;
-			}
+			/* Intentionally kept even for prefers-reduced-motion.
+			See Note 4 of https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html */
+			animation: spinner-spin 1.4s linear infinite both;
 		}
 
 		@keyframes spinner-spin {
