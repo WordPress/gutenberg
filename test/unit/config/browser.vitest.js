@@ -4,11 +4,6 @@ import { cleanup } from '@testing-library/react';
 import { afterEach } from 'vitest';
 import './matchers/to-be-positioned-popover.vitest';
 
-// Run browser tests with the same development feature flags as the jsdom
-// project. Browser-native platform APIs intentionally remain untouched.
-// eslint-disable-next-line @wordpress/wp-global-usage
-globalThis.SCRIPT_DEBUG = true;
-
 globalThis.tinyMCEPreInit = {
 	baseURL: 'about:blank',
 };
