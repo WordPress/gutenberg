@@ -318,7 +318,7 @@ test.describe( 'Collaboration - Undo/Redo', () => {
 		await loadDefaultCategoryViaPublishPanel( page );
 
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'abcdef' );
 		await page.keyboard.press( LINE_START_KEY );

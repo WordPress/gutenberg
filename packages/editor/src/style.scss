@@ -6,6 +6,7 @@
 @use "@wordpress/media-editor/build-style/style.css" as *;
 @use "./components/autocompleters/style.scss" as *;
 @use "./components/collab-sidebar/style.scss" as *;
+@use "./components/collab-sidebar/rich-text-control/style.scss" as *;
 @use "./components/collaborators-presence/avatar/styles.scss" as *;
 @use "./components/collaborators-presence/avatar-group/styles.scss" as *;
 @use "./components/collaborators-presence/styles/collaborators-list.scss" as *;

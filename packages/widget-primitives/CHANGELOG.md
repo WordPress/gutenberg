@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.5.0 (2026-08-12)
+
 ### New Features
 
 -   `WidgetAction` gains envelope fields: `icon`, a registered icon name
@@ -12,6 +14,12 @@
     the application-registered resolver (`registerIconResolver`), so
     `WidgetType.icon` always reaches hosts renderable
     ([#80969](https://github.com/WordPress/gutenberg/pull/80969)).
+
+### Enhancements
+
+-   Name the two forms of an action icon: `WidgetActionRecord` carries the
+    registered icon name on the wire, and `WidgetAction.icon` narrows to the
+    rendered element hosts receive ([#81381](https://github.com/WordPress/gutenberg/pull/81381)).
 
 ### Documentation
 

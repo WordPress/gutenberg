@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render, act } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import {
 	createRegistry,
 	createReduxStore,
@@ -19,10 +12,6 @@ import {
 	unregisterBlockType,
 	getBlockTypes,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import {
 	operationsFromOverlay,
 	applyOperations,

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { overlayReducer } from '../overlay-context';
 
 describe( 'overlayReducer', () => {
