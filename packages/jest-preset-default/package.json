@@ -30,6 +30,11 @@
 		"jest-preset.js"
 	],
 	"main": "jest-preset.js",
+	"exports": {
+		".": "./jest-preset.js",
+		"./jest-preset": "./jest-preset.js",
+		"./package.json": "./package.json"
+	},
 	"dependencies": {
 		"@wordpress/jest-console": "file:../jest-console",
 		"babel-jest": "^30.4.1",

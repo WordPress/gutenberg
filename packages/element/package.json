@@ -44,18 +44,28 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@types/react": "^18.3.27",
-		"@types/react-dom": "^18.3.1",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/escape-html": "file:../escape-html",
 		"change-case": "^4.1.2",
-		"is-plain-object": "^5.0.0",
-		"react": "^18.3.1",
-		"react-dom": "^18.3.1"
+		"is-plain-object": "^5.0.0"
 	},
 	"devDependencies": {
 		"@testing-library/dom": "^10.4.1",
 		"@testing-library/react": "^16.3.2"
+	},
+	"peerDependencies": {
+		"@types/react": "^18 || ^19",
+		"@types/react-dom": "^18 || ^19",
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		},
+		"@types/react-dom": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

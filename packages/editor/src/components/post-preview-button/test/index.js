@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import PostPreviewButton, { PostPreviewMenuItem } from '..';
 
 jest.useRealTimers();

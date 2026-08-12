@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 jest.mock( '@octokit/rest' );
 jest.mock( '../../lib/milestone' );
 jest.mock( '../../lib/logger', () => ( {
@@ -38,7 +35,6 @@ import {
 } from '../changelog';
 import _pullRequests from './fixtures/pull-requests.json';
 import botPullRequestFixture from './fixtures/bot-pull-requests.json';
-
 const { Octokit } = require( '@octokit/rest' );
 const {
 	getMilestoneByTitle,

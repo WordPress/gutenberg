@@ -1,10 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 
 export default function save( { attributes } ) {

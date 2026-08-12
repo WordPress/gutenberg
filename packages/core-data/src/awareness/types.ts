@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import type { Y } from '@wordpress/sync';
-
-/**
- * Internal dependencies
- */
 import type { SelectionState } from '../types';
 import type { User } from '../entity-types';
 

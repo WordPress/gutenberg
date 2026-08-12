@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { fireEvent, render, screen } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
-import { ToolbarGroup } from '..';
-
-/**
- * WordPress dependencies
- */
 import { wordpress } from '@wordpress/icons';
+import { ToolbarGroup } from '..';
 
 describe( 'ToolbarGroup', () => {
 	describe( 'basic rendering', () => {

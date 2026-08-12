@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { ReactElement, ComponentType } from 'react';
 
 /**
@@ -67,6 +64,7 @@ export type FieldTypeName =
 	| 'number'
 	| 'datetime'
 	| 'date'
+	| 'time'
 	| 'media'
 	| 'boolean'
 	| 'email'
@@ -168,41 +166,6 @@ export type EditConfigDatetime = {
 };
 
 /**
- * Edit configuration for the rich text control.
- */
-export type EditConfigRichText = {
-	control: 'richtext';
-	/**
-	 * Additional class name applied to the control.
-	 */
-	className?: string;
-	/**
-	 * Block client ID, when the control is rendered for a specific block.
-	 */
-	clientId?: string;
-	/**
-	 * Format types the control allows. Defaults to all registered formats.
-	 */
-	allowedFormats?: string[];
-	/**
-	 * Disable all formatting, rendering plain text only.
-	 */
-	disableFormats?: boolean;
-	/**
-	 * Disable interactive formats such as links.
-	 */
-	withoutInteractiveFormatting?: boolean;
-	/**
-	 * Preserve white space in the value.
-	 */
-	preserveWhiteSpace?: boolean;
-	/**
-	 * Disable line breaks (Enter key).
-	 */
-	disableLineBreaks?: boolean;
-};
-
-/**
  * Edit configuration for other control types (excluding 'text', 'textarea', and 'datetime').
  */
 export type EditConfigGeneric = {
@@ -217,7 +180,6 @@ export type EditConfig =
 	| EditConfigTextarea
 	| EditConfigText
 	| EditConfigDatetime
-	| EditConfigRichText
 	| EditConfigGeneric;
 
 export type Field< Item > = {
@@ -272,7 +234,7 @@ export type Field< Item > = {
 	 *
 	 * Range rules are normalized according to `type`:
 	 * - `'integer' | 'number'`: `min`/`max` accept `number`
-	 * - `'date' | 'datetime'`: `min`/`max` accept `string`
+	 * - `'date' | 'datetime' | 'time'`: `min`/`max` accept `string`
 	 * - all other field types ignore `min`/`max`
 	 */
 	isValid?: Rules< Item >;
@@ -345,7 +307,12 @@ export type Field< Item > = {
 	/**
 	 * Display format configuration for fields.
 	 */
-	format?: FormatDatetime | FormatDate | FormatNumber | FormatInteger;
+	format?:
+		| FormatDatetime
+		| FormatDate
+		| FormatTime
+		| FormatNumber
+		| FormatInteger;
 
 	/**
 	 * Callback used to format the value of the field for display.
@@ -385,6 +352,20 @@ export type FormatDate = {
 	weekStartsOn?: DayNumber;
 };
 export type DayNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
+/**
+ * Format for time fields:
+ *
+ * - time: the format string (e.g., 'g:i a' for '2:30 pm').
+ *
+ * If not provided, defaults to the WordPress time format setting.
+ *
+ * Whether the Edit control offers a seconds field follows this format: it does
+ * when the format string renders seconds, and does not otherwise.
+ */
+export type FormatTime = {
+	time?: string;
+};
 
 /**
  * Format for number fields:
@@ -437,6 +418,7 @@ export type NormalizedField< Item > = Omit<
 	format:
 		| {}
 		| Required< FormatDate >
+		| Required< FormatTime >
 		| Required< FormatInteger >
 		| Required< FormatNumber >;
 	getValueFormatted: ( {

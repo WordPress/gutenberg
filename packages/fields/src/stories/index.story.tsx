@@ -1,14 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import type { Field, View, Form } from '@wordpress/dataviews';
 import { DataForm, DataViews } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
-
 import {
 	authorField,
 	commentStatusField,
@@ -19,7 +11,6 @@ import {
 	statusField,
 	titleField,
 } from '../fields';
-
 // Fields not yet covered:
 // featuredImageField,
 // pageTitleField,
@@ -27,7 +18,6 @@ import {
 // patternTitleField,
 // templateField,
 // templateTitleField,
-
 import type { BasePost, BasePostWithEmbeddedAuthor } from '../types';
 
 // Mock users for the story.

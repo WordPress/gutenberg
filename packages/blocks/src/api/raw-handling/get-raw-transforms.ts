@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getBlockTransforms } from '../factory';
 import type { RawTransform } from './types';
 

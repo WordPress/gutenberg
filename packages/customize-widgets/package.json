@@ -39,6 +39,7 @@
 	},
 	"wpScript": true,
 	"dependencies": {
+		"@wordpress/admin-ui": "file:../admin-ui",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/block-library": "file:../block-library",
@@ -59,6 +60,7 @@
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/preferences": "file:../preferences",
 		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/theme": "file:../theme",
 		"@wordpress/ui": "file:../ui",
 		"@wordpress/widgets": "file:../widgets",
 		"clsx": "^2.1.1",

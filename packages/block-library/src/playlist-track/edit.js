@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { isBlobURL } from '@wordpress/blob';
 import { useContext, useEffect, useRef, useState } from '@wordpress/element';
 import {
@@ -28,10 +25,6 @@ import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import { PlaylistContext } from '../playlist/context';
 import { getTrackAttributes, getTrackImageAttributes } from '../playlist/utils';
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
@@ -53,7 +46,7 @@ const PlaylistTrackEdit = ( {
 	const showImages = context?.showImages ?? true;
 	const imageButton = useRef();
 	const blockProps = useBlockProps();
-	const { currentTrackClientId, setCurrentTrackClientId, addTracks } =
+	const { currentTrackClientId, setCurrentTrackClientId } =
 		useContext( PlaylistContext );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
@@ -163,20 +156,6 @@ const PlaylistTrackEdit = ( {
 					variant="toolbar"
 				/>
 			</BlockControls>
-			{ !! addTracks && (
-				<BlockControls group="block">
-					<MediaReplaceFlow
-						name={ __( 'Add' ) }
-						onSelect={ addTracks }
-						accept="audio/*"
-						multiple
-						handleUpload={ false }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						onError={ onUploadError }
-						variant="toolbar"
-					/>
-				</BlockControls>
-			) }
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<TextControl

@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as interfaceStore } from '@wordpress/interface';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { TEMPLATE_POST_TYPE } from '../../store/constants';
 import { store as editorStore } from '../../store';

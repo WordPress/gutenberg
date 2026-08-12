@@ -1,13 +1,5 @@
 /* eslint-disable testing-library/render-result-naming-convention */
-
-/**
- * WordPress dependencies
- */
 import { renderToString } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import {
 	getSerializeCapableElement,
 	concat,

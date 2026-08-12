@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { SelectControl } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import { usePublicTaxonomies } from '../../utils';
 
 export default function TaxonomyControl( { value, onChange, ...props } ) {

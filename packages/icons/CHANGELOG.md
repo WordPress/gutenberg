@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add the `inlineImage` icon. ([#81271](https://github.com/WordPress/gutenberg/pull/81271))
+-   Add the `playlistTrack` icon. ([#80959](https://github.com/WordPress/gutenberg/pull/80959))
+
+### Internal
+
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
+
 ## 15.3.0 (2026-07-29)
 
 ### Enhancements

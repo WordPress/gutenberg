@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __experimentalItem as Item, FlexBlock } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { isRTL } from '@wordpress/i18n';
 import { chevronRightSmall, chevronLeftSmall, Icon } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { SidebarNavigationContext } from '../sidebar';
 

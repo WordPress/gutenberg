@@ -9,10 +9,6 @@
  *
  * @see https://github.com/WordPress/gutenberg/pull/49650 for more discussion.
  */
-
-/**
- * External dependencies
- */
 const fs = require( 'fs' ).promises;
 const path = require( 'path' );
 const { exec } = require( 'child_process' );
