@@ -1,6 +1,6 @@
 import {
 	BlobReader,
-	BlobWriter,
+	Uint8ArrayWriter,
 	ZipReader,
 } from '@zip.js/zip.js/lib/zip-no-worker-inflate.js';
 
@@ -218,8 +218,8 @@ async function getEntryFile( entry ) {
 	} );
 
 	try {
-		const blob = await entry.getData(
-			new BlobWriter(),
+		const data = await entry.getData(
+			new Uint8ArrayWriter(),
 			getZipEntryReadDebugOptions( entryInfo )
 		);
 		const options = {};
@@ -228,7 +228,7 @@ async function getEntryFile( entry ) {
 			options.lastModified = entry.lastModDate.getTime();
 		}
 
-		const file = new File( [ blob ], fileName, options );
+		const file = new File( [ data ], fileName, options );
 		debugPlaylistZip( 'created ZIP entry file', {
 			entry: entryInfo,
 			file: getPlaylistZipDebugMediaInfo( file ),

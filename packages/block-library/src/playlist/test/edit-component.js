@@ -65,7 +65,7 @@ jest.mock( '@wordpress/blob', () => ( {
 
 jest.mock( '@zip.js/zip.js/lib/zip-no-worker-inflate.js', () => ( {
 	BlobReader: jest.fn(),
-	BlobWriter: jest.fn( function ( type ) {
+	Uint8ArrayWriter: jest.fn( function ( type ) {
 		this.type = type;
 	} ),
 	ZipReader: jest.fn( function () {
@@ -141,11 +141,7 @@ describe( 'PlaylistEdit', () => {
 			filename,
 			directory: false,
 			lastModDate: new Date( '2026-08-11T00:00:00Z' ),
-			getData: jest.fn( ( writer ) =>
-				Promise.resolve(
-					new Blob( [ filename ], { type: writer.type } )
-				)
-			),
+			getData: jest.fn( () => Promise.resolve( new Uint8Array() ) ),
 		};
 	}
 
