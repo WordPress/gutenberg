@@ -134,7 +134,7 @@ test.describe( 'Block variations', () => {
 		await page.getByRole( 'option', { name: 'Large Quote' } ).click();
 
 		// Select the quote block.
-		await pageUtils.pressKeys( 'primary+a' );
+		await page.keyboard.press( 'ArrowUp' );
 
 		await expect(
 			page

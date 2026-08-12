@@ -258,10 +258,9 @@ test.describe( 'Quote', () => {
 		test( 'and renders only one paragraph for the cite, if the quote is void', async ( {
 			editor,
 			page,
-			pageUtils,
 		} ) => {
 			await editor.insertBlock( { name: 'core/quote' } );
-			await pageUtils.pressKeys( 'primary+a' );
+			await page.keyboard.press( 'ArrowUp' );
 			await editor.clickBlockToolbarButton( 'Add citation' );
 			await page.keyboard.type( 'cite' );
 			await editor.clickBlockOptionsMenuItem( 'Ungroup' );
@@ -278,11 +277,11 @@ test.describe( 'Quote', () => {
 
 		test( 'and renders a void paragraph if both the cite and quote are void', async ( {
 			editor,
-			pageUtils,
+			page,
 		} ) => {
 			await editor.insertBlock( { name: 'core/quote' } );
 			// Select the quote
-			await pageUtils.pressKeys( 'primary+a' );
+			await page.keyboard.press( 'ArrowUp' );
 			await editor.clickBlockOptionsMenuItem( 'Ungroup' );
 			expect( await editor.getEditedPostContent() ).toBe( '' );
 		} );
@@ -397,7 +396,7 @@ test.describe( 'Quote', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/quote' } );
 		await page.keyboard.type( '1' );
-		await pageUtils.pressKeys( 'primary+a', { times: 2 } );
+		await page.keyboard.press( 'ArrowUp' );
 		await editor.clickBlockToolbarButton( 'Add citation' );
 		await page.keyboard.type( '2' );
 		expect( await editor.getEditedPostContent() ).toBe(
@@ -428,7 +427,7 @@ test.describe( 'Quote', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/quote' } );
 		await page.keyboard.type( '1' );
-		await pageUtils.pressKeys( 'primary+a', { times: 2 } );
+		await page.keyboard.press( 'ArrowUp' );
 		await editor.clickBlockToolbarButton( 'Add citation' );
 		await page.keyboard.type( '2' );
 		await pageUtils.pressKeys( 'Shift+ArrowUp' );

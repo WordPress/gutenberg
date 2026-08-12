@@ -423,9 +423,8 @@ test.describe( 'Navigation block', () => {
 				await navigation.useLinkShortcut();
 
 				await navigation.addSubmenuPage( 'Dog' );
-				// Navigate to the Dog link content using ArrowLeft (ArrowUp skips
-				// blocks with nested focusables).
-				await pageUtils.pressKeys( 'ArrowLeft', { times: 2 } );
+				await pageUtils.pressKeys( 'ArrowUp' );
+				await pageUtils.pressKeys( 'ArrowRight' );
 			} );
 
 			await test.step( 'can use the shortcut to open the preview with the keyboard and escape keypress sends focus back to the navigation link block in the submenu', async () => {
@@ -510,9 +509,8 @@ test.describe( 'Navigation block', () => {
 			 */
 			// Exit the toolbar
 			await page.keyboard.press( 'Escape' );
-			// Move to the submenu item (only one ArrowUp needed - skips the
-			// submenu wrapper directly to Cat's content)
-			await page.keyboard.press( 'ArrowUp' );
+			// Move to the submenu item
+			await pageUtils.pressKeys( 'ArrowUp', { times: 2 } );
 
 			// Check we're on our submenu link
 			await navigation.checkLabelFocus( 'Cat' );
@@ -528,12 +526,7 @@ test.describe( 'Navigation block', () => {
 			await navigation.checkLabelFocus( 'Cat' );
 		} );
 
-		test( 'Deleting items', async ( {
-			page,
-			pageUtils,
-			navigation,
-			editor,
-		} ) => {
+		test( 'Deleting items', async ( { pageUtils, navigation, editor } ) => {
 			// Add top-level nav items.
 			await pageUtils.pressKeys( 'ArrowDown' );
 			await navigation.useBlockInserter();
@@ -573,9 +566,9 @@ test.describe( 'Navigation block', () => {
 			await navigation.addCustomURL( 'https://wordpress.org' );
 			await navigation.expectToHaveTextSelected( 'wordpress.org' );
 
-			// One ArrowUp to get to Dog (skips wrapper)
-			await page.keyboard.press( 'ArrowUp' );
+			await pageUtils.pressKeys( 'ArrowUp', { times: 2 } );
 			await navigation.checkLabelFocus( 'Dog' );
+			await pageUtils.pressKeys( 'ArrowUp', { times: 1 } );
 			await pageUtils.pressKeys( 'access+z' );
 			await pageUtils.pressKeys( 'ArrowDown' );
 			await navigation.checkLabelFocus( 'example.com' );
