@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Notes: Restore the sidebar that was open before a note was added when the note form is cancelled, instead of leaving no sidebar open.
+-   Notes: Restore the sidebar that was open before a note was added when the note form is cancelled, instead of leaving no sidebar open ([#81547](https://github.com/WordPress/gutenberg/pull/81547)).
 
 ## 14.53.0 (2026-08-12)
 
