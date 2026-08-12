@@ -122,7 +122,7 @@
 
 		// Make room for the inserter next to the parent selector.
 		&.has-parent:has(.block-editor-block-parent-selector__inserter) {
-			margin-left: calc(#{$grid-unit-60} + #{$grid-unit-40} + #{$grid-unit-10});
+			margin-left: calc(#{$grid-unit-60} + #{$grid-unit-30} + #{$grid-unit-15} + #{$grid-unit-10} + 2 * #{$border-width});
 			.show-icon-labels & {
 				margin-left: 0;
 			}
@@ -160,7 +160,7 @@
 		// With the inserter next to the parent button, the border moves to
 		// the shared container so the pair reads as one toolbar segment.
 		&:has(.block-editor-block-parent-selector__inserter) {
-			left: calc(-#{$grid-unit-60} - #{$grid-unit-40} - #{$grid-unit-10} - #{$border-width});
+			left: calc(-#{$grid-unit-60} - #{$grid-unit-30} - #{$grid-unit-15} - #{$grid-unit-10} - 3 * #{$border-width});
 			display: flex;
 			align-items: center;
 			border: $border-width solid $gray-900;
