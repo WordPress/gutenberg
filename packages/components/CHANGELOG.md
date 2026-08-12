@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 39.0.0 (2026-08-12)
+
 ### Breaking Changes
 
 -   `ValidatedTextControl`: Remove from private APIs. Use `ValidatedInputControl` instead ([#80680](https://github.com/WordPress/gutenberg/pull/80680)).
