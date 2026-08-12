@@ -1268,6 +1268,21 @@ test.describe( 'List (@firefox)', () => {
 		);
 	} );
 
+	test( 'remove empty list graciously through UI', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( '* 1' );
+
+		await editor.clickBlockToolbarButton( 'Options' );
+		await page.getByRole( 'menuitem', { name: 'Delete' } ).click();
+
+		expect( await editor.getEditedPostContent() ).toBe( '' );
+	} );
+
 	test( 'should not change the contents when you change the list type to Ordered', async ( {
 		editor,
 		page,
@@ -2159,14 +2174,10 @@ test.describe( 'List (@firefox)', () => {
 			editor.canvas.locator( '.is-multi-selected' )
 		).toHaveCount( 2 );
 
-		// Both items, including the nested one, are removed.
+		// Both items, including the nested one, are removed, and with
+		// them the emptied list itself.
 		await page.keyboard.press( 'Backspace' );
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/list',
-				innerBlocks: [],
-			},
-		] );
+		await expect.poll( editor.getBlocks ).toEqual( [] );
 	} );
 
 	test( 'should multi-select the top level items when extending a selection from a nested item to the previous top level item', async ( {
@@ -2226,14 +2237,10 @@ test.describe( 'List (@firefox)', () => {
 			'2 blocks selected.'
 		);
 
-		// Both items, including the nested one, are removed.
+		// Both items, including the nested one, are removed, and with
+		// them the emptied list itself.
 		await page.keyboard.press( 'Backspace' );
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/list',
-				innerBlocks: [],
-			},
-		] );
+		await expect.poll( editor.getBlocks ).toEqual( [] );
 	} );
 
 	test( 'should merge a following paragraph into the outermost list with Delete from a nested item (#77245)', async ( {

@@ -1038,10 +1038,9 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 
 		await page.keyboard.press( 'Backspace' );
 
-		// Expect both columns to be deleted.
-		await expect
-			.poll( editor.getBlocks )
-			.toMatchObject( [ { name: 'core/columns', innerBlocks: [] } ] );
+		// Expect the columns block to be deleted along with its emptied
+		// columns.
+		await expect.poll( editor.getBlocks ).toEqual( [] );
 	} );
 
 	test( 'should multi-select from within the list block', async ( {
