@@ -2462,6 +2462,46 @@ test.describe( 'List (@firefox)', () => {
 		] );
 	} );
 
+	test( 'should remove an anchored list when deleting its last item', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/list',
+			attributes: { anchor: 'list' },
+			innerBlocks: [
+				{ name: 'core/list-item', attributes: { anchor: 'item' } },
+			],
+		} );
+		// Inserting selects the list container; ArrowDown moves the caret
+		// into the sole empty item.
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.type( 'x' );
+
+		// Typing lands in the sole item, verifying both the setup and the
+		// caret position.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				attributes: { anchor: 'list' },
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'x', anchor: 'item' },
+					},
+				],
+			},
+		] );
+
+		// Delete the text, then the emptied item: the anchors are not
+		// content, so the item and the list are removed together instead
+		// of the item being lifted out as a paragraph first.
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect.poll( editor.getBlocks ).toEqual( [] );
+	} );
+
 	test( 'should leave nested list intact when deleting the parent item', async ( {
 		editor,
 		page,
