@@ -41,12 +41,14 @@ function Root( { className, ...settings } ) {
 		isFocusMode,
 		isPreviewMode,
 		editedContentOnlySection,
+		expandedControlsBlock,
 	} = useSelect( ( select ) => {
 		const {
 			getSettings,
 			isTyping,
 			hasBlockSpotlight,
 			getEditedContentOnlySection,
+			getExpandedControlsBlock,
 		} = unlock( select( blockEditorStore ) );
 		const {
 			outlineMode,
@@ -58,6 +60,7 @@ function Root( { className, ...settings } ) {
 			isFocusMode: focusMode || hasBlockSpotlight(),
 			isPreviewMode: _isPreviewMode,
 			editedContentOnlySection: getEditedContentOnlySection(),
+			expandedControlsBlock: getExpandedControlsBlock(),
 		};
 	}, [] );
 	const registry = useRegistry();
@@ -118,6 +121,11 @@ function Root( { className, ...settings } ) {
 					clientId={ editedContentOnlySection }
 				/>
 			) }
+			{ !! expandedControlsBlock && (
+				<CollapseExpandedControlsOnOutsideSelect
+					clientId={ expandedControlsBlock }
+				/>
+			) }
 		</IntersectionObserver.Provider>
 	);
 }
@@ -147,6 +155,32 @@ function StopEditingContentOnlySectionOnOutsideSelect( { clientId } ) {
 			stopEditingContentOnlySection();
 		}
 	}, [ isBlockOrDescendantSelected, stopEditingContentOnlySection ] );
+
+	return null;
+}
+
+function CollapseExpandedControlsOnOutsideSelect( { clientId } ) {
+	const { collapseBlockControls } = unlock( useDispatch( blockEditorStore ) );
+	// Unlike an edited contentOnly section, selecting the capturing block
+	// itself also collapses; only a selection within its inner blocks keeps
+	// the controls expanded.
+	const isDescendantSelected = useSelect(
+		( select ) => {
+			const { hasSelectedInnerBlock, getBlockSelectionStart } =
+				select( blockEditorStore );
+			return (
+				! getBlockSelectionStart() ||
+				hasSelectedInnerBlock( clientId, true )
+			);
+		},
+		[ clientId ]
+	);
+
+	useEffect( () => {
+		if ( ! isDescendantSelected ) {
+			collapseBlockControls();
+		}
+	}, [ isDescendantSelected, collapseBlockControls ] );
 
 	return null;
 }

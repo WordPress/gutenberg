@@ -598,6 +598,8 @@ function BlockListBlockProvider( props ) {
 				getMultiSelectedBlockClientIds,
 				hasSelectedInnerBlock,
 				getBlocksByName,
+				getBlockSelectionStart,
+				getControlsCapturingParent,
 
 				getBlockIndex,
 				isBlockMultiSelected,
@@ -701,6 +703,20 @@ function BlockListBlockProvider( props ) {
 				( !! sectionBlockClientId &&
 					hasSelectedInnerBlock( sectionBlockClientId, checkDeep ) );
 
+			// A collapsed controls-capturing ancestor renders its own
+			// controls in place of the selected block's; the selected
+			// block's controls are suppressed until expanded. Content-locked
+			// sections take precedence over controls capture.
+			const controlsCapturingParent = sectionBlockClientId
+				? undefined
+				: getControlsCapturingParent( clientId );
+			const capturesSelectionControls =
+				! sectionBlockClientId &&
+				_hasBlockSupport( blockName, 'captureControls', false ) &&
+				isAncestorOfSelectedBlock &&
+				getControlsCapturingParent( getBlockSelectionStart() ) ===
+					clientId;
+
 			const multiple = hasBlockSupport( blockName, 'multiple', true );
 
 			// For block types with `multiple` support, there is no "original
@@ -728,11 +744,13 @@ function BlockListBlockProvider( props ) {
 					getEditedContentOnlySection() === clientId,
 				blockEditingMode,
 				mayDisplayControls:
-					_isSelected ||
-					( isFirstMultiSelectedBlock( clientId ) &&
-						getMultiSelectedBlockClientIds().every(
-							( id ) => getBlockName( id ) === blockName
-						) ),
+					capturesSelectionControls ||
+					( ! controlsCapturingParent &&
+						( _isSelected ||
+							( isFirstMultiSelectedBlock( clientId ) &&
+								getMultiSelectedBlockClientIds().every(
+									( id ) => getBlockName( id ) === blockName
+								) ) ) ),
 				mayDisplayParentControls:
 					_hasBlockSupport(
 						getBlockName( clientId ),

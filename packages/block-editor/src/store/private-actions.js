@@ -400,6 +400,29 @@ export function stopEditingContentOnlySection() {
 }
 
 /**
+ * Temporarily expand the inner blocks of a controls-capturing block so the
+ * selected inner block shows its own toolbar and inspector controls.
+ *
+ * @param {string} clientId The client id of the controls-capturing block.
+ */
+export function expandBlockControls( clientId ) {
+	return {
+		type: 'EXPAND_BLOCK_CONTROLS',
+		clientId,
+	};
+}
+
+/**
+ * Action that collapses the inner blocks of a controls-capturing block back
+ * into the capturing block's controls.
+ */
+export function collapseBlockControls() {
+	return {
+		type: 'EXPAND_BLOCK_CONTROLS',
+	};
+}
+
+/**
  * Sets the zoom level.
  *
  * @param {number} zoom the new zoom level

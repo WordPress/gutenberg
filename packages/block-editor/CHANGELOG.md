@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New features
+
+-   Added the `captureControls` block support: a block that opts in keeps showing its own toolbar and inspector while its inner blocks are selected, with the selection reduced to a tile at the end of the toolbar that temporarily expands the selection's own controls ([#81464](https://github.com/WordPress/gutenberg/pull/81464)).
+
 ### Internal
 
 -   Use the new `@wordpress/kebab-case` package instead of unlocking the `kebabCase` utility from the `@wordpress/components` private APIs ([#81294](https://github.com/WordPress/gutenberg/pull/81294)).

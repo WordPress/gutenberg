@@ -158,6 +158,7 @@ function StyleStateInspectorSlots( {
 function BlockInspector() {
 	const {
 		selectedBlockCount,
+		isCapturedSelection,
 		renderedBlockName,
 		renderedBlockClientId,
 		blockType,
@@ -178,6 +179,7 @@ function BlockInspector() {
 			getSelectedBlockCount,
 			getBlockName,
 			getParentSectionBlock,
+			getControlsCapturingParent,
 			isSectionBlock: _isSectionBlock,
 			getEditedContentOnlySection,
 			isWithinEditedContentOnlySection,
@@ -191,9 +193,19 @@ function BlockInspector() {
 		const isWithinEditedSection = isWithinEditedContentOnlySection(
 			_selectedBlockClientId
 		);
+		// Selection (single or multi) within a collapsed controls-capturing
+		// block renders the capturing block's inspector instead.
+		// Content-locked sections take precedence over controls capture.
+		const _firstSelectedClientId = getSelectedBlockClientIds()[ 0 ];
+		const _controlsCapturingParent =
+			isWithinEditedSection ||
+			getParentSectionBlock( _firstSelectedClientId )
+				? undefined
+				: getControlsCapturingParent( _firstSelectedClientId );
 		const _renderedBlockClientId = isWithinEditedSection
 			? _selectedBlockClientId
 			: getParentSectionBlock( _selectedBlockClientId ) ||
+			  _controlsCapturingParent ||
 			  _selectedBlockClientId;
 		const _renderedBlockName =
 			_renderedBlockClientId && getBlockName( _renderedBlockClientId );
@@ -209,6 +221,7 @@ function BlockInspector() {
 
 		return {
 			selectedBlockCount: getSelectedBlockCount(),
+			isCapturedSelection: !! _controlsCapturingParent,
 			renderedBlockClientId: _renderedBlockClientId,
 			renderedBlockName: _renderedBlockName,
 			blockType: _blockType,
@@ -290,7 +303,11 @@ function BlockInspector() {
 		selectedBlockStyleState
 	);
 
-	if ( hasSelectedBlocks && ! isSectionBlockInSelection ) {
+	if (
+		hasSelectedBlocks &&
+		! isSectionBlockInSelection &&
+		! isCapturedSelection
+	) {
 		return (
 			<div className="block-editor-block-inspector">
 				<MultiSelectionInspector />
@@ -308,7 +325,11 @@ function BlockInspector() {
 		);
 	}
 
-	if ( hasSelectedBlocks && isSectionBlockInSelection ) {
+	if (
+		hasSelectedBlocks &&
+		isSectionBlockInSelection &&
+		! isCapturedSelection
+	) {
 		return (
 			<div className="block-editor-block-inspector">
 				<MultiSelectionInspector />
