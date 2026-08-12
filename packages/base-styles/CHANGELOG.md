@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   `input-control`: Use `outset-ring__focus` for focus styling, WPDS tokens for border styling, and a hover border treatment aligned with `@wordpress/ui` ([#81357](https://github.com/WordPress/gutenberg/pull/81357)). If you also define custom `:focus` box-shadow styles on the same selector, remove them to avoid duplicate focus rings.
+-   `input-control`: Use `outset-ring__focus` for focus styling, WPDS tokens for border styling, and a hover border treatment aligned with `@wordpress/ui`. If you also define custom `:focus` box-shadow styles on the same selector, remove them to avoid duplicate focus rings ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
 
 ## 12.1.0 (2026-08-12)
 
