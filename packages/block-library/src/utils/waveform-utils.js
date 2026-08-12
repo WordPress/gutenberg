@@ -3,7 +3,11 @@
  * Used by both the WaveformPlayer component (editor) and view.js (frontend).
  */
 import { colord } from 'colord';
+import { restoreWaveformAutoinitAttribute } from './disable-waveform-autoinit';
+// eslint-disable-next-line import/order -- This dependency reads the document attribute during module evaluation.
 import WaveformPlayerLib from '@arraypress/waveform-player';
+
+restoreWaveformAutoinitAttribute();
 
 /**
  * Configuration constants.
@@ -11,6 +15,46 @@ import WaveformPlayerLib from '@arraypress/waveform-player';
  */
 const DEFAULT_WAVEFORM_HEIGHT = 100;
 const DEFAULT_SEEK_LABEL = 'Seek';
+const ICON_ELEMENTS = new Set( [
+	'svg',
+	'g',
+	'path',
+	'circle',
+	'ellipse',
+	'line',
+	'polygon',
+	'polyline',
+	'rect',
+	'title',
+	'desc',
+] );
+const ICON_ATTRIBUTES = new Set( [
+	'aria-hidden',
+	'aria-label',
+	'class',
+	'clip-rule',
+	'cx',
+	'cy',
+	'd',
+	'fill',
+	'fill-rule',
+	'height',
+	'r',
+	'rx',
+	'ry',
+	'stroke',
+	'stroke-linecap',
+	'stroke-linejoin',
+	'stroke-width',
+	'viewBox',
+	'width',
+	'x',
+	'x1',
+	'x2',
+	'y',
+	'y1',
+	'y2',
+] );
 
 /**
  * Get computed style for an element, using ownerDocument for iframe compatibility.
@@ -202,6 +246,40 @@ function serializeColorValue( colorValue ) {
 		: colorValue;
 }
 
+function sanitizeSvgIcon( value ) {
+	const { body } = document.implementation.createHTMLDocument( '' );
+	body.innerHTML = value;
+
+	if (
+		body.children.length !== 1 ||
+		body.firstElementChild?.tagName.toLowerCase() !== 'svg'
+	) {
+		return;
+	}
+
+	const elements = [
+		body.firstElementChild,
+		...body.firstElementChild.getElementsByTagName( '*' ),
+	];
+	for ( const element of elements ) {
+		if ( ! ICON_ELEMENTS.has( element.tagName.toLowerCase() ) ) {
+			element.remove();
+			continue;
+		}
+
+		for ( const attribute of [ ...element.attributes ] ) {
+			if (
+				attribute.name.startsWith( 'on' ) ||
+				! ICON_ATTRIBUTES.has( attribute.name )
+			) {
+				element.removeAttribute( attribute.name );
+			}
+		}
+	}
+
+	return body.innerHTML;
+}
+
 /**
  * Get all colors needed for the waveform player based on the element's styles.
  *
@@ -250,6 +328,8 @@ export function getWaveformColors(
  * @param {string} options.progressColor    - The progress indicator color.
  * @param {string} options.waveformGradient - The waveform gradient direction.
  * @param {string} options.buttonColor      - The play button color.
+ * @param {string} options.playIcon         - The play icon SVG markup.
+ * @param {string} options.pauseIcon        - The pause icon SVG markup.
  * @param {string} options.seekLabel        - Accessible label for the seek control.
  * @param {string} options.seekValueText    - Accessible value-text template for the seek control (e.g. '%1$s of %2$s').
  * @param {number} options.height           - The waveform height in pixels.
@@ -265,6 +345,8 @@ export function createWaveformContainer( {
 	progressColor,
 	waveformGradient,
 	buttonColor,
+	playIcon,
+	pauseIcon,
 	seekLabel,
 	seekValueText,
 	height = DEFAULT_WAVEFORM_HEIGHT,
@@ -285,6 +367,14 @@ export function createWaveformContainer( {
 	);
 	if ( waveformGradient ) {
 		container.setAttribute( 'data-waveform-gradient', waveformGradient );
+	}
+	const sanitizedPlayIcon = playIcon && sanitizeSvgIcon( playIcon );
+	if ( sanitizedPlayIcon ) {
+		container.setAttribute( 'data-play-icon', sanitizedPlayIcon );
+	}
+	const sanitizedPauseIcon = pauseIcon && sanitizeSvgIcon( pauseIcon );
+	if ( sanitizedPauseIcon ) {
+		container.setAttribute( 'data-pause-icon', sanitizedPauseIcon );
 	}
 	container.setAttribute( 'data-button-color', buttonColor );
 	container.setAttribute(
@@ -515,6 +605,8 @@ export function logPlayError( error ) {
  * @param {boolean}  options.autoPlay              - Whether to auto-play when ready.
  * @param {Function} options.onEnded               - Callback when track ends.
  * @param {Object}   options.labels                - Translated button labels.
+ * @param {string}   options.playIcon              - The play icon SVG markup.
+ * @param {string}   options.pauseIcon             - The pause icon SVG markup.
  * @param {string}   options.waveformStyle         - Waveform style (bars, mirror, line, blocks, dots, seekbar).
  * @param {boolean}  options.showPlayButtonArtwork - Whether to show artwork on the play button.
  * @return {Object} Object with instance, container, and destroy function.
@@ -535,6 +627,8 @@ export function initWaveformPlayer(
 		autoPlay,
 		onEnded,
 		labels,
+		playIcon,
+		pauseIcon,
 		waveformStyle,
 		showPlayButtonArtwork = false,
 	}
@@ -567,6 +661,8 @@ export function initWaveformPlayer(
 		progressColor,
 		waveformGradient,
 		buttonColor: textColor,
+		playIcon,
+		pauseIcon,
 		seekLabel: title || labels?.seek,
 		seekValueText: labels?.seekValueText,
 		waveformStyle,
