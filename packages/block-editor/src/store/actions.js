@@ -1371,7 +1371,16 @@ export const mergeBlocks =
 			return;
 		}
 
-		if ( isUnmodifiedDefaultBlock( blockA ) ) {
+		// An unmodified default block adds nothing to the merge. Neither
+		// does an empty block of a different type, where merging would
+		// transform blockB into blockA's type instead (a paragraph deleted
+		// into an empty heading became a heading), so remove blockA in both
+		// cases.
+		if (
+			isUnmodifiedDefaultBlock( blockA ) ||
+			( blockA.name !== blockB.name &&
+				isUnmodifiedBlock( blockA, 'content' ) )
+		) {
 			const isASelected = select.isBlockSelected( clientIdA );
 
 			if ( isASelected ) {
@@ -1401,26 +1410,6 @@ export const mergeBlocks =
 				);
 			} else {
 				dispatch.selectBlock( blockA.clientId );
-			}
-			return;
-		}
-
-		// Merging into an empty block of a different type would transform
-		// the content block into the empty block's type (a paragraph deleted
-		// into an empty heading became a heading). Nothing of the empty
-		// block is worth preserving, so remove it instead, exactly like the
-		// unmodified default block above it.
-		if (
-			blockA.name !== blockB.name &&
-			isUnmodifiedBlock( blockA, 'content' )
-		) {
-			if ( select.isBlockSelected( clientIdA ) ) {
-				registry.batch( () => {
-					dispatch.removeBlock( clientIdA, false );
-					dispatch.selectBlock( clientIdB, 0 );
-				} );
-			} else {
-				dispatch.removeBlock( clientIdA, false );
 			}
 			return;
 		}
