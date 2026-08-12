@@ -30,10 +30,17 @@ const MIME_TYPES = {
 };
 
 export function isZipFile( file ) {
+	const mimeType = file?.type || file?.mime_type || file?.mime;
+
 	return (
 		!! file?.name?.match( /\.zip$/i ) ||
-		file?.type === 'application/zip' ||
-		file?.type === 'application/x-zip-compressed'
+		!! file?.filename?.match( /\.zip$/i ) ||
+		!! file?.file?.match( /\.zip$/i ) ||
+		!! file?.url?.match( /\.zip(?:[?#].*)?$/i ) ||
+		!! file?.source_url?.match( /\.zip(?:[?#].*)?$/i ) ||
+		mimeType === 'application/zip' ||
+		mimeType === 'application/x-zip' ||
+		mimeType === 'application/x-zip-compressed'
 	);
 }
 

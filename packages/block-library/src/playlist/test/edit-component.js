@@ -90,6 +90,7 @@ jest.mock( '@wordpress/data', () => ( {
 jest.mock( '@wordpress/i18n', () => ( {
 	__: ( text ) => text,
 	_x: ( text ) => text,
+	sprintf: ( text, replacement ) => text.replace( '%s', replacement ),
 } ) );
 
 jest.mock( '@wordpress/icons', () => ( {
@@ -127,6 +128,7 @@ describe( 'PlaylistEdit', () => {
 	let selectBlock;
 	let createErrorNotice;
 	let mediaUpload;
+	let uploadedFileCount;
 
 	function createZipFile() {
 		return new File( [ 'playlist' ], 'album.zip', {
@@ -158,14 +160,28 @@ describe( 'PlaylistEdit', () => {
 		replaceInnerBlocks = jest.fn();
 		selectBlock = jest.fn();
 		createErrorNotice = jest.fn();
-		mediaUpload = jest.fn( ( { filesList, onFileChange } ) =>
-			onFileChange(
-				Array.from( filesList ).map( ( file, index ) => ( {
-					id: index + 10,
+		uploadedFileCount = 0;
+		mediaUpload = jest.fn( ( { filesList, onFileChange } ) => {
+			const attachments = Array.from( filesList ).map(
+				( file, index ) => ( {
+					id: uploadedFileCount + index + 10,
 					url: `https://example.com/${ file.name }`,
 					title: file.name.replace( /\.[^.]+$/, '' ),
-				} ) )
-			)
+				} )
+			);
+			uploadedFileCount += attachments.length;
+			onFileChange( attachments );
+		} );
+		window.fetch = jest.fn( () =>
+			Promise.resolve( {
+				ok: true,
+				blob: () =>
+					Promise.resolve(
+						new Blob( [ 'playlist' ], {
+							type: 'application/zip',
+						} )
+					),
+			} )
 		);
 		useDispatch.mockReturnValue( {
 			createErrorNotice,
@@ -203,6 +219,12 @@ describe( 'PlaylistEdit', () => {
 		);
 
 		expect( mediaPlaceholderProps.multiple ).toBe( 'add' );
+		expect( mediaPlaceholderProps.allowedTypes ).toEqual( [
+			'audio',
+			'application/zip',
+			'application/x-zip',
+			'application/x-zip-compressed',
+		] );
 	} );
 
 	it( 'lets users select additional audio tracks individually from the Media Library', () => {
@@ -296,21 +318,38 @@ describe( 'PlaylistEdit', () => {
 		} );
 
 		expect( mediaPlaceholderProps.accept ).toBe(
-			'audio/*,.zip,application/zip,application/x-zip-compressed'
+			'audio/*,.zip,application/zip,application/x-zip,application/x-zip-compressed'
 		);
-		expect( mediaUpload ).toHaveBeenCalledWith(
+		expect( mediaUpload ).toHaveBeenNthCalledWith(
+			1,
 			expect.objectContaining( {
 				allowedTypes: [ 'audio', 'image' ],
 				filesList: [
 					expect.objectContaining( {
 						name: 'scruffian - Relics - 01 Curing.mp3',
 					} ),
+				],
+				multiple: false,
+			} )
+		);
+		expect( mediaUpload ).toHaveBeenNthCalledWith(
+			2,
+			expect.objectContaining( {
+				allowedTypes: [ 'audio', 'image' ],
+				filesList: [
 					expect.objectContaining( {
 						name: 'scruffian - Relics - 02 Bramblers Relic.mp3',
 					} ),
-					expect.objectContaining( { name: 'cover.png' } ),
 				],
-				multiple: true,
+				multiple: false,
+			} )
+		);
+		expect( mediaUpload ).toHaveBeenNthCalledWith(
+			3,
+			expect.objectContaining( {
+				allowedTypes: [ 'audio', 'image' ],
+				filesList: [ expect.objectContaining( { name: 'cover.png' } ) ],
+				multiple: false,
 			} )
 		);
 		expect( replaceInnerBlocks ).toHaveBeenCalledWith( 'playlist-1', [
@@ -340,6 +379,147 @@ describe( 'PlaylistEdit', () => {
 		expect(
 			replaceInnerBlocks.mock.calls[ 0 ][ 1 ][ 0 ].attributes
 		).not.toHaveProperty( 'trackNumber' );
+	} );
+
+	it( 'fills playlist tracks from a ZIP attachment selected in the Media Library', async () => {
+		useSelect.mockReturnValue( {
+			mediaUpload,
+			innerBlockTracks: [],
+		} );
+
+		render(
+			<PlaylistEdit
+				attributes={ defaultAttributes }
+				clientId="playlist-1"
+				insertBlocksAfter={ jest.fn() }
+				isSelected={ false }
+				setAttributes={ jest.fn() }
+			/>
+		);
+
+		await act( async () => {
+			await mediaPlaceholderProps.onSelect( {
+				id: 20,
+				filename: 'album.zip',
+				mime_type: 'application/zip',
+				url: 'https://example.com/album.zip',
+			} );
+		} );
+
+		expect( window.fetch ).toHaveBeenCalledWith(
+			'https://example.com/album.zip'
+		);
+		expect( replaceInnerBlocks ).toHaveBeenCalledWith( 'playlist-1', [
+			expect.objectContaining( {
+				name: 'core/playlist-track',
+				attributes: expect.objectContaining( {
+					title: 'Curing',
+					artist: 'scruffian',
+					album: 'Relics',
+				} ),
+			} ),
+			expect.objectContaining( {
+				name: 'core/playlist-track',
+				attributes: expect.objectContaining( {
+					title: 'Bramblers Relic',
+					artist: 'scruffian',
+					album: 'Relics',
+				} ),
+			} ),
+		] );
+	} );
+
+	it( 'shows an error when a non-audio media item is selected', async () => {
+		useSelect.mockReturnValue( {
+			mediaUpload,
+			innerBlockTracks: [],
+		} );
+
+		render(
+			<PlaylistEdit
+				attributes={ defaultAttributes }
+				clientId="playlist-1"
+				insertBlocksAfter={ jest.fn() }
+				isSelected={ false }
+				setAttributes={ jest.fn() }
+			/>
+		);
+
+		await act( async () => {
+			await mediaPlaceholderProps.onSelect( {
+				id: 20,
+				mime_type: 'image/png',
+				url: 'https://example.com/image.png',
+			} );
+		} );
+
+		expect( createErrorNotice ).toHaveBeenCalledWith(
+			'Only audio files and ZIP files can be added to a playlist.',
+			{ type: 'snackbar' }
+		);
+		expect( replaceInnerBlocks ).not.toHaveBeenCalled();
+	} );
+
+	it( 'fills playlist tracks when the ZIP cover image upload fails', async () => {
+		mediaUpload = jest.fn( ( { filesList, onFileChange, onError } ) => {
+			const [ file ] = filesList;
+			if ( file.name === 'cover.png' ) {
+				onError( 'The cover image could not be uploaded.' );
+				return;
+			}
+
+			const attachment = {
+				id: uploadedFileCount + 10,
+				url: `https://example.com/${ file.name }`,
+				title: file.name.replace( /\.[^.]+$/, '' ),
+			};
+			uploadedFileCount += 1;
+			onFileChange( [ attachment ] );
+		} );
+		useSelect.mockReturnValue( {
+			mediaUpload,
+			innerBlockTracks: [],
+		} );
+
+		render(
+			<PlaylistEdit
+				attributes={ defaultAttributes }
+				clientId="playlist-1"
+				insertBlocksAfter={ jest.fn() }
+				isSelected={ false }
+				setAttributes={ jest.fn() }
+			/>
+		);
+
+		await act( async () => {
+			await mediaPlaceholderProps.onSelect( createZipFile() );
+		} );
+
+		expect( replaceInnerBlocks ).toHaveBeenCalledWith( 'playlist-1', [
+			expect.objectContaining( {
+				name: 'core/playlist-track',
+				attributes: expect.objectContaining( {
+					title: 'Curing',
+					artist: 'scruffian',
+					album: 'Relics',
+				} ),
+			} ),
+			expect.objectContaining( {
+				name: 'core/playlist-track',
+				attributes: expect.objectContaining( {
+					title: 'Bramblers Relic',
+					artist: 'scruffian',
+					album: 'Relics',
+				} ),
+			} ),
+		] );
+		expect(
+			replaceInnerBlocks.mock.calls[ 0 ][ 1 ][ 0 ].attributes
+		).toHaveProperty( 'image', undefined );
+		expect( createErrorNotice ).toHaveBeenCalledWith(
+			'The cover image from the ZIP file could not be uploaded: The cover image could not be uploaded.',
+			{ type: 'snackbar' }
+		);
 	} );
 
 	it( 'adds ZIP tracks to an existing playlist', async () => {
