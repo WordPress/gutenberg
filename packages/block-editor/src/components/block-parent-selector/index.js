@@ -2,7 +2,7 @@ import { ToolbarButton } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
-import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
+import { hasBlockSupport } from '@wordpress/blocks';
 import { plus } from '@wordpress/icons';
 import useBlockDisplayInformation from '../use-block-display-information';
 import BlockIcon from '../block-icon';
@@ -39,9 +39,6 @@ export default function BlockParentSelector() {
 			const parents = getBlockParents( selectedBlockClientId );
 			const _parentClientId =
 				parentSection ?? parents[ parents.length - 1 ];
-			const parentBlockType = getBlockType(
-				getBlockName( _parentClientId )
-			);
 			// The child of the parent on the selection's path: the selected
 			// block itself unless the parent is a section further up.
 			const childClientId =
@@ -53,15 +50,16 @@ export default function BlockParentSelector() {
 					getBlockOrder( _parentClientId )[
 						getBlockIndex( childClientId ) + 1
 					],
-				// A parent that merges with the text flow (quote, list) grows
-				// by typing: Enter appends. Only parents outside the text
-				// flow need an explicit affordance to add another child.
+				// A block that splits (paragraph, heading, list item,
+				// button) grows the container by typing: Enter appends a
+				// sibling. Only blocks that cannot split need an explicit
+				// affordance to add one.
 				showInserter:
-					!! parentBlockType &&
-					! parentBlockType.merge &&
+					!! _parentClientId &&
 					! hasBlockSupport(
-						parentBlockType,
-						'__experimentalOnMerge'
+						getBlockName( selectedBlockClientId ),
+						'splitting',
+						false
 					),
 			};
 		},
@@ -110,7 +108,7 @@ export default function BlockParentSelector() {
 						hasSingleBlockType,
 					} ) => (
 						<ToolbarButton
-							className="block-editor-block-parent-selector__button block-editor-block-parent-selector__inserter"
+							className="block-editor-block-parent-selector__inserter"
 							onClick={ onToggle }
 							aria-expanded={ isOpen }
 							disabled={ disabled }

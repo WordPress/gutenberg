@@ -120,10 +120,9 @@
 			}
 		}
 
-		// Make room for the second button when the parent selector also
-		// carries an inserter.
+		// Make room for the inserter next to the parent selector.
 		&.has-parent:has(.block-editor-block-parent-selector__inserter) {
-			margin-left: calc(2 * #{$grid-unit-60} + #{$grid-unit-10} + #{$grid-unit-05});
+			margin-left: calc(#{$grid-unit-60} + #{$grid-unit-40} + #{$grid-unit-10});
 			.show-icon-labels & {
 				margin-left: 0;
 			}
@@ -158,10 +157,24 @@
 		position: absolute;
 		left: calc(-#{$grid-unit-60} - #{$grid-unit-10} - #{$border-width});
 
+		// With the inserter next to the parent button, the border moves to
+		// the shared container so the pair reads as one toolbar segment.
 		&:has(.block-editor-block-parent-selector__inserter) {
-			left: calc(-2 * #{$grid-unit-60} - #{$grid-unit-10} - #{$grid-unit-05} - #{$border-width});
+			left: calc(-#{$grid-unit-60} - #{$grid-unit-40} - #{$grid-unit-10} - #{$border-width});
 			display: flex;
-			gap: $grid-unit-05;
+			align-items: center;
+			border: $border-width solid $gray-900;
+			border-radius: $radius-small;
+			background-color: $white;
+
+			.block-editor-block-parent-selector__button {
+				border: none;
+			}
+		}
+
+		.block-editor-block-parent-selector__inserter.components-button.has-icon {
+			@include inserter-toggle;
+			margin-right: $grid-unit-10;
 		}
 
 		&::before {
