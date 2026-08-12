@@ -1016,10 +1016,11 @@ describe( 'ColorPicker', () => {
 
 			// Test pattern 2: Update the alphaInput
 			await user.fill( alphaInput, '25' );
-			expect( onChange ).toHaveBeenLastCalledWith( '#ffffff40' );
-
-			expect( alphaSlider ).toHaveValue( '25' );
-			expect( alphaInput ).toHaveValue( 25 );
+			await waitFor( () => {
+				expect( onChange ).toHaveBeenLastCalledWith( '#ffffff40' );
+				expect( alphaSlider ).toHaveValue( '25' );
+				expect( alphaInput ).toHaveValue( 25 );
+			} );
 		} );
 	} );
 } );
