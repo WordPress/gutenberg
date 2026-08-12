@@ -145,6 +145,23 @@ export default function useInput() {
 							event.preventDefault();
 							insertAfterBlock( clientId );
 						} else {
+							// An empty container renders a ghost of its
+							// default block instead of a stored child.
+							// Focus materialises it through the ghost's
+							// own focus listener.
+							if ( ! getBlockOrder( clientId ).length ) {
+								const ghostElement =
+									event.target.ownerDocument.activeElement.querySelector(
+										'[data-block]'
+									);
+
+								if ( ghostElement ) {
+									event.preventDefault();
+									ghostElement.focus();
+									return;
+								}
+							}
+
 							function getNextClientId( id ) {
 								let nextClientId = null;
 

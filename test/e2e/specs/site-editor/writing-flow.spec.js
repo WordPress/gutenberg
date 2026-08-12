@@ -77,7 +77,6 @@ test.describe( 'Site editor writing flow', () => {
 		const { id } = await requestUtils.createPage( {
 			status: 'draft',
 			title: 'test',
-			content: '<!-- wp:paragraph --><p></p><!-- /wp:paragraph -->',
 		} );
 
 		await admin.visitSiteEditor( {
@@ -116,5 +115,11 @@ test.describe( 'Site editor writing flow', () => {
 			name: 'Empty block',
 		} );
 		await expect( thirdBlock ).toBeFocused();
+
+		// Typing proves the ghost materialised into a real stored block.
+		await page.keyboard.type( 'a' );
+		await expect(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		).toHaveText( 'a' );
 	} );
 } );
