@@ -128,6 +128,7 @@ test.describe( 'Block template registration', () => {
 		} );
 
 		// Change template.
+		await editor.openDocumentSettingsSidebar();
 		await page.getByRole( 'button', { name: 'Post', exact: true } ).click();
 		await page.getByRole( 'button', { name: 'Template options' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Change template' } ).click();
@@ -155,6 +156,7 @@ test.describe( 'Block template registration', () => {
 		} );
 
 		// Change template.
+		await editor.openDocumentSettingsSidebar();
 		await page.getByRole( 'button', { name: 'Post', exact: true } ).click();
 		await page.getByRole( 'button', { name: 'Template options' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Change template' } ).click();
