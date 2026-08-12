@@ -363,21 +363,22 @@
 		}
 	}
 
-	// Transparent spacer that pushes the caption panel down to the image's
-	// bottom edge. The image is centered, so its bottom is `50vh + height/2`;
+	// Transparent spacer that pushes the caption panel down to just above the
+	// image's bottom edge. The image is centered, so its bottom is
+	// `50vh + height/2`; subtracting 32px starts the caption over the image's
+	// bottom 32px, so a short caption is visible without scrolling.
 	// `--wp--lightbox-container-height` is published by `setOverlayStyles()` and
 	// recomputed on resize, so the caption stays anchored responsively.
 	.wp-lightbox-caption-spacer {
-		height: calc(50vh + var(--wp--lightbox-container-height, 0px) / 2);
+		height: calc(50vh + var(--wp--lightbox-container-height, 0px) / 2 - 32px);
 		cursor: zoom-out;
 	}
 
-	// Opaque panel (painted with the overlay background) so the caption fully
-	// covers the image as it scrolls up over it. Minimal top padding keeps a
-	// single-line caption within the safe area below the image, so it does not
-	// force a scroll.
+	// Panel painted with the overlay background (semi-transparent, see the
+	// inline style) so the caption reads clearly while still letting the part
+	// of the image it overlaps show through.
 	.wp-lightbox-caption-panel {
-		padding-block: 8px env(safe-area-inset-bottom);
+		padding-block: 24px;
 		cursor: default;
 	}
 

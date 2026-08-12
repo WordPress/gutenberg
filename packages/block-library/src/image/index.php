@@ -416,7 +416,7 @@ function block_core_image_print_lightbox_overlay() {
 				</div>
 				<div class="wp-lightbox-caption-scroll" data-wp-bind--hidden="!state.selectedImage.caption">
 					<div class="wp-lightbox-caption-spacer" aria-hidden="true"></div>
-					<div class="wp-lightbox-caption-panel" style="background-color: {$background_color}" data-wp-on--click="actions.handleCaptionClick">
+					<div class="wp-lightbox-caption-panel" style="background-color: color-mix(in srgb, {$background_color} 80%, transparent)" data-wp-on--click="actions.handleCaptionClick">
 						<div
 							class="wp-element-caption wp-lightbox-caption"
 							data-wp-watch="callbacks.setCaption"
