@@ -67,6 +67,23 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	const META_KEY_ANIMATED_VIDEO_POSTER = 'animated_video_poster';
 
 	/**
+	 * Post meta key recording the file names produced by the sideload endpoint.
+	 *
+	 * Each successful sideload appends the file name(s) it created for an
+	 * attachment under this key. The finalize endpoint reads them back to
+	 * confirm every stored sub-size was actually produced here, rather than
+	 * trusting a client-supplied name that could point at another attachment's
+	 * files. Stored as one row per value (via {@see add_post_meta()}) so concurrent
+	 * sideloads never read-modify-write a shared value.
+	 *
+	 * Matches the key used by WordPress core's implementation so the records
+	 * stay interchangeable when core also ships these endpoints.
+	 *
+	 * @var string
+	 */
+	const META_KEY_SIDELOAD_FILE_NAME = '_wp_sideloaded_file';
+
+	/**
 	 * Registers the routes for attachments.
 	 *
 	 * @see register_rest_route()
@@ -91,8 +108,11 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 							'description'       => __( 'Image size. Can be a single size name or an array of size names to register the same file under multiple sizes.', 'gutenberg' ),
 							'type'              => array( 'string', 'array' ),
 							'items'             => array(
-								'type' => 'string',
+								'type'      => 'string',
+								'minLength' => 1,
 							),
+							'minItems'          => 1,
+							'minLength'         => 1,
 							'required'          => true,
 							// A custom callback is used instead of the default `rest_validate_request_arg`
 							// because WordPress's `rest_is_array()` treats scalar strings as single-element
@@ -102,34 +122,17 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 							// current list of registered sizes, which reflects any sizes added after the
 							// route was registered (e.g. via add_image_size() in tests).
 							'validate_callback' => static function ( $value, $request, $param ) {
-								$valid_sizes   = array_keys( wp_get_registered_image_subsizes() );
-								$valid_sizes[] = 'original';
-								$valid_sizes[] = self::IMAGE_SIZE_SOURCE_ORIGINAL;
-								$valid_sizes[] = self::IMAGE_SIZE_ANIMATED_VIDEO;
-								$valid_sizes[] = self::IMAGE_SIZE_ANIMATED_VIDEO_POSTER;
-								$valid_sizes[] = 'scaled';
-								$valid_sizes[] = 'full';
-
-								$items = is_string( $value ) ? array( $value ) : ( is_array( $value ) ? $value : null );
-								if ( null === $items ) {
-									return new WP_Error(
-										'rest_invalid_type',
-										/* translators: %s: Parameter name. */
-										sprintf( __( '%s must be a string or an array of strings.', 'gutenberg' ), $param )
-									);
+								/*
+								 * Providing a custom callback replaces the default schema
+								 * validation, so apply the declared schema (type, minLength,
+								 * minItems) before the enum check below.
+								 */
+								$schema_validity = rest_validate_request_arg( $value, $request, $param );
+								if ( is_wp_error( $schema_validity ) ) {
+									return $schema_validity;
 								}
 
-								foreach ( $items as $item ) {
-									if ( ! is_string( $item ) || ! in_array( $item, $valid_sizes, true ) ) {
-										return new WP_Error(
-											'rest_not_in_enum',
-											/* translators: %s: Parameter name. */
-											sprintf( __( '%s contains an invalid image size.', 'gutenberg' ), $param )
-										);
-									}
-								}
-
-								return true;
+								return self::validate_image_size_names( $value, $param );
 							},
 						),
 						'convert_format' => array(
@@ -159,10 +162,43 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 							'type'        => 'integer',
 						),
 						'sub_sizes' => array(
-							'description' => __( 'Array of sub-size metadata collected from sideload responses.', 'gutenberg' ),
-							'type'        => 'array',
-							'default'     => array(),
-							'items'       => array(
+							'description'       => __( 'Array of sub-size metadata collected from sideload responses.', 'gutenberg' ),
+							'type'              => 'array',
+							'default'           => array(),
+							/*
+							 * As on the sideload endpoint, the size names are checked in a
+							 * callback rather than an enum, so the set reflects the sizes
+							 * registered when the request runs. The callback sits on
+							 * sub_sizes because a nested property cannot carry one.
+							 */
+							'validate_callback' => static function ( $value, $request, $param ) {
+								/*
+								 * Providing a custom callback replaces the default schema
+								 * validation, so apply the declared schema first. That is what
+								 * guarantees each entry is an object carrying an image_size of
+								 * the declared type.
+								 */
+								$schema_validity = rest_validate_request_arg( $value, $request, $param );
+								if ( is_wp_error( $schema_validity ) ) {
+									return $schema_validity;
+								}
+
+								foreach ( (array) $value as $index => $sub_size ) {
+									$sub_size = (array) $sub_size;
+
+									$validity = self::validate_image_size_names(
+										$sub_size['image_size'] ?? null,
+										sprintf( '%s[%s][image_size]', $param, $index )
+									);
+
+									if ( is_wp_error( $validity ) ) {
+										return $validity;
+									}
+								}
+
+								return true;
+							},
+							'items'             => array(
 								'type'       => 'object',
 								'properties' => array(
 									'image_size'     => array(
@@ -174,8 +210,11 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 										'description' => __( 'Size name, or an array of size names when a single file is registered under multiple sizes with matching dimensions.', 'gutenberg' ),
 										'type'        => array( 'string', 'array' ),
 										'items'       => array(
-											'type' => 'string',
+											'type'      => 'string',
+											'minLength' => 1,
 										),
+										'minItems'    => 1,
+										'minLength'   => 1,
 										'required'    => true,
 									),
 									'width'          => array(
@@ -209,7 +248,12 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				),
 				'allow_batch' => $this->allow_batch,
 				'schema'      => array( $this, 'get_public_item_schema' ),
-			)
+			),
+			// Override core's route so this schema wins on WordPress versions
+			// that register their own finalize route: without the override the
+			// earlier core registration is dispatched and this hardened schema
+			// (minLength/minItems) never applies.
+			true
 		);
 	}
 
@@ -747,6 +791,177 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	}
 
 	/**
+	 * Validates the `sub_sizes` file names against what this attachment produced.
+	 *
+	 * The {@see self::finalize_item()} method stores the client-supplied `file`
+	 * and `original_image` values in the attachment metadata, where they are
+	 * later resolved within the attachment's upload directory and read or deleted
+	 * (for example by {@see wp_get_original_image_path()}, {@see wp_getimagesize()},
+	 * and {@see wp_delete_attachment_files()}). Shape validation alone is not enough: a
+	 * bare basename such as `photo-1024x768.jpg` is a valid basename even when
+	 * it names a *different* attachment's file in the same upload directory, so
+	 * a user with the `upload_files` capability could otherwise point these
+	 * fields at another user's media and have those files deleted when their own
+	 * attachment is later removed.
+	 *
+	 * Provenance closes that gap. Every file the sideload endpoint creates is
+	 * recorded under {@see self::META_KEY_SIDELOAD_FILE_NAME} as it is produced, using
+	 * server-generated names. finalize accepts a `file` or `original_image`
+	 * value only when it matches one of those recorded names (or the
+	 * attachment's own attached file, which it definitionally owns). A value
+	 * that was never produced here - an absolute path, a traversal sequence, or
+	 * another attachment's basename - is not in the recorded set and is
+	 * rejected, without a database scan of every attachment.
+	 *
+	 * @param int   $attachment_id The attachment being finalized.
+	 * @param array $sub_sizes     Sub-size metadata collected from sideloads.
+	 * @return true|WP_Error True if every file name was produced here, WP_Error otherwise.
+	 */
+	protected function validate_sub_size_provenance( int $attachment_id, array $sub_sizes ) {
+		$allowed = $this->get_sideloaded_file_names( $attachment_id );
+
+		foreach ( $sub_sizes as $sub_size ) {
+			foreach ( array( 'file', 'original_image' ) as $key ) {
+				/*
+				 * Every string that was sent is checked, no matter how unlikely
+				 * a name it looks. A loose emptiness test would wave through
+				 * '0', which is a valid one-character name as far as the schema
+				 * is concerned and is stored like any other.
+				 */
+				if ( ! isset( $sub_size[ $key ] ) || ! is_string( $sub_size[ $key ] ) ) {
+					continue;
+				}
+
+				if ( ! in_array( $sub_size[ $key ], $allowed, true ) ) {
+					return new WP_Error(
+						'rest_invalid_sub_size_file',
+						__( 'Invalid sub-size file name. File names must have been produced by a prior sideload for this attachment.', 'gutenberg' ),
+						array( 'status' => 400 )
+					);
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Returns the file names which a finalize request may store for an attachment.
+	 *
+	 * The set is the file names the sideload endpoint recorded as it produced
+	 * them (ref. {@see self::META_KEY_SIDELOAD_FILE_NAME}), plus the attachment's own
+	 * attached file - accepted in both its uploads-relative and basename form so
+	 * a scaled main-file pointer validates regardless of which the client
+	 * echoes - plus the names already stored in the attachment's own metadata.
+	 * Every value is server-generated, so accepting an exact match cannot
+	 * introduce a path that escapes the attachment's upload directory.
+	 *
+	 * @param int  $attachment_id      The attachment being finalized.
+	 * @param bool $include_provenance Whether to include the sideload provenance rows.
+	 *                                 Pass false to get only the names recoverable from
+	 *                                 the attached file and stored metadata, e.g. to decide
+	 *                                 whether a provenance row is still needed. Default true.
+	 * @return string[] File names that may appear in the finalize submission.
+	 *
+	 * @phpstan-return list<string>
+	 */
+	protected function get_sideloaded_file_names( int $attachment_id, bool $include_provenance = true ): array {
+		$allowed = array();
+
+		if ( $include_provenance ) {
+			foreach ( (array) get_post_meta( $attachment_id, self::META_KEY_SIDELOAD_FILE_NAME ) as $name ) {
+				if ( is_string( $name ) && '' !== $name ) {
+					$allowed[] = $name;
+				}
+			}
+		}
+
+		$attached_file = get_post_meta( $attachment_id, '_wp_attached_file', true );
+		if ( is_string( $attached_file ) && strlen( $attached_file ) > 0 ) {
+			$allowed[] = $attached_file;
+			$allowed[] = wp_basename( $attached_file );
+		}
+
+		/*
+		 * Names already stored in this attachment's metadata passed this same
+		 * check when they were written, so accepting them again introduces
+		 * nothing new. Including them keeps finalize idempotent: a client that
+		 * never received the response to a successful finalize retries the
+		 * identical request, and a client that finalizes in more than one call
+		 * re-sends sizes it has already stored. Neither should be rejected.
+		 */
+		$metadata = wp_get_attachment_metadata( $attachment_id, true );
+		if ( is_array( $metadata ) ) {
+			$stored = array(
+				$metadata['file'] ?? null,
+				$metadata['original_image'] ?? null,
+				$metadata[ self::META_KEY_SOURCE_IMAGE ] ?? null,
+				$metadata['animated_video'] ?? null,
+				$metadata['animated_video_poster'] ?? null,
+			);
+
+			if ( ! empty( $metadata['sizes'] ) && is_array( $metadata['sizes'] ) ) {
+				foreach ( $metadata['sizes'] as $size ) {
+					$stored[] = is_array( $size ) ? ( $size['file'] ?? null ) : null;
+				}
+			}
+
+			foreach ( $stored as $name ) {
+				if ( is_string( $name ) && '' !== $name ) {
+					$allowed[] = $name;
+					$allowed[] = wp_basename( $name );
+				}
+			}
+		}
+
+		return array_values( array_unique( $allowed ) );
+	}
+
+	/**
+	 * Returns the uploads subdirectory an attachment is stored in.
+	 *
+	 * Used to place a sideloaded file alongside the attachment it extends. The
+	 * result is concatenated into a filesystem path by the caller, so it is
+	 * returned only when the attachment resolves inside the uploads directory
+	 * and the stored path is well formed.
+	 *
+	 * @param string $attached_file Absolute path to the attached file.
+	 * @return string|null Subdirectory beginning with a slash, an empty string when the
+	 *                     attachment sits in the base directory, or null when the
+	 *                     attachment is not inside the uploads directory.
+	 *
+	 * @phpstan-param non-empty-string $attached_file
+	 */
+	protected function get_attachment_upload_subdir( string $attached_file ): ?string {
+		$uploads = wp_get_upload_dir();
+		if ( empty( $uploads['basedir'] ) ) {
+			return null;
+		}
+
+		$basedir  = untrailingslashit( wp_normalize_path( $uploads['basedir'] ) );
+		$file_dir = wp_normalize_path( dirname( $attached_file ) );
+
+		/*
+		 * The attachment's directory must be the uploads base directory itself
+		 * or a directory inside it. The trailing slash in the prefix comparison
+		 * keeps a sibling directory that merely shares the prefix (for example
+		 * 'uploads-elsewhere' next to 'uploads') from matching.
+		 */
+		if ( $file_dir !== $basedir && ! str_starts_with( $file_dir, trailingslashit( $basedir ) ) ) {
+			return null;
+		}
+
+		$subdir = (string) substr( $file_dir, strlen( $basedir ) );
+
+		// A prefix match alone does not rule out a path that climbs back out.
+		if ( in_array( '..', explode( '/', $subdir ), true ) ) {
+			return null;
+		}
+
+		return $subdir;
+	}
+
+	/**
 	 * Finalizes an attachment after client-side media processing.
 	 *
 	 * Triggers the {@see 'wp_generate_attachment_metadata'} filter so that
@@ -765,6 +980,16 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			return $post;
 		}
 
+		// Sub-size metadata collected from sideload responses. Confirm every
+		// file name was produced by a prior sideload for this attachment before
+		// storing it, so a client cannot make finalize record (and later read or
+		// delete) another attachment's files.
+		$sub_sizes  = $request['sub_sizes'] ?? array();
+		$provenance = $this->validate_sub_size_provenance( $attachment_id, $sub_sizes );
+		if ( is_wp_error( $provenance ) ) {
+			return $provenance;
+		}
+
 		$metadata = wp_get_attachment_metadata( $attachment_id );
 
 		if ( ! is_array( $metadata ) ) {
@@ -772,22 +997,40 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		}
 
 		// Apply all sub-size metadata collected from sideload responses.
-		$sub_sizes = $request['sub_sizes'] ?? array();
-
 		foreach ( $sub_sizes as $sub_size ) {
 			$image_size = $sub_size['image_size'];
 
 			// When multiple size names share identical dimensions the client
 			// sends a single sub-size entry with an array of names. Register the
-			// same file under each name. Arrays only contain regular sizes.
+			// same file under each name.
 			if ( is_array( $image_size ) ) {
+				/*
+				 * Arrays carry regular sizes only, as the sideload endpoint
+				 * enforces. Each special size names a single file handled by one
+				 * of the branches below, so grouping one under a shared file
+				 * would write it to the wrong place; reject rather than guess.
+				 */
+				if ( array_intersect( $image_size, self::get_special_image_sizes() ) ) {
+					return new WP_Error(
+						'rest_invalid_sub_size_name',
+						__( 'A grouped sub-size entry may only name regular image sizes.', 'gutenberg' ),
+						array( 'status' => 400 )
+					);
+				}
+
+				// As below: `file` is not required by the schema, and a size
+				// entry that names no file is not worth recording.
+				if ( empty( $sub_size['file'] ) ) {
+					continue;
+				}
+
 				$metadata['sizes'] = $metadata['sizes'] ?? array();
 
 				foreach ( $image_size as $name ) {
 					$metadata['sizes'][ $name ] = array(
 						'width'     => $sub_size['width'] ?? 0,
 						'height'    => $sub_size['height'] ?? 0,
-						'file'      => $sub_size['file'] ?? '',
+						'file'      => $sub_size['file'],
 						'mime-type' => $sub_size['mime_type'] ?? '',
 						'filesize'  => $sub_size['filesize'] ?? 0,
 					);
@@ -825,6 +1068,12 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 					$metadata['image_meta']['orientation'] = 1;
 				}
 			} elseif ( self::IMAGE_SIZE_SOURCE_ORIGINAL === $image_size ) {
+				// As above: `file` is not required by the schema, and each of
+				// these sizes is nothing but the file it names.
+				if ( empty( $sub_size['file'] ) ) {
+					continue;
+				}
+
 				// Source-format original: stored under its own meta key so the
 				// scaled-sideload flow (which writes 'original_image') cannot
 				// clobber it. 'original_image' keeps pointing at the
@@ -832,23 +1081,35 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				// is handled by a delete_attachment hook that reads this key.
 				$metadata[ self::META_KEY_SOURCE_IMAGE ] = $sub_size['file'];
 			} elseif ( self::IMAGE_SIZE_ANIMATED_VIDEO === $image_size ) {
+				if ( empty( $sub_size['file'] ) ) {
+					continue;
+				}
+
 				// Converted video companion of an animated GIF. Stored
 				// under its own key; the GIF stays the attachment. The
 				// editor reads this key to switch the block to a video;
 				// companion cleanup lives in lib/media/animated-gif-to-video.php.
 				$metadata[ self::META_KEY_ANIMATED_VIDEO ] = $sub_size['file'];
 			} elseif ( self::IMAGE_SIZE_ANIMATED_VIDEO_POSTER === $image_size ) {
+				if ( empty( $sub_size['file'] ) ) {
+					continue;
+				}
+
 				// Static first-frame poster for the converted video. Used as
 				// the video block's poster and deleted alongside the video.
 				// See lib/media/animated-gif-to-video.php.
 				$metadata[ self::META_KEY_ANIMATED_VIDEO_POSTER ] = $sub_size['file'];
 			} else {
+				if ( empty( $sub_size['file'] ) ) {
+					continue;
+				}
+
 				$metadata['sizes'] = $metadata['sizes'] ?? array();
 
 				$metadata['sizes'][ $image_size ] = array(
 					'width'     => $sub_size['width'] ?? 0,
 					'height'    => $sub_size['height'] ?? 0,
-					'file'      => $sub_size['file'] ?? '',
+					'file'      => $sub_size['file'],
 					'mime-type' => $sub_size['mime_type'] ?? '',
 					'filesize'  => $sub_size['filesize'] ?? 0,
 				);
@@ -870,6 +1131,33 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		$metadata = apply_filters( 'wp_generate_attachment_metadata', $metadata, $attachment_id, 'update' );
 
 		wp_update_attachment_metadata( $attachment_id, $metadata );
+
+		/*
+		 * Drop only the provenance rows this request consumed, now that the
+		 * names are recorded in the metadata itself. A row is dropped only once
+		 * its name is recoverable from the stored metadata, so a name the
+		 * 'wp_generate_attachment_metadata' filter removed - or that a failed
+		 * update never persisted - keeps its row and the retried request the
+		 * endpoint documents as idempotent still validates. Rows for sideloads
+		 * that have not been finalized yet survive for a later call, and passing
+		 * the value makes the delete a no-op when the row is already gone, so a
+		 * retried request cleans up without error. Any rows left behind by an
+		 * abandoned upload are removed with the attachment itself.
+		 */
+		$recoverable = $this->get_sideloaded_file_names( $attachment_id, false );
+		foreach ( $sub_sizes as $sub_size ) {
+			foreach ( array( 'file', 'original_image' ) as $key ) {
+				// Matches the set validate_sub_size_provenance() checked, so
+				// every name a request was allowed to store is also cleaned up.
+				if (
+					isset( $sub_size[ $key ] ) &&
+					is_string( $sub_size[ $key ] ) &&
+					in_array( $sub_size[ $key ], $recoverable, true )
+				) {
+					delete_post_meta( $attachment_id, self::META_KEY_SIDELOAD_FILE_NAME, wp_slash( $sub_size[ $key ] ) );
+				}
+			}
+		}
 
 		$response_request = new WP_REST_Request(
 			WP_REST_Server::READABLE,
@@ -910,17 +1198,24 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * However, here it is desired not to add the suffix in order to maintain the same
 	 * naming convention as if the file was uploaded regularly.
 	 *
+	 * The suffix is only dropped when no file of that name already exists in $dir,
+	 * so this never returns a name that would overwrite one. The unsuffixed name
+	 * must also derive from the attachment's own file name, and
+	 * {@see self::sideload_item()} pins the upload to the attachment's own
+	 * directory, so any name returned here belongs to the attachment being
+	 * extended.
+	 *
 	 * @link https://github.com/WordPress/wordpress-develop/blob/30954f7ac0840cfdad464928021d7f380940c347/src/wp-includes/functions.php#L2576-L2582
 	 *
-	 * @param string     $filename            Unique file name.
-	 * @param string     $dir                 Directory path.
-	 * @param int|string $number              The highest number that was used to make the file name unique
-	 *                                        or an empty string if unused.
-	 * @param string     $attachment_filename Original attachment file name.
+	 * @param string      $filename            Unique file name.
+	 * @param string      $dir                 Directory path.
+	 * @param int|string  $number              The highest number that was used to make the file name unique
+	 *                                         or an empty string if unused.
+	 * @param string|null $attachment_filename Original attachment file name.
 	 * @return string Filtered file name.
 	 */
 	private static function filter_wp_unique_filename( $filename, $dir, $number, $attachment_filename ) {
-		if ( empty( $number ) || ! $attachment_filename ) {
+		if ( ! is_int( $number ) || ! $attachment_filename ) {
 			return $filename;
 		}
 
@@ -933,14 +1228,100 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		}
 
 		$matches = array();
-		if ( preg_match( '/(.*)(-\d+x\d+|-scaled)-' . $number . '$/', $name, $matches ) ) {
-			$filename_without_suffix = $matches[1] . $matches[2] . ".$ext";
-			if ( $matches[1] === $orig_name ) {
+		if ( preg_match( '/(.*)-(\d+x\d+|scaled)-' . $number . '$/', $name, $matches ) ) {
+			$filename_without_suffix = $matches[1] . '-' . $matches[2] . ".$ext";
+			if ( $matches[1] === $orig_name && ! file_exists( "$dir/$filename_without_suffix" ) ) {
 				return $filename_without_suffix;
 			}
 		}
 
 		return $filename;
+	}
+
+	/**
+	 * Validates an image size name, or an array of names sharing a single file.
+	 *
+	 * Shared by the sideload endpoint, which names the size a file is produced
+	 * for, and the finalize endpoint, which names the size each submitted entry
+	 * is stored under. Both need the same set, and finalize accepts a payload of
+	 * its own rather than one this class produced, so leaving it unconstrained
+	 * there would let a submission write an arbitrary key into the metadata
+	 * 'sizes' array or route a file into a branch it was never produced for.
+	 *
+	 * @param mixed  $value The image size name, or an array of names.
+	 * @param string $param Parameter name, used in the error messages.
+	 * @return true|WP_Error True when every name is valid, WP_Error otherwise.
+	 */
+	private static function validate_image_size_names( $value, $param ) {
+		$special_sizes = self::get_special_image_sizes();
+		$regular_sizes = array_values(
+			array_diff(
+				array_merge(
+					array_keys( wp_get_registered_image_subsizes() ),
+					// Not a registered sub-size, but stored as an ordinary
+					// entry in the metadata 'sizes' array (PDF thumbnails).
+					array( 'full' )
+				),
+				$special_sizes
+			)
+		);
+
+		if ( is_string( $value ) ) {
+			$items       = array( $value );
+			$valid_sizes = array_merge( $regular_sizes, $special_sizes );
+		} elseif ( is_array( $value ) ) {
+			/**
+			 * An array registers one sideloaded file under several size names,
+			 * which only makes sense for regular sub-sizes: each special size
+			 * names a single file with its own handling in
+			 * {@see self::sideload_item()} and its own metadata key in
+			 * {@see self::finalize_item()}. Rejecting them here is what lets the
+			 * array branches in both methods treat an array as regular sizes.
+			 */
+			$items       = $value;
+			$valid_sizes = $regular_sizes;
+		} else {
+			return new WP_Error(
+				'rest_invalid_type',
+				/* translators: %s: Parameter name. */
+				sprintf( __( '%s must be a string or an array of strings.', 'gutenberg' ), $param )
+			);
+		}
+
+		foreach ( $items as $item ) {
+			if ( ! in_array( $item, $valid_sizes, true ) ) {
+				return new WP_Error(
+					'rest_not_in_enum',
+					/* translators: %s: Parameter name. */
+					sprintf( __( '%s contains an invalid image size.', 'gutenberg' ), $param )
+				);
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Returns the image size names which name a single file rather than a sub-size.
+	 *
+	 * Each of these is handled on its own in {@see self::sideload_item()} and stored
+	 * under its own key by {@see self::finalize_item()}, so unlike a regular
+	 * sub-size none of them may appear in an array of names sharing one file.
+	 *
+	 * @return string[] Special image size names.
+	 *
+	 * @phpstan-return non-empty-list<non-empty-string>
+	 */
+	private static function get_special_image_sizes() {
+		return array(
+			'original',
+			'scaled',
+			// Source-format original (e.g. the HEIC kept alongside its JPEG derivative).
+			self::IMAGE_SIZE_SOURCE_ORIGINAL,
+			// Converted-video companions for an animated GIF (the MP4/WebM and its poster).
+			self::IMAGE_SIZE_ANIMATED_VIDEO,
+			self::IMAGE_SIZE_ANIMATED_VIDEO_POSTER,
+		);
 	}
 
 	/**
@@ -977,7 +1358,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			);
 		}
 
-		// Arrays only contain regular sub-size names that share dimensions.
+		// Arrays only contain regular sub-size names that share dimensions, which
+		// the image_size validation enforces (ref. get_special_image_sizes()).
 		// Validate each one against its registered constraints.
 		if ( is_array( $image_size ) ) {
 			foreach ( $image_size as $name ) {
@@ -1109,6 +1491,26 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			);
 		}
 
+		/*
+		 * Sideloaded files are placed in the same directory as the attachment
+		 * they extend, because the file names produced here are later resolved
+		 * against that directory. An attachment stored outside the uploads
+		 * directory has no such directory to use, so there is nowhere the names
+		 * this would produce could resolve.
+		 */
+		$attached_file = get_attached_file( $attachment_id, true );
+		$subdir        = is_string( $attached_file ) && '' !== $attached_file
+			? $this->get_attachment_upload_subdir( $attached_file )
+			: null;
+
+		if ( ! is_string( $attached_file ) || '' === $attached_file || null === $subdir ) {
+			return new WP_Error(
+				'rest_sideload_attachment_not_in_uploads',
+				__( 'The attachment is not stored in the uploads directory, so a file cannot be sideloaded for it.', 'gutenberg' ),
+				array( 'status' => 403 )
+			);
+		}
+
 		if ( ! $request['convert_format'] ) {
 			// Prevent image conversion as that is done client-side.
 			add_filter( 'image_editor_output_format', '__return_empty_array', 100 );
@@ -1124,8 +1526,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		 * With the following filter we can work around this safeguard.
 		 */
 
-		$attachment_filename = get_attached_file( $attachment_id, true );
-		$attachment_filename = $attachment_filename ? wp_basename( $attachment_filename ) : null;
+		$attachment_filename = wp_basename( $attached_file );
 
 		/**
 		 * @param string        $filename                 Unique file name.
@@ -1143,24 +1544,34 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		add_filter( 'wp_unique_filename', $filter_filename, 10, 6 );
 
-		$parent_post = get_post_parent( $attachment_id );
+		// Pin the upload to the attachment's own directory, rather than deriving
+		// it from the parent post's date as media_handle_upload() does for a
+		// brand new upload. See the note above where $subdir is resolved.
+		$filter_upload_dir = static function ( $uploads ) use ( $subdir ) {
+			if (
+				is_array( $uploads ) &&
+				isset( $uploads['basedir'], $uploads['baseurl'] ) &&
+				is_string( $uploads['basedir'] ) &&
+				is_string( $uploads['baseurl'] )
+			) {
+				$uploads['subdir'] = $subdir;
+				$uploads['path']   = $uploads['basedir'] . $subdir;
+				$uploads['url']    = $uploads['baseurl'] . $subdir;
+			}
+			return $uploads;
+		};
 
-		$time = null;
-
-		// Matches logic in media_handle_upload().
-		// The post date doesn't usually matter for pages, so don't backdate this upload.
-		if ( $parent_post && 'page' !== $parent_post->post_type && substr( $parent_post->post_date, 0, 4 ) > 0 ) {
-			$time = $parent_post->post_date;
-		}
+		add_filter( 'upload_dir', $filter_upload_dir, 100 );
 
 		if ( ! empty( $files ) ) {
-			$file = $this->upload_from_file( $files, $headers, $time );
+			$file = $this->upload_from_file( $files, $headers );
 		} else {
-			$file = $this->upload_from_data( $request->get_body(), $headers, $time );
+			$file = $this->upload_from_data( $request->get_body(), $headers );
 		}
 
 		remove_filter( 'wp_unique_filename', $filter_filename );
 		remove_filter( 'image_editor_output_format', '__return_empty_array', 100 );
+		remove_filter( 'upload_dir', $filter_upload_dir, 100 );
 
 		if ( is_wp_error( $file ) ) {
 			return $file;
@@ -1215,7 +1626,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		// `image_size` may be a single string or an array of names that share the
 		// same dimensions and therefore reuse a single sideloaded file. Arrays
 		// only carry regular sub-sizes; the special keys below ('original',
-		// 'scaled', and the source-format original) are always scalar strings.
+		// 'scaled', and the source-format original) are always scalar strings,
+		// which the image_size validation enforces (ref. get_special_image_sizes()).
 		$sub_size_data = array(
 			'image_size' => $image_size,
 		);
@@ -1251,25 +1663,17 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			// downsized and an 'original' image has any EXIF orientation already
 			// applied. This is the same swap WordPress makes when it scales or
 			// rotates an image on upload. See core's _wp_image_meta_replace_original().
-			$current_file = get_attached_file( $attachment_id, true );
-
-			if ( ! $current_file ) {
-				return new WP_Error(
-					'rest_sideload_no_attached_file',
-					__( 'Unable to retrieve the attached file for this attachment.', 'gutenberg' ),
-					array( 'status' => 404 )
-				);
-			}
-
-			$sub_size_data['original_image'] = wp_basename( $current_file );
+			$sub_size_data['original_image'] = $attachment_filename;
 
 			// Update the attached file to point to the supplied image.
 			// This writes to _wp_attached_file meta, not _wp_attachment_metadata.
 			// Guard against a failed update so a stale original is not recorded.
 			if (
-				get_attached_file( $attachment_id, true ) !== $path &&
+				$attached_file !== $path &&
 				! update_attached_file( $attachment_id, $path )
 			) {
+				// Clean up the uploaded file, which nothing references yet.
+				wp_delete_file( $path );
 				return new WP_Error(
 					'rest_sideload_update_attached_file_failed',
 					__( 'Unable to update the attached file for this attachment.', 'gutenberg' ),
@@ -1287,6 +1691,26 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			$sub_size_data['file']      = wp_basename( $path );
 			$sub_size_data['mime_type'] = $type;
 			$sub_size_data['filesize']  = wp_filesize( $path );
+		}
+
+		/*
+		 * Record the file names produced for this attachment so finalize can
+		 * confirm every stored sub-size was actually sideloaded here. The
+		 * values recorded are exactly the ones handed back to the client, so
+		 * finalize accepts a submission only when it echoes what was produced.
+		 * add_post_meta() appends one row per value, which avoids the
+		 * read-modify-write race that a single serialized value would create
+		 * for concurrent sideloads (the same reason metadata is deferred to
+		 * finalize).
+		 */
+		foreach ( array( 'file', 'original_image' ) as $provenance_key ) {
+			if (
+				isset( $sub_size_data[ $provenance_key ] ) &&
+				is_string( $sub_size_data[ $provenance_key ] ) &&
+				'' !== $sub_size_data[ $provenance_key ]
+			) {
+				add_post_meta( $attachment_id, self::META_KEY_SIDELOAD_FILE_NAME, wp_slash( $sub_size_data[ $provenance_key ] ) );
+			}
 		}
 
 		return rest_ensure_response( $sub_size_data );
