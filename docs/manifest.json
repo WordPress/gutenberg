@@ -252,7 +252,7 @@
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "How to Extend the Editor",
+		"title": "Extending the Editor",
 		"slug": "extend-editor",
 		"markdown_source": "../docs/how-to-guides/extend-editor.md",
 		"parent": "how-to-guides"
