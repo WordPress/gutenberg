@@ -7,6 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { RawHTML } from '@wordpress/element';
+import { serialize } from '@wordpress/blocks';
 import {
 	useBlockProps,
 	useInnerBlockItems,
@@ -31,8 +32,8 @@ export default function save( { attributes } ) {
 
 	const blockProps = useBlockProps.save();
 
-	const items = useInnerBlockItems.save();
-	const sections = mapCellsToSections( rows, items );
+	const innerBlocks = useInnerBlockItems.save();
+	const sections = mapCellsToSections( rows, innerBlocks );
 
 	return (
 		<figure { ...blockProps }>
@@ -48,11 +49,11 @@ export default function save( { attributes } ) {
 						<Tag key={ section.name }>
 							{ section.rows.map( ( row, rowIndex ) => (
 								<tr key={ rowIndex }>
-									{ row.map( ( cell ) => (
-										<RawHTML key={ cell.clientId }>
-											{ cell.html }
-										</RawHTML>
-									) ) }
+									<RawHTML>
+										{ serialize( row, {
+											isInnerBlocks: true,
+										} ) }
+									</RawHTML>
 								</tr>
 							) ) }
 						</Tag>

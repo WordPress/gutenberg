@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, AsyncModeProvider } from '@wordpress/data';
-import {
-	serializeBlock,
-	__unstableGetInnerBlocks as getInnerBlocks,
-} from '@wordpress/blocks';
+import { __unstableGetInnerBlocks as getInnerBlocks } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -87,17 +84,13 @@ export function useInnerBlockItems() {
 /**
  * Save-context companion to `useInnerBlockItems`.
  *
- * Returns an array of `{ clientId, html }` objects, one per inner block, where
- * `html` is the serialized block content. Reads from the same module-level
- * provider as `useInnerBlocksProps.save`, so it works during block validation
- * where the `innerBlocks` function parameter is not passed.
+ * Returns the inner blocks array from the current save context. Reads from
+ * the same module-level provider as `useInnerBlocksProps.save`, so it works
+ * during block validation where the `innerBlocks` function parameter is not
+ * passed.
  *
- * @return {Array} Array of `{ clientId, html }` objects.
+ * @return {Array} Inner blocks array.
  */
 useInnerBlockItems.save = function () {
-	const innerBlocks = getInnerBlocks();
-	return innerBlocks.map( ( block ) => ( {
-		clientId: block.clientId,
-		html: serializeBlock( block ),
-	} ) );
+	return getInnerBlocks();
 };
