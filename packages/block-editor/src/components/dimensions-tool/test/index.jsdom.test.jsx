@@ -136,7 +136,7 @@ describe( 'DimensionsTool', () => {
 		} );
 
 		it( 'displays an aspect ratio that is written differently to the option with the same ratio', () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const { rerender } = render(
 				<ControlledExample
 					value={ { aspectRatio: '1/1' } }
@@ -159,7 +159,7 @@ describe( 'DimensionsTool', () => {
 		} );
 
 		it( 'displays an aspect ratio without a matching option as custom', () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			render(
 				<ControlledExample
 					value={ { aspectRatio: '7/5' } }
@@ -173,7 +173,7 @@ describe( 'DimensionsTool', () => {
 		} );
 
 		it( 'updates the scale control when the value prop changes', () => {
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const { rerender } = render(
 				<ControlledExample
 					value={ { aspectRatio: '16/9', scale: 'cover' } }
@@ -201,7 +201,7 @@ describe( 'DimensionsTool', () => {
 	describe( 'external updates', () => {
 		it( 'restores the scale that was set externally', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const updateRef = { current: null };
 
 			render(
@@ -235,7 +235,7 @@ describe( 'DimensionsTool', () => {
 
 		it( 'restores the aspect ratio that was set externally', async () => {
 			const user = userEvent.setup();
-			const onChange = jest.fn();
+			const onChange = vi.fn();
 			const updateRef = { current: null };
 
 			render(
