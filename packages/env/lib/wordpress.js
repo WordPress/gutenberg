@@ -165,6 +165,13 @@ async function getLatestWordPressVersion( options ) {
 				// the first run in a fresh CI environment), use the highest
 				// version the mirror actually has instead of a tag that is
 				// guaranteed to fail the `git fetch` that follows.
+				//
+				// This substitution is silent: `options` at this stage of
+				// config parsing carries no spinner or logger to surface it
+				// through, and this is the only function in the package that
+				// would need one introduced for a single warning. Worth a
+				// user-facing message in a follow-up if this proves confusing
+				// in practice.
 				const fallback =
 					( await getCache(
 						'latestWordPressVersion',
