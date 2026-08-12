@@ -1,8 +1,8 @@
 # Block Edit Visually Button
 
-`BlockEditVisuallyButton` renders the toolbar button that takes a block out of the HTML editor and back to the visual editor. It is the toolbar counterpart of the "Edit as HTML" / "Edit visually" item that [`BlockSettingsMenu`](../block-settings-menu/README.md) renders, and it exists so that a block being edited as HTML always offers a visible way back without opening the settings menu.
+`BlockEditVisuallyButton` renders the toolbar button that takes a block out of the HTML editor and back to the visual editor. It is the toolbar counterpart of the "Edit as HTML" / "Edit visually" item that [`BlockSettingsMenu`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-settings-menu/README.md) renders, and it exists so that a block being edited as HTML always offers a visible way back without opening the settings menu.
 
-_Note:_ This component is internal to the block editor and is not exported from `@wordpress/block-editor`. It is rendered by [`BlockToolbar`](../block-toolbar/README.md); it is documented here for contributors working on the block toolbar rather than as public API.
+_Note:_ This component is internal to the block editor and is not exported from `@wordpress/block-editor`. It is rendered by [`BlockToolbar`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-toolbar/README.md); it is documented here for contributors working on the block toolbar rather than as public API.
 
 ## Development guidelines
 
@@ -30,6 +30,7 @@ function MyBlockToolbar( { clientIds } ) {
 #### `clientIds`
 
 -   **Type:** `Array`
+-   **Required:** Yes
 
 The client IDs of the currently selected blocks. The button renders only when the array contains exactly one client ID, since editing visually applies to a single block.
 
