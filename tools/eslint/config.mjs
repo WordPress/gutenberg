@@ -844,6 +844,26 @@ export default dedupePlugins( [
 		},
 	},
 
+	// Override: dataviews — restrict private-apis imports.
+	{
+		files: [ 'packages/dataviews/**' ],
+		rules: {
+			'no-restricted-imports': [
+				'error',
+				{
+					paths: [
+						...restrictedImports,
+						{
+							name: '@wordpress/private-apis',
+							message:
+								'dataviews is a bundled package that plugins may import via npm, where a second copy of private-apis cannot unlock objects locked by the WordPress copy and throws at runtime.',
+						},
+					],
+				},
+			],
+		},
+	},
+
 	// Override: edit-post, edit-site — restrict interface imports.
 	{
 		files: [ 'packages/edit-post/**', 'packages/edit-site/**' ],
