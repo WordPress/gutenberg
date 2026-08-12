@@ -233,10 +233,6 @@ export default defineConfig( {
 						screenshotDirectory:
 							'test-results/vitest-browser-screenshots',
 						screenshotFailures: true,
-						trace: {
-							mode: 'retain-on-failure',
-							tracesDir: 'test-results/vitest-browser-traces',
-						},
 					},
 				},
 			},
