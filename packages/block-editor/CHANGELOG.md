@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `DimensionsTool`: Reflect aspect ratio and scale values that are updated from outside the component, such as by undo or `updateBlockAttributes`. The scale control no longer displays a stale value, and an aspect ratio that is written differently to its preset, e.g. `1/1` rather than `1`, is displayed as that preset instead of as "Original" ([#80747](https://github.com/WordPress/gutenberg/pull/80747)).
+
+## 16.2.0 (2026-08-12)
+
 ### Internal
 
 -   Use the new `@wordpress/kebab-case` package instead of unlocking the `kebabCase` utility from the `@wordpress/components` private APIs ([#81294](https://github.com/WordPress/gutenberg/pull/81294)).
@@ -36,6 +42,7 @@
 -   Background block support: Fix gradients not being applied to a block when a theme opts out of `settings.background.gradient` in `theme.json` ([#81056](https://github.com/WordPress/gutenberg/pull/81056)).
 -   `LinkControl`: Restore the preview title underline by slightly increasing the title's line height, which was too tight for the underline to be visible ([#81083](https://github.com/WordPress/gutenberg/pull/81083)).
 -   `URLInput`: Skip link search requests while an IME composition is in progress; the search now fires once with the confirmed value on `compositionend` ([#80602](https://github.com/WordPress/gutenberg/pull/80602)).
+-   `SpacingSizesControl`: Give the control's visible label its own translation context instead of sharing an entry with the side input's aria label, which feeds the same placeholders in the opposite order — a single shared translation could not be correct for both ([#81240](https://github.com/WordPress/gutenberg/pull/81240)).
 -   Style states: Persist `aspect-ratio: auto` when resetting aspect ratio in a viewport or pseudo state so the default-state ratio no longer wins. ([#81393](https://github.com/WordPress/gutenberg/pull/81393)).
 
 ## 16.1.0 (2026-07-29)
@@ -55,6 +62,7 @@
 
 -   Gate the HEIC canvas conversion fallback on `window.__clientSideMediaProcessing` instead of the redundant `window.__heicUploadSupport` flag, fixing client-side HEIC conversion in Safari on core WordPress installs ([#80452](https://github.com/WordPress/gutenberg/pull/80452)).
 -   `URLInput`: Request suggestions for a value the field is mounted with, instead of waiting for the input to be focused, and stop requesting initial suggestions on mount when `disableSuggestions` is set ([#80721](https://github.com/WordPress/gutenberg/pull/80721)).
+-   The multi-selection inspector card and the spoken selection announcement now disclose the total number of blocks a selection contains when the selected blocks have nested content, e.g. "2 blocks selected, 4 including nested blocks." ([#80745](https://github.com/WordPress/gutenberg/pull/80745)).
 
 ## 16.0.0 (2026-07-14)
 

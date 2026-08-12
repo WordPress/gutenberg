@@ -18,7 +18,7 @@ import {
 	sv,
 } from 'date-fns/locale';
 
-// Storybook date controls pass a number, but react-day-picker expects a Date
+// Storybook date controls pass a number, but DayPicker expects a Date.
 // for props such as `endMonth`.
 export function toDate( value: Date | number | undefined ): Date | undefined {
 	return value === undefined ? undefined : new Date( value );

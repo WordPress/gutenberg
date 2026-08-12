@@ -1,8 +1,12 @@
 import { forwardRef, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-import { ControlWithError } from '../control-with-error';
-import NumberControl from '../../number-control';
+import { __experimentalNumberControl as NumberControl } from '@wordpress/components';
+import { ControlWithError } from './control-with-error';
 import type { ValidatedControlProps } from './types';
+
+type NumberControlProps = React.ComponentProps< typeof NumberControl >;
+
+type ValidatedNumberControlProps = NumberControlProps & ValidatedControlProps;
 
 const UnforwardedValidatedNumberControl = (
 	{
@@ -10,7 +14,7 @@ const UnforwardedValidatedNumberControl = (
 		customValidity,
 		markWhenOptional,
 		...restProps
-	}: React.ComponentProps< typeof NumberControl > & ValidatedControlProps,
+	}: ValidatedNumberControlProps,
 	forwardedRef: React.ForwardedRef< HTMLInputElement >
 ) => {
 	const validityTargetRef = useRef< HTMLInputElement >( null );
@@ -28,7 +32,8 @@ const UnforwardedValidatedNumberControl = (
 	);
 };
 
-export const ValidatedNumberControl = forwardRef(
-	UnforwardedValidatedNumberControl
-);
+export const ValidatedNumberControl: React.ForwardRefExoticComponent<
+	React.PropsWithoutRef< ValidatedNumberControlProps > &
+		React.RefAttributes< HTMLInputElement >
+> = forwardRef( UnforwardedValidatedNumberControl );
 ValidatedNumberControl.displayName = 'ValidatedNumberControl';

@@ -15,7 +15,7 @@ import {
 } from 'date-fns';
 import { ar } from 'date-fns/locale';
 import { useState } from '@wordpress/element';
-import { TZDate } from 'react-day-picker';
+import { TZDate } from '@daypicker/react';
 import { usePreviewRange, RangeCalendar } from '../range-calendar';
 import { getDateButton, getDateCell, monthNameFormatter } from './__utils__';
 import type { DateRange, RangeCalendarProps } from '../types';

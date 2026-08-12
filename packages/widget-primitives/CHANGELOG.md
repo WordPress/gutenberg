@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.5.0 (2026-08-12)
+
 ### New Features
 
 -   `WidgetAction` gains envelope fields: `icon`, a registered icon name
