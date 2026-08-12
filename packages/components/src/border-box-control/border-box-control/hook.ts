@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import * as styles from '../styles';
 import {
 	getBorderDiff,
@@ -19,7 +12,6 @@ import {
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import { useCx } from '../../utils/hooks/use-cx';
-
 import type { Border } from '../../border-control/types';
 import type { Borders, BorderSide, BorderBoxControlProps } from '../types';
 

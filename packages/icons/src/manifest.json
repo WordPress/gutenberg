@@ -794,6 +794,11 @@
 		"public": true
 	},
 	{
+		"slug": "inline-image",
+		"label": "Inline Image",
+		"filePath": "library/inline-image.svg"
+	},
+	{
 		"slug": "insert-after",
 		"label": "Insert After",
 		"filePath": "library/insert-after.svg"

@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { image } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import BlockIcon from '../';
 
 function getIconWrapper( container ) {

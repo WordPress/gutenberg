@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import filter from '../html-formatting-remover';
 import { deepFilterHTML, deepFilterNodeList } from '../utils';
 

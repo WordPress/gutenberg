@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalToolsPanelContext as ToolsPanelContext } from '@wordpress/components';
 import { useContext, useMemo } from '@wordpress/element';
 

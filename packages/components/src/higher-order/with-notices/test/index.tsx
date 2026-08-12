@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import {
 	act,
 	render,
@@ -9,20 +6,12 @@ import {
 	waitForElementToBeRemoved,
 	within,
 } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import {
 	createRef,
 	forwardRef,
 	useEffect,
 	useImperativeHandle,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import withNotices from '..';
 import type { WithNoticeProps } from '../types';
 

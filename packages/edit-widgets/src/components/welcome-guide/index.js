@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { ExternalLink, Guide } from '@wordpress/components';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { createInterpolateElement } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import { store as editWidgetsStore } from '../../store';
 
 export default function WelcomeGuide() {

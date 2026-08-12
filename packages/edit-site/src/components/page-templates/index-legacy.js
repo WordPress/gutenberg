@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
 import { useState, useMemo, useCallback } from '@wordpress/element';
@@ -11,10 +8,6 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { addQueryArgs } from '@wordpress/url';
 import { useEvent } from '@wordpress/compose';
 import { useView, useViewConfig } from '@wordpress/views';
-
-/**
- * Internal dependencies
- */
 import AddNewTemplate from '../add-new-template-legacy';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';

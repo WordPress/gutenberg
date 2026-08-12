@@ -531,7 +531,6 @@ _Properties_
 
 -   _name_ `string`: The type of block.
 -   _attributes_ `?Object`: Attributes to pass to the newly created block.
--   _attributesToCopy_ `?Array<string>`: Attributes to be copied from adjacent blocks when inserted.
 
 ### getDraggedBlockClientIds
 

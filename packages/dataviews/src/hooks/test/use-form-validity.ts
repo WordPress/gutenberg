@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
-import { renderHook, waitFor } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { useFormValidity } from '../use-form-validity';
 import type { Field } from '../../types';
 
@@ -232,6 +225,145 @@ describe( 'useFormValidity', () => {
 					isValid: false,
 				} );
 			} );
+		} );
+	} );
+
+	describe( 'isVisible', () => {
+		type TestItem = {
+			id: number;
+			isActive: boolean;
+			name?: string;
+			email?: string;
+		};
+		const fields: Field< TestItem >[] = [
+			{
+				id: 'isActive',
+				type: 'boolean',
+			},
+			{
+				id: 'name',
+				type: 'text',
+				isVisible: ( item ) => item.isActive === true,
+				isValid: {
+					required: true,
+				},
+			},
+			{
+				id: 'email',
+				type: 'text',
+				isValid: {
+					required: true,
+				},
+			},
+		];
+		const form = { fields: [ 'isActive', 'name' ] };
+
+		it( 'hidden fields are not validated', () => {
+			const item: TestItem = { id: 1, isActive: false, name: undefined };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'toggling visibility re-runs validation for an unchanged value', () => {
+			const { result, rerender } = renderHook(
+				( { item }: { item: TestItem } ) =>
+					useFormValidity( item, fields, form ),
+				{
+					initialProps: {
+						item: { id: 1, isActive: true, name: undefined },
+					},
+				}
+			);
+			expect( result.current.validity ).toEqual( {
+				name: { required: { type: 'invalid' } },
+			} );
+			expect( result.current.isValid ).toBe( false );
+
+			rerender( { item: { id: 1, isActive: false, name: undefined } } );
+			expect( result.current.validity ).toEqual( undefined );
+			expect( result.current.isValid ).toBe( true );
+
+			rerender( { item: { id: 1, isActive: true, name: undefined } } );
+			expect( result.current.validity ).toEqual( {
+				name: { required: { type: 'invalid' } },
+			} );
+			expect( result.current.isValid ).toBe( false );
+		} );
+
+		it( 'hidden children of combined fields are not validated', () => {
+			const item: TestItem = {
+				id: 1,
+				isActive: false,
+				name: undefined,
+				email: undefined,
+			};
+			const combinedForm = {
+				fields: [ { id: 'combined', children: [ 'name', 'email' ] } ],
+			};
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () =>
+				useFormValidity( item, fields, combinedForm )
+			);
+			expect( validity ).toEqual( {
+				combined: {
+					children: {
+						email: { required: { type: 'invalid' } },
+					},
+				},
+			} );
+			expect( isValid ).toBe( false );
+		} );
+
+		it( 'a stale async result does not resurface after the field is hidden', async () => {
+			let resolveCustom: ( value: string | null ) => void = () => {};
+			const asyncFields: Field< TestItem >[] = [
+				{
+					id: 'isActive',
+					type: 'boolean',
+				},
+				{
+					id: 'name',
+					type: 'text',
+					isVisible: ( item ) => item.isActive === true,
+					isValid: {
+						custom: () =>
+							new Promise< string | null >( ( resolve ) => {
+								resolveCustom = resolve;
+							} ),
+					},
+				},
+			];
+			const { result, rerender } = renderHook(
+				( { item }: { item: TestItem } ) =>
+					useFormValidity( item, asyncFields, form ),
+				{
+					initialProps: {
+						item: { id: 1, isActive: true, name: 'a' },
+					},
+				}
+			);
+			expect( result.current.validity ).toEqual( {
+				name: {
+					custom: { type: 'validating', message: 'Validating…' },
+				},
+			} );
+
+			rerender( { item: { id: 1, isActive: false, name: 'a' } } );
+			expect( result.current.validity ).toEqual( undefined );
+
+			await act( async () => {
+				resolveCustom( 'Invalid value.' );
+			} );
+			expect( result.current.validity ).toEqual( undefined );
+			expect( result.current.isValid ).toBe( true );
 		} );
 	} );
 
@@ -2265,6 +2397,47 @@ describe( 'useFormValidity', () => {
 				custom: {
 					type: 'invalid',
 					message: 'Value must be a number.',
+				},
+			} );
+			expect( isValid ).toBe( false );
+		} );
+
+		it( 'array is valid if value is empty', () => {
+			const item = { id: 1, tags: undefined };
+			const fields: Field< {} >[] = [
+				{
+					id: 'tags',
+					type: 'array',
+				},
+			];
+			const form = { fields: [ 'tags' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'array is invalid if values are not strings when not empty', () => {
+			const item = { id: 1, tags: [ 'valid', 42 ] };
+			const fields: Field< {} >[] = [
+				{
+					id: 'tags',
+					type: 'array',
+				},
+			];
+			const form = { fields: [ 'tags' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.tags ).toEqual( {
+				custom: {
+					type: 'invalid',
+					message: 'Every value must be a string.',
 				},
 			} );
 			expect( isValid ).toBe( false );

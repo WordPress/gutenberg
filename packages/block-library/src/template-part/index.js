@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import { capitalCase } from 'change-case';
-
-/**
- * WordPress dependencies
- */
 import { store as coreDataStore } from '@wordpress/core-data';
 import { select } from '@wordpress/data';
 import { symbolFilled } from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import edit from './edit';

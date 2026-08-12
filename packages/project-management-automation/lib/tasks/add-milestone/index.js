@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const debug = require( '../../debug' );
 const getAssociatedPullRequest = require( '../../get-associated-pull-request' );
 

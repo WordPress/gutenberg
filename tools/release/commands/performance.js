@@ -1,14 +1,7 @@
-/**
- * External dependencies
- */
 const os = require( 'os' );
 const fs = require( 'fs' );
 const path = require( 'path' );
 const SimpleGit = require( 'simple-git' );
-
-/**
- * Internal dependencies
- */
 const { formats, log } = require( '../lib/logger' );
 const {
 	runShellScript,

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useCallback,
 	useEffect,
@@ -21,10 +18,6 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import { createBlock } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import withRegistryProvider from './with-registry-provider';
 import { store as editorStore } from '../../store';
 import useAutosaveNotice from './use-autosave-notice';

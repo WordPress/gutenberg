@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { RangeControl, Spinner, Button } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
@@ -10,10 +7,6 @@ import { useCallback, useMemo, useRef } from '@wordpress/element';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
 import { useFocusOnMount } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 

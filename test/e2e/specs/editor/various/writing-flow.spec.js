@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -46,10 +43,19 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await expect( activeElementLocator ).toHaveCount( 1 );
 		await expect( activeElementLocator ).toHaveText( '2nd col' );
 
-		// Arrow up skips non-empty blocks and column/columns wrappers,
-		// navigating directly to the prior text input. Since columns
-		// are side by side, "1st col" and "2nd col" are on the same
-		// visual line, so ArrowUp goes to "First paragraph".
+		// Arrow up in inner blocks should navigate through (1) column wrapper,
+		// (2) text fields.
+		await page.keyboard.press( 'ArrowUp' );
+		await expect
+			.poll( writingFlowUtils.getActiveBlockName )
+			.toBe( 'core/column' );
+		await page.keyboard.press( 'ArrowUp' );
+		await expect
+			.poll( writingFlowUtils.getActiveBlockName )
+			.toBe( 'core/columns' );
+
+		// Arrow up from focused (columns) block wrapper exits nested context
+		// to prior text input.
 		await page.keyboard.press( 'ArrowUp' );
 		await expect
 			.poll( writingFlowUtils.getActiveBlockName )
@@ -838,7 +844,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'First' );
 		await page.keyboard.press( 'Enter' );
@@ -1074,7 +1080,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 <!-- /wp:paragraph -->` );
 	} );
 
-	test( 'should move to the start of the first line on ArrowUp (-firefox)', async ( {
+	test( 'should move to the start of the first line on ArrowUp', async ( {
 		page,
 		editor,
 	} ) => {

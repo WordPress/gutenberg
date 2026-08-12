@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import {
 	getNodesWithStyles,
 	getNodesWithSettings,
@@ -30,6 +27,7 @@ jest.mock( '@wordpress/blocks', () => ( {
 	},
 	__EXPERIMENTAL_ELEMENTS: {
 		link: 'a:where(:not(.wp-element-button))',
+		heading: 'h1, h2, h3, h4, h5, h6',
 		h1: 'h1',
 		h2: 'h2',
 		h3: 'h3',
@@ -1388,6 +1386,137 @@ describe( 'global styles renderer', () => {
 
 			expect( result ).toEqual(
 				'a:where(:not(.wp-element-button)){color: blue;}@media (width <= 480px){:root :where(a:where(:not(.wp-element-button))){color: red;}}@media (width <= 480px){:root :where(a:where(:not(.wp-element-button)):hover){color: orange;}}'
+			);
+		} );
+
+		it( 'renders block element styles defined only in a viewport', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/group': {
+							'@mobile': {
+								elements: {
+									heading: {
+										color: {
+											text: 'red',
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'@media (width <= 480px){:root :where(.wp-block-group h1,.wp-block-group  h2,.wp-block-group  h3,.wp-block-group  h4,.wp-block-group  h5,.wp-block-group  h6){color: red;}}'
+			);
+		} );
+
+		it( 'renders block element pseudo styles defined only in a viewport', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/group': {
+							'@mobile': {
+								elements: {
+									link: {
+										':hover': {
+											color: {
+												text: 'red',
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'@media (width <= 480px){:root :where(.wp-block-group a:where(:not(.wp-element-button)):hover){color: red;}}'
+			);
+		} );
+
+		it( 'renders block element styles defined in separate viewports', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/group': {
+							'@mobile': {
+								elements: {
+									link: {
+										color: {
+											text: 'red',
+										},
+									},
+								},
+							},
+							'@tablet': {
+								elements: {
+									link: {
+										color: {
+											text: 'blue',
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'@media (width <= 480px){:root :where(.wp-block-group a:where(:not(.wp-element-button))){color: red;}}@media (480px < width <= 782px){:root :where(.wp-block-group a:where(:not(.wp-element-button))){color: blue;}}'
 			);
 		} );
 
