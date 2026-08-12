@@ -1,268 +1,130 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getSettings, setSettings } from '@wordpress/date';
 import { useState } from '@wordpress/element';
-import normalizeFields from '../../../field-types';
-import { OPERATOR_BETWEEN } from '../../../constants';
-import DateControl from '../date';
-import type { DataFormControlProps } from '../../../types';
+import { setSettings, getSettings } from '@wordpress/date';
+import DataForm from '../../../dataform';
+import type { Field } from '../../../types';
 
-jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
+type TestItem = { id: number; publishedOn: string };
 
-const noop = () => {};
-
-type TestItem = {
-	published?: string | [ string, string ];
-};
-
-const field = normalizeFields< TestItem >( [
+const fields: Field< TestItem >[] = [
 	{
-		id: 'published',
-		label: 'Published',
+		id: 'publishedOn',
+		label: 'Published on',
 		type: 'date',
 	},
-] )[ 0 ];
+];
 
-const getMonthGrid = ( monthLabel: string ) =>
-	screen.getByRole( 'grid', { name: monthLabel } );
+const form = { fields: [ 'publishedOn' ] };
 
-const fullDateFormatter = new Intl.DateTimeFormat( 'en-US', {
-	weekday: 'long',
-	year: 'numeric',
-	month: 'long',
-	day: 'numeric',
-} );
-
-const getDayButton = ( date: Date ) =>
-	screen.getByRole( 'button', {
-		name: new RegExp( fullDateFormatter.format( date ) ),
+function ControlledDataForm( { initialValue }: { initialValue: string } ) {
+	const [ item, setItem ] = useState< TestItem >( {
+		id: 1,
+		publishedOn: initialValue,
 	} );
-
-function RangeHarness( {
-	initialValue,
-}: {
-	initialValue: [ string, string ];
-} ) {
-	const [ data, setData ] = useState< TestItem >( {
-		published: initialValue,
-	} );
-	const onChange: DataFormControlProps< TestItem >[ 'onChange' ] = (
-		edits
-	) => setData( ( current ) => ( { ...current, ...edits } ) as TestItem );
 	return (
-		<DateControl
-			data={ data }
-			field={ field }
-			onChange={ onChange }
-			operator={ OPERATOR_BETWEEN }
+		<DataForm
+			data={ item }
+			fields={ fields }
+			form={ form }
+			onChange={ ( edits ) =>
+				setItem( ( previous ) => ( { ...previous, ...edits } ) )
+			}
 		/>
 	);
 }
 
-describe( 'DateControl', () => {
-	it( 'should move the calendar to the month of a value changed from outside the control', () => {
-		const { rerender } = render(
-			<DateControl
-				data={ { published: '2024-03-15' } as TestItem }
-				field={ field }
-				onChange={ noop }
-			/>
-		);
+describe( 'dataform-controls/date', () => {
+	const originalSettings = getSettings();
 
-		expect( getMonthGrid( 'March 2024' ) ).toBeInTheDocument();
-
-		// External value change, e.g. an undo, a reset, or switching the
-		// edited item.
-		rerender(
-			<DateControl
-				data={ { published: '2024-11-15' } as TestItem }
-				field={ field }
-				onChange={ noop }
-			/>
-		);
-
-		expect( getMonthGrid( 'November 2024' ) ).toBeInTheDocument();
+	afterEach( () => {
+		setSettings( originalSettings );
 	} );
 
-	it( 'should keep the displayed month when the value is cleared from outside the control', () => {
-		const { rerender } = render(
-			<DateControl
-				data={ { published: '2024-03-15' } as TestItem }
-				field={ field }
-				onChange={ noop }
-			/>
-		);
-
-		rerender(
-			<DateControl data={ {} } field={ field } onChange={ noop } />
-		);
-
-		expect( getMonthGrid( 'March 2024' ) ).toBeInTheDocument();
-	} );
-
-	describe( 'with the `between` operator', () => {
-		it( 'should move the calendar to the start of a range changed from outside the control', () => {
-			const { rerender } = render(
-				<DateControl
-					data={
-						{
-							published: [ '2024-03-10', '2024-03-20' ],
-						} as TestItem
-					}
-					field={ field }
-					onChange={ noop }
-					operator={ OPERATOR_BETWEEN }
-				/>
-			);
-
-			expect( getMonthGrid( 'March 2024' ) ).toBeInTheDocument();
-
-			rerender(
-				<DateControl
-					data={
-						{
-							published: [ '2024-11-05', '2024-11-25' ],
-						} as TestItem
-					}
-					field={ field }
-					onChange={ noop }
-					operator={ OPERATOR_BETWEEN }
-				/>
-			);
-
-			expect( getMonthGrid( 'November 2024' ) ).toBeInTheDocument();
-		} );
-
-		it( 'should keep the displayed month while selecting the end of a cross-month range', async () => {
-			const user = userEvent.setup();
-			render(
-				<RangeHarness initialValue={ [ '2024-03-10', '2024-03-12' ] } />
-			);
-
-			// Start a new range in the displayed month…
-			await user.click( getDayButton( new Date( 2024, 2, 20 ) ) );
-			// …navigate to the next month…
-			await user.click(
-				screen.getByRole( 'button', { name: /next month/i } )
-			);
-			expect( getMonthGrid( 'April 2024' ) ).toBeInTheDocument();
-
-			// …and select the end of the range there. The view must not
-			// jump back to the month of the range start.
-			await user.click( getDayButton( new Date( 2024, 3, 1 ) ) );
-
-			expect( getMonthGrid( 'April 2024' ) ).toBeInTheDocument();
-		} );
-
-		it( 'should keep the displayed month when it falls inside a range changed from outside the control', () => {
-			const { rerender } = render(
-				<DateControl
-					data={
-						{
-							published: [ '2026-02-10', '2026-02-15' ],
-						} as TestItem
-					}
-					field={ field }
-					onChange={ noop }
-					operator={ OPERATOR_BETWEEN }
-				/>
-			);
-
-			rerender(
-				<DateControl
-					data={
-						{
-							published: [ '2026-01-10', '2026-03-20' ],
-						} as TestItem
-					}
-					field={ field }
-					onChange={ noop }
-					operator={ OPERATOR_BETWEEN }
-				/>
-			);
-
-			expect( getMonthGrid( 'February 2026' ) ).toBeInTheDocument();
-		} );
-	} );
-
-	describe( 'with a site time zone ahead of the browser', () => {
-		let originalSettings: ReturnType< typeof getSettings >;
-
-		beforeAll( () => {
-			originalSettings = getSettings();
-			// UTC+14, ahead of every possible browser time zone.
+	// Jest pins the browser timezone to UTC, so the mismatch is created from the
+	// WordPress side: a site behind UTC used to shift the plain calendar day
+	// onto the previous one.
+	it.each( [ -8, -5, 5.5, 9 ] )(
+		'shows the stored day as selected on a site at UTC%s',
+		async ( offset ) => {
 			setSettings( {
 				...originalSettings,
 				timezone: {
-					...originalSettings.timezone,
-					string: 'Pacific/Kiritimati',
-					offset: 14,
+					offset,
+					offsetFormatted: String( offset ),
+					string: '',
+					abbr: '',
 				},
 			} );
-		} );
 
-		afterAll( () => {
-			setSettings( originalSettings );
-		} );
+			render( <ControlledDataForm initialValue="2026-08-20" /> );
 
-		it( 'should move the calendar to the month of a value changed across a month boundary', () => {
-			const { rerender } = render(
-				<DateControl
-					data={ { published: '2026-02-15' } as TestItem }
-					field={ field }
-					onChange={ noop }
-				/>
-			);
-
-			expect( getMonthGrid( 'February 2026' ) ).toBeInTheDocument();
-
-			// March 1 in the site time zone is still February in the
-			// browser's, so a comparison in the wrong time zone keeps the
-			// calendar on February and hides the selected day.
-			rerender(
-				<DateControl
-					data={ { published: '2026-03-01' } as TestItem }
-					field={ field }
-					onChange={ noop }
-				/>
-			);
-
-			expect( getMonthGrid( 'March 2026' ) ).toBeInTheDocument();
 			expect(
-				screen.getByRole( 'button', { name: /March 1, 2026/ } )
+				screen.getByRole( 'button', {
+					name: /august 20, 2026, selected/i,
+				} )
 			).toBeInTheDocument();
+		}
+	);
+
+	it( 'commits the day that was clicked', async () => {
+		setSettings( {
+			...originalSettings,
+			timezone: {
+				offset: -8,
+				offsetFormatted: '-8',
+				string: '',
+				abbr: '',
+			},
 		} );
+		const user = userEvent.setup();
 
-		it( 'should move the calendar when a range changes across a month boundary', () => {
-			const { rerender } = render(
-				<DateControl
-					data={
-						{
-							published: [ '2026-02-10', '2026-02-15' ],
-						} as TestItem
-					}
-					field={ field }
-					onChange={ noop }
-					operator={ OPERATOR_BETWEEN }
-				/>
-			);
+		render( <ControlledDataForm initialValue="2026-08-20" /> );
 
-			expect( getMonthGrid( 'February 2026' ) ).toBeInTheDocument();
+		await user.click(
+			screen.getByRole( 'button', { name: /august 25, 2026/i } )
+		);
 
-			rerender(
-				<DateControl
-					data={
-						{
-							published: [ '2026-03-01', '2026-03-05' ],
-						} as TestItem
-					}
-					field={ field }
-					onChange={ noop }
-					operator={ OPERATOR_BETWEEN }
-				/>
-			);
+		expect(
+			screen.getByLabelText< HTMLInputElement >( 'Date' ).value
+		).toBe( '2026-08-25' );
+		expect(
+			screen.getByRole( 'button', {
+				name: /august 25, 2026, selected/i,
+			} )
+		).toBeInTheDocument();
+	} );
 
-			expect( getMonthGrid( 'March 2026' ) ).toBeInTheDocument();
+	// A named timezone kept the calendar in the site frame before this fix,
+	// through its `timeZone` prop; this guards the path now that the prop is
+	// gone and the day is anchored to the browser instead.
+	it( 'shows and commits the right day on a site with a named timezone', async () => {
+		setSettings( {
+			...originalSettings,
+			timezone: {
+				offset: 9,
+				offsetFormatted: '9',
+				string: 'Asia/Tokyo',
+				abbr: 'JST',
+			},
 		} );
+		const user = userEvent.setup();
+
+		render( <ControlledDataForm initialValue="2026-08-20" /> );
+
+		expect(
+			screen.getByRole( 'button', {
+				name: /august 20, 2026, selected/i,
+			} )
+		).toBeInTheDocument();
+
+		await user.click(
+			screen.getByRole( 'button', { name: /august 25, 2026/i } )
+		);
+
+		expect(
+			screen.getByLabelText< HTMLInputElement >( 'Date' ).value
+		).toBe( '2026-08-25' );
 	} );
 } );
+

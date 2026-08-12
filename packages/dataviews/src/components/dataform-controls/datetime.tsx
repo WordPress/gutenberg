@@ -1,4 +1,3 @@
-import { isSameMonth } from 'date-fns';
 import {
 	BaseControl,
 	privateApis as componentsPrivateApis,
@@ -11,7 +10,6 @@ import { Calendar, Stack } from '@wordpress/ui';
 import type { DataFormControlProps, FormatDatetime } from '../../types';
 import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../../constants';
 import RelativeDateControl from './utils/relative-date-control';
-import toCalendarDate from './utils/to-calendar-date';
 import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
 import getCustomValidity from './utils/get-custom-validity';
 import parseDateTime from '../../field-types/utils/parse-date-time';
@@ -41,34 +39,11 @@ function CalendarDateTimeControl< Item >( {
 	const disabled = field.isDisabled( { item: data, field } );
 	const fieldValue = getValue( { item: data } );
 	const value = typeof fieldValue === 'string' ? fieldValue : undefined;
-	const {
-		timezone: { string: timezoneString },
-	} = getSettings();
 
 	const [ calendarMonth, setCalendarMonth ] = useState< Date >( () => {
 		const parsedDate = parseDateTime( value );
-		// Default to current month
-		return toCalendarDate( parsedDate || new Date(), timezoneString );
+		return parsedDate || new Date(); // Default to current month
 	} );
-	// Follow the value when it changes, so that a change from outside the
-	// control, e.g. an undo, a reset, or switching the edited item, brings
-	// the selection into view. Months are compared in the calendar's time
-	// zone: near a month boundary, a date can belong to a different month
-	// there than in the browser's time zone.
-	useEffect( () => {
-		const parsedDate = parseDateTime( value );
-		if ( parsedDate ) {
-			const targetMonth = toCalendarDate( parsedDate, timezoneString );
-			setCalendarMonth( ( currentMonth ) =>
-				isSameMonth(
-					targetMonth,
-					toCalendarDate( currentMonth, timezoneString )
-				)
-					? currentMonth
-					: targetMonth
-			);
-		}
-	}, [ value, timezoneString ] );
 
 	const inputControlRef = useRef< HTMLInputElement >( null );
 	const validationTimeoutRef =
@@ -94,13 +69,11 @@ function CalendarDateTimeControl< Item >( {
 				// Extract the date part in WP timezone from the calendar selection
 				const wpDate = dateI18n( 'Y-m-d', newDate );
 
-				// Preserve time if it exists in current value, otherwise use current time
-				let wpTime: string;
-				if ( value ) {
-					wpTime = dateI18n( 'H:i', getDate( value ) );
-				} else {
-					wpTime = dateI18n( 'H:i', newDate );
-				}
+				// Preserve the time from the current value; a value set for the
+				// first time starts at the beginning of the day.
+				const wpTime = value
+					? dateI18n( 'H:i', getDate( value ) )
+					: '00:00';
 
 				// Combine date and time in WP timezone and convert to ISO
 				const finalDateTime = getDate( `${ wpDate }T${ wpTime }` );
@@ -147,21 +120,26 @@ function CalendarDateTimeControl< Item >( {
 				// Update calendar month to match
 				const parsedDate = parseDateTime( dateTime.toISOString() );
 				if ( parsedDate ) {
-					setCalendarMonth(
-						toCalendarDate( parsedDate, timezoneString )
-					);
+					setCalendarMonth( parsedDate );
 				}
 			} else {
 				onChangeCallback( undefined );
 			}
 		},
-		[ onChangeCallback, timezoneString ]
+		[ onChangeCallback ]
 	);
 
 	const { format: fieldFormat } = field;
 	const weekStartsOn =
 		( fieldFormat as FormatDatetime ).weekStartsOn ??
 		getSettings().l10n.startOfWeek;
+	const { timezone } = getSettings();
+	// A site configured with a manual UTC offset reports no named timezone —
+	// without one the calendar falls back to the browser's, whose days shift
+	// onto an adjacent day whenever the two timezones disagree on the date —
+	// so the offset itself is passed, rendered by the PHP `P` format as the
+	// `±HH:MM` shape the calendar accepts.
+	const timeZone = timezone.string || dateI18n( 'P' );
 
 	let displayLabel = label;
 	if ( isValid?.required && ! markWhenOptional && ! hideLabelFromVision ) {
@@ -212,7 +190,7 @@ function CalendarDateTimeControl< Item >( {
 						onValueChange={ onSelectDate }
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
-						timeZone={ timezoneString || undefined }
+						timeZone={ timeZone }
 						weekStartsOn={ weekStartsOn }
 						disabled={ disabled || disabledMatchers }
 					/>
@@ -257,3 +235,4 @@ export default function DateTime< Item >( {
 		/>
 	);
 }
+
