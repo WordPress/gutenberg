@@ -14,6 +14,7 @@ import typescriptEslintParser from '@typescript-eslint/parser';
 import globPackage from 'glob';
 import {
 	discoverTestFiles,
+	getVitestProjectName,
 	getVitestTestsByProject,
 	VITEST_PROJECT_NAMES,
 } from './discover-test-files.mjs';
@@ -38,13 +39,24 @@ const policyExceptions = JSON.parse(
 	)
 );
 const renderedUiBaseline = new Set( policyExceptions.renderedUi );
+const discoveredTests = discoverTestFiles( ROOT_DIR );
 const vitestTestsByProject = getVitestTestsByProject(
-	discoverTestFiles( ROOT_DIR ),
+	discoveredTests,
 	migration
 );
 const vitestTests = Object.values( vitestTestsByProject ).flat().sort();
 const jsdomTests = new Set( vitestTestsByProject.jsdom );
 const browserTests = new Set( vitestTestsByProject.browser );
+const allJsdomTests = new Set(
+	discoveredTests.filter(
+		( file ) => getVitestProjectName( file ) === 'jsdom'
+	)
+);
+const allBrowserTests = new Set(
+	discoveredTests.filter(
+		( file ) => getVitestProjectName( file ) === 'browser'
+	)
+);
 const vitestInfrastructure = [
 	'test/unit/vitest.config.mjs',
 	...glob( 'test/unit/config/**/*.vitest*.{js,jsx,mjs,ts,tsx}', {
@@ -84,15 +96,15 @@ if ( renderedUiBaseline.size !== policyExceptions.renderedUi.length ) {
 	violations.push( 'Rendered UI jsdom baseline entries must be unique' );
 }
 for ( const file of renderedUiBaseline ) {
-	if ( ! jsdomTests.has( file ) ) {
+	if ( ! allJsdomTests.has( file ) ) {
 		violations.push(
 			`${ file }: rendered UI baseline entries must be jsdom tests`
 		);
 	}
 }
 for ( const [ exceptionName, projectTests ] of [
-	[ 'browserFireEvent', browserTests ],
-	[ 'jsdomBrowserApis', jsdomTests ],
+	[ 'browserFireEvent', allBrowserTests ],
+	[ 'jsdomBrowserApis', allJsdomTests ],
 ] ) {
 	for ( const [ file, reason ] of Object.entries(
 		policyExceptions[ exceptionName ]
@@ -262,6 +274,26 @@ for ( const file of vitestTests ) {
 	}
 }
 
+for ( const file of [ ...allJsdomTests, ...allBrowserTests ].sort() ) {
+	const source = readFileSync( path.join( ROOT_DIR, file ), 'utf8' );
+	const project = getVitestProjectName( file );
+
+	violations.push(
+		...validateVitestPolicy( {
+			file,
+			source,
+			project,
+			allowBrowserFireEvent: Boolean(
+				policyExceptions.browserFireEvent[ file ]
+			),
+			allowJsdomBrowserApis: Boolean(
+				policyExceptions.jsdomBrowserApis[ file ]
+			),
+			allowRenderedUi: renderedUiBaseline.has( file ),
+		} )
+	);
+}
+
 for ( const file of files ) {
 	const filename = path.join( ROOT_DIR, file );
 	const source = readFileSync( filename, 'utf8' );
@@ -279,28 +311,6 @@ for ( const file of files ) {
 			( reference ) => reference.identifier
 		) ?? []
 	);
-	let project = 'node';
-	if ( browserTests.has( file ) ) {
-		project = 'browser';
-	} else if ( jsdomTests.has( file ) ) {
-		project = 'jsdom';
-	}
-
-	violations.push(
-		...validateVitestPolicy( {
-			file,
-			source,
-			project,
-			allowBrowserFireEvent: Boolean(
-				policyExceptions.browserFireEvent[ file ]
-			),
-			allowJsdomBrowserApis: Boolean(
-				policyExceptions.jsdomBrowserApis[ file ]
-			),
-			allowRenderedUi: renderedUiBaseline.has( file ),
-		} )
-	);
-
 	traverseAst( ast, visitorKeys, {
 		AssignmentExpression( node ) {
 			if ( isCommonJsExport( node.left ) ) {
@@ -542,7 +552,9 @@ for ( const projectName of VITEST_PROJECT_NAMES ) {
 console.log(
 	`Validated ${ vitestTests.length } Vitest tests, ${
 		files.length
-	} ESM graph files, ${
+	} ESM graph files, ${ allJsdomTests.size } jsdom policy files, ${
+		allBrowserTests.size
+	} Browser policy files, ${
 		vitestVersions.size
 	} workspace dependencies, and ${ typescriptTestCount } TypeScript ${
 		typescriptTestCount === 1 ? 'test' : 'tests'
