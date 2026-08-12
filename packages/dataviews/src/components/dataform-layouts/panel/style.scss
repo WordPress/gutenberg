@@ -113,7 +113,9 @@
 .dataforms-layouts-panel__field-label-error-content {
 	position: relative;
 	z-index: 1;
-	cursor: help;
+	// Match the row's cursor: clicking the error label activates the edit
+	// button, like clicking anywhere else on the row.
+	cursor: var(--wpds-cursor-control);
 	color: var(--wpds-color-foreground-content-error-weak);
 	display: inline-flex;
 	flex-direction: row;

@@ -609,6 +609,88 @@ describe( 'DataForm component', () => {
 			);
 			expect( titleEditField ).toBeInTheDocument();
 		} );
+
+		it( 'should open the field when the error indicator next to the label is clicked', async () => {
+			const user = userEvent.setup();
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fields }
+					form={ formPanelMode }
+					data={ { ...data, title: '' } }
+					validity={ {
+						title: {
+							required: {
+								type: 'invalid' as const,
+								message: 'Title is required.',
+							},
+						},
+					} }
+				/>
+			);
+
+			// The row only reveals the error after its flyout has been
+			// open once.
+			await user.click( fieldsSelector.title.view() );
+			await user.keyboard( '{Escape}' );
+			await screen.findByRole( 'button', {
+				name: 'Edit Title (has errors)',
+			} );
+
+			// The error indicator wraps the label and stacks above the edit
+			// button's stretched hit area, so it delegates clicks to it.
+			await user.click( screen.getByText( 'Title' ) );
+			expect( fieldsSelector.title.edit() ).toBeVisible();
+
+			// Dismissing the flyout returns focus to the edit button, as if
+			// it had been clicked directly.
+			await user.keyboard( '{Escape}' );
+			await waitFor( () =>
+				expect( fieldsSelector.title.view() ).toHaveFocus()
+			);
+		} );
+
+		it( 'should open the field when the error indicator is clicked and labels are hidden', async () => {
+			const user = userEvent.setup();
+			const formPanelNoLabel = {
+				...form,
+				layout: {
+					type: 'panel',
+					labelPosition: 'none',
+				} as const,
+			};
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fields }
+					form={ formPanelNoLabel }
+					data={ { ...data, title: '' } }
+					validity={ {
+						title: {
+							required: {
+								type: 'invalid' as const,
+								message: 'Title is required.',
+							},
+						},
+					} }
+				/>
+			);
+
+			// The row only reveals the error after its flyout has been
+			// open once.
+			await user.click( fieldsSelector.title.view() );
+			await user.keyboard( '{Escape}' );
+
+			// Without a label the error indicator is a standalone icon that
+			// stacks above the edit button's stretched hit area, so it
+			// delegates clicks to it.
+			await user.click(
+				await screen.findByRole( 'img', {
+					name: 'Title is required.',
+				} )
+			);
+			expect( fieldsSelector.title.edit() ).toBeVisible();
+		} );
 	} );
 
 	describe( 'in card mode', () => {

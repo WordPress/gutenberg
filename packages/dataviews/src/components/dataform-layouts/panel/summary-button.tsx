@@ -12,7 +12,7 @@ import type {
 	NormalizedPanelLayout,
 } from '../../../types';
 import getLabelClassName from './utils/get-label-classname';
-import getLabelContent from './utils/get-label-content';
+import FieldLabelContent from './field-label-content';
 import getFirstValidationError from './utils/get-first-validation-error';
 
 export default function SummaryButton< Item >( {
@@ -41,7 +41,16 @@ export default function SummaryButton< Item >( {
 	const errorMessage = getFirstValidationError( validity );
 	const showError = touched && !! errorMessage;
 	const labelClassName = getLabelClassName( labelPosition, showError );
-	const labelContent = getLabelContent( showError, errorMessage, fieldLabel );
+
+	const editButtonRef = useRef< HTMLButtonElement >( null );
+	// The error label/icon stacks above the edit button's stretched hit area
+	// so that its tooltip stays hoverable, which also intercepts clicks: relay
+	// them to the edit button, keeping it the single real trigger.
+	const activateEditButton = () => {
+		editButtonRef.current?.focus();
+		editButtonRef.current?.click();
+	};
+
 	const className = clsx(
 		'dataforms-layouts-panel__field-trigger',
 		`dataforms-layouts-panel__field-trigger--label-${ labelPosition }`,
@@ -72,11 +81,19 @@ export default function SummaryButton< Item >( {
 	return (
 		<div className={ className }>
 			{ labelPosition !== 'none' && (
-				<span className={ labelClassName }>{ labelContent }</span>
+				<span className={ labelClassName }>
+					<FieldLabelContent
+						showError={ showError }
+						errorMessage={ errorMessage }
+						fieldLabel={ fieldLabel }
+						onErrorClick={ activateEditButton }
+					/>
+				</span>
 			) }
 			{ labelPosition === 'none' && showError && (
 				<Tooltip.Root>
 					<Tooltip.Trigger
+						onClick={ activateEditButton }
 						render={
 							<span
 								className="dataforms-layouts-panel__field-label-error-content"
@@ -128,6 +145,7 @@ export default function SummaryButton< Item >( {
 			</span>
 			{ ! disabled && (
 				<Button
+					ref={ editButtonRef }
 					className="dataforms-layouts-panel__field-trigger-icon"
 					label={ ariaLabel }
 					icon={ pencil }
