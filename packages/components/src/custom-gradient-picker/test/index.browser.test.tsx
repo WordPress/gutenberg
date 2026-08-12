@@ -175,7 +175,7 @@ describe( 'CustomGradientBar', () => {
 	// consumer opts out, so arrow keys must still move a control point.
 	it( 'moves a control point with the arrow keys', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<CustomGradientBar
@@ -209,7 +209,7 @@ describe( 'CustomGradientBar', () => {
 	// the position comes from the markers container's box, so that has to be
 	// given one in jsdom.
 	it( 'moves a control point when dragged', () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		const { container } = render(
 			<CustomGradientBar
@@ -243,7 +243,7 @@ describe( 'CustomGradientBar', () => {
 	} );
 
 	it( 'does not move a control point when dragged and positioning is disabled', () => {
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		const { container } = render(
 			<CustomGradientBar
@@ -275,7 +275,7 @@ describe( 'CustomGradientBar', () => {
 
 	it( 'does not move a control point when positioning is disabled', async () => {
 		const user = userEvent.setup();
-		const onChange = jest.fn();
+		const onChange = vi.fn();
 
 		render(
 			<CustomGradientBar
