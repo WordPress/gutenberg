@@ -34,16 +34,9 @@
  *     re-render, so reading the latest entries / callbacks via refs avoids
  *     stale-closure bugs without resubscribing on every overlay change.
  */
-/**
- * WordPress dependencies
- */
 import { useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { useSuggestionOverlay } from './overlay-context';
 import { operationsFromOverlay, useSuggestionsProvider } from './provider';
 import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';

@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { render, act } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import SuggestionAutoSave, { operationsForEntry } from '../auto-save';
 import {
 	SuggestionOverlayProvider,
