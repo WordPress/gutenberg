@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `ThemeProvider`: Avoid root-level relational selectors when forwarding `cornerRadius` presets to reduce style recalculation work. ([#81457](https://github.com/WordPress/gutenberg/pull/81457))
+
 ## 1.2.0 (2026-08-12)
 
 ### Bug Fixes

@@ -5,6 +5,13 @@
 ### Bug Fix
 
 -   DataForms: Fix the `date` and `datetime` controls selecting and highlighting the day next to the one clicked on a site configured with a manual UTC offset rather than a named timezone. Such a site reports no timezone the calendar can work in, so the calendar fell back to the browser's while the values stayed anchored to the site's, and the two frames can disagree on the day. Each control now keeps the calendar and its value in one frame: `datetime` in the site's when it has a named timezone — which also keeps the day marked as today the site's, matching the date picker used outside DataForm — and in the browser's otherwise, while a `date` is treated as the plain calendar day it is. [#81350](https://github.com/WordPress/gutenberg/pull/81350)
+-   DataForm: Send a single update per calendar interaction in the `datetime` control instead of two identical ones. Selecting or clearing a date now reveals the validation message by firing a synthetic `invalid` event on the input, rather than briefly moving focus into it and re-sending the value, and announces it to screen readers since focus stays on the calendar. [#81440](https://github.com/WordPress/gutenberg/pull/81440)
+
+### Internal
+
+-   DataForm: Internalize `ValidatedComboboxControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81449](https://github.com/WordPress/gutenberg/pull/81449)
+-   DataForm: Internalize `ValidatedFormTokenField` instead of unlocking it from the `@wordpress/components` private APIs. [#81451](https://github.com/WordPress/gutenberg/pull/81451)
+-   DataForm: Internalize `ValidatedToggleGroupControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81450](https://github.com/WordPress/gutenberg/pull/81450)
 
 ## 18.0.0 (2026-08-12)
 
@@ -17,11 +24,8 @@
 -   DataViews: Replace the inlined `kebabCase` utility with the new `@wordpress/kebab-case` package. [#81294](https://github.com/WordPress/gutenberg/pull/81294)
 -   DataForm: Internalize `ValidatedSelectControl` and its `ControlWithError` foundation instead of unlocking them from the `@wordpress/components` private APIs. The foundation is a temporary copy slated to be replaced by the upcoming `@wordpress/ui` implementation. [#81391](https://github.com/WordPress/gutenberg/pull/81391)
 -   DataForm: Internalize `ValidatedCheckboxControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81435](https://github.com/WordPress/gutenberg/pull/81435)
--   DataForm: Internalize `ValidatedComboboxControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81449](https://github.com/WordPress/gutenberg/pull/81449)
 -   DataForm: Internalize `ValidatedNumberControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81433](https://github.com/WordPress/gutenberg/pull/81433)
 -   DataForm: Internalize `ValidatedRadioControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81434](https://github.com/WordPress/gutenberg/pull/81434)
--   DataForm: Internalize `ValidatedFormTokenField` instead of unlocking it from the `@wordpress/components` private APIs. [#81451](https://github.com/WordPress/gutenberg/pull/81451)
--   DataForm: Internalize `ValidatedToggleGroupControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81450](https://github.com/WordPress/gutenberg/pull/81450)
 
 ### New Features
 
