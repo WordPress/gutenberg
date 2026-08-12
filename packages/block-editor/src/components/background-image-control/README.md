@@ -21,23 +21,34 @@ Renders the background image controls, to be used within a `ToolsPanelItem` in t
 
 ```jsx
 import { useState } from 'react';
-import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
+import {
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import BackgroundImageControl from '../background-image-control';
 
 const MyBackgroundImageControl = () => {
 	const [ style, setStyle ] = useState( {} );
 	return (
 		<ToolsPanel label={ 'Background' } panelId="my-panel">
-			<BackgroundImageControl
-				value={ style }
-				onChange={ setStyle }
-				settings={ {
-					background: {
-						backgroundImage: true,
-						backgroundSize: true,
-					},
-				} }
-			/>
+			<ToolsPanelItem
+				label={ 'Image' }
+				panelId="my-panel"
+				isShownByDefault
+				hasValue={ () => !! style?.background?.backgroundImage }
+				onDeselect={ () => setStyle( {} ) }
+			>
+				<BackgroundImageControl
+					value={ style }
+					onChange={ setStyle }
+					settings={ {
+						background: {
+							backgroundImage: true,
+							backgroundSize: true,
+						},
+					} }
+				/>
+			</ToolsPanelItem>
 		</ToolsPanel>
 	);
 };
