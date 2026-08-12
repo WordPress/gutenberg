@@ -31,7 +31,7 @@
 		{ "path": "../dom" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
-		{ "path": "../icons" },
+		{ "path": "../icons/tsconfig.build.json" },
 		{ "path": "../kebab-case" },
 		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../primitives" },

@@ -7,7 +7,7 @@
 	},
 	"references": [
 		{ "path": "../asset-loader" },
-		{ "path": "../block-editor" },
+		{ "path": "../block-editor/tsconfig.build.json" },
 		{ "path": "../blocks" },
 		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../core-data/tsconfig.build.json" },

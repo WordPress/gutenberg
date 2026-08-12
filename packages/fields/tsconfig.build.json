@@ -1,8 +1,10 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.dev.base.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"checkJs": false
+	},
 	"references": [
-		{ "path": "./tsconfig.build.json" },
 		{ "path": "../a11y/tsconfig.build.json" },
 		{ "path": "../api-fetch/tsconfig.build.json" },
 		{ "path": "../blob/tsconfig.build.json" },
@@ -29,5 +31,6 @@
 		{ "path": "../block-editor/tsconfig.build.json" },
 		{ "path": "../warning" },
 		{ "path": "../wordcount/tsconfig.build.json" }
-	]
+	],
+	"exclude": [ "**/benchmark", "**/test/**", "**/stories/**", "**/*.story.*" ]
 }
