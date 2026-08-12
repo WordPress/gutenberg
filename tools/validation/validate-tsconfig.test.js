@@ -48,8 +48,12 @@ function createRepo( { packages, build, root } ) {
 			version: '1.0.0',
 			...( dependencies && { dependencies } ),
 		} );
-		for ( const [ fileName, references ] of Object.entries( tsconfigs ) ) {
+		for ( const [ fileName, tsconfig ] of Object.entries( tsconfigs ) ) {
+			const { references = [], ...rest } = Array.isArray( tsconfig )
+				? { references: tsconfig }
+				: tsconfig;
 			writeJson( join( packageDir, fileName ), {
+				...rest,
 				references: references.map( ( path ) => ( { path } ) ),
 			} );
 		}
@@ -274,5 +278,41 @@ test( 'fails when the root solution does not reference the build solution', () =
 	expect( result.status ).not.toBe( 0 );
 	expect( result.stderr ).toContain(
 		'Missing reference to "./tsconfig.build.json" in tsconfig.json'
+	);
+} );
+
+const devOnlyPackage = {
+	tsconfigs: {
+		'tsconfig.json': {
+			extends: '../../tsconfig.dev.base.json',
+			references: [],
+		},
+	},
+};
+
+test( 'passes when a package without a build project is in the root solution', () => {
+	const result = runValidator(
+		createRepo( {
+			packages: { 'jest-console': devOnlyPackage },
+			build: [],
+			root: [ './tsconfig.build.json', 'packages/jest-console' ],
+		} )
+	);
+
+	expect( result.status ).toBe( 0 );
+} );
+
+test( 'fails when a package without a build project is missing from the root solution', () => {
+	const result = runValidator(
+		createRepo( {
+			packages: { 'jest-console': devOnlyPackage },
+			build: [],
+			root: [ './tsconfig.build.json' ],
+		} )
+	);
+
+	expect( result.status ).not.toBe( 0 );
+	expect( result.stderr ).toContain(
+		'Missing reference to "packages/jest-console/tsconfig.json" in tsconfig.json'
 	);
 } );

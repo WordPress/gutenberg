@@ -1,8 +1,9 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
-	"compilerOptions": {
-		"types": [ "style-imports" ]
-	},
-	"references": [ { "path": "../dataviews" }, { "path": "../element" } ]
+	"extends": "../../tsconfig.dev.base.json",
+	"references": [
+		{ "path": "./tsconfig.build.json" },
+		{ "path": "../dataviews" },
+		{ "path": "../element/tsconfig.build.json" }
+	]
 }

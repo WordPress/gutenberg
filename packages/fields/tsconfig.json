@@ -5,24 +5,24 @@
 		"checkJs": false
 	},
 	"references": [
-		{ "path": "../a11y" },
-		{ "path": "../api-fetch" },
+		{ "path": "../a11y/tsconfig.build.json" },
+		{ "path": "../api-fetch/tsconfig.build.json" },
 		{ "path": "../blob/tsconfig.build.json" },
 		{ "path": "../components" },
-		{ "path": "../compose" },
-		{ "path": "../core-data" },
+		{ "path": "../compose/tsconfig.build.json" },
+		{ "path": "../core-data/tsconfig.build.json" },
 		{ "path": "../block-editor" },
 		{ "path": "../blocks" },
 		{ "path": "../data" },
 		{ "path": "../dataviews" },
 		{ "path": "../date" },
-		{ "path": "../element" },
+		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../hooks" },
-		{ "path": "../html-entities" },
-		{ "path": "../i18n" },
+		{ "path": "../html-entities/tsconfig.build.json" },
+		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons" },
-		{ "path": "../media-utils" },
-		{ "path": "../notices" },
+		{ "path": "../media-utils/tsconfig.build.json" },
+		{ "path": "../notices/tsconfig.build.json" },
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
 		{ "path": "../router" },
@@ -30,6 +30,6 @@
 		{ "path": "../url" },
 		{ "path": "../block-editor" },
 		{ "path": "../warning" },
-		{ "path": "../wordcount" }
+		{ "path": "../wordcount/tsconfig.build.json" }
 	]
 }

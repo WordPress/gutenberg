@@ -36,6 +36,7 @@
 
 ### Internal
 
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
 -   Widget actions menu: render the action icon directly; the widget types
     contract guarantees a renderable element ([#81381](https://github.com/WordPress/gutenberg/pull/81381)).
 -   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))

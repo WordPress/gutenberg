@@ -67,6 +67,21 @@ const packagesWithTypes = glob
 	.map( ( tsconfigPath ) => basename( dirname( tsconfigPath ) ) );
 
 /**
+ * Whether a project extends the shared dev configuration, which packages use
+ * for the files they never publish declarations for.
+ *
+ * @param {string} tsconfigPath Absolute path of the project.
+ * @return {boolean} Whether the project is a dev project.
+ */
+function isDevProject( tsconfigPath ) {
+	const extended = readTsconfig( tsconfigPath ).extends;
+	return (
+		typeof extended === 'string' &&
+		basename( extended ) === 'tsconfig.dev.base.json'
+	);
+}
+
+/**
  * Returns the projects a package builds its declarations from and, if any,
  * type checks its dev files with. Packages that are not split yet build from
  * `tsconfig.json` and may carry a separate `tsconfig.test.json`.
@@ -77,12 +92,18 @@ const packagesWithTypes = glob
 function packageProjects( packageName ) {
 	const packageDir = resolve( repoRoot, 'packages', packageName );
 	const buildProject = join( packageDir, 'tsconfig.build.json' );
+	const defaultProject = join( packageDir, 'tsconfig.json' );
 
 	if ( existsSync( buildProject ) ) {
-		return {
-			srcProject: buildProject,
-			devProject: join( packageDir, 'tsconfig.json' ),
-		};
+		return { srcProject: buildProject, devProject: defaultProject };
+	}
+
+	/*
+	 * A package that emits no declarations needs no build project: its
+	 * default project checks src along with the dev files.
+	 */
+	if ( isDevProject( defaultProject ) ) {
+		return { srcProject: undefined, devProject: defaultProject };
 	}
 
 	const testProject = join( packageDir, 'tsconfig.test.json' );
@@ -123,7 +144,7 @@ function srcProjectReferences( srcProject, packageName ) {
 for ( const packageName of packagesWithTypes ) {
 	const { srcProject, devProject } = packageProjects( packageName );
 
-	if ( ! buildSolutionReferences.has( srcProject ) ) {
+	if ( srcProject && ! buildSolutionReferences.has( srcProject ) ) {
 		reportError(
 			`Missing reference to "${ relative(
 				repoRoot,
@@ -158,9 +179,11 @@ for ( const packageName of packagesWithTypes ) {
 
 	/*
 	 * Only what the src project reaches counts: a reference that lives in
-	 * the dev project alone leaves the package build without it.
+	 * the dev project alone leaves the package build without it. Packages
+	 * without a build project check their dependencies in the dev project.
 	 */
-	const references = srcProjectReferences( srcProject, packageName );
+	const dependingProject = srcProject ?? devProject;
+	const references = srcProjectReferences( dependingProject, packageName );
 
 	if ( packageJson.dependencies ) {
 		for ( const dependency of Object.keys( packageJson.dependencies ) ) {
@@ -174,12 +197,15 @@ for ( const packageName of packagesWithTypes ) {
 				const dependencyProject = packageProjects(
 					dependencyPackageName
 				).srcProject;
+				if ( ! dependencyProject ) {
+					continue;
+				}
 				if ( ! references.has( dependencyProject ) ) {
 					reportError(
 						`Missing reference to "${ relative(
 							resolve( repoRoot, 'packages', packageName ),
 							dependencyProject
-						) }" in ${ relative( repoRoot, srcProject ) }`
+						) }" in ${ relative( repoRoot, dependingProject ) }`
 					);
 				}
 			}

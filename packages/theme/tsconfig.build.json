@@ -13,9 +13,9 @@
 		"**/*.story.*"
 	],
 	"references": [
-		{ "path": "../compose" },
-		{ "path": "../deprecated" },
-		{ "path": "../element" },
+		{ "path": "../compose/tsconfig.build.json" },
+		{ "path": "../deprecated/tsconfig.build.json" },
+		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../private-apis" },
 		{ "path": "../style-runtime" }
 	]

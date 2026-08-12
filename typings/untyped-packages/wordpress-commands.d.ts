@@ -1,7 +1,7 @@
 /*
  * `@wordpress/commands` ships untyped JavaScript resolved through gitignored
- * build artifacts; this ambient declaration covers the surface this package
- * consumes so type builds don't depend on those artifacts existing.
+ * build artifacts; the base tsconfig maps the package here so type checking
+ * never depends on those artifacts existing.
  */
 declare module '@wordpress/commands' {
 	import type { StoreDescriptor } from '@wordpress/data';
