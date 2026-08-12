@@ -1034,6 +1034,27 @@ describe( 'DataForm component', () => {
 				() => new Promise( ( resolve ) => setTimeout( resolve, 10 ) )
 			);
 
+		function ControlledForm( {
+			onChange: onChangeProp = noop,
+		}: {
+			onChange?: ( edits: { date?: string } ) => void;
+		} ) {
+			const [ item, setItem ] = useState< {
+				date: string | undefined;
+			} >( { date: '2026-01-10T10:00:00.000Z' } );
+			return (
+				<Dataform
+					onChange={ ( edits ) => {
+						onChangeProp( edits );
+						setItem( ( prev ) => ( { ...prev, ...edits } ) );
+					} }
+					fields={ datetimeFields }
+					form={ datetimeForm }
+					data={ item }
+				/>
+			);
+		}
+
 		it( 'should call onChange once when a date is selected in the calendar', async () => {
 			const onChange = jest.fn();
 			const user = userEvent.setup();
@@ -1050,33 +1071,18 @@ describe( 'DataForm component', () => {
 			await flushTimeouts();
 
 			expect( onChange ).toHaveBeenCalledTimes( 1 );
+			// The time is preserved from the previous value.
 			expect( onChange ).toHaveBeenCalledWith( {
-				date: expect.any( String ),
+				date: '2026-01-15T10:00:00.000Z',
 			} );
+			expect( speak ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should call onChange once and show the required error when the date is cleared, without moving focus to the input', async () => {
+		it( 'should call onChange once and show the required error when the date is cleared, keeping focus on the day button', async () => {
 			const onChange = jest.fn();
 			const user = userEvent.setup();
 
-			function ControlledForm() {
-				const [ item, setItem ] = useState< {
-					date: string | undefined;
-				} >( { date: '2026-01-10T10:00:00.000Z' } );
-				return (
-					<Dataform
-						onChange={ ( edits ) => {
-							onChange( edits );
-							setItem( ( prev ) => ( { ...prev, ...edits } ) );
-						} }
-						fields={ datetimeFields }
-						form={ datetimeForm }
-						data={ item }
-					/>
-				);
-			}
-
-			render( <ControlledForm /> );
+			render( <ControlledForm onChange={ onChange } /> );
 
 			// Clicking the selected day deselects it.
 			await user.click( dayButton( new Date( 2026, 0, 10 ) ) );
@@ -1087,7 +1093,30 @@ describe( 'DataForm component', () => {
 			expect(
 				await screen.findByText( 'Constraints not satisfied' )
 			).toBeVisible();
-			expect( screen.getByLabelText( /date time/i ) ).not.toHaveFocus();
+			// Focus does not move, so the error is announced instead.
+			expect( speak ).toHaveBeenCalledWith( 'Constraints not satisfied' );
+			expect( dayButton( new Date( 2026, 0, 10 ) ) ).toHaveFocus();
+		} );
+
+		it( 'should clear the revealed error when a valid date is selected in the calendar', async () => {
+			const user = userEvent.setup();
+
+			render( <ControlledForm /> );
+
+			// Clicking the selected day deselects it, making the field invalid.
+			await user.click( dayButton( new Date( 2026, 0, 10 ) ) );
+			await flushTimeouts();
+
+			expect(
+				await screen.findByText( 'Constraints not satisfied' )
+			).toBeVisible();
+
+			await user.click( dayButton( new Date( 2026, 0, 15 ) ) );
+			await flushTimeouts();
+
+			expect(
+				screen.queryByText( 'Constraints not satisfied' )
+			).not.toBeInTheDocument();
 		} );
 	} );
 } );

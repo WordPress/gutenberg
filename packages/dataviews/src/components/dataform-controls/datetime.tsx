@@ -4,6 +4,7 @@ import {
 } from '@wordpress/components';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { speak } from '@wordpress/a11y';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { Calendar, Stack } from '@wordpress/ui';
 import type { DataFormControlProps, FormatDatetime } from '../../types';
@@ -87,13 +88,25 @@ function CalendarDateTimeControl< Item >( {
 			// input's validity state by firing a synthetic `invalid` event,
 			// which the validated control listens to in order to display its
 			// error message without moving focus (unlike `reportValidity()`).
+			// The control re-reads the message on this event, so dispatching
+			// unconditionally is also what clears a stale error once a valid
+			// date is selected.
 			// The timeout ensures the input has re-rendered with the new
 			// value before its validity is sampled.
 			clearTimeout( validationTimeoutRef.current );
 			validationTimeoutRef.current = setTimeout( () => {
-				inputControlRef.current?.dispatchEvent(
+				const input = inputControlRef.current;
+				if ( ! input ) {
+					return;
+				}
+				input.dispatchEvent(
 					new Event( 'invalid', { cancelable: true } )
 				);
+				// Focus stays on the calendar, so announce the message;
+				// revealing it alone would go unnoticed by screen readers.
+				if ( input.validationMessage ) {
+					speak( input.validationMessage );
+				}
 			}, 0 );
 		},
 		[ onChangeCallback, value ]
