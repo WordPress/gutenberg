@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	MenuItem,
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -12,10 +9,6 @@ import { useState } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { addQueryArgs } from '@wordpress/url';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { store as reusableBlocksStore } from '../../store';
 
 function ReusableBlocksManageButton( { clientId } ) {

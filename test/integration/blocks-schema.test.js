@@ -1,18 +1,11 @@
-/**
- * External dependencies
- */
 import Ajv from 'ajv';
 import glob from 'fast-glob';
-
-/**
- * Internal dependencies
- */
 import blockSchema from '../../schemas/json/block.json';
 
 describe( 'block.json schema', () => {
 	const jsonFiles = glob.sync(
 		[ 'packages/*/src/**/block.json', '{lib,phpunit,test}/**/block.json' ],
-		{ onlyFiles: true }
+		{ onlyFiles: true, ignore: [ '**/node_modules/**' ] }
 	);
 	const invalidFiles = glob.sync(
 		[ 'test/integration/fixtures/block-schemas/*.json' ],

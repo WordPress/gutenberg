@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import usePrevious from '../use-previous';
 
 /**

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import phrasingContentReducer from '../phrasing-content-reducer';
 import { deepFilterHTML } from '../utils';
 

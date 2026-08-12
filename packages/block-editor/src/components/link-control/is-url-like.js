@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { getProtocol, isValidProtocol, isValidFragment } from '@wordpress/url';
 
 /**

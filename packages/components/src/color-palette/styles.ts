@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import styled from '@emotion/styled';
-
-/**
- * Internal dependencies
- */
 import { Heading } from '../heading';
 import { CONFIG } from '../utils';
 

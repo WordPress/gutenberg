@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -46,10 +43,19 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await expect( activeElementLocator ).toHaveCount( 1 );
 		await expect( activeElementLocator ).toHaveText( '2nd col' );
 
-		// Arrow up skips non-empty blocks and column/columns wrappers,
-		// navigating directly to the prior text input. Since columns
-		// are side by side, "1st col" and "2nd col" are on the same
-		// visual line, so ArrowUp goes to "First paragraph".
+		// Arrow up in inner blocks should navigate through (1) column wrapper,
+		// (2) text fields.
+		await page.keyboard.press( 'ArrowUp' );
+		await expect
+			.poll( writingFlowUtils.getActiveBlockName )
+			.toBe( 'core/column' );
+		await page.keyboard.press( 'ArrowUp' );
+		await expect
+			.poll( writingFlowUtils.getActiveBlockName )
+			.toBe( 'core/columns' );
+
+		// Arrow up from focused (columns) block wrapper exits nested context
+		// to prior text input.
 		await page.keyboard.press( 'ArrowUp' );
 		await expect
 			.poll( writingFlowUtils.getActiveBlockName )
@@ -838,7 +844,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'First' );
 		await page.keyboard.press( 'Enter' );
@@ -1422,9 +1428,10 @@ class WritingFlowUtils {
 		} );
 		await firstColumn.focus();
 		await firstColumn.getByRole( 'button', { name: 'Add block' } ).click();
-		await this.page.click(
-			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
-		);
+		await this.page
+			.getByRole( 'listbox', { name: 'Blocks' } )
+			.getByRole( 'option', { name: 'Paragraph' } )
+			.click();
 		await this.page.keyboard.type( '1st col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "1st" instead of "First" here.
 
 		await this.editor.canvas
@@ -1433,9 +1440,10 @@ class WritingFlowUtils {
 		await this.editor.canvas
 			.locator( 'role=button[name="Add block"i]' )
 			.click();
-		await this.page.click(
-			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
-		);
+		await this.page
+			.getByRole( 'listbox', { name: 'Blocks' } )
+			.getByRole( 'option', { name: 'Paragraph' } )
+			.click();
 		await this.page.keyboard.type( '2nd col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "2nd" instead of "Second" here.
 		await this.editor.showBlockToolbar();
 		await this.page.keyboard.press( 'Shift+Tab' ); // Move to toolbar to select parent

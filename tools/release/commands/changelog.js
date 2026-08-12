@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 const { Octokit } = require( '@octokit/rest' );
 const { sprintf } = require( 'sprintf-js' );
 const semver = require( 'semver' );
-
-/**
- * Internal dependencies
- */
 const { getNextMajorVersion } = require( '../lib/version' );
 const {
 	getMilestoneByTitle,
@@ -15,7 +8,6 @@ const {
 } = require( '../lib/milestone' );
 const { log, warn, formats } = require( '../lib/logger' );
 const config = require( '../config' );
-// @ts-ignore
 const manifest = require( '../../../package.json' );
 
 const UNKNOWN_FEATURE_FALLBACK_NAME = 'Uncategorized';

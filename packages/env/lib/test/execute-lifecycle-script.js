@@ -1,8 +1,5 @@
 'use strict';
 /* eslint-disable jest/no-conditional-expect */
-/**
- * Internal dependencies
- */
 const {
 	LifecycleScriptError,
 	executeLifecycleScript,

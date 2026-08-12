@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -9,10 +6,6 @@ import {
 } from '@wordpress/components';
 import { useContext, useState, useMemo } from '@wordpress/element';
 import { areGlobalStylesEqual } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { ScreenHeader } from '../screen-header';
 import { GlobalStylesContext } from '../context';
 import useGlobalStylesRevisions from './use-global-styles-revisions';

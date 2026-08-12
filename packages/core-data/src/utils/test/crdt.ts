@@ -1,13 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { Y } from '@wordpress/sync';
-
-/**
- * External dependencies
- */
 import { describe, expect, it, jest, beforeEach } from '@jest/globals';
-
 /**
  * Mock getBlockTypes so CRDT merging can identify rich-text attributes.
  * Also stub __unstableSerializeAndClean so we can assert how it's invoked
@@ -54,16 +46,8 @@ jest.mock( '@wordpress/blocks', () => {
 		),
 	};
 } );
-
-/**
- * WordPress dependencies
- */
 import { parse } from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import { CRDT_RECORD_MAP_KEY } from '../../sync';
 import {
 	applyPostChangesToCRDTDoc,

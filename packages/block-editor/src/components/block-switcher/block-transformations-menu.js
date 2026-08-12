@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { MenuGroup, MenuItem } from '@wordpress/components';
 import {
@@ -8,10 +5,6 @@ import {
 	switchToBlockType,
 } from '@wordpress/blocks';
 import { useState, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import BlockIcon from '../block-icon';
 import PreviewBlockPopover from './preview-block-popover';
 import BlockVariationTransformations from './block-variation-transformations';

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { useSelect, dispatch, resolveSelect } from '@wordpress/data';
 import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
@@ -8,10 +5,6 @@ import {
 	store as blocksStore,
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '@wordpress/routes-lock-unlock';
 import type {
 	Scope,
@@ -68,7 +61,6 @@ export function blockSlug( blockName: string ): string {
 export function useContentBlocks(): ContentBlock[] {
 	return useSelect(
 		( s ) =>
-			// @ts-ignore - getBlockTypes is untyped in this context.
 			s( blocksStore )
 				.getBlockTypes()
 				.filter( ( block: ContentBlock ) =>

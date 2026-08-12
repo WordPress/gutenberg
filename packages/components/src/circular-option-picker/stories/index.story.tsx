@@ -1,14 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-/**
- * WordPress dependencies
- */
 import { createContext, useContext, useState } from '@wordpress/element';
-/**
- * Internal dependencies
- */
 import CircularOptionPicker from '..';
 
 const CircularOptionPickerStoryContext = createContext< {
