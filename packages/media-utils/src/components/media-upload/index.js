@@ -275,14 +275,22 @@ class MediaUpload extends Component {
 	}
 
 	stopUndoRedoPropagation( event ) {
-		const isUndoRedo =
-			( event.metaKey || event.ctrlKey ) &&
-			event.key &&
-			event.key.toLowerCase() === 'z';
-
-		if ( isUndoRedo ) {
-			event.stopPropagation();
+		if ( ! event.metaKey && ! event.ctrlKey ) {
+			return;
 		}
+
+		// Undo is primary+z, redo is primary+shift+z with a primary+y alias on
+		// non-Apple platforms. Matching both characters covers every variant
+		// without needing to know the platform here.
+		const character = event.key?.toLowerCase();
+		if ( character !== 'z' && character !== 'y' ) {
+			return;
+		}
+
+		// Only stop the editor from acting on the keystroke. The event still
+		// reaches the focused field, so native text undo keeps working inside
+		// the modal's inputs.
+		event.stopPropagation();
 	}
 
 	initializeListeners() {
@@ -419,13 +427,14 @@ class MediaUpload extends Component {
 
 	componentWillUnmount() {
 		this.detachUndoRedoGuard();
-		this.frame?.remove();
 		this.frame?.close();
+		this.frame?.modal?.remove();
+		this.frame?.remove();
 	}
 
 	detachUndoRedoGuard() {
-		if ( this.frame?.el ) {
-			this.frame.el.removeEventListener(
+		if ( this.frame?.modal?.el ) {
+			this.frame.modal.el.removeEventListener(
 				'keydown',
 				this.stopUndoRedoPropagation,
 				true
@@ -465,8 +474,8 @@ class MediaUpload extends Component {
 		const { value } = this.props;
 		this.updateCollection();
 
-		if ( this.frame?.el ) {
-			this.frame.el.addEventListener(
+		if ( this.frame?.modal?.el ) {
+			this.frame.modal.el.addEventListener(
 				'keydown',
 				this.stopUndoRedoPropagation,
 				true
