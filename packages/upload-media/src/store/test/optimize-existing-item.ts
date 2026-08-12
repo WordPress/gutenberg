@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { createRegistry } from '@wordpress/data';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
-
-/**
- * Internal dependencies
- */
 import { store as uploadStore } from '..';
 import { OperationType } from '../types';
 import { unlock } from '../../lock-unlock';
@@ -39,7 +32,7 @@ jest.mock( '../../feature-detection', () => ( {
 
 function createRegistryWithStores() {
 	const registry = createRegistry();
-	// @ts-ignore
+	// @ts-expect-error `register` is not typed to accept the store descriptor.
 	[ uploadStore ].forEach( registry.register );
 	return registry;
 }
