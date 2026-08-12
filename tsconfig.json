@@ -3,7 +3,8 @@
 	"references": [
 		{ "path": "./tsconfig.build.json" },
 		{ "path": "packages/interactivity/tsconfig.test.json" },
-		{ "path": "packages/theme/tsconfig.test.json" }
+		{ "path": "packages/theme/tsconfig.test.json" },
+		{ "path": "packages/token-list" }
 	],
 	"files": []
 }

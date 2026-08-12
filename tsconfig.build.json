@@ -77,7 +77,7 @@
 		{ "path": "packages/style-runtime" },
 		{ "path": "packages/sync" },
 		{ "path": "packages/theme" },
-		{ "path": "packages/token-list" },
+		{ "path": "packages/token-list/tsconfig.build.json" },
 		{ "path": "packages/ui" },
 		{ "path": "packages/undo-manager" },
 		{ "path": "packages/upload-media" },
