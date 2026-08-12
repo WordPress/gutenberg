@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { Context } from './helpers';
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 import type { FontFace, FontFamily } from './font-family';

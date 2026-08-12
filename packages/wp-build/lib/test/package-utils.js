@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getPackageInfo } from '../package-utils.mjs';
 
 describe( 'getPackageInfo() resolve-miss contract', () => {

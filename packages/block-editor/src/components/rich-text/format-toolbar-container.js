@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { Popover, ToolbarGroup } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import BlockControls from '../block-controls';
 import FormatToolbar from './format-toolbar';
 import NavigableToolbar from '../navigable-toolbar';

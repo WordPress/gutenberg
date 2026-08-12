@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, isRTL } from '@wordpress/i18n';
 import {
 	__experimentalItemGroup as ItemGroup,

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const engine = require( '../lib/engine' );
 const getIntermediateRepresentation = require( '../lib/get-intermediate-representation' );
 
@@ -726,9 +723,6 @@ describe( 'Intermediate Representation', () => {
 				expect(
 					parse(
 						`
-						/**
-						 * Internal dependencies
-						 */
 						import fnDeclaration from './module-code';
 
 						export default fnDeclaration;
@@ -754,9 +748,6 @@ describe( 'Intermediate Representation', () => {
 				expect(
 					parse(
 						`
-						/**
-						 * Internal dependencies
-						 */
 						import { functionDeclaration as fnDeclaration } from './module-code';
 
 						export default fnDeclaration;
@@ -797,9 +788,6 @@ describe( 'Intermediate Representation', () => {
 					engine(
 						'test-code.ts',
 						`
-						/**
-						 * Internal dependencies
-						 */
 						import * as variables from './named-import-namespace-module';
 
 						export { variables };

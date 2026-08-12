@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useState, useEffect } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
 import { useNavigate } from '@wordpress/route';
-
-/**
- * Internal dependencies
- */
 import type { CanvasData } from '../../store/types';
 import BootBackButton from './back-button';
 

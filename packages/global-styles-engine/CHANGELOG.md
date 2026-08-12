@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+## 1.20.0 (2026-08-12)
+
+### Bug Fixes
+
+-   Report changes to site-wide border, shadow, outline, filter and dimensions in the global styles changelist. These are rendered by the styles engine but were not compared, so changing only one of them was reported as no change at all ([#81407](https://github.com/WordPress/gutenberg/pull/81407)).
+-   Render block element styles defined only inside responsive viewport states.
+
+## 1.19.0 (2026-07-29)
+
+### Internal
+
+-   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).
+
 ### Bug Fixes
 
 -   Wrap block-level preset class selectors in `:where()` so they keep the same `0-1-0` specificity as root-level presets, preventing block-level palettes (e.g. via the `wp_theme_json_data_theme` filter) from overriding responsive state styles ([#80580](https://github.com/WordPress/gutenberg/issues/80580)).

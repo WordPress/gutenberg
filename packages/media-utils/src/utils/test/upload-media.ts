@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { uploadMedia } from '../upload-media';
 import { UploadError } from '../upload-error';
 import { uploadToServer } from '../upload-to-server';

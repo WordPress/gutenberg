@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { getBlockType } from '@wordpress/blocks';
 import { Button } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import Warning from '../warning';
 

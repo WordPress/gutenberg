@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
@@ -9,10 +6,6 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { parse } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { useAvailableTemplates, useEditedPostContext } from './hooks';
 import { searchTemplates } from '../../utils/search-templates';
 
