@@ -84,6 +84,7 @@ test.describe( 'Gallery', () => {
 			attributes: { layout: { type: 'constrained' } },
 			innerBlocks: [
 				{ name: 'core/paragraph', attributes: { content: 'Text' } },
+				{ name: 'core/image' },
 			],
 		} );
 		await editor.canvas.locator( '[data-type="core/paragraph"]' ).click();
@@ -96,6 +97,14 @@ test.describe( 'Gallery', () => {
 		await expect(
 			toolbar.locator( 'role=button[name="Add block"]' )
 		).toBeHidden();
+
+		// An image in the same group has no typing path a user would
+		// guess, so the inserter appears for it.
+		await editor.canvas.locator( '[data-type="core/image"]' ).click();
+		await editor.showBlockToolbar();
+		await expect(
+			toolbar.locator( 'role=button[name="Add block"]' )
+		).toBeVisible();
 	} );
 
 	test( 'can be transformed from pasting shortcode, and can undo/redo', async ( {

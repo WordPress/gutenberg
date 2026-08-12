@@ -2,7 +2,11 @@ import { ToolbarButton } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
-import { hasBlockSupport } from '@wordpress/blocks';
+import {
+	getBlockType,
+	getDefaultBlockName,
+	hasBlockSupport,
+} from '@wordpress/blocks';
 import { plus } from '@wordpress/icons';
 import useBlockDisplayInformation from '../use-block-display-information';
 import BlockIcon from '../block-icon';
@@ -28,6 +32,7 @@ export default function BlockParentSelector() {
 				getBlockName,
 				getBlockIndex,
 				getBlockOrder,
+				canInsertBlockType,
 			} = unlock( select( blockEditorStore ) );
 			// Not getSelectedBlockClientId: a text selection crossing into a
 			// nested block resolves to the ancestor alone, but its selection
@@ -39,6 +44,25 @@ export default function BlockParentSelector() {
 			const parents = getBlockParents( selectedBlockClientId );
 			const _parentClientId =
 				parentSection ?? parents[ parents.length - 1 ];
+			const parentBlockType = getBlockType(
+				getBlockName( _parentClientId )
+			);
+			// The two typing conventions users know: Enter continues a
+			// text flow wrapper (list, quote), and Enter yields a new
+			// default block. Where neither applies, adding a sibling
+			// needs a visible affordance, even when Enter would work.
+			const typingAppends =
+				parentBlockType?.merge ||
+				hasBlockSupport( parentBlockType, '__experimentalOnMerge' ) ||
+				( hasBlockSupport(
+					getBlockName( selectedBlockClientId ),
+					'splitting',
+					false
+				) &&
+					canInsertBlockType(
+						getDefaultBlockName(),
+						_parentClientId
+					) );
 			// The child of the parent on the selection's path: the selected
 			// block itself unless the parent is a section further up.
 			const childClientId =
@@ -50,17 +74,7 @@ export default function BlockParentSelector() {
 					getBlockOrder( _parentClientId )[
 						getBlockIndex( childClientId ) + 1
 					],
-				// A block that splits (paragraph, heading, list item,
-				// button) grows the container by typing: Enter appends a
-				// sibling. Only blocks that cannot split need an explicit
-				// affordance to add one.
-				showInserter:
-					!! _parentClientId &&
-					! hasBlockSupport(
-						getBlockName( selectedBlockClientId ),
-						'splitting',
-						false
-					),
+				showInserter: !! _parentClientId && ! typingAppends,
 			};
 		},
 		[]
