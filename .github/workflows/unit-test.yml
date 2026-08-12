@@ -89,11 +89,10 @@ jobs:
               with:
                   node-version: ${{ matrix.node }}
 
-            - name: Run build scripts
-              # It's not necessary to run the full build, since Jest can interpret
-              # source files with `babel-jest`. Some packages have their own custom
-              # build tasks, however. These must be run.
-              run: npm exec --no -- lerna run build
+			- name: Run build scripts
+			  # Native Vite transforms do not require the full Gutenberg build.
+			  # Some packages have custom build tasks that their tests consume.
+			  run: npm exec --no -- lerna run build
 
             - name: Run the remaining Jest partition
               env:
