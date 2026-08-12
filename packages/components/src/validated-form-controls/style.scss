@@ -14,17 +14,8 @@
 		border-color: $alert-red;
 	}
 
-	// For TextControl, TextareaControl
-	:is(textarea, input[type="text"]):invalid[data-validity-visible] {
-		@extend %red-focus-ring;
-
-		border-color: $alert-red;
-	}
-
-	// For ComboboxControl
-	.components-combobox-control__suggestions-container:has(
-	input:invalid[data-validity-visible]
-):not(:has([aria-expanded="true"])) {
+	// For TextareaControl
+	textarea:invalid[data-validity-visible] {
 		@extend %red-focus-ring;
 
 		border-color: $alert-red;
@@ -37,18 +28,6 @@
 	// For CustomSelectControl
 	&:has(select:invalid[data-validity-visible]) .components-input-control__backdrop {
 		--wp-components-color-accent: #{$alert-red};
-		border-color: $alert-red;
-	}
-
-	// For ToggleGroupControl
-	&:has(input[type="radio"]:invalid[data-validity-visible]) {
-		--wp-components-color-accent: #{$alert-red};
-	}
-
-	// For FormTokenField
-	&:has(input:invalid[data-validity-visible]) .components-form-token-field__input-container:not(:has([aria-expanded="true"])) {
-		@extend %red-focus-ring;
-
 		border-color: $alert-red;
 	}
 
