@@ -239,8 +239,8 @@
 				"fgSurface5": {
 					"$value": {
 						"colorSpace": "srgb",
-						"components": [ 0, 0.094, 0.294 ],
-						"hex": "#00184b"
+						"components": [ 0, 0.051, 0.227 ],
+						"hex": "#000d3a"
 					}
 				},
 				"fgSurface3": {
@@ -402,8 +402,8 @@
 				"fgSurface5": {
 					"$value": {
 						"colorSpace": "srgb",
-						"components": [ 0, 0.161, 0 ],
-						"hex": "#002900"
+						"components": [ 0, 0.102, 0 ],
+						"hex": "#001a00"
 					}
 				},
 				"fgSurface3": {
@@ -565,8 +565,8 @@
 				"fgSurface5": {
 					"$value": {
 						"colorSpace": "srgb",
-						"components": [ 0.161, 0.086, 0 ],
-						"hex": "#291600"
+						"components": [ 0.118, 0.055, 0 ],
+						"hex": "#1e0e00"
 					}
 				},
 				"fgSurface3": {
@@ -728,8 +728,8 @@
 				"fgSurface5": {
 					"$value": {
 						"colorSpace": "srgb",
-						"components": [ 0.239, 0, 0 ],
-						"hex": "#3d0000"
+						"components": [ 0.188, 0, 0 ],
+						"hex": "#300000"
 					}
 				},
 				"fgSurface3": {
@@ -891,8 +891,8 @@
 				"fgSurface5": {
 					"$value": {
 						"colorSpace": "srgb",
-						"components": [ 0.106, 0.106, 0.106 ],
-						"hex": "#1b1b1b"
+						"components": [ 0.071, 0.071, 0.071 ],
+						"hex": "#121212"
 					}
 				},
 				"fgSurface3": {
@@ -1054,8 +1054,8 @@
 				"fgSurface5": {
 					"$value": {
 						"colorSpace": "srgb",
-						"components": [ 0.141, 0.102, 0 ],
-						"hex": "#241a00"
+						"components": [ 0.098, 0.067, 0 ],
+						"hex": "#191100"
 					}
 				},
 				"fgSurface3": {

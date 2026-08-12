@@ -6,6 +6,7 @@ import { DEFAULT_SEED_COLORS } from '../color-ramps';
 
 const MINIMUM_TEXT_CONTRAST = 4.5;
 const MINIMUM_STATE_DELTA_E_OK = 0.04;
+const MINIMUM_LIGHT_STATE_DELTA_E_OK = 0.16;
 const TARGET_STATE_CONTRAST = 1.5;
 const CUSTOM_PRIMARY = '#0057b8';
 const CUSTOM_BACKGROUND = '#f6f3ef';
@@ -44,6 +45,11 @@ const BACKGROUND_COLOR_CASES = [
 	{ name: 'Ocean', background: '#5f787f' },
 	{ name: 'Midnight', background: '#3d4042' },
 	{ name: 'Sunrise', background: '#cc4541' },
+] as const;
+
+const LIGHT_BACKGROUND_COLOR_CASES = [
+	{ name: 'WordPress light', background: '#f8f8f8' },
+	{ name: 'Light', background: '#eaeeed' },
 ] as const;
 
 const NEUTRAL_INTERACTIVE_FOREGROUNDS = [
@@ -238,6 +244,36 @@ describe( 'semantic color contrast', () => {
 			expect(
 				deltaEOK( parse( resting ), parse( active ) )
 			).toBeGreaterThanOrEqual( MINIMUM_STATE_DELTA_E_OK );
+		}
+	);
+
+	it.each( LIGHT_BACKGROUND_COLOR_CASES )(
+		'increases perceptual separation between normal neutral interactive foreground states with $name',
+		( { background } ) => {
+			const { result } = renderHook( () =>
+				useThemeProviderStyles( {
+					color: {
+						background,
+						primary: DEFAULT_SEED_COLORS.primary,
+					},
+				} )
+			);
+			const styles = result.current.themeProviderStyles as Record<
+				string,
+				string | number | undefined
+			>;
+			const resting = readToken(
+				styles,
+				'--wpds-color-foreground-interactive-neutral'
+			);
+			const active = readToken(
+				styles,
+				'--wpds-color-foreground-interactive-neutral-active'
+			);
+
+			expect(
+				deltaEOK( parse( resting ), parse( active ) )
+			).toBeGreaterThanOrEqual( MINIMUM_LIGHT_STATE_DELTA_E_OK );
 		}
 	);
 } );

@@ -19,6 +19,12 @@ const lightnessConstraintForegroundEnhancedContrast = (
 	direction === 'lighter'
 		? 0.85 // lightness of #cecece
 		: 0.35; // lightness of #3a3a3a
+const lightnessConstraintForegroundStateContrast = (
+	direction: RampDirection
+) =>
+	direction === 'lighter'
+		? lightnessConstraintForegroundHighContrast( direction )
+		: 0.18; // lightness of #121212
 const lightnessConstraintBgFill = ( direction: RampDirection ) =>
 	direction === 'lighter'
 		? 0.67 // lightness of #969696 (7:1 vs black)
@@ -58,6 +64,7 @@ const foregroundHighContrastOnSurfaceConfig: RampStepConfig = {
 
 const fgSurface5Config: RampStepConfig = {
 	...foregroundHighContrastOnSurfaceConfig,
+	lightness: lightnessConstraintForegroundStateContrast,
 	contrast: {
 		reference: 'fgSurface4',
 		followDirection: 'main',
