@@ -77,12 +77,24 @@ test.describe( 'Site editor writing flow', () => {
 		const { id } = await requestUtils.createPage( {
 			status: 'draft',
 			title: 'test',
+			content: '<!-- wp:paragraph --><p></p><!-- /wp:paragraph -->',
 		} );
 
 		await admin.visitSiteEditor( {
 			postId: id,
 			postType: 'page',
 			canvas: 'edit',
+		} );
+
+		// Render the page within its template so the template blocks
+		// surround the post blocks.
+		await expect(
+			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
+		).toBeVisible();
+		await page.evaluate( () => {
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.setRenderingMode( 'template-locked' );
 		} );
 
 		// select the first block
