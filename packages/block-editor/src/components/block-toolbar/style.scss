@@ -118,11 +118,27 @@
 				display: none;
 			}
 		}
+
+		// The captured block selector renders detached at the end of the
+		// toolbar, so the group before it is the visual last child.
+		> :has(+ .block-editor-captured-block-selector),
+		> :has(+ .block-editor-captured-block-selector) .components-toolbar-group,
+		> :has(+ .block-editor-captured-block-selector) .components-toolbar {
+			&::after {
+				display: none;
+			}
+		}
 	}
 
 	& > .block-editor-block-toolbar {
 		flex-grow: initial;
 		width: initial;
+	}
+
+	.block-editor-captured-block-selector {
+		position: relative;
+		margin-top: -$border-width;
+		margin-bottom: -$border-width;
 	}
 
 	.block-editor-block-parent-selector {

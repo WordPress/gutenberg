@@ -29,6 +29,7 @@ import EditSectionButton from './edit-section-button';
 import { unlock } from '../../lock-unlock';
 import { deviceTypeKey } from '../../store/private-keys';
 import BlockToolbarIcon from './block-toolbar-icon';
+import CapturedBlockSelector from './captured-block-selector';
 import { hasViewportBlockStyleState } from '../../hooks/block-style-state';
 
 /**
@@ -53,6 +54,7 @@ export function PrivateBlockToolbar( {
 	const {
 		blockClientId,
 		blockClientIds,
+		capturedClientIds,
 		isDefaultEditingMode,
 		blockType,
 		toolbarKey,
@@ -83,6 +85,7 @@ export function PrivateBlockToolbar( {
 			getSettings,
 			getTemplateLock,
 			getParentSectionBlock,
+			getControlsCapturingParent,
 			isZoomOut,
 			isSectionBlock,
 			isBlockHiddenAtViewport,
@@ -91,57 +94,72 @@ export function PrivateBlockToolbar( {
 		} = unlock( select( blockEditorStore ) );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
-		const parents = getBlockParents( selectedBlockClientId );
-		const parentSection = getParentSectionBlock( selectedBlockClientId );
+		const _isZoomOut = isZoomOut();
+		// A collapsed controls-capturing ancestor's toolbar is shown in
+		// place of the selection's own, with the selection reduced to a
+		// tile at the end of the toolbar. Section blocks take precedence.
+		const controlsCapturingParent =
+			! _isZoomOut && ! getParentSectionBlock( selectedBlockClientId )
+				? getControlsCapturingParent( selectedBlockClientId )
+				: undefined;
+		const displayedClientIds = controlsCapturingParent
+			? [ controlsCapturingParent ]
+			: selectedBlockClientIds;
+		const displayedClientId = displayedClientIds[ 0 ];
+		const parents = getBlockParents( displayedClientId );
+		const parentSection = getParentSectionBlock( displayedClientId );
 		const parentClientId = parentSection ?? parents[ parents.length - 1 ];
 		const parentBlockName = getBlockName( parentClientId );
 		const parentBlockType = getBlockType( parentBlockName );
-		const editingMode = getBlockEditingMode( selectedBlockClientId );
+		const editingMode = getBlockEditingMode( displayedClientId );
 		const _isDefaultEditingMode = editingMode === 'default';
-		const _blockName = getBlockName( selectedBlockClientId );
-		const isValid = selectedBlockClientIds.every( ( id ) =>
+		const _blockName = getBlockName( displayedClientId );
+		const isValid = displayedClientIds.every( ( id ) =>
 			isBlockValid( id )
 		);
-		const isVisual = selectedBlockClientIds.every(
+		const isVisual = displayedClientIds.every(
 			( id ) => getBlockMode( id ) === 'visual'
 		);
-		const _isUsingBindings = selectedBlockClientIds.every(
+		const _isUsingBindings = displayedClientIds.every(
 			( clientId ) =>
 				!! getBlockAttributes( clientId )?.metadata?.bindings
 		);
 
 		// If one or more selected blocks are locked, do not show the BlockGroupToolbar.
-		const _hasTemplateLock = selectedBlockClientIds.some(
+		const _hasTemplateLock = displayedClientIds.some(
 			( id ) => getTemplateLock( id ) === 'contentOnly'
 		);
 
-		const _isZoomOut = isZoomOut();
-		const _isSectionBlock = isSectionBlock( selectedBlockClientId );
-		const _canEditBlock = canEditBlock( selectedBlockClientId );
+		const _isSectionBlock = isSectionBlock( displayedClientId );
+		const _canEditBlock = canEditBlock( displayedClientId );
 		const _showSwitchSectionStyleButton =
 			_canEditBlock && ( _isZoomOut || _isSectionBlock );
 
 		const _currentDeviceType =
 			getSettings()?.[ deviceTypeKey ]?.toLowerCase() || 'desktop';
 		const _areSelectedBlocksHiddenOnViewport =
-			selectedBlockClientIds.length > 0 &&
-			selectedBlockClientIds.every( ( id ) =>
+			displayedClientIds.length > 0 &&
+			displayedClientIds.every( ( id ) =>
 				isBlockHiddenAtViewport( id, _currentDeviceType )
 			);
 		const _isEditingResponsiveStyleState =
 			isResponsiveEditing() &&
 			hasViewportBlockStyleState(
-				getSelectedBlockStyleState( selectedBlockClientId )
+				getSelectedBlockStyleState( displayedClientId )
 			);
 
 		return {
-			blockClientId: selectedBlockClientId,
-			blockClientIds: selectedBlockClientIds,
+			blockClientId: displayedClientId,
+			blockClientIds: displayedClientIds,
+			capturedClientIds: controlsCapturingParent
+				? selectedBlockClientIds
+				: null,
 			isDefaultEditingMode: _isDefaultEditingMode,
-			blockType: selectedBlockClientId && getBlockType( _blockName ),
+			blockType: displayedClientId && getBlockType( _blockName ),
 			shouldShowVisualToolbar: isValid && isVisual,
-			toolbarKey: `${ selectedBlockClientId }${ parentClientId }`,
+			toolbarKey: `${ displayedClientId }${ parentClientId }`,
 			showParentSelector:
+				! controlsCapturingParent &&
 				! _isZoomOut &&
 				parentBlockType &&
 				editingMode !== 'contentOnly' &&
@@ -151,7 +169,7 @@ export function PrivateBlockToolbar( {
 					'__experimentalParentSelector',
 					true
 				) &&
-				selectedBlockClientIds.length === 1,
+				displayedClientIds.length === 1,
 			isUsingBindings: _isUsingBindings,
 			isSectionContainer: _isSectionBlock,
 			hasContentOnlyLocking: _hasTemplateLock,
@@ -302,6 +320,12 @@ export function PrivateBlockToolbar( {
 					) }
 				<BlockEditVisuallyButton clientIds={ blockClientIds } />
 				<BlockSettingsMenu clientIds={ blockClientIds } />
+				{ capturedClientIds && isLargeViewport && (
+					<CapturedBlockSelector
+						clientIds={ capturedClientIds }
+						parentClientId={ blockClientId }
+					/>
+				) }
 			</div>
 		</NavigableToolbar>
 	);
