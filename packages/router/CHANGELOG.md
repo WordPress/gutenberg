@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.53.0 (2026-08-12)
+
 ### New Features
 
 -   Add a `replace` option to `useHistory().navigate` to update the current history entry instead of pushing a new one.
