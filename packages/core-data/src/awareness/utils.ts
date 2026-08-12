@@ -85,6 +85,22 @@ export function areCollaboratorInfosEqual(
 	} );
 }
 
+function hasValidAvatarUrls(
+	value: unknown
+): value is CollaboratorInfo[ 'avatar_urls' ] {
+	if (
+		'object' !== typeof value ||
+		null === value ||
+		Array.isArray( value )
+	) {
+		return false;
+	}
+
+	return [ '24', '48', '96' ].every(
+		( size ) => ! ( size in value ) || 'string' === typeof value[ size ]
+	);
+}
+
 /**
  * Check that awareness information contains the fields required to present a
  * collaborator. Awareness is supplied by peers, so its runtime shape cannot be
@@ -93,19 +109,31 @@ export function areCollaboratorInfosEqual(
  * @param value - The collaborator information to check.
  * @return Whether the collaborator can be presented safely.
  */
-export function hasPresentableCollaboratorInfo( value: unknown ): boolean {
+export function hasPresentableCollaboratorInfo(
+	value: unknown
+): value is CollaboratorInfo {
 	if ( 'object' !== typeof value || null === value ) {
 		return false;
 	}
 
-	const candidate = value as Record< string, unknown >;
 	return (
-		Number.isInteger( candidate.id ) &&
-		( candidate.id as number ) >= 0 &&
-		'string' === typeof candidate.name &&
-		'' !== candidate.name.trim() &&
-		'number' === typeof candidate.enteredAt &&
-		Number.isFinite( candidate.enteredAt )
+		'id' in value &&
+		'name' in value &&
+		'slug' in value &&
+		'avatar_urls' in value &&
+		'browserType' in value &&
+		'enteredAt' in value &&
+		( null === value.id ||
+			( 'number' === typeof value.id &&
+				Number.isInteger( value.id ) &&
+				value.id > 0 ) ) &&
+		'string' === typeof value.name &&
+		'' !== value.name.trim() &&
+		'string' === typeof value.slug &&
+		hasValidAvatarUrls( value.avatar_urls ) &&
+		'string' === typeof value.browserType &&
+		'number' === typeof value.enteredAt &&
+		Number.isFinite( value.enteredAt )
 	);
 }
 
@@ -121,42 +149,54 @@ export function generateCollaboratorInfo(
 	clientId: number
 ): CollaboratorInfo {
 	if ( 'object' === typeof currentCollaborator && currentCollaborator ) {
-		const user = currentCollaborator as Record< string, unknown >;
-		if (
-			Number.isInteger( user.id ) &&
-			( user.id as number ) > 0 &&
-			'string' === typeof user.name &&
-			'' !== user.name.trim()
-		) {
+		const user = currentCollaborator;
+		if ( 'id' in user && 'name' in user ) {
 			const avatarUrls: CollaboratorInfo[ 'avatar_urls' ] = {};
 
-			if ( 'object' === typeof user.avatar_urls && user.avatar_urls ) {
+			if (
+				'avatar_urls' in user &&
+				'object' === typeof user.avatar_urls &&
+				user.avatar_urls
+			) {
 				for ( const size of [ '24', '48', '96' ] as const ) {
-					const url = (
-						user.avatar_urls as Record< string, unknown >
-					 )[ size ];
+					const url =
+						size in user.avatar_urls
+							? user.avatar_urls[ size ]
+							: undefined;
 					if ( 'string' === typeof url ) {
 						avatarUrls[ size ] = url;
 					}
 				}
 			}
 
-			return {
+			const collaboratorInfo = {
 				avatar_urls: avatarUrls,
 				browserType: getBrowserName(),
 				enteredAt: Date.now(),
-				id: user.id as number,
+				id: user.id,
 				name: user.name,
-				slug: 'string' === typeof user.slug ? user.slug : '',
+				slug:
+					'slug' in user && 'string' === typeof user.slug
+						? user.slug
+						: '',
 			};
+
+			if (
+				hasPresentableCollaboratorInfo( collaboratorInfo ) &&
+				null !== collaboratorInfo.id
+			) {
+				return collaboratorInfo;
+			}
 		}
 	}
 
+	// The Yjs client ID remains available on the surrounding awareness state for
+	// session-specific UI identity and also makes the fallback slug deterministic.
 	return {
 		avatar_urls: {},
 		browserType: getBrowserName(),
 		enteredAt: Date.now(),
-		id: clientId,
+		id: null,
 		name: __( 'Anonymous User' ),
 		slug: `anonymous-${ clientId }`,
 	};

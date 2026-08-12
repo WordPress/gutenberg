@@ -489,7 +489,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 				clientId: 2,
 				isMe: false,
 				collaboratorInfo: {
-					id: 2,
+					id: null,
 					name: 'Anonymous User',
 					slug: 'anonymous-2',
 					avatar_urls: {},

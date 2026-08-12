@@ -123,7 +123,7 @@ describe( 'BaseAwareness', () => {
 				awareness.getLocalStateField( 'collaboratorInfo' );
 			expect( collaboratorInfo ).toMatchObject( {
 				avatar_urls: {},
-				id: doc.clientID,
+				id: null,
 				name: 'Anonymous User',
 				slug: `anonymous-${ doc.clientID }`,
 			} );
@@ -141,7 +141,7 @@ describe( 'BaseAwareness', () => {
 			expect(
 				awareness.getLocalStateField( 'collaboratorInfo' )
 			).toMatchObject( {
-				id: doc.clientID,
+				id: null,
 				name: 'Anonymous User',
 			} );
 		} );

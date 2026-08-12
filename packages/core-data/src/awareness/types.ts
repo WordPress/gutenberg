@@ -6,7 +6,9 @@ export type CollaboratorInfo = Pick< User< 'view' >, 'name' | 'slug' > & {
 	avatar_urls: Partial< User< 'view' >[ 'avatar_urls' ] >;
 	browserType: string;
 	enteredAt: number;
-	id: User< 'view' >[ 'id' ];
+	// This exclusively represents a WordPress user ID. Fallback collaborators
+	// have no WordPress identity, so their ID is null.
+	id: User< 'view' >[ 'id' ] | null;
 };
 
 /**

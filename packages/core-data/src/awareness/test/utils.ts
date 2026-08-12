@@ -1,4 +1,8 @@
-import { areCollaboratorInfosEqual, generateCollaboratorInfo } from '../utils';
+import {
+	areCollaboratorInfosEqual,
+	generateCollaboratorInfo,
+	hasPresentableCollaboratorInfo,
+} from '../utils';
 import type { CollaboratorInfo } from '../types';
 import type { User } from '../../entity-types';
 
@@ -314,6 +318,57 @@ describe( 'Awareness Utils', () => {
 		} );
 	} );
 
+	describe( 'hasPresentableCollaboratorInfo', () => {
+		test( 'accepts complete named and fallback collaborator information', () => {
+			expect(
+				hasPresentableCollaboratorInfo( {
+					avatar_urls: {},
+					browserType: 'Chrome',
+					enteredAt: 1704067200000,
+					id: 42,
+					name: 'Test User',
+					slug: 'test-user',
+				} )
+			).toBe( true );
+			expect(
+				hasPresentableCollaboratorInfo( {
+					avatar_urls: {},
+					browserType: 'Chrome',
+					enteredAt: 1704067200000,
+					id: null,
+					name: 'Anonymous User',
+					slug: 'anonymous-9',
+				} )
+			).toBe( true );
+		} );
+
+		test( 'rejects incomplete or malformed collaborator information', () => {
+			expect( hasPresentableCollaboratorInfo( { id: 42 } ) ).toBe(
+				false
+			);
+			expect(
+				hasPresentableCollaboratorInfo( {
+					avatar_urls: { '48': 42 },
+					browserType: 'Chrome',
+					enteredAt: 1704067200000,
+					id: 42,
+					name: 'Test User',
+					slug: 'test-user',
+				} )
+			).toBe( false );
+			expect(
+				hasPresentableCollaboratorInfo( {
+					avatar_urls: {},
+					browserType: 'Chrome',
+					enteredAt: 1704067200000,
+					id: 0,
+					name: 'Test User',
+					slug: 'test-user',
+				} )
+			).toBe( false );
+		} );
+	} );
+
 	describe( 'fallback collaborator', () => {
 		beforeEach( () => {
 			mockUserAgent( 'Some Browser/1.0' );
@@ -327,7 +382,7 @@ describe( 'Awareness Utils', () => {
 				avatar_urls: {},
 				browserType: 'Unknown',
 				enteredAt: 1704067200000,
-				id: 9,
+				id: null,
 				name: 'Anonymous User',
 				slug: 'anonymous-9',
 			} );
@@ -335,7 +390,7 @@ describe( 'Awareness Utils', () => {
 
 		test( 'creates fallback information for an unusable user response', () => {
 			expect( generateCollaboratorInfo( { id: 1 }, 9 ) ).toMatchObject( {
-				id: 9,
+				id: null,
 				name: 'Anonymous User',
 				slug: 'anonymous-9',
 			} );

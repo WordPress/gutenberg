@@ -131,9 +131,12 @@ export function useBlockHighlighting(
 						{
 							blockId: localClientId,
 							clientId: userState.clientId,
-							userId: userState.collaboratorInfo.id,
+							userId:
+								userState.collaboratorInfo.id ??
+								userState.clientId,
 							color: getAvatarBorderColor(
-								userState.collaboratorInfo.id
+								userState.collaboratorInfo.id ??
+									userState.clientId
 							),
 							userName: userState.collaboratorInfo.name,
 							avatarUrl: getAvatarUrl(
@@ -172,7 +175,7 @@ export function useBlockHighlighting(
 
 				const { firstId, lastId, middleEls, sameContainer } = range;
 				const color = getAvatarBorderColor(
-					userState.collaboratorInfo.id
+					userState.collaboratorInfo.id ?? userState.clientId
 				);
 				const userName = userState.collaboratorInfo.name;
 				const avatarUrl = getAvatarUrl(
@@ -185,7 +188,9 @@ export function useBlockHighlighting(
 						{
 							blockId: firstId,
 							clientId: userState.clientId,
-							userId: userState.collaboratorInfo.id,
+							userId:
+								userState.collaboratorInfo.id ??
+								userState.clientId,
 							color,
 							userName,
 							avatarUrl,
@@ -202,7 +207,8 @@ export function useBlockHighlighting(
 					( blockId ) => ( {
 						blockId,
 						clientId: userState.clientId,
-						userId: userState.collaboratorInfo.id,
+						userId:
+							userState.collaboratorInfo.id ?? userState.clientId,
 						color,
 						userName,
 						avatarUrl,
@@ -246,8 +252,8 @@ export function useBlockHighlighting(
 		const overlayRect = overlayElement?.getBoundingClientRect() ?? null;
 
 		// Track which users already have an avatar placed. Fallback collaborators
-		// use their Yjs client ID as their user ID, so anonymous sessions remain
-		// distinct while multiple sessions for a named user stay grouped.
+		// use their Yjs client ID, so anonymous sessions remain distinct while
+		// multiple sessions for a named user stay grouped.
 		const usersWithAvatar = new Set< number >();
 
 		blocksToHighlight.forEach( ( block ) => {

@@ -364,15 +364,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 					String( clientId ),
 					{
 						name: collaboratorState.collaboratorInfo.name,
-						// Fallback identities use the awareness client ID in both
-						// fields; it must not be exported as a WordPress user ID.
-						wpUserId:
-							collaboratorState.collaboratorInfo.id ===
-								clientId &&
-							collaboratorState.collaboratorInfo.slug ===
-								`anonymous-${ clientId }`
-								? null
-								: collaboratorState.collaboratorInfo.id,
+						wpUserId: collaboratorState.collaboratorInfo.id,
 					},
 				] )
 		);

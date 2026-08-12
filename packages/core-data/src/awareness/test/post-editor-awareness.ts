@@ -840,9 +840,9 @@ describe( 'PostEditorAwareness', () => {
 					avatar_urls: {},
 					browserType: 'Chrome',
 					enteredAt: 123,
-					id: 456,
+					id: null,
 					name: 'Anonymous User',
-					slug: 'anonymous-456',
+					slug: 'test-user',
 				},
 			} );
 

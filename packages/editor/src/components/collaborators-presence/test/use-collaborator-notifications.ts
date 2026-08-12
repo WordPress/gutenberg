@@ -196,7 +196,7 @@ describe( 'useCollaboratorNotifications', () => {
 				clientId: 321,
 				collaboratorInfo: {
 					...bob.collaboratorInfo,
-					id: 321,
+					id: null,
 					name: 'Anonymous User',
 				},
 			};
