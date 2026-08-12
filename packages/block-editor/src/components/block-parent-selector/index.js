@@ -2,11 +2,7 @@ import { ToolbarButton } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
-import {
-	getBlockType,
-	getDefaultBlockName,
-	hasBlockSupport,
-} from '@wordpress/blocks';
+import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { plus } from '@wordpress/icons';
 import useBlockDisplayInformation from '../use-block-display-information';
 import BlockIcon from '../block-icon';
@@ -32,7 +28,6 @@ export default function BlockParentSelector() {
 				getBlockName,
 				getBlockIndex,
 				getBlockOrder,
-				canInsertBlockType,
 			} = unlock( select( blockEditorStore ) );
 			// Not getSelectedBlockClientId: a text selection crossing into a
 			// nested block resolves to the ancestor alone, but its selection
@@ -47,22 +42,13 @@ export default function BlockParentSelector() {
 			const parentBlockType = getBlockType(
 				getBlockName( _parentClientId )
 			);
-			// The two typing conventions users know: Enter continues a
-			// text flow wrapper (list, quote), and Enter yields a new
-			// default block. Where neither applies, adding a sibling
-			// needs a visible affordance, even when Enter would work.
-			const typingAppends =
+			// A wrapper that merges with the text flow (list, quote) grows
+			// by typing: Enter continues it, and users know that. Any
+			// other parent gets an explicit affordance to add a child;
+			// the Inserter hides itself when nothing is insertable.
+			const isTextFlowWrapper =
 				parentBlockType?.merge ||
-				hasBlockSupport( parentBlockType, '__experimentalOnMerge' ) ||
-				( hasBlockSupport(
-					getBlockName( selectedBlockClientId ),
-					'splitting',
-					false
-				) &&
-					canInsertBlockType(
-						getDefaultBlockName(),
-						_parentClientId
-					) );
+				hasBlockSupport( parentBlockType, '__experimentalOnMerge' );
 			// The child of the parent on the selection's path: the selected
 			// block itself unless the parent is a section further up.
 			const childClientId =
@@ -74,7 +60,7 @@ export default function BlockParentSelector() {
 					getBlockOrder( _parentClientId )[
 						getBlockIndex( childClientId ) + 1
 					],
-				showInserter: !! _parentClientId && ! typingAppends,
+				showInserter: !! _parentClientId && ! isTextFlowWrapper,
 			};
 		},
 		[]

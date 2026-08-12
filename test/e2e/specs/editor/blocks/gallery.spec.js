@@ -73,7 +73,7 @@ test.describe( 'Gallery', () => {
 		] );
 	} );
 
-	test( 'does not offer the parent selector inserter for splittable blocks', async ( {
+	test( 'hides the parent selector inserter only inside text flow wrappers', async ( {
 		admin,
 		editor,
 		page,
@@ -84,7 +84,6 @@ test.describe( 'Gallery', () => {
 			attributes: { layout: { type: 'constrained' } },
 			innerBlocks: [
 				{ name: 'core/paragraph', attributes: { content: 'Text' } },
-				{ name: 'core/image' },
 			],
 		} );
 		await editor.canvas.locator( '[data-type="core/paragraph"]' ).click();
@@ -96,15 +95,26 @@ test.describe( 'Gallery', () => {
 		).toBeVisible();
 		await expect(
 			toolbar.locator( 'role=button[name="Add block"]' )
-		).toBeHidden();
+		).toBeVisible();
 
-		// An image in the same group has no typing path a user would
-		// guess, so the inserter appears for it.
-		await editor.canvas.locator( '[data-type="core/image"]' ).click();
+		// A list merges with the text flow: Enter continues it, so its
+		// items get no inserter.
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/list',
+			innerBlocks: [
+				{ name: 'core/list-item', attributes: { content: 'one' } },
+			],
+		} );
+		await editor.canvas.locator( '[data-type="core/list-item"]' ).click();
+
 		await editor.showBlockToolbar();
 		await expect(
-			toolbar.locator( 'role=button[name="Add block"]' )
+			toolbar.locator( 'role=button[name="Select parent block: List"]' )
 		).toBeVisible();
+		await expect(
+			toolbar.locator( 'role=button[name^="Add "]' )
+		).toBeHidden();
 	} );
 
 	test( 'can be transformed from pasting shortcode, and can undo/redo', async ( {
