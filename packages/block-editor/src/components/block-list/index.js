@@ -12,7 +12,7 @@ import {
 	useMemo,
 	useCallback,
 } from '@wordpress/element';
-import { getDefaultBlockName } from '@wordpress/blocks';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import { useInBetweenInserter } from './use-in-between-inserter';
@@ -178,6 +178,8 @@ function Items( {
 		isZoomOut,
 		selectedBlocks,
 		visibleBlocks,
+		ghostBlockName,
+		ghostBlockAttributes,
 		shouldRenderAppender,
 	} = useSelect(
 		( select ) => {
@@ -191,6 +193,7 @@ function Items( {
 				isSectionBlock,
 				isContainerInsertableToInContentOnlyMode,
 				getBlockName,
+				getBlockListSettings,
 				isZoomOut: _isZoomOut,
 				canInsertBlockType,
 			} = unlock( select( blockEditorStore ) );
@@ -203,6 +206,25 @@ function Items( {
 					selectedBlocks: EMPTY_ARRAY,
 					visibleBlocks: EMPTY_SET,
 				};
+			}
+
+			// A block list without a custom appender renders a ghost of
+			// the container's default block while empty: a real block
+			// object rendered before it exists in the store, inserted on
+			// entry.
+			let _ghostBlockName;
+			let _ghostBlockAttributes;
+			if ( hasAppender && ! hasCustomAppender && ! _order.length ) {
+				const defaultBlock = ( rootClientId
+					? getBlockListSettings( rootClientId )?.defaultBlock
+					: undefined ) ?? { name: getDefaultBlockName() };
+				if (
+					defaultBlock.name &&
+					canInsertBlockType( defaultBlock.name, rootClientId )
+				) {
+					_ghostBlockName = defaultBlock.name;
+					_ghostBlockAttributes = defaultBlock.attributes;
+				}
 			}
 
 			const selectedBlockClientIds = getSelectedBlockClientIds();
@@ -223,21 +245,28 @@ function Items( {
 
 			const templateLock = getTemplateLock( rootClientId );
 
+			const appenderAllowed =
+				( ! isSectionBlock( rootClientId ) ||
+					isContainerInsertableToInContentOnlyMode(
+						getBlockName( selectedBlockClientId ),
+						rootClientId
+					) ) &&
+				getBlockEditingMode( rootClientId ) !== 'disabled' &&
+				( ! templateLock || templateLock === 'contentOnly' ) &&
+				hasAppender &&
+				! _isZoomOut();
+
 			return {
 				order: _order,
 				selectedBlocks: selectedBlockClientIds,
 				visibleBlocks: __unstableGetVisibleBlocks(),
 				isZoomOut: _isZoomOut(),
+				// The ghost is the block list's empty state: it renders
+				// whether or not the block is selected.
+				ghostBlockName: appenderAllowed ? _ghostBlockName : undefined,
+				ghostBlockAttributes: _ghostBlockAttributes,
 				shouldRenderAppender:
-					( ! isSectionBlock( rootClientId ) ||
-						isContainerInsertableToInContentOnlyMode(
-							getBlockName( selectedBlockClientId ),
-							rootClientId
-						) ) &&
-					getBlockEditingMode( rootClientId ) !== 'disabled' &&
-					( ! templateLock || templateLock === 'contentOnly' ) &&
-					hasAppender &&
-					! _isZoomOut() &&
+					appenderAllowed &&
 					( hasCustomAppender ||
 						hasSelectedRoot ||
 						showRootAppender ),
@@ -246,14 +275,29 @@ function Items( {
 		[ rootClientId, hasAppender, hasCustomAppender ]
 	);
 
+	// One ghost per empty period: regenerated when the list empties again
+	// or the default block changes, stable in between so the client ID,
+	// and with it the DOM, survives materialization.
+	const ghostBlock = useMemo(
+		() =>
+			ghostBlockName
+				? createBlock( ghostBlockName, ghostBlockAttributes )
+				: null,
+		[ ghostBlockName, ghostBlockAttributes ]
+	);
+	const showGhost = !! ghostBlock;
+
+	const items = showGhost ? [ ...order, ghostBlock.clientId ] : order;
+
 	return (
 		<LayoutProvider value={ layout }>
-			{ order.map( ( clientId ) => (
+			{ items.map( ( clientId ) => (
 				<AsyncModeProvider
 					key={ clientId }
 					value={
 						// Only provide data asynchronously if the block is
-						// not visible and not selected.
+						// not visible, not selected, and not the ghost.
+						clientId !== ghostBlock?.clientId &&
 						! visibleBlocks.has( clientId ) &&
 						! selectedBlocks.includes( clientId )
 					}
@@ -268,6 +312,11 @@ function Items( {
 					<BlockListBlock
 						rootClientId={ rootClientId }
 						clientId={ clientId }
+						ghostBlock={
+							clientId === ghostBlock?.clientId
+								? ghostBlock
+								: undefined
+						}
 					/>
 					{ isZoomOut && (
 						<ZoomOutSeparator
@@ -279,7 +328,7 @@ function Items( {
 				</AsyncModeProvider>
 			) ) }
 			{ order.length < 1 && placeholder }
-			{ shouldRenderAppender && (
+			{ shouldRenderAppender && ! showGhost && (
 				<BlockListAppender
 					tagName={ __experimentalAppenderTagName }
 					rootClientId={ rootClientId }

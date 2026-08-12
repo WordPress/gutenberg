@@ -24,9 +24,19 @@ jest.mock( '@wordpress/data', () => {
 						] ),
 					getEntityRecordEdits: jest.fn().mockReturnValue( {
 						title: 'My Site',
+						description: 'My Tagline',
+						site_logo: 123,
+						site_icon: 456,
 					} ),
 					getEntityConfig: jest.fn().mockReturnValue( {
-						meta: { labels: { title: 'Title' } },
+						meta: {
+							labels: {
+								title: 'Site Title',
+								description: 'Site Tagline',
+								site_logo: 'Site Logo',
+								site_icon: 'Site Icon',
+							},
+						},
 					} ),
 				};
 			};
@@ -36,7 +46,7 @@ jest.mock( '@wordpress/data', () => {
 } );
 
 describe( 'useIsDirty', () => {
-	it( 'should calculate dirtyEntityRecords', () => {
+	it( 'should calculate dirtyEntityRecords in the expected order', () => {
 		const { result } = renderHook( () => useIsDirty() );
 		expect( result.current.dirtyEntityRecords ).toEqual( [
 			{
@@ -45,7 +55,30 @@ describe( 'useIsDirty', () => {
 				property: 'property',
 				title: 'title',
 			},
-			{ kind: 'root', name: 'site', property: 'title', title: 'Title' },
+			{
+				kind: 'root',
+				name: 'site',
+				property: 'title',
+				title: 'Site Title',
+			},
+			{
+				kind: 'root',
+				name: 'site',
+				property: 'description',
+				title: 'Site Tagline',
+			},
+			{
+				kind: 'root',
+				name: 'site',
+				property: 'site_logo',
+				title: 'Site Logo',
+			},
+			{
+				kind: 'root',
+				name: 'site',
+				property: 'site_icon',
+				title: 'Site Icon',
+			},
 		] );
 	} );
 	it( 'should return `isDirty: true` when there are changes', () => {
@@ -71,7 +104,40 @@ describe( 'useIsDirty', () => {
 					kind: 'root',
 					name: 'site',
 					key: 'key',
-					property: 'property',
+					property: 'title',
+				},
+				false
+			);
+		} );
+		act( () => {
+			result.current.setUnselectedEntities(
+				{
+					kind: 'root',
+					name: 'site',
+					key: 'key',
+					property: 'description',
+				},
+				false
+			);
+		} );
+		act( () => {
+			result.current.setUnselectedEntities(
+				{
+					kind: 'root',
+					name: 'site',
+					key: 'key',
+					property: 'site_logo',
+				},
+				false
+			);
+		} );
+		act( () => {
+			result.current.setUnselectedEntities(
+				{
+					kind: 'root',
+					name: 'site',
+					key: 'key',
+					property: 'site_icon',
 				},
 				false
 			);
