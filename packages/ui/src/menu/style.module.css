@@ -18,7 +18,7 @@
 			--_wp-ui-menu-elevation-md: 0px 2px 3px 0px #0000000d, 0px 4px 5px 0px #0000000a, 0px 12px 12px 0px #00000008, 0px 16px 16px 0px #00000005;
 
 			max-height: min(var(--available-height), 480px, 60dvh);
-			min-width: max(var(--anchor-width, 0px), var(--wp-ui-menu-min-width));
+			min-width: min(var(--available-width), var(--wp-ui-menu-min-width));
 			max-width: min(var(--available-width), var(--wp-ui-menu-max-width));
 			overflow-block: auto;
 			overscroll-behavior: none;
@@ -118,6 +118,7 @@
 		.item {
 			--wp-ui-menu-item-height: var(--wpds-dimension-size-md);
 			--wp-ui-menu-item-padding-block: var(--wpds-dimension-padding-xs);
+			--_gcd-a-border-radius: var(--wpds-border-radius-sm);
 
 			display: grid;
 			grid-column: 1 / -1;
@@ -156,9 +157,13 @@
 			}
 
 			&[data-highlighted] {
+				--_gcd-a-outline: var(--wpds-border-width-focus) solid transparent;
+
 				outline: var(--wpds-border-width-focus) solid transparent;
 
 				@media ( forced-colors: active ) {
+					--_gcd-a-outline: var(--wpds-border-width-focus) solid Highlight;
+
 					outline-color: Highlight;
 				}
 			}

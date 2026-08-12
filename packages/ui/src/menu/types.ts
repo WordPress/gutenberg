@@ -7,13 +7,61 @@ export type PortalProps = ComponentProps< typeof _Menu.Portal >;
 
 export type PositionerProps = ComponentProps< typeof _Menu.Positioner >;
 
-export type RootProps< Payload = unknown > = _Menu.Root.Props< Payload >;
+export interface RootProps
+	extends Pick<
+		_Menu.Root.Props,
+		| 'open'
+		| 'onOpenChange'
+		| 'onOpenChangeComplete'
+		| 'defaultOpen'
+		| 'modal'
+		| 'loopFocus'
+		| 'highlightItemOnHover'
+		| 'disabled'
+		| 'actionsRef'
+		| 'triggerId'
+		| 'defaultTriggerId'
+	> {
+	/**
+	 * The menu subcomponents (`Menu.Trigger`, `Menu.Popup`, etc.).
+	 */
+	children?: ReactNode;
+}
 
-export type TriggerProps< Payload = unknown > = _Menu.Trigger.Props< Payload >;
+export interface TriggerProps
+	extends ComponentProps< 'button' >,
+		Pick< _Menu.Trigger.Props, 'openOnHover' | 'delay' | 'closeDelay' > {
+	/**
+	 * The content to be rendered inside the trigger.
+	 */
+	children?: ReactNode;
+}
 
-export type SubmenuRootProps = _Menu.SubmenuRoot.Props;
+export interface SubmenuRootProps
+	extends Pick<
+		_Menu.SubmenuRoot.Props,
+		| 'open'
+		| 'onOpenChange'
+		| 'onOpenChangeComplete'
+		| 'defaultOpen'
+		| 'loopFocus'
+		| 'highlightItemOnHover'
+		| 'disabled'
+		| 'closeParentOnEsc'
+		| 'actionsRef'
+	> {
+	/**
+	 * The submenu subcomponents (`Menu.SubmenuTrigger`, `Menu.Popup`, etc.).
+	 */
+	children?: ReactNode;
+}
 
-export type RadioGroupProps = _Menu.RadioGroup.Props;
+export type RadioGroupProps = ComponentProps< typeof _Menu.RadioGroup > & {
+	/**
+	 * The radio menu items in the group.
+	 */
+	children?: ReactNode;
+};
 
 export type GroupProps = ComponentProps< typeof _Menu.Group > & {
 	/**

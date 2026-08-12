@@ -24,7 +24,6 @@ type ItemAriaProps = Pick<
 	'aria-describedby' | 'aria-keyshortcuts' | 'aria-label' | 'aria-labelledby'
 >;
 type UseItemContentOptions = ItemAriaProps & {
-	labelledBy?: string;
 	shortcut?: ItemProps[ 'shortcut' ];
 };
 
@@ -65,7 +64,6 @@ function useItemContent(
 		'aria-keyshortcuts': ariaKeyShortcuts,
 		'aria-label': ariaLabel,
 		'aria-labelledby': ariaLabelledBy,
-		labelledBy: additionalLabelledBy,
 		shortcut,
 	}: UseItemContentOptions
 ) {
@@ -99,17 +97,11 @@ function useItemContent(
 	/*
 	 * `aria-labelledby` takes precedence over `aria-label` in the accessible
 	 * name algorithm. Only provide our generated label relationship when the
-	 * consumer has not supplied either explicit naming prop. Additional labels
-	 * are only appended to that generated relationship, so explicit naming stays
-	 * fully consumer-controlled.
+	 * consumer has not supplied either explicit naming prop, so explicit naming
+	 * stays fully consumer-controlled.
 	 */
 	const labelledBy =
-		ariaLabelledBy ??
-		( ariaLabel
-			? undefined
-			: [ resolvedLabelId, additionalLabelledBy ]
-					.filter( Boolean )
-					.join( ' ' ) || undefined );
+		ariaLabelledBy ?? ( ariaLabel ? undefined : resolvedLabelId );
 
 	return {
 		contentContextValue: {
@@ -167,13 +159,13 @@ function ItemContent( {
 		</ItemLabel>
 	);
 
+	/*
+	 * Content comes first in the DOM because Base UI falls back to the item's
+	 * textContent for typeahead. CSS grid still places the optional
+	 * presentational prefix in the earlier visual column.
+	 */
 	return (
 		<>
-			{ prefix && (
-				<span aria-hidden="true" className={ styles[ 'item-prefix' ] }>
-					{ prefix }
-				</span>
-			) }
 			<span className={ styles[ 'item-content' ] }>
 				<span className={ styles[ 'item-children' ] }>
 					{ itemChildren }
@@ -194,6 +186,11 @@ function ItemContent( {
 					</span>
 				) }
 			</span>
+			{ prefix && (
+				<span aria-hidden="true" className={ styles[ 'item-prefix' ] }>
+					{ prefix }
+				</span>
+			) }
 			{ shortcut && shortcutDescriptionId && (
 				<KeyboardShortcutDescription
 					descriptionId={ shortcutDescriptionId }

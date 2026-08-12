@@ -465,6 +465,27 @@ describe( 'Menu', () => {
 		);
 	} );
 
+	it( 'ignores presentational prefixes during keyboard typeahead', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.Item>Duplicate</Menu.Item>
+					<Menu.Item prefix="Decorative prefix">Archive</Menu.Item>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+		await user.keyboard( '{ArrowDown}a' );
+
+		expect(
+			await screen.findByRole( 'menuitem', { name: 'Archive' } )
+		).toHaveFocus();
+	} );
+
 	it( 'keeps shared alignment slots outside the item-local content', async () => {
 		const user = userEvent.setup();
 
@@ -642,6 +663,38 @@ describe( 'Menu', () => {
 				name: 'Archive current item',
 			} )
 		).not.toHaveAttribute( 'aria-labelledby' );
+	} );
+
+	it( 'supports custom rendering for item labels and descriptions', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.Item>
+						<Menu.ItemLabel render={ <strong /> }>
+							Duplicate
+						</Menu.ItemLabel>
+						<Menu.ItemDescription render={ <em /> }>
+							Create a separate copy.
+						</Menu.ItemDescription>
+					</Menu.Item>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+
+		const item = await screen.findByRole( 'menuitem', {
+			name: 'Duplicate',
+			description: 'Create a separate copy.',
+		} );
+
+		expect( queryItemLabel( item )?.tagName ).toBe( 'STRONG' );
+		expect( screen.getByText( 'Create a separate copy.' ).tagName ).toBe(
+			'EM'
+		);
 	} );
 
 	it( 'supports custom portal and positioner elements', async () => {

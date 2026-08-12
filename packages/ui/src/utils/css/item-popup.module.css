@@ -29,10 +29,6 @@
 			grid-area: main;
 			grid-template-rows: minmax(0, 1fr) auto;
 			grid-template-areas: "scrollable" "footer";
-		}
-
-		.list,
-		.list-typography {
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-md);
 			line-height: var(--wpds-typography-line-height-sm);
@@ -132,24 +128,6 @@
 
 		.item-icon {
 			flex-shrink: 0;
-		}
-
-		.item-label {
-			composes: body-md from "../../text/style.module.css";
-
-			color: inherit;
-		}
-
-		.item-description {
-			composes: body-sm from "../../text/style.module.css";
-
-			color: var(--wpds-color-foreground-content-neutral-weak);
-			overflow-wrap: anywhere;
-		}
-
-		.item[data-highlighted]:not([aria-disabled="true"]) .item-description,
-		.item[aria-disabled="true"] .item-description {
-			color: inherit;
 		}
 
 		/* Only style when there is content, because otherwise the element would block clicks

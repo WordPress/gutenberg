@@ -1,3 +1,4 @@
+import { mergeProps, useRender } from '@base-ui/react';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { useMenuItemContentContext } from './context';
@@ -8,17 +9,18 @@ import type { ItemDescriptionProps } from './types';
  * Renders supplementary text below a menu item label.
  */
 const ItemDescription = forwardRef< HTMLSpanElement, ItemDescriptionProps >(
-	function MenuItemDescription( { className, id, ...props }, ref ) {
+	function MenuItemDescription( { className, id, render, ...props }, ref ) {
 		const itemContentContext = useMenuItemContentContext();
 
-		return (
-			<span
-				ref={ ref }
-				id={ id ?? itemContentContext?.descriptionId }
-				className={ clsx( styles[ 'item-description' ], className ) }
-				{ ...props }
-			/>
-		);
+		return useRender( {
+			defaultTagName: 'span',
+			ref,
+			render,
+			props: mergeProps< 'span' >( props, {
+				id: id ?? itemContentContext?.descriptionId,
+				className: clsx( styles[ 'item-description' ], className ),
+			} ),
+		} );
 	}
 );
 

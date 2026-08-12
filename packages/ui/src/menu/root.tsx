@@ -20,11 +20,11 @@ import type { RootProps } from './types';
  * </Menu.Root>
  * ```
  */
-function Root< Payload = unknown >( props: RootProps< Payload > ) {
+function Root( props: RootProps ) {
 	return (
 		<DirectionProvider>
 			<MenuContext.Provider value={ { isSubmenu: false } }>
-				<_Menu.Root< Payload > { ...props } />
+				<_Menu.Root { ...props } />
 			</MenuContext.Provider>
 		</DirectionProvider>
 	);
