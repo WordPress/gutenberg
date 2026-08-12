@@ -10,8 +10,12 @@ let hasErrors = false;
 const __dirname = dirname( fileURLToPath( import.meta.url ) );
 const repoRoot = resolve( __dirname, '../..' );
 
+/*
+ * Package src projects are referenced from tsconfig.build.json; the root
+ * tsconfig.json is the full solution that adds per-package test projects.
+ */
 const rootTsconfigJson = JSONC.parse(
-	readFileSync( resolve( repoRoot, 'tsconfig.json' ), 'utf8' )
+	readFileSync( resolve( repoRoot, 'tsconfig.build.json' ), 'utf8' )
 );
 
 const packagesWithTypes = glob
@@ -21,7 +25,10 @@ const packagesWithTypes = glob
 for ( const packageName of packagesWithTypes ) {
 	if (
 		! rootTsconfigJson.references.some(
-			( reference ) => reference.path === `packages/${ packageName }`
+			( reference ) =>
+				reference.path === `packages/${ packageName }` ||
+				reference.path ===
+					`packages/${ packageName }/tsconfig.build.json`
 		)
 	) {
 		console.error(
@@ -64,7 +71,10 @@ for ( const packageName of packagesWithTypes ) {
 					packagesWithTypes.includes( dependencyPackageName ) &&
 					! references.some(
 						( reference ) =>
-							reference.path === `../${ dependencyPackageName }`
+							reference.path ===
+								`../${ dependencyPackageName }` ||
+							reference.path ===
+								`../${ dependencyPackageName }/tsconfig.build.json`
 					)
 				) {
 					console.error(

@@ -1,0 +1,15 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "./tsconfig.base.json",
+	"compilerOptions": {
+		"noEmit": true,
+		"emitDeclarationOnly": false,
+		"types": [ "jest" ]
+	},
+	"include": [
+		"${configDir}/src/**/test/**/*",
+		"${configDir}/src/**/stories/**/*",
+		"${configDir}/src/**/*.story.*"
+	],
+	"exclude": [ "**/benchmark" ]
+}

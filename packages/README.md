@@ -327,32 +327,38 @@ Gutenberg uses TypeScript for several reasons, including:
 Gutenberg uses TypeScript by running the TypeScript compiler (`tsc`) on select packages.
 These packages benefit from type checking and produced type declarations in the published packages.
 
-To opt-in to TypeScript tooling, packages should include a `tsconfig.json` file in the package root and add an entry to the root `tsconfig.json` references.
-The changes will indicate that the package has opted in and will be included in the TypeScript build process.
+To opt-in to TypeScript tooling, a package needs two tsconfig files:
 
-A `tsconfig.json` file should look like the following (comments are not necessary):
+-   `tsconfig.build.json` is the build project: it covers `src`, emits declarations to `build-types`, and is what other packages and `npm run build` consume.
+-   `tsconfig.json` is the default dev project: it covers test and story files with `noEmit`, so `npm run typecheck` and the IDE type check them without their declarations ending up in the published package.
+
+Both extend shared base configurations (comments are not necessary):
 
 ```jsonc
+// tsconfig.build.json
 {
-	// Extends a base configuration common to most packages
+	// Extends a base configuration common to most packages.
 	"extends": "../../tsconfig.base.json",
 
-	// Options for the TypeScript compiler
-	// We'll usually set our `rootDir` and `declarationDir` as follows, which is specific
-	// to each project.
-	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types"
-	},
-
-	// Which source files should be included
-	"include": [ "src/**/*" ],
-
-	// Other WordPress package dependencies that have opted-in to TypeScript should be listed
-	// here. In this case, our package depends on `@wordpress/dom-ready`.
-	"references": [ { "path": "../dom-ready" } ]
+	// Other WordPress package dependencies that have opted-in to TypeScript
+	// should be listed here, always pointing at their build project.
+	"references": [ { "path": "../dom-ready/tsconfig.build.json" } ]
 }
 ```
+
+```jsonc
+// tsconfig.json
+{
+	// Extends the shared dev project configuration (noEmit, jest types,
+	// test and story includes).
+	"extends": "../../tsconfig.dev.base.json",
+
+	// The dev project checks against the build project's declarations.
+	"references": [ { "path": "./tsconfig.build.json" } ]
+}
+```
+
+Register both at the root: add `packages/<name>/tsconfig.build.json` to the root `tsconfig.build.json` references and `packages/<name>` to the root `tsconfig.json` references.
 
 Type declarations will be produced in the `build-types` which should be included in the published package.
 For consumers to use the published type declarations, we'll set the `types` field in `package.json`:
