@@ -87,19 +87,6 @@ jobs:
               with:
                   node-version: ${{ matrix.node }}
 
-            - name: Detect Browser Mode tests
-              id: browser-tests
-              run: |
-                  FOUND="$(node test/unit/scripts/has-browser-tests-for-shard.mjs "${{ matrix.shard }}")"
-                  echo "found=$FOUND" >> "$GITHUB_OUTPUT"
-
-            - name: Install Chromium for Browser Mode tests
-              if: ${{ steps.browser-tests.outputs.found == 'true' }}
-              uses: ./.github/setup-playwright
-              with:
-                  workspace: '@wordpress/unit-tests'
-                  browsers: chromium
-
             - name: Run build scripts
               # It's not necessary to run the full build, since Jest can interpret
               # source files with `babel-jest`. Some packages have their own custom
@@ -129,8 +116,47 @@ jobs:
                   FK_ENV_NODEJS: ${{ matrix.node }}
               run: |
                   npm run test:unit:vitest -- \
+                    --project=node \
+                    --project=jsdom \
                     --shard="$SHARD" \
                     --passWithNoTests
+
+    unit-js-browser:
+        name: JavaScript Browser (Chromium, Node.js 20)
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+            id-token: write
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+              with:
+                  node-version: 20
+
+            - name: Install Chromium for Browser Mode tests
+              uses: ./.github/setup-playwright
+              with:
+                  workspace: '@wordpress/unit-tests'
+                  browsers: chromium
+
+            - name: Run build scripts
+              # It's not necessary to run the full build, since Vitest uses
+              # native Vite transforms. Some packages have their own custom
+              # build tasks, however. These must be run.
+              run: npx lerna run build
+
+            - name: Run the Vitest Browser project
+              env:
+                  FK_ENV_NODEJS: '20'
+              run: npm run test:unit:vitest -- --project=browser
 
     unit-js-date:
         name: JavaScript Date Tests (Node.js ${{ matrix.node }})
