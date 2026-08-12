@@ -17,6 +17,25 @@
  * @since   7.1.0
  */
 
+if ( ! function_exists( 'gutenberg_get_note_thread_root_id' ) ) {
+	/**
+	 * Returns the top-level note ID for a thread.
+	 *
+	 * Notes are a single level deep: a top-level note (`comment_parent` of 0)
+	 * with replies hanging directly off it. Follower records are keyed by that
+	 * top-level note so a subscription covers the whole thread.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param WP_Comment $comment A note comment.
+	 * @return int The top-level note ID for the thread.
+	 */
+	function gutenberg_get_note_thread_root_id( WP_Comment $comment ): int {
+		$parent = (int) $comment->comment_parent;
+		return $parent > 0 ? $parent : (int) $comment->comment_ID;
+	}
+}
+
 if ( ! function_exists( 'gutenberg_get_note_followers' ) ) {
 	/**
 	 * Returns the user IDs following a note thread.
@@ -520,7 +539,21 @@ if ( ! function_exists( 'gutenberg_send_note_follower_notification' ) ) {
 		$post_title  = $post ? wp_specialchars_decode( get_the_title( $post ), ENT_QUOTES ) : '';
 		$author_name = $comment->comment_author ? $comment->comment_author : __( 'Someone', 'gutenberg' );
 		$content     = wp_strip_all_tags( wp_specialchars_decode( $comment->comment_content ) );
-		$edit_link   = $post ? gutenberg_get_note_notification_link( $post, $comment ) : '';
+
+		/*
+		 * Composed for the recipient, like the rest of the message:
+		 * get_edit_post_link() answers for whoever is current, which here is
+		 * the replying user over REST and nobody at all under WP-Cron. This
+		 * mirrors gutenberg_send_note_notification(); the editor has no
+		 * per-thread deep link to point at yet.
+		 */
+		$edit_link = '';
+		if ( $post ) {
+			$previous_user_id = get_current_user_id();
+			wp_set_current_user( $user->ID );
+			$edit_link = (string) get_edit_post_link( $post->ID, 'url' );
+			wp_set_current_user( $previous_user_id );
+		}
 
 		/* translators: %1$s: commenter name, %2$s: post title. */
 		$message = sprintf( __( '%1$s added a note to a thread you follow on "%2$s".', 'gutenberg' ), $author_name, $post_title );

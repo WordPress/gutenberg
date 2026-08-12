@@ -193,7 +193,7 @@ class Tests_Notes_Followers extends WP_UnitTestCase {
 	 * @return string Mention anchor markup.
 	 */
 	private static function mention( int $user_id, string $label = '@User' ): string {
-		return sprintf( '<a class="wp-note-mention user-%d" href="#">%s</a>', $user_id, $label );
+		return sprintf( '<span class="wp-note-mention user-%d">%s</span>', $user_id, $label );
 	}
 
 	/**

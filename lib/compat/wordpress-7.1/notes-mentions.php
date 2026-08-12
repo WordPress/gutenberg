@@ -212,10 +212,26 @@ function gutenberg_send_note_notification( WP_User $user, WP_Comment $comment, ?
 		$lines[] = __( 'Edit This', 'gutenberg' ) . ': ' . $edit_link;
 	}
 
+	$body = implode( "\n", $lines );
+
+	/**
+	 * Filters the note mention notification email body.
+	 *
+	 * Lets features layered on top of mentions extend the message, such as the
+	 * per-thread follower subscriptions appending an unfollow link.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param string     $body    Email body.
+	 * @param WP_User    $user    Recipient.
+	 * @param WP_Comment $comment The note that triggered the notification.
+	 */
+	$body = apply_filters( 'wp_note_notification_text', $body, $user, $comment );
+
 	// Declared explicitly so a filtered default cannot turn the message into HTML.
 	$headers = 'Content-Type: text/plain; charset="' . get_option( 'blog_charset' ) . '"';
 
-	$sent = wp_mail( $user->user_email, $subject, implode( "\n", $lines ), $headers );
+	$sent = wp_mail( $user->user_email, $subject, $body, $headers );
 
 	if ( $switched_locale ) {
 		restore_previous_locale();
