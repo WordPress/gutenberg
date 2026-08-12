@@ -121,7 +121,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 							// of the expected formats". The callback validates the enum per-item using the
 							// current list of registered sizes, which reflects any sizes added after the
 							// route was registered (e.g. via add_image_size() in tests).
-							'validate_callback' => static function ( $value, $request, $param ) {
+							'validate_callback' => static function ( $value, WP_REST_Request $request, string $param ) {
 								/*
 								 * Providing a custom callback replaces the default schema
 								 * validation, so apply the declared schema (type, minLength,
@@ -166,12 +166,19 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 							'type'              => 'array',
 							'default'           => array(),
 							/*
+							 * A finalize request sends one entry per sideloaded sub-size, so
+							 * the ceiling only needs to clear the number of sizes a site can
+							 * register. Bounding it keeps a request from repeating a name
+							 * across an arbitrary number of entries.
+							 */
+							'maxItems'          => 100,
+							/*
 							 * As on the sideload endpoint, the size names are checked in a
 							 * callback rather than an enum, so the set reflects the sizes
 							 * registered when the request runs. The callback sits on
 							 * sub_sizes because a nested property cannot carry one.
 							 */
-							'validate_callback' => static function ( $value, $request, $param ) {
+							'validate_callback' => static function ( $value, WP_REST_Request $request, string $param ) {
 								/*
 								 * Providing a custom callback replaces the default schema
 								 * validation, so apply the declared schema first. That is what
@@ -333,7 +340,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				'format'            => 'uri',
 				'description'       => __( 'URL of an external image to sideload into the media library, instead of uploading a file.', 'gutenberg' ),
 				'sanitize_callback' => 'sanitize_url',
-				'validate_callback' => static function ( $url, WP_REST_Request $request, string $param ) {
+				'validate_callback' => static function ( $url, $request, $param ) {
 					/*
 					 * A custom validate_callback replaces the default
 					 * rest_validate_request_arg(), so re-apply it first to keep
@@ -823,16 +830,19 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		foreach ( $sub_sizes as $sub_size ) {
 			foreach ( array( 'file', 'original_image' ) as $key ) {
 				/*
-				 * Every string that was sent is checked, no matter how unlikely
+				 * Every value that was sent is checked, no matter how unlikely
 				 * a name it looks. A loose emptiness test would wave through
 				 * '0', which is a valid one-character name as far as the schema
-				 * is concerned and is stored like any other.
+				 * is concerned and is stored like any other. A value the schema
+				 * types as a string but which arrives as something else is
+				 * rejected rather than skipped, so a subclass which widens the
+				 * schema cannot pass an unchecked value on to the metadata.
 				 */
-				if ( ! isset( $sub_size[ $key ] ) || ! is_string( $sub_size[ $key ] ) ) {
+				if ( ! isset( $sub_size[ $key ] ) ) {
 					continue;
 				}
 
-				if ( ! in_array( $sub_size[ $key ], $allowed, true ) ) {
+				if ( ! is_string( $sub_size[ $key ] ) || ! in_array( $sub_size[ $key ], $allowed, true ) ) {
 					return new WP_Error(
 						'rest_invalid_sub_size_file',
 						__( 'Invalid sub-size file name. File names must have been produced by a prior sideload for this attachment.', 'gutenberg' ),
@@ -1143,8 +1153,18 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		 * the value makes the delete a no-op when the row is already gone, so a
 		 * retried request cleans up without error. Any rows left behind by an
 		 * abandoned upload are removed with the attachment itself.
+		 *
+		 * Retrying is idempotent for the request as it was sent. A name is only
+		 * unavailable to a retry once a later finalize has overwritten the same
+		 * size with a newly sideloaded file, which drops the earlier name from
+		 * the metadata the retry recovers it from.
+		 *
+		 * The names are collected before deleting so a request which repeats
+		 * the same name across many sub-sizes still issues one query per
+		 * distinct name.
 		 */
 		$recoverable = $this->get_sideloaded_file_names( $attachment_id, false );
+		$consumed    = array();
 		foreach ( $sub_sizes as $sub_size ) {
 			foreach ( array( 'file', 'original_image' ) as $key ) {
 				// Matches the set validate_sub_size_provenance() checked, so
@@ -1154,9 +1174,13 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 					is_string( $sub_size[ $key ] ) &&
 					in_array( $sub_size[ $key ], $recoverable, true )
 				) {
-					delete_post_meta( $attachment_id, self::META_KEY_SIDELOAD_FILE_NAME, wp_slash( $sub_size[ $key ] ) );
+					$consumed[] = $sub_size[ $key ];
 				}
 			}
+		}
+
+		foreach ( array_unique( $consumed ) as $file_name ) {
+			delete_post_meta( $attachment_id, self::META_KEY_SIDELOAD_FILE_NAME, wp_slash( $file_name ) );
 		}
 
 		$response_request = new WP_REST_Request(
