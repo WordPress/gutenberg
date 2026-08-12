@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import ColorGradientControl from '../colors-gradients/control';
 
 export default function ColorPaletteControl( {

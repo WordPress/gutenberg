@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { SlotFillProvider } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { uploadMedia } from '@wordpress/media-utils';
@@ -11,10 +8,6 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
-
-/**
- * Internal dependencies
- */
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import { buildWidgetAreasPostId, KIND, POST_TYPE } from '../../store/utils';
 import useLastSelectedWidgetArea from '../../hooks/use-last-selected-widget-area';

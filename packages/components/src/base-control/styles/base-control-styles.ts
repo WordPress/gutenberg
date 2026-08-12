@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
-
-/**
- * Internal dependencies
- */
 import { baseLabelTypography, boxSizingReset, font, COLORS } from '../../utils';
 import { space } from '../../utils/space';
 

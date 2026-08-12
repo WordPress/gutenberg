@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { useImageCropper } from '@wordpress/image-cropper';

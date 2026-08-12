@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { test, expect } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import { gotoStoryId } from '../utils';
 
 test.describe( 'Popover', () => {

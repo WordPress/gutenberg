@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../gap';
 
 describe( 'gap', () => {

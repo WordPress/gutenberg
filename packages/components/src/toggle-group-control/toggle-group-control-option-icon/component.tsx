@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../../context';
 import type { ToggleGroupControlOptionIconProps } from '../types';
 import { ToggleGroupControlOptionBase } from '../toggle-group-control-option-base';

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Fragment, useEffect, useMemo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -9,10 +6,6 @@ import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { NoteThread } from './note-thread';
 import {
@@ -106,7 +99,11 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 		const nextThread = threads[ currentIndex + 1 ];
 		const prevThread = threads[ currentIndex - 1 ];
 
-		await onDelete( note );
+		const deleted = await onDelete( note );
+		// Leave the selection alone when the delete failed; the note is still there.
+		if ( ! deleted ) {
+			return;
+		}
 
 		if ( note.parent !== 0 ) {
 			// Move focus to the parent thread when a reply was deleted.
@@ -161,7 +158,7 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 			focusNoteThread(
 				selectedNote,
 				sidebarRef.current,
-				selectedNote === 'new' ? 'textarea' : undefined
+				selectedNote === 'new' ? '[role="textbox"]' : undefined
 			);
 			// Clear focus flag to avoid re-triggering.
 			selectNote( selectedNote );

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { logged } from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { __experimentalIsEditingReusableBlock } from '../selectors';
 
 describe( '__experimentalIsEditingReusableBlock', () => {

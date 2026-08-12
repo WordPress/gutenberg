@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { setImmutably } from '../object';
 
 describe( 'setImmutably', () => {

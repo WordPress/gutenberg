@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	setDefaultBlockName,
 	setFreeformContentHandlerName,
@@ -14,15 +11,7 @@ import { select } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import HtmlRenderer from './utils/html-renderer';
-
-/**
- * Internal dependencies
- */
 // Experimental blocks are only registered in the Gutenberg plugin (see
 // `__experimentalRegisterExperimentalCoreBlocks`). `registerCoreBlocks`
 // filters them out via `isBlockMetadataExperimental`, so they are never
@@ -147,7 +136,6 @@ import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
 import * as footnotes from './footnotes';
-
 import isBlockMetadataExperimental from './utils/is-block-metadata-experimental';
 import { unlock } from './lock-unlock';
 
@@ -197,6 +185,8 @@ const getAllBlocks = () => {
 		pageList,
 		pageListItem,
 		pattern,
+		playlist,
+		playlistTrack,
 		preformatted,
 		pullquote,
 		reusableBlock,
@@ -208,6 +198,10 @@ const getAllBlocks = () => {
 		socialLinks,
 		spacer,
 		table,
+		tabs,
+		tabList,
+		tabPanels,
+		tabPanel,
 		tagCloud,
 		textColumns,
 		verse,
@@ -281,12 +275,8 @@ const getAllBlocks = () => {
 	}
 
 	if ( window?.__experimentalEnableBlockExperiments ) {
-		blocks.push( tabList );
-		blocks.push( tabs );
-		blocks.push( tabPanel );
-		blocks.push( tabPanels );
-		blocks.push( playlist );
-		blocks.push( playlistTrack );
+		// Blocks added here are only registered when the "Block experiments"
+		// option is enabled in the Gutenberg > Experiments settings page.
 	}
 
 	blocks.push( classic );

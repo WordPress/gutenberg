@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -14,10 +11,6 @@ import { isRTL, __ } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
 // @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import type { StateDefinition } from './utils';
 import { unlock } from './lock-unlock';
 
@@ -33,6 +26,7 @@ interface ScreenHeaderProps {
 	selectedPseudoState?: string;
 	onChangeViewport?: ( value: string ) => void;
 	onChangePseudoState?: ( value: string ) => void;
+	showResponsiveStateControls?: boolean;
 }
 
 export function ScreenHeader( {
@@ -45,6 +39,7 @@ export function ScreenHeader( {
 	selectedPseudoState = 'default',
 	onChangeViewport,
 	onChangePseudoState,
+	showResponsiveStateControls = true,
 }: ScreenHeaderProps ) {
 	return (
 		<VStack spacing={ 0 }>
@@ -69,7 +64,11 @@ export function ScreenHeader( {
 									</Heading>
 									<VStack spacing={ 2 } alignment="right">
 										<StateControl
-											viewportStates={ viewportStates }
+											viewportStates={
+												showResponsiveStateControls
+													? viewportStates
+													: []
+											}
 											pseudoStates={ pseudoStates }
 											viewportValue={ selectedViewport }
 											pseudoStateValue={

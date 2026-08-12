@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import a11yPlugin from 'colord/plugins/a11y';
 import namesPlugin from 'colord/plugins/names';
 import { colord, extend } from 'colord';
-
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { Notice } from '@wordpress/components';
 import { speak } from '@wordpress/a11y';

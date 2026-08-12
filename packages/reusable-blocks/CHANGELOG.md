@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 5.53.0 (2026-08-12)
+
+
+## 5.52.0 (2026-07-29)
+
+## 5.51.0 (2026-07-14)
+
 ### Deprecations
 
 -   Deprecated the `wp.reusableBlocks.ReusableBlocksMenuItems` component and the `core/reusable-blocks` store actions (`__experimentalConvertBlockToStatic`, `__experimentalConvertBlocksToReusable`, `__experimentalDeleteReusableBlock`, `__experimentalSetEditingReusableBlock`) and selector (`__experimentalIsEditingReusableBlock`). The package is unused by core and will become a no-op compatibility package in a future release.

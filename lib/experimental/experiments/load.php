@@ -30,6 +30,11 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Enables new blocks to allow building forms. You are likely to experience UX issues that are being addressed.', 'gutenberg' ),
 				),
 				array(
+					'id'          => 'gutenberg-global-styles-inheritance-ui',
+					'label'       => __( 'Global Styles inheritance in the block inspector', 'gutenberg' ),
+					'description' => __( 'Shows the value a block inherits from Global Styles in the block inspector when nothing is set on the block itself, and adds a control to clear a value you set back to the inherited one.', 'gutenberg' ),
+				),
+				array(
 					'id'          => 'gutenberg-grid-interactivity',
 					'label'       => __( 'Grid interactivity', 'gutenberg' ),
 					'description' => __( 'Enables enhancements to the Grid block that let you move and resize items in the editor canvas.', 'gutenberg' ),
@@ -114,11 +119,6 @@ function gutenberg_initialize_experiments_settings() {
 					'id'          => 'gutenberg-guidelines',
 					'label'       => __( 'Guidelines', 'gutenberg' ),
 					'description' => __( 'Enables the Guidelines page under Settings and the experimental knowledge storage (wp_knowledge).', 'gutenberg' ),
-				),
-				array(
-					'id'          => 'gutenberg-content-types',
-					'label'       => __( 'Content types', 'gutenberg' ),
-					'description' => __( 'Enables a UI for creating and managing custom taxonomies and custom post types under Settings.', 'gutenberg' ),
 				),
 				array(
 					'id'          => 'gutenberg-dashboard-widgets',

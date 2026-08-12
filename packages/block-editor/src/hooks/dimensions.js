@@ -1,24 +1,14 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { getBlockSupport } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import InspectorControls from '../components/inspector-controls';
 import {
 	DimensionsPanel as StylesDimensionsPanel,
 	useHasDimensionsPanel,
 } from '../components/global-styles';
+import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
 import { MarginVisualizer, PaddingVisualizer } from './spacing-visualizer';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
@@ -78,17 +68,28 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 	const selectedState = useBlockStyleState();
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 	const isEnabled = useHasDimensionsPanel( settings, selectedState );
-	const style = useSelect(
+	const { style, className } = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled
 			if ( ! isEnabled ) {
-				return undefined;
+				return {};
 			}
-			return select( blockEditorStore ).getBlockAttributes( clientId )
-				?.style;
+			const attributes =
+				select( blockEditorStore ).getBlockAttributes( clientId ) || {};
+			return {
+				style: attributes.style,
+				className: attributes.className,
+			};
 		},
 		[ clientId, isEnabled ]
 	);
+
+	const { value: inheritedValue } = useResolvedStyle(
+		name,
+		className,
+		selectedState
+	);
+
 	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
 	const value = isStateSelected
 		? getStyleForState( style, selectedState )
@@ -139,6 +140,7 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 				onVisualize={
 					isStateSelected ? undefined : setVisualizedProperty
 				}
+				inheritedValue={ inheritedValue }
 			/>
 			{ ! isStateSelected &&
 				!! settings?.spacing?.padding &&

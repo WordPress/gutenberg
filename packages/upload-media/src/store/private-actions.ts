@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import { v4 as uuidv4 } from 'uuid';
-
-/**
- * WordPress dependencies
- */
 import { createBlobURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import type { createRegistry } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
-
-/**
- * Internal dependencies
- */
 import {
 	cloneFile,
 	convertBlobToFile,
@@ -21,6 +10,7 @@ import {
 	renameFile,
 } from '../utils';
 import { canvasConvertToJpeg } from '../canvas-utils';
+import { getHeicUnsupportedMessage } from '../heic-support';
 import { getUnappliedExifOrientation } from '../heic-parser';
 import {
 	isClientSideMediaSupported,
@@ -30,7 +20,7 @@ import { getImageDimensions } from '../get-image-dimensions';
 import { CLIENT_SIDE_SUPPORTED_MIME_TYPES, HEIC_MIME_TYPES } from './constants';
 import { StubFile } from '../stub-file';
 import { ErrorCode, UploadError } from '../upload-error';
-import { measure } from './utils/debug-logger';
+import { debug, measure } from './utils/debug-logger';
 import {
 	vipsResizeImage,
 	vipsRotateImage,
@@ -42,6 +32,8 @@ import {
 } from './utils';
 import {
 	convertGifToVideo,
+	isConversionTimeoutError,
+	isSizeLimitConversionError,
 	isUnsupportedConversionError,
 	terminateVideoConversionWorker,
 } from './utils/video-conversion';
@@ -441,6 +433,10 @@ export function processItem( id: QueueItemId ) {
 			id,
 			operation,
 		} );
+
+		debug(
+			`Starting operation ${ operation } for ${ item.file.name } (item ${ item.id })`
+		);
 
 		switch ( operation ) {
 			case OperationType.Prepare:
@@ -892,8 +888,7 @@ export function prepareItem( id: QueueItemId ) {
 					id,
 					new UploadError( {
 						code: ErrorCode.HEIC_DECODE_ERROR,
-						message:
-							'This browser cannot decode HEIC images and the server does not support them either. Please convert to JPEG before uploading.',
+						message: getHeicUnsupportedMessage(),
 						file,
 					} )
 				);
@@ -1034,6 +1029,11 @@ export function uploadItem( id: QueueItemId ) {
 			filesList: [ item.file ],
 			additionalData: item.additionalData,
 			signal: item.abortController?.signal,
+			// The queue's own items drive upload progress UI and save
+			// locking; without this, consumers that track uploads themselves
+			// (e.g. the editor's progress snackbar) would count this file a
+			// second time.
+			isTransportOnly: true,
 			onFileChange: ( [ attachment ] ) => {
 				if ( attachment && ! isBlobURL( attachment.url ) ) {
 					finishUpload( attachment );
@@ -1135,16 +1135,24 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 		// Add '-scaled' suffix for big image threshold resizing.
 		const scaledSuffix = Boolean( args.isThresholdResize );
 
+		// Metadata stripping and bit depth cap from the `image_strip_meta`
+		// and `image_max_bit_depth` filters, carried in the editor settings.
+		const { imageStripMeta, imageMaxBitDepth } = select.getSettings();
+
 		try {
 			const file = await vipsResizeImage(
 				item.id,
 				item.file,
 				args.resize,
-				false, // smartCrop
-				addSuffix,
-				item.abortController?.signal,
-				scaledSuffix,
-				args.quality
+				{
+					smartCrop: false,
+					addSuffix,
+					signal: item.abortController?.signal,
+					scaledSuffix,
+					quality: args.quality,
+					stripMeta: imageStripMeta,
+					maxBitdepth: imageMaxBitDepth,
+				}
 			);
 
 			measure( {
@@ -1302,13 +1310,21 @@ export function transcodeImageItem(
 		const quality = args.outputQuality ?? DEFAULT_OUTPUT_QUALITY;
 		const interlaced = args.interlaced ?? false;
 
+		// Metadata stripping and bit depth cap from the `image_strip_meta`
+		// and `image_max_bit_depth` filters, carried in the editor settings.
+		const { imageStripMeta, imageMaxBitDepth } = select.getSettings();
+
 		try {
 			const file = await vipsConvertImageFormat(
 				item.id,
 				item.file,
 				outputMimeType,
-				quality,
-				interlaced
+				{
+					quality,
+					interlaced,
+					stripMeta: imageStripMeta,
+					maxBitdepth: imageMaxBitDepth,
+				}
 			);
 
 			measure( {
@@ -1386,7 +1402,11 @@ export function transcodeGifItem(
 			const file = await convertGifToVideo(
 				item.id,
 				gifFile,
-				outputMimeType
+				outputMimeType,
+				{
+					timeout: args?.timeout,
+					maxTotalPixels: args?.maxTotalPixels,
+				}
 			);
 
 			// Hand the transcoded video to the next Upload op as the
@@ -1434,9 +1454,41 @@ export function transcodeGifItem(
 			// create an `animated_video` meta entry pointing at the GIF
 			// itself — meaningless.
 			if ( isUnsupportedConversionError( error ) ) {
+				/*
+				 * A GIF skipped for exceeding the total-pixel budget is a
+				 * graceful outcome like any other unsupported conversion,
+				 * but worth a SCRIPT_DEBUG diagnostic so developers testing
+				 * large GIFs understand why no companion video was produced.
+				 */
+				if ( isSizeLimitConversionError( error ) ) {
+					debug(
+						`Skipping GIF to video conversion: ${
+							error instanceof Error ? error.message : error
+						}`
+					);
+				}
 				dispatch.cancelItem(
 					id,
 					new Error( 'Animated GIF conversion unsupported' ),
+					true
+				);
+				return;
+			}
+			/*
+			 * The conversion ran past the allowed time and was abandoned:
+			 * the GIF attachment stands alone, which is exactly what the
+			 * user uploaded. SCRIPT_DEBUG diagnostic only, no user-facing
+			 * error.
+			 */
+			if ( isConversionTimeoutError( error ) ) {
+				debug(
+					`GIF to video conversion timed out; keeping the original GIF only: ${
+						error instanceof Error ? error.message : error
+					}`
+				);
+				dispatch.cancelItem(
+					id,
+					new Error( 'Animated GIF conversion timed out' ),
 					true
 				);
 				return;
@@ -1865,9 +1917,31 @@ export function finalizeItem( id: QueueItemId ) {
 					updates.attachment = updatedAttachment;
 				}
 			} catch ( error ) {
-				// Log but don't fail the upload if finalization fails.
+				// Log the underlying failure so it is visible in every
+				// environment; `apiFetch` may reject with a plain object
+				// rather than an Error, and the user-facing notice below is
+				// deliberately generic.
 				// eslint-disable-next-line no-console
 				console.warn( 'Media finalization failed:', error );
+
+				// Finalize is the server's commit point: it writes the
+				// attachment metadata (responsive sub-sizes and the final
+				// `-scaled` file reference). If it fails, none of that was
+				// saved, so the upload is NOT complete. Reporting success
+				// would let the editor keep — and autosave — a block whose
+				// attachment is missing its registered sizes (so the front
+				// end cannot build a srcset) and whose file references are
+				// inconsistent. Fail the item instead so the error surfaces
+				// to the user rather than showing "upload complete".
+				dispatch.cancelItem(
+					id,
+					new UploadError( {
+						code: ErrorCode.MEDIA_FINALIZE_ERROR,
+						message: __( 'Could not finalize the upload.' ),
+						file: item.file,
+					} )
+				);
+				return;
 			}
 		}
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEntityRecord } from '@wordpress/core-data';
 
 function Media( { id, size = [ 'large', 'medium', 'thumbnail' ], ...props } ) {

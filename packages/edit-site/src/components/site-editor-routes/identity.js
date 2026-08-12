@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import Editor from '../editor';
 import SidebarNavigationScreenIdentity from '../sidebar-navigation-screen-identity';
 import SidebarIdentity from '../sidebar-identity';

@@ -1,7 +1,3 @@
-/**
- * WordPress dependencies
- */
-
 const v1 = {
 	attributes: {
 		commentsToShow: {
