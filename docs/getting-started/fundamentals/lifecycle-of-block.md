@@ -4,11 +4,16 @@ A block is not a single thing. It starts as a block type definition, becomes a J
 
 This article follows a block through those phases and shows which format it takes in each one. Knowing where a phase runs—the browser or the server—tells you where a given piece of code belongs.
 
+![Lifecycle of a block: a registered block type becomes a block object in the Editor, is serialized as HTML with block delimiters in post_content, and is rendered as HTML on the front end](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/block-lifecycle.svg)
+
 ## Registration
 
-Registration tells WordPress that a block type exists. It happens on every request, on both the server and the client, and it defines nothing about a specific block in a specific post.
+Registration tells WordPress that a block type exists. It runs on every request, on both the server and the client, and it says nothing about any specific block in any specific post. [Registration of a block](https://developer.wordpress.org/block-editor/getting-started/fundamentals/registration-of-a-block/) covers this phase in depth, but two details shape everything that follows:
 
-The [`block.json`](https://developer.wordpress.org/block-editor/getting-started/fundamentals/block-json/) file is the canonical description of the block type. It declares the block name, its attributes, its supports, and the asset files the block needs:
+-   Registering on the server is what makes the block metadata available to PHP and to the REST API. A block registered only in JavaScript is unknown to the server, so it cannot render dynamically.
+-   The assets declared in `block.json` are _registered_ here, not enqueued, and each property has its own behavior: `editorScript` and `editorStyle` load in the Editor, `script` and `style` load in both the Editor and the front end, and `viewScript`, `viewScriptModule`, and `viewStyle` load only on the front end when the page contains the block. The [block metadata reference](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/) documents each one.
+
+The [`block.json`](https://developer.wordpress.org/block-editor/getting-started/fundamentals/block-json/) file is the canonical description of a block type. The examples in this article all follow the same one:
 
 ```json
 {
@@ -29,37 +34,7 @@ The [`block.json`](https://developer.wordpress.org/block-editor/getting-started/
 }
 ```
 
-On the server, [`register_block_type()`](https://developer.wordpress.org/reference/functions/register_block_type/) reads that file and adds the block type to the registry:
-
-```php
-add_action( 'init', 'my_plugin_register_message_block' );
-
-function my_plugin_register_message_block() {
-	register_block_type( __DIR__ . '/build/message' );
-}
-```
-
-On the client, [`registerBlockType()`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/) adds the same block type to the JavaScript registry and attaches the `edit` and `save` functions, which only exist in JavaScript:
-
-```js
-import { registerBlockType } from '@wordpress/blocks';
-
-import metadata from './block.json';
-import Edit from './edit';
-import save from './save';
-
-registerBlockType( metadata.name, {
-	edit: Edit,
-	save,
-} );
-```
-
-Two details are easy to miss:
-
-- The asset handles declared in `block.json` are *registered* during this phase, not enqueued. `editorScript` is loaded in the Editor, while `script`, `viewScript`, and `style` are only enqueued on the front end when the page actually contains the block.
-- Server-side registration is what makes the block metadata available to PHP and to the REST API. Blocks registered only in JavaScript are unknown to the server, so they cannot render dynamically.
-
-See [Registration of a block](https://developer.wordpress.org/block-editor/getting-started/fundamentals/registration-of-a-block/) for the full picture.
+The `content` attribute is declared with a `source` and a `selector`, which means its value lives in the block's markup rather than in the block delimiter. Keep that in mind, as it shows up again in the phases below.
 
 ## Parsing
 
@@ -132,7 +107,17 @@ The resulting string is what gets stored in `post_content`:
 
 Notice that `content` does not appear in the delimiter. Attributes declared with a `source` are read back out of the markup when the post is parsed again, so only the remaining attributes are serialized as JSON.
 
-Blocks that rely on [dynamic rendering](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/) usually return `null` from `save`. In that case there is no inner markup to store, and the block is serialized as a single self-closing delimiter that carries just its attributes:
+Blocks that rely on [dynamic rendering](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/) usually return `null` from `save`, and that changes how their attributes are declared. With no saved markup, there is nothing for a `source` to read from, so a dynamic version of this block declares `content` without one:
+
+```json
+"attributes": {
+	"content": {
+		"type": "string"
+	}
+}
+```
+
+The value is then stored in the delimiter instead of in markup, and the whole block is serialized as a single self-closing comment:
 
 ```html
 <!-- wp:my-plugin/message {"content":"Hello from a block"} /-->
@@ -142,8 +127,8 @@ Blocks that rely on [dynamic rendering](https://developer.wordpress.org/block-ed
 
 On the front end the Editor is gone, and the stored HTML is processed in PHP. [`do_blocks()`](https://developer.wordpress.org/reference/functions/do_blocks/), which runs on the `the_content` filter, parses `post_content` and calls [`render_block()`](https://developer.wordpress.org/reference/functions/render_block/) for every block:
 
-- **Static blocks** have their saved markup returned as is.
-- **Dynamic blocks** discard the saved markup and generate fresh output from the `render` file declared in `block.json`, or from a `render_callback` passed to `register_block_type()`.
+-   **Static blocks** have their saved markup returned as is.
+-   **Dynamic blocks** discard the saved markup and generate fresh output from the `render` file declared in `block.json`, or from a `render_callback` passed to `register_block_type()`.
 
 A `render.php` file receives the block's attributes, its saved inner markup, and the `WP_Block` instance:
 
@@ -164,19 +149,19 @@ Whichever path a block takes, the output passes through the `render_block` and `
 
 ## The formats of a block
 
-| Format | Where it exists | Produced by |
-| --- | --- | --- |
-| Block type definition | JavaScript and PHP registries | `registerBlockType()` and `register_block_type()` |
-| Block object | Editor memory (`core/block-editor` store) | `parse()`, or inserting a block |
-| Serialized HTML with delimiters | `post_content` in the database | `serialize()` and `save` |
-| Rendered HTML | The front-end response | `do_blocks()` and `render_block()` |
+| Format                          | Where it exists                           | Produced by                                       |
+| ------------------------------- | ----------------------------------------- | ------------------------------------------------- |
+| Block type definition           | JavaScript and PHP registries             | `registerBlockType()` and `register_block_type()` |
+| Block object                    | Editor memory (`core/block-editor` store) | `parse()`, or inserting a block                   |
+| Serialized HTML with delimiters | `post_content` in the database            | `serialize()` and `save`                          |
+| Rendered HTML                   | The front-end response                    | `do_blocks()` and `render_block()`                |
 
 The same block moves between all four, and each transition is a place where behavior can be added: registration for metadata and assets, the Editor for the authoring experience, `save` for what is stored, and the render callback for what visitors see.
 
 ## Additional resources
 
-- [Data flow and data format](https://developer.wordpress.org/block-editor/explanations/architecture/data-flow/)
-- [Markup representation of a block](https://developer.wordpress.org/block-editor/getting-started/fundamentals/markup-representation-block/)
-- [Static or dynamic rendering of a block](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/)
-- [`edit` and `save`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/)
-- [Block deprecation](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-deprecation/)
+-   [Data flow and data format](https://developer.wordpress.org/block-editor/explanations/architecture/data-flow/)
+-   [Markup representation of a block](https://developer.wordpress.org/block-editor/getting-started/fundamentals/markup-representation-block/)
+-   [Static or dynamic rendering of a block](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/)
+-   [`edit` and `save`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/)
+-   [Block deprecation](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-deprecation/)

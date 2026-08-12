@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 560" width="1240" height="560" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-label="The lifecycle of a block: a registered block type becomes a block object in the Editor, is serialized as HTML with block delimiters in post_content, and is rendered as HTML on the front end.">
+  <defs>
+    <style>
+      .eyebrow { fill:#2d40e8; font-weight:700; font-size:13px; letter-spacing:1.5px; }
+      .title { fill:#101419; font-weight:800; font-size:34px; }
+      .subtitle { fill:#5c6470; font-size:19px; }
+      .st { fill:#101419; font-weight:700; font-size:21px; }
+      .body { fill:#3c434a; font-size:15px; }
+      .chip { fill:#5c6470; font-weight:700; font-size:12px; letter-spacing:1px; }
+      .step { fill:#2d40e8; font-weight:700; font-size:14px; }
+      .note { fill:#5c6470; font-size:15px; }
+      .mono { font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2d40e8"/>
+    </marker>
+  </defs>
+
+  <rect width="1240" height="560" fill="#ffffff"/>
+
+  <text class="eyebrow" x="30" y="52">BLOCK FUNDAMENTALS</text>
+  <text class="title" x="30" y="95">Lifecycle of a block</text>
+  <text class="subtitle" x="30" y="128">The same block in four formats, and what moves it from one to the next.</text>
+
+  <!-- 1. Block type -->
+  <rect x="30" y="185" width="250" height="170" rx="10" fill="#ffffff" stroke="#d0d5da" stroke-width="2"/>
+  <text class="chip" x="52" y="216">REGISTRIES · JS + PHP</text>
+  <text class="st" x="52" y="248">Block type</text>
+  <text class="body" x="52" y="280">Metadata from <tspan class="mono" font-size="14">block.json</tspan>,</text>
+  <text class="body" x="52" y="302">plus the <tspan class="mono" font-size="14">edit</tspan> and <tspan class="mono" font-size="14">save</tspan></text>
+  <text class="body" x="52" y="324">functions and the assets</text>
+  <text class="body" x="52" y="346">the block declares.</text>
+
+  <!-- 2. Block object -->
+  <rect x="330" y="185" width="250" height="170" rx="10" fill="#ffffff" stroke="#d0d5da" stroke-width="2"/>
+  <text class="chip" x="352" y="216">EDITOR MEMORY</text>
+  <text class="st" x="352" y="248">Block object</text>
+  <text class="body" x="352" y="280"><tspan class="mono" font-size="14">{ clientId, name,</tspan></text>
+  <text class="body" x="352" y="302"><tspan class="mono" font-size="14">attributes, innerBlocks }</tspan></text>
+  <text class="body" x="352" y="330">Rendered by <tspan class="mono" font-size="14">edit</tspan>, updated</text>
+  <text class="body" x="352" y="352">through <tspan class="mono" font-size="14">setAttributes</tspan>.</text>
+
+  <!-- 3. Serialized HTML -->
+  <rect x="630" y="185" width="250" height="170" rx="10" fill="#ffffff" stroke="#d0d5da" stroke-width="2"/>
+  <text class="chip" x="652" y="216">DATABASE · POST_CONTENT</text>
+  <text class="st" x="652" y="248">Serialized HTML</text>
+  <text class="body" x="652" y="280">The output of <tspan class="mono" font-size="14">save</tspan>, wrapped</text>
+  <text class="body" x="652" y="302">in block delimiters that</text>
+  <text class="body" x="652" y="324">carry the attributes not</text>
+  <text class="body" x="652" y="346">sourced from the markup.</text>
+
+  <!-- 4. Rendered HTML -->
+  <rect x="930" y="185" width="250" height="170" rx="10" fill="#ffffff" stroke="#d0d5da" stroke-width="2"/>
+  <text class="chip" x="952" y="216">FRONT-END RESPONSE</text>
+  <text class="st" x="952" y="248">Rendered HTML</text>
+  <text class="body" x="952" y="280">The saved markup for a</text>
+  <text class="body" x="952" y="302">static block, or fresh</text>
+  <text class="body" x="952" y="324">output from the render</text>
+  <text class="body" x="952" y="346">callback for a dynamic one.</text>
+
+  <!-- forward arrows -->
+  <g stroke="#2d40e8" stroke-width="2" marker-end="url(#arrow)">
+    <line x1="284" y1="270" x2="322" y2="270"/>
+    <line x1="584" y1="270" x2="622" y2="270"/>
+    <line x1="884" y1="270" x2="922" y2="270"/>
+  </g>
+  <text class="step" x="303" y="180" text-anchor="middle">insert</text>
+  <text class="step" x="303" y="163" text-anchor="middle">register +</text>
+  <text class="step" x="603" y="180" text-anchor="middle">serialize()</text>
+  <text class="step" x="603" y="163" text-anchor="middle">save +</text>
+  <text class="step" x="903" y="180" text-anchor="middle">render_block()</text>
+  <text class="step" x="903" y="163" text-anchor="middle">do_blocks() +</text>
+
+  <!-- return arrow: parse -->
+  <path d="M 700 361 L 700 420 L 455 420 L 455 361" fill="none" stroke="#2d40e8" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrow)"/>
+  <text class="step" x="578" y="443" text-anchor="middle">parse()</text>
+
+  <text class="note" x="30" y="497">Reopening the post parses the stored HTML back into block objects and validates it by re-running <tspan class="mono" font-size="14">save</tspan>, which is why changing</text>
+  <text class="note" x="30" y="521">the markup a block saves requires a deprecation.</text>
+</svg>
