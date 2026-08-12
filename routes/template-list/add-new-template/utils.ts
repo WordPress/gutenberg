@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -641,14 +638,18 @@ const useEntitiesInfo = (
 		( select ) => {
 			return Object.keys( templatePrefixes || {} ).reduce(
 				( accumulator: any, slug ) => {
-					accumulator[ slug ] = !! select(
-						coreStore
-					).getEntityRecords( entityName, slug, {
-						per_page: 1,
-						_fields: 'id',
-						context: 'view',
-						...additionalQueryParameters[ slug ],
-					} )?.length;
+					const records = select( coreStore ).getEntityRecords(
+						entityName,
+						slug,
+						{
+							per_page: 1,
+							_fields: 'id',
+							context: 'view',
+							...additionalQueryParameters[ slug ],
+						}
+					);
+					accumulator[ slug ] =
+						records === null || records.length > 0;
 					return accumulator;
 				},
 				{}

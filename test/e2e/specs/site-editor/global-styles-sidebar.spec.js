@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Global styles sidebar', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
-	} );
-
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
@@ -18,6 +11,10 @@ test.describe( 'Global styles sidebar', () => {
 			postType: 'wp_template',
 			canvas: 'edit',
 		} );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test( 'should filter blocks list results', async ( { page } ) => {

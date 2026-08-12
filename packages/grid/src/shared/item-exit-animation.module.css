@@ -1,0 +1,49 @@
+/*
+ * Absolutely positioned clone of a removed tile. Siblings reflow via
+ * FLIP while this overlay scales down and fades out.
+ */
+.exit-overlay {
+	position: absolute;
+	pointer-events: none;
+	z-index: 2;
+	overflow: hidden;
+	transform-origin: center center;
+	opacity: 1;
+	transform: scale(1);
+}
+
+@media not (prefers-reduced-motion: reduce) {
+	.exit-overlay {
+		animation:
+			wp-grid-item-exit-opacity var(--wpds-motion-duration-md)
+			var(--wpds-motion-easing-subtle) forwards,
+			wp-grid-item-exit-scale var(--wpds-motion-duration-md)
+			var(--wpds-motion-easing-balanced) forwards;
+	}
+}
+
+@keyframes wp-grid-item-exit-opacity {
+	from {
+		opacity: 1;
+	}
+
+	to {
+		opacity: 0;
+	}
+}
+
+@keyframes wp-grid-item-exit-scale {
+	from {
+		transform: scale(1);
+	}
+
+	to {
+		transform: scale(0.88);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.exit-overlay {
+		display: none;
+	}
+}

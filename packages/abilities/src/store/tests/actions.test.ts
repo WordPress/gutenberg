@@ -1,10 +1,6 @@
 /**
  * Tests for store actions.
  */
-
-/**
- * Internal dependencies
- */
 import {
 	registerAbility,
 	unregisterAbility,

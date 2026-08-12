@@ -644,8 +644,10 @@ _**Note:** Since WordPress 6.2._
 -   Type: `Object`
 -   Default value: null
 -   Subproperties:
+    -   `aspectRatio`: type `boolean`, default value `false`
     -   `height`: type `boolean`, default value `false`
     -   `minHeight`: type `boolean`, default value `false`
+    -   `minWidth`: type `boolean`, default value `false`
     -   `width`: type `boolean`, default value `false`
 
 This value signals that a block supports some of the CSS style properties related to dimensions. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/global-settings-and-styles.md#opt-in-into-ui-controls).
@@ -653,17 +655,18 @@ This value signals that a block supports some of the CSS style properties relate
 ```js
 supports: {
 	dimensions: {
-		aspectRatio: true // Enable aspect ratio control.
-		height: true // Enable height control.
-		minHeight: true // Enable min height control.
-		width: true // Enable width control.
+		aspectRatio: true, // Enable aspect ratio control.
+		height: true, // Enable height control.
+		minHeight: true, // Enable min height control.
+		minWidth: true, // Enable min width control.
+		width: true, // Enable width control.
 	}
 }
 ```
 
 When a block declares support for a specific dimensions property, its attributes definition is extended to include the `style` attribute.
 
--   `style`: an attribute of `object` type with no default assigned. This is added when `aspectRatio`, `height`, `minHeight`, or `width` support is declared. It stores the custom values set by the user. For example:
+-   `style`: an attribute of `object` type with no default assigned. This is added when `aspectRatio`, `height`, `minHeight`, `minWidth`, or `width` support is declared. It stores the custom values set by the user. For example:
 
 ```js
 attributes: {
@@ -672,11 +675,25 @@ attributes: {
             aspectRatio: "16/9",
             height: "40vh",
             minHeight: "50vh",
+            minWidth: "200px",
             width: "400px",
         }
     }
 }
 ```
+
+## editableRoot
+
+-   Type: `boolean`
+-   Default value: `false`
+
+When set to `true`, the block declares that it keeps working when an ancestor
+element (the editor canvas) is the `contenteditable` editing host, with focus
+and the native selection residing there instead of on the block's own editable
+elements. The editor uses this to keep the canvas editable while such a block
+is selected, enabling native partial selection across blocks. Blocks that rely
+on `event.target` or DOM focus pointing at their own elements should not
+declare this support.
 
 ## filter
 
@@ -830,7 +847,7 @@ For the `flow` layout type only, determines display of the "Inner blocks use con
 -   Type: `boolean`
 -   Default value: `false`
 
-For the `flex` layout type only, determines display of sizing controls (Fit/Fill/Fixed) on all child blocks of the flex block.
+For the `flex` layout type only, determines display of sizing controls (Fit/Grow/Max width/Fixed) on all child blocks of the flex block.
 
 ### layout.allowVerticalAlignment
 

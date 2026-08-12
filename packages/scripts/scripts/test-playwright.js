@@ -8,16 +8,8 @@ process.env.NODE_ENV = 'test';
 process.on( 'unhandledRejection', ( err ) => {
 	throw err;
 } );
-
-/**
- * External dependencies
- */
 const { resolve } = require( 'node:path' );
 const { sync: spawn } = require( 'cross-spawn' );
-
-/**
- * Internal dependencies
- */
 const {
 	fromConfigRoot,
 	hasProjectFile,
@@ -41,7 +33,6 @@ try {
 	// First, try to load the package installed from among the optional peerDependencies.
 	loadConfig = require( '@wordpress/env/lib/config' ).loadConfig;
 } catch {
-	// eslint-disable-next-line no-console
 	console.log(
 		'Notice: Could not find @wordpress/env package. Using WP_BASE_URL environment variable or else the default http://localhost:8889 URL for tests.'
 	);

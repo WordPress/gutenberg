@@ -1,33 +1,83 @@
-/**
- * External dependencies
- */
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { v4 as uuid } from 'uuid';
-
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
-import { getNestedValue, setNestedValue } from './utils';
+import { clearUnchangedEdits, getNestedValue, setNestedValue } from './utils';
 import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
 import {
+	CRDT_AUTOSAVE_SNAPSHOT_KEY,
 	LOCAL_EDITOR_ORIGIN,
 	LOCAL_UNDO_IGNORED_ORIGIN,
 	getSyncManager,
 } from './sync';
 import logEntityDeprecation from './utils/log-entity-deprecation';
+import {
+	getRawValue,
+	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
+} from './utils/crdt';
 
 function addTitleToAutoDraft( record ) {
 	return record.status === 'auto-draft' ? { ...record, title: '' } : record;
+}
+
+// Post meta is applied to the CRDT one subkey at a time, so compare the save
+// response at the same granularity to avoid carrying stale sibling values.
+function getServerMutatedMetaFields( updatedMeta, persistedMeta, syncedMeta ) {
+	const baseline = { ...persistedMeta, ...syncedMeta };
+
+	return Object.fromEntries(
+		Object.entries( updatedMeta ?? {} ).filter( ( [ key, value ] ) => {
+			if ( key === POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ) {
+				// The persisted CRDT snapshot may change on save and is
+				// intentionally excluded from CRDT meta synchronization, so it
+				// is not a server mutation.
+				return false;
+			}
+
+			return ! fastDeepEqual( value, baseline[ key ] );
+		} )
+	);
+}
+
+function getServerMutatedFields(
+	updatedRecord,
+	persistedRecord,
+	syncedChanges
+) {
+	return Object.fromEntries(
+		Object.entries( updatedRecord ).flatMap( ( [ key, value ] ) => {
+			if ( key === 'meta' ) {
+				const serverMutatedMeta = getServerMutatedMetaFields(
+					value,
+					persistedRecord.meta,
+					syncedChanges.meta
+				);
+
+				return Object.keys( serverMutatedMeta ).length
+					? [ [ key, serverMutatedMeta ] ]
+					: [];
+			}
+
+			const baseline =
+				key in syncedChanges
+					? syncedChanges[ key ]
+					: persistedRecord[ key ];
+
+			// The save response nests raw attributes as `{ raw, rendered }`
+			// while the baseline holds raw strings; compare raw values so the
+			// shape difference does not read as a server mutation.
+			const wasServerMutated = ! fastDeepEqual(
+				getRawValue( value ) ?? value,
+				getRawValue( baseline ) ?? baseline
+			);
+
+			return wasServerMutated ? [ [ key, value ] ] : [];
+		} )
+	);
 }
 
 /**
@@ -384,6 +434,9 @@ export const deleteEntityRecord =
  * @param {Object}        edits                The edits.
  * @param {Object}        options              Options for the edit.
  * @param {boolean}       [options.undoIgnore] Whether to ignore the edit in undo history or not.
+ * @param {boolean}       [options.isCached]   Whether the edit is transient (e.g. typing). Transient
+ *                                             edits are staged and eventually merged into the
+ *                                             preceding undo level instead of creating a new one.
  *
  * @return {Object} Action object.
  */
@@ -421,14 +474,7 @@ export const editEntityRecord =
 			recordId,
 			// Clear edits when they are equal to their persisted counterparts
 			// so that the property is not considered dirty.
-			edits: Object.keys( edits ).reduce( ( acc, key ) => {
-				const recordValue = record[ key ];
-				const value = editsWithMerges[ key ];
-				acc[ key ] = fastDeepEqual( recordValue, value )
-					? undefined
-					: value;
-				return acc;
-			}, {} ),
+			edits: clearUnchangedEdits( editsWithMerges, record ),
 		};
 		if ( entityConfig.syncConfig ) {
 			const objectType = `${ kind }/${ name }`;
@@ -597,17 +643,15 @@ export const __unstableCreateUndoLevel =
  *                                                the exceptions. Defaults to false.
  */
 export const saveEntityRecord =
-	(
-		kind,
-		name,
-		record,
-		{
+	( kind, name, record, options = {} ) =>
+	async ( { select, resolveSelect, dispatch } ) => {
+		const {
 			isAutosave = false,
 			__unstableFetch = apiFetch,
+			__unstableSkipSyncUpdate = false,
 			throwOnError = false,
-		} = {}
-	) =>
-	async ( { select, resolveSelect, dispatch } ) => {
+		} = options;
+
 		logEntityDeprecation( kind, name, 'saveEntityRecord' );
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
@@ -678,6 +722,25 @@ export const saveEntityRecord =
 					? select.getRawEntityRecord( kind, name, recordId )
 					: {};
 
+				// `saveEntityRecord` can be called directly, bypassing
+				// `editEntityRecord`, so make sure its changes enter the
+				// CRDT first. An autosave snapshots the document below, and
+				// a regular save creates the persisted document from it, so
+				// both must see these changes.
+				if (
+					entityConfig.syncConfig &&
+					! __unstableSkipSyncUpdate &&
+					! isNewRecord &&
+					persistedRecord
+				) {
+					getSyncManager()?.update(
+						`${ kind }/${ name }`,
+						recordId,
+						record,
+						LOCAL_UNDO_IGNORED_ORIGIN
+					);
+				}
+
 				// Most of this autosave logic is very specific to posts.
 				// This is fine for now as it is the only supported autosave,
 				// but ideally this should all be handled in the back end,
@@ -711,6 +774,21 @@ export const saveEntityRecord =
 									: undefined,
 						}
 					);
+					// Capture the CRDT snapshot in the same tick as the
+					// payload so it describes exactly the content being
+					// autosaved.
+					if ( entityConfig.syncConfig ) {
+						const crdtSnapshot =
+							getSyncManager()?.getEntitySnapshot(
+								`${ kind }/${ name }`,
+								recordId
+							);
+
+						if ( crdtSnapshot ) {
+							data[ CRDT_AUTOSAVE_SNAPSHOT_KEY ] = crdtSnapshot;
+						}
+					}
+
 					updatedRecord = await __unstableFetch( {
 						path: `${ path }/autosaves`,
 						method: 'POST',
@@ -784,21 +862,40 @@ export const saveEntityRecord =
 						method: recordId ? 'PUT' : 'POST',
 						data: edits,
 					} );
+					// Pass the pre-`__unstablePrePersist` edits so the reducer
+					// can clear the persisted edits from state. The values
+					// added by `__unstablePrePersist` (e.g. a fresh CRDT
+					// snapshot in `meta`) never exist in the state edits, so
+					// comparing against them would fail to match and leave the
+					// record dirty after a successful save.
 					dispatch.receiveEntityRecords(
 						kind,
 						name,
 						updatedRecord,
 						undefined,
 						true,
-						edits
+						record
 					);
 					if ( entityConfig.syncConfig ) {
+						let syncChanges;
+						if ( __unstableSkipSyncUpdate ) {
+							syncChanges = {};
+						} else if ( isNewRecord || ! persistedRecord ) {
+							syncChanges = updatedRecord;
+						} else {
+							syncChanges = getServerMutatedFields(
+								updatedRecord,
+								persistedRecord,
+								record
+							);
+						}
+
 						// Use an untracked origin so that the save
 						// response does not create undo levels.
 						getSyncManager()?.update(
 							`${ kind }/${ name }`,
 							recordId,
-							updatedRecord,
+							syncChanges,
 							LOCAL_UNDO_IGNORED_ORIGIN,
 							{ isSave: true }
 						);
@@ -1116,32 +1213,3 @@ export const receiveRevisions =
 			invalidateCache,
 		} );
 	};
-
-/**
- * Returns an action object used to set the sync connection status for an entity or collection.
- *
- * @param {string}             kind   Kind of the entity.
- * @param {string}             name   Name of the entity.
- * @param {number|string|null} key    The entity key, or null for collections.
- * @param {Object|null}        status The connection state object or null on unload.
- *
- * @return {Object} Action object.
- */
-export function setSyncConnectionStatus( kind, name, key, status ) {
-	if ( ! status ) {
-		return {
-			type: 'CLEAR_SYNC_CONNECTION_STATUS',
-			kind,
-			name,
-			key,
-		};
-	}
-
-	return {
-		type: 'SET_SYNC_CONNECTION_STATUS',
-		kind,
-		name,
-		key,
-		status,
-	};
-}

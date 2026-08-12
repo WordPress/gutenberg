@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	AlignmentControl,
 	BlockControls,
@@ -20,7 +13,7 @@ import {
 	ComboboxControl,
 	SelectControl,
 	ToggleControl,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalVStack as VStack,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -32,10 +25,6 @@ import { useMemo, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as blocksStore } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { recreateWithRecommendedBlocks } from './utils';
 import {
 	useDefaultAvatar,
@@ -107,7 +96,6 @@ function AuthorCombobox( { value, onChange } ) {
 
 	return (
 		<ComboboxControl
-			__next40pxDefaultSize
 			label={ __( 'Author' ) }
 			options={ authorOptions }
 			value={ value?.id }
@@ -268,7 +256,6 @@ function PostAuthorEdit( {
 							}
 						>
 							<SelectControl
-								__next40pxDefaultSize
 								label={ __( 'Avatar size' ) }
 								value={ avatarSize }
 								options={ avatarSizes }
@@ -341,11 +328,11 @@ function PostAuthorEdit( {
 						alignment="left"
 						spacing={ 4 }
 					>
-						<Text as="p">
+						<WCText as="p">
 							{ __(
 								'This block is no longer supported. Recreate its design with the Avatar, Author Name and Author Biography blocks.'
 							) }
-						</Text>
+						</WCText>
 						<Button
 							variant="primary"
 							onClick={ transformBlock }
@@ -356,7 +343,6 @@ function PostAuthorEdit( {
 					</VStack>
 				</InspectorControlsLastItem>
 			) }
-
 			<BlockControls group="block">
 				<AlignmentControl
 					value={ textAlign }
@@ -365,7 +351,6 @@ function PostAuthorEdit( {
 					} }
 				/>
 			</BlockControls>
-
 			<div { ...blockProps }>
 				{ showAvatar && (
 					<div className="wp-block-post-author__avatar">

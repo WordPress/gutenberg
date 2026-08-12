@@ -1,25 +1,12 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
+import type { Block } from '@wordpress/blocks';
 import {
 	getBlockType,
 	getBlockTypes,
 	getBlockFromExample,
 	createBlock,
-	// @wordpress/blocks imports are not typed.
-	// @ts-expect-error
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
-import type {
-	BlockExample,
-	ColorOrigin,
-	MultiOriginPalettes,
-	BlockType,
-} from './types';
+import type { BlockExample, ColorOrigin, MultiOriginPalettes } from './types';
 import ColorExamples from './color-examples';
 import DuotoneExamples from './duotone-examples';
 import { STYLE_BOOK_COLOR_GROUPS } from './constants';
@@ -111,7 +98,7 @@ function getOverviewBlockExamples(
 	}
 
 	// Get examples for typography blocks.
-	const typographyBlockExamples: BlockType[] = [];
+	const typographyBlockExamples: Block[] = [];
 
 	if ( getBlockType( 'core/heading' ) ) {
 		const headingBlock = createBlock( 'core/heading', {
@@ -212,7 +199,7 @@ function getOverviewBlockExamples(
  */
 export function getExamples( colors: MultiOriginPalettes ): BlockExample[] {
 	const nonHeadingBlockExamples = getBlockTypes()
-		.filter( ( blockType: BlockType ) => {
+		.filter( ( blockType ) => {
 			const { name, example, supports } = blockType;
 			return (
 				name !== 'core/heading' &&
@@ -220,7 +207,7 @@ export function getExamples( colors: MultiOriginPalettes ): BlockExample[] {
 				supports?.inserter !== false
 			);
 		} )
-		.map( ( blockType: BlockType ) => ( {
+		.map( ( blockType ) => ( {
 			name: blockType.name,
 			title: blockType.title,
 			category: blockType.category,
@@ -232,7 +219,7 @@ export function getExamples( colors: MultiOriginPalettes ): BlockExample[] {
 			blocks: getBlockFromExample( blockType.name, {
 				...blockType.example,
 				attributes: {
-					...blockType.example.attributes,
+					...blockType.example?.attributes,
 					style: undefined,
 				},
 			} ),

@@ -21,10 +21,10 @@ Relevant docs and discussions:
 
 Each synced entity gets its own `Y.Doc` with two root-level `Y.Map` entries:
 
-| Key        | Constant              | Purpose                                                                                                                                                                                |
-| ---------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `document` | `CRDT_RECORD_MAP_KEY` | Holds the entity record data (the synced properties).                                                                                                                                  |
-| `state`    | `CRDT_STATE_MAP_KEY`  | Metadata about the CRDT document and the entity: a schema version number (`version`), the timestamp of the last save (`savedAt`), and the client ID of the peer who saved (`savedBy`). |
+| Key        | Constant              | Purpose                                                                                                                                                                                                                                       |
+| ---------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `document` | `CRDT_RECORD_MAP_KEY` | Holds the entity record data (the synced properties).                                                                                                                                                                                         |
+| `state`    | `CRDT_STATE_MAP_KEY`  | Metadata about the CRDT document and the entity: a schema version number (`version`) and the last user-facing entity save (`savedAt`/`savedBy`). Peers refetch records on `savedAt`; collaborator save notifications use `savedAt`/`savedBy`. |
 
 These constants are defined in `src/config.ts`.
 
@@ -64,8 +64,9 @@ A provider is a transport layer that syncs Yjs document updates between peers. T
 
 The default provider (`src/providers/http-polling/`) uses HTTP polling to exchange updates with a central sync server. A shared polling manager batches updates for all rooms (entities) into a single request per poll cycle. See [the HTTP polling README](./src/providers/http-polling/README.md) for full details including the REST API format, sync protocol, and compaction.
 
--   Poll interval: 1 second when editing alone, 250ms when collaborators are detected.
--   On errors, the interval backs off exponentially (up to 30 seconds).
+-   Poll interval: 4 seconds when editing alone, 1 second when collaborators are detected.
+-   The `sync.pollingManager.pollingInterval` and `sync.pollingManager.pollingIntervalWithCollaborators` filters can make active-tab polling faster, but slower values are clamped to the defaults.
+-   On errors, the interval backs off according to the retry schedule before continuing at 30-second automatic retries.
 -   Awareness state is sent and received alongside document updates in the same poll request.
 
 ### Custom providers

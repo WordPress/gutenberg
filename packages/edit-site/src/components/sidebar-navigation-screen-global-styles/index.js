@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
@@ -8,29 +5,14 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { store as editorStore } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
+import { useGlobalStylesRevisions } from '@wordpress/global-styles-ui';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
-import SidebarNavigationItem from '../sidebar-navigation-item';
-import { useGlobalStylesRevisions } from '@wordpress/global-styles-ui';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
 import { MainSidebarNavigationContent } from '../sidebar-navigation-screen-main';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
-
-export function SidebarNavigationItemGlobalStyles( props ) {
-	const { name } = useLocation();
-	return (
-		<SidebarNavigationItem
-			{ ...props }
-			aria-current={ name === 'styles' }
-		/>
-	);
-}
 
 export default function SidebarNavigationScreenGlobalStyles() {
 	const history = useHistory();
@@ -73,9 +55,7 @@ export default function SidebarNavigationScreenGlobalStyles() {
 				description={ __(
 					'Customize the appearance of your website using the block editor.'
 				) }
-				content={
-					<MainSidebarNavigationContent activeItem="styles-navigation-item" />
-				}
+				content={ <MainSidebarNavigationContent /> }
 				footer={
 					shouldShowGlobalStylesFooter && (
 						<SidebarNavigationScreenDetailsFooter

@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import { ConfirmDialog } from '../component';
 
@@ -24,7 +13,7 @@ const meta: Meta< typeof ConfirmDialog > = {
 			control: false,
 		},
 	},
-	tags: [ 'status-experimental' ],
+	tags: [ 'status-experimental', 'manifest' ],
 	args: {
 		onCancel: fn(),
 		onConfirm: fn(),
@@ -34,8 +23,9 @@ const meta: Meta< typeof ConfirmDialog > = {
 			expanded: true,
 		},
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
+			notes: 'Will be superseded by [`AlertDialog`](?path=/docs/design-system-components-alertdialog--docs) in `@wordpress/ui`, but continue using for now.',
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 	},

@@ -122,6 +122,29 @@ The `resolvers` option should be passed as an object where each key is the name 
 
 Resolvers, in combination with [thunks](https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/thunks.md#thunks-can-be-async), can be used to implement asynchronous data flows for your store.
 
+##### Object-form resolvers
+
+A resolver can be defined as an object with a `fulfill` method and optional `isFulfilled` and `shouldInvalidate` methods:
+
+```js
+resolvers: {
+	getPage: {
+		fulfill: ( id ) => async ( { dispatch } ) => {
+			const data = await fetchPage( id );
+			dispatch( { type: 'RECEIVE_PAGE', id, data } );
+		},
+		isFulfilled: ( state, id ) => !! state.pages[ id ],
+		shouldInvalidate: ( action, id ) => action.type === 'INVALIDATE_PAGE' && action.id === id,
+	},
+},
+```
+
+A resolver can also be a plain function with `isFulfilled` or `shouldInvalidate` assigned as properties. It will be normalized into the `{ fulfill, isFulfilled, shouldInvalidate }` object form internally.
+
+**`isFulfilled( state, ...args )`** lets you override the `hasFinishedResolution` meta selector for a given set of args. Normally, a resolver is skipped only when the resolution metadata records that it has already run for those args. With `isFulfilled`, you can look at the actual store state and decide that the data is already there: for example because it was loaded by a different resolver or preloaded server-side. When `isFulfilled` returns `true`, the `fulfill` method is not called and no resolution metadata is written.
+
+**`shouldInvalidate( action, ...args )`** is called on every dispatched action for each set of args that has already been resolved. If it returns `true`, the resolution for those args is invalidated, causing the resolver to run again on the next selector call. This is useful for automatically re-fetching data when a related action signals that the cached result may be stale.
+
 #### `controls` (deprecated)
 
 To handle asynchronous data flows, it is recommended to use [thunks](https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/thunks.md#thunks-can-be-async) instead of `controls`.
@@ -477,9 +500,11 @@ _Returns_
 
 Creates a memoized selector that caches the computed values according to the array of "dependants" and the selector parameters, and recomputes the values only when any of them changes.
 
-_Related_
+See The documentation for the `rememo` package from which the `createSelector` function is reexported.
 
--   The documentation for the `rememo` package from which the `createSelector` function is reexported.
+_Type_
+
+-   `( selector: S, getDependants: GetDependants ) => S & EnhancedSelector`
 
 ### dispatch
 
@@ -505,6 +530,40 @@ _Parameters_
 _Returns_
 
 -   `DispatchReturn< StoreNameOrDescriptor >`: Object containing the action creators.
+
+### EnhancedSelector
+
+Undocumented declaration.
+
+### GetDependants
+
+Undocumented declaration.
+
+### keyedReducer
+
+Higher-order reducer creator which creates a combined reducer object, keyed by a property on the action object.
+
+_Usage_
+
+```js
+import { keyedReducer } from '@wordpress/data';
+
+const itemsByContext = keyedReducer( 'context' )( ( state = [], action ) => {
+	switch ( action.type ) {
+		case 'ADD_ITEM':
+			return [ ...state, action.item ];
+	}
+	return state;
+} );
+```
+
+_Parameters_
+
+-   _actionProperty_ `string`: Action property by which to key object.
+
+_Returns_
+
+-   Higher-order reducer.
 
 ### plugins
 
@@ -564,9 +623,9 @@ _Returns_
 
 ### RegistryConsumer
 
-A custom react Context consumer exposing the provided `registry` to children components. Used along with the RegistryProvider.
+A custom React context consumer exposing the provided `registry` to children components. Used along with the RegistryProvider.
 
-You can read more about the react context api here: <https://react.dev/learn/passing-data-deeply-with-context#step-3-provide-the-context>
+You can read more about the React context API here: <https://react.dev/learn/passing-data-deeply-with-context#step-3-provide-the-context>
 
 _Usage_
 
@@ -597,7 +656,7 @@ const App = ( { props } ) => {
 
 A custom Context provider for exposing the provided `registry` to children components via a consumer.
 
-See <a name="#RegistryConsumer">RegistryConsumer</a> documentation for example.
+See <a href="#registryconsumer">RegistryConsumer</a> documentation for example.
 
 ### resolveSelect
 
@@ -741,11 +800,11 @@ _Returns_
 
 ### useRegistry
 
-A custom react hook exposing the registry context for use.
+A custom React hook exposing the registry context for use.
 
-This exposes the `registry` value provided via the <a href="#RegistryProvider">Registry Provider</a> to a component implementing this hook.
+This exposes the `registry` value provided via the <a href="#registryprovider">Registry Provider</a> to a component implementing this hook.
 
-It acts similarly to the `useContext` react hook.
+It acts similarly to the `useContext` React hook.
 
 Note: Generally speaking, `useRegistry` is a low level hook that in most cases won't be needed for implementation. Most interactions with the `@wordpress/data` API can be performed via the `useSelect` hook, or the `withSelect` and `withDispatch` higher order components.
 
@@ -772,7 +831,7 @@ const ParentProvidingRegistry = ( props ) => {
 
 _Returns_
 
--   `DataRegistry`: A custom react hook exposing the registry context value.
+-   `DataRegistry`: A custom React hook exposing the registry context value.
 
 ### useSelect
 

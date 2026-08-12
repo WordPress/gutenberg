@@ -1,15 +1,9 @@
-/**
- * @jest-environment jsdom
- */
-
-/**
- * External dependencies
- */
 import { renderHook, act } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
+import {
+	useBlockBindingsUtils,
+	useBlockEditingMode,
+} from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 import {
 	useEntityBinding,
 	buildNavigationLinkEntityBinding,
@@ -26,15 +20,6 @@ jest.mock( '@wordpress/data/src/components/use-select', () => {
 	const mock = jest.fn();
 	return mock;
 } );
-
-/**
- * WordPress dependencies
- */
-import {
-	useBlockBindingsUtils,
-	useBlockEditingMode,
-} from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
 
 describe( 'useEntityBinding', () => {
 	const mockUpdateBlockBindings = jest.fn();

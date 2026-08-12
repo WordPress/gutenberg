@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import { colord, extend } from 'colord';
 import a11yPlugin from 'colord/plugins/a11y';
-
 extend( [ a11yPlugin ] );
-
-/**
- * WordPress dependencies
- */
-import { Icon, Tooltip } from '@wordpress/components';
+import { Icon as WCIcon } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { Tooltip } from '@wordpress/ui';
 import type { AvatarProps } from './types';
 import { useImageLoadingStatus } from './use-image-loading-status';
 
@@ -73,7 +62,7 @@ function Avatar( {
 					'--editor-avatar-name-color': nameColor,
 			  }
 			: {} ),
-	} as React.CSSProperties;
+	};
 
 	const avatar = (
 		<div
@@ -104,7 +93,7 @@ function Avatar( {
 			</span>
 			{ dimmed && !! statusIndicator && (
 				<span className="editor-avatar__status-indicator">
-					<Icon icon={ statusIndicator } />
+					<WCIcon icon={ statusIndicator } />
 				</span>
 			) }
 			{ showBadge && (
@@ -114,7 +103,12 @@ function Avatar( {
 	);
 
 	if ( name && ( ! showBadge || label ) ) {
-		return <Tooltip text={ name }>{ avatar }</Tooltip>;
+		return (
+			<Tooltip.Root>
+				<Tooltip.Trigger render={ avatar } />
+				<Tooltip.Popup>{ name }</Tooltip.Popup>
+			</Tooltip.Root>
+		);
 	}
 
 	return avatar;

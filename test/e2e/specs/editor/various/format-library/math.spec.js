@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Format Library - Math', () => {
@@ -14,7 +11,7 @@ test.describe( 'Format Library - Math', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 
 		await page.keyboard.type( 'equation: ' );
@@ -84,6 +81,64 @@ test.describe( 'Format Library - Math', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content: 'equation: ab',
+				},
+			},
+		] );
+	} );
+
+	test( 'should seed the math format from the current selection', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+
+		// Type the LaTeX as plain text, then select it.
+		await page.keyboard.type( 'equation: x^2' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 3 } );
+
+		// Mark the selection as math.
+		await editor.clickBlockToolbarButton( 'More' );
+		await page.getByRole( 'menuitem', { name: 'Math' } ).click();
+
+		// The selected text should be used as the LaTeX and render immediately.
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content:
+						'equation: <math data-latex="x^2"><semantics><msup><mi>x</mi><mn>2</mn></msup><annotation encoding="application/x-tex">x^2</annotation></semantics></math>',
+				},
+			},
+		] );
+
+		// Clicking the button again on the active object should revert it to
+		// its LaTeX source, so the round-trip lands back on the original text.
+		await editor.clickBlockToolbarButton( 'More' );
+		await page.getByRole( 'menuitem', { name: 'Math' } ).click();
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'equation: x^2',
+				},
+			},
+		] );
+
+		// The restored text stays selected, so re-marking it as math without
+		// reselecting should round-trip straight back to the math object.
+		await editor.clickBlockToolbarButton( 'More' );
+		await page.getByRole( 'menuitem', { name: 'Math' } ).click();
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content:
+						'equation: <math data-latex="x^2"><semantics><msup><mi>x</mi><mn>2</mn></msup><annotation encoding="application/x-tex">x^2</annotation></semantics></math>',
 				},
 			},
 		] );

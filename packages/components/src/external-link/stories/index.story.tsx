@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import ExternalLink from '..';
 
 const meta: Meta< typeof ExternalLink > = {
@@ -21,8 +14,9 @@ const meta: Meta< typeof ExternalLink > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'not-recommended',
 			whereUsed: 'global',
+			notes: 'Use [`Link`](?path=/docs/design-system-components-link--docs) from `@wordpress/ui` instead, with the `openInNewTab` prop set.',
 		},
 	},
 };

@@ -1,14 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useCallback } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { useControlledState } from '../utils/hooks';
 import { clamp } from '../utils/math';
-
 import type { UseControlledRangeValueArgs } from './types';
 
 /**

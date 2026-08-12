@@ -1,19 +1,9 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import ResizableBox from '..';
 
 const meta: Meta< typeof ResizableBox > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Utilities/ResizableBox',
 	id: 'components-resizablebox',
 	component: ResizableBox,
@@ -26,7 +16,7 @@ const meta: Meta< typeof ResizableBox > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

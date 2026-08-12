@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useMediaQuery, useViewportMatch } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useState } from '@wordpress/element';
 import { PinnedItems } from '@wordpress/interface';
-
-/**
- * Internal dependencies
- */
 import CollapsibleBlockToolbar from '../collapsible-block-toolbar';
 import DocumentBar from '../document-bar';
 import DocumentTools from '../document-tools';
@@ -23,12 +16,6 @@ import PostViewLink from '../post-view-link';
 import PreviewDropdown from '../preview-dropdown';
 import ZoomOutToggle from '../zoom-out-toggle';
 import { store as editorStore } from '../../store';
-import {
-	ATTACHMENT_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
-	PATTERN_POST_TYPE,
-	NAVIGATION_POST_TYPE,
-} from '../../store/constants';
 import { CollaboratorsPresence } from '../collaborators-presence/index';
 import { unlock } from '../../lock-unlock';
 
@@ -50,7 +37,6 @@ function Header( {
 		hasBlockSelection,
 		hasSectionRootClientId,
 		isStylesCanvasActive,
-		isAttachment,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
 		const {
@@ -78,23 +64,12 @@ function Header( {
 			isStylesCanvasActive:
 				!! getStylesPath()?.startsWith( '/revisions' ) ||
 				getShowStylebook(),
-			isAttachment:
-				getCurrentPostType() === ATTACHMENT_POST_TYPE &&
-				window?.__experimentalMediaEditor,
 		};
 	}, [] );
 
 	const canBeZoomedOut =
 		[ 'post', 'page', 'wp_template' ].includes( postType ) &&
 		hasSectionRootClientId;
-
-	const disablePreviewOption =
-		[
-			ATTACHMENT_POST_TYPE,
-			NAVIGATION_POST_TYPE,
-			TEMPLATE_PART_POST_TYPE,
-			PATTERN_POST_TYPE,
-		].includes( postType ) || isStylesCanvasActive;
 
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
@@ -109,13 +84,11 @@ function Header( {
 		<HeaderSkeleton
 			toolbar={
 				<>
-					{ ! isAttachment && (
-						<DocumentTools
-							disableBlockTools={
-								isStylesCanvasActive || isTextEditor
-							}
-						/>
-					) }
+					<DocumentTools
+						disableBlockTools={
+							isStylesCanvasActive || isTextEditor
+						}
+					/>
 					{ hasFixedToolbar && isLargeViewport && (
 						<CollapsibleBlockToolbar
 							isCollapsed={ isBlockToolsCollapsed }
@@ -137,6 +110,12 @@ function Header( {
 			}
 			settings={
 				<>
+					{ ! hasCenter && ! isTooNarrowForDocumentBar && (
+						<CollaboratorsPresence
+							postType={ postType }
+							postId={ postId }
+						/>
+					) }
 					{ ! customSaveButton && ! isPublishSidebarOpened && (
 						/*
 						 * This button isn't completely hidden by the publish sidebar.
@@ -152,7 +131,7 @@ function Header( {
 
 					<PreviewDropdown
 						forceIsAutosaveable={ forceIsDirty }
-						disabled={ disablePreviewOption }
+						disabled={ isStylesCanvasActive }
 					/>
 
 					<PostPreviewButton
@@ -177,7 +156,7 @@ function Header( {
 						/>
 					) }
 					{ customSaveButton }
-					{ ! isAttachment && <MoreMenu /> }
+					<MoreMenu />
 				</>
 			}
 		/>

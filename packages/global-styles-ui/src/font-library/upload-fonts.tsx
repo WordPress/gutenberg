@@ -1,9 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalVStack as VStack,
 	Button,
 	DropZone,
@@ -14,10 +11,6 @@ import {
 } from '@wordpress/components';
 import { useContext, useState } from '@wordpress/element';
 import type { FontFace } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { ALLOWED_FILE_EXTENSIONS } from './utils/constants';
 import { FontLibraryContext } from './context';
 import { Font } from './lib/lib-font.browser';
@@ -253,11 +246,11 @@ function UploadFonts() {
 						) }
 					/>
 				) }
-				<Text className="font-library__upload-area__text">
+				<WCText className="font-library__upload-area__text">
 					{ __(
 						'Uploaded fonts appear in your library and can be used in your theme. Supported formats: .ttf, .otf, .woff, and .woff2.'
 					) }
-				</Text>
+				</WCText>
 			</VStack>
 		</div>
 	);

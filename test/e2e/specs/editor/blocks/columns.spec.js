@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Columns', () => {
@@ -62,9 +59,9 @@ test.describe( 'Columns', () => {
 			)
 		);
 		await editor.clickBlockToolbarButton( 'Options' );
-		await page.click( 'role=menuitem[name="Lock"i]' );
+		await page.getByRole( 'menuitem', { name: 'Lock' } ).click();
 		await page.locator( 'role=checkbox[name="Lock removal"i]' ).check();
-		await page.click( 'role=button[name="Apply"i]' );
+		await page.getByRole( 'button', { name: 'Apply' } ).click();
 
 		// Select columns block
 		await editor.selectBlocks(
@@ -80,10 +77,11 @@ test.describe( 'Columns', () => {
 		await expect( columnsChangeInput ).toHaveAttribute( 'min', '3' );
 
 		// Changing the number of columns should take into account locked columns
-		await page.fill( 'role=spinbutton[name="Columns"i]', '1' );
+		await page.getByRole( 'spinbutton', { name: 'Columns' } ).fill( '1' );
 		await pageUtils.pressKeys( 'Tab' );
 		await expect( columnsChangeInput ).toHaveValue( '3' );
 	} );
+
 	test( 'Ungroup properly', async ( { editor } ) => {
 		await editor.insertBlock( {
 			name: 'core/columns',
@@ -379,11 +377,7 @@ test.describe( 'Columns', () => {
 		} );
 	} );
 
-	test( 'should arrow up into empty columns', async ( {
-		editor,
-		page,
-		pageUtils,
-	} ) => {
+	test( 'should arrow up into empty columns', async ( { editor, page } ) => {
 		await editor.insertBlock( {
 			name: 'core/columns',
 			innerBlocks: [ { name: 'core/column' }, { name: 'core/column' } ],
@@ -393,7 +387,7 @@ test.describe( 'Columns', () => {
 		} );
 
 		await page.keyboard.press( 'ArrowUp' );
-		await pageUtils.pressKeys( 'primary+a' );
+		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'Delete' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [

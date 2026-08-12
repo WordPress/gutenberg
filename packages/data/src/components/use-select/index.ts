@@ -1,6 +1,7 @@
-/**
- * WordPress dependencies
- */
+// useSelect is a low-level hook that intentionally breaks rules-of-hooks
+// in its internal helpers (_useStaticSelect, _useMappingSelect) where
+// hooks are called inside non-hook functions and conditionally dispatched.
+/* eslint-disable react-hooks/rules-of-hooks */
 import { createQueue } from '@wordpress/priority-queue';
 import {
 	useRef,
@@ -10,10 +11,6 @@ import {
 	useDebugValue,
 } from '@wordpress/element';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
-
-/**
- * Internal dependencies
- */
 import useRegistry from '../registry-provider/use-registry';
 import useAsyncMode from '../async-mode-provider/use-async-mode';
 import type {
@@ -367,3 +364,4 @@ export function useSuspenseSelect< T extends MapSelect >(
 ): ReturnType< T > {
 	return _useMappingSelect( true, mapSelect, deps ) as ReturnType< T >;
 }
+/* eslint-enable react-hooks/rules-of-hooks */

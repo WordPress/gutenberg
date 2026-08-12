@@ -4,13 +4,15 @@
 
 ```bash
 # Setup
+nvm use                    # Use the required node version
 npm install && composer install
-npm run wp-env status   # Always check status first
-npm run wp-env start    # Only start if not already running
+npm run wp-env-test status      # Always check status first.
+npm run wp-env-test start       # Only start if not already running.
 
 # Development
-npm start               # Development with watch
-npm run build          # Production build
+npm start     # Development with watch
+npm run build # Production build
+npm run build -- --skip-types # Faster build; skips type generation
 ```
 
 ### Key Directories
@@ -26,28 +28,17 @@ npm run build          # Production build
     -   `/docs/how-to-guides/` - Implementation tutorials
     -   `/docs/reference-guides/` - API documentation
 
-## Testing instructions
+## Progressive discovery
 
-> **Note**: PHP/E2E tests require wp-env running.
+Read only what your task needs, when it needs it:
+
+-   **Contributor docs**: before starting a task, check `docs/contributors/code/` for the guide covering that kind of work (coding guidelines, backward compatibility, workspaces, releases) and read the relevant one.
+-   **User-facing copy**: before writing or changing a string a user reads, read `docs/contributors/documentation/copy-guide.md` — it covers terminology, capitalization, and how to word an error message.
+-   **Directory guides**: some directories carry their own `AGENTS.md` and `README.md` with rules for working there (e.g. `packages/components/AGENTS.md`) — read it before changing files in that directory.
+
+## Code quality
 
 ```bash
-# JavaScript
-npm test                   # All JS tests
-npm run test:unit         # Unit tests
-npm run test:unit -- --testNamePattern="<TestName>"  # Specific test
-npm run test:unit <path_to_test_directory>
-
-# PHP (requires wp-env)
-composer test             # All PHP tests
-vendor/bin/phpunit <path_to_test_file.php>  # Specific file
-vendor/bin/phpunit <path_to_test_directory>/              # Directory
-
-# E2E (requires wp-env)
-npm run test:e2e
-npm run test:e2e -- <path_to_test_file.spec.js>  # Specific test file
-npm run test:e2e -- --headed                   # Run with browser visible
-
-# Code Quality
 npm run format            # Fix JS formatting
 npm run lint:js          # Check JS linting
 vendor/bin/phpcbf        # Fix PHP standards
@@ -69,10 +60,16 @@ For full architecture details, see `docs/explanations/architecture/`.
 
 ## Common pitfalls
 
--   PHP features in `lib/compat/` MUST target a specific `wordpress-X.Y/` subdirectory.
+-   Do not add dependencies to the root `package.json`. Add them to the workspace that uses them, or create a new workspace under `tools/` (or `test/` for test infrastructure). See [Workspace Development](docs/contributors/code/workspace-development.md).
+-   PHP features in `lib/compat/` MUST go in the `wordpress-X.Y/` directory for their intended WordPress release. Inspect the available compatibility directories first; do not assume the newest one is right.
 -   Avoid using private APIs in bundled packages (packages without `wpScript` or `wpModuleExports`). Private APIs are intended for Core usage; bundled packages may also be imported via npm into plugin scripts, causing incompatibilities.
+-   Avoid adding new APIs prefixed with `__experimental` or `__unstable`. This pattern is now not used. Instead use private APIs or in bundled packages regular exports.
 -   `block-editor` is a WordPress-agnostic package. NEVER add `core-data` dependencies or direct REST API calls to it.
 -   `@wordpress/build` (`packages/wp-build`) is a generic build tool used both in Gutenberg and by plugins targeting WordPress Core directly. Avoid Gutenberg-specific changes in it.
+-   Never invoke WordPress's forked or local CLIs through `npx` (e.g. `npx prettier`, `npx wp-scripts`). WordPress ships its own `wp-prettier` fork, and `wp-scripts` is the bin name of `@wordpress/scripts`. A bare `npx wp-scripts` can resolve to an unrelated third-party package on the public registry, not the local tool. Use the npm scripts instead (`npm run format`, `npm run lint:js`, `npm run lint:css` and so on), which run the binaries from local `node_modules`.
+-   PHP function and class names are renamed at build time (`gutenberg_*` prefix, `*_Gutenberg` suffix) to avoid conflicts with WordPress Core — the built names, not the source names, are what runs (and what tests must call). See `docs/contributors/code/build-system-function-prefixing.md`.
+-   Production code changes in a package require an entry in that package's `CHANGELOG.md`. See `docs/contributors/code/managing-packages.md`.
+-   A rejected `apiFetch` is not always an `Error`: a REST error arrives as a plain object (`{ code, message, data }`), `parse: false` rejects with the `Response` (which carries `status`, not `message`), an aborted request rethrows an `AbortError`, and a handler set via `setFetchHandler` can reject anything. Do not interpolate the rejection into a string (`` `${ error }` `` gives `[object Object]`) or branch on `instanceof Error`. Normalise it to a message before showing the user anything, and supply your own copy when there is none — `ensureError` in `packages/core-data/src/private-actions.js` is the reference implementation, though it is local to that file rather than exported.
 
 ## PR instructions
 

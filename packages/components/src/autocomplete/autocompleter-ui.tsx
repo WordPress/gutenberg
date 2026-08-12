@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import { createPortal } from 'react-dom';
-
-/**
- * WordPress dependencies
- */
 import {
 	useLayoutEffect,
 	useRef,
@@ -17,10 +10,6 @@ import { useAnchor } from '@wordpress/rich-text';
 import { useDebounce, useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import getDefaultUseItems from './get-default-use-items';
 import Button from '../button';
 import Popover from '../popover';
@@ -96,7 +85,6 @@ export function AutocompleterUI( {
 	// ensuring a fresh mount (and stable hook identity) when the completer changes.
 	const useItems =
 		autocompleter.useItems ?? getDefaultUseItems( autocompleter );
-	// eslint-disable-next-line react-compiler/react-compiler
 	const [ items ] = useItems( filterValue );
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,

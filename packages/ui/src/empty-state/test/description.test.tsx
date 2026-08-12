@@ -10,4 +10,17 @@ describe( 'EmptyState.Description', () => {
 
 		expect( ref.current ).toBeInstanceOf( HTMLParagraphElement );
 	} );
+
+	it( 'forwards ref to custom render element', () => {
+		const ref = createRef< HTMLDivElement >();
+
+		render(
+			<Description ref={ ref } render={ <div /> }>
+				Description text
+			</Description>
+		);
+
+		expect( ref.current ).toBeInstanceOf( HTMLDivElement );
+		expect( ref.current?.tagName ).toBe( 'DIV' );
+	} );
 } );

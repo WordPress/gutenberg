@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { getBlockSupport } from '@wordpress/blocks';
 import { memo, useMemo, useEffect, useId, useState } from '@wordpress/element';
 import { useDispatch, useRegistry } from '@wordpress/data';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
 import {
 	useBlockEditContext,
 	mayDisplayControlsKey,
@@ -269,6 +258,7 @@ export function useBlockSettings( name, parentLayout ) {
 		aspectRatio,
 		height,
 		minHeight,
+		minWidth,
 		width,
 		dimensionSizes,
 		layout,
@@ -332,6 +322,7 @@ export function useBlockSettings( name, parentLayout ) {
 		'dimensions.aspectRatio',
 		'dimensions.height',
 		'dimensions.minHeight',
+		'dimensions.minWidth',
 		'dimensions.width',
 		'dimensions.dimensionSizes',
 		'layout',
@@ -446,6 +437,7 @@ export function useBlockSettings( name, parentLayout ) {
 				aspectRatio,
 				height,
 				minHeight,
+				minWidth,
 				width,
 				dimensionSizes,
 			},
@@ -487,6 +479,7 @@ export function useBlockSettings( name, parentLayout ) {
 		aspectRatio,
 		height,
 		minHeight,
+		minWidth,
 		width,
 		dimensionSizes,
 		layout,

@@ -1,22 +1,12 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { getBlockType } from '@wordpress/blocks';
-import { Button, VisuallyHidden } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
+import { Button } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
+import { useInstanceId, useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { forwardRef } from '@wordpress/element';
-import { __, isRTL } from '@wordpress/i18n';
-import { displayShortcut } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
+import { forwardRef, useMemo } from '@wordpress/element';
+import { __, isRTL, sprintf } from '@wordpress/i18n';
+import { displayShortcut, shortcutAriaLabel } from '@wordpress/keycodes';
 import {
 	chevronLeft,
 	chevronRight,
@@ -62,10 +52,12 @@ const BlockMoverButton = forwardRef(
 		ref
 	) => {
 		const instanceId = useInstanceId( BlockMoverButton );
-		const normalizedClientIds = Array.isArray( clientIds )
-			? clientIds
-			: [ clientIds ];
+		const normalizedClientIds = useMemo(
+			() => ( Array.isArray( clientIds ) ? clientIds : [ clientIds ] ),
+			[ clientIds ]
+		);
 		const blocksCount = normalizedClientIds.length;
+		const isMobileViewport = useViewportMatch( 'small', '<' );
 
 		const {
 			blockType,
@@ -107,7 +99,7 @@ const BlockMoverButton = forwardRef(
 					orientation: moverOrientation || blockListOrientation,
 				};
 			},
-			[ clientIds, direction ]
+			[ direction, moverOrientation, normalizedClientIds ]
 		);
 
 		const { moveBlocksDown, moveBlocksUp } =
@@ -123,6 +115,7 @@ const BlockMoverButton = forwardRef(
 		};
 
 		const descriptionId = `block-editor-block-mover-button__description-${ instanceId }`;
+		const keyCharacter = direction === 'up' ? 't' : 'y';
 
 		return (
 			<>
@@ -138,26 +131,34 @@ const BlockMoverButton = forwardRef(
 						direction,
 						orientation
 					) }
+					tooltipPosition={
+						! isMobileViewport &&
+						direction === 'down' &&
+						orientation === 'vertical'
+							? 'bottom'
+							: 'top'
+					}
 					aria-describedby={ descriptionId }
 					{ ...props }
 					onClick={ isDisabled ? null : onClick }
 					disabled={ isDisabled }
 					accessibleWhenDisabled
-					shortcut={
-						direction === 'up'
-							? displayShortcut.secondary( 't' )
-							: displayShortcut.secondary( 'y' )
-					}
+					shortcut={ displayShortcut.secondary( keyCharacter ) }
 				/>
 				<VisuallyHidden id={ descriptionId }>
-					{ getBlockMoverDescription(
-						blocksCount,
-						blockType && blockType.title,
-						firstIndex,
-						isFirst,
-						isLast,
-						direction === 'up' ? -1 : 1,
-						orientation
+					{ sprintf(
+						// translators: 1: Description of the block movement. 2: Keyboard shortcut.
+						__( '%1$s (%2$s)' ),
+						getBlockMoverDescription(
+							blocksCount,
+							blockType && blockType.title,
+							firstIndex,
+							isFirst,
+							isLast,
+							direction === 'up' ? -1 : 1,
+							orientation
+						),
+						shortcutAriaLabel.secondary( keyCharacter )
 					) }
 				</VisuallyHidden>
 			</>

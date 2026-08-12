@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	useEntityRecord,
@@ -11,7 +8,7 @@ import { BlockPreview } from '@wordpress/block-editor';
 import {
 	PanelBody,
 	Button,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
@@ -20,10 +17,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import CreateNewTemplateModal from '../post-template/create-new-template-modal';
 
@@ -117,11 +110,11 @@ export default function ClassicThemeContent() {
 			>
 				<VStack>
 					{ ! templateId && (
-						<Text>
+						<WCText>
 							{ __(
 								'This page uses a classic template. To edit this template with blocks, create a block template.'
 							) }
-						</Text>
+						</WCText>
 					) }
 					{ template && previewContent && (
 						<div className="editor-template-actions-panel__preview">

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	AlignmentControl,
 	BlockControls,
@@ -14,10 +7,6 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import Placeholder from './placeholder';
 
 export default function CommentsLegacy( {

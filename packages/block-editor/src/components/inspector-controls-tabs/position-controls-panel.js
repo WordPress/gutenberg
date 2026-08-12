@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalUseSlotFills as useSlotFills,
 	__experimentalToolsPanel as ToolsPanel,
@@ -8,10 +5,6 @@ import {
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import InspectorControlsGroups from '../inspector-controls/groups';
 import { default as InspectorControls } from '../inspector-controls';
 import { store as blockEditorStore } from '../../store';

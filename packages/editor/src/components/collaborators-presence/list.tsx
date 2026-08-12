@@ -3,13 +3,10 @@ import { Popover, Button } from '@wordpress/components';
 import { closeSmall } from '@wordpress/icons';
 import { type PostEditorAwarenessState } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
-
 import Avatar from './avatar';
 import { getAvatarUrl } from '../collaborators-overlay/get-avatar-url';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import { type CursorRegistry } from '../collaborators-overlay/cursor-registry';
-
-import './styles/collaborators-list.scss';
 
 interface CollaboratorsListProps {
 	activeCollaborators: PostEditorAwarenessState[];

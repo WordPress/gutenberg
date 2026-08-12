@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Notice,
 	__experimentalConfirmDialog as ConfirmDialog,

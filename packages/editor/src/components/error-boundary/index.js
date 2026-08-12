@@ -1,20 +1,13 @@
-/**
- * WordPress dependencies
- */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	Button,
 	__experimentalHStack as HStack,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 } from '@wordpress/components';
 import { select } from '@wordpress/data';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { doAction } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 
 function getContent() {
@@ -71,9 +64,9 @@ class ErrorBoundary extends Component {
 				expanded={ false }
 				wrap
 			>
-				<Text as="p">
+				<WCText as="p">
 					{ __( 'The editor has encountered an unexpected error.' ) }
-				</Text>
+				</WCText>
 				<HStack expanded={ false }>
 					{ canCopyContent && (
 						<CopyButton text={ getContent }>

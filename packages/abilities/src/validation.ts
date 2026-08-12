@@ -7,16 +7,8 @@
  *
  * @see https://developer.wordpress.org/rest-api/extending-the-rest-api/schema/#json-schema-basics
  */
-
-/**
- * External dependencies
- */
 import Ajv from 'ajv-draft-04';
 import addFormats from 'ajv-formats';
-
-/**
- * Internal dependencies
- */
 import type { ValidationError } from './types';
 
 const ajv = new Ajv( {
@@ -28,7 +20,15 @@ const ajv = new Ajv( {
 	allowUnionTypes: true, // Allow anyOf without explicit type
 } );
 
-addFormats( ajv, [ 'date-time', 'email', 'hostname', 'ipv4', 'ipv6', 'uuid' ] );
+addFormats( ajv, [
+	'date-time',
+	'email',
+	'hostname',
+	'ipv4',
+	'ipv6',
+	'uri',
+	'uuid',
+] );
 
 /**
  * Formats AJV errors into a simple error message.
@@ -78,6 +78,7 @@ function formatAjvError( ajvError: any, param: string ): string {
 				ipv4: `${ fullParam } is not a valid IP address.`,
 				ipv6: `${ fullParam } is not a valid IP address.`,
 				hostname: `${ fullParam } is not a valid hostname.`,
+				uri: `${ fullParam } is not a valid URI.`,
 			};
 			return formatMessages[ format ] || `Invalid ${ format }.`;
 

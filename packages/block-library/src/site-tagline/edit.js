@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
@@ -59,8 +56,13 @@ export default function SiteTaglineEdit( props ) {
 			tagName={ TagName }
 			value={ tagline }
 			disableLineBreaks
-			__unstableOnSplitAtEnd={ () =>
-				insertBlocksAfter( createBlock( getDefaultBlockName() ) )
+			__unstableOnSplitAtEnd={
+				insertBlocksAfter
+					? () =>
+							insertBlocksAfter(
+								createBlock( getDefaultBlockName() )
+							)
+					: undefined
 			}
 			{ ...blockProps }
 		/>

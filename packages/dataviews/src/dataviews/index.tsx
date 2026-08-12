@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import type { ReactNode, ComponentProps, ReactElement } from 'react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	useContext,
 	useEffect,
@@ -16,10 +9,6 @@ import {
 } from '@wordpress/element';
 import { useResizeObserver } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import DataViewsContext from '../components/dataviews-context';
 import { VIEW_LAYOUTS } from '../components/dataviews-layouts';
 import {
@@ -57,7 +46,7 @@ type DataViewsProps< Item > = {
 		totalItems: number;
 		totalPages: number;
 	};
-	defaultLayouts: SupportedLayouts;
+	defaultLayouts?: SupportedLayouts;
 	selection?: string[];
 	onChangeSelection?: ( items: string[] ) => void;
 	onClickItem?: ( item: Item ) => void;
@@ -82,6 +71,7 @@ type DataViewsProps< Item > = {
 const defaultGetItemId = ( item: ItemWithId ) => item.id;
 const defaultIsItemClickable = () => true;
 const EMPTY_ARRAY: any[] = [];
+const DEFAULT_LAYOUTS: SupportedLayouts = { table: {}, grid: {}, list: {} };
 
 const dataViewsLayouts = VIEW_LAYOUTS.filter(
 	( viewLayout ) => ! viewLayout.isPicker
@@ -144,7 +134,7 @@ function DataViews< Item >( {
 	getItemLevel,
 	isLoading = false,
 	paginationInfo,
-	defaultLayouts: defaultLayoutsProperty,
+	defaultLayouts: defaultLayoutsProperty = DEFAULT_LAYOUTS,
 	selection: selectionProperty,
 	onChangeSelection,
 	onClickItem,
@@ -241,17 +231,20 @@ function DataViews< Item >( {
 		}
 	}, [ hasPrimaryOrLockedFilters, isShowingFilter ] );
 
-	// Filter out DataViewsPicker layouts.
+	// Filter out DataViewsPicker layouts and normalize `true` to `{}`.
 	const defaultLayouts = useMemo(
 		() =>
 			Object.fromEntries(
-				Object.entries( defaultLayoutsProperty ).filter(
-					( [ layoutType ] ) => {
+				Object.entries( defaultLayoutsProperty )
+					.filter( ( [ layoutType ] ) => {
 						return dataViewsLayouts.some(
 							( viewLayout ) => viewLayout.type === layoutType
 						);
-					}
-				)
+					} )
+					.map( ( [ key, value ] ) => [
+						key,
+						value === true ? {} : value,
+					] )
 			),
 		[ defaultLayoutsProperty ]
 	);
@@ -306,6 +299,11 @@ function DataViews< Item >( {
 	);
 }
 
+/**
+ * `DataViews` renders a dataset using configurable layouts (table, grid, list)
+ * with built-in search, filtering, sorting, pagination, and actions. Use it to
+ * display and manage a collection of records.
+ */
 // Populate the DataViews sub components
 const DataViewsSubComponents = DataViews as typeof DataViews & {
 	BulkActionToolbar: typeof BulkActionsFooter;

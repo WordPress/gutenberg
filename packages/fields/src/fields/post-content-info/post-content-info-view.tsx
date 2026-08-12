@@ -1,8 +1,5 @@
-/**
- * WordPress dependencies
- */
 import {
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __, _x, _n, sprintf } from '@wordpress/i18n';
@@ -10,10 +7,6 @@ import { count as wordCount } from '@wordpress/wordcount';
 import type { Strategy } from '@wordpress/wordcount';
 import { humanTimeDiff } from '@wordpress/date';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { BasePostWithEditedEntity } from '../../types';
 
 // Taken from packages/editor/src/components/time-to-read/index.js.
@@ -78,16 +71,16 @@ export default function PostContentInfoView( {
 	return (
 		<VStack spacing={ 1 }>
 			{ contentInfoText && (
-				<Text variant="muted">{ contentInfoText }</Text>
+				<WCText variant="muted">{ contentInfoText }</WCText>
 			) }
 			{ modified && (
-				<Text variant="muted">
+				<WCText variant="muted">
 					{ sprintf(
 						// translators: %s: Human-readable time difference, e.g. "2 days ago".
 						__( 'Last edited %s.' ),
 						humanTimeDiff( modified )
 					) }
-				</Text>
+				</WCText>
 			) }
 		</VStack>
 	);

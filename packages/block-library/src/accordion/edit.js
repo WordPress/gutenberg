@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useBlockProps,
 	useInnerBlocksProps,
@@ -22,10 +19,6 @@ import {
 } from '@wordpress/components';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const ACCORDION_BLOCK_NAME = 'core/accordion-item';
@@ -58,10 +51,8 @@ export default function Edit( {
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: [ [ ACCORDION_BLOCK_NAME ] ],
 		defaultBlock: ACCORDION_BLOCK,
 		directInsert: true,
-		templateInsertUpdatesSelection: true,
 	} );
 
 	const addAccordionItemBlock = () => {
@@ -140,7 +131,6 @@ export default function Edit( {
 						}
 					>
 						<ToggleControl
-							isBlock
 							label={ __( 'Auto-close' ) }
 							onChange={ ( value ) => {
 								setAttributes( {
@@ -160,7 +150,6 @@ export default function Edit( {
 						onDeselect={ () => setAttributes( { showIcon: true } ) }
 					>
 						<ToggleControl
-							isBlock
 							label={ __( 'Show icon' ) }
 							onChange={ ( value ) => {
 								setAttributes( {
@@ -186,7 +175,6 @@ export default function Edit( {
 							}
 						>
 							<ToggleGroupControl
-								__next40pxDefaultSize
 								isBlock
 								label={ __( 'Icon Position' ) }
 								value={ iconPosition }

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
 import type { GlobalStylesConfig } from '../types';
 
@@ -38,6 +35,7 @@ const VALID_SETTINGS = [
 	'dimensions.aspectRatio',
 	'dimensions.height',
 	'dimensions.minHeight',
+	'dimensions.minWidth',
 	'dimensions.width',
 	'dimensions.dimensionSizes',
 	'layout.contentSize',
@@ -71,6 +69,8 @@ const VALID_SETTINGS = [
 	'typography.textIndent',
 	'typography.textTransform',
 	'typography.writingMode',
+	'viewport.mobile',
+	'viewport.tablet',
 ];
 
 export function getSetting< T = any >(

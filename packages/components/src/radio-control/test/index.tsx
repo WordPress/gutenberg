@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import RadioControl from '../';
 
 const ControlledRadioControl = ( {
@@ -80,6 +69,16 @@ describe.each( [
 			expect(
 				screen.getByRole( 'radiogroup', { name: defaultProps.label } )
 			).toBeVisible();
+		} );
+
+		it( 'should disable the radio group when `disabled` is true', () => {
+			render(
+				<Component { ...defaultProps } disabled onChange={ () => {} } />
+			);
+
+			expect(
+				screen.getByRole( 'radiogroup', { name: defaultProps.label } )
+			).toBeDisabled();
 		} );
 
 		it( 'should describe the radio group with the help text', () => {

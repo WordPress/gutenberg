@@ -1,13 +1,7 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
 // eslint-disable-next-line @wordpress/use-recommended-components -- admin-ui is a bundled package that depends on @wordpress/ui
 import { Badge, Button, Text } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
+import { Icon, wordpress } from '@wordpress/icons';
 import Page from '..';
 import Breadcrumbs from '../../breadcrumbs';
 import { withRouter } from '../../stories/with-router';
@@ -62,6 +56,54 @@ export const WithBreadcrumbs: Story = {
 				] }
 			/>
 		),
+		hasPadding: true,
+		children: <Text>Page content here</Text>,
+	},
+};
+
+export const WithVisual: Story = {
+	args: {
+		title: 'Page title',
+		visual: <Icon icon={ wordpress } size={ 24 } />,
+		showSidebarToggle: false,
+		hasPadding: true,
+		children: <Text>Page content here</Text>,
+	},
+};
+
+export const WithVisualAndBreadcrumbs: Story = {
+	args: {
+		visual: <Icon icon={ wordpress } size={ 24 } />,
+		showSidebarToggle: false,
+		breadcrumbs: (
+			<Breadcrumbs
+				items={ [
+					{ label: 'Root breadcrumb', to: '/connectors' },
+					{ label: 'Level 1 breadcrumb' },
+				] }
+			/>
+		),
+		hasPadding: true,
+		children: <Text>Page content here</Text>,
+	},
+};
+
+/**
+ * Demonstrates that large images are constrained by the header visual styles.
+ *
+ * The `img` uses an empty `alt` because the visual region is hidden from assistive
+ * technologies and the page title carries the accessible name.
+ */
+export const WithImageVisual: Story = {
+	args: {
+		title: 'Page title',
+		visual: (
+			<img
+				src="https://secure.gravatar.com/avatar/c0ccdd53794779bcc07fcae7b79c4d80?s=48&r=g&d=mm"
+				alt=""
+			/>
+		),
+		showSidebarToggle: false,
 		hasPadding: true,
 		children: <Text>Page content here</Text>,
 	},
@@ -140,6 +182,7 @@ export const WithActions: Story = {
 
 export const FullHeader: Story = {
 	args: {
+		visual: <Icon icon={ wordpress } size={ 24 } />,
 		subTitle: 'All of the subtitle text you need goes here.',
 		breadcrumbs: (
 			<Breadcrumbs

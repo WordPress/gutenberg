@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { __, isRTL } from '@wordpress/i18n';
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { ExternalLinkProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
@@ -23,17 +12,7 @@ function UnforwardedExternalLink(
 	>,
 	ref: ForwardedRef< HTMLAnchorElement >
 ) {
-	const { href, children, className, rel = '', ...additionalProps } = props;
-	const optimizedRel = [
-		...new Set(
-			[
-				...rel.split( ' ' ),
-				'external',
-				'noreferrer',
-				'noopener',
-			].filter( Boolean )
-		),
-	].join( ' ' );
+	const { href, children, className, ...additionalProps } = props;
 	const classes = clsx( 'components-external-link', className );
 	/* Anchor links are perceived as external links.
 	This constant helps check for on page anchor links,
@@ -60,7 +39,6 @@ function UnforwardedExternalLink(
 			href={ href }
 			onClick={ onClickHandler }
 			target="_blank"
-			rel={ optimizedRel }
 			ref={ ref }
 		>
 			<span className="components-external-link__contents">
