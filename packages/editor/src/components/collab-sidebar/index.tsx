@@ -1,9 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
@@ -12,11 +9,6 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 // @ts-expect-error - No type declarations available for @wordpress/interface
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { registerFormatType, unregisterFormatType } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import PluginSidebar from '../plugin-sidebar';
 import {
 	ALL_NOTES_SIDEBAR,
@@ -36,20 +28,10 @@ import {
 	readMultiBlockSelection,
 } from './utils';
 import type { Thread } from './utils';
-import { NOTE_FORMAT_NAME, noteFormat } from './format';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
 
 function NotesSidebar( { postId }: { postId: number } ) {
-	useEffect( () => {
-		// @ts-expect-error noteFormat is an untyped JS settings object; the
-		// WPFormat type requires fields the runtime treats as optional.
-		registerFormatType( NOTE_FORMAT_NAME, noteFormat );
-		return () => {
-			unregisterFormatType( NOTE_FORMAT_NAME );
-		};
-	}, [] );
-
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const { toggleBlockSpotlight, selectBlock } = unlock(

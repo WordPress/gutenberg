@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { Spinner } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { useStylesId } from '../../hooks/use-styles-id';
 import { useEditorSettings } from '../../hooks/use-editor-settings';
 import { useEditorAssets } from '../../hooks/use-editor-assets';

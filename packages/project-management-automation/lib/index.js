@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 const { setFailed, getInput } = require( '@actions/core' );
 const { getOctokit, context } = require( '@actions/github' );
-
-/**
- * Internal dependencies
- */
 const assignFixedIssues = require( './tasks/assign-fixed-issues' );
 const firstTimeContributorAccountLink = require( './tasks/first-time-contributor-account-link' );
 const firstTimeContributorLabel = require( './tasks/first-time-contributor-label' );

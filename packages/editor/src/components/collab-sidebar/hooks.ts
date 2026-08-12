@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import {
@@ -20,15 +17,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 // @ts-expect-error - No type declarations available for @wordpress/interface
 import { store as interfaceStore } from '@wordpress/interface';
 import { RichTextData, create, toHTMLString } from '@wordpress/rich-text';
-
-/**
- * External dependencies
- */
 import type { MutableRefObject } from 'react';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { FLOATING_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
@@ -521,9 +510,14 @@ export function useNoteActions() {
 					},
 				};
 
-				await saveEntityRecord( 'root', 'comment', newNoteData, {
-					throwOnError: true,
-				} );
+				const savedRecord = await saveEntityRecord(
+					'root',
+					'comment',
+					newNoteData,
+					{
+						throwOnError: true,
+					}
+				);
 
 				// Resolving a note drops its inline highlight: strip the marker
 				// so the note falls back to a block-level note in the content.
@@ -543,28 +537,37 @@ export function useNoteActions() {
 						? __( 'Note marked as resolved.' )
 						: __( 'Note reopened.' )
 				);
-			} else {
-				const updateData = {
-					id,
-					content,
-					status,
-				};
 
-				await saveEntityRecord( 'root', 'comment', updateData, {
-					throwOnError: true,
-				} );
-
-				createNotice(
-					// @ts-expect-error The notices types don't cover the
-					// custom 'snackbar' status used here.
-					'snackbar',
-					__( 'Note updated.' ),
-					{
-						type: 'snackbar',
-						isDismissible: true,
-					}
-				);
+				return savedRecord;
 			}
+
+			const updateData = {
+				id,
+				content,
+				status,
+			};
+
+			const savedRecord = await saveEntityRecord(
+				'root',
+				'comment',
+				updateData,
+				{
+					throwOnError: true,
+				}
+			);
+
+			createNotice(
+				// @ts-expect-error The notices types don't cover the custom
+				// 'snackbar' status used here.
+				'snackbar',
+				__( 'Note updated.' ),
+				{
+					type: 'snackbar',
+					isDismissible: true,
+				}
+			);
+
+			return savedRecord;
 		} catch ( error ) {
 			onError( error );
 		}
@@ -626,6 +629,8 @@ export function useNoteActions() {
 					isDismissible: true,
 				}
 			);
+
+			return true;
 		} catch ( error ) {
 			onError( error );
 		}
@@ -709,18 +714,31 @@ export function useFloatingBoard( {
 		};
 
 		// Recalc is deferred to a rAF; back-to-back updates collapse into one paint.
-		const rafId = window.requestAnimationFrame( () => {
-			const result = calculateNotePositions( {
-				threads,
-				selectedNoteId,
-				blockRects: store.getBlockRects(),
-				heights,
-				scrollTop: canvas?.scrollTop ?? 0,
-			} );
+		let rafId;
+		const schedule = () => {
+			window.cancelAnimationFrame( rafId );
+			rafId = window.requestAnimationFrame( () => {
+				const result = calculateNotePositions( {
+					threads,
+					selectedNoteId,
+					blockRects: store.getAnchorRects(),
+					heights,
+					scrollTop: canvas?.scrollTop ?? 0,
+				} );
 
-			setNotePositions( result.positions );
-			applyScroll();
-		} );
+				setNotePositions( result.positions );
+				applyScroll();
+			} );
+		};
+
+		schedule();
+
+		// Anchors are read from the DOM, so editing, adding or removing any
+		// block leaves the threads after it stale.
+		const contentObserver = new window.ResizeObserver( schedule );
+		if ( rootEl ) {
+			contentObserver.observe( rootEl );
+		}
 
 		// Root scrolling elements (documentElement/body) don't fire scroll
 		// on themselves; capture on the window catches them in either canvas.
@@ -730,6 +748,7 @@ export function useFloatingBoard( {
 
 		return () => {
 			window.cancelAnimationFrame( rafId );
+			contentObserver.disconnect();
 			view?.removeEventListener( 'scroll', applyScroll, listenerOptions );
 		};
 	}, [ sidebarRef, heights, isFloating, selectedNoteId, store, threads ] );

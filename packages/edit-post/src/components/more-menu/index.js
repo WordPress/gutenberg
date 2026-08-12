@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { displayShortcut } from '@wordpress/keycodes';
 import { PreferenceToggleMenuItem } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import ManagePatternsMenuItem from './manage-patterns-menu-item';
 import WelcomeGuideMenuItem from './welcome-guide-menu-item';

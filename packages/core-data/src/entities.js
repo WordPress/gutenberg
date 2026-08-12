@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { capitalCase, pascalCase } from 'change-case';
-
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import { __unstableSerializeAndClean, parse } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { PostEditorAwareness } from './awareness/post-editor-awareness';
 import { getSyncManager } from './sync';
 import {
@@ -49,8 +38,10 @@ export const rootEntitiesConfig = [
 				'description',
 				'gmt_offset',
 				'home',
+				'image_max_bit_depth',
 				'image_sizes',
 				'image_size_threshold',
+				'image_strip_meta',
 				'name',
 				'site_icon',
 				'site_icon_url',

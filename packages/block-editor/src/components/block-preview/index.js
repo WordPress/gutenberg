@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useDisabled, useMergeRefs } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { memo, useMemo } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { ExperimentalBlockEditorProvider } from '../provider';
 import AutoHeightBlockPreview from './auto';
 import EditorStyles from '../editor-styles';

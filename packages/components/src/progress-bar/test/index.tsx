@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { ProgressBar } from '..';
 import { INDETERMINATE_TRACK_WIDTH } from '../styles';
 

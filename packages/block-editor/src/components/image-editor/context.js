@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { createContext, useContext, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import useSaveImage from './use-save-image';
 import useTransformImage from './use-transform-image';
 

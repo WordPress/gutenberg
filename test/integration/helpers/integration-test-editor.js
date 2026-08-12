@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useState, useEffect } from '@wordpress/element';
 import {
 	BlockEditorProvider,
@@ -25,10 +18,6 @@ import {
 	unregisterFormatType,
 } from '@wordpress/rich-text';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { waitForStoreResolvers } from './wait-for-store-resolvers';
 import { unlock } from '../../../packages/block-library/src/lock-unlock';
 

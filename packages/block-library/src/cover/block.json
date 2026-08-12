@@ -100,6 +100,7 @@
 	},
 	"usesContext": [ "postId", "postType" ],
 	"supports": {
+		"__experimentalOnEnter": true,
 		"anchor": true,
 		"align": true,
 		"html": false,

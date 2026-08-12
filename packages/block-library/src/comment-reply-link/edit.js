@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { _x } from '@wordpress/i18n';
 import { useBlockProps } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
 function Edit( props ) {

@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const { readdir, stat, readFile } = require( 'fs/promises' );
 

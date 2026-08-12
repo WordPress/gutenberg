@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { FlexItem } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { NoteByline } from './note-byline';
 import type { Thread } from './utils';
 

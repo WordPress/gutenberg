@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Warning } from '@wordpress/block-editor';
 import { Button, Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';

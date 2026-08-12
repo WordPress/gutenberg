@@ -1,20 +1,146 @@
-/**
- * Internal dependencies
- */
 import {
+	finalizePreparedNpmRelease,
 	getNpmReleasePackages,
 	getNpmReleaseGitRecoveryCommands,
 	getRemoteBranchSha,
 	getRemoteTagShas,
 	getTagPushCommands,
 	getTagRefspec,
+	prepareNpmRelease,
 	publishPackagesToNpm,
 	publishVersionedPackagesToNpm,
 	pushNpmReleaseGitMetadata,
 	runNpmPublishPreflight,
 	runNpmReleasePhase,
+	runPackagesRelease,
 	verifyRemotePackageTags,
 } from '../packages';
+
+describe( 'prepareNpmRelease', () => {
+	it.each( [
+		[ 'latest', 'release/23.5' ],
+		[ 'next', 'trunk' ],
+		[ 'bugfix', undefined ],
+		[ 'wp', undefined ],
+	] )(
+		'prepares a %s release',
+		async ( releaseType, expectedPluginReleaseBranch ) => {
+			const config = {
+				gitWorkingDirectoryPath: '/repo',
+				releaseType,
+			};
+			const checkoutNpmReleaseBranchFn = jest.fn();
+			const findPluginReleaseBranchNameFn = jest
+				.fn()
+				.mockResolvedValue( 'release/23.5' );
+			const runNpmReleaseBranchSyncStepFn = jest.fn();
+			const updatePackagesFn = jest
+				.fn()
+				.mockResolvedValue( 'changelog-sha' );
+
+			await expect(
+				prepareNpmRelease( config, {
+					checkoutNpmReleaseBranchFn,
+					findPluginReleaseBranchNameFn,
+					runNpmReleaseBranchSyncStepFn,
+					updatePackagesFn,
+				} )
+			).resolves.toEqual( {
+				changelogCommit: 'changelog-sha',
+				pluginReleaseBranch: expectedPluginReleaseBranch,
+			} );
+			expect( findPluginReleaseBranchNameFn.mock.calls ).toEqual(
+				releaseType === 'latest' ? [ [ '/repo' ] ] : []
+			);
+			expect( checkoutNpmReleaseBranchFn.mock.calls ).toEqual(
+				[ 'bugfix', 'wp' ].includes( releaseType ) ? [ [ config ] ] : []
+			);
+			expect( runNpmReleaseBranchSyncStepFn.mock.calls ).toEqual(
+				expectedPluginReleaseBranch
+					? [ [ expectedPluginReleaseBranch, config ] ]
+					: []
+			);
+			expect( updatePackagesFn ).toHaveBeenCalledTimes( 1 );
+			expect( updatePackagesFn ).toHaveBeenCalledWith( config );
+		}
+	);
+} );
+
+describe( 'finalizePreparedNpmRelease', () => {
+	it.each( [
+		[ 'latest', 'release/23.5', [ 'trunk', 'release/23.5' ] ],
+		[ 'bugfix', undefined, [ 'trunk' ] ],
+		[ 'next', undefined, [] ],
+		[ 'wp', undefined, [] ],
+	] )(
+		'finalizes a %s release',
+		async ( releaseType, pluginReleaseBranch, expectedBranches ) => {
+			const config = { releaseType };
+			const backportCommitsToBranchFn = jest.fn();
+			const commits = [ 'changelog-sha', 'publish-sha' ];
+
+			await finalizePreparedNpmRelease(
+				config,
+				{
+					changelogCommit: commits[ 0 ],
+					pluginReleaseBranch,
+					publishCommit: commits[ 1 ],
+				},
+				{ backportCommitsToBranchFn }
+			);
+
+			expect( backportCommitsToBranchFn.mock.calls ).toEqual(
+				expectedBranches.map( ( branch ) => [
+					branch,
+					commits,
+					config,
+				] )
+			);
+		}
+	);
+} );
+
+describe( 'runPackagesRelease', () => {
+	it( 'runs the release lifecycle in order', async () => {
+		const config = {
+			gitWorkingDirectoryPath: '/repo',
+			interactive: false,
+		};
+		const releaseState = { changelogCommit: 'changelog-sha' };
+		const prepareNpmReleaseFn = jest.fn().mockResolvedValue( releaseState );
+		const publishPreparedPackagesToNpmFn = jest
+			.fn()
+			.mockResolvedValue( 'publish-sha' );
+		const finalizePreparedNpmReleaseFn = jest.fn();
+
+		await runPackagesRelease( config, [], {
+			finalizePreparedNpmReleaseFn,
+			prepareNpmReleaseFn,
+			publishPreparedPackagesToNpmFn,
+		} );
+
+		expect( prepareNpmReleaseFn ).toHaveBeenCalledTimes( 1 );
+		expect( prepareNpmReleaseFn ).toHaveBeenCalledWith( config );
+		expect( publishPreparedPackagesToNpmFn ).toHaveBeenCalledTimes( 1 );
+		expect( publishPreparedPackagesToNpmFn ).toHaveBeenCalledWith( config );
+		expect( finalizePreparedNpmReleaseFn ).toHaveBeenCalledTimes( 1 );
+		expect( finalizePreparedNpmReleaseFn ).toHaveBeenCalledWith( config, {
+			changelogCommit: 'changelog-sha',
+			publishCommit: 'publish-sha',
+		} );
+		expect(
+			prepareNpmReleaseFn.mock.invocationCallOrder[ 0 ]
+		).toBeLessThan(
+			publishPreparedPackagesToNpmFn.mock.invocationCallOrder[ 0 ]
+		);
+		expect(
+			publishPreparedPackagesToNpmFn.mock.invocationCallOrder[ 0 ]
+		).toBeLessThan(
+			finalizePreparedNpmReleaseFn.mock.invocationCallOrder[ 0 ]
+		);
+		expect( console ).toHaveLogged();
+	} );
+} );
 
 describe( 'getNpmReleasePackages', () => {
 	it( 'returns public packages tagged at HEAD', async () => {
@@ -215,10 +341,13 @@ describe( 'verifyRemotePackageTags', () => {
 } );
 
 describe( 'runNpmPublishPreflight', () => {
-	it( 'uses the npm access command supported by current npm versions', async () => {
+	// npm whoami output, intentionally padded to verify it is trimmed.
+	const WHOAMI = { stdout: 'wp-user\n' };
+
+	it( 'verifies npm authentication before checking registry state', async () => {
 		const commandFn = jest
 			.fn()
-			.mockResolvedValueOnce()
+			.mockResolvedValueOnce( WHOAMI )
 			.mockRejectedValueOnce( {
 				stderr: 'npm ERR! code E404',
 			} );
@@ -237,11 +366,10 @@ describe( 'runNpmPublishPreflight', () => {
 			)
 		).resolves.toEqual( [] );
 
-		expect( commandFn ).toHaveBeenNthCalledWith(
-			1,
-			'npm access list packages @wordpress --json',
-			{ cwd: '/repo', stdio: 'pipe' }
-		);
+		expect( commandFn ).toHaveBeenNthCalledWith( 1, 'npm whoami', {
+			cwd: '/repo',
+			stdio: 'pipe',
+		} );
 		expect( commandFn ).toHaveBeenNthCalledWith(
 			2,
 			'npm view @wordpress/a11y@4.50.0 version gitHead dist-tags --json',
@@ -250,10 +378,34 @@ describe( 'runNpmPublishPreflight', () => {
 		expect( console ).toHaveLogged();
 	} );
 
+	it( 'fails without checking registry state when npm authentication fails', async () => {
+		const commandFn = jest.fn().mockRejectedValueOnce(
+			Object.assign( new Error( 'Command failed: npm whoami' ), {
+				stderr: 'npm ERR! code ENEEDAUTH',
+			} )
+		);
+
+		await expect(
+			runNpmPublishPreflight(
+				{
+					distTag: 'latest',
+					gitWorkingDirectoryPath: '/repo',
+					publishCommit: 'publish-sha',
+					releasePackages: [
+						{ name: '@wordpress/a11y', version: '4.50.0' },
+					],
+				},
+				{ commandFn }
+			)
+		).rejects.toThrow( 'Command failed: npm whoami' );
+		expect( commandFn ).toHaveBeenCalledTimes( 1 );
+		expect( console ).toHaveLogged();
+	} );
+
 	it( 'accepts a published version from the prepared commit with the expected dist-tag', async () => {
 		const commandFn = jest
 			.fn()
-			.mockResolvedValueOnce()
+			.mockResolvedValueOnce( WHOAMI )
 			.mockResolvedValueOnce( {
 				stdout: '{"version":"4.50.0","gitHead":"publish-sha","dist-tags":{"latest":"4.50.0"}}',
 			} );
@@ -278,7 +430,7 @@ describe( 'runNpmPublishPreflight', () => {
 	it( 'fails when a published version came from another commit', async () => {
 		const commandFn = jest
 			.fn()
-			.mockResolvedValueOnce()
+			.mockResolvedValueOnce( WHOAMI )
 			.mockResolvedValueOnce( {
 				stdout: '{"version":"4.50.0","gitHead":"other-sha","dist-tags":{"latest":"4.50.0"}}',
 			} );
@@ -304,7 +456,7 @@ describe( 'runNpmPublishPreflight', () => {
 	it( 'fails with an actionable error when a published version has no gitHead', async () => {
 		const commandFn = jest
 			.fn()
-			.mockResolvedValueOnce()
+			.mockResolvedValueOnce( WHOAMI )
 			.mockResolvedValueOnce( {
 				stdout: '{"version":"4.50.0","dist-tags":{"latest":"4.50.0"}}',
 			} );
@@ -330,7 +482,7 @@ describe( 'runNpmPublishPreflight', () => {
 	it( 'fails when a published version has the wrong dist-tag', async () => {
 		const commandFn = jest
 			.fn()
-			.mockResolvedValueOnce()
+			.mockResolvedValueOnce( WHOAMI )
 			.mockResolvedValueOnce( {
 				stdout: '{"version":"4.50.0","gitHead":"publish-sha","dist-tags":{"latest":"4.49.0"}}',
 			} );
@@ -356,7 +508,7 @@ describe( 'runNpmPublishPreflight', () => {
 	it( 'fails when the registry returns a different version', async () => {
 		const commandFn = jest
 			.fn()
-			.mockResolvedValueOnce()
+			.mockResolvedValueOnce( WHOAMI )
 			.mockResolvedValueOnce( {
 				stdout: '{"version":"4.49.0","gitHead":"publish-sha","dist-tags":{"latest":"4.49.0"}}',
 			} );

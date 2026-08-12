@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { focus } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import useRefEffect from '../use-ref-effect';
 
 /**

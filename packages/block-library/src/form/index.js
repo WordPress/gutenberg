@@ -1,11 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { addFilter } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
+import { __ } from '@wordpress/i18n';
 import initBlock from '../utils/init-block';
 import edit from './edit';
 import metadata from './block.json';
@@ -13,13 +7,48 @@ import save from './save';
 import variations from './variations';
 import deprecated from './deprecated';
 import { icon } from './icons';
+import {
+	formSubmissionNotificationSuccess,
+	formSubmissionNotificationError,
+} from './utils';
 
 const { name } = metadata;
 
 export { metadata, name };
 
+const TEMPLATE = [
+	formSubmissionNotificationSuccess,
+	formSubmissionNotificationError,
+	[
+		'core/form-input',
+		{
+			type: 'text',
+			label: __( 'Name' ),
+			required: true,
+		},
+	],
+	[
+		'core/form-input',
+		{
+			type: 'email',
+			label: __( 'Email' ),
+			required: true,
+		},
+	],
+	[
+		'core/form-input',
+		{
+			type: 'textarea',
+			label: __( 'Comment' ),
+			required: true,
+		},
+	],
+	[ 'core/form-submit-button', {} ],
+];
+
 export const settings = {
 	icon,
+	template: TEMPLATE,
 	edit,
 	save,
 	deprecated,

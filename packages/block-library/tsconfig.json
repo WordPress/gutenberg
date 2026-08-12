@@ -31,6 +31,7 @@
 		{ "path": "../interactivity-router" },
 		{ "path": "../latex-to-mathml" },
 		{ "path": "../notices" },
+		{ "path": "../kebab-case" },
 		{ "path": "../keycodes" },
 		{ "path": "../keyboard-shortcuts" },
 		{ "path": "../primitives" },

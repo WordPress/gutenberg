@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { CSSProperties, ReactNode, Ref } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { Stack } from '@wordpress/ui';
 
 /**

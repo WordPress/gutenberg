@@ -1,10 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useRef } from '@wordpress/element';
-/**
- * Internal dependencies
- */
 import useEvent from '../use-event';
 
 // This is the current implementation of `useResizeObserver`.

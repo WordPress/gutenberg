@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { Stack, Text } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import styles from './style.module.css';
 
 interface HelloWorldAttributes {
