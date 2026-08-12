@@ -733,7 +733,11 @@ export function validateBlock(
 	const blockType = normalizeBlockType( blockTypeOrName );
 	let generatedBlockContent;
 	try {
-		generatedBlockContent = getSaveContent( blockType!, block.attributes );
+		generatedBlockContent = getSaveContent(
+			blockType!,
+			block.attributes,
+			block.innerBlocks
+		);
 	} catch ( error ) {
 		logger.error(
 			'Block validation failed because an error occurred while generating block content:\n\n%s',
