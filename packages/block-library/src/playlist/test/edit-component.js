@@ -332,6 +332,9 @@ describe( 'PlaylistEdit', () => {
 				multiple: false,
 			} )
 		);
+		expect( mediaUpload.mock.calls[ 0 ][ 0 ].filesList[ 0 ].type ).toBe(
+			''
+		);
 		expect( mediaUpload ).toHaveBeenNthCalledWith(
 			2,
 			expect.objectContaining( {
@@ -408,6 +411,54 @@ describe( 'PlaylistEdit', () => {
 
 		expect( window.fetch ).toHaveBeenCalledWith(
 			'https://example.com/album.zip'
+		);
+		expect( replaceInnerBlocks ).toHaveBeenCalledWith( 'playlist-1', [
+			expect.objectContaining( {
+				name: 'core/playlist-track',
+				attributes: expect.objectContaining( {
+					title: 'Curing',
+					artist: 'scruffian',
+					album: 'Relics',
+				} ),
+			} ),
+			expect.objectContaining( {
+				name: 'core/playlist-track',
+				attributes: expect.objectContaining( {
+					title: 'Bramblers Relic',
+					artist: 'scruffian',
+					album: 'Relics',
+				} ),
+			} ),
+		] );
+	} );
+
+	it( 'fills playlist tracks from a legacy ZIP attachment selected in the Media Library', async () => {
+		useSelect.mockReturnValue( {
+			mediaUpload,
+			innerBlockTracks: [],
+		} );
+
+		render(
+			<PlaylistEdit
+				attributes={ defaultAttributes }
+				clientId="playlist-1"
+				insertBlocksAfter={ jest.fn() }
+				isSelected={ false }
+				setAttributes={ jest.fn() }
+			/>
+		);
+
+		await act( async () => {
+			await mediaPlaceholderProps.onSelect( {
+				id: 20,
+				type: 'application',
+				mime: 'application/zip',
+				url: 'https://example.com/download?id=20',
+			} );
+		} );
+
+		expect( window.fetch ).toHaveBeenCalledWith(
+			'https://example.com/download?id=20'
 		);
 		expect( replaceInnerBlocks ).toHaveBeenCalledWith( 'playlist-1', [
 			expect.objectContaining( {

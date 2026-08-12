@@ -9,51 +9,31 @@ const AUDIO_FILE_EXTENSION =
 const IMAGE_FILE_EXTENSION = /\.(jpe?g|png|gif|webp)$/i;
 const COVER_FILE_NAME = /^(cover|folder|album|albumart|artwork)\./i;
 
-const MIME_TYPES = {
-	aac: 'audio/aac',
-	aif: 'audio/aiff',
-	aiff: 'audio/aiff',
-	flac: 'audio/flac',
-	gif: 'image/gif',
-	jpg: 'image/jpeg',
-	jpeg: 'image/jpeg',
-	m4a: 'audio/mp4',
-	m4b: 'audio/mp4',
-	mp3: 'audio/mpeg',
-	oga: 'audio/ogg',
-	ogg: 'audio/ogg',
-	opus: 'audio/ogg',
-	png: 'image/png',
-	wav: 'audio/wav',
-	weba: 'audio/webm',
-	webp: 'image/webp',
-};
-
 export function isZipFile( file ) {
-	const mimeType = file?.type || file?.mime_type || file?.mime;
+	const mimeTypes = [ file?.mime_type, file?.mime, file?.type ].filter(
+		Boolean
+	);
+	const hasZipFileExtension = ( value ) =>
+		typeof value === 'string' && /\.zip(?:[?#].*)?$/i.test( value );
 
 	return (
-		!! file?.name?.match( /\.zip$/i ) ||
-		!! file?.filename?.match( /\.zip$/i ) ||
-		!! file?.file?.match( /\.zip$/i ) ||
-		!! file?.url?.match( /\.zip(?:[?#].*)?$/i ) ||
-		!! file?.source_url?.match( /\.zip(?:[?#].*)?$/i ) ||
-		mimeType === 'application/zip' ||
-		mimeType === 'application/x-zip' ||
-		mimeType === 'application/x-zip-compressed'
+		hasZipFileExtension( file?.name ) ||
+		hasZipFileExtension( file?.filename ) ||
+		hasZipFileExtension( file?.file ) ||
+		hasZipFileExtension( file?.url ) ||
+		hasZipFileExtension( file?.source_url ) ||
+		file?.subtype === 'zip' ||
+		mimeTypes.some(
+			( mimeType ) =>
+				mimeType === 'application/zip' ||
+				mimeType === 'application/x-zip' ||
+				mimeType === 'application/x-zip-compressed'
+		)
 	);
 }
 
 function getFileName( path = '' ) {
 	return path.split( /[/\\]/ ).pop() || path;
-}
-
-function getFileExtension( fileName ) {
-	return fileName.split( '.' ).pop()?.toLowerCase();
-}
-
-function getMimeType( fileName ) {
-	return MIME_TYPES[ getFileExtension( fileName ) ] || '';
 }
 
 function stripFileExtension( fileName ) {
@@ -108,9 +88,10 @@ function sortTracksByNumber( tracks ) {
 
 async function getEntryFile( entry ) {
 	const fileName = getFileName( entry.filename );
-	const type = getMimeType( fileName );
-	const blob = await entry.getData( new BlobWriter( type ) );
-	const options = { type: blob.type || type };
+	// Keep the MIME type unset so WordPress validates the upload by extension
+	// instead of by a browser-dependent guess for extracted ZIP entries.
+	const blob = await entry.getData( new BlobWriter() );
+	const options = {};
 
 	if ( entry.lastModDate ) {
 		options.lastModified = entry.lastModDate.getTime();
