@@ -2856,4 +2856,138 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		// JPEG output, so the jpeg_quality filter overrides the 82 default.
 		$this->assertSame( 70, $data['image_quality']['default'] );
 	}
+
+	/**
+	 * Sideloads a thumbnail and returns the sub-size entry finalize expects.
+	 *
+	 * @param int    $attachment_id Attachment to sideload for.
+	 * @param string $filename      File name to sideload as.
+	 * @return array Sub-size entry from the sideload response.
+	 */
+	private function sideload_thumbnail( $attachment_id, $filename ) {
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', "attachment; filename={$filename}" );
+		$request->set_param( 'image_size', 'thumbnail' );
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/test-image.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status(), 'Sideloading the thumbnail should succeed.' );
+
+		return $response->get_data();
+	}
+
+	/**
+	 * The cleanup pass runs a query per distinct consumed name, so the number of
+	 * entries a single request may carry is bounded by the schema rather than by
+	 * the size of the request body.
+	 *
+	 * @covers ::finalize_item
+	 */
+	public function test_finalize_rejects_more_sub_sizes_than_the_schema_allows() {
+		wp_set_current_user( self::$admin_id );
+
+		$attachment_id = $this->create_attachment_for_sideload();
+
+		$sub_sizes = array_fill(
+			0,
+			101,
+			array(
+				'image_size' => 'thumbnail',
+				'width'      => 150,
+				'height'     => 150,
+				'file'       => 'canola-150x150.jpg',
+				'filesize'   => 1234,
+			)
+		);
+
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/finalize" );
+		$request->set_param( 'sub_sizes', $sub_sizes );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 400, $response->get_status(), 'Too many entries should be rejected.' );
+		$this->assertSame( 'rest_invalid_param', $response->get_data()['code'] );
+	}
+
+	/**
+	 * A name repeated across entries is one consumed record, not one delete per
+	 * entry, and repeating it must not turn a valid request into an error.
+	 *
+	 * @covers ::finalize_item
+	 */
+	public function test_finalize_consumes_a_repeated_file_name_once() {
+		wp_set_current_user( self::$admin_id );
+
+		$queries = 0;
+		$count   = function ( $query ) use ( &$queries ) {
+			if ( str_contains( $query, Gutenberg_REST_Attachments_Controller::META_KEY_SIDELOAD_FILE_NAME ) ) {
+				++$queries;
+			}
+			return $query;
+		};
+
+		// The same produced name, echoed back a couple of times and then many times.
+		$measure = function ( $repeats, $filename ) use ( $count, &$queries ) {
+			$attachment_id = $this->create_attachment_for_sideload();
+			$thumbnail     = $this->sideload_thumbnail( $attachment_id, $filename );
+
+			$queries = 0;
+			add_filter( 'query', $count );
+
+			$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/finalize" );
+			$request->set_param( 'sub_sizes', array_fill( 0, $repeats, $thumbnail ) );
+			$response = rest_get_server()->dispatch( $request );
+
+			remove_filter( 'query', $count );
+
+			$this->assertSame( 200, $response->get_status(), 'Repeating a produced name should not fail the request.' );
+			$this->assertSame(
+				array(),
+				get_post_meta( $attachment_id, Gutenberg_REST_Attachments_Controller::META_KEY_SIDELOAD_FILE_NAME ),
+				'The repeated name should be consumed, leaving no record behind.'
+			);
+
+			return $queries;
+		};
+
+		$this->assertSame(
+			$measure( 2, 'repeat-few-150x150.jpg' ),
+			$measure( 20, 'repeat-many-150x150.jpg' ),
+			'Cleanup should query once per distinct name, not once per entry.'
+		);
+	}
+
+	/**
+	 * The route schema types these values as strings, so a non-string cannot
+	 * arrive through it. The provenance check is the boundary that decides what
+	 * reaches the metadata, though, and a subclass may widen the schema, so a
+	 * value it cannot check must be rejected rather than passed over.
+	 *
+	 * @covers ::validate_sub_size_provenance
+	 */
+	public function test_validate_sub_size_provenance_rejects_a_non_string_file_name() {
+		wp_set_current_user( self::$admin_id );
+
+		$attachment_id = $this->create_attachment_for_sideload();
+
+		$controller = new Gutenberg_REST_Attachments_Controller( 'attachment' );
+		$method     = new ReflectionMethod( $controller, 'validate_sub_size_provenance' );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$method->setAccessible( true );
+		}
+
+		$result = $method->invoke(
+			$controller,
+			$attachment_id,
+			array(
+				array(
+					'image_size' => 'thumbnail',
+					'file'       => array( 'canola-150x150.jpg' ),
+				),
+			)
+		);
+
+		$this->assertWPError( $result, 'A non-string file name must not be waved through.' );
+		$this->assertSame( 'rest_invalid_sub_size_file', $result->get_error_code() );
+	}
 }
