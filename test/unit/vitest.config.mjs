@@ -305,13 +305,6 @@ export default defineConfig( {
 							'test-results/vitest-browser-screenshots'
 						),
 						screenshotFailures: true,
-						trace: {
-							mode: 'retain-on-failure',
-							tracesDir: path.join(
-								ROOT_DIR,
-								'test-results/vitest-browser-traces'
-							),
-						},
 					},
 				},
 			},
