@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
-import { ValidatedToggleGroupControl } from '../components';
-import { ToggleGroupControlOption } from '../../toggle-group-control';
+import { __experimentalToggleGroupControlOption as ToggleGroupControlOption } from '@wordpress/components';
+import { ValidatedToggleGroupControl } from '../toggle-group-control';
 
 // The `help` prop is rendered visually by BaseControl but is not
 // programmatically associated with the toggle group via aria-describedby.
