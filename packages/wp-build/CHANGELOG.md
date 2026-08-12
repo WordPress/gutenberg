@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.21.0 (2026-08-12)
+
 ### Enhancements
 
 -   Widgets: carry an action's `icon` and `relevance` from `widget.json`
