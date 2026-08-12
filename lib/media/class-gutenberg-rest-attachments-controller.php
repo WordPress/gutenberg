@@ -403,7 +403,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			add_filter( 'big_image_size_threshold', '__return_false', 100 );
 		}
 
-		if ( ! $request['convert_format'] ) {
+		if ( false === $request['convert_format'] ) {
 			add_filter( 'image_editor_output_format', '__return_empty_array', 100 );
 		}
 
@@ -1049,13 +1049,13 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	}
 
 	/**
-	 * Side-loads a media file without creating an attachment.
+	 * Side-loads a media file without creating a new attachment.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, WP_Error object on failure.
 	 */
 	public function sideload_item( WP_REST_Request $request ) {
-		$attachment_id = $request['id'];
+		$attachment_id = (int) $request['id'];
 
 		$post = $this->get_post( $attachment_id );
 
@@ -1069,7 +1069,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		) {
 			return new WP_Error(
 				'rest_post_invalid_id',
-				__( 'Invalid post ID, only images and PDFs can be sideloaded.', 'gutenberg' ),
+				__( 'Invalid post ID. Only images and PDFs can be sideloaded.', 'gutenberg' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -1094,7 +1094,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			);
 		}
 
-		if ( ! $request['convert_format'] ) {
+		if ( false === $request['convert_format'] ) {
 			// Prevent image conversion as that is done client-side.
 			add_filter( 'image_editor_output_format', '__return_empty_array', 100 );
 		}
