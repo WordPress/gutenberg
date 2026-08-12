@@ -42,6 +42,19 @@ import {
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
+/**
+ * Notice id for the snackbar a note's deletion puts up.
+ *
+ * Stable per note so the snackbar can be taken down again once the note is
+ * restored, whichever way the restore happened.
+ *
+ * @param {number} noteId Deleted note id.
+ * @return {string} Notice id.
+ */
+function getDeleteNoticeId( noteId ) {
+	return `editor-note-deleted-${ noteId }`;
+}
+
 export function useNoteThreads( postId ) {
 	const queryArgs = {
 		post: postId,
@@ -508,17 +521,22 @@ export function useNoteActions() {
 			}
 
 			/*
+			 * Whether the block still carries the note's id. True before the
+			 * cleanup below, and true again once undo puts the id back.
+			 */
+			const isAttached = () =>
+				!! clientId &&
+				getNoteIdsFromMetadata(
+					getBlockAttributes( clientId )?.metadata
+				).includes( note.id );
+
+			/*
 			 * Whether the delete leaves an undo level behind. It only does
 			 * when the note was actually attached to a block: replies and
 			 * orphaned notes have no footprint in the content, so there's
 			 * nothing for the editor's undo to restore.
 			 */
-			const isUndoable =
-				isTrashed &&
-				!! clientId &&
-				getNoteIdsFromMetadata(
-					getBlockAttributes( clientId )?.metadata
-				).includes( note.id );
+			const isUndoable = isTrashed && isAttached();
 
 			if ( clientId ) {
 				const attributes = getBlockAttributes( clientId );
@@ -593,19 +611,28 @@ export function useNoteActions() {
 				}
 			};
 
+			/*
+			 * Route undoable deletes through the editor's undo so the button
+			 * and the undo shortcut are the same action, and redo re-deletes.
+			 * The snackbar outlives a restore made from the toolbar or the
+			 * keyboard, so check the note is still gone first: undoing a
+			 * second time would take an unrelated change off the stack.
+			 */
+			const undoDelete = () => {
+				if ( ! isAttached() ) {
+					undo();
+				}
+			};
+
 			createNotice( 'snackbar', __( 'Note deleted.' ), {
+				id: getDeleteNoticeId( note.id ),
 				type: 'snackbar',
 				isDismissible: true,
 				...( isTrashed && {
 					actions: [
 						{
 							label: __( 'Undo' ),
-							/*
-							 * Route undoable deletes through the editor's undo
-							 * so the button and the undo shortcut are the same
-							 * action, and redo re-deletes.
-							 */
-							onClick: isUndoable ? undo : restoreNote,
+							onClick: isUndoable ? undoDelete : restoreNote,
 						},
 					],
 				} ),
@@ -634,7 +661,7 @@ export function useNoteTrashSync() {
 		getTrashedNotes,
 		getTrashedNotes
 	);
-	const { createNotice } = useDispatch( noticesStore );
+	const { createNotice, removeNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	// Requests in flight, so a re-render mid-round-trip doesn't fire a second.
 	const pending = useRef( new Set() );
@@ -674,6 +701,13 @@ export function useNoteTrashSync() {
 			pending.current.add( noteId );
 			try {
 				if ( referenced ) {
+					/*
+					 * The note is on its way back, so retire the snackbar that
+					 * offered to bring it back. Dismissed before the request
+					 * rather than after it so the stale Undo can't be clicked
+					 * during the round-trip.
+					 */
+					removeNotice( getDeleteNoticeId( noteId ) );
 					// `untrash` restores the comment's pre-trash status.
 					await saveEntityRecord(
 						'root',
@@ -718,6 +752,7 @@ export function useNoteTrashSync() {
 		saveEntityRecord,
 		deleteEntityRecord,
 		createNotice,
+		removeNotice,
 	] );
 }
 

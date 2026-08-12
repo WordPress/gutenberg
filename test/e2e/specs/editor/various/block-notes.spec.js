@@ -251,6 +251,42 @@ test.describe( 'Block Notes', () => {
 		).toBeHidden();
 	} );
 
+	test( 'dismisses the delete snackbar once the note comes back', async ( {
+		page,
+		pageUtils,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Testing block comments' },
+			comment: 'Restore me only once.',
+		} );
+		await blockNoteUtils.clickBlockNoteActionMenuItem( 'Delete' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Delete' } )
+			.click();
+
+		const deletedNotice = page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Note deleted.' } );
+		await expect( deletedNotice ).toBeVisible();
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect(
+			page.locator( '.editor-collab-sidebar-panel__note-content' )
+		).toHaveText( 'Restore me only once.' );
+
+		// The snackbar's Undo would pop an unrelated change off the stack now
+		// that the delete is already undone, so it goes away with the note it
+		// offered to restore.
+		await expect( deletedNotice ).toBeHidden();
+		await expect(
+			page.locator( '.editor-collab-sidebar-panel__note-content' )
+		).toHaveText( 'Restore me only once.' );
+	} );
+
 	test( 'undoes edits made after a delete before restoring the note', async ( {
 		editor,
 		page,
@@ -267,6 +303,18 @@ test.describe( 'Block Notes', () => {
 			.getByRole( 'dialog' )
 			.getByRole( 'button', { name: 'Delete' } )
 			.click();
+
+		// Let the delete settle before typing: a re-render landing mid-word
+		// splits the typing across undo levels, and then the first undo only
+		// takes part of it back.
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Note deleted.' } )
+		).toBeVisible();
+		await expect(
+			page.locator( '.editor-collab-sidebar-panel__note-content' )
+		).toBeHidden();
 
 		const paragraph = editor.canvas.getByRole( 'document', {
 			name: 'Block: Paragraph',
