@@ -1,6 +1,7 @@
 import clsx from 'clsx';
-import { Disabled, Composite } from '@wordpress/components';
-import { __, _x, sprintf } from '@wordpress/i18n';
+import { Button, Disabled, Composite } from '@wordpress/components';
+import { __, _n, _x, sprintf } from '@wordpress/i18n';
+import { comment as commentIcon } from '@wordpress/icons';
 import {
 	BlockList,
 	privateApis as blockEditorPrivateApis,
@@ -100,7 +101,7 @@ const getStyleBookNavigationFromPath = ( path ) => {
  *
  * @return {Object} Object containing properties for each type of palette.
  */
-function useMultiOriginPalettes() {
+export function useMultiOriginPalettes() {
 	const { colors, gradients } = useMultipleOriginColorsAndGradients();
 
 	// Add duotone filters to the palettes data.
@@ -237,6 +238,8 @@ function StyleBook(
 		showTabs = true,
 		userConfig = {},
 		path = '',
+		noteActions,
+		highlightedAnchor,
 	},
 	ref
 ) {
@@ -336,6 +339,8 @@ function StyleBook(
 									settings={ settings }
 									title={ tab.title }
 									goTo={ goTo }
+									noteActions={ noteActions }
+									highlightedAnchor={ highlightedAnchor }
 								/>
 							</Tabs.Panel>
 						);
@@ -349,6 +354,8 @@ function StyleBook(
 					onSelect={ onSelect }
 					settings={ settings }
 					goTo={ goTo }
+					noteActions={ noteActions }
+					highlightedAnchor={ highlightedAnchor }
 				/>
 			) }
 		</div>
@@ -553,6 +560,8 @@ export const StyleBookBody = ( {
 	settings,
 	title,
 	goTo,
+	noteActions,
+	highlightedAnchor,
 } ) => {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const [ hasIframeLoaded, setHasIframeLoaded ] = useState( false );
@@ -592,6 +601,18 @@ export const StyleBookBody = ( {
 		}
 	}, [ goTo?.top, hasIframeLoaded ] );
 
+	// Bring the example a selected note points at into view. The anchor is
+	// used as an element id rather than a selector: example names contain a
+	// slash, which would need escaping in a selector but is fine for a lookup.
+	useEffect( () => {
+		if ( hasIframeLoaded && iframeRef.current && highlightedAnchor ) {
+			scrollToSection(
+				`example-${ highlightedAnchor }`,
+				iframeRef.current
+			);
+		}
+	}, [ highlightedAnchor, hasIframeLoaded ] );
+
 	return (
 		<Iframe
 			onLoad={ handleLoad }
@@ -624,6 +645,8 @@ export const StyleBookBody = ( {
 				}
 				isSelected={ isSelected }
 				onSelect={ onSelect }
+				noteActions={ noteActions }
+				highlightedAnchor={ highlightedAnchor }
 				key={ title }
 			/>
 		</Iframe>
@@ -631,7 +654,15 @@ export const StyleBookBody = ( {
 };
 
 const Examples = memo(
-	( { className, filteredExamples, label, isSelected, onSelect } ) => {
+	( {
+		className,
+		filteredExamples,
+		label,
+		isSelected,
+		onSelect,
+		noteActions,
+		highlightedAnchor,
+	} ) => {
 		return (
 			<Composite
 				orientation="vertical"
@@ -644,10 +675,15 @@ const Examples = memo(
 						<Example
 							key={ example.name }
 							id={ `example-${ example.name }` }
+							name={ example.name }
 							title={ example.title }
 							content={ example.content }
 							blocks={ example.blocks }
 							isSelected={ isSelected?.( example.name ) }
+							noteActions={ noteActions }
+							isNoteHighlighted={
+								highlightedAnchor === example.name
+							}
 							onClick={
 								!! onSelect
 									? () =>
@@ -674,6 +710,8 @@ const Examples = memo(
 								examples={ subcategory.examples }
 								isSelected={ isSelected }
 								onSelect={ onSelect }
+								noteActions={ noteActions }
+								highlightedAnchor={ highlightedAnchor }
 							/>
 						</Composite.Group>
 					) ) }
@@ -682,17 +720,26 @@ const Examples = memo(
 	}
 );
 
-const Subcategory = ( { examples, isSelected, onSelect } ) => {
+const Subcategory = ( {
+	examples,
+	isSelected,
+	onSelect,
+	noteActions,
+	highlightedAnchor,
+} ) => {
 	return (
 		!! examples?.length &&
 		examples.map( ( example ) => (
 			<Example
 				key={ example.name }
 				id={ `example-${ example.name }` }
+				name={ example.name }
 				title={ example.title }
 				content={ example.content }
 				blocks={ example.blocks }
 				isSelected={ isSelected?.( example.name ) }
+				noteActions={ noteActions }
+				isNoteHighlighted={ highlightedAnchor === example.name }
 				onClick={ !! onSelect ? () => onSelect( example.name ) : null }
 			/>
 		) )
@@ -701,7 +748,80 @@ const Subcategory = ( { examples, isSelected, onSelect } ) => {
 
 const disabledExamples = [ 'example-duotones' ];
 
-const Example = ( { id, title, blocks, isSelected, onClick, content } ) => {
+/**
+ * The per-example notes affordance.
+ *
+ * It sits in its own grid cell beside the example rather than inside it: the
+ * example is itself a `role="button"` composite item, and nesting a button in
+ * a button is both invalid and a good way to break the Style Book's arrow-key
+ * navigation. Keeping it out of the composite leaves that navigation exactly
+ * as it was; the button is reached with Tab.
+ *
+ * @param {Object}   props
+ * @param {string}   props.name        Style Book example name, used as the anchor.
+ * @param {string}   props.title       Example title, for the accessible label.
+ * @param {number}   props.count       Notes already left on this example.
+ * @param {Function} props.onAddNote   Called to start a new note.
+ * @param {Function} props.onOpenNotes Called to review existing notes.
+ * @return {React.JSX.Element} The button.
+ */
+const ExampleNoteButton = ( {
+	name,
+	title,
+	count,
+	onAddNote,
+	onOpenNotes,
+} ) => {
+	const hasNotes = count > 0;
+
+	return (
+		<Button
+			className="editor-style-book__example-note-button"
+			size="compact"
+			icon={ commentIcon }
+			variant={ hasNotes ? 'secondary' : 'tertiary' }
+			text={ hasNotes ? String( count ) : undefined }
+			label={
+				hasNotes
+					? sprintf(
+							/* translators: %1$d: number of notes. %2$s: Title of an example, e.g. Heading. */
+							_n(
+								'%1$d note on %2$s',
+								'%1$d notes on %2$s',
+								count
+							),
+							count,
+							title
+					  )
+					: sprintf(
+							/* translators: %s: Title of an example, e.g. Heading. */
+							__( 'Add note on %s' ),
+							title
+					  )
+			}
+			onClick={ ( event ) => {
+				event.stopPropagation();
+				if ( hasNotes ) {
+					onOpenNotes( name );
+				} else {
+					onAddNote( name );
+				}
+			} }
+		/>
+	);
+};
+
+const Example = ( {
+	id,
+	name,
+	title,
+	blocks,
+	isSelected,
+	onClick,
+	content,
+	noteActions,
+	isNoteHighlighted,
+} ) => {
 	const originalSettings = useSelect(
 		( select ) => select( blockEditorStore ).getSettings(),
 		[]
@@ -730,12 +850,18 @@ const Example = ( { id, title, blocks, isSelected, onClick, content } ) => {
 			: {};
 
 	return (
-		<div role="row">
+		<div
+			role="row"
+			className={ clsx( 'editor-style-book__example-row', {
+				'has-note-actions': !! noteActions,
+			} ) }
+		>
 			<div role="gridcell">
 				<Composite.Item
 					className={ clsx( 'editor-style-book__example', {
 						'is-selected': isSelected,
 						'is-disabled-example': !! disabledProps?.disabled,
+						'is-note-anchor-highlighted': isNoteHighlighted,
 					} ) }
 					id={ id }
 					aria-label={
@@ -775,6 +901,17 @@ const Example = ( { id, title, blocks, isSelected, onClick, content } ) => {
 					</div>
 				</Composite.Item>
 			</div>
+			{ !! noteActions && (
+				<div role="gridcell">
+					<ExampleNoteButton
+						name={ name }
+						title={ title }
+						count={ noteActions.counts?.[ name ] ?? 0 }
+						onAddNote={ noteActions.onAddNote }
+						onOpenNotes={ noteActions.onOpenNotes }
+					/>
+				</div>
+			) }
 		</div>
 	);
 };
