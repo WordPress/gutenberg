@@ -67,4 +67,42 @@ test.describe( 'Site editor writing flow', () => {
 		);
 		await expect( inspectorBlockTab ).toBeFocused();
 	} );
+
+	test( 'enter selects the next block', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const { id } = await requestUtils.createPage( {
+			status: 'draft',
+			title: 'test',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: id,
+			postType: 'page',
+			canvas: 'edit',
+		} );
+
+		// select the first block
+		const firstBlock = editor.canvas.locator(
+			'role=document[name="Block: Title"i]'
+		);
+		await editor.selectBlocks( firstBlock );
+
+		await expect( firstBlock ).toBeFocused();
+
+		await page.keyboard.press( 'Enter' );
+		const secondBlock = editor.canvas.locator(
+			'role=document[name="Block: Content"i]'
+		);
+		await expect( secondBlock ).toBeFocused();
+
+		await page.keyboard.press( 'Enter' );
+		const thirdBlock = editor.canvas.getByRole( 'document', {
+			name: 'Empty block',
+		} );
+		await expect( thirdBlock ).toBeFocused();
+	} );
 } );
