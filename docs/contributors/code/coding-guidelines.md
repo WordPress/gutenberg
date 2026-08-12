@@ -80,7 +80,9 @@ While the [staged process](https://tc39.es/process-document/) for introducing a 
 
 In the Gutenberg project, we use [the ES2015 import syntax](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import) to enable us to create modular code with clear separations between code of a specific feature, code shared across distinct WordPress features, and third-party dependencies.
 
-These separations are identified by multi-line comments at the top of a file which imports code from another file or source.
+Imports can reference third-party packages, WordPress packages, or local files.
+
+Write imports as one contiguous block. Do not separate dependency types with comments or blank lines.
 
 #### External dependencies
 
@@ -89,9 +91,6 @@ An external dependency is third-party code that is not maintained by WordPress c
 Example:
 
 ```js
-/**
- * External dependencies
- */
 import moment from 'moment';
 ```
 
@@ -102,9 +101,6 @@ To encourage reusability between features, our JavaScript is split into domain-s
 Example:
 
 ```js
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 ```
 
@@ -115,9 +111,6 @@ Within a specific feature, code is organized into separate files and folders. As
 Example:
 
 ```js
-/**
- * Internal dependencies
- */
 import VisualEditor from '../visual-editor';
 ```
 
@@ -797,3 +790,27 @@ We use
 The easiest way to use PHPCS is [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-environment). Once that's installed, you can check your PHP by running `npm run lint:php`.
 
 If you prefer to install PHPCS locally, you should use `composer`. [Install `composer`](https://getcomposer.org/download/) on your computer, then run `composer install`. This will install `phpcs` and `WordPress-Coding-Standards` which you can then run via `composer lint`.
+
+## GitHub Actions workflow files
+
+GitHub Actions workflows operate in a privileged software supply chain environment, therefore all workflow files must adhere to a high degree of quality and security standards.
+
+These files are statically scanned when modified using [Actionlint](https://github.com/rhysd/actionlint) and [Zizmor](https://github.com/zizmorcore/zizmor). Actionlint scans the YAML workflow files within the `.github/workflows` directory, while Zizmor additionally scans any action file (`action.yml`) located anywhere in the repository. It's recommended that you install both of these tools locally using a package manager to run prior to submitting changes to workflow or action files.
+
+- [GitHub Actions Workflow Standards for WordPress](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/github-actions/)
+- [Actionlint installations instructions](https://github.com/rhysd/actionlint/blob/main/docs/install.md)
+- [Zizmor installation instructions](https://docs.zizmor.sh/installation/)
+
+To run Actionlint:
+
+```
+actionlint
+```
+
+To run Zizmor for all workflow files (note the trailing period):
+
+```
+zizmor .
+```
+
+**Note:** A workflow run failure will not occur when issues are detected by Zizmor. Instead, the generated report is submitted to GitHub Code Scanning and surfaced through a status check and inline annotations contextually within a pull request. Some locally reported issues may be ignored based on the repository's configured Code Scanning settings.

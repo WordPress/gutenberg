@@ -1,12 +1,4 @@
-/**
- * External dependencies
- */
 import { renderHook } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { dispatch, select } from '@wordpress/data';
 import {
 	createBlock,
@@ -14,10 +6,7 @@ import {
 	unregisterBlockType,
 } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
-
-/**
- * Internal dependencies
- */
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useBlockBindingsUtils } from '../';
 
 describe( 'useBlockBindingsUtils', () => {

@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { Marked, type Tokens } from 'marked';
 
 // Skip escaping `"` and `'` so shortcodes like `[gallery ids="123"]` survive

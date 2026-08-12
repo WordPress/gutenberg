@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { isAnimatedGif } from '../utils';
 
 /**

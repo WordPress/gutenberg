@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render, waitFor, queryByAttribute } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import ColorPaletteControl from '../control';
 
 const noop = () => {};

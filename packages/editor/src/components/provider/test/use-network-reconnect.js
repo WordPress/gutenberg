@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { renderHook } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useRegistry } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import useNetworkReconnect from '../use-network-reconnect';
 
 const mockPauseQueue = jest.fn();

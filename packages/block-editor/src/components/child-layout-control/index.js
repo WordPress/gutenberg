@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
@@ -15,10 +12,6 @@ import {
 import { __, _x } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { useGetNumberOfBlocksBeforeCell } from '../grid/use-get-number-of-blocks-before-cell';
 import { store as blockEditorStore } from '../../store';
 import { useSettings } from '../use-settings';
@@ -306,7 +299,6 @@ function GridControls( {
 			>
 				<FlexItem style={ { width: '50%' } }>
 					<InputControl
-						size="__unstable-large"
 						label={ __( 'Column span' ) }
 						type="number"
 						onChange={ ( value ) => {
@@ -331,7 +323,6 @@ function GridControls( {
 				</FlexItem>
 				<FlexItem style={ { width: '50%' } }>
 					<InputControl
-						size="__unstable-large"
 						label={ __( 'Row span' ) }
 						type="number"
 						onChange={ ( value ) => {
@@ -369,7 +360,6 @@ function GridControls( {
 				>
 					<FlexItem style={ { width: '50%' } }>
 						<InputControl
-							size="__unstable-large"
 							label={ __( 'Column' ) }
 							type="number"
 							onChange={ ( value ) => {
@@ -404,7 +394,6 @@ function GridControls( {
 					</FlexItem>
 					<FlexItem style={ { width: '50%' } }>
 						<InputControl
-							size="__unstable-large"
 							label={ __( 'Row' ) }
 							type="number"
 							onChange={ ( value ) => {

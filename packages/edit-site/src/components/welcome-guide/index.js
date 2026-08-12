@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import WelcomeGuideEditor from './editor';
 import WelcomeGuidePage from './page';
 import WelcomeGuideTemplate from './template';

@@ -9,13 +9,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/**
- * Maximum length, in characters, of a guideline row's content.
- */
-if ( ! defined( 'GUTENBERG_GUIDELINE_MAX_LENGTH' ) ) {
-	define( 'GUTENBERG_GUIDELINE_MAX_LENGTH', 5000 );
-}
-
 if ( ! function_exists( 'wp_knowledge_types' ) ) {
 	/**
 	 * Returns the registered knowledge types keyed by slug.
@@ -76,6 +69,11 @@ if ( ! function_exists( 'wp_guideline_scopes' ) ) {
 	 * automatically. The registry carries identity and presentation only; rows
 	 * are created on first save.
 	 *
+	 * The `blocks` scope is the one exception: it has no single `guideline-blocks`
+	 * row. Its section lists per-block guidelines stored as `guideline-block-*`
+	 * rows. Removing it from this registry (via the filter) hides that section on
+	 * the Settings page.
+	 *
 	 * @return array {
 	 *     Slug-keyed map of guideline scopes.
 	 *
@@ -113,6 +111,11 @@ if ( ! function_exists( 'wp_guideline_scopes' ) ) {
 					'description' => __( 'Outline your style, dimensions, formats, mood and aesthetic preferences.', 'gutenberg' ),
 					'order'       => 30,
 				),
+				'blocks'     => array(
+					'title'       => __( 'Blocks', 'gutenberg' ),
+					'description' => __( 'Create tailored guidelines for specific block types.', 'gutenberg' ),
+					'order'       => 40,
+				),
 				'additional' => array(
 					'title'       => __( 'Additional', 'gutenberg' ),
 					'description' => __( 'Add additional guidelines.', 'gutenberg' ),
@@ -120,6 +123,22 @@ if ( ! function_exists( 'wp_guideline_scopes' ) ) {
 				),
 			)
 		);
+	}
+}
+
+if ( ! function_exists( 'wp_guideline_max_length' ) ) {
+	/**
+	 * Returns the maximum length, in characters, of a guideline row's content.
+	 *
+	 * @return int Maximum number of characters allowed in guideline content.
+	 */
+	function wp_guideline_max_length(): int {
+		/**
+		 * Filters the maximum length, in characters, of a guideline row's content.
+		 *
+		 * @param int $max_length Maximum number of characters. Default 5000.
+		 */
+		return (int) apply_filters( 'wp_guideline_max_length', 5000 );
 	}
 }
 
@@ -325,26 +344,43 @@ if ( ! function_exists( 'wp_knowledge_maybe_map_term_label' ) ) {
 
 if ( ! function_exists( 'wp_guideline_scope_from_slug' ) ) {
 	/**
-	 * Resolve a registry scope key from a guideline row slug.
+	 * Resolve the scope that owns a guideline row slug.
 	 *
-	 * Returns the scope key for `guideline-{scope}` slugs that match a
-	 * registered scope, or null for block rows (`guideline-block-*`) and
-	 * unknown scopes.
+	 * Returns the scope key for a `guideline-{scope}` slug that matches a
+	 * registered scope. A registered scope key always wins, so a scope keyed
+	 * like `block-foo` resolves to itself rather than the blocks scope. Any
+	 * other `guideline-block-*` slug is a per-block row that belongs to the
+	 * `blocks` scope while it is registered. Returns null for the bare
+	 * `guideline-block-` slug and for any unknown scope.
 	 *
 	 * @access private
 	 *
 	 * @param string $slug Post slug.
-	 * @return string|null Scope key, or null if not a registry scope.
+	 * @return string|null Scope key, or null if the slug is not a registered scope.
 	 */
 	function wp_guideline_scope_from_slug( string $slug ): ?string {
-		if ( ! str_starts_with( $slug, 'guideline-' ) || str_starts_with( $slug, 'guideline-block-' ) ) {
+		if ( ! str_starts_with( $slug, 'guideline-' ) ) {
 			return null;
 		}
 
-		$scope  = substr( $slug, strlen( 'guideline-' ) );
 		$scopes = wp_guideline_scopes();
+		$scope  = substr( $slug, strlen( 'guideline-' ) );
 
-		return isset( $scopes[ $scope ] ) ? $scope : null;
+		// A slug that matches a registered scope key is that scope. Checking this
+		// first lets a scope keyed like `block-foo` win over the per-block
+		// namespace below, instead of being swallowed by the blocks scope.
+		if ( isset( $scopes[ $scope ] ) ) {
+			return $scope;
+		}
+
+		// Otherwise a `guideline-block-<name>` row is a per-block row that belongs
+		// to the blocks scope while it is registered. A real block name never
+		// equals a registered scope key, so the check above stays safe.
+		if ( str_starts_with( $slug, 'guideline-block-' ) && strlen( $slug ) > strlen( 'guideline-block-' ) ) {
+			return isset( $scopes['blocks'] ) ? 'blocks' : null;
+		}
+
+		return null;
 	}
 }
 
@@ -353,10 +389,13 @@ if ( ! function_exists( 'wp_knowledge_guard_guideline_row' ) ) {
 	 * Hook callback for `rest_pre_insert_wp_knowledge` that sanitizes and
 	 * normalizes guideline rows on the REST insert path.
 	 *
-	 * For rows whose slug begins with `guideline-`:
+	 * Only rows whose slug maps to a registered guideline scope are shaped (see
+	 * `wp_guideline_scope_from_slug()`); any other row is left untouched. For a
+	 * recognized guideline row this callback:
 	 * - Sanitizes `post_content` to plain text capped at the guideline length.
-	 * - Re-stamps the title of registry scopes from `wp_guideline_scopes()` in
-	 *   the site locale. Block rows keep the client-provided canonical block name.
+	 * - Re-stamps the title of single-row registry scopes from
+	 *   `wp_guideline_scopes()` in the site locale. Per-block rows (the multi-row
+	 *   `blocks` scope) keep the client-provided canonical block name.
 	 *
 	 * Slug uniqueness is intentionally left to WordPress: the published row keeps
 	 * its exact slug because the first save has no conflict and later saves reuse
@@ -383,23 +422,26 @@ if ( ! function_exists( 'wp_knowledge_guard_guideline_row' ) ) {
 			}
 		}
 
-		if ( ! str_starts_with( (string) $slug, 'guideline-' ) ) {
+		// Only shape rows whose slug maps to a registered guideline scope.
+		$scope = wp_guideline_scope_from_slug( (string) $slug );
+		if ( null === $scope ) {
 			return $prepared_post;
 		}
 
 		// Sanitize content: plain text, capped at the guideline length.
 		if ( isset( $prepared_post->post_content ) ) {
 			$content = sanitize_textarea_field( $prepared_post->post_content );
-			if ( mb_strlen( $content, 'UTF-8' ) > GUTENBERG_GUIDELINE_MAX_LENGTH ) {
-				$content = mb_substr( $content, 0, GUTENBERG_GUIDELINE_MAX_LENGTH, 'UTF-8' );
+			$max     = wp_guideline_max_length();
+			if ( mb_strlen( $content, 'UTF-8' ) > $max ) {
+				$content = mb_substr( $content, 0, $max, 'UTF-8' );
 			}
 			$prepared_post->post_content = $content;
 		}
 
-		// Re-stamp registry scope titles in the site locale. Block rows keep the
+		// Re-stamp single-row registry scope titles in the site locale. The
+		// blocks scope is multi-row, so its per-block rows keep the
 		// client-provided canonical block name.
-		$scope = wp_guideline_scope_from_slug( $slug );
-		if ( null !== $scope ) {
+		if ( 'blocks' !== $scope ) {
 			$switched = switch_to_locale( get_locale() );
 			$scopes   = wp_guideline_scopes();
 			if ( $switched ) {

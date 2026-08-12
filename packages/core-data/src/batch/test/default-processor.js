@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import defaultProcessor from '../default-processor';
 
 jest.mock( '@wordpress/api-fetch' );

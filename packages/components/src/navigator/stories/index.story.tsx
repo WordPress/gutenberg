@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import { VStack } from '../../v-stack';
 import { HStack } from '../../h-stack';

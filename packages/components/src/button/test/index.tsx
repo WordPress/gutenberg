@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
+import { press } from '@ariakit/test';
 import { createRef, forwardRef } from '@wordpress/element';
 import { plusCircle } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import _Button from '..';
 import Tooltip from '../../tooltip';
 import cleanupTooltip from '../../tooltip/test/utils';
-import { press } from '@ariakit/test';
 
 jest.mock( '../../icon', () => () => <div data-testid="test-icon" /> );
 
@@ -636,9 +625,9 @@ describe( 'Button', () => {
 			<Button href="foo" type="image/png" />
 			{ /* @ts-expect-error - if button, type must be submit/reset/button */ }
 			<Button type="image/png" />
-			{ /* @ts-expect-error */ }
+			{ /* @ts-expect-error `type` must be submit, reset or button. */ }
 			<Button type="invalidtype" />
-			{ /* @ts-expect-error */ }
+			{ /* @ts-expect-error `accessibleWhenDisabled` is not supported on a link button. */ }
 			<Button disabled accessibleWhenDisabled href="foo" />
 		</>;
 	} );

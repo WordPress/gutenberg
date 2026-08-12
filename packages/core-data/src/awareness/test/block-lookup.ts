@@ -1,19 +1,11 @@
-/**
- * External dependencies
- */
 import { Y } from '@wordpress/sync';
 import { renderHook } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import {
 	getBlockPathInYdoc,
 	getContainingBlockYMap,
 	resolveBlockClientIdByPath,
 	usePostContentBlocks,
 } from '../block-lookup';
-
 import type { EditorStoreBlock } from '../block-lookup';
 
 type MockBlock = EditorStoreBlock & {

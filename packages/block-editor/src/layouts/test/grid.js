@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import grid from '../grid';
 
 const GridLayoutInspectorControls = grid.inspectorControls;
