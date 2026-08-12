@@ -287,9 +287,11 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 			],
 		} );
 
-		await editor.canvas
-			.getByRole( 'document', { name: 'Empty block' } )
-			.click();
+		// Select via the store rather than a click: the list block's toolbar
+		// floats over the paragraph above it and swallows the pointer event.
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Empty block' } )
+		);
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{ name: 'core/paragraph', attributes: { content: '' } },
