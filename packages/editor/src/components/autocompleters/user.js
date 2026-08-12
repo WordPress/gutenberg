@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -52,7 +49,7 @@ export default {
 				const { getUsers } = select( coreStore );
 				return getUsers( {
 					context: 'view',
-					search: encodeURIComponent( filterValue ),
+					search: filterValue,
 				} );
 			},
 			[ filterValue ]

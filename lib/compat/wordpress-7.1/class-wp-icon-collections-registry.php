@@ -1,6 +1,15 @@
 <?php
+/**
+ * Icon Collections: WP_Icon_Collections_Registry class
+ *
+ * @package gutenberg
+ */
 
 if ( ! class_exists( 'WP_Icon_Collections_Registry' ) ) {
+
+	/**
+	 * Core class used for managing registered icon collections.
+	 */
 	class WP_Icon_Collections_Registry {
 		/**
 		 * Registered icon collections array.

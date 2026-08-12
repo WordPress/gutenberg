@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type {
 	KeyboardEvent,
@@ -9,31 +6,23 @@ import type {
 	FocusEvent,
 	ReactNode,
 } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useDebounce, useInstanceId, usePrevious } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
+import { withIgnoreIMEEvents } from '@wordpress/keycodes';
 import Token from './token';
 import TokenInput from './token-input';
-import { TokensAndInputWrapperFlex } from './styles';
 import SuggestionsList from './suggestions-list';
 import type { FormTokenFieldProps, TokenItem } from './types';
-import { FlexItem } from '../flex';
+import { Flex, FlexItem } from '../flex';
+import styles from './style.module.scss';
 import {
 	StyledHelp,
 	StyledLabel,
 } from '../base-control/styles/base-control-styles';
-import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 
 const identity = ( value: string ) => value;
 
@@ -826,14 +815,15 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 				onMouseDown={ onContainerTouched }
 				onTouchStart={ onContainerTouched }
 			>
-				<TokensAndInputWrapperFlex
+				<Flex
+					className={ styles[ 'tokens-and-input' ] }
 					justify="flex-start"
 					align="center"
 					gap={ 1 }
 					wrap
 				>
 					{ renderTokensAndInput() }
-				</TokensAndInputWrapperFlex>
+				</Flex>
 				{ isExpanded && (
 					<SuggestionsList
 						instanceId={ instanceId }

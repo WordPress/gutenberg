@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`md5 creates a hash of a number 1`] = `"55587a910882016321201e6ebbc9f595"`;
 

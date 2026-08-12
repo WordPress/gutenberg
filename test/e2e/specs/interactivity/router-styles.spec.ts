@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 
 const COLOR_RED = 'rgb(255, 0, 0)';

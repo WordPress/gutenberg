@@ -194,7 +194,7 @@ export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 /**
  * Font weight variants.
  */
-export type FontWeight = 'regular' | 'medium';
+export type FontWeight = 'default' | 'emphasis';
 
 /**
  * Line height scale.

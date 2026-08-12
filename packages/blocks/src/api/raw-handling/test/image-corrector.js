@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import imageCorrector from '../image-corrector';
 import { deepFilterHTML } from '../utils';
 

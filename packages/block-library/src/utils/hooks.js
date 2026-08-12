@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { v4 as uuidv4 } from 'uuid';
-
-/**
- * WordPress dependencies
- */
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
@@ -13,10 +6,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useRegistry } from '@wordpress/data';
 import { useLayoutEffect, useEffect, useRef } from '@wordpress/element';
 import { store as uploadStore } from '@wordpress/upload-media';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 
 /**

@@ -346,4 +346,47 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 
 		$this->assertSameSetsWithIndex( $expected, $variation_data, 'Variation data with resolved ref values does not match' );
 	}
+
+	/**
+	 * Tests that a non-string `className` attribute does not cause a fatal
+	 * error and the block content is returned unmodified.
+	 *
+	 * @covers ::gutenberg_render_block_style_variation_class_name
+	 */
+	public function test_block_style_variation_class_name_with_non_string_class_name() {
+		$block = array(
+			'blockName' => 'core/paragraph',
+			'attrs'     => array(
+				'className' => array( '0', '1' ),
+			),
+		);
+
+		$block_content = "<p class=\"0 1\">Test</p>\n";
+
+		$this->assertSame(
+			$block_content,
+			gutenberg_render_block_style_variation_class_name( $block_content, $block ),
+			'Block content should be returned unchanged when className is not a string'
+		);
+	}
+
+	/**
+	 * Tests to ensure that there are no references to an undefined array key
+	 * if `className` is not assigned.
+	 *
+	 * @covers ::gutenberg_render_block_style_variation_class_name
+	 */
+	public function test_block_style_variation_class_name_with_missing_class_name() {
+		$block = array(
+			'blockName' => 'core/paragraph',
+			'attrs'     => array(),
+		);
+
+		$block_content = "<p>Test</p>\n";
+
+		$this->assertSame(
+			$block_content,
+			gutenberg_render_block_style_variation_class_name( $block_content, $block )
+		);
+	}
 }

@@ -1,14 +1,6 @@
 'use strict';
-
-/**
- * External dependencies
- */
 const { stat } = require( 'fs' ).promises;
 const { homedir } = require( 'os' );
-
-/**
- * Internal dependencies
- */
 const getCacheDirectory = require( '../get-cache-directory' );
 
 jest.mock( 'fs', () => ( {

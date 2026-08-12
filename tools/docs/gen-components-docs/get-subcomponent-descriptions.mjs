@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import fs from 'node:fs/promises';
 import babel from '@babel/core';
 import { parse as commentParser } from 'comment-parser';

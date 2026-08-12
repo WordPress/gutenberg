@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useEffect } from '@wordpress/element';
 import { useDispatch, useRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __, _n, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import withRegistryProvider from './with-registry-provider';
 import { unlock } from '../../lock-unlock';
 import { store as uploadStore } from '../../store';

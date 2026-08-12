@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { FetchHandler } from '../../types';
 import createPreloadingMiddleware, {
 	CLEAR,
@@ -101,12 +98,12 @@ describe( 'Preloading Middleware', () => {
 					const noResponseMock =
 						'undefined' === typeof window.Response;
 					if ( noResponseMock ) {
-						// @ts-expect-error
+						// @ts-expect-error The stub does not implement the full `Response` static side.
 						window.Response = class {
 							constructor( body, options ) {
-								// @ts-expect-error
+								// @ts-expect-error `body` is not a declared property on the stub.
 								this.body = JSON.parse( body );
-								// @ts-expect-error
+								// @ts-expect-error `headers` is not a declared property on the stub.
 								this.headers = options.headers;
 							}
 						};
@@ -141,7 +138,7 @@ describe( 'Preloading Middleware', () => {
 						async () => {}
 					);
 					if ( noResponseMock ) {
-						// @ts-expect-error
+						// @ts-expect-error The operand of `delete` must be optional.
 						delete window.Response;
 					}
 					return response.then( ( value ) => {

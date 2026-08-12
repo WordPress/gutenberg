@@ -97,7 +97,7 @@
 
 	.dataviews-view-grid__media {
 		width: 100%;
-		aspect-ratio: 1/1;
+		aspect-ratio: var(--wp-dataviews-media-aspect-ratio, 1/1);
 		background-color: var(--wpds-color-background-surface-neutral-strong);
 		border-radius: var(--wpds-border-radius-md);
 		overflow: hidden;
@@ -257,7 +257,7 @@
 
 .dataviews-view-grid__group-header {
 	font-size: var(--wpds-typography-font-size-lg);
-	font-weight: var(--wpds-typography-font-weight-medium);
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 	color: var(--wpds-color-foreground-content-neutral);
 	margin: 0 0 var(--wpds-dimension-gap-sm) 0;
 	padding: 0 var(--wpds-dimension-padding-2xl);
