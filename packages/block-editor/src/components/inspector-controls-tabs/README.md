@@ -1,148 +1,69 @@
 # Inspector Controls Tabs
 
-The `InspectorControlsTabs` component provides a tabbed interface within the Inspector Controls sidebar of the WordPress Block Editor, allowing you to organize block settings into logical groups for better user experience.
+The `InspectorControlsTabs` component splits the block inspector sidebar into tabs, so a block's settings, styles and list view fills are grouped instead of being stacked in a single scrolling column.
 
-## Description
+_Note:_ This component is internal to the `@wordpress/block-editor` package. It is not exported from the package and is not part of the public API. It is rendered by [`BlockInspector`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-inspector/README.md), which decides whether tabs are shown at all.
 
-The `InspectorControlsTabs` component helps reduce visual clutter in the sidebar by organizing related settings into tabs. This is particularly useful for blocks with numerous settings that can be logically grouped into different categories.
+## Development guidelines
 
-## Installation
+The tabs are not authored by the block. Each tab renders [`InspectorControls`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md) slots, so a block populates a tab simply by rendering `InspectorControls` with the matching `group`: the Settings tab renders the default, `position` and `bindings` groups plus the Advanced panel, the Styles tab renders the `color`, `background`, `filter`, `typography`, `dimensions`, `border` and `styles` groups, and the List View tab renders the `list` group.
 
-This component is part of the `@wordpress/block-editor` package. If you're developing with WordPress, it should already be available in your environment.
+Which tabs exist is determined by the `useInspectorControlsTabs` hook, which only returns a tab when at least one fill has been rendered into its groups. The hook also honors the `blockInspectorTabs` block editor setting, which can disable tabs globally or per block name. `BlockInspector` renders this component only when the hook returns more than one tab; with a single tab the sections are rendered flat instead.
 
-```bash
-npm install @wordpress/block-editor
-```
+Two behaviors are worth knowing when consuming the tabs. The List View tab is restricted by an allowlist that currently contains only `core/navigation`, so other blocks never receive it even if they render `list` group fills. And because the tab panel mounts before slot fills arrive, blocks that are known to have a List View tab select it by default via `defaultTabId` rather than falling back to Settings.
 
-## Usage
+Tab labels are rendered as icons with a tooltip. When the `showIconLabels` preference from `@wordpress/preferences` is enabled, the tab title is rendered as text instead.
+
+### Usage
 
 ```jsx
-import { InspectorControls } from '@wordpress/block-editor';
-import { PanelBody } from '@wordpress/components';
-import { InspectorControlsTabs } from '@wordpress/block-editor';
+import InspectorControlsTabs from '../inspector-controls-tabs';
+import useInspectorControlsTabs from '../inspector-controls-tabs/use-inspector-controls-tabs';
 
-function MyBlockEdit({ attributes, setAttributes }) {
-    return (
-        <>
-            <InspectorControls>
-                <InspectorControlsTabs>
-                    <InspectorControlsTabs.Tab name="style" title="Style">
-                        <PanelBody title="Style Settings">
-                            {/* Style-related controls */}
-                        </PanelBody>
-                    </InspectorControlsTabs.Tab>
+function MyBlockInspector( { blockName, clientId, hasBlockStyles } ) {
+	const availableTabs = useInspectorControlsTabs( blockName );
 
-                    <InspectorControlsTabs.Tab name="advanced" title="Advanced">
-                        <PanelBody title="Advanced Settings">
-                            {/* Advanced controls */}
-                        </PanelBody>
-                    </InspectorControlsTabs.Tab>
-                </InspectorControlsTabs>
-            </InspectorControls>
+	if ( availableTabs.length <= 1 ) {
+		return null;
+	}
 
-            {/* Block content */}
-        </>
-    );
+	return (
+		<InspectorControlsTabs
+			blockName={ blockName }
+			clientId={ clientId }
+			hasBlockStyles={ hasBlockStyles }
+			tabs={ availableTabs }
+		/>
+	);
 }
 ```
 
-## Props
+### Props
 
-### InspectorControlsTabs
+#### `blockName`
 
-The main wrapper component that creates the tabbed interface.
+-   **Type:** `String`
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| children | Node | - | Tab components to be rendered |
+The name of the block being inspected, for example `core/navigation`. It is used to decide whether the List View tab is available and to resolve the border panel label. When omitted, the Advanced panel is not rendered in the Settings tab.
 
-### InspectorControlsTabs.Tab
+#### `clientId`
 
-Individual tab component that wraps the content for each tab.
+-   **Type:** `String`
 
-| Prop | Type | Required | Description |
-|------|------|----------|-------------|
-| name | string | Yes | Unique identifier for the tab |
-| title | string | Yes | Display title for the tab |
-| children | Node | Yes | Content to be displayed when tab is active |
+The client ID of the block being inspected. It is used as the key of the tabs panel so that selecting a different block resets the selected tab, and it is passed to the block styles preview in the Styles tab.
 
-## Examples
+#### `hasBlockStyles`
 
-### Basic Usage
+-   **Type:** `Boolean`
 
-```jsx
-import { InspectorControls } from '@wordpress/block-editor';
-import {
-    PanelBody,
-    TextControl,
-    ColorPicker
-} from '@wordpress/components';
-import { InspectorControlsTabs } from '@wordpress/block-editor';
+Whether the block has registered block styles. When `true`, the Styles tab renders a "Styles" panel with the block style previews above the block support slots.
 
-function MyBlockEdit({ attributes, setAttributes }) {
-    const { text, backgroundColor } = attributes;
+#### `tabs`
 
-    return (
-        <>
-            <InspectorControls>
-                <InspectorControlsTabs>
-                    <InspectorControlsTabs.Tab name="content" title="Content">
-                        <PanelBody>
-                            <TextControl
-                                label="Text Content"
-                                value={text}
-                                onChange={(value) => setAttributes({ text: value })}
-                            />
-                        </PanelBody>
-                    </InspectorControlsTabs.Tab>
+-   **Type:** `Array`
 
-                    <InspectorControlsTabs.Tab name="style" title="Style">
-                        <PanelBody>
-                            <ColorPicker
-                                label="Background Color"
-                                color={backgroundColor}
-                                onChange={(value) => setAttributes({ backgroundColor: value })}
-                            />
-                        </PanelBody>
-                    </InspectorControlsTabs.Tab>
-                </InspectorControlsTabs>
-            </InspectorControls>
+The tabs to render in the tab list, in display order. Each entry is an object with `name`, `title` and `icon`. Pass the value returned by `useInspectorControlsTabs`; only tabs matching the `settings`, `styles` and `list` names have a corresponding panel.
 
-            <div style={{ backgroundColor }}>
-                {text}
-            </div>
-        </>
-    );
-}
-```
+## Related components
 
-### Multiple Panels in a Tab
-
-```jsx
-<InspectorControlsTabs>
-    <InspectorControlsTabs.Tab name="style" title="Style">
-        <PanelBody title="Colors">
-            {/* Color controls */}
-        </PanelBody>
-        <PanelBody title="Typography">
-            {/* Typography controls */}
-        </PanelBody>
-        <PanelBody title="Spacing">
-            {/* Spacing controls */}
-        </PanelBody>
-    </InspectorControlsTabs.Tab>
-</InspectorControlsTabs>
-```
-
-## Best Practices
-
-1. Group related controls together in the same tab
-2. Use clear, concise tab names that describe the contained settings
-3. Order tabs from most to least commonly used
-4. Keep the number of tabs reasonable (3-4 maximum recommended)
-5. Ensure tab names are consistent with WordPress conventions
-
-## Related Components
-
-- [`InspectorControls`](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-editor/src/components/inspector-controls)
-- [`PanelBody`](https://github.com/WordPress/gutenberg/tree/trunk/packages/components/src/panel)
+Block Editor components are components that can be used to compose the UI of your block editor. Thus, they can only be used under a [`BlockEditorProvider`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/provider/README.md) in the components tree.
