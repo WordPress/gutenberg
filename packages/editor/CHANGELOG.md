@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Notes: Restore the sidebar that was open before a note was added when the note form is cancelled, instead of leaving no sidebar open.
+
 ## 14.53.0 (2026-08-12)
 
 ### Internal
