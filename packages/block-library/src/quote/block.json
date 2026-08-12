@@ -28,6 +28,7 @@
 	},
 	"supports": {
 		"anchor": true,
+		"captureControls": true,
 		"align": [ "left", "right", "wide", "full" ],
 		"html": false,
 		"background": {
