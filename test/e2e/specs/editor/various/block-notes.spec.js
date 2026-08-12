@@ -2296,6 +2296,42 @@ test.describe( 'Block Notes', () => {
 			).toBeVisible();
 			await expect( thread ).toBeVisible();
 		} );
+
+		test( 'keeps a typed note when the lock lands mid-draft', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			await admin.editPost( postId );
+			await editor.selectBlocks(
+				editor.canvas
+					.getByRole( 'document', { name: 'Block: Paragraph' } )
+					.first()
+			);
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+
+			const textbox = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+			await textbox.pressSequentially( 'Worth keeping.' );
+
+			await lockPost( requestUtils );
+
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Notes are locked for this post.' } )
+			).toBeVisible();
+			// The rejection must not take the draft down with it.
+			await expect( textbox ).toHaveText( 'Worth keeping.' );
+		} );
 	} );
 } );
 
