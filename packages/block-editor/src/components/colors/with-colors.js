@@ -1,6 +1,6 @@
 import { useMemo, Component } from '@wordpress/element';
 import { compose, createHigherOrderComponent } from '@wordpress/compose';
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import { kebabCase } from '@wordpress/kebab-case';
 import {
 	getColorClassName,
 	getColorObjectByColorValue,
@@ -8,9 +8,6 @@ import {
 	getMostReadableColor,
 } from './utils';
 import { useSettings } from '../use-settings';
-import { unlock } from '../../lock-unlock';
-
-const { kebabCase } = unlock( componentsPrivateApis );
 
 /**
  * Capitalizes the first letter in a string.

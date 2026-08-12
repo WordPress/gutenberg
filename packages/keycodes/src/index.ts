@@ -151,6 +151,7 @@ export const SHIFT = 'shift';
 export const ZERO = 48;
 
 export { isAppleOS };
+export { withIgnoreIMEEvents } from './with-ignore-ime-events';
 
 /**
  * Capitalise the first character of a string.

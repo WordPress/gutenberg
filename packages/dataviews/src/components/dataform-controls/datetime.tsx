@@ -6,7 +6,7 @@ import {
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
-import { Stack } from '@wordpress/ui';
+import { Calendar, Stack } from '@wordpress/ui';
 import type { DataFormControlProps, FormatDatetime } from '../../types';
 import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../../constants';
 import RelativeDateControl from './utils/relative-date-control';
@@ -14,7 +14,7 @@ import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
 import getCustomValidity from './utils/get-custom-validity';
 import { unlock } from '../../lock-unlock';
 
-const { DateCalendar, ValidatedInputControl } = unlock( componentsPrivateApis );
+const { ValidatedInputControl } = unlock( componentsPrivateApis );
 
 const formatDateTime = ( value?: string ): string => {
 	if ( ! value ) {
@@ -90,7 +90,7 @@ function CalendarDateTimeControl< Item >( {
 	}, [] );
 
 	const onSelectDate = useCallback(
-		( newDate: Date | undefined | null ) => {
+		( newDate: Date | null ) => {
 			let dateTimeValue: string | undefined;
 			if ( newDate ) {
 				// Read the day the calendar reported, rather than re-anchoring
@@ -209,10 +209,12 @@ function CalendarDateTimeControl< Item >( {
 				/>
 				{ /* Calendar widget */ }
 				{ ! compact && (
-					<DateCalendar
+					<Calendar
 						style={ { width: '100%' } }
 						selected={ getCalendarDate( value ) || undefined }
 						onSelect={ onSelectDate }
+						value={ value ? parseDateTime( value ) : null }
+						onValueChange={ onSelectDate }
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
 						weekStartsOn={ weekStartsOn }
