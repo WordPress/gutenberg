@@ -10,3 +10,7 @@ globalThis.IS_WORDPRESS_CORE = true;
 // Inject the `IS_GUTENBERG_PLUGIN` global, used for feature flagging.
 // eslint-disable-next-line @wordpress/wp-global-usage
 globalThis.IS_GUTENBERG_PLUGIN = true;
+
+// Run all tests with development tools enabled.
+// eslint-disable-next-line @wordpress/wp-global-usage
+globalThis.SCRIPT_DEBUG = true;
