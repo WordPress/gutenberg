@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
@@ -14,7 +11,6 @@ import {
 	FlexItem,
 	SearchControl,
 	Spinner,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useDebounce } from '@wordpress/compose';
@@ -24,15 +20,11 @@ import {
 } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import { buildTermsTree } from '../../utils/terms';
+import { normalizeTextString } from '../../utils/normalize-text-string';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { normalizeTextString } = unlock( componentsPrivateApis );
 const { RECEIVE_INTERMEDIATE_RESULTS } = unlock( coreDataPrivateApis );
 
 /**
@@ -417,7 +409,6 @@ export function HierarchicalTermSelector( { slug } ) {
 		<Flex direction="column" gap="4">
 			{ showFilter && ! loading && (
 				<SearchControl
-					__next40pxDefaultSize
 					label={ filterLabel }
 					placeholder={ filterLabel }
 					value={ filterValue }
@@ -462,7 +453,6 @@ export function HierarchicalTermSelector( { slug } ) {
 				<form onSubmit={ onAddTerm }>
 					<Flex direction="column" gap="4">
 						<TextControl
-							__next40pxDefaultSize
 							className="editor-post-taxonomies__hierarchical-terms-input"
 							label={ newTermLabel }
 							value={ formName }
@@ -471,7 +461,6 @@ export function HierarchicalTermSelector( { slug } ) {
 						/>
 						{ !! availableTerms.length && (
 							<TreeSelect
-								__next40pxDefaultSize
 								label={ parentSelectLabel }
 								noOptionLabel={ noParentOption }
 								onChange={ onChangeFormParent }

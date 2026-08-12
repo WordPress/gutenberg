@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { sprintf, _x } from '@wordpress/i18n';
 import { __experimentalUseCustomUnits as useCustomUnits } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import PresetInputControl from '../../preset-input-control';
 import { useSettings } from '../../use-settings';
 import { store as blockEditorStore } from '../../../store';

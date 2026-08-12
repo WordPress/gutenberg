@@ -1,14 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { isBlobURL } from '@wordpress/blob';
 import {
-	Disabled,
 	SelectControl,
 	Spinner,
 	ToggleControl,
@@ -29,10 +21,6 @@ import { useDispatch } from '@wordpress/data';
 import { audio as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { createUpgradedEmbedBlock } from '../embed/util';
 import {
 	useUploadMediaFromBlobURL,
@@ -224,7 +212,6 @@ function AudioEdit( {
 						}
 					>
 						<SelectControl
-							__next40pxDefaultSize
 							label={ _x(
 								'Preload',
 								'noun; Audio block parameter'
@@ -250,14 +237,11 @@ function AudioEdit( {
 				</ToolsPanel>
 			</InspectorControls>
 			<figure { ...blockProps }>
-				{ /*
-				Disable the audio tag if the block is not selected
-				so the user clicking on it won't play the
-				file or change the position slider when the controls are enabled.
-				*/ }
-				<Disabled isDisabled={ ! isSingleSelected }>
-					<audio controls="controls" src={ src ?? temporaryURL } />
-				</Disabled>
+				<audio
+					controls="controls"
+					inert={ ! isSingleSelected ? 'true' : undefined }
+					src={ src ?? temporaryURL }
+				/>
 				{ !! temporaryURL && <Spinner /> }
 				<Caption
 					attributes={ attributes }

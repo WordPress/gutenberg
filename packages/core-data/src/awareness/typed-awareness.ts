@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { Awareness } from '@wordpress/sync';
-
-/**
- * Internal dependencies
- */
 import { getRecordValue } from './utils';
 
 /**

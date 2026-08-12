@@ -13,7 +13,7 @@ const meta: Meta< typeof Icon > = {
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',
-			notes: 'When rendering SVGs, use `Icon` from `@wordpress/ui` instead.',
+			notes: 'When rendering SVGs, use [`Icon`](?path=/docs/design-system-components-icon--docs) from `@wordpress/ui` instead.',
 		},
 	},
 };
@@ -24,21 +24,6 @@ const Template: StoryFn< typeof Icon > = ( args ) => <Icon { ...args } />;
 export const Default = Template.bind( {} );
 Default.args = {
 	icon: wordpress,
-};
-
-export const FillColor: StoryFn< typeof Icon > = ( args ) => {
-	return (
-		<div
-			style={ {
-				fill: 'blue',
-			} }
-		>
-			<Icon { ...args } />
-		</div>
-	);
-};
-FillColor.args = {
-	...Default.args,
 };
 
 /**

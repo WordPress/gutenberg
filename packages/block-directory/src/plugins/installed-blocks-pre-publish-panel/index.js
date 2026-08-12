@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { _n, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { PluginPrePublishPanel } from '@wordpress/editor';
-
-/**
- * Internal dependencies
- */
 import CompactList from '../../components/compact-list';
 import { store as blockDirectoryStore } from '../../store';
 

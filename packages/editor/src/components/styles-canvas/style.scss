@@ -3,7 +3,7 @@
 
 .editor-styles-canvas {
 	height: 100%;
-	padding: $grid-unit-20;
+	padding: $grid-unit-30;
 
 	// This is the gray background color that's applied behind "isolation mode".
 	// The color normally comes from .editor-visual-editor, but that class is missing here.
@@ -19,7 +19,6 @@
 
 .editor-styles-canvas__section {
 	background: $white; // Fallback color, overridden by JavaScript.
-	border-radius: $radius-large;
 	bottom: 0;
 	left: 0;
 	overflow: hidden;

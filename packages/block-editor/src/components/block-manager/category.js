@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useCallback } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { CheckboxControl } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import BlockTypesChecklist from './checklist';
 
 function BlockManagerCategory( {

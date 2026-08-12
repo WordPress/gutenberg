@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { privateApis as routePrivateApis } from '@wordpress/route';
 import { SnackbarNotices } from '@wordpress/notices';
 import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
@@ -20,21 +13,17 @@ import { useState, useEffect, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Page, getAdminThemeColors } from '@wordpress/admin-ui';
 import { Tooltip } from '@wordpress/ui';
-import { privateApis as themePrivateApis } from '@wordpress/theme';
-
-/**
- * Internal dependencies
- */
+import { ThemeProvider } from '@wordpress/theme';
 import Sidebar from '../sidebar';
 import SavePanel from '../save-panel';
 import CanvasRenderer from '../canvas-renderer';
 import useRouteTitle from '../app/use-route-title';
 import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
+import useSyncBodyBackground from './use-sync-body-background';
 import './style.scss';
 
 const { useLocation, useMatches, Outlet } = unlock( routePrivateApis );
-const { ThemeProvider } = unlock( themePrivateApis );
 
 export default function Root() {
 	const matches = useMatches();
@@ -61,6 +50,8 @@ export default function Root() {
 
 	const themeColors = useMemo( getAdminThemeColors, [] );
 
+	const layoutRef = useSyncBodyBackground();
+
 	return (
 		<SlotFillProvider>
 			<Tooltip.Provider>
@@ -70,6 +61,7 @@ export default function Root() {
 				>
 					<ThemeProvider color={ themeColors }>
 						<div
+							ref={ layoutRef }
 							className={ clsx( 'boot-layout', {
 								'has-canvas': !! canvas || canvas === null,
 								'has-full-canvas': isFullScreen,

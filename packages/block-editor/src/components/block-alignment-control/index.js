@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import BlockAlignmentUI from './ui';
 
 const BlockAlignmentControl = ( props ) => {

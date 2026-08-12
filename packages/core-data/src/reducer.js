@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import { compose } from '@wordpress/compose';
 import { combineReducers } from '@wordpress/data';
 import { createUndoManager } from '@wordpress/undo-manager';
-
-/**
- * Internal dependencies
- */
 import { clearUnchangedEdits, ifMatchingAction, replaceAction } from './utils';
 import { reducer as queriedDataReducer } from './queried-data';
 import { rootEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
@@ -751,11 +740,18 @@ export function collaborationSupported( state = true, action ) {
  */
 export function viewConfigs( state = {}, action ) {
 	switch ( action.type ) {
-		case 'RECEIVE_VIEW_CONFIG':
+		case 'RECEIVE_VIEW_CONFIG': {
+			const key = `${ action.kind }/${ action.name }`;
+			// Merge so a partial (`_fields`) response doesn't clobber
+			// properties already received for the same entity.
 			return {
 				...state,
-				[ `${ action.kind }/${ action.name }` ]: action.config,
+				[ key ]: {
+					...state[ key ],
+					...action.config,
+				},
 			};
+		}
 	}
 	return state;
 }

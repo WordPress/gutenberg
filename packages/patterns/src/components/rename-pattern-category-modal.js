@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Modal, Button, TextControl } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { store as coreStore } from '@wordpress/core-data';
@@ -10,10 +7,6 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { speak } from '@wordpress/a11y';
-
-/**
- * Internal dependencies
- */
 import { CATEGORY_SLUG } from './category-selector';
 
 export default function RenamePatternCategoryModal( {
@@ -132,7 +125,6 @@ export default function RenamePatternCategoryModal( {
 					<Stack direction="column" gap="sm">
 						<TextControl
 							ref={ textControlRef }
-							__next40pxDefaultSize
 							label={ __( 'Name' ) }
 							value={ name }
 							onChange={ onChange }

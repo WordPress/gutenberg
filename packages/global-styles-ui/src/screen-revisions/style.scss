@@ -116,7 +116,7 @@
 	gap: $grid-unit-10;
 	.global-styles-ui-screen-revisions__date {
 		text-transform: uppercase;
-		font-weight: 600;
+		font-weight: var(--wpds-typography-font-weight-emphasis);
 		font-size: 12px;
 	}
 }

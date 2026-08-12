@@ -180,6 +180,10 @@ _Returns_
 
 -   `RichTextValue`: A rich text value.
 
+### EventListenersProps
+
+The callback-Set refs the private event-listener helpers dispatch from.
+
 ### getActiveFormat
 
 Gets the format object by type at the start of the selection. This can be used to get e.g. the URL of a link format at the current selection, but also to check if a format is active at the selection. Returns undefined if there is no format at the selection.

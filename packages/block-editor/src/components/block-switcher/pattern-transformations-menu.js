@@ -1,17 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useInstanceId, useViewportMatch } from '@wordpress/compose';
 import { chevronRight } from '@wordpress/icons';
-
 import { Composite, MenuGroup, MenuItem, Popover } from '@wordpress/components';
 import { VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import BlockPreview from '../block-preview';
 import useTransformedPatterns from './use-transformed-patterns';
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store, privateApis } from '@wordpress/interactivity';
 
 const { directive, h } = privateApis(

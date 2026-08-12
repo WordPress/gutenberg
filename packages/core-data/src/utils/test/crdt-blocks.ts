@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { Y } from '@wordpress/sync';
-
-/**
- * External dependencies
- */
 import {
 	describe,
 	expect,
@@ -14,14 +7,12 @@ import {
 	beforeEach,
 	afterEach,
 } from '@jest/globals';
-
 /**
  * Mock uuid module
  */
 jest.mock( 'uuid', () => ( {
 	v4: () => 'mocked-uuid-' + Math.random(),
 } ) );
-
 /**
  * Mock @wordpress/blocks module
  */
@@ -101,15 +92,7 @@ jest.mock( '@wordpress/blocks', () => ( {
 		},
 	],
 } ) );
-
-/**
- * WordPress dependencies
- */
 import { RichTextData } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import {
 	mergeCrdtBlocks,
 	mergeRichTextUpdate,
@@ -163,6 +146,64 @@ describe( 'crdt-blocks', () => {
 				block.get( 'attributes' ) as YBlockAttributes
 			 ).get( 'content' ) as Y.Text;
 			expect( content.toString() ).toBe( 'Hello World' );
+		} );
+
+		it( 'syncs innerContent of static inner-content blocks into the Y.Doc', () => {
+			const incomingBlocks: Block[] = [
+				{
+					name: 'core/html',
+					attributes: {},
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: 'Editable' },
+							innerBlocks: [],
+							clientId: 'inner-1',
+						},
+					],
+					innerContent: [ '<div class="banner">', null, '</div>' ],
+					clientId: 'html-1',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, incomingBlocks, null );
+
+			const block = yblocks.get( 0 );
+			expect( block.get( 'innerContent' ) ).toEqual( [
+				'<div class="banner">',
+				null,
+				'</div>',
+			] );
+		} );
+
+		it( 'updates innerContent when the static markup changes', () => {
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/html',
+					attributes: {},
+					innerBlocks: [],
+					innerContent: [ '<p>one</p>' ],
+					clientId: 'html-1',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/html',
+					attributes: {},
+					innerBlocks: [],
+					innerContent: [ '<p>two</p>' ],
+					clientId: 'html-1',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			expect( yblocks.get( 0 ).get( 'innerContent' ) ).toEqual( [
+				'<p>two</p>',
+			] );
 		} );
 
 		it( 'updates existing blocks when content changes', () => {

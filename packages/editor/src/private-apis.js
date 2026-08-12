@@ -1,18 +1,10 @@
-/**
- * WordPress dependencies
- */
 import {
 	CreateTemplatePartModal,
 	patternTitleField,
 	templateTitleField,
 } from '@wordpress/fields';
 import * as interfaceApis from '@wordpress/interface';
-
-/**
- * Internal dependencies
- */
 import { lock } from './lock-unlock';
-import { EntitiesSavedStatesExtensible } from './components/entities-saved-states';
 import BackButton from './components/header/back-button';
 import Editor from './components/editor';
 import PluginPostExcerpt from './components/post-excerpt/plugin';
@@ -24,7 +16,6 @@ import ToolsMoreMenuGroup from './components/more-menu/tools-more-menu-group';
 import ViewMoreMenuGroup from './components/more-menu/view-more-menu-group';
 import ResizableEditor from './components/resizable-editor';
 import { registerCoreBlockBindingsSources } from './bindings/api';
-import { getTemplateInfo } from './utils/get-template-info';
 import GlobalStylesUIWrapper from './components/global-styles';
 import { StyleBookPreview } from './components/style-book';
 import { useGlobalStyles, useStyle } from './components/global-styles/hooks';
@@ -39,7 +30,6 @@ lock( privateApis, {
 	patternTitleField,
 	templateTitleField,
 	BackButton,
-	EntitiesSavedStatesExtensible,
 	Editor,
 	PluginPostExcerpt,
 	PostCardPanel,
@@ -51,7 +41,6 @@ lock( privateApis, {
 	ResizableEditor,
 	UploadProgressSnackbar,
 	registerCoreBlockBindingsSources,
-	getTemplateInfo,
 	// Global Styles
 	GlobalStylesUIWrapper,
 	GlobalStylesActionMenu,

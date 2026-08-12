@@ -20,7 +20,7 @@
 	cursor: var(--wpds-cursor-control);
 	padding: 3px var(--wpds-dimension-padding-lg); // Use padding to offset the is-active border, this benefits Windows High Contrast mode
 	margin-left: 0;
-	font-weight: var(--wpds-typography-font-weight-regular);
+	font-weight: var(--wpds-typography-font-weight-default);
 	color: var(--wpds-color-foreground-interactive-neutral);
 
 	&:disabled,

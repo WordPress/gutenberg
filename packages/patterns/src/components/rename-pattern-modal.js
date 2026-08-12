@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Button, Modal, TextControl } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { store as coreStore } from '@wordpress/core-data';
@@ -93,7 +90,6 @@ export default function RenamePatternModal( {
 			<form onSubmit={ onRename }>
 				<Stack direction="column" gap="lg">
 					<TextControl
-						__next40pxDefaultSize
 						label={ __( 'Name' ) }
 						value={ name }
 						onChange={ setName }

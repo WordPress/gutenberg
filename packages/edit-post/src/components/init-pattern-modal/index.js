@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
 import {
@@ -51,7 +48,6 @@ export default function InitPatternModal() {
 						onChange={ setTitle }
 						placeholder={ __( 'My pattern' ) }
 						className="patterns-create-modal__name-input"
-						__next40pxDefaultSize
 					/>
 					<ToggleControl
 						label={ _x( 'Synced', 'pattern (singular)' ) }
