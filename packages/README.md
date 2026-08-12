@@ -327,7 +327,7 @@ Gutenberg uses TypeScript for several reasons, including:
 Gutenberg uses TypeScript by running the TypeScript compiler (`tsc`) on select packages.
 These packages benefit from type checking and produced type declarations in the published packages.
 
-A package opts in to TypeScript tooling with two tsconfig files:
+A package opts in to TypeScript tooling with a `tsconfig.json` build project registered in the root `tsconfig.build.json` references. Packages with test or story files split into two projects:
 
 -   `tsconfig.build.json` is the build project: it covers `src`, emits declarations to `build-types`, and is what other packages and `npm run build` consume.
 -   `tsconfig.json` is the dev project: it covers test and story files with `noEmit`, so `npm run typecheck` and the IDE can check them without their declarations ending up in the published package.
@@ -340,9 +340,13 @@ Both extend shared base configurations (comments are not necessary):
 	// Extends a base configuration common to most packages.
 	"extends": "../../tsconfig.base.json",
 
-	// Dependencies that have opted in to TypeScript are referenced here,
-	// always by their build project.
-	"references": [ { "path": "../dom-ready/tsconfig.build.json" } ]
+	// Dependencies that have opted in to TypeScript are referenced here: a
+	// split one by its build project, one on a single config by its
+	// directory.
+	"references": [
+		{ "path": "../dom-ready/tsconfig.build.json" },
+		{ "path": "../hooks" }
+	]
 }
 ```
 
