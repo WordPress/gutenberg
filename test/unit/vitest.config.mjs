@@ -16,6 +16,8 @@ const ROOT_DIR = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
 	'../..'
 );
+const nodeRequire = createRequire( import.meta.url );
+const emotionPlugin = nodeRequire.resolve( '@swc/plugin-emotion' );
 const NORMALIZED_ROOT_DIR = ROOT_DIR.split( path.sep ).join( '/' );
 const gutenbergEnvSetupFile = path.join(
 	ROOT_DIR,
@@ -50,7 +52,7 @@ if (
 		 * Resolve to an absolute path so Vitest can load the reporter regardless
 		 * of hoisting layout.
 		 */
-		createRequire( import.meta.url ).resolve( '@flakiness/vitest' ),
+		nodeRequire.resolve( '@flakiness/vitest' ),
 		{
 			duplicates: 'rename',
 			flakinessProject: 'WordPress/gutenberg',
@@ -80,7 +82,7 @@ export default defineConfig( {
 		react( {
 			plugins: [
 				[
-					'@swc/plugin-emotion',
+					emotionPlugin,
 					{
 						autoLabel: 'always',
 						labelFormat: '[local]',
