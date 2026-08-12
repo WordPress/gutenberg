@@ -7,6 +7,8 @@ import { restoreWaveformAutoinitAttribute } from './disable-waveform-autoinit';
 // eslint-disable-next-line import/order -- This dependency reads the document attribute during module evaluation.
 import WaveformPlayerLib from '@arraypress/waveform-player';
 
+// The dependency reads the opt-out once during module evaluation. Restore the
+// page's original setting before any player instances are created.
 restoreWaveformAutoinitAttribute();
 
 /**
