@@ -61,6 +61,7 @@ const hydrateNode = async ( node: Element ) => {
 		return;
 	}
 	try {
+		await splitTask();
 		const fragment = getRegionRootFragment( node );
 		const vdom = toVdom( node );
 		initialVdom.set( node, vdom );
@@ -70,8 +71,6 @@ const hydrateNode = async ( node: Element ) => {
 		warn(
 			`Failed to hydrate island: ${( e as Error ).message ?? e}`
 		);
-	} finally {
-		await splitTask();
 	}
 };
 
