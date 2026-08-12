@@ -767,7 +767,9 @@ test.describe( 'Router regions', () => {
 		// Correct: exactly one region3, inside the new target container.
 		await expect( region3 ).toHaveCount( 1 );
 		await expect(
-			page.getByTestId( 'regions-with-attach-to' ).getByTestId( 'region3' )
+			page
+				.getByTestId( 'regions-with-attach-to' )
+				.getByTestId( 'region3' )
 		).toBeVisible();
 		// And the old `body`-attached element is gone (region3 is not a direct
 		// body child anymore).

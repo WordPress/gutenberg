@@ -1233,7 +1233,11 @@ describe( 'auto-keys (id + synthetic): cross-splice, refresh, and dedup behavior
 
 	it( 'splicing into a data-wp-key SSR item keeps its identity and nested content (no re-init)', async () => {
 		await setup(
-			`${ keyedNested( 'a', 'a', 'a', 'a-child', 'ac' ) }${ item( 'b', 'b', 'b' ) }`
+			`${ keyedNested( 'a', 'a', 'a', 'a-child', 'ac' ) }${ item(
+				'b',
+				'b',
+				'b'
+			) }`
 		);
 		await flush();
 		const feed = document.querySelector( '[data-wp-interactive]' )!;
@@ -1258,7 +1262,12 @@ describe( 'auto-keys (id + synthetic): cross-splice, refresh, and dedup behavior
 		expect( feed.children[ 1 ] ).toBe( bEl );
 		expect( aEl.querySelector( 'span' ) ).toBe( childEl );
 		expect( childEl.lastElementChild?.textContent ).toBe( 'x' );
-		expect( state.initCounts ).toEqual( { a: 1, 'a-child': 1, b: 1, x: 1 } );
+		expect( state.initCounts ).toEqual( {
+			a: 1,
+			'a-child': 1,
+			b: 1,
+			x: 1,
+		} );
 	} );
 
 	it( 'splicing into an id-keyed spliced item keeps its identity and nested content (no re-init)', async () => {
