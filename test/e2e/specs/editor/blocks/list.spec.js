@@ -2469,15 +2469,29 @@ test.describe( 'List (@firefox)', () => {
 			name: 'core/list',
 			attributes: { anchor: 'list' },
 			innerBlocks: [
-				{
-					name: 'core/list-item',
-					attributes: { content: 'x', anchor: 'item' },
-				},
+				{ name: 'core/list-item', attributes: { anchor: 'item' } },
 			],
 		} );
+		// Inserting selects the list container; ArrowDown moves the caret
+		// into the sole empty item.
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.type( 'x' );
 
-		await editor.canvas.locator( '[data-type="core/list-item"]' ).click();
-		await page.keyboard.press( 'End' );
+		// Typing lands in the sole item, verifying both the setup and the
+		// caret position.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				attributes: { anchor: 'list' },
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'x', anchor: 'item' },
+					},
+				],
+			},
+		] );
+
 		// Delete the text, then the emptied item: the anchors are not
 		// content, so the item and the list are removed together instead
 		// of the item being lifted out as a paragraph first.
