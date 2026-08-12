@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### New Features
+
+-   `Page`: Add a `navigation` prop (`{ items, currentHref }`) and a `components.link` override for link-based navigation between sections, rendered in the page header ([#79746](https://github.com/WordPress/gutenberg/pull/79746)).
+
+## 2.8.0 (2026-08-12)
+
 ### Bug Fixes
 
 -   `Breadcrumbs`: reset the list item margin that wp-admin's `common.css` applies, which left the trail misaligned with the rest of the page header ([#81134](https://github.com/WordPress/gutenberg/pull/81134)).

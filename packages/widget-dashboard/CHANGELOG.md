@@ -2,8 +2,13 @@
 
 ## Unreleased
 
+## 0.5.0 (2026-08-12)
+
 ### New Features
 
+-   Tile spacing is host-tunable via `--wp-widget-dashboard-tile-padding` and
+    `--wp-widget-dashboard-tile-header-gap`; the header gap follows the tile
+    padding unless set apart ([#81352](https://github.com/WordPress/gutenberg/pull/81352)).
 -   The actions "More" menu renders each action's resolved icon as the menu
     item prefix ([#81275](https://github.com/WordPress/gutenberg/pull/81275)).
 
@@ -18,6 +23,8 @@
 
 ### Internal
 
+-   Widget actions menu: render the action icon directly; the widget types
+    contract guarantees a renderable element ([#81381](https://github.com/WordPress/gutenberg/pull/81381)).
 -   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
 
 ## 0.4.0 (2026-07-29)

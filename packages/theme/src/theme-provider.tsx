@@ -39,12 +39,11 @@ export const ThemeProvider = ( {
 
 	const wrapperRef = useRef< HTMLDivElement >( null );
 
-	// For root providers, mirror the wrapper's custom properties onto the
-	// document element of the wrapper's own document (which may be an iframe)
-	// so they reach portals and content rendered outside the React subtree.
-	// `html` is shared, so set/remove individual properties (restoring any
-	// prior value) rather than assigning a whole style object. Preset settings
-	// like `cornerRadius` are forwarded by the prebuilt CSS instead.
+	// For root providers, mirror the wrapper's custom properties and preset
+	// attributes onto the document element of the wrapper's own document
+	// (which may be an iframe) so they reach portals and content rendered
+	// outside the React subtree. `html` is shared, so restore prior values on
+	// cleanup rather than replacing its complete style or attribute state.
 	useIsomorphicLayoutEffect( () => {
 		if ( ! isRoot ) {
 			return;
@@ -68,6 +67,15 @@ export const ThemeProvider = ( {
 
 		const previous = new Map< string, string >();
 		const applied: string[] = [];
+		const previousRootProvider = root.getAttribute(
+			'data-wpds-root-provider'
+		);
+		const previousCornerRadius = root.getAttribute(
+			'data-wpds-corner-radius'
+		);
+
+		root.setAttribute( 'data-wpds-root-provider', 'true' );
+		root.setAttribute( 'data-wpds-corner-radius', cornerRadiusPreset );
 
 		for ( const [ rawKey, rawValue ] of Object.entries(
 			themeProviderStyles
@@ -102,8 +110,26 @@ export const ThemeProvider = ( {
 					root.style.removeProperty( key );
 				}
 			}
+
+			if ( previousRootProvider === null ) {
+				root.removeAttribute( 'data-wpds-root-provider' );
+			} else {
+				root.setAttribute(
+					'data-wpds-root-provider',
+					previousRootProvider
+				);
+			}
+
+			if ( previousCornerRadius === null ) {
+				root.removeAttribute( 'data-wpds-corner-radius' );
+			} else {
+				root.setAttribute(
+					'data-wpds-corner-radius',
+					previousCornerRadius
+				);
+			}
 		};
-	}, [ isRoot, themeProviderStyles ] );
+	}, [ cornerRadiusPreset, isRoot, themeProviderStyles ] );
 
 	return (
 		<div
