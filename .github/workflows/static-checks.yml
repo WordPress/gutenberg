@@ -115,10 +115,7 @@ jobs:
                   npm run lint:css:update-suppressions
 
             - name: Type checking
-              run: npm run typecheck
-
-            - name: Build packages
-              run: npm run build -- --skip-types
+              run: npm run build
 
             - name: Validate package contents
               run: npm run lint:package-contents
