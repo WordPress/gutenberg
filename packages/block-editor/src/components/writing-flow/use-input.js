@@ -210,6 +210,10 @@ export default function useInput() {
 
 							if ( nextClientId ) {
 								event.preventDefault();
+								// An initial position of `true` is an
+								// internal sentinel: it focuses the block
+								// wrapper instead of a text field within
+								// it. See useFocusFirstElement.
 								selectBlock( nextClientId, true );
 							}
 						}

@@ -144,19 +144,10 @@ test.describe( 'Site editor writing flow', () => {
 		await page.keyboard.type( 'a' );
 
 		await expect
-			.poll( () =>
-				editor.getBlocks().then( ( blocks ) =>
-					blocks.map( ( { name, attributes } ) => ( {
-						name,
-						...( name === 'core/paragraph' && {
-							content: attributes.content,
-						} ),
-					} ) )
-				)
-			)
-			.toEqual( [
+			.poll( () => editor.getBlocks() )
+			.toMatchObject( [
 				{ name: 'core/site-title' },
-				{ name: 'core/paragraph', content: 'a' },
+				{ name: 'core/paragraph', attributes: { content: 'a' } },
 				{ name: 'core/site-tagline' },
 			] );
 	} );
