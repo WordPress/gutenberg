@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Notes: Keep a floating note thread at its block's place in the document when the block is hidden at the current viewport, and label the thread as hidden, instead of collapsing it to the top of the notes panel.
+
 ## 14.53.0 (2026-08-12)
 
 ### Internal
