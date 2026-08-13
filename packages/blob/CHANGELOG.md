@@ -2,8 +2,11 @@
 
 ## Unreleased
 
-## 4.53.0 (2026-08-12)
+### Internal
 
+-   Split tsconfig into a build project and a default dev project so test files are type checked without shipping their declarations. ([#81509](https://github.com/WordPress/gutenberg/pull/81509))
+
+## 4.53.0 (2026-08-12)
 
 ## 4.52.0 (2026-07-29)
 
