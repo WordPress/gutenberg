@@ -215,9 +215,8 @@
 
 .block-editor-global-styles__text-shadow-remove-button {
 	position: absolute;
-	right: 0;
+	right: $grid-unit;
 	top: $grid-unit;
-	margin: auto $grid-unit auto;
 	opacity: 0;
 
 	@media not (prefers-reduced-motion) {
