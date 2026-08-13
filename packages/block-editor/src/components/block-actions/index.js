@@ -39,6 +39,11 @@ export default function BlockActions( {
 						canInsertBlockType( block.name, rootClientId )
 					);
 				} ),
+				canCopy: blocks.every( ( block ) => {
+					return (
+						!! block && hasBlockSupport( block.name, 'copy', true )
+					);
+				} ),
 				canCopyStyles: blocks.every( ( block ) => {
 					return (
 						!! block &&
@@ -50,6 +55,7 @@ export default function BlockActions( {
 					return (
 						!! block &&
 						hasBlockSupport( block.name, 'multiple', true ) &&
+						hasBlockSupport( block.name, 'duplicate', true ) &&
 						canInsertBlockType( block.name, rootClientId )
 					);
 				} ),
@@ -59,7 +65,8 @@ export default function BlockActions( {
 	);
 	const { getBlocksByClientId, getBlocks } = useSelect( blockEditorStore );
 
-	const { canRemove, canInsertBlock, canCopyStyles, canDuplicate } = selected;
+	const { canRemove, canInsertBlock, canCopy, canCopyStyles, canDuplicate } =
+		selected;
 
 	const {
 		removeBlocks,
@@ -73,6 +80,7 @@ export default function BlockActions( {
 	const pasteStyles = usePasteStyles();
 
 	return children( {
+		canCopy,
 		canCopyStyles,
 		canDuplicate,
 		canInsertBlock,

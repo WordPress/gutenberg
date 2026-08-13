@@ -37,6 +37,10 @@
 		"removable": false,
 		"reusable": false,
 		"inserter": false,
+		"duplicate": false,
+		"copy": false,
+		"lock": false,
+		"visibility": false,
 		"typography": {
 			"textAlign": true,
 			"fontSize": true,

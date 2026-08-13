@@ -231,6 +231,7 @@ const getQuickActionsCommands = () =>
 			return (
 				!! block &&
 				hasBlockSupport( block.name, 'multiple', true ) &&
+				hasBlockSupport( block.name, 'duplicate', true ) &&
 				canInsertBlockType( block.name, rootClientId )
 			);
 		} );
