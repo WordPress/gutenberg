@@ -285,6 +285,18 @@ describe( 'table-v2 utils', () => {
 
 			expect( result ).toBeNull();
 		} );
+
+		it( 'returns null when a selected cell is already merged', () => {
+			const rows = [ { type: 'body', cellCount: 2 } ];
+			const cells = [
+				createCell( 'cell-1', { colSpan: 2 } ),
+				createCell( 'cell-2' ),
+			];
+
+			const result = mergeCells( rows, cells, 2, [ 'cell-1', 'cell-2' ] );
+
+			expect( result ).toBeNull();
+		} );
 	} );
 
 	describe( 'unmergeCells', () => {

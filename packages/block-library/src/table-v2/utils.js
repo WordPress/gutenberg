@@ -597,6 +597,16 @@ export function mergeCells( rows, cells, columnCount, selectedClientIds ) {
 		return null;
 	}
 
+	// Don't allow merging if any selected cell is already merged.
+	const hasMergedCell = rectangle.selectedPlacements.some(
+		( p ) =>
+			( p.cell.attributes.rowSpan || 1 ) > 1 ||
+			( p.cell.attributes.colSpan || 1 ) > 1
+	);
+	if ( hasMergedCell ) {
+		return null;
+	}
+
 	const { startRow, endRow, startColumn, endColumn } = rectangle;
 
 	// The top-left cell becomes the merged cell.
