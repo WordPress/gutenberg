@@ -168,43 +168,51 @@
 			background-color: $white;
 			box-sizing: border-box;
 			height: $grid-unit-60;
-			padding-right: $grid-unit-15;
+			// The 6px sides every toolbar group has.
+			padding-right: $grid-unit-15 * 0.5;
+			padding-left: $grid-unit-15 * 0.5;
 
 			.block-editor-block-parent-selector__button {
 				border: none;
 				min-height: 0;
 				height: 100%;
+				// The 36px width every icon button in a toolbar has.
+				min-width: $block-toolbar-height - $grid-unit-15;
+				padding-right: $grid-unit-15 * 0.5;
+				padding-left: $grid-unit-15 * 0.5;
 			}
 		}
 
 		.block-editor-block-parent-selector__inserter.components-button.has-icon {
-			// The size every other inserter square has.
-			height: $button-size-small;
-			min-width: $button-size-small;
-			padding: 0;
+			// The same target every icon button in a toolbar has: 36px
+			// wide over the full toolbar height.
+			height: 100%;
+			min-width: $block-toolbar-height - $grid-unit-15;
+			padding: 0 $grid-unit-15 * 0.5;
 			color: $white;
 			background: transparent;
 
-			// The black square, drawn under the icon.
+			// The black square every other inserter has, drawn under the
+			// icon in the middle of the target.
 			&::after {
 				content: "";
 				position: absolute;
 				z-index: -1;
-				top: 0;
-				left: 0;
-				right: 0;
-				bottom: 0;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				width: $button-size-small;
+				height: $button-size-small;
 				border-radius: $radius-small;
 				background: $gray-900;
 			}
 
-			// The toolbar focus ring stays at its standard size, around
-			// the square rather than hugging it.
+			// The focus ring at its standard toolbar size and inset.
 			&::before {
-				top: -$grid-unit-05;
-				left: -$grid-unit-05;
-				right: -$grid-unit-05;
-				height: calc(100% + #{$grid-unit-10});
+				top: calc(50% - #{$grid-unit-40 * 0.5});
+				left: 2px;
+				right: 2px;
+				height: $grid-unit-40;
 			}
 
 			&:hover {
