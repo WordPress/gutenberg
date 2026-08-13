@@ -18,5 +18,5 @@ module.exports = {
 	],
 	'packages/icons/src/library/*': [ 'npm run -w packages/icons build' ],
 	// The validator takes the repository root, so staged paths are not passed.
-	'**/tsconfig.json': [ () => 'npm run lint:tsconfig' ],
+	'**/tsconfig*.json': [ () => 'npm run lint:tsconfig' ],
 };
