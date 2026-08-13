@@ -104,16 +104,73 @@ if ( ! function_exists( 'wp_collaboration_register_meta' ) ) {
 				'type'              => 'string',
 			)
 		);
-
-		// Linked entities must support custom-fields so that the _crdt_document
-		// meta can be persisted via the REST API.
-		add_post_type_support( 'wp_navigation', 'custom-fields' );
-		add_post_type_support( 'wp_template', 'custom-fields' );
-		add_post_type_support( 'wp_template_part', 'custom-fields' );
-		add_post_type_support( 'wp_global_styles', 'custom-fields' );
 	}
 	add_action( 'init', 'gutenberg_rest_api_crdt_post_meta' );
 }
+
+/**
+ * Adds `custom-fields` support to post types that persist a CRDT document.
+ *
+ * Collaboration persists the shared document in the `_crdt_document` post meta,
+ * sent as part of the regular REST save. `WP_REST_Posts_Controller` only exposes
+ * the `meta` property in its schema, and only writes meta on create and update,
+ * when the post type supports `custom-fields`. A post type that does not declare
+ * the support therefore has its CRDT document discarded without an error: a
+ * reload starts from an empty document, and the stale updates still held in sync
+ * storage are applied on top of it, reverting saved changes.
+ *
+ * This applies to every post type the editor syncs rather than a fixed set.
+ * Linked entities such as `wp_navigation` are the most visible case because they
+ * are saved from within another post, but any post type registered without
+ * `custom-fields` support loses its CRDT document the same way.
+ *
+ * Post types whose REST controller is not a `WP_REST_Posts_Controller` are
+ * skipped, because no other core controller reads or writes the `meta` property.
+ * `wp_template` and `wp_template_part` are served by
+ * `WP_REST_Templates_Controller`, which defines its own schema, so the support
+ * would have no effect for them by default; they are picked up automatically
+ * once the `active_templates` experiment moves them onto the posts controller.
+ * A subclass that replaces the schema outright, such as
+ * `WP_REST_Global_Styles_Controller`, still ignores the support.
+ *
+ * Runs on `wp_loaded` so that post types registered after
+ * `create_initial_post_types()`, which runs on `init` at priority 0, are covered
+ * as well. That is still before REST routes are registered, which is when the
+ * schema exposing `meta` is built.
+ *
+ * @since 7.1.0
+ */
+function gutenberg_add_crdt_document_post_type_support() {
+	if ( ! wp_is_collaboration_enabled() ) {
+		return;
+	}
+
+	foreach ( get_post_types( array( 'show_in_rest' => true ), 'objects' ) as $post_type ) {
+		if ( post_type_supports( $post_type->name, 'custom-fields' ) ) {
+			continue;
+		}
+
+		if ( wp_is_post_type_collaboration_disabled( $post_type->name ) ) {
+			continue;
+		}
+
+		/*
+		 * Mirrors WP_Post_Type::get_rest_controller(), which falls back to
+		 * WP_REST_Posts_Controller when no controller class is registered. An
+		 * unknown class name is skipped rather than assumed to persist meta.
+		 */
+		$controller_class = $post_type->rest_controller_class
+			? $post_type->rest_controller_class
+			: 'WP_REST_Posts_Controller';
+
+		if ( ! is_a( $controller_class, 'WP_REST_Posts_Controller', true ) ) {
+			continue;
+		}
+
+		add_post_type_support( $post_type->name, 'custom-fields' );
+	}
+}
+add_action( 'wp_loaded', 'gutenberg_add_crdt_document_post_type_support' );
 
 if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 	/**
