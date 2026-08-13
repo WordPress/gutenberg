@@ -6,6 +6,10 @@
 
 -   Notes: Honour a per-action note lock. The notes sidebar now hides or disables the affordances the server reports as locked through the `lockedNoteActions` editor setting, and shows a notice on a fully locked post ([#72724](https://github.com/WordPress/gutenberg/issues/72724)).
 
+### Bug Fixes
+
+-   Register the editor and block editor keyboard shortcuts from the editor provider, so shortcuts work for consumers that mount the editor without rendering `EditorKeyboardShortcutsRegister` themselves ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
+
 ## 14.53.0 (2026-08-12)
 
 ### Internal

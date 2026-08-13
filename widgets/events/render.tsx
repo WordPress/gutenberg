@@ -4,7 +4,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { mapMarker } from '@wordpress/icons';
-import { Icon, Link, Stack, EmptyState } from '@wordpress/ui';
+import { Icon, Stack, EmptyState } from '@wordpress/ui';
 import { EventsList, type WPEvent } from './components';
 import type { EventsWidgetAttributes } from './types';
 import styles from './style.module.css';
@@ -117,11 +117,7 @@ export default function WordPressEvents( {
 	}, [ activeLocation, hasSelectedLocation, userLocale ] );
 
 	return (
-		<Stack
-			direction="column"
-			justify="space-between"
-			className={ styles.container }
-		>
+		<Stack direction="column" className={ styles.container }>
 			{ ! hasSelectedLocation && (
 				<Stack
 					align="center"
@@ -160,22 +156,6 @@ export default function WordPressEvents( {
 					location={ locationLabel || activeLocation }
 				/>
 			) }
-			<div className={ styles.footer }>
-				<Stack direction="row" align="center" gap="sm" wrap="wrap">
-					<Link
-						href="https://make.wordpress.org/community/meetups-landing-page"
-						openInNewTab
-					>
-						{ __( 'Meetups' ) }
-					</Link>
-					<Link
-						href="https://central.wordcamp.org/schedule/"
-						openInNewTab
-					>
-						{ __( 'WordCamps' ) }
-					</Link>
-				</Stack>
-			</div>
 		</Stack>
 	);
 }
