@@ -55,8 +55,13 @@ function gutenberg_delete_installed_fonts() {
 		rmdir( $font_path );
 	}
 
-	// Delete any installed fonts from global styles.
-	$global_styles_post_id = WP_Theme_JSON_Resolver::get_user_global_styles_post_id();
+	// Delete any installed fonts from global styles. Gutenberg overrides the
+	// resolver with its own subclass, so prefer it when the plugin is active.
+	$resolver_class = class_exists( 'WP_Theme_JSON_Resolver_Gutenberg' )
+		? 'WP_Theme_JSON_Resolver_Gutenberg'
+		: 'WP_Theme_JSON_Resolver';
+
+	$global_styles_post_id = $resolver_class::get_user_global_styles_post_id();
 	$request               = new WP_REST_Request( 'POST', '/wp/v2/global-styles/' . $global_styles_post_id );
 	$request->set_body_params( array( 'settings' => array( 'typography' => array( 'fontFamilies' => array() ) ) ) );
 
