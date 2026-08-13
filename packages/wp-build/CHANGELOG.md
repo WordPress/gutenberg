@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Register the content module for routes that only export a `canvas`, so a route without a stage or inspector can render a custom canvas.
+
 ## 0.21.0 (2026-08-12)
 
 ### Enhancements
