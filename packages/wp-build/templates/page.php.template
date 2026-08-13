@@ -34,27 +34,6 @@ function {{PREFIX}}_register_{{PAGE_SLUG_UNDERSCORE}}_route( $path, $content_mod
 }
 
 /**
- * Unregister a route for the {{PAGE_SLUG}} page.
- *
- * Removes the route registered at $path together with any nested route below
- * it, so a whole section can be turned off with a single call.
- *
- * @param string $path Route path to unregister (e.g., '/templates').
- */
-function {{PREFIX}}_unregister_{{PAGE_SLUG_UNDERSCORE}}_route( $path ) {
-	global ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_routes;
-
-	${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_routes = array_values(
-		array_filter(
-			${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_routes,
-			static function ( $route ) use ( $path ) {
-				return $route['path'] !== $path && ! str_starts_with( $route['path'], $path . '/' );
-			}
-		)
-	);
-}
-
-/**
  * Register a menu item for the {{PAGE_SLUG}} page.
  *
  * @param string $id          Menu item ID.

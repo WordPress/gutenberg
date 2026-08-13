@@ -1,6 +1,7 @@
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
+import { notFound } from '@wordpress/route';
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
 
@@ -12,6 +13,14 @@ const PRELOADED_NAVIGATION_MENUS_QUERY = {
 };
 
 export const route = {
+	async beforeLoad() {
+		// Only block themes render `wp_navigation` posts. Classic themes manage
+		// their menus through Appearance > Menus instead.
+		const theme = await resolveSelect( coreStore ).getCurrentTheme();
+		if ( ! theme?.is_block_theme ) {
+			throw notFound();
+		}
+	},
 	title: () => __( 'Navigation' ),
 	canvas: async ( {
 		search,

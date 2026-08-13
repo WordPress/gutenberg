@@ -53,28 +53,6 @@ function gutenberg_site_editor_register_default_menu_items() {
 add_action( 'site-editor-v2_init', 'gutenberg_site_editor_register_default_menu_items', 5 );
 
 /**
- * Unregister the routes the active theme has no use for.
- *
- * Runs after the build-generated route registration so the routes never reach
- * the client. Hiding the menu items alone would leave the screens reachable by
- * URL, offering site management a classic theme ignores.
- */
-function gutenberg_site_editor_v2_unregister_unsupported_routes() {
-	if ( ! wp_is_block_theme() ) {
-		gutenberg_unregister_site_editor_v2_route( '/navigation' );
-	}
-
-	if ( ! current_theme_supports( 'block-templates' ) ) {
-		gutenberg_unregister_site_editor_v2_route( '/templates' );
-	}
-
-	if ( ! current_theme_supports( 'block-templates' ) && ! current_theme_supports( 'block-template-parts' ) ) {
-		gutenberg_unregister_site_editor_v2_route( '/template-parts' );
-	}
-}
-add_action( 'site-editor-v2_init', 'gutenberg_site_editor_v2_unregister_unsupported_routes', 20 );
-
-/**
  * Renders the admin bar on the site editor page.
  */
 function gutenberg_site_editor_enable_admin_bar() {
