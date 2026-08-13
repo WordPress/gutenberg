@@ -1,5 +1,5 @@
 import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
-import { isTextField } from '@wordpress/dom';
+import { isEntirelySelected, isTextField } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
@@ -77,18 +77,32 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			}
 
 			/**
-			 * Prevents default dragging behavior within a block. To do: we must
-			 * handle this in the future and clean up the drag target.
+			 * Prevents default dragging behavior within a block, except when
+			 * the dragged text selection covers the whole field: then the
+			 * drag moves the block itself. To do: we must handle partial
+			 * selections in the future and clean up the drag target.
 			 *
 			 * @param {DragEvent} event Drag event.
 			 */
 			function onDragStart( event ) {
-				if (
-					node !== event.target ||
-					node.isContentEditable ||
-					node.ownerDocument.activeElement !== node ||
-					hasMultiSelection()
-				) {
+				const { activeElement } = node.ownerDocument;
+				// Dragging a text selection that covers everything in the
+				// field moves the block, the same way dragging a non text
+				// block does.
+				const isFullySelectedTextDrag =
+					node.contains( event.target ) &&
+					activeElement &&
+					node.contains( activeElement ) &&
+					activeElement.isContentEditable &&
+					isEntirelySelected( activeElement ) &&
+					! hasMultiSelection();
+				const isDirectBlockDrag =
+					node === event.target &&
+					! node.isContentEditable &&
+					activeElement === node &&
+					! hasMultiSelection();
+
+				if ( ! isDirectBlockDrag && ! isFullySelectedTextDrag ) {
 					event.preventDefault();
 					return;
 				}
