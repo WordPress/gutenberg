@@ -424,8 +424,7 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 
 	$minimum_column_width_attr = $parent_layout['minimumColumnWidth'] ?? null;
 	$minimum_column_width      = is_string( $minimum_column_width_attr ) ? $minimum_column_width_attr : null;
-	$column_count_attr         = $parent_layout['columnCount'] ?? null;
-	$column_count              = is_numeric( $column_count_attr ) ? (int) $column_count_attr : null;
+	$column_count              = $parent_layout['columnCount'] ?? null;
 
 	/*
 	 * If columnSpan or columnStart is set, and the parent grid is responsive, i.e. if it has a minimumColumnWidth set,
@@ -849,12 +848,6 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$minimum_column_width_attr = $layout_for_styles['minimumColumnWidth'] ?? null;
 		$minimum_column_width      = is_string( $minimum_column_width_attr ) ? $minimum_column_width_attr : null;
 
-		// The same values from the default viewport, used below to decide where to set `container-type`.
-		$base_column_count_attr         = $base_layout['columnCount'] ?? null;
-		$base_column_count              = is_numeric( $base_column_count_attr ) ? (int) $base_column_count_attr : null;
-		$base_minimum_column_width_attr = $base_layout['minimumColumnWidth'] ?? null;
-		$base_minimum_column_width      = is_string( $base_minimum_column_width_attr ) ? $base_minimum_column_width_attr : null;
-
 		/*
 		 * If the gap value is an array, we use the "left" value because it represents the vertical gap, which
 		 * is the relevant one for computation of responsive grid columns.
@@ -924,7 +917,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		}
 
 		if ( ! empty( $grid_declarations ) ) {
-			$base_has_container_type = empty( $base_column_count ) || ( ! empty( $base_column_count ) && ! empty( $base_minimum_column_width ) );
+			$base_has_container_type = empty( $base_layout['columnCount'] ) || ( ! empty( $base_layout['columnCount'] ) && ! empty( $base_layout['minimumColumnWidth'] ) );
 			if ( empty( $column_count ) || ! empty( $minimum_column_width ) ) {
 				if ( null === $viewport_overrides || ! $base_has_container_type ) {
 					$grid_declarations['container-type'] = 'inline-size';
