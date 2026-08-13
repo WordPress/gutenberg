@@ -36,7 +36,13 @@ type Fixtures = {
 // This test only needs collaboration enabled, not a second user.
 const test = base.extend< Fixtures >( {
 	collaborationEnabled: [
-		async ( { requestUtils }, use ) => {
+		async ( { requestUtils, isGutenbergPluginActive }, use ) => {
+			// eslint-disable-next-line playwright/no-skipped-test
+			test.skip(
+				! isGutenbergPluginActive,
+				'Collaboration tests require Gutenberg plugin to be active'
+			);
+
 			await setCollaboration( requestUtils, true );
 			try {
 				await use( true );

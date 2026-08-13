@@ -19,9 +19,15 @@ type Fixtures = {
 
 const test = base.extend< Fixtures >( {
 	collaborationUtils: async (
-		{ admin, editor, requestUtils, page },
+		{ admin, editor, requestUtils, page, isGutenbergPluginActive },
 		use
 	) => {
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			! isGutenbergPluginActive,
+			'Collaboration tests require Gutenberg plugin to be active'
+		);
+
 		const utils = new CollaborationUtilsClass( {
 			admin,
 			cleanupUsersMode: 'tracked',
