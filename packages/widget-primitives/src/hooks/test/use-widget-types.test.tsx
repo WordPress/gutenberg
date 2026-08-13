@@ -228,7 +228,7 @@ describe( 'useWidgetTypes', () => {
 		);
 	} );
 
-	it( 'leaves an action without an icon when the reference does not resolve', async () => {
+	it( 'clears the action stand-in when the reference does not resolve', async () => {
 		const { result } = renderHook( () =>
 			useWidgetTypes( actionIconRecords )
 		);
@@ -241,7 +241,7 @@ describe( 'useWidgetTypes', () => {
 		);
 	} );
 
-	it( 'emits record actions without their icon while the reference resolves', async () => {
+	it( 'holds the action icon slot with a stand-in while the reference resolves', async () => {
 		registerIconResolver(
 			() => new Promise< WidgetIcon | null >( () => {} )
 		);
@@ -256,7 +256,9 @@ describe( 'useWidgetTypes', () => {
 			id: 'report',
 			relevance: 'high',
 		} );
-		expect( result.current[ 0 ][ 0 ].actions?.[ 0 ].icon ).toBeUndefined();
+		expect(
+			isValidElement( result.current[ 0 ][ 0 ].actions?.[ 0 ].icon )
+		).toBe( true );
 	} );
 
 	it( "keeps a module action's element icon", async () => {

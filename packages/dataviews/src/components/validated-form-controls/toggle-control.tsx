@@ -1,8 +1,12 @@
 import { forwardRef, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-import { ControlWithError } from '../control-with-error';
+import { ToggleControl } from '@wordpress/components';
+import { ControlWithError } from './control-with-error';
 import type { ValidatedControlProps } from './types';
-import ToggleControl from '../../toggle-control';
+
+type ToggleControlProps = React.ComponentProps< typeof ToggleControl >;
+
+type ValidatedToggleControlProps = ToggleControlProps & ValidatedControlProps;
 
 // TODO: Should we customize the default `missingValue` message? It says to "check this box".
 
@@ -12,7 +16,7 @@ const UnforwardedValidatedToggleControl = (
 		customValidity,
 		markWhenOptional,
 		...restProps
-	}: React.ComponentProps< typeof ToggleControl > & ValidatedControlProps,
+	}: ValidatedToggleControlProps,
 	forwardedRef: React.ForwardedRef< HTMLInputElement >
 ) => {
 	const validityTargetRef = useRef< HTMLInputElement >( null );
@@ -34,7 +38,8 @@ const UnforwardedValidatedToggleControl = (
 	);
 };
 
-export const ValidatedToggleControl = forwardRef(
-	UnforwardedValidatedToggleControl
-);
+export const ValidatedToggleControl: React.ForwardRefExoticComponent<
+	React.PropsWithoutRef< ValidatedToggleControlProps > &
+		React.RefAttributes< HTMLInputElement >
+> = forwardRef( UnforwardedValidatedToggleControl );
 ValidatedToggleControl.displayName = 'ValidatedToggleControl';

@@ -8,7 +8,7 @@
 	"references": [
 		{ "path": "../a11y" },
 		{ "path": "../api-fetch" },
-		{ "path": "../blob" },
+		{ "path": "../blob/tsconfig.build.json" },
 		{ "path": "../block-editor" },
 		{ "path": "../block-serialization-default-parser" },
 		{ "path": "../blocks" },
@@ -41,7 +41,7 @@
 		{ "path": "../private-apis" },
 		{ "path": "../rich-text" },
 		{ "path": "../server-side-render" },
-		{ "path": "../theme" },
+		{ "path": "../theme/tsconfig.build.json" },
 		{ "path": "../ui" },
 		{ "path": "../url" },
 		{ "path": "../upload-media" },

@@ -41,6 +41,7 @@ Read only what your task needs, when it needs it:
 ```bash
 npm run format            # Fix JS formatting
 npm run lint:js          # Check JS linting
+npm run typecheck        # Type check sources, plus dev files of migrated packages
 vendor/bin/phpcbf        # Fix PHP standards
 vendor/bin/phpcs         # Check PHP standards
 
@@ -69,6 +70,7 @@ For full architecture details, see `docs/explanations/architecture/`.
 -   Never invoke WordPress's forked or local CLIs through `npx` (e.g. `npx prettier`, `npx wp-scripts`). WordPress ships its own `wp-prettier` fork, and `wp-scripts` is the bin name of `@wordpress/scripts`. A bare `npx wp-scripts` can resolve to an unrelated third-party package on the public registry, not the local tool. Use the npm scripts instead (`npm run format`, `npm run lint:js`, `npm run lint:css` and so on), which run the binaries from local `node_modules`.
 -   PHP function and class names are renamed at build time (`gutenberg_*` prefix, `*_Gutenberg` suffix) to avoid conflicts with WordPress Core — the built names, not the source names, are what runs (and what tests must call). See `docs/contributors/code/build-system-function-prefixing.md`.
 -   Production code changes in a package require an entry in that package's `CHANGELOG.md`. See `docs/contributors/code/managing-packages.md`.
+-   TypeScript configs are being split per package, one package at a time: `tsconfig.build.json` (src only, emits `build-types`) and the default `tsconfig.json` (dev project: tests and stories, `noEmit`, jest types). References to a split package point at `../<pkg>/tsconfig.build.json`, references to a package still on a single config point at `../<pkg>`. `npm run build` does not type check the dev files of split packages; use `npm run typecheck` for those, and keep jest types out of build projects. See the TypeScript section in `packages/README.md`.
 -   A rejected `apiFetch` is not always an `Error`: a REST error arrives as a plain object (`{ code, message, data }`), `parse: false` rejects with the `Response` (which carries `status`, not `message`), an aborted request rethrows an `AbortError`, and a handler set via `setFetchHandler` can reject anything. Do not interpolate the rejection into a string (`` `${ error }` `` gives `[object Object]`) or branch on `instanceof Error`. Normalise it to a message before showing the user anything, and supply your own copy when there is none — `ensureError` in `packages/core-data/src/private-actions.js` is the reference implementation, though it is local to that file rather than exported.
 
 ## PR instructions
