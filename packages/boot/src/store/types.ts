@@ -105,6 +105,25 @@ export interface RouteConfig {
 	inspector?: ( context: RouteLoaderContext ) => boolean | Promise< boolean >;
 
 	/**
+	 * Function that determines whether to show the stage.
+	 * When not defined, defaults to true (always show stage if component exists).
+	 * When it returns false, the stage is hidden even if a stage component is
+	 * exported, leaving the canvas to fill the surfaces area.
+	 *
+	 * @example
+	 * ```tsx
+	 * export const route = {
+	 *   stage: async () => {
+	 *     // Only show the stage when there is something to edit
+	 *     const theme = await resolveSelect( coreStore ).getCurrentTheme();
+	 *     return !! theme?.is_block_theme;
+	 *   },
+	 * };
+	 * ```
+	 */
+	stage?: ( context: RouteLoaderContext ) => boolean | Promise< boolean >;
+
+	/**
 	 * Function that returns the document title for the route.
 	 * The returned title will be formatted as: "{title} ‹ {siteTitle} — WordPress"
 	 * and announced to screen readers for accessibility.
