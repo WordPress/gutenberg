@@ -81,7 +81,7 @@ async function getMirrorVersions() {
 			.filter( Boolean )
 			.map( ( match ) => match[ 1 ] );
 	} catch {
-		return [];
+		return null;
 	}
 }
 
