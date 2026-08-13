@@ -166,6 +166,14 @@
 			left: calc(-#{$grid-unit-60} - #{$grid-unit-30} - #{$grid-unit-15} - #{$grid-unit-10} - 3 * #{$border-width});
 			border: $border-width solid $gray-900;
 			border-radius: $radius-small;
+			// The box paints the background, like the toolbar box does for
+			// its groups.
+			background-color: $white;
+
+			// The box draws the border too.
+			.components-toolbar-group {
+				border-right: none;
+			}
 
 			.block-editor-block-parent-selector__button {
 				border: none;

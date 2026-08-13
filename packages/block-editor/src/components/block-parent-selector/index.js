@@ -1,5 +1,4 @@
-import clsx from 'clsx';
-import { ToolbarButton } from '@wordpress/components';
+import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
@@ -75,62 +74,67 @@ export default function BlockParentSelector() {
 		highlightParent: true,
 	} );
 
+	const parentButton = (
+		<ToolbarButton
+			className="block-editor-block-parent-selector__button"
+			onClick={ () => selectBlock( parentClientId ) }
+			label={ sprintf(
+				/* translators: %s: Name of the block's parent. */
+				__( 'Select parent block: %s' ),
+				blockInformation?.title
+			) }
+			showTooltip
+			icon={ <BlockIcon icon={ blockInformation?.icon } /> }
+		/>
+	);
+
 	return (
 		<div
-			// With the inserter next to it, the pair is a toolbar group:
-			// the class gives both buttons the standard toolbar sizing.
-			// (ToolbarGroup does not take the ref the gestures need.)
-			className={ clsx( 'block-editor-block-parent-selector', {
-				'components-toolbar-group': showInserter,
-			} ) }
+			className="block-editor-block-parent-selector"
 			key={ parentClientId }
 			ref={ nodeRef }
 			{ ...showHoveredOrFocusedGestures }
 		>
-			<ToolbarButton
-				className="block-editor-block-parent-selector__button"
-				onClick={ () => selectBlock( parentClientId ) }
-				label={ sprintf(
-					/* translators: %s: Name of the block's parent. */
-					__( 'Select parent block: %s' ),
-					blockInformation?.title
-				) }
-				showTooltip
-				icon={ <BlockIcon icon={ blockInformation?.icon } /> }
-			/>
+			{ ! showInserter && parentButton }
 			{ showInserter && (
-				<Inserter
-					position="bottom right"
-					rootClientId={ parentClientId }
-					clientId={ nextSiblingClientId }
-					isAppender={ ! nextSiblingClientId }
-					__experimentalIsQuick
-					renderToggle={ ( {
-						onToggle,
-						isOpen,
-						disabled,
-						blockTitle,
-						hasSingleBlockType,
-					} ) => (
-						<ToolbarButton
-							className="block-editor-block-parent-selector__inserter"
-							onClick={ onToggle }
-							aria-expanded={ isOpen }
-							disabled={ disabled }
-							label={
-								hasSingleBlockType
-									? sprintf(
-											/* translators: %s: title of the block to be added. */
-											__( 'Add %s' ),
-											blockTitle
-									  )
-									: __( 'Add block' )
-							}
-							showTooltip
-							icon={ plus }
-						/>
-					) }
-				/>
+				// A real toolbar group, so the buttons get the standard
+				// toolbar sizing, and the group overlaps the container
+				// border the way toolbar groups overlap the toolbar box.
+				<ToolbarGroup>
+					{ parentButton }
+					<Inserter
+						position="bottom right"
+						rootClientId={ parentClientId }
+						clientId={ nextSiblingClientId }
+						isAppender={ ! nextSiblingClientId }
+						__experimentalIsQuick
+						renderToggle={ ( {
+							onToggle,
+							isOpen,
+							disabled,
+							blockTitle,
+							hasSingleBlockType,
+						} ) => (
+							<ToolbarButton
+								className="block-editor-block-parent-selector__inserter"
+								onClick={ onToggle }
+								aria-expanded={ isOpen }
+								disabled={ disabled }
+								label={
+									hasSingleBlockType
+										? sprintf(
+												/* translators: %s: title of the block to be added. */
+												__( 'Add %s' ),
+												blockTitle
+										  )
+										: __( 'Add block' )
+								}
+								showTooltip
+								icon={ plus }
+							/>
+						) }
+					/>
+				</ToolbarGroup>
 			) }
 		</div>
 	);
