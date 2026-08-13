@@ -516,17 +516,15 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		// The block before the hovered boundary must be one where typing
 		// can't create a block after it, so that the in-between inserter
 		// shows in the gap.
-		await editor.setContent( `<!-- wp:image -->
-<figure class="wp-block-image"><img alt=""/></figure>
-<!-- /wp:image -->
-
-<!-- wp:heading -->
-<h2 class="wp-block-heading">Heading</h2>
-<!-- /wp:heading -->
-
-<!-- wp:paragraph -->
-<p>First paragraph</p>
-<!-- /wp:paragraph -->` );
+		await editor.insertBlock( { name: 'core/image' } );
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { content: 'Heading' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First paragraph' },
+		} );
 		// Put the caret in the trailing paragraph so the test can catch an
 		// insertion that wrongly follows the caret instead of the inserter.
 		await editor.canvas.locator( 'p:text("First paragraph")' ).click();

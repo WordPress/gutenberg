@@ -5,15 +5,24 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 const IMAGE_DATA_URI =
 	'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
-const IMAGE_BLOCK = `<!-- wp:image --><figure class="wp-block-image"><img src="${ IMAGE_DATA_URI }" alt=""/></figure><!-- /wp:image -->`;
-
-const paragraphBlock = ( content ) =>
-	`<!-- wp:paragraph --><p>${ content }</p><!-- /wp:paragraph -->`;
+const IMAGE = {
+	name: 'core/image',
+	attributes: { url: IMAGE_DATA_URI },
+};
 
 test.describe( 'In-between block inserter', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
+
+	// Inserting blocks leaves the last one selected, and its floating
+	// toolbar sits exactly where these tests hover. Clear the selection
+	// so the canvas is in the same resting state a reader starts from.
+	async function deselect( page ) {
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
+		);
+	}
 
 	// Moves the mouse away from the canvas, then to the given point. The
 	// extra steps imitate real cursor movement, which the in-between
@@ -32,7 +41,9 @@ test.describe( 'In-between block inserter', () => {
 	}
 
 	test( 'appears between two images', async ( { editor, page } ) => {
-		await editor.setContent( IMAGE_BLOCK + IMAGE_BLOCK );
+		await editor.insertBlock( IMAGE );
+		await editor.insertBlock( IMAGE );
+		await deselect( page );
 		const images = editor.canvas.getByRole( 'document', {
 			name: 'Block: Image',
 		} );
@@ -51,7 +62,9 @@ test.describe( 'In-between block inserter', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.setContent( IMAGE_BLOCK + IMAGE_BLOCK );
+		await editor.insertBlock( IMAGE );
+		await editor.insertBlock( IMAGE );
+		await deselect( page );
 		const images = editor.canvas.getByRole( 'document', {
 			name: 'Block: Image',
 		} );
@@ -72,10 +85,15 @@ test.describe( 'In-between block inserter', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.setContent(
-			'<!-- wp:heading --><h2 class="wp-block-heading">Heading</h2><!-- /wp:heading -->' +
-				paragraphBlock( 'A paragraph' )
-		);
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { content: 'Heading' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'A paragraph' },
+		} );
+		await deselect( page );
 		const heading = editor.canvas.getByRole( 'document', {
 			name: 'Block: Heading',
 		} );
@@ -92,9 +110,12 @@ test.describe( 'In-between block inserter', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.setContent(
-			IMAGE_BLOCK + paragraphBlock( 'A paragraph' )
-		);
+		await editor.insertBlock( IMAGE );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'A paragraph' },
+		} );
+		await deselect( page );
 		const image = editor.canvas.getByRole( 'document', {
 			name: 'Block: Image',
 		} );
@@ -116,9 +137,14 @@ test.describe( 'In-between block inserter', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.setContent(
-			'<!-- wp:buttons --><div class="wp-block-buttons"><!-- wp:button --><div class="wp-block-button"><a class="wp-block-button__link wp-element-button">One</a></div><!-- /wp:button --><!-- wp:button --><div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Two</a></div><!-- /wp:button --></div><!-- /wp:buttons -->'
-		);
+		await editor.insertBlock( {
+			name: 'core/buttons',
+			innerBlocks: [
+				{ name: 'core/button', attributes: { text: 'One' } },
+				{ name: 'core/button', attributes: { text: 'Two' } },
+			],
+		} );
+		await deselect( page );
 		const buttons = editor.canvas.getByRole( 'document', {
 			name: 'Block: Button',
 			exact: true,
@@ -140,9 +166,15 @@ test.describe( 'In-between block inserter', () => {
 	} );
 
 	test( 'is hidden between two paragraphs', async ( { editor, page } ) => {
-		await editor.setContent(
-			paragraphBlock( 'First' ) + paragraphBlock( 'Second' )
-		);
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second' },
+		} );
+		await deselect( page );
 		const paragraphs = editor.canvas.getByRole( 'document', {
 			name: 'Block: Paragraph',
 		} );
@@ -168,9 +200,12 @@ test.describe( 'In-between block inserter', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.setContent(
-			paragraphBlock( 'A paragraph' ) + IMAGE_BLOCK
-		);
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'A paragraph' },
+		} );
+		await editor.insertBlock( IMAGE );
+		await deselect( page );
 		const paragraph = editor.canvas.getByRole( 'document', {
 			name: 'Block: Paragraph',
 		} );
@@ -198,9 +233,12 @@ test.describe( 'In-between block inserter', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.setContent(
-			IMAGE_BLOCK + paragraphBlock( 'A paragraph' )
-		);
+		await editor.insertBlock( IMAGE );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'A paragraph' },
+		} );
+		await deselect( page );
 		const paragraph = editor.canvas.getByRole( 'document', {
 			name: 'Block: Paragraph',
 		} );

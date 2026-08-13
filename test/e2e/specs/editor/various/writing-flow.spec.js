@@ -873,13 +873,14 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 	} ) => {
 		// The first block must be one where typing can't create a block
 		// after it, so that the in-between inserter shows in the gap.
-		await editor.setContent( `<!-- wp:image -->
-<figure class="wp-block-image"><img alt=""/></figure>
-<!-- /wp:image -->
-
-<!-- wp:paragraph -->
-<p>2</p>
-<!-- /wp:paragraph -->` );
+		await editor.insertBlock( { name: 'core/image' } );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: '2' },
+		} );
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
+		);
 
 		const imageBlock = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
@@ -918,13 +919,14 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 	} ) => {
 		// The first block must be one where typing can't create a block
 		// after it, so that the in-between inserter shows in the gap.
-		await editor.setContent( `<!-- wp:image -->
-<figure class="wp-block-image"><img alt=""/></figure>
-<!-- /wp:image -->
-
-<!-- wp:image {"align":"wide"} -->
-<figure class="wp-block-image alignwide"><img alt=""/></figure>
-<!-- /wp:image -->` );
+		await editor.insertBlock( { name: 'core/image' } );
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: { align: 'wide' },
+		} );
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
+		);
 
 		const imageBlocks = editor.canvas.locator(
 			'role=document[name="Block: Image"i]'
