@@ -79,6 +79,11 @@ const { state, actions } = store(
 			},
 			get isSubmenuOpen() {
 				const ctx = getContext();
+				// Submenus explicitly configured to open on click keep their
+				// own click/hover/focus state even inside an open overlay.
+				if ( ctx.openOnClick ) {
+					return state.isMenuOpen;
+				}
 				// Once the overlay itself is open, its styles always expand
 				// every submenu regardless of hover/click/focus state, so the
 				// toggle's `aria-expanded` should reflect that immediately
