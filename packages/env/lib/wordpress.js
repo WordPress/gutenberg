@@ -111,7 +111,7 @@ function compareWordPressVersions( a, b ) {
  * Returns the latest stable version of WordPress, as reported by the
  * stable-check endpoint on WordPress.org. If the WordPress/WordPress mirror
  * hasn't synced that version's tag yet, falls back to a version the mirror
- * actually has, since fetching the reported version would otherwise fail.
+ * actually has.
  *
  * @param {Object} options an object with cacheDirectoryPath set to the path to the cache directory in ~/.wp-env.
  * @return {string} The latest stable version of WordPress, like "6.0.1"
