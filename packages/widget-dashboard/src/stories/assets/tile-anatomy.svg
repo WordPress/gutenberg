@@ -11,9 +11,9 @@
   <text x="92" y="86" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1e3a8a">Goal Progress</text>
   <circle cx="200" cy="81" r="8" fill="#eef4fe" stroke="#7f9cd8" stroke-width="1.2"/>
   <text x="200" y="85" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10" font-weight="700" font-style="italic" fill="#3b62b0">i</text>
-  <rect x="300" y="72" width="110" height="22" rx="6" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.2"/>
-  <text x="312" y="87" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#475569">Metric</text>
-  <path d="M396 81 l7 0 l-3.5 5 z" fill="#94a3b8"/>
+  <rect x="334" y="72" width="110" height="22" rx="6" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="346" y="87" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#475569">Metric</text>
+  <path d="M430 81 l7 0 l-3.5 5 z" fill="#94a3b8"/>
   <rect x="452" y="72" width="42" height="22" rx="6" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.2"/>
   <circle cx="473" cy="78" r="1.8" fill="#475569"/>
   <circle cx="473" cy="83" r="1.8" fill="#475569"/>
@@ -36,7 +36,8 @@
   <circle cx="510" cy="83" r="2.5" fill="#cbd5e1"/>
   <text x="560" y="79" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#334155">header</text>
   <text x="560" y="94" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#94a3b8">icon · title · help</text>
-  <text x="560" y="108" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#94a3b8">attributes: high · actions: low</text>
+  <text x="560" y="108" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#94a3b8">attributes: high inline · full schema in settings</text>
+  <text x="560" y="122" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#94a3b8">actions: low</text>
 
   <line x1="510" y1="145" x2="552" y2="145" stroke="#cbd5e1" stroke-width="1.2"/>
   <circle cx="510" cy="145" r="2.5" fill="#cbd5e1"/>

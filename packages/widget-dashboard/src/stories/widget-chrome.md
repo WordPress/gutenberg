@@ -15,7 +15,7 @@ The chrome reads the widget type and materializes each field in one of three are
 
 ![One widget type materialized as a tile of three areas: the header takes the identity, the high-relevance attributes, and the low-relevance actions; the content takes the render module fed with the attribute values; the footer takes the promoted actions.](./assets/tile-anatomy.svg)
 
-The header takes the identity (`icon`, `title`, `help`), the high-relevance `attributes`, and the low-relevance `actions`. The content belongs to the render module, fed the attribute values. The footer takes the promoted `actions`.
+The header takes the identity (`icon`, `title`, `help`), the high-relevance `attributes` inline plus the settings trigger for the full schema, and the low-relevance `actions` in the More menu. The content belongs to the render module, fed the attribute values. The footer takes the promoted `actions`.
 
 ## The frame
 
