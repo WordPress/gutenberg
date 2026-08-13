@@ -25,6 +25,7 @@
 ### Bug Fixes
 
 -   Footnotes: Treat unreadable `footnotes` post meta as no footnotes instead of throwing, so the block shows its placeholder rather than the block crash warning ([#81201](https://github.com/WordPress/gutenberg/pull/81201)).
+-   Playlist: Disable waveform player auto-initialization before loading the dependency, and sanitize custom SVG icons passed through the Playlist waveform utility.
 -   Playlist: Improve handling of declarative waveform player configuration ([#81342](https://github.com/WordPress/gutenberg/pull/81342)).
 -   Cover: Pass `'full'` instead of `null` as the featured image size for parallax and repeated backgrounds, so a null array offset is no longer reached on PHP 8.5 ([#81444](https://github.com/WordPress/gutenberg/pull/81444)).
 

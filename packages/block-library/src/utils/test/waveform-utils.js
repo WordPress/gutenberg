@@ -734,6 +734,88 @@ describe( 'Waveform utilities', () => {
 
 			player.destroy();
 		} );
+
+		it( 'uses default control icons when custom icon markup is unsupported', () => {
+			const element = document.createElement( 'div' );
+			document.body.appendChild( element );
+
+			const player = initWaveformPlayer( element, {
+				src: 'https://cdn.example.com/track.mp3',
+				title: 'Test track',
+				labels: { seek: 'Seek' },
+				playIcon: '<span data-player-fixture="icon"></span>',
+				pauseIcon: '<span data-player-fixture="icon"></span>',
+			} );
+
+			expect(
+				player.container.querySelector( '[data-player-fixture]' )
+			).toBeNull();
+			expect(
+				player.container.querySelector( '.waveform-icon-play svg' )
+			).not.toBeNull();
+			expect(
+				player.container.querySelector( '.waveform-icon-pause svg' )
+			).not.toBeNull();
+
+			player.destroy();
+		} );
+
+		it( 'sanitizes custom SVG icon markup', () => {
+			const element = document.createElement( 'div' );
+			document.body.appendChild( element );
+
+			const player = initWaveformPlayer( element, {
+				src: 'https://cdn.example.com/track.mp3',
+				title: 'Test track',
+				labels: { seek: 'Seek' },
+				playIcon:
+					'<svg viewBox="0 0 24 24" onclick="alert( \'x\' )" data-player-fixture="svg"><script>alert( \'x\' )</script><path d="M8 5v14l11-7z" onload="alert( \'x\' )" data-player-fixture="path"/></svg>',
+			} );
+
+			const icon = player.container.querySelector(
+				'.waveform-icon-play svg'
+			);
+			expect( icon ).not.toBeNull();
+			expect( icon ).toHaveAttribute( 'viewBox', '0 0 24 24' );
+			expect( icon ).not.toHaveAttribute( 'onclick' );
+			expect( icon.querySelector( 'path' ) ).not.toHaveAttribute(
+				'onload'
+			);
+			expect( icon.querySelector( 'script' ) ).toBeNull();
+			expect(
+				player.container.querySelector( '[data-player-fixture]' )
+			).toBeNull();
+
+			player.destroy();
+		} );
+
+		it( 'supports safe custom SVG icon markup', () => {
+			const element = document.createElement( 'div' );
+			document.body.appendChild( element );
+
+			const player = initWaveformPlayer( element, {
+				src: 'https://cdn.example.com/track.mp3',
+				title: 'Test track',
+				labels: { seek: 'Seek' },
+				playIcon:
+					'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none"><path d="M4 12h16" stroke="currentColor" stroke-width="2"/></svg>',
+			} );
+
+			const icon = player.container.querySelector(
+				'.waveform-icon-play svg'
+			);
+			expect( icon ).toHaveAttribute( 'aria-hidden', 'true' );
+			expect( icon.querySelector( 'path' ) ).toHaveAttribute(
+				'stroke',
+				'currentColor'
+			);
+			expect( icon.querySelector( 'path' ) ).toHaveAttribute(
+				'stroke-width',
+				'2'
+			);
+
+			player.destroy();
+		} );
 	} );
 
 	describe( 'logPlayError', () => {

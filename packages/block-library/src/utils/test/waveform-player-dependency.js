@@ -1,14 +1,5 @@
 import '@testing-library/jest-dom';
 
-const DEFAULT_PLAYBACK_RATES = [
-	'0.5x',
-	'0.75x',
-	'1x',
-	'1.25x',
-	'1.5x',
-	'1.75x',
-	'2x',
-];
 const FIXTURE_ATTRIBUTE = 'data-player-fixture';
 
 function createDeclarativePlayer( attributes = {} ) {
@@ -25,10 +16,27 @@ function createDeclarativePlayer( attributes = {} ) {
 
 function loadWaveformPlayer() {
 	let WaveformPlayer;
+	const documentElement = document.documentElement;
+	const hadAutoinitAttribute = documentElement.hasAttribute(
+		'data-waveform-autoinit'
+	);
+	const previousAutoinitValue = documentElement.getAttribute(
+		'data-waveform-autoinit'
+	);
 
 	jest.isolateModules( () => {
+		documentElement.setAttribute( 'data-waveform-autoinit', 'false' );
 		WaveformPlayer = require( '@arraypress/waveform-player' ).default;
 	} );
+
+	if ( hadAutoinitAttribute ) {
+		documentElement.setAttribute(
+			'data-waveform-autoinit',
+			previousAutoinitValue
+		);
+	} else {
+		documentElement.removeAttribute( 'data-waveform-autoinit' );
+	}
 
 	return WaveformPlayer;
 }
@@ -71,8 +79,11 @@ describe( 'Waveform Player dependency', () => {
 		jsdomStubs.forEach( ( stub ) => stub.mockRestore() );
 		jest.useRealTimers();
 		jest.resetModules();
+		jest.dontMock( '@arraypress/waveform-player' );
 		document.body.innerHTML = '';
+		document.documentElement.removeAttribute( 'data-waveform-autoinit' );
 		delete window.WaveformPlayer;
+		WaveformPlayer = undefined;
 
 		if ( originalReadyState ) {
 			Object.defineProperty( document, 'readyState', originalReadyState );
@@ -81,25 +92,32 @@ describe( 'Waveform Player dependency', () => {
 		}
 	} );
 
-	it( 'uses the default control icons when declarative icon values are unsupported', () => {
-		const iconValue = `<span ${ FIXTURE_ATTRIBUTE }></span>`;
-		const element = createDeclarativePlayer( {
-			'data-play-icon': iconValue,
-			'data-pause-icon': iconValue,
+	it( 'disables dependency auto-init before loading the Playlist utility', () => {
+		const observedAutoinitValues = [];
+
+		jest.isolateModules( () => {
+			jest.doMock( '@arraypress/waveform-player', () => {
+				observedAutoinitValues.push(
+					document.documentElement.getAttribute(
+						'data-waveform-autoinit'
+					)
+				);
+
+				class MockWaveformPlayer {}
+
+				return {
+					__esModule: true,
+					default: MockWaveformPlayer,
+				};
+			} );
+
+			require( '../waveform-utils' );
 		} );
 
-		WaveformPlayer = loadWaveformPlayer();
-		WaveformPlayer.init();
-
-		expect(
-			element.querySelector( `[${ FIXTURE_ATTRIBUTE }]` )
-		).toBeNull();
-		expect(
-			element.querySelector( '.waveform-icon-play svg' )
-		).not.toBeNull();
-		expect(
-			element.querySelector( '.waveform-icon-pause svg' )
-		).not.toBeNull();
+		expect( observedAutoinitValues ).toEqual( [ 'false' ] );
+		expect( document.documentElement ).not.toHaveAttribute(
+			'data-waveform-autoinit'
+		);
 	} );
 
 	it( 'uses the default alignment when a declarative alignment value is unsupported', () => {
@@ -113,9 +131,13 @@ describe( 'Waveform Player dependency', () => {
 		const track = element.querySelector( '.waveform-track' );
 		expect( track ).toHaveClass( 'waveform-align-center' );
 		expect( track ).not.toHaveAttribute( FIXTURE_ATTRIBUTE );
+		expect( console ).toHaveWarnedWith(
+			'[WaveformPlayer] Invalid buttonAlign option, using default:',
+			getFragmentedAttributeValue( 'center' )
+		);
 	} );
 
-	it( 'uses the default playback rates when a declarative rate list is unsupported', () => {
+	it( 'uses supported playback rates from declarative rate lists', () => {
 		const element = createDeclarativePlayer( {
 			'data-show-playback-speed': 'true',
 			'data-playback-rates': JSON.stringify( [
@@ -129,9 +151,10 @@ describe( 'Waveform Player dependency', () => {
 		WaveformPlayer.init();
 
 		const options = [ ...element.querySelectorAll( '.speed-option' ) ];
-		expect( options.map( ( option ) => option.textContent ) ).toEqual(
-			DEFAULT_PLAYBACK_RATES
-		);
+		expect( options.map( ( option ) => option.textContent ) ).toEqual( [
+			'1x',
+			'1.5x',
+		] );
 		expect(
 			options.some( ( option ) =>
 				option.hasAttribute( FIXTURE_ATTRIBUTE )
@@ -182,13 +205,22 @@ describe( 'Waveform Player dependency', () => {
 		).not.toBeNull();
 	} );
 
-	it( 'initializes declarative players only after an explicit request', () => {
-		const element = createDeclarativePlayer();
+	it( 'initializes declarative players only after an explicit request from the Playlist utility', () => {
+		const element = createDeclarativePlayer( {
+			'data-play-icon':
+				'<img src="invalid" onerror="window.__waveformXss = true">',
+		} );
 
-		WaveformPlayer = loadWaveformPlayer();
+		jest.isolateModules( () => {
+			require( '../waveform-utils' );
+			WaveformPlayer = window.WaveformPlayer;
+		} );
 
 		expect( element ).not.toHaveAttribute( 'data-waveform-initialized' );
 		expect( element ).toBeEmptyDOMElement();
+		expect( document.documentElement ).not.toHaveAttribute(
+			'data-waveform-autoinit'
+		);
 
 		WaveformPlayer.init();
 
@@ -199,5 +231,22 @@ describe( 'Waveform Player dependency', () => {
 		expect(
 			element.querySelector( '.waveform-player-inner' )
 		).not.toBeNull();
+	} );
+
+	it( 'preserves the page auto-init setting after loading the Playlist utility', () => {
+		document.documentElement.setAttribute(
+			'data-waveform-autoinit',
+			'application-value'
+		);
+
+		jest.isolateModules( () => {
+			require( '../waveform-utils' );
+			WaveformPlayer = window.WaveformPlayer;
+		} );
+
+		expect( document.documentElement ).toHaveAttribute(
+			'data-waveform-autoinit',
+			'application-value'
+		);
 	} );
 } );
