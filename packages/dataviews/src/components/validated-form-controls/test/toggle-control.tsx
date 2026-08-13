@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ValidatedToggleControl } from '../components';
+import { ValidatedToggleControl } from '../toggle-control';
 
 describe( 'ValidatedToggleControl', () => {
 	it( 'should preserve the help description', () => {

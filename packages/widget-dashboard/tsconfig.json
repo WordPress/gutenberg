@@ -11,7 +11,7 @@
 		{ "path": "../data" },
 		{ "path": "../dataviews" },
 		{ "path": "../element" },
-		{ "path": "../grid" },
+		{ "path": "../grid/tsconfig.build.json" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
 		{ "path": "../primitives" },

@@ -7,7 +7,7 @@
 	"references": [
 		{ "path": "../a11y" },
 		{ "path": "../api-fetch" },
-		{ "path": "../blob" },
+		{ "path": "../blob/tsconfig.build.json" },
 		{ "path": "../components" },
 		{ "path": "../compose" },
 		{ "path": "../core-data" },

@@ -184,6 +184,8 @@
 		"test:unit:php:multisite:debug": "npm-run-all test:unit:php:setup:debug test:unit:php:multisite:base",
 		"test:unit:update": "npm run --workspace @wordpress/unit-tests test:unit -- --updateSnapshot",
 		"test:unit:watch": "npm run --workspace @wordpress/unit-tests test:unit:watch --",
+		"pretypecheck": "npm run --workspace @wordpress/build-scripts generate-worker-placeholders --",
+		"typecheck": "tsc --build",
 		"wp-env": "wp-env",
 		"wp-env-test": "wp-env --config .wp-env.test.json"
 	},
