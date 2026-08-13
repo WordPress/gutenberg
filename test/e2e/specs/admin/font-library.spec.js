@@ -3,9 +3,20 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+let FONT_LIBRARY_PAGE_PATH;
+let FONT_LIBRARY_PAGE_QUERY;
+
 test.describe( 'Font Library', () => {
 	test.describe( 'When a user manages custom fonts via the UI', () => {
-		test.beforeAll( async ( { requestUtils } ) => {
+		test.beforeAll( async ( { requestUtils, isGutenbergPluginActive } ) => {
+			if ( isGutenbergPluginActive ) {
+				FONT_LIBRARY_PAGE_PATH = 'admin.php';
+				FONT_LIBRARY_PAGE_QUERY = 'page=font-library-wp-admin';
+			} else {
+				FONT_LIBRARY_PAGE_PATH = 'font-library.php';
+				FONT_LIBRARY_PAGE_QUERY = '';
+			}
+
 			await requestUtils.activateTheme( 'twentytwentyone' );
 			/*
 			 * Delete all installed fonts, font files, the fonts directory, and user font settings
@@ -18,8 +29,8 @@ test.describe( 'Font Library', () => {
 
 		test.beforeEach( async ( { admin } ) => {
 			await admin.visitAdminPage(
-				'admin.php',
-				'page=font-library-wp-admin'
+				FONT_LIBRARY_PAGE_PATH,
+				FONT_LIBRARY_PAGE_QUERY
 			);
 		} );
 
@@ -101,8 +112,8 @@ test.describe( 'Font Library', () => {
 
 			// Check fonts can be uninstalled.
 			await admin.visitAdminPage(
-				'admin.php',
-				'page=font-library-wp-admin'
+				FONT_LIBRARY_PAGE_PATH,
+				FONT_LIBRARY_PAGE_QUERY
 			);
 
 			await page.getByRole( 'button', { name: 'Exo 2' } ).click();
