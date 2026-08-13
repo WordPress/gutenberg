@@ -51,6 +51,37 @@ test.describe( 'Block Notes', () => {
 		await expect( form ).toBeFocused();
 	} );
 
+	test( 'toolbar button closes the new note form it opened', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Testing block comments' },
+		} );
+		const addNote = page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Add note', exact: true } );
+		const form = page.getByRole( 'textbox', {
+			name: 'New note',
+			exact: true,
+		} );
+
+		await addNote.click();
+		await expect( form ).toBeFocused();
+		await expect( addNote ).toHaveAttribute( 'aria-expanded', 'true' );
+
+		/*
+		 * Opening the notes sidebar narrows the canvas, which re-centres the
+		 * block toolbar out from under the pointer. Re-clicking the button has
+		 * to do something predictable rather than silently no-op, or the button
+		 * reads as broken.
+		 */
+		await addNote.click();
+		await expect( form ).toBeHidden();
+		await expect( addNote ).toHaveAttribute( 'aria-expanded', 'false' );
+	} );
+
 	test( 'can add a note to a block', async ( { editor, page } ) => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',

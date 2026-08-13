@@ -124,6 +124,23 @@ function NotesSidebar( { postId } ) {
 		} );
 	}
 
+	/*
+	 * Opening the form widens the sidebar, which narrows the canvas and
+	 * re-centres the block toolbar out from under the pointer. A second click
+	 * therefore lands wherever the button used to be, so the button itself has
+	 * to stay predictable: toggle the form it owns rather than silently
+	 * re-opening the one already on screen.
+	 */
+	function toggleNewNoteForBlock( targetClientId ) {
+		if ( selectedNoteId === 'new' && targetClientId === clientId ) {
+			selectNote( undefined );
+			toggleBlockSpotlight( targetClientId, false );
+			return undefined;
+		}
+
+		return addNewNoteForBlock( targetClientId );
+	}
+
 	useShortcut(
 		'core/editor/new-note',
 		( event ) => {
@@ -166,8 +183,9 @@ function NotesSidebar( { postId } ) {
 			{ !! clientId && (
 				<AddNoteToolbarButton
 					clientId={ clientId }
+					isOpen={ selectedNoteId === 'new' }
 					onClick={ ( toolbarClientId ) =>
-						addNewNoteForBlock( toolbarClientId )
+						toggleNewNoteForBlock( toolbarClientId )
 					}
 				/>
 			) }

@@ -12,7 +12,7 @@ import { unlock } from '../../lock-unlock';
 
 const { NoteIconToolbarSlotFill } = unlock( blockEditorPrivateApis );
 
-function NoteToolbarButton( { clientId, onClick } ) {
+function NoteToolbarButton( { clientId, isOpen, onClick } ) {
 	const block = useSelect(
 		( select ) => select( blockEditorStore ).getBlock( clientId ),
 		[ clientId ]
@@ -44,6 +44,8 @@ function NoteToolbarButton( { clientId, onClick } ) {
 			label={ label }
 			onClick={ onClick }
 			aria-haspopup="dialog"
+			aria-expanded={ isOpen }
+			isPressed={ isOpen }
 			disabled={ isDisabled }
 			shortcut={ shortcut }
 			showTooltip
@@ -51,11 +53,12 @@ function NoteToolbarButton( { clientId, onClick } ) {
 	);
 }
 
-export function AddNoteToolbarButton( { clientId, onClick } ) {
+export function AddNoteToolbarButton( { clientId, isOpen, onClick } ) {
 	return (
 		<NoteIconToolbarSlotFill.Fill>
 			<NoteToolbarButton
 				clientId={ clientId }
+				isOpen={ isOpen }
 				onClick={ () => onClick( clientId ) }
 			/>
 		</NoteIconToolbarSlotFill.Fill>
