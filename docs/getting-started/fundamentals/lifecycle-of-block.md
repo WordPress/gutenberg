@@ -4,7 +4,7 @@ A block is not a single thing. It starts as a block type definition, becomes a J
 
 This article follows a block through those phases and shows which format it takes in each one. Knowing where a phase runs—the browser or the server—tells you where a given piece of code belongs.
 
-![Lifecycle of a block: a registered block type becomes a block object in the Editor, is serialized as HTML with block delimiters in post_content, and is rendered as HTML on the front end](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/block-lifecycle.svg)
+[![Open block lifecycle diagram image](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/block-lifecycle.svg)](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/block-lifecycle.svg 'Open block lifecycle diagram image')
 
 ## Registration
 
@@ -26,7 +26,8 @@ The [`block.json`](https://developer.wordpress.org/block-editor/getting-started/
 		"content": {
 			"type": "string",
 			"source": "html",
-			"selector": "p"
+			"selector": "p",
+			"default": ""
 		}
 	},
 	"editorScript": "file:./index.js",
@@ -38,16 +39,19 @@ The `content` attribute is declared with a `source` and a `selector`, which mean
 
 ## Parsing
 
-When a post is opened in the Editor, its `post_content` is a string of HTML. The [`parse()`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-blocks/#parse) function from `@wordpress/blocks` turns that string into a tree of block objects:
+When a post is opened in the Editor, its `post_content` is a string of HTML. The [`parse()`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-blocks/#parse) function from `@wordpress/blocks` turns that string into an array of block objects, each one holding its own children in `innerBlocks`:
 
 ```js
-{
-	clientId: '6a8b1c4e-...',
-	name: 'my-plugin/message',
-	attributes: { content: 'Hello from a block' },
-	innerBlocks: [],
-	isValid: true,
-}
+const blocks = parse( postContent );
+// [
+// 	{
+// 		clientId: '6a8b1c4e-...',
+// 		name: 'my-plugin/message',
+// 		attributes: { content: 'Hello from a block' },
+// 		innerBlocks: [],
+// 		isValid: true,
+// 	},
+// ]
 ```
 
 Attributes come from two places. Those stored as JSON in the opening delimiter are read directly, and those declared with a `source` (like `content` above) are extracted from the saved markup using the `selector`.
@@ -107,13 +111,23 @@ The resulting string is what gets stored in `post_content`:
 
 Notice that `content` does not appear in the delimiter. Attributes declared with a `source` are read back out of the markup when the post is parsed again, so only the remaining attributes are serialized as JSON.
 
-Blocks that rely on [dynamic rendering](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/) usually return `null` from `save`, and that changes how their attributes are declared. With no saved markup, there is nothing for a `source` to read from, so a dynamic version of this block declares `content` without one:
+Blocks that rely on [dynamic rendering](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/) usually return `null` from `save`, and that changes how their attributes are declared. With no saved markup, there is nothing for a `source` to read from, so a dynamic version of this block declares `content` without one and points at a `render` file instead:
 
 ```json
-"attributes": {
-	"content": {
-		"type": "string"
-	}
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "my-plugin/message",
+	"title": "Message",
+	"category": "text",
+	"attributes": {
+		"content": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"editorScript": "file:./index.js",
+	"render": "file:./render.php"
 }
 ```
 
@@ -128,9 +142,9 @@ The value is then stored in the delimiter instead of in markup, and the whole bl
 On the front end the Editor is gone, and the stored HTML is processed in PHP. [`do_blocks()`](https://developer.wordpress.org/reference/functions/do_blocks/), which runs on the `the_content` filter, parses `post_content` and calls [`render_block()`](https://developer.wordpress.org/reference/functions/render_block/) for every block:
 
 -   **Static blocks** have their saved markup returned as is.
--   **Dynamic blocks** discard the saved markup and generate fresh output from the `render` file declared in `block.json`, or from a `render_callback` passed to `register_block_type()`.
+-   **Dynamic blocks** generate their output at render time, from the `render` file declared in `block.json` or from a `render_callback` passed to `register_block_type()`.
 
-A `render.php` file receives the block's attributes, its saved inner markup, and the `WP_Block` instance:
+The `render.php` file from the dynamic example above receives the block's attributes, whatever markup was saved for the block, and the `WP_Block` instance. When `save` returns `null`, nothing is stored between the delimiters, so `$content` arrives empty:
 
 ```php
 <?php
