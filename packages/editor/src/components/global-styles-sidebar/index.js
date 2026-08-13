@@ -1,4 +1,5 @@
-import { FlexItem, Flex, Button } from '@wordpress/components';
+import { Button } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { styles, seen, backup } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -121,52 +122,50 @@ export default function GlobalStylesSidebar() {
 				// remaining height.
 				render={ <div className="editor-global-styles-sidebar" /> }
 				header={
-					<Flex
+					<Stack
 						className="editor-global-styles-sidebar__header"
-						gap={ 1 }
+						direction="row"
+						align="center"
+						gap="xs"
 					>
-						<FlexItem>
-							<h2 className="editor-global-styles-sidebar__header-title">
-								{ __( 'Styles' ) }
-							</h2>
-						</FlexItem>
-						<Flex
-							justify="flex-end"
-							gap={ 1 }
+						<h2 className="editor-global-styles-sidebar__header-title">
+							{ __( 'Styles' ) }
+						</h2>
+						<Stack
 							className="editor-global-styles-sidebar__header-actions"
+							direction="row"
+							align="center"
+							justify="flex-end"
+							gap="xs"
 						>
 							{ ! isMobileViewport && (
-								<FlexItem>
-									<Button
-										icon={ seen }
-										label={ __( 'Style Book' ) }
-										isPressed={ showStylebook }
-										accessibleWhenDisabled
-										disabled={ shouldResetNavigation }
-										onClick={ toggleStyleBook }
-										size="compact"
-									/>
-								</FlexItem>
-							) }
-							<FlexItem>
 								<Button
-									label={ __( 'Revisions' ) }
-									icon={ backup }
-									onClick={ toggleRevisions }
+									icon={ seen }
+									label={ __( 'Style Book' ) }
+									isPressed={ showStylebook }
 									accessibleWhenDisabled
-									disabled={ ! hasRevisions }
-									isPressed={
-										isRevisionsOpened ||
-										isRevisionsStyleBookOpened
-									}
+									disabled={ shouldResetNavigation }
+									onClick={ toggleStyleBook }
 									size="compact"
 								/>
-							</FlexItem>
+							) }
+							<Button
+								label={ __( 'Revisions' ) }
+								icon={ backup }
+								onClick={ toggleRevisions }
+								accessibleWhenDisabled
+								disabled={ ! hasRevisions }
+								isPressed={
+									isRevisionsOpened ||
+									isRevisionsStyleBookOpened
+								}
+								size="compact"
+							/>
 							<GlobalStylesActionMenu
 								onChangePath={ setStylesPath }
 							/>
-						</Flex>
-					</Flex>
+						</Stack>
+					</Stack>
 				}
 			>
 				<GlobalStylesUI
