@@ -9,6 +9,19 @@ import {
 import { closeSmall } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
+/*
+ * InspectorPopoverHeader Component
+ *
+ * Renders a header that is suitable for use in an
+ * inspector sidebar popover.
+ *
+ * @param {Object} props             The component props.
+ * @param {string} props.title       Title to display in the header.
+ * @param {string} [props.help]      Optional. Text to display at the bottom of the header.
+ * @param {Array}  [props.actions]   Optional. Array of actions to display in the header as a row of buttons.
+ * @param {Function} [props.onClose] Optional. Function called when the user presses the close button. If not provided, no close button will appear.
+ * @return {JSX.Element}             A styled header component for an inspector sidebar popover.
+ */
 export default function InspectorPopoverHeader( {
 	title,
 	help,
