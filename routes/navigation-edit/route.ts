@@ -20,6 +20,13 @@ export const route = {
 			throw notFound();
 		}
 
+		// Only block themes render `wp_navigation` posts. Classic themes manage
+		// their menus through Appearance > Menus instead.
+		const theme = await resolveSelect( coreStore ).getCurrentTheme();
+		if ( ! theme?.is_block_theme ) {
+			throw notFound();
+		}
+
 		try {
 			const navigation = await resolveSelect( coreStore ).getEntityRecord(
 				'postType',
