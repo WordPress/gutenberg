@@ -1,30 +1,35 @@
 <?php
 /**
- * Animated GIF → video: clean up the companion files of a converted GIF.
+ * Motion companions: clean up the video files stored alongside an image.
  *
- * When client-side media processing is enabled, an opaque animated GIF is
- * stored as a normal image attachment (it stays a single media library item).
- * The GIF is also transcoded to a video (MP4/WebM) and a static first-frame
- * poster, both sideloaded as *companion files* of that same attachment — like
- * the HEIC original — and recorded in the attachment metadata under the
- * `animated_video` and `animated_video_poster` keys. They are never separate
- * attachments. Transparent GIFs are not converted (a `<video>` cannot
- * reproduce GIF transparency), so they have no companion.
+ * Some uploads carry motion that cannot be stored in an image: an opaque
+ * animated GIF, or a HEIC/HEIF image sequence (an Apple Live Photo or Android
+ * burst). When client-side media processing is enabled, each is stored as a
+ * normal image attachment — the GIF itself, or a still frame decoded from the
+ * sequence — and stays a single media library item. The motion is re-encoded
+ * in the browser to a video (MP4/WebM) and sideloaded as a *companion file* of
+ * that same attachment, like the HEIC original, recorded in the attachment
+ * metadata under the `animated_video` key.
  *
- * The swap to a video is handled in the editor: an uploaded GIF whose companion
- * video is available is switched to the Video block's "GIF" variation, which
- * serializes a normal `<video autoplay loop muted playsinline>` and so renders
- * natively on the front end with no render-time filtering. The author can
- * restore the original GIF from the block toolbar. The only thing left for PHP
- * is removing the sideloaded companions when their attachment is deleted, which
- * core's wp_delete_attachment_files() does not know about.
+ * A GIF also gets a static first-frame poster companion under
+ * `animated_video_poster`; a sequence needs none, because the uploaded still
+ * is already its first frame. Transparent GIFs are not converted at all (a
+ * `<video>` cannot reproduce GIF transparency), so they have no companion.
+ *
+ * The swap to a video is handled in the editor: an image whose companion video
+ * is available is switched to the Video block's "GIF" or "Live photo"
+ * variation, which serializes a normal `<video>` and so renders natively on
+ * the front end. The author can restore the original image from the block
+ * toolbar. The only thing left for PHP is removing the sideloaded companions
+ * when their attachment is deleted, which core's
+ * wp_delete_attachment_files() does not know about.
  *
  * @package gutenberg
  */
 
 /**
- * Returns the absolute path to one of an attachment's animated-GIF companion
- * files (the converted video or its poster), if recorded.
+ * Returns the absolute path to one of an attachment's motion companion files
+ * (the converted video or its poster), if recorded.
  *
  * The path is rebuilt from the attachment's own (trusted) directory plus the
  * recorded basename, so the stored metadata cannot point anywhere else.
@@ -83,12 +88,15 @@ function gutenberg_delete_animated_gif_companion_file( ?string $path ): void {
 }
 
 /**
- * Deletes the companion video and poster when their GIF attachment is deleted.
+ * Deletes the companion video and poster when their attachment is deleted.
  *
- * The companions are sideloaded next to the GIF and recorded in
- * $metadata['animated_video'] and $metadata['animated_video_poster']. WordPress
- * core's wp_delete_attachment_files() does not know about them, so without this
- * hook they would linger on disk after the attachment is deleted.
+ * The companions are sideloaded next to the image (an animated GIF, or the
+ * still frame of an image sequence) and recorded in
+ * $metadata['animated_video'] and $metadata['animated_video_poster'].
+ * WordPress core's wp_delete_attachment_files() does not know about them, so
+ * without this hook they would linger on disk after the attachment is
+ * deleted. A sequence has no poster companion, and the lookup simply returns
+ * nothing for it.
  *
  * @param int $post_id Attachment ID being deleted.
  */
