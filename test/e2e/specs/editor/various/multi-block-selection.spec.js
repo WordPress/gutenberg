@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 /** @typedef {import('@playwright/test').Page} Page */
@@ -47,6 +44,51 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		);
 	} );
 
+	test( 'should disclose the blocks nested in selected blocks', async ( {
+		page,
+		editor,
+		pageUtils,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/group',
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'inner one' },
+				},
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'inner two' },
+				},
+			],
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'outer' },
+		} );
+
+		await editor.canvas.getByText( 'outer' ).click();
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
+
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1, 4 ] );
+
+		await expect( page.locator( '[aria-live="assertive"]' ) ).toHaveText(
+			'2 blocks selected, 4 including nested blocks.'
+		);
+
+		await editor.openDocumentSettingsSidebar();
+		await expect(
+			page.locator( '.block-editor-multi-selection-inspector__card' )
+		).toContainText( '2 Blocks' );
+		await expect(
+			page.locator( '.block-editor-multi-selection-inspector__card' )
+		).toContainText( '4 including nested blocks' );
+	} );
+
 	// See #14448: an incorrect buffer may trigger multi-selection too soon.
 	test( 'should only trigger multi-selection when at the end (-webkit)', async ( {
 		page,
@@ -85,7 +127,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Shift+Enter' );
@@ -112,7 +154,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		multiBlockSelectionUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '12' );
@@ -135,7 +177,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Shift+ArrowUp' );
@@ -247,7 +289,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
@@ -293,7 +335,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		multiBlockSelectionUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
@@ -591,7 +633,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '12' );
 		await page.keyboard.press( 'ArrowLeft' );
@@ -658,7 +700,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '123' );
 		await page.keyboard.press( 'ArrowLeft' );
@@ -775,7 +817,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		multiBlockSelectionUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', {
+			.getByRole( 'document', {
 				name: 'Add default block',
 			} )
 			.click();
@@ -867,7 +909,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '1' );
 
@@ -1041,10 +1083,9 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 
 		await page.keyboard.press( 'Backspace' );
 
-		// Expect both columns to be deleted.
-		await expect
-			.poll( editor.getBlocks )
-			.toMatchObject( [ { name: 'core/columns', innerBlocks: [] } ] );
+		// Expect the columns block to be deleted along with its emptied
+		// columns.
+		await expect.poll( editor.getBlocks ).toEqual( [] );
 	} );
 
 	test( 'should multi-select from within the list block', async ( {
@@ -1269,7 +1310,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '1[' );
 		await page.keyboard.press( 'Enter' );
@@ -1298,7 +1339,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '1[' );
 		await page.keyboard.press( 'Enter' );

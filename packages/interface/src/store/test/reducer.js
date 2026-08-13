@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { activeModal } from '../reducer';
 
 describe( 'state', () => {

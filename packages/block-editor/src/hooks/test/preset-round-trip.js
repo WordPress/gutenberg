@@ -6,21 +6,15 @@
  * preset references, clear the relevant reset surfaces, and treat explicit
  * empty values as non-contributing layers.
  */
-
-/**
- * Internal dependencies
- */
 import {
 	getValueFromVariable,
 	getPresetVariableFromValue,
 } from '@wordpress/global-styles-engine';
-
 import {
 	getCustomValueFromPreset as getCustomSpacingValue,
 	getPresetValueFromCustomValue as getSpacingPresetFromCustom,
 	isValueSpacingPreset,
 } from '../../components/spacing-sizes-control/utils';
-
 import {
 	getCustomValueFromPreset,
 	getPresetValueFromCustomValue,

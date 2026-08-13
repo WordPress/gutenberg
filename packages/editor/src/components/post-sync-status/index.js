@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import PostPanelRow from '../post-panel-row';
 import { store as editorStore } from '../../store';
 

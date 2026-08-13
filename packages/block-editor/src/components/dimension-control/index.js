@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useMemo, useState } from '@wordpress/element';
 import {
 	BaseControl,
@@ -13,10 +6,6 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useSettings } from '../use-settings';
 import PresetInputControl from '../preset-input-control';
 import { CUSTOM_VALUE_SETTINGS } from '../preset-input-control/constants';

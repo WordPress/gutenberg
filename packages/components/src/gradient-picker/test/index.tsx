@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * Internal dependencies
- */
 import GradientPicker from '..';
 
 const GRADIENT_A =

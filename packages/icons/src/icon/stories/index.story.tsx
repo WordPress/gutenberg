@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import type { ReactElement } from 'react';
 import type { StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import Icon from '../';
 import check from '../../library/check';
 import * as icons from '../../';

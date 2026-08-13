@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import normalizeFields from '../index';
 import type { Field } from '../../types';
 

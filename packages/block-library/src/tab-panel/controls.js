@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	InspectorControls,
 	store as blockEditorStore,
@@ -12,10 +9,6 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import TabToolbarControls from '../tabs/tab-toolbar-controls';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 

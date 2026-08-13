@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { calculateVersionBumpFromChangelog } from '../common';
 
 describe( 'calculateVersionBumpFromChangelog', () => {

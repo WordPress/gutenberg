@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
+import { detectTypeFromLicenseText, checkAllCompatible } from '../license';
 const fs = require( 'fs' );
 const path = require( 'path' );
-
-/**
- * Internal dependencies
- */
-import { detectTypeFromLicenseText, checkAllCompatible } from '../license';
 
 describe( 'detectTypeFromLicenseText', () => {
 	let licenseText;

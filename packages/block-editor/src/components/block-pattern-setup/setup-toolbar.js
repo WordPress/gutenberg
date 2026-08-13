@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, isRTL } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import {
@@ -9,10 +6,6 @@ import {
 	grid,
 	stretchFullWidth,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { VIEWMODES } from './constants';
 
 const Actions = ( { onBlockPatternSelect } ) => (

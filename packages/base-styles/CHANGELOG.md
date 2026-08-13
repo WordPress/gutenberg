@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `outset-ring__focus`: Use a `--focus-color` fallback in the outline instead of declaring the custom property locally, so ancestor overrides apply correctly ([#81242](https://github.com/WordPress/gutenberg/pull/81242)).
+
+## 12.1.0 (2026-08-12)
+
+
+## 12.0.0 (2026-07-29)
+
 ### Breaking Changes
 
 -   Remove the `$accent-color` parameter from `input-control` and `input-style__focus`. Focus styling now uses `--wp-admin-theme-color` internally ([#80595](https://github.com/WordPress/gutenberg/pull/80595)).
@@ -9,7 +18,6 @@
 ### Enhancements
 
 -   `outset-ring__focus`: Allow overriding the focus ring color via the `--focus-color` custom property ([#80587](https://github.com/WordPress/gutenberg/pull/80587)).
--   `outset-ring__focus`: Use a `--focus-color` fallback in the outline instead of declaring the custom property locally, so ancestor overrides apply correctly ([#81242](https://github.com/WordPress/gutenberg/pull/81242)).
 
 ### Bug Fixes
 

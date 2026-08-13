@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { ToolbarButton } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import useBlockDisplayInformation from '../use-block-display-information';
 import BlockIcon from '../block-icon';
 import { useShowHoveredOrFocusedGestures } from '../block-toolbar/utils';
