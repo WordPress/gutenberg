@@ -25,7 +25,7 @@
 		{ "path": "../keycodes" },
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
-		{ "path": "../theme" },
+		{ "path": "../theme/tsconfig.build.json" },
 		{ "path": "../ui" },
 		{ "path": "../url" },
 		{ "path": "../warning" }

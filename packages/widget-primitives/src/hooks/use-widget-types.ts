@@ -17,25 +17,36 @@ import type {
 
 /*
  * Transparent stand-in for an icon reference that has not resolved yet:
- * it holds the icon slot so titles do not shift when the icon lands.
+ * it holds the icon slot so titles do not shift and actions keep their
+ * icon shape while the icon lands.
  */
 const pendingIcon: WidgetIcon = createElement( 'svg', {
 	viewBox: '0 0 24 24',
 } );
 
 /**
- * Emitted actions carry only renderable icons: a wire reference resolves
- * after the gate and patches in; anything else non-renderable drops.
+ * Emitted actions carry only renderable icons: a wire reference holds the
+ * slot with the stand-in while it resolves; anything else non-renderable
+ * drops.
  *
- * @param actions Declared actions, from the record or the module.
+ * @param actions     Declared actions, from the record or the module.
+ * @param holdPending Whether wire references resolve later (record actions).
  */
 function withRenderableIcons(
-	actions: ( WidgetAction | WidgetActionRecord )[]
+	actions: ( WidgetAction | WidgetActionRecord )[],
+	holdPending: boolean
 ): WidgetAction[] {
-	return actions.map( ( { icon, ...action } ) => ( {
-		...action,
-		...( isValidElement( icon ) ? { icon: icon as WidgetIcon } : {} ),
-	} ) );
+	return actions.map( ( { icon, ...action } ) => {
+		if ( isValidElement( icon ) ) {
+			return { ...action, icon: icon as WidgetIcon };
+		}
+
+		if ( holdPending && typeof icon === 'string' ) {
+			return { ...action, icon: pendingIcon };
+		}
+
+		return action;
+	} );
 }
 
 /* `true` while records or their metadata imports are still resolving; hosts
@@ -141,7 +152,12 @@ export function useWidgetTypes(
 							? { keywords: record.keywords }
 							: {} ),
 						...( actions
-							? { actions: withRenderableIcons( actions ) }
+							? {
+									actions: withRenderableIcons(
+										actions,
+										actions === record.actions
+									),
+							  }
 							: {} ),
 					} as WidgetType;
 				} catch {
@@ -192,9 +208,8 @@ export function useWidgetTypes(
 			}
 
 			/*
-			 * Each record action's icon reference resolves off the gate
-			 * and patches into the emitted action; an unresolvable
-			 * reference leaves the action without an icon.
+			 * Record action icon references resolve off the gate and
+			 * patch in; an unresolvable reference clears the stand-in.
 			 */
 			for ( const record of records ) {
 				for ( const action of record.actions ?? [] ) {
@@ -203,7 +218,7 @@ export function useWidgetTypes(
 					}
 
 					void resolveIcon( action.icon ).then( ( resolved ) => {
-						if ( cancelled || ! resolved ) {
+						if ( cancelled ) {
 							return;
 						}
 
@@ -215,11 +230,22 @@ export function useWidgetTypes(
 
 								return {
 									...type,
-									actions: type.actions?.map( ( entry ) =>
-										entry.id === action.id
-											? { ...entry, icon: resolved }
-											: entry
-									),
+									actions: type.actions?.map( ( entry ) => {
+										if ( entry.id !== action.id ) {
+											return entry;
+										}
+
+										if ( resolved ) {
+											return {
+												...entry,
+												icon: resolved,
+											};
+										}
+
+										return entry.icon === pendingIcon
+											? { ...entry, icon: undefined }
+											: entry;
+									} ),
 								};
 							} )
 						);

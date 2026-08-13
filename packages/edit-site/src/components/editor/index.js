@@ -2,7 +2,6 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import {
-	EditorKeyboardShortcutsRegister,
 	privateApis as editorPrivateApis,
 	store as editorStore,
 } from '@wordpress/editor';
@@ -167,7 +166,6 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 		<SitePreview />
 	) : (
 		<>
-			<EditorKeyboardShortcutsRegister />
 			{ isEditMode && <BlockKeyboardShortcuts /> }
 			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
 			{ isEditMode && isReady && (
