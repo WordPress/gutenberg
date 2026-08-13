@@ -2,6 +2,7 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { select, dispatch } from '@wordpress/data';
 import { invalidateAttachmentResolutions } from '../../utils/invalidate-attachment-resolutions';
+import { attachMediaToCurrentPost } from '../../utils/attach-media-to-current-post';
 
 const DEFAULT_EMPTY_GALLERY = [];
 
@@ -240,6 +241,11 @@ const slimImageObject = ( img ) => {
 		'alt',
 		'link',
 		'caption',
+		// The attachment's parent post. Consumers use this to tell an
+		// unattached item from one that already belongs to another post; without
+		// it, selections coming through `onUpdate` (the gallery edit and replace
+		// flows) are indistinguishable from items whose parent is unknown.
+		'uploadedTo',
 	];
 	return attrSet.reduce( ( result, key ) => {
 		if ( img?.hasOwnProperty( key ) ) {
@@ -451,22 +457,28 @@ class MediaUpload extends Component {
 			return;
 		}
 
-		if ( multiple ) {
-			onSelect(
-				selectedImages.models.map( ( model ) =>
-					slimImageObject( model.toJSON() )
-				)
-			);
-		} else {
-			onSelect( slimImageObject( selectedImages.models[ 0 ].toJSON() ) );
-		}
+		const selection = selectedImages.models.map( ( model ) =>
+			slimImageObject( model.toJSON() )
+		);
+
+		const selected = multiple ? selection : selection[ 0 ];
+		onSelect( selected );
+
+		// Attach exactly what landed in the block, and never awaited — see
+		// `attachMediaToCurrentPost`. Called after `onSelect` so a background
+		// write can't delay the selection reaching the editor.
+		attachMediaToCurrentPost( selected, { select, dispatch } );
 	}
 
 	onSelect() {
 		const { onSelect, multiple = false } = this.props;
 		// Get media attachment details from the frame state.
 		const attachment = this.frame.state().get( 'selection' ).toJSON();
-		onSelect( multiple ? attachment : attachment[ 0 ] );
+		const selected = multiple ? attachment : attachment[ 0 ];
+		onSelect( selected );
+
+		// Not awaited — see `attachMediaToCurrentPost`.
+		attachMediaToCurrentPost( selected, { select, dispatch } );
 	}
 
 	onOpen() {

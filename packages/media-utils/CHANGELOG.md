@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Prevent editor block removal by stopping undo/redo event propagation when the Media Library modal is open ([#79898](https://github.com/WordPress/gutenberg/pull/79898)).
+-   Media selected from a picker is now attached to the post it is added to, when it is not already attached to another post — matching what uploading into that post has always done ([#81804](https://github.com/WordPress/gutenberg/pull/81804)).
 
 ### Internal
 

@@ -12,7 +12,7 @@ import {
 	privateApis as coreDataPrivateApis,
 	store as coreStore,
 } from '@wordpress/core-data';
-import { resolveSelect, useDispatch } from '@wordpress/data';
+import { resolveSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { Modal, DropZone, FormFileUpload, Button } from '@wordpress/components';
 import { upload as uploadIcon } from '@wordpress/icons';
 import { DataViewsPicker } from '@wordpress/dataviews';
@@ -41,6 +41,7 @@ import {
 import { store as noticesStore, SnackbarNotices } from '@wordpress/notices';
 import type { Attachment, RestAttachment } from '../../utils/types';
 import { transformAttachment } from '../../utils/transform-attachment';
+import { attachMediaToCurrentPost } from '../../utils/attach-media-to-current-post';
 import { uploadMedia } from '../../utils/upload-media';
 import { unlock } from '../../lock-unlock';
 import { UploadStatusPopover } from './upload-status-popover';
@@ -235,6 +236,7 @@ export function MediaUploadModal( {
 		useDispatch( noticesStore );
 	const invalidateAttachmentResolutions =
 		useInvalidateAttachmentResolutions();
+	const registry = useRegistry();
 	const [ queryParams, setQueryParams ] = useState< ViewQueryParams >(
 		() => defaultQueryParams
 	);
@@ -455,10 +457,16 @@ export function MediaUploadModal( {
 
 					removeAllNotices( 'snackbar', NOTICES_CONTEXT );
 					onSelect( selectedItems );
+
+					// Attach exactly what landed in the block, and never
+					// awaited — see `attachMediaToCurrentPost`. Called after
+					// `onSelect` so a background write can't delay the
+					// selection reaching the editor.
+					attachMediaToCurrentPost( selectedItems, registry );
 				},
 			},
 		],
-		[ multiple, onSelect, selection, removeAllNotices ]
+		[ multiple, onSelect, selection, removeAllNotices, registry ]
 	);
 
 	const handleModalClose = useCallback( () => {
