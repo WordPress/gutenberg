@@ -1525,6 +1525,38 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that a viewport still gets `container-type` when the default viewport's
+	 * minimumColumnWidth is unusable. The default viewport skips the declaration in that
+	 * case, so the viewport rule must not assume it was already written.
+	 *
+	 * @covers ::gutenberg_get_layout_style
+	 */
+	public function test_gutenberg_get_layout_style_sets_container_type_when_base_minimum_column_width_is_unusable() {
+		$layout_styles = gutenberg_get_layout_style(
+			'.wp-layout',
+			array(
+				'type'               => 'grid',
+				'columnCount'        => 3,
+				'minimumColumnWidth' => array( '9rem' ),
+			),
+			false,
+			null,
+			false,
+			'0.5em',
+			null,
+			array(
+				'viewport_overrides' => array( 'minimumColumnWidth' => '20rem' ),
+				'rules_group'        => '@media (min-width: 600px)',
+			)
+		);
+
+		$this->assertSame(
+			'@media (min-width: 600px){.wp-layout{grid-template-columns:repeat(auto-fill, minmax(max(min(20rem, 100%), (100% - (0.5em * (3 - 1))) /3), 1fr));container-type:inline-size;}}',
+			$layout_styles
+		);
+	}
+
+	/**
 	 * Tests that grid counts saved as numeric strings (WordPress 6.3 to 6.6) produce the
 	 * same CSS as numbers.
 	 *

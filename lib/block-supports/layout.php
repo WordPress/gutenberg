@@ -914,7 +914,14 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		}
 
 		if ( ! empty( $grid_declarations ) ) {
-			$base_has_container_type = empty( $base_layout['columnCount'] ) || ( ! empty( $base_layout['columnCount'] ) && ! empty( $base_layout['minimumColumnWidth'] ) );
+			/*
+			 * This flag records whether the default viewport already set `container-type`, so
+			 * it has to read the base values through the same guards the default viewport pass
+			 * used. Reading them raw would claim a `container-type` that was never written.
+			 */
+			$base_column_count         = is_numeric( $base_layout['columnCount'] ?? null ) ? (int) $base_layout['columnCount'] : null;
+			$base_minimum_column_width = is_string( $base_layout['minimumColumnWidth'] ?? null ) ? $base_layout['minimumColumnWidth'] : null;
+			$base_has_container_type   = empty( $base_column_count ) || ( ! empty( $base_column_count ) && ! empty( $base_minimum_column_width ) );
 			if ( empty( $column_count ) || ! empty( $minimum_column_width ) ) {
 				if ( null === $viewport_overrides || ! $base_has_container_type ) {
 					$grid_declarations['container-type'] = 'inline-size';
