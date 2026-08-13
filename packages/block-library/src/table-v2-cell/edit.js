@@ -386,6 +386,19 @@ export default function TableCellEdit( {
 		return maxColumn - minColumn + 1;
 	}, [ isCellSetSelection, cellPlacements, selectedClientIds ] );
 
+	const canMerge = useMemo( () => {
+		if ( ! isCellSetSelection ) {
+			return false;
+		}
+		const selectedClientIdSet = new Set( selectedClientIds );
+		return ! cellPlacements.some(
+			( placement ) =>
+				selectedClientIdSet.has( placement.cell.clientId ) &&
+				( ( placement.cell.attributes.rowSpan || 1 ) > 1 ||
+					( placement.cell.attributes.colSpan || 1 ) > 1 )
+		);
+	}, [ isCellSetSelection, cellPlacements, selectedClientIds ] );
+
 	const tableControls = [
 		{
 			icon: tableRowAfter,
@@ -449,7 +462,7 @@ export default function TableCellEdit( {
 			rowSpan={ rowSpan > 1 ? rowSpan : undefined }
 		>
 			<BlockControls group="other">
-				{ isCellSetSelection && (
+				{ canMerge && (
 					<ToolbarButton
 						icon={ group }
 						label={ __( 'Merge cells' ) }
