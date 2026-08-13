@@ -24,6 +24,27 @@ let cleanup: () => void;
 let vipsPromise: Promise< typeof Vips > | undefined;
 
 /**
+ * Estimated bytes of WASM memory required per decoded pixel.
+ *
+ * A decoded image needs roughly width * height * 4 bytes (RGBA), plus working
+ * buffers while vips resizes and re-encodes it. Four bytes per pixel is a
+ * deliberately conservative lower bound.
+ */
+const BYTES_PER_PIXEL = 4;
+
+/**
+ * Memory budget (in bytes) for decoding every frame of an animated image.
+ *
+ * wasm-vips runs in a fixed 1 GiB WASM heap that cannot grow (wasm-vips 0.0.18
+ * builds with `INITIAL_MEMORY` === `MAXIMUM_MEMORY` === 1 GiB), so an
+ * animation loaded with `[n=-1]` — every frame stacked into one tall image —
+ * costs roughly frames * width * pageHeight * 4 bytes. A long animation of
+ * otherwise modest dimensions therefore exhausts the heap even though a single
+ * frame is small. ~0.5 GiB leaves headroom for the resize and re-encode steps.
+ */
+const ANIMATION_MEMORY_BUDGET = 0.5 * 1024 * 1024 * 1024;
+
+/**
  * Caches Blob URLs created for inlined WASM binaries.
  *
  * The WASM binaries are inlined as `Uint8Array` values at build time. wasm-vips
@@ -565,7 +586,9 @@ function resizeHighBitDepth<
  * `wp_generate_animated_image_subsizes` filter, carried here as the
  * `preserveAnimation` option. Cropped sizes always flatten to the first
  * frame (per-frame cropping is not supported), also matching the
- * pre-existing behavior.
+ * pre-existing behavior. Animations whose decoded frames would not fit the
+ * WASM heap also flatten to the first frame, so an opted-in site gets a
+ * static sub-size rather than a failed upload.
  * See https://github.com/WordPress/gutenberg/issues/80383.
  *
  * @param id      Item ID.
@@ -618,6 +641,26 @@ export async function resizeImage(
 		};
 
 		let image = vips.Image.newFromBuffer( buffer, strOptions, loadOptions );
+
+		/*
+		 * Decoding is lazy, so the frame count is known before any pixels are
+		 * materialized. `[n=-1]` stacks every frame into one tall image, which
+		 * for a long animation needs far more memory than the single-frame
+		 * dimensions suggest. Rather than let the resize abort the whole
+		 * upload when that exceeds the WASM heap, fall back to a first-frame
+		 * sub-size, which is what this image would have produced before the
+		 * `wp_generate_animated_image_subsizes` opt-in.
+		 */
+		if ( strOptions ) {
+			const frames =
+				image.pageHeight > 0 ? image.height / image.pageHeight : 1;
+			const estimatedBytes =
+				image.width * image.pageHeight * frames * BYTES_PER_PIXEL;
+			if ( estimatedBytes > ANIMATION_MEMORY_BUDGET ) {
+				strOptions = '';
+				image = vips.Image.newFromBuffer( buffer, strOptions, {} );
+			}
+		}
 
 		image.onProgress = onProgress;
 
