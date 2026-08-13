@@ -1,8 +1,16 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "../utils/theme-variables" as *;
+
 .components-guide {
 	$image-height: 300px;
+	// TODO: Replace with a --wpds-dimension-surface-width-* token.
 	$image-width: 320px;
 
 	@include break-small() {
+		// TODO: Replace with a --wpds-dimension-surface-width-* token.
 		width: 600px;
 	}
 
@@ -25,12 +33,6 @@
 			align-self: flex-start;
 			margin: $grid-unit-10 $grid-unit-10 0 0;
 			position: static;
-
-			&:hover {
-				svg {
-					fill: $white;
-				}
-			}
 		}
 	}
 
@@ -59,7 +61,7 @@
 		height: $button-size;
 		justify-content: center;
 		margin: 0 0 $grid-unit-30 0;
-		padding: 0 $grid-unit-40;
+		padding: 0 $grid-unit-30;
 		position: relative;
 		width: 100%;
 	}
@@ -86,6 +88,7 @@
 
 .components-modal__frame.components-guide {
 	border: none;
+	// TODO: Replace with a --wpds-dimension-surface-width-* token.
 	min-width: 312px;
 	max-height: 575px;
 
@@ -103,11 +106,11 @@
 	}
 
 	&.components-guide__back-button {
-		left: $grid-unit-40;
+		left: $grid-unit-30;
 	}
 
 	&.components-guide__forward-button,
 	&.components-guide__finish-button {
-		right: $grid-unit-40;
+		right: $grid-unit-30;
 	}
 }

@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { View } from '../../view';
 import { Scrollable } from '..';
 
@@ -31,6 +20,11 @@ const meta: Meta< typeof Scrollable > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Planned for deprecation.',
+		},
 	},
 };
 export default meta;

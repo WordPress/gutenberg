@@ -1,31 +1,30 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch } from '@wordpress/data';
-import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf, _x } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useState } from '@wordpress/element';
-import { DataForm } from '@wordpress/dataviews';
 import {
 	Button,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
-import type { Action } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
-import { titleField } from '../fields';
 import type { BasePost, CoreDataError } from '../types';
 import { getItemTitle } from './utils';
 
-const fields = [ titleField ];
-const formDuplicateAction = {
-	fields: [ 'title' ],
-};
+interface RenderModalProps< Item > {
+	items: Item[];
+	closeModal?: () => void;
+	onActionPerformed?: ( items: Item[] ) => void;
+}
+
+interface Action< Item > {
+	id: string;
+	label: string;
+	isEligible?: ( item: Item ) => boolean;
+	modalFocusOnMount?: string;
+	RenderModal: ( props: RenderModalProps< Item > ) => React.JSX.Element;
+}
 
 const duplicatePost: Action< BasePost > = {
 	id: 'duplicate-post',
@@ -56,10 +55,12 @@ const duplicatePost: Action< BasePost > = {
 				return;
 			}
 
+			const isTemplate = item.type === 'wp_template';
+
 			const newItemObject = {
-				status: 'draft',
+				status: isTemplate ? 'publish' : 'draft',
 				title: item.title,
-				slug: item.title || __( 'No title' ),
+				slug: isTemplate ? item.slug : item.title || __( 'No title' ),
 				comment_status: item.comment_status,
 				content:
 					typeof item.content === 'string'
@@ -90,7 +91,7 @@ const duplicatePost: Action< BasePost > = {
 				);
 			assignableProperties.forEach( ( property ) => {
 				if ( item.hasOwnProperty( property ) ) {
-					// @ts-ignore
+					// @ts-expect-error `property` is a dynamic string key on both objects.
 					newItemObject[ property ] = item[ property ];
 				}
 			} );
@@ -107,7 +108,7 @@ const duplicatePost: Action< BasePost > = {
 					sprintf(
 						// translators: %s: Title of the created post, e.g: "Hello world".
 						__( '"%s" successfully created.' ),
-						decodeEntities( newItem.title?.rendered || item.title )
+						getItemTitle( newItem )
 					),
 					{
 						id: 'duplicate-post-action',
@@ -137,14 +138,21 @@ const duplicatePost: Action< BasePost > = {
 		return (
 			<form onSubmit={ createPage }>
 				<VStack spacing={ 3 }>
-					<DataForm
-						data={ item }
-						fields={ fields }
-						form={ formDuplicateAction }
-						onChange={ ( changes ) =>
+					{ typeof item.id === 'string' && (
+						<div>
+							{ __(
+								'You are about to duplicate a bundled template. Changes will not be live until you activate the new template.'
+							) }
+						</div>
+					) }
+					<InputControl
+						label={ __( 'Title' ) }
+						placeholder={ __( 'No title' ) }
+						value={ getItemTitle( item ) }
+						onChange={ ( value ) =>
 							setItem( ( prev ) => ( {
 								...prev,
-								...changes,
+								title: value || __( 'No title' ),
 							} ) )
 						}
 					/>

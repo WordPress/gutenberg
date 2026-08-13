@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 const { command } = require( 'execa' );
 const npmPackageArg = require( 'npm-package-arg' );
 const writePkg = require( 'write-pkg' );
-
-/**
- * Internal dependencies
- */
 const { info, error } = require( './log' );
 
 module.exports = async ( {
@@ -37,14 +30,15 @@ module.exports = async ( {
 	function checkDependency( packageArg ) {
 		const { type } = npmPackageArg( packageArg );
 		if (
-			! [ 'git', 'tag', 'version', 'range', 'remote' ].includes( type )
+			! [ 'git', 'tag', 'version', 'range', 'remote', 'alias' ].includes(
+				type
+			)
 		) {
 			throw new Error(
 				`Provided package type "${ type }" is not supported.`
 			);
 		}
 	}
-
 	const dependencies = {};
 	const devDependencies = {};
 

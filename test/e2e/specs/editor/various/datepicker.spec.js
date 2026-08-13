@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 // Set browser to a timezone that's different to `timezone`.
@@ -15,6 +12,7 @@ const TIMEZONES = [ 'Pacific/Honolulu', 'UTC', 'Australia/Sydney' ];
 TIMEZONES.forEach( ( timezone ) => {
 	test.describe( `Datepicker: ${ timezone }`, () => {
 		let originalTimezone;
+
 		test.beforeAll( async ( { requestUtils } ) => {
 			originalTimezone = ( await requestUtils.getSiteSettings() )
 				.timezone;

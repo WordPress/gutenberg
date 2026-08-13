@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __, _x } from '@wordpress/i18n';
 import { useMemo, useEffect, forwardRef } from '@wordpress/element';
 import { useAsyncList } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import BlockTypesList from '../block-types-list';
 import InserterPanel from './panel';
 import useBlockTypesState from './hooks/use-block-types-state';
@@ -183,6 +176,11 @@ export function BlockTypesTab(
 	for ( const item of items ) {
 		// Skip reusable blocks, they moved to the patterns tab.
 		if ( item.category === 'reusable' ) {
+			continue;
+		}
+
+		// Skip search-only items from browse view (they're still searchable).
+		if ( item.isSearchOnly ) {
 			continue;
 		}
 

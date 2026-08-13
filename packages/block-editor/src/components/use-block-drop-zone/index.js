@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { useCallback, useState } from '@wordpress/element';
 import {
@@ -9,13 +6,10 @@ import {
 } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
 import {
+	hasBlockSupport,
 	isUnmodifiedDefaultBlock as getIsUnmodifiedDefaultBlock,
 	store as blocksStore,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import useOnBlockDrop from '../use-on-block-drop';
 import {
 	getDistanceToNearestEdge,
@@ -410,7 +404,15 @@ export default function useBlockDropZone( {
 					return;
 				}
 
-				const blocks = getBlocks( targetRootClientId );
+				const blocks = getBlocks( targetRootClientId )
+					// Filter out blocks that are hidden
+					.filter( ( block ) => {
+						return ! (
+							hasBlockSupport( block.name, 'visibility', true ) &&
+							block.attributes?.metadata?.blockVisibility ===
+								false
+						);
+					} );
 
 				// The block list is empty, don't show the insertion point but still allow dropping.
 				if ( blocks.length === 0 ) {

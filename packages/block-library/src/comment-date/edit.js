@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEntityProp } from '@wordpress/core-data';
 import {
 	dateI18n,
@@ -18,10 +15,6 @@ import {
 	ToggleControl,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 /**
@@ -35,7 +28,7 @@ import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
  * @param {Object} props.context           Inherited context.
  * @param {string} props.context.commentId The comment ID.
  *
- * @return {JSX.Element} React element.
+ * @return {React.JSX.Element} React element.
  */
 export default function Edit( {
 	attributes: { format, isLink },
@@ -86,7 +79,6 @@ export default function Edit( {
 					isShownByDefault
 				>
 					<ToggleControl
-						__nextHasNoMarginBottom
 						label={ __( 'Link to comment' ) }
 						onChange={ () => setAttributes( { isLink: ! isLink } ) }
 						checked={ isLink }

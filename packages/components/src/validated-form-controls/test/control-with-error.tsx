@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
-import { useState, useCallback } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { ValidatedInputControl } from '../components';
+import { useState, useCallback, useId, useRef } from '@wordpress/element';
+import { ValidatedInputControl, ValidatedRangeControl } from '../components';
 
 describe( 'ControlWithError', () => {
 	describe( 'Async Validation', () => {
@@ -38,7 +27,7 @@ describe( 'ControlWithError', () => {
 					>[ 'customValidity' ]
 				>( undefined );
 
-			const onValidate = useCallback(
+			const onChange = useCallback(
 				( value?: string ) => {
 					setCustomValidity( {
 						type: 'validating',
@@ -59,6 +48,8 @@ describe( 'ControlWithError', () => {
 							} );
 						}
 					}, serverDelayMs );
+
+					setText( value ?? '' );
 				},
 				[ serverDelayMs ]
 			);
@@ -67,10 +58,7 @@ describe( 'ControlWithError', () => {
 				<ValidatedInputControl
 					label="Text"
 					value={ text }
-					onChange={ ( newValue ) => {
-						setText( newValue ?? '' );
-					} }
-					onValidate={ onValidate }
+					onChange={ onChange }
 					customValidity={ customValidity }
 					{ ...restProps }
 				/>
@@ -219,6 +207,421 @@ describe( 'ControlWithError', () => {
 					screen.getByText( 'The word "error" is not allowed.' )
 				).toBeVisible();
 			} );
+		} );
+	} );
+
+	describe( 'Reveal during pending validation', () => {
+		it( 'should keep the pending indicator instead of a native error on a synthetic `invalid` event', async () => {
+			const user = userEvent.setup();
+
+			function PendingValidatedInputControl() {
+				const ref = useRef< HTMLInputElement >( null );
+				return (
+					<>
+						<ValidatedInputControl
+							ref={ ref }
+							label="Text"
+							required
+							value=""
+							onChange={ () => {} }
+							customValidity={ {
+								type: 'validating',
+								message: 'Validating...',
+							} }
+						/>
+						<button
+							type="button"
+							onClick={ () =>
+								ref.current?.dispatchEvent(
+									new Event( 'invalid', {
+										cancelable: true,
+									} )
+								)
+							}
+						>
+							Show errors
+						</button>
+					</>
+				);
+			}
+
+			render( <PendingValidatedInputControl /> );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Show errors' } )
+			);
+
+			await waitFor( () => {
+				expect( screen.getByText( 'Validating...' ) ).toBeVisible();
+			} );
+			expect(
+				screen.queryByText( 'Constraints not satisfied' )
+			).not.toBeInTheDocument();
+		} );
+	} );
+
+	describe( 'Form submission', () => {
+		const CustomValidatedInputControl = ( {
+			...restProps
+		}: React.ComponentProps< typeof ValidatedInputControl > ) => {
+			const [ customValidity, setCustomValidity ] =
+				useState<
+					React.ComponentProps<
+						typeof ValidatedInputControl
+					>[ 'customValidity' ]
+				>( undefined );
+			return (
+				<ValidatedInputControl
+					onChange={ ( value ) =>
+						value === 'error'
+							? setCustomValidity( {
+									type: 'invalid',
+									message: 'The word "error" is not allowed.',
+							  } )
+							: setCustomValidity( undefined )
+					}
+					customValidity={ customValidity }
+					{ ...restProps }
+				/>
+			);
+		};
+
+		it( 'should show custom validity messages regardless of "touched" state if parent form is submitted', async () => {
+			const user = userEvent.setup();
+			const onSubmit = jest.fn();
+			render(
+				<form onSubmit={ onSubmit }>
+					<CustomValidatedInputControl label="Text" />
+					<button type="submit">Submit</button>
+				</form>
+			);
+
+			const input = screen.getByRole< HTMLInputElement >( 'textbox', {
+				name: 'Text',
+			} );
+
+			// User has interacted, but not blurred
+			await user.type( input, 'error' );
+			await user.keyboard( '{enter}' );
+
+			// Input is marked as invalid at the HTML level
+			await waitFor( () => {
+				expect( input.checkValidity() ).toBe( false );
+			} );
+			expect( input.validationMessage ).toBe(
+				'The word "error" is not allowed.'
+			);
+
+			// Field is showing the error message
+			expect(
+				screen.getByText( 'The word "error" is not allowed.' )
+			).toBeVisible();
+
+			// Form is not submitted
+			expect( onSubmit ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'aria-describedby', () => {
+		it( 'should connect the error message to the input via aria-describedby', async () => {
+			const user = userEvent.setup();
+			render(
+				<form>
+					<ValidatedInputControl label="URL" required />
+					<button type="submit">Submit</button>
+				</form>
+			);
+
+			const input = screen.getByRole( 'textbox', { name: /^URL/ } );
+
+			expect( input ).not.toHaveAttribute( 'aria-describedby' );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Submit' } )
+			);
+
+			await waitFor( () => {
+				expect( input ).toHaveAccessibleDescription(
+					expect.stringContaining( 'Constraints not satisfied' )
+				);
+			} );
+		} );
+
+		it( 'should preserve existing aria-describedby values', async () => {
+			const user = userEvent.setup();
+
+			function TestComponent() {
+				const hintId = useId();
+				return (
+					<form>
+						<ValidatedInputControl
+							label="URL"
+							required
+							aria-describedby={ hintId }
+						/>
+						<p id={ hintId }>Enter a full URL.</p>
+						<button type="submit">Submit</button>
+					</form>
+				);
+			}
+
+			render( <TestComponent /> );
+
+			const input = screen.getByRole( 'textbox', { name: /^URL/ } );
+
+			expect( input ).toHaveAccessibleDescription( 'Enter a full URL.' );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Submit' } )
+			);
+
+			await waitFor( () => {
+				expect( input ).toHaveAccessibleDescription(
+					expect.stringContaining( 'Constraints not satisfied' )
+				);
+			} );
+			expect( input ).toHaveAccessibleDescription(
+				expect.stringContaining( 'Enter a full URL.' )
+			);
+		} );
+
+		it( 'should connect a custom validity error to the input via aria-describedby', async () => {
+			const user = userEvent.setup();
+
+			function TestComponent() {
+				const [ customValidity, setCustomValidity ] =
+					useState<
+						React.ComponentProps<
+							typeof ValidatedInputControl
+						>[ 'customValidity' ]
+					>( undefined );
+				const inputRef = useRef< HTMLInputElement >( null );
+
+				return (
+					<>
+						<ValidatedInputControl
+							ref={ inputRef }
+							label="URL"
+							customValidity={ customValidity }
+						/>
+						<button
+							type="button"
+							onClick={ () => {
+								setCustomValidity( {
+									type: 'invalid',
+									message: 'Please enter a valid URL.',
+								} );
+								requestAnimationFrame(
+									() => inputRef.current?.reportValidity()
+								);
+							} }
+						>
+							Validate
+						</button>
+					</>
+				);
+			}
+
+			render( <TestComponent /> );
+
+			const input = screen.getByRole( 'textbox', { name: 'URL' } );
+			expect( input ).not.toHaveAttribute( 'aria-describedby' );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Validate' } )
+			);
+
+			await waitFor( () => {
+				expect( input ).toHaveAccessibleDescription(
+					expect.stringContaining( 'Please enter a valid URL.' )
+				);
+			} );
+		} );
+
+		it( 'should remove aria-describedby when the error is resolved', async () => {
+			const user = userEvent.setup();
+
+			function TestComponent() {
+				const [ customValidity, setCustomValidity ] =
+					useState<
+						React.ComponentProps<
+							typeof ValidatedInputControl
+						>[ 'customValidity' ]
+					>( undefined );
+				const inputRef = useRef< HTMLInputElement >( null );
+
+				return (
+					<>
+						<ValidatedInputControl
+							ref={ inputRef }
+							label="URL"
+							customValidity={ customValidity }
+						/>
+						<button
+							type="button"
+							onClick={ () => {
+								setCustomValidity( {
+									type: 'invalid',
+									message: 'Please enter a valid URL.',
+								} );
+								requestAnimationFrame(
+									() => inputRef.current?.reportValidity()
+								);
+							} }
+						>
+							Validate
+						</button>
+						<button
+							type="button"
+							onClick={ () => setCustomValidity( undefined ) }
+						>
+							Clear
+						</button>
+					</>
+				);
+			}
+
+			render( <TestComponent /> );
+
+			const input = screen.getByRole( 'textbox', { name: 'URL' } );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Validate' } )
+			);
+
+			await waitFor( () => {
+				expect( input ).toHaveAccessibleDescription(
+					expect.stringContaining( 'Please enter a valid URL.' )
+				);
+			} );
+
+			await user.click( screen.getByRole( 'button', { name: 'Clear' } ) );
+
+			await waitFor( () => {
+				expect( input ).not.toHaveAttribute( 'aria-describedby' );
+			} );
+		} );
+	} );
+
+	describe( 'ValidatedRangeControl', () => {
+		it( 'should accessibly label the internal slider and spin button', () => {
+			render(
+				<ValidatedRangeControl
+					label="Opacity"
+					required
+					min={ 0 }
+					max={ 100 }
+					onChange={ () => {} }
+				/>
+			);
+
+			// The slider is styled with `opacity: 0`, so it's not "visible"
+			// in the DOM sense, but it's still accessible.
+			expect(
+				screen.getByRole( 'slider', {
+					name: 'Opacity (Required)',
+				} )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'spinbutton', {
+					name: 'Opacity (Required)',
+				} )
+			).toBeVisible();
+		} );
+	} );
+
+	describe( 'Focus behavior', () => {
+		it( 'should focus the first error in the form', async () => {
+			const user = userEvent.setup();
+			render(
+				<form>
+					<ValidatedInputControl label="Text1" required />
+					<ValidatedInputControl label="Text2" required />
+					<button type="submit">Submit</button>
+				</form>
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Submit' } )
+			);
+
+			expect(
+				screen.getByRole( 'textbox', { name: /^Text1/ } )
+			).toHaveFocus();
+		} );
+
+		it( 'should focus the field on an `invalid` event, even if there is no enclosing form', async () => {
+			const user = userEvent.setup();
+			function ValidatedInputControlWithRef(
+				props: React.ComponentProps< typeof ValidatedInputControl >
+			) {
+				const ref = useRef< HTMLInputElement >( null );
+				return (
+					<>
+						<ValidatedInputControl ref={ ref } { ...props } />
+						<button
+							type="button"
+							onClick={ () => ref.current?.reportValidity() }
+						>
+							Report Validity
+						</button>
+					</>
+				);
+			}
+
+			render( <ValidatedInputControlWithRef label="Text" required /> );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Report Validity' } )
+			);
+
+			await waitFor( () => {
+				expect(
+					screen.getByRole( 'textbox', { name: /^Text/ } )
+				).toHaveFocus();
+			} );
+		} );
+
+		it( 'should show the error message without moving focus on a synthetic `invalid` event', async () => {
+			const user = userEvent.setup();
+			function ValidatedInputControlWithRef(
+				props: React.ComponentProps< typeof ValidatedInputControl >
+			) {
+				const ref = useRef< HTMLInputElement >( null );
+				return (
+					<>
+						<ValidatedInputControl ref={ ref } { ...props } />
+						<button
+							type="button"
+							onClick={ () =>
+								ref.current?.dispatchEvent(
+									new Event( 'invalid', {
+										cancelable: true,
+									} )
+								)
+							}
+						>
+							Show errors
+						</button>
+					</>
+				);
+			}
+
+			render( <ValidatedInputControlWithRef label="Text" required /> );
+
+			const button = screen.getByRole( 'button', {
+				name: 'Show errors',
+			} );
+			await user.click( button );
+
+			// The error message is revealed...
+			await waitFor( () => {
+				expect(
+					screen.getByText( 'Constraints not satisfied' )
+				).toBeVisible();
+			} );
+			// ...but focus is not moved to the invalid field.
+			expect( button ).toHaveFocus();
 		} );
 	} );
 } );

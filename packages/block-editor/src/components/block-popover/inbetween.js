@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { useMemo, useReducer, useLayoutEffect } from '@wordpress/element';
 import { Popover } from '@wordpress/components';
 import { isRTL } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import usePopoverScroll from './use-popover-scroll';
@@ -112,12 +101,18 @@ function BlockPopoverInbetween( {
 				} else if ( isVertical ) {
 					// vertical
 					top = previousRect ? previousRect.bottom : nextRect.top;
-					width = previousRect ? previousRect.width : nextRect.width;
+					width =
+						nextRect && previousRect
+							? ( previousRect.width + nextRect.width ) / 2
+							: ( previousRect || nextRect ).width;
 					height =
 						nextRect && previousRect
 							? nextRect.top - previousRect.bottom
 							: 0;
-					left = previousRect ? previousRect.left : nextRect.left;
+					left =
+						nextRect && previousRect
+							? ( previousRect.left + nextRect.left ) / 2
+							: ( previousRect || nextRect ).left;
 				} else {
 					top = previousRect ? previousRect.top : nextRect.top;
 					height = previousRect
@@ -217,7 +212,6 @@ function BlockPopoverInbetween( {
 		return null;
 	}
 
-	/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 	// While ideally it would be enough to capture the
 	// bubbling focus event from the Inserter, due to the
 	// characteristics of click focusing of `button`s in
@@ -253,7 +247,6 @@ function BlockPopoverInbetween( {
 			</div>
 		</Popover>
 	);
-	/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 }
 
 export default BlockPopoverInbetween;

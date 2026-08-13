@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import {
 	Warning,
@@ -68,10 +61,11 @@ const CommentsForm = ( { postId, postType } ) => {
 
 	const isSiteEditor = postType === undefined || postId === undefined;
 
-	const { defaultCommentStatus } = useSelect(
+	const defaultCommentStatus = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getSettings()
-				.__experimentalDiscussionSettings
+				.__experimentalDiscussionSettings?.defaultCommentStatus,
+		[]
 	);
 
 	const postTypeSupportsComments = useSelect( ( select ) =>

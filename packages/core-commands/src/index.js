@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { createRoot, StrictMode } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { CommandMenu } from '@wordpress/commands';
-
-/**
- * Internal dependencies
- */
 import { useAdminNavigationCommands } from './admin-navigation-commands';
 import { useSiteEditorNavigationCommands } from './site-editor-navigation-commands';
 import { unlock } from './lock-unlock';
@@ -17,9 +10,10 @@ const { RouterProvider } = unlock( routerPrivateApis );
 
 // Register core commands and render the Command Palette.
 function CommandPalette( { settings } ) {
-	const { menu_commands: menuCommands } = settings;
+	const { menu_commands: menuCommands, is_network_admin: isNetworkAdmin } =
+		settings;
 	useAdminNavigationCommands( menuCommands );
-	useSiteEditorNavigationCommands();
+	useSiteEditorNavigationCommands( isNetworkAdmin );
 	return (
 		<RouterProvider pathArg="p">
 			<CommandMenu />

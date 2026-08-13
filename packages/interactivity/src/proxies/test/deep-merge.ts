@@ -1,14 +1,4 @@
-/* eslint-disable eslint-comments/disable-enable-pair */
-/* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
-/**
- * External dependencies
- */
 import { effect } from '@preact/signals';
-/**
- * Internal dependencies
- */
 import { proxifyState, peek, deepMerge } from '../';
 import { hasPropSignal } from '../state';
 import { getProxyFromObject } from '../registry';

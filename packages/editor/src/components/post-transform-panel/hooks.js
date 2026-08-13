@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { parse } from '@wordpress/blocks';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 
@@ -49,8 +42,20 @@ function filterPatterns( patterns, template ) {
 		index === items.findIndex( ( item ) => currentItem.name === item.name );
 
 	// Filter out core/directory patterns not included in theme.json.
-	const filterOutExcludedPatternSources = ( pattern ) =>
-		! EXCLUDED_PATTERN_SOURCES.includes( pattern.source );
+	// Exception: navigation-overlay patterns should always show core patterns.
+	// We only want them to show here, we want them excluded everywhere else
+	// to avoid showing them in the inserter or the patterns page.
+	const filterOutExcludedPatternSources = ( pattern ) => {
+		if (
+			template.area === 'navigation-overlay' &&
+			pattern.blockTypes?.includes(
+				'core/template-part/navigation-overlay'
+			)
+		) {
+			return true;
+		}
+		return ! EXCLUDED_PATTERN_SOURCES.includes( pattern.source );
+	};
 
 	// Looks for patterns that have the same template type as the current template,
 	// or have a block type that matches the current template area.

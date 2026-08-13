@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
@@ -8,10 +5,6 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import OverlayMenuIcon from './overlay-menu-icon';
 
 export default function OverlayMenuPreview( { setAttributes, hasIcon, icon } ) {
@@ -24,7 +17,6 @@ export default function OverlayMenuPreview( { setAttributes, hasIcon, icon } ) {
 				onDeselect={ () => setAttributes( { hasIcon: true } ) }
 			>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={ __( 'Show icon button' ) }
 					help={ __(
 						'Configure the visual appearance of the button that toggles the overlay menu.'
@@ -43,8 +35,6 @@ export default function OverlayMenuPreview( { setAttributes, hasIcon, icon } ) {
 				onDeselect={ () => setAttributes( { icon: 'handle' } ) }
 			>
 				<ToggleGroupControl
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					className="wp-block-navigation__overlay-menu-icon-toggle-group"
 					label={ __( 'Icon' ) }
 					value={ icon }

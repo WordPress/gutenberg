@@ -1,0 +1,6 @@
+.wp-block-tab-panel {
+	&[hidden],
+	&:empty {
+		display: none !important;
+	}
+}

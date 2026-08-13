@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { PanelBody } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import FlatTermSelector from '../post-taxonomies/flat-term-selector';
 import { store as editorStore } from '../../store';
 
@@ -40,7 +33,7 @@ const TagsPanel = () => {
 					tagLabel
 				) }
 			</p>
-			<FlatTermSelector slug="post_tag" __nextHasNoMarginBottom />
+			<FlatTermSelector slug="post_tag" />
 		</PanelBody>
 	);
 };

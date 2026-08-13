@@ -1,54 +1,127 @@
-# Status of the sync experiment in Gutenberg
+# Real-time collaboration
 
-The sync package is part of an ongoing research effort to lay the groundwork of Real-Time Collaboration in Gutenberg.
+The `sync` package provides the syncing layer for real-time collaboration. Each entity with sync enabled is represented by a CRDT ([Yjs](https://docs.yjs.dev/)) document. Local edits to an entity are applied to its CRDT document, which is synced with other peers via a provider. Those peers extract changes from the CRDT document and apply them to their local state.
 
-Relevant docs:
+Relevant docs and discussions:
 
-- https://make.wordpress.org/core/2023/07/13/real-time-collaboration-architecture/
-- https://github.com/WordPress/gutenberg/issues/52593
-- https://docs.yjs.dev/
+-   https://make.wordpress.org/core/2023/07/13/real-time-collaboration-architecture/
+-   https://github.com/WordPress/gutenberg/issues/52593
+-   https://github.com/WordPress/gutenberg/discussions/65012
 
-## Enable the experiment
+## Key concepts
 
-The experiment can be enabled in the "Guteberg > Experiments" page. When it is enabled (search for `gutenberg-sync-collaboration` in the codebase), the client receives two new pieces of data:
+-   **CRDT document**: A [Yjs `Y.Doc`](https://docs.yjs.dev/api/y.doc) that holds synced entity data. CRDTs (Conflict-free Replicated Data Types) allow concurrent edits from multiple peers to be merged automatically without conflicts.
+-   **Sync manager**: Orchestrates the lifecycle of synced entities: creating CRDT documents, connecting providers, attaching observers, and coordinating updates.
+-   **Provider**: A transport layer that syncs CRDT document updates between peers. The default provider uses HTTP polling; plugins can substitute their own provider via the `sync.providers` filter.
+-   **Awareness**: Ephemeral presence state (e.g., cursor positions, user identity) shared between peers. Unlike CRDT document state, awareness is not persisted.
+-   **Sync config**: An entity-level configuration object that defines how local changes are written to the CRDT document and how remote changes are extracted from it. See the `SyncConfig` type in `src/types.ts`.
+-   **Origin**: A value attached to each Yjs transaction to identify the source of a change (e.g., local editor, sync manager, undo manager, or remote peer). Origins are used to decide which changes should trigger store updates and which should be tracked by the undo manager.
 
-- `window.__experimentalEnableSync`: boolean. Used by the `core-data` package to determine whether to bootstrap and use the sync provider offered by the `sync` package.
-- `window.__experimentalCollaborativeEditingSecret`: string. A secret used by the `sync` package to create a secure connection among peers.
+## CRDT document structure
 
-## The data flow
+Each synced entity gets its own `Y.Doc` with two root-level `Y.Map` entries:
 
-The current experiment updates `core-data` to leverage the YJS library for synchronization and merging changes. Each core-data entity record represents a YJS document and updates to the `--edit` record are broadcasted among peers.
+| Key        | Constant              | Purpose                                                                                                                                                                                                                                       |
+| ---------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `document` | `CRDT_RECORD_MAP_KEY` | Holds the entity record data (the synced properties).                                                                                                                                                                                         |
+| `state`    | `CRDT_STATE_MAP_KEY`  | Metadata about the CRDT document and the entity: a schema version number (`version`) and the last user-facing entity save (`savedAt`/`savedBy`). Peers refetch records on `savedAt`; collaborator save notifications use `savedAt`/`savedBy`. |
 
-These are the specific checkpoints:
+These constants are defined in `src/config.ts`.
 
-1. REGISTER.
-	- See `getSyncProvider().register( ... )` in `registerSyncConfigs`.
-	- Not all entity types are sync-enabled at the moment, look at those that declare a `syncConfig` and `syncObjectType` in `rootEntitiesConfig`.
-2. BOOTSTRAP.
-	- See `getSyncProvider().bootstrap( ... )` in `getEntityRecord`.
-	- The `bootstrap` function fetches the entity and sets up the callback that will dispatch the relevant Redux action when document changes are broadcasted from other peers.
-3. UPDATE.
-	- See `getSyncProvider().update( ... )` in `editEntityRecord`.
-	- Each change done by a peer to the `--edit` entity record (local changes, not persisted ones) is broadcasted to the others.
-	- The data that is shared is the whole block list.
+## Sync manager
 
-This is the data flow when the peer A makes a local change:
+The sync manager (`src/manager.ts`) orchestrates the lifecycle of synced entities. Its public API:
 
-- Peer A makes a local change.
-- Peer A triggers a `getSyncProvider().update( ... )` request (see `editEntityRecord`).
-- All peers (including A) receive the broadcasted change and execute the callback (see `updateHandler` in `createSyncProvider.bootstrap`).
-- All peers (including A) trigger a `EDIT_ENTITY_RECORD` redux action.
+-   **`load(syncConfig, objectType, objectId, record, handlers)`**: Initialize an entity for syncing. Creates a `Y.Doc`, connects providers, attaches deep observers, restores any persisted CRDT document, and registers the entity with the undo manager.
+-   **`loadCollection(syncConfig, objectType, handlers)`**: Initialize a collection (e.g., an entity type's list view) for syncing. Used to detect when a peer saves a record so the collection can be refetched.
+-   **`update(objectType, objectId, changes, origin, options)`**: Apply local changes to the entity's CRDT document. The sync config's `applyChangesToCRDTDoc` is called inside a Yjs transaction.
+-   **`unload(objectType, objectId)`**: Disconnect providers, remove observers, and destroy the `Y.Doc`.
+-   **`getAwareness(objectType, objectId)`**: Return the awareness instance for the entity, if one exists.
+-   **`createPersistedCRDTDoc(objectType, objectId)`**: Serialize the entity's CRDT document for persistence (see "Persistence" below).
+-   **`undoManager`**: The sync-aware undo manager, lazily created when the first entity is loaded (see "Undo / redo" below).
 
-## What works and what doesn't
+### Data flow
 
-- Undo/redo does not work.
-- Changes can be persisted and the publish/update button should react accordingly for all peers.
-- Offline.
-	- Changes are stored in the browser's local storage (indexedDB) for each user/peer. Users can navigate away from the document and they'll see the changes when they come back.
-	- Offline changes can be deleted via visiting the browser's database in all peers, then reload the document.
-- Documents can get out of sync. For example:
-	- Two peers open the same document.
-	- One of them (A) leaves the document. Then, the remaining user (B) makes changes.
-	- When A comes back to the document, the changes B made are not visible to A.
-- Entities
-	- Not all entities are synced. For example, global styles are not. Look at the `base` entity config for an example (it declares `syncConfig` and `syncObjectType` properties).
+1.  **Local changes**: When the entity record is edited or changed locally, the consumer must call `syncManager.update()` with the changed record. The sync config's `applyChangesToCRDTDoc` updates the CRDT document. The provider observes these updates and sends them to peers.
+2.  **Remote changes**: When the provider receives remote updates, it applies them to the local `Y.Doc`. An observer detects non-local changes and calls `syncConfig.getChangesFromCRDTDoc` to extract the changed properties, which are then written to the local store via `handlers.editRecord`.
+
+### Sync config
+
+The sync config (`SyncConfig` in `src/types.ts`) is an entity-level object that controls what gets synced and how:
+
+-   **`applyChangesToCRDTDoc(ydoc, changes)`**: Write local changes into the CRDT document.
+-   **`getChangesFromCRDTDoc(ydoc, editedRecord)`**: Compare the CRDT document against the current entity record and return the properties that differ.
+-   **`createAwareness(ydoc, objectId)`** _(optional)_: Create an `Awareness` instance for collaborative presence.
+-   **`getPersistedCRDTDoc(record)`** _(optional)_: Extract a serialized CRDT document from the entity record for restoration on load (see "Persistence" below).
+
+The sync config "owns" the sync behavior of the entity; it has sole knowledge of the entity schema and edit flows. The sync config is defined and controlled by the `core-data` package.
+
+## Providers
+
+A provider is a transport layer that syncs Yjs document updates between peers. This package uses a pluggable provider system defined in `src/providers/`.
+
+### Default: HTTP polling
+
+The default provider (`src/providers/http-polling/`) uses HTTP polling to exchange updates with a central sync server. A shared polling manager batches updates for all rooms (entities) into a single request per poll cycle. See [the HTTP polling README](./src/providers/http-polling/README.md) for full details including the REST API format, sync protocol, and compaction.
+
+-   Poll interval: 4 seconds when editing alone, 1 second when collaborators are detected.
+-   The `sync.pollingManager.pollingInterval` and `sync.pollingManager.pollingIntervalWithCollaborators` filters can make active-tab polling faster, but slower values are clamped to the defaults.
+-   On errors, the interval backs off according to the retry schedule before continuing at 30-second automatic retries.
+-   Awareness state is sent and received alongside document updates in the same poll request.
+
+### Custom providers
+
+Plugins can replace or augment the default provider using the `sync.providers` WordPress filter hook. The filter receives an array of `ProviderCreator` functions and should return the same. Each `ProviderCreator` is an async function that receives `{ objectType, objectId, ydoc, awareness? }` and returns `{ destroy, on }`. The `on` method is used by the sync manager to listen for provider status events (e.g., connection state changes).
+
+```js
+import { addFilter } from '@wordpress/hooks';
+import { Y } from '@wordpress/sync';
+
+addFilter( 'sync.providers', 'my-plugin/websocket-provider', ( providers ) => {
+	// Replace the default HTTP polling provider with a WebSocket provider.
+	return [
+		async ( { objectType, objectId, ydoc, awareness } ) => {
+			const ws = new WebSocketProvider(
+				ydoc,
+				objectType,
+				objectId,
+				awareness
+			);
+
+			return {
+				destroy: () => ws.disconnect(),
+				on: ( event, callback ) =>
+					ws.addEventListener( event, callback ),
+			};
+		},
+	];
+} );
+```
+
+## Persistence
+
+CRDT documents can be persisted so that a user returning to an entity can restore its CRDT state (including the full edit history needed for proper merging). See `src/utils.ts` for serialization helpers.
+
+-   **Initialization problem**: Persisting CRDT documents establishes a shared starting point for all peers. This is critical to prevent data loss and ensure proper merging of concurrent edits.
+-   **Serialization**: The sync manager's `createPersistedCRDTDoc` method returns a serialized `Y.Doc`. The consumer is responsible for storing this string.
+-   **Restoration**: On `load`, if the entity's sync config provides `getPersistedCRDTDoc`, the sync manager calls it to retrieve the serialized CRDT document.
+-   **Invalidation**: After restoring, the sync manager compares the CRDT document against the current entity record (via `getChangesFromCRDTDoc`). If they differ (e.g., the server mutated the entity on save, or an out-of-band update occurred), the differences are applied to the CRDT document and a save is triggered to re-persist it.
+
+Persistence is opt-in per entity type via `syncConfig.getPersistedCRDTDoc`.
+
+## Awareness
+
+Awareness provides ephemeral presence information (cursor positions, user identity, etc.) that can be used to enhance the collaborative experience. Awareness state is shared between peers but not persisted.
+
+-   An entity's sync config can optionally create an `Awareness` instance via `createAwareness(ydoc, objectId)`.
+-   The awareness instance is passed to providers, which transport awareness state alongside document updates.
+-   Consumers can call `syncManager.getAwareness(objectType, objectId)` to access the awareness instance for a given entity.
+
+## Undo / redo
+
+The `SyncUndoManager` (`src/undo-manager.ts`) replaces the default WordPress undo manager when synced entities are in use. It wraps Yjs's built-in undo functionality.
+
+-   **Lazy creation**: The undo manager is created when the first entity is loaded. If no entities are synced, the default WordPress undo manager is used.
+-   **Automatic tracking**: Unlike the default undo manager, which explicitly records each edit, the `SyncUndoManager` relies on Yjs to track changes to observed `Y.Map` instances. Only changes with the local editor origin are tracked.
+-   **Capture grouping**: Changes within 500ms of each other are grouped into a single undo step, preventing mid-word undo breaks.
+-   **Limitation**: Once created, the `SyncUndoManager` only tracks synced entities. Edits to non-synced entities are not included in the undo stack.

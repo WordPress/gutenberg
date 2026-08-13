@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	InspectorControls,
@@ -20,10 +17,6 @@ import {
 } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { useCanEditEntity } from '../utils/hooks';
 import { unlock } from '../lock-unlock';
 
@@ -77,6 +70,21 @@ function ReadOnlyContent( {
 	);
 }
 
+function EditableContentLoaded( {
+	blockProps,
+	blocks,
+	onInput,
+	onChange,
+	tagName: TagName = 'div',
+} ) {
+	const props = useInnerBlocksProps( blockProps, {
+		value: blocks,
+		onInput,
+		onChange,
+	} );
+	return <TagName { ...props } />;
+}
+
 function EditableContent( { context = {}, tagName: TagName = 'div' } ) {
 	const { postType, postId } = context;
 
@@ -86,31 +94,39 @@ function EditableContent( { context = {}, tagName: TagName = 'div' } ) {
 		{ id: postId }
 	);
 
-	const entityRecord = useSelect(
-		( select ) => {
-			return select( coreStore ).getEntityRecord(
+	// Wait for the entity record before mounting the inner blocks area, so
+	// that an empty `blocks` value means an empty post rather than one that
+	// has not loaded yet.
+	const hasLoadedRecord = useSelect(
+		( select ) =>
+			select( coreStore ).getEntityRecord(
 				'postType',
 				postType,
 				postId
-			);
-		},
+			) !== undefined ||
+			select( coreStore ).hasFinishedResolution( 'getEntityRecord', [
+				'postType',
+				postType,
+				postId,
+			] ),
 		[ postType, postId ]
 	);
 
-	const hasInnerBlocks = !! entityRecord?.content?.raw || blocks?.length;
+	const blockProps = useBlockProps( { className: 'entry-content' } );
 
-	const initialInnerBlocks = [ [ 'core/paragraph' ] ];
+	if ( ! hasLoadedRecord ) {
+		return <TagName { ...blockProps } />;
+	}
 
-	const props = useInnerBlocksProps(
-		useBlockProps( { className: 'entry-content' } ),
-		{
-			value: blocks,
-			onInput,
-			onChange,
-			template: ! hasInnerBlocks ? initialInnerBlocks : undefined,
-		}
+	return (
+		<EditableContentLoaded
+			blockProps={ blockProps }
+			blocks={ blocks }
+			onInput={ onInput }
+			onChange={ onChange }
+			tagName={ TagName }
+		/>
 	);
-	return <TagName { ...props } />;
 }
 
 function Content( props ) {
@@ -183,7 +199,7 @@ function RecursionError() {
  * @param {Function} props.onSelectTagName onChange function for the SelectControl.
  * @param {string}   props.clientId        The client ID of the current block.
  *
- * @return {JSX.Element}                The control group.
+ * @return {React.JSX.Element}                The control group.
  */
 function PostContentEditControls( { tagName, onSelectTagName, clientId } ) {
 	return (

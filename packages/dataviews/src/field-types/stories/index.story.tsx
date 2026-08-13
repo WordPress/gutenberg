@@ -1,18 +1,14 @@
-/**
- * WordPress dependencies
- */
 import { useState, useMemo } from '@wordpress/element';
 import {
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
+	Icon as WCIcon,
+	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import DataViews from '../../components/dataviews/index';
-import DataForm from '../../components/dataform/index';
-import { filterSortAndPaginate } from '../../filter-and-sort-data-view';
+import { Stack } from '@wordpress/ui';
+import { starFilled } from '@wordpress/icons';
+import DataViews from '../../dataviews/index';
+import DataForm from '../../dataform/index';
+import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { View, Form, Field } from '../../types';
 
 const meta = {
@@ -31,45 +27,95 @@ const meta = {
 				'Chooses the Edit function for the field. "Default" means use the default Edit function for the field type.',
 			options: [
 				'default',
+				'adaptiveSelect',
 				'array',
 				'checkbox',
 				'color',
+				'combobox',
 				'date',
 				'datetime',
 				'email',
 				'integer',
+				'number',
 				'password',
 				'radio',
 				'select',
 				'telephone',
 				'url',
 				'text',
+				'time',
 				'toggle',
 				'toggleGroup',
 			],
+		},
+		asyncElements: {
+			control: { type: 'boolean' },
+			description:
+				'Whether the filter should fetch elements asynchronously.',
+			options: [ true, false ],
+		},
+		manyElements: {
+			control: { type: 'boolean' },
+			description:
+				'Add 10 more elements to push over the threshold and trigger Combobox rendering',
+			if: { arg: 'Edit', eq: 'adaptiveSelect' },
+		},
+		disabled: {
+			control: { type: 'boolean' },
+			description: 'Whether the field controls are disabled.',
 		},
 	},
 	args: {
 		type: 'regular',
 		Edit: 'default',
+		asyncElements: false,
+		manyElements: false,
+		disabled: false,
 	},
 };
 export default meta;
 
+const DollarPrefix = () => (
+	<InputControlPrefixWrapper>
+		<span>$</span>
+	</InputControlPrefixWrapper>
+);
+const StarIconPrefix = () => (
+	<InputControlPrefixWrapper variant="icon">
+		<WCIcon icon={ starFilled } />
+	</InputControlPrefixWrapper>
+);
+const PercentSuffix = () => (
+	<InputControlSuffixWrapper>
+		<span>%</span>
+	</InputControlSuffixWrapper>
+);
+const USDSuffix = () => (
+	<InputControlSuffixWrapper>
+		<span>USD</span>
+	</InputControlSuffixWrapper>
+);
 type DataType = {
 	id: number;
 	text: string;
 	textWithElements: string;
+	textWithRadio: string;
 	textWithTextarea: string;
 	integer: number;
 	integerWithElements: number;
+	number?: number;
+	numberWithElements?: number;
 	boolean: boolean;
 	booleanWithToggle: boolean;
 	booleanWithElements: boolean;
 	datetime: string;
+	datetimeCompact?: string;
 	datetimeWithElements: string;
 	date: string;
 	dateWithElements: string;
+	time: string;
+	timeWithSeconds: string;
+	timeWithElements: string;
 	email: string;
 	emailWithElements: string;
 	telephone: string;
@@ -86,25 +132,36 @@ type DataType = {
 	arrayWithElements: string[];
 	notype: string;
 	notypeWithElements: string;
+	priceWithPrefix?: string;
+	ratingWithIcon?: string;
+	percentageWithSuffix?: string;
+	priceWithBoth?: string;
 };
 
 const data: DataType[] = [
 	{
 		id: 1,
 		text: 'Text',
-		textWithElements: 'Item 1',
+		textWithElements: 'item1',
+		textWithRadio: 'item2',
 		textWithTextarea: 'Textarea',
 		integer: 1,
 		integerWithElements: 1,
+		number: 10.25,
+		numberWithElements: 2,
 		boolean: true,
 		booleanWithToggle: true,
 		booleanWithElements: true,
 		datetime: '2021-01-01T14:30:00Z',
-		datetimeWithElements: '2021-01-01T14:30:00Z',
+		datetimeCompact: '2021-01-01T14:30:00Z',
+		datetimeWithElements: '1982-05-10T20:30:00Z',
 		date: '2021-01-01',
 		dateWithElements: '2021-01-01',
+		time: '14:30',
+		timeWithSeconds: '14:30:45',
+		timeWithElements: '13:00',
 		email: 'hi@example.com',
-		emailWithElements: 'hi@example.com',
+		emailWithElements: 'bob@example.com',
 		telephone: '+1-555-123-4567',
 		telephoneWithElements: '+1-555-123-4567',
 		color: '#ff6600',
@@ -120,8 +177,29 @@ const data: DataType[] = [
 		arrayWithElements: [ 'item1', 'item2', 'item3' ],
 		notype: 'No type',
 		notypeWithElements: 'No type',
+		priceWithPrefix: '25.99',
+		ratingWithIcon: '4.5',
+		percentageWithSuffix: '85',
+		priceWithBoth: '199.99',
 	},
 ];
+
+// Helper function to generate additional elements for demonstrating the threshold
+function generateAdditionalElements(
+	count: number,
+	prefix: string
+): { value: any; label: string }[] {
+	const additional = [];
+	for ( let i = 1; i <= count; i++ ) {
+		additional.push( {
+			value: `${ prefix }${ i + 3 }`,
+			label: `${ prefix.charAt( 0 ).toUpperCase() + prefix.slice( 1 ) } ${
+				i + 3
+			}`,
+		} );
+	}
+	return additional;
+}
 
 const fields: Field< DataType >[] = [
 	{
@@ -135,6 +213,18 @@ const fields: Field< DataType >[] = [
 		type: 'text',
 		label: 'Text (with elements)',
 		description: 'Help for text with elements.',
+		elements: [
+			{ value: 'item1', label: 'Item 1' },
+			{ value: 'item2', label: 'Item 2' },
+			{ value: 'item3', label: 'Item 3' },
+		],
+	},
+	{
+		id: 'textWithRadio',
+		type: 'text',
+		label: 'Text (with radio)',
+		description: 'Help for text with radio.',
+		Edit: 'radio',
 		elements: [
 			{ value: 'item1', label: 'Item 1' },
 			{ value: 'item2', label: 'Item 2' },
@@ -164,6 +254,29 @@ const fields: Field< DataType >[] = [
 			{ value: 2, label: 'Two' },
 			{ value: 3, label: 'Three' },
 		],
+		setValue: ( { value } ) => ( {
+			integerWithElements: parseInt( value, 10 ),
+		} ),
+	},
+	{
+		id: 'number',
+		type: 'number',
+		label: 'Number',
+		description: 'Number field increments by 0.01.',
+	},
+	{
+		id: 'numberWithElements',
+		type: 'number',
+		label: 'Number (with elements)',
+		description: 'Number field with elements.',
+		elements: [
+			{ value: 1, label: 'One' },
+			{ value: 2, label: 'Two' },
+			{ value: 3, label: 'Three' },
+		],
+		setValue: ( { value } ) => ( {
+			numberWithElements: Number( value ),
+		} ),
 	},
 	{
 		id: 'boolean',
@@ -187,6 +300,9 @@ const fields: Field< DataType >[] = [
 			{ value: true, label: 'It is true' },
 			{ value: false, label: 'It is false' },
 		],
+		setValue: ( { value } ) => ( {
+			booleanWithElements: value === 'true' ? true : false,
+		} ),
 	},
 	{
 		id: 'datetime',
@@ -195,22 +311,32 @@ const fields: Field< DataType >[] = [
 		description: 'Help for datetime.',
 	},
 	{
+		id: 'datetimeCompact',
+		type: 'datetime',
+		label: 'Datetime (compact)',
+		description: 'Datetime field without the calendar widget.',
+		Edit: {
+			control: 'datetime',
+			compact: true,
+		},
+	},
+	{
 		id: 'datetimeWithElements',
 		type: 'datetime',
 		label: 'Datetime (with elements)',
 		description: 'Help for datetime with elements.',
 		elements: [
 			{
-				value: '2021-01-01T14:30:00Z',
-				label: 'January 1st, 2021. 14:30UTC',
+				value: '1973-02-01T14:30:00Z',
+				label: 'February 1st, 1973. 14:30UTC',
 			},
 			{
-				value: '2021-02-01T14:30:00Z',
-				label: 'February 1st, 2021. 14:30UTC',
+				value: '1982-05-10T20:30:00Z',
+				label: 'May 10th, 1982. 20:30UTC',
 			},
 			{
-				value: '2021-03-01T14:30:00Z',
-				label: 'March 1st, 2021. 14:30UTC',
+				value: '1994-03-01T14:30:00Z',
+				label: 'March 1st, 1994. 14:30UTC',
 			},
 		],
 	},
@@ -232,6 +358,31 @@ const fields: Field< DataType >[] = [
 		],
 	},
 	{
+		id: 'time',
+		type: 'time',
+		label: 'Time',
+		description: 'Help for time.',
+	},
+	{
+		id: 'timeWithSeconds',
+		type: 'time',
+		label: 'Time (with seconds)',
+		description:
+			'A format that renders seconds also gives the control a seconds field.',
+		format: { time: 'H:i:s' },
+	},
+	{
+		id: 'timeWithElements',
+		type: 'time',
+		label: 'Time (with elements)',
+		description: 'Help for time with elements.',
+		elements: [
+			{ value: '09:00', label: 'Morning' },
+			{ value: '13:00', label: 'Afternoon' },
+			{ value: '19:00', label: 'Evening' },
+		],
+	},
+	{
 		id: 'email',
 		type: 'email',
 		label: 'Email',
@@ -247,6 +398,9 @@ const fields: Field< DataType >[] = [
 			{ value: 'jane@example.com', label: 'Jane Doe' },
 			{ value: 'bob@example.com', label: 'Bob Smith' },
 		],
+		setValue: ( { value } ) => ( {
+			emailWithElements: value,
+		} ),
 	},
 	{
 		id: 'telephone',
@@ -395,24 +549,69 @@ const fields: Field< DataType >[] = [
 			{ value: 'item3', label: 'Item 3' },
 		],
 	},
+	{
+		id: 'priceWithPrefix',
+		label: 'Text with Prefix',
+		type: 'text',
+		description: 'Text field with dollar sign prefix.',
+		Edit: {
+			control: 'text',
+			prefix: DollarPrefix,
+		},
+	},
+	{
+		id: 'ratingWithIcon',
+		label: 'Text with Icon Prefix',
+		type: 'text',
+		description: 'Text field with star icon prefix.',
+		Edit: {
+			control: 'text',
+			prefix: StarIconPrefix,
+		},
+	},
+	{
+		id: 'percentageWithSuffix',
+		label: 'Text with Suffix',
+		type: 'text',
+		description: 'Text field with percent sign suffix.',
+		Edit: {
+			control: 'text',
+			suffix: PercentSuffix,
+		},
+	},
+	{
+		id: 'priceWithBoth',
+		label: 'Text with Prefix and Suffix',
+		type: 'text',
+		description: 'Text field with both dollar prefix and USD suffix.',
+		Edit: {
+			control: 'text',
+			prefix: DollarPrefix,
+			suffix: USDSuffix,
+		},
+	},
 ];
 
 type PanelTypes = 'regular' | 'panel';
 type ControlTypes =
 	| 'default'
+	| 'adaptiveSelect'
 	| 'array'
 	| 'checkbox'
 	| 'color'
+	| 'combobox'
 	| 'date'
 	| 'datetime'
 	| 'email'
 	| 'integer'
+	| 'number'
 	| 'password'
 	| 'radio'
 	| 'select'
 	| 'telephone'
 	| 'url'
 	| 'text'
+	| 'time'
 	| 'toggle'
 	| 'toggleGroup';
 
@@ -420,23 +619,78 @@ interface FieldTypeStoryProps {
 	fields: Field< DataType >[];
 	type: PanelTypes;
 	Edit: ControlTypes;
+	asyncElements: boolean;
+	manyElements: boolean;
+	disabled: boolean;
 }
 
 const FieldTypeStory = ( {
 	fields: _fields,
 	type,
 	Edit,
+	asyncElements,
+	manyElements,
+	disabled,
 }: FieldTypeStoryProps ) => {
 	const storyFields = useMemo( () => {
-		if ( Edit === 'default' ) {
-			return _fields;
+		let fieldsToProcess = _fields;
+
+		if ( disabled ) {
+			fieldsToProcess = fieldsToProcess.map( ( field ) => ( {
+				...field,
+				isDisabled: true,
+			} ) );
 		}
 
-		return _fields.map( ( field: Field< DataType > ) => ( {
-			...field,
-			Edit,
-		} ) );
-	}, [ _fields, Edit ] );
+		if ( Edit !== 'default' ) {
+			fieldsToProcess = fieldsToProcess.map(
+				( field: Field< DataType > ) => ( {
+					...field,
+					Edit,
+				} )
+			);
+		}
+
+		// Expand elements when adaptiveSelect is selected and manyElements is toggled
+		if ( Edit === 'adaptiveSelect' && manyElements ) {
+			fieldsToProcess = fieldsToProcess.map( ( field ) => {
+				if ( field.elements && Array.isArray( field.elements ) ) {
+					const fieldIdPrefix = field.id.replace(
+						'WithElements',
+						''
+					);
+					const additionalElements = generateAdditionalElements(
+						10,
+						fieldIdPrefix
+					);
+					return {
+						...field,
+						elements: [ ...field.elements, ...additionalElements ],
+					};
+				}
+				return field;
+			} );
+		}
+
+		if ( asyncElements ) {
+			fieldsToProcess = fieldsToProcess.map( ( field ) => {
+				if ( field.elements ) {
+					const elements = field.elements;
+					return {
+						...field,
+						elements: undefined,
+						getElements: () =>
+							new Promise( ( resolve ) =>
+								setTimeout( () => resolve( elements ), 500 )
+							),
+					};
+				}
+				return field;
+			} );
+		}
+
+		return fieldsToProcess;
+	}, [ _fields, Edit, asyncElements, manyElements, disabled ] );
 	const form = useMemo(
 		() => ( {
 			layout: { type },
@@ -468,7 +722,7 @@ const FieldTypeStory = ( {
 		null;
 
 	return (
-		<HStack alignment="stretch">
+		<Stack direction="row" gap="sm" align="stretch">
 			<div style={ { flex: 2 } }>
 				<DataViews
 					getItemId={ ( item ) => item.id.toString() }
@@ -487,7 +741,7 @@ const FieldTypeStory = ( {
 						},
 					] }
 					defaultLayouts={ {
-						table: {},
+						table: true,
 					} }
 					selection={ selectedIds.map( ( id ) => id.toString() ) }
 					onChangeSelection={ ( newSelection ) =>
@@ -498,7 +752,7 @@ const FieldTypeStory = ( {
 				/>
 			</div>
 			{ selectedItem ? (
-				<VStack alignment="top">
+				<Stack direction="column" gap="sm" align="top">
 					<DataForm
 						data={ selectedItem }
 						form={ form }
@@ -518,9 +772,14 @@ const FieldTypeStory = ( {
 							);
 						} }
 					/>
-				</VStack>
+				</Stack>
 			) : (
-				<VStack alignment="center">
+				<Stack
+					direction="column"
+					gap="sm"
+					align="center"
+					justify="center"
+				>
 					<span
 						style={ {
 							color: '#888',
@@ -528,60 +787,225 @@ const FieldTypeStory = ( {
 					>
 						Please, select a single item.
 					</span>
-				</VStack>
+				</Stack>
 			) }
-		</HStack>
+		</Stack>
 	);
 };
 
-export const All = ( {
+export const AllComponent = ( {
 	type,
 	Edit,
+	asyncElements,
+	manyElements,
+	disabled,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
+	asyncElements: boolean;
+	manyElements: boolean;
+	disabled: boolean;
 } ) => {
-	return <FieldTypeStory fields={ fields } type={ type } Edit={ Edit } />;
+	return (
+		<FieldTypeStory
+			fields={ fields }
+			type={ type }
+			Edit={ Edit }
+			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
+		/>
+	);
 };
+AllComponent.storyName = 'All types';
 
-export const Text = ( {
+export const TextComponent = ( {
 	type,
 	Edit,
+	asyncElements,
+	manyElements,
+	disabled,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
+	asyncElements: boolean;
+	manyElements: boolean;
+	disabled: boolean;
 } ) => {
 	const textFields = useMemo(
 		() => fields.filter( ( field ) => field.type === 'text' ),
 		[]
 	);
 
-	return <FieldTypeStory fields={ textFields } type={ type } Edit={ Edit } />;
+	return (
+		<FieldTypeStory
+			fields={ textFields }
+			type={ type }
+			Edit={ Edit }
+			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
+		/>
+	);
 };
+TextComponent.storyName = 'text';
 
-export const Integer = ( {
+export const IntegerComponent = ( {
 	type,
 	Edit,
+	asyncElements,
+	manyElements,
+	formatSeparatorThousand,
+	disabled,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
+	asyncElements: boolean;
+	manyElements: boolean;
+	formatSeparatorThousand?: string;
+	disabled: boolean;
 } ) => {
 	const integerFields = useMemo(
-		() => fields.filter( ( field ) => field.type === 'integer' ),
-		[]
+		() =>
+			fields
+				.filter( ( field ) => field.type === 'integer' )
+				.map( ( field ) => {
+					if ( formatSeparatorThousand !== undefined ) {
+						return {
+							...field,
+							format: {
+								separatorThousand: formatSeparatorThousand,
+							},
+						};
+					}
+					return field;
+				} ),
+		[ formatSeparatorThousand ]
 	);
 
 	return (
-		<FieldTypeStory fields={ integerFields } type={ type } Edit={ Edit } />
+		<FieldTypeStory
+			fields={ integerFields }
+			type={ type }
+			Edit={ Edit }
+			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
+		/>
 	);
 };
+IntegerComponent.storyName = 'integer';
+IntegerComponent.args = {
+	formatSeparatorThousand: ',',
+};
+IntegerComponent.argTypes = {
+	formatSeparatorThousand: {
+		control: 'text',
+		description:
+			'Character used as thousand separator (e.g., "," for "1,234"). Default is ",".',
+	},
+};
 
-export const Boolean = ( {
+export const NumberComponent = ( {
 	type,
 	Edit,
+	asyncElements,
+	manyElements,
+	formatSeparatorThousand,
+	formatSeparatorDecimal,
+	formatDecimals,
+	disabled,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
+	asyncElements: boolean;
+	manyElements: boolean;
+	formatSeparatorThousand?: string;
+	formatSeparatorDecimal?: string;
+	formatDecimals?: number;
+	disabled: boolean;
+} ) => {
+	const numberFields = useMemo(
+		() =>
+			fields
+				.filter( ( field ) => field.type === 'number' )
+				.map( ( field ) => {
+					if (
+						formatSeparatorThousand !== undefined ||
+						formatSeparatorDecimal !== undefined ||
+						formatDecimals !== undefined
+					) {
+						const format: {
+							separatorThousand?: string;
+							separatorDecimal?: string;
+							decimals?: number;
+						} = {};
+						if ( formatSeparatorThousand !== undefined ) {
+							format.separatorThousand = formatSeparatorThousand;
+						}
+						if ( formatSeparatorDecimal !== undefined ) {
+							format.separatorDecimal = formatSeparatorDecimal;
+						}
+						if ( formatDecimals !== undefined ) {
+							format.decimals = formatDecimals;
+						}
+						return {
+							...field,
+							format,
+						};
+					}
+					return field;
+				} ),
+		[ formatSeparatorThousand, formatSeparatorDecimal, formatDecimals ]
+	);
+
+	return (
+		<FieldTypeStory
+			fields={ numberFields }
+			type={ type }
+			Edit={ Edit }
+			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
+		/>
+	);
+};
+NumberComponent.storyName = 'number';
+NumberComponent.args = {
+	formatSeparatorThousand: ',',
+	formatSeparatorDecimal: '.',
+	formatDecimals: 2,
+};
+NumberComponent.argTypes = {
+	formatSeparatorThousand: {
+		control: 'text',
+		description:
+			'Character used as thousand separator (e.g., "," for "1,234"). Default is ",".',
+	},
+	formatSeparatorDecimal: {
+		control: 'text',
+		description:
+			'Character used as decimal separator (e.g., "." for "1.23"). Default is ".".',
+	},
+	formatDecimals: {
+		control: { type: 'number', min: 0, max: 100, step: 1 },
+		description:
+			'Number of decimal places to display (0-100). Default is 2.',
+	},
+};
+
+export const BooleanComponent = ( {
+	type,
+	Edit,
+	asyncElements,
+	manyElements,
+	disabled,
+}: {
+	type: PanelTypes;
+	Edit: ControlTypes;
+	asyncElements: boolean;
+	manyElements: boolean;
+	disabled: boolean;
 } ) => {
 	const booleanFields = useMemo(
 		() => fields.filter( ( field ) => field.type === 'boolean' ),
@@ -589,48 +1013,244 @@ export const Boolean = ( {
 	);
 
 	return (
-		<FieldTypeStory fields={ booleanFields } type={ type } Edit={ Edit } />
+		<FieldTypeStory
+			fields={ booleanFields }
+			type={ type }
+			Edit={ Edit }
+			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
+		/>
 	);
 };
+BooleanComponent.storyName = 'boolean';
 
-export const DateTime = ( {
+export const DateTimeComponent = ( {
 	type,
 	Edit,
+	asyncElements,
+	manyElements,
+	formatDatetime,
+	formatWeekStartsOn,
+	disabled,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
+	asyncElements: boolean;
+	manyElements: boolean;
+	formatDatetime?: string;
+	formatWeekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+	disabled: boolean;
 } ) => {
-	const dateTimeFields = useMemo(
-		() => fields.filter( ( field ) => field.type === 'datetime' ),
-		[]
+	const datetimeFields = useMemo(
+		() =>
+			fields
+				.filter( ( field ) => field.id.startsWith( 'datetime' ) )
+				.map( ( field ) => {
+					if ( formatDatetime || formatWeekStartsOn !== undefined ) {
+						const format: {
+							datetime?: string;
+							weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+						} = {};
+						if ( formatDatetime ) {
+							format.datetime = formatDatetime;
+						}
+						if ( formatWeekStartsOn !== undefined ) {
+							format.weekStartsOn = formatWeekStartsOn;
+						}
+						return {
+							...field,
+							format,
+						};
+					}
+					return field;
+				} ),
+		[ formatDatetime, formatWeekStartsOn ]
 	);
 
 	return (
-		<FieldTypeStory fields={ dateTimeFields } type={ type } Edit={ Edit } />
+		<FieldTypeStory
+			fields={ datetimeFields }
+			type={ type }
+			Edit={ Edit }
+			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
+		/>
 	);
 };
+DateTimeComponent.storyName = 'datetime';
+DateTimeComponent.args = {
+	formatDatetime: '',
+	formatWeekStartsOn: undefined,
+};
+DateTimeComponent.argTypes = {
+	formatDatetime: {
+		control: 'text',
+		description:
+			'Custom PHP date format string (e.g., "M j, Y g:i a" for "Jan 1, 2021 2:30 pm"). Leave empty to use WordPress default.',
+	},
+	formatWeekStartsOn: {
+		control: 'select',
+		options: {
+			Default: undefined,
+			Sunday: 0,
+			Monday: 1,
+			Tuesday: 2,
+			Wednesday: 3,
+			Thursday: 4,
+			Friday: 5,
+			Saturday: 6,
+		},
+		description:
+			'Day that the week starts on. Leave as Default to use WordPress default.',
+	},
+};
 
-export const Date = ( {
+export const DateComponent = ( {
 	type,
 	Edit,
+	asyncElements,
+	manyElements,
+	formatDate,
+	formatWeekStartsOn,
+	disabled,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
+	asyncElements: boolean;
+	manyElements: boolean;
+	formatDate?: string;
+	formatWeekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+	disabled: boolean;
 } ) => {
 	const dateFields = useMemo(
-		() => fields.filter( ( field ) => field.type === 'date' ),
-		[]
+		() =>
+			fields
+				.filter( ( field ) => field.type === 'date' )
+				.map( ( field ) => {
+					if ( formatDate || formatWeekStartsOn !== undefined ) {
+						const format: {
+							date?: string;
+							weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+						} = {};
+						if ( formatDate ) {
+							format.date = formatDate;
+						}
+						if ( formatWeekStartsOn !== undefined ) {
+							format.weekStartsOn = formatWeekStartsOn;
+						}
+						return {
+							...field,
+							format,
+						};
+					}
+					return field;
+				} ),
+		[ formatDate, formatWeekStartsOn ]
 	);
 
-	return <FieldTypeStory fields={ dateFields } type={ type } Edit={ Edit } />;
+	return (
+		<FieldTypeStory
+			fields={ dateFields }
+			type={ type }
+			Edit={ Edit }
+			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
+		/>
+	);
+};
+DateComponent.storyName = 'date';
+DateComponent.args = {
+	formatDate: '',
+	formatWeekStartsOn: undefined,
+};
+DateComponent.argTypes = {
+	formatDate: {
+		control: 'text',
+		description:
+			'Custom PHP date format string (e.g., "F j, Y" for "November 6, 2010"). Leave empty to use WordPress default.',
+	},
+	formatWeekStartsOn: {
+		control: 'select',
+		options: {
+			Default: undefined,
+			Sunday: 0,
+			Monday: 1,
+			Tuesday: 2,
+			Wednesday: 3,
+			Thursday: 4,
+			Friday: 5,
+			Saturday: 6,
+		},
+		description:
+			'Day that the week starts on. Leave as Default to use WordPress default.',
+	},
 };
 
-export const Email = ( {
+export const TimeComponent = ( {
 	type,
 	Edit,
+	asyncElements,
+	manyElements,
+	formatTime,
+	disabled,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
+	asyncElements: boolean;
+	manyElements: boolean;
+	formatTime?: string;
+	disabled: boolean;
+} ) => {
+	const timeFields = useMemo(
+		() =>
+			fields
+				.filter( ( field ) => field.type === 'time' )
+				.map( ( field ) =>
+					formatTime
+						? { ...field, format: { time: formatTime } }
+						: field
+				),
+		[ formatTime ]
+	);
+
+	return (
+		<FieldTypeStory
+			fields={ timeFields }
+			type={ type }
+			Edit={ Edit }
+			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
+		/>
+	);
+};
+TimeComponent.storyName = 'time';
+TimeComponent.args = {
+	formatTime: '',
+};
+TimeComponent.argTypes = {
+	formatTime: {
+		control: 'text',
+		description:
+			'Custom PHP time format string (e.g., "g:i a" for "2:30 pm"). Leave empty to use the format each field declares.',
+	},
+};
+
+export const EmailComponent = ( {
+	type,
+	Edit,
+	asyncElements,
+	manyElements,
+	disabled,
+}: {
+	type: PanelTypes;
+	Edit: ControlTypes;
+	asyncElements: boolean;
+	manyElements: boolean;
+	disabled: boolean;
 } ) => {
 	const emailFields = useMemo(
 		() => fields.filter( ( field ) => field.type === 'email' ),
@@ -638,20 +1258,33 @@ export const Email = ( {
 	);
 
 	return (
-		<FieldTypeStory fields={ emailFields } type={ type } Edit={ Edit } />
+		<FieldTypeStory
+			fields={ emailFields }
+			type={ type }
+			Edit={ Edit }
+			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
+		/>
 	);
 };
+EmailComponent.storyName = 'email';
 
-export const Telephone = ( {
+export const TelephoneComponent = ( {
 	type,
 	Edit,
+	asyncElements,
+	manyElements,
+	disabled,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
+	asyncElements: boolean;
+	manyElements: boolean;
+	disabled: boolean;
 } ) => {
-	const telephoneFields = useMemo(
-		() => fields.filter( ( field ) => field.type === 'telephone' ),
-		[]
+	const telephoneFields = fields.filter( ( field ) =>
+		field.id.startsWith( 'telephone' )
 	);
 
 	return (
@@ -659,31 +1292,57 @@ export const Telephone = ( {
 			fields={ telephoneFields }
 			type={ type }
 			Edit={ Edit }
+			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
 		/>
 	);
 };
+TelephoneComponent.storyName = 'telephone';
 
-export const Url = ( {
+export const UrlComponent = ( {
 	type,
 	Edit,
+	asyncElements,
+	manyElements,
+	disabled,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
+	asyncElements: boolean;
+	manyElements: boolean;
+	disabled: boolean;
 } ) => {
 	const urlFields = useMemo(
 		() => fields.filter( ( field ) => field.type === 'url' ),
 		[]
 	);
 
-	return <FieldTypeStory fields={ urlFields } type={ type } Edit={ Edit } />;
+	return (
+		<FieldTypeStory
+			fields={ urlFields }
+			type={ type }
+			Edit={ Edit }
+			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
+		/>
+	);
 };
+UrlComponent.storyName = 'url';
 
-export const Color = ( {
+export const ColorComponent = ( {
 	type,
 	Edit,
+	asyncElements,
+	manyElements,
+	disabled,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
+	asyncElements: boolean;
+	manyElements: boolean;
+	disabled: boolean;
 } ) => {
 	const colorFields = useMemo(
 		() => fields.filter( ( field ) => field.type === 'color' ),
@@ -691,16 +1350,30 @@ export const Color = ( {
 	);
 
 	return (
-		<FieldTypeStory fields={ colorFields } type={ type } Edit={ Edit } />
+		<FieldTypeStory
+			fields={ colorFields }
+			type={ type }
+			Edit={ Edit }
+			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
+		/>
 	);
 };
+ColorComponent.storyName = 'color';
 
-export const Media = ( {
+export const MediaComponent = ( {
 	type,
 	Edit,
+	asyncElements,
+	manyElements,
+	disabled,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
+	asyncElements: boolean;
+	manyElements: boolean;
+	disabled: boolean;
 } ) => {
 	const mediaFields = useMemo(
 		() => fields.filter( ( field ) => field.type === 'media' ),
@@ -708,16 +1381,30 @@ export const Media = ( {
 	);
 
 	return (
-		<FieldTypeStory fields={ mediaFields } type={ type } Edit={ Edit } />
+		<FieldTypeStory
+			fields={ mediaFields }
+			type={ type }
+			Edit={ Edit }
+			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
+		/>
 	);
 };
+MediaComponent.storyName = 'media';
 
-export const Array = ( {
+export const ArrayComponent = ( {
 	type,
 	Edit,
+	asyncElements,
+	manyElements,
+	disabled,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
+	asyncElements: boolean;
+	manyElements: boolean;
+	disabled: boolean;
 } ) => {
 	const arrayTextFields = useMemo(
 		() => fields.filter( ( field ) => field.type === 'array' ),
@@ -729,33 +1416,56 @@ export const Array = ( {
 			fields={ arrayTextFields }
 			type={ type }
 			Edit={ Edit }
+			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
 		/>
 	);
 };
+ArrayComponent.storyName = 'array';
 
-export const Password = ( {
+export const PasswordComponent = ( {
 	type,
 	Edit,
+	asyncElements,
+	manyElements,
+	disabled,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
+	asyncElements: boolean;
+	manyElements: boolean;
+	disabled: boolean;
 } ) => {
-	const passwordFields = useMemo(
-		() => fields.filter( ( field ) => field.type === 'password' ),
-		[]
+	const passwordFields = fields.filter( ( field ) =>
+		field.id.startsWith( 'password' )
 	);
 
 	return (
-		<FieldTypeStory fields={ passwordFields } type={ type } Edit={ Edit } />
+		<FieldTypeStory
+			fields={ passwordFields }
+			type={ type }
+			Edit={ Edit }
+			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
+		/>
 	);
 };
+PasswordComponent.storyName = 'password';
 
-export const NoType = ( {
+export const NoTypeComponent = ( {
 	type,
 	Edit,
+	asyncElements,
+	manyElements,
+	disabled,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
+	asyncElements: boolean;
+	manyElements: boolean;
+	disabled: boolean;
 } ) => {
 	const noTypeFields = useMemo(
 		() => fields.filter( ( field ) => field.type === undefined ),
@@ -763,6 +1473,14 @@ export const NoType = ( {
 	);
 
 	return (
-		<FieldTypeStory fields={ noTypeFields } type={ type } Edit={ Edit } />
+		<FieldTypeStory
+			fields={ noTypeFields }
+			type={ type }
+			Edit={ Edit }
+			asyncElements={ asyncElements }
+			manyElements={ manyElements }
+			disabled={ disabled }
+		/>
 	);
 };
+NoTypeComponent.storyName = 'No type';

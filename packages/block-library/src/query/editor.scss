@@ -1,3 +1,8 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .block-library-query-pattern__selection-modal {
 	.block-editor-block-patterns-list {
 		column-count: 2;
@@ -19,7 +24,7 @@
 		padding: $grid-unit-20 0;
 		transform: translateY(- $grid-unit-05); // Offsets the top padding on the modal content container
 		margin-bottom: - $grid-unit-05;
-		z-index: z-index(".block-library-query-pattern__selection-search");
+		z-index: 2; // Above the BlockPreview z-index: 1 overlay in the scrolling list.
 	}
 }
 

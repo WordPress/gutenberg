@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	RangeControl,
@@ -10,10 +7,6 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { InspectorControls } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { MIN_PREVIEW_HEIGHT, MAX_PREVIEW_HEIGHT } from './edit';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
@@ -59,7 +52,6 @@ export default function FileBlockInspector( {
 							onDeselect={ () => changeDisplayPreview( true ) }
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Show inline embed' ) }
 								help={
 									displayPreview
@@ -80,8 +72,6 @@ export default function FileBlockInspector( {
 								onDeselect={ () => changePreviewHeight( 600 ) }
 							>
 								<RangeControl
-									__nextHasNoMarginBottom
-									__next40pxDefaultSize
 									label={ __( 'Height in pixels' ) }
 									min={ MIN_PREVIEW_HEIGHT }
 									max={ Math.max(
@@ -112,8 +102,6 @@ export default function FileBlockInspector( {
 						onDeselect={ () => changeLinkDestinationOption( href ) }
 					>
 						<SelectControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label={ __( 'Link to' ) }
 							value={ textLinkHref }
 							options={ linkDestinationOptions }
@@ -127,7 +115,6 @@ export default function FileBlockInspector( {
 						onDeselect={ () => changeOpenInNewWindow( false ) }
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Open in new tab' ) }
 							checked={ openInNewWindow }
 							onChange={ changeOpenInNewWindow }
@@ -140,7 +127,6 @@ export default function FileBlockInspector( {
 						onDeselect={ () => changeShowDownloadButton( true ) }
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Show download button' ) }
 							checked={ showDownloadButton }
 							onChange={ changeShowDownloadButton }

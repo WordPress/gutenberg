@@ -44,11 +44,11 @@ function YourBlockEdit( { attributes } ) {
 
 The block is responsible for using the `save` function to ensure that all attributes with a `source` field are saved according to the attributes definition. This is not automatic.
 
-Attributes without a `source` will be automatically saved in the block [comment delimiter](/docs/explanations/architecture/key-concepts.md#data-attributes).
+Attributes without a `source` will be automatically saved in the block [comment delimiter](/docs/explanations/architecture/key-concepts.md#data-and-attributes).
 
 For example, using the above attributes definition you would need to ensure that your `save` function has a corresponding img tag for the `url` attribute. The `title` and `size` attributes will be saved in the comment delimiter.
 
-_Example_: Example `save` function that contains the `url` attribute
+_Example_: Example `save` function that contains the `url` attribute.
 
 ```js
 function YourBlockSave( { attributes } ) {
@@ -105,7 +105,7 @@ _Example_: Example `enum`.
 Attribute sources are used to define how the attribute values are extracted from saved post content. They provide a mechanism to map from the saved markup to a JavaScript representation of a block.
 
 The available `source` values are:
-- `(no value)` - when no `source` is specified then data is stored in the block's [comment delimiter](/docs/explanations/architecture/key-concepts.md#data-attributes).
+- `(no value)` - when no `source` is specified then data is stored in the block's [comment delimiter](/docs/explanations/architecture/key-concepts.md#data-and-attributes).
 - `attribute` - data is stored in an HTML element attribute.
 - `text` - data is stored in HTML text.
 - `html` - data is stored in HTML. This is typically used by `RichText`.
@@ -469,7 +469,7 @@ The `role` property designates an attribute as being of a particular conceptual 
 Use `content` to designate the attribute as user-editable content. Blocks with attributes marked as `content` may be enabled for privileged editing in special circumstances such as content only locking.
 Use `local` to mark the attribute as temporary and non-persistable. Attributes marked as `local` are ignored by the Block Serializer and never saved to post content.
 
-_Example_: `content` role used by the paragraph block
+_Example_: `content` role used by the paragraph block.
 
 ```js
 {

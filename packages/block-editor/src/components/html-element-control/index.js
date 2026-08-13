@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	SelectControl,
@@ -8,10 +5,6 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { htmlElementMessages } from './messages';
 
@@ -88,8 +81,6 @@ export default function HTMLElementControl( {
 	return (
 		<VStack spacing={ 2 } className="block-editor-html-element-control">
 			<SelectControl
-				__nextHasNoMarginBottom
-				__next40pxDefaultSize
 				label={ __( 'HTML element' ) }
 				options={ modifiedOptions }
 				value={ tagName }

@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type {
 	ComponentPropsWithoutRef,
@@ -9,17 +6,9 @@ import type {
 	MouseEvent,
 	ReactElement,
 } from 'react';
-
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
 import { forwardRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import Tooltip from '../tooltip';
 import Icon from '../icon';
 import { VisuallyHidden } from '../visually-hidden';
@@ -89,7 +78,22 @@ function useDeprecatedProps( {
 	};
 }
 
-export function UnforwardedButton(
+/**
+ * Lets users take actions and make choices with a single click or tap.
+ *
+ * ```jsx
+ * import { Button } from '@wordpress/components';
+ * const Mybutton = () => (
+ *   <Button
+ *     variant="primary"
+ *     onClick={ handleClick }
+ *   >
+ *     Click here
+ *   </Button>
+ * );
+ * ```
+ */
+export const Button = forwardRef( function UnforwardedButton(
 	props: ButtonProps & DeprecatedButtonProps,
 	ref: ForwardedRef< any >
 ) {
@@ -161,6 +165,7 @@ export function UnforwardedButton(
 		'is-destructive': isDestructive,
 		'has-text': !! icon && ( hasChildren || text ),
 		'has-icon': !! icon,
+		'has-icon-right': iconPosition === 'right',
 	} );
 
 	const trulyDisabled = disabled && ! accessibleWhenDisabled;
@@ -285,22 +290,6 @@ export function UnforwardedButton(
 			) }
 		</>
 	);
-}
+} );
 
-/**
- * Lets users take actions and make choices with a single click or tap.
- *
- * ```jsx
- * import { Button } from '@wordpress/components';
- * const Mybutton = () => (
- *   <Button
- *     variant="primary"
- *     onClick={ handleClick }
- *   >
- *     Click here
- *   </Button>
- * );
- * ```
- */
-export const Button = forwardRef( UnforwardedButton );
 export default Button;

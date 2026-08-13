@@ -1,17 +1,11 @@
-/**
- * WordPress dependencies
- */
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { select, dispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store } from '../';
 
 describe( 'selectors', () => {
 	beforeEach( () => {
 		registerBlockType( 'core/test-block-a', {
+			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'design',
 			title: 'Test Block A',
@@ -20,6 +14,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/test-block-b', {
+			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'text',
 			title: 'Test Block B',
@@ -102,7 +97,7 @@ describe( 'selectors', () => {
 			expect(
 				select( store ).__experimentalGetAllowedPatterns( {
 					blocks: { byClientId: new Map() },
-					blockListSettings: {},
+					blockListSettings: new Map(),
 					settings: {
 						__experimentalBlockPatterns: [
 							{

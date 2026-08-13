@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { createElement, Component } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import serialize, {
 	getCommentAttributes,
 	getSaveContent,
@@ -56,6 +49,7 @@ describe( 'block serializer', () => {
 
 			it( 'should work when block type is passed as string', () => {
 				registerBlockType( 'core/fruit', {
+					apiVersion: 3,
 					title: 'Fruit',
 					category: 'widgets',
 					save: fruitBlockSave,
@@ -281,6 +275,7 @@ describe( 'block serializer', () => {
 	describe( 'serializeBlock()', () => {
 		it( 'serializes the freeform content fallback block without comment delimiters', () => {
 			registerBlockType( 'core/freeform', {
+				apiVersion: 3,
 				category: 'text',
 				title: 'freeform block',
 				attributes: {
@@ -301,6 +296,7 @@ describe( 'block serializer', () => {
 		} );
 		it( 'serializes the freeform content fallback block with comment delimiters in nested context', () => {
 			registerBlockType( 'core/freeform', {
+				apiVersion: 3,
 				category: 'text',
 				title: 'freeform block',
 				attributes: {
@@ -325,6 +321,7 @@ describe( 'block serializer', () => {
 		} );
 		it( 'serializes the unregistered fallback block without comment delimiters', () => {
 			registerBlockType( 'core/unregistered-block', {
+				apiVersion: 3,
 				category: 'text',
 				title: 'unregistered block',
 				attributes: {
@@ -345,6 +342,7 @@ describe( 'block serializer', () => {
 		} );
 		it( 'preserves content from invalid blocks when source information is present', () => {
 			registerBlockType( 'core/quote', {
+				apiVersion: 3,
 				category: 'text',
 				title: 'Quote',
 				attributes: { content: 'string' },
@@ -370,6 +368,7 @@ describe( 'block serializer', () => {
 		} );
 		it( 're-generates content from invalid blocks when source information is missing (losing content)', () => {
 			registerBlockType( 'core/quote', {
+				apiVersion: 3,
 				category: 'text',
 				title: 'Quote',
 				attributes: { content: 'string' },
@@ -385,11 +384,80 @@ describe( 'block serializer', () => {
 
 			expect( serializeBlock( block ) ).toBe( '<!-- wp:quote /-->' );
 		} );
+		it( 'serializes the Custom HTML block from its static fragments', () => {
+			registerBlockType( 'core/html', {
+				apiVersion: 3,
+				category: 'text',
+				title: 'Custom HTML',
+				save: () => null,
+			} );
+			registerBlockType( 'core/fruit', {
+				apiVersion: 3,
+				category: 'text',
+				title: 'fruit block',
+				attributes: {
+					fruit: {
+						type: 'string',
+					},
+				},
+				save: ( { attributes } ) => attributes.fruit,
+			} );
+
+			const block = createBlock(
+				'core/html',
+				{},
+				[ createBlock( 'core/fruit', { fruit: 'Bananas' } ) ],
+				[ '<div>', null, '</div>' ]
+			);
+
+			expect( serializeBlock( block ) ).toBe(
+				'<!-- wp:html -->\n' +
+					'<div><!-- wp:fruit {"fruit":"Bananas"} -->\n' +
+					'Bananas\n' +
+					'<!-- /wp:fruit --></div>\n' +
+					'<!-- /wp:html -->'
+			);
+		} );
+		it( 'appends inner blocks missing an innerContent placeholder', () => {
+			registerBlockType( 'core/html', {
+				apiVersion: 3,
+				category: 'text',
+				title: 'Custom HTML',
+				save: () => null,
+			} );
+			registerBlockType( 'core/fruit', {
+				apiVersion: 3,
+				category: 'text',
+				title: 'fruit block',
+				attributes: {
+					fruit: {
+						type: 'string',
+					},
+				},
+				save: ( { attributes } ) => attributes.fruit,
+			} );
+
+			const block = createBlock(
+				'core/html',
+				{},
+				[ createBlock( 'core/fruit', { fruit: 'Bananas' } ) ],
+				[ '<div></div>' ]
+			);
+
+			expect( serializeBlock( block ) ).toBe(
+				'<!-- wp:html -->\n' +
+					'<div></div><!-- wp:fruit {"fruit":"Bananas"} -->\n' +
+					'Bananas\n' +
+					'<!-- /wp:fruit -->\n' +
+					'<!-- /wp:html -->'
+			);
+		} );
 	} );
 
 	describe( 'serialize()', () => {
 		beforeEach( () => {
 			const blockType = {
+				apiVersion: 3,
 				attributes: {
 					throw: {
 						type: 'boolean',
@@ -461,6 +529,7 @@ describe( 'block serializer', () => {
 	describe( 'getBlockInnerHTML', () => {
 		it( "should return the block's serialized inner HTML", () => {
 			const blockType = {
+				apiVersion: 3,
 				attributes: {
 					content: {
 						type: 'string',

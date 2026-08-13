@@ -1,13 +1,4 @@
-/**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
-	AlignmentControl,
 	BlockControls,
 	InspectorControls,
 	useBlockProps,
@@ -18,24 +9,20 @@ import {
 import {
 	ToggleControl,
 	TextControl,
+	ExternalLink,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
+import { createInterpolateElement } from '@wordpress/element';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function PostTitleEdit( {
-	attributes: { level, levelOptions, textAlign, isLink, rel, linkTarget },
+	attributes: { level, levelOptions, isLink, rel, linkTarget, placeholder },
 	setAttributes,
 	context: { postType, postId, queryId },
-	insertBlocksAfter,
 } ) {
 	const TagName = level === 0 ? 'p' : `h${ level }`;
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
@@ -67,34 +54,31 @@ export default function PostTitleEdit( {
 		postId
 	);
 	const [ link ] = useEntityProp( 'postType', postType, 'link', postId );
-	const onSplitAtEnd = () => {
-		insertBlocksAfter( createBlock( getDefaultBlockName() ) );
-	};
-	const blockProps = useBlockProps( {
-		className: clsx( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
+	const blockProps = useBlockProps();
 	const blockEditingMode = useBlockEditingMode();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	let titleElement = <TagName { ...blockProps }>{ __( 'Title' ) }</TagName>;
+	let titleElement = (
+		<TagName { ...blockProps }>{ placeholder || __( 'Title' ) }</TagName>
+	);
 
 	if ( postType && postId ) {
 		titleElement = userCanEdit ? (
 			<PlainText
 				tagName={ TagName }
-				placeholder={ __( 'No title' ) }
+				placeholder={ __( '(no title)' ) }
 				value={ rawTitle }
 				onChange={ setTitle }
 				__experimentalVersion={ 2 }
-				__unstableOnSplitAtEnd={ onSplitAtEnd }
+				disableLineBreaks
 				{ ...blockProps }
 			/>
 		) : (
 			<TagName
 				{ ...blockProps }
-				dangerouslySetInnerHTML={ { __html: fullTitle?.rendered } }
+				dangerouslySetInnerHTML={ {
+					__html: fullTitle?.rendered || __( '(no title)' ),
+				} }
 			/>
 		);
 	}
@@ -107,11 +91,13 @@ export default function PostTitleEdit( {
 					href={ link }
 					target={ linkTarget }
 					rel={ rel }
-					placeholder={ ! rawTitle.length ? __( 'No title' ) : null }
+					placeholder={
+						! rawTitle.length ? __( '(no title)' ) : null
+					}
 					value={ rawTitle }
 					onChange={ setTitle }
 					__experimentalVersion={ 2 }
-					__unstableOnSplitAtEnd={ onSplitAtEnd }
+					disableLineBreaks
 				/>
 			</TagName>
 		) : (
@@ -122,7 +108,7 @@ export default function PostTitleEdit( {
 					rel={ rel }
 					onClick={ ( event ) => event.preventDefault() }
 					dangerouslySetInnerHTML={ {
-						__html: fullTitle?.rendered,
+						__html: fullTitle?.rendered || __( '(no title)' ),
 					} }
 				/>
 			</TagName>
@@ -140,12 +126,6 @@ export default function PostTitleEdit( {
 							onChange={ ( newLevel ) =>
 								setAttributes( { level: newLevel } )
 							}
-						/>
-						<AlignmentControl
-							value={ textAlign }
-							onChange={ ( nextAlign ) => {
-								setAttributes( { textAlign: nextAlign } );
-							} }
 						/>
 					</BlockControls>
 					<InspectorControls>
@@ -169,7 +149,6 @@ export default function PostTitleEdit( {
 								}
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={ __( 'Make title a link' ) }
 									onChange={ () =>
 										setAttributes( { isLink: ! isLink } )
@@ -192,7 +171,6 @@ export default function PostTitleEdit( {
 										}
 									>
 										<ToggleControl
-											__nextHasNoMarginBottom
 											label={ __( 'Open in new tab' ) }
 											onChange={ ( value ) =>
 												setAttributes( {
@@ -205,7 +183,7 @@ export default function PostTitleEdit( {
 										/>
 									</ToolsPanelItem>
 									<ToolsPanelItem
-										label={ __( 'Link rel' ) }
+										label={ __( 'Link relation' ) }
 										isShownByDefault
 										hasValue={ () => !! rel }
 										onDeselect={ () =>
@@ -213,9 +191,17 @@ export default function PostTitleEdit( {
 										}
 									>
 										<TextControl
-											__next40pxDefaultSize
-											__nextHasNoMarginBottom
-											label={ __( 'Link rel' ) }
+											label={ __( 'Link relation' ) }
+											help={ createInterpolateElement(
+												__(
+													'The <a>Link Relation</a> attribute defines the relationship between a linked resource and the current document.'
+												),
+												{
+													a: (
+														<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel" />
+													),
+												}
+											) }
 											value={ rel }
 											onChange={ ( newRel ) =>
 												setAttributes( { rel: newRel } )

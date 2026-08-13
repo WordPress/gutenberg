@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { useReducedMotion } from '@wordpress/compose';
 import { __unstableMotion as motion } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import BlockPopoverCover from './cover';
 
