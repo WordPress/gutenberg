@@ -4,6 +4,20 @@
 
 ### New Features
 
+-   `WidgetRelevance` gains a `'medium'` tier between `'high'` and `'low'`,
+    for persistent but compact visibility
+    ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
+
+### Enhancements
+
+-   `useWidgetTypes` holds the icon slot with the stand-in while an action's
+    icon reference resolves; an unresolvable reference clears it
+    ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
+
+## 0.5.0 (2026-08-12)
+
+### New Features
+
 -   `WidgetAction` gains envelope fields: `icon`, a registered icon name
     resolved by `useWidgetTypes` into a renderable element, and `relevance`
     (`'high' | 'low'`) ([#81275](https://github.com/WordPress/gutenberg/pull/81275)).
