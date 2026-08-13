@@ -178,14 +178,18 @@ export const privateRemoveBlocks =
 				?.length
 		) {
 			const blockOrder = select.getBlockOrder( rootClientId );
+			// The root can be gone already when the removal is part of a
+			// larger operation (e.g. a merge moving the last item out of a
+			// list removes the emptied list first).
+			const rootBlock =
+				select.__unstableGetBlockWithoutInnerBlocks( rootClientId );
 			removeRoot =
+				!! rootBlock &&
 				blockOrder.length === clientIds.length &&
 				blockOrder.every( ( clientId ) =>
 					clientIds.includes( clientId )
 				) &&
-				isUnmodifiedBlock(
-					select.__unstableGetBlockWithoutInnerBlocks( rootClientId )
-				);
+				isUnmodifiedBlock( rootBlock );
 		}
 
 		if ( selectPrevious ) {
