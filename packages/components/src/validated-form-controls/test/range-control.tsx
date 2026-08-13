@@ -4,6 +4,31 @@ import { useState, useRef } from '@wordpress/element';
 import { ValidatedRangeControl } from '../components';
 
 describe( 'ValidatedRangeControl', () => {
+	it( 'should accessibly label the internal slider and spin button', () => {
+		render(
+			<ValidatedRangeControl
+				label="Opacity"
+				required
+				min={ 0 }
+				max={ 100 }
+				onChange={ () => {} }
+			/>
+		);
+
+		// The slider is styled with `opacity: 0`, so it's not "visible"
+		// in the DOM sense, but it's still accessible.
+		expect(
+			screen.getByRole( 'slider', {
+				name: 'Opacity (Required)',
+			} )
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'spinbutton', {
+				name: 'Opacity (Required)',
+			} )
+		).toBeVisible();
+	} );
+
 	it( 'should preserve the help description', () => {
 		render(
 			<ValidatedRangeControl label="Opacity" help="Set the opacity." />

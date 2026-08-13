@@ -33,6 +33,7 @@
 -   Remove `ValidatedToggleControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81492](https://github.com/WordPress/gutenberg/pull/81492)).
 -   Remove `ValidatedToggleGroupControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81450](https://github.com/WordPress/gutenberg/pull/81450)).
 -   `ToggleGroupControl`: Streamline focus ring color styles ([#81242](https://github.com/WordPress/gutenberg/pull/81242)).
+-   `ControlWithError`: Remove the internal implementation in favor of the `ControlWithError` component from `@wordpress/ui` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)).
 
 ## 39.0.0 (2026-08-12)
 
