@@ -91,7 +91,7 @@ Used to build accessible labels and ARIA roles for the control group. Should rep
 ### `isResponsive`
 
 -   **Type:** `Boolean`
--   **Default:** `false` )
+-   **Default:** `false`
 -   **Required:** `false`
 
 Determines whether the component displays the default or responsive controls. Updates the state of the toggle control. See also `onIsResponsiveChange` below.
