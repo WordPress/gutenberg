@@ -995,7 +995,7 @@ describe( 'private actions', () => {
 			// why no companion video was produced.
 			convertGifToVideo.mockRejectedValue(
 				new Error(
-					'Unsupported: GIF exceeds maximum conversion size (5000x5000 x 100 frames = 2500000000 pixels; limit is 300000000)'
+					'Unsupported: exceeds maximum conversion size (GIF is 5000x5000 x 100 frames = 2500000000 pixels; limit is 300000000)'
 				)
 			);
 			const { select, dispatch } = buildArgs();

@@ -7,6 +7,7 @@ import {
 	VideoSample,
 	QUALITY_HIGH,
 	canEncodeVideo,
+	normalizeRotation,
 } from 'mediabunny';
 import type { HeicSequenceInput, ItemId } from './types';
 
@@ -33,15 +34,17 @@ const GIF_DEFAULT_FRAME_DURATION_US = 100_000;
 export const UNSUPPORTED_ERROR_PREFIX = 'Unsupported';
 
 /**
- * Message prefix for GIFs skipped because they exceed the total-pixel budget.
+ * Message prefix for sources skipped because they exceed the total-pixel
+ * budget. Shared by the GIF and image-sequence paths, which append their own
+ * dimensions and frame count after it.
  *
  * Starts with UNSUPPORTED_ERROR_PREFIX so existing consumers treat the skip
- * as a graceful fallback (keep the uploaded GIF, no companion video); the
+ * as a graceful fallback (keep the uploaded original, no companion video); the
  * longer prefix lets consumers distinguish it, e.g. to log a warning. Like
  * UNSUPPORTED_ERROR_PREFIX, the contract is the message prefix because only
  * the message string survives the worker boundary.
  */
-export const SIZE_LIMIT_ERROR_PREFIX = `${ UNSUPPORTED_ERROR_PREFIX }: GIF exceeds maximum conversion size`;
+export const SIZE_LIMIT_ERROR_PREFIX = `${ UNSUPPORTED_ERROR_PREFIX }: exceeds maximum conversion size`;
 
 /**
  * Default budget for total decoded pixels (width × height × frame count)
@@ -104,13 +107,16 @@ interface SourceFrame {
  * @param frames         Async generator of frames in presentation order.
  * @param outputMimeType Output MIME type ('video/mp4' or 'video/webm').
  * @param maxDimensions  Optional maximum dimension for downscaling.
+ * @param rotation       Optional clockwise display rotation in degrees
+ *                       (0, 90, 180, 270) to bake into the encoded frames.
  * @return Encoded video buffer.
  */
 async function encodeFramesToVideo(
 	id: ItemId,
 	frames: AsyncGenerator< SourceFrame >,
 	outputMimeType: string,
-	maxDimensions?: number
+	maxDimensions?: number,
+	rotation?: number
 ): Promise< ArrayBuffer > {
 	if ( typeof VideoEncoder === 'undefined' ) {
 		throw new Error(
@@ -127,6 +133,15 @@ async function encodeFramesToVideo(
 		);
 	}
 
+	/*
+	 * Bake any display rotation into the frames rather than recording it as
+	 * container metadata: WebM cannot carry a rotation matrix at all, and the
+	 * still image produced alongside a converted sequence is itself baked
+	 * upright, so a player that ignored the metadata would show a poster and a
+	 * video at odds with each other.
+	 */
+	const rotate = normalizeRotation( rotation ?? 0 );
+
 	const source = new VideoSampleSource( {
 		codec,
 		bitrate: QUALITY_HIGH,
@@ -137,6 +152,7 @@ async function encodeFramesToVideo(
 		 * fine seek granularity.
 		 */
 		keyFrameInterval: 10,
+		...( rotate ? { rotate } : {} ),
 	} );
 	const target = new BufferTarget();
 	const output = new Output( {
@@ -324,7 +340,7 @@ async function* decodeGifFrames(
 			const totalPixels = probeWidth * probeHeight * frameCount;
 			if ( totalPixels > pixelBudget ) {
 				throw new Error(
-					`${ SIZE_LIMIT_ERROR_PREFIX } (${ probeWidth }x${ probeHeight } x ${ frameCount } frames = ${ totalPixels } pixels; limit is ${ pixelBudget })`
+					`${ SIZE_LIMIT_ERROR_PREFIX } (GIF is ${ probeWidth }x${ probeHeight } x ${ frameCount } frames = ${ totalPixels } pixels; limit is ${ pixelBudget })`
 				);
 			}
 		}
@@ -535,24 +551,50 @@ export async function convertGifToVideo(
  * re-encodes them with mediabunny, exactly like the GIF path but sourced from
  * a VideoDecoder instead of an ImageDecoder.
  *
+ * Any display rotation carried by the sequence is baked into the encoded
+ * frames, so the resulting video is upright in every player.
+ *
  * @param id             Item ID.
  * @param sequence       Demuxed sequence (codec config + samples).
  * @param outputMimeType Output MIME type ('video/mp4' or 'video/webm').
  * @param maxDimensions  Optional maximum dimension for downscaling.
+ * @param maxTotalPixels Optional budget for total decoded pixels
+ *                       (width × height × frame count) beyond which the
+ *                       conversion is rejected with SIZE_LIMIT_ERROR_PREFIX.
+ *                       Defaults to DEFAULT_MAX_TOTAL_PIXELS; `0` disables.
  * @return Encoded video buffer.
  */
 export async function convertHeicSequenceToVideo(
 	id: ItemId,
 	sequence: HeicSequenceInput,
 	outputMimeType: string,
-	maxDimensions?: number
+	maxDimensions?: number,
+	maxTotalPixels?: number
 ): Promise< ArrayBuffer > {
+	/*
+	 * Enforce the budget before taking the lock: unlike the GIF path the frame
+	 * count and dimensions are already known from the demuxer, so an
+	 * over-budget sequence can be rejected without decoding anything.
+	 */
+	const pixelBudget = maxTotalPixels ?? DEFAULT_MAX_TOTAL_PIXELS;
+	if ( pixelBudget > 0 ) {
+		const frameCount = sequence.samples.length;
+		const totalPixels =
+			sequence.codedWidth * sequence.codedHeight * frameCount;
+		if ( totalPixels > pixelBudget ) {
+			throw new Error(
+				`${ SIZE_LIMIT_ERROR_PREFIX } (sequence is ${ sequence.codedWidth }x${ sequence.codedHeight } x ${ frameCount } frames = ${ totalPixels } pixels; limit is ${ pixelBudget })`
+			);
+		}
+	}
+
 	return withOperationLock( id, () =>
 		encodeFramesToVideo(
 			id,
 			decodeHevcSequenceFrames( id, sequence ),
 			outputMimeType,
-			maxDimensions
+			maxDimensions,
+			sequence.rotation
 		)
 	);
 }

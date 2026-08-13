@@ -78,20 +78,24 @@ export async function convertGifToVideo(
  * @param sequence       Demuxed sequence (codec config + samples).
  * @param outputMimeType Output MIME type ('video/mp4' or 'video/webm').
  * @param maxDimensions  Optional maximum dimension for downscaling.
+ * @param maxTotalPixels Optional budget for total decoded pixels
+ *                       (width × height × frame count); `0` disables.
  * @return Video file buffer.
  */
 export async function convertHeicSequenceToVideo(
 	id: ItemId,
 	sequence: HeicSequenceInput,
 	outputMimeType: string,
-	maxDimensions?: number
+	maxDimensions?: number,
+	maxTotalPixels?: number
 ): Promise< ArrayBuffer > {
 	const api = getWorkerAPI();
 	return api.convertHeicSequenceToVideo(
 		id,
 		sequence,
 		outputMimeType,
-		maxDimensions
+		maxDimensions,
+		maxTotalPixels
 	);
 }
 

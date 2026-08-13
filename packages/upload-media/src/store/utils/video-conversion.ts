@@ -18,12 +18,12 @@ import type { QueueItemId } from '../types';
 const UNSUPPORTED_ERROR_PREFIX = 'Unsupported';
 
 /**
- * Message prefix used by @wordpress/video-conversion for GIFs skipped
+ * Message prefix used by @wordpress/video-conversion for sources skipped
  * because they exceed the total-pixel budget. This MUST mirror the
  * package's exported `SIZE_LIMIT_ERROR_PREFIX`; it is duplicated here for
  * the same bundle-size reason as UNSUPPORTED_ERROR_PREFIX above.
  */
-const SIZE_LIMIT_ERROR_PREFIX = `${ UNSUPPORTED_ERROR_PREFIX }: GIF exceeds maximum conversion size`;
+const SIZE_LIMIT_ERROR_PREFIX = `${ UNSUPPORTED_ERROR_PREFIX }: exceeds maximum conversion size`;
 
 /**
  * Message prefix for conversions abandoned by the timeout in

@@ -217,6 +217,8 @@ jest.mock( 'mediabunny', () => ( {
 	},
 	QUALITY_HIGH: 'quality-high',
 	canEncodeVideo: ( ...args: unknown[] ) => mockCanEncodeVideo( ...args ),
+	normalizeRotation: ( rotation: number ) =>
+		( ( ( rotation % 360 ) + 360 ) % 360 ) as 0 | 90 | 180 | 270,
 } ) );
 
 beforeEach( () => {
@@ -634,5 +636,100 @@ describe( 'convertHeicSequenceToVideo', () => {
 		for ( const sample of mockVideoSamples ) {
 			expect( sample.closed ).toBe( true );
 		}
+	} );
+
+	describe( 'display rotation', () => {
+		it( 'bakes a portrait rotation into the encoded frames', async () => {
+			const sequence = buildSequence( 2 );
+			sequence.rotation = 90;
+
+			await convertHeicSequenceToVideo(
+				'seq-rot',
+				sequence,
+				'video/mp4'
+			);
+
+			expect( mockVideoSampleSourceOpts[ 0 ] ).toHaveProperty(
+				'rotate',
+				90
+			);
+		} );
+
+		it( 'bakes rotation into WebM output too, which cannot carry it as metadata', async () => {
+			const sequence = buildSequence( 2 );
+			sequence.rotation = 270;
+
+			await convertHeicSequenceToVideo(
+				'seq-rot-webm',
+				sequence,
+				'video/webm'
+			);
+
+			expect( mockVideoSampleSourceOpts[ 0 ] ).toHaveProperty(
+				'rotate',
+				270
+			);
+		} );
+
+		it( 'omits the rotate option entirely for upright sequences', async () => {
+			await convertHeicSequenceToVideo(
+				'seq-upright',
+				buildSequence( 2 ),
+				'video/mp4'
+			);
+
+			expect( mockVideoSampleSourceOpts[ 0 ] ).not.toHaveProperty(
+				'rotate'
+			);
+		} );
+	} );
+
+	describe( 'total pixel budget', () => {
+		it( 'rejects an over-budget sequence without decoding anything', async () => {
+			const sequence = buildSequence( 4 );
+			sequence.codedWidth = 4000;
+			sequence.codedHeight = 3000;
+
+			await expect(
+				convertHeicSequenceToVideo(
+					'seq-toobig',
+					sequence,
+					'video/mp4',
+					undefined,
+					1000
+				)
+			).rejects.toThrow( SIZE_LIMIT_ERROR_PREFIX );
+
+			// Rejected up front: no chunk was ever fed to the decoder.
+			expect( mockEncodedChunks ).toHaveLength( 0 );
+		} );
+
+		it( 'converts a sequence within the budget', async () => {
+			const result = await convertHeicSequenceToVideo(
+				'seq-ok',
+				buildSequence( 3 ),
+				'video/mp4',
+				undefined,
+				10 * 10 * 3
+			);
+
+			expect( result ).toBeInstanceOf( ArrayBuffer );
+		} );
+
+		it( 'skips the check when the budget is 0', async () => {
+			const sequence = buildSequence( 2 );
+			sequence.codedWidth = 8000;
+			sequence.codedHeight = 8000;
+
+			const result = await convertHeicSequenceToVideo(
+				'seq-nobudget',
+				sequence,
+				'video/mp4',
+				undefined,
+				0
+			);
+
+			expect( result ).toBeInstanceOf( ArrayBuffer );
+		} );
 	} );
 } );
