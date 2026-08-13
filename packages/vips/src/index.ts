@@ -651,13 +651,14 @@ export async function resizeImage(
 		 * sub-size, which is what this image would have produced before the
 		 * `wp_generate_animated_image_subsizes` opt-in.
 		 */
+		let frames = 1;
 		if ( strOptions ) {
-			const frames =
-				image.pageHeight > 0 ? image.height / image.pageHeight : 1;
+			frames = image.pageHeight > 0 ? image.height / image.pageHeight : 1;
 			const estimatedBytes =
 				image.width * image.pageHeight * frames * BYTES_PER_PIXEL;
 			if ( estimatedBytes > ANIMATION_MEMORY_BUDGET ) {
 				strOptions = '';
+				frames = 1;
 				image = vips.Image.newFromBuffer( buffer, strOptions, {} );
 			}
 		}
@@ -723,9 +724,14 @@ export async function resizeImage(
 		 * Lower effort plus allowing slight inter-frame/inter-palette error
 		 * is 4-8x faster and eliminates the size bloat, with no visible
 		 * quality difference at sub-size dimensions.
+		 *
+		 * This is keyed off the frame count rather than the opt-in: the
+		 * inter-frame and inter-palette tolerances mean nothing for a single
+		 * frame, so a static GIF would only pay the lower effort in worse
+		 * compression.
 		 * See https://github.com/WordPress/gutenberg/issues/80266.
 		 */
-		if ( strOptions && 'image/gif' === type ) {
+		if ( frames > 1 && 'image/gif' === type ) {
 			saveOptions.effort = 2;
 			saveOptions.interframe_maxerror = 8;
 			saveOptions.interpalette_maxerror = 16;

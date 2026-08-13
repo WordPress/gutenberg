@@ -127,6 +127,9 @@ describe( 'resizeImage', () => {
 			} );
 			const buffer = await gifFile.arrayBuffer();
 
+			// Three frames stacked into one 300px-tall image.
+			mockHeight = 300;
+
 			await resizeImage(
 				'itemId',
 				buffer,
@@ -177,6 +180,44 @@ describe( 'resizeImage', () => {
 				crop: 'centre',
 				size: 'down',
 			} );
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.gif',
+				expect.not.objectContaining( {
+					interframe_maxerror: expect.anything(),
+				} )
+			);
+		} );
+
+		it( 'leaves gifsave at its defaults for a static GIF', async () => {
+			const gifFile = new File( [ '<BLOB>' ], 'example.gif', {
+				lastModified: 1234567891,
+				type: 'image/gif',
+			} );
+			const buffer = await gifFile.arrayBuffer();
+
+			/*
+			 * The mocked image reports a single frame (height === pageHeight).
+			 * The inter-frame and inter-palette tolerances are meaningless for
+			 * one frame, so a static GIF uploaded to an opted-in site must not
+			 * pay libvips' default `effort` in worse compression.
+			 */
+			await resizeImage(
+				'itemId',
+				buffer,
+				'image/gif',
+				{
+					width: 100,
+					height: 100,
+				},
+				{ preserveAnimation: true }
+			);
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.gif',
+				expect.not.objectContaining( {
+					effort: expect.anything(),
+				} )
+			);
 			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
 				'.gif',
 				expect.not.objectContaining( {
