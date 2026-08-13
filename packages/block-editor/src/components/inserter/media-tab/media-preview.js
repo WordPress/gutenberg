@@ -22,6 +22,7 @@ import { getFilename } from '@wordpress/url';
 import { Tooltip } from '@wordpress/ui';
 import InserterDraggableBlocks from '../../inserter-draggable-blocks';
 import { getBlockAndPreviewFromMedia } from './utils';
+import { getAttachCopy } from './attach-copy';
 import { store as blockEditorStore } from '../../../store';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
@@ -64,13 +65,7 @@ function MediaPreviewOptions( { category, media, onDetach } ) {
 							onClick={ () => onDetach( media ) }
 							icon={ linkOff }
 						>
-							{ category.postTypeLabel
-								? sprintf(
-										/* translators: %s: Name of the post type e.g: "Page". */
-										__( 'Detach from %s' ),
-										category.postTypeLabel
-								  )
-								: __( 'Detach from post' ) }
+							{ getAttachCopy( category ).detachAction }
 						</MenuItem>
 					) }
 				</MenuGroup>

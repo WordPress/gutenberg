@@ -460,11 +460,18 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__patterns-explore-button,
-.block-editor-inserter__media-library-button {
+// Sits at the bottom of the media tab column, below the category list. The
+// wrapper owns the separation from the list so the buttons inside it are spaced
+// only by the stack's own gap.
+.block-editor-inserter__media-tabs-footer {
+	margin-top: $grid-unit-20;
+}
+
+.block-editor-inserter__media-library-button,
+.block-editor-inserter__media-add-folder-button {
 	&.components-button {
 		padding: $grid-unit-20;
 		justify-content: center;
-		margin-top: $grid-unit-20;
 		width: 100%;
 	}
 }

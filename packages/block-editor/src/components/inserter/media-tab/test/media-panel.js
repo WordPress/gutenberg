@@ -118,3 +118,31 @@ describe( 'MediaCategoryPanel subscription gating', () => {
 		expect( subscribe ).not.toHaveBeenCalled();
 	} );
 } );
+
+describe( 'MediaCategoryPanel attach copy', () => {
+	it( 'falls back to the default copy when the source supplies none', () => {
+		renderPanel( baseCategory );
+
+		expect(
+			screen.getByRole( 'button', { name: 'Attach images' } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'uses the copy the source supplies', () => {
+		// A media folder words the same affordance around the folder, so the
+		// panel renders whatever the source hands it rather than assuming the
+		// attached-images wording.
+		renderPanel( {
+			...baseCategory,
+			name: 'media-folder-7',
+			attachCopy: { attachButton: 'Add images to folder' },
+		} );
+
+		expect(
+			screen.getByRole( 'button', { name: 'Add images to folder' } )
+		).toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', { name: 'Attach images' } )
+		).not.toBeInTheDocument();
+	} );
+} );

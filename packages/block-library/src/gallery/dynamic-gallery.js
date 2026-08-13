@@ -18,9 +18,18 @@ import {
 	useBlockEditingMode,
 	__experimentalUseBlockPreview as useBlockPreview,
 } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 import { sharedIcon } from './shared-icon';
 import { Caption } from '../utils/caption';
-import { DEFAULT_ORDERBY, DEFAULT_ORDER, MAX_IMAGES } from './dynamic-source';
+import {
+	DEFAULT_ORDERBY,
+	DEFAULT_ORDER,
+	MAX_IMAGES,
+	MEDIA_FOLDER,
+	getDynamicSource,
+} from './dynamic-source';
 
 /**
  * Ordering options for a dynamic gallery source. Each value is a composite
@@ -64,6 +73,96 @@ function OrderControl( { orderby, order, onChange } ) {
 				onChange( { orderby: newOrderby, order: newOrder } );
 			} }
 		/>
+	);
+}
+
+/**
+ * Every media folder, alphabetically — the options for the folder chooser below.
+ * Matches the query the inserter's folder categories use, so both read from one
+ * resolved list rather than issuing separate requests.
+ */
+const MEDIA_FOLDERS_QUERY = {
+	per_page: -1,
+	hide_empty: false,
+	orderby: 'name',
+	order: 'asc',
+};
+
+/**
+ * "Folder" control for a media folder gallery: which folder's images to show.
+ *
+ * Unlike the ordering control this isn't an optional setting — a folder gallery
+ * with no folder resolves to nothing — so it renders as a plain control rather
+ * than a resettable `ToolsPanelItem`.
+ *
+ * @param {Object}   props
+ * @param {?number}  props.folderId  The currently selected folder id.
+ * @param {Function} props.onChange  Called with the new folder id (or `undefined`).
+ * @param {string}   props.label     The control's label.
+ * @param {string}   props.noneLabel Placeholder option copy for "no folder chosen".
+ */
+function FolderControl( { folderId, onChange, label, noneLabel } ) {
+	const folders = useSelect(
+		( select ) =>
+			select( coreStore ).getEntityRecords(
+				'taxonomy',
+				'wp_media_folder',
+				MEDIA_FOLDERS_QUERY
+			),
+		[]
+	);
+
+	const options = [
+		// Keeps the control usable before a folder is chosen, and lets a chosen
+		// one be cleared again.
+		{ label: noneLabel, value: '' },
+		...( folders ?? [] ).map( ( folder ) => ( {
+			label: decodeEntities( folder.name ),
+			value: String( folder.id ),
+		} ) ),
+	];
+
+	// A folder that has since been deleted (or isn't readable) leaves an id with
+	// no matching option. Surface it rather than silently snapping the control
+	// back to "no folder", which would misrepresent what the block is set to.
+	const hasSelection = folderId !== undefined && folderId !== null;
+	const isMissing =
+		hasSelection &&
+		!! folders &&
+		! folders.some( ( folder ) => folder.id === folderId );
+
+	return (
+		<>
+			<SelectControl
+				label={ label }
+				value={ hasSelection ? String( folderId ) : '' }
+				options={
+					isMissing
+						? [
+								...options,
+								{
+									label: __( 'Folder not found' ),
+									value: String( folderId ),
+								},
+						  ]
+						: options
+				}
+				onChange={ ( value ) =>
+					onChange( value ? Number( value ) : undefined )
+				}
+			/>
+			{ isMissing && (
+				<Notice
+					className="wp-block-gallery__source-notice"
+					status="warning"
+					isDismissible={ false }
+				>
+					{ __(
+						'The selected folder no longer exists. Choose another folder to display images.'
+					) }
+				</Notice>
+			) }
+		</>
 	);
 }
 
@@ -119,10 +218,13 @@ export function GallerySourcePanel( {
 	const {
 		dynamicContent,
 		canUseDynamicSource,
+		availableSources,
 		sourceDescriptor,
 		sourceOrderby,
 		sourceOrder,
 		setSourceOrder,
+		sourceFolderId,
+		setSourceFolderId,
 		convertToStatic,
 		enableDynamicMode,
 		resetSource,
@@ -132,16 +234,17 @@ export function GallerySourcePanel( {
 	} = dynamic;
 	const isDynamic = !! dynamicContent;
 
-	const [ isConfirming, setIsConfirming ] = useState( false );
+	// The source awaiting confirmation, set only while the dialog is open.
+	const [ sourcePendingConfirm, setSourcePendingConfirm ] = useState();
 	const [ isConfirmingDetach, setIsConfirmingDetach ] = useState( false );
 
 	// Entering dynamic mode discards any hand-added images, so confirm first
 	// when there are images to lose; otherwise switch straight away.
-	function requestEnableDynamicMode() {
+	function requestEnableDynamicMode( source ) {
 		if ( hasImages ) {
-			setIsConfirming( true );
+			setSourcePendingConfirm( source );
 		} else {
-			enableDynamicMode();
+			enableDynamicMode( source );
 		}
 	}
 
@@ -170,6 +273,14 @@ export function GallerySourcePanel( {
 						>
 							{ __( 'Detach Gallery' ) }
 						</Button>
+						{ dynamicContent.source === MEDIA_FOLDER && (
+							<FolderControl
+								folderId={ sourceFolderId }
+								onChange={ setSourceFolderId }
+								label={ sourceDescriptor.selectFolderLabel }
+								noneLabel={ sourceDescriptor.noFolderMessage }
+							/>
+						) }
 					</div>
 					{ hasMoreImagesThanCap && (
 						<Notice
@@ -228,37 +339,45 @@ export function GallerySourcePanel( {
 		return null;
 	}
 
+	const pendingDescriptor = sourcePendingConfirm
+		? getDynamicSource( sourcePendingConfirm )
+		: undefined;
+
 	return (
 		<>
 			<PanelBody title={ __( 'Source' ) }>
 				<div className="wp-block-gallery__source-settings">
 					{ /*
-					 * Hardcoded on purpose: this single-source entry button (and
-					 * its confirm dialog below) is temporary. Once more sources
-					 * exist it becomes a "Choose source" select whose options read
-					 * from each source descriptor's `title`, with help text
-					 * carrying the per-source explanation this string does today.
+					 * One entry button per available source, each labelled with
+					 * that source's own `title`. A list rather than a select:
+					 * choosing a source is a one-way change that replaces the
+					 * gallery's contents, so it reads better as an action than as
+					 * a setting, and it keeps the confirmation attached to the
+					 * thing being confirmed.
 					 */ }
-					<Button
-						__next40pxDefaultSize
-						variant="secondary"
-						onClick={ requestEnableDynamicMode }
-					>
-						{ __( 'Use images attached to the post' ) }
-					</Button>
+					{ availableSources.map( ( [ source, descriptor ] ) => (
+						<Button
+							key={ source }
+							__next40pxDefaultSize
+							variant="secondary"
+							onClick={ () => requestEnableDynamicMode( source ) }
+						>
+							{ descriptor.title }
+						</Button>
+					) ) }
 				</div>
 			</PanelBody>
-			{ isConfirming && (
+			{ pendingDescriptor && (
 				<ConfirmDialog
 					isOpen
-					title={ __( 'Use images attached to the post?' ) }
+					title={ pendingDescriptor.title }
 					__experimentalHideHeader={ false }
-					confirmButtonText={ __( 'Use attached images' ) }
+					confirmButtonText={ __( 'Replace images' ) }
 					onConfirm={ () => {
-						enableDynamicMode();
-						setIsConfirming( false );
+						enableDynamicMode( sourcePendingConfirm );
+						setSourcePendingConfirm( undefined );
 					} }
-					onCancel={ () => setIsConfirming( false ) }
+					onCancel={ () => setSourcePendingConfirm( undefined ) }
 					size="medium"
 				>
 					{ __(
@@ -337,12 +456,19 @@ export function GalleryDynamicView( {
 	multiGallerySelection,
 } ) {
 	const {
+		dynamicContent,
 		sourceDescriptor,
+		sourceFolderId,
 		dynamicImageBlocks,
 		galleryContext,
 		isResolvingDynamic,
 		convertToStatic,
 	} = dynamic;
+
+	// A folder gallery with no folder chosen yet isn't "empty" so much as
+	// unconfigured, so it says what to do rather than what will appear.
+	const needsFolder =
+		dynamicContent?.source === MEDIA_FOLDER && ! sourceFolderId;
 
 	// Detaching the gallery materializes editable inner blocks, which is a
 	// structural change. Only offer it when the block is fully editable:
@@ -358,10 +484,16 @@ export function GalleryDynamicView( {
 	// post with no matching images and a template with no post in context yet —
 	// in either case the source simply resolves to nothing right now. The per-
 	// source wording comes from the source descriptor.
-	const emptyInstructions = isResolvingDynamic
-		? __( 'Loading images…' )
-		: sourceDescriptor?.emptyMessage ??
-		  __( 'Dynamic images will appear here.' );
+	let emptyInstructions;
+	if ( needsFolder ) {
+		emptyInstructions = sourceDescriptor.noFolderMessage;
+	} else if ( isResolvingDynamic ) {
+		emptyInstructions = __( 'Loading images…' );
+	} else {
+		emptyInstructions =
+			sourceDescriptor?.emptyMessage ??
+			__( 'Dynamic images will appear here.' );
+	}
 
 	return (
 		<>

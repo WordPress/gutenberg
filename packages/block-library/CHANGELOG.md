@@ -15,6 +15,7 @@
 
 ### Enhancements
 
+-   Gallery: Add a media folder source to dynamic mode, so a gallery can display the images in a folder rather than the images attached to the post. The Source panel now offers a choice of sources. Behind the `gutenberg-media-folders` experiment.
 -   Playlist Track: Use a dedicated icon for the block toolbar. ([#80959](https://github.com/WordPress/gutenberg/pull/80959))
 -   Playlist: Expose the parent "Add track" toolbar control to selected Playlist Track child blocks via block toolbar sharing ([#80368](https://github.com/WordPress/gutenberg/pull/80368)).
 -   Playlist: Allow selecting audio tracks individually in the Media Library without holding Shift or Command, transform multiple Audio blocks into a Playlist, and transform a one-track Playlist into Audio. ([#80926](https://github.com/WordPress/gutenberg/pull/80926))

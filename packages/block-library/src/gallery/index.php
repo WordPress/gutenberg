@@ -113,6 +113,34 @@ function block_core_gallery_resolve_dynamic_source( $source, $block ) {
 	$source_name = $source['source'] ?? null;
 	$args        = isset( $source['args'] ) && is_array( $source['args'] ) ? $source['args'] : array();
 
+	// Query arguments shared by every source. Map the camelCase `args`
+	// (block-attribute convention) to WP_Query names, defaulting to the same
+	// order as the editor preview (see `dynamic-source.js`). Only REST-supported
+	// orderby values are allowed; `menu_order` is intentionally unsupported (it
+	// isn't a valid media REST `orderby`).
+	$orderby = $args['orderBy'] ?? 'date';
+	if ( ! in_array( $orderby, array( 'date', 'title' ), true ) ) {
+		$orderby = 'date';
+	}
+	$order = strtoupper( $args['order'] ?? 'desc' ) === 'ASC' ? 'ASC' : 'DESC';
+
+	// Bound the number of resolved images until the gallery supports
+	// pagination. Kept in sync with the editor query's `per_page` cap; a
+	// case-insensitive grep for `max_images` finds both this and
+	// `MAX_IMAGES` in `dynamic-source.js`.
+	$max_images = 100;
+
+	$base_query_args = array(
+		'post_type'      => 'attachment',
+		'post_status'    => 'inherit',
+		'post_mime_type' => 'image',
+		'orderby'        => $orderby,
+		'order'          => $order,
+		'posts_per_page' => $max_images,
+		'fields'         => 'ids',
+		'no_found_rows'  => true,
+	);
+
 	switch ( $source_name ) {
 		case 'core/attached-media':
 			// Prefer the post supplied via block context, falling back to the post
@@ -125,34 +153,42 @@ function block_core_gallery_resolve_dynamic_source( $source, $block ) {
 				return array();
 			}
 
-			// Map the camelCase `args` (block-attribute convention) to WP_Query
-			// names, defaulting to the same order as the editor preview (see
-			// `dynamic-source.js`). Only REST-supported orderby values are
-			// allowed; `menu_order` is intentionally unsupported (it isn't a
-			// valid media REST `orderby`).
-			$orderby = $args['orderBy'] ?? 'date';
-			if ( ! in_array( $orderby, array( 'date', 'title' ), true ) ) {
-				$orderby = 'date';
-			}
-			$order = strtoupper( $args['order'] ?? 'desc' ) === 'ASC' ? 'ASC' : 'DESC';
+			$query = new WP_Query(
+				array_merge(
+					$base_query_args,
+					array( 'post_parent' => $post_id )
+				)
+			);
 
-			// Bound the number of resolved images until the gallery supports
-			// pagination. Kept in sync with the editor query's `per_page` cap; a
-			// case-insensitive grep for `max_images` finds both this and
-			// `MAX_IMAGES` in `dynamic-source.js`.
-			$max_images = 100;
+			return array_map( 'intval', $query->posts );
+
+		case 'core/media-folder':
+			$folder_id = isset( $args['folderId'] ) ? (int) $args['folderId'] : 0;
+
+			// No folder chosen, or the media folders experiment is off so the
+			// taxonomy doesn't exist. Either way there is nothing to resolve, so
+			// bail before running a query that can only come back empty.
+			if ( $folder_id <= 0 || ! taxonomy_exists( 'wp_media_folder' ) ) {
+				return array();
+			}
 
 			$query = new WP_Query(
-				array(
-					'post_parent'    => $post_id,
-					'post_type'      => 'attachment',
-					'post_status'    => 'inherit',
-					'post_mime_type' => 'image',
-					'orderby'        => $orderby,
-					'order'          => $order,
-					'posts_per_page' => $max_images,
-					'fields'         => 'ids',
-					'no_found_rows'  => true,
+				array_merge(
+					$base_query_args,
+					array(
+						'tax_query' => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+							array(
+								'taxonomy'         => 'wp_media_folder',
+								'field'            => 'term_id',
+								'terms'            => array( $folder_id ),
+								// Folders are registered hierarchical, but the
+								// editor only creates a flat list and shows a
+								// folder's own images — so the frontend matches
+								// that rather than rolling up descendants.
+								'include_children' => false,
+							),
+						),
+					)
 				)
 			);
 

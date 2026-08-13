@@ -5,7 +5,7 @@
  * In the future we could consider creating an Openvese package that can be used in both `editor` and `site-editor`.
  * The rest of the settings would still need to be in sync though.
  */
-import { __, sprintf, _x } from '@wordpress/i18n';
+import { __, _n, sprintf, _x } from '@wordpress/i18n';
 import { dispatch, resolveSelect, select, subscribe } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
@@ -265,6 +265,70 @@ const createCoreMediaCategory = ( { getQuery, ...category } ) => ( {
 } );
 
 /**
+ * Copy for the "Attached images" source's attach/detach affordances. The shared
+ * panel in `block-editor` renders whatever copy the source supplies, so the
+ * post-type-specific wording is built here, where the post type is known.
+ *
+ * @param {string|null} [typeLabel] The post type's singular label (e.g. "Page"),
+ *                                  or null to fall back to the generic "post".
+ * @return {Object} The source's `attachCopy`.
+ */
+const getAttachedImagesCopy = ( typeLabel ) => ( {
+	attachButton: __( 'Attach images' ),
+	attachedNotice: ( count ) =>
+		typeLabel
+			? sprintf(
+					/* translators: %1$d: Number of images attached. %2$s: Name of the post type e.g: "Page". */
+					_n(
+						'%1$d image attached to %2$s.',
+						'%1$d images attached to %2$s.',
+						count
+					),
+					count,
+					typeLabel
+			  )
+			: sprintf(
+					/* translators: %d: Number of images attached to the post. */
+					_n(
+						'%d image attached to post.',
+						'%d images attached to post.',
+						count
+					),
+					count
+			  ),
+	noneAttachedNotice: __( 'No images were attached.' ),
+	attachErrorNotice: __( 'Could not attach images.' ),
+	detachAction: typeLabel
+		? sprintf(
+				/* translators: %s: Name of the post type e.g: "Page". */
+				__( 'Detach from %s' ),
+				typeLabel
+		  )
+		: __( 'Detach from post' ),
+	detachModalTitle: __( 'Detach image' ),
+	detachModalBody: typeLabel
+		? sprintf(
+				/* translators: %s: Name of the post type e.g: "Page". */
+				__(
+					'Detach this image from the current %s? The image will remain in the Media Library.'
+				),
+				typeLabel
+		  )
+		: __(
+				'Detach this image from the current post? The image will remain in the Media Library.'
+		  ),
+	detachConfirmButton: __( 'Detach' ),
+	detachedNotice: typeLabel
+		? sprintf(
+				/* translators: %s: Name of the post type e.g: "Page". */
+				__( 'Image detached from %s.' ),
+				typeLabel
+		  )
+		: __( 'Image detached from post.' ),
+	detachErrorNotice: __( 'Could not detach image.' ),
+} );
+
+/**
  * Builds the "Attachments" media category for a given post. It behaves like
  * any other inserter media source (e.g. Openverse): it appears in the tab list
  * and renders through the shared media panel. In addition to `fetch`, it exposes
@@ -288,9 +352,7 @@ const getAttachedImagesCategory = ( postId, typeLabel ) =>
 		},
 		mediaType: 'image',
 		getQuery: ( query ) => getAttachedImagesQuery( postId, query ),
-		// The post type's singular label (e.g. "Page"), threaded through so the
-		// shared panel can word its attach/detach copy for the current post type.
-		postTypeLabel: typeLabel,
+		attachCopy: getAttachedImagesCopy( typeLabel ),
 		// Empty-state message. Providing this also keeps the source in the tab
 		// list when it has no items, so it stays discoverable and the first
 		// image can be attached even with none yet.
@@ -319,6 +381,169 @@ const getAttachedImagesCategory = ( postId, typeLabel ) =>
 			invalidateAttachedImagesQueries( postId, query );
 		},
 	} );
+
+/**
+ * The media folders taxonomy's REST base. It names both the `/wp/v2/media`
+ * collection parameter used to filter attachments by folder and the field on an
+ * attachment record holding its folder ids — `WP_REST_Posts_Controller` derives
+ * both from `rest_base`, so the hyphenated form is correct in a REST context
+ * even though the taxonomy itself is `wp_media_folder`.
+ */
+const MEDIA_FOLDER_REST_BASE = 'media-folders';
+
+const getMediaFolderQuery = ( folderId, query = {} ) => ( {
+	...query,
+	media_type: 'image',
+	[ MEDIA_FOLDER_REST_BASE ]: [ folderId ],
+} );
+
+/**
+ * Reads an attachment's current folder ids straight from the REST record.
+ *
+ * Folder assignment is many-to-many, and saving the taxonomy field *replaces*
+ * the whole set — so adding or removing one folder means reading the current set
+ * first and writing the union/difference. The record is read here rather than
+ * taken from the caller's media item because selections coming from the media
+ * picker are not guaranteed to carry the taxonomy field.
+ *
+ * @param {number} attachmentId The attachment id.
+ * @return {Promise<number[]>} The attachment's current folder ids.
+ */
+const getAttachmentFolderIds = async ( attachmentId ) => {
+	const record = await resolveSelect( coreStore ).getEntityRecord(
+		'postType',
+		'attachment',
+		attachmentId
+	);
+	const folderIds = record?.[ MEDIA_FOLDER_REST_BASE ];
+	return Array.isArray( folderIds ) ? folderIds : [];
+};
+
+const saveAttachmentFolderIds = ( attachmentId, folderIds ) =>
+	// `throwOnError` so a failed REST write rejects rather than being silently
+	// swallowed, letting the panel surface an error notice (see
+	// `saveAttachmentParent`).
+	dispatch( coreStore ).saveEntityRecord(
+		'postType',
+		'attachment',
+		{
+			id: attachmentId,
+			[ MEDIA_FOLDER_REST_BASE ]: folderIds,
+		},
+		{ throwOnError: true }
+	);
+
+/**
+ * Copy for a folder source's attach/detach affordances, worded around the
+ * folder's own name. Mirrors `getAttachedImagesCopy`.
+ *
+ * @param {string} folderName The folder's (decoded) name.
+ * @return {Object} The source's `attachCopy`.
+ */
+const getMediaFolderCopy = ( folderName ) => ( {
+	attachButton: __( 'Add images to folder' ),
+	attachedNotice: ( count ) =>
+		sprintf(
+			/* translators: %1$d: Number of images added. %2$s: Name of the folder. */
+			_n(
+				'%1$d image added to %2$s.',
+				'%1$d images added to %2$s.',
+				count
+			),
+			count,
+			folderName
+		),
+	noneAttachedNotice: __( 'No images were added.' ),
+	attachErrorNotice: __( 'Could not add images to the folder.' ),
+	detachAction: __( 'Remove from folder' ),
+	detachModalTitle: __( 'Remove image from folder' ),
+	detachModalBody: sprintf(
+		/* translators: %s: Name of the folder. */
+		__(
+			'Remove this image from %s? The image will remain in the Media Library.'
+		),
+		folderName
+	),
+	detachConfirmButton: __( 'Remove' ),
+	detachedNotice: sprintf(
+		/* translators: %s: Name of the folder. */
+		__( 'Image removed from %s.' ),
+		folderName
+	),
+	detachErrorNotice: __( 'Could not remove image from the folder.' ),
+} );
+
+/**
+ * Builds a media category for a single media folder (a `wp_media_folder` term).
+ *
+ * Structurally identical to the "Attached images" category — it renders through
+ * the same shared panel, gets pagination for free from `coreMediaFetch`, and
+ * exposes the same `attach`/`detach`/`invalidate`/`subscribe` capabilities — but
+ * membership is a taxonomy term rather than the attachment's parent post. That
+ * means a folder is not tied to the edited post, so these categories are offered
+ * everywhere the media tab appears.
+ *
+ * @param {Object} term The folder term record from `/wp/v2/media-folders`.
+ * @return {InserterMediaCategory} The folder's media category.
+ */
+const getMediaFolderCategory = ( term ) => {
+	const folderId = term.id;
+	const folderName = decodeEntities( term.name );
+
+	return createCoreMediaCategory( {
+		// Namespaced so a folder can never collide with a built-in source name.
+		name: `media-folder-${ folderId }`,
+		labels: {
+			name: folderName,
+			search_items: __( 'Search images' ),
+		},
+		mediaType: 'image',
+		getQuery: ( query ) => getMediaFolderQuery( folderId, query ),
+		folderId,
+		attachCopy: getMediaFolderCopy( folderName ),
+		// As with "Attached images", this both supplies the empty-state copy and
+		// keeps the folder in the tab list while it is empty — which is what
+		// makes a brand new folder reachable so images can be added to it.
+		emptyMessage: __( 'No images in this folder.' ),
+		async attach( mediaItems ) {
+			const attachmentIds = getImageAttachmentIds( mediaItems );
+
+			await Promise.all(
+				attachmentIds.map( async ( attachmentId ) => {
+					const folderIds =
+						await getAttachmentFolderIds( attachmentId );
+					// Already in this folder: skip the write rather than
+					// re-saving an unchanged set. The image still counts toward
+					// the notice below, which reports what the selection put in
+					// the folder, not how many rows changed.
+					if ( folderIds.includes( folderId ) ) {
+						return;
+					}
+					await saveAttachmentFolderIds( attachmentId, [
+						...folderIds,
+						folderId,
+					] );
+				} )
+			);
+
+			return attachmentIds.length;
+		},
+		async detach( mediaItem ) {
+			const folderIds = await getAttachmentFolderIds( mediaItem.id );
+			await saveAttachmentFolderIds(
+				mediaItem.id,
+				folderIds.filter( ( id ) => id !== folderId )
+			);
+		},
+		invalidate( query = {} ) {
+			dispatch( coreStore ).invalidateResolution( 'getEntityRecords', [
+				'postType',
+				'attachment',
+				getCoreMediaQuery( getMediaFolderQuery( folderId, query ) ),
+			] );
+		},
+	} );
+};
 
 /** @type {InserterMediaCategory[]} */
 const inserterMediaCategories = [
@@ -412,14 +637,24 @@ const inserterMediaCategories = [
  * navigation menus and templates, which aren't the entity that actually gets
  * rendered, so attaching media to them is meaningless.
  *
+ * Media folders, in contrast, aren't tied to the edited entity, so a category is
+ * appended for each folder regardless of what is being edited. The list is empty
+ * unless the media folders experiment is on (the taxonomy is only registered
+ * then, so it resolves to nothing).
+ *
  * @param {number|string} postId                  The current post id.
  * @param {string}        [viewablePostTypeLabel] Singular label of the post type, set only when it is front-end viewable (post, page, public CPT).
+ * @param {Object[]}      [mediaFolders]          The `wp_media_folder` term records.
  * @return {InserterMediaCategory[]} The inserter media categories.
  */
 export default function getInserterMediaCategories(
 	postId,
-	viewablePostTypeLabel
+	viewablePostTypeLabel,
+	mediaFolders
 ) {
+	const folderCategories = ( mediaFolders ?? [] ).map(
+		getMediaFolderCategory
+	);
 	const currentPostId = normalizePostId( postId );
 
 	// A falsy label means either a non-viewable post type (synced pattern,
@@ -427,11 +662,12 @@ export default function getInserterMediaCategories(
 	// cases the category is omitted. A numeric id is also required since it
 	// backs the attachment `parent` query.
 	if ( ! currentPostId || ! viewablePostTypeLabel ) {
-		return inserterMediaCategories;
+		return [ ...inserterMediaCategories, ...folderCategories ];
 	}
 
 	return [
 		getAttachedImagesCategory( currentPostId, viewablePostTypeLabel ),
 		...inserterMediaCategories,
+		...folderCategories,
 	];
 }

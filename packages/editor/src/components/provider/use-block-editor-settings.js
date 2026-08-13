@@ -30,6 +30,81 @@ const { store: mediaEditorStore } = unlock( mediaEditorPrivateApis );
 
 const EMPTY_OBJECT = {};
 
+/**
+ * Every folder, alphabetically. Folders are a small, hand-curated set, so they
+ * are fetched in one page rather than paginated, and empty ones are kept: a new
+ * folder has to be listed in the inserter before anything can be put in it.
+ */
+const MEDIA_FOLDERS_QUERY = {
+	per_page: -1,
+	hide_empty: false,
+	orderby: 'name',
+	order: 'asc',
+};
+
+/**
+ * The `wp_media_folder` terms backing the inserter's folder media categories.
+ *
+ * Returns `undefined` when the media folders experiment is off — the taxonomy
+ * isn't registered then, so nothing is requested and the inserter is unchanged.
+ *
+ * @return {Object[]|undefined} The folder term records, or `undefined`.
+ */
+function useMediaFolders() {
+	return useSelect(
+		( select ) =>
+			window.__experimentalMediaFolders
+				? select( coreStore ).getEntityRecords(
+						'taxonomy',
+						'wp_media_folder',
+						MEDIA_FOLDERS_QUERY
+				  )
+				: undefined,
+		[]
+	);
+}
+
+/**
+ * The folder-creation capability handed to the inserter's "Add folder" button.
+ *
+ * `block-editor` is WordPress-agnostic and can't write a taxonomy term itself,
+ * so the capability is injected as a setting from here. `undefined` when the
+ * experiment is off, which is what hides the button.
+ *
+ * @return {?{canCreate: boolean, create: Function}} The media folders capability.
+ */
+function useInserterMediaFolders() {
+	const canCreateMediaFolders = useSelect(
+		( select ) =>
+			window.__experimentalMediaFolders
+				? select( coreStore ).canUser( 'create', {
+						kind: 'taxonomy',
+						name: 'wp_media_folder',
+				  } )
+				: false,
+		[]
+	);
+	const { saveEntityRecord } = useDispatch( coreStore );
+
+	return useMemo( () => {
+		if ( ! window.__experimentalMediaFolders ) {
+			return undefined;
+		}
+		return {
+			canCreate: !! canCreateMediaFolders,
+			// `throwOnError` so a rejected write (e.g. a duplicate name) reaches
+			// the caller and can be reported, rather than failing silently.
+			create: ( name ) =>
+				saveEntityRecord(
+					'taxonomy',
+					'wp_media_folder',
+					{ name },
+					{ throwOnError: true }
+				),
+		};
+	}, [ canCreateMediaFolders, saveEntityRecord ] );
+}
+
 function __experimentalReusableBlocksSelect( select ) {
 	const { RECEIVE_INTERMEDIATE_RESULTS } = unlock( coreDataPrivateApis );
 	const { getEntityRecords } = select( coreStore );
@@ -348,12 +423,20 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	const forceDisableFocusMode = settings.focusMode === false;
 
 	// The "Attachments" media category depends on the edited post and its post
-	// type label (which gates whether it's offered and words its copy), so the
-	// categories are derived rather than being a static list.
+	// type label (which gates whether it's offered and words its copy), and one
+	// category is derived per media folder, so the categories are derived rather
+	// than being a static list. Re-deriving when the folders resolve is what
+	// makes a newly created folder appear in the tab list.
+	const mediaFolders = useMediaFolders();
+	const inserterMediaFolders = useInserterMediaFolders();
 	const inserterMediaCategories = useMemo(
 		() =>
-			getInserterMediaCategories( currentPostId, viewablePostTypeLabel ),
-		[ currentPostId, viewablePostTypeLabel ]
+			getInserterMediaCategories(
+				currentPostId,
+				viewablePostTypeLabel,
+				mediaFolders
+			),
+		[ currentPostId, viewablePostTypeLabel, mediaFolders ]
 	);
 
 	return useMemo( () => {
@@ -413,6 +496,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
 			inserterMediaCategories,
+			inserterMediaFolders,
 			__experimentalFetchRichUrlData: fetchUrlData,
 			// Todo: This only checks the top level post, not the post within a template or any other entity that can be edited.
 			// This might be better as a generic "canUser" selector.
@@ -476,6 +560,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		blockPatterns,
 		blockPatternCategories,
 		inserterMediaCategories,
+		inserterMediaFolders,
 		canUseUnfilteredHTML,
 		undo,
 		createPageEntity,

@@ -14,6 +14,8 @@
 
 ### Enhancements
 
+-   Inserter: Support media folders in the Media tab — folders are listed as media categories with an "Add images to folder" action, an "Add folder" button creates one, and attach/detach copy now travels with each media category instead of being hardcoded to the attached-images wording. Behind the `gutenberg-media-folders` experiment.
+-   Inserter: Skip the media category visibility probe for categories that supply an `emptyMessage`, since they are listed regardless of the result.
 -   Creating a new block next to a sibling of the same type now inherits the sibling's attributes consistently, whether it is created by the appender, the inserter, or Enter at the edge of the text. Everything except the sibling's content (attributes with the `content` role) and its `metadata` is copied. The `attributesToCopy` list of a default block is removed: the copied attributes derive from the block's attribute roles.
 
 ### Enhancements
