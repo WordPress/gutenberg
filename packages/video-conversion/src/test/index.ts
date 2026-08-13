@@ -217,8 +217,6 @@ jest.mock( 'mediabunny', () => ( {
 	},
 	QUALITY_HIGH: 'quality-high',
 	canEncodeVideo: ( ...args: unknown[] ) => mockCanEncodeVideo( ...args ),
-	normalizeRotation: ( rotation: number ) =>
-		( ( ( rotation % 360 ) + 360 ) % 360 ) as 0 | 90 | 180 | 270,
 } ) );
 
 beforeEach( () => {

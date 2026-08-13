@@ -1218,6 +1218,75 @@ function readBoxAt( r: Reader, offset: number ): BoxInfo | null {
 }
 
 /**
+ * ISOBMFF brands that identify a file as an image sequence rather than a
+ * single still image. `msf1` is the generic HEIF sequence brand (Apple Live
+ * Photos, Android bursts); `hevs`/`hevm` are its HEVC-specific variants.
+ */
+const SEQUENCE_BRANDS = [ 'msf1', 'hevs', 'hevm' ];
+
+/**
+ * Whether an ISOBMFF file is a HEIC/HEIF image *sequence* rather than a
+ * single still image.
+ *
+ * The file extension and reported MIME type cannot be trusted here: exported
+ * Live Photos routinely arrive as `.heic` with an `image/heic` type even
+ * though they carry a movie track and no still item at all. So sniff the
+ * container instead — first the `ftyp` brands, then, for files that declare
+ * only generic brands, the structure itself (a sample-table track with no
+ * primary still item).
+ *
+ * @param buffer Raw file contents.
+ * @return Whether the file is an image sequence.
+ */
+export function isHeicSequence( buffer: ArrayBuffer ): boolean {
+	try {
+		const r = new Reader( buffer );
+		const fileEnd = buffer.byteLength;
+
+		const ftyp = findBox( r, 0, fileEnd, 'ftyp' );
+		if ( ftyp ) {
+			// major_brand (4), minor_version (4), then compatible_brands[].
+			r.pos = ftyp.offset + ftyp.headerSize;
+			const brands: string[] = [ r.str( 4 ) ];
+			r.pos += 4; // minor_version
+			const brandsEnd = ftyp.offset + ftyp.size;
+			while ( r.pos + 4 <= brandsEnd ) {
+				brands.push( r.str( 4 ) );
+			}
+			if (
+				brands.some( ( brand ) => SEQUENCE_BRANDS.includes( brand ) )
+			) {
+				return true;
+			}
+		}
+
+		/*
+		 * No sequence brand declared. A file that nonetheless has a decodable
+		 * sample-table track and no primary still item can only be played as a
+		 * sequence, so treat it as one; anything with a `pitm` is a still (or a
+		 * still with an auxiliary track) and belongs on the still path.
+		 */
+		const moovBox = findBox( r, 0, fileEnd, 'moov' );
+		if ( ! moovBox || ! findSequenceStbl( r, moovBox ) ) {
+			return false;
+		}
+		const metaBox = findBox( r, 0, fileEnd, 'meta' );
+		if ( ! metaBox ) {
+			return true;
+		}
+		return ! findBox(
+			r,
+			metaBox.offset + metaBox.headerSize + 4,
+			metaBox.offset + metaBox.size,
+			'pitm'
+		);
+	} catch {
+		// A file we cannot even walk is not a sequence we can convert.
+		return false;
+	}
+}
+
+/**
  * Parse a HEIC/HEIF image sequence (msf1 brand — Apple Live Photo HEVC
  * sequences, Android bursts) and extract the temporal HEVC frames.
  *

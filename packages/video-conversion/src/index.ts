@@ -7,7 +7,7 @@ import {
 	VideoSample,
 	QUALITY_HIGH,
 	canEncodeVideo,
-	normalizeRotation,
+	type Rotation,
 } from 'mediabunny';
 import type { HeicSequenceInput, ItemId } from './types';
 
@@ -88,6 +88,17 @@ function padToEven( value: number ): number {
 }
 
 /**
+ * Snaps an arbitrary angle to the four rotations an encoder can apply.
+ *
+ * @param degrees Clockwise angle in degrees.
+ * @return Equivalent right-angle rotation.
+ */
+function toRightAngle( degrees: number ): Rotation {
+	const wrapped = ( ( Math.round( degrees / 90 ) * 90 ) % 360 ) + 360;
+	return ( wrapped % 360 ) as Rotation;
+}
+
+/**
  * A frame to encode plus its display duration (microseconds).
  */
 interface SourceFrame {
@@ -140,7 +151,7 @@ async function encodeFramesToVideo(
 	 * upright, so a player that ignored the metadata would show a poster and a
 	 * video at odds with each other.
 	 */
-	const rotate = normalizeRotation( rotation ?? 0 );
+	const rotate = toRightAngle( rotation ?? 0 );
 
 	const source = new VideoSampleSource( {
 		codec,

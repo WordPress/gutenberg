@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import {
 	parseHeic,
 	parseHeicSequence,
+	isHeicSequence,
 	reverseBits32,
 	parseExifOrientation,
 	getUnappliedExifOrientation,
@@ -790,6 +791,45 @@ describe( 'parseHeicSequence', () => {
 		expect( () => parseHeicSequence( meta.buffer ) ).toThrow(
 			'No moov box'
 		);
+	} );
+
+	it( 'reports the first sync sample, which becomes the still image', () => {
+		const seq = parseHeicSequence( buffer );
+		const firstSync = seq.samples.findIndex( ( s ) => s.isSync );
+
+		expect( firstSync ).toBe( 0 );
+		expect( seq.samples[ firstSync ].data.length ).toBeGreaterThan( 0 );
+	} );
+} );
+
+describe( 'isHeicSequence', () => {
+	const sequenceBuffer = readFileSync(
+		join( __dirname, 'fixtures', 'msf1.heic' )
+	).buffer;
+
+	it( 'detects a real image sequence despite its .heic extension', () => {
+		expect( isHeicSequence( sequenceBuffer ) ).toBe( true );
+	} );
+
+	it( 'rejects a still HEIC that declares a primary item', () => {
+		const hdlr = buildHdlr();
+		const pitm = buildPitm( 1 );
+		const iloc = buildIloc( [ [ 1, [ [ 0, 4 ] ] ] ] );
+		const meta = buildFullBox( 'meta', 0, 0, concat( hdlr, pitm, iloc ) );
+
+		expect( isHeicSequence( meta.buffer ) ).toBe( false );
+	} );
+
+	it( 'rejects a buffer that is not ISOBMFF at all', () => {
+		const junk = new Uint8Array( [ 1, 2, 3, 4, 5, 6, 7, 8 ] );
+
+		expect( isHeicSequence( junk.buffer ) ).toBe( false );
+	} );
+
+	it( 'rejects a truncated file rather than throwing', () => {
+		const truncated = sequenceBuffer.slice( 0, 12 );
+
+		expect( isHeicSequence( truncated ) ).toBe( false );
 	} );
 } );
 

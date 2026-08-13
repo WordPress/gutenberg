@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Convert HEIC/HEIF image sequences (Apple Live Photos, Android bursts — `image/heic-sequence`, `image/heif-sequence`) to a web-safe video (MP4/WebM) client-side before upload. The temporal HEVC frames are demuxed and decoded with WebCodecs, then re-encoded via `@wordpress/video-conversion`. Falls back to uploading the original file when WebCodecs is unavailable ([#79642](https://github.com/WordPress/gutenberg/issues/79642)).
+-   Support HEIC/HEIF image sequences (Apple Live Photos, Android bursts). The sequence's first frame is decoded to a JPEG and uploaded as the attachment, and its motion is re-encoded to a web-safe video (MP4/WebM) sideloaded as an `animated_video` companion — the same model animated GIFs use. Sequences are detected by sniffing the container, since exported Live Photos routinely arrive typed as ordinary `image/heic` stills. Falls back to uploading the original untouched when the platform cannot decode HEVC ([#79642](https://github.com/WordPress/gutenberg/issues/79642)).
 
 ## 0.38.0 (2026-08-12)
 

@@ -1,5 +1,6 @@
 import {
 	type BatchId,
+	isVideoProcessingOperation,
 	OperationType,
 	type QueueItem,
 	type QueueItemId,
@@ -123,16 +124,16 @@ export function getActiveImageProcessingCount( state: State ): number {
 /**
  * Returns the number of items currently performing video processing operations.
  *
- * This counts items whose current operation is TranscodeGif,
- * used to enforce the video processing concurrency limit (1 at a time).
+ * This counts items whose current operation encodes video, used to enforce the
+ * video processing concurrency limit (1 at a time).
  *
  * @param state Upload state.
  *
  * @return Number of items currently processing video.
  */
 export function getActiveVideoProcessingCount( state: State ): number {
-	return state.queue.filter(
-		( item ) => item.currentOperation === OperationType.TranscodeGif
+	return state.queue.filter( ( item ) =>
+		isVideoProcessingOperation( item.currentOperation )
 	).length;
 }
 
@@ -159,8 +160,8 @@ export function getPendingImageProcessing( state: State ): QueueItem[] {
 }
 
 /**
- * Returns items waiting for video processing (next operation is TranscodeGif
- * but not yet started).
+ * Returns items waiting for video processing (next operation encodes video but
+ * has not yet started).
  *
  * @param state Upload state.
  *
@@ -172,8 +173,8 @@ export function getPendingVideoProcessing( state: State ): QueueItem[] {
 			? item.operations[ 0 ][ 0 ]
 			: item.operations?.[ 0 ];
 		return (
-			nextOperation === OperationType.TranscodeGif &&
-			item.currentOperation !== OperationType.TranscodeGif
+			isVideoProcessingOperation( nextOperation ) &&
+			! isVideoProcessingOperation( item.currentOperation )
 		);
 	} );
 }
