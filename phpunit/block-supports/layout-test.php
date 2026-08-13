@@ -1474,27 +1474,86 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that non-numeric columnCount and rowCount, and a non-string minimumColumnWidth,
-	 * fall back to the responsive default instead of leaking into the CSS.
+	 * Tests that non-numeric grid counts and a non-string minimumColumnWidth are treated as
+	 * absent instead of leaking into the CSS. Each case leaves the other attributes valid so
+	 * that the branch the guard protects is actually reached.
+	 *
+	 * @dataProvider data_gutenberg_get_layout_style_with_non_numeric_grid_values
 	 *
 	 * @covers ::gutenberg_get_layout_style
+	 *
+	 * @param array  $layout          Grid layout values.
+	 * @param string $expected_output The expected output.
 	 */
-	public function test_gutenberg_get_layout_style_with_non_numeric_grid_counts() {
-		$layout_styles = gutenberg_get_layout_style(
-			'.wp-layout',
+	public function test_gutenberg_get_layout_style_with_non_numeric_grid_values( $layout, $expected_output ) {
+		$this->assertSame( $expected_output, gutenberg_get_layout_style( '.wp-layout', $layout ) );
+	}
+
+	/**
+	 * Data provider for test_gutenberg_get_layout_style_with_non_numeric_grid_values().
+	 *
+	 * @return array
+	 */
+	public function data_gutenberg_get_layout_style_with_non_numeric_grid_values() {
+		return array(
+			'every value unusable falls back to the responsive default' => array(
+				'layout'          => array(
+					'type'               => 'grid',
+					'columnCount'        => array( 3 ),
+					'rowCount'           => array( 2 ),
+					'minimumColumnWidth' => array( '20rem' ),
+				),
+				'expected_output' => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(min(12rem, 100%), 1fr));container-type:inline-size;}',
+			),
+			'non-string minimumColumnWidth drops the container query' => array(
+				'layout'          => array(
+					'type'               => 'grid',
+					'columnCount'        => 3,
+					'minimumColumnWidth' => array( '20rem' ),
+				),
+				'expected_output' => '.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));}',
+			),
+			'non-numeric rowCount drops the row track rule' => array(
+				'layout'          => array(
+					'type'        => 'grid',
+					'columnCount' => 3,
+					'rowCount'    => array( 2 ),
+				),
+				'expected_output' => '.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));}',
+			),
+		);
+	}
+
+	/**
+	 * Tests that a non-numeric parent columnCount is treated as absent, so a child of a
+	 * responsive grid still gets its container query.
+	 *
+	 * @covers ::gutenberg_get_child_layout_style_rules
+	 */
+	public function test_gutenberg_get_child_layout_style_rules_with_non_numeric_parent_column_count() {
+		$expected_output = array(
 			array(
-				'type'               => 'grid',
-				'columnCount'        => array( 3 ),
-				'rowCount'           => array( 2 ),
-				'minimumColumnWidth' => array( '20rem' ),
-			)
+				'selector'     => '.wp-container-content-test',
+				'declarations' => array( 'grid-column' => 'span 2' ),
+			),
+			array(
+				'rules_group'  => '@container (max-width: 25.5rem )',
+				'selector'     => '.wp-container-content-test',
+				'declarations' => array(
+					'grid-column' => '1/-1',
+					'grid-row'    => 'auto',
+				),
+			),
 		);
 
-		$this->assertSame(
-			'.wp-layout{grid-template-columns:repeat(auto-fill, minmax(min(12rem, 100%), 1fr));container-type:inline-size;}',
-			$layout_styles,
-			'Non-numeric grid counts should fall back to the responsive default.'
+		$actual_output = gutenberg_get_child_layout_style_rules(
+			'.wp-container-content-test',
+			array( 'columnSpan' => 2 ),
+			array( 'columnCount' => array( 3 ) ),
+			null
 		);
+
+		$this->assertSame( $expected_output, $actual_output );
 	}
 
 	/**
