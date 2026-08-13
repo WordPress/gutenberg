@@ -4,14 +4,6 @@
     - changed-files:
           - any-glob-to-any-file: 'packages/a11y/**'
 
-'[Package] Abilities':
-    - changed-files:
-          - any-glob-to-any-file: 'packages/abilities/**'
-
-'[Package] Admin UI':
-    - changed-files:
-          - any-glob-to-any-file: 'packages/admin-ui/**'
-
 '[Package] API fetch':
     - changed-files:
           - any-glob-to-any-file: 'packages/api-fetch/**'
@@ -27,10 +19,6 @@
 '[Package] Blob':
     - changed-files:
           - any-glob-to-any-file: 'packages/blob/**'
-
-'[Package] Boot':
-    - changed-files:
-          - any-glob-to-any-file: 'packages/boot/**'
 
 '[Package] Block editor':
     - changed-files:
@@ -84,10 +72,6 @@
     - changed-files:
           - any-glob-to-any-file: 'packages/deprecated/**'
 
-'[Package] Design System MCP':
-    - changed-files:
-          - any-glob-to-any-file: 'packages/design-system-mcp/**'
-
 '[Package] DOM ready':
     - changed-files:
           - any-glob-to-any-file: 'packages/dom-ready/**'
@@ -132,10 +116,6 @@
     - changed-files:
           - any-glob-to-any-file: 'packages/format-library/**'
 
-'[Package] Grid':
-    - changed-files:
-          - any-glob-to-any-file: 'packages/grid/**'
-
 '[Package] Hooks':
     - changed-files:
           - any-glob-to-any-file: 'packages/hooks/**'
@@ -151,10 +131,6 @@
 '[Package] Icons':
     - changed-files:
           - any-glob-to-any-file: 'packages/icons/**'
-
-'[Package] Image Cropper':
-    - changed-files:
-          - any-glob-to-any-file: 'packages/image-cropper/**'
 
 '[Package] Interactivity':
     - changed-files:
@@ -236,6 +212,10 @@
     - changed-files:
           - any-glob-to-any-file: 'packages/router/**'
 
+'[Package] Sanitize':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/sanitize/**'
+
 '[Package] Server Side Render':
     - changed-files:
           - any-glob-to-any-file: 'packages/server-side-render/**'
@@ -268,26 +248,10 @@
     - changed-files:
           - any-glob-to-any-file: 'packages/viewport/**'
 
-'[Package] Views':
-    - changed-files:
-          - any-glob-to-any-file: 'packages/views/**'
-
 '[Package] Warning':
     - changed-files:
           - any-glob-to-any-file: 'packages/warning/**'
 
-'[Package] Widget Dashboard':
-    - changed-files:
-          - any-glob-to-any-file: 'packages/widget-dashboard/**'
-
-'[Package] Widget primitives':
-    - changed-files:
-          - any-glob-to-any-file: 'packages/widget-primitives/**'
-
 '[Package] Word count':
     - changed-files:
           - any-glob-to-any-file: 'packages/wordcount/**'
-
-'[Package] wp-build':
-    - changed-files:
-          - any-glob-to-any-file: 'packages/wp-build/**'
