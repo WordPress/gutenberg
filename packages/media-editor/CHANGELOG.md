@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add a `scope` prop to `MediaEditor` so each frame can keep its own persisted details-sidebar visibility.
+
 ### Bug Fixes
 
 -   Keep initial focus on the modal dialog frame instead of moving it to the crop area once the image loads ([#81541](https://github.com/WordPress/gutenberg/pull/81541)).
