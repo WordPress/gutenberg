@@ -39,6 +39,18 @@ export interface HeicImageData {
 	outputHeight: number;
 	/** Rotation angle in degrees counter-clockwise (0, 90, 180, 270). */
 	rotation: number;
+	/**
+	 * EXIF orientation (1-8) to apply when there is no native `irot`/`imir`
+	 * transform.
+	 *
+	 * libheif applies the `irot`/`imir` boxes but ignores EXIF orientation for
+	 * HEIF-family inputs, so this captures the orientation for files that carry
+	 * it in an EXIF tag instead. It is 1 (no change) whenever a native transform
+	 * is present, so the two are never applied together. This mirrors
+	 * `getUnappliedExifOrientation` so the canvas decode path and the sub-size
+	 * generation path agree on mirror-only inputs.
+	 */
+	exifOrientation: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -694,6 +706,8 @@ export function parseHeic( buffer: ArrayBuffer ): HeicImageData {
 		outputWidth: width,
 		outputHeight: height,
 		rotation,
+		exifOrientation:
+			rotation === 0 ? getUnappliedExifOrientation( buffer ) : 1,
 	};
 }
 
@@ -833,7 +847,202 @@ function parseGridImage(
 		outputWidth,
 		outputHeight,
 		rotation,
+		exifOrientation:
+			rotation === 0 ? getUnappliedExifOrientation( buffer ) : 1,
 	};
+}
+
+// ---------------------------------------------------------------------------
+// EXIF orientation (shared by AVIF and HEIF)
+// ---------------------------------------------------------------------------
+
+/**
+ * Read the EXIF Orientation tag from a raw EXIF/TIFF payload.
+ *
+ * The payload is the body of an ISOBMFF `Exif` item: a 4-byte
+ * `exif_tiff_header_offset` followed by a TIFF block. Some encoders omit the
+ * offset prefix and start with the TIFF byte-order marker directly, so both
+ * layouts are handled.
+ *
+ * @param payload EXIF item body.
+ * @return Orientation value (1-8), or 1 when absent/unparseable.
+ */
+function readTiffOrientation( payload: Uint8Array ): number {
+	if ( payload.length < 8 ) {
+		return 1;
+	}
+	const view = new DataView(
+		payload.buffer,
+		payload.byteOffset,
+		payload.byteLength
+	);
+
+	// Locate the TIFF header. 0x4949 ('II') and 0x4D4D ('MM') are the
+	// little/big-endian byte-order markers; if the payload starts with one
+	// there is no 4-byte offset prefix.
+	let tiffStart = 0;
+	const firstWord = view.getUint16( 0 );
+	if ( firstWord !== 0x4949 && firstWord !== 0x4d4d ) {
+		tiffStart = view.getUint32( 0 ) + 4;
+	}
+	if ( tiffStart + 8 > payload.length ) {
+		return 1;
+	}
+
+	const byteOrder = view.getUint16( tiffStart );
+	let little: boolean;
+	if ( byteOrder === 0x4949 ) {
+		little = true;
+	} else if ( byteOrder === 0x4d4d ) {
+		little = false;
+	} else {
+		return 1;
+	}
+
+	// IFD0 offset is relative to the TIFF header.
+	const ifd0 = tiffStart + view.getUint32( tiffStart + 4, little );
+	if ( ifd0 + 2 > payload.length ) {
+		return 1;
+	}
+
+	const entryCount = view.getUint16( ifd0, little );
+	for ( let i = 0; i < entryCount; i++ ) {
+		const entry = ifd0 + 2 + i * 12;
+		if ( entry + 12 > payload.length ) {
+			break;
+		}
+		// Orientation tag (0x0112) is a SHORT whose value sits in the first
+		// two bytes of the 4-byte value/offset field.
+		if ( view.getUint16( entry, little ) === 0x0112 ) {
+			const value = view.getUint16( entry + 8, little );
+			return value >= 1 && value <= 8 ? value : 1;
+		}
+	}
+
+	return 1;
+}
+
+/**
+ * Locate the `meta` box and its child boxes for an ISOBMFF (HEIF/AVIF) file.
+ *
+ * @param r Binary reader.
+ * @return The meta box plus its parsed child boxes, or null if absent.
+ */
+function findMeta( r: Reader ): { box: BoxInfo; children: BoxInfo[] } | null {
+	const metaBox = findBox( r, 0, r.view.byteLength, 'meta' );
+	if ( ! metaBox ) {
+		return null;
+	}
+	// meta is a FullBox: children start after version (1) + flags (3).
+	const start = metaBox.offset + metaBox.headerSize + 4;
+	const end = metaBox.offset + metaBox.size;
+	return { box: metaBox, children: findBoxes( r, start, end ) };
+}
+
+/**
+ * Extract the EXIF orientation from an ISOBMFF (HEIF/AVIF) container.
+ *
+ * AVIF and HEIF store EXIF metadata as an `Exif` item inside the `meta` box.
+ * Neither WordPress's server-side `exif_read_data()` nor libheif applies this
+ * orientation, so it is read here for client-side rotation.
+ *
+ * @param buffer Raw file contents.
+ * @return EXIF orientation (1-8), or 1 when absent/unparseable.
+ */
+export function parseExifOrientation( buffer: ArrayBuffer ): number {
+	try {
+		const r = new Reader( buffer );
+		const meta = findMeta( r );
+		if ( ! meta ) {
+			return 1;
+		}
+
+		const iinfBox = meta.children.find( ( b ) => b.type === 'iinf' );
+		const ilocBox = meta.children.find( ( b ) => b.type === 'iloc' );
+		if ( ! iinfBox || ! ilocBox ) {
+			return 1;
+		}
+
+		const itemTypes = parseIinf( r, iinfBox );
+		let exifItemId: number | undefined;
+		for ( const [ id, type ] of itemTypes ) {
+			if ( type === 'Exif' ) {
+				exifItemId = id;
+				break;
+			}
+		}
+		if ( exifItemId === undefined ) {
+			return 1;
+		}
+
+		const loc = parseIloc( r, ilocBox ).get( exifItemId );
+		if ( ! loc || loc.extents.length === 0 ) {
+			return 1;
+		}
+
+		const idatBox = meta.children.find( ( b ) => b.type === 'idat' );
+		const idatOffset = idatBox ? idatBox.offset + idatBox.headerSize : 0;
+
+		return readTiffOrientation( readItemData( buffer, loc, idatOffset ) );
+	} catch {
+		return 1;
+	}
+}
+
+/**
+ * Whether an ISOBMFF (HEIF/AVIF) file carries a native `irot`/`imir` transform.
+ *
+ * libheif/libvips apply these on decode, so when one is present the EXIF
+ * orientation must NOT be applied again to avoid double-rotation.
+ *
+ * @param r Binary reader.
+ * @return True if an `irot` or `imir` property box is present.
+ */
+function hasNativeTransform( r: Reader ): boolean {
+	const meta = findMeta( r );
+	if ( ! meta ) {
+		return false;
+	}
+	const iprp = meta.children.find( ( b ) => b.type === 'iprp' );
+	if ( ! iprp ) {
+		return false;
+	}
+	const ipco = findBox(
+		r,
+		iprp.offset + iprp.headerSize,
+		iprp.offset + iprp.size,
+		'ipco'
+	);
+	if ( ! ipco ) {
+		return false;
+	}
+	const start = ipco.offset + ipco.headerSize;
+	const end = ipco.offset + ipco.size;
+	return Boolean(
+		findBox( r, start, end, 'irot' ) || findBox( r, start, end, 'imir' )
+	);
+}
+
+/**
+ * Get the EXIF orientation that neither the server nor libheif/libvips will
+ * apply automatically for an ISOBMFF (HEIF/AVIF) image.
+ *
+ * Returns 1 (no correction needed) when the file has a native `irot`/`imir`
+ * transform, because libheif already rotates it on decode. Otherwise returns
+ * the EXIF Orientation tag so the caller can rotate explicitly.
+ *
+ * @param buffer Raw file contents.
+ * @return EXIF orientation (1-8) requiring explicit rotation, or 1.
+ */
+export function getUnappliedExifOrientation( buffer: ArrayBuffer ): number {
+	try {
+		if ( hasNativeTransform( new Reader( buffer ) ) ) {
+			return 1;
+		}
+	} catch {
+		return 1;
+	}
+	return parseExifOrientation( buffer );
 }
 
 /* eslint-enable no-bitwise */

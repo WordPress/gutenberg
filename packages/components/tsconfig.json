@@ -6,6 +6,7 @@
 			"gutenberg-env",
 			"gutenberg-test-env",
 			"jest",
+			"react-css-custom-properties",
 			"style-imports"
 		]
 	},
@@ -22,6 +23,7 @@
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
 		{ "path": "../is-shallow-equal" },
+		{ "path": "../kebab-case" },
 		{ "path": "../keycodes" },
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },

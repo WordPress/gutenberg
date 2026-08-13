@@ -1274,9 +1274,13 @@
 					"$value": "{wpds-color.primitive.primary.stroke3}",
 					"$description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track) that are hovered, focused, or active."
 				},
-				"neutral-disabled": {
+				"brand-disabled": {
 					"$value": "{wpds-color.primitive.bg.stroke2}",
-					"$description": "Background color for thumbs with normal emphasis (eg. slider thumb and filled track), in their disabled state, regardless of the tone."
+					"$description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track), in their disabled state."
+				},
+				"neutral-weak-disabled": {
+					"$value": "{wpds-color.primitive.bg.stroke2}",
+					"$description": "Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb), in their disabled state."
 				}
 			},
 			"$extensions": {
@@ -1362,6 +1366,10 @@
 				"neutral-weak": {
 					"$value": "{wpds-color.primitive.bg.fgSurface3}",
 					"$description": "Foreground color for interactive elements with neutral tone and weak emphasis."
+				},
+				"neutral-weak-active": {
+					"$value": "{wpds-color.primitive.bg.fgSurface4}",
+					"$description": "Foreground color for interactive elements with neutral tone and weak emphasis that are hovered, focused, or active."
 				},
 				"neutral-weak-disabled": {
 					"$value": "{wpds-color.primitive.bg.fgSurface2}",

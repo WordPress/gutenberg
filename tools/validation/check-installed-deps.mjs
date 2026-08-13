@@ -5,6 +5,8 @@
  * `package-lock.json` against `node_modules/.package-lock.json` (npm's hidden
  * lockfile, written on every install to record the actual installed tree).
  *
+ * Works with both the hoisted and isolated layouts.
+ *
  * Exits non-zero with a hint to run `npm install` if the trees diverge.
  */
 
@@ -85,6 +87,28 @@ if ( needsCheck ) {
 	const lockPkgs = lock.packages || {};
 	const hiddenPkgs = hidden.packages || {};
 
+	// The package name is the path segment after the final `node_modules/`.
+	const NM = 'node_modules/';
+	const packageName = ( pkgPath ) => {
+		const i = pkgPath.lastIndexOf( NM );
+		return i === -1 ? pkgPath : pkgPath.slice( i + NM.length );
+	};
+
+	/*
+	 * Index installed packages by `name@version` → set of `resolved` sources.
+	 */
+	const installedByKey = new Map();
+	for ( const [ pkgPath, info ] of Object.entries( hiddenPkgs ) ) {
+		if ( info.link || ! info.version ) {
+			continue;
+		}
+		const key = `${ packageName( pkgPath ) }@${ info.version }`;
+		if ( ! installedByKey.has( key ) ) {
+			installedByKey.set( key, new Set() );
+		}
+		installedByKey.get( key ).add( info.resolved );
+	}
+
 	const reportedMismatches = [];
 	const MAX_REPORTED = 5;
 	let totalMismatches = 0;
@@ -100,22 +124,24 @@ if ( needsCheck ) {
 			continue;
 		}
 
-		const installed = hiddenPkgs[ pkgPath ];
+		// Optional/extraneous deps may legitimately not be installed.
+		if ( info.optional || info.extraneous ) {
+			continue;
+		}
+
+		/*
+		 * Match by name@version. For aliases `info.name` is the real name
+		 */
+		const leaf = packageName( pkgPath );
+		const resolvedSet =
+			installedByKey.get( `${ info.name || leaf }@${ info.version }` ) ||
+			installedByKey.get( `${ leaf }@${ info.version }` );
 
 		let mismatch;
-		if ( ! installed ) {
-			/*
-			 * Optional deps may be skipped by npm on the current platform
-			 * (e.g. macOS-only fsevents on Linux). Don't flag them as
-			 * missing. Real drift on an optional dep would still be caught
-			 * below as an integrity mismatch.
-			 */
-			if ( info.optional ) {
-				continue;
-			}
+		if ( ! resolvedSet ) {
 			mismatch = `missing: ${ pkgPath }`;
-		} else if ( installed.integrity !== info.integrity ) {
-			mismatch = `integrity mismatch: ${ pkgPath }`;
+		} else if ( info.resolved && ! resolvedSet.has( info.resolved ) ) {
+			mismatch = `source mismatch: ${ pkgPath }`;
 		}
 
 		if ( ! mismatch ) {

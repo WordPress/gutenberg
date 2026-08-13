@@ -1,19 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import { Resizable } from 're-resizable';
 import type { ResizableProps } from 're-resizable';
 import type { ForwardedRef } from 'react';
-
-/**
- * Internal dependencies
- */
 import ResizeTooltip from './resize-tooltip';
 
 const HANDLE_CLASS_NAME = 'components-resizable-box__handle';
@@ -132,6 +121,10 @@ function UnforwardedResizableBox(
 	);
 }
 
+/**
+ * `ResizableBox` wraps content in a container with draggable handles, letting
+ * users interactively resize it along one or more edges or corners.
+ */
 export const ResizableBox = forwardRef( UnforwardedResizableBox );
 ResizableBox.displayName = 'ResizableBox';
 

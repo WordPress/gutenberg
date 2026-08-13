@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	useBlockProps,
 	InspectorControls,
@@ -36,10 +29,6 @@ import { Icon, search } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { speak } from '@wordpress/a11y';
-
-/**
- * Internal dependencies
- */
 import {
 	PC_WIDTH_DEFAULT,
 	PX_WIDTH_DEFAULT,
@@ -376,7 +365,6 @@ export default function SearchEdit( {
 					>
 						<SelectControl
 							value={ buttonPosition }
-							__next40pxDefaultSize
 							label={ __( 'Button position' ) }
 							onChange={ ( value ) => {
 								setAttributes( {
@@ -421,7 +409,6 @@ export default function SearchEdit( {
 					>
 						<VStack>
 							<UnitControl
-								__next40pxDefaultSize
 								label={ __( 'Width' ) }
 								id={ unitControlInputId } // Unused, kept for backwards compatibility
 								min={
@@ -473,7 +460,6 @@ export default function SearchEdit( {
 									} );
 								} }
 								isBlock
-								__next40pxDefaultSize
 							>
 								{ PERCENTAGE_WIDTHS.map( ( widthValue ) => {
 									return (
@@ -495,7 +481,6 @@ export default function SearchEdit( {
 			</InspectorControls>
 			<InspectorControls group="advanced">
 				<SelectControl
-					__next40pxDefaultSize
 					label={ __( 'HTML element' ) }
 					value={ tagName ?? '' }
 					options={ [

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useRef, useEffect, useCallback } from '@wordpress/element';
 
 let origin: Element | null = null;

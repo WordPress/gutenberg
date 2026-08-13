@@ -37,5 +37,5 @@
 .percentage {
 	fill: var(--site-health-fg);
 	font-size: 36px;
-	font-weight: var(--wpds-typography-font-weight-medium);
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 }

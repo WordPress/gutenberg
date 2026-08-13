@@ -1,20 +1,5 @@
-/**
- * @jest-environment jsdom
- */
-
-/**
- * External dependencies
- */
 import { render, act, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { GRID_ITEM_DATA_KEY } from '../../shared/grid-item-key';
 import { useLanePlacement } from '../use-lane-placement';
 import type {

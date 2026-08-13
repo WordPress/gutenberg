@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import deepFreeze from 'deep-freeze';
-
-/**
- * WordPress dependencies
- */
 import {
 	registerBlockType,
 	unregisterBlockType,
@@ -13,10 +6,6 @@ import {
 	privateApis,
 } from '@wordpress/blocks';
 import { combineReducers } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import {
 	hasSameKeys,
 	isUpdatingSameBlockAttribute,
@@ -43,6 +32,7 @@ import {
 	withDerivedBlockEditingModes,
 	viewportModalClientIds,
 	selectedBlockStyleState,
+	styleStateViewport,
 } from '../reducer';
 import { getBlockOrder, getBlocks } from '../selectors';
 import { unlock } from '../../lock-unlock';
@@ -834,7 +824,7 @@ describe( 'state', () => {
 				blocks: [
 					{
 						clientId: 'ribs',
-						name: 'core/freeform',
+						name: 'core/registered-block',
 						innerBlocks: [],
 					},
 				],
@@ -880,7 +870,7 @@ describe( 'state', () => {
 				blocks: [
 					{
 						clientId: 'wings',
-						name: 'core/freeform',
+						name: 'core/registered-block',
 						innerBlocks: [],
 					},
 				],
@@ -888,7 +878,7 @@ describe( 'state', () => {
 
 			expect( state.byClientId.size ).toBe( 1 );
 			expect( state.byClientId.get( 'wings' ).name ).toBe(
-				'core/freeform'
+				'core/registered-block'
 			);
 			expect( state.byClientId.get( 'wings' ).clientId ).toBe( 'wings' );
 			expect( Object.fromEntries( state.order ) ).toEqual( {
@@ -903,7 +893,7 @@ describe( 'state', () => {
 			);
 			expect( state.tree.get( 'wings' ) ).toEqual( {
 				clientId: 'wings',
-				name: 'core/freeform',
+				name: 'core/registered-block',
 				innerBlocks: [],
 			} );
 		} );
@@ -955,7 +945,7 @@ describe( 'state', () => {
 				blocks: [
 					{
 						clientId: 'wings',
-						name: 'core/freeform',
+						name: 'core/registered-block',
 						innerBlocks: [],
 					},
 				],
@@ -974,7 +964,7 @@ describe( 'state', () => {
 			);
 			expect( state.tree.get( 'wings' ) ).toEqual( {
 				clientId: 'wings',
-				name: 'core/freeform',
+				name: 'core/registered-block',
 				innerBlocks: [],
 			} );
 		} );
@@ -1037,7 +1027,7 @@ describe( 'state', () => {
 				blocks: [
 					{
 						clientId: 'chicken',
-						name: 'core/freeform',
+						name: 'core/registered-block',
 						innerBlocks: [],
 					},
 				],
@@ -1048,7 +1038,7 @@ describe( 'state', () => {
 				'core/test-block'
 			);
 			expect( replacedState.byClientId.get( 'chicken' ).name ).toBe(
-				'core/freeform'
+				'core/registered-block'
 			);
 			expect( replacedState.byClientId.get( 'chicken' ).clientId ).toBe(
 				'chicken'
@@ -1072,7 +1062,7 @@ describe( 'state', () => {
 			] );
 			const replacementNestedBlock = {
 				clientId: 'chicken',
-				name: 'core/freeform',
+				name: 'core/registered-block',
 				attributes: {},
 				innerBlocks: [],
 			};
@@ -1098,7 +1088,7 @@ describe( 'state', () => {
 				'core/test-block'
 			);
 			expect( replacedNestedState.byClientId.get( 'chicken' ).name ).toBe(
-				'core/freeform'
+				'core/registered-block'
 			);
 		} );
 
@@ -1603,7 +1593,7 @@ describe( 'state', () => {
 				blocks: [
 					{
 						clientId: 'persimmon',
-						name: 'core/freeform',
+						name: 'core/registered-block',
 						innerBlocks: [],
 					},
 				],
@@ -5948,7 +5938,6 @@ describe( 'state', () => {
 				clientId: 'client-1',
 				showStateOnCanvas: true,
 				value: {
-					viewport: 'default',
 					pseudo: ':hover',
 				},
 			} );
@@ -5994,7 +5983,6 @@ describe( 'state', () => {
 				clientId: 'client-2',
 				showStateOnCanvas: true,
 				value: {
-					viewport: 'default',
 					pseudo: ':focus',
 				},
 			} );
@@ -6103,6 +6091,36 @@ describe( 'state', () => {
 				{
 					type: 'SELECTION_CHANGE',
 					clientId: 'client-2',
+				}
+			);
+
+			expect( state ).toBeUndefined();
+		} );
+
+		it( 'keeps the selected state for selection changes within the same block', () => {
+			const originalState = {
+				clientId: 'client-1',
+				value: { viewport: 'default', pseudo: ':hover' },
+			};
+			const state = selectedBlockStyleState( originalState, {
+				type: 'SELECTION_CHANGE',
+				start: { clientId: 'client-1' },
+				end: { clientId: 'client-1' },
+			} );
+
+			expect( state ).toBe( originalState );
+		} );
+
+		it( 'clears the selected state for selection changes across multiple blocks', () => {
+			const state = selectedBlockStyleState(
+				{
+					clientId: 'client-1',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
+				{
+					type: 'SELECTION_CHANGE',
+					start: { clientId: 'client-1' },
+					end: { clientId: 'client-2' },
 				}
 			);
 
@@ -6272,6 +6290,35 @@ describe( 'state', () => {
 				showStateOnCanvas: false,
 				value: { viewport: '@mobile', pseudo: ':hover' },
 			} );
+		} );
+	} );
+
+	describe( 'styleStateViewport', () => {
+		it( 'defaults to "default"', () => {
+			expect( styleStateViewport( undefined, {} ) ).toBe( 'default' );
+		} );
+
+		it( 'stores the selected viewport', () => {
+			expect(
+				styleStateViewport( 'default', {
+					type: 'SET_STYLE_STATE_VIEWPORT',
+					viewport: '@tablet',
+				} )
+			).toBe( '@tablet' );
+		} );
+
+		it( 'falls back to "default" when no viewport is provided', () => {
+			expect(
+				styleStateViewport( '@tablet', {
+					type: 'SET_STYLE_STATE_VIEWPORT',
+				} )
+			).toBe( 'default' );
+		} );
+
+		it( 'ignores unrelated actions', () => {
+			expect(
+				styleStateViewport( '@mobile', { type: 'SOME_OTHER_ACTION' } )
+			).toBe( '@mobile' );
 		} );
 	} );
 

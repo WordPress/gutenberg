@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import DownloadableBlockIcon from '../downloadable-block-icon';
 
 export default function CompactList( { items } ) {

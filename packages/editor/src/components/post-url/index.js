@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { safeDecodeURIComponent, cleanForSlug } from '@wordpress/url';
 import { useState, createInterpolateElement } from '@wordpress/element';
@@ -18,10 +15,6 @@ import { store as noticesStore } from '@wordpress/notices';
 import { copySmall } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { useCopyToClipboard, useInstanceId } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 
 /**
@@ -109,7 +102,6 @@ export default function PostURL( { onClose } ) {
 					{ isEditable && (
 						<>
 							<InputControl
-								__next40pxDefaultSize
 								prefix={
 									<InputControlPrefixWrapper>
 										/

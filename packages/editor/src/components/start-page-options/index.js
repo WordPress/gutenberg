@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Flex, FlexItem, Modal, CheckboxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, useMemo, useEffect } from '@wordpress/element';
@@ -13,10 +10,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __unstableSerializeAndClean } from '@wordpress/blocks';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as interfaceStore } from '@wordpress/interface';
-
-/**
- * Internal dependencies
- */
 import {
 	ATTACHMENT_POST_TYPE,
 	TEMPLATE_POST_TYPE,

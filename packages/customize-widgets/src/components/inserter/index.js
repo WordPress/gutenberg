@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { __experimentalLibrary as Library } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { store as customizeWidgetsStore } from '../../store';
 
 function Inserter( { setIsOpened } ) {

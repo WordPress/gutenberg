@@ -15,3 +15,9 @@
 .wp-block-pullquote__citation {
 	color: inherit;
 }
+
+// Ensure custom line-height values applied to the block are inherited by the
+// paragraph instead of being overridden by the default editor styles.
+.wp-block-pullquote[style*="line-height"] :where(p) {
+	line-height: inherit;
+}

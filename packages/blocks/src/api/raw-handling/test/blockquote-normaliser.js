@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import blockquoteNormaliser from '../blockquote-normaliser';
 import { deepFilterHTML } from '../utils';
 

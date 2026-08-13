@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { FormTokenField } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -83,7 +80,6 @@ export default function FormatControls( { onChange, query: { format } } ) {
 			} }
 			help=""
 			__experimentalExpandOnFocus
-			__next40pxDefaultSize
 		/>
 	);
 }

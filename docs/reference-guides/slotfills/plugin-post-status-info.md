@@ -19,4 +19,4 @@ registerPlugin( 'post-status-info-test', { render: PluginPostStatusInfoTest } );
 
 ## Location
 
-![Location in the Summary panel](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/plugin-post-status-info-location.png?raw=true)
+![Location in the Summary panel](https://developer.wordpress.org/files/2026/06/plugin-post-status-info-location.png)

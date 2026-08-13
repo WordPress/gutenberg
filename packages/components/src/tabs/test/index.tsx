@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import { screen, waitFor } from '@testing-library/react';
 import { press, click } from '@ariakit/test';
 import { render } from '@ariakit/test/react';
-
-/**
- * WordPress dependencies
- */
 import { useEffect, useState } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { Tabs } from '..';
 import type { TabsProps } from '../types';
 
@@ -176,8 +165,6 @@ const ControlledTabs = ( {
 	);
 };
 
-let originalGetClientRects: () => DOMRectList;
-
 async function waitForComponentToBeInitializedWithSelectedTab(
 	selectedTabName: string | undefined
 ) {
@@ -218,21 +205,6 @@ async function waitForComponentToBeInitializedWithSelectedTab(
 }
 
 describe( 'Tabs', () => {
-	beforeAll( () => {
-		originalGetClientRects = window.HTMLElement.prototype.getClientRects;
-		// Mocking `getClientRects()` is necessary to pass a check performed by
-		// the `focus.tabbable.find()` and by the `focus.focusable.find()` functions
-		// from the `@wordpress/dom` package.
-		// @ts-expect-error We're not trying to comply to the DOM spec, only mocking
-		window.HTMLElement.prototype.getClientRects = function () {
-			return [ 'trick-jsdom-into-having-size-for-element-rect' ];
-		};
-	} );
-
-	afterAll( () => {
-		window.HTMLElement.prototype.getClientRects = originalGetClientRects;
-	} );
-
 	describe( 'Adherence to spec and basic behavior', () => {
 		it( 'should apply the correct roles, semantics and attributes', async () => {
 			await render( <UncontrolledTabs tabs={ TABS } /> );
