@@ -243,8 +243,8 @@ const GOAL_FIELDS: WidgetAttributeField< GoalAttributes >[] = [
 	},
 ];
 
-// Three declarative actions: two at high relevance for the chrome footer (a
-// text link and an icon-carrying download), one at the default relevance for
+// Three declarative actions spanning the relevance scale: a high link and a
+// medium download for the chrome footer, one at the default relevance for
 // the More menu.
 const GOAL_ACTIONS: WidgetAction[] = [
 	{
@@ -257,7 +257,7 @@ const GOAL_ACTIONS: WidgetAction[] = [
 	{
 		id: 'export-progress',
 		label: 'Export progress',
-		relevance: 'high',
+		relevance: 'medium',
 		icon: download,
 		href: new URL( './goal-progress.csv', import.meta.url ).href,
 		download: 'goal-progress.csv',
@@ -439,7 +439,7 @@ Their tiles compare the header presentations:
 
 The widget only declares relevance; the fit is measured by the chrome, so the same declaration adapts to any tile width. Resize the canvas to watch the headers switch presentations.
 
-Beyond attributes, \`demo/goal-progress\` declares three \`actions\`, and the same relevance policy routes them: the two at \`relevance: 'high'\` materialize in a persistent chrome footer (the "View goal details" text link on the leading edge; the icon-carrying "Export progress" download as an icon-only link on the trailing edge), while "About goals" stays at the default relevance and lands in the "More" menu. The widget declares each action as data plus its importance; the host owns the surfaces.
+Beyond attributes, \`demo/goal-progress\` declares three \`actions\` spanning the relevance scale, and that scale routes them: "View goal details" at \`'high'\` mounts as a leading text link in a persistent chrome footer, "Export progress" at \`'medium'\` beside it as a trailing icon-only link, and "About goals" at the default \`'low'\` lands in the "More" menu. The widget declares each action as data plus its importance; the host owns the surfaces.
 
 Each type also carries a \`help\` note, opened from the info icon in the header, that describes its attributes and what they do.
 `,

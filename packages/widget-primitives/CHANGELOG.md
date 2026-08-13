@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### New Features
+
+-   `WidgetRelevance` gains a `'medium'` tier between `'high'` and `'low'`:
+    a declaration worth persistent but compact visibility. Hosts map the
+    scale to surfaces of decreasing prominence
+    ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
+
 ### Enhancements
 
 -   `useWidgetTypes` holds the icon slot with the transparent stand-in while

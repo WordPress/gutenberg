@@ -61,8 +61,8 @@ function IconAction( { action }: IconActionProps ): React.ReactNode {
 
 type WidgetFooterProps = {
 	/**
-	 * The actions this footer materializes; the host routes the
-	 * `relevance: 'high'` ones here.
+	 * The actions this footer materializes; the host routes the promoted
+	 * tiers (`relevance: 'high'` and `'medium'`) here.
 	 */
 	actions: WidgetAction[];
 
@@ -73,15 +73,16 @@ type WidgetFooterProps = {
 };
 
 /**
- * Persistent strip of chrome under the widget body, the prominent surface for
- * the widget's `relevance: 'high'` actions: always visible, unlike the More
- * menu the remaining actions collapse into.
+ * Persistent strip of chrome under the widget body, the prominent surface
+ * for the widget's promoted actions: always visible, unlike the More menu
+ * the remaining actions collapse into.
  *
- * Materialization is by declared shape: an action without an icon mounts as a
- * text link on the leading edge; an action with one mounts as an icon-only
- * link on the trailing edge, its label serving as accessible name and tooltip.
- * Both mount real anchors, so middle-click, copy address, and download
- * semantics survive.
+ * Materialization follows the relevance tier: `'high'` actions mount as
+ * text links on the leading edge, labels always visible; `'medium'` actions
+ * mount on the trailing edge as compact affordances, icon-only when the
+ * action declares an icon and text links otherwise. Every affordance is a
+ * real anchor, so middle-click, copy address, and download semantics
+ * survive.
  *
  * @param {WidgetFooterProps} props Component props.
  */
@@ -93,10 +94,11 @@ export function WidgetFooter( {
 		return null;
 	}
 
-	const linkActions = actions.filter( ( action ) => ! action.icon );
-	const iconActions = actions.filter(
-		( action ): action is WidgetAction & { icon: WidgetIcon } =>
-			!! action.icon
+	const highActions = actions.filter(
+		( action ) => action.relevance === 'high'
+	);
+	const mediumActions = actions.filter(
+		( action ) => action.relevance === 'medium'
 	);
 
 	return (
@@ -107,9 +109,9 @@ export function WidgetFooter( {
 			className={ styles[ 'widget-footer' ] }
 			{ ...( editMode ? { inert: 'true' } : {} ) }
 		>
-			{ linkActions.length > 0 && (
+			{ highActions.length > 0 && (
 				<Stack direction="row" align="center" gap="lg" wrap="wrap">
-					{ linkActions.map( ( action ) => (
+					{ highActions.map( ( action ) => (
 						<Link
 							key={ action.id }
 							href={ action.href }
@@ -122,17 +124,34 @@ export function WidgetFooter( {
 				</Stack>
 			) }
 
-			{ iconActions.length > 0 && (
+			{ mediumActions.length > 0 && (
 				<Stack
 					direction="row"
 					align="center"
 					gap="xs"
-					className={ styles[ 'icon-actions' ] }
+					className={ styles[ 'compact-actions' ] }
 				>
 					<Tooltip.Provider>
-						{ iconActions.map( ( action ) => (
-							<IconAction key={ action.id } action={ action } />
-						) ) }
+						{ mediumActions.map( ( action ) =>
+							action.icon ? (
+								<IconAction
+									key={ action.id }
+									action={ {
+										...action,
+										icon: action.icon,
+									} }
+								/>
+							) : (
+								<Link
+									key={ action.id }
+									href={ action.href }
+									download={ action.download }
+									openInNewTab={ action.openInNewTab }
+								>
+									{ action.label }
+								</Link>
+							)
+						) }
 					</Tooltip.Provider>
 				</Stack>
 			) }
