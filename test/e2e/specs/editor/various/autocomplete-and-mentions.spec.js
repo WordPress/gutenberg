@@ -740,7 +740,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		// The editing host, which `RichText` mirrors these attributes onto by
 		// hand, only takes over once the block has a sibling.
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'A first paragraph.' );
 		await page.keyboard.press( 'Enter' );
