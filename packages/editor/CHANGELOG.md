@@ -6,6 +6,10 @@
 
 -   Notes: Enable notes on saved templates and template parts in the site editor, resolving the note's target post from the template record's `wp_id` ([#72918](https://github.com/WordPress/gutenberg/issues/72918)).
 
+### Bug Fixes
+
+-   Register the editor and block editor keyboard shortcuts from the editor provider, so shortcuts work for consumers that mount the editor without rendering `EditorKeyboardShortcutsRegister` themselves ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
+
 ## 14.53.0 (2026-08-12)
 
 ### Internal

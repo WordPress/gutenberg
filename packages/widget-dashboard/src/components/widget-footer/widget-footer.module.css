@@ -1,0 +1,32 @@
+/*
+ * Full-width divider; content aligns to the card padding. The body above
+ * has no bottom padding, so scrolled content runs flush to the divider.
+ */
+.widget-footer {
+	padding-block: var(--wpds-dimension-padding-md);
+	padding-inline: var(--wp-ui-card-padding);
+	border-block-start-style: solid;
+	border-block-start-width: var(--wpds-border-width-xs);
+	border-block-start-color: var(--wpds-color-stroke-surface-neutral-weak);
+}
+
+.compact-actions {
+	margin-inline-start: auto;
+}
+
+/* High action with a declared icon: the icon rides as a prefix. */
+.prefixed-action {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-xs);
+}
+
+/*
+ * Square the icon-only link via the Button override hooks for icon
+ * buttons; breathing room comes from the size, not from padding.
+ */
+.icon-action {
+	--wp-ui-button-aspect-ratio: 1;
+	--wp-ui-button-padding-inline: 0px;
+	--wp-ui-button-min-width: unset;
+}

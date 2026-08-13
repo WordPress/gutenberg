@@ -10,6 +10,7 @@ import type {
 import type { WidgetName } from '@wordpress/widget-primitives';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardContainerColumnCount } from '../../hooks/use-dashboard-container-column-count';
+import { splitWidgetActions } from '../../utils/split-widget-actions';
 import { WidgetActions } from '../widget-actions';
 import { WidgetAttributes } from '../widget-attributes';
 import { WidgetChrome } from '../widget-chrome';
@@ -124,14 +125,16 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 				( type ) => type.name === widget.type
 			);
 			const hasSettings = !! widgetType?.attributes?.length;
-			const hasActions = !! widgetType?.actions?.length;
 
 			const isFullBleed = widgetType?.presentation === 'full-bleed';
+
+			const { menu: menuActions } = splitWidgetActions( widgetType );
+			const hasActions = menuActions.length > 0;
 
 			// The active mode's controls: layout while customizing, the
 			// attribute controls (high-relevance fields on the prominent
 			// surface, plus a settings entry point when needed) and the
-			// declared actions otherwise.
+			// menu actions otherwise.
 			let controls: React.ReactNode;
 			if ( editMode ) {
 				controls = <WidgetLayoutControls widget={ widget } />;
@@ -146,7 +149,7 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 						) }
 
 						{ hasActions && (
-							<WidgetActions widgetType={ widgetType } />
+							<WidgetActions actions={ menuActions } />
 						) }
 					</>
 				);
