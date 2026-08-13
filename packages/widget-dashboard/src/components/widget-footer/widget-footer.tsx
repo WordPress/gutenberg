@@ -1,7 +1,63 @@
+import { __, sprintf } from '@wordpress/i18n';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Link, LinkButton, Stack, Tooltip } from '@wordpress/ui';
 import type { WidgetAction, WidgetIcon } from '@wordpress/widget-primitives';
 import styles from './widget-footer.module.css';
+
+type IconActionProps = {
+	/**
+	 * An icon-carrying action, materialized as an icon-only link.
+	 */
+	action: WidgetAction & { icon: WidgetIcon };
+};
+
+/**
+ * Icon-only link for an icon-carrying action. `openInNewTab` mounts the
+ * target on the anchor directly instead of through `Link`, which would add
+ * its external glyph beside the action icon; the new-tab hint joins the
+ * accessible name instead, which the `aria-label` would otherwise mute.
+ *
+ * @param {IconActionProps} props Component props.
+ */
+function IconAction( { action }: IconActionProps ): React.ReactNode {
+	const label = action.openInNewTab
+		? sprintf(
+				/* translators: %s: action label. */
+				__( '%s (opens in a new tab)' ),
+				action.label
+		  )
+		: action.label;
+
+	return (
+		<Tooltip.Root>
+			<Tooltip.Trigger
+				render={
+					<LinkButton
+						variant="minimal"
+						tone="neutral"
+						size="compact"
+						className={ styles[ 'icon-action' ] }
+						aria-label={ label }
+						href={ action.href }
+						download={ action.download }
+						render={
+							action.openInNewTab ? (
+								/* The href and the icon content merge in
+								   through the render-prop chain at runtime,
+								   invisible to the static analyzer. */
+								// eslint-disable-next-line jsx-a11y/anchor-has-content, jsx-a11y/anchor-is-valid
+								<a target="_blank" rel="noopener noreferrer" />
+							) : undefined
+						}
+					/>
+				}
+			>
+				<LinkButton.Icon icon={ action.icon } />
+			</Tooltip.Trigger>
+			<Tooltip.Popup>{ action.label }</Tooltip.Popup>
+		</Tooltip.Root>
+	);
+}
 
 type WidgetFooterProps = {
 	/**
@@ -75,27 +131,7 @@ export function WidgetFooter( {
 				>
 					<Tooltip.Provider>
 						{ iconActions.map( ( action ) => (
-							<Tooltip.Root key={ action.id }>
-								<Tooltip.Trigger
-									render={
-										<LinkButton
-											variant="minimal"
-											tone="neutral"
-											size="compact"
-											className={
-												styles[ 'icon-action' ]
-											}
-											aria-label={ action.label }
-											href={ action.href }
-											download={ action.download }
-											openInNewTab={ action.openInNewTab }
-										/>
-									}
-								>
-									<LinkButton.Icon icon={ action.icon } />
-								</Tooltip.Trigger>
-								<Tooltip.Popup>{ action.label }</Tooltip.Popup>
-							</Tooltip.Root>
+							<IconAction key={ action.id } action={ action } />
 						) ) }
 					</Tooltip.Provider>
 				</Stack>
