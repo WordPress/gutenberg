@@ -6,7 +6,7 @@
 	},
 	"references": [
 		{ "path": "../api-fetch" },
-		{ "path": "../blob" },
+		{ "path": "../blob/tsconfig.build.json" },
 		{ "path": "../compose" },
 		{ "path": "../data" },
 		{ "path": "../element" },
