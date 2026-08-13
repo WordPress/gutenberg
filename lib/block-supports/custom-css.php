@@ -6,6 +6,101 @@
  */
 
 /**
+ * Returns whether a style object contains custom CSS at any nesting level.
+ *
+ * @param mixed $style Block style attribute value.
+ * @return bool Whether custom CSS is present.
+ */
+function gutenberg_style_has_custom_css( $style ) {
+	if ( ! is_array( $style ) ) {
+		return false;
+	}
+
+	if ( isset( $style['css'] ) && is_string( $style['css'] ) && '' !== trim( $style['css'] ) ) {
+		return true;
+	}
+
+	foreach ( $style as $value ) {
+		if ( gutenberg_style_has_custom_css( $value ) ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Removes custom CSS keys from a style object at every nesting level.
+ *
+ * @param mixed $style Block style attribute value.
+ * @return mixed Style value with custom CSS removed.
+ */
+function gutenberg_strip_custom_css_from_style( $style ) {
+	if ( ! is_array( $style ) ) {
+		return $style;
+	}
+
+	unset( $style['css'] );
+
+	foreach ( $style as $key => $value ) {
+		if ( is_array( $value ) ) {
+			$style[ $key ] = gutenberg_strip_custom_css_from_style( $value );
+			if ( empty( $style[ $key ] ) ) {
+				unset( $style[ $key ] );
+			}
+		}
+	}
+
+	return $style;
+}
+
+/**
+ * Builds processed custom CSS rules for the default and viewport states.
+ *
+ * @param array  $style    Block style attribute.
+ * @param string $selector CSS selector used to scope nested custom CSS.
+ * @return string[] Processed CSS rule strings.
+ */
+function gutenberg_get_processed_custom_css_rules( $style, $selector ) {
+	$css_rules = array();
+
+	$append_processed_css = static function ( $css, $media_query = null ) use ( &$css_rules, $selector ) {
+		if ( ! is_string( $css ) || '' === trim( $css ) ) {
+			return;
+		}
+
+		// Validate CSS doesn't contain HTML markup (same validation as global styles REST API).
+		if ( preg_match( '#</?\w+#', $css ) ) {
+			return;
+		}
+
+		$processed_css = WP_Theme_JSON_Gutenberg::process_blocks_custom_css( $css, $selector );
+		if ( empty( $processed_css ) ) {
+			return;
+		}
+
+		$css_rules[] = $media_query
+			? $media_query . '{' . $processed_css . '}'
+			: $processed_css;
+	};
+
+	$append_processed_css( $style['css'] ?? null );
+
+	$viewport_settings        = gutenberg_get_global_settings( array( 'viewport' ) );
+	$responsive_media_queries = WP_Theme_JSON_Gutenberg::get_viewport_media_queries( $viewport_settings );
+
+	foreach ( $responsive_media_queries as $breakpoint => $media_query ) {
+		$viewport_css = null;
+		if ( isset( $style[ $breakpoint ] ) && is_array( $style[ $breakpoint ] ) ) {
+			$viewport_css = $style[ $breakpoint ]['css'] ?? null;
+		}
+		$append_processed_css( $viewport_css, $media_query );
+	}
+
+	return $css_rules;
+}
+
+/**
  * Render the custom CSS stylesheet and add class name to block as required.
  *
  * @param array $parsed_block The parsed block.
@@ -25,8 +120,8 @@
  * } $parsed_block
  */
 function gutenberg_render_custom_css_support_styles( $parsed_block ) {
-	$custom_css = $parsed_block['attrs']['style']['css'] ?? null;
-	if ( ! is_string( $custom_css ) || '' === trim( $custom_css ) ) {
+	$style = $parsed_block['attrs']['style'] ?? null;
+	if ( ! gutenberg_style_has_custom_css( $style ) ) {
 		return $parsed_block;
 	}
 
@@ -35,13 +130,15 @@ function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 		return $parsed_block;
 	}
 
-	// Validate CSS doesn't contain HTML markup (same validation as global styles REST API).
-	if ( preg_match( '#</?\w+#', $custom_css ) ) {
+	// Generate a unique class name for this block instance.
+	$class_name    = wp_unique_id_from_values( $parsed_block, 'wp-custom-css-' );
+	$selector      = '.' . $class_name;
+	$processed_css = implode( '', gutenberg_get_processed_custom_css_rules( $style, $selector ) );
+
+	if ( empty( $processed_css ) ) {
 		return $parsed_block;
 	}
 
-	// Generate a unique class name for this block instance.
-	$class_name          = wp_unique_id_from_values( $parsed_block, 'wp-custom-css-' );
 	$existing_class_name = $parsed_block['attrs']['className'] ?? null;
 	$updated_class_name  = is_string( $existing_class_name )
 		? "$existing_class_name $class_name"
@@ -49,28 +146,22 @@ function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 
 	$parsed_block['attrs']['className'] = $updated_class_name;
 
-	// Process the custom CSS using the same method as global styles.
-	$selector      = '.' . $class_name;
-	$processed_css = WP_Theme_JSON_Gutenberg::process_blocks_custom_css( $custom_css, $selector );
-
-	if ( ! empty( $processed_css ) ) {
-		/**
-		 * Reuse one handle so identical custom CSS is enqueued only once via
-		 * {@see wp_unique_id_from_values()}. Explicitly declare the `wp-block-library`
-		 * dependency so `global-styles` is guaranteed to print after it, preventing
-		 * block default styles from unintentionally overriding global styles.
-		 */
-		$handle = 'wp-block-custom-css';
-		if ( ! wp_style_is( $handle, 'registered' ) ) {
-			wp_register_style( $handle, false, array( 'wp-block-library', 'global-styles' ) );
-		}
-		$after_styles = wp_styles()->get_data( $handle, 'after' );
-		if ( ! is_array( $after_styles ) ) {
-			$after_styles = array();
-		}
-		if ( ! in_array( $processed_css, $after_styles, true ) ) {
-			wp_add_inline_style( $handle, $processed_css );
-		}
+	/**
+	 * Reuse one handle so identical custom CSS is enqueued only once via
+	 * {@see wp_unique_id_from_values()}. Explicitly declare the `wp-block-library`
+	 * dependency so `global-styles` is guaranteed to print after it, preventing
+	 * block default styles from unintentionally overriding global styles.
+	 */
+	$handle = 'wp-block-custom-css';
+	if ( ! wp_style_is( $handle, 'registered' ) ) {
+		wp_register_style( $handle, false, array( 'wp-block-library', 'global-styles' ) );
+	}
+	$after_styles = wp_styles()->get_data( $handle, 'after' );
+	if ( ! is_array( $after_styles ) ) {
+		$after_styles = array();
+	}
+	if ( ! in_array( $processed_css, $after_styles, true ) ) {
+		wp_add_inline_style( $handle, $processed_css );
 	}
 
 	return $parsed_block;
@@ -210,14 +301,16 @@ function gutenberg_strip_custom_css_from_blocks( $content ) {
 			continue;
 		}
 
-		if ( ! isset( $attrs['style']['css'] ) ) {
+		if ( ! isset( $attrs['style'] ) || ! gutenberg_style_has_custom_css( $attrs['style'] ) ) {
 			continue;
 		}
 
-		// Remove css and clean up empty style.
-		unset( $attrs['style']['css'] );
-		if ( empty( $attrs['style'] ) ) {
+		$stripped_style = gutenberg_strip_custom_css_from_style( $attrs['style'] );
+
+		if ( empty( $stripped_style ) ) {
 			unset( $attrs['style'] );
+		} else {
+			$attrs['style'] = $stripped_style;
 		}
 
 		// Locate the JSON portion within the token.

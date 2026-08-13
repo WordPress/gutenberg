@@ -445,7 +445,7 @@ export function getResponsiveStateCSSRules(
 ) {
 	const cssRules = [];
 	const validPseudoStates = VALID_BLOCK_PSEUDO_STATES[ name ] ?? [];
-	const nestedStateKeys = [ 'elements', ...validPseudoStates ];
+	const nestedStateKeys = [ 'elements', 'css', ...validPseudoStates ];
 	const responsiveMediaQueries =
 		getResponsiveMediaQueries( viewportSettings );
 

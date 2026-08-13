@@ -478,6 +478,55 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that custom CSS support adds a class when only viewport CSS is present.
+	 *
+	 * @covers ::gutenberg_render_custom_css_support_styles
+	 */
+	public function test_custom_css_support_adds_class_name_when_viewport_css_present() {
+		$this->register_custom_css_block_with_support(
+			'test/custom-css-viewport',
+			array( 'customCSS' => true )
+		);
+
+		$parsed_block = array(
+			'blockName' => 'test/custom-css-viewport',
+			'attrs'     => array(
+				'style' => array(
+					'@mobile' => array(
+						'css' => 'color: blue;',
+					),
+				),
+			),
+		);
+
+		$result = gutenberg_render_custom_css_support_styles( $parsed_block );
+
+		$this->assertArrayHasKey( 'className', $result['attrs'], 'Block should have className added when viewport CSS is present.' );
+		$this->assertMatchesRegularExpression( '/wp-custom-css-/', $result['attrs']['className'], 'className should contain wp-custom-css- prefix.' );
+
+		$after_styles = wp_styles()->get_data( 'wp-block-custom-css', 'after' );
+		$this->assertIsArray( $after_styles, 'Custom CSS stylesheet should have inline rules.' );
+		$combined_css = implode( '', $after_styles );
+		$this->assertStringContainsString( '@media', $combined_css, 'Viewport custom CSS should be wrapped in a media query.' );
+		$this->assertStringContainsString( 'color: blue', $combined_css, 'Viewport custom CSS declarations should be present.' );
+	}
+
+	/**
+	 * Tests that viewport custom CSS is stripped from block attributes.
+	 *
+	 * @covers ::gutenberg_strip_custom_css_from_blocks
+	 */
+	public function test_strip_custom_css_removes_viewport_css_from_block() {
+		$content = '<!-- wp:paragraph {"style":{"@mobile":{"css":"color: blue;"},"color":{"text":"#ff0000"}}} --><p>Hello</p><!-- /wp:paragraph -->';
+
+		$result = wp_unslash( gutenberg_strip_custom_css_from_blocks( $content ) );
+		$blocks = parse_blocks( $result );
+
+		$this->assertArrayNotHasKey( 'css', $blocks[0]['attrs']['style']['@mobile'] ?? array(), 'Viewport style.css should be stripped.' );
+		$this->assertSame( '#ff0000', $blocks[0]['attrs']['style']['color']['text'], 'Other style properties should be preserved.' );
+	}
+
+	/**
 	 * Tests that style.css is stripped from a single block.
 	 *
 	 * @covers ::gutenberg_strip_custom_css_from_blocks

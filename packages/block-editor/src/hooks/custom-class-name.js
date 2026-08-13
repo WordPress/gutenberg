@@ -3,8 +3,11 @@ import { addFilter } from '@wordpress/hooks';
 import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 import { InspectorControls } from '../components';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import { store as blockEditorStore } from '../store';
+import { unlock } from '../lock-unlock';
 
 /**
  * Filters registered block settings, extending attributes to include `className`.
@@ -27,9 +30,18 @@ export function addAttribute( settings ) {
 	return settings;
 }
 
-function CustomClassNameControlsPure( { className, setAttributes } ) {
+function CustomClassNameControlsPure( { clientId, className, setAttributes } ) {
 	const blockEditingMode = useBlockEditingMode();
-	if ( blockEditingMode !== 'default' ) {
+	const hasSelectedStyleState = useSelect(
+		( select ) => {
+			const { hasSelectedStyleState: hasSelectedBlockStyleState } =
+				unlock( select( blockEditorStore ) );
+			return hasSelectedBlockStyleState( clientId );
+		},
+		[ clientId ]
+	);
+
+	if ( blockEditingMode !== 'default' || hasSelectedStyleState ) {
 		return null;
 	}
 
