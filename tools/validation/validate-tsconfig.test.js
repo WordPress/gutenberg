@@ -261,3 +261,18 @@ test( 'passes when a package solution reaches the dependency through a sub proje
 
 	expect( result.status ).toBe( 0 );
 } );
+
+test( 'fails when the root solution does not reference the build solution', () => {
+	const result = runValidator(
+		createRepo( {
+			packages: { blob: splitPackage },
+			build: [ 'packages/blob/tsconfig.build.json' ],
+			root: [ 'packages/blob' ],
+		} )
+	);
+
+	expect( result.status ).not.toBe( 0 );
+	expect( result.stderr ).toContain(
+		'Missing reference to "./tsconfig.build.json" in tsconfig.json'
+	);
+} );

@@ -52,6 +52,16 @@ const rootSolutionPath = resolve( repoRoot, 'tsconfig.json' );
 const buildSolutionReferences = referencedProjects( buildSolutionPath );
 const rootSolutionReferences = referencedProjects( rootSolutionPath );
 
+/*
+ * Without this reference `npm run typecheck` still exits cleanly, but the
+ * sources of packages without a dev project silently drop out.
+ */
+if ( ! rootSolutionReferences.has( buildSolutionPath ) ) {
+	reportError(
+		'Missing reference to "./tsconfig.build.json" in tsconfig.json'
+	);
+}
+
 const packagesWithTypes = glob
 	.sync( 'packages/*/tsconfig.json', { cwd: repoRoot } )
 	.map( ( tsconfigPath ) => basename( dirname( tsconfigPath ) ) );
