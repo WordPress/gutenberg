@@ -610,7 +610,6 @@ function MediaEditorContent( {
 									<div className="media-editor__canvas-area">
 										{ isImage ? (
 											<MediaEditorCanvas
-												focusOnMount
 												isPlacementActive={
 													isPlacementActive
 												}
