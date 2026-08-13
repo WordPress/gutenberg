@@ -6,6 +6,7 @@
 
 -   Icon: Apply only padding to the inner SVG in the editor, so margin is no longer applied twice compared to the front end ([#81292](https://github.com/WordPress/gutenberg/pull/81292)).
 -   Term Description: Apply the term description display filters when rendering with term context inside a Terms Query loop, so multi-paragraph descriptions keep their paragraphs and match the taxonomy archive rendering ([#81290](https://github.com/WordPress/gutenberg/pull/81290)).
+-   Post Featured Image: Do not wrap the media placeholder in a post link when `isLink` comes from the template, so adding a featured image no longer crashes the editor ([#81573](https://github.com/WordPress/gutenberg/issues/81573)).
 
 ## 10.4.0 (2026-08-12)
 
