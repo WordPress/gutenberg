@@ -4,7 +4,6 @@ import {
 	AutosaveMonitor,
 	LocalAutosaveMonitor,
 	UnsavedChangesWarning,
-	EditorKeyboardShortcutsRegister,
 	ErrorBoundary,
 	PostLockedModal,
 	store as editorStore,
@@ -593,7 +592,6 @@ function Layout( {
 								<AutosaveMonitor />
 								<LocalAutosaveMonitor />
 								<EditPostKeyboardShortcuts />
-								<EditorKeyboardShortcutsRegister />
 								<BlockKeyboardShortcuts />
 								{ currentPostType === 'wp_block' && (
 									<InitPatternModal />
