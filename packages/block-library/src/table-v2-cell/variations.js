@@ -4,8 +4,8 @@ import { header as icon } from '@wordpress/icons';
 const variations = [
 	{
 		name: 'table-header',
-		title: __( 'Table header' ),
-		description: __( 'A header cell within a table.' ),
+		title: __( 'Table Heading' ),
+		description: __( 'A heading cell within a table.' ),
 		icon,
 		attributes: { tag: 'th' },
 		scope: [],
