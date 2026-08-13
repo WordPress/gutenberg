@@ -218,11 +218,26 @@ test.describe( 'Widgets screen', () => {
 			.getByRole( 'option', { name: 'Heading', exact: true } )
 			.click();
 
-		await expect(
-			firstWidgetArea.getByRole( 'document', {
-				name: 'Block: Heading',
-			} )
-		).toBeFocused();
+		const insertedHeading = firstWidgetArea.getByRole( 'document', {
+			name: 'Block: Heading',
+		} );
+		// The block owns the caret: it is focused itself, or the engaged
+		// editing host holds focus with the selection inside the block.
+		await expect
+			.poll( () =>
+				insertedHeading.evaluate( ( el ) => {
+					const { activeElement } = el.ownerDocument;
+					const { anchorNode } =
+						el.ownerDocument.defaultView.getSelection();
+					return (
+						el === activeElement ||
+						( activeElement?.contentEditable === 'true' &&
+							activeElement.contains( el ) &&
+							el.contains( anchorNode ) )
+					);
+				} )
+			)
+			.toBe( true );
 		await page.keyboard.type( 'My Heading' );
 
 		await widgetsScreen.saveWidgets();
