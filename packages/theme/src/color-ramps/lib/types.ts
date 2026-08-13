@@ -24,6 +24,7 @@ export type Ramp = {
 	fgSurface2: string;
 	fgSurface3: string;
 	fgSurface4: string;
+	fgSurface5: string;
 	// Foreground (text, icon) colors on top of bgFill
 	fgFill: string;
 	fgFillInverted: string;

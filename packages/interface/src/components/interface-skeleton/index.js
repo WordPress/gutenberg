@@ -6,11 +6,7 @@ import {
 	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-import {
-	useReducedMotion,
-	useViewportMatch,
-	useResizeObserver,
-} from '@wordpress/compose';
+import { useReducedMotion, useViewportMatch } from '@wordpress/compose';
 
 const ANIMATION_DURATION = 0.25;
 const commonTransition = {
@@ -75,8 +71,6 @@ function InterfaceSkeleton(
 	},
 	ref
 ) {
-	const [ secondarySidebarResizeListener, secondarySidebarSize ] =
-		useResizeObserver();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const disableMotion = useReducedMotion();
 	const defaultTransition = {
@@ -161,20 +155,23 @@ function InterfaceSkeleton(
 								initial="closed"
 								animate="open"
 								exit="closed"
+								// `auto` leaves the open width to the panel, so a
+								// sidebar that is already open on page load is
+								// at its full width on the first paint instead
+								// of animating there. framer-motion measures
+								// the element to animate, then restores `auto`.
 								variants={ {
-									open: { width: secondarySidebarSize.width },
+									open: { width: 'auto' },
 									closed: { width: 0 },
 								} }
 								transition={ defaultTransition }
 							>
 								<motion.div
 									style={ {
-										position: 'absolute',
 										width: isMobileViewport
 											? '100vw'
-											: 'fit-content',
+											: 'max-content',
 										height: '100%',
-										left: 0,
 									} }
 									variants={ {
 										open: { x: 0 },
@@ -182,7 +179,6 @@ function InterfaceSkeleton(
 									} }
 									transition={ defaultTransition }
 								>
-									{ secondarySidebarResizeListener }
 									{ secondarySidebar }
 								</motion.div>
 							</NavigableRegion>

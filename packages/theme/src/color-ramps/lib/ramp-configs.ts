@@ -13,6 +13,18 @@ const lightnessConstraintForegroundMediumContrast = (
 	direction === 'lighter'
 		? 0.77 // lightness of #b4b4b4
 		: 0.56; // lightness of #747474
+const lightnessConstraintForegroundEnhancedContrast = (
+	direction: RampDirection
+) =>
+	direction === 'lighter'
+		? 0.85 // lightness of #cecece
+		: 0.35; // lightness of #3a3a3a
+const lightnessConstraintForegroundStateContrast = (
+	direction: RampDirection
+) =>
+	direction === 'lighter'
+		? lightnessConstraintForegroundHighContrast( direction )
+		: 0.18; // lightness of #121212
 const lightnessConstraintBgFill = ( direction: RampDirection ) =>
 	direction === 'lighter'
 		? 0.67 // lightness of #969696 (7:1 vs black)
@@ -39,7 +51,7 @@ const ACCENT_SURFACE_TAPER_CHROMA: TaperChromaOptions = {
 	radiusLight: 0.01,
 };
 
-const fgSurface4Config: RampStepConfig = {
+const foregroundHighContrastOnSurfaceConfig: RampStepConfig = {
 	contrast: {
 		reference: 'surface3',
 		followDirection: 'main',
@@ -47,6 +59,30 @@ const fgSurface4Config: RampStepConfig = {
 		preferLighter: true,
 	},
 	lightness: lightnessConstraintForegroundHighContrast,
+	taperChromaOptions: FG_TAPER_CHROMA,
+};
+
+const fgSurface5Config: RampStepConfig = {
+	...foregroundHighContrastOnSurfaceConfig,
+	lightness: lightnessConstraintForegroundStateContrast,
+	contrast: {
+		reference: 'fgSurface4',
+		followDirection: 'main',
+		target: 1.5,
+		preferLighter: true,
+		// Fall back to the directional endpoint instead of shifting the entire ramp.
+		ignoreWhenAdjustingSeed: true,
+	},
+};
+
+const fgSurface4Config: RampStepConfig = {
+	contrast: {
+		reference: 'surface3',
+		followDirection: 'main',
+		target: 5.5,
+		preferLighter: true,
+	},
+	lightness: lightnessConstraintForegroundEnhancedContrast,
 	taperChromaOptions: FG_TAPER_CHROMA,
 };
 
@@ -123,7 +159,7 @@ export const BG_RAMP_CONFIG: RampConfig = {
 			target: 1.2,
 		},
 	},
-	bgFillInverted2: fgSurface4Config,
+	bgFillInverted2: foregroundHighContrastOnSurfaceConfig,
 	bgFillDark: {
 		contrast: {
 			reference: 'surface3',
@@ -197,6 +233,7 @@ export const BG_RAMP_CONFIG: RampConfig = {
 		taperChromaOptions: FG_TAPER_CHROMA,
 	},
 	fgSurface4: fgSurface4Config,
+	fgSurface5: fgSurface5Config,
 	// fgFill
 	fgFill: {
 		contrast: {
@@ -301,6 +338,10 @@ export const ACCENT_RAMP_CONFIG: RampConfig = {
 	},
 	fgSurface4: {
 		...BG_RAMP_CONFIG.fgSurface4,
+		taperChromaOptions: undefined,
+	},
+	fgSurface5: {
+		...BG_RAMP_CONFIG.fgSurface5,
 		taperChromaOptions: undefined,
 	},
 };

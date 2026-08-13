@@ -315,6 +315,15 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page() {
 			}
 		}
 	</style>
+	<div class="wrap hide-if-js">
+		<h1 class="wp-heading-inline"><?php echo esc_html( get_admin_page_title() ); ?></h1>
+		<?php
+		wp_admin_notice(
+			__( 'This screen requires JavaScript. Enable JavaScript in your browser settings and reload the page.' ),
+			array( 'type' => 'error' )
+		);
+		?>
+	</div>
 	<div id="{{PAGE_SLUG}}-wp-admin-app" class="boot-layout-container"></div>
 	<?php
 }
