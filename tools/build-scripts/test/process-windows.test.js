@@ -14,6 +14,7 @@ const platformDescriptor = Object.getOwnPropertyDescriptor(
 );
 
 beforeEach( () => {
+	jest.clearAllMocks();
 	Object.defineProperty( process, 'platform', { value: 'win32' } );
 } );
 
@@ -42,4 +43,29 @@ test( 'uses taskkill to terminate a watcher tree on Windows', () => {
 		[ '/pid', '123', '/T', '/F' ],
 		{ stdio: 'ignore' }
 	);
+} );
+
+test( 'ignores a watcher tree that already exited on Windows', () => {
+	execFileSync.mockImplementationOnce( () => {
+		const error = new Error( 'Command failed: taskkill /pid 123 /T /F' );
+		error.status = 128;
+		throw error;
+	} );
+
+	expect( () =>
+		stopWatchProcess( { pid: 123, exitCode: null, signalCode: null } )
+	).not.toThrow();
+} );
+
+test( 'warns without throwing when taskkill fails on Windows', () => {
+	execFileSync.mockImplementationOnce( () => {
+		const error = new Error( 'Access is denied' );
+		error.status = 1;
+		throw error;
+	} );
+
+	expect( () =>
+		stopWatchProcess( { pid: 123, exitCode: null, signalCode: null } )
+	).not.toThrow();
+	expect( console ).toHaveWarned();
 } );
