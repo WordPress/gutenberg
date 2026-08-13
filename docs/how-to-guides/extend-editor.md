@@ -62,8 +62,6 @@ function SubtitleSidebar() {
 }
 ```
 
-![The sidebar, open next to the editor canvas, with its icon active in the header](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/extend-editor-plugin-sidebar.png)
-
 `getEditedPostAttribute` returns the value including edits the user has not saved yet, which is what you want for a control that writes back to the same field. The meta key has to be registered in PHP before either call works; see [Store data in post meta](#store-data-in-post-meta).
 
 ### Add a panel to the Document sidebar
@@ -85,8 +83,6 @@ function ReviewPanel() {
 	);
 }
 ```
-
-![The Editorial review panel expanded in the Post tab of the document sidebar, below Format and above Categories](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/extend-editor-document-setting-panel.png)
 
 The `name` is required and must be unique within your plugin; it is what identifies the panel under Preferences → Panels, where a user can hide it. Unlike `PluginSidebar`, a document panel cannot be pinned to the toolbar.
 
@@ -133,8 +129,6 @@ function SendToReviewMenuItem() {
 }
 ```
 
-![The block settings menu open on a paragraph, with a Send to review item between Hide and Create pattern](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/extend-editor-block-settings-menu-item.png)
-
 The notice stands in for whatever your plugin does with the selection; the point is that `onClick` runs in a component, so the `core/block-editor` store tells you which blocks the user has selected.
 
 Without `allowedBlocks` the item shows for every block. With it, and with several blocks selected, the item only shows when every selected block is in the list.
@@ -171,8 +165,6 @@ function ChecklistPanel() {
 }
 ```
 
-![The pre-publish panel with a Publishing checklist section open below Visibility and Publish](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/extend-editor-pre-publish-panel.png)
-
 The panel starts collapsed unless you pass `initialOpen`, except when no `title` is given, in which case it is always open.
 
 ### Register the fills
@@ -196,7 +188,7 @@ function MyPluginFills() {
 registerPlugin( 'my-plugin', { render: MyPluginFills } );
 ```
 
-The plugin name must start with a letter and contain only lowercase letters, numbers, and dashes; `registerPlugin` throws otherwise. Each fill still decides where it appears, so one plugin can mount as many as it needs.
+The plugin name must start with a letter and contain only lowercase letters, numbers, and dashes. An invalid name is not an exception: `registerPlugin` logs an error to the console, registers nothing, and returns `null`, so the symptom you see is fills that never render. Each fill still decides where it appears, so one plugin can mount as many as it needs.
 
 ## Modify blocks with filters
 
