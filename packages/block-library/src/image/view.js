@@ -550,6 +550,15 @@ const { state, actions, callbacks } = store(
 					verticalPadding = 80;
 				}
 
+				// Adds extra breathing room on every side of the enlarged image
+				// so a caption has room to sit below it without covering it.
+				// Applied to every image (not only captioned ones) so navigating
+				// a gallery never resizes the image. `padding` here is the total
+				// removed from each axis, so the per-side inset is half of it.
+				const imageSafeArea = 24;
+				horizontalPadding += imageSafeArea * 2;
+				verticalPadding += imageSafeArea * 2;
+
 				const targetMaxWidth = Math.min(
 					window.innerWidth - horizontalPadding,
 					containerWidth
