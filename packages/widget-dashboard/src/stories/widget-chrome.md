@@ -9,6 +9,14 @@ The chrome is everything the dashboard wraps around a widget instance: the heade
 The widget declares its identity and how it wants to be framed; the chrome materializes both.
 The widget never paints its own header or toolbar.
 
+## From metadata to tile
+
+The chrome reads the widget type and materializes each field in one of three areas.
+
+![One widget type materialized as a tile of three areas: the header takes the identity, the high-relevance attributes, and the low-relevance actions; the content takes the render module fed with the attribute values; the footer takes the promoted actions.](./assets/tile-anatomy.svg)
+
+The header takes the identity (`icon`, `title`, `help`), the high-relevance `attributes`, and the low-relevance `actions`. The content belongs to the render module, fed the attribute values. The footer takes the promoted `actions`.
+
 ## The frame
 
 The dashboard widget interprets `presentation` and determines how much chrome a widget gets.
