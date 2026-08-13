@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Read and write notes through the `note` entity rather than the comments endpoint, so threads arrive pre-assembled and replies come back in edit context ([#81599](https://github.com/WordPress/gutenberg/pull/81599)).
+
 ### Bug Fixes
 
 -   Register the editor and block editor keyboard shortcuts from the editor provider, so shortcuts work for consumers that mount the editor without rendering `EditorKeyboardShortcutsRegister` themselves ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).

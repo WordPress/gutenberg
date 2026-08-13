@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Tally the post list's notes count from the notes endpoint, fetching only `id`, `post` and `reply_count` instead of a row per note ([#81599](https://github.com/WordPress/gutenberg/pull/81599)).
+
 ### Internal
 
 -   Stop rendering `EditorKeyboardShortcutsRegister`, which the editor provider now renders itself ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).

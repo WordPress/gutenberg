@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a `note` entity backed by the `wp/v2/notes` endpoint. Records are whole threads: each carries its replies in a `replies` array plus a `reply_count` ([#81599](https://github.com/WordPress/gutenberg/pull/81599)).
+
 ## 7.53.0 (2026-08-12)
 
 ### Enhancements
