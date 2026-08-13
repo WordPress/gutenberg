@@ -87,11 +87,7 @@ async function getMirrorVersions() {
 
 /**
  * Compares two dotted-numeric WordPress version strings, like "6.5.9" and
- * "6.5.10", numerically segment by segment so "6.5.10" sorts after "6.5.9".
- * Only handles the plain major[.minor[.patch]] shape core release tags use,
- * not general semver -- see isWPMajorMinorVersionLower() in
- * runtime/docker/wordpress.js, which makes the same tradeoff for a different
- * comparison.
+ * "6.5.10" or "6.6".
  *
  * @param {string} a A version string.
  * @param {string} b Another version string.
