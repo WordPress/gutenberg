@@ -343,7 +343,7 @@ function TextShadowEditor( { textShadow, onChange }: TextShadowEditorProps ) {
 			<Stack direction="column" gap="sm">
 				<Stack direction="row" justify="space-between" align="center">
 					<Subtitle level={ 3 }>{ __( 'Text Shadows' ) }</Subtitle>
-					<FlexItem className="global-styles-ui__text-shadows-panel__options-container">
+					<FlexItem className="global-styles-ui__shadows-panel__options-container">
 						<Button
 							size="small"
 							icon={ plus }

@@ -1,79 +1,47 @@
-/**
- * WordPress dependencies
- */
-import {
-	__experimentalItemGroup as ItemGroup,
-	Button,
-	FlexItem,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
 import { Stack } from '@wordpress/ui';
-import { __, sprintf, isRTL } from '@wordpress/i18n';
-import {
-	plus,
-	Icon,
-	chevronLeft,
-	chevronRight,
-	moreVertical,
-} from '@wordpress/icons';
-import { useState } from '@wordpress/element';
 import type { TextShadowPreset } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
-import { Subtitle } from './subtitle';
-import { NavigationButtonAsItem } from './navigation-button';
 import { ScreenHeader } from './screen-header';
 import { ScreenBody } from './screen-body';
-import { getNewIndexFromPresets } from './utils';
-import ConfirmResetShadowDialog from './confirm-reset-shadow-dialog';
+import PresetGroup from './presets/preset-group';
+import { usePresets } from './presets/use-presets';
 import { useSetting } from './hooks';
-import { unlock } from './lock-unlock';
-
-const { Menu } = unlock( componentsPrivateApis );
+import { getNewIndexFromPresets } from './utils';
 
 export const DEFAULT_TEXT_SHADOW = '1px 1px 2px rgba(0, 0, 0, 0.3)';
 
 export default function ScreenTextShadows() {
-	const [ defaultTextShadows ] = useSetting(
-		'typography.textShadowPresets.default'
-	);
-	const [ defaultTextShadowsEnabled ] = useSetting(
+	const [ defaultEnabled ] = useSetting< boolean >(
 		'typography.defaultTextShadowPresets'
 	);
-	const [ themeTextShadows ] = useSetting(
-		'typography.textShadowPresets.theme'
+	const def = usePresets< TextShadowPreset >(
+		'typography.textShadowPresets',
+		'default'
 	);
-	const [ customTextShadows, setCustomTextShadows ] = useSetting(
-		'typography.textShadowPresets.custom'
+	const theme = usePresets< TextShadowPreset >(
+		'typography.textShadowPresets',
+		'theme'
+	);
+	const custom = usePresets< TextShadowPreset >(
+		'typography.textShadowPresets',
+		'custom'
 	);
 
-	const onCreateTextShadow = ( textShadow: TextShadowPreset ) => {
-		setCustomTextShadows( [ ...( customTextShadows || [] ), textShadow ] );
+	const addCustomTextShadow = () => {
+		const index = getNewIndexFromPresets( custom.presets, 'text-shadow-' );
+		custom.setPresets( [
+			...custom.presets,
+			{
+				/* translators: %d: is an index for a preset */
+				name: sprintf( __( 'Text Shadow %d' ), index ),
+				textShadow: DEFAULT_TEXT_SHADOW,
+				slug: `text-shadow-${ index }`,
+			},
+		] );
 	};
-
-	const handleResetTextShadows = () => {
-		setCustomTextShadows( [] );
-	};
-
-	const [ isResetDialogOpen, setIsResetDialogOpen ] = useState( false );
-
-	const toggleResetDialog = () => setIsResetDialogOpen( ! isResetDialogOpen );
 
 	return (
 		<>
-			{ isResetDialogOpen && (
-				<ConfirmResetShadowDialog
-					text={ __(
-						'Are you sure you want to remove all custom text shadows?'
-					) }
-					confirmButtonText={ __( 'Remove' ) }
-					isOpen={ isResetDialogOpen }
-					toggleOpen={ toggleResetDialog }
-					onConfirm={ handleResetTextShadows }
-				/>
-			) }
 			<ScreenHeader
 				title={ __( 'Text Shadows' ) }
 				description={ __(
@@ -82,128 +50,48 @@ export default function ScreenTextShadows() {
 			/>
 			<ScreenBody>
 				<Stack
-					className="global-styles-ui__text-shadows-panel"
 					direction="column"
+					className="global-styles-ui__text-shadows-panel"
 					gap="xl"
 				>
-					{ defaultTextShadowsEnabled && (
-						<TextShadowList
+					{ defaultEnabled && (
+						<PresetGroup
 							label={ __( 'Default' ) }
-							textShadows={ defaultTextShadows || [] }
-							category="default"
+							items={ def.presets }
+							getEditPath={ ( slug ) =>
+								`/typography/text-shadows/edit/default/${ slug }`
+							}
 						/>
 					) }
-					{ themeTextShadows && themeTextShadows.length > 0 && (
-						<TextShadowList
+					{ theme.presets.length > 0 && (
+						<PresetGroup
 							label={ __( 'Theme' ) }
-							textShadows={ themeTextShadows || [] }
-							category="theme"
+							items={ theme.presets }
+							getEditPath={ ( slug ) =>
+								`/typography/text-shadows/edit/theme/${ slug }`
+							}
 						/>
 					) }
-					<TextShadowList
+					<PresetGroup
 						label={ __( 'Custom' ) }
-						textShadows={ customTextShadows || [] }
-						category="custom"
-						canCreate
-						onCreate={ onCreateTextShadow }
-						onReset={ toggleResetDialog }
+						items={ custom.presets }
+						getEditPath={ ( slug ) =>
+							`/typography/text-shadows/edit/custom/${ slug }`
+						}
+						addLabel={ __( 'Add text shadow' ) }
+						onAdd={ addCustomTextShadow }
+						menuAction={ {
+							label: __( 'Remove all custom text shadows' ),
+							optionsLabel: __( 'Text shadow options' ),
+							confirmText: __(
+								'Are you sure you want to remove all custom text shadows?'
+							),
+							confirmButtonText: __( 'Remove' ),
+							onConfirm: () => custom.setPresets( [] ),
+						} }
 					/>
 				</Stack>
 			</ScreenBody>
 		</>
-	);
-}
-
-interface TextShadowListProps {
-	label: string;
-	textShadows: TextShadowPreset[];
-	category: string;
-	canCreate?: boolean;
-	onCreate?: ( textShadow: TextShadowPreset ) => void;
-	onReset?: () => void;
-}
-
-function TextShadowList( {
-	label,
-	textShadows,
-	category,
-	canCreate,
-	onCreate,
-	onReset,
-}: TextShadowListProps ) {
-	const handleAddTextShadow = () => {
-		const newIndex = getNewIndexFromPresets( textShadows, 'text-shadow-' );
-		onCreate?.( {
-			name: sprintf(
-				/* translators: %d: is an index for a preset */
-				__( 'Text Shadow %d' ),
-				newIndex
-			),
-			textShadow: DEFAULT_TEXT_SHADOW,
-			slug: `text-shadow-${ newIndex }`,
-		} );
-	};
-
-	return (
-		<Stack direction="column" gap="sm">
-			<Stack direction="row" justify="space-between" align="center">
-				<Subtitle level={ 3 }>{ label }</Subtitle>
-				<FlexItem className="global-styles-ui__text-shadows-panel__options-container">
-					{ canCreate && (
-						<Button
-							size="small"
-							icon={ plus }
-							label={ __( 'Add text shadow' ) }
-							onClick={ handleAddTextShadow }
-						/>
-					) }
-					{ !! textShadows?.length && category === 'custom' && (
-						<Menu>
-							<Menu.TriggerButton
-								render={
-									<Button
-										size="small"
-										icon={ moreVertical }
-										label={ __( 'Text shadow options' ) }
-									/>
-								}
-							/>
-							<Menu.Popover>
-								<Menu.Item onClick={ onReset }>
-									<Menu.ItemLabel>
-										{ __(
-											'Remove all custom text shadows'
-										) }
-									</Menu.ItemLabel>
-								</Menu.Item>
-							</Menu.Popover>
-						</Menu>
-					) }
-				</FlexItem>
-			</Stack>
-			{ textShadows.length > 0 && (
-				<ItemGroup isBordered isSeparated>
-					{ textShadows.map( ( textShadow ) => (
-						<NavigationButtonAsItem
-							key={ textShadow.slug }
-							path={ `/typography/text-shadows/edit/${ category }/${ textShadow.slug }` }
-						>
-							<Stack
-								direction="row"
-								justify="space-between"
-								align="center"
-							>
-								<FlexItem>{ textShadow.name }</FlexItem>
-								<Icon
-									icon={
-										isRTL() ? chevronLeft : chevronRight
-									}
-								/>
-							</Stack>
-						</NavigationButtonAsItem>
-					) ) }
-				</ItemGroup>
-			) }
-		</Stack>
 	);
 }
