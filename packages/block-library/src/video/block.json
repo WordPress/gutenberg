@@ -104,5 +104,6 @@
 		}
 	},
 	"editorStyle": "wp-block-video-editor",
-	"style": "wp-block-video"
+	"style": "wp-block-video",
+	"viewScriptModule": "@wordpress/block-library/media-playback"
 }
