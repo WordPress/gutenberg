@@ -21,6 +21,7 @@ const ALLOWLIST = {
 			'Card',
 			'Collapsible',
 			'CollapsibleCard',
+			'ControlWithError',
 			'EmptyState',
 			'Icon',
 			'Input',
