@@ -119,6 +119,7 @@ export default function useInput() {
 					}
 
 					const rootClientId = getBlockRootClientId( clientId );
+					const { activeElement } = event.target.ownerDocument;
 
 					// Ensure template is not locked.
 					if (
@@ -134,12 +135,15 @@ export default function useInput() {
 						event.preventDefault();
 						__unstableSplitSelection();
 					} else if (
-						// The editable element may be nested within the
-						// block wrapper (e.g. Site Title), so resolve the
-						// block from the active element.
-						getBlockClientId(
-							event.target.ownerDocument.activeElement
-						) === clientId
+						// Handle Enter only on the block wrapper itself or
+						// an editable element within the block, which may be
+						// nested within the wrapper (e.g. Site Title). Other
+						// focusable elements (an embed's URL field, an
+						// appender button) keep their native Enter behavior.
+						( activeElement.getAttribute( 'data-block' ) ===
+							clientId ||
+							activeElement.isContentEditable ) &&
+						getBlockClientId( activeElement ) === clientId
 					) {
 						// The default block depends on context: containers
 						// such as the gallery define their own default
