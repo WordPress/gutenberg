@@ -18,7 +18,7 @@ test.describe( 'undo', () => {
 		undoUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'before pause' );
 		await editor.page.waitForTimeout( 1000 );
@@ -90,7 +90,7 @@ test.describe( 'undo', () => {
 		undoUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 
 		await page.keyboard.type( 'before keyboard ' );
@@ -166,7 +166,7 @@ test.describe( 'undo', () => {
 
 	test( 'should undo bold', async ( { page, pageUtils, editor } ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'test' );
 		await editor.saveDraft();
@@ -205,7 +205,7 @@ test.describe( 'undo', () => {
 		undoUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 
 		const firstBlock = await editor.getEditedPostContent();
@@ -356,7 +356,7 @@ test.describe( 'undo', () => {
 
 		// Issue is demonstrated from an edited post: create, save, and reload.
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'original' );
 		await editor.saveDraft();
@@ -391,7 +391,7 @@ test.describe( 'undo', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '1' );
 		await editor.saveDraft();
@@ -406,7 +406,7 @@ test.describe( 'undo', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '1' );
 		await editor.publishPost();
@@ -421,7 +421,7 @@ test.describe( 'undo', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 
 		await page.keyboard.type( '1' );
@@ -463,7 +463,7 @@ test.describe( 'undo', () => {
 		// and skipping `undo` history steps.
 		const text = 'tonis';
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( text );
 		await editor.publishPost();
@@ -495,7 +495,7 @@ test.describe( 'undo', () => {
 			.type( 'a' ); // First step.
 		await page.keyboard.press( 'Backspace' ); // Second step.
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click(); // third step.
 
 		// Title should be empty
@@ -534,7 +534,7 @@ test.describe( 'undo', () => {
 			.click();
 
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'Howdy!' );
 
@@ -574,7 +574,7 @@ test.describe( 'undo', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'some linked text here' );
 		// Select the word "linked".
@@ -610,7 +610,7 @@ test.describe( 'undo', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'first' );
 		await page.keyboard.press( 'Enter' );
@@ -654,7 +654,7 @@ test.describe( 'undo', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'a paragraph' );
 		await editor.insertBlock( {

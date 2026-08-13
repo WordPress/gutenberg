@@ -199,6 +199,20 @@ The exported kit for handling them:
 />
 ```
 
+## Tile spacing
+
+The tile chrome is a `Card` at the Card's default density. Hosts can tighten or relax it by setting two custom properties at `:root`:
+
+```css
+:root {
+	--wp-widget-dashboard-tile-padding: var(--wpds-dimension-padding-lg);
+}
+```
+
+`--wp-widget-dashboard-tile-padding` controls the padding of the tile surface. `--wp-widget-dashboard-tile-header-gap` controls the space between the tile header and the body; it follows the tile padding unless set apart. Use `--wpds-*` spacing tokens as values. The floating header of full-bleed tiles and the picker previews follow the same properties.
+
+`:root` rather than a dashboard wrapper matters for the picker: it mounts in a dialog under `document.body`, which a wrapper's custom properties never reach.
+
 ## How this host translates the contract
 
 This engine is one host implementation of `@wordpress/widget-primitives`. It maps contract fields to host-owned UI as follows.

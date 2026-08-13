@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.53.0 (2026-08-12)
+
 ### Enhancements
 
 -   Improve error reporting in private action `saveDirtyEntities` ([#81151](https://github.com/WordPress/gutenberg/pull/81151)).
@@ -10,6 +12,7 @@
 
 -   Keep collaboration awareness available with an anonymous fallback identity based on the Yjs client ID when WordPress user information is unavailable.
 -   Footnotes: Treat unreadable `footnotes` post meta as no footnotes instead of throwing. Malformed JSON, or valid JSON that is not an array, threw inside a store subscriber where no error boundary catches it, so the edit was dropped and the post silently stopped saving ([#81201](https://github.com/WordPress/gutenberg/pull/81201)).
+-   `saveEntityRecord`: Reset persisted edits using the original edits instead of the `__unstablePrePersist`-augmented request payload. With collaborative editing enabled, the injected CRDT snapshot made the post-save comparison against the state edits fail, leaving the record dirty after a successful save whenever `meta` was edited.
 -   Ensure revision resolvers finish after fetched revisions are stored.
 
 ### Internal

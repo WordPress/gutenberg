@@ -11,7 +11,12 @@ import {
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
-import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
+import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
+import {
+	getBlockClientId,
+	getSelectionEditableElement,
+	isInSameBlock,
+} from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
 
@@ -109,17 +114,26 @@ export function getClosestTabbable(
 	}
 
 	function isTabCandidate( node ) {
-		// If it's a block wrapper (not itself a contenteditable editing surface)
-		// and there are nested focusable nodes, skip because there are better
-		// candidates. We must not skip contenteditable nodes that happen to
-		// contain links or other focusable inline elements, since those are the
-		// correct navigation targets.
-		//
-		// See https://github.com/WordPress/gutenberg/pull/77474
-		// TODO: Consider fixing focus.tabbable
+		// Skip if there's only one child that is content editable (and thus a
+		// better candidate).
+		if (
+			node.children.length === 1 &&
+			isInSameBlock( node, node.firstElementChild ) &&
+			node.firstElementChild.getAttribute( 'contenteditable' ) === 'true'
+		) {
+			return;
+		}
+
+		// Wrappers that merge with the text flow dissolve into it: their
+		// content is the better candidate. Any other container is a
+		// boundary the caret stops on.
+		const blockType = getBlockType( node.getAttribute( 'data-type' ) );
 		if (
 			node.contentEditable !== 'true' &&
 			getBlockClientId( node ) &&
+			blockType &&
+			( blockType.merge ||
+				hasBlockSupport( blockType, '__experimentalOnMerge' ) ) &&
 			focus.focusable
 				.find( node )
 				// Exclude form elements for now because primary+a cannot be
