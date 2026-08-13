@@ -199,7 +199,7 @@ function gutenberg_media_processing_filter_rest_index( WP_REST_Response $respons
 	 * take the server-side path (e.g. some Media Library uploads) also still
 	 * produce static sub-sizes, as core has no animated resize support.
 	 *
-	 * @since 23.7.0
+	 * @since 23.9.0
 	 *
 	 * @param bool $generate_animated_image_subsizes Whether to generate animated
 	 *                                                sub-sizes for animated images.

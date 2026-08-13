@@ -29,10 +29,22 @@ function gutenberg_block_editor_preload_paths_7_2( $paths ) {
 			break;
 		}
 
-		// entities.js lists the field directly after `description`.
+		/*
+		 * entities.js lists the field directly after `description`, and the
+		 * 7.1 filter above builds a list that starts with it. Without that
+		 * anchor there is no way to reproduce entities.js ordering here, and
+		 * a list in any other order is simply ignored by the browser, so
+		 * leave the path untouched rather than emit one that cannot match.
+		 * Preloading is an optimization: a miss costs one extra request for
+		 * the root index, never a wrong response.
+		 */
 		$position = array_search( 'description', $fields, true );
-		$position = false === $position ? count( $fields ) : $position + 1;
-		array_splice( $fields, $position, 0, 'generate_animated_image_subsizes' );
+
+		if ( false === $position ) {
+			break;
+		}
+
+		array_splice( $fields, $position + 1, 0, 'generate_animated_image_subsizes' );
 
 		$paths[ $key ] = '/?_fields=' . implode( ',', $fields );
 		break;
