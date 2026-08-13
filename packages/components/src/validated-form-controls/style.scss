@@ -2,18 +2,23 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "../utils/theme-variables" as *;
 
+%red-focus-ring {
+	--focus-color: #{ $alert-red };
+}
+
 .components-validated-control {
 	// For components based on InputBase
 	&:has(:is(input, select):invalid[data-validity-visible])
 	.components-input-control__backdrop {
-		--wp-components-color-accent: #{$alert-red};
+		@extend %red-focus-ring;
+
 		border-color: $alert-red;
 	}
 
 	// For TextareaControl
 	textarea:invalid[data-validity-visible] {
-		--wp-admin-theme-color: #{$alert-red};
-		--wp-components-color-accent: #{$alert-red};
+		@extend %red-focus-ring;
+
 		border-color: $alert-red;
 	}
 }
@@ -23,14 +28,16 @@
 
 	// For CustomSelectControl
 	&:has(select:invalid[data-validity-visible]) .components-input-control__backdrop {
-		--wp-components-color-accent: #{$alert-red};
+		@extend %red-focus-ring;
+
 		border-color: $alert-red;
 	}
 
 	// For ContentEditableControl
 	&:has(input:invalid[data-validity-visible])
 	.components-validated-control__content-editable [role="textbox"] {
-		--wp-admin-theme-color: #{$alert-red};
+		@extend %red-focus-ring;
+
 		border-color: $alert-red;
 	}
 }

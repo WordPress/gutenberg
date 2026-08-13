@@ -242,7 +242,7 @@ function gutenberg_sanitize_widget_actions( $actions, $dir_name = '' ) {
 			}
 		}
 
-		if ( isset( $action['relevance'] ) && in_array( $action['relevance'], array( 'high', 'low' ), true ) ) {
+		if ( isset( $action['relevance'] ) && in_array( $action['relevance'], array( 'high', 'medium', 'low' ), true ) ) {
 			$entry['relevance'] = $action['relevance'];
 		}
 
