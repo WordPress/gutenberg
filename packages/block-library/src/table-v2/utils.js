@@ -289,14 +289,17 @@ export function getCellRectangleClientIds(
 
 	const rectangle = {
 		startRow: Math.min( startPlacement.rowIndex, endPlacement.rowIndex ),
-		endRow: Math.max( startPlacement.rowIndex, endPlacement.rowIndex ),
+		endRow: Math.max(
+			getPlacementEndRow( startPlacement ),
+			getPlacementEndRow( endPlacement )
+		),
 		startColumn: Math.min(
 			startPlacement.columnIndex,
 			endPlacement.columnIndex
 		),
 		endColumn: Math.max(
-			startPlacement.columnIndex,
-			endPlacement.columnIndex
+			getPlacementEndColumn( startPlacement ),
+			getPlacementEndColumn( endPlacement )
 		),
 	};
 

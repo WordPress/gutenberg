@@ -77,6 +77,49 @@ describe( 'table-v2 utils', () => {
 				getCellRectangleClientIds( rows, cells, 3, 'cell-2', 'cell-4' )
 			).toEqual( [ 'cell-1', 'cell-2', 'cell-4', 'cell-5' ] );
 		} );
+
+		it( 'expands rectangle to cover rowSpan of start/end cells', () => {
+			// 4x4 table with rowSpan=2 on col 0 and col 3 in rows 0-1.
+			// Row 0: cell-A (col 0, rowSpan 2), cell-B (col 1), cell-C (col 2), cell-D (col 3, rowSpan 2)
+			// Row 1: (occupied by A), cell-E (col 1), cell-F (col 2), (occupied by D)
+			// Row 2: cell-G, cell-H, cell-I, cell-J
+			// Row 3: cell-K, cell-L, cell-M, cell-N
+			const rows = [
+				{ type: 'body', cellCount: 2 },
+				{ type: 'body', cellCount: 2 },
+				{ type: 'body', cellCount: 4 },
+				{ type: 'body', cellCount: 4 },
+			];
+			const cells = [
+				createCell( 'cell-A', { rowSpan: 2 } ),
+				createCell( 'cell-B' ),
+				createCell( 'cell-C' ),
+				createCell( 'cell-D', { rowSpan: 2 } ),
+				createCell( 'cell-E' ),
+				createCell( 'cell-F' ),
+				createCell( 'cell-G' ),
+				createCell( 'cell-H' ),
+				createCell( 'cell-I' ),
+				createCell( 'cell-J' ),
+				createCell( 'cell-K' ),
+				createCell( 'cell-L' ),
+				createCell( 'cell-M' ),
+				createCell( 'cell-N' ),
+			];
+
+			// Drag from cell-A (row 0, col 0, rowSpan 2) to cell-D (row 0, col 3, rowSpan 2).
+			// Rectangle should expand to rows 0-1, cols 0-3, selecting all 6 cells.
+			expect(
+				getCellRectangleClientIds( rows, cells, 4, 'cell-A', 'cell-D' )
+			).toEqual( [
+				'cell-A',
+				'cell-B',
+				'cell-C',
+				'cell-D',
+				'cell-E',
+				'cell-F',
+			] );
+		} );
 	} );
 
 	describe( 'getCellSelectionOutsideBorderAttributes', () => {
