@@ -316,6 +316,21 @@ describe( 'Awareness Utils', () => {
 				slug: '',
 			} );
 		} );
+
+		test( 'retains valid avatar URLs when another supported size is malformed', () => {
+			const user = createMockUser( {
+				avatar_urls: {
+					'24': 'https://example.com/small.png',
+					'48': 42,
+					'96': 'https://example.com/large.png',
+				},
+			} as unknown as Partial< User< 'view' > > );
+
+			expect( generateCollaboratorInfo( user, 9 ).avatar_urls ).toEqual( {
+				'24': 'https://example.com/small.png',
+				'96': 'https://example.com/large.png',
+			} );
+		} );
 	} );
 
 	describe( 'hasPresentableCollaboratorInfo', () => {

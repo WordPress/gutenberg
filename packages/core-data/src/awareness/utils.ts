@@ -1,6 +1,8 @@
 import { __ } from '@wordpress/i18n';
 import type { CollaboratorInfo } from './types';
 
+const AVATAR_SIZES = [ '24', '48', '96' ] as const;
+
 /**
  * Get the browser name from the user agent.
  * @return The browser name.
@@ -96,9 +98,27 @@ function hasValidAvatarUrls(
 		return false;
 	}
 
-	return [ '24', '48', '96' ].every(
+	return AVATAR_SIZES.every(
 		( size ) => ! ( size in value ) || 'string' === typeof value[ size ]
 	);
+}
+
+function normalizeAvatarUrls(
+	value: unknown
+): CollaboratorInfo[ 'avatar_urls' ] {
+	const avatarUrls: CollaboratorInfo[ 'avatar_urls' ] = {};
+
+	if ( 'object' !== typeof value || null === value ) {
+		return avatarUrls;
+	}
+
+	for ( const size of AVATAR_SIZES ) {
+		if ( size in value && 'string' === typeof value[ size ] ) {
+			avatarUrls[ size ] = value[ size ];
+		}
+	}
+
+	return avatarUrls;
 }
 
 /**
@@ -151,26 +171,10 @@ export function generateCollaboratorInfo(
 	if ( 'object' === typeof currentCollaborator && currentCollaborator ) {
 		const user = currentCollaborator;
 		if ( 'id' in user && 'name' in user ) {
-			const avatarUrls: CollaboratorInfo[ 'avatar_urls' ] = {};
-
-			if (
-				'avatar_urls' in user &&
-				'object' === typeof user.avatar_urls &&
-				user.avatar_urls
-			) {
-				for ( const size of [ '24', '48', '96' ] as const ) {
-					const url =
-						size in user.avatar_urls
-							? user.avatar_urls[ size ]
-							: undefined;
-					if ( 'string' === typeof url ) {
-						avatarUrls[ size ] = url;
-					}
-				}
-			}
-
 			const collaboratorInfo = {
-				avatar_urls: avatarUrls,
+				avatar_urls: normalizeAvatarUrls(
+					'avatar_urls' in user ? user.avatar_urls : undefined
+				),
 				browserType: getBrowserName(),
 				enteredAt: Date.now(),
 				id: user.id,

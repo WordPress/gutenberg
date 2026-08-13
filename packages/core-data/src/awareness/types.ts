@@ -2,13 +2,15 @@ import type { Y } from '@wordpress/sync';
 import type { SelectionState } from '../types';
 import type { User } from '../entity-types';
 
-export type CollaboratorInfo = Pick< User< 'view' >, 'name' | 'slug' > & {
-	avatar_urls: Partial< User< 'view' >[ 'avatar_urls' ] >;
-	browserType: string;
-	enteredAt: number;
+export type CollaboratorInfo = {
 	// This exclusively represents a WordPress user ID. Fallback collaborators
 	// have no WordPress identity, so their ID is null.
 	id: User< 'view' >[ 'id' ] | null;
+	name: User< 'view' >[ 'name' ];
+	slug: User< 'view' >[ 'slug' ];
+	avatar_urls: Partial< User< 'view' >[ 'avatar_urls' ] >;
+	browserType: string;
+	enteredAt: number;
 };
 
 /**
