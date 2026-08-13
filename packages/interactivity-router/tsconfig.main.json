@@ -6,7 +6,10 @@
 		"checkJs": false,
 		"strict": false
 	},
-	"references": [ { "path": "../a11y" }, { "path": "../interactivity" } ],
+	"references": [
+		{ "path": "../a11y" },
+		{ "path": "../interactivity/tsconfig.build.json" }
+	],
 	"exclude": [
 		"**/benchmark",
 		"build-*/**",

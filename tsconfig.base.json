@@ -2,6 +2,17 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"compilerOptions": {
 		"allowJs": true,
+		"paths": {
+			"@wordpress/block-editor": [
+				"./typings/untyped-packages/any-module.d.ts"
+			],
+			"@wordpress/patterns": [
+				"./typings/untyped-packages/any-module.d.ts"
+			],
+			"@wordpress/interface": [
+				"./typings/untyped-packages/any-module.d.ts"
+			]
+		},
 		"checkJs": true,
 		"allowSyntheticDefaultImports": true,
 		"jsx": "preserve",

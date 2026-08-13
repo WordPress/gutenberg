@@ -108,13 +108,20 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 	useEffect( () => {
 		const validityTarget = getValidityTarget();
 		const handler = () => {
+			// Re-read the message: the target's validity may have changed
+			// since it was last sampled, without a re-render in between.
+			// While async validation is pending, keep its indicator instead
+			// of showing a message its result may supersede.
+			if ( customValidity?.type !== 'validating' ) {
+				setErrorMessage( validityTarget?.validationMessage );
+			}
 			setShowMessage( true );
 			validityTarget?.setAttribute( VALIDITY_VISIBLE_ATTRIBUTE, '' );
 		};
 
 		validityTarget?.addEventListener( 'invalid', handler );
 		return () => validityTarget?.removeEventListener( 'invalid', handler );
-	}, [ getValidityTarget ] );
+	}, [ customValidity?.type, getValidityTarget ] );
 
 	// Suppress the native error popover, while keeping the focus behavior intact.
 	useEffect( () => {
