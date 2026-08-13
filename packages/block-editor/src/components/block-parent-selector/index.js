@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { ToolbarButton } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
@@ -76,7 +77,12 @@ export default function BlockParentSelector() {
 
 	return (
 		<div
-			className="block-editor-block-parent-selector"
+			// With the inserter next to it, the pair is a toolbar group:
+			// the class gives both buttons the standard toolbar sizing.
+			// (ToolbarGroup does not take the ref the gestures need.)
+			className={ clsx( 'block-editor-block-parent-selector', {
+				'components-toolbar-group': showInserter,
+			} ) }
 			key={ parentClientId }
 			ref={ nodeRef }
 			{ ...showHoveredOrFocusedGestures }
