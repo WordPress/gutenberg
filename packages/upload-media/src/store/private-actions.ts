@@ -902,9 +902,9 @@ export function prepareItem( id: QueueItemId ) {
 			} catch {
 				/*
 				 * Demuxing or the still decode failed. Handled below by
-				 * uploading the original file, which the server collapses to a
-				 * single frame — a still image is a better outcome than a
-				 * failed upload.
+				 * uploading the original file unchanged, which WordPress
+				 * stores and relabels as an ordinary still `.heic` — a better
+				 * outcome than a failed upload.
 				 */
 			}
 
@@ -946,9 +946,10 @@ export function prepareItem( id: QueueItemId ) {
 				/*
 				 * A sequence we cannot decode here (no WebCodecs, no platform
 				 * HEVC codec, or a demux failure). Upload it untouched: the
-				 * still-image decoder below would only fail on it, whereas the
-				 * server collapses it to a single frame. The motion is lost,
-				 * which is the same outcome as uploading outside the editor.
+				 * still-image decoder below would only fail on it, whereas
+				 * WordPress stores it and relabels it as an ordinary still
+				 * `.heic`. The motion is not converted, which is the same
+				 * outcome as uploading the file outside the editor.
 				 */
 				operations.push( OperationType.Upload );
 				dispatch< AddOperationsAction >( {

@@ -357,9 +357,10 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		 * The '-sequence' variants (multi-frame Live Photos and bursts) are
 		 * included: the editor normally uploads a decoded still frame instead,
 		 * and reaches this path only when the browser cannot decode HEVC at
-		 * all. Rejecting the upload there would be worse than storing it —
-		 * WordPress collapses a sequence to its first frame, so the user still
-		 * gets a usable photo, just without the motion.
+		 * all. Rejecting those is inconsistent with the rest of the pipeline —
+		 * wp_check_filetype_and_ext() renames a '.heics' upload to '.heic' and
+		 * records it as 'image/heic', so a file turned away here is one the
+		 * very next step would have treated as an ordinary still.
 		 *
 		 * Core's wp_is_heic_image_mime_type() covers exactly this list, but it
 		 * only exists in WordPress 7.1 and later, and this plugin supports 6.9.
