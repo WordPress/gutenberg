@@ -2,10 +2,10 @@ import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import { forwardRef, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { ENTER } from '@wordpress/keycodes';
-import { pasteHandler } from '@wordpress/blocks';
+import { ENTER, DELETE } from '@wordpress/keycodes';
+import { pasteHandler, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import {
 	privateApis as richTextPrivateApis,
 	create,
@@ -38,6 +38,10 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 		[]
 	);
 
+	const registry = useRegistry();
+	const { getBlockOrder, getBlock, canRemoveBlock } =
+		useSelect( blockEditorStore );
+
 	const [ isSelected, setIsSelected ] = useState( false );
 
 	const { ref: focusRef } = usePostTitleFocus( forwardedRef );
@@ -46,14 +50,19 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 
 	const [ selection, setSelection ] = useState( {} );
 
-	const { clearSelectedBlock, insertBlocks, insertDefaultBlock } =
-		useDispatch( blockEditorStore );
+	const {
+		clearSelectedBlock,
+		insertBlocks,
+		insertDefaultBlock,
+		removeBlock,
+	} = useDispatch( blockEditorStore );
 
 	const decodedPlaceholder =
 		decodeEntities( placeholder ) || __( 'Add title' );
 
 	const {
 		value,
+		getValue,
 		onChange,
 		ref: richTextRef,
 	} = useRichText( {
@@ -97,10 +106,63 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 		insertDefaultBlock( undefined, undefined, 0 );
 	}
 
+	function onForwardDeletePress( event ) {
+		const { start, end, text } = getValue();
+
+		// The browser handles deletion within the title itself.
+		if ( start !== text.length || end !== text.length ) {
+			return;
+		}
+
+		const clientId = getBlockOrder()[ 0 ];
+
+		if ( ! clientId || ! canRemoveBlock( clientId ) ) {
+			return;
+		}
+
+		const block = getBlock( clientId );
+		const isMergeable =
+			block.name === 'core/paragraph' || block.name === 'core/heading';
+
+		if ( ! isMergeable && ! isUnmodifiedDefaultBlock( block ) ) {
+			return;
+		}
+
+		event.preventDefault();
+		// Batch so that when removing the last block reinserts a selected
+		// default block (see ensureDefaultBlock), the selection never
+		// reaches subscribers and focus stays in the title.
+		registry.batch( () => {
+			if ( isMergeable && ! isUnmodifiedDefaultBlock( block ) ) {
+				// Strip HTML as when pasting: it is assumed that HTML in
+				// the title is undesirable.
+				const contentNoHTML = stripHTML(
+					block.attributes.content.toString()
+				);
+				const newValue = insert(
+					getValue(),
+					create( { html: contentNoHTML } ),
+					text.length,
+					text.length
+				);
+				// As with merging blocks, keep the caret at the merge point.
+				onChange( {
+					...newValue,
+					start: text.length,
+					end: text.length,
+				} );
+			}
+			removeBlock( clientId, false );
+			clearSelectedBlock();
+		} );
+	}
+
 	function onKeyDown( event ) {
 		if ( event.keyCode === ENTER ) {
 			event.preventDefault();
 			onEnterPress();
+		} else if ( event.keyCode === DELETE ) {
+			onForwardDeletePress( event );
 		}
 	}
 
