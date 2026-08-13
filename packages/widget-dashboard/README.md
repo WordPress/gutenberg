@@ -236,7 +236,7 @@ Edits on any surface stage through the engine's internal layer and reach `onLayo
 
 Actions carry the same `relevance` scale, mapped to surfaces of decreasing prominence:
 
--   **Footer, leading**: `relevance: 'high'` actions render as text links in a persistent strip under the widget body.
+-   **Footer, leading**: `relevance: 'high'` actions render as text links in a persistent strip under the widget body, a declared icon riding as prefix.
 -   **Footer, trailing**: `relevance: 'medium'` actions render as compact affordances: icon-only links when the action declares an icon, text links otherwise.
 -   **More menu**: the rest collapse into the three-dots menu in the tile header.
 

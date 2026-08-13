@@ -63,7 +63,7 @@ A persistent strip under the body, for the actions the widget promotes.
 
 `relevance` routes every action to its surface.
 
--   **`high`.** Text links on the leading edge, labels always visible.
+-   **`high`.** Text links on the leading edge, labels always visible, a declared icon as prefix.
 -   **`medium`.** Compact affordances on the trailing edge: icon-only with a declared icon, text links otherwise.
 -   **`low`** (default). The header's More menu.
 

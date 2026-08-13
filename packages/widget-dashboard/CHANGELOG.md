@@ -5,9 +5,10 @@
 ### New Features
 
 -   Widget chrome footer: `relevance: 'high'` actions mount as leading text
-    links in a persistent strip under the widget body, `'medium'` as trailing
-    compact affordances (icon-only with a declared icon); the "More" menu
-    keeps the rest, and full-bleed widgets keep every action in the menu
+    links (declared icon as prefix) in a persistent strip under the widget
+    body, `'medium'` as trailing compact affordances (icon-only with a
+    declared icon); the "More" menu keeps the rest, and full-bleed widgets
+    keep every action in the menu
     ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
 
 ## 0.5.0 (2026-08-12)

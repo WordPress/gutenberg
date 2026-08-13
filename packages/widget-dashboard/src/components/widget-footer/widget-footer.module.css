@@ -14,6 +14,13 @@
 	margin-inline-start: auto;
 }
 
+/* High action with a declared icon: the icon rides as a prefix. */
+.prefixed-action {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-xs);
+}
+
 /*
  * Square the icon-only link via the Button override hooks for icon
  * buttons; breathing room comes from the size, not from padding.

@@ -1,6 +1,6 @@
 import { __, sprintf } from '@wordpress/i18n';
 // eslint-disable-next-line @wordpress/use-recommended-components
-import { Link, LinkButton, Stack, Tooltip } from '@wordpress/ui';
+import { Icon, Link, LinkButton, Stack, Tooltip } from '@wordpress/ui';
 import type { WidgetAction, WidgetIcon } from '@wordpress/widget-primitives';
 import styles from './widget-footer.module.css';
 
@@ -70,8 +70,9 @@ type WidgetFooterProps = {
 
 /**
  * Persistent strip under the widget body. `'high'` actions mount as leading
- * text links; `'medium'` actions as trailing compact affordances, icon-only
- * when they declare an icon. Every affordance is a real anchor.
+ * text links, a declared icon riding as prefix; `'medium'` actions as
+ * trailing compact affordances, icon-only when they declare an icon. Every
+ * affordance is a real anchor.
  *
  * @param {WidgetFooterProps} props Component props.
  */
@@ -106,7 +107,13 @@ export function WidgetFooter( {
 							href={ action.href }
 							download={ action.download }
 							openInNewTab={ action.openInNewTab }
+							className={
+								action.icon
+									? styles[ 'prefixed-action' ]
+									: undefined
+							}
 						>
+							{ action.icon && <Icon icon={ action.icon } /> }
 							{ action.label }
 						</Link>
 					) ) }
