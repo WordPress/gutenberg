@@ -40,6 +40,8 @@ npm run test:unit -- test/integration/blocks-schema.test.js
 
 ## Fixtures
 
+### Block fixtures
+
 The `fixtures/blocks/` directory contains serialized block fixtures used by `full-content.test.js` to verify that blocks serialize and parse correctly.
 
 To generate missing fixtures:
@@ -53,6 +55,17 @@ To regenerate all fixtures from scratch:
 ```bash
 npm run fixtures:regenerate
 ```
+
+### theme.json schema fixtures
+
+`theme-schema.test.js` decides what to expect from where a file sits, so adding a case means adding a file and nothing else.
+
+| Location | Expectation |
+|---|---|
+| any `theme.json` under `lib/`, `phpunit/`, `test/`, or `packages/*/src/` | must validate, and must set `$schema` |
+| any `.json` file directly in `fixtures/schemas/` | must fail validation |
+
+Name an invalid fixture after the schema definition that rejects it, adding a `_suffix` when one definition needs several cases, as in `stylesPropertiesAndElementsComplete_pseudo.json`. Nothing enforces the name, so check the failure comes from the definition you meant to test.
 
 ## Jest Configuration
 

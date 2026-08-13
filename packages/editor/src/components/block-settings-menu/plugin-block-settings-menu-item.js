@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { BlockSettingsMenuControls } from '@wordpress/block-editor';
 import { MenuItem } from '@wordpress/components';
 import { compose } from '@wordpress/compose';

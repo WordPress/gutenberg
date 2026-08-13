@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { applyFilters } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
 import { createHttpPollingProvider } from './http-polling/http-polling-provider';
 import type { ProviderCreator } from '../types';
 

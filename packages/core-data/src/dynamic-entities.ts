@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { GetRecordsHttpQuery, State } from './selectors';
 import type * as ET from './entity-types';
 

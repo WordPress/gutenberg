@@ -17,12 +17,14 @@ const ALLOWLIST = {
 	'@wordpress/ui': {
 		allowed: [
 			'Badge',
+			'Calendar',
 			'Card',
 			'Collapsible',
 			'CollapsibleCard',
 			'EmptyState',
 			'Icon',
 			'Link',
+			'RangeCalendar',
 			'Skeleton',
 			'Stack',
 			'Tabs',
@@ -63,7 +65,8 @@ const DENYLIST = {
 		__experimentalVStack: 'Use `Stack` from `@wordpress/ui` instead.',
 		__experimentalZStack:
 			'{{ name }} is planned for deprecation. Write your own CSS instead.',
-		Animate: '{{ name }} is planned for deprecation.',
+		Animate:
+			'Write your own CSS animations instead, preferably using the motion tokens available in `@wordpress/theme`.',
 		Card: 'Use `Card.Root` from `@wordpress/ui` instead.',
 		CardBody: 'Use `Card.Content` from `@wordpress/ui` instead.',
 		CardDivider: 'A divider is no longer a standard pattern for cards.',

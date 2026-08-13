@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { Y } from '@wordpress/sync';
 import { resolveSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import {
 	BaseAwarenessState,
 	BaseAwareness,

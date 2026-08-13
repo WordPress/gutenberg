@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-
-/**
- * WordPress dependencies
- */
 import { createBlobURL, revokeBlobURL } from '@wordpress/blob';
-
-/**
- * Internal dependencies
- */
 import {
 	generateThumbnails,
 	getTranscodeImageOperation,

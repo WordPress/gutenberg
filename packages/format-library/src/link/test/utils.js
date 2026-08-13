@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { isValidHref, getFormatBoundary } from '../utils';
 
 describe( 'isValidHref', () => {

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { preserveClientIds } from '../preserve-client-ids';
 
 describe( 'preserveClientIds', () => {

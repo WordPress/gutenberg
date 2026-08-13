@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { combineReducers } from '../combine-reducers';
 
 function counterReducer( count = 0, action ) {

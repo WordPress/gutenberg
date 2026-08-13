@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { getBlockType } from '@wordpress/blocks';
 // @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -18,10 +15,6 @@ import {
 	setSetting as setSettingHelper,
 } from '@wordpress/global-styles-engine';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { ScreenHeader } from './screen-header';
 import BlockPreviewPanel from './block-preview-panel';
 import { Subtitle } from './subtitle';

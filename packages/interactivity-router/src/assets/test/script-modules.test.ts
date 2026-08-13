@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { preloadScriptModules } from '../script-modules';
 
 jest.mock( '../dynamic-importmap', () => ( {

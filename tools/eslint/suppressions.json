@@ -24,11 +24,6 @@
 			"count": 2
 		}
 	},
-	"packages/block-editor/src/components/block-inspector/edit-contents.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/block-inspector/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -258,26 +253,6 @@
 	"packages/block-editor/src/components/link-picker/link-preview.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
-		}
-	},
-	"packages/block-editor/src/components/list-view/block-select-button.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/list-view/branch.js": {
-		"react-hooks/refs": {
-			"count": 2
-		}
-	},
-	"packages/block-editor/src/components/list-view/drop-indicator.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/multi-selection-inspector/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/preset-input-control/index.js": {
@@ -781,16 +756,6 @@
 			"count": 3
 		}
 	},
-	"packages/components/src/item-group/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/components/src/menu/stories/index.story.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/menu/styles.ts": {
 		"no-restricted-imports": {
 			"count": 2
@@ -862,11 +827,6 @@
 	"packages/components/src/slot-fill/slot.tsx": {
 		"react-hooks/refs": {
 			"count": 1
-		}
-	},
-	"packages/components/src/spinner/styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
 		}
 	},
 	"packages/components/src/style-provider/index.tsx": {
@@ -982,11 +942,6 @@
 	"packages/connectors/src/connector-item.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 5
-		}
-	},
-	"packages/content-types/src/components/layout/index.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
 		}
 	},
 	"packages/core-data/src/components/entities-saved-states/index.js": {
@@ -1377,16 +1332,6 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/sidebar/header.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/sidebar/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/editor/src/components/sidebar/post-revision-summary.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
@@ -1650,7 +1595,7 @@
 	},
 	"packages/global-styles-ui/src/font-sizes/font-size.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 5
+			"count": 3
 		}
 	},
 	"packages/global-styles-ui/src/font-sizes/font-sizes-count.tsx": {
@@ -1659,11 +1604,6 @@
 		}
 	},
 	"packages/global-styles-ui/src/font-sizes/font-sizes.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 5
-		}
-	},
-	"packages/global-styles-ui/src/font-sizes/rename-font-size-dialog.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
 		}
@@ -1770,11 +1710,6 @@
 	},
 	"packages/global-styles-ui/src/shadows-edit-panel.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 6
-		}
-	},
-	"packages/global-styles-ui/src/shadows-panel.tsx": {
-		"@wordpress/use-recommended-components": {
 			"count": 3
 		}
 	},
@@ -1828,11 +1763,6 @@
 	},
 	"packages/lazy-editor/src/components/preview/index.tsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
-	"packages/media-editor/src/components/media-editor/index.tsx": {
-		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
 	},
@@ -2044,31 +1974,11 @@
 			"count": 1
 		}
 	},
-	"routes/post-type-edit/stage.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
-	"routes/post-types-list/stage.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
 	"routes/styles/stage.tsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1
 		},
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"routes/taxonomies-list/stage.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
-	"routes/taxonomy-edit/stage.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1
 		}
 	},

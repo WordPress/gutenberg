@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { keyboardReturn } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import URLInput from '../url-input';
 
 export default function LinkEditor( {

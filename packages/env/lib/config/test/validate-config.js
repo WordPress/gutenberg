@@ -1,7 +1,4 @@
 'use strict';
-/**
- * Internal dependencies
- */
 const {
 	ValidationError,
 	checkString,
