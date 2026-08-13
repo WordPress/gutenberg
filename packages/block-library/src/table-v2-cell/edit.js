@@ -402,7 +402,6 @@ export default function TableCellEdit( {
 						renderContent={ () => (
 							<div style={ { padding: '16px', width: '360px' } }>
 								<BorderControl
-									__next40pxDefaultSize
 									enableAlpha
 									enableStyle
 									label={ __( 'Outside border' ) }
