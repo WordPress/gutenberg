@@ -108,6 +108,39 @@ test.describe( 'Post title', () => {
 			await page.keyboard.type( ', ' );
 			await expect( titleField ).toHaveText( 'Hello, world' );
 		} );
+
+		test( 'should merge blocks that transform to the default block', async ( {
+			editor,
+			page,
+			admin,
+		} ) => {
+			await admin.createNewPost();
+
+			const titleField = editor.canvas.getByRole( 'textbox', {
+				name: 'Add title',
+			} );
+
+			await expect( titleField ).toBeFocused();
+			await page.keyboard.type( 'Hello' );
+
+			await page.evaluate( () => {
+				const { createBlock } = window.wp.blocks;
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.insertBlocks(
+						[ createBlock( 'core/heading', { content: 'World' } ) ],
+						0,
+						undefined,
+						false
+					);
+			} );
+
+			// The heading transforms to a paragraph and merges, the same
+			// as forward delete between a paragraph and a heading.
+			await page.keyboard.press( 'Delete' );
+			await expect.poll( editor.getBlocks ).toEqual( [] );
+			await expect( titleField ).toHaveText( 'HelloWorld' );
+		} );
 	} );
 
 	test.describe( 'HTML handling', () => {

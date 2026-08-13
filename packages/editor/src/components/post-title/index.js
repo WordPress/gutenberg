@@ -5,7 +5,12 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { ENTER, DELETE } from '@wordpress/keycodes';
-import { pasteHandler, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import {
+	pasteHandler,
+	isUnmodifiedDefaultBlock,
+	getDefaultBlockName,
+	switchToBlockType,
+} from '@wordpress/blocks';
 import {
 	privateApis as richTextPrivateApis,
 	create,
@@ -55,6 +60,7 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 		insertBlocks,
 		insertDefaultBlock,
 		removeBlock,
+		replaceBlocks,
 	} = useDispatch( blockEditorStore );
 
 	const decodedPlaceholder =
@@ -121,38 +127,64 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 		}
 
 		const block = getBlock( clientId );
-		const isMergeable =
-			block.name === 'core/paragraph' || block.name === 'core/heading';
 
-		if ( ! isMergeable && ! isUnmodifiedDefaultBlock( block ) ) {
+		if ( isUnmodifiedDefaultBlock( block ) ) {
+			event.preventDefault();
+			// Batch so that when removing the last block reinserts a
+			// selected default block (see ensureDefaultBlock), the
+			// selection never reaches subscribers and focus stays in the
+			// title.
+			registry.batch( () => {
+				removeBlock( clientId, false );
+				clearSelectedBlock();
+			} );
+			return;
+		}
+
+		// Blocks with inner blocks are left alone for now. Between blocks,
+		// forward delete moves the first inner block out of the container
+		// rather than merging text (see onMerge in block.js).
+		if ( getBlockOrder( clientId ).length ) {
+			return;
+		}
+
+		// As between blocks, transform the block to the default type
+		// before merging, so any block with such a transform can merge
+		// into the title. Without a transform, do nothing.
+		const [ blockOfDefaultType, ...remainingBlocks ] =
+			( block.name === getDefaultBlockName()
+				? [ block ]
+				: switchToBlockType( block, getDefaultBlockName() ) ) ?? [];
+
+		if ( ! blockOfDefaultType ) {
 			return;
 		}
 
 		event.preventDefault();
-		// Batch so that when removing the last block reinserts a selected
-		// default block (see ensureDefaultBlock), the selection never
-		// reaches subscribers and focus stays in the title.
 		registry.batch( () => {
-			if ( isMergeable && ! isUnmodifiedDefaultBlock( block ) ) {
-				// Strip HTML as when pasting: it is assumed that HTML in
-				// the title is undesirable.
-				const contentNoHTML = stripHTML(
-					block.attributes.content.toString()
-				);
-				const newValue = insert(
-					getValue(),
-					create( { html: contentNoHTML } ),
-					text.length,
-					text.length
-				);
-				// As with merging blocks, keep the caret at the merge point.
-				onChange( {
-					...newValue,
-					start: text.length,
-					end: text.length,
-				} );
+			// Strip HTML as when pasting: it is assumed that HTML in the
+			// title is undesirable.
+			const contentNoHTML = stripHTML(
+				blockOfDefaultType.attributes.content?.toString() ?? ''
+			);
+			const newValue = insert(
+				getValue(),
+				create( { html: contentNoHTML } ),
+				text.length,
+				text.length
+			);
+			// As with merging blocks, keep the caret at the merge point.
+			onChange( {
+				...newValue,
+				start: text.length,
+				end: text.length,
+			} );
+
+			if ( remainingBlocks.length ) {
+				replaceBlocks( clientId, remainingBlocks );
+			} else {
+				removeBlock( clientId, false );
 			}
-			removeBlock( clientId, false );
 			clearSelectedBlock();
 		} );
 	}
