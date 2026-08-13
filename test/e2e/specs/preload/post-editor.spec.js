@@ -31,6 +31,7 @@ test.describe( 'Preload', () => {
 		page,
 		admin,
 		editor,
+		isGutenbergPluginActive,
 	} ) => {
 		const { requests, stop } = recordRequests( page );
 		const { requests: requestsUntilMount, stop: stopOnMount } =
@@ -67,9 +68,13 @@ test.describe( 'Preload', () => {
 
 		// Only collab side effects (CRDT persist + first wp-sync poll)
 		// should escape before mount — they're detached promise chains
-		// off `receiveEntityRecords`.
+		// off `receiveEntityRecords`. The `wp-sync` routes and the notes
+		// comments query below only exist with the Gutenberg plugin, so
+		// core sees neither.
 		expect( Array.from( new Set( requestsUntilMount ) ).sort() ).toEqual(
-			[ 'POST /wp-sync/v1/save', 'POST /wp-sync/v1/updates' ].sort()
+			isGutenbergPluginActive
+				? [ 'POST /wp-sync/v1/save', 'POST /wp-sync/v1/updates' ].sort()
+				: []
 		);
 		// Every preloaded path should be consumed by the kickoff.
 		expect( preloadStatus ).toBe(
@@ -80,12 +85,14 @@ test.describe( 'Preload', () => {
 		// isn't stable across runs, so this assertion deduplicates.
 		// To do: these should all be removed or preloaded.
 		expect( Array.from( new Set( requests ) ).sort() ).toEqual(
-			[
-				`GET /wp/v2/comments?context=edit&post=${ postId }&type=note&status=all&per_page=100`,
-				'POST /wp-sync/v1/save',
-				'POST /wp-sync/v1/updates',
-				'POST /wp/v2/users/me',
-			].sort()
+			isGutenbergPluginActive
+				? [
+						`GET /wp/v2/comments?context=edit&post=${ postId }&type=note&status=all&per_page=100`,
+						'POST /wp-sync/v1/save',
+						'POST /wp-sync/v1/updates',
+						'POST /wp/v2/users/me',
+				  ].sort()
+				: [ 'POST /wp/v2/users/me' ]
 		);
 	} );
 } );
