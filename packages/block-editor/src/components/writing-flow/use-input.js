@@ -10,7 +10,7 @@ import {
 } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
-import { getSelectionEditableElement } from '../../utils/dom';
+import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
 
 /**
  * Handles input for selections across blocks.
@@ -134,8 +134,11 @@ export default function useInput() {
 						event.preventDefault();
 						__unstableSplitSelection();
 					} else if (
-						event.target.ownerDocument.activeElement?.getAttribute(
-							'data-block'
+						// The editable element may be nested within the
+						// block wrapper (e.g. Site Title), so resolve the
+						// block from the active element.
+						getBlockClientId(
+							event.target.ownerDocument.activeElement
 						) === clientId
 					) {
 						// The default block depends on context: containers

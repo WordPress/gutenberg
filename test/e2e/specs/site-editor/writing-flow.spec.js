@@ -122,4 +122,42 @@ test.describe( 'Site editor writing flow', () => {
 			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
 		).toHaveText( 'a' );
 	} );
+
+	test( 'enter in a nested editable inserts a block after', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//header',
+			postType: 'wp_template_part',
+			canvas: 'edit',
+		} );
+
+		// The Site Title's editable element is nested within the block
+		// wrapper, unlike e.g. a paragraph, where they are the same
+		// element.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Site title text' } )
+			.click();
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'a' );
+
+		await expect
+			.poll( () =>
+				editor.getBlocks().then( ( blocks ) =>
+					blocks.map( ( { name, attributes } ) => ( {
+						name,
+						...( name === 'core/paragraph' && {
+							content: attributes.content,
+						} ),
+					} ) )
+				)
+			)
+			.toEqual( [
+				{ name: 'core/site-title' },
+				{ name: 'core/paragraph', content: 'a' },
+				{ name: 'core/site-tagline' },
+			] );
+	} );
 } );
