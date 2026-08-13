@@ -16,6 +16,7 @@ import {
 	addNoteIdToMetadata,
 	removeNoteIdFromMetadata,
 	calculateNotePositions,
+	getHiddenBlockAnchorRect,
 	pickPrimaryNote,
 	BLOCK_LEVEL_NOTE_START,
 	getInlineMarkerStart,
@@ -568,6 +569,170 @@ describe( 'calculateNotePositions', () => {
 		// 1 (downward):   (234 + 80) - 300 + 20 = 34 → 334
 		expect( positions ).toEqual( { 1: 334, new: 234 } );
 		expect( positions[ 1 ] ).toBeGreaterThan( blockRects[ 1 ].top - 50 );
+	} );
+
+	it( 'positions a thread anchored to a hidden block boundary rect', () => {
+		// Thread 2's block is hidden, so it anchors to the zero-height
+		// boundary where the block would be, between its two neighbours.
+		const threads = [ { id: 1 }, { id: 2 }, { id: 3 } ];
+		const blockRects = {
+			1: makeRect( 100 ),
+			2: { top: 300, height: 0 },
+			3: makeRect( 500 ),
+		};
+		const heights = { 1: 50, 2: 50, 3: 50 };
+
+		const { positions } = calculateNotePositions( {
+			threads,
+			selectedNoteId: 1,
+			blockRects,
+			heights,
+			scrollTop: 0,
+		} );
+
+		// 1: 100 - 16 = 84
+		// 2: 300 - 16 = 284
+		// 3: 500 - 16 = 484
+		expect( positions ).toEqual( { 1: 84, 2: 284, 3: 484 } );
+	} );
+
+	it( 'keeps a hidden thread ahead of the thread it shares a boundary with', () => {
+		// A hidden block's boundary rect sits at the top of the next
+		// rendered block, tying with that block's own thread. Document
+		// order decides, and the sweep pushes the later thread down.
+		const threads = [ { id: 1 }, { id: 2 } ];
+		const blockRects = {
+			1: { top: 300, height: 0 },
+			2: makeRect( 300 ),
+		};
+		const heights = { 1: 50, 2: 50 };
+
+		const { positions } = calculateNotePositions( {
+			threads,
+			selectedNoteId: 1,
+			blockRects,
+			heights,
+			scrollTop: 0,
+		} );
+
+		// 1 (anchor):    300 - 16 = 284
+		// 2 (downward):  (284 + 50) - 300 + 20 = 54 → 354
+		expect( positions ).toEqual( { 1: 284, 2: 354 } );
+		expect( positions[ 1 ] ).toBeLessThan( positions[ 2 ] );
+	} );
+
+	it( 'positions every thread when the hidden thread is the anchor', () => {
+		const threads = [ { id: 1 }, { id: 2 }, { id: 3 } ];
+		const blockRects = {
+			1: makeRect( 100 ),
+			2: { top: 300, height: 0 },
+			3: makeRect( 500 ),
+		};
+		const heights = { 1: 50, 2: 50, 3: 50 };
+
+		const { positions } = calculateNotePositions( {
+			threads,
+			selectedNoteId: 2,
+			blockRects,
+			heights,
+			scrollTop: 0,
+		} );
+
+		expect( positions ).toEqual( { 1: 84, 2: 284, 3: 484 } );
+	} );
+} );
+
+describe( 'getHiddenBlockAnchorRect', () => {
+	// Only the rendered blocks appear in the lookup; a hidden block (and
+	// anything nested inside it) resolves to null, like the real DOM.
+	function makeLookup( rectsByClientId ) {
+		return ( clientId ) => {
+			const rect = rectsByClientId[ clientId ];
+			return rect ? { getBoundingClientRect: () => rect } : null;
+		};
+	}
+
+	const rect = ( top, height = 100 ) => ( {
+		top,
+		left: 20,
+		width: 600,
+		height,
+	} );
+
+	it( 'centres the rect in the gap between the rendered neighbours', () => {
+		// 'a' ends at 200, 'c' starts at 400, so the hidden block's slot is
+		// at 300 - where the block itself sits when it is selected.
+		const result = getHiddenBlockAnchorRect(
+			'b',
+			[ 'a', 'b', 'c' ],
+			makeLookup( { a: rect( 100 ), c: rect( 400 ) } )
+		);
+
+		expect( result ).toEqual( {
+			top: 300,
+			left: 20,
+			width: 600,
+			height: 0,
+		} );
+	} );
+
+	it( 'skips consecutive unrendered blocks, such as a hidden subtree', () => {
+		const result = getHiddenBlockAnchorRect(
+			'parent',
+			[ 'a', 'parent', 'child', 'grandchild', 'c' ],
+			makeLookup( { a: rect( 100 ), c: rect( 400 ) } )
+		);
+
+		expect( result.top ).toBe( 300 );
+	} );
+
+	it( "anchors to the next block's top when nothing precedes", () => {
+		const result = getHiddenBlockAnchorRect(
+			'a',
+			[ 'a', 'b' ],
+			makeLookup( { b: rect( 400 ) } )
+		);
+
+		expect( result ).toEqual( {
+			top: 400,
+			left: 20,
+			width: 600,
+			height: 0,
+		} );
+	} );
+
+	it( "anchors to the previous block's bottom when nothing follows", () => {
+		const result = getHiddenBlockAnchorRect(
+			'c',
+			[ 'a', 'b', 'c' ],
+			makeLookup( { a: rect( 100 ), b: rect( 250, 80 ) } )
+		);
+
+		expect( result ).toEqual( {
+			top: 330,
+			left: 20,
+			width: 600,
+			height: 0,
+		} );
+	} );
+
+	it( 'returns null when no block in the document is rendered', () => {
+		expect(
+			getHiddenBlockAnchorRect( 'b', [ 'a', 'b', 'c' ], makeLookup( {} ) )
+		).toBeNull();
+	} );
+
+	it( 'returns null for a client ID that is not in the document', () => {
+		expect(
+			getHiddenBlockAnchorRect(
+				'gone',
+				[ 'a', 'b' ],
+				makeLookup( { a: rect( 100 ), b: rect( 400 ) } )
+			)
+		).toBeNull();
+		expect(
+			getHiddenBlockAnchorRect( 'a', undefined, makeLookup( {} ) )
+		).toBeNull();
 	} );
 } );
 
