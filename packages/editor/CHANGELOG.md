@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Internal
-
--   Use the Real-Time Collaboration experiment when determining whether collaboration is enabled for the current post ([#80658](https://github.com/WordPress/gutenberg/pull/80658)).
-
 ## 14.53.0 (2026-08-12)
 
 ### Internal
