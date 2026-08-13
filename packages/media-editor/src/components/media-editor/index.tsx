@@ -69,6 +69,35 @@ interface EditorTab {
 export interface MediaEditorFrameProps {
 	children: ReactNode;
 	headerActions: ReactNode;
+	/**
+	 * Reset / Undo / Redo. `null` for non-image media, which has no edit
+	 * history.
+	 *
+	 * A frame with no footer — the wp-admin route, where a footer would be out
+	 * of place — places this itself, alongside `saveActions` and
+	 * `imageControls`. A frame with a footer renders the pre-composed
+	 * `footerActions` instead. Render one or the other, never both.
+	 */
+	historyActions: ReactNode;
+	/**
+	 * Cancel / Save.
+	 */
+	saveActions: ReactNode;
+	/**
+	 * Rotate / flip / zoom and the aspect-ratio control, as a flat toolbar.
+	 *
+	 * Non-null only when `footerLayout` is `narrow`: above that breakpoint the
+	 * Crop panel renders these itself, so a frame that rendered this
+	 * unconditionally would show them twice. A frame that composes the
+	 * clusters by hand must give this a home, or the transform controls become
+	 * unreachable once the sidebar collapses.
+	 */
+	imageControls: ReactNode;
+	/**
+	 * `historyActions`, `saveActions` and `imageControls` pre-composed into the
+	 * layout selected by `footerLayout`. A convenience for frames with a
+	 * footer; frames that place the clusters themselves should ignore it.
+	 */
 	footerActions: ReactNode;
 	/**
 	 * Footer layout selector. Frames apply this to the footer container
@@ -111,6 +140,14 @@ export interface MediaEditorProps {
 	 * @default 'media-editor'
 	 */
 	scope?: string;
+	/**
+	 * Size applied to the Cancel/Save buttons. Footers use the 40px default;
+	 * frames that host these actions in a page header should pass `compact` so
+	 * they match the header's other controls.
+	 *
+	 * @default 'default'
+	 */
+	actionsSize?: 'default' | 'compact';
 }
 
 interface MediaEditorSidebarProps {
@@ -297,31 +334,38 @@ function HistoryActions( {
 	);
 }
 
-interface FooterActionsProps {
+interface SaveActionsProps {
 	isSaving: boolean;
 	hasMedia: boolean;
 	hasChanges: boolean;
+	size: 'default' | 'compact';
 	onCancel: () => void;
 	onSave: () => void;
 }
 
-function FooterActions( {
+function SaveActions( {
 	isSaving,
 	hasMedia,
 	hasChanges,
+	size,
 	onCancel,
 	onSave,
-}: FooterActionsProps ) {
+}: SaveActionsProps ) {
 	const saveDisabled = isSaving || ! hasMedia || ! hasChanges;
+	// `size="compact"` fully specifies the height on its own, and the 40px
+	// opt-in applies only to the default size, so the two are mutually
+	// exclusive rather than combined.
+	const isCompact = size === 'compact';
 	return (
 		<Stack
-			className="media-editor__footer-actions"
+			className="media-editor__save-actions"
 			justify="flex-end"
 			align="center"
 			gap="sm"
 		>
 			<Button
-				__next40pxDefaultSize
+				__next40pxDefaultSize={ ! isCompact }
+				size={ isCompact ? 'compact' : undefined }
 				variant="tertiary"
 				onClick={ onCancel }
 				disabled={ isSaving }
@@ -330,7 +374,8 @@ function FooterActions( {
 				{ __( 'Cancel' ) }
 			</Button>
 			<Button
-				__next40pxDefaultSize
+				__next40pxDefaultSize={ ! isCompact }
+				size={ isCompact ? 'compact' : undefined }
 				variant="primary"
 				onClick={ onSave }
 				isBusy={ isSaving }
@@ -355,6 +400,7 @@ function MediaEditorContent( {
 	showCloseButton = false,
 	shouldCloseOnEsc = false,
 	scope = 'media-editor',
+	actionsSize = 'default',
 }: MediaEditorProps ) {
 	const cropper = useMediaEditor();
 	// The sidebar is a side column from the `small` breakpoint up and collapses
@@ -689,10 +735,11 @@ function MediaEditorContent( {
 		/>
 	) : null;
 	const actions = (
-		<FooterActions
+		<SaveActions
 			isSaving={ isSaving }
 			hasMedia={ !! media }
 			hasChanges={ hasChanges }
+			size={ actionsSize }
 			onCancel={ handleRequestClose }
 			onSave={ saveMediaEditor }
 		/>
@@ -736,6 +783,12 @@ function MediaEditorContent( {
 				scope={ scope }
 			/>
 		),
+		historyActions: history,
+		saveActions: actions,
+		// Gated here rather than in the frame: above the breakpoint these
+		// controls already render inside the Crop panel, so handing them to a
+		// frame that placed them unconditionally would show them twice.
+		imageControls: footerLayout === 'narrow' ? imageControls : null,
 		footerActions,
 		footerLayout,
 		onRequestClose: handleRequestClose,

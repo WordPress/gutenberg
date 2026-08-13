@@ -74,42 +74,107 @@ function MediaEditorRoute() {
 			// A scope of its own, so that the details sidebar opens by default
 			// here regardless of whether it was last collapsed in the modal.
 			scope={ MEDIA_EDITOR_SCOPE }
+			// The actions sit in the page header rather than a footer, so they
+			// match the height of the header's other controls.
+			actionsSize="compact"
 			onClose={ navigateBack }
 			onSaved={ ( { id: savedId } ) => {
 				if ( savedId !== attachmentId ) {
 					navigate( { to: `/media-editor/${ savedId }` } );
 				}
 			} }
-			renderFrame={ ( { children, headerActions, onKeyDown } ) => (
-				<Page
-					className="media-editor-route"
-					ariaLabel={ title }
-					breadcrumbs={
-						<Breadcrumbs
-							items={
-								isStandaloneAdminPage
-									? [ { label: title } ]
-									: [
-											{
-												label: __( 'Media' ),
-												to: MEDIA_LIST_PATH,
-											},
-											{ label: title },
-									  ]
-							}
-						/>
-					}
-					actions={ headerActions }
-				>
-					{ /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */ }
+			renderFrame={ ( {
+				children,
+				headerActions,
+				historyActions,
+				saveActions,
+				imageControls,
+				footerLayout,
+				onKeyDown,
+			} ) => {
+				// Below the sidebar-collapse breakpoint the header has no room
+				// for the history cluster: it already carries the breadcrumbs,
+				// Cancel/Save, and (under `medium`) the framework's navigation
+				// toggle, in a single row that does not wrap. History joins the
+				// transform controls in a bar under the canvas instead, which
+				// is what the modal's narrow footer does.
+				const isNarrow = footerLayout === 'narrow';
+				return (
+					// The keydown handler covers the whole frame, not just the
+					// canvas: undo/redo live in the header, so after clicking
+					// one, focus sits outside the content region and the
+					// keyboard shortcuts would no longer reach the handler.
+					// `Page` takes no `onKeyDown`, hence the wrapper; it is
+					// `display: contents`, so it adds no box to the layout.
+					// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 					<div
-						className="media-editor-route__content"
+						className="media-editor-route__shortcut-scope"
 						onKeyDown={ onKeyDown }
 					>
-						{ children }
+						<Page
+							className="media-editor-route"
+							ariaLabel={ title }
+							breadcrumbs={
+								<Breadcrumbs
+									items={
+										isStandaloneAdminPage
+											? [ { label: title } ]
+											: [
+													{
+														label: __( 'Media' ),
+														to: MEDIA_LIST_PATH,
+													},
+													{ label: title },
+											  ]
+									}
+								/>
+							}
+							actions={
+								<>
+									{ ! isNarrow && historyActions && (
+										<>
+											{ historyActions }
+											<div
+												className="media-editor-route__actions-divider"
+												aria-hidden="true"
+											/>
+										</>
+									) }
+									{ headerActions }
+									<div
+										className="media-editor-route__actions-divider"
+										aria-hidden="true"
+									/>
+									{ /* A group rather than a region: the page
+									     is already a landmark, and two buttons
+									     do not warrant a second one. */ }
+									<div
+										role="group"
+										aria-label={ __( 'Save actions' ) }
+									>
+										{ saveActions }
+									</div>
+								</>
+							}
+						>
+							<div className="media-editor-route__content">
+								{ children }
+							</div>
+							{ isNarrow &&
+								( imageControls || historyActions ) && (
+									<div
+										className="media-editor-route__toolbar"
+										role="region"
+										aria-label={ __( 'Editor actions' ) }
+									>
+										{ imageControls }
+										{ historyActions }
+									</div>
+								) }
+						</Page>
 					</div>
-				</Page>
-			) }
+				);
+			} }
 		/>
 	);
 }
