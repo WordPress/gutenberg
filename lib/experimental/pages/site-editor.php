@@ -21,61 +21,30 @@ function gutenberg_register_site_editor_admin_page() {
 add_action( 'admin_menu', 'gutenberg_register_site_editor_admin_page' );
 
 /**
- * Whether the active theme can use the Navigation screen.
- *
- * The screen edits `wp_navigation` posts, which only block themes render.
- * Classic themes manage their menus through Appearance > Menus instead.
- *
- * @return bool True if the active theme is a block theme.
- */
-function gutenberg_site_editor_v2_supports_navigation() {
-	return wp_is_block_theme();
-}
-
-/**
- * Whether the active theme can use the Templates screen.
- *
- * Block themes and classic themes shipping a `theme.json` file opt in
- * automatically, other classic themes have to call
- * `add_theme_support( 'block-templates' )`.
- *
- * @return bool True if the active theme supports block templates.
- */
-function gutenberg_site_editor_v2_supports_block_templates() {
-	return (bool) current_theme_supports( 'block-templates' );
-}
-
-/**
- * Whether the active theme can use the Template Parts screen.
- *
- * Mirrors the check the Template Part block makes before rendering a theme
- * template part: `block-template-parts` lets a classic theme opt into template
- * parts alone, without the rest of the block template system.
- *
- * @return bool True if the active theme supports block template parts.
- */
-function gutenberg_site_editor_v2_supports_block_template_parts() {
-	return gutenberg_site_editor_v2_supports_block_templates() || (bool) current_theme_supports( 'block-template-parts' );
-}
-
-/**
  * Register default menu items for the site editor page.
  */
 function gutenberg_site_editor_register_default_menu_items() {
 	gutenberg_register_site_editor_v2_menu_item( 'home', __( 'Home', 'gutenberg' ), '/', '' );
 	gutenberg_register_site_editor_v2_menu_item( 'styles', __( 'Styles', 'gutenberg' ), '/styles', '' );
 
-	if ( gutenberg_site_editor_v2_supports_navigation() ) {
+	// The screen edits `wp_navigation` posts, which only block themes render.
+	// Classic themes manage their menus through Appearance > Menus instead.
+	if ( wp_is_block_theme() ) {
 		gutenberg_register_site_editor_v2_menu_item( 'navigation', __( 'Navigation', 'gutenberg' ), '/navigation', '' );
 	}
 
 	gutenberg_register_site_editor_v2_menu_item( 'pages', __( 'Pages', 'gutenberg' ), '/types/page', '' );
 
-	if ( gutenberg_site_editor_v2_supports_block_templates() ) {
+	// Block themes and classic themes shipping a `theme.json` file opt in
+	// automatically, other classic themes have to call
+	// `add_theme_support( 'block-templates' )`.
+	if ( current_theme_supports( 'block-templates' ) ) {
 		gutenberg_register_site_editor_v2_menu_item( 'templates', __( 'Templates', 'gutenberg' ), '/templates', '' );
 	}
 
-	if ( gutenberg_site_editor_v2_supports_block_template_parts() ) {
+	// `block-template-parts` lets a classic theme opt into template parts alone,
+	// as the Template Part block itself allows.
+	if ( current_theme_supports( 'block-templates' ) || current_theme_supports( 'block-template-parts' ) ) {
 		gutenberg_register_site_editor_v2_menu_item( 'templateParts', __( 'Template Parts', 'gutenberg' ), '/template-parts', '' );
 	}
 
@@ -91,15 +60,15 @@ add_action( 'site-editor-v2_init', 'gutenberg_site_editor_register_default_menu_
  * URL, offering site management a classic theme ignores.
  */
 function gutenberg_site_editor_v2_unregister_unsupported_routes() {
-	if ( ! gutenberg_site_editor_v2_supports_navigation() ) {
+	if ( ! wp_is_block_theme() ) {
 		gutenberg_unregister_site_editor_v2_route( '/navigation' );
 	}
 
-	if ( ! gutenberg_site_editor_v2_supports_block_templates() ) {
+	if ( ! current_theme_supports( 'block-templates' ) ) {
 		gutenberg_unregister_site_editor_v2_route( '/templates' );
 	}
 
-	if ( ! gutenberg_site_editor_v2_supports_block_template_parts() ) {
+	if ( ! current_theme_supports( 'block-templates' ) && ! current_theme_supports( 'block-template-parts' ) ) {
 		gutenberg_unregister_site_editor_v2_route( '/template-parts' );
 	}
 }
