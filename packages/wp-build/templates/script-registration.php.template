@@ -52,8 +52,7 @@ function {{PREFIX}}_override_script( $scripts, $handle, $src, $deps = array(), $
 function {{PREFIX}}_register_package_scripts( $scripts ) {
 	// Load build constants
 	$build_constants = require __DIR__ . '/constants.php';
-	$default_version = ! SCRIPT_DEBUG ? $build_constants['version'] : time();
-	$extension       = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
+	$default_version = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? time() : $build_constants['version'];
 
 	$scripts_dir  = __DIR__ . '/scripts';
 	$scripts_file = $scripts_dir . '/registry.php';
@@ -63,6 +62,11 @@ function {{PREFIX}}_register_package_scripts( $scripts ) {
 	}
 
 	$scripts_data = require $scripts_file;
+
+	$extension = '.min.js';
+	if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG && $build_constants['has_debug_assets'] ) {
+		$extension = '.js';
+	}
 	$plugin_dir   = dirname( __FILE__ );
 
 	foreach ( $scripts_data as $script_data ) {
