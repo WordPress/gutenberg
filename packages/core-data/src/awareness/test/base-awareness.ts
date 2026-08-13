@@ -122,7 +122,6 @@ describe( 'BaseAwareness', () => {
 			const collaboratorInfo =
 				awareness.getLocalStateField( 'collaboratorInfo' );
 			expect( collaboratorInfo ).toMatchObject( {
-				avatar_urls: {},
 				id: null,
 				name: 'Anonymous User',
 				slug: `anonymous-${ doc.clientID }`,

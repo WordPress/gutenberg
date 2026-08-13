@@ -1,8 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import type { CollaboratorInfo } from './types';
 
-const AVATAR_SIZES = [ '24', '48', '96' ] as const;
-
 /**
  * Get the browser name from the user agent.
  * @return The browser name.
@@ -89,7 +87,7 @@ export function areCollaboratorInfosEqual(
 
 function hasValidAvatarUrls(
 	value: unknown
-): value is CollaboratorInfo[ 'avatar_urls' ] {
+): value is NonNullable< CollaboratorInfo[ 'avatar_urls' ] > {
 	if (
 		'object' !== typeof value ||
 		null === value ||
@@ -98,27 +96,9 @@ function hasValidAvatarUrls(
 		return false;
 	}
 
-	return AVATAR_SIZES.every(
+	return [ '24', '48', '96' ].every(
 		( size ) => ! ( size in value ) || 'string' === typeof value[ size ]
 	);
-}
-
-function normalizeAvatarUrls(
-	value: unknown
-): CollaboratorInfo[ 'avatar_urls' ] {
-	const avatarUrls: CollaboratorInfo[ 'avatar_urls' ] = {};
-
-	if ( 'object' !== typeof value || null === value ) {
-		return avatarUrls;
-	}
-
-	for ( const size of AVATAR_SIZES ) {
-		if ( size in value && 'string' === typeof value[ size ] ) {
-			avatarUrls[ size ] = value[ size ];
-		}
-	}
-
-	return avatarUrls;
 }
 
 /**
@@ -140,7 +120,6 @@ export function hasPresentableCollaboratorInfo(
 		'id' in value &&
 		'name' in value &&
 		'slug' in value &&
-		'avatar_urls' in value &&
 		'browserType' in value &&
 		'enteredAt' in value &&
 		( null === value.id ||
@@ -150,7 +129,8 @@ export function hasPresentableCollaboratorInfo(
 		'string' === typeof value.name &&
 		'' !== value.name.trim() &&
 		'string' === typeof value.slug &&
-		hasValidAvatarUrls( value.avatar_urls ) &&
+		( ! ( 'avatar_urls' in value ) ||
+			hasValidAvatarUrls( value.avatar_urls ) ) &&
 		'string' === typeof value.browserType &&
 		'number' === typeof value.enteredAt &&
 		Number.isFinite( value.enteredAt )
@@ -168,15 +148,20 @@ export function generateCollaboratorInfo(
 	currentCollaborator: unknown,
 	clientId: number
 ): CollaboratorInfo {
+	const presentationInfo = {
+		browserType: getBrowserName(),
+		enteredAt: Date.now(),
+	};
+
 	if ( 'object' === typeof currentCollaborator && currentCollaborator ) {
 		const user = currentCollaborator;
 		if ( 'id' in user && 'name' in user ) {
 			const collaboratorInfo = {
-				avatar_urls: normalizeAvatarUrls(
-					'avatar_urls' in user ? user.avatar_urls : undefined
-				),
-				browserType: getBrowserName(),
-				enteredAt: Date.now(),
+				...presentationInfo,
+				...( 'avatar_urls' in user &&
+				hasValidAvatarUrls( user.avatar_urls )
+					? { avatar_urls: user.avatar_urls }
+					: {} ),
 				id: user.id,
 				name: user.name,
 				slug:
@@ -197,9 +182,7 @@ export function generateCollaboratorInfo(
 	// The Yjs client ID remains available on the surrounding awareness state for
 	// session-specific UI identity and also makes the fallback slug deterministic.
 	return {
-		avatar_urls: {},
-		browserType: getBrowserName(),
-		enteredAt: Date.now(),
+		...presentationInfo,
 		id: null,
 		name: __( 'Anonymous User' ),
 		slug: `anonymous-${ clientId }`,

@@ -492,7 +492,6 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 					id: null,
 					name: 'Anonymous User',
 					slug: 'anonymous-2',
-					avatar_urls: {},
 					browserType: 'Firefox',
 					enteredAt: 1704067300000,
 				},

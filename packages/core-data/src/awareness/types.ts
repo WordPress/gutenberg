@@ -8,7 +8,8 @@ export type CollaboratorInfo = {
 	id: User< 'view' >[ 'id' ] | null;
 	name: User< 'view' >[ 'name' ];
 	slug: User< 'view' >[ 'slug' ];
-	avatar_urls: Partial< User< 'view' >[ 'avatar_urls' ] >;
+	// Fallback collaborators omit avatar URLs so avatar components render initials.
+	avatar_urls?: Partial< User< 'view' >[ 'avatar_urls' ] >;
 	browserType: string;
 	enteredAt: number;
 };

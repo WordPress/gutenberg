@@ -21,8 +21,8 @@ export abstract class BaseAwarenessState<
 		try {
 			currentUser = await resolveSelect( coreStore ).getCurrentUser();
 		} catch {
-			// User resolution is expected to fail on sites where user REST routes
-			// are unavailable. The generated fallback identity remains usable.
+			// Any user-resolution failure leaves collaboration usable with a
+			// fallback identity. Authorization remains the provider's responsibility.
 		}
 
 		this.setLocalStateField(

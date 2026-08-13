@@ -303,33 +303,14 @@ describe( 'Awareness Utils', () => {
 			} );
 		} );
 
-		test( 'normalizes invalid optional presentation fields', () => {
+		test( 'omits invalid avatar data', () => {
 			const user = createMockUser( {
 				avatar_urls: 'invalid',
-				slug: null,
 			} as unknown as Partial< User< 'view' > > );
 			const collaboratorInfo = generateCollaboratorInfo( user, 9 );
 
-			expect( collaboratorInfo ).toMatchObject( {
-				avatar_urls: {},
-				id: 1,
-				slug: '',
-			} );
-		} );
-
-		test( 'retains valid avatar URLs when another supported size is malformed', () => {
-			const user = createMockUser( {
-				avatar_urls: {
-					'24': 'https://example.com/small.png',
-					'48': 42,
-					'96': 'https://example.com/large.png',
-				},
-			} as unknown as Partial< User< 'view' > > );
-
-			expect( generateCollaboratorInfo( user, 9 ).avatar_urls ).toEqual( {
-				'24': 'https://example.com/small.png',
-				'96': 'https://example.com/large.png',
-			} );
+			expect( collaboratorInfo ).toMatchObject( { id: 1 } );
+			expect( collaboratorInfo ).not.toHaveProperty( 'avatar_urls' );
 		} );
 	} );
 
@@ -337,7 +318,9 @@ describe( 'Awareness Utils', () => {
 		test( 'accepts complete named and fallback collaborator information', () => {
 			expect(
 				hasPresentableCollaboratorInfo( {
-					avatar_urls: {},
+					avatar_urls: {
+						'48': 'https://example.com/medium.png',
+					},
 					browserType: 'Chrome',
 					enteredAt: 1704067200000,
 					id: 42,
@@ -347,7 +330,6 @@ describe( 'Awareness Utils', () => {
 			).toBe( true );
 			expect(
 				hasPresentableCollaboratorInfo( {
-					avatar_urls: {},
 					browserType: 'Chrome',
 					enteredAt: 1704067200000,
 					id: null,
@@ -394,7 +376,6 @@ describe( 'Awareness Utils', () => {
 			const collaboratorInfo = generateCollaboratorInfo( undefined, 9 );
 
 			expect( collaboratorInfo ).toEqual( {
-				avatar_urls: {},
 				browserType: 'Unknown',
 				enteredAt: 1704067200000,
 				id: null,

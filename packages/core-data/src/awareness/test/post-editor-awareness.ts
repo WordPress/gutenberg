@@ -837,12 +837,11 @@ describe( 'PostEditorAwareness', () => {
 			);
 			awareness.getSeenStates().set( 456, {
 				collaboratorInfo: {
-					avatar_urls: {},
 					browserType: 'Chrome',
 					enteredAt: 123,
 					id: null,
 					name: 'Anonymous User',
-					slug: 'test-user',
+					slug: 'anonymous-456',
 				},
 			} );
 
@@ -868,7 +867,7 @@ describe( 'PostEditorAwareness', () => {
 					enteredAt: 123,
 					id: 42,
 					name: 'Test User',
-					slug: 'anonymous-456',
+					slug: 'test-user',
 				},
 			} );
 
