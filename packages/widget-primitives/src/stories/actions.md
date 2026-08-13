@@ -61,3 +61,5 @@ Where no link primitive fits, as in a command palette, the host mounts what the 
 The widget lists its actions; it never specifies where they go. The host maps them to its surfaces: a dashboard might gather them in a "More" menu, a footer, or a command palette.
 
 `relevance` carries the widget's side of that decision: `'high'` marks an action worth a prominent surface, `'low'` (the default) the rest. Attributes already use the same vocabulary: the widget declares intent, and the host owns the surface.
+
+The dashboard host maps the hint this way: high-relevance actions mount in a persistent footer under the widget body, and the rest collapse into the "More" menu. Full-bleed widgets render no chrome, so all of their actions stay in the menu.

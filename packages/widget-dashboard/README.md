@@ -205,7 +205,7 @@ The tile chrome is a `Card` at the Card's default density. Hosts can tighten or 
 
 ```css
 :root {
-	--wp-widget-dashboard-tile-padding: var(--wpds-dimension-padding-lg);
+	--wp-widget-dashboard-tile-padding: var( --wpds-dimension-padding-lg );
 }
 ```
 
@@ -231,6 +231,15 @@ A widget declares importance per attribute through `relevance` (`'high' | 'low'`
 The prominent surface holds only while it fits. The header measures the space it can grant its toolbar; when the promoted fields' natural width exceeds it, they collapse into a dropdown holding them as a form. The settings trigger is not part of the collapse: it stays in the toolbar whenever non-promoted attributes exist. The presentation follows the measurement both ways: widen the tile and the fields return inline.
 
 Edits on any surface stage through the engine's internal layer and reach `onLayoutChange` on commit. Prominent-surface and dropdown edits publish on a shared auto-save debounce; the settings surface publishes on Save.
+
+### Actions
+
+Actions carry the same `relevance` vocabulary, mapped to two surfaces:
+
+-   **Footer**: `relevance: 'high'` actions render in a persistent strip under the widget body. Actions without an icon mount as leading text links; actions with one mount as trailing icon-only links, the label serving as accessible name and tooltip.
+-   **More menu**: the remaining actions collapse into the three-dots menu in the tile header.
+
+Every affordance is a real anchor, so middle-click, copy address, and download semantics survive. Full-bleed widgets render no chrome to host a footer, so all of their actions stay in the menu.
 
 ## Authoring widgets
 
