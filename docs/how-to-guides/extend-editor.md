@@ -66,19 +66,39 @@ function SubtitleSidebar() {
 
 ### Add a panel to the Document sidebar
 
-`PluginDocumentSettingPanel` renders below the Status & Availability panel, next to the post's own settings. Use it for a setting that belongs to the document, where a dedicated sidebar would be too much.
+`PluginDocumentSettingPanel` renders in the Post tab of the document sidebar, below the post's own summary of Status, Publish, Slug, and so on, and above Categories and Tags. Use it for a setting that belongs to the document, where a dedicated sidebar would be too much.
 
 ```jsx
-import { PluginDocumentSettingPanel } from '@wordpress/editor';
+import {
+	PluginDocumentSettingPanel,
+	store as editorStore,
+} from '@wordpress/editor';
+import { TextControl } from '@wordpress/components';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 function ReviewPanel() {
+	const reviewer = useSelect(
+		( select ) =>
+			select( editorStore ).getEditedPostAttribute( 'meta' )
+				?.my_plugin_reviewer ?? '',
+		[]
+	);
+	const { editPost } = useDispatch( editorStore );
+
 	return (
 		<PluginDocumentSettingPanel
 			name="my-plugin-review"
 			title={ __( 'Editorial review' ) }
 		>
-			{ /* Controls for the review workflow. */ }
+			<TextControl
+				__nextHasNoMarginBottom
+				label={ __( 'Reviewer' ) }
+				value={ reviewer }
+				onChange={ ( value ) =>
+					editPost( { meta: { my_plugin_reviewer: value } } )
+				}
+			/>
 		</PluginDocumentSettingPanel>
 	);
 }
@@ -225,7 +245,9 @@ addFilter(
 );
 ```
 
-An attribute added this way is not saved on its own. Unless it has a `source`, it is serialized into the block's comment delimiter, and for a static block that changes the saved markup, so existing content is flagged as invalid. [Block filters](/docs/reference-guides/filters/block-filters.md) covers the ways to handle this, including `blocks.getSaveContent.extraProps`.
+Unless it has a `source`, the attribute is stored in the block's comment delimiter rather than in its markup. That is safe for existing content: validation compares the output of the block's `save` function against the markup already in the post, and the delimiter is not part of that comparison.
+
+Getting the value into the saved markup is the separate step, and the one to be careful with. `blocks.getSaveContent.extraProps` changes what `save` produces, so posts written before your filter existed no longer match and are flagged as invalid. [Block filters](/docs/reference-guides/filters/block-filters.md) covers that filter and the deprecation strategies for it.
 
 ### Wrap a block's edit component
 
@@ -298,25 +320,29 @@ registerBlockVariation( 'core/group', {
 
 ## Store data in post meta
 
-Meta fields are the usual place for data an extension collects about a post. Register the field in PHP with `show_in_rest` so the Editor can read and write it:
+Meta fields are the usual place for data an extension collects about a post. The sidebar and the document panel above both write to one, so register each in PHP with `show_in_rest` so the Editor can read and write it:
 
 ```php
 function my_plugin_register_meta() {
-	register_post_meta(
-		'post',
-		'my_plugin_subtitle',
-		array(
-			'show_in_rest' => true,
-			'single'       => true,
-			'type'         => 'string',
-			'default'      => '',
-		)
-	);
+	$fields = array( 'my_plugin_subtitle', 'my_plugin_reviewer' );
+
+	foreach ( $fields as $field ) {
+		register_post_meta(
+			'post',
+			$field,
+			array(
+				'show_in_rest' => true,
+				'single'       => true,
+				'type'         => 'string',
+				'default'      => '',
+			)
+		);
+	}
 }
 add_action( 'init', 'my_plugin_register_meta' );
 ```
 
-From JavaScript, read the field with `getEditedPostAttribute( 'meta' )` and write it with `editPost`, as in the sidebar example above. Both go through the `core/editor` store, so the value is part of the post's unsaved edits and is saved with the post rather than in a request of its own.
+From JavaScript, read a field with `getEditedPostAttribute( 'meta' )` and write it with `editPost`, as in the two examples above. Both go through the `core/editor` store, so the value is part of the post's unsaved edits and is saved with the post rather than in a request of its own.
 
 ## Guidelines
 
