@@ -560,3 +560,180 @@ export function toggleSection( rows, cells, { type, columnCount } ) {
 		columnCount,
 	} );
 }
+
+/**
+ * Merges a rectangular selection of cells into a single cell.
+ *
+ * The top-left cell becomes the merged cell, inheriting rowSpan and colSpan
+ * for the full rectangle. All other cells in the selection are removed.
+ * Only cells within the same section (head/body/foot) can be merged.
+ *
+ * @param {Array}  rows              Row descriptors.
+ * @param {Array}  cells             Cell inner blocks.
+ * @param {number} columnCount       Number of columns.
+ * @param {Array}  selectedClientIds Selected cell client IDs.
+ * @return {Object|null} Object with rows, cells, and mergedClientId, or null if merge is invalid.
+ */
+export function mergeCells( rows, cells, columnCount, selectedClientIds ) {
+	if ( ! selectedClientIds || selectedClientIds.length < 2 ) {
+		return null;
+	}
+
+	const placements = getCellPlacements( rows, cells, columnCount );
+	const rectangle = getSelectedPlacementRectangle(
+		placements,
+		selectedClientIds
+	);
+
+	if ( ! rectangle ) {
+		return null;
+	}
+
+	// All selected cells must be in the same section.
+	const sectionTypes = new Set(
+		rectangle.selectedPlacements.map( ( p ) => p.rowType )
+	);
+	if ( sectionTypes.size > 1 ) {
+		return null;
+	}
+
+	const { startRow, endRow, startColumn, endColumn } = rectangle;
+
+	// The top-left cell becomes the merged cell.
+	const mergedPlacement = rectangle.selectedPlacements.find(
+		( p ) => p.rowIndex === startRow && p.columnIndex === startColumn
+	);
+	if ( ! mergedPlacement ) {
+		return null;
+	}
+
+	const mergedClientId = mergedPlacement.cell.clientId;
+	const rowSpan = endRow - startRow + 1;
+	const colSpan = endColumn - startColumn + 1;
+
+	// Client IDs to remove (all selected except the merged cell).
+	const removedClientIds = new Set(
+		selectedClientIds.filter( ( id ) => id !== mergedClientId )
+	);
+
+	// Build new cells array: keep merged cell (with updated spans), remove others.
+	const nextCells = cells
+		.map( ( cell ) => {
+			if ( cell.clientId === mergedClientId ) {
+				return {
+					...cell,
+					attributes: {
+						...cell.attributes,
+						rowSpan,
+						colSpan,
+					},
+				};
+			}
+			return cell;
+		} )
+		.filter( ( cell ) => ! removedClientIds.has( cell.clientId ) );
+
+	// Count removed cells per row to update cellCount.
+	const removedByRow = new Map();
+	for ( const placement of rectangle.selectedPlacements ) {
+		if ( placement.cell.clientId === mergedClientId ) {
+			continue;
+		}
+		const row = placement.rowIndex;
+		removedByRow.set( row, ( removedByRow.get( row ) || 0 ) + 1 );
+	}
+
+	const nextRows = rows.map( ( row, index ) => {
+		const removed = removedByRow.get( index ) || 0;
+		return removed > 0
+			? { ...row, cellCount: row.cellCount - removed }
+			: row;
+	} );
+
+	return { rows: nextRows, cells: nextCells, mergedClientId };
+}
+
+/**
+ * Unmerges a cell by resetting its rowSpan/colSpan to 1 and creating
+ * new cells for each vacated slot.
+ *
+ * @param {Array}  rows        Row descriptors.
+ * @param {Array}  cells       Cell inner blocks.
+ * @param {number} columnCount Number of columns.
+ * @param {string} clientId    Client ID of the merged cell.
+ * @return {Object|null} Object with rows and cells, or null if cell is not merged.
+ */
+export function unmergeCells( rows, cells, columnCount, clientId ) {
+	const placements = getCellPlacements( rows, cells, columnCount );
+	const placement = placements.find( ( p ) => p.cell.clientId === clientId );
+
+	if ( ! placement ) {
+		return null;
+	}
+
+	const { rowSpan = 1, colSpan = 1 } = placement.cell.attributes;
+
+	if ( rowSpan <= 1 && colSpan <= 1 ) {
+		return null;
+	}
+
+	const { rowIndex, rowType } = placement;
+
+	// Reset the merged cell's spans.
+	const resetCell = {
+		...placement.cell,
+		attributes: {
+			...placement.cell.attributes,
+			rowSpan: 1,
+			colSpan: 1,
+		},
+	};
+
+	// Build a map of new cells to insert per row (excluding the top-left slot).
+	const newCellsByRow = new Map();
+	for ( let rowOffset = 0; rowOffset < rowSpan; rowOffset++ ) {
+		for ( let colOffset = 0; colOffset < colSpan; colOffset++ ) {
+			if ( rowOffset === 0 && colOffset === 0 ) {
+				continue;
+			}
+			const row = rowIndex + rowOffset;
+			if ( ! newCellsByRow.has( row ) ) {
+				newCellsByRow.set( row, [] );
+			}
+			newCellsByRow.get( row ).push( createCell( rowType ) );
+		}
+	}
+
+	// Rebuild the cells array row by row, inserting new cells after the
+	// merged cell (or after existing cells in each row).
+	const nextCells = [];
+	const nextRows = [];
+	let cellIndex = 0;
+
+	for ( let rowIdx = 0; rowIdx < rows.length; rowIdx++ ) {
+		const row = rows[ rowIdx ];
+		const rowCells = cells.slice( cellIndex, cellIndex + row.cellCount );
+		const newCellsForRow = newCellsByRow.get( rowIdx ) || [];
+
+		if ( rowIdx === rowIndex ) {
+			// The merged cell is in this row. Replace it with the reset cell
+			// and append new cells for this row after it.
+			const updatedRowCells = rowCells.map( ( cell ) =>
+				cell.clientId === clientId ? resetCell : cell
+			);
+			nextCells.push( ...updatedRowCells, ...newCellsForRow );
+		} else {
+			// Insert new cells after the last cell in this row.
+			nextCells.push( ...rowCells, ...newCellsForRow );
+		}
+
+		nextRows.push( {
+			...row,
+			cellCount: row.cellCount + newCellsForRow.length,
+		} );
+
+		cellIndex += row.cellCount;
+	}
+
+	return { rows: nextRows, cells: nextCells };
+}

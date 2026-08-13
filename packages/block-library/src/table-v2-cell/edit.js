@@ -32,6 +32,8 @@ import {
 	getCellSelectionOutsideBorderValue,
 	insertColumn,
 	insertRow,
+	mergeCells,
+	unmergeCells,
 } from '../table-v2/utils';
 
 const DEFAULT_SELECTION_BORDER = {
@@ -63,8 +65,12 @@ export default function TableCellEdit( {
 		DEFAULT_SELECTION_BORDER
 	);
 	const registry = useRegistry();
-	const { multiSelectSet, replaceInnerBlocks, updateBlockAttributes } =
-		useDispatch( blockEditorStore );
+	const {
+		multiSelectSet,
+		replaceInnerBlocks,
+		selectBlock,
+		updateBlockAttributes,
+	} = useDispatch( blockEditorStore );
 
 	const {
 		columnCount,
@@ -266,6 +272,58 @@ export default function TableCellEdit( {
 		multiSelectSet( columnCellIds );
 	}
 
+	function onMergeCells() {
+		if ( ! isCellSetSelection ) {
+			return;
+		}
+
+		const result = mergeCells(
+			rows,
+			siblingCells,
+			columnCount,
+			selectedClientIds
+		);
+
+		if ( ! result ) {
+			return;
+		}
+
+		registry.batch( () => {
+			updateBlockAttributes( parentClientId, {
+				rows: result.rows,
+			} );
+			replaceInnerBlocks( parentClientId, result.cells, false );
+			selectBlock( result.mergedClientId );
+		} );
+	}
+
+	function onUnmergeCells() {
+		const { rowSpan = 1, colSpan = 1 } = attributes;
+
+		if ( rowSpan <= 1 && colSpan <= 1 ) {
+			return;
+		}
+
+		const result = unmergeCells(
+			rows,
+			siblingCells,
+			columnCount,
+			clientId
+		);
+
+		if ( ! result ) {
+			return;
+		}
+
+		registry.batch( () => {
+			updateBlockAttributes( parentClientId, {
+				rows: result.rows,
+			} );
+			replaceInnerBlocks( parentClientId, result.cells, false );
+			selectBlock( clientId );
+		} );
+	}
+
 	function applyOutsideBorder( nextBorder ) {
 		const normalizedBorder = normalizeBorder( nextBorder );
 		if ( ! normalizedBorder ) {
@@ -387,6 +445,23 @@ export default function TableCellEdit( {
 	return (
 		<CellTag { ...blockProps }>
 			<BlockControls group="other">
+				{ isCellSetSelection && (
+					<ToolbarButton
+						icon={ table }
+						label={ __( 'Merge cells' ) }
+						onClick={ onMergeCells }
+						showTooltip
+					/>
+				) }
+				{ ! isCellSetSelection &&
+					( attributes.rowSpan > 1 || attributes.colSpan > 1 ) && (
+						<ToolbarButton
+							icon={ table }
+							label={ __( 'Unmerge cells' ) }
+							onClick={ onUnmergeCells }
+							showTooltip
+						/>
+					) }
 				{ isCellSetSelection && (
 					<Dropdown
 						popoverProps={ { placement: 'bottom-start' } }
