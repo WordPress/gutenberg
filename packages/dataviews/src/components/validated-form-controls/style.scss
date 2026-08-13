@@ -28,7 +28,7 @@
 
 	// For ToggleGroupControl
 	&:has(input[type="radio"]:invalid[data-validity-visible]) {
-		--wp-components-color-accent: #{$alert-red};
+		--focus-color: #{$alert-red};
 	}
 }
 
