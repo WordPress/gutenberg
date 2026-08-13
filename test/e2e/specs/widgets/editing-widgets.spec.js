@@ -160,27 +160,27 @@ test.describe( 'Widgets screen', () => {
 			name: 'Blocks',
 		} );
 
-		const paragraphBlock = inlineQuickInserter.getByRole( 'option', {
-			name: 'Paragraph',
+		// The first block must be one where typing can't create a block
+		// after it, so that the in-between inserter shows in the gap.
+		await page
+			.getByRole( 'searchbox', { name: 'Search' } )
+			.fill( 'Separator' );
+		const separatorOption = inlineQuickInserter.getByRole( 'option', {
+			name: 'Separator',
 			exact: true,
 		} );
-		await paragraphBlock.click();
+		await separatorOption.click();
 
-		const firstParagraphBlock = firstWidgetArea.getByRole( 'document', {
-			name: /^Empty block/,
-		} );
-		await firstParagraphBlock.focus();
-		await page.keyboard.type( 'First Paragraph' );
-
+		// Enter on the selected separator starts a paragraph after it.
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Second Paragraph' );
 
-		const firstParagraphBlockLocator = firstWidgetArea
+		const secondParagraphBlock = firstWidgetArea
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
-			.filter( { hasText: 'First Paragraph' } );
+			.filter( { hasText: 'Second Paragraph' } );
 
-		const firstParagraphBlockBoundingBox =
-			await firstParagraphBlockLocator.boundingBox();
+		const secondParagraphBlockBoundingBox =
+			await secondParagraphBlock.boundingBox();
 
 		// Click outside the block to move the focus back to the widget area.
 		await firstWidgetArea.click( {
@@ -190,13 +190,11 @@ test.describe( 'Widgets screen', () => {
 			},
 		} );
 
-		// Hover above the first block to trigger the inline inserter. The
-		// boundary between the two paragraphs no longer shows it, because
-		// typing can already create a block there.
+		// Hover above the last block to trigger the inline inserter between blocks.
 		await page.mouse.move(
-			firstParagraphBlockBoundingBox.x +
-				firstParagraphBlockBoundingBox.width / 2,
-			firstParagraphBlockBoundingBox.y - 10
+			secondParagraphBlockBoundingBox.x +
+				secondParagraphBlockBoundingBox.width / 2,
+			secondParagraphBlockBoundingBox.y - 10
 		);
 
 		// There will be 2 matches here.
@@ -231,13 +229,10 @@ test.describe( 'Widgets screen', () => {
 
 		await expect.poll( widgetsScreen.getWidgetAreaBlocks ).toMatchObject( {
 			'sidebar-1': [
+				{ name: 'core/separator' },
 				{
 					name: 'core/heading',
 					attributes: { content: 'My Heading' },
-				},
-				{
-					name: 'core/paragraph',
-					attributes: { content: 'First Paragraph' },
 				},
 				{
 					name: 'core/paragraph',

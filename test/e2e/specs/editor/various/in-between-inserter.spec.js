@@ -58,54 +58,6 @@ test.describe( 'In-between block inserter', () => {
 		).toBeVisible();
 	} );
 
-	test( 'appears after the last of two images', async ( {
-		editor,
-		page,
-	} ) => {
-		await editor.insertBlock( IMAGE );
-		await editor.insertBlock( IMAGE );
-		await deselect( page );
-		const images = editor.canvas.getByRole( 'document', {
-			name: 'Block: Image',
-		} );
-		const box = await images.nth( 1 ).boundingBox();
-
-		await hoverBoundary(
-			page,
-			box.x + box.width / 2,
-			box.y + box.height + 10
-		);
-
-		await expect(
-			page.getByRole( 'button', { name: 'Add block' } )
-		).toBeVisible();
-	} );
-
-	test( 'appears before the first block, even a heading', async ( {
-		editor,
-		page,
-	} ) => {
-		await editor.insertBlock( {
-			name: 'core/heading',
-			attributes: { content: 'Heading' },
-		} );
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: { content: 'A paragraph' },
-		} );
-		await deselect( page );
-		const heading = editor.canvas.getByRole( 'document', {
-			name: 'Block: Heading',
-		} );
-		const box = await heading.boundingBox();
-
-		await hoverBoundary( page, box.x + box.width / 2, box.y - 10 );
-
-		await expect(
-			page.getByRole( 'button', { name: 'Add block' } )
-		).toBeVisible();
-	} );
-
 	test( 'appears between an image and a paragraph', async ( {
 		editor,
 		page,
@@ -166,6 +118,7 @@ test.describe( 'In-between block inserter', () => {
 	} );
 
 	test( 'is hidden between two paragraphs', async ( { editor, page } ) => {
+		await editor.insertBlock( IMAGE );
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'First' },
@@ -175,16 +128,20 @@ test.describe( 'In-between block inserter', () => {
 			attributes: { content: 'Second' },
 		} );
 		await deselect( page );
+		const image = editor.canvas.getByRole( 'document', {
+			name: 'Block: Image',
+		} );
 		const paragraphs = editor.canvas.getByRole( 'document', {
 			name: 'Block: Paragraph',
 		} );
+		const imageBox = await image.boundingBox();
 		const box1 = await paragraphs.nth( 0 ).boundingBox();
 		const box2 = await paragraphs.nth( 1 ).boundingBox();
 
-		// First show the inserter before the first block, so that the later
-		// hidden state can't be mistaken for the inserter not activating at
-		// all.
-		await hoverBoundary( page, box1.x + box1.width / 2, box1.y - 10 );
+		// First show the inserter below the image, so that the later hidden
+		// state can't be mistaken for the inserter not activating at all.
+		const control = gapBetween( imageBox, box1 );
+		await hoverBoundary( page, control.x, control.y );
 		const inserterButton = page.getByRole( 'button', {
 			name: 'Add block',
 		} );
@@ -200,24 +157,27 @@ test.describe( 'In-between block inserter', () => {
 		editor,
 		page,
 	} ) => {
+		await editor.insertBlock( IMAGE );
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'A paragraph' },
 		} );
 		await editor.insertBlock( IMAGE );
 		await deselect( page );
+		const images = editor.canvas.getByRole( 'document', {
+			name: 'Block: Image',
+		} );
 		const paragraph = editor.canvas.getByRole( 'document', {
 			name: 'Block: Paragraph',
 		} );
-		const image = editor.canvas.getByRole( 'document', {
-			name: 'Block: Image',
-		} );
+		const imageBox = await images.nth( 0 ).boundingBox();
 		const box1 = await paragraph.boundingBox();
-		const box2 = await image.boundingBox();
+		const box2 = await images.nth( 1 ).boundingBox();
 
-		// Positive control: the boundary before the first block shows the
-		// inserter.
-		await hoverBoundary( page, box1.x + box1.width / 2, box1.y - 10 );
+		// Positive control: the boundary between the image and the
+		// paragraph shows the inserter.
+		const control = gapBetween( imageBox, box1 );
+		await hoverBoundary( page, control.x, control.y );
 		const inserterButton = page.getByRole( 'button', {
 			name: 'Add block',
 		} );
@@ -225,43 +185,6 @@ test.describe( 'In-between block inserter', () => {
 
 		const { x, y } = gapBetween( box1, box2 );
 		await hoverBoundary( page, x, y );
-
-		await expect( inserterButton ).toBeHidden();
-	} );
-
-	test( 'is hidden after a paragraph that is the last block', async ( {
-		editor,
-		page,
-	} ) => {
-		await editor.insertBlock( IMAGE );
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: { content: 'A paragraph' },
-		} );
-		await deselect( page );
-		const paragraph = editor.canvas.getByRole( 'document', {
-			name: 'Block: Paragraph',
-		} );
-		const box = await paragraph.boundingBox();
-
-		// Positive control: the boundary above the paragraph shows the
-		// inserter because an image is above it.
-		const image = editor.canvas.getByRole( 'document', {
-			name: 'Block: Image',
-		} );
-		const imageBox = await image.boundingBox();
-		const { x, y } = gapBetween( imageBox, box );
-		await hoverBoundary( page, x, y );
-		const inserterButton = page.getByRole( 'button', {
-			name: 'Add block',
-		} );
-		await expect( inserterButton ).toBeVisible();
-
-		await hoverBoundary(
-			page,
-			box.x + box.width / 2,
-			box.y + box.height + 10
-		);
 
 		await expect( inserterButton ).toBeHidden();
 	} );

@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   The inserter that appears when hovering the gap between blocks now stays out of the way of writing: in vertical lists it is hidden below any block whose type supports splitting, since pressing Enter at the end of such a block already creates a block there. It now also appears before the first block and after the last one, following the same rule.
+-   The inserter that appears when hovering the gap between blocks now stays out of the way of writing: in vertical lists it is hidden below any block whose type supports splitting, since pressing Enter at the end of such a block already creates a block there.
 
 ### Bug Fixes
 
