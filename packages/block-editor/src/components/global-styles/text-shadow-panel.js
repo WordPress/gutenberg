@@ -227,7 +227,7 @@ function TextShadowToggle( { textShadow, onChange, onToggle, isOpen } ) {
 						'block-editor-global-styles__text-shadow-remove-button',
 						{ 'is-open': isOpen }
 					) }
-					label={ __( 'Remove' ) }
+					label={ __( 'Remove text shadow' ) }
 				/>
 			) }
 		</>
