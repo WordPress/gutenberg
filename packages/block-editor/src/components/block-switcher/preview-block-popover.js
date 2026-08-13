@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { Popover } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import BlockPreview from '../block-preview';
 
 export default function PreviewBlockPopover( {

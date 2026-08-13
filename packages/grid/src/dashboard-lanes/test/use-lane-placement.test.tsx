@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render, act, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { GRID_ITEM_DATA_KEY } from '../../shared/grid-item-key';
 import { useLanePlacement } from '../use-lane-placement';
 import type {
@@ -88,9 +77,16 @@ function setNativeSupport( supported: boolean ) {
 		if ( property === 'display' && value === 'grid-lanes' ) {
 			return supported;
 		}
-		return originalSupports
-			? originalSupports.call( CSS, property, value as string )
-			: false;
+		if ( ! originalSupports ) {
+			return false;
+		}
+		/*
+		 * `call` on the overloaded `CSS.supports` resolves to the
+		 * single-argument signature, so pass equivalent condition text.
+		 */
+		return value === undefined
+			? originalSupports.call( CSS, property )
+			: originalSupports.call( CSS, `(${ property }: ${ value })` );
 	};
 }
 

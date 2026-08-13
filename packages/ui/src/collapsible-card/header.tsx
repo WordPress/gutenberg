@@ -7,7 +7,7 @@ import * as Collapsible from '../collapsible';
 import { Icon } from '../icon';
 import styles from './style.module.css';
 import defenseStyles from '../utils/css/global-css-defense.module.css';
-import focusStyles from '../utils/css/focus.module.css';
+import focusStyles from '../utils/css/focus.module.scss';
 import { HeaderDescriptionIdContext } from './context';
 import type { HeaderProps } from './types';
 

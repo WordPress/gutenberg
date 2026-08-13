@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useState, useRef, useEffect, useReducer } from '@wordpress/element';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
-
-/**
- * Internal dependencies
- */
 import BlockPopoverCover from '../components/block-popover/cover';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 

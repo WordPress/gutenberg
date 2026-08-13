@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen, within } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { createRegistry, RegistryProvider } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import InlineNotices from '../index';
 import { store as noticesStore } from '../../../store';
 

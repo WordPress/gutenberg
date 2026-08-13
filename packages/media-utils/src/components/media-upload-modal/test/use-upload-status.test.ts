@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { renderHook, act } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { useUploadStatus } from '../use-upload-status';
 import { UploadError } from '../../../utils/upload-error';
 

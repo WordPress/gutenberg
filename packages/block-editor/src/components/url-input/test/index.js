@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { speak } from '@wordpress/a11y';
 import { useState } from '@wordpress/element';
 import { dispatch } from '@wordpress/data';
 import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import URLInput from '../';
 import { store as blockEditorStore } from '../../../store';
 
@@ -334,6 +323,62 @@ describe( 'URLInput', () => {
 				} );
 			}
 		} );
+	} );
+
+	describe( 'IME composition', () => {
+		it( 'should not fetch suggestions for the intermediate values of an IME composition', async () => {
+			const { input } = renderURLInput();
+
+			fireEvent.compositionStart( input );
+			fireEvent.change( input, { target: { value: 'ほ' } } );
+			fireEvent.change( input, { target: { value: 'ほん' } } );
+			fireEvent.change( input, { target: { value: 'ほんだ' } } );
+			await flushDebounce();
+
+			expect( fetchLinkSuggestions ).not.toHaveBeenCalled();
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'should not fetch suggestions for a value superseded by an IME composition', async () => {
+			const { user, input } = renderURLInput();
+
+			await user.type( input, 'ab' );
+			fireEvent.compositionStart( input );
+			fireEvent.change( input, { target: { value: 'abほ' } } );
+			await flushDebounce();
+
+			expect( fetchLinkSuggestions ).not.toHaveBeenCalled();
+		} );
+
+		// Firefox reports the confirmed value of a composition after
+		// `compositionend`, Chrome and Safari before it.
+		// See: https://bugzilla.mozilla.org/show_bug.cgi?id=1305387
+		it.each( [ 'before', 'after' ] )(
+			'should fetch suggestions for a composed value reported %s the composition ends',
+			async ( order ) => {
+				const { input } = renderURLInput();
+
+				fireEvent.compositionStart( input );
+				fireEvent.change( input, { target: { value: 'ほんだ' } } );
+				// Compositions outlast the debounce, so the confirmed value is
+				// the only one a request is made for.
+				await flushDebounce();
+
+				if ( order === 'before' ) {
+					fireEvent.change( input, { target: { value: 'ホンダ' } } );
+					fireEvent.compositionEnd( input );
+				} else {
+					fireEvent.compositionEnd( input );
+					fireEvent.change( input, { target: { value: 'ホンダ' } } );
+				}
+
+				expect( await screen.findByRole( 'listbox' ) ).toBeVisible();
+				expect( fetchLinkSuggestions ).toHaveBeenCalledTimes( 1 );
+				expect( fetchLinkSuggestions ).toHaveBeenCalledWith( 'ホンダ', {
+					isInitialSuggestions: false,
+				} );
+			}
+		);
 	} );
 
 	describe( 'announcements', () => {

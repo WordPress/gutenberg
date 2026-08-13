@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { Fragment, useState } from '@wordpress/element';
 import { SelectControl } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import ResponsiveBlockControl from '../index';
 
 const inputId = 'input-12345678';

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { CropperState, Size } from './types';
 import { degreesToRadians } from './math/rotation';
 import { isValidSize, sanitizeCropperState } from './math/sanitize';

@@ -1,6 +1,25 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+### Internal
+
+-   Collapse the `tsconfig.src.json`/`tsconfig.bin.json`/`tsconfig.test.json` projects into the repository-standard split of `tsconfig.build.json` and a default dev `tsconfig.json`. ([#81509](https://github.com/WordPress/gutenberg/pull/81509))
+
+### Bug Fixes
+
+-   `ThemeProvider`: Avoid root-level relational selectors when forwarding `cornerRadius` presets to reduce style recalculation work. ([#81457](https://github.com/WordPress/gutenberg/pull/81457))
+
+## 1.2.0 (2026-08-12)
+
+### Bug Fixes
+
+-   Avoid `ThemeProvider` assigning CSS color properties when a seed value is not provided and there is no ancestor to inherit from. This is consistent with how `cursor` and `cornerRadius` behave, and resolves an issue where `ThemeProvider` may forcibly override colors to the default color scheme in situations where the admin color scheme properties may be provided elsewhere ([#80600](https://github.com/WordPress/gutenberg/pull/80600)).
+
+### Internal
+
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
+
+## 1.1.0 (2026-07-29)
 
 ### Enhancements
 

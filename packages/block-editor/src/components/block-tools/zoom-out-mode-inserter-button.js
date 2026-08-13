@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { Button } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
 import { _x } from '@wordpress/i18n';

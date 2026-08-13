@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	DropZone,
@@ -28,6 +21,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 import {
 	archive,
 	audio,
@@ -48,10 +42,6 @@ import {
 	privateApis as mediaUtilsPrivateApis,
 } from '@wordpress/media-utils';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import type { MediaEditProps } from '../../types';
 import useMovingAnimation from './use-moving-animation';
@@ -212,7 +202,7 @@ const archiveMimeTypes = [
 function MediaTitle( { attachment }: { attachment: Attachment< 'view' > } ) {
 	return (
 		<Truncate className="fields__media-edit-filename">
-			{ attachment.title.rendered }
+			{ decodeEntities( attachment.title.rendered ) }
 		</Truncate>
 	);
 }
@@ -356,9 +346,11 @@ function ExpandedMediaEditAttachments( {
 									? sprintf(
 											/* translators: %s: The title of the media item. */
 											__( 'Replace %s' ),
-											(
-												attachment as Attachment< 'view' >
-											 ).title.rendered
+											decodeEntities(
+												(
+													attachment as Attachment< 'view' >
+												 ).title.rendered
+											)
 									  )
 									: __( 'Replace' )
 							}

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import SidebarNavigationItem from '../sidebar-navigation-item';
 
 export default function CategoryItem( {

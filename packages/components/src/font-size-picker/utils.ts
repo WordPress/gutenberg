@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { FontSizePickerProps, FontSize } from './types';
 
 /**

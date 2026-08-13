@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	Notice,
@@ -14,10 +11,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import { scopeSlug, saveGuidelineRow, deleteGuidelineRow } from '../data';
 import type { Scope, GuidelineQuery } from '../types';
 

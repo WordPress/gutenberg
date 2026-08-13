@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getChangesToPush, getStylesUpdate } from '../index';
 
 describe( 'getChangesToPush', () => {

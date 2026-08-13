@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	renderToString,
 	useRef,
@@ -14,10 +7,6 @@ import {
 	useMemo,
 } from '@wordpress/element';
 import { useFocusableIframe, useMergeRefs } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import type { SandBoxProps } from './types';
 
 type SandBoxContentProps = Omit< SandBoxProps, 'allowSameOrigin' >;
@@ -268,6 +257,7 @@ function IsolatedSandBox( {
 	onFocus,
 	tabIndex,
 	allowPopups = false,
+	allowForms = false,
 }: SandBoxContentProps ) {
 	const ref = useRef< HTMLIFrameElement >( null );
 	const [ width, setWidth ] = useState( 0 );
@@ -275,6 +265,7 @@ function IsolatedSandBox( {
 
 	const sandbox = clsx( 'allow-scripts', 'allow-presentation', {
 		'allow-popups': allowPopups,
+		'allow-forms': allowForms,
 	} );
 
 	const srcDoc = useMemo(
@@ -393,6 +384,7 @@ function SameOriginSandBox( {
 	onFocus,
 	tabIndex,
 	allowPopups = false,
+	allowForms = false,
 }: SandBoxContentProps ) {
 	const ref = useRef< HTMLIFrameElement >( null );
 	const [ width, setWidth ] = useState( 0 );
@@ -404,6 +396,7 @@ function SameOriginSandBox( {
 		'allow-presentation',
 		{
 			'allow-popups': allowPopups,
+			'allow-forms': allowForms,
 		}
 	);
 

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	Modal,
@@ -42,15 +35,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { focus } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
-
-/**
- * Internal dependencies
- */
 import AddCustomTemplateModalContent from './add-custom-template-modal-content';
 import {
 	useDefaultTemplateTypes,

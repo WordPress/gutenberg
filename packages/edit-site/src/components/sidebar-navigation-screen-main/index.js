@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import {
@@ -13,10 +10,6 @@ import {
 } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 

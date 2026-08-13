@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { hasBlockSupport } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import LineHeightControl from '../components/line-height-control';
 import { cleanEmptyObject } from './utils';
 import { useSettings } from '../components/use-settings';
