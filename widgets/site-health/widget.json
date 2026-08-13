@@ -12,13 +12,6 @@
 	"textdomain": "default",
 	"actions": [
 		{
-			"id": "review-items",
-			"label": "Review items",
-			"icon": "core/format-list-bullets",
-			"relevance": "high",
-			"href": "site-health.php"
-		},
-		{
 			"id": "site-health-status",
 			"label": "Status",
 			"icon": "dashboard-widgets/seen",

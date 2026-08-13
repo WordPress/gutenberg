@@ -1,8 +1,8 @@
 import { useState, useEffect } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@wordpress/components';
-import { Stack, Text } from '@wordpress/ui';
+import { Link, Stack, Text } from '@wordpress/ui';
 import { CircleProgress, type HealthTone } from './components';
 import styles from './style.module.css';
 
@@ -136,6 +136,7 @@ export default function SiteHealth() {
 	const total = counts.good + counts.recommended + counts.critical;
 	const percentage =
 		total > 0 ? Math.round( ( counts.good / total ) * 100 ) : 0;
+	const issuesTotal = counts.recommended + counts.critical;
 	const tone = toneForPercentage( percentage );
 
 	return (
@@ -148,6 +149,15 @@ export default function SiteHealth() {
 		>
 			<CircleProgress percentage={ percentage } tone={ tone } />
 			<Text variant="body-lg">{ statusMessage( counts ) }</Text>
+			{ issuesTotal > 0 && (
+				<Link href="site-health.php">
+					{ sprintf(
+						/* translators: %d: Number of issues to address. */
+						_n( 'Review %d item', 'Review %d items', issuesTotal ),
+						issuesTotal
+					) }
+				</Link>
+			) }
 		</Stack>
 	);
 }
