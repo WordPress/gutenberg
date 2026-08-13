@@ -834,12 +834,9 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		}
 	} elseif ( 'grid' === $layout_type ) {
 		/*
-		 * Column and row counts are whole numbers. The editor stores them as numbers, but
-		 * content saved by WordPress 6.3 to 6.6 stored columnCount as a numeric string, and
-		 * that migration only runs when a block is parsed in JavaScript, so the front end
-		 * still sees strings. Accept any numeric value and cast it. minimumColumnWidth is a
-		 * CSS length, so only a string is usable. Anything else is treated as absent because
-		 * it can't render as valid CSS.
+		 * Column and row counts are whole numbers, for the same reason as the grid line
+		 * numbers in gutenberg_get_child_layout_style_rules(). minimumColumnWidth is a CSS
+		 * length, so only a string is usable.
 		 */
 		$column_count_attr         = $layout_for_styles['columnCount'] ?? null;
 		$column_count              = is_numeric( $column_count_attr ) ? (int) $column_count_attr : null;
