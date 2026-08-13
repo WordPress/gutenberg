@@ -40,12 +40,7 @@ test.use( {
 } );
 
 test.describe( 'Document-Isolation-Policy', () => {
-	test.beforeEach( async ( { admin, page, isGutenbergPluginActive } ) => {
-		// eslint-disable-next-line playwright/no-skipped-test
-		test.skip(
-			! isGutenbergPluginActive,
-			'Document-Isolation-Policy header requires Gutenberg plugin'
-		);
+	test.beforeEach( async ( { admin, page } ) => {
 		// These tests only apply to Chromium 137+.
 		test.skip(
 			( await getChromiumMajorVersion( page ) ) < 137,
