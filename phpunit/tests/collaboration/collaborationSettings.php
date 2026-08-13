@@ -11,8 +11,8 @@
 class Tests_Collaboration_Settings extends WP_UnitTestCase {
 	private const CRDT_DOC_META_KEY = '_crdt_document';
 
-	private $block_editor_was_registered;
-	private $original_block_editor_inline_scripts;
+	private $core_data_was_registered;
+	private $original_core_data_inline_scripts;
 	private $original_pagenow;
 
 	public function set_up() {
@@ -20,17 +20,17 @@ class Tests_Collaboration_Settings extends WP_UnitTestCase {
 
 		parent::set_up();
 
-		$wp_scripts                        = wp_scripts();
-		$this->block_editor_was_registered = isset( $wp_scripts->registered['wp-block-editor'] );
-		if ( ! $this->block_editor_was_registered ) {
-			wp_register_script( 'wp-block-editor', '' );
+		$wp_scripts                     = wp_scripts();
+		$this->core_data_was_registered = isset( $wp_scripts->registered['wp-core-data'] );
+		if ( ! $this->core_data_was_registered ) {
+			wp_register_script( 'wp-core-data', '' );
 		}
 
-		$block_editor_script                        = $wp_scripts->registered['wp-block-editor'];
-		$this->original_block_editor_inline_scripts = $block_editor_script->extra['before'] ?? null;
-		$block_editor_script->extra['before']       = array();
-		$this->original_pagenow                     = $pagenow;
-		$pagenow                                    = 'post.php';
+		$core_data_script                        = $wp_scripts->registered['wp-core-data'];
+		$this->original_core_data_inline_scripts = $core_data_script->extra['before'] ?? null;
+		$core_data_script->extra['before']       = array();
+		$this->original_pagenow                  = $pagenow;
+		$pagenow                                 = 'post.php';
 	}
 
 	public function tear_down() {
@@ -39,23 +39,23 @@ class Tests_Collaboration_Settings extends WP_UnitTestCase {
 		remove_filter( 'pre_option_gutenberg-experiments', '__return_empty_array', 11 );
 
 		$wp_scripts = wp_scripts();
-		if ( $this->block_editor_was_registered ) {
-			$block_editor_script = $wp_scripts->registered['wp-block-editor'];
-			if ( null === $this->original_block_editor_inline_scripts ) {
-				unset( $block_editor_script->extra['before'] );
+		if ( $this->core_data_was_registered ) {
+			$core_data_script = $wp_scripts->registered['wp-core-data'];
+			if ( null === $this->original_core_data_inline_scripts ) {
+				unset( $core_data_script->extra['before'] );
 			} else {
-				$block_editor_script->extra['before'] = $this->original_block_editor_inline_scripts;
+				$core_data_script->extra['before'] = $this->original_core_data_inline_scripts;
 			}
 		} else {
-			wp_deregister_script( 'wp-block-editor' );
+			wp_deregister_script( 'wp-core-data' );
 		}
 
 		$pagenow = $this->original_pagenow;
 		parent::tear_down();
 	}
 
-	private function get_block_editor_inline_scripts() {
-		$inline_scripts = wp_scripts()->get_data( 'wp-block-editor', 'before' );
+	private function get_core_data_inline_scripts() {
+		$inline_scripts = wp_scripts()->get_data( 'wp-core-data', 'before' );
 		return is_array( $inline_scripts ) ? $inline_scripts : array();
 	}
 
@@ -102,7 +102,7 @@ class Tests_Collaboration_Settings extends WP_UnitTestCase {
 
 		$this->assertContains(
 			'window.__experimentalEnableRealTimeCollaboration = true;',
-			$this->get_block_editor_inline_scripts()
+			$this->get_core_data_inline_scripts()
 		);
 	}
 
@@ -113,7 +113,7 @@ class Tests_Collaboration_Settings extends WP_UnitTestCase {
 
 		$this->assertStringNotContainsString(
 			'window.__experimentalEnableRealTimeCollaboration',
-			implode( "\n", $this->get_block_editor_inline_scripts() )
+			implode( "\n", $this->get_core_data_inline_scripts() )
 		);
 	}
 
@@ -125,7 +125,7 @@ class Tests_Collaboration_Settings extends WP_UnitTestCase {
 
 		$this->assertContains(
 			'window.__experimentalEnableRealTimeCollaboration = false;',
-			$this->get_block_editor_inline_scripts()
+			$this->get_core_data_inline_scripts()
 		);
 	}
 }

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Only initialize the sync manager, entity syncing, and CRDT persistence when the real-time collaboration experiment is enabled ([#80658](https://github.com/WordPress/gutenberg/pull/80658)).
+
 ## 7.53.0 (2026-08-12)
 
 ### Enhancements

@@ -135,7 +135,9 @@ export const rootEntitiesConfig = [
 		plural: 'comments',
 		label: __( 'Comment' ),
 		supportsPagination: true,
-		syncConfig: defaultCollectionSyncConfig,
+		...( globalThis.window?.__experimentalEnableRealTimeCollaboration
+			? { syncConfig: defaultCollectionSyncConfig }
+			: {} ),
 	},
 	{
 		name: 'menu',
@@ -311,7 +313,7 @@ export const prePersistPostType = async (
 	// saved post and CRDT snapshot are committed in the same request. We don't
 	// want a post save to fail but a CRDT update to succeed or vice versa.
 	// CRDT repair uses /wp-sync/v1/save to avoid post-save side effects.
-	if ( persistedRecord ) {
+	if ( window.__experimentalEnableRealTimeCollaboration && persistedRecord ) {
 		const objectType = `postType/${ name }`;
 		const objectId = persistedRecord.id;
 		const serializedDoc = await getSyncManager()?.createPersistedCRDTDoc(
@@ -406,6 +408,10 @@ async function loadPostTypeEntities() {
 					: DEFAULT_ENTITY_KEY,
 		};
 
+		if ( ! window.__experimentalEnableRealTimeCollaboration ) {
+			return entity;
+		}
+
 		/**
 		 * @type {import('@wordpress/sync').SyncConfig}
 		 */
@@ -497,7 +503,9 @@ async function loadTaxonomyEntities() {
 			supportsPagination: true,
 		};
 
-		entity.syncConfig = defaultSyncConfig;
+		if ( window.__experimentalEnableRealTimeCollaboration ) {
+			entity.syncConfig = defaultSyncConfig;
+		}
 
 		return entity;
 	} );

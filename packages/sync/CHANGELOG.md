@@ -2,8 +2,11 @@
 
 ## Unreleased
 
-## 1.53.0 (2026-08-12)
+### Internal
 
+-   Enable the default HTTP polling provider only when the Real-Time Collaboration experiment is enabled ([#80658](https://github.com/WordPress/gutenberg/pull/80658)).
+
+## 1.53.0 (2026-08-12)
 
 ## 1.52.0 (2026-07-29)
 

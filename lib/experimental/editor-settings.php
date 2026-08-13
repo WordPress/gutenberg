@@ -48,7 +48,7 @@ function gutenberg_enable_experiments() {
 		);
 
 		wp_add_inline_script(
-			'wp-block-editor',
+			'wp-core-data',
 			'window.__experimentalEnableRealTimeCollaboration = ' . wp_json_encode( $collaboration_enabled ) . ';',
 			'before'
 		);
