@@ -170,13 +170,17 @@
 			// its groups.
 			background-color: $white;
 
-			// The box draws the border too.
-			.components-toolbar-group {
+			// The same rule the Toolbar container has for its last group;
+			// this box stands in for it here.
+			> .components-toolbar-group:last-child {
 				border-right: none;
 			}
 
 			.block-editor-block-parent-selector__button {
+				// Buttons in a toolbar are transparent; the box paints the
+				// background and border behind them.
 				border: none;
+				background: none;
 			}
 		}
 
