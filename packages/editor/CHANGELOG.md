@@ -5,6 +5,8 @@
 ### Enhancements
 
 -   Notes Sidebar: Promote the "Add note" action from the block-toolbar overflow menu to a dedicated toolbar button placed before the ellipsis. Blocks that already have a thread continue to show the avatar indicator alongside the button ([#78188](https://github.com/WordPress/gutenberg/issues/78188)).
+-   Notes Sidebar: The "Add note" toolbar button now toggles the form it opened and exposes `aria-expanded`, so clicking it again closes the form instead of silently doing nothing ([#78188](https://github.com/WordPress/gutenberg/issues/78188)).
+-   Notes Sidebar: Fade the floating note card in once its anchor has been measured, rather than cutting it to full opacity in a single frame ([#78188](https://github.com/WordPress/gutenberg/issues/78188)).
 
 ### Bug Fixes
 
