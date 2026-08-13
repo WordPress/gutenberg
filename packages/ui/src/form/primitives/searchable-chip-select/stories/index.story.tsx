@@ -62,7 +62,7 @@ export const Creatable: Story = {
 			value: '__create__',
 			label:
 				'Create new item' + ( inputValue ? `: ${ inputValue }` : '' ),
-			creatable: true as const,
+			creatable: true,
 		};
 
 		return (
@@ -186,7 +186,7 @@ export const GroupedCreatable: Story = {
 			value: '__create__',
 			label:
 				'Create new item' + ( inputValue ? `: ${ inputValue }` : '' ),
-			creatable: true as const,
+			creatable: true,
 		};
 		const items = [
 			...GROUPED_ITEMS,

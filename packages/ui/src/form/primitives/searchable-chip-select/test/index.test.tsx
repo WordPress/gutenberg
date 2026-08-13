@@ -178,7 +178,7 @@ describe( 'SearchableChipSelect', () => {
 		const creatableItem = {
 			value: '__create__',
 			label: 'Create new item',
-			creatable: true as const,
+			creatable: true,
 		};
 
 		it( 'renders the creatable item in the list footer using the default renderer', async () => {
@@ -232,7 +232,7 @@ describe( 'SearchableChipSelect', () => {
 			const groupedCreatableItem = {
 				value: '__create__',
 				label: 'Create new item: zzzzz',
-				creatable: true as const,
+				creatable: true,
 			};
 			const items = [
 				...GROUPED_ITEMS,

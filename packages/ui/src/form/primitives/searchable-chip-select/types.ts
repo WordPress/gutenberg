@@ -6,21 +6,14 @@ import type {
 	ComboboxRootProps,
 } from '../combobox/types';
 
-export type RegularItem = {
+export type Item = {
 	label: string;
 	value: string;
 	disabled?: boolean;
-	creatable?: never;
+	creatable?: boolean;
 };
 
-export type CreatableItem = {
-	label: string;
-	value: string;
-	disabled?: boolean;
-	creatable: true;
-};
-
-export type Item = RegularItem | CreatableItem;
+type CreatableItem = Item & { creatable: true };
 
 export type ItemGroup = {
 	label: string;
