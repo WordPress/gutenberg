@@ -532,7 +532,7 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 			 * See https://github.com/WordPress/gutenberg/issues/80383.
 			 */
 			await expect(
-				editor.canvas.getByRole( 'button', {
+				editor.canvas.getByRole( 'document', {
 					name: 'Add default block',
 				} )
 			).toBeVisible();
