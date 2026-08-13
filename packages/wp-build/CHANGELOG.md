@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Register the content module for routes that only export a `canvas`, so a route without a stage or inspector can render a custom canvas ([#81578](https://github.com/WordPress/gutenberg/pull/81578)).
+
 ### Documentation
 
 -   Widget attributes: the `relevance` hint documents the `'medium'` tier
