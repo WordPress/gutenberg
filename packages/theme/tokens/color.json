@@ -66,11 +66,18 @@
 						"hex": "#fff"
 					}
 				},
-				"fgSurface4": {
+				"fgSurface5": {
 					"$value": {
 						"colorSpace": "srgb",
 						"components": [ 0.043, 0, 0.439 ],
 						"hex": "#0b0070"
+					}
+				},
+				"fgSurface4": {
+					"$value": {
+						"colorSpace": "srgb",
+						"components": [ 0.145, 0.227, 0.792 ],
+						"hex": "#253aca"
 					}
 				},
 				"fgSurface3": {
@@ -222,11 +229,18 @@
 						"hex": "#fff"
 					}
 				},
-				"fgSurface4": {
+				"fgSurface5": {
 					"$value": {
 						"colorSpace": "srgb",
 						"components": [ 0, 0.106, 0.31 ],
 						"hex": "#001b4f"
+					}
+				},
+				"fgSurface4": {
+					"$value": {
+						"colorSpace": "srgb",
+						"components": [ 0, 0.298, 0.639 ],
+						"hex": "#004ca3"
 					}
 				},
 				"fgSurface3": {
@@ -378,11 +392,18 @@
 						"hex": "#fff"
 					}
 				},
-				"fgSurface4": {
+				"fgSurface5": {
 					"$value": {
 						"colorSpace": "srgb",
 						"components": [ 0, 0.161, 0 ],
 						"hex": "#002900"
+					}
+				},
+				"fgSurface4": {
+					"$value": {
+						"colorSpace": "srgb",
+						"components": [ 0, 0.373, 0.071 ],
+						"hex": "#005f12"
 					}
 				},
 				"fgSurface3": {
@@ -534,11 +555,18 @@
 						"hex": "#fff"
 					}
 				},
-				"fgSurface4": {
+				"fgSurface5": {
 					"$value": {
 						"colorSpace": "srgb",
 						"components": [ 0.18, 0.098, 0 ],
 						"hex": "#2e1900"
+					}
+				},
+				"fgSurface4": {
+					"$value": {
+						"colorSpace": "srgb",
+						"components": [ 0.424, 0.278, 0 ],
+						"hex": "#6c4700"
 					}
 				},
 				"fgSurface3": {
@@ -690,11 +718,18 @@
 						"hex": "#fff"
 					}
 				},
-				"fgSurface4": {
+				"fgSurface5": {
 					"$value": {
 						"colorSpace": "srgb",
 						"components": [ 0.278, 0, 0 ],
 						"hex": "#470000"
+					}
+				},
+				"fgSurface4": {
+					"$value": {
+						"colorSpace": "srgb",
+						"components": [ 0.639, 0, 0 ],
+						"hex": "#a30000"
 					}
 				},
 				"fgSurface3": {
@@ -846,11 +881,18 @@
 						"hex": "#fff"
 					}
 				},
-				"fgSurface4": {
+				"fgSurface5": {
 					"$value": {
 						"colorSpace": "srgb",
 						"components": [ 0.118, 0.118, 0.118 ],
 						"hex": "#1e1e1e"
+					}
+				},
+				"fgSurface4": {
+					"$value": {
+						"colorSpace": "srgb",
+						"components": [ 0.31, 0.31, 0.31 ],
+						"hex": "#4f4f4f"
 					}
 				},
 				"fgSurface3": {
@@ -1002,11 +1044,18 @@
 						"hex": "#fff"
 					}
 				},
-				"fgSurface4": {
+				"fgSurface5": {
 					"$value": {
 						"colorSpace": "srgb",
 						"components": [ 0.157, 0.114, 0 ],
 						"hex": "#281d00"
+					}
+				},
+				"fgSurface4": {
+					"$value": {
+						"colorSpace": "srgb",
+						"components": [ 0.376, 0.302, 0 ],
+						"hex": "#604d00"
 					}
 				},
 				"fgSurface3": {
@@ -1290,7 +1339,7 @@
 		"foreground": {
 			"content": {
 				"neutral": {
-					"$value": "{wpds-color.primitive.bg.fgSurface4}",
+					"$value": "{wpds-color.primitive.bg.fgSurface5}",
 					"$description": "Foreground color for content like text with normal emphasis."
 				},
 				"neutral-weak": {
@@ -1298,7 +1347,7 @@
 					"$description": "Foreground color for content like text with weak emphasis."
 				},
 				"success": {
-					"$value": "{wpds-color.primitive.success.fgSurface4}",
+					"$value": "{wpds-color.primitive.success.fgSurface5}",
 					"$description": "Foreground color for content like text with success tone and normal emphasis."
 				},
 				"success-weak": {
@@ -1306,7 +1355,7 @@
 					"$description": "Foreground color for content like text with success tone and weak emphasis."
 				},
 				"info": {
-					"$value": "{wpds-color.primitive.info.fgSurface4}",
+					"$value": "{wpds-color.primitive.info.fgSurface5}",
 					"$description": "Foreground color for content like text with info tone and normal emphasis."
 				},
 				"info-weak": {
@@ -1314,7 +1363,7 @@
 					"$description": "Foreground color for content like text with info tone and weak emphasis."
 				},
 				"warning": {
-					"$value": "{wpds-color.primitive.warning.fgSurface4}",
+					"$value": "{wpds-color.primitive.warning.fgSurface5}",
 					"$description": "Foreground color for content like text with warning tone and normal emphasis."
 				},
 				"warning-weak": {
@@ -1322,7 +1371,7 @@
 					"$description": "Foreground color for content like text with warning tone and weak emphasis."
 				},
 				"caution": {
-					"$value": "{wpds-color.primitive.caution.fgSurface4}",
+					"$value": "{wpds-color.primitive.caution.fgSurface5}",
 					"$description": "Foreground color for content like text with caution tone and normal emphasis."
 				},
 				"caution-weak": {
@@ -1330,7 +1379,7 @@
 					"$description": "Foreground color for content like text with caution tone and weak emphasis."
 				},
 				"error": {
-					"$value": "{wpds-color.primitive.error.fgSurface4}",
+					"$value": "{wpds-color.primitive.error.fgSurface5}",
 					"$description": "Foreground color for content like text with error tone and normal emphasis."
 				},
 				"error-weak": {
@@ -1340,7 +1389,7 @@
 			},
 			"interactive": {
 				"neutral": {
-					"$value": "{wpds-color.primitive.bg.fgSurface4}",
+					"$value": "{wpds-color.primitive.bg.fgSurface5}",
 					"$description": "Foreground color for interactive elements with neutral tone and normal emphasis."
 				},
 				"neutral-active": {

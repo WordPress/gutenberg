@@ -80,6 +80,12 @@ function calculateRamp( {
 			);
 		}
 
+		const contrastTarget =
+			typeof contrast.target === 'function'
+				? contrast.target( mainDir )
+				: contrast.target;
+		const adjustedTarget = adjustContrastTarget( contrastTarget );
+
 		// Check if we can reuse color from the `sameAsIfPossible` config option
 		if ( sameAsIfPossible ) {
 			const candidateColor = calculatedColors.get( sameAsIfPossible );
@@ -93,7 +99,6 @@ function calculateRamp( {
 				referenceColor,
 				candidateColor
 			);
-			const adjustedTarget = adjustContrastTarget( contrast.target );
 			// If the candidate meets the contrast requirement, use it
 			if ( candidateContrast >= adjustedTarget ) {
 				// Store the reused color
@@ -130,8 +135,6 @@ function calculateRamp( {
 			referenceColor,
 			contrast.followDirection
 		);
-
-		const adjustedTarget = adjustContrastTarget( contrast.target );
 
 		// Define the lightness constraint, if needed.
 		let lightnessConstraint;

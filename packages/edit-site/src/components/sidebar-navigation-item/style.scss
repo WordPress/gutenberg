@@ -8,9 +8,10 @@
 	border: none;
 	min-height: $grid-unit-50;
 
-	&:hover,
 	&:focus,
-	&[aria-current="true"] {
+	&[aria-current="true"],
+	// Bump the specificity above the <Item> component's own `:hover` color.
+	&#{&}:hover {
 		color: var(--wpds-color-foreground-interactive-neutral-weak-active);
 	}
 

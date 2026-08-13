@@ -1,11 +1,9 @@
-import { privateApis, Spinner } from '@wordpress/components';
+import { Spinner } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import type { DataFormControlProps } from '../../types';
 import useElements from '../../hooks/use-elements';
-import { unlock } from '../../lock-unlock';
+import { ValidatedComboboxControl } from '../validated-form-controls';
 import getCustomValidity from './utils/get-custom-validity';
-
-const { ValidatedComboboxControl } = unlock( privateApis );
 
 export default function Combobox< Item >( {
 	data,
@@ -19,7 +17,7 @@ export default function Combobox< Item >( {
 	const value = getValue( { item: data } ) ?? '';
 
 	const onChangeControl = useCallback(
-		( newValue: string | null ) =>
+		( newValue: string | null | undefined ) =>
 			onChange( setValue( { item: data, value: newValue ?? '' } ) ),
 		[ data, onChange, setValue ]
 	);
