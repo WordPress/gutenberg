@@ -214,6 +214,36 @@
 					background: var(--wp-admin-theme-color);
 				}
 			}
+
+			// With the text labels preference, the button shows its label
+			// like every other toolbar button, not the black square.
+			.show-icon-labels & {
+				width: auto;
+				height: auto;
+				min-width: 0;
+				padding: 0 $grid-unit-15;
+				color: inherit;
+
+				svg {
+					display: none;
+				}
+
+				&::after {
+					content: attr(aria-label);
+					position: static;
+					border-radius: 0;
+					background: none;
+					white-space: nowrap;
+				}
+
+				&:hover {
+					color: var(--wp-admin-theme-color);
+
+					&::after {
+						background: none;
+					}
+				}
+			}
 		}
 
 		&::before {
