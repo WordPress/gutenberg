@@ -22,6 +22,7 @@
 
 -   Device Preview: Keep tablet and mobile iframe widths inside their responsive breakpoints so media queries remain accurate at browser zoom levels.
 -   Document tools: Fix icon button focus styles to use the design system `outset-ring__focus` mixin ([#81115](https://github.com/WordPress/gutenberg/pull/81115)).
+-   Device Preview: Show no viewport as selected in the View menu while the canvas sits at a width set by dragging its edges, so choosing a viewport snaps the canvas back to that viewport's width instead of doing nothing ([#81472](https://github.com/WordPress/gutenberg/issues/81472)).
 
 ## 14.52.0 (2026-07-29)
 
