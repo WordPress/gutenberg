@@ -41,6 +41,7 @@ export default function useInput() {
 		__unstableExpandSelection,
 		__unstableMarkAutomaticChange,
 		insertAfterBlock,
+		insertBlock,
 		selectBlock,
 	} = useDispatch( blockEditorStore );
 
@@ -155,19 +156,26 @@ export default function useInput() {
 							event.preventDefault();
 							insertAfterBlock( clientId );
 						} else {
-							// An empty container renders a ghost of its
-							// default block instead of a stored child.
-							// Focus materialises it through the ghost's
-							// own focus listener.
+							// Descend into an empty container by inserting
+							// its default block, the same block an appender
+							// or ghost would insert.
 							if ( ! getBlockOrder( clientId ).length ) {
-								const ghostElement =
-									event.target.ownerDocument.activeElement.querySelector(
-										'[data-block]'
-									);
+								const { defaultBlock } =
+									getBlockListSettings( clientId ) ?? {};
+								const name =
+									defaultBlock?.name ??
+									getDefaultBlockName();
 
-								if ( ghostElement ) {
+								if ( canInsertBlockType( name, clientId ) ) {
 									event.preventDefault();
-									ghostElement.focus();
+									insertBlock(
+										createBlock(
+											name,
+											defaultBlock?.attributes
+										),
+										0,
+										clientId
+									);
 									return;
 								}
 							}
