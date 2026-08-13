@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useRef } from '@wordpress/element';
 import { compose, createHigherOrderComponent } from '@wordpress/compose';
 import { kebabCase } from '@wordpress/kebab-case';
