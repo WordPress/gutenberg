@@ -1,17 +1,60 @@
-import type { ReactNode } from 'react';
+import type { ComponentType, ReactNode } from 'react';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { Spinner } from '@wordpress/components';
-import { useMemo } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { useStylesId } from '../../hooks/use-styles-id';
 import { useEditorSettings } from '../../hooks/use-editor-settings';
 import { useEditorAssets } from '../../hooks/use-editor-assets';
 import { unlock } from '../../lock-unlock';
 
 const { Editor: PrivateEditor, BackButton } = unlock( editorPrivateApis );
-const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
+
+/**
+ * Renders `@wordpress/block-library`'s keyboard shortcuts.
+ *
+ * The module is imported dynamically because `@wordpress/block-library` is one
+ * of the editor assets this package loads on demand: a static import resolves
+ * `window.wp.blockLibrary` while this module is evaluated, which is before
+ * those assets exist.
+ *
+ * Ideally this component wouldn't exist at all: it hardcodes transforms for two
+ * specific core blocks. Blocks should declare their own shortcuts, so any block
+ * can register them and the editor doesn't need to know about them.
+ *
+ * @return The block keyboard shortcuts, once they can be resolved.
+ */
+function BlockKeyboardShortcuts() {
+	const [ Shortcuts, setShortcuts ] = useState< ComponentType | null >(
+		null
+	);
+
+	useEffect( () => {
+		let ignore = false;
+		import( '@wordpress/block-library' )
+			.then( ( module ) => {
+				if ( ! ignore ) {
+					setShortcuts(
+						() =>
+							unlock( module.privateApis ).BlockKeyboardShortcuts
+					);
+				}
+			} )
+			.catch( ( error: Error ) => {
+				// eslint-disable-next-line no-console
+				console.error(
+					'Failed to load the block keyboard shortcuts:',
+					error
+				);
+			} );
+		return () => {
+			ignore = true;
+		};
+	}, [] );
+
+	return Shortcuts ? <Shortcuts /> : null;
+}
 
 interface EditorProps {
 	postType?: string;
@@ -112,12 +155,6 @@ export function Editor( {
 			settings={ finalSettings }
 			styles={ finalSettings.styles }
 		>
-			{ /*
-			   Ideally this component wouldn't exist: it hardcodes transforms
-			   for two specific core blocks. Blocks should declare their own
-			   shortcuts, so any block can register them and the editor doesn't
-			   need to know about them.
-			 */ }
 			{ ! finalSettings.isPreviewMode && <BlockKeyboardShortcuts /> }
 			{ backButton && <BackButton>{ backButton }</BackButton> }
 		</PrivateEditor>
