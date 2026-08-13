@@ -1,11 +1,9 @@
 import type { WidgetAction, WidgetType } from '@wordpress/widget-primitives';
 
 /**
- * Splits a widget type's declared actions across the chrome's two surfaces:
- * the footer takes the promoted tiers (`relevance: 'high'` and `'medium'`),
- * the More menu takes the rest. Full-bleed widgets have no chrome to host a
- * footer, so every action stays in the menu. Both surfaces read this one
- * rule so they cannot drift.
+ * Splits a widget type's actions across the chrome surfaces: the footer
+ * takes `relevance: 'high'` and `'medium'`, the More menu the rest.
+ * Full-bleed widgets have no footer, so every action stays in the menu.
  *
  * @param widgetType The widget type whose actions are routed.
  */

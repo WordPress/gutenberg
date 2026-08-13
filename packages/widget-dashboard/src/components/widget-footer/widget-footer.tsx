@@ -6,16 +6,15 @@ import styles from './widget-footer.module.css';
 
 type IconActionProps = {
 	/**
-	 * An icon-carrying action, materialized as an icon-only link.
+	 * The action to materialize.
 	 */
 	action: WidgetAction & { icon: WidgetIcon };
 };
 
 /**
- * Icon-only link for an icon-carrying action. `openInNewTab` mounts the
- * target on the anchor directly instead of through `Link`, which would add
- * its external glyph beside the action icon; the new-tab hint joins the
- * accessible name instead, which the `aria-label` would otherwise mute.
+ * Icon-only link. `openInNewTab` mounts the target on the anchor rather
+ * than through `Link`, whose external glyph would double the icon; the
+ * new-tab hint joins the accessible name.
  *
  * @param {IconActionProps} props Component props.
  */
@@ -42,9 +41,7 @@ function IconAction( { action }: IconActionProps ): React.ReactNode {
 						download={ action.download }
 						render={
 							action.openInNewTab ? (
-								/* The href and the icon content merge in
-								   through the render-prop chain at runtime,
-								   invisible to the static analyzer. */
+								/* href and content merge in at runtime. */
 								// eslint-disable-next-line jsx-a11y/anchor-has-content, jsx-a11y/anchor-is-valid
 								<a target="_blank" rel="noopener noreferrer" />
 							) : undefined
@@ -61,28 +58,20 @@ function IconAction( { action }: IconActionProps ): React.ReactNode {
 
 type WidgetFooterProps = {
 	/**
-	 * The actions this footer materializes; the host routes the promoted
-	 * tiers (`relevance: 'high'` and `'medium'`) here.
+	 * The promoted actions (`relevance: 'high'` and `'medium'`).
 	 */
 	actions: WidgetAction[];
 
 	/**
-	 * Inert the footer while customizing, so it does not capture interaction.
+	 * Inert the footer while customizing.
 	 */
 	editMode?: boolean;
 };
 
 /**
- * Persistent strip of chrome under the widget body, the prominent surface
- * for the widget's promoted actions: always visible, unlike the More menu
- * the remaining actions collapse into.
- *
- * Materialization follows the relevance tier: `'high'` actions mount as
- * text links on the leading edge, labels always visible; `'medium'` actions
- * mount on the trailing edge as compact affordances, icon-only when the
- * action declares an icon and text links otherwise. Every affordance is a
- * real anchor, so middle-click, copy address, and download semantics
- * survive.
+ * Persistent strip under the widget body. `'high'` actions mount as leading
+ * text links; `'medium'` actions as trailing compact affordances, icon-only
+ * when they declare an icon. Every affordance is a real anchor.
  *
  * @param {WidgetFooterProps} props Component props.
  */

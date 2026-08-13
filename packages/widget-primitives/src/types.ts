@@ -62,9 +62,9 @@ export interface WidgetHelp {
 }
 
 /**
- * How relevant a declaration is, as a decreasing scale. The widget declares
- * importance, not a surface; hosts map the tiers to surfaces of decreasing
- * prominence. `'low'` is the default.
+ * How relevant a declaration is. The widget declares importance, not a
+ * surface; hosts map the scale to surfaces of decreasing prominence.
+ * `'low'` is the default.
  */
 export type WidgetRelevance = 'high' | 'medium' | 'low';
 
@@ -99,10 +99,7 @@ export interface WidgetAction {
 	icon?: WidgetIcon;
 
 	/**
-	 * How relevant the action is among the widget's actions. Hosts map the
-	 * scale to surfaces of decreasing prominence: `'high'` deserves the
-	 * most prominent one, `'medium'` a persistent but compact one, and
-	 * `'low'` (the default) a collapsed surface such as a menu.
+	 * How relevant the action is among the widget's actions.
 	 */
 	relevance?: WidgetRelevance;
 

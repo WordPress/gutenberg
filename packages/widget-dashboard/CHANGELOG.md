@@ -4,11 +4,10 @@
 
 ### New Features
 
--   Widget chrome footer: promoted actions materialize as a persistent strip
-    under the widget body. `relevance: 'high'` actions mount as leading text
-    links, `'medium'` actions as trailing compact affordances (icon-only when
-    the action declares an icon); the "More" menu keeps the remaining actions,
-    and full-bleed widgets keep every action in the menu
+-   Widget chrome footer: `relevance: 'high'` actions mount as leading text
+    links in a persistent strip under the widget body, `'medium'` as trailing
+    compact affordances (icon-only with a declared icon); the "More" menu
+    keeps the rest, and full-bleed widgets keep every action in the menu
     ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
 
 ## 0.5.0 (2026-08-12)

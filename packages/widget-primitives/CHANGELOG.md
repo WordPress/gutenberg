@@ -4,17 +4,15 @@
 
 ### New Features
 
--   `WidgetRelevance` gains a `'medium'` tier between `'high'` and `'low'`:
-    a declaration worth persistent but compact visibility. Hosts map the
-    scale to surfaces of decreasing prominence
+-   `WidgetRelevance` gains a `'medium'` tier between `'high'` and `'low'`,
+    for persistent but compact visibility
     ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
 
 ### Enhancements
 
--   `useWidgetTypes` holds the icon slot with the transparent stand-in while
-    an action's icon reference resolves, so hosts routing actions by icon
-    keep a stable shape from first paint; an unresolvable reference clears
-    the stand-in ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
+-   `useWidgetTypes` holds the icon slot with the stand-in while an action's
+    icon reference resolves; an unresolvable reference clears it
+    ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
 
 ## 0.5.0 (2026-08-12)
 

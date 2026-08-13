@@ -236,11 +236,11 @@ Edits on any surface stage through the engine's internal layer and reach `onLayo
 
 Actions carry the same `relevance` scale, mapped to surfaces of decreasing prominence:
 
--   **Footer, leading**: `relevance: 'high'` actions render as text links in a persistent strip under the widget body, labels always visible.
--   **Footer, trailing**: `relevance: 'medium'` actions render beside them as compact affordances: an icon-only link when the action declares an icon (the label as accessible name and tooltip), a text link otherwise.
--   **More menu**: the remaining actions collapse into the three-dots menu in the tile header.
+-   **Footer, leading**: `relevance: 'high'` actions render as text links in a persistent strip under the widget body.
+-   **Footer, trailing**: `relevance: 'medium'` actions render as compact affordances: icon-only links when the action declares an icon, text links otherwise.
+-   **More menu**: the rest collapse into the three-dots menu in the tile header.
 
-Every affordance is a real anchor, so middle-click, copy address, and download semantics survive. Full-bleed widgets render no chrome to host a footer, so all of their actions stay in the menu.
+Every affordance is a real anchor. Full-bleed widgets have no footer, so all of their actions stay in the menu.
 
 ## Authoring widgets
 

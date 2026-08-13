@@ -25,14 +25,12 @@ const pendingIcon: WidgetIcon = createElement( 'svg', {
 } );
 
 /**
- * Emitted actions carry only renderable icons. A record action's wire
- * reference holds the slot with the stand-in until it resolves after the
- * gate; module-declared actions have no resolution pass, so anything
- * non-renderable drops.
+ * Emitted actions carry only renderable icons: a wire reference holds the
+ * slot with the stand-in while it resolves; anything else non-renderable
+ * drops.
  *
  * @param actions     Declared actions, from the record or the module.
- * @param holdPending Substitute the stand-in for wire references that
- *                    resolve after the gate.
+ * @param holdPending Whether wire references resolve later (record actions).
  */
 function withRenderableIcons(
 	actions: ( WidgetAction | WidgetActionRecord )[],
@@ -210,10 +208,8 @@ export function useWidgetTypes(
 			}
 
 			/*
-			 * Each record action's icon reference resolves off the gate
-			 * and patches into the emitted action; an unresolvable
-			 * reference clears the stand-in, leaving the action without
-			 * an icon.
+			 * Record action icon references resolve off the gate and
+			 * patch in; an unresolvable reference clears the stand-in.
 			 */
 			for ( const record of records ) {
 				for ( const action of record.actions ?? [] ) {

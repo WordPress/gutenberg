@@ -1,9 +1,6 @@
 /*
- * The divider spans the full card width in every presentation; the content
- * aligns to the card padding via `--wp-ui-card-padding`, which already
- * resolves the host-tunable tile padding. The body above is a middle card
- * section with no bottom padding, so scrolled content runs flush to the
- * divider.
+ * Full-width divider; content aligns to the card padding. The body above
+ * has no bottom padding, so scrolled content runs flush to the divider.
  */
 .widget-footer {
 	padding-block: var(--wpds-dimension-padding-md);
@@ -18,11 +15,8 @@
 }
 
 /*
- * Square the icon-only link to the icon-button geometry, via the override
- * hooks the Button styles declare for icon buttons. Breathing room around
- * the glyph comes from the size scale (compact height around the 24px
- * icon), not from padding: inline padding past ~3px widens the box out of
- * square, and below that it does not move anything.
+ * Square the icon-only link via the Button override hooks for icon
+ * buttons; breathing room comes from the size, not from padding.
  */
 .icon-action {
 	--wp-ui-button-aspect-ratio: 1;

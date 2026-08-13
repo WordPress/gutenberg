@@ -90,8 +90,6 @@ export function WidgetFrame( {
 	const isBodyBleeding =
 		presentation === 'full-bleed' || presentation === 'content-bleed';
 
-	// The footer is the prominent surface for high-relevance actions;
-	// `splitWidgetActions` owns the routing rule shared with the menu.
 	const { footer: footerActions } = splitWidgetActions( widgetType );
 
 	const body = (

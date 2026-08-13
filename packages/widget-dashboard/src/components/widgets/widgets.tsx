@@ -128,8 +128,6 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 
 			const isFullBleed = widgetType?.presentation === 'full-bleed';
 
-			// `splitWidgetActions` owns the footer/menu routing rule; the
-			// frame reads the footer half of the same split.
 			const { menu: menuActions } = splitWidgetActions( widgetType );
 			const hasActions = menuActions.length > 0;
 
