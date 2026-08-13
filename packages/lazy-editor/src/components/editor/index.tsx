@@ -112,6 +112,12 @@ export function Editor( {
 			settings={ finalSettings }
 			styles={ finalSettings.styles }
 		>
+			{ /*
+			   Ideally this component wouldn't exist: it hardcodes transforms
+			   for two specific core blocks. Blocks should declare their own
+			   shortcuts, so any block can register them and the editor doesn't
+			   need to know about them.
+			 */ }
 			{ ! finalSettings.isPreviewMode && <BlockKeyboardShortcuts /> }
 			{ backButton && <BackButton>{ backButton }</BackButton> }
 		</PrivateEditor>
