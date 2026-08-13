@@ -124,3 +124,17 @@ Renders a `Stack` with `top: floating.y` when in floating mode. CSS uses the `--
 - `useSyncExternalStore` is the right React 18 primitive for "external mutable source with snapshot" - gives concurrent-mode-safe subscriptions without a provider.
 - The scroll listener updates a CSS variable rather than React state, so scrolling doesn't re-render. Per-note `top` only recomputes when threads, heights, selection, or structural inputs change.
 - Batching `getBoundingClientRect` reads inside the `rAF` and separating them from style writes avoids forced layout.
+
+## Style Book notes
+
+Notes also work in the Style Book, in `../style-book/notes/`. The surface differs from the post editor in two ways that shape the code here.
+
+**There is no edited post.** The Style Book is opened from the styles canvas, where the editor is editing a template. Notes are stored against the current theme's user `wp_global_styles` post instead - the record the Styles UI already edits - which makes them theme-specific, since core keeps one per theme. `useNoteActions` takes a `postId` for this. Passing one also turns off the block-attribute wiring, which is not merely unnecessary there but harmful: the canvas usually has a block selected, and `metadata.noteId` would land on it.
+
+**There are no persisted blocks.** Style Book examples are generated on every render and get fresh client ids, so `metadata.noteId` cannot anchor anything. Each note instead carries a `_wp_note_anchor` comment meta holding the example's name - `core/button`, `typography`, `theme-colors` - which is deterministic and stable across sessions and reloads. The server side is in `lib/compat/wordpress-7.2/global-styles-notes.php`.
+
+What is shared: `NoteThread` and the note/reply/form components, `useNoteActions`, and the thread-materialization helpers in `utils.js`. What is not: the thread list, because the post editor's keeps note selection in step with block selection and spotlights the anchored block.
+
+`NoteThread` takes an optional `anchorLabel` for this. Without one, a root note with no block means the block was deleted, and the thread says so - true in the post editor, wrong for every Style Book note.
+
+Anchors that no longer match a rendered example - a deactivated block plugin, a renamed example - group under "Other notes" rather than disappearing, mirroring how orphaned notes stay visible in `useNoteThreads`.

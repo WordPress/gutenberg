@@ -42,6 +42,7 @@ function StyleBookNotesSidebar( { globalStylesId } ) {
 		>
 			<StyleBookNotesPanel
 				groups={ groups }
+				labels={ labels }
 				globalStylesId={ globalStylesId }
 				sidebarRef={ sidebarRef }
 			/>

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Notes: Support notes in the Style Book, stored against the user global styles post and anchored to a Style Book example ([#73278](https://github.com/WordPress/gutenberg/issues/73278)).
+
 ## 14.53.0 (2026-08-12)
 
 ### Internal

@@ -14,6 +14,23 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import DefaultSidebar from './default-sidebar';
 import WelcomeGuideStyles from './welcome-guide';
+import { STYLE_BOOK_NOTES_SIDEBAR } from '../collab-sidebar/constants';
+
+export const GLOBAL_STYLES_SIDEBAR = 'edit-site/global-styles';
+
+/*
+ * Complementary areas that belong to the styles experience.
+ *
+ * Opening any other area means the user has left Styles, and the styles
+ * navigation - including the Style Book - is reset. The Style Book notes
+ * sidebar is part of that experience rather than a departure from it: it holds
+ * notes about the Style Book the user is looking at, so moving between the two
+ * has to leave the canvas standing.
+ */
+const STYLES_COMPLEMENTARY_AREAS = [
+	GLOBAL_STYLES_SIDEBAR,
+	STYLE_BOOK_NOTES_SIDEBAR,
+];
 
 export default function GlobalStylesSidebar() {
 	const {
@@ -48,9 +65,9 @@ export default function GlobalStylesSidebar() {
 			stylesPath: getStylesPath(),
 			showStylebook: getShowStylebook(),
 			shouldResetNavigation:
-				'edit-site/global-styles' !==
-					getActiveComplementaryArea( 'core' ) ||
-				! _isVisualEditorMode,
+				! STYLES_COMPLEMENTARY_AREAS.includes(
+					getActiveComplementaryArea( 'core' )
+				) || ! _isVisualEditorMode,
 			showListViewByDefault: _showListViewByDefault,
 			hasRevisions:
 				!! globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count,
@@ -75,11 +92,13 @@ export default function GlobalStylesSidebar() {
 
 	const previousActiveArea = usePrevious( activeComplementaryArea );
 
-	// Reset navigation when sidebar opens
+	// Reset navigation when the sidebar opens, but only on a fresh entry into
+	// Styles - coming back from the notes sidebar is a return, not an opening,
+	// and resetting there would close the Style Book the notes are about.
 	useEffect( () => {
 		if (
-			activeComplementaryArea === 'edit-site/global-styles' &&
-			previousActiveArea !== 'edit-site/global-styles'
+			activeComplementaryArea === GLOBAL_STYLES_SIDEBAR &&
+			! STYLES_COMPLEMENTARY_AREAS.includes( previousActiveArea )
 		) {
 			resetStylesNavigation();
 		}
@@ -112,7 +131,7 @@ export default function GlobalStylesSidebar() {
 		<>
 			<DefaultSidebar
 				className="editor-global-styles-sidebar"
-				identifier="edit-site/global-styles"
+				identifier={ GLOBAL_STYLES_SIDEBAR }
 				title={ __( 'Styles' ) }
 				icon={ styles }
 				closeLabel={ __( 'Close Styles' ) }

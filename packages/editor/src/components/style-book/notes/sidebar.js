@@ -1,4 +1,4 @@
-import { Fragment, useMemo, useRef } from '@wordpress/element';
+import { Fragment, useEffect, useMemo, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { Stack, Text } from '@wordpress/ui';
@@ -23,11 +23,17 @@ import { unlock } from '../../../lock-unlock';
  *
  * @param {Object} props
  * @param {Array}  props.groups         Ordered anchor groups from `useStyleBookNoteThreads`.
+ * @param {Object} props.labels         Example name to display title.
  * @param {number} props.globalStylesId Post the notes are stored on.
  * @param {Object} props.sidebarRef     Ref to the scroll container.
  * @return {React.JSX.Element} The notes list.
  */
-export function StyleBookNotesPanel( { groups, globalStylesId, sidebarRef } ) {
+export function StyleBookNotesPanel( {
+	groups,
+	labels,
+	globalStylesId,
+	sidebarRef,
+} ) {
 	const { pendingAnchor, setPendingAnchor, setActiveAnchor } =
 		useStyleBookNotesContext();
 	const { selectNote } = unlock( useDispatch( editorStore ) );
@@ -36,6 +42,18 @@ export function StyleBookNotesPanel( { groups, globalStylesId, sidebarRef } ) {
 		[]
 	);
 	const isSubmittingRef = useRef( false );
+	const addNoteRef = useRef( null );
+
+	/*
+	 * The request to add a note comes from the canvas, so focus has to follow
+	 * it into the sidebar - otherwise the form opens somewhere the keyboard
+	 * user has not been taken to.
+	 */
+	useEffect( () => {
+		if ( pendingAnchor ) {
+			addNoteRef.current?.querySelector( '[role="textbox"]' )?.focus();
+		}
+	}, [ pendingAnchor ] );
 
 	const {
 		onCreate,
@@ -54,10 +72,13 @@ export function StyleBookNotesPanel( { groups, globalStylesId, sidebarRef } ) {
 		[ groups ]
 	);
 
-	const pendingGroup = groups.find(
-		( group ) => group.anchor === pendingAnchor
-	);
-	const pendingLabel = pendingGroup?.label ?? pendingAnchor;
+	/*
+	 * The title comes from the label map rather than from the groups: the
+	 * first note on an example is added before any group for it exists, and
+	 * naming the form after the raw anchor would show `core/heading` where the
+	 * canvas says "Headings".
+	 */
+	const pendingLabel = pendingAnchor ? labels?.[ pendingAnchor ] : undefined;
 
 	const handleDelete = async ( note ) => {
 		const currentIndex = orderedThreads.findIndex(
@@ -170,46 +191,51 @@ export function StyleBookNotesPanel( { groups, globalStylesId, sidebarRef } ) {
 				</Text>
 			) }
 			{ !! pendingAnchor && (
-				<NoteCard>
-					<NoteForm
-						onSubmit={ async ( inputComment ) => {
-							isSubmittingRef.current = true;
-							try {
-								/*
-								 * The create action resolves `undefined` when
-								 * the save fails (it surfaces its own error
-								 * notice); keep the form open so the draft is
-								 * not lost.
-								 */
-								const savedRecord = await onCreate( {
-									content: inputComment,
-								} );
-								if ( savedRecord ) {
-									setPendingAnchor( null );
-									selectNote( savedRecord.id );
-									focusNoteThread(
-										savedRecord.id,
-										sidebarRef.current
-									);
+				<div
+					ref={ addNoteRef }
+					className="editor-style-book-notes__add-note"
+				>
+					<NoteCard>
+						<NoteForm
+							onSubmit={ async ( inputComment ) => {
+								isSubmittingRef.current = true;
+								try {
+									/*
+									 * The create action resolves `undefined` when
+									 * the save fails (it surfaces its own error
+									 * notice); keep the form open so the draft is
+									 * not lost.
+									 */
+									const savedRecord = await onCreate( {
+										content: inputComment,
+									} );
+									if ( savedRecord ) {
+										setPendingAnchor( null );
+										selectNote( savedRecord.id );
+										focusNoteThread(
+											savedRecord.id,
+											sidebarRef.current
+										);
+									}
+									return savedRecord;
+								} finally {
+									isSubmittingRef.current = false;
 								}
-								return savedRecord;
-							} finally {
-								isSubmittingRef.current = false;
-							}
-						} }
-						onCancel={ () => setPendingAnchor( null ) }
-						labels={ {
-							input: pendingLabel
-								? sprintf(
-										// translators: %s: Style Book example title, e.g. "Button".
-										__( 'New note on %s' ),
-										pendingLabel
-								  )
-								: __( 'New note' ),
-							placeholder: __( 'Add a note or @ mention' ),
-						} }
-					/>
-				</NoteCard>
+							} }
+							onCancel={ () => setPendingAnchor( null ) }
+							labels={ {
+								input: pendingLabel
+									? sprintf(
+											// translators: %s: Style Book example title, e.g. "Button".
+											__( 'New note on %s' ),
+											pendingLabel
+									  )
+									: __( 'New note' ),
+								placeholder: __( 'Add a note or @ mention' ),
+							} }
+						/>
+					</NoteCard>
+				</div>
 			) }
 			{ groups.map( ( group ) => {
 				// Unresolved threads sort first, so the first resolved one

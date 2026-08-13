@@ -49,6 +49,23 @@ class Tests_Global_Styles_Notes extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Re-applies the registrations the test case tears down.
+	 *
+	 * `WP_UnitTestCase_Base` unregisters every meta key after each test and
+	 * re-runs `create_initial_post_types()` before each one, which between
+	 * them drop the anchor meta and reset `wp_global_styles` to its stock
+	 * supports. Both are normally applied on `init`, which does not fire again
+	 * here, so only the first test would see them.
+	 */
+	public function set_up() {
+		parent::set_up();
+
+		wp_create_initial_comment_meta();
+		gutenberg_register_note_anchor_meta();
+		gutenberg_add_global_styles_notes_support();
+	}
+
+	/**
 	 * Returns the current theme's user global styles post id, creating the
 	 * record if the theme has not been customized yet.
 	 *
@@ -192,11 +209,11 @@ class Tests_Global_Styles_Notes extends WP_Test_REST_TestCase {
 	 */
 	public function data_valid_anchors() {
 		return array(
-			'core block'      => array( 'core/button' ),
-			'third-party'     => array( 'my-plugin/testimonial' ),
-			'typography'      => array( 'typography' ),
-			'color group'     => array( 'theme-colors' ),
-			'duotone group'   => array( 'duotones' ),
+			'core block'    => array( 'core/button' ),
+			'third-party'   => array( 'my-plugin/testimonial' ),
+			'typography'    => array( 'typography' ),
+			'color group'   => array( 'theme-colors' ),
+			'duotone group' => array( 'duotones' ),
 		);
 	}
 
@@ -318,7 +335,7 @@ class Tests_Global_Styles_Notes extends WP_Test_REST_TestCase {
 		);
 
 		$this->assertSame( 400, $response->get_status() );
-		$this->assertSame( 'rest_invalid_param', $response->get_data()['code'] );
+		$this->assertSame( 'rest_too_long', $response->get_data()['code'] );
 	}
 
 	/**
