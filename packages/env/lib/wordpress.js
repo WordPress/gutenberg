@@ -64,8 +64,9 @@ async function canAccessWPORG() {
  * Returns every stable version tag currently on the WordPress/WordPress
  * mirror, which is what wp-env actually fetches WordPress core from.
  *
- * @return {string[]} Every available version, like [ '6.5.8', '6.5.9' ]. Empty
- *                     if the mirror could not be queried.
+ * @return {?string[]} Every available version, like [ '6.5.8', '6.5.9' ].
+ *                      Null if the mirror couldn't be queried, e.g. the
+ *                      remote or the local network connection is down.
  */
 async function getMirrorVersions() {
 	try {
@@ -75,11 +76,11 @@ async function getMirrorVersions() {
 		] );
 		return output
 			.split( '\n' )
-			.map( ( line ) =>
-				line.match( /refs\/tags\/(\d+\.\d+(?:\.\d+)?)$/ )
+			.map(
+				( line ) =>
+					line.match( /refs\/tags\/(\d+\.\d+(?:\.\d+)?)$/ )?.[ 1 ]
 			)
-			.filter( Boolean )
-			.map( ( match ) => match[ 1 ] );
+			.filter( Boolean );
 	} catch {
 		return null;
 	}
@@ -150,30 +151,25 @@ async function getLatestWordPressVersion( options ) {
 		if ( status === 'latest' ) {
 			const mirrorVersions = await getMirrorVersions();
 
-			// If the mirror listing failed, mirrorVersions is empty and this
-			// is skipped -- that isn't confirmation the tag is missing, so
-			// fall through to using the reported version as before.
+			// A null mirrorVersions means the listing itself failed, most
+			// likely a network issue -- that isn't confirmation the tag is
+			// missing, so fall through to using the reported version as
+			// before.
 			if (
-				mirrorVersions.length &&
+				mirrorVersions !== null &&
 				! mirrorVersions.includes( version )
 			) {
-				// The mirror hasn't synced this tag yet, so fall back instead
-				// of returning a version that's guaranteed to fail the
-				// `git fetch` that follows. Prefer the last known good
-				// version from a previous run; if there isn't one (e.g. the
-				// first run on a fresh CI runner), use the highest version
-				// the mirror actually has.
-				//
-				// This fallback isn't reported to the user -- no spinner or
-				// logger reaches this point in config parsing.
-				const fallback =
-					( await getCache(
-						'latestWordPressVersion',
-						cacheOptions
-					) ) ||
-					[ ...mirrorVersions ]
-						.sort( compareWordPressVersions )
-						.pop();
+				// The mirror hasn't synced this tag yet, so fall back to the
+				// highest version it actually has instead of returning a
+				// version that's guaranteed to fail the `git fetch` that
+				// follows.
+				const fallback = [ ...mirrorVersions ]
+					.sort( compareWordPressVersions )
+					.pop();
+
+				console.warn(
+					`wp-env: WordPress ${ version } hasn't synced to the WordPress/WordPress mirror yet. Using ${ fallback } instead.`
+				);
 
 				CACHED_WP_VERSION = fallback;
 				await setCache(

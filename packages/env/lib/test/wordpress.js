@@ -61,31 +61,11 @@ describe( 'getLatestWordPressVersion', () => {
 		);
 	} );
 
-	it( 'falls back to the last known good version when the mirror has not synced the new tag yet', async () => {
+	it( 'falls back to the highest version on the mirror when it has not synced the new tag yet, and warns about it', async () => {
 		const dns = require( 'dns' ).promises;
 		const got = require( 'got' );
 		const SimpleGit = require( 'simple-git' );
-		const { getCache } = require( '../cache' );
-		const { getLatestWordPressVersion } = require( '../wordpress' );
-
-		dns.resolve.mockResolvedValue( [ '127.0.0.1' ] );
-		mockStableCheck( got, '6.6.0' );
-		// The mirror's highest tag (6.5.9) deliberately differs from the
-		// cached value (6.4.0) so this proves the cache wins outright,
-		// rather than coincidentally matching what the mirror has.
-		mockMirrorTags( SimpleGit, [ '6.5.8', '6.5.9' ] );
-		getCache.mockResolvedValue( '6.4.0' );
-
-		const version = await getLatestWordPressVersion( cacheOptions );
-
-		expect( version ).toBe( '6.4.0' );
-	} );
-
-	it( 'falls back to the highest version on the mirror when there is no cache at all, such as a fresh CI runner', async () => {
-		const dns = require( 'dns' ).promises;
-		const got = require( 'got' );
-		const SimpleGit = require( 'simple-git' );
-		const { getCache, setCache } = require( '../cache' );
+		const { setCache } = require( '../cache' );
 		const { getLatestWordPressVersion } = require( '../wordpress' );
 
 		dns.resolve.mockResolvedValue( [ '127.0.0.1' ] );
@@ -96,7 +76,6 @@ describe( 'getLatestWordPressVersion', () => {
 			'6.5.9',
 			'not-a-version',
 		] );
-		getCache.mockResolvedValue( undefined );
 
 		const version = await getLatestWordPressVersion( cacheOptions );
 
@@ -106,6 +85,7 @@ describe( 'getLatestWordPressVersion', () => {
 			'6.5.10',
 			expect.anything()
 		);
+		expect( console ).toHaveWarned();
 	} );
 
 	it( 'uses the reported version anyway when the mirror listing itself fails', async () => {
