@@ -33,6 +33,7 @@ import { Content, valueToHTMLString } from './content';
 import { withDeprecations } from './with-deprecations';
 import BlockContext from '../block-context';
 import { unlock } from '../../lock-unlock';
+import { PrivateBlockContext } from '../block-list/private-block-context';
 
 // `RichTextShortcut` and `RichTextInputEvent` now live in
 // `@wordpress/rich-text` so they share the shortcut and input-event contexts
@@ -48,7 +49,7 @@ const {
 
 const instanceIdKey = Symbol( 'instanceId' );
 
-export function RichTextWrapper(
+function RichTextWrapper(
 	{
 		children,
 		tagName = 'div',
@@ -87,6 +88,7 @@ export function RichTextWrapper(
 		} );
 	}
 
+	const { supportsSplitting } = useContext( PrivateBlockContext );
 	const instanceId = useInstanceId( RichTextWrapper );
 	const anchorRef = useRef();
 	const [ anchorElement, setAnchorElement ] = useState( null );
@@ -511,6 +513,7 @@ export function RichTextWrapper(
 						onSplitAtDoubleLineEnd,
 						keyboardShortcuts,
 						inputEvents,
+						supportsSplitting,
 					} ),
 					anchorRef,
 					setAnchorElement,
@@ -529,11 +532,13 @@ export function RichTextWrapper(
 	);
 }
 
+const ForwardedRichTextWrapper = forwardRef( RichTextWrapper );
+
+export { ForwardedRichTextWrapper as RichTextWrapper };
+
 // This is the private API for the RichText component.
 // It allows access to all props, not just the public ones.
-export const PrivateRichText = withDeprecations(
-	forwardRef( RichTextWrapper )
-);
+export const PrivateRichText = withDeprecations( ForwardedRichTextWrapper );
 
 PrivateRichText.Content = Content;
 PrivateRichText.isEmpty = ( value ) => {
