@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   DataForm: Send a single update per calendar interaction in the `datetime` control instead of two identical ones. Selecting or clearing a date now reveals the validation message by firing a synthetic `invalid` event on the input, rather than briefly moving focus into it and re-sending the value, and announces it to screen readers since focus stays on the calendar. [#81440](https://github.com/WordPress/gutenberg/pull/81440)
+
+### Internal
+
+-   DataForm: Internalize `ValidatedComboboxControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81449](https://github.com/WordPress/gutenberg/pull/81449)
+-   DataForm: Internalize `ValidatedFormTokenField` instead of unlocking it from the `@wordpress/components` private APIs. [#81451](https://github.com/WordPress/gutenberg/pull/81451)
+-   DataForm: Internalize `ValidatedToggleControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81492](https://github.com/WordPress/gutenberg/pull/81492)
+-   DataForm: Internalize `ValidatedToggleGroupControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81450](https://github.com/WordPress/gutenberg/pull/81450)
+
+## 18.0.0 (2026-08-12)
+
 ### Breaking Changes
 
 -   DataForms: Remove the built-in `richtext` control, its `EditConfigRichText` type, and the package's `privateApis` export, whose only member was that control. Assembling `@wordpress/rich-text` inside a bundled package broke plugins that install DataViews from npm ([#81233](https://github.com/WordPress/gutenberg/issues/81233)), so the control moved to `@wordpress/editor`, next to its only consumer. `@wordpress/rich-text` is no longer a dependency of this package, and a rich text field now needs a custom `Edit` component ([#81430](https://github.com/WordPress/gutenberg/pull/81430)).

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 14.53.0 (2026-08-12)
+
 ### Internal
 
 -   Notes: Move the rich text control the note form renders from `@wordpress/dataviews` into this package, where `@wordpress/rich-text` is the same copy the block editor uses ([#81430](https://github.com/WordPress/gutenberg/pull/81430)).

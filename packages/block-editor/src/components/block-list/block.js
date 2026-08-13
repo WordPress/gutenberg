@@ -346,7 +346,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 
 				if (
 					blockOrder.length === 1 &&
-					isUnmodifiedBlock( getBlock( firstClientId ) )
+					isUnmodifiedBlock( getBlock( firstClientId ), 'content' )
 				) {
 					removeBlock( _clientId );
 				} else if ( isTextualWrapper ) {
@@ -393,7 +393,10 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 
 						if (
 							! getBlockOrder( _clientId ).length &&
-							isUnmodifiedBlock( getBlock( _clientId ) )
+							isUnmodifiedBlock(
+								getBlock( _clientId ),
+								'content'
+							)
 						) {
 							removeBlock( _clientId, false );
 						}
@@ -768,6 +771,11 @@ function BlockListBlockProvider( props ) {
 				blockVisibility,
 				deviceType,
 				viewportSettings,
+				supportsSplitting: hasBlockSupport(
+					blockName,
+					'splitting',
+					false
+				),
 			};
 		},
 		[ clientId, rootClientId, ghostBlock, ghostBlockWithoutAttributes ]
@@ -851,6 +859,7 @@ function BlockListBlockProvider( props ) {
 		blockVisibility,
 		deviceType,
 		viewportSettings,
+		supportsSplitting,
 	} = selectedProps;
 
 	const privateContext = {
@@ -893,6 +902,7 @@ function BlockListBlockProvider( props ) {
 		blockVisibility,
 		deviceType,
 		viewportSettings,
+		supportsSplitting,
 	};
 
 	if (

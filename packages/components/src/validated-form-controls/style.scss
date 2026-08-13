@@ -16,13 +16,6 @@
 		--wp-components-color-accent: #{$alert-red};
 		border-color: $alert-red;
 	}
-
-	// For ComboboxControl
-	.components-combobox-control__suggestions-container:has(
-	input:invalid[data-validity-visible]
-):not(:has([aria-expanded="true"])) {
-		--wp-admin-theme-color: #{$alert-red};
-	}
 }
 
 .components-validated-control__wrapper-with-error-delegate {
@@ -31,17 +24,6 @@
 	// For CustomSelectControl
 	&:has(select:invalid[data-validity-visible]) .components-input-control__backdrop {
 		--wp-components-color-accent: #{$alert-red};
-		border-color: $alert-red;
-	}
-
-	// For ToggleGroupControl
-	&:has(input[type="radio"]:invalid[data-validity-visible]) {
-		--wp-components-color-accent: #{$alert-red};
-	}
-
-	// For FormTokenField
-	&:has(input:invalid[data-validity-visible]) .components-form-token-field__input-container:not(:has([aria-expanded="true"])) {
-		--wp-admin-theme-color: #{$alert-red};
 		border-color: $alert-red;
 	}
 

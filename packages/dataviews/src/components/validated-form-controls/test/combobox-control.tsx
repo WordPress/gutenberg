@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ValidatedComboboxControl } from '../components';
+import { ValidatedComboboxControl } from '../combobox-control';
 
 // The `help` prop is rendered visually by BaseControl but is not
 // programmatically associated with the combobox input via aria-describedby.
