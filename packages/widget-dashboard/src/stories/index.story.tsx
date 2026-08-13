@@ -251,6 +251,7 @@ const GOAL_ACTIONS: WidgetAction[] = [
 		id: 'view-goal',
 		label: 'View goal details',
 		relevance: 'high',
+		icon: chartBar,
 		href: 'https://wordpress.org/',
 		openInNewTab: true,
 	},
@@ -439,7 +440,7 @@ Their tiles compare the header presentations:
 
 The widget only declares relevance; the fit is measured by the chrome, so the same declaration adapts to any tile width. Resize the canvas to watch the headers switch presentations.
 
-Beyond attributes, \`demo/goal-progress\` declares three \`actions\` spanning the relevance scale, and that scale routes them: "View goal details" at \`'high'\` mounts as a leading text link in a persistent chrome footer, "Export progress" at \`'medium'\` beside it as a trailing icon-only link, and "About goals" at the default \`'low'\` lands in the "More" menu. The widget declares each action as data plus its importance; the host owns the surfaces.
+Beyond attributes, \`demo/goal-progress\` declares three \`actions\` spanning the relevance scale, and that scale routes them: "View goal details" at \`'high'\` mounts as a leading text link (declared icon as prefix) in a persistent chrome footer, "Export progress" at \`'medium'\` beside it as a trailing icon-only link, and "About goals" at the default \`'low'\` lands in the "More" menu. The widget declares each action as data plus its importance; the host owns the surfaces.
 
 Each type also carries a \`help\` note, opened from the info icon in the header, that describes its attributes and what they do.
 `,
