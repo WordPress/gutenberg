@@ -871,18 +871,23 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		editor,
 		page,
 	} ) => {
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( '1' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( '2' );
-		await page.keyboard.press( 'ArrowUp' );
+		// The first block must be one where typing can't create a block
+		// after it, so that the in-between inserter shows in the gap.
+		await editor.insertBlock( { name: 'core/image' } );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: '2' },
+		} );
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
+		);
 
-		const paragraphBlock = editor.canvas
-			.locator( 'role=document[name="Block: Paragraph"i]' )
-			.first();
-		const paragraphRect = await paragraphBlock.boundingBox();
-		const x = paragraphRect.x + ( 2 * paragraphRect.width ) / 3;
-		const y = paragraphRect.y + paragraphRect.height + 1;
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		const imageRect = await imageBlock.boundingBox();
+		const x = imageRect.x + ( 2 * imageRect.width ) / 3;
+		const y = imageRect.y + imageRect.height + 1;
 
 		// The typing observer requires two mouse moves to detect an actual
 		// move.
@@ -899,9 +904,9 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.type( '3' );
 
 		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
-<p>1</p>
-<!-- /wp:paragraph -->
+			.toBe( `<!-- wp:image -->
+<figure class="wp-block-image"><img alt=""/></figure>
+<!-- /wp:image -->
 
 <!-- wp:paragraph -->
 <p>23</p>
@@ -911,65 +916,42 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 	test( 'should not have a dead zone above an aligned block', async ( {
 		editor,
 		page,
-		pageUtils,
 	} ) => {
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( '1' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( '/image' );
-		await expect(
-			page.getByRole( 'option', { name: 'Image', selected: true } )
-		).toBeVisible();
-		await page.keyboard.press( 'Enter' );
-		await editor.clickBlockToolbarButton( 'Align block' );
-
-		const wideButton = page.locator(
-			'role=menuitemradio[name="Wide width"i]'
-		);
-		await wideButton.click();
-
-		// Focus the block content
-		await pageUtils.pressKeys( 'Tab' );
-
-		// Select the previous block.
-		await page.keyboard.press( 'ArrowUp' );
-		await page.keyboard.press( 'ArrowUp' );
-
-		// Confirm correct setup.
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
-<p>1</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:image {"align":"wide"} -->
-<figure class="wp-block-image alignwide"><img alt=""/></figure>
-<!-- /wp:image -->` );
-
-		const paragraphBlock = editor.canvas.locator(
-			'role=document[name="Block: Paragraph"i]'
+		// The first block must be one where typing can't create a block
+		// after it, so that the in-between inserter shows in the gap.
+		await editor.insertBlock( { name: 'core/image' } );
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: { align: 'wide' },
+		} );
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
 		);
 
-		// Find a point outside the paragraph between the blocks where it's
+		const imageBlocks = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+
+		// Find a point outside the first image between the blocks where it's
 		// expected that the sibling inserter would be placed.
-		const paragraphRect = await paragraphBlock.boundingBox();
-		const x = paragraphRect.x + ( 2 * paragraphRect.width ) / 3;
-		const y = paragraphRect.y + paragraphRect.height + 1;
+		const firstImageRect = await imageBlocks.first().boundingBox();
+		const x = firstImageRect.x + ( 2 * firstImageRect.width ) / 3;
+		const y = firstImageRect.y + firstImageRect.height + 1;
 
 		await page.mouse.move( x, y );
 
 		const inserter = page.locator( 'role=button[name="Add block"i]' );
 		await expect( inserter ).toBeVisible();
 
-		// Find the space between the inserter and the image block.
+		// Find the space between the inserter and the aligned image block.
 		const inserterRect = await inserter.boundingBox();
 		const lowerInserterY = inserterRect.y + ( 2 * inserterRect.height ) / 3;
 
-		// Clicking that in-between space should select the image block.
+		// Clicking that in-between space should select the aligned image
+		// block.
 		await page.mouse.click( x, lowerInserterY );
 
-		await expect(
-			editor.canvas.locator( 'role=document[name="Block: Image"i]' )
-		).toHaveClass( /is-selected/ );
+		await expect( imageBlocks.last() ).toHaveClass( /is-selected/ );
 	} );
 
 	test( 'should focus preceding tabbable using shift+tab from post title and writing flow container', async ( {

@@ -160,18 +160,18 @@ test.describe( 'Widgets screen', () => {
 			name: 'Blocks',
 		} );
 
-		const paragraphBlock = inlineQuickInserter.getByRole( 'option', {
-			name: 'Paragraph',
+		// The first block must be one where typing can't create a block
+		// after it, so that the in-between inserter shows in the gap.
+		await page
+			.getByRole( 'searchbox', { name: 'Search' } )
+			.fill( 'Separator' );
+		const separatorOption = inlineQuickInserter.getByRole( 'option', {
+			name: 'Separator',
 			exact: true,
 		} );
-		await paragraphBlock.click();
+		await separatorOption.click();
 
-		const firstParagraphBlock = firstWidgetArea.getByRole( 'document', {
-			name: /^Empty block/,
-		} );
-		await firstParagraphBlock.focus();
-		await page.keyboard.type( 'First Paragraph' );
-
+		// Enter on the selected separator starts a paragraph after it.
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Second Paragraph' );
 
@@ -229,10 +229,7 @@ test.describe( 'Widgets screen', () => {
 
 		await expect.poll( widgetsScreen.getWidgetAreaBlocks ).toMatchObject( {
 			'sidebar-1': [
-				{
-					name: 'core/paragraph',
-					attributes: { content: 'First Paragraph' },
-				},
+				{ name: 'core/separator' },
 				{
 					name: 'core/heading',
 					attributes: { content: 'My Heading' },

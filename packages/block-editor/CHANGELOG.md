@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   The inserter that appears when hovering the gap between blocks now stays out of the way of writing: in vertical lists it is hidden below any block whose type supports splitting, since pressing Enter at the end of such a block already creates a block there.
+
 ### Bug Fixes
 
 -   `DimensionsTool`: Reflect aspect ratio and scale values that are updated from outside the component, such as by undo or `updateBlockAttributes`. The scale control no longer displays a stale value, and an aspect ratio that is written differently to its preset, e.g. `1/1` rather than `1`, is displayed as that preset instead of as "Original" ([#80747](https://github.com/WordPress/gutenberg/pull/80747)).
