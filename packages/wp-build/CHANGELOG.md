@@ -9,7 +9,7 @@
 -   Widgets: carry a widget's declarative `icon` reference from `widget.json`
     into the generated PHP registry ([#80969](https://github.com/WordPress/gutenberg/pull/80969)).
 -   Render a no-JavaScript heading and notice from the generated page templates ([#81365](https://github.com/WordPress/gutenberg/pull/81365)).
--   Generate an `unregister_<page>_route()` function alongside the registration one, so a page can drop a route and everything nested below it.
+-   Generate an `unregister_<page>_route()` function alongside the registration one, so a page can drop a route and everything nested below it ([#81581](https://github.com/WordPress/gutenberg/pull/81581)).
 
 ### Bug Fixes
 
