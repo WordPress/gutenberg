@@ -13,6 +13,7 @@ import type { Icon } from './icon';
 import type { MenuLocation } from './menu-location';
 import type { NavMenu } from './nav-menu';
 import type { NavMenuItem } from './nav-menu-item';
+import type { Note } from './note';
 import type { Page } from './page';
 import type { Plugin } from './plugin';
 import type { Post } from './post';
@@ -47,6 +48,7 @@ export type {
 	MenuLocation,
 	NavMenu,
 	NavMenuItem,
+	Note,
 	Page,
 	Plugin,
 	Post,
@@ -112,6 +114,7 @@ export interface PerPackageEntityRecords< C extends Context > {
 		| MenuLocation< C >
 		| NavMenu< C >
 		| NavMenuItem< C >
+		| Note< C >
 		| Page< C >
 		| Plugin< C >
 		| Post< C >

@@ -151,7 +151,7 @@ export function NoteThread( {
 		}
 	}
 
-	const allReplies = note?.reply || [];
+	const allReplies = note?.replies || [];
 	const lastReply =
 		allReplies.length > 0 ? allReplies[ allReplies.length - 1 ] : undefined;
 	const restReplies = allReplies.length > 0 ? allReplies.slice( 0, -1 ) : [];

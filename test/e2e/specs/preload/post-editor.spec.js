@@ -82,7 +82,7 @@ test.describe( 'Preload', () => {
 		// To do: these should all be removed or preloaded.
 		expect( Array.from( new Set( requests ) ).sort() ).toEqual(
 			[
-				`GET /wp/v2/comments?context=edit&post=${ postId }&type=note&status=all&per_page=100`,
+				`GET /wp/v2/notes?context=edit&post=${ postId }&per_page=100`,
 				'POST /wp-sync/v1/save',
 				'POST /wp-sync/v1/updates',
 				'POST /wp/v2/users/me',

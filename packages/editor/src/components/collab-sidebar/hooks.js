@@ -38,17 +38,12 @@ const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 export function useNoteThreads( postId ) {
 	const queryArgs = {
 		post: postId,
-		type: 'note',
-		status: 'all',
 		per_page: -1,
 	};
 
-	const { records: threads } = useEntityRecords(
-		'root',
-		'comment',
-		queryArgs,
-		{ enabled: !! postId && typeof postId === 'number' }
-	);
+	const { records: threads } = useEntityRecords( 'root', 'note', queryArgs, {
+		enabled: !! postId && typeof postId === 'number',
+	} );
 
 	const { getBlockAttributes } = useSelect( blockEditorStore );
 	const { clientIds } = useSelect( ( select ) => {
@@ -67,7 +62,7 @@ export function useNoteThreads( postId ) {
 		/*
 		 * Single pass over clientIds builds the forward map and reverse lookup
 		 * together. getNoteIdsFromMetadata returns numeric ids, matching the
-		 * types returned by the comments REST endpoint.
+		 * types returned by the notes REST endpoint.
 		 */
 		const blocksWithNotes = {};
 		const clientIdByNoteId = new Map();
@@ -82,31 +77,21 @@ export function useNoteThreads( postId ) {
 			}
 		}
 
-		// Materialize threads; collect roots; replies linked in a second pass
-		// via unshift to invert order (matches prior reverse semantics).
+		/*
+		 * The notes endpoint returns whole threads: every record is top level
+		 * and already carries its replies, oldest first. Only the block link
+		 * has to be resolved here.
+		 */
 		const threadsById = new Map();
-		const rootThreads = [];
-		for ( const item of threads ) {
+		const rootThreads = threads.map( ( item ) => {
 			const thread = {
 				...item,
-				reply: [],
-				blockClientId:
-					item.parent === 0
-						? clientIdByNoteId.get( item.id ) ?? null
-						: null,
+				replies: item.replies ?? [],
+				blockClientId: clientIdByNoteId.get( item.id ) ?? null,
 			};
 			threadsById.set( item.id, thread );
-			if ( item.parent === 0 ) {
-				rootThreads.push( thread );
-			}
-		}
-		for ( const item of threads ) {
-			if ( item.parent !== 0 ) {
-				threadsById
-					.get( item.parent )
-					?.reply.unshift( threadsById.get( item.id ) );
-			}
-		}
+			return thread;
+		} );
 
 		if ( rootThreads.length === 0 ) {
 			return { notes: [], unresolvedNotes: [] };
@@ -305,12 +290,11 @@ export function useNoteActions() {
 
 			const savedRecord = await saveEntityRecord(
 				'root',
-				'comment',
+				'note',
 				{
 					post: getCurrentPostId(),
 					content,
 					status: 'hold',
-					type: 'note',
 					parent: parent || 0,
 				},
 				{ throwOnError: true }
@@ -373,7 +357,7 @@ export function useNoteActions() {
 				// First, update the thread status.
 				await saveEntityRecord(
 					'root',
-					'comment',
+					'note',
 					{
 						id,
 						status,
@@ -387,7 +371,6 @@ export function useNoteActions() {
 				const newNoteData = {
 					post: getCurrentPostId(),
 					content: content || '', // Empty content for resolve, content for reopen.
-					type: 'note',
 					status,
 					parent: id,
 					meta: {
@@ -398,7 +381,7 @@ export function useNoteActions() {
 
 				const savedRecord = await saveEntityRecord(
 					'root',
-					'comment',
+					'note',
 					newNoteData,
 					{
 						throwOnError: true,
@@ -435,7 +418,7 @@ export function useNoteActions() {
 
 			const savedRecord = await saveEntityRecord(
 				'root',
-				'comment',
+				'note',
 				updateData,
 				{
 					throwOnError: true,
@@ -462,7 +445,7 @@ export function useNoteActions() {
 				? note.blockClientId || getSelectedBlockClientId()
 				: null;
 
-			await deleteEntityRecord( 'root', 'comment', note.id, undefined, {
+			await deleteEntityRecord( 'root', 'note', note.id, undefined, {
 				throwOnError: true,
 			} );
 
