@@ -147,8 +147,8 @@ function TextShadowControl( { textShadow, onChange } ) {
 			) : (
 				<Composite
 					role="listbox"
-					className="block-editor-global-styles__text-shadow-list"
 					aria-label={ __( 'Text shadow presets' ) }
+					render={ <Stack direction="column" /> }
 				>
 					{ choices.map( ( { value, label } ) => {
 						const isActive = value === activeValue;
@@ -162,9 +162,10 @@ function TextShadowControl( { textShadow, onChange } ) {
 									{ 'is-active': isActive }
 								) }
 								onClick={ () => onChange( value ) }
+								render={ <Button __next40pxDefaultSize /> }
 							>
 								<span>{ label }</span>
-								{ isActive && <Icon icon={ check } /> }
+								<Icon icon={ check } />
 							</Composite.Item>
 						);
 					} ) }
