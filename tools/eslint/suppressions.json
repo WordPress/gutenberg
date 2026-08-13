@@ -7952,7 +7952,7 @@
 	},
 	"packages/rich-text/src/hook/index.js": {
 		"react-hooks/refs": {
-			"count": 12
+			"count": 16
 		}
 	},
 	"packages/viewport/src/test/if-viewport-matches.jsdom.test.jsx": {
