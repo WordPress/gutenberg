@@ -223,7 +223,7 @@ When a widget type declares `help`, the tile chrome surfaces its `content` and o
 
 ### Attribute editing
 
-A widget declares importance per attribute through `relevance` (`'high' | 'low'`, absent means `'low'`). The declaration states importance, not placement; this host maps it to two surfaces:
+A widget declares importance per attribute through `relevance` (`'high' | 'medium' | 'low'`, absent means `'low'`). The declaration states importance, not placement; this host maps it to two surfaces:
 
 -   **Prominent surface**: `relevance: 'high'` fields render as bare inline controls in the tile header, for in-context edits.
 -   **Settings surface**: the full schema, opened from the settings trigger. The trigger shows only when some attribute is not promoted; otherwise it would repeat the prominent surface.

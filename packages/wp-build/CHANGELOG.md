@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Documentation
+
+-   Widget attributes: the `relevance` hint documents the `'medium'` tier
+    ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
+
 ## 0.21.0 (2026-08-12)
 
 ### Enhancements

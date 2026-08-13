@@ -12,9 +12,9 @@ const { Menu } = unlock( componentsPrivateApis );
 
 type WidgetActionsProps = {
 	/**
-	 * The actions this menu materializes. The host routes them by relevance:
-	 * the footer takes `'high'`, this menu the rest, and every action for
-	 * full-bleed widgets, which have no footer.
+	 * The actions this menu materializes. The host routes by relevance:
+	 * the footer takes `'high'` and `'medium'`, this menu the rest, and
+	 * every action for full-bleed widgets, which have no footer.
 	 */
 	actions: WidgetAction[];
 };
