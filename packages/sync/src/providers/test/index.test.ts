@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { afterEach, describe, expect, it, jest } from '@jest/globals';
-
-/**
- * Internal dependencies
- */
 import type { ProviderCreator } from '../../types';
 
 type ProvidersModule = typeof import('../index');
