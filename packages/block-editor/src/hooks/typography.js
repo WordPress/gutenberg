@@ -142,15 +142,11 @@ export function TypographyPanel( {
 	asWrapper,
 } ) {
 	const selectedState = useBlockStyleState();
-	const isEnabled = useHasTypographyPanel( settings );
+	const isPanelEnabled = useHasTypographyPanel( settings );
 
 	const { style, fontFamily, fontSize, fitText, textColor, className } =
 		useSelect(
 			( select ) => {
-				// Early return to avoid subscription when disabled.
-				if ( ! isEnabled ) {
-					return {};
-				}
 				const {
 					style: _style,
 					fontFamily: _fontFamily,
@@ -169,8 +165,18 @@ export function TypographyPanel( {
 					className: _className,
 				};
 			},
-			[ clientId, isEnabled ]
+			[ clientId ]
 		);
+
+	// A present value keeps the panel available even when the settings
+	// hide every control, so the value can still be removed.
+	const isEnabled =
+		isPanelEnabled ||
+		!! fontSize ||
+		!! fontFamily ||
+		!! textColor ||
+		!! style?.color?.text ||
+		!! Object.keys( style?.typography ?? {} ).length;
 
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 

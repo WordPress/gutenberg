@@ -67,13 +67,9 @@ function DimensionsInspectorControl( { children, resetAllFilter } ) {
 export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 	const selectedState = useBlockStyleState();
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
-	const isEnabled = useHasDimensionsPanel( settings, selectedState );
+	const isPanelEnabled = useHasDimensionsPanel( settings, selectedState );
 	const { style, className } = useSelect(
 		( select ) => {
-			// Early return to avoid subscription when disabled
-			if ( ! isEnabled ) {
-				return {};
-			}
 			const attributes =
 				select( blockEditorStore ).getBlockAttributes( clientId ) || {};
 			return {
@@ -81,8 +77,17 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 				className: attributes.className,
 			};
 		},
-		[ clientId, isEnabled ]
+		[ clientId ]
 	);
+
+	// A present value keeps the panel available even when the settings
+	// hide every control, so the value can still be removed.
+	const hasSpacingOrDimensionsValues =
+		!! style?.spacing?.padding ||
+		!! style?.spacing?.margin ||
+		!! style?.spacing?.blockGap ||
+		!! Object.keys( style?.dimensions ?? {} ).length;
+	const isEnabled = isPanelEnabled || hasSpacingOrDimensionsValues;
 
 	const { value: inheritedValue } = useResolvedStyle(
 		name,

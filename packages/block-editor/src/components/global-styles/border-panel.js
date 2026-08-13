@@ -9,6 +9,11 @@ import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
 import BorderRadiusControl from '../border-radius-control';
+import GatedValueRow, {
+	displayStyleValue,
+	displayBoxStyleValue,
+} from './gated-value-row';
+import DisabledControlsNotice from './disabled-controls-notice';
 import { useColorsPerOrigin } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
@@ -368,6 +373,33 @@ export default function BorderPanel( {
 		showBorderWidth ||
 		showBorderRadius;
 
+	// Display forms for values whose controls are disabled. A flat border
+	// prints in the CSS shorthand order (width, style, color, with preset
+	// colors reduced to their slug); split borders print each side's parts
+	// joined with spaces.
+	const displayBorderSide = ( side ) =>
+		[ side?.width, side?.style, displayStyleValue( side?.color ) ]
+			.filter( Boolean )
+			.join( ' ' );
+	const displayBorder = ( rawBorder ) => {
+		if ( ! rawBorder ) {
+			return '';
+		}
+		if ( hasSplitBorders( rawBorder ) ) {
+			return [ 'top', 'right', 'bottom', 'left' ]
+				.map( ( side ) => displayBorderSide( rawBorder[ side ] ) )
+				.filter( Boolean )
+				.join( ' ' );
+		}
+		return displayBorderSide( rawBorder );
+	};
+
+	const showBorderItemControls = showBorderWidth || showBorderColor;
+	const hasDisabledControlValues =
+		( ! showBorderItemControls && isDefinedBorder( value?.border ) ) ||
+		( ! showBorderRadius && hasBorderRadius() ) ||
+		( ! hasShadowControl && hasShadow() );
+
 	const label = useBorderPanelLabel( {
 		blockName: name,
 		hasShadowControl,
@@ -382,7 +414,9 @@ export default function BorderPanel( {
 			panelId={ panelId }
 			label={ label }
 		>
-			{ ( showBorderWidth || showBorderColor ) && (
+			{ hasDisabledControlValues && <DisabledControlsNotice /> }
+			{ ( showBorderItemControls ||
+				isDefinedBorder( value?.border ) ) && (
 				<InheritanceToolsPanelItem
 					{ ...inheritanceProps(
 						isBorderPlaceholder,
@@ -396,42 +430,51 @@ export default function BorderPanel( {
 					isShownByDefault={ showBorderByDefault }
 					panelId={ panelId }
 				>
-					{ ( showInheritanceLabelIndicators ||
-						hasShadowControl ) && (
-						// Render the visible label as `BaseControl.VisualLabel`
-						// (which produces `.components-base-control__label`)
-						// rather than passing `label` to `BorderBoxControl`,
-						// whose internal `<StyledLabel>` carries no stable
-						// className. The inheritance treatment and the
-						// local-override reset affordance both target
-						// `.components-base-control__label`, so the visible
-						// "Border" label has to be a `BaseControl` label to
-						// receive them.
-						//
-						// Render it whenever a Shadow control is also present so
-						// the two controls stay disambiguated (mirrors the
-						// Shadow label's `hasBorderControl` guard below, and
-						// trunk's `hideLabelFromVision={ ! hasShadowControl }`),
-						// even when inheritance indicators are off (e.g. in
-						// Global Styles).
-						<BaseControl.VisualLabel as="legend">
-							{ __( 'Border' ) }
-						</BaseControl.VisualLabel>
+					{ ! showBorderItemControls && (
+						<GatedValueRow
+							value={ displayBorder( value?.border ) }
+							onReset={ () => resetBorder() }
+						/>
 					) }
-					<BorderBoxControl
-						colors={ colors }
-						disableCustomColors={ ! areCustomSolidsEnabled }
-						enableAlpha
-						enableStyle={ showBorderStyle }
-						onChange={ onBorderChange }
-						popoverOffset={ 40 }
-						popoverPlacement="left-start"
-						value={ border }
-						__experimentalIsRenderedInSidebar
-					/>
+					{ showBorderItemControls &&
+						( showInheritanceLabelIndicators ||
+							hasShadowControl ) && (
+							// Render the visible label as `BaseControl.VisualLabel`
+							// (which produces `.components-base-control__label`)
+							// rather than passing `label` to `BorderBoxControl`,
+							// whose internal `<StyledLabel>` carries no stable
+							// className. The inheritance treatment and the
+							// local-override reset affordance both target
+							// `.components-base-control__label`, so the visible
+							// "Border" label has to be a `BaseControl` label to
+							// receive them.
+							//
+							// Render it whenever a Shadow control is also present so
+							// the two controls stay disambiguated (mirrors the
+							// Shadow label's `hasBorderControl` guard below, and
+							// trunk's `hideLabelFromVision={ ! hasShadowControl }`),
+							// even when inheritance indicators are off (e.g. in
+							// Global Styles).
+							<BaseControl.VisualLabel as="legend">
+								{ __( 'Border' ) }
+							</BaseControl.VisualLabel>
+						) }
+					{ showBorderItemControls && (
+						<BorderBoxControl
+							colors={ colors }
+							disableCustomColors={ ! areCustomSolidsEnabled }
+							enableAlpha
+							enableStyle={ showBorderStyle }
+							onChange={ onBorderChange }
+							popoverOffset={ 40 }
+							popoverPlacement="left-start"
+							value={ border }
+							__experimentalIsRenderedInSidebar
+						/>
+					) }
 				</InheritanceToolsPanelItem>
 			) }
-			{ showBorderRadius && (
+			{ ( showBorderRadius || hasBorderRadius() ) && (
 				<InheritanceToolsPanelItem
 					{ ...inheritanceProps(
 						isBorderRadiusPlaceholder,
@@ -444,16 +487,31 @@ export default function BorderPanel( {
 					isShownByDefault={ defaultControls.radius }
 					panelId={ panelId }
 				>
-					<BorderRadiusControl
-						presets={ settings?.border?.radiusSizes }
-						values={ borderRadius }
-						onChange={ ( newValue ) => {
-							setBorderRadius( newValue || undefined );
-						} }
-					/>
+					{ showBorderRadius ? (
+						<BorderRadiusControl
+							presets={ settings?.border?.radiusSizes }
+							values={ borderRadius }
+							onChange={ ( newValue ) => {
+								setBorderRadius( newValue || undefined );
+							} }
+						/>
+					) : (
+						<GatedValueRow
+							value={ displayBoxStyleValue(
+								value?.border?.radius,
+								[
+									'topLeft',
+									'topRight',
+									'bottomRight',
+									'bottomLeft',
+								]
+							) }
+							onReset={ () => setBorderRadius( undefined ) }
+						/>
+					) }
 				</InheritanceToolsPanelItem>
 			) }
-			{ hasShadowControl && (
+			{ ( hasShadowControl || hasShadow() ) && (
 				<InheritanceToolsPanelItem
 					{ ...inheritanceProps(
 						isShadowPlaceholder,
@@ -470,20 +528,29 @@ export default function BorderPanel( {
 					showLocalOverrideActionsInLabel={ false }
 					panelId={ panelId }
 				>
-					{ hasBorderControl ? (
-						<BaseControl.VisualLabel as="legend">
-							{ __( 'Shadow' ) }
-						</BaseControl.VisualLabel>
-					) : null }
+					{ hasShadowControl ? (
+						<>
+							{ hasBorderControl ? (
+								<BaseControl.VisualLabel as="legend">
+									{ __( 'Shadow' ) }
+								</BaseControl.VisualLabel>
+							) : null }
 
-					<ShadowPopover
-						shadow={ shadow }
-						onShadowChange={ setShadowWithInheritedCommit }
-						settings={ settings }
-						hasLocalValue={ hasShadow() }
-						hasLocalOverride={ hasShadowLocalOverride }
-						onReset={ resetShadow }
-					/>
+							<ShadowPopover
+								shadow={ shadow }
+								onShadowChange={ setShadowWithInheritedCommit }
+								settings={ settings }
+								hasLocalValue={ hasShadow() }
+								hasLocalOverride={ hasShadowLocalOverride }
+								onReset={ resetShadow }
+							/>
+						</>
+					) : (
+						<GatedValueRow
+							value={ displayStyleValue( value?.shadow ) }
+							onReset={ resetShadow }
+						/>
+					) }
 				</InheritanceToolsPanelItem>
 			) }
 		</Wrapper>

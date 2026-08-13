@@ -12,6 +12,8 @@ import {
 	useHasBackgroundPanel,
 	hasBackgroundImageValue,
 	hasBackgroundGradientValue,
+	hasBackgroundColorValue,
+	hasLegacyColorGradientValue,
 } from '../components/global-styles/background-panel';
 import {
 	getStyleForState,
@@ -196,6 +198,7 @@ export function BackgroundImagePanel( {
 	const hasColorBackgroundSupport =
 		colorSupport && colorSupport.background !== false;
 	const hasColorGradientSupport = !! colorSupport?.gradients;
+	const hasPanelControls = useHasBackgroundPanel( settings );
 
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 
@@ -244,8 +247,16 @@ export function BackgroundImagePanel( {
 		),
 	} );
 
+	// A present value keeps the panel available even when the settings
+	// hide every control, so the value can still be removed.
+	const hasBackgroundValues =
+		hasBackgroundImageValue( styleValue ) ||
+		hasBackgroundColorValue( styleValue ) ||
+		hasBackgroundGradientValue( styleValue ) ||
+		hasLegacyColorGradientValue( styleValue );
+
 	if (
-		! useHasBackgroundPanel( settings ) ||
+		( ! hasPanelControls && ! hasBackgroundValues ) ||
 		( ! hasBackgroundSupport( name ) &&
 			! hasColorBackgroundSupport &&
 			! hasColorGradientSupport )

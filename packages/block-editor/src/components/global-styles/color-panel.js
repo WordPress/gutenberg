@@ -3,6 +3,8 @@ import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getCSSValueFromRawStyle } from '@wordpress/style-engine';
 import ColorGradientDropdownItem from './color-gradient-dropdown-item';
+import GatedValueRow, { displayStyleValue } from './gated-value-row';
+import DisabledControlsNotice from './disabled-controls-notice';
 import {
 	useColorsPerOrigin,
 	useGradientsPerOrigin,
@@ -14,7 +16,10 @@ import {
 	extractPresetSlug,
 	encodeColorValueWithPalette,
 } from '../../utils/color-values';
-import { isGlobalStylesInheritanceEnabled } from './inheritance';
+import {
+	InheritanceToolsPanelItem,
+	isGlobalStylesInheritanceEnabled,
+} from './inheritance';
 
 // Despite the "ColorPanel" name, this gates only the element-level color
 // controls (link, heading, button, caption, h1–h6) — surfaced as the
@@ -292,6 +297,23 @@ export default function ColorPanel( {
 	);
 
 	const items = [
+		// A link color whose control is disabled keeps a row so the value
+		// can still be removed.
+		! showLinkPanel &&
+			hasLink() && {
+				key: 'link',
+				label: __( 'Link' ),
+				hasValue: hasLink,
+				resetValue: resetLink,
+				isShownByDefault: defaultControls.link,
+				resetOnlyDisplay: [
+					value?.elements?.link?.color?.text,
+					value?.elements?.link?.[ ':hover' ]?.color?.text,
+				]
+					.map( displayStyleValue )
+					.filter( Boolean )
+					.join( ' ' ),
+			},
 		showLinkPanel && {
 			key: 'link',
 			label: __( 'Link' ),
@@ -352,6 +374,42 @@ export default function ColorPanel( {
 
 	elements.forEach( ( { name, label: elementLabel, showPanel } ) => {
 		if ( ! showPanel ) {
+			// An element color whose controls are disabled keeps a row so
+			// the values can still be removed.
+			const rawElementColor = value?.elements?.[ name ]?.color;
+			const hasRawElementValue = !! (
+				rawElementColor?.text ||
+				rawElementColor?.background ||
+				rawElementColor?.gradient
+			);
+			if ( ! hasRawElementValue ) {
+				return;
+			}
+			const resetDisabledElement = () => {
+				const newValue = setImmutably(
+					value,
+					[ 'elements', name, 'color', 'background' ],
+					undefined
+				);
+				newValue.elements[ name ].color.gradient = undefined;
+				newValue.elements[ name ].color.text = undefined;
+				onChange( newValue );
+			};
+			items.push( {
+				key: name,
+				label: elementLabel,
+				hasValue: () => hasRawElementValue,
+				resetValue: resetDisabledElement,
+				isShownByDefault: defaultControls[ name ],
+				resetOnlyDisplay: [
+					rawElementColor?.text,
+					rawElementColor?.background,
+					rawElementColor?.gradient,
+				]
+					.map( displayStyleValue )
+					.filter( Boolean )
+					.join( ' ' ),
+			} );
 			return;
 		}
 
@@ -534,8 +592,28 @@ export default function ColorPanel( {
 			panelId={ panelId }
 			label={ label }
 		>
+			{ items.some( ( item ) => item.resetOnlyDisplay !== undefined ) && (
+				<DisabledControlsNotice />
+			) }
 			{ items.map( ( item ) => {
 				const { key, ...restItem } = item;
+				if ( item.resetOnlyDisplay !== undefined ) {
+					return (
+						<InheritanceToolsPanelItem
+							key={ key }
+							label={ item.label }
+							hasValue={ item.hasValue }
+							onDeselect={ item.resetValue }
+							isShownByDefault={ item.isShownByDefault }
+							panelId={ panelId }
+						>
+							<GatedValueRow
+								value={ item.resetOnlyDisplay }
+								onReset={ item.resetValue }
+							/>
+						</InheritanceToolsPanelItem>
+					);
+				}
 				return (
 					<ColorGradientDropdownItem
 						key={ key }
