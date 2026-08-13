@@ -26,10 +26,28 @@ add_action( 'admin_menu', 'gutenberg_register_site_editor_admin_page' );
 function gutenberg_site_editor_register_default_menu_items() {
 	gutenberg_register_site_editor_v2_menu_item( 'home', __( 'Home', 'gutenberg' ), '/', '' );
 	gutenberg_register_site_editor_v2_menu_item( 'styles', __( 'Styles', 'gutenberg' ), '/styles', '' );
-	gutenberg_register_site_editor_v2_menu_item( 'navigation', __( 'Navigation', 'gutenberg' ), '/navigation', '' );
+
+	// The screen edits `wp_navigation` posts, which only block themes render.
+	// Classic themes manage their menus through Appearance > Menus instead.
+	if ( wp_is_block_theme() ) {
+		gutenberg_register_site_editor_v2_menu_item( 'navigation', __( 'Navigation', 'gutenberg' ), '/navigation', '' );
+	}
+
 	gutenberg_register_site_editor_v2_menu_item( 'pages', __( 'Pages', 'gutenberg' ), '/types/page', '' );
-	gutenberg_register_site_editor_v2_menu_item( 'templates', __( 'Templates', 'gutenberg' ), '/templates', '' );
-	gutenberg_register_site_editor_v2_menu_item( 'templateParts', __( 'Template Parts', 'gutenberg' ), '/template-parts', '' );
+
+	// Block themes and classic themes shipping a `theme.json` file opt in
+	// automatically, other classic themes have to call
+	// `add_theme_support( 'block-templates' )`.
+	if ( current_theme_supports( 'block-templates' ) ) {
+		gutenberg_register_site_editor_v2_menu_item( 'templates', __( 'Templates', 'gutenberg' ), '/templates', '' );
+	}
+
+	// `block-template-parts` lets a classic theme opt into template parts alone,
+	// as the Template Part block itself allows.
+	if ( current_theme_supports( 'block-templates' ) || current_theme_supports( 'block-template-parts' ) ) {
+		gutenberg_register_site_editor_v2_menu_item( 'templateParts', __( 'Template Parts', 'gutenberg' ), '/template-parts', '' );
+	}
+
 	gutenberg_register_site_editor_v2_menu_item( 'patterns', __( 'Patterns', 'gutenberg' ), '/patterns', '' );
 }
 add_action( 'site-editor-v2_init', 'gutenberg_site_editor_register_default_menu_items', 5 );
