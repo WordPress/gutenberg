@@ -454,16 +454,78 @@ export function insertRow( rows, cells, { rowIndex, type, columnCount } ) {
  * @return {Object} Object with rows and cells.
  */
 export function deleteRow( rows, cells, { rowIndex } ) {
-	const deleteIndex = getRowCellOffset( rows, rowIndex );
-	const cellCount = rows[ rowIndex ]?.cellCount || 0;
+	return deleteRows( rows, cells, {
+		startRow: rowIndex,
+		endRow: rowIndex,
+	} );
+}
 
-	return {
-		rows: [ ...rows.slice( 0, rowIndex ), ...rows.slice( rowIndex + 1 ) ],
-		cells: [
-			...cells.slice( 0, deleteIndex ),
-			...cells.slice( deleteIndex + cellCount ),
-		],
-	};
+/**
+ * Deletes a range of rows from the table.
+ *
+ * Cells with rowSpan that start before the range but extend into it
+ * have their rowSpan reduced. Cells entirely within the range are removed.
+ *
+ * @param {Array}  rows             Row descriptors.
+ * @param {Array}  cells            Current cell inner blocks.
+ * @param {Object} options          Options.
+ * @param {number} options.startRow Starting row index to delete.
+ * @param {number} options.endRow   Ending row index to delete (inclusive).
+ * @return {Object} Object with rows and cells.
+ */
+export function deleteRows( rows, cells, { startRow, endRow } ) {
+	const placements = getCellPlacements(
+		rows,
+		cells,
+		Number.MAX_SAFE_INTEGER
+	);
+
+	// Collect client IDs of cells to delete (entirely within the range).
+	// Also compute rowSpan reductions for cells that span across the boundary.
+	const deletedClientIds = new Set();
+	const spanReductions = new Map();
+
+	for ( const placement of placements ) {
+		const { rowSpan = 1 } = placement.cell.attributes;
+		const placementEndRow = placement.rowIndex + rowSpan - 1;
+
+		// Cell starts within the deleted range.
+		if ( placement.rowIndex >= startRow && placement.rowIndex <= endRow ) {
+			deletedClientIds.add( placement.cell.clientId );
+			continue;
+		}
+
+		// Cell starts before the range but extends into it.
+		if ( placement.rowIndex < startRow && placementEndRow >= startRow ) {
+			const overlap = Math.min( placementEndRow, endRow ) - startRow + 1;
+			spanReductions.set( placement.cell.clientId, rowSpan - overlap );
+		}
+	}
+
+	// Build new cells: remove deleted cells, reduce spans for boundary cells.
+	const nextCells = cells
+		.filter( ( cell ) => ! deletedClientIds.has( cell.clientId ) )
+		.map( ( cell ) => {
+			const reduction = spanReductions.get( cell.clientId );
+			if ( reduction !== undefined ) {
+				return {
+					...cell,
+					attributes: {
+						...cell.attributes,
+						rowSpan: reduction,
+					},
+				};
+			}
+			return cell;
+		} );
+
+	// Remove row descriptors in the range.
+	const nextRows = [
+		...rows.slice( 0, startRow ),
+		...rows.slice( endRow + 1 ),
+	];
+
+	return { rows: nextRows, cells: nextCells };
 }
 
 /**
@@ -505,25 +567,95 @@ export function insertColumn( rows, cells, { columnIndex } ) {
  * @return {Object} Object with rows and cells.
  */
 export function deleteColumn( rows, cells, { columnIndex } ) {
-	const newRows = [];
-	const newCells = [];
-	let cellIndex = 0;
+	return deleteColumns( rows, cells, {
+		startColumn: columnIndex,
+		endColumn: columnIndex,
+	} );
+}
 
-	for ( const row of rows ) {
-		const deleteIndex = Math.min( columnIndex, row.cellCount - 1 );
-		newRows.push( { ...row, cellCount: row.cellCount - 1 } );
+/**
+ * Deletes a range of columns from the table.
+ *
+ * Cells with colSpan that start before the range but extend into it
+ * have their colSpan reduced. Cells entirely within the range are removed.
+ *
+ * @param {Array}  rows                Row descriptors.
+ * @param {Array}  cells               Current cell inner blocks.
+ * @param {Object} options             Options.
+ * @param {number} options.startColumn Starting column index to delete.
+ * @param {number} options.endColumn   Ending column index to delete (inclusive).
+ * @return {Object} Object with rows and cells.
+ */
+export function deleteColumns( rows, cells, { startColumn, endColumn } ) {
+	const placements = getCellPlacements(
+		rows,
+		cells,
+		Number.MAX_SAFE_INTEGER
+	);
 
-		newCells.push( ...cells.slice( cellIndex, cellIndex + deleteIndex ) );
-		newCells.push(
-			...cells.slice(
-				cellIndex + deleteIndex + 1,
-				cellIndex + row.cellCount
-			)
-		);
-		cellIndex += row.cellCount;
+	// Collect client IDs of cells to delete (entirely within the range).
+	// Also compute colSpan reductions for cells that span across the boundary.
+	const deletedClientIds = new Set();
+	const spanReductions = new Map();
+
+	for ( const placement of placements ) {
+		const { colSpan = 1 } = placement.cell.attributes;
+		const placementEndColumn = placement.columnIndex + colSpan - 1;
+
+		// Cell starts within the deleted range.
+		if (
+			placement.columnIndex >= startColumn &&
+			placement.columnIndex <= endColumn
+		) {
+			deletedClientIds.add( placement.cell.clientId );
+			continue;
+		}
+
+		// Cell starts before the range but extends into it.
+		if (
+			placement.columnIndex < startColumn &&
+			placementEndColumn >= startColumn
+		) {
+			const overlap =
+				Math.min( placementEndColumn, endColumn ) - startColumn + 1;
+			spanReductions.set( placement.cell.clientId, colSpan - overlap );
+		}
 	}
 
-	return { rows: newRows, cells: newCells };
+	// Build new cells: remove deleted cells, reduce spans for boundary cells.
+	const nextCells = cells
+		.filter( ( cell ) => ! deletedClientIds.has( cell.clientId ) )
+		.map( ( cell ) => {
+			const reduction = spanReductions.get( cell.clientId );
+			if ( reduction !== undefined ) {
+				return {
+					...cell,
+					attributes: {
+						...cell.attributes,
+						colSpan: reduction,
+					},
+				};
+			}
+			return cell;
+		} );
+
+	// Update row cellCounts: count remaining cells per row.
+	const remainingByRow = new Map();
+	for ( const placement of placements ) {
+		if ( ! deletedClientIds.has( placement.cell.clientId ) ) {
+			remainingByRow.set(
+				placement.rowIndex,
+				( remainingByRow.get( placement.rowIndex ) || 0 ) + 1
+			);
+		}
+	}
+
+	const nextRows = rows.map( ( row, index ) => ( {
+		...row,
+		cellCount: remainingByRow.get( index ) ?? row.cellCount,
+	} ) );
+
+	return { rows: nextRows, cells: nextCells };
 }
 
 /**

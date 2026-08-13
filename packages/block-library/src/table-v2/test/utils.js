@@ -4,6 +4,8 @@ import {
 	getCellSelectionOutsideBorderValue,
 	mergeCells,
 	unmergeCells,
+	deleteRows,
+	deleteColumns,
 } from '../utils';
 
 function createCell( clientId, attributes = {} ) {
@@ -383,6 +385,134 @@ describe( 'table-v2 utils', () => {
 			const result = unmergeCells( rows, cells, 2, 'cell-1' );
 
 			expect( result ).toBeNull();
+		} );
+	} );
+
+	describe( 'deleteRows', () => {
+		it( 'deletes a single row', () => {
+			const rows = [
+				{ type: 'body', cellCount: 2 },
+				{ type: 'body', cellCount: 2 },
+			];
+			const cells = [
+				createCell( 'cell-1' ),
+				createCell( 'cell-2' ),
+				createCell( 'cell-3' ),
+				createCell( 'cell-4' ),
+			];
+
+			const result = deleteRows( rows, cells, {
+				startRow: 0,
+				endRow: 0,
+			} );
+
+			expect( result.rows ).toHaveLength( 1 );
+			expect( result.cells ).toHaveLength( 2 );
+			expect( result.cells[ 0 ].clientId ).toBe( 'cell-3' );
+		} );
+
+		it( 'deletes a range of rows', () => {
+			const rows = [
+				{ type: 'body', cellCount: 2 },
+				{ type: 'body', cellCount: 2 },
+				{ type: 'body', cellCount: 2 },
+			];
+			const cells = [
+				createCell( 'cell-1' ),
+				createCell( 'cell-2' ),
+				createCell( 'cell-3' ),
+				createCell( 'cell-4' ),
+				createCell( 'cell-5' ),
+				createCell( 'cell-6' ),
+			];
+
+			const result = deleteRows( rows, cells, {
+				startRow: 0,
+				endRow: 1,
+			} );
+
+			expect( result.rows ).toHaveLength( 1 );
+			expect( result.cells ).toHaveLength( 2 );
+			expect( result.cells[ 0 ].clientId ).toBe( 'cell-5' );
+		} );
+
+		it( 'reduces rowSpan of cells spanning across the boundary', () => {
+			const rows = [
+				{ type: 'body', cellCount: 1 },
+				{ type: 'body', cellCount: 1 },
+				{ type: 'body', cellCount: 1 },
+			];
+			const cells = [
+				createCell( 'cell-1', { rowSpan: 3 } ),
+				createCell( 'cell-2' ),
+				createCell( 'cell-3' ),
+			];
+
+			const result = deleteRows( rows, cells, {
+				startRow: 1,
+				endRow: 2,
+			} );
+
+			expect( result.rows ).toHaveLength( 1 );
+			expect( result.cells ).toHaveLength( 1 );
+			expect( result.cells[ 0 ].clientId ).toBe( 'cell-1' );
+			expect( result.cells[ 0 ].attributes.rowSpan ).toBe( 1 );
+		} );
+	} );
+
+	describe( 'deleteColumns', () => {
+		it( 'deletes a single column', () => {
+			const rows = [ { type: 'body', cellCount: 3 } ];
+			const cells = [
+				createCell( 'cell-1' ),
+				createCell( 'cell-2' ),
+				createCell( 'cell-3' ),
+			];
+
+			const result = deleteColumns( rows, cells, {
+				startColumn: 1,
+				endColumn: 1,
+			} );
+
+			expect( result.rows[ 0 ].cellCount ).toBe( 2 );
+			expect( result.cells ).toHaveLength( 2 );
+			expect( result.cells[ 0 ].clientId ).toBe( 'cell-1' );
+			expect( result.cells[ 1 ].clientId ).toBe( 'cell-3' );
+		} );
+
+		it( 'deletes a range of columns', () => {
+			const rows = [ { type: 'body', cellCount: 4 } ];
+			const cells = [
+				createCell( 'cell-1' ),
+				createCell( 'cell-2' ),
+				createCell( 'cell-3' ),
+				createCell( 'cell-4' ),
+			];
+
+			const result = deleteColumns( rows, cells, {
+				startColumn: 1,
+				endColumn: 2,
+			} );
+
+			expect( result.rows[ 0 ].cellCount ).toBe( 2 );
+			expect( result.cells ).toHaveLength( 2 );
+			expect( result.cells[ 0 ].clientId ).toBe( 'cell-1' );
+			expect( result.cells[ 1 ].clientId ).toBe( 'cell-4' );
+		} );
+
+		it( 'reduces colSpan of cells spanning across the boundary', () => {
+			const rows = [ { type: 'body', cellCount: 1 } ];
+			const cells = [ createCell( 'cell-1', { colSpan: 4 } ) ];
+
+			const result = deleteColumns( rows, cells, {
+				startColumn: 1,
+				endColumn: 2,
+			} );
+
+			expect( result.rows[ 0 ].cellCount ).toBe( 1 );
+			expect( result.cells ).toHaveLength( 1 );
+			expect( result.cells[ 0 ].clientId ).toBe( 'cell-1' );
+			expect( result.cells[ 0 ].attributes.colSpan ).toBe( 2 );
 		} );
 	} );
 } );

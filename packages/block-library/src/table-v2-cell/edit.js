@@ -26,8 +26,8 @@ import {
 	ungroup,
 } from '@wordpress/icons';
 import {
-	deleteColumn,
-	deleteRow,
+	deleteColumns,
+	deleteRows,
 	getCellLocation,
 	getCellPlacements,
 	getCellSelectionOutsideBorderAttributes,
@@ -169,11 +169,30 @@ export default function TableCellEdit( {
 		if ( ! selectedCellLocation ) {
 			return;
 		}
-		replaceTable(
-			deleteRow( rows, siblingCells, {
-				rowIndex: selectedCellLocation.rowIndex,
-			} )
-		);
+
+		let startRow = selectedCellLocation.rowIndex;
+		let endRow = selectedCellLocation.rowIndex;
+
+		if ( isCellSetSelection ) {
+			const selectedPlacements = cellPlacements.filter( ( p ) =>
+				selectedClientIds.includes( p.cell.clientId )
+			);
+			if ( selectedPlacements.length ) {
+				startRow = Math.min(
+					...selectedPlacements.map( ( p ) => p.rowIndex )
+				);
+				endRow = Math.max(
+					...selectedPlacements.map(
+						( p ) =>
+							p.rowIndex + ( p.cell.attributes.rowSpan || 1 ) - 1
+					)
+				);
+			}
+		} else {
+			endRow = startRow + ( rowSpan || 1 ) - 1;
+		}
+
+		replaceTable( deleteRows( rows, siblingCells, { startRow, endRow } ) );
 	}
 
 	function onInsertColumn( delta ) {
@@ -200,12 +219,37 @@ export default function TableCellEdit( {
 		if ( ! selectedCellLocation || columnCount <= 1 ) {
 			return;
 		}
-		replaceTable(
-			deleteColumn( rows, siblingCells, {
-				columnIndex: selectedCellLocation.columnIndex,
-			} ),
-			columnCount - 1
-		);
+
+		let startColumn = selectedCellLocation.columnIndex;
+		let endColumn = selectedCellLocation.columnIndex;
+
+		if ( isCellSetSelection ) {
+			const selectedPlacements = cellPlacements.filter( ( p ) =>
+				selectedClientIds.includes( p.cell.clientId )
+			);
+			if ( selectedPlacements.length ) {
+				startColumn = Math.min(
+					...selectedPlacements.map( ( p ) => p.columnIndex )
+				);
+				endColumn = Math.max(
+					...selectedPlacements.map(
+						( p ) =>
+							p.columnIndex +
+							( p.cell.attributes.colSpan || 1 ) -
+							1
+					)
+				);
+			}
+		} else {
+			endColumn = startColumn + ( colSpan || 1 ) - 1;
+		}
+
+		const result = deleteColumns( rows, siblingCells, {
+			startColumn,
+			endColumn,
+		} );
+
+		replaceTable( result, columnCount - ( endColumn - startColumn + 1 ) );
 	}
 
 	function onSelectRow() {
@@ -362,7 +406,9 @@ export default function TableCellEdit( {
 			...selectedPlacements.map( ( p ) => p.rowIndex )
 		);
 		const maxRow = Math.max(
-			...selectedPlacements.map( ( p ) => p.rowIndex )
+			...selectedPlacements.map(
+				( p ) => p.rowIndex + ( p.cell.attributes.rowSpan || 1 ) - 1
+			)
 		);
 		return maxRow - minRow + 1;
 	}, [ isCellSetSelection, cellPlacements, selectedClientIds ] );
@@ -381,7 +427,9 @@ export default function TableCellEdit( {
 			...selectedPlacements.map( ( p ) => p.columnIndex )
 		);
 		const maxColumn = Math.max(
-			...selectedPlacements.map( ( p ) => p.columnIndex )
+			...selectedPlacements.map(
+				( p ) => p.columnIndex + ( p.cell.attributes.colSpan || 1 ) - 1
+			)
 		);
 		return maxColumn - minColumn + 1;
 	}, [ isCellSetSelection, cellPlacements, selectedClientIds ] );
@@ -439,7 +487,8 @@ export default function TableCellEdit( {
 		},
 		{
 			icon: tableRowDelete,
-			title: __( 'Delete row' ),
+			title:
+				selectedRowCount > 1 ? __( 'Delete rows' ) : __( 'Delete row' ),
 			onClick: onDeleteRow,
 		},
 		{
@@ -454,7 +503,10 @@ export default function TableCellEdit( {
 		},
 		{
 			icon: tableColumnDelete,
-			title: __( 'Delete column' ),
+			title:
+				selectedColumnCount > 1
+					? __( 'Delete columns' )
+					: __( 'Delete column' ),
 			onClick: onDeleteColumn,
 		},
 	];
