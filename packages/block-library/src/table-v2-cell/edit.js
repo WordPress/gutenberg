@@ -15,6 +15,7 @@ import { useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	border,
+	group,
 	table,
 	tableColumnAfter,
 	tableColumnBefore,
@@ -22,6 +23,7 @@ import {
 	tableRowAfter,
 	tableRowBefore,
 	tableRowDelete,
+	ungroup,
 } from '@wordpress/icons';
 import {
 	deleteColumn,
@@ -60,7 +62,7 @@ export default function TableCellEdit( {
 	setAttributes,
 	clientId,
 } ) {
-	const { content, tag: CellTag } = attributes;
+	const { content, tag: CellTag, colSpan, rowSpan } = attributes;
 	const [ selectionBorder, setSelectionBorder ] = useState(
 		DEFAULT_SELECTION_BORDER
 	);
@@ -298,8 +300,6 @@ export default function TableCellEdit( {
 	}
 
 	function onUnmergeCells() {
-		const { rowSpan = 1, colSpan = 1 } = attributes;
-
 		if ( rowSpan <= 1 && colSpan <= 1 ) {
 			return;
 		}
@@ -443,25 +443,28 @@ export default function TableCellEdit( {
 	const blockProps = useBlockProps();
 
 	return (
-		<CellTag { ...blockProps }>
+		<CellTag
+			{ ...blockProps }
+			colSpan={ colSpan > 1 ? colSpan : undefined }
+			rowSpan={ rowSpan > 1 ? rowSpan : undefined }
+		>
 			<BlockControls group="other">
 				{ isCellSetSelection && (
 					<ToolbarButton
-						icon={ table }
+						icon={ group }
 						label={ __( 'Merge cells' ) }
 						onClick={ onMergeCells }
 						showTooltip
 					/>
 				) }
-				{ ! isCellSetSelection &&
-					( attributes.rowSpan > 1 || attributes.colSpan > 1 ) && (
-						<ToolbarButton
-							icon={ table }
-							label={ __( 'Unmerge cells' ) }
-							onClick={ onUnmergeCells }
-							showTooltip
-						/>
-					) }
+				{ ! isCellSetSelection && ( rowSpan > 1 || colSpan > 1 ) && (
+					<ToolbarButton
+						icon={ ungroup }
+						label={ __( 'Unmerge cells' ) }
+						onClick={ onUnmergeCells }
+						showTooltip
+					/>
+				) }
 				{ isCellSetSelection && (
 					<Dropdown
 						popoverProps={ { placement: 'bottom-start' } }
