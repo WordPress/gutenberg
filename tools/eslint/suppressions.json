@@ -851,7 +851,7 @@
 	},
 	"packages/components/src/textarea-control/styles/textarea-control-styles.ts": {
 		"no-restricted-imports": {
-			"count": 2
+			"count": 1
 		}
 	},
 	"packages/components/src/toggle-group-control/toggle-group-control/utils.ts": {
@@ -1193,11 +1193,6 @@
 		}
 	},
 	"packages/editor/src/components/error-boundary/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
-	"packages/editor/src/components/global-styles-sidebar/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
 		}

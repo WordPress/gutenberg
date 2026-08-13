@@ -7,6 +7,7 @@
 ### Bug Fixes
 
 -   Adjust the specificity of the responsive image default in the layout container so components can size their own images ([#80845](https://github.com/WordPress/gutenberg/pull/80845)).
+-   Ignore `updateMenuItem` for menu items that were never registered, instead of adding a partial entry that renders as an empty navigation row ([#81581](https://github.com/WordPress/gutenberg/pull/81581)).
 
 ## 0.19.0 (2026-07-29)
 

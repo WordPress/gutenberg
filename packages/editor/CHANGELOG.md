@@ -6,6 +6,10 @@
 
 -   Notes Sidebar: Promote the "Add note" action from the block-toolbar overflow menu to a dedicated toolbar button placed before the ellipsis. Blocks that already have a thread continue to show the avatar indicator alongside the button ([#78188](https://github.com/WordPress/gutenberg/issues/78188)).
 
+### Bug Fixes
+
+-   Register the editor and block editor keyboard shortcuts from the editor provider, so shortcuts work for consumers that mount the editor without rendering `EditorKeyboardShortcutsRegister` themselves ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
+
 ## 14.53.0 (2026-08-12)
 
 ### Internal
