@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Testing overlapping PRs bot ([#76820](https://github.com/WordPress/gutenberg/pull/76820)).
+
 ### Bug Fixes
 
 -   `InputControl`: Vertically center the value of date and time inputs in Safari ([#81361](https://github.com/WordPress/gutenberg/pull/81361)).
