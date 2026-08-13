@@ -2,18 +2,10 @@
 @use "@wordpress/base-styles/variables" as *;
 
 .edit-site-sidebar-navigation-item.components-item {
-	color: var(--wpds-color-foreground-interactive-neutral-weak);
 	// 6px right padding to align with + button
 	padding: $grid-unit-10 6px $grid-unit-10 $grid-unit-20;
 	border: none;
 	min-height: $grid-unit-50;
-
-	&:focus,
-	&[aria-current="true"],
-	// Bump the specificity above the <Item> component's own `:hover` color.
-	&#{&}:hover {
-		color: var(--wpds-color-foreground-interactive-neutral-weak-active);
-	}
 
 	&[aria-current="true"] {
 		background: var(--wpds-color-background-interactive-neutral-weak-active);
