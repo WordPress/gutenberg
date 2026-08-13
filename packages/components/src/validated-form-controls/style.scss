@@ -17,8 +17,8 @@
 
 	// For TextareaControl
 	textarea:invalid[data-validity-visible] {
-		--wp-admin-theme-color: #{$alert-red};
-		--wp-components-color-accent: #{$alert-red};
+		@extend %red-focus-ring;
+
 		border-color: $alert-red;
 	}
 }
@@ -36,7 +36,8 @@
 	// For ContentEditableControl
 	&:has(input:invalid[data-validity-visible])
 	.components-validated-control__content-editable [role="textbox"] {
-		--wp-admin-theme-color: #{$alert-red};
+		@extend %red-focus-ring;
+
 		border-color: $alert-red;
 	}
 }
