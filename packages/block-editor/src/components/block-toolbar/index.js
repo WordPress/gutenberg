@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
@@ -17,10 +10,6 @@ import {
 	isTemplatePart,
 } from '@wordpress/blocks';
 import { ToolbarGroup } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import BlockMover from '../block-mover';
 import BlockParentSelector from '../block-parent-selector';
 import BlockControls from '../block-controls';

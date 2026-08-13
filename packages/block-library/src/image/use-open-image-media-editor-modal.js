@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	privateApis as blockEditorPrivateApis,
@@ -9,10 +6,6 @@ import {
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { useRegistry, useSelect } from '@wordpress/data';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 
 function normalizeImageBlockCaption( caption ) {

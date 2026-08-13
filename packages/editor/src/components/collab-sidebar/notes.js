@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Fragment, useEffect, useMemo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -9,10 +6,6 @@ import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { NoteThread } from './note-thread';
 import {

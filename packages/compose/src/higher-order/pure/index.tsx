@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import type { ComponentType, ComponentClass } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { Component } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { createHigherOrderComponent } from '../../utils/create-higher-order-component';
 
 /**

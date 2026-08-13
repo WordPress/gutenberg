@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { render, renderHook, screen } from '@testing-library/react';
 import { click, render as renderAriakit } from '@ariakit/test/react';
-
-/**
- * Internal dependencies
- */
 import ColorPanel, {
 	useHasColorPanel,
 	useHasTextPanel,

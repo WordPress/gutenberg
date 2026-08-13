@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 const { Octokit } = require( '@octokit/rest' );
 const { sprintf } = require( 'sprintf-js' );
 const semver = require( 'semver' );
-
-/**
- * Internal dependencies
- */
 const { getNextMajorVersion } = require( '../lib/version' );
 const {
 	getMilestoneByTitle,
@@ -15,7 +8,6 @@ const {
 } = require( '../lib/milestone' );
 const { log, warn, formats } = require( '../lib/logger' );
 const config = require( '../config' );
-// @ts-ignore
 const manifest = require( '../../../package.json' );
 
 const UNKNOWN_FEATURE_FALLBACK_NAME = 'Uncategorized';
@@ -138,6 +130,7 @@ const LABEL_FEATURE_MAPPING = {
 	'[Package] E2E Tests': 'Testing',
 	'[Package] E2E Test Utils': 'Testing',
 	'[Type] Automated Testing': 'Testing',
+	'[Type] Flaky Test': 'Testing',
 	'Connectors screen': 'Connectors',
 	'[Package] UI': 'Components',
 	'[Package] Compose': 'Components',
@@ -303,6 +296,20 @@ function getFeatureSpecificLabels( labels ) {
 }
 
 /**
+ * Returns the first package or tool-specific label from the given labels.
+ *
+ * @param {string[]} labels Label names.
+ *
+ * @return {string|undefined} the package or tool-specific label.
+ */
+function getPackageOrToolSpecificLabel( labels ) {
+	return labels.find(
+		( label ) =>
+			label.startsWith( '[Package] ' ) || label.startsWith( '[Tool] ' )
+	);
+}
+
+/**
  * Returns type candidates based on given issue title.
  *
  * @param {string} title Issue title.
@@ -388,6 +395,16 @@ function getIssueFeature( issue ) {
 
 	if ( blockSpecificLabels ) {
 		return 'Block Library';
+	}
+
+	// 4. Package and tool-specific labels that do not have an explicit mapping.
+	const packageOrToolSpecificLabel = getPackageOrToolSpecificLabel( labels );
+
+	if ( packageOrToolSpecificLabel ) {
+		return packageOrToolSpecificLabel.replace(
+			/^\[(?:Package|Tool)\] /,
+			''
+		);
 	}
 
 	// Fallback - if we couldn't find a good match.

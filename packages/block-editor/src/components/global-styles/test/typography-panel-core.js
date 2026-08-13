@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import { click, render as renderAriakit } from '@ariakit/test/react';
-
-/**
- * Internal dependencies
- */
 import TypographyPanel from '../typography-panel';
 
 // Coverage for `TypographyPanel` with the `gutenberg-global-styles-inheritance-ui`

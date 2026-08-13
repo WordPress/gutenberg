@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { wrap, terminate } from '../main-thread';
 import { WORKER_SYMBOL } from '../types';
 

@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { Tokenizer } from 'simple-html-tokenizer';
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import { createLogger, createQueuedLogger } from './logger';
 import type { Logger, LoggerItem } from './types';
 import { getSaveContent } from '../serializer';

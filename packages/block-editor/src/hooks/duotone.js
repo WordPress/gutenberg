@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
-
-/**
- * WordPress dependencies
- */
 import {
 	getBlockSupport,
 	getBlockType,
@@ -20,10 +13,6 @@ import {
 	getBlockSelector,
 	privateApis as globalStylesEnginePrivateApis,
 } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import {
 	BlockControls,
 	InspectorControls,

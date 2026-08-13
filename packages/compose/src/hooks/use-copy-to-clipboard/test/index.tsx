@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * Internal dependencies
- */
 import useCopyToClipboard, { copyToClipboard, restoreFocus } from '../';
 
 interface TestComponentProps {

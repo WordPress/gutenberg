@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { debounce, useEvent } from '@wordpress/compose';
 import {
 	createContext,
@@ -20,10 +13,6 @@ import type {
 	ResolveWidgetModule,
 	WidgetType,
 } from '@wordpress/widget-primitives';
-
-/**
- * Internal dependencies
- */
 import { DEFAULT_GRID } from '../utils/default-grid';
 import { normalizeGridSettings } from '../utils/normalize-grid-settings';
 import { DEFAULT_ROW_HEIGHT } from '../utils/row-height-presets';

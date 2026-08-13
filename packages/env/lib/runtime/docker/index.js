@@ -1,21 +1,10 @@
 'use strict';
-/**
- * External dependencies
- */
 const { spawn, execSync } = require( 'child_process' );
 const path = require( 'path' );
 const util = require( 'util' );
+const exec = util.promisify( require( 'child_process' ).exec );
 const { v2: dockerCompose } = require( 'docker-compose' );
 const { rimraf } = require( 'rimraf' );
-
-/**
- * Promisified dependencies
- */
-const exec = util.promisify( require( 'child_process' ).exec );
-
-/**
- * Internal dependencies
- */
 const {
 	writeDockerFiles,
 	ensureDockerInitialized,

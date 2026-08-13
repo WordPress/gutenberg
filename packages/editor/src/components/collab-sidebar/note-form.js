@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import {
 	__experimentalTruncate as Truncate,
@@ -9,23 +6,16 @@ import {
 import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
-import { isKeyboardEvent } from '@wordpress/keycodes';
-import { privateApis as dataviewsPrivateApis } from '@wordpress/dataviews';
+import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../lock-unlock';
 import { sanitizeNoteContent } from './utils';
 import noteMentionCompleter from './note-mention-completer';
-
 /*
- * The rich text form field is assembled in `@wordpress/dataviews` on top of the
- * presentational `ContentEditableControl` shell in `@wordpress/components`; the
- * notes sidebar is its second consumer.
+ * The rich text form field wires `@wordpress/rich-text` into the presentational
+ * `ContentEditableControl` shell from `@wordpress/components`. The notes
+ * sidebar is its only consumer, so it lives next to it.
  */
-const { RichTextControl } = unlock( dataviewsPrivateApis );
+import RichTextControl from './rich-text-control';
 
 /*
  * `@` mentions are not on this list: the completer inserts a mention as a
@@ -123,7 +113,12 @@ export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 				gap="sm"
 				wrap="wrap"
 			>
-				<Button size="compact" variant="tertiary" onClick={ onCancel }>
+				<Button
+					size="compact"
+					variant="tertiary"
+					onClick={ onCancel }
+					shortcut="Escape"
+				>
 					<Truncate>{ __( 'Cancel' ) }</Truncate>
 				</Button>
 				<Button
@@ -132,6 +127,7 @@ export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 					variant="primary"
 					type="submit"
 					disabled={ isDisabled }
+					shortcut={ displayShortcut.primary( 'Enter' ) }
 				>
 					<Truncate>{ labels?.submit ?? __( 'Add note' ) }</Truncate>
 				</Button>

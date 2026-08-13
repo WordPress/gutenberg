@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import variations, { isGifVariation } from '../variations';
 
 const GIF_ATTRIBUTES = {

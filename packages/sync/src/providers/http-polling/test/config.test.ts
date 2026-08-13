@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { describe, expect, it, jest } from '@jest/globals';
 
 type SyncConfig = typeof import('../config');

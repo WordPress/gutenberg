@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
 import { children as childrenSource } from '@wordpress/blocks';
 import { __unstableCreateElement } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import RichTextMultiline from './multiline';
 
 export function withDeprecations( Component ) {

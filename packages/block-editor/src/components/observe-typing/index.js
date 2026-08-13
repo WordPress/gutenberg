@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useRefEffect, useMergeRefs } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { isTextField } from '@wordpress/dom';
@@ -14,10 +11,6 @@ import {
 	ESCAPE,
 	TAB,
 } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 
 /**

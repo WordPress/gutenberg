@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { areCollaboratorInfosEqual, generateCollaboratorInfo } from '../utils';
 import type { CollaboratorInfo } from '../types';
 import type { User } from '../../entity-types';
