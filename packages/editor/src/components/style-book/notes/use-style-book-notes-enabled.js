@@ -13,26 +13,44 @@ import { store as coreStore } from '@wordpress/core-data';
  * a write to global styles, the capability to check is the one for that
  * record, not a generic comment capability.
  *
+ * Answering costs REST requests - a post type record and a capability probe -
+ * so callers pass `enabled` to say when the answer is wanted. The sidebar is
+ * mounted for the whole editor session but only matters once the Style Book is
+ * open, and asking earlier would add requests to every site editor load,
+ * whether or not anyone visits the Style Book.
+ *
+ * @param {Object}  [options]         Options.
+ * @param {boolean} [options.enabled] Whether to resolve the answer at all.
+ *                                    Defaults to true.
  * @return {{ globalStylesId: number|undefined, isEnabled: boolean }} The post
  * notes are stored on, and whether the feature is available.
  */
-export function useStyleBookNotesEnabled() {
+export function useStyleBookNotesEnabled( { enabled = true } = {} ) {
 	const globalStylesId = useSelect(
 		( select ) =>
-			select( coreStore ).__experimentalGetCurrentGlobalStylesId(),
-		[]
+			enabled
+				? select( coreStore ).__experimentalGetCurrentGlobalStylesId()
+				: undefined,
+		[ enabled ]
 	);
 
-	const supportsNotes = useSelect( ( select ) => {
-		const postType = select( coreStore ).getPostType( 'wp_global_styles' );
-		/*
-		 * `add_post_type_support()` stores its arguments as an array, so the
-		 * REST `supports.editor` value is `[ { notes: true } ]` rather than a
-		 * bare `true`. Read it the way the comments controller does.
-		 */
-		const [ editorSupport ] = postType?.supports?.editor ?? [];
-		return !! editorSupport?.notes;
-	}, [] );
+	const supportsNotes = useSelect(
+		( select ) => {
+			if ( ! enabled ) {
+				return false;
+			}
+			const postType =
+				select( coreStore ).getPostType( 'wp_global_styles' );
+			/*
+			 * `add_post_type_support()` stores its arguments as an array, so
+			 * the REST `supports.editor` value is `[ { notes: true } ]` rather
+			 * than a bare `true`. Read it the way the comments controller does.
+			 */
+			const [ editorSupport ] = postType?.supports?.editor ?? [];
+			return !! editorSupport?.notes;
+		},
+		[ enabled ]
+	);
 
 	/*
 	 * The id has to be resolved first: an unqualified `canUser` here would

@@ -72,7 +72,12 @@ export default function StyleBookNotes() {
 		};
 	}, [] );
 
-	const { globalStylesId, isEnabled } = useStyleBookNotesEnabled();
+	// This component is mounted for the whole editor session, so the checks
+	// wait until the Style Book is actually open rather than adding requests
+	// to every site editor load.
+	const { globalStylesId, isEnabled } = useStyleBookNotesEnabled( {
+		enabled: showStylebook && ! isRevisions,
+	} );
 
 	if ( ! showStylebook || isRevisions || ! isEnabled ) {
 		return null;
