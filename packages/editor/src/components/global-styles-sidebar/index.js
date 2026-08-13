@@ -12,7 +12,7 @@ import GlobalStylesUI from '../global-styles';
 import { GlobalStylesActionMenu } from '../global-styles/menu';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import DefaultSidebar from './default-sidebar';
+import PluginSidebar from '../plugin-sidebar';
 import WelcomeGuideStyles from './welcome-guide';
 
 export default function GlobalStylesSidebar() {
@@ -110,13 +110,16 @@ export default function GlobalStylesSidebar() {
 
 	return (
 		<>
-			<DefaultSidebar
-				className="editor-global-styles-sidebar"
+			<PluginSidebar
+				name="global-styles"
 				identifier="edit-site/global-styles"
 				title={ __( 'Styles' ) }
 				icon={ styles }
 				closeLabel={ __( 'Close Styles' ) }
-				panelClassName="editor-global-styles-sidebar__panel"
+				className="editor-global-styles-sidebar__panel"
+				// The sidebar is a flex column so the panel can fill the
+				// remaining height.
+				render={ <div className="editor-global-styles-sidebar" /> }
 				header={
 					<Flex
 						className="editor-global-styles-sidebar__header"
@@ -173,7 +176,7 @@ export default function GlobalStylesSidebar() {
 					selectedViewport={ styleStateViewport }
 					showResponsiveStateControls={ false }
 				/>
-			</DefaultSidebar>
+			</PluginSidebar>
 			<WelcomeGuideStyles />
 		</>
 	);
