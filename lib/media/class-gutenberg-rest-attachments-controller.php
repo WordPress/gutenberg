@@ -360,6 +360,9 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		 * all. Rejecting the upload there would be worse than storing it —
 		 * WordPress collapses a sequence to its first frame, so the user still
 		 * gets a usable photo, just without the motion.
+		 *
+		 * Core's wp_is_heic_image_mime_type() covers exactly this list, but it
+		 * only exists in WordPress 7.1 and later, and this plugin supports 6.9.
 		 */
 		if ( ! $bypass_mime_check ) {
 			$heic_mime_types = array(
