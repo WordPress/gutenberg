@@ -178,7 +178,42 @@
 		}
 
 		.block-editor-block-parent-selector__inserter.components-button.has-icon {
-			@include inserter-toggle;
+			// The size every other inserter square has.
+			height: $button-size-small;
+			min-width: $button-size-small;
+			padding: 0;
+			color: $white;
+			background: transparent;
+
+			// The black square, drawn under the icon.
+			&::after {
+				content: "";
+				position: absolute;
+				z-index: -1;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				border-radius: $radius-small;
+				background: $gray-900;
+			}
+
+			// The toolbar focus ring stays at its standard size, around
+			// the square rather than hugging it.
+			&::before {
+				top: -$grid-unit-05;
+				left: -$grid-unit-05;
+				right: -$grid-unit-05;
+				height: calc(100% + #{$grid-unit-10});
+			}
+
+			&:hover {
+				color: $white;
+
+				&::after {
+					background: var(--wp-admin-theme-color);
+				}
+			}
 		}
 
 		&::before {
