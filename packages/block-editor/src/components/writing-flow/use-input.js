@@ -163,8 +163,7 @@ export default function useInput() {
 								const { defaultBlock } =
 									getBlockListSettings( clientId ) ?? {};
 								const name =
-									defaultBlock?.name ??
-									getDefaultBlockName();
+									defaultBlock?.name ?? getDefaultBlockName();
 
 								if ( canInsertBlockType( name, clientId ) ) {
 									event.preventDefault();
