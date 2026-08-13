@@ -1,14 +1,11 @@
 import clsx from 'clsx';
 import {
-	__experimentalSpacer as Spacer,
 	__experimentalItemGroup as ItemGroup,
 	__experimentalUnitControl as UnitControl,
-	__experimentalGrid as Grid,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	useNavigator,
 	Dropdown,
 	Button,
-	FlexItem,
 	ColorPalette,
 } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
@@ -159,21 +156,19 @@ function TextShadowsPreview( { textShadow }: TextShadowsPreviewProps ) {
 	};
 
 	return (
-		<Spacer marginBottom={ 4 } marginTop={ -2 }>
-			<Stack
-				direction="row"
-				align="center"
-				justify="center"
-				className="global-styles-ui__text-shadow-preview-panel"
+		<Stack
+			direction="row"
+			align="center"
+			justify="center"
+			className="global-styles-ui__text-shadow-preview-panel"
+		>
+			<span
+				className="global-styles-ui__text-shadow-preview-text"
+				style={ textShadowStyle }
 			>
-				<span
-					className="global-styles-ui__text-shadow-preview-text"
-					style={ textShadowStyle }
-				>
-					{ __( 'Code is poetry' ) }
-				</span>
-			</Stack>
-		</Spacer>
+				{ __( 'Code is poetry' ) }
+			</span>
+		</Stack>
 	);
 }
 
@@ -208,21 +203,23 @@ function TextShadowEditor( { textShadow, onChange }: TextShadowEditorProps ) {
 
 	return (
 		<>
-			<Stack direction="column" gap="sm">
-				<Stack direction="row" justify="space-between" align="center">
-					<Subtitle level={ 3 }>{ __( 'Text Shadows' ) }</Subtitle>
-					<FlexItem className="global-styles-ui__shadows-panel__options-container">
-						<Button
-							size="small"
-							icon={ plus }
-							label={ __( 'Add text shadow' ) }
-							onClick={ onAddTextShadowPart }
-							ref={ addTextShadowButtonRef }
-						/>
-					</FlexItem>
-				</Stack>
+			<Stack
+				direction="row"
+				justify="space-between"
+				align="center"
+				className="global-styles-ui__text-shadow-editor__header"
+			>
+				<Subtitle level={ 3 }>{ __( 'Text Shadows' ) }</Subtitle>
+				<div className="global-styles-ui__shadows-panel__options-container">
+					<Button
+						size="small"
+						icon={ plus }
+						label={ __( 'Add text shadow' ) }
+						onClick={ onAddTextShadowPart }
+						ref={ addTextShadowButtonRef }
+					/>
+				</div>
 			</Stack>
-			<Spacer />
 			<ItemGroup isBordered isSeparated>
 				{ textShadowParts.map( ( part, index ) => (
 					<TextShadowItem
@@ -355,7 +352,7 @@ function TextShadowPopover( {
 					onTextShadowChange( 'color', value ?? '' )
 				}
 			/>
-			<Grid columns={ 2 } gap={ 4 }>
+			<div className="global-styles-ui__text-shadow-editor__inputs">
 				<TextShadowInputControl
 					label={ __( 'X Position' ) }
 					value={ textShadowObj.x }
@@ -373,7 +370,7 @@ function TextShadowPopover( {
 						onTextShadowChange( 'blur', value )
 					}
 				/>
-			</Grid>
+			</div>
 		</Stack>
 	);
 }

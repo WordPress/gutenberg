@@ -1,8 +1,5 @@
 import { __, isRTL } from '@wordpress/i18n';
-import {
-	__experimentalItemGroup as ItemGroup,
-	FlexItem,
-} from '@wordpress/components';
+import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
 import { Subtitle } from './subtitle';
@@ -19,7 +16,7 @@ function TextShadows() {
 						justify="space-between"
 						align="center"
 					>
-						<FlexItem>{ __( 'Text shadow presets' ) }</FlexItem>
+						<span>{ __( 'Text shadow presets' ) }</span>
 						<Icon icon={ isRTL() ? chevronLeft : chevronRight } />
 					</Stack>
 				</NavigationButtonAsItem>

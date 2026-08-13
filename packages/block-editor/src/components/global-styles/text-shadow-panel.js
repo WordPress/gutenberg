@@ -1,7 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import {
 	Button,
-	FlexItem,
 	Dropdown,
 	MenuGroup,
 	MenuItemsChoice,
@@ -189,7 +188,7 @@ function TextShadowToggle( { textShadow, onChange, onToggle, isOpen } ) {
 					gap="sm"
 				>
 					<Icon icon={ textShadowIcon } size={ 24 } />
-					<FlexItem>{ __( 'Text shadow' ) }</FlexItem>
+					<span>{ __( 'Text shadow' ) }</span>
 				</Stack>
 			</Button>
 			{ !! textShadow && (
