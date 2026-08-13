@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `InputControl`, `SelectControl`, `CustomSelectControl`: Align focus rings with the design system ([#80417](https://github.com/WordPress/gutenberg/pull/80417)).
+
 ### Bug Fixes
 
 -   `InputControl`: Vertically center the value of date and time inputs in Safari ([#81361](https://github.com/WordPress/gutenberg/pull/81361)).
