@@ -3,6 +3,7 @@ import { isBlobURL } from '@wordpress/blob';
 import {
 	Spinner,
 	Placeholder,
+	ToolbarButton,
 	__experimentalToolsPanel as ToolsPanel,
 } from '@wordpress/components';
 import {
@@ -11,14 +12,17 @@ import {
 	InspectorControls,
 	MediaPlaceholder,
 	MediaReplaceFlow,
+	store as blockEditorStore,
 	useBlockProps,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { useRef, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
-import { video as icon } from '@wordpress/icons';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { image as imageIcon, video as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
+import { createBlock } from '@wordpress/blocks';
 import { prependHTTPS } from '@wordpress/url';
 import { createUpgradedEmbedBlock } from '../embed/util';
 import {
@@ -31,6 +35,7 @@ import Tracks from './tracks';
 import { Caption } from '../utils/caption';
 import PosterImage from '../utils/poster-image';
 import { isGifVariation, isLivePhotoVariation } from './variations';
+import { getCarriedMotionConversionAttributes } from '../utils/motion-companion';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 
@@ -38,6 +43,7 @@ function VideoEdit( {
 	isSelected: isSingleSelected,
 	attributes,
 	className,
+	clientId,
 	setAttributes,
 	insertBlocksAfter,
 	onReplace,
@@ -164,6 +170,46 @@ function VideoEdit( {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
 
+	/*
+	 * A Live photo plays a companion video of an image attachment, so this
+	 * block can be turned back into the still image it was converted from.
+	 * That needs the attachment record, which only resolves asynchronously —
+	 * hence a dedicated control rather than a block-switcher transform, which
+	 * has to decide synchronously whether it applies.
+	 */
+	const stillImage = useSelect(
+		( select ) =>
+			isLivePhoto && id && isSingleSelected
+				? select( coreStore ).getEntityRecord(
+						'postType',
+						'attachment',
+						id,
+						{ context: 'view' }
+				  )
+				: null,
+		[ isLivePhoto, id, isSingleSelected ]
+	);
+
+	const { replaceBlocks } = useDispatch( blockEditorStore );
+
+	function convertToStillImage() {
+		replaceBlocks(
+			clientId,
+			createBlock( 'core/image', {
+				...getCarriedMotionConversionAttributes( attributes ),
+				id,
+				url: stillImage.source_url,
+				alt: stillImage.alt_text,
+				caption: attributes.caption,
+				/*
+				 * Without this the Image block would convert straight back to
+				 * a Live photo, since its companion video is still there.
+				 */
+				preserveStillImage: true,
+			} )
+		);
+	}
+
 	// Much of this description is duplicated from MediaPlaceholder.
 	const placeholder = ( content ) => {
 		return (
@@ -219,6 +265,13 @@ function VideoEdit( {
 						/>
 					</BlockControls>
 					<BlockControls group="other">
+						{ isLivePhoto && !! stillImage && (
+							<ToolbarButton
+								icon={ imageIcon }
+								label={ __( 'Display as still image' ) }
+								onClick={ convertToStillImage }
+							/>
+						) }
 						<MediaReplaceFlow
 							mediaId={ id }
 							mediaURL={ src }

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Video: Add a "Live photo" variation for uploaded HEIC/HEIF image sequences (Apple Live Photos, Android bursts). It shows the sequence's still frame and plays its motion on hover or focus, in the editor and on the front end. An uploaded sequence becomes one automatically once its companion video is ready, and "Display as still image" turns it back into an Image block ([#79642](https://github.com/WordPress/gutenberg/issues/79642)).
+
 ### Bug Fixes
 
 -   Icon: Apply only padding to the inner SVG in the editor, so margin is no longer applied twice compared to the front end ([#81292](https://github.com/WordPress/gutenberg/pull/81292)).

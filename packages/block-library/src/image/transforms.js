@@ -2,35 +2,10 @@ import { createBlobURL, isBlobURL } from '@wordpress/blob';
 import { createBlock, getBlockAttributes } from '@wordpress/blocks';
 import { select } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Returns the subset of block attributes that should be carried over when
- * converting an animated-GIF Image block into its converted Video block.
- *
- * The conversion swaps one block for another via `createBlock`, which would
- * otherwise drop everything the author set on the original block. This carries
- * the attributes both blocks support: block alignment, the HTML anchor, custom
- * class names, and margin spacing.
- *
- * Image-only attributes such as links (`href`/`linkDestination`), sizing
- * (`sizeSlug`/`scale`), and `border`/`shadow` styles are intentionally not
- * carried: the Video block has no equivalent, so copying them would leave
- * attributes the target block cannot represent.
- *
- * @param {Object} attributes Source block attributes.
- * @return {Object} Attributes to spread into the converted block.
- */
-function getCarriedGifConversionAttributes( attributes ) {
-	const { align, anchor, className, style } = attributes;
-	const margin = style?.spacing?.margin;
-
-	return {
-		...( align && { align } ),
-		...( anchor && { anchor } ),
-		...( className && { className } ),
-		...( margin && { style: { spacing: { margin } } } ),
-	};
-}
+import {
+	getCarriedMotionConversionAttributes,
+	getMotionCompanion,
+} from '../utils/motion-companion';
 
 /**
  * Returns the sideloaded video companion of an animated GIF image attachment,
@@ -70,24 +45,7 @@ function getAnimatedGifVideoCompanion( id, url ) {
 		id,
 		{ context: 'view' }
 	);
-	const details = record?.media_details;
-	if ( ! details?.animated_video || ! record?.source_url ) {
-		return null;
-	}
-	// Companion files are sideloaded next to the GIF, so they share its
-	// directory; build their URLs from the GIF's own source URL.
-	const dir = record.source_url.slice(
-		0,
-		record.source_url.lastIndexOf( '/' ) + 1
-	);
-	return {
-		src: dir + details.animated_video,
-		poster: details.animated_video_poster
-			? dir + details.animated_video_poster
-			: undefined,
-		width: details.width,
-		height: details.height,
-	};
+	return getMotionCompanion( record );
 }
 
 export function stripFirstImage( attributes, { shortcode } ) {
@@ -355,7 +313,7 @@ const transforms = {
 				const companion = getAnimatedGifVideoCompanion( id, url );
 
 				return createBlock( 'core/video', {
-					...getCarriedGifConversionAttributes( attributes ),
+					...getCarriedMotionConversionAttributes( attributes ),
 					id,
 					src: companion.src,
 					poster: companion.poster,
