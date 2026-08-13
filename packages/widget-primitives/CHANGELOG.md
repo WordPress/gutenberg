@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `useWidgetTypes` holds the icon slot with the transparent stand-in while
+    an action's icon reference resolves, so hosts routing actions by icon
+    keep a stable shape from first paint; an unresolvable reference clears
+    the stand-in ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
+
 ## 0.5.0 (2026-08-12)
 
 ### New Features
