@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { Spinner } from '@wordpress/components';
@@ -10,6 +11,7 @@ import { useEditorAssets } from '../../hooks/use-editor-assets';
 import { unlock } from '../../lock-unlock';
 
 const { Editor: PrivateEditor, BackButton } = unlock( editorPrivateApis );
+const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
 interface EditorProps {
 	postType?: string;
@@ -110,6 +112,7 @@ export function Editor( {
 			settings={ finalSettings }
 			styles={ finalSettings.styles }
 		>
+			{ ! finalSettings.isPreviewMode && <BlockKeyboardShortcuts /> }
 			{ backButton && <BackButton>{ backButton }</BackButton> }
 		</PrivateEditor>
 	);
