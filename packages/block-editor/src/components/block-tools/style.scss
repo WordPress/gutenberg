@@ -239,6 +239,9 @@
 				&::after {
 					content: attr(aria-label);
 					position: static;
+					transform: none;
+					width: auto;
+					height: auto;
 					border-radius: 0;
 					background: none;
 					white-space: nowrap;
