@@ -10,6 +10,7 @@ import type {
 import type { WidgetName } from '@wordpress/widget-primitives';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardContainerColumnCount } from '../../hooks/use-dashboard-container-column-count';
+import { splitWidgetActions } from '../../utils/split-widget-actions';
 import { WidgetActions } from '../widget-actions';
 import { WidgetAttributes } from '../widget-attributes';
 import { WidgetChrome } from '../widget-chrome';
@@ -127,13 +128,9 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 
 			const isFullBleed = widgetType?.presentation === 'full-bleed';
 
-			// The chrome footer is the prominent surface for high-relevance
-			// actions, so the menu takes the rest. full-bleed widgets have no
-			// footer and keep every action in the menu.
-			const actions = widgetType?.actions ?? [];
-			const menuActions = isFullBleed
-				? actions
-				: actions.filter( ( action ) => action.relevance !== 'high' );
+			// `splitWidgetActions` owns the footer/menu routing rule; the
+			// frame reads the footer half of the same split.
+			const { menu: menuActions } = splitWidgetActions( widgetType );
 			const hasActions = menuActions.length > 0;
 
 			// The active mode's controls: layout while customizing, the

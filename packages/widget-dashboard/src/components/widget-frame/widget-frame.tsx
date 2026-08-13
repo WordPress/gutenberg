@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Card, Notice, Stack, VisuallyHidden } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
+import { splitWidgetActions } from '../../utils/split-widget-actions';
 import { WidgetFooter } from '../widget-footer';
 import { WidgetHeader } from '../widget-header';
 import { WidgetRender } from '../widget-render';
@@ -89,14 +90,9 @@ export function WidgetFrame( {
 	const isBodyBleeding =
 		presentation === 'full-bleed' || presentation === 'content-bleed';
 
-	// The footer is the prominent surface for high-relevance actions.
-	// full-bleed leaves no chrome to host one, so its actions all stay in
-	// the More menu.
-	const footerActions = isHeaderHidden
-		? []
-		: ( widgetType.actions ?? [] ).filter(
-				( action ) => action.relevance === 'high'
-		  );
+	// The footer is the prominent surface for high-relevance actions;
+	// `splitWidgetActions` owns the routing rule shared with the menu.
+	const { footer: footerActions } = splitWidgetActions( widgetType );
 
 	const body = (
 		<WidgetErrorBoundary>
