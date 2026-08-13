@@ -3,7 +3,7 @@
 	"extends": "../../tsconfig.base.json",
 	"references": [
 		{ "path": "../api-fetch" },
-		{ "path": "../blob" },
+		{ "path": "../blob/tsconfig.build.json" },
 		{ "path": "../compose" },
 		{ "path": "../components" },
 		{ "path": "../core-data" },
