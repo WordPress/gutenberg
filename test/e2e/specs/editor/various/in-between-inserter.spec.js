@@ -153,6 +153,38 @@ test.describe( 'In-between block inserter', () => {
 		await expect( inserterButton ).toBeHidden();
 	} );
 
+	test( 'a click in a hidden gap moves the caret to the block below', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second' },
+		} );
+		await deselect( page );
+		const paragraphs = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		const box1 = await paragraphs.nth( 0 ).boundingBox();
+
+		const x = box1.x + ( 2 * box1.width ) / 3;
+		const y = box1.y + box1.height + 1;
+		await hoverBoundary( page, x, y );
+		await page.mouse.click( x, y );
+		// The caret lands at the end of the block below the gap, the same
+		// place a click on the visible insertion point puts it.
+		await page.keyboard.type( 'X' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: 'SecondX' } },
+		] );
+	} );
+
 	test( 'is hidden between a paragraph and an image', async ( {
 		editor,
 		page,
