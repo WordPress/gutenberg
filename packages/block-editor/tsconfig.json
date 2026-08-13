@@ -32,7 +32,7 @@
 		{ "path": "../notices" },
 		{ "path": "../rich-text" },
 		{ "path": "../style-engine" },
-		{ "path": "../token-list" },
+		{ "path": "../token-list/tsconfig.build.json" },
 		{ "path": "../ui" },
 		{ "path": "../url" },
 		{ "path": "../upload-media" },
