@@ -55,18 +55,19 @@ function ColumnInspectorControls( { width, setAttributes } ) {
 	);
 }
 
-/*
- * Edit component for the Column block.
+/**
+ * Renders the `core/column` block in the editor.
  *
- * @param {Object}   props             Component props.
- * @param {Object}   props.attributes  Block attributes.
- * @param {string}   [props.attributes.verticalAlignment]  Vertical alignment of column.
- * @param {string|number} [props.attributes.width]  Column width.
- * @param {string}   [props.attributes.templateLock]  Template locking mechanism.
- * @param {Array}    [props.attributes.allowedBlocks]  Allowed inner blocks.
- * @param {Function} props.setAttributes Function to update block attributes.
- * @param {string}   props.clientId    Unique client ID for the block.
- * @return {JSX.Element}               Rendered Column block edit component.
+ * @param {Object}         props                                Component props.
+ * @param {Object}         props.attributes                     Block attributes.
+ * @param {string}         [props.attributes.verticalAlignment] Vertical alignment of the column, one of `top`, `center`, `bottom` or `stretch`. Setting it resets the alignment on the parent Columns block.
+ * @param {string|number}  [props.attributes.width]             Column width, used as its `flex-basis`. A number is treated as a percentage, for content saved before the attribute became a CSS length.
+ * @param {string|boolean} [props.attributes.templateLock]      Template lock applied to the inner blocks, one of `all`, `insert`, `contentOnly` or `false`.
+ * @param {string[]}       [props.attributes.allowedBlocks]     Names of the blocks allowed as inner blocks, added by the `allowedBlocks` block support.
+ * @param {Function}       props.setAttributes                  Callback for updating block attributes.
+ * @param {string}         props.clientId                       Client ID of the block.
+ *
+ * @return {React.JSX.Element} React element.
  */
 function ColumnEdit( {
 	attributes: { verticalAlignment, width, templateLock, allowedBlocks },
