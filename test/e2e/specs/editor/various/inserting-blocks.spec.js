@@ -525,9 +525,9 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'First paragraph' },
 		} );
-		// Put the caret in the trailing paragraph so the test can catch an
-		// insertion that wrongly follows the caret instead of the inserter.
-		await editor.canvas.locator( 'p:text("First paragraph")' ).click();
+		// Inserting the paragraph leaves the caret in it, away from the
+		// hovered boundary, so the test can catch an insertion that wrongly
+		// follows the caret instead of the inserter.
 
 		const boundingBox = await editor.canvas
 			.getByRole( 'document', { name: 'Block: Heading' } )
