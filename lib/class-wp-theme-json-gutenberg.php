@@ -402,7 +402,6 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 7.0.0 Added type markers to the schema for boolean values.
 	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`, and
 	 *              `typography.textIndent` properties.
-
 	 * @since 7.1.0 Added `viewport` property.
 	 * @since 7.1.0 Added `typography.textShadow`, `typography.textShadowPresets`,
 	 *              and `typography.defaultTextShadowPresets`.
