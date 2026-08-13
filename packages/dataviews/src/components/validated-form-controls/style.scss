@@ -9,7 +9,8 @@
 	// For components based on InputBase
 	&:has(:is(input, select):invalid[data-validity-visible])
 	.components-input-control__backdrop {
-		--wp-components-color-accent: #{$alert-red};
+		@extend %red-focus-ring;
+
 		border-color: $alert-red;
 	}
 

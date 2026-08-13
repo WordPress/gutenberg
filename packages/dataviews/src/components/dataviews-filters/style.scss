@@ -62,8 +62,8 @@
 
 	.dataviews-filters__summary-operators-filter-select {
 		width: 100%;
+		min-width: 0;
 		white-space: nowrap;
-		overflow: hidden;
 	}
 }
 
