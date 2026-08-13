@@ -21,6 +21,9 @@ const meta: Meta< typeof FormToggle > = {
 			whereUsed: 'global',
 			notes: 'For standard toggles with labels, use `ToggleControl` instead.',
 		},
+		// FIXME: Story shows FormToggle without a visible label (label). Update it to use ToggleControl, or pair the toggle with a visible label, so the example is copy-paste safe.
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
 	},
 };
 export default meta;

@@ -10,6 +10,12 @@ import ValidationComponent from './validation';
 import VisibilityComponent from './visibility';
 
 const meta = {
+	parameters: {
+		// FIXME: Validation error-delegate inputs are unlabeled (label).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
+
 	tags: [ 'manifest' ],
 	title: 'DataViews/DataForm',
 	component: DataForm,

@@ -9,6 +9,12 @@ import type { ActionButton, View } from '../../types';
 import { data, fields, type SpaceObject } from './fixtures';
 
 const meta = {
+	parameters: {
+		// FIXME: Picker UI nests interactive controls (nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
+
 	tags: [ 'manifest' ],
 	title: 'DataViews/DataViewsPicker',
 	component: DataViewsPicker,

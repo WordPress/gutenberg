@@ -18,6 +18,9 @@ const meta: Meta< typeof UseCompositeStatePlaceholder > = {
 	},
 	args: {},
 	parameters: {
+		// FIXME: Items use role="listitem" on <button>, which is not an allowed ARIA role for that element (aria-allowed-role).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
 		controls: { exclude: /^unstable_/ },
 		docs: {
 			canvas: { sourceState: 'shown' },

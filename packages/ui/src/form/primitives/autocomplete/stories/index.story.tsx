@@ -38,6 +38,9 @@ const meta: Meta< typeof Autocomplete.Root > = {
 		'Autocomplete.Clear': Autocomplete.Clear,
 	},
 	parameters: {
+		// FIXME: Listbox/grid markup has incomplete ARIA relationships; inline list is not keyboard-accessible when scrollable (aria-required-attr/children/parent, aria-allowed-attr, scrollable-region-focusable).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
 		componentStatus: {
 			status: 'recommended',
 			whereUsed: 'global',

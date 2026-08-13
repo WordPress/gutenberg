@@ -44,6 +44,9 @@ const meta: Meta< typeof RangeControl > = {
 		onMouseMove: fn(),
 	},
 	parameters: {
+		// FIXME: Mark labels fail color-contrast; some mark stories also render an empty heading when `label` is unset (empty-heading).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {

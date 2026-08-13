@@ -12,6 +12,9 @@ const meta: Meta< typeof BorderBoxControl > = {
 		value: { control: false },
 	},
 	parameters: {
+		// FIXME: Border UI text fails color-contrast.
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {

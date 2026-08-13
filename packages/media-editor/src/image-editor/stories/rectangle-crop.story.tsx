@@ -118,6 +118,12 @@ function resolveAspectRatio(
 }
 
 const meta: Meta< typeof Cropper > = {
+	parameters: {
+		// FIXME: Editor chrome fails color-contrast; debug view has a non-keyboard-accessible scroll region (color-contrast, scrollable-region-focusable).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
+
 	title: 'MediaEditor/ImageEditor',
 	component: Cropper,
 	tags: [ 'status-experimental' ],

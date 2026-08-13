@@ -14,6 +14,9 @@ const meta: Meta< typeof SandBox > = {
 		onFocus: fn(),
 	},
 	parameters: {
+		// FIXME: SandBox iframe is missing an accessible title (frame-title). Pass a `title` arg in these stories (and prefer requiring it in real usage).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {

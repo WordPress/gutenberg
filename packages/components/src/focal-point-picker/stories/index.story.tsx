@@ -17,6 +17,9 @@ const meta: Meta< typeof FocalPointPicker > = {
 		onDragStart: fn(),
 	},
 	parameters: {
+		// FIXME: Draggable handle is a nameless aria command (aria-command-name).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {

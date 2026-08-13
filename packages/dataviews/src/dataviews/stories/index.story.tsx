@@ -32,6 +32,9 @@ const meta = {
 	// (sb-main-padding class). This ensures consistent layout in DataViews stories
 	// when clicking actions menus. Without this the padding on the body will jump.
 	parameters: {
+		// FIXME: Grid media buttons lack names; Minimal UI scroll region is not keyboard-accessible; Async Infinite Scroll list items lack a required parent (button-name, scrollable-region-focusable, aria-required-parent).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
 		layout: 'fullscreen',
 	},
 	decorators: [

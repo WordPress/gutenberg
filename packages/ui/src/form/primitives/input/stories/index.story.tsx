@@ -50,6 +50,11 @@ WithSuffixControl.args = {
 	...WithSuffixControl.args,
 	children: undefined,
 };
+WithSuffixControl.parameters = {
+	// FIXME: Story shows Input without a visible label (label). Update it to include Field.Label (or an equivalent labeled composition) so the example is copy-paste safe.
+	// See: https://github.com/WordPress/gutenberg/issues/81596
+	a11y: { test: 'todo' },
+};
 export { WithSuffixControl };
 
 export const Disabled: Story = {

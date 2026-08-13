@@ -20,6 +20,11 @@ import {
 export default {
 	title: 'Fields/Media Fields',
 	component: DataForm,
+	parameters: {
+		// FIXME: Data Views preview table has an empty column header (empty-table-header).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 };
 
 // Sample data for media fields

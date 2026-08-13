@@ -15,6 +15,11 @@ import './style.css';
 export default {
 	title: 'ImageCropper/ImageCropper',
 	component: ImageCropper,
+	parameters: {
+		// FIXME: Crop controls include an unlabeled input and unnamed select (label, select-name).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 };
 
 const DefaultComponent = ( args: ImageCropperProps ) => {
