@@ -193,7 +193,7 @@ class Tests_Notes_Followers extends WP_UnitTestCase {
 	 * @return string Mention anchor markup.
 	 */
 	private static function mention( int $user_id, string $label = '@User' ): string {
-		return sprintf( '<a class="wp-note-mention user-%d" href="#">%s</a>', $user_id, $label );
+		return sprintf( '<span class="wp-note-mention user-%d">%s</span>', $user_id, $label );
 	}
 
 	/**
@@ -562,5 +562,155 @@ class Tests_Notes_Followers extends WP_UnitTestCase {
 
 		$this->assertSame( 201, $response->get_status() );
 		$this->assertContains( self::$mentioned->user_email, $this->sent_to );
+	}
+
+	/**
+	 * Resolving or reopening a thread posts a system note. Announcing it as a
+	 * reply would mail followers a body with nothing in it, since resolve
+	 * notes carry no content.
+	 *
+	 * @covers ::gutenberg_notify_note_followers
+	 * @covers ::gutenberg_get_note_status_event
+	 */
+	public function test_system_notes_do_not_send_the_follower_email(): void {
+		$root = $this->insert_note(
+			'Start ' . self::mention( self::$mentioned->ID ),
+			self::$commenter->ID
+		);
+		$this->fire_rest_insert( $root );
+
+		$this->sent    = array();
+		$this->sent_to = array();
+
+		$resolver = self::create_user( 'editor' );
+		$system   = $this->insert_note( '', $resolver->ID, $root->comment_ID );
+		update_comment_meta( $system->comment_ID, '_wp_note_status', 'resolved' );
+		$this->fire_rest_insert( $system );
+
+		$this->assertEmpty( $this->emails_to( self::$mentioned->user_email ) );
+	}
+
+	/**
+	 * The controller saves comment meta after `rest_insert_comment` fires, so
+	 * a system note has to be recognized from the request that created it.
+	 *
+	 * @covers ::gutenberg_get_note_status_event
+	 */
+	public function test_system_notes_are_recognized_before_their_meta_is_saved(): void {
+		$root = $this->insert_note(
+			'Start ' . self::mention( self::$mentioned->ID ),
+			self::$commenter->ID
+		);
+		$this->fire_rest_insert( $root );
+
+		$this->sent    = array();
+		$this->sent_to = array();
+
+		$resolver = self::create_user( 'editor' );
+		$system   = $this->insert_note( 'Reopening this', $resolver->ID, $root->comment_ID );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->set_param( 'meta', array( '_wp_note_status' => 'reopen' ) );
+
+		// No meta row exists yet, exactly as during a real create.
+		$this->assertSame( '', get_comment_meta( $system->comment_ID, '_wp_note_status', true ) );
+		$this->assertSame( 'reopen', gutenberg_get_note_status_event( $system, $request ) );
+
+		do_action( 'rest_insert_comment', $system, $request, true );
+
+		$this->assertEmpty( $this->emails_to( self::$mentioned->user_email ) );
+	}
+
+	/**
+	 * A regular reply is not mistaken for a thread event.
+	 *
+	 * @covers ::gutenberg_get_note_status_event
+	 */
+	public function test_regular_notes_record_no_thread_event(): void {
+		$note = $this->insert_note( 'Just a note', self::$commenter->ID );
+
+		$this->assertNull( gutenberg_get_note_status_event( $note ) );
+		$this->assertNull( gutenberg_get_note_status_event( $note, new WP_REST_Request( 'POST', '/wp/v2/comments' ) ) );
+	}
+
+	/**
+	 * The sent action is what channels other than email hook, so it has to
+	 * report every recipient and say why they were notified.
+	 *
+	 * @covers ::gutenberg_send_note_notification
+	 * @covers ::gutenberg_send_note_follower_notification
+	 */
+	public function test_notification_sent_action_reports_every_recipient(): void {
+		$fired = array();
+		add_action(
+			'wp_note_notification_sent',
+			static function ( $user_id, $comment, $context, $sent ) use ( &$fired ): void {
+				$fired[] = array(
+					'user_id' => $user_id,
+					'context' => $context,
+					'sent'    => $sent,
+				);
+			},
+			10,
+			4
+		);
+
+		$root = $this->insert_note(
+			'Start ' . self::mention( self::$mentioned->ID ),
+			self::$commenter->ID
+		);
+		$this->fire_rest_insert( $root );
+
+		$this->assertSame(
+			array(
+				array(
+					'user_id' => self::$mentioned->ID,
+					'context' => 'mention',
+					'sent'    => true,
+				),
+			),
+			$fired
+		);
+
+		// The same user, now reached as a follower rather than a mention.
+		$fired   = array();
+		$replier = self::create_user( 'editor' );
+		$reply   = $this->insert_note( 'Following up', $replier->ID, $root->comment_ID );
+		$this->fire_rest_insert( $reply );
+
+		$this->assertContains(
+			array(
+				'user_id' => self::$mentioned->ID,
+				'context' => 'follower',
+				'sent'    => true,
+			),
+			$fired
+		);
+	}
+
+	/**
+	 * A mentioned post author is reported under their own context, so a
+	 * channel integration can tell the routed mention from a plain one.
+	 *
+	 * @covers ::gutenberg_route_post_author_mention_notification
+	 */
+	public function test_notification_sent_action_reports_the_routed_post_author_mention(): void {
+		$contexts = array();
+		add_action(
+			'wp_note_notification_sent',
+			static function ( $user_id, $comment, $context ) use ( &$contexts ): void {
+				$contexts[ $user_id ] = $context;
+			},
+			10,
+			3
+		);
+
+		$note = $this->insert_note(
+			'Hey ' . self::mention( self::$post_author->ID, '@Author' ),
+			self::$commenter->ID
+		);
+		$this->fire_rest_insert( $note );
+
+		$this->assertSame( 'post_author_mention', $contexts[ self::$post_author->ID ] ?? null );
 	}
 }

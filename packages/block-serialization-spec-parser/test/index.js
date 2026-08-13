@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import path from 'path';
-
-/**
- * Internal dependencies
- */
 import { parse } from '../';
 import { jsTester, phpTester } from '../shared-tests';
 

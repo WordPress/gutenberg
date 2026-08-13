@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getAutocompleteMatch } from '../get-autocomplete-match';
 import type { WPCompleter } from '../types';
 
