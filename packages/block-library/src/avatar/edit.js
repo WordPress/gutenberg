@@ -305,14 +305,14 @@ const UserEdit = ( { attributes, context, setAttributes, isSelected } ) => {
  * either `CommentEdit` or `UserEdit`, depending on whether the block is used
  * inside a comment.
  *
- * @param {Object}   props                     React props.
- * @param {Object}   props.attributes          Block attributes.
- * @param {Object}   props.context             Inherited context.
- * @param {number}   [props.context.commentId] The comment ID. Present, possibly as `null` in the Site Editor, when the block is used inside a comment.
- * @param {string}   [props.context.postType]  The post type of the current post.
- * @param {number}   [props.context.postId]    The ID of the current post.
- * @param {Function} props.setAttributes       Callback for updating block attributes.
- * @param {boolean}  props.isSelected          Whether the block is selected.
+ * @param {Object}      props                     React props.
+ * @param {Object}      props.attributes          Block attributes.
+ * @param {Object}      props.context             Inherited context.
+ * @param {number|null} [props.context.commentId] The comment ID when the block is used inside a comment. `null` in the Site Editor, where no comment is resolved but the comment variant is still rendered.
+ * @param {string}      [props.context.postType]  The post type of the current post.
+ * @param {number}      [props.context.postId]    The ID of the current post.
+ * @param {Function}    props.setAttributes       Callback for updating block attributes.
+ * @param {boolean}     props.isSelected          Whether the block is selected.
  *
  * @return {React.JSX.Element} React element.
  */
