@@ -135,7 +135,7 @@ const AvatarInspectorControls = ( {
  * @param {React.ReactNode} props.children Avatar image to wrap.
  * @param {boolean}         props.isLink   Whether to wrap the children in a link.
  *
- * @return {React.JSX.Element} React element.
+ * @return {React.ReactNode} The children, wrapped in a link when `isLink` is true.
  */
 const AvatarLinkWrapper = ( { children, isLink } ) =>
 	isLink ? (
