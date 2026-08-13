@@ -4,7 +4,7 @@
 
 ### Internal
 
--   Heading: Declare the heading level and paragraph keyboard shortcuts on the block's variations and transforms, rather than in a `BlockKeyboardShortcuts` component that every editor had to render. The `BlockKeyboardShortcuts` private export has been removed.
+-   Heading: Declare the heading level and paragraph keyboard shortcuts on the block's variations and transforms, rather than in a `BlockKeyboardShortcuts` component that every editor had to render. The `BlockKeyboardShortcuts` private export has been removed ([#81588](https://github.com/WordPress/gutenberg/pull/81588)).
 
 ### Bug Fixes
 
