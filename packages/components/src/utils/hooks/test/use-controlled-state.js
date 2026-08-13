@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render, fireEvent, screen } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import useControlledState from '../use-controlled-state';
 
 const noop = () => {};

@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { settings } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import Tooltip from '../tooltip';
 import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import {

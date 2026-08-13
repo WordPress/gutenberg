@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const {
 	test: base,
 	expect,
@@ -636,6 +633,8 @@ test.describe( 'Widgets screen', () => {
 		await pageUtils.setBrowserViewport( 'small' );
 
 		const firstWidgetArea = widgetsScreen.widgetAreas.first();
+		// Wait for the widget areas to render before inserting.
+		await expect( firstWidgetArea ).toBeVisible();
 
 		const addParagraphBlock =
 			await widgetsScreen.getBlockInGlobalInserter( 'Paragraph' );

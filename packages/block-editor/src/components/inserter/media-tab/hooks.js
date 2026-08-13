@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -92,8 +85,12 @@ export function useMediaResults( category, query = {}, refreshKey ) {
 			lastQueryKeyRef.current = key;
 			lastFetchRef.current = category.fetch;
 			lastSourceRef.current = category.name;
+			// Omit the default first page so sources that forward the query to a
+			// strict external API don't receive an unexpected `page` arg.
+			const { page, ...queryWithoutPage } = query;
+			const fetchQuery = page > 1 ? query : queryWithoutPage;
 			const { mediaItems, totalItems, totalPages } = normalizeFetchResult(
-				await category.fetch?.( query )
+				await category.fetch?.( fetchQuery )
 			);
 			if ( request === lastRequestRef.current ) {
 				// Set together so the grid and the pager never disagree.

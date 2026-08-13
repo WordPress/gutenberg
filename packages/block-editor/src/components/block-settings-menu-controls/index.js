@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	createSlotFill,
 	MenuGroup,
@@ -8,10 +5,6 @@ import {
 } from '@wordpress/components';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import {
 	useConvertToGroupButtonProps,
 	ConvertToGroupButton,

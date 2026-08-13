@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	ToggleControl,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from './utils';
 
 export function useHasImageSettingsPanel( name, value, inheritedValue ) {

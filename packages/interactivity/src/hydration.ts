@@ -1,10 +1,4 @@
-/**
- * External dependencies
- */
 import { hydrate, type ContainerNode, type ComponentChild } from 'preact';
-/**
- * Internal dependencies
- */
 import { toVdom, hydratedIslands } from './vdom';
 import { createRootFragment, splitTask } from './utils';
 

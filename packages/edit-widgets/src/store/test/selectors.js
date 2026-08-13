@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import * as _selectors from '../selectors';
 
 const selectors = { ..._selectors };

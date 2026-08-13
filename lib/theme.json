@@ -338,6 +338,7 @@
 					"radius": true
 				},
 				"dimensions": {
+					"width": true,
 					"dimensionSizes": [
 						{
 							"name": "25%",

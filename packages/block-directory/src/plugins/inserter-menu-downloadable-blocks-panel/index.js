@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __unstableInserterMenuExtension } from '@wordpress/block-editor';
 import { debounce } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DownloadableBlocksPanel from '../../components/downloadable-blocks-panel';
 
 function InserterMenuDownloadableBlocksPanel() {

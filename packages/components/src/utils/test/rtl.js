@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { convertLTRToRTL } from '../rtl';
 
 describe( 'convertLTRToRTL', () => {

@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { Stack } from '@wordpress/ui';
 import { useContext } from '@wordpress/element';
 // @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import type { GlobalStylesSettings } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { ScreenHeader } from './screen-header';
 import { ScreenBody } from './screen-body';
 import TypographyElements from './typography-elements';

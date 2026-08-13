@@ -1,7 +1,3 @@
-/**
- * Internal dependencies
- */
-
 import { normaliseFormats } from './normalise-formats';
 
 /** @typedef {import('./types').RichTextValue} RichTextValue */

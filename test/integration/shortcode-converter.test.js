@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { createBlock, registerBlockType } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import segmentHTMLToShortcodeBlock from '../../packages/blocks/src/api/raw-handling/shortcode-converter';
 
 describe( 'segmentHTMLToShortcodeBlock', () => {
