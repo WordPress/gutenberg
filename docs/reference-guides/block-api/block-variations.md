@@ -43,6 +43,7 @@ A block variation is defined by an object that can contain the following fields:
     -   `transform` - Block variation is shown in the component for variation transformations.
 -   `isDefault` (optional, type `boolean`) – Defaults to `false`. Indicates whether the current variation is the default one (details below).
 -   `isActive` (optional, type `Function|string[]`) - A function or an array of block attributes that is used to determine if the variation is active when the block is selected. The function accepts `blockAttributes` and `variationAttributes` (details below).
+-   `shortcut` (optional, type `Object`) - A keyboard shortcut that applies the variation to the selected block (details below).
 
 <div class="callout callout-info">
 	You can technically create a block variation without a unique <code>name</code>, but this is <strong>not</strong> recommended. A unique <code>name</code> allows the Editor to differentiate between your variation and others that may exist. It also allows your variation to be unregistered as needed and has implications for the <code>isDefault</code> settings (details below).
@@ -247,3 +248,36 @@ wp.blocks.registerBlockVariation( 'core/paragraph', {
 If a block instance has attributes `textColor: vivid-red` and `backgroundColor: cyan-bluish-gray`, both variations' `isActive` criterion will match that block instance. In this case, the more _specific_ match will be determined to be the active variation, where specificity is calculated as the length of each `isActive` array. This means that the `Red/Grey Paragraph` will be shown as the active variation.
 
 Note that specificity cannot be determined for a matching variation if its `isActive` property is a function rather than a `string[]`. In this case, the first matching variation will be determined to be the active variation. For this reason, it is generally recommended to use a `string[]` rather than a `function` for the `isActive` property.
+
+## Using `shortcut`
+
+A variation can declare a keyboard shortcut that applies it to the selected block. The shortcut is registered with the editor's keyboard shortcuts store and listed in the keyboard shortcuts help modal.
+
+The `shortcut` object takes the following parameters:
+
+-   `name` (type `string`) – A unique and machine-readable shortcut name, e.g. `core/block-editor/transform-paragraph-to-heading-2`.
+-   `description` (type `string`) – A translated description, displayed in the keyboard shortcuts help modal.
+-   `keyCombination` (type `Object`) – The key combination that triggers the shortcut, as a `character` and an optional `modifier` (one of the modifiers supported by the [`wp-keycodes` package](/packages/keycodes/README.md), e.g. `access` or `primary`).
+-   `aliases` (optional, type `Object[]`) – Alternative key combinations that trigger the same shortcut.
+
+For example, the core Heading block gives each of its level variations a shortcut:
+
+```js
+wp.blocks.registerBlockVariation( 'core/heading', {
+	name: 'h2',
+	title: 'Heading 2',
+	attributes: { level: 2 },
+	isActive: ( blockAttributes ) => blockAttributes.level === 2,
+	shortcut: {
+		name: 'core/block-editor/transform-paragraph-to-heading-2',
+		description: __( 'Transform the selected block into a heading 2.' ),
+		keyCombination: { modifier: 'access', character: '2' },
+	},
+} );
+```
+
+The shortcut is not limited to blocks of the variation's own block type. When the selected block is already of that type, the variation's `attributes` are applied to it — unless `isActive` reports the variation as already active, in which case nothing happens. Otherwise the selected block is transformed to the variation's block type first, which requires a [block transform](/docs/reference-guides/block-api/block-transforms.md#block) between the two block types to exist. In the example above, that is what lets the shortcut turn a Paragraph block into a Heading block as well as change the level of an existing one.
+
+Shortcuts only apply to blocks that are fully editable, and are ignored for blocks in a restricted editing mode such as content-only editing.
+
+Key combinations are matched globally, so a combination already claimed by another block or by the editor itself will not reliably reach your variation. In development builds a warning is logged when two blocks declare the same combination.
