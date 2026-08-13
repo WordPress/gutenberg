@@ -1,14 +1,13 @@
 import { __ } from '@wordpress/i18n';
 import {
 	Button,
+	Composite,
 	Dropdown,
-	MenuGroup,
-	MenuItemsChoice,
 	SelectControl,
 } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Stack, Text } from '@wordpress/ui';
 import { useRef, useMemo } from '@wordpress/element';
-import { shadow as textShadowIcon, Icon, reset } from '@wordpress/icons';
+import { shadow as textShadowIcon, Icon, check, reset } from '@wordpress/icons';
 import clsx from 'clsx';
 import { useSettings } from '../use-settings';
 
@@ -21,7 +20,7 @@ import { useSettings } from '../use-settings';
 const EMPTY_ARRAY = [];
 
 // Above this number of presets, the list is rendered as a compact dropdown
-// rather than a long list of radio menu items.
+// rather than a long list of options.
 const PRESETS_SELECT_THRESHOLD = 7;
 
 /**
@@ -125,32 +124,52 @@ function TextShadowControl( { textShadow, onChange } ) {
 			direction="column"
 			gap="sm"
 		>
-			<MenuGroup label={ __( 'Text shadow' ) }>
-				<div
-					className="block-editor-global-styles__text-shadow-preview"
-					style={ { textShadow: previewValue } }
+			<Text variant="heading-sm" render={ <h2 /> }>
+				{ __( 'Text shadow' ) }
+			</Text>
+			<div
+				className="block-editor-global-styles__text-shadow-preview"
+				style={ { textShadow: previewValue } }
+			>
+				{ __( 'Code is poetry' ) }
+			</div>
+			{ presets.length >= PRESETS_SELECT_THRESHOLD ? (
+				<SelectControl
+					hideLabelFromVision
+					label={ __( 'Text shadow preset' ) }
+					value={ activeValue }
+					options={ [
+						{ value: '', label: __( 'Default' ) },
+						...choices,
+					] }
+					onChange={ onChange }
+				/>
+			) : (
+				<Composite
+					role="listbox"
+					className="block-editor-global-styles__text-shadow-list"
+					aria-label={ __( 'Text shadow presets' ) }
 				>
-					{ __( 'Code is poetry' ) }
-				</div>
-				{ presets.length >= PRESETS_SELECT_THRESHOLD ? (
-					<SelectControl
-						hideLabelFromVision
-						label={ __( 'Text shadow preset' ) }
-						value={ activeValue }
-						options={ [
-							{ value: '', label: __( 'Default' ) },
-							...choices,
-						] }
-						onChange={ onChange }
-					/>
-				) : (
-					<MenuItemsChoice
-						choices={ choices }
-						value={ activeValue }
-						onSelect={ onChange }
-					/>
-				) }
-			</MenuGroup>
+					{ choices.map( ( { value, label } ) => {
+						const isActive = value === activeValue;
+						return (
+							<Composite.Item
+								key={ value }
+								role="option"
+								aria-selected={ isActive }
+								className={ clsx(
+									'block-editor-global-styles__text-shadow-list-item',
+									{ 'is-active': isActive }
+								) }
+								onClick={ () => onChange( value ) }
+							>
+								<span>{ label }</span>
+								{ isActive && <Icon icon={ check } /> }
+							</Composite.Item>
+						);
+					} ) }
+				</Composite>
+			) }
 			<Stack direction="row" justify="flex-end">
 				<Button
 					__next40pxDefaultSize

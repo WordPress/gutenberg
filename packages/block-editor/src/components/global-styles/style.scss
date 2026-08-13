@@ -165,6 +165,37 @@
 	@include mixins.checkerboard-background( 8px );
 }
 
+.block-editor-global-styles__text-shadow-list {
+	display: flex;
+	flex-direction: column;
+}
+
+.block-editor-global-styles__text-shadow-list-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: $grid-unit-10;
+	width: 100%;
+	padding: $grid-unit-10;
+	border: none;
+	border-radius: $radius-small;
+	background: none;
+	text-align: start;
+	cursor: var(--wpds-cursor-control);
+
+	&:hover {
+		background-color: $gray-100;
+	}
+
+	&:focus-visible {
+		@include mixins.button-style__focus();
+	}
+
+	&.is-active {
+		font-weight: 600;
+	}
+}
+
 .block-editor-global-styles__text-shadow-dropdown {
 	display: block;
 	padding: 0;
