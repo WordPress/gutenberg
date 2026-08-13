@@ -100,7 +100,16 @@ export function createBoardStore() {
 		},
 
 		getFirstBlockElement() {
-			return blockRefs.values().next().value ?? null;
+			// A thread whose block is hidden at the current viewport
+			// registers a null element; skip those or the caller loses the
+			// canvas (and with it scroll syncing) whenever the first noted
+			// block happens to be hidden.
+			for ( const el of blockRefs.values() ) {
+				if ( el ) {
+					return el;
+				}
+			}
+			return null;
 		},
 	};
 }
