@@ -26,17 +26,19 @@ export default function GlobalStylesSidebar() {
 		activeComplementaryArea,
 		editorSettings,
 		styleStateViewport,
+		isDistractionFree,
 	} = useSelect( ( select ) => {
+		const { get } = select( preferencesStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
-		const { getStylesPath, getShowStylebook } = unlock(
-			select( editorStore )
-		);
-		const _isVisualEditorMode =
-			'visual' === select( editorStore ).getEditorMode();
-		const _showListViewByDefault = select( preferencesStore ).get(
-			'core',
-			'showListViewByDefault'
-		);
+		const {
+			getStylesPath,
+			getShowStylebook,
+			getEditorMode,
+			getEditorSettings,
+		} = unlock( select( editorStore ) );
+		const _isVisualEditorMode = 'visual' === getEditorMode();
+		const _showListViewByDefault = get( 'core', 'showListViewByDefault' );
+		const _isDistractionFree = get( 'core', 'distractionFree' );
 		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
 			select( coreStore );
 
@@ -55,12 +57,12 @@ export default function GlobalStylesSidebar() {
 			showListViewByDefault: _showListViewByDefault,
 			hasRevisions:
 				!! globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count,
-			activeComplementaryArea:
-				select( interfaceStore ).getActiveComplementaryArea( 'core' ),
-			editorSettings: select( editorStore ).getEditorSettings(),
+			activeComplementaryArea: getActiveComplementaryArea( 'core' ),
+			editorSettings: getEditorSettings(),
 			styleStateViewport: unlock(
 				select( blockEditorStore )
 			).getStyleStateViewport(),
+			isDistractionFree: _isDistractionFree,
 		};
 	}, [] );
 	const { setStylesPath, setShowStylebook, resetStylesNavigation } = unlock(
@@ -116,6 +118,7 @@ export default function GlobalStylesSidebar() {
 				identifier="edit-site/global-styles"
 				title={ __( 'Styles' ) }
 				icon={ styles }
+				isPinnable={ ! isDistractionFree }
 				closeLabel={ __( 'Close Styles' ) }
 				className="editor-global-styles-sidebar__panel"
 				// The sidebar is a flex column so the panel can fill the
