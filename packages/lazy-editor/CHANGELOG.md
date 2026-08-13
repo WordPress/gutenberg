@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Render `BlockKeyboardShortcuts` so the paragraph and heading transform shortcuts work in the editor ([#81586](https://github.com/WordPress/gutenberg/pull/81586)).
+
 ## 1.19.0 (2026-08-12)
 
 
