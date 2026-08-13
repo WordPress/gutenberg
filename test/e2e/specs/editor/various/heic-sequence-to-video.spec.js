@@ -302,6 +302,57 @@ test.describe( 'Video conversion: HEIC/HEIF image sequence', () => {
 			expectLivePhotoPlayback( blocks[ 0 ].attributes );
 		} );
 
+		test( 'plays on hover on the front end, and only there', async ( {
+			editor,
+			page,
+			sequenceUtils,
+		} ) => {
+			await uploadAndConvert( { editor, sequenceUtils } );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			// The behavior is wired up at render time, so the saved markup
+			// carries the directives without a block deprecation.
+			const video = page.locator( 'figure.wp-block-video video' );
+			await expect( video ).toHaveAttribute(
+				'data-wp-interactive',
+				'core/video'
+			);
+			await expect( video ).toHaveAttribute(
+				'data-wp-on--pointerenter',
+				'actions.playLivePhoto'
+			);
+			// Reachable without a pointer.
+			await expect( video ).toHaveAttribute( 'tabindex', '0' );
+			// It rests on the still: autoplay would make it an animation.
+			await expect( video ).not.toHaveAttribute( 'autoplay', /.*/ );
+			await expect( video ).toHaveAttribute( 'poster', /.+/ );
+		} );
+
+		test( 'leaves an ordinary video page without the extra script', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/video',
+				attributes: {
+					src: 'https://example.com/video.mp4',
+					controls: true,
+				},
+			} );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			await expect(
+				page.locator( 'figure.wp-block-video video' )
+			).not.toHaveAttribute( 'data-wp-interactive', /.*/ );
+			expect( await page.content() ).not.toContain(
+				'block-library/video/view'
+			);
+		} );
+
 		test( 'undo restores the still image and leaves it alone', async ( {
 			editor,
 			pageUtils,
