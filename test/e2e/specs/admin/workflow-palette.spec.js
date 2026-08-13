@@ -4,7 +4,12 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Workflow palette', () => {
-	test.beforeAll( async ( { requestUtils } ) => {
+	test.beforeAll( async ( { requestUtils, isGutenbergPluginActive } ) => {
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			! isGutenbergPluginActive,
+			'gutenberg-workflow-palette experiment requires Gutenberg plugin'
+		);
 		await requestUtils.setGutenbergExperiments( [
 			'gutenberg-workflow-palette',
 		] );

@@ -92,7 +92,12 @@ async function saveSectionGuidelines( page, title, text ) {
 }
 
 test.describe( 'Guidelines', () => {
-	test.beforeAll( async ( { requestUtils } ) => {
+	test.beforeAll( async ( { requestUtils, isGutenbergPluginActive } ) => {
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			! isGutenbergPluginActive,
+			'gutenberg-guidelines experiment requires Gutenberg plugin'
+		);
 		await requestUtils.setGutenbergExperiments( [
 			'gutenberg-guidelines',
 		] );

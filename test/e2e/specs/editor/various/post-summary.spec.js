@@ -4,7 +4,12 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Post Summary', () => {
-	test.beforeEach( async ( { requestUtils } ) => {
+	test.beforeEach( async ( { requestUtils, isGutenbergPluginActive } ) => {
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			! isGutenbergPluginActive,
+			'gutenberg-dataform-inspector experiment requires Gutenberg plugin'
+		);
 		await requestUtils.setGutenbergExperiments( [
 			'gutenberg-dataform-inspector',
 		] );

@@ -20,7 +20,12 @@ async function createUserPostType( requestUtils ) {
 }
 
 test.describe( 'User post types', () => {
-	test.beforeAll( async ( { requestUtils } ) => {
+	test.beforeAll( async ( { requestUtils, isGutenbergPluginActive } ) => {
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			! isGutenbergPluginActive,
+			'gutenberg-content-types experiment requires Gutenberg plugin'
+		);
 		await requestUtils.setGutenbergExperiments( [
 			'gutenberg-content-types',
 		] );

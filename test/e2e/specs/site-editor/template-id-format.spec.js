@@ -63,7 +63,12 @@ async function saveEntities( { page } ) {
 test.describe( 'Template ID Format', () => {
 	let pageId;
 
-	test.beforeAll( async ( { requestUtils } ) => {
+	test.beforeAll( async ( { requestUtils, isGutenbergPluginActive } ) => {
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			! isGutenbergPluginActive,
+			'Template activation experiment requires Gutenberg plugin'
+		);
 		await requestUtils.activateTheme( 'twentytwentyfive' );
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );

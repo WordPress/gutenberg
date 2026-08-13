@@ -9,7 +9,12 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 // fixtures failing any test that logs a console error.
 // See https://github.com/WordPress/gutenberg/issues/79090.
 test.describe( 'Block Fields with pattern overrides bindings', () => {
-	test.beforeAll( async ( { requestUtils } ) => {
+	test.beforeAll( async ( { requestUtils, isGutenbergPluginActive } ) => {
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			! isGutenbergPluginActive,
+			'Block Fields experiment requires Gutenberg plugin'
+		);
 		await requestUtils.setGutenbergExperiments( [
 			'gutenberg-content-only-inspector-fields',
 		] );

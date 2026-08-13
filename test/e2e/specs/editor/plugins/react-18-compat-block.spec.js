@@ -13,7 +13,12 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 // support for function components. The assertions below describe the desired
 // end state and act as a checklist for that work.
 test.describe( 'React 18 compatibility block (React 19 runtime)', () => {
-	test.beforeAll( async ( { requestUtils } ) => {
+	test.beforeAll( async ( { requestUtils, isGutenbergPluginActive } ) => {
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			! isGutenbergPluginActive,
+			'gutenberg-react-19 experiment requires Gutenberg plugin'
+		);
 		await requestUtils.setGutenbergExperiments( [ 'gutenberg-react-19' ] );
 		await requestUtils.activatePlugin(
 			'gutenberg-test-react-18-compat-block'
