@@ -109,7 +109,5 @@ export const route = {
 				{ undoIgnore: true }
 			);
 		}
-
-		return { postId };
 	},
 };
