@@ -83,18 +83,6 @@ export default {
 	},
 };
 
-/**
- * Resets the text shadow block support attribute. This can be used when
- * disabling the text shadow support controls for a block via a progressive
- * discovery panel.
- *
- * @param {Object} props               Block props.
- * @param {Object} props.setAttributes Function to set block's attributes.
- */
-export function resetTextShadow( { setAttributes } ) {
-	setAttributes( { textShadow: undefined } );
-}
-
 addFilter(
 	'blocks.registerBlockType',
 	'core/textShadow/addAttribute',
