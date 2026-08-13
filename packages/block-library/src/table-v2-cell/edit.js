@@ -11,7 +11,7 @@ import {
 	ToolbarDropdownMenu,
 } from '@wordpress/components';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	border,
@@ -205,9 +205,29 @@ export default function TableCellEdit( {
 			return;
 		}
 
-		const { rowIndex } = selectedCellLocation;
+		let startRow = selectedCellLocation.rowIndex;
+		let endRow = selectedCellLocation.rowIndex;
+
+		if ( isCellSetSelection ) {
+			const selectedPlacements = cellPlacements.filter( ( placement ) =>
+				selectedClientIds.includes( placement.cell.clientId )
+			);
+			if ( selectedPlacements.length ) {
+				startRow = Math.min(
+					...selectedPlacements.map( ( p ) => p.rowIndex )
+				);
+				endRow = Math.max(
+					...selectedPlacements.map( ( p ) => p.rowIndex )
+				);
+			}
+		}
+
 		const rowCellIds = cellPlacements
-			.filter( ( placement ) => placement.rowIndex === rowIndex )
+			.filter(
+				( placement ) =>
+					placement.rowIndex >= startRow &&
+					placement.rowIndex <= endRow
+			)
 			.map( ( placement ) => placement.cell.clientId );
 
 		multiSelectSet( rowCellIds );
@@ -218,9 +238,29 @@ export default function TableCellEdit( {
 			return;
 		}
 
-		const { columnIndex } = selectedCellLocation;
+		let startColumn = selectedCellLocation.columnIndex;
+		let endColumn = selectedCellLocation.columnIndex;
+
+		if ( isCellSetSelection ) {
+			const selectedPlacements = cellPlacements.filter( ( placement ) =>
+				selectedClientIds.includes( placement.cell.clientId )
+			);
+			if ( selectedPlacements.length ) {
+				startColumn = Math.min(
+					...selectedPlacements.map( ( p ) => p.columnIndex )
+				);
+				endColumn = Math.max(
+					...selectedPlacements.map( ( p ) => p.columnIndex )
+				);
+			}
+		}
+
 		const columnCellIds = cellPlacements
-			.filter( ( placement ) => placement.columnIndex === columnIndex )
+			.filter(
+				( placement ) =>
+					placement.columnIndex >= startColumn &&
+					placement.columnIndex <= endColumn
+			)
 			.map( ( placement ) => placement.cell.clientId );
 
 		multiSelectSet( columnCellIds );
@@ -250,15 +290,57 @@ export default function TableCellEdit( {
 		} );
 	}
 
+	const selectedRowCount = useMemo( () => {
+		if ( ! isCellSetSelection ) {
+			return 1;
+		}
+		const selectedPlacements = cellPlacements.filter( ( placement ) =>
+			selectedClientIds.includes( placement.cell.clientId )
+		);
+		if ( ! selectedPlacements.length ) {
+			return 1;
+		}
+		const minRow = Math.min(
+			...selectedPlacements.map( ( p ) => p.rowIndex )
+		);
+		const maxRow = Math.max(
+			...selectedPlacements.map( ( p ) => p.rowIndex )
+		);
+		return maxRow - minRow + 1;
+	}, [ isCellSetSelection, cellPlacements, selectedClientIds ] );
+
+	const selectedColumnCount = useMemo( () => {
+		if ( ! isCellSetSelection ) {
+			return 1;
+		}
+		const selectedPlacements = cellPlacements.filter( ( placement ) =>
+			selectedClientIds.includes( placement.cell.clientId )
+		);
+		if ( ! selectedPlacements.length ) {
+			return 1;
+		}
+		const minColumn = Math.min(
+			...selectedPlacements.map( ( p ) => p.columnIndex )
+		);
+		const maxColumn = Math.max(
+			...selectedPlacements.map( ( p ) => p.columnIndex )
+		);
+		return maxColumn - minColumn + 1;
+	}, [ isCellSetSelection, cellPlacements, selectedClientIds ] );
+
 	const tableControls = [
 		{
 			icon: tableRowAfter,
-			title: __( 'Select row' ),
+			title:
+				selectedRowCount > 1 ? __( 'Select rows' ) : __( 'Select row' ),
 			onClick: onSelectRow,
 		},
 		{
 			icon: tableColumnAfter,
-			title: __( 'Select column' ),
+			title:
+				selectedColumnCount > 1
+					? __( 'Select columns' )
+					: __( 'Select column' ),
 			onClick: onSelectColumn,
 		},
 		{
