@@ -94,7 +94,7 @@ export default function BlockParentSelector() {
 			/>
 			{ showInserter && (
 				<Inserter
-					position="bottom center"
+					position="bottom right"
 					rootClientId={ parentClientId }
 					clientId={ nextSiblingClientId }
 					isAppender={ ! nextSiblingClientId }
