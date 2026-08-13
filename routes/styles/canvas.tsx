@@ -23,7 +23,7 @@ function Canvas() {
 	// The style book reads the theme's colors and typography from the editor
 	// settings. It cannot fall back to the editor store here, because on this
 	// route nothing mounts the editor that would populate it.
-	const { editorSettings } = useEditorSettings( {
+	const { isReady: settingsReady, editorSettings } = useEditorSettings( {
 		stylesId: globalStylesId,
 	} );
 
@@ -39,7 +39,10 @@ function Canvas() {
 		} );
 	};
 
-	if ( ! assetsReady ) {
+	// Settings are awaited as well as assets: an unresolved `editorSettings` is
+	// still an object, so it would suppress the style book's own fallback and
+	// render a first pass with no theme styles.
+	if ( ! assetsReady || ! settingsReady ) {
 		return (
 			<div
 				style={ {
