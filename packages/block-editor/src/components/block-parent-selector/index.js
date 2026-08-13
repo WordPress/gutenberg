@@ -36,27 +36,30 @@ export default function BlockParentSelector() {
 				selectedBlockClientId
 			);
 			const parents = getBlockParents( selectedBlockClientId );
-			const _parentClientId =
-				parentSection ?? parents[ parents.length - 1 ];
+			const immediateParentClientId = parents[ parents.length - 1 ];
+			const _parentClientId = parentSection ?? immediateParentClientId;
 			const parentBlockType = getBlockType(
 				getBlockName( _parentClientId )
 			);
 			// A wrapper that merges with the text flow (list, quote) grows
 			// by typing: Enter continues it, and users know that. Any
-			// other parent gets an explicit affordance to add a child;
-			// the Inserter hides itself when nothing is insertable.
+			// other parent gets a plus button to add a child; the Inserter
+			// hides itself when nothing is insertable.
 			const isTextFlowWrapper =
 				parentBlockType?.merge ||
 				hasBlockSupport( parentBlockType, '__experimentalOnMerge' );
-			// The child of the parent on the selection's path: the selected
-			// block itself unless the parent is a section further up.
-			const childClientId =
-				parents[ parents.indexOf( _parentClientId ) + 1 ] ??
-				selectedBlockClientId;
 			return {
 				parentClientId: _parentClientId,
-				nextSiblingClientId: getNextBlockClientId( childClientId ),
-				showInserter: !! _parentClientId && ! isTextFlowWrapper,
+				nextSiblingClientId: getNextBlockClientId(
+					selectedBlockClientId
+				),
+				// When the shown parent is a section further up the tree
+				// rather than the direct parent, its content is locked and
+				// nothing can be inserted, so no button.
+				showInserter:
+					!! _parentClientId &&
+					_parentClientId === immediateParentClientId &&
+					! isTextFlowWrapper,
 			};
 		},
 		[]
