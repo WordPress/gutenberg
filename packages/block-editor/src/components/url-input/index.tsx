@@ -3,7 +3,14 @@ import clsx from 'clsx';
 import { speak } from '@wordpress/a11y';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { useEffect, useRef, useState } from '@wordpress/element';
-import { UP, DOWN, ENTER, TAB, ESCAPE } from '@wordpress/keycodes';
+import {
+	UP,
+	DOWN,
+	ENTER,
+	TAB,
+	ESCAPE,
+	withIgnoreIMEEvents,
+} from '@wordpress/keycodes';
 import {
 	BaseControl,
 	Button,
@@ -332,7 +339,7 @@ export default function URLInput( props: URLInputProps ) {
 		}
 	}
 
-	function handleKeyDown( event: KeyboardEvent< HTMLInputElement > ) {
+	const handleNonIMEKeyDown = useEvent( ( event: KeyboardEvent< HTMLInputElement > ) => {
 		onKeyDown?.( event );
 
 		// When closing on navigate-outside is enabled, Escape dismisses a
@@ -424,7 +431,15 @@ export default function URLInput( props: URLInputProps ) {
 				break;
 			}
 		}
-	}
+	} );
+
+	// Keystrokes within an IME composition control the IME, not the field.
+	// The default control filters them out by itself; wrapping covers inputs
+	// mounted by `__experimentalRenderControl` consumers. The wrapper can't
+	// take the handler's closure directly: `react-hooks/refs` rejects passing
+	// a closure that reaches refs to a render-time call, while `useEvent`'s
+	// stable callback is fine to wrap.
+	const handleKeyDown = withIgnoreIMEEvents( handleNonIMEKeyDown );
 
 	// The handlers detect focus moving outside of the component. They are
 	// bound to both the input and the suggestions list, which share the
