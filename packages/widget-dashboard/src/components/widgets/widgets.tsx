@@ -124,14 +124,22 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 				( type ) => type.name === widget.type
 			);
 			const hasSettings = !! widgetType?.attributes?.length;
-			const hasActions = !! widgetType?.actions?.length;
 
 			const isFullBleed = widgetType?.presentation === 'full-bleed';
+
+			// The chrome footer is the prominent surface for high-relevance
+			// actions, so the menu takes the rest. full-bleed widgets have no
+			// footer and keep every action in the menu.
+			const actions = widgetType?.actions ?? [];
+			const menuActions = isFullBleed
+				? actions
+				: actions.filter( ( action ) => action.relevance !== 'high' );
+			const hasActions = menuActions.length > 0;
 
 			// The active mode's controls: layout while customizing, the
 			// attribute controls (high-relevance fields on the prominent
 			// surface, plus a settings entry point when needed) and the
-			// declared actions otherwise.
+			// menu actions otherwise.
 			let controls: React.ReactNode;
 			if ( editMode ) {
 				controls = <WidgetLayoutControls widget={ widget } />;
@@ -146,7 +154,7 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 						) }
 
 						{ hasActions && (
-							<WidgetActions widgetType={ widgetType } />
+							<WidgetActions actions={ menuActions } />
 						) }
 					</>
 				);

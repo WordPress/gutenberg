@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### New Features
+
+-   Widget chrome footer: `relevance: 'high'` actions materialize as a
+    persistent strip under the widget body. Actions without an icon mount as
+    leading text links, actions with one as trailing icon-only links; the
+    "More" menu keeps the remaining actions, and full-bleed widgets keep every
+    action in the menu ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
+
 ## 0.5.0 (2026-08-12)
 
 ### New Features

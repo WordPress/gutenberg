@@ -6,7 +6,7 @@ import '@wordpress/components/build-style/style.css';
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '@wordpress/dataviews/build-style/style.css';
 import { useState } from '@wordpress/element';
-import { chartBar, trendingUp } from '@wordpress/icons';
+import { chartBar, download, trendingUp } from '@wordpress/icons';
 import type {
 	ResolveWidgetModule,
 	WidgetAction,
@@ -243,19 +243,30 @@ const GOAL_FIELDS: WidgetAttributeField< GoalAttributes >[] = [
 	},
 ];
 
-// Two declarative actions: an external link and a client-side download.
+// Three declarative actions: two at high relevance for the chrome footer (a
+// text link and an icon-carrying download), one at the default relevance for
+// the More menu.
 const GOAL_ACTIONS: WidgetAction[] = [
 	{
 		id: 'view-goal',
 		label: 'View goal details',
+		relevance: 'high',
 		href: 'https://wordpress.org/',
 		openInNewTab: true,
 	},
 	{
 		id: 'export-progress',
 		label: 'Export progress',
+		relevance: 'high',
+		icon: download,
 		href: new URL( './goal-progress.csv', import.meta.url ).href,
 		download: 'goal-progress.csv',
+	},
+	{
+		id: 'about-goals',
+		label: 'About goals',
+		href: 'https://wordpress.org/documentation/',
+		openInNewTab: true,
 	},
 ];
 
@@ -266,7 +277,7 @@ const goalProgressWidgetType: WidgetType = {
 	description: 'Sample goal widget whose attributes are all promoted.',
 	help: {
 		content:
-			'One attribute, <strong>Goal metric</strong>, at <strong>high</strong> relevance: a single field in the header and no settings button. Two actions in the <strong>More</strong> menu: a link and a download.',
+			'One attribute, <strong>Goal metric</strong>, at <strong>high</strong> relevance: a single field in the header and no settings button. Two promoted actions in the footer (a link and a download), plus one in the <strong>More</strong> menu.',
 	},
 	icon: trendingUp,
 	renderModule: 'demo/widgets/goal-progress/render',
@@ -428,7 +439,7 @@ Their tiles compare the header presentations:
 
 The widget only declares relevance; the fit is measured by the chrome, so the same declaration adapts to any tile width. Resize the canvas to watch the headers switch presentations.
 
-Beyond attributes, \`demo/goal-progress\` declares two \`actions\`: a "View goal details" link and an "Export progress" download. The host surfaces them in a "More" menu in the toolbar, so the widget declares each action as data and the host owns where it appears.
+Beyond attributes, \`demo/goal-progress\` declares three \`actions\`, and the same relevance policy routes them: the two at \`relevance: 'high'\` materialize in a persistent chrome footer (the "View goal details" text link on the leading edge; the icon-carrying "Export progress" download as an icon-only link on the trailing edge), while "About goals" stays at the default relevance and lands in the "More" menu. The widget declares each action as data plus its importance; the host owns the surfaces.
 
 Each type also carries a \`help\` note, opened from the info icon in the header, that describes its attributes and what they do.
 `,
