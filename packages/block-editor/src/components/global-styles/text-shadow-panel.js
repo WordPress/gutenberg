@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	Button,
@@ -13,15 +10,7 @@ import {
 import { Stack } from '@wordpress/ui';
 import { useRef, useMemo } from '@wordpress/element';
 import { shadow as textShadowIcon, Icon, reset } from '@wordpress/icons';
-
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * Internal dependencies
- */
 import { useSettings } from '../use-settings';
 
 /**

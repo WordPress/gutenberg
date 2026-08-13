@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, isRTL } from '@wordpress/i18n';
 import {
 	__experimentalItemGroup as ItemGroup,
@@ -8,10 +5,6 @@ import {
 } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { Subtitle } from './subtitle';
 import { NavigationButtonAsItem } from './navigation-button';
 

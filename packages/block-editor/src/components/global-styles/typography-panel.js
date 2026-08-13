@@ -788,7 +788,11 @@ export default function TypographyPanel( {
 
 	// Text Shadow
 	const hasTextShadowControl = useHasTextShadowControl( settings );
-	const textShadow = inheritedValue?.typography?.textShadow;
+	const inheritedTextShadow = inheritedValue?.typography?.textShadow;
+	const textShadow = value?.typography?.textShadow ?? inheritedTextShadow;
+	const isTextShadowPlaceholder =
+		! hasValue( value?.typography?.textShadow ) &&
+		hasValue( inheritedTextShadow );
 	const setTextShadow = ( newValue ) => {
 		onChange(
 			setImmutably(
@@ -798,7 +802,7 @@ export default function TypographyPanel( {
 			)
 		);
 	};
-	const hasTextShadow = () => !! value?.typography?.textShadow;
+	const hasTextShadow = () => hasValue( value?.typography?.textShadow );
 	const resetTextShadow = () => setTextShadow( undefined );
 
 	const resetAllFilter = useCallback(
@@ -1137,7 +1141,11 @@ export default function TypographyPanel( {
 				</InheritanceToolsPanelItem>
 			) }
 			{ hasTextShadowControl && (
-				<ToolsPanelItem
+				<InheritanceToolsPanelItem
+					{ ...inheritanceProps(
+						isTextShadowPlaceholder,
+						hasTextShadow() && inheritedTextShadow !== undefined
+					) }
 					label={ __( 'Text shadow' ) }
 					hasValue={ hasTextShadow }
 					onDeselect={ resetTextShadow }
@@ -1148,7 +1156,7 @@ export default function TypographyPanel( {
 						textShadow={ textShadow }
 						onChange={ setTextShadow }
 					/>
-				</ToolsPanelItem>
+				</InheritanceToolsPanelItem>
 			) }
 			{ hasTextAlignmentControl && (
 				<InheritanceToolsPanelItem

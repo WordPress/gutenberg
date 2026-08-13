@@ -1,44 +1,22 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalSpacer as Spacer,
 	__experimentalItemGroup as ItemGroup,
-	__experimentalInputControl as InputControl,
 	__experimentalUnitControl as UnitControl,
 	__experimentalGrid as Grid,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	useNavigator,
-	__experimentalConfirmDialog as ConfirmDialog,
 	Dropdown,
 	Button,
-	Flex,
 	FlexItem,
 	ColorPalette,
-	Modal,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	plus,
-	typography as typographyIcon,
-	reset,
-	moreVertical,
-} from '@wordpress/icons';
+import { plus, typography as typographyIcon, reset } from '@wordpress/icons';
 import { useState, useMemo, useLayoutEffect, useRef } from '@wordpress/element';
 import type { TextShadowPreset } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { Subtitle } from './subtitle';
-import { ScreenHeader } from './screen-header';
 import { ScreenBody } from './screen-body';
 import { DEFAULT_TEXT_SHADOW } from './screen-text-shadows';
 import {
@@ -47,235 +25,125 @@ import {
 	textShadowObjectToString,
 	type TextShadowObject,
 } from './shadow-utils';
-import { useSetting } from './hooks';
-import { unlock } from './lock-unlock';
-
-const { Menu } = unlock( componentsPrivateApis );
-
-const customTextShadowMenuItems = [
-	{
-		label: __( 'Rename' ),
-		action: 'rename',
-	},
-	{
-		label: __( 'Delete' ),
-		action: 'delete',
-	},
-];
-
-const presetTextShadowMenuItems = [
-	{
-		label: __( 'Reset' ),
-		action: 'reset',
-	},
-];
+import { usePresets } from './presets/use-presets';
+import PresetEditHeader from './presets/preset-edit-header';
+import type { PresetEditHeaderMenuItem } from './presets/preset-edit-header';
+import ConfirmDeleteDialog from './presets/dialogs/confirm-delete-dialog';
+import RenameDialog from './presets/dialogs/rename-dialog';
 
 export default function ScreenTextShadowsEdit() {
 	const { goBack, params } = useNavigator();
-	const { category, slug } = params;
+	const origin = params.category as string;
+	const slug = params.slug as string;
 
-	const [ textShadows, setTextShadows ] = useSetting(
-		`typography.textShadowPresets.${ category }`
-	);
-	const [ baseTextShadows ] = useSetting(
-		`typography.textShadowPresets.${ category }`,
-		undefined,
-		'base'
+	const { presets, basePresets, setPresets } = usePresets< TextShadowPreset >(
+		'typography.textShadowPresets',
+		origin
 	);
 
-	const selectedTextShadow = useMemo(
-		() =>
-			( textShadows || [] ).find(
-				( textShadow: TextShadowPreset ) => textShadow.slug === slug
-			),
-		[ textShadows, slug ]
-	);
-	const baseSelectedTextShadow = useMemo(
-		() =>
-			( baseTextShadows || [] ).find(
-				( b: TextShadowPreset ) => b.slug === slug
-			),
-		[ baseTextShadows, slug ]
-	);
-	const [ isConfirmDialogVisible, setIsConfirmDialogVisible ] =
-		useState( false );
-	const [ isRenameModalVisible, setIsRenameModalVisible ] = useState( false );
-	const [ textShadowName, setTextShadowName ] = useState<
-		string | undefined
-	>( selectedTextShadow?.name );
+	const textShadow = presets.find( ( p ) => p.slug === slug );
+
+	const [ isDeleteOpen, setIsDeleteOpen ] = useState( false );
+	const [ isRenameOpen, setIsRenameOpen ] = useState( false );
 
 	// If the edited preset no longer exists (deleted, reset, or an invalid
 	// deep link), navigate back.
 	useLayoutEffect( () => {
-		if ( !! slug && ! selectedTextShadow ) {
+		if ( !! slug && ! textShadow ) {
 			goBack();
 		}
-	}, [ slug, selectedTextShadow, goBack ] );
+	}, [ slug, textShadow, goBack ] );
 
-	if ( ! category || ! slug || ! selectedTextShadow ) {
+	if ( ! origin || ! slug || ! textShadow ) {
 		return null;
 	}
 
-	const onTextShadowChange = ( textShadow: string ) => {
-		setTextShadows(
-			textShadows.map( ( s: TextShadowPreset ) =>
-				s.slug === slug ? { ...s, textShadow } : s
+	const baseTextShadow = basePresets.find( ( p ) => p.slug === slug );
+
+	const onTextShadowChange = ( value: string ) =>
+		setPresets(
+			presets.map( ( p ) =>
+				p.slug === slug ? { ...textShadow, textShadow: value } : p
 			)
 		);
-	};
 
-	const onMenuClick = ( action: string ) => {
-		if ( action === 'reset' ) {
-			if ( ! baseSelectedTextShadow ) {
-				return;
-			}
-			setTextShadows(
-				textShadows.map( ( s: TextShadowPreset ) =>
-					s.slug === slug ? baseSelectedTextShadow : s
-				)
-			);
-		} else if ( action === 'delete' ) {
-			setIsConfirmDialogVisible( true );
-		} else if ( action === 'rename' ) {
-			setIsRenameModalVisible( true );
-		}
-	};
-
-	const handleTextShadowDelete = () => {
-		setTextShadows(
-			textShadows.filter( ( s: TextShadowPreset ) => s.slug !== slug )
-		);
-	};
-
-	const handleTextShadowRename = ( newName: string | undefined ) => {
-		if ( ! newName ) {
-			return;
-		}
-		setTextShadows(
-			textShadows.map( ( s: TextShadowPreset ) =>
-				s.slug === slug ? { ...s, name: newName } : s
-			)
-		);
-	};
+	const menuItems: PresetEditHeaderMenuItem[] =
+		origin === 'custom'
+			? [
+					{
+						label: __( 'Rename' ),
+						onClick: () => setIsRenameOpen( true ),
+					},
+					{
+						label: __( 'Delete' ),
+						onClick: () => setIsDeleteOpen( true ),
+					},
+			  ]
+			: [
+					{
+						label: __( 'Reset' ),
+						onClick: () => {
+							if ( ! baseTextShadow ) {
+								return;
+							}
+							setPresets(
+								presets.map( ( p ) =>
+									p.slug === slug ? baseTextShadow : p
+								)
+							);
+						},
+						disabled:
+							textShadow.textShadow ===
+							baseTextShadow?.textShadow,
+					},
+			  ];
 
 	return (
 		<>
-			<Stack direction="row" justify="space-between" align="center">
-				<ScreenHeader title={ selectedTextShadow.name } />
-				<Spacer marginTop={ 2 } marginBottom={ 0 } paddingX={ 4 }>
-					<Menu>
-						<Menu.TriggerButton
-							render={
-								<Button
-									size="small"
-									icon={ moreVertical }
-									label={ __( 'Menu' ) }
-								/>
-							}
-						/>
-						<Menu.Popover>
-							{ ( category === 'custom'
-								? customTextShadowMenuItems
-								: presetTextShadowMenuItems
-							).map( ( item ) => (
-								<Menu.Item
-									key={ item.action }
-									onClick={ () => onMenuClick( item.action ) }
-									disabled={
-										item.action === 'reset' &&
-										selectedTextShadow.textShadow ===
-											baseSelectedTextShadow?.textShadow
-									}
-								>
-									<Menu.ItemLabel>
-										{ item.label }
-									</Menu.ItemLabel>
-								</Menu.Item>
-							) ) }
-						</Menu.Popover>
-					</Menu>
-				</Spacer>
-			</Stack>
+			<PresetEditHeader
+				title={ textShadow.name }
+				menuLabel={ __( 'Menu' ) }
+				menuItems={ menuItems }
+			/>
 			<ScreenBody>
-				<TextShadowsPreview
-					textShadow={ selectedTextShadow.textShadow }
-				/>
+				<TextShadowsPreview textShadow={ textShadow.textShadow } />
 				<TextShadowEditor
-					textShadow={ selectedTextShadow.textShadow }
+					textShadow={ textShadow.textShadow }
 					onChange={ onTextShadowChange }
 				/>
 			</ScreenBody>
-			{ isConfirmDialogVisible && (
-				<ConfirmDialog
-					isOpen
-					onConfirm={ () => {
-						handleTextShadowDelete();
-						setIsConfirmDialogVisible( false );
-					} }
-					onCancel={ () => {
-						setIsConfirmDialogVisible( false );
-					} }
-					confirmButtonText={ __( 'Delete' ) }
-					size="medium"
-				>
-					{ sprintf(
+			{ isDeleteOpen && (
+				<ConfirmDeleteDialog
+					message={ sprintf(
 						/* translators: %s: Name of the text shadow preset. */
 						__(
 							'Are you sure you want to delete "%s" text shadow preset?'
 						),
-						selectedTextShadow.name
+						textShadow.name
 					) }
-				</ConfirmDialog>
+					isOpen={ isDeleteOpen }
+					toggleOpen={ () => setIsDeleteOpen( false ) }
+					onConfirm={ () => {
+						setPresets(
+							presets.filter( ( p ) => p.slug !== slug )
+						);
+						goBack();
+					} }
+				/>
 			) }
-			{ isRenameModalVisible && (
-				<Modal
-					title={ __( 'Rename' ) }
-					onRequestClose={ () => setIsRenameModalVisible( false ) }
-					size="small"
-				>
-					<form
-						onSubmit={ ( event ) => {
-							event.preventDefault();
-							handleTextShadowRename( textShadowName );
-							setIsRenameModalVisible( false );
-						} }
-					>
-						<InputControl
-							autoComplete="off"
-							label={ __( 'Name' ) }
-							placeholder={ __( 'Text shadow name' ) }
-							value={ textShadowName ?? '' }
-							onChange={ setTextShadowName }
-						/>
-						<Spacer marginBottom={ 6 } />
-						<Flex
-							className="block-editor-shadow-edit-modal__actions"
-							justify="flex-end"
-							expanded={ false }
-						>
-							<FlexItem>
-								<Button
-									__next40pxDefaultSize
-									variant="tertiary"
-									onClick={ () =>
-										setIsRenameModalVisible( false )
-									}
-								>
-									{ __( 'Cancel' ) }
-								</Button>
-							</FlexItem>
-							<FlexItem>
-								<Button
-									__next40pxDefaultSize
-									variant="primary"
-									type="submit"
-								>
-									{ __( 'Save' ) }
-								</Button>
-							</FlexItem>
-						</Flex>
-					</form>
-				</Modal>
+			{ isRenameOpen && (
+				<RenameDialog
+					initialName={ textShadow.name }
+					placeholder={ __( 'Text shadow name' ) }
+					toggleOpen={ () => setIsRenameOpen( false ) }
+					onRename={ ( name ) =>
+						setPresets(
+							presets.map( ( p ) =>
+								p.slug === slug ? { ...p, name } : p
+							)
+						)
+					}
+				/>
 			) }
 		</>
 	);
