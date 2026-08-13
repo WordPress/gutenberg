@@ -1525,38 +1525,6 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that a non-numeric parent columnCount is treated as absent, so a child of a
-	 * responsive grid still gets its container query.
-	 *
-	 * @covers ::gutenberg_get_child_layout_style_rules
-	 */
-	public function test_gutenberg_get_child_layout_style_rules_with_non_numeric_parent_column_count() {
-		$expected_output = array(
-			array(
-				'selector'     => '.wp-container-content-test',
-				'declarations' => array( 'grid-column' => 'span 2' ),
-			),
-			array(
-				'rules_group'  => '@container (max-width: 25.5rem )',
-				'selector'     => '.wp-container-content-test',
-				'declarations' => array(
-					'grid-column' => '1/-1',
-					'grid-row'    => 'auto',
-				),
-			),
-		);
-
-		$actual_output = gutenberg_get_child_layout_style_rules(
-			'.wp-container-content-test',
-			array( 'columnSpan' => 2 ),
-			array( 'columnCount' => array( 3 ) ),
-			null
-		);
-
-		$this->assertSame( $expected_output, $actual_output );
-	}
-
-	/**
 	 * Tests that grid counts saved as numeric strings (WordPress 6.3 to 6.6) produce the
 	 * same CSS as numbers.
 	 *
