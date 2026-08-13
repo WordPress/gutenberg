@@ -1474,44 +1474,34 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that non-numeric grid counts and a non-string minimumColumnWidth are treated as
-	 * absent instead of leaking into the CSS. Each case leaves the other attributes valid so
-	 * that the branch the guard protects is actually reached.
+	 * Tests that non-numeric grid counts are treated as absent instead of leaking into the
+	 * CSS. The rowCount case keeps columnCount valid, because the row track rule is only
+	 * reached when there is a column count.
 	 *
-	 * @dataProvider data_gutenberg_get_layout_style_with_non_numeric_grid_values
+	 * @dataProvider data_gutenberg_get_layout_style_with_non_numeric_grid_counts
 	 *
 	 * @covers ::gutenberg_get_layout_style
 	 *
 	 * @param array  $layout          Grid layout values.
 	 * @param string $expected_output The expected output.
 	 */
-	public function test_gutenberg_get_layout_style_with_non_numeric_grid_values( $layout, $expected_output ) {
+	public function test_gutenberg_get_layout_style_with_non_numeric_grid_counts( $layout, $expected_output ) {
 		$this->assertSame( $expected_output, gutenberg_get_layout_style( '.wp-layout', $layout ) );
 	}
 
 	/**
-	 * Data provider for test_gutenberg_get_layout_style_with_non_numeric_grid_values().
+	 * Data provider for test_gutenberg_get_layout_style_with_non_numeric_grid_counts().
 	 *
 	 * @return array
 	 */
-	public function data_gutenberg_get_layout_style_with_non_numeric_grid_values() {
+	public function data_gutenberg_get_layout_style_with_non_numeric_grid_counts() {
 		return array(
-			'every value unusable falls back to the responsive default' => array(
+			'non-numeric columnCount falls back to the responsive default' => array(
 				'layout'          => array(
-					'type'               => 'grid',
-					'columnCount'        => array( 3 ),
-					'rowCount'           => array( 2 ),
-					'minimumColumnWidth' => array( '20rem' ),
+					'type'        => 'grid',
+					'columnCount' => array( 3 ),
 				),
 				'expected_output' => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(min(12rem, 100%), 1fr));container-type:inline-size;}',
-			),
-			'non-string minimumColumnWidth drops the container query' => array(
-				'layout'          => array(
-					'type'               => 'grid',
-					'columnCount'        => 3,
-					'minimumColumnWidth' => array( '20rem' ),
-				),
-				'expected_output' => '.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));}',
 			),
 			'non-numeric rowCount drops the row track rule' => array(
 				'layout'          => array(
@@ -1521,38 +1511,6 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => '.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));}',
 			),
-		);
-	}
-
-	/**
-	 * Tests that a viewport still gets `container-type` when the default viewport's
-	 * minimumColumnWidth is unusable. The default viewport skips the declaration in that
-	 * case, so the viewport rule must not assume it was already written.
-	 *
-	 * @covers ::gutenberg_get_layout_style
-	 */
-	public function test_gutenberg_get_layout_style_sets_container_type_when_base_minimum_column_width_is_unusable() {
-		$layout_styles = gutenberg_get_layout_style(
-			'.wp-layout',
-			array(
-				'type'               => 'grid',
-				'columnCount'        => 3,
-				'minimumColumnWidth' => array( '9rem' ),
-			),
-			false,
-			null,
-			false,
-			'0.5em',
-			null,
-			array(
-				'viewport_overrides' => array( 'minimumColumnWidth' => '20rem' ),
-				'rules_group'        => '@media (min-width: 600px)',
-			)
-		);
-
-		$this->assertSame(
-			'@media (min-width: 600px){.wp-layout{grid-template-columns:repeat(auto-fill, minmax(max(min(20rem, 100%), (100% - (0.5em * (3 - 1))) /3), 1fr));container-type:inline-size;}}',
-			$layout_styles
 		);
 	}
 

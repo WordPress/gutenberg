@@ -835,15 +835,12 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 	} elseif ( 'grid' === $layout_type ) {
 		/*
 		 * Column and row counts are whole numbers, for the same reason as the grid line
-		 * numbers in gutenberg_get_child_layout_style_rules(). minimumColumnWidth is a CSS
-		 * length, so only a string is usable.
+		 * numbers in gutenberg_get_child_layout_style_rules().
 		 */
-		$column_count_attr         = $layout_for_styles['columnCount'] ?? null;
-		$column_count              = is_numeric( $column_count_attr ) ? (int) $column_count_attr : null;
-		$row_count_attr            = $layout_for_styles['rowCount'] ?? null;
-		$row_count                 = is_numeric( $row_count_attr ) ? (int) $row_count_attr : null;
-		$minimum_column_width_attr = $layout_for_styles['minimumColumnWidth'] ?? null;
-		$minimum_column_width      = is_string( $minimum_column_width_attr ) ? $minimum_column_width_attr : null;
+		$column_count_attr = $layout_for_styles['columnCount'] ?? null;
+		$column_count      = is_numeric( $column_count_attr ) ? (int) $column_count_attr : null;
+		$row_count_attr    = $layout_for_styles['rowCount'] ?? null;
+		$row_count         = is_numeric( $row_count_attr ) ? (int) $row_count_attr : null;
 
 		/*
 		 * If the gap value is an array, we use the "left" value because it represents the vertical gap, which
@@ -890,7 +887,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		 * value for any of the grid properties.
 		 */
 		$should_output_grid_columns = null === $viewport_overrides || $has_viewport_property_override( 'minimumColumnWidth' ) || $has_viewport_property_override( 'columnCount' ) || $has_viewport_property_override( 'autoFit' );
-		$uses_gap_in_grid_columns   = ! empty( $column_count ) && ! empty( $minimum_column_width );
+		$uses_gap_in_grid_columns   = ! empty( $column_count ) && ! empty( $layout_for_styles['minimumColumnWidth'] );
 		if ( $has_block_gap_override && $uses_gap_in_grid_columns ) {
 			$should_output_grid_columns = true;
 		}
@@ -903,26 +900,19 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		 */
 		$auto_placement = ! empty( $layout_for_styles['autoFit'] ) ? 'auto-fit' : 'auto-fill';
 
-		if ( $should_output_grid_columns && ! empty( $column_count ) && ! empty( $minimum_column_width ) ) {
-			$max_value                                  = 'max(min(' . $minimum_column_width . ', 100%), (100% - (' . $responsive_gap_value . ' * (' . $column_count . ' - 1))) /' . $column_count . ')';
+		if ( $should_output_grid_columns && ! empty( $column_count ) && ! empty( $layout_for_styles['minimumColumnWidth'] ) ) {
+			$max_value                                  = 'max(min(' . $layout_for_styles['minimumColumnWidth'] . ', 100%), (100% - (' . $responsive_gap_value . ' * (' . $column_count . ' - 1))) /' . $column_count . ')';
 			$grid_declarations['grid-template-columns'] = 'repeat(' . $auto_placement . ', minmax(' . $max_value . ', 1fr))';
 		} elseif ( $should_output_grid_columns && ! empty( $column_count ) ) {
 			$grid_declarations['grid-template-columns'] = 'repeat(' . $column_count . ', minmax(0, 1fr))';
 		} elseif ( $should_output_grid_columns ) {
-			$responsive_column_width                    = ! empty( $minimum_column_width ) ? $minimum_column_width : '12rem';
-			$grid_declarations['grid-template-columns'] = 'repeat(' . $auto_placement . ', minmax(min(' . $responsive_column_width . ', 100%), 1fr))';
+			$minimum_column_width                       = ! empty( $layout_for_styles['minimumColumnWidth'] ) ? $layout_for_styles['minimumColumnWidth'] : '12rem';
+			$grid_declarations['grid-template-columns'] = 'repeat(' . $auto_placement . ', minmax(min(' . $minimum_column_width . ', 100%), 1fr))';
 		}
 
 		if ( ! empty( $grid_declarations ) ) {
-			/*
-			 * This flag records whether the default viewport already set `container-type`, so
-			 * it has to read the base values through the same guards the default viewport pass
-			 * used. Reading them raw would claim a `container-type` that was never written.
-			 */
-			$base_column_count         = is_numeric( $base_layout['columnCount'] ?? null ) ? (int) $base_layout['columnCount'] : null;
-			$base_minimum_column_width = is_string( $base_layout['minimumColumnWidth'] ?? null ) ? $base_layout['minimumColumnWidth'] : null;
-			$base_has_container_type   = empty( $base_column_count ) || ( ! empty( $base_column_count ) && ! empty( $base_minimum_column_width ) );
-			if ( empty( $column_count ) || ! empty( $minimum_column_width ) ) {
+			$base_has_container_type = empty( $base_layout['columnCount'] ) || ( ! empty( $base_layout['columnCount'] ) && ! empty( $base_layout['minimumColumnWidth'] ) );
+			if ( empty( $column_count ) || ! empty( $layout_for_styles['minimumColumnWidth'] ) ) {
 				if ( null === $viewport_overrides || ! $base_has_container_type ) {
 					$grid_declarations['container-type'] = 'inline-size';
 				}
