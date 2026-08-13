@@ -205,13 +205,23 @@ export default function useSelectionObserver() {
 						node.contentEditable === 'true' &&
 						! isMultiSelecting()
 					) {
+						// Only return focus to the editable containing the
+						// selection when the wrapper actually held focus:
+						// a stale native selection can trigger this while
+						// the user works elsewhere (e.g. List View), and
+						// focus must not be pulled into the canvas then.
+						const hadFocus =
+							ownerDocument.activeElement === node &&
+							ownerDocument.hasFocus();
 						setContentEditableWrapper( node, false );
-						let element =
-							startNode.nodeType === startNode.ELEMENT_NODE
-								? startNode
-								: startNode.parentElement;
-						element = element?.closest( '[contenteditable]' );
-						element?.focus();
+						if ( hadFocus ) {
+							let element =
+								startNode.nodeType === startNode.ELEMENT_NODE
+									? startNode
+									: startNode.parentElement;
+							element = element?.closest( '[contenteditable]' );
+							element?.focus();
+						}
 					}
 					return;
 				}
