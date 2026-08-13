@@ -1,14 +1,29 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
-		"composite": true
+		"rootDir": ".",
+		"allowImportingTsExtensions": true,
+		"types": [
+			"jest",
+			"node",
+			"style-imports",
+			"react-css-custom-properties"
+		]
 	},
-	"files": [],
+	"files": [ "global.d.ts" ],
+	"include": [
+		"bin",
+		"terrazzo.config.ts",
+		"*-plugins/test/**/*",
+		"src/**/stories/**/*",
+		"src/**/test/**/*",
+		"src/**/*.story.*"
+	],
 	"references": [
-		{ "path": "../compose" },
-		{ "path": "../style-runtime" },
-		{ "path": "./tsconfig.src.json" },
+		{ "path": "./tsconfig.build.json" },
 		{ "path": "./tsconfig.plugins.json" },
-		{ "path": "./tsconfig.bin.json" }
+		{ "path": "../compose" },
+		{ "path": "../style-runtime" }
 	]
 }
