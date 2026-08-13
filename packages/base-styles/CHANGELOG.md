@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `outset-ring__focus`: Use a `--focus-color` fallback in the outline instead of declaring the custom property locally, so ancestor overrides apply correctly ([#81242](https://github.com/WordPress/gutenberg/pull/81242)).
+
 ## 12.1.0 (2026-08-12)
 
 
