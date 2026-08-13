@@ -758,6 +758,54 @@ describe( 'URLInput', () => {
 			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
 		} );
 
+		it( 'should ignore an Escape that is part of an IME composition', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<ControlledURLInput
+					__experimentalFetchLinkSuggestions={ fetchLinkSuggestions }
+					closeSuggestionsOnNavigateOutside
+					// The default control filters IME keystrokes out by
+					// itself, so the component's own handling is only
+					// reachable through a custom control.
+					__experimentalRenderControl={ (
+						controlProps,
+						{ onChange, suffix, help, ...inputProps }
+					) => (
+						<input
+							{ ...inputProps }
+							onChange={ ( event ) =>
+								onChange( event.target.value )
+							}
+						/>
+					) }
+				/>
+			);
+			const input = screen.getByRole( 'combobox' );
+			await user.click( input );
+			await user.keyboard( 'hello' );
+			await screen.findByRole( 'listbox' );
+
+			// While composing, macOS browsers report the real key along with
+			// the `isComposing` flag…
+			fireEvent.keyDown( input, {
+				...KEY_EVENTS.esc,
+				isComposing: true,
+			} );
+
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+
+			// …and Safari marks the end of a composition by key code alone.
+			fireEvent.keyDown( input, { key: 'Escape', keyCode: 229 } );
+
+			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+
+			// A plain Escape still dismisses the list.
+			fireEvent.keyDown( input, KEY_EVENTS.esc );
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		} );
+
 		it( 'should not open the suggestions while the field is not focused', async () => {
 			const { user, input } = renderURLInput( {
 				value: 'hello',
