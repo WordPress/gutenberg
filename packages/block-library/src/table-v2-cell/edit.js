@@ -391,11 +391,24 @@ export default function TableCellEdit( {
 			return false;
 		}
 		const selectedClientIdSet = new Set( selectedClientIds );
-		return ! cellPlacements.some(
-			( placement ) =>
-				selectedClientIdSet.has( placement.cell.clientId ) &&
-				( ( placement.cell.attributes.rowSpan || 1 ) > 1 ||
-					( placement.cell.attributes.colSpan || 1 ) > 1 )
+		const selectedPlacements = cellPlacements.filter( ( p ) =>
+			selectedClientIdSet.has( p.cell.clientId )
+		);
+		if ( selectedPlacements.length < 2 ) {
+			return false;
+		}
+		// All selected cells must be in the same section.
+		const sectionTypes = new Set(
+			selectedPlacements.map( ( p ) => p.rowType )
+		);
+		if ( sectionTypes.size > 1 ) {
+			return false;
+		}
+		// No selected cell can already be merged.
+		return ! selectedPlacements.some(
+			( p ) =>
+				( p.cell.attributes.rowSpan || 1 ) > 1 ||
+				( p.cell.attributes.colSpan || 1 ) > 1
 		);
 	}, [ isCellSetSelection, cellPlacements, selectedClientIds ] );
 
