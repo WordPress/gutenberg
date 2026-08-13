@@ -49,6 +49,16 @@ function gutenberg_notes_preview_author_color( $user_id ) {
  * @return array[] Threads, in the order the conversations started.
  */
 function gutenberg_notes_preview_get_threads( $post_id ) {
+	static $cache = array();
+
+	$post_id = (int) $post_id;
+
+	// Both the enqueue pass and the render pass want the threads; one query is
+	// enough for either.
+	if ( isset( $cache[ $post_id ] ) ) {
+		return $cache[ $post_id ];
+	}
+
 	$comments = get_comments(
 		array(
 			'post_id'                   => $post_id,
@@ -98,6 +108,8 @@ function gutenberg_notes_preview_get_threads( $post_id ) {
 			$threads[ $parent_id ]['replies'][] = $reply;
 		}
 	}
+
+	$cache[ $post_id ] = $threads;
 
 	return $threads;
 }
@@ -162,9 +174,9 @@ function gutenberg_notes_preview_render_byline( $comment ) {
  *
  * @param int   $note_id  Top-level note ID.
  * @param array $thread   Thread data from gutenberg_notes_preview_get_threads().
- * @param bool  $can_repl Whether the viewer may reply.
+ * @param bool  $can_reply Whether the viewer may reply.
  */
-function gutenberg_notes_preview_render_thread( $note_id, $thread, $can_repl ) {
+function gutenberg_notes_preview_render_thread( $note_id, $thread, $can_reply ) {
 	$comment = $thread['comment'];
 	$color   = gutenberg_notes_preview_author_color( $comment->user_id );
 	$context = array(
@@ -214,7 +226,7 @@ function gutenberg_notes_preview_render_thread( $note_id, $thread, $can_repl ) {
 			);
 		}
 
-		if ( $can_repl && ! $thread['resolved'] ) {
+		if ( $can_reply && ! $thread['resolved'] ) {
 			?>
 			<form class="wp-notes-preview__reply-form" data-wp-on--submit="actions.submitReply">
 				<label class="screen-reader-text" for="wp-notes-preview-reply-<?php echo esc_attr( (string) $note_id ); ?>">
@@ -276,17 +288,6 @@ function gutenberg_notes_preview_render_panel() {
 	}
 
 	$can_reply = current_user_can( 'create_post_notes', $post_id );
-
-	wp_interactivity_state(
-		'gutenberg/notes-preview',
-		array(
-			'postId'       => $post_id,
-			'restUrl'      => rest_url( 'wp/v2/comments' ),
-			'restNonce'    => wp_create_nonce( 'wp_rest' ),
-			'canReply'     => $can_reply,
-			'genericError' => __( 'The reply could not be saved. Please try again.', 'gutenberg' ),
-		)
-	);
 
 	$root_context = array(
 		'selectedId'   => '',
@@ -435,11 +436,30 @@ function gutenberg_notes_preview_enqueue_assets() {
 		return;
 	}
 
+	$post_id = get_queried_object_id();
+
 	wp_enqueue_script_module( '@wordpress/notes-preview' );
 	wp_enqueue_style( 'wp-notes-preview' );
 
+	/*
+	 * Set here rather than alongside the markup: WP_Script_Modules serialises
+	 * the interactivity state on `wp_footer` at priority 10, and the rail
+	 * renders at 100. State added after that point never reaches the page, and
+	 * the reply form would post to nowhere.
+	 */
+	wp_interactivity_state(
+		'gutenberg/notes-preview',
+		array(
+			'postId'       => $post_id,
+			'restUrl'      => rest_url( 'wp/v2/comments' ),
+			'restNonce'    => wp_create_nonce( 'wp_rest' ),
+			'canReply'     => current_user_can( 'create_post_notes', $post_id ),
+			'genericError' => __( 'The reply could not be saved. Please try again.', 'gutenberg' ),
+		)
+	);
+
 	$css = gutenberg_notes_preview_highlight_css(
-		gutenberg_notes_preview_get_threads( get_queried_object_id() )
+		gutenberg_notes_preview_get_threads( $post_id )
 	);
 
 	if ( $css ) {
