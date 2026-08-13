@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Device Preview: Show no viewport as selected in the View menu while the canvas sits at a width set by dragging its edges, so choosing a viewport snaps the canvas back to that viewport's width instead of doing nothing ([#81472](https://github.com/WordPress/gutenberg/issues/81472)).
+-   Device Preview: Show no viewport as selected in the View menu while the canvas sits at a width set by dragging its edges, so choosing a viewport snaps the canvas back to that viewport's width instead of doing nothing ([#81572](https://github.com/WordPress/gutenberg/pull/81572)).
 
 ## 14.53.0 (2026-08-12)
 
