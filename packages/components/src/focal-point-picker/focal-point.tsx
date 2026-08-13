@@ -1,11 +1,4 @@
-/**
- * Internal dependencies
- */
 import { PointerCircle } from './styles/focal-point-style';
-
-/**
- * External dependencies
- */
 import type { FocalPointProps } from './types';
 import type { WordPressComponentProps } from '../context';
 

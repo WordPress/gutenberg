@@ -31,6 +31,8 @@ function gutenberg_register_media_editor_admin_page() {
 
 /**
  * Sets the admin page title before wp-admin/admin-header.php renders.
+ *
+ * @global string $title The admin page title.
  */
 function gutenberg_media_editor_wp_admin_set_title() {
 	global $title;

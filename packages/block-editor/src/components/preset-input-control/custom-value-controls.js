@@ -1,12 +1,7 @@
-/**
- * WordPress dependencies
- */
 import {
 	RangeControl,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
-
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { Tooltip } from '@wordpress/ui';
 
 /**
@@ -72,7 +67,6 @@ export default function CustomValueControls( {
 			onFocus={ onMouseOver }
 			onMouseOut={ onMouseOut }
 			onMouseOver={ onMouseOver }
-			size="__unstable-large"
 			units={ units }
 			value={ [ parsedQuantity, computedUnit ].join( '' ) }
 			placeholder={ allPlaceholder }
@@ -127,7 +121,6 @@ export default function CustomValueControls( {
 				step={ step }
 				value={ parsedQuantity }
 				withInputField={ false }
-				__next40pxDefaultSize
 			/>
 		</>
 	);

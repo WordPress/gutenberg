@@ -54,6 +54,23 @@
 				}
 			}
 		},
+		"settingsBlockVisibilityProperties": {
+			"type": "object",
+			"properties": {
+				"blockVisibility": {
+					"description": "Settings related to block visibility.",
+					"type": "object",
+					"properties": {
+						"allowEditing": {
+							"description": "Whether block visibility can be edited in the editor. Set to `false` to hide the block visibility controls. Saved block visibility attributes are always rendered regardless of this setting.",
+							"type": "boolean",
+							"default": true
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
 		"settingsBorderProperties": {
 			"type": "object",
 			"properties": {
@@ -859,6 +876,30 @@
 				}
 			}
 		},
+		"settingsViewportProperties": {
+			"type": "object",
+			"properties": {
+				"viewport": {
+					"description": "Viewport breakpoint settings used for responsive block styles and block visibility. Invalid breakpoint values are ignored. If only one valid breakpoint is declared, it remains keyed by its configured viewport and uses a single max-width query. If neither breakpoint is valid, the default breakpoints are used. If `mobile` is greater than or equal to `tablet`, only the `mobile` breakpoint is used.",
+					"type": "object",
+					"properties": {
+						"mobile": {
+							"description": "Maximum viewport width for mobile styles.",
+							"type": "string",
+							"default": "480px",
+							"pattern": "^(?:\\d+|\\d*\\.\\d+)(?:px|em|rem)$"
+						},
+						"tablet": {
+							"description": "Maximum viewport width for tablet styles. Tablet styles apply above the mobile width and up to this width when both breakpoints are configured, or up to this width when tablet is the only valid breakpoint.",
+							"type": "string",
+							"default": "782px",
+							"pattern": "^(?:\\d+|\\d*\\.\\d+)(?:px|em|rem)$"
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
 		"settingsCustomProperties": {
 			"type": "object",
 			"properties": {
@@ -868,6 +909,24 @@
 			}
 		},
 		"settingsProperties": {
+			"allOf": [
+				{ "$ref": "#/definitions/settingsAppearanceToolsProperties" },
+				{ "$ref": "#/definitions/settingsBackgroundProperties" },
+				{ "$ref": "#/definitions/settingsBlockVisibilityProperties" },
+				{ "$ref": "#/definitions/settingsBorderProperties" },
+				{ "$ref": "#/definitions/settingsColorProperties" },
+				{ "$ref": "#/definitions/settingsDimensionsProperties" },
+				{ "$ref": "#/definitions/settingsLayoutProperties" },
+				{ "$ref": "#/definitions/settingsLightboxProperties" },
+				{ "$ref": "#/definitions/settingsPositionProperties" },
+				{ "$ref": "#/definitions/settingsShadowProperties" },
+				{ "$ref": "#/definitions/settingsSpacingProperties" },
+				{ "$ref": "#/definitions/settingsTypographyProperties" },
+				{ "$ref": "#/definitions/settingsViewportProperties" },
+				{ "$ref": "#/definitions/settingsCustomProperties" }
+			]
+		},
+		"settingsBlockProperties": {
 			"allOf": [
 				{ "$ref": "#/definitions/settingsAppearanceToolsProperties" },
 				{ "$ref": "#/definitions/settingsBackgroundProperties" },
@@ -887,6 +946,24 @@
 			"enum": [
 				"appearanceTools",
 				"background",
+				"blockVisibility",
+				"border",
+				"color",
+				"dimensions",
+				"layout",
+				"lightbox",
+				"position",
+				"shadow",
+				"spacing",
+				"typography",
+				"viewport",
+				"custom"
+			]
+		},
+		"settingsBlockPropertyNames": {
+			"enum": [
+				"appearanceTools",
+				"background",
 				"border",
 				"color",
 				"dimensions",
@@ -899,15 +976,15 @@
 				"custom"
 			]
 		},
-		"settingsPropertiesComplete": {
+		"settingsBlockPropertiesComplete": {
 			"allOf": [
 				{
-					"$ref": "#/definitions/settingsProperties"
+					"$ref": "#/definitions/settingsBlockProperties"
 				},
 				{
 					"type": "object",
 					"propertyNames": {
-						"$ref": "#/definitions/settingsPropertyNames"
+						"$ref": "#/definitions/settingsBlockPropertyNames"
 					}
 				}
 			]
@@ -917,339 +994,339 @@
 			"type": "object",
 			"properties": {
 				"core/accordion": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/accordion-heading": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/accordion-item": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/accordion-panel": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/archives": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/audio": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/avatar": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/block": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/breadcrumbs": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/button": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/buttons": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/calendar": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/categories": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/code": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/column": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/columns": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/comment-author-avatar": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/comment-author-name": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/comment-content": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/comment-date": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/comment-edit-link": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/comment-reply-link": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/comments": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/comments-pagination": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/comments-pagination-next": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/comments-pagination-numbers": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/comments-pagination-previous": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/comments-title": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/comment-template": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/cover": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/details": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/embed": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/file": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/footnotes": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/freeform": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/gallery": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/group": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/heading": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/home-link": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/html": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/icon": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/image": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/latest-comments": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/latest-posts": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/list": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/list-item": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/loginout": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/math": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/media-text": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/missing": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/more": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/navigation": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/navigation-link": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/navigation-submenu": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/nextpage": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/page-list": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/page-list-item": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/paragraph": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/post-author": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/post-author-biography": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/post-author-name": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/post-comment": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/post-comments-count": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/post-comments-form": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/post-comments-link": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/post-content": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/post-date": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/post-excerpt": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/post-featured-image": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/post-navigation-link": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/post-template": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/post-terms": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/post-time-to-read": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/post-title": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/preformatted": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/pullquote": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/query": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/query-no-results": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/query-pagination": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/query-pagination-next": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/query-pagination-numbers": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/query-pagination-previous": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/query-title": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/query-total": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/quote": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/read-more": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/rss": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/search": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/separator": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/shortcode": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/site-logo": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/site-tagline": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/site-title": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/social-link": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/social-links": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/spacer": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/table": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/tag-cloud": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/template-part": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/term-count": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/term-description": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/term-name": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/term-template": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/terms-query": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/text-columns": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/verse": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/video": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/widget-area": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/legacy-widget": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				},
 				"core/widget-group": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				}
 			},
 			"patternProperties": {
 				"^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
+					"$ref": "#/definitions/settingsBlockPropertiesComplete"
 				}
 			},
 			"additionalProperties": false
@@ -1797,6 +1874,13 @@
 								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
+						"textShadow": {
+							"description": "Sets the `text-shadow` CSS property.",
+							"oneOf": [
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
+							]
+						},
 						"writingMode": {
 							"description": "Sets the `writing-mode` CSS property.",
 							"oneOf": [
@@ -1863,20 +1947,169 @@
 		"stylesBlocksPseudoSelectorsPropertyNames": {
 			"enum": [ ":hover", ":focus", ":focus-visible", ":active" ]
 		},
+		"stylesBlocksPropertiesAndPseudoComplete": {
+			"description": "Style properties plus the pseudo-selectors available to blocks that support them.",
+			"allOf": [
+				{
+					"$ref": "#/definitions/stylesProperties"
+				},
+				{
+					"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
+				},
+				{
+					"type": "object",
+					"propertyNames": {
+						"anyOf": [
+							{
+								"$ref": "#/definitions/stylesPropertyNames"
+							},
+							{
+								"$ref": "#/definitions/stylesBlocksPseudoSelectorsPropertyNames"
+							}
+						]
+					}
+				}
+			]
+		},
+		"stylesBlocksResponsiveStatePropertiesComplete": {
+			"description": "The styles a block can set inside a single responsive breakpoint state: the same style properties as the default block state, plus per-element styles.",
+			"allOf": [
+				{
+					"$ref": "#/definitions/stylesProperties"
+				},
+				{
+					"type": "object",
+					"properties": {
+						"elements": {
+							"$ref": "#/definitions/stylesElementsPropertiesComplete"
+						}
+					}
+				},
+				{
+					"type": "object",
+					"propertyNames": {
+						"anyOf": [
+							{
+								"$ref": "#/definitions/stylesPropertyNames"
+							},
+							{
+								"enum": [ "elements" ]
+							}
+						]
+					}
+				}
+			]
+		},
+		"stylesBlocksResponsiveStateWithPseudoPropertiesComplete": {
+			"description": "The styles a block that supports pseudo-selectors can set inside a single responsive breakpoint state: style properties, per-element styles, and the block's pseudo-selectors.",
+			"allOf": [
+				{
+					"$ref": "#/definitions/stylesProperties"
+				},
+				{
+					"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
+				},
+				{
+					"type": "object",
+					"properties": {
+						"elements": {
+							"$ref": "#/definitions/stylesElementsPropertiesComplete"
+						}
+					}
+				},
+				{
+					"type": "object",
+					"propertyNames": {
+						"anyOf": [
+							{
+								"$ref": "#/definitions/stylesPropertyNames"
+							},
+							{
+								"enum": [ "elements" ]
+							},
+							{
+								"$ref": "#/definitions/stylesBlocksPseudoSelectorsPropertyNames"
+							}
+						]
+					}
+				}
+			]
+		},
 		"stylesBlocksResponsiveSelectorsProperties": {
-			"description": "Responsive block states keyed by breakpoint name. Each breakpoint supports the same style properties as the default block state.",
+			"description": "Responsive block states keyed by breakpoint name. Each breakpoint supports the same style properties as the default block state, plus per-element styles.",
 			"type": "object",
 			"properties": {
-				"mobile": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+				"@mobile": {
+					"$ref": "#/definitions/stylesBlocksResponsiveStatePropertiesComplete"
 				},
-				"tablet": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
+				"@tablet": {
+					"$ref": "#/definitions/stylesBlocksResponsiveStatePropertiesComplete"
 				}
 			}
 		},
 		"stylesBlocksResponsiveSelectorsPropertyNames": {
-			"enum": [ "mobile", "tablet" ]
+			"enum": [ "@mobile", "@tablet" ]
+		},
+		"stylesBlocksResponsiveSelectorsWithPseudoProperties": {
+			"description": "Responsive block states for blocks that support pseudo-selectors. Each breakpoint supports the same style properties as the default block state, plus per-element styles and the block's pseudo-selectors.",
+			"type": "object",
+			"properties": {
+				"@mobile": {
+					"$ref": "#/definitions/stylesBlocksResponsiveStateWithPseudoPropertiesComplete"
+				},
+				"@tablet": {
+					"$ref": "#/definitions/stylesBlocksResponsiveStateWithPseudoPropertiesComplete"
+				}
+			}
+		},
+		"stylesBlockVariationsWithPseudoProperties": {
+			"description": "Block style variations for blocks that support pseudo-selectors. Each variation supports the same style properties, responsive states and pseudo-selectors as the block itself.",
+			"type": "object",
+			"patternProperties": {
+				"^[a-z][a-z0-9-]*$": {
+					"allOf": [
+						{
+							"$ref": "#/definitions/stylesProperties"
+						},
+						{
+							"$ref": "#/definitions/stylesBlocksResponsiveSelectorsWithPseudoProperties"
+						},
+						{
+							"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
+						},
+						{
+							"type": "object",
+							"properties": {
+								"elements": {
+									"$ref": "#/definitions/stylesElementsPropertiesComplete"
+								},
+								"blocks": {
+									"$ref": "#/definitions/stylesVariationBlocksPropertiesComplete"
+								}
+							}
+						},
+						{
+							"type": "object",
+							"propertyNames": {
+								"anyOf": [
+									{
+										"$ref": "#/definitions/stylesPropertyNames"
+									},
+									{
+										"enum": [ "elements", "blocks" ]
+									},
+									{
+										"$ref": "#/definitions/stylesBlocksResponsiveSelectorsPropertyNames"
+									},
+									{
+										"$ref": "#/definitions/stylesBlocksPseudoSelectorsPropertyNames"
+									}
+								]
+							}
+						}
+					]
+				}
+			}
 		},
 		"stylesElementsPseudoSelectorsProperties": {
 			"type": "object",
@@ -1905,21 +2138,21 @@
 			}
 		},
 		"stylesBlocksCustomStatesProperties": {
-			"description": "Custom class-based block states using the '@' prefix. Each state supports style properties as well as the same pseudo-selectors available to the block.",
+			"description": "Custom class-based block states using the '-' prefix. Each state supports style properties as well as the same pseudo-selectors available to the block.",
 			"type": "object",
 			"properties": {
-				"@current": {
+				"-current": {
 					"description": "Styles applied to the current/active item (e.g. .current-menu-item in navigation).",
 					"allOf": [
 						{
-							"$ref": "#/definitions/stylesPropertiesComplete"
-						},
-						{
-							"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
+							"$ref": "#/definitions/stylesBlocksPropertiesAndPseudoComplete"
 						}
 					]
 				}
 			}
+		},
+		"stylesBlocksCustomStatesPropertyNames": {
+			"enum": [ "-current" ]
 		},
 		"stylesElementsPseudoSelectorsPropertyNames": {
 			"enum": [
@@ -1932,21 +2165,6 @@
 				":visited"
 			]
 		},
-		"stylesElementsResponsiveSelectorsProperties": {
-			"description": "Responsive element states keyed by breakpoint name. Each breakpoint supports the same style properties as the default element state.",
-			"type": "object",
-			"properties": {
-				"mobile": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
-				},
-				"tablet": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
-				}
-			}
-		},
-		"stylesElementsResponsiveSelectorsPropertyNames": {
-			"enum": [ "mobile", "tablet" ]
-		},
 		"stylesElementsPropertiesComplete": {
 			"description": "Styles defined on a per-element basis using the element's selector.",
 			"type": "object",
@@ -1957,9 +2175,6 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesElementsResponsiveSelectorsProperties"
-						},
-						{
 							"$ref": "#/definitions/stylesElementsPseudoSelectorsProperties"
 						},
 						{
@@ -1968,9 +2183,6 @@
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
-									},
-									{
-										"$ref": "#/definitions/stylesElementsResponsiveSelectorsPropertyNames"
 									},
 									{
 										"$ref": "#/definitions/stylesElementsPseudoSelectorsPropertyNames"
@@ -1986,9 +2198,6 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesElementsResponsiveSelectorsProperties"
-						},
-						{
 							"$ref": "#/definitions/stylesElementsPseudoSelectorsProperties"
 						},
 						{
@@ -1997,9 +2206,6 @@
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
-									},
-									{
-										"$ref": "#/definitions/stylesElementsResponsiveSelectorsPropertyNames"
 									},
 									{
 										"$ref": "#/definitions/stylesElementsPseudoSelectorsPropertyNames"
@@ -2015,17 +2221,11 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesElementsResponsiveSelectorsProperties"
-						},
-						{
 							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
-									},
-									{
-										"$ref": "#/definitions/stylesElementsResponsiveSelectorsPropertyNames"
 									}
 								]
 							}
@@ -2038,17 +2238,11 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesElementsResponsiveSelectorsProperties"
-						},
-						{
 							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
-									},
-									{
-										"$ref": "#/definitions/stylesElementsResponsiveSelectorsPropertyNames"
 									}
 								]
 							}
@@ -2061,17 +2255,11 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesElementsResponsiveSelectorsProperties"
-						},
-						{
 							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
-									},
-									{
-										"$ref": "#/definitions/stylesElementsResponsiveSelectorsPropertyNames"
 									}
 								]
 							}
@@ -2084,17 +2272,11 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesElementsResponsiveSelectorsProperties"
-						},
-						{
 							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
-									},
-									{
-										"$ref": "#/definitions/stylesElementsResponsiveSelectorsPropertyNames"
 									}
 								]
 							}
@@ -2107,17 +2289,11 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesElementsResponsiveSelectorsProperties"
-						},
-						{
 							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
-									},
-									{
-										"$ref": "#/definitions/stylesElementsResponsiveSelectorsPropertyNames"
 									}
 								]
 							}
@@ -2130,17 +2306,11 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesElementsResponsiveSelectorsProperties"
-						},
-						{
 							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
-									},
-									{
-										"$ref": "#/definitions/stylesElementsResponsiveSelectorsPropertyNames"
 									}
 								]
 							}
@@ -2153,17 +2323,11 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesElementsResponsiveSelectorsProperties"
-						},
-						{
 							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
-									},
-									{
-										"$ref": "#/definitions/stylesElementsResponsiveSelectorsPropertyNames"
 									}
 								]
 							}
@@ -2176,17 +2340,11 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesElementsResponsiveSelectorsProperties"
-						},
-						{
 							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
-									},
-									{
-										"$ref": "#/definitions/stylesElementsResponsiveSelectorsPropertyNames"
 									}
 								]
 							}
@@ -2199,17 +2357,11 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesElementsResponsiveSelectorsProperties"
-						},
-						{
 							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
-									},
-									{
-										"$ref": "#/definitions/stylesElementsResponsiveSelectorsPropertyNames"
 									}
 								]
 							}
@@ -2222,17 +2374,11 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesElementsResponsiveSelectorsProperties"
-						},
-						{
 							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
-									},
-									{
-										"$ref": "#/definitions/stylesElementsResponsiveSelectorsPropertyNames"
 									}
 								]
 							}
@@ -2245,17 +2391,11 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesElementsResponsiveSelectorsProperties"
-						},
-						{
 							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
-									},
-									{
-										"$ref": "#/definitions/stylesElementsResponsiveSelectorsPropertyNames"
 									}
 								]
 							}
@@ -2302,44 +2442,16 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesBlocksResponsiveSelectorsProperties"
+							"$ref": "#/definitions/stylesBlocksResponsiveSelectorsWithPseudoProperties"
 						},
 						{
 							"type": "object",
 							"properties": {
+								"elements": {
+									"$ref": "#/definitions/stylesElementsPropertiesComplete"
+								},
 								"variations": {
-									"type": "object",
-									"patternProperties": {
-										"^[a-z][a-z0-9-]*$": {
-											"allOf": [
-												{
-													"$ref": "#/definitions/stylesProperties"
-												},
-												{
-													"$ref": "#/definitions/stylesBlocksResponsiveSelectorsProperties"
-												},
-												{
-													"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
-												},
-												{
-													"type": "object",
-													"propertyNames": {
-														"anyOf": [
-															{
-																"$ref": "#/definitions/stylesPropertyNames"
-															},
-															{
-																"$ref": "#/definitions/stylesBlocksResponsiveSelectorsPropertyNames"
-															},
-															{
-																"$ref": "#/definitions/stylesBlocksPseudoSelectorsPropertyNames"
-															}
-														]
-													}
-												}
-											]
-										}
-									}
+									"$ref": "#/definitions/stylesBlockVariationsWithPseudoProperties"
 								}
 							}
 						},
@@ -2354,7 +2466,7 @@
 										"$ref": "#/definitions/stylesPropertyNames"
 									},
 									{
-										"enum": [ "variations" ]
+										"enum": [ "elements", "variations" ]
 									},
 									{
 										"$ref": "#/definitions/stylesBlocksResponsiveSelectorsPropertyNames"
@@ -2496,16 +2608,49 @@
 				"core/navigation-link": {
 					"allOf": [
 						{
-							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesBlocksResponsiveSelectorsProperties"
+							"$ref": "#/definitions/stylesBlocksResponsiveSelectorsWithPseudoProperties"
 						},
 						{
 							"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
 						},
 						{
 							"$ref": "#/definitions/stylesBlocksCustomStatesProperties"
+						},
+						{
+							"type": "object",
+							"properties": {
+								"elements": {
+									"$ref": "#/definitions/stylesElementsPropertiesComplete"
+								},
+								"variations": {
+									"$ref": "#/definitions/stylesBlockVariationsWithPseudoProperties"
+								}
+							}
+						},
+						{
+							"type": "object",
+							"propertyNames": {
+								"anyOf": [
+									{
+										"$ref": "#/definitions/stylesPropertyNames"
+									},
+									{
+										"enum": [ "elements", "variations" ]
+									},
+									{
+										"$ref": "#/definitions/stylesBlocksResponsiveSelectorsPropertyNames"
+									},
+									{
+										"$ref": "#/definitions/stylesBlocksPseudoSelectorsPropertyNames"
+									},
+									{
+										"$ref": "#/definitions/stylesBlocksCustomStatesPropertyNames"
+									}
+								]
+							}
 						}
 					]
 				},
@@ -2681,12 +2826,12 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				}
 			},
-			"patternProperties": {
-				"^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$": {
-					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-				}
+			"propertyNames": {
+				"pattern": "^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$"
 			},
-			"additionalProperties": false
+			"additionalProperties": {
+				"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+			}
 		},
 		"stylesPropertiesAndElementsComplete": {
 			"allOf": [
@@ -2739,6 +2884,9 @@
 					"$ref": "#/definitions/stylesProperties"
 				},
 				{
+					"$ref": "#/definitions/stylesBlocksResponsiveSelectorsProperties"
+				},
+				{
 					"type": "object",
 					"properties": {
 						"elements": {
@@ -2755,6 +2903,9 @@
 						"anyOf": [
 							{
 								"$ref": "#/definitions/stylesPropertyNames"
+							},
+							{
+								"$ref": "#/definitions/stylesBlocksResponsiveSelectorsPropertyNames"
 							},
 							{
 								"enum": [ "elements", "blocks" ]
@@ -2778,6 +2929,9 @@
 					"$ref": "#/definitions/stylesProperties"
 				},
 				{
+					"$ref": "#/definitions/stylesBlocksResponsiveSelectorsProperties"
+				},
+				{
 					"type": "object",
 					"properties": {
 						"elements": {
@@ -2794,6 +2948,9 @@
 						"anyOf": [
 							{
 								"$ref": "#/definitions/stylesPropertyNames"
+							},
+							{
+								"$ref": "#/definitions/stylesBlocksResponsiveSelectorsPropertyNames"
 							},
 							{
 								"enum": [ "elements", "blocks" ]
@@ -2839,10 +2996,18 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"$ref": "#/definitions/stylesBlocksResponsiveSelectorsProperties"
+							"$ref": "#/definitions/stylesBlocksResponsiveSelectorsWithPseudoProperties"
 						},
 						{
 							"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
+						},
+						{
+							"type": "object",
+							"properties": {
+								"elements": {
+									"$ref": "#/definitions/stylesElementsPropertiesComplete"
+								}
+							}
 						},
 						{
 							"type": "object",
@@ -2850,6 +3015,9 @@
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
+									},
+									{
+										"enum": [ "elements" ]
 									},
 									{
 										"$ref": "#/definitions/stylesBlocksResponsiveSelectorsPropertyNames"
@@ -2989,7 +3157,50 @@
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/navigation-link": {
-					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+					"allOf": [
+						{
+							"$ref": "#/definitions/stylesProperties"
+						},
+						{
+							"$ref": "#/definitions/stylesBlocksResponsiveSelectorsWithPseudoProperties"
+						},
+						{
+							"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
+						},
+						{
+							"$ref": "#/definitions/stylesBlocksCustomStatesProperties"
+						},
+						{
+							"type": "object",
+							"properties": {
+								"elements": {
+									"$ref": "#/definitions/stylesElementsPropertiesComplete"
+								}
+							}
+						},
+						{
+							"type": "object",
+							"propertyNames": {
+								"anyOf": [
+									{
+										"$ref": "#/definitions/stylesPropertyNames"
+									},
+									{
+										"enum": [ "elements" ]
+									},
+									{
+										"$ref": "#/definitions/stylesBlocksResponsiveSelectorsPropertyNames"
+									},
+									{
+										"$ref": "#/definitions/stylesBlocksPseudoSelectorsPropertyNames"
+									},
+									{
+										"$ref": "#/definitions/stylesBlocksCustomStatesPropertyNames"
+									}
+								]
+							}
+						}
+					]
 				},
 				"core/navigation-submenu": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
@@ -3163,12 +3374,12 @@
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				}
 			},
-			"patternProperties": {
-				"^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$": {
-					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
-				}
+			"propertyNames": {
+				"pattern": "^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$"
 			},
-			"additionalProperties": false
+			"additionalProperties": {
+				"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+			}
 		},
 		"stylesVariationBlockPropertiesComplete": {
 			"allOf": [

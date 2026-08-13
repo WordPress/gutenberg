@@ -1,11 +1,14 @@
 .root {
 	margin: 0 auto;
-	max-width: calc(var(--wpds-dimension-base) * 80);
+	max-width: var(--wpds-dimension-surface-width-sm);
 	text-align: center;
 	height: 100%;
 }
 
 .loading {
-	min-height: calc(var(--wpds-dimension-base) * 55);
+	/* TODO: Look into a WPDS token once one exists that fits a vertical
+	   (height) measure; the `surface-width` tokens are width-oriented and
+	   don't exactly match this value. */
+	min-height: 220px;
 	height: 100%;
 }

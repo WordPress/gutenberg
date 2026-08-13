@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import SpacingInputControl from './spacing-input-control';
 import {
 	LABELS,

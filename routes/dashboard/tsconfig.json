@@ -11,5 +11,5 @@
 		"types": [ "style-imports" ]
 	},
 	"include": [ "**/*.ts", "**/*.tsx" ],
-	"exclude": [ "**/test/**", "build", "node_modules", "widget-primitives" ]
+	"exclude": [ "**/test/**", "build", "node_modules" ]
 }

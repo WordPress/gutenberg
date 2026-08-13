@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { _n, __, sprintf } from '@wordpress/i18n';
@@ -9,12 +6,7 @@ import { displayShortcut, rawShortcut } from '@wordpress/keycodes';
 import { check } from '@wordpress/icons';
 import { EntitiesSavedStates } from '@wordpress/editor';
 import { Button, Modal } from '@wordpress/components';
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { Tooltip } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import './style.scss';
 import useSaveShortcut from '../save-panel/use-save-shortcut';
 

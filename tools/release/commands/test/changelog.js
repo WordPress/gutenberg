@@ -1,6 +1,15 @@
-/**
- * Internal dependencies
- */
+jest.mock( '@octokit/rest' );
+jest.mock( '../../lib/milestone' );
+jest.mock( '../../lib/logger', () => ( {
+	log: jest.fn(),
+	warn: jest.fn(),
+	formats: {
+		title: jest.fn( ( message ) => message ),
+		error: jest.fn( ( message ) => message ),
+		warning: jest.fn( ( message ) => message ),
+	},
+} ) );
+
 import {
 	getNormalizedTitle,
 	reword,
@@ -20,9 +29,18 @@ import {
 	getContributorProps,
 	getContributorsList,
 	mapLabelsToFeatures,
+	createChangelog,
+	fetchAllPullRequests,
+	getManualChangelogInstructions,
 } from '../changelog';
 import _pullRequests from './fixtures/pull-requests.json';
 import botPullRequestFixture from './fixtures/bot-pull-requests.json';
+const { Octokit } = require( '@octokit/rest' );
+const {
+	getMilestoneByTitle,
+	getIssuesByMilestone,
+} = require( '../../lib/milestone' );
+const { log, warn } = require( '../../lib/logger' );
 
 /**
  * pull-requests.json is a static snapshot of real data from the GitHub API.
@@ -33,6 +51,145 @@ import botPullRequestFixture from './fixtures/bot-pull-requests.json';
  */
 const pullRequests = _pullRequests.concat( botPullRequestFixture );
 
+/**
+ * Returns an Octokit stub for a repository without any release, so that
+ * `--unreleased` runs find no previous release in the series.
+ *
+ * @return {Object} Octokit stub.
+ */
+const createOctokitWithoutReleases = () => ( {
+	repos: {
+		listReleases: {
+			endpoint: {
+				merge: jest.fn().mockReturnValue( {} ),
+			},
+		},
+	},
+	paginate: {
+		iterator: jest.fn().mockReturnValue(
+			( async function* () {
+				yield { data: [] };
+			} )()
+		),
+	},
+} );
+
+describe( 'createChangelog', () => {
+	const settings = {
+		owner: 'WordPress',
+		repo: 'gutenberg',
+		milestone: 'Gutenberg 23.5',
+		unreleased: false,
+	};
+
+	beforeEach( () => {
+		jest.clearAllMocks();
+		Octokit.mockImplementation( () => ( {} ) );
+	} );
+
+	it( 'keeps successful changelog output unchanged', async () => {
+		getMilestoneByTitle.mockResolvedValue( {
+			number: 235,
+			title: settings.milestone,
+		} );
+		getIssuesByMilestone.mockResolvedValue( pullRequests );
+
+		await createChangelog( settings );
+
+		expect( log ).toHaveBeenCalledTimes( 2 );
+		expect( log ).toHaveBeenNthCalledWith(
+			2,
+			getChangelog( pullRequests ) +
+				getContributorProps( pullRequests ) +
+				getContributorsList( pullRequests )
+		);
+	} );
+
+	it( 'does not swallow operational errors', async () => {
+		getMilestoneByTitle.mockRejectedValue(
+			new Error( 'GitHub request failed.' )
+		);
+
+		await expect( createChangelog( settings ) ).rejects.toThrow(
+			'GitHub request failed.'
+		);
+		expect( log ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'explains how to fill the notes in by hand when there are no unreleased pull requests', async () => {
+		Octokit.mockImplementation( createOctokitWithoutReleases );
+		getMilestoneByTitle.mockResolvedValue( {
+			number: 235,
+			title: settings.milestone,
+		} );
+		// An issue that is not a pull request, so no pull request is found.
+		getIssuesByMilestone.mockResolvedValue( [ { number: 123 } ] );
+
+		await createChangelog( { ...settings, unreleased: true } );
+
+		expect( warn ).toHaveBeenCalledTimes( 1 );
+		expect( log ).toHaveBeenCalledTimes( 2 );
+		expect( log ).toHaveBeenNthCalledWith(
+			2,
+			getManualChangelogInstructions( settings.milestone )
+		);
+	} );
+} );
+
+describe( 'getManualChangelogInstructions', () => {
+	it( 'includes the command that regenerates the notes for the milestone', () => {
+		expect( getManualChangelogInstructions( 'Gutenberg 23.5' ) ).toContain(
+			'npm run other:changelog -- --milestone="Gutenberg 23.5" --unreleased'
+		);
+	} );
+} );
+
+describe( 'fetchAllPullRequests', () => {
+	it( 'resolves to an empty list when a milestone has no unreleased pull requests', async () => {
+		const milestone = 'Gutenberg 23.5';
+
+		getMilestoneByTitle.mockResolvedValue( {
+			number: 235,
+			title: milestone,
+		} );
+		getIssuesByMilestone.mockResolvedValue( [ { number: 123 } ] );
+
+		await expect(
+			fetchAllPullRequests( createOctokitWithoutReleases(), {
+				owner: 'WordPress',
+				repo: 'gutenberg',
+				milestone,
+				unreleased: true,
+			} )
+		).resolves.toEqual( [] );
+	} );
+
+	it( 'fails when a milestone has no pull requests at all', async () => {
+		const milestone = 'Gutenberg 23.5';
+
+		getMilestoneByTitle.mockResolvedValue( {
+			number: 235,
+			title: milestone,
+		} );
+		getIssuesByMilestone.mockResolvedValue( [ { number: 123 } ] );
+
+		await expect(
+			// Without `unreleased`, no release is looked up.
+			fetchAllPullRequests(
+				{},
+				{
+					owner: 'WordPress',
+					repo: 'gutenberg',
+					milestone,
+					unreleased: false,
+				}
+			)
+		).rejects.toThrow(
+			'There are no pull requests associated with milestone "Gutenberg 23.5".'
+		);
+	} );
+} );
+
 describe( 'getNormalizedTitle', () => {
 	const DEFAULT_ISSUE = {
 		labels: [],
@@ -41,20 +198,6 @@ describe( 'getNormalizedTitle', () => {
 	it.each( [
 		[ 'adds period', 'Fixes a bug', 'Fixes a bug.' ],
 		[ 'keeps period', 'Fixes a bug.', 'Fixes a bug.' ],
-		[
-			'omits mobile by title',
-			'[RNMoBILe] Address mobile concern',
-			undefined,
-		],
-		[
-			'omits mobile by issue',
-			'Address mobile concern',
-			undefined,
-			{
-				...DEFAULT_ISSUE,
-				labels: [ { name: 'Mobile App - i.e. Android or iOS' } ],
-			},
-		],
 		[
 			'avoids reword of joined terms',
 			'e2e-tests: Improve test stability',

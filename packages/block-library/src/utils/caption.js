@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -104,10 +97,13 @@ export function Caption( {
 							setAttributes( { [ attributeKey ]: value } )
 						}
 						inlineToolbar
-						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter(
-								createBlock( getDefaultBlockName() )
-							)
+						__unstableOnSplitAtEnd={
+							insertBlocksAfter
+								? () =>
+										insertBlocksAfter(
+											createBlock( getDefaultBlockName() )
+										)
+								: undefined
 						}
 						readOnly={ readOnly }
 						{ ...props }

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Breadcrumbs, Page } from '@wordpress/admin-ui';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
@@ -12,11 +9,7 @@ import {
 	type Media,
 } from '@wordpress/media-editor';
 import { useNavigate, useParams } from '@wordpress/route';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../lock-unlock';
+import { unlock } from '@wordpress/routes-lock-unlock';
 import './style.scss';
 
 const { usePostFields } = unlock( editorPrivateApis );

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
 test.describe( 'ColorPicker HSL inputs', () => {
@@ -17,7 +14,11 @@ test.describe( 'ColorPicker HSL inputs', () => {
 
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Text' } )
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
 			.click();
 
 		await page

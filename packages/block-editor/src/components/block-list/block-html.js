@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import TextareaAutosize from 'react-autosize-textarea';
-
-/**
- * WordPress dependencies
- */
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -15,14 +8,12 @@ import {
 	getSaveContent,
 	validateBlock,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
+import { useNativeUndo } from '../../utils/native-undo';
 
 function BlockHTML( { clientId } ) {
 	const [ html, setHtml ] = useState( '' );
+	const nativeUndoRef = useNativeUndo();
 	const block = useSelect(
 		( select ) => select( blockEditorStore ).getBlock( clientId ),
 		[ clientId ]
@@ -83,6 +74,9 @@ function BlockHTML( { clientId } ) {
 			value={ html }
 			onBlur={ onChange }
 			onChange={ ( event ) => setHtml( event.target.value ) }
+			// The edits are local state until committed on blur, so undo
+			// and redo must remain the browser's own within the field.
+			ref={ nativeUndoRef }
 		/>
 	);
 }

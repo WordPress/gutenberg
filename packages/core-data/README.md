@@ -214,6 +214,7 @@ _Parameters_
 -   _edits_ `Object`: The edits.
 -   _options_ `Object`: Options for the edit.
 -   _options.undoIgnore_ `[boolean]`: Whether to ignore the edit in undo history or not.
+-   _options.isCached_ `[boolean]`: Whether the edit is transient (e.g. typing). Transient edits are staged and eventually merged into the preceding undo level instead of creating a new one.
 
 _Returns_
 
@@ -1134,7 +1135,6 @@ function PageRenameForm( { id } ) {
 	return (
 		<form onSubmit={ onRename }>
 			<TextControl
-				__next40pxDefaultSize
 				label={ __( 'Name' ) }
 				value={ page.editedRecord.title }
 				onChange={ setTitle }

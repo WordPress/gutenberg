@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Icon as WCIcon,
 	__experimentalText as WCText,
@@ -10,10 +7,6 @@ import {
 import { useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { unseen } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
 import useBlockVisibility from './use-block-visibility';
@@ -32,6 +25,7 @@ export default function ViewportVisibilityInfo( { clientId } ) {
 	const {
 		currentBlockVisibility,
 		selectedDeviceType,
+		viewportSettings,
 		hasParentHiddenEverywhere,
 	} = useSelect(
 		( select ) => {
@@ -43,13 +37,15 @@ export default function ViewportVisibilityInfo( { clientId } ) {
 				isBlockParentHiddenEverywhere,
 				getSettings,
 			} = unlock( select( blockEditorStore ) );
+			const settings = getSettings();
 
 			return {
 				currentBlockVisibility:
 					getBlockAttributes( clientId )?.metadata?.blockVisibility,
 				selectedDeviceType:
-					getSettings()?.[ deviceTypeKey ]?.toLowerCase() ||
+					settings?.[ deviceTypeKey ]?.toLowerCase() ||
 					BLOCK_VISIBILITY_VIEWPORTS.desktop.key,
+				viewportSettings: settings?.__experimentalFeatures?.viewport,
 				hasParentHiddenEverywhere:
 					isBlockParentHiddenEverywhere( clientId ),
 			};
@@ -66,6 +62,7 @@ export default function ViewportVisibilityInfo( { clientId } ) {
 	const { isBlockCurrentlyHidden, currentViewport } = useBlockVisibility( {
 		blockVisibility: currentBlockVisibility,
 		deviceType: selectedDeviceType,
+		viewportSettings,
 		view: canvasView,
 	} );
 

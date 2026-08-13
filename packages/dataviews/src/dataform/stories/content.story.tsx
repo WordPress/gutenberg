@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useState, useRef, useEffect } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import DataForm from '../index';
 import useFormValidity from '../../hooks/use-form-validity';
@@ -18,7 +11,7 @@ const meta: Meta< typeof DataForm > = {
 	parameters: {
 		controls: { disable: true },
 	},
-	tags: [ '!dev' /* Hide individual story pages from sidebar */ ],
+	tags: [ '!dev' /* Hide individual story pages from sidebar */, 'manifest' ],
 };
 export default meta;
 

@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import { usePrevious } from '@wordpress/compose';
 import { useEffect, useState, useCallback } from '@wordpress/element';
 import type { Y } from '@wordpress/sync';
-
-/**
- * Internal dependencies
- */
 import { getSyncManager } from '../sync';
 import { usePostContentBlocks } from '../awareness/block-lookup';
 import type { EditorStoreBlock } from '../awareness/block-lookup';
@@ -171,8 +164,8 @@ export function useIsDisconnected(
 
 /**
  * Hook that subscribes to the CRDT state map and returns the most recent
- * save event (timestamp + client ID). The state map is updated by
- * `markEntityAsSaved` in `@wordpress/sync`
+ * user-facing post save event (timestamp + client ID). The state map is
+ * updated by `markEntityAsSaved` in `@wordpress/sync`.
  *
  * @param postId   The ID of the post.
  * @param postType The type of the post.

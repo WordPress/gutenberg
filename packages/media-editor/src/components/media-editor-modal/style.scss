@@ -36,6 +36,8 @@
 	// spacing, not divider lines. 16px top / 32px sides / 24px bottom.
 	padding: $grid-unit-20 $grid-unit-40 $grid-unit-30;
 	background: $white;
+	// Above the `.interface-interface-skeleton__sidebar` which has a z-index of 100000.
+	z-index: z-index(".media-editor-modal__footer");
 
 	&.is-wide {
 		flex-direction: row;

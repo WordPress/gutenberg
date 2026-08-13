@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	BaseControl,
 	privateApis as componentsPrivateApis,
@@ -8,11 +5,7 @@ import {
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
-import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
+import { Calendar, Stack } from '@wordpress/ui';
 import type { DataFormControlProps, FormatDatetime } from '../../types';
 import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../../constants';
 import RelativeDateControl from './utils/relative-date-control';
@@ -21,7 +14,7 @@ import getCustomValidity from './utils/get-custom-validity';
 import parseDateTime from '../../field-types/utils/parse-date-time';
 import { unlock } from '../../lock-unlock';
 
-const { DateCalendar, ValidatedInputControl } = unlock( componentsPrivateApis );
+const { ValidatedInputControl } = unlock( componentsPrivateApis );
 
 const formatDateTime = ( value?: string ): string => {
 	if ( ! value ) {
@@ -75,7 +68,7 @@ function CalendarDateTimeControl< Item >( {
 	}, [] );
 
 	const onSelectDate = useCallback(
-		( newDate: Date | undefined | null ) => {
+		( newDate: Date | null ) => {
 			let dateTimeValue: string | undefined;
 			if ( newDate ) {
 				// Extract the date part in WP timezone from the calendar selection
@@ -176,7 +169,6 @@ function CalendarDateTimeControl< Item >( {
 				{ /* Manual datetime input */ }
 				<ValidatedInputControl
 					ref={ inputControlRef }
-					__next40pxDefaultSize
 					required={ !! isValid?.required }
 					customValidity={ getCustomValidity( isValid, validity ) }
 					type="datetime-local"
@@ -198,14 +190,10 @@ function CalendarDateTimeControl< Item >( {
 				/>
 				{ /* Calendar widget */ }
 				{ ! compact && (
-					<DateCalendar
+					<Calendar
 						style={ { width: '100%' } }
-						selected={
-							value
-								? parseDateTime( value ) || undefined
-								: undefined
-						}
-						onSelect={ onSelectDate }
+						value={ value ? parseDateTime( value ) : null }
+						onValueChange={ onSelectDate }
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezoneString || undefined }

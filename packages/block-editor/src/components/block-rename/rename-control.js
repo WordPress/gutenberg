@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-
-/**
- * Internal dependencies
- */
 import BlockRenameModal from './modal';
 
 export default function BlockRenameControl( { clientId } ) {

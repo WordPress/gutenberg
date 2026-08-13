@@ -1,22 +1,11 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useMemo, useState, forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Dropdown from '../dropdown';
 import { ColorPicker } from '../color-picker';
 import CircularOptionPicker, {
@@ -275,6 +264,11 @@ function UnforwardedColorPalette(
 		ariaLabel,
 		ariaLabelledby
 	);
+
+	// If disableCustomColors is true and colors.length is 0, return null to avoid rendering an empty palette wrapper.
+	if ( disableCustomColors && colors.length === 0 && ! actions ) {
+		return null;
+	}
 
 	return (
 		<VStack spacing={ 3 } ref={ forwardedRef } { ...additionalProps }>

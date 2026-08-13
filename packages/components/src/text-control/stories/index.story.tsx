@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import TextControl from '..';
 
 const meta: Meta< typeof TextControl > = {
@@ -46,7 +35,6 @@ const DefaultTemplate: StoryFn< typeof TextControl > = ( {
 
 	return (
 		<TextControl
-			__next40pxDefaultSize
 			{ ...args }
 			value={ value }
 			onChange={ ( v ) => {
@@ -61,7 +49,6 @@ export const Default: StoryFn< typeof TextControl > = DefaultTemplate.bind(
 	{}
 );
 Default.args = {
-	__next40pxDefaultSize: true,
 	placeholder: 'Placeholder',
 };
 

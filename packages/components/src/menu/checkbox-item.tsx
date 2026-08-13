@@ -1,21 +1,11 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef, useContext } from '@wordpress/element';
 import { Icon, check } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { Context } from './context';
 import type { CheckboxItemProps } from './types';
 import * as Styled from './styles';
+import { useMenuItemHideOnClick } from './use-menu-item-hide-on-click';
 
 export const CheckboxItem = forwardRef<
 	HTMLDivElement,
@@ -25,24 +15,25 @@ export const CheckboxItem = forwardRef<
 	ref
 ) {
 	const menuContext = useContext( Context );
+	const store = menuContext?.store;
+	const computedHideOnClick = useMenuItemHideOnClick( store, hideOnClick );
 
-	if ( ! menuContext?.store ) {
+	if ( ! store ) {
 		throw new Error(
 			'Menu.CheckboxItem can only be rendered inside a Menu component'
 		);
 	}
-
 	return (
 		<Styled.CheckboxItem
 			ref={ ref }
 			{ ...props }
 			accessibleWhenDisabled
 			disabled={ disabled }
-			hideOnClick={ hideOnClick }
-			store={ menuContext.store }
+			store={ store }
+			hideOnClick={ computedHideOnClick }
 		>
 			<Ariakit.MenuItemCheck
-				store={ menuContext.store }
+				store={ store }
 				render={ <Styled.ItemPrefixWrapper /> }
 				// Override some ariakit inline styles
 				style={ { width: 'auto', height: 'auto' } }

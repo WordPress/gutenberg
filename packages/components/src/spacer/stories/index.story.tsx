@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { Spacer } from '..';
 
 const controls = [
@@ -74,3 +67,11 @@ export const Default: StoryFn< typeof Spacer > = Template.bind( {} );
 Default.args = {
 	children: 'This is the spacer',
 };
+
+export const Nested: StoryFn< typeof Spacer > = () => (
+	<Spacer padding={ 4 } style={ { backgroundColor: '#ddd' } }>
+		<Spacer style={ { backgroundColor: '#fff' } }>
+			<BlackBox />
+		</Spacer>
+	</Spacer>
+);
