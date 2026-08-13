@@ -1,8 +1,9 @@
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
 import { useNavigate } from '@wordpress/route';
 import type { CanvasData } from '../../store/types';
 import BootBackButton from './back-button';
+import useNavigateToEntityRecord from './use-navigate-to-entity-record';
 
 interface CanvasProps {
 	canvas: CanvasData;
@@ -18,6 +19,29 @@ interface CanvasProps {
 export default function Canvas( { canvas }: CanvasProps ) {
 	const [ Editor, setEditor ] = useState< any >( null );
 	const navigate = useNavigate();
+	const { onNavigateToEntityRecord, onNavigateToPreviousEntityRecord } =
+		useNavigateToEntityRecord();
+
+	/*
+	 * Memoized because the editor provider pushes these settings into the store
+	 * whenever their identity changes, and the callbacks have to stay stable for
+	 * the block inspector to keep offering the same affordance.
+	 */
+	const settings = useMemo(
+		() => ( {
+			isPreviewMode: canvas.isPreview,
+			styles: canvas.isPreview
+				? [ { css: 'body{min-height:100vh;}' } ]
+				: [],
+			onNavigateToEntityRecord,
+			onNavigateToPreviousEntityRecord,
+		} ),
+		[
+			canvas.isPreview,
+			onNavigateToEntityRecord,
+			onNavigateToPreviousEntityRecord,
+		]
+	);
 
 	useEffect( () => {
 		// Dynamically import the lazy-editor module
@@ -67,12 +91,7 @@ export default function Canvas( { canvas }: CanvasProps ) {
 				<Editor
 					postType={ canvas.postType }
 					postId={ canvas.postId }
-					settings={ {
-						isPreviewMode: canvas.isPreview,
-						styles: canvas.isPreview
-							? [ { css: 'body{min-height:100vh;}' } ]
-							: [],
-					} }
+					settings={ settings }
 					backButton={ backButton }
 				/>
 			</div>
