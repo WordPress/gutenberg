@@ -180,6 +180,14 @@
 				min-width: $block-toolbar-height - $grid-unit-15;
 				padding-right: $grid-unit-15 * 0.5;
 				padding-left: $grid-unit-15 * 0.5;
+
+				// The focus ring at its standard toolbar size and inset.
+				&::before {
+					top: calc(50% - #{$grid-unit-40 * 0.5});
+					left: 2px;
+					right: 2px;
+					height: $grid-unit-40;
+				}
 			}
 		}
 
