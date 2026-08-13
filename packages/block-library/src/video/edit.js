@@ -30,7 +30,7 @@ import TracksEditor from './tracks-editor';
 import Tracks from './tracks';
 import { Caption } from '../utils/caption';
 import PosterImage from '../utils/poster-image';
-import { isGifVariation } from './variations';
+import { isGifVariation, isLivePhotoVariation } from './variations';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 
@@ -45,6 +45,9 @@ function VideoEdit( {
 	const videoPlayer = useRef();
 	const { id, controls, poster, src, tracks, width, height } = attributes;
 	const isGif = isGifVariation( attributes );
+	const isLivePhoto = isLivePhotoVariation( attributes );
+	// Both variations play with the same attributes; only autoplay differs.
+	const playsLikeMotion = isGif || isLivePhoto;
 	// Give the <video> an explicit (non-`auto`) aspect ratio derived from the
 	// stored dimensions. The width/height attributes alone only yield
 	// `aspect-ratio: auto W/H`, whose `auto` keyword defers to the element's
@@ -83,6 +86,22 @@ function VideoEdit( {
 			videoPlayer.current?.play().catch( () => {} );
 		}
 	}, [ isGif, src, poster ] );
+
+	// A Live photo rests on its still frame and plays only while the pointer
+	// is over it (or it holds focus, so the motion is reachable without a
+	// pointer). Rewinding on the way out returns it to that still frame.
+	// These read the element from the event rather than the ref, matching the
+	// front-end module, which has only the event's element to work with.
+	function playLivePhoto( event ) {
+		// Browsers allow muted videos to be played programmatically.
+		event.currentTarget.play().catch( () => {} );
+	}
+
+	function pauseLivePhoto( event ) {
+		const player = event.currentTarget;
+		player.pause();
+		player.currentTime = 0;
+	}
 
 	// TODO: Whether the video was obtained from the media library or was provided by URL, obtain the `videoWidth` and `videoHeight` of the video once its metadata has loaded and persist in the block attributes.
 	function onSelectVideo( media ) {
@@ -214,7 +233,7 @@ function VideoEdit( {
 					</BlockControls>
 				</>
 			) }
-			{ ! isGif && (
+			{ ! playsLikeMotion && (
 				<InspectorControls>
 					<ToolsPanel
 						label={ __( 'Settings' ) }
@@ -254,9 +273,13 @@ function VideoEdit( {
 					src={ src || temporaryURL }
 					ref={ videoPlayer }
 					autoPlay={ isGif }
-					loop={ isGif }
-					muted={ isGif }
-					playsInline={ isGif }
+					loop={ playsLikeMotion }
+					muted={ playsLikeMotion }
+					playsInline={ playsLikeMotion }
+					onPointerEnter={ isLivePhoto ? playLivePhoto : undefined }
+					onPointerLeave={ isLivePhoto ? pauseLivePhoto : undefined }
+					onFocus={ isLivePhoto ? playLivePhoto : undefined }
+					onBlur={ isLivePhoto ? pauseLivePhoto : undefined }
 					width={ width }
 					height={ height }
 					style={ aspectRatio ? { aspectRatio } : undefined }
