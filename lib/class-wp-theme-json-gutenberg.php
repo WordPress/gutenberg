@@ -125,7 +125,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.2.0 Added 'shadow' presets.
 	 * @since 6.6.0 Updated the 'prevent_override' value for font size presets to use 'typography.defaultFontSizes' and spacing size presets to use `spacing.defaultSpacingSizes`.
 	 * @since 6.6.0 Added `aspectRatios`.
-	 * @since 7.1.0 Added 'textShadow' presets.
+	 * @since 7.2.0 Added 'textShadow' presets.
 	 * @var array
 	 */
 	const PRESETS_METADATA = array(
@@ -403,7 +403,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`, and
 	 *              `typography.textIndent` properties.
 	 * @since 7.1.0 Added `viewport` property.
-	 * @since 7.1.0 Added `typography.textShadow`, `typography.textShadowPresets`,
+	 * @since 7.2.0 Added `typography.textShadow`, `typography.textShadowPresets`,
 	 *              and `typography.defaultTextShadowPresets`.
 	 * @var array
 	 */
