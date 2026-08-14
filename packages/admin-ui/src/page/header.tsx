@@ -46,7 +46,13 @@ export default function Header( {
 				gap="sm"
 				justify="space-between"
 			>
-				<Stack direction="row" gap="sm" align="center" justify="start">
+				<Stack
+					className={ styles[ 'header-leading' ] }
+					direction="row"
+					gap="sm"
+					align="center"
+					justify="start"
+				>
 					{ showSidebarToggle && (
 						<SidebarToggleSlot
 							bubblesVirtually
