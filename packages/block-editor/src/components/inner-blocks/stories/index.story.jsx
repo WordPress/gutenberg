@@ -9,15 +9,17 @@ import BlockList from '../../block-list';
 import { useBlockProps } from '../../block-list/use-block-props';
 import { ExperimentalBlockEditorProvider } from '../../provider';
 
-// `InnerBlocks` only renders within a block, so the props being demonstrated
-// are passed down to the block type registered below through a context rather
-// than rendered by the story directly.
-const InnerBlocksProps = createContext( {} );
+// `InnerBlocks` only renders within a block, so the story args are passed down
+// to the block type registered below through a context rather than rendered by
+// the story directly.
+const ArgsContext = createContext( {} );
 
 const CONTAINER_BLOCK = 'storybook/inner-blocks-container';
+const TEXT_BLOCK = 'storybook/example-text';
+const MEDIA_BLOCK = 'storybook/example-media';
 const CHILD_BLOCKS = [
-	[ 'storybook/example-text', 'Example Text', 'text' ],
-	[ 'storybook/example-media', 'Example Media', 'media' ],
+	[ TEXT_BLOCK, 'Example Text', 'text' ],
+	[ MEDIA_BLOCK, 'Example Media', 'media' ],
 ];
 
 // The inner blocks appender is only rendered while the block holding the inner
@@ -30,14 +32,21 @@ const SELECTION = {
 };
 
 function ContainerEdit() {
-	const innerBlocksProps = useContext( InnerBlocksProps );
+	const args = useContext( ArgsContext );
 	const blockProps = useBlockProps();
 
 	return (
 		<div { ...blockProps }>
-			<InnerBlocks { ...innerBlocksProps } />
+			<InnerBlocks { ...args } />
 		</div>
 	);
+}
+
+function ChildEdit( { name } ) {
+	const blockProps = useBlockProps();
+	const { title } = getBlockType( name );
+
+	return <p { ...blockProps }>{ title }</p>;
 }
 
 // Minimal block types, so that the story doesn't depend on the block library.
@@ -48,9 +57,10 @@ function useContainerBlock() {
 		CHILD_BLOCKS.forEach( ( [ name, title, category ] ) => {
 			if ( ! getBlockType( name ) ) {
 				registerBlockType( name, {
+					apiVersion: 3,
 					title,
 					category,
-					edit: () => title,
+					edit: ChildEdit,
 					save: () => null,
 				} );
 			}
@@ -87,6 +97,35 @@ const storyStyles = `
 	}
 `;
 
+// The rendered story is a block editor hosting the example block below, so the
+// generated snippet would only show that scaffolding. This is how a block
+// renders the inner blocks area that the controls act on instead.
+const sourceCode = `registerBlockType( 'my-plugin/my-block', {
+	edit() {
+		const blockProps = useBlockProps();
+
+		return (
+			<div { ...blockProps }>
+				<InnerBlocks
+					allowedBlocks={ [ 'core/image', 'core/paragraph' ] }
+					orientation="vertical"
+					renderAppender={ InnerBlocks.ButtonBlockAppender }
+				/>
+			</div>
+		);
+	},
+
+	save() {
+		const blockProps = useBlockProps.save();
+
+		return (
+			<div { ...blockProps }>
+				<InnerBlocks.Content />
+			</div>
+		);
+	},
+} );`;
+
 const meta = {
 	title: 'BlockEditor/InnerBlocks',
 	component: InnerBlocks,
@@ -97,11 +136,18 @@ const meta = {
 				component:
 					'InnerBlocks is a component which allows a single block to have multiple blocks as children. It is rendered by a block `edit` implementation, and pairs with `InnerBlocks.Content` in the `save` implementation, which is replaced by the content of the nested blocks.',
 			},
+			source: { code: sourceCode },
 		},
 	},
 	argTypes: {
 		allowedBlocks: {
-			control: { type: 'object' },
+			control: { type: 'select' },
+			options: [ 'all', 'none', 'text block only' ],
+			mapping: {
+				all: true,
+				none: false,
+				'text block only': [ TEXT_BLOCK ],
+			},
 			description:
 				'The block types that can be inserted. `true` allows every block type, `false` allows none, and an array limits insertion to the listed block types.',
 			table: {
@@ -169,9 +215,9 @@ const meta = {
 		placeholder: {
 			control: false,
 			description:
-				'A component rendered in front of the appender, which can be used to represent an example state before any block is inserted.',
+				'An element rendered in front of the appender, which can be used to represent an example state before any block is inserted.',
 			table: {
-				type: { summary: 'Component' },
+				type: { summary: 'Element' },
 			},
 		},
 	},
@@ -184,7 +230,7 @@ export const Default = {
 		const blocks = useContainerBlock();
 
 		return (
-			<InnerBlocksProps.Provider value={ args }>
+			<ArgsContext.Provider value={ args }>
 				<ExperimentalBlockEditorProvider
 					value={ blocks }
 					selection={ SELECTION }
@@ -194,7 +240,7 @@ export const Default = {
 						<BlockList />
 					</div>
 				</ExperimentalBlockEditorProvider>
-			</InnerBlocksProps.Provider>
+			</ArgsContext.Provider>
 		);
 	},
 };
