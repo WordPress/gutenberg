@@ -490,7 +490,18 @@
       - icon
       - size
 - name: Input
-  props: []
+  props:
+      - className
+      - defaultValue
+      - disabled
+      - onValueChange
+      - prefix
+      - render
+      - size
+      - style
+      - suffix
+      - type
+      - value
 - name: InputControl
   props:
       - className
@@ -509,7 +520,16 @@
       - type
       - value
 - name: InputLayout
-  props: []
+  props:
+      - isBorderless
+      - prefix
+      - size
+      - suffix
+      - visuallyDisabled
+  subcomponents:
+      - name: InputLayout.Slot
+        props:
+            - padding
 - name: ItemGroup
   props:
       - as

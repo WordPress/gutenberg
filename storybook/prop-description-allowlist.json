@@ -54,7 +54,6 @@
 	"FormTokenField:className",
 	"FormTokenField:label",
 	"Input",
-	"InputLayout",
 	"Modal:aria",
 	"Modal:key",
 	"Popover>Popover.Slot",

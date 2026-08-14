@@ -82,8 +82,9 @@ const DENYLIST = {
 			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
 		FlexItem:
 			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
-		InputControl: 'Use `InputControl` from `@wordpress/ui` instead.',
-		NumberControl:
+		__experimentalInputControl:
+			'Use `InputControl` from `@wordpress/ui` instead.',
+		__experimentalNumberControl:
 			'Use `InputControl` from `@wordpress/ui` with `type="number"` instead.',
 		ResponsiveWrapper: '{{ name }} is planned for deprecation.',
 		TabPanel: 'Use `Tabs` from `@wordpress/ui` instead.',
