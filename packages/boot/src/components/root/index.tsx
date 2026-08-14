@@ -17,6 +17,7 @@ import { ThemeProvider } from '@wordpress/theme';
 import Sidebar from '../sidebar';
 import SavePanel from '../save-panel';
 import CanvasRenderer from '../canvas-renderer';
+import ErrorBoundary from '../error-boundary';
 import useRouteTitle from '../app/use-route-title';
 import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
@@ -181,12 +182,14 @@ export default function Root() {
 														/>
 													</div>
 												) }
-											<CanvasRenderer
-												canvas={ canvas }
-												routeContentModule={
-													routeContentModule
-												}
-											/>
+											<ErrorBoundary>
+												<CanvasRenderer
+													canvas={ canvas }
+													routeContentModule={
+														routeContentModule
+													}
+												/>
+											</ErrorBoundary>
 										</div>
 									) }
 								</ThemeProvider>
