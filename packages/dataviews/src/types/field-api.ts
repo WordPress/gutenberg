@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { ReactElement, ComponentType } from 'react';
 
 /**
@@ -67,6 +64,7 @@ export type FieldTypeName =
 	| 'number'
 	| 'datetime'
 	| 'date'
+	| 'time'
 	| 'media'
 	| 'boolean'
 	| 'email'
@@ -236,7 +234,7 @@ export type Field< Item > = {
 	 *
 	 * Range rules are normalized according to `type`:
 	 * - `'integer' | 'number'`: `min`/`max` accept `number`
-	 * - `'date' | 'datetime'`: `min`/`max` accept `string`
+	 * - `'date' | 'datetime' | 'time'`: `min`/`max` accept `string`
 	 * - all other field types ignore `min`/`max`
 	 */
 	isValid?: Rules< Item >;
@@ -309,7 +307,12 @@ export type Field< Item > = {
 	/**
 	 * Display format configuration for fields.
 	 */
-	format?: FormatDatetime | FormatDate | FormatNumber | FormatInteger;
+	format?:
+		| FormatDatetime
+		| FormatDate
+		| FormatTime
+		| FormatNumber
+		| FormatInteger;
 
 	/**
 	 * Callback used to format the value of the field for display.
@@ -349,6 +352,20 @@ export type FormatDate = {
 	weekStartsOn?: DayNumber;
 };
 export type DayNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
+/**
+ * Format for time fields:
+ *
+ * - time: the format string (e.g., 'g:i a' for '2:30 pm').
+ *
+ * If not provided, defaults to the WordPress time format setting.
+ *
+ * Whether the Edit control offers a seconds field follows this format: it does
+ * when the format string renders seconds, and does not otherwise.
+ */
+export type FormatTime = {
+	time?: string;
+};
 
 /**
  * Format for number fields:
@@ -401,6 +418,7 @@ export type NormalizedField< Item > = Omit<
 	format:
 		| {}
 		| Required< FormatDate >
+		| Required< FormatTime >
 		| Required< FormatInteger >
 		| Required< FormatNumber >;
 	getValueFormatted: ( {
@@ -480,6 +498,14 @@ export type DataFormControlProps< Item > = {
 		suffix?: React.ComponentType;
 		rows?: number;
 		compact?: boolean;
+		// Rich text control options.
+		className?: string;
+		clientId?: string;
+		allowedFormats?: string[];
+		disableFormats?: boolean;
+		withoutInteractiveFormatting?: boolean;
+		preserveWhiteSpace?: boolean;
+		disableLineBreaks?: boolean;
 	};
 };
 

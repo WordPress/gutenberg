@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { ComponentType, ReactElement } from 'react';
 
 /**
@@ -94,6 +91,12 @@ export interface BlockVariation<
 	 */
 	innerBlocks?: Array< unknown[] >;
 	/**
+	 * Static HTML fragments interleaved with inner blocks, where `null`
+	 * entries mark inner block positions. Only applies to the Custom HTML
+	 * block.
+	 */
+	innerContent?: Array< string | null >;
+	/**
 	 * Example provides structured data for
 	 * the block preview. You can set to
 	 * `undefined` to disable the preview shown
@@ -156,6 +159,11 @@ export interface BlockTransform<
 > {
 	type: 'block' | 'enter' | 'files' | 'prefix' | 'raw' | 'shortcode';
 	blocks?: string[];
+	/**
+	 * The target block variation name for block transforms that produce a
+	 * variation of the transformed block type.
+	 */
+	variationName?: string;
 	priority?: number;
 	isMultiBlock?: boolean;
 	isMatch?: (
@@ -239,6 +247,12 @@ export interface BlockType<
 	example?: Partial< BlockType > & {
 		innerBlocks?: BlockExampleInnerBlock[];
 		/**
+		 * Static HTML fragments interleaved with inner blocks, where `null`
+		 * entries mark inner block positions. Only applies to the Custom HTML
+		 * block.
+		 */
+		innerContent?: Array< string | null >;
+		/**
 		 * The width of the preview container in pixels.
 		 */
 		viewportWidth?: number;
@@ -274,6 +288,19 @@ export interface BlockType<
 	 * Allowed child block types.
 	 */
 	allowedBlocks?: string[];
+	/**
+	 * Initial child blocks created when an empty block of this type
+	 * is inserted, as a list of `[ name, attributes, innerTemplate ]`
+	 * items.
+	 */
+	template?: Array<
+		[ string, Record< string, unknown >?, Array< unknown >? ]
+	>;
+	/**
+	 * Whether the selection should move into the first block created from
+	 * the template when it is inserted.
+	 */
+	templateInsertUpdatesSelection?: boolean;
 	/**
 	 * Context provided for available access by descendants of
 	 * blocks of this type, in the form of an object which maps
@@ -482,6 +509,14 @@ export interface Block<
 	 * Inner blocks.
 	 */
 	innerBlocks: Block[];
+	/**
+	 * Static HTML fragments interleaved with inner blocks, for the Custom HTML
+	 * block. `null` entries mark the positions of the inner blocks within the
+	 * static markup. When present, this is the canonical source of the block's
+	 * own markup and is used for serialization instead of the `save`
+	 * implementation.
+	 */
+	innerContent?: Array< string | null >;
 	/**
 	 * Original content of the block before validation fixes.
 	 */
@@ -815,8 +850,17 @@ export interface TypographyProps {
 export interface SpacingProps {
 	/**
 	 * Enable block gap control.
+	 *
+	 * The object form declares the sides the control applies to, and the gap
+	 * value to fall back to when neither the theme nor the user has set one.
 	 */
-	blockGap: boolean | AxialDirection[];
+	blockGap:
+		| boolean
+		| AxialDirection[]
+		| {
+				__experimentalDefault?: string;
+				sides?: AxialDirection[];
+		  };
 
 	/**
 	 * Enable margin control UI for all or specified element directions.

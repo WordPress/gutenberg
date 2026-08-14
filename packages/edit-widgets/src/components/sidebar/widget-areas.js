@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { blockDefault } from '@wordpress/icons';
@@ -9,10 +6,6 @@ import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 import { safeHTML } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import { store as editWidgetsStore } from '../../store';
 
 export default function WidgetAreas( { selectedWidgetAreaId } ) {

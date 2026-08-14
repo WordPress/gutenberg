@@ -24,7 +24,7 @@
 
 		&-title {
 			font-size: $font-size-medium;
-			font-weight: $font-weight-medium;
+			font-weight: var(--wpds-typography-font-weight-emphasis);
 			line-height: $font-line-height-small;
 			display: flex;
 			gap: $grid-unit-05;
@@ -92,7 +92,7 @@
 
 		&-name {
 			font-size: $font-size-medium;
-			font-weight: $font-weight-medium;
+			font-weight: var(--wpds-typography-font-weight-emphasis);
 			line-height: $font-line-height-small;
 			color: $gray-900;
 			overflow: hidden;

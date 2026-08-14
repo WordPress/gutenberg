@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ReactNode, ReactElement, ComponentProps } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { cloneElement } from '@wordpress/element';
 
 function getClickableItemProps< Item >( {
@@ -86,9 +79,7 @@ export function ItemClickWrapper< Item >( {
 			className: `${ className } ${ className }--clickable`,
 			...extraProps,
 			children,
-		} ) as ReactElement<
-			Pick< React.DOMAttributes< Element >, 'onClick' | 'onKeyDown' >
-		>;
+		} );
 
 		// Clone the element and enhance onClick to stop propagation
 		return cloneElement( renderedElement, {

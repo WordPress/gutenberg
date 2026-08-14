@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as blocksStore } from '@wordpress/blocks';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import {
@@ -24,10 +21,6 @@ import {
 } from '@wordpress/block-editor';
 import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
-
-/**
- * Internal dependencies
- */
 import { useBlockVariations } from './variations/variations-panel';
 import { ScreenHeader } from './screen-header';
 import { NavigationButtonAsItem } from './navigation-button';
@@ -40,6 +33,7 @@ const {
 	useHasBorderPanel,
 	useSettingsForBlockElement,
 	useHasColorPanel,
+	useHasBackgroundPanel,
 } = unlock( blockEditorPrivateApis );
 
 function useSortedBlockTypes() {
@@ -70,6 +64,7 @@ export function useBlockHasGlobalStyles( blockName: string ) {
 	const settings = useSettingsForBlockElement( rawSettings, blockName );
 	const hasTypographyPanel = useHasTypographyPanel( settings );
 	const hasColorPanel = useHasColorPanel( settings );
+	const hasBackgroundPanel = useHasBackgroundPanel( settings );
 	const hasBorderPanel = useHasBorderPanel( settings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasLayoutPanel = hasBorderPanel || hasDimensionsPanel;
@@ -77,6 +72,7 @@ export function useBlockHasGlobalStyles( blockName: string ) {
 	const hasGlobalStyles =
 		hasTypographyPanel ||
 		hasColorPanel ||
+		hasBackgroundPanel ||
 		hasLayoutPanel ||
 		hasVariationsPanel;
 	return hasGlobalStyles;

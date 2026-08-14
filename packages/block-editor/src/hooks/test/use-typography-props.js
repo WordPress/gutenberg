@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getTypographyClassesAndStyles } from '../use-typography-props';
 
 describe( 'getTypographyClassesAndStyles', () => {

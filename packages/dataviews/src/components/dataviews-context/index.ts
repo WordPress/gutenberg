@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { ComponentProps, ReactElement, ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { createContext, createRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type {
 	View,
 	Action,
@@ -46,8 +35,10 @@ type DataViewsContextType< Item > = {
 	) => ReactElement;
 	isItemClickable: ( item: Item ) => boolean;
 	containerWidth: number;
-	containerRef: React.RefObject< HTMLDivElement | null >;
-	resizeObserverRef: React.Ref< HTMLDivElement | null >;
+	containerRef: React.MutableRefObject< HTMLDivElement | null >;
+	resizeObserverRef:
+		| ( ( element?: HTMLDivElement | null ) => void )
+		| React.RefObject< HTMLDivElement >;
 	defaultLayouts: NormalizedSupportedLayouts;
 	filters: NormalizedFilter[];
 	isShowingFilter: boolean;

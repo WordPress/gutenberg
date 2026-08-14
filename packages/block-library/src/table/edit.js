@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	memo,
 	useCallback,
@@ -48,10 +41,6 @@ import {
 	tableRowDelete,
 	table,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import {
 	createTable,
 	updateSelectedCell,
@@ -455,7 +444,7 @@ function TableEdit( {
 				<>
 					<BlockControls group="block">
 						<AlignmentControl
-							label={ __( 'Change column alignment' ) }
+							label={ __( 'Align column content' ) }
 							alignmentControls={ ALIGNMENT_CONTROLS }
 							value={ getCellAlignment() }
 							onChange={ ( nextAlign ) =>
@@ -563,7 +552,6 @@ function TableEdit( {
 						onSubmit={ onCreateTable }
 					>
 						<TextControl
-							__next40pxDefaultSize
 							type="number"
 							label={ __( 'Column count' ) }
 							value={ initialColumnCount }
@@ -572,7 +560,6 @@ function TableEdit( {
 							className="blocks-table__placeholder-input"
 						/>
 						<TextControl
-							__next40pxDefaultSize
 							type="number"
 							label={ __( 'Row count' ) }
 							value={ initialRowCount }

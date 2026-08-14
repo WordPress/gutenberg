@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	Icon as WCIcon,
@@ -21,11 +14,7 @@ import {
 	arrowRight,
 	arrowLeft,
 } from '@wordpress/icons';
-import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
+import { getBlockType } from '@wordpress/blocks';
 import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
@@ -110,20 +99,14 @@ function BlockCard( {
 			if ( parentClientId || isChild || ! allowParentNavigation ) {
 				return {};
 			}
-			const { getBlockParents, getBlockName } =
-				select( blockEditorStore );
+			const { getBlockParents, getBlockName, shouldRenderBlockListView } =
+				unlock( select( blockEditorStore ) );
 
-			// Find the top-most parent block that is either:
-			// 1. A navigation block (special case for ad-hoc list view support)
-			// 2. Any block with listView support
+			// Find the top-most parent block that participates in List View.
 			const parents = getBlockParents( clientId, false );
-			const foundParentId = parents.find( ( parentId ) => {
-				const parentName = getBlockName( parentId );
-				return (
-					parentName === 'core/navigation' ||
-					hasBlockSupport( parentName, 'listView' )
-				);
-			} );
+			const foundParentId = parents.find( ( parentId ) =>
+				shouldRenderBlockListView( parentId )
+			);
 
 			return {
 				parentBlockClientId: foundParentId,

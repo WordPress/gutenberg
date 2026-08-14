@@ -1,23 +1,11 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { Spinner, Composite } from '@wordpress/components';
 import { createInterpolateElement } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { getBlockType } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { VisuallyHidden, Tooltip } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import BlockRatings from '../block-ratings';
 import DownloadableBlockIcon from '../downloadable-block-icon';
 import DownloadableBlockNotice from '../downloadable-block-notice';
@@ -31,24 +19,36 @@ function getDownloadableBlockLabel(
 	const stars = Math.round( rating / 0.5 ) * 0.5;
 
 	if ( ! isInstalled && hasNotice ) {
-		/* translators: %s: block title */
-		return sprintf( 'Retry installing %s.', decodeEntities( title ) );
+		return sprintf(
+			/* translators: %s: block title */
+			__( 'Retry installing %s.' ),
+			decodeEntities( title )
+		);
 	}
 
 	if ( isInstalled ) {
-		/* translators: %s: block title */
-		return sprintf( 'Add %s.', decodeEntities( title ) );
+		return sprintf(
+			/* translators: %s: block title */
+			__( 'Add %s.' ),
+			decodeEntities( title )
+		);
 	}
 
 	if ( isInstalling ) {
-		/* translators: %s: block title */
-		return sprintf( 'Installing %s.', decodeEntities( title ) );
+		return sprintf(
+			/* translators: %s: block title */
+			__( 'Installing %s.' ),
+			decodeEntities( title )
+		);
 	}
 
 	// No ratings yet, just use the title.
 	if ( ratingCount < 1 ) {
-		/* translators: %s: block title */
-		return sprintf( 'Install %s.', decodeEntities( title ) );
+		return sprintf(
+			/* translators: %s: block title */
+			__( 'Install %s.' ),
+			decodeEntities( title )
+		);
 	}
 
 	return sprintf(

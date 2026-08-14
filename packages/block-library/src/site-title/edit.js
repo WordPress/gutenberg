@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
@@ -17,19 +14,14 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
 export default function SiteTitleEdit( props ) {
 	useDeprecatedTextAlign( props );
 
-	const { attributes, setAttributes, insertBlocksAfter } = props;
+	const { attributes, setAttributes } = props;
 
 	const { level, levelOptions, isLink, linkTarget } = attributes;
 	const { canUserEdit, title } = useSelect( ( select ) => {
@@ -73,9 +65,6 @@ export default function SiteTitleEdit( props ) {
 				onChange={ setTitle }
 				allowedFormats={ [] }
 				disableLineBreaks
-				__unstableOnSplitAtEnd={ () =>
-					insertBlocksAfter( createBlock( getDefaultBlockName() ) )
-				}
 			/>
 		</TagName>
 	) : (

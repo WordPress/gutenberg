@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type {
 	ComponentPropsWithoutRef,
@@ -9,17 +6,9 @@ import type {
 	MouseEvent,
 	ReactElement,
 } from 'react';
-
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
 import { forwardRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import Tooltip from '../tooltip';
 import Icon from '../icon';
 import { VisuallyHidden } from '../visually-hidden';
@@ -104,7 +93,7 @@ function useDeprecatedProps( {
  * );
  * ```
  */
-export function UnforwardedButton(
+export const Button = forwardRef( function UnforwardedButton(
 	props: ButtonProps & DeprecatedButtonProps,
 	ref: ForwardedRef< any >
 ) {
@@ -301,8 +290,6 @@ export function UnforwardedButton(
 			) }
 		</>
 	);
-}
+} );
 
-export const Button = forwardRef( UnforwardedButton );
-Button.displayName = 'Button';
 export default Button;

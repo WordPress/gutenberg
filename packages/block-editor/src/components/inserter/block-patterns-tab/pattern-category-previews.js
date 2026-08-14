@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useMemo,
 	useState,
@@ -9,7 +6,6 @@ import {
 	useEffect,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -17,10 +13,6 @@ import {
 	__experimentalText as WCText,
 	FlexBlock,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import usePatternsState from '../hooks/use-patterns-state';
 import BlockPatternsList from '../../block-patterns-list';
 import usePatternsPaging from '../hooks/use-patterns-paging';

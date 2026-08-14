@@ -1,29 +1,39 @@
-/**
- * WordPress dependencies
- */
 import { Page } from '@wordpress/admin-ui';
+import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as viewportStore } from '@wordpress/viewport';
-
-/**
- * Internal dependencies
- */
+import {
+	WidgetDashboard,
+	type DashboardWidget,
+} from '@wordpress/widget-dashboard';
+import {
+	useWidgetTypes,
+	type WidgetModuleRecord,
+} from '@wordpress/widget-primitives';
+import { registerDashboardFieldTypes } from './field-types';
 import { useDashboardGridSettings, useDashboardLayout } from './hooks';
-import { WidgetDashboard } from './widget-dashboard';
-import type { DashboardWidget } from './widget-dashboard';
-import { useWidgetTypes } from './widget-types';
+
+registerDashboardFieldTypes();
 
 function Dashboard() {
 	const [ layout, setLayout, resetLayout ] = useDashboardLayout(
 		'gutenberg_dashboard'
 	);
 
-	const [ gridSettings, setGridSettings ] = useDashboardGridSettings();
+	const gridSettings = useDashboardGridSettings();
 
-	const [ widgetTypes, isResolving ] = useWidgetTypes();
+	const widgetsModules = useSelect(
+		( select ) =>
+			select( coreStore ).getEntityRecords( 'root', 'widgetModule' ) as
+				| WidgetModuleRecord[]
+				| null,
+		[]
+	);
+
+	const [ widgetTypes, isResolving ] = useWidgetTypes( widgetsModules );
 
 	const [ editMode, setEditMode ] = useState( false );
 
@@ -34,9 +44,6 @@ function Dashboard() {
 		[]
 	);
 
-	const customizeDashboardLabel = __( 'Customize Dashboard' );
-	const dashboardLabel = __( 'Dashboard' );
-
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const handleLayoutChange = ( next: DashboardWidget[] ) => {
@@ -46,7 +53,9 @@ function Dashboard() {
 		} );
 	};
 
-	const pageTitle = editMode ? customizeDashboardLabel : dashboardLabel;
+	const pageTitle = editMode
+		? __( 'Customize Dashboard' )
+		: __( 'Dashboard' );
 
 	return (
 		<WidgetDashboard
@@ -56,7 +65,6 @@ function Dashboard() {
 			onLayoutChange={ handleLayoutChange }
 			onLayoutReset={ resetLayout }
 			gridSettings={ gridSettings }
-			onGridSettingsChange={ setGridSettings }
 			editMode={ editMode }
 			onEditChange={ setEditMode }
 		>
@@ -69,6 +77,8 @@ function Dashboard() {
 				<WidgetDashboard.NoWidgetsState />
 				<WidgetDashboard.Widgets />
 			</Page>
+
+			<WidgetDashboard.Commands />
 		</WidgetDashboard>
 	);
 }

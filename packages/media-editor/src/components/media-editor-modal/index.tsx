@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Modal } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -8,10 +5,6 @@ import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
 import type { Field } from '@wordpress/dataviews';
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
-
-/**
- * Internal dependencies
- */
 import MediaEditor from '../media-editor';
 import type { Media } from '../media-editor-provider';
 import { store as mediaEditorStore } from '../../store';
@@ -37,12 +30,14 @@ export function MediaEditorModal( {
 	fields = [],
 	aspectRatioPresets,
 }: MediaEditorModalProps ) {
-	const { isModalOpen, id, onUpdate } = useSelect( ( select ) => {
-		const { isOpen, getId, getOnUpdate } = select( mediaEditorStore );
+	const { isModalOpen, id, onUpdate, onClose } = useSelect( ( select ) => {
+		const { isOpen, getId, getOnUpdate, getOnClose } =
+			select( mediaEditorStore );
 		return {
 			isModalOpen: isOpen(),
 			id: getId(),
 			onUpdate: getOnUpdate(),
+			onClose: getOnClose(),
 		};
 	}, [] );
 
@@ -66,6 +61,11 @@ export function MediaEditorModal( {
 		event.stopPropagation();
 	};
 
+	const handleClose = () => {
+		closeMediaEditorModal();
+		onClose?.();
+	};
+
 	return (
 		<MediaEditor
 			id={ id }
@@ -75,7 +75,7 @@ export function MediaEditorModal( {
 			shouldCloseOnEsc
 			noticesClassName="media-editor-modal__snackbar"
 			noticesPortalElement={ portalElement }
-			onClose={ closeMediaEditorModal }
+			onClose={ handleClose }
 			onSaved={ ( { id: savedId, url, previous } ) => {
 				if ( savedId && onUpdate ) {
 					const update: MediaEditorModalUpdate = {
@@ -84,7 +84,7 @@ export function MediaEditorModal( {
 					};
 					onUpdate( update );
 				}
-				closeMediaEditorModal();
+				handleClose();
 				if ( previous && savedId !== previous.id && onUpdate ) {
 					// Intentionally unscoped: the modal is closing, so the
 					// snackbar surfaces in the host editor (not the media
@@ -108,6 +108,8 @@ export function MediaEditorModal( {
 			renderFrame={ ( {
 				children,
 				headerActions,
+				footerActions,
+				footerLayout,
 				onRequestClose,
 				onKeyDown,
 				shouldCloseOnClickOutside,
@@ -127,6 +129,13 @@ export function MediaEditorModal( {
 						headerActions={ headerActions }
 					>
 						{ children }
+						<div
+							className={ `media-editor-modal__footer is-${ footerLayout }` }
+							role="region"
+							aria-label={ __( 'Editor actions' ) }
+						>
+							{ footerActions }
+						</div>
 					</Modal>
 				</ShortcutProvider>
 			) }

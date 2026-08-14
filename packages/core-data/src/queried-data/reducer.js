@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { combineReducers, keyedReducer } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { conservativeMapItem, ifMatchingAction, replaceAction } from '../utils';
 import { DEFAULT_ENTITY_KEY } from '../entities';
 import getQueryParts from './get-query-parts';

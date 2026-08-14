@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import Stars from './stars';
 
 export const BlockRatings = ( { rating } ) => (

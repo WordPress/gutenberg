@@ -24,25 +24,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
-/**
- * External dependencies
- */
 import { isPlainObject } from 'is-plain-object';
 import { paramCase as kebabCase } from 'change-case';
-
-/**
- * WordPress dependencies
- */
 import {
 	escapeHTML,
 	escapeAttribute,
 	isValidAttributeName,
 } from '@wordpress/escape-html';
-
-/**
- * Internal dependencies
- */
 import { createContext, Fragment, StrictMode, forwardRef } from './react';
 import RawHTML from './raw-html';
 
@@ -626,9 +614,7 @@ export function renderElement(
 
 		case Consumer.$$typeof:
 			return renderElement(
-				props.children(
-					context || type._currentValue || type._context._currentValue
-				),
+				props.children( context || type._currentValue ),
 				context,
 				legacyContext
 			);

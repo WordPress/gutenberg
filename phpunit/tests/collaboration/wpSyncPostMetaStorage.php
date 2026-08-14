@@ -120,11 +120,9 @@ class Tests_Collaboration_WpSyncPostMetaStorage extends WP_UnitTestCase {
 
 		/*
 		 * array_first() is a PHP 8.5 function. WordPress added
-		 * a polyfill in WP 6.9 (see https://core.trac.wordpress.org/ticket/63853).
-		 * Since Gutenberg must support the two most recent WordPress
-		 * versions (currently 6.8+), we cannot rely on it here.
+		 * a polyfill in WP 6.9 (see https://core.trac.wordpress.org/changeset/60672).
 		 */
-		$storage_post_id = $posts[0] ?? null;
+		$storage_post_id = array_first( $posts );
 		$this->assertIsInt( $storage_post_id );
 
 		return $storage_post_id;

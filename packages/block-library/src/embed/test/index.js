@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import {
 	registerBlockType,
 	unregisterBlockType,
 	registerBlockVariation,
 	unregisterBlockVariation,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import {
 	findMoreSuitableBlock,
 	getClassNames,

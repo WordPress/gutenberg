@@ -644,6 +644,7 @@ _**Note:** Since WordPress 6.2._
 -   Type: `Object`
 -   Default value: null
 -   Subproperties:
+    -   `aspectRatio`: type `boolean`, default value `false`
     -   `height`: type `boolean`, default value `false`
     -   `minHeight`: type `boolean`, default value `false`
     -   `minWidth`: type `boolean`, default value `false`
@@ -654,11 +655,11 @@ This value signals that a block supports some of the CSS style properties relate
 ```js
 supports: {
 	dimensions: {
-		aspectRatio: true // Enable aspect ratio control.
-		height: true // Enable height control.
-		minHeight: true // Enable min height control.
-		minWidth: true // Enable min width control.
-		width: true // Enable width control.
+		aspectRatio: true, // Enable aspect ratio control.
+		height: true, // Enable height control.
+		minHeight: true, // Enable min height control.
+		minWidth: true, // Enable min width control.
+		width: true, // Enable width control.
 	}
 }
 ```
@@ -680,6 +681,19 @@ attributes: {
     }
 }
 ```
+
+## editableRoot
+
+-   Type: `boolean`
+-   Default value: `false`
+
+When set to `true`, the block declares that it keeps working when an ancestor
+element (the editor canvas) is the `contenteditable` editing host, with focus
+and the native selection residing there instead of on the block's own editable
+elements. The editor uses this to keep the canvas editable while such a block
+is selected, enabling native partial selection across blocks. Blocks that rely
+on `event.target` or DOM focus pointing at their own elements should not
+declare this support.
 
 ## filter
 
@@ -833,7 +847,7 @@ For the `flow` layout type only, determines display of the "Inner blocks use con
 -   Type: `boolean`
 -   Default value: `false`
 
-For the `flex` layout type only, determines display of sizing controls (Fit/Fill/Fixed) on all child blocks of the flex block.
+For the `flex` layout type only, determines display of sizing controls (Fit/Grow/Max width/Fixed) on all child blocks of the flex block.
 
 ### layout.allowVerticalAlignment
 

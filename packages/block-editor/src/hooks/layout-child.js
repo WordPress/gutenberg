@@ -1,14 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import { store as blockEditorStore } from '../store';
+import { unlock } from '../lock-unlock';
 import { useStyleOverride } from './utils';
 import { useLayout } from '../components/block-list/layout';
 import {
@@ -16,17 +11,39 @@ import {
 	GridItemResizer,
 	GridItemMovers,
 } from '../components/grid';
+import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import useBlockVisibility from '../components/block-visibility/use-block-visibility';
 import { deviceTypeKey } from '../store/private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
+import {
+	DEFAULT_BLOCK_STYLE_STATE,
+	getStyleForState,
+	hasViewportBlockStyleState,
+	setStyleForState,
+} from './block-style-state';
+
+const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 
 // Used for generating the instance ID
 const LAYOUT_CHILD_BLOCK_PROPS_REFERENCE = {};
-// Keep in sync with WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS.
-const RESPONSIVE_BREAKPOINTS = {
-	mobile: '@media (width <= 480px)',
-	tablet: '@media (480px < width <= 782px)',
+
+// These are the serialized `selfStretch` values. `max` used to be called
+// "Fixed" in the UI, but was renamed and replaced by `fixedNoShrink`.
+const FLEX_CHILD_LAYOUT_VALUES = {
+	fit: 'fit',
+	grow: 'fill',
+	max: 'fixed',
+	fixed: 'fixedNoShrink',
 };
+
+const FLEX_SIZE_VALUES = [
+	FLEX_CHILD_LAYOUT_VALUES.max,
+	FLEX_CHILD_LAYOUT_VALUES.fixed,
+];
+
+function isFlexSizeValue( value ) {
+	return FLEX_SIZE_VALUES.includes( value );
+}
 
 function serializeRule( { selector, declarations } ) {
 	return `${ selector } {
@@ -60,6 +77,7 @@ export function getChildLayoutStyleRules( {
 		columnSpan,
 		rowSpan,
 	} = effectiveLayout;
+	const baseSelfStretch = layout.selfStretch;
 	const { columnCount, minimumColumnWidth } = parentLayout;
 	const rules = [];
 
@@ -69,10 +87,30 @@ export function getChildLayoutStyleRules( {
 		hasViewportOverride( 'selfStretch' ) ||
 		hasViewportOverride( 'flexSize' )
 	) {
-		if ( selfStretch === 'fixed' && flexSize ) {
+		if (
+			hasViewportOverrides &&
+			( selfStretch === FLEX_CHILD_LAYOUT_VALUES.fit ||
+				selfStretch === FLEX_CHILD_LAYOUT_VALUES.grow ) &&
+			isFlexSizeValue( baseSelfStretch ) &&
+			layout.flexSize
+		) {
+			declarations[ 'flex-basis' ] = 'unset';
+			if ( baseSelfStretch === FLEX_CHILD_LAYOUT_VALUES.fixed ) {
+				declarations[ 'flex-shrink' ] = 'unset';
+			}
+		}
+		if ( isFlexSizeValue( selfStretch ) && flexSize ) {
 			declarations[ 'flex-basis' ] = flexSize;
+			if ( selfStretch === FLEX_CHILD_LAYOUT_VALUES.fixed ) {
+				declarations[ 'flex-shrink' ] = '0';
+			} else if (
+				hasViewportOverrides &&
+				baseSelfStretch === FLEX_CHILD_LAYOUT_VALUES.fixed
+			) {
+				declarations[ 'flex-shrink' ] = 'unset';
+			}
 			declarations[ 'box-sizing' ] = 'border-box';
-		} else if ( selfStretch === 'fill' ) {
+		} else if ( selfStretch === FLEX_CHILD_LAYOUT_VALUES.grow ) {
 			declarations[ 'flex-grow' ] = '1';
 		}
 	}
@@ -208,12 +246,16 @@ export function getResponsiveChildLayoutStyles( {
 	style = {},
 	selector,
 	parentLayout = {},
+	viewportSettings,
 } ) {
 	const baseLayout = style?.layout ?? {};
 
-	return Object.entries( RESPONSIVE_BREAKPOINTS )
+	return Object.entries( getResponsiveMediaQueries( viewportSettings ) )
 		.map( ( [ viewport, mediaQuery ] ) => {
-			const viewportLayout = style?.[ viewport ]?.layout;
+			const viewportLayout = getStyleForState( style, {
+				viewport,
+				pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
+			} )?.layout;
 			if ( ! viewportLayout || ! Object.keys( viewportLayout ).length ) {
 				return '';
 			}
@@ -233,10 +275,50 @@ export function getResponsiveChildLayoutStyles( {
 		.join( '' );
 }
 
-function useBlockPropsChildLayoutStyles( { style } ) {
-	const shouldRenderChildLayoutStyles = useSelect( ( select ) => {
-		return ! select( blockEditorStore ).getSettings().disableLayoutStyles;
+/**
+ * Merges child layout changes into the active layout style state.
+ *
+ * @param {Object|undefined} style         Block style attributes.
+ * @param {Object}           layout        Child layout changes.
+ * @param {Object}           selectedState Selected block style state.
+ * @return {Object|undefined} Updated block style attributes.
+ */
+export function getUpdatedChildLayoutStyle( style, layout, selectedState ) {
+	if ( ! hasViewportBlockStyleState( selectedState ) ) {
+		return {
+			...style,
+			layout: {
+				...style?.layout,
+				...layout,
+			},
+		};
+	}
+
+	const layoutState = {
+		viewport: selectedState.viewport,
+		pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
+	};
+	const stateStyle = getStyleForState( style, layoutState );
+
+	return setStyleForState( style, layoutState, {
+		...stateStyle,
+		layout: {
+			...stateStyle?.layout,
+			...layout,
+		},
 	} );
+}
+
+function useBlockPropsChildLayoutStyles( { style } ) {
+	const { shouldRenderChildLayoutStyles, viewportSettings } = useSelect(
+		( select ) => {
+			const settings = select( blockEditorStore ).getSettings();
+			return {
+				shouldRenderChildLayoutStyles: ! settings.disableLayoutStyles,
+				viewportSettings: settings?.__experimentalFeatures?.viewport,
+			};
+		}
+	);
 	const layout = style?.layout ?? {};
 	const { columnStart, rowStart, columnSpan, rowSpan } = layout;
 	const parentLayout = useLayout() || {};
@@ -272,6 +354,7 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 				style,
 				selector,
 				parentLayout,
+				viewportSettings,
 			} ),
 		].join( '' );
 	}
@@ -325,7 +408,9 @@ function GridTools( {
 		parentBlockVisibility,
 		blockBlockVisibility,
 		deviceType,
+		viewportSettings,
 		isChildBlockAGrid,
+		selectedState,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -334,8 +419,8 @@ function GridTools( {
 				getTemplateLock,
 				getBlockAttributes,
 				getSettings,
-			} = select( blockEditorStore );
-
+				getSelectedBlockStyleState,
+			} = unlock( select( blockEditorStore ) );
 			const _rootClientId = getBlockRootClientId( clientId );
 
 			if (
@@ -351,6 +436,9 @@ function GridTools( {
 			const parentAttributes = getBlockAttributes( _rootClientId );
 			const blockAttributes = getBlockAttributes( clientId );
 			const settings = getSettings();
+			const currentDeviceType =
+				settings?.[ deviceTypeKey ]?.toLowerCase() ||
+				BLOCK_VISIBILITY_VIEWPORTS.desktop.key;
 
 			return {
 				rootClientId: _rootClientId,
@@ -359,26 +447,57 @@ function GridTools( {
 					parentAttributes?.metadata?.blockVisibility,
 				blockBlockVisibility:
 					blockAttributes?.metadata?.blockVisibility,
-				deviceType:
-					settings?.[ deviceTypeKey ]?.toLowerCase() ||
-					BLOCK_VISIBILITY_VIEWPORTS.desktop.key,
+				deviceType: currentDeviceType,
+				viewportSettings: settings?.__experimentalFeatures?.viewport,
 				// Check if the selected child block is itself a grid.
 				isChildBlockAGrid: blockAttributes?.layout?.type === 'grid',
+				selectedState: getSelectedBlockStyleState( clientId ),
 			};
 		},
 		[ clientId ]
 	);
 
-	const { isBlockCurrentlyHidden: isParentBlockCurrentlyHidden } =
-		useBlockVisibility( {
-			blockVisibility: parentBlockVisibility,
-			deviceType,
-		} );
+	// Get the block's DOM element to derive the canvas iframe window,
+	// so viewport detection matches the actual block rendering context
+	const blockElement = useBlockElement( clientId );
+	const rawCanvasView = blockElement?.ownerDocument?.defaultView;
+	const canvasView = rawCanvasView === null ? undefined : rawCanvasView;
+
+	const {
+		isBlockCurrentlyHidden: isParentBlockCurrentlyHidden,
+		currentViewport,
+	} = useBlockVisibility( {
+		blockVisibility: parentBlockVisibility,
+		deviceType,
+		view: canvasView,
+		viewportSettings,
+	} );
+
+	// Check whether any ancestor of the parent grid is hidden at the viewport
+	// actually detected from the canvas, so it stays consistent with how
+	// blocks are hidden.
+	const isAnyAncestorHidden = useSelect(
+		( select ) => {
+			if ( ! rootClientId ) {
+				return false;
+			}
+			const { isBlockParentHiddenAtViewport } = unlock(
+				select( blockEditorStore )
+			);
+			return isBlockParentHiddenAtViewport(
+				rootClientId,
+				currentViewport
+			);
+		},
+		[ rootClientId, currentViewport ]
+	);
 
 	const { isBlockCurrentlyHidden: isBlockItselfCurrentlyHidden } =
 		useBlockVisibility( {
 			blockVisibility: blockBlockVisibility,
 			deviceType,
+			view: canvasView,
+			viewportSettings,
 		} );
 
 	// Use useState() instead of useRef() so that GridItemResizer updates when ref is set.
@@ -386,7 +505,7 @@ function GridTools( {
 
 	const childGridClientId = isChildBlockAGrid ? clientId : undefined;
 
-	if ( ! isVisible || isParentBlockCurrentlyHidden ) {
+	if ( ! isVisible || isParentBlockCurrentlyHidden || isAnyAncestorHidden ) {
 		return null;
 	}
 
@@ -394,13 +513,7 @@ function GridTools( {
 
 	function updateLayout( layout ) {
 		setAttributes( {
-			style: {
-				...style,
-				layout: {
-					...style?.layout,
-					...layout,
-				},
-			},
+			style: getUpdatedChildLayoutStyle( style, layout, selectedState ),
 		} );
 	}
 

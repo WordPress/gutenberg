@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -76,9 +73,9 @@ test.describe( 'Style Revisions', () => {
 	} ) => {
 		await editor.canvas.locator( 'body' ).click();
 		await userGlobalStylesRevisions.openStylesPanel();
-		await page.getByRole( 'button', { name: 'Colors' } ).click();
+		await page.getByRole( 'button', { name: 'Background styles' } ).click();
 		await page
-			.getByRole( 'button', { name: 'Background', exact: true } )
+			.getByRole( 'button', { name: 'Color', exact: true } )
 			.click();
 		await page
 			.getByRole( 'option', { name: 'Luminous vivid amber' } )
@@ -227,7 +224,7 @@ test.describe( 'Style Revisions', () => {
 			page.getByLabel( 'Global styles revisions list' )
 		).toBeVisible();
 
-		await page.click( 'role=button[name="Back"]' );
+		await page.getByRole( 'button', { name: 'Back', exact: true } ).click();
 
 		await expect(
 			page.getByLabel( 'Global styles revisions list' )

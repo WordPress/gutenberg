@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import safeHTML from './safe-html';
 
 /**

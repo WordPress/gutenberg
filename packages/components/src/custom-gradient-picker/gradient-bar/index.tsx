@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-import type { MouseEventHandler } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useRef, useReducer } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import type { MouseEventHandler } from 'react';
 import ControlPoints from './control-points';
 import { getHorizontalRelativeGradientPosition } from './utils';
 import { MINIMUM_DISTANCE_BETWEEN_INSERTER_AND_POINT } from './constants';

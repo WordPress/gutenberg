@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { camelCase } from 'change-case';
-
-/**
- * WordPress dependencies
- */
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import { STORE_NAME } from './name';
 import { additionalEntityConfigLoaders, DEFAULT_ENTITY_KEY } from './entities';
 import { getSyncManager } from './sync';
@@ -25,6 +14,7 @@ import {
 	RECEIVE_INTERMEDIATE_RESULTS,
 	isNumericID,
 	normalizeQueryForResolution,
+	saveCRDTDoc,
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
 import { restoreSelection, getSelectionHistory } from './utils/crdt-selection';
@@ -193,8 +183,13 @@ export const getEntityRecord =
 					} );
 				}
 
+				const syncManager =
+					select?.isCollaborationSupported?.() === false
+						? undefined
+						: getSyncManager();
+
 				// Load the entity record for syncing. Do not await promise.
-				void getSyncManager()?.load(
+				void syncManager?.load(
 					entityConfig.syncConfig,
 					objectType,
 					objectId,
@@ -250,9 +245,15 @@ export const getEntityRecord =
 						// persistence. As we add support for syncing additional entity,
 						// we'll need to revisit where persisted CRDT documents are stored.
 						persistCRDTDoc: () => {
-							resolveSelect
+							if (
+								! entityConfig.syncConfig?.supportsPersistence
+							) {
+								return;
+							}
+
+							return resolveSelect
 								.getEditedEntityRecord( kind, name, key )
-								.then( ( editedRecord ) => {
+								.then( async ( editedRecord ) => {
 									// Don't persist the CRDT document if the record is still an
 									// auto-draft or if the entity does not support meta.
 									const { meta, status } = editedRecord;
@@ -260,19 +261,14 @@ export const getEntityRecord =
 										return;
 									}
 
-									// Trigger a minimal save to persist the CRDT document. The
-									// entity's pre-persist hooks will create the persisted CRDT
-									// document and apply it to the record's meta.
 									const entityIdKey =
 										entityConfig.key || DEFAULT_ENTITY_KEY;
-									dispatch.saveEntityRecord(
-										kind,
-										name,
-										{
-											[ entityIdKey ]:
-												editedRecord[ entityIdKey ],
-										},
-										{ __unstableSkipSyncUpdate: true }
+									const entityId =
+										editedRecord[ entityIdKey ];
+
+									await saveCRDTDoc(
+										`${ kind }/${ name }`,
+										entityId
 									);
 								} );
 						},
@@ -286,6 +282,11 @@ export const getEntityRecord =
 									selectionHistory
 								);
 							}
+						},
+						onUndoStackChange: ( undoState ) => {
+							dispatch.__unstableNotifySyncUndoManagerChange(
+								undoState
+							);
 						},
 						restoreUndoMeta: ( ydoc, meta ) => {
 							const selectionHistory =
@@ -1055,7 +1056,7 @@ getDefaultTemplateId.shouldInvalidate = ( action ) => {
  */
 export const getRevisions =
 	( kind, name, recordKey, query = {} ) =>
-	async ( { dispatch, registry, resolveSelect } ) => {
+	async ( { dispatch, resolveSelect } ) => {
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
@@ -1130,37 +1131,31 @@ export const getRevisions =
 					} );
 				}
 
-				registry.batch( () => {
-					dispatch.receiveRevisions(
+				await dispatch.receiveRevisions(
+					kind,
+					name,
+					recordKey,
+					records,
+					query,
+					false,
+					meta
+				);
+
+				// Mark individual getRevision resolutions as done so that
+				// subsequent getRevision calls skip redundant API fetches.
+				const key = entityConfig.revisionKey || DEFAULT_ENTITY_KEY;
+				const normalizedQuery = normalizeQueryForResolution( rawQuery );
+				const resolutionsArgs = records
+					.filter( ( record ) => record[ key ] )
+					.map( ( record ) => [
 						kind,
 						name,
 						recordKey,
-						records,
-						query,
-						false,
-						meta
-					);
+						record[ key ],
+						normalizedQuery,
+					] );
 
-					// Mark individual getRevision resolutions as done so that
-					// subsequent getRevision calls skip redundant API fetches.
-					const key = entityConfig.revisionKey || DEFAULT_ENTITY_KEY;
-					const normalizedQuery =
-						normalizeQueryForResolution( rawQuery );
-					const resolutionsArgs = records
-						.filter( ( record ) => record[ key ] )
-						.map( ( record ) => [
-							kind,
-							name,
-							recordKey,
-							record[ key ],
-							normalizedQuery,
-						] );
-
-					dispatch.finishResolutions(
-						'getRevision',
-						resolutionsArgs
-					);
-				} );
+				dispatch.finishResolutions( 'getRevision', resolutionsArgs );
 			}
 		} finally {
 			dispatch.__unstableReleaseStoreLock( lock );
@@ -1249,7 +1244,7 @@ export const getRevision =
 			}
 
 			if ( record ) {
-				dispatch.receiveRevisions(
+				await dispatch.receiveRevisions(
 					kind,
 					name,
 					recordKey,
@@ -1348,14 +1343,24 @@ export const getEditorAssets =
 /**
  * Requests view config for a given entity type from the REST API.
  *
- * @param {string} kind Entity kind.
- * @param {string} name Entity name.
+ * @param {string}    kind           Entity kind.
+ * @param {string}    name           Entity name.
+ * @param {?Object}   options        Optional options.
+ * @param {?string[]} options.fields Optional subset of top-level config
+ *                                   properties to request, mapped to the REST
+ *                                   API `_fields` parameter. When omitted, the
+ *                                   full config is requested.
  */
 export const getViewConfig =
-	( kind, name ) =>
+	( kind, name, options = {} ) =>
 	async ( { dispatch } ) => {
+		const query = { kind, name };
+		const fields = getNormalizedCommaSeparable( options.fields );
+		if ( fields?.length ) {
+			query._fields = fields.join( ',' );
+		}
 		const config = await apiFetch( {
-			path: addQueryArgs( '/wp/v2/view-config', { kind, name } ),
+			path: addQueryArgs( '/wp/v2/view-config', query ),
 		} );
 		dispatch.receiveViewConfig( kind, name, config );
 	};

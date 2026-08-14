@@ -6,8 +6,10 @@
 		"checkJs": false
 	},
 	"references": [
+		{ "path": "../a11y" },
 		{ "path": "../api-fetch" },
 		{ "path": "../components" },
+		{ "path": "../compose" },
 		{ "path": "../core-data" },
 		{ "path": "../data" },
 		{ "path": "../dataviews" },

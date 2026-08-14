@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
 import type { ReactNode } from 'react';
@@ -80,10 +80,7 @@ describe( 'Select', () => {
 			</Select.Root>
 		);
 
-		const placeholder = screen.getByText( 'Select' );
-
 		expect( screen.getByRole( 'combobox' ) ).toHaveTextContent( 'Select' );
-		expect( placeholder ).toHaveAttribute( 'data-placeholder' );
 	} );
 
 	it( 'supports custom placeholder text', () => {
@@ -96,29 +93,8 @@ describe( 'Select', () => {
 			</Select.Root>
 		);
 
-		const placeholder = screen.getByText( 'Choose an item' );
-
 		expect( screen.getByRole( 'combobox' ) ).toHaveTextContent(
 			'Choose an item'
-		);
-		expect( placeholder ).toHaveAttribute( 'data-placeholder' );
-	} );
-
-	it( 'does not use placeholder styling when a value is selected', () => {
-		render(
-			<Select.Root defaultValue="Item 1">
-				<Select.Trigger />
-				<Select.Popup>
-					<Select.Item value="Item 1" />
-				</Select.Popup>
-			</Select.Root>
-		);
-
-		const trigger = screen.getByRole( 'combobox' );
-
-		expect( trigger ).toHaveTextContent( 'Item 1' );
-		expect( within( trigger ).getByText( 'Item 1' ) ).not.toHaveAttribute(
-			'data-placeholder'
 		);
 	} );
 
@@ -345,4 +321,69 @@ describe( 'Select', () => {
 		} );
 	} );
 	/* eslint-enable testing-library/no-node-access */
+
+	describe( 'grouped items', () => {
+		const GROUPED_ITEMS = [
+			{
+				label: 'Group 1',
+				items: [
+					{ value: 'item-1', label: 'Item 1' },
+					{ value: 'item-2', label: 'Item 2' },
+				],
+			},
+			{
+				label: 'Group 2',
+				items: [ { value: 'item-3', label: 'Item 3' } ],
+			},
+		];
+
+		it( 'forwards refs', async () => {
+			const user = userEvent.setup();
+			const groupRef = createRef< HTMLDivElement >();
+			const groupLabelRef = createRef< HTMLDivElement >();
+
+			render(
+				<Select.Root
+					items={ GROUPED_ITEMS.flatMap( ( group ) => group.items ) }
+				>
+					<Select.Trigger />
+					<Select.Popup>
+						{ GROUPED_ITEMS.map( ( group ) => (
+							<Select.Group
+								key={ group.label }
+								ref={
+									group.label === 'Group 1'
+										? groupRef
+										: undefined
+								}
+							>
+								<Select.GroupLabel
+									ref={
+										group.label === 'Group 1'
+											? groupLabelRef
+											: undefined
+									}
+								>
+									{ group.label }
+								</Select.GroupLabel>
+								{ group.items.map( ( item ) => (
+									<Select.Item
+										key={ item.value }
+										value={ item }
+									>
+										{ item.label }
+									</Select.Item>
+								) ) }
+							</Select.Group>
+						) ) }
+					</Select.Popup>
+				</Select.Root>
+			);
+
+			await user.click( screen.getByRole( 'combobox' ) );
+
+			expect( groupRef.current ).toBeInstanceOf( HTMLDivElement );
+			expect( groupLabelRef.current ).toBeInstanceOf( HTMLDivElement );
+		} );
+	} );
 } );

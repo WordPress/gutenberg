@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, _x } from '@wordpress/i18n';
 import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
@@ -8,10 +5,6 @@ import {
 	__experimentalSpacer as Spacer,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import TypographyPanel from './typography-panel';
 import { ScreenHeader } from './screen-header';
 import TypographyPreview from './typography-preview';
@@ -68,7 +61,6 @@ function ScreenTypographyElement( { element }: ScreenTypographyElementProps ) {
 							setHeadingLevel( value as string )
 						}
 						isBlock
-						size="__unstable-large"
 					>
 						<ToggleGroupControlOption
 							value="heading"

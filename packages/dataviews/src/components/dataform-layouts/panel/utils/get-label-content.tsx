@@ -1,9 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { Icon as WCIcon } from '@wordpress/components';
 import { error as errorIcon } from '@wordpress/icons';
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { Tooltip, VisuallyHidden } from '@wordpress/ui';
 
 function getLabelContent(

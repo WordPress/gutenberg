@@ -79,7 +79,7 @@ export const CONTRAST_COMBINATIONS: {
 
 // Used when generating the DTCG tokens and the static color ramps.
 export const DEFAULT_SEED_COLORS = {
-	bg: '#fcfcfc',
+	background: '#fcfcfc',
 	primary: '#3858e9',
 	info: '#0090ff',
 	success: '#4ab866',

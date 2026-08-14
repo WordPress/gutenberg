@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Page } from '@wordpress/admin-ui';
 import {
 	Button,
@@ -18,17 +15,13 @@ import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Notice } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
+import { unlock } from '@wordpress/routes-lock-unlock';
 import './style.scss';
 import { AiPluginCallout } from './ai-plugin-callout';
 import {
 	getIsFileModDisabled,
 	registerDefaultConnectors,
 } from './default-connectors';
-import { unlock } from '../lock-unlock';
 
 const { store } = unlock( connectorsPrivateApis );
 
@@ -130,7 +123,7 @@ function ConnectorsPage() {
 						style={ { maxWidth: 480 } }
 					>
 						<VStack alignment="center" spacing={ 2 }>
-							<Heading level={ 2 } size={ 15 } weight={ 600 }>
+							<Heading level={ 2 } size={ 15 }>
 								{ __( 'No connectors yet' ) }
 							</Heading>
 							<WCText size={ 12 }>

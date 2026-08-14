@@ -7,7 +7,6 @@
 
 require_once __DIR__ . '/navigation-link/shared/item-should-render.php';
 require_once __DIR__ . '/navigation-link/shared/render-submenu-icon.php';
-require_once __DIR__ . '/navigation-link/shared/build-css-font-sizes.php';
 
 /**
  * Renders the submenu icon SVG for the Navigation Submenu block.
@@ -77,26 +76,18 @@ function block_core_navigation_submenu_get_submenu_visibility( $context ) {
 function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	// Check if this navigation item should render based on post status.
 	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-		if ( ! gutenberg_block_core_shared_navigation_item_should_render( $attributes, $block ) ) {
-			return '';
-		}
+		$should_render = gutenberg_block_core_shared_navigation_item_should_render( $attributes, $block );
+	} else {
+		$should_render = block_core_shared_navigation_item_should_render( $attributes, $block );
+	}
+	if ( ! $should_render ) {
+		return '';
 	}
 
 	// Don't render the block's subtree if it has no label.
 	if ( empty( $attributes['label'] ) ) {
 		return '';
 	}
-
-	// The build system prefixes this function with "gutenberg_" to avoid
-	// collisions with the core version. Until this function is backported to
-	// core, we need to guard its use and only call the prefixed name in
-	//  the plugin.
-	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-		$font_sizes = gutenberg_block_core_shared_navigation_build_css_font_sizes( $block->context );
-	} else {
-		$font_sizes = block_core_shared_navigation_build_css_font_sizes( $block->context );
-	}
-	$style_attribute = $font_sizes['inline_styles'];
 
 	// Render inner blocks first to check if any menu items will actually display.
 	$inner_blocks_html = '';
@@ -124,10 +115,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	$classes = array(
 		'wp-block-navigation-item',
 	);
-	$classes = array_merge(
-		$classes,
-		$font_sizes['css_classes']
-	);
+
 	if ( $has_submenu ) {
 		$classes[] = 'has-child';
 	}
@@ -147,7 +135,6 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
 			'class' => implode( ' ', $classes ),
-			'style' => $style_attribute,
 		)
 	);
 
