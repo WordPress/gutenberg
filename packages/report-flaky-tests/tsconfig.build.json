@@ -6,5 +6,13 @@
 		// which resolves relative imports by their real `.ts` extension.
 		"allowImportingTsExtensions": true
 	},
-	"exclude": [ "**/benchmark", "src/__tests__", "src/__fixtures__" ]
+	"exclude": [
+		"**/benchmark",
+		"**/test/**",
+		"**/tests/**",
+		"**/stories/**",
+		"**/*.story.*",
+		"src/__tests__",
+		"src/__fixtures__"
+	]
 }

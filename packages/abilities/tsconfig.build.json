@@ -1,7 +1,15 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
-	"exclude": [ "**/*.test.ts", "**/tests/**", "src/loader.ts" ],
+	"exclude": [
+		"**/benchmark",
+		"**/test/**",
+		"**/tests/**",
+		"**/stories/**",
+		"**/*.story.*",
+		"**/*.test.ts",
+		"src/loader.ts"
+	],
 	"references": [
 		{
 			"path": "../api-fetch/tsconfig.build.json"
