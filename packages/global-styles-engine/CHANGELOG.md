@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add pseudo-selector support for select elements.
+
 ## 1.20.0 (2026-08-12)
 
 ### Bug Fixes

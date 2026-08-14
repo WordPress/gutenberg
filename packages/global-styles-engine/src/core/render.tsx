@@ -220,6 +220,7 @@ const VALID_ELEMENT_PSEUDO_SELECTORS: Record< string, string[] > = {
 		':focus-visible',
 		':active',
 	],
+	select: [ ':hover', ':focus', ':focus-visible', ':active' ],
 };
 
 /**
