@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Render the editor preferences modal, so the Preferences menu item and command open it ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+
 ## 1.19.0 (2026-08-12)
 
 
