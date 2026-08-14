@@ -4,12 +4,12 @@
 
 ### Breaking Changes
 
--   `Select.Item`: `'compact'` is removed from the `size` prop. Use `'default'` instead ([#81354](https://github.com/WordPress/gutenberg/pull/81354)).
--   `Combobox.Item`, `SelectControl.Item`: the `size` prop is removed ([#81354](https://github.com/WordPress/gutenberg/pull/81354)).
+-   `Select.Item`: Remove `'compact'` from the `size` prop. Use `'default'` instead ([#81354](https://github.com/WordPress/gutenberg/pull/81354)).
+-   `Combobox.Item`, `SelectControl.Item`: The `size` prop is removed ([#81354](https://github.com/WordPress/gutenberg/pull/81354)).
 
 ### Enhancements
 
--   `Select.Item`, `Combobox.Item`, and `Autocomplete.Item`: default item height is now 32px (previously 40px) ([#81354](https://github.com/WordPress/gutenberg/pull/81354)).
+-   `Select.Item`, `Combobox.Item`, and `Autocomplete.Item`: Default item height is now 32px (previously 40px) ([#81354](https://github.com/WordPress/gutenberg/pull/81354)).
 
 ### Internal
 
