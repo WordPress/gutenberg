@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Register the editor and block editor keyboard shortcuts from the editor provider, so shortcuts work for consumers that mount the editor without rendering `EditorKeyboardShortcutsRegister` themselves ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
+
+## 14.53.0 (2026-08-12)
+
+### Internal
+
+-   Notes: Move the rich text control the note form renders from `@wordpress/dataviews` into this package, where `@wordpress/rich-text` is the same copy the block editor uses ([#81430](https://github.com/WordPress/gutenberg/pull/81430)).
+-   Use the new `@wordpress/kebab-case` package instead of unlocking the `kebabCase` utility from the `@wordpress/components` private APIs ([#81294](https://github.com/WordPress/gutenberg/pull/81294)).
+-   Vendor a local copy of the `normalizeTextString` utility instead of unlocking it from the `@wordpress/components` private APIs ([#81294](https://github.com/WordPress/gutenberg/pull/81294)).
+
 ### Enhancements
 
 -   Add a read-only code diff to the revisions screen ([#80314](https://github.com/WordPress/gutenberg/pull/80314)).

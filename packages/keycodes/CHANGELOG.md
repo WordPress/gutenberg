@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.53.0 (2026-08-12)
+
 ### New Features
 
 -   Add `withIgnoreIMEEvents`, a helper that wraps a keydown handler so it ignores events fired during an IME composition. Previously a private API of `@wordpress/components` ([#81343](https://github.com/WordPress/gutenberg/pull/81343)).
