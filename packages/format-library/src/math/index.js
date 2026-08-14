@@ -10,12 +10,10 @@ import {
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import {
 	Popover,
-	privateApis as componentsPrivateApis,
+	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
+import { ControlWithError } from '@wordpress/ui';
 import { math as icon } from '@wordpress/icons';
-import { unlock } from '../lock-unlock';
-
-const { ValidatedInputControl } = unlock( componentsPrivateApis );
 
 const name = 'core/math';
 const title = __( 'Math' );
@@ -32,6 +30,7 @@ function InlineUI( {
 	);
 	const [ error, setError ] = useState( null );
 	const formRef = useRef();
+	const inputRef = useRef();
 
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
@@ -85,18 +84,24 @@ function InlineUI( {
 				style={ { minWidth: '300px', padding: '4px' } }
 				onSubmit={ ( event ) => event.preventDefault() }
 			>
-				<ValidatedInputControl
-					hideLabelFromVision
-					label={ __( 'LaTeX math syntax' ) }
-					value={ latex }
+				<ControlWithError
+					className="components-validated-control"
 					customValidity={
 						error ? { type: 'invalid', message: error } : undefined
 					}
-					onChange={ handleLatexChange }
-					placeholder={ __( 'e.g., x^2, \\frac{a}{b}' ) }
-					autoComplete="off"
-					className="block-editor-format-toolbar__math-input"
-				/>
+					getValidityTarget={ () => inputRef.current }
+				>
+					<InputControl
+						ref={ inputRef }
+						hideLabelFromVision
+						label={ __( 'LaTeX math syntax' ) }
+						value={ latex }
+						onChange={ handleLatexChange }
+						placeholder={ __( 'e.g., x^2, \\frac{a}{b}' ) }
+						autoComplete="off"
+						className="block-editor-format-toolbar__math-input"
+					/>
+				</ControlWithError>
 			</form>
 		</Popover>
 	);

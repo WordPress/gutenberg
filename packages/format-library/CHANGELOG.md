@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Math format: Compose validation with `ControlWithError` from `@wordpress/ui` instead of unlocking `ValidatedInputControl` from the `@wordpress/components` private APIs ([#81230](https://github.com/WordPress/gutenberg/issues/81230)).
+
 ## 5.53.0 (2026-08-12)
 
 
