@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import JustifyContentUI from './ui';
 
 const JustifyContentControl = ( props ) => {

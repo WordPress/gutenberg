@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { createRegistry } from '../../registry';
 import { createRegistryControl } from '../../factory';
 

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Page, BrowserContext } from '@playwright/test';
-
-/**
- * WordPress dependencies
- */
 import {
 	Editor,
 	type Admin,
@@ -644,8 +637,10 @@ export async function setCollaboration(
 	requestUtils: RequestUtils,
 	enabled: boolean
 ): Promise< void > {
+	// Relative path: a leading slash would resolve against the origin and
+	// break on subdirectory installs.
 	const response = await requestUtils.request.get(
-		'/wp-admin/options-writing.php'
+		'wp-admin/options-writing.php'
 	);
 	const html = await response.text();
 	const nonce = html.match( /name="_wpnonce" value="([^"]+)"/ )![ 1 ];
@@ -665,7 +660,7 @@ export async function setCollaboration(
 
 	formData[ optionName ] = optionValue;
 
-	await requestUtils.request.post( '/wp-admin/options.php', {
+	await requestUtils.request.post( 'wp-admin/options.php', {
 		form: formData,
 		failOnStatusCode: true,
 	} );

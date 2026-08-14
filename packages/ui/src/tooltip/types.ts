@@ -1,6 +1,5 @@
 import type { ReactElement, ReactNode } from 'react';
 import type { Tooltip as _Tooltip } from '@base-ui/react/tooltip';
-
 import type { ComponentProps } from '../utils/types';
 
 export type PortalProps = ComponentProps< typeof _Tooltip.Portal >;

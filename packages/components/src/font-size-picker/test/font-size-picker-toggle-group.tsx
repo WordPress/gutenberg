@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { render } from '@ariakit/test/react';
-
-/**
- * Internal dependencies
- */
 import FontSizePickerToggleGroup from '../font-size-picker-toggle-group';
 import type { FontSize } from '../types';
 
@@ -39,8 +32,6 @@ describe( 'FontSizePickerToggleGroup', () => {
 					value="16px"
 					valueMode="literal"
 					onChange={ onChange }
-					__next40pxDefaultSize={ false }
-					size="default"
 				/>
 			);
 			// Should select the medium option (16px)
@@ -57,8 +48,6 @@ describe( 'FontSizePickerToggleGroup', () => {
 					value="medium"
 					valueMode="slug"
 					onChange={ onChange }
-					__next40pxDefaultSize={ false }
-					size="default"
 				/>
 			);
 			// Should select the medium option
@@ -75,8 +64,6 @@ describe( 'FontSizePickerToggleGroup', () => {
 					value={ undefined }
 					valueMode="literal"
 					onChange={ onChange }
-					__next40pxDefaultSize={ false }
-					size="default"
 				/>
 			);
 			// Should have no selection
@@ -93,8 +80,6 @@ describe( 'FontSizePickerToggleGroup', () => {
 					value=""
 					valueMode="literal"
 					onChange={ onChange }
-					__next40pxDefaultSize={ false }
-					size="default"
 				/>
 			);
 			// Should have no selection
@@ -112,8 +97,6 @@ describe( 'FontSizePickerToggleGroup', () => {
 				<FontSizePickerToggleGroup
 					fontSizes={ fontSizes }
 					onChange={ onChange }
-					__next40pxDefaultSize={ false }
-					size="default"
 				/>
 			);
 			await user.click( screen.getByRole( 'radio', { name: 'Small' } ) );
@@ -128,8 +111,6 @@ describe( 'FontSizePickerToggleGroup', () => {
 					fontSizes={ fontSizes }
 					value="medium"
 					onChange={ onChange }
-					__next40pxDefaultSize={ false }
-					size="default"
 				/>
 			);
 			// Click a different option
@@ -165,8 +146,6 @@ describe( 'FontSizePickerToggleGroup', () => {
 					value="12px"
 					valueMode="literal"
 					onChange={ onChange }
-					__next40pxDefaultSize={ false }
-					size="default"
 				/>
 			);
 			// Should have no selection when there are multiple matches
@@ -183,8 +162,6 @@ describe( 'FontSizePickerToggleGroup', () => {
 					value="small-1"
 					valueMode="slug"
 					onChange={ onChange }
-					__next40pxDefaultSize={ false }
-					size="default"
 				/>
 			);
 			// Should select the specific font size by slug
@@ -226,8 +203,6 @@ describe( 'FontSizePickerToggleGroup', () => {
 					value="1em"
 					valueMode="literal"
 					onChange={ onChange }
-					__next40pxDefaultSize={ false }
-					size="default"
 				/>
 			);
 			// Should select the medium option (1em)
@@ -244,8 +219,6 @@ describe( 'FontSizePickerToggleGroup', () => {
 					value="clamp(1.75rem, 3vw, 2.25rem)"
 					valueMode="literal"
 					onChange={ onChange }
-					__next40pxDefaultSize={ false }
-					size="default"
 				/>
 			);
 			// Should select the extra large option
@@ -262,8 +235,6 @@ describe( 'FontSizePickerToggleGroup', () => {
 					value="medium"
 					valueMode="slug"
 					onChange={ onChange }
-					__next40pxDefaultSize={ false }
-					size="default"
 				/>
 			);
 			// Should select the medium option

@@ -13,10 +13,10 @@ function Text( { children }: { children: React.ReactNode } ) {
 				margin: 0,
 				fontFamily: 'var(--wpds-typography-font-family-body)',
 				fontSize: 'var(--wpds-typography-font-size-md)',
-				fontWeight: 'var(--wpds-typography-font-weight-regular)',
+				fontWeight: 'var(--wpds-typography-font-weight-default)',
 				lineHeight: 'var(--wpds-typography-line-height-sm)',
 				textWrap: 'pretty',
-				color: 'var(--wpds-color-fg-content-neutral-weak)',
+				color: 'var(--wpds-color-foreground-content-neutral-weak)',
 			} }
 		>
 			{ children }
@@ -34,6 +34,11 @@ const meta: Meta< typeof Card.Root > = {
 		'Card.FullBleed': Card.FullBleed,
 		'Card.Title': Card.Title,
 	},
+	// Temporary: Due to an upstream bug, render the root explicitly so the
+	// components manifest extractor can resolve props from the JSX.
+	//
+	// See: https://github.com/storybookjs/storybook/issues/34877
+	render: ( args ) => <Card.Root { ...args } />,
 	parameters: {
 		componentStatus: {
 			status: 'recommended',
@@ -47,28 +52,24 @@ type Story = StoryObj< typeof Card.Root >;
 
 export const Default: Story = {
 	args: {
-		children: (
-			<>
-				<Card.Header>
-					<Card.Title>Card title</Card.Title>
-				</Card.Header>
-				<Card.Content>
-					<Text>
-						This is the main content area. It can contain any
-						elements. This is the main content area. It can contain
-						any elements. This is the main content area. It can
-						contain any elements. This is the main content area. It
-						can contain any elements. This is the main content area.
-						It can contain any elements. This is the main content
-						area. It can contain any elements.
-					</Text>
-					<Text>
-						This is the main content area. It can contain any
-						elements.
-					</Text>
-				</Card.Content>
-			</>
-		),
+		children: [
+			<Card.Header key="header">
+				<Card.Title>Card title</Card.Title>
+			</Card.Header>,
+			<Card.Content key="content">
+				<Text>
+					This is the main content area. It can contain any elements.
+					This is the main content area. It can contain any elements.
+					This is the main content area. It can contain any elements.
+					This is the main content area. It can contain any elements.
+					This is the main content area. It can contain any elements.
+					This is the main content area. It can contain any elements.
+				</Text>
+				<Text>
+					This is the main content area. It can contain any elements.
+				</Text>
+			</Card.Content>,
+		],
 	},
 };
 
@@ -101,24 +102,22 @@ export const FullBleedCoverOnly: Story = {
  */
 export const FullBleedCoverWithHeader: Story = {
 	args: {
-		children: (
-			<>
-				<Card.Header>
-					<Card.Title>Card title</Card.Title>
-				</Card.Header>
-				<Card.Content>
-					<Card.FullBleed>
-						<div
-							style={ {
-								height: 180,
-								background:
-									'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-							} }
-						/>
-					</Card.FullBleed>
-				</Card.Content>
-			</>
-		),
+		children: [
+			<Card.Header key="header">
+				<Card.Title>Card title</Card.Title>
+			</Card.Header>,
+			<Card.Content key="content">
+				<Card.FullBleed>
+					<div
+						style={ {
+							height: 180,
+							background:
+								'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+						} }
+					/>
+				</Card.FullBleed>
+			</Card.Content>,
+		],
 	},
 };
 
@@ -128,25 +127,26 @@ export const FullBleedCoverWithHeader: Story = {
  */
 export const WithFullBleed: Story = {
 	args: {
-		children: (
-			<>
-				<Card.Header>
-					<Card.Title>Featured image</Card.Title>
-				</Card.Header>
-				<Card.Content render={ <Stack direction="column" gap="lg" /> }>
-					<Card.FullBleed>
-						<div
-							style={ {
-								height: 160,
-								background:
-									'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-							} }
-						/>
-					</Card.FullBleed>
-					<Text>Content below the full-bleed area.</Text>
-				</Card.Content>
-			</>
-		),
+		children: [
+			<Card.Header key="header">
+				<Card.Title>Featured image</Card.Title>
+			</Card.Header>,
+			<Card.Content
+				key="content"
+				render={ <Stack direction="column" gap="lg" /> }
+			>
+				<Card.FullBleed>
+					<div
+						style={ {
+							height: 160,
+							background:
+								'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+						} }
+					/>
+				</Card.FullBleed>
+				<Text>Content below the full-bleed area.</Text>
+			</Card.Content>,
+		],
 	},
 };
 
@@ -170,28 +170,29 @@ export const HeaderOnly: Story = {
  */
 export const FullBleedHeroWithTitle: Story = {
 	args: {
-		children: (
-			<>
-				<Card.Header render={ <Stack direction="column" gap="lg" /> }>
-					<Card.FullBleed>
-						<div
-							style={ {
-								height: 180,
-								background:
-									'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-							} }
-						/>
-					</Card.FullBleed>
-					<Card.Title>Hero image card</Card.Title>
-				</Card.Header>
-				<Card.Content>
-					<Text>
-						The image above bleeds to the card&apos;s top and side
-						edges.
-					</Text>
-				</Card.Content>
-			</>
-		),
+		children: [
+			<Card.Header
+				key="header"
+				render={ <Stack direction="column" gap="lg" /> }
+			>
+				<Card.FullBleed>
+					<div
+						style={ {
+							height: 180,
+							background:
+								'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+						} }
+					/>
+				</Card.FullBleed>
+				<Card.Title>Hero image card</Card.Title>
+			</Card.Header>,
+			<Card.Content key="content">
+				<Text>
+					The image above bleeds to the card&apos;s top and side
+					edges.
+				</Text>
+			</Card.Content>,
+		],
 	},
 };
 
@@ -202,27 +203,25 @@ export const FullBleedHeroWithTitle: Story = {
  */
 export const FullBleedHeroOnly: Story = {
 	args: {
-		children: (
-			<>
-				<Card.Header>
-					<Card.FullBleed>
-						<div
-							style={ {
-								height: 180,
-								background:
-									'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-							} }
-						/>
-					</Card.FullBleed>
-				</Card.Header>
-				<Card.Content>
-					<Text>
-						The image above bleeds to the card&apos;s top and side
-						edges.
-					</Text>
-				</Card.Content>
-			</>
-		),
+		children: [
+			<Card.Header key="header">
+				<Card.FullBleed>
+					<div
+						style={ {
+							height: 180,
+							background:
+								'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+						} }
+					/>
+				</Card.FullBleed>
+			</Card.Header>,
+			<Card.Content key="content">
+				<Text>
+					The image above bleeds to the card&apos;s top and side
+					edges.
+				</Text>
+			</Card.Content>,
+		],
 	},
 };
 
@@ -234,15 +233,13 @@ export const FullBleedHeroOnly: Story = {
 export const CustomSemantics: Story = {
 	args: {
 		render: <section />,
-		children: (
-			<>
-				<Card.Header>
-					<Card.Title render={ <h2 /> }>Section heading</Card.Title>
-				</Card.Header>
-				<Card.Content>
-					<Text>Semantically meaningful card content.</Text>
-				</Card.Content>
-			</>
-		),
+		children: [
+			<Card.Header key="header">
+				<Card.Title render={ <h2 /> }>Section heading</Card.Title>
+			</Card.Header>,
+			<Card.Content key="content">
+				<Text>Semantically meaningful card content.</Text>
+			</Card.Content>,
+		],
 	},
 };

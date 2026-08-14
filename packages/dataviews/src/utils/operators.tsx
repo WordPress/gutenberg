@@ -1,25 +1,15 @@
-/**
- * External dependencies
- */
 import { subDays, subWeeks, subMonths, subYears } from 'date-fns';
-
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { createInterpolateElement } from '@wordpress/element';
 import { getDate } from '@wordpress/date';
 import type { ReactElement } from 'react';
-
-/**
- * Internal dependencies
- */
 import type {
 	FilterOperator,
 	NormalizedFilter,
 	Operator,
 	Option,
 } from '../types';
+import parseTime from '../field-types/utils/parse-time';
 import {
 	OPERATOR_AFTER,
 	OPERATOR_AFTER_INC,
@@ -49,6 +39,35 @@ const filterTextWrappers = {
 	Name: <span className="dataviews-filters__summary-filter-text-name" />,
 	Value: <span className="dataviews-filters__summary-filter-text-value" />,
 };
+
+/**
+ * Reduces a value and the value it is compared against to numbers. The filter
+ * value picks the scale: a time filter compares field values as seconds since
+ * midnight, anything else compares as timestamps. `parseTime` accepts only
+ * `HH:mm[:ss]`, so no date or datetime is read as a time.
+ *
+ * A field value that does not parse on a time filter's scale becomes `NaN`:
+ * every ordering operator is false for it, and `notOn` is true — matching how
+ * `is`/`isNot` treat a missing value.
+ *
+ * @param fieldValue  The item's value.
+ * @param filterValue The value it is compared against.
+ * @return            Both values as comparable numbers.
+ */
+function toComparableTemporals(
+	fieldValue: any,
+	filterValue: any
+): [ number, number ] {
+	const filterTime = parseTime( filterValue );
+	if ( filterTime !== null ) {
+		return [ parseTime( fieldValue ) ?? NaN, filterTime ];
+	}
+
+	return [
+		getDate( fieldValue ).getTime(),
+		getDate( filterValue ).getTime(),
+	];
+}
 
 /**
  * Calculates a date offset from now.
@@ -206,13 +225,27 @@ const OPERATORS: {
 			if (
 				! Array.isArray( filterValue ) ||
 				filterValue.length !== 2 ||
-				filterValue[ 0 ] === undefined ||
-				filterValue[ 1 ] === undefined
+				// An unfilled bound is `undefined` from the controls, `''`
+				// when it arrives from a persisted view, or `null` once
+				// `undefined` round-trips through JSON persistence.
+				filterValue.includes( undefined ) ||
+				filterValue.includes( '' ) ||
+				filterValue.includes( null )
 			) {
 				return true;
 			}
 
 			const fieldValue = field.getValue( { item } );
+
+			// Time bounds pick the scale, as in `toComparableTemporals`:
+			// values compare as seconds since midnight so precision does not
+			// matter, and a value that is not a time is excluded rather than
+			// compared as a string.
+			const [ min, max ] = filterValue.map( parseTime );
+			if ( min !== null && max !== null ) {
+				const value = parseTime( fieldValue );
+				return value !== null && value >= min && value <= max;
+			}
 
 			if (
 				typeof fieldValue === 'number' ||
@@ -461,10 +494,12 @@ const OPERATORS: {
 				return true;
 			}
 
-			const filterDate = getDate( filterValue );
-			const fieldDate = getDate( field.getValue( { item } ) );
+			const [ fieldTemporal, filterTemporal ] = toComparableTemporals(
+				field.getValue( { item } ),
+				filterValue
+			);
 
-			return fieldDate < filterDate;
+			return fieldTemporal < filterTemporal;
 		},
 		selection: 'single',
 	},
@@ -487,10 +522,12 @@ const OPERATORS: {
 				return true;
 			}
 
-			const filterDate = getDate( filterValue );
-			const fieldDate = getDate( field.getValue( { item } ) );
+			const [ fieldTemporal, filterTemporal ] = toComparableTemporals(
+				field.getValue( { item } ),
+				filterValue
+			);
 
-			return fieldDate > filterDate;
+			return fieldTemporal > filterTemporal;
 		},
 		selection: 'single',
 	},
@@ -515,10 +552,12 @@ const OPERATORS: {
 				return true;
 			}
 
-			const filterDate = getDate( filterValue );
-			const fieldDate = getDate( field.getValue( { item } ) );
+			const [ fieldTemporal, filterTemporal ] = toComparableTemporals(
+				field.getValue( { item } ),
+				filterValue
+			);
 
-			return fieldDate <= filterDate;
+			return fieldTemporal <= filterTemporal;
 		},
 		selection: 'single',
 	},
@@ -543,10 +582,12 @@ const OPERATORS: {
 				return true;
 			}
 
-			const filterDate = getDate( filterValue );
-			const fieldDate = getDate( field.getValue( { item } ) );
+			const [ fieldTemporal, filterTemporal ] = toComparableTemporals(
+				field.getValue( { item } ),
+				filterValue
+			);
 
-			return fieldDate >= filterDate;
+			return fieldTemporal >= filterTemporal;
 		},
 		selection: 'single',
 	},
@@ -664,10 +705,12 @@ const OPERATORS: {
 				return true;
 			}
 
-			const filterDate = getDate( filterValue );
-			const fieldDate = getDate( field.getValue( { item } ) );
+			const [ fieldTemporal, filterTemporal ] = toComparableTemporals(
+				field.getValue( { item } ),
+				filterValue
+			);
 
-			return filterDate.getTime() === fieldDate.getTime();
+			return fieldTemporal === filterTemporal;
 		},
 		selection: 'single',
 	},
@@ -690,10 +733,12 @@ const OPERATORS: {
 				return true;
 			}
 
-			const filterDate = getDate( filterValue );
-			const fieldDate = getDate( field.getValue( { item } ) );
+			const [ fieldTemporal, filterTemporal ] = toComparableTemporals(
+				field.getValue( { item } ),
+				filterValue
+			);
 
-			return filterDate.getTime() !== fieldDate.getTime();
+			return fieldTemporal !== filterTemporal;
 		},
 		selection: 'single',
 	},

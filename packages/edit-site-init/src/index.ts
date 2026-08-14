@@ -1,8 +1,6 @@
-/**
- * WordPress dependencies
- */
 import {
 	home,
+	siteLogo,
 	styles,
 	navigation,
 	page,
@@ -21,6 +19,7 @@ export async function init() {
 	// Define icons for menu items
 	const menuIcons: Record< string, { icon: React.ReactElement } > = {
 		home: { icon: home },
+		identity: { icon: siteLogo },
 		styles: { icon: styles },
 		navigation: { icon: navigation },
 		pages: { icon: page },

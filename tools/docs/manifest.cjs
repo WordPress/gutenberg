@@ -1,8 +1,4 @@
 /* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
-
-/**
- * External dependencies
- */
 const fs = require( 'fs' );
 const path = require( 'path' );
 const { join, resolve } = path;
@@ -20,9 +16,8 @@ const blockCategoryPaths = glob(
 );
 const componentPaths = glob( 'packages/components/src/*/**/README.md', {
 	cwd: ROOT_DIR,
-	// Don't expose documentation for mobile only and private components just yet.
+	// Don't expose documentation for private components just yet.
 	ignore: [
-		'**/src/mobile/**/README.md',
 		'packages/components/src/theme/README.md',
 		'packages/components/src/view/README.md',
 		'packages/components/src/menu/README.md',

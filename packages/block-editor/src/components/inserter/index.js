@@ -1,25 +1,19 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { speak } from '@wordpress/a11y';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Dropdown, Button } from '@wordpress/components';
-import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-import { createBlock, store as blocksStore } from '@wordpress/blocks';
+import { useDispatch, useSelect } from '@wordpress/data';
+import {
+	createBlock,
+	store as blocksStore,
+	__experimentalGetBlockLabel as getBlockLabel,
+} from '@wordpress/blocks';
 import { forwardRef } from '@wordpress/element';
 import { plus } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import InserterMenu from './menu';
 import QuickInserter from './quick-inserter';
 import { store as blockEditorStore } from '../../store';
+import { getSiblingBlockAttributes } from '../../utils/sibling-block-attributes';
 import { getAppenderLabel } from './get-appender-label';
 
 const UnforwardedInserterToggle = (
@@ -156,7 +150,6 @@ const UnforwardedInserter = (
 			const defaultBlockType = directInsertBlock
 				? getBlockType( directInsertBlock.name )
 				: null;
-
 			return {
 				hasItems: hasInserterItems( _targetRootClientId ),
 				hasSingleBlockType: _hasSingleBlockType,
@@ -173,8 +166,16 @@ const UnforwardedInserter = (
 		[ rootClientId, clientId, shouldDirectInsert ]
 	);
 
-	const registry = useRegistry();
 	const { insertBlock } = useDispatch( blockEditorStore );
+	const {
+		getBlock,
+		getBlockIndex,
+		getBlockOrder,
+		getBlockRootClientId,
+		getBlockSelectionEnd,
+		getPreviousBlockClientId,
+	} = useSelect( blockEditorStore );
+	const { getActiveBlockVariation, getBlockType } = useSelect( blocksStore );
 
 	// The global inserter (no isAppender, no rootClientId, no clientId) should
 	// always render, even with no items.
@@ -185,14 +186,7 @@ const UnforwardedInserter = (
 	function insertOnlyAllowedBlock() {
 		const blockName = blockToInsert?.name ?? allowedBlockType.name;
 
-		function getAdjacentBlockAttributes( attributesToCopy ) {
-			if ( ! attributesToCopy?.length ) {
-				return {};
-			}
-
-			const { getBlock, getPreviousBlockClientId } =
-				registry.select( blockEditorStore );
-
+		function getAdjacentBlockAttributes() {
 			// Find the adjacent block of the same type whose attributes
 			// should be copied: previous sibling when inserting next to
 			// an existing block, otherwise the last child of the root.
@@ -213,25 +207,10 @@ const UnforwardedInserter = (
 				}
 			}
 
-			if ( ! adjacentAttributes ) {
-				return {};
-			}
-
-			return Object.fromEntries(
-				attributesToCopy
-					.filter( ( attr ) => attr in adjacentAttributes )
-					.map( ( attr ) => [ attr, adjacentAttributes[ attr ] ] )
-			);
+			return getSiblingBlockAttributes( blockName, adjacentAttributes );
 		}
 
 		function getInsertionIndex() {
-			const {
-				getBlockIndex,
-				getBlockSelectionEnd,
-				getBlockOrder,
-				getBlockRootClientId,
-			} = registry.select( blockEditorStore );
-
 			// If the clientId is defined, we insert at the position of the block.
 			if ( clientId ) {
 				return getBlockIndex( clientId );
@@ -254,9 +233,7 @@ const UnforwardedInserter = (
 		// Attempt to augment the inserted block with attributes from an adjacent block.
 		// This ensures styling from nearby blocks is preserved in the newly inserted block.
 		// See: https://github.com/WordPress/gutenberg/issues/37904
-		const newAttributes = getAdjacentBlockAttributes(
-			blockToInsert?.attributesToCopy
-		);
+		const newAttributes = getAdjacentBlockAttributes();
 
 		const newBlock = createBlock( blockName, {
 			...blockToInsert?.attributes,
@@ -272,12 +249,29 @@ const UnforwardedInserter = (
 
 		onSelectOrClose?.( newBlock );
 
-		const message = sprintf(
-			// translators: %s: the name of the block that has been added
-			__( '%s block added' ),
-			allowedBlockType.title
-		);
-		speak( message );
+		const blockTypeToInsert = getBlockType( blockName );
+		let blockLabelToInsert;
+		if ( blockTypeToInsert ) {
+			blockLabelToInsert = getBlockLabel(
+				blockTypeToInsert,
+				newBlock.attributes
+			);
+
+			if ( blockLabelToInsert === blockTypeToInsert.title ) {
+				blockLabelToInsert =
+					getActiveBlockVariation( blockName, newBlock.attributes )
+						?.title || blockLabelToInsert;
+			}
+		}
+
+		if ( blockLabelToInsert ) {
+			const message = sprintf(
+				// translators: %s: the name of the block that has been added
+				__( '%s block added' ),
+				blockLabelToInsert
+			);
+			speak( message );
+		}
 	}
 
 	function renderToggle( { onToggle: dropdownOnToggle, isOpen } ) {

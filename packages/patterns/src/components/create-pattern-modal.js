@@ -1,23 +1,15 @@
-/**
- * WordPress dependencies
- */
 import {
 	Modal,
 	Button,
 	TextControl,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 	ToggleControl,
 } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { __, _x } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import {
 	PATTERN_DEFAULT_CATEGORY,
 	PATTERN_SYNC_TYPES,
@@ -115,14 +107,13 @@ export function CreatePatternModalContents( {
 				onCreate( title, syncType );
 			} }
 		>
-			<VStack spacing="5">
+			<Stack direction="column" gap="lg">
 				<TextControl
 					label={ __( 'Name' ) }
 					value={ title }
 					onChange={ setTitle }
 					placeholder={ __( 'My pattern' ) }
 					className="patterns-create-modal__name-input"
-					__next40pxDefaultSize
 				/>
 				<CategorySelector
 					categoryTerms={ categoryTerms }
@@ -143,7 +134,7 @@ export function CreatePatternModalContents( {
 						);
 					} }
 				/>
-				<HStack justify="right">
+				<Stack gap="sm" justify="end">
 					<Button
 						__next40pxDefaultSize
 						variant="tertiary"
@@ -154,7 +145,6 @@ export function CreatePatternModalContents( {
 					>
 						{ __( 'Cancel' ) }
 					</Button>
-
 					<Button
 						__next40pxDefaultSize
 						variant="primary"
@@ -164,8 +154,8 @@ export function CreatePatternModalContents( {
 					>
 						{ confirmLabel }
 					</Button>
-				</HStack>
-			</VStack>
+				</Stack>
+			</Stack>
 		</form>
 	);
 }

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { buildTermsTree } from '../terms';
 
 describe( 'buildTermsTree()', () => {

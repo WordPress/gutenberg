@@ -14,11 +14,10 @@ const config: Config = {
 		'./tokens/color.json',
 		'./tokens/cursor.json',
 		'./tokens/dimension.json',
-		'./tokens/elevation.json',
 		'./tokens/motion.json',
 		'./tokens/typography.json',
 	],
-	outDir: './src/prebuilt',
+	outDir: '.',
 
 	// Preserve source ordering of tokens in output. This is important because
 	// many of our tokens operate on a size scale (2xs → 2xl) and it's more easy
@@ -28,7 +27,7 @@ const config: Config = {
 	plugins: [
 		inlineAliasValues( {
 			pattern: /^wpds-color\.primitive\./,
-			filename: 'ts/color-tokens.ts',
+			filename: 'src/prebuilt/ts/color-tokens.ts',
 			tokenId: ( tokenId ) =>
 				tokenId
 					.replace( /\.primitive/, '' )
@@ -37,30 +36,8 @@ const config: Config = {
 		} ),
 		inlineAliasValues( { pattern: /^wpds-dimension\.primitive\./ } ),
 		pluginCSS( {
-			filename: 'css/design-tokens.css',
+			filename: 'prebuilt/css/design-tokens.css',
 			variableName: ( token ) => makeCSSVar( token.id ),
-			transform( token ) {
-				// This addresses a specific browser issue where Chrome renders
-				// a font-weight of 500 as 600 instead of 400 when the target
-				// weight is not locally available, which is inconsistent with
-				// the spec-defined behavior. This workaround ensures that a 400
-				// weight is used if the 500 weight is not locally available,
-				// while still using the 500 weight if it _is_ available. This
-				// is applied at the plugin layer to ensure the original token
-				// value can be preserved at the intended 500 weight, where the
-				// bug only occurs in specific browser rendering.
-				//
-				// See: https://issues.chromium.org/issues/40552893
-				// See: https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/font-weight#fallback_weights
-				if (
-					token.id.startsWith( 'wpds-typography.font-weight.' ) &&
-					token.$value === 500
-				) {
-					return '499';
-				}
-
-				return undefined;
-			},
 			baseSelector: ':root',
 			modeSelectors: [
 				{
@@ -69,20 +46,58 @@ const config: Config = {
 						'@media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi )',
 					],
 				},
+				// Each corner-radius preset is applied via the
+				// `data-wpds-corner-radius` attribute that `ThemeProvider`
+				// sets on its scoping element. A root `ThemeProvider` mirrors
+				// its preset attributes directly to the document element so
+				// the whole token surface stays consistent on `<html>` (e.g.
+				// for PHP-rendered admin UI outside the React app).
+				{
+					mode: 'corner-radius-none',
+					selectors: [
+						'[data-wpds-corner-radius="none"]',
+						':root[data-wpds-root-provider="true"][data-wpds-corner-radius="none"]',
+					],
+				},
+				{
+					mode: 'corner-radius-subtle',
+					selectors: [
+						'[data-wpds-corner-radius="subtle"]',
+						':root[data-wpds-root-provider="true"][data-wpds-corner-radius="subtle"]',
+					],
+				},
+				{
+					mode: 'corner-radius-moderate',
+					selectors: [
+						'[data-wpds-corner-radius="moderate"]',
+						':root[data-wpds-root-provider="true"][data-wpds-corner-radius="moderate"]',
+					],
+				},
+				{
+					mode: 'corner-radius-pronounced',
+					selectors: [
+						'[data-wpds-corner-radius="pronounced"]',
+						':root[data-wpds-root-provider="true"][data-wpds-corner-radius="pronounced"]',
+					],
+				},
 			],
 			legacyHex: true,
 		} ),
 		pluginKnownWpdsCssVariables( {
-			filename: 'js/design-tokens.mjs',
+			filename: 'prebuilt/js/design-tokens.mjs',
 		} ),
 		pluginDsTokenFallbacks( {
-			filename: 'js/design-token-fallbacks.mjs',
+			filename: 'prebuilt/js/design-token-fallbacks.mjs',
+			scssFilename: false,
+			additionalScssFilenames: [
+				'../base-styles/internal/_wpds-token-fallbacks.scss',
+			],
 		} ),
 		pluginDsTokenDocs( {
-			filename: '../../docs/tokens.md',
+			filename: 'docs/tokens.md',
 		} ),
 		typescriptTypes( {
-			filename: 'ts/token-types.ts',
+			filename: 'src/prebuilt/ts/token-types.ts',
 			types: [
 				{
 					name: 'PaddingSize',
@@ -140,7 +155,7 @@ const config: Config = {
 						'Background color variants for surface elements.',
 					patterns: [
 						{
-							pattern: /^wpds-color\.bg\.surface\.(.+)$/,
+							pattern: /^wpds-color\.background\.surface\.(.+)$/,
 							transform: ( variant ) =>
 								variant.split( '.' ).join( '-' ),
 						},
@@ -152,7 +167,8 @@ const config: Config = {
 						'Background color variants for interactive elements.',
 					patterns: [
 						{
-							pattern: /^wpds-color\.bg\.interactive\.(.+)$/,
+							pattern:
+								/^wpds-color\.background\.interactive\.(.+)$/,
 							transform: ( variant ) =>
 								variant
 									.split( '.' )
@@ -167,7 +183,7 @@ const config: Config = {
 						'Foreground color variants for content text and icons.',
 					patterns: [
 						{
-							pattern: /^wpds-color\.fg\.content\.(.+)$/,
+							pattern: /^wpds-color\.foreground\.content\.(.+)$/,
 							transform: ( variant ) =>
 								variant.split( '.' ).join( '-' ),
 						},
@@ -179,7 +195,8 @@ const config: Config = {
 						'Foreground color variants for interactive element text and icons.',
 					patterns: [
 						{
-							pattern: /^wpds-color\.fg\.interactive\.(.+)$/,
+							pattern:
+								/^wpds-color\.foreground\.interactive\.(.+)$/,
 							transform: ( variant ) =>
 								variant
 									.split( '.' )
@@ -219,7 +236,7 @@ const config: Config = {
 					description: 'Foreground color variants for text elements.',
 					patterns: [
 						{
-							pattern: /^wpds-color\.fg\.[^.]+\.(.+)$/,
+							pattern: /^wpds-color\.foreground\.[^.]+\.(.+)$/,
 							transform: ( variant ) =>
 								variant.split( '.' ).join( '-' ),
 						},

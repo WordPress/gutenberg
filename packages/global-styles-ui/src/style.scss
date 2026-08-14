@@ -81,13 +81,13 @@
 	// Need to override the too specific styles for complementary areas.
 	margin-bottom: 0 !important;
 	text-transform: uppercase;
-	font-weight: variables.$font-weight-medium !important;
+	font-weight: var(--wpds-typography-font-weight-emphasis) !important;
 	font-size: 11px !important;
 }
 
 .global-styles-ui-section-title {
 	color: colors.$gray-800;
-	font-weight: 600;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 	line-height: 1.2;
 	padding: 16px 16px 0;
 	margin: 0;
@@ -231,6 +231,14 @@
 	display: flex;
 	flex-direction: column;
 	height: 100%;
+}
+
+.global-styles-ui-color-palette__tablist-container {
+	border-bottom: variables.$border-width solid colors.$gray-300;
+}
+
+.global-styles-ui-color-palette__tablist {
+	margin-bottom: calc(-1 * variables.$border-width);
 }
 
 .global-styles-ui-sidebar__navigator-screen .single-column {

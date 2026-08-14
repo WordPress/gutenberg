@@ -74,10 +74,10 @@ function canonicalComponentName( name: string ): string {
 }
 
 /**
- * Parse props from a component's reactDocgen data, filtering out
+ * Parse props from a component's `reactComponentMeta` data, filtering out
  * deprecated and ignored props.
  *
- * @param rawProps - The reactDocgen props record.
+ * @param rawProps - The component meta props record.
  * @return Parsed props with deprecated entries removed.
  */
 export function parseProps(
@@ -85,9 +85,9 @@ export function parseProps(
 		string,
 		{
 			required?: boolean;
-			tsType?: { name: string; raw?: string };
+			type?: { name: string; raw?: string };
 			description?: string;
-			defaultValue?: { value: string };
+			defaultValue?: { value: string } | null;
 		}
 	>
 ): ComponentProp[] {
@@ -104,7 +104,7 @@ export function parseProps(
 			// Prefer `raw` when present, as it carries the source-authored type
 			// expression a consumer could use directly. Primitives emit only
 			// `name`, so fall back if `raw` is not present.
-			type: propInfo.tsType?.raw || propInfo.tsType?.name || 'unknown',
+			type: propInfo.type?.raw || propInfo.type?.name || 'unknown',
 			required: propInfo.required || false,
 			description: propInfo.description || '',
 			defaultValue: propInfo.defaultValue?.value ?? null,
@@ -180,7 +180,7 @@ export function parseComponentDetail(
 		}
 
 		const description = component.description || '';
-		const props = parseProps( component.reactDocgen?.props || {} );
+		const props = parseProps( component.reactComponentMeta?.props || {} );
 		const stories = component.stories || [];
 
 		if ( ! detail ) {

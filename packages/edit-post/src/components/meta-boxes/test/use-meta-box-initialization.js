@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { RegistryProvider, createRegistry } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { useMetaBoxInitialization } from '../use-meta-box-initialization';
 import { STORE_NAME } from '../../../store/constants';
 

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const {
 	camelCaseDash,
 	defaultRequestToExternal,
