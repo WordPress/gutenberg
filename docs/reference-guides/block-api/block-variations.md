@@ -276,7 +276,9 @@ wp.blocks.registerBlockVariation( 'core/heading', {
 } );
 ```
 
-The shortcut is not limited to blocks of the variation's own block type. When the selected block is already of that type, the variation's `attributes` are applied to it — unless `isActive` reports the variation as already active, in which case nothing happens. Otherwise the selected block is transformed to the variation's block type first, which requires a [block transform](/docs/reference-guides/block-api/block-transforms.md#block) between the two block types to exist. In the example above, that is what lets the shortcut turn a Paragraph block into a Heading block as well as change the level of an existing one.
+The shortcut only applies to blocks that are already of the variation's own block type: it sets the variation's `attributes` on the selected block, and does nothing when `isActive` reports the variation as already active. In the example above, that is what lets the shortcut change the level of an existing Heading block.
+
+To reach the variation from a *different* block type, declare the same shortcut on a [block transform](/docs/reference-guides/block-api/block-transforms.md#keyboard-shortcuts) that produces this block, giving it the same `name` and a `variationName` pointing back at the variation. The Heading block does both, which is why <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>2</kbd> turns a Paragraph into an H2 as well as changing an existing heading's level. Declaring one shortcut in several places is expected, as long as every declaration agrees on the key combination and description; the two can never both apply to the same selection.
 
 Shortcuts only apply to blocks that are fully editable, and are ignored for blocks in a restricted editing mode such as content-only editing.
 
