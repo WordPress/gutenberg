@@ -24,6 +24,7 @@
 		"./preview": "./preview.jsx"
 	},
 	"devDependencies": {
+		"@babel/core": "^7.25.7",
 		"@emotion/babel-plugin": "^11.13.5",
 		"@emotion/is-prop-valid": "^1.4.0",
 		"@emotion/react": "^11.14.0",
@@ -33,9 +34,10 @@
 		"@storybook/icons": "^2.0.1",
 		"@storybook/react-vite": "^10.4.3",
 		"@storybook/test-runner": "^0.24.2",
+		"@types/babel__core": "^7.20.5",
 		"@types/js-yaml": "^3.12.10",
 		"@types/react": "^18.3.27",
-		"@vitejs/plugin-react": "^5.1.2",
+		"@vitejs/plugin-react": "^6.0.5",
 		"@wordpress/admin-ui": "file:../packages/admin-ui",
 		"@wordpress/base-styles": "file:../packages/base-styles",
 		"@wordpress/block-editor": "file:../packages/block-editor",
@@ -73,7 +75,7 @@
 		"storybook-addon-tag-badges": "^3.0.4",
 		"terser": "^5.37.0",
 		"typescript": "npm:@typescript/typescript6@^6.0.2",
-		"vite": "^7.3.2",
+		"vite": "^8.2.1",
 		"wait-on": "^8.0.1"
 	},
 	"publishConfig": {

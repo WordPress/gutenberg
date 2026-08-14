@@ -7,6 +7,8 @@ import {
 import { resolveFields } from '../field-types';
 import { resolveIcon } from '../icon-resolver';
 import type {
+	WidgetAction,
+	WidgetActionRecord,
 	WidgetIcon,
 	WidgetModuleRecord,
 	WidgetName,
@@ -15,11 +17,37 @@ import type {
 
 /*
  * Transparent stand-in for an icon reference that has not resolved yet:
- * it holds the icon slot so titles do not shift when the icon lands.
+ * it holds the icon slot so titles do not shift and actions keep their
+ * icon shape while the icon lands.
  */
 const pendingIcon: WidgetIcon = createElement( 'svg', {
 	viewBox: '0 0 24 24',
 } );
+
+/**
+ * Emitted actions carry only renderable icons: a wire reference holds the
+ * slot with the stand-in while it resolves; anything else non-renderable
+ * drops.
+ *
+ * @param actions     Declared actions, from the record or the module.
+ * @param holdPending Whether wire references resolve later (record actions).
+ */
+function withRenderableIcons(
+	actions: ( WidgetAction | WidgetActionRecord )[],
+	holdPending: boolean
+): WidgetAction[] {
+	return actions.map( ( { icon, ...action } ) => {
+		if ( isValidElement( icon ) ) {
+			return { ...action, icon: icon as WidgetIcon };
+		}
+
+		if ( holdPending && typeof icon === 'string' ) {
+			return { ...action, icon: pendingIcon };
+		}
+
+		return action;
+	} );
+}
 
 /* `true` while records or their metadata imports are still resolving; hosts
    must not treat a widget instance as missing until it is `false`. */
@@ -89,6 +117,8 @@ export function useWidgetTypes(
 					const icon =
 						moduleIcon ?? ( record.icon ? pendingIcon : undefined );
 
+					const actions = record.actions ?? metadata.actions;
+
 					return {
 						...metadata,
 						...( metadata.attributes
@@ -121,8 +151,13 @@ export function useWidgetTypes(
 						...( record.keywords
 							? { keywords: record.keywords }
 							: {} ),
-						...( record.actions
-							? { actions: record.actions }
+						...( actions
+							? {
+									actions: withRenderableIcons(
+										actions,
+										actions === record.actions
+									),
+							  }
 							: {} ),
 					} as WidgetType;
 				} catch {
@@ -173,39 +208,44 @@ export function useWidgetTypes(
 			}
 
 			/*
-			 * Each action icon reference resolves off the gate and patches
-			 * into the emitted type; an unresolvable reference clears, so
-			 * hosts only render elements.
+			 * Record action icon references resolve off the gate and
+			 * patch in; an unresolvable reference clears the stand-in.
 			 */
-			for ( const widgetType of results ) {
-				for ( const action of widgetType?.actions ?? [] ) {
+			for ( const record of records ) {
+				for ( const action of record.actions ?? [] ) {
 					if ( typeof action.icon !== 'string' ) {
 						continue;
 					}
 
-					const reference = action.icon;
-					void resolveIcon( reference ).then( ( resolved ) => {
+					void resolveIcon( action.icon ).then( ( resolved ) => {
 						if ( cancelled ) {
 							return;
 						}
 
 						setWidgetTypes( ( prev ) =>
 							prev.map( ( type ) => {
-								if ( type.name !== widgetType?.name ) {
+								if ( type.name !== record.name ) {
 									return type;
 								}
 
 								return {
 									...type,
-									actions: type.actions?.map( ( entry ) =>
-										entry.id === action.id &&
-										entry.icon === reference
-											? {
-													...entry,
-													icon: resolved ?? undefined,
-											  }
-											: entry
-									),
+									actions: type.actions?.map( ( entry ) => {
+										if ( entry.id !== action.id ) {
+											return entry;
+										}
+
+										if ( resolved ) {
+											return {
+												...entry,
+												icon: resolved,
+											};
+										}
+
+										return entry.icon === pendingIcon
+											? { ...entry, icon: undefined }
+											: entry;
+									} ),
 								};
 							} )
 						);
