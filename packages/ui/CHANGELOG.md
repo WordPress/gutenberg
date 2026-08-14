@@ -8,6 +8,7 @@
 -   Add a `Menu` component. ([#79560](https://github.com/WordPress/gutenberg/pull/79560))
 -   Add `ControlWithError` component, ported from `@wordpress/components` and `@wordpress/dataviews` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574)).
 -   Export `ValidityIndicator`, so custom validated controls can render the same validity message as `ControlWithError` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574)).
+-   Add `ValidatedInputControl` component, an `InputControl` wrapped in `ControlWithError` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81627](https://github.com/WordPress/gutenberg/pull/81627)).
 
 ### Breaking Changes
 
