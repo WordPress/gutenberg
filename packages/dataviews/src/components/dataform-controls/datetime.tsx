@@ -1,3 +1,4 @@
+import { format } from 'date-fns';
 import {
 	BaseControl,
 	privateApis as componentsPrivateApis,
@@ -66,15 +67,19 @@ function CalendarDateTimeControl< Item >( {
 	const onSelectDate = useCallback(
 		( newDate: Date | null ) => {
 			if ( newDate ) {
-				// Extract the date part in WP timezone from the calendar selection
-				const wpDate = dateI18n( 'Y-m-d', newDate );
+				// Read the selected day through the date's own fields, like the
+				// calendar renders it. Converting the instant with `dateI18n`
+				// instead would shift the day across midnight whenever the site
+				// timezone is behind the calendar's.
+				const wpDate = format( newDate, 'yyyy-MM-dd' );
 
-				// Preserve time if it exists in current value, otherwise use current time
+				// Preserve time if it exists in current value, otherwise use
+				// the start of the selected day.
 				let wpTime: string;
 				if ( value ) {
 					wpTime = dateI18n( 'H:i', getDate( value ) );
 				} else {
-					wpTime = dateI18n( 'H:i', newDate );
+					wpTime = format( newDate, 'HH:mm' );
 				}
 
 				// Combine date and time in WP timezone and convert to ISO
