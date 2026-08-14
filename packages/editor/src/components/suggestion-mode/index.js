@@ -9,6 +9,11 @@ export {
 	registerSuggestionOverlayFilter,
 } from './with-suggestion-overlay';
 export { MoveGhostsProvider } from './use-move-ghosts';
+export {
+	registerClipboardSuggestionStrip,
+	stripSuggestionDataFromBlock,
+	stripSuggestionDataFromBlocks,
+} from './clipboard-strip';
 export { default as SuggestionAutoSave } from './auto-save';
 export { default as SuggestionStoreInterceptor } from './store-interceptor';
 export { default as SuggestionUndoGuard } from './suggestion-undo-guard';
