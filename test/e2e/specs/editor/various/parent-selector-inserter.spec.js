@@ -31,7 +31,7 @@ test.describe( 'Parent selector inserter', () => {
 			.click();
 
 		await editor.showBlockToolbar();
-		await page.locator( 'role=button[name="Add Image"]' ).click();
+		await page.locator( 'role=button[name="Add image"]' ).click();
 
 		// The new empty image lands between the two, selected, showing its
 		// media placeholder.
