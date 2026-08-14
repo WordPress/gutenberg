@@ -1,5 +1,9 @@
 import { RichTextData } from '@wordpress/rich-text';
-import { sliceValueToHTML } from '../suggestion-deletion-keyboard';
+import {
+	collapsedDeleteTarget,
+	isContiguousDeleteRun,
+	sliceValueToHTML,
+} from '../suggestion-deletion-keyboard';
 
 describe( 'sliceValueToHTML', () => {
 	it( 'serializes a plain slice', () => {
@@ -38,5 +42,120 @@ describe( 'sliceValueToHTML', () => {
 		expect( sliceValueToHTML( undefined, 0, 2 ) ).toBe( '' );
 		expect( sliceValueToHTML( null, 0, 2 ) ).toBe( '' );
 		expect( sliceValueToHTML( 42, 0, 2 ) ).toBe( '' );
+	} );
+} );
+
+describe( 'isContiguousDeleteRun', () => {
+	const run = {
+		clientId: 'a',
+		attributeKey: 'content',
+		id: 7,
+		start: 2,
+		end: 3,
+		caret: 2,
+		dir: 'forward',
+	};
+	const at = ( overrides ) => ( {
+		clientId: 'a',
+		attributeKey: 'content',
+		isBackward: false,
+		pos: 2,
+		...overrides,
+	} );
+
+	it( 'continues a run whose caret has not moved', () => {
+		expect( isContiguousDeleteRun( run, at() ) ).toBe( true );
+	} );
+
+	it( 'does not continue without a run', () => {
+		expect( isContiguousDeleteRun( null, at() ) ).toBe( false );
+	} );
+
+	it( 'does not continue before the note id resolves', () => {
+		expect( isContiguousDeleteRun( { ...run, id: null }, at() ) ).toBe(
+			false
+		);
+	} );
+
+	it( 'does not continue in the opposite direction', () => {
+		expect( isContiguousDeleteRun( run, at( { isBackward: true } ) ) ).toBe(
+			false
+		);
+	} );
+
+	it( 'does not continue after the caret moves', () => {
+		expect( isContiguousDeleteRun( run, at( { pos: 5 } ) ) ).toBe( false );
+	} );
+
+	it( 'does not continue in another block or attribute', () => {
+		expect( isContiguousDeleteRun( run, at( { clientId: 'b' } ) ) ).toBe(
+			false
+		);
+		expect(
+			isContiguousDeleteRun( run, at( { attributeKey: 'citation' } ) )
+		).toBe( false );
+	} );
+} );
+
+describe( 'collapsedDeleteTarget', () => {
+	it( 'anchors a new run on the grapheme next to the caret', () => {
+		expect( collapsedDeleteTarget( 'abcdef', 3, false ) ).toEqual( {
+			start: 3,
+			end: 4,
+		} );
+		expect( collapsedDeleteTarget( 'abcdef', 3, true ) ).toEqual( {
+			start: 2,
+			end: 3,
+		} );
+	} );
+
+	it( 'grows a forward run from the run end, not the parked caret', () => {
+		// The caret stays at 0 across the whole run, so reading the target
+		// from `pos` would re-target "a" on every repeat.
+		const run = { start: 0, end: 1, caret: 0 };
+		expect( collapsedDeleteTarget( 'abcdef', 0, false, run ) ).toEqual( {
+			start: 1,
+			end: 2,
+		} );
+		run.end = 2;
+		expect( collapsedDeleteTarget( 'abcdef', 0, false, run ) ).toEqual( {
+			start: 2,
+			end: 3,
+		} );
+	} );
+
+	it( 'grows a backward run from the run start', () => {
+		const run = { start: 4, end: 6, caret: 4 };
+		expect( collapsedDeleteTarget( 'abcdef', 4, true, run ) ).toEqual( {
+			start: 3,
+			end: 4,
+		} );
+	} );
+
+	it( 'returns null at the value edges', () => {
+		expect( collapsedDeleteTarget( 'abcdef', 0, true ) ).toBeNull();
+		expect( collapsedDeleteTarget( 'abcdef', 6, false ) ).toBeNull();
+		// A forward run that has reached the end of the value.
+		expect(
+			collapsedDeleteTarget( 'abcdef', 0, false, {
+				start: 0,
+				end: 6,
+				caret: 0,
+			} )
+		).toBeNull();
+	} );
+
+	it( 'steps over a whole emoji grapheme in both directions', () => {
+		const text = 'a👨‍👩‍👧b';
+		const family = text.slice( 1, text.length - 1 );
+		const forward = collapsedDeleteTarget( text, 1, false );
+		expect( text.slice( forward.start, forward.end ) ).toBe( family );
+		// And when growing a run that has already marked the leading "a".
+		const grown = collapsedDeleteTarget( text, 0, false, {
+			start: 0,
+			end: 1,
+			caret: 0,
+		} );
+		expect( text.slice( grown.start, grown.end ) ).toBe( family );
 	} );
 } );
