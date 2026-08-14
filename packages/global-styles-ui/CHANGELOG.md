@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Group input and select typography and color controls in a dedicated Forms section in Global Styles.
 -   Add a text shadow presets screen under Typography ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
 
 ### Bug Fixes
