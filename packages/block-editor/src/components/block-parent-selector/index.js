@@ -1,15 +1,14 @@
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
-import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { plus } from '@wordpress/icons';
+import { store as blockEditorStore } from '../../store';
+import { useParentInserter } from './use-parent-inserter';
 import useBlockDisplayInformation from '../use-block-display-information';
 import BlockIcon from '../block-icon';
 import Inserter from '../inserter';
 import { useShowHoveredOrFocusedGestures } from '../block-toolbar/utils';
-import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 
 /**
  * Block parent selector component, displaying the hierarchy of the
@@ -19,51 +18,8 @@ import { unlock } from '../../lock-unlock';
  */
 export default function BlockParentSelector() {
 	const { selectBlock } = useDispatch( blockEditorStore );
-	const { parentClientId, nextSiblingClientId, showInserter } = useSelect(
-		( select ) => {
-			const {
-				getBlockParents,
-				getSelectedBlockClientIds,
-				getParentSectionBlock,
-				getBlockName,
-				getNextBlockClientId,
-			} = unlock( select( blockEditorStore ) );
-			// Not getSelectedBlockClientId: a text selection crossing into a
-			// nested block resolves to the ancestor alone, but its selection
-			// start and end differ.
-			const [ selectedBlockClientId ] = getSelectedBlockClientIds();
-			const parentSection = getParentSectionBlock(
-				selectedBlockClientId
-			);
-			const parents = getBlockParents( selectedBlockClientId );
-			const immediateParentClientId = parents[ parents.length - 1 ];
-			const _parentClientId = parentSection ?? immediateParentClientId;
-			const parentBlockType = getBlockType(
-				getBlockName( _parentClientId )
-			);
-			// A wrapper that merges with the text flow (list, quote) grows
-			// by typing: Enter continues it, and users know that. Any
-			// other parent gets a plus button to add a child; the Inserter
-			// hides itself when nothing is insertable.
-			const isTextFlowWrapper =
-				parentBlockType?.merge ||
-				hasBlockSupport( parentBlockType, '__experimentalOnMerge' );
-			return {
-				parentClientId: _parentClientId,
-				nextSiblingClientId: getNextBlockClientId(
-					selectedBlockClientId
-				),
-				// When the shown parent is a section further up the tree
-				// rather than the direct parent, its content is locked and
-				// nothing can be inserted, so no button.
-				showInserter:
-					!! _parentClientId &&
-					_parentClientId === immediateParentClientId &&
-					! isTextFlowWrapper,
-			};
-		},
-		[]
-	);
+	const { parentClientId, nextSiblingClientId, showInserter } =
+		useParentInserter();
 	const blockInformation = useBlockDisplayInformation( parentClientId );
 
 	// Allows highlighting the parent block outline when focusing or hovering

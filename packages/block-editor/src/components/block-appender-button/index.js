@@ -4,6 +4,7 @@ import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { plus } from '@wordpress/icons';
 import { _x, sprintf } from '@wordpress/i18n';
 import Inserter from '../inserter';
+import { useParentInserter } from '../block-parent-selector/use-parent-inserter';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
@@ -18,6 +19,10 @@ import { unlock } from '../../lock-unlock';
  *                          appended blocks.
  */
 export default function BlockAppenderButton( { clientId } ) {
+	// The parent selector's inserter already adds a block next to the
+	// selected one; a second plus button in the same toolbar would be
+	// two ways to add a block, a row apart.
+	const { showInserter: parentShowsInserter } = useParentInserter();
 	const canAppend = useSelect(
 		( select ) => {
 			const {
@@ -67,7 +72,7 @@ export default function BlockAppenderButton( { clientId } ) {
 		[ clientId ]
 	);
 
-	if ( ! canAppend ) {
+	if ( ! canAppend || parentShowsInserter ) {
 		return null;
 	}
 
