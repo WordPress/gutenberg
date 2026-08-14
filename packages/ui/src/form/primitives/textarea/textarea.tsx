@@ -20,24 +20,9 @@ const wrappedRender = (
 };
 
 /**
- * A styled textarea input with design token styling.
+ * A low-level primitive for a textarea field.
  *
- * ```jsx
- * import { Textarea } from '@wordpress/ui';
- * import { useState } from '@wordpress/element';
- *
- * const MyTextarea = () => {
- *   const [ value, setValue ] = useState( '' );
- *
- *   return (
- *     <Textarea
- *       value={ value }
- *       onValueChange={ setValue }
- *       placeholder="Enter text"
- *     />
- *   );
- * };
- * ```
+ * Prefer `TextareaControl` when using with a standard label and description.
  */
 export const Textarea = forwardRef< HTMLTextAreaElement, TextareaProps >(
 	function Textarea(
