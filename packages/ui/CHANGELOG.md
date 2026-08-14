@@ -9,7 +9,7 @@
 
 ### Enhancements
 
--   `Select.Item`, `Combobox.Item`, and `Autocomplete.Item`: default item height is now 36px (previously 40px) ([#81354](https://github.com/WordPress/gutenberg/pull/81354)).
+-   `Select.Item`, `Combobox.Item`, and `Autocomplete.Item`: default item height is now 32px (previously 40px) ([#81354](https://github.com/WordPress/gutenberg/pull/81354)).
 
 ### Internal
 
