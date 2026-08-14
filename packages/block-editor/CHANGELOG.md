@@ -15,6 +15,10 @@
 -   Patterns explorer: Refactor the category sidebar to use `Tabs` ([#81807](https://github.com/WordPress/gutenberg/pull/81807)).
 -   Show separate horizontal and vertical block spacing controls in the block inspector only for Flex and Grid layouts, while retaining axial gap support in Global Styles. Responsive Grid column calculations use the horizontal gap, while Flow and Constrained layouts use the vertical gap when receiving an axial value ([#81476](https://github.com/WordPress/gutenberg/pull/81476)).
 
+### Internal
+
+-   `URLInput`: Compose validation with `ControlWithError` from `@wordpress/ui` instead of unlocking `ValidatedInputControl` from the `@wordpress/components` private APIs ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81627](https://github.com/WordPress/gutenberg/pull/81627)).
+
 ### Bug Fixes
 
 -   `InnerBlocks`: Resolve the `default` of a block's `layout` support before providing it to inner blocks. A block that declared its layout only as a support default, such as the Gallery, previously handed its children the raw support config, which has no `type`, so the children resolved to the flow layout instead. As a result an Image nested in a Gallery offered left/center/right alignment, which the flex layout does not permit ([#81606](https://github.com/WordPress/gutenberg/pull/81606)).

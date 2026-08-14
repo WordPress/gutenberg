@@ -9,15 +9,17 @@ import {
 	__experimentalInputControl as InputControl,
 	Spinner,
 	Popover,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useDebounce, useEvent, useInstanceId } from '@wordpress/compose';
+import { ControlWithError } from '@wordpress/ui';
+import {
+	useDebounce,
+	useEvent,
+	useInstanceId,
+	useMergeRefs,
+} from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { isURL } from '@wordpress/url';
 import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
-
-const { ValidatedInputControl } = unlock( componentsPrivateApis );
 
 const noop = () => {};
 
@@ -430,28 +432,31 @@ function Control( {
 		setIsValidated( true );
 	}
 
+	const validityTargetRef = useRef();
+	const inputRef = useMergeRefs( [ inputProps.ref, validityTargetRef ] );
+
 	if ( renderControl ) {
 		return renderControl( controlProps, inputProps, isLoading );
 	}
 
-	const MaybeValidatedInputControl = isValidated
-		? ValidatedInputControl
-		: InputControl;
-
 	return (
 		<BaseControl { ...controlProps }>
-			<MaybeValidatedInputControl
-				{ ...inputProps }
-				{ ...( isValidated && {
-					customValidity,
+			{ isValidated ? (
+				<ControlWithError
+					className="components-validated-control"
+					required={ inputProps.required }
 					// Suppress the "(Required)" indicator in the label.
 					// The field is still required for validation, but the indicator
 					// can be hidden when markWhenOptional is set to true.
-					...( markWhenOptional !== undefined && {
-						markWhenOptional,
-					} ),
-				} ) }
-			/>
+					markWhenOptional={ markWhenOptional }
+					customValidity={ customValidity }
+					getValidityTarget={ () => validityTargetRef.current }
+				>
+					<InputControl { ...inputProps } ref={ inputRef } />
+				</ControlWithError>
+			) : (
+				<InputControl { ...inputProps } ref={ inputRef } />
+			) }
 			{ isLoading && <Spinner /> }
 		</BaseControl>
 	);
