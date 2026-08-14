@@ -415,7 +415,7 @@ An organized collection of items displayed in a specific order. ([Source](https:
 -	**Name:** core/list
 -	**Category:** text
 -	**Allowed Blocks:** core/list-item
-**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** ordered, placeholder, reversed, start, type, values
 
 ## List item
