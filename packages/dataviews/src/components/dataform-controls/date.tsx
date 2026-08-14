@@ -1,5 +1,6 @@
 import {
 	format,
+	isSameMonth,
 	isValid as isValidDate,
 	subMonths,
 	subDays,
@@ -297,6 +298,17 @@ function CalendarDateControl< Item >( {
 		return parsedDate || new Date(); // Default to current month
 	} );
 
+	// Sync the displayed month when the value changes from outside the
+	// control, e.g. after undo, reset, or switching the edited item.
+	const [ prevValue, setPrevValue ] = useState( value );
+	if ( value !== prevValue ) {
+		setPrevValue( value );
+		const parsedDate = parseDate( value );
+		if ( parsedDate && ! isSameMonth( parsedDate, calendarMonth ) ) {
+			setCalendarMonth( parsedDate );
+		}
+	}
+
 	const [ isTouched, setIsTouched ] = useState( false );
 	const validityTargetRef = useRef< HTMLInputElement >( null );
 
@@ -512,6 +524,25 @@ function CalendarDateRangeControl< Item >( {
 	const [ calendarMonth, setCalendarMonth ] = useState< Date >( () => {
 		return selectedRange?.from || new Date();
 	} );
+
+	// Sync the displayed month when the value changes from outside the
+	// control, e.g. after undo, reset, or switching the edited item. Skip
+	// when part of the new range is already visible, so that selecting the
+	// end of a cross-month range doesn't move the view away.
+	const [ prevValue, setPrevValue ] = useState( value );
+	if (
+		value?.[ 0 ] !== prevValue?.[ 0 ] ||
+		value?.[ 1 ] !== prevValue?.[ 1 ]
+	) {
+		setPrevValue( value );
+		const isRangeVisible = [ selectedRange?.from, selectedRange?.to ].some(
+			( date ) => date && isSameMonth( date, calendarMonth )
+		);
+		const targetMonth = selectedRange?.from ?? selectedRange?.to;
+		if ( targetMonth && ! isRangeVisible ) {
+			setCalendarMonth( targetMonth );
+		}
+	}
 
 	const [ isTouched, setIsTouched ] = useState( false );
 	const fromInputRef = useRef< HTMLInputElement >( null );
