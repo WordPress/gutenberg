@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   `filterURLForDisplay`: Clamp the truncated file name's head slice at zero, so a small `maxLength` no longer returns a string longer than the untruncated one ([#81529](https://github.com/WordPress/gutenberg/pull/81529)).
 -   `getQueryArgs`: Split each query argument on its first `=` only, so values containing `=` — base64 padding, JWTs, nested URLs — are no longer truncated, and ignore malformed pairs with no key instead of promoting the value to one ([#81066](https://github.com/WordPress/gutenberg/pull/81066)).
 
 ## 4.53.0 (2026-08-12)

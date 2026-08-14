@@ -1190,6 +1190,13 @@ describe( 'filterURLForDisplay', () => {
 		);
 		expect( url ).toBe( 'superlongti…ion.jpeg' );
 	} );
+	it( 'should not return more than the shortest truncation when maxLength is tiny', () => {
+		const url = filterURLForDisplay(
+			'https://example.com/averylongfilename.png',
+			5
+		);
+		expect( url ).toBe( '…ame.png' );
+	} );
 	it( 'should remove query arguments', () => {
 		const url = filterURLForDisplay(
 			'http://www.wordpress.org/wp-content/uploads/myimage.jpeg?query_args=a',
