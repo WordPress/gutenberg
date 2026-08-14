@@ -11,6 +11,7 @@ import {
 } from '@wordpress/blocks';
 import { ToolbarGroup } from '@wordpress/components';
 import BlockMover from '../block-mover';
+import BlockAppenderButton from '../block-appender-button';
 import BlockParentSelector from '../block-parent-selector';
 import BlockControls from '../block-controls';
 import __unstableBlockToolbarLastItem from './block-toolbar-last-item';
@@ -241,6 +242,13 @@ export function PrivateBlockToolbar( {
 								clientIds={ blockClientIds }
 								hideDragHandle={ hideDragHandle }
 							/>
+							{ ! isMultiToolbar &&
+								isDefaultEditingMode &&
+								! hideDragHandle && (
+									<BlockAppenderButton
+										clientId={ blockClientId }
+									/>
+								) }
 						</ToolbarGroup>
 					</div>
 				) }
