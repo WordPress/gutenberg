@@ -127,7 +127,7 @@ function ColumnEdit( {
 			templateLock,
 			allowedBlocks,
 			renderAppender: hasChildBlocks
-				? undefined
+				? false
 				: InnerBlocks.ButtonBlockAppender,
 		}
 	);
