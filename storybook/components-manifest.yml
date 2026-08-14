@@ -1362,6 +1362,26 @@
       - unit
       - units
       - value
+- name: ValidatedInputControl
+  props:
+      - className
+      - customValidity
+      - defaultValue
+      - description
+      - details
+      - disabled
+      - hideLabelFromVision
+      - label
+      - markWhenOptional
+      - onValueChange
+      - prefix
+      - render
+      - required
+      - size
+      - style
+      - suffix
+      - type
+      - value
 - name: ValidityIndicator
   props:
       - id
