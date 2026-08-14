@@ -7,6 +7,7 @@
 -   Add `Spinner` component ([#81358](https://github.com/WordPress/gutenberg/pull/81358)).
 -   Add a `Menu` component. ([#79560](https://github.com/WordPress/gutenberg/pull/79560))
 -   Add `ControlWithError` component, ported from `@wordpress/components` and `@wordpress/dataviews` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)).
+-   Export `ValidityIndicator`, so custom validated controls can render the same validity message as `ControlWithError` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)).
 
 ### Breaking Changes
 
