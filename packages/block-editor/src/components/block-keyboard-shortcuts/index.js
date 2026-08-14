@@ -140,9 +140,9 @@ function useApplyBlockShortcut() {
 
 function BlockShortcut( { entry, apply } ) {
 	useShortcut( entry.name, ( event ) => {
-		// Another handler already acted on this event. Block editor providers
-		// can be nested, in which case this component is mounted more than
-		// once.
+		// Another handler already acted on this event: either a shortcut
+		// claiming the same key combination, or this same shortcut mounted
+		// twice because block editor providers can be nested.
 		if ( event.defaultPrevented ) {
 			return;
 		}
@@ -181,9 +181,8 @@ function BlockShortcutsRegister( { shortcuts } ) {
 			}
 
 			// Handlers are matched by key combination rather than by name, so
-			// two blocks claiming the same one both run, and each does nothing
-			// unless its own block is selected. To the user the shortcut works
-			// for one block and is dead for the other.
+			// two blocks claiming the same one both run on the same event, in
+			// registration order, and the first that applies takes it.
 			const { modifier, character } = shortcut.keyCombination;
 			const combination = `${ modifier ?? '' }+${ character }`;
 			if ( combinations.has( combination ) ) {
