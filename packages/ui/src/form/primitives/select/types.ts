@@ -3,8 +3,6 @@ import type { ReactElement } from 'react';
 import type { ComponentProps } from '../../../utils/types';
 import type { InputLayoutProps } from '../input-layout/types';
 
-export type SelectItemSize = 'default' | 'small';
-
 export type PortalProps = ComponentProps< typeof _Select.Portal >;
 
 export type PositionerProps = ComponentProps< typeof _Select.Positioner >;
@@ -90,7 +88,7 @@ export type SelectItemProps = Omit<
 	 *
 	 * @default 'default'
 	 */
-	size?: SelectItemSize;
+	size?: 'default' | 'small';
 	/**
 	 * The content of the item.
 	 */
