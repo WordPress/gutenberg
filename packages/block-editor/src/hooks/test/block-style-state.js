@@ -1,8 +1,87 @@
 import {
+	getPopulatedViewportStyleStates,
+	getResponsiveStylesLabel,
 	getStyleForState,
 	scopeResetAllFilterToState,
 	setStyleForState,
 } from '../block-style-state';
+
+describe( 'getPopulatedViewportStyleStates', () => {
+	it( 'returns no viewport states when a block has no responsive style overrides', () => {
+		expect(
+			getPopulatedViewportStyleStates( {
+				color: { text: '#000000' },
+				':hover': { color: { text: '#ff0000' } },
+				'@current': { color: { text: '#00ff00' } },
+			} )
+		).toEqual( [] );
+	} );
+
+	it( 'returns populated viewport states in display order', () => {
+		expect(
+			getPopulatedViewportStyleStates( {
+				'@mobile': { color: { text: '#ff0000' } },
+				'@tablet': { spacing: { padding: { top: '20px' } } },
+			} )
+		).toEqual( [ '@tablet', '@mobile' ] );
+	} );
+
+	it( 'counts pseudo-state styles nested inside a viewport', () => {
+		expect(
+			getPopulatedViewportStyleStates( {
+				'@mobile': {
+					':hover': { color: { text: '#ff0000' } },
+				},
+			} )
+		).toEqual( [ '@mobile' ] );
+	} );
+
+	it( 'ignores empty and malformed viewport style slices', () => {
+		expect(
+			getPopulatedViewportStyleStates( {
+				'@tablet': { color: { text: undefined } },
+				'@mobile': null,
+			} )
+		).toEqual( [] );
+	} );
+
+	it( 'does not mutate the style attribute', () => {
+		const style = {
+			'@tablet': { color: { text: undefined } },
+			'@mobile': { color: { text: '#ff0000' } },
+		};
+
+		getPopulatedViewportStyleStates( style );
+
+		expect( style ).toEqual( {
+			'@tablet': { color: { text: undefined } },
+			'@mobile': { color: { text: '#ff0000' } },
+		} );
+	} );
+} );
+
+describe( 'getResponsiveStylesLabel', () => {
+	it( 'returns no description when a block has no responsive styles', () => {
+		expect( getResponsiveStylesLabel( {} ) ).toBeNull();
+	} );
+
+	it( 'describes a single responsive viewport', () => {
+		expect(
+			getResponsiveStylesLabel( {
+				'@mobile': { color: { text: '#ff0000' } },
+			} )
+		).toBe( 'Block has responsive styles for Mobile.' );
+	} );
+
+	it( 'describes all responsive viewports in display order', () => {
+		expect(
+			getResponsiveStylesLabel( {
+				'@mobile': { color: { text: '#ff0000' } },
+				'@tablet': { spacing: { padding: { top: '20px' } } },
+			} )
+		).toBe( 'Block has responsive styles for Tablet, Mobile.' );
+	} );
+} );
 
 describe( 'getStyleForState', () => {
 	it( 'returns the root style for the default state', () => {

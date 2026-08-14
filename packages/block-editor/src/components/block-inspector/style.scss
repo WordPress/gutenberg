@@ -62,3 +62,12 @@
 		justify-content: center;
 	}
 }
+
+.block-editor-block-inspector__responsive-styles-info {
+	padding-top: $grid-unit-05;
+	padding-bottom: $grid-unit-05;
+	margin: 0 $grid-unit-20 $grid-unit-20;
+	display: flex;
+	align-items: center;
+	justify-content: start;
+}

@@ -5,7 +5,7 @@ import {
 	__experimentalTreeGridItem as TreeGridItem,
 } from '@wordpress/components';
 import { useInstanceId, useDebounce } from '@wordpress/compose';
-import { moreVertical } from '@wordpress/icons';
+import { mobile, moreVertical, unseen } from '@wordpress/icons';
 import {
 	useCallback,
 	useMemo,
@@ -40,6 +40,7 @@ import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
 import { getBlockVisibilityLabel } from '../block-visibility';
+import { getResponsiveStylesLabel } from '../../hooks/block-style-state';
 
 function ListViewBlock( {
 	clientId,
@@ -110,6 +111,7 @@ function ListViewBlock( {
 
 	const {
 		blockName,
+		blockStyle,
 		blockVisibility,
 		blockEditingMode,
 		allowRightClickOverrides,
@@ -135,6 +137,7 @@ function ListViewBlock( {
 
 			return {
 				blockName: getBlockName( clientId ),
+				blockStyle: attributes?.style,
 				blockVisibility: attributes?.metadata?.blockVisibility,
 				blockEditingMode: getBlockEditingModeForClientId( clientId ),
 				allowRightClickOverrides: settings.allowRightClickOverrides,
@@ -555,6 +558,14 @@ function ListViewBlock( {
 		blockVisibility,
 		viewportSettings
 	);
+	const responsiveStylesDescription = getResponsiveStylesLabel( blockStyle );
+	const blockStatusDescription = [
+		blockVisibilityDescription,
+		responsiveStylesDescription,
+	]
+		.filter( Boolean )
+		.join( ' ' );
+	const blockStatusIcon = blockVisibilityDescription ? unseen : mobile;
 
 	const hasSiblings = siblingBlockCount > 0;
 	const canShowBlockActions = showBlockActions && ! isDisabled;
@@ -657,14 +668,15 @@ function ListViewBlock( {
 							isExpanded={ canEditBlock ? isExpanded : undefined }
 							selectedClientIds={ selectedClientIds }
 							ariaDescribedBy={ descriptionId }
-							visibilityLabel={ blockVisibilityDescription }
+							statusLabel={ blockStatusDescription }
+							statusIcon={ blockStatusIcon }
 							isDisabled={ isDisabled }
 						/>
 						<AriaReferencedText id={ descriptionId }>
 							{ [
 								blockPositionDescription,
 								blockPropertiesDescription,
-								blockVisibilityDescription,
+								blockStatusDescription,
 							]
 								.filter( Boolean )
 								.join( ' ' ) }
