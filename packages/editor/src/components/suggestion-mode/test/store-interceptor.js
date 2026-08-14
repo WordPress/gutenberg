@@ -594,6 +594,73 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		} );
 	} );
 
+	it( 'adopts a resetBlocks as the new baseline instead of capturing it', async () => {
+		// A `resetBlocks` is content handed down by the controlling entity —
+		// the sync manager applying another session's changes, a revision
+		// restore, a refetch. Every block in it carries a fresh clientId, so
+		// without the external-reset check the interceptor read the arriving
+		// document as a page of insertions and the outgoing one as a page of
+		// removals, doubling the post in the canvas and opening a note per
+		// block (issue #73411, finding F-21).
+		const { registry, getOverlay } = setup();
+
+		const incoming = [
+			createBlock( TEST_BLOCK_NAME, { content: 'Hello' } ),
+			createBlock( TEST_BLOCK_NAME, { content: 'From the server' } ),
+		];
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).resetBlocks( incoming );
+		} );
+		await flushSubscribers();
+
+		const liveBlocks = registry.select( blockEditorStore ).getBlocks();
+		expect( liveBlocks.map( ( block ) => block.clientId ) ).toEqual(
+			incoming.map( ( block ) => block.clientId )
+		);
+		expect(
+			liveBlocks.map(
+				( block ) => block.attributes?.metadata?.suggestion
+			)
+		).toEqual( [ undefined, undefined ] );
+		expect( Object.keys( getOverlay().entries ) ).toEqual( [] );
+	} );
+
+	it( 'still captures an edit made after a resetBlocks', async () => {
+		// The adoption above must re-seed the baseline, not switch capture
+		// off: the next real edit — on a block that only exists because of
+		// the reset — is still a suggestion.
+		const { registry, getOverlay } = setup();
+
+		const incoming = [
+			createBlock( TEST_BLOCK_NAME, { content: 'From the server' } ),
+		];
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).resetBlocks( incoming );
+		} );
+		await flushSubscribers();
+
+		const incomingClientId = incoming[ 0 ].clientId;
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( incomingClientId, {
+					content: 'Edited',
+				} );
+		} );
+		await flushSubscribers();
+
+		// Reverted on the live block, captured in the overlay — the ordinary
+		// attribute-suggestion path.
+		expect(
+			registry
+				.select( blockEditorStore )
+				.getBlockAttributes( incomingClientId )?.content
+		).toBe( 'From the server' );
+		expect(
+			getOverlay().entries[ incomingClientId ]?.overlayAttributes?.content
+		).toBe( 'Edited' );
+	} );
+
 	it( 'defers an empty default block, then registers a single insertion once it gains content', async () => {
 		// Regression: typing into a freshly-appended empty paragraph must
 		// produce ONE suggestion (the block insertion, content included) —
