@@ -1,4 +1,4 @@
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
@@ -22,6 +22,7 @@ import {
 	readEventRange,
 } from './keyboard-target';
 import { isPartOfPendingInsertion } from './store-interceptor';
+import { notifyEditRefused } from './refuse-edit';
 
 /**
  * Turn typing (and simple paste) in Suggest mode into an inline addition
@@ -81,6 +82,7 @@ export default function SuggestionAdditionKeyboard() {
 	const { getBlockName } = useSelect( blockEditorStore );
 	const { requestInterceptorBypass, isDeferredInsertion } =
 		useSuggestionOverlay();
+	const registry = useRegistry();
 
 	// The in-progress addition run. `id` is null while the suggestion note is
 	// being created; characters entered in that window queue in `pending` and
@@ -262,7 +264,9 @@ export default function SuggestionAdditionKeyboard() {
 	 * Returns whether the input was consumed. Callers must only cancel the
 	 * native edit when this returns true — when no valid single-attribute
 	 * anchor exists the input has to fall through to the native/overlay path
-	 * rather than being swallowed.
+	 * rather than being swallowed. A gesture this component owns but declines
+	 * (a type-over of a marked run) also counts as consumed: cancelling is the
+	 * refusal.
 	 *
 	 * `domRange` carries the DOM-derived offsets for the edit
 	 * (`readEventRange`); the store caret is only trusted for block/attribute
@@ -340,11 +344,15 @@ export default function SuggestionAdditionKeyboard() {
 				 * Type-over of a selection that overlaps an existing
 				 * suggestion marker: wrapping it in the `del` marker would
 				 * re-attribute part of that marker to the new id (see
-				 * `formatsRangeHasSuggestion`). Fall through to the
-				 * native/overlay path instead of intercepting.
+				 * `formatsRangeHasSuggestion`), and the overlay it used to
+				 * fall through to would hide that marker (#73411, F-09).
+				 * Neither representation fits, so the gesture is consumed and
+				 * declined — the caller cancels the native edit, leaving the
+				 * existing suggestion exactly as it was.
 				 */
 				resetRun();
-				return false;
+				notifyEditRefused( registry );
+				return true;
 			}
 			const run = runRef.current;
 			const isContiguous =
@@ -384,6 +392,7 @@ export default function SuggestionAdditionKeyboard() {
 			isDeferredInsertion,
 			beginInsertion,
 			commit,
+			registry,
 			resetRun,
 			authorId,
 		]
