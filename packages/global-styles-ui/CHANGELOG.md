@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Group input and select typography and color controls in a dedicated Forms section in Global Styles.
+-   Add an Elements section to Global Styles for the elements already available in Typography and Colors.
 -   Expose typography and color controls for citations, inputs, and selects in Global Styles ([#80852](https://github.com/WordPress/gutenberg/pull/80852)).
 
 ## 1.20.0 (2026-08-12)
