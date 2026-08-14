@@ -6,11 +6,11 @@ Build tool for WordPress plugins.
 
 `@wordpress/build` is an opinionated build system designed for WordPress plugins. It provides:
 
-- **Transpilation**: Converts TypeScript/JSX source code to both CommonJS (`build/`) and ESM (`build-module/`) formats using esbuild
-- **Style Compilation**: Processes SCSS files and CSS modules, generating LTR and RTL versions
-- **Bundling**: Creates browser-ready bundles for WordPress scripts and modules
-- **PHP Generation**: Automatically generates PHP registration files for scripts, modules, and styles
-- **Watch Mode**: Incremental rebuilds during development
+-   **Transpilation**: Converts TypeScript/JSX source code to both CommonJS (`build/`) and ESM (`build-module/`) formats using esbuild
+-   **Style Compilation**: Processes SCSS files and CSS modules, generating LTR and RTL versions
+-   **Bundling**: Creates browser-ready bundles for WordPress scripts and modules
+-   **PHP Generation**: Automatically generates PHP registration files for scripts, modules, and styles
+-   **Watch Mode**: Incremental rebuilds during development
 
 ## Installation
 
@@ -67,9 +67,9 @@ Configure your `package.json` with the following optional fields:
 
 Controls whether the package is exposed as a bundled WordPress script/module and accessible via the configured global variable.
 
-- **`true`**: The package will be bundled and exposed as a WordPress script. It will be available in WordPress as part of the configured global (e.g., `wp.blockEditor`, `wp.data`, or a custom global name if configured differently).
+-   **`true`**: The package will be bundled and exposed as a WordPress script. It will be available in WordPress as part of the configured global (e.g., `wp.blockEditor`, `wp.data`, or a custom global name if configured differently).
 
-- **Omitted or `false` (default)**: The package will not be exposed as a WordPress script. Use this for packages designed solely as dependencies for other packages. The package can still be used as a dependency via npm imports by other packages.
+-   **Omitted or `false` (default)**: The package will not be exposed as a WordPress script. Use this for packages designed solely as dependencies for other packages. The package can still be used as a dependency via npm imports by other packages.
 
 ```json
 {
@@ -107,7 +107,7 @@ Additional script dependencies:
 
 ```json
 {
-	"wpScriptExtraDependencies": ["wp-polyfill"]
+	"wpScriptExtraDependencies": [ "wp-polyfill" ]
 }
 ```
 
@@ -232,8 +232,8 @@ The prefix used for WordPress script handles in `.asset.php` files (e.g., `wp-da
 
 With this configuration:
 
-- `@my-plugin/editor` → `window.myPlugin.editor` with handle `mp-editor`
-- `@my-plugin/data` → `window.myPlugin.data` with handle `mp-data`
+-   `@my-plugin/editor` → `window.myPlugin.editor` with handle `mp-editor`
+-   `@my-plugin/data` → `window.myPlugin.data` with handle `mp-data`
 
 ### `wpPlugin.externalNamespaces`
 
@@ -258,9 +258,9 @@ Additional package namespaces to externalize (consume as externals, not expose).
 
 This allows your packages to consume third-party dependencies as externals:
 
-- `import { Cart } from '@woo/cart'` → `window.woo.cart` with handle `woocommerce-cart`
-- `import { Button } from '@acme/ui'` → `window.acme.ui` with handle `acme-plugin-ui`
-- Dependencies are tracked in `.asset.php` files
+-   `import { Cart } from '@woo/cart'` → `window.woo.cart` with handle `woocommerce-cart`
+-   `import { Button } from '@acme/ui'` → `window.acme.ui` with handle `acme-plugin-ui`
+-   Dependencies are tracked in `.asset.php` files
 
 If `handlePrefix` is omitted, it defaults to the namespace key (e.g., `"woo"` → `woo-cart`).
 
@@ -277,7 +277,7 @@ Pages can be defined as simple strings or as objects with initialization modules
 			"my-admin-page",
 			{
 				"id": "my-other-page",
-				"init": ["@my-plugin/my-page-init"]
+				"init": [ "@my-plugin/my-page-init" ]
 			}
 		]
 	}
@@ -286,19 +286,19 @@ Pages can be defined as simple strings or as objects with initialization modules
 
 **Page Configuration:**
 
-- **String format**: `"my-admin-page"` - Simple page with no init modules
-- **Object format**: `{ "id": "page-slug", "init": ["@scope/package"], "experimental": true }` - Page with optional init modules
-    - **`id`** (required): The page slug used in WordPress admin URLs
-    - **`init`** (optional): Array of script module IDs to execute during page initialization
-    - **`experimental`** (optional, default `false`): When `true`, the page is excluded from WordPress Core builds (`IS_WORDPRESS_CORE=true`), along with any route that belongs only to experimental pages.
+-   **String format**: `"my-admin-page"` - Simple page with no init modules
+-   **Object format**: `{ "id": "page-slug", "init": ["@scope/package"], "experimental": true }` - Page with optional init modules
+    -   **`id`** (required): The page slug used in WordPress admin URLs
+    -   **`init`** (optional): Array of script module IDs to execute during page initialization
+    -   **`experimental`** (optional, default `false`): When `true`, the page is excluded from WordPress Core builds (`IS_WORDPRESS_CORE=true`), along with any route that belongs only to experimental pages.
 
 **Generated Files:**
 
 This generates two page modes:
 
-- `build/pages/my-admin-page/page.php` - Full-page mode (takes over entire admin screen with custom sidebar)
-- `build/pages/my-admin-page/page-wp-admin.php` - WP-Admin mode (integrates within standard wp-admin interface)
-- `build/pages.php` - Loader for all pages
+-   `build/pages/my-admin-page/page.php` - Full-page mode (takes over entire admin screen with custom sidebar)
+-   `build/pages/my-admin-page/page-wp-admin.php` - WP-Admin mode (integrates within standard wp-admin interface)
+-   `build/pages.php` - Loader for all pages
 
 Each mode provides route/menu registration functions and a render callback. Routes are automatically registered for both modes.
 
@@ -343,8 +343,8 @@ add_menu_page( 'Title', 'Menu', 'capability', 'my-admin-page', 'my_plugin_my_adm
 **Init Modules:**
 Init modules are JavaScript packages that execute during page initialization, after menu items and routes are registered and before the app renders. They're ideal for:
 
-- Adding icons to menu items (icons can't be passed from PHP)
-- Registering command palette entries
+-   Adding icons to menu items (icons can't be passed from PHP)
+-   Registering command palette entries
 
 **Creating an Init Module:**
 
@@ -395,9 +395,9 @@ The `init()` function is **mandatory** - all init modules must export this named
 
 This configuration:
 
-- Packages like `@wordpress/data` expose `window.wp.data`
-- Packages like `@wordpress/block-editor` expose `window.wp.blockEditor`
-- All packages can consume `@wordpress/*` as externals
+-   Packages like `@wordpress/data` expose `window.wp.data`
+-   Packages like `@wordpress/block-editor` expose `window.wp.blockEditor`
+-   All packages can consume `@wordpress/*` as externals
 
 ### Example: Third-Party Plugin
 
@@ -413,18 +413,18 @@ This configuration:
 
 This configuration:
 
-- Packages like `@acme/editor` expose `window.acme.editor`
-- Packages like `@acme/data` expose `window.acme.data`
-- All packages can still consume `@wordpress/*` → `window.wp.*`
-- All packages can still consume vendors (react, lodash) → `window.React`, `window.lodash`
+-   Packages like `@acme/editor` expose `window.acme.editor`
+-   Packages like `@acme/data` expose `window.acme.data`
+-   All packages can still consume `@wordpress/*` → `window.wp.*`
+-   All packages can still consume vendors (react, lodash) → `window.React`, `window.lodash`
 
 ### Behavior
 
-- **Packages with `wpScript: true` matching the namespace**: Bundled with global exposure
-- **Packages with `wpScript: true` not matching the namespace**: Bundled without global exposure
-- **Dependencies**: `@wordpress/*` packages are always externalized to `wp.*` globals
-- **Vendors**: React, lodash, jQuery, moment are always externalized to their standard globals
-- **Asset files**: `.asset.php` files are always generated for WordPress dependency management
+-   **Packages with `wpScript: true` matching the namespace**: Bundled with global exposure
+-   **Packages with `wpScript: true` not matching the namespace**: Bundled without global exposure
+-   **Dependencies**: `@wordpress/*` packages are always externalized to `wp.*` globals
+-   **Vendors**: React, lodash, jQuery, moment are always externalized to their standard globals
+-   **Asset files**: `.asset.php` files are always generated for WordPress dependency management
 
 ## Output Structure
 
@@ -471,15 +471,15 @@ For routes that should appear on multiple pages:
 {
 	"route": {
 		"path": "/settings",
-		"page": ["my-admin-page", "other-page"]
+		"page": [ "my-admin-page", "other-page" ]
 	}
 }
 ```
 
 The `page` field can be either:
 
-- **String**: Route belongs to a single page
-- **Array**: Route appears on multiple pages (the build system will register the route for each page)
+-   **String**: Route belongs to a single page
+-   **Array**: Route appears on multiple pages (the build system will register the route for each page)
 
 Each page ID must match one of the pages defined in `wpPlugin.pages` in your root `package.json`. This tells the build system which page(s) this route belongs to. It can also map to existing pages registered by other plugins.
 
@@ -513,22 +513,22 @@ The canvas is a full-screen area typically used for editor previews. To use a cu
 
 Export a `route` object with optional hooks. Each hook receives `{ params, search }` — path parameters and query string values from the URL.
 
-- **`beforeLoad`** — Runs before navigation completes. Use for auth checks, validation, or redirects. Throw `redirect()` or `notFound()` from `@wordpress/route` to abort navigation.
-- **`loader`** — Runs while the route is loading. Use to preload data (for example, `resolveSelect` from `@wordpress/data`) so `stage` components can read from the store without a loading state. May return an object whose properties are merged into the route's loader data. For data that must be available before the JavaScript application loads, use [`rest_preload_api_request()`](https://developer.wordpress.org/reference/functions/rest_preload_api_request/) in your page's PHP render callback instead.
-- **`canvas`** — Runs in parallel with `loader`. Controls which canvas is rendered depending on return values:
-    - `CanvasData` (`{ postType, postId, isPreview?, editLink? }`) → default WordPress editor canvas
-    - `null` → custom `canvas.tsx` component (if provided)
-    - `undefined` or omitted → no canvas
+-   **`beforeLoad`** — Runs before navigation completes. Use for auth checks, validation, or redirects. Throw `redirect()` or `notFound()` from `@wordpress/route` to abort navigation.
+-   **`loader`** — Runs while the route is loading. Use to preload data (for example, `resolveSelect` from `@wordpress/data`) so `stage` components can read from the store without a loading state. May return an object whose properties are merged into the route's loader data. For data that must be available before the JavaScript application loads, use [`rest_preload_api_request()`](https://developer.wordpress.org/reference/functions/rest_preload_api_request/) in your page's PHP render callback instead.
+-   **`canvas`** — Runs in parallel with `loader`. Controls which canvas is rendered depending on return values:
+    -   `CanvasData` (`{ postType, postId, isPreview?, editLink? }`) → default WordPress editor canvas
+    -   `null` → custom `canvas.tsx` component (if provided)
+    -   `undefined` or omitted → no canvas
 
 ```tsx
 export const route = {
-	beforeLoad: ({ params, search }) => {
+	beforeLoad: ( { params, search } ) => {
 		// Pre-navigation validation, auth checks
 	},
-	loader: ({ params, search }) => {
+	loader: ( { params, search } ) => {
 		// Data preloading
 	},
-	canvas: ({ params, search }) => {
+	canvas: ( { params, search } ) => {
 		// Return CanvasData to use default canvas (editor)
 		return {
 			postType: params.type,
@@ -542,7 +542,7 @@ export const route = {
 
 		// Return undefined to show no canvas
 		// return undefined;
-	}
+	},
 };
 ```
 
@@ -550,10 +550,10 @@ export const route = {
 
 The build system generates:
 
-- `build/routes/{route-name}/content.js` - Bundled stage/inspector/canvas components
-- `build/routes/{route-name}/route.js` - Bundled lifecycle hooks (if present)
-- `build/routes/registry.php` - Route registry data
-- `build/routes.php` - Route registration logic
+-   `build/routes/{route-name}/content.js` - Bundled stage/inspector/canvas components
+-   `build/routes/{route-name}/route.js` - Bundled lifecycle hooks (if present)
+-   `build/routes/registry.php` - Route registry data
+-   `build/routes.php` - Route registration logic
 
 The boot package in Gutenberg will automatically use these routes and make them available.
 
@@ -580,13 +580,13 @@ widgets/
 
 Widgets use a dual-entry pattern, similar in spirit to how blocks split metadata between `block.json` and `edit.js`:
 
-| Concern | Lives in | Reason |
-| --- | --- | --- |
-| Identity (`name`) | both (must match) | server needs it to register; client uses it to resolve the runtime entry |
-| Translatable metadata (`title`, `description`, `help`, `keywords`) | `widget.json` | translated server-side via `textdomain`, so the host receives localized strings without a JS runtime |
-| Framing (`category`, `presentation`) | `widget.json` | plain JSON the host reads without a JS runtime |
-| Attribute schema (types, options, labels, `relevance`) | `widget.ts` | needs TypeScript coupling with `render` props; labels are translated with `__()` |
-| Icon and `example` | `widget.ts` | runtime values co-located with the attribute schema |
+| Concern                                                            | Lives in          | Reason                                                                                               |
+| ------------------------------------------------------------------ | ----------------- | ---------------------------------------------------------------------------------------------------- |
+| Identity (`name`)                                                  | both (must match) | server needs it to register; client uses it to resolve the runtime entry                             |
+| Translatable metadata (`title`, `description`, `help`, `keywords`) | `widget.json`     | translated server-side via `textdomain`, so the host receives localized strings without a JS runtime |
+| Framing (`category`, `presentation`)                               | `widget.json`     | plain JSON the host reads without a JS runtime                                                       |
+| Attribute schema (types, options, labels, `relevance`)             | `widget.ts`       | needs TypeScript coupling with `render` props; labels are translated with `__()`                     |
+| Icon and `example`                                                 | `widget.ts`       | runtime values co-located with the attribute schema                                                  |
 
 Rule of thumb: anything the host needs before loading a widget's module — identity, translatable copy, framing — goes in `widget.json`, which the build forwards to `build/widgets/registry.php` and exposes through the REST API. Anything that needs TypeScript or runtime values (attribute schema, icon, `example`) goes in `widget.ts`.
 
@@ -607,14 +607,14 @@ Rule of thumb: anything the host needs before loading a widget's module — iden
 
 **Fields:**
 
-- **`name`** (required): Namespaced identifier (e.g., `"my-plugin/hello-world"`)
-- **`title`** (optional): Human-readable title. Translated server-side using `textdomain`.
-- **`description`** (optional): Short description. Translated server-side using `textdomain`.
-- **`help`** (optional): Contextual help note for compact surfaces. An object with `content` (may carry `<em>`/`<strong>`) and optional `links` (`label`, `href`). Translated server-side using `textdomain`.
-- **`keywords`** (optional): Search aliases. Translated server-side using `textdomain`.
-- **`category`** (optional): Grouping category for filtering
-- **`presentation`** (optional): Rendering intent (`framed`, `content-bleed`, `full-bleed`)
-- **`textdomain`** (optional): Gettext text domain for translating `title`, `description`, `help`, and `keywords`
+-   **`name`** (required): Namespaced identifier (e.g., `"my-plugin/hello-world"`)
+-   **`title`** (optional): Human-readable title. Translated server-side using `textdomain`.
+-   **`description`** (optional): Short description. Translated server-side using `textdomain`.
+-   **`help`** (optional): Contextual help note for compact surfaces. An object with `content` (may carry `<em>`/`<strong>`) and optional `links` (`label`, `href`). Translated server-side using `textdomain`.
+-   **`keywords`** (optional): Search aliases. Translated server-side using `textdomain`.
+-   **`category`** (optional): Grouping category for filtering
+-   **`presentation`** (optional): Rendering intent (`framed`, `content-bleed`, `full-bleed`)
+-   **`textdomain`** (optional): Gettext text domain for translating `title`, `description`, `help`, and `keywords`
 
 ### `widget.ts` — runtime schema
 
@@ -657,7 +657,7 @@ const widget = {
 export default widget;
 ```
 
-Each attribute entry is a DataViews `Field` plus an optional `relevance` hint (`'high' | 'low'`). The widget declares importance; the host decides where to expose each field. When absent, `relevance` defaults to `'low'`.
+Each attribute entry is a DataViews `Field` plus an optional `relevance` hint (`'high' | 'medium' | 'low'`). The widget declares importance; the host decides where to expose each field. When absent, `relevance` defaults to `'low'`.
 
 The same `HelloWorldAttributes` type is consumed by `render.tsx`, giving the author a single source of truth for the data contract.
 
@@ -677,7 +677,9 @@ export default function HelloWorld( { attributes }: HelloWorldRenderProps ) {
 	return (
 		<div>
 			Hello, { attributes.greeting ?? 'World' }!
-			{ attributes.showDate && <time>{ new Date().toLocaleDateString() }</time> }
+			{ attributes.showDate && (
+				<time>{ new Date().toLocaleDateString() }</time>
+			) }
 		</div>
 	);
 }
@@ -689,12 +691,12 @@ All non-JSON entries are optional. The build system checks for files with extens
 
 The build system generates:
 
-- `build/widgets/{widget-name}/render.min.js` + `render.js` — Bundled UI component (ESM)
-- `build/widgets/{widget-name}/render.min.asset.php` — Asset metadata for render module
-- `build/widgets/{widget-name}/widget.min.js` + `widget.js` — Bundled metadata (ESM)
-- `build/widgets/{widget-name}/widget.min.asset.php` — Asset metadata for widget module
-- `build/widgets/registry.php` — Widget registry data
-- `build/widgets.php` — Script module registration logic
+-   `build/widgets/{widget-name}/render.min.js` + `render.js` — Bundled UI component (ESM)
+-   `build/widgets/{widget-name}/render.min.asset.php` — Asset metadata for render module
+-   `build/widgets/{widget-name}/widget.min.js` + `widget.js` — Bundled metadata (ESM)
+-   `build/widgets/{widget-name}/widget.min.asset.php` — Asset metadata for widget module
+-   `build/widgets/registry.php` — Widget registry data
+-   `build/widgets.php` — Script module registration logic
 
 ### PHP Registration
 

@@ -7,7 +7,7 @@
 	},
 	"references": [
 		{ "path": "../api-fetch" },
-		{ "path": "../blob" },
+		{ "path": "../blob/tsconfig.build.json" },
 		{ "path": "../components" },
 		{ "path": "../core-data" },
 		{ "path": "../data" },
