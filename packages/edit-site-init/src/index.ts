@@ -58,15 +58,7 @@ export async function init() {
 		} );
 	} );
 
-	/*
-	 * Editor preferences that are off unless something seeds them. Both the
-	 * post editor and the site editor seed the same values, because they are
-	 * what the editor expects rather than anything this application prefers —
-	 * they belong in the editor itself, and this is a copy until they move.
-	 *
-	 * Only these three matter: every other preference those editors seed is
-	 * either falsy anyway, or read with a fallback at the point of use.
-	 */
+	// Read without a fallback where they are used, so they are off unless seeded.
 	dispatch( preferencesStore ).setDefaults( 'core', {
 		allowRightClickOverrides: true,
 		enableChoosePatternModal: true,
