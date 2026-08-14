@@ -20,5 +20,11 @@
 		{ "path": "../style-runtime" },
 		{ "path": "../theme/tsconfig.build.json" }
 	],
-	"exclude": [ "**/benchmark", "**/test/**", "**/stories/**", "**/*.story.*" ]
+	"exclude": [
+		"**/benchmark",
+		"**/test/**",
+		"**/tests/**",
+		"**/stories/**",
+		"**/*.story.*"
+	]
 }

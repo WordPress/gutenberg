@@ -31,5 +31,11 @@
 		{ "path": "../ui/tsconfig.build.json" },
 		{ "path": "../warning" }
 	],
-	"exclude": [ "**/benchmark", "**/test/**", "**/stories/**", "**/*.story.*" ]
+	"exclude": [
+		"**/benchmark",
+		"**/test/**",
+		"**/tests/**",
+		"**/stories/**",
+		"**/*.story.*"
+	]
 }
