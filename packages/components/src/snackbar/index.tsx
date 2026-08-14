@@ -7,7 +7,6 @@ import {
 	useLayoutEffect,
 	useRef,
 	forwardRef,
-	renderToString,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
@@ -23,6 +22,13 @@ const NOTICE_TIMEOUT = 6000;
  * Custom hook which announces the message with the given politeness, if a
  * valid message is provided.
  *
+ * A non-string message is read from the DOM node the returned ref is attached
+ * to, rather than serialized with `renderToString`. Serializing during render
+ * invokes the message components as plain functions, so any hooks they use
+ * would be registered against the component rendering the snackbar, crashing
+ * it when the message changes shape. See
+ * https://github.com/WordPress/gutenberg/issues/61199.
+ *
  * @param message    Message to announce.
  * @param politeness Politeness to announce.
  */
@@ -30,14 +36,32 @@ function useSpokenMessage(
 	message: SnackbarProps[ 'spokenMessage' ],
 	politeness: NonNullable< SnackbarProps[ 'politeness' ] >
 ) {
-	const spokenMessage =
-		typeof message === 'string' ? message : renderToString( message );
+	const messageContainerRef = useRef< HTMLDivElement >( null );
+	const previouslySpokenRef = useRef< {
+		message: string;
+		politeness: NonNullable< SnackbarProps[ 'politeness' ] >;
+	} >();
 
 	useEffect( () => {
-		if ( spokenMessage ) {
+		const spokenMessage =
+			typeof message === 'string'
+				? message
+				: messageContainerRef.current?.innerHTML;
+
+		if (
+			spokenMessage &&
+			( spokenMessage !== previouslySpokenRef.current?.message ||
+				politeness !== previouslySpokenRef.current?.politeness )
+		) {
+			previouslySpokenRef.current = {
+				message: spokenMessage,
+				politeness,
+			};
 			speak( spokenMessage, politeness );
 		}
-	}, [ spokenMessage, politeness ] );
+	} );
+
+	return messageContainerRef;
 }
 
 function UnforwardedSnackbar(
@@ -85,7 +109,16 @@ function UnforwardedSnackbar(
 		}
 	}
 
-	useSpokenMessage( spokenMessage, politeness );
+	const spokenMessageRef = useSpokenMessage( spokenMessage, politeness );
+
+	// When `spokenMessage` is a distinct element (not the default `children`
+	// and not a string), it has no place in the rendered output to read the
+	// announcement from, so render it in a hidden container.
+	const isSpokenMessageDistinctElement =
+		typeof spokenMessage !== 'string' &&
+		spokenMessage !== children &&
+		spokenMessage !== null &&
+		spokenMessage !== undefined;
 
 	// The `onDismiss/onRemove` can have unstable references,
 	// trigger side-effect cleanup, and reset timers.
@@ -140,7 +173,24 @@ function UnforwardedSnackbar(
 				{ icon && (
 					<div className="components-snackbar__icon">{ icon }</div>
 				) }
-				{ children }
+				{ /* `display: contents` keeps the wrapper out of the flex
+				layout while providing a node scoped to the default spoken
+				message (the children) for `useSpokenMessage` to read. */ }
+				<div
+					ref={
+						isSpokenMessageDistinctElement
+							? undefined
+							: spokenMessageRef
+					}
+					style={ { display: 'contents' } }
+				>
+					{ children }
+				</div>
+				{ isSpokenMessageDistinctElement && (
+					<div hidden ref={ spokenMessageRef }>
+						{ spokenMessage }
+					</div>
+				) }
 				{ actions.map(
 					( { label, onClick, url, openInNewTab = false }, index ) =>
 						url !== undefined && openInNewTab ? (
