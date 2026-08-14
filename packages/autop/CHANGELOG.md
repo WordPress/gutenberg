@@ -2,8 +2,11 @@
 
 ## Unreleased
 
-## 4.53.0 (2026-08-12)
+### Bug Fixes
 
+-   `autop` no longer leaves an unbalanced `</p>` when an `<hr>` is not followed by a blank line, matching `wpautop()` ([#81356](https://github.com/WordPress/gutenberg/pull/81356)).
+
+## 4.53.0 (2026-08-12)
 
 ## 4.52.0 (2026-07-29)
 

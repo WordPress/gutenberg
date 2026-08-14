@@ -326,7 +326,9 @@ test( 'that_autop_treats_block_level_elements_as_blocks', () => {
 		'h4',
 		'h5',
 		'h6',
-		'hr',
+		// `hr` is void, so `<hr>foo</hr>` is not a meaningful fixture here. It is
+		// covered by the dedicated tests below, and core's equivalent PHPUnit test
+		// omits it for the same reason.
 		'fieldset',
 		'legend',
 		'section',
@@ -537,6 +539,36 @@ test( 'that autop correctly adds a start and end tag when followed by a div', ()
 		'Testing autop with a div\n<div class="wp-some-class">content</div>';
 	const expected =
 		'<p>Testing autop with a div</p>\n<div class="wp-some-class">content</div>';
+
+	expect( autop( content ).trim() ).toBe( expected );
+} );
+
+test( 'that autop closes the paragraph before an hr', () => {
+	const content = 'before\n<hr>\nafter';
+	const expected = '<p>before</p>\n<hr>\n<p>after</p>';
+
+	expect( autop( content ).trim() ).toBe( expected );
+} );
+
+test( 'that autop closes the paragraph before self-closing hr variants', () => {
+	expect( autop( 'before\n<hr />\nafter' ).trim() ).toBe(
+		'<p>before</p>\n<hr />\n<p>after</p>'
+	);
+	expect( autop( 'before\n<hr/>\nafter' ).trim() ).toBe(
+		'<p>before</p>\n<hr/>\n<p>after</p>'
+	);
+} );
+
+test( 'that autop starts a new paragraph after every hr', () => {
+	const content = 'a\n<hr>\nb\n<hr>\nc';
+	const expected = '<p>a</p>\n<hr>\n<p>b</p>\n<hr>\n<p>c</p>';
+
+	expect( autop( content ).trim() ).toBe( expected );
+} );
+
+test( 'that autop closes the paragraph after an hr preceded by a blank line', () => {
+	const content = 'before\n\n<hr>\nafter';
+	const expected = '<p>before</p>\n<hr>\n<p>after</p>';
 
 	expect( autop( content ).trim() ).toBe( expected );
 } );

@@ -191,6 +191,9 @@ export function autop( text: string, br: boolean = true ): string {
 		'$1\n\n'
 	);
 
+	// Add a double line break after hr tags, which are self closing.
+	text = text.replace( /(<hr\s*?\/?>)/g, '$1\n\n' );
+
 	// Standardize newline characters to "\n".
 	text = text.replace( /\r\n|\r/g, '\n' );
 
