@@ -59,7 +59,15 @@ export function Edit( { attributes, setAttributes } ) {
 	const isContentOnlyMode = useBlockEditingMode() === 'contentOnly';
 
 	const colorProps = useColorProps( attributes );
-	const spacingProps = useSpacingProps( attributes );
+	// Only padding is applied to the inner SVG element, matching the front
+	// end. The margin support is serialized to the block wrapper instead.
+	const spacingProps = useSpacingProps( {
+		style: {
+			spacing: {
+				padding: attributes.style?.spacing?.padding,
+			},
+		},
+	} );
 	const borderProps = useBorderProps( attributes );
 	const dimensionsProps = useDimensionsProps( attributes );
 

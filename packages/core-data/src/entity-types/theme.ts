@@ -83,6 +83,14 @@ declare module './base-entity-records' {
 			 */
 			'automatic-feed-links': boolean;
 			/**
+			 * Whether a theme uses block-based template parts.
+			 */
+			'block-template-parts': boolean;
+			/**
+			 * Whether a theme uses block-based templates.
+			 */
+			'block-templates': boolean;
+			/**
 			 * Whether border settings are enabled.
 			 */
 			border: boolean;
