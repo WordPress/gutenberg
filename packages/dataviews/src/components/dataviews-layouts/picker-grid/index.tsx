@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { Spinner, Flex, FlexItem, Composite } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
@@ -14,6 +14,7 @@ import type {
 	ViewPickerGridProps,
 } from '../../../types';
 import type { SetSelection } from '../../../types/private';
+import { MEDIA_FITS } from '../../../constants';
 import { GridItems } from '../utils/grid-items';
 import getDataByGroup from '../utils/get-data-by-group';
 import useSelectionProps from '../utils/use-selection-props';
@@ -322,6 +323,19 @@ function ViewPickerGrid< Item >( {
 	const perPage = view?.perPage ?? 0;
 	const setSize = isInfiniteScroll ? paginationInfo?.totalItems : undefined;
 
+	// Consumer-configured fill for item previews, validated against the
+	// presets (like `density`) so arbitrary values are ignored, and surfaced
+	// to CSS as a custom property the media field's stylesheet reads. Always
+	// set (with the `cover` default), so an identically-named variable set by
+	// a consumer on an ancestor can't leak into the previews when the view
+	// doesn't configure it.
+	const gridStyle = {
+		'--wp-dataviews-media-fit':
+			view.layout?.mediaFit && MEDIA_FITS.includes( view.layout.mediaFit )
+				? view.layout.mediaFit
+				: 'cover',
+	} as CSSProperties;
+
 	// Calculate placeholders needed for infinite scroll
 	const gridColumns = useGridColumns();
 	const placeholdersNeeded = usePlaceholdersNeeded(
@@ -373,11 +387,7 @@ function ViewPickerGrid< Item >( {
 								>
 									<GridItems
 										previewSize={ usedPreviewSize }
-										style={ {
-											gridTemplateColumns:
-												usedPreviewSize &&
-												`repeat(auto-fill, minmax(${ usedPreviewSize }px, 1fr))`,
-										} }
+										style={ gridStyle }
 										aria-busy={ isLoading }
 										ref={
 											resizeObserverRef as React.RefObject< HTMLDivElement >
@@ -447,6 +457,7 @@ function ViewPickerGrid< Item >( {
 									}
 								) }
 								previewSize={ usedPreviewSize }
+								style={ gridStyle }
 								aria-busy={ isLoading }
 								ref={
 									resizeObserverRef as React.RefObject< HTMLDivElement >

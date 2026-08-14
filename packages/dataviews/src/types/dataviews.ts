@@ -7,7 +7,7 @@ import type {
 	SortDirection,
 } from './field-api';
 import type { SetSelection } from './private';
-import type { MEDIA_ASPECT_RATIOS } from '../constants';
+import type { MEDIA_ASPECT_RATIOS, MEDIA_FITS } from '../constants';
 
 /**
  * The filters applied to the dataset.
@@ -234,6 +234,13 @@ export type Density = 'compact' | 'balanced' | 'comfortable';
  */
 export type MediaAspectRatio = ( typeof MEDIA_ASPECT_RATIOS )[ number ];
 
+/**
+ * How the media field fills its preview box. Derived from the `MEDIA_FITS`
+ * constant, which layouts also use to validate the configured value at
+ * runtime, so the two can't drift apart.
+ */
+export type MediaFit = ( typeof MEDIA_FITS )[ number ];
+
 export interface ViewTable extends ViewBase {
 	type: 'table';
 
@@ -309,6 +316,14 @@ export interface ViewGrid extends ViewBase {
 		 * stay aligned. Defaults to `'1/1'`.
 		 */
 		aspectRatio?: MediaAspectRatio;
+
+		/**
+		 * How the media field fills the preview box. `'cover'` crops it to
+		 * fill, `'contain'` fits the whole media inside so its own aspect
+		 * ratio stays visible. The box keeps the shape set by `aspectRatio`
+		 * either way, so rows stay aligned. Defaults to `'cover'`.
+		 */
+		mediaFit?: MediaFit;
 	};
 }
 
@@ -330,6 +345,14 @@ export interface ViewPickerGrid extends ViewBase {
 		 * The density of the grid layout.
 		 */
 		density?: Density;
+
+		/**
+		 * How the media field fills the preview box. `'cover'` crops it to
+		 * fill, `'contain'` fits the whole media inside so its own aspect
+		 * ratio stays visible. The box stays square either way, so rows stay
+		 * aligned. Defaults to `'cover'`.
+		 */
+		mediaFit?: MediaFit;
 	};
 }
 

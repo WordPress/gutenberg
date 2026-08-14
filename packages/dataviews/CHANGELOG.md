@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   DataViews: Add a `mediaFit` option to the `grid` and `pickerGrid` layouts to fit item previews inside their box (`contain`) instead of cropping them (`cover`), so the media's own aspect ratio stays visible. Consumers can offer this to users as an "Original aspect ratio" toggle in the view options via `config.mediaFitControl` ([#81567](https://github.com/WordPress/gutenberg/issues/81567)).
 -   Validated form controls: Align invalid focus styling for `ComboboxControl` and `FormTokenField` with the design system ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
 -   DataViews filters: Align filter search input focus styling with `outset-ring__focus` ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
 

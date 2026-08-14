@@ -956,6 +956,89 @@ describe( 'DataViews component', () => {
 			expect( previewSizeSlider ).toBeInTheDocument();
 			expect( previewSizeSlider ).toHaveValue( '0' ); // Falls back to the smallest size, which is the first one.
 		} );
+
+		describe( 'media fit', () => {
+			// `layout` is loosely typed so the invalid-value case below can
+			// pass something the `mediaFit` union rejects.
+			const renderGrid = (
+				layout: Record< string, unknown > = {},
+				props = {}
+			) =>
+				render(
+					<DataViewWrapper
+						view={
+							{
+								type: 'grid',
+								mediaField: 'image',
+								layout,
+							} as unknown as View
+						}
+						{ ...props }
+					/>
+				);
+
+			const getGrid = ( container: HTMLElement ) =>
+				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+				container.querySelector( '.dataviews-view-grid-items' );
+
+			it( 'crops previews by default', () => {
+				const { container } = renderGrid();
+				expect( getGrid( container ) ).toHaveStyle( {
+					'--wp-dataviews-media-fit': 'cover',
+				} );
+			} );
+
+			it( 'fits previews when configured to contain', () => {
+				const { container } = renderGrid( { mediaFit: 'contain' } );
+				expect( getGrid( container ) ).toHaveStyle( {
+					'--wp-dataviews-media-fit': 'contain',
+				} );
+			} );
+
+			it( 'ignores an unsupported value and falls back to cropping', () => {
+				const { container } = renderGrid( { mediaFit: 'fill' } );
+				expect( getGrid( container ) ).toHaveStyle( {
+					'--wp-dataviews-media-fit': 'cover',
+				} );
+			} );
+
+			it( 'hides the control unless the consumer opts in', async () => {
+				renderGrid();
+				const user = userEvent.setup();
+				await user.click(
+					screen.getByRole( 'button', { name: 'View options' } )
+				);
+				expect(
+					screen.queryByRole( 'checkbox', {
+						name: 'Original aspect ratio',
+					} )
+				).not.toBeInTheDocument();
+			} );
+
+			it( 'toggles the fit from the view options when opted in', async () => {
+				const { container } = renderGrid(
+					{},
+					{
+						config: {
+							perPageSizes: [ 10, 20 ],
+							mediaFitControl: true,
+						},
+					}
+				);
+				const user = userEvent.setup();
+				await user.click(
+					screen.getByRole( 'button', { name: 'View options' } )
+				);
+				await user.click(
+					screen.getByRole( 'checkbox', {
+						name: 'Original aspect ratio',
+					} )
+				);
+				expect( getGrid( container ) ).toHaveStyle( {
+					'--wp-dataviews-media-fit': 'contain',
+				} );
+			} );
+		} );
 	} );
 
 	describe( 'in list view', () => {

@@ -80,7 +80,7 @@
 		position: relative;
 
 		img {
-			object-fit: cover;
+			object-fit: var(--wp-dataviews-media-fit, cover);
 			width: 100%;
 			height: 100%;
 		}
