@@ -32,7 +32,6 @@ const ALLOWLIST = {
 			'Stack',
 			'Tabs',
 			'Text',
-			'Textarea',
 			'Tooltip',
 			'VisuallyHidden',
 		],
@@ -83,6 +82,9 @@ const DENYLIST = {
 			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
 		FlexItem:
 			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
+		InputControl: 'Use `InputControl` from `@wordpress/ui` instead.',
+		NumberControl:
+			'Use `InputControl` from `@wordpress/ui` with `type="number"` instead.',
 		ResponsiveWrapper: '{{ name }} is planned for deprecation.',
 		TabPanel: 'Use `Tabs` from `@wordpress/ui` instead.',
 		TabbableContainer: '{{ name }} is planned for deprecation.',
