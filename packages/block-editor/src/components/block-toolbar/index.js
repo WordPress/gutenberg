@@ -303,9 +303,7 @@ export function PrivateBlockToolbar( {
 					) }
 				<BlockEditVisuallyButton clientIds={ blockClientIds } />
 				{ ! isMultiToolbar && isDefaultEditingMode && (
-					<ToolbarGroup>
-						<BlockAppenderButton clientId={ blockClientId } />
-					</ToolbarGroup>
+					<BlockAppenderButton clientId={ blockClientId } />
 				) }
 				<BlockSettingsMenu clientIds={ blockClientIds } />
 			</div>
