@@ -1,15 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { copy } from '@wordpress/icons';
-import { InputLayout as InputLayoutComponent } from '../input-layout';
-import { InputLayout } from '../';
+import { InputLayout } from '../input-layout';
+import { InputLayout as InputLayoutWithSlot } from '../';
 import { IconButton } from '../../../../icon-button';
 
-const meta: Meta< typeof InputLayoutComponent > = {
+const meta: Meta< typeof InputLayout > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/Primitives/InputLayout',
-	component: InputLayoutComponent,
+	component: InputLayout,
 	subcomponents: {
-		'InputLayout.Slot': InputLayout.Slot,
+		'InputLayout.Slot': InputLayoutWithSlot.Slot,
 	},
 	// Temporary: Due to an upstream bug, render the component explicitly so the
 	// components manifest extractor can resolve props from the JSX. The public
@@ -17,7 +17,7 @@ const meta: Meta< typeof InputLayoutComponent > = {
 	// implementation module instead (same approach as ColorPicker).
 	//
 	// See: https://github.com/storybookjs/storybook/issues/34877
-	render: ( args ) => <InputLayoutComponent { ...args } />,
+	render: ( args ) => <InputLayout { ...args } />,
 	parameters: {
 		componentStatus: {
 			status: 'recommended',
@@ -27,7 +27,7 @@ const meta: Meta< typeof InputLayoutComponent > = {
 };
 export default meta;
 
-type Story = StoryObj< typeof InputLayoutComponent >;
+type Story = StoryObj< typeof InputLayout >;
 
 export const Default: Story = {
 	args: {},
@@ -63,7 +63,7 @@ export const WithPrefix: Story = {
  */
 export const WithPaddedPrefix: Story = {
 	args: {
-		prefix: <InputLayout.Slot>https://</InputLayout.Slot>,
+		prefix: <InputLayoutWithSlot.Slot>https://</InputLayoutWithSlot.Slot>,
 	},
 };
 
@@ -75,14 +75,14 @@ export const WithSuffixControl: Story = {
 	args: {
 		children: <div style={ { flex: 1 } } />,
 		suffix: (
-			<InputLayout.Slot padding="minimal">
+			<InputLayoutWithSlot.Slot padding="minimal">
 				<IconButton
 					size="small"
 					variant="minimal"
 					icon={ copy }
 					label="Copy"
 				/>
-			</InputLayout.Slot>
+			</InputLayoutWithSlot.Slot>
 		),
 	},
 };
