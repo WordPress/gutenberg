@@ -45,6 +45,103 @@ export const normalizeMedia = ( element: StyleElement ): StyleElement => {
 };
 
 /**
+ * Returns all the style elements contained in the passed document.
+ *
+ * @param doc Document instance.
+ * @return List of `<style>` and `<link rel=stylesheet>` elements.
+ */
+const getStyleElements = ( doc: Document ): StyleElement[] =>
+	Array.from(
+		doc.querySelectorAll< StyleElement >( 'style,link[rel=stylesheet]' )
+	);
+
+/**
+ * Style elements that are managed by the router.
+ *
+ * These are the elements that came in a server response: either those present
+ * in the initial HTML document, or those inserted by the router itself during
+ * a navigation. The router only disables, enables or moves these elements.
+ *
+ * Style elements injected by other client-side scripts, e.g., dark mode
+ * switchers, consent managers or lazy-loaded style sheets, are not part of
+ * this set, so they are left untouched across navigations.
+ */
+const managedStyles = new WeakSet< StyleElement >();
+
+/**
+ * Whether the initial style elements could not be marked as managed.
+ *
+ * When that happens, the router falls back to managing every style element in
+ * the document, which is the behavior it had before this distinction existed.
+ */
+let markingFailed = false;
+
+/**
+ * Returns whether the passed style element is managed by the router.
+ *
+ * @param element `<style>` or `<link>` element.
+ * @return Whether the router manages the passed element.
+ */
+const isManaged = ( element: StyleElement ): boolean =>
+	markingFailed || managedStyles.has( element );
+
+/**
+ * Marks the style elements of the initial page as managed by the router.
+ *
+ * The router needs a snapshot of the server-rendered markup to tell apart the
+ * style elements that came in the initial HTML response from those that were
+ * injected later by other client-side scripts. The request is made with
+ * `cache: 'force-cache'`, so the browser serves the cached response of the
+ * current page whenever there is one, and only hits the network otherwise.
+ *
+ * The returned promise never rejects. When the initial page cannot be fetched
+ * or parsed, a flag is set so the router manages every style element, just
+ * like it did before.
+ *
+ * @return Promise that resolves once the initial style elements are marked.
+ */
+const markInitialStylesAsManaged = async (): Promise< void > => {
+	try {
+		const url = new URL( window.location.href );
+		url.hash = '';
+		const res = await window.fetch( url.href, { cache: 'force-cache' } );
+		if ( ! res.ok ) {
+			markingFailed = true;
+			return;
+		}
+		const html = await res.text();
+		const doc = new window.DOMParser().parseFromString( html, 'text/html' );
+
+		// Normalized elements of the server response, consumed as they are
+		// matched so each of them marks at most one element in the document.
+		const serverElements = getStyleElements( doc ).map( normalizeMedia );
+
+		getStyleElements( window.document ).forEach( ( element ) => {
+			const normalized = normalizeMedia( element );
+			const index = serverElements.findIndex( ( serverElement ) =>
+				areNodesEqual( normalized, serverElement )
+			);
+			if ( index !== -1 ) {
+				serverElements.splice( index, 1 );
+				managedStyles.add( element );
+			}
+		} );
+	} catch {
+		markingFailed = true;
+	}
+};
+
+/**
+ * Promise that resolves once the style elements of the initial page have been
+ * marked as managed by the router.
+ *
+ * The request starts as soon as this module is evaluated, and it is memoized
+ * in this constant.
+ */
+export const initialStylesMarked: Promise< void > =
+	markInitialStylesAsManaged();
+
+/**
  * Adds the minimum style elements from Y around those in X using a
  * shortest common supersequence algorithm, returning a list of
  * promises for all the elements in Y.
@@ -74,6 +171,8 @@ export function updateStylesWithSCS(
 		return Y.map( ( element ) => {
 			const promise = prepareStylePromise( element );
 			parent.appendChild( element );
+			// Elements inserted by the router are managed by definition.
+			managedStyles.add( element );
 			return promise;
 		} );
 	}
@@ -116,6 +215,8 @@ export function updateStylesWithSCS(
 				last.after( yElement );
 				last = yElement;
 			}
+			// Elements inserted by the router are managed by definition.
+			managedStyles.add( yElement );
 			yIndex++;
 		}
 	}
@@ -204,6 +305,9 @@ const prepareStylePromise = (
  * make them effectively disabled until they are applied with the
  * {@link applyStyles|`applyStyles`} function.
  *
+ * Style elements injected by other client-side scripts are excluded from the
+ * merge, so they are left untouched and keep applying to the new page.
+ *
  * Note that this function alters the passed document, as it can transfer
  * nodes from it to the global document.
  *
@@ -211,14 +315,17 @@ const prepareStylePromise = (
  * @return A list of promises for each style element in the passed document.
  */
 export const preloadStyles = ( doc: Document ): Promise< StyleElement >[] => {
-	const currentStyleElements = Array.from(
-		window.document.querySelectorAll< StyleElement >(
-			'style,link[rel=stylesheet]'
-		)
+	const currentStyleElements = getStyleElements( window.document ).filter(
+		isManaged
 	);
-	const newStyleElements = Array.from(
-		doc.querySelectorAll< StyleElement >( 'style,link[rel=stylesheet]' )
-	);
+
+	// Elements parsed from a page fetched by the router are server-rendered by
+	// definition. That's not the case when the passed document is the current
+	// one, which happens when the router prepares the initial page.
+	const newStyleElements =
+		doc === window.document
+			? getStyleElements( doc ).filter( isManaged )
+			: getStyleElements( doc );
 
 	// Set styles in order.
 	return updateStylesWithSCS( currentStyleElements, newStyleElements );
@@ -231,12 +338,15 @@ export const preloadStyles = ( doc: Document ): Promise< StyleElement >[] => {
  * If the style element has the `data-original-media` attribute, the
  * original `media` value is restored.
  *
+ * Style elements injected by other client-side scripts are skipped, so they
+ * are neither enabled nor disabled.
+ *
  * @param styles List of style elements to apply.
  */
 export const applyStyles = ( styles: StyleElement[] ) => {
-	window.document
-		.querySelectorAll( 'style,link[rel=stylesheet]' )
-		.forEach( ( el: HTMLLinkElement | HTMLStyleElement ) => {
+	getStyleElements( window.document )
+		.filter( isManaged )
+		.forEach( ( el ) => {
 			if ( el.sheet ) {
 				if ( styles.includes( el ) ) {
 					// Only update mediaText when necessary.

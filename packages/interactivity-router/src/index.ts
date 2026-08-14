@@ -1,5 +1,10 @@
 import { store, privateApis, getConfig } from '@wordpress/interactivity';
-import { preloadStyles, applyStyles, type StyleElement } from './assets/styles';
+import {
+	preloadStyles,
+	applyStyles,
+	initialStylesMarked,
+	type StyleElement,
+} from './assets/styles';
 import {
 	preloadScriptModules,
 	importScriptModules,
@@ -356,8 +361,14 @@ window.document
 	.forEach( ( { src } ) => markScriptModuleAsResolved( src ) );
 
 // Await hydration completion before setting the initial page to ensure initialVdom is populated.
+// The style elements of the initial page need to be marked as managed by the
+// router as well, so those injected by other scripts are not cached as part of
+// the initial page.
 ( async () => {
-	const initialVdomMap = await initialVdomPromise;
+	const [ initialVdomMap ] = await Promise.all( [
+		initialVdomPromise,
+		initialStylesMarked,
+	] );
 	pages.set(
 		getPagePath( window.location.href ),
 		Promise.resolve(
@@ -475,10 +486,13 @@ export const { state, actions } = store< Store >( 'core/router', {
 				}
 			}, 400 );
 
-			const page = yield Promise.race( [
-				pages.get( pagePath ),
+			// The style elements of the initial page must be classified before
+			// any style is disabled, so the marking is awaited here as well.
+			const result = yield Promise.race( [
+				Promise.all( [ pages.get( pagePath ), initialStylesMarked ] ),
 				timeoutPromise,
 			] );
+			const page = result?.[ 0 ];
 
 			// Dismisses loading message if it hasn't been added yet.
 			clearTimeout( loadingTimeout );
