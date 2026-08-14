@@ -12,7 +12,7 @@ const { MediaUploadModal: MediaUploadModalComponent } = unlock(
 );
 
 /**
- * Class component wrapper for MediaUploadModal to maintain compatibility
+ * Functional component wrapper for MediaUploadModal to maintain compatibility
  * with the stable MediaUpload component API (render prop pattern).
  * @param {Object} props Component props.
  */
