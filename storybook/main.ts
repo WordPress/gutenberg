@@ -4,12 +4,13 @@ import {
 	type InlineConfig,
 	type PluginOption,
 	mergeConfig,
-	transformWithEsbuild,
+	transformWithOxc,
 } from 'vite';
 import react from '@vitejs/plugin-react';
 import type { StorybookConfig } from '@storybook/react-vite';
 import dsTokenFallbacks from '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks';
 import dsTokenFallbacksJs from '@wordpress/theme/vite-plugins/vite-ds-token-fallbacks';
+import babel from './vite-babel-plugin.js';
 
 /**
  * @see https://storybook.js.org/docs/faq#how-do-i-fix-module-resolution-in-special-environments
@@ -28,6 +29,7 @@ const stories = [
 	'./stories/design-system/**/*.story.@(ts|tsx)',
 	'../packages/block-editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
 	'../packages/editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
+	'../packages/global-styles-ui/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
 	'../packages/components/src/**/stories/*.story.@(jsx|tsx)',
 	'../packages/components/src/**/stories/*.mdx',
 	'../packages/icons/src/**/stories/*.story.@(js|tsx|mdx)',
@@ -125,23 +127,45 @@ const config: StorybookConfig = {
 		return mergeConfig( viteConfig, {
 			plugins: [
 				dsTokenFallbacksJs(),
-				react( {
-					jsxImportSource: '@emotion/react',
-					babel: {
-						plugins: [ getAbsolutePath( '@emotion/babel-plugin' ) ],
+				react() as PluginOption,
+				// @rolldown/plugin-babel requires Node 22, but Gutenberg still
+				// supports Node 20. Keep the same call shape so this fallback can
+				// be replaced with the package after the Node upgrade.
+				await babel( {
+					generatorOpts: {
+						decoratorsBeforeExport: true,
+						importAttributesKeyword: 'with',
 					},
-				} ) as PluginOption,
+					overrides: [
+						{
+							test: /x(?:$|\?)/,
+							retainLines: NODE_ENV !== 'production',
+						},
+					],
+					plugins: [ getAbsolutePath( '@emotion/babel-plugin' ) ],
+				} ),
 				{
 					name: 'load-js-files-as-jsx',
+					enforce: 'pre',
 					async transform( code: string, id: string ) {
 						if ( ! id.match( /.*\.js$/ ) ) {
 							return null;
 						}
 
-						return transformWithEsbuild( code, id, {
-							loader: 'jsx',
-							jsx: 'automatic',
+						const result = await transformWithOxc( code, id, {
+							lang: 'jsx',
+							jsx: { runtime: 'automatic' },
 						} );
+
+						for ( const warning of result.warnings ) {
+							this.warn( warning );
+						}
+
+						return {
+							code: result.code,
+							map: result.map,
+							moduleType: 'js',
+						};
 					},
 				},
 				// Stub the vips and wasm-vips packages for Storybook since they use WASM modules that Vite can't handle.
@@ -204,7 +228,7 @@ const config: StorybookConfig = {
 			build: {
 				/**
 				 * Use terser with keep_fnames to preserve component names in source code display.
-				 * Without this, Vite's esbuild minifier mangles component names (e.g., BoxControl -> J)
+				 * Without this, Vite's default minifier mangles component names (e.g., BoxControl -> J)
 				 * which breaks the Storybook docs source code display.
 				 * @see https://github.com/storybookjs/storybook/issues/20769
 				 */
@@ -230,8 +254,8 @@ const config: StorybookConfig = {
 				},
 			},
 			optimizeDeps: {
-				esbuildOptions: {
-					loader: {
+				rolldownOptions: {
+					moduleTypes: {
 						'.js': 'tsx',
 					},
 				},

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId, usePrevious } from '@wordpress/compose';
 import {
 	Button,
@@ -25,10 +18,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
 import { Stack, VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../../lock-unlock';
 import { ActionsMenuGroup, ActionModal } from '../../dataviews-item-actions';
 import DataViewsContext from '../../dataviews-context';
@@ -41,6 +30,8 @@ import type {
 	ActionModal as ActionModalType,
 } from '../../../types';
 import getDataByGroup from '../utils/get-data-by-group';
+import useSelectionProps from '../utils/use-selection-props';
+import type { SelectionProps } from '../utils/use-selection-props';
 
 interface ListViewItemProps< Item > {
 	view: ViewListType;
@@ -51,7 +42,7 @@ interface ListViewItemProps< Item > {
 	titleField?: NormalizedField< Item >;
 	mediaField?: NormalizedField< Item >;
 	descriptionField?: NormalizedField< Item >;
-	onSelect: ( item: Item ) => void;
+	selectionProps: SelectionProps;
 	otherFields: NormalizedField< Item >[];
 	onDropdownTriggerKeyDown: React.KeyboardEventHandler< HTMLButtonElement >;
 	posinset?: number;
@@ -147,7 +138,7 @@ function ListItem< Item >( {
 	titleField,
 	mediaField,
 	descriptionField,
-	onSelect,
+	selectionProps,
 	otherFields,
 	onDropdownTriggerKeyDown,
 	posinset,
@@ -311,7 +302,7 @@ function ListItem< Item >( {
 						aria-labelledby={ labelId }
 						aria-describedby={ descriptionId }
 						className="dataviews-view-list__item"
-						onClick={ () => onSelect( item ) }
+						{ ...selectionProps }
 					/>
 				</div>
 				<Stack
@@ -408,8 +399,15 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		.map( ( fieldId ) => fields.find( ( f ) => fieldId === f.id ) )
 		.filter( isDefined );
 
-	const onSelect = ( item: Item ) =>
-		onChangeSelection( [ getItemId( item ) ] );
+	const { getSelectionProps } = useSelectionProps( {
+		data,
+		getItemId,
+		isItemSelectable: () => true,
+		selection,
+		onChangeSelection,
+		selectionMode: 'single-required',
+		shouldSelectOnClick: true,
+	} );
 
 	const generateCompositeItemIdPrefix = useCallback(
 		( item: Item ) => `${ baseId }-${ getItemId( item ) }`,
@@ -600,7 +598,9 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 											actions={ actions }
 											item={ item }
 											isSelected={ item === selectedItem }
-											onSelect={ onSelect }
+											selectionProps={ getSelectionProps(
+												getItemId( item )
+											) }
 											mediaField={ mediaField }
 											titleField={ titleField }
 											descriptionField={
@@ -639,7 +639,9 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 							actions={ actions }
 							item={ item }
 							isSelected={ item === selectedItem }
-							onSelect={ onSelect }
+							selectionProps={ getSelectionProps(
+								getItemId( item )
+							) }
 							mediaField={ mediaField }
 							titleField={ titleField }
 							descriptionField={ descriptionField }

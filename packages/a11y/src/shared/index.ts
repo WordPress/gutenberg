@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import clear from './clear';
 import filterMessage from './filter-message';
 

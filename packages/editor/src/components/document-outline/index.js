@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useRef, useMemo } from '@wordpress/element';
@@ -8,10 +5,6 @@ import { create, getTextContent } from '@wordpress/rich-text';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { Path, SVG, Line, Rect } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import DocumentOutlineItem from './item';
 import { store as editorStore } from '../../store';
 

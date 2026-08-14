@@ -1,13 +1,12 @@
-/**
- * Internal dependencies
- */
 jest.mock( '@octokit/rest' );
 jest.mock( '../../lib/milestone' );
 jest.mock( '../../lib/logger', () => ( {
 	log: jest.fn(),
+	warn: jest.fn(),
 	formats: {
 		title: jest.fn( ( message ) => message ),
 		error: jest.fn( ( message ) => message ),
+		warning: jest.fn( ( message ) => message ),
 	},
 } ) );
 
@@ -32,16 +31,16 @@ import {
 	mapLabelsToFeatures,
 	createChangelog,
 	fetchAllPullRequests,
+	getManualChangelogInstructions,
 } from '../changelog';
 import _pullRequests from './fixtures/pull-requests.json';
 import botPullRequestFixture from './fixtures/bot-pull-requests.json';
-
-const Octokit = require( '@octokit/rest' );
+const { Octokit } = require( '@octokit/rest' );
 const {
 	getMilestoneByTitle,
 	getIssuesByMilestone,
 } = require( '../../lib/milestone' );
-const { log } = require( '../../lib/logger' );
+const { log, warn } = require( '../../lib/logger' );
 
 /**
  * pull-requests.json is a static snapshot of real data from the GitHub API.
@@ -51,6 +50,29 @@ const { log } = require( '../../lib/logger' );
  * See: https://github.com/WordPress/gutenberg/pull/38777#discussion_r808992346.
  */
 const pullRequests = _pullRequests.concat( botPullRequestFixture );
+
+/**
+ * Returns an Octokit stub for a repository without any release, so that
+ * `--unreleased` runs find no previous release in the series.
+ *
+ * @return {Object} Octokit stub.
+ */
+const createOctokitWithoutReleases = () => ( {
+	repos: {
+		listReleases: {
+			endpoint: {
+				merge: jest.fn().mockReturnValue( {} ),
+			},
+		},
+	},
+	paginate: {
+		iterator: jest.fn().mockReturnValue(
+			( async function* () {
+				yield { data: [] };
+			} )()
+		),
+	},
+} );
 
 describe( 'createChangelog', () => {
 	const settings = {
@@ -93,27 +115,38 @@ describe( 'createChangelog', () => {
 		);
 		expect( log ).toHaveBeenCalledTimes( 1 );
 	} );
+
+	it( 'explains how to fill the notes in by hand when there are no unreleased pull requests', async () => {
+		Octokit.mockImplementation( createOctokitWithoutReleases );
+		getMilestoneByTitle.mockResolvedValue( {
+			number: 235,
+			title: settings.milestone,
+		} );
+		// An issue that is not a pull request, so no pull request is found.
+		getIssuesByMilestone.mockResolvedValue( [ { number: 123 } ] );
+
+		await createChangelog( { ...settings, unreleased: true } );
+
+		expect( warn ).toHaveBeenCalledTimes( 1 );
+		expect( log ).toHaveBeenCalledTimes( 2 );
+		expect( log ).toHaveBeenNthCalledWith(
+			2,
+			getManualChangelogInstructions( settings.milestone )
+		);
+	} );
+} );
+
+describe( 'getManualChangelogInstructions', () => {
+	it( 'includes the command that regenerates the notes for the milestone', () => {
+		expect( getManualChangelogInstructions( 'Gutenberg 23.5' ) ).toContain(
+			'npm run other:changelog -- --milestone="Gutenberg 23.5" --unreleased'
+		);
+	} );
 } );
 
 describe( 'fetchAllPullRequests', () => {
-	it( 'explains how to recover when a milestone has no unreleased pull requests', async () => {
+	it( 'resolves to an empty list when a milestone has no unreleased pull requests', async () => {
 		const milestone = 'Gutenberg 23.5';
-		const octokit = {
-			repos: {
-				listReleases: {
-					endpoint: {
-						merge: jest.fn().mockReturnValue( {} ),
-					},
-				},
-			},
-			paginate: {
-				iterator: jest.fn().mockReturnValue(
-					( async function* () {
-						yield { data: [] };
-					} )()
-				),
-			},
-		};
 
 		getMilestoneByTitle.mockResolvedValue( {
 			number: 235,
@@ -122,14 +155,37 @@ describe( 'fetchAllPullRequests', () => {
 		getIssuesByMilestone.mockResolvedValue( [ { number: 123 } ] );
 
 		await expect(
-			fetchAllPullRequests( octokit, {
+			fetchAllPullRequests( createOctokitWithoutReleases(), {
 				owner: 'WordPress',
 				repo: 'gutenberg',
 				milestone,
 				unreleased: true,
 			} )
+		).resolves.toEqual( [] );
+	} );
+
+	it( 'fails when a milestone has no pull requests at all', async () => {
+		const milestone = 'Gutenberg 23.5';
+
+		getMilestoneByTitle.mockResolvedValue( {
+			number: 235,
+			title: milestone,
+		} );
+		getIssuesByMilestone.mockResolvedValue( [ { number: 123 } ] );
+
+		await expect(
+			// Without `unreleased`, no release is looked up.
+			fetchAllPullRequests(
+				{},
+				{
+					owner: 'WordPress',
+					repo: 'gutenberg',
+					milestone,
+					unreleased: false,
+				}
+			)
 		).rejects.toThrow(
-			'There are no unreleased pull requests associated with milestone "Gutenberg 23.5". Release coordinator: verify that every cherry-picked pull request is assigned to this milestone before rerunning the release.'
+			'There are no pull requests associated with milestone "Gutenberg 23.5".'
 		);
 	} );
 } );
@@ -290,29 +346,36 @@ describe( 'getIssueType', () => {
 } );
 
 describe( 'getIssueFeature', () => {
-	it( 'returns "Unknown" as feature if there are no labels', () => {
+	it( 'returns "Uncategorized" as feature if there are no labels', () => {
 		const result = getIssueFeature( { labels: [] } );
 
 		expect( result ).toBe( 'Uncategorized' );
 	} );
 
-	it( 'falls by to "Unknown" as the feature if unable to classify by other means', () => {
+	it( 'falls back to "Uncategorized" when no label can classify the issue', () => {
 		const result = getIssueFeature( {
-			labels: [
-				{
-					name: 'Some Label',
-				},
-				{
-					name: '[Package] Example Package', // 1. has explicit mapping.
-				},
-				{
-					name: '[Package] Another One',
-				},
-			],
+			labels: [ { name: 'Some Label' } ],
 		} );
 
-		expect( result ).toEqual( 'Uncategorized' );
+		expect( result ).toBe( 'Uncategorized' );
 	} );
+
+	it.each( [
+		[ '[Package] Element', 'Element' ],
+		[ '[Package] Widget Dashboard', 'Widget Dashboard' ],
+		[ '[Package] Boot', 'Boot' ],
+		[ '[Tool] WP Scripts', 'WP Scripts' ],
+		[ '[Package] Interface', 'Interface' ],
+	] )(
+		'uses an otherwise-unmapped %s label as a fallback category',
+		( label, expected ) => {
+			const result = getIssueFeature( {
+				labels: [ { name: 'Some Label' }, { name: label } ],
+			} );
+
+			expect( result ).toEqual( expected );
+		}
+	);
 
 	it( 'gives precedence to manual feature mapping', () => {
 		const result = getIssueFeature( {
@@ -413,18 +476,20 @@ describe( 'getTypesByLabels', () => {
 } );
 
 describe( 'mapLabelsToFeatures', () => {
-	it( 'returns all normalized feature candidates by feature prefix. it is case insensitive', () => {
+	it( 'returns all normalized feature candidates case-insensitively', () => {
 		const result = mapLabelsToFeatures( [
 			'[Package] Commands',
 			'[Package] Block Library',
 			'[Feature] Link Editing',
 			'[Feature] block Multi Selection',
+			'[Type] Flaky Test',
 		] );
 
 		expect( result ).toEqual( [
 			'Commands',
 			'Block Library',
 			'Block Editor',
+			'Testing',
 		] );
 	} );
 } );

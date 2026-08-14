@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getNextMajorVersion } from '../version';
 
 describe( 'getNextMajorVersion', () => {

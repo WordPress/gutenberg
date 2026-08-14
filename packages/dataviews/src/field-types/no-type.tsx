@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { SortDirection } from '../types';
 import type { FieldType } from '../types/private';
 import { OPERATOR_IS, OPERATOR_IS_NOT } from '../constants';

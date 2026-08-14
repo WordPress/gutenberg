@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { fireEvent, render, screen, within } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import PlaylistTrackEdit from '../edit';
 import { PlaylistContext } from '../../playlist/context';
 import { useUploadMediaFromBlobURL } from '../../utils/hooks';
@@ -18,9 +7,7 @@ import { useUploadMediaFromBlobURL } from '../../utils/hooks';
 let mockMediaReplaceFlowProps;
 
 jest.mock( '@wordpress/block-editor', () => ( {
-	BlockControls: ( { children, group = 'default' } ) => (
-		<div data-testid={ `block-controls-${ group }` }>{ children }</div>
-	),
+	BlockControls: ( { children } ) => <div>{ children }</div>,
 	BlockIcon: () => <span />,
 	InspectorControls: ( { children } ) => <div>{ children }</div>,
 	MediaPlaceholder: () => <div />,
@@ -80,14 +67,12 @@ const defaultAttributes = {
 function renderEdit( props = {} ) {
 	const setAttributes = jest.fn();
 	const setCurrentTrackClientId = props.setCurrentTrackClientId || jest.fn();
-	const addTracks = props.addTracks;
 
 	render(
 		<PlaylistContext.Provider
 			value={ {
 				currentTrackClientId: props.currentTrackClientId ?? null,
 				setCurrentTrackClientId,
-				addTracks,
 			} }
 		>
 			<PlaylistTrackEdit
@@ -184,6 +169,7 @@ describe( 'PlaylistTrackEdit', () => {
 		renderEdit( {
 			attributes: {
 				blob: 'blob:https://example.com/temporary-track',
+				length: undefined,
 				src: undefined,
 			},
 		} );
@@ -193,31 +179,12 @@ describe( 'PlaylistTrackEdit', () => {
 				url: 'blob:https://example.com/temporary-track',
 			} )
 		);
-	} );
-
-	it( 'allows tracks to be added from the track toolbar', () => {
-		const addTracks = jest.fn();
-		renderEdit( { addTracks } );
-
-		fireEvent.click( screen.getByRole( 'button', { name: 'Add track' } ) );
-
-		expect( addTracks ).toHaveBeenCalledWith( {} );
-	} );
-
-	it( 'renders the add track control in a different toolbar group from replace', () => {
-		renderEdit( { addTracks: jest.fn() } );
+		const trackButton = screen.getByRole( 'button', {
+			name: /Song One/,
+		} );
 
 		expect(
-			within( screen.getByTestId( 'block-controls-other' ) ).getByRole(
-				'button',
-				{ name: 'Replace' }
-			)
-		).toBeInTheDocument();
-		expect(
-			within( screen.getByTestId( 'block-controls-block' ) ).getByRole(
-				'button',
-				{ name: 'Add track' }
-			)
+			within( trackButton ).getByRole( 'presentation', { hidden: true } )
 		).toBeInTheDocument();
 	} );
 

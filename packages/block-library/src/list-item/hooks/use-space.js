@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useRefEffect } from '@wordpress/compose';
 import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { SPACE, TAB } from '@wordpress/keycodes';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import useIndentListItem from './use-indent-list-item';
 import useOutdentListItem from './use-outdent-list-item';
 import { unlock } from '../../lock-unlock';

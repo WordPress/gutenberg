@@ -1,10 +1,6 @@
 /**
  * Tests for store reducer.
  */
-
-/**
- * Internal dependencies
- */
 import reducer from '../reducer';
 import {
 	REGISTER_ABILITY,

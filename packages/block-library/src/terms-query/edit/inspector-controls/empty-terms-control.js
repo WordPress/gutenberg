@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { ToggleControl } from '@wordpress/components';
 
 export default function EmptyTermsControl( { value, onChange, ...props } ) {

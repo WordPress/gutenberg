@@ -2,7 +2,7 @@
 /**
  * Unit tests covering WP_Test_REST_Comments_Controller_Gutenberg functionality.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	protected static $admin_id;
