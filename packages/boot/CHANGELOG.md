@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Translate the click-to-edit label on a previewed canvas, and name the action rather than the gesture ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+-   Translate the click-to-edit label on a previewed canvas, and name the action rather than the gesture ([#81620](https://github.com/WordPress/gutenberg/pull/81620)).
 
 ### Enhancements
 
