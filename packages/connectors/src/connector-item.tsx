@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -13,10 +10,6 @@ import {
 } from '@wordpress/components';
 import { createInterpolateElement, useId, useState } from '@wordpress/element';
 import { __, sprintf, type TransformedText } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { ReactNode } from 'react';
 import type { ApiKeySource } from './types';
 

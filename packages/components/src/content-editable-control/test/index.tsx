@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render, screen, fireEvent } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import ContentEditableControl from '..';
 
 // The presentational shell is deliberately decoupled from `@wordpress/rich-text`:

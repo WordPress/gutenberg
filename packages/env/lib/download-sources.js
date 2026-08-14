@@ -1,18 +1,11 @@
 'use strict';
-/**
- * External dependencies
- */
 const fs = require( 'fs' );
 const path = require( 'path' );
 const util = require( 'util' );
+const pipeline = util.promisify( require( 'stream' ).pipeline );
 const got = require( 'got' );
 const AdmZip = require( 'adm-zip' );
 const SimpleGit = require( 'simple-git' );
-
-/**
- * Promisified dependencies
- */
-const pipeline = util.promisify( require( 'stream' ).pipeline );
 const { rimraf } = require( 'rimraf' );
 
 /**
@@ -85,6 +78,15 @@ async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 
 	log( 'Checking out the specified ref.' );
 	await git.checkout( source.ref );
+
+	// Checking out a ref which already exists as a local branch doesn't advance
+	// that branch to the commit which was just fetched, so the branch has to be
+	// moved explicitly for updates to have any effect. `FETCH_HEAD` is used
+	// rather than the ref itself because `source.ref` is undefined when the
+	// source string has no `#ref` part, in which case the repository's default
+	// branch is the intended target.
+	log( 'Resetting to the fetched commit.' );
+	await git.reset( [ '--hard', 'FETCH_HEAD' ] );
 
 	onProgress( 1 );
 }

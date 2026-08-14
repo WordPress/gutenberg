@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useEffect, useState } from '@wordpress/element';
 import {
 	getWpCompatOverlaySlot,
 	useEnableWpCompatOverlaySlot,
 } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import Modal from '../';
 import type { ModalProps } from '../types';
 

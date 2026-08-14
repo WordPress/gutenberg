@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useState, useCallback, useId, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { ValidatedInputControl, ValidatedRangeControl } from '../components';
 
 describe( 'ControlWithError', () => {
@@ -218,6 +207,56 @@ describe( 'ControlWithError', () => {
 					screen.getByText( 'The word "error" is not allowed.' )
 				).toBeVisible();
 			} );
+		} );
+	} );
+
+	describe( 'Reveal during pending validation', () => {
+		it( 'should keep the pending indicator instead of a native error on a synthetic `invalid` event', async () => {
+			const user = userEvent.setup();
+
+			function PendingValidatedInputControl() {
+				const ref = useRef< HTMLInputElement >( null );
+				return (
+					<>
+						<ValidatedInputControl
+							ref={ ref }
+							label="Text"
+							required
+							value=""
+							onChange={ () => {} }
+							customValidity={ {
+								type: 'validating',
+								message: 'Validating...',
+							} }
+						/>
+						<button
+							type="button"
+							onClick={ () =>
+								ref.current?.dispatchEvent(
+									new Event( 'invalid', {
+										cancelable: true,
+									} )
+								)
+							}
+						>
+							Show errors
+						</button>
+					</>
+				);
+			}
+
+			render( <PendingValidatedInputControl /> );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Show errors' } )
+			);
+
+			await waitFor( () => {
+				expect( screen.getByText( 'Validating...' ) ).toBeVisible();
+			} );
+			expect(
+				screen.queryByText( 'Constraints not satisfied' )
+			).not.toBeInTheDocument();
 		} );
 	} );
 

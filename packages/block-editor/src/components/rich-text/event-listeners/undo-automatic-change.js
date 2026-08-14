@@ -1,13 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { BACKSPACE, ESCAPE } from '@wordpress/keycodes';
-
 import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 

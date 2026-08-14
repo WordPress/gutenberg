@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { transformSync } from '@babel/core';
-
-/**
- * Internal dependencies
- */
 import plugin from '../';
 
 describe( 'babel-plugin-import-jsx-pragma', () => {

@@ -1,21 +1,11 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { privateApis as routePrivateApis } from '@wordpress/route';
 import { SnackbarNotices } from '@wordpress/notices';
 import { SlotFillProvider } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { getAdminThemeColors } from '@wordpress/admin-ui';
 import { ThemeProvider } from '@wordpress/theme';
-
-/**
- * Internal dependencies
- */
+import { UnsavedChangesWarning } from '@wordpress/editor';
 import SavePanel from '../save-panel';
 import CanvasRenderer from '../canvas-renderer';
 import { unlock } from '../../lock-unlock';
@@ -64,6 +54,7 @@ export default function RootSinglePage() {
 							}
 						) }
 					>
+						<UnsavedChangesWarning />
 						<SavePanel />
 						<SnackbarNotices className="boot-notices__snackbar" />
 						<div className="boot-layout__surfaces">

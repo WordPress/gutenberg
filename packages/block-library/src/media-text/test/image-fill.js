@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { imageFillStyles } from '../image-fill';
 
 describe( 'imageFillStyles()', () => {

@@ -5,9 +5,6 @@ Some components need to generate a unique id for each instance. This could serve
 ## Usage
 
 ```jsx
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 
 function MyCustomElement() {

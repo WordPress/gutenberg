@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { cloneElement, forwardRef } from '@wordpress/element';
-
-/**
- * External dependencies
- */
 import type { ReactElement } from 'react';
 import type { SVGProps } from '@wordpress/primitives';
 
