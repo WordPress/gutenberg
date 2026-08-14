@@ -4,10 +4,10 @@
 
 .interface-interface-skeleton__sidebar:has(.editor-collab-sidebar) {
 	box-shadow: none;
+}
 
-	.interface-complementary-area-header {
-		display: none;
-	}
+.editor-collab-sidebar__header {
+	display: none;
 }
 
 .editor-collab-sidebar {

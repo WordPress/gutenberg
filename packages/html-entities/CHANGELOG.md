@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.53.0 (2026-08-12)
+
 ### Internal
 
 -   Migrate the HTML entity decoding tests to Vitest. ([#81037](https://github.com/WordPress/gutenberg/pull/81037))

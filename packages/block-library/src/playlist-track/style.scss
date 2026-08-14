@@ -43,6 +43,11 @@
 			object-fit: cover;
 		}
 
+		.wp-block-playlist-track__spinner {
+			flex: 0 0 auto;
+			margin: 0;
+		}
+
 		.wp-block-playlist-track__content {
 			flex: 1 1 0;
 			min-width: 0;
@@ -60,6 +65,9 @@
 		}
 
 		.wp-block-playlist-track__length {
+			display: flex;
+			align-items: center;
+			justify-content: flex-end;
 			margin-left: auto;
 			font-size: 0.85em;
 			opacity: 0.7;

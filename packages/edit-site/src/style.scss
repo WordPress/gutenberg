@@ -56,12 +56,16 @@ body.js.site-editor-php {
 	background: var(--wpds-color-background-surface-neutral-weak);
 
 	@include break-medium {
+		// Relayed through a custom property to keep `body` the subject of its
+		// own `:has()`. With `body:has(…) #wpadminbar`, every DOM change in the
+		// editor recalculates the whole document.
 		&:has(.editor-editor-interface.is-distraction-free) {
 			--wp-admin--admin-bar--height: 0px;
+			--wp-editor-admin-bar-display: none;
+		}
 
-			#wpadminbar {
-				display: none;
-			}
+		#wpadminbar {
+			display: var(--wp-editor-admin-bar-display, block);
 		}
 	}
 }
