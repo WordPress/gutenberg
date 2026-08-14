@@ -26,6 +26,7 @@ import {
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
+import { EDITOR_INTENT_SUGGEST } from './constants';
 import { unlock } from '../lock-unlock';
 import { setCanvasWidth } from './private-actions';
 import { getCanvasWidthByDeviceType } from '../utils/device-type';
@@ -1096,7 +1097,26 @@ export const toggleTopToolbar =
  */
 export const switchEditorMode =
 	( mode ) =>
-	( { dispatch, registry } ) => {
+	( { dispatch, registry, select } ) => {
+		/*
+		 * The code editor edits raw `post_content`, which has nowhere to put
+		 * an inline marker and is re-parsed wholesale on the way back, so a
+		 * raw edit made while suggesting bypasses capture and takes the
+		 * existing markers down with it. Refuse the switch instead, and say
+		 * why: the menu item is disabled, but the keyboard shortcut and the
+		 * command palette both reach this action directly.
+		 */
+		if (
+			mode === 'text' &&
+			select.getEditorIntent() === EDITOR_INTENT_SUGGEST
+		) {
+			speak(
+				__( 'The code editor is not available while suggesting.' ),
+				'assertive'
+			);
+			return;
+		}
+
 		registry.dispatch( preferencesStore ).set( 'core', 'editorMode', mode );
 
 		if ( mode !== 'visual' ) {

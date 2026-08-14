@@ -796,6 +796,44 @@ describe( 'Editor actions', () => {
 					.get( 'core', 'distractionFree' )
 			).toBe( false );
 		} );
+
+		it( 'refuses to switch to the code editor while suggesting', () => {
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+
+			registry.dispatch( editorStore ).switchEditorMode( 'text' );
+
+			// The stored preference is untouched, so leaving the suggest
+			// intent does not strand the user in the code editor.
+			expect(
+				registry.select( preferencesStore ).get( 'core', 'editorMode' )
+			).toBeUndefined();
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'visual'
+			);
+		} );
+
+		it( 'reports the visual editor while suggesting, and restores the stored mode on the way out', () => {
+			registry.dispatch( editorStore ).switchEditorMode( 'text' );
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'text'
+			);
+
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'visual'
+			);
+
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'edit'
+			);
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'text'
+			);
+		} );
 	} );
 
 	describe( 'setEditorIntent', () => {

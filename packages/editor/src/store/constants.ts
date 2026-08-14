@@ -42,8 +42,11 @@ export const DESIGN_POST_TYPES = [
  * Editor intent values. The intent represents the user's current editing
  * purpose (edit the post directly, suggest changes, or view in read-only).
  *
- * Orthogonal to the `editorMode` preference (visual vs. code): a user can
- * be in `suggest` intent in either visual or code mode.
+ * Mostly orthogonal to the `editorMode` preference (visual vs. code). The
+ * exception is `suggest`, which always reports `visual`: the code editor
+ * hands back raw `post_content` with nowhere to carry an inline marker, so
+ * `getEditorMode` masks the preference rather than changing it, and the
+ * user's stored mode returns with the `edit` intent.
  *
  * Storage and defaults:
  *   - Session-scoped: held in the editor store's reducer, not the

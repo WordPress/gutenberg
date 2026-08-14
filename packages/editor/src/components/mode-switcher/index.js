@@ -3,6 +3,8 @@ import { MenuItemsChoice, MenuGroup } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as editorStore } from '../../store';
+import { EDITOR_INTENT_SUGGEST } from '../../store/constants';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Set of available mode options.
@@ -21,22 +23,29 @@ const MODES = [
 ];
 
 function ModeSwitcher() {
-	const { shortcut, isRichEditingEnabled, isCodeEditingEnabled, mode } =
-		useSelect(
-			( select ) => ( {
-				shortcut: select(
-					keyboardShortcutsStore
-				).getShortcutRepresentation( 'core/editor/toggle-mode' ),
-				isRichEditingEnabled:
-					select( editorStore ).getEditorSettings()
-						.richEditingEnabled,
-				isCodeEditingEnabled:
-					select( editorStore ).getEditorSettings()
-						.codeEditingEnabled,
-				mode: select( editorStore ).getEditorMode(),
-			} ),
-			[]
-		);
+	const {
+		shortcut,
+		isRichEditingEnabled,
+		isCodeEditingEnabled,
+		isSuggestIntent,
+		mode,
+	} = useSelect(
+		( select ) => ( {
+			shortcut: select(
+				keyboardShortcutsStore
+			).getShortcutRepresentation( 'core/editor/toggle-mode' ),
+			isRichEditingEnabled:
+				select( editorStore ).getEditorSettings().richEditingEnabled,
+			isCodeEditingEnabled:
+				select( editorStore ).getEditorSettings().codeEditingEnabled,
+			// `getEditorIntent` is private while Suggest mode is experimental.
+			isSuggestIntent:
+				unlock( select( editorStore ) ).getEditorIntent() ===
+				EDITOR_INTENT_SUGGEST,
+			mode: select( editorStore ).getEditorMode(),
+		} ),
+		[]
+	);
 	const { switchEditorMode } = useDispatch( editorStore );
 
 	let selectedMode = mode;
@@ -46,12 +55,25 @@ function ModeSwitcher() {
 	if ( ! isCodeEditingEnabled && mode === 'text' ) {
 		selectedMode = 'visual';
 	}
+	// Suggesting is a visual-only intent: see `getEditorMode`.
+	if ( isSuggestIntent ) {
+		selectedMode = 'visual';
+	}
 
 	const choices = MODES.map( ( choice ) => {
 		if ( ! isCodeEditingEnabled && choice.value === 'text' ) {
 			choice = {
 				...choice,
 				disabled: true,
+			};
+		}
+		if ( isSuggestIntent && choice.value === 'text' ) {
+			choice = {
+				...choice,
+				disabled: true,
+				info: __(
+					'Raw HTML edits cannot be captured as suggestions. Switch to Editing to use the code editor.'
+				),
 			};
 		}
 		if ( ! isRichEditingEnabled && choice.value === 'visual' ) {
