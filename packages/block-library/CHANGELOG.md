@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Icon: Apply only padding to the inner SVG in the editor, so margin is no longer applied twice compared to the front end ([#81292](https://github.com/WordPress/gutenberg/pull/81292)).
+-   Social Links: Give the visible label its own line height, so a label that wraps in a narrow container no longer draws every line on top of the previous one ([#81611](https://github.com/WordPress/gutenberg/pull/81611)).
 -   Term Description: Apply the term description display filters when rendering with term context inside a Terms Query loop, so multi-paragraph descriptions keep their paragraphs and match the taxonomy archive rendering ([#81290](https://github.com/WordPress/gutenberg/pull/81290)).
 
 ## 10.4.0 (2026-08-12)

@@ -33,6 +33,11 @@
 			margin-left: 0.5em;
 			margin-right: 0.5em;
 			font-size: 0.65em;
+			// The anchor sets `line-height: 0` so the icon adds no vertical
+			// space. The label inherits it, which stacks every wrapped line at
+			// the same position and renders them on top of each other once the
+			// container is too narrow for the label to fit on one line.
+			line-height: normal;
 		}
 	}
 
