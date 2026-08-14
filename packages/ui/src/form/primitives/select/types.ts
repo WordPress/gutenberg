@@ -1,8 +1,9 @@
 import type { Select as _Select } from '@base-ui/react/select';
 import type { ReactElement } from 'react';
 import type { ComponentProps } from '../../../utils/types';
-import type { ItemPopupSize } from '../../../utils/item-popup-size';
 import type { InputLayoutProps } from '../input-layout/types';
+
+export type SelectItemSize = 'default' | 'small';
 
 export type PortalProps = ComponentProps< typeof _Select.Portal >;
 
@@ -89,7 +90,7 @@ export type SelectItemProps = Omit<
 	 *
 	 * @default 'default'
 	 */
-	size?: ItemPopupSize;
+	size?: SelectItemSize;
 	/**
 	 * The content of the item.
 	 */
