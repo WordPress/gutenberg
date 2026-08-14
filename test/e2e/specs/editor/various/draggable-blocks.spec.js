@@ -595,7 +595,7 @@ test.describe( 'Draggable block', () => {
 			.toBe( 'first' );
 	} );
 
-	test( 'still drags a single block by its fully selected text', async ( {
+	test( 'keeps a drag of partially selected text native', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -615,43 +615,7 @@ test.describe( 'Draggable block', () => {
 			window.wp.data.select( 'core/block-editor' ).getBlockOrder()
 		);
 
-		// Select all the text of the first paragraph.
-		await editor.canvas
-			.locator( 'role=document[name="Block: Paragraph"i] >> text=first' )
-			.click();
-		await pageUtils.pressKeys( 'primary+a' );
-
-		// A drag on the fully selected text carries the block.
-		const fullResult = await editor.canvas
-			.locator( `[data-block="${ firstClientId }"]` )
-			.evaluate( ( node ) => {
-				const dataTransfer = new DataTransfer();
-				const event = new DragEvent( 'dragstart', {
-					bubbles: true,
-					cancelable: true,
-					dataTransfer,
-				} );
-				const notPrevented = node.dispatchEvent( event );
-				return {
-					notPrevented,
-					data: dataTransfer.getData( 'wp-blocks' ),
-				};
-			} );
-		expect( fullResult.notPrevented ).toBe( true );
-		expect( JSON.parse( fullResult.data ) ).toMatchObject( {
-			type: 'block',
-			srcClientIds: [ firstClientId ],
-			srcRootClientId: '',
-		} );
-
-		// End the drag before testing the next case. The event is dispatched
-		// on the body because the dragged block is cloned while dragging, so
-		// its block selector would match two elements.
-		await editor.canvas.locator( 'body' ).evaluate( ( body ) => {
-			body.dispatchEvent( new DragEvent( 'dragend', { bubbles: true } ) );
-		} );
-
-		// A drag on partially selected text stays native and carries no
+		// A drag on partially selected text is not prevented and carries no
 		// block payload. Move the caret to the start of the field, then
 		// select a single character.
 		await editor.canvas

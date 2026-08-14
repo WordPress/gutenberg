@@ -76,40 +76,15 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				}
 			}
 
-			// The field whose content is entirely covered by the text
-			// selection, or null when there is none. Derived from the
-			// selection, not the active element, so it holds the same
-			// answer while a press has made the field non editable.
-			function getEntirelySelectedField() {
-				const selection = node.ownerDocument.defaultView.getSelection();
-				const { anchorNode } = selection;
-
-				if ( selection.isCollapsed || ! anchorNode ) {
-					return null;
-				}
-
-				const anchorElement =
-					anchorNode.nodeType === anchorNode.ELEMENT_NODE
-						? anchorNode
-						: anchorNode.parentElement;
-				const field = anchorElement?.closest( '[contenteditable]' );
-
-				return field &&
-					node.contains( field ) &&
-					isEntirelySelected( field )
-					? field
-					: null;
-			}
-
 			/**
-			 * A press on a fully selected field drags the block, but the
-			 * browser only starts a drag of a text selection when the press
-			 * begins at rest on the selected glyphs; a press that is
-			 * already moving falls back to starting a new selection. For
-			 * the length of the press, make the block itself the drag
-			 * target instead: a non editable, draggable element starts a
-			 * native drag from a press anywhere inside it, however fast
-			 * the gesture begins.
+			 * A press on the block's fully selected content drags the
+			 * block, but the browser only starts a drag of a text selection
+			 * when the press begins at rest on the selected glyphs; a press
+			 * that is already moving falls back to starting a new
+			 * selection. For the length of the press, make the block a non
+			 * editable, draggable element instead: exactly the shape a
+			 * directly draggable block has, from which a native drag starts
+			 * on any press, however fast the gesture begins.
 			 *
 			 * @param {MouseEvent} event Mouse down event.
 			 */
@@ -129,42 +104,54 @@ export function useEventHandlers( { clientId, isSelected } ) {
 					return;
 				}
 
-				const editableElement = getEntirelySelectedField();
+				const { ownerDocument } = node;
+				const selection = ownerDocument.defaultView.getSelection();
 
 				if (
-					! editableElement ||
-					! editableElement.isContentEditable ||
+					! node.isContentEditable ||
+					selection.isCollapsed ||
+					! isEntirelySelected( node ) ||
 					hasMultiSelection()
 				) {
 					return;
 				}
 
-				const { ownerDocument } = node;
-				const selection = ownerDocument.defaultView.getSelection();
+				const hadTabIndex = node.hasAttribute( 'tabindex' );
 
 				node.setAttribute( 'draggable', 'true' );
-				editableElement.setAttribute( 'contenteditable', 'false' );
+				node.setAttribute( 'contenteditable', 'false' );
+
+				// A non editable block is only a drag target while it is
+				// focused, and losing editability also loses the focus
+				// unless the block is focusable in its own right.
+				if ( ! hadTabIndex ) {
+					node.setAttribute( 'tabindex', '-1' );
+				}
+				node.focus();
 
 				function restore() {
 					node.removeAttribute( 'draggable' );
-					editableElement.setAttribute( 'contenteditable', 'true' );
+					node.setAttribute( 'contenteditable', 'true' );
+					if ( ! hadTabIndex ) {
+						node.removeAttribute( 'tabindex' );
+					}
 					ownerDocument.removeEventListener( 'mouseup', onPressEnd );
 					node.removeEventListener( 'dragstart', onPressDragStart );
 				}
 
 				function onPressDragStart() {
-					// The drag session is committed; the field can become
-					// editable again while the block is dragged.
+					// The drag session is committed; the block can become
+					// editable again while it is dragged.
 					restore();
 				}
 
 				function onPressEnd( e ) {
 					restore();
-					// The field was not editable during the press, so the
+					// The block was not editable during the press, so the
 					// browser did not place a caret for the click. Place it
 					// where the press landed, so clicking into the selected
 					// text keeps putting the caret at the click position.
-					editableElement.focus();
+					node.focus();
 					const position = ownerDocument.caretPositionFromPoint?.(
 						e.clientX,
 						e.clientY
@@ -193,27 +180,21 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			}
 
 			/**
-			 * A drag of a text selection that covers everything in the
-			 * field moves the block itself, the same way dragging a non
-			 * text block does. A drag of a partial selection stays fully
-			 * native: the browser moves the text to the drop point, like
-			 * cut and paste.
+			 * Starts a drag of the block when it is the direct, non
+			 * editable, focused drag target. The press above puts a fully
+			 * selected block in exactly that shape. Any other drag within
+			 * the block stays fully native: the browser moves the dragged
+			 * text selection to the drop point, like cut and paste.
 			 *
 			 * @param {DragEvent} event Drag event.
 			 */
 			function onDragStart( event ) {
-				const { activeElement } = node.ownerDocument;
-				const fullySelectedField =
-					node.contains( event.target ) && ! hasMultiSelection()
-						? getEntirelySelectedField()
-						: null;
-				const isDirectBlockDrag =
-					node === event.target &&
-					! node.isContentEditable &&
-					activeElement === node &&
-					! hasMultiSelection();
-
-				if ( ! isDirectBlockDrag && ! fullySelectedField ) {
+				if (
+					node !== event.target ||
+					node.isContentEditable ||
+					node.ownerDocument.activeElement !== node ||
+					hasMultiSelection()
+				) {
 					return;
 				}
 
@@ -228,10 +209,13 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				const { ownerDocument } = node;
 				const { defaultView } = ownerDocument;
 				const selection = defaultView.getSelection();
-				// Dragging a fully selected field keeps its selection, so
-				// the highlight rides along with the dragged block and
-				// survives the drop. Other drags clear the selection.
-				const editableElement = fullySelectedField;
+				// A block dragged by its fully selected content keeps the
+				// selection, so the highlight rides along with the block
+				// and survives the drop. Other drags clear the selection.
+				const editableElement =
+					! selection.isCollapsed && isEntirelySelected( node )
+						? node
+						: null;
 
 				if ( ! editableElement ) {
 					selection.removeAllRanges();
