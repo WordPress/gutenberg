@@ -3,7 +3,6 @@ import { Stack } from '@wordpress/ui';
 import { useContext } from '@wordpress/element';
 import { ScreenHeader } from './screen-header';
 import { ScreenBody } from './screen-body';
-import TypographyElements from './typography-elements';
 import TypographyVariations from './variations/variations-typography';
 import FontFamilies from './font-families';
 import FontSizesCount from './font-sizes/font-sizes-count';
@@ -23,14 +22,13 @@ function ScreenTypography() {
 			<ScreenHeader
 				title={ __( 'Typography' ) }
 				description={ __(
-					'Available fonts, typographic styles, and the application of those styles.'
+					'Manage the fonts and typographic styles available across the site.'
 				) }
 			/>
 			<ScreenBody>
 				<Stack direction="column" gap="xl">
 					<TypographyVariations title={ __( 'Typesets' ) } />
 					{ fontLibraryEnabled && <FontFamilies /> }
-					<TypographyElements />
 					<FontSizesCount />
 					{ hasTextShadowControl && <TextShadows /> }
 				</Stack>
