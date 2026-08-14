@@ -1,4 +1,5 @@
-import { FlexItem, Flex, Button } from '@wordpress/components';
+import { Button } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { styles, seen, backup } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -12,7 +13,7 @@ import GlobalStylesUI from '../global-styles';
 import { GlobalStylesActionMenu } from '../global-styles/menu';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import DefaultSidebar from './default-sidebar';
+import PluginSidebar from '../plugin-sidebar';
 import WelcomeGuideStyles from './welcome-guide';
 
 export default function GlobalStylesSidebar() {
@@ -25,17 +26,19 @@ export default function GlobalStylesSidebar() {
 		activeComplementaryArea,
 		editorSettings,
 		styleStateViewport,
+		isDistractionFree,
 	} = useSelect( ( select ) => {
+		const { get } = select( preferencesStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
-		const { getStylesPath, getShowStylebook } = unlock(
-			select( editorStore )
-		);
-		const _isVisualEditorMode =
-			'visual' === select( editorStore ).getEditorMode();
-		const _showListViewByDefault = select( preferencesStore ).get(
-			'core',
-			'showListViewByDefault'
-		);
+		const {
+			getStylesPath,
+			getShowStylebook,
+			getEditorMode,
+			getEditorSettings,
+		} = unlock( select( editorStore ) );
+		const _isVisualEditorMode = 'visual' === getEditorMode();
+		const _showListViewByDefault = get( 'core', 'showListViewByDefault' );
+		const _isDistractionFree = get( 'core', 'distractionFree' );
 		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
 			select( coreStore );
 
@@ -54,12 +57,12 @@ export default function GlobalStylesSidebar() {
 			showListViewByDefault: _showListViewByDefault,
 			hasRevisions:
 				!! globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count,
-			activeComplementaryArea:
-				select( interfaceStore ).getActiveComplementaryArea( 'core' ),
-			editorSettings: select( editorStore ).getEditorSettings(),
+			activeComplementaryArea: getActiveComplementaryArea( 'core' ),
+			editorSettings: getEditorSettings(),
 			styleStateViewport: unlock(
 				select( blockEditorStore )
 			).getStyleStateViewport(),
+			isDistractionFree: _isDistractionFree,
 		};
 	}, [] );
 	const { setStylesPath, setShowStylebook, resetStylesNavigation } = unlock(
@@ -110,60 +113,62 @@ export default function GlobalStylesSidebar() {
 
 	return (
 		<>
-			<DefaultSidebar
-				className="editor-global-styles-sidebar"
+			<PluginSidebar
+				name="global-styles"
 				identifier="edit-site/global-styles"
 				title={ __( 'Styles' ) }
 				icon={ styles }
+				isPinnable={ ! isDistractionFree }
 				closeLabel={ __( 'Close Styles' ) }
-				panelClassName="editor-global-styles-sidebar__panel"
+				className="editor-global-styles-sidebar__panel"
+				// The sidebar is a flex column so the panel can fill the
+				// remaining height.
+				render={ <div className="editor-global-styles-sidebar" /> }
 				header={
-					<Flex
+					<Stack
 						className="editor-global-styles-sidebar__header"
-						gap={ 1 }
+						direction="row"
+						align="center"
+						gap="xs"
 					>
-						<FlexItem>
-							<h2 className="editor-global-styles-sidebar__header-title">
-								{ __( 'Styles' ) }
-							</h2>
-						</FlexItem>
-						<Flex
-							justify="flex-end"
-							gap={ 1 }
+						<h2 className="editor-global-styles-sidebar__header-title">
+							{ __( 'Styles' ) }
+						</h2>
+						<Stack
 							className="editor-global-styles-sidebar__header-actions"
+							direction="row"
+							align="center"
+							justify="flex-end"
+							gap="xs"
 						>
 							{ ! isMobileViewport && (
-								<FlexItem>
-									<Button
-										icon={ seen }
-										label={ __( 'Style Book' ) }
-										isPressed={ showStylebook }
-										accessibleWhenDisabled
-										disabled={ shouldResetNavigation }
-										onClick={ toggleStyleBook }
-										size="compact"
-									/>
-								</FlexItem>
-							) }
-							<FlexItem>
 								<Button
-									label={ __( 'Revisions' ) }
-									icon={ backup }
-									onClick={ toggleRevisions }
+									icon={ seen }
+									label={ __( 'Style Book' ) }
+									isPressed={ showStylebook }
 									accessibleWhenDisabled
-									disabled={ ! hasRevisions }
-									isPressed={
-										isRevisionsOpened ||
-										isRevisionsStyleBookOpened
-									}
+									disabled={ shouldResetNavigation }
+									onClick={ toggleStyleBook }
 									size="compact"
 								/>
-							</FlexItem>
+							) }
+							<Button
+								label={ __( 'Revisions' ) }
+								icon={ backup }
+								onClick={ toggleRevisions }
+								accessibleWhenDisabled
+								disabled={ ! hasRevisions }
+								isPressed={
+									isRevisionsOpened ||
+									isRevisionsStyleBookOpened
+								}
+								size="compact"
+							/>
 							<GlobalStylesActionMenu
 								onChangePath={ setStylesPath }
 							/>
-						</Flex>
-					</Flex>
+						</Stack>
+					</Stack>
 				}
 			>
 				<GlobalStylesUI
@@ -173,7 +178,7 @@ export default function GlobalStylesSidebar() {
 					selectedViewport={ styleStateViewport }
 					showResponsiveStateControls={ false }
 				/>
-			</DefaultSidebar>
+			</PluginSidebar>
 			<WelcomeGuideStyles />
 		</>
 	);

@@ -35,6 +35,7 @@ import StartPageOptions from '../start-page-options';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import StartTemplateOptions from '../start-template-options';
 import EditorKeyboardShortcuts from '../global-keyboard-shortcuts';
+import EditorKeyboardShortcutsRegister from '../global-keyboard-shortcuts/register-shortcuts';
 import PatternRenameModal from '../pattern-rename-modal';
 import PatternDuplicateModal from '../pattern-duplicate-modal';
 import TemplatePartMenuItems from '../template-part-menu-items';
@@ -426,6 +427,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 									{ type === 'wp_navigation' && (
 										<NavigationBlockEditingMode />
 									) }
+									<EditorKeyboardShortcutsRegister />
 									<EditorKeyboardShortcuts />
 									<KeyboardShortcutHelpModal />
 									<BlockRemovalWarnings />
