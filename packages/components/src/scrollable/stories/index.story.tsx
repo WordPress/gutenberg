@@ -64,6 +64,7 @@ const Template: StoryFn< typeof Scrollable > = ( { ...args } ) => {
 						right: 0,
 					} }
 					type="text"
+					aria-label="Element out of view"
 					value="Focus me"
 					readOnly
 				/>
