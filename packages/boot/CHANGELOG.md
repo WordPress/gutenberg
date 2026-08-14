@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Contain a failure to the surface it happened in, so a stage, inspector or canvas that throws leaves the rest of the screen working ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+-   Contain a failure to the surface it happened in, so a stage, inspector or canvas that throws leaves the rest of the screen working ([#81622](https://github.com/WordPress/gutenberg/pull/81622)).
 
 ### Enhancements
 
