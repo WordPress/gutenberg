@@ -10,7 +10,7 @@ LABELER_CONFIG="$REPO_ROOT/.github/labeler.yml"
 
 # DO NOT ADD TO THIS LIST. These are packages which do not have an associated
 # GitHub label yet. Remove entries from this list as labels are created.
-EXCLUDED_PACKAGES="
+EXCLUDED_PACKAGES=(
 	annotations
 	asset-loader
 	block-directory
@@ -47,7 +47,20 @@ EXCLUDED_PACKAGES="
 	widgets
 	worker-threads
 	workflow
-"
+)
+
+is_excluded_package() {
+	local pkg_name="$1"
+	local excluded_package
+
+	for excluded_package in "${EXCLUDED_PACKAGES[@]}"; do
+		if [[ "$excluded_package" == "$pkg_name" ]]; then
+			return 0
+		fi
+	done
+
+	return 1
+}
 
 missing=()
 
@@ -60,7 +73,7 @@ for pkg_dir in "$REPO_ROOT"/packages/*/; do
 	pkg_name="$(basename "$pkg_dir")"
 
 	# Skip excluded packages
-	if echo "$EXCLUDED_PACKAGES" | grep -qw "$pkg_name"; then
+	if is_excluded_package "$pkg_name"; then
 		continue
 	fi
 
