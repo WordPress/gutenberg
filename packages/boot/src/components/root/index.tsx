@@ -11,12 +11,14 @@ import {
 import { menu } from '@wordpress/icons';
 import { useState, useEffect, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { UnsavedChangesWarning } from '@wordpress/editor';
 import { Page, getAdminThemeColors } from '@wordpress/admin-ui';
 import { Tooltip } from '@wordpress/ui';
 import { ThemeProvider } from '@wordpress/theme';
 import Sidebar from '../sidebar';
 import SavePanel from '../save-panel';
 import CanvasRenderer from '../canvas-renderer';
+import ErrorBoundary from '../error-boundary';
 import useRouteTitle from '../app/use-route-title';
 import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
@@ -67,6 +69,7 @@ export default function Root() {
 								'has-full-canvas': isFullScreen,
 							} ) }
 						>
+							<UnsavedChangesWarning />
 							<SavePanel />
 							<SnackbarNotices className="boot-notices__snackbar" />
 							{ isMobileViewport && (
@@ -181,12 +184,14 @@ export default function Root() {
 														/>
 													</div>
 												) }
-											<CanvasRenderer
-												canvas={ canvas }
-												routeContentModule={
-													routeContentModule
-												}
-											/>
+											<ErrorBoundary>
+												<CanvasRenderer
+													canvas={ canvas }
+													routeContentModule={
+														routeContentModule
+													}
+												/>
+											</ErrorBoundary>
 										</div>
 									) }
 								</ThemeProvider>
