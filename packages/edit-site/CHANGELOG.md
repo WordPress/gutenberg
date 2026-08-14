@@ -6,6 +6,10 @@
 
 -   Seed the root `ThemeProvider` with the admin color scheme primary color so portaled popovers and modals receive the scheme's accent colors ([#81653](https://github.com/WordPress/gutenberg/pull/81653)).
 
+### Enhancements
+
+-   Explain what templates are in the Templates sidebar description. ([#60304](https://github.com/WordPress/gutenberg/issues/60304))
+
 ### Internal
 
 -   Stop rendering `EditorKeyboardShortcutsRegister`, which the editor provider now renders itself ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).

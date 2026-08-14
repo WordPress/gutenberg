@@ -8,7 +8,7 @@ export default function SidebarNavigationScreenTemplatesBrowse( { backPath } ) {
 		<SidebarNavigationScreen
 			title={ __( 'Templates' ) }
 			description={ __(
-				'Create new templates, or reset any customizations made to the templates supplied by your theme.'
+				'A template specifies the structure of a page. Here, you can add new templates, or reset any customizations made to the templates supplied by your theme.'
 			) }
 			backPath={ backPath }
 			content={
