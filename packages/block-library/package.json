@@ -47,6 +47,7 @@
 		"./file/view": "./build-module/file/view.mjs",
 		"./form/view": "./build-module/form/view.mjs",
 		"./image/view": "./build-module/image/view.mjs",
+		"./media-playback": "./build-module/utils/media-playback.mjs",
 		"./navigation/view": "./build-module/navigation/view.mjs",
 		"./playlist/view": "./build-module/playlist/view.mjs",
 		"./query/view": "./build-module/query/view.mjs",
