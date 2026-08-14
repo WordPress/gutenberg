@@ -5,7 +5,7 @@ import {
 	BlockEditContextProvider,
 	blockEditingModeKey,
 } from '../block-edit/context';
-import { BlockStylePanelsSubset } from './block-style-panels';
+import BlockStylePanels from './block-style-panels';
 import {
 	BLOCK_STYLE_SETTINGS_PATHS,
 	useBlockSettings,
@@ -130,7 +130,7 @@ function MixedTextStylePanels( {
 	);
 
 	return (
-		<BlockStylePanelsSubset
+		<BlockStylePanels
 			clientId={ sourceClientId }
 			name={ sourceName }
 			panels={ panels }
