@@ -538,4 +538,87 @@ test.describe( 'Draggable block', () => {
 			},
 		] );
 	} );
+
+	test( 'still drags a single block by its fully selected text', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'first' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'second' );
+
+		// Confirm correct setup.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'first' } },
+			{ name: 'core/paragraph', attributes: { content: 'second' } },
+		] );
+
+		const [ firstClientId ] = await page.evaluate( () =>
+			window.wp.data.select( 'core/block-editor' ).getBlockOrder()
+		);
+
+		// Select all the text of the first paragraph.
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i] >> text=first' )
+			.click();
+		await pageUtils.pressKeys( 'primary+a' );
+
+		// A drag on the fully selected text carries the block.
+		const fullResult = await editor.canvas
+			.locator( `[data-block="${ firstClientId }"]` )
+			.evaluate( ( node ) => {
+				const dataTransfer = new DataTransfer();
+				const event = new DragEvent( 'dragstart', {
+					bubbles: true,
+					cancelable: true,
+					dataTransfer,
+				} );
+				const notPrevented = node.dispatchEvent( event );
+				return {
+					notPrevented,
+					data: dataTransfer.getData( 'wp-blocks' ),
+				};
+			} );
+		expect( fullResult.notPrevented ).toBe( true );
+		expect( JSON.parse( fullResult.data ) ).toMatchObject( {
+			type: 'block',
+			srcClientIds: [ firstClientId ],
+			srcRootClientId: '',
+		} );
+
+		// End the drag before testing the next case. The event is dispatched
+		// on the body because the dragged block is cloned while dragging, so
+		// its block selector would match two elements.
+		await editor.canvas.locator( 'body' ).evaluate( ( body ) => {
+			body.dispatchEvent( new DragEvent( 'dragend', { bubbles: true } ) );
+		} );
+
+		// A drag on partially selected text is prevented. Move the caret to
+		// the start of the field, then select a single character.
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i] >> text=first' )
+			.click();
+		await pageUtils.pressKeys( 'primary+a' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await pageUtils.pressKeys( 'shift+ArrowRight' );
+		const partialResult = await editor.canvas
+			.locator( `[data-block="${ firstClientId }"]` )
+			.evaluate( ( node ) => {
+				const dataTransfer = new DataTransfer();
+				const event = new DragEvent( 'dragstart', {
+					bubbles: true,
+					cancelable: true,
+					dataTransfer,
+				} );
+				const notPrevented = node.dispatchEvent( event );
+				return {
+					notPrevented,
+					data: dataTransfer.getData( 'wp-blocks' ),
+				};
+			} );
+		expect( partialResult.notPrevented ).toBe( false );
+		expect( partialResult.data ).toBe( '' );
+	} );
 } );
