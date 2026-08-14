@@ -45,6 +45,7 @@
 -   Patterns explorer: Refactor the category sidebar to use `Tabs` ([#81807](https://github.com/WordPress/gutenberg/pull/81807)).
 -   `PublishDateTimePicker`: Add a `showPopoverHeader` prop so the picker can be rendered inline, without the popover title and close button. Rename the header's reset action from "Now" to "Reset", which reads as an action rather than a status ([#81806](https://github.com/WordPress/gutenberg/pull/81806)).
 -   Show separate horizontal and vertical block spacing controls in the block inspector only for Flex and Grid layouts, while retaining axial gap support in Global Styles. Responsive Grid column calculations use the horizontal gap, while Flow and Constrained layouts use the vertical gap when receiving an axial value ([#81476](https://github.com/WordPress/gutenberg/pull/81476)).
+-   Block Fields: The link field control now follows the DataForm control conventions: it renders the field label, and fields can declare it as `Edit: { control: 'link' }` to configure the offered link settings and the search suggestions query ([#81636](https://github.com/WordPress/gutenberg/pull/81636)).
 
 ### Bug Fixes
 
@@ -53,6 +54,7 @@
 -   `DuotoneControl`: Keep the picked preset's identity when applying a duotone to a block. Two presets can hold the same pair of colors, and the applied preset was resolved by matching colors, so the first of any duplicate pair was saved and both appeared selected ([#81605](https://github.com/WordPress/gutenberg/pull/81605)).
 -   `InnerBlocks`: Resolve the `default` of a block's `layout` support before providing it to inner blocks. A block that declared its layout only as a support default, such as the Gallery, previously handed its children the raw support config, which has no `type`, so the children resolved to the flow layout instead. As a result an Image nested in a Gallery offered left/center/right alignment, which the flex layout does not permit ([#81606](https://github.com/WordPress/gutenberg/pull/81606)).
 -   Never apply Spotlight mode in a preview canvas, which cannot be edited and so rendered most of its content faded ([#81615](https://github.com/WordPress/gutenberg/pull/81615)).
+-   Block Fields: Read the link field's nofollow state from combined `rel` values such as `noopener nofollow`, so editing the URL no longer drops the token ([#81636](https://github.com/WordPress/gutenberg/pull/81636)).
 -   Grid: Keep child layout changes made with the resizer scoped to the selected viewport.
 -   `DimensionsTool`: Reflect aspect ratio and scale values that are updated from outside the component, such as by undo or `updateBlockAttributes`. The scale control no longer displays a stale value, and an aspect ratio that is written differently to its preset, e.g. `1/1` rather than `1`, is displayed as that preset instead of as "Original" ([#80747](https://github.com/WordPress/gutenberg/pull/80747)).
 -   `ListView`: Only move focus into the list when the new `focusOnMount` prop is set, so that a list mounted as a side effect of a selection no longer pulls focus out of the editor canvas ([#81659](https://github.com/WordPress/gutenberg/pull/81659)).

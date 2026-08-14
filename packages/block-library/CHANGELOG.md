@@ -7,6 +7,10 @@
 -   Math: Declare `interactivity.clientNavigation` support. The block's front end output is static markup, and without the declaration a Math block inside a Query block forced full page reloads on pagination ([#82248](https://github.com/WordPress/gutenberg/pull/82248)).
 -   Query: Show a snackbar notice instead of a blocking modal when "Reload full page" is turned on automatically because a block inside the Query block doesn't support client-side navigation ([#82246](https://github.com/WordPress/gutenberg/pull/82246)).
 
+### Enhancements
+
+-   Button: Offer the "Mark as nofollow" setting in the content panel link field, matching the block's toolbar link popover ([#81636](https://github.com/WordPress/gutenberg/pull/81636)).
+
 ### Bug Fixes
 
 -   Image: Fix cropped galleries rendering images at their natural height in the editor canvas. The baseline inline `height: auto` is no longer emitted for images inside a cropped gallery, so the gallery's own cropping CSS applies ([#82318](https://github.com/WordPress/gutenberg/pull/82318)).
