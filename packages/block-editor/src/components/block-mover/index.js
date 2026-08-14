@@ -1,6 +1,9 @@
 import clsx from 'clsx';
-import { ToolbarGroup, ToolbarItem } from '@wordpress/components';
+import { dragHandle } from '@wordpress/icons';
+import { ToolbarGroup, ToolbarItem, Button } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+import BlockDraggable from '../block-draggable';
 import { BlockMoverUpButton, BlockMoverDownButton } from './button';
 import { store as blockEditorStore } from '../../store';
 
@@ -63,6 +66,22 @@ function BlockMover( { clientIds, hideDragHandle } ) {
 				'is-horizontal': orientation === 'horizontal',
 			} ) }
 		>
+			{ ! hideDragHandle && (
+				<BlockDraggable clientIds={ clientIds } fadeWhenDisabled>
+					{ ( draggableProps ) => (
+						<Button
+							__next40pxDefaultSize
+							icon={ dragHandle }
+							className="block-editor-block-mover__drag-handle"
+							label={ __( 'Drag' ) }
+							// Should not be able to tab to drag handle as this
+							// button can only be used with a pointer device.
+							tabIndex="-1"
+							{ ...draggableProps }
+						/>
+					) }
+				</BlockDraggable>
+			) }
 			{ ! isManualGrid && (
 				<div className="block-editor-block-mover__move-button-container">
 					<ToolbarItem>

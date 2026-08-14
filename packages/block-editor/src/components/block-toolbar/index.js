@@ -238,13 +238,6 @@ export function PrivateBlockToolbar( {
 										clientId={ blockClientId }
 									/>
 								) }
-							{ ! isMultiToolbar &&
-								isDefaultEditingMode &&
-								! hideDragHandle && (
-									<BlockAppenderButton
-										clientId={ blockClientId }
-									/>
-								) }
 							<BlockMover
 								clientIds={ blockClientIds }
 								hideDragHandle={ hideDragHandle }
@@ -309,6 +302,11 @@ export function PrivateBlockToolbar( {
 						</>
 					) }
 				<BlockEditVisuallyButton clientIds={ blockClientIds } />
+				{ ! isMultiToolbar && isDefaultEditingMode && (
+					<ToolbarGroup>
+						<BlockAppenderButton clientId={ blockClientId } />
+					</ToolbarGroup>
+				) }
 				<BlockSettingsMenu clientIds={ blockClientIds } />
 			</div>
 		</NavigableToolbar>
