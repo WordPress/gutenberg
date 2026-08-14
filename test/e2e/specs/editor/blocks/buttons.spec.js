@@ -22,7 +22,7 @@ test.describe( 'Buttons', () => {
 			.click();
 
 		await editor.showBlockToolbar();
-		await page.locator( 'role=button[name="Add Button"]' ).click();
+		await page.locator( 'role=button[name="Add button"]' ).click();
 		await page.keyboard.type( 'New' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
