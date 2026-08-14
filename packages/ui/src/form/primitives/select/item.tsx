@@ -4,10 +4,6 @@ import { forwardRef } from '@wordpress/element';
 import { check } from '@wordpress/icons';
 import itemPopupStyles from '../../../utils/css/item-popup.module.css';
 import resetStyles from '../../../utils/css/resets.module.css';
-import {
-	getItemPopupSizeClassName,
-	normalizeItemPopupSize,
-} from '../../../utils/item-popup-size';
 import { Icon } from '../../../icon';
 import type { SelectItemProps } from './types';
 
@@ -16,14 +12,12 @@ export const Item = forwardRef< HTMLDivElement, SelectItemProps >(
 		{ className, value, size = 'default', children, ...restProps },
 		ref
 	) {
-		const normalizedSize = normalizeItemPopupSize( size );
-
 		return (
 			<_Select.Item
 				className={ clsx(
 					resetStyles[ 'box-sizing' ],
 					itemPopupStyles.item,
-					getItemPopupSizeClassName( size, itemPopupStyles ),
+					size === 'small' && itemPopupStyles[ 'is-size-small' ],
 					className
 				) }
 				value={ value }
@@ -36,7 +30,7 @@ export const Item = forwardRef< HTMLDivElement, SelectItemProps >(
 						itemPopupStyles[ 'item-icon' ],
 						itemPopupStyles[ 'item-indicator-icon' ]
 					) }
-					size={ normalizedSize === 'small' ? 20 : 24 }
+					size={ size === 'small' ? 20 : 24 }
 				/>
 				<_Select.ItemText>{ children }</_Select.ItemText>
 			</_Select.Item>
