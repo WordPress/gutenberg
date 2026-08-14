@@ -4,6 +4,7 @@ import {
 	typography,
 	color,
 	layout,
+	postCommentsForm,
 	shadow as shadowIcon,
 } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
@@ -36,6 +37,7 @@ function RootMenu() {
 	const hasShadowPanel = true; // Same as Gutenberg
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasLayoutPanel = hasDimensionsPanel;
+	const hasFormsPanel = hasTypographyPanel || hasColorPanel;
 
 	return (
 		<>
@@ -51,6 +53,14 @@ function RootMenu() {
 				{ hasColorPanel && (
 					<NavigationButtonAsItem icon={ color } path="/colors">
 						{ __( 'Colors' ) }
+					</NavigationButtonAsItem>
+				) }
+				{ hasFormsPanel && (
+					<NavigationButtonAsItem
+						icon={ postCommentsForm }
+						path="/forms"
+					>
+						{ __( 'Forms' ) }
 					</NavigationButtonAsItem>
 				) }
 				{ hasBackgroundPanel && (
