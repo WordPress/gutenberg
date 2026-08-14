@@ -185,6 +185,83 @@ describe( 'Post actions', () => {
 		} );
 	} );
 
+	describe( 'editPost()', () => {
+		const draftPost = {
+			id: postId,
+			type: 'post',
+			title: 'bar',
+			content: 'bar',
+			excerpt: 'crackers',
+			status: 'draft',
+		};
+
+		function setupPost() {
+			const registry = createRegistryWithStores();
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', draftPost );
+			registry.dispatch( editorStore ).setupEditor( draftPost );
+			return registry;
+		}
+
+		it( 'refuses a post status edit while suggesting', () => {
+			const registry = setupPost();
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+			speak.mockClear();
+
+			registry.dispatch( editorStore ).editPost( { status: 'pending' } );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getEditedPostAttribute( 'status' )
+			).toBe( 'draft' );
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
+			expect( speak ).toHaveBeenCalledWith(
+				'The post status cannot be changed while suggesting.',
+				'assertive'
+			);
+		} );
+
+		it( 'keeps the other edits in the same call while suggesting', () => {
+			const registry = setupPost();
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+
+			registry
+				.dispatch( editorStore )
+				.editPost( { status: 'pending', excerpt: 'new crackers' } );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getEditedPostAttribute( 'status' )
+			).toBe( 'draft' );
+			expect(
+				registry
+					.select( editorStore )
+					.getEditedPostAttribute( 'excerpt' )
+			).toBe( 'new crackers' );
+		} );
+
+		it( 'applies a post status edit while editing', () => {
+			const registry = setupPost();
+
+			registry.dispatch( editorStore ).editPost( { status: 'pending' } );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getEditedPostAttribute( 'status' )
+			).toBe( 'pending' );
+		} );
+	} );
+
 	describe( 'savePost()', () => {
 		it( 'saves a modified post', async () => {
 			const post = {

@@ -13,6 +13,8 @@ import PostTrash from '../post-trash';
 import usePostFields from '../post-fields';
 import { usePostTemplatePanelMode } from '../post-template/hooks';
 import revisionsField from '../../dataviews/fields/revisions';
+import { EDITOR_INTENT_SUGGEST } from '../../store/constants';
+import { unlock } from '../../lock-unlock';
 
 const EMPTY_FORM = { layout: { type: 'panel' }, fields: [] };
 const VIEW_CONFIG_FIELDS = [ 'form' ];
@@ -168,26 +170,34 @@ function bindFieldToNamespace( field, namespace, isVisible = () => true ) {
 }
 
 export default function DataFormPostSummary( { onActionPerformed } ) {
-	const { postType, postId, isPostStatusRemoved, availableTemplates } =
-		useSelect( ( select ) => {
-			const {
-				getCurrentPostType,
-				getCurrentPostId,
-				isEditorPanelRemoved,
-				getEditorSettings,
-			} = select( editorStore );
-			const _availableTemplates = select(
-				coreDataStore
-			).getCurrentTheme()?.is_block_theme
-				? null
-				: getEditorSettings().availableTemplates ?? null;
-			return {
-				postType: getCurrentPostType(),
-				postId: getCurrentPostId(),
-				isPostStatusRemoved: isEditorPanelRemoved( 'post-status' ),
-				availableTemplates: _availableTemplates,
-			};
-		}, [] );
+	const {
+		postType,
+		postId,
+		isPostStatusRemoved,
+		availableTemplates,
+		isSuggesting,
+	} = useSelect( ( select ) => {
+		const {
+			getCurrentPostType,
+			getCurrentPostId,
+			isEditorPanelRemoved,
+			getEditorSettings,
+		} = select( editorStore );
+		const _availableTemplates = select( coreDataStore ).getCurrentTheme()
+			?.is_block_theme
+			? null
+			: getEditorSettings().availableTemplates ?? null;
+		return {
+			postType: getCurrentPostType(),
+			postId: getCurrentPostId(),
+			isPostStatusRemoved: isEditorPanelRemoved( 'post-status' ),
+			availableTemplates: _availableTemplates,
+			// `getEditorIntent` is private while Suggest mode is experimental.
+			isSuggesting:
+				unlock( select( editorStore ) ).getEditorIntent() ===
+				EDITOR_INTENT_SUGGEST,
+		};
+	}, [] );
 	const { form: formConfig } = useViewConfig( {
 		kind: 'postType',
 		name: postType,
@@ -294,6 +304,11 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 							elements: field.elements.filter(
 								( element ) => element.value !== 'trash'
 							),
+							// A status change is an editorial decision the
+							// suggestion layer has no way to hold as pending,
+							// so Suggest mode shows it without offering to
+							// change it. See issue #73411 (F-15).
+							readOnly: isSuggesting,
 						};
 					}
 					if ( field.id === 'template' ) {
@@ -328,6 +343,7 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 			availableTemplates,
 			fieldNamespaces,
 			postType,
+			isSuggesting,
 		]
 	);
 

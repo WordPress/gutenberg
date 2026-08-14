@@ -26,6 +26,7 @@ import {
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
+import { EDITOR_INTENT_SUGGEST } from './constants';
 import { unlock } from '../lock-unlock';
 import { setCanvasWidth } from './private-actions';
 import { getCanvasWidthByDeviceType } from '../utils/device-type';
@@ -36,6 +37,14 @@ const { getEntitySnapshot } = unlock( coreDataPrivateApis );
 // the server. Their messages restate what the notice already says, so there are
 // no details worth disclosing.
 const CLIENT_GENERATED_ERROR_CODES = [ 'offline_error', 'fetch_error' ];
+
+// Post-level fields the Suggest intent refuses to edit because there is no way
+// to hold them as a pending proposal: they are not part of the block tree, so
+// nothing can carry a marker for them and nothing can review them later. Only
+// `status` is listed for now — it is the field that carries editorial
+// authority. The rest of the post-level fields (title, excerpt, featured image)
+// still need a per-field capture-or-disable decision. See issue #73411 (F-15).
+const SUGGEST_LOCKED_POST_FIELDS = [ 'status' ];
 
 /**
  * Returns an action generator used in signalling that editor has initialized with
@@ -178,9 +187,37 @@ export const editPost =
 	( edits, options ) =>
 	( { select, registry } ) => {
 		const { id, type } = select.getCurrentPost();
+		let nextEdits = edits;
+
+		/*
+		 * Suggest mode proposes changes, it doesn't apply them. Post status is
+		 * the one post-level field that moves the post along the editorial
+		 * workflow (draft -> pending -> publish), so a suggester who can change
+		 * it is approving their own work while nominally only suggesting.
+		 * Drop it here rather than in the sidebar control alone: the publish
+		 * button, "Switch to draft", the command palette and third-party code
+		 * all reach the post through this action. See issue #73411 (F-15).
+		 */
+		if (
+			select.getEditorIntent() === EDITOR_INTENT_SUGGEST &&
+			SUGGEST_LOCKED_POST_FIELDS.some( ( key ) => key in nextEdits )
+		) {
+			nextEdits = { ...nextEdits };
+			SUGGEST_LOCKED_POST_FIELDS.forEach( ( key ) => {
+				delete nextEdits[ key ];
+			} );
+			speak(
+				__( 'The post status cannot be changed while suggesting.' ),
+				'assertive'
+			);
+			if ( ! Object.keys( nextEdits ).length ) {
+				return;
+			}
+		}
+
 		registry
 			.dispatch( coreStore )
-			.editEntityRecord( 'postType', type, id, edits, options );
+			.editEntityRecord( 'postType', type, id, nextEdits, options );
 	};
 
 /**
