@@ -82,7 +82,9 @@ test.describe( 'Preload', () => {
 		expect( Array.from( new Set( requests ) ).sort() ).toEqual(
 			[
 				`GET /wp/v2/comments?context=edit&post=${ pageId }&type=note&status=all&per_page=100`,
-				`GET /wp/v2/pages/${ pageId }/autosaves?context=edit`,
+				// Scoped to the current user (admin, id 1): the editor only
+				// reads that author's autosave.
+				`GET /wp/v2/pages/${ pageId }/autosaves?context=edit&author=1`,
 				'GET /wp/v2/taxonomies?context=edit',
 				'GET /wp/v2/templates/lookup?slug=front-page',
 				'GET /wp/v2/types/page?context=edit',

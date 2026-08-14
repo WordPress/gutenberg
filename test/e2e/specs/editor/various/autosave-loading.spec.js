@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const {
 	test,
 	expect,
@@ -72,15 +69,43 @@ async function waitForAutosaveResolution( page, postId ) {
 	await page.waitForFunction( () => window?.wp?.data );
 	await expect
 		.poll( () =>
-			page.evaluate(
-				( id ) =>
-					window.wp.data
-						.select( 'core' )
-						.hasFetchedAutosaves( 'post', id ),
-				postId
-			)
+			page.evaluate( ( id ) => {
+				const { select } = window.wp.data;
+				const authorId = select( 'core' ).getCurrentUser()?.id;
+
+				return select( 'core' ).hasFetchedAutosave(
+					'post',
+					id,
+					authorId
+				);
+			}, postId )
 		)
 		.toBe( true );
+}
+
+/**
+ * Discards the resolved autosave and asks for it again, so the next request
+ * goes to the network.
+ *
+ * The preload cache serves each entry once, so a re-resolution is the only way
+ * to observe the request the editor makes on a page that was preloaded.
+ *
+ * @param {import('@playwright/test').Page} page   Page to refetch in.
+ * @param {number}                          postId Post being edited.
+ */
+async function refetchAutosave( page, postId ) {
+	await page.evaluate( ( id ) => {
+		const { dispatch, resolveSelect, select } = window.wp.data;
+		const authorId = select( 'core' ).getCurrentUser()?.id;
+
+		dispatch( 'core' ).invalidateResolution( 'getAutosave', [
+			'post',
+			id,
+			authorId,
+		] );
+
+		return resolveSelect( 'core' ).getAutosave( 'post', id, authorId );
+	}, postId );
 }
 
 /**
@@ -167,7 +192,7 @@ test.describe( 'Autosave loading', () => {
 		await requestUtils.deleteAllPosts();
 	} );
 
-	test( 'requests a single author-scoped autosave on load', async ( {
+	test( 'serves the author-scoped autosave from the preload cache', async ( {
 		admin,
 		page,
 		requestUtils,
@@ -183,16 +208,23 @@ test.describe( 'Autosave loading', () => {
 		await admin.editPost( post.id );
 		await waitForAutosaveResolution( page, post.id );
 
+		// No request at all. The preloaded path and the one the editor asks
+		// for have to agree exactly, or the preload goes unused and the
+		// editor fetches over the network what it was already handed.
+		expect( requests ).toHaveLength( 0 );
+
 		const currentUserId = await page.evaluate(
 			() => window.wp.data.select( 'core' ).getCurrentUser()?.id
 		);
 
-		// One request, not two. The editor's preload kickoff and
-		// `isEditedPostAutosaveable` have to ask for the same record under the
-		// same resolution key, or each fetches its own.
+		// Ask again with the preload spent, to see the request itself. One,
+		// not two: the editor's preload kickoff and `isEditedPostAutosaveable`
+		// have to ask for the same record under the same resolution key, or
+		// each fetches its own.
+		await refetchAutosave( page, post.id );
+
 		expect( requests ).toHaveLength( 1 );
 		expect( requests[ 0 ].searchParams.get( 'context' ) ).toBe( 'edit' );
-		expect( requests[ 0 ].searchParams.get( 'per_page' ) ).toBe( '1' );
 		expect( requests[ 0 ].searchParams.get( 'author' ) ).toBe(
 			String( currentUserId )
 		);
@@ -220,7 +252,7 @@ test.describe( 'Autosave loading', () => {
 		await page.keyboard.type( ' edited' );
 
 		// `isEditedPostAutosaveable` returns false for as long as
-		// `hasFetchedAutosaves` is false, which is how a resolution recorded
+		// `hasFetchedAutosave` is false, which is how a resolution recorded
 		// under a key nothing reads disables autosaving with no visible error.
 		await expect
 			.poll( () =>
@@ -300,6 +332,9 @@ test.describe( 'Autosave loading', () => {
 			const requests = trackAutosaveRequests( secondUserPage );
 			await gotoPostEditor( secondUserPage, post.id );
 			await waitForAutosaveResolution( secondUserPage, post.id );
+
+			// The load itself is preloaded, so refetch to see the request.
+			await refetchAutosave( secondUserPage, post.id );
 
 			expect( requests ).toHaveLength( 1 );
 			expect( requests[ 0 ].searchParams.get( 'author' ) ).toBe(
