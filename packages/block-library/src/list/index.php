@@ -30,6 +30,10 @@ function block_core_list_render( $attributes, $content ) {
 	while ( $processor->next_tag() ) {
 		if ( in_array( $processor->get_tag(), $list_tags, true ) ) {
 			$processor->add_class( 'wp-block-list' );
+			$layout = $attributes['layout'] ?? array();
+			if ( ! empty( $layout['contentSize'] ) || ! empty( $layout['wideSize'] ) ) {
+				$processor->add_class( 'has-custom-content-size' );
+			}
 			break;
 		}
 	}

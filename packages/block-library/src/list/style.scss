@@ -8,3 +8,26 @@ ul {
 :root :where(.wp-block-list.has-background) {
 	padding: $block-bg-padding--v $block-bg-padding--h;
 }
+
+// Constrained layout justifies children with auto margins. List items otherwise
+// stretch to the full width of the list, so justification has no visible effect.
+// Shrink items to their content so left/center/right can apply, including when a
+// custom content/wide width is set (e.g. 100%). Only cap at 100% when there is
+// no custom size, so constrained layout's max-width is not overridden.
+ul.wp-block-list.is-content-justification-left > li,
+ol.wp-block-list.is-content-justification-left > li,
+ul.wp-block-list.is-content-justification-center > li,
+ol.wp-block-list.is-content-justification-center > li,
+ul.wp-block-list.is-content-justification-right > li,
+ol.wp-block-list.is-content-justification-right > li {
+	width: max-content;
+}
+
+ul.wp-block-list.is-content-justification-left:not(.has-custom-content-size) > li,
+ol.wp-block-list.is-content-justification-left:not(.has-custom-content-size) > li,
+ul.wp-block-list.is-content-justification-center:not(.has-custom-content-size) > li,
+ol.wp-block-list.is-content-justification-center:not(.has-custom-content-size) > li,
+ul.wp-block-list.is-content-justification-right:not(.has-custom-content-size) > li,
+ol.wp-block-list.is-content-justification-right:not(.has-custom-content-size) > li {
+	max-width: 100%;
+}
