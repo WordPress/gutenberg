@@ -31,5 +31,11 @@
 		{ "path": "../warning" },
 		{ "path": "../wordcount/tsconfig.build.json" }
 	],
-	"exclude": [ "**/benchmark", "**/test/**", "**/stories/**", "**/*.story.*" ]
+	"exclude": [
+		"**/benchmark",
+		"**/test/**",
+		"**/tests/**",
+		"**/stories/**",
+		"**/*.story.*"
+	]
 }

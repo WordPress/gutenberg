@@ -49,5 +49,11 @@
 		"src/components/block-visibility/use-block-visibility.ts"
 	],
 	"include": [ "src/utils/**/*.ts" ],
-	"exclude": [ "**/benchmark", "**/test/**", "**/stories/**", "**/*.story.*" ]
+	"exclude": [
+		"**/benchmark",
+		"**/test/**",
+		"**/tests/**",
+		"**/stories/**",
+		"**/*.story.*"
+	]
 }

@@ -10,5 +10,11 @@
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" }
 	],
-	"exclude": [ "**/benchmark", "**/test/**", "**/stories/**", "**/*.story.*" ]
+	"exclude": [
+		"**/benchmark",
+		"**/test/**",
+		"**/tests/**",
+		"**/stories/**",
+		"**/*.story.*"
+	]
 }
