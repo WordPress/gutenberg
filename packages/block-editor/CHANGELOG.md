@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Register and handle the keyboard shortcuts that blocks declare on their variations and transforms, so that any block can contribute a shortcut without the editor knowing about it. Shortcuts apply to the selected block, and are listed under "Block shortcuts" in the keyboard shortcuts help modal ([#81588](https://github.com/WordPress/gutenberg/pull/81588)).
+
 ### Bug Fixes
 
 -   Never apply Spotlight mode in a preview canvas, which cannot be edited and so rendered most of its content faded ([#81615](https://github.com/WordPress/gutenberg/pull/81615)).

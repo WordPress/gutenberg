@@ -9,6 +9,7 @@ import {
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import Root from '../root';
+import ErrorBoundary from '../error-boundary';
 import type { Route, RouteConfig, RouteLoaderContext } from '../../store/types';
 import { unlock } from '../../lock-unlock';
 
@@ -129,12 +130,16 @@ function createRouteFromDefinition( route: Route, parentRoute: AnyRoute ) {
 					<>
 						{ Stage && showStage && (
 							<div className="boot-layout__stage">
-								<Stage />
+								<ErrorBoundary>
+									<Stage />
+								</ErrorBoundary>
 							</div>
 						) }
 						{ Inspector && showInspector && (
 							<div className="boot-layout__inspector">
-								<Inspector />
+								<ErrorBoundary>
+									<Inspector />
+								</ErrorBoundary>
 							</div>
 						) }
 					</>

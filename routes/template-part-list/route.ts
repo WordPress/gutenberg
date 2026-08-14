@@ -51,9 +51,6 @@ export const route = {
 				postType: 'wp_template_part',
 				postId,
 				isPreview: true,
-				editLink: `/types/wp_template_part/edit/${ encodeURIComponent(
-					postId
-				) }`,
 			};
 		}
 
@@ -72,9 +69,6 @@ export const route = {
 				postType: 'wp_template_part',
 				postId,
 				isPreview: true,
-				editLink: `/types/wp_template_part/edit/${ encodeURIComponent(
-					postId
-				) }`,
 			};
 		}
 
