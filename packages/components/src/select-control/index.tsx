@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import BaseControl from '../base-control';
 import { Select, StyledInputBase } from './styles/select-control-styles';
 import type { WordPressComponentProps } from '../context';

@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { Button, Dropdown } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import PostScheduleCheck from './check';
 import PostScheduleForm from './index';
 import { usePostScheduleLabel } from './label';

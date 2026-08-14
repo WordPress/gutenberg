@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import clearUnchangedEdits from '../clear-unchanged-edits';
 
 describe( 'clearUnchangedEdits', () => {

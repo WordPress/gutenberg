@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen, waitFor } from '@testing-library/react';
 import { press, hover, click, sleep } from '@ariakit/test';
-
-/**
- * WordPress dependencies
- */
 import { shortcutAriaLabel } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import Modal from '../../modal';
 import Tooltip, { TOOLTIP_DELAY } from '..';
 

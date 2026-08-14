@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getFormatType } from '../get-format-type';
 import { unregisterFormatType } from '../unregister-format-type';
 import { registerFormatType } from '../register-format-type';

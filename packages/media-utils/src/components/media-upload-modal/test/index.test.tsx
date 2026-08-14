@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import { MediaUploadModal } from '../index';
 import { unlock } from '../../../lock-unlock';
 

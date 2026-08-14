@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { RawHTML } from '@wordpress/element';
 import {
 	getColorClassName,
@@ -13,7 +6,6 @@ import {
 	RichText,
 	useBlockProps,
 } from '@wordpress/block-editor';
-
 import { isRTL } from '@wordpress/i18n';
 
 const supports = {

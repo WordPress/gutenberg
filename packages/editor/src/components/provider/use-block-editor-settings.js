@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -18,10 +15,6 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { privateApis as mediaEditorPrivateApis } from '@wordpress/media-editor';
-
-/**
- * Internal dependencies
- */
 import getInserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import mediaUploadOnSuccess from '../../utils/media-upload/on-success';
@@ -58,7 +51,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalGlobalStylesBaseStyles',
 	'allImageSizes',
 	'alignWide',
-	'blockStatesEnabled',
+	'blockStatesEditingEnabled',
 	'blockInspectorTabs',
 	'maxUploadFileSize',
 	'allowedMimeTypes',
@@ -352,8 +345,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		return settings.allowedBlockTypes;
 	}, [ settings.allowedBlockTypes, hiddenBlockTypes, blockTypes ] );
 
-	const forceDisableFocusMode = settings.focusMode === false;
-
 	// The "Attachments" media category depends on the edited post and its post
 	// type label (which gates whether it's offered and words its copy), so the
 	// categories are derived rather than being a static list.
@@ -378,7 +369,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			imageMaxBitDepth,
 			allowedBlockTypes,
 			allowRightClickOverrides,
-			focusMode: focusMode && ! forceDisableFocusMode,
+			focusMode,
 			hasFixedToolbar,
 			isDistractionFree,
 			keepCaretInsideBlock,
@@ -474,7 +465,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		allowedBlockTypes,
 		allowRightClickOverrides,
 		focusMode,
-		forceDisableFocusMode,
 		hasFixedToolbar,
 		isDistractionFree,
 		keepCaretInsideBlock,

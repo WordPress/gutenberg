@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### New Features
+
+-   Block variations and `block` type block transforms accept a `shortcut` property, declaring a keyboard shortcut that applies the variation or transform to the selected block. See the [block variations](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-variations/) and [block transforms](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-transforms/) documentation ([#81588](https://github.com/WordPress/gutenberg/pull/81588)).
+
+## 15.26.0 (2026-08-12)
+
+### Internal
+
+-   Update `hpq` to 1.4.0 for its bundled TypeScript types ([#81199](https://github.com/WordPress/gutenberg/pull/81199)).
+
+## 15.25.0 (2026-07-29)
+
 ### Internal
 
 -   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).

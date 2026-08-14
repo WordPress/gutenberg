@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -11,10 +8,6 @@ import {
 	type PostSaveEvent,
 } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 

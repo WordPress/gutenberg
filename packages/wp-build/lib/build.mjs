@@ -1,8 +1,4 @@
 #!/usr/bin/env node
-
-/**
- * External dependencies
- */
 import { readFile, writeFile, copyFile, mkdir, unlink } from 'fs/promises';
 import path from 'path';
 import { createHash } from 'node:crypto';
@@ -21,30 +17,6 @@ import cssnano from 'cssnano';
 import babel from 'esbuild-plugin-babel';
 import { camelCase } from 'change-case';
 import { NodePackageImporter } from 'sass-embedded';
-
-// Optional dependency: @wordpress/theme provides plugins that inject fallback
-// values for design system tokens. Fails gracefully when the package is not
-// installed (it is an optional peerDependency).
-let dsTokenFallbacks;
-let dsTokenFallbacksJs;
-try {
-	const { default: postcssPlugin } = await import(
-		// eslint-disable-next-line import/no-unresolved
-		'@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks'
-	);
-	const { default: esbuildPlugin } = await import(
-		// eslint-disable-next-line import/no-unresolved
-		'@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks'
-	);
-	dsTokenFallbacks = postcssPlugin;
-	dsTokenFallbacksJs = esbuildPlugin;
-} catch {
-	// @wordpress/theme is optional; skip token fallbacks if not available.
-}
-
-/**
- * Internal dependencies
- */
 import {
 	groupByDepth,
 	findScriptsToRebundle,
@@ -73,6 +45,26 @@ import {
 	buildWorkers,
 	generateWorkerCode,
 } from './worker-build.mjs';
+
+// Optional dependency: @wordpress/theme provides plugins that inject fallback
+// values for design system tokens. Fails gracefully when the package is not
+// installed (it is an optional peerDependency).
+let dsTokenFallbacks;
+let dsTokenFallbacksJs;
+try {
+	const { default: postcssPlugin } = await import(
+		// eslint-disable-next-line import/no-unresolved
+		'@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks'
+	);
+	const { default: esbuildPlugin } = await import(
+		// eslint-disable-next-line import/no-unresolved
+		'@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks'
+	);
+	dsTokenFallbacks = postcssPlugin;
+	dsTokenFallbacksJs = esbuildPlugin;
+} catch {
+	// @wordpress/theme is optional; skip token fallbacks if not available.
+}
 
 const ROOT_DIR = process.cwd();
 const PACKAGES_DIR = path.join( ROOT_DIR, 'packages' );
@@ -624,12 +616,33 @@ async function bundlePackage( packageName, options = {} ) {
 			globalName,
 		};
 
-		// For packages with default exports, add a footer to properly expose the default
-		if ( packageJson.wpScriptDefaultExport && globalName ) {
-			baseConfig.footer = {
-				js: `if (typeof ${ globalName } === 'object' && ${ globalName }.default) { ${ globalName } = ${ globalName }.default; }`,
-			};
+		/*
+		 * Wrap the bundle in an IIFE so the `'use strict'` directive esbuild emits for the
+		 * (strict) ES module output stays at the function level. Left at the top of the
+		 * file it is a *file-level* directive, which — because load-scripts.php
+		 * concatenates raw file contents — forces strict mode onto any sloppy-mode script
+		 * bundled after it, throwing on e.g. implicit globals. Wrapping confines the
+		 * directive to this bundle. See https://core.trac.wordpress.org/ticket/65515.
+		 */
+		baseConfig.banner = { js: '(function() {' };
+
+		/*
+		 * esbuild's `globalName` assigns onto a locally-declared `var` root (using a
+		 * `window.…` global name would emit `var window`, shadowing the real global), so
+		 * that assignment is trapped inside the wrapper. Re-expose it on the real global
+		 * object in the footer, then close the IIFE.
+		 */
+		let footerJs = '';
+		if ( shouldExposeGlobal ) {
+			const globalMember = camelCase( packageName );
+			// For packages with default exports, expose the default, not the namespace.
+			if ( packageJson.wpScriptDefaultExport ) {
+				footerJs += `if (typeof ${ globalName } === 'object' && ${ globalName }.default) { ${ globalName } = ${ globalName }.default; }\n`;
+			}
+			footerJs += `(window.${ scriptGlobal } ||= {}).${ globalMember } = ${ scriptGlobal }.${ globalMember };\n`;
 		}
+		footerJs += '})();';
+		baseConfig.footer = { js: footerJs };
 
 		const baseBundlePlugins = [
 			momentTimezoneAliasPlugin(),
@@ -2165,6 +2178,18 @@ function toPhpActionsLiteral( actions ) {
 				);
 			}
 
+			if ( action.icon !== undefined ) {
+				parts.push(
+					`'icon' => ${ toPhpStringLiteral( action.icon ) }`
+				);
+			}
+
+			if ( action.relevance !== undefined ) {
+				parts.push(
+					`'relevance' => ${ toPhpStringLiteral( action.relevance ) }`
+				);
+			}
+
 			return `array( ${ parts.join( ', ' ) } )`;
 		} );
 
@@ -2376,7 +2401,12 @@ async function buildAll( baseUrlExpression ) {
 				path: metadata.path,
 				page,
 				hasRoute: routeFiles.hasRoute,
-				hasContent: routeFiles.hasStage || routeFiles.hasInspector,
+				// Must match the condition that builds `content.js`, which
+				// bundles the canvas alongside the stage and inspector.
+				hasContent:
+					routeFiles.hasStage ||
+					routeFiles.hasInspector ||
+					routeFiles.hasCanvas,
 			};
 		} );
 	} );

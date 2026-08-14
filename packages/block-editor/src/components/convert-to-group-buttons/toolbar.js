@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { group, row, stack, grid } from '@wordpress/icons';
 import { _x } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useConvertToGroupButtonProps } from '../convert-to-group-buttons';
 import { store as blockEditorStore } from '../../store';
 import { groupBlocks } from '../../utils/group-blocks';

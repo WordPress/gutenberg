@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 import { createBlobURL } from '@wordpress/blob';
 import { addFilter } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
 import {
 	LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_NONE,

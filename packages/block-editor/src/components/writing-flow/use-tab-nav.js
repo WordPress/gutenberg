@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { focus, isFormElement } from '@wordpress/dom';
 import { TAB } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect, useMergeRefs } from '@wordpress/compose';
 import { useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { isInSameBlock, isInsideRootBlock } from '../../utils/dom';
 import { unlock } from '../../lock-unlock';
@@ -176,7 +169,13 @@ export default function useTabNav() {
 		}
 
 		function onFocusOut( event ) {
-			setLastFocus( { ...getLastFocus(), current: event.target } );
+			// `focusout` also fires when focus moves between elements within the
+			// canvas, but only the element focus left the canvas from is of
+			// interest. `contains` is false for a null `relatedTarget`, which is
+			// what focus moving to another document reports.
+			if ( ! node.contains( event.relatedTarget ) ) {
+				setLastFocus( { current: event.target } );
+			}
 
 			const { ownerDocument } = node;
 

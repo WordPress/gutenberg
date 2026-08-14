@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	InspectorControls,
@@ -21,10 +14,6 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 function InputFieldBlock( { attributes, setAttributes, className } ) {

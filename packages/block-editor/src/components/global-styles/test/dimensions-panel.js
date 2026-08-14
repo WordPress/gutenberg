@@ -1,13 +1,6 @@
 /* eslint jest/expect-expect: ["warn", { "assertFunctionNames": ["expect", "expectLocalOverride", "expectPlaceholderState"] }] */
-/**
- * External dependencies
- */
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * Internal dependencies
- */
 import DimensionsPanel from '../dimensions-panel';
 
 // The inheritance treatment sits behind the

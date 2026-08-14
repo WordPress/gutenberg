@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { logged } from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import pure from '../';
 
 describe( 'pure', () => {

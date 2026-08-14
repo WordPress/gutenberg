@@ -26,14 +26,14 @@ widgets/hello-world/
 ├── widget.ts          metadata module: default-exports attributes, example
 ├── render.tsx         render module: default-exports the React component
 ├── style.module.css   optional, injected at runtime by the build
-└── report.csv         optional static asset linked from an action `href`
+└── report.csv         optional static asset; action `href`s resolve it only where `widgets/` ships
 ```
 
 The split between `widget.json` and `widget.ts` is deliberate. `widget.json` is build-time input: plain JSON the pipeline can read without executing code, including the translatable strings (`title`, `description`, `help`, `keywords`) the server localizes through `textdomain`.
 
 Unlike the other translatable strings, `help` is an object: `content` plus optional `links`, meant for compact surfaces such as tooltips.
 
-`actions`: declarative verbs (`id`, `label`, plus exactly one fulfillment key). Today the only key is `href`, a link target, with optional `download` / `openInNewTab`. Hosts mount the primitive and place it; the dashboard uses a "More" menu. A relative `href` that exists under `widgets/{name}/` becomes a plugin URL at registration; missing relative non-admin files are dropped. `data:` and `javascript:` hrefs are rejected. Prefer absolute URLs for assets that must work in the plugin zip (which does not ship `widgets/`).
+`actions`: declarative verbs (`id`, `label`, optional `icon` and `relevance`, plus exactly one fulfillment key). Today the only key is `href`, a link target, with optional `download` / `openInNewTab`. Hosts mount the primitive and place it; the dashboard routes by `relevance`: `'high'` and `'medium'` to a persistent footer, the rest to a "More" menu. A relative `href` that exists under `widgets/{name}/` becomes a plugin URL at registration; missing relative non-admin files are dropped. `data:` and `javascript:` hrefs are rejected. Prefer absolute URLs for assets that must work in the plugin zip (which does not ship `widgets/`).
 
 `icon`: a registered icon name (`collection/icon-name`), resolved client-side through the site's Icons API. Malformed names are dropped at registration.
 

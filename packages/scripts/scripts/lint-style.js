@@ -1,18 +1,5 @@
-/**
- * External dependencies
- */
 const { sync: spawn } = require( 'cross-spawn' );
 const { sync: resolveBin } = require( 'resolve-bin' );
-
-function isNoConfigFoundError( err ) {
-	return (
-		err.code === 78 && err.message.startsWith( 'No configuration provided' )
-	);
-}
-
-/**
- * Internal dependencies
- */
 const {
 	fromConfigRoot,
 	getArgsFromCLI,
@@ -20,6 +7,12 @@ const {
 	hasFileArgInCLI,
 	hasProjectFile,
 } = require( '../utils' );
+
+function isNoConfigFoundError( err ) {
+	return (
+		err.code === 78 && err.message.startsWith( 'No configuration provided' )
+	);
+}
 
 /**
  * Checks whether a resolvable Stylelint configuration exists

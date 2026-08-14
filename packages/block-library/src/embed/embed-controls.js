@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	ToolbarButton,
@@ -11,10 +8,6 @@ import {
 } from '@wordpress/components';
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 import { pencil } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 function getResponsiveHelp( checked ) {

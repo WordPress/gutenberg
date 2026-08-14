@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createUndoManager } from '@wordpress/undo-manager';
 import { useCallback, useReducer } from '@wordpress/element';
 import type { UndoManager } from '@wordpress/undo-manager';

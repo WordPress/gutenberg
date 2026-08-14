@@ -127,7 +127,7 @@ The state controls for blocks in the block inspector and Global Styles let users
 
 ```php
 function example_disable_block_states_editing( $settings ) {
-	$settings[ 'blockStatesEnabled' ] = false;
+	$settings[ 'blockStatesEditingEnabled' ] = false;
 
 	return $settings;
 }

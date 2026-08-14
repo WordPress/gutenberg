@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 const { confirm, select } = require( '@inquirer/prompts' );
 const { capitalCase } = require( 'change-case' );
 const program = require( 'commander' );
-
-/**
- * Internal dependencies
- */
 const checkSystemRequirements = require( './check-system-requirements' );
 const CLIError = require( './cli-error' );
 const log = require( './log' );
