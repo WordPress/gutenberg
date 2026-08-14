@@ -187,6 +187,7 @@ function UnforwardedLinkUI( props, ref ) {
 			onClose={ props.onClose }
 			anchor={ props.anchor }
 			shift
+			{ ...( props.popoverProps ?? {} ) }
 		>
 			{ ! addingBlock && ! addingPage && (
 				<div
