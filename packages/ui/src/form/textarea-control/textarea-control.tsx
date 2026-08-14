@@ -4,6 +4,24 @@ import type { TextareaControlProps } from './types';
 
 /**
  * A complete textarea field with integrated label and description.
+ *
+ * ```jsx
+ * import { TextareaControl } from '@wordpress/ui';
+ * import { useState } from '@wordpress/element';
+ *
+ * const MyTextareaControl = () => {
+ *   const [ text, setText ] = useState( '' );
+ *
+ *   return (
+ *     <TextareaControl
+ *       label="Text"
+ *       description="Enter some text"
+ *       value={ text }
+ *       onValueChange={ setText }
+ *     />
+ *   );
+ * };
+ * ```
  */
 export const TextareaControl = forwardRef<
 	HTMLTextAreaElement,

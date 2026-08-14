@@ -24,7 +24,9 @@ ruleTester.run( 'use-recommended-components', rule, {
 		"import { Link } from '@wordpress/ui';",
 		"import { Stack } from '@wordpress/ui';",
 		"import { Text } from '@wordpress/ui';",
-		"import { Badge, Icon, Link, Stack, Tabs, Text, Tooltip } from '@wordpress/ui';",
+		"import { Textarea } from '@wordpress/ui';",
+		"import { TextareaControl } from '@wordpress/ui';",
+		"import { Badge, Icon, Link, Stack, Tabs, Text, Textarea, TextareaControl, Tooltip } from '@wordpress/ui';",
 
 		// Unlocked private APIs are only checked for denied names.
 		"import { privateApis } from '@wordpress/components'; import { unlock } from '../../lock-unlock'; const { SomethingElse } = unlock( privateApis );",
@@ -119,6 +121,15 @@ ruleTester.run( 'use-recommended-components', rule, {
 			errors: [
 				{
 					message: 'Use `Tooltip` from `@wordpress/ui` instead.',
+				},
+			],
+		},
+		{
+			code: "import { TextareaControl } from '@wordpress/components';",
+			errors: [
+				{
+					message:
+						'Use `TextareaControl` from `@wordpress/ui` instead.',
 				},
 			],
 		},

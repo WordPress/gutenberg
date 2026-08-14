@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Mark `Textarea` and `TextareaControl` from `@wordpress/ui` as recommended, and discourage `TextareaControl` from `@wordpress/components`.
 -   The `dependency-group` rule's `"never"` mode now recognizes dependency comments regardless of capitalization or a trailing period while preserving other comments. ([#81246](https://github.com/WordPress/gutenberg/pull/81246))
 
 ## 25.8.0 (2026-07-29)

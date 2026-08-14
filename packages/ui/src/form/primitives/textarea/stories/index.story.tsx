@@ -2,13 +2,18 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Textarea } from '../index';
 
 const meta: Meta< typeof Textarea > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/Primitives/Textarea',
 	component: Textarea,
+	// Temporary: Due to an upstream bug, render the root explicitly so the
+	// components manifest extractor can resolve props from the JSX.
+	//
+	// See: https://github.com/storybookjs/storybook/issues/34877
+	render: ( args ) => <Textarea { ...args } />,
 	parameters: {
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components` and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };

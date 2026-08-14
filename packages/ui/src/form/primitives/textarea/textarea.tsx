@@ -19,6 +19,26 @@ const wrappedRender = (
 	};
 };
 
+/**
+ * A styled textarea input with design token styling.
+ *
+ * ```jsx
+ * import { Textarea } from '@wordpress/ui';
+ * import { useState } from '@wordpress/element';
+ *
+ * const MyTextarea = () => {
+ *   const [ value, setValue ] = useState( '' );
+ *
+ *   return (
+ *     <Textarea
+ *       value={ value }
+ *       onValueChange={ setValue }
+ *       placeholder="Enter text"
+ *     />
+ *   );
+ * };
+ * ```
+ */
 export const Textarea = forwardRef< HTMLTextAreaElement, TextareaProps >(
 	function Textarea(
 		{
