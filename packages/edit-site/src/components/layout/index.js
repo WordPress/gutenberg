@@ -41,7 +41,7 @@ const { useLocation } = unlock( routerPrivateApis );
 const { useStyle, UploadProgressSnackbar } = unlock( editorPrivateApis );
 
 const ANIMATION_DURATION = 0.3;
-const CONTENT_COLOR = { background: '#ffffff' };
+const CONTENT_COLOR = { background: '#fcfcfc' };
 
 function Layout() {
 	const { query, name: routeKey, areas, widths } = useLocation();
