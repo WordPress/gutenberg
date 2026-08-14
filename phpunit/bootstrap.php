@@ -93,6 +93,7 @@ $GLOBALS['wp_tests_options'] = array(
 		'gutenberg-media-processing'   => 1,
 		'gutenberg-guidelines'         => 1,
 		'gutenberg-dashboard-widgets'  => 1,
+		'gutenberg-pattern-blocks'     => 1,
 	),
 );
 

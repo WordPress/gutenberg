@@ -4,11 +4,19 @@ import {
 	setUnregisteredTypeHandlerName,
 	setGroupingBlockName,
 	registerBlockType,
+	parse,
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { useDisabled } from '@wordpress/compose';
 import { select } from '@wordpress/data';
-import { useBlockProps } from '@wordpress/block-editor';
+import {
+	RecursionProvider,
+	useBlockProps,
+	useHasRecursion,
+	useInnerBlocksProps,
+	Warning,
+} from '@wordpress/block-editor';
+import { useMemo } from '@wordpress/element';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { __, sprintf } from '@wordpress/i18n';
 import HtmlRenderer from './utils/html-renderer';
@@ -299,6 +307,62 @@ export const __experimentalGetCoreBlocks = () =>
 		( { metadata } ) => ! isBlockMetadataExperimental( metadata )
 	);
 
+const NOOP = () => {};
+
+/**
+ * Builds block components for pattern-backed PHP-only blocks.
+ *
+ * @param {string} blockName Registered block name.
+ * @param {string} markup    Pattern markup.
+ * @return {{ edit: Function, save: Function }} Block components.
+ */
+function createPatternBlockComponents( blockName, markup ) {
+	function save() {
+		// The markup stays in the registration, so an instance only saves attributes.
+		return null;
+	}
+
+	// The binding source writes bound edits to `content`, so this controlled
+	// tree needs no sync handlers.
+	function PatternBlockEdit() {
+		const blocks = useMemo( () => parse( markup ), [] );
+		const innerBlocksProps = useInnerBlocksProps( useBlockProps(), {
+			value: blocks,
+			onInput: NOOP,
+			onChange: NOOP,
+			renderAppender: false,
+		} );
+		return <div { ...innerBlocksProps } />;
+	}
+
+	function RecursionWarning() {
+		const blockProps = useBlockProps();
+		return (
+			<div { ...blockProps }>
+				<Warning>
+					{ __( 'Block cannot be rendered inside itself.' ) }
+				</Warning>
+			</div>
+		);
+	}
+
+	function Edit() {
+		const hasAlreadyRendered = useHasRecursion( blockName );
+
+		if ( hasAlreadyRendered ) {
+			return <RecursionWarning />;
+		}
+
+		return (
+			<RecursionProvider uniqueId={ blockName }>
+				<PatternBlockEdit />
+			</RecursionProvider>
+		);
+	}
+
+	return { edit: Edit, save };
+}
+
 /**
  * Function to register core blocks provided by the block editor.
  *
@@ -319,6 +383,11 @@ export const registerCoreBlocks = (
 	// Auto-register PHP-only blocks with ServerSideRender
 	if ( window.__unstableAutoRegisterBlocks ) {
 		window.__unstableAutoRegisterBlocks.forEach( ( blockName ) => {
+			// Pattern-backed blocks use the dedicated registration below.
+			if ( window.__unstableAutoRegisterBlockPatterns?.[ blockName ] ) {
+				return;
+			}
+
 			const bootstrappedBlockType = unlock(
 				select( blocksStore )
 			).getBootstrappedBlockType( blockName );
@@ -380,6 +449,35 @@ export const registerCoreBlocks = (
 				save: () => null,
 			} );
 		} );
+	}
+
+	// Auto-register PHP-only `pattern` blocks.
+	if ( window.__unstableAutoRegisterBlockPatterns ) {
+		Object.entries( window.__unstableAutoRegisterBlockPatterns ).forEach(
+			( [ blockName, markup ] ) => {
+				const bootstrappedBlockType = unlock(
+					select( blocksStore )
+				).getBootstrappedBlockType( blockName );
+
+				registerBlockType( blockName, {
+					...bootstrappedBlockType,
+					title: bootstrappedBlockType?.title || blockName,
+					...( ( bootstrappedBlockType?.apiVersion ?? 0 ) < 3 && {
+						apiVersion: 3,
+					} ),
+					example: bootstrappedBlockType?.example ?? {
+						innerBlocks: parse( markup ),
+					},
+					// Each instance needs an overrides object of its own. Define the
+					// default here because an empty PHP array reaches JavaScript as `[]`.
+					attributes: {
+						...bootstrappedBlockType?.attributes,
+						content: { type: 'object', default: {} },
+					},
+					...createPatternBlockComponents( blockName, markup ),
+				} );
+			}
+		);
 	}
 
 	setDefaultBlockName( paragraph.name );
