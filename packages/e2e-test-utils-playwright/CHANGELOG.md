@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `Metrics.getInteractionDurations()`: Return the input-to-next-paint duration of each traced interaction, read from the `EventTiming` records already present in the trace. Unlike `getSelectionEventDurations()`, it covers the render and the presentation delay, which is what INP measures.
+
 ## 1.53.0 (2026-08-12)
 
 ### Bug Fixes

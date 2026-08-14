@@ -314,23 +314,32 @@ test.describe( 'Post Editor Performance', () => {
 				// Click the next paragraph.
 				await paragraph.click();
 
+				// An `EventTiming` record only reaches the trace once the frame
+				// it measures has been presented, so let the click paint before
+				// tracing stops.
+				await page.evaluate(
+					() =>
+						new Promise( ( resolve ) => {
+							window.requestAnimationFrame( () =>
+								window.requestAnimationFrame( resolve )
+							);
+						} )
+				);
+
 				// Stop tracing. Save just one representative sample.
 				await metrics.stopTracing(
 					i === Math.floor( iterations / 2 ) && 'post-editor-focus'
 				);
 
-				// Get the durations.
-				const allDurations = metrics.getSelectionEventDurations();
-				const duration = allDurations.reduce(
-					( acc, eventDurations ) => acc + sum( eventDurations ),
-					0
-				);
+				// Get the durations. A click is one interaction, so this is a
+				// single duration.
+				const durations = metrics.getInteractionDurations();
 
 				// Save the results.
 				if ( i === 1 ) {
-					results.firstFocus.push( duration );
+					results.firstFocus.push( ...durations );
 				} else {
-					results.focus.push( duration );
+					results.focus.push( ...durations );
 				}
 			}
 		} );

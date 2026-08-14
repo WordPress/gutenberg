@@ -37,6 +37,18 @@ type EventDispatch = TraceEvent & {
 	args: { data: { type: EventType } };
 };
 
+// A traced `EventTiming`, once filtered down to the entries that belong to an
+// interaction.
+interface InteractionTiming extends TraceEvent {
+	args: {
+		data: {
+			type: EventType;
+			duration: number;
+			interactionId: number;
+		};
+	};
+}
+
 interface Trace {
 	traceEvents: TraceEvent[];
 }
@@ -364,6 +376,57 @@ export class Metrics {
 		return [ ...durations.values() ].filter(
 			( eventDurations ) => eventDurations.length
 		);
+	}
+
+	/**
+	 * Measures from the input timestamp to the paint that follows, so unlike
+	 * `getSelectionEventDurations` it also covers the render and the
+	 * presentation delay. This is the quantity INP aggregates.
+	 *
+	 * Chromium emits one `EventTiming` entry per event of an interaction, all
+	 * carrying that same duration, so the entries are grouped by
+	 * `interactionId`. Entries outside an interaction have an `interactionId`
+	 * of `0`. The values come from the Event Timing API and are rounded to 8ms.
+	 *
+	 * A record only reaches the trace once the frame it measures has been
+	 * presented, so callers have to let the interaction paint before calling
+	 * `stopTracing()`. Stopping right after the input drops most of them.
+	 *
+	 * @return Input-to-next-paint duration of each traced interaction.
+	 */
+	getInteractionDurations() {
+		if ( this.trace.traceEvents.length === 0 ) {
+			throw new Error(
+				'No trace events found. Did you forget to call stopTracing()?'
+			);
+		}
+
+		const durations = new Map< number, number >();
+
+		for ( const item of this.trace.traceEvents ) {
+			if (
+				item.cat !== 'devtools.timeline' ||
+				item.name !== 'EventTiming'
+			) {
+				continue;
+			}
+
+			const data = ( item as InteractionTiming ).args.data;
+
+			if ( ! data?.interactionId ) {
+				continue;
+			}
+
+			durations.set(
+				data.interactionId,
+				Math.max(
+					durations.get( data.interactionId ) ?? 0,
+					data.duration
+				)
+			);
+		}
+
+		return [ ...durations.values() ];
 	}
 
 	/**
