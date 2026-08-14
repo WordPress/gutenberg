@@ -1,6 +1,6 @@
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { plus } from '@wordpress/icons';
@@ -123,11 +123,17 @@ export default function BlockParentSelector() {
 								label={
 									hasSingleBlockType
 										? sprintf(
-												/* translators: %s: title of the block to be added. */
-												__( 'Add %s' ),
-												blockTitle
+												// translators: %s: the name of the block when there is only one
+												_x(
+													'Add %s',
+													'directly add the only allowed block'
+												),
+												blockTitle.toLowerCase()
 										  )
-										: __( 'Add block' )
+										: _x(
+												'Add block',
+												'Generic label for block inserter button'
+										  )
 								}
 								showTooltip
 								icon={ plus }
