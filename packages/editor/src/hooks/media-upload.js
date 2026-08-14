@@ -1,6 +1,6 @@
-import { Component } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import deprecated from '@wordpress/deprecated';
+import { useState } from '@wordpress/element';
 import {
 	MediaUpload,
 	privateApis as mediaUtilsPrivateApis,
@@ -14,57 +14,49 @@ const { MediaUploadModal: MediaUploadModalComponent } = unlock(
 /**
  * Class component wrapper for MediaUploadModal to maintain compatibility
  * with the stable MediaUpload component API (render prop pattern).
+ * @param {Object} props Component props.
  */
-class MediaUploadModalWrapper extends Component {
-	constructor( props ) {
-		super( props );
-		this.state = {
-			isOpen: false,
-		};
-		this.openModal = this.openModal.bind( this );
-		this.closeModal = this.closeModal.bind( this );
-	}
+function MediaUploadModalWrapper( props ) {
+	const [ isOpen, setIsOpen ] = useState( false );
 
-	openModal() {
-		this.setState( { isOpen: true } );
-	}
+	const {
+		allowedTypes,
+		multiple,
+		value,
+		onSelect,
+		title,
+		modalClass,
+		render,
+		onClose,
+	} = props;
 
-	closeModal() {
-		this.setState( { isOpen: false } );
-		this.props.onClose?.();
-	}
+	const closeModal = () => {
+		setIsOpen( false );
+		onClose?.();
+	};
 
-	render() {
-		const {
-			allowedTypes,
-			multiple,
-			value,
-			onSelect,
-			title,
-			modalClass,
-			render,
-		} = this.props;
-		const { isOpen } = this.state;
+	const openModal = () => {
+		setIsOpen( true );
+	};
 
-		return (
-			<>
-				{ render( { open: this.openModal } ) }
-				<MediaUploadModalComponent
-					allowedTypes={ allowedTypes }
-					multiple={ multiple }
-					value={ value }
-					onSelect={ ( media ) => {
-						onSelect( media );
-						this.closeModal();
-					} }
-					onClose={ this.closeModal }
-					title={ title }
-					isOpen={ isOpen }
-					modalClass={ modalClass }
-				/>
-			</>
-		);
-	}
+	return (
+		<>
+			{ render( { open: openModal } ) }
+			<MediaUploadModalComponent
+				allowedTypes={ allowedTypes }
+				multiple={ multiple }
+				value={ value }
+				onSelect={ ( media ) => {
+					onSelect( media );
+					closeModal();
+				} }
+				onClose={ closeModal }
+				title={ title }
+				isOpen={ isOpen }
+				modalClass={ modalClass }
+			/>
+		</>
+	);
 }
 
 if ( window.__experimentalDataViewsMediaModal ) {
