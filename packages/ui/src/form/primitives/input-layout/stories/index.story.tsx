@@ -1,20 +1,23 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { copy } from '@wordpress/icons';
-import * as InputLayout from '../index';
+import { InputLayout as InputLayoutComponent } from '../input-layout';
+import { InputLayout } from '../';
 import { IconButton } from '../../../../icon-button';
 
-const meta: Meta< typeof InputLayout.Root > = {
+const meta: Meta< typeof InputLayoutComponent > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/Primitives/InputLayout',
-	component: InputLayout.Root,
+	component: InputLayoutComponent,
 	subcomponents: {
 		'InputLayout.Slot': InputLayout.Slot,
 	},
-	// Temporary: Due to an upstream bug, render the root explicitly so the
-	// components manifest extractor can resolve props from the JSX.
+	// Temporary: Due to an upstream bug, render the component explicitly so the
+	// components manifest extractor can resolve props from the JSX. The public
+	// export is a compound `Object.assign`, so point `component` at the
+	// implementation module instead (same approach as ColorPicker).
 	//
 	// See: https://github.com/storybookjs/storybook/issues/34877
-	render: ( args ) => <InputLayout.Root { ...args } />,
+	render: ( args ) => <InputLayoutComponent { ...args } />,
 	parameters: {
 		componentStatus: {
 			status: 'recommended',
@@ -24,7 +27,7 @@ const meta: Meta< typeof InputLayout.Root > = {
 };
 export default meta;
 
-type Story = StoryObj< typeof InputLayout.Root >;
+type Story = StoryObj< typeof InputLayoutComponent >;
 
 export const Default: Story = {
 	args: {},

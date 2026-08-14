@@ -519,7 +519,7 @@
       - suffix
       - type
       - value
-- name: InputLayout.Root
+- name: InputLayoutComponent
   props:
       - isBorderless
       - prefix

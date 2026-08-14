@@ -1,8 +1,6 @@
-import { InputLayout as Root } from './input-layout';
-import { InputLayoutSlot as Slot } from './slot';
+import { InputLayout as _InputLayout } from './input-layout';
+import { InputLayoutSlot } from './slot';
 
-export { Root, Slot };
-
-export const InputLayout = Object.assign( Root, {
-	Slot,
+export const InputLayout = Object.assign( _InputLayout, {
+	Slot: InputLayoutSlot,
 } );
