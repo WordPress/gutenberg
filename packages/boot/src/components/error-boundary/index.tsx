@@ -49,20 +49,22 @@ export default class ErrorBoundary extends Component< Props, State > {
 		}
 
 		return (
-			<EmptyState.Root>
-				<EmptyState.Icon icon={ caution } />
-				<EmptyState.Title>
-					{ __( 'Something went wrong' ) }
-				</EmptyState.Title>
-				<EmptyState.Description>
-					{ __(
-						'This part of the screen could not be displayed. Reloading the page may help.'
-					) }
-				</EmptyState.Description>
-				<EmptyState.Actions>
-					<CopyErrorButton error={ error } />
-				</EmptyState.Actions>
-			</EmptyState.Root>
+			<div className="boot-error-boundary">
+				<EmptyState.Root>
+					<EmptyState.Icon icon={ caution } />
+					<EmptyState.Title>
+						{ __( 'Something went wrong' ) }
+					</EmptyState.Title>
+					<EmptyState.Description>
+						{ __(
+							'This part of the screen could not be displayed. Reloading the page may help.'
+						) }
+					</EmptyState.Description>
+					<EmptyState.Actions>
+						<CopyErrorButton error={ error } />
+					</EmptyState.Actions>
+				</EmptyState.Root>
+			</div>
 		);
 	}
 }
