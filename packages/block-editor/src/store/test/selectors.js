@@ -2882,6 +2882,37 @@ describe( 'selectors', () => {
 			);
 		} );
 
+		it( 'should stop allowing blocks once preview mode is turned on', () => {
+			const blocks = {
+				byClientId: new Map(),
+				attributes: new Map(),
+				order: new Map(),
+				parents: new Map(),
+				blockEditingModes: new Map(),
+			};
+			const editing = {
+				blocks,
+				blockListSettings: new Map(),
+				settings: {},
+			};
+			// Ask once while the canvas is editable, so the answer is
+			// memoized, then turn preview mode on. The editor intent flips
+			// this setting at runtime, so a stale `true` here is what lets a
+			// read-only canvas split blocks and open a working inserter.
+			expect( canInsertBlockType( editing, 'core/test-block-a' ) ).toBe(
+				true
+			);
+
+			const previewing = {
+				blocks,
+				blockListSettings: new Map(),
+				settings: { isPreviewMode: true },
+			};
+			expect(
+				canInsertBlockType( previewing, 'core/test-block-a' )
+			).toBe( false );
+		} );
+
 		it( 'should deny blocks when the editor has a template lock', () => {
 			const state = {
 				blocks: {
