@@ -1,12 +1,21 @@
 import { useCallback, useEffect } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { useSuggestionOverlay } from './overlay-context';
-import { INLINE_OP_TYPE, useSuggestionsProvider } from './provider';
-import { SUGGESTION_TYPE_FORMAT, applyFormatPlan } from '../inline-suggestions';
+import {
+	INLINE_OP_TYPE,
+	findInlineOp,
+	parseSuggestionPayload,
+	useSuggestionsProvider,
+} from './provider';
+import {
+	SUGGESTION_TYPE_FORMAT,
+	applyFormatPlan,
+	rejectInlineFormat,
+} from '../inline-suggestions';
 import { contentKey } from './suggestion-content-reconciler';
 import { readLiveInlineSelection } from './keyboard-target';
 import { removeNoteIdFromMetadata } from '../collab-sidebar/utils';
@@ -44,11 +53,13 @@ export default function SuggestionFormatKeyboard() {
 		( select ) => select( coreStore ).getCurrentUser()?.id ?? null,
 		[]
 	);
-	const { createSuggestion, deleteSuggestion } = useSuggestionsProvider();
+	const { createSuggestion, updateSuggestion, deleteSuggestion } =
+		useSuggestionsProvider();
 	const { updateBlockAttributes, selectionChange } =
 		useDispatch( blockEditorStore );
 	const { getBlockAttributes } = useSelect( blockEditorStore );
 	const { createNotice } = useDispatch( noticesStore );
+	const registry = useRegistry();
 	const {
 		registerFormatHandler,
 		requestInterceptorBypass,
@@ -93,9 +104,147 @@ export default function SuggestionFormatKeyboard() {
 		);
 	}, [ createNotice ] );
 
+	/*
+	 * Write a marked value to the live block, bypassing the suggest-mode
+	 * interceptor.
+	 *
+	 * Writing re-renders RichText, which re-applies the STORE selection to the
+	 * DOM. The note round trip that precedes every call here is an async gap
+	 * during which the user may have moved the caret (End, a click), and the
+	 * store's selection sync lags the DOM — so the restore would clobber the
+	 * live caret and re-select the run, making a fast typist's next keystroke a
+	 * type-over. Read the live DOM selection and move the store selection with
+	 * the write so the restore lands where the user actually is. A format plan
+	 * never changes the text, so the DOM offsets map 1:1 onto the marked value.
+	 */
+	const writeContent = useCallback(
+		( clientId, content ) => {
+			const liveSelection = readLiveInlineSelection(
+				clientId,
+				'content'
+			);
+			requestInterceptorBypass( clientId );
+			updateBlockAttributes( clientId, { content } );
+			if ( liveSelection ) {
+				selectionChange(
+					clientId,
+					'content',
+					liveSelection.start,
+					liveSelection.end
+				);
+			}
+		},
+		[ requestInterceptorBypass, updateBlockAttributes, selectionChange ]
+	);
+
+	/*
+	 * A second format toggle over a run that already carries this suggester's
+	 * own pending `format` marker revises that suggestion rather than opening a
+	 * second one (#73411, F-12). The marker's note keeps the original run it
+	 * recorded at suggest time — that is what a reject has to restore — and only
+	 * its proposed side is updated. When the toggle puts the run back exactly as
+	 * that original, the suggestion no longer proposes anything and is retracted
+	 * instead of being stored as a note whose before and after are identical.
+	 */
+	const runFormatExtend = useCallback(
+		async ( { clientId, blockName, prevContent, nextContent, plan } ) => {
+			const snapshotKey = contentKey( prevContent );
+			const commentId = plan.extendsId;
+			const stale = () =>
+				contentKey( getBlockAttributes( clientId )?.content ) !==
+				snapshotKey;
+			if ( stale() ) {
+				notifyDropped();
+				return;
+			}
+			let comment = null;
+			try {
+				comment = await registry
+					.resolveSelect( coreStore )
+					.getEntityRecord( 'root', 'comment', commentId );
+			} catch {
+				comment = null;
+			}
+			const existing = findInlineOp(
+				parseSuggestionPayload( comment?.meta?._wp_suggestion )
+					?.operations
+			);
+			/*
+			 * The note has to still be the pending format suggestion the marker
+			 * claims it is. A peer accepting or rejecting it mid-toggle (status
+			 * off `hold`) leaves the marker about to be cleared, so revising the
+			 * note would fight that resolution.
+			 */
+			if (
+				comment?.status !== 'hold' ||
+				existing?.suggestionType !== SUGGESTION_TYPE_FORMAT
+			) {
+				notifyDropped();
+				return;
+			}
+			const beforeHTML = existing.beforeHTML ?? '';
+			try {
+				if ( plan.afterHTML === beforeHTML ) {
+					const restored = rejectInlineFormat(
+						nextContent,
+						commentId,
+						beforeHTML
+					);
+					if ( restored === nextContent || stale() ) {
+						notifyDropped();
+						return;
+					}
+					writeContent( clientId, restored );
+					await cleanupAbandonedNote( clientId, commentId );
+					return;
+				}
+				await updateSuggestion( {
+					commentId,
+					blockName,
+					operations: [
+						{
+							type: INLINE_OP_TYPE,
+							attribute: 'content',
+							suggestionType: SUGGESTION_TYPE_FORMAT,
+							beforeHTML,
+							afterHTML: plan.afterHTML,
+						},
+					],
+				} );
+				// The update is an async gap; the same re-validation the create
+				// path does before writing applies here.
+				if ( stale() ) {
+					notifyDropped();
+					return;
+				}
+				writeContent( clientId, applyFormatPlan( nextContent, plan ) );
+			} catch {
+				// `updateSuggestion` / `deleteSuggestion` surface their own
+				// error notices. The note is left as it was.
+				notifyDropped();
+			}
+		},
+		[
+			registry,
+			getBlockAttributes,
+			updateSuggestion,
+			cleanupAbandonedNote,
+			writeContent,
+			notifyDropped,
+		]
+	);
+
 	// The queued task: open the format note, then re-validate and write.
 	const runFormatEdit = useCallback(
-		async ( { clientId, blockName, prevContent, nextContent, plan } ) => {
+		async ( request ) => {
+			const { clientId, blockName, prevContent, nextContent, plan } =
+				request;
+			// A plan naming an existing marker revises that suggestion instead
+			// of creating a second one over the same run.
+			if ( plan.extendsId ) {
+				await runFormatExtend( request );
+				return;
+			}
 			const snapshotKey = contentKey( prevContent );
 			/*
 			 * The plan was diffed against `prevContent`. If the block moved on
@@ -143,36 +292,10 @@ export default function SuggestionFormatKeyboard() {
 					notifyDropped();
 					return;
 				}
-				const marked = applyFormatPlan( nextContent, plan, {
-					id,
-					authorId,
-				} );
-				/*
-				 * Writing the marker re-renders RichText, which re-applies the
-				 * STORE selection to the DOM. The note POST above is an async
-				 * gap during which the user may have moved the caret (End, a
-				 * click), and the store's selection sync lags the DOM — so the
-				 * restore would clobber the live caret and re-select the run,
-				 * making a fast typist's next keystroke a type-over. Read the
-				 * live DOM selection and move the store selection with the
-				 * write so the restore lands where the user actually is. A
-				 * format plan never changes the text, so the DOM offsets map
-				 * 1:1 onto the marked value.
-				 */
-				const liveSelection = readLiveInlineSelection(
+				writeContent(
 					clientId,
-					'content'
+					applyFormatPlan( nextContent, plan, { id, authorId } )
 				);
-				requestInterceptorBypass( clientId );
-				updateBlockAttributes( clientId, { content: marked } );
-				if ( liveSelection ) {
-					selectionChange(
-						clientId,
-						'content',
-						liveSelection.start,
-						liveSelection.end
-					);
-				}
 			} catch {
 				// `createSuggestion` surfaces its own error notice; trash a
 				// note created before the failure so it isn't orphaned.
@@ -184,9 +307,8 @@ export default function SuggestionFormatKeyboard() {
 			authorId,
 			createSuggestion,
 			getBlockAttributes,
-			updateBlockAttributes,
-			selectionChange,
-			requestInterceptorBypass,
+			runFormatExtend,
+			writeContent,
 			cleanupAbandonedNote,
 			notifyDropped,
 		]

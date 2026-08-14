@@ -20,6 +20,10 @@ const getFormatType = ( name ) => select( richTextStore ).getFormatType( name );
 
 const rtd = ( html ) => RichTextData.fromHTMLString( html );
 
+// A pending `format` marker authored by user 7, wrapping the given inner HTML.
+const formatMark = ( id, inner ) =>
+	`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="format" data-author="7">${ inner }</mark>`;
+
 beforeAll( () => {
 	if ( ! getFormatType( SUGGESTION_FORMAT_NAME ) ) {
 		registerSuggestionFormat();
@@ -143,6 +147,60 @@ describe( 'planFormatMarkers', () => {
 		);
 		expect( planFormatMarkers( prev, next ) ).toEqual( { kind: 'none' } );
 	} );
+
+	it( "extends the suggester's own format marker on a second toggle", () => {
+		const prev = rtd(
+			`Hello ${ formatMark( 1, '<strong>world</strong>' ) }`
+		);
+		const next = rtd(
+			`Hello ${ formatMark( 1, '<strong><em>world</em></strong>' ) }`
+		);
+		const plan = planFormatMarkers( prev, next, { authorId: 7 } );
+		expect( plan.kind ).toBe( 'format' );
+		expect( plan.extendsId ).toBe( '1' );
+		expect( plan.range ).toEqual( { start: 6, end: 11 } );
+		// The proposed run is captured without the marker wrapper, and the
+		// original stays on the existing note rather than being recaptured
+		// from the already-suggested run.
+		expect( plan.afterHTML ).toBe( '<strong><em>world</em></strong>' );
+		expect( plan.beforeHTML ).toBeUndefined();
+	} );
+
+	it( "declines to extend another author's marker", () => {
+		const prev = rtd(
+			`Hello ${ formatMark( 1, '<strong>world</strong>' ) }`
+		);
+		const next = rtd(
+			`Hello ${ formatMark( 1, '<strong><em>world</em></strong>' ) }`
+		);
+		expect( planFormatMarkers( prev, next, { authorId: 9 } ) ).toEqual( {
+			kind: 'none',
+		} );
+		// And with no author at all (anonymous edit) it stays conservative.
+		expect( planFormatMarkers( prev, next ) ).toEqual( { kind: 'none' } );
+	} );
+
+	it( 'declines to extend when the toggle spills past the marker', () => {
+		const prev = rtd( `Hello ${ formatMark( 1, 'world' ) }` );
+		const next = rtd(
+			`<strong>Hello ${ formatMark( 1, 'world' ) }</strong>`
+		);
+		expect( planFormatMarkers( prev, next, { authorId: 7 } ) ).toEqual( {
+			kind: 'none',
+		} );
+	} );
+
+	it( 'declines to extend a marker that is not a format suggestion', () => {
+		const prev = rtd(
+			'Hello <mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add" data-author="7">world</mark>'
+		);
+		const next = rtd(
+			'Hello <mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add" data-author="7"><strong>world</strong></mark>'
+		);
+		expect( planFormatMarkers( prev, next, { authorId: 7 } ) ).toEqual( {
+			kind: 'none',
+		} );
+	} );
 } );
 
 describe( 'applyFormatPlan', () => {
@@ -175,6 +233,29 @@ describe( 'applyFormatPlan', () => {
 		expect( html ).toContain( 'data-author="7"' );
 		// The proposed formatting is carried in place; the text appears once.
 		expect( html ).toContain( '<strong>' );
+		expect( html.match( /world/g ) ).toHaveLength( 1 );
+	} );
+
+	it( 'keeps the extended marker whole, with its original id and author', () => {
+		const prev = rtd(
+			`Hello ${ formatMark( 1, '<strong>world</strong>' ) }`
+		);
+		const next = rtd(
+			`Hello ${ formatMark( 1, '<strong><em>world</em></strong>' ) }`
+		);
+		const plan = planFormatMarkers( prev, next, { authorId: 7 } );
+		const result = applyFormatPlan( next, plan );
+
+		expect( findSuggestionRange( result, 1 ) ).toEqual( {
+			start: 6,
+			end: 11,
+		} );
+		const html = result.toHTMLString();
+		expect( html.match( /<mark/g ) ).toHaveLength( 1 );
+		expect( html ).toContain( 'data-suggestion-id="1"' );
+		expect( html ).toContain( 'data-author="7"' );
+		expect( html ).toContain( '<strong>' );
+		expect( html ).toContain( '<em>' );
 		expect( html.match( /world/g ) ).toHaveLength( 1 );
 	} );
 
