@@ -1,5 +1,5 @@
 import type { Meta, StoryFn } from '@storybook/react-vite';
-import { useState } from '@wordpress/element';
+import { useId, useState } from '@wordpress/element';
 import FormToggle from '..';
 
 const meta: Meta< typeof FormToggle > = {
@@ -27,16 +27,22 @@ export default meta;
 
 const Template: StoryFn< typeof FormToggle > = ( { onChange, ...args } ) => {
 	const [ isChecked, setChecked ] = useState( true );
+	const id = useId();
 
 	return (
-		<FormToggle
-			{ ...args }
-			checked={ isChecked }
-			onChange={ ( e ) => {
-				setChecked( ( state ) => ! state );
-				onChange( e );
-			} }
-		/>
+		<>
+			{ /* FormToggle has no built-in label; paired here so the example is copy-paste safe. */ }
+			<label htmlFor={ id }>Enable feature</label>
+			<FormToggle
+				{ ...args }
+				id={ id }
+				checked={ isChecked }
+				onChange={ ( e ) => {
+					setChecked( ( state ) => ! state );
+					onChange( e );
+				} }
+			/>
+		</>
 	);
 };
 
