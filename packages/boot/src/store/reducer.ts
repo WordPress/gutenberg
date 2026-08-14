@@ -19,6 +19,12 @@ export function reducer( state: State = initialState, action: Action ): State {
 			};
 
 		case 'UPDATE_MENU_ITEM':
+			// Updating an item that was never registered would add a partial
+			// entry to the menu, which renders as an empty navigation row.
+			if ( ! state.menuItems[ action.id ] ) {
+				return state;
+			}
+
 			return {
 				...state,
 				menuItems: {

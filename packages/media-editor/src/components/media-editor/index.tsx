@@ -99,22 +99,36 @@ export interface MediaEditorProps {
 	noticesPortalElement?: Element | null;
 	showCloseButton?: boolean;
 	shouldCloseOnEsc?: boolean;
+	/**
+	 * The `@wordpress/interface` scope for the details sidebar and its pinned
+	 * items. Frames should pass a distinct scope so that sidebar visibility —
+	 * which is persisted per scope to user meta — is remembered separately for
+	 * each surface. The modal is a transient surface where a collapsed sidebar
+	 * is a reasonable choice; the full-screen route is one where the sidebar is
+	 * the primary metadata surface and should open by default. Sharing a scope
+	 * would let a choice made in one decide the other's starting state.
+	 *
+	 * @default 'media-editor'
+	 */
+	scope?: string;
 }
 
 interface MediaEditorSidebarProps {
 	tabs: EditorTab[];
 	activeTabId?: string;
 	onTabChange: ( tabId: string ) => void;
+	scope: string;
 }
 
 function MediaEditorSidebar( {
 	tabs,
 	activeTabId,
 	onTabChange,
+	scope,
 }: MediaEditorSidebarProps ) {
 	return (
 		<ComplementaryArea
-			scope="media-editor"
+			scope={ scope }
 			identifier="media-editor/details"
 			title={ __( 'Details' ) }
 			icon={ drawerRight }
@@ -157,6 +171,7 @@ interface HeaderActionsProps {
 	isImage: boolean;
 	showCloseButton?: boolean;
 	onCancel: () => void;
+	scope: string;
 }
 
 function HeaderActions( {
@@ -164,6 +179,7 @@ function HeaderActions( {
 	isImage,
 	showCloseButton = false,
 	onCancel,
+	scope,
 }: HeaderActionsProps ) {
 	const [ isShortcutsModalOpen, setIsShortcutsModalOpen ] = useState( false );
 	return (
@@ -181,7 +197,7 @@ function HeaderActions( {
 					onClick={ () => setIsShortcutsModalOpen( true ) }
 				/>
 			) }
-			<PinnedItems.Slot scope="media-editor" />
+			<PinnedItems.Slot scope={ scope } />
 			{ showCloseButton && (
 				<Button
 					size="compact"
@@ -338,6 +354,7 @@ function MediaEditorContent( {
 	noticesPortalElement,
 	showCloseButton = false,
 	shouldCloseOnEsc = false,
+	scope = 'media-editor',
 }: MediaEditorProps ) {
 	const cropper = useMediaEditor();
 	// The sidebar is a side column from the `small` breakpoint up and collapses
@@ -596,6 +613,7 @@ function MediaEditorContent( {
 							tabs={ tabs }
 							activeTabId={ activeTabId }
 							onTabChange={ setSelectedTabId }
+							scope={ scope }
 						/>
 						<InterfaceSkeleton
 							className="media-editor__skeleton"
@@ -610,7 +628,6 @@ function MediaEditorContent( {
 									<div className="media-editor__canvas-area">
 										{ isImage ? (
 											<MediaEditorCanvas
-												focusOnMount
 												isPlacementActive={
 													isPlacementActive
 												}
@@ -633,7 +650,7 @@ function MediaEditorContent( {
 								</div>
 							}
 							sidebar={
-								<ComplementaryArea.Slot scope="media-editor" />
+								<ComplementaryArea.Slot scope={ scope } />
 							}
 						/>
 					</>
@@ -716,6 +733,7 @@ function MediaEditorContent( {
 				isImage={ isImage }
 				showCloseButton={ showCloseButton }
 				onCancel={ handleRequestClose }
+				scope={ scope }
 			/>
 		),
 		footerActions,

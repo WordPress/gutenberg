@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.53.0 (2026-08-12)
+
 ### Internal
 
 -   Remove `@wordpress/content-types` from the list of core modules using private APIs, as part of removing the content types experiment. [#81340](https://github.com/WordPress/gutenberg/pull/81340)

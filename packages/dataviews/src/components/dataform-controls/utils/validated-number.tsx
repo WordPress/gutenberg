@@ -2,16 +2,13 @@ import {
 	Flex,
 	BaseControl,
 	__experimentalNumberControl as NumberControl,
-	privateApis,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { OPERATOR_BETWEEN } from '../../../constants';
 import type { DataFormControlProps, FormatNumber } from '../../../types';
-import { unlock } from '../../../lock-unlock';
+import { ValidatedNumberControl } from '../../validated-form-controls';
 import getCustomValidity from './get-custom-validity';
-
-const { ValidatedNumberControl } = unlock( privateApis );
 
 type NumberBetween = [ number | string, number | string ];
 
@@ -150,8 +147,16 @@ export default function ValidatedNumber< Item >( {
 			onChange={ onChangeControl }
 			hideLabelFromVision={ hideLabelFromVision }
 			step={ step }
-			min={ isValid.min ? isValid.min.constraint : undefined }
-			max={ isValid.max ? isValid.max.constraint : undefined }
+			min={
+				typeof isValid.min?.constraint === 'number'
+					? isValid.min.constraint
+					: undefined
+			}
+			max={
+				typeof isValid.max?.constraint === 'number'
+					? isValid.max.constraint
+					: undefined
+			}
 			disabled={ disabled }
 		/>
 	);

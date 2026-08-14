@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Internal
+
+-   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509))
+
+## 0.20.0 (2026-08-12)
+
 ### Breaking Changes
 
 -   `IconButton`: Require `shortcut.label` for a human-readable accessible shortcut description. Generate it with `shortcutAriaLabel` from `@wordpress/keycodes`. ([#80402](https://github.com/WordPress/gutenberg/pull/80402))
@@ -19,6 +25,7 @@
 
 ### Internal
 
+-   Update React DayPicker from 9.14.0 to 10.0.1 and adopt the scoped package. ([#81439](https://github.com/WordPress/gutenberg/pull/81439))
 -   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
 -   Refactor shared focus utilities to use the `outset-ring__focus()` mixin from `@wordpress/base-styles` ([#80635](https://github.com/WordPress/gutenberg/pull/80635)).
 -   `Button`: Expand the Storybook e2e `VariantStates` matrix with compact, small, and with-icon rows ([#80793](https://github.com/WordPress/gutenberg/pull/80793)).
