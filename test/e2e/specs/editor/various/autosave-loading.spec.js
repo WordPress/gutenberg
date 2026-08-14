@@ -276,10 +276,7 @@ test.describe( 'Autosave loading', () => {
 	} );
 
 	test( "returns the current user's autosave, not a newer one by another author", async ( {
-		admin,
-		editor,
 		browser,
-		page,
 		requestUtils,
 	} ) => {
 		const post = await requestUtils.createPost( {
@@ -321,9 +318,16 @@ test.describe( 'Autosave loading', () => {
 				)
 				.toBe( true );
 
-			await admin.editPost( post.id );
-			await waitForAutosaveResolution( page, post.id );
-			await editAndAutosave( page, editor, ' by the administrator' );
+			// The administrator autosaves over REST rather than in a second
+			// editor: two editors open on one post trip the post lock, and all
+			// this needs is a newer autosave belonging to somebody else.
+			await requestUtils.rest( {
+				method: 'POST',
+				path: `/wp/v2/posts/${ post.id }/autosaves`,
+				data: {
+					content: `${ POST_CONTENT }\n<!-- wp:paragraph -->\n<p>By the administrator</p>\n<!-- /wp:paragraph -->`,
+				},
+			} );
 
 			// Reload the second user's editor. Asking for a single record
 			// without scoping it to an author would return the
@@ -333,9 +337,12 @@ test.describe( 'Autosave loading', () => {
 			await gotoPostEditor( secondUserPage, post.id );
 			await waitForAutosaveResolution( secondUserPage, post.id );
 
-			// The load itself is preloaded, so refetch to see the request.
-			await refetchAutosave( secondUserPage, post.id );
-
+			// Unlike the administrator case above, this one is not served from
+			// the preload cache. For this user the kickoff's second phase lands
+			// after the cache is cleared, so none of the paths it carries are
+			// consumed — autosaves, the post author, the template lookup and
+			// global styles alike. That is pre-existing and not specific to
+			// autosaves; it reproduces on trunk with the other four.
 			expect( requests ).toHaveLength( 1 );
 			expect( requests[ 0 ].searchParams.get( 'author' ) ).toBe(
 				String( secondUserId )
