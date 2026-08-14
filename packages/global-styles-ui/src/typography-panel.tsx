@@ -9,11 +9,13 @@ const { useSettingsForBlockElement, TypographyPanel: StylesTypographyPanel } =
 interface TypographyPanelProps {
 	element: string;
 	headingLevel: string;
+	showTextColor?: boolean;
 }
 
 export default function TypographyPanel( {
 	element,
 	headingLevel,
+	showTextColor = true,
 }: TypographyPanelProps ) {
 	let prefixParts: string[] = [];
 	if ( element === 'heading' ) {
@@ -32,11 +34,20 @@ export default function TypographyPanel( {
 	);
 	const [ rawSettings ] = useSetting( '' );
 	const usedElement = element === 'heading' ? headingLevel : element;
-	const settings = useSettingsForBlockElement(
+	const elementSettings = useSettingsForBlockElement(
 		rawSettings,
 		undefined,
 		usedElement
 	);
+	const settings = showTextColor
+		? elementSettings
+		: {
+				...elementSettings,
+				color: {
+					...elementSettings.color,
+					text: false,
+				},
+		  };
 
 	return (
 		<StylesTypographyPanel
