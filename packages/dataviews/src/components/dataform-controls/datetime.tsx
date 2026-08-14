@@ -1,4 +1,3 @@
-import { isSameMonth } from 'date-fns';
 import {
 	BaseControl,
 	privateApis as componentsPrivateApis,
@@ -46,16 +45,15 @@ function CalendarDateTimeControl< Item >( {
 		return parsedDate || new Date(); // Default to current month
 	} );
 
-	// Sync the displayed month when the value changes from outside the
-	// control, e.g. after undo, reset, or switching the edited item.
-	const [ prevValue, setPrevValue ] = useState( value );
-	if ( value !== prevValue ) {
-		setPrevValue( value );
+	// Follow the value when it changes, so that a change from outside the
+	// control, e.g. an undo, a reset, or switching the edited item, brings
+	// the selection into view.
+	useEffect( () => {
 		const parsedDate = parseDateTime( value );
-		if ( parsedDate && ! isSameMonth( parsedDate, calendarMonth ) ) {
+		if ( parsedDate ) {
 			setCalendarMonth( parsedDate );
 		}
-	}
+	}, [ value ] );
 
 	const inputControlRef = useRef< HTMLInputElement >( null );
 	const validationTimeoutRef =

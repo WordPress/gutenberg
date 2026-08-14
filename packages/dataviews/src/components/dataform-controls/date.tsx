@@ -298,16 +298,15 @@ function CalendarDateControl< Item >( {
 		return parsedDate || new Date(); // Default to current month
 	} );
 
-	// Sync the displayed month when the value changes from outside the
-	// control, e.g. after undo, reset, or switching the edited item.
-	const [ prevValue, setPrevValue ] = useState( value );
-	if ( value !== prevValue ) {
-		setPrevValue( value );
+	// Follow the value when it changes, so that a change from outside the
+	// control, e.g. an undo, a reset, or switching the edited item, brings
+	// the selection into view.
+	useEffect( () => {
 		const parsedDate = parseDate( value );
-		if ( parsedDate && ! isSameMonth( parsedDate, calendarMonth ) ) {
+		if ( parsedDate ) {
 			setCalendarMonth( parsedDate );
 		}
-	}
+	}, [ value ] );
 
 	const [ isTouched, setIsTouched ] = useState( false );
 	const validityTargetRef = useRef< HTMLInputElement >( null );
@@ -525,24 +524,23 @@ function CalendarDateRangeControl< Item >( {
 		return selectedRange?.from || new Date();
 	} );
 
-	// Sync the displayed month when the value changes from outside the
-	// control, e.g. after undo, reset, or switching the edited item. Skip
-	// when part of the new range is already visible, so that selecting the
-	// end of a cross-month range doesn't move the view away.
-	const [ prevValue, setPrevValue ] = useState( value );
-	if (
-		value?.[ 0 ] !== prevValue?.[ 0 ] ||
-		value?.[ 1 ] !== prevValue?.[ 1 ]
-	) {
-		setPrevValue( value );
-		const isRangeVisible = [ selectedRange?.from, selectedRange?.to ].some(
-			( date ) => date && isSameMonth( date, calendarMonth )
-		);
-		const targetMonth = selectedRange?.from ?? selectedRange?.to;
-		if ( targetMonth && ! isRangeVisible ) {
-			setCalendarMonth( targetMonth );
-		}
-	}
+	// Follow the value when it changes, so that a change from outside the
+	// control, e.g. an undo, a reset, or switching the edited item, brings
+	// the range into view. Keep the current view when part of the new range
+	// is already visible, so that selecting the end of a cross-month range
+	// doesn't move the view away.
+	const [ fromValue, toValue ] = value ?? [];
+	useEffect( () => {
+		setCalendarMonth( ( currentMonth ) => {
+			const from = parseDate( fromValue );
+			const to = parseDate( toValue );
+			const targetMonth = from ?? to;
+			const isRangeVisible = [ from, to ].some(
+				( date ) => date && isSameMonth( date, currentMonth )
+			);
+			return targetMonth && ! isRangeVisible ? targetMonth : currentMonth;
+		} );
+	}, [ fromValue, toValue ] );
 
 	const [ isTouched, setIsTouched ] = useState( false );
 	const fromInputRef = useRef< HTMLInputElement >( null );
