@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Translate the click-to-edit label on a previewed canvas, and name the action rather than the gesture ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+
 ### Enhancements
 
 -   Add a `stage` visibility function to a route's config, mirroring `inspector`, so a route can hide its stage and leave the canvas to fill the surfaces area.

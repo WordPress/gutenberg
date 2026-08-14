@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
 import { useNavigate } from '@wordpress/route';
+import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as bootStore } from '../../store';
 import type { CanvasData } from '../../store/types';
@@ -131,7 +132,7 @@ export default function Canvas( { canvas }: CanvasProps ) {
 					} }
 					role="button"
 					tabIndex={ 0 }
-					aria-label="Click to edit"
+					aria-label={ __( 'Edit' ) }
 				/>
 			) }
 		</div>
