@@ -357,6 +357,37 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 				screen.queryByRole( 'group', { name: 'Block spacing' } )
 			).not.toBeInTheDocument();
 		} );
+
+		it( 'keeps the block spacing control visible when axial support changes', () => {
+			const settings = {
+				...settingsWithSpacingPresets,
+				spacing: {
+					...settingsWithSpacingPresets.spacing,
+					blockGap: [ 'horizontal', 'vertical' ],
+				},
+			};
+			const props = {
+				value: {},
+				settings,
+				onChange: () => {},
+				panelId: 'test-panel',
+			};
+			const { rerender } = render(
+				<DimensionsPanel { ...props } allowAxialBlockGap />
+			);
+
+			expect(
+				screen.getAllByRole( 'slider', { name: /block spacing/i } )
+			).toHaveLength( 2 );
+
+			rerender(
+				<DimensionsPanel { ...props } allowAxialBlockGap={ false } />
+			);
+
+			expect(
+				screen.getAllByRole( 'slider', { name: /block spacing/i } )
+			).toHaveLength( 1 );
+		} );
 	} );
 
 	describe( 'padding (BoxControl archetype)', () => {

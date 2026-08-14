@@ -1014,6 +1014,7 @@ export default function DimensionsPanel( {
 						) ) }
 					{ showSpacingPresetsControl && (
 						<SpacingSizesControl
+							key={ isAxialGap ? 'axial-gap' : 'single-gap' }
 							label={ __( 'Block spacing' ) }
 							min={ 0 }
 							onChange={ setGapValues }
