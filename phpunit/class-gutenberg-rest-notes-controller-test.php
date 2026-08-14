@@ -253,6 +253,39 @@ class Tests_REST_Notes_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Resolving and reopening a thread each record a reply of their own, and
+	 * neither counts as a reply someone wrote.
+	 *
+	 * @covers ::attach_replies
+	 */
+	public function test_reply_count_ignores_resolution_entries() {
+		$thread = $this->create_note();
+		$this->create_note(
+			array(
+				'comment_parent'  => $thread,
+				'comment_content' => 'A written reply.',
+			)
+		);
+
+		$resolved = $this->create_note( array( 'comment_parent' => $thread ) );
+		update_comment_meta( $resolved, '_wp_note_status', 'resolved' );
+
+		$reopened = $this->create_note( array( 'comment_parent' => $thread ) );
+		update_comment_meta( $reopened, '_wp_note_status', 'reopen' );
+
+		wp_set_current_user( self::$editor_id );
+
+		$data = $this->get_notes()->get_data();
+
+		$this->assertSame( 1, $data[0]['reply_count'], 'Only the written reply should be counted.' );
+		$this->assertCount(
+			3,
+			$data[0]['replies'],
+			'The thread still needs the resolution entries to render its history.'
+		);
+	}
+
+	/**
 	 * The collection is scoped to a post.
 	 *
 	 * @covers ::get_items_permissions_check

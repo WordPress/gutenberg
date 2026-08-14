@@ -226,7 +226,7 @@ class Gutenberg_REST_Notes_Controller extends WP_REST_Comments_Controller {
 		);
 
 		$schema['properties']['reply_count'] = array(
-			'description' => __( 'The number of replies in the thread.', 'gutenberg' ),
+			'description' => __( 'The number of replies written in the thread, not counting the entries that record a resolution.', 'gutenberg' ),
 			'type'        => 'integer',
 			'context'     => array( 'view', 'edit' ),
 			'readonly'    => true,
@@ -379,21 +379,19 @@ class Gutenberg_REST_Notes_Controller extends WP_REST_Comments_Controller {
 			return $response;
 		}
 
-		$replies_by_parent = $this->get_replies( $thread_ids, $request );
+		list( $replies_by_parent, $counts_by_parent ) = $this->get_replies( $thread_ids, $request );
 
 		foreach ( $threads as $index => $thread ) {
 			if ( ! isset( $thread['id'] ) ) {
 				continue;
 			}
 
-			$replies = isset( $replies_by_parent[ $thread['id'] ] ) ? $replies_by_parent[ $thread['id'] ] : array();
-
 			if ( $want_replies ) {
-				$threads[ $index ]['replies'] = $replies;
+				$threads[ $index ]['replies'] = isset( $replies_by_parent[ $thread['id'] ] ) ? $replies_by_parent[ $thread['id'] ] : array();
 			}
 
 			if ( $want_count ) {
-				$threads[ $index ]['reply_count'] = count( $replies );
+				$threads[ $index ]['reply_count'] = isset( $counts_by_parent[ $thread['id'] ] ) ? $counts_by_parent[ $thread['id'] ] : 0;
 			}
 		}
 
@@ -407,7 +405,12 @@ class Gutenberg_REST_Notes_Controller extends WP_REST_Comments_Controller {
 	 *
 	 * @param int[]           $thread_ids Top-level note IDs.
 	 * @param WP_REST_Request $request    Full details about the request.
-	 * @return array Prepared reply arrays keyed by parent note ID, oldest first.
+	 * @return array {
+	 *     Two maps, both keyed by parent note ID.
+	 *
+	 *     @type array $0 Prepared reply arrays, oldest first.
+	 *     @type array $1 Written reply counts.
+	 * }
 	 */
 	protected function get_replies( $thread_ids, $request ) {
 		$query = new WP_Comment_Query();
@@ -426,17 +429,31 @@ class Gutenberg_REST_Notes_Controller extends WP_REST_Comments_Controller {
 		);
 
 		$replies_by_parent = array();
+		$counts_by_parent  = array();
 
 		foreach ( $replies as $reply ) {
 			if ( ! $this->check_read_permission( $reply, $request ) ) {
 				continue;
 			}
 
+			$parent_id = (int) $reply->comment_parent;
+
 			$prepared = $this->prepare_item_for_response( $reply, $request );
 
-			$replies_by_parent[ (int) $reply->comment_parent ][] = $this->prepare_response_for_collection( $prepared );
+			$replies_by_parent[ $parent_id ][] = $this->prepare_response_for_collection( $prepared );
+
+			/*
+			 * Resolving or reopening a thread records a reply of its own, marked
+			 * with `_wp_note_status`. The thread needs those to render its
+			 * history, but they are not something anyone wrote, so they stay out
+			 * of the count a caller shows as "N replies". The meta cache is
+			 * primed by the query above, so this costs no extra round trip.
+			 */
+			if ( '' === (string) get_comment_meta( $reply->comment_ID, '_wp_note_status', true ) ) {
+				$counts_by_parent[ $parent_id ] = isset( $counts_by_parent[ $parent_id ] ) ? $counts_by_parent[ $parent_id ] + 1 : 1;
+			}
 		}
 
-		return $replies_by_parent;
+		return array( $replies_by_parent, $counts_by_parent );
 	}
 }

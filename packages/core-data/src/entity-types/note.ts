@@ -61,7 +61,8 @@ declare module './base-entity-records' {
 			 */
 			replies: Note< C >[];
 			/**
-			 * The number of replies in the thread.
+			 * The number of replies written in the thread. The entries that
+			 * record a resolution are in `replies` but not in this count.
 			 */
 			reply_count: number;
 			/**

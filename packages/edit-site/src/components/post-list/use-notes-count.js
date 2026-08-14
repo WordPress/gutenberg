@@ -8,6 +8,10 @@ import { useEntityRecords } from '@wordpress/core-data';
  * the number of threads plus the replies they report. `_fields` keeps the
  * response to the three values the tally needs rather than whole threads.
  *
+ * `reply_count` covers replies someone wrote; resolving or reopening a thread
+ * records a reply of its own that the endpoint leaves out, so a thread nobody
+ * answered counts as one however many times it changed hands.
+ *
  * @param {number[]} postIds - Array of post IDs to fetch notes for.
  * @return {{ notesCount: Object, isResolving: boolean }} Object with notesCount map and loading state.
  */
