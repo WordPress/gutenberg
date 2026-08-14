@@ -346,6 +346,29 @@ function MetaBoxesMain() {
 	);
 }
 
+// TEMP: remove. Stands in for a plugin panel that reads the store and throws
+// while rendering. Nested so the component stack has something to show.
+function TempCrashInner( { title } ) {
+	if ( title.toLowerCase().includes( 'crash' ) ) {
+		throw new TypeError(
+			`Cannot read properties of undefined (reading 'length')`
+		);
+	}
+
+	return null;
+}
+
+// TEMP: remove. Type "crash" in the post title to trigger it.
+function TempCrash() {
+	const title = useSelect(
+		( _select ) =>
+			_select( editorStore ).getEditedPostAttribute( 'title' ) ?? '',
+		[]
+	);
+
+	return <TempCrashInner title={ title } />;
+}
+
 function Layout( {
 	postId: initialPostId,
 	postType: initialPostType,
@@ -556,6 +579,7 @@ function Layout( {
 			<Tooltip.Provider>
 				<ThemeProvider isRoot color={ { primary: adminPrimary } }>
 					<ErrorBoundary canCopyContent>
+						<TempCrash />
 						<WelcomeGuide postType={ currentPostType } />
 						<div { ...navigateRegionsProps }>
 							<Editor
