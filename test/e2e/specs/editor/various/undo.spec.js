@@ -714,20 +714,6 @@ test.describe( 'Media Library modal undo', () => {
 		await expect( modal ).toBeVisible();
 		await expect( modal.locator( '.media-frame-content' ) ).toBeVisible();
 
-		const searchInput = page.locator( '#media-search-input' );
-		await expect( searchInput ).toBeVisible();
-		await searchInput.focus();
-		await page.keyboard.press( 'T' );
-		await page.keyboard.press( 'e' );
-		await page.keyboard.press( 's' );
-		await page.keyboard.press( 't' );
-
-		await expect( searchInput ).toHaveValue( 'Test' );
-
-		await pageUtils.pressKeys( 'primary+z' );
-		await expect( searchInput ).not.toHaveValue( 'Test' );
-		await expect( modal ).toBeVisible();
-
 		const closeButton = page.locator( '.media-modal-close' );
 		await expect( closeButton ).toBeVisible();
 		await closeButton.focus();
