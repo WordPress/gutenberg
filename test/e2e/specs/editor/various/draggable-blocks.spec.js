@@ -539,6 +539,62 @@ test.describe( 'Draggable block', () => {
 		] );
 	} );
 
+	test( 'drags a fully selected block from a press that is already moving', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'first' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'second' );
+
+		// Confirm correct setup.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'first' } },
+			{ name: 'core/paragraph', attributes: { content: 'second' } },
+		] );
+
+		// Select all the text of the first paragraph.
+		const firstParagraph = editor.canvas.locator(
+			'role=document[name="Block: Paragraph"i] >> text=first'
+		);
+		await firstParagraph.click();
+		await pageUtils.pressKeys( 'primary+a' );
+
+		const secondParagraph = editor.canvas.locator(
+			'role=document[name="Block: Paragraph"i] >> text=second'
+		);
+		const secondBox = await secondParagraph.boundingBox();
+
+		// Press on the selected text and move away immediately, without a
+		// resting press on the glyphs, past the lower half of the second
+		// paragraph.
+		await firstParagraph.hover();
+		await page.mouse.down();
+		await dragTo(
+			page,
+			secondBox.x + secondBox.width * 0.5,
+			secondBox.y + secondBox.height * 0.75
+		);
+		await page.mouse.up();
+
+		// The block moved below the second paragraph.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'second' } },
+			{ name: 'core/paragraph', attributes: { content: 'first' } },
+		] );
+
+		// The text is still fully selected after the drop.
+		await expect
+			.poll( () =>
+				editor.canvas
+					.locator( ':root' )
+					.evaluate( () => window.getSelection().toString() )
+			)
+			.toBe( 'first' );
+	} );
+
 	test( 'still drags a single block by its fully selected text', async ( {
 		editor,
 		page,
@@ -595,8 +651,9 @@ test.describe( 'Draggable block', () => {
 			body.dispatchEvent( new DragEvent( 'dragend', { bubbles: true } ) );
 		} );
 
-		// A drag on partially selected text is prevented. Move the caret to
-		// the start of the field, then select a single character.
+		// A drag on partially selected text stays native and carries no
+		// block payload. Move the caret to the start of the field, then
+		// select a single character.
 		await editor.canvas
 			.locator( 'role=document[name="Block: Paragraph"i] >> text=first' )
 			.click();
@@ -618,7 +675,7 @@ test.describe( 'Draggable block', () => {
 					data: dataTransfer.getData( 'wp-blocks' ),
 				};
 			} );
-		expect( partialResult.notPrevented ).toBe( false );
+		expect( partialResult.notPrevented ).toBe( true );
 		expect( partialResult.data ).toBe( '' );
 	} );
 } );

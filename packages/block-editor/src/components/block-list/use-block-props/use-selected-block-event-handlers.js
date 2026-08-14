@@ -76,26 +76,145 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				}
 			}
 
+			// The editable field whose content is entirely covered by the
+			// text selection, or null when there is none. Pressing such a
+			// field drags the block; the attribute gives it a grab cursor.
+			let entirelySelectedField = null;
+			// The field the current press started on, for the length of
+			// the press and the drag that may follow it.
+			let pressedField = null;
+
+			function onSelectionChange() {
+				const { activeElement } = node.ownerDocument;
+				const selection = node.ownerDocument.defaultView.getSelection();
+
+				entirelySelectedField =
+					! selection.isCollapsed &&
+					activeElement &&
+					node.contains( activeElement ) &&
+					activeElement.isContentEditable &&
+					isEntirelySelected( activeElement ) &&
+					! hasMultiSelection()
+						? activeElement
+						: null;
+
+				if ( entirelySelectedField ) {
+					node.dataset.entirelySelected = 'true';
+				} else {
+					delete node.dataset.entirelySelected;
+				}
+			}
+
 			/**
-			 * Prevents default dragging behavior within a block, except when
-			 * the dragged text selection covers the whole field: then the
-			 * drag moves the block itself. To do: we must handle partial
-			 * selections in the future and clean up the drag target.
+			 * A press on a fully selected field drags the block, but the
+			 * browser only starts a drag of a text selection when the press
+			 * begins at rest on the selected glyphs; a press that is
+			 * already moving falls back to starting a new selection. For
+			 * the length of the press, make the block itself the drag
+			 * target instead: a non editable, draggable element starts a
+			 * native drag from a press anywhere inside it, however fast
+			 * the gesture begins.
+			 *
+			 * @param {MouseEvent} event Mouse down event.
+			 */
+			function onMouseDown( event ) {
+				if ( event.button !== 0 ) {
+					return;
+				}
+
+				// Shift and other modifiers adjust the selection; those
+				// presses keep their native behavior.
+				if (
+					event.shiftKey ||
+					event.metaKey ||
+					event.ctrlKey ||
+					event.altKey
+				) {
+					return;
+				}
+
+				if ( ! entirelySelectedField ) {
+					return;
+				}
+
+				const { ownerDocument } = node;
+				const selection = ownerDocument.defaultView.getSelection();
+				const editableElement = entirelySelectedField;
+
+				node.setAttribute( 'draggable', 'true' );
+				editableElement.setAttribute( 'contenteditable', 'false' );
+				pressedField = editableElement;
+
+				function restore() {
+					pressedField = null;
+					node.removeAttribute( 'draggable' );
+					editableElement.setAttribute( 'contenteditable', 'true' );
+					ownerDocument.removeEventListener( 'mouseup', onPressEnd );
+					node.removeEventListener( 'dragstart', onPressDragStart );
+				}
+
+				function onPressDragStart() {
+					// The drag session is committed; the field can become
+					// editable again while the block is dragged.
+					restore();
+				}
+
+				function onPressEnd( e ) {
+					restore();
+					// The field was not editable during the press, so the
+					// browser did not place a caret for the click. Place it
+					// where the press landed, so clicking into the selected
+					// text keeps putting the caret at the click position.
+					editableElement.focus();
+					const position = ownerDocument.caretPositionFromPoint?.(
+						e.clientX,
+						e.clientY
+					);
+
+					if ( position ) {
+						selection.setPosition(
+							position.offsetNode,
+							position.offset
+						);
+					} else {
+						const range = ownerDocument.caretRangeFromPoint?.(
+							e.clientX,
+							e.clientY
+						);
+
+						if ( range ) {
+							selection.removeAllRanges();
+							selection.addRange( range );
+						}
+					}
+				}
+
+				node.addEventListener( 'dragstart', onPressDragStart );
+				ownerDocument.addEventListener( 'mouseup', onPressEnd );
+			}
+
+			/**
+			 * A drag of a text selection that covers everything in the
+			 * field moves the block itself, the same way dragging a non
+			 * text block does. A drag of a partial selection stays fully
+			 * native: the browser moves the text to the drop point, like
+			 * cut and paste.
 			 *
 			 * @param {DragEvent} event Drag event.
 			 */
 			function onDragStart( event ) {
 				const { activeElement } = node.ownerDocument;
-				// Dragging a text selection that covers everything in the
-				// field moves the block, the same way dragging a non text
-				// block does.
+				// The press above already converts a press on a fully
+				// selected field into a block drag; the selection check
+				// remains for drags the browser starts on its own.
 				const isFullySelectedTextDrag =
-					node.contains( event.target ) &&
-					activeElement &&
-					node.contains( activeElement ) &&
-					activeElement.isContentEditable &&
-					isEntirelySelected( activeElement ) &&
-					! hasMultiSelection();
+					!! pressedField ||
+					( node.contains( event.target ) &&
+						activeElement &&
+						node.contains( activeElement ) &&
+						activeElement.isContentEditable &&
+						isEntirelySelected( activeElement ) &&
+						! hasMultiSelection() );
 				const isDirectBlockDrag =
 					node === event.target &&
 					! node.isContentEditable &&
@@ -103,7 +222,6 @@ export function useEventHandlers( { clientId, isSelected } ) {
 					! hasMultiSelection();
 
 				if ( ! isDirectBlockDrag && ! isFullySelectedTextDrag ) {
-					event.preventDefault();
 					return;
 				}
 				const data = JSON.stringify( {
@@ -117,7 +235,17 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				const { ownerDocument } = node;
 				const { defaultView } = ownerDocument;
 				const selection = defaultView.getSelection();
-				selection.removeAllRanges();
+				// Dragging a fully selected field keeps its selection, so
+				// the highlight rides along with the dragged block and
+				// survives the drop. Other drags clear the selection.
+				const editableElement =
+					pressedField ||
+					( isFullySelectedTextDrag && activeElement ) ||
+					null;
+
+				if ( ! editableElement ) {
+					selection.removeAllRanges();
+				}
 
 				// Setting the drag chip as the drag image actually works, but
 				// the behaviour is slightly different in every browser. In
@@ -275,6 +403,16 @@ export function useEventHandlers( { clientId, isSelected } ) {
 					clone.remove();
 					node.id = id;
 					dragElement.remove();
+					// Moving the block in the document tears the selection
+					// out of it; select the field in full again, so the
+					// block reads as still selected after the drop.
+					if ( editableElement ) {
+						editableElement.focus();
+						const range = ownerDocument.createRange();
+						range.selectNodeContents( editableElement );
+						selection.removeAllRanges();
+						selection.addRange( range );
+					}
 					stopDraggingBlocks();
 					document.body.classList.remove(
 						'is-dragging-components-draggable'
@@ -297,8 +435,15 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				ownerDocument.documentElement.classList.add( 'is-dragging' );
 			}
 
+			onSelectionChange();
+
 			node.addEventListener( 'keydown', onKeyDown );
+			node.addEventListener( 'mousedown', onMouseDown );
 			node.addEventListener( 'dragstart', onDragStart );
+			node.ownerDocument.addEventListener(
+				'selectionchange',
+				onSelectionChange
+			);
 
 			/**
 			 * Handles double-click events on section blocks to edit content only section.
@@ -329,8 +474,14 @@ export function useEventHandlers( { clientId, isSelected } ) {
 
 			return () => {
 				node.removeEventListener( 'keydown', onKeyDown );
+				node.removeEventListener( 'mousedown', onMouseDown );
 				node.removeEventListener( 'dragstart', onDragStart );
 				node.removeEventListener( 'dblclick', onDoubleClick );
+				node.ownerDocument.removeEventListener(
+					'selectionchange',
+					onSelectionChange
+				);
+				delete node.dataset.entirelySelected;
 			};
 		},
 		[
