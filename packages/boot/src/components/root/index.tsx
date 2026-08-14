@@ -11,6 +11,7 @@ import {
 import { menu } from '@wordpress/icons';
 import { useState, useEffect, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { UnsavedChangesWarning } from '@wordpress/editor';
 import { Page, getAdminThemeColors } from '@wordpress/admin-ui';
 import { Tooltip } from '@wordpress/ui';
 import { ThemeProvider } from '@wordpress/theme';
@@ -67,6 +68,7 @@ export default function Root() {
 								'has-full-canvas': isFullScreen,
 							} ) }
 						>
+							<UnsavedChangesWarning />
 							<SavePanel />
 							<SnackbarNotices className="boot-notices__snackbar" />
 							{ isMobileViewport && (
