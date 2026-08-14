@@ -16,11 +16,7 @@ const { useSettingsForBlockElement, ColorPanel: StylesColorPanel } = unlock(
 	blockEditorPrivateApis
 );
 
-const ADDITIONAL_ELEMENTS = [
-	{ name: 'cite', label: __( 'Citations' ) },
-	{ name: 'textInput', label: __( 'Inputs' ) },
-	{ name: 'select', label: __( 'Selects' ) },
-];
+const ADDITIONAL_ELEMENTS = [ { name: 'cite', label: __( 'Citations' ) } ];
 
 const DEFAULT_CONTROLS = {
 	link: true,
@@ -28,11 +24,23 @@ const DEFAULT_CONTROLS = {
 	button: true,
 	caption: true,
 	cite: true,
-	textInput: true,
-	select: true,
 };
 
-function ScreenColors() {
+interface ElementColorsProps {
+	additionalElements: { name: string; label: string }[];
+	defaultControls: Record< string, boolean >;
+	settingsTransform?: (
+		settings: GlobalStylesSettings
+	) => GlobalStylesSettings;
+	label?: string;
+}
+
+export function ElementColors( {
+	additionalElements,
+	defaultControls,
+	settingsTransform = ( settings ) => settings,
+	label,
+}: ElementColorsProps ) {
 	// Get user styles for editing
 	const [ style, setStyle ] = useStyle< GlobalStylesStyles >(
 		'',
@@ -49,8 +57,25 @@ function ScreenColors() {
 	);
 	// Get settings for the color panel
 	const [ rawSettings ] = useSetting< GlobalStylesSettings >( '' );
-	const settings = useSettingsForBlockElement( rawSettings );
+	const settings = settingsTransform(
+		useSettingsForBlockElement( rawSettings )
+	);
 
+	return (
+		<StylesColorPanel
+			inheritedValue={ inheritedStyle }
+			value={ style }
+			onChange={ setStyle }
+			settings={ settings }
+			additionalElements={ additionalElements }
+			defaultControls={ defaultControls }
+			label={ label }
+			showInheritanceLabelIndicators={ false }
+		/>
+	);
+}
+
+function ScreenColors() {
 	return (
 		<>
 			<ScreenHeader
@@ -64,14 +89,9 @@ function ScreenColors() {
 					<Palette />
 				</VStack>
 			</ScreenBody>
-			<StylesColorPanel
-				inheritedValue={ inheritedStyle }
-				value={ style }
-				onChange={ setStyle }
-				settings={ settings }
+			<ElementColors
 				additionalElements={ ADDITIONAL_ELEMENTS }
 				defaultControls={ DEFAULT_CONTROLS }
-				showInheritanceLabelIndicators={ false }
 			/>
 		</>
 	);

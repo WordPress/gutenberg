@@ -17,6 +17,7 @@ import ScreenBlock from './screen-block';
 import ScreenTypography from './screen-typography';
 import ScreenTypographyElement from './screen-typography-element';
 import ScreenColors from './screen-colors';
+import ScreenForms from './screen-forms';
 import ScreenColorPalette from './screen-color-palette';
 import ScreenBackground from './screen-background';
 import { ScreenShadows, ScreenShadowsEdit } from './screen-shadows';
@@ -204,6 +205,9 @@ export function GlobalStylesUI( {
 					<GlobalStylesNavigationScreen path="/typography">
 						<ScreenTypography />
 					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/forms">
+						<ScreenForms />
+					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/typography/font-sizes">
 						<FontSizes />
 					</GlobalStylesNavigationScreen>
@@ -252,10 +256,10 @@ export function GlobalStylesUI( {
 					<GlobalStylesNavigationScreen path="/typography/button">
 						<ScreenTypographyElement element="button" />
 					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/typography/textInput">
+					<GlobalStylesNavigationScreen path="/forms/typography/textInput">
 						<ScreenTypographyElement element="textInput" />
 					</GlobalStylesNavigationScreen>
-					<GlobalStylesNavigationScreen path="/typography/select">
+					<GlobalStylesNavigationScreen path="/forms/typography/select">
 						<ScreenTypographyElement element="select" />
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/blocks">
