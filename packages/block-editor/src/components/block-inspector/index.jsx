@@ -39,6 +39,14 @@ import {
 	hasViewportBlockStyleState,
 	isDefaultBlockStyleState,
 } from '../../hooks/block-style-state';
+import MixedTextStyleControls from './mixed-text-style-controls';
+import {
+	getContentOnlySectionClientIds,
+	getExpandedTextStyleTargetClientIds,
+	getTextStyleTargetClientIds,
+} from './mixed-text-style-utils';
+
+const EMPTY_ARRAY = [];
 
 function StyleInspectorSlots( {
 	showAdvancedControls = true,
@@ -169,6 +177,9 @@ function BlockInspector() {
 		showStateOnCanvas,
 		isResponsiveEditing,
 		blockStatesEditingEnabled,
+		isMixedSelection,
+		selectedBlockClientIds,
+		selectedSectionClientIds,
 	} = useSelect( ( select ) => {
 		const {
 			getSettings,
@@ -198,8 +209,12 @@ function BlockInspector() {
 			_renderedBlockClientId && getBlockName( _renderedBlockClientId );
 		const _blockType =
 			_renderedBlockName && getBlockType( _renderedBlockName );
-		const selectedBlockClientIds = getSelectedBlockClientIds();
-		const _isSectionBlockInSelection = selectedBlockClientIds.some(
+		const _selectedBlockClientIds = getSelectedBlockClientIds();
+		const selectedBlockNames = _selectedBlockClientIds.map( ( clientId ) =>
+			getBlockName( clientId )
+		);
+		const _isMixedSelection = new Set( selectedBlockNames ).size > 1;
+		const _selectedSectionClientIds = _selectedBlockClientIds.filter(
 			( id ) => _isSectionBlock( id )
 		);
 		const blockStyles =
@@ -211,7 +226,8 @@ function BlockInspector() {
 			renderedBlockClientId: _renderedBlockClientId,
 			renderedBlockName: _renderedBlockName,
 			blockType: _blockType,
-			isSectionBlockInSelection: _isSectionBlockInSelection,
+			isSectionBlockInSelection: _selectedSectionClientIds.length > 0,
+			selectedSectionClientIds: _selectedSectionClientIds,
 			isSectionBlock: _isSectionBlock( _renderedBlockClientId ),
 			hasBlockStyles: _hasBlockStyles,
 			editedContentOnlySection: getEditedContentOnlySection(),
@@ -224,54 +240,94 @@ function BlockInspector() {
 			),
 			isResponsiveEditing: _isResponsiveEditing(),
 			blockStatesEditingEnabled: getSettings().blockStatesEditingEnabled,
+			isMixedSelection: _isMixedSelection,
+			selectedBlockClientIds: _selectedBlockClientIds,
 		};
 	}, [] );
 
-	// Separate useSelect for contentClientIds with proper dependencies
-	const contentClientIds = useSelect(
+	// Resolve content-only descendants and expanded mixed-selection targets with
+	// the selection-specific dependencies kept out of the primary selector.
+	const {
+		contentClientIds,
+		contentTextStyleClientIds,
+		mixedSelectionTextStyleClientIds,
+	} = useSelect(
 		( select ) => {
-			if ( ! isSectionBlock || ! renderedBlockClientId ) {
-				return [];
+			const shouldCollectSelectedTextStyleTargets =
+				selectedBlockCount > 1 &&
+				( isMixedSelection || selectedSectionClientIds.length > 0 );
+			if (
+				( ! isSectionBlock || ! renderedBlockClientId ) &&
+				! shouldCollectSelectedTextStyleTargets
+			) {
+				return {
+					contentClientIds: EMPTY_ARRAY,
+					contentTextStyleClientIds: EMPTY_ARRAY,
+					mixedSelectionTextStyleClientIds: EMPTY_ARRAY,
+				};
 			}
 
 			const {
 				getClientIdsOfDescendants,
 				getBlockEditingMode,
+				getBlockName,
 				shouldRenderBlockListView,
 			} = unlock( select( blockEditorStore ) );
 
-			const descendants = getClientIdsOfDescendants(
-				renderedBlockClientId
-			);
-
-			// Exclude items from the content tab that are already present in the
-			// List View tab.
-			const listViewDescendants = new Set();
-			descendants.forEach( ( clientId ) => {
-				if ( shouldRenderBlockListView( clientId ) ) {
-					const listViewChildren =
-						getClientIdsOfDescendants( clientId );
-					listViewChildren.forEach( ( childId ) =>
-						listViewDescendants.add( childId )
-					);
-				}
-			} );
-
-			return descendants.filter( ( current ) => {
-				return (
-					! listViewDescendants.has( current ) &&
-					getBlockEditingMode( current ) === 'contentOnly'
-				);
-			} );
+			const representedClientIds =
+				isSectionBlock && renderedBlockClientId
+					? getContentOnlySectionClientIds(
+							[ renderedBlockClientId ],
+							getClientIdsOfDescendants,
+							getBlockEditingMode,
+							shouldRenderBlockListView
+					  )
+					: EMPTY_ARRAY;
+			return {
+				contentClientIds: representedClientIds,
+				contentTextStyleClientIds: getTextStyleTargetClientIds(
+					representedClientIds,
+					getBlockName,
+					getBlockType
+				),
+				mixedSelectionTextStyleClientIds:
+					shouldCollectSelectedTextStyleTargets
+						? getExpandedTextStyleTargetClientIds(
+								selectedBlockClientIds,
+								selectedSectionClientIds,
+								( sectionClientId ) =>
+									getContentOnlySectionClientIds(
+										[ sectionClientId ],
+										getClientIdsOfDescendants,
+										getBlockEditingMode,
+										shouldRenderBlockListView
+									),
+								getBlockName,
+								getBlockType
+						  )
+						: EMPTY_ARRAY,
+			};
 		},
-		[ isSectionBlock, renderedBlockClientId ]
+		[
+			isMixedSelection,
+			isSectionBlock,
+			renderedBlockClientId,
+			selectedBlockClientIds,
+			selectedBlockCount,
+			selectedSectionClientIds,
+		]
 	);
+
+	const hasSharedTextStyleControls =
+		mixedSelectionTextStyleClientIds.length > 0 ||
+		contentTextStyleClientIds.length > 0;
 
 	const availableTabs = useInspectorControlsTabs(
 		blockType?.name,
 		contentClientIds,
 		isSectionBlock,
-		hasBlockStyles
+		hasBlockStyles,
+		hasSharedTextStyleControls
 	);
 	const hasMultipleTabs = availableTabs?.length > 1;
 
@@ -294,13 +350,21 @@ function BlockInspector() {
 			<div className="block-editor-block-inspector">
 				<MultiSelectionInspector />
 				{ hasMultipleTabs ? (
-					<InspectorControlsTabs tabs={ availableTabs } />
-				) : (
-					<StyleInspectorSlots
-						showAdvancedControls={ false }
-						showPositionControls={ false }
-						showBindingsControls={ false }
+					<InspectorControlsTabs
+						tabs={ availableTabs }
+						textStyleClientIds={ mixedSelectionTextStyleClientIds }
 					/>
+				) : (
+					<>
+						<MixedTextStyleControls
+							clientIds={ mixedSelectionTextStyleClientIds }
+						/>
+						<StyleInspectorSlots
+							showAdvancedControls={ false }
+							showPositionControls={ false }
+							showBindingsControls={ false }
+						/>
+					</>
 				) }
 			</div>
 		);
@@ -310,6 +374,9 @@ function BlockInspector() {
 		return (
 			<div className="block-editor-block-inspector">
 				<MultiSelectionInspector />
+				<MixedTextStyleControls
+					clientIds={ mixedSelectionTextStyleClientIds }
+				/>
 			</div>
 		);
 	}
@@ -352,6 +419,7 @@ function BlockInspector() {
 				isSectionBlock={ isSectionBlock }
 				availableTabs={ availableTabs }
 				contentClientIds={ contentClientIds }
+				textStyleClientIds={ contentTextStyleClientIds }
 				hasBlockStyles={ hasBlockStyles }
 				editedContentOnlySection={ editedContentOnlySection }
 				blockEditingMode={ blockEditingMode }
@@ -409,6 +477,7 @@ const BlockInspectorSingleBlock = ( {
 	isSectionBlock,
 	availableTabs,
 	contentClientIds,
+	textStyleClientIds,
 	hasBlockStyles,
 	editedContentOnlySection,
 	blockEditingMode,
@@ -514,6 +583,7 @@ const BlockInspectorSingleBlock = ( {
 						tabs={ availableTabs }
 						isSectionBlock={ isSectionBlock }
 						contentClientIds={ contentClientIds }
+						textStyleClientIds={ textStyleClientIds }
 					/>
 				</>
 			) }
@@ -526,6 +596,11 @@ const BlockInspectorSingleBlock = ( {
 					<InspectorControls.Slot group="content" />
 					<InspectorControls.Slot group="list" ref={ listViewRef } />
 					<ListViewContentPopover listViewRef={ listViewRef } />
+					{ isSectionBlock && (
+						<MixedTextStyleControls
+							clientIds={ textStyleClientIds }
+						/>
+					) }
 					{ ! isSectionBlock && <StyleInspectorSlots /> }
 				</>
 			) }

@@ -130,7 +130,13 @@ function BordersInspectorControl( { label, children, resetAllFilter } ) {
 	);
 }
 
-export function BorderPanel( { clientId, name, setAttributes, settings } ) {
+export function BorderPanel( {
+	clientId,
+	name,
+	setAttributes,
+	settings,
+	asWrapper,
+} ) {
 	const selectedState = useBlockStyleState();
 	const isEnabled = useHasBorderPanel( settings );
 	const { style, borderColor, className } = useSelect(
@@ -195,7 +201,7 @@ export function BorderPanel( { clientId, name, setAttributes, settings } ) {
 
 	return (
 		<StylesBorderPanel
-			as={ BordersInspectorControl }
+			as={ asWrapper || BordersInspectorControl }
 			panelId={ clientId }
 			settings={ settings }
 			value={ value }

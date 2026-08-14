@@ -12,6 +12,7 @@ import { BackgroundImagePanel } from '../../hooks/background';
 import { ColorToolsPanel } from '../global-styles/color-panel';
 import { TypographyToolsPanel } from '../global-styles/typography-panel';
 import { BackgroundToolsPanel } from '../global-styles/background-panel';
+import MixedTextStyleControls from '../block-inspector/mixed-text-style-controls';
 
 // Section blocks present a curated subset of the normal block style panels.
 // Their block-support fills are gated off by editing mode (see
@@ -101,6 +102,7 @@ const StylesTab = ( {
 	hasBlockStyles,
 	isSectionBlock,
 	contentClientIds,
+	textStyleClientIds,
 } ) => {
 	return (
 		<>
@@ -111,6 +113,9 @@ const StylesTab = ( {
 					clientId={ clientId }
 					contentClientIds={ contentClientIds }
 				/>
+			) }
+			{ !! textStyleClientIds?.length && (
+				<MixedTextStyleControls clientIds={ textStyleClientIds } />
 			) }
 			{
 				// Extenders have in the past always been allowed to add controls to group

@@ -3,6 +3,18 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 /** @typedef {import('@playwright/test').Page} Page */
 /** @typedef {import('@wordpress/e2e-test-utils-playwright').Editor} Editor */
 
+async function setCustomFontSize( page, value ) {
+	const editorSettings = page.getByRole( 'region', {
+		name: 'Editor settings',
+	} );
+	await editorSettings
+		.getByRole( 'button', { name: 'Set custom size' } )
+		.click();
+	await editorSettings
+		.getByRole( 'spinbutton', { name: 'Font size' } )
+		.fill( value );
+}
+
 /**
  * Some tests in this file use the character `|` to represent the caret's position
  * in a more readable format.
@@ -900,6 +912,187 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 				},
 			},
 		] );
+	} );
+
+	for ( const direction of [ 'forward', 'reverse' ] ) {
+		test( `shows shared text styles for a paragraph and image selected ${ direction }`, async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Text target' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/image',
+			} );
+
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			const image = editor.canvas.getByRole( 'document', {
+				name: 'Block: Image',
+			} );
+			await editor.selectBlocks(
+				direction === 'forward' ? paragraph : image,
+				direction === 'forward' ? image : paragraph
+			);
+			await editor.showBlockToolbar();
+
+			await expect(
+				page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Align text' } )
+			).toBeHidden();
+
+			await editor.openDocumentSettingsSidebar();
+			const editorSettings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await expect(
+				editorSettings.getByRole( 'heading', { name: 'Typography' } )
+			).toBeVisible();
+			await expect(
+				editorSettings.getByRole( 'heading', { name: 'Dimensions' } )
+			).toBeVisible();
+
+			const imageAttributes = ( await editor.getBlocks() )[ 1 ]
+				.attributes;
+			await setCustomFontSize( page, '23' );
+
+			await expect
+				.poll(
+					async () =>
+						( await editor.getBlocks() )[ 0 ].attributes.style
+							?.typography?.fontSize
+				)
+				.toBe( '23px' );
+			expect( ( await editor.getBlocks() )[ 1 ].attributes ).toEqual(
+				imageAttributes
+			);
+		} );
+	}
+
+	test( 'updates compatible text blocks only in a three-type selection', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Paragraph' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { content: 'Heading' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				style: { border: { radius: '8px' } },
+			},
+		} );
+
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		const image = editor.canvas.getByRole( 'document', {
+			name: 'Block: Image',
+		} );
+		await editor.selectBlocks( paragraph, image );
+		await editor.openDocumentSettingsSidebar();
+
+		const imageAttributes = ( await editor.getBlocks() )[ 2 ].attributes;
+		await setCustomFontSize( page, '29' );
+
+		await expect
+			.poll( async () =>
+				( await editor.getBlocks() )
+					.slice( 0, 2 )
+					.map(
+						( block ) =>
+							block.attributes.style?.typography?.fontSize
+					)
+			)
+			.toEqual( [ '29px', '29px' ] );
+		expect( ( await editor.getBlocks() )[ 2 ].attributes ).toEqual(
+			imageAttributes
+		);
+	} );
+
+	test( 'keeps the existing same-type style and toolbar behavior', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'One' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Two' },
+		} );
+		const paragraphs = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await editor.selectBlocks( paragraphs.first(), paragraphs.last() );
+		await editor.showBlockToolbar();
+
+		await expect(
+			page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Align text' } )
+		).toBeVisible();
+
+		await editor.openDocumentSettingsSidebar();
+		await setCustomFontSize( page, '19' );
+		await expect
+			.poll( async () =>
+				( await editor.getBlocks() ).map(
+					( block ) => block.attributes.style?.typography?.fontSize
+				)
+			)
+			.toEqual( [ '19px', '19px' ] );
+	} );
+
+	test( 'does not add text styles to an image-only selection', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Image' } )
+		);
+		await editor.openDocumentSettingsSidebar();
+
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await editorSettings.getByRole( 'tab', { name: 'Styles' } ).click();
+		await expect(
+			editorSettings.getByRole( 'heading', { name: 'Dimensions' } )
+		).toBeVisible();
+		await expect(
+			editorSettings.getByRole( 'heading', { name: 'Typography' } )
+		).toBeHidden();
+	} );
+
+	test( 'does not add text styles to a mixed non-text selection', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		await editor.insertBlock( { name: 'core/spacer' } );
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Image' } ),
+			editor.canvas.getByRole( 'document', { name: 'Block: Spacer' } )
+		);
+		await editor.openDocumentSettingsSidebar();
+
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'heading', { name: 'Typography' } )
+		).toBeHidden();
 	} );
 
 	// Previously we would unexpectedly duplicate the block on Enter.
