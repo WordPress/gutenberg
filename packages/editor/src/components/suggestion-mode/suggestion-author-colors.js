@@ -1,10 +1,116 @@
+import { __, sprintf } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import { decodeEntities } from '@wordpress/html-entities';
 import { useStyleOverride } from '@wordpress/block-editor';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import { useNoteThreads } from '../collab-sidebar/hooks';
 import { parseSuggestionPayload } from './provider';
 import { store as editorStore } from '../../store';
+
+/**
+ * Collect the distinct authors that actually have an inline-suggestion thread,
+ * mapped to their display name (empty string when the server did not send one).
+ *
+ * @param {Array} threads Unresolved note threads.
+ * @return {Map<number, string>} Author id to display name, in thread order.
+ */
+function getInlineSuggestionAuthors( threads ) {
+	const authors = new Map();
+	for ( const thread of threads ?? [] ) {
+		const payload = parseSuggestionPayload( thread?.meta?._wp_suggestion );
+		const hasInline = payload?.operations?.some(
+			( op ) => op.type === 'inline-suggestion'
+		);
+		if ( ! hasInline ) {
+			continue;
+		}
+		// `author` is a server-assigned user id (a non-negative integer); skip
+		// anything that isn't, so the numeric value can compose the attribute
+		// selector directly (no escaping needed inside the quoted value, and
+		// `CSS.escape` would wrongly escape a leading digit).
+		const author = thread.author;
+		if ( ! Number.isInteger( author ) || author < 0 ) {
+			continue;
+		}
+		if ( authors.has( author ) ) {
+			continue;
+		}
+		authors.set( author, decodeEntities( thread.author_name ?? '' ) );
+	}
+	return authors;
+}
+
+/**
+ * Escape a display name for use inside a double-quoted CSS string. Names are
+ * user-supplied, so a stray quote or backslash would otherwise break out of the
+ * `content` value and corrupt the injected stylesheet.
+ *
+ * @param {string} value Decoded display name.
+ * @return {string} Value safe to place between double quotes.
+ */
+function escapeCssString( value ) {
+	return value.replace( /[\\"]/g, '\\$&' ).replace( /[\n\r]+/g, ' ' );
+}
+
+/**
+ * Build CSS that names the suggester in the screen-reader announcements
+ * bracketing each inline marker. `content-suggestion.scss` paints a generic
+ * "Start of suggested addition." from the marker's `data-` attributes; these
+ * rules are more specific and replace it with the authored version, so a
+ * screen-reader user gets the same "who" that sighted reviewers get from the
+ * per-author tint above.
+ *
+ * Pure so it can be unit-tested without React.
+ *
+ * @param {Array} threads Unresolved note threads (each with `author`,
+ *                        `author_name` and the `_wp_suggestion` meta payload).
+ * @return {string} Serialized CSS targeting `.wp-suggestion-a11y` pseudo-elements.
+ */
+export function buildSuggestionAuthorAnnouncementCss( threads ) {
+	const announcements = {
+		add: [
+			/* translators: %s: Name of the person who made the suggestion. */
+			__( 'Start of suggested addition by %s.' ),
+			/* translators: %s: Name of the person who made the suggestion. */
+			__( 'End of suggested addition by %s.' ),
+		],
+		del: [
+			/* translators: %s: Name of the person who made the suggestion. */
+			__( 'Start of suggested deletion by %s.' ),
+			/* translators: %s: Name of the person who made the suggestion. */
+			__( 'End of suggested deletion by %s.' ),
+		],
+		format: [
+			/* translators: %s: Name of the person who made the suggestion. */
+			__( 'Start of suggested formatting change by %s.' ),
+			/* translators: %s: Name of the person who made the suggestion. */
+			__( 'End of suggested formatting change by %s.' ),
+		],
+	};
+	const rules = [];
+	for ( const [ author, name ] of getInlineSuggestionAuthors( threads ) ) {
+		if ( ! name ) {
+			continue;
+		}
+		for ( const [ type, [ start, end ] ] of Object.entries(
+			announcements
+		) ) {
+			const sel =
+				`.wp-suggestion[data-author="${ author }"]` +
+				`[data-suggestion-type="${ type }"] .wp-suggestion-a11y`;
+			rules.push(
+				`${ sel }::before{content:"${ escapeCssString(
+					sprintf( start, name )
+				) }";}`,
+				`${ sel }::after{content:"${ escapeCssString(
+					sprintf( end, name )
+				) }";}`
+			);
+		}
+	}
+	return rules.join( '' );
+}
 
 /**
  * Build CSS that tints each inline suggestion marker with its author's color by
@@ -23,28 +129,8 @@ import { store as editorStore } from '../../store';
  * @return {string} Serialized CSS targeting `.wp-suggestion[data-author]`.
  */
 export function buildSuggestionAuthorColorCss( threads ) {
-	const seen = new Set();
 	const rules = [];
-	for ( const thread of threads ?? [] ) {
-		const payload = parseSuggestionPayload( thread?.meta?._wp_suggestion );
-		const hasInline = payload?.operations?.some(
-			( op ) => op.type === 'inline-suggestion'
-		);
-		if ( ! hasInline ) {
-			continue;
-		}
-		// `author` is a server-assigned user id (a non-negative integer); skip
-		// anything that isn't, so the numeric value can compose the attribute
-		// selector directly (no escaping needed inside the quoted value, and
-		// `CSS.escape` would wrongly escape a leading digit).
-		const author = thread.author;
-		if ( ! Number.isInteger( author ) || author < 0 ) {
-			continue;
-		}
-		if ( seen.has( author ) ) {
-			continue;
-		}
-		seen.add( author );
+	for ( const author of getInlineSuggestionAuthors( threads ).keys() ) {
 		const color = getAvatarBorderColor( author );
 		const sel = `.wp-suggestion[data-author="${ author }"]`;
 		rules.push( `${ sel }{--suggestion-author-color:${ color };}` );
@@ -53,10 +139,12 @@ export function buildSuggestionAuthorColorCss( threads ) {
 }
 
 /**
- * Injects per-author `--suggestion-author-color` rules into the editor canvas so
- * each inline suggestion marker tints to its author. Mounted once inside the
- * suggestion overlay provider, alongside `SuggestionAnnotations`, so the tint is
- * visible to everyone viewing the post in any editor intent.
+ * Injects the per-author rules for inline suggestion markers into the editor
+ * canvas: `--suggestion-author-color` so each marker tints to its author, and
+ * the matching screen-reader announcement so the same "who" is available
+ * without sight. Mounted once inside the suggestion overlay provider, alongside
+ * `SuggestionAnnotations`, so both are present for everyone viewing the post in
+ * any editor intent.
  *
  * Uses `useStyleOverride` so the rules reach the iframed canvas (a plain
  * `<style>` in the chrome would only affect the parent document).
@@ -70,7 +158,9 @@ export default function SuggestionAuthorColors() {
 	);
 	const { unresolvedNotes } = useNoteThreads( postId );
 	const css = useMemo(
-		() => buildSuggestionAuthorColorCss( unresolvedNotes ),
+		() =>
+			buildSuggestionAuthorColorCss( unresolvedNotes ) +
+			buildSuggestionAuthorAnnouncementCss( unresolvedNotes ),
 		[ unresolvedNotes ]
 	);
 	useStyleOverride( { id: 'core-suggestion-author-colors', css } );

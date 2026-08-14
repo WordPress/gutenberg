@@ -175,6 +175,41 @@ $suggestion-addition-text-color: color-mix(in srgb, var(--suggestion-author-colo
 		text-decoration-thickness: 2px;
 		text-underline-offset: 2px;
 	}
+
+	// Everything above is color and text-decoration, which conveys nothing to
+	// a screen reader: a proposed deletion reads as ordinary prose. The editor
+	// nests a `.wp-suggestion-a11y` span inside each marker (a rich-text
+	// decoration that never serializes) carrying the announcement for its type
+	// and author; paint it as generated content so the marker is bracketed in
+	// the reading order.
+	//
+	// Generated content rather than a real text node on purpose: this lives
+	// inside a `contenteditable`, where a hidden text node would be reachable
+	// by the caret, land in the selection and ride along on copy. A
+	// pseudo-element cannot be edited, selected or copied. The strings arrive
+	// through `data-` attributes (the same trick the pending-move tab uses
+	// above) so they stay translatable instead of being baked into CSS.
+	.wp-suggestion-a11y {
+		&::before,
+		&::after {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			overflow: hidden;
+			clip-path: inset(50%);
+			white-space: nowrap;
+			pointer-events: none;
+			user-select: none;
+		}
+
+		&::before {
+			content: attr(data-suggestion-a11y-start);
+		}
+
+		&::after {
+			content: attr(data-suggestion-a11y-end);
+		}
+	}
 }
 
 // Move ghost: a non-interactive placeholder rendered at a moved block's

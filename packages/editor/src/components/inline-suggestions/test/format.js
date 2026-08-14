@@ -207,6 +207,40 @@ describe( 'suggestion a11y role decoration', () => {
 			expect( addSuggestionRoleFormats( [] ) ).toEqual( [] );
 			expect( addSuggestionRoleFormats( undefined ) ).toBe( undefined );
 		} );
+
+		it( 'gives a format marker no insertion/deletion role', () => {
+			// A formatting suggestion neither adds nor removes text, so
+			// announcing it as a deletion tells a screen-reader user the run
+			// is slated for removal when it is not.
+			const { formats } = create( {
+				html: marker( 3, 'format', 'zz' ),
+			} );
+			const decorated = addSuggestionRoleFormats( formats );
+			const decoration = decorated[ 0 ].find(
+				( f ) => f.type === SUGGESTION_A11Y_FORMAT_NAME
+			);
+			expect( decoration ).toBeTruthy();
+			expect( decoration.attributes.role ).toBe( undefined );
+		} );
+
+		it( 'brackets every marker type with screen-reader announcements', () => {
+			for ( const [ type, word ] of [
+				[ 'add', 'addition' ],
+				[ 'del', 'deletion' ],
+				[ 'format', 'formatting change' ],
+			] ) {
+				const { formats } = create( { html: marker( 4, type, 'q' ) } );
+				const decoration = addSuggestionRoleFormats(
+					formats
+				)[ 0 ].find( ( f ) => f.type === SUGGESTION_A11Y_FORMAT_NAME );
+				expect( decoration.attributes.start ).toBe(
+					`Start of suggested ${ word }.`
+				);
+				expect( decoration.attributes.end ).toBe(
+					`End of suggested ${ word }.`
+				);
+			}
+		} );
 	} );
 
 	describe( 'serialization safety', () => {
@@ -229,6 +263,16 @@ describe( 'suggestion a11y role decoration', () => {
 			const html = value.toHTMLString();
 			expect( html ).not.toContain( 'role=' );
 			expect( html ).not.toContain( 'wp-suggestion-a11y' );
+			expect( html ).toContain( 'data-suggestion-id="1"' );
+			expect( html ).toContain( 'b' );
+		} );
+
+		it( 'drops the announcement attributes read back from the editable DOM', () => {
+			const value = RichTextData.fromHTMLString(
+				`a<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="del"><span class="wp-suggestion-a11y" role="deletion" data-suggestion-a11y-start="Start of suggested deletion." data-suggestion-a11y-end="End of suggested deletion.">b</span></mark>c`
+			);
+			const html = value.toHTMLString();
+			expect( html ).not.toContain( 'data-suggestion-a11y' );
 			expect( html ).toContain( 'data-suggestion-id="1"' );
 			expect( html ).toContain( 'b' );
 		} );
