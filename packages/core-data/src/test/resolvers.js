@@ -1528,7 +1528,6 @@ describe( 'getAutosave', () => {
 		return {
 			dispatch: Object.assign( jest.fn(), {
 				receiveAutosaves: jest.fn(),
-				finishResolution: jest.fn(),
 			} ),
 			resolveSelect: Object.assign( jest.fn(), {
 				getPostType: jest.fn( () => ( {
@@ -1549,7 +1548,7 @@ describe( 'getAutosave', () => {
 		)( { dispatch, resolveSelect } );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
-			path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit&per_page=1&author=${ AUTHOR_ID }`,
+			path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit&author=${ AUTHOR_ID }`,
 		} );
 		expect( dispatch.receiveAutosaves ).toHaveBeenCalledWith(
 			postId,
@@ -1557,22 +1556,7 @@ describe( 'getAutosave', () => {
 		);
 	} );
 
-	it( 'marks getAutosaves resolution as finished so hasFetchedAutosaves reports true', async () => {
-		const { dispatch, resolveSelect } = setUp( SUCCESSFUL_RESPONSE );
-
-		await getAutosave(
-			postType,
-			postId,
-			AUTHOR_ID
-		)( { dispatch, resolveSelect } );
-
-		expect( dispatch.finishResolution ).toHaveBeenCalledWith(
-			'getAutosaves',
-			[ postType, postId ]
-		);
-	} );
-
-	it( 'finishes getAutosaves resolution even when the author has no autosave', async () => {
+	it( 'receives nothing when the author has no autosave', async () => {
 		const { dispatch, resolveSelect } = setUp( [] );
 
 		await getAutosave(
@@ -1582,13 +1566,9 @@ describe( 'getAutosave', () => {
 		)( { dispatch, resolveSelect } );
 
 		expect( dispatch.receiveAutosaves ).not.toHaveBeenCalled();
-		expect( dispatch.finishResolution ).toHaveBeenCalledWith(
-			'getAutosaves',
-			[ postType, postId ]
-		);
 	} );
 
-	it( 'does not fetch when the author is unknown, but still finishes resolution', async () => {
+	it( 'does not fetch when the author is unknown', async () => {
 		const { dispatch, resolveSelect } = setUp( SUCCESSFUL_RESPONSE );
 
 		await getAutosave(
@@ -1598,15 +1578,10 @@ describe( 'getAutosave', () => {
 		)( { dispatch, resolveSelect } );
 
 		expect( triggerFetch ).not.toHaveBeenCalled();
-		// Bailing without reporting would leave autosaving disabled for the
-		// session if the current user id never arrives.
-		expect( dispatch.finishResolution ).toHaveBeenCalledWith(
-			'getAutosaves',
-			[ postType, postId ]
-		);
+		expect( resolveSelect.getPostType ).not.toHaveBeenCalled();
 	} );
 
-	it( 'does not fetch when the post type does not support autosaves, but still finishes resolution', async () => {
+	it( 'does not fetch when the post type does not support autosaves', async () => {
 		const { dispatch } = setUp( SUCCESSFUL_RESPONSE );
 		const resolveSelect = Object.assign( jest.fn(), {
 			getPostType: jest.fn( () => ( {
@@ -1622,33 +1597,6 @@ describe( 'getAutosave', () => {
 		)( { dispatch, resolveSelect } );
 
 		expect( triggerFetch ).not.toHaveBeenCalled();
-		expect( dispatch.finishResolution ).toHaveBeenCalledWith(
-			'getAutosaves',
-			[ postType, postId ]
-		);
-	} );
-
-	it( 'finishes resolution even when the request fails', async () => {
-		const { dispatch, resolveSelect } = setUp( SUCCESSFUL_RESPONSE );
-		triggerFetch.mockImplementation( () => {
-			throw new Error( 'Network error' );
-		} );
-
-		await expect(
-			getAutosave(
-				postType,
-				postId,
-				AUTHOR_ID
-			)( { dispatch, resolveSelect } )
-		).rejects.toThrow( 'Network error' );
-
-		expect( dispatch.receiveAutosaves ).not.toHaveBeenCalled();
-		// A failed fetch previously still counted as fetched, because
-		// hasFinishedResolution treats an errored resolution as complete.
-		expect( dispatch.finishResolution ).toHaveBeenCalledWith(
-			'getAutosaves',
-			[ postType, postId ]
-		);
 	} );
 
 	it( 'leaves the getAutosaves resolver behavior unchanged', async () => {

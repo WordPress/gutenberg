@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Register the editor and block editor keyboard shortcuts from the editor provider, so shortcuts work for consumers that mount the editor without rendering `EditorKeyboardShortcutsRegister` themselves ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
+-   `isEditedPostAutosaveable`: Read `hasFetchedAutosave` for the current user rather than `hasFetchedAutosaves` for the whole collection, so it tracks the request the editor actually makes. It no longer reports the post as autosaveable before the current user is known ([#71367](https://github.com/WordPress/gutenberg/pull/71367)).
 
 ## 14.53.0 (2026-08-12)
 
