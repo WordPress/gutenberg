@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Icon: Apply only padding to the inner SVG in the editor, so margin is no longer applied twice compared to the front end ([#81292](https://github.com/WordPress/gutenberg/pull/81292)).
+-   Image: Stop clicking the enlarged image from closing the lightbox, so tapping to inspect an image, or mis-tapping while reaching for the gallery's Previous or Next button, no longer dismisses it. The dialog still closes from the area around the image, the Close button, and Escape ([#78907](https://github.com/WordPress/gutenberg/pull/78907)).
 -   Term Description: Apply the term description display filters when rendering with term context inside a Terms Query loop, so multi-paragraph descriptions keep their paragraphs and match the taxonomy archive rendering ([#81290](https://github.com/WordPress/gutenberg/pull/81290)).
 
 ## 10.4.0 (2026-08-12)

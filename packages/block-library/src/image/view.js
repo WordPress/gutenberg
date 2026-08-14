@@ -36,6 +36,14 @@ const focusableSelectors = [
 ];
 
 /**
+ * Matches the element wrapping the enlarged image in the lightbox. Its box is
+ * sized to the image, so it doubles as the image's hit area.
+ *
+ * @type {string}
+ */
+const imageContainerSelector = '.lightbox-image-container';
+
+/**
  * Returns the appropriate src URL for an image.
  *
  * @param {string} uploadedSrc - Full size image src.
@@ -212,6 +220,17 @@ const { state, actions, callbacks } = store(
 
 				// Computes the styles of the overlay for the animation.
 				callbacks.setOverlayStyles();
+			},
+			handleOverlayClick( event ) {
+				// The enlarged image is not a dismiss target. Users click or tap
+				// it to inspect it, and in a gallery a mis-tap while reaching for
+				// the Previous/Next buttons would close the dialog and lose their
+				// place. The dialog is dismissed by clicking the area around the
+				// image, by the Close button, or by pressing Escape.
+				if ( event.target.closest( imageContainerSelector ) ) {
+					return;
+				}
+				actions.hideLightbox();
 			},
 			hideLightbox() {
 				if ( state.overlayEnabled ) {

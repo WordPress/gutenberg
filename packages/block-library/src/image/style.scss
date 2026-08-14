@@ -304,6 +304,10 @@
 		width: var(--wp--lightbox-container-width);
 		height: var(--wp--lightbox-container-height);
 		z-index: 2000001;
+		// Clicking the enlarged image does not close the lightbox, so it must
+		// not present the overlay's zoom-out cursor. The area around the image
+		// still closes it and keeps that cursor.
+		cursor: default;
 	}
 
 	.wp-block-image {
