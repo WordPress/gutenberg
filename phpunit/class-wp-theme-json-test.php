@@ -2049,6 +2049,37 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_get_stylesheet_generates_layout_styles_with_axial_block_gap() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'spacing' => array(
+						'blockGap' => true,
+					),
+				),
+				'styles'   => array(
+					'blocks' => array(
+						'core/group' => array(
+							'spacing' => array(
+								'blockGap' => array(
+									'top'  => '1em',
+									'left' => '2em',
+								),
+							),
+						),
+					),
+				),
+			),
+			'default'
+		);
+
+		$this->assertSameCSS(
+			':root :where(.wp-block-group-is-layout-flow) > :first-child{margin-block-start: 0;}:root :where(.wp-block-group-is-layout-flow) > :last-child{margin-block-end: 0;}:root :where(.wp-block-group-is-layout-flow) > *{margin-block-start: 1em;margin-block-end: 0;}:root :where(.wp-block-group-is-layout-constrained) > :first-child{margin-block-start: 0;}:root :where(.wp-block-group-is-layout-constrained) > :last-child{margin-block-end: 0;}:root :where(.wp-block-group-is-layout-constrained) > *{margin-block-start: 1em;margin-block-end: 0;}:root :where(.wp-block-group-is-layout-flex){gap: 1em 2em;}:root :where(.wp-block-group-is-layout-grid){gap: 1em 2em;}',
+			$theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) )
+		);
+	}
+
 	public function test_get_stylesheet_generates_layout_styles_with_spacing_presets() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(

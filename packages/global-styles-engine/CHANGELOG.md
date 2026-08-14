@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Use the row block spacing value for Flow and Constrained layouts when Global Styles defines separate row and column values.
+
 ## 1.20.0 (2026-08-12)
 
 ### Bug Fixes
