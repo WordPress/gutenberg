@@ -209,7 +209,7 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	// A fully selected field shows a grab cursor: pressing anywhere in it
 	// drags the block.
 	&[data-entirely-selected],
-	&[data-entirely-selected] [contenteditable] {
+	[data-entirely-selected] {
 		cursor: grab;
 	}
 }

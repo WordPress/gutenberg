@@ -1,5 +1,5 @@
 import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
-import { isEntirelySelected, isTextField } from '@wordpress/dom';
+import { isTextField } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
@@ -76,33 +76,16 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				}
 			}
 
-			// The editable field whose content is entirely covered by the
-			// text selection, or null when there is none. Pressing such a
-			// field drags the block; the attribute gives it a grab cursor.
-			let entirelySelectedField = null;
 			// The field the current press started on, for the length of
 			// the press and the drag that may follow it.
 			let pressedField = null;
 
-			function onSelectionChange() {
-				const { activeElement } = node.ownerDocument;
-				const selection = node.ownerDocument.defaultView.getSelection();
-
-				entirelySelectedField =
-					! selection.isCollapsed &&
-					activeElement &&
-					node.contains( activeElement ) &&
-					activeElement.isContentEditable &&
-					isEntirelySelected( activeElement ) &&
-					! hasMultiSelection()
-						? activeElement
-						: null;
-
-				if ( entirelySelectedField ) {
-					node.dataset.entirelySelected = 'true';
-				} else {
-					delete node.dataset.entirelySelected;
-				}
+			// Rich text marks its element while its content is entirely
+			// covered by the text selection.
+			function getEntirelySelectedField() {
+				return node.matches( '[data-entirely-selected]' )
+					? node
+					: node.querySelector( '[data-entirely-selected]' );
 			}
 
 			/**
@@ -133,13 +116,18 @@ export function useEventHandlers( { clientId, isSelected } ) {
 					return;
 				}
 
-				if ( ! entirelySelectedField ) {
+				const editableElement = getEntirelySelectedField();
+
+				if (
+					! editableElement ||
+					! editableElement.isContentEditable ||
+					hasMultiSelection()
+				) {
 					return;
 				}
 
 				const { ownerDocument } = node;
 				const selection = ownerDocument.defaultView.getSelection();
-				const editableElement = entirelySelectedField;
 
 				node.setAttribute( 'draggable', 'true' );
 				editableElement.setAttribute( 'contenteditable', 'false' );
@@ -205,25 +193,23 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			function onDragStart( event ) {
 				const { activeElement } = node.ownerDocument;
 				// The press above already converts a press on a fully
-				// selected field into a block drag; the selection check
+				// selected field into a block drag; the attribute check
 				// remains for drags the browser starts on its own.
-				const isFullySelectedTextDrag =
-					!! pressedField ||
-					( node.contains( event.target ) &&
-						activeElement &&
-						node.contains( activeElement ) &&
-						activeElement.isContentEditable &&
-						isEntirelySelected( activeElement ) &&
-						! hasMultiSelection() );
+				const fullySelectedField =
+					pressedField ||
+					( node.contains( event.target ) && ! hasMultiSelection()
+						? getEntirelySelectedField()
+						: null );
 				const isDirectBlockDrag =
 					node === event.target &&
 					! node.isContentEditable &&
 					activeElement === node &&
 					! hasMultiSelection();
 
-				if ( ! isDirectBlockDrag && ! isFullySelectedTextDrag ) {
+				if ( ! isDirectBlockDrag && ! fullySelectedField ) {
 					return;
 				}
+
 				const data = JSON.stringify( {
 					type: 'block',
 					srcClientIds: [ clientId ],
@@ -238,10 +224,7 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				// Dragging a fully selected field keeps its selection, so
 				// the highlight rides along with the dragged block and
 				// survives the drop. Other drags clear the selection.
-				const editableElement =
-					pressedField ||
-					( isFullySelectedTextDrag && activeElement ) ||
-					null;
+				const editableElement = fullySelectedField;
 
 				if ( ! editableElement ) {
 					selection.removeAllRanges();
@@ -435,15 +418,9 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				ownerDocument.documentElement.classList.add( 'is-dragging' );
 			}
 
-			onSelectionChange();
-
 			node.addEventListener( 'keydown', onKeyDown );
 			node.addEventListener( 'mousedown', onMouseDown );
 			node.addEventListener( 'dragstart', onDragStart );
-			node.ownerDocument.addEventListener(
-				'selectionchange',
-				onSelectionChange
-			);
 
 			/**
 			 * Handles double-click events on section blocks to edit content only section.
@@ -477,11 +454,6 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				node.removeEventListener( 'mousedown', onMouseDown );
 				node.removeEventListener( 'dragstart', onDragStart );
 				node.removeEventListener( 'dblclick', onDoubleClick );
-				node.ownerDocument.removeEventListener(
-					'selectionchange',
-					onSelectionChange
-				);
-				delete node.dataset.entirelySelected;
 			};
 		},
 		[
