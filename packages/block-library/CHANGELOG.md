@@ -2,11 +2,6 @@
 
 ## Unreleased
 
-### Enhancements
-
--   List: Add align (wide/full), layout, and block gap support ([#68002](https://github.com/WordPress/gutenberg/pull/68002)).
--   List: Make layout justification move list items with or without a custom content width ([#68002](https://github.com/WordPress/gutenberg/pull/68002)).
-
 ### Internal
 
 -   Heading: Declare the heading level and paragraph keyboard shortcuts on the block's variations and transforms, rather than in a `BlockKeyboardShortcuts` component that every editor had to render. The `BlockKeyboardShortcuts` private export has been removed ([#81588](https://github.com/WordPress/gutenberg/pull/81588)).
