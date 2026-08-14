@@ -4,6 +4,7 @@
 	"compilerOptions": {
 		"noEmit": true,
 		"emitDeclarationOnly": false,
+		"checkJs": false,
 		"types": [ "jest" ]
 	},
 	/*
