@@ -304,7 +304,11 @@ function CalendarDateControl< Item >( {
 	useEffect( () => {
 		const parsedDate = parseDate( value );
 		if ( parsedDate ) {
-			setCalendarMonth( parsedDate );
+			setCalendarMonth( ( currentMonth ) =>
+				isSameMonth( parsedDate, currentMonth )
+					? currentMonth
+					: parsedDate
+			);
 		}
 	}, [ value ] );
 

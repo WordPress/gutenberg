@@ -1,3 +1,4 @@
+import { isSameMonth } from 'date-fns';
 import {
 	BaseControl,
 	privateApis as componentsPrivateApis,
@@ -51,7 +52,11 @@ function CalendarDateTimeControl< Item >( {
 	useEffect( () => {
 		const parsedDate = parseDateTime( value );
 		if ( parsedDate ) {
-			setCalendarMonth( parsedDate );
+			setCalendarMonth( ( currentMonth ) =>
+				isSameMonth( parsedDate, currentMonth )
+					? currentMonth
+					: parsedDate
+			);
 		}
 	}, [ value ] );
 
