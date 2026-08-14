@@ -1,5 +1,5 @@
 import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
-import { isTextField } from '@wordpress/dom';
+import { isEntirelySelected, isTextField } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
@@ -80,12 +80,19 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			// the press and the drag that may follow it.
 			let pressedField = null;
 
-			// Rich text marks its element while its content is entirely
-			// covered by the text selection.
+			// The editable field whose content is entirely covered by the
+			// text selection, or null when there is none.
 			function getEntirelySelectedField() {
-				return node.matches( '[data-entirely-selected]' )
-					? node
-					: node.querySelector( '[data-entirely-selected]' );
+				const { activeElement } = node.ownerDocument;
+				const selection = node.ownerDocument.defaultView.getSelection();
+
+				return ! selection.isCollapsed &&
+					activeElement &&
+					node.contains( activeElement ) &&
+					activeElement.isContentEditable &&
+					isEntirelySelected( activeElement )
+					? activeElement
+					: null;
 			}
 
 			/**
@@ -118,11 +125,7 @@ export function useEventHandlers( { clientId, isSelected } ) {
 
 				const editableElement = getEntirelySelectedField();
 
-				if (
-					! editableElement ||
-					! editableElement.isContentEditable ||
-					hasMultiSelection()
-				) {
+				if ( ! editableElement || hasMultiSelection() ) {
 					return;
 				}
 
