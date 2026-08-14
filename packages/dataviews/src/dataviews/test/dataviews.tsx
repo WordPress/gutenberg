@@ -977,27 +977,27 @@ describe( 'DataViews component', () => {
 					/>
 				);
 
-			const getGrid = ( container: HTMLElement ) =>
-				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-				container.querySelector( '.dataviews-view-grid-items' );
+			// The standard (non-infinite-scroll) grid root, which carries the
+			// custom properties the previews read.
+			const getGrid = () => screen.getByRole( 'grid' );
 
 			it( 'crops previews by default', () => {
-				const { container } = renderGrid();
-				expect( getGrid( container ) ).toHaveStyle( {
+				renderGrid();
+				expect( getGrid() ).toHaveStyle( {
 					'--wp-dataviews-media-fit': 'cover',
 				} );
 			} );
 
 			it( 'fits previews when configured to contain', () => {
-				const { container } = renderGrid( { mediaFit: 'contain' } );
-				expect( getGrid( container ) ).toHaveStyle( {
+				renderGrid( { mediaFit: 'contain' } );
+				expect( getGrid() ).toHaveStyle( {
 					'--wp-dataviews-media-fit': 'contain',
 				} );
 			} );
 
 			it( 'ignores an unsupported value and falls back to cropping', () => {
-				const { container } = renderGrid( { mediaFit: 'fill' } );
-				expect( getGrid( container ) ).toHaveStyle( {
+				renderGrid( { mediaFit: 'fill' } );
+				expect( getGrid() ).toHaveStyle( {
 					'--wp-dataviews-media-fit': 'cover',
 				} );
 			} );
@@ -1016,7 +1016,7 @@ describe( 'DataViews component', () => {
 			} );
 
 			it( 'toggles the fit from the view options when opted in', async () => {
-				const { container } = renderGrid(
+				renderGrid(
 					{},
 					{
 						config: {
@@ -1034,7 +1034,7 @@ describe( 'DataViews component', () => {
 						name: 'Original aspect ratio',
 					} )
 				);
-				expect( getGrid( container ) ).toHaveStyle( {
+				expect( getGrid() ).toHaveStyle( {
 					'--wp-dataviews-media-fit': 'contain',
 				} );
 			} );
