@@ -467,7 +467,7 @@ const LinkUITools = ( {
 					{ __( 'Create page' ) }
 				</Button>
 			) }
-			{ canAddBlock && matchingItems.length === 0 && (
+			{ canAddBlock && (
 				<Button
 					__next40pxDefaultSize
 					ref={ addBlockButtonRef }
