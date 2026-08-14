@@ -43,6 +43,7 @@
 ### Documentation
 
 -   Add an Emotion-to-SCSS Modules migration guide for contributors ([#82567](https://github.com/WordPress/gutenberg/pull/82567)).
+-   `Notice`, `Snackbar`: Fix a crash when a child using hooks is conditionally rendered ([#81640](https://github.com/WordPress/gutenberg/pull/81640)).
 
 ### Internal
 
