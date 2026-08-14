@@ -161,15 +161,16 @@ describe( 'finalizePreparedNpmRelease', () => {
 } );
 
 describe( 'backportCommitsToBranch', () => {
-	const createGit = () => {
-		const git = {
-			fetch: jest.fn( () => git ),
-			checkout: jest.fn( () => git ),
-			pull: jest.fn().mockResolvedValue(),
-			push: jest.fn().mockResolvedValue(),
-			raw: jest.fn().mockResolvedValue( '' ),
-		};
-		return git;
+	const createGit = () => ( {
+		fetch: jest.fn().mockResolvedValue(),
+		push: jest.fn().mockResolvedValue(),
+		raw: jest.fn().mockResolvedValue( '' ),
+	} );
+
+	const getRawCallOrder = ( git, matcher ) => {
+		const callIndex = git.raw.mock.calls.findIndex( matcher );
+		expect( callIndex ).toBeGreaterThan( -1 );
+		return git.raw.mock.invocationCallOrder[ callIndex ];
 	};
 
 	it( 'applies the changelog commit, cherry-picks the publish commit, and verifies before pushing', async () => {
@@ -184,8 +185,18 @@ describe( 'backportCommitsToBranch', () => {
 			{ applyReleaseChangelogCommitFn, git, verifyBackportedChangelogsFn }
 		);
 
-		expect( git.checkout ).toHaveBeenCalledWith( 'trunk' );
-		expect( git.pull ).toHaveBeenCalledWith( 'origin', 'trunk' );
+		expect( git.fetch ).toHaveBeenCalledWith( 'origin', 'trunk' );
+		expect( git.raw ).toHaveBeenCalledWith(
+			'checkout',
+			'-B',
+			'trunk',
+			'origin/trunk'
+		);
+		expect( git.raw ).toHaveBeenCalledWith(
+			'reset',
+			'--hard',
+			'origin/trunk'
+		);
 		expect( applyReleaseChangelogCommitFn ).toHaveBeenCalledWith(
 			{
 				changelogCommit: 'changelog-sha',
@@ -209,8 +220,15 @@ describe( 'backportCommitsToBranch', () => {
 		);
 		expect( git.push ).toHaveBeenCalledWith( 'origin', 'trunk' );
 		expect(
+			getRawCallOrder( git, ( args ) => args.includes( 'checkout' ) )
+		).toBeLessThan(
 			applyReleaseChangelogCommitFn.mock.invocationCallOrder[ 0 ]
-		).toBeLessThan( git.raw.mock.invocationCallOrder[ 0 ] );
+		);
+		expect(
+			applyReleaseChangelogCommitFn.mock.invocationCallOrder[ 0 ]
+		).toBeLessThan(
+			getRawCallOrder( git, ( args ) => args.includes( 'cherry-pick' ) )
+		);
 		expect(
 			verifyBackportedChangelogsFn.mock.invocationCallOrder[ 0 ]
 		).toBeLessThan( git.push.mock.invocationCallOrder[ 0 ] );
@@ -229,7 +247,11 @@ describe( 'backportCommitsToBranch', () => {
 			{ applyReleaseChangelogCommitFn, git, verifyBackportedChangelogsFn }
 		);
 
-		expect( git.raw ).not.toHaveBeenCalled();
+		expect(
+			git.raw.mock.calls.some( ( args ) =>
+				args.includes( 'cherry-pick' )
+			)
+		).toBe( false );
 		expect( verifyBackportedChangelogsFn ).toHaveBeenCalledWith(
 			expect.objectContaining( { releaseCommit: 'changelog-sha' } ),
 			{ git }
@@ -278,18 +300,50 @@ describe( 'backportCommitsToBranch', () => {
 
 		expect( git.push ).not.toHaveBeenCalled();
 		expect( git.raw ).toHaveBeenCalledWith( 'cherry-pick', '--abort' );
-		expect( git.raw ).toHaveBeenCalledWith(
-			'reset',
-			'--hard',
-			'origin/trunk'
-		);
+		// The cleanup reset is in place, unlike the targeted reset that syncs
+		// the branch to the remote tip during setup.
+		expect( git.raw ).toHaveBeenCalledWith( 'reset', '--hard' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'does not push and cleans the working copy when the branch setup fails', async () => {
+		const git = createGit();
+		git.raw.mockImplementation( async ( ...args ) => {
+			if ( args[ 0 ] === 'checkout' && args[ 1 ] === '-B' ) {
+				throw new Error( 'cannot update the branch ref' );
+			}
+			return '';
+		} );
+		const verifyBackportedChangelogsFn = jest.fn();
+
+		await expect(
+			backportCommitsToBranch(
+				'trunk',
+				{
+					changelogCommit: 'changelog-sha',
+					publishCommit: 'publish-sha',
+				},
+				{ gitWorkingDirectoryPath: '/repo', interactive: false },
+				{
+					applyReleaseChangelogCommitFn: jest.fn(),
+					git,
+					verifyBackportedChangelogsFn,
+				}
+			)
+		).rejects.toThrow( 'cannot update the branch ref' );
+
+		expect( git.push ).not.toHaveBeenCalled();
+		expect( verifyBackportedChangelogsFn ).not.toHaveBeenCalled();
+		expect( git.raw ).toHaveBeenCalledWith( 'reset', '--hard' );
 		expect( console ).toHaveLogged();
 	} );
 
 	it( 'reports both the backport and cleanup failures when reset fails', async () => {
 		const git = createGit();
 		git.raw.mockImplementation( async ( ...args ) => {
-			if ( args[ 0 ] === 'reset' ) {
+			// Only the in-place cleanup reset fails; the setup reset targeting
+			// the remote tip succeeds.
+			if ( args[ 0 ] === 'reset' && args.length === 2 ) {
 				throw { code: 'LOCKED', message: 'cannot lock index' };
 			}
 			return '';
@@ -314,7 +368,7 @@ describe( 'backportCommitsToBranch', () => {
 				}
 			)
 		).rejects.toThrow(
-			'Backporting to "trunk" failed, and restoring the working copy to origin/trunk also failed: cannot lock index (LOCKED). Original failure: verification failed'
+			'Backporting to "trunk" failed, and cleaning the working copy also failed: cannot lock index (LOCKED). Original failure: verification failed'
 		);
 
 		expect( git.push ).not.toHaveBeenCalled();
@@ -583,13 +637,18 @@ describe( 'verifyBackportedChangelogs', () => {
 		);
 	} );
 
-	it( 'fails when a published changelog contains no version heading', async () => {
+	it( 'skips changelogs that have never published a release', async () => {
 		const git = {
 			raw: jest.fn( async ( ...args ) => {
 				if ( args[ 0 ] === 'ls-tree' ) {
-					return 'packages/data/CHANGELOG.md\n';
+					return 'packages/connectors/CHANGELOG.md\npackages/data/CHANGELOG.md\n';
 				}
-				return '# Changelog\n\n## Unreleased\n';
+				if (
+					args[ 1 ].endsWith( 'packages/connectors/CHANGELOG.md' )
+				) {
+					return '# Changelog\n\n## Unreleased\n';
+				}
+				return '# Changelog\n\n## Unreleased\n\n' + RELEASED;
 			} ),
 		};
 
@@ -602,9 +661,9 @@ describe( 'verifyBackportedChangelogs', () => {
 				},
 				{ git }
 			)
-		).rejects.toThrow(
-			'packages/data/CHANGELOG.md in publish-sha has no version heading; refusing to push the backport to "trunk".'
-		);
+		).resolves.toBeUndefined();
+
+		expect( console ).toHaveLogged();
 	} );
 
 	it( 'propagates failures reading a changelog that exists on the target branch', async () => {

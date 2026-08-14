@@ -1264,7 +1264,9 @@ async function applyReleaseChangelogCommit(
  * Verifies that the backport did not move any changelog entry into or out of
  * a published version section: for every package changelog in the release,
  * the released portion at the branch tip must be byte-identical to the
- * released content.
+ * released content. Changelogs with nothing published to protect are skipped:
+ * those without a single version heading in the release, and those that no
+ * longer exist on the target branch.
  *
  * @param {Object} options                         Options.
  * @param {string} options.branchName              Target branch name.
@@ -1317,9 +1319,12 @@ async function verifyBackportedChangelogs(
 			await git.raw( 'show', `${ releaseCommit }:${ changelogPath }` )
 		);
 		if ( releasedSection === '' ) {
-			throw new Error(
-				`${ changelogPath } in ${ releaseCommit } has no version heading; refusing to push the backport to "${ branchName }".`
+			// Without a version heading the package has never published a
+			// release, so there is no published section to protect.
+			log(
+				`>> Skipping released changelog verification for ${ changelogPath }: it has no released versions.`
 			);
+			continue;
 		}
 		if ( ! branchChangelogPaths.has( changelogPath ) ) {
 			// A package removed on the target branch has no changelog to
@@ -1388,16 +1393,19 @@ async function backportCommitsToBranch(
 	log( `>> Backporting commits to "${ branchName }".` );
 
 	/*
-	 * Reset any local changes and replace them with the origin branch's copy.
+	 * Force the local branch to exactly the remote tip instead of pulling, so
+	 * that a diverged local branch or debris left by an interrupted earlier
+	 * run can never be merged into the backport that gets pushed.
 	 *
-	 * Perform an additional fetch to ensure that when we push our changes that
-	 * it's very unlikely that new commits could have appeared at the origin
-	 * HEAD between when we started running this script and now when we're
-	 * pushing our changes back upstream.
+	 * Fetching immediately before the work also makes it very unlikely that
+	 * new commits appear at the origin HEAD between when this script started
+	 * and when the backport is pushed back upstream.
 	 */
-	await git.fetch().checkout( branchName ).pull( 'origin', branchName );
+	await git.fetch( 'origin', branchName );
 
 	try {
+		await git.raw( 'checkout', '-B', branchName, `origin/${ branchName }` );
+		await git.raw( 'reset', '--hard', `origin/${ branchName }` );
 		if ( changelogCommit ) {
 			await applyReleaseChangelogCommitFn(
 				{ changelogCommit, gitWorkingDirectoryPath },
@@ -1425,10 +1433,15 @@ async function backportCommitsToBranch(
 		// the next backport target.
 		await git.raw( 'cherry-pick', '--abort' ).catch( () => {} );
 		try {
-			await git.raw( 'reset', '--hard', `origin/${ branchName }` );
+			/*
+			 * Reset in place: the failure may predate `checkout -B`, leaving
+			 * HEAD on another branch that a targeted reset would move. The
+			 * next run's `checkout -B` re-syncs this branch ref anyway.
+			 */
+			await git.raw( 'reset', '--hard' );
 		} catch ( cleanupError ) {
 			throw new Error(
-				`Backporting to "${ branchName }" failed, and restoring the working copy to origin/${ branchName } also failed: ${ getErrorMessage(
+				`Backporting to "${ branchName }" failed, and cleaning the working copy also failed: ${ getErrorMessage(
 					cleanupError
 				) }. Original failure: ${ getErrorMessage( error ) }`
 			);
