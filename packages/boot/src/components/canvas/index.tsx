@@ -1,9 +1,13 @@
 import { useState, useEffect, useMemo } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
 import { useNavigate } from '@wordpress/route';
+import { useSelect } from '@wordpress/data';
+import { store as bootStore } from '../../store';
 import type { CanvasData } from '../../store/types';
 import BootBackButton from './back-button';
-import useNavigateToEntityRecord from './use-navigate-to-entity-record';
+import useNavigateToEntityRecord, {
+	useActionPerformed,
+} from './use-navigate-to-entity-record';
 
 interface CanvasProps {
 	canvas: CanvasData;
@@ -21,6 +25,20 @@ export default function Canvas( { canvas }: CanvasProps ) {
 	const navigate = useNavigate();
 	const { onNavigateToEntityRecord, onNavigateToPreviousEntityRecord } =
 		useNavigateToEntityRecord();
+	const onActionPerformed = useActionPerformed( canvas.postType );
+
+	// Where clicking a previewed canvas goes, resolved the same way the editor
+	// resolves anywhere else it sends you to edit an entity.
+	const editLink = useSelect(
+		( select ) =>
+			canvas.postType && canvas.postId
+				? select( bootStore ).getEntityLink(
+						canvas.postType,
+						canvas.postId
+				  )
+				: undefined,
+		[ canvas.postType, canvas.postId ]
+	);
 
 	/*
 	 * Memoized because the editor provider pushes these settings into the store
@@ -93,15 +111,16 @@ export default function Canvas( { canvas }: CanvasProps ) {
 					postId={ canvas.postId }
 					settings={ settings }
 					backButton={ backButton }
+					onActionPerformed={ onActionPerformed }
 				/>
 			</div>
-			{ canvas.isPreview && canvas.editLink && (
+			{ canvas.isPreview && editLink && (
 				<div
-					onClick={ () => navigate( { to: canvas.editLink } ) }
+					onClick={ () => navigate( { to: editLink } ) }
 					onKeyDown={ ( e ) => {
 						if ( e.key === 'Enter' || e.key === ' ' ) {
 							e.preventDefault();
-							navigate( { to: canvas.editLink } );
+							navigate( { to: editLink } );
 						}
 					} }
 					style={ {

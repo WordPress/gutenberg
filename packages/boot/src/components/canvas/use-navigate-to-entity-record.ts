@@ -1,12 +1,16 @@
 import { useCallback, useMemo } from '@wordpress/element';
-import { useRegistry } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
+import { store as noticesStore } from '@wordpress/notices';
+import { decodeEntities } from '@wordpress/html-entities';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	useNavigate,
 	useSearch,
 	privateApis as routePrivateApis,
 } from '@wordpress/route';
+import { store as bootStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const { useCanGoBack, useRouter } = unlock( routePrivateApis );
@@ -44,6 +48,10 @@ export default function useNavigateToEntityRecord() {
 	const navigate = useNavigate() as Navigate;
 	const search = useSearch( { strict: false } ) as { focusMode?: unknown };
 	const registry = useRegistry();
+	const getEntityLink = useSelect(
+		( select ) => select( bootStore ).getEntityLink,
+		[]
+	);
 	const router = useRouter();
 	const canGoBack = useCanGoBack();
 
@@ -80,22 +88,18 @@ export default function useNavigateToEntityRecord() {
 			}
 
 			/*
-			 * Template and template part IDs carry a `theme//slug` form, so the
-			 * separator has to survive being placed in the path.
-			 *
 			 * `focusMode` marks the entity as one navigated into rather than
 			 * opened directly, which is what offers the way back out. The search
 			 * is replaced rather than extended so the block stashed above stays
 			 * with the entity it belongs to.
 			 */
-			navigate( {
-				to: `/types/${ params.postType }/edit/${ encodeURIComponent(
-					params.postId
-				) }`,
-				search: () => ( { focusMode: true } ),
-			} );
+			const to = getEntityLink( params.postType, params.postId );
+
+			if ( to ) {
+				navigate( { to, search: () => ( { focusMode: true } ) } );
+			}
 		},
-		[ navigate, registry ]
+		[ navigate, registry, getEntityLink ]
 	);
 
 	/*
@@ -113,4 +117,84 @@ export default function useNavigateToEntityRecord() {
 	);
 
 	return { onNavigateToEntityRecord, onNavigateToPreviousEntityRecord };
+}
+
+interface ActionItem {
+	id: string | number;
+	type: string;
+	title?: string | { rendered?: string };
+}
+
+/**
+ * Builds the callback the editor runs after a post action.
+ *
+ * Actions taken from inside the editor act on the entity being edited, so
+ * trashing or deleting one leaves the canvas showing something that is no
+ * longer there, and duplicating one gives no way to reach the copy.
+ *
+ * @param postType Post type rendered in the canvas.
+ * @return The callback, for passing to the editor.
+ */
+export function useActionPerformed( postType?: string ) {
+	const navigate = useNavigate() as Navigate;
+	const { createSuccessNotice } = useDispatch( noticesStore );
+	const getEntityLink = useSelect(
+		( select ) => select( bootStore ).getEntityLink,
+		[]
+	);
+
+	return useCallback(
+		( actionId: string, items: ActionItem[] ) => {
+			switch ( actionId ) {
+				case 'move-to-trash':
+				case 'delete-post': {
+					const to = postType && getEntityLink( postType );
+
+					if ( to ) {
+						navigate( { to, search: () => ( {} ) } );
+					}
+					break;
+				}
+
+				case 'duplicate-post': {
+					const newItem = items[ 0 ];
+					const to = getEntityLink( newItem.type, newItem.id );
+
+					if ( ! to ) {
+						break;
+					}
+
+					const title =
+						typeof newItem.title === 'string'
+							? newItem.title
+							: newItem.title?.rendered;
+
+					/*
+					 * The action has already announced the copy under this id.
+					 * Reissuing it under the same id replaces that notice rather
+					 * than stacking a second one, and adds the way to reach it.
+					 */
+					createSuccessNotice(
+						sprintf(
+							// translators: %s: Title of the created post, e.g: "Hello world".
+							__( '"%s" successfully created.' ),
+							decodeEntities( title ?? '' ) || __( '(no title)' )
+						),
+						{
+							type: 'snackbar',
+							id: 'duplicate-post-action',
+							actions: [
+								{
+									label: __( 'Edit' ),
+									onClick: () => navigate( { to } ),
+								},
+							],
+						}
+					);
+					break;
+				}
+			}
+		},
+		[ navigate, createSuccessNotice, getEntityLink, postType ]
+	);
 }
