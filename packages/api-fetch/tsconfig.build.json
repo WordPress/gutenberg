@@ -6,5 +6,11 @@
 		{ "path": "../private-apis" },
 		{ "path": "../url" }
 	],
-	"exclude": [ "**/test" ]
+	"exclude": [
+		"**/benchmark",
+		"**/test/**",
+		"**/tests/**",
+		"**/stories/**",
+		"**/*.story.*"
+	]
 }

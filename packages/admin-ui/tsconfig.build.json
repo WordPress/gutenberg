@@ -15,9 +15,8 @@
 	],
 	"exclude": [
 		"**/benchmark",
-		"packages/*/build-*/**",
-		"packages/*/build/**",
 		"**/test/**",
+		"**/tests/**",
 		"**/stories/**",
 		"**/*.story.*"
 	]
