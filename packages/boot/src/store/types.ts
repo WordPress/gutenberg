@@ -53,11 +53,25 @@ export interface CanvasData {
 	 * Indicates if the canvas is in preview mode.
 	 */
 	isPreview?: boolean;
+}
+
+/**
+ * The routes an entity of a given post type is edited and listed at.
+ *
+ * Registered by the application rather than known here, so the shell holds no
+ * knowledge of any particular page's URLs.
+ */
+export interface EntityLinks {
 	/**
-	 * Optional edit link for click-to-edit navigation.
-	 * When provided with isPreview: true, clicking the canvas navigates to this URL.
+	 * Path the entities of this post type are listed at.
 	 */
-	editLink?: string;
+	list?: string;
+
+	/**
+	 * Path an entity of this post type is edited at. `{id}` is replaced with
+	 * the encoded entity ID.
+	 */
+	edit?: string;
 }
 
 /**
@@ -180,4 +194,5 @@ export interface State {
 	menuItems: Record< string, MenuItem >;
 	routes: Route[];
 	dashboardLink?: string;
+	entityLinks: Record< string, EntityLinks >;
 }

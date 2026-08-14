@@ -73,7 +73,6 @@ export const route = {
 			postType: NAVIGATION_POST_TYPE,
 			postId,
 			isPreview: true,
-			editLink: `/types/wp_navigation/edit/${ postId }`,
 		};
 	},
 	loader: async ( {
