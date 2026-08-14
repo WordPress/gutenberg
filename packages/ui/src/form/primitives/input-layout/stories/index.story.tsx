@@ -1,21 +1,20 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { copy } from '@wordpress/icons';
-import { InputLayout } from '../input-layout';
-import { InputLayout as InputLayoutCompound } from '../';
+import * as InputLayout from '../index';
 import { IconButton } from '../../../../icon-button';
 
-const meta: Meta< typeof InputLayout > = {
+const meta: Meta< typeof InputLayout.Root > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/Primitives/InputLayout',
-	component: InputLayout,
+	component: InputLayout.Root,
+	subcomponents: {
+		'InputLayout.Slot': InputLayout.Slot,
+	},
 	// Temporary: Due to an upstream bug, render the root explicitly so the
 	// components manifest extractor can resolve props from the JSX.
 	//
 	// See: https://github.com/storybookjs/storybook/issues/34877
-	render: ( args ) => <InputLayout { ...args } />,
-	subcomponents: {
-		'InputLayout.Slot': InputLayoutCompound.Slot,
-	},
+	render: ( args ) => <InputLayout.Root { ...args } />,
 	parameters: {
 		componentStatus: {
 			status: 'recommended',
@@ -25,7 +24,7 @@ const meta: Meta< typeof InputLayout > = {
 };
 export default meta;
 
-type Story = StoryObj< typeof InputLayout >;
+type Story = StoryObj< typeof InputLayout.Root >;
 
 export const Default: Story = {
 	args: {},
@@ -61,7 +60,7 @@ export const WithPrefix: Story = {
  */
 export const WithPaddedPrefix: Story = {
 	args: {
-		prefix: <InputLayoutCompound.Slot>https://</InputLayoutCompound.Slot>,
+		prefix: <InputLayout.Slot>https://</InputLayout.Slot>,
 	},
 };
 
@@ -73,14 +72,14 @@ export const WithSuffixControl: Story = {
 	args: {
 		children: <div style={ { flex: 1 } } />,
 		suffix: (
-			<InputLayoutCompound.Slot padding="minimal">
+			<InputLayout.Slot padding="minimal">
 				<IconButton
 					size="small"
 					variant="minimal"
 					icon={ copy }
 					label="Copy"
 				/>
-			</InputLayoutCompound.Slot>
+			</InputLayout.Slot>
 		),
 	},
 };

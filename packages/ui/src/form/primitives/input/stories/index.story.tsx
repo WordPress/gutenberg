@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Input } from '../input';
+import { Input } from '../index';
 import { InputLayout } from '../../input-layout';
 import { WithSuffixControl } from '../../input-layout/stories/index.story';
 
