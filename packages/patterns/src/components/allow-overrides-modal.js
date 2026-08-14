@@ -54,7 +54,7 @@ export function AllowOverridesModal( {
 				<Stack direction="column" gap="xl">
 					<Text id={ descriptionId }>
 						{ __(
-							'Overrides are changes you make to a block within a synced pattern instance. Use overrides to customize a synced pattern instance to suit its new context. Name this block to specify an override.'
+							'Adding an override will allow this block to be edited within any instance of this synced pattern. To set an override, name this block.'
 						) }
 					</Text>
 					<TextControl
@@ -109,7 +109,7 @@ export function DisallowOverridesModal( { onClose, onSave } ) {
 				<Stack direction="column" gap="xl">
 					<Text id={ descriptionId }>
 						{ __(
-							'Are you sure you want to disable overrides? Disabling overrides will revert all applied overrides for this block throughout instances of this pattern.'
+							'Are you sure you want to disable an override for this block? By disabling, any custom content for this block throughout every instance of this pattern will be reverted to the original content of the synced pattern.'
 						) }
 					</Text>
 					<Stack gap="sm" justify="end">
