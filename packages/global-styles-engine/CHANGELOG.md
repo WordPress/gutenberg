@@ -7,6 +7,10 @@
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 -   Stop normalizing deprecated style state aliases and falling back to legacy style paths; global styles must use canonical state keys ([#84531](https://github.com/WordPress/gutenberg/pull/84531)).
 
+### New Features
+
+-   Add `:hover`, `:focus`, `:focus-visible`, and `:active` support for the `select` element ([#81644](https://github.com/WordPress/gutenberg/pull/81644)).
+
 ## 1.24.0 (2026-10-07)
 
 ### New Features
