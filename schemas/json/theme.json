@@ -2306,27 +2306,7 @@
 					]
 				},
 				"label": {
-					"allOf": [
-						{
-							"$ref": "#/definitions/stylesProperties"
-						},
-						{
-							"$ref": "#/definitions/stylesElementsResponsiveSelectorsProperties"
-						},
-						{
-							"type": "object",
-							"propertyNames": {
-								"anyOf": [
-									{
-										"$ref": "#/definitions/stylesPropertyNames"
-									},
-									{
-										"$ref": "#/definitions/stylesElementsResponsiveSelectorsPropertyNames"
-									}
-								]
-							}
-						}
-					]
+					"$ref": "#/definitions/stylesPropertiesComplete"
 				},
 				"select": {
 					"allOf": [
