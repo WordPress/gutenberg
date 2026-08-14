@@ -4,7 +4,9 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
-import { load } from 'js-yaml';
+import yaml from 'js-yaml';
+
+const { load } = yaml;
 
 const PACKAGE_GLOB_PATTERN = /^packages\/([^/]+)\/\*\*$/;
 const PACKAGE_LABEL_COLOR = 'ED2572';
