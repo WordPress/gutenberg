@@ -88,6 +88,9 @@ function useApplyBlockShortcut() {
 			}
 
 			const block = getBlock( clientId );
+			if ( ! block ) {
+				return false;
+			}
 
 			// Prefer a transform declared for this specific variation, and
 			// fall back to transforming to the block type and applying the
