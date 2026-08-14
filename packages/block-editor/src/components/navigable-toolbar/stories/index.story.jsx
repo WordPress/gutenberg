@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import NavigableToolbar from '../';
 
 const meta = {
@@ -86,9 +79,11 @@ export const Default = {
 	render: function Template( args ) {
 		return (
 			<NavigableToolbar { ...args }>
-				<Button variant="primary">{ __( 'Button 1' ) }</Button>
-				<Button>{ __( 'Button 2' ) }</Button>
-				<Button>{ __( 'Button 3' ) }</Button>
+				<Button __next40pxDefaultSize variant="primary">
+					{ __( 'Button 1' ) }
+				</Button>
+				<Button __next40pxDefaultSize>{ __( 'Button 2' ) }</Button>
+				<Button __next40pxDefaultSize>{ __( 'Button 3' ) }</Button>
 			</NavigableToolbar>
 		);
 	},
@@ -98,9 +93,11 @@ export const VerticalOrientation = {
 	render: function Template( args ) {
 		return (
 			<NavigableToolbar { ...args } orientation="vertical">
-				<Button variant="primary">{ __( 'Button 1' ) }</Button>
-				<Button>{ __( 'Button 2' ) }</Button>
-				<Button>{ __( 'Button 3' ) }</Button>
+				<Button __next40pxDefaultSize variant="primary">
+					{ __( 'Button 1' ) }
+				</Button>
+				<Button __next40pxDefaultSize>{ __( 'Button 2' ) }</Button>
+				<Button __next40pxDefaultSize>{ __( 'Button 3' ) }</Button>
 			</NavigableToolbar>
 		);
 	},
@@ -116,9 +113,11 @@ export const WithKeyboardNavigation = {
 					) }
 				</p>
 				<NavigableToolbar { ...args } shouldUseKeyboardFocusShortcut>
-					<Button variant="primary">{ __( 'Button 1' ) }</Button>
-					<Button>{ __( 'Button 2' ) }</Button>
-					<Button>{ __( 'Button 3' ) }</Button>
+					<Button __next40pxDefaultSize variant="primary">
+						{ __( 'Button 1' ) }
+					</Button>
+					<Button __next40pxDefaultSize>{ __( 'Button 2' ) }</Button>
+					<Button __next40pxDefaultSize>{ __( 'Button 3' ) }</Button>
 				</NavigableToolbar>
 			</div>
 		);
@@ -135,9 +134,11 @@ export const WithEscapeBehavior = {
 					) }
 				</p>
 				<NavigableToolbar { ...args } focusEditorOnEscape>
-					<Button variant="primary">{ __( 'Button 1' ) }</Button>
-					<Button>{ __( 'Button 2' ) }</Button>
-					<Button>{ __( 'Button 3' ) }</Button>
+					<Button __next40pxDefaultSize variant="primary">
+						{ __( 'Button 1' ) }
+					</Button>
+					<Button __next40pxDefaultSize>{ __( 'Button 2' ) }</Button>
+					<Button __next40pxDefaultSize>{ __( 'Button 3' ) }</Button>
 				</NavigableToolbar>
 			</div>
 		);
