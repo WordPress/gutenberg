@@ -9,6 +9,7 @@
 
 ### Bug Fix
 
+-   DataForm: Store the day that was clicked in the `datetime` control's calendar instead of the previous day when the site timezone is behind the browser's. [#81637](https://github.com/WordPress/gutenberg/pull/81637)
 -   Validated form controls: Align invalid focus styling for InputBase-based controls with the design system ([#80417](https://github.com/WordPress/gutenberg/pull/80417)).
 -   DataViews: Prevent the filter operator select focus ring from being clipped. [#80417](https://github.com/WordPress/gutenberg/pull/80417)
 -   DataForm: Send a single update per calendar interaction in the `datetime` control instead of two identical ones. Selecting or clearing a date now reveals the validation message by firing a synthetic `invalid` event on the input, rather than briefly moving focus into it and re-sending the value, and announces it to screen readers since focus stays on the calendar. [#81440](https://github.com/WordPress/gutenberg/pull/81440)
