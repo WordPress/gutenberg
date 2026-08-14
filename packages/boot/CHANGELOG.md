@@ -12,6 +12,8 @@
 
 ### Enhancements
 
+-   Warn before leaving the page with unsaved changes ([#81625](https://github.com/WordPress/gutenberg/pull/81625)).
+
 -   Add a `stage` visibility function to a route's config, mirroring `inspector`, so a route can hide its stage and leave the canvas to fill the surfaces area.
 -   Pass the editor's entity navigation callbacks from the canvas, so a template part or synced pattern can be opened from the block inspector and navigated back out of, restoring the block that was selected ([#81590](https://github.com/WordPress/gutenberg/pull/81590)).
 -   Add `registerEntityLinks` and `getEntityLink`, so an application declares where each post type is listed and edited and the canvas resolves every link through them ([#81590](https://github.com/WordPress/gutenberg/pull/81590)).
