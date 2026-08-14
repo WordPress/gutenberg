@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	BlockControls,
 	useBlockProps,
@@ -19,12 +16,8 @@ import {
 	formatOutdentRTL,
 } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
-import { useCallback, useEffect, Platform } from '@wordpress/element';
+import { useCallback, useEffect } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import OrderedListSettings from './ordered-list-settings';
 import { migrateToListV2 } from './utils';
 import TagName from './tag-name';
@@ -32,8 +25,6 @@ import TagName from './tag-name';
 const DEFAULT_BLOCK = {
 	name: 'core/list-item',
 };
-const TEMPLATE = [ [ 'core/list-item' ] ];
-const NATIVE_MARGIN_SPACING = 8;
 
 /**
  * At the moment, deprecations don't handle create blocks from attributes
@@ -45,7 +36,7 @@ const NATIVE_MARGIN_SPACING = 8;
  */
 function useMigrateOnLoad( attributes, clientId ) {
 	const registry = useRegistry();
-	const { updateBlockAttributes, replaceInnerBlocks } =
+	const { updateBlockAttributes, replaceInnerBlocks, selectBlock } =
 		useDispatch( blockEditorStore );
 
 	useEffect( () => {
@@ -63,9 +54,19 @@ function useMigrateOnLoad( attributes, clientId ) {
 			alternative: 'inner blocks',
 		} );
 
+		// The selection can be inside an inner block created from the block
+		// type template at insertion, which the migration replaces; restore
+		// the selection to the migrated block in that case.
+		const shouldReselectBlock = registry
+			.select( blockEditorStore )
+			.hasSelectedInnerBlock( clientId, true );
+
 		registry.batch( () => {
 			updateBlockAttributes( clientId, newAttributes );
 			replaceInnerBlocks( clientId, newInnerBlocks );
+			if ( shouldReselectBlock ) {
+				selectBlock( clientId );
+			}
 		} );
 	}, [ attributes.values ] );
 }
@@ -118,11 +119,10 @@ function IndentUI( { clientId } ) {
 	);
 }
 
-export default function Edit( { attributes, setAttributes, clientId, style } ) {
+export default function Edit( { attributes, setAttributes, clientId } ) {
 	const { ordered, type, reversed, start } = attributes;
 	const blockProps = useBlockProps( {
 		style: {
-			...( Platform.isNative && style ),
 			listStyleType: ordered && type !== 'decimal' ? type : undefined,
 		},
 	} );
@@ -130,14 +130,7 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		defaultBlock: DEFAULT_BLOCK,
 		directInsert: true,
-		template: TEMPLATE,
 		templateLock: false,
-		templateInsertUpdatesSelection: true,
-		...( Platform.isNative && {
-			marginVertical: NATIVE_MARGIN_SPACING,
-			marginHorizontal: NATIVE_MARGIN_SPACING,
-			renderAppender: false,
-		} ),
 		__experimentalCaptureToolbars: true,
 	} );
 	useMigrateOnLoad( attributes, clientId );

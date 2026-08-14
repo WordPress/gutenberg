@@ -1,0 +1,81 @@
+[
+	{
+		"blockName": "core/button",
+		"attrs": {
+			"fontSize": "xx-large"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<div class=\"wp-block-button has-custom-font-size has-xx-large-font-size\"><a class=\"wp-block-button__link wp-element-button\">My button 1</a></div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-button has-custom-font-size has-xx-large-font-size\"><a class=\"wp-block-button__link wp-element-button\">My button 1</a></div>\n"
+		]
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
+	},
+	{
+		"blockName": "core/button",
+		"attrs": {
+			"style": {
+				"typography": {
+					"fontStyle": "normal",
+					"fontWeight": "800"
+				}
+			}
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<div class=\"wp-block-button\" style=\"font-style:normal;font-weight:800\"><a class=\"wp-block-button__link wp-element-button\">My button 2</a></div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-button\" style=\"font-style:normal;font-weight:800\"><a class=\"wp-block-button__link wp-element-button\">My button 2</a></div>\n"
+		]
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
+	},
+	{
+		"blockName": "core/button",
+		"attrs": {
+			"style": {
+				"typography": {
+					"letterSpacing": "39px"
+				}
+			}
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<div class=\"wp-block-button\" style=\"letter-spacing:39px\"><a class=\"wp-block-button__link wp-element-button\">My button 3</a></div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-button\" style=\"letter-spacing:39px\"><a class=\"wp-block-button__link wp-element-button\">My button 3</a></div>\n"
+		]
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
+	},
+	{
+		"blockName": "core/button",
+		"attrs": {
+			"tagName": "button",
+			"style": {
+				"typography": {
+					"letterSpacing": "39px"
+				}
+			}
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<div class=\"wp-block-button\" style=\"letter-spacing:39px\"><button type=\"button\" class=\"wp-block-button__link wp-element-button\">My button 4</button></div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-button\" style=\"letter-spacing:39px\"><button type=\"button\" class=\"wp-block-button__link wp-element-button\">My button 4</button></div>\n"
+		]
+	}
+]

@@ -1,0 +1,66 @@
+import type { Action } from './actions';
+import type { State } from './types';
+
+const initialState: State = {
+	menuItems: {},
+	routes: [],
+	dashboardLink: undefined,
+	entityLinks: {},
+};
+
+export function reducer( state: State = initialState, action: Action ): State {
+	switch ( action.type ) {
+		case 'REGISTER_MENU_ITEM':
+			return {
+				...state,
+				menuItems: {
+					...state.menuItems,
+					[ action.id ]: action.menuItem,
+				},
+			};
+
+		case 'UPDATE_MENU_ITEM':
+			// Updating an item that was never registered would add a partial
+			// entry to the menu, which renders as an empty navigation row.
+			if ( ! state.menuItems[ action.id ] ) {
+				return state;
+			}
+
+			return {
+				...state,
+				menuItems: {
+					...state.menuItems,
+					[ action.id ]: {
+						...state.menuItems[ action.id ],
+						...action.updates,
+					},
+				},
+			};
+
+		case 'REGISTER_ROUTE':
+			return {
+				...state,
+				routes: [ ...state.routes, action.route ],
+			};
+
+		case 'REGISTER_ENTITY_LINKS':
+			return {
+				...state,
+				entityLinks: {
+					...state.entityLinks,
+					[ action.postType ]: {
+						...state.entityLinks[ action.postType ],
+						...action.links,
+					},
+				},
+			};
+
+		case 'SET_DASHBOARD_LINK':
+			return {
+				...state,
+				dashboardLink: action.dashboardLink,
+			};
+	}
+
+	return state;
+}

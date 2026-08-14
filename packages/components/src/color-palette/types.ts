@@ -1,17 +1,11 @@
-/**
- * External dependencies
- */
 import type { CSSProperties, ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { DropdownProps } from '../dropdown/types';
 import type { HeadingSize } from '../heading/types';
 
 export type ColorObject = {
 	name: string;
 	color: NonNullable< CSSProperties[ 'color' ] >;
+	slug?: string;
 };
 
 export type PaletteObject = {
@@ -24,9 +18,22 @@ type PaletteProps = {
 	clearColor: () => void;
 	/**
 	 * Callback called when a color is selected.
+	 * The third argument is the slug of the selected palette entry, when available.
 	 */
-	onChange: ( newColor?: string, index?: number ) => void;
+	onChange: ( newColor?: string, index?: number, slug?: string ) => void;
 	value?: string;
+	/**
+	 * The slug of the currently selected palette entry.
+	 *
+	 * When set to a non-empty string, selection is determined by slug rather
+	 * than by color value — this correctly handles palettes where two entries
+	 * share the same color. Palette entries without a slug will not appear
+	 * selected in this mode, even if their color value matches `value`.
+	 *
+	 * An empty string is treated the same as `undefined`: selection falls
+	 * back to matching by color value.
+	 */
+	selectedSlug?: string;
 	actions?: ReactNode;
 	headingLevel?: HeadingSize;
 };
@@ -43,7 +50,10 @@ export type CustomColorPickerDropdownProps = DropdownProps & {
 	isRenderedInSidebar: boolean;
 };
 
-export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
+export type ColorPaletteProps = Pick<
+	PaletteProps,
+	'onChange' | 'selectedSlug'
+> & {
 	/**
 	 * Whether the palette should have a clearing button.
 	 *

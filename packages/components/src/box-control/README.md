@@ -20,43 +20,29 @@ function Example() {
   } );
 
   return (
-    <BoxControl
-      __next40pxDefaultSize
-      values={ values }
-      onChange={ setValues }
-    />
+    <BoxControl values={ values } onChange={ setValues } />
   );
 };
 ```
 
 ## Props
 
-### `__next40pxDefaultSize`
-
-Start opting into the larger default height that will become the default size in a future version.
-
- - Type: `boolean`
- - Required: No
- - Default: `false`
-
 ### `allowReset`
-
-If this property is true, a button to reset the box control is rendered.
 
  - Type: `boolean`
  - Required: No
  - Default: `true`
 
-### `id`
+If this property is true, a button to reset the box control is rendered.
 
-The id to use as a base for the unique HTML id attribute of the control.
+### `id`
 
  - Type: `string`
  - Required: No
 
-### `inputProps`
+The id to use as a base for the unique HTML id attribute of the control.
 
-Props for the internal `UnitControl` components.
+### `inputProps`
 
  - Type: `UnitControlPassthroughProps`
  - Required: No
@@ -64,41 +50,41 @@ Props for the internal `UnitControl` components.
     	min: 0,
     }`
 
-### `label`
+Props for the internal `UnitControl` components.
 
-Heading label for the control.
+### `label`
 
  - Type: `string`
  - Required: No
  - Default: `__( 'Box Control' )`
 
-### `onChange`
+Heading label for the control.
 
-A callback function when an input value changes.
+### `onChange`
 
  - Type: `(next: BoxControlValue) => void`
  - Required: No
  - Default: `() => {}`
 
-### `presets`
+A callback function when an input value changes.
 
-Available presets to pick from.
+### `presets`
 
  - Type: `Preset[]`
  - Required: No
 
+Available presets to pick from.
+
 ### `presetKey`
+
+ - Type: `string`
+ - Required: No
 
 The key of the preset to apply.
 If you provide a list of presets, you must provide a preset key to use.
 The format of preset selected values is going to be `var:preset|${ presetKey }|${ presetSlug }`
 
- - Type: `string`
- - Required: No
-
 ### `resetValues`
-
-The `top`, `right`, `bottom`, and `left` box dimension values to use when the control is reset.
 
  - Type: `BoxControlValue`
  - Required: No
@@ -109,35 +95,37 @@ The `top`, `right`, `bottom`, and `left` box dimension values to use when the co
     	left: undefined,
     }`
 
+The `top`, `right`, `bottom`, and `left` box dimension values to use when the control is reset.
+
 ### `sides`
+
+ - Type: `readonly (keyof BoxControlValue | "horizontal" | "vertical")[]`
+ - Required: No
 
 Collection of sides to allow control of. If omitted or empty, all sides will be available.
 
 Allowed values are "top", "right", "bottom", "left", "vertical", and "horizontal".
 
- - Type: `readonly (keyof BoxControlValue | "horizontal" | "vertical")[]`
- - Required: No
-
 ### `splitOnAxis`
-
-If this property is true, when the box control is unlinked, vertical and horizontal controls
-can be used instead of updating individual sides.
 
  - Type: `boolean`
  - Required: No
  - Default: `false`
 
-### `units`
+If this property is true, when the box control is unlinked, vertical and horizontal controls
+can be used instead of updating individual sides.
 
-Available units to select from.
+### `units`
 
  - Type: `WPUnitControlUnit[]`
  - Required: No
  - Default: `CSS_UNITS`
 
-### `values`
+Available units to select from.
 
-The current values of the control, expressed as an object of `top`, `right`, `bottom`, and `left` values.
+### `values`
 
  - Type: `BoxControlValue`
  - Required: No
+
+The current values of the control, expressed as an object of `top`, `right`, `bottom`, and `left` values.

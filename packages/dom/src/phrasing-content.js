@@ -10,8 +10,8 @@
 
 /**
  * @typedef SemanticElementDefinition
- * @property {string[]}      [attributes] Content attributes
- * @property {ContentSchema} [children]   Content attributes
+ * @property {string[]}          [attributes] Content attributes
+ * @property {ContentSchema|'*'} [children]   Content attributes
  */
 
 /**
@@ -55,17 +55,6 @@ const textContentSchema = {
 	wbr: {},
 	'#text': {},
 };
-
-// Recursion is needed.
-// Possible: strong > em > strong.
-// Impossible: strong > strong.
-const excludedElements = [ '#text', 'br' ];
-Object.keys( textContentSchema )
-	.filter( ( element ) => ! excludedElements.includes( element ) )
-	.forEach( ( tag ) => {
-		const { [ tag ]: removedTag, ...restSchema } = textContentSchema;
-		textContentSchema[ tag ].children = restSchema;
-	} );
 
 /**
  * Embedded content elements.
@@ -124,7 +113,27 @@ const embeddedContentSchema = {
 			'height',
 		],
 	},
+	math: {
+		attributes: [ 'display', 'xmlns' ],
+		children: '*',
+	},
 };
+
+const excludedElements = [ '#text', 'br', 'wbr' ];
+
+// Wire up children for each text-level wrapper.
+// - Recursion is needed (e.g. strong > em > strong; not strong > strong).
+// - <img> is allowed too: text-level wrappers accept phrasing content, and
+//   <a>'s transparent model permits non-interactive embedded content.
+Object.keys( textContentSchema )
+	.filter( ( element ) => ! excludedElements.includes( element ) )
+	.forEach( ( tag ) => {
+		const { [ tag ]: removedTag, ...restSchema } = textContentSchema;
+		textContentSchema[ tag ].children = {
+			...restSchema,
+			img: embeddedContentSchema.img,
+		};
+	} );
 
 /**
  * Phrasing content elements.

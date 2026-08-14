@@ -1,0 +1,16 @@
+{
+	"name": "@wordpress/home-route",
+	"version": "1.0.0",
+	"private": true,
+	"route": {
+		"path": "/",
+		"page": "site-editor-v2"
+	},
+	"dependencies": {
+		"@wordpress/core-data": "file:../../packages/core-data",
+		"@wordpress/data": "file:../../packages/data",
+		"@wordpress/dom": "file:../../packages/dom",
+		"@wordpress/i18n": "file:../../packages/i18n",
+		"@wordpress/url": "file:../../packages/url"
+	}
+}

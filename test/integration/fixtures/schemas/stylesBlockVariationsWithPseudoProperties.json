@@ -1,0 +1,19 @@
+{
+	"$schema": "../../../../schemas/json/theme.json",
+	"version": 3,
+	"styles": {
+		"blocks": {
+			"core/navigation-link": {
+				"variations": {
+					"outline": {
+						"-current": {
+							"color": {
+								"text": "red"
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

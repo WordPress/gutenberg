@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
@@ -11,11 +8,9 @@ import {
 	getBlockTransforms,
 	findTransform,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
+import { setContentEditableWrapper } from './utils';
+import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
 
 /**
  * Handles input for selections across blocks.
@@ -33,6 +28,10 @@ export default function useInput() {
 		getSelectionStart,
 		getSelectionEnd,
 		getBlockAttributes,
+		getNextBlockClientId,
+		getBlockOrder,
+		getBlockEditingMode,
+		getBlockListSettings,
 	} = useSelect( blockEditorStore );
 	const {
 		replaceBlocks,
@@ -41,14 +40,32 @@ export default function useInput() {
 		__unstableDeleteSelection,
 		__unstableExpandSelection,
 		__unstableMarkAutomaticChange,
+		insertAfterBlock,
+		insertBlock,
+		selectBlock,
 	} = useDispatch( blockEditorStore );
 
 	return useRefEffect( ( node ) => {
 		function onBeforeInput( event ) {
-			// If writing flow is editable, NEVER allow the browser to alter the
-			// DOM. This will cause React errors (and the DOM should only be
-			// altered in a controlled fashion).
-			if ( node.contentEditable === 'true' ) {
+			// If writing flow is editable, never allow the browser to alter
+			// the DOM outside of an editable element within a block. This
+			// will cause React errors (and the DOM should only be altered in
+			// a controlled fashion). The wrapper can be contentEditable with
+			// a single selection when the selected block supports
+			// `editableRoot`; in that case edits within the block's editable
+			// element are handled by its rich text instance.
+			if ( node.contentEditable !== 'true' ) {
+				return;
+			}
+
+			if ( hasMultiSelection() ) {
+				event.preventDefault();
+				return;
+			}
+
+			const selection = node.ownerDocument.defaultView.getSelection();
+
+			if ( ! getSelectionEditableElement( selection, node ) ) {
 				event.preventDefault();
 			}
 		}
@@ -60,7 +77,7 @@ export default function useInput() {
 
 			if ( ! hasMultiSelection() ) {
 				if ( event.keyCode === ENTER ) {
-					if ( event.shiftKey || __unstableIsFullySelected() ) {
+					if ( event.shiftKey ) {
 						return;
 					}
 
@@ -101,29 +118,116 @@ export default function useInput() {
 						}
 					}
 
-					if (
-						! hasBlockSupport( blockName, 'splitting', false ) &&
-						! event.__deprecatedOnSplit
-					) {
-						return;
-					}
+					const rootClientId = getBlockRootClientId( clientId );
+					const { activeElement } = event.target.ownerDocument;
 
 					// Ensure template is not locked.
 					if (
-						canInsertBlockType(
-							blockName,
-							getBlockRootClientId( clientId )
-						)
+						! __unstableIsFullySelected() &&
+						( canInsertBlockType(
+							getDefaultBlockName(),
+							rootClientId
+						) ||
+							canInsertBlockType( blockName, rootClientId ) ) &&
+						( hasBlockSupport( blockName, 'splitting', false ) ||
+							event.__deprecatedOnSplit )
 					) {
-						__unstableSplitSelection();
 						event.preventDefault();
+						__unstableSplitSelection();
+					} else if (
+						// Handle Enter only on the block wrapper itself or
+						// an editable element within the block, which may be
+						// nested within the wrapper (e.g. Site Title). Other
+						// focusable elements (an embed's URL field, an
+						// appender button) keep their native Enter behavior.
+						( activeElement.getAttribute( 'data-block' ) ===
+							clientId ||
+							activeElement.isContentEditable ) &&
+						getBlockClientId( activeElement ) === clientId
+					) {
+						// The default block depends on context: containers
+						// such as the gallery define their own default
+						// block, which is what insertAfterBlock inserts.
+						const { defaultBlock: directInsertBlock } =
+							( rootClientId &&
+								getBlockListSettings( rootClientId ) ) ||
+							{};
+
+						if (
+							canInsertBlockType(
+								directInsertBlock?.name ??
+									getDefaultBlockName(),
+								rootClientId
+							)
+						) {
+							event.preventDefault();
+							insertAfterBlock( clientId );
+						} else {
+							// Descend into an empty container by inserting
+							// its default block, the same block an appender
+							// or ghost would insert.
+							if ( ! getBlockOrder( clientId ).length ) {
+								const { defaultBlock } =
+									getBlockListSettings( clientId ) ?? {};
+								const name =
+									defaultBlock?.name ?? getDefaultBlockName();
+
+								if ( canInsertBlockType( name, clientId ) ) {
+									event.preventDefault();
+									insertBlock(
+										createBlock(
+											name,
+											defaultBlock?.attributes
+										),
+										0,
+										clientId
+									);
+									return;
+								}
+							}
+
+							function getNextClientId( id ) {
+								let nextClientId = null;
+
+								while (
+									typeof id === 'string' &&
+									! ( nextClientId =
+										getNextBlockClientId( id ) )
+								) {
+									id = getBlockRootClientId( id );
+								}
+
+								return nextClientId;
+							}
+
+							let nextClientId =
+								getBlockOrder( clientId )[ 0 ] ??
+								getNextClientId( clientId );
+
+							while (
+								nextClientId &&
+								getBlockEditingMode( nextClientId ) ===
+									'disabled'
+							) {
+								nextClientId = getNextClientId( nextClientId );
+							}
+
+							if ( nextClientId ) {
+								event.preventDefault();
+								// An initial position of `true` is an
+								// internal sentinel: it focuses the block
+								// wrapper instead of a text field within
+								// it. See useFocusFirstElement.
+								selectBlock( nextClientId, true );
+							}
+						}
 					}
 				}
 				return;
 			}
 
 			if ( event.keyCode === ENTER ) {
-				node.contentEditable = false;
+				setContentEditableWrapper( node, false );
 				event.preventDefault();
 				if ( __unstableIsFullySelected() ) {
 					replaceBlocks(
@@ -137,7 +241,7 @@ export default function useInput() {
 				event.keyCode === BACKSPACE ||
 				event.keyCode === DELETE
 			) {
-				node.contentEditable = false;
+				setContentEditableWrapper( node, false );
 				event.preventDefault();
 				if ( __unstableIsFullySelected() ) {
 					removeBlocks( getSelectedBlockClientIds() );
@@ -152,7 +256,7 @@ export default function useInput() {
 				event.key.length === 1 &&
 				! ( event.metaKey || event.ctrlKey )
 			) {
-				node.contentEditable = false;
+				setContentEditableWrapper( node, false );
 				if ( __unstableIsSelectionMergeable() ) {
 					__unstableDeleteSelection( event.keyCode === DELETE );
 				} else {
@@ -172,7 +276,7 @@ export default function useInput() {
 				return;
 			}
 
-			node.contentEditable = false;
+			setContentEditableWrapper( node, false );
 
 			if ( __unstableIsSelectionMergeable() ) {
 				__unstableDeleteSelection();

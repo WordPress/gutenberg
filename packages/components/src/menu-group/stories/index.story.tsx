@@ -1,21 +1,11 @@
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import MenuGroup from '..';
 import MenuItem from '../../menu-item';
 import MenuItemsChoice from '../../menu-items-choice';
 
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
 const meta: Meta< typeof MenuGroup > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Actions/MenuGroup',
 	component: MenuGroup,
 	id: 'components-menugroup',
@@ -25,6 +15,11 @@ const meta: Meta< typeof MenuGroup > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'Subcomponent of `DropdownMenu`.',
+		},
 	},
 };
 export default meta;
@@ -76,8 +71,8 @@ const MultiGroupsTemplate: StoryFn< typeof MenuGroup > = ( args ) => {
  * When other menu items exist above or below a MenuGroup, the group
  * should have a divider line between it and the adjacent item.
  */
-export const WithSeperator = MultiGroupsTemplate.bind( {} );
-WithSeperator.args = {
+export const WithSeparator = MultiGroupsTemplate.bind( {} );
+WithSeparator.args = {
 	...Default.args,
 	hideSeparator: false,
 	label: 'Editor',

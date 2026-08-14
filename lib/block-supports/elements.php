@@ -111,7 +111,7 @@ function gutenberg_render_elements_support_styles( $parsed_block ) {
 	 * `render_block_data` filter in 6.6.0 to avoid filtered attributes
 	 * breaking the application of the elements CSS class.
 	 *
-	 * @see https://github.com/WordPress/gutenberg/pull/59535.
+	 * @link https://github.com/WordPress/gutenberg/pull/59535
 	 *
 	 * The change in filter means, the argument types for this function
 	 * have changed and require deprecating.
@@ -193,7 +193,7 @@ function gutenberg_render_elements_support_styles( $parsed_block ) {
 				)
 			);
 
-			if ( isset( $element_style_object[':hover'] ) ) {
+			if ( isset( $element_style_object[':hover'], $element_config['hover_selector'] ) ) {
 				gutenberg_style_engine_get_styles(
 					$element_style_object[':hover'],
 					array(
@@ -232,35 +232,55 @@ function gutenberg_render_elements_support_styles( $parsed_block ) {
  *
  * @see gutenberg_render_elements_support_styles
  *
- * @param  string $block_content Rendered block content.
- * @param  array  $block         Block object.
+ * @param string $block_content Rendered block content.
+ * @param array  $block         Block object.
+ * @return string               Filtered block content.
  *
- * @return string                Filtered block content.
+ * @phpstan-param array{
+ *     attrs: array{
+ *         className?: string,
+ *         ...
+ *     },
+ *     ...
+ * } $block
  */
 function gutenberg_render_elements_class_name( $block_content, $block ) {
-	$class_string = $block['attrs']['className'] ?? '';
-	preg_match( '/\bwp-elements-\S+\b/', $class_string, $matches );
+	$class_name_attr   = $block['attrs']['className'] ?? null;
+	$class_name_prefix = 'wp-elements-';
+	if ( ! is_string( $class_name_attr ) || ! str_contains( $class_name_attr, $class_name_prefix ) ) {
+		return $block_content;
+	}
 
-	if ( empty( $matches ) ) {
+	// Parse out the 'wp-elements-*' class name.
+	$matched_class_name = null;
+	$token_delimiter    = " \t\f\r\n";
+	$class_token        = strtok( $class_name_attr, $token_delimiter );
+	while ( false !== $class_token ) {
+		if ( str_starts_with( $class_token, $class_name_prefix ) ) {
+			$matched_class_name = $class_token;
+			break;
+		}
+		$class_token = strtok( $token_delimiter );
+	}
+	if ( null === $matched_class_name ) {
 		return $block_content;
 	}
 
 	$tags = new WP_HTML_Tag_Processor( $block_content );
-
 	if ( $tags->next_tag() ) {
-		$tags->add_class( $matches[0] );
+		$tags->add_class( $matched_class_name );
 	}
 
 	return $tags->get_updated_html();
 }
 
 // Remove deprecated WordPress core filters.
-remove_filter( 'render_block', 'wp_render_elements_support', 10, 2 );
-remove_filter( 'pre_render_block', 'wp_render_elements_support_styles', 10, 2 );
+remove_filter( 'render_block', 'wp_render_elements_support', 10 );
+remove_filter( 'pre_render_block', 'wp_render_elements_support_styles', 10 );
 
 // Remove WordPress core filters to avoid rendering duplicate elements stylesheet & attaching classes twice.
-remove_filter( 'render_block', 'wp_render_elements_class_name', 10, 2 );
-remove_filter( 'render_block_data', 'wp_render_elements_support_styles', 10, 1 );
+remove_filter( 'render_block', 'wp_render_elements_class_name', 10 );
+remove_filter( 'render_block_data', 'wp_render_elements_support_styles', 10 );
 
 add_filter( 'render_block', 'gutenberg_render_elements_class_name', 10, 2 );
 add_filter( 'render_block_data', 'gutenberg_render_elements_support_styles', 10, 1 );

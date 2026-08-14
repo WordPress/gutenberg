@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { DropdownMenu } from '@wordpress/components';
 import { useState, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -14,10 +11,6 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import {
 	PATTERN_TYPES,
@@ -25,7 +18,7 @@ import {
 	TEMPLATE_PART_POST_TYPE,
 } from '../../utils/constants';
 
-const { useHistory } = unlock( routerPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { CreatePatternModal, useAddPatternCategory } = unlock(
 	editPatternsPrivateApis
 );
@@ -33,6 +26,7 @@ const { CreateTemplatePartModal } = unlock( editorPrivateApis );
 
 export default function AddNewPattern() {
 	const history = useHistory();
+	const location = useLocation();
 	const [ showPatternModal, setShowPatternModal ] = useState( false );
 	const [ showTemplatePartModal, setShowTemplatePartModal ] =
 		useState( false );
@@ -126,6 +120,7 @@ export default function AddNewPattern() {
 					toggleProps={ {
 						variant: 'primary',
 						showTooltip: false,
+						size: 'compact',
 						__next40pxDefaultSize: true,
 					} }
 					text={ addNewPatternLabel }
@@ -159,13 +154,12 @@ export default function AddNewPattern() {
 						return;
 					}
 					try {
-						const {
-							params: { postType, categoryId },
-						} = history.getLocationWithParams();
 						let currentCategoryId;
 						// When we're not handling template parts, we should
 						// add or create the proper pattern category.
-						if ( postType !== TEMPLATE_PART_POST_TYPE ) {
+						if (
+							location.query.postType !== TEMPLATE_PART_POST_TYPE
+						) {
 							/*
 							 * categoryMap.values() returns an iterator.
 							 * Iterator.prototype.find() is not yet widely supported.
@@ -173,7 +167,10 @@ export default function AddNewPattern() {
 							 */
 							const currentCategory = Array.from(
 								categoryMap.values()
-							).find( ( term ) => term.name === categoryId );
+							).find(
+								( term ) =>
+									term.name === location.query.categoryId
+							);
 							if ( currentCategory ) {
 								currentCategoryId =
 									currentCategory.id ||
@@ -194,7 +191,7 @@ export default function AddNewPattern() {
 						// category.
 						if (
 							! currentCategoryId &&
-							categoryId !== 'my-patterns'
+							location.query.categoryId !== 'my-patterns'
 						) {
 							history.navigate(
 								`/pattern?categoryId=${ PATTERN_DEFAULT_CATEGORY }`

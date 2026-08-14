@@ -15,8 +15,6 @@ const MyTreeSelect = () => {
 
 	return (
 		<TreeSelect
-			__nextHasNoMarginBottom
-			__next40pxDefaultSize
 			label="Parent page"
 			noOptionLabel="No parent page"
 			onChange={ ( newPage ) => setPage( newPage ) }
@@ -54,94 +52,81 @@ const MyTreeSelect = () => {
 
 ## Props
 
-### `__next40pxDefaultSize`
-
-Start opting into the larger default height that will become the default size in a future version.
-
- - Type: `boolean`
- - Required: No
- - Default: `false`
-
-### `__nextHasNoMarginBottom`
-
-Start opting into the new margin-free styles that will become the default in a future version.
-
- - Type: `boolean`
- - Required: No
- - Default: `false`
-
 ### `children`
-
-As an alternative to the `options` prop, `optgroup`s and `options` can be
-passed in as `children` for more customizability.
 
  - Type: `ReactNode`
  - Required: No
 
+As an alternative to the `options` prop, `optgroup`s and `options` can be
+passed in as `children` for more customizability.
+
 ### `disabled`
+
+ - Type: `boolean`
+ - Required: No
+ - Default: `false`
 
 If true, the `input` will be disabled.
 
+### `hideLabelFromVision`
+
  - Type: `boolean`
  - Required: No
  - Default: `false`
-
-### `hideLabelFromVision`
 
 If true, the label will only be visible to screen readers.
 
- - Type: `boolean`
- - Required: No
- - Default: `false`
-
 ### `help`
+
+ - Type: `ReactNode`
+ - Required: No
 
 Additional description for the control.
 
 Only use for meaningful description or instructions for the control. An element containing the description will be programmatically associated to the BaseControl by the means of an `aria-describedby` attribute.
 
+### `label`
+
  - Type: `ReactNode`
  - Required: No
-
-### `label`
 
 If this property is added, a label will be generated using label property as the content.
 
- - Type: `ReactNode`
- - Required: No
-
 ### `labelPosition`
-
-The position of the label.
 
  - Type: `"top" | "bottom" | "side" | "edge"`
  - Required: No
  - Default: `'top'`
 
-### `noOptionLabel`
+The position of the label.
 
-If this property is added, an option will be added with this label to represent empty selection.
+### `noOptionLabel`
 
  - Type: `string`
  - Required: No
 
+If this property is added, an option will be added with this label to represent empty selection.
+
 ### `onChange`
+
+ - Type: `((value: string, extra?: { event?: ChangeEvent<HTMLSelectElement>; }) => void) | undefined`
+ - Required: No
 
 A function that receives the value of the new option that is being selected as input.
 
- - Type: `(value: string, extra?: { event?: ChangeEvent<HTMLSelectElement>; }) => void`
- - Required: No
-
 ### `options`
+
+ - Type: `readonly ({ label: string; value: string; } & Omit<OptionHTMLAttributes<HTMLOptionElement>, "label" | "value">)[]`
+ - Required: No
 
 An array of option property objects to be rendered,
 each with a `label` and `value` property, as well as any other
 `<option>` attributes.
 
- - Type: `readonly ({ label: string; value: string; } & Omit<OptionHTMLAttributes<HTMLOptionElement>, "label" | "value">)[]`
- - Required: No
-
 ### `prefix`
+
+ - Type: `ReactNode`
+ - Required: No
 
 Renders an element on the left side of the input.
 
@@ -160,25 +145,25 @@ import {
 />
 ```
 
- - Type: `ReactNode`
- - Required: No
-
 ### `selectedId`
-
-The id of the currently selected node.
 
  - Type: `string`
  - Required: No
 
+The id of the currently selected node.
+
 ### `size`
 
-Adjusts the size of the input.
-
- - Type: `"default" | "small" | "compact" | "__unstable-large"`
+ - Type: `"default" | "small" | "compact"`
  - Required: No
  - Default: `'default'`
 
+Adjusts the size of the input.
+
 ### `suffix`
+
+ - Type: `ReactNode`
+ - Required: No
 
 Renders an element on the right side of the input.
 
@@ -197,20 +182,17 @@ import {
 />
 ```
 
- - Type: `ReactNode`
- - Required: No
-
 ### `tree`
-
-An array containing the tree objects with the possible nodes the user can select.
 
  - Type: `Tree[]`
  - Required: No
 
-### `variant`
+An array containing the tree objects with the possible nodes the user can select.
 
-The style variant of the control.
+### `variant`
 
  - Type: `"default" | "minimal"`
  - Required: No
  - Default: `'default'`
+
+The style variant of the control.
