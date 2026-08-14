@@ -20,7 +20,6 @@ import {
 	useInnerBlocksProps,
 	useBlockEditingMode,
 	BlockControls,
-	MediaReplaceFlow,
 	useSettings,
 } from '@wordpress/block-editor';
 import { useEffect, useMemo } from '@wordpress/element';
@@ -602,7 +601,6 @@ export default function GalleryEdit( props ) {
 		}
 	}, [ linkTo ] );
 
-	const hasImageIds = hasImages && images.some( ( image ) => !! image.id );
 	const imagesUploading = images.some(
 		( img ) => ! img.id && img.url?.indexOf( 'blob:' ) === 0
 	);
@@ -914,22 +912,6 @@ export default function GalleryEdit( props ) {
 				</ToolbarDropdownMenu>
 			</BlockControls>
 			<>
-				{ ! multiGallerySelection && ! isDynamic && (
-					<BlockControls group="other">
-						<MediaReplaceFlow
-							allowedTypes={ ALLOWED_MEDIA_TYPES }
-							handleUpload={ false }
-							onSelect={ updateImages }
-							name={ __( 'Add' ) }
-							multiple
-							mediaIds={ images
-								.filter( ( image ) => image.id )
-								.map( ( image ) => image.id ) }
-							addToGallery={ hasImageIds }
-							variant="toolbar"
-						/>
-					</BlockControls>
-				) }
 				<GalleryGapCustomProperties
 					style={ attributes.style }
 					clientId={ clientId }

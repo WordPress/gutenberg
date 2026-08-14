@@ -3,11 +3,9 @@ import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	MediaPlaceholder,
-	MediaReplaceFlow,
 	BlockIcon,
 	useBlockProps,
 	useInnerBlocksProps,
-	BlockControls,
 	InspectorControls,
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
@@ -471,17 +469,6 @@ const PlaylistEdit = ( {
 
 	return (
 		<>
-			<BlockControls group="other" __experimentalShareWithChildBlocks>
-				<MediaReplaceFlow
-					name={ __( 'Add track' ) }
-					onSelect={ onAddTracks }
-					accept="audio/*"
-					multiple="add"
-					handleUpload={ false }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					onError={ onUploadError }
-				/>
-			</BlockControls>
 			<InspectorControls>
 				<ToolsPanel
 					label={ __( 'Settings' ) }

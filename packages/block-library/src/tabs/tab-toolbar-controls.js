@@ -8,16 +8,17 @@ import { useSelect } from '@wordpress/data';
 import useTabActions from './use-tab-actions';
 
 /**
- * "Add tab" and "Remove tab" buttons in the block toolbar for the tabs block.
- * Inserts or removes a core/tab-panel. The tab-list items attribute is kept
- * in sync automatically via useTabListItemsSync.
+ * "Remove tab" button in the block toolbar for the tabs block. Removes a
+ * core/tab-panel; tabs are added with the inserter in the block toolbar. The
+ * tab-list items attribute is kept in sync automatically via
+ * useTabListItemsSync.
  *
  * @param {Object} props
  * @param {string} props.tabsClientId The client ID of the parent tabs block.
  * @return {React.JSX.Element} The toolbar control element.
  */
 export default function TabToolbarControls( { tabsClientId } ) {
-	const { insertTab, removeTab } = useTabActions( tabsClientId );
+	const { removeTab } = useTabActions( tabsClientId );
 	const isRemoveDisabled = useSelect(
 		( select ) => {
 			if ( ! tabsClientId ) {
@@ -34,11 +35,6 @@ export default function TabToolbarControls( { tabsClientId } ) {
 	return (
 		<BlockControls group="other">
 			<ToolbarGroup>
-				<ToolbarButton
-					className="components-toolbar__control"
-					onClick={ () => insertTab() }
-					text={ __( 'Add tab' ) }
-				/>
 				<ToolbarButton
 					className="components-toolbar__control"
 					onClick={ () => removeTab() }
