@@ -99,7 +99,6 @@
 	"SelectControl:ref",
 	"Slot>Fill",
 	"Slot>SlotFillProvider",
-	"TextControl:className",
 	"ToggleControl:className",
 	"ToggleControl:help",
 	"ToggleGroupControl>ToggleGroupControlOption:value",

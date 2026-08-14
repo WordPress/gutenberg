@@ -956,17 +956,6 @@
       - onChange
       - rows
       - value
-- name: TextControl
-  props:
-      - __next40pxDefaultSize
-      - __nextHasNoMarginBottom
-      - className
-      - help
-      - hideLabelFromVision
-      - label
-      - onChange
-      - type
-      - value
 - name: TextHighlight
   props:
       - highlight
