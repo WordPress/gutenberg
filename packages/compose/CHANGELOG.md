@@ -1,6 +1,7 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+
 ### Internal
 
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
@@ -15,9 +16,6 @@
 
 -   `useFixedWindowList`: Remove a duplicate `resize` listener registration, and page by the measured viewport height rather than the initial window size ([#80935](https://github.com/WordPress/gutenberg/pull/80935)).
 -   `useViewportMatch`: Scope the generated media query to `screen`, so that printing does not report the viewport as having become narrower ([#81367](https://github.com/WordPress/gutenberg/pull/81367)).
-### Internal
-
-
 ## 8.5.0 (2026-07-29)
 
 ## 8.4.0 (2026-07-14)

@@ -1,13 +1,14 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
-### Internal
-
--   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
 
 ### Bug Fixes
 
 -   Use the row block spacing value for Flow and Constrained layouts when Global Styles defines separate row and column values ([#81476](https://github.com/WordPress/gutenberg/pull/81476)).
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
 
 ## 1.20.0 (2026-08-12)
 
@@ -15,9 +16,6 @@
 
 -   Report changes to site-wide border, shadow, outline, filter and dimensions in the global styles changelist. These are rendered by the styles engine but were not compared, so changing only one of them was reported as no change at all ([#81407](https://github.com/WordPress/gutenberg/pull/81407)).
 -   Render block element styles defined only inside responsive viewport states.
-### Internal
-
-
 ## 1.19.0 (2026-07-29)
 
 ### Internal
