@@ -1,4 +1,5 @@
 import { Component } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { select, dispatch } from '@wordpress/data';
 import { invalidateAttachmentResolutions } from '../../utils/invalidate-attachment-resolutions';
@@ -227,9 +228,19 @@ const getGalleryDetailsMediaFrame = () => {
 	} );
 };
 
-// The media library image object contains numerous attributes
-// we only need this set to display the image in the library.
-const slimImageObject = ( img ) => {
+/**
+ * Reduces a media library image object down to the fields needed to display
+ * it in the library.
+ *
+ * The base set of fields below is deliberately small. Consumers that need to
+ * preserve additional attachment fields, such as custom meta registered by a
+ * plugin, can extend the result through the `media.slimImageObject` filter,
+ * which receives the reduced object and the full original attachment.
+ *
+ * @param {Object} img The full media library image object.
+ * @return {Object} The reduced image object, after filtering.
+ */
+export const slimImageObject = ( img ) => {
 	const attrSet = [
 		'sizes',
 		'mime',
@@ -241,12 +252,13 @@ const slimImageObject = ( img ) => {
 		'link',
 		'caption',
 	];
-	return attrSet.reduce( ( result, key ) => {
+	const baseFields = attrSet.reduce( ( result, key ) => {
 		if ( img?.hasOwnProperty( key ) ) {
 			result[ key ] = img[ key ];
 		}
 		return result;
 	}, {} );
+	return applyFilters( 'media.slimImageObject', baseFields, img );
 };
 
 const getAttachmentsCollection = ( ids ) => {
