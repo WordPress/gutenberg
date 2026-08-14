@@ -76,22 +76,28 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				}
 			}
 
-			// The field the current press started on, for the length of
-			// the press and the drag that may follow it.
-			let pressedField = null;
-
-			// The editable field whose content is entirely covered by the
-			// text selection, or null when there is none.
+			// The field whose content is entirely covered by the text
+			// selection, or null when there is none. Derived from the
+			// selection, not the active element, so it holds the same
+			// answer while a press has made the field non editable.
 			function getEntirelySelectedField() {
-				const { activeElement } = node.ownerDocument;
 				const selection = node.ownerDocument.defaultView.getSelection();
+				const { anchorNode } = selection;
 
-				return ! selection.isCollapsed &&
-					activeElement &&
-					node.contains( activeElement ) &&
-					activeElement.isContentEditable &&
-					isEntirelySelected( activeElement )
-					? activeElement
+				if ( selection.isCollapsed || ! anchorNode ) {
+					return null;
+				}
+
+				const anchorElement =
+					anchorNode.nodeType === anchorNode.ELEMENT_NODE
+						? anchorNode
+						: anchorNode.parentElement;
+				const field = anchorElement?.closest( '[contenteditable]' );
+
+				return field &&
+					node.contains( field ) &&
+					isEntirelySelected( field )
+					? field
 					: null;
 			}
 
@@ -125,7 +131,11 @@ export function useEventHandlers( { clientId, isSelected } ) {
 
 				const editableElement = getEntirelySelectedField();
 
-				if ( ! editableElement || hasMultiSelection() ) {
+				if (
+					! editableElement ||
+					! editableElement.isContentEditable ||
+					hasMultiSelection()
+				) {
 					return;
 				}
 
@@ -134,10 +144,8 @@ export function useEventHandlers( { clientId, isSelected } ) {
 
 				node.setAttribute( 'draggable', 'true' );
 				editableElement.setAttribute( 'contenteditable', 'false' );
-				pressedField = editableElement;
 
 				function restore() {
-					pressedField = null;
 					node.removeAttribute( 'draggable' );
 					editableElement.setAttribute( 'contenteditable', 'true' );
 					ownerDocument.removeEventListener( 'mouseup', onPressEnd );
@@ -195,14 +203,10 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			 */
 			function onDragStart( event ) {
 				const { activeElement } = node.ownerDocument;
-				// The press above already converts a press on a fully
-				// selected field into a block drag; the attribute check
-				// remains for drags the browser starts on its own.
 				const fullySelectedField =
-					pressedField ||
-					( node.contains( event.target ) && ! hasMultiSelection()
+					node.contains( event.target ) && ! hasMultiSelection()
 						? getEntirelySelectedField()
-						: null );
+						: null;
 				const isDirectBlockDrag =
 					node === event.target &&
 					! node.isContentEditable &&
