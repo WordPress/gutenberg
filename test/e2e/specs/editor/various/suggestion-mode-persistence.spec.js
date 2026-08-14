@@ -11,6 +11,9 @@
  *     can still be accepted or rejected afterwards.
  *   - Un-accepted insertions never render on the public front end (the
  *     type-aware render_block strip), while pending removals still do.
+ *   - An un-accepted move does not change what readers see: the front end
+ *     renders the pre-move order even though `post_content` holds the
+ *     proposed one.
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
@@ -268,6 +271,55 @@ test.describe( 'Suggestion mode persistence', () => {
 		await expect(
 			page.locator( 'body' ).getByText( 'Proposed new paragraph' )
 		).toBeHidden();
+	} );
+
+	test( 'a pending move renders in its original order on the front end', async ( {
+		editor,
+		page,
+	} ) => {
+		/*
+		 * A move is the one structural suggestion with nothing to strip: the
+		 * block is real content and the proposal is its POSITION. The editor
+		 * keeps the proposed order (that is what a reviewer needs to see), so
+		 * the pre-render pass has to put it back for readers.
+		 */
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Alpha the first' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Bravo the second' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const mover = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Alpha the first' } );
+		await editor.selectBlocks( mover );
+
+		const suggestionSaved = suggestionSavedPromise( page );
+		await editor.clickBlockToolbarButton( 'Move down' );
+		await expect( mover ).toHaveClass( /is-suggestion-pending-move/ );
+		await suggestionSaved;
+
+		// The editor - and `post_content` - hold the PROPOSED order.
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized.indexOf( 'Bravo the second' ) ).toBeLessThan(
+			serialized.indexOf( 'Alpha the first' )
+		);
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const rendered = await page.locator( 'body' ).innerText();
+		expect( rendered ).toContain( 'Alpha the first' );
+		expect( rendered ).toContain( 'Bravo the second' );
+		// Readers still see the order the post is actually in.
+		expect( rendered.indexOf( 'Alpha the first' ) ).toBeLessThan(
+			rendered.indexOf( 'Bravo the second' )
+		);
 	} );
 
 	test( 'pending inline suggestions on the front end: additions are hidden, deletions and format runs render their text', async ( {
