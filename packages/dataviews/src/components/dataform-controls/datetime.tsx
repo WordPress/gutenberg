@@ -1,21 +1,15 @@
-import {
-	BaseControl,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { BaseControl } from '@wordpress/components';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
-import { Calendar, Stack } from '@wordpress/ui';
+import { Calendar, Stack, ValidatedInputControl } from '@wordpress/ui';
 import type { DataFormControlProps, FormatDatetime } from '../../types';
 import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../../constants';
 import RelativeDateControl from './utils/relative-date-control';
 import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
 import getCustomValidity from './utils/get-custom-validity';
 import parseDateTime from '../../field-types/utils/parse-date-time';
-import { unlock } from '../../lock-unlock';
-
-const { ValidatedInputControl } = unlock( componentsPrivateApis );
 
 const formatDateTime = ( value?: string ): string => {
 	if ( ! value ) {
@@ -167,7 +161,7 @@ function CalendarDateTimeControl< Item >( {
 					label={ __( 'Date time' ) }
 					hideLabelFromVision
 					value={ formatDateTime( value ) }
-					onChange={ handleManualDateTimeChange }
+					onValueChange={ handleManualDateTimeChange }
 					disabled={ disabled }
 					min={
 						minConstraint

@@ -9,6 +9,27 @@ jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
 
 const noop = () => {};
 
+// Applies the edits reported by `onChange` back to `data`, the way real
+// consumers do. Text controls are strictly controlled, so without this
+// feedback loop typed characters would not accumulate in the input.
+function StatefulDataform< Item extends object >( {
+	data: initialData,
+	onChange,
+	...props
+}: React.ComponentProps< typeof Dataform< Item > > ) {
+	const [ currentData, setCurrentData ] = useState( initialData );
+	return (
+		<Dataform< Item >
+			{ ...props }
+			data={ currentData }
+			onChange={ ( edits ) => {
+				setCurrentData( ( prev ) => ( { ...prev, ...edits } ) );
+				onChange( edits );
+			} }
+		/>
+	);
+}
+
 const fields = [
 	{
 		id: 'title',
@@ -120,7 +141,7 @@ describe( 'DataForm component', () => {
 		it( 'should call onChange with the correct value for each typed character', async () => {
 			const onChange = jest.fn();
 			render(
-				<Dataform
+				<StatefulDataform
 					onChange={ onChange }
 					fields={ fields }
 					form={ form }
@@ -189,7 +210,7 @@ describe( 'DataForm component', () => {
 				},
 			];
 			render(
-				<Dataform
+				<StatefulDataform
 					onChange={ onChange }
 					fields={ fieldsWithTime }
 					form={ { ...form, fields: [ 'startTime' ] } }
@@ -496,7 +517,7 @@ describe( 'DataForm component', () => {
 		it( 'should call onChange with the correct value for each typed character', async () => {
 			const onChange = jest.fn();
 			render(
-				<Dataform
+				<StatefulDataform
 					onChange={ onChange }
 					fields={ fields }
 					form={ formPanelMode }
