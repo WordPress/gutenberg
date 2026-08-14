@@ -41,9 +41,14 @@ export function useNoteThreads( postId ) {
 		per_page: -1,
 	};
 
-	const { records: threads } = useEntityRecords( 'root', 'note', queryArgs, {
-		enabled: !! postId && typeof postId === 'number',
-	} );
+	const { records: threads } = useEntityRecords(
+		'commentType',
+		'note',
+		queryArgs,
+		{
+			enabled: !! postId && typeof postId === 'number',
+		}
+	);
 
 	const { getBlockAttributes } = useSelect( blockEditorStore );
 	const { clientIds } = useSelect( ( select ) => {
@@ -289,7 +294,7 @@ export function useNoteActions() {
 				: null;
 
 			const savedRecord = await saveEntityRecord(
-				'root',
+				'commentType',
 				'note',
 				{
 					post: getCurrentPostId(),
@@ -356,7 +361,7 @@ export function useNoteActions() {
 			if ( status === 'approved' || status === 'hold' ) {
 				// First, update the thread status.
 				await saveEntityRecord(
-					'root',
+					'commentType',
 					'note',
 					{
 						id,
@@ -380,7 +385,7 @@ export function useNoteActions() {
 				};
 
 				const savedRecord = await saveEntityRecord(
-					'root',
+					'commentType',
 					'note',
 					newNoteData,
 					{
@@ -417,7 +422,7 @@ export function useNoteActions() {
 			};
 
 			const savedRecord = await saveEntityRecord(
-				'root',
+				'commentType',
 				'note',
 				updateData,
 				{
@@ -445,9 +450,15 @@ export function useNoteActions() {
 				? note.blockClientId || getSelectedBlockClientId()
 				: null;
 
-			await deleteEntityRecord( 'root', 'note', note.id, undefined, {
-				throwOnError: true,
-			} );
+			await deleteEntityRecord(
+				'commentType',
+				'note',
+				note.id,
+				undefined,
+				{
+					throwOnError: true,
+				}
+			);
 
 			if ( clientId ) {
 				const attributes = getBlockAttributes( clientId );

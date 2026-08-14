@@ -13,7 +13,7 @@ import { useEntityRecords } from '@wordpress/core-data';
  */
 export default function useNotesCount( postIds ) {
 	const { records: notes, isResolving } = useEntityRecords(
-		'root',
+		'commentType',
 		'note',
 		{
 			post: postIds,

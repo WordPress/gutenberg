@@ -144,9 +144,16 @@ export const rootEntitiesConfig = [
 		 * its replies in a `replies` array - so a page break never separates a
 		 * reply from its parent and replies arrive in the same context as the
 		 * thread.
+		 *
+		 * Keyed under a `commentType` kind, mirroring `postType`. Comment types
+		 * have no registry to discover them from yet, so the kind carries no
+		 * loader in `additionalEntityConfigLoaders` and its entities are
+		 * declared here instead; `getEntitiesConfig` no-ops for a kind without
+		 * one. The existing `root`, `comment` entity moves under the same kind
+		 * separately, since that rename reaches consumers beyond notes.
 		 */
 		name: 'note',
-		kind: 'root',
+		kind: 'commentType',
 		baseURL: '/wp/v2/notes',
 		baseURLParams: { context: 'edit' },
 		plural: 'notes',

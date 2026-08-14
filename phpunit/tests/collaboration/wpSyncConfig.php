@@ -205,6 +205,18 @@ class Tests_Collaboration_WpSyncConfig extends WP_UnitTestCase {
 		$this->assertTrue( WP_Sync_Config::can_user_sync_entity_type( 'root', 'comment', (string) self::$comment_id ) );
 	}
 
+	public function test_can_user_sync_single_note_entity() {
+		wp_set_current_user( self::$editor_id );
+
+		$this->assertTrue( WP_Sync_Config::can_user_sync_entity_type( 'commentType', 'note', (string) self::$comment_id ) );
+	}
+
+	public function test_can_user_sync_single_note_entity_requires_edit_permission() {
+		wp_set_current_user( self::$subscriber_id );
+
+		$this->assertFalse( WP_Sync_Config::can_user_sync_entity_type( 'commentType', 'note', (string) self::$comment_id ) );
+	}
+
 	/**
 	 * @dataProvider data_collection_entity_types
 	 *
@@ -224,9 +236,10 @@ class Tests_Collaboration_WpSyncConfig extends WP_UnitTestCase {
 	 */
 	public function data_collection_entity_types(): array {
 		return array(
-			'post type collection' => array( 'postType', 'post' ),
-			'taxonomy collection'  => array( 'taxonomy', 'category' ),
-			'root collection'      => array( 'root', 'site' ),
+			'post type collection'    => array( 'postType', 'post' ),
+			'taxonomy collection'     => array( 'taxonomy', 'category' ),
+			'root collection'         => array( 'root', 'site' ),
+			'comment type collection' => array( 'commentType', 'note' ),
 		);
 	}
 
