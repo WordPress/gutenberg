@@ -2,7 +2,11 @@ import { useCallback, useMemo } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
-import { useNavigate, privateApis as routePrivateApis } from '@wordpress/route';
+import {
+	useNavigate,
+	useSearch,
+	privateApis as routePrivateApis,
+} from '@wordpress/route';
 import { unlock } from '../../lock-unlock';
 
 const { useCanGoBack, useRouter } = unlock( routePrivateApis );
@@ -38,6 +42,7 @@ interface NavigateParams {
  */
 export default function useNavigateToEntityRecord() {
 	const navigate = useNavigate() as Navigate;
+	const search = useSearch( { strict: false } ) as { focusMode?: unknown };
 	const registry = useRegistry();
 	const router = useRouter();
 	const canGoBack = useCanGoBack();
@@ -77,19 +82,34 @@ export default function useNavigateToEntityRecord() {
 			/*
 			 * Template and template part IDs carry a `theme//slug` form, so the
 			 * separator has to survive being placed in the path.
+			 *
+			 * `focusMode` marks the entity as one navigated into rather than
+			 * opened directly, which is what offers the way back out. The search
+			 * is replaced rather than extended so the block stashed above stays
+			 * with the entity it belongs to.
 			 */
 			navigate( {
 				to: `/types/${ params.postType }/edit/${ encodeURIComponent(
 					params.postId
 				) }`,
+				search: () => ( { focusMode: true } ),
 			} );
 		},
 		[ navigate, registry ]
 	);
 
+	/*
+	 * Only entities navigated into offer a way back out. The editor reads this
+	 * as the entity being a focused one, giving it the document bar's back
+	 * button and the surrounding padding, so an entity opened directly — from a
+	 * list, say — must not have it. `canGoBack` covers reloading such a URL,
+	 * where the marker survives but the history to return to does not.
+	 */
+	const isFocusMode = !! search.focusMode;
 	const onNavigateToPreviousEntityRecord = useMemo(
-		() => ( canGoBack ? () => router.history.back() : undefined ),
-		[ canGoBack, router ]
+		() =>
+			isFocusMode && canGoBack ? () => router.history.back() : undefined,
+		[ isFocusMode, canGoBack, router ]
 	);
 
 	return { onNavigateToEntityRecord, onNavigateToPreviousEntityRecord };
