@@ -5,6 +5,15 @@ import styles from '../style.module.scss';
 
 const noop = () => {};
 
+function getModalOverlay() {
+	/* eslint-disable testing-library/no-node-access */
+	const overlay = document.querySelector(
+		'.components-modal__screen-overlay'
+	)!;
+	/* eslint-enable testing-library/no-node-access */
+	return overlay;
+}
+
 describe( 'Confirm', () => {
 	describe( 'Confirm component', () => {
 		describe( 'Structure', () => {
@@ -20,9 +29,7 @@ describe( 'Confirm', () => {
 
 				expect( dialog ).toBeInTheDocument();
 				expect( dialog ).toHaveClass( 'components-confirm-dialog' );
-				// Disable reason: Semantic queries can't reach the overlay.
-				// eslint-disable-next-line testing-library/no-node-access
-				expect( dialog.parentElement ).toHaveClass( styles.wrapper );
+				expect( getModalOverlay() ).toHaveClass( styles.wrapper );
 
 				elementsTexts.forEach( ( txt ) => {
 					const el = screen.getByText( txt );
@@ -140,9 +147,7 @@ describe( 'Confirm', () => {
 
 				const confirmDialog = screen.getByRole( 'dialog' );
 
-				// Disable reason: Semantic queries can’t reach the overlay.
-				// eslint-disable-next-line testing-library/no-node-access
-				await user.click( confirmDialog.parentElement! );
+				await user.click( getModalOverlay() );
 
 				expect( confirmDialog ).not.toBeInTheDocument();
 				expect( onCancel ).toHaveBeenCalled();
@@ -307,11 +312,7 @@ describe( 'Confirm', () => {
 				</ConfirmDialog>
 			);
 
-			const confirmDialog = screen.getByRole( 'dialog' );
-
-			// Disable reason: Semantic queries can’t reach the overlay.
-			// eslint-disable-next-line testing-library/no-node-access
-			await user.click( confirmDialog.parentElement! );
+			await user.click( getModalOverlay() );
 
 			expect( onCancel ).toHaveBeenCalled();
 		} );
