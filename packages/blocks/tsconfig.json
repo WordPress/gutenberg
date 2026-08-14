@@ -16,7 +16,7 @@
 		{ "path": "../html-entities/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../is-shallow-equal" },
-		{ "path": "../keycodes" },
+		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../private-apis" },
 		{ "path": "../rich-text" },
 		{ "path": "../shortcode/tsconfig.build.json" },
