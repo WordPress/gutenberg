@@ -7,5 +7,12 @@
 	"references": [
 		{ "path": "../dataviews" },
 		{ "path": "../element/tsconfig.build.json" }
+	],
+	"exclude": [
+		"**/benchmark",
+		"**/test/**",
+		"**/tests/**",
+		"**/stories/**",
+		"**/*.story.*"
 	]
 }

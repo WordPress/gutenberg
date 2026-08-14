@@ -3,8 +3,14 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"rootDir": "src",
-		"types": [ "jest", "node" ]
+		"types": [ "node" ]
 	},
 	"include": [ "src" ],
-	"exclude": []
+	"exclude": [
+		"**/benchmark",
+		"**/test/**",
+		"**/tests/**",
+		"**/stories/**",
+		"**/*.story.*"
+	]
 }

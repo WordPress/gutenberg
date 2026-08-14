@@ -4,7 +4,7 @@
 	"compilerOptions": {
 		"checkJs": false,
 		"noImplicitAny": false,
-		"types": [ "jest", "node" ]
+		"types": [ "node" ]
 	},
 	"references": [
 		{ "path": "../api-fetch/tsconfig.build.json" },
@@ -29,6 +29,10 @@
 		{ "path": "../warning" }
 	],
 	"exclude": [
-		"src/**/test/**/*.js" // only exclude js files, ts files should be checked
+		"**/benchmark",
+		"**/test/**",
+		"**/tests/**",
+		"**/stories/**",
+		"**/*.story.*"
 	]
 }

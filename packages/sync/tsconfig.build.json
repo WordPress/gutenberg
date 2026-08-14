@@ -4,7 +4,14 @@
 	"compilerOptions": {
 		"types": [ "node" ]
 	},
-	"exclude": [ "src/y-utilities/y-multidoc-undomanager.js" ],
+	"exclude": [
+		"**/benchmark",
+		"**/test/**",
+		"**/tests/**",
+		"**/stories/**",
+		"**/*.story.*",
+		"src/y-utilities/y-multidoc-undomanager.js"
+	],
 	"references": [
 		{ "path": "../api-fetch/tsconfig.build.json" },
 		{ "path": "../hooks" },
