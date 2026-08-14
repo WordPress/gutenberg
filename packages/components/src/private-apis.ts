@@ -6,7 +6,6 @@ import { Tabs } from './tabs';
 import { lock } from './lock-unlock';
 import Badge from './badge';
 import {
-	ValidatedInputControl,
 	ValidatedContentEditableControl,
 	ValidatedTextareaControl,
 } from './validated-form-controls';
@@ -21,7 +20,6 @@ lock( privateApis, {
 	Menu,
 	Badge,
 	useDrag,
-	ValidatedInputControl,
 	ValidatedContentEditableControl,
 	ValidatedTextareaControl,
 } );
