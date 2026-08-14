@@ -1,4 +1,5 @@
 import { createBlock, getBlockAttributes } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
 import { getLevelFromHeadingNodeName } from './shared';
 import { getTransformedAttributes } from '../utils/get-transformed-attributes';
 
@@ -96,6 +97,22 @@ const transforms = {
 			type: 'block',
 			isMultiBlock: true,
 			blocks: [ 'core/paragraph' ],
+			shortcut: {
+				name: 'core/block-editor/transform-heading-to-paragraph',
+				description: __(
+					'Transform the selected heading into a paragraph.'
+				),
+				keyCombination: {
+					modifier: 'access',
+					character: '0',
+				},
+				aliases: [
+					{
+						modifier: 'access',
+						character: '7',
+					},
+				],
+			},
 			transform: ( attributes ) =>
 				attributes.map( ( _attributes ) => {
 					const { content, style } = _attributes;

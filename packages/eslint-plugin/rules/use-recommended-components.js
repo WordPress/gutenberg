@@ -17,12 +17,14 @@ const ALLOWLIST = {
 	'@wordpress/ui': {
 		allowed: [
 			'Badge',
+			'Calendar',
 			'Card',
 			'Collapsible',
 			'CollapsibleCard',
 			'EmptyState',
 			'Icon',
 			'Link',
+			'RangeCalendar',
 			'Skeleton',
 			'Stack',
 			'Tabs',

@@ -137,12 +137,14 @@ async function build() {
 		if ( ! skipTypes ) {
 			console.log( '\n📘 Building TypeScript types...\n' );
 			const tsStartTime = Date.now();
-			await exec( 'tsc', [ '--build' ] ).catch( () => {
-				console.error(
-					'\n❌ TypeScript compilation failed. Try cleaning up first: `npm run clean:package-types`'
-				);
-				throw new Error( 'TypeScript compilation failed' );
-			} );
+			await exec( 'tsc', [ '--build', 'tsconfig.build.json' ] ).catch(
+				() => {
+					console.error(
+						'\n❌ TypeScript compilation failed. Try cleaning up first: `npm run clean:package-types`'
+					);
+					throw new Error( 'TypeScript compilation failed' );
+				}
+			);
 			const buildTime = Date.now() - tsStartTime;
 			console.log( `   ✔ Built TypeScript types (${ buildTime }ms)` );
 
