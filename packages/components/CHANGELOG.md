@@ -7,10 +7,19 @@
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
     -   `DropdownContentWrapper` ([#81522](https://github.com/WordPress/gutenberg/pull/81522))
 
+### Enhancements
+
+-   `TextControl`, `TextareaControl`, `FormTokenField`, `ContentEditableControl`, `ComboboxControl`: Align focus and hover styles with the design system ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
+-   `InputControl`, `SelectControl`, `CustomSelectControl`: Align focus rings with the design system ([#80417](https://github.com/WordPress/gutenberg/pull/80417)).
+
 ### Bug Fixes
 
 -   `InputControl`: Vertically center the value of date and time inputs in Safari ([#81361](https://github.com/WordPress/gutenberg/pull/81361)).
 -   `ControlWithError`: Re-read the target's validation message when an `invalid` event is received, so a message that changed without a re-render in between (e.g. a programmatic value change followed by a synthetic `invalid` event) is not revealed stale or empty. While a `validating` custom validity is pending, the message is left untouched so the pending indicator keeps showing ([#81440](https://github.com/WordPress/gutenberg/pull/81440)).
+
+### TypeScript
+
+-   `ComboboxControl`: Narrow the `onChange` callback parameter type to `string | null`, matching the values the component actually passes. The previous indexed-access type on the optional `value` prop leaked an accidental `undefined` into the union ([#81568](https://github.com/WordPress/gutenberg/pull/81568)).
 
 ### Internal
 

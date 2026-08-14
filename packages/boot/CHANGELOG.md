@@ -2,6 +2,27 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Translate the click-to-edit label on a previewed canvas, and name the action rather than the gesture ([#81620](https://github.com/WordPress/gutenberg/pull/81620)).
+
+### Enhancements
+
+-   Contain a failure to the surface it happened in, so a stage, inspector or canvas that throws leaves the rest of the screen working ([#81622](https://github.com/WordPress/gutenberg/pull/81622)).
+
+### Enhancements
+
+-   Warn before leaving the page with unsaved changes ([#81625](https://github.com/WordPress/gutenberg/pull/81625)).
+
+-   Add a `stage` visibility function to a route's config, mirroring `inspector`, so a route can hide its stage and leave the canvas to fill the surfaces area.
+-   Pass the editor's entity navigation callbacks from the canvas, so a template part or synced pattern can be opened from the block inspector and navigated back out of, restoring the block that was selected ([#81590](https://github.com/WordPress/gutenberg/pull/81590)).
+-   Add `registerEntityLinks` and `getEntityLink`, so an application declares where each post type is listed and edited and the canvas resolves every link through them ([#81590](https://github.com/WordPress/gutenberg/pull/81590)).
+-   Run the editor's post actions from the canvas, returning to the list when an entity is trashed or deleted and offering a way to reach a duplicate ([#81590](https://github.com/WordPress/gutenberg/pull/81590)).
+
+### Breaking Changes
+
+-   Remove `editLink` from a route's canvas data. Register the post type's `edit` path with `registerEntityLinks` instead ([#81590](https://github.com/WordPress/gutenberg/pull/81590)).
+
 ## 0.20.0 (2026-08-12)
 
 ### Bug Fixes
