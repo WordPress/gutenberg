@@ -489,12 +489,18 @@
   props:
       - icon
       - size
+- name: Input
+  props: []
 - name: InputControl
   props:
       - __next36pxDefaultSize
       - __next40pxDefaultSize
       - __unstableInputWidth
       - __unstableStateReducer
+      - className
+      - defaultValue
+      - description
+      - details
       - disabled
       - dragDirection
       - dragThreshold
@@ -509,8 +515,11 @@
       - onDragEnd
       - onDragStart
       - onValidate
+      - onValueChange
       - prefix
+      - render
       - size
+      - style
       - suffix
       - type
       - value
@@ -527,6 +536,8 @@
             - children
             - size
             - variant
+- name: InputLayout
+  props: []
 - name: ItemGroup
   props:
       - as
@@ -998,6 +1009,8 @@
       - render
       - style
       - variant
+- name: Textarea
+  props: []
 - name: TextareaControl
   props:
       - __nextHasNoMarginBottom

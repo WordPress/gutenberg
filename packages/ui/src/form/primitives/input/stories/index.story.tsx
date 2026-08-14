@@ -4,6 +4,7 @@ import { InputLayout } from '../../input-layout';
 import { WithSuffixControl } from '../../input-layout/stories/index.story';
 
 const meta: Meta< typeof Input > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/Primitives/Input',
 	component: Input,
 	argTypes: {
@@ -14,9 +15,8 @@ const meta: Meta< typeof Input > = {
 	},
 	parameters: {
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components`, and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
