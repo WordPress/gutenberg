@@ -331,15 +331,14 @@ test.describe( 'Post Editor Performance', () => {
 					i === Math.floor( iterations / 2 ) && 'post-editor-focus'
 				);
 
-				// Get the durations. A click is one interaction, so this is a
-				// single duration.
-				const durations = metrics.getInteractionDurations();
+				// Get the duration.
+				const duration = metrics.getInteractionDuration();
 
 				// Save the results.
 				if ( i === 1 ) {
-					results.firstFocus.push( ...durations );
+					results.firstFocus.push( duration );
 				} else {
-					results.focus.push( ...durations );
+					results.focus.push( duration );
 				}
 			}
 		} );

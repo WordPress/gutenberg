@@ -4,7 +4,7 @@
 
 ### New Features
 
--   `Metrics.getInteractionDurations()`: Return the input-to-next-paint duration of each traced interaction, read from the `EventTiming` records already present in the trace. Unlike `getSelectionEventDurations()`, it covers the render and the presentation delay, which is what INP measures.
+-   `Metrics.getInteractionDuration()`: New method returning the input-to-next-paint duration of the traced interaction, which is what INP measures ([#81623](https://github.com/WordPress/gutenberg/pull/81623)).
 
 ## 1.53.0 (2026-08-12)
 
