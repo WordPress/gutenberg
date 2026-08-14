@@ -1305,4 +1305,18 @@ describe( 'normalizePath', () => {
 		const ab = normalizePath( '/foo/bar?a%2Ca=5,5&a,b=1,1' );
 		expect( ab ).toBe( '/foo/bar?a%2Ca=5%2C5&a%2Cb=1%2C1' );
 	} );
+
+	it( 'should not blow up on malformed params', () => {
+		const path = '/foo/bar?baz=%E0%A4%A';
+
+		expect( () => normalizePath( path ) ).not.toThrow();
+		expect( normalizePath( path ) ).toBe( '/foo/bar?baz=%25E0%25A4%25A' );
+	} );
+
+	it( 'returns a stable path when a param is malformed', () => {
+		const ab = normalizePath( '/foo/bar?a=5&b=50%off' );
+		const ba = normalizePath( '/foo/bar?b=50%off&a=5' );
+
+		expect( ab ).toBe( ba );
+	} );
 } );
