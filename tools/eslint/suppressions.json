@@ -1732,7 +1732,7 @@
 	},
 	"packages/global-styles-ui/src/gradients-palette-panel.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 2
+			"count": 1
 		}
 	},
 	"packages/global-styles-ui/src/navigation-button.tsx": {
