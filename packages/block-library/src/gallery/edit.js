@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	SelectControl,
 	ToggleControl,
@@ -43,10 +36,6 @@ import {
 	linkOff,
 	fullscreen,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { sharedIcon } from './shared-icon';
 import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
 import { getHrefAndDestination } from './utils';

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { getFontSize } from '../../utils/font-size';
 import { COLORS } from '../../utils';
 import { Text } from '../';

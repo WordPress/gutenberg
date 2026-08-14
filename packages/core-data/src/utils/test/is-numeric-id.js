@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import isNumericID from '../is-numeric-id';
 
 describe( 'isNumericID', () => {

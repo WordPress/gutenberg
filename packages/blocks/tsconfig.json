@@ -6,7 +6,7 @@
 	},
 	"references": [
 		{ "path": "../autop" },
-		{ "path": "../blob" },
+		{ "path": "../blob/tsconfig.build.json" },
 		{ "path": "../block-serialization-default-parser" },
 		{ "path": "../data" },
 		{ "path": "../deprecated" },

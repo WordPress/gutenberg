@@ -71,6 +71,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-view-config-data.php';
 	require __DIR__ . '/compat/wordpress-7.1/view-config-api.php';
 	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-view-config-controller-7-1.php';
+	require __DIR__ . '/compat/wordpress-7.1/notes-mentions.php';
 	require __DIR__ . '/compat/wordpress-7.1/class-wp-icon-collections-registry.php';
 	require __DIR__ . '/compat/wordpress-7.1/class-wp-rest-icon-collections-controller.php';
 	require __DIR__ . '/compat/wordpress-7.1/rest-api.php';
@@ -228,13 +229,6 @@ require __DIR__ . '/overlay-patterns.php';
 if ( gutenberg_is_experiment_enabled( 'gutenberg-guidelines' ) ) {
 	require __DIR__ . '/experimental/knowledge/load.php';
 	require __DIR__ . '/experimental/knowledge/index.php';
-}
-
-// Content types (only load when experiment is enabled).
-if ( gutenberg_is_experiment_enabled( 'gutenberg-content-types' ) ) {
-	require __DIR__ . '/experimental/content-types/load.php';
-	require __DIR__ . '/experimental/content-types/index.php';
-	require __DIR__ . '/experimental/content-types/post-types.php';
 }
 
 // Dashboard Widgets (only load when experiment is enabled).

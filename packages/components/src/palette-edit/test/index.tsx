@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen, waitFor } from '@testing-library/react';
 import { click, type, press } from '@ariakit/test';
-
-/**
- * Internal dependencies
- */
 import PaletteEdit, {
 	getNameAndSlugForPosition,
 	deduplicateElementSlugs,

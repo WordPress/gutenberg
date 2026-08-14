@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useImageEditingContext } from './context';
 
 export default function FormControls() {

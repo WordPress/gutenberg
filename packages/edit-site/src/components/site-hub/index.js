@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { __, isRTL } from '@wordpress/i18n';
@@ -8,10 +5,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { memo, forwardRef, useContext } from '@wordpress/element';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-
-/**
- * Internal dependencies
- */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { SidebarNavigationContext } from '../sidebar';

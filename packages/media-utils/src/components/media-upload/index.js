@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { select, dispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { invalidateAttachmentResolutions } from '../../utils/invalidate-attachment-resolutions';
 
 const DEFAULT_EMPTY_GALLERY = [];

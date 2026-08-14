@@ -1,11 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import {
-	EditorKeyboardShortcutsRegister,
 	privateApis as editorPrivateApis,
 	store as editorStore,
 } from '@wordpress/editor';
@@ -19,10 +15,6 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import WelcomeGuide from '../welcome-guide';
 import CanvasLoader from '../canvas-loader';
 import { unlock } from '../../lock-unlock';
@@ -35,6 +27,7 @@ import SiteEditorMoreMenu from '../more-menu';
 import useEditorIframeProps from '../block-editor/use-editor-iframe-props';
 import { ViewportSync } from '../block-editor/use-viewport-sync';
 import useEditorTitle from './use-editor-title';
+import useRevisionsURLSync from './use-revisions-url-sync';
 import { useIsSiteEditorLoading } from '../layout/hooks';
 import { useAdaptEditorToCanvas } from './use-adapt-editor-to-canvas';
 import {
@@ -79,7 +72,7 @@ function getNavigationPath( location, postType ) {
 	) {
 		return getListPathForPostType( postType );
 	}
-	return addQueryArgs( path, { canvas: undefined } );
+	return addQueryArgs( path, { canvas: undefined, revision: undefined } );
 }
 
 export default function EditSiteEditor( { isHomeRoute = false } ) {
@@ -97,13 +90,13 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 		[]
 	);
 	const postWithTemplate = !! context?.postId;
-	useEditorTitle(
-		postWithTemplate ? context.postType : postType,
-		postWithTemplate ? context.postId : postId
-	);
+	const editorPostType = postWithTemplate ? context.postType : postType;
+	const editorPostId = postWithTemplate ? context.postId : postId;
+	useEditorTitle( editorPostType, editorPostId );
 	const _isPreviewingTheme = isPreviewingTheme();
 	const iframeProps = useEditorIframeProps();
 	const isEditMode = canvas === 'edit';
+	useRevisionsURLSync( isEditMode, editorPostType, editorPostId );
 	const loadingProgressId = useInstanceId(
 		CanvasLoader,
 		'edit-site-editor__loading-progress'
@@ -173,7 +166,6 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 		<SitePreview />
 	) : (
 		<>
-			<EditorKeyboardShortcutsRegister />
 			{ isEditMode && <BlockKeyboardShortcuts /> }
 			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
 			{ isEditMode && isReady && (

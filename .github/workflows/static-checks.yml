@@ -28,6 +28,7 @@ jobs:
         permissions:
             contents: read
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        timeout-minutes: 30
         strategy:
             matrix:
                 event: ['${{ github.event_name }}']
@@ -112,6 +113,11 @@ jobs:
               run: |
                   npm run lint:css -- --formatter compact
                   npm run lint:css:update-suppressions
+
+            - name: Type check dev projects
+              # TODO: Fold the build type check below into this run once
+              # every package is migrated to the split tsconfig layout.
+              run: npm run typecheck
 
             - name: Type checking
               run: npm run build

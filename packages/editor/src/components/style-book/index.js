@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { Disabled, Composite } from '@wordpress/components';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import {
@@ -33,10 +26,6 @@ import { ENTER, SPACE } from '@wordpress/keycodes';
 import { uploadMedia } from '@wordpress/media-utils';
 import { store as coreStore } from '@wordpress/core-data';
 import { Tabs } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { STYLE_BOOK_IFRAME_STYLES } from './constants';
 import {

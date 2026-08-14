@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { Button, Flex, FlexItem } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import {
@@ -18,10 +11,6 @@ import {
 	useInstanceId,
 } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import EntityTypeList from './entity-type-list';
 import { useIsDirty } from './hooks/use-is-dirty';
 import { unlock } from '../../lock-unlock';
