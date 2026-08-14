@@ -26,7 +26,6 @@
 		{ "path": "../router" },
 		{ "path": "../ui/tsconfig.build.json" },
 		{ "path": "../url" },
-		{ "path": "../block-editor/tsconfig.build.json" },
 		{ "path": "../warning" },
 		{ "path": "../wordcount/tsconfig.build.json" }
 	]

@@ -25,5 +25,12 @@
 		{ "path": "../ui/tsconfig.build.json" }
 	],
 	"include": [ "src/**/*" ],
-	"exclude": [ "**/stories/**", "**/*.story.*", "src/font-library/lib/**/*" ]
+	"exclude": [
+		"**/benchmark",
+		"**/test/**",
+		"**/tests/**",
+		"**/stories/**",
+		"**/*.story.*",
+		"src/font-library/lib/**/*"
+	]
 }
