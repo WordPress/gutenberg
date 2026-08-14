@@ -1319,4 +1319,14 @@ describe( 'normalizePath', () => {
 
 		expect( ab ).toBe( ba );
 	} );
+
+	it( 'keeps the query beyond a second question mark', () => {
+		expect( normalizePath( '/foo/bar?redirect=/watch?v=abc' ) ).toBe(
+			'/foo/bar?redirect=%2Fwatch%3Fv=abc'
+		);
+
+		expect( normalizePath( '/foo/bar?a=1?b=2' ) ).not.toBe(
+			normalizePath( '/foo/bar?a=1?zzz=9' )
+		);
+	} );
 } );
