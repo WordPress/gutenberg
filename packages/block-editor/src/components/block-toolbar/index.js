@@ -238,10 +238,6 @@ export function PrivateBlockToolbar( {
 										clientId={ blockClientId }
 									/>
 								) }
-							<BlockMover
-								clientIds={ blockClientIds }
-								hideDragHandle={ hideDragHandle }
-							/>
 							{ ! isMultiToolbar &&
 								isDefaultEditingMode &&
 								! hideDragHandle && (
@@ -249,6 +245,10 @@ export function PrivateBlockToolbar( {
 										clientId={ blockClientId }
 									/>
 								) }
+							<BlockMover
+								clientIds={ blockClientIds }
+								hideDragHandle={ hideDragHandle }
+							/>
 						</ToolbarGroup>
 					</div>
 				) }
