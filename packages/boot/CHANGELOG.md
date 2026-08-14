@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Canvas: Do not offer to edit a trashed entity from its preview ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+-   Canvas: Do not offer to edit a trashed entity from its preview ([#81632](https://github.com/WordPress/gutenberg/pull/81632)).
 -   Translate the click-to-edit label on a previewed canvas, and name the action rather than the gesture ([#81620](https://github.com/WordPress/gutenberg/pull/81620)).
 
 ### Enhancements
