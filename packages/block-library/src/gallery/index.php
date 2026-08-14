@@ -382,98 +382,105 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 	// the current gap setting in order to maintain the number of flex columns
 	// so a css var is added to allow this.
 
-	$style_attr = is_array( $attributes['style'] ?? null )
-		? $attributes['style']
-		: array();
-	if (
-		defined( 'IS_GUTENBERG_PLUGIN' ) &&
-		IS_GUTENBERG_PLUGIN &&
-		function_exists( 'gutenberg_resolve_style_state_aliases' )
-	) {
-		$style_attr = gutenberg_resolve_style_state_aliases( $style_attr, 'core/gallery' );
-	}
-
-	$unique_gallery_classname = wp_unique_id( 'wp-block-gallery-' );
-	$processed_content        = new WP_HTML_Tag_Processor( $content );
+	$processed_content = new WP_HTML_Tag_Processor( $content );
 	$processed_content->next_tag();
-	$processed_content->add_class( $unique_gallery_classname );
 
-	// --gallery-block--gutter-size is deprecated. --wp--style--gallery-gap-default should be used by themes that want to set a default
-	// gap on the gallery.
-	$fallback_gap = 'var( --wp--style--gallery-gap-default, var( --gallery-block--gutter-size, var( --wp--style--block-gap, 0.5em ) ) )';
-
-	if ( null === $global_styles ) {
-		$global_styles = function_exists( 'wp_get_global_styles' ) ? wp_get_global_styles() : array();
-	}
-
-	$global_gallery_styles = $global_styles['blocks']['core/gallery'] ?? array();
-	$global_gallery_gap    = $global_gallery_styles['spacing']['blockGap'] ?? $fallback_gap;
-	$has_block_gap         = is_array( $style_attr['spacing'] ?? null ) && array_key_exists( 'blockGap', $style_attr['spacing'] );
-	// Prefer the block's own gap value, then Gallery global styles. Missing
-	// values fall back to the Gallery blockGap default.
-	$block_gap  = $has_block_gap
-		? $style_attr['spacing']['blockGap']
-		: $global_gallery_gap;
-	$gap_column = block_core_gallery_get_column_gap_value( $block_gap, $fallback_gap );
-
-	// Set the CSS variable to the column value for Gallery's flex width calculations.
-	$gallery_styles = array(
-		array(
-			'selector'     => ".wp-block-gallery.{$unique_gallery_classname}",
-			'declarations' => array(
-				'--wp--style--unstable-gallery-gap' => $gap_column,
-			),
-		),
-	);
-
-	$global_settings          = wp_get_global_settings();
-	$viewport_settings        = $global_settings['viewport'] ?? null;
-	$responsive_media_queries = array();
-	foreach ( array( 'WP_Theme_JSON_Gutenberg', 'WP_Theme_JSON' ) as $theme_json_class_name ) {
-		if ( method_exists( $theme_json_class_name, 'get_viewport_media_queries' ) ) {
-			$responsive_media_queries = $theme_json_class_name::get_viewport_media_queries( $viewport_settings );
-			break;
-		}
-	}
-
-	foreach ( $responsive_media_queries as $breakpoint => $media_query ) {
-		$viewport_style                = $style_attr[ $breakpoint ] ?? null;
-		$has_viewport_block_gap        = is_array( $viewport_style ) &&
-			is_array( $viewport_style['spacing'] ?? null ) &&
-			array_key_exists( 'blockGap', $viewport_style['spacing'] );
-		$has_global_viewport_block_gap = is_array( $global_gallery_styles[ $breakpoint ]['spacing'] ?? null ) &&
-			array_key_exists( 'blockGap', $global_gallery_styles[ $breakpoint ]['spacing'] );
-
-		// Viewport-specific block values win. Gallery global viewport values
-		// only apply when the block has no base gap, so they do not override an instance value.
-		if ( $has_viewport_block_gap ) {
-			$viewport_gap = $viewport_style['spacing']['blockGap'];
-		} elseif ( ! $has_block_gap && $has_global_viewport_block_gap ) {
-			$viewport_gap = $global_gallery_styles[ $breakpoint ]['spacing']['blockGap'];
-		} else {
-			continue;
+	/*
+	 * Only generate the gap styles — and the unique classname that exists solely
+	 * to scope them — if the theme has not opted out of layout styles.
+	 */
+	if ( ! current_theme_supports( 'disable-layout-styles' ) ) {
+		$style_attr = is_array( $attributes['style'] ?? null )
+			? $attributes['style']
+			: array();
+		if (
+			defined( 'IS_GUTENBERG_PLUGIN' ) &&
+			IS_GUTENBERG_PLUGIN &&
+			function_exists( 'gutenberg_resolve_style_state_aliases' )
+		) {
+			$style_attr = gutenberg_resolve_style_state_aliases( $style_attr, 'core/gallery' );
 		}
 
-		if ( null === $viewport_gap ) {
-			continue;
+		$unique_gallery_classname = wp_unique_id( 'wp-block-gallery-' );
+		$processed_content->add_class( $unique_gallery_classname );
+
+		// --gallery-block--gutter-size is deprecated. --wp--style--gallery-gap-default should be used by themes that want to set a default
+		// gap on the gallery.
+		$fallback_gap = 'var( --wp--style--gallery-gap-default, var( --gallery-block--gutter-size, var( --wp--style--block-gap, 0.5em ) ) )';
+
+		if ( null === $global_styles ) {
+			$global_styles = function_exists( 'wp_get_global_styles' ) ? wp_get_global_styles() : array();
 		}
 
-		$gallery_styles[] = array(
-			'selector'     => ".wp-block-gallery.{$unique_gallery_classname}",
-			'declarations' => array(
-				'--wp--style--unstable-gallery-gap' => block_core_gallery_get_column_gap_value(
-					$viewport_gap,
-					$fallback_gap
+		$global_gallery_styles = $global_styles['blocks']['core/gallery'] ?? array();
+		$global_gallery_gap    = $global_gallery_styles['spacing']['blockGap'] ?? $fallback_gap;
+		$has_block_gap         = is_array( $style_attr['spacing'] ?? null ) && array_key_exists( 'blockGap', $style_attr['spacing'] );
+		// Prefer the block's own gap value, then Gallery global styles. Missing
+		// values fall back to the Gallery blockGap default.
+		$block_gap  = $has_block_gap
+			? $style_attr['spacing']['blockGap']
+			: $global_gallery_gap;
+		$gap_column = block_core_gallery_get_column_gap_value( $block_gap, $fallback_gap );
+
+		// Set the CSS variable to the column value for Gallery's flex width calculations.
+		$gallery_styles = array(
+			array(
+				'selector'     => ".wp-block-gallery.{$unique_gallery_classname}",
+				'declarations' => array(
+					'--wp--style--unstable-gallery-gap' => $gap_column,
 				),
 			),
-			'rules_group'  => $media_query,
+		);
+
+		$global_settings          = wp_get_global_settings();
+		$viewport_settings        = $global_settings['viewport'] ?? null;
+		$responsive_media_queries = array();
+		foreach ( array( 'WP_Theme_JSON_Gutenberg', 'WP_Theme_JSON' ) as $theme_json_class_name ) {
+			if ( method_exists( $theme_json_class_name, 'get_viewport_media_queries' ) ) {
+				$responsive_media_queries = $theme_json_class_name::get_viewport_media_queries( $viewport_settings );
+				break;
+			}
+		}
+
+		foreach ( $responsive_media_queries as $breakpoint => $media_query ) {
+			$viewport_style                = $style_attr[ $breakpoint ] ?? null;
+			$has_viewport_block_gap        = is_array( $viewport_style ) &&
+				is_array( $viewport_style['spacing'] ?? null ) &&
+				array_key_exists( 'blockGap', $viewport_style['spacing'] );
+			$has_global_viewport_block_gap = is_array( $global_gallery_styles[ $breakpoint ]['spacing'] ?? null ) &&
+				array_key_exists( 'blockGap', $global_gallery_styles[ $breakpoint ]['spacing'] );
+
+			// Viewport-specific block values win. Gallery global viewport values
+			// only apply when the block has no base gap, so they do not override an instance value.
+			if ( $has_viewport_block_gap ) {
+				$viewport_gap = $viewport_style['spacing']['blockGap'];
+			} elseif ( ! $has_block_gap && $has_global_viewport_block_gap ) {
+				$viewport_gap = $global_gallery_styles[ $breakpoint ]['spacing']['blockGap'];
+			} else {
+				continue;
+			}
+
+			if ( null === $viewport_gap ) {
+				continue;
+			}
+
+			$gallery_styles[] = array(
+				'selector'     => ".wp-block-gallery.{$unique_gallery_classname}",
+				'declarations' => array(
+					'--wp--style--unstable-gallery-gap' => block_core_gallery_get_column_gap_value(
+						$viewport_gap,
+						$fallback_gap
+					),
+				),
+				'rules_group'  => $media_query,
+			);
+		}
+
+		wp_style_engine_get_stylesheet_from_css_rules(
+			$gallery_styles,
+			array( 'context' => 'block-supports' )
 		);
 	}
-
-	wp_style_engine_get_stylesheet_from_css_rules(
-		$gallery_styles,
-		array( 'context' => 'block-supports' )
-	);
 
 	// The WP_HTML_Tag_Processor class calls get_updated_html() internally
 	// when the instance is treated as a string, but here we explicitly
