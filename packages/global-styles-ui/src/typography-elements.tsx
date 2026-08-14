@@ -16,8 +16,8 @@ interface ElementItemProps {
 }
 
 interface TypographyElementsProps {
-	elements?: Omit< ElementItemProps, 'parentMenu' >[];
-	parentMenu?: string;
+	elements: Omit< ElementItemProps, 'parentMenu' >[];
+	parentMenu: string;
 	title?: string;
 }
 
@@ -74,23 +74,14 @@ function ElementItem( { parentMenu, element, label }: ElementItemProps ) {
 
 function TypographyElements( {
 	elements,
-	parentMenu = '',
-	title = __( 'Elements' ),
+	parentMenu,
+	title,
 }: TypographyElementsProps ) {
-	const displayedElements = elements ?? [
-		{ element: 'text', label: __( 'Text' ) },
-		{ element: 'link', label: __( 'Links' ) },
-		{ element: 'heading', label: __( 'Headings' ) },
-		{ element: 'caption', label: __( 'Captions' ) },
-		{ element: 'cite', label: __( 'Citations' ) },
-		{ element: 'button', label: __( 'Buttons' ) },
-	];
-
 	return (
 		<VStack spacing={ 3 }>
-			<Subtitle level={ 3 }>{ title }</Subtitle>
+			{ title && <Subtitle level={ 3 }>{ title }</Subtitle> }
 			<ItemGroup isBordered isSeparated>
-				{ displayedElements.map( ( { element, label } ) => (
+				{ elements.map( ( { element, label } ) => (
 					<ElementItem
 						key={ element }
 						parentMenu={ parentMenu }
