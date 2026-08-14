@@ -1005,3 +1005,153 @@ describe( 'createSuggestion (notes sidebar switch)', () => {
 		).toBe( FLOATING_NOTES_SIDEBAR );
 	} );
 } );
+
+describe( 'review decisions and undo history', () => {
+	const PARAGRAPH = 'core/test-decision-paragraph';
+
+	beforeAll( () => {
+		if (
+			! select( richTextStore ).getFormatType( SUGGESTION_FORMAT_NAME )
+		) {
+			registerFormatType( SUGGESTION_FORMAT_NAME, suggestionFormat );
+		}
+		registerBlockType( PARAGRAPH, {
+			apiVersion: 3,
+			attributes: {
+				content: { type: 'string', default: '' },
+				metadata: { type: 'object' },
+			},
+			save: () => null,
+			category: 'text',
+			title: 'Test Decision Paragraph',
+		} );
+	} );
+
+	afterAll( () => {
+		if ( select( richTextStore ).getFormatType( SUGGESTION_FORMAT_NAME ) ) {
+			unregisterFormatType( SUGGESTION_FORMAT_NAME );
+		}
+		getBlockTypes().forEach( ( block ) =>
+			unregisterBlockType( block.name )
+		);
+	} );
+
+	function setup() {
+		const registry = createRegistry();
+		registry.register( noticesStore );
+		registry.register( blockEditorStore );
+		registry.register(
+			createReduxStore( 'core', {
+				reducer: ( state = {} ) => state,
+				actions: {
+					saveEntityRecord: () => async () => ( { id: 9 } ),
+				},
+				selectors: {
+					getEditedEntityRecord: () => null,
+					getEntityRecord: () => null,
+					getCurrentUser: () => null,
+				},
+			} )
+		);
+		registry.register( createStubInterfaceStore() );
+
+		const block = createBlock( PARAGRAPH );
+		registry.dispatch( blockEditorStore ).resetBlocks( [ block ] );
+		registry
+			.dispatch( blockEditorStore )
+			.updateBlockAttributes( block.clientId, {
+				content: RichTextData.fromHTMLString(
+					'Hello <mark class="wp-suggestion" data-suggestion-id="9" data-suggestion-type="add">world</mark>'
+				),
+			} );
+		// Close the setup writes as a normal undo level so the assertions
+		// below observe the decision's own history mode, not a leftover.
+		registry
+			.dispatch( blockEditorStore )
+			.__unstableMarkLastChangeAsPersistent();
+
+		let providerHandle;
+		function CaptureProvider() {
+			providerHandle = useSuggestionsProvider();
+			return null;
+		}
+
+		render(
+			<RegistryProvider value={ registry }>
+				<CaptureProvider />
+			</RegistryProvider>
+		);
+
+		return { registry, block, getProvider: () => providerHandle };
+	}
+
+	const inlinePayload = {
+		schemaVersion: 2,
+		blockName: PARAGRAPH,
+		baseRevision: null,
+		operations: [
+			{
+				type: 'inline-suggestion',
+				attribute: 'content',
+				suggestionType: 'add',
+			},
+		],
+	};
+
+	it( 'keeps an applied suggestion out of undo history', async () => {
+		const { registry, block, getProvider } = setup();
+		expect(
+			registry
+				.select( blockEditorStore )
+				.__unstableGetLastBlockChangeHistoryMode()
+		).toBe( 'persistent' );
+
+		await act( async () => {
+			await getProvider().applySuggestion( {
+				commentId: 9,
+				clientId: block.clientId,
+				payload: inlinePayload,
+			} );
+		} );
+
+		// The proposed text is committed...
+		expect(
+			registry
+				.select( blockEditorStore )
+				.getBlockAttributes( block.clientId )
+				?.content.toHTMLString()
+		).toBe( 'Hello world' );
+		// ...and the write is invisible to undo. Left as an undo level, the
+		// first Ctrl+Z after accepting puts the `<mark>` back while the note
+		// stays resolved — a marker with no Accept/Reject and no way out.
+		expect(
+			registry
+				.select( blockEditorStore )
+				.__unstableGetLastBlockChangeHistoryMode()
+		).toBe( 'ignore' );
+	} );
+
+	it( 'keeps a rejected suggestion out of undo history', async () => {
+		const { registry, block, getProvider } = setup();
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 9,
+				clientId: block.clientId,
+				payload: inlinePayload,
+			} );
+		} );
+
+		expect(
+			registry
+				.select( blockEditorStore )
+				.getBlockAttributes( block.clientId )
+				?.content.toHTMLString()
+		).toBe( 'Hello ' );
+		expect(
+			registry
+				.select( blockEditorStore )
+				.__unstableGetLastBlockChangeHistoryMode()
+		).toBe( 'ignore' );
+	} );
+} );

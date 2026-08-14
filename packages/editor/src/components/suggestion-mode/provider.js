@@ -481,6 +481,29 @@ export function useSuggestionsProvider() {
 	const { requestInterceptorBypass, clearOverlay } = useSuggestionOverlay();
 	const registry = useRegistry();
 
+	/*
+	 * Keep the next block-editor write out of undo history.
+	 *
+	 * Applying or rejecting a suggestion is a review decision, not one of the
+	 * reviewer's content edits. It has two halves — the live block change and
+	 * the comment's lifecycle status — and only the first is something the
+	 * undo stack can hold: the status lives on the server, is shared with
+	 * every other session, and cannot be walked back by a keystroke here.
+	 * Recording the block half as an undo level therefore lets Ctrl+Z split
+	 * the two apart. Undo after accepting puts the `<mark>` back while the
+	 * note stays resolved, leaving a marked-up run with no Accept/Reject on
+	 * it and no way to clear it through the UI.
+	 *
+	 * `history: 'ignore'` keeps the applied content (it still reaches the
+	 * entity and saves) while making the write invisible to undo, so the two
+	 * halves can no longer come apart. This is the same treatment
+	 * `createSuggestion` gives the note-id linkage above, and the notes
+	 * delete-cleanup gives its own bookkeeping writes.
+	 */
+	const ignoreNextChangeInUndo = useCallback( () => {
+		markNextChangeAsNotPersistent?.( { history: 'ignore' } );
+	}, [ markNextChangeAsNotPersistent ] );
+
 	const createSuggestion = useCallback(
 		async ( { clientId, blockName, operations } ) => {
 			if ( ! postId ) {
@@ -773,6 +796,7 @@ export function useSuggestionsProvider() {
 				try {
 					requestInterceptorBypass( targetClientId );
 					clearOverlay( targetClientId );
+					ignoreNextChangeInUndo();
 					updateBlockAttributes( targetClientId, {
 						[ attributeKey ]: nextValue,
 					} );
@@ -796,6 +820,7 @@ export function useSuggestionsProvider() {
 					// Roll the attribute back so the block isn't left
 					// half-applied if the server rejected the status update.
 					requestInterceptorBypass( targetClientId );
+					ignoreNextChangeInUndo();
 					updateBlockAttributes( targetClientId, {
 						[ attributeKey ]: originalValue,
 					} );
@@ -828,10 +853,12 @@ export function useSuggestionsProvider() {
 						);
 						if ( clearAttrs ) {
 							requestInterceptorBypass( targetClientId );
+							ignoreNextChangeInUndo();
 							updateBlockAttributes( targetClientId, clearAttrs );
 						}
 						requestInterceptorBypass( targetClientId );
 						clearOverlay( targetClientId );
+						ignoreNextChangeInUndo();
 						removeBlock( targetClientId );
 					} else if (
 						structuralOp.type === 'block-insert-after' ||
@@ -866,6 +893,7 @@ export function useSuggestionsProvider() {
 							? { ...withOpsApplied, ...markerCleared }
 							: withOpsApplied;
 						requestInterceptorBypass( targetClientId );
+						ignoreNextChangeInUndo();
 						updateBlockAttributes(
 							targetClientId,
 							finalAttributes
@@ -937,6 +965,7 @@ export function useSuggestionsProvider() {
 				// interceptor isn't running and these calls are no-ops.
 				requestInterceptorBypass( targetClientId );
 				clearOverlay( targetClientId );
+				ignoreNextChangeInUndo();
 				updateBlockAttributes( targetClientId, newAttributes );
 
 				await saveEntityRecord(
@@ -958,6 +987,7 @@ export function useSuggestionsProvider() {
 				// Roll back the block change so the UI isn't left in a
 				// half-applied state if the server rejected the update.
 				requestInterceptorBypass( targetClientId );
+				ignoreNextChangeInUndo();
 				updateBlockAttributes( targetClientId, rollbackPayload );
 				createNotice(
 					'error',
@@ -975,6 +1005,7 @@ export function useSuggestionsProvider() {
 			createNotice,
 			requestInterceptorBypass,
 			clearOverlay,
+			ignoreNextChangeInUndo,
 		]
 	);
 
@@ -1014,6 +1045,7 @@ export function useSuggestionsProvider() {
 				if ( structuralOp.type === 'block-insert-after' ) {
 					requestInterceptorBypass( clientId );
 					clearOverlay( clientId );
+					ignoreNextChangeInUndo();
 					removeBlock( clientId );
 				} else if ( structuralOp.type === 'block-move' ) {
 					const clearAttrs = clearSuggestionMarkerAttributes(
@@ -1034,8 +1066,12 @@ export function useSuggestionsProvider() {
 					 */
 					registry.batch( () => {
 						if ( clearAttrs ) {
+							ignoreNextChangeInUndo();
 							updateBlockAttributes( clientId, clearAttrs );
 						}
+						// Marked per dispatch: the flag covers the next
+						// change only, and a batch is still two of them.
+						ignoreNextChangeInUndo();
 						moveBlockToPosition(
 							clientId,
 							/*
@@ -1058,6 +1094,7 @@ export function useSuggestionsProvider() {
 					);
 					if ( clearAttrs ) {
 						requestInterceptorBypass( clientId );
+						ignoreNextChangeInUndo();
 						updateBlockAttributes( clientId, clearAttrs );
 					}
 					clearOverlay( clientId );
@@ -1121,6 +1158,7 @@ export function useSuggestionsProvider() {
 					try {
 						requestInterceptorBypass( targetClientId );
 						clearOverlay( targetClientId );
+						ignoreNextChangeInUndo();
 						updateBlockAttributes( targetClientId, {
 							[ attributeKey ]: nextValue,
 						} );
@@ -1147,6 +1185,7 @@ export function useSuggestionsProvider() {
 						// server rejected the status update. Mirrors the
 						// apply-path rollback.
 						requestInterceptorBypass( targetClientId );
+						ignoreNextChangeInUndo();
 						updateBlockAttributes( targetClientId, {
 							[ attributeKey ]: originalValue,
 						} );
@@ -1196,6 +1235,7 @@ export function useSuggestionsProvider() {
 			moveBlockToPosition,
 			requestInterceptorBypass,
 			clearOverlay,
+			ignoreNextChangeInUndo,
 			registry,
 		]
 	);
