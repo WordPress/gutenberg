@@ -237,7 +237,7 @@ describe( 'private selectors', () => {
 			).toEqual( [] );
 		} );
 
-		it( 'normalizes a variation shortcut to the declaring block type, without restricting the blocks it applies to', () => {
+		it( 'resolves a variation shortcut to the declaring block type, without restricting the blocks it applies to', () => {
 			expect(
 				getBlockKeyboardShortcuts(
 					getState( {
@@ -249,14 +249,14 @@ describe( 'private selectors', () => {
 				)
 			).toEqual( [
 				{
-					shortcut,
+					...shortcut,
 					targetBlockName: 'core/heading',
 					variationName: 'h1',
 				},
 			] );
 		} );
 
-		it( 'normalizes a `to` transform shortcut to the first target block', () => {
+		it( 'resolves a `to` transform shortcut to the first target block', () => {
 			expect(
 				getBlockKeyboardShortcuts(
 					getState( {
@@ -278,7 +278,7 @@ describe( 'private selectors', () => {
 				)
 			).toEqual( [
 				{
-					shortcut,
+					...shortcut,
 					targetBlockName: 'core/paragraph',
 					blockNames: [ 'core/heading' ],
 					variationName: undefined,
@@ -286,7 +286,7 @@ describe( 'private selectors', () => {
 			] );
 		} );
 
-		it( 'normalizes a `from` transform shortcut to the declaring block type', () => {
+		it( 'resolves a `from` transform shortcut to the declaring block type', () => {
 			expect(
 				getBlockKeyboardShortcuts(
 					getState( {
@@ -311,7 +311,7 @@ describe( 'private selectors', () => {
 				)
 			).toEqual( [
 				{
-					shortcut,
+					...shortcut,
 					targetBlockName: 'core/heading',
 					blockNames: [ 'core/paragraph', 'core/list' ],
 					variationName: undefined,

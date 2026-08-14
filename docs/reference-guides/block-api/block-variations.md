@@ -255,7 +255,7 @@ A variation can declare a keyboard shortcut that applies it to the selected bloc
 
 The `shortcut` object takes the following parameters:
 
--   `name` (type `string`) – A unique and machine-readable shortcut name, e.g. `core/block-editor/transform-paragraph-to-heading-2`.
+-   `name` (type `string`) – A unique and machine-readable shortcut name, e.g. `core/block-editor/transform-to-heading-2`.
 -   `description` (type `string`) – A translated description, displayed in the keyboard shortcuts help modal.
 -   `keyCombination` (type `Object`) – The key combination that triggers the shortcut, as a `character` and an optional `modifier` (one of the modifiers supported by the [`wp-keycodes` package](/packages/keycodes/README.md), e.g. `access` or `primary`).
 -   `aliases` (optional, type `Object[]`) – Alternative key combinations that trigger the same shortcut.
@@ -269,7 +269,7 @@ wp.blocks.registerBlockVariation( 'core/heading', {
 	attributes: { level: 2 },
 	isActive: ( blockAttributes ) => blockAttributes.level === 2,
 	shortcut: {
-		name: 'core/block-editor/transform-paragraph-to-heading-2',
+		name: 'core/block-editor/transform-to-heading-2',
 		description: __( 'Transform the selected block into a heading 2.' ),
 		keyCombination: { modifier: 'access', character: '2' },
 	},

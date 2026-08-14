@@ -12,14 +12,10 @@ import type {
 } from '../types';
 
 /**
- * A keyboard shortcut declared by a block variation or transform, normalized
- * into the block type it produces and the block types it applies to.
+ * A keyboard shortcut declared by a block variation or transform, together with
+ * the block change it performs.
  */
-export interface NormalizedBlockShortcut {
-	/**
-	 * The shortcut as declared by the block.
-	 */
-	shortcut: BlockShortcut;
+type ResolvedBlockShortcut = BlockShortcut & {
 	/**
 	 * The block type the shortcut produces.
 	 */
@@ -33,7 +29,7 @@ export interface NormalizedBlockShortcut {
 	 * The variation of `targetBlockName` the shortcut produces, if any.
 	 */
 	variationName?: string;
-}
+};
 
 const ROOT_BLOCK_SUPPORTS: string[] = [
 	'background',
@@ -321,11 +317,11 @@ export const getBlockBindingsSourceFieldsList = createRegistrySelector(
  *
  * @param state Data state.
  *
- * @return The declared shortcuts, normalized for the block editor to apply.
+ * @return The declared shortcuts, each paired with the block change it makes.
  */
 export const getBlockKeyboardShortcuts = createSelector(
-	( state: BlockStoreState ): NormalizedBlockShortcut[] => {
-		const shortcuts: NormalizedBlockShortcut[] = [];
+	( state: BlockStoreState ): ResolvedBlockShortcut[] => {
+		const shortcuts: ResolvedBlockShortcut[] = [];
 
 		for ( const blockName of Object.keys( state.blockTypes ) ) {
 			// A variation shortcut produces the variation of the block type it
@@ -338,7 +334,7 @@ export const getBlockKeyboardShortcuts = createSelector(
 					continue;
 				}
 				shortcuts.push( {
-					shortcut: variation.shortcut,
+					...variation.shortcut,
 					targetBlockName: blockName,
 					variationName: variation.name,
 				} );
@@ -347,8 +343,8 @@ export const getBlockKeyboardShortcuts = createSelector(
 			const transforms = state.blockTypes[ blockName ]?.transforms;
 
 			for ( const transform of transforms?.to ?? [] ) {
-				// A `to` transform can list several targets, but a shortcut can
-				// only produce one. The first entry wins.
+				// A `to` transform can list several target blocks, but a shortcut
+				// can only produce one of them. The first is used.
 				const targetBlockName = transform.blocks?.[ 0 ];
 				if (
 					! transform.shortcut ||
@@ -358,7 +354,7 @@ export const getBlockKeyboardShortcuts = createSelector(
 					continue;
 				}
 				shortcuts.push( {
-					shortcut: transform.shortcut,
+					...transform.shortcut,
 					targetBlockName,
 					blockNames: [ blockName ],
 					variationName: transform.variationName,
@@ -374,7 +370,7 @@ export const getBlockKeyboardShortcuts = createSelector(
 					continue;
 				}
 				shortcuts.push( {
-					shortcut: transform.shortcut,
+					...transform.shortcut,
 					targetBlockName: blockName,
 					blockNames: transform.blocks,
 					variationName: transform.variationName,

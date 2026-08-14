@@ -13,7 +13,7 @@ import { unlock } from '../../lock-unlock';
  * Returns every keyboard shortcut declared by a registered block type, through
  * either a block variation or a block transform.
  *
- * @return {Array} Normalized block shortcuts.
+ * @return {Array} Declared shortcuts, each paired with the block change it makes.
  */
 function useDeclaredBlockShortcuts() {
 	return useSelect(
@@ -31,7 +31,7 @@ function useDeclaredBlockShortcuts() {
  * that resolves to the block's current state is still handled, so that the key
  * combination is swallowed rather than typed into the block.
  *
- * @return {Function} Callback receiving a normalized shortcut.
+ * @return {Function} Callback receiving a declared shortcut.
  */
 function useApplyBlockShortcut() {
 	const {
@@ -139,7 +139,7 @@ function useApplyBlockShortcut() {
 }
 
 function BlockShortcut( { entry, apply } ) {
-	useShortcut( entry.shortcut.name, ( event ) => {
+	useShortcut( entry.name, ( event ) => {
 		// Another handler already acted on this event. Block editor providers
 		// can be nested, in which case this component is mounted more than
 		// once.
@@ -169,14 +169,21 @@ function BlockShortcutsRegister( { shortcuts } ) {
 		const registered = new Set();
 		const combinations = new Map();
 
-		for ( const { shortcut } of shortcuts ) {
+		for ( const shortcut of shortcuts ) {
+			// The store keys shortcuts by name, so the second registration
+			// would overwrite the first and leave one of the two blocks
+			// answering to the other's key combination.
 			if ( registered.has( shortcut.name ) ) {
+				warning(
+					`Block keyboard shortcut "${ shortcut.name }" is declared more than once.`
+				);
 				continue;
 			}
 
-			// Shortcuts are matched by key combination, so two blocks claiming
-			// the same one leaves whichever block is not selected silently
-			// without a shortcut.
+			// Handlers are matched by key combination rather than by name, so
+			// two blocks claiming the same one both run, and each does nothing
+			// unless its own block is selected. To the user the shortcut works
+			// for one block and is dead for the other.
 			const { modifier, character } = shortcut.keyCombination;
 			const combination = `${ modifier ?? '' }+${ character }`;
 			if ( combinations.has( combination ) ) {
@@ -229,7 +236,7 @@ export default function BlockKeyboardShortcuts() {
 				<BlockShortcut
 					// Shortcut names are not guaranteed to be unique across
 					// blocks, so the index keeps the list stable.
-					key={ `${ entry.shortcut.name }-${ index }` }
+					key={ `${ entry.name }-${ index }` }
 					entry={ entry }
 					apply={ apply }
 				/>
