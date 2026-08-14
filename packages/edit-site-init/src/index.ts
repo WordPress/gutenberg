@@ -10,6 +10,7 @@ import {
 } from '@wordpress/icons';
 import { dispatch } from '@wordpress/data';
 import { store as bootStore } from '@wordpress/boot';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Initialize edit-site menu items with icons.
@@ -55,5 +56,20 @@ export async function init() {
 			...entityLinks.default,
 			...links,
 		} );
+	} );
+
+	/*
+	 * Editor preferences that are off unless something seeds them. Both the
+	 * post editor and the site editor seed the same values, because they are
+	 * what the editor expects rather than anything this application prefers —
+	 * they belong in the editor itself, and this is a copy until they move.
+	 *
+	 * Only these three matter: every other preference those editors seed is
+	 * either falsy anyway, or read with a fallback at the point of use.
+	 */
+	dispatch( preferencesStore ).setDefaults( 'core', {
+		allowRightClickOverrides: true,
+		enableChoosePatternModal: true,
+		showBlockBreadcrumbs: true,
 	} );
 }
