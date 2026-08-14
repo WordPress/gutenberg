@@ -3,7 +3,7 @@ import type { GlobalStylesSettings } from '@wordpress/global-styles-engine';
 import { ScreenHeader } from './screen-header';
 import { ScreenBody } from './screen-body';
 import TypographyElements from './typography-elements';
-import { ElementColors } from './screen-colors';
+import { ElementColors } from './element-colors';
 
 const FORM_ELEMENTS = [
 	{ element: 'textInput', label: __( 'Inputs' ) },
@@ -41,7 +41,7 @@ function ScreenForms() {
 	return (
 		<>
 			<ScreenHeader
-				title={ __( 'Forms' ) }
+				title={ __( 'Form controls' ) }
 				description={ __(
 					'Customize the typography and colors of inputs and selects.'
 				) }
@@ -49,7 +49,7 @@ function ScreenForms() {
 			<ScreenBody>
 				<TypographyElements
 					elements={ FORM_ELEMENTS }
-					parentMenu="/forms"
+					parentMenu="/elements/form-controls"
 					title={ __( 'Typography' ) }
 				/>
 			</ScreenBody>

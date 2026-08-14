@@ -5,6 +5,8 @@ import {
 	__experimentalSpacer as Spacer,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
+import type { GlobalStylesSettings } from '@wordpress/global-styles-engine';
+import { ElementColors } from './element-colors';
 import TypographyPanel from './typography-panel';
 import { ScreenHeader } from './screen-header';
 import TypographyPreview from './typography-preview';
@@ -46,10 +48,51 @@ const elements = {
 
 interface ScreenTypographyElementProps {
 	element: keyof typeof elements;
+	showColorControls?: boolean;
 }
 
-function ScreenTypographyElement( { element }: ScreenTypographyElementProps ) {
+const ADDITIONAL_COLOR_ELEMENTS = [ 'cite', 'textInput', 'select' ];
+
+function getColorSettingsForElement(
+	settings: GlobalStylesSettings,
+	element: keyof typeof elements
+) {
+	const colorSettings = settings.color as typeof settings.color & {
+		heading?: boolean;
+		button?: boolean;
+		caption?: boolean;
+	};
+
+	return {
+		...settings,
+		color: {
+			...colorSettings,
+			link: element === 'link' && colorSettings?.link,
+			heading: element === 'heading' && colorSettings?.heading,
+			button: element === 'button' && colorSettings?.button,
+			caption: element === 'caption' && colorSettings?.caption,
+		},
+	};
+}
+
+function ScreenTypographyElement( {
+	element,
+	showColorControls = true,
+}: ScreenTypographyElementProps ) {
 	const [ headingLevel, setHeadingLevel ] = useState( 'heading' );
+	const hasColorPanel = showColorControls && element !== 'text';
+	const additionalElements = ADDITIONAL_COLOR_ELEMENTS.includes( element )
+		? [ { name: element, label: elements[ element ].title } ]
+		: [];
+	const defaultColorControls = {
+		link: element === 'link',
+		heading: element === 'heading',
+		button: element === 'button',
+		caption: element === 'caption',
+		cite: element === 'cite',
+		textInput: element === 'textInput',
+		select: element === 'select',
+	};
 
 	return (
 		<>
@@ -122,7 +165,18 @@ function ScreenTypographyElement( { element }: ScreenTypographyElementProps ) {
 			<TypographyPanel
 				element={ element }
 				headingLevel={ headingLevel }
+				showTextColor={ element === 'text' || ! hasColorPanel }
 			/>
+			{ hasColorPanel && (
+				<ElementColors
+					additionalElements={ additionalElements }
+					defaultControls={ defaultColorControls }
+					settingsTransform={ ( settings ) =>
+						getColorSettingsForElement( settings, element )
+					}
+					label={ __( 'Colors' ) }
+				/>
+			) }
 		</>
 	);
 }

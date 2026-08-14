@@ -1,79 +1,8 @@
 import { __ } from '@wordpress/i18n';
 import { __experimentalVStack as VStack } from '@wordpress/components';
-// @ts-expect-error: Not typed yet.
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import type {
-	GlobalStylesStyles,
-	GlobalStylesSettings,
-} from '@wordpress/global-styles-engine';
 import { ScreenHeader } from './screen-header';
 import { ScreenBody } from './screen-body';
 import Palette from './palette';
-import { useStyle, useSetting } from './hooks';
-import { unlock } from './lock-unlock';
-
-const { useSettingsForBlockElement, ColorPanel: StylesColorPanel } = unlock(
-	blockEditorPrivateApis
-);
-
-const ADDITIONAL_ELEMENTS = [ { name: 'cite', label: __( 'Citations' ) } ];
-
-const DEFAULT_CONTROLS = {
-	link: true,
-	heading: true,
-	button: true,
-	caption: true,
-	cite: true,
-};
-
-interface ElementColorsProps {
-	additionalElements: { name: string; label: string }[];
-	defaultControls: Record< string, boolean >;
-	settingsTransform?: (
-		settings: GlobalStylesSettings
-	) => GlobalStylesSettings;
-	label?: string;
-}
-
-export function ElementColors( {
-	additionalElements,
-	defaultControls,
-	settingsTransform = ( settings ) => settings,
-	label,
-}: ElementColorsProps ) {
-	// Get user styles for editing
-	const [ style, setStyle ] = useStyle< GlobalStylesStyles >(
-		'',
-		undefined,
-		'user',
-		false
-	);
-	// Get inherited styles for display
-	const [ inheritedStyle ] = useStyle< GlobalStylesStyles >(
-		'',
-		undefined,
-		'merged',
-		false
-	);
-	// Get settings for the color panel
-	const [ rawSettings ] = useSetting< GlobalStylesSettings >( '' );
-	const settings = settingsTransform(
-		useSettingsForBlockElement( rawSettings )
-	);
-
-	return (
-		<StylesColorPanel
-			inheritedValue={ inheritedStyle }
-			value={ style }
-			onChange={ setStyle }
-			settings={ settings }
-			additionalElements={ additionalElements }
-			defaultControls={ defaultControls }
-			label={ label }
-			showInheritanceLabelIndicators={ false }
-		/>
-	);
-}
 
 function ScreenColors() {
 	return (
@@ -81,7 +10,7 @@ function ScreenColors() {
 			<ScreenHeader
 				title={ __( 'Colors' ) }
 				description={ __(
-					'Palette colors and the application of those colors on site elements.'
+					'Manage the color palettes used on the site.'
 				) }
 			/>
 			<ScreenBody>
@@ -89,10 +18,6 @@ function ScreenColors() {
 					<Palette />
 				</VStack>
 			</ScreenBody>
-			<ElementColors
-				additionalElements={ ADDITIONAL_ELEMENTS }
-				defaultControls={ DEFAULT_CONTROLS }
-			/>
 		</>
 	);
 }
