@@ -23,6 +23,8 @@ const ALLOWLIST = {
 			'Collapsible',
 			'CollapsibleCard',
 			'EmptyState',
+			'Field',
+			'Fieldset',
 			'Icon',
 			'Link',
 			'RangeCalendar',

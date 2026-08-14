@@ -3,6 +3,7 @@ import * as Fieldset from '../';
 import { DETAILS_EXAMPLE } from '../../../stories/shared';
 
 const meta: Meta< typeof Fieldset.Root > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/Primitives/Fieldset',
 	component: Fieldset.Root,
 	subcomponents: {
@@ -12,9 +13,8 @@ const meta: Meta< typeof Fieldset.Root > = {
 	},
 	parameters: {
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components` and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
