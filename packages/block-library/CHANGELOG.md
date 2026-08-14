@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Terms Query: Pass custom `termQuery` args through to the REST API call in the editor, matching the Query Loop block's `restQueryArgs` pattern, so editor previews can reflect custom query args ([#81300](https://github.com/WordPress/gutenberg/issues/81300)).
+
 ### Internal
 
 -   Heading: Declare the heading level and paragraph keyboard shortcuts on the block's variations and transforms, rather than in a `BlockKeyboardShortcuts` component that every editor had to render. The `BlockKeyboardShortcuts` private export has been removed ([#81588](https://github.com/WordPress/gutenberg/pull/81588)).
