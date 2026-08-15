@@ -170,6 +170,77 @@ describe( 'summarizeOperations', () => {
 		);
 	} );
 
+	it( 'keeps the spaces between consecutive changed words', () => {
+		// The word diff tokenizes whitespace separately, so a space between
+		// two changed words can match a space on the other side and land in
+		// the diff as an `equal` segment. Concatenating only the changed
+		// segments then glued the words together: a cross-block delete quoted
+		// "blackquartzjudgemyvow," in the sidebar (F-10).
+		const lines = summarizeOperations( [
+			{
+				type: 'attribute-set',
+				attribute: 'content',
+				before: 'alpha beta gamma delta epsilon',
+				after: 'alpha one two three four',
+			},
+		] );
+		expect( lines ).toEqual(
+			expect.arrayContaining( [
+				{ label: 'Add:', value: '“one two three four”' },
+				{ label: 'Delete:', value: '“beta gamma delta epsilon”' },
+			] )
+		);
+	} );
+
+	it( 'does not leak markup into a quoted Add: line', () => {
+		// Diffing the raw content attribute treats a tag as a token, so
+		// `<strong>` and `</strong>` were quoted to the reviewer as literal
+		// text alongside the words they wrap (F-10).
+		const lines = summarizeOperations( [
+			{
+				type: 'attribute-set',
+				attribute: 'content',
+				before: 'A short paragraph here.',
+				after: 'A short paragraph containing <strong>bold text</strong> here.',
+			},
+		] );
+		expect( lines ).toEqual( [
+			{ label: 'Add:', value: '“containing bold text”' },
+		] );
+		expect( lines[ 0 ].value ).not.toMatch( /</ );
+	} );
+
+	it( 'separates changed runs that were not adjacent in the text', () => {
+		// Two insertions three words apart are two proposals, not one phrase.
+		const lines = summarizeOperations( [
+			{
+				type: 'attribute-set',
+				attribute: 'content',
+				before: 'Hello world, this is a sentence.',
+				after: 'Hello brave new world, this is a much longer sentence.',
+			},
+		] );
+		expect( lines ).toEqual( [
+			{ label: 'Add:', value: '“brave new … much longer”' },
+		] );
+	} );
+
+	it( 'treats a line break as a word separator when quoting', () => {
+		// `textContent` drops a `<br>` without leaving a separator behind, so
+		// the words on either side of a soft line break ran together.
+		const lines = summarizeOperations( [
+			{
+				type: 'attribute-set',
+				attribute: 'content',
+				before: 'First line',
+				after: 'First line<br>second line',
+			},
+		] );
+		expect( lines ).toEqual( [
+			{ label: 'Add:', value: '“second line”' },
+		] );
+	} );
+
 	it( 'treats non-text content attributes as a format change', () => {
 		const lines = summarizeOperations( [
 			{
