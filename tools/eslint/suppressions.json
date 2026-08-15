@@ -1192,11 +1192,6 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/error-boundary/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
 	"packages/editor/src/components/global-styles-sidebar/welcome-guide.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
