@@ -1353,6 +1353,11 @@ test.describe( 'List View', () => {
 		const optionsForFileMenu = page.getByRole( 'menu', {
 			name: 'Options',
 		} );
+		// The menu moves focus to its first item on mount. Keys sent before
+		// that lands are handled by the toggle button instead of the menu.
+		const firstMenuItem = optionsForFileMenu
+			.getByRole( 'menuitem' )
+			.first();
 		await expect(
 			optionsForFileToggle,
 			'Pressing arrow right should move focus to the menu dropdown toggle button'
@@ -1363,6 +1368,7 @@ test.describe( 'List View', () => {
 			optionsForFileMenu,
 			'Pressing Enter should open the menu dropdown'
 		).toBeVisible();
+		await expect( firstMenuItem ).toBeFocused();
 
 		await page.keyboard.press( 'Escape' );
 		await expect(
@@ -1379,6 +1385,7 @@ test.describe( 'List View', () => {
 			optionsForFileMenu,
 			'Pressing Space should also open the menu dropdown'
 		).toBeVisible();
+		await expect( firstMenuItem ).toBeFocused();
 
 		await pageUtils.pressKeys( 'primaryAlt+t' ); // Keyboard shortcut for Insert before.
 		await expect
@@ -1400,6 +1407,7 @@ test.describe( 'List View', () => {
 			optionsForFileMenu,
 			'Pressing Space should also open the menu dropdown'
 		).toBeVisible();
+		await expect( firstMenuItem ).toBeFocused();
 		await pageUtils.pressKeys( 'access+z' ); // Keyboard shortcut for Delete.
 		await expect
 			.poll(
@@ -1420,6 +1428,7 @@ test.describe( 'List View', () => {
 			optionsForFileMenu.getByRole( 'menuitem', { name: 'Delete' } ),
 			'The delete menu item should be hidden for locked blocks'
 		).toBeHidden();
+		await expect( firstMenuItem ).toBeFocused();
 		await pageUtils.pressKeys( 'access+z' );
 		await expect
 			.poll(
