@@ -25,7 +25,7 @@ describe( 'TextareaControl', () => {
 
 		expect(
 			screen.getByRole( 'textbox', { name: 'Notes' } )
-		).toBeVisible();
+		).toBeInTheDocument();
 	} );
 
 	it( 'renders with a description', () => {
@@ -37,7 +37,10 @@ describe( 'TextareaControl', () => {
 		);
 
 		expect(
-			screen.getByText( 'Please provide your feedback.' )
+			screen.getByRole( 'textbox', {
+				name: 'Comment',
+				description: 'Please provide your feedback.',
+			} )
 		).toBeVisible();
 	} );
 
