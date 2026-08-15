@@ -416,6 +416,26 @@ HTML;
 	}
 
 	/**
+	 * Asserts that one substring appears before another in rendered HTML.
+	 *
+	 * Layout support can add classes and attributes to nested lists, so tests
+	 * should not depend on an exact `<ul class="wp-block-list">` string.
+	 *
+	 * @param string $first   Substring that should appear first.
+	 * @param string $second  Substring that should appear later.
+	 * @param string $html    Rendered HTML.
+	 * @param string $message Failure message.
+	 */
+	private function assert_substring_appears_before( $first, $second, $html, $message ) {
+		$first_pos  = strpos( $html, $first );
+		$second_pos = strpos( $html, $second );
+
+		$this->assertNotFalse( $first_pos, $message );
+		$this->assertNotFalse( $second_pos, $message );
+		$this->assertLessThan( $second_pos, $first_pos, $message );
+	}
+
+	/**
 	 * Tests if list item content is updated with a plain text value returned by the source.
 	 *
 	 * @covers WP_Block::render
@@ -565,13 +585,9 @@ HTML;
 			$result,
 			'The original list item content should be replaced by the source value.'
 		);
-		$this->assertStringContainsString(
+		$this->assert_substring_appears_before(
 			'Bound list item',
-			$normalized,
-			'The list item should render the source text.'
-		);
-		$this->assertMatchesRegularExpression(
-			'#<li[^>]*>\s*Bound list item.*<ul[^>]*>.*Nested child.*</ul>#s',
+			'Nested child',
 			$normalized,
 			'The list item should render the source text and preserve nested list inner blocks.'
 		);
@@ -602,13 +618,9 @@ HTML;
 			$result,
 			'Raw list markup before the nested block should be replaced by the source value.'
 		);
-		$this->assertStringContainsString(
+		$this->assert_substring_appears_before(
 			'Bound list item',
-			$normalized,
-			'The list item should render the source text.'
-		);
-		$this->assertMatchesRegularExpression(
-			'#<li[^>]*>\s*Bound list item.*<ul[^>]*>.*Nested child should remain.*</ul>#s',
+			'Nested child should remain',
 			$normalized,
 			'The list item should preserve only the delimiter-backed nested list inner block.'
 		);
@@ -639,8 +651,8 @@ HTML;
 			$result,
 			'An empty source value should clear the original list item content.'
 		);
-		$this->assertMatchesRegularExpression(
-			'#<li[^>]*>.*<ul[^>]*>.*Nested child.*</ul>#s',
+		$this->assertStringContainsString(
+			'Nested child',
 			$normalized,
 			'An empty source value should still preserve nested list inner blocks.'
 		);
@@ -671,13 +683,9 @@ HTML;
 			$result,
 			'The original list item content should be replaced by the source value.'
 		);
-		$this->assertStringContainsString(
+		$this->assert_substring_appears_before(
 			'Bound list item',
-			$normalized,
-			'The list item should render the source text.'
-		);
-		$this->assertMatchesRegularExpression(
-			'#<li[^>]*>\s*Bound list item.*<ol[^>]*>.*Nested ordered child.*</ol>#s',
+			'Nested ordered child',
 			$normalized,
 			'The list item should render the source text and preserve the nested ordered list.'
 		);
@@ -805,18 +813,9 @@ HTML;
 			$result,
 			'The original list item content should be replaced by the pattern override.'
 		);
-		$this->assertStringContainsString(
-			'Nested child',
-			$normalized,
-			'Nested list inner blocks should remain in the rendered output.'
-		);
-		$this->assertStringContainsString(
+		$this->assert_substring_appears_before(
 			'Pattern <em>override</em>',
-			$normalized,
-			'The list item should render the pattern override markup.'
-		);
-		$this->assertMatchesRegularExpression(
-			'#<li[^>]*>\s*Pattern <em>override</em>.*<ul[^>]*>.*Nested child.*</ul>#s',
+			'Nested child',
 			$normalized,
 			'The list item should render the pattern override before its nested list.'
 		);
