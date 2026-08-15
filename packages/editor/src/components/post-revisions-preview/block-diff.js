@@ -1,16 +1,9 @@
-/**
- * External dependencies
- */
 /*
  * `diffWordsWithSpace` preserves the v4-style per-word output. v6+
  * stopped treating whitespace as a token in `diffWords`, which coalesces
  * adjacent word changes into a single removed/added pair.
  */
 import { diffArrays, diffWordsWithSpace } from 'diff';
-
-/**
- * WordPress dependencies
- */
 import { parse as grammarParse } from '@wordpress/block-serialization-default-parser';
 import {
 	privateApis as blocksPrivateApis,
@@ -24,10 +17,6 @@ import {
 	applyFormat,
 } from '@wordpress/rich-text';
 import { __, _n, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { DIFF_DESCRIPTION_IDS } from './diff-format-types';
 

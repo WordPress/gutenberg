@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { applyFilters } from '@wordpress/hooks';
 import {
@@ -27,10 +20,6 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import PostFeaturedImageCheck from './check';
 import { store as editorStore } from '../../store';
 

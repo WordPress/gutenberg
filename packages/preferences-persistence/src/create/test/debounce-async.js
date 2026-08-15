@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import debounceAsync from '../debounce-async';
 
 // See https://stackoverflow.com/questions/52177631/jest-timer-and-promise-dont-work-well-settimeout-and-async-function.

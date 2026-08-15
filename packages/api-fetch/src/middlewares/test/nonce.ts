@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { FetchHandler } from '../../types';
 import createNonceMiddleware from '../nonce';
 

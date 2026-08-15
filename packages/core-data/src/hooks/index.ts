@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { WithPermissions } from './use-entity-records';
 
 /**

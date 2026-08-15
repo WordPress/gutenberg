@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import postcss from 'postcss';
-
-/**
- * Internal dependencies
- */
 import plugin from '../';
 
 /**

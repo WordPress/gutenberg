@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import withWeakMapCache from '../with-weak-map-cache';
 
 describe( 'withWeakMapCache', () => {

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useRef } from '@wordpress/element';
 import { useIsomorphicLayoutEffect } from '@wordpress/compose';
 

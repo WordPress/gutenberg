@@ -71,6 +71,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-view-config-data.php';
 	require __DIR__ . '/compat/wordpress-7.1/view-config-api.php';
 	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-view-config-controller-7-1.php';
+	require __DIR__ . '/compat/wordpress-7.1/notes-mentions.php';
 	require __DIR__ . '/compat/wordpress-7.1/class-wp-icon-collections-registry.php';
 	require __DIR__ . '/compat/wordpress-7.1/class-wp-rest-icon-collections-controller.php';
 	require __DIR__ . '/compat/wordpress-7.1/rest-api.php';
@@ -230,17 +231,11 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-guidelines' ) ) {
 	require __DIR__ . '/experimental/knowledge/index.php';
 }
 
-// Content types (only load when experiment is enabled).
-if ( gutenberg_is_experiment_enabled( 'gutenberg-content-types' ) ) {
-	require __DIR__ . '/experimental/content-types/load.php';
-	require __DIR__ . '/experimental/content-types/index.php';
-	require __DIR__ . '/experimental/content-types/post-types.php';
-}
-
 // Dashboard Widgets (only load when experiment is enabled).
 if ( gutenberg_is_experiment_enabled( 'gutenberg-dashboard-widgets' ) ) {
 	require __DIR__ . '/experimental/dashboard-widgets/load.php';
 	require __DIR__ . '/experimental/dashboard-widgets/widget-types.php';
+	require __DIR__ . '/experimental/dashboard-widgets/widget-icons.php';
 	require __DIR__ . '/experimental/dashboard-widgets/dashboard-layout.php';
 	require __DIR__ . '/experimental/dashboard-widgets/default-layout-seed.php';
 }

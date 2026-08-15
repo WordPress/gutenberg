@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	useBlockProps,
 	InspectorControls,
@@ -36,10 +29,6 @@ import { Icon, search } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { speak } from '@wordpress/a11y';
-
-/**
- * Internal dependencies
- */
 import {
 	PC_WIDTH_DEFAULT,
 	PX_WIDTH_DEFAULT,

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import placeCaretAtEdge from './place-caret-at-edge';
 
 /**

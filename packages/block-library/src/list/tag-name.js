@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
 
 function TagName( props, ref ) {

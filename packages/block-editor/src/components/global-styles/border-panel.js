@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	BorderBoxControl,
 	__experimentalHasSplitBorders as hasSplitBorders,
@@ -11,10 +8,6 @@ import {
 import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import BorderRadiusControl from '../border-radius-control';
 import { useColorsPerOrigin } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
@@ -24,7 +17,7 @@ import { ShadowPopover, useShadowPresets } from './shadow-panel-components';
 import {
 	getInheritanceProps,
 	InheritanceToolsPanelItem,
-	ENABLE_GLOBAL_STYLES_INHERITANCE,
+	isGlobalStylesInheritanceEnabled,
 } from './inheritance';
 
 export function useHasBorderPanel( settings ) {
@@ -107,7 +100,7 @@ export default function BorderPanel( {
 	panelId,
 	name,
 	defaultControls = DEFAULT_CONTROLS,
-	showInheritanceLabelIndicators = ENABLE_GLOBAL_STYLES_INHERITANCE,
+	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
 } ) {
 	const colors = useColorsPerOrigin( settings );
 	const areCustomSolidsEnabled = settings?.color?.custom;

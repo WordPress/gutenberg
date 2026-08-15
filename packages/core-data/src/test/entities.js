@@ -1,8 +1,4 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
-
 jest.mock( '@wordpress/api-fetch' );
 jest.mock( '../sync', () => ( {
 	...jest.requireActual( '../sync' ),
@@ -12,10 +8,6 @@ jest.mock( '../utils/crdt', () => ( {
 	...jest.requireActual( '../utils/crdt' ),
 	applyPostChangesToCRDTDoc: jest.fn(),
 } ) );
-
-/**
- * Internal dependencies
- */
 import {
 	getMethodName,
 	rootEntitiesConfig,
