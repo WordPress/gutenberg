@@ -16,6 +16,7 @@ export { default as SuggestionNoteGC } from './suggestion-note-gc';
 export { default as SuggestionDeletionKeyboard } from './suggestion-deletion-keyboard';
 export { default as SuggestionAdditionKeyboard } from './suggestion-addition-keyboard';
 export { default as SuggestionFormatKeyboard } from './suggestion-format-keyboard';
+export { default as SuggestionMultiBlockFormatNotice } from './multi-block-format-notice';
 export { default as SuggestionContentReconciler } from './suggestion-content-reconciler';
 export {
 	default as SuggestionAnnotations,
