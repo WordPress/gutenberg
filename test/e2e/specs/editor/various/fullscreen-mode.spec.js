@@ -99,5 +99,70 @@ test.describe( 'Fullscreen Mode', () => {
 				getSiteEditorOpenNavigationButton( page )
 			).toBeVisible();
 		} );
+
+		test( 'should not obscure the back button when showing icon labels', async ( {
+			page,
+			admin,
+			editor,
+		} ) => {
+			await admin.visitSiteEditor( { canvas: 'edit' } );
+			await editor.setPreferences( 'core', {
+				showIconLabels: true,
+			} );
+
+			const backButton = getSiteEditorOpenNavigationButton( page );
+			await expect( backButton ).toBeVisible();
+
+			await expectBackButtonNotObscured(
+				backButton,
+				getEditorTopBar( page ).getByRole( 'button', {
+					name: 'Block Inserter',
+					exact: true,
+				} )
+			);
+		} );
+	} );
+
+	test( 'should not obscure the back button when showing icon labels', async ( {
+		page,
+		admin,
+		editor,
+	} ) => {
+		await admin.createNewPost();
+		await editor.setPreferences( 'core', {
+			showIconLabels: true,
+		} );
+		await enableFullscreenMode( page );
+
+		await expect( page.locator( 'body' ) ).toHaveClass(
+			/show-icon-labels/
+		);
+
+		const backLink = getPostEditorBackLink( page );
+		await expect( backLink ).toBeVisible();
+
+		await expectBackButtonNotObscured(
+			backLink,
+			getEditorTopBar( page ).getByRole( 'button', {
+				name: 'Block Inserter',
+				exact: true,
+			} )
+		);
 	} );
 } );
+
+/**
+ * Assert that the back control is fully to the left of the following toolbar
+ * control, so its label is not covered when "Show button text labels" is on.
+ *
+ * @param {import('@playwright/test').Locator} backControl
+ * @param {import('@playwright/test').Locator} followingControl
+ */
+async function expectBackButtonNotObscured( backControl, followingControl ) {
+	const backBox = await backControl.boundingBox();
+	const followingBox = await followingControl.boundingBox();
+
+	expect( backBox ).not.toBeNull();
+	expect( followingBox ).not.toBeNull();
+	expect( backBox.x + backBox.width ).toBeLessThanOrEqual( followingBox.x );
+}
