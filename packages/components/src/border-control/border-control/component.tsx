@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import BorderControlDropdown from '../border-control-dropdown';
 import UnitControl from '../../unit-control';
 import RangeControl from '../../range-control';
@@ -16,7 +9,6 @@ import { VisuallyHidden } from '../../visually-hidden';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { useBorderControl } from './hook';
-
 import type { BorderControlProps, LabelProps } from '../types';
 import { Spacer } from '../../spacer';
 
@@ -73,7 +65,6 @@ const UnconnectedBorderControl = (
 			/>
 			<HStack spacing={ 4 } className={ innerWrapperClassName }>
 				<UnitControl
-					__next40pxDefaultSize
 					prefix={
 						<Spacer marginRight={ 1 } marginBottom={ 0 }>
 							<BorderControlDropdown
@@ -117,7 +108,6 @@ const UnconnectedBorderControl = (
 						step={ [ 'px', '%' ].includes( widthUnit ) ? 1 : 0.1 }
 						value={ widthValue || undefined }
 						withInputField={ false }
-						__next40pxDefaultSize
 					/>
 				) }
 			</HStack>

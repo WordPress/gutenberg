@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { css } from '@emotion/react';
-
-/**
- * Internal dependencies
- */
 import { COLORS, CONFIG, boxSizingReset, rtl } from '../utils';
 import { space } from '../utils/space';
 import { StyledLabel } from '../base-control/styles/base-control-styles';
@@ -13,7 +6,6 @@ import {
 	ValueInput as UnitControlWrapper,
 	UnitSelect,
 } from '../unit-control/styles/unit-control-styles';
-
 import type { Border } from './types';
 
 const focusBoxShadow = css`
@@ -52,6 +44,10 @@ export const wrapperWidth = css`
 export const wrapperHeight = css`
 	height: 40px;
 `;
+
+export function getInnerWrapperStyles( { hasWidth }: { hasWidth: boolean } ) {
+	return css( innerWrapper(), hasWidth && wrapperWidth, wrapperHeight );
+}
 
 export const borderControlDropdown = css`
 	background: #fff;

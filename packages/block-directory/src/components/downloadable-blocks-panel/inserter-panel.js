@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';

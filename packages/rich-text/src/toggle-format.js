@@ -1,14 +1,5 @@
-/**
- * WordPress dependencies
- */
-
 import { speak } from '@wordpress/a11y';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-
 import { getActiveFormat } from './get-active-format';
 import { removeFormat } from './remove-format';
 import { applyFormat } from './apply-format';

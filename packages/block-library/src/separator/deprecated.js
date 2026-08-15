@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { getColorClassName, useBlockProps } from '@wordpress/block-editor';
 
 const v1 = {

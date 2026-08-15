@@ -1,25 +1,11 @@
-/**
- * @jest-environment jsdom
- */
-
-/**
- * External dependencies
- */
 import { renderHook } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
-
 // Mock useRemoteUrlData from block-editor
 const mockUseRemoteUrlData = jest.fn();
-
 jest.mock( '@wordpress/block-editor', () => ( {
 	privateApis: {},
 	store: {},
 } ) );
-
 // Mock the unlock function to return useRemoteUrlData, isHashLink, and isRelativePath
 jest.mock( '../../../lock-unlock', () => ( {
 	unlock: jest.fn( () => ( {
@@ -29,10 +15,6 @@ jest.mock( '../../../lock-unlock', () => ( {
 			url?.startsWith( '/' ) && ! url?.startsWith( '//' ),
 	} ) ),
 } ) );
-
-/**
- * Internal dependencies
- */
 import {
 	computeDisplayUrl,
 	computeBadges,
@@ -498,6 +480,23 @@ describe( 'useLinkPreview', () => {
 			);
 
 			expect( result.current.title ).toBe( 'Test Category' );
+		} );
+
+		it( 'should show "(no title)" for an untitled entity, not the title object', () => {
+			const { result } = renderHook( () =>
+				useLinkPreview( {
+					url: 'https://example.com/page',
+					// Untitled page: an empty `title.rendered` object.
+					entityRecord: { title: { raw: '', rendered: '' } },
+					type: 'page',
+					hasBinding: false,
+					isEntityAvailable: true,
+				} )
+			);
+
+			expect( result.current.title ).toBe( '(no title)' );
+			// Truthy title, so no rich URL fetch.
+			expect( mockUseRemoteUrlData ).toHaveBeenCalledWith( null );
 		} );
 
 		it( 'should use entityRecord.name for taxonomy terms', () => {

@@ -47,20 +47,30 @@ function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 		? "$existing_class_name $class_name"
 		: $class_name;
 
-	_wp_array_set( $parsed_block, array( 'attrs', 'className' ), $updated_class_name );
+	$parsed_block['attrs']['className'] = $updated_class_name;
 
 	// Process the custom CSS using the same method as global styles.
 	$selector      = '.' . $class_name;
 	$processed_css = WP_Theme_JSON_Gutenberg::process_blocks_custom_css( $custom_css, $selector );
 
 	if ( ! empty( $processed_css ) ) {
-		/*
-		 * Register and add inline style for block custom CSS.
-		 * The style depends on global-styles to ensure custom CSS loads after
-		 * and can override global styles.
+		/**
+		 * Reuse one handle so identical custom CSS is enqueued only once via
+		 * {@see wp_unique_id_from_values()}. Explicitly declare the `wp-block-library`
+		 * dependency so `global-styles` is guaranteed to print after it, preventing
+		 * block default styles from unintentionally overriding global styles.
 		 */
-		wp_register_style( 'wp-block-custom-css', false, array( 'global-styles' ) );
-		wp_add_inline_style( 'wp-block-custom-css', $processed_css );
+		$handle = 'wp-block-custom-css';
+		if ( ! wp_style_is( $handle, 'registered' ) ) {
+			wp_register_style( $handle, false, array( 'wp-block-library', 'global-styles' ) );
+		}
+		$after_styles = wp_styles()->get_data( $handle, 'after' );
+		if ( ! is_array( $after_styles ) ) {
+			$after_styles = array();
+		}
+		if ( ! in_array( $processed_css, $after_styles, true ) ) {
+			wp_add_inline_style( $handle, $processed_css );
+		}
 	}
 
 	return $parsed_block;

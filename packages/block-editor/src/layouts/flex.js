@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, _x } from '@wordpress/i18n';
 import {
 	justifyLeft,
@@ -23,10 +20,6 @@ import {
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../hooks/gap';
 import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
@@ -240,6 +233,7 @@ export default {
 		layout = {},
 		onChange,
 		layoutBlockSupport,
+		controlsGroup = 'block',
 	} ) {
 		const { allowVerticalAlignment = true, allowJustification = true } =
 			layoutBlockSupport;
@@ -249,7 +243,10 @@ export default {
 		}
 
 		return (
-			<BlockControls group="block" __experimentalShareWithChildBlocks>
+			<BlockControls
+				group={ controlsGroup }
+				__experimentalShareWithChildBlocks
+			>
 				{ allowJustification && (
 					<FlexLayoutJustifyContentControl
 						layout={ layout }
@@ -437,7 +434,6 @@ function FlexLayoutVerticalAlignmentControl( {
 
 	return (
 		<ToggleGroupControl
-			__next40pxDefaultSize
 			label={ __( 'Alignment' ) }
 			onChange={ onVerticalAlignmentChange }
 			value={ verticalAlignment }
@@ -524,7 +520,6 @@ function FlexLayoutJustifyContentControl( {
 
 	return (
 		<ToggleGroupControl
-			__next40pxDefaultSize
 			label={ __( 'Justification' ) }
 			value={ justifyContent }
 			onChange={ onJustificationChange }
@@ -568,7 +563,6 @@ function OrientationControl( { layout, onChange } ) {
 	} = layout;
 	return (
 		<ToggleGroupControl
-			__next40pxDefaultSize
 			className="block-editor-hooks__flex-layout-orientation-controls"
 			label={ __( 'Orientation' ) }
 			value={ orientation }

@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useSettings } from '../../components/use-settings';
 
 /**
@@ -24,8 +17,6 @@ import { useSettings } from '../../components/use-settings';
  * @return {Element} Letter-spacing control.
  */
 export default function LetterSpacingControl( {
-	/** @deprecated Default behavior since WordPress 7.1. Prop can be safely removed. */
-	__next40pxDefaultSize: _next40pxDefaultSize,
 	value,
 	onChange,
 	__unstableInputWidth = '60px',
@@ -39,8 +30,6 @@ export default function LetterSpacingControl( {
 
 	return (
 		<UnitControl
-			__next40pxDefaultSize
-			__shouldNotWarnDeprecated36pxSize
 			{ ...otherProps }
 			label={ __( 'Letter spacing' ) }
 			value={ value }

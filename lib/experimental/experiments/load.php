@@ -30,6 +30,11 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Enables new blocks to allow building forms. You are likely to experience UX issues that are being addressed.', 'gutenberg' ),
 				),
 				array(
+					'id'          => 'gutenberg-global-styles-inheritance-ui',
+					'label'       => __( 'Global Styles inheritance in the block inspector', 'gutenberg' ),
+					'description' => __( 'Shows the value a block inherits from Global Styles in the block inspector when nothing is set on the block itself, and adds a control to clear a value you set back to the inherited one.', 'gutenberg' ),
+				),
+				array(
 					'id'          => 'gutenberg-grid-interactivity',
 					'label'       => __( 'Grid interactivity', 'gutenberg' ),
 					'description' => __( 'Enables enhancements to the Grid block that let you move and resize items in the editor canvas.', 'gutenberg' ),
@@ -43,7 +48,7 @@ function gutenberg_initialize_experiments_settings() {
 				array(
 					'id'          => 'gutenberg-media-editor',
 					'label'       => __( 'Media Editor (Route)', 'gutenberg' ),
-					'description' => __( 'Enables a dedicated route-based media editor screen for editing media items (metadata and content).', 'gutenberg' ),
+					'description' => __( 'Replaces the core Edit Media screen with a dedicated route-based media editor for editing media items (metadata and content).', 'gutenberg' ),
 				),
 				array(
 					'id'          => 'gutenberg-dataviews-media-modal',
@@ -113,22 +118,12 @@ function gutenberg_initialize_experiments_settings() {
 				array(
 					'id'          => 'gutenberg-guidelines',
 					'label'       => __( 'Guidelines', 'gutenberg' ),
-					'description' => __( 'Enables guidelines feature for managing editorial voice and tone guidelines under Settings.', 'gutenberg' ),
-				),
-				array(
-					'id'          => 'gutenberg-content-types',
-					'label'       => __( 'Content types', 'gutenberg' ),
-					'description' => __( 'Enables a UI for creating and managing custom taxonomies and custom post types under Settings.', 'gutenberg' ),
+					'description' => __( 'Enables the Guidelines page under Settings and the experimental knowledge storage (wp_knowledge).', 'gutenberg' ),
 				),
 				array(
 					'id'          => 'gutenberg-dashboard-widgets',
 					'label'       => __( 'New Dashboard experience', 'gutenberg' ),
 					'description' => __( 'Enables a new dashboard experience with resizable, reorderable widgets that plugins can register and users can personalize.', 'gutenberg' ),
-				),
-				array(
-					'id'          => 'gutenberg-omnibar',
-					'label'       => __( 'Toolbar UI refresh', 'gutenberg' ),
-					'description' => __( 'Previews a redesigned toolbar UI that is visually consistent everywhere. For now, it includes replacing home/odometer dashicon with site icon if set.', 'gutenberg' ),
 				),
 				array(
 					'id'          => 'gutenberg-react-19',

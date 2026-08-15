@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type {
 	FontSizePickerSelectProps,
 	FontSizePickerSelectOption,
@@ -60,7 +53,6 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 
 	return (
 		<StyledCustomSelectControl
-			__next40pxDefaultSize
 			className="components-font-size-picker__select"
 			label={ __( 'Font size' ) }
 			hideLabelFromVision

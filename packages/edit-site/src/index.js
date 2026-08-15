@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as blocksStore } from '@wordpress/blocks';
 import {
 	registerCoreBlocks,
@@ -12,15 +9,10 @@ import deprecated from '@wordpress/deprecated';
 import { createRoot, StrictMode } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { applyFilters } from '@wordpress/hooks';
 import {
 	registerLegacyWidgetBlock,
 	registerWidgetGroupBlock,
 } from '@wordpress/widgets';
-
-/**
- * Internal dependencies
- */
 import { store as editSiteStore } from './store';
 import { unlock } from './lock-unlock';
 import App from './components/app';
@@ -61,16 +53,6 @@ export function initializeEditor( id, settings ) {
 		welcomeGuideTemplate: true,
 	} );
 
-	const collaborationNotificationPreferenceDefaults = applyFilters(
-		'editor.CollaborationNotificationPreferenceDefaults',
-		{
-			showCollaborationJoinNotifications: true,
-			showCollaborationLeaveNotifications: true,
-			showCollaborationPostSaveNotifications: true,
-		},
-		'core/edit-site'
-	);
-
 	dispatch( preferencesStore ).setDefaults( 'core', {
 		allowRightClickOverrides: true,
 		distractionFree: false,
@@ -85,12 +67,9 @@ export function initializeEditor( id, settings ) {
 		showListViewByDefault: false,
 		enableChoosePatternModal: true,
 		showCollaborationCursor: false,
-		showCollaborationJoinNotifications:
-			collaborationNotificationPreferenceDefaults.showCollaborationJoinNotifications,
-		showCollaborationLeaveNotifications:
-			collaborationNotificationPreferenceDefaults.showCollaborationLeaveNotifications,
-		showCollaborationPostSaveNotifications:
-			collaborationNotificationPreferenceDefaults.showCollaborationPostSaveNotifications,
+		showCollaborationJoinNotifications: true,
+		showCollaborationLeaveNotifications: true,
+		showCollaborationPostSaveNotifications: true,
 	} );
 
 	if ( window.__clientSideMediaProcessing ) {

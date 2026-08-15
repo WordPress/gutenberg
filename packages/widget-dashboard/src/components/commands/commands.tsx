@@ -1,27 +1,13 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	useCommands,
 	privateApis as commandsPrivateApis,
 } from '@wordpress/commands';
-import {
-	columns,
-	grid,
-	layout as layoutIcon,
-	plus,
-	trash,
-} from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
+import { layout as layoutIcon, plus, trash } from '@wordpress/icons';
 import { unlock } from '../../lock-unlock';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
-import { getGridModel } from '../../utils/grid-model-change';
 import { usePendingWhenEditMode } from './use-pending-when-edit-mode';
 
 const { useCommandContext } = unlock( commandsPrivateApis );
@@ -35,14 +21,8 @@ type CommandCallback = ( options: { close: () => void } ) => void;
  * active command context so they surface under Suggestions by default.
  */
 export function Commands() {
-	const {
-		editMode,
-		onEditChange,
-		onLayoutReset,
-		gridSettings,
-		canEditGridSettings,
-		commitGridModelChange,
-	} = useDashboardInternalContext();
+	const { editMode, onEditChange, onLayoutReset } =
+		useDashboardInternalContext();
 
 	const { setInserterOpen, setResetDialogOpen } = useDashboardUIContext();
 
@@ -52,26 +32,6 @@ export function Commands() {
 		editMode,
 		onEditChange,
 	} );
-
-	const gridModel = getGridModel( gridSettings );
-	const isGridLayout = gridModel === 'grid';
-	const isMasonryLayout = gridModel === 'masonry';
-
-	const switchToMasonry = useCallback< CommandCallback >(
-		( { close } ) => {
-			close();
-			commitGridModelChange( 'masonry' );
-		},
-		[ commitGridModelChange ]
-	);
-
-	const switchToGrid = useCallback< CommandCallback >(
-		( { close } ) => {
-			close();
-			commitGridModelChange( 'grid' );
-		},
-		[ commitGridModelChange ]
-	);
 
 	const resetToDefault = useCallback< CommandCallback >(
 		( { close } ) => {
@@ -122,35 +82,6 @@ export function Commands() {
 				callback: addWidgets,
 			},
 			{
-				name: 'core/dashboard/switch-to-masonry-layout',
-				label: __( 'Switch dashboard to masonry layout' ),
-				icon: columns,
-				category: 'command',
-				context: DASHBOARD_COMMAND_CONTEXT,
-				keywords: [
-					__( 'layout' ),
-					__( 'layout model' ),
-					__( 'masonry' ),
-				],
-				disabled: ! canEditGridSettings || isMasonryLayout || editMode,
-				callback: switchToMasonry,
-			},
-			{
-				name: 'core/dashboard/switch-to-grid-layout',
-				label: __( 'Switch dashboard to grid layout' ),
-				icon: grid,
-				category: 'command',
-				context: DASHBOARD_COMMAND_CONTEXT,
-				keywords: [
-					__( 'layout' ),
-					__( 'layout model' ),
-					__( 'grid' ),
-					__( 'standard grid' ),
-				],
-				disabled: ! canEditGridSettings || isGridLayout || editMode,
-				callback: switchToGrid,
-			},
-			{
 				name: 'core/dashboard/reset-to-default',
 				label: __( 'Reset dashboard widgets to default' ),
 				icon: trash,
@@ -166,11 +97,6 @@ export function Commands() {
 			editMode,
 			customize,
 			addWidgets,
-			canEditGridSettings,
-			isMasonryLayout,
-			isGridLayout,
-			switchToMasonry,
-			switchToGrid,
 			onLayoutReset,
 			resetToDefault,
 		]

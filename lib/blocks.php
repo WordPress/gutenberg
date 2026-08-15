@@ -374,7 +374,7 @@ function _gutenberg_footnotes_kses_init() {
  */
 function _gutenberg_footnotes_force_filtered_html_on_import_filter( $arg ) {
 	if ( function_exists( '_wp_filter_post_meta_footnotes' ) ) {
-		return;
+		return $arg;
 	}
 	// force_filtered_html_on_import is true we need to init the global styles kses filters.
 	if ( $arg ) {

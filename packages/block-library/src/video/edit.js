@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { isBlobURL } from '@wordpress/blob';
 import {
 	Spinner,
@@ -27,10 +20,6 @@ import { useDispatch } from '@wordpress/data';
 import { video as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { prependHTTPS } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { createUpgradedEmbedBlock } from '../embed/util';
 import {
 	useUploadMediaFromBlobURL,
@@ -41,6 +30,7 @@ import TracksEditor from './tracks-editor';
 import Tracks from './tracks';
 import { Caption } from '../utils/caption';
 import PosterImage from '../utils/poster-image';
+import { isGifVariation } from './variations';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 
@@ -53,7 +43,17 @@ function VideoEdit( {
 	onReplace,
 } ) {
 	const videoPlayer = useRef();
-	const { id, controls, poster, src, tracks } = attributes;
+	const { id, controls, poster, src, tracks, width, height } = attributes;
+	const isGif = isGifVariation( attributes );
+	// Give the <video> an explicit (non-`auto`) aspect ratio derived from the
+	// stored dimensions. The width/height attributes alone only yield
+	// `aspect-ratio: auto W/H`, whose `auto` keyword defers to the element's
+	// natural ratio while the poster/metadata load - during which Chrome briefly
+	// computes a runaway height (tens of thousands of pixels) before settling.
+	// That spike is what reads as a duplicated image during the GIF-to-video
+	// swap. A non-`auto` ratio governs the box height throughout the load.
+	const aspectRatio =
+		width && height ? `${ width } / ${ height }` : undefined;
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const blockEditingMode = useBlockEditingMode();
@@ -72,6 +72,17 @@ function VideoEdit( {
 			videoPlayer.current.load();
 		}
 	}, [ poster ] );
+
+	// The GIF variation plays like an animated GIF in the editor (the playback
+	// attributes are applied to the preview <video> below). Regular videos do
+	// not autoplay in the editor, so only nudge GIFs into playing after a
+	// source change in case the muted autoplay did not start on its own.
+	useEffect( () => {
+		if ( isGif ) {
+			// Browsers allow muted videos to be played programmatically.
+			videoPlayer.current?.play().catch( () => {} );
+		}
+	}, [ isGif, src, poster ] );
 
 	// TODO: Whether the video was obtained from the media library or was provided by URL, obtain the `videoWidth` and `videoHeight` of the video once its metadata has loaded and persist in the block attributes.
 	function onSelectVideo( media ) {
@@ -203,36 +214,38 @@ function VideoEdit( {
 					</BlockControls>
 				</>
 			) }
-			<InspectorControls>
-				<ToolsPanel
-					label={ __( 'Settings' ) }
-					resetAll={ () => {
-						setAttributes( {
-							autoplay: false,
-							controls: true,
-							loop: false,
-							muted: false,
-							playsInline: false,
-							preload: 'metadata',
-							poster: undefined,
-						} );
-					} }
-					dropdownMenuProps={ dropdownMenuProps }
-				>
-					<VideoCommonSettings
-						setAttributes={ setAttributes }
-						attributes={ attributes }
-					/>
-					<PosterImage
-						poster={ poster }
-						onChange={ ( posterImage ) =>
+			{ ! isGif && (
+				<InspectorControls>
+					<ToolsPanel
+						label={ __( 'Settings' ) }
+						resetAll={ () => {
 							setAttributes( {
-								poster: posterImage?.url,
-							} )
-						}
-					/>
-				</ToolsPanel>
-			</InspectorControls>
+								autoplay: false,
+								controls: true,
+								loop: false,
+								muted: false,
+								playsInline: false,
+								preload: 'metadata',
+								poster: undefined,
+							} );
+						} }
+						dropdownMenuProps={ dropdownMenuProps }
+					>
+						<VideoCommonSettings
+							setAttributes={ setAttributes }
+							attributes={ attributes }
+						/>
+						<PosterImage
+							poster={ poster }
+							onChange={ ( posterImage ) =>
+								setAttributes( {
+									poster: posterImage?.url,
+								} )
+							}
+						/>
+					</ToolsPanel>
+				</InspectorControls>
+			) }
 			<figure { ...blockProps }>
 				<video
 					controls={ controls }
@@ -240,6 +253,13 @@ function VideoEdit( {
 					poster={ poster }
 					src={ src || temporaryURL }
 					ref={ videoPlayer }
+					autoPlay={ isGif }
+					loop={ isGif }
+					muted={ isGif }
+					playsInline={ isGif }
+					width={ width }
+					height={ height }
+					style={ aspectRatio ? { aspectRatio } : undefined }
 				>
 					<Tracks tracks={ tracks } />
 				</video>

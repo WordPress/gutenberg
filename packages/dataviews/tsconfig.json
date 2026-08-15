@@ -11,6 +11,7 @@
 		]
 	},
 	"references": [
+		{ "path": "../a11y" },
 		{ "path": "../components" },
 		{ "path": "../compose" },
 		{ "path": "../data" },
@@ -20,10 +21,11 @@
 		{ "path": "../element" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
+		{ "path": "../kebab-case" },
 		{ "path": "../keycodes" },
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
-		{ "path": "../theme" },
+		{ "path": "../theme/tsconfig.build.json" },
 		{ "path": "../ui" },
 		{ "path": "../url" },
 		{ "path": "../warning" }

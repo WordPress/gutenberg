@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { copy, symbol } from '@wordpress/icons';
 import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import BlockSwitcher from '../block-switcher';
 import BlockIcon from '../block-icon';
 import BlockStylesDropdown from './block-styles-dropdown';
@@ -89,9 +82,8 @@ function getBlockIconVariant( { select, clientIds } ) {
 }
 
 function getBlockIcon( { select, clientIds } ) {
-	const { getBlockName, getBlockAttributes, isSectionBlock } = unlock(
-		select( blockEditorStore )
-	);
+	const { getBlockName, getBlockAttributes, getBlock, isSectionBlock } =
+		unlock( select( blockEditorStore ) );
 
 	const _isSingleBlock = clientIds.length === 1;
 	const firstClientId = clientIds[ 0 ];
@@ -109,7 +101,12 @@ function getBlockIcon( { select, clientIds } ) {
 	const blockType = getBlockType( blockName );
 	if ( _isSingleBlock ) {
 		const { getActiveBlockVariation } = select( blocksStore );
-		const match = getActiveBlockVariation( blockName, blockAttributes );
+		const match = getActiveBlockVariation(
+			blockName,
+			blockAttributes,
+			undefined,
+			getBlock?.( firstClientId )?.innerContent
+		);
 		return match?.icon || blockType?.icon;
 	}
 

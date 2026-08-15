@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import assignFixedIssues from '../';
 
 describe( 'assignFixedIssues', () => {

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { isBlobURL } from '@wordpress/blob';
 import {
 	SelectControl,
@@ -28,10 +21,6 @@ import { useDispatch } from '@wordpress/data';
 import { audio as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { createUpgradedEmbedBlock } from '../embed/util';
 import {
 	useUploadMediaFromBlobURL,
@@ -41,6 +30,19 @@ import { Caption } from '../utils/caption';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
+/**
+ * Renders the `core/audio` block on the editor.
+ *
+ * @param {Object}   props                   React props.
+ * @param {Object}   props.attributes        Block attributes: `blob`, `src`, `caption`, `id`, `autoplay`, `loop` and `preload`.
+ * @param {string}   props.className         Class name generated for the block.
+ * @param {Function} props.setAttributes     Callback for updating block attributes.
+ * @param {Function} props.onReplace         Callback for replacing this block with other blocks.
+ * @param {boolean}  props.isSelected        Whether the block is the only selected block.
+ * @param {Function} props.insertBlocksAfter Callback for inserting blocks after this one.
+ *
+ * @return {React.JSX.Element} React element.
+ */
 function AudioEdit( {
 	attributes,
 	className,
@@ -223,7 +225,6 @@ function AudioEdit( {
 						}
 					>
 						<SelectControl
-							__next40pxDefaultSize
 							label={ _x(
 								'Preload',
 								'noun; Audio block parameter'

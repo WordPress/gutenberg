@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { Spinner } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { useStylesId } from '../../hooks/use-styles-id';
 import { useEditorSettings } from '../../hooks/use-editor-settings';
 import { useEditorAssets } from '../../hooks/use-editor-assets';
@@ -27,16 +16,18 @@ interface EditorProps {
 	postId?: string;
 	settings?: Record< string, any >;
 	backButton?: ReactNode;
+	onActionPerformed?: ( actionId: string, items: any[] ) => void;
 }
 
 /**
  * Lazy-loading editor component that handles asset loading and settings initialization.
  *
- * @param {Object}    props            Component props
- * @param {string}    props.postType   Optional post type to edit. If not provided, resolves to homepage.
- * @param {string}    props.postId     Optional post ID to edit. If not provided, resolves to homepage.
- * @param {Object}    props.settings   Optional extra settings to merge with editor settings
- * @param {ReactNode} props.backButton Optional back button to render in editor header
+ * @param {Object}    props                   Component props
+ * @param {string}    props.postType          Optional post type to edit. If not provided, resolves to homepage.
+ * @param {string}    props.postId            Optional post ID to edit. If not provided, resolves to homepage.
+ * @param {Object}    props.settings          Optional extra settings to merge with editor settings
+ * @param {ReactNode} props.backButton        Optional back button to render in editor header
+ * @param {Function}  props.onActionPerformed Optional callback run after a post action
  * @return The editor component with loading states
  */
 export function Editor( {
@@ -44,6 +35,7 @@ export function Editor( {
 	postId,
 	settings,
 	backButton,
+	onActionPerformed,
 }: EditorProps ) {
 	// Resolve homepage when no postType/postId provided
 	const homePage = useSelect(
@@ -120,6 +112,7 @@ export function Editor( {
 			templateId={ templateId }
 			settings={ finalSettings }
 			styles={ finalSettings.styles }
+			onActionPerformed={ onActionPerformed }
 		>
 			{ backButton && <BackButton>{ backButton }</BackButton> }
 		</PrivateEditor>

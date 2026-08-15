@@ -1,14 +1,6 @@
 // CSS Baseline 2024 stepped-value functions not yet recognized by Stylelint.
 const CSS_BASELINE_2024_FUNCTIONS = [ 'round', 'rem', 'mod' ];
 
-const SELECTOR_CLASS_PATTERN = [
-	'^[a-z][a-z0-9]*(?:(?:__|--|-)[a-z0-9]+)*$',
-	{
-		message:
-			'Selector should use lowercase class segments separated with hyphens, double hyphens, or double underscores (selector-class-pattern)',
-	},
-];
-
 /** @type {import('stylelint').Config} */
 module.exports = {
 	extends: '@wordpress/stylelint-config/scss-stylistic',
@@ -16,6 +8,7 @@ module.exports = {
 		'stylelint-plugin-logical-css',
 		'@wordpress/theme/stylelint-plugins/no-token-fallback-values',
 	],
+	reportNeedlessDisables: true,
 	rules: {
 		'at-rule-empty-line-before': null,
 		'at-rule-no-unknown': null,
@@ -31,11 +24,26 @@ module.exports = {
 		],
 		'declaration-property-value-disallowed-list': [
 			{
-				'/.*/': [ '/--wp-components-color-/' ],
+				'/.*/': [
+					'/--wp-components-color-/',
+					'/\\$font-weight-regular/',
+					'/\\$font-weight-medium/',
+				],
 				cursor: [ 'pointer' ],
 			},
 			{
 				message: ( property, value ) => {
+					if (
+						value.includes( '$font-weight-regular' ) ||
+						value.includes( '$font-weight-medium' )
+					) {
+						const variable = value.includes(
+							'$font-weight-regular'
+						)
+							? '$font-weight-regular'
+							: '$font-weight-medium';
+						return `\`${ variable }\` has been removed. Use \`var(--wpds-typography-font-weight-default)\` or \`var(--wpds-typography-font-weight-emphasis)\` based on the intended emphasis.`;
+					}
 					if ( property === 'cursor' ) {
 						return 'Use the `var( --wpds-cursor-control )` token for interactive non-link controls. If this is for a link, you can disable this rule.';
 					}
@@ -54,7 +62,13 @@ module.exports = {
 			},
 		],
 		'rule-empty-line-before': null,
-		'selector-class-pattern': null,
+		'selector-class-pattern': [
+			'^[a-z][a-z0-9]*(?:(?:__|--|-)[a-z0-9]+)*$',
+			{
+				message:
+					'Selector should use lowercase class segments separated with hyphens, double hyphens, or double underscores (selector-class-pattern)',
+			},
+		],
 		'value-keyword-case': null,
 		'scss/operator-no-unspaced': null,
 		'scss/selector-no-redundant-nesting-selector': null,
@@ -152,16 +166,6 @@ module.exports = {
 						],
 					},
 				],
-			},
-		},
-		{
-			files: [
-				'packages/components/src/**/*.module.{css,scss}',
-				'packages/theme/src/**/*.module.{css,scss}',
-				'packages/ui/src/**/*.module.{css,scss}',
-			],
-			rules: {
-				'selector-class-pattern': SELECTOR_CLASS_PATTERN,
 			},
 		},
 	],

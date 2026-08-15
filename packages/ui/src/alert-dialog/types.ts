@@ -1,6 +1,5 @@
 import type { AlertDialog as _AlertDialog } from '@base-ui/react/alert-dialog';
 import type { ReactElement, ReactNode } from 'react';
-
 import type { ComponentProps } from '../utils/types';
 
 export type PortalProps = ComponentProps< typeof _AlertDialog.Portal >;

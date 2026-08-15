@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { TextareaControl } from '@wordpress/components';
 import type { Attachment, Updatable } from '@wordpress/core-data';
 import type { Field } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import { getRawContent } from '../utils/get-raw-content';
 
 const captionField: Partial< Field< Updatable< Attachment > > > = {

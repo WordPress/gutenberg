@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useMemo, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import * as styles from '../styles';
 import { parseQuantityAndUnitFromRawValue } from '../../unit-control/utils';
 import type { WordPressComponentProps } from '../../context';
@@ -130,10 +123,11 @@ export function useBorderControl(
 		wrapperWidth = '116px';
 	}
 	const innerWrapperClassName = useMemo( () => {
-		const widthStyle = !! wrapperWidth && styles.wrapperWidth;
-		const heightStyle = styles.wrapperHeight;
-
-		return cx( styles.innerWrapper(), widthStyle, heightStyle );
+		return cx(
+			styles.getInnerWrapperStyles( {
+				hasWidth: !! wrapperWidth,
+			} )
+		);
 	}, [ wrapperWidth, cx ] );
 
 	const sliderClassName = useMemo( () => {

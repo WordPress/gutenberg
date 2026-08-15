@@ -1,9 +1,15 @@
 const jsxRuntime = require( 'react/jsx-runtime' );
+const { warnCompat } = require( './warn-compat' );
 
 function applyDefaultProps( type, config ) {
 	if ( ! type || ! type.defaultProps ) {
 		return config;
 	}
+
+	warnCompat(
+		'jsx-default-props',
+		'`defaultProps` on function components was removed in React 19 and is emulated by a compatibility polyfill. Use default parameters instead.'
+	);
 
 	const defaultProps = type.defaultProps;
 	let props = config;

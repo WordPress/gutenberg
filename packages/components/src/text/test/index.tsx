@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { getFontSize } from '../../utils/font-size';
 import { COLORS } from '../../utils';
 import { Text } from '../';
@@ -103,6 +96,23 @@ describe( 'Text', () => {
 		);
 		expect( screen.getByRole( 'heading' ) ).toHaveStyle( {
 			color: 'rgb(255, 165, 0)',
+		} );
+	} );
+
+	test( 'should render variant color regardless of Emotion insertion order', () => {
+		render(
+			<>
+				<Text role="note" variant="muted">
+					Primer.
+				</Text>
+				<Text role="heading" color="orange" variant="muted">
+					Lorem ipsum.
+				</Text>
+			</>
+		);
+
+		expect( screen.getByRole( 'heading' ) ).toHaveStyle( {
+			color: COLORS.theme.gray[ 700 ],
 		} );
 	} );
 

@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { Button, Dropdown } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { default as PostFormatForm, POST_FORMATS } from './';
 import PostFormatCheck from './check';
 import PostPanelRow from '../post-panel-row';

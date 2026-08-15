@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __, _x } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import AuthorSelect from './author-select';
 import CategorySelect from './category-select';
 import FormTokenField from '../form-token-field';
@@ -103,7 +96,6 @@ export function QueryControls( {
 			{ [
 				onOrderChange && onOrderByChange && (
 					<SelectControl
-						__next40pxDefaultSize
 						key="query-controls-order-select"
 						label={ __( 'Order by' ) }
 						value={
@@ -151,7 +143,6 @@ export function QueryControls( {
 					props.categorySuggestions &&
 					props.onCategoryChange && (
 						<FormTokenField
-							__next40pxDefaultSize
 							key="query-controls-categories-select"
 							label={ __( 'Categories' ) }
 							value={
@@ -161,7 +152,7 @@ export function QueryControls( {
 									// Keeping the fallback to `item.value` for legacy reasons,
 									// even if items of `selectedCategories` should not have a
 									// `value` property.
-									// @ts-expect-error
+									// @ts-expect-error `value` does not exist on `Category`.
 									value: item.name || item.value,
 								} ) )
 							}
@@ -184,7 +175,6 @@ export function QueryControls( {
 				),
 				onNumberOfItemsChange && (
 					<RangeControl
-						__next40pxDefaultSize
 						key="query-controls-range-control"
 						label={ __( 'Number of items' ) }
 						value={ numberOfItems }

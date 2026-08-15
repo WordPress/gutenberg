@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { format } from 'util';
 import glob from 'fast-glob';
-
-/**
- * WordPress dependencies
- */
 import prettierConfig from '@wordpress/prettier-config';
 import {
 	getBlockTypes,
@@ -19,10 +12,6 @@ import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
-
-/**
- * Internal dependencies
- */
 import {
 	blockNameToFixtureBasename,
 	getAvailableBlockFixturesBasenames,
@@ -49,6 +38,7 @@ const normalizeParsedBlocks = ( blocks ) =>
 		isValid: block.isValid,
 		attributes: JSON.parse( JSON.stringify( block.attributes ) ),
 		innerBlocks: normalizeParsedBlocks( block.innerBlocks ),
+		...( block.innerContent ? { innerContent: block.innerContent } : {} ),
 	} ) );
 
 describe( 'full post content fixture', () => {

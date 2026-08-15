@@ -9,9 +9,6 @@ With `BlockControls`, you can customize the toolbar to include controls specific
 ## Usage
 
 ```jsx
-/**
- * WordPress dependencies
- */
 import {
 	BlockControls,
 	__experimentalBlockAlignmentMatrixControl as BlockAlignmentMatrixControl,

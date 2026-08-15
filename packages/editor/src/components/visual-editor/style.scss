@@ -34,11 +34,8 @@
 		padding-right: $grid-unit-30;
 	}
 
-	// In the iframed canvas this keeps extra scrollbars from appearing (when block toolbars overflow). In the
-	// legacy (non-iframed) canvas, overflow must not be hidden in order to maintain support for sticky positioning.
-	&.is-iframed {
-		overflow: hidden;
-	}
+	// Keeps extra scrollbars from appearing when block toolbars overflow.
+	overflow: hidden;
 
 	// The button element easily inherits styles that are meant for the editor style.
 	// These rules enhance the specificity to reduce that inheritance.
