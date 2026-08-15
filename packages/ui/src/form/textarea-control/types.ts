@@ -1,4 +1,5 @@
-import type { TextareaProps } from '../primitives/textarea/types';
+import type { Textarea } from '../primitives';
 import type { ControlProps } from '../types';
 
-export type TextareaControlProps = TextareaProps & ControlProps;
+export type TextareaControlProps = React.ComponentProps< typeof Textarea > &
+	ControlProps;
