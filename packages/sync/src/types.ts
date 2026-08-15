@@ -107,6 +107,12 @@ export interface ProviderCreatorOptions {
 	objectId: ObjectID | null;
 	ydoc: Y.Doc;
 	awareness?: Awareness;
+
+	/**
+	 * The Yjs instance backing `ydoc`. Separately bundled providers must use
+	 * it instead of their own copy: https://github.com/yjs/yjs/issues/438
+	 */
+	Y: typeof Y;
 }
 
 export type ProviderCreator = (

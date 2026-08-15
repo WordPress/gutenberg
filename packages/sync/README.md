@@ -32,7 +32,7 @@ Private @wordpress/sync APIs.
 
 Yjs should not be considered a public API. It is a third-party library that _will_ experience breaking changes in the future. It is re-exported here so that internal `@wordpress/*` consumers of this bundled package have a single import path for Yjs.
 
-Note: this package is bundled into its consumers, so each consumer ends up with its own copy of Yjs. Sharing Yjs documents across separately-bundled scripts is not supported — see <https://github.com/yjs/yjs/issues/438>.
+Note: this package is bundled into its consumers, so each consumer ends up with its own copy of Yjs. A separately-bundled script must never import its own Yjs to work with a shared document — see <https://github.com/yjs/yjs/issues/438>. Sync providers receive the Yjs instance backing the document as the `Y` option of their creator function.
 
 ### YJS_VERSION
 

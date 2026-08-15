@@ -5,8 +5,10 @@
  * import path for Yjs.
  *
  * Note: this package is bundled into its consumers, so each consumer ends up
- * with its own copy of Yjs. Sharing Yjs documents across separately-bundled
- * scripts is not supported — see https://github.com/yjs/yjs/issues/438.
+ * with its own copy of Yjs. A separately-bundled script must never import its
+ * own Yjs to work with a shared document — see
+ * https://github.com/yjs/yjs/issues/438. Sync providers receive the Yjs
+ * instance backing the document as the `Y` option of their creator function.
  */
 export * as Y from 'yjs';
 
