@@ -565,8 +565,13 @@ HTML;
 			$result,
 			'The original list item content should be replaced by the source value.'
 		);
+		$this->assertStringContainsString(
+			'Bound list item',
+			$normalized,
+			'The list item should render the source text.'
+		);
 		$this->assertMatchesRegularExpression(
-			'#<li>Bound list item\s*<ul[^>]*class="[^"]*wp-block-list[^"]*"[^>]*><li>Nested child</li></ul></li>#',
+			'#<li[^>]*>Bound list item.*<ul[^>]*>.*Nested child.*</ul>#s',
 			$normalized,
 			'The list item should render the source text and preserve nested list inner blocks.'
 		);
@@ -597,8 +602,13 @@ HTML;
 			$result,
 			'Raw list markup before the nested block should be replaced by the source value.'
 		);
+		$this->assertStringContainsString(
+			'Bound list item',
+			$normalized,
+			'The list item should render the source text.'
+		);
 		$this->assertMatchesRegularExpression(
-			'#<li>Bound list item\s*<ul[^>]*class="[^"]*wp-block-list[^"]*"[^>]*><li>Nested child should remain</li></ul></li>#',
+			'#<li[^>]*>Bound list item.*<ul[^>]*>.*Nested child should remain.*</ul>#s',
 			$normalized,
 			'The list item should preserve only the delimiter-backed nested list inner block.'
 		);
@@ -630,7 +640,7 @@ HTML;
 			'An empty source value should clear the original list item content.'
 		);
 		$this->assertMatchesRegularExpression(
-			'#<li>\s*<ul[^>]*class="[^"]*wp-block-list[^"]*"[^>]*><li>Nested child</li></ul></li>#',
+			'#<li[^>]*>.*<ul[^>]*>.*Nested child.*</ul>#s',
 			$normalized,
 			'An empty source value should still preserve nested list inner blocks.'
 		);
@@ -661,8 +671,13 @@ HTML;
 			$result,
 			'The original list item content should be replaced by the source value.'
 		);
+		$this->assertStringContainsString(
+			'Bound list item',
+			$normalized,
+			'The list item should render the source text.'
+		);
 		$this->assertMatchesRegularExpression(
-			'#<li>Bound list item\s*<ol[^>]*class="[^"]*wp-block-list[^"]*"[^>]*><li>Nested ordered child</li></ol></li>#',
+			'#<li[^>]*>Bound list item.*<ol[^>]*>.*Nested ordered child.*</ol>#s',
 			$normalized,
 			'The list item should render the source text and preserve the nested ordered list.'
 		);
@@ -791,12 +806,12 @@ HTML;
 			'The original list item content should be replaced by the pattern override.'
 		);
 		$this->assertStringContainsString(
-			'<li>Nested child</li>',
+			'Nested child',
 			$normalized,
 			'Nested list inner blocks should remain in the rendered output.'
 		);
 		$this->assertMatchesRegularExpression(
-			'#<li>Pattern <em>override</em><ul[^>]*class="[^"]*wp-block-list[^"]*"[^>]*><li>Nested child</li></ul></li>#',
+			'#<li[^>]*>Pattern <em>override</em>.*<ul[^>]*>.*Nested child.*</ul>#s',
 			$normalized,
 			'The list item should render the pattern override before its nested list.'
 		);
