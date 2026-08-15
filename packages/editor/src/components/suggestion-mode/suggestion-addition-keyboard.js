@@ -2,6 +2,8 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { pasteHandler } from '@wordpress/blocks';
+import { create, concat, toHTMLString } from '@wordpress/rich-text';
 import { unlock } from '../../lock-unlock';
 import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
 import { INLINE_OP_TYPE, useSuggestionsProvider } from './provider';
@@ -22,6 +24,85 @@ import {
 	readEventRange,
 } from './keyboard-target';
 import { isPartOfPendingInsertion } from './store-interceptor';
+
+/**
+ * @typedef {Object} RunSegment
+ * @property {string}  text   Plain text of the segment.
+ * @property {?string} [html] Rich HTML when the segment carries inline formats.
+ */
+
+/**
+ * Collapse the segments buffered for an addition run into the value to insert.
+ * A run is normally one typed character or one pasted string, but characters
+ * typed while the note request is in flight queue up behind it, so a rich paste
+ * and plain typing can end up in the same marker.
+ *
+ * `html` is null unless at least one segment carried formatting, which keeps the
+ * plain-typing path on the exact same insertion it always used.
+ *
+ * @param {RunSegment[]} segments Buffered segments, in entry order.
+ * @return {{ text: string, html: ?string }} The combined run.
+ */
+function mergeRunSegments( segments ) {
+	let record = create();
+	let hasHTML = false;
+	for ( const segment of segments ) {
+		if ( segment.html ) {
+			hasHTML = true;
+			record = concat( record, create( { html: segment.html } ) );
+		} else {
+			record = concat( record, create( { text: segment.text ?? '' } ) );
+		}
+	}
+	return {
+		text: record.text,
+		html: hasHTML ? toHTMLString( { value: record } ) : null,
+	};
+}
+
+/**
+ * The inline HTML a paste should propose, or null when it carries no formatting
+ * worth keeping.
+ *
+ * Externally copied markup runs through `pasteHandler` in `INLINE` mode — the
+ * same sanitizer the editor's own paste pipeline uses — so a suggested paste
+ * proposes exactly what a paste outside Suggest mode would have inserted.
+ * Content copied from another rich text in this editor is already clean and is
+ * used as-is, matching `RichText`'s own internal-paste shortcut.
+ *
+ * @param {?DataTransfer} clipboardData Clipboard payload from the paste event.
+ * @param {string}        plainText     The paste's plain-text flavour.
+ * @return {?string} Inline HTML to insert, or null to fall back to plain text.
+ */
+function readInlinePasteHTML( clipboardData, plainText ) {
+	let html = '';
+	try {
+		html = clipboardData?.getData?.( 'text/html' ) ?? '';
+	} catch {
+		// Browsers that expose no clipboard flavours paste plain text anyway.
+		return null;
+	}
+	if ( ! html ) {
+		return null;
+	}
+	const isInternal = clipboardData?.getData?.( 'rich-text' ) === 'true';
+	const inline = isInternal
+		? html
+		: pasteHandler( { HTML: html, plainText, mode: 'INLINE' } );
+	if ( typeof inline !== 'string' || ! inline ) {
+		return null;
+	}
+	const record = create( { html: inline } );
+	if ( ! record.text || /[\r\n]/.test( record.text ) ) {
+		// Only simple inline pastes are owned here; see `onPaste`.
+		return null;
+	}
+	const carriesFormats = Array.from( { length: record.text.length } ).some(
+		( _, index ) => record.formats[ index ]?.length
+	);
+	// Nothing to preserve: the plain-text path produces the same run.
+	return carriesFormats ? inline : null;
+}
 
 /**
  * Turn typing (and simple paste) in Suggest mode into an inline addition
@@ -45,11 +126,13 @@ import { isPartOfPendingInsertion } from './store-interceptor';
  * - A simple single-line paste is handled on the `paste` event (capture phase,
  *   ahead of the editor's own paste pipeline) and inserted exactly like typed
  *   text; over a selection it is a type-over. Multi-line / block-level paste is
- *   left to the editor's paste pipeline.
+ *   left to the editor's paste pipeline. Inline formatting the paste carries
+ *   (bold, links) survives: the clipboard HTML goes through the same
+ *   `pasteHandler` sanitizer the editor uses outside Suggest mode, and the
+ *   result is inserted inside the `add` marker instead of being flattened.
  *
  * Out of scope for now (left to the existing overlay/diff path): IME
- * composition, and rich/inline formatting carried by a paste (the pasted text
- * is inserted as a plain `add` run).
+ * composition.
  *
  * @return {null} Renders nothing.
  */
@@ -130,7 +213,7 @@ export default function SuggestionAdditionKeyboard() {
 	// then add the replacement at the selection end); a collapsed range is a
 	// plain insertion. The run stays open so contiguous typing can grow it.
 	const beginInsertion = useCallback(
-		async ( clientId, attributeKey, start, end, text ) => {
+		async ( clientId, attributeKey, start, end, segment ) => {
 			const isTypeOver = start !== end;
 			const markerStart = isTypeOver ? end : start;
 			const run = {
@@ -139,7 +222,7 @@ export default function SuggestionAdditionKeyboard() {
 				id: null,
 				start: markerStart,
 				end: markerStart,
-				pending: text,
+				pending: [ segment ],
 			};
 			runRef.current = run;
 			/*
@@ -192,9 +275,9 @@ export default function SuggestionAdditionKeyboard() {
 					resetRun();
 					return;
 				}
-				const buffered = run.pending;
+				const buffered = mergeRunSegments( run.pending );
 				run.id = addId;
-				run.pending = '';
+				run.pending = [];
 				/*
 				 * Compose the whole gesture into ONE content value — the `del`
 				 * marker over the replaced range plus the addition run — and
@@ -223,7 +306,8 @@ export default function SuggestionAdditionKeyboard() {
 					}
 				}
 				const inserted = insertInlineAddition( value, {
-					text: buffered,
+					text: buffered.text,
+					html: buffered.html,
 					attributes: buildSuggestionMarkerAttributes( {
 						id: addId,
 						type: SUGGESTION_TYPE_ADDITION,
@@ -232,7 +316,7 @@ export default function SuggestionAdditionKeyboard() {
 					start: run.start,
 					end: run.start,
 				} );
-				run.end = run.start + buffered.length;
+				run.end = run.start + buffered.text.length;
 				commit( clientId, attributeKey, inserted, run.end );
 			} catch {
 				// `createSuggestion` already surfaces a notice on failure; drop
@@ -254,10 +338,12 @@ export default function SuggestionAdditionKeyboard() {
 	);
 
 	/*
-	 * Route a unit of inserted text (a typed character or a pasted run) to the
-	 * right place: buffer it while a note request is in flight, grow the open
-	 * marker when the caret is still at its trailing edge, or start a new run.
-	 * `allowGrow` is false for paste so a pasted run is always its own marker.
+	 * Route a unit of inserted content (a typed character or a pasted run,
+	 * described by a `RunSegment`) to the right place: buffer it while a note
+	 * request is in flight, grow the open marker when the caret is still at its
+	 * trailing edge, or start a new run. `allowGrow` is false for paste so a
+	 * pasted run is always its own marker — which also means a run only ever
+	 * grows by plain typed text.
 	 *
 	 * Returns whether the input was consumed. Callers must only cancel the
 	 * native edit when this returns true — when no valid single-attribute
@@ -269,7 +355,8 @@ export default function SuggestionAdditionKeyboard() {
 	 * identification because its offsets lag the DOM under fast typing.
 	 */
 	const insertText = useCallback(
-		( text, allowGrow, domRange ) => {
+		( segment, allowGrow, domRange ) => {
+			const text = segment.text;
 			const caret = readInlineCaret( getSelectionStart, getSelectionEnd );
 			const inFlight = runRef.current;
 			if ( inFlight && inFlight.id === null ) {
@@ -289,7 +376,7 @@ export default function SuggestionAdditionKeyboard() {
 					caret.clientId === inFlight.clientId &&
 					caret.attributeKey === inFlight.attributeKey
 				) {
-					inFlight.pending += text;
+					inFlight.pending.push( segment );
 					return true;
 				}
 				resetRun();
@@ -373,7 +460,7 @@ export default function SuggestionAdditionKeyboard() {
 				return true;
 			}
 
-			beginInsertion( clientId, attributeKey, start, end, text );
+			beginInsertion( clientId, attributeKey, start, end, segment );
 			return true;
 		},
 		[
@@ -421,7 +508,7 @@ export default function SuggestionAdditionKeyboard() {
 			 * — a preventDefault without a subsequent write would silently
 			 * drop the typed character.
 			 */
-			if ( insertText( text, true, readEventRange( event ) ) ) {
+			if ( insertText( { text }, true, readEventRange( event ) ) ) {
 				event.preventDefault();
 			}
 		},
@@ -455,7 +542,11 @@ export default function SuggestionAdditionKeyboard() {
 			 */
 			// A clipboard event exposes no target ranges; `readEventRange`
 			// falls back to the live DOM selection.
-			if ( insertText( plain, false, readEventRange( event ) ) ) {
+			const segment = {
+				text: plain,
+				html: readInlinePasteHTML( event.clipboardData, plain ),
+			};
+			if ( insertText( segment, false, readEventRange( event ) ) ) {
 				event.preventDefault();
 				event.stopImmediatePropagation();
 			}
