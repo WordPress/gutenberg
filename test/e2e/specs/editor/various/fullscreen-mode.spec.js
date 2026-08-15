@@ -33,6 +33,15 @@ function getSiteEditorOpenNavigationButton( page ) {
 	} );
 }
 
+function getFirstDocumentTool( page ) {
+	// With "Show button text labels" on, the inserter's accessible name is
+	// "Add" rather than "Block Inserter".
+	return getEditorTopBar( page )
+		.getByRole( 'toolbar', { name: 'Document tools' } )
+		.getByRole( 'button' )
+		.first();
+}
+
 test.describe( 'Fullscreen Mode', () => {
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllPosts();
@@ -115,10 +124,7 @@ test.describe( 'Fullscreen Mode', () => {
 
 			await expectBackButtonNotObscured(
 				backButton,
-				getEditorTopBar( page ).getByRole( 'button', {
-					name: 'Block Inserter',
-					exact: true,
-				} )
+				getFirstDocumentTool( page )
 			);
 		} );
 	} );
@@ -143,10 +149,7 @@ test.describe( 'Fullscreen Mode', () => {
 
 		await expectBackButtonNotObscured(
 			backLink,
-			getEditorTopBar( page ).getByRole( 'button', {
-				name: 'Block Inserter',
-				exact: true,
-			} )
+			getFirstDocumentTool( page )
 		);
 	} );
 } );
