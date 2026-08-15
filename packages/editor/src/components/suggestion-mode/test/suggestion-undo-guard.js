@@ -1,11 +1,9 @@
-import { findNewestWithdrawableSuggestion } from '../suggestion-undo-guard';
+import { findNewestPendingSuggestion } from '../suggestion-undo-guard';
 
-describe( 'findNewestWithdrawableSuggestion', () => {
+describe( 'findNewestPendingSuggestion', () => {
 	it( 'returns null when nothing is pending', () => {
-		expect( findNewestWithdrawableSuggestion( {}, null ) ).toBeNull();
-		expect(
-			findNewestWithdrawableSuggestion( undefined, null )
-		).toBeNull();
+		expect( findNewestPendingSuggestion( {}, null ) ).toBeNull();
+		expect( findNewestPendingSuggestion( undefined, null ) ).toBeNull();
 	} );
 
 	it( 'ignores entries whose overlay equals their baseline', () => {
@@ -16,7 +14,7 @@ describe( 'findNewestWithdrawableSuggestion', () => {
 				lastEditSeq: 5,
 			},
 		};
-		expect( findNewestWithdrawableSuggestion( entries, null ) ).toBeNull();
+		expect( findNewestPendingSuggestion( entries, null ) ).toBeNull();
 	} );
 
 	it( 'ignores unstamped attribute entries', () => {
@@ -26,7 +24,7 @@ describe( 'findNewestWithdrawableSuggestion', () => {
 				overlayAttributes: { level: 3 },
 			},
 		};
-		expect( findNewestWithdrawableSuggestion( entries, null ) ).toBeNull();
+		expect( findNewestPendingSuggestion( entries, null ) ).toBeNull();
 	} );
 
 	it( 'picks the most recently edited pending attribute entry', () => {
@@ -42,7 +40,7 @@ describe( 'findNewestWithdrawableSuggestion', () => {
 				lastEditSeq: 8,
 			},
 		};
-		expect( findNewestWithdrawableSuggestion( entries, null ) ).toEqual( {
+		expect( findNewestPendingSuggestion( entries, null ) ).toEqual( {
 			kind: 'attribute',
 			clientId: 'block-2',
 			entry: entries[ 'block-2' ],
@@ -64,9 +62,7 @@ describe( 'findNewestWithdrawableSuggestion', () => {
 				metadata: { suggestion: { type: 'pending-move' } },
 			} ),
 		};
-		expect(
-			findNewestWithdrawableSuggestion( entries, withMarker )
-		).toEqual( {
+		expect( findNewestPendingSuggestion( entries, withMarker ) ).toEqual( {
 			kind: 'structural',
 			clientId: 'block-1',
 			entry: entries[ 'block-1' ],
@@ -79,11 +75,11 @@ describe( 'findNewestWithdrawableSuggestion', () => {
 			getBlockAttributes: () => ( { metadata: {} } ),
 		};
 		expect(
-			findNewestWithdrawableSuggestion( entries, withoutMarker )
+			findNewestPendingSuggestion( entries, withoutMarker )
 		).toBeNull();
 	} );
 
-	it( 'leaves block-remove suggestions to the real undo stack', () => {
+	it( 'marks a block-remove as owned by the real undo stack', () => {
 		const entries = {
 			'block-1': {
 				baselineAttributes: {},
@@ -98,8 +94,40 @@ describe( 'findNewestWithdrawableSuggestion', () => {
 			} ),
 		};
 		expect(
-			findNewestWithdrawableSuggestion( entries, blockEditor )
-		).toBeNull();
+			findNewestPendingSuggestion( entries, blockEditor )
+		).toMatchObject( { kind: 'history', clientId: 'block-1', seq: 9 } );
+	} );
+
+	it( 'lets a stale block-remove fall away once its marker is gone', () => {
+		const entries = {
+			'block-1': {
+				baselineAttributes: {},
+				overlayAttributes: {},
+				structuralOp: { type: 'block-remove' },
+				structuralOpSeq: 9,
+			},
+			'block-2': {
+				baselineAttributes: {},
+				overlayAttributes: {},
+				structuralOp: { type: 'block-insert-after' },
+				structuralOpSeq: 4,
+			},
+		};
+		// The removal has already been reverted through history; only the
+		// insertion still carries a live marker.
+		const blockEditor = {
+			getBlockAttributes: ( clientId ) =>
+				clientId === 'block-2'
+					? {
+							metadata: {
+								suggestion: { type: 'pending-insert' },
+							},
+					  }
+					: { metadata: {} },
+		};
+		expect(
+			findNewestPendingSuggestion( entries, blockEditor )
+		).toMatchObject( { kind: 'structural', clientId: 'block-2', seq: 4 } );
 	} );
 
 	it( 'orders attribute and structural candidates by capture sequence', () => {
@@ -122,7 +150,69 @@ describe( 'findNewestWithdrawableSuggestion', () => {
 			} ),
 		};
 		expect(
-			findNewestWithdrawableSuggestion( entries, blockEditor )
+			findNewestPendingSuggestion( entries, blockEditor )
 		).toMatchObject( { kind: 'attribute', clientId: 'block-1' } );
+	} );
+
+	it( 'lets a newer block-remove shadow an older withdrawable suggestion', () => {
+		const entries = {
+			'inserted-block': {
+				baselineAttributes: {},
+				overlayAttributes: {},
+				structuralOp: { type: 'block-insert-after' },
+				structuralOpSeq: 4,
+			},
+			'doomed-block': {
+				baselineAttributes: {},
+				overlayAttributes: {},
+				structuralOp: { type: 'block-remove' },
+				structuralOpSeq: 5,
+			},
+		};
+		const blockEditor = {
+			getBlockAttributes: ( clientId ) => ( {
+				metadata: {
+					suggestion: {
+						type:
+							clientId === 'doomed-block'
+								? 'pending-remove'
+								: 'pending-insert',
+					},
+				},
+			} ),
+		};
+		// Newest-first: the removal is the newer action, so the guard must
+		// report it rather than the insertion it could withdraw itself.
+		expect(
+			findNewestPendingSuggestion( entries, blockEditor )
+		).toMatchObject( {
+			kind: 'history',
+			clientId: 'doomed-block',
+			seq: 5,
+		} );
+	} );
+
+	it( 'lets a newer block-remove shadow an older attribute suggestion', () => {
+		const entries = {
+			'heading-block': {
+				baselineAttributes: { level: 2 },
+				overlayAttributes: { level: 3 },
+				lastEditSeq: 4,
+			},
+			'doomed-block': {
+				baselineAttributes: {},
+				overlayAttributes: {},
+				structuralOp: { type: 'block-remove' },
+				structuralOpSeq: 5,
+			},
+		};
+		const blockEditor = {
+			getBlockAttributes: () => ( {
+				metadata: { suggestion: { type: 'pending-remove' } },
+			} ),
+		};
+		expect(
+			findNewestPendingSuggestion( entries, blockEditor )
+		).toMatchObject( { kind: 'history', clientId: 'doomed-block' } );
 	} );
 } );

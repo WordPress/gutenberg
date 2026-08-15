@@ -32,7 +32,9 @@
  *     marker), as history-ignored writes so the withdrawal can't itself be
  *     undone into a resurrected marker. `SuggestionNoteGC` observes the
  *     anchor disappearing and trashes the note. Suggested removals instead
- *     revert cleanly through the real undo stack (see PENDING_MARKER_BY_OP).
+ *     revert cleanly through the real undo stack (see HISTORY_OWNED_OPS), and
+ *     while one is pending and newest the guard stands aside entirely so undo
+ *     keeps running newest-first.
  *   - Otherwise (inline text/format markers live in block content and undo
  *     cleanly) it arms an "adoption token" (see overlay-context) and lets
  *     the real undo run. The store interceptor consumes the token when the
@@ -62,35 +64,51 @@ import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
 import { unlock } from '../../lock-unlock';
 
 /*
- * Structural ops the guard withdraws itself. `block-remove` is deliberately
- * absent: undoing a suggested removal reverts cleanly through the real undo
- * stack — the history transaction replaces the re-inserted block wholesale,
- * taking the marker and the async note linkage with it, and consuming the
- * history item keeps a follow-up undo stepping into older changes. Moves and
- * insertions leave the block alive across the transaction, where the
- * history-ignored linkage write resurrects the marker — those are withdrawn
- * here instead.
+ * The pending marker each structural op leaves on its block. A candidate whose
+ * marker is gone has already been resolved or withdrawn, so the overlay entry
+ * behind it is stale.
  */
 const PENDING_MARKER_BY_OP = {
 	'block-insert-after': 'pending-insert',
 	'block-move': 'pending-move',
+	'block-remove': 'pending-remove',
 };
 
+/*
+ * Structural ops the real undo stack owns rather than the guard. Undoing a
+ * suggested removal reverts cleanly through history - the transaction replaces
+ * the re-inserted block wholesale, taking the marker and the async note linkage
+ * with it, and leaving the history item unconsumed keeps a follow-up undo
+ * stepping into older changes. Moves and insertions leave the block alive
+ * across the transaction, where the history-ignored linkage write resurrects
+ * the marker, so the guard withdraws those itself.
+ *
+ * These still take part in the newest-first ordering below: a pending removal
+ * that is newer than every withdrawable suggestion has to reach undo first, or
+ * an older suggestion jumps the queue and the stack stops matching the order
+ * the user worked in.
+ */
+const HISTORY_OWNED_OPS = new Set( [ 'block-remove' ] );
+
 /**
- * Find the pending suggestion the guard should withdraw on undo: the overlay
- * entry (attribute edit or structural op) with the highest capture sequence.
+ * Find the newest pending suggestion the overlay is holding: the entry
+ * (attribute edit or structural op) with the highest capture sequence.
  * Attribute candidates need a pending baseline-vs-overlay diff; structural
- * candidates need their pending marker still live on the block (an already
- * resolved or withdrawn op is stale overlay state, not a candidate).
+ * candidates need their pending marker still live on the block.
+ *
+ * The `kind` says who reverts it. `attribute` and `structural` are withdrawn by
+ * the guard; `history` means the newest suggestion belongs to the real undo
+ * stack, so the guard must stand aside rather than reach past it for an older
+ * one it could withdraw.
  *
  * @param {Object}      entries     Overlay entries keyed by clientId.
  * @param {Object|null} blockEditor Block-editor selectors; without them (unit
  *                                  tests, standalone) structural candidates
  *                                  are skipped.
- * @return {{kind: 'attribute'|'structural', clientId: string, entry: Object,
- * seq: number}|null} Newest withdrawable suggestion.
+ * @return {{kind: 'attribute'|'structural'|'history', clientId: string,
+ * entry: Object, seq: number}|null} Newest pending suggestion.
  */
-export function findNewestWithdrawableSuggestion( entries, blockEditor ) {
+export function findNewestPendingSuggestion( entries, blockEditor ) {
 	let newest = null;
 	for ( const [ clientId, entry ] of Object.entries( entries ?? {} ) ) {
 		if (
@@ -123,7 +141,9 @@ export function findNewestWithdrawableSuggestion( entries, blockEditor ) {
 				markerType === PENDING_MARKER_BY_OP[ entry.structuralOp.type ]
 			) {
 				newest = {
-					kind: 'structural',
+					kind: HISTORY_OWNED_OPS.has( entry.structuralOp.type )
+						? 'history'
+						: 'structural',
 					clientId,
 					entry,
 					seq: entry.structuralOpSeq,
@@ -274,11 +294,21 @@ export default function SuggestionUndoGuard() {
 		 * @return {boolean} True when the undo was consumed.
 		 */
 		const withdrawNewestSuggestion = () => {
-			const newest = findNewestWithdrawableSuggestion(
+			const newest = findNewestPendingSuggestion(
 				entriesRef.current,
 				registry.select( blockEditorStore )
 			);
-			if ( ! newest || newest.seq <= getLastContentCaptureSeq() ) {
+			/*
+			 * `history` kind: the newest suggestion is one the real undo stack
+			 * reverts. Standing aside is what keeps undo newest-first - reaching
+			 * past it for an older withdrawable suggestion would unwind the
+			 * user's actions out of order.
+			 */
+			if (
+				! newest ||
+				newest.kind === 'history' ||
+				newest.seq <= getLastContentCaptureSeq()
+			) {
 				return false;
 			}
 			if ( newest.kind === 'structural' ) {
