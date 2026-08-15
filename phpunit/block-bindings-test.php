@@ -571,7 +571,7 @@ HTML;
 			'The list item should render the source text.'
 		);
 		$this->assertMatchesRegularExpression(
-			'#<li[^>]*>Bound list item.*<ul[^>]*>.*Nested child.*</ul>#s',
+			'#<li[^>]*>\s*Bound list item.*<ul[^>]*>.*Nested child.*</ul>#s',
 			$normalized,
 			'The list item should render the source text and preserve nested list inner blocks.'
 		);
@@ -608,7 +608,7 @@ HTML;
 			'The list item should render the source text.'
 		);
 		$this->assertMatchesRegularExpression(
-			'#<li[^>]*>Bound list item.*<ul[^>]*>.*Nested child should remain.*</ul>#s',
+			'#<li[^>]*>\s*Bound list item.*<ul[^>]*>.*Nested child should remain.*</ul>#s',
 			$normalized,
 			'The list item should preserve only the delimiter-backed nested list inner block.'
 		);
@@ -677,7 +677,7 @@ HTML;
 			'The list item should render the source text.'
 		);
 		$this->assertMatchesRegularExpression(
-			'#<li[^>]*>Bound list item.*<ol[^>]*>.*Nested ordered child.*</ol>#s',
+			'#<li[^>]*>\s*Bound list item.*<ol[^>]*>.*Nested ordered child.*</ol>#s',
 			$normalized,
 			'The list item should render the source text and preserve the nested ordered list.'
 		);
@@ -810,8 +810,13 @@ HTML;
 			$normalized,
 			'Nested list inner blocks should remain in the rendered output.'
 		);
+		$this->assertStringContainsString(
+			'Pattern <em>override</em>',
+			$normalized,
+			'The list item should render the pattern override markup.'
+		);
 		$this->assertMatchesRegularExpression(
-			'#<li[^>]*>Pattern <em>override</em>.*<ul[^>]*>.*Nested child.*</ul>#s',
+			'#<li[^>]*>\s*Pattern <em>override</em>.*<ul[^>]*>.*Nested child.*</ul>#s',
 			$normalized,
 			'The list item should render the pattern override before its nested list.'
 		);
