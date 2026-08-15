@@ -496,18 +496,25 @@ export function getPostChangesFromCRDTDoc(
 	}
 
 	// When blocks changed but content didn't (the sender internally used a lazy
-	// serializer function), inject a closure that captures the synced blocks
-	// and serializes them on demand. Mirrors what useEntityBlockEditor does
-	// locally. A fresh function on every persistent edit marks the entity
-	// dirty (so the save button reactivates for peers), while serialization
-	// stays lazy (only runs when getEditedPostContent reads it). The closure
-	// captures `capturedBlocks` so the right content is returned even if the
-	// caller later clears `record.blocks` (e.g. the Code Editor re-parsing
-	// from content).
+	// serializer function), inject a closure that serializes the record's
+	// blocks on demand. Mirrors what useEntityBlockEditor does locally. A fresh
+	// function on every persistent edit marks the entity dirty (so the save
+	// button reactivates for peers), while serialization stays lazy (only runs
+	// when getEditedPostContent reads it).
+	//
+	// It reads the record it is handed rather than the synced blocks alone,
+	// because a later edit that writes `blocks` without writing `content` (any
+	// non-persistent block change - withdrawing a pending suggestion, say)
+	// would otherwise stay invisible to getEditedPostContent and to saving,
+	// which would put the stale blocks back on the server. `capturedBlocks` is
+	// the fallback for a caller that clears `record.blocks` (e.g. the Code
+	// Editor re-parsing from content).
 	if ( changes.blocks && ! changes.content ) {
 		const capturedBlocks = changes.blocks;
-		changes.content = () =>
-			__unstableSerializeAndClean( capturedBlocks as WPBlock[] );
+		changes.content = ( record?: { blocks?: Block[] } ) =>
+			__unstableSerializeAndClean(
+				( record?.blocks ?? capturedBlocks ) as WPBlock[]
+			);
 	}
 
 	// Meta changes must be merged with the edited record since not all meta

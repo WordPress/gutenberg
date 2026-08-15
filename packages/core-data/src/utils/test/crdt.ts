@@ -1121,7 +1121,7 @@ describe( 'crdt', () => {
 			expect( typeof changes.content ).toBe( 'function' );
 		} );
 
-		it( 'injected content function captures the synced blocks and ignores its caller-supplied argument', () => {
+		it( 'injected content function serializes the record it is handed, falling back to the synced blocks', () => {
 			addBlockToDoc( map, 'block-1', 'Hello world' );
 
 			const editedRecord = {
@@ -1137,21 +1137,27 @@ describe( 'crdt', () => {
 				defaultSyncedProperties
 			);
 
-			// The injected function takes no parameters and serializes the
-			// captured (synced) blocks. This is what makes getEditedPostContent
-			// keep working after the Code Editor clears `record.blocks` to force
-			// a re-parse: the closure already has the right blocks on hand.
-			//
 			// The mocked __unstableSerializeAndClean returns "serialized:<n>"
-			// where n is the length of the blocks it was called with. The
-			// captured blocks have one entry, so both calls below should yield
-			// "serialized:1" (proving the closure ignores its argument and
-			// uses the captured blocks instead).
+			// where n is the length of the blocks it was called with, and the
+			// captured (synced) blocks have one entry.
 			const contentFn = changes.content as ( args?: {
-				blocks: Block[];
+				blocks?: Block[];
 			} ) => string;
+
+			// A record with blocks wins: a later edit that writes `blocks`
+			// without writing `content` (any non-persistent block change) has
+			// to be what getEditedPostContent and saving see.
+			expect( contentFn( { blocks: [ {}, {}, {} ] as Block[] } ) ).toBe(
+				'serialized:3'
+			);
+			// Including an emptied one — no blocks left means no content.
+			expect( contentFn( { blocks: [] } ) ).toBe( 'serialized:0' );
+
+			// No blocks on the record: fall back to the captured ones. This is
+			// what makes getEditedPostContent keep working after the Code
+			// Editor clears `record.blocks` to force a re-parse.
 			expect( contentFn() ).toBe( 'serialized:1' );
-			expect( contentFn( { blocks: [] } ) ).toBe( 'serialized:1' );
+			expect( contentFn( {} ) ).toBe( 'serialized:1' );
 		} );
 
 		it( 'does not inject a content function when content also changed in the doc', () => {
