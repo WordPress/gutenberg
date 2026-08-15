@@ -30,6 +30,7 @@ export {
 	registerSuggestionFormat,
 	findSuggestionRange,
 	findSuggestionText,
+	getSuggestionMarkerSelector,
 } from './format';
 export { useAnnotateSuggestions } from './use-annotate-suggestions';
 export {
