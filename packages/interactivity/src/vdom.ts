@@ -114,7 +114,6 @@ export function toVdom( root: Node ): ComponentChild {
 		}
 
 		const elementNode = node as HTMLElement;
-		const { attributes } = elementNode;
 		const localName = elementNode.localName as keyof JSX.IntrinsicElements;
 
 		const props: Record< string, any > = {};
@@ -125,9 +124,16 @@ export function toVdom( root: Node ): ComponentChild {
 		let ignore = false;
 		let island = false;
 
-		for ( let i = 0; i < attributes.length; i++ ) {
-			const attributeName = attributes[ i ].name;
-			const attributeValue = attributes[ i ].value;
+		// `getAttributeNames()` copies the attribute names into a plain JS
+		// array, which is much faster than per-attribute access to the live
+		// NamedNodeMap (`attributes[ i ].name` / `.value`): each index access
+		// and property read crosses the JS/DOM boundary and may allocate an
+		// `Attr` wrapper object.
+		const attributeNames = elementNode.getAttributeNames();
+		for ( let i = 0; i < attributeNames.length; i++ ) {
+			const attributeName = attributeNames[ i ];
+			const attributeValue =
+				elementNode.getAttribute( attributeName ) ?? '';
 			if (
 				attributeName[ directivePrefix.length ] &&
 				attributeName.slice( 0, directivePrefix.length ) ===
