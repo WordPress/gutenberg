@@ -175,6 +175,10 @@ export function toVdom( root: Node ): ComponentChild {
 						directives.push( [ attributeName, namespace, value ] );
 					}
 				}
+				// Directive attributes are never boolean properties, so skip
+				// the boolean check below and assign the value directly.
+				props[ attributeName ] = attributeValue;
+				continue;
 			} else if ( attributeName === 'ref' ) {
 				continue;
 			}
