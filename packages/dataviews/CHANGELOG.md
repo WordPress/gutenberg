@@ -12,6 +12,7 @@
 -   Validated form controls: Align invalid focus styling for InputBase-based controls with the design system ([#80417](https://github.com/WordPress/gutenberg/pull/80417)).
 -   DataViews: Prevent the filter operator select focus ring from being clipped. [#80417](https://github.com/WordPress/gutenberg/pull/80417)
 -   DataForm: Send a single update per calendar interaction in the `datetime` control instead of two identical ones. Selecting or clearing a date now reveals the validation message by firing a synthetic `invalid` event on the input, rather than briefly moving focus into it and re-sending the value, and announces it to screen readers since focus stays on the calendar. [#81440](https://github.com/WordPress/gutenberg/pull/81440)
+- 	DataViews: Clarify the empty state when the current page is out of bounds ("No results on this page"), offer a "Go to first page" action, and keep the page switcher available when totals are known. [#80982](https://github.com/WordPress/gutenberg/pull/80982)
 
 ### Internal
 
@@ -53,7 +54,6 @@
 -   DataViews: Fix the `between` date filter discarding a manually entered `From`/`To` date on blur. The control now commits an incomplete range with an unfilled bound — which neither filters nor renders a chip — instead of waiting for both dates, so a typed date survives tabbing away and a range can be entered manually at all. [#81150](https://github.com/WordPress/gutenberg/pull/81150)
 -   DataViews: Render the filter chip for an incomplete `between` range as if no value were set — matching how the filter itself does not apply — instead of showing a dangling bound or the literal string "undefined". A `null` bound, produced when an unfilled bound round-trips through JSON persistence, is now treated as unfilled too. [#80830](https://github.com/WordPress/gutenberg/pull/80830)
 -   DataViews: Treat an empty value as valid in the `array` field type's built-in validation, matching the other field types — use the `required` rule to enforce non-empty values. Fields declaring `elements` still reject empty values. [#81378](https://github.com/WordPress/gutenberg/pull/81378)
--   DataViews: Clarify the empty state when the current page is out of bounds ("No results on this page"), offer a "Go to first page" action, and keep the page switcher available when totals are known. [#80982](https://github.com/WordPress/gutenberg/pull/80982)
 
 ### Internal
 
