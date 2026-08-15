@@ -90,23 +90,29 @@
 ### Internal
 
 -   Dependency updates ([#77954](https://github.com/WordPress/gutenberg/pull/77954)).
+-   Updated `diff` dependency from `^4.0.2` to `^8.0.3` ([#77992](https://github.com/WordPress/gutenberg/pull/77992)).
+
+### Enhancements
+
+-   Editor: Pause the client-side media upload queue while the browser is offline and resume it automatically when connectivity returns ([#76765](https://github.com/WordPress/gutenberg/pull/76765)).
+
+### Bug Fixes
+
+-   Template actions panel: Fix the keyboard activation of the "Change template" preview so it only opens the swap modal on <kbd>Enter</kbd> / <kbd>Space</kbd> ([#78641](https://github.com/WordPress/gutenberg/pull/78641)).
 
 ## 14.47.0 (2026-05-27)
 
 ### Enhancements
 
 -   Editor: Add padding around inline notices in the editor content area and distraction-free header.
--   Editor: Pause the client-side media upload queue while the browser is offline and resume it automatically when connectivity returns ([#76765](https://github.com/WordPress/gutenberg/pull/76765)).
 -   The Media Editor modal is now mounted unconditionally and the `openMediaEditorModal` setting is always provided to the block editor. Previously both were gated behind the `gutenberg-media-editor-modal` experiment, which has been removed.
 
 ### Bug Fixes
 
 -   `mediaFinalize` now returns the post-finalize attachment (transformed from the REST response), so the upload-media queue can refresh the in-flight attachment URL. Required for the front-end `srcset` to render on client-side-media uploads that exceeded the big-image threshold.
--   Template actions panel: Fix the keyboard activation of the "Change template" preview so it only opens the swap modal on <kbd>Enter</kbd> / <kbd>Space</kbd> ([#78641](https://github.com/WordPress/gutenberg/pull/78641)).
 
 ### Internal
 
--   Updated `diff` dependency from `^4.0.2` to `^8.0.3` ([#77992](https://github.com/WordPress/gutenberg/pull/77992)).
 
 ## 14.46.0 (2026-05-14)
 
@@ -133,6 +139,8 @@
 ## 14.39.0 (2026-01-29)
 
 ## 14.38.0 (2026-01-16)
+
+## 14.37.0 (2025-12-23)
 
 ## 14.36.0 (2025-11-26)
 
@@ -553,6 +561,11 @@
     -   getInserterItems,
     -   hasInserterItems,
     -   getBlockListSettings.
+-   `ServerSideRender` component was deprecated. The component is now available in `@wordpress/server-side-render`.
+
+### Internal
+
+-   Replace internal controls definitions with usage of new @wordpress/data-controls package (see [#15435](https://github.com/WordPress/gutenberg/pull/15435)
 
 ## 9.3.0 (2019-05-21)
 
@@ -560,13 +573,11 @@
 
 -   The `getAutosave`, `getAutosaveAttribute`, and `hasAutosave` selectors are deprecated. Please use the `getAutosave` selector in the `@wordpress/core-data` package.
 -   The `resetAutosave` action is deprecated. An equivalent action `receiveAutosaves` has been added to the `@wordpress/core-data` package.
--   `ServerSideRender` component was deprecated. The component is now available in `@wordpress/server-side-render`.
 
 ### Internal
 
 -   Refactor setupEditor effects to action-generator using controls ([#14513](https://github.com/WordPress/gutenberg/pull/14513))
 -   Remove redux-multi dependency (no longer needed/used with above refactor)
--   Replace internal controls definitions with usage of new @wordpress/data-controls package (see [#15435](https://github.com/WordPress/gutenberg/pull/15435)
 
 ## 9.1.0 (2019-03-06)
 
@@ -592,6 +603,10 @@
 
 ## 9.0.7 (2019-01-03)
 
+### Bug Fixes
+
+-   Fixes an error and unrecoverable state which occurs on autosave completion for a `'publicly_queryable' => false` post type.
+
 ## 9.0.6 (2018-12-18)
 
 ### Bug Fixes
@@ -603,7 +618,6 @@
 ### Bug Fixes
 
 -   `getEditedPostAttribute` now correctly returns the merged result of edits as a partial change when given `'meta'` as the `attributeName`.
--   Fixes an error and unrecoverable state which occurs on autosave completion for a `'publicly_queryable' => false` post type.
 
 ## 9.0.4 (2018-11-30)
 
@@ -618,6 +632,11 @@
 ### Breaking Changes
 
 -   `PostPublishPanelToggle` has been removed. Use `PostPublishButton` instead.
+-   `DocumentTitle` component has been removed.
+
+### Deprecations
+
+-   `PostPublishPanelToggle` has been deprecated in favor of `PostPublishButton`.
 
 ## 8.0.0 (2018-11-15)
 
@@ -661,7 +680,6 @@
 
 ### Deprecations
 
--   `PostPublishPanelToggle` has been deprecated in favor of `PostPublishButton`.
 
 ### Internal
 
@@ -673,13 +691,16 @@
 
 -   Adjust a11y roles for menu items, and make sure screen readers can properly use BlockNavigationList ([#11431](https://github.com/WordPress/gutenberg/issues/11431)).
 
+### Internal
+
+-   Remove `findDOMNode` usage from the `NavigableToolbar` component.
+
 ## 6.1.1 (2018-11-03)
 
 ### Internal
 
 -   Remove `findDOMNode` usage from the `Inserter` component.
 -   Remove `findDOMNode` usage from the `Block` component.
--   Remove `findDOMNode` usage from the `NavigableToolbar` component.
 
 ## 6.1.0 (2018-10-30)
 
@@ -735,6 +756,12 @@
 
 ## 4.0.3 (2018-10-18)
 
+## 4.0.1 (2018-10-10)
+
+### Deprecations
+
+-   The `UnsavedChangesWarning` component `forceIsDirty` prop has been deprecated.
+
 ## 4.0.0 (2018-09-30)
 
 ### Breaking Changes
@@ -745,11 +772,11 @@
 -   `RichText` `getSettings` prop has been removed. The `unstableGetSettings` prop is available if continued use is required. Unstable APIs are strongly discouraged to be used, and are subject to removal without notice, even as part of a minor release.
 -   `RichText` `onSetup` prop has been removed. The `unstableOnSetup` prop is available if continued use is required. Unstable APIs are strongly discouraged to be used, and are subject to removal without notice, even as part of a minor release.
 -   `RichTextProvider` has been removed. Please use `wp.data.select( 'core/editor' )` methods instead.
+-   `getDocumentTitle` selector (`core/editor`) has been removed.
 
 ### Deprecations
 
 -   The `checkTemplateValidity` action has been deprecated. Validity is verified automatically upon block reset.
--   The `UnsavedChangesWarning` component `forceIsDirty` prop has been deprecated.
 
 ## 3.0.0 (2018-09-05)
 
@@ -772,8 +799,8 @@
 -   `getSharedBlocks` selector has been removed. Use `getReusableBlocks` instead.
 -   `editorMediaUpload` has been removed. Use `mediaUpload` instead.
 -   Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.
--   `DocumentTitle` component has been removed.
--   `getDocumentTitle` selector (`core/editor`) has been removed.
+- `wp.editor.DocumentTitle` component has been removed.
+- `isCleanNewPost` and `getDocumentTitle` selectors (`core/editor`) have been removed.
 
 ### Deprecations
 

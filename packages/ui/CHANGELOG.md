@@ -105,6 +105,7 @@
 -   Focus ring utilities: Remove the shared outline transition so focus ring styles are not accidentally overridden by component transitions ([#78823](https://github.com/WordPress/gutenberg/pull/78823)).
 -   `Field.Description`: Apply `text-wrap: pretty` to description text to avoid typographic widows ([#79143](https://github.com/WordPress/gutenberg/pull/79143)).
 -   `Autocomplete`: Add `Autocomplete.Group` and `Autocomplete.GroupLabel` subcomponents ([#78901](https://github.com/WordPress/gutenberg/pull/78901)).
+-   `Popover`: Animate the popup open and closed ([#78885](https://github.com/WordPress/gutenberg/pull/78885)).
 
 ### Code Quality
 
@@ -146,31 +147,40 @@
 ### Enhancements
 
 -   `Tooltip`: Use `--wpds-border-radius-md` for portaled popup surfaces, aligning with menus and popovers ([#78983](https://github.com/WordPress/gutenberg/pull/78983)).
--   `Popover`: Animate the popup open and closed ([#78885](https://github.com/WordPress/gutenberg/pull/78885)).
 -   `Tooltip.Provider`: Widen the types to accept all props of the equivalent `Tooltip.Provider` from `@base-ui/react` (types-only change) ([#78642](https://github.com/WordPress/gutenberg/pull/78642)).
 
 ### Internal
 
 -   Update `@base-ui/react` from `1.4.1` to [`1.5.0`](https://github.com/mui/base-ui/releases/tag/v1.5.0) ([#78448](https://github.com/WordPress/gutenberg/pull/78448)).
 
+### New Features
+
+-   Add `Combobox` primitive ([#78399](https://github.com/WordPress/gutenberg/pull/78399)).
+
 ## 0.14.0 (2026-05-27)
 
 ### Breaking Changes
 
 -   Upgrade React to v19 ([#61521](https://github.com/WordPress/gutenberg/pull/61521)).
+-   `Popover`: **`Popup` positioner API** ([#78168](https://github.com/WordPress/gutenberg/pull/78168)). Add a `Popover.Positioner` subcomponent and an optional `positioner` prop on `Popover.Popup` (when omitted, the default `Popover.Positioner` is used). Remove `side`, `align`, `sideOffset`, `alignOffset`, `anchor`, `arrowPadding`, `collisionAvoidance`, `collisionBoundary`, `collisionPadding`, and `sticky` from `Popover.Popup`; pass `positioner={ <Popover.Positioner side="…" align="…" anchor={ … } /> }` instead.
+-   `Tooltip`, `Popover`, `Select`, `Autocomplete`, `Dialog`, `Drawer`, `AlertDialog`: Narrow the TypeScript types of the `Portal` subcomponent props to the package's standard `ComponentProps` shape. `className` and `style` no longer accept the `(state) => …` callback variant, and `render` no longer accepts the two-arg `(props, state) => …` variant from Base UI. Runtime behavior is unchanged ([#78168](https://github.com/WordPress/gutenberg/pull/78168)).
 
 ### New Features
 
 -   `Card`: `Card.FullBleed` now supports edge-bumping in additional positions ([#77856](https://github.com/WordPress/gutenberg/pull/77856)):
     -   As the **first child of `Card.Header`**, it extends flush to the card's top and side edges — ideal for hero images. Inter-sibling spacing is consumer-managed: compose `Card.Header` with `Stack` via the `render` prop to add a gap between the hero and following siblings (e.g. `Card.Title`).
     -   As the **sole child of `Card.Content`**, it extends flush to the card's side edges and additionally to the top edge when `Content` is the first card child, or the bottom edge when it is the last. This enables full-bleed content panels with or without a header above them.
--   Add `Combobox` primitive ([#78399](https://github.com/WordPress/gutenberg/pull/78399)).
+-   Add `useEnableWpCompatOverlaySlot()` hook to opt into a body-level overlay container that stacks `@wordpress/ui` overlays above `@wordpress/components` overlays in mixed-library compositions. The slot auto-enables wherever `window.wp.components` is on the global (the typical script-loader setup for WordPress plugins and admin screens), so the hook is mostly relevant for hosts that bundle `@wordpress/components` (or only `@wordpress/ui`) directly — apps that aren't built with standard WordPress build tooling. Per-component support will be added incrementally ([#77851](https://github.com/WordPress/gutenberg/pull/77851)).
 
 ### Enhancements
 
 -   Export `getWpCompatOverlaySlot()` so consumers can route their own portals into the compat overlay slot ([#78183](https://github.com/WordPress/gutenberg/pull/78183)).
 -   `Select`, `SelectControl`: Default the popup's portal container to the `@wordpress/ui` compat overlay slot when present, so select popups stack reliably above other overlays in mixed-library compositions. A caller-supplied `Select.Portal` `container` prop continues to take precedence ([#78372](https://github.com/WordPress/gutenberg/pull/78372)).
 -   `Autocomplete`: Default the popup's portal container to the `@wordpress/ui` compat overlay slot when present, so autocomplete popups stack reliably above other overlays in mixed-library compositions. A caller-supplied `Autocomplete.Portal` `container` prop continues to take precedence ([#78375](https://github.com/WordPress/gutenberg/pull/78375)).
+-   `Button`: Allow long labels to wrap within constrained containers ([#78300](https://github.com/WordPress/gutenberg/pull/78300)).
+-   `Tooltip`: Default the floating popup's portal container to the `@wordpress/ui` compat overlay slot when present, so tooltips stack reliably above other overlays in mixed-library compositions. A caller-supplied `Tooltip.Portal` `container` prop continues to take precedence ([#78095](https://github.com/WordPress/gutenberg/pull/78095)).
+-   `Select`: Add a `Select.Positioner` subcomponent and a `positioner` slot prop on `Select.Popup` to customize the popup placement, mirroring the existing `portal` slot pattern ([#78168](https://github.com/WordPress/gutenberg/pull/78168)).
+-   `Autocomplete`: Add an `Autocomplete.Positioner` subcomponent and a `positioner` slot prop on `Autocomplete.Popup` to customize the popup placement, mirroring the existing `portal` slot pattern ([#78168](https://github.com/WordPress/gutenberg/pull/78168)).
 
 ### Bug Fixes
 
@@ -182,6 +192,10 @@
 -   Apply shared item popup typography to inline lists and empty states ([#78403](https://github.com/WordPress/gutenberg/pull/78403)).
 -   Stretch the compat overlay slot to viewport size so portaled popups stop collapsing to their min-content width — most visible on long-text tooltips, which wrapped to one word per line ([#78441](https://github.com/WordPress/gutenberg/pull/78441)).
 
+### Internal
+
+-   Add internal `getWpCompatOverlaySlot()` helper and a co-located unlayered CSS module that lazily provide a body-level `[data-wp-compat-overlay-slot]` container at z-index `1000000003`, gated by `useEnableWpCompatOverlaySlot()` and by auto-detection of `window.wp.components` ([#77851](https://github.com/WordPress/gutenberg/pull/77851)).
+
 ## 0.13.0 (2026-05-14)
 
 ### Breaking Changes
@@ -192,8 +206,6 @@
 -   `Select`: `Select.Item` no longer renders its `value` as fallback item content. Pass item content explicitly as `children`. Migrate `<Select.Item value="Foo" />` to `<Select.Item value="Foo">Foo</Select.Item>` ([#77861](https://github.com/WordPress/gutenberg/pull/77861)).
 -   `Tooltip`: **`Popup` positioner API** ([#78089](https://github.com/WordPress/gutenberg/pull/78089)). Add a `Tooltip.Positioner` subcomponent and an optional `positioner` prop on `Tooltip.Popup` (when omitted, the default `Tooltip.Positioner` is used). Remove `side`, `align`, and `sideOffset` from `Tooltip.Popup`; pass `positioner={ <Tooltip.Positioner side="…" align="…" sideOffset={ … } /> }` instead. The new subcomponent exposes the full positioner surface (`alignOffset`, `anchor`, `collisionAvoidance`, `collisionBoundary`, `collisionPadding`, `sticky`, etc.) and mirrors the existing `portal` slot pattern.
 -   `CollapsibleCard.Header`: Now renders an outer `<div>` wrapper around the trigger. Forwarded props (`className`, `aria-*`, `data-*`) and `ref` land on this outer wrapper instead of the inner click-target div ([#77962](https://github.com/WordPress/gutenberg/pull/77962)).
--   `Popover`: **`Popup` positioner API** ([#78168](https://github.com/WordPress/gutenberg/pull/78168)). Add a `Popover.Positioner` subcomponent and an optional `positioner` prop on `Popover.Popup` (when omitted, the default `Popover.Positioner` is used). Remove `side`, `align`, `sideOffset`, `alignOffset`, `anchor`, `arrowPadding`, `collisionAvoidance`, `collisionBoundary`, `collisionPadding`, and `sticky` from `Popover.Popup`; pass `positioner={ <Popover.Positioner side="…" align="…" anchor={ … } /> }` instead.
--   `Tooltip`, `Popover`, `Select`, `Autocomplete`, `Dialog`, `Drawer`, `AlertDialog`: Narrow the TypeScript types of the `Portal` subcomponent props to the package's standard `ComponentProps` shape. `className` and `style` no longer accept the `(state) => …` callback variant, and `render` no longer accepts the two-arg `(props, state) => …` variant from Base UI. Runtime behavior is unchanged ([#78168](https://github.com/WordPress/gutenberg/pull/78168)).
 
 ### New Features
 
@@ -209,24 +221,18 @@
 
 ### New Features
 
--   Add `useEnableWpCompatOverlaySlot()` hook to opt into a body-level overlay container that stacks `@wordpress/ui` overlays above `@wordpress/components` overlays in mixed-library compositions. The slot auto-enables wherever `window.wp.components` is on the global (the typical script-loader setup for WordPress plugins and admin screens), so the hook is mostly relevant for hosts that bundle `@wordpress/components` (or only `@wordpress/ui`) directly — apps that aren't built with standard WordPress build tooling. Per-component support will be added incrementally ([#77851](https://github.com/WordPress/gutenberg/pull/77851)).
 
 ### Enhancements
 
--   `Button`: Allow long labels to wrap within constrained containers ([#78300](https://github.com/WordPress/gutenberg/pull/78300)).
 -   `Select`: Add a `placeholder` prop to `Select.Trigger`, and support `null` item values for clearable placeholder options ([#78076](https://github.com/WordPress/gutenberg/pull/78076)).
 -   `Drawer`: Fade the popup elevation shadow alongside the slide ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
 -   `Drawer`: Allow mouse-drag swipe-dismiss in the popup-edge padding gutter ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
--   `Tooltip`: Default the floating popup's portal container to the `@wordpress/ui` compat overlay slot when present, so tooltips stack reliably above other overlays in mixed-library compositions. A caller-supplied `Tooltip.Portal` `container` prop continues to take precedence ([#78095](https://github.com/WordPress/gutenberg/pull/78095)).
 -   `IconButton`: Add a `positioner` prop, accepting a `<Tooltip.Positioner />` element, to customize how the tooltip is positioned relative to the button ([#78089](https://github.com/WordPress/gutenberg/pull/78089)).
 -   `CollapsibleCard.Header`: Pass `render={ <h2 /> }` (or any of `<h1>`–`<h6>`) to wrap the trigger in a heading and contribute to the document outline, following the W3C APG accordion pattern (heading wraps button) ([#77962](https://github.com/WordPress/gutenberg/pull/77962)).
--   `Select`: Add a `Select.Positioner` subcomponent and a `positioner` slot prop on `Select.Popup` to customize the popup placement, mirroring the existing `portal` slot pattern ([#78168](https://github.com/WordPress/gutenberg/pull/78168)).
--   `Autocomplete`: Add an `Autocomplete.Positioner` subcomponent and a `positioner` slot prop on `Autocomplete.Popup` to customize the popup placement, mirroring the existing `portal` slot pattern ([#78168](https://github.com/WordPress/gutenberg/pull/78168)).
 
 ### Internal
 
 -   `Dialog`: Use `--wpds-motion-*` design tokens for animation duration and easing ([#76097](https://github.com/WordPress/gutenberg/pull/76097)).
--   Add internal `getWpCompatOverlaySlot()` helper and a co-located unlayered CSS module that lazily provide a body-level `[data-wp-compat-overlay-slot]` container at z-index `1000000003`, gated by `useEnableWpCompatOverlaySlot()` and by auto-detection of `window.wp.components` ([#77851](https://github.com/WordPress/gutenberg/pull/77851)).
 
 ## 0.12.0 (2026-04-29)
 
@@ -272,6 +278,7 @@
 -   Update `@base-ui/react` from `1.4.0` to [`1.4.1`](https://github.com/mui/base-ui/releases/tag/v1.4.1) ([#77520](https://github.com/WordPress/gutenberg/pull/77520)).
 -   Extract shared `useScheduleValidation` hook; refactor `Dialog`, `Popover`, and `Tabs` validation contexts to use it ([#77165](https://github.com/WordPress/gutenberg/pull/77165)).
 -   `Tabs`: Wrap two validation timeout waits in `act(...)` to avoid intermittent test warnings ([#77319](https://github.com/WordPress/gutenberg/pull/77319)).
+-   `Notice.ActionLink`: Use `Text` component for typography ([#77332](https://github.com/WordPress/gutenberg/pull/77332)).
 
 ## 0.11.0 (2026-04-15)
 
@@ -309,7 +316,6 @@
 -   `AlertDialog`: Rewrite internals to use Base UI's `AlertDialog` primitives directly instead of `Dialog` wrappers. Introduces an internal state machine for async confirm flows ([#76937](https://github.com/WordPress/gutenberg/pull/76937)).
 -   `Field.Label`, `Fieldset.Legend`, `Field.Details`: Refactor `VisuallyHidden` composition to preserve semantic HTML elements when visually hiding content.
 -   `Badge`: Use `Text` component for typography ([#77295](https://github.com/WordPress/gutenberg/pull/77295)).
--   `Notice.ActionLink`: Use `Text` component for typography ([#77332](https://github.com/WordPress/gutenberg/pull/77332)).
 -   Update `@base-ui/react` from `1.3.0` to `1.4.0` ([#77308](https://github.com/WordPress/gutenberg/pull/77308)).
 
 ## 0.10.0 (2026-04-01)
@@ -330,11 +336,13 @@
 
 -   `Dialog.Root`: expose `disablePointerDismissal` prop ([#76847](https://github.com/WordPress/gutenberg/pull/76847)).
 -   `Dialog.Popup`: Default `initialFocus` now deprioritizes the close icon, focusing the first tabbable content element instead (following WAI-ARIA APG guidance) ([#76910](https://github.com/WordPress/gutenberg/pull/76910)).
+-   `Card`: Use `Text` component for `Title` typography ([#76642](https://github.com/WordPress/gutenberg/pull/76642)).
 
 ### Internal
 
 -   Extract `useDeprioritizedInitialFocus` shared hook for reuse across overlay components ([#76910](https://github.com/WordPress/gutenberg/pull/76910)).
 -   `Tabs`: Add development-mode validation for Tab/Panel count matching ([#75170](https://github.com/WordPress/gutenberg/pull/75170)).
+-   Update `@base-ui/react` from 1.2.0 to [1.3.0](https://github.com/mui/base-ui/blob/master/CHANGELOG.md#v130) ([#76603](https://github.com/WordPress/gutenberg/pull/76603)).
 
 ### TypeScript
 
@@ -360,15 +368,15 @@
 -   `Dialog`: Use `--wpds-dimension-surface-width-*` design tokens for width constraints ([#76494](https://github.com/WordPress/gutenberg/pull/76494)).
 -   `Notice`: Improve narrow layout by letting description and actions span the icon column when a title is present ([#76202](https://github.com/WordPress/gutenberg/pull/76202)).
 -   `Notice`: Use `Text` component for `Title` and `Description` typography ([#75870](https://github.com/WordPress/gutenberg/pull/75870)).
--   `Card`: Use `Text` component for `Title` typography ([#76642](https://github.com/WordPress/gutenberg/pull/76642)).
 -   `Card`, `CollapsibleCard`: update padding to match legacy `Card` component ([#76368](https://github.com/WordPress/gutenberg/pull/76368)).
 -   `CollapsibleCard`: move trigger to the header ([#76265](https://github.com/WordPress/gutenberg/pull/76265)).
 -   `CollapsibleCard`: add animations ([#76378](https://github.com/WordPress/gutenberg/pull/76378)).
 -   `CollapsibleCard`: allows the browser page search to find and expand the panel contents via the `hiddenUntilFound` prop. ([#76498](https://github.com/WordPress/gutenberg/pull/76498)).
+-   `Field.Label`, `Fieldset.Legend`: Add `hideFromVision` prop to visually hide the label while keeping it accessible to screen readers ([#76052](https://github.com/WordPress/gutenberg/pull/76052)).
+-   `Tooltip`: Change default `side` from `bottom` to `top`. ([#76131](https://github.com/WordPress/gutenberg/pull/76131)).
 
 ### Internal
 
--   Update `@base-ui/react` from 1.2.0 to [1.3.0](https://github.com/mui/base-ui/blob/master/CHANGELOG.md#v130) ([#76603](https://github.com/WordPress/gutenberg/pull/76603)).
 
 ## 0.8.0 (2026-03-04)
 
@@ -382,9 +390,7 @@
 
 ### Enhancements
 
--   `Field.Label`, `Fieldset.Legend`: Add `hideFromVision` prop to visually hide the label while keeping it accessible to screen readers ([#76052](https://github.com/WordPress/gutenberg/pull/76052)).
 -   `Dialog`: Add `--wp-ui-dialog-z-index` CSS custom property for legacy z-index compatibility ([#75874](https://github.com/WordPress/gutenberg/pull/75874)).
--   `Tooltip`: Change default `side` from `bottom` to `top`. ([#76131](https://github.com/WordPress/gutenberg/pull/76131)).
 
 ### Bug Fixes
 

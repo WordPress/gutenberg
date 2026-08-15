@@ -34,6 +34,7 @@
 ### Breaking Changes
 
 -   Update all icons to render with `currentColor` by default. Consumers that style icons by setting inherited `fill` on a wrapper should set `color` instead, or pass `style={ { color: ... } }` to the icon. ([#79320](https://github.com/WordPress/gutenberg/pull/79320))
+-   Remove `tab` icon. ([#77439](https://github.com/WordPress/gutenberg/pull/77439))
 
 ## 14.0.1 (2026-06-16)
 
@@ -46,7 +47,6 @@
 ### Breaking Changes
 
 -   Rename `timeToRead` icon to `time`. ([#78804](https://github.com/WordPress/gutenberg/pull/78804))
--   Remove `tab` icon. ([#77439](https://github.com/WordPress/gutenberg/pull/77439))
 
 ## 13.2.0 (2026-05-27)
 
@@ -79,6 +79,8 @@
 ## 11.6.0 (2026-01-29)
 
 ## 11.5.0 (2026-01-16)
+
+## 11.4.0 (2025-12-23)
 
 ## 11.3.0 (2025-11-26)
 
@@ -171,14 +173,22 @@
 
 ## 10.9.0 (2024-10-03)
 
-## 10.8.0 (2024-09-19)
-
 ### New Features
 
 -   Add new `envelope` icon.
 
--   Add new `bell` and `bell-unread` icons.
+## 10.8.2 (2024-09-30)
+
+### New Features
+
 -   Add new `arrowUpLeft` and `arrowDownRight` icons.
+
+## 10.8.0 (2024-09-19)
+
+### New Features
+
+
+-   Add new `bell` and `bell-unread` icons.
 
 ## 10.7.0 (2024-09-05)
 
@@ -210,9 +220,11 @@
 
 ## 9.47.0 (2024-04-19)
 
+-   Add new `chevronDownSmall` icon.
+- Add new `chevronDownSmall` icon.
+
 ## 9.46.0 (2024-04-03)
 
--   Add new `chevronDownSmall` icon.
 
 ## 9.45.0 (2024-03-21)
 
@@ -342,6 +354,10 @@
 
 -   Add new `commentTitle` icon. ([#40419](https://github.com/WordPress/gutenberg/pull/40419))
 
+## 8.2.2 (2022-04-26)
+
+-   Add new `commentTitle` icon. ([#40419](https://github.com/WordPress/gutenberg/pull/40419))
+
 ## 8.2.0 (2022-04-08)
 
 ### New Features
@@ -357,11 +373,14 @@
 
 -   Changed `dragHandle` footprint from 18x18 to 24x24 to match other icons. ([#39342](https://github.com/WordPress/gutenberg/pull/39342))
 
+### New Features
+
+-   Added new icon: `post`, and refreshed the existing `pin` icon. ([#39139](https://github.com/WordPress/gutenberg/pull/39139))
+
 ## 7.0.0 (2022-02-23)
 
 ### New Features
 
--   Added new icon: `post`, and refreshed the existing `pin` icon. ([#39139](https://github.com/WordPress/gutenberg/pull/39139))
 
 ### Breaking Changes
 

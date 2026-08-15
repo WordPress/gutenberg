@@ -37,6 +37,8 @@
 
 ## 4.38.0 (2026-01-16)
 
+## 4.37.0 (2025-12-23)
+
 ## 4.36.0 (2025-11-26)
 
 ## 4.35.0 (2025-11-12)
@@ -79,6 +81,10 @@
 
 ## 4.16.0 (2025-01-15)
 
+### New Features
+
+-   Enable an optional namespace parameter for `hasAction` & `hasFilter`. When checking if an action or filter exists, `hasAction` and `hasFilter` now accept an optional parameter to limit matches by namespace.
+
 ## 4.15.0 (2025-01-02)
 
 ## 4.14.0 (2024-12-11)
@@ -92,6 +98,12 @@
 ## 4.10.0 (2024-10-16)
 
 ## 4.9.0 (2024-10-03)
+
+### New Features
+
+- added new `doActionAsync` and `applyFiltersAsync` functions to run hooks in async mode ([#64204](https://github.com/WordPress/gutenberg/pull/64204)).
+
+## 4.8.2 (2024-09-30)
 
 ### New Features
 
@@ -262,7 +274,6 @@
 
 ### New Features
 
--   Enable an optional namespace parameter for `hasAction` & `hasFilter`. When checking if an action or filter exists, `hasAction` and `hasFilter` now accept an optional parameter to limit matches by namespace.
 
 ## 2.4.0 (2019-06-12)
 

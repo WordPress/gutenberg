@@ -41,6 +41,18 @@
 
 -   Fix documentation typos ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
 
+### Enhancements
+
+-   `useMergeRefs`: Support cleanup functions returned by inner ref callbacks (React 19 ref callback cleanup pattern). Inner refs that return a cleanup have it invoked at teardown instead of being called with `null`.
+
+### Bug Fixes
+
+-   `useMediaQuery`, `useViewportMatch`: Resolve the `view` default lazily so the hooks no longer throw `ReferenceError: window is not defined` during server-side rendering. Regression from [#76446](https://github.com/WordPress/gutenberg/pull/76446).
+
+### Deprecations
+
+-   The `pure` HoC now logs a runtime deprecation warning. Use `memo` or `PureComponent` from `@wordpress/element` instead.
+
 ## 8.0.0 (2026-05-27)
 
 ### Breaking Changes
@@ -49,17 +61,14 @@
 
 ### Enhancements
 
--   `useMergeRefs`: Support cleanup functions returned by inner ref callbacks (React 19 ref callback cleanup pattern). Inner refs that return a cleanup have it invoked at teardown instead of being called with `null`.
 
 ### Bug Fixes
 
 -   `useCopyToClipboard`: Call the `onSuccess` callback even when the trigger node unmounts before the copy resolves ([#78387](https://github.com/WordPress/gutenberg/pull/78387)).
 -   `useDialog`: Handle Escape via React `onKeyDown` so portaled descendants can stop propagation to prevent the dialog from closing ([#78433](https://github.com/WordPress/gutenberg/pull/78433)).
--   `useMediaQuery`, `useViewportMatch`: Resolve the `view` default lazily so the hooks no longer throw `ReferenceError: window is not defined` during server-side rendering. Regression from [#76446](https://github.com/WordPress/gutenberg/pull/76446).
 
 ### Deprecations
 
--   The `pure` HoC now logs a runtime deprecation warning. Use `memo` or `PureComponent` from `@wordpress/element` instead.
 
 ## 7.46.0 (2026-05-14)
 
@@ -86,6 +95,8 @@
 ## 7.39.0 (2026-01-29)
 
 ## 7.38.0 (2026-01-16)
+
+## 7.37.0 (2025-12-23)
 
 ## 7.36.0 (2025-11-26)
 

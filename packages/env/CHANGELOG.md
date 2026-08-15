@@ -52,6 +52,17 @@
 
 -   Suppress spinner and success message output when using `--json` flag to ensure clean, parseable JSON output.
 
+### New Features
+
+-   Added `--auto-port` flag to the `start` command. When passed, `wp-env` automatically finds available ports if the configured ports are busy. Without this flag, ports default to `8888`/`8889` and Docker reports an error if they are busy (matching pre-existing behavior).
+-   Added `phpmyadmin` boolean configuration option to enable phpMyAdmin. Setting `phpmyadminPort` also enables phpMyAdmin for backward compatibility.
+-   Added phpMyAdmin support to the Playground runtime. When enabled, phpMyAdmin is available at `http://localhost:<port>/phpmyadmin`.
+
+### Breaking Changes
+
+-   Pretty permalinks (`/%year%/%monthnum%/%day%/%postname%/`) are now enabled by default, matching WordPress core behavior on fresh installs. Previously, plain permalinks were used because the loopback test that WordPress runs during installation fails inside Docker.
+-   The `port` option now defaults to `null` (auto-select) instead of `8888`. When `null`, `wp-env` tries port 8888 (or 8889 for tests) first, then falls back to an available ephemeral port. Set an explicit port number to preserve the previous behavior.
+
 ## 11.0.0 (2026-02-18)
 
 ### Bug Fixes
@@ -62,27 +73,16 @@
 
 ### New Features
 
--   Added `--auto-port` flag to the `start` command. When passed, `wp-env` automatically finds available ports if the configured ports are busy. Without this flag, ports default to `8888`/`8889` and Docker reports an error if they are busy (matching pre-existing behavior).
 
 ### Breaking Changes
 
--   Pretty permalinks (`/%year%/%monthnum%/%day%/%postname%/`) are now enabled by default, matching WordPress core behavior on fresh installs. Previously, plain permalinks were used because the loopback test that WordPress runs during installation fails inside Docker.
--   The `port` option now defaults to `null` (auto-select) instead of `8888`. When `null`, `wp-env` tries port 8888 (or 8889 for tests) first, then falls back to an available ephemeral port. Set an explicit port number to preserve the previous behavior.
 -   Replaced `install-path` command with `status` command. The work directory path is now available as part of the status output.
 
 ### New Features
 
--   Added `phpmyadmin` boolean configuration option to enable phpMyAdmin. Setting `phpmyadminPort` also enables phpMyAdmin for backward compatibility.
--   Added phpMyAdmin support to the Playground runtime. When enabled, phpMyAdmin is available at `http://localhost:<port>/phpmyadmin`.
 -   Added `status` command that shows comprehensive environment information including running state, URLs, ports, configuration, and paths.
 -   Added `--config` global option to specify a custom configuration file path, enabling multiple parallel environments from the same directory.
 -   Added `testsEnvironment` configuration option. Set to `false` to skip creating test containers (`tests-mysql`, `tests-wordpress`, `tests-cli`, `tests-phpmyadmin`), reducing resource usage when test isolation is achieved via separate config files.
-
-## 10.39.0 (2026-01-29)
-
-### New Features
-
--   Add experimental WordPress Playground runtime support. Use `--runtime=playground` flag to start wp-env with Playground instead of Docker.
 -   Add `cleanup` command to remove environment-specific resources (containers, volumes, networks, and local files) while preserving Docker images for faster re-starts.
 -   Add `--force` flag to both `destroy` and `cleanup` commands to skip the confirmation prompt.
 -   Rename `clean` command to `reset` for clarity. The `clean` command is now deprecated but still works as an alias.
@@ -91,7 +91,18 @@
 
 -   The `clean` command is deprecated. Use `reset` instead. The `afterClean` lifecycle script is also deprecated in favor of `afterReset`.
 
+## 10.39.0 (2026-01-29)
+
+### New Features
+
+-   Add experimental WordPress Playground runtime support. Use `--runtime=playground` flag to start wp-env with Playground instead of Docker.
+
+### Deprecation
+
+
 ## 10.38.0 (2026-01-16)
+
+## 10.37.0 (2025-12-23)
 
 ## 10.36.0 (2025-11-26)
 
@@ -196,6 +207,12 @@
 -   Ignore `$schema` key in environment config parsing ([#62626](https://github.com/WordPress/gutenberg/pull/62626)).
 
 ## 10.1.0 (2024-06-15)
+
+## 10.0.2 (2024-06-25)
+
+### Enhancement
+
+-   Ignore `$schema` key in environment config parsing ([#62626](https://github.com/WordPress/gutenberg/pull/62626)).
 
 ## 10.0.0 (2024-05-31)
 
@@ -500,15 +517,30 @@
 
 -   `wp-env destroy` now removes dangling docker volumes and networks associated with the WordPress environment.
 
+## 1.5.0 (2020-06-15)
+
+### New Feature
+
+-   Add support for running interactive commands. Examples: `wp-env run cli wp shell` and `wp-env run cli bash`.
+
 ## 1.4.0 (2020-05-28)
 
 ### New Features
 
--   Add support for running interactive commands. Examples: `wp-env run cli wp shell` and `wp-env run cli bash`.
 -   View php and WordPress log output with the new `wp-env logs` command.
 -   Clean up your local environment with the new `wp-env destroy` command.
 -   Expose Docker service for running phpunit commands.
 -   You may now mount local directories to any location within the WordPress install. For example, you may specify `"wp-content/mu-plugins": "./path/to/mu-plugins"` to add mu-plugins.
+
+## 1.2.0 (2020-04-15)
+
+### New Feature
+
+-   URLs for ZIP files are now supported as core, plugin, and theme sources.
+-   The `.wp-env.json` coniguration file now accepts a `config` object for setting `wp-config.php` values.
+-   A `.wp-env.override.json` configuration file can now be used to override fields from `.wp-env.json`.
+-   You may now override the directory in which `wp-env` creates generated files with the `WP_ENV_HOME` environment variable. The default directory is `~/.wp-env/` (or `~/wp-env/` on Linux).
+-   The `.wp-env.json` coniguration file now accepts `port` and `testsPort` options which can be used to set the ports on which the docker instance is mounted.
 
 ## 1.1.0 (2020-04-01)
 

@@ -170,6 +170,7 @@
 ### Documentation
 
 -   Document `clsx` object syntax for conditional CSS Module classes ([#79490](https://github.com/WordPress/gutenberg/pull/79490), [#79535](https://github.com/WordPress/gutenberg/pull/79535)).
+-   Add component documentation for `ColorPicker`, `CustomSelectControl`, `Navigator`, `NumberControl`, `ResizableBox`, and `Slot` components ([#79460](https://github.com/WordPress/gutenberg/pull/79460)).
 
 ### Bug Fixes
 
@@ -210,6 +211,7 @@
 
 -   `BaseControl`: Apply `text-wrap: pretty` to help text to avoid typographic widows ([#79112](https://github.com/WordPress/gutenberg/pull/79112)).
 -   `Button`, `DropdownMenu`, `FormToggle`, `Modal`, `Panel`, `RadioControl`, `Toolbar`: Migrate hardcoded border and stroke colors to WPDS tokens ([#79244](https://github.com/WordPress/gutenberg/pull/79244)).
+-   `Tooltip`: Mark as not recommended for use in a WordPress environment, in favour of `Tooltip` from `@wordpress/ui` ([#78693](https://github.com/WordPress/gutenberg/pull/78693)).
 
 ### Bug Fixes
 
@@ -224,11 +226,12 @@
 -   Adopt `--wpds-dimension-size-*` design tokens [#79093](https://github.com/WordPress/gutenberg/pull/79093).
 -   Point the legacy `--wp-components-*` color fallbacks at the design system tokens (`--wpds-*` / `--wp-admin-theme-color*`), so component styles get sensible defaults from the prebuilt token stylesheet without a runtime `<ThemeProvider>` ([#78664](https://github.com/WordPress/gutenberg/pull/78664)).
 -   `withFallbackStyles`: Refactor from a class component to a function component with hooks ([#78837](https://github.com/WordPress/gutenberg/pull/78837)).
+-   `Tabs`: Update `@ariakit/react` to `0.4.29`, adopting the upstream fix that moves focus to the selected tab on a controlled selection change, and removing the now-unnecessary controlled-mode focus workarounds ([#79055](https://github.com/WordPress/gutenberg/pull/79055)).
+-   `ToggleGroupControl`: Radio options now render an auto-generated `name` attribute, following Ariakit's `Radio` behavior ([#79055](https://github.com/WordPress/gutenberg/pull/79055)).
 
 ### Documentation
 
 -   `Menu`: Fix `overriden` typo to `overridden` in `CheckboxItemProps` and `RadioItemProps`. ([#79331](https://github.com/WordPress/gutenberg/pull/79331))
--   Add component documentation for `ColorPicker`, `CustomSelectControl`, `Navigator`, `NumberControl`, `ResizableBox`, and `Slot` components ([#79460](https://github.com/WordPress/gutenberg/pull/79460)).
 
 ### Code Quality
 
@@ -257,8 +260,6 @@
 ### Internal
 
 -   `UnitControl`: Remove dead native code branches now that `Platform.OS` is always `'web'` following the React Native removal ([#79031](https://github.com/WordPress/gutenberg/pull/79031)).
--   `Tabs`: Update `@ariakit/react` to `0.4.29`, adopting the upstream fix that moves focus to the selected tab on a controlled selection change, and removing the now-unnecessary controlled-mode focus workarounds ([#79055](https://github.com/WordPress/gutenberg/pull/79055)).
--   `ToggleGroupControl`: Radio options now render an auto-generated `name` attribute, following Ariakit's `Radio` behavior ([#79055](https://github.com/WordPress/gutenberg/pull/79055)).
 -   Dependency updates ([#77954](https://github.com/WordPress/gutenberg/pull/77954)).
 
 ## 34.0.0 (2026-05-27)
@@ -270,18 +271,20 @@
 -   `Notice`: Rework internal DOM structure and class names ([#78231](https://github.com/WordPress/gutenberg/pull/78231)). Consumers relying on those implementation details should update their projects accordingly:
     -   Removed the `is-dismissible` class name on the root wrapper.
     -   Moved the `.components-notice__actions` wrapper as a sibling of `.components-notice__content` (it was previously nested inside it).
+-   Upgrade React to v19 ([#61521](https://github.com/WordPress/gutenberg/pull/61521)).
 
 ### Enhancements
 
--   `Tooltip`: Mark as not recommended for use in a WordPress environment, in favour of `Tooltip` from `@wordpress/ui` ([#78693](https://github.com/WordPress/gutenberg/pull/78693)).
 -   `Tabs`, `TabPanel`: Align selected tab colors and indicators with `@wordpress/ui` `Tabs` ([#78418](https://github.com/WordPress/gutenberg/pull/78418)).
 -   `NoticeList`: Add vertical spacing between notices in a list.
 -   `Draggable`: Render the drag clone inside the `@wordpress/ui` compat overlay slot so it shares stacking with `@wordpress/ui` overlays opened mid-drag. Auto-enabled in WordPress environments; other hosts can opt in via `useEnableWpCompatOverlaySlot()` ([#78183](https://github.com/WordPress/gutenberg/pull/78183), [#78354](https://github.com/WordPress/gutenberg/pull/78354)).
+-   `Notice`: Align appearance with `Notice` from `@wordpress/ui` (full border, rounded corners, tinted intent surfaces, design-token-driven colors and spacing, `closeSmall` dismiss icon, compact action buttons, and grid layout that places actions in their own row for symmetric padding) ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
 
 ### Bug Fixes
 
 -   `Popover`: Don't close when focus moves into the `@wordpress/ui` compat overlay slot, or is restored to the popover from any portaled descendant. This unblocks nested overlays such as `@wordpress/ui` `Select`, which previously dismissed the host `Popover` on hover and on overlay dismissal ([#78407](https://github.com/WordPress/gutenberg/pull/78407)).
 -   `RangeControl`: Remove the `icon` prop from the web types. It was added in error during the TypeScript migration and never had any effect on web; use `beforeIcon` or `afterIcon` instead. The prop remains functional in the native (mobile) implementation ([#78444](https://github.com/WordPress/gutenberg/pull/78444)).
+-   `FormTokenField`: Correct `preventDefault` handling for `__experimentalValidateInput` and validate pasted delimiter-separated tokens ([#77181](https://github.com/WordPress/gutenberg/pull/77181)).
 
 ### Internal
 
@@ -296,14 +299,12 @@
 -   `Button`: Align `link` variant underline (offset and thickness) with `ExternalLink` and `Link` from `@wordpress/ui` ([#77842](https://github.com/WordPress/gutenberg/pull/77842)).
 -   `Modal`: render as a bottom sheet on mobile so the height adapts to the content and CTAs stay within thumb reach ([#77956](https://github.com/WordPress/gutenberg/pull/77956)).
 -   `Text`: Use a theme-aware gray token for the muted variant ([#77999](https://github.com/WordPress/gutenberg/pull/77999)).
--   `Notice`: Align appearance with `Notice` from `@wordpress/ui` (full border, rounded corners, tinted intent surfaces, design-token-driven colors and spacing, `closeSmall` dismiss icon, compact action buttons, and grid layout that places actions in their own row for symmetric padding) ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
 
 ### Bug Fixes
 
 -   `TabPanel`: Fix tab indicator animation while switching tabs ([#77812](https://github.com/WordPress/gutenberg/pull/77812)).
 -   `ColorPicker`: Fix issue where clearing the hex input entirely doesn't reset the selected color to black ([#77912](https://github.com/WordPress/gutenberg/pull/77912)).
 -   `ExternalLink`: Fix focus outline rendered in wp-admin ([#77935](https://github.com/WordPress/gutenberg/pull/77935)).
--   `FormTokenField`: Correct `preventDefault` handling for `__experimentalValidateInput` and validate pasted delimiter-separated tokens ([#77181](https://github.com/WordPress/gutenberg/pull/77181)).
 -   `ColorPalette`: Fix duplicate-key warnings and incorrect selected swatch behavior when multiple palette entries share the same color value ([#78004](https://github.com/WordPress/gutenberg/pull/78004)).
 
 ### Internal
@@ -338,6 +339,10 @@
 -   `Menu`: Refactor `Menu.Popover` to use Ariakit’s `render` prop, wrapping content in `MenuMotionRoot` (motion styles) and `MenuSurface` (panel layout and `variant` chrome) ([#77460](https://github.com/WordPress/gutenberg/pull/77460)).
 -   Fix types for TypeScript 7.0 ([#77177](https://github.com/WordPress/gutenberg/pull/77177)).
 
+### Bug Fixes
+
+-   `Autocomplete`: Skip stale triggers from completed mentions ([#77185](https://github.com/WordPress/gutenberg/pull/77185)).
+
 ## 32.6.0 (2026-04-15)
 
 ### Documentation
@@ -353,7 +358,6 @@
 -   `Autocomplete`: Fix value comparison to avoid resetting block inserter in RTC ([#76980](https://github.com/WordPress/gutenberg/pull/76980)).
 -   `ValidatedRangeControl`: Fix `aria-label` rendered as `[object Object]` when `required` or `markWhenOptional` is set ([#77042](https://github.com/WordPress/gutenberg/pull/77042)).
 -   `Autocomplete`: Fix matching logic to prefer longest overlapping trigger ([#77018](https://github.com/WordPress/gutenberg/pull/77018)).
--   `Autocomplete`: Skip stale triggers from completed mentions ([#77185](https://github.com/WordPress/gutenberg/pull/77185)).
 
 ### Enhancements
 
@@ -369,6 +373,7 @@
 -   `BoxControl`: Remove unused state for icon side ([#77143](https://github.com/WordPress/gutenberg/pull/77143)).
 -   `Autocomplete`: Remove `getAutoCompleterUI` factory pattern ([#77048](https://github.com/WordPress/gutenberg/pull/77048)).
 -   `CustomSelectControl`, `Sandbox`: Rename internal React function names ([#77148](https://github.com/WordPress/gutenberg/pull/77148)).
+-   `Autocomplete`: Extract matching logic into a standalone pure function ([#76957](https://github.com/WordPress/gutenberg/pull/76957)).
 
 ### Code Quality
 
@@ -389,10 +394,10 @@
 ### Enhancements
 
 -   `Button`: Hide focus outline on `:active` in High Contrast (forced colors) mode to provide visual click feedback ([#76833](https://github.com/WordPress/gutenberg/pull/76833)).
+-   `Snackbar`: Use `--wpds-dimension-surface-width-lg` design token for max-width ([#76592](https://github.com/WordPress/gutenberg/pull/76592)).
 
 ### Internal
 
--   `Autocomplete`: Extract matching logic into a standalone pure function ([#76957](https://github.com/WordPress/gutenberg/pull/76957)).
 
 ## 32.4.0 (2026-03-18)
 
@@ -401,12 +406,13 @@
 -   Revert `word-break: break-word` addition ([#76230](https://github.com/WordPress/gutenberg/pull/76230)).
 -   `VisuallyHidden`: Add `word-break: normal` to prevent text wrapping issues in screen reader content ([#75539](https://github.com/WordPress/gutenberg/pull/75539)).
 -   `DateTimePicker`: Fix error that occurs when selecting a day outside the valid days for a month (e.g. February 30) ([#76400](https://github.com/WordPress/gutenberg/pull/76400)).
+-   `Menu`: Fix controlled checked state for radio items ([#76041](https://github.com/WordPress/gutenberg/pull/76041)).
 
 ### Enhancements
 
 -   `DateCalendar`, `DateRangeCalendar`: Add `showOutsideDays` and `fixedWeeks` props and style outside-month days ([#76199](https://github.com/WordPress/gutenberg/pull/76199)).
 -   `Modal`: Use `--wpds-dimension-surface-width-*` design tokens for width constraints ([#76494](https://github.com/WordPress/gutenberg/pull/76494)).
--   `Snackbar`: Use `--wpds-dimension-surface-width-lg` design token for max-width ([#76592](https://github.com/WordPress/gutenberg/pull/76592)).
+-   `Tooltip`: Change default `placement` from `bottom` to `top`. ([#76131](https://github.com/WordPress/gutenberg/pull/76131)).
 
 ### Internal
 
@@ -420,7 +426,6 @@
 
 ### Bug Fixes
 
--   `Menu`: Fix controlled checked state for radio items ([#76041](https://github.com/WordPress/gutenberg/pull/76041)).
 -   `ColorPicker`: Preserve hue and saturation when the selected color becomes achromatic ([#75493](https://github.com/WordPress/gutenberg/pull/75493)).
 -   `SnackbarList`: Fix scaling distortion when a snackbar's content is updated in place via a shared notice ID ([#75709](https://github.com/WordPress/gutenberg/pull/75709)).
 -   `ToggleGroupControl`: Fix hover styles on disabled items ([#75737](https://github.com/WordPress/gutenberg/pull/75737)).
@@ -432,7 +437,6 @@
 
 -   `ToggleGroupControl`: Make unselected item color consistent across all variants ([#75737](https://github.com/WordPress/gutenberg/pull/75737)).
 -   `Button`: Add `word-break: break-word`. ([#76071](https://github.com/WordPress/gutenberg/pull/76071)).
--   `Tooltip`: Change default `placement` from `bottom` to `top`. ([#76131](https://github.com/WordPress/gutenberg/pull/76131)).
 
 ### Internal
 
@@ -455,6 +459,7 @@
 
 -   Improve visual emphasis of the selected item in the ToggleGroupControl component ([#75138](https://github.com/WordPress/gutenberg/pull/75138)).
 -   `DateCalendar`, `DateRangeCalendar`: use lighter gray for disabled dates ([#75683](https://github.com/WordPress/gutenberg/pull/75683)).
+-   `ToggleControl` pass full props and support required validation in `ValidatedToggleControl`. [#74956](https://github.com/WordPress/gutenberg/pull/74956)
 
 ### Internal
 
@@ -478,10 +483,10 @@
 ### Internal
 
 -   `ValidatedComboboxControl`: Expose the component under private API's. [#74891](https://github.com/WordPress/gutenberg/pull/74891)
+-   `SlotFill`: unify context providers and `Fill` implementations ([#68056](https://github.com/WordPress/gutenberg/pull/68056)).
 
 ### Enhancements
 
--   `ToggleControl` pass full props and support required validation in `ValidatedToggleControl`. [#74956](https://github.com/WordPress/gutenberg/pull/74956)
 
 ## 32.0.0 (2026-01-16)
 
@@ -541,7 +546,29 @@
 -   `Menu`: Clean up popover wrappers ([#74207](https://github.com/WordPress/gutenberg/pull/74207)).
 -   `Button`, `DateCalendar`, `DateRangeCalendar`, `CheckboxControl`, `Panel`, `Placeholder`: Remove outdated vendor prefix properties in CSS ([#74213](https://github.com/WordPress/gutenberg/pull/74213)).
 -   Updated `fast-deep-equal` imports for compatibility with strict Node.js resolution ([#74530](https://github.com/WordPress/gutenberg/pull/74530)).
--   `SlotFill`: unify context providers and `Fill` implementations ([#68056](https://github.com/WordPress/gutenberg/pull/68056)).
+
+## 31.0.0 (2025-12-23)
+
+### Breaking Changes
+
+-   Validated form controls (private API): Removed `onValidate` prop (use `onChange` to set `customValidity` messages, or add conditionals directly inside the `customValidity` prop instead) ([#73559](https://github.com/WordPress/gutenberg/pull/73559)).
+-   `FormTokenField`: Remove deprecated `__nextHasNoMarginBottom` prop and promote to default behavior ([#73846](https://github.com/WordPress/gutenberg/pull/73846)).
+
+### Enhancements
+
+-   `Menu` and othr menu items: change default size to be 32px tall rather than 40px to improve menu density. ([#73429](https://github.com/WordPress/gutenberg/pull/73429)).
+-   Unify padding using for DataViews, Modals and other container components. ([#73334](https://github.com/WordPress/gutenberg/pull/73334))
+-   `Snackbar`: Shorten timeout duration ([#73814](https://github.com/WordPress/gutenberg/pull/73814)).
+
+### Bug Fixes
+
+-   `Modal`: Fix vertical scroll issue by reducing style specificity to allow overrides. ([#73739](https://github.com/WordPress/gutenberg/pull/73739))
+-   `Notice`: Fix notice component spacing issue when actions are present. ([#69430](https://github.com/WordPress/gutenberg/pull/69430))
+
+### Internal
+
+-   `AlignmentMatrixControl`: Migrate styles from Emotion to a CSS module ([#73714](https://github.com/WordPress/gutenberg/pull/73714) and [#73757](https://github.com/WordPress/gutenberg/pull/73757)).
+-   `AnglePickerControl`: Migrate styles from Emotion to a CSS module ([#73786](https://github.com/WordPress/gutenberg/pull/73786)).
 
 ## 30.9.0 (2025-11-26)
 
@@ -550,6 +577,7 @@
 -   `ExternalLink`: Fix arrow direction for RTL languages. The external link arrow now correctly points to the top-left (↖) instead of top-right (↗) in RTL layouts. ([#73400](https://github.com/WordPress/gutenberg/pull/73400)).
 -   Fixed an issue where the `Guide` component’s close button became invisible on hover when used on light backgrounds. The component's close button now relies on the default button hover effect, and the custom hover color is applied only within `welcome-guide` implementations to maintain consistency. ([#73220](https://github.com/WordPress/gutenberg/pull/73220)).
 -   `DateTimePicker`: Fixed timezone handling when selecting specific dates around changes in daylight savings time when browser and server timezone settings are not in sync, which would cause an incorrect date to be selected. ([#73444](https://github.com/WordPress/gutenberg/pull/73444)).
+-   `Modal`: Fix full-screen modal height to allow contents to scroll properly ([#73150](https://github.com/WordPress/gutenberg/pull/73150)).
 
 ## 30.8.0 (2025-11-12)
 
@@ -560,7 +588,6 @@
 -   `Card`, `CardHeader`, `CardBody` and `CardFooter`: Add support for directional padding through object-based size prop, allowing independent control of padding for each side ([#72511](https://github.com/WordPress/gutenberg/pull/72511)).
 -   `CustomSelectControl`: Fix the options with the same name are shown as the selected option ([#72189](https://github.com/WordPress/gutenberg/pull/72189)).
 -   `NumberControl`: Fix crash when min prop is string and step prop contains decimal ([#73107](https://github.com/WordPress/gutenberg/pull/73107)).
--   `Modal`: Fix full-screen modal height to allow contents to scroll properly ([#73150](https://github.com/WordPress/gutenberg/pull/73150)).
 
 ### Internal
 
@@ -595,6 +622,31 @@
 -   Validated form controls: Replace `rem` with `px` in error message ([#72669](https://github.com/WordPress/gutenberg/pull/72669)).
 -   `FocalPointPicker`: Fix label markup ([#70835](https://github.com/WordPress/gutenberg/pull/70835)).
 
+## 30.6.5 (2026-01-30)
+
+### Bug Fixes
+
+-   `Popover`: Fix `onDialogClose` logic to only close the popover if the blur event targets the specific popover instance ([#72376](https://github.com/WordPress/gutenberg/pull/72376)).
+-   `Popover`: Fix bug where clicking outside nested popovers only closed the inner one. ([#74340](https://github.com/WordPress/gutenberg/pull/74340))
+
+## 30.6.3 (2025-11-10)
+
+### Bug Fixes
+
+-   `NumberControl`: Fix crash when min prop is string and step prop contains decimal ([#73107](https://github.com/WordPress/gutenberg/pull/73107)).
+
+## 30.6.2 (2025-11-07)
+
+### Bug Fixes
+
+-   `Button`: Revert disabled primary button state to its previous one ([#73037](https://github.com/WordPress/gutenberg/pull/73037)).
+
+## 30.6.1 (2025-10-28)
+
+### Enhancements
+
+-   `FontSizePicker`: Add `valueMode` prop to control how the `value` prop is interpreted (`'literal'` for size values, `'slug'` for font size slugs) ([#71703](https://github.com/WordPress/gutenberg/pull/71703))
+
 ## 30.6.0 (2025-10-17)
 
 ### Enhancements
@@ -604,7 +656,6 @@
 -   `SearchControl`: Normalize styles ([#72072](https://github.com/WordPress/gutenberg/pull/72072)).
 -   `Badge`: Avoid propagating text-decoration styles from ancestors into the component ([#72097](https://github.com/WordPress/gutenberg/pull/72097), [#72302](https://github.com/WordPress/gutenberg/pull/72302)).
 -   `CheckboxControl`, `RadioControl`, `ToggleControl` (`FormToggle`): Ensure elements are focused when clicked in Safari ([#72115](https://github.com/WordPress/gutenberg/pull/72115)).
--   `FontSizePicker`: Add `valueMode` prop to control how the `value` prop is interpreted (`'literal'` for size values, `'slug'` for font size slugs) ([#71703](https://github.com/WordPress/gutenberg/pull/71703))
 
 ### Bug Fixes
 
@@ -634,6 +685,7 @@
 ### Bug Fixes
 
 -   `Modal`: Fix modal headings and labels to use proper editor text color instead of wp-admin colors ([#71311](https://github.com/WordPress/gutenberg/pull/71311)).
+-   Validated form controls: Fix Sass var handling for red color ([#71391](https://github.com/WordPress/gutenberg/pull/71391)).
 
 ### Internal
 
@@ -649,27 +701,28 @@
 ### Bug Fixes
 
 -   `Tabs`: Ensure font size inheritance for tab buttons in all contexts ([#71346](https://github.com/WordPress/gutenberg/pull/71346)).
--   Validated form controls: Fix Sass var handling for red color ([#71391](https://github.com/WordPress/gutenberg/pull/71391)).
 
 ### Internal
 
 -   Upgrade `framer-motion` package to version `^11.15.0` ([#71442](https://github.com/WordPress/gutenberg/pull/71442)).
 -   Display names for Context providers [#71208](https://github.com/WordPress/gutenberg/pull/71208).
+-   Validated form controls: Fix bug where "validating" state was not shown when transitioning from error state ([#71260](https://github.com/WordPress/gutenberg/pull/71260)).
 
 ## 30.2.0 (2025-08-20)
 
 ### Bug Fixes
 
 -   `MenuItem`: make accessible when disabled ([#71251](https://github.com/WordPress/gutenberg/pull/71251)).
+-   `DatePicker`: Fix day label alignment for start and end of week ([#71005](https://github.com/WordPress/gutenberg/pull/71005)).
 
 ### Enhancement
 
 -   Upgrade `gradient-parser` to version `1.1.1` to support HSL/HSLA color, CSS variables, and `calc()` expressions ([#71186](https://github.com/WordPress/gutenberg/pull/71186)).
+-   `Button`: Update the disabled state for the Primary button to be less emphasized, to avoid confusing it for enabled. ([#70674](https://github.com/WordPress/gutenberg/pull/70674)).
 
 ### Internal
 
 -   Validated form controls: Add support for async validation. This is a breaking API change that splits the `customValidator` prop into an `onValidate` callback and a `customValidity` object. ([#71184](https://github.com/WordPress/gutenberg/pull/71184)).
--   Validated form controls: Fix bug where "validating" state was not shown when transitioning from error state ([#71260](https://github.com/WordPress/gutenberg/pull/71260)).
 -   `DateCalendar`, `DateRangeCalendar`: use `px` instead of `rem` units. ([#71248](https://github.com/WordPress/gutenberg/pull/71248)).
 
 ## 30.1.0 (2025-08-07)
@@ -677,13 +730,11 @@
 ### Enhancement
 
 -   `ColorPicker`: Improve color picker slider focus styles for better keyboard navigation accessibility ([#70146](https://github.com/WordPress/gutenberg/pull/70146)).
--   `Button`: Update the disabled state for the Primary button to be less emphasized, to avoid confusing it for enabled. ([#70674](https://github.com/WordPress/gutenberg/pull/70674)).
 
 ### Bug Fixes
 
 -   `TextareaControl`: Add missing component CSS classname ([#70930](https://github.com/WordPress/gutenberg/pull/70930)).
 -   `PaletteEdit`: Fill available space with input field ([#70935](https://github.com/WordPress/gutenberg/pull/70935)).
--   `DatePicker`: Fix day label alignment for start and end of week ([#71005](https://github.com/WordPress/gutenberg/pull/71005)).
 
 ### Enhancement
 
@@ -737,6 +788,7 @@
 ### Bug Fixes
 
 -   `FormTokenField`: Fix filtering with full-width string ([#70232](https://github.com/WordPress/gutenberg/pull/70232)).
+-   `FocalPointPicker`: Fix SVG display when it doesn't provide a width attribute ([#70061](https://github.com/WordPress/gutenberg/pull/70061))..
 
 ### Internal
 
@@ -750,6 +802,8 @@
 
 -   `Snackbar`: Add support to open links in a new tab ([#69905](https://github.com/WordPress/gutenberg/pull/69905)).
 -   `ColorPicker`: Add a visual cue when the value is copied ([#70083](https://github.com/WordPress/gutenberg/pull/70083)).
+-   `TextControl`: Add theming support ([#69640](https://github.com/WordPress/gutenberg/pull/69640)).
+-   `TextareaControl`: Add theming support ([#69640](https://github.com/WordPress/gutenberg/pull/69640)).
 
 ### Internal
 
@@ -761,15 +815,12 @@
 
 -   `Guide`: Make next and previous button text customizable ([#69907](https://github.com/WordPress/gutenberg/pull/69907)).
 -   `Popover`: Introduce a virtual padding of `8px` to prevent it from hitting the viewport edge ([#69555](https://github.com/WordPress/gutenberg/pull/69555)).
--   `TextControl`: Add theming support ([#69640](https://github.com/WordPress/gutenberg/pull/69640)).
--   `TextareaControl`: Add theming support ([#69640](https://github.com/WordPress/gutenberg/pull/69640)).
 
 ### Bug Fixes
 
 -   `ToggleGroupControl`: Fix active background for empty string value ([#69969](https://github.com/WordPress/gutenberg/pull/69969)).
 -   `ItemGroup`: Fix double border in `ItemGroup` when last item is focused ([#70021](https://github.com/WordPress/gutenberg/pull/70021)).
 -   `__experimentalUseCustomUnits `: Don't mutate 'ALL_CSS_UNITS' default value ([#70037](https://github.com/WordPress/gutenberg/pull/70037)).
--   `FocalPointPicker`: Fix SVG display when it doesn't provide a width attribute ([#70061](https://github.com/WordPress/gutenberg/pull/70061))..
 
 ### Internal
 
@@ -805,6 +856,10 @@
 -   `Autocomplete`: Extracts `getNodeText` function into a separate file and adds unit tests ([#69135](https://github.com/WordPress/gutenberg/pull/69135)).
 -   `NumberControl`: update stepping to match HTML number input stepping ([#34566](https://github.com/WordPress/gutenberg/pull/34566)).
 
+### Internal
+
+-   `NumberControl`: Fixed className test to properly verify className application. ([#69540](https://github.com/WordPress/gutenberg/pull/69540)).
+
 ## 29.6.0 (2025-03-13)
 
 ### Enhancement
@@ -813,11 +868,29 @@
 
 ### Internal
 
--   `NumberControl`: Fixed className test to properly verify className application. ([#69540](https://github.com/WordPress/gutenberg/pull/69540)).
 
 ### Bug Fixes
 
 -   `Button`: Remove fixed width from small and compact buttons with icons ([#69378](https://github.com/WordPress/gutenberg/pull/69378)).
+-   `FontSizePicker`: Remove non translatable additional info from font size picker visual label and improve labeling. ([#69011](https://github.com/WordPress/gutenberg/pull/69011)).
+
+## 29.5.4 (2025-07-08)
+
+### Internal
+
+-   Mark `withIgnoreIMEEvents()` function as private API ([#70056](https://github.com/WordPress/gutenberg/pull/70056)).
+
+## 29.5.3 (2025-04-28)
+
+### Bug Fixes
+
+-   `ToggleGroupControl`: Fix active background for empty string value ([#69969](https://github.com/WordPress/gutenberg/pull/69969)).
+
+## 29.5.2 (2025-04-01)
+
+### Bug Fixes
+
+-   `Button`: Fix tertiary variant displaying incorrect text color in pressed and hover states ([#68542](https://github.com/WordPress/gutenberg/pull/68542)).
 
 ## 29.5.0 (2025-02-28)
 
@@ -841,7 +914,6 @@
 
 ### Bug Fixes
 
--   `FontSizePicker`: Remove non translatable additional info from font size picker visual label and improve labeling. ([#69011](https://github.com/WordPress/gutenberg/pull/69011)).
 -   `Notice`: Fix text contrast for dark mode ([#69226](https://github.com/WordPress/gutenberg/pull/69226)).
 
 ## 29.4.0 (2025-02-12)
@@ -871,6 +943,10 @@
 -   `CircularOptionPicker`, `ColorPalette`: Fix usage of tooltip in the Circular option picker. ([#68602](https://github.com/WordPress/gutenberg/pull/68602)).
 -   `InputControl`: Ensures email and url inputs have consistent LTR alignment in RTL languages ([#68188](https://github.com/WordPress/gutenberg/pull/68188)).
 
+### Enhancements
+
+-   `Heading`: Revert text contrast fix for dark mode with optimizeReadabilityFor ([#68472](https://github.com/WordPress/gutenberg/pull/68472)).
+
 ## 29.1.0 (2025-01-02)
 
 ### Enhancements
@@ -879,8 +955,7 @@
 -   `Navigation`: Upsize back buttons ([#68157](https://github.com/WordPress/gutenberg/pull/68157)).
 -   `Heading`: Fix text contrast for dark mode ([#68349](https://github.com/WordPress/gutenberg/pull/68349)).
 -   `Text`: Fix text contrast for dark mode ([#68349](https://github.com/WordPress/gutenberg/pull/68349)).
--   `Heading`: Revert text contrast fix for dark mode with optimizeReadabilityFor ([#68472](https://github.com/WordPress/gutenberg/pull/68472)).
--   `Text`: Revert text contrast fix for dark mode with optimizeReadabilityFor ([#68472](https://github.com/WordPress/gutenberg/pull/68472)).
+-   `Button`: Adjust `secondary` variant hover style. ([#67325](https://github.com/WordPress/gutenberg/pull/67325)).
 
 ### Deprecations
 
@@ -896,6 +971,7 @@
 -   `BoxControl`: Better respect for the `min` prop in the Range Slider ([#67819](https://github.com/WordPress/gutenberg/pull/67819)).
 -   `FontSizePicker`: Add `display:contents` rule to fix overflowing text in the custom size select. ([#68280](https://github.com/WordPress/gutenberg/pull/68280)).
 -   `BoxControl`: Fix aria-valuetext value ([#68362](https://github.com/WordPress/gutenberg/pull/68362)).
+-   `CustomSelectControl`: Use `useStoreState` to get `currentValue` and avoid stale values ([#67815](https://github.com/WordPress/gutenberg/pull/67815)).
 
 ### Experimental
 
@@ -928,7 +1004,8 @@
 -   `MenuItem`: Increase height to 40px ([#67435](https://github.com/WordPress/gutenberg/pull/67435)).
 -   `MenuItemsChoice`: Increase option height to 40px ([#67435](https://github.com/WordPress/gutenberg/pull/67435)).
 -   `Navigation`: Fix active item hover color ([#67732](https://github.com/WordPress/gutenberg/pull/67732)).
--   `Button`: Adjust `secondary` variant hover style. ([#67325](https://github.com/WordPress/gutenberg/pull/67325)).
+-   `DropZone`: Add `isEligible` prop to allow customizing whether the drop zone should activate ([#67317](https://github.com/WordPress/gutenberg/pull/67317)).
+-   `DuotonePicker`: Simplify Button styles ([#66641](https://github.com/WordPress/gutenberg/pull/66641)).
 
 ### Deprecations
 
@@ -956,7 +1033,6 @@
 
 -   `ResizableBox`: Make drag handles focusable ([#67305](https://github.com/WordPress/gutenberg/pull/67305)).
 -   `CustomSelectControl`: Update correctly when `showSelectedHint` is enabled ([#67733](https://github.com/WordPress/gutenberg/pull/67733)).
--   `CustomSelectControl`: Use `useStoreState` to get `currentValue` and avoid stale values ([#67815](https://github.com/WordPress/gutenberg/pull/67815)).
 
 ## 28.13.0 (2024-11-27)
 
@@ -988,9 +1064,7 @@
 -   `ColorPicker`: Update sizes of color format select and copy button ([#67093](https://github.com/WordPress/gutenberg/pull/67093)).
 -   `ComboboxControl`: Update reset button size ([#67215](https://github.com/WordPress/gutenberg/pull/67215)).
 -   `Autocomplete`: Increase option height ([#67214](https://github.com/WordPress/gutenberg/pull/67214)).
--   `DropZone`: Add `isEligible` prop to allow customizing whether the drop zone should activate ([#67317](https://github.com/WordPress/gutenberg/pull/67317)).
 -   `CircularOptionPicker`: Update `Button` sizes to be ready for 40px default size ([#67285](https://github.com/WordPress/gutenberg/pull/67285)).
--   `DuotonePicker`: Simplify Button styles ([#66641](https://github.com/WordPress/gutenberg/pull/66641)).
 
 ### Experimental
 
@@ -1014,6 +1088,7 @@
 ### Bug Fixes
 
 -   `Popover`: Fix missing label of the headerTitle Close button ([#66813](https://github.com/WordPress/gutenberg/pull/66813)).
+-   `ToggleGroupControl`: Fix active background for `0` value ([#66855](https://github.com/WordPress/gutenberg/pull/66855)).
 
 ### Enhancements
 
@@ -1022,11 +1097,13 @@
 -   `PaletteEdit`: Add appropriate size props to Buttons ([#66590](https://github.com/WordPress/gutenberg/pull/66590)).
 -   `Notice`: Add appropriate size props to Buttons ([#66593](https://github.com/WordPress/gutenberg/pull/66593)).
 -   `FormTokenField`: Fix token styles ([#66640](https://github.com/WordPress/gutenberg/pull/66640)).
+-   `Popover`: Use small size variant for close button when `expandOnMobile` prop is enabled ([#66587](https://github.com/WordPress/gutenberg/pull/66587)).
 
 ### Internal
 
 -   `Snackbar`: Use link variant for action Button ([#66560](https://github.com/WordPress/gutenberg/pull/66560)).
 -   `BorderControl`: Remove unnecessary boolean assignments ([#66857](https://github.com/WordPress/gutenberg/pull/66857)).
+-   `Panel`: Add 40px size prop to Button ([#66589](https://github.com/WordPress/gutenberg/pull/66589)).
 
 ## 28.11.0 (2024-10-30)
 
@@ -1044,7 +1121,8 @@
 ### Enhancements
 
 -   `PaletteEdit`: use `Item` internally instead of custom styles ([#66164](https://github.com/WordPress/gutenberg/pull/66164)).
--   `Popover`: Use small size variant for close button when `expandOnMobile` prop is enabled ([#66587](https://github.com/WordPress/gutenberg/pull/66587)).
+-   `ComboboxControl`: display `No items found` when there are no matches found ([#66142](https://github.com/WordPress/gutenberg/pull/66142))
+-   `FormTokenField`: display `No items found` when there are no matches found. This occurs when the `__experimentalExpandOnFocus` prop is enabled ([#66142](https://github.com/WordPress/gutenberg/pull/66142))
 
 ### Experimental
 
@@ -1061,7 +1139,6 @@
 
 -   ESLint: Stop disabling `react-hooks/exhaustive-deps` rule ([#66324](https://github.com/WordPress/gutenberg/pull/66324)).
 -   `TabPanel`: Add 40px size prop to tab Button ([#66557](https://github.com/WordPress/gutenberg/pull/66557)).
--   `Panel`: Add 40px size prop to Button ([#66589](https://github.com/WordPress/gutenberg/pull/66589)).
 
 ## 28.10.0 (2024-10-16)
 
@@ -1083,8 +1160,6 @@
 
 -   `Modal`: Modal dialog small improvement for elementShouldBeHidden ([#65941](https://github.com/WordPress/gutenberg/pull/65941)).
 -   `Tabs`: revamped vertical orientation styles ([#65387](https://github.com/WordPress/gutenberg/pull/65387)).
--   `ComboboxControl`: display `No items found` when there are no matches found ([#66142](https://github.com/WordPress/gutenberg/pull/66142))
--   `FormTokenField`: display `No items found` when there are no matches found. This occurs when the `__experimentalExpandOnFocus` prop is enabled ([#66142](https://github.com/WordPress/gutenberg/pull/66142))
 
 ## 28.9.0 (2024-10-03)
 
@@ -1096,13 +1171,14 @@
 -   `ToggleGroupControl`: indicator doesn't jump around when the layout around it changes ([#65175](https://github.com/WordPress/gutenberg/pull/65175)).
 -   `Composite`: fix legacy support for the store prop ([#65821](https://github.com/WordPress/gutenberg/pull/65821)).
 -   `Composite`: make items tabbable if active element gets removed ([#65720](https://github.com/WordPress/gutenberg/pull/65720)).
--   `DropZone`: fix class names on drop ([#65798](https://github.com/WordPress/gutenberg/pull/65798)).
+-   `MenuItemsChoice`: Allow menu items height to adapt to its content ([#65204](https://github.com/WordPress/gutenberg/pull/65204)).
 
 ### Deprecations
 
 -   `__experimentalBorderControl` can now be imported as a stable `BorderControl` ([#65475](https://github.com/WordPress/gutenberg/pull/65475)).
 -   `__experimentalBorderBoxControl` can now be imported as a stable `BorderBoxControl` ([#65586](https://github.com/WordPress/gutenberg/pull/65586)).
 -   `__experimentalNavigator*` components can now be imported as a stable `Navigator`. Similarly, the `__experimentalUseNavigator` hook can be imported as a stable `useNavigator` ([#65802](https://github.com/WordPress/gutenberg/pull/65802)).
+-   `__experimentalBoxControl` can now be imported as a stable `BoxControl` ([#65469](https://github.com/WordPress/gutenberg/pull/65469)).
 
 ### Enhancements
 
@@ -1116,6 +1192,67 @@
 -   `BorderControl`: Use `__next40pxDefaultSize` prop for Reset button ([#65682](https://github.com/WordPress/gutenberg/pull/65682)).
 -   `Navigator`: stabilize APIs ([#64613](https://github.com/WordPress/gutenberg/pull/64613)).
 -   `ToggleGroupControl`: indicator animation is now more lightweight and performant ([#65175](https://github.com/WordPress/gutenberg/pull/65175)).
+-   `BoxControl`: promote to stable ([#65469](https://github.com/WordPress/gutenberg/pull/65469)).
+
+## 28.8.12 (2025-02-04)
+
+### Bug Fixes
+
+-   `Composite.Hover`: Restore functionality ([#67212](https://github.com/WordPress/gutenberg/pull/67212)).
+-   `Composite.Typeahead`: Restore functionality ([#67212](https://github.com/WordPress/gutenberg/pull/67212)).
+
+## 28.8.11 (2024-11-20)
+
+### Bug Fixes
+
+-  `FormFileUpload`: Prevent HEIC and HEIF files from being uploaded on Safari ([#67139](https://github.com/WordPress/gutenberg/pull/67139)).
+
+## 28.8.7 (2024-10-21)
+
+### Bug Fixes
+
+-   `ToggleGroupControl`: Don't set value on focus after a reset ([#66151](https://github.com/WordPress/gutenberg/pull/66151)).
+
+## 28.8.6 (2024-10-14)
+
+### Bug Fixes
+
+-   `ToolsPanel`: atomic one-step state update when (un)registering panels ([#65564](https://github.com/WordPress/gutenberg/pull/65564)).
+-   `Navigator`: fix `isInitial` logic ([#65527](https://github.com/WordPress/gutenberg/pull/65527)).
+-   `ToggleGroupControl`: Fix arrow key navigation in RTL ([#65735](https://github.com/WordPress/gutenberg/pull/65735)).
+-   `Composite`: fix legacy support for the store prop ([#65821](https://github.com/WordPress/gutenberg/pull/65821)).
+-   `Composite`: make items tabbable if active element gets removed ([#65720](https://github.com/WordPress/gutenberg/pull/65720)).
+-   `DatePicker`: Use compact button size. ([#65653](https://github.com/WordPress/gutenberg/pull/65653)).
+-   `DropZone`: fix class names on drop ([#65798](https://github.com/WordPress/gutenberg/pull/65798)).
+-   `Tooltip`: add `aria-describedby` to the anchor only if not redundant ([#65989](https://github.com/WordPress/gutenberg/pull/65989)).
+-   `PaletteEdit`: dedupe palette element slugs ([#65772](https://github.com/WordPress/gutenberg/pull/65772)).
+-   `ToggleGroupControl`: Don't autoselect option on first group focus ([#65892](https://github.com/WordPress/gutenberg/pull/65892)).
+-   `Guide`: Update finish button to use the new default size ([#65680](https://github.com/WordPress/gutenberg/pull/65680)).
+
+## 28.8.5 (2024-10-06)
+
+### Bug Fixes
+
+-   `Composite`: fix legacy support for the store prop ([#65821](https://github.com/WordPress/gutenberg/pull/65821)).
+-   `Composite`: make items tabbable if active element gets removed ([#65720](https://github.com/WordPress/gutenberg/pull/65720)).
+-   `DatePicker`: Use compact button size. ([#65653](https://github.com/WordPress/gutenberg/pull/65653)).
+
+## 28.8.4 (2024-10-01)
+
+### Bug Fixes
+
+-   `ToggleGroupControl`: Fix arrow key navigation in RTL ([#65735](https://github.com/WordPress/gutenberg/pull/65735)).
+
+## 28.8.3 (2024-09-30)
+
+### Enhancements
+
+-   `Guide`: Update finish button to use the new default size ([#65680](https://github.com/WordPress/gutenberg/pull/65680)).
+
+### Bug Fixes
+
+-   `ToolsPanel`: atomic one-step state update when (un)registering panels ([#65564](https://github.com/WordPress/gutenberg/pull/65564)).
+-   `Navigator`: fix `isInitial` logic ([#65527](https://github.com/WordPress/gutenberg/pull/65527)).
 
 ## 28.8.0 (2024-09-19)
 
@@ -1124,13 +1261,11 @@
 -   `Tabs`: restore vertical indicator ([#65385](https://github.com/WordPress/gutenberg/pull/65385)).
 -   `Tabs`: indicator positioning under RTL direction ([#64926](https://github.com/WordPress/gutenberg/pull/64926)).
 -   `Popover`: Update `toolbar` variant radius to match block toolbar ([#65263](https://github.com/WordPress/gutenberg/pull/65263)).
--   `MenuItemsChoice`: Allow menu items height to adapt to its content ([#65204](https://github.com/WordPress/gutenberg/pull/65204)).
 -   `BoxControl`: Unify input filed width whether linked or not ([#65348](https://github.com/WordPress/gutenberg/pull/65348)).
 
 ### Deprecations
 
 -   Deprecate `__unstableComposite`, `__unstableCompositeGroup`, `__unstableCompositeItem` and `__unstableUseCompositeState`. Consumers of the package should use the stable `Composite` component instead ([#63572](https://github.com/WordPress/gutenberg/pull/63572)).
--   `__experimentalBoxControl` can now be imported as a stable `BoxControl` ([#65469](https://github.com/WordPress/gutenberg/pull/65469)).
 
 ### New Features
 
@@ -1151,7 +1286,6 @@
 -   `Tooltip`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
 -   `Modal`: add exit animation for internally triggered events ([#65203](https://github.com/WordPress/gutenberg/pull/65203)).
 -   `Card`: Adopt radius scale ([#65053](https://github.com/WordPress/gutenberg/pull/65053)).
--   `BoxControl`: promote to stable ([#65469](https://github.com/WordPress/gutenberg/pull/65469)).
 
 ### Bug Fixes
 
@@ -1163,6 +1297,7 @@
 -   `Composite`: Remove from private APIs ([#63569](https://github.com/WordPress/gutenberg/pull/63569)).
 -   use local copy of `use-lilius` instead of `npm` dependency ([#65097](https://github.com/WordPress/gutenberg/pull/65097)).
 -   `BoxControl`: Fix critical error when null value is passed ([#65287](https://github.com/WordPress/gutenberg/pull/65287)).
+-   `Composite` V2: remove `store` prop and `useCompositeStore` hook ([#64723](https://github.com/WordPress/gutenberg/pull/64723)).
 
 ## 28.7.0 (2024-09-05)
 
@@ -1240,7 +1375,6 @@
 -   `Composite` V2: fix Storybook docgen ([#64682](https://github.com/WordPress/gutenberg/pull/64682)).
 -   `Composite` V2: add "With Slot Fill" example ([#65051](https://github.com/WordPress/gutenberg/pull/65051)).
 -   `Composite` V2: accept store props on top-level component ([#64832](https://github.com/WordPress/gutenberg/pull/64832)).
--   `Composite` V2: remove `store` prop and `useCompositeStore` hook ([#64723](https://github.com/WordPress/gutenberg/pull/64723)).
 
 ## 28.6.0 (2024-08-21)
 
@@ -1305,6 +1439,8 @@
 -   `TextareaControl`: Update styles ([#64586](https://github.com/WordPress/gutenberg/pull/64586)).
 -   `CircularOptionPicker`: Update hard-coded border-width value ([#64680](https://github.com/WordPress/gutenberg/pull/64680)).
 -   `CustomGradientPicker`: Update hard-coded border-width value ([#64680](https://github.com/WordPress/gutenberg/pull/64680)).
+-   `ColorPalette`: partial support of `color-mix()` CSS colors ([#64224](https://github.com/WordPress/gutenberg/pull/64224)).
+-   `DimensionControl`: Add `__nextHasNoMarginBottom` prop to remove bottom margin ([#64346](https://github.com/WordPress/gutenberg/pull/64346)).
 
 ### Bug Fixes
 
@@ -1334,22 +1470,23 @@
 -   `Autocompleter UI`: Fix text color when hovering selected item ([#64294](https://github.com/WordPress/gutenberg/pull/64294)).
 -   `Heading`: Add the missing `size` prop to the component's props type ([#64299](https://github.com/WordPress/gutenberg/pull/64299)).
 -   `TextControl`: Fix the padding of the component to be consistent with the rest of the controls. ([#64326](https://github.com/WordPress/gutenberg/pull/64326)).
+-   `BaseControl`: change label's `display` to `block`. ([#63911](https://github.com/WordPress/gutenberg/pull/63911))
+-   `ToggleControl`: Fix indentation ([#63903](https://github.com/WordPress/gutenberg/pull/63903)).
 
 ### Enhancements
 
--   `ColorPalette`: partial support of `color-mix()` CSS colors ([#64224](https://github.com/WordPress/gutenberg/pull/64224)).
 -   `TimeInput`: Expose as subcomponent of `TimePicker` ([#63145](https://github.com/WordPress/gutenberg/pull/63145)).
 -   `RadioControl`: add support for option help text ([#63751](https://github.com/WordPress/gutenberg/pull/63751)).
 -   `SelectControl`: Infer `value` type from `options` ([#64069](https://github.com/WordPress/gutenberg/pull/64069)).
 -   `Guide`: Add `__next40pxDefaultSize` to buttons ([#64181](https://github.com/WordPress/gutenberg/pull/64181)).
 -   `SelectControl`: Pass through `options` props ([#64211](https://github.com/WordPress/gutenberg/pull/64211)).
--   `DimensionControl`: Add `__nextHasNoMarginBottom` prop to remove bottom margin ([#64346](https://github.com/WordPress/gutenberg/pull/64346)).
 
 ### Internal
 
 -   Upgraded `@ariakit/react` (v0.4.7) and `@ariakit/test` (v0.4.0) ([#64066](https://github.com/WordPress/gutenberg/pull/64066)).
 -   `DropdownMenuV2`: break menu item help text on multiple lines for better truncation. ([#63916](https://github.com/WordPress/gutenberg/pull/63916)).
 -   `CustomSelectControl`: Support generic props type ([#63985](https://github.com/WordPress/gutenberg/pull/63985)).
+-   `Placeholder`: Remove unnecessary `placeholder-style` Sass mixin ([#63885](https://github.com/WordPress/gutenberg/pull/63885)).
 
 ## 28.4.0 (2024-07-24)
 
@@ -1359,11 +1496,9 @@
 
 ### Bug Fixes
 
--   `BaseControl`: change label's `display` to `block`. ([#63911](https://github.com/WordPress/gutenberg/pull/63911))
 -   `ComboboxControl`: Fix ComboboxControl reset button when using the keyboard. ([#63410](https://github.com/WordPress/gutenberg/pull/63410))
 -   `Button`: Never apply `aria-disabled` to anchor ([#63376](https://github.com/WordPress/gutenberg/pull/63376)).
 -   `SelectControl`: Fix hover/focus color in wp-admin ([#63855](https://github.com/WordPress/gutenberg/pull/63855)).
--   `ToggleControl`: Fix indentation ([#63903](https://github.com/WordPress/gutenberg/pull/63903)).
 
 ### Enhancements
 
@@ -1376,6 +1511,7 @@
 -   `CheckboxControl`: Slightly reduced footprint. Make label treatment, focus styles, and spacing consistent with `ToggleControl` and `RadioControl`. ([#63490](https://github.com/WordPress/gutenberg/pull/63490)).
 -   `RadioControl`: Slightly reduced footprint. Make label treatment, focus styles, and spacing consistent with `ToggleControl` and `CheckboxControl`. ([#63490](https://github.com/WordPress/gutenberg/pull/63490)).
 -   `FormToggle`: Update spacing and appearance to adhere to 4px baseline, slightly reducing footprint. Make label treatment and focus styles consistent with `RadioControl` and `CheckboxControl`. ([#63490](https://github.com/WordPress/gutenberg/pull/63490)).
+-   `Tabs`: hyphenate tab labels ([#63337](https://github.com/WordPress/gutenberg/pull/63337)).
 
 ### Internal
 
@@ -1386,7 +1522,6 @@
 -   `Tabs`: Vertical Tabs should be 40px min height. ([#63446](https://github.com/WordPress/gutenberg/pull/63446)).
 -   `ColorPicker`: Use `minimal` variant for `SelectControl` ([#63676](https://github.com/WordPress/gutenberg/pull/63676)).
 -   `Tabs`: keep full opacity of focus ring and remove hover styles on disabled tabs ([#63754](https://github.com/WordPress/gutenberg/pull/63754)).
--   `Placeholder`: Remove unnecessary `placeholder-style` Sass mixin ([#63885](https://github.com/WordPress/gutenberg/pull/63885)).
 
 ### Documentation
 
@@ -1396,7 +1531,6 @@
 
 ### Enhancements
 
--   `Tabs`: hyphenate tab labels ([#63337](https://github.com/WordPress/gutenberg/pull/63337)).
 -   `Tooltip`: Add support for `className` prop ([#63157](https://github.com/WordPress/gutenberg/pull/63157)).
 -   `Toolbar`: Add support for `vertical` orientation ([#60123](https://github.com/WordPress/gutenberg/pull/60123)).
 -   `BaseControl`: forward ref on `VisualLabel` ([#63169](https://github.com/WordPress/gutenberg/pull/63169)).
@@ -1466,6 +1600,12 @@
 
 -   `Tabs`: Prevent accidental overflow in indicator ([#61979](https://github.com/WordPress/gutenberg/pull/61979)).
 
+## 28.0.3 (2024-06-25)
+
+### Enhancements
+
+- `__experimentalPaletteEdit`: improve the accessibility. ([#62753](https://github.com/WordPress/gutenberg/pull/62753))
+
 ## 28.0.0 (2024-05-31)
 
 ### Breaking Changes
@@ -1479,6 +1619,7 @@
 -   `ComboboxControl`: Introduce Combobox expandOnFocus prop ([#61705](https://github.com/WordPress/gutenberg/pull/61705)).
 -   `ProgressBar`: Expose as public API ([#61062](https://github.com/WordPress/gutenberg/pull/61062)).
 -   `ProgressBar`: Simplify default width implementation and make it more easily overridable ([#61976](https://github.com/WordPress/gutenberg/pull/61976)).
+-   `FontSizePicker`: Add `vw` and `vh` units to the default units in the font size picker ([#60507](<(https://github.com/WordPress/gutenberg/pull/60607)>).
 
 ### Bug Fixes
 
@@ -1504,7 +1645,6 @@
 
 ### Enhancements
 
--   `FontSizePicker`: Add `vw` and `vh` units to the default units in the font size picker ([#60507](<(https://github.com/WordPress/gutenberg/pull/60607)>).
 -   `PaletteEdit`: Use consistent spacing and metrics. ([#61368](https://github.com/WordPress/gutenberg/pull/61368)).
 -   `FormTokenField`: Hide label when not defined ([#61336](https://github.com/WordPress/gutenberg/pull/61336)).
 -   `ComboboxControl`: supports disabled items ([#61294](https://github.com/WordPress/gutenberg/pull/61294)).
@@ -1516,27 +1656,35 @@
 -   `ToolsPanel`: Fix sticking “Reset” option ([#60621](https://github.com/WordPress/gutenberg/pull/60621)).
 -   Fix an issue where types used a synthetic default import ([#61679](https://github.com/WordPress/gutenberg/pull/61679)).
 
+### Bug Fix
+
+-   `BaseControl`, `InputControl`: Remove usage of aria-details from InputControl and BaseControl ([#61203](https://github.com/WordPress/gutenberg/pull/61203)).
+
 ## 27.5.0 (2024-05-02)
 
 ### Enhancements
 
--   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
 -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
 -   `View`: Fix prop types ([#60919](https://github.com/WordPress/gutenberg/pull/60919)).
 -   `Placeholder`: Unify appearance across. ([#59275](https://github.com/WordPress/gutenberg/pull/59275)).
 -   `Toolbar`: Adjust top toolbar to use same metrics as block toolbar ([#61126](https://github.com/WordPress/gutenberg/pull/61126)).
 -   `DropZone`: Avoid a media query on mount [#60546](https://github.com/WordPress/gutenberg/pull/60546)).
 -   `ComboboxControl`: Simplify string normalization ([#60893](https://github.com/WordPress/gutenberg/pull/60893)).
+-   `CheckboxControl`: Update help text alignment ([#60787](https://github.com/WordPress/gutenberg/pull/60787)).
+-   `Autocomplete` : match the autocomplete styling to that of List View and Command Palette([#60131](https://github.com/WordPress/gutenberg/pull/60131)).
 
 ### Bug Fixes
 
--   `BaseControl`, `InputControl`: Remove usage of aria-details from InputControl and BaseControl ([#61203](https://github.com/WordPress/gutenberg/pull/61203)).
 -   `SlotFill`: fixed missing `getServerSnapshot` parameter in slot map ([#60943](https://github.com/WordPress/gutenberg/pull/60943)).
 -   `Panel`: Fix issue with collapsing panel header ([#61319](https://github.com/WordPress/gutenberg/pull/61319)).
 
 ### Internal
 
 -   `FontSizerPicker`: Improve docs for default units ([#60996](https://github.com/WordPress/gutenberg/pull/60996)).
+
+### Bug Fix
+
+-   `CheckboxControl`: Fix label text wrap ([#60787](https://github.com/WordPress/gutenberg/pull/60787)).
 
 ## 27.4.0 (2024-04-19)
 
@@ -1553,14 +1701,12 @@
 -   `Navigator`: Navigation to the active path doesn't create a new location history ([#60561](https://github.com/WordPress/gutenberg/pull/60561)).
 -   `FormToggle`: Forwards ref to input ([#60234](https://github.com/WordPress/gutenberg/pull/60234)).
 -   `ToggleControl`: Forwards ref to FormToggle ([#60234](https://github.com/WordPress/gutenberg/pull/60234)).
--   `CheckboxControl`: Update help text alignment ([#60787](https://github.com/WordPress/gutenberg/pull/60787)).
 
 ### Bug Fixes
 
 -   `Truncate`: Fix link control link preview when it displays long URLs ([#60890](https://github.com/WordPress/gutenberg/pull/60890)).
 
 -   `ProgressBar`: Fix CSS variable with invalid value ([#60576](https://github.com/WordPress/gutenberg/pull/60576)).
--   `CheckboxControl`: Fix label text wrap ([#60787](https://github.com/WordPress/gutenberg/pull/60787)).
 
 ### Experimental
 
@@ -1608,7 +1754,6 @@
 
 -   `TextControl`: Add typings for `date`, `time` and `datetime-local` ([#59666](https://github.com/WordPress/gutenberg/pull/59666)).
 -   `Text`, `Heading`, `ItemGroup` : Update the line height from 1.2 to 1.4 ([#60041](https://github.com/WordPress/gutenberg/pull/60041)).
--   `Autocomplete` : match the autocomplete styling to that of List View and Command Palette([#60131](https://github.com/WordPress/gutenberg/pull/60131)).
 
 ### Deprecations
 
@@ -1623,16 +1768,19 @@
 -   `PaletteEdit`: Fix number incrementing of default names for new colors added in non-en-US locales ([#52212](https://github.com/WordPress/gutenberg/pull/52212)).
 -   `DateTimePicker`: Change day button size back from 32px to 28px ([#59990](https://github.com/WordPress/gutenberg/pull/59990)).
 
+### Bug Fix
+
+-   `InputControl`: Fix sample code on InputControl docs [#59517](https://github.com/WordPress/gutenberg/pull/59517)
+-   `ToggleGroupControl`: Fix unwanted backdrop vertical animation ([#59642](https://github.com/WordPress/gutenberg/pull/59642)).
+
 ## 27.1.0 (2024-03-06)
 
 ### Bug Fixes
 
--   `InputControl`: Fix sample code on InputControl docs [#59517](https://github.com/WordPress/gutenberg/pull/59517)
 -   `Tooltip`: Explicitly set system font to avoid CSS bleed ([#59307](https://github.com/WordPress/gutenberg/pull/59307)).
 -   `HStack`, `VStack`: Stop passing invalid props to underlying element ([#59416](https://github.com/WordPress/gutenberg/pull/59416)).
 -   `Button`: Fix focus outline in disabled primary variant ([#59391](https://github.com/WordPress/gutenberg/pull/59391)).
 -   `Button`: Place `children` before the icon when `iconPosition` is `right` ([#59489](https://github.com/WordPress/gutenberg/pull/59489)).
--   `ToggleGroupControl`: Fix unwanted backdrop vertical animation ([#59642](https://github.com/WordPress/gutenberg/pull/59642)).
 
 ### Internal
 
@@ -1642,6 +1790,7 @@
 ### Experimental
 
 -   `CustomSelectControlV2`: Remove legacy adapter layer ([#59420](https://github.com/WordPress/gutenberg/pull/59420)).
+-   `Tabs`: rename `initialTabId` prop to `defaultTabId` ([#59035](https://github.com/WordPress/gutenberg/pull/59035)).
 
 ## 27.0.0 (2024-02-21)
 
@@ -1663,18 +1812,21 @@
 
 ### Experimental
 
--   `Tabs`: rename `initialTabId` prop to `defaultTabId` ([#59035](https://github.com/WordPress/gutenberg/pull/59035)).
+-   `CustomSelectControlV2`: Adapt component for legacy usage ([#57902](https://github.com/WordPress/gutenberg/pull/57902)).
+
+
+### Bug Fix
+
+-   `Modal`: Add `box-sizing` reset style ([#58905](https://github.com/WordPress/gutenberg/pull/58905)).
 
 ## 26.0.1 (2024-02-13)
 
 ### Bug Fixes
 
--   `Modal`: Add `box-sizing` reset style ([#58905](https://github.com/WordPress/gutenberg/pull/58905)).
 -   `Popover`: Fix positioning in nested iframes by upgrading Floating UI packages to their latest versions ([#58932](https://github.com/WordPress/gutenberg/pull/58932)).
 
 ### Experimental
 
--   `CustomSelectControlV2`: Adapt component for legacy usage ([#57902](https://github.com/WordPress/gutenberg/pull/57902)).
 
 ## 26.0.0 (2024-02-09)
 
@@ -1694,6 +1846,7 @@
 -   Remove deprecation warnings for `__next36pxDefaultSize` prop ([#58703](https://github.com/WordPress/gutenberg/pull/58703)).
 -   `CheckboxControl`: Remove ability for label prop to be false ([#58339](https://github.com/WordPress/gutenberg/pull/58339)).
 -   `FocalPointPicker`: Apply modern styling ([#58459](https://github.com/WordPress/gutenberg/pull/58459)).
+-   `Popover`: Adding `constrainTabbing` prop to `useDialog` hook ([#57962](https://github.com/WordPress/gutenberg/pull/57962))
 
 ### Bug Fixes
 
@@ -1735,7 +1888,6 @@
 -   `Tooltip` and `Button`: tidy up unit tests ([#57975](https://github.com/WordPress/gutenberg/pull/57975)).
 -   `BorderControl`, `BorderBoxControl`: Replace style picker with ToggleGroupControl ([#57562](https://github.com/WordPress/gutenberg/pull/57562)).
 -   `SlotFill`: fix typo in use-slot-fills return docs ([#57654](https://github.com/WordPress/gutenberg/pull/57654))
--   `Popover`: Adding `constrainTabbing` prop to `useDialog` hook ([#57962](https://github.com/WordPress/gutenberg/pull/57962))
 
 ### Bug Fixes
 
@@ -1782,6 +1934,8 @@
 -   `InputControl`, `NumberControl`, `UnitControl`, `SelectControl`, `TreeSelect`: Add `compact` size variant ([#57398](https://github.com/WordPress/gutenberg/pull/57398)).
 -   `ToggleGroupControl`: Update button size in large variant to be 32px ([#57338](https://github.com/WordPress/gutenberg/pull/57338)).
 -   `Tooltip`: improve unit tests ([#57345](https://github.com/WordPress/gutenberg/pull/57345)).
+-   `Navigator`: use vanilla CSS animations instead of `framer-motion` ([#56909](https://github.com/WordPress/gutenberg/pull/56909)).
+-   `ToolsPanel`/`ToolsPanelHeader`: Added `dropdownMenuProps` to allow customization of the panel's dropdown menu. Also merged default and optional control menu groups ([#55785](https://github.com/WordPress/gutenberg/pull/55785)).
 
 ### Experimental
 
@@ -1789,12 +1943,24 @@
 -   `Tabs`: do not render hidden content ([#57046](https://github.com/WordPress/gutenberg/pull/57046)).
 -   `Tabs`: improve hover and text alignment styles ([#57275](https://github.com/WordPress/gutenberg/pull/57275)).
 -   `Tabs`: make sure `Tab`s are associated to the right `TabPanel`s, regardless of the order they're rendered in ([#57033](https://github.com/WordPress/gutenberg/pull/57033)).
+-   `CustomSelect`: add `WordPressComponentsProps` for more flexibility ([#56998](https://github.com/WordPress/gutenberg/pull/56998))
+
+### Code Quality
+
+-   `Composite`: add unit tests for `useCompositeState` ([#56645](https://github.com/WordPress/gutenberg/pull/56645)).
+
+### Bug Fix
+
+-   `SlotFillProvider`: Restore contextual Slot/Fills within SlotFillProvider ([#56779](https://github.com/WordPress/gutenberg/pull/56779)).
+
+### Internal
+
+-   Move `kebabCase()` function from `block-editor` package and mark it as private API ([#56758](https://github.com/WordPress/gutenberg/pull/56758)).
 
 ## 25.14.0 (2023-12-13)
 
 ### Enhancements
 
--   `Navigator`: use vanilla CSS animations instead of `framer-motion` ([#56909](https://github.com/WordPress/gutenberg/pull/56909)).
 -   `FormToggle`: fix sass deprecation warning ([#56672](https://github.com/WordPress/gutenberg/pull/56672)).
 -   `QueryControls`: Add opt-in prop for 40px default size ([#56576](https://github.com/WordPress/gutenberg/pull/56576)).
 -   `CheckboxControl`: Add option to not render label ([#56158](https://github.com/WordPress/gutenberg/pull/56158)).
@@ -1802,7 +1968,7 @@
 -   `FocalPointPicker`: Add opt-in prop for 40px default size ([#56021](https://github.com/WordPress/gutenberg/pull/56021)).
 -   `DimensionControl`: Add opt-in prop for 40px default size ([#56805](https://github.com/WordPress/gutenberg/pull/56805)).
 -   `FontSizePicker`: Add opt-in prop for 40px default size ([#56804](https://github.com/WordPress/gutenberg/pull/56804)).
--   `ToolsPanel`/`ToolsPanelHeader`: Added `dropdownMenuProps` to allow customization of the panel's dropdown menu. Also merged default and optional control menu groups ([#55785](https://github.com/WordPress/gutenberg/pull/55785)).
+-   `InserterButton`: Move mobile InserterButton from components package to block-editor package ([#56494](https://github.com/WordPress/gutenberg/pull/56494))
 
 ### Bug Fixes
 
@@ -1810,17 +1976,14 @@
 -   `ToggleGroupControl`: react correctly to external controlled updates ([#56678](https://github.com/WordPress/gutenberg/pull/56678)).
 -   `ToolsPanel`: fix a performance issue ([#56770](https://github.com/WordPress/gutenberg/pull/56770)).
 -   `BorderControl`: adjust `BorderControlDropdown` Button size to fix misaligned border ([#56730](https://github.com/WordPress/gutenberg/pull/56730)).
--   `SlotFillProvider`: Restore contextual Slot/Fills within SlotFillProvider ([#56779](https://github.com/WordPress/gutenberg/pull/56779)).
 
 ### Internal
 
 -   `DropdownMenuV2Ariakit`: prevent prefix collapsing if all radios or checkboxes are unselected ([#56720](https://github.com/WordPress/gutenberg/pull/56720)).
--   Move `kebabCase()` function from `block-editor` package and mark it as private API ([#56758](https://github.com/WordPress/gutenberg/pull/56758)).
 
 ### Experimental
 
 -   `Tabs`: implement new `tabId` prop ([#56883](https://github.com/WordPress/gutenberg/pull/56883)).
--   `CustomSelect`: add `WordPressComponentsProps` for more flexibility ([#56998](https://github.com/WordPress/gutenberg/pull/56998))
 
 ### Experimental
 
@@ -1831,17 +1994,19 @@
 -   `Search`: Added links to storybook for more information on usage. ([#56815](https://github.com/WordPress/gutenberg/pull/56815)).
 -   `Spinner`: Added links to storybook for more information on usage. ([#56953](https://github.com/WordPress/gutenberg/pull/56953)).
 
+### Bug Fix
+
+-   `DateTime`: Make the Timezone indication render a tooltip only when necessary. ([#56214](https://github.com/WordPress/gutenberg/pull/56214)).
+
 ## 25.13.0 (2023-11-29)
 
 ### Enhancements
 
 -   `FormToggle`: refine animation and improve high contrast styles ([#56515](https://github.com/WordPress/gutenberg/pull/56515)).
 -   `Button`: Add focus rings to focusable disabled buttons ([#56383](https://github.com/WordPress/gutenberg/pull/56383)).
--   `InserterButton`: Move mobile InserterButton from components package to block-editor package ([#56494](https://github.com/WordPress/gutenberg/pull/56494))
 
 ### Bug Fixes
 
--   `DateTime`: Make the Timezone indication render a tooltip only when necessary. ([#56214](https://github.com/WordPress/gutenberg/pull/56214)).
 -   `ToolsPanelItem`: Use useLayoutEffect to prevent rendering glitch for last panel item styling. ([#56536](https://github.com/WordPress/gutenberg/pull/56536)).
 -   `FormTokenField`: Fix broken suggestions scrollbar when the `__experimentalExpandOnFocus` prop is defined ([#56426](https://github.com/WordPress/gutenberg/pull/56426)).
 -   `FormTokenField`: `onFocus` prop is now typed as a React `FocusEvent` ([#56426](https://github.com/WordPress/gutenberg/pull/56426)).
@@ -1859,7 +2024,10 @@
 
 -   `Slot`: add `style` prop to `bubblesVirtually` version ([#56428](https://github.com/WordPress/gutenberg/pull/56428))
 -   Introduce experimental new version of `CustomSelectControl` based on `ariakit` ([#55790](https://github.com/WordPress/gutenberg/pull/55790))
--   `Composite`: add unit tests for `useCompositeState` ([#56645](https://github.com/WordPress/gutenberg/pull/56645)).
+
+### Bug Fix
+
+-   Improve Button saving state accessibility. ([#55547](https://github.com/WordPress/gutenberg/pull/55547))
 
 ## 25.12.0 (2023-11-16)
 
@@ -1899,11 +2067,15 @@
 ### Bug Fixes
 
 -   `Autocomplete`: Add `aria-live` announcements for Mac and IOS Voiceover to fix lack of support for `aria-owns` ([#54902](https://github.com/WordPress/gutenberg/pull/54902)).
--   Improve Button saving state accessibility. ([#55547](https://github.com/WordPress/gutenberg/pull/55547))
 
 ### Internal
 
 -   Introduce experimental new version of `DropdownMenu` based on `ariakit` ([#54939](https://github.com/WordPress/gutenberg/pull/54939))
+-   Update `@ariakit/react` to version `0.3.5` ([#55365](https://github.com/WordPress/gutenberg/pull/55365))
+
+### Bug Fix
+
+-   `Autocomplete`: Fix disappearing results issue when using multiple triggers inline ([#55301](https://github.com/WordPress/gutenberg/pull/55301))
 
 ## 25.10.0 (2023-10-18)
 
@@ -1916,21 +2088,29 @@
 -   `GradientPicker`: remove overflow styles and padding from `ColorPicker` popovers ([#55265](https://github.com/WordPress/gutenberg/pull/55265)).
 -   `Tabs`: Expose via private APIs ([#55327](https://github.com/WordPress/gutenberg/pull/55327)).
 -   `ColorPalette`/`ToggleGroupControl/ToggleGroupControlOptionBase`: add `type="button"` attribute to native `<button>`s ([#55125](https://github.com/WordPress/gutenberg/pull/55125)).
+-   `Composite`/`AlignmentMatrixControl`/`CircularOptionPicker`: Starts the `Composite` migration from `reakit` to `ariakit` ([#54225](https://github.com/WordPress/gutenberg/pull/54225)).
 
 ### Bug Fixes
 
 -   Render a "mouse event trap" when using a `ColorPicker` inside a `Popover` to prevent issues when rendering on top of `iframes` ([#55149](https://github.com/WordPress/gutenberg/pull/55149)).
 -   `Modal`: fix closing when contained iframe is focused ([#51602](https://github.com/WordPress/gutenberg/pull/51602)).
--   `Autocomplete`: Fix disappearing results issue when using multiple triggers inline ([#55301](https://github.com/WordPress/gutenberg/pull/55301))
 
 ### Internal
 
--   Update `@ariakit/react` to version `0.3.5` ([#55365](https://github.com/WordPress/gutenberg/pull/55365))
 -   `ConfirmDialog`: Migrate to TypeScript. ([#54954](https://github.com/WordPress/gutenberg/pull/54954)).
+-   `Text`: Migrate to TypeScript. ([#54953](https://github.com/WordPress/gutenberg/pull/54953)).
 
 ### New Features
 
 -   `Toolbar`: add new `variant` prop for 'unstyled' option ([#55139](https://github.com/WordPress/gutenberg/pull/55139)).
+
+### Bug Fix
+
+-   `Button`: Revert toggled style selector to use a class instead of attributes ([#55065](https://github.com/WordPress/gutenberg/pull/55065)).
+
+### Experimental
+
+-   Introduce `Tabs`, an experimental v2 of `TabPanel`: ([#53960](https://github.com/WordPress/gutenberg/pull/53960)).
 
 ## 25.9.0 (2023-10-05)
 
@@ -1943,7 +2123,7 @@
 -   `InputControl`, `NumberControl`, `UnitControl`, `SelectControl`, `CustomSelectControl`, `TreeSelect`: Add opt-in prop for next 40px default size, superseding the `__next36pxDefaultSize` prop ([#53819](https://github.com/WordPress/gutenberg/pull/53819)).
 -   `Modal`: add a new `size` prop to support preset widths, including a `fill` option to eventually replace the `isFullScreen` prop ([#54471](https://github.com/WordPress/gutenberg/pull/54471)).
 -   Wrapped `TextareaControl` in a `forwardRef` call ([#54975](https://github.com/WordPress/gutenberg/pull/54975)).
--   `Composite`/`AlignmentMatrixControl`/`CircularOptionPicker`: Starts the `Composite` migration from `reakit` to `ariakit` ([#54225](https://github.com/WordPress/gutenberg/pull/54225)).
+-   `Sandbox`: Add `tabIndex` prop ([#54408](https://github.com/WordPress/gutenberg/pull/54408)).
 
 ### Bug Fixes
 
@@ -1954,7 +2134,6 @@
 -   `Button`: Remove `aria-selected` CSS selector from styling 'active' buttons ([#54931](https://github.com/WordPress/gutenberg/pull/54931)).
 -   `Popover`: Apply the CSS in JS styles properly for components used within popovers. ([#54912](https://github.com/WordPress/gutenberg/pull/54912))
 -   `Button`: Remove hover styles when `aria-disabled` is set to `true` for the secondary variant. ([#54978](https://github.com/WordPress/gutenberg/pull/54978))
--   `Button`: Revert toggled style selector to use a class instead of attributes ([#55065](https://github.com/WordPress/gutenberg/pull/55065)).
 
 ### Internal
 
@@ -1966,17 +2145,38 @@
 -   `SlotFill`: Migrate to TypeScript and Convert to Functional Component `<Slot bubblesVirtually />`. ([#51350](https://github.com/WordPress/gutenberg/pull/51350)).
 -   `Components`: move `ui/utils` to `utils` and remove `ui/` folder ([#54922](https://github.com/WordPress/gutenberg/pull/54922)).
 -   Ensure `@types/` dependencies used by final type files are included in the main dependency field ([#50231](https://github.com/WordPress/gutenberg/pull/50231)).
--   `Text`: Migrate to TypeScript. ([#54953](https://github.com/WordPress/gutenberg/pull/54953)).
 
 ### Experimental
 
--   Introduce `Tabs`, an experimental v2 of `TabPanel`: ([#53960](https://github.com/WordPress/gutenberg/pull/53960)).
+
+## 25.8.13 (2023-11-13)
+
+### Bug Fix
+
+-   `Autocomplete`: Add `aria-live` announcements for Mac and IOS Voiceover to fix lack of support for `aria-owns` ([#54902](https://github.com/WordPress/gutenberg/pull/54902)).
+
+## 25.8.7 (2023-10-16)
+
+### Enhancements
+
+-   `ProgressBar`: use text color to ensure enough contrast against background ([#55285](https://github.com/WordPress/gutenberg/pull/55285)).
+
+## 25.8.3 (2023-10-02)
+
+### Bug Fix
+
+-   `Popover`: Apply the CSS in JS styles properly for components used within popovers. ([#54912](https://github.com/WordPress/gutenberg/pull/54912))
+
+## 25.8.1 (2023-09-25)
+
+### Enhancements
+
+-   Add new option `firstContentElement` to Modal's `focusOnMount` prop to allow consumers to focus the first element within the Modal's **contents** ([#54590](https://github.com/WordPress/gutenberg/pull/54590)).
 
 ## 25.8.0 (2023-09-20)
 
 ### Enhancements
 
--   Add new option `firstContentElement` to Modal's `focusOnMount` prop to allow consumers to focus the first element within the Modal's **contents** ([#54590](https://github.com/WordPress/gutenberg/pull/54590)).
 -   `Notice`: Improve accessibility by adding visually hidden text to clarify what a notice text is about and the notice type (success, error, warning, info) ([#54498](https://github.com/WordPress/gutenberg/pull/54498)).
 -   Making Circular Option Picker a `listbox`. Note that while this changes some public API, new props are optional, and currently have default values; this will change in another patch ([#52255](https://github.com/WordPress/gutenberg/pull/52255)).
 -   `ToggleGroupControl`: Rewrite backdrop animation using framer motion shared layout animations, add better support for controlled and uncontrolled modes ([#50278](https://github.com/WordPress/gutenberg/pull/50278)).
@@ -1989,7 +2189,6 @@
 -   `DuotonePicker/ColorListPicker`: Adds appropriate labels to 'Duotone Filter' color pickers ([#54468](https://github.com/WordPress/gutenberg/pull/54468)).
 -   `SearchControl`: support new `40px` and `32px` sizes ([#54548](https://github.com/WordPress/gutenberg/pull/54548)).
 -   `FormTokenField`: Add `tokenizeOnBlur` prop to add any incompleteTokenValue as a new token when field loses focus ([#54445](https://github.com/WordPress/gutenberg/pull/54445)).
--   `Sandbox`: Add `tabIndex` prop ([#54408](https://github.com/WordPress/gutenberg/pull/54408)).
 
 ### Bug Fixes
 
@@ -2046,6 +2245,13 @@
 -   `Shortcut`: Add Storybook stories ([#53627](https://github.com/WordPress/gutenberg/pull/53627)).
 -   `SlotFill`: Do not render children when using `<Slot bubblesVirtually />`. ([#53272](https://github.com/WordPress/gutenberg/pull/53272))
 -   Update `@floating-ui/react-dom` to the latest version ([#46845](https://github.com/WordPress/gutenberg/pull/46845)).
+-   `MenuItem`: Add Storybook stories ([#53613](https://github.com/WordPress/gutenberg/pull/53613)).
+
+## 25.6.1 (2023-08-20)
+
+### Internal
+
+-   Components: Remove unnecessary utils ([#53679](https://github.com/WordPress/gutenberg/pull/53679)).
 
 ## 25.6.0 (2023-08-16)
 
@@ -2070,9 +2276,7 @@
 
 -   `ControlGroup`, `FormGroup`, `ControlLabel`, `Spinner`: Remove unused `ui/` components from the codebase ([#52953](https://github.com/WordPress/gutenberg/pull/52953)).
 -   `MenuItem`: Convert to TypeScript ([#53132](https://github.com/WordPress/gutenberg/pull/53132)).
--   `MenuItem`: Add Storybook stories ([#53613](https://github.com/WordPress/gutenberg/pull/53613)).
 -   `MenuGroup`: Add Storybook stories ([#53090](https://github.com/WordPress/gutenberg/pull/53090)).
--   Components: Remove unnecessary utils ([#53679](https://github.com/WordPress/gutenberg/pull/53679)).
 
 ## 25.5.0 (2023-08-10)
 
@@ -2130,7 +2334,8 @@
 -   `UnitControl`: Revamp support for changing unit by typing ([#39303](https://github.com/WordPress/gutenberg/pull/39303)).
 -   `Modal`: Update corner radius to be between buttons and the site view frame, in a 2-4-8 system. ([#51254](https://github.com/WordPress/gutenberg/pull/51254)).
 -   `ItemGroup`: Update button focus state styles to be inline with other button focus states in the editor. ([#51576](https://github.com/WordPress/gutenberg/pull/51576)).
--   `ItemGroup`: Update button focus state styles to target `:focus-visible` rather than `:focus`. ([#51787](https://github.com/WordPress/gutenberg/pull/51787)).
+-   `Dropdown` and `DropdownMenu`: use internal context system to automatically pick the toolbar popover variant when rendered inside the `Toolbar` component ([#51154](https://github.com/WordPress/gutenberg/pull/51154)).
+-   `ItemGroup`: Update styles so all SVGs inherit color from their parent element ([#50819](https://github.com/WordPress/gutenberg/pull/50819)).
 
 ### Bug Fixes
 
@@ -2147,12 +2352,50 @@
 
 -   `SearchControl`: Improve documentation around usage of `label` prop ([#51781](https://github.com/WordPress/gutenberg/pull/51781)).
 
+## 25.1.8 (2023-07-18)
+
+### Bug Fix
+
+-   `Toolbar`: Fix toolbar items not being tabbable on the first render. ([#52613](https://github.com/WordPress/gutenberg/pull/52613))
+
+## 25.1.7 (2023-07-14)
+
+### Enhancements
+
+-   `Navigator`: Add `replace` option to `navigator.goTo()` and `navigator.goToParent()` ([#52456](https://github.com/WordPress/gutenberg/pull/52456)).
+
+## 25.1.5 (2023-07-07)
+
+### Bug Fix
+
+-   `UnitControl`: Fix crash when certain units are used ([#52211](https://github.com/WordPress/gutenberg/pull/52211)).
+-   `Guide`: Place focus on the guide's container instead of its first tabbable ([#52300](https://github.com/WordPress/gutenberg/pull/52300)).
+- `Popover`: Pin `react-dropdown-menu` version to avoid breaking changes in dependency updates. ([52356](https://github.com/WordPress/gutenberg/pull/52356)).
+
+## 25.1.3 (2023-06-28)
+
+### Bug Fix
+
+-   `Modal`: Add small top padding to the content so that avoid cutting off the visible outline when hovering items ([#51829](https://github.com/WordPress/gutenberg/pull/51829)).
+
+## 25.1.2 (2023-06-27)
+
+### Bug Fix
+
+-   `ConfirmDialog`: Ensure onConfirm isn't called an extra time when submitting one of the buttons using the keyboard ([#51730](https://github.com/WordPress/gutenberg/pull/51730)).
+-   `ZStack`: ZStack: fix component bounding box to match children ([#51836](https://github.com/WordPress/gutenberg/pull/51836)).
+
+### Enhancements
+
+-   `SelectControl`: Added option to set hidden options. ([#51545](https://github.com/WordPress/gutenberg/pull/51545))
+-   `Button`: Introduce `size` prop with `default`, `compact`, and `small` variants ([#51842](https://github.com/WordPress/gutenberg/pull/51842)).
+-   `ItemGroup`: Update button focus state styles to target `:focus-visible` rather than `:focus`. ([#51787](https://github.com/WordPress/gutenberg/pull/51787)).
+
 ## 25.1.0 (2023-06-07)
 
 ### Enhancements
 
 -   `BorderControl`: Improve color code readability in aria-label ([#51197](https://github.com/WordPress/gutenberg/pull/51197)).
--   `Dropdown` and `DropdownMenu`: use internal context system to automatically pick the toolbar popover variant when rendered inside the `Toolbar` component ([#51154](https://github.com/WordPress/gutenberg/pull/51154)).
 
 ### Bug Fixes
 
@@ -2163,7 +2406,7 @@
 -   Wrapped `TabPanel` in a `forwardRef` call ([#50199](https://github.com/WordPress/gutenberg/pull/50199)).
 -   `ColorPalette`: Improve readability of color name and value, and improve rendering of partially transparent colors ([#50450](https://github.com/WordPress/gutenberg/pull/50450)).
 -   `Button`: Add `__next32pxSmallSize` prop to opt into the new 32px size when the `isSmall` prop is enabled ([#51012](https://github.com/WordPress/gutenberg/pull/51012)).
--   `ItemGroup`: Update styles so all SVGs inherit color from their parent element ([#50819](https://github.com/WordPress/gutenberg/pull/50819)).
+-   `FontSizePicker`: Tweak the header spacing to be more consistent with other design tools ([#50855](https://github.com/WordPress/gutenberg/pull/50855)).
 
 ### Experimental
 
@@ -2194,7 +2437,10 @@
 ### Enhancements
 
 -   `Tooltip`: Update background color so tooltip boundaries are more visible in the site editor ([#50792](https://github.com/WordPress/gutenberg/pull/50792)).
--   `FontSizePicker`: Tweak the header spacing to be more consistent with other design tools ([#50855](https://github.com/WordPress/gutenberg/pull/50855)).
+
+### Bug Fix
+
+-   Update `<Button>` component to have a transparent background for its tertiary disabled state, to match its enabled state. ([#50496](https://github.com/WordPress/gutenberg/pull/50496)).
 
 ## 24.0.0 (2023-05-10)
 
@@ -2205,7 +2451,6 @@
 ### Bug Fixes
 
 -   `NavigableContainer`: do not trap focus in `TabbableContainer` ([#49846](https://github.com/WordPress/gutenberg/pull/49846)).
--   Update `<Button>` component to have a transparent background for its tertiary disabled state, to match its enabled state. ([#50496](https://github.com/WordPress/gutenberg/pull/50496)).
 
 ### Internal
 
@@ -2219,6 +2464,7 @@
 -   `TreeGrid`: Update docs with `data-expanded` attribute usage ([#50026](https://github.com/WordPress/gutenberg/pull/50026)).
 -   Consolidate multiple versions of `README` and `CONTRIBUTING` docs, and add them to Storybook ([#50226](https://github.com/WordPress/gutenberg/pull/50226)).
 -   `DimensionControl`: Use WordPress package instead of react in code example ([#50435](https://github.com/WordPress/gutenberg/pull/50435)).
+-   `Autocomplete`: Update `Usage` section in README. ([#49965](https://github.com/WordPress/gutenberg/pull/49965)).
 
 ### Enhancements
 
@@ -2242,6 +2488,7 @@
 -   Tweak `WordPressComponent` type so `selector` property is optional ([#49960](https://github.com/WordPress/gutenberg/pull/49960)).
 -   Update `Modal` appearance on small screens ([#50039](https://github.com/WordPress/gutenberg/pull/50039)).
 -   Update the framer motion dependency to the latest version `10.11.6` ([#49822](https://github.com/WordPress/gutenberg/pull/49822)).
+-   Update `reakit` dependency to 1.3.11 ([#49763](https://github.com/WordPress/gutenberg/pull/49763)).
 
 ### Enhancements
 
@@ -2252,6 +2499,7 @@
 -   `Modal`: Updated spacing / dimensions of `isFullScreen` ([#49894](https://github.com/WordPress/gutenberg/pull/49894)).
 -   `SlotFill`: Added util for creating private SlotFills and supporting Symbol keys ([#49819](https://github.com/WordPress/gutenberg/pull/49819)).
 -   `IconType`: Export for external use ([#49649](https://github.com/WordPress/gutenberg/pull/49649)).
+-   `Spinner`: add explicit opacity and background styles ([#49695](https://github.com/WordPress/gutenberg/pull/49695)).
 
 ### Bug Fixes
 
@@ -2260,27 +2508,30 @@
 ### Documentation
 
 -   `Autocomplete`: Add heading and fix type for `onReplace` in README. ([#49798](https://github.com/WordPress/gutenberg/pull/49798)).
--   `Autocomplete`: Update `Usage` section in README. ([#49965](https://github.com/WordPress/gutenberg/pull/49965)).
+
+### Bug Fix
+
+-   `Snackbar`: Fix insufficient color contrast on hover ([#49682](https://github.com/WordPress/gutenberg/pull/49682)).
 
 ## 23.8.0 (2023-04-12)
 
 ### Internal
 
 -   `Mobile` Refactor of the KeyboardAwareFlatList component.
--   Update `reakit` dependency to 1.3.11 ([#49763](https://github.com/WordPress/gutenberg/pull/49763)).
+-   `QueryControls`: Replace bottom margin overrides with `__nextHasNoMarginBottom`([47515](https://github.com/WordPress/gutenberg/pull/47515)).
 
 ### Enhancements
 
 -   `DropZone`: Smooth animation ([#49517](https://github.com/WordPress/gutenberg/pull/49517)).
 -   `Navigator`: Add `skipFocus` property in `NavigateOptions`. ([#49350](https://github.com/WordPress/gutenberg/pull/49350)).
--   `Spinner`: add explicit opacity and background styles ([#49695](https://github.com/WordPress/gutenberg/pull/49695)).
 -   Make TypeScript types available for consumers ([#49229](https://github.com/WordPress/gutenberg/pull/49229)).
 
 ### Bug Fixes
 
--   `Snackbar`: Fix insufficient color contrast on hover ([#49682](https://github.com/WordPress/gutenberg/pull/49682)).
 
 ## 23.7.0 (2023-03-29)
+
+-   `ImageSizeControl`: Remove the "Image Dimensions" label ([#49414](https://github.com/WordPress/gutenberg/pull/49414)).
 
 ### Internal
 
@@ -2289,7 +2540,6 @@
 -   `ColorPicker`: Convert to TypeScript ([#49214](https://github.com/WordPress/gutenberg/pull/49214)).
 -   `GradientPicker`: Convert to TypeScript ([#48316](https://github.com/WordPress/gutenberg/pull/48316)).
 -   `FormTokenField`: Add a `__nextHasNoMarginBottom` prop to start opting into the margin-free styles ([48609](https://github.com/WordPress/gutenberg/pull/48609)).
--   `QueryControls`: Replace bottom margin overrides with `__nextHasNoMarginBottom`([47515](https://github.com/WordPress/gutenberg/pull/47515)).
 
 ### Enhancements
 
@@ -2338,6 +2588,8 @@
 -   `PaletteEdit`: Convert to TypeScript ([#47764](https://github.com/WordPress/gutenberg/pull/47764)).
 -   `QueryControls`: Refactor away from Lodash (`.groupBy`) ([#48779](https://github.com/WordPress/gutenberg/pull/48779)).
 -   `ToolbarContext`: Convert to TypeScript ([#49002](https://github.com/WordPress/gutenberg/pull/49002)).
+-   `Autocomplete`: Convert to TypeScript ([#47751](https://github.com/WordPress/gutenberg/pull/47751)).
+-   `Autocomplete`: avoid calling setState on input ([#48565](https://github.com/WordPress/gutenberg/pull/48565)).
 
 ## 23.5.0 (2023-03-01)
 
@@ -2351,8 +2603,11 @@
 -   `TabPanel`: Improve unit test in preparation for controlled component updates ([#48086](https://github.com/WordPress/gutenberg/pull/48086)).
 -   `Autocomplete`: performance: avoid setting state on every value change ([#48485](https://github.com/WordPress/gutenberg/pull/48485)).
 -   `Higher Order` -- `with-constrained-tabbing`: Convert to TypeScript ([#48162](https://github.com/WordPress/gutenberg/pull/48162)).
--   `Autocomplete`: Convert to TypeScript ([#47751](https://github.com/WordPress/gutenberg/pull/47751)).
--   `Autocomplete`: avoid calling setState on input ([#48565](https://github.com/WordPress/gutenberg/pull/48565)).
+-   `ToolsPanel`: Refactor unit tests to TypeScript ([48275](https://github.com/WordPress/gutenberg/pull/48275)).
+
+### Bug Fix
+
+-   `useAutocompleteProps`, `Autocomplete`: Make accessible when rendered in an iframe ([#47907](https://github.com/WordPress/gutenberg/pull/47907)).
 
 ## 23.4.0 (2023-02-15)
 
@@ -2360,7 +2615,6 @@
 
 -   `ToolsPanel`: fix type inconsistencies between types, docs and normal component usage ([47944](https://github.com/WordPress/gutenberg/pull/47944)).
 -   `SelectControl`: Fix styling when `multiple` prop is enabled ([#47893](https://github.com/WordPress/gutenberg/pull/43213)).
--   `useAutocompleteProps`, `Autocomplete`: Make accessible when rendered in an iframe ([#47907](https://github.com/WordPress/gutenberg/pull/47907)).
 
 ### Enhancements
 
@@ -2368,6 +2622,7 @@
 -   `ColorPalette`: ensure text label contrast checking works with CSS variables ([#47373](https://github.com/WordPress/gutenberg/pull/47373)).
 -   `Navigator`: Support dynamic paths with parameters ([#47827](https://github.com/WordPress/gutenberg/pull/47827)).
 -   `Navigator`: Support hierarchical paths navigation and add `NavigatorToParentButton` component ([#47883](https://github.com/WordPress/gutenberg/pull/47883)).
+-   `Popover`: add `overlay` option to the `placement` prop ([47004](https://github.com/WordPress/gutenberg/pull/47004)).
 
 ### Internal
 
@@ -2386,7 +2641,29 @@
 -   `ToolsPanel`: Ensure display of optional items when values are updated externally and multiple blocks selected ([47864](https://github.com/WordPress/gutenberg/pull/47864)).
 -   `Navigator`: add more pattern matching tests, refine existing tests ([47910](https://github.com/WordPress/gutenberg/pull/47910)).
 -   `ToolsPanel`: Refactor Storybook examples to TypeScript ([47944](https://github.com/WordPress/gutenberg/pull/47944)).
--   `ToolsPanel`: Refactor unit tests to TypeScript ([48275](https://github.com/WordPress/gutenberg/pull/48275)).
+-   `TreeGrid`: Convert to TypeScript ([#47516](https://github.com/WordPress/gutenberg/pull/47516)).
+-   `Popover`: Take iframe element scaling into account ([47004](https://github.com/WordPress/gutenberg/pull/47004)).
+
+## 23.3.2 (2023-02-14)
+
+### Internal
+
+-   `NavigatorButton`: Reuse `Button` types ([47754](https://github.com/WordPress/gutenberg/pull/47754)).
+-   `ToolsPanel`: Allow display of optional items when values are updated externally to item controls ([47727](https://github.com/WordPress/gutenberg/pull/47727)).
+-   `ToolsPanel`: Ensure display of optional items when values are updated externally and multiple blocks selected ([47864](https://github.com/WordPress/gutenberg/pull/47864)).
+-   `CustomSelectControl`: lock the `__experimentalShowSelectedHint` prop ([#47229](https://github.com/WordPress/gutenberg/pull/47229)).
+-   Lock the `__experimentalPopoverPositionToPlacement` function and rename it to `__experimentalPopoverLegacyPositionToPlacement` ([#47505](https://github.com/WordPress/gutenberg/pull/47505)).
+-   `Navigator`: add more pattern matching tests, refine existing tests ([47910](https://github.com/WordPress/gutenberg/pull/47910)).
+
+### Enhancements
+
+-   `ColorPalette`: ensure text label contrast checking works with CSS variables ([#47373](https://github.com/WordPress/gutenberg/pull/47373)).
+-  `Navigator`: Support dynamic paths with parameters ([#47827](https://github.com/WordPress/gutenberg/pull/47827)).
+-  `Navigator`: Support hierarchical paths navigation and add `NavigatorToParentButton` component ([#47883](https://github.com/WordPress/gutenberg/pull/47883)).
+
+### Bug Fix
+
+-   `SelectControl`: Fix styling when `multiple` prop is enabled ([#47893](https://github.com/WordPress/gutenberg/pull/43213)).
 
 ## 23.3.0 (2023-02-01)
 
@@ -2399,7 +2676,6 @@
 -   `Dropdown`: deprecate `position` prop, use `popoverProps` instead ([46865](https://github.com/WordPress/gutenberg/pull/46865)).
 -   `Button`: improve padding for buttons with icon and text. ([46764](https://github.com/WordPress/gutenberg/pull/46764)).
 -   `ColorPalette`: Use computed color when css variable is passed to `ColorPicker` ([47181](https://github.com/WordPress/gutenberg/pull/47181)).
--   `Popover`: add `overlay` option to the `placement` prop ([47004](https://github.com/WordPress/gutenberg/pull/47004)).
 
 ### Internal
 
@@ -2411,9 +2687,8 @@
 -   `ColorPalette`, `BorderControl`, `GradientPicker`: refine types and logic around single vs multiple palettes ([#47384](https://github.com/WordPress/gutenberg/pull/47384)).
 -   `Button`: Convert to TypeScript ([#46997](https://github.com/WordPress/gutenberg/pull/46997)).
 -   `QueryControls`: Convert to TypeScript ([#46721](https://github.com/WordPress/gutenberg/pull/46721)).
--   `TreeGrid`: Convert to TypeScript ([#47516](https://github.com/WordPress/gutenberg/pull/47516)).
 -   `Notice`: refactor to TypeScript ([47118](https://github.com/WordPress/gutenberg/pull/47118)).
--   `Popover`: Take iframe element scaling into account ([47004](https://github.com/WordPress/gutenberg/pull/47004)).
+-   `AlignmentMatrixControl`: Update center cell label to 'Center' instead of 'Center Center' ([#46852](https://github.com/WordPress/gutenberg/pull/46852)).
 
 ### Bug Fixes
 
@@ -2424,7 +2699,6 @@
 
 ### Internal
 
--   `AlignmentMatrixControl`: Update center cell label to 'Center' instead of 'Center Center' ([#46852](https://github.com/WordPress/gutenberg/pull/46852)).
 -   `Toolbar`: move all subcomponents under the same folder ([46951](https://github.com/WordPress/gutenberg/pull/46951)).
 -   `Dashicon`: remove unnecessary type for `className` prop ([46849](https://github.com/WordPress/gutenberg/pull/46849)).
 -   `ColorPicker` & `QueryControls`: Replace bottom margin overrides with `__nextHasNoMarginBottom` ([#46448](https://github.com/WordPress/gutenberg/pull/46448)).
@@ -2437,11 +2711,33 @@
 -   `Placeholder`: set fixed right margin for label's icon ([46918](https://github.com/WordPress/gutenberg/pull/46918)).
 -   `TreeGrid`: Fix right-arrow keyboard navigation when a row contains more than two focusable elements ([46998](https://github.com/WordPress/gutenberg/pull/46998)).
 
+### New Feature
+
+-   `TabPanel`: support disabled prop for tab buttons ([#46471](https://github.com/WordPress/gutenberg/pull/46471)).
+
+### Bug Fix
+
+-   `ComboboxControl`: Fix unexpected behaviour in IME Composition ([#46827](https://github.com/WordPress/gutenberg/pull/46827)).
+
 ## 23.1.0 (2023-01-02)
 
 ### Breaking Changes
 
 -   `ColorPalette`: The experimental `__experimentalHasMultipleOrigins` prop has been removed ([#46315](https://github.com/WordPress/gutenberg/pull/46315)).
+
+### Internal
+
+-   `Theme`: Remove public export ([#46427](https://github.com/WordPress/gutenberg/pull/46427)).
+-   `Autocomplete`: Refactor away from `_.find()` ([#46537](https://github.com/WordPress/gutenberg/pull/46537)).
+-   `TabPanel`: Refactor away from `_.find()` ([#46537](https://github.com/WordPress/gutenberg/pull/46537)).
+-   `BottomSheetPickerCell`: Refactor away from `_.find()` for mobile ([#46537](https://github.com/WordPress/gutenberg/pull/46537)).
+-   Refactor global styles context away from `_.find()` for mobile ([#46537](https://github.com/WordPress/gutenberg/pull/46537)).
+-   `Dropdown`: Convert to TypeScript ([#45787](https://github.com/WordPress/gutenberg/pull/45787)).
+
+### Bug Fix
+
+-   `Toolbar`: Fix duplicate focus style on anchor link button ([#46759](https://github.com/WordPress/gutenberg/pull/46759)).
+-   `useNavigateRegions`: Ensure region navigation picks the next region based on where the current user focus is located instead of starting at the beginning ([#44883](https://github.com/WordPress/gutenberg/pull/44883)).
 
 ## 23.0.0 (2022-12-14)
 
@@ -2452,7 +2748,6 @@
 ### New Features
 
 -   `TabPanel`: support manual tab activation ([#46004](https://github.com/WordPress/gutenberg/pull/46004)).
--   `TabPanel`: support disabled prop for tab buttons ([#46471](https://github.com/WordPress/gutenberg/pull/46471)).
 -   `BaseControl`: Add `useBaseControlProps` hook to help generate id-related props ([#46170](https://github.com/WordPress/gutenberg/pull/46170)).
 
 ### Bug Fixes
@@ -2461,9 +2756,6 @@
 -   `InputControl`: Fix internal `Flex` wrapper usage that could add an unintended `height: 100%` ([#46213](https://github.com/WordPress/gutenberg/pull/46213)).
 -   `Navigator`: Allow calling `goTo` and `goBack` twice in one render cycle ([#46391](https://github.com/WordPress/gutenberg/pull/46391)).
 -   `Modal`: Fix unexpected modal closing in IME Composition ([#46453](https://github.com/WordPress/gutenberg/pull/46453)).
--   `Toolbar`: Fix duplicate focus style on anchor link button ([#46759](https://github.com/WordPress/gutenberg/pull/46759)).
--   `useNavigateRegions`: Ensure region navigation picks the next region based on where the current user focus is located instead of starting at the beginning ([#44883](https://github.com/WordPress/gutenberg/pull/44883)).
--   `ComboboxControl`: Fix unexpected behaviour in IME Composition ([#46827](https://github.com/WordPress/gutenberg/pull/46827)).
 
 ### Enhancements
 
@@ -2482,6 +2774,7 @@
 ### Experimental
 
 -   `TextControl`: Restrict `type` prop to `email`, `number`, `password`, `tel`, `text`, `search` or `url` ([#45433](https://github.com/WordPress/gutenberg/pull/45433/)).
+-   `Theme`: Add support for custom `background` color ([#45466](https://github.com/WordPress/gutenberg/pull/45466)).
 
 ### Internal
 
@@ -2492,27 +2785,27 @@
 -   `Dashicon`: Convert to TypeScript ([#45924](https://github.com/WordPress/gutenberg/pull/45924)).
 -   `PaletteEdit`: add follow up changelog for #45681 and tests [#46095](https://github.com/WordPress/gutenberg/pull/46095).
 -   `AlignmentMatrixControl`: Convert to TypeScript ([#46162](https://github.com/WordPress/gutenberg/pull/46162)).
--   `Theme`: Remove public export ([#46427](https://github.com/WordPress/gutenberg/pull/46427)).
--   `Autocomplete`: Refactor away from `_.find()` ([#46537](https://github.com/WordPress/gutenberg/pull/46537)).
--   `TabPanel`: Refactor away from `_.find()` ([#46537](https://github.com/WordPress/gutenberg/pull/46537)).
--   `BottomSheetPickerCell`: Refactor away from `_.find()` for mobile ([#46537](https://github.com/WordPress/gutenberg/pull/46537)).
--   Refactor global styles context away from `_.find()` for mobile ([#46537](https://github.com/WordPress/gutenberg/pull/46537)).
--   `Dropdown`: Convert to TypeScript ([#45787](https://github.com/WordPress/gutenberg/pull/45787)).
+-   `AnglePickerControl`: remove `:focus-visible' outline on `CircleOutlineWrapper` ([#45758](https://github.com/WordPress/gutenberg/pull/45758))
+-   `Snackbar`: Convert to TypeScript ([#45472](https://github.com/WordPress/gutenberg/pull/45472)).
 
 ### Documentation
 
 -   `Tooltip`: Add readme and unit tests for `shortcut` prop ([#46092](https://github.com/WordPress/gutenberg/pull/46092)).
+
+### Bug Fix
+
+-   `ToggleControl`: Fix toggle control label text overflow ([#45962](https://github.com/WordPress/gutenberg/pull/45962)).
 
 ## 22.1.0 (2022-11-16)
 
 ### Enhancements
 
 -   `ColorPalette`, `BorderBox`, `BorderBoxControl`: polish and DRY prop types, add default values ([#45463](https://github.com/WordPress/gutenberg/pull/45463)).
--   `TabPanel`: Add ability to set icon only tab buttons ([#45005](https://github.com/WordPress/gutenberg/pull/45005)).
+-   `FontSizePicker`: Pass the preset object to the onChange callback to allow conversion from preset slugs to CSS vars ([#44967](https://github.com/WordPress/gutenberg/pull/44967)).
+-   `FontSizePicker`: Improve hint text shown next to 'Font size' label ([#44966](https://github.com/WordPress/gutenberg/pull/44966)).
 
 ### Internal
 
--   `AnglePickerControl`: remove `:focus-visible' outline on `CircleOutlineWrapper` ([#45758](https://github.com/WordPress/gutenberg/pull/45758))
 
 ### Bug Fixes
 
@@ -2522,7 +2815,6 @@
 -   `Icon`: Making size prop work for icon components using dash icon strings ([#45593](https://github.com/WordPress/gutenberg/pull/45593))
 -   `ToolsPanelItem`: Prevent unintended calls to onDeselect when parent panel is remounted and item is rendered via SlotFill ([#45673](https://github.com/WordPress/gutenberg/pull/45673))
 -   `ColorPicker`: Prevent all number fields from becoming "0" when one of them is an empty string ([#45649](https://github.com/WordPress/gutenberg/pull/45649)).
--   `ToggleControl`: Fix toggle control label text overflow ([#45962](https://github.com/WordPress/gutenberg/pull/45962)).
 
 ### Internal
 
@@ -2538,12 +2830,16 @@
 -   `MenuGroup`: Convert to TypeScript ([#45617](https://github.com/WordPress/gutenberg/pull/45617)).
 -   `useCx`: fix story to satisfy the `react-hooks/exhaustive-deps` eslint rule ([#45614](https://github.com/WordPress/gutenberg/pull/45614))
 -   Activate the `react-hooks/exhuastive-deps` eslint rule for the Components package ([#41166](https://github.com/WordPress/gutenberg/pull/41166))
--   `Snackbar`: Convert to TypeScript ([#45472](https://github.com/WordPress/gutenberg/pull/45472)).
+-   `FontSizePicker`: Refactor to use components instead of helper functions ([#44891](https://github.com/WordPress/gutenberg/pull/44891)).
 
 ### Experimental
 
 -   `ToggleGroupControl`: Only show enclosing border when `isBlock` and not `isDeselectable` ([#45492](https://github.com/WordPress/gutenberg/pull/45492)).
--   `Theme`: Add support for custom `background` color ([#45466](https://github.com/WordPress/gutenberg/pull/45466)).
+-   Theming: updated Components package to utilize the new `accent` prop of the experimental `Theme` component.
+
+### Bug Fix
+
+-   `useNavigateRegions`: Add new keyboard shortcut alias to cover backtick and tilde keys inconsistencies across browsers ([#45019](https://github.com/WordPress/gutenberg/pull/45019)).
 
 ## 22.0.0 (2022-11-02)
 
@@ -2565,18 +2861,15 @@
 
 ### Enhancements
 
--   `FontSizePicker`: Pass the preset object to the onChange callback to allow conversion from preset slugs to CSS vars ([#44967](https://github.com/WordPress/gutenberg/pull/44967)).
 -   `FontSizePicker`: Improved slider design when `withSlider` is set ([#44598](https://github.com/WordPress/gutenberg/pull/44598)).
 -   `ToggleControl`: Improved types for the `help` prop, covering the dynamic render function option, and enabled the dynamic `help` behavior only for a controlled component ([#45279](https://github.com/WordPress/gutenberg/pull/45279)).
 -   `BorderControl` & `BorderBoxControl`: Replace `__next36pxDefaultSize` with "default" and "large" size variants ([#41860](https://github.com/WordPress/gutenberg/pull/41860)).
 -   `UnitControl`: Remove outer wrapper to normalize className placement ([#41860](https://github.com/WordPress/gutenberg/pull/41860)).
 -   `ColorPalette`: Fix transparent checkered background pattern ([#45295](https://github.com/WordPress/gutenberg/pull/45295)).
 -   `ToggleGroupControl`: Add `isDeselectable` prop to allow deselecting the selected option ([#45123](https://github.com/WordPress/gutenberg/pull/45123)).
--   `FontSizePicker`: Improve hint text shown next to 'Font size' label ([#44966](https://github.com/WordPress/gutenberg/pull/44966)).
 
 ### Bug Fixes
 
--   `useNavigateRegions`: Add new keyboard shortcut alias to cover backtick and tilde keys inconsistencies across browsers ([#45019](https://github.com/WordPress/gutenberg/pull/45019)).
 -   `Button`: Tweak the destructive button primary, link, and default variants ([#44427](https://github.com/WordPress/gutenberg/pull/44427)).
 -   `UnitControl`: Fix `disabled` style is overridden by core `form.css` style ([#45250](https://github.com/WordPress/gutenberg/pull/45250)).
 -   `ItemGroup`: fix RTL `Item` styles when rendered as a button ([#45280](https://github.com/WordPress/gutenberg/pull/45280)).
@@ -2605,7 +2898,7 @@
 -   `Autocomplete`: use Popover's new `placement` prop instead of legacy `position` prop ([#44396](https://github.com/WordPress/gutenberg/pull/44396/)).
 -   `SelectControl`: Add `onChange`, `onBlur` and `onFocus` to storybook actions ([#45432](https://github.com/WordPress/gutenberg/pull/45432/)).
 -   `FontSizePicker`: Add more comprehensive tests ([#45298](https://github.com/WordPress/gutenberg/pull/45298)).
--   `FontSizePicker`: Refactor to use components instead of helper functions ([#44891](https://github.com/WordPress/gutenberg/pull/44891)).
+-   `withFilters`: Refactor away from `_.without()` ([#44980](https://github.com/WordPress/gutenberg/pull/44980/)).
 
 ### Experimental
 
@@ -2613,14 +2906,16 @@
 
 ### Experimental
 
--   Theming: updated Components package to utilize the new `accent` prop of the experimental `Theme` component.
+
+### Bug Fix
+
+-   `ToggleGroupControl`: Remove unsupported `disabled` prop from types, and correctly mark `label` prop as required ([#45114](https://github.com/WordPress/gutenberg/pull/45114)).
 
 ## 21.3.0 (2022-10-19)
 
 ### Bug Fixes
 
 -   `FontSizePicker`: Ensure that fluid font size presets appear correctly in the UI controls ([#44791](https://github.com/WordPress/gutenberg/pull/44791)).
--   `ToggleGroupControl`: Remove unsupported `disabled` prop from types, and correctly mark `label` prop as required ([#45114](https://github.com/WordPress/gutenberg/pull/45114)).
 -   `Navigator`: prevent partially hiding focus ring styles, by removing unnecessary overflow rules on `NavigatorScreen` ([#44973](https://github.com/WordPress/gutenberg/pull/44973)).
 -   `Navigator`: restore focus only once per location ([#44972](https://github.com/WordPress/gutenberg/pull/44972)).
 
@@ -2634,18 +2929,29 @@
 -   `Sandbox`: Use `toString` to create observe and resize script string ([#42872](https://github.com/WordPress/gutenberg/pull/42872)).
 -   `Navigator`: refactor unit tests to TypeScript and to `user-event` ([#44970](https://github.com/WordPress/gutenberg/pull/44970)).
 -   `Navigator`: Refactor Storybook code to TypeScript and controls ([#44979](https://github.com/WordPress/gutenberg/pull/44979)).
--   `withFilters`: Refactor away from `_.without()` ([#44980](https://github.com/WordPress/gutenberg/pull/44980/)).
 -   `withFocusReturn`: Refactor tests to `@testing-library/react` ([#45012](https://github.com/WordPress/gutenberg/pull/45012)).
 -   `ToolsPanel`: updated to satisfy `react/exhaustive-deps` eslint rule ([#45028](https://github.com/WordPress/gutenberg/pull/45028))
 -   `Tooltip`: updated to ignore `react/exhaustive-deps` eslint rule ([#45043](https://github.com/WordPress/gutenberg/pull/45043))
+
+### Enhancements
+
+-   `BorderBoxControl`: Omit unit select when width values are mixed ([#44592](https://github.com/WordPress/gutenberg/pull/44592))
+-   `BorderControl`: Add ability to disable unit selection ([#44592](https://github.com/WordPress/gutenberg/pull/44592))
+-   `SuggestionList`: use `requestAnimationFrame` instead of `setTimeout` when scrolling selected item into view. This change improves the responsiveness of the `ComboboxControl` and `FormTokenField` components when rapidly hovering over the suggestion items in the list ([#44573](https://github.com/WordPress/gutenberg/pull/44573)).
+
+### Experimental
+
+-   Add experimental `Theme` component ([#44668](https://github.com/WordPress/gutenberg/pull/44668)).
+
+### Bug Fix
+
+-   `FontSizePicker`: Fix header order in RTL languages ([#44590](https://github.com/WordPress/gutenberg/pull/44590)).
 
 ## 21.2.0 (2022-10-05)
 
 ### Enhancements
 
 -   `FontSizePicker`: Updated to take up full width of its parent and have a 40px Reset button when `size` is `__unstable-large` ([44559](https://github.com/WordPress/gutenberg/pull/44559)).
--   `BorderBoxControl`: Omit unit select when width values are mixed ([#44592](https://github.com/WordPress/gutenberg/pull/44592))
--   `BorderControl`: Add ability to disable unit selection ([#44592](https://github.com/WordPress/gutenberg/pull/44592))
 
 ### Bug Fixes
 
@@ -2654,11 +2960,9 @@
 -   `ToggleGroupControl`: adjust icon color when inactive, from `gray-700` to `gray-900` ([#44575](https://github.com/WordPress/gutenberg/pull/44575)).
 -   `TokenInput`: improve logic around the `aria-activedescendant` attribute, which was causing unintended focus behavior for some screen readers ([#44526](https://github.com/WordPress/gutenberg/pull/44526)).
 -   `NavigatorScreen`: fix focus issue where back button received focus unexpectedly ([#44239](https://github.com/WordPress/gutenberg/pull/44239))
--   `FontSizePicker`: Fix header order in RTL languages ([#44590](https://github.com/WordPress/gutenberg/pull/44590)).
 
 ### Enhancements
 
--   `SuggestionList`: use `requestAnimationFrame` instead of `setTimeout` when scrolling selected item into view. This change improves the responsiveness of the `ComboboxControl` and `FormTokenField` components when rapidly hovering over the suggestion items in the list ([#44573](https://github.com/WordPress/gutenberg/pull/44573)).
 
 ### Internal
 
@@ -2669,10 +2973,15 @@
 -   `Sandbox`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44378](https://github.com/WordPress/gutenberg/pull/44378))
 -   `FontSizePicker`: Convert to TypeScript ([#44449](https://github.com/WordPress/gutenberg/pull/44449)).
 -   `FontSizePicker`: Replace SCSS with Emotion + components ([#44483](https://github.com/WordPress/gutenberg/pull/44483)).
+-   `Notice`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44157](https://github.com/WordPress/gutenberg/pull/44157))
 
 ### Experimental
 
--   Add experimental `Theme` component ([#44668](https://github.com/WordPress/gutenberg/pull/44668)).
+
+### New Features
+
+-   `MenuItem`: Add suffix prop for injecting non-icon and non-shortcut content to menu items ([#44260](https://github.com/WordPress/gutenberg/pull/44260)).
+-   `ToolsPanel`: Add subheadings to ellipsis menu and reset text to default control menu items ([#44260](https://github.com/WordPress/gutenberg/pull/44260)).
 
 ## 21.1.0 (2022-09-21)
 
@@ -2687,15 +2996,49 @@
 
 ### New Features
 
--   `MenuItem`: Add suffix prop for injecting non-icon and non-shortcut content to menu items ([#44260](https://github.com/WordPress/gutenberg/pull/44260)).
--   `ToolsPanel`: Add subheadings to ellipsis menu and reset text to default control menu items ([#44260](https://github.com/WordPress/gutenberg/pull/44260)).
 
 ### Internal
 
 -   `NavigationMenu` updated to ignore `react/exhaustive-deps` eslint rule ([#44090](https://github.com/WordPress/gutenberg/pull/44090)).
 -   `RangeControl`: updated to pass `react/exhaustive-deps` eslint rule ([#44271](https://github.com/WordPress/gutenberg/pull/44271)).
 -   `UnitControl` updated to pass the `react/exhaustive-deps` eslint rule ([#44161](https://github.com/WordPress/gutenberg/pull/44161)).
--   `Notice`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44157](https://github.com/WordPress/gutenberg/pull/44157))
+-   `ColorPalette`: Refactor tests to `@testing-library/react` ([#44108](https://github.com/WordPress/gutenberg/pull/44108)).
+
+### Enhancements
+
+-   `UnitControl`: Consistently hide spin buttons ([#43985](https://github.com/WordPress/gutenberg/pull/43985)).
+
+## 21.0.7 (2022-11-11)
+
+### Deprecations
+
+-   `Popover`: the deprecation messages for anchor-related props (`anchorRef`, `anchorRect`, `getAnchorRect`) have been updated. ([#45195](https://github.com/WordPress/gutenberg/pull/45195)).
+
+### Breaking Changes
+
+-   `Popover`: The deprecated `range` and `__unstableShift` props have been removed ([#45195](https://github.com/WordPress/gutenberg/pull/45195)).
+
+### Internal
+
+-   `ColorPalette`: Convert to TypeScript ([#44632](https://github.com/WordPress/gutenberg/pull/44632)).
+
+## 21.0.6 (2022-10-18)
+
+### Bug Fix
+
+-   `Navigator`: restore focus only once per location  ([#44972](https://github.com/WordPress/gutenberg/pull/44972)).
+
+## 21.0.5 (2022-10-11)
+
+### Bug Fix
+
+-   `FontSizePicker`: Ensure that fluid font size presets appear correctly in the UI controls ([#44791](https://github.com/WordPress/gutenberg/pull/44791))
+
+## 21.0.3 (2022-09-27)
+
+### Bug Fix
+
+-   `Popover`: fix limitShift logic by adding iframe offset correctly [#42950](https://github.com/WordPress/gutenberg/pull/42950)).
 
 ## 21.0.0 (2022-09-13)
 
@@ -2705,6 +3048,7 @@
 -   `AnglePickerControl`: Deprecate bottom margin style. Add a `__nextHasNoMarginBottom` prop to start opting into the margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.4 ([#43867](https://github.com/WordPress/gutenberg/pull/43867)).
 -   `Popover`: deprecate `__unstableShift` prop in favour of new `shift` prop. The `__unstableShift` is currently scheduled for removal in WordPress 6.3 ([#43845](https://github.com/WordPress/gutenberg/pull/43845)).
 -   `Popover`: removed the `__unstableObserveElement` prop, which is not necessary anymore. The functionality is now supported directly by the component without the need of an external prop ([#43617](https://github.com/WordPress/gutenberg/pull/43617)).
+-   `Popover`: deprecate `__unstableForcePosition` prop in favour of new `flip` and `resize` props. The `__unstableForcePosition` is currently scheduled for removal in WordPress 6.3 ([#43546](https://github.com/WordPress/gutenberg/pull/43546)).
 
 ### Bug Fixes
 
@@ -2725,12 +3069,14 @@
 -   `RangeControl`: Tweak dark gray marking color to be consistent with the grays in `@wordpress/base-styles` ([#43773](https://github.com/WordPress/gutenberg/pull/43773)).
 -   `UnitControl`: Tweak unit dropdown color to be consistent with the grays in `@wordpress/base-styles` ([#43773](https://github.com/WordPress/gutenberg/pull/43773)).
 -   `SearchControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43871](https://github.com/WordPress/gutenberg/pull/43871)).
--   `UnitControl`: Consistently hide spin buttons ([#43985](https://github.com/WordPress/gutenberg/pull/43985)).
 -   `CardHeader`, `CardBody`, `CardFooter`: Tweak `isShady` background colors to be consistent with the grays in `@wordpress/base-styles` ([#43719](https://github.com/WordPress/gutenberg/pull/43719)).
 -   `InputControl`, `SelectControl`: Tweak `disabled` colors to be consistent with the grays in `@wordpress/base-styles` ([#43719](https://github.com/WordPress/gutenberg/pull/43719)).
 -   `FocalPointPicker`: Tweak media placeholder background color to be consistent with the grays in `@wordpress/base-styles` ([#43994](https://github.com/WordPress/gutenberg/pull/43994)).
 -   `RangeControl`: Tweak rail, track, and mark colors to be consistent with the grays in `@wordpress/base-styles` ([#43994](https://github.com/WordPress/gutenberg/pull/43994)).
 -   `UnitControl`: Tweak unit dropdown hover color to be consistent with the grays in `@wordpress/base-styles` ([#43994](https://github.com/WordPress/gutenberg/pull/43994)).
+-   `GradientPicker`: Show custom picker before swatches ([#43577](https://github.com/WordPress/gutenberg/pull/43577)).
+-   `ColorPalette`: Make popover style consistent ([#43570](https://github.com/WordPress/gutenberg/pull/43570)).
+-   `Popover`: Introduce new `flip` and `resize` props ([#43546](https://github.com/WordPress/gutenberg/pull/43546/)).
 
 ### Internal
 
@@ -2762,21 +3108,32 @@
 -   `IsolatedEventContainer`: Refactor tests to `@testing-library/react` ([#44073](https://github.com/WordPress/gutenberg/pull/44073)).
 -   `KeyboardShortcuts`: Refactor tests to `@testing-library/react` ([#44075](https://github.com/WordPress/gutenberg/pull/44075)).
 -   `Slot`/`Fill`: Refactor tests to `@testing-library/react` ([#44084](https://github.com/WordPress/gutenberg/pull/44084)).
--   `ColorPalette`: Refactor tests to `@testing-library/react` ([#44108](https://github.com/WordPress/gutenberg/pull/44108)).
+-   `ClipboardButton`, `FocusableIframe`, `IsolatedEventContainer`, `withConstrainedTabbing`, `withSpokenMessages`: Improve TypeScript types ([#43579](https://github.com/WordPress/gutenberg/pull/43579)).
+-   `DateTimePicker`: address feedback after recent refactor to `date-fns` and `use-lilius` ([#43495](https://github.com/WordPress/gutenberg/pull/43495)).
+-   `DropdownMenu`: use `KeyboardEvent.code`, refactor tests to model RTL and `user-event` ([#43439](https://github.com/WordPress/gutenberg/pull/43439/)).
+-   `Autocomplete`: Refactor away from `_.escapeRegExp()` ([#43629](https://github.com/WordPress/gutenberg/pull/43629/)).
+-   `TextHighlight`: Refactor away from `_.escapeRegExp()` ([#43629](https://github.com/WordPress/gutenberg/pull/43629/)).
+
+### Experimental
+
+-   `Popover`: Deprecate `__unstableForcePosition`, now replaced by new `flip` and `resize` props ([#43546](https://github.com/WordPress/gutenberg/pull/43546/)).
+
+### Bug Fix
+
+-   `AlignmentMatrixControl`: keep the physical direction in RTL languages ([#43126](https://github.com/WordPress/gutenberg/pull/43126)).
+-   `ToggleGroupControl`: Fix minor inconsistency in label height ([#43331](https://github.com/WordPress/gutenberg/pull/43331)).
+-   `Disabled`: preserve input values when toggling the `isDisabled` prop ([#43508](https://github.com/WordPress/gutenberg/pull/43508/))
 
 ## 20.0.0 (2022-08-24)
 
 ### Deprecations
 
 -   `CustomSelectControl`: Deprecate constrained width style. Add a `__nextUnconstrainedWidth` prop to start opting into the unconstrained width that will become the default in a future version, currently scheduled to be WordPress 6.4 ([#43230](https://github.com/WordPress/gutenberg/pull/43230)).
--   `Popover`: deprecate `__unstableForcePosition` prop in favour of new `flip` and `resize` props. The `__unstableForcePosition` is currently scheduled for removal in WordPress 6.3 ([#43546](https://github.com/WordPress/gutenberg/pull/43546)).
 
 ### Bug Fixes
 
--   `AlignmentMatrixControl`: keep the physical direction in RTL languages ([#43126](https://github.com/WordPress/gutenberg/pull/43126)).
 -   `AlignmentMatrixControl`: Fix the `width` prop so it works as intended ([#43482](https://github.com/WordPress/gutenberg/pull/43482)).
 -   `SelectControl`, `CustomSelectControl`: Truncate long option strings ([#43301](https://github.com/WordPress/gutenberg/pull/43301)).
--   `ToggleGroupControl`: Fix minor inconsistency in label height ([#43331](https://github.com/WordPress/gutenberg/pull/43331)).
 -   `Popover`: fix and improve opening animation ([#43186](https://github.com/WordPress/gutenberg/pull/43186)).
 -   `Popover`: fix incorrect deps in hooks resulting in incorrect positioning after calling `update` ([#43267](https://github.com/WordPress/gutenberg/pull/43267/)).
 -   `FontSizePicker`: Fix excessive margin between label and input ([#43304](https://github.com/WordPress/gutenberg/pull/43304)).
@@ -2784,30 +3141,31 @@
 -   `Popover`: make sure offset middleware always applies the latest frame offset values ([#43329](https://github.com/WordPress/gutenberg/pull/43329/)).
 -   `Dropdown`: anchor popover to the dropdown wrapper (instead of the toggle) ([#43377](https://github.com/WordPress/gutenberg/pull/43377/)).
 -   `Guide`: Fix error when rendering with no pages ([#43380](https://github.com/WordPress/gutenberg/pull/43380/)).
--   `Disabled`: preserve input values when toggling the `isDisabled` prop ([#43508](https://github.com/WordPress/gutenberg/pull/43508/))
 
 ### Enhancements
 
--   `GradientPicker`: Show custom picker before swatches ([#43577](https://github.com/WordPress/gutenberg/pull/43577)).
 -   `CustomGradientPicker`, `GradientPicker`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43387](https://github.com/WordPress/gutenberg/pull/43387)).
 -   `ToolsPanel`: Tighten grid gaps ([#43424](https://github.com/WordPress/gutenberg/pull/43424)).
--   `ColorPalette`: Make popover style consistent ([#43570](https://github.com/WordPress/gutenberg/pull/43570)).
 -   `ToggleGroupControl`: Improve TypeScript documentation ([#43265](https://github.com/WordPress/gutenberg/pull/43265)).
 -   `ComboboxControl`: Normalize hyphen-like characters to an ASCII hyphen ([#42942](https://github.com/WordPress/gutenberg/pull/42942)).
 -   `FormTokenField`: Refactor away from `_.difference()` ([#43224](https://github.com/WordPress/gutenberg/pull/43224/)).
 -   `Autocomplete`: use `KeyboardEvent.code` instead of `KeyboardEvent.keyCode` ([#43432](https://github.com/WordPress/gutenberg/pull/43432/)).
 -   `ConfirmDialog`: replace (almost) every usage of `fireEvent` with `@testing-library/user-event` ([#43429](https://github.com/WordPress/gutenberg/pull/43429/)).
--   `Popover`: Introduce new `flip` and `resize` props ([#43546](https://github.com/WordPress/gutenberg/pull/43546/)).
+-   `ToggleGroupControlOptionIcon`: Maintain square proportions ([#43060](https://github.com/WordPress/gutenberg/pull/43060/)).
+-   `ToggleGroupControlOptionIcon`: Add a required `label` prop so the button is always accessibly labeled. Also removes `showTooltip` from the accepted prop types, as the tooltip will now always be shown. ([#43060](https://github.com/WordPress/gutenberg/pull/43060/)).
+-   `SelectControl`, `CustomSelectControl`: Refresh and refactor chevron down icon ([#42962](https://github.com/WordPress/gutenberg/pull/42962)).
+-   `ToggleGroupControl`, `RangeControl`, `FontSizePicker`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([#43062](https://github.com/WordPress/gutenberg/pull/43062)).
+-   `ColorPalette`: use index while iterating over color entries to avoid React "duplicated key" warning ([#43096](https://github.com/WordPress/gutenberg/pull/43096)).
+-   `AnglePickerControl`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([#43160](https://github.com/WordPress/gutenberg/pull/43160/)).
+-   `ComboboxControl`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([#43165](https://github.com/WordPress/gutenberg/pull/43165/)).
 
 ### Internal
 
 -   `Tooltip`: Refactor tests to `@testing-library/react` ([#43061](https://github.com/WordPress/gutenberg/pull/43061)).
--   `ClipboardButton`, `FocusableIframe`, `IsolatedEventContainer`, `withConstrainedTabbing`, `withSpokenMessages`: Improve TypeScript types ([#43579](https://github.com/WordPress/gutenberg/pull/43579)).
 -   Clean up unused and duplicate `COLORS` values ([#43445](https://github.com/WordPress/gutenberg/pull/43445)).
 -   Update `floating-ui` to the latest version ([#43206](https://github.com/WordPress/gutenberg/pull/43206)).
 -   `DateTimePicker`, `TimePicker`, `DatePicker`: Switch from `moment` to `date-fns` ([#43005](https://github.com/WordPress/gutenberg/pull/43005)).
 -   `DatePicker`: Switch from `react-dates` to `use-lilius` ([#43005](https://github.com/WordPress/gutenberg/pull/43005)).
--   `DateTimePicker`: address feedback after recent refactor to `date-fns` and `use-lilius` ([#43495](https://github.com/WordPress/gutenberg/pull/43495)).
 -   `convertLTRToRTL()`: Refactor away from `_.mapKeys()` ([#43258](https://github.com/WordPress/gutenberg/pull/43258/)).
 -   `withSpokenMessages`: Update to use `@testing-library/react` ([#43273](https://github.com/WordPress/gutenberg/pull/43273)).
 -   `MenuGroup`: Refactor unit tests to use `@testing-library/react` ([#43275](https://github.com/WordPress/gutenberg/pull/43275)).
@@ -2831,14 +3189,18 @@
 -   `Tooltip`: Refactor away from `_.includes()` ([#43518](https://github.com/WordPress/gutenberg/pull/43518/)).
 -   `TreeGrid`: Refactor away from `_.includes()` ([#43518](https://github.com/WordPress/gutenberg/pull/43518/)).
 -   `FormTokenField`: use `KeyboardEvent.code`, refactor tests to modern RTL and `user-event` ([#43442](https://github.com/WordPress/gutenberg/pull/43442/)).
--   `DropdownMenu`: use `KeyboardEvent.code`, refactor tests to model RTL and `user-event` ([#43439](https://github.com/WordPress/gutenberg/pull/43439/)).
--   `Autocomplete`: Refactor away from `_.escapeRegExp()` ([#43629](https://github.com/WordPress/gutenberg/pull/43629/)).
--   `TextHighlight`: Refactor away from `_.escapeRegExp()` ([#43629](https://github.com/WordPress/gutenberg/pull/43629/)).
+-   `ToggleGroupControl`: Add `__experimentalIsIconGroup` prop ([#43060](https://github.com/WordPress/gutenberg/pull/43060/)).
+-   `Swatch`: Remove component in favor of `ColorIndicator` [#43068](https://github.com/WordPress/gutenberg/pull/43068)).
 
 ### Experimental
 
 -   `FormTokenField`: add `__experimentalAutoSelectFirstMatch` prop to auto select the first matching suggestion on typing ([#42527](https://github.com/WordPress/gutenberg/pull/42527/)).
--   `Popover`: Deprecate `__unstableForcePosition`, now replaced by new `flip` and `resize` props ([#43546](https://github.com/WordPress/gutenberg/pull/43546/)).
+
+### Bug Fix
+
+-   `ColorPalette`: forward correctly `popoverProps` in the `CustomColorPickerDropdown` component [#42989](https://github.com/WordPress/gutenberg/pull/42989)).
+-   `ColorPalette`, `CustomGradientBar`: restore correct color picker popover position [#42989](https://github.com/WordPress/gutenberg/pull/42989)).
+-   `Popover`: fix iframe offset not updating when iframe resizes ([#42971](https://github.com/WordPress/gutenberg/pull/43172)).
 
 ## 19.17.0 (2022-08-10)
 
@@ -2855,15 +3217,9 @@
 -   `ColorPicker`: fix layout overflow [#42992](https://github.com/WordPress/gutenberg/pull/42992)).
 -   `ToolsPanel`: Constrain grid columns to 50% max-width ([#42795](https://github.com/WordPress/gutenberg/pull/42795)).
 -   `Popover`: anchor correctly to parent node when no explicit anchor is passed ([#42971](https://github.com/WordPress/gutenberg/pull/42971)).
--   `ColorPalette`: forward correctly `popoverProps` in the `CustomColorPickerDropdown` component [#42989](https://github.com/WordPress/gutenberg/pull/42989)).
--   `ColorPalette`, `CustomGradientBar`: restore correct color picker popover position [#42989](https://github.com/WordPress/gutenberg/pull/42989)).
--   `Popover`: fix iframe offset not updating when iframe resizes ([#42971](https://github.com/WordPress/gutenberg/pull/43172)).
 
 ### Enhancements
 
--   `ToggleGroupControlOptionIcon`: Maintain square proportions ([#43060](https://github.com/WordPress/gutenberg/pull/43060/)).
--   `ToggleGroupControlOptionIcon`: Add a required `label` prop so the button is always accessibly labeled. Also removes `showTooltip` from the accepted prop types, as the tooltip will now always be shown. ([#43060](https://github.com/WordPress/gutenberg/pull/43060/)).
--   `SelectControl`, `CustomSelectControl`: Refresh and refactor chevron down icon ([#42962](https://github.com/WordPress/gutenberg/pull/42962)).
 -   `FontSizePicker`: Add large size variant ([#42716](https://github.com/WordPress/gutenberg/pull/42716/)).
 -   `Popover`: tidy up code, add more comments ([#42944](https://github.com/WordPress/gutenberg/pull/42944)).
 -   Add `box-sizing` reset style mixin to utils ([#42754](https://github.com/WordPress/gutenberg/pull/42754)).
@@ -2871,20 +3227,22 @@
 -   Update control labels to the new uppercase styles ([#42789](https://github.com/WordPress/gutenberg/pull/42789)).
 -   `UnitControl`: Update unit dropdown design for the large size variant ([#42000](https://github.com/WordPress/gutenberg/pull/42000)).
 -   `BaseControl`: Add `box-sizing` reset style ([#42889](https://github.com/WordPress/gutenberg/pull/42889)).
--   `ToggleGroupControl`, `RangeControl`, `FontSizePicker`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([#43062](https://github.com/WordPress/gutenberg/pull/43062)).
 -   `BoxControl`: Export `applyValueToSides` util function. ([#42733](https://github.com/WordPress/gutenberg/pull/42733/)).
--   `ColorPalette`: use index while iterating over color entries to avoid React "duplicated key" warning ([#43096](https://github.com/WordPress/gutenberg/pull/43096)).
--   `AnglePickerControl`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([#43160](https://github.com/WordPress/gutenberg/pull/43160/)).
--   `ComboboxControl`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([#43165](https://github.com/WordPress/gutenberg/pull/43165/)).
+-   `ComboboxControl`, `FormTokenField`: Add custom render callback for options in suggestions list ([#42597](https://github.com/WordPress/gutenberg/pull/42597/)).
 
 ### Internal
 
--   `ToggleGroupControl`: Add `__experimentalIsIconGroup` prop ([#43060](https://github.com/WordPress/gutenberg/pull/43060/)).
 -   `Flex`, `FlexItem`, `FlexBlock`: Convert to TypeScript ([#42537](https://github.com/WordPress/gutenberg/pull/42537)).
 -   `InputControl`: Fix incorrect `size` prop passing ([#42793](https://github.com/WordPress/gutenberg/pull/42793)).
 -   `Placeholder`: Convert to TypeScript ([#42990](https://github.com/WordPress/gutenberg/pull/42990)).
 -   `Popover`: rewrite Storybook examples using controls [#42903](https://github.com/WordPress/gutenberg/pull/42903)).
--   `Swatch`: Remove component in favor of `ColorIndicator` [#43068](https://github.com/WordPress/gutenberg/pull/43068)).
+-   `Swatch`: Convert to TypeScript ([#42162](https://github.com/WordPress/gutenberg/pull/42162)).
+-   `StyleProvider`: Convert to TypeScript ([#42541](https://github.com/WordPress/gutenberg/pull/42541)).
+-   `ComboboxControl`: Add support for uncontrolled mode ([#42752](https://github.com/WordPress/gutenberg/pull/42752)).
+
+### Bug Fix
+
+-   `Popover`: Fix offset when the reference element is within an iframe. ([#42417](https://github.com/WordPress/gutenberg/pull/42417)).
 
 ## 19.16.0 (2022-07-27)
 
@@ -2897,7 +3255,6 @@
 -   `ColorPalette`: Fix background image in RTL mode ([#42510](https://github.com/WordPress/gutenberg/pull/42510)).
 -   `RangeControl`: clamp initialPosition between min and max values ([#42571](https://github.com/WordPress/gutenberg/pull/42571)).
 -   `Tooltip`: avoid unnecessary re-renders of select child elements ([#42483](https://github.com/WordPress/gutenberg/pull/42483)).
--   `Popover`: Fix offset when the reference element is within an iframe. ([#42417](https://github.com/WordPress/gutenberg/pull/42417)).
 
 ### Enhancements
 
@@ -2913,7 +3270,8 @@
 -   `BorderControl`: Render dropdown as prefix within its `UnitControl` ([#42212](https://github.com/WordPress/gutenberg/pull/42212/))
 -   `UnitControl`: Update prop types to allow ReactNode as prefix ([#42212](https://github.com/WordPress/gutenberg/pull/42212/))
 -   `ToolsPanel`: Updated README with panel layout information and more expansive usage example ([#42615](https://github.com/WordPress/gutenberg/pull/42615)).
--   `ComboboxControl`, `FormTokenField`: Add custom render callback for options in suggestions list ([#42597](https://github.com/WordPress/gutenberg/pull/42597/)).
+-   `ToggleGroupControl`: Add large size variant ([#42008](https://github.com/WordPress/gutenberg/pull/42008/)).
+-   `InputControl`: Ensure that the padding between a `prefix`/`suffix` and the text input stays at a reasonable 8px, even in larger size variants ([#42166](https://github.com/WordPress/gutenberg/pull/42166)).
 
 ### Internal
 
@@ -2928,9 +3286,11 @@
 -   `BoxControl`: Refactor away from `_.isEmpty()` ([#42468](https://github.com/WordPress/gutenberg/pull/42468)).
 -   `RadioControl`: Refactor away from `_.isEmpty()` ([#42468](https://github.com/WordPress/gutenberg/pull/42468)).
 -   `SelectControl`: Refactor away from `_.isEmpty()` ([#42468](https://github.com/WordPress/gutenberg/pull/42468)).
--   `StyleProvider`: Convert to TypeScript ([#42541](https://github.com/WordPress/gutenberg/pull/42541)).
 -   `ComboboxControl`: Replace `keyboardEvent.keyCode` with `keyboardEvent.code`([#42569](https://github.com/WordPress/gutenberg/pull/42569)).
--   `ComboboxControl`: Add support for uncontrolled mode ([#42752](https://github.com/WordPress/gutenberg/pull/42752)).
+
+### Bug Fix
+
+-   Fix `ToolTip` position to ensure it is always positioned relative to the first child of the ToolTip. ([#41268](https://github.com/WordPress/gutenberg/pull/41268))
 
 ## 19.15.0 (2022-07-13)
 
@@ -2941,12 +3301,12 @@
 -   `ComboboxControl`: use custom prefix when generating the instanceId ([#42134](https://github.com/WordPress/gutenberg/pull/42134).
 -   `Popover`: pass missing anchor ref to the `getAnchorRect` callback prop. ([#42076](https://github.com/WordPress/gutenberg/pull/42076)).
 -   `Popover`: call `getAnchorRect` callback prop even if `anchorRefFallback` has no value. ([#42329](https://github.com/WordPress/gutenberg/pull/42329)).
--   Fix `ToolTip` position to ensure it is always positioned relative to the first child of the ToolTip. ([#41268](https://github.com/WordPress/gutenberg/pull/41268))
 
 ### Enhancements
 
--   `ToggleGroupControl`: Add large size variant ([#42008](https://github.com/WordPress/gutenberg/pull/42008/)).
--   `InputControl`: Ensure that the padding between a `prefix`/`suffix` and the text input stays at a reasonable 8px, even in larger size variants ([#42166](https://github.com/WordPress/gutenberg/pull/42166)).
+-   `ComboboxControl` & `FormTokenField`: Add `__next36pxDefaultSize` flag for larger default size ([#40746](https://github.com/WordPress/gutenberg/pull/40746)).
+-   `Modal` design adjustments: Blur elements outside of the modal, increase modal title size, use larger close icon, remove header border when modal contents are scrolled. ([#40781](https://github.com/WordPress/gutenberg/pull/40781)).
+
 
 ### Internal
 
@@ -2974,17 +3334,19 @@
 -   `ExternalLink`: Refactor away from Lodash ([#42341](https://github.com/WordPress/gutenberg/pull/42341/)).
 -   `Navigation`: updated to satisfy `react/exhaustive-deps` eslint rule ([#41612](https://github.com/WordPress/gutenberg/pull/41612))
 
+### Bug Fix
+
+-   `ColorPicker`: Widen hex input field for mobile. ([#42004](https://github.com/WordPress/gutenberg/pull/42004))
+
 ## 19.14.0 (2022-06-29)
 
 ### Bug Fixes
 
 -   `ColorPicker`: Remove horizontal scrollbar when using HSL or RGB color input types. ([#41646](https://github.com/WordPress/gutenberg/pull/41646))
--   `ColorPicker`: Widen hex input field for mobile. ([#42004](https://github.com/WordPress/gutenberg/pull/42004))
 
 ### Enhancements
 
 -   Wrapped `ColorIndicator` in a `forwardRef` call ([#41587](https://github.com/WordPress/gutenberg/pull/41587)).
--   `ComboboxControl` & `FormTokenField`: Add `__next36pxDefaultSize` flag for larger default size ([#40746](https://github.com/WordPress/gutenberg/pull/40746)).
 -   `BorderControl`: Improve TypeScript support. ([#41843](https://github.com/WordPress/gutenberg/pull/41843)).
 -   `DatePicker`: highlight today's date. ([#41647](https://github.com/WordPress/gutenberg/pull/41647/)).
 -   Allow automatic repositioning of `BorderBoxControl` and `ColorPalette` popovers within smaller viewports ([#41930](https://github.com/WordPress/gutenberg/pull/41930)).
@@ -3043,6 +3405,8 @@
 -   `ExternalLink`: Convert to TypeScript ([#41681](https://github.com/WordPress/gutenberg/pull/41681)).
 -   `InputControl` updated to satisfy `react/exhaustive-deps` eslint rule ([#41601](https://github.com/WordPress/gutenberg/pull/41601))
 -   `Modal`: updated to satisfy `react/exhaustive-deps` eslint rule ([#41610](https://github.com/WordPress/gutenberg/pull/41610))
+-   `Dropdown` updated to satisfy `react/exhaustive-deps` eslint rule ([#41505](https://github.com/WordPress/gutenberg/pull/41505))
+-   `DateDayPicker` updated to satisfy `react/exhaustive-deps` eslint rule ([#41470](https://github.com/WordPress/gutenberg/pull/41470)).
 
 ### Experimental
 
@@ -3076,8 +3440,6 @@
 -   `BoxControl`: Update unit tests to use `@testing-library/user-event` ([#41422](https://github.com/WordPress/gutenberg/pull/41422)).
 -   `Surface`: Convert to TypeScript ([#41212](https://github.com/WordPress/gutenberg/pull/41212)).
 -   `Autocomplete` updated to satisfy `react/exhaustive-deps` eslint rule ([#41382](https://github.com/WordPress/gutenberg/pull/41382))
--   `Dropdown` updated to satisfy `react/exhaustive-deps` eslint rule ([#41505](https://github.com/WordPress/gutenberg/pull/41505))
--   `DateDayPicker` updated to satisfy `react/exhaustive-deps` eslint rule ([#41470](https://github.com/WordPress/gutenberg/pull/41470)).
 
 ### Experimental
 
@@ -3101,6 +3463,8 @@
 -   `CheckboxControl`: Convert to TypeScript ([#40915](https://github.com/WordPress/gutenberg/pull/40915)).
 -   `ButtonGroup`: Convert to TypeScript ([#41007](https://github.com/WordPress/gutenberg/pull/41007)).
 -   `Popover`: refactor component to use the `floating-ui` library internally ([#40740](https://github.com/WordPress/gutenberg/pull/40740)).
+-   Setup `user-event` in unit tests inline, once per test ([#40839](https://github.com/WordPress/gutenberg/pull/40839)).
+-   `DatePicker`: Update `react-dates` to 21.8.0 ([#40801](https://github.com/WordPress/gutenberg/pull/40801)).
 
 ## 19.10.0 (2022-05-04)
 
@@ -3108,14 +3472,11 @@
 
 -   `UnitControl`: migrate unit tests to TypeScript ([#40697](https://github.com/WordPress/gutenberg/pull/40697)).
 -   `DatePicker`: Add improved unit tests ([#40754](https://github.com/WordPress/gutenberg/pull/40754)).
--   Setup `user-event` in unit tests inline, once per test ([#40839](https://github.com/WordPress/gutenberg/pull/40839)).
--   `DatePicker`: Update `react-dates` to 21.8.0 ([#40801](https://github.com/WordPress/gutenberg/pull/40801)).
 
 ### Enhancements
 
 -   `InputControl`: Add `__next36pxDefaultSize` flag for larger default size ([#40622](https://github.com/WordPress/gutenberg/pull/40622)).
 -   `UnitControl`: Add `__next36pxDefaultSize` flag for larger default size ([#40627](https://github.com/WordPress/gutenberg/pull/40627)).
--   `Modal` design adjustments: Blur elements outside of the modal, increase modal title size, use larger close icon, remove header border when modal contents are scrolled. ([#40781](https://github.com/WordPress/gutenberg/pull/40781)).
 -   `SelectControl`: Improved TypeScript support ([#40737](https://github.com/WordPress/gutenberg/pull/40737)).
 -   `ToggleControlGroup`: Switch to internal `Icon` component for dashicon support ([40717](https://github.com/WordPress/gutenberg/pull/40717)).
 -   Improve `ToolsPanel` accessibility. ([#40716](https://github.com/WordPress/gutenberg/pull/40716))
@@ -3132,6 +3493,10 @@
 
 -   `TextControl`: Convert to TypeScript ([#40633](https://github.com/WordPress/gutenberg/pull/40633)).
 
+### Bug Fix
+
+-   `InputControl`: allow user to input a value interactively in Storybook, by removing default value argument ([#40410](https://github.com/WordPress/gutenberg/pull/40410)).
+
 ## 19.9.0 (2022-04-21)
 
 ### Bug Fixes
@@ -3144,7 +3509,10 @@
 
 ### Bug Fixes
 
--   `InputControl`: allow user to input a value interactively in Storybook, by removing default value argument ([#40410](https://github.com/WordPress/gutenberg/pull/40410)).
+
+### Enhancements
+
+-   `InputControl`: Improved TypeScript type annotations ([#40119](https://github.com/WordPress/gutenberg/pull/40119)).
 
 ## 19.8.0 (2022-04-08)
 
@@ -3153,7 +3521,7 @@
 -   Update `BorderControl` and `BorderBoxControl` to allow the passing of custom class names to popovers ([#39753](https://github.com/WordPress/gutenberg/pull/39753)).
 -   `ToggleGroupControl`: Reintroduce backdrop animation ([#40021](https://github.com/WordPress/gutenberg/pull/40021)).
 -   `Card`: Adjust border radius effective size ([#40032](https://github.com/WordPress/gutenberg/pull/40032)).
--   `InputControl`: Improved TypeScript type annotations ([#40119](https://github.com/WordPress/gutenberg/pull/40119)).
+-   `UnitControl`: add support for the `onBlur` prop ([#39589](https://github.com/WordPress/gutenberg/pull/39589)).
 
 ### Internal
 
@@ -3184,7 +3552,6 @@
 -   Add `onClick` prop on `FormFileUpload`. ([#39268](https://github.com/WordPress/gutenberg/pull/39268))
 -   `FocalPointPicker`: stop using `UnitControl`'s deprecated `unit` prop ([#39504](https://github.com/WordPress/gutenberg/pull/39504)).
 -   `CheckboxControl`: Add support for the `indeterminate` state ([#39462](https://github.com/WordPress/gutenberg/pull/39462)).
--   `UnitControl`: add support for the `onBlur` prop ([#39589](https://github.com/WordPress/gutenberg/pull/39589)).
 
 ### Internal
 
@@ -3209,12 +3576,17 @@
 -   `InputControl`: Allow `onBlur` for empty values to commit the change when `isPressEnterToChange` is true, and move reset behavior to the ESCAPE key. ([#39109](https://github.com/WordPress/gutenberg/pull/39109)).
 -   `TreeGrid`: Add tests for Home/End keyboard navigation. Add `onFocusRow` callback for Home/End keyboard navigation, this was missed in the implementation PR. Modify test for expanding/collapsing a row as row 1 implements this now. Update README with latest changes. ([#39302](https://github.com/WordPress/gutenberg/pull/39302))
 -   `ToggleGroupControlOption`: Calculate width from button content and remove `LabelPlaceholderView` ([#39345](https://github.com/WordPress/gutenberg/pull/39345))
+-   `TreeGrid`: Update callback tests to use `TreeGridRow` and `TreeGridCell` sub-components. ([#39002](https://github.com/WordPress/gutenberg/pull/39002)).
 
 ### Bug Fixes
 
 -   Normalize `font-family` on `Button`, `ColorPalette`, `ComoboboxControl`, `DateTimePicker`, `FormTokenField`, `InputControl`, `SelectControl`, and `ToggleGroupControl` ([#38969](https://github.com/WordPress/gutenberg/pull/38969)).
 -   Fix input value selection of `InputControl`-based controls in Firefox and Safari with axial constraint of drag gesture ([#38968](https://github.com/WordPress/gutenberg/pull/38968)).
 -   Fix `UnitControl`'s behavior around updating the unit when a new `value` is passed (i.e. in controlled mode). ([#39148](https://github.com/WordPress/gutenberg/pull/39148)).
+
+### Experimental
+
+-   `UnitControl`: tidy up utilities and types. In particular, change the type of parsed quantities to `number` (previously it could have been a `string` too). ([#38987](https://github.com/WordPress/gutenberg/pull/38987]))
 
 ## 19.5.0 (2022-02-23)
 
@@ -3226,7 +3598,17 @@
 ### Enhancements
 
 -   `TreeGrid`: Add tests for `onCollapseRow`, `onExpandRow`, and `onFocusRow` callback functions. ([#38942](https://github.com/WordPress/gutenberg/pull/38942)).
--   `TreeGrid`: Update callback tests to use `TreeGridRow` and `TreeGridCell` sub-components. ([#39002](https://github.com/WordPress/gutenberg/pull/39002)).
+-   `TreeGrid` accessibility: Add Home/End keys for better keyboard navigation. ([#38679](https://github.com/WordPress/gutenberg/pull/38679))
+-   Add `resolvePoint` prop to `FocalPointPicker` to allow updating the value of the picker after a user interaction ([#38247](https://github.com/WordPress/gutenberg/pull/38247))
+-   `TreeGrid`: Allow SHIFT key to be held, and add `onFocusRow` callback to the `TreeGrid` component, fired when focus is shifted from one row to another via Up and Down arrow keys. ([#38314](https://github.com/WordPress/gutenberg/pull/38314))
+
+### Bug Fix
+
+-   Update the `HexInput` component to accept a pasted value that contains a starting #
+
+### Experimental
+
+-   `Navigator`: add `NavigatorButton` and `NavigatorBackButton` components ([#38634](https://github.com/WordPress/gutenberg/pull/38634))
 
 ## 19.4.0 (2022-02-10)
 
@@ -3246,27 +3628,32 @@
 -   Update the visual design of the `Spinner` component. ([#37551](https://github.com/WordPress/gutenberg/pull/37551))
 -   `TreeGrid` accessibility enhancements around the expand/collapse functionality. ([#38358](https://github.com/WordPress/gutenberg/pull/38358))
 -   `TreeGrid` accessibility: improve browser support for Left Arrow focus to parent row in child row. ([#38639](https://github.com/WordPress/gutenberg/pull/38639))
--   `TreeGrid` accessibility: Add Home/End keys for better keyboard navigation. ([#38679](https://github.com/WordPress/gutenberg/pull/38679))
--   Add `resolvePoint` prop to `FocalPointPicker` to allow updating the value of the picker after a user interaction ([#38247](https://github.com/WordPress/gutenberg/pull/38247))
--   `TreeGrid`: Allow SHIFT key to be held, and add `onFocusRow` callback to the `TreeGrid` component, fired when focus is shifted from one row to another via Up and Down arrow keys. ([#38314](https://github.com/WordPress/gutenberg/pull/38314))
+-   Updated `ToolsPanel` header icon to only show "plus" icon when all items are optional and all are currently hidden ([#38262](https://github.com/WordPress/gutenberg/pull/38262))
 
 ### Experimental
 
 -   `Navigator`: rename `push`/`pop` to `goTo`/`goBack` ([#38582](https://github.com/WordPress/gutenberg/pull/38582))
--   `Navigator`: add `NavigatorButton` and `NavigatorBackButton` components ([#38634](https://github.com/WordPress/gutenberg/pull/38634))
--   `UnitControl`: tidy up utilities and types. In particular, change the type of parsed quantities to `number` (previously it could have been a `string` too). ([#38987](https://github.com/WordPress/gutenberg/pull/38987]))
+-   Add focus restoration to `Navigator` ([#38149](https://github.com/WordPress/gutenberg/pull/38149)).
+
+### Bug Fix
+
+-   `DateTimePicker`: Fix the date format associated to the `is12Hour` prop ([#37465](https://github.com/WordPress/gutenberg/pull/37465))
 
 ## 19.3.0 (2022-01-27)
 
 ### Enhancements
 
 -   Refine `ExternalLink` to be same size as the text, to appear more as a glyph than an icon. ([#37859](https://github.com/WordPress/gutenberg/pull/37859))
--   Updated `ToolsPanel` header icon to only show "plus" icon when all items are optional and all are currently hidden ([#38262](https://github.com/WordPress/gutenberg/pull/38262))
 -   `TreeGrid`: Fix keyboard navigation for expand/collapse table rows in Firefox ([#37983](https://github.com/WordPress/gutenberg/pull/37983))
+-   Wrapped `Modal` in a `forwardRef` call ([#36831](https://github.com/WordPress/gutenberg/pull/36831)).
+-   Refactor `DateTime` class component to functional component ([#36835](https://github.com/WordPress/gutenberg/pull/36835))
+-   Unify styles for `ColorIndicator` with how they appear in Global Styles ([#37028](https://github.com/WordPress/gutenberg/pull/37028))
+-   Add support for rendering the `ColorPalette` in a `Dropdown` when opened in the sidebar ([#37067](https://github.com/WordPress/gutenberg/pull/37067))
+-   Add support for proper borders to color indicators ([#37500](https://github.com/WordPress/gutenberg/pull/37500))
+-   Refactor `SuggestionsList` class component to functional component([#36924](https://github.com/WordPress/gutenberg/pull/36924/))
 
 ### Bug Fixes
 
--   Update the `HexInput` component to accept a pasted value that contains a starting #
 -   Update `ToggleGroupControl` background active state to use a simple background color instead of animated backdrop ([38008](https://github.com/WordPress/gutenberg/pull/38008))
 -   Update label spacing for the `BoxControl`, `CustomGradientPicker`, `FormTokenField`, `InputControl`, and `ToolsPanel` components to use a bottom margin of `8px` for consistency. ([#37844](https://github.com/WordPress/gutenberg/pull/37844))
 -   Add missing styles to the `BaseControl.VisualLabel` component. ([#37747](https://github.com/WordPress/gutenberg/pull/37747))
@@ -3279,26 +3666,18 @@
 ### Experimental
 
 -   Add basic history location support to `Navigator` ([#37416](https://github.com/WordPress/gutenberg/pull/37416)).
--   Add focus restoration to `Navigator` ([#38149](https://github.com/WordPress/gutenberg/pull/38149)).
-
-## 19.2.0 (2022-01-04)
-
-### Experimental
-
 -   Reinstated the ability to pass additional props to the `ToolsPanel` ([#36428](https://github.com/WordPress/gutenberg/pull/36428)).
 -   Added an `__unstable-large` size variant to `InputControl`, `SelectControl`, and `UnitControl` for selective migration to the larger 40px heights. ([#35646](https://github.com/WordPress/gutenberg/pull/35646)).
 -   Fixed inconsistent padding in `UnitControl` ([#35646](https://github.com/WordPress/gutenberg/pull/35646)).
 -   Added support for RTL behavior for the `ZStack`'s `offset` prop ([#36769](https://github.com/WordPress/gutenberg/pull/36769))
--   Fixed race conditions causing conditionally displayed `ToolsPanelItem` components to be erroneously deregistered ([#36588](https://github.com/WordPress/gutenberg/pull/36588)).
 -   Added `__experimentalHideHeader` prop to `Modal` component ([#36831](https://github.com/WordPress/gutenberg/pull/36831)).
 -   Added experimental `ConfirmDialog` component ([#34153](https://github.com/WordPress/gutenberg/pull/34153)).
 -   Divider: improve support for vertical orientation and RTL styles, use start/end logical props instead of top/bottom, change border-color to `currentColor` ([#36579](https://github.com/WordPress/gutenberg/pull/36579)).
 -   `ToggleGroupControl`: Avoid calling `onChange` if radio state changed from an incoming value ([#37224](https://github.com/WordPress/gutenberg/pull/37224/)).
 -   `ToggleGroupControl`: fix the computation of the backdrop dimensions when rendered in a Popover ([#37067](https://github.com/WordPress/gutenberg/pull/37067)).
--   Add `__experimentalIsRenderedInSidebar` property to the `GradientPicker`and `CustomGradientPicker`. The property changes the color popover behavior to have a special placement behavior appropriate for sidebar UI's.
 -   Add `first` and `last` classes to displayed `ToolsPanelItem` group within a `ToolsPanel` ([#37546](https://github.com/WordPress/gutenberg/pull/37546))
 
-### Bug Fixes
+### Bug Fix
 
 -   Fixed spacing between `BaseControl` fields and help text within the `ToolsPanel` ([#36334](https://github.com/WordPress/gutenberg/pull/36334))
 -   Replaced hardcoded blue in `ColorPicker` with UI theme color ([#36153](https://github.com/WordPress/gutenberg/pull/36153)).
@@ -3306,24 +3685,37 @@
 -   Normalized label line-height and spacing within the `ToolsPanel` ([36387](https://github.com/WordPress/gutenberg/pull/36387))
 -   Remove unused `reakit-utils` from peer dependencies ([#37369](https://github.com/WordPress/gutenberg/pull/37369)).
 -   Update all Emotion dependencies to the latest version to ensure they work correctly with React types ([#37365](https://github.com/WordPress/gutenberg/pull/37365)).
--   `DateTimePicker`: Fix the date format associated to the `is12Hour` prop ([#37465](https://github.com/WordPress/gutenberg/pull/37465))
+
+## 19.2.2 (2022-01-18)
+
+### Bug Fix
+
+-   Prevent keyDown events from propagating up in `CustomSelectControl` ([#30557](https://github.com/WordPress/gutenberg/pull/30557))
+-   Mark `children` prop as optional in `SelectControl` ([#37872](https://github.com/WordPress/gutenberg/pull/37872))
+
+## 19.2.0 (2022-01-04)
+
+### Experimental
+
+-   Fixed race conditions causing conditionally displayed `ToolsPanelItem` components to be erroneously deregistered ([#36588](https://github.com/WordPress/gutenberg/pull/36588)).
+
+### Bug Fixes
+
 -   Allowed `ToolsPanel` to register items when `panelId` is `null` due to multiple block selection ([37216](https://github.com/WordPress/gutenberg/pull/37216)).
 
 ### Enhancements
 
--   Wrapped `Modal` in a `forwardRef` call ([#36831](https://github.com/WordPress/gutenberg/pull/36831)).
--   Refactor `DateTime` class component to functional component ([#36835](https://github.com/WordPress/gutenberg/pull/36835))
--   Unify styles for `ColorIndicator` with how they appear in Global Styles ([#37028](https://github.com/WordPress/gutenberg/pull/37028))
--   Add support for rendering the `ColorPalette` in a `Dropdown` when opened in the sidebar ([#37067](https://github.com/WordPress/gutenberg/pull/37067))
 -   Show an incremental sequence of numbers (1/2/3/4/5) as a label of the font size, when we have at most five font sizes, where at least one the them contains a complex css value(clamp, var, etc..). We do this because complex css values cannot be calculated properly and the incremental sequence of numbers as labels can help the user better mentally map the different available font sizes. ([#37038](https://github.com/WordPress/gutenberg/pull/37038))
--   Add support for proper borders to color indicators ([#37500](https://github.com/WordPress/gutenberg/pull/37500))
--   Refactor `SuggestionsList` class component to functional component([#36924](https://github.com/WordPress/gutenberg/pull/36924/))
 
 ## 19.1.4 (2021-12-13)
 
 ### Bug Fixes
 
 -   Improve accessibility and visibility in `ColorPalette` ([#36925](https://github.com/WordPress/gutenberg/pull/36925))
+
+### Experimental
+
+-   Add the `__experimentalIsRenderedInSidebar` prop to `GradientPicker` and `CustomGradientPicker` to position color popovers appropriately in sidebar UIs ([#37115](https://github.com/WordPress/gutenberg/pull/37115)).
 
 ## 19.1.3 (2021-12-06)
 
@@ -3348,9 +3740,12 @@
 
 -   Fixed a bug which prevented setting `PM` hours correctly in the `DateTimePicker` ([#36878](https://github.com/WordPress/gutenberg/pull/36878)).
 
-## 19.0.2 (2021-11-15)
+## 19.0.3 (2021-11-15)
 
 -   Remove erroneous use of `??=` syntax from `build-module`.
+
+## 19.0.2 (2021-11-15)
+
 
 ## 19.0.1 (2021-11-07)
 
@@ -3368,6 +3763,7 @@
 ### New Features
 
 -   Added support for `step="any"` in `NumberControl` and `RangeControl` ([#34542](https://github.com/WordPress/gutenberg/pull/34542)).
+-   Update the `ColorPicker` component to the latest design ([#35220](https://github.com/WordPress/gutenberg/pull/35220))
 
 ### Enhancements
 
@@ -3385,6 +3781,10 @@
 
 -   The `color` property a `tinycolor2` color object passed on `onChangeComplete` property of the `ColorPicker` component was removed. Please use the new `onChange` property that accepts a string color representation ([#35562](https://github.com/WordPress/gutenberg/pull/35562)).
 
+### Internal
+
+-   Deleted the `useJumpStep` utility function ([#35561](https://github.com/WordPress/gutenberg/pull/35561)).
+
 ## 18.0.0 (2021-10-12)
 
 ### Breaking Changes
@@ -3397,7 +3797,6 @@
 ### New Features
 
 -   Add an experimental `Navigator` components ([#34904](https://github.com/WordPress/gutenberg/pull/34904)) as a replacement for the previous `Navigation` related components.
--   Update the `ColorPicker` component to the latest design ([#35220](https://github.com/WordPress/gutenberg/pull/35220))
 
 ### Bug Fixes
 
@@ -3406,7 +3805,6 @@
 ### Internal
 
 -   Deleted the `createComponent` utility function ([#34929](https://github.com/WordPress/gutenberg/pull/34929)).
--   Deleted the `useJumpStep` utility function ([#35561](https://github.com/WordPress/gutenberg/pull/35561)).
 
 ## 17.0.0 (2021-09-09)
 
@@ -3500,15 +3898,33 @@
 
 -   Allows focus of the `FocalPointPicker` draggable area and adjustment with arrow keys. This was added in [#22531](https://github.com/WordPress/gutenberg/pull/22264) but was no longer working.
 
-## 12.0.0 (2020-12-17)
+## 12.0.1 (2021-01-05)
 
 ### Enhancements
 
 -   ComboboxControl: Deburr option labels before filter
+- ComboboxControl: Deburr option labels before filter
+
+## 12.0.0 (2020-12-17)
+
+### Enhancements
+
 
 ### Breaking Changes
 
 -   Introduce support for other units and advanced CSS properties on `FontSizePicker`. Provided the value passed to the `FontSizePicker` is a string or one of the size options passed is a string, onChange will start to be called with a string value instead of a number. On WordPress usage, font size options are now automatically converted to strings with the default "px" unit added.
+
+## 11.1.5 (2021-02-17)
+
+### Breaking Change
+
+- Introduce support for other units and advanced CSS properties on `FontSizePicker`. Provided the value passed to the `FontSizePicker` is a string or one of the size options passed is a string, onChange will start to be called with a string value instead of a number. On WordPress usage, font size options are now automatically converted to strings with the default "px" unit added.
+
+## 11.0.0 (2020-10-06)
+
+### Breaking Change
+
+-   `Dashicon` component no longer renders SVGs. If you rely on this component, make sure to load the dashicon font.
 
 ## 10.1.0 (2020-09-03)
 
@@ -3526,7 +3942,15 @@
 ### Breaking Changes
 
 -   `NumberControl` no longer automatically transforms values when rendering `value` into a `<input />` HTML element.
--   `Dashicon` component no longer renders SVGs. If you rely on this component, make sure to load the dashicon font.
+
+## 9.7.0 (2020-05-28)
+
+### Deprecations
+
+-   The `Guide` component no longer supports passing pages as children. Use the `pages` prop instead.
+- The `Guide` component no longer supports passing pages as children. Use the `pages` prop instead.
+-   The `GuidePage` component is deprecated. Use the `pages` prop in `Guide` instead.
+- The `GuidePage` component is deprecated. Use the `pages` prop in `Guide` instead.
 
 ## 9.6.0 (2020-05-14)
 
@@ -3537,8 +3961,6 @@
 
 ### Deprecations
 
--   The `Guide` component no longer supports passing pages as children. Use the `pages` prop instead.
--   The `GuidePage` component is deprecated. Use the `pages` prop in `Guide` instead.
 
 ## 9.2.0 (2020-02-10)
 
@@ -3574,34 +3996,21 @@
 -   `isDefault` prop in `Button` has been deprecated. Consider using `isSecondary` instead.
 -   `IconButton` has been deprecated. Use the `Button` component instead.
 
+## 8.3.0 (2019-09-16)
+
+### Improvements
+
+-   Limit `Base Control Label` to the width of its content.
+
 ## 8.2.0 (2019-08-29)
 
 ### New Features
 
 -   The bundled `re-resizable` dependency has been updated from requiring `5.0.1` to requiring `^6.0.0` ([#17011](https://github.com/WordPress/gutenberg/pull/17011)).
-
-## 8.1.0 (2019-08-05)
-
-### New Features
-
 -   Added a new `popoverProps` prop to the `Dropdown` component which allows users of the `Dropdown` component to pass props directly to the `Popover` component.
--   Added and documented `hideLabelFromVision` prop to `BaseControl` used by `SelectControl`, `TextControl`, and `TextareaControl`.
 -   Added a new `popoverProps` prop to the `DropdownMenu` component which allows to pass props directly to the nested `Popover` component.
 -   Added a new `toggleProps` prop to the `DropdownMenu` component which allows to pass props directly to the nested `IconButton` component.
 -   Added a new `menuProps` prop to the `DropdownMenu` component which allows to pass props directly to the nested `NavigableMenu` component.
-
-### Deprecations
-
--   `menuLabel` prop in `DropdownComponent` has been deprecated. Consider using `menuProps` object and its `aria-label` property instead.
--   `position` prop in `DropdownComponent` has been deprecated. Consider using `popoverProps` object and its `position` property instead.
-
-### Bug Fixes
-
--   The `Button` component will no longer assign default styling (`is-default` class) when explicitly assigned as primary (the `isPrimary` prop). This should resolve potential conflicts affecting a combination of `isPrimary`, `isDefault`, and `isLarge` / `isSmall`, where the busy animation would appear with incorrect coloring.
-
-### Deprecations
-
--   The `Popover` component `onClickOutside` prop has been deprecated. Use `onFocusOutside` instead.
 
 ### Internal
 
@@ -3609,12 +4018,38 @@
 -   The `MenuItem` component will now always use an `IconButton`. This prevents a focus loss when clicking a menu item.
 -   Package no longer depends on external `react-click-outside` library.
 
+### Deprecations
+
+-   `menuLabel` prop in `DropdownComponent` has been deprecated. Consider using `menuProps` object and its `aria-label` property instead.
+-   `position` prop in `DropdownComponent` has been deprecated. Consider using `popoverProps` object and its `position` property instead.
+-   The `Popover` component `onClickOutside` prop has been deprecated. Use `onFocusOutside` instead.
+
+## 8.1.0 (2019-08-05)
+
+### New Features
+
+-   Added and documented `hideLabelFromVision` prop to `BaseControl` used by `SelectControl`, `TextControl`, and `TextareaControl`.
+
+### Deprecations
+
+
+### Bug Fixes
+
+-   The `Button` component will no longer assign default styling (`is-default` class) when explicitly assigned as primary (the `isPrimary` prop). This should resolve potential conflicts affecting a combination of `isPrimary`, `isDefault`, and `isLarge` / `isSmall`, where the busy animation would appear with incorrect coloring.
+
+### Deprecations
+
+
+### Internal
+
+
 ## 8.0.0 (2019-06-12)
 
 ### New Features
 
 -   Add new `BlockQuotation` block to the primitives folder to support blockquote in a multiplatform way. [#15482](https://github.com/WordPress/gutenberg/pull/15482).
 -   `DropdownMenu` now supports passing a [render prop](https://reactjs.org/docs/render-props.html#using-props-other-than-render) as children for more advanced customization.
+-   Added a new `Snackbar` component.
 
 ### Internal
 
@@ -3632,34 +4067,35 @@
 
 -   Although `DateTimePicker` does not allow picking the seconds, passed the current seconds as the selected value for seconds when calling `onChange`. Now it passes zero.
 
+### Bug Fix
+
+-   Fixed minutes field of `DateTimePicker` missed '0' before single digit values.
+
 ## 7.4.0 (2019-05-21)
 
 ### New Features
 
 -   Added a new `HorizontalRule` component.
--   Added a new `Snackbar` component.
+-   Added a new `render` property to `FormFileUpload` component. Allowing users of the component to custom the UI for their needs.
+-   Added a new `BaseControl.VisualLabel` component.
+-   Added a new `preview` prop to the `Placeholder` component which allows to display a preview, for example a media preview when the Placeholder is used in media editing contexts.
 
 ### Bug Fixes
 
 -   Fixed display of reset button when using RangeControl `allowReset` prop.
--   Fixed minutes field of `DateTimePicker` missed '0' before single digit values.
+-   Fix `instanceId` prop passed through to `Button` component via `MenuItems` producing React console error. Fixed by removing the unnecessary use of `withInstanceId` on the `MenuItems` component [#14599](https://github.com/WordPress/gutenberg/pull/14599)
 
 ## 7.3.0 (2019-04-16)
 
 ### New Features
 
--   Added a new `render` property to `FormFileUpload` component. Allowing users of the component to custom the UI for their needs.
--   Added a new `BaseControl.VisualLabel` component.
--   Added a new `preview` prop to the `Placeholder` component which allows to display a preview, for example a media preview when the Placeholder is used in media editing contexts.
 -   Added a new `anchorRect` prop to `Popover` which enables a developer to provide a custom `DOMRect` object at which to position the popover.
 
 ### Enhancements
 
--   Limit `Base Control Label` to the width of its content.
 
 ### Bug Fixes
 
--   Fix `instanceId` prop passed through to `Button` component via `MenuItems` producing React console error. Fixed by removing the unnecessary use of `withInstanceId` on the `MenuItems` component [#14599](https://github.com/WordPress/gutenberg/pull/14599)
 
 ## 7.2.0 (2019-03-20)
 
@@ -3741,13 +4177,16 @@
 
 -   `Dropdown.refresh()` has been deprecated as the contained `Popover` is now automatically refreshed.
 
+### Internal
+
+-   Forward `ref` support in `TabbableContainer` and `NavigableMenu` components.
+
 ## 5.0.2 (2018-11-03)
 
 ### Internal
 
 -   Forward `ref` in the `PanelBody` component.
 -   Tooltip are no longer removed when Button becomes disabled, it's left to the component rendering the Tooltip.
--   Forward `ref` support in `TabbableContainer` and `NavigableMenu` components.
 
 ## 5.0.1 (2018-10-30)
 

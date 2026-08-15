@@ -17,6 +17,7 @@
 ### Enhancements
 
 - 	`format`: Detect `prettier.config.mjs` so the bundled default config is not used when one is present ([#80422](https://github.com/WordPress/gutenberg/pull/80422)).
+-   Update `webpack-dev-server` to `^5.2.1`, resolving several Dependabot security alerts and migrating the internal dev-server proxy config to the v5 array format ([#80347](https://github.com/WordPress/gutenberg/pull/80347)).
 
 ## 33.0.0 (2026-07-14)
 
@@ -29,7 +30,6 @@
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 -   Update `stylelint` to `^16.26.1` ([#79648](https://github.com/WordPress/gutenberg/pull/79648)).
 -   Widen the `@playwright/test` peer dependency to `>=1` and mark it optional, so consumers aren't forced to bump Playwright or satisfy it under strict peer deps ([#78632](https://github.com/WordPress/gutenberg/pull/78632)).
--   Update `webpack-dev-server` to `^5.2.1`, resolving several Dependabot security alerts and migrating the internal dev-server proxy config to the v5 array format ([#80347](https://github.com/WordPress/gutenberg/pull/80347)).
 
 ## 32.6.0 (2026-07-01)
 
@@ -72,6 +72,8 @@
 ### Internal
 
 -   The bundled `eslint` dependency has been updated from `^8.3.0` to `^8.57.1` ([#74316](https://github.com/WordPress/gutenberg/pull/74316)).
+
+## 31.2.0 (2025-12-23)
 
 ## 31.1.0 (2025-11-26)
 
@@ -471,12 +473,15 @@
 
 -   Fix incorrect handling in `plugin-zip` for root-level files and some specific platform conditions ([#41439](https://github.com/WordPress/gutenberg/pull/41439)).
 
+### New Feature
+
+-   Support tsx files in `viewScript`, `script`, `editorScript` ([#41068](https://github.com/WordPress/gutenberg/pull/41068)).
+
 ## 23.1.0 (2022-05-18)
 
 ### New Features
 
 -   Enable by default code formatting for JSON files in the `format` command ([#40994](https://github.com/WordPress/gutenberg/pull/40994)). You can opt-out of this behavior by providing a custom file matcher, example: `wp-scripts format src/**/*.js`.
--   Support tsx files in `viewScript`, `script`, `editorScript` ([#41068](https://github.com/WordPress/gutenberg/pull/41068)).
 
 ### Bug Fixes
 
@@ -498,6 +503,16 @@
 ### Bug Fixes
 
 -   Update `markdownlint` and `markdownlint-cli` to the latest versions ([#40479](https://github.com/WordPress/gutenberg/pull/40479)).
+
+### Enhancements
+
+-   Disable `selector-class-pattern` rule when linting styles until we have more flexible handling ([#37531](https://github.com/WordPress/gutenberg/pull/37531)).
+
+## 22.4.2 (2022-04-26)
+
+### New Feature
+
+-   Add `--dist-tag` flag to the `packages-update` command to allow specifying a custom dist-tag when updating npm packages ([#40514](https://github.com/WordPress/gutenberg/pull/
 
 ## 22.4.0 (2022-04-08)
 
@@ -587,7 +602,6 @@
 
 ### Enhancements
 
--   Disable `selector-class-pattern` rule when linting styles until we have more flexible handling ([#37531](https://github.com/WordPress/gutenberg/pull/37531)).
 
 ### Bug Fixes
 
@@ -667,6 +681,8 @@
 
 -   The bundled `@svgr/webpack` dependency has been updated from requiring `^5.2.0` to requiring `^5.5.0` ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
 -   The bundled `webpack-bundle-analyzer` dependency has been updated from requiring `^4.2.0` to requiring `^4.4.2` ([#33818](https://github.com/WordPress/gutenberg/pull/33818)).
+-   Update webpack config to minimize also CSS files ([#33676](https://github.com/WordPress/gutenberg/pull/33676)).
+-   The default PostCSS config uses cssnano to minimize CSS output ([#33750](https://github.com/WordPress/gutenberg/pull/33750)).
 
 ### Bug Fixes
 
@@ -678,8 +694,6 @@
 
 -   Update `eslint-plugin-markdown` package to `2.20.0` ([#33432](https://github.com/WordPress/gutenberg/pull/33432)).
 -   Update `sass` package to `1.35.2` ([#33433](https://github.com/WordPress/gutenberg/pull/33433)).
--   Update webpack config to minimize also CSS files ([#33676](https://github.com/WordPress/gutenberg/pull/33676)).
--   The default PostCSS config uses cssnano to minimize CSS output ([#33750](https://github.com/WordPress/gutenberg/pull/33750)).
 
 ## 17.0.0 (2021-07-21)
 
@@ -860,6 +874,7 @@
 ### New Features
 
 -   The PostCSS loader now gives preference to a `postcss.config.js` configuration file if present.
+-   The `test-e2e` and `test-unit` scripts will now disambiguate custom configurations, preferring a `jest-e2e.config.js`, `jest-e2e.config.json`, `jest-unit.config.js`, or `jest-unit.config.json` Jest configuration file if present, falling back to `jest.config.js` or `jest.config.json`. This allows for configurations which should only apply to one or the other test variant.
 
 ### Bug Fixes
 
@@ -873,13 +888,16 @@
 -   New `--webpack-no-externals` flag added to `build` and `start` scripts. It disables scripts' assets generation, and omits the list of default externals ([#22310](https://github.com/WordPress/gutenberg/pull/22310)).
 -   New `--webpack-bundle-analyzer` flag added to `build` and `start` scripts. It enables visualization for the size of webpack output files with an interactive zoomable treemap ([#22310](https://github.com/WordPress/gutenberg/pull/22310)).
 -   New `--webpack--devtool` flag added to `start` script. It controls how source maps are generated. See options at https://webpack.js.org/configuration/devtool/#devtool ([#22310](https://github.com/WordPress/gutenberg/pull/22310)).
--   The `test-e2e` and `test-unit` scripts will now disambiguate custom configurations, preferring a `jest-e2e.config.js`, `jest-e2e.config.json`, `jest-unit.config.js`, or `jest-unit.config.json` Jest configuration file if present, falling back to `jest.config.js` or `jest.config.json`. This allows for configurations which should only apply to one or the other test variant.
+-   Add new capability to `build` and `start` scripts that automates handling CSS, SASS or SCSS files by importing them from JavaScript code ([#21730](https://github.com/WordPress/gutenberg/pull/21730)). You can find more details about CSS assets management in webpack at https://webpack.js.org/guides/asset-management/#loading-css.
+
+### Breaking Changes
+
+- The default babel configuration has changed to only support stage-4 proposals. This affects the `build` and `start` commands that use the bundled babel configuration; if a project provides its own, this change doesn't affect it. [#22083](https://github.com/WordPress/gutenberg/pull/22083)
 
 ## 9.1.0 (2020-05-14)
 
 ### New Features
 
--   Add new capability to `build` and `start` scripts that automates handling CSS, SASS or SCSS files by importing them from JavaScript code ([#21730](https://github.com/WordPress/gutenberg/pull/21730)). You can find more details about CSS assets management in webpack at https://webpack.js.org/guides/asset-management/#loading-css.
 
 ### Enhancements
 
@@ -915,6 +933,12 @@
 ### Enhancements
 
 -   The bundled `eslint` dependency has been updated from requiring `^6.1.0` to requiring `^6.8.0` ([#21424](https://github.com/WordPress/gutenberg/pull/21424)).
+- Incompatibility between `@svgr/webpack` in version `4.3.3` and `url-loader` in version `3.0.0` was fixed by bumping `@svgr/webpack` to `^5.2.0`.
+- All webpack dependencies got minor version update if applicable.
+
+### Internal
+
+- Package depends now on the shared Prettier config exposed in `@wordpress/prettier-config` dependency ([#20026](https://github.com/WordPress/gutenberg/pull/20026)).
 
 ## 7.2.0 (2020-04-01)
 
@@ -1113,6 +1137,13 @@
 ### Bug Fixes
 
 -   Resolves an issue where npm package lint script did not work in Windows environments ([#9321](https://github.com/WordPress/gutenberg/pull/9321)
+
+### Internal
+
+
+## 2.1.0 (Unreleased)
+
+- Updated dependencies: `jest`, `npm-package-json-lint` and `read-pkg-up`
 
 ### Internal
 

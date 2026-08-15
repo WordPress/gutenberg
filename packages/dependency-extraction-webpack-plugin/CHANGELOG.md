@@ -48,6 +48,8 @@
 
 ## 6.38.0 (2026-01-16)
 
+## 6.37.0 (2025-12-23)
+
 ## 6.36.0 (2025-11-26)
 
 ## 6.35.0 (2025-11-12)
@@ -107,6 +109,18 @@
 ### Enhancements
 
 -   Detection of magic comments is now done before minification ([#65582](https://github.com/WordPress/gutenberg/pull/65582)).
+
+### Bug Fixes
+
+-   Fix a bug where cycles in dependent modules could enter infinite recursion ([#65291](https://github.com/WordPress/gutenberg/pull/65291)).
+
+## 6.8.3 (2024-09-30)
+
+### Enhancements
+
+-   Detection of magic comments is now done before minification ([#65582](https://github.com/WordPress/gutenberg/pull/65582)).
+
+## 6.8.2 (2024-09-23)
 
 ### Bug Fixes
 

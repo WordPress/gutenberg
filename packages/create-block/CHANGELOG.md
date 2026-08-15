@@ -45,6 +45,12 @@
 
 -   Fixed scaffolded `package.json` dependencies to include WordPress packages used in default templates. ([#72978](https://github.com/WordPress/gutenberg/pull/72978))
 
+## 4.80.0 (2025-12-23)
+
+### Bug Fixes
+
+-   Fixed scaffolded `package.json` dependencies to include WordPress packages used in default templates. ([#72978](https://github.com/WordPress/gutenberg/pull/72978))
+
 ## 4.79.0 (2025-11-26)
 
 ## 4.78.0 (2025-11-12)
@@ -537,6 +543,18 @@
 
 -   Update `esnext` (default) template to scaffold 3 JavaScript source files to illustrate how ES modules help to better organize code ([#21750](https://github.com/WordPress/gutenberg/pull/21750)).
 
+## 0.11.0 (2020-04-15)
+
+### New Features
+
+- Added readme.txt file to the existing templates to make your entry in the plugin browser most useful ([#20694](https://github.com/WordPress/gutenberg/pull/20694)).
+- Added prompts for the `author`, `license` and `version` of the plugin ([#20694](https://github.com/WordPress/gutenberg/pull/20694)).
+
+### Bug Fixes
+
+- Make `version` prompt mandatory and provide validation against semantic versioning ([#20756](https://github.com/WordPress/gutenberg/pull/20756)).
+- Omit optional values in the scaffolded files when they aren't provided ([#20756](https://github.com/WordPress/gutenberg/pull/20756)).
+
 ## 0.10.0 (2020-04-01)
 
 ### New Features
@@ -554,6 +572,10 @@
 ### Bug Fixes
 
 -   Fixed buggy check for minimum system requirements when run with `npx` and `npm init` ([#20461](https://github.com/WordPress/gutenberg/pull/20461)).
+
+## 0.8.2 (2020-02-26)
+
+- Fixed buggy check for minimum system requirements when run with `npx` and `npm init` ([#20456](https://github.com/WordPress/gutenberg/pull/20456)).
 
 ## 0.8.1 (2020-02-25)
 

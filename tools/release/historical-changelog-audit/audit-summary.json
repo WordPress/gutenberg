@@ -1,0 +1,92 @@
+{
+	"inventory": {
+		"tagRecordCount": 27469,
+		"stableTagCount": 20326,
+		"excludedPrereleaseTagCount": 7143,
+		"stableEventCount": 531,
+		"inScopeEventCount": 496,
+		"classificationCounts": {
+			"legacy-postpublish-changelog": 3,
+			"metadata-restoration-or-special-tag": 13,
+			"pre-audit-stable-publish": 35,
+			"prepublish-changelog": 170,
+			"stable-publish-without-changelog-finalization": 310
+		},
+		"pairingCounts": {
+			"excluded-no-trunk-changelog-backport": 8,
+			"excluded-non-trunk-release-lane": 1,
+			"not-applicable": 358,
+			"paired": 153,
+			"paired-by-reviewed-resolution": 5,
+			"paired-reversed-order-with-intervening-commits": 2,
+			"paired-with-intervening-commits": 4
+		}
+	},
+	"immediate": {
+		"coverage": {
+			"eventCount": 173,
+			"fileCount": 9578
+		},
+		"summary": {
+			"findingCount": 140,
+			"unresolvedCount": 0,
+			"exclusionCount": 2017,
+			"preexistingDriftCount": 1,
+			"structuralDiagnosticCount": 24
+		}
+	},
+	"secondary": {
+		"coverage": {
+			"eventCount": 173,
+			"fileCount": 9433
+		},
+		"summary": {
+			"mutationCount": 546,
+			"unresolvedCount": 11,
+			"exclusionCount": 151,
+			"structuralDiagnosticCount": 11
+		}
+	},
+	"frozen": {
+		"coverage": {
+			"eventCount": 531,
+			"fileCount": 20326,
+			"packagePathCount": 131,
+			"frozenReleasedBlockCount": 5346
+		},
+		"summary": {
+			"mutationCount": 2963,
+			"unreleasedShipmentCandidateCount": 88,
+			"attributionFindingCount": 758,
+			"correctlyAttributedCount": 4583,
+			"unresolvedAttributionCount": 5,
+			"exclusionCount": 9746,
+			"structuralDiagnosticCount": 8
+		}
+	},
+	"ledger": {
+		"coverage": {
+			"immediateFindingCount": 140,
+			"secondaryMutationCount": 546,
+			"secondaryUnresolvedCount": 11,
+			"frozenReleasedBlockCount": 5346,
+			"frozenMutationCount": 2963,
+			"frozenAttributionFindingCount": 758,
+			"frozenUnresolvedAttributionCount": 5,
+			"unreleasedShipmentCandidateCount": 88,
+			"changedFileCandidateCount": 105
+		},
+		"summary": {
+			"correctionRowCount": 653,
+			"proposedCorrectionCount": 650,
+			"alreadyCorrectedCount": 3,
+			"acceptedExceptionCount": 1804,
+			"unresolvedCorrectionCount": 0,
+			"pendingShipmentProofCount": 0,
+			"independentReviewRequirementCount": 746,
+			"pendingIndependentReviewCount": 0,
+			"reviewedSpecialEvidenceCount": 47
+		},
+		"integrityHash": "b2eb9e18b48b5b81cdce4095f39d9ab1f87652b20e19d79b5adb0257587f8d69"
+	}
+}

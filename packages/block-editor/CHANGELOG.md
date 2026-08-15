@@ -13,6 +13,10 @@
 -   Grid: Keep child layout changes made with the resizer scoped to the selected viewport.
 -   `DimensionsTool`: Reflect aspect ratio and scale values that are updated from outside the component, such as by undo or `updateBlockAttributes`. The scale control no longer displays a stale value, and an aspect ratio that is written differently to its preset, e.g. `1/1` rather than `1`, is displayed as that preset instead of as "Original" ([#80747](https://github.com/WordPress/gutenberg/pull/80747)).
 
+### Enhancements
+
+-   Allow Global Styles to supply additional element color controls to the shared Colors panel ([#80852](https://github.com/WordPress/gutenberg/pull/80852)).
+
 ## 16.2.0 (2026-08-12)
 
 ### Internal
@@ -21,7 +25,6 @@
 
 ### Enhancements
 
--   Allow Global Styles to supply additional element color controls to the shared Colors panel ([#80852](https://github.com/WordPress/gutenberg/pull/80852)).
 -   Creating a new block next to a sibling of the same type now inherits the sibling's attributes consistently, whether it is created by the appender, the inserter, or Enter at the edge of the text. Everything except the sibling's content (attributes with the `content` role) and its `metadata` is copied. The `attributesToCopy` list of a default block is removed: the copied attributes derive from the block's attribute roles.
 
 ### Enhancements
@@ -51,6 +54,7 @@
 -   `LinkControl`: Restore the preview title underline by slightly increasing the title's line height, which was too tight for the underline to be visible ([#81083](https://github.com/WordPress/gutenberg/pull/81083)).
 -   `URLInput`: Skip link search requests while an IME composition is in progress; the search now fires once with the confirmed value on `compositionend` ([#80602](https://github.com/WordPress/gutenberg/pull/80602)).
 -   `SpacingSizesControl`: Give the control's visible label its own translation context instead of sharing an entry with the side input's aria label, which feeds the same placeholders in the opposite order — a single shared translation could not be correct for both ([#81240](https://github.com/WordPress/gutenberg/pull/81240)).
+-   The multi-selection inspector card and the spoken selection announcement now disclose the total number of blocks a selection contains when the selected blocks have nested content, e.g. "2 blocks selected, 4 including nested blocks." ([#80745](https://github.com/WordPress/gutenberg/pull/80745)).
 
 ## 16.1.0 (2026-07-29)
 
@@ -69,7 +73,6 @@
 
 -   Gate the HEIC canvas conversion fallback on `window.__clientSideMediaProcessing` instead of the redundant `window.__heicUploadSupport` flag, fixing client-side HEIC conversion in Safari on core WordPress installs ([#80452](https://github.com/WordPress/gutenberg/pull/80452)).
 -   `URLInput`: Request suggestions for a value the field is mounted with, instead of waiting for the input to be focused, and stop requesting initial suggestions on mount when `disableSuggestions` is set ([#80721](https://github.com/WordPress/gutenberg/pull/80721)).
--   The multi-selection inspector card and the spoken selection announcement now disclose the total number of blocks a selection contains when the selected blocks have nested content, e.g. "2 blocks selected, 4 including nested blocks." ([#80745](https://github.com/WordPress/gutenberg/pull/80745)).
 
 ## 16.0.0 (2026-07-14)
 
@@ -102,6 +105,7 @@
 -   Use the emphasis font-weight token for UI emphasis ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 -   Inserter media categories support an optional `emptyMessage`, shown in place of the generic "No results found" notice, that also keeps a source listed when it has no items. The media panel additionally renders attach/detach affordances for attached images ([#79336](https://github.com/WordPress/gutenberg/pull/79336)).
+-   Grid: Add a "Fill available space" option to the grid layout that switches the auto-placement keyword from `auto-fill` to `auto-fit`, so columns stretch to fill the row instead of leaving empty tracks. ([#79356](https://github.com/WordPress/gutenberg/pull/79356))
 
 ## 15.23.0 (2026-07-01)
 
@@ -109,7 +113,6 @@
 
 ### Enhancements
 
--   Grid: Add a "Fill available space" option to the grid layout that switches the auto-placement keyword from `auto-fill` to `auto-fit`, so columns stretch to fill the row instead of leaving empty tracks. ([#79356](https://github.com/WordPress/gutenberg/pull/79356))
 -   List View: a block that supports `listView` is now excluded from the List View when it has no inner blocks and disallows insertion (`allowedBlocks` is `[]` or `false`), since there is nothing to show, rearrange, or add. ([#78932](https://github.com/WordPress/gutenberg/pull/78932))
 
 ## 15.21.1 (2026-06-16)
@@ -128,17 +131,18 @@
 
 -   `ListView`: Compute the block visibility label once in `ListViewBlock` and pass it down to `ListViewBlockSelectButton`, removing a duplicated `useSelect`/`getBlockVisibilityLabel` call and clarifying that the label is exposed to assistive technology through the row's `aria-describedby` ([#78640](https://github.com/WordPress/gutenberg/pull/78640)).
 -   Dependency updates ([#77954](https://github.com/WordPress/gutenberg/pull/77954)).
+-   Updated `diff` dependency from `^4.0.2` to `^8.0.3` ([#77992](https://github.com/WordPress/gutenberg/pull/77992)).
 
 ## 15.20.0 (2026-05-27)
 
 ### Bug Fixes
 
 -   `ColorPanel`: Theme CSS custom-property gradients are now decoded to their preset slug and persisted as a `gradient` block attribute rather than as a raw `style.color.gradient` value ([#78328](https://github.com/WordPress/gutenberg/pull/78328)).
+-   `ColorPanel`: Fix incorrect color selection and text↔link sync with duplicate-value palette entries. Slug-based selection is now threaded through the color panel so that two palette entries sharing the same hex value but different slugs are treated as distinct choices. The text↔link sync condition now compares raw stored references instead of decoded hex values; the previous decoded comparison incorrectly conflated entries that shared a hex value ([#78048](https://github.com/WordPress/gutenberg/pull/78048)).
 
 ### Internal
 
 -   Remove legacy `Notice` overrides in block placeholder notices and media replace flow error UI ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
--   Updated `diff` dependency from `^4.0.2` to `^8.0.3` ([#77992](https://github.com/WordPress/gutenberg/pull/77992)).
 
 ## 15.19.0 (2026-05-14)
 
@@ -148,7 +152,6 @@
 
 ### Bug Fixes
 
--   `ColorPanel`: Fix incorrect color selection and text↔link sync with duplicate-value palette entries. Slug-based selection is now threaded through the color panel so that two palette entries sharing the same hex value but different slugs are treated as distinct choices. The text↔link sync condition now compares raw stored references instead of decoded hex values; the previous decoded comparison incorrectly conflated entries that shared a hex value ([#78048](https://github.com/WordPress/gutenberg/pull/78048)).
 
 ## 15.18.0 (2026-04-29)
 
@@ -173,6 +176,8 @@
 ## 15.12.0 (2026-01-29)
 
 ## 15.11.0 (2026-01-16)
+
+## 15.10.0 (2025-12-23)
 
 ## 15.9.0 (2025-11-26)
 
@@ -373,18 +378,40 @@
 
 -   `LinkControl`: fix scrollbar displayed on toggle link settings ([#47986](https://github.com/WordPress/gutenberg/pull/47986)).
 
+## 11.3.6 (2023-03-01)
+
+### Bug Fix
+
+-   `SpacingSizesControl`: fix white dot on thumb ([#48574](https://github.com/WordPress/gutenberg/pull/48574)).
+
 ## 11.3.0 (2023-02-01)
+
+### Bug Fix
+
+-   Move component styles needed for iframes to content styles ([#47103](https://github.com/WordPress/gutenberg/pull/47103)).
+-   Block Inserter: Correctly apply style to the default inserter ([#47166](https://github.com/WordPress/gutenberg/pull/47166)).
+-   List View: Fix crash when the first template-parts is deleted width del key ([#47227](https://github.com/WordPress/gutenberg/pull/47227)).
 
 ## 11.2.0 (2023-01-11)
 
 ### Bug Fixes
 
 -   `BlockInspector`: Fix browser warning error when block is not selected ([#46875](https://github.com/WordPress/gutenberg/pull/46875)).
--   Move component styles needed for iframes to content styles ([#47103](https://github.com/WordPress/gutenberg/pull/47103)).
--   Block Inserter: Correctly apply style to the default inserter ([#47166](https://github.com/WordPress/gutenberg/pull/47166)).
--   List View: Fix crash when the first template-parts is deleted width del key ([#47227](https://github.com/WordPress/gutenberg/pull/47227)).
+
+### Enhancements
+
+-   `URLInput`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([46692](https://github.com/WordPress/gutenberg/pull/46692)).
 
 ## 11.1.0 (2023-01-02)
+
+### Bug Fix
+
+-   `SpacingSizesControl`: Change ARIA role from `region` to `group` to avoid unwanted ARIA landmark regions ([#46530](https://github.com/WordPress/gutenberg/pull/46530)).
+-   `FocalPointPicker`: Fix layout misalignment when placed in the `BlockInspector` ([#46631](https://github.com/WordPress/gutenberg/pull/46631)).
+
+### Enhancements
+
+-   Fluid typography: add configurable fluid typography settings for minimum font size to theme.json ([#42489](https://github.com/WordPress/gutenberg/pull/42489)).
 
 ## 11.0.0 (2022-12-14)
 
@@ -395,13 +422,9 @@
 ### Enhancements
 
 -   `URLInput`: the `renderSuggestions` callback prop now receives `currentInputValue` as a new parameter ([45806](https://github.com/WordPress/gutenberg/pull/45806)).
--   Fluid typography: add configurable fluid typography settings for minimum font size to theme.json ([#42489](https://github.com/WordPress/gutenberg/pull/42489)).
--   `URLInput`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([46692](https://github.com/WordPress/gutenberg/pull/46692)).
 
 ### Bug Fixes
 
--   `SpacingSizesControl`: Change ARIA role from `region` to `group` to avoid unwanted ARIA landmark regions ([#46530](https://github.com/WordPress/gutenberg/pull/46530)).
--   `FocalPointPicker`: Fix layout misalignment when placed in the `BlockInspector` ([#46631](https://github.com/WordPress/gutenberg/pull/46631)).
 
 ## 10.5.0 (2022-11-16)
 
@@ -431,6 +454,19 @@
 ## 10.2.0 (2022-10-05)
 
 ## 10.1.0 (2022-09-21)
+
+## 10.0.10 (2022-11-11)
+
+### Enhancement
+
+-   Fluid typography: adjust font size min and max rules ([#45536](https://github.com/WordPress/gutenberg/pull/45536)).
+
+## 10.0.6 (2022-10-11)
+
+### Bug Fix
+
+-   `FontSizePicker`: Update fluid utils so that only string, floats and integers are treated as valid font sizes for the purposes of fluid typography ([#44847](https://github.com/WordPress/gutenberg/pull/44847))
+-   `getTypographyClassesAndStyles()`: Ensure that font sizes are transformed into fluid values if fluid typography is activated ([#44852](https://github.com/WordPress/gutenberg/pull/44852))
 
 ## 10.0.0 (2022-09-13)
 
@@ -478,6 +514,7 @@
 ### New Features
 
 -   `LineHeightControl`: Changes internal implementation to use `NumberControl`, which allows enhanced interactions such as dragging to change the value. To improve consistency with other control components, the bottom margin styles on the component has been deprecated, and will be removed in a future version. To opt into this simplified margin style, set the `__nextHasNoMarginBottom` prop to `true`.
+-   List View now supports selecting and dragging multiple blocks via `SHIFT` clicking items in the list [#38314](https://github.com/WordPress/gutenberg/pull/38314).
 
 ## 8.1.1 (2022-02-10)
 
@@ -487,7 +524,6 @@
 
 ### New Features
 
--   List View now supports selecting and dragging multiple blocks via `SHIFT` clicking items in the list [#38314](https://github.com/WordPress/gutenberg/pull/38314).
 
 ## 8.1.0 (2022-01-27)
 
@@ -552,11 +588,17 @@
 
 -   Add new `__experimentalEditorSkeleton` component. This has been moved over from the `@wordpress/edit-post` package, where it was an internal component called `EditorRegions`. Its class names have thus been renamed from `edit-post-editor-regions` to `block-editor-editor-skeleton`.
 
-## 3.3.0 (2019-11-14)
+## 3.4.0 (2019-12-19)
 
 ### New Features
 
 -   Added a `label` prop to `URLInput`. This allows the label to be set without needing to wrap the `URLInput` in a `BaseControl`.
+- Added a `label` prop to `URLInput`. This allows the label to be set without needing to wrap the `URLInput` in a `BaseControl`.
+
+## 3.3.0 (2019-11-14)
+
+### New Features
+
 
 ### Deprecations
 
@@ -578,7 +620,7 @@
 
 -   Refactored `BlockSettingsMenu` to use `DropdownMenu` from `@wordpress/components`.
 
-## 2.0.0 (2019-04-16)
+## 2.1.0 (2019-05-21)
 
 ### New Features
 
@@ -590,6 +632,11 @@
 -   Added the usage of `mediaPreview` for the `Placeholder` component to the `MediaPlaceholder` component.
 -   Added a an `onDoubleClick` event handler to the `MediaPlaceholder` component.
 -   Added a way to pass special `ref` property to the `PlainText` component.
+
+## 2.0.0 (2019-04-16)
+
+### New Features
+
 -   The `URLPopover` component now passes through all unhandled props to the underlying Popover component.
 
 ### Breaking Changes

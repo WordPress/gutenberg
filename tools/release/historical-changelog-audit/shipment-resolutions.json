@@ -1,0 +1,1204 @@
+{
+	"schemaVersion": 1,
+	"baselineSha": "cd0c368a2e5e2d046306031ddd824d3f5eda60bd",
+	"resolutions": [
+		{
+			"id": "scripts-split-jest-config-move",
+			"package": "@wordpress/scripts",
+			"entryHash": "8a166836648adb3bdc456d26baa7e6ae1df9c92e9b9cf1c3769309a990e3213b",
+			"wrongTag": "@wordpress/scripts@10.0.0",
+			"decision": "move-entry",
+			"evidence": {
+				"commitShas": [ "30c25bb6d1f366d944187b109dc97f12ce552adb" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "21b9900901963649e69faa6eff697a4105423aa8",
+						"afterSha": "ab0988b3b10ea7603ae701908e780ec40c7ef1d6",
+						"filePath": "packages/scripts/utils/config.js",
+						"beforeExcludes": [
+							"function getJestOverrideConfigFile"
+						],
+						"afterContains": [
+							"function getJestOverrideConfigFile",
+							"jest-${ suffix }.config.js"
+						]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "A later broad changelog reformat also matched the uncited text; the original feature commit and executable configuration helper prove first shipment in 11.0.0."
+			}
+		},
+		{
+			"id": "components-43495-move",
+			"package": "@wordpress/components",
+			"entryHash": "2c76745124986f18de4572b6942fb58b0b1cb7fcab437cf1a3284f1025c27c05",
+			"wrongTag": "@wordpress/components@20.0.0",
+			"decision": "move-entry",
+			"evidence": {
+				"commitShas": [ "9e80dabebd0218074f2b84f98223667b7ff1b110" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "171b87c7465b93e685e081c5f57f153507363c95",
+						"afterSha": "0d732d4b184adcb28cc83087603e81b764390d4b",
+						"filePath": "packages/components/src/date-time/date/index.tsx",
+						"beforeExcludes": [ "endOfWeek( day )" ],
+						"afterContains": [ "endOfWeek( day )" ]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The wrong tag predates the reviewed DateTimePicker implementation state; two files also match the PR's exact before/after blobs across the destination transition."
+			}
+		},
+		{
+			"id": "env-interactive-commands-move",
+			"package": "@wordpress/env",
+			"entryHash": "ffd9eaa95ba9c02ac863f19ef66b90e7d0e24600fb1f096e0a7e6b524386c449",
+			"wrongTag": "@wordpress/env@1.4.0",
+			"decision": "move-entry",
+			"evidence": {
+				"commitShas": [ "cdf70c2692619cc83d25206c2366d0bcbc54f714" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "21b9900901963649e69faa6eff697a4105423aa8",
+						"afterSha": "ab0988b3b10ea7603ae701908e780ec40c7ef1d6",
+						"filePath": "packages/env/lib/commands/run.js",
+						"beforeContains": [
+							"const dockerCompose = require( 'docker-compose' );"
+						],
+						"beforeExcludes": [ "function spawnCommandDirectly" ],
+						"afterContains": [
+							"function spawnCommandDirectly",
+							"stdio: 'inherit'"
+						],
+						"afterExcludes": [
+							"const dockerCompose = require( 'docker-compose' );"
+						]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "README churn produced a false earlier predicate; the executable command implementation is absent from 1.4.0 and present in 1.5.0."
+			}
+		},
+		{
+			"id": "babel-react-runtime-note-restoration",
+			"package": "@wordpress/babel-preset-default",
+			"entryHash": "f1806b3d4afdfa08b8a5ba8021825973ac92e2b29ddcd5b248765e319c16899e",
+			"wrongTag": "@wordpress/babel-preset-default@8.0.0",
+			"decision": "postpublish-restoration",
+			"evidence": {
+				"commitShas": [ "f306096741fe61a76833dbf66b64993678f8d84f" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "42f38f287506a6b3ed8ccba839b18ad066821044",
+						"afterSha": "2f30cddff15723ac7017fd009fc5913b7b419400",
+						"filePath": "packages/babel-preset-default/index.js",
+						"beforeExcludes": [ "runtime: 'automatic'" ],
+						"afterContains": [ "runtime: 'automatic'" ]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The compatibility note documents the automatic JSX runtime breaking change that first shipped in the 8.0.0 tag."
+			}
+		},
+		{
+			"id": "dependency-extraction-react-runtime-note-restoration",
+			"package": "@wordpress/dependency-extraction-webpack-plugin",
+			"entryHash": "6e4c0ff413d42b556b351a1a8e4da702558af1ca0706246bd4a8d1b868545bd7",
+			"wrongTag": "@wordpress/dependency-extraction-webpack-plugin@6.0.0",
+			"decision": "postpublish-restoration",
+			"evidence": {
+				"commitShas": [ "f306096741fe61a76833dbf66b64993678f8d84f" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "42f38f287506a6b3ed8ccba839b18ad066821044",
+						"afterSha": "2f30cddff15723ac7017fd009fc5913b7b419400",
+						"filePath": "packages/dependency-extraction-webpack-plugin/lib/util.js",
+						"beforeExcludes": [ "case 'react/jsx-runtime':" ],
+						"afterContains": [
+							"case 'react/jsx-runtime':",
+							"return 'ReactJSXRuntime';"
+						]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The compatibility note belongs to 6.0.0 because that tag first maps the automatic JSX runtime dependencies."
+			}
+		},
+		{
+			"id": "scripts-react-runtime-note-restoration",
+			"package": "@wordpress/scripts",
+			"entryHash": "01f3c16e42230e3396b0f494995966994d9ddb929023a7a1a1552f311d9a6d2e",
+			"wrongTag": "@wordpress/scripts@28.0.0",
+			"decision": "postpublish-restoration",
+			"evidence": {
+				"commitShas": [ "f306096741fe61a76833dbf66b64993678f8d84f" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "42f38f287506a6b3ed8ccba839b18ad066821044",
+						"afterSha": "2f30cddff15723ac7017fd009fc5913b7b419400",
+						"filePath": "packages/babel-preset-default/index.js",
+						"beforeExcludes": [ "runtime: 'automatic'" ],
+						"afterContains": [ "runtime: 'automatic'" ]
+					},
+					{
+						"beforeSha": "42f38f287506a6b3ed8ccba839b18ad066821044",
+						"afterSha": "2f30cddff15723ac7017fd009fc5913b7b419400",
+						"filePath": "packages/dependency-extraction-webpack-plugin/lib/util.js",
+						"beforeExcludes": [ "case 'react/jsx-runtime':" ],
+						"afterContains": [ "case 'react/jsx-runtime':" ]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The scripts compatibility note describes the bundled Babel and dependency-extraction behavior released in the same 28.0.0 publish event."
+			}
+		},
+		{
+			"id": "scripts-css-minification-move",
+			"package": "@wordpress/scripts",
+			"entryHash": "a9cb323784b3649787c401516159746ba53876e12bc399d2df65bf8c2e971f3d",
+			"wrongTag": "@wordpress/scripts@17.1.0",
+			"decision": "move-entry",
+			"evidence": {
+				"commitShas": [
+					"21e78ef5a255ab052333bcf7fef2403052b9bfc0",
+					"470e5cf9f2e5abb6edfcdbaab00ed3214be6ffe7"
+				],
+				"treeTransitions": [
+					{
+						"beforeSha": "4e106dd6283fd742aeb521ebc0ae29f35d4274b4",
+						"afterSha": "8b67fbd424bc67f81c2d825877f0fae726d6363a",
+						"filePath": "packages/scripts/config/webpack.config.js",
+						"beforeExcludes": [ "require( 'cssnano' )" ],
+						"afterContains": [ "require( 'cssnano' )" ]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The original optimizer implementation was replaced by cssnano before shipment; the CSS-minification behavior first appears in 18.0.0."
+			}
+		},
+		{
+			"id": "block-library-post-content-security-move",
+			"package": "@wordpress/block-library",
+			"entryHash": "2ff3a53bac3d9631f5c0040a703e52f46a3b230bf442a945cbc4207b3324022a",
+			"wrongTag": "@wordpress/block-library@10.3.0",
+			"decision": "move-entry",
+			"evidence": {
+				"commitShas": [ "6b364aac1ebc8d008795e2cd50d487efbaf777a7" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "7e8b17a983f9391d3ebc7717af2a1c9ed7efc7ab",
+						"afterSha": "989764d42ff93e33684aaf0b96a5b7f3d9bbff52",
+						"filePath": "packages/block-library/src/post-content/index.php",
+						"beforeExcludes": [ "$allowed_tag_names" ],
+						"afterContains": [
+							"$allowed_tag_names",
+							"in_array( $normalized_tag_name, $allowed_tag_names, true )"
+						]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The public documentation commit has no implementation SHA, so exact PHP tree content proves the security fix is absent in 10.3.0 and present in 10.4.0."
+			}
+		},
+		{
+			"id": "block-library-post-date-security-move",
+			"package": "@wordpress/block-library",
+			"entryHash": "c1151e5b5079c7f56bc4a08e0f9317cad9dffc9bae0964c3637172b56502168a",
+			"wrongTag": "@wordpress/block-library@10.3.0",
+			"decision": "move-entry",
+			"evidence": {
+				"commitShas": [ "6b364aac1ebc8d008795e2cd50d487efbaf777a7" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "7e8b17a983f9391d3ebc7717af2a1c9ed7efc7ab",
+						"afterSha": "989764d42ff93e33684aaf0b96a5b7f3d9bbff52",
+						"filePath": "packages/block-library/src/post-date/index.php",
+						"beforeExcludes": [
+							"esc_attr( $unformatted_date )",
+							"esc_html( $formatted_date )"
+						],
+						"afterContains": [
+							"esc_attr( $unformatted_date )",
+							"esc_html( $formatted_date )"
+						]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "Exact PHP tree content proves the output escaping is absent in 10.3.0 and present in the 10.4.0 security patch tag."
+			}
+		},
+		{
+			"id": "dataviews-76041-cross-package-move",
+			"package": "@wordpress/dataviews",
+			"entryHash": "1aff69466caf2b93fe7d8509ccd51a7ec364a5820f3b21f7589aa97f456bc3db",
+			"wrongTag": "@wordpress/dataviews@13.0.0",
+			"decision": "move-entry",
+			"evidence": {
+				"commitShas": [ "b91551fe80bf6f4769c61c783b8e79bf7e07306d" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "8bfc179b9aed74c0a6dd6e8edf7a49e40e4f87cc",
+						"afterSha": "c20787b1778ae64c2db65643b1c236309d68e6ba",
+						"filePath": "packages/components/package.json",
+						"beforeContains": [ "\"@ariakit/react\": \"^0.4.21\"" ],
+						"afterContains": [ "\"@ariakit/react\": \"^0.4.22\"" ]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The DataViews behavior is supplied by the Components menu dependency change in the same monorepo release; that dependency transition occurs after 13.0.0 and before 13.1.0."
+			}
+		},
+		{
+			"id": "style-engine-44519-restoration",
+			"package": "@wordpress/style-engine",
+			"entryHash": "dd0f3ecec19b6c2fe9e1a843a05176e22e3f0308097cde30302685e406d85c6e",
+			"wrongTag": "@wordpress/style-engine@1.2.0",
+			"decision": "postpublish-restoration",
+			"evidence": {
+				"commitShas": [ "e5e99868736d225e02fe0774baf2e4f8deb7b5fc" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "23e136283fa1d3b8d9d8b33869f871ad5eb77726",
+						"afterSha": "8d42d2febb7d0ba8372a33e560a62f5a5f6a9112",
+						"filePath": "lib/client-assets.php",
+						"beforeExcludes": [
+							"remove_action( 'wp_enqueue_scripts', 'wp_enqueue_stored_styles' );"
+						],
+						"afterContains": [
+							"remove_action( 'wp_enqueue_scripts', 'wp_enqueue_stored_styles' );"
+						]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "This package note documents repository integration code outside the npm subtree; that code is already present at the 1.2.0 publish event, so the late entry is a restoration."
+			}
+		},
+		{
+			"id": "components-41505-move",
+			"package": "@wordpress/components",
+			"entryHash": "5298cfe2d81a7f9a59dec806efa1a4e9407c92cea451feb93175b77bfe80f092",
+			"wrongTag": "@wordpress/components@19.12.0",
+			"decision": "move-entry",
+			"evidence": {
+				"commitShas": [ "e21cd3a6484d07a04b8e020cd66875dc076c12eb" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "a3e0b62091e8a8bdf5e2518e42d60d7098af48cc",
+						"afterSha": "48d5f37dfb52d2e77c8eeb662f9874cf141b8c6b",
+						"filePath": "packages/components/src/dropdown/index.js",
+						"beforeExcludes": [ "[ onToggle, isOpen ]" ],
+						"afterContains": [ "[ onToggle, isOpen ]" ]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The original one-line dependency change evolved before publication, but the callback dependencies remain absent in 19.12.0 and present in 19.13.0."
+			}
+		},
+		{
+			"id": "components-48565-restoration",
+			"package": "@wordpress/components",
+			"entryHash": "bc15e2da5af50f440c3f89ca22ed65bad83554cb1bc9a37f0a7afd1cd670f079",
+			"wrongTag": "@wordpress/components@23.5.0",
+			"decision": "postpublish-restoration",
+			"evidence": {
+				"commitShas": [ "35859ff0b24922f9d6115b381a3cc1001dd094eb" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "c25ff895413bad4354c55c0c2d732552618b0d56",
+						"afterSha": "d5e03a74b79e3ca84afda24375474a103a063ee4",
+						"filePath": "packages/components/src/autocomplete/index.js",
+						"beforeExcludes": [
+							"function useLastDifferentValue",
+							"const didUserInput"
+						],
+						"afterContains": [
+							"function useLastDifferentValue",
+							"const didUserInput"
+						]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "A later refactor caused a misleading forward predicate; the feature's defining helper and input-state check first appear in 23.5.0."
+			}
+		},
+		{
+			"id": "wp-build-workers-move",
+			"package": "@wordpress/build",
+			"entryHash": "60dcf6cc42a50a6c18eda29076b27948256270c17aa2b918e6410a2712433212",
+			"wrongTag": "@wordpress/build@0.7.0",
+			"decision": "move-entry",
+			"evidence": {
+				"commitShas": [
+					"aec311f5909c93158fbd9c704900189b27f978e3",
+					"2453663191c3e8966ac7f16a82a327c38437606c"
+				],
+				"treeTransitions": [
+					{
+						"beforeSha": "eee1cfb1472f11183e40fb77465a5f13145df7ad",
+						"afterSha": "376124aa10dbc2cc0c81c964ec00b99fcfee5382",
+						"filePath": "packages/wp-build/lib/worker-build.mjs",
+						"beforeExcludes": [ "wpWorkers" ],
+						"afterContains": [
+							"if ( ! packageJson.wpWorkers )",
+							"Build worker bundles"
+						]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The cited PR is not the introducing commit; exact package-tree content and the two worker implementation commits prove first shipment in 0.8.0."
+			}
+		},
+		{
+			"id": "components-sidebar-gradient-first-tag",
+			"package": "@wordpress/components",
+			"entryHash": "74a29729bbe0099adbd1889dcda7f7b69b6376a75438d787f556b1376975ae3d",
+			"wrongTag": "@wordpress/components@19.2.0",
+			"decision": "move-and-replace-entry",
+			"destinationTag": "@wordpress/components@19.1.4",
+			"replacement": {
+				"subsection": "Experimental",
+				"text": "-   Add the `__experimentalIsRenderedInSidebar` prop to `GradientPicker` and `CustomGradientPicker` to position color popovers appropriately in sidebar UIs ([#37115](https://github.com/WordPress/gutenberg/pull/37115))."
+			},
+			"evidence": {
+				"commitShas": [
+					"8e04929799f21ff6ad07f60dfe5fa555c7edfcdd",
+					"78c7f0c7a9c3d69979d0633375325104fb03b86d"
+				],
+				"treeTransitions": [
+					{
+						"beforeSha": "f8c50499a12f926661103acfaeea6780d85b947b",
+						"afterSha": "3826b68f8c5b5026b318463af647f6fb19b534d2",
+						"filePath": "packages/components/src/custom-gradient-bar/control-points.js",
+						"beforeExcludes": [
+							"function GradientColorPickerDropdown"
+						],
+						"afterContains": [
+							"function GradientColorPickerDropdown",
+							"result.__unstableForcePosition = true"
+						]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The behavioral implementation is absent from 19.1.3 and present in 19.1.4. The replacement adds the actual implementation PR and preserves the entry's meaning; 19.1.4 is earlier than the candidate PR's 19.1.6 destination."
+			}
+		},
+		{
+			"id": "block-library-video-poster-restoration",
+			"package": "@wordpress/block-library",
+			"entryHash": "6cd390f1f7179cc154ac94133b2e5adacf1e5e277666237f0a03fbaecca61a01",
+			"wrongTag": "@wordpress/block-library@2.1.4",
+			"decision": "postpublish-restoration",
+			"evidence": {
+				"commitShas": [
+					"a8fe865af07812949e5ef97505668e5587c8aefb",
+					"1cd604df7e9017e0dbe3ab64897ac3af35ca35c5"
+				],
+				"treeTransitions": [
+					{
+						"beforeSha": "c74dd9f9f939caac7fdbd1c0053a3213b9b106b3",
+						"afterSha": "08476d7fc1533357dca48ad8fb185cd76096c41d",
+						"filePath": "packages/block-library/src/video/edit.js",
+						"beforeExcludes": [
+							"const VIDEO_POSTER_ALLOWED_MEDIA_TYPES = [ 'image' ];"
+						],
+						"afterContains": [
+							"const VIDEO_POSTER_ALLOWED_MEDIA_TYPES = [ 'image' ];",
+							"allowedTypes={ VIDEO_POSTER_ALLOWED_MEDIA_TYPES }"
+						]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "PR 10864 landed before the 2.1.4 publish and the immutable 2.1.4 tree contains the poster-image media-type fix; the changelog-only follow-up landed minutes after the tag."
+			}
+		},
+		{
+			"id": "block-library-image-dimensions-move",
+			"package": "@wordpress/block-library",
+			"entryHash": "9a0540c739181a18fee3250efa6c09edaa77646c44405c72b4e0138840fe7d1e",
+			"wrongTag": "@wordpress/block-library@2.27.0",
+			"decision": "move-entry",
+			"destinationTag": "@wordpress/block-library@2.29.1",
+			"evidence": {
+				"commitShas": [ "2cc9a1b7206c4ae2313cab21c82bb937c117de00" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "f8ba578f596180935650320d79c4971883d4716b",
+						"afterSha": "974367a41626c3fc28e7e028c93a53b5f1e021e1",
+						"filePath": "packages/block-library/src/image/edit.js",
+						"beforeExcludes": [
+							"url: newURL,\n\t\t\t\tid: undefined,\n\t\t\t\twidth: undefined,\n\t\t\t\theight: undefined,"
+						],
+						"afterContains": [
+							"url: newURL,\n\t\t\t\tid: undefined,\n\t\t\t\twidth: undefined,\n\t\t\t\theight: undefined,"
+						]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The URL-replacement dimension reset is absent from 2.27.0, landed in PR 26879, and is present in the 2.29.1 artifact tree."
+			}
+		},
+		{
+			"id": "components-toolbar-item-restoration",
+			"package": "@wordpress/components",
+			"entryHash": "41a5373799d0eee4e6323be429003e5eb53038f08278686642de26f341951bb0",
+			"wrongTag": "@wordpress/components@10.1.0",
+			"decision": "postpublish-restoration",
+			"evidence": {
+				"commitShas": [
+					"af768dc98c625e33de8023084c6a5c198c52f8ef",
+					"0de3abb761357f7225f840b31aca780db45a9d97"
+				],
+				"treeTransitions": [
+					{
+						"beforeSha": "381a42b62e157d0e7fd6366cc51b0f5725990044",
+						"afterSha": "07baf5a12007d31bbd4ee22113b07952f7eacc26",
+						"filePath": "packages/components/src/toolbar-item/index.js",
+						"beforeExcludes": [ "data-toolbar-item" ],
+						"afterContains": [ "data-toolbar-item" ]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The stable ToolbarItem implementation shipped in 10.1.0; PR 27576 explicitly restored its missing changelog entry later."
+			}
+		},
+		{
+			"id": "components-toolbar-label-restoration",
+			"package": "@wordpress/components",
+			"entryHash": "f9efe8881962a8cb45d96dd11efc9d465dc6d66d4fc258a4d218168694e78c9b",
+			"wrongTag": "@wordpress/components@10.1.0",
+			"decision": "postpublish-restoration",
+			"evidence": {
+				"commitShas": [
+					"af768dc98c625e33de8023084c6a5c198c52f8ef",
+					"0de3abb761357f7225f840b31aca780db45a9d97"
+				],
+				"treeTransitions": [
+					{
+						"beforeSha": "381a42b62e157d0e7fd6366cc51b0f5725990044",
+						"afterSha": "07baf5a12007d31bbd4ee22113b07952f7eacc26",
+						"filePath": "packages/components/src/toolbar/index.js",
+						"beforeExcludes": [
+							"function Toolbar( { className, label, ...props }, ref )"
+						],
+						"afterContains": [
+							"function Toolbar( { className, label, ...props }, ref )"
+						]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The required Toolbar label API shipped in 10.1.0 and the later changelog-only PR identifies these entries as missing documentation."
+			}
+		},
+		{
+			"id": "components-toolbar-deprecation-restoration",
+			"package": "@wordpress/components",
+			"entryHash": "680111c845f1d7f22a2575c1daa44b60bf5208d8918a17f44c3e6d10a3b0b25c",
+			"wrongTag": "@wordpress/components@10.1.0",
+			"decision": "postpublish-restoration",
+			"evidence": {
+				"commitShas": [
+					"af768dc98c625e33de8023084c6a5c198c52f8ef",
+					"0de3abb761357f7225f840b31aca780db45a9d97"
+				],
+				"treeTransitions": [
+					{
+						"beforeSha": "381a42b62e157d0e7fd6366cc51b0f5725990044",
+						"afterSha": "07baf5a12007d31bbd4ee22113b07952f7eacc26",
+						"filePath": "packages/components/src/toolbar/index.js",
+						"beforeExcludes": [
+							"deprecated( 'Using Toolbar without label prop'"
+						],
+						"afterContains": [
+							"deprecated( 'Using Toolbar without label prop'"
+						]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The no-label Toolbar deprecation shipped in 10.1.0 and was documented by the same explicit missing-changelog restoration."
+			}
+		},
+		{
+			"id": "components-build-module-nullish-assignment-move",
+			"package": "@wordpress/components",
+			"entryHash": "a046b7f13d0d66038149d81993431b21421ac8617aaba01f16cfc9f16cb58d49",
+			"wrongTag": "@wordpress/components@19.0.2",
+			"decision": "move-entry",
+			"destinationTag": "@wordpress/components@19.0.3",
+			"evidence": {
+				"commitShas": [ "813264522582223827f11fd7a1573fea754fe285" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "9a1dd3474d937468e4cf9caf9886ad61ef0a8f50",
+						"afterSha": "c6594e767659bd3289e633a17c44fdf6a4933194",
+						"filePath": "packages/components/package.json",
+						"beforeContains": [ "\"version\": \"19.0.2\"" ],
+						"afterContains": [ "\"version\": \"19.0.3\"" ]
+					}
+				],
+				"npmArtifacts": [
+					{
+						"version": "19.0.2",
+						"tarball": "https://registry.npmjs.org/@wordpress/components/-/components-19.0.2.tgz",
+						"shasum": "e0d9362c3f2f63c2f4ff170fe36dfb0f9b068b28",
+						"integrity": "sha512-wFnRHHeFBqeDJw0/BTMPTooAZE3kG6+jO2hiNe1JKPAoUte5ESQUTEOiCBTKdYx74leC34X+axRmL1qVX6D9RA==",
+						"filePath": "package/build-module/button/index.js",
+						"fileSha256": "3378c62e4f10b18007c8af06796c1b1c053c6036ad0809ba69fa822770998d69",
+						"contains": [ "computedVariant ??= 'primary';" ]
+					},
+					{
+						"version": "19.0.3",
+						"tarball": "https://registry.npmjs.org/@wordpress/components/-/components-19.0.3.tgz",
+						"shasum": "4d2e129627b3e80ba8b8effde7f15e1dfbc6111c",
+						"integrity": "sha512-A8Y1rIpqBXEpc53IZ0TztEkdAaboMyaLY6PxYXniiI1KUSUrybQIBqcPe6uuCZIBCQNNh2uG3uvHisnuC1HWFQ==",
+						"filePath": "package/build-module/button/index.js",
+						"fileSha256": "97ea03ab86c8bbbe37e5a05aa58f4fe0e08f92a53d6744d9fb9ab0d406fe7692",
+						"excludes": [ "??=" ]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "Registry shasums and exact extracted-file hashes prove the 19.0.2 npm build-module contains nullish assignment while 19.0.3 removes it; source tags alone cannot prove this build-time transformation."
+			}
+		},
+		{
+			"id": "interactivity-block-support-schema-move",
+			"package": "@wordpress/interactivity",
+			"entryHash": "5d658e97fa8cc4fb507270c18d62e8882118214f7fbc11b1d7924f3f62689d6a",
+			"wrongTag": "@wordpress/interactivity@4.0.0",
+			"decision": "move-entry",
+			"destinationTag": "@wordpress/interactivity@5.0.0",
+			"evidence": {
+				"commitShas": [ "f6e9fccc236e11af1f114509ce92c84cf0dbacc1" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "45de2cb4212fed7f2763e95f10300d1ff9d0ec08",
+						"afterSha": "eb796371e9630636a4a8837033807b0c4a06ed67",
+						"filePath": "schemas/json/block.json",
+						"beforeExcludes": [
+							"\"clientNavigation\"",
+							"\"interactive\""
+						],
+						"afterContains": [
+							"\"clientNavigation\"",
+							"\"interactive\""
+						]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The cited schema properties are absent at 4.0.0 and present at 5.0.0; the implementation lives in the repository schema outside the package subtree."
+			}
+		},
+		{
+			"id": "jest-preset-travis-reporter-restoration",
+			"package": "@wordpress/jest-preset-default",
+			"entryHash": "d7752d1dbdf4eccd014bab3e4669cb0e68d7f1a89672916535a30017262b5c6d",
+			"wrongTag": "@wordpress/jest-preset-default@5.3.0",
+			"decision": "postpublish-restoration",
+			"evidence": {
+				"commitShas": [
+					"ed8b4a58fbae71177ed27b766d5642c4607f0aa4",
+					"278f524f165d510d99dc6fa421ea9f470d986f8b"
+				],
+				"treeTransitions": [
+					{
+						"beforeSha": "52bfe7deb90fe2b6df7f1a0a92f89cc69462a491",
+						"afterSha": "cc8b3fde75738a15c6152d18458eb5078a620cbe",
+						"filePath": "packages/jest-preset-default/scripts/travis-fold-passes-reporter.js",
+						"beforeExcludes": [ "class TravisFoldPassesReporter" ],
+						"afterContains": [
+							"class TravisFoldPassesReporter",
+							"travis_fold:start:TravisFoldPassesReporter"
+						]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The Travis reporter implementation shipped in 5.3.0; the 2020 changelog update restored the omitted note before the next patch tag."
+			}
+		},
+		{
+			"id": "scripts-travis-reporter-restoration",
+			"package": "@wordpress/scripts",
+			"entryHash": "d7752d1dbdf4eccd014bab3e4669cb0e68d7f1a89672916535a30017262b5c6d",
+			"wrongTag": "@wordpress/scripts@6.1.0",
+			"decision": "postpublish-restoration",
+			"evidence": {
+				"commitShas": [
+					"ed8b4a58fbae71177ed27b766d5642c4607f0aa4",
+					"278f524f165d510d99dc6fa421ea9f470d986f8b"
+				],
+				"treeTransitions": [
+					{
+						"beforeSha": "52bfe7deb90fe2b6df7f1a0a92f89cc69462a491",
+						"afterSha": "cc8b3fde75738a15c6152d18458eb5078a620cbe",
+						"filePath": "packages/jest-preset-default/jest-preset.js",
+						"beforeExcludes": [ "travis-fold-passes-reporter.js" ],
+						"afterContains": [ "travis-fold-passes-reporter.js" ]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "Scripts 6.1.0 bundled the Jest preset containing the Travis reporter; its changelog note was restored after publication."
+			}
+		},
+		{
+			"id": "scripts-eslint-major-restoration",
+			"package": "@wordpress/scripts",
+			"entryHash": "cb42c7dab2fad0bbdf94befdfd01eae99450d75b5e8da0b014e899f8b93e1cc2",
+			"wrongTag": "@wordpress/scripts@22.2.0",
+			"decision": "postpublish-restoration",
+			"evidence": {
+				"commitShas": [ "65f6bde2b4e4897cdb41ac9647bfceb0c1ead18c" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "bc1ccad6698ada7ea0096df8e55a188fcd3a1a26",
+						"afterSha": "c37fd7edbc3e379540d7b24fce75a6f640a434ae",
+						"filePath": "packages/eslint-plugin/package.json",
+						"beforeContains": [ "\"version\": \"10.0.2\"" ],
+						"afterContains": [ "\"version\": \"11.0.0\"" ]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The Scripts 22.2.0 publish tree already contains the bundled eslint-plugin 11.0.0 major; the same-day patch only restored the explanatory note."
+			}
+		},
+		{
+			"id": "block-editor-additional-colors-postpublish-move",
+			"package": "@wordpress/block-editor",
+			"entryHash": "ecd5ca5928330a11b702dc73c58d20e5e801263744f4d0f4c5d83d5b05a9fd1a",
+			"wrongTag": "@wordpress/block-editor@16.2.0",
+			"decision": "move-to-unreleased",
+			"destinationSubsection": "Enhancements",
+			"evidence": {
+				"commitShas": [
+					"29669dcb8564ae5462dcb954c7a1753b9ad22bc3",
+					"3bb6eb7a08697ad16033851aa4b780be5ca0ac4f"
+				],
+				"treeTransitions": [
+					{
+						"beforeSha": "989764d42ff93e33684aaf0b96a5b7f3d9bbff52",
+						"afterSha": "29669dcb8564ae5462dcb954c7a1753b9ad22bc3",
+						"filePath": "packages/block-editor/src/components/global-styles/color-panel.js",
+						"beforeExcludes": [ "additionalElements = []" ],
+						"afterContains": [
+							"additionalElements = []",
+							"...additionalElements.map"
+						]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "Although the implementation merged before the August 12 publish date, the immutable 16.2.0 package tag omits it. The feature therefore belongs in Unreleased at the frozen baseline, not in 16.2.0."
+			}
+		},
+		{
+			"id": "block-library-waveform-126-postpublish-move",
+			"package": "@wordpress/block-library",
+			"entryHash": "62885fa687c3b7f8acdabf8d315b103c4e597d14e200d6d5ae1a41bc2a308eff",
+			"wrongTag": "@wordpress/block-library@10.4.0",
+			"decision": "move-to-unreleased",
+			"destinationSubsection": "Bug Fixes",
+			"evidence": {
+				"commitShas": [ "fe89562bf1b6cb8f87bae9b6d2c1e92b33d41271" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "989764d42ff93e33684aaf0b96a5b7f3d9bbff52",
+						"afterSha": "fe89562bf1b6cb8f87bae9b6d2c1e92b33d41271",
+						"filePath": "packages/block-library/package.json",
+						"beforeContains": [
+							"\"@arraypress/waveform-player\": \"^1.23.0\""
+						],
+						"beforeExcludes": [
+							"\"@arraypress/waveform-player\": \"^1.26.0\""
+						],
+						"afterContains": [
+							"\"@arraypress/waveform-player\": \"^1.26.0\""
+						]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The 10.4.0 package tag still depends on waveform-player 1.23.0; the 1.26.0 dependency update landed after publication and belongs in Unreleased."
+			}
+		},
+		{
+			"id": "block-library-playlist-spinner-postpublish-move",
+			"package": "@wordpress/block-library",
+			"entryHash": "a666ce8b0e0d2119f9b33a27c7918aae37b3c3c49698e8a4c8a409551a643156",
+			"wrongTag": "@wordpress/block-library@10.4.0",
+			"decision": "move-to-unreleased",
+			"destinationSubsection": "Bug Fixes",
+			"evidence": {
+				"commitShas": [ "2d9c286ac6fad5d46ee95985e0da35928613be78" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "989764d42ff93e33684aaf0b96a5b7f3d9bbff52",
+						"afterSha": "2d9c286ac6fad5d46ee95985e0da35928613be78",
+						"filePath": "packages/block-library/src/playlist-track/edit.js",
+						"beforeExcludes": [
+							"className=\"wp-block-playlist-track__spinner\""
+						],
+						"afterContains": [
+							"className=\"wp-block-playlist-track__spinner\""
+						]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The inline spinner implementation is absent from 10.4.0 and first appears after that publish, so the entry belongs in Unreleased."
+			}
+		},
+		{
+			"id": "boot-menu-update-guard-postpublish-move",
+			"package": "@wordpress/boot",
+			"entryHash": "d65bf82be70c065d60b998e5a55d12af74dd26c2cd5c1aba4fcd1597b7a777e1",
+			"wrongTag": "@wordpress/boot@0.20.0",
+			"decision": "move-to-unreleased",
+			"destinationSubsection": "Bug Fixes",
+			"evidence": {
+				"commitShas": [ "ab2550247a8d70ca603752ba5789d670e274a6b6" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "989764d42ff93e33684aaf0b96a5b7f3d9bbff52",
+						"afterSha": "ab2550247a8d70ca603752ba5789d670e274a6b6",
+						"filePath": "packages/boot/src/store/reducer.ts",
+						"beforeExcludes": [
+							"if ( ! state.menuItems[ action.id ] )"
+						],
+						"afterContains": [
+							"if ( ! state.menuItems[ action.id ] )"
+						]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The update guard is absent from the 0.20.0 package tag and merged the following day, so its changelog entry belongs in Unreleased."
+			}
+		},
+		{
+			"id": "core-data-theme-support-types-postpublish-move",
+			"package": "@wordpress/core-data",
+			"entryHash": "c693ab6a75d571df873102f8a7e92dd2e7568a8761db4b1947e163924965351c",
+			"wrongTag": "@wordpress/core-data@7.53.0",
+			"decision": "move-to-unreleased",
+			"destinationSubsection": "Enhancements",
+			"evidence": {
+				"commitShas": [ "ab2550247a8d70ca603752ba5789d670e274a6b6" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "989764d42ff93e33684aaf0b96a5b7f3d9bbff52",
+						"afterSha": "ab2550247a8d70ca603752ba5789d670e274a6b6",
+						"filePath": "packages/core-data/src/entity-types/theme.ts",
+						"beforeExcludes": [
+							"'block-template-parts': boolean;",
+							"'block-templates': boolean;"
+						],
+						"afterContains": [
+							"'block-template-parts': boolean;",
+							"'block-templates': boolean;"
+						]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The ThemeSupports type additions are absent from 7.53.0 and merged after publication, so their entry belongs in Unreleased."
+			}
+		},
+		{
+			"id": "data-use-dispatch-restoration",
+			"package": "@wordpress/data",
+			"entryHash": "c7e672f73785c7c1556a76679e277a45f7348e17ef19d1da2c62be62a403456f",
+			"wrongTag": "@wordpress/data@4.6.0",
+			"decision": "postpublish-restoration",
+			"evidence": {
+				"commitShas": [ "97806141c43af90f597c3ed1196d79a7442166a8" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "87f92f8f58a14a58b44beff0919734c546b3b975",
+						"afterSha": "256d514d356709cfdb27e28a5b200043d768d9cc",
+						"filePath": "packages/data/src/index.js",
+						"beforeExcludes": [
+							"export { useDispatch } from './components/use-dispatch';"
+						],
+						"afterContains": [
+							"export { useDispatch } from './components/use-dispatch';"
+						]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The public useDispatch export is absent from 4.5.0 and present in the immutable 4.6.0 package tree; its later changelog insertion documents code already shipped in 4.6.0."
+			}
+		},
+		{
+			"id": "data-use-dispatch-with-map-restoration",
+			"package": "@wordpress/data",
+			"entryHash": "60ddb4f2cd00b042b9fe86c79f90aa28b905bc7f52c26c64a5c03dd8db55836d",
+			"wrongTag": "@wordpress/data@4.6.0",
+			"decision": "postpublish-restoration",
+			"evidence": {
+				"commitShas": [ "97806141c43af90f597c3ed1196d79a7442166a8" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "87f92f8f58a14a58b44beff0919734c546b3b975",
+						"afterSha": "256d514d356709cfdb27e28a5b200043d768d9cc",
+						"filePath": "packages/data/src/components/with-dispatch/index.js",
+						"beforeExcludes": [ "useDispatchWithMap" ],
+						"afterContains": [
+							"useDispatchWithMap",
+							"const dispatchProps = useDispatchWithMap( mapDispatch, [] );"
+						]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "withDispatch uses the new internal hook in the immutable 4.6.0 tree but not 4.5.0, proving this is post-publish documentation for 4.6.0."
+			}
+		},
+		{
+			"id": "docgen-array-pop-restoration",
+			"package": "@wordpress/docgen",
+			"entryHash": "10eb29b83d5f6b46b28a9dd450779b65b5a08d9c85315dfa07d7a8a276a23451",
+			"wrongTag": "@wordpress/docgen@1.2.0",
+			"decision": "postpublish-restoration",
+			"evidence": {
+				"commitShas": [ "23043f84e3ab13f8d40cf986fc3982284146df04" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "1e024a20a20369af7bc9720a676fdd3837a3a105",
+						"afterSha": "87f92f8f58a14a58b44beff0919734c546b3b975",
+						"filePath": "packages/docgen/src/index.js",
+						"beforeContains": [
+							"currentFileStack.pop( inputFile );"
+						],
+						"afterContains": [ "currentFileStack.pop();" ],
+						"afterExcludes": [
+							"currentFileStack.pop( inputFile );"
+						]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The Array#pop fix is present in 1.2.0 and absent from 1.1.0; the much later first exact text match only reflects a spelling correction to the changelog."
+			}
+		},
+		{
+			"id": "redux-routine-null-action-restoration",
+			"package": "@wordpress/redux-routine",
+			"entryHash": "c16f6d3d6ab2f30c19f6efc68419b70eb7560ab69d98c448ef1ebe97485e27b8",
+			"wrongTag": "@wordpress/redux-routine@3.0.2",
+			"decision": "postpublish-restoration",
+			"evidence": {
+				"commitShas": [ "87d67ee796569e4241fcb5241fc35db2a07e4a84" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "0aa5c4340f57a69ab935f9e819d74958aad2e022",
+						"afterSha": "ce02ee2a1749b9b5564cb8483f6c8f24cf8a3871",
+						"filePath": "packages/redux-routine/src/runtime.js",
+						"beforeExcludes": [
+							"isActionOfType",
+							"if ( ! isAction( value ) )"
+						],
+						"afterContains": [
+							"isActionOfType",
+							"if ( ! isAction( value ) )"
+						]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The null-safe action predicates are absent from 3.0.1 and present in 3.0.2, so the uncited note is a valid post-publish restoration."
+			}
+		},
+		{
+			"id": "scripts-thread-loader-restoration",
+			"package": "@wordpress/scripts",
+			"entryHash": "13981e94098a8240c0c6d10dfe1059eaa2b152f5929bb1a899f8b47aea989934",
+			"wrongTag": "@wordpress/scripts@3.2.0",
+			"decision": "postpublish-restoration",
+			"evidence": {
+				"commitShas": [ "c830087d5d12ed8ac48cdf667d85f8066aa4b440" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "1e024a20a20369af7bc9720a676fdd3837a3a105",
+						"afterSha": "87f92f8f58a14a58b44beff0919734c546b3b975",
+						"filePath": "packages/scripts/config/webpack.config.js",
+						"beforeExcludes": [
+							"require.resolve( 'thread-loader' )"
+						],
+						"afterContains": [
+							"require.resolve( 'thread-loader' )"
+						]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The default webpack configuration first contains thread-loader in the immutable 3.2.0 tree, proving that the later changelog note belongs to 3.2.0."
+			}
+		},
+		{
+			"id": "scripts-babel-cache-restoration",
+			"package": "@wordpress/scripts",
+			"entryHash": "7efa4dcf4c203012f41ccd350ab7a0fe52658134bc68ab74eb1c7ac949cebe44",
+			"wrongTag": "@wordpress/scripts@3.2.0",
+			"decision": "postpublish-restoration",
+			"evidence": {
+				"commitShas": [ "c830087d5d12ed8ac48cdf667d85f8066aa4b440" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "1e024a20a20369af7bc9720a676fdd3837a3a105",
+						"afterSha": "87f92f8f58a14a58b44beff0919734c546b3b975",
+						"filePath": "packages/scripts/config/webpack.config.js",
+						"beforeExcludes": [
+							"cacheDirectory: process.env.BABEL_CACHE_DIRECTORY || true"
+						],
+						"afterContains": [
+							"cacheDirectory: process.env.BABEL_CACHE_DIRECTORY || true"
+						]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "Persistent Babel-loader caching first appears in the 3.2.0 package tree and is correctly documented in that release."
+			}
+		},
+		{
+			"id": "scripts-production-source-map-loader-restoration",
+			"package": "@wordpress/scripts",
+			"entryHash": "c585e98a041e1d0fa8d348d5f744e72c700a177052cf89ac86c602d849269259",
+			"wrongTag": "@wordpress/scripts@3.2.0",
+			"decision": "postpublish-restoration",
+			"evidence": {
+				"commitShas": [ "c830087d5d12ed8ac48cdf667d85f8066aa4b440" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "1e024a20a20369af7bc9720a676fdd3837a3a105",
+						"afterSha": "87f92f8f58a14a58b44beff0919734c546b3b975",
+						"filePath": "packages/scripts/config/webpack.config.js",
+						"beforeExcludes": [ "config.module.rules.unshift( {" ],
+						"afterContains": [
+							"config.module.rules.unshift( {",
+							"use: require.resolve( 'source-map-loader' )"
+						]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "In 3.2.0 source-map-loader is moved into the non-production branch; the immutable configuration proves the optimization shipped in that version."
+			}
+		},
+		{
+			"id": "scripts-eslint-plugin-major-restoration-4",
+			"package": "@wordpress/scripts",
+			"entryHash": "2fc3ebca8966fab366cf236e0f0626d605e33f778767318d2235f581150ec818",
+			"wrongTag": "@wordpress/scripts@4.0.0",
+			"decision": "postpublish-restoration",
+			"evidence": {
+				"commitShas": [ "1a6d1b7de833b236bef67eedf8164a14364920f0" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "87f92f8f58a14a58b44beff0919734c546b3b975",
+						"afterSha": "989502eccaadee1ea7666d6d9fb9f4d08b274546",
+						"filePath": "packages/eslint-plugin/package.json",
+						"beforeContains": [ "\"version\": \"2.2.0\"" ],
+						"afterContains": [ "\"version\": \"3.0.0\"" ]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The coordinated 4.0.0 publish tree contains eslint-plugin 3.0.0 while 3.2.0 contains 2.2.0, proving the bundled-major note belongs to Scripts 4.0.0."
+			}
+		},
+		{
+			"id": "scripts-dependency-extraction-major-restoration-5",
+			"package": "@wordpress/scripts",
+			"entryHash": "6751739dac42629d8fd03aa5b849f7dc76e97172b050846c8642e8eb2d83569d",
+			"wrongTag": "@wordpress/scripts@5.0.0",
+			"decision": "postpublish-restoration",
+			"evidence": {
+				"commitShas": [ "c43c0acacf1edc6f3f857549b00bb6753ad22b4d" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "989502eccaadee1ea7666d6d9fb9f4d08b274546",
+						"afterSha": "4fd00581206f63b1854962e9aa23afded445b7ee",
+						"filePath": "packages/dependency-extraction-webpack-plugin/package.json",
+						"beforeContains": [ "\"version\": \"1.2.0\"" ],
+						"afterContains": [ "\"version\": \"2.0.0\"" ]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The coordinated 5.0.0 publish tree contains dependency-extraction-webpack-plugin 2.0.0 while 4.0.0 contains 1.2.0, proving the bundled-major note belongs to Scripts 5.0.0."
+			}
+		},
+		{
+			"id": "components-select-control-multiple-23-3-2-restoration",
+			"package": "@wordpress/components",
+			"entryHash": "9be1488efe999aa1a8747cec86faaa9424bc8a223443b38017e16da32774b05c",
+			"wrongTag": "@wordpress/components@23.3.1",
+			"decision": "restore-entry",
+			"evidence": {
+				"commitShas": [
+					"a4e7a4b0b759f30104c80135a1e00c07d1f072d6",
+					"91cba54e9620f83ee24944d70b16847af0e204a4"
+				],
+				"treeTransitions": [
+					{
+						"beforeSha": "e9ff92d836928aba65dde94d9d193bc401a934d7",
+						"afterSha": "1bf01c01a8238ce3a681ad1e517f86033818b78d",
+						"filePath": "packages/components/src/select-control/index.tsx",
+						"beforeContains": [
+							"suffix={ suffix || <SelectControlChevronDown /> }"
+						],
+						"beforeExcludes": [
+							"suffix || ( ! multiple && <SelectControlChevronDown /> )"
+						],
+						"afterContains": [
+							"suffix || ( ! multiple && <SelectControlChevronDown /> )"
+						]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The changelog link target is mistyped as PR 43213, but its visible PR 47893 and both immutable implementation commits identify the SelectControl fix; the package tree changes from the old unconditional chevron to the multiple-aware state in 23.3.2."
+			}
+		},
+		{
+			"id": "components-unit-control-regex-25-1-5-restoration",
+			"package": "@wordpress/components",
+			"entryHash": "dd226ed4d48e3b67924203b5500ae0168d0032f65481c4cb4ae206f0ca0a7e2e",
+			"wrongTag": "@wordpress/components@25.1.4",
+			"decision": "restore-entry",
+			"evidence": {
+				"commitShas": [ "4090d21ed1d4e0abf2298e8e359400e54eb7693a" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "65fb4cd5187a47ca274c24c04a220bcdb2ddfa67",
+						"afterSha": "3eeb607ebb76c3bf06cb8acb462f0dc068f340f9",
+						"filePath": "packages/components/src/unit-control/index.tsx",
+						"beforeExcludes": [
+							"import { escapeRegExp } from '../utils/strings';"
+						],
+						"afterContains": [
+							"import { escapeRegExp } from '../utils/strings';",
+							"escapeRegExp( firstUnitValue.substring( 0, 1 ) )"
+						]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The uncited Fixes reference in commit 4090d21 identifies issue 52211 rather than a conventional PR-subject match; escaping regex-control characters is absent from 25.1.4 and present in the immutable 25.1.5 package tree."
+			}
+		},
+		{
+			"id": "block-library-cover-content-position-2-28-7-restoration",
+			"package": "@wordpress/block-library",
+			"entryHash": "39613db625d41b03c5550666a046c05fb52a42d3969e4993ee53fa05851b07bc",
+			"wrongTag": "@wordpress/block-library@2.28.6",
+			"decision": "restore-entry",
+			"evidence": {
+				"commitShas": [ "9dfd2b3628b2ab348905bdbb7a240d8ca5df42ec" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "244dd6ef2ffd553519ea54cf4e8b1fd1a0d0a671",
+						"afterSha": "a56ed29096f92fe434f9f0a88d9ab76479ee5ec1",
+						"filePath": "packages/block-library/src/cover/deprecated.js",
+						"beforeExcludes": [ "contentPosition: {" ],
+						"afterContains": [ "contentPosition: {" ]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The exact PR 29542 implementation adds the missing deprecated Cover attribute between the immutable 2.28.6 and 2.28.7 package trees, proving first shipment in 2.28.7."
+			}
+		},
+		{
+			"id": "components-fluid-font-preset-21-0-5-restoration",
+			"package": "@wordpress/components",
+			"entryHash": "d6769b6666065681320e077dfca7482be92b6afa0cb8ddc2192504a249564157",
+			"wrongTag": "@wordpress/components@21.0.4",
+			"decision": "restore-entry",
+			"evidence": {
+				"commitShas": [ "07b1f982c141c546c0c92891ba90296bafc89962" ],
+				"treeTransitions": [
+					{
+						"beforeSha": "491b4b522dffb4d25aca066ec55500f456ac4aa3",
+						"afterSha": "e0bb20cabd2152c8f0f6758e1b4e17fa24c5e588",
+						"filePath": "packages/components/src/font-size-picker/utils.js",
+						"beforeContains": [ "\t\tname," ],
+						"beforeExcludes": [ "name: name || slug," ],
+						"afterContains": [ "name: name || slug," ]
+					}
+				]
+			},
+			"review": {
+				"status": "reviewed",
+				"rationale": "The changelog cites issue 44791, while the reviewed WordPress 6.1 backport commit 07b1f98 carries the fix; the immutable 21.0.5 tree adds the slug fallback that makes unnamed fluid presets display correctly."
+			}
+		}
+	]
+}

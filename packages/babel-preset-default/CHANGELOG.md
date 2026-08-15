@@ -37,6 +37,8 @@
 
 ## 8.38.0 (2026-01-16)
 
+## 8.37.0 (2025-12-23)
+
 ## 8.36.0 (2025-11-26)
 
 ## 8.35.0 (2025-11-12)
@@ -299,6 +301,12 @@
 
 -   The bundled `@babel/core` dependency has been updated from requiring `^7.11.6` to requiring `^7.12.9`. All other Babel plugins were updated to the latest version (see [Highlights](https://babeljs.io/blog/2020/10/15/7.12.0)).
 
+## 4.19.0 (2020-10-06)
+
+### New Features
+
+-   The bundled `@babel/core` dependency has been updated from requiring `^7.9.0` to requiring `^7.11.6`. All other Babel plugins were updated to the latest version (see Highlights: [7.11](https://babeljs.io/blog/2020/07/30/7.11.0) and [7.10](https://babeljs.io/blog/2020/05/25/7.10.0)).
+
 ## 4.14.0 (2020-05-27)
 
 ### Breaking Changes
@@ -307,7 +315,6 @@
 
 ### New Features
 
--   The bundled `@babel/core` dependency has been updated from requiring `^7.9.0` to requiring `^7.11.6`. All other Babel plugins were updated to the latest version (see Highlights: [7.11](https://babeljs.io/blog/2020/07/30/7.11.0) and [7.10](https://babeljs.io/blog/2020/05/25/7.10.0)).
 
 ## 4.12.0 (2020-04-15)
 
@@ -341,6 +348,13 @@
 -   Handle `<></>` JSX Fragments with `@wordpress/element` `Fragment` ([#15120](https://github.com/WordPress/gutenberg/pull/15120)).
 -   The bundled `@babel/core` dependency has been updated from requiring `^7.2.2` to requiring `^7.4.4`. Babel preset is now using `core-js@3` instead of `core-js@2` (see [Migration Guide](https://babeljs.io/blog/2019/03/19/7.4.0#migration-from-core-js-2)).
 
+## 4.1.0 (2019-03-20)
+
+### Bug Fix
+
+-   The runtime transform no longer disables [the `regenerator` option](https://babeljs.io/docs/en/babel-plugin-transform-runtime#regenerator). This should resolve issues where a file generated using the preset would assume the presence of a `regeneratorRuntime` object in the global scope. While this is not considered a breaking change, you may be mindful to consider that with transformed output now explicitly importing the runtime regenerator, bundle sizes may increase if you do not otherwise mitigate the additional import by either (a) overriding the option in your own Babel configuration extensions or (b) redefining the resolved value of `@babel/runtime/regenerator` using a feature like [Webpack's `externals` option](https://webpack.js.org/configuration/externals/).
+- The runtime transform no longer disables [the `regenerator` option](https://babeljs.io/docs/en/babel-plugin-transform-runtime#regenerator). This should resolve issues where a file generated using the preset would assume the presence of a `regeneratorRuntime` object in the global scope. While this is not considered a breaking change, you may be mindful to consider that with transformed output now explicitly importing the runtime regenerator, bundle sizes may increase if you do not otherwise mitigate the additional import by either (a) overriding the option in your own Babel configuration extensions or (b) redefining the resolved value of `@babel/runtime/regenerator` using a feature like [Webpack's `externals` option](https://webpack.js.org/configuration/externals/).
+
 ## 4.0.0 (2019-03-06)
 
 ### Breaking Changes
@@ -350,7 +364,6 @@
 
 ### Bug Fixes
 
--   The runtime transform no longer disables [the `regenerator` option](https://babeljs.io/docs/en/babel-plugin-transform-runtime#regenerator). This should resolve issues where a file generated using the preset would assume the presence of a `regeneratorRuntime` object in the global scope. While this is not considered a breaking change, you may be mindful to consider that with transformed output now explicitly importing the runtime regenerator, bundle sizes may increase if you do not otherwise mitigate the additional import by either (a) overriding the option in your own Babel configuration extensions or (b) redefining the resolved value of `@babel/runtime/regenerator` using a feature like [Webpack's `externals` option](https://webpack.js.org/configuration/externals/).
 
 ## 3.0.0 (2018-09-30)
 

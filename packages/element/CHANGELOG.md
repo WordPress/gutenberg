@@ -5,6 +5,10 @@
 ## 8.5.0 (2026-08-12)
 
 
+### Breaking Changes
+
+-   Move `react` and `react-dom` from `dependencies` to `peerDependencies`. Consumers must now provide `react` and `react-dom` themselves. `@types/react` and `@types/react-dom` become optional peer dependencies ([#80053](https://github.com/WordPress/gutenberg/pull/80053)).
+
 ## 8.4.0 (2026-07-29)
 
 ### Bug Fixes
@@ -15,7 +19,6 @@
 
 ### Breaking Changes
 
--   Move `react` and `react-dom` from `dependencies` to `peerDependencies`. Consumers must now provide `react` and `react-dom` themselves. `@types/react` and `@types/react-dom` become optional peer dependencies ([#80053](https://github.com/WordPress/gutenberg/pull/80053)).
 
 ## 8.2.0 (2026-07-01)
 
@@ -63,6 +66,8 @@
 
 ## 6.38.0 (2026-01-16)
 
+## 6.37.0 (2025-12-23)
+
 ## 6.36.0 (2025-11-26)
 
 ## 6.35.0 (2025-11-12)
@@ -104,6 +109,10 @@
 ## 6.17.0 (2025-01-29)
 
 ## 6.16.0 (2025-01-15)
+
+### New Features
+
+-   Added `lazy` feature (see: https://reactjs.org/docs/react-api.html#reactlazy).
 
 ## 6.15.0 (2025-01-02)
 
@@ -215,11 +224,21 @@
 
 ## 5.4.0 (2023-02-15)
 
+## 5.3.2 (2023-02-21)
+
+### New Features
+
+-   Started exporting the `flushSync` function from `react-dom`
+
 ## 5.3.0 (2023-02-01)
 
 ## 5.2.0 (2023-01-11)
 
 ## 5.1.0 (2023-01-02)
+
+### New Features
+
+-   Started exporting new React 18 APIs ([46610](https://github.com/WordPress/gutenberg/pull/46610))
 
 ## 5.0.0 (2022-12-14)
 
@@ -229,7 +248,6 @@
 
 ### New Features
 
--   Started exporting new React 18 APIs ([46610](https://github.com/WordPress/gutenberg/pull/46610))
 
 ## 4.20.0 (2022-11-16)
 
@@ -333,6 +351,11 @@
 ### New Features
 
 -   Include TypeScript type declarations ([#21248](https://github.com/WordPress/gutenberg/pull/21248))
+
+## 2.12.0 (2020-04-01)
+
+### New Features
+
 -   Graduated `__experimentalCreateInterpolateElement` function to stable api: `createInterpolateElement` (see [20699](https://github.com/WordPress/gutenberg/pull/20699))
 
 ## 2.10.0 (2019-12-19)
@@ -352,13 +375,8 @@
 
 ### New Features
 
--   Added `lazy` feature (see: https://reactjs.org/docs/react-api.html#reactlazy).
 -   Added `Suspense` component (see: https://reactjs.org/docs/react-api.html#reactsuspense).
-
-## 2.3.0 (2019-03-06)
-
-### New Features
-
+- Added `lazy` feautre (see: https://reactjs.org/docs/react-api.html#reactlazy).
 -   Added `useCallback` hook (see: https://reactjs.org/docs/hooks-reference.html#usecallback).
 -   Added `useContext` hook (see: https://reactjs.org/docs/hooks-reference.html#usecontext).
 -   Added `useDebugValue` hook (see: https://reactjs.org/docs/hooks-reference.html#usedebugvalue).
@@ -369,6 +387,11 @@
 -   Added `useReducer` hook (see: https://reactjs.org/docs/hooks-reference.html#usereducer).
 -   Added `useRef` hook (see: https://reactjs.org/docs/hooks-reference.html#useref).
 -   Added `useState` hook (see: https://reactjs.org/docs/hooks-reference.html#usestate).
+
+## 2.3.0 (2019-03-06)
+
+### New Features
+
 
 ## 2.1.8 (2018-11-15)
 

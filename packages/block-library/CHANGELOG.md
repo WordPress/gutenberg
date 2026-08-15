@@ -11,6 +11,8 @@
 -   Icon: Apply only padding to the inner SVG in the editor, so margin is no longer applied twice compared to the front end ([#81292](https://github.com/WordPress/gutenberg/pull/81292)).
 -   Playlist Track: Mark track media fields as content so toolbar inserters add an empty track instead of duplicating the selected track.
 -   Term Description: Apply the term description display filters when rendering with term context inside a Terms Query loop, so multi-paragraph descriptions keep their paragraphs and match the taxonomy archive rendering ([#81290](https://github.com/WordPress/gutenberg/pull/81290)).
+-   Playlist Track: Show the upload loading indicator inline with the track row.
+-   Playlist: Update `@arraypress/waveform-player` to `^1.26.0`, disable automatic initialization, and prevent custom SVG icons from being configured through HTML data attributes.
 
 ## 10.4.0 (2026-08-12)
 
@@ -30,10 +32,9 @@
 ### Bug Fixes
 
 -   Footnotes: Treat unreadable `footnotes` post meta as no footnotes instead of throwing, so the block shows its placeholder rather than the block crash warning ([#81201](https://github.com/WordPress/gutenberg/pull/81201)).
--   Playlist Track: Show the upload loading indicator inline with the track row.
 -   Playlist: Improve handling of declarative waveform player configuration ([#81342](https://github.com/WordPress/gutenberg/pull/81342)).
--   Playlist: Update `@arraypress/waveform-player` to `^1.26.0`, disable automatic initialization, and prevent custom SVG icons from being configured through HTML data attributes.
 -   Cover: Pass `'full'` instead of `null` as the featured image size for parallax and repeated backgrounds, so a null array offset is no longer reached on PHP 8.5 ([#81444](https://github.com/WordPress/gutenberg/pull/81444)).
+-   Navigation Overlay Close: Inherit typography and color from the overlay, so the button follows the theme font instead of the browser default button styles ([#80751](https://github.com/WordPress/gutenberg/pull/80751)).
 
 ### Internal
 
@@ -48,10 +49,7 @@
 
 ### Bug Fixes
 
--   Navigation Overlay Close: Inherit typography and color from the overlay, so the button follows the theme font instead of the browser default button styles ([#80751](https://github.com/WordPress/gutenberg/pull/80751)).
 -   Playlist: Update `@arraypress/waveform-player` to `^1.23.0`, which no longer sets `crossorigin="anonymous"` on its audio element, fixing playback of tracks served without CORS headers such as media offloaded to a CDN ([#80533](https://github.com/WordPress/gutenberg/pull/80533)).
--   Post Content: Restrict the wrapper tag to the supported values offered in the editor.
--   Post Date: Escape date values and link URLs before rendering the block.
 
 ### Internal
 
@@ -66,6 +64,15 @@
 -   Use the emphasis font-weight token for UI emphasis ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 -   Make the Tabs, Tab List, Tab Panels, and Tab Panel blocks stable ([#80163](https://github.com/WordPress/gutenberg/pull/80163)).
+-   Image and Site Logo blocks: the Crop toolbar button now opens the Media Editor modal instead of an inline cropper. The previous inline experience is removed ([#78654](https://github.com/WordPress/gutenberg/pull/78654)).
+
+### Bug Fixes
+
+-   Image: external images inserted by URL are now sideloaded on the server when uploaded to the media library, so the upload works when the editor is cross-origin isolated ([#79409](https://github.com/WordPress/gutenberg/pull/79409)).
+
+### New Features
+
+-   Gallery: add a dynamic mode that displays images resolved from a source (initially the images attached to the current post) instead of manually-added image blocks, with an editor preview, mode toggles, and server-side rendering. [#78796](https://github.com/WordPress/gutenberg/pull/78796).
 
 ## 10.1.0 (2026-07-01)
 
@@ -77,17 +84,18 @@
 
 ### New Features
 
--   Gallery: add a dynamic mode that displays images resolved from a source (initially the images attached to the current post) instead of manually-added image blocks, with an editor preview, mode toggles, and server-side rendering. [#78796](https://github.com/WordPress/gutenberg/pull/78796).
 
 ### Enhancements
 
--   Image and Site Logo blocks: the Crop toolbar button now opens the Media Editor modal instead of an inline cropper. The previous inline experience is removed ([#78654](https://github.com/WordPress/gutenberg/pull/78654)).
 -   Search: Expose an HTML element selector in the Advanced inspector panel that can render the block in the semantic HTML `<search>` landmark element instead of `<form role="search">`. Defers to `add_theme_support( 'html5', array( 'search-element' ) )` when the per-block value is left at "Default".
 -   Icon Block: Insert with a default icon instead of an empty placeholder ([#79111](https://github.com/WordPress/gutenberg/pull/79111)).
 
 ### Bug Fixes
 
--   Image: external images inserted by URL are now sideloaded on the server when uploaded to the media library, so the upload works when the editor is cross-origin isolated ([#79409](https://github.com/WordPress/gutenberg/pull/79409)).
+
+### Code Quality
+
+-   Page List: derive `isNested` from a new `core/isInsideSubmenu` block context provided by Navigation Submenu, replacing the self-setting attribute pattern that was dirtying related entities ([#79015](https://github.com/WordPress/gutenberg/issues/79015)).
 
 ## 9.48.1 (2026-06-16)
 
@@ -96,7 +104,6 @@
 ### Code Quality
 
 -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
--   Page List: derive `isNested` from a new `core/isInsideSubmenu` block context provided by Navigation Submenu, replacing the self-setting attribute pattern that was dirtying related entities ([#79015](https://github.com/WordPress/gutenberg/issues/79015)).
 
 ## 9.47.0 (2026-05-27)
 
@@ -294,6 +301,12 @@
 
 -   Post Date: Escape date values and link URLs before rendering the block.
 
+## 8.19.4 (2023-10-09)
+
+### Bug Fix
+
+-   Fix Image block lightbox missing alt attribute and improve accessibility. ([#54608](https://github.com/WordPress/gutenberg/pull/55010))
+
 ## 8.19.0 (2023-09-20)
 
 ## 8.18.0 (2023-08-31)
@@ -418,6 +431,10 @@
 
 -   Social Icons: Avoid loss of previously selected background color when switching back from "Logos Only" style ([#39276](https://github.com/WordPress/gutenberg/pull/39276)).
 
+### Bug Fix
+
+-   Gallery block: disable edit as html support ([#39318](https://github.com/WordPress/gutenberg/pull/39318)).
+
 ## 7.1.0 (2022-03-11)
 
 ## 7.0.0 (2022-02-10)
@@ -428,7 +445,6 @@
 
 ### Bug Fixes
 
--   Gallery block: disable edit as html support ([#39318](https://github.com/WordPress/gutenberg/pull/39318)).
 -   Removed unused `@wordpress/escape-html` and `@wordpress/is-shallow-equal` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
 
 ## 6.1.0 (2022-01-27)
@@ -484,11 +500,29 @@
 -   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at <https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/>.
 -   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at <https://nodejs.org/en/about/releases/>.
 
+## 2.29.1 (2021-04-06)
+
+### Bug Fixes
+
+-   Fix Image Block, reset image dimensions when replace URL. bug mentioned in ([#26333](https://github.com/WordPress/gutenberg/issues/26333)).
+
 ## 2.29.0 (2021-03-17)
 
 ### Bug Fixes
 
 -   Fix a regression where the Cover block migration would not work with a non-default contentPosition ([#29542](https://github.com/WordPress/gutenberg/pull/29542))
+
+## 2.28.7 (2021-03-05)
+
+### Bug Fixes
+
+- Fix a regression where the Cover block migration would not work with a non-default contentPosition ([#29542](https://github.com/WordPress/gutenberg/pull/29542))
+
+## 2.28.3 (2021-02-08)
+
+### Bug Fixes
+
+-   Fix a regression where the Cover block migration would not work with custom units for `minHeight` ([#28627](https://github.com/WordPress/gutenberg/pull/28627))
 
 ## 2.28.0 (2021-02-01)
 
@@ -498,7 +532,6 @@
 
 ### Bug Fixes
 
--   Fix a regression where the Cover block migration would not work with custom units for `minHeight` ([#28627](https://github.com/WordPress/gutenberg/pull/28627))
 
 ## 2.27.0 (2020-12-17)
 
@@ -512,11 +545,9 @@
 -   Fix a regression where the Cover would not show opacity controls for the default overlay color ([#26625](https://github.com/WordPress/gutenberg/pull/26625)).
 -   Fix a regression ([#26545](https://github.com/WordPress/gutenberg/pull/26545)) where the Cover block lost its default background overlay color
     ([#26569](https://github.com/WordPress/gutenberg/pull/26569)).
--   Fix Image Block, reset image dimensions when replace URL. bug mentioned in ([#26333](https://github.com/WordPress/gutenberg/issues/26333)).
 
 ### Enhancements
 
--   File Block: Copy url button is moved to Block toolbar.
 
 ## 2.23.0 (2020-09-03)
 
@@ -535,12 +566,17 @@
 -   Fixes a regression published in version 2.9.2 that would prevent some build tools from including
     styles provided in the packages build-styles directory.
 
-## 2.7.0 (2019-08-05)
+## 2.8.0 (2019-08-29)
 
 ### Enhancements
 
 -   Heading block uses `has-text-align-*` class names rather than inline style for text alignment.
 -   Verse block uses `has-text-align-*` class names rather than inline style for text alignment.
+
+## 2.7.0 (2019-08-05)
+
+### Enhancements
+
 
 ### Bug Fixes
 
@@ -645,6 +681,10 @@
 -   Include the classic block if `wp.oldEditor` is defined.
 -   Include the HTML block.
 
+### Deprecations
+
+-   Attribute type coercion has been deprecated. Omit the source to preserve type via serialized comment demarcation.
+
 ## 2.0.0 (2018-09-05)
 
 ### Breaking Changes
@@ -652,5 +692,3 @@
 -   Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.
 
 ### Deprecations
-
--   Attribute type coercion has been deprecated. Omit the source to preserve type via serialized comment demarcation.

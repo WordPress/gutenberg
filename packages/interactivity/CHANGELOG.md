@@ -48,13 +48,18 @@
 
 ## 6.39.0 (2026-01-29)
 
+### Bug Fixes
+
+-   Fix and refactor runtime initialization logic. ([#71123](https://github.com/WordPress/gutenberg/pull/71123))
+-   Update deprecation warning for unique ID format. ([#74580](https://github.com/WordPress/gutenberg/pull/74580))
+
 ## 6.38.0 (2026-01-16)
 
 ### Bug Fixes
 
 -   Preserve boolean HTML attributes during client-side navigation. ([#74446](https://github.com/WordPress/gutenberg/pull/74446))
--   Fix and refactor runtime initialization logic. ([#71123](https://github.com/WordPress/gutenberg/pull/71123))
--   Update deprecation warning for unique ID format. ([#74580](https://github.com/WordPress/gutenberg/pull/74580))
+
+## 6.37.0 (2025-12-23)
 
 ## 6.36.0 (2025-11-26)
 
@@ -70,6 +75,20 @@
 ### Bug Fixes
 
 -   Fix derived state closures processing on client-side navigation. ([#72725](https://github.com/WordPress/gutenberg/pull/72725))
+
+## 6.33.3 (2026-01-30)
+
+### Bug Fixes
+
+-   Fix and refactor runtime initialization logic. ([#71123](https://github.com/WordPress/gutenberg/pull/71123))
+-   Update deprecation warning for unique ID format. ([#74580](https://github.com/WordPress/gutenberg/pull/74580))
+
+## 6.33.2 (2025-11-25)
+
+### Bug Fixes
+
+-   Return a deep-clone object from `getServerState` and `getServerContext` functions. ([#73437](https://github.com/WordPress/gutenberg/pull/73437))
+-   Fix using `getServerContext` in derived state getters. ([#73518](https://github.com/WordPress/gutenberg/pull/73518))
 
 ## 6.33.0 (2025-10-17)
 
@@ -91,6 +110,10 @@
 
 ## 6.30.0 (2025-09-03)
 
+### Bug Fixes
+
+-   Make state getters to be updated asynchronously with `store()`. ([#70974](https://github.com/WordPress/gutenberg/pull/70974))
+
 ## 6.29.0 (2025-08-20)
 
 ## 6.28.0 (2025-08-07)
@@ -102,19 +125,21 @@
 
 ### Bug Fixes
 
--   Make state getters to be updated asynchronously with `store()`. ([#70974](https://github.com/WordPress/gutenberg/pull/70974))
 
 ## 6.27.0 (2025-07-23)
 
 ## 6.26.0 (2025-06-25)
+
+### Bug Fixes
+
+-   Fix captured errors in `withScope` for passed generators. ([#70303](https://github.com/WordPress/gutenberg/pull/70303))
+-   Fix parsing of HTML comments without siblings. ([#70304](https://github.com/WordPress/gutenberg/pull/70304))
 
 ## 6.25.0 (2025-06-04)
 
 ### Bug Fixes
 
 -   Fix `store()` types to support typing it without passing a store part. ([#70296](https://github.com/WordPress/gutenberg/pull/70296))
--   Fix captured errors in `withScope` for passed generators. ([#70303](https://github.com/WordPress/gutenberg/pull/70303))
--   Fix parsing of HTML comments without siblings. ([#70304](https://github.com/WordPress/gutenberg/pull/70304))
 
 ## 6.24.0 (2025-05-22)
 
@@ -177,11 +202,38 @@
 
 ## 6.9.0 (2024-10-03)
 
+### Enhancements
+
+-   Improve TypeScript support for generators ([#64577](https://github.com/WordPress/gutenberg/pull/64577)).
+
+## 6.8.6 (2025-02-04)
+
+### Bug Fixes
+
+-   Fix property modification from inherited context two or more levels above ([#66872](https://github.com/WordPress/gutenberg/pull/66872)).
+
+## 6.8.5 (2024-10-21)
+
+### Bug Fixes
+
+-   Fix reactivity of undefined objects and arrays added with `deepMerge()` ([#66183](https://github.com/WordPress/gutenberg/pull/66183)).
+
+## 6.8.4 (2024-10-14)
+
+### Bug Fixes
+
+-   Fix an issue where "default" could not be used as a directive suffix ([#65815](https://github.com/WordPress/gutenberg/pull/65815)).
+
+## 6.8.3 (2024-10-06)
+
+### Bug Fixes
+
+-   Correctly handle lazily added, deeply nested properties with `deepMerge()` ([#65465](https://github.com/WordPress/gutenberg/pull/65465)).
+
 ## 6.8.0 (2024-09-19)
 
 ### Enhancements
 
--   Improve TypeScript support for generators ([#64577](https://github.com/WordPress/gutenberg/pull/64577)).
 -   Refactor internal context proxies implementation ([#64713](https://github.com/WordPress/gutenberg/pull/64713)).
 
 ### Bug Fixes
@@ -256,11 +308,14 @@
 
 ## 5.6.0 (2024-05-02)
 
+### Enhancements
+
+-   Improve data-wp-context debugging by validating it as a stringified JSON Object. ([#61045](https://github.com/WordPress/gutenberg/pull/61045))
+
 ## 5.5.0 (2024-04-19)
 
 ### Enhancements
 
--   Improve data-wp-context debugging by validating it as a stringified JSON Object. ([#61045](https://github.com/WordPress/gutenberg/pull/61045))
 
 ### Bug Fixes
 
@@ -288,6 +343,12 @@
 ### Bug Fixes
 
 -   Only add proxies to plain objects inside the store. ([#59039](https://github.com/WordPress/gutenberg/pull/59039))
+
+## 5.0.2 (2024-02-27)
+
+### Bug Fixes
+
+-   Prevent passing state proxies as receivers to deepSignal proxy handlers. ([#57134](https://github.com/WordPress/gutenberg/pull/57134))
 -   Improve context merges using proxies. ([59187](https://github.com/WordPress/gutenberg/pull/59187))
 
 ## 5.0.0 (2024-02-09)
@@ -305,6 +366,7 @@
 
 -   Break up init with yielding to main to prevent long task from hydration. ([#58227](https://github.com/WordPress/gutenberg/pull/58227))
 -   Support setting the namespace using a string in `data-wp-interactive`, like `data-wp-interactive="myPlugin"`. ([#58743](https://github.com/WordPress/gutenberg/pull/58743))
+-   Add `block supports` for `clientNavigation` and `interactive` properties on `block.json` schema.([#58132](https://github.com/WordPress/gutenberg/pull/58132))
 
 ### Bug Fixes
 
@@ -327,7 +389,6 @@
 -   Prevent the usage of Preact components in `wp-text`. ([#57879](https://github.com/WordPress/gutenberg/pull/57879))
 -   Update `preact`, `@preact/signals` and `deepsignal` dependencies. ([#57891](https://github.com/WordPress/gutenberg/pull/57891))
 -   Export `withScope()` and allow to use it with asynchronous operations. ([#58013](https://github.com/WordPress/gutenberg/pull/58013))
--   Add `block supports` for `clientNavigation` and `interactive` properties on `block.json` schema.([#58132](https://github.com/WordPress/gutenberg/pull/58132))
 
 ### New Features
 
@@ -371,6 +432,12 @@
 ## 2.5.0 (2023-10-18)
 
 ## 2.4.0 (2023-10-05)
+
+## 2.3.9 (2023-10-23)
+
+### Bug Fix
+
+-   Update the title when using enhanced pagination. ([#55446](https://github.com/WordPress/gutenberg/pull/55446))
 
 ## 2.3.0 (2023-09-20)
 

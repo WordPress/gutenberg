@@ -41,6 +41,8 @@
 
 ## 4.38.0 (2026-01-16)
 
+## 4.37.0 (2025-12-23)
+
 ## 4.36.0 (2025-11-26)
 
 ## 4.35.0 (2025-11-12)
@@ -248,6 +250,15 @@
 
 ## 1.21.0 (2021-03-17)
 
+## 1.19.0 (2020-10-20)
+
+### Deprecations
+
+-   Deprecated the `syncSelect`, `select` and `dispatch` controls that are now part of
+    `@wordpress/data` and built in by default in every data store.
+- Deprecated the `syncSelect`, `select` and `dispatch` controls that are now part of
+  `@wordpress/data` and built in by default in every data store.
+
 ## 1.18.0 (2020-10-06)
 
 ### New Features
@@ -256,8 +267,6 @@
 
 ### Deprecations
 
--   Deprecated the `syncSelect`, `select` and `dispatch` controls that are now part of
-    `@wordpress/data` and built in by default in every data store.
 
 ## 1.4.0 (2019-11-14)
 

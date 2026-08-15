@@ -68,13 +68,16 @@
 
 -   Fix `genereated` typo to `generated` in README. ([#79331](https://github.com/WordPress/gutenberg/pull/79331))
 
+### Bug Fixes
+
+-   Stop the build from crashing when a namespaced import resolves to a package that is not an installed dependency. `getPackageInfo` now returns `null` (honoring its documented contract) instead of throwing, letting the externals plugin fall through to esbuild's own resolution ([#78715](https://github.com/WordPress/gutenberg/pull/78715)).
+
 ## 0.16.1 (2026-06-16)
 
 ## 0.16.0 (2026-06-10)
 
 ### Bug Fixes
 
--   Stop the build from crashing when a namespaced import resolves to a package that is not an installed dependency. `getPackageInfo` now returns `null` (honoring its documented contract) instead of throwing, letting the externals plugin fall through to esbuild's own resolution ([#78715](https://github.com/WordPress/gutenberg/pull/78715)).
 -   Remove the incorrect `#wpwrap` background from wp-admin critical CSS to prevent a black flash before hydration; rely on the existing `body` background instead ([#78493](https://github.com/WordPress/gutenberg/pull/78493)).
 -   Revert the getter-based export replacement in `@wordpress/build` to restore compatibility for affected Gutenberg 23.0 builds ([#78917](https://github.com/WordPress/gutenberg/pull/78917)).
 
@@ -124,10 +127,12 @@
 
 ## 0.8.0 (2026-02-18)
 
+-   Add `wpWorkers` field support for automatic worker bundling ([#74785](https://github.com/WordPress/gutenberg/pull/74785)).
+- Add WASM inlining plugin for bundling WebAssembly modules.
+
 ## 0.7.0 (2026-01-29)
 
 -   Update documentation to describe `wpPlugin.name`
--   Add `wpWorkers` field support for automatic worker bundling ([#74785](https://github.com/WordPress/gutenberg/pull/74785)).
 -   Add WASM inlining plugin for bundling WebAssembly modules.
 
 ## 0.6.0 (2026-01-16)

@@ -2,12 +2,15 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add the `block-templates` and `block-template-parts` theme features to the `ThemeSupports` type. Both are registered with `show_in_rest`, so they were already present in the response ([#81581](https://github.com/WordPress/gutenberg/pull/81581)).
+
 ## 7.53.0 (2026-08-12)
 
 ### Enhancements
 
 -   Improve error reporting in private action `saveDirtyEntities` ([#81151](https://github.com/WordPress/gutenberg/pull/81151)).
--   Add the `block-templates` and `block-template-parts` theme features to the `ThemeSupports` type. Both are registered with `show_in_rest`, so they were already present in the response ([#81581](https://github.com/WordPress/gutenberg/pull/81581)).
 
 ### Bug Fixes
 
@@ -74,6 +77,8 @@
 ## 7.39.0 (2026-01-29)
 
 ## 7.38.0 (2026-01-16)
+
+## 7.37.0 (2025-12-23)
 
 ## 7.36.0 (2025-11-26)
 
@@ -180,6 +185,10 @@
 
 ## 6.24.0 (2023-11-29)
 
+### Enhancements
+
+-   Revisions: add new selectors, `getRevisions` and `getRevision`, to fetch entity revisions. [#54046](https://github.com/WordPress/gutenberg/pull/54046).
+
 ## 6.23.0 (2023-11-16)
 
 ## 6.22.0 (2023-11-02)
@@ -189,7 +198,6 @@
 ### Enhancements
 
 -   Add `getEntityRecordsTotalItems` and `getEntityRecordsTotalPages` selectors. [#55164](https://github.com/WordPress/gutenberg/pull/55164).
--   Revisions: add new selectors, `getRevisions` and `getRevision`, to fetch entity revisions. [#54046](https://github.com/WordPress/gutenberg/pull/54046).
 
 ## 6.20.0 (2023-10-05)
 
@@ -283,12 +291,15 @@
 
 ## 4.4.0 (2022-04-08)
 
+### New Features
+
+-   Added support for fetching block patterns and their categories, with the `getBlockPatterns` and `getBlockPatternCategories` selectors.
+
 ## 4.3.0 (2022-03-23)
 
 ### New Features
 
 -   The saveEntityRecord, saveEditedEntityRecord, and deleteEntityRecord actions now accept an optional throwOnError option (defaults to false). When set to true, any exceptions occurring when the action was executing are re-thrown, causing dispatch().saveEntityRecord() to reject with an error. ([#39258](https://github.com/WordPress/gutenberg/pull/39258))
--   Added support for fetching block patterns and their categories, with the `getBlockPatterns` and `getBlockPatternCategories` selectors.
 
 ## 4.2.0 (2022-03-11)
 

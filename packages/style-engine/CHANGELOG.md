@@ -49,6 +49,8 @@
 
 ## 2.38.0 (2026-01-16)
 
+## 2.37.0 (2025-12-23)
+
 ## 2.36.0 (2025-11-26)
 
 ## 2.35.0 (2025-11-12)
@@ -247,3 +249,37 @@
 -   Add basic block supports to backend ([#39446](https://github.com/WordPress/gutenberg/pull/39446)).
 -   Added initial version of the style engine ([#37978](https://github.com/WordPress/gutenberg/pull/37978)).
 -   Include `@wordpress/style-engine` on the list of external dependencies to allow using `wp.styleEngine` global with WordPress 6.1 and beyond ([#43840](https://github.com/WordPress/gutenberg/pull/43840)).
+
+## 0.16.0 (2022-09-13)
+
+## 0.15.0 (2022-08-24)
+
+## 0.14.0 (2022-08-10)
+
+## 0.13.0 (2022-07-27)
+
+## 0.12.0 (2022-07-13)
+
+## 0.11.0 (2022-06-29)
+
+## 0.10.0 (2022-06-15)
+
+## 0.9.0 (2022-06-01)
+
+## 0.8.0 (2022-05-18)
+
+## 0.7.0 (2022-05-04)
+
+## 0.6.0 (2022-04-21)
+
+## 0.5.0 (2022-04-08)
+
+## 0.4.0 (2022-03-23)
+
+## 0.3.0 (2022-03-11)
+
+## 0.2.0 (2022-02-23)
+
+### New Feature
+
+-   Added initial version of the style engine ([#37978](https://github.com/WordPress/gutenberg/pull/37978)).

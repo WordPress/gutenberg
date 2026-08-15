@@ -49,6 +49,8 @@
 
 ## 10.38.0 (2026-01-16)
 
+## 10.37.0 (2025-12-23)
+
 ## 10.36.0 (2025-11-26)
 
 ## 10.35.0 (2025-11-12)
@@ -292,13 +294,16 @@
 
 ## 6.4.0 (2022-03-11)
 
+### New Features
+
+-   Store the resolution errors in store metadata and expose them using `hasResolutionFailed` the `getResolutionError` meta-selectors ([#38669](https://github.com/WordPress/gutenberg/pull/38669)).
+-   Expose the resolution status (undefined, resolving, finished, error) via the `getResolutionState` meta-selector ([#38669](https://github.com/WordPress/gutenberg/pull/38669)).
+
 ## 6.3.0 (2022-02-23)
 
 ### New Features
 
 -   Enabled thunks by default for all stores and removed the `__experimentalUseThunks` flag.
--   Store the resolution errors in store metadata and expose them using `hasResolutionFailed` the `getResolutionError` meta-selectors ([#38669](https://github.com/WordPress/gutenberg/pull/38669)).
--   Expose the resolution status (undefined, resolving, finished, error) via the `getResolutionState` meta-selector ([#38669](https://github.com/WordPress/gutenberg/pull/38669)).
 
 ## 6.2.1 (2022-02-10)
 
@@ -382,6 +387,7 @@
 
 -   `withSelect` internally uses the new `useSelect` hook. ([#15737](https://github.com/WordPress/gutenberg/pull/15737). **Note:** This _could_ impact performance of code using `withSelect` in edge-cases. To avoid impact, memoize passed in `mapSelectToProps` callbacks or implement `useSelect` directly with dependencies.
 -   `withDispatch` internally uses a new `useDispatchWithMap` hook (an internal only api) ([#15896](https://github.com/WordPress/gutenberg/pull/15896))
+-   Expose `hasResolver` property on returned selectors indicating whether the selector has a corresponding resolver.
 
 ## 4.5.0 (2019-05-21)
 
@@ -392,15 +398,21 @@
 
 ### Enhancements
 
--   Expose `hasResolver` property on returned selectors indicating whether the selector has a corresponding resolver.
+
+## 4.4.0 (2019-03-20)
+
+### Enhancements
+
+-   Introduce new `invalidateResolutionForStore` dispatch action for signalling to invalidate the resolution cache for an entire given store.
+- Introduce new `invalidateResolutionForStore` dispatch action for signalling to invalidate the resolution cache for an entire given store.
+-   Introduce new `invalidateResolutionForStoreSelector` dispatch action for signalling to invalidate the resolution cache for a store selector (and all variations of arguments on that selector).
+- Introduce new `invalidateResolutionForStoreSelector` dispatch action for signalling to invalidate the resolution cache for a store selector (and all variations of arguments on that selector).
 
 ## 4.3.0 (2019-03-06)
 
 ### Enhancements
 
 -   The `registerStore` function now accepts an optional `initialState` option value.
--   Introduce new `invalidateResolutionForStore` dispatch action for signalling to invalidate the resolution cache for an entire given store.
--   Introduce new `invalidateResolutionForStoreSelector` dispatch action for signalling to invalidate the resolution cache for a store selector (and all variations of arguments on that selector).
 
 ### Bug Fixes
 
@@ -468,6 +480,16 @@
 
 ## 2.1.3 (2018-10-18)
 
+## 2.1.1 (2018-10-10)
+
+### Polish
+
+-   Updated `redux` dependency to the latest version.
+
+### Bug Fixes
+
+-   Fix the promise middleware in Firefox.
+
 ## 2.1.0 (2018-09-30)
 
 ### New Features
@@ -476,7 +498,6 @@
 
 ### Internal
 
--   Updated `redux` dependency to the latest version.
 
 ### Deprecations
 
@@ -484,7 +505,6 @@
 
 ### Bug Fixes
 
--   Fix the promise middleware in Firefox.
 
 ## 2.0.0 (2018-09-05)
 

@@ -61,6 +61,8 @@
 
 -   Improved TypeScript definitions ([#67565](https://github.com/WordPress/gutenberg/pull/67565)).
 
+## 5.37.0 (2025-12-23)
+
 ## 5.36.0 (2025-11-26)
 
 ## 5.35.0 (2025-11-12)
@@ -300,6 +302,7 @@
 ### New Features
 
 -   New option `speak` enables control as to whether the notice content is announced to screen readers (defaults to `true`)
+- The `createNotice` can now optionally accept a WPNotice object as the sole argument.
 
 ### Bug Fixes
 

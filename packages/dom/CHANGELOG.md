@@ -41,6 +41,8 @@
 
 ## 4.38.0 (2026-01-16)
 
+## 4.37.0 (2025-12-23)
+
 ## 4.36.0 (2025-11-26)
 
 ## 4.35.0 (2025-11-12)
@@ -270,12 +272,17 @@
 
 -   Add `documentHasTextSelection` to inquire specifically about ranges of selected text, in addition to the existing `documentHasSelection`.
 
+## 2.2.0 (2019-03-20)
+
+### Bug Fix
+
+-   `tabbables.find` considers at most a single radio input for a given name. The checked input is given priority, falling back to the first in the tabindex-sorted set if there is no checked input.
+
 ## 2.1.0 (2019-03-06)
 
 ### Bug Fixes
 
 -   Update `isHorizontalEdge` to account for empty text nodes.
--   `tabbables.find` considers at most a single radio input for a given name. The checked input is given priority, falling back to the first in the tabindex-sorted set if there is no checked input.
 
 ## 2.0.8 (2019-01-03)
 

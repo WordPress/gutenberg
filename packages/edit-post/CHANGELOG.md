@@ -52,6 +52,8 @@
 
 ## 8.38.0 (2026-01-16)
 
+## 8.37.0 (2025-12-23)
+
 ## 8.36.0 (2025-11-26)
 
 ### Internal
@@ -127,6 +129,12 @@
 ## 8.2.0 (2024-06-26)
 
 ## 8.1.0 (2024-06-15)
+
+### Bug Fixes
+
+-   Add ´@wordpress/html-entities´ package to the list of dependencies in package.json. ([#62313](https://github.com/WordPress/gutenberg/pull/62313))
+
+## 8.0.2 (2024-06-18)
 
 ### Bug Fixes
 
@@ -328,6 +336,12 @@
 
 -   convert `INIT` effect to controls & actions [#14740](https://github.com/WordPress/gutenberg/pull/14740)
 
+## 3.3.1 (2019-04-04)
+
+### Bug Fixes
+
+-   Prevent `ClipboardButton` from incorrectly copying a serialized block string instead of the intended text in Safari.
+
 ## 3.2.0 (2019-03-06)
 
 ### Internal
@@ -337,7 +351,6 @@
 ### Bug Fixes
 
 -   Fix 'save' keyboard shortcut not functioning in the Code Editor.
--   Prevent `ClipboardButton` from incorrectly copying a serialized block string instead of the intended text in Safari.
 
 ## 3.1.7 (2019-01-03)
 
