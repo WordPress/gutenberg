@@ -139,10 +139,22 @@ export function toVdom( root: Node ): ComponentChild {
 					const regexResult = nsPathRegExp.exec( attributeValue );
 					const namespace = regexResult?.[ 1 ] ?? null;
 					let value: any = regexResult?.[ 2 ] ?? attributeValue;
-					try {
-						const parsedValue = JSON.parse( value );
-						value = isObject( parsedValue ) ? parsedValue : value;
-					} catch {}
+					// The parsed value is only ever used if it is a plain
+					// object, so a value can only be worth parsing if it
+					// starts with `{` (allowing leading whitespace, which
+					// JSON.parse tolerates for values set via setAttribute).
+					// This gates the common case of plain string values
+					// (e.g. `data-wp-interactive="myplugin"`), avoiding the
+					// relatively expensive SyntaxError that JSON.parse throws
+					// for every non-JSON value.
+					if ( /^\s*\{/.test( value ) ) {
+						try {
+							const parsedValue = JSON.parse( value );
+							value = isObject( parsedValue )
+								? parsedValue
+								: value;
+						} catch {}
+					}
 					if ( attributeName === 'data-wp-interactive' ) {
 						island = true;
 						const islandNamespace =
