@@ -331,7 +331,7 @@ test.describe( 'List View', () => {
 	// If list view sidebar is open and focus is not inside the sidebar, move
 	// focus to the sidebar when using the shortcut. If focus is inside the
 	// sidebar, shortcut should close the sidebar.
-	test.skip( 'ensures List View global shortcut works properly', async ( {
+	test( 'ensures List View global shortcut works properly', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -353,7 +353,7 @@ test.describe( 'List View', () => {
 			name: 'Block navigation structure',
 		} );
 
-		// The paragraph item should be selected.
+		// The paragraph item should be selected and focused.
 		await expect(
 			listView.getByRole( 'gridcell', {
 				name: 'Paragraph',
@@ -361,6 +361,9 @@ test.describe( 'List View', () => {
 				selected: true,
 			} )
 		).toBeVisible();
+		await expect(
+			listView.getByRole( 'link', { name: 'Paragraph' } )
+		).toBeFocused();
 
 		// Navigate to the image block item.
 		await page.keyboard.press( 'ArrowUp' );
@@ -400,6 +403,7 @@ test.describe( 'List View', () => {
 
 		// Open List View.
 		await pageUtils.pressKeys( 'access+o' );
+		await expect( imageItem ).toBeFocused();
 
 		// Focus the list view close button and make sure the shortcut will
 		// close the list view. This is to catch a bug where elements could be
@@ -421,6 +425,7 @@ test.describe( 'List View', () => {
 
 		// Open List View.
 		await pageUtils.pressKeys( 'access+o' );
+		await expect( imageItem ).toBeFocused();
 
 		// Focus the outline tab and select it. This test ensures the outline
 		// tab receives similar focus events based on the shortcut.
