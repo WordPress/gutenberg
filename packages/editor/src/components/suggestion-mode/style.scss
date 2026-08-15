@@ -13,6 +13,13 @@
 	em {
 		font-style: italic;
 		color: $gray-700;
+		// Proposed text is quoted verbatim, so the runs of spaces a
+		// suggestion adds or removes have to survive rendering; the default
+		// HTML collapse makes one space and three look identical. Wrapping
+		// stays on so a long quote (or a link URL) still breaks inside the
+		// sidebar instead of forcing it to scroll sideways.
+		white-space: pre-wrap;
+		overflow-wrap: break-word;
 	}
 }
 
