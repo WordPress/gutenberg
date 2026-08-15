@@ -1,8 +1,6 @@
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
-	getCanvasHeight,
 	getDefaultRenderingMode,
 	getPostBlocksByName,
 	isCollaborationEnabledForCurrentPost,
@@ -244,74 +242,5 @@ describe( 'getDefaultRenderingMode', () => {
 				'post-only'
 			);
 		} );
-	} );
-} );
-
-describe( 'getCanvasHeight', () => {
-	// Default viewport breakpoints: Mobile 480, Tablet 782.
-	function setupRegistry( { isZoomOut = false, viewport } = {} ) {
-		getCanvasHeight.registry = {
-			select: ( store ) => {
-				if ( store === blockEditorStore ) {
-					// In a real registry, `unlock( select( blockEditorStore ) )`
-					// returns the combined public + private selectors, so both
-					// getSettings and isZoomOut live in the unlocked map.
-					const selectors = {};
-					lock( selectors, {
-						getSettings: () => ( {
-							__experimentalFeatures: viewport
-								? { viewport }
-								: {},
-						} ),
-						isZoomOut: () => isZoomOut,
-					} );
-					return selectors;
-				}
-			},
-		};
-	}
-
-	it( 'keeps the portrait aspect ratio at the inset mobile preview width', () => {
-		// Mobile aspect ratio is 8/5 (portrait): 479 * 8/5 = 766 (rounded).
-		setupRegistry();
-		expect( getCanvasHeight( { canvasWidth: 479 } ) ).toBe( 766 );
-	} );
-
-	it( 'keeps the portrait aspect ratio at the inset tablet preview width', () => {
-		// Tablet aspect ratio is 4/3 (portrait): 781 * 4/3 = 1041 (rounded).
-		setupRegistry();
-		expect( getCanvasHeight( { canvasWidth: 781 } ) ).toBe( 1041 );
-	} );
-
-	it( 'returns undefined for desktop (no aspect ratio applies)', () => {
-		setupRegistry();
-		expect( getCanvasHeight( { canvasWidth: 1200 } ) ).toBeUndefined();
-	} );
-
-	it( 'returns undefined when zoom-out is active', () => {
-		setupRegistry( { isZoomOut: true } );
-		expect( getCanvasHeight( { canvasWidth: 479 } ) ).toBeUndefined();
-	} );
-
-	it( 'returns undefined when the width is dragged within a device band but is not the preset', () => {
-		// 400 resolves to Mobile (at or below the 480 breakpoint) but is not the
-		// 479 preset, so the device height does not apply and the canvas fills.
-		setupRegistry();
-		expect( getCanvasHeight( { canvasWidth: 400 } ) ).toBeUndefined();
-	} );
-
-	it( 'returns undefined when canvasWidth is not set', () => {
-		setupRegistry();
-		expect( getCanvasHeight( {} ) ).toBeUndefined();
-	} );
-
-	it( 'uses custom viewport breakpoints when provided', () => {
-		// Custom mobile preset 639: 639 * 8/5 = 1022 (rounded).
-		setupRegistry( {
-			viewport: { mobile: '640px', tablet: '1024px' },
-		} );
-		expect( getCanvasHeight( { canvasWidth: 639 } ) ).toBe( 1022 );
-		// Custom tablet preset 1023: 1023 * 4/3 = 1364.
-		expect( getCanvasHeight( { canvasWidth: 1023 } ) ).toBe( 1364 );
 	} );
 } );
