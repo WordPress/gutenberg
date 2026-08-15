@@ -121,11 +121,11 @@ function IndentUI( { clientId } ) {
 
 export default function Edit( { attributes, setAttributes, clientId } ) {
 	const { ordered, type, reversed, start, layout } = attributes;
+	const hasCustomContentSize = !! ( layout?.contentSize || layout?.wideSize );
 	const blockProps = useBlockProps( {
-		className:
-			layout?.contentSize || layout?.wideSize
-				? 'has-custom-content-size'
-				: undefined,
+		...( hasCustomContentSize
+			? { className: 'has-custom-content-size' }
+			: {} ),
 		style: {
 			listStyleType: ordered && type !== 'decimal' ? type : undefined,
 		},
