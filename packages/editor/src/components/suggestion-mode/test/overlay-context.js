@@ -83,6 +83,77 @@ describe( 'overlayReducer', () => {
 		expect( cleared ).not.toBe( withEntry );
 	} );
 
+	describe( 'CLEAR_OVERLAY_FOR_COMMENT', () => {
+		const withComment = ( commentId ) => {
+			const withEntry = overlayReducer( INITIAL, {
+				type: 'CAPTURE_BASELINE',
+				clientId: CLIENT_ID,
+				blockName: 'core/heading',
+				attributes: { level: 2 },
+			} );
+			return overlayReducer( withEntry, {
+				type: 'SET_COMMENT_ID',
+				clientId: CLIENT_ID,
+				commentId,
+			} );
+		};
+
+		it( 'removes the entry when the comment owns it', () => {
+			const state = withComment( 42 );
+			const cleared = overlayReducer( state, {
+				type: 'CLEAR_OVERLAY_FOR_COMMENT',
+				clientId: CLIENT_ID,
+				commentId: 42,
+			} );
+			expect( cleared ).toEqual( {} );
+		} );
+
+		it( 'matches across the string/number boundary', () => {
+			const state = withComment( 42 );
+			const cleared = overlayReducer( state, {
+				type: 'CLEAR_OVERLAY_FOR_COMMENT',
+				clientId: CLIENT_ID,
+				commentId: '42',
+			} );
+			expect( cleared ).toEqual( {} );
+		} );
+
+		it( 'keeps an entry that belongs to another suggestion', () => {
+			const state = withComment( 42 );
+			const next = overlayReducer( state, {
+				type: 'CLEAR_OVERLAY_FOR_COMMENT',
+				clientId: CLIENT_ID,
+				commentId: 43,
+			} );
+			expect( next ).toBe( state );
+			expect( next[ CLIENT_ID ].commentId ).toBe( 42 );
+		} );
+
+		it( 'keeps an entry that has no comment yet', () => {
+			const state = overlayReducer( INITIAL, {
+				type: 'CAPTURE_BASELINE',
+				clientId: CLIENT_ID,
+				blockName: 'core/heading',
+				attributes: { level: 2 },
+			} );
+			const next = overlayReducer( state, {
+				type: 'CLEAR_OVERLAY_FOR_COMMENT',
+				clientId: CLIENT_ID,
+				commentId: 42,
+			} );
+			expect( next ).toBe( state );
+		} );
+
+		it( 'is a no-op when the block has no entry', () => {
+			const next = overlayReducer( INITIAL, {
+				type: 'CLEAR_OVERLAY_FOR_COMMENT',
+				clientId: CLIENT_ID,
+				commentId: 42,
+			} );
+			expect( next ).toBe( INITIAL );
+		} );
+	} );
+
 	it( 'returns the same reference for unknown actions', () => {
 		const next = overlayReducer( INITIAL, { type: 'UNKNOWN' } );
 		expect( next ).toBe( INITIAL );

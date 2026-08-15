@@ -87,6 +87,18 @@ const UNDO_ADOPTION_TTL_MS = 1000;
  *                                                               overlay attributes.
  */
 
+/**
+ * A block can hold more than one pending suggestion at a time — an
+ * attribute-set overlay (heading level) alongside inline markers in the same
+ * block's content, which is a legitimate combination because the two describe
+ * disjoint parts of the block. The overlay entry belongs to whichever
+ * suggestion opened it, so a decision on one of the block's other suggestions
+ * must leave it alone. `clearOverlayForComment` is the guarded clear used by
+ * those paths: it removes the entry only when the entry is the one linked to
+ * the comment being resolved. See finding F-14 in the Suggest mode testing
+ * document.
+ */
+
 const EMPTY_ENTRIES = Object.freeze( {} );
 
 const OverlayContext = createContext( {
@@ -94,6 +106,7 @@ const OverlayContext = createContext( {
 	captureBaseline: () => {},
 	setOverlayAttributes: () => {},
 	clearOverlay: () => {},
+	clearOverlayForComment: () => {},
 	setCommentId: () => {},
 	setSyncedOpsKey: () => {},
 	setStructuralOp: () => {},
@@ -166,6 +179,25 @@ export function overlayReducer( state, action ) {
 			}
 			const { [ action.clientId ]: _removed, ...rest } = state;
 			return rest;
+		}
+		case 'CLEAR_OVERLAY_FOR_COMMENT': {
+			/*
+			 * Guarded clear for decision paths that act on a suggestion which
+			 * does not live in the overlay (an inline marker). The block may
+			 * still hold an unrelated pending attribute suggestion, and that
+			 * entry is the only anchor keeping its note alive — dropping it
+			 * would send the note to the garbage collector and take the
+			 * proposed value off the canvas with it.
+			 */
+			const entry = state[ action.clientId ];
+			if ( entry?.commentId === null || entry?.commentId === undefined ) {
+				return state;
+			}
+			if ( String( entry.commentId ) !== String( action.commentId ) ) {
+				return state;
+			}
+			const { [ action.clientId ]: _dropped, ...remaining } = state;
+			return remaining;
 		}
 		case 'SET_COMMENT_ID': {
 			const entry = state[ action.clientId ];
@@ -277,6 +309,16 @@ export function SuggestionOverlayProvider( { children } ) {
 
 	const clearOverlay = useCallback(
 		( clientId ) => dispatch( { type: 'CLEAR_OVERLAY', clientId } ),
+		[]
+	);
+
+	const clearOverlayForComment = useCallback(
+		( clientId, commentId ) =>
+			dispatch( {
+				type: 'CLEAR_OVERLAY_FOR_COMMENT',
+				clientId,
+				commentId,
+			} ),
 		[]
 	);
 
@@ -544,6 +586,7 @@ export function SuggestionOverlayProvider( { children } ) {
 			captureBaseline,
 			setOverlayAttributes,
 			clearOverlay,
+			clearOverlayForComment,
 			setCommentId,
 			setSyncedOpsKey,
 			setStructuralOp,
@@ -568,6 +611,7 @@ export function SuggestionOverlayProvider( { children } ) {
 			captureBaseline,
 			setOverlayAttributes,
 			clearOverlay,
+			clearOverlayForComment,
 			setCommentId,
 			setSyncedOpsKey,
 			setStructuralOp,
