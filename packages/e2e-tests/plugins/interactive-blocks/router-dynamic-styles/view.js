@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store, getElement } from '@wordpress/interactivity';
 
 const PLUGIN_STYLE_ID = 'test-router-plugin-style';
