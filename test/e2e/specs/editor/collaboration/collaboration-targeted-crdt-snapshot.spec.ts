@@ -177,6 +177,7 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 			content:
 				'<!-- wp:paragraph --><p>Atomic content base.</p><!-- /wp:paragraph -->',
 			status: 'draft',
+			date_gmt: new Date().toISOString(),
 		} );
 		await collaborationUtils.openPost( post.id );
 
@@ -234,7 +235,13 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 						},
 					} );
 				} catch ( error ) {
-					conflictCode = error.code;
+					if (
+						error &&
+						typeof error === 'object' &&
+						'code' in error
+					) {
+						conflictCode = String( error.code );
+					}
 				}
 				const finalRecord = await window.wp.apiFetch( {
 					path: `/wp/v2/posts/${ postId }?context=edit`,
