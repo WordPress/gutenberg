@@ -6,6 +6,60 @@ The atomic steps that build the feature. Read `ARCHITECTURE.md` first and
 Status: `todo` | `in-progress` (+ branch/owner) | `done`. Keep this table the
 single source of truth for progress.
 
+## Trunk re-homing, 2026-08-17
+
+Steps 00-10 sat 292 commits behind `trunk`. Same procedure as the previous
+round: hub and spokes rebased onto current `trunk` preserving the
+hub-and-spoke shape, every spoke re-pointed at its reproduced commit. Backups
+live in the `wtc-backup/2026-08-17/*` tags.
+
+The substantive collisions all trace to the widget icon pipeline
+(WordPress/gutenberg#80969) and the action envelope work
+(WordPress/gutenberg#81275, #81381, #81556) landing on `trunk`. Re-homed, not
+restored:
+
+-   **01** · `trunk` now carries `icon` (a registered icon reference) and
+    wire-form `actions` on `WidgetModuleRecord`. The step's own `icon` addition
+    dropped; only `origin`, `definition_id`, and `content` remain genuinely new.
+-   **02** · textual only: `trunk` inserted `gutenberg_sanitize_widget_icon()`
+    at the same spot the step inserts its registration helper. Both stand.
+-   **03** · the bootstrap conflict was the removed `gutenberg-content-types`
+    experiment. In review, the code-registered loop now passes `icon` through
+    `gutenberg_sanitize_widget_icon()`, extending the registration-gate
+    doctrine `trunk` established for manifest icons; test fixtures moved to
+    the `collection/icon-name` shape the sanitizer enforces.
+-   **05** · no textual conflict, and that was the trap: the step's `icon`
+    emission and schema entry auto-merged alongside `trunk`'s own, leaving a
+    duplicate REST field. The duplicate dropped in review; the step keeps
+    `origin` / `definition_id` / `content` and the cpt title branch.
+-   **07** · the server-defined branch now integrates with `trunk`'s icon
+    resolution: a record icon reference enters as the pending stand-in and
+    resolves off the loading gate like any other, and wire actions pass
+    through `withRenderableIcons()` so hosts keep receiving only renderable
+    icons.
+-   **08** · textual only: `trunk` dropped dependency-group comments in
+    `widget-render.tsx`.
+
+Cross-step alignment, applied as a hub commit as in the last round: the lint
+conventions now reject dependency-group comment headers (new files are not
+covered by the bulk suppressions of WordPress/gutenberg#81248), so the
+renderer files dropped theirs; `core-widget-defs.php` re-aligned per the
+current phpcs ruleset.
+
+Settled from the last round's open items: the `WidgetModuleRecord.icon` string
+vs `WidgetType.icon` element divergence. The declarative icon pipeline
+resolves the wire reference at the `useWidgetTypes` boundary.
+
+Still open:
+
+-   CHANGELOG entries for `@wordpress/widget-primitives` before steps become
+    PRs.
+-   Steps 14-17 were rewritten against the action envelope as of the last
+    round; the envelope has since gained `icon`, `relevance`, and the
+    wire/resolved split. The connection-language steps do not collide with
+    that (their entry point is the `steps` fulfillment); reviewed and left as
+    written.
+
 ## Trunk re-homing, 2026-08-03
 
 Steps 00-09 were built in June and sat ~780 commits behind `trunk`. The hub and
