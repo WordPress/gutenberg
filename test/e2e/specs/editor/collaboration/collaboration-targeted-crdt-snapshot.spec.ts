@@ -158,4 +158,92 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 		expect( result.conflictCode ).toBe( 'rest_sync_document_conflict' );
 		expect( result.persistedDoc ).toBe( result.firstDoc );
 	} );
+
+	test( 'rolls back content when the matching CRDT snapshot is stale', async ( {
+		collaborationUtils,
+		page,
+		requestUtils,
+	} ) => {
+		const post = await requestUtils.createPost( {
+			title: 'Atomic synchronized entity save',
+			content:
+				'<!-- wp:paragraph --><p>Atomic content base.</p><!-- /wp:paragraph -->',
+			status: 'draft',
+		} );
+		await collaborationUtils.openPost( post.id );
+
+		const result = await page.evaluate(
+			async ( { consent, postId } ) => {
+				const { unlock } =
+					window.wp.privateApis.__dangerousOptInToUnstableAPIsOnlyForCoreModules(
+						consent,
+						'@wordpress/core-data'
+					);
+				const coreDispatch = unlock(
+					window.wp.data.dispatch( 'core' )
+				);
+				const persistedRecord = await window.wp.apiFetch( {
+					path: `/wp/v2/posts/${ postId }?context=edit`,
+				} );
+				const originalContent = persistedRecord.content.raw;
+				const expectedDoc = persistedRecord.meta?._crdt_document || '';
+				const winningDoc =
+					await coreDispatch.createEntityCRDTPersistenceSnapshot(
+						'postType',
+						'post',
+						postId,
+						{ title: 'Winning snapshot' }
+					);
+				const staleEntityDoc =
+					await coreDispatch.createEntityCRDTPersistenceSnapshot(
+						'postType',
+						'post',
+						postId,
+						{ title: 'Stale entity snapshot' }
+					);
+				await window.wp.apiFetch( {
+					path: '/wp-sync/v1/save',
+					method: 'POST',
+					data: {
+						room: `postType/post:${ postId }`,
+						doc: winningDoc,
+						expected_doc: expectedDoc,
+					},
+				} );
+
+				let conflictCode = null;
+				try {
+					await window.wp.apiFetch( {
+						path: '/wp-sync/v1/save-entity',
+						method: 'POST',
+						data: {
+							room: `postType/post:${ postId }`,
+							expected_content: originalContent,
+							expected_doc: expectedDoc,
+							content:
+								'<!-- wp:paragraph --><p>Torn replacement.</p><!-- /wp:paragraph -->',
+							doc: staleEntityDoc,
+						},
+					} );
+				} catch ( error ) {
+					conflictCode = error.code;
+				}
+				const finalRecord = await window.wp.apiFetch( {
+					path: `/wp/v2/posts/${ postId }?context=edit`,
+				} );
+				return {
+					conflictCode,
+					originalContent,
+					winningDoc,
+					finalContent: finalRecord.content.raw,
+					finalDoc: finalRecord.meta?._crdt_document,
+				};
+			},
+			{ consent: CORE_DATA_PRIVATE_APIS_CONSENT, postId: post.id }
+		);
+
+		expect( result.conflictCode ).toBe( 'rest_sync_document_conflict' );
+		expect( result.finalContent ).toBe( result.originalContent );
+		expect( result.finalDoc ).toBe( result.winningDoc );
+	} );
 } );
