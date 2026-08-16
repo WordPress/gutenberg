@@ -1,6 +1,10 @@
 import apiFetch from '@wordpress/api-fetch';
 import { getSyncManager } from '../../sync';
-import { saveCRDTDoc } from '../save-crdt-doc';
+import {
+	enqueueCRDTDocSave,
+	saveCRDTDoc,
+	setPersistedCRDTDoc,
+} from '../save-crdt-doc';
 
 jest.mock( '@wordpress/api-fetch' );
 jest.mock( '../../sync', () => ( {
@@ -27,6 +31,8 @@ describe( 'saveCRDTDoc', () => {
 
 	beforeEach( () => {
 		apiFetch.mockReset();
+		setPersistedCRDTDoc( 'postType/post', 1, undefined );
+		setPersistedCRDTDoc( 'postType/post', 2, undefined );
 		syncManager = {
 			createPersistedCRDTDoc: jest.fn(),
 		};
@@ -43,7 +49,7 @@ describe( 'saveCRDTDoc', () => {
 		await flushPromises();
 
 		fetch.resolve( {} );
-		await save;
+		await expect( save ).resolves.toBe( true );
 
 		expect( apiFetch ).toHaveBeenCalledWith( {
 			path: '/wp-sync/v1/save',
@@ -51,6 +57,7 @@ describe( 'saveCRDTDoc', () => {
 			data: {
 				room: 'postType/post:1',
 				doc: 'doc',
+				expected_doc: '',
 			},
 		} );
 	} );
@@ -58,7 +65,9 @@ describe( 'saveCRDTDoc', () => {
 	it( 'does not call the sync endpoint when there is no serialized CRDT document', async () => {
 		syncManager.createPersistedCRDTDoc.mockResolvedValue( null );
 
-		await saveCRDTDoc( 'postType/post', 1 );
+		await expect( saveCRDTDoc( 'postType/post', 1 ) ).resolves.toBe(
+			false
+		);
 
 		expect( apiFetch ).not.toHaveBeenCalled();
 	} );
@@ -85,6 +94,7 @@ describe( 'saveCRDTDoc', () => {
 			data: {
 				room: 'postType/post:1',
 				doc: 'doc-1',
+				expected_doc: '',
 			},
 		} );
 
@@ -100,6 +110,7 @@ describe( 'saveCRDTDoc', () => {
 			data: {
 				room: 'postType/post:1',
 				doc: 'doc-2',
+				expected_doc: 'doc-1',
 			},
 		} );
 
@@ -128,6 +139,7 @@ describe( 'saveCRDTDoc', () => {
 			data: {
 				room: 'postType/post:1',
 				doc: 'doc-1',
+				expected_doc: '',
 			},
 		} );
 		expect( apiFetch ).toHaveBeenNthCalledWith( 2, {
@@ -136,6 +148,7 @@ describe( 'saveCRDTDoc', () => {
 			data: {
 				room: 'postType/post:2',
 				doc: 'doc-2',
+				expected_doc: '',
 			},
 		} );
 
@@ -170,9 +183,47 @@ describe( 'saveCRDTDoc', () => {
 			data: {
 				room: 'postType/post:1',
 				doc: 'doc-2',
+				expected_doc: '',
 			},
 		} );
 
 		await secondSave;
+	} );
+
+	it( 'serializes another persistence operation against a sync save for the same room', async () => {
+		const repairFetch = createDeferred();
+		syncManager.createPersistedCRDTDoc.mockResolvedValue( 'sync-doc' );
+		apiFetch
+			.mockImplementationOnce( () => repairFetch.promise )
+			.mockResolvedValueOnce( {} );
+
+		const repair = enqueueCRDTDocSave( 'postType/post', 1, () =>
+			apiFetch( {
+				path: '/wp/v2/posts/1',
+				method: 'POST',
+				data: { content: 'repaired content' },
+			} )
+		);
+		const syncSave = saveCRDTDoc( 'postType/post', 1 );
+
+		await flushPromises();
+		expect( apiFetch ).toHaveBeenCalledTimes( 1 );
+		expect( syncManager.createPersistedCRDTDoc ).not.toHaveBeenCalled();
+
+		repairFetch.resolve( {} );
+		await repair;
+		await flushPromises();
+
+		expect( syncManager.createPersistedCRDTDoc ).toHaveBeenCalledTimes( 1 );
+		expect( apiFetch ).toHaveBeenLastCalledWith( {
+			path: '/wp-sync/v1/save',
+			method: 'POST',
+			data: {
+				room: 'postType/post:1',
+				doc: 'sync-doc',
+				expected_doc: '',
+			},
+		} );
+		await syncSave;
 	} );
 } );

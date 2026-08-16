@@ -3,36 +3,50 @@ import { getSyncManager } from '../sync';
 
 const SYNC_SAVE_API_PATH = '/wp-sync/v1/save';
 const saveCRDTDocQueues = new Map();
+const persistedCRDTDocs = new Map();
 
-async function serializeAndSaveCRDTDoc( objectType, objectId, room ) {
+async function saveSerializedCRDTDoc( room, serializedDoc, expectedDoc ) {
+	try {
+		await apiFetch( {
+			path: SYNC_SAVE_API_PATH,
+			method: 'POST',
+			data: {
+				room,
+				doc: serializedDoc,
+				expected_doc:
+					persistedCRDTDocs.get( room ) ?? expectedDoc ?? '',
+			},
+		} );
+	} catch ( error ) {
+		if ( error?.code === 'rest_sync_document_conflict' ) {
+			persistedCRDTDocs.delete( room );
+		}
+		throw error;
+	}
+
+	persistedCRDTDocs.set( room, serializedDoc );
+	return true;
+}
+
+async function serializeAndSaveCRDTDoc(
+	objectType,
+	objectId,
+	room,
+	expectedDoc
+) {
 	const serializedDoc = await getSyncManager()?.createPersistedCRDTDoc(
 		objectType,
 		objectId
 	);
 
 	if ( ! serializedDoc ) {
-		return;
+		return false;
 	}
 
-	await apiFetch( {
-		path: SYNC_SAVE_API_PATH,
-		method: 'POST',
-		data: {
-			room,
-			doc: serializedDoc,
-		},
-	} );
+	return saveSerializedCRDTDoc( room, serializedDoc, expectedDoc );
 }
 
-/**
- * Persist the current CRDT document through the sync /save endpoint.
- *
- * @param {import('@wordpress/sync').ObjectType} objectType Object type.
- * @param {import('@wordpress/sync').ObjectID}   objectId   Object ID.
- */
-export async function saveCRDTDoc( objectType, objectId ) {
-	const room = `${ objectType }:${ objectId }`;
-
+async function enqueueRoomSave( room, save ) {
 	// Saves are chained per-room, which forms a queue.
 	// Without a queue, two /save calls might fire close together with a risk
 	// that the older serialized CRDT snapshot completes after the newer one and
@@ -43,15 +57,62 @@ export async function saveCRDTDoc( objectType, objectId ) {
 	const currentSave = previousSave
 		// A failed save should reject its caller, but not block later saves.
 		.catch( () => {} )
-		.then( () => serializeAndSaveCRDTDoc( objectType, objectId, room ) );
+		.then( save );
 
 	saveCRDTDocQueues.set( room, currentSave );
 
 	try {
-		await currentSave;
+		return await currentSave;
 	} finally {
 		if ( saveCRDTDocQueues.get( room ) === currentSave ) {
 			saveCRDTDocQueues.delete( room );
 		}
 	}
+}
+
+/**
+ * Serialize persistence operations for a sync room.
+ *
+ * @param {import('@wordpress/sync').ObjectType} objectType Object type.
+ * @param {import('@wordpress/sync').ObjectID}   objectId   Object ID.
+ * @param {Function}                             save       Persistence operation.
+ * @return {Promise<*>} Result of the persistence operation.
+ */
+export function enqueueCRDTDocSave( objectType, objectId, save ) {
+	const room = `${ objectType }:${ objectId }`;
+	return enqueueRoomSave( room, save );
+}
+
+/**
+ * Record the latest CRDT document persisted by another room-queued operation.
+ *
+ * @param {import('@wordpress/sync').ObjectType} objectType Object type.
+ * @param {import('@wordpress/sync').ObjectID}   objectId   Object ID.
+ * @param {string}                               doc        Persisted CRDT document.
+ */
+export function setPersistedCRDTDoc( objectType, objectId, doc ) {
+	const room = `${ objectType }:${ objectId }`;
+	if ( doc === undefined ) {
+		persistedCRDTDocs.delete( room );
+		return;
+	}
+	persistedCRDTDocs.set( room, doc );
+}
+
+/**
+ * Persist the current CRDT document through the sync /save endpoint.
+ *
+ * @param {import('@wordpress/sync').ObjectType} objectType    Object type.
+ * @param {import('@wordpress/sync').ObjectID}   objectId      Object ID.
+ * @param {string}                               [expectedDoc] Last persisted CRDT document.
+ * @return {Promise<boolean>} Whether a CRDT document was persisted.
+ */
+export async function saveCRDTDoc( objectType, objectId, expectedDoc ) {
+	const room = `${ objectType }:${ objectId }`;
+	if ( expectedDoc !== undefined ) {
+		persistedCRDTDocs.set( room, expectedDoc );
+	}
+	return enqueueCRDTDocSave( objectType, objectId, () =>
+		serializeAndSaveCRDTDoc( objectType, objectId, room, expectedDoc )
+	);
 }

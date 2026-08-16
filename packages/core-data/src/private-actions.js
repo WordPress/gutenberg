@@ -5,6 +5,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { STORE_NAME } from './name';
 import { getSyncManager, hasSyncManager } from './sync';
+import { saveCRDTDoc } from './utils';
 
 /**
  * Returns an action object used in signalling that the registered post meta
@@ -178,6 +179,30 @@ export const setCollaborationSupported =
 				hasRedo: false,
 			} );
 		}
+	};
+
+/**
+ * Persists the current CRDT document for a sync-enabled entity.
+ *
+ * @param {string}        kind     Entity kind.
+ * @param {string}        name     Entity name.
+ * @param {number|string} recordId Entity record ID.
+ * @return {Promise<boolean>} Whether a CRDT document was persisted.
+ */
+export const persistEntityCRDTDoc =
+	( kind, name, recordId ) =>
+	async ( { select } ) => {
+		const entityConfig = select.getEntityConfig( kind, name );
+		if ( ! entityConfig?.syncConfig?.supportsPersistence ) {
+			return false;
+		}
+
+		const record = select.getRawEntityRecord?.( kind, name, recordId );
+		return saveCRDTDoc(
+			`${ kind }/${ name }`,
+			recordId,
+			record?.meta?._crdt_document || ''
+		);
 	};
 
 /**
