@@ -10,11 +10,11 @@
 	background: $white;
 	display: grid;
 	grid-auto-flow: row;
-	grid-template: auto / $button-size-compact minmax(0, max-content) minmax(min-content, 1fr) $header-height;
+	grid-template: auto / auto minmax(0, max-content) minmax(min-content, 1fr) $header-height;
 	&:has(> .editor-header__center) {
-		grid-template: auto / $button-size-compact min-content 1fr min-content $header-height;
+		grid-template: auto / auto min-content 1fr min-content $header-height;
 		@include break-medium {
-			grid-template: auto / $button-size-compact minmax(min-content, 2fr) 2.5fr minmax(min-content, 2fr) $header-height;
+			grid-template: auto / auto minmax(min-content, 2fr) 2.5fr minmax(min-content, 2fr) $header-height;
 		}
 	}
 	@include break-mobile {
@@ -127,15 +127,9 @@
  * Show icon labels.
  */
 
-// Grow the first track to the labeled back button so the toolbar does not overlap it.
-.show-icon-labels .editor-header:has(> .editor-header__back-button) {
-	grid-template: auto / max-content minmax(0, max-content) minmax(min-content, 1fr) $header-height;
-	&:has(> .editor-header__center) {
-		grid-template: auto / max-content min-content 1fr min-content $header-height;
-		@include break-medium {
-			grid-template: auto / max-content minmax(min-content, 2fr) 2.5fr minmax(min-content, 2fr) $header-height;
-		}
-	}
+.show-icon-labels .editor-header__back-button {
+	// Include padding in the used width so the labeled control does not overflow.
+	width: max-content;
 }
 
 .show-icon-labels.interface-pinned-items,
