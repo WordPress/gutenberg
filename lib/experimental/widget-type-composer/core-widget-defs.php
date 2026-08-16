@@ -28,26 +28,26 @@ function gutenberg_get_composition_demo_content() {
 	$image_alt = __( 'A grey dove drinking from a pool among mossy rocks.', 'gutenberg' );
 
 	/* Cover attributes, and the markup core saves for each: `focalPoint`
-	   becomes the image's `object-position`, `customOverlayColor` and
-	   `dimRatio` become the background layer. */
-	$focal_x     = 0.5;
-	$focal_y     = 1;
-	$overlay     = '#3858e9';
-	$dim_ratio   = 60;
-	$object_pos  = ( $focal_x * 100 ) . '% ' . ( $focal_y * 100 ) . '%';
+		becomes the image's `object-position`, `customOverlayColor` and
+		`dimRatio` become the background layer. */
+	$focal_x    = 0.5;
+	$focal_y    = 1;
+	$overlay    = '#3858e9';
+	$dim_ratio  = 60;
+	$object_pos = ( $focal_x * 100 ) . '% ' . ( $focal_y * 100 ) . '%';
 
 	/* `height` fills the tile, `min-height` is the floor when the surface is
-	   content-driven. `position` anchors the background layers to the cover
-	   itself, not to whatever positioned ancestor the host happens to have. */
+		content-driven. `position` anchors the background layers to the cover
+		itself, not to whatever positioned ancestor the host happens to have. */
 	$cover_style = 'position:relative;display:flex;align-items:center;justify-content:center;height:100%;min-height:220px;overflow:hidden;';
 	/* Explicit stacking: core's cover CSS layers these, and the dashboard does
-	   not load it, so without z-index the image would paint over the overlay. */
+		not load it, so without z-index the image would paint over the overlay. */
 	$image_style = 'position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;object-position:' . $object_pos . ';';
 	$dim_style   = 'position:absolute;inset:0;z-index:1;background-color:' . $overlay . ';opacity:' . ( $dim_ratio / 100 ) . ';';
 	$inner_style = 'position:relative;z-index:2;padding:24px;text-align:center;';
 	/* Set on each element: wp-admin styles headings explicitly, and an explicit
-	   rule beats an inherited colour from the container. */
-	$text_style  = 'color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.4);';
+		rule beats an inherited colour from the container. */
+	$text_style = 'color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.4);';
 
 	return '<!-- wp:cover ' . wp_json_encode(
 		array(

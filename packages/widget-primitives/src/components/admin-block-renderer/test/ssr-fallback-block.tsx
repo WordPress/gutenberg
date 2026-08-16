@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render, screen, waitFor } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { SsrFallbackBlock } from '../ssr-fallback-block';
 
 const MARKUP = '<!-- wp:paragraph --><p>Hi</p><!-- /wp:paragraph -->';

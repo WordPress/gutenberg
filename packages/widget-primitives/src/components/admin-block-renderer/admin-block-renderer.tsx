@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { parse } from '@wordpress/block-serialization-default-parser';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { getAdminBlock } from './registry';
 import { serializeNode } from './serialize-node';
 import { SsrFallbackBlock } from './ssr-fallback-block';

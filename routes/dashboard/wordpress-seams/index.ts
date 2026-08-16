@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import type { RenderBlocks } from '@wordpress/widget-primitives';
 

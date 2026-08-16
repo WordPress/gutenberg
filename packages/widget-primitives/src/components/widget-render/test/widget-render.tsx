@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { Suspense } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { WidgetRender } from '../widget-render';
 import { registerAdminBlock } from '../../admin-block-renderer/registry';
 import type { ResolveWidgetModule, WidgetType } from '../../../types';

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 /* Side-effect import: registers the bundled admin blocks (`core-admin/*`). */
 import './admin-blocks';
 

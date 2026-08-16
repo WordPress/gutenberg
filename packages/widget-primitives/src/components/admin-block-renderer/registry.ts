@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ComponentType } from 'react';
-
-/**
- * Internal dependencies
- */
 import { createAdminBlock } from './create-admin-block';
 import type { AdminBlockComponentProps, AdminBlockSpec } from './types';
 

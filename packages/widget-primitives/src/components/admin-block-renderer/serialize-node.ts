@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import type { parse } from '@wordpress/block-serialization-default-parser';
 
 type ParsedNode = ReturnType< typeof parse >[ number ];

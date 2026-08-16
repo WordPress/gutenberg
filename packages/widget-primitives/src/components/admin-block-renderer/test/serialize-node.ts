@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { parse } from '@wordpress/block-serialization-default-parser';
-
-/**
- * Internal dependencies
- */
 import { serializeNode } from '../serialize-node';
 
 /* Round-trips markup through the parser and back, which is the property the

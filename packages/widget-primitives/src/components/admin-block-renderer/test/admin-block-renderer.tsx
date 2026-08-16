@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import { AdminBlockRenderer } from '../admin-block-renderer';
 import { registerAdminBlock } from '../registry';
 
