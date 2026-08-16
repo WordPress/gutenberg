@@ -77,4 +77,85 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 			'Targeted snapshot content.'
 		);
 	} );
+
+	test( 'rejects a stale CRDT snapshot writer', async ( {
+		collaborationUtils,
+		page,
+		requestUtils,
+	} ) => {
+		const post = await requestUtils.createPost( {
+			title: 'CRDT snapshot conflict',
+			content:
+				'<!-- wp:paragraph --><p>Conflict base.</p><!-- /wp:paragraph -->',
+			status: 'draft',
+		} );
+		await collaborationUtils.openPost( post.id );
+
+		const result = await page.evaluate(
+			async ( { consent, postId } ) => {
+				const { unlock } =
+					window.wp.privateApis.__dangerousOptInToUnstableAPIsOnlyForCoreModules(
+						consent,
+						'@wordpress/core-data'
+					);
+				const coreDispatch = unlock(
+					window.wp.data.dispatch( 'core' )
+				);
+				const persistedRecord = await window.wp.apiFetch( {
+					path: `/wp/v2/posts/${ postId }?context=edit`,
+				} );
+				const expectedDoc = persistedRecord.meta?._crdt_document || '';
+				const firstDoc =
+					await coreDispatch.createEntityCRDTPersistenceSnapshot(
+						'postType',
+						'post',
+						postId,
+						{ title: 'First writer' }
+					);
+				const staleDoc =
+					await coreDispatch.createEntityCRDTPersistenceSnapshot(
+						'postType',
+						'post',
+						postId,
+						{ title: 'Stale writer' }
+					);
+				await window.wp.apiFetch( {
+					path: '/wp-sync/v1/save',
+					method: 'POST',
+					data: {
+						room: `postType/post:${ postId }`,
+						doc: firstDoc,
+						expected_doc: expectedDoc,
+					},
+				} );
+
+				let conflictCode = null;
+				try {
+					await window.wp.apiFetch( {
+						path: '/wp-sync/v1/save',
+						method: 'POST',
+						data: {
+							room: `postType/post:${ postId }`,
+							doc: staleDoc,
+							expected_doc: expectedDoc,
+						},
+					} );
+				} catch ( error ) {
+					conflictCode = error.code;
+				}
+				const finalRecord = await window.wp.apiFetch( {
+					path: `/wp/v2/posts/${ postId }?context=edit`,
+				} );
+				return {
+					conflictCode,
+					firstDoc,
+					persistedDoc: finalRecord.meta?._crdt_document,
+				};
+			},
+			{ consent: CORE_DATA_PRIVATE_APIS_CONSENT, postId: post.id }
+		);
+
+		expect( result.conflictCode ).toBe( 'rest_sync_document_conflict' );
+		expect( result.persistedDoc ).toBe( result.firstDoc );
+	} );
 } );
