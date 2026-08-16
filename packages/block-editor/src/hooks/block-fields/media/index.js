@@ -1,9 +1,6 @@
-/**
- * WordPress dependencies
- */
 import {
 	Button,
-	Icon,
+	Icon as WCIcon,
 	__experimentalGrid as Grid,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -17,10 +14,6 @@ import {
 	video as videoIcon,
 	reset as resetIcon,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import MediaReplaceFlow from '../../../components/media-replace-flow';
 import MediaUploadCheck from '../../../components/media-upload/check';
 import { useInspectorPopoverPlacement } from '../use-inspector-popover-placement';
@@ -92,11 +85,11 @@ function MediaThumbnail( { data, field, attachment, config } ) {
 		}
 
 		if ( icon ) {
-			return <Icon icon={ icon } size={ 20 } />;
+			return <WCIcon icon={ icon } size={ 20 } />;
 		}
 	}
 
-	return <Icon icon={ mediaIcon } size={ 20 } />;
+	return <WCIcon icon={ mediaIcon } size={ 20 } />;
 }
 
 export default function Media( { data, field, onChange, config = {} } ) {

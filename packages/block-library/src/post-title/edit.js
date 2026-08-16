@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	BlockControls,
 	InspectorControls,
@@ -17,21 +14,15 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { createInterpolateElement } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function PostTitleEdit( {
 	attributes: { level, levelOptions, isLink, rel, linkTarget, placeholder },
 	setAttributes,
 	context: { postType, postId, queryId },
-	insertBlocksAfter,
 } ) {
 	const TagName = level === 0 ? 'p' : `h${ level }`;
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
@@ -63,9 +54,6 @@ export default function PostTitleEdit( {
 		postId
 	);
 	const [ link ] = useEntityProp( 'postType', postType, 'link', postId );
-	const onSplitAtEnd = () => {
-		insertBlocksAfter( createBlock( getDefaultBlockName() ) );
-	};
 	const blockProps = useBlockProps();
 	const blockEditingMode = useBlockEditingMode();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -82,7 +70,7 @@ export default function PostTitleEdit( {
 				value={ rawTitle }
 				onChange={ setTitle }
 				__experimentalVersion={ 2 }
-				__unstableOnSplitAtEnd={ onSplitAtEnd }
+				disableLineBreaks
 				{ ...blockProps }
 			/>
 		) : (
@@ -109,7 +97,7 @@ export default function PostTitleEdit( {
 					value={ rawTitle }
 					onChange={ setTitle }
 					__experimentalVersion={ 2 }
-					__unstableOnSplitAtEnd={ onSplitAtEnd }
+					disableLineBreaks
 				/>
 			</TagName>
 		) : (
@@ -203,7 +191,6 @@ export default function PostTitleEdit( {
 										}
 									>
 										<TextControl
-											__next40pxDefaultSize
 											label={ __( 'Link relation' ) }
 											help={ createInterpolateElement(
 												__(

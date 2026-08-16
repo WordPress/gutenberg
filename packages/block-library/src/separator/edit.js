@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	getColorClassName,
 	InspectorControls,
@@ -14,10 +7,6 @@ import {
 } from '@wordpress/block-editor';
 import { HorizontalRule, SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import useDeprecatedOpacity from './use-deprecated-opacity';
 
 const HtmlElementControl = ( { tagName, setAttributes } ) => {
@@ -39,7 +28,6 @@ const HtmlElementControl = ( { tagName, setAttributes } ) => {
 							'The <div> element should only be used if the block is a design element with no semantic meaning.'
 					  )
 			}
-			__next40pxDefaultSize
 		/>
 	);
 };

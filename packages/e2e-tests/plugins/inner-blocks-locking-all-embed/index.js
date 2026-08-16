@@ -23,11 +23,11 @@
 		title: 'Test Inner Blocks Locking All Embed',
 		icon: 'cart',
 		category: 'text',
+		template: TEMPLATE,
 
 		edit: function Edit() {
 			const blockProps = useBlockProps();
 			const innerBlocksProps = useInnerBlocksProps( blockProps, {
-				template: TEMPLATE,
 				templateLock: 'all',
 			} );
 			return el( 'div', innerBlocksProps );

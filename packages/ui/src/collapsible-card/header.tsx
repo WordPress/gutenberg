@@ -7,7 +7,7 @@ import * as Collapsible from '../collapsible';
 import { Icon } from '../icon';
 import styles from './style.module.css';
 import defenseStyles from '../utils/css/global-css-defense.module.css';
-import focusStyles from '../utils/css/focus.module.css';
+import focusStyles from '../utils/css/focus.module.scss';
 import { HeaderDescriptionIdContext } from './context';
 import type { HeaderProps } from './types';
 
@@ -25,6 +25,8 @@ import type { HeaderProps } from './types';
  * Avoid placing interactive elements (buttons, links, inputs) inside the
  * header, since the entire area is clickable and their events will bubble
  * to trigger the collapse toggle.
+ *
+ * Place full-bleed media in `CollapsibleCard.Content`, not the header.
  */
 export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 	function CollapsibleCardHeader(

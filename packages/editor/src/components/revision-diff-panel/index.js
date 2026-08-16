@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { PanelBody } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import PostPanelRow from '../post-panel-row';
 
 /**
@@ -15,8 +8,14 @@ import PostPanelRow from '../post-panel-row';
  * @param {string}  props.title       Panel title.
  * @param {Object}  props.entries     Map of key → diffWords parts arrays.
  * @param {boolean} props.initialOpen Whether the panel starts open.
+ * @param {string}  [props.className] Optional class for the content wrapper.
  */
-export default function RevisionDiffPanel( { title, entries, initialOpen } ) {
+export default function RevisionDiffPanel( {
+	title,
+	entries,
+	initialOpen,
+	className,
+} ) {
 	if ( ! entries ) {
 		return null;
 	}
@@ -53,7 +52,7 @@ export default function RevisionDiffPanel( { title, entries, initialOpen } ) {
 
 	return (
 		<PanelBody title={ title } initialOpen={ initialOpen }>
-			{ fields }
+			<div className={ className }>{ fields }</div>
 		</PanelBody>
 	);
 }

@@ -1,14 +1,13 @@
-/**
- * WordPress dependencies
- */
+import { useMemo } from '@wordpress/element';
+import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import StateControl from '../components/global-styles/state-control';
 import StateControlBadges from '../components/global-styles/state-control-badges';
 import { useToolsPanelDropdownMenuProps } from '../components/global-styles/utils';
+import { useSettings } from '../components/use-settings';
+import { unlock } from '../lock-unlock';
+
+const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
 export const PSEUDO_STATE_LABELS = {
 	':hover': __( 'Hover' ),
@@ -17,6 +16,27 @@ export const PSEUDO_STATE_LABELS = {
 	':active': __( 'Active' ),
 };
 
+export const RESPONSIVE_STATE_LABELS = {
+	'@tablet': __( 'Tablet' ),
+	'@mobile': __( 'Mobile' ),
+};
+
+// Viewport states are selected globally via the editor's device preview.
+function getDeviceStateOptions( viewportSettings ) {
+	const breakpoints = getViewportBreakpoints( viewportSettings );
+
+	return Object.entries( RESPONSIVE_STATE_LABELS )
+		.filter(
+			( [ value ] ) =>
+				( value !== '@tablet' || breakpoints.tablet !== undefined ) &&
+				( value !== '@mobile' || breakpoints.mobile !== undefined )
+		)
+		.map( ( [ value, label ] ) => ( {
+			value,
+			label,
+		} ) );
+}
+
 // Keep in sync with WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS
 // and packages/global-styles-engine/src/core/render.tsx.
 export const VALID_BLOCK_PSEUDO_STATES = {
@@ -24,7 +44,7 @@ export const VALID_BLOCK_PSEUDO_STATES = {
 	'core/navigation-link': [ ':hover', ':focus', ':focus-visible', ':active' ],
 };
 
-function getStateOptions( name ) {
+function getPseudoStateOptions( name ) {
 	const validStates = VALID_BLOCK_PSEUDO_STATES[ name ] ?? [];
 
 	return validStates
@@ -35,46 +55,75 @@ function getStateOptions( name ) {
 		} ) );
 }
 
+const DEFAULT_STATE_VALUE = 'default';
+const EMPTY_STATE_OPTIONS = [];
+
 /**
  * Renders a pseudo-state selector in the block card header.
- * Only shown for blocks with configured pseudo-state support.
+ *
+ * Viewport states are selected globally via the editor's device preview
+ * (Responsive editing), so only pseudo-states are exposed here.
  *
  * @param {Object}   props          Component props.
  * @param {string}   props.name     Block name.
- * @param {string}   props.value    Currently selected pseudo-state value.
- * @param {Function} props.onChange Callback when pseudo-state selection changes.
+ * @param {Object}   props.value    Currently selected style-state value.
+ * @param {Function} props.onChange Callback when style-state selection changes.
  * @return {Element|null} State control component, or null if not applicable.
  */
 export function BlockStatesControl( { name, value, onChange } ) {
-	const stateOptions = getStateOptions( name );
+	const pseudoStateOptions = useMemo(
+		() => getPseudoStateOptions( name ),
+		[ name ]
+	);
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	if ( ! stateOptions.length ) {
+	if ( ! pseudoStateOptions.length ) {
 		return null;
 	}
 
 	return (
 		<StateControl
-			pseudoStates={ stateOptions }
-			pseudoStateValue={ value }
-			onChangePseudoState={ onChange }
+			pseudoStates={ pseudoStateOptions }
+			pseudoStateValue={ value?.pseudo ?? DEFAULT_STATE_VALUE }
+			onChangePseudoState={ ( pseudo ) => onChange( { pseudo } ) }
 			popoverProps={ dropdownMenuProps.popoverProps }
 			showText={ false }
 		/>
 	);
 }
 
-export function BlockStateBadges( { name, value } ) {
-	const stateOptions = getStateOptions( name );
+/**
+ * Renders badges for the active style states of a block.
+ *
+ * @param {Object}  props                     Component props.
+ * @param {string}  props.name                Block name.
+ * @param {Object}  props.value               Currently selected style-state value.
+ * @param {boolean} props.isResponsiveEditing Whether Responsive editing is enabled.
+ * @return {Element|null} Badges component, or null if there is nothing to show.
+ */
+export function BlockStateBadges( { name, value, isResponsiveEditing } ) {
+	const pseudoStateOptions = useMemo(
+		() => getPseudoStateOptions( name ),
+		[ name ]
+	);
+	const [ viewportSettings ] = useSettings( 'viewport' );
+	const deviceStateOptions = useMemo(
+		() => getDeviceStateOptions( viewportSettings ),
+		[ viewportSettings ]
+	);
 
-	if ( ! stateOptions.length ) {
+	if ( ! pseudoStateOptions.length && ! isResponsiveEditing ) {
 		return null;
 	}
 
 	return (
 		<StateControlBadges
-			pseudoStates={ stateOptions }
-			pseudoStateValue={ value }
+			viewportStates={
+				isResponsiveEditing ? deviceStateOptions : EMPTY_STATE_OPTIONS
+			}
+			pseudoStates={ pseudoStateOptions }
+			viewportValue={ value?.viewport ?? DEFAULT_STATE_VALUE }
+			pseudoStateValue={ value?.pseudo ?? DEFAULT_STATE_VALUE }
 		/>
 	);
 }

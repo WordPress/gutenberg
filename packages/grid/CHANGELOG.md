@@ -1,58 +1,56 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+### Internal
 
-### Enhancements
+-   Split tsconfig into a build project and a default dev project; story and test declarations are no longer published to npm. ([#81509](https://github.com/WordPress/gutenberg/pull/81509))
 
--   Add `--wp-grid-placeholder-outline-style` and
-    `--wp-grid-resize-preview-outline-style` CSS custom properties for
-    the drag-placeholder outline (default `dashed`) and resize-preview
-    border (default `solid`).
--   Set `data-wp-dashboard-grid-resizing` on the `DashboardGrid` root
-    element while any tile resize gesture is active, so consumers can
-    adjust styles when the pointer may still hover tiles ([#78234](https://github.com/WordPress/gutenberg/pull/78234)).
-
-### New Features
-
--   Initial release. Ships two layout components:
-    -   `DashboardGrid`, a 2D packed grid with explicit `(width,
-        height)` spans, drag-to-reorder and resize handles.
-    -   `DashboardLanes`, a masonry-style surface aligned with the
-        WebKit `display: grid-lanes` spec. Tiles declare a column
-        span only; heights are driven by content; placement follows
-        a source-ordered, shortest-lane skyline with a
-        `flow-tolerance` tiebreaker. Falls back to a JS-driven
-        polyfill on browsers without native support.
--   Export `DashboardGridLayoutItem`, `DashboardGridProps`,
-    `DashboardLanesLayoutItem`, and `DashboardLanesProps` types.
--   Add `renderDragPreview` prop and `DragPreviewRenderProps` type on
-    both surfaces for consumers that need to wrap the dragged-clone
-    visual with their own chrome. The surface keeps a thin functional
-    frame (lift scale, grabbing cursor, pointer pass-through) around
-    the consumer's wrapper.
--   Expose CSS custom properties for theming the lift scale,
-    placeholder opacity, placeholder outline color, and placeholder
-    radius (`--wp-grid-drag-preview-scale`,
-    `--wp-grid-placeholder-opacity`,
-    `--wp-grid-placeholder-outline-color`,
-    `--wp-grid-placeholder-radius`).
-
-### Breaking changes
-
--   Remove the `spacing` prop from `DashboardGrid` and `DashboardLanes`.
-    The gap between tiles is now owned by the design-system gap token
-    (`--wpds-dimension-gap-md`) applied in CSS; override via theme or
-    density rather than per instance. `GridOverlayRenderProps` no
-    longer exposes `spacing` or `gapPx`; the overlay inherits the same
-    gap token. The `DashboardGridSpacing` type export is removed.
+## 0.5.0 (2026-08-12)
 
 ### Internal
 
--   Organize the package source under `dashboard-grid/`,
-    `dashboard-lanes/`, and `shared/` so each layout model owns its
-    component, types, stories, and tests.
--   Drop the default visual layer on the drag-preview wrapper
-    (shadow). The dragged clone now renders the consumer's children
-    directly inside the functional frame; visual chrome is owned by
-    the consumer either through the tile children themselves or via
-    `renderDragPreview`.
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
+
+## 0.4.0 (2026-07-29)
+
+### Internal
+
+-   Update Jest type definitions to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
+
+## 0.3.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 0.2.0 (2026-07-01)
+
+## 0.1.0 (2026-06-24)
+
+### New Features
+
+-   Initial experimental release. Ships two layout components sharing
+    the same layout-as-data contract (a `layout` array keyed by child
+    `key`, `editMode`, and `onChangeLayout` / `onPreviewLayout`
+    callbacks):
+    -   `DashboardGrid`, a 2D packed grid with explicit
+        `(width, height)` spans, drag-to-reorder, and resize handles.
+    -   `DashboardLanes`, a masonry-style surface aligned with the
+        WebKit `display: grid-lanes` spec. Tiles declare a column span
+        only; heights are driven by content; placement follows a
+        source-ordered, shortest-lane skyline with a `flow-tolerance`
+        tiebreaker. Uses the native engine when supported and falls
+        back to a JS-driven polyfill otherwise.
+-   Keyboard-accessible drag-to-reorder on both surfaces, with sibling
+    tiles animating into place on reflow (respects
+    `prefers-reduced-motion`).
+-   `renderResizeHandle`, `renderDragPreview`, and `renderGridOverlay`
+    render props on both surfaces for consumers that need custom
+    interaction chrome.
+-   CSS custom properties for theming the tile gap, drag preview,
+    placeholder, resize preview, and edit-mode overlay without
+    touching package internals.
+-   Export the `DashboardGridLayoutItem`, `DashboardGridProps`,
+    `DashboardLanesLayoutItem`, `DashboardLanesProps`,
+    `DragPreviewRenderProps`, `GridOverlayRenderProps`, `ResizeDelta`,
+    and `ResizeHandleRenderProps` types.

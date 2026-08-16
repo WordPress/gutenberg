@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
-import { sprintf, __ } from '@wordpress/i18n';
+import { sprintf, __, _n } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { backup } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import PostLastRevisionCheck from './check';
 import PostPanelRow from '../post-panel-row';
 import { store as editorStore } from '../../store';
@@ -88,8 +81,12 @@ export function PrivatePostLastRevision() {
 					className="editor-private-post-last-revision__button"
 					text={ revisionsCount }
 					aria-label={ sprintf(
-						/* translators: %s: number of revisions. */
-						__( 'Open revisions screen: %s revisions' ),
+						/* translators: %d: number of revisions. */
+						_n(
+							'Open revisions screen: %d revision',
+							'Open revisions screen: %d revisions',
+							revisionsCount
+						),
 						revisionsCount
 					) }
 					variant="tertiary"

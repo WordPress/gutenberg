@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState, useMemo } from '@wordpress/element';
 import { close, justifyStretch, stretchFullWidth } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components -- @wordpress/grid consumes @wordpress/ui in story examples only.
 import { Icon, IconButton, Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { DashboardGrid } from '..';
 import type { DashboardGridLayoutItem } from '../types';
 import type {
@@ -72,23 +61,23 @@ type Tone = 'brand' | 'info' | 'success' | 'warning' | 'error' | 'neutral';
 // fallbacks into each `var()` call. Using literal strings keeps the
 // `@wordpress/no-unknown-ds-tokens` lint rule happy.
 const bgTokens: Record< Tone, string > = {
-	brand: 'var(--wpds-color-bg-surface-brand)',
-	info: 'var(--wpds-color-bg-surface-info)',
-	success: 'var(--wpds-color-bg-surface-success)',
-	warning: 'var(--wpds-color-bg-surface-warning)',
-	error: 'var(--wpds-color-bg-surface-error)',
-	neutral: 'var(--wpds-color-bg-surface-neutral-weak)',
+	brand: 'var(--wpds-color-background-surface-brand)',
+	info: 'var(--wpds-color-background-surface-info)',
+	success: 'var(--wpds-color-background-surface-success)',
+	warning: 'var(--wpds-color-background-surface-warning)',
+	error: 'var(--wpds-color-background-surface-error)',
+	neutral: 'var(--wpds-color-background-surface-neutral-weak)',
 };
 
 const fgTokens: Record< Tone, string > = {
 	// `brand` has no dedicated fg-content token in the design system,
 	// so neutral content reads safely against the brand surface tint.
-	brand: 'var(--wpds-color-fg-content-neutral)',
-	info: 'var(--wpds-color-fg-content-info)',
-	success: 'var(--wpds-color-fg-content-success)',
-	warning: 'var(--wpds-color-fg-content-warning)',
-	error: 'var(--wpds-color-fg-content-error)',
-	neutral: 'var(--wpds-color-fg-content-neutral)',
+	brand: 'var(--wpds-color-foreground-content-neutral)',
+	info: 'var(--wpds-color-foreground-content-info)',
+	success: 'var(--wpds-color-foreground-content-success)',
+	warning: 'var(--wpds-color-foreground-content-warning)',
+	error: 'var(--wpds-color-foreground-content-error)',
+	neutral: 'var(--wpds-color-foreground-content-neutral)',
 };
 
 function Tile( {
@@ -152,7 +141,7 @@ function TileActions( {
 				variant="solid"
 				tone={ isFill ? 'brand' : 'neutral' }
 				icon={ justifyStretch }
-				label="Fill width"
+				label="Fill available width"
 				aria-pressed={ isFill }
 				onClick={ onToggleFill }
 			/>
@@ -195,13 +184,13 @@ function formatTileLabel( item: DashboardGridLayoutItem ): string {
 // Static token maps so the build-time token fallback plugin can inject
 // fallbacks into each `var()` call.
 const panelBgTokens: Record< 'warning' | 'success', string > = {
-	warning: 'var(--wpds-color-bg-surface-warning)',
-	success: 'var(--wpds-color-bg-surface-success)',
+	warning: 'var(--wpds-color-background-surface-warning)',
+	success: 'var(--wpds-color-background-surface-success)',
 };
 
 const panelFgTokens: Record< 'warning' | 'success', string > = {
-	warning: 'var(--wpds-color-fg-content-warning)',
-	success: 'var(--wpds-color-fg-content-success)',
+	warning: 'var(--wpds-color-foreground-content-warning)',
+	success: 'var(--wpds-color-foreground-content-success)',
 };
 
 const panelStrokeTokens: Record< 'warning' | 'success', string > = {
@@ -332,6 +321,50 @@ export const Responsive: Story = {
 };
 
 /**
+ * Layered configuration: `columns` caps the count and
+ * `minColumnWidth` enforces a per-tile width floor. The grid renders
+ * up to `columns` columns on wide containers and reduces the count
+ * on narrow ones whenever fitting all of them would push tiles
+ * below `minColumnWidth`. Resize the preview to see the cap apply
+ * on wide widths and the floor reduce the count on narrow widths.
+ */
+export const Layered: Story = {
+	args: {
+		layout: [
+			{ key: 'a', width: 1, order: 1 },
+			{ key: 'b', width: 2, order: 2 },
+			{ key: 'c', width: 2, order: 3 },
+			{ key: 'd', width: 1, order: 4 },
+			{ key: 'e', width: 2, order: 5 },
+			{ key: 'f', width: 2, order: 6 },
+		],
+		rowHeight: 96,
+		columns: 6,
+		minColumnWidth: 240,
+		children: [
+			<Tile key="a" tone="brand">
+				width: 1
+			</Tile>,
+			<Tile key="b" tone="info">
+				width: 2
+			</Tile>,
+			<Tile key="c" tone="success">
+				width: 2
+			</Tile>,
+			<Tile key="d" tone="warning">
+				width: 1
+			</Tile>,
+			<Tile key="e" tone="error">
+				width: 2
+			</Tile>,
+			<Tile key="f" tone="neutral">
+				width: 2
+			</Tile>,
+		],
+	},
+};
+
+/**
  * A `width: 'fill'` item expands to cover the remaining columns in
  * its row. Mix it with fixed-width items on either side to build
  * sidebar-like layouts that adapt to the column count.
@@ -436,15 +469,11 @@ export const RowHeight: Story = {
 /**
  * Edit mode with drag, resize, and all width modes. While `editMode`
  * is on, `<DashboardGrid />` paints its default overlay behind the
- * tiles to visualize the underlying template: diagonal stripes, a
- * dashed outline on each column track, a subtle column fill that
- * marks the drop zones against the gaps, and a 1px row divider when
- * `rowHeight` is numeric. The overlay disappears when `editMode`
- * flips back to `false`.
+ * tiles to visualize the underlying template: rounded row-marker
+ * tiles in each column when `rowHeight` is numeric. The overlay
+ * disappears when `editMode` flips back to `false`.
  *
- * Theme the default look in place via CSS custom properties exposed
- * by the package (`--wp-grid-overlay-stripe-color`,
- * `--wp-grid-overlay-track-color`, `--wp-grid-overlay-column-fill`),
+ * Theme the default look in place via `--wp-grid-overlay-tile-bg`,
  * or replace the visual wholesale by passing `renderGridOverlay`.
  * See the `Custom Grid Overlay` story for a full override example.
  *
@@ -669,23 +698,14 @@ function CustomResizeHandle( {
 }
 
 /**
- * Drop-in wrapper that bumps the dragged-clone shadow and clips its
- * corners. The grid keeps the lift scale and the grabbing cursor on
- * the functional frame; the consumer's wrapper sits inside it.
+ * Example `renderDragPreview` wrapper: keeps the clone height chain
+ * intact. Lift, shadow, and motion live on the grid
+ * `.drag-preview-frame`; set `--wp-grid-drag-preview-radius` on the
+ * surface when the lift shadow should match rounded tiles (see widget
+ * dashboard).
  */
 function CustomDragPreview( { children }: DragPreviewRenderProps ) {
-	return (
-		<div
-			style={ {
-				height: '100%',
-				boxShadow: 'var(--wpds-elevation-lg)',
-				borderRadius: 'var(--wpds-border-radius-lg)',
-				overflow: 'hidden',
-			} }
-		>
-			{ children }
-		</div>
-	);
+	return <div style={ { height: '100%' } }>{ children }</div>;
 }
 
 /**
@@ -693,8 +713,8 @@ function CustomDragPreview( { children }: DragPreviewRenderProps ) {
  *
  * 1. `renderResizeHandle` swaps the default corner triangle for a
  *    custom diagonal-arrow icon.
- * 2. `renderDragPreview` wraps the dragged clone with extra chrome
- *    (stronger shadow, rounded corners, overflow clipping).
+ * 2. `renderDragPreview` wraps the dragged clone (here only for the
+ *    height chain; lift and shadow stay on the grid frame).
  * 3. CSS custom properties on an ancestor retheme the lift scale,
  *    placeholder opacity, placeholder outline color, and placeholder
  *    border-radius without touching the package.
@@ -745,7 +765,7 @@ export const Customization: Story = {
 			'--wp-grid-drag-preview-scale': '1.08',
 			'--wp-grid-placeholder-opacity': '0.2',
 			'--wp-grid-placeholder-outline-color':
-				'var(--wpds-color-fg-content-warning)',
+				'var(--wpds-color-foreground-content-warning)',
 			'--wp-grid-placeholder-radius': '12px',
 		} as React.CSSProperties;
 
@@ -787,14 +807,14 @@ function NumberedOverlay( { columns, isActive }: GridOverlayRenderProps ) {
 				inset: 0,
 				display: 'grid',
 				gridTemplateColumns: `repeat(${ columns }, minmax(0, 1fr))`,
-				gap: 'var(--wpds-dimension-gap-md)',
+				gap: 'var(--wpds-dimension-gap-xl)',
 				pointerEvents: 'none',
 				opacity: isActive ? 1 : 0,
 				visibility: isActive ? 'visible' : 'hidden',
 				transition: isActive
 					? 'opacity 200ms ease, visibility 0s linear 0s'
 					: 'opacity 200ms ease, visibility 0s linear 200ms',
-				backgroundImage: `repeating-linear-gradient(135deg, color-mix(in srgb, var(--wpds-color-bg-surface-info) 24%, transparent) 0 6px, transparent 6px 12px)`,
+				backgroundImage: `repeating-linear-gradient(135deg, color-mix(in srgb, var(--wpds-color-background-surface-info) 24%, transparent) 0 6px, transparent 6px 12px)`,
 			} }
 		>
 			{ Array.from( { length: columns } ).map( ( _, i ) => (
@@ -804,7 +824,7 @@ function NumberedOverlay( { columns, isActive }: GridOverlayRenderProps ) {
 						outline:
 							'1px dashed var(--wpds-color-stroke-surface-info)',
 						backgroundColor:
-							'color-mix(in srgb, var(--wpds-color-bg-surface-info) 10%, transparent)',
+							'color-mix(in srgb, var(--wpds-color-background-surface-info) 10%, transparent)',
 						position: 'relative',
 					} }
 				>
@@ -816,8 +836,9 @@ function NumberedOverlay( { columns, isActive }: GridOverlayRenderProps ) {
 							fontSize: 10,
 							padding: '1px 6px',
 							borderRadius: 2,
-							background: 'var(--wpds-color-bg-surface-info)',
-							color: 'var(--wpds-color-fg-content-info)',
+							background:
+								'var(--wpds-color-background-surface-info)',
+							color: 'var(--wpds-color-foreground-content-info)',
 							fontFamily:
 								'var(--wpds-typography-font-family-mono)',
 						} }

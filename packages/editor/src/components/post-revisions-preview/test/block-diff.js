@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	createBlock,
 	registerBlockType,
@@ -9,12 +6,8 @@ import {
 	serialize,
 } from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
-import * as paragraphBlock from '@wordpress/block-library/src/paragraph';
-import * as groupBlock from '@wordpress/block-library/src/group';
-
-/**
- * Internal dependencies
- */
+import * as paragraphBlock from '@wordpress/block-library/build-module/paragraph/index.mjs';
+import * as groupBlock from '@wordpress/block-library/build-module/group/index.mjs';
 import { diffRevisionContent } from '../block-diff';
 import {
 	registerDiffFormatTypes,
@@ -230,7 +223,7 @@ describe( 'diffRevisionContent', () => {
 				attributes: {
 					// Inline diff: "existing" → "modified"
 					content:
-						'This is some <del title="Removed" class="revision-diff-removed">existing</del><ins title="Added" class="revision-diff-added">modified</ins> content',
+						'This is some <del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">existing</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">modified</ins> content',
 					__revisionDiffStatus: {
 						status: 'modified',
 					},
@@ -339,30 +332,32 @@ describe( 'diffRevisionContent', () => {
 		] );
 		const blocks = diffRevisionContent( current, previous );
 
-		// LCS matches one block ("First block content" at prev[0] -> curr[1]).
+		// LCS matches one block ("Second block content" at prev[1] -> curr[0]).
 		// The other block appears as removed + added (showing the reorder).
 		// We intentionally don't pair identical blocks as "modified" since
 		// there's no actual content change - just a position change.
+		// (Pre-v8, LCS matched the other block. Both are equally-valid
+		// choices for a pure swap.)
 		expect( normalizeBlockTree( blocks ) ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: 'Second block content',
-					__revisionDiffStatus: { status: 'added' },
+					content: 'First block content',
+					__revisionDiffStatus: { status: 'removed' },
 				},
 			},
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: 'First block content',
+					content: 'Second block content',
 					__revisionDiffStatus: undefined,
 				},
 			},
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: 'Second block content',
-					__revisionDiffStatus: { status: 'removed' },
+					content: 'First block content',
+					__revisionDiffStatus: { status: 'added' },
 				},
 			},
 		] );
@@ -425,7 +420,7 @@ describe( 'diffRevisionContent', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content:
-						'Second block content<ins title="Added" class="revision-diff-added"> modified</ins>',
+						'Second block content<ins aria-describedby="revision-diff-added-desc" class="revision-diff-added"> modified</ins>',
 					__revisionDiffStatus: {
 						status: 'modified',
 					},
@@ -435,6 +430,107 @@ describe( 'diffRevisionContent', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content: 'First block content',
+					__revisionDiffStatus: undefined,
+				},
+			},
+		] );
+	} );
+
+	it( 'filters whitespace-only freeform pseudo-blocks before LCS', () => {
+		/*
+		 * Direct canary for the whitespace-pseudo-block filter in
+		 * `diffRawBlocks`. The grammar parser emits
+		 * `{ blockName: null, innerHTML: '\n\n' }` for the whitespace
+		 * between block markers; under `diff` v6+'s LCS tie-breaker,
+		 * those pseudo-blocks would otherwise be selected as the match
+		 * anchor in [paragraph, whitespace, paragraph] swaps, leaving
+		 * `pairSimilarBlocks` with two removed and two added paragraphs
+		 * to mis-match by similarity. With the filter, the LCS picks a
+		 * content block and the surrounding paragraphs pair cleanly.
+		 */
+		const previous = serialize( [
+			createBlock( 'core/paragraph', { content: 'Alpha content' } ),
+			createBlock( 'core/paragraph', { content: 'Beta content' } ),
+		] );
+		const current = serialize( [
+			createBlock( 'core/paragraph', {
+				content: 'Beta content modified',
+			} ),
+			createBlock( 'core/paragraph', { content: 'Alpha content' } ),
+		] );
+		const blocks = diffRevisionContent( current, previous );
+		const normalized = normalizeBlockTree( blocks );
+
+		const statuses = normalized.map(
+			( b ) => b.attributes.__revisionDiffStatus?.status
+		);
+		// Exactly one modified pair and one unchanged anchor — not the
+		// double-modified mis-pair that the unfiltered LCS would yield.
+		expect( statuses.filter( ( s ) => s === 'modified' ) ).toHaveLength(
+			1
+		);
+		expect( statuses.filter( ( s ) => s === undefined ) ).toHaveLength( 1 );
+
+		const unchanged = normalized.find(
+			( b ) => b.attributes.__revisionDiffStatus === undefined
+		);
+		expect( unchanged.attributes.content ).toBe( 'Alpha content' );
+	} );
+
+	it( 'places paired modification at current-revision position when only unchanged blocks sit between', () => {
+		/*
+		 * Direct canary for the `crossesCurrentContent` "unchanged
+		 * between removed and added" branch. The modified block crosses
+		 * two unchanged paragraphs; the placement heuristic should
+		 * anchor it at its current-revision position (index 0), not at
+		 * the removed position (index 3) — otherwise the modified block
+		 * would render after content that already comes before it in
+		 * the current revision.
+		 */
+		const previous = serialize( [
+			createBlock( 'core/paragraph', {
+				content: 'Stays one anchor sentence',
+			} ),
+			createBlock( 'core/paragraph', {
+				content: 'Stays two anchor sentence',
+			} ),
+			createBlock( 'core/paragraph', {
+				content: 'Original tail content sentence',
+			} ),
+		] );
+		const current = serialize( [
+			createBlock( 'core/paragraph', {
+				content: 'Original tail content sentence rewritten',
+			} ),
+			createBlock( 'core/paragraph', {
+				content: 'Stays one anchor sentence',
+			} ),
+			createBlock( 'core/paragraph', {
+				content: 'Stays two anchor sentence',
+			} ),
+		] );
+		const blocks = diffRevisionContent( current, previous );
+
+		expect( normalizeBlockTree( blocks ) ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content:
+						'Original tail content sentence<ins aria-describedby="revision-diff-added-desc" class="revision-diff-added"> rewritten</ins>',
+					__revisionDiffStatus: { status: 'modified' },
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Stays one anchor sentence',
+					__revisionDiffStatus: undefined,
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Stays two anchor sentence',
 					__revisionDiffStatus: undefined,
 				},
 			},
@@ -697,7 +793,7 @@ describe( 'diffRevisionContent', () => {
 							attributes: {
 								// B→D modification with inline diff
 								content:
-									'<del title="Removed" class="revision-diff-removed">B</del><ins title="Added" class="revision-diff-added">D</ins>',
+									'<del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">B</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">D</ins>',
 								__revisionDiffStatus: {
 									status: 'modified',
 								},
@@ -756,7 +852,7 @@ describe( 'diffRevisionContent', () => {
 							attributes: {
 								// jumps→leaps modification with inline diff
 								content:
-									'The quick brown fox <del title="Removed" class="revision-diff-removed">jumps</del><ins title="Added" class="revision-diff-added">leaps</ins> over the lazy dog',
+									'The quick brown fox <del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">jumps</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">leaps</ins> over the lazy dog',
 								__revisionDiffStatus: {
 									status: 'modified',
 								},
@@ -953,7 +1049,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'Hello <strong><span title="1 format added" class="revision-diff-format-added">world</span></strong>',
+							'Hello <strong><mark aria-describedby="revision-diff-format-added-desc" class="revision-diff-format-added">world</mark></strong>',
 						__revisionDiffStatus: {
 							status: 'modified',
 						},
@@ -981,7 +1077,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'Hello <strong><del title="Removed" class="revision-diff-removed">world</del><ins title="Added" class="revision-diff-added">everyone</ins></strong>',
+							'Hello <strong><del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">world</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">everyone</ins></strong>',
 						__revisionDiffStatus: {
 							status: 'modified',
 						},
@@ -1033,7 +1129,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'Visit <a href="https://new-site.com"><span title="1 format changed" class="revision-diff-format-changed">our site</span></a> today',
+							'Visit <a href="https://new-site.com"><mark aria-describedby="revision-diff-format-changed-desc" class="revision-diff-format-changed">our site</mark></a> today',
 						__revisionDiffStatus: {
 							status: 'modified',
 						},
@@ -1063,7 +1159,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'Visit <a href="https://example.com"><del title="Removed" class="revision-diff-removed">our</del><ins title="Added" class="revision-diff-added">the</ins> <del title="Removed" class="revision-diff-removed">site</del><ins title="Added" class="revision-diff-added">website</ins></a> today',
+							'Visit <a href="https://example.com"><del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">our</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">the</ins> <del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">site</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">website</ins></a> today',
 						__revisionDiffStatus: {
 							status: 'modified',
 						},
@@ -1113,7 +1209,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'<span title="1 format removed" class="revision-diff-format-removed">Bold</span> and <span title="1 format removed" class="revision-diff-format-removed">italic</span> text',
+							'<mark aria-describedby="revision-diff-format-removed-desc" class="revision-diff-format-removed">Bold</mark> and <mark aria-describedby="revision-diff-format-removed-desc" class="revision-diff-format-removed">italic</mark> text',
 						__revisionDiffStatus: {
 							status: 'modified',
 						},
@@ -1141,7 +1237,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'Hello <em><span title="1 format added, 1 format removed" class="revision-diff-format-changed">world</span></em>',
+							'Hello <em><mark aria-describedby="revision-diff-format-changed-desc" class="revision-diff-format-changed">world</mark></em>',
 						__revisionDiffStatus: {
 							status: 'modified',
 						},
@@ -1188,7 +1284,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'<del title="Removed" class="revision-diff-removed">Hello</del><ins title="Added" class="revision-diff-added">Goodbye</ins> <strong>world</strong>!',
+							'<del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">Hello</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">Goodbye</ins> <strong>world</strong>!',
 						__revisionDiffStatus: {
 							status: 'modified',
 						},
@@ -1226,7 +1322,7 @@ describe( 'diffRevisionContent', () => {
 							name: 'core/paragraph',
 							attributes: {
 								content:
-									'<del title="Removed" class="revision-diff-removed">Hello</del><ins title="Added" class="revision-diff-added">Goodbye</ins> <strong><del title="Removed" class="revision-diff-removed">world</del><ins title="Added" class="revision-diff-added">everyone</ins></strong>',
+									'<del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">Hello</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">Goodbye</ins> <strong><del aria-describedby="revision-diff-removed-desc" class="revision-diff-removed">world</del><ins aria-describedby="revision-diff-added-desc" class="revision-diff-added">everyone</ins></strong>',
 								__revisionDiffStatus: {
 									status: 'modified',
 								},

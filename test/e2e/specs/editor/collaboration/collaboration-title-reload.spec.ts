@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { test as base, expect } from '@wordpress/e2e-test-utils-playwright';
-
-/**
- * Internal dependencies
- */
 import type CollaborationUtils from './fixtures/collaboration-utils';
 import CollaborationUtilsClass, {
 	setCollaboration,
@@ -33,6 +26,7 @@ const test = base.extend< Fixtures >( {
 		await setCollaboration( requestUtils, true );
 		await use( utils );
 		await utils.teardown();
+		await setCollaboration( requestUtils, false );
 	},
 	collaboratorUser: async (
 		{ collaborationUtils, requestUtils },
@@ -110,7 +104,6 @@ test( 'reloading after a synced title edit keeps both users on the same title', 
 	await collaborationUtils.waitForMutualDiscovery( { timeout: 30000 } );
 
 	const state = await collaborationUtils.waitForConvergence( {
-		includeCrdtDocument: true,
 		timeout: 30000,
 	} );
 

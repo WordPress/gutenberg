@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { createContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { ThemeProviderSettings } from './types';
 
 interface ThemeContextType {
@@ -16,5 +9,6 @@ export const ThemeContext = createContext< ThemeContextType >( {
 	resolvedSettings: {
 		color: {},
 		cursor: undefined,
+		cornerRadius: undefined,
 	},
 } );

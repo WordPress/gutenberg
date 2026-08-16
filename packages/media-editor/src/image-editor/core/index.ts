@@ -1,6 +1,7 @@
 // Types
 export type {
 	CropperState,
+	CropperAction,
 	TransformOperation,
 	NormalizedPoint,
 	NormalizedRect,
@@ -9,10 +10,6 @@ export type {
 	StencilProps,
 	HandlePosition,
 } from './types';
-// Note: `CropperAction` is intentionally not exported. The reducer's
-// action shape is an internal detail; consumers drive state through
-// the named setters on `UseCropperStateReturn` (setPan, setZoom, etc.).
-// This keeps the public API stable as the reducer evolves.
 
 // Constants
 export {
@@ -22,9 +19,23 @@ export {
 } from './constants';
 export type { AspectRatioPreset } from './constants';
 
+// Reducer + state helpers. `CropperAction` and `cropperReducer` are
+// exported so composite stores can delegate cropper actions through the
+// pure reducer (see `useMediaEditorState`). Most consumers should
+// instead drive state through the named setters on `CropperController`.
+export {
+	cropperReducer,
+	enforceContainment,
+	areCropperStatesEqual,
+	isStateDirty,
+} from './state';
+
 // Source region (pixel and percentage)
 export { getSourceRegion, getSourceRegionPercent } from './source-region';
 export type { SourceRegion, SourceRegionPercent } from './source-region';
+
+// Crop-rect helpers
+export { computeInscribedRect } from './crop-rect';
 
 // Pipeline
 export {

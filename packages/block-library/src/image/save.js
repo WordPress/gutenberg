@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	RichText,
 	useBlockProps,
@@ -13,10 +6,6 @@ import {
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { mediaPosition } from './utils';
 
 export default function save( { attributes } ) {
@@ -37,6 +26,7 @@ export default function save( { attributes } ) {
 		linkTarget,
 		sizeSlug,
 		title,
+		isDecorative,
 		metadata: { bindings = {} } = {},
 	} = attributes;
 
@@ -103,6 +93,7 @@ export default function save( { attributes } ) {
 				return style;
 			} )() }
 			title={ title }
+			role={ isDecorative ? 'none' : undefined }
 		/>
 	);
 

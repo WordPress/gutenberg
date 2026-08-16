@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { Y } from '@wordpress/sync';
-
-/**
- * External dependencies
- */
 import {
 	describe,
 	expect,
@@ -14,14 +7,12 @@ import {
 	beforeEach,
 	afterEach,
 } from '@jest/globals';
-
 /**
  * Mock uuid module
  */
 jest.mock( 'uuid', () => ( {
 	v4: () => 'mocked-uuid-' + Math.random(),
 } ) );
-
 /**
  * Mock @wordpress/blocks module
  */
@@ -101,15 +92,7 @@ jest.mock( '@wordpress/blocks', () => ( {
 		},
 	],
 } ) );
-
-/**
- * WordPress dependencies
- */
 import { RichTextData } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import {
 	mergeCrdtBlocks,
 	mergeRichTextUpdate,
@@ -165,6 +148,64 @@ describe( 'crdt-blocks', () => {
 			expect( content.toString() ).toBe( 'Hello World' );
 		} );
 
+		it( 'syncs innerContent of static inner-content blocks into the Y.Doc', () => {
+			const incomingBlocks: Block[] = [
+				{
+					name: 'core/html',
+					attributes: {},
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: 'Editable' },
+							innerBlocks: [],
+							clientId: 'inner-1',
+						},
+					],
+					innerContent: [ '<div class="banner">', null, '</div>' ],
+					clientId: 'html-1',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, incomingBlocks, null );
+
+			const block = yblocks.get( 0 );
+			expect( block.get( 'innerContent' ) ).toEqual( [
+				'<div class="banner">',
+				null,
+				'</div>',
+			] );
+		} );
+
+		it( 'updates innerContent when the static markup changes', () => {
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/html',
+					attributes: {},
+					innerBlocks: [],
+					innerContent: [ '<p>one</p>' ],
+					clientId: 'html-1',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/html',
+					attributes: {},
+					innerBlocks: [],
+					innerContent: [ '<p>two</p>' ],
+					clientId: 'html-1',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			expect( yblocks.get( 0 ).get( 'innerContent' ) ).toEqual( [
+				'<p>two</p>',
+			] );
+		} );
+
 		it( 'updates existing blocks when content changes', () => {
 			const initialBlocks: Block[] = [
 				{
@@ -190,6 +231,78 @@ describe( 'crdt-blocks', () => {
 
 			expect( yblocks.length ).toBe( 1 );
 			const block = yblocks.get( 0 );
+			const content = (
+				block.get( 'attributes' ) as YBlockAttributes
+			 ).get( 'content' ) as Y.Text;
+			expect( content.toString() ).toBe( 'Updated content' );
+		} );
+
+		it( 'updates the clientId when an updated block arrives with a different clientId', () => {
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Initial content' },
+					innerBlocks: [],
+					clientId: 'initial-id',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+			expect( yblocks.get( 0 ).get( 'clientId' ) ).toBe( 'initial-id' );
+
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Updated content' },
+					innerBlocks: [],
+					clientId: 'updated-id',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			expect( yblocks.length ).toBe( 1 );
+			const block = yblocks.get( 0 );
+			expect( block.get( 'clientId' ) ).toBe( 'updated-id' );
+			const content = (
+				block.get( 'attributes' ) as YBlockAttributes
+			 ).get( 'content' ) as Y.Text;
+			expect( content.toString() ).toBe( 'Updated content' );
+		} );
+
+		it( 'preserves the local clientId when requested for reparsed content blocks', () => {
+			// Simulates the Code Editor flow: the sender re-parses raw HTML on
+			// every keystroke, which mints a fresh clientId for every block.
+			// The Y.Doc's clientId should stay stable so remote peers don't
+			// remount the block (and any embed iframe within it).
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Initial content' },
+					innerBlocks: [],
+					clientId: 'stable-id',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+			expect( yblocks.get( 0 ).get( 'clientId' ) ).toBe( 'stable-id' );
+
+			const reparsedBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Updated content' },
+					innerBlocks: [],
+					clientId: 'freshly-parsed-id',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, reparsedBlocks, null, {
+				preserveClientIds: true,
+			} );
+
+			expect( yblocks.length ).toBe( 1 );
+			const block = yblocks.get( 0 );
+			expect( block.get( 'clientId' ) ).toBe( 'stable-id' );
 			const content = (
 				block.get( 'attributes' ) as YBlockAttributes
 			 ).get( 'content' ) as Y.Text;
@@ -2827,6 +2940,26 @@ describe( 'crdt-blocks', () => {
 			mergeRichTextUpdate( yText, 'Hi 👋🏽!', asHtmlStringIndex( 6 ) );
 
 			expect( yText.toString() ).toBe( 'Hi 👋🏽!' );
+		} );
+	} );
+
+	describe( 'mergeRichTextUpdate - rapid typing', () => {
+		it( 'appends repeated text one character at a time with cursor hints', () => {
+			const text =
+				'987654321098765432109876543210987654321098765432109876543210';
+			const yText = doc.getText( 'test' );
+			yText.insert( 0, 'p1' );
+
+			for ( let i = 1; i <= text.length; i++ ) {
+				const value = `p1${ text.slice( 0, i ) }`;
+				mergeRichTextUpdate(
+					yText,
+					value,
+					asHtmlStringIndex( value.length )
+				);
+			}
+
+			expect( yText.toString() ).toBe( `p1${ text }` );
 		} );
 	} );
 

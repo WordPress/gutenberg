@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import {
 	Navigator,
 	__experimentalItem as Item,
 	FlexItem,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import { IconWithCurrentColor } from './icon-with-current-color';
 
 interface GenericNavigationButtonProps {

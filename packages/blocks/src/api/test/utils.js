@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { createBlock } from '../factory';
 import {
 	getBlockTypes,
@@ -14,6 +11,7 @@ import {
 	getAccessibleBlockLabel,
 	getBlockLabel,
 	isBlockRegistered,
+	sanitizeBlockAttributes,
 	__experimentalSanitizeBlockAttributes,
 	getBlockAttributesNamesByRole,
 	isContentBlock,
@@ -254,13 +252,10 @@ describe( 'sanitizeBlockAttributes', () => {
 			title: 'Test block',
 		} );
 
-		const attributes = __experimentalSanitizeBlockAttributes(
-			'core/test-block',
-			{
-				defined: 'defined-attribute',
-				notDefined: 'not-defined-attribute',
-			}
-		);
+		const attributes = sanitizeBlockAttributes( 'core/test-block', {
+			defined: 'defined-attribute',
+			notDefined: 'not-defined-attribute',
+		} );
 
 		expect( attributes ).toEqual( {
 			defined: 'defined-attribute',
@@ -269,10 +264,7 @@ describe( 'sanitizeBlockAttributes', () => {
 
 	it( 'throws error if the block is not registered', () => {
 		expect( () => {
-			__experimentalSanitizeBlockAttributes(
-				'core/not-registered-test-block',
-				{}
-			);
+			sanitizeBlockAttributes( 'core/not-registered-test-block', {} );
 		} ).toThrowErrorMatchingInlineSnapshot(
 			`"Block type 'core/not-registered-test-block' is not registered."`
 		);
@@ -293,10 +285,7 @@ describe( 'sanitizeBlockAttributes', () => {
 			title: 'Test block',
 		} );
 
-		const attributes = __experimentalSanitizeBlockAttributes(
-			'core/test-block',
-			{}
-		);
+		const attributes = sanitizeBlockAttributes( 'core/test-block', {} );
 
 		expect( attributes ).toEqual( {
 			hasDefaultValue: 'default-value',
@@ -321,18 +310,42 @@ describe( 'sanitizeBlockAttributes', () => {
 			title: 'Test block',
 		} );
 
-		const attributes = __experimentalSanitizeBlockAttributes(
-			'core/test-block',
-			{
-				nodeContent: [ 'test-1', 'test-2' ],
-			}
-		);
+		const attributes = sanitizeBlockAttributes( 'core/test-block', {
+			nodeContent: [ 'test-1', 'test-2' ],
+		} );
 
 		expect( attributes ).toEqual( {
 			nodeContent: [ 'test-1', 'test-2' ],
 			childrenContent: [],
 			withDefault: [ 'test' ],
 		} );
+	} );
+
+	it( 'keeps the experimental function as a deprecated alias', () => {
+		registerBlockType( 'core/test-block', {
+			apiVersion: 3,
+			attributes: {
+				defined: {
+					type: 'string',
+				},
+			},
+			title: 'Test block',
+		} );
+
+		const attributes = __experimentalSanitizeBlockAttributes(
+			'core/test-block',
+			{
+				defined: 'defined-attribute',
+				notDefined: 'not-defined-attribute',
+			}
+		);
+
+		expect( attributes ).toEqual( {
+			defined: 'defined-attribute',
+		} );
+		expect( console ).toHaveWarnedWith(
+			'__experimentalSanitizeBlockAttributes is deprecated since version 7.1. Please use sanitizeBlockAttributes instead.'
+		);
 	} );
 } );
 

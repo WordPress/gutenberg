@@ -4,7 +4,7 @@
 	"references": [
 		{ "path": "../a11y" },
 		{ "path": "../block-serialization-default-parser" },
-		{ "path": "../blob" },
+		{ "path": "../blob/tsconfig.build.json" },
 		{ "path": "../blocks" },
 		{ "path": "../components" },
 		{ "path": "../compose" },
@@ -24,14 +24,15 @@
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
 		{ "path": "../image-cropper" },
-		{ "path": "../interactivity" },
+		{ "path": "../interactivity/tsconfig.build.json" },
 		{ "path": "../is-shallow-equal" },
+		{ "path": "../kebab-case" },
 		{ "path": "../keycodes" },
 		{ "path": "../keyboard-shortcuts" },
 		{ "path": "../notices" },
 		{ "path": "../rich-text" },
 		{ "path": "../style-engine" },
-		{ "path": "../token-list" },
+		{ "path": "../token-list/tsconfig.build.json" },
 		{ "path": "../ui" },
 		{ "path": "../url" },
 		{ "path": "../upload-media" },
@@ -41,6 +42,11 @@
 	// NOTE: This package is being progressively typed. You are encouraged to
 	// expand this array with files which can be type-checked. At some point in
 	// the future, this can be simplified to an `includes` of `src/**/*`.
-	"files": [ "src/components/block-context/index.js", "src/utils/dom.js" ],
-	"include": []
+	"files": [
+		"src/lock-unlock.ts",
+		"src/components/block-context/index.js",
+		"src/components/block-visibility/constants.ts",
+		"src/components/block-visibility/use-block-visibility.ts"
+	],
+	"include": [ "src/utils/**/*.ts" ]
 }

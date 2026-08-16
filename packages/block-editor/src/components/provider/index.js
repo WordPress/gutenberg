@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch } from '@wordpress/data';
 import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
@@ -10,16 +7,13 @@ import {
 	detectClientSideMediaSupport,
 	isHeicCanvasSupported,
 } from '@wordpress/upload-media';
-
-/**
- * Internal dependencies
- */
 import withRegistryProvider from './with-registry-provider';
 import useBlockSync from './use-block-sync';
 import { store as blockEditorStore } from '../../store';
 import { BlockRefsProvider } from './block-refs-provider';
 import { unlock } from '../../lock-unlock';
 import KeyboardShortcuts from '../keyboard-shortcuts';
+import BlockKeyboardShortcuts from '../block-keyboard-shortcuts';
 import useMediaUploadSettings from './use-media-upload-settings';
 import { mediaUploadOnSuccessKey } from '../../store/private-keys';
 import { SelectionContext } from './selection-context';
@@ -102,7 +96,7 @@ function shouldEnableClientSideMediaProcessing() {
  *
  * Returns true when:
  * 1. Full client-side processing is NOT available (otherwise it handles HEIC already)
- * 2. The server has set the __heicUploadSupport flag
+ * 2. The server has set the __clientSideMediaProcessing flag
  * 3. The browser supports createImageBitmap + OffscreenCanvas (e.g. Safari)
  *
  * @return {boolean} Whether HEIC-only canvas processing should be enabled.
@@ -118,7 +112,7 @@ function shouldEnableHeicCanvasProcessing() {
 		return false;
 	}
 
-	if ( ! window.__heicUploadSupport ) {
+	if ( ! window.__clientSideMediaProcessing ) {
 		isHeicCanvasEnabledCache = false;
 		return false;
 	}
@@ -368,7 +362,12 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 
 		const children = (
 			<SlotFillProvider passthrough>
-				{ ! settings?.isPreviewMode && <KeyboardShortcuts.Register /> }
+				{ ! settings?.isPreviewMode && (
+					<>
+						<KeyboardShortcuts.Register />
+						<BlockKeyboardShortcuts />
+					</>
+				) }
 				<BlockRefsProvider>{ props.children }</BlockRefsProvider>
 			</SlotFillProvider>
 		);

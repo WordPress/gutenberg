@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 import type { UndoManager } from '@wordpress/undo-manager';
 import deprecated from '@wordpress/deprecated';
 import type { ConnectionStatus } from '@wordpress/sync';
-
-/**
- * Internal dependencies
- */
 import { STORE_NAME } from './name';
 import {
 	getQueriedItems,
@@ -24,6 +17,7 @@ import {
 	isNumericID,
 	getUserPermissionCacheKey,
 } from './utils';
+import { getSyncManager } from './sync';
 import type * as ET from './entity-types';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
@@ -44,6 +38,10 @@ export interface State {
 	themeGlobalStyleVariations: Record< string, string >;
 	themeGlobalStyleRevisions: Record< number, Object >;
 	undoManager: UndoManager;
+	syncUndoManagerState: {
+		hasRedo: boolean;
+		hasUndo: boolean;
+	};
 	userPermissions: Record< string, boolean >;
 	users: UserState;
 	navigationFallbackId: EntityRecordKey;
@@ -1148,6 +1146,9 @@ export function getRedoEdit( state: State ): Optional< any > {
  * @return Whether there is a previous edit or not.
  */
 export function hasUndo( state: State ): boolean {
+	if ( getSyncManager()?.undoManager ) {
+		return state.syncUndoManagerState.hasUndo;
+	}
 	return getUndoManager( state ).hasUndo();
 }
 
@@ -1160,6 +1161,9 @@ export function hasUndo( state: State ): boolean {
  * @return Whether there is a next edit or not.
  */
 export function hasRedo( state: State ): boolean {
+	if ( getSyncManager()?.undoManager ) {
+		return state.syncUndoManagerState.hasRedo;
+	}
 	return getUndoManager( state ).hasRedo();
 }
 

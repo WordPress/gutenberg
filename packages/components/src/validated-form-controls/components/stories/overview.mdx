@@ -39,9 +39,9 @@ We don't foresee these being needed much, but it is technically possible by the 
 
 ### Delegate elements
 
-The implementations for `ToggleGroupControl`, `CustomSelectControl`, and `FormTokenField` use a "delegate" element for validation, due to upstream limitations that prevent us from using the actual underlying elements for constraint validation. A delegate element in this context is a visually hidden form element that we "delegate" the Constraint Validation API concerns to.
+The implementation for `CustomSelectControl` uses a "delegate" element for validation, due to upstream limitations that prevent us from using the actual underlying elements for constraint validation. A delegate element in this context is a visually hidden form element that we "delegate" the Constraint Validation API concerns to.
 
-This is not ideal, but lets us maintain a consistent mechanism to scroll to the invalid field when attempting to submit, and block the form from submitting. It is hopefully fine as a stopgap, given the low amount of actual validation that will need happen on these two specific components.
+This is not ideal, but lets us maintain a consistent mechanism to scroll to the invalid field when attempting to submit, and block the form from submitting. It is hopefully fine as a stopgap, given the low amount of actual validation that will need happen on this specific component.
 
 ### Controlled mode only
 

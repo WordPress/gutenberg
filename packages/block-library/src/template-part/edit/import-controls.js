@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
@@ -14,10 +11,6 @@ import {
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import { useCreateTemplatePartFromBlocks } from './utils/hooks';
 import { transformWidgetToBlock } from './utils/transformers';
 
@@ -147,7 +140,6 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 						options={ options }
 						onChange={ ( value ) => setSelectedSidebar( value ) }
 						disabled={ ! options.length }
-						__next40pxDefaultSize
 					/>
 				</FlexBlock>
 				<FlexItem

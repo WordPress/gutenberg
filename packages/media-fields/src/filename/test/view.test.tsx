@@ -1,23 +1,12 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import type { NormalizedField } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import FileNameView from '../view';
 import filenameField from '../index';
 import type { MediaItem } from '../../types';
 
 describe( 'FileNameView', () => {
 	describe( 'filename rendering', () => {
-		it( 'renders short filename (15 characters or less)', () => {
+		it( 'renders short filename without a tooltip anchor', () => {
 			const item: Partial< MediaItem > = {
 				source_url: 'https://example.com/uploads/12345678901.jpg', // exactly 15 chars
 			};
@@ -29,11 +18,11 @@ describe( 'FileNameView', () => {
 				/>
 			);
 
-			// Verify the filename is visible to users
-			expect( screen.getByText( '12345678901.jpg' ) ).toBeInTheDocument();
+			const rendered = screen.getByText( '12345678901.jpg' );
+			expect( rendered ).toHaveClass( 'dataviews-media-field__filename' );
 		} );
 
-		it( 'renders long filename (more than 15 characters)', () => {
+		it( 'renders long filename inside a Tooltip and exposes the full name in the DOM', () => {
 			const longFilename =
 				'very-long-filename-that-exceeds-fifteen-characters.jpg';
 			const item: Partial< MediaItem > = {
@@ -47,11 +36,11 @@ describe( 'FileNameView', () => {
 				/>
 			);
 
-			// Verify the full filename text is accessible to users
-			// (the component handles truncation via Truncate/Tooltip, but the text is still present)
-			expect(
-				screen.getByText( longFilename.slice( 0, 15 ) + '…' )
-			).toBeInTheDocument();
+			// CSS handles the visual ellipsis; the DOM text remains the full
+			// filename so assistive technology reading the row gets the
+			// complete name, and the Tooltip exposes it on mouse hover.
+			const rendered = screen.getByText( longFilename );
+			expect( rendered ).toHaveClass( 'dataviews-media-field__filename' );
 		} );
 	} );
 

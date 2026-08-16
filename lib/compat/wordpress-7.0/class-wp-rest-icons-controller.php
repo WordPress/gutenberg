@@ -36,7 +36,7 @@ if ( ! class_exists( 'WP_REST_Icons_Controller' ) ) {
 
 			register_rest_route(
 				$this->namespace,
-				'/' . $this->rest_base . '/(?P<name>[a-z][a-z0-9-]*/[a-z][a-z0-9-]*)',
+				'/' . $this->rest_base . '/(?P<name>[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?/[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?)',
 				array(
 					'args'   => array(
 						'name' => array(

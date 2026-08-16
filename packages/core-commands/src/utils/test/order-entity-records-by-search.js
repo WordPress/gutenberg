@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { orderEntityRecordsBySearch } from '../order-entity-records-by-search';
 
 const mockData = [

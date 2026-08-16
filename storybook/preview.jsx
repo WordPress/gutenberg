@@ -59,7 +59,7 @@ export const globalTypes = {
 	},
 	dsColorTheme: {},
 	dsCursorControl: {},
-	dsDensity: {},
+	dsCornerRadius: {},
 };
 
 export const decorators = [
@@ -116,6 +116,10 @@ export const parameters = {
 				],
 				'Icons',
 				'Design System',
+				'Widget Primitives',
+				[ 'Introduction', 'Anatomy', 'System Architecture' ],
+				'Widget Dashboard',
+				[ 'Introduction', 'Anatomy', 'Widget Chrome', 'Playground' ],
 			];
 			const PRIORITIZED_MDX_DOCS = [ 'Introduction', 'Overview' ];
 

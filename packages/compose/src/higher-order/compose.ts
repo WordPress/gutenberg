@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { basePipe } from './pipe';
 
 /**
