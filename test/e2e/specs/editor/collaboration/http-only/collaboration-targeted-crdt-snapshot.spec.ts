@@ -1,4 +1,4 @@
-import { test, expect } from './fixtures';
+import { test, expect } from '../fixtures';
 
 const CORE_DATA_PRIVATE_APIS_CONSENT =
 	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.';
