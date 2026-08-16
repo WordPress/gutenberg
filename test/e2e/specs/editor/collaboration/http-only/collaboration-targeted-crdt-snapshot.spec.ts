@@ -4,7 +4,7 @@ const CORE_DATA_PRIVATE_APIS_CONSENT =
 	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.';
 
 test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
-	test( 'reloads isolated snapshot changes without mutating or duplicating the live document', async ( {
+	test( 'persists an isolated snapshot without mutating or duplicating block content', async ( {
 		collaborationUtils,
 		editor,
 		page,
@@ -19,7 +19,7 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 		} );
 		await collaborationUtils.openPost( post.id );
 
-		const liveContent = await page.evaluate(
+		const result = await page.evaluate(
 			async ( { consent, postId } ) => {
 				const { unlock } =
 					window.wp.privateApis.__dangerousOptInToUnstableAPIsOnlyForCoreModules(
@@ -59,23 +59,31 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 							persistedRecord.meta?._crdt_document || '',
 					},
 				} );
+				const savedRecord = await window.wp.apiFetch( {
+					path: `/wp/v2/posts/${ postId }?context=edit`,
+				} );
 
-				return window.wp.data
-					.select( 'core/block-editor' )
-					.getBlocks()[ 0 ]
-					.attributes.content.toString();
+				return {
+					doc,
+					persistedDoc: savedRecord.meta?._crdt_document,
+					liveContent: window.wp.data
+						.select( 'core/block-editor' )
+						.getBlocks()[ 0 ]
+						.attributes.content.toString(),
+				};
 			},
 			{ consent: CORE_DATA_PRIVATE_APIS_CONSENT, postId: post.id }
 		);
 
-		expect( liveContent ).toBe( 'Original persisted content.' );
+		expect( result.persistedDoc ).toBe( result.doc );
+		expect( result.liveContent ).toBe( 'Original persisted content.' );
 		await page.reload();
 		await collaborationUtils.waitForEntityReady( page );
 
 		const blocks = await editor.getBlocks();
 		expect( blocks ).toHaveLength( 1 );
 		expect( blocks[ 0 ].attributes.content ).toBe(
-			'Targeted snapshot content.'
+			'Original persisted content.'
 		);
 	} );
 
@@ -304,7 +312,11 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 				markFirstSaveStarted();
 				await firstSaveReleased;
 			}
-			await route.continue();
+			await route.fulfill( {
+				status: 200,
+				contentType: 'application/json',
+				body: '{}',
+			} );
 		} );
 
 		await page.evaluate( ( consent ) => {
