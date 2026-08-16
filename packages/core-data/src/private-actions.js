@@ -182,6 +182,24 @@ export const setCollaborationSupported =
 	};
 
 /**
+ * Creates a persisted CRDT snapshot with isolated entity changes without
+ * applying those changes to the live collaborative document.
+ *
+ * @param {string}        kind     Entity kind.
+ * @param {string}        name     Entity name.
+ * @param {number|string} recordId Entity record ID.
+ * @param {Object}        changes  Changes to include in the snapshot.
+ * @return {Promise<string|null>} Serialized CRDT document, when loaded.
+ */
+export const createEntityCRDTPersistenceSnapshot =
+	( kind, name, recordId, changes ) => () =>
+		getSyncManager()?.createPersistedCRDTDoc(
+			`${ kind }/${ name }`,
+			recordId,
+			changes
+		);
+
+/**
  * Persists the current CRDT document for a sync-enabled entity.
  *
  * @param {string}        kind     Entity kind.
