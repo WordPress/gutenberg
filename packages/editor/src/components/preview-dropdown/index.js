@@ -18,7 +18,10 @@ import { VisuallyHidden } from '@wordpress/ui';
 import { store as editorStore } from '../../store';
 import { PostPreviewMenuItem } from '../post-preview-button';
 import { sidebars } from '../sidebar/constants';
-import { VIEWPORT_STATE_BY_DEVICE_TYPE } from '../../utils/device-type';
+import {
+	VIEWPORT_STATE_BY_DEVICE_TYPE,
+	getCanvasWidthByDeviceType,
+} from '../../utils/device-type';
 import { unlock } from '../../lock-unlock';
 
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
@@ -26,6 +29,7 @@ const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	const {
 		deviceType,
+		isAtDeviceWidth,
 		homeUrl,
 		hasMobileViewport,
 		hasTabletViewport,
@@ -45,6 +49,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			getRenderingMode,
 			getDeviceType,
 			getEditorSettings,
+			getCanvasWidth,
 		} = unlock( select( editorStore ) );
 		const {
 			isResponsiveEditing: _isResponsiveEditing,
@@ -54,11 +59,15 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		const { getEntityRecord, getPostType } = select( coreStore );
 		const { get } = select( preferencesStore );
 		const _currentPostType = getCurrentPostType();
-		const viewportBreakpoints = getViewportBreakpoints(
-			getSettings().__experimentalFeatures?.viewport
-		);
+		const viewportSettings = getSettings().__experimentalFeatures?.viewport;
+		const viewportBreakpoints = getViewportBreakpoints( viewportSettings );
+		const _deviceType = getDeviceType();
+
 		return {
-			deviceType: getDeviceType(),
+			deviceType: _deviceType,
+			isAtDeviceWidth:
+				getCanvasWidth() ===
+				getCanvasWidthByDeviceType( _deviceType, viewportSettings ),
 			homeUrl: getEntityRecord( 'root', '__unstableBase' )?.home,
 			hasMobileViewport: viewportBreakpoints.mobile !== undefined,
 			hasTabletViewport: viewportBreakpoints.tablet !== undefined,
@@ -193,7 +202,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 					<MenuGroup>
 						<MenuItemsChoice
 							choices={ choices }
-							value={ deviceType }
+							value={ isAtDeviceWidth ? deviceType : '' }
 							onSelect={ handleDevicePreviewChange }
 						/>
 					</MenuGroup>

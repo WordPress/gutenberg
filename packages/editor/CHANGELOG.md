@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Register the editor and block editor keyboard shortcuts from the editor provider, so shortcuts work for consumers that mount the editor without rendering `EditorKeyboardShortcutsRegister` themselves ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
+-   Device Preview: Show no viewport as selected in the View menu while the canvas sits at a width set by dragging its edges, so choosing a viewport snaps the canvas back to that viewport's width instead of doing nothing ([#81572](https://github.com/WordPress/gutenberg/pull/81572)).
 
 ## 14.53.0 (2026-08-12)
 
