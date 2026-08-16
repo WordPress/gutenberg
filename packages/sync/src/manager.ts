@@ -298,6 +298,7 @@ export function createSyncManager( debug = false ): SyncManager {
 					objectId,
 					ydoc,
 					awareness,
+					Y,
 				} );
 
 				// Attach status listener after provider creation.
@@ -437,6 +438,7 @@ export function createSyncManager( debug = false ): SyncManager {
 					objectType,
 					objectId: null,
 					ydoc,
+					Y,
 				} );
 
 				// Attach status listener after provider creation.
