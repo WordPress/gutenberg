@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add an `editor.PostRevision.badges` filter so plugins can register extra visual-revisions timeline badges. Matching labels also appear in the picker accessible name.
+
 ### Bug Fixes
 
 -   Register the editor and block editor keyboard shortcuts from the editor provider, so shortcuts work for consumers that mount the editor without rendering `EditorKeyboardShortcutsRegister` themselves ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).

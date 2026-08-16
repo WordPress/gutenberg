@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { addFilter, removeFilter } from '@wordpress/hooks';
 import PostRevisionsTimeline from '../';
+import { REVISION_BADGES_FILTER } from '../get-revision-badges';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
 jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
@@ -144,6 +146,10 @@ describe( 'PostRevisionsTimeline', () => {
 		useDispatch.mockReturnValue( { setCurrentRevisionId: jest.fn() } );
 	} );
 
+	afterEach( () => {
+		removeFilter( REVISION_BADGES_FILTER, 'test/public' );
+	} );
+
 	it( 'keeps the author field intact and labels autosaves', () => {
 		render( <PostRevisionsTimeline /> );
 
@@ -165,5 +171,28 @@ describe( 'PostRevisionsTimeline', () => {
 			screen.queryByText( 'Current Revision by Bob' )
 		).not.toBeInTheDocument();
 		expect( getCurrentRevision ).not.toHaveBeenCalled();
+	} );
+
+	it( 'shows a plugin badge and includes it in the accessible name', () => {
+		addFilter( REVISION_BADGES_FILTER, 'test/public', ( badges ) => [
+			...badges,
+			{
+				id: 'test/public',
+				label: 'Public',
+				intent: 'informational',
+				isMatch: ( item ) => item.id === 2,
+			},
+		] );
+
+		render( <PostRevisionsTimeline /> );
+
+		expect( screen.getByText( 'Public' ) ).toBeVisible();
+		expect( screen.getAllByRole( 'option' )[ 1 ] ).toHaveAccessibleName(
+			/Public/
+		);
+		expect( screen.getAllByRole( 'option' )[ 0 ] ).not.toHaveAccessibleName(
+			/Public/
+		);
+		expect( screen.getByText( 'Autosave' ) ).toBeVisible();
 	} );
 } );

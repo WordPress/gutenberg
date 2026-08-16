@@ -9,6 +9,7 @@ import { Badge, Stack, Text } from '@wordpress/ui';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { PostContentInformationUI } from '../post-content-information';
+import getRevisionBadges from './get-revision-badges';
 
 const PAGE_SIZE = 10;
 const EMPTY_ARRAY = [];
@@ -33,17 +34,17 @@ function getDisplayDate( value ) {
 		: humanTimeDiff( date );
 }
 
-function isAutosaveRevision( item ) {
-	// Autosaves use the `{parent_id}-autosave-v1` slug, like Core's `wp_is_post_autosave()`.
-	return item.slug?.endsWith( '-autosave-v1' ) ?? false;
-}
-
 function RevisionBadges( { item } ) {
-	if ( ! isAutosaveRevision( item ) ) {
+	const badges = getRevisionBadges( item );
+	if ( ! badges.length ) {
 		return null;
 	}
 
-	return <Badge intent="none">{ __( 'Autosave' ) }</Badge>;
+	return badges.map( ( badge ) => (
+		<Badge key={ badge.id } intent={ badge.intent }>
+			{ badge.label }
+		</Badge>
+	) );
 }
 
 export default function PostRevisionsTimeline() {
@@ -87,16 +88,15 @@ export default function PostRevisionsTimeline() {
 				// instead of the raw ISO timestamp.
 				getValue: ( { item } ) => {
 					const displayDate = getDisplayDate( item.date );
-
-					if ( ! isAutosaveRevision( item ) ) {
-						return displayDate;
-					}
-
-					return sprintf(
-						/* translators: 1: revision date, 2: revision type. */
-						__( '%1$s, %2$s' ),
-						displayDate,
-						__( 'Autosave' )
+					return getRevisionBadges( item ).reduce(
+						( label, badge ) =>
+							sprintf(
+								/* translators: 1: revision date or prior labels, 2: revision type. */
+								__( '%1$s, %2$s' ),
+								label,
+								badge.label
+							),
+						displayDate
 					);
 				},
 				render: ( { item } ) => (
