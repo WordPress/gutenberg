@@ -104,7 +104,7 @@ export function toVdom( root: Node ): ComponentChild {
 		// CDATA_SECTION_NODE (4)
 		if ( nodeType === 4 ) {
 			nodesToReplace.add( node );
-			return node.nodeValue;
+			return ( node as CDATASection ).data;
 		}
 
 		// COMMENT_NODE (8) || PROCESSING_INSTRUCTION_NODE (7)
@@ -288,7 +288,7 @@ export function toVdom( root: Node ): ComponentChild {
 	);
 	nodesToReplace.forEach( ( node: Node ) =>
 		( node as CDATASection ).replaceWith(
-			new window.Text( ( node as CDATASection ).nodeValue ?? '' )
+			new window.Text( ( node as CDATASection ).data )
 		)
 	);
 
