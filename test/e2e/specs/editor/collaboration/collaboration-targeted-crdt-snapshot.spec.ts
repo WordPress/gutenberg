@@ -333,4 +333,54 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 		expect( requests ).toHaveLength( 2 );
 		expect( requests[ 1 ].expected_doc ).toBe( requests[ 0 ].doc );
 	} );
+
+	test( 'repairs the selected occurrence among duplicate contentless blocks', async ( {
+		collaborationUtils,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const post = await requestUtils.createPost( {
+			title: 'Targeted duplicate block repair',
+			content:
+				'<!-- wp:separator --><hr class="wp-block-separator has-alpha-channel-opacity"/><!-- /wp:separator -->\n\n<!-- wp:separator --><hr class="wp-block-separator has-alpha-channel-opacity"/><!-- /wp:separator -->',
+			status: 'draft',
+		} );
+		await collaborationUtils.openPost( post.id );
+
+		const didPersist = await page.evaluate( async ( consent ) => {
+			const { unlock } =
+				window.wp.privateApis.__dangerousOptInToUnstableAPIsOnlyForCoreModules(
+					consent,
+					'@wordpress/core-data'
+				);
+			const editorSelect = window.wp.data.select( 'core/editor' );
+			return unlock(
+				window.wp.data.dispatch( 'core' )
+			).persistEntityBlockAttributes(
+				'postType',
+				editorSelect.getCurrentPostType(),
+				editorSelect.getCurrentPostId(),
+				{
+					record: editorSelect.getCurrentPost(),
+					blockPath: [ 1 ],
+					isMatch: ( block ) => block.name === 'core/separator',
+					matchCount: 2,
+					matchIndex: 1,
+					blockCount: 2,
+					blockName: 'core/separator',
+					attributes: { metadata: { noteId: [ 123 ] } },
+				}
+			);
+		}, CORE_DATA_PRIVATE_APIS_CONSENT );
+
+		expect( didPersist ).toBe( true );
+		await page.reload();
+		await collaborationUtils.waitForEntityReady( page );
+
+		const blocks = await editor.getBlocks();
+		expect( blocks ).toHaveLength( 2 );
+		expect( blocks[ 0 ].attributes.metadata?.noteId ).toBeUndefined();
+		expect( blocks[ 1 ].attributes.metadata?.noteId ).toEqual( [ 123 ] );
+	} );
 } );
