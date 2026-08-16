@@ -327,32 +327,46 @@ Gutenberg uses TypeScript for several reasons, including:
 Gutenberg uses TypeScript by running the TypeScript compiler (`tsc`) on select packages.
 These packages benefit from type checking and produced type declarations in the published packages.
 
-To opt-in to TypeScript tooling, packages should include a `tsconfig.json` file in the package root and add an entry to the root `tsconfig.json` references.
-The changes will indicate that the package has opted in and will be included in the TypeScript build process.
+A package opts in to TypeScript tooling with a `tsconfig.json` in its root, registered in the root `tsconfig.build.json` references.
 
-A `tsconfig.json` file should look like the following (comments are not necessary):
+Packages are being migrated to a two project layout, one package at a time:
+
+-   `tsconfig.build.json` is the build project: it covers `src`, emits declarations to `build-types`, and is what other packages and `npm run build` consume.
+-   `tsconfig.json` is the dev project: it covers test and story files with `noEmit`, so `npm run typecheck` and the IDE can check them without their declarations ending up in the published package.
+
+Both extend shared base configurations (comments are not necessary):
 
 ```jsonc
+// tsconfig.build.json
 {
-	// Extends a base configuration common to most packages
+	// Extends a base configuration common to most packages.
 	"extends": "../../tsconfig.base.json",
 
-	// Options for the TypeScript compiler
-	// We'll usually set our `rootDir` and `declarationDir` as follows, which is specific
-	// to each project.
-	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types"
-	},
-
-	// Which source files should be included
-	"include": [ "src/**/*" ],
-
-	// Other WordPress package dependencies that have opted-in to TypeScript should be listed
-	// here. In this case, our package depends on `@wordpress/dom-ready`.
-	"references": [ { "path": "../dom-ready" } ]
+	// Dependencies that have opted in to TypeScript are referenced here: a
+	// migrated one by its build project, one still on a single config by
+	// its directory.
+	"references": [
+		{ "path": "../dom-ready/tsconfig.build.json" },
+		{ "path": "../hooks" }
+	]
 }
 ```
+
+```jsonc
+// tsconfig.json
+{
+	// Extends the shared dev project configuration (noEmit, jest types,
+	// test and story includes).
+	"extends": "../../tsconfig.dev.base.json",
+
+	// The dev project checks against the build project's declarations.
+	"references": [ { "path": "./tsconfig.build.json" } ]
+}
+```
+
+A migrated package registers both projects at the root: `packages/<name>/tsconfig.build.json` in the root `tsconfig.build.json` references, and `packages/<name>` in the root `tsconfig.json` references.
+
+Ambient types used only by dev files (`@types/jest`, `@types/node`, `@testing-library/jest-dom`) belong in the package's own `devDependencies`, listed via `types` in the dev project, so jest globals do not apply to `src`.
 
 Type declarations will be produced in the `build-types` which should be included in the published package.
 For consumers to use the published type declarations, we'll set the `types` field in `package.json`:

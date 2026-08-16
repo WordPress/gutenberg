@@ -1,8 +1,14 @@
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
 import { useNavigate } from '@wordpress/route';
+import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+import { store as bootStore } from '../../store';
 import type { CanvasData } from '../../store/types';
 import BootBackButton from './back-button';
+import useNavigateToEntityRecord, {
+	useActionPerformed,
+} from './use-navigate-to-entity-record';
 
 interface CanvasProps {
 	canvas: CanvasData;
@@ -18,6 +24,43 @@ interface CanvasProps {
 export default function Canvas( { canvas }: CanvasProps ) {
 	const [ Editor, setEditor ] = useState< any >( null );
 	const navigate = useNavigate();
+	const { onNavigateToEntityRecord, onNavigateToPreviousEntityRecord } =
+		useNavigateToEntityRecord();
+	const onActionPerformed = useActionPerformed( canvas.postType );
+
+	// Where clicking a previewed canvas goes, resolved the same way the editor
+	// resolves anywhere else it sends you to edit an entity.
+	const editLink = useSelect(
+		( select ) =>
+			canvas.postType && canvas.postId
+				? select( bootStore ).getEntityLink(
+						canvas.postType,
+						canvas.postId
+				  )
+				: undefined,
+		[ canvas.postType, canvas.postId ]
+	);
+
+	/*
+	 * Memoized because the editor provider pushes these settings into the store
+	 * whenever their identity changes, and the callbacks have to stay stable for
+	 * the block inspector to keep offering the same affordance.
+	 */
+	const settings = useMemo(
+		() => ( {
+			isPreviewMode: canvas.isPreview,
+			styles: canvas.isPreview
+				? [ { css: 'body{min-height:100vh;}' } ]
+				: [],
+			onNavigateToEntityRecord,
+			onNavigateToPreviousEntityRecord,
+		} ),
+		[
+			canvas.isPreview,
+			onNavigateToEntityRecord,
+			onNavigateToPreviousEntityRecord,
+		]
+	);
 
 	useEffect( () => {
 		// Dynamically import the lazy-editor module
@@ -67,22 +110,18 @@ export default function Canvas( { canvas }: CanvasProps ) {
 				<Editor
 					postType={ canvas.postType }
 					postId={ canvas.postId }
-					settings={ {
-						isPreviewMode: canvas.isPreview,
-						styles: canvas.isPreview
-							? [ { css: 'body{min-height:100vh;}' } ]
-							: [],
-					} }
+					settings={ settings }
 					backButton={ backButton }
+					onActionPerformed={ onActionPerformed }
 				/>
 			</div>
-			{ canvas.isPreview && canvas.editLink && (
+			{ canvas.isPreview && editLink && (
 				<div
-					onClick={ () => navigate( { to: canvas.editLink } ) }
+					onClick={ () => navigate( { to: editLink } ) }
 					onKeyDown={ ( e ) => {
 						if ( e.key === 'Enter' || e.key === ' ' ) {
 							e.preventDefault();
-							navigate( { to: canvas.editLink } );
+							navigate( { to: editLink } );
 						}
 					} }
 					style={ {
@@ -93,7 +132,7 @@ export default function Canvas( { canvas }: CanvasProps ) {
 					} }
 					role="button"
 					tabIndex={ 0 }
-					aria-label="Click to edit"
+					aria-label={ __( 'Edit' ) }
 				/>
 			) }
 		</div>

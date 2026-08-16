@@ -1,58 +1,47 @@
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalSpacer as Spacer,
-	useNavigator,
 	__experimentalView as View,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-	privateApis as componentsPrivateApis,
-	Button,
+	useNavigator,
 	FlexItem,
 	ToggleControl,
 } from '@wordpress/components';
-import { moreVertical } from '@wordpress/icons';
 import { useState, useEffect } from '@wordpress/element';
 import type {
-	TypographyPreset,
+	FontSize as FontSizeType,
 	FluidTypographySettings,
-	FontSize,
 	FluidTypographyConfig,
 } from '@wordpress/global-styles-engine';
-import { ScreenHeader } from '../screen-header';
+import { Stack } from '@wordpress/ui';
 import FontSizePreview from './font-size-preview';
-import ConfirmDeleteFontSizeDialog from './confirm-delete-font-size-dialog';
-import RenameFontSizeDialog from './rename-font-size-dialog';
 import { SizeControl } from '../size-control';
+import { usePresets } from '../presets/use-presets';
 import { useSetting } from '../hooks';
-import { unlock } from '../lock-unlock';
-
-const { Menu } = unlock( componentsPrivateApis );
+import PresetEditHeader from '../presets/preset-edit-header';
+import type { PresetEditHeaderMenuItem } from '../presets/preset-edit-header';
+import ConfirmDeleteDialog from '../presets/dialogs/confirm-delete-dialog';
+import RenameDialog from '../presets/dialogs/rename-dialog';
 
 function FontSize() {
-	const [ isDeleteConfirmOpen, setIsDeleteConfirmOpen ] = useState( false );
-	const [ isRenameDialogOpen, setIsRenameDialogOpen ] = useState( false );
+	const { params, goBack } = useNavigator();
+	const origin = params.origin as string;
+	const slug = params.slug as string;
 
-	const {
-		params: { origin, slug },
-		goBack,
-	} = useNavigator();
-
-	const [ fontSizes, setFontSizes ] = useSetting<
-		Record< string, TypographyPreset[] > | undefined
-	>( 'typography.fontSizes' );
+	const { presets, setPresets } = usePresets< FontSizeType >(
+		'typography.fontSizes',
+		origin
+	);
 	const [ globalFluid ] = useSetting<
 		boolean | FluidTypographySettings | undefined
 	>( 'typography.fluid' );
 
-	// Get the font sizes from the origin, default to empty array.
-	const sizes = fontSizes?.[ origin as string ] ?? [];
+	const fontSize = presets.find( ( s ) => s.slug === slug );
 
-	// Get the font size by slug.
-	const fontSize: FontSize | undefined = sizes.find(
-		( size ) => size.slug === slug
-	);
+	const [ isDeleteOpen, setIsDeleteOpen ] = useState( false );
+	const [ isRenameOpen, setIsRenameOpen ] = useState( false );
 
-	// Navigate to the font sizes list if the font size is not available.
+	// The preset can disappear while its screen is open, e.g. when presets are
+	// reset globally. Navigate back to the font sizes list in that case.
 	useEffect( () => {
 		if ( !! slug && ! fontSize ) {
 			goBack();
@@ -63,159 +52,74 @@ function FontSize() {
 		return null;
 	}
 
-	// Whether the font size is fluid. If not defined, use the global fluid value of the theme.
 	const isFluid =
-		fontSize?.fluid !== undefined ? !! fontSize.fluid : !! globalFluid;
+		fontSize.fluid !== undefined ? !! fontSize.fluid : !! globalFluid;
+	const isCustomFluid = typeof fontSize.fluid === 'object';
 
-	// Whether custom fluid values are used.
-	const isCustomFluid = typeof fontSize?.fluid === 'object';
-
-	const handleNameChange = ( value: string ) => {
-		updateFontSize( 'name', value );
-	};
-
-	const handleFontSizeChange = ( value: string | undefined ) => {
-		updateFontSize( 'size', value );
-	};
-
-	const handleFluidChange = ( value: boolean ) => {
-		updateFontSize( 'fluid', value );
-	};
+	const set = ( key: keyof FontSizeType, value: unknown ) =>
+		setPresets(
+			presets.map( ( p ) =>
+				p.slug === slug
+					? ( { ...fontSize, [ key ]: value } as FontSizeType )
+					: p
+			)
+		);
 
 	const handleCustomFluidValues = ( value: boolean ) => {
 		if ( value ) {
-			// If custom values are used, init the values with the current ones.
-			updateFontSize( 'fluid', {
-				min: fontSize.size,
-				max: fontSize.size,
-			} );
+			set( 'fluid', { min: fontSize.size, max: fontSize.size } );
 		} else {
-			// If custom fluid values are disabled, set fluid to true.
-			updateFontSize( 'fluid', true );
+			set( 'fluid', true );
 		}
 	};
-
 	const handleMinChange = ( value: string | undefined ) => {
 		const fluid: FluidTypographyConfig =
 			typeof fontSize.fluid === 'object' ? fontSize.fluid : {};
-		updateFontSize( 'fluid', { ...fluid, min: value } );
+		set( 'fluid', { ...fluid, min: value } );
 	};
-
 	const handleMaxChange = ( value: string | undefined ) => {
 		const fluid: FluidTypographyConfig =
 			typeof fontSize.fluid === 'object' ? fontSize.fluid : {};
-		updateFontSize( 'fluid', { ...fluid, max: value } );
+		set( 'fluid', { ...fluid, max: value } );
 	};
 
-	const updateFontSize = ( key: string, value: any ) => {
-		const newFontSizes = sizes.map( ( size ) => {
-			if ( size.slug === slug ) {
-				return { ...size, [ key ]: value }; // Create a new object with updated key
-			}
-			return size;
-		} );
-
-		setFontSizes( {
-			...fontSizes,
-			[ origin as string ]: newFontSizes,
-		} );
-	};
-
-	const handleRemoveFontSize = () => {
-		const newFontSizes = sizes.filter( ( size ) => size.slug !== slug );
-		setFontSizes( {
-			...fontSizes,
-			[ origin as string ]: newFontSizes,
-		} );
-	};
-
-	const toggleDeleteConfirm = () => {
-		setIsDeleteConfirmOpen( ! isDeleteConfirmOpen );
-	};
-
-	const toggleRenameDialog = () => {
-		setIsRenameDialogOpen( ! isRenameDialogOpen );
-	};
+	const menuItems: PresetEditHeaderMenuItem[] =
+		origin === 'custom'
+			? [
+					{
+						label: __( 'Rename' ),
+						onClick: () => setIsRenameOpen( true ),
+					},
+					{
+						label: __( 'Delete' ),
+						onClick: () => setIsDeleteOpen( true ),
+					},
+			  ]
+			: [];
 
 	return (
 		<>
-			<ConfirmDeleteFontSizeDialog
-				fontSize={ fontSize }
-				isOpen={ isDeleteConfirmOpen }
-				toggleOpen={ toggleDeleteConfirm }
-				handleRemoveFontSize={ handleRemoveFontSize }
-			/>
-
-			{ isRenameDialogOpen && (
-				<RenameFontSizeDialog
-					fontSize={ fontSize }
-					toggleOpen={ toggleRenameDialog }
-					handleRename={ handleNameChange }
-				/>
-			) }
-
-			<VStack spacing={ 4 }>
-				<HStack justify="space-between" alignment="flex-start">
-					<ScreenHeader
-						title={ fontSize.name }
-						description={ sprintf(
-							/* translators: %s: font size preset name. */
-							__( 'Manage the font size %s.' ),
-							fontSize.name
-						) }
-					/>
-					{ origin === 'custom' && (
-						<FlexItem>
-							<Spacer
-								marginTop={ 3 }
-								marginBottom={ 0 }
-								paddingX={ 4 }
-							>
-								<Menu>
-									<Menu.TriggerButton
-										render={
-											<Button
-												size="small"
-												icon={ moreVertical }
-												label={ __(
-													'Font size options'
-												) }
-											/>
-										}
-									/>
-									<Menu.Popover>
-										<Menu.Item
-											onClick={ toggleRenameDialog }
-										>
-											<Menu.ItemLabel>
-												{ __( 'Rename' ) }
-											</Menu.ItemLabel>
-										</Menu.Item>
-										<Menu.Item
-											onClick={ toggleDeleteConfirm }
-										>
-											<Menu.ItemLabel>
-												{ __( 'Delete' ) }
-											</Menu.ItemLabel>
-										</Menu.Item>
-									</Menu.Popover>
-								</Menu>
-							</Spacer>
-						</FlexItem>
+			<Stack direction="column" gap="md">
+				<PresetEditHeader
+					title={ fontSize.name }
+					description={ sprintf(
+						/* translators: %s: font size preset name. */
+						__( 'Manage the font size %s.' ),
+						fontSize.name
 					) }
-				</HStack>
-
+					menuLabel={ __( 'Font size options' ) }
+					menuItems={ menuItems }
+				/>
 				<View>
 					<Spacer
 						paddingX={ 4 }
 						marginBottom={ 0 }
 						paddingBottom={ 6 }
 					>
-						<VStack spacing={ 4 }>
+						<Stack direction="column" gap="md">
 							<FlexItem>
 								<FontSizePreview fontSize={ fontSize } />
 							</FlexItem>
-
 							<SizeControl
 								label={ __( 'Size' ) }
 								value={
@@ -223,19 +127,17 @@ function FontSize() {
 										? String( fontSize.size )
 										: ''
 								}
-								onChange={ handleFontSizeChange }
+								onChange={ ( value ) => set( 'size', value ) }
 								disabled={ isCustomFluid }
 							/>
-
 							<ToggleControl
 								label={ __( 'Fluid typography' ) }
 								help={ __(
 									'Scale the font size dynamically to fit the screen or viewport.'
 								) }
 								checked={ isFluid }
-								onChange={ handleFluidChange }
+								onChange={ ( value ) => set( 'fluid', value ) }
 							/>
-
 							{ isFluid && (
 								<ToggleControl
 									label={ __( 'Custom fluid values' ) }
@@ -246,13 +148,12 @@ function FontSize() {
 									onChange={ handleCustomFluidValues }
 								/>
 							) }
-
 							{ isCustomFluid && (
 								<>
 									<SizeControl
 										label={ __( 'Minimum' ) }
 										value={
-											typeof fontSize?.fluid === 'object'
+											typeof fontSize.fluid === 'object'
 												? fontSize.fluid?.min
 												: undefined
 										}
@@ -261,7 +162,7 @@ function FontSize() {
 									<SizeControl
 										label={ __( 'Maximum' ) }
 										value={
-											typeof fontSize?.fluid === 'object'
+											typeof fontSize.fluid === 'object'
 												? fontSize.fluid?.max
 												: undefined
 										}
@@ -269,10 +170,43 @@ function FontSize() {
 									/>
 								</>
 							) }
-						</VStack>
+						</Stack>
 					</Spacer>
 				</View>
-			</VStack>
+			</Stack>
+			{ isDeleteOpen && (
+				<ConfirmDeleteDialog
+					message={ sprintf(
+						/* translators: %s: Name of the font size preset. */
+						__(
+							'Are you sure you want to delete "%s" font size preset?'
+						),
+						fontSize.name
+					) }
+					isOpen={ isDeleteOpen }
+					toggleOpen={ () => setIsDeleteOpen( false ) }
+					onConfirm={ () => {
+						setPresets(
+							presets.filter( ( p ) => p.slug !== slug )
+						);
+						goBack();
+					} }
+				/>
+			) }
+			{ isRenameOpen && (
+				<RenameDialog
+					initialName={ fontSize.name }
+					placeholder={ __( 'Font size preset name' ) }
+					toggleOpen={ () => setIsRenameOpen( false ) }
+					onRename={ ( name ) =>
+						setPresets(
+							presets.map( ( p ) =>
+								p.slug === slug ? { ...p, name } : p
+							)
+						)
+					}
+				/>
+			) }
 		</>
 	);
 }
