@@ -10,15 +10,11 @@
 	background: $white;
 	display: grid;
 	grid-auto-flow: row;
-	// Compact by default so the first track matches the icon-only back button.
-	// Grow to the label when "Show button text labels" is on; a fixed track
-	// would clip the button and let the toolbar overlap it.
-	--wp-editor-header-start-column: #{$button-size-compact};
-	grid-template: auto / var(--wp-editor-header-start-column) minmax(0, max-content) minmax(min-content, 1fr) $header-height;
+	grid-template: auto / $button-size-compact minmax(0, max-content) minmax(min-content, 1fr) $header-height;
 	&:has(> .editor-header__center) {
-		grid-template: auto / var(--wp-editor-header-start-column) min-content 1fr min-content $header-height;
+		grid-template: auto / $button-size-compact min-content 1fr min-content $header-height;
 		@include break-medium {
-			grid-template: auto / var(--wp-editor-header-start-column) minmax(min-content, 2fr) 2.5fr minmax(min-content, 2fr) $header-height;
+			grid-template: auto / $button-size-compact minmax(min-content, 2fr) 2.5fr minmax(min-content, 2fr) $header-height;
 		}
 	}
 	@include break-mobile {
@@ -131,8 +127,15 @@
  * Show icon labels.
  */
 
+// Grow the first track to the labeled back button so the toolbar does not overlap it.
 .show-icon-labels .editor-header:has(> .editor-header__back-button) {
-	--wp-editor-header-start-column: max-content;
+	grid-template: auto / max-content minmax(0, max-content) minmax(min-content, 1fr) $header-height;
+	&:has(> .editor-header__center) {
+		grid-template: auto / max-content min-content 1fr min-content $header-height;
+		@include break-medium {
+			grid-template: auto / max-content minmax(min-content, 2fr) 2.5fr minmax(min-content, 2fr) $header-height;
+		}
+	}
 }
 
 .show-icon-labels.interface-pinned-items,
