@@ -29,6 +29,51 @@ import { getComputedAcceptAttribute } from '../media-placeholder/utils';
 const noop = () => {};
 let uniqueId = 0;
 
+/**
+ * A component that implements a replacement flow for various media objects.
+ *
+ * @example
+ * ```jsx
+ * function Example() {
+ *   const [ mediaURL, setMediaURL ] = useState( 'https://example.media' );
+ *
+ *   return (
+ *     <BlockControls>
+ *       <MediaReplaceFlow
+ *         allowedTypes={ [ 'png' ] }
+ *         accept="image/*"
+ *         mediaURL={ mediaURL }
+ *         onSelectURL={ setMediaURL }
+ *       />
+ *     </BlockControls>
+ *   );
+ * }
+ * ```
+ *
+ * @param {Object}   props                       The component props.
+ * @param {string}   props.mediaURL              The URL of the media.
+ * @param {number}   props.mediaId               The Id of the attachment post type for the current media.
+ * @param {Array}    props.mediaIds              The Ids of the attachments post type for the current media.
+ * @param {Array}    props.allowedTypes          A list of media types allowed to replace the current media.
+ * @param {string}   props.accept                The mime type of the media.
+ * @param {Function} props.onError               Callback called when an upload error happens and receives an error message as an argument.
+ * @param {Function} props.onSelect              Callback used when media is replaced from the Media Library or when a new media is uploaded. It is called with one argument `media` which is an object with all the media details.
+ * @param {Function} props.onSelectURL           Callback used when media URL is selected.
+ * @param {Function} props.onReset               Callback used when the media should be reset.
+ * @param {Function} props.onToggleFeaturedImage Callback used when the featured image should be toggled.
+ * @param {boolean}  props.useFeaturedImage      Whether the featured image is currently used.
+ * @param {Function} props.onFilesUpload         Callback called before to start to upload the files. It receives an array with the files to upload before to the final process.
+ * @param {string}   props.name                  A `string` value will be used as the label of the replace button. It can also accept `Phrasing content` elements(ex. `span`).
+ * @param {Function} props.createNotice          Creates a media replace notice.
+ * @param {Function} props.removeNotice          Removes a media replace notice.
+ * @param {Element}  props.children              If passed, children are rendered inside the dropdown.
+ * @param {boolean}  props.multiple              If multiple is true, the user can select multiple images from the media library.
+ * @param {boolean}  props.addToGallery          If true, the user can add the selected images to the gallery.
+ * @param {boolean}  props.handleUpload          Whether the component should handle the upload process.
+ * @param {Object}   props.popoverProps          The props to be passed to the `Popover` component.
+ *
+ * @return {Element} The component to be rendered.
+ */
 const MediaReplaceFlow = ( {
 	mediaURL,
 	mediaId,
