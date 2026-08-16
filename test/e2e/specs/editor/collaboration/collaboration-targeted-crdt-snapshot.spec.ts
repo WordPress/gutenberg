@@ -272,18 +272,19 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 			content:
 				'<!-- wp:paragraph --><p>Queued persistence base.</p><!-- /wp:paragraph -->',
 			status: 'draft',
+			date_gmt: new Date().toISOString(),
 		} );
 		await collaborationUtils.openPost( post.id );
 
-		let releaseFirstSave;
+		let releaseFirstSave!: () => void;
 		const firstSaveReleased = new Promise< void >( ( resolve ) => {
 			releaseFirstSave = resolve;
 		} );
-		let markFirstSaveStarted;
+		let markFirstSaveStarted!: () => void;
 		const firstSaveStarted = new Promise< void >( ( resolve ) => {
 			markFirstSaveStarted = resolve;
 		} );
-		const requests = [];
+		const requests: Array< { doc: string; expected_doc: string } > = [];
 		await page.route( '**/*', async ( route ) => {
 			const request = route.request();
 			const url = new URL( request.url() );
@@ -314,7 +315,10 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 				);
 			const editorSelect = window.wp.data.select( 'core/editor' );
 			const dispatch = unlock( window.wp.data.dispatch( 'core' ) );
-			window.__firstQueuedSave = dispatch.persistEntityCRDTDoc(
+			const queuedWindow = window as typeof window & {
+				__firstQueuedSave: Promise< boolean >;
+			};
+			queuedWindow.__firstQueuedSave = dispatch.persistEntityCRDTDoc(
 				'postType',
 				editorSelect.getCurrentPostType(),
 				editorSelect.getCurrentPostId()
@@ -329,7 +333,10 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 				);
 			const editorSelect = window.wp.data.select( 'core/editor' );
 			const dispatch = unlock( window.wp.data.dispatch( 'core' ) );
-			window.__secondQueuedSave = dispatch.persistEntityCRDTDoc(
+			const queuedWindow = window as typeof window & {
+				__secondQueuedSave: Promise< boolean >;
+			};
+			queuedWindow.__secondQueuedSave = dispatch.persistEntityCRDTDoc(
 				'postType',
 				editorSelect.getCurrentPostType(),
 				editorSelect.getCurrentPostId()
@@ -338,12 +345,16 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 
 		expect( requests ).toHaveLength( 1 );
 		releaseFirstSave();
-		await page.evaluate( () =>
-			Promise.all( [
-				window.__firstQueuedSave,
-				window.__secondQueuedSave,
-			] )
-		);
+		await page.evaluate( () => {
+			const queuedWindow = window as typeof window & {
+				__firstQueuedSave: Promise< boolean >;
+				__secondQueuedSave: Promise< boolean >;
+			};
+			return Promise.all( [
+				queuedWindow.__firstQueuedSave,
+				queuedWindow.__secondQueuedSave,
+			] );
+		} );
 
 		expect( requests ).toHaveLength( 2 );
 		expect( requests[ 1 ].expected_doc ).toBe( requests[ 0 ].doc );
