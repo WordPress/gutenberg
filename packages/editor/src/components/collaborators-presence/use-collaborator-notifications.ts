@@ -10,6 +10,7 @@ import {
 import { store as preferencesStore } from '@wordpress/preferences';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
+import { getCollaboratorDisplayName } from '../../utils/get-collaborator-display-name';
 
 const { useOnCollaboratorJoin, useOnCollaboratorLeave, useOnPostSave } =
 	unlock( privateApis );
@@ -148,7 +149,9 @@ export function useCollaboratorNotifications(
 					sprintf(
 						/* translators: %s: collaborator display name */
 						__( '%s has joined the post.' ),
-						collaborator.collaboratorInfo.name
+						getCollaboratorDisplayName(
+							collaborator.collaboratorInfo
+						)
 					),
 					{
 						id: `${ NOTIFICATION_TYPE.COLLAB_USER_ENTERED }-${
@@ -178,7 +181,9 @@ export function useCollaboratorNotifications(
 					sprintf(
 						/* translators: %s: collaborator display name */
 						__( '%s has left the post.' ),
-						collaborator.collaboratorInfo.name
+						getCollaboratorDisplayName(
+							collaborator.collaboratorInfo
+						)
 					),
 					{
 						id: `${ NOTIFICATION_TYPE.COLLAB_USER_EXITED }-${
@@ -221,7 +226,7 @@ export function useCollaboratorNotifications(
 					) && PUBLISHED_STATUSES.includes( effectiveStatus );
 
 				const message = getPostUpdatedMessage(
-					saver.collaboratorInfo.name,
+					getCollaboratorDisplayName( saver.collaboratorInfo ),
 					effectiveStatus,
 					isFirstPublish
 				);

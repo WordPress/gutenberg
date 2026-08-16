@@ -372,7 +372,7 @@ describe( 'Awareness Utils', () => {
 			jest.spyOn( Date, 'now' ).mockReturnValue( 1704067200000 );
 		} );
 
-		test( 'creates fallback information when the user is unavailable', () => {
+		test( 'stores a canonical fallback name when the user is unavailable', () => {
 			const collaboratorInfo = generateCollaboratorInfo( undefined, 9 );
 
 			expect( collaboratorInfo ).toEqual( {

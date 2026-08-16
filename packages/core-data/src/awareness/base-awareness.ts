@@ -21,8 +21,9 @@ export abstract class BaseAwarenessState<
 		try {
 			currentUser = await resolveSelect( coreStore ).getCurrentUser();
 		} catch {
-			// Any user-resolution failure leaves collaboration usable with a
-			// fallback identity. Authorization remains the provider's responsibility.
+			// Fall through with an undefined user so a fallback collaborator
+			// identity is generated below. Authorization remains the provider's
+			// responsibility.
 		}
 
 		this.setLocalStateField(

@@ -13,6 +13,7 @@ import {
 	useRequestAnimationFrameRecompute,
 } from './use-debounced-recompute';
 import { getOrderedBlockRange } from './cursor-dom-utils';
+import { getCollaboratorDisplayName } from '../../utils/get-collaborator-display-name';
 
 const { useActiveCollaborators, useResolvedSelection } =
 	unlock( coreDataPrivateApis );
@@ -138,7 +139,9 @@ export function useBlockHighlighting(
 								userState.collaboratorInfo.id ??
 									userState.clientId
 							),
-							userName: userState.collaboratorInfo.name,
+							userName: getCollaboratorDisplayName(
+								userState.collaboratorInfo
+							),
 							avatarUrl: getAvatarUrl(
 								userState.collaboratorInfo.avatar_urls
 							),
@@ -177,7 +180,9 @@ export function useBlockHighlighting(
 				const color = getAvatarBorderColor(
 					userState.collaboratorInfo.id ?? userState.clientId
 				);
-				const userName = userState.collaboratorInfo.name;
+				const userName = getCollaboratorDisplayName(
+					userState.collaboratorInfo
+				);
 				const avatarUrl = getAvatarUrl(
 					userState.collaboratorInfo.avatar_urls
 				);

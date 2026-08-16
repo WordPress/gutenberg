@@ -1,4 +1,3 @@
-import { __ } from '@wordpress/i18n';
 import type { CollaboratorInfo } from './types';
 
 /**
@@ -184,7 +183,9 @@ export function generateCollaboratorInfo(
 	return {
 		...presentationInfo,
 		id: null,
-		name: __( 'Anonymous User' ),
+		// Keep shared awareness data language-neutral. The editor localizes this
+		// fallback name for the viewer when it is displayed.
+		name: 'Anonymous User',
 		slug: `anonymous-${ clientId }`,
 	};
 }
