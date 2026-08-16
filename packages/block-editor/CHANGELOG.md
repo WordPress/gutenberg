@@ -41,6 +41,7 @@
 
 ### Bug Fixes
 
+-   `usePopoverScroll`: Prevent the default action on the wheel events it forwards into the canvas. Block popovers render outside the canvas iframe, in a document with no room to scroll, so the browser would start a mousewheel transaction against a target it could never scroll and drop subsequent wheel events until the pointer moved. Scrolling with the pointer over the in-between block inserter froze for several seconds as a result ([#81415](https://github.com/WordPress/gutenberg/pull/81415)).
 -   `isBlockSelected`: Return `false` when called without a client ID, instead of matching the `undefined` client ID of an empty selection ([#81212](https://github.com/WordPress/gutenberg/pull/81212)).
 -   `URLInput`: Collapse a text selection reaching the start of the field before letting an up arrow press through to the editor, so selecting to the start and pressing up no longer navigates out of the field instead of collapsing the caret ([#80780](https://github.com/WordPress/gutenberg/pull/80780)).
 -   `URLInput`: Leave Shift-modified arrow keys to the browser, so extending a selection with Shift+Up or Shift+Down no longer collapses it to the start or end of the field ([#80780](https://github.com/WordPress/gutenberg/pull/80780)).
