@@ -8,7 +8,7 @@ For information on creating and managing packages in Gutenberg, see the [package
 
 Packages are the first layer of architecture in Gutenberg. Each package should have a single, clear purpose, include a README, document prerequisites and public APIs, and avoid utility/kitchen-sink patterns. Default to bundled packages unless globals or modules are necessary.
 
-For complete guidelines, see the [package guidelines](#package-guidelines) in the packages README.
+For complete guidelines, see the [package guidelines](/docs/reference-guides/packages.md#package-guidelines) in the packages README.
 
 ## Using the packages via WordPress global
 
