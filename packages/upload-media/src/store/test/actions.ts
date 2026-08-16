@@ -1687,6 +1687,60 @@ describe( 'actions', () => {
 			expect( vipsResizeImage ).toHaveBeenCalled();
 		} );
 
+		it( 'enables smart crop when the setting is on', async () => {
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				smartCrop: true,
+			} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			const { vipsResizeImage } = require( '../utils' );
+			( vipsResizeImage as jest.Mock ).mockClear();
+
+			await unlock( registry.dispatch( uploadStore ) ).resizeCropItem(
+				item.id,
+				{ resize: { width: 100, height: 100, crop: true } }
+			);
+
+			expect( vipsResizeImage ).toHaveBeenCalledWith(
+				expect.anything(),
+				expect.anything(),
+				expect.anything(),
+				expect.objectContaining( { smartCrop: true } )
+			);
+		} );
+
+		it( 'defaults smart crop to false when the setting is unset', async () => {
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			const { vipsResizeImage } = require( '../utils' );
+			( vipsResizeImage as jest.Mock ).mockClear();
+
+			await unlock( registry.dispatch( uploadStore ) ).resizeCropItem(
+				item.id,
+				{ resize: { width: 100, height: 100, crop: true } }
+			);
+
+			expect( vipsResizeImage ).toHaveBeenCalledWith(
+				expect.anything(),
+				expect.anything(),
+				expect.anything(),
+				expect.objectContaining( { smartCrop: false } )
+			);
+		} );
+
 		it( 'skips resize when no resize args are provided', async () => {
 			unlock( registry.dispatch( uploadStore ) ).addItem( {
 				file: jpegFile,

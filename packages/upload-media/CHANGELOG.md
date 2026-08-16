@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add a `smartCrop` setting that positions hard-cropped image sizes using libvips' saliency-aware `attention` strategy instead of cropping from the center. Only sizes registered with `crop => true` are affected; positional crops and soft resizes are unchanged. Off by default, and gated in the Gutenberg plugin by the "Smart cropping of image sizes" experiment ([#81706](https://github.com/WordPress/gutenberg/issues/81706)).
+
 ## 0.38.0 (2026-08-12)
 
 ### Enhancements

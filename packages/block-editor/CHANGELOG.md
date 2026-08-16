@@ -4,6 +4,7 @@
 
 ### New Features
 
+-   Forward a `smartCrop` media upload setting, derived from the `gutenberg-media-smart-crop` experiment, so hard-cropped image sizes can be positioned around the most visually interesting part of the image during client-side processing ([#81706](https://github.com/WordPress/gutenberg/issues/81706)).
 -   Register and handle the keyboard shortcuts that blocks declare on their variations and transforms, so that any block can contribute a shortcut without the editor knowing about it. Shortcuts apply to the selected block, and are listed under "Block shortcuts" in the keyboard shortcuts help modal ([#81588](https://github.com/WordPress/gutenberg/pull/81588)).
 
 ### Bug Fixes

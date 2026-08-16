@@ -20,6 +20,9 @@ function useMediaUploadSettings( settings = {} ) {
 			bigImageSizeThreshold: settings.bigImageSizeThreshold,
 			imageStripMeta: settings.imageStripMeta,
 			imageMaxBitDepth: settings.imageMaxBitDepth,
+			// Gated by the `gutenberg-media-smart-crop` experiment rather than an
+			// editor setting, so it is read from the global set in PHP.
+			smartCrop: Boolean( window.__experimentalMediaSmartCrop ),
 		} ),
 		[ settings ]
 	);

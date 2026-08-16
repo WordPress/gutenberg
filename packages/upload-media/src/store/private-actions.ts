@@ -1137,7 +1137,10 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 
 		// Metadata stripping and bit depth cap from the `image_strip_meta`
 		// and `image_max_bit_depth` filters, carried in the editor settings.
-		const { imageStripMeta, imageMaxBitDepth } = select.getSettings();
+		// `smartCrop` is gated by the `gutenberg-media-smart-crop` experiment and
+		// only takes effect for sizes registered with `crop => true`.
+		const { imageStripMeta, imageMaxBitDepth, smartCrop } =
+			select.getSettings();
 
 		try {
 			const file = await vipsResizeImage(
@@ -1145,7 +1148,7 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 				item.file,
 				args.resize,
 				{
-					smartCrop: false,
+					smartCrop: smartCrop ?? false,
 					addSuffix,
 					signal: item.abortController?.signal,
 					scaledSuffix,

@@ -55,6 +55,11 @@ function gutenberg_initialize_experiments_settings() {
 					'label'       => __( 'Media Upload Modal', 'gutenberg' ),
 					'description' => __( 'Replaces the existing WordPress media modal with a new modal powered by Data Views, supporting browsing, selecting, and uploading media.', 'gutenberg' ),
 				),
+				array(
+					'id'          => 'gutenberg-media-smart-crop',
+					'label'       => __( 'Smart cropping of image sizes', 'gutenberg' ),
+					'description' => __( 'Positions hard-cropped image sizes around the most visually interesting part of the image instead of the center, during client-side media processing. Applies to newly uploaded images only.', 'gutenberg' ),
+				),
 			),
 		),
 		array(
