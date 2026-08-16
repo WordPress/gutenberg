@@ -15,6 +15,7 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 			content:
 				'<!-- wp:paragraph --><p>Original persisted content.</p><!-- /wp:paragraph -->',
 			status: 'draft',
+			date_gmt: new Date().toISOString(),
 		} );
 		await collaborationUtils.openPost( post.id );
 
