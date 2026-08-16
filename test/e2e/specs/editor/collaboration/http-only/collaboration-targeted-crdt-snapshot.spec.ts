@@ -312,7 +312,11 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 				markFirstSaveStarted();
 				await firstSaveReleased;
 			}
-			await route.continue();
+			await route.fulfill( {
+				status: 200,
+				contentType: 'application/json',
+				body: '{}',
+			} );
 		} );
 
 		await page.evaluate( ( consent ) => {
