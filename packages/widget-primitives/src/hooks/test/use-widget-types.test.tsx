@@ -98,6 +98,31 @@ const moduleLessRecords: WidgetModuleRecord[] = [
 	},
 ];
 
+const PARAGRAPH = '<!-- wp:paragraph --><p>x</p><!-- /wp:paragraph -->';
+
+const codeRegisteredRecords: WidgetModuleRecord[] = [
+	{
+		name: 'test/code-def',
+		widget_module: null,
+		render_module: null,
+		origin: 'code-registered',
+		title: 'Code def',
+		description: 'Declared in PHP.',
+		content: PARAGRAPH,
+	},
+];
+
+const cptRecords: WidgetModuleRecord[] = [
+	{
+		name: 'test/cpt-def',
+		widget_module: null,
+		origin: 'cpt',
+		definition_id: 42,
+		title: 'Recent',
+		content: PARAGRAPH,
+	},
+];
+
 const stringIconRecords: WidgetModuleRecord[] = [
 	{
 		name: 'test/string-icon',
@@ -197,6 +222,48 @@ describe( 'useWidgetTypes', () => {
 
 		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
 		expect( result.current[ 0 ] ).toHaveLength( 0 );
+	} );
+
+	it( 'resolves a server-defined record from its inline content', async () => {
+		const { result } = renderHook( () =>
+			useWidgetTypes( codeRegisteredRecords )
+		);
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+
+		expect( result.current[ 0 ][ 0 ] ).toMatchObject( {
+			name: 'test/code-def',
+			apiVersion: 1,
+			renderModule: '',
+			origin: 'code-registered',
+			title: 'Code def',
+			description: 'Declared in PHP.',
+			content: PARAGRAPH,
+		} );
+	} );
+
+	it( 'maps definition_id to definitionId for a cpt record', async () => {
+		const { result } = renderHook( () => useWidgetTypes( cptRecords ) );
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+
+		expect( result.current[ 0 ][ 0 ] ).toMatchObject( {
+			origin: 'cpt',
+			definitionId: 42,
+			content: PARAGRAPH,
+		} );
+	} );
+
+	it( 'omits server-defined fields the record does not carry', async () => {
+		const { result } = renderHook( () =>
+			useWidgetTypes( moduleLessRecords )
+		);
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+
+		expect( result.current[ 0 ][ 0 ] ).not.toHaveProperty( 'origin' );
+		expect( result.current[ 0 ][ 0 ] ).not.toHaveProperty( 'definitionId' );
+		expect( result.current[ 0 ][ 0 ] ).not.toHaveProperty( 'content' );
 	} );
 
 	it( 'prefers the resolved record icon over the module element', async () => {
