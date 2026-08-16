@@ -371,6 +371,7 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 			content:
 				'<!-- wp:separator --><hr class="wp-block-separator has-alpha-channel-opacity"/><!-- /wp:separator -->\n\n<!-- wp:separator --><hr class="wp-block-separator has-alpha-channel-opacity"/><!-- /wp:separator -->',
 			status: 'draft',
+			date_gmt: new Date().toISOString(),
 		} );
 		await collaborationUtils.openPost( post.id );
 
@@ -390,7 +391,8 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 				{
 					record: editorSelect.getCurrentPost(),
 					blockPath: [ 1 ],
-					isMatch: ( block ) => block.name === 'core/separator',
+					isMatch: ( block: { name: string } ) =>
+						block.name === 'core/separator',
 					matchCount: 2,
 					matchIndex: 1,
 					blockCount: 2,
@@ -406,7 +408,11 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 
 		const blocks = await editor.getBlocks();
 		expect( blocks ).toHaveLength( 2 );
-		expect( blocks[ 0 ].attributes.metadata?.noteId ).toBeUndefined();
-		expect( blocks[ 1 ].attributes.metadata?.noteId ).toEqual( [ 123 ] );
+		const metadata = blocks.map(
+			( block ) =>
+				block.attributes.metadata as { noteId?: number[] } | undefined
+		);
+		expect( metadata[ 0 ]?.noteId ).toBeUndefined();
+		expect( metadata[ 1 ]?.noteId ).toEqual( [ 123 ] );
 	} );
 } );
