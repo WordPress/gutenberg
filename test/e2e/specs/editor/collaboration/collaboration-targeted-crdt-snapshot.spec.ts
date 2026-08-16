@@ -15,6 +15,7 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 			content:
 				'<!-- wp:paragraph --><p>Original persisted content.</p><!-- /wp:paragraph -->',
 			status: 'draft',
+			date_gmt: new Date().toISOString(),
 		} );
 		await collaborationUtils.openPost( post.id );
 
@@ -88,6 +89,7 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 			content:
 				'<!-- wp:paragraph --><p>Conflict base.</p><!-- /wp:paragraph -->',
 			status: 'draft',
+			date_gmt: new Date().toISOString(),
 		} );
 		await collaborationUtils.openPost( post.id );
 
@@ -141,7 +143,13 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 						},
 					} );
 				} catch ( error ) {
-					conflictCode = error.code;
+					if (
+						error &&
+						typeof error === 'object' &&
+						'code' in error
+					) {
+						conflictCode = String( error.code );
+					}
 				}
 				const finalRecord = await window.wp.apiFetch( {
 					path: `/wp/v2/posts/${ postId }?context=edit`,
@@ -169,6 +177,7 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 			content:
 				'<!-- wp:paragraph --><p>Atomic content base.</p><!-- /wp:paragraph -->',
 			status: 'draft',
+			date_gmt: new Date().toISOString(),
 		} );
 		await collaborationUtils.openPost( post.id );
 
@@ -226,7 +235,13 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 						},
 					} );
 				} catch ( error ) {
-					conflictCode = error.code;
+					if (
+						error &&
+						typeof error === 'object' &&
+						'code' in error
+					) {
+						conflictCode = String( error.code );
+					}
 				}
 				const finalRecord = await window.wp.apiFetch( {
 					path: `/wp/v2/posts/${ postId }?context=edit`,
@@ -257,18 +272,19 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 			content:
 				'<!-- wp:paragraph --><p>Queued persistence base.</p><!-- /wp:paragraph -->',
 			status: 'draft',
+			date_gmt: new Date().toISOString(),
 		} );
 		await collaborationUtils.openPost( post.id );
 
-		let releaseFirstSave;
+		let releaseFirstSave!: () => void;
 		const firstSaveReleased = new Promise< void >( ( resolve ) => {
 			releaseFirstSave = resolve;
 		} );
-		let markFirstSaveStarted;
+		let markFirstSaveStarted!: () => void;
 		const firstSaveStarted = new Promise< void >( ( resolve ) => {
 			markFirstSaveStarted = resolve;
 		} );
-		const requests = [];
+		const requests: Array< { doc: string; expected_doc: string } > = [];
 		await page.route( '**/*', async ( route ) => {
 			const request = route.request();
 			const url = new URL( request.url() );
@@ -299,7 +315,10 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 				);
 			const editorSelect = window.wp.data.select( 'core/editor' );
 			const dispatch = unlock( window.wp.data.dispatch( 'core' ) );
-			window.__firstQueuedSave = dispatch.persistEntityCRDTDoc(
+			const queuedWindow = window as typeof window & {
+				__firstQueuedSave: Promise< boolean >;
+			};
+			queuedWindow.__firstQueuedSave = dispatch.persistEntityCRDTDoc(
 				'postType',
 				editorSelect.getCurrentPostType(),
 				editorSelect.getCurrentPostId()
@@ -314,7 +333,10 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 				);
 			const editorSelect = window.wp.data.select( 'core/editor' );
 			const dispatch = unlock( window.wp.data.dispatch( 'core' ) );
-			window.__secondQueuedSave = dispatch.persistEntityCRDTDoc(
+			const queuedWindow = window as typeof window & {
+				__secondQueuedSave: Promise< boolean >;
+			};
+			queuedWindow.__secondQueuedSave = dispatch.persistEntityCRDTDoc(
 				'postType',
 				editorSelect.getCurrentPostType(),
 				editorSelect.getCurrentPostId()
@@ -323,12 +345,16 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 
 		expect( requests ).toHaveLength( 1 );
 		releaseFirstSave();
-		await page.evaluate( () =>
-			Promise.all( [
-				window.__firstQueuedSave,
-				window.__secondQueuedSave,
-			] )
-		);
+		await page.evaluate( () => {
+			const queuedWindow = window as typeof window & {
+				__firstQueuedSave: Promise< boolean >;
+				__secondQueuedSave: Promise< boolean >;
+			};
+			return Promise.all( [
+				queuedWindow.__firstQueuedSave,
+				queuedWindow.__secondQueuedSave,
+			] );
+		} );
 
 		expect( requests ).toHaveLength( 2 );
 		expect( requests[ 1 ].expected_doc ).toBe( requests[ 0 ].doc );
@@ -345,6 +371,7 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 			content:
 				'<!-- wp:separator --><hr class="wp-block-separator has-alpha-channel-opacity"/><!-- /wp:separator -->\n\n<!-- wp:separator --><hr class="wp-block-separator has-alpha-channel-opacity"/><!-- /wp:separator -->',
 			status: 'draft',
+			date_gmt: new Date().toISOString(),
 		} );
 		await collaborationUtils.openPost( post.id );
 
@@ -364,7 +391,8 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 				{
 					record: editorSelect.getCurrentPost(),
 					blockPath: [ 1 ],
-					isMatch: ( block ) => block.name === 'core/separator',
+					isMatch: ( block: { name: string } ) =>
+						block.name === 'core/separator',
 					matchCount: 2,
 					matchIndex: 1,
 					blockCount: 2,
@@ -380,7 +408,11 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 
 		const blocks = await editor.getBlocks();
 		expect( blocks ).toHaveLength( 2 );
-		expect( blocks[ 0 ].attributes.metadata?.noteId ).toBeUndefined();
-		expect( blocks[ 1 ].attributes.metadata?.noteId ).toEqual( [ 123 ] );
+		const metadata = blocks.map(
+			( block ) =>
+				block.attributes.metadata as { noteId?: number[] } | undefined
+		);
+		expect( metadata[ 0 ]?.noteId ).toBeUndefined();
+		expect( metadata[ 1 ]?.noteId ).toEqual( [ 123 ] );
 	} );
 } );
