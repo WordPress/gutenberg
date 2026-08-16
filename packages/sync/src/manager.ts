@@ -830,10 +830,12 @@ export function createSyncManager( debug = false ): SyncManager {
 	 *
 	 * @param {ObjectType} objectType Object type.
 	 * @param {ObjectID}   objectId   Object ID.
+	 * @param {ObjectData} changes    Changes to include in the snapshot.
 	 */
 	async function createPersistedCRDTDoc(
 		objectType: ObjectType,
-		objectId: ObjectID
+		objectId: ObjectID,
+		changes?: Partial< ObjectData >
 	): Promise< string | null > {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
@@ -845,6 +847,25 @@ export function createSyncManager( debug = false ): SyncManager {
 		// Local updates may be deferred when editing alone. Apply them so
 		// they are included in the serialized document.
 		flushPendingCRDTDocUpdates();
+
+		if ( changes ) {
+			const snapshot = createYjsDoc( { objectType } );
+			Y.applyUpdateV2(
+				snapshot,
+				Y.encodeStateAsUpdateV2( entityState.ydoc )
+			);
+			try {
+				snapshot.transact( () => {
+					entityState.syncConfig.applyChangesToCRDTDoc(
+						snapshot,
+						changes
+					);
+				}, LOCAL_SYNC_MANAGER_ORIGIN );
+				return serializeCrdtDoc( snapshot );
+			} finally {
+				snapshot.destroy();
+			}
+		}
 
 		return serializeCrdtDoc( entityState.ydoc );
 	}
