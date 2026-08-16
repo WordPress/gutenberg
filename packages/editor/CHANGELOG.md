@@ -6,6 +6,7 @@
 
 -   Add a `PluginPostRevisionInfo` slot under the visual revisions post card. Fills receive the selected revision as `fillProps.context`.
 -   Add a `PluginPostRevisionHeader` slot in the visual revisions header settings cluster, after Settings and before Exit. Fills receive the same `fillProps.context` as `PluginPostRevisionInfo`.
+-   Add an `editor.PostRevision.badges` filter so plugins can register extra visual-revisions timeline badges. Matching labels also appear in the picker accessible name.
 
 ### Bug Fixes
 

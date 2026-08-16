@@ -12,8 +12,8 @@ One of the most common ways to modify the Editor is through the [`block_editor_s
 
 The `block_editor_settings_all` hook passes two parameters to the callback function:
 
-- `$settings` – An array of configurable settings for the Editor.
-- `$context` – An instance of [`WP_Block_Editor_Context`](https://developer.wordpress.org/reference/classes/wp_block_editor_context/), an object that contains information about the current Editor.
+-   `$settings` – An array of configurable settings for the Editor.
+-   `$context` – An instance of [`WP_Block_Editor_Context`](https://developer.wordpress.org/reference/classes/wp_block_editor_context/), an object that contains information about the current Editor.
 
 The following example modifies the maximum upload file size. Add this to a plugin or your theme's `functions.php` file to test it.
 
@@ -193,6 +193,50 @@ addFilter(
 );
 ```
 
+### `editor.PostRevision.badges`
+
+This filter extends the badges shown on each row of the visual revisions timeline. It also updates the picker option’s accessible name. The filter receives the default descriptor list (the core Autosave badge) and should return an array of descriptors.
+
+Each descriptor needs:
+
+-   `id` — a namespaced string, such as `my-plugin/public`.
+-   `label` — a translated string, or a function that returns one from the revision record.
+-   `isMatch` — a synchronous function that returns whether the badge applies to that revision.
+-   `intent` — optional Badge intent (`none` by default).
+
+`isMatch` runs against the revision record from the timeline query. That record includes `slug`, `meta` (keys registered with `show_in_rest`), `author`, dates, and raw title, excerpt, and content. Callbacks must be pure and cheap.
+
+```js
+import { addFilter } from '@wordpress/hooks';
+import { __ } from '@wordpress/i18n';
+
+addFilter(
+	'editor.PostRevision.badges',
+	'my-plugin/public-version',
+	( badges ) => [
+		...badges,
+		{
+			id: 'my-plugin/public',
+			label: __( 'Public' ),
+			intent: 'informational',
+			isMatch: ( item ) => !! item.meta?.my_plugin_is_public,
+		},
+	]
+);
+```
+
+To hide the core Autosave badge:
+
+```js
+import { addFilter } from '@wordpress/hooks';
+
+addFilter(
+	'editor.PostRevision.badges',
+	'my-plugin/hide-autosave',
+	( badges ) => badges.filter( ( badge ) => badge.id !== 'core/autosave' )
+);
+```
+
 ### `editor.PostPreview.interstitialMarkup`
 
 You can also filter the interstitial message shown when generating previews. Here's an example:
@@ -323,9 +367,9 @@ addAction(
 	'editor.ErrorBoundary.errorLogged',
 	'mu-plugin/error-capture-setup',
 	( error ) => {
-		// Error is the exception's error object. 
+		// Error is the exception's error object.
 		// You can console.log it or send it to an external error-tracking tool.
-		console.log ( error );
+		console.log( error );
 	}
 );
 ```
