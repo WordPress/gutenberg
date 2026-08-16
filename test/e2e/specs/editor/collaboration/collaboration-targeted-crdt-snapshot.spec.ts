@@ -246,4 +246,91 @@ test.describe( 'Collaboration - targeted CRDT persistence snapshot', () => {
 		expect( result.finalContent ).toBe( result.originalContent );
 		expect( result.finalDoc ).toBe( result.winningDoc );
 	} );
+
+	test( 'serializes overlapping CRDT saves for the same room', async ( {
+		collaborationUtils,
+		page,
+		requestUtils,
+	} ) => {
+		const post = await requestUtils.createPost( {
+			title: 'Queued CRDT persistence',
+			content:
+				'<!-- wp:paragraph --><p>Queued persistence base.</p><!-- /wp:paragraph -->',
+			status: 'draft',
+		} );
+		await collaborationUtils.openPost( post.id );
+
+		let releaseFirstSave;
+		const firstSaveReleased = new Promise< void >( ( resolve ) => {
+			releaseFirstSave = resolve;
+		} );
+		let markFirstSaveStarted;
+		const firstSaveStarted = new Promise< void >( ( resolve ) => {
+			markFirstSaveStarted = resolve;
+		} );
+		const requests = [];
+		await page.route( '**/*', async ( route ) => {
+			const request = route.request();
+			const url = new URL( request.url() );
+			const restPath =
+				url.searchParams.get( 'rest_route' ) ||
+				url.pathname.replace( /^\/wp-json/, '' );
+			if (
+				request.method() !== 'POST' ||
+				restPath !== '/wp-sync/v1/save'
+			) {
+				await route.continue();
+				return;
+			}
+
+			requests.push( request.postDataJSON() );
+			if ( requests.length === 1 ) {
+				markFirstSaveStarted();
+				await firstSaveReleased;
+			}
+			await route.continue();
+		} );
+
+		await page.evaluate( ( consent ) => {
+			const { unlock } =
+				window.wp.privateApis.__dangerousOptInToUnstableAPIsOnlyForCoreModules(
+					consent,
+					'@wordpress/core-data'
+				);
+			const editorSelect = window.wp.data.select( 'core/editor' );
+			const dispatch = unlock( window.wp.data.dispatch( 'core' ) );
+			window.__firstQueuedSave = dispatch.persistEntityCRDTDoc(
+				'postType',
+				editorSelect.getCurrentPostType(),
+				editorSelect.getCurrentPostId()
+			);
+		}, CORE_DATA_PRIVATE_APIS_CONSENT );
+		await firstSaveStarted;
+		await page.evaluate( ( consent ) => {
+			const { unlock } =
+				window.wp.privateApis.__dangerousOptInToUnstableAPIsOnlyForCoreModules(
+					consent,
+					'@wordpress/core-data'
+				);
+			const editorSelect = window.wp.data.select( 'core/editor' );
+			const dispatch = unlock( window.wp.data.dispatch( 'core' ) );
+			window.__secondQueuedSave = dispatch.persistEntityCRDTDoc(
+				'postType',
+				editorSelect.getCurrentPostType(),
+				editorSelect.getCurrentPostId()
+			);
+		}, CORE_DATA_PRIVATE_APIS_CONSENT );
+
+		expect( requests ).toHaveLength( 1 );
+		releaseFirstSave();
+		await page.evaluate( () =>
+			Promise.all( [
+				window.__firstQueuedSave,
+				window.__secondQueuedSave,
+			] )
+		);
+
+		expect( requests ).toHaveLength( 2 );
+		expect( requests[ 1 ].expected_doc ).toBe( requests[ 0 ].doc );
+	} );
 } );
