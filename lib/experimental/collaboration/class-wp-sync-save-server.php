@@ -68,7 +68,7 @@ if ( ! class_exists( 'WP_Sync_Save_Server' ) ) {
 					'callback'            => array( $this, 'handle_request' ),
 					'permission_callback' => array( $this, 'check_permissions' ),
 					'args'                => array(
-						'room' => array(
+						'room'         => array(
 							'required' => true,
 							'type'     => 'string',
 						),
