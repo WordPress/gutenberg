@@ -77,9 +77,11 @@ jobs:
             - name: Cherry-pick the commit
               id: cherry-pick
               if: steps.label-check.outputs.cherry_pick == 'true'
+              env:
+                  VERSION: ${{ steps.label-check.outputs.version }}
+                  COMMIT_SHA: ${{ steps.label-check.outputs.commit_sha }}
               run: |
-                  TARGET_BRANCH="wp/${{ steps.label-check.outputs.version }}"
-                  COMMIT_SHA="${{ steps.label-check.outputs.commit_sha }}"
+                  TARGET_BRANCH="wp/${VERSION}"
                   echo "Target branch: $TARGET_BRANCH"
                   echo "Commit SHA: $COMMIT_SHA"
                   git checkout "$TARGET_BRANCH"
@@ -93,7 +95,6 @@ jobs:
                     echo "cherry_pick_sha=$CHERRY_PICK_SHA" >> "$GITHUB_OUTPUT"
                     git push origin "$TARGET_BRANCH"
                   fi
-
             - name: Remove cherry-pick label
               if: steps.label-check.outputs.cherry_pick == 'true' && steps.cherry-pick.outputs.conflict == 'false'
               uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
