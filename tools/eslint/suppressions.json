@@ -1327,9 +1327,14 @@
 			"count": 1
 		}
 	},
+	"packages/editor/src/components/sidebar/classic-revisions-link.js": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
 	"packages/editor/src/components/sidebar/post-revision-summary.js": {
 		"@wordpress/use-recommended-components": {
-			"count": 2
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/site-discussion/index.js": {

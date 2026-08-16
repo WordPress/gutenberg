@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a `PluginPostRevisionInfo` slot under the visual revisions post card. Fills receive the selected revision as `fillProps.context`.
+-   Add a `PluginPostRevisionHeader` slot in the visual revisions header settings cluster, after Settings and before Exit. Fills receive the same `fillProps.context` as `PluginPostRevisionInfo`.
+
 ### Bug Fixes
 
 -   Register the editor and block editor keyboard shortcuts from the editor provider, so shortcuts work for consumers that mount the editor without rendering `EditorKeyboardShortcutsRegister` themselves ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
