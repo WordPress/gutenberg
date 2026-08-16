@@ -323,9 +323,16 @@ function gutenberg_register_widget_type_if_new( $name, $args ) {
  * `gutenberg_get_registered_widget_modules()`) and registers each one with
  * `origin = 'built-in'`. The manifest is the single source of built-in widget
  * authorship in this codebase; this loop is a deterministic copy of it into the
- * in-memory registry, with no filters in between. Later origins register
- * through the same `gutenberg_register_widget_type_if_new()` helper; earlier
- * sources win on a name collision.
+ * in-memory registry, with no filters in between.
+ *
+ * Code-registered origin: iterates definitions declared via
+ * `gutenberg_register_widget_def()` and registers each with
+ * `origin = 'code-registered'`, carrying inline composition `content` plus
+ * display metadata. No database row.
+ *
+ * Both origins register through the same `gutenberg_register_widget_type_if_new()`
+ * helper; earlier sources win on a name collision. The CPT origin is added in a
+ * later step.
  */
 function gutenberg_register_widget_types() {
 	if ( ! function_exists( 'gutenberg_get_registered_widget_modules' ) ) {
@@ -359,15 +366,41 @@ function gutenberg_register_widget_types() {
 			)
 		);
 	}
+
+	/* Code-registered origin: from `gutenberg_register_widget_def()` calls. */
+	if ( function_exists( 'gutenberg_get_registered_widget_defs' ) ) {
+		foreach ( gutenberg_get_registered_widget_defs() as $definition ) {
+			if ( empty( $definition['name'] ) ) {
+				continue;
+			}
+
+			gutenberg_register_widget_type_if_new(
+				$definition['name'],
+				array(
+					'render_module' => null,
+					'widget_module' => null,
+					'presentation'  => $definition['presentation'] ?? null,
+					'origin'        => 'code-registered',
+					'title'         => $definition['title'] ?? '',
+					'description'   => $definition['description'] ?? '',
+					'icon'          => gutenberg_sanitize_widget_icon( $definition['icon'] ?? null ),
+					'category'      => $definition['category'] ?? '',
+					'content'       => $definition['content'] ?? '',
+				)
+			);
+		}
+	}
 }
 
+/*
+ * Runs at priority 30 so origin sources that populate the registry at earlier
+ * priorities are in place first: code-registered definitions are declared via
+ * `gutenberg_register_widget_def()` on `init` (before 30), and later origins
+ * follow the same pattern.
+ */
 if ( did_action( 'init' ) ) {
 	gutenberg_register_widget_types();
 } else {
-	/*
-	 * Runs at priority 30 so origin sources that populate the registry at
-	 * earlier priorities (added in later steps) are in place first.
-	 */
 	add_action( 'init', 'gutenberg_register_widget_types', 30 );
 }
 

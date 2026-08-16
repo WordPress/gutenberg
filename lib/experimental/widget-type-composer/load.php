@@ -14,5 +14,5 @@
  * @package gutenberg
  */
 
-// Steps add their requires below, e.g.:
-// require_once __DIR__ . '/widget-definitions.php';
+// Server-defined widget definitions (code-registered now; CPT origin added later).
+require_once __DIR__ . '/widget-definitions.php';
