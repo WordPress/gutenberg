@@ -238,7 +238,7 @@ test.describe( 'Image', () => {
 		] = await editor.getBlocks();
 
 		// Open the media editor modal from the block toolbar.
-		await editor.clickBlockToolbarButton( 'Crop' );
+		await editor.clickBlockToolbarButton( 'Edit image' );
 		const modal = page.locator( 'role=dialog[name="Edit media"i]' );
 		await expect( modal ).toBeVisible();
 
@@ -268,11 +268,11 @@ test.describe( 'Image', () => {
 			imageBlock.locator( '.components-spinner' )
 		).toBeHidden();
 
-		// Closing the modal returns focus to the Crop toolbar button. The
-		// button is disabled (not hidden) while the edit loads, so it stays in
-		// the DOM to receive focus rather than dropping it to the canvas.
+		// Closing the modal returns focus to the "Edit image" toolbar button.
+		// The button is disabled (not hidden) while the edit loads, so it stays
+		// in the DOM to receive focus rather than dropping it to the canvas.
 		await expect(
-			page.locator( 'role=button[name="Crop"i]' )
+			page.locator( 'role=button[name="Edit image"i]' )
 		).toBeFocused();
 	} );
 

@@ -113,7 +113,7 @@ export default function CoverBlockControls( {
 						<ToolbarButton
 							ref={ editMediaButtonRef }
 							icon={ crop }
-							label={ __( 'Crop background image' ) }
+							label={ __( 'Edit image' ) }
 							onClick={ onEditMedia }
 							aria-haspopup="dialog"
 							// Disable rather than hide while the edited image
