@@ -56,11 +56,19 @@ export function SnackbarList( {
 	onRemove,
 }: WordPressComponentProps< SnackbarListProps, 'div' > ) {
 	const listRef = useRef< HTMLDivElement >( null );
+	const noticeGenerations = useRef( new Map< string, number >() );
 	const isReducedMotion = useReducedMotion();
 	className = clsx( 'components-snackbar-list', className );
 	const removeNotice =
-		( notice: SnackbarListProps[ 'notices' ][ number ] ) => () =>
+		( notice: SnackbarListProps[ 'notices' ][ number ] ) => () => {
+			// A notice may be recreated with the same ID before React commits its
+			// removal. Remount the Snackbar in that case so its timeout restarts.
+			noticeGenerations.current.set(
+				notice.id,
+				( noticeGenerations.current.get( notice.id ) ?? 0 ) + 1
+			);
 			onRemove?.( notice.id );
+		};
 	return (
 		<div
 			className={ className }
@@ -91,6 +99,11 @@ export function SnackbarList( {
 						>
 							<div className="components-snackbar-list__notice-container">
 								<Snackbar
+									key={
+										noticeGenerations.current.get(
+											notice.id
+										) ?? 0
+									}
 									{ ...restNotice }
 									onRemove={ removeNotice( notice ) }
 									listRef={ listRef }

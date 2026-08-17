@@ -1,5 +1,6 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { click } from '@ariakit/test';
+import { useState } from '@wordpress/element';
 import SnackbarList from '../list';
 
 window.scrollTo = jest.fn();
@@ -7,6 +8,7 @@ window.scrollTo = jest.fn();
 describe( 'SnackbarList', () => {
 	afterEach( () => {
 		jest.resetAllMocks();
+		jest.useRealTimers();
 	} );
 
 	it( 'should get focus after a snackbar is dismissed', async () => {
@@ -35,5 +37,40 @@ describe( 'SnackbarList', () => {
 		);
 
 		expect( screen.getByTestId( 'snackbar-list' ) ).toHaveFocus();
+	} );
+
+	it( 'should restart auto-dismissal when a notice is replaced with the same ID', async () => {
+		jest.useFakeTimers();
+		const onRemove = jest.fn();
+		const notice = {
+			id: 'ID_1',
+			content: 'A collaborator joined.',
+		};
+
+		function RecreatedNotice() {
+			const [ notices, setNotices ] = useState( [ notice ] );
+
+			return (
+				<SnackbarList
+					notices={ notices }
+					onRemove={ ( id ) => {
+						onRemove( id );
+						setNotices( [ { ...notice } ] );
+					} }
+				/>
+			);
+		}
+
+		render( <RecreatedNotice /> );
+
+		await act( async () => jest.advanceTimersByTime( 6000 ) );
+		expect( onRemove ).toHaveBeenCalledTimes( 1 );
+
+		expect( screen.getByTestId( 'snackbar' ) ).toHaveTextContent(
+			notice.content
+		);
+
+		await act( async () => jest.advanceTimersByTime( 6000 ) );
+		expect( onRemove ).toHaveBeenCalledTimes( 2 );
 	} );
 } );

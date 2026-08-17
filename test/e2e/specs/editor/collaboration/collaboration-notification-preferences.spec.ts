@@ -52,9 +52,11 @@ test.describe( 'Collaboration - Notification preferences', () => {
 
 		// Scope to the last snackbar so a stray/earlier snackbar can't
 		// cause a Playwright strict-mode violation on this locator.
-		await expect( page.getByTestId( 'snackbar' ).last() ).toContainText(
+		const joinNotice = page.getByTestId( 'snackbar' ).last();
+		await expect( joinNotice ).toContainText(
 			`${ SECOND_USER_DISPLAY_NAME } has joined the post.`,
 			{ timeout: 10000 }
 		);
+		await expect( joinNotice ).toBeHidden( { timeout: 10000 } );
 	} );
 } );
