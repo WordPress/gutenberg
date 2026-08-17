@@ -8,10 +8,7 @@ export { default as getPalettes } from './settings/get-palette';
 // Utilities
 export { areGlobalStylesEqual } from './core/equal';
 export { mergeGlobalStyles } from './core/merge';
-export {
-	default as getGlobalStylesChanges,
-	getGlobalStylesChangelist,
-} from './utils/get-global-styles-changes';
+export { default as getGlobalStylesChanges } from './utils/get-global-styles-changes';
 
 // Core rendering
 export { generateGlobalStyles } from './core/render';

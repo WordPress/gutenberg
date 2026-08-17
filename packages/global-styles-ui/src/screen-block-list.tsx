@@ -8,6 +8,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalText as WCText,
 } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import {
 	useState,
@@ -18,10 +19,7 @@ import {
 	useDeferredValue,
 	memo,
 } from '@wordpress/element';
-import {
-	getGlobalStylesChangelist,
-	type GlobalStylesConfig,
-} from '@wordpress/global-styles-engine';
+import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import {
 	BlockIcon,
 	privateApis as blockEditorPrivateApis,
@@ -97,74 +95,6 @@ export function hasUserStylesForBlock(
 	);
 }
 
-interface BlockStyle {
-	name: string;
-	label?: string;
-}
-
-/**
- * A short summary of what the user changed on a block, e.g.
- * "Typography, Colors, Plain variation".
- *
- * A changed style variation is named rather than described: whatever was
- * changed inside it, it contributes one "{Label} variation" entry.
- *
- * Returns an empty string when nothing can be named: a block changed only
- * through its custom CSS counts as customized but has nothing to show.
- *
- * @param user             The user's global styles config.
- * @param blockName        The block to summarize, e.g. `core/quote`.
- * @param registeredStyles The block's registered style variations, used to turn
- *                         a variation's slug into its label.
- * @return The summary, or an empty string.
- */
-export function getUserStylesSummary(
-	user: GlobalStylesConfig | undefined,
-	blockName: string,
-	registeredStyles: BlockStyle[] = []
-): string {
-	const blockStyles = user?.styles?.blocks?.[ blockName ];
-	// Compare this block's own entry against nothing, so the changelist reports
-	// the block's categories rather than the whole config's. `variations` is not
-	// one of the keys it inspects, so it never reports them here.
-	const changes = getGlobalStylesChangelist(
-		{
-			styles: blockStyles,
-			settings: user?.settings?.blocks?.[ blockName ],
-		},
-		{}
-	);
-	const entries = [ ...new Set( changes.map( ( [ , label ] ) => label ) ) ];
-
-	// Name each changed variation instead of describing what changed in it.
-	Object.entries( blockStyles?.variations ?? {} ).forEach(
-		( [ slug, variationStyles ] ) => {
-			if ( ! hasAnyValue( variationStyles ) ) {
-				return;
-			}
-			const label =
-				registeredStyles.find( ( style ) => style.name === slug )
-					?.label || slug;
-			entries.push(
-				sprintf(
-					/* translators: %s: the name of a block style variation, e.g. "Plain". */
-					__( '%s variation' ),
-					label
-				)
-			);
-		}
-	);
-
-	if ( ! entries.length ) {
-		return '';
-	}
-
-	return entries.join(
-		/* translators: Used between list items, there is a space after the comma. */
-		__( ', ' ) // eslint-disable-line @wordpress/i18n-no-flanking-whitespace
-	);
-}
-
 type StyleFilter = 'all' | 'customized';
 
 function useSortedBlockTypes() {
@@ -211,10 +141,10 @@ export function useBlockHasGlobalStyles( blockName: string ) {
 
 interface BlockMenuItemProps {
 	block: any;
-	summary: string;
+	isCustomized: boolean;
 }
 
-function BlockMenuItem( { block, summary }: BlockMenuItemProps ) {
+function BlockMenuItem( { block, isCustomized }: BlockMenuItemProps ) {
 	const hasBlockMenuItem = useBlockHasGlobalStyles( block.name );
 	if ( ! hasBlockMenuItem ) {
 		return null;
@@ -224,23 +154,23 @@ function BlockMenuItem( { block, summary }: BlockMenuItemProps ) {
 		<NavigationButtonAsItem
 			path={ '/blocks/' + encodeURIComponent( block.name ) }
 		>
-			<HStack
-				justify="flex-start"
-				alignment={ !! summary ? 'flex-start' : 'center' }
-				spacing={ 2 }
-			>
+			<HStack justify="flex-start" spacing={ 2 }>
 				<BlockIcon
 					className="global-styles-ui-block-types-item__icon"
 					icon={ block.icon }
 				/>
-				<FlexItem>
-					{ block.title }
-					{ !! summary && (
-						<span className="global-styles-ui-block-types-item__summary">
-							{ summary }
-						</span>
-					) }
-				</FlexItem>
+				<FlexItem>{ block.title }</FlexItem>
+				{ isCustomized && (
+					<>
+						<VisuallyHidden>
+							{ __( 'Has custom styles' ) }
+						</VisuallyHidden>
+						<span
+							aria-hidden="true"
+							className="global-styles-ui-block-types-item__indicator"
+						/>
+					</>
+				) }
 			</HStack>
 		</NavigationButtonAsItem>
 	);
@@ -278,32 +208,24 @@ interface BlockListProps {
 function BlockList( { filterValue, styleFilter }: BlockListProps ) {
 	const sortedBlockTypes = useSortedBlockTypes();
 	const debouncedSpeak = useDebounce( speak, 500 );
-	const { isMatchingSearchTerm, getBlockStyles } = useSelect( blocksStore );
+	const { isMatchingSearchTerm } = useSelect( blocksStore );
 	const { user } = useContext( GlobalStylesContext );
 
-	// Computed once for the whole list rather than per row, so the list does not
-	// open a context subscription for every registered block. Maps a customized
-	// block's name to its summary, which can be an empty string.
-	const customizedBlocks = useMemo( () => {
-		const summaries = new Map< string, string >();
-		const blockNames = new Set( [
+	// Computed once for the whole list rather than per row, so the list does
+	// not open a context subscription for every registered block.
+	const customizedBlockNames = useMemo( () => {
+		const names = new Set< string >();
+		const blockNames = [
 			...Object.keys( user?.styles?.blocks ?? {} ),
 			...Object.keys( user?.settings?.blocks ?? {} ),
-		] );
+		];
 		blockNames.forEach( ( blockName ) => {
 			if ( hasUserStylesForBlock( user, blockName ) ) {
-				summaries.set(
-					blockName,
-					getUserStylesSummary(
-						user,
-						blockName,
-						getBlockStyles( blockName )
-					)
-				);
+				names.add( blockName );
 			}
 		} );
-		return summaries;
-	}, [ user, getBlockStyles ] );
+		return names;
+	}, [ user ] );
 
 	const searchedBlockTypes = ! filterValue
 		? sortedBlockTypes
@@ -314,7 +236,7 @@ function BlockList( { filterValue, styleFilter }: BlockListProps ) {
 	const filteredBlockTypes =
 		styleFilter === 'customized'
 			? searchedBlockTypes.filter( ( blockType ) =>
-					customizedBlocks.has( blockType.name )
+					customizedBlockNames.has( blockType.name )
 			  )
 			: searchedBlockTypes;
 
@@ -358,7 +280,7 @@ function BlockList( { filterValue, styleFilter }: BlockListProps ) {
 				filteredBlockTypes.map( ( block ) => (
 					<BlockMenuItem
 						block={ block }
-						summary={ customizedBlocks.get( block.name ) ?? '' }
+						isCustomized={ customizedBlockNames.has( block.name ) }
 						key={ 'menu-itemblock-' + block.name }
 					/>
 				) )
