@@ -40,10 +40,15 @@ export default function StateControl( {
 		} ) ),
 	];
 	const pseudoStateOptions = [
-		{ label: __( 'Default' ), value: 'default' },
+		{
+			label: __( 'Default' ),
+			value: 'default',
+			info: __( 'Applies when no other state is active.' ),
+		},
 		...pseudoStates.map( ( state ) => ( {
 			label: state.label,
 			value: state.value,
+			info: state.info,
 		} ) ),
 	];
 
@@ -153,6 +158,7 @@ export default function StateControl( {
 												? check
 												: null
 										}
+										info={ option.info }
 									>
 										{ option.label }
 									</MenuItem>
