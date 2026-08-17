@@ -38,7 +38,9 @@
 	"supports": {
 		"anchor": true,
 		"align": [ "wide", "full" ],
-		"layout": true,
+		"layout": {
+			"allowJustification": false
+		},
 		"html": false,
 		"__experimentalBorder": {
 			"color": true,
@@ -73,8 +75,7 @@
 			"blockGap": true,
 			"__experimentalDefaultControls": {
 				"margin": false,
-				"padding": false,
-				"blockGap": false
+				"padding": false
 			}
 		},
 		"__unstablePasteTextInline": true,
