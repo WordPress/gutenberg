@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Internal
-
--   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
-
 ### New Features
 
 -   `WidgetRelevance` gains a `'medium'` tier between `'high'` and `'low'`,
@@ -17,6 +13,10 @@
 -   `useWidgetTypes` holds the icon slot with the stand-in while an action's
     icon reference resolves; an unresolvable reference clears it
     ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
 
 ## 0.5.0 (2026-08-12)
 
