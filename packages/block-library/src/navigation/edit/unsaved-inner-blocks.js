@@ -105,7 +105,15 @@ export default function UnsavedInnerBlocks( {
 		hasSelection,
 	] );
 
-	const Wrapper = isSaving ? Disabled : 'div';
+	if ( isSaving ) {
+		// We will get an error (Function components cannot be given refs) if we pass ref to Disabled component.
+		// So we need to to pass it to the inner div.
+		return (
+			<Disabled>
+				<div { ...innerBlocksProps } />
+			</Disabled>
+		);
+	}
 
-	return <Wrapper { ...innerBlocksProps } />;
+	return <div { ...innerBlocksProps } />;
 }
