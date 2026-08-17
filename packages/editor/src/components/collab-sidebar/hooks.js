@@ -579,7 +579,6 @@ export function useFloatingBoard( {
 					blockRects: store.getAnchorRects(),
 					heights,
 					scrollTop: canvas?.scrollTop ?? 0,
-					boardHeight: panel.clientHeight,
 				} );
 
 				setNotePositions( result.positions );

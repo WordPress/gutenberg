@@ -15,8 +15,6 @@ export function sanitizeNoteContent( str ) {
 const THREAD_ALIGN_OFFSET = -16;
 const THREAD_GAP = 16;
 const OVERLAP_MARGIN = 20;
-// Breathing room kept between a shifted thread and the edges of the board.
-const BOARD_MARGIN = 16;
 
 /**
  * Avatar border colors chosen to be visually distinct from each other and from
@@ -459,7 +457,6 @@ export function removeNoteIdFromMetadata( metadata, noteId ) {
  * @param {Object<string,DOMRect>}  params.blockRects     Pre-read anchor rects keyed by thread ID.
  * @param {Object<string,number>}   params.heights        Rendered heights keyed by thread ID.
  * @param {number}                  params.scrollTop      Current scroll offset of the editor content.
- * @param {number}                  params.boardHeight    Visible height of the floating board.
  * @return {{ positions: Object<string,number> }} Computed top positions.
  */
 export function calculateNotePositions( {
@@ -468,7 +465,6 @@ export function calculateNotePositions( {
 	blockRects,
 	heights,
 	scrollTop = 0,
-	boardHeight = 0,
 } ) {
 	const offsets = {};
 
@@ -501,33 +497,10 @@ export function calculateNotePositions( {
 	const anchorTop = anchorRect.top || 0;
 	const anchorHeight = heights[ anchorThread.id ] || 0;
 
-	/*
-	 * The board is clipped, not scrollable, so a thread that extends past its
-	 * bottom edge is unreachable — the case a tall selected thread hits when a
-	 * note is expanded ("Show more") or gathers replies. Shift the anchor up by
-	 * as much as it overflows, stopping at the top of the board. Anything left
-	 * over means the thread is taller than the board itself, which the CSS
-	 * `max-height` turns into an in-thread scroll.
-	 */
-	let anchorOffset = THREAD_ALIGN_OFFSET;
-	if ( boardHeight > 0 ) {
-		// `anchorTop + THREAD_ALIGN_OFFSET` is measured against the canvas, whose
-		// top edge lines up with the board's; the thread's own `margin-top`
-		// cancels the offset out again, so `anchorTop` is its top within the board.
-		const overflow =
-			anchorTop + anchorHeight - ( boardHeight - BOARD_MARGIN );
-		if ( overflow > 0 ) {
-			anchorOffset -= Math.min(
-				overflow,
-				Math.max( 0, anchorTop - BOARD_MARGIN )
-			);
-		}
-	}
-
-	offsets[ anchorThread.id ] = anchorOffset;
+	offsets[ anchorThread.id ] = THREAD_ALIGN_OFFSET;
 
 	// Process threads after the anchor, offsetting overlapping threads downward.
-	let prevAdjustedTop = anchorTop + anchorOffset;
+	let prevAdjustedTop = anchorTop + THREAD_ALIGN_OFFSET;
 	let prevHeight = anchorHeight;
 
 	for ( let i = anchorIndex + 1; i < orderedThreads.length; i++ ) {
@@ -554,7 +527,7 @@ export function calculateNotePositions( {
 	}
 
 	// Process threads before the anchor, offsetting overlapping threads upward.
-	let belowAdjustedTop = anchorTop + anchorOffset;
+	let belowAdjustedTop = anchorTop + THREAD_ALIGN_OFFSET;
 
 	for ( let i = anchorIndex - 1; i >= 0; i-- ) {
 		const thread = orderedThreads[ i ];
