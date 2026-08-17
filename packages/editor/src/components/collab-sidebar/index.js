@@ -1,13 +1,18 @@
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
+import { MenuGroup, MenuItemsChoice } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
-import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import {
+	useShortcut,
+	store as keyboardShortcutsStore,
+} from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import PluginSidebar from '../plugin-sidebar';
+import NotesMoreMenuGroup from '../more-menu/notes-more-menu-group';
 import { ALL_NOTES_SIDEBAR } from './constants';
 import { Notes } from './notes';
 import { FloatingNotes, FloatingNotesFill } from './floating-notes';
@@ -22,13 +27,17 @@ import { unlock } from '../../lock-unlock';
 
 function NotesSidebar( { postId } ) {
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	const { enableComplementaryArea, disableComplementaryArea } =
+		useDispatch( interfaceStore );
 	const { toggleBlockSpotlight, selectBlock } = unlock(
 		useDispatch( blockEditorStore )
 	);
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const sidebarRef = useRef( null );
+	// How the floating notes render in the canvas: 'full', 'minimized'
+	// (author avatars only), or 'hidden'.
+	const [ notesDisplayMode, setNotesDisplayMode ] = useState( 'full' );
 
 	const { clientId, noteId, isClassicBlock } = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId, getBlockName } =
@@ -75,8 +84,13 @@ function NotesSidebar( { postId } ) {
 	// the "All notes" sidebar, which lists the same threads.
 	const hasVisibleFloatingNotes =
 		showFloatingNotes &&
+		notesDisplayMode !== 'hidden' &&
 		( unresolvedNotes.length > 0 || selectedNoteId !== undefined ) &&
 		! isAllNotesSidebarOpen;
+	// The display-mode choices live in the editor's Options (ellipsis) menu;
+	// they only apply where the floating notes can render.
+	const showNotesDisplayOptions =
+		showFloatingNotes && unresolvedNotes.length > 0;
 
 	async function focusNote( {
 		targetClientId,
@@ -85,6 +99,11 @@ function NotesSidebar( { postId } ) {
 	} ) {
 		if ( ! targetClientId ) {
 			return;
+		}
+
+		// Acting on a note always brings the floating notes back into view.
+		if ( notesDisplayMode === 'hidden' ) {
+			setNotesDisplayMode( 'full' );
 		}
 
 		// Approved (resolved) notes only appear in the "All notes" sidebar.
@@ -129,6 +148,15 @@ function NotesSidebar( { postId } ) {
 		} );
 	}
 
+	function applyNotesDisplayMode( value ) {
+		// Close the "All notes" sidebar so the chosen floating mode is
+		// visible on the canvas.
+		if ( isAllNotesSidebarOpen ) {
+			disableComplementaryArea( 'core' );
+		}
+		setNotesDisplayMode( value );
+	}
+
 	useShortcut(
 		'core/editor/new-note',
 		( event ) => {
@@ -139,6 +167,47 @@ function NotesSidebar( { postId } ) {
 			isDisabled: isDistractionFree || isClassicBlock || ! clientId,
 		}
 	);
+
+	// Keyboard equivalents for the display-mode choices in the Options menu,
+	// available wherever those choices are.
+	const notesDisplayShortcutsDisabled =
+		isDistractionFree || ! showNotesDisplayOptions;
+	useShortcut(
+		'core/editor/expand-notes',
+		( event ) => {
+			event.preventDefault();
+			applyNotesDisplayMode( 'full' );
+		},
+		{ isDisabled: notesDisplayShortcutsDisabled }
+	);
+	useShortcut(
+		'core/editor/minimize-notes',
+		( event ) => {
+			event.preventDefault();
+			applyNotesDisplayMode( 'minimized' );
+		},
+		{ isDisabled: notesDisplayShortcutsDisabled }
+	);
+	useShortcut(
+		'core/editor/hide-notes',
+		( event ) => {
+			event.preventDefault();
+			applyNotesDisplayMode( 'hidden' );
+		},
+		{ isDisabled: notesDisplayShortcutsDisabled }
+	);
+
+	// Human-readable combinations, surfaced on the menu items themselves.
+	const notesDisplayShortcuts = useSelect( ( select ) => {
+		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
+		return {
+			full: getShortcutRepresentation( 'core/editor/expand-notes' ),
+			minimized: getShortcutRepresentation(
+				'core/editor/minimize-notes'
+			),
+			hidden: getShortcutRepresentation( 'core/editor/hide-notes' ),
+		};
+	}, [] );
 
 	// Surface one thread for the avatar indicator.
 	const currentThreads =
@@ -168,6 +237,39 @@ function NotesSidebar( { postId } ) {
 					addNewNoteForBlock( menuClientId )
 				}
 			/>
+			{ showNotesDisplayOptions && (
+				<NotesMoreMenuGroup>
+					{ ( { onClose } ) => (
+						<MenuGroup label={ __( 'Notes' ) }>
+							<MenuItemsChoice
+								choices={ [
+									{
+										value: 'full',
+										label: __( 'Expand notes' ),
+										shortcut: notesDisplayShortcuts.full,
+									},
+									{
+										value: 'minimized',
+										label: __( 'Minimize notes' ),
+										shortcut:
+											notesDisplayShortcuts.minimized,
+									},
+									{
+										value: 'hidden',
+										label: __( 'Hide notes' ),
+										shortcut: notesDisplayShortcuts.hidden,
+									},
+								] }
+								value={ notesDisplayMode }
+								onSelect={ ( value ) => {
+									applyNotesDisplayMode( value );
+									onClose();
+								} }
+							/>
+						</MenuGroup>
+					) }
+				</NotesMoreMenuGroup>
+			) }
 			{ showAllNotesSidebar && (
 				<PluginSidebar
 					identifier={ ALL_NOTES_SIDEBAR }
@@ -189,6 +291,7 @@ function NotesSidebar( { postId } ) {
 					<FloatingNotes
 						notes={ unresolvedNotes }
 						sidebarRef={ sidebarRef }
+						isCompact={ notesDisplayMode === 'minimized' }
 					/>
 				</FloatingNotesFill>
 			) }

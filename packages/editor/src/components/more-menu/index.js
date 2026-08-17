@@ -11,6 +11,7 @@ import { store as interfaceStore, ActionItem } from '@wordpress/interface';
 import { VisuallyHidden } from '@wordpress/ui';
 import CopyContentMenuItem from './copy-content-menu-item';
 import ModeSwitcher from '../mode-switcher';
+import NotesMoreMenuGroup from './notes-more-menu-group';
 import ToolsMoreMenuGroup from './tools-more-menu-group';
 import ViewMoreMenuGroup from './view-more-menu-group';
 import { store as editorStore } from '../../store';
@@ -113,6 +114,7 @@ export default function MoreMenu( { isRevisionMode = false } ) {
 							label={ __( 'Panels' ) }
 							fillProps={ { onClick: onClose } }
 						/>
+						<NotesMoreMenuGroup.Slot fillProps={ { onClose } } />
 						<MenuGroup label={ __( 'Tools' ) }>
 							<MenuItem
 								onClick={ () =>
