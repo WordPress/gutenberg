@@ -4,6 +4,7 @@
 ### Internal
 
 -   Collapse the `tsconfig.src.json`/`tsconfig.bin.json`/`tsconfig.test.json` projects into the repository-standard split of `tsconfig.build.json` and a default dev `tsconfig.json`. ([#81509](https://github.com/WordPress/gutenberg/pull/81509))
+-   Update Terrazzo packages to 2.5.0, use its resolver for mode overrides, and restore token linting with semantic WCAG AA contrast checks ([#81082](https://github.com/WordPress/gutenberg/pull/81082)).
 
 ### Bug Fixes
 
@@ -31,7 +32,6 @@
 
 ### Internal
 
--   Update Terrazzo packages to 2.5.0, use its resolver for mode overrides, and restore token linting with semantic WCAG AA contrast checks ([#81082](https://github.com/WordPress/gutenberg/pull/81082)).
 -   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).
 
 ### Code Quality
