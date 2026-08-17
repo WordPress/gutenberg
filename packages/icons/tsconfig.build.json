@@ -4,13 +4,5 @@
 	"references": [
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../primitives" }
-	],
-	"exclude": [
-		"**/benchmark",
-		"**/test/**",
-		"**/tests/**",
-		"**/__tests__/**",
-		"**/stories/**",
-		"**/*.story.*"
 	]
 }
