@@ -136,3 +136,7 @@ point inherits that precision.
 -   Sources skew towards curated photography and wordpress.org assets. Neither is
     a random sample of real media libraries.
 -   Grades live in one browser's `localStorage`. Export them.
+-   Every crop is inlined, so the report grows with the run: 20 images at two
+    sizes is about 5 MB, 50 images at four sizes about 18 MB. Past roughly 40
+    images a run gets unwieldy to open and tedious to grade in one sitting.
+    Several smaller runs beat one large one.
