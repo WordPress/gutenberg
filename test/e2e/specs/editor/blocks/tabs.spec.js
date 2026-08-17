@@ -279,6 +279,103 @@ test.describe( 'Tabs', () => {
 		} );
 	} );
 
-	// TODO: Add a `Frontend functionality` describe block for front-end
-	// interaction tests (e.g. switching tabs on the published post).
+	test.describe( 'Frontend functionality', () => {
+		const tabsWithAnchoredTarget = {
+			name: 'core/tabs',
+			innerBlocks: [
+				{ name: 'core/tab-list' },
+				{
+					name: 'core/tab-panels',
+					innerBlocks: [
+						{
+							name: 'core/tab-panel',
+							attributes: { label: 'Tab 1' },
+							innerBlocks: [
+								{
+									name: 'core/paragraph',
+									attributes: { content: 'Panel 1' },
+								},
+							],
+						},
+						{
+							name: 'core/tab-panel',
+							attributes: { label: 'Tab 2' },
+							innerBlocks: [
+								{
+									name: 'core/paragraph',
+									attributes: {
+										anchor: 'target',
+										content: 'Panel 2',
+									},
+								},
+							],
+						},
+					],
+				},
+			],
+		};
+
+		test.beforeEach( async ( { admin } ) => {
+			await admin.createNewPost();
+		} );
+
+		test( 'activates the tab whose panel contains the URL hash target', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/spacer',
+				attributes: { height: '1000px' },
+			} );
+			await editor.insertBlock( tabsWithAnchoredTarget );
+
+			await expect(
+				editor.canvas.getByRole( 'tab', { name: 'Tab 2' } )
+			).toBeVisible();
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }#target` );
+
+			await expect(
+				page.getByRole( 'tab', { name: 'Tab 2' } )
+			).toHaveAttribute( 'aria-selected', 'true' );
+			await expect( page.locator( '#target' ) ).toBeInViewport();
+		} );
+
+		test( 'activates the tab when a link to a target inside a panel is clicked', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					content: '<a href="#target">Go to the second tab</a>',
+				},
+			} );
+			await editor.insertBlock( {
+				name: 'core/spacer',
+				attributes: { height: '1000px' },
+			} );
+			await editor.insertBlock( tabsWithAnchoredTarget );
+
+			await expect(
+				editor.canvas.getByRole( 'tab', { name: 'Tab 2' } )
+			).toBeVisible();
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			const target = page.locator( '#target' );
+			await expect( target ).toBeHidden();
+
+			await page
+				.getByRole( 'link', { name: 'Go to the second tab' } )
+				.click();
+
+			await expect(
+				page.getByRole( 'tab', { name: 'Tab 2' } )
+			).toHaveAttribute( 'aria-selected', 'true' );
+			await expect( target ).toBeInViewport();
+		} );
+	} );
 } );
