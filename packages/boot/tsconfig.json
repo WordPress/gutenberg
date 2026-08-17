@@ -12,6 +12,7 @@
 		{ "path": "../compose" },
 		{ "path": "../core-data" },
 		{ "path": "../data" },
+		{ "path": "../dom" },
 		{ "path": "../editor" },
 		{ "path": "../element" },
 		{ "path": "../html-entities" },

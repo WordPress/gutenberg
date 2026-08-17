@@ -48,6 +48,7 @@
 
 ### Bug Fixes
 
+-   Table of Contents: Continue rendering saved legacy content until the post is edited and resaved.
 -   Navigation Overlay Close: Inherit typography and color from the overlay, so the button follows the theme font instead of the browser default button styles ([#80751](https://github.com/WordPress/gutenberg/pull/80751)).
 -   Playlist: Update `@arraypress/waveform-player` to `^1.23.0`, which no longer sets `crossorigin="anonymous"` on its audio element, fixing playback of tracks served without CORS headers such as media offloaded to a CDN ([#80533](https://github.com/WordPress/gutenberg/pull/80533)).
 -   Post Content: Restrict the wrapper tag to the supported values offered in the editor.
