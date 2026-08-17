@@ -157,6 +157,15 @@ describe( 'useWidgetTypes', () => {
 		expect( label ).toMatchObject( { id: 'label', type: 'text' } );
 	} );
 
+	it( 'defaults apiVersion when the module omits it', async () => {
+		const { result } = renderHook( () =>
+			useWidgetTypes( stringIconRecords )
+		);
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+		expect( result.current[ 0 ][ 0 ].apiVersion ).toBe( 1 );
+	} );
+
 	it( 'resolves a record without a metadata module from its fields', async () => {
 		const resolvedIcon = createElement( 'svg', {
 			viewBox: '0 0 20 20',

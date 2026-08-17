@@ -54,10 +54,25 @@ function withRenderableIcons(
 type UseWidgetTypesResult = readonly [ WidgetType[], boolean ];
 
 /*
- * Applied to records without a metadata module, which have no place to
- * declare one. Modules keep declaring their own.
+ * Applied when neither the record nor its metadata module declares one.
  */
 const DEFAULT_API_VERSION = 1;
+
+/*
+ * The record fields that overlay a module's metadata, shared by both
+ * resolution paths so they cannot drift.
+ */
+function recordOverlay( record: WidgetModuleRecord ) {
+	return {
+		name: record.name as WidgetName,
+		renderModule: record.render_module ?? '',
+		...( record.presentation ? { presentation: record.presentation } : {} ),
+		...( record.category ? { category: record.category } : {} ),
+		...( record.description ? { description: record.description } : {} ),
+		...( record.help ? { help: record.help } : {} ),
+		...( record.keywords ? { keywords: record.keywords } : {} ),
+	};
+}
 
 /**
  * Resolves widget types from host-supplied records.
@@ -113,23 +128,8 @@ export function useWidgetTypes(
 
 					return {
 						apiVersion: DEFAULT_API_VERSION,
-						name: record.name as WidgetName,
-						renderModule: record.render_module,
 						title: record.title ?? record.name,
 						...( record.icon ? { icon: pendingIcon } : {} ),
-						...( record.presentation
-							? { presentation: record.presentation }
-							: {} ),
-						...( record.category
-							? { category: record.category }
-							: {} ),
-						...( record.description
-							? { description: record.description }
-							: {} ),
-						...( record.help ? { help: record.help } : {} ),
-						...( record.keywords
-							? { keywords: record.keywords }
-							: {} ),
 						...( record.actions
 							? {
 									actions: withRenderableIcons(
@@ -138,6 +138,7 @@ export function useWidgetTypes(
 									),
 							  }
 							: {} ),
+						...recordOverlay( record ),
 					} as WidgetType;
 				}
 
@@ -166,6 +167,7 @@ export function useWidgetTypes(
 					const actions = record.actions ?? metadata.actions;
 
 					return {
+						apiVersion: DEFAULT_API_VERSION,
 						...metadata,
 						...( metadata.attributes
 							? {
@@ -174,8 +176,6 @@ export function useWidgetTypes(
 									),
 							  }
 							: {} ),
-						name: record.name as WidgetName,
-						renderModule: record.render_module ?? '',
 						icon,
 						/*
 						 * `title` is required:
@@ -184,19 +184,6 @@ export function useWidgetTypes(
 						 * - Then the record's name as fallback
 						 */
 						title: record.title ?? metadata.title ?? record.name,
-						...( record.presentation
-							? { presentation: record.presentation }
-							: {} ),
-						...( record.category
-							? { category: record.category }
-							: {} ),
-						...( record.description
-							? { description: record.description }
-							: {} ),
-						...( record.help ? { help: record.help } : {} ),
-						...( record.keywords
-							? { keywords: record.keywords }
-							: {} ),
 						...( actions
 							? {
 									actions: withRenderableIcons(
@@ -205,6 +192,7 @@ export function useWidgetTypes(
 									),
 							  }
 							: {} ),
+						...recordOverlay( record ),
 					} as WidgetType;
 				} catch {
 					return null;
