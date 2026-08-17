@@ -36,9 +36,10 @@ export default function Canvas( { canvas }: CanvasProps ) {
 	 * overlay meant for mobile — and carries the width it was left at when
 	 * returned to. Anything else opens at the default.
 	 */
-	const { viewport } = useSearch( { strict: false } ) as {
-		viewport?: string;
-	};
+	const viewport = useSearch( {
+		strict: false,
+		select: ( search ) => ( search as { viewport?: string } ).viewport,
+	} ) as string | undefined;
 
 	/*
 	 * Where clicking a previewed canvas goes, resolved the same way the editor

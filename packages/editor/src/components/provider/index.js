@@ -144,7 +144,7 @@ function useBlockEditorProps( post, template, mode ) {
  * @param {Object}  props.settings                       The editor settings.
  * @param {boolean} props.recovery                       Indicates if the editor is in recovery mode.
  * @param {Array}   props.initialEdits                   The initial edits for the editor.
- * @param {string}  [props.initialViewport]              The device type an entity opens at, one of those `setDeviceType` accepts. Applied per entity, so a width set from the device preview does not follow the user into the next one. The current width is left alone when omitted.
+ * @param {string}  [props.initialViewport]              The device type an entity opens at, one of those `setDeviceType` accepts. Applied whenever it or the entity changes, so a width set from the device preview does not follow the user into the next entity. The current width is left alone when omitted.
  * @param {Object}  props.children                       The child components.
  * @param {Object}  [props.BlockEditorProviderComponent] The block editor provider component to use. Defaults to ExperimentalBlockEditorProvider.
  * @param {Object}  [props.__unstableTemplate]           The template object.
@@ -304,13 +304,9 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		 * the theme's breakpoints from the block editor store — the store this
 		 * provider is the one to fill, and has not yet when it mounts.
 		 */
-		const initialCanvasWidth = useMemo(
-			() =>
-				getCanvasWidthByDeviceType(
-					initialViewport,
-					blockEditorSettings.__experimentalFeatures?.viewport
-				),
-			[ initialViewport, blockEditorSettings ]
+		const initialCanvasWidth = getCanvasWidthByDeviceType(
+			initialViewport,
+			blockEditorSettings.__experimentalFeatures?.viewport
 		);
 
 		const {

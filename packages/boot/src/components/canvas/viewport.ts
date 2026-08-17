@@ -1,6 +1,11 @@
 export const DEFAULT_DEVICE_TYPE = 'Desktop';
 
-// Lowercase in the URL, PascalCase in the editor store.
+/*
+ * Lowercase in the URL, PascalCase in the editor store. Duplicated in
+ * packages/edit-site/src/components/block-editor/viewport.js, in the editor's
+ * preview-dropdown choices, and in the block editor's block-visibility
+ * constants. Update all four when adding a viewport type.
+ */
 const VALID_VIEWPORTS = [ 'desktop', 'tablet', 'mobile' ];
 
 /**
@@ -9,7 +14,7 @@ const VALID_VIEWPORTS = [ 'desktop', 'tablet', 'mobile' ];
  * @param viewport Viewport, as written in the URL.
  * @return Whether the editor has a width for it.
  */
-export function isValidViewport( viewport?: string ) {
+export function isValidViewport( viewport?: string ): viewport is string {
 	return !! viewport && VALID_VIEWPORTS.includes( viewport.toLowerCase() );
 }
 
@@ -24,6 +29,6 @@ export function getDeviceType( viewport?: string ) {
 		return DEFAULT_DEVICE_TYPE;
 	}
 
-	const value = ( viewport as string ).toLowerCase();
+	const value = viewport.toLowerCase();
 	return value.charAt( 0 ).toUpperCase() + value.slice( 1 );
 }

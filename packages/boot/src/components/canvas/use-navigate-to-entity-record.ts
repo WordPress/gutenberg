@@ -86,15 +86,18 @@ export default function useNavigateToEntityRecord() {
 			 */
 			const requestedViewport = params.viewport?.toLowerCase();
 			const hasRequestedViewport = isValidViewport( requestedViewport );
-			const currentViewport = (
-				( registry.select( editorStore ) as any ).getDeviceType() ??
-				DEFAULT_DEVICE_TYPE
-			).toLowerCase();
-			// The default is written as no entry, so `undefined` to clear any.
+			const currentDeviceType = hasRequestedViewport
+				? ( registry.select( editorStore ) as any ).getDeviceType() ??
+				  DEFAULT_DEVICE_TYPE
+				: DEFAULT_DEVICE_TYPE;
+			/*
+			 * The search below is spread from the previous one, so the default
+			 * has to clear an entry rather than skip writing one.
+			 */
 			const viewport =
-				currentViewport === DEFAULT_DEVICE_TYPE.toLowerCase()
+				currentDeviceType === DEFAULT_DEVICE_TYPE
 					? undefined
-					: currentViewport;
+					: currentDeviceType.toLowerCase();
 
 			if ( selectedBlock || hasRequestedViewport ) {
 				navigate( {
