@@ -70,6 +70,13 @@ class Gutenberg_Widget_Type_Composer_Widget_Modules_Fields_Test extends WP_UnitT
 				'description' => 'Meta details.',
 				'icon'        => 'wordpress/plugins',
 				'content'     => self::SAMPLE_CONTENT,
+				'actions'     => array(
+					array(
+						'id'    => 'visit',
+						'label' => 'Visit',
+						'href'  => 'https://example.com/',
+					),
+				),
 			)
 		);
 		gutenberg_register_widget_types();
@@ -84,6 +91,8 @@ class Gutenberg_Widget_Type_Composer_Widget_Modules_Fields_Test extends WP_UnitT
 		$this->assertSame( 'wordpress/plugins', $code['icon'] );
 		$this->assertSame( self::SAMPLE_CONTENT, $code['content'] );
 		$this->assertNull( $code['definition_id'] );
+		$this->assertCount( 1, $code['actions'] );
+		$this->assertSame( 'visit', $code['actions'][0]['id'] );
 	}
 
 	public function test_cpt_fields_in_rest() {

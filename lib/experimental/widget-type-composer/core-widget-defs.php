@@ -90,6 +90,15 @@ function gutenberg_register_core_widget_defs() {
 			'description'  => __( 'A widget type whose body is a composition of core blocks, rendered on the server.', 'gutenberg' ),
 			'category'     => 'dashboard',
 			'presentation' => 'full-bleed',
+			'actions'      => array(
+				array(
+					'id'           => 'composition-demo-photo',
+					'label'        => __( 'View the photo', 'gutenberg' ),
+					'icon'         => 'core/external',
+					'href'         => 'https://pd.w.org/2026/08/946a703630b14924.41406734.jpg',
+					'openInNewTab' => true,
+				),
+			),
 			'content'      => gutenberg_get_composition_demo_content(),
 		)
 	);

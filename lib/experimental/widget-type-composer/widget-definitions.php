@@ -297,6 +297,9 @@ add_filter( 'user_has_cap', 'gutenberg_widget_def_synthesize_cap', 10, 4 );
  *     @type string $icon        Optional. Icon identifier (Dashicon slug or
  *                               registered icon name).
  *     @type string $category    Optional. Grouping category.
+ *     @type array  $actions     Optional. Declarative actions the widget type
+ *                               exposes; sanitized by the resolver through the
+ *                               same registration gate as manifest actions.
  *     @type string $content     Required. Block markup defining the composition.
  * }
  * @return bool True on success, false when validation fails.

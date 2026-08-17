@@ -193,6 +193,42 @@ class Gutenberg_Widget_Type_Composer_Widget_Definitions_Test extends WP_UnitTest
 		$this->assertNull( $entry->widget_module );
 	}
 
+	public function test_code_registered_def_actions_pass_the_registration_gate() {
+		$this->setExpectedIncorrectUsage( 'gutenberg_sanitize_widget_actions' );
+
+		gutenberg_register_widget_def(
+			'test/def-actions',
+			array(
+				'title'   => 'With actions',
+				'content' => self::SAMPLE_CONTENT,
+				'actions' => array(
+					array(
+						'id'           => 'visit',
+						'label'        => 'Visit',
+						'icon'         => 'core/external',
+						'href'         => 'https://example.com/',
+						'openInNewTab' => true,
+					),
+					array(
+						'id'    => 'broken',
+						'label' => 'Broken',
+						'href'  => 'javascript:alert(1)',
+					),
+				),
+			)
+		);
+
+		gutenberg_register_widget_types();
+
+		$entry = WP_Widget_Type_Registry::get_instance()->get_registered( 'test/def-actions' );
+
+		$this->assertNotNull( $entry );
+		$this->assertCount( 1, $entry->actions );
+		$this->assertSame( 'visit', $entry->actions[0]['id'] );
+		$this->assertSame( 'core/external', $entry->actions[0]['icon'] );
+		$this->assertTrue( $entry->actions[0]['openInNewTab'] );
+	}
+
 	public function test_earlier_origin_wins_over_code_registered() {
 		// Simulate an earlier source (e.g. built-in) already holding the name.
 		WP_Widget_Type_Registry::get_instance()->register(
