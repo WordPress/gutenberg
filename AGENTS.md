@@ -42,7 +42,7 @@ Read only what your task needs, when it needs it:
 ```bash
 npm run format            # Fix JS formatting
 npm run lint:js          # Check JS linting
-npm run typecheck        # Type check everything, including tests and stories
+npm run typecheck        # Type check sources, plus TypeScript tests and stories
 vendor/bin/phpcbf        # Fix PHP standards
 vendor/bin/phpcs         # Check PHP standards
 
