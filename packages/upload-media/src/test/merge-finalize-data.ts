@@ -1,7 +1,3 @@
-/**
- * @jest-environment jsdom
- */
-
 import { mergeFinalizeDataRecords } from '../merge-finalize-data';
 
 describe( 'mergeFinalizeDataRecords', () => {

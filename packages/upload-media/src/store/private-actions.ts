@@ -2001,10 +2001,10 @@ export function generateThumbnails( id: QueueItemId ) {
 
 								scaledOperations.push( OperationType.Upload );
 
-								const plannedScaledNames =
-									plannedScaled.sizeNames?.length
-										? plannedScaled.sizeNames
-										: [ 'scaled' ];
+								const plannedScaledNames = plannedScaled
+									.sizeNames?.length
+									? plannedScaled.sizeNames
+									: [ 'scaled' ];
 								const scaledImageSizeParam =
 									plannedScaledNames.length === 1
 										? plannedScaledNames[ 0 ]

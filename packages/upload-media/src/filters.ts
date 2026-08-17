@@ -168,10 +168,10 @@ export async function applyPlanImageSizeFilter(
 ): Promise< PlanImageSizeArgs | PlanImageSizeArgs[] | null > {
 	let result: PlanImageSizeArgs | PlanImageSizeArgs[] | null;
 	try {
-		result = ( await applyFiltersAsync(
-			PLAN_IMAGE_SIZE_HOOK,
-			args
-		) ) as PlanImageSizeArgs | PlanImageSizeArgs[] | null;
+		result = ( await applyFiltersAsync( PLAN_IMAGE_SIZE_HOOK, args ) ) as
+			| PlanImageSizeArgs
+			| PlanImageSizeArgs[]
+			| null;
 	} catch {
 		// A throwing filter must not block thumbnail generation.
 		return args;

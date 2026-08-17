@@ -446,7 +446,11 @@ describe( 'private actions', () => {
 			const thunk = finalizeItem( 'test-id' );
 			await thunk( { select, dispatch } );
 
-			expect( mediaFinalize ).toHaveBeenCalledWith( 42, mockSubSizes, {} );
+			expect( mediaFinalize ).toHaveBeenCalledWith(
+				42,
+				mockSubSizes,
+				{}
+			);
 			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {
 				attachment: updatedAttachment,
 			} );
@@ -482,7 +486,11 @@ describe( 'private actions', () => {
 			const thunk = finalizeItem( 'test-id' );
 			await thunk( { select, dispatch } );
 
-			expect( mediaFinalize ).toHaveBeenCalledWith( 42, mockSubSizes, {} );
+			expect( mediaFinalize ).toHaveBeenCalledWith(
+				42,
+				mockSubSizes,
+				{}
+			);
 			expect( warnSpy ).toHaveBeenCalledWith(
 				'Media finalization failed:',
 				restError

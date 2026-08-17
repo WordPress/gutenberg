@@ -4,10 +4,10 @@ import { transformAttachment } from '@wordpress/media-utils';
 /**
  * Finalizes a client-side processed attachment.
  *
- * @param id         Attachment ID.
- * @param subSizes   Sub-size metadata collected from sideloads.
- * @param clientData Optional plugin data sent as `client_extended_data` (e.g. encode qualities).
- * @return Transformed attachment from the finalize response, when present.
+ * @param {number} id         Attachment ID.
+ * @param {Array}  subSizes   Sub-size metadata collected from sideloads.
+ * @param {Object} clientData Optional plugin data sent as `client_extended_data` (e.g. encode qualities).
+ * @return {Object|undefined} Transformed attachment from the finalize response, when present.
  */
 export default async function mediaFinalize(
 	id,
