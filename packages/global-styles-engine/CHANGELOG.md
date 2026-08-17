@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Use the row block spacing value for Flow and Constrained layouts when Global Styles defines separate row and column values.
+-   Use the row block spacing value for Flow and Constrained layouts when Global Styles defines separate row and column values ([#81476](https://github.com/WordPress/gutenberg/pull/81476)).
 
 ## 1.20.0 (2026-08-12)
 
