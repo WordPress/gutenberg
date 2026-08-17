@@ -1,4 +1,4 @@
-import { Page } from '@wordpress/admin-ui';
+import { Breadcrumbs, Page } from '@wordpress/admin-ui';
 import apiFetch from '@wordpress/api-fetch';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import type { Field, View } from '@wordpress/dataviews';
@@ -257,7 +257,18 @@ function SiteHealthPage() {
 
 	if ( ! isLoading && checks.length === 0 && unavailable > 0 ) {
 		return (
-			<Page title={ __( 'Site Health' ) } hasPadding>
+			<Page
+				breadcrumbs={
+					<Breadcrumbs
+						items={ [
+							{ label: __( 'Dashboard' ), to: '/' },
+							{ label: __( 'Site Health' ) },
+						] }
+					/>
+				}
+				ariaLabel={ __( 'Site Health' ) }
+				hasPadding
+			>
 				<Stack direction="column" gap="sm">
 					<Text render={ <p /> }>
 						{ errorMessage
@@ -280,7 +291,15 @@ function SiteHealthPage() {
 
 	return (
 		<Page
-			title={ __( 'Site Health' ) }
+			breadcrumbs={
+				<Breadcrumbs
+					items={ [
+						{ label: __( 'Dashboard' ), to: '/' },
+						{ label: __( 'Site Health' ) },
+					] }
+				/>
+			}
+			ariaLabel={ __( 'Site Health' ) }
 			subTitle={ __( "Results from your site's latest health checks." ) }
 			hasPadding={ false }
 		>
