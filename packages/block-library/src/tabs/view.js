@@ -154,25 +154,65 @@ const { actions, state } = store(
 					}
 				}
 			},
-		},
-		callbacks: {
-			/**
-			 * When the tabs are initialized, we need to check if there is a hash in the url and if so if it exists in the current tabsList, set the active tab to that index.
-			 *
-			 */
-			onTabsInit: () => {
-				const { tabsList } = state;
-				if ( tabsList.length === 0 ) {
+			activateTabByHash: () => {
+				if ( ! window?.location?.hash?.length ) {
 					return;
 				}
 
-				const { hash } = window.location;
-				const tabId = hash.replace( '#', '' );
-				const tabIndex = tabsList.findIndex( ( t ) => t === tabId );
-				// Check if tabIndex is a positive number and if so we'll auto activate that tab.
-				if ( tabIndex >= 0 ) {
-					actions.setActiveTab( tabIndex, true );
+				const { tabsList } = state;
+
+				if ( ! tabsList || tabsList.length === 0 ) {
+					return;
 				}
+
+				const hash = decodeURIComponent(
+					window.location.hash.slice( 1 )
+				);
+
+				const panelIndex = tabsList.findIndex( ( t ) => t === hash );
+				if ( panelIndex >= 0 ) {
+					actions.setActiveTab( panelIndex, true );
+					return;
+				}
+
+				const targetElement = document.getElementById( hash );
+				if ( ! targetElement ) {
+					return;
+				}
+
+				// Walk up the panels containing the target rather than taking
+				// the nearest one, so that nested tabs resolve to the panel
+				// belonging to this block.
+				let panel = targetElement.closest( '[role="tabpanel"]' );
+				let tabIndex = -1;
+
+				while ( panel && tabIndex < 0 ) {
+					tabIndex = tabsList.findIndex( ( t ) => t === panel.id );
+					panel =
+						panel.parentElement?.closest( '[role="tabpanel"]' ) ??
+						null;
+				}
+
+				if ( tabIndex < 0 ) {
+					return;
+				}
+
+				actions.setActiveTab( tabIndex );
+				setTimeout( () => {
+					targetElement.scrollIntoView( { behavior: 'smooth' } );
+				}, 100 );
+			},
+		},
+		callbacks: {
+			/**
+			 * When the tabs are initialized, activate the tab that the URL hash
+			 * points into, if any.
+			 */
+			onTabsInit: () => {
+				actions.activateTabByHash();
+			},
+			onHashChange: () => {
+				actions.activateTabByHash();
 			},
 		},
 	},
