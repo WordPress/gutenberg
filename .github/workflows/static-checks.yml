@@ -120,7 +120,7 @@ jobs:
             - name: Check type declaration files
               # Runs against the declarations the type check just emitted;
               # the bundle build below skips types and with them this check.
-              run: npm run --workspace @wordpress/build-scripts check-type-declarations
+              run: npm run check:type-declarations
 
             - name: Build packages
               run: npm run build -- --skip-types
