@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import PostSavedState from '../';
 
 const mockSavePost = jest.fn();

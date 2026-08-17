@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { createRegistry } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import { loadAssets } from '../load-assets';
 import { store as blockDirectoryStore } from '..';
 

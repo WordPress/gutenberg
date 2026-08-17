@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	MenuGroup,
 	MenuItem,
@@ -12,10 +9,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { useEntityRecords, useEntityProp } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import useNavigationMenu from '../use-navigation-menu';
 
 function buildMenuLabel( title, id, status ) {

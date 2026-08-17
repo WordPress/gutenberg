@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store } from '@wordpress/block-editor';
 import { Modal, Button, Flex, FlexItem } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';

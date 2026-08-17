@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { parseHref } from '@tanstack/history';
 import {
 	createBrowserHistory,
@@ -21,10 +18,6 @@ import {
 	useRouter,
 	useRouterState,
 } from '@tanstack/react-router';
-
-/**
- * Internal dependencies
- */
 import { lock } from './lock-unlock';
 
 /**

@@ -1,21 +1,14 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalListView as ListView,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { useFocusOnMount, useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
 import { useCallback, useRef, useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { ESCAPE } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import ListViewOutline from './list-view-outline';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
@@ -25,9 +18,6 @@ const { TabbedSidebar } = unlock( blockEditorPrivateApis );
 export default function ListViewSidebar() {
 	const { setIsListViewOpened } = useDispatch( editorStore );
 	const { getListViewToggleRef } = unlock( useSelect( editorStore ) );
-
-	// This hook handles focus when the sidebar first renders.
-	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 
 	// When closing the list view, focus should return to the toggle button.
 	const closeListView = useCallback( () => {
@@ -60,7 +50,6 @@ export default function ListViewSidebar() {
 
 	// Must merge the refs together so focus can be handled properly in the next function.
 	const listViewContainerRef = useMergeRefs( [
-		focusOnMountRef,
 		listViewRef,
 		setDropZoneElement,
 	] );
@@ -128,6 +117,7 @@ export default function ListViewSidebar() {
 								<div className="editor-list-view-sidebar__list-view-panel-content">
 									<ListView
 										dropZoneElement={ dropZoneElement }
+										focusOnMount
 									/>
 								</div>
 							</div>

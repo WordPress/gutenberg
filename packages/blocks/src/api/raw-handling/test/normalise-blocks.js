@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import normaliseBlocks from '../normalise-blocks';
 
 describe( 'normaliseBlocks', () => {

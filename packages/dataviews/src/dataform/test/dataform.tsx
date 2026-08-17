@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
-
-/**
- * Internal dependencies
- */
 import Dataform from '../index';
 import useFormValidity from '../../hooks/use-form-validity';
 
@@ -187,6 +176,98 @@ describe( 'DataForm component', () => {
 
 			expect( onChange ).toHaveBeenLastCalledWith( { price: 3.75 } );
 			expect( priceInput ).toHaveValue( 3.75 );
+		} );
+
+		it( 'should edit time fields with a time input', async () => {
+			const onChange = jest.fn();
+			const fieldsWithTime = [
+				...fields,
+				{
+					id: 'startTime',
+					label: 'Start time',
+					type: 'time' as const,
+				},
+			];
+			render(
+				<Dataform
+					onChange={ onChange }
+					fields={ fieldsWithTime }
+					form={ { ...form, fields: [ 'startTime' ] } }
+					data={ { ...data, startTime: '14:30' } }
+				/>
+			);
+
+			const timeInput = screen.getByLabelText( /start time/i );
+			expect( timeInput ).toHaveAttribute( 'type', 'time' );
+			expect( timeInput ).toHaveValue( '14:30' );
+
+			const user = userEvent.setup();
+			await user.clear( timeInput );
+			await user.type( timeInput, '18:45' );
+
+			expect( onChange ).toHaveBeenLastCalledWith( {
+				startTime: '18:45',
+			} );
+		} );
+
+		it( 'should constrain the time input to the field min, max and format', () => {
+			const fieldsWithTime = [
+				...fields,
+				{
+					id: 'startTime',
+					label: 'Start time',
+					type: 'time' as const,
+					format: { time: 'H:i:s' },
+					isValid: { min: '09:00', max: '17:00' },
+				},
+			];
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fieldsWithTime }
+					form={ { ...form, fields: [ 'startTime' ] } }
+					data={ { ...data, startTime: '14:30' } }
+				/>
+			);
+
+			const timeInput = screen.getByLabelText( /start time/i );
+			expect( timeInput ).toHaveAttribute( 'min', '09:00' );
+			expect( timeInput ).toHaveAttribute( 'max', '17:00' );
+			// Seconds in the format make the input offer a seconds field.
+			expect( timeInput ).toHaveAttribute( 'step', '1' );
+		} );
+
+		it( 'should normalize tolerated time values for the time input', () => {
+			const fieldsWithTime = [
+				...fields,
+				{
+					id: 'startTime',
+					label: 'Start time',
+					type: 'time' as const,
+				},
+			];
+			const renderWithValue = ( startTime: string ) => (
+				<Dataform
+					onChange={ noop }
+					fields={ fieldsWithTime }
+					form={ { ...form, fields: [ 'startTime' ] } }
+					data={ { ...data, startTime } }
+				/>
+			);
+			const { rerender } = render( renderWithValue( '9:30' ) );
+
+			// `input[type=time]` accepts only zero-padded `HH:mm[:ss]`.
+			const timeInput = screen.getByLabelText( /start time/i );
+			expect( timeInput ).toHaveValue( '09:30' );
+
+			rerender( renderWithValue( '14:30Z' ) );
+			expect( timeInput ).toHaveValue( '14:30' );
+
+			// A value carrying seconds gets a seconds field even when the
+			// format does not ask for them.
+			rerender( renderWithValue( '14:30:45' ) );
+			expect( timeInput ).toHaveValue( '14:30:45' );
+			expect( timeInput ).toHaveAttribute( 'step', '1' );
 		} );
 
 		it( 'should render combined fields correctly', async () => {
@@ -917,6 +998,125 @@ describe( 'DataForm component', () => {
 			);
 
 			expect( speak ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'datetime fields', () => {
+		const datetimeFields = [
+			{
+				id: 'date',
+				label: 'Date',
+				type: 'datetime' as const,
+				isValid: { required: true },
+			},
+		];
+
+		const datetimeForm = {
+			fields: [ 'date' ],
+		};
+
+		const dayButton = ( date: Date ) =>
+			screen.getByRole( 'button', {
+				name: new RegExp(
+					new Intl.DateTimeFormat( 'en-US', {
+						weekday: 'long',
+						year: 'numeric',
+						month: 'long',
+						day: 'numeric',
+					} ).format( date )
+				),
+			} );
+
+		// Waits out any timeouts scheduled by the control, so that a
+		// duplicate update scheduled for a later tick is not missed.
+		const flushTimeouts = () =>
+			act(
+				() => new Promise( ( resolve ) => setTimeout( resolve, 10 ) )
+			);
+
+		function ControlledForm( {
+			onChange: onChangeProp = noop,
+		}: {
+			onChange?: ( edits: { date?: string } ) => void;
+		} ) {
+			const [ item, setItem ] = useState< {
+				date: string | undefined;
+			} >( { date: '2026-01-10T10:00:00.000Z' } );
+			return (
+				<Dataform
+					onChange={ ( edits ) => {
+						onChangeProp( edits );
+						setItem( ( prev ) => ( { ...prev, ...edits } ) );
+					} }
+					fields={ datetimeFields }
+					form={ datetimeForm }
+					data={ item }
+				/>
+			);
+		}
+
+		it( 'should call onChange once when a date is selected in the calendar', async () => {
+			const onChange = jest.fn();
+			const user = userEvent.setup();
+			render(
+				<Dataform
+					onChange={ onChange }
+					fields={ datetimeFields }
+					form={ datetimeForm }
+					data={ { date: '2026-01-10T10:00:00.000Z' } }
+				/>
+			);
+
+			await user.click( dayButton( new Date( 2026, 0, 15 ) ) );
+			await flushTimeouts();
+
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
+			// The time is preserved from the previous value.
+			expect( onChange ).toHaveBeenCalledWith( {
+				date: '2026-01-15T10:00:00.000Z',
+			} );
+			expect( speak ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should call onChange once and show the required error when the date is cleared, keeping focus on the day button', async () => {
+			const onChange = jest.fn();
+			const user = userEvent.setup();
+
+			render( <ControlledForm onChange={ onChange } /> );
+
+			// Clicking the selected day deselects it.
+			await user.click( dayButton( new Date( 2026, 0, 10 ) ) );
+			await flushTimeouts();
+
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
+			expect( onChange ).toHaveBeenCalledWith( { date: undefined } );
+			expect(
+				await screen.findByText( 'Constraints not satisfied' )
+			).toBeVisible();
+			// Focus does not move, so the error is announced instead.
+			expect( speak ).toHaveBeenCalledWith( 'Constraints not satisfied' );
+			expect( dayButton( new Date( 2026, 0, 10 ) ) ).toHaveFocus();
+		} );
+
+		it( 'should clear the revealed error when a valid date is selected in the calendar', async () => {
+			const user = userEvent.setup();
+
+			render( <ControlledForm /> );
+
+			// Clicking the selected day deselects it, making the field invalid.
+			await user.click( dayButton( new Date( 2026, 0, 10 ) ) );
+			await flushTimeouts();
+
+			expect(
+				await screen.findByText( 'Constraints not satisfied' )
+			).toBeVisible();
+
+			await user.click( dayButton( new Date( 2026, 0, 15 ) ) );
+			await flushTimeouts();
+
+			expect(
+				screen.queryByText( 'Constraints not satisfied' )
+			).not.toBeInTheDocument();
 		} );
 	} );
 } );

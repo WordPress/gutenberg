@@ -6,7 +6,7 @@
 	},
 	"references": [
 		{ "path": "../autop" },
-		{ "path": "../blob" },
+		{ "path": "../blob/tsconfig.build.json" },
 		{ "path": "../block-serialization-default-parser" },
 		{ "path": "../data" },
 		{ "path": "../deprecated" },
@@ -16,6 +16,7 @@
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },
 		{ "path": "../is-shallow-equal" },
+		{ "path": "../keycodes" },
 		{ "path": "../private-apis" },
 		{ "path": "../rich-text" },
 		{ "path": "../shortcode" },

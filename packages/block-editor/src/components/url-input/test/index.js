@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { speak } from '@wordpress/a11y';
 import { useState } from '@wordpress/element';
 import { dispatch } from '@wordpress/data';
 import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import URLInput from '../';
 import { store as blockEditorStore } from '../../../store';
 
@@ -336,6 +325,62 @@ describe( 'URLInput', () => {
 		} );
 	} );
 
+	describe( 'IME composition', () => {
+		it( 'should not fetch suggestions for the intermediate values of an IME composition', async () => {
+			const { input } = renderURLInput();
+
+			fireEvent.compositionStart( input );
+			fireEvent.change( input, { target: { value: 'ほ' } } );
+			fireEvent.change( input, { target: { value: 'ほん' } } );
+			fireEvent.change( input, { target: { value: 'ほんだ' } } );
+			await flushDebounce();
+
+			expect( fetchLinkSuggestions ).not.toHaveBeenCalled();
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'should not fetch suggestions for a value superseded by an IME composition', async () => {
+			const { user, input } = renderURLInput();
+
+			await user.type( input, 'ab' );
+			fireEvent.compositionStart( input );
+			fireEvent.change( input, { target: { value: 'abほ' } } );
+			await flushDebounce();
+
+			expect( fetchLinkSuggestions ).not.toHaveBeenCalled();
+		} );
+
+		// Firefox reports the confirmed value of a composition after
+		// `compositionend`, Chrome and Safari before it.
+		// See: https://bugzilla.mozilla.org/show_bug.cgi?id=1305387
+		it.each( [ 'before', 'after' ] )(
+			'should fetch suggestions for a composed value reported %s the composition ends',
+			async ( order ) => {
+				const { input } = renderURLInput();
+
+				fireEvent.compositionStart( input );
+				fireEvent.change( input, { target: { value: 'ほんだ' } } );
+				// Compositions outlast the debounce, so the confirmed value is
+				// the only one a request is made for.
+				await flushDebounce();
+
+				if ( order === 'before' ) {
+					fireEvent.change( input, { target: { value: 'ホンダ' } } );
+					fireEvent.compositionEnd( input );
+				} else {
+					fireEvent.compositionEnd( input );
+					fireEvent.change( input, { target: { value: 'ホンダ' } } );
+				}
+
+				expect( await screen.findByRole( 'listbox' ) ).toBeVisible();
+				expect( fetchLinkSuggestions ).toHaveBeenCalledTimes( 1 );
+				expect( fetchLinkSuggestions ).toHaveBeenCalledWith( 'ホンダ', {
+					isInitialSuggestions: false,
+				} );
+			}
+		);
+	} );
+
 	describe( 'announcements', () => {
 		it( 'should announce the number of results', async () => {
 			await renderWithSuggestions();
@@ -415,6 +460,13 @@ describe( 'URLInput', () => {
 				'aria-activedescendant',
 				firstOption.id
 			);
+
+			fireEvent.keyDown( input, KEY_EVENTS.up );
+
+			expect( input ).toHaveAttribute(
+				'aria-activedescendant',
+				secondOption.id
+			);
 		} );
 
 		it( 'should select and submit the active suggestion when pressing Enter', async () => {
@@ -490,6 +542,28 @@ describe( 'URLInput', () => {
 
 			fireEvent.keyDown( input, KEY_EVENTS.down );
 			expect( input.selectionStart ).toBe( 5 );
+
+			// A selection reaching an end is collapsed to it first.
+			input.setSelectionRange( 0, 5 );
+			fireEvent.keyDown( input, KEY_EVENTS.up );
+			expect( input.selectionEnd ).toBe( 0 );
+		} );
+
+		it( 'should leave a selection being extended with the shift key alone', async () => {
+			const { user, input } = renderURLInput( {
+				disableSuggestions: true,
+			} );
+
+			await user.type( input, 'hello' );
+			input.setSelectionRange( 0, 5 );
+
+			fireEvent.keyDown( input, {
+				...KEY_EVENTS.up,
+				shiftKey: true,
+			} );
+
+			expect( input.selectionStart ).toBe( 0 );
+			expect( input.selectionEnd ).toBe( 5 );
 		} );
 	} );
 

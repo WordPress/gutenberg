@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { create } from '../create';
 import { toHTMLString } from '../to-html-string';
 import { registerFormatType } from '../register-format-type';

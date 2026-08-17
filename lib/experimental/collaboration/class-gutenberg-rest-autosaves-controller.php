@@ -15,6 +15,34 @@
 class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 
 	/**
+	 * Meta key holding the CRDT snapshot describing an autosave's content.
+	 *
+	 * @var string
+	 */
+	public const CRDT_SNAPSHOT_META_KEY = '_crdt_autosave_snapshot';
+
+	/**
+	 * Request parameter holding the CRDT snapshot describing an autosave's
+	 * content.
+	 *
+	 * This string must match CRDT_AUTOSAVE_SNAPSHOT_KEY in @wordpress/core-data.
+	 *
+	 * @var string
+	 */
+	public const CRDT_SNAPSHOT_PARAM = 'crdt_snapshot';
+
+	/**
+	 * Maximum accepted length of a stored CRDT snapshot, in bytes.
+	 *
+	 * A snapshot is a state vector plus a delete set, so it grows with the
+	 * much slower than content. Unlikely to exceed 1 MB, but use as a safety
+	 * backstop.
+	 *
+	 * @var int
+	 */
+	private const MAX_CRDT_SNAPSHOT_LENGTH = MB_IN_BYTES;
+
+	/**
 	 * Parent post controller.
 	 *
 	 * @since 5.0.0
@@ -53,9 +81,10 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function create_item( $request ) {
-
-		if ( ! defined( 'WP_RUN_CORE_TESTS' ) && ! defined( 'DOING_AUTOSAVE' ) ) {
-			define( 'DOING_AUTOSAVE', true );
+		// Gutenberg selects this controller only when RTC is enabled. Preserve
+		// Core behavior if it is registered explicitly or instantiated directly.
+		if ( ! wp_is_collaboration_enabled() ) {
+			return parent::create_item( $request );
 		}
 
 		$post = $this->get_parent( $request['id'] );
@@ -64,66 +93,64 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 			return $post;
 		}
 
-		$prepared_post     = $this->gutenberg_parent_controller->prepare_item_for_database( $request );
-		$prepared_post->ID = $post->ID;
-		$user_id           = get_current_user_id();
-
-		// We need to check post lock to ensure the original author didn't leave their browser tab open.
-		if ( ! function_exists( 'wp_check_post_lock' ) ) {
+		// Autosave creation may fire this callback for revisioned post meta.
+		if ( ! function_exists( 'wp_autosave_post_revisioned_meta_fields' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/post.php';
 		}
 
-		$post_lock_is_active      = wp_check_post_lock( $post->ID );
-		$is_auto_draft            = 'auto-draft' === $post->post_status;
-		$is_draft                 = 'draft' === $post->post_status || $is_auto_draft;
-		$is_collaboration_enabled = wp_is_collaboration_enabled();
+		// Post-type collaboration support is determined after the autosaves
+		// controller is selected, so disabled post types must delegate to Core.
+		if ( wp_is_post_type_collaboration_disabled( $post->post_type ) ) {
+			return parent::create_item( $request );
+		}
+
+		if ( ! defined( 'WP_RUN_CORE_TESTS' ) && ! defined( 'DOING_AUTOSAVE' ) ) {
+			define( 'DOING_AUTOSAVE', true );
+		}
+
+		$prepared_post     = $this->gutenberg_parent_controller->prepare_item_for_database( $request );
+		$prepared_post->ID = $post->ID;
+		$post_data         = (array) $prepared_post;
+		$meta              = (array) $request->get_param( 'meta' );
 
 		/*
-		 * When a post is still in draft form, updates from the author can directly update the post.
-		 * Other autosaves must be stored as per-user autosave revisions.
+		 * Regular draft autosaves must not update the parent post directly under
+		 * RTC. All peers share a persisted editing state in the CRDT, so their
+		 * autosaved changes must be stored in revisions. Applying those edits to
+		 * the parent post would make them appear to be external changes when the
+		 * editor next reloads, causing the same changes to be reapplied to the
+		 * CRDT and duplicated.
 		 *
-		 * When RTC is active, however, regular draft autosaves must not update the parent post directly.
-		 * Since all peers are sharing a persisted editing state (a shared CRDT), it’s important that
-		 * they all store updates in a revision. If edits were applied to the post, then upon the next
-		 * editor reload, it would appear as though the post had been updated externally, and those same
-		 * changes would be re-applied to the CRDT, duplicating the edits.
-		 *
-		 * The one caveat for RTC is that the first peer to store an edit must promote an auto-draft
-		 * into a real draft post. If this doesn’t happen then the peers may continue to make edits
-		 * but the draft will be lost, as auto-drafts are not listed in post views.
+		 * The first peer to store an edit must still promote an auto-draft into
+		 * a real draft. Otherwise, peers could continue editing while the post
+		 * remains an unlisted auto-draft and may be lost.
 		 */
-		$can_update_author_draft_post = (
-			$is_draft &&
-			(int) $post->post_author === $user_id &&
-			! $is_collaboration_enabled
-		);
-		$can_promote_auto_draft_post  = (
-			$is_auto_draft &&
-			$is_collaboration_enabled &&
+		$should_promote_auto_draft = (
+			'auto-draft' === $post->post_status &&
 			current_user_can( 'edit_post', $post->ID )
 		);
 
-		$should_update_parent_draft_post = (
-			$can_promote_auto_draft_post ||
-			( ! $post_lock_is_active && $can_update_author_draft_post )
-		);
-
-		if ( $should_update_parent_draft_post ) {
-			$autosave_id = wp_update_post( wp_slash( (array) $prepared_post ), true );
-		} elseif ( $this->is_redundant_autosave( $post, (array) $prepared_post, (array) $request->get_param( 'meta' ) ) ) {
+		if ( $should_promote_auto_draft ) {
+			$autosave_id = wp_update_post( wp_slash( $post_data ), true );
+		} elseif ( $this->is_redundant_autosave( $post, $post_data, $meta ) ) {
 			/*
-			 * Nothing changed and there is no existing autosave to update, so
-			 * storing a revision would only create one that is identical to the
-			 * post. Avoid a no-op revision because WordPress decides whether to warn
-			 * about "a more recent autosave" by comparing timestamps.
+			 * Nothing changed from the latest shared state, so storing a
+			 * revision would only create an identical one. Avoid a no-op
+			 * revision because WordPress decides whether to warn about "a more
+			 * recent autosave" by comparing timestamps.
 			 */
 			$autosave_id = $post->ID;
 		} else {
-			$autosave_id = $this->create_post_autosave( (array) $prepared_post, (array) $request->get_param( 'meta' ) );
+			$autosave_id = $this->create_post_autosave( $post_data, $meta );
 		}
 
 		if ( is_wp_error( $autosave_id ) ) {
 			return $autosave_id;
+		}
+
+		// Only save a CRDT snapshot with an autosave (not with parent post)
+		if ( $autosave_id !== $post->ID ) {
+			$this->store_crdt_snapshot( $autosave_id, $request );
 		}
 
 		$autosave = get_post( $autosave_id );
@@ -133,6 +160,44 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 		$response = rest_ensure_response( $response );
 
 		return $response;
+	}
+
+	/**
+	 * Stores the CRDT snapshot describing the content an autosave captured.
+	 *
+	 * The snapshot allows an editor session verify that a shared document
+	 * already contains everything the autosave holds, so the "more recent
+	 * autosave" notice can be suppressed as redundant.
+	 *
+	 * Anything invalid is dropped rather than erroring, and any previously
+	 * stored snapshot is cleared, because a missing snapshot only means the
+	 * editor falls back to showing the "newer autosave" notice.
+	 *
+	 * @param int             $autosave_id Autosave revision ID.
+	 * @param WP_REST_Request $request     Full details about the request.
+	 * @return void
+	 */
+	private function store_crdt_snapshot( $autosave_id, $request ) {
+		$snapshot = $request->get_param( self::CRDT_SNAPSHOT_PARAM );
+
+		$is_valid_snapshot = (
+			is_string( $snapshot ) &&
+			'' !== $snapshot &&
+			strlen( $snapshot ) <= self::MAX_CRDT_SNAPSHOT_LENGTH
+		);
+
+		if ( ! $is_valid_snapshot ) {
+			/*
+			 * The autosave revision is reused across autosaves, so a snapshot
+			 * stored by an earlier request would otherwise remain attached to
+			 * this request's newer content and could wrongly vouch for it.
+			 * Clear it so the editor falls back to showing the notice.
+			 */
+			delete_metadata( 'post', $autosave_id, self::CRDT_SNAPSHOT_META_KEY );
+			return;
+		}
+
+		update_metadata( 'post', $autosave_id, self::CRDT_SNAPSHOT_META_KEY, wp_slash( $snapshot ) );
 	}
 
 	/**
@@ -200,13 +265,6 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 	 * @return WP_Post The post or revision to compare against.
 	 */
 	private function get_autosave_comparison_baseline( $post ) {
-		// Outside RTC the parent post is kept up to date (author draft autosaves
-		// update it directly), so core's parent comparison is already correct.
-		// Keep the default behavior for non-RTC.
-		if ( ! wp_is_collaboration_enabled() ) {
-			return $post;
-		}
-
 		// wp_get_post_revisions() returns revisions newest-first by default, and
 		// includes per-user autosaves (they are revisions), so the first entry is
 		// the most recent shared content.

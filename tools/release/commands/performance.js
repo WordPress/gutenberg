@@ -1,14 +1,7 @@
-/**
- * External dependencies
- */
 const os = require( 'os' );
 const fs = require( 'fs' );
 const path = require( 'path' );
 const SimpleGit = require( 'simple-git' );
-
-/**
- * Internal dependencies
- */
 const { formats, log } = require( '../lib/logger' );
 const {
 	runShellScript,
@@ -102,6 +95,11 @@ function quartiles( array ) {
 	}
 
 	const q50 = med( 0, numbers.length );
+
+	// A single value has no halves, and `med()` would read past the array.
+	if ( numbers.length === 1 ) {
+		return { q25: q50, q50, q75: q50 };
+	}
 
 	let q25, q75;
 	if ( numbers.length % 2 === 0 ) {
@@ -301,7 +299,7 @@ async function runPerformanceTests( branches, options ) {
 	logAtIndent( 2, 'Creating directory:', formats.success( sourceDir ) );
 	fs.mkdirSync( sourceDir );
 
-	// @ts-ignore
+	// @ts-expect-error The `simple-git` module namespace has no call signatures.
 	const sourceGit = SimpleGit( sourceDir );
 	logAtIndent(
 		2,
@@ -328,7 +326,6 @@ async function runPerformanceTests( branches, options ) {
 			'Fetching test runner branch:',
 			formats.success( options.testsBranch )
 		);
-		// @ts-ignore
 		await sourceGit.raw(
 			'fetch',
 			'--depth=1',
@@ -355,7 +352,7 @@ async function runPerformanceTests( branches, options ) {
 		'Checking out branch:',
 		formats.success( testRunnerBranch )
 	);
-	// @ts-ignore
+	// @ts-expect-error The `simple-git` module namespace has no call signatures.
 	await SimpleGit( testRunnerDir ).raw( 'checkout', testRunnerBranch );
 
 	logAtIndent( 2, 'Installing dependencies and building' );
@@ -390,7 +387,7 @@ async function runPerformanceTests( branches, options ) {
 
 		logAtIndent( 3, 'Creating directory:', formats.success( envDir ) );
 		fs.mkdirSync( envDir );
-		// @ts-ignore
+		// @ts-expect-error `branchDirs` is inferred as `{}`, which has no string index signature.
 		branchDirs[ branch ] = envDir;
 		const buildDir = path.join( envDir, 'plugin' );
 
@@ -398,7 +395,7 @@ async function runPerformanceTests( branches, options ) {
 		await runShellScript( `cp -R ${ sourceDir } ${ buildDir }` );
 
 		logAtIndent( 3, 'Checking out:', formats.success( branch ) );
-		// @ts-ignore
+		// @ts-expect-error The `simple-git` module namespace has no call signatures.
 		await SimpleGit( buildDir ).raw( 'checkout', branch );
 
 		logAtIndent( 3, 'Installing dependencies and building' );
@@ -490,7 +487,7 @@ async function runPerformanceTests( branches, options ) {
 			);
 
 			const sanitizedBranchName = sanitizeBranchName( branch );
-			// @ts-ignore
+			// @ts-expect-error `branchDirs` is inferred as `{}`, which has no string index signature.
 			const envDir = branchDirs[ branch ];
 
 			logAtIndent( 2, 'Starting environment' );
@@ -525,9 +522,8 @@ async function runPerformanceTests( branches, options ) {
 	//
 	//   npm run --workspace @wordpress/build-scripts resolve-trace-source-maps -- <trace> --build-dir <build-dir>
 	const headBranch = branches[ 0 ];
-	// @ts-ignore
 	const headBuildScriptsDir = path.join(
-		// @ts-ignore
+		// @ts-expect-error `branchDirs` is inferred as `{}`, which has no string index signature.
 		branchDirs[ headBranch ],
 		'plugin',
 		'build',

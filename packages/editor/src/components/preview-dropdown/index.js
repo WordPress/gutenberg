@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	DropdownMenu,
@@ -22,10 +15,6 @@ import { ActionItem, store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import { VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { PostPreviewMenuItem } from '../post-preview-button';
 import { sidebars } from '../sidebar/constants';

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'List View', () => {
@@ -499,6 +496,33 @@ test.describe( 'List View', () => {
 		).toBeFocused();
 	} );
 
+	test( 'should place focus on the first block when no block is selected', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { content: 'First' },
+		} );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+
+		// Clicking the title deselects the blocks.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.click();
+
+		// Open List View.
+		await pageUtils.pressKeys( 'access+o' );
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		await expect(
+			listView.getByRole( 'link', { name: 'First' } )
+		).toBeFocused();
+	} );
+
 	test( 'should duplicate block using keyboard', async ( {
 		editor,
 		pageUtils,
@@ -640,6 +664,17 @@ test.describe( 'List View', () => {
 				name: 'Copy Styles',
 			} )
 			.click();
+
+		// Wait for the copy confirmation. It only shows up once the styles
+		// have actually been written to the clipboard: the click on "Copy
+		// Styles" resolves before the asynchronous clipboard write settles,
+		// so pasting right away can read the clipboard before the styles
+		// are in it.
+		await expect(
+			page
+				.getByTestId( 'snackbar' )
+				.getByText( 'Styles copied to clipboard.' )
+		).toBeVisible();
 
 		// Open List View.
 		await listViewUtils.openListView();
