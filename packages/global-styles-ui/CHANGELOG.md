@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Font Library: Resolve variable font weight ranges to a single value so the previews no longer fall back to the surrounding font weight ([#81748](https://github.com/WordPress/gutenberg/pull/81748)).
+
 ### Enhancements
 
 -   Expose typography and color controls for citations, inputs, and selects in Global Styles ([#80852](https://github.com/WordPress/gutenberg/pull/80852)).
