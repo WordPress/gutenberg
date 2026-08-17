@@ -2252,14 +2252,21 @@ class WP_Theme_JSON_Gutenberg {
 
 			// Support split row / column values and concatenate to a shorthand value.
 			if ( is_array( $block_gap_value ) ) {
-				if ( isset( $block_gap_value['top'] ) && isset( $block_gap_value['left'] ) ) {
-					$block_gap_row_value    = static::get_property_value( $node, array( 'spacing', 'blockGap', 'top' ) );
-					$block_gap_column_value = static::get_property_value( $node, array( 'spacing', 'blockGap', 'left' ) );
+				$has_block_gap_row_value    = isset( $block_gap_value['top'] );
+				$has_block_gap_column_value = isset( $block_gap_value['left'] );
+
+				if ( $has_block_gap_row_value || $has_block_gap_column_value ) {
+					$block_gap_row_value = $has_block_gap_row_value
+						? static::get_property_value( $node, array( 'spacing', 'blockGap', 'top' ) )
+						: '0';
+					$block_gap_column_value = $has_block_gap_column_value
+						? static::get_property_value( $node, array( 'spacing', 'blockGap', 'left' ) )
+						: '0';
 					$block_gap_value        = $block_gap_row_value === $block_gap_column_value
 						? $block_gap_row_value
 						: $block_gap_row_value . ' ' . $block_gap_column_value;
 				} else {
-					// Skip outputting gap value if not all sides are provided.
+					// Skip outputting a gap value if neither supported axis is provided.
 					$block_gap_value     = null;
 					$block_gap_row_value = null;
 				}
