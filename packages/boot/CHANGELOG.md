@@ -25,6 +25,7 @@
 
 ### Breaking Changes
 
+-   Boot's internal DOM classes are no longer stable styling hooks. Consumers should style their mount element and their own route content; the package does not provide replacement hooks for styling its private shell ([#81756](https://github.com/WordPress/gutenberg/pull/81756)).
 -   Remove `editLink` from a route's canvas data. Register the post type's `edit` path with `registerEntityLinks` instead ([#81590](https://github.com/WordPress/gutenberg/pull/81590)).
 
 ## 0.20.0 (2026-08-12)
