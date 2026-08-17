@@ -54,51 +54,26 @@ export default function ListViewSidebar() {
 		setDropZoneElement,
 	] );
 
-	/*
-	 * Callback function to handle list view or outline focus.
-	 *
-	 * @param {string} currentTab The current tab. Either list view or outline.
-	 *
-	 * @return void
-	 */
-	function handleSidebarFocus( currentTab ) {
-		// Tab panel focus.
-		const tabPanelFocus = focus.tabbable.find( tabsRef.current )[ 0 ];
-		// List view tab is selected.
-		if ( currentTab === 'list-view' ) {
-			// Either focus the list view or the tab panel. Must have a fallback because the list view does not render when there are no blocks.
-			const listViewApplicationFocus = focus.tabbable.find(
-				listViewRef.current
-			)[ 0 ];
-			const listViewFocusArea = sidebarRef.current.contains(
-				listViewApplicationFocus
-			)
-				? listViewApplicationFocus
-				: tabPanelFocus;
-			listViewFocusArea.focus();
-			// Outline tab is selected.
-		} else {
-			tabPanelFocus.focus();
-		}
-	}
+	// The sidebar only renders while it is open, so this handles the shortcut
+	// from there on. Opening is left to the global shortcut.
+	useShortcut( 'core/editor/toggle-list-view', () => {
+		const sidebar = sidebarRef.current;
 
-	const handleToggleListViewShortcut = useCallback( () => {
 		// If the sidebar has focus, it is safe to close.
-		if (
-			sidebarRef.current.contains(
-				sidebarRef.current.ownerDocument.activeElement
-			)
-		) {
+		if ( sidebar.contains( sidebar.ownerDocument.activeElement ) ) {
 			closeListView();
-		} else {
-			// If the list view or outline does not have focus, focus should be moved to it.
-			handleSidebarFocus( tab );
+			return;
 		}
-	}, [ closeListView, tab ] );
 
-	// This only fires when the sidebar is open because of the conditional rendering.
-	// It is the same shortcut to open but that is defined as a global shortcut and only fires when the sidebar is closed.
-	useShortcut( 'core/editor/toggle-list-view', handleToggleListViewShortcut );
+		// The list view does not render when there are no blocks, so focus
+		// falls back to the tabs.
+		const target =
+			( tab === 'list-view' &&
+				focus.tabbable.find( listViewRef.current )[ 0 ] ) ||
+			focus.tabbable.find( tabsRef.current )[ 0 ];
+
+		target?.focus();
+	} );
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions

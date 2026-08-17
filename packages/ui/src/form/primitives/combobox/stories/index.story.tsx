@@ -95,7 +95,6 @@ export const Compact: Story = {
 								<Combobox.Item
 									key={ item.value }
 									value={ item }
-									size="compact"
 								>
 									{ item.label }
 								</Combobox.Item>

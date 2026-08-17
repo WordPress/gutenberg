@@ -88,6 +88,16 @@ export function Editor( {
 		() => ( {
 			...editorSettings,
 			...settings,
+			/*
+			 * The theme's styles and the user's global styles, then whatever the
+			 * host adds for the surface it is rendering into. Spelled out after
+			 * the spread because `styles` is a list each source adds to: a host
+			 * contributing its own must not drop everyone else's.
+			 */
+			styles: [
+				...( editorSettings.styles ?? [] ),
+				...( settings?.styles ?? [] ),
+			],
 		} ),
 		[ editorSettings, settings ]
 	);
