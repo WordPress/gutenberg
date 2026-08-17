@@ -76,8 +76,7 @@ if ( ! class_exists( 'WP_Sync_Save_Server' ) ) {
 								'type'      => 'string',
 							),
 							'expected_doc' => array(
-								'required' => true,
-								'type'     => 'string',
+								'type' => 'string',
 							),
 						),
 					)
@@ -296,7 +295,7 @@ if ( ! class_exists( 'WP_Sync_Save_Server' ) ) {
 				$updated = $this->update_crdt_doc(
 					$post_id,
 					$request['doc'],
-					$request['expected_doc']
+					$request->has_param( 'expected_doc' ) ? $request['expected_doc'] : null
 				);
 				if ( is_wp_error( $updated ) ) {
 					return $updated;
@@ -323,12 +322,25 @@ if ( ! class_exists( 'WP_Sync_Save_Server' ) ) {
 		 *
 		 * @param int    $post_id      Post ID.
 		 * @param string $doc          Replacement CRDT document.
-		 * @param string $expected_doc Expected persisted CRDT document.
+		 * @param string|null $expected_doc Expected persisted CRDT document, or null for an unconditional save.
 		 * @return true|WP_Error True on success, otherwise an error.
 		 */
-		private function update_crdt_doc( int $post_id, string $doc, string $expected_doc ) {
+		private function update_crdt_doc( int $post_id, string $doc, ?string $expected_doc ) {
 			wp_cache_delete( $post_id, 'post_meta' );
 			$current_doc = get_post_meta( $post_id, self::CRDT_DOC_META_KEY, true );
+			if ( null === $expected_doc ) {
+				$updated = update_post_meta( $post_id, self::CRDT_DOC_META_KEY, $doc );
+				if ( false === $updated && $current_doc !== $doc ) {
+					return new WP_Error(
+						'rest_crdt_save_failed',
+						__( 'Failed to save CRDT document.', 'gutenberg' ),
+						array( 'status' => 500 )
+					);
+				}
+
+				return true;
+			}
+
 			if ( $current_doc !== $expected_doc ) {
 				return new WP_Error(
 					'rest_sync_document_conflict',
