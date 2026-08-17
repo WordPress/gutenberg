@@ -7,6 +7,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as bootStore } from '../../store';
 import type { CanvasData } from '../../store/types';
 import BootBackButton from './back-button';
+import SitePreview from './site-preview';
 import useNavigateToEntityRecord, {
 	useActionPerformed,
 } from './use-navigate-to-entity-record';
@@ -41,6 +42,22 @@ export default function Canvas( { canvas }: CanvasProps ) {
 	 * The record is the one the editor loads for this canvas, so reading it
 	 * here costs no request of its own.
 	 */
+	/*
+	 * A route that names no entity leaves the editor to resolve one, which it
+	 * does from the block templates only a block theme has. `undefined` while
+	 * the theme is still being read.
+	 */
+	const hasEntity = !! ( canvas.postType && canvas.postId );
+	const isBlockTheme = useSelect(
+		( select ) =>
+			(
+				select( coreStore ).getCurrentTheme() as
+					| { is_block_theme?: boolean }
+					| undefined
+			 )?.is_block_theme,
+		[]
+	);
+
 	const { editLink, isTrashed } = useSelect(
 		( select ) => {
 			if ( ! canvas.postType || ! canvas.postId ) {
@@ -97,8 +114,14 @@ export default function Canvas( { canvas }: CanvasProps ) {
 			} );
 	}, [] );
 
-	// Show spinner while loading the editor module
-	if ( ! Editor ) {
+	// Nothing for the editor to open, so show the site the route configures.
+	if ( ! hasEntity && isBlockTheme === false ) {
+		return <SitePreview />;
+	}
+
+	// Show spinner while loading the editor module, and until it is known which
+	// of the two this canvas is, so the wrong one is never shown first.
+	if ( ! Editor || ( ! hasEntity && isBlockTheme === undefined ) ) {
 		return (
 			<div
 				style={ {
