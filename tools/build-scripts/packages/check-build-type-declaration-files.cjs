@@ -29,8 +29,8 @@ const chalk = require( 'chalk' );
  */
 async function packageNeedsExtraCheck( packagePath ) {
 	/*
-	 * Migrated packages compile src from tsconfig.build.json; the default
-	 * tsconfig.json is their dev project.
+	 * A split package compiles src from tsconfig.build.json; its default
+	 * tsconfig.json is the dev project.
 	 */
 	let configPath = path.join( packagePath, 'tsconfig.build.json' );
 	try {
