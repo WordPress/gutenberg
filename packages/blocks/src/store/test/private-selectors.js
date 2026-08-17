@@ -237,7 +237,7 @@ describe( 'private selectors', () => {
 			).toEqual( [] );
 		} );
 
-		it( 'resolves a variation shortcut to the declaring block type, without restricting the blocks it applies to', () => {
+		it( 'restricts a variation shortcut to the block type declaring it', () => {
 			expect(
 				getBlockKeyboardShortcuts(
 					getState( {
@@ -251,6 +251,7 @@ describe( 'private selectors', () => {
 				{
 					...shortcut,
 					targetBlockName: 'core/heading',
+					blockNames: [ 'core/heading' ],
 					variationName: 'h1',
 				},
 			] );
@@ -268,7 +269,7 @@ describe( 'private selectors', () => {
 										{
 											type: 'block',
 											blocks: [ 'core/paragraph' ],
-											shortcut,
+											shortcuts: [ shortcut ],
 										},
 									],
 								},
@@ -301,7 +302,7 @@ describe( 'private selectors', () => {
 												'core/paragraph',
 												'core/list',
 											],
-											shortcut,
+											shortcuts: [ shortcut ],
 										},
 									],
 								},
@@ -319,6 +320,55 @@ describe( 'private selectors', () => {
 			] );
 		} );
 
+		it( 'lets one transform carry a shortcut per target variation', () => {
+			expect(
+				getBlockKeyboardShortcuts(
+					getState( {
+						blockTypes: [
+							{
+								name: 'core/heading',
+								transforms: {
+									from: [
+										{
+											type: 'block',
+											blocks: [ 'core/paragraph' ],
+											shortcuts: [
+												{
+													...shortcut,
+													name: 'test/h1',
+													variationName: 'h1',
+												},
+												{
+													...shortcut,
+													name: 'test/h2',
+													variationName: 'h2',
+												},
+											],
+										},
+									],
+								},
+							},
+						],
+					} )
+				)
+			).toEqual( [
+				{
+					...shortcut,
+					name: 'test/h1',
+					targetBlockName: 'core/heading',
+					blockNames: [ 'core/paragraph' ],
+					variationName: 'h1',
+				},
+				{
+					...shortcut,
+					name: 'test/h2',
+					targetBlockName: 'core/heading',
+					blockNames: [ 'core/paragraph' ],
+					variationName: 'h2',
+				},
+			] );
+		} );
+
 		it( 'ignores shortcuts on transforms that cannot apply them', () => {
 			expect(
 				getBlockKeyboardShortcuts(
@@ -332,11 +382,16 @@ describe( 'private selectors', () => {
 										{
 											type: 'prefix',
 											prefix: '#',
-											shortcut,
+											shortcuts: [ shortcut ],
 										},
 									],
 									// No target block to switch to.
-									to: [ { type: 'block', shortcut } ],
+									to: [
+										{
+											type: 'block',
+											shortcuts: [ shortcut ],
+										},
+									],
 								},
 							},
 						],

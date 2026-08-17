@@ -60,7 +60,7 @@ function useApplyBlockShortcut() {
 			}
 
 			const blockName = getBlockName( clientId );
-			if ( blockNames && ! blockNames.includes( blockName ) ) {
+			if ( ! blockNames.includes( blockName ) ) {
 				return false;
 			}
 
@@ -159,30 +159,47 @@ function BlockShortcutsRegister( { shortcuts } ) {
 	const { registerShortcut, unregisterShortcut } = useDispatch(
 		keyboardShortcutsStore
 	);
-	// Shortcuts registered by a previous run, so that those belonging to a
-	// block type that has since been unregistered can be removed. Registration
-	// deliberately outlives this component: providers can be nested, and
-	// unmounting one of them must not take the shortcuts away from the others.
-	const registeredRef = useRef( new Set() );
+	// Shortcuts registered by a previous run, keyed by name, so that those
+	// belonging to a block type that has since been unregistered can be
+	// removed. Registration deliberately outlives this component: providers can
+	// be nested, and unmounting one of them must not take the shortcuts away
+	// from the others.
+	const registeredRef = useRef( new Map() );
 
 	useEffect( () => {
-		const registered = new Set();
+		const registered = new Map();
 		const combinations = new Map();
 
 		for ( const shortcut of shortcuts ) {
-			// The store keys shortcuts by name, so the second registration
-			// would overwrite the first and leave one of the two blocks
-			// answering to the other's key combination.
-			if ( registered.has( shortcut.name ) ) {
-				warning(
-					`Block keyboard shortcut "${ shortcut.name }" is declared more than once.`
-				);
+			const config = {
+				name: shortcut.name,
+				category: 'block',
+				description: shortcut.description,
+				keyCombination: shortcut.keyCombination,
+				aliases: shortcut.aliases,
+			};
+			const serialized = JSON.stringify( config );
+
+			// One shortcut is declared once per block change it can make, so
+			// the same name legitimately appears more than once: the heading
+			// level shortcuts are declared both on the variation, for a
+			// heading, and on the transform that produces one from a
+			// paragraph. Only declarations that disagree are a mistake, since
+			// the store keys shortcuts by name and the last one registered
+			// would decide what the others are matched against.
+			const previous = registered.get( shortcut.name );
+			if ( previous !== undefined ) {
+				if ( previous !== serialized ) {
+					warning(
+						`Block keyboard shortcut "${ shortcut.name }" is declared more than once with different settings.`
+					);
+				}
 				continue;
 			}
 
 			// Handlers are matched by key combination rather than by name, so
-			// two blocks claiming the same one both run on the same event, in
-			// registration order, and the first that applies takes it.
+			// two shortcuts claiming the same one both run on the same event,
+			// in registration order, and the first that applies takes it.
 			const { modifier, character } = shortcut.keyCombination;
 			const combination = `${ modifier ?? '' }+${ character }`;
 			if ( combinations.has( combination ) ) {
@@ -196,17 +213,11 @@ function BlockShortcutsRegister( { shortcuts } ) {
 			}
 			combinations.set( combination, shortcut.name );
 
-			registerShortcut( {
-				name: shortcut.name,
-				category: 'block',
-				description: shortcut.description,
-				keyCombination: shortcut.keyCombination,
-				aliases: shortcut.aliases,
-			} );
-			registered.add( shortcut.name );
+			registerShortcut( config );
+			registered.set( shortcut.name, serialized );
 		}
 
-		for ( const name of registeredRef.current ) {
+		for ( const name of registeredRef.current.keys() ) {
 			if ( ! registered.has( name ) ) {
 				unregisterShortcut( name );
 			}
