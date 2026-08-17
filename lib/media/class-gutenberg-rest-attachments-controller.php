@@ -188,11 +188,11 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 					'callback'            => array( $this, 'finalize_item' ),
 					'permission_callback' => array( $this, 'edit_media_item_permissions_check' ),
 					'args'                => array(
-						'id' => array(
+						'id'                   => array(
 							'description' => __( 'Unique identifier for the attachment.', 'gutenberg' ),
 							'type'        => 'integer',
 						),
-						'sub_sizes' => array(
+						'sub_sizes'            => array(
 							'description'       => __( 'Array of sub-size metadata collected from sideload responses.', 'gutenberg' ),
 							'type'              => 'array',
 							'default'           => array(),
