@@ -46,7 +46,6 @@ const stories = [
 	'../packages/widget-primitives/src/**/stories/*.story.@(ts|tsx)',
 	'../packages/widget-dashboard/src/**/stories/*.mdx',
 	'../packages/widget-dashboard/src/**/stories/*.story.@(ts|tsx)',
-	'../routes/dashboard/**/stories/*.story.@(ts|tsx)',
 	'../packages/ui/src/**/stories/*.mdx',
 	'../packages/ui/src/**/stories/*.story.@(ts|tsx)',
 	'../packages/admin-ui/src/**/stories/*.story.@(ts|tsx)',
@@ -226,6 +225,10 @@ const config: StorybookConfig = {
 				},
 			],
 			build: {
+				// Storybook's preview includes its shared runtime and all stories.
+				// Automatic chunk splitting is already enabled; 3.5 MB leaves a
+				// meaningful budget above the current 3.15 MB largest chunk.
+				chunkSizeWarningLimit: 3_500,
 				/**
 				 * Use terser with keep_fnames to preserve component names in source code display.
 				 * Without this, Vite's default minifier mangles component names (e.g., BoxControl -> J)
@@ -237,6 +240,13 @@ const config: StorybookConfig = {
 					keep_fnames: true,
 					mangle: {
 						keep_fnames: true,
+					},
+				},
+				rolldownOptions: {
+					checks: {
+						// Storybook's docgen transforms are expected to dominate the
+						// build. Keep them enabled without emitting timing warnings.
+						pluginTimings: false,
 					},
 				},
 			},

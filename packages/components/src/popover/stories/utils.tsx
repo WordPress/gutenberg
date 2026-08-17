@@ -1,7 +1,7 @@
 import { createPortal, useState } from '@wordpress/element';
-import Popover from '../..';
-import { Provider as SlotFillProvider } from '../../../slot-fill';
-import type { WordPressComponentProps } from '../../../context';
+import Popover from '..';
+import { Provider as SlotFillProvider } from '../../slot-fill';
+import type { WordPressComponentProps } from '../../context';
 
 const GenericIframe = ( {
 	children,
@@ -15,7 +15,7 @@ const GenericIframe = ( {
 			title="My Iframe"
 			srcDoc="<!doctype html><html><body></body></html>"
 			// Waiting for the load event ensures that this works in Firefox.
-			// See https://github.com/facebook/react/issues/22847#issuecomment-991394558
+			// See: https://github.com/facebook/react/issues/22847#issuecomment-991394558
 			onLoad={ ( event ) => {
 				if ( event.currentTarget.contentDocument ) {
 					setContainerNode(
