@@ -19,6 +19,10 @@
 -   Add `registerEntityLinks` and `getEntityLink`, so an application declares where each post type is listed and edited and the canvas resolves every link through them ([#81590](https://github.com/WordPress/gutenberg/pull/81590)).
 -   Run the editor's post actions from the canvas, returning to the list when an entity is trashed or deleted and offering a way to reach a duplicate ([#81590](https://github.com/WordPress/gutenberg/pull/81590)).
 
+### Code Quality
+
+-   Load Boot styles through CSS Modules while preserving existing DOM class names ([#81755](https://github.com/WordPress/gutenberg/pull/81755)).
+
 ### Breaking Changes
 
 -   Remove `editLink` from a route's canvas data. Register the post type's `edit` path with `registerEntityLinks` instead ([#81590](https://github.com/WordPress/gutenberg/pull/81590)).
