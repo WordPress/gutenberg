@@ -1211,6 +1211,15 @@ test.describe( 'Block Notes', () => {
 				6
 			);
 
+		// Long enough that the paragraphs fill the canvas the way a real post
+		// does, so the threads are spread down the board rather than stacked
+		// at the top.
+		const longParagraph = ( tag ) =>
+			`${ tag }. ` +
+			'This paragraph is long enough to occupy a good part of the canvas. '.repeat(
+				4
+			);
+
 		test( "selects the clicked thread, not the block's primary note", async ( {
 			editor,
 			page,
@@ -1235,53 +1244,62 @@ test.describe( 'Block Notes', () => {
 				).toBeVisible();
 			}
 
-			// Selecting a thread selects its block too. On a block carrying
-			// several notes that block transition used to re-sync the selection
-			// to the block's primary note, so the clicked thread was left
-			// focused while a sibling took the reply form (#81730).
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'Paragraph one' },
-			} );
-			await addLongNote( 'Alpha' );
-			await editor.canvas
-				.getByRole( 'document', { name: 'Block: Paragraph' } )
-				.filter( { hasText: 'Paragraph one' } )
-				.click();
-			await addLongNote( 'Bravo' );
+			async function selectParagraph( tag ) {
+				await editor.canvas
+					.getByRole( 'document', { name: 'Block: Paragraph' } )
+					.filter( { hasText: tag } )
+					.click();
+			}
 
-			// A note on another block, to park the selection off paragraph one.
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'Paragraph two' },
-			} );
-			await addLongNote( 'Charlie' );
+			for ( const tag of [ 'First', 'Second', 'Third' ] ) {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: { content: longParagraph( tag ) },
+				} );
+			}
+
+			// Three notes on the middle paragraph.
+			for ( const tag of [ 'One', 'Two', 'Three' ] ) {
+				await selectParagraph( 'Second' );
+				await addLongNote( tag );
+			}
+
+			// A note on the last paragraph, so the block selection sits away
+			// from the middle one and clicking a thread there is a real change.
+			await selectParagraph( 'Third' );
+			await addLongNote( 'Elsewhere' );
 
 			const board = page.getByRole( 'tree', {
 				name: 'Unresolved notes',
 			} );
-			const bravo = board
-				.getByRole( 'treeitem', { name: /Note: Bravo/ } )
+			const first = board
+				.getByRole( 'treeitem', { name: /Note: One/ } )
 				.first();
-			const alpha = board
-				.getByRole( 'treeitem', { name: /Note: Alpha/ } )
+			const third = board
+				.getByRole( 'treeitem', { name: /Note: Three/ } )
 				.first();
 
-			// Press "Show more" on the second note of paragraph one. The button
-			// does not stop the click, which reaches the thread and selects it.
-			await bravo.getByRole( 'button', { name: 'Show more' } ).click();
+			await third.getByRole( 'button', { name: 'Show more' } ).click();
 
 			// The note that was clicked is the one that expands...
 			await expect(
-				bravo.getByRole( 'button', { name: 'Show less' } )
+				third.getByRole( 'button', { name: 'Show less' } )
 			).toBeVisible();
-			// ...and the one that is selected.
-			await expect( bravo ).toHaveAttribute( 'aria-expanded', 'true' );
-			await expect( alpha ).toHaveAttribute( 'aria-expanded', 'false' );
-			// The reply form belongs to the selected thread.
+			// ...and the one that is selected, with the reply form.
+			await expect( third ).toHaveAttribute( 'aria-expanded', 'true' );
 			await expect(
-				bravo.getByRole( 'textbox', { name: /Reply to note/ } )
+				third.getByRole( 'textbox', { name: /Reply to note/ } )
 			).toBeVisible();
+
+			// The first note on the block is untouched: neither expanded nor
+			// selected, and holding no reply form.
+			await expect( first ).toHaveAttribute( 'aria-expanded', 'false' );
+			await expect(
+				first.getByRole( 'button', { name: 'Show more' } )
+			).toBeVisible();
+			await expect(
+				first.getByRole( 'textbox', { name: /Reply to note/ } )
+			).toBeHidden();
 		} );
 
 		test( 'auto-selects first unresolved note when clicking a block with multiple notes', async ( {
