@@ -270,6 +270,7 @@ const PlaylistTrackEdit = ( {
 							tagName="span"
 							className="wp-block-playlist-track__title"
 							value={ title }
+							aria-label={ __( 'Track title' ) }
 							placeholder={ __( 'Add title' ) }
 							onChange={ ( value ) => {
 								setAttributes( { title: value } );
@@ -281,6 +282,7 @@ const PlaylistTrackEdit = ( {
 								tagName="span"
 								className="wp-block-playlist-track__artist"
 								value={ artist }
+								aria-label={ __( 'Track artist' ) }
 								placeholder={ __( 'Add artist' ) }
 								onChange={ ( value ) =>
 									setAttributes( { artist: value } )
