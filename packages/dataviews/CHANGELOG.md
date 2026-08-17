@@ -87,7 +87,6 @@
 
 ### Internal
 
--   Upgrade Storybook to 10.5.3 and remove a temporary `render` workaround from the DataViews story that is no longer needed ([#80692](https://github.com/WordPress/gutenberg/pull/80692)).
 -   Update `date-fns` to 4.4.0 ([#80763](https://github.com/WordPress/gutenberg/pull/80763)).
 -   Update Jest type definitions to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
 -   DataViews: Model `useSelectionProps` with orthogonal semantic props (`selectionMode`, `shouldSelectOnClick`, and a caller-supplied `isItemSelectable`) instead of a picker-specific flag, and route the `list` layout's selection through the shared hook. `selectionMode` distinguishes multi-selection from the two single-selection semantics (`'single-required'` keeps an item selected on re-click, `'single-clearable'` allows clearing it), so the `list` layout keeps its always-selected behavior while single-select pickers stay clearable. No behavior change. [#80677](https://github.com/WordPress/gutenberg/pull/80677)

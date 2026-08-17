@@ -75,7 +75,6 @@
 
 ### Internal
 
--   Upgrade Storybook to 10.5.3 ([#80692](https://github.com/WordPress/gutenberg/pull/80692)).
 -   Add an integration test covering named field-type resolution in
     `useWidgetTypes` ([#80208](https://github.com/WordPress/gutenberg/pull/80208)).
 

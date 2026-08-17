@@ -53,10 +53,6 @@
 -   Update `colorjs.io` dependency to remove need for colorspace registration workaround ([#80272](https://github.com/WordPress/gutenberg/pull/80272)).
 -   Regenerate design token styles using the shared CSS/SCSS Prettier configuration ([#80422](https://github.com/WordPress/gutenberg/pull/80422)).
 
-### Internal
-
--   Upgrade Storybook to 10.5.3 ([#80692](https://github.com/WordPress/gutenberg/pull/80692)).
-
 ## 1.0.0 (2026-07-14)
 
 ### Stable Release
