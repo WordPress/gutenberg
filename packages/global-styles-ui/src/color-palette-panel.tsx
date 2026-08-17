@@ -44,6 +44,10 @@ export default function ColorPalettePanel( { name }: ColorPalettePanelProps ) {
 		'color.defaultPalette',
 		name
 	);
+	const [ customColorEnabled ] = useSetting< boolean >(
+		'color.custom',
+		name
+	);
 
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const popoverProps = isMobileViewport ? mobilePopoverProps : undefined;
@@ -90,14 +94,16 @@ export default function ColorPalettePanel( { name }: ColorPalettePanelProps ) {
 						popoverProps={ popoverProps }
 					/>
 				) }
-			<PaletteEdit
-				colors={ customColors }
-				onChange={ setCustomColors }
-				paletteLabel={ __( 'Custom' ) }
-				paletteLabelHeadingLevel={ 3 }
-				slugPrefix="custom-"
-				popoverProps={ popoverProps }
-			/>
+			{ customColorEnabled !== false && (
+				<PaletteEdit
+					colors={ customColors }
+					onChange={ setCustomColors }
+					paletteLabel={ __( 'Custom' ) }
+					paletteLabelHeadingLevel={ 3 }
+					slugPrefix="custom-"
+					popoverProps={ popoverProps }
+				/>
+			) }
 			<ColorVariations title={ __( 'Palettes' ) } />
 		</VStack>
 	);
