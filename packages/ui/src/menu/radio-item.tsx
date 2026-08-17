@@ -58,7 +58,11 @@ const RadioItem = forwardRef< HTMLDivElement, RadioItemProps >(
 					keepMounted
 					className={ styles[ 'item-selection-indicator' ] }
 				>
-					<Icon icon={ radioCheck } size={ 24 } aria-hidden="true" />
+					<Icon
+						icon={ radioCheck }
+						className={ styles[ 'radio-selection-icon' ] }
+						aria-hidden="true"
+					/>
 				</_Menu.RadioItemIndicator>
 				<MenuItemContentContext.Provider value={ contentContextValue }>
 					<ItemContent

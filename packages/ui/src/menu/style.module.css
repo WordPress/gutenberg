@@ -216,6 +216,12 @@
 			}
 		}
 
+		.radio-selection-icon {
+			width: var(--wpds-dimension-size-xs);
+			height: var(--wpds-dimension-size-xs);
+			fill: currentColor;
+		}
+
 		.item-prefix {
 			grid-column: prefix-start / prefix-end;
 			display: flex;
