@@ -127,7 +127,7 @@ function packageProjects( packageName ) {
 		return {
 			srcProject: undefined,
 			devProject: defaultProject,
-			storiesProject: undefined,
+			storiesProject,
 		};
 	}
 
@@ -135,7 +135,7 @@ function packageProjects( packageName ) {
 	return {
 		srcProject: join( packageDir, 'tsconfig.json' ),
 		devProject: existsSync( testProject ) ? testProject : undefined,
-		storiesProject: undefined,
+		storiesProject,
 	};
 }
 

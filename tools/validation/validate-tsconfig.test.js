@@ -463,6 +463,31 @@ test( 'fails when the build project carries a test type', () => {
 	);
 } );
 
+test( 'checks the stories project of a package without a build project', () => {
+	const result = runValidator(
+		createRepo( {
+			packages: {
+				icons: {
+					tsconfigs: {
+						'tsconfig.json': {
+							extends: '../../tsconfig.dev.base.json',
+							references: [],
+						},
+						'tsconfig.stories.json': [],
+					},
+				},
+			},
+			build: [],
+			root: [ './tsconfig.build.json', 'packages/icons' ],
+		} )
+	);
+
+	expect( result.status ).not.toBe( 0 );
+	expect( result.stderr ).toContain(
+		'Missing reference to "packages/icons/tsconfig.stories.json" in tsconfig.json'
+	);
+} );
+
 test( 'fails when a build project exclude omits a dev-file pattern of the base', () => {
 	const result = runValidator(
 		createRepo( {
