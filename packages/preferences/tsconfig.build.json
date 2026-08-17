@@ -11,6 +11,5 @@
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons" },
 		{ "path": "../private-apis" }
-	],
-	"include": [ "src/**/*" ]
+	]
 }

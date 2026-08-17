@@ -2,8 +2,6 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types",
 		"types": [ "gutenberg-env" ]
 	},
 	"references": [
@@ -15,6 +13,5 @@
 		{ "path": "../priority-queue/tsconfig.build.json" },
 		{ "path": "../private-apis" },
 		{ "path": "../undo-manager" }
-	],
-	"include": [ "src/**/*" ]
+	]
 }
