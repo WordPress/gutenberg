@@ -2,8 +2,8 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	/*
-	 * Storybook's component meta extractor needs stories and component
-	 * sources in one project; tests stay in the dev project with jest.
+	 * Type checks stories against sources without jest types. Kept out of
+	 * tsconfig.json so Storybook's meta extractor stays on its inferred project.
 	 */
 	"compilerOptions": {
 		"noEmit": true,
@@ -14,6 +14,12 @@
 			"react-css-custom-properties"
 		]
 	},
+	"exclude": [
+		"**/benchmark",
+		"**/test/**",
+		"**/tests/**",
+		"**/__tests__/**"
+	],
 	"references": [
 		{ "path": "../a11y/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },

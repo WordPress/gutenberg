@@ -12,7 +12,14 @@
 		]
 	},
 	"files": [ "global.d.ts" ],
-	"include": [ "src/**/test/**/*.ts", "src/**/test/**/*.tsx" ],
+	"include": [
+		"src/**/test/**/*.ts",
+		"src/**/test/**/*.tsx",
+		"src/**/tests/**/*.ts",
+		"src/**/tests/**/*.tsx",
+		"src/**/__tests__/**/*.ts",
+		"src/**/__tests__/**/*.tsx"
+	],
 	"references": [
 		{ "path": "./tsconfig.build.json" },
 		{ "path": "../a11y/tsconfig.build.json" },
