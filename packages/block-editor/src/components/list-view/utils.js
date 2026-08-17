@@ -80,8 +80,9 @@ export function getCommonDepthClientIds(
  *
  * @param {string}       focusClientId   The client ID of the block to focus.
  * @param {?HTMLElement} treeGridElement The container element to search within.
+ * @param {?AbortSignal} signal          Optional signal to stop waiting for the row and leave focus alone.
  */
-export function focusListItem( focusClientId, treeGridElement ) {
+export function focusListItem( focusClientId, treeGridElement, signal ) {
 	if ( ! treeGridElement ) {
 		return;
 	}
@@ -108,12 +109,26 @@ export function focusListItem( focusClientId, treeGridElement ) {
 			subtree: true,
 		} );
 
+		signal?.addEventListener(
+			'abort',
+			() => {
+				clearTimeout( timer );
+				observer.disconnect();
+				resolve( null );
+			},
+			{ once: true }
+		);
+
 		// Stop trying after 3 seconds.
 		timer = setTimeout( () => {
 			observer.disconnect();
 			resolve( null );
 		}, 3000 );
 	} ).then( ( element ) => {
+		if ( signal?.aborted ) {
+			return;
+		}
+
 		if ( element && element.isConnected ) {
 			// Focus the first focusable in the row, which is the ListViewBlockSelectButton.
 			focus.focusable.find( element )?.[ 0 ]?.focus();
