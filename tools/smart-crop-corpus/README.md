@@ -58,11 +58,35 @@ The report is a table: one row per image per size, showing the centre crop
 -   ≈ no meaningful difference
 
 Keyboard: `1` / `2` / `3` to grade and advance, `j` / `k` to move, click either
-crop to enlarge both. Grades are held in `localStorage`; "Copy results JSON"
-takes them elsewhere. Rows tagged "no visible change" are ones where attention
+crop to enlarge both. Rows tagged "no visible change" are ones where attention
 picked the centre anyway and there is nothing to judge.
 
 A tally at the top reports what share of decided calls favoured smart crop.
+
+## Exporting
+
+Grades are held in `localStorage`, which means they belong to one browser and
+disappear with the site data. Export before closing the tab.
+
+**Export summary** writes `smart-crop-review-<run>.md`, a readable report meant
+to be pasted into an issue comment:
+
+-   how many comparisons passed, failed, showed no difference, or went ungraded,
+    counted both as comparisons and as distinct images
+-   pass rate broken down by source, by size, and by subject, which is where a
+    failure class shows itself: if attention only loses on plugin banners, that
+    is a different conclusion than losing across the board
+-   the mean of each confidence signal for passed rows against failed rows. A
+    signal worth gating on has to separate those two columns; one that reads the
+    same for both is not measuring anything useful
+-   every failure listed individually, with relative paths to its attention and
+    centre crops in `images/`, a link back to the original, and its signals, so a
+    bad crop can be looked at again later rather than just counted
+
+The file downloads and is also written into the "Export output" panel on the
+page, because some sandboxed viewers block a download a page starts itself.
+
+**Copy results JSON** is the raw verdict map, for feeding somewhere else.
 
 ## What it crops
 
@@ -135,7 +159,8 @@ point inherits that precision.
     would be the next improvement if the numbers start carrying weight.
 -   Sources skew towards curated photography and wordpress.org assets. Neither is
     a random sample of real media libraries.
--   Grades live in one browser's `localStorage`. Export them.
+-   Grades live in one browser's `localStorage`, and the exported summary is a
+    snapshot rather than a live document. Re-export after grading more rows.
 -   Every crop is inlined, so the report grows with the run: 20 images at two
     sizes is about 5 MB, 50 images at four sizes about 18 MB. Past roughly 40
     images a run gets unwieldy to open and tedious to grade in one sitting.

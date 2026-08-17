@@ -288,15 +288,219 @@ const SCRIPT = `
 		}
 	} );
 
+	var run = JSON.parse( document.getElementById( 'run-data' ).textContent );
+	var byId = {};
+	run.rows.forEach( function ( row ) { byId[ row.id ] = row; } );
+
+	function show( text ) {
+		var output = document.getElementById( 'results' );
+		output.textContent = text;
+		output.closest( 'details' ).open = true;
+	}
+
+	/**
+	 * Offers a file to save, and returns whether the attempt was made.
+	 *
+	 * Sandboxed viewers block downloads a page starts itself, so the same text
+	 * always lands in the panel below as well.
+	 */
+	function offerDownload( name, text ) {
+		try {
+			var blob = new Blob( [ text ], { type: 'text/markdown' } );
+			var url = URL.createObjectURL( blob );
+			var link = document.createElement( 'a' );
+			link.href = url;
+			link.download = name;
+			document.body.appendChild( link );
+			link.click();
+			document.body.removeChild( link );
+			setTimeout( function () { URL.revokeObjectURL( url ); }, 5000 );
+			return true;
+		} catch ( e ) {
+			return false;
+		}
+	}
+
+	function pct( part, whole ) {
+		return whole ? Math.round( ( part / whole ) * 100 ) + '%' : '-';
+	}
+
+	/** Counts verdicts across a set of rows. */
+	function tallyOf( ids ) {
+		var counts = { up: 0, down: 0, same: 0, ungraded: 0 };
+		ids.forEach( function ( id ) {
+			var verdict = verdicts[ id ];
+			if ( counts[ verdict ] === undefined ) { counts.ungraded++; }
+			else { counts[ verdict ]++; }
+		} );
+		counts.decided = counts.up + counts.down;
+		return counts;
+	}
+
+	/** Groups row ids by a key, preserving first-seen order. */
+	function groupBy( pick ) {
+		var order = [];
+		var groups = {};
+		run.rows.forEach( function ( row ) {
+			var key = pick( row );
+			if ( ! groups[ key ] ) { groups[ key ] = []; order.push( key ); }
+			groups[ key ].push( row.id );
+		} );
+		return { order: order, groups: groups };
+	}
+
+	function breakdownTable( title, pick ) {
+		var grouped = groupBy( pick );
+		var lines = [
+			'### ' + title,
+			'',
+			'| ' + title + ' | Better | Worse | Same | Ungraded | Pass rate |',
+			'| --- | ---: | ---: | ---: | ---: | ---: |',
+		];
+		grouped.order.forEach( function ( key ) {
+			var t = tallyOf( grouped.groups[ key ] );
+			lines.push(
+				'| ' + key + ' | ' + t.up + ' | ' + t.down + ' | ' + t.same +
+				' | ' + t.ungraded + ' | ' + pct( t.up, t.decided ) + ' |'
+			);
+		} );
+		return lines.join( '\\n' );
+	}
+
+	/** Mean of one signal across the rows carrying a given verdict. */
+	function meanSignal( verdict, key ) {
+		var values = run.rows
+			.filter( function ( row ) { return verdicts[ row.id ] === verdict; } )
+			.map( function ( row ) { return row.signals[ key ]; } )
+			.filter( function ( value ) { return typeof value === 'number'; } );
+		if ( ! values.length ) { return '-'; }
+		var sum = values.reduce( function ( a, b ) { return a + b; }, 0 );
+		return ( sum / values.length ).toFixed( 3 );
+	}
+
+	function buildSummary() {
+		var all = run.rows.map( function ( row ) { return row.id; } );
+		var total = tallyOf( all );
+		var failures = run.rows.filter( function ( row ) {
+			return verdicts[ row.id ] === 'down';
+		} );
+		var passes = run.rows.filter( function ( row ) {
+			return verdicts[ row.id ] === 'up';
+		} );
+		var distinct = function ( list ) {
+			var seen = {};
+			list.forEach( function ( row ) { seen[ row.image.id ] = 1; } );
+			return Object.keys( seen ).length;
+		};
+
+		var out = [];
+		out.push( '# Smart crop review - ' + run.runId );
+		out.push( '' );
+		out.push( '- Run \`' + run.runId + '\`, seed \`' + run.seed + '\`' );
+		out.push( '- Cropped ' + run.createdAt + ', graded ' + new Date().toISOString() );
+		out.push( '- libvips ' + run.vipsVersion + ', sizes: ' + run.sizes.join( ', ' ) );
+		out.push( '- ' + run.rows.length + ' comparisons across ' + distinct( run.rows ) + ' images' );
+		out.push( '' );
+		out.push( '## Result' );
+		out.push( '' );
+		out.push( '| Verdict | Comparisons | Images | Share of decided |' );
+		out.push( '| --- | ---: | ---: | ---: |' );
+		out.push( '| Passed (attention better) | ' + total.up + ' | ' + distinct( passes ) + ' | ' + pct( total.up, total.decided ) + ' |' );
+		out.push( '| Failed (attention worse) | ' + total.down + ' | ' + distinct( failures ) + ' | ' + pct( total.down, total.decided ) + ' |' );
+		out.push( '| No difference | ' + total.same + ' | | |' );
+		out.push( '| Ungraded | ' + total.ungraded + ' | | |' );
+		out.push( '' );
+		out.push(
+			total.decided + ' of ' + run.rows.length + ' comparisons decided. ' +
+			'Of those, ' + pct( total.up, total.decided ) + ' favoured smart crop.'
+		);
+		out.push( '' );
+		out.push( breakdownTable( 'Source', function ( row ) { return row.image.source; } ) );
+		out.push( '' );
+		out.push( breakdownTable( 'Size', function ( row ) { return row.size; } ) );
+		out.push( '' );
+		out.push( breakdownTable( 'Subject', function ( row ) { return row.image.subject; } ) );
+		out.push( '' );
+		out.push( '## Confidence signals' );
+		out.push( '' );
+		out.push( 'Mean value across graded rows. A signal worth gating on should' );
+		out.push( 'separate the two columns.' );
+		out.push( '' );
+		out.push( '| Signal | Passed | Failed |' );
+		out.push( '| --- | ---: | ---: |' );
+		[
+			[ 'off-centre', 'centreOffset' ],
+			[ 'entropy agreement', 'entropyAgreement' ],
+			[ 'changed vs centre', 'changeFromCentre' ],
+		].forEach( function ( pair ) {
+			out.push(
+				'| ' + pair[ 0 ] + ' | ' + meanSignal( 'up', pair[ 1 ] ) +
+				' | ' + meanSignal( 'down', pair[ 1 ] ) + ' |'
+			);
+		} );
+		out.push( '' );
+		out.push( '## Failures (' + failures.length + ')' );
+		out.push( '' );
+
+		if ( ! failures.length ) {
+			out.push( 'None recorded.' );
+		} else {
+			out.push(
+				'Cases where the attention crop was judged worse than centre. Image' +
+				' paths are relative to this file when it sits in its run directory.'
+			);
+			out.push( '' );
+			failures.forEach( function ( row, index ) {
+				var s = row.signals || {};
+				var focal = s.focalPoint
+					? s.focalPoint.x + ', ' + s.focalPoint.y
+					: 'n/a';
+				out.push(
+					( index + 1 ) + '. **' + row.image.title + '** - ' + row.size +
+					' (' + row.image.source + ', ' + row.image.subject + ')'
+				);
+				out.push( '   - attention: \`' + row.files.attention + '\`' );
+				out.push( '   - centre: \`' + row.files.centre + '\`' );
+				if ( row.image.pageUrl ) {
+					out.push( '   - source: ' + row.image.pageUrl );
+				}
+				out.push(
+					'   - focal ' + focal + ' | off-centre ' + s.centreOffset +
+					' | entropy agree ' + s.entropyAgreement +
+					' | changed ' + s.changeFromCentre
+				);
+			} );
+		}
+
+		out.push( '' );
+		out.push( 'Generated by \`tools/smart-crop-corpus\`. See' );
+		out.push( 'https://github.com/WordPress/gutenberg/issues/81706' );
+		out.push( '' );
+
+		return out.join( '\\n' );
+	}
+
+	document.getElementById( 'summary' ).addEventListener( 'click', function () {
+		var total = tallyOf( run.rows.map( function ( row ) { return row.id; } ) );
+
+		if ( ! total.up && ! total.down && ! total.same ) {
+			show( 'Nothing graded yet. Grade some rows first.' );
+			return;
+		}
+
+		var text = buildSummary();
+		show( text );
+		var saved = offerDownload( 'smart-crop-review-' + run.runId + '.md', text );
+		this.textContent = saved ? 'Summary saved' : 'Summary below';
+	} );
+
 	document.getElementById( 'copy' ).addEventListener( 'click', function () {
 		var payload = JSON.stringify( {
 			runId: runId,
 			gradedAt: new Date().toISOString(),
 			verdicts: verdicts,
 		}, null, 2 );
-		var output = document.getElementById( 'results' );
-		output.textContent = payload;
-		output.closest( 'details' ).open = true;
+		show( payload );
 
 		if ( navigator.clipboard ) {
 			navigator.clipboard.writeText( payload ).then( function () {
@@ -309,6 +513,8 @@ const SCRIPT = `
 		verdicts = {};
 		save();
 		render();
+		document.getElementById( 'summary' ).textContent = 'Export summary';
+		document.getElementById( 'copy' ).textContent = 'Copy results JSON';
 	} );
 
 	rows[ 0 ] && rows[ 0 ].classList.add( 'focused' );
@@ -468,6 +674,7 @@ export function renderReport( run ) {
 	<div class="bar-inner">
 		<span class="tally" id="tally"></span>
 		<span class="grow"></span>
+		<button id="summary">Export summary</button>
 		<button id="copy">Copy results JSON</button>
 		<button id="reset">Reset grades</button>
 	</div>
@@ -492,8 +699,8 @@ export function renderReport( run ) {
 	</div>
 
 	<details>
-		<summary>Results JSON &mdash; grades are kept in this browser; use &ldquo;Copy results JSON&rdquo; to take them elsewhere</summary>
-		<pre id="results">No grades recorded yet.</pre>
+		<summary>Export output &mdash; grades are kept in this browser only, so take them with you before closing the tab</summary>
+		<pre id="results">Nothing exported yet. Use &ldquo;Export summary&rdquo; for a readable Markdown report, or &ldquo;Copy results JSON&rdquo; for the raw verdicts.</pre>
 	</details>
 
 	<details>
