@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   `Card`: Use the normal neutral surface stroke for the default border.
+-   `Card`: Use the normal neutral surface stroke for the default border. ([#81746](https://github.com/WordPress/gutenberg/pull/81746))
 
 ## 0.20.0 (2026-08-12)
 
