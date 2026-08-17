@@ -697,7 +697,7 @@ test.describe( 'Media Library modal undo', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'does not remove block on undo while media modal is open, but allows native input undo', async ( {
+	test( 'does not remove block on undo while media modal is open', async ( {
 		editor,
 		page,
 		pageUtils,
