@@ -22,11 +22,15 @@ export default ( props ) => ( element ) => {
 			supportsSplitting,
 			disableLineBreaks,
 			onChange,
-			value,
+			getValue,
 			onSplitAtDoubleLineEnd,
 			registry,
 			onSplitAtEnd,
 		} = props.current;
+		// The rendered value can lag the record: the capture phase listener
+		// that syncs the selection runs on this event, and a re-render with
+		// the new selection has not happened yet.
+		const value = getValue();
 		const { text, start, end } = value;
 
 		if ( event.shiftKey ) {

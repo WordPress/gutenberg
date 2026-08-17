@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Seed the root `ThemeProvider` with the admin color scheme primary color so portaled popovers and modals receive the scheme's accent colors ([#81653](https://github.com/WordPress/gutenberg/pull/81653)).
+
 ### Internal
 
 -   Seed content-surface `ThemeProvider` backgrounds with `#fcfcfc` instead of `#ffffff`, matching the design system default and preserving room for stronger and weaker neutral surface tokens ([#81646](https://github.com/WordPress/gutenberg/pull/81646)).
