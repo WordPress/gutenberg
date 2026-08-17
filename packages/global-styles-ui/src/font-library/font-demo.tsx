@@ -1,4 +1,3 @@
-import { __experimentalText as WCText } from '@wordpress/components';
 import { useContext, useEffect, useState, useRef } from '@wordpress/element';
 import type { FontFamily, FontFace } from '@wordpress/core-data';
 import { FontLibraryContext } from './context';
@@ -102,12 +101,12 @@ function FontDemo( { font, text }: FontDemoProps ) {
 					className="font-library__font-variant_demo-image"
 				/>
 			) : (
-				<WCText
+				<span
 					style={ textDemoStyle }
 					className="font-library__font-variant_demo-text"
 				>
 					{ text }
-				</WCText>
+				</span>
 			) }
 		</div>
 	);
