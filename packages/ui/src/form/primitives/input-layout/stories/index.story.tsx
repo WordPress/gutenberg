@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { copy } from '@wordpress/icons';
-import { InputLayout } from '../input-layout';
-import { InputLayout as _InputLayout } from '../';
+import { InputLayout } from '../';
 import { IconButton } from '../../../../icon-button';
 
 const meta: Meta< typeof InputLayout > = {
@@ -9,12 +8,10 @@ const meta: Meta< typeof InputLayout > = {
 	title: 'Design System/Components/Form/Primitives/InputLayout',
 	component: InputLayout,
 	subcomponents: {
-		'InputLayout.Slot': _InputLayout.Slot,
+		'InputLayout.Slot': InputLayout.Slot,
 	},
 	// Temporary: Due to an upstream bug, render the component explicitly so the
-	// components manifest extractor can resolve props from the JSX. The public
-	// export is a compound `Object.assign`, so point `component` at the
-	// implementation module instead.
+	// components manifest extractor can resolve props from the JSX.
 	//
 	// See: https://github.com/storybookjs/storybook/issues/34877
 	render: ( args ) => <InputLayout { ...args } />,
@@ -63,7 +60,7 @@ export const WithPrefix: Story = {
  */
 export const WithPaddedPrefix: Story = {
 	args: {
-		prefix: <_InputLayout.Slot>https://</_InputLayout.Slot>,
+		prefix: <InputLayout.Slot>https://</InputLayout.Slot>,
 	},
 };
 
@@ -75,14 +72,14 @@ export const WithSuffixControl: Story = {
 	args: {
 		children: <div style={ { flex: 1 } } />,
 		suffix: (
-			<_InputLayout.Slot padding="minimal">
+			<InputLayout.Slot padding="minimal">
 				<IconButton
 					size="small"
 					variant="minimal"
 					icon={ copy }
 					label="Copy"
 				/>
-			</_InputLayout.Slot>
+			</InputLayout.Slot>
 		),
 	},
 };
