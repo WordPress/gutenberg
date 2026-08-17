@@ -250,7 +250,24 @@ const config: StorybookConfig = {
 				postcss: {
 					// Vite bundles its own PostCSS, creating a deep
 					// type incompatibility with the top-level PostCSS.
-					plugins: [ dsTokenFallbacks as any ],
+					plugins: [
+						dsTokenFallbacks as any,
+						{
+							// `postcss-modules` turns CSS composed from another module into a
+							// string before it prepends it to the current stylesheet. Parsing
+							// that string discards the declarations' source metadata. Vite's
+							// later URL-rewrite plugin requires that metadata.
+							postcssPlugin:
+								'restore-composed-css-module-sources',
+							OnceExit( root ) {
+								root.walkDecls( ( declaration ) => {
+									if ( ! declaration.source?.input.file ) {
+										declaration.source = root.source;
+									}
+								} );
+							},
+						},
+					],
 				},
 			},
 			optimizeDeps: {
