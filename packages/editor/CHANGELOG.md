@@ -18,6 +18,7 @@
 -   Document tools: Fix icon button focus styles to use the design system `outset-ring__focus` mixin ([#81115](https://github.com/WordPress/gutenberg/pull/81115)).
 -   `mediaUpload`: Add an `isTransportOnly` parameter, set by the `@wordpress/upload-media` queue, which owns progress tracking and save locking for its own items and uses this function only as its server transport. Fixes the progress snackbar showing "1 of 2" for a single HEIC upload in Safari ([#80369](https://github.com/WordPress/gutenberg/issues/80369)).
 -   Improve error reporting in private action `saveDirtyEntities` ([#81151](https://github.com/WordPress/gutenberg/pull/81151)).
+-   Header: Allow the Back button column to grow when "Show button text labels" is enabled so the label is not obscured by the following controls ([#81701](https://github.com/WordPress/gutenberg/pull/81701)).
 
 ## 14.51.0 (2026-07-14)
 
