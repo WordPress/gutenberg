@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Report a server-side upload failure in plain language instead of passing on the REST client's `invalid_json` and `unknown_error` messages ([#81712](https://github.com/WordPress/gutenberg/pull/81712)).
+
 ## 5.53.0 (2026-08-12)
 
 
