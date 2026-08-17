@@ -131,38 +131,11 @@ describe( 'ThemeProvider', () => {
 		expect( readProp( provider, '--wp-admin-theme-color' ) ).toBe( '' );
 	} );
 
-	it( 'warns when generated color tokens miss a semantic contrast target', () => {
-		const warn = jest
-			.spyOn( console, 'warn' )
-			.mockImplementation( () => {} );
-
-		render(
-			<ThemeProvider
-				color={ {
-					primary: INACCESSIBLE_PRIMARY,
-					background: INACCESSIBLE_BACKGROUND,
-				} }
-			>
-				<div>x</div>
-			</ThemeProvider>
-		);
-
-		expect( warn ).toHaveBeenCalledWith(
-			'ThemeProvider: Generated color tokens do not meet contrast targets.',
-			expect.any( Array )
-		);
-
-		warn.mockRestore();
-	} );
-
 	it( 'reports color warning changes through the callback', () => {
 		const onColorWarningsChange = jest.fn<
 			void,
 			[ readonly ThemeProviderColorWarning[] ]
 		>();
-		const warn = jest
-			.spyOn( console, 'warn' )
-			.mockImplementation( () => {} );
 		const { rerender } = render(
 			<ThemeProvider
 				color={ {
@@ -206,8 +179,6 @@ describe( 'ThemeProvider', () => {
 		);
 
 		expect( onColorWarningsChange ).toHaveBeenCalledWith( [] );
-
-		warn.mockRestore();
 	} );
 
 	it( 'does not report unchanged warnings again when the callback identity changes', () => {

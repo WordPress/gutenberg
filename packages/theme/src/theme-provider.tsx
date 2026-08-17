@@ -31,8 +31,6 @@ export const ThemeProvider = ( {
 		} );
 
 	const cornerRadiusPreset = resolvedSettings.cornerRadius ?? 'subtle';
-	const hasLocalColor =
-		color.primary !== undefined || color.background !== undefined;
 	const hasColorWarningsChangeHandler = onColorWarningsChange !== undefined;
 	const onColorWarningsChangeEvent = useEvent( onColorWarningsChange );
 
@@ -44,20 +42,6 @@ export const ThemeProvider = ( {
 	);
 
 	const wrapperRef = useRef< HTMLDivElement >( null );
-
-	useIsomorphicLayoutEffect( () => {
-		if (
-			process.env.NODE_ENV !== 'production' &&
-			hasLocalColor &&
-			colorWarnings.length > 0
-		) {
-			// eslint-disable-next-line no-console
-			console.warn(
-				'ThemeProvider: Generated color tokens do not meet contrast targets.',
-				colorWarnings
-			);
-		}
-	}, [ colorWarnings, hasLocalColor ] );
 
 	useEffect( () => {
 		if ( hasColorWarningsChangeHandler ) {

@@ -1,12 +1,12 @@
 import { renderHook } from '@testing-library/react';
 import {
 	getSemanticColorCustomProperty,
+	MINIMUM_TEXT_CONTRAST,
 	SEMANTIC_COLOR_CONTRAST_PAIRS,
 } from '../semantic-color-contrast-pairs';
 import { getContrast } from '../color-ramps/lib/color-utils';
 import { useThemeProviderStyles } from '../use-theme-provider-styles';
 
-const MINIMUM_TEXT_CONTRAST = 4.5;
 const CUSTOM_PRIMARY = '#0057b8';
 const CUSTOM_BACKGROUND = '#f6f3ef';
 

@@ -106,7 +106,7 @@ The `color` prop accepts an object with the following optional properties:
 
 Both properties accept a fully opaque sRGB-parseable string: a hex value (e.g. `#3858e9`), an `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`). Non-opaque alpha values, `transparent`, and other CSS color spaces (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and will throw an error. The theme system automatically generates appropriate color ramps and determines light/dark mode based on these seed colors.
 
-`ThemeProvider` logs a development warning when generated ramp steps or semantic foreground/background pairs do not meet their contrast targets. Use `onColorWarningsChange` to receive the same structured warnings from the provider's resolved colors:
+Use `onColorWarningsChange` to receive structured warnings when generated ramp steps or semantic foreground/background pairs do not meet their contrast targets:
 
 ```js
 <ThemeProvider

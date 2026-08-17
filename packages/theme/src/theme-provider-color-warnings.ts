@@ -3,6 +3,7 @@ import { getContrast } from './color-ramps/lib/color-utils';
 import type { Ramp, RampResult } from './color-ramps/lib/types';
 import {
 	getSemanticColorCustomProperty,
+	MINIMUM_TEXT_CONTRAST,
 	SEMANTIC_COLOR_CONTRAST_PAIRS,
 	type SemanticColorToken,
 } from './semantic-color-contrast-pairs';
@@ -26,8 +27,6 @@ export type ThemeProviderColorWarning =
 			requiredContrast: number;
 			achievedContrast: number;
 	  };
-
-const MINIMUM_TEXT_CONTRAST = 4.5;
 
 export function collectThemeProviderColorWarnings(
 	ramps: ReadonlyMap< ThemeProviderColorRampName, RampResult >,
