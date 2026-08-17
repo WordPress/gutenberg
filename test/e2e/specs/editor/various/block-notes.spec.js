@@ -1841,6 +1841,74 @@ test.describe( 'Block Notes', () => {
 		} );
 	} );
 
+	test.describe( 'Long notes', () => {
+		// Long enough that "Show more" appears and the expanded thread is
+		// taller than the floating board.
+		const LONG_NOTE = Array.from(
+			{ length: 40 },
+			( _, index ) =>
+				`Sentence number ${ index + 1 } of a very long note body.`
+		).join( ' ' );
+
+		test( 'keeps an expanded note inside the floating board', async ( {
+			editor,
+			page,
+		} ) => {
+			// The spacer pushes the noted paragraph down the canvas, so the
+			// thread starts well below the top of the board (#81730).
+			await editor.insertBlock( {
+				name: 'core/spacer',
+				attributes: { height: '300px' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Noted paragraph' },
+			} );
+
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await page
+				.getByRole( 'textbox', { name: 'New note', exact: true } )
+				.fill( LONG_NOTE );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+
+			const board = page.getByRole( 'tree', {
+				name: 'Unresolved notes',
+			} );
+			const thread = board.getByRole( 'treeitem' ).first();
+			await expect( thread ).toBeVisible();
+
+			await board.getByRole( 'button', { name: 'Show more' } ).click();
+			await expect(
+				board.getByRole( 'button', { name: 'Show less' } )
+			).toBeVisible();
+
+			// The board is clipped, so a thread reaching past its bottom edge
+			// is unreachable: the thread has to be shifted up to fit.
+			const boardBox = await board.boundingBox();
+			await expect
+				.poll( async () => {
+					const threadBox = await thread.boundingBox();
+					return threadBox.y + threadBox.height;
+				} )
+				.toBeLessThanOrEqual( boardBox.y + boardBox.height + 1 );
+
+			// A note taller than the board itself scrolls within the thread,
+			// which has to bring the reply field into the board.
+			const reply = board.getByRole( 'textbox', {
+				name: /Reply to note/,
+			} );
+			await reply.scrollIntoViewIfNeeded();
+			const replyBox = await reply.boundingBox();
+			expect( replyBox.y ).toBeGreaterThanOrEqual( boardBox.y );
+			expect( replyBox.y + replyBox.height ).toBeLessThanOrEqual(
+				boardBox.y + boardBox.height + 1
+			);
+		} );
+	} );
+
 	test.describe( 'Rich text formatting in the note form', () => {
 		test( 'Cmd+B toggles bold in the new note textbox', async ( {
 			editor,
