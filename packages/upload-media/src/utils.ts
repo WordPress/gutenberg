@@ -1,5 +1,6 @@
 import { getFilename } from '@wordpress/url';
 import { _x } from '@wordpress/i18n';
+import { HEIC_MIME_TYPES } from './store/constants';
 
 /**
  * Converts a Blob to a File with a default name like "image.png".
@@ -167,4 +168,121 @@ export function isAnimatedGif( buffer: ArrayBuffer ): boolean {
 	}
 
 	return false;
+}
+
+/**
+ * Number of leading bytes that always contain a complete File Type Box.
+ *
+ * The box is a 4-byte size, the `ftyp` marker, a major brand, a minor version,
+ * and then one 4-byte compatible brand each. 64 bytes leaves room for a dozen
+ * compatible brands, well beyond what image files declare.
+ */
+export const FILE_TYPE_BOX_BYTES = 64;
+
+/**
+ * Brands that identify a HEIC/HEIF image, as registered with the MP4RA.
+ *
+ * `mif1` and `msf1` are the generic HEIF brands, which AVIF files carry as a
+ * compatible brand too, so the AVIF brands have to be ruled out before these
+ * are consulted.
+ */
+const HEIC_BRANDS = [
+	'heic',
+	'heix',
+	'heim',
+	'heis',
+	'hevc',
+	'hevx',
+	'hevm',
+	'hevs',
+	'mif1',
+	'msf1',
+];
+
+/**
+ * Brands that identify an AVIF image, which shares the HEIF container.
+ */
+const AVIF_BRANDS = [ 'avif', 'avis' ];
+
+/**
+ * Detects whether a file buffer contains a HEIC/HEIF image.
+ *
+ * Reads the ISOBMFF File Type Box, which every HEIF-family file opens with:
+ *
+ * 1. Checks for the `ftyp` marker at offset 4.
+ * 2. Collects the brands the box declares — the major brand at offset 8, then
+ *    the compatible brands from offset 16 on, four ASCII characters each.
+ * 3. Returns true when a HEIC/HEIF brand is present and no AVIF brand is.
+ *
+ * The browser derives `File.type` from the file extension alone, so this is the
+ * only way to recognize a HEIC photo that was saved as `.jpg` or `.png`, or one
+ * the operating system could not identify at all (`File.type === ''`).
+ *
+ * Only the File Type Box is read, so a file can declare a HEIF brand here and
+ * still turn out to be undecodable. That is harmless: it means the file reaches
+ * the HEIC conversion path, where a real decode is attempted and any failure
+ * surfaces as an ordinary decode error.
+ *
+ * Based on ISO/IEC 14496-12 (ISOBMFF) and ISO/IEC 23008-12 (HEIF):
+ *
+ * @see https://mp4ra.org/registered-types/brands
+ *
+ * @param buffer File ArrayBuffer. The first `FILE_TYPE_BOX_BYTES` bytes suffice.
+ * @return Whether the buffer contains a HEIC/HEIF image.
+ */
+export function isHeicBuffer( buffer: ArrayBuffer ): boolean {
+	const view = new Uint8Array( buffer );
+
+	const readBrand = ( offset: number ) =>
+		String.fromCharCode( ...view.subarray( offset, offset + 4 ) );
+
+	// The File Type Box marker follows the 4-byte box size.
+	if ( view.length < 12 || readBrand( 4 ) !== 'ftyp' ) {
+		return false;
+	}
+
+	// The major brand, then every compatible brand after the minor version.
+	const brands = [ readBrand( 8 ) ];
+	for ( let offset = 16; offset + 4 <= view.length; offset += 4 ) {
+		brands.push( readBrand( offset ) );
+	}
+
+	if ( brands.some( ( brand ) => AVIF_BRANDS.includes( brand ) ) ) {
+		return false;
+	}
+
+	return brands.some( ( brand ) => HEIC_BRANDS.includes( brand ) );
+}
+
+/**
+ * Detects whether a file is a HEIC/HEIF image, whatever its name claims.
+ *
+ * A browser derives `File.type` from the file extension alone, so a HEIC photo
+ * saved as `.jpg` or `.png` announces itself as a JPEG or PNG, and one the
+ * operating system cannot identify announces nothing at all. Both are settled
+ * here by reading the file's own header.
+ *
+ * Only files that could plausibly be images are read, so an ISOBMFF video is
+ * never mistaken for a still and no non-image upload pays for the read.
+ *
+ * @param file File to inspect.
+ * @return Whether the file is a HEIC/HEIF image.
+ */
+export async function isHeicFile( file: File ): Promise< boolean > {
+	if ( HEIC_MIME_TYPES.includes( file.type ) ) {
+		return true;
+	}
+
+	if ( file.type && ! file.type.startsWith( 'image/' ) ) {
+		return false;
+	}
+
+	try {
+		return isHeicBuffer(
+			await file.slice( 0, FILE_TYPE_BOX_BYTES ).arrayBuffer()
+		);
+	} catch {
+		// An unreadable file is left to the upload itself to report.
+		return false;
+	}
 }

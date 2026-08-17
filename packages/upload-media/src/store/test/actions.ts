@@ -2,6 +2,7 @@ import { createRegistry } from '@wordpress/data';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 import { store as uploadStore } from '..';
 import { ItemStatus, OperationType } from '../types';
+import { ErrorCode } from '../../upload-error';
 import { unlock } from '../../lock-unlock';
 jest.mock( '@wordpress/blob', () => ( {
 	__esModule: true,
@@ -392,6 +393,51 @@ describe( 'actions', () => {
 				true
 			);
 			expect( updatedItem.additionalData.convert_format ).toBe( true );
+		} );
+
+		it( 'routes a HEIC file named .jpg through the HEIC conversion path', async () => {
+			// A HEIC File Type Box under a name that makes the browser report
+			// the file as a JPEG. Taking it at its word sends undecodable
+			// bytes down the vips path, where the upload strands (#81707).
+			const ftyp = 'ftypheic\0\0\0\0mif1miaf';
+			const heicNamedJpeg = new File(
+				[
+					new Uint8Array( [
+						0x00,
+						0x00,
+						0x00,
+						4 + ftyp.length,
+						...[ ...ftyp ].map( ( character ) =>
+							character.charCodeAt( 0 )
+						),
+					] ),
+				],
+				'example.jpg',
+				{ type: 'image/jpeg' }
+			);
+			const onError = jest.fn();
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: heicNamedJpeg,
+				onError,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			// jsdom exposes none of the decoders canvasConvertToJpeg tries, so
+			// reaching the HEIC path here means failing to decode. The point is
+			// that it reports that failure rather than uploading the file.
+			expect( onError ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					code: ErrorCode.HEIC_DECODE_ERROR,
+				} )
+			);
 		} );
 	} );
 
