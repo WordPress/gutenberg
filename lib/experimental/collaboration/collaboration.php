@@ -80,6 +80,7 @@ if ( ! function_exists( 'gutenberg_register_collaboration_rest_routes' ) ) {
 		if ( ! $sync_storage instanceof WP_Sync_Storage ) {
 			$sync_storage = new WP_Sync_Post_Meta_Storage();
 		}
+
 		$sync_server  = new WP_HTTP_Polling_Sync_Server( $sync_storage );
 		$sync_server->register_routes();
 
