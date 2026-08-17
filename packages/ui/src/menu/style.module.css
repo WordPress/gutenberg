@@ -189,6 +189,16 @@
 			}
 		}
 
+		/*
+		 * Content precedes the prefix in the DOM for typeahead. Keep every
+		 * visual slot in the same row regardless of DOM order.
+		 */
+		.item-selection-indicator,
+		.item-prefix,
+		.item-content {
+			grid-row: 1;
+		}
+
 		.item-selection-indicator {
 			grid-column: selection-start / selection-end;
 			align-self: center;
