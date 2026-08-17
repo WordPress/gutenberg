@@ -2256,7 +2256,7 @@ class WP_Theme_JSON_Gutenberg {
 				$has_block_gap_column_value = isset( $block_gap_value['left'] );
 
 				if ( $has_block_gap_row_value || $has_block_gap_column_value ) {
-					$block_gap_row_value = $has_block_gap_row_value
+					$block_gap_row_value    = $has_block_gap_row_value
 						? static::get_property_value( $node, array( 'spacing', 'blockGap', 'top' ) )
 						: '0';
 					$block_gap_column_value = $has_block_gap_column_value
