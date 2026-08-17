@@ -13,7 +13,7 @@ import { unlock } from '../../lock-unlock';
  * Returns every keyboard shortcut declared by a registered block type, through
  * either a block variation or a block transform.
  *
- * @return {Array} Normalized block shortcuts.
+ * @return {Array} Declared shortcuts, each paired with the block change it makes.
  */
 function useDeclaredBlockShortcuts() {
 	return useSelect(
@@ -31,7 +31,7 @@ function useDeclaredBlockShortcuts() {
  * that resolves to the block's current state is still handled, so that the key
  * combination is swallowed rather than typed into the block.
  *
- * @return {Function} Callback receiving a normalized shortcut.
+ * @return {Function} Callback receiving a declared shortcut.
  */
 function useApplyBlockShortcut() {
 	const {
@@ -60,7 +60,7 @@ function useApplyBlockShortcut() {
 			}
 
 			const blockName = getBlockName( clientId );
-			if ( blockNames && ! blockNames.includes( blockName ) ) {
+			if ( ! blockNames.includes( blockName ) ) {
 				return false;
 			}
 
@@ -139,10 +139,10 @@ function useApplyBlockShortcut() {
 }
 
 function BlockShortcut( { entry, apply } ) {
-	useShortcut( entry.shortcut.name, ( event ) => {
-		// Another handler already acted on this event. Block editor providers
-		// can be nested, in which case this component is mounted more than
-		// once.
+	useShortcut( entry.name, ( event ) => {
+		// Another handler already acted on this event: either a shortcut
+		// claiming the same key combination, or this same shortcut mounted
+		// twice because block editor providers can be nested.
 		if ( event.defaultPrevented ) {
 			return;
 		}
@@ -159,24 +159,47 @@ function BlockShortcutsRegister( { shortcuts } ) {
 	const { registerShortcut, unregisterShortcut } = useDispatch(
 		keyboardShortcutsStore
 	);
-	// Shortcuts registered by a previous run, so that those belonging to a
-	// block type that has since been unregistered can be removed. Registration
-	// deliberately outlives this component: providers can be nested, and
-	// unmounting one of them must not take the shortcuts away from the others.
-	const registeredRef = useRef( new Set() );
+	// Shortcuts registered by a previous run, keyed by name, so that those
+	// belonging to a block type that has since been unregistered can be
+	// removed. Registration deliberately outlives this component: providers can
+	// be nested, and unmounting one of them must not take the shortcuts away
+	// from the others.
+	const registeredRef = useRef( new Map() );
 
 	useEffect( () => {
-		const registered = new Set();
+		const registered = new Map();
 		const combinations = new Map();
 
-		for ( const { shortcut } of shortcuts ) {
-			if ( registered.has( shortcut.name ) ) {
+		for ( const shortcut of shortcuts ) {
+			const config = {
+				name: shortcut.name,
+				category: 'block',
+				description: shortcut.description,
+				keyCombination: shortcut.keyCombination,
+				aliases: shortcut.aliases,
+			};
+			const serialized = JSON.stringify( config );
+
+			// One shortcut is declared once per block change it can make, so
+			// the same name legitimately appears more than once: the heading
+			// level shortcuts are declared both on the variation, for a
+			// heading, and on the transform that produces one from a
+			// paragraph. Only declarations that disagree are a mistake, since
+			// the store keys shortcuts by name and the last one registered
+			// would decide what the others are matched against.
+			const previous = registered.get( shortcut.name );
+			if ( previous !== undefined ) {
+				if ( previous !== serialized ) {
+					warning(
+						`Block keyboard shortcut "${ shortcut.name }" is declared more than once with different settings.`
+					);
+				}
 				continue;
 			}
 
-			// Shortcuts are matched by key combination, so two blocks claiming
-			// the same one leaves whichever block is not selected silently
-			// without a shortcut.
+			// Handlers are matched by key combination rather than by name, so
+			// two shortcuts claiming the same one both run on the same event,
+			// in registration order, and the first that applies takes it.
 			const { modifier, character } = shortcut.keyCombination;
 			const combination = `${ modifier ?? '' }+${ character }`;
 			if ( combinations.has( combination ) ) {
@@ -190,17 +213,11 @@ function BlockShortcutsRegister( { shortcuts } ) {
 			}
 			combinations.set( combination, shortcut.name );
 
-			registerShortcut( {
-				name: shortcut.name,
-				category: 'block',
-				description: shortcut.description,
-				keyCombination: shortcut.keyCombination,
-				aliases: shortcut.aliases,
-			} );
-			registered.add( shortcut.name );
+			registerShortcut( config );
+			registered.set( shortcut.name, serialized );
 		}
 
-		for ( const name of registeredRef.current ) {
+		for ( const name of registeredRef.current.keys() ) {
 			if ( ! registered.has( name ) ) {
 				unregisterShortcut( name );
 			}
@@ -229,7 +246,7 @@ export default function BlockKeyboardShortcuts() {
 				<BlockShortcut
 					// Shortcut names are not guaranteed to be unique across
 					// blocks, so the index keeps the list stable.
-					key={ `${ entry.shortcut.name }-${ index }` }
+					key={ `${ entry.name }-${ index }` }
 					entry={ entry }
 					apply={ apply }
 				/>
