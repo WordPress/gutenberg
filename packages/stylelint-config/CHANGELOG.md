@@ -52,6 +52,8 @@
 
 -   Added `plugin-wpds/no-unknown-ds-tokens` and `plugin-wpds/no-setting-wpds-custom-properties` rules from `@wordpress/theme` to catch design token misuse ([#74226](https://github.com/WordPress/gutenberg/pull/74226)).
 
+## 23.29.0 (2025-12-23)
+
 ## 23.28.0 (2025-11-26)
 
 ## 23.27.0 (2025-11-12)
@@ -253,7 +255,8 @@
 
 ### Breaking Changes
 
--   Increase the minimum Node.js version to 12 ([#27934](https://github.com/WordPress/gutenberg/pull/27934)).
+-   Removed stylelint `^10.1.0`, `^11.0.0`, and `^12.0.0` as peer dependency.
+
 
 ### Internal
 

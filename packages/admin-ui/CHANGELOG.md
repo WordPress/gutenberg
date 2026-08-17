@@ -78,6 +78,10 @@
 
 -   Admin UI: use UI Text component in header. [#77372](https://github.com/WordPress/gutenberg/pull/77372)
 
+### Internal
+
+-   `Breadcrumbs`: Migrate from `@wordpress/components` to `Link`, `Stack`, and `Text` from `@wordpress/ui`. [#77012](https://github.com/WordPress/gutenberg/pull/77012)
+
 ## 1.12.0 (2026-04-15)
 
 ### Enhancements
@@ -86,7 +90,6 @@
 
 ### Internal
 
--   `Breadcrumbs`: Migrate from `@wordpress/components` to `Link`, `Stack`, and `Text` from `@wordpress/ui`. [#77012](https://github.com/WordPress/gutenberg/pull/77012)
 
 ## 1.11.0 (2026-04-01)
 
@@ -114,6 +117,8 @@
 ## 1.7.0 (2026-01-29)
 
 ## 1.6.0 (2026-01-16)
+
+## 1.5.0 (2025-12-23)
 
 ## 1.4.0 (2025-11-26)
 

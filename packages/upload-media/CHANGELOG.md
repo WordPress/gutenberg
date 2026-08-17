@@ -38,6 +38,10 @@
 
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 
+### Bug Fix
+
+-   Apply EXIF orientation to AVIF/HEIF sub-sizes when the orientation is stored in an EXIF tag rather than a native `irot` transform, which neither the server nor libvips auto-rotates ([#79384](https://github.com/WordPress/gutenberg/pull/79384)).
+
 ## 0.35.0 (2026-07-01)
 
 ## 0.34.0 (2026-06-24)
@@ -51,7 +55,6 @@
 ### Bug Fix
 
 -   `uploadItem` no longer dispatches `finishOperation` twice when both `onFileChange` and `onSuccess` fire for the same attachment ([#74917](https://github.com/WordPress/gutenberg/pull/74917)).
--   Apply EXIF orientation to AVIF/HEIF sub-sizes when the orientation is stored in an EXIF tag rather than a native `irot` transform, which neither the server nor libvips auto-rotates ([#79384](https://github.com/WordPress/gutenberg/pull/79384)).
 
 ## 0.33.1 (2026-06-16)
 
@@ -98,6 +101,8 @@
 ## 0.24.0 (2026-01-29)
 
 ## 0.23.0 (2026-01-16)
+
+## 0.22.0 (2025-12-23)
 
 ## 0.21.0 (2025-11-26)
 

@@ -41,6 +41,8 @@
 
 ## 6.11.0 (2026-01-16)
 
+## 6.10.0 (2025-12-23)
+
 ## 6.9.0 (2025-11-26)
 
 ## 6.8.0 (2025-11-12)
@@ -263,6 +265,12 @@
 -   Add new `subscribe` method to subscribe to changes in the internal locale data.
 -   Add new `hasTranslation` method to determine whether a translation for a string is available.
 
+## 3.18.0 (2021-02-2)
+
+### Enhancements
+
+- Allow the return values of i18n functions to be filtered ([#27966](https://github.com/WordPress/gutenberg/pull/27966))
+
 ## 3.17.0 (2020-12-17)
 
 ### Enhancements
@@ -281,6 +289,7 @@
 
 -   Include TypeScript type declarations ([#18942](https://github.com/WordPress/gutenberg/pull/18942))
 -   Add `createI18n` method to allow creation of multiple i18n instances ([#21182](https://github.com/WordPress/gutenberg/pull/21182))
+- Add `isRTL` function  ([#20298](https://github.com/WordPress/gutenberg/pull/20298))
 
 ## 3.10.0 (2020-04-01)
 
@@ -294,6 +303,12 @@
 
 -   The module has been internally refactored to use [Tannin](https://github.com/aduth/tannin) in place of [Jed](https://github.com/messageformat/Jed/). This has no impact on the public interface of the module, but should come with considerable benefit to performance, memory usage, and bundle size.
 
+## 3.0.1 (2018-10-10)
+
+### Bug Fixes
+
+-   The initialization of the internal Jed instance now correctly assigns its default data.
+
 ## 3.0.0 (2018-09-30)
 
 ### Breaking Changes
@@ -303,7 +318,6 @@
 
 ### Bug Fixes
 
--   The initialization of the internal Jed instance now correctly assigns its default data.
 
 ## 2.0.0 (2018-09-05)
 

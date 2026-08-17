@@ -48,6 +48,8 @@
 
 ## 6.38.0 (2026-01-16)
 
+## 6.37.0 (2025-12-23)
+
 ## 6.36.0 (2025-11-26)
 
 ### Internal
@@ -284,10 +286,12 @@
 -   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at <https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/>.
 -   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at <https://nodejs.org/en/about/releases/>.
 
+### New Features
+
+-   Initial version of the package.
+
 ## 1.3.0 (2021-03-17)
 
 ## 0.1.0 (2019-03-06)
 
 ### New Features
-
--   Initial version of the package.

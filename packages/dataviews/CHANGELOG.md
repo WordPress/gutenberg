@@ -96,7 +96,6 @@
 ### Bug Fix
 
 -   DataViews: Stop the infinite-scroll list from jumping while pages load asynchronously. The scroll-anchor restoration no longer discards scrolling the user did during the load, and the footer's visibility no longer depends on the loading state, so it no longer mounts mid-load (resizing the scroll container). [#79546](https://github.com/WordPress/gutenberg/pull/79546)
--   Fix Dataviews popover hover text color readability issue on WordPress 7.0. [#80105](https://github.com/WordPress/gutenberg/pull/80105)
 
 ### Internal
 
@@ -110,6 +109,10 @@
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 
 -   `ValidatedDateControl`: Update validation error message to be announced by screen readers using `speak` instead of an inline `aria-live` region ([#79600](https://github.com/WordPress/gutenberg/pull/79600))
+
+### Documentation
+
+-   Add component documentation for `DataViews`, `DataViewsPicker`, and `DataForm` components ([#79460](https://github.com/WordPress/gutenberg/pull/79460)).
 
 ## 17.1.0 (2026-07-01)
 
@@ -133,12 +136,12 @@
 ### Documentation
 
 -   Fix `overriden` typo to `overridden` in README. ([#79331](https://github.com/WordPress/gutenberg/pull/79331))
--   Add component documentation for `DataViews`, `DataViewsPicker`, and `DataForm` components ([#79460](https://github.com/WordPress/gutenberg/pull/79460)).
 
 ### Internal
 
 -   Adopt `--wpds-dimension-size-*` design tokens [#79093](https://github.com/WordPress/gutenberg/pull/79093).
 -   Migrate the remaining `var(--wpds-dimension-base)` usages off the removed primitive token [#79254](https://github.com/WordPress/gutenberg/pull/79254).
+-   Update `@ariakit/react` to `0.4.29` ([#79055](https://github.com/WordPress/gutenberg/pull/79055)).
 
 ## 16.0.1 (2026-06-16)
 
@@ -162,7 +165,6 @@
 
 ### Internal
 
--   Update `@ariakit/react` to `0.4.29` ([#79055](https://github.com/WordPress/gutenberg/pull/79055)).
 -   Dependency updates ([#77954](https://github.com/WordPress/gutenberg/pull/77954)).
 
 ## 15.0.0 (2026-05-27)
@@ -246,12 +248,14 @@
 -   DataViews: Add border to sticky table headers. [#76396](https://github.com/WordPress/gutenberg/pull/76396)
 -   DataViews: Update scrolling so the scrollbar appears on the active layout when DataViews is rendered in a constrained-height container. This may slightly change the UI depending on the container height. [#76453](https://github.com/WordPress/gutenberg/pull/76453)
 -   DataViews: Add density option to Grid and PickerGrid layouts. [#75887](https://github.com/WordPress/gutenberg/pull/75887)
+-   DataForm: Add `applyLabel` and `cancelLabel` options to `panel` layout's `openAs` modal config for customizing modal button labels. [#76099](https://github.com/WordPress/gutenberg/pull/76099)
 
 ### Bug Fixes
 
 -   DataViews: Fix last column classname in table layout. [#76133](https://github.com/WordPress/gutenberg/pull/76133)
 -   DataViews: Add spinner in DataViewsLayout in initial load of data. [#76486](https://github.com/WordPress/gutenberg/pull/76486)
 -   DataForm: Properly handle dates in datetime control. [#76193](https://github.com/WordPress/gutenberg/pull/76193)
+-   DataViews: Fix sort indicator not resetting across column menus. [#76041](https://github.com/WordPress/gutenberg/pull/76041)
 
 ### Code Quality
 
@@ -265,7 +269,6 @@
 
 ### Bug Fixes
 
--   DataViews: Fix sort indicator not resetting across column menus. [#76041](https://github.com/WordPress/gutenberg/pull/76041)
 -   DataForm: Fix label color of array control. [#75730](https://github.com/WordPress/gutenberg/pull/75730)
 -   DataForm: Fix text overflow for long unhyphenated text in panel layout. [#76073](https://github.com/WordPress/gutenberg/pull/76073)
 -   DataForm: Fix `card` layout's toggle button screen reader text. [#76039](https://github.com/WordPress/gutenberg/pull/76039)
@@ -278,10 +281,11 @@
 -   DataForm: Fix vertical alignment of summary fields in card layout. [#75864](https://github.com/WordPress/gutenberg/pull/75864)
 -   DataViews: Remove visual divider between quick and regular actions in the actions menu. [#75893](https://github.com/WordPress/gutenberg/pull/75893)
 -   DataForm: field label for panel layout are no longer uppercased. [#75944](https://github.com/WordPress/gutenberg/pull/75944)
+-   DataViews: Fix first/last column header text misalignment in table layout when no bulk actions are present. [#75372](https://github.com/WordPress/gutenberg/issues/75372)
+- DataViews: Fix first/last column header text misalignment in table layout when no bulk actions are present. [#75372](https://github.com/WordPress/gutenberg/issues/75372)
 
 ### Enhancements
 
--   DataForm: Add `applyLabel` and `cancelLabel` options to `panel` layout's `openAs` modal config for customizing modal button labels. [#76099](https://github.com/WordPress/gutenberg/pull/76099)
 -   Documentation: Update README.md. [#75881](https://github.com/WordPress/gutenberg/pull/75881)
 -   DataViews: Improve UI in `list` layout when we render only title and/or media fields. [#76042](https://github.com/WordPress/gutenberg/pull/76042)
 -   DataViews: Adjust column spacing in table layout when no titleField is provided. [#75410](https://github.com/WordPress/gutenberg/pull/75410)
@@ -299,7 +303,6 @@
 
 ### Bug Fixes
 
--   DataViews: Fix first/last column header text misalignment in table layout when no bulk actions are present. [#75372](https://github.com/WordPress/gutenberg/issues/75372)
 -   DataForm: Fix text selection in panel layout summary rows by replacing `::after` overlay with accessible card pattern. [#75565](https://github.com/WordPress/gutenberg/pull/75565)
 -   DataViews: Improve styling for filters when long values are in use. [#75369](https://github.com/WordPress/gutenberg/pull/75369)
 -   DataForm: Fix label case for regular layout. [#75292](https://github.com/WordPress/gutenberg/pull/75292)
@@ -343,6 +346,7 @@
 -   DataForm: Sync React-level validation to native inputs on date fields. [#74994](https://github.com/WordPress/gutenberg/pull/74994)
 -   Fix primary action visibility in table layout when the action doesn't support bulk operations, and fix compact action menu not visible on mobile when there is only one action. [#74836](https://github.com/WordPress/gutenberg/pull/74836)
 -   DataViews: Use regular casing for bulk selection count. [#74573](https://github.com/WordPress/gutenberg/pull/74573)
+-   Dataviews: Fix insert left and right handling in table layout for RTL languages. [#74681](https://github.com/WordPress/gutenberg/pull/74681)
 
 ### Code Quality
 
@@ -380,7 +384,6 @@
 -   DataViews: `filterSortAndPaginate()` will ignore sorting on non-sortable fields [#73950](https://github.com/WordPress/gutenberg/pull/73950)
 -   DataViews: Fix locked fields order when toggling visibility in properties section. [#74326](https://github.com/WordPress/gutenberg/pull/74326)
 -   Dataviews: Fix column header move item in RTL moves in the opposite direction to the arrow. [#74644](https://github.com/WordPress/gutenberg/pull/74644)
--   Dataviews: Fix insert left and right handling in table layout for RTL languages. [#74681](https://github.com/WordPress/gutenberg/pull/74681)
 
 ### Enhancements
 
@@ -397,6 +400,26 @@
 -   DataViews: Add panel form layout validation. [#73700](https://github.com/WordPress/gutenberg/pull/73700)
 -   Converted package to a compliant dual CJS/ESM module ([#73822](https://github.com/WordPress/gutenberg/pull/73822) and [#74348](https://github.com/WordPress/gutenberg/pull/74348))
 -   Add density preference support to List view with compact, balanced (default), and comfortable options. ([#71050](https://github.com/WordPress/gutenberg/pull/71050))
+
+## 11.1.0 (2025-12-23)
+
+### Code Quality
+
+- DataViews: Remove extra wrapper for GridItem. [#73665](https://github.com/WordPress/gutenberg/pull/73665)
+
+### Bug Fixes
+
+- Fix sticky footer in DataViews grid view. [#73661](https://github.com/WordPress/gutenberg/pull/73661)
+- DataViews: Apply primary style to first column if there is no title field. [#73729](https://github.com/WordPress/gutenberg/pull/73729)
+
+### Enhancements
+
+- Better labels for operators and deprecate the `isNotAll` operator. [#73671](https://github.com/WordPress/gutenberg/pull/73671)
+- Field API: move validation to the field type. [#73642](https://github.com/WordPress/gutenberg/pull/73642)
+- DataForm: add support for `min`/`max` and `minLength`/`maxLength` validation for relevant controls. [#73465](https://github.com/WordPress/gutenberg/pull/73465)
+- Field API: display formats for `number` and `integer` types. [#73644](https://github.com/WordPress/gutenberg/pull/73644)
+- DataViews: Update padding to 24px for consistency. [#73334](https://github.com/WordPress/gutenberg/pull/73334)
+-   Documentation: add missing props in DataViews. [#73611](https://github.com/WordPress/gutenberg/pull/73611)
 
 ## 11.0.0 (2025-11-26)
 
@@ -416,11 +439,11 @@
 -   Documentation: surface better the `type` property in the documentation. [#73349](https://github.com/WordPress/gutenberg/pull/73349)
 -   Documentation: improve DataView's `layout` prop. [#73470](https://github.com/WordPress/gutenberg/pull/73470)
 -   Documentation: document `readOnly`, `description`, and `placeholder` properties. [#73515](https://github.com/WordPress/gutenberg/pull/73515)
--   Documentation: add missing props in DataViews. [#73611](https://github.com/WordPress/gutenberg/pull/73611)
 -   DataForm Panel Layout: Focus the first input element when the panel opens. [#72322](https://github.com/WordPress/gutenberg/pull/72322)
 -   DataForm: Pattern validation is now supported on all fields that browsers support it in. [#73156](https://github.com/WordPress/gutenberg/pull/73156)
 -   Documentation: improve operators docs. [#73523](https://github.com/WordPress/gutenberg/pull/73523)
 -   DataViews table layout: fix table header spacing when using non-default column alignment. [#73398](https://github.com/WordPress/gutenberg/pull/73398)
+-   DataForm: use envelope icon instead of atSymbol for email control component. [#73184](https://github.com/WordPress/gutenberg/pull/73184)
 
 ### Bug fixes
 
@@ -445,8 +468,8 @@
 -   DataViews: Simplify the view config properties section. [#73064](https://github.com/WordPress/gutenberg/pull/73064)
 -   DataViews: Add a contextual menu to the table layout header. [#73104](https://github.com/WordPress/gutenberg/pull/73104)
 -   DataViewsPicker: Add table layout support. [#72914](https://github.com/WordPress/gutenberg/pull/72914)
--   DataForm: use envelope icon instead of atSymbol for email control component. [#73184](https://github.com/WordPress/gutenberg/pull/73184)
 -   DataViews: Group DataViews actions based on primary actions and regular actions and adds a separator between the groups. [#72866](https://github.com/WordPress/gutenberg/pull/72866)
+-   DataViews: datetime filter and default render use local time. [#72756](https://github.com/WordPress/gutenberg/pull/72756)
 
 ### Bug fixes
 
@@ -459,24 +482,48 @@
 
 ### Enhancements
 
--   DataViews: datetime filter and default render use local time. [#72756](https://github.com/WordPress/gutenberg/pull/72756)
 -   DataViews: keep icon-only buttons on mobile for bulk actions. [#72761](https://github.com/WordPress/gutenberg/pull/72761)
 -   DataForm: update spacing for regular and card layouts. [#72249](https://github.com/WordPress/gutenberg/pull/72249).
 -   DataForm: Fix password field suffix alignment. [#72524](https://github.com/WordPress/gutenberg/pull/72524).
+-   Consistently use font-weight 499 instead of 500 ([#72473](https://github.com/WordPress/gutenberg/pull/72473)).
+-   DataForm: Add support for non collapsible cards. [#72540](https://github.com/WordPress/gutenberg/pull/72540)
+
+## 10.1.6 (2025-11-18)
+
+### Bug fixes
+
+- Fix: ensure primary actions are not wrapped in the list layout. [#73333](https://github.com/WordPress/gutenberg/pull/73333)
+
+## 10.1.4 (2025-11-10)
+
+### Bug fixes
+
+- Fix: Table layout column spacing. [#72969](https://github.com/WordPress/gutenberg/pull/72969)
+
+## 10.1.3 (2025-11-07)
+
+### Enhancements
+
+- DatViews list layout: remove link variant from primary actions's button. [#72920](https://github.com/WordPress/gutenberg/pull/72920)
+
+## 10.1.2 (2025-11-03)
+
+### Bug fixes
+
+- Fix: DataViews modal actions in list layout. [#72793](https://github.com/WordPress/gutenberg/pull/72793)
 
 ## 10.1.0 (2025-10-21)
 
 ### Enhancements
 
--   Consistently use font-weight 499 instead of 500 ([#72473](https://github.com/WordPress/gutenberg/pull/72473)).
 -   Dataviews: Use text based buttons for actions instead of text. [#72417](https://github.com/WordPress/gutenberg/pull/72417)
--   DataForm: Add support for non collapsible cards. [#72540](https://github.com/WordPress/gutenberg/pull/72540)
 
 ## 10.0.0 (2025-10-17)
 
 ### Bug Fixes
 
 -   DataViewsPicker: ensure title overflows correctly in Grid view. ([#72339](https://github.com/WordPress/gutenberg/pull/72339))
+-   Always render a wrapper for media field (prevents layout break when 'itemClickable' is false). [#72078](https://github.com/WordPress/gutenberg/pull/72078).
 
 ### Enhancements
 
@@ -522,7 +569,6 @@
 
 -   DataViews: keep non-hideable fields out of the hidden-fields list when they’re already invisible. [#71729](https://github.com/WordPress/gutenberg/pull/71729/)
 -   DataViewsPicker: Hide the space reserved for the title when the title is hidden. [#71865](https://github.com/WordPress/gutenberg/pull/71865)
--   Always render a wrapper for media field (prevents layout break when 'itemClickable' is false). [#72078](https://github.com/WordPress/gutenberg/pull/72078).
 
 ### Enhancements
 
@@ -551,6 +597,7 @@
 -   DataForm: Add object configuration support for Edit property with some options. ([#71582](https://github.com/WordPress/gutenberg/pull/71582))
 -   DataForm: Add summary field support for composed fields. ([#71614](https://github.com/WordPress/gutenberg/pull/71614))
 -   DataForm: update radio control to support `required` and `custom` validation. [#71664](https://github.com/WordPress/gutenberg/pull/71664)
+- Introduce a new `DataViewsPicker` component. [#70971](https://github.com/WordPress/gutenberg/pull/70971)
 
 ### Bug Fixes
 
@@ -626,6 +673,8 @@
 -   Add support for the `Edit` control on the date field type ([#70836](https://github.com/WordPress/gutenberg/pull/70836)).
 -   Add support for responsive image attributes in media fields by adding a `config` prop to `mediaField.render`, containing a `sizes` string. Also simplifies grid logic and fixes imprecisions in grid resizing by changing the observed container. ([#70493](https://github.com/WordPress/gutenberg/pull/70493)).
 -   `DataViews` empty state can be customized using the new `empty` prop.
+-   Align media styles in table view with list view for consistency.
+- Align media styles in table view with list view for consistency.
 
 ### Enhancements
 
@@ -659,7 +708,6 @@
 -   Allow readonly fields in DataForm when `readOnly` is set to `true`.
 -   Adjust the padding when the component is placed inside a `Card`.
 -   Introduce `perPageSizes` to control the available sizes of the items per page.
--   Align media styles in table view with list view for consistency.
 
 ### Breaking Changes
 
@@ -760,11 +808,23 @@ const view = {
 
 -   Adjust layout of filter / actions row, increase width of search control when the container is narrower. ([#64681](https://github.com/WordPress/gutenberg/pull/64681)).
 
+## Breaking Changes
+
+-   `DataForm`'s `onChange` prop has been update to receive as argument only the fields that have changed.
+
 ## 4.1.0 (2024-08-07)
 
 ## Internal
 
 -   Upgraded `@ariakit/react` (v0.4.7) ([#64066](https://github.com/WordPress/gutenberg/pull/64066)).
+
+## New features
+
+-   Support multiple layouts in `DataForm` component and introduce the `panel` layout.
+
+## Breaking Changes
+
+-   `DataForm`'s `visibleFields` prop has been renamed to `fields`.
 
 ## 4.0.0 (2024-07-24)
 
@@ -773,12 +833,9 @@ const view = {
 -   `onSelectionChange` prop has been renamed to `onChangeSelection` and its argument has been updated to be a list of ids.
 -   `setSelection` prop has been removed. Please use `onChangeSelection` instead.
 -   `header` field property has been renamed to `label`.
--   `DataForm`'s `visibleFields` prop has been renamed to `fields`.
--   `DataForm`'s `onChange` prop has been update to receive as argument only the fields that have changed.
 
 ### New features
 
--   Support multiple layouts in `DataForm` component and introduce the `panel` layout.
 
 ## 3.0.0 (2024-07-10)
 
@@ -797,6 +854,10 @@ const view = {
 
 ## 2.2.0 (2024-06-26)
 
+### Enhancements
+
+-   Add `registry` argument to the callback of the actions API. ([#62505](https://github.com/WordPress/gutenberg/pull/62505)).
+
 ## 2.1.0 (2024-06-15)
 
 ## 2.0.0 (2024-05-31)
@@ -814,7 +875,6 @@ const view = {
 ### Enhancements
 
 -   `label` prop in Actions API can be either a `string` value or a `function`, in case we want to use information from the selected items. ([#61942](https://github.com/WordPress/gutenberg/pull/61942)).
--   Add `registry` argument to the callback of the actions API. ([#62505](https://github.com/WordPress/gutenberg/pull/62505)).
 
 ## 1.2.0 (2024-05-16)
 
@@ -836,6 +896,11 @@ const view = {
 
 -   The `enumeration` type has been removed and we'll introduce new field types soon. The existing filters will still work as before given they checked for field.elements, which is still a condition filters should have.
 
+### Breaking changes
+
+-   Removed the `getPaginationResults` and `sortByTextFields` utils and replaced them with a unique `filterSortAndPaginate` function.
+- Removed the `getPaginationResults` and `sortByTextFields` utils and replaced them with a unique `filterSortAndPaginate` function.
+
 ## 0.8.0 (2024-03-21)
 
 ### Enhancements
@@ -845,7 +910,6 @@ const view = {
 
 ### Breaking Changes
 
--   Removed the `getPaginationResults` and `sortByTextFields` utils and replaced them with a unique `filterSortAndPaginate` function.
 
 ## 0.7.0 (2024-03-06)
 

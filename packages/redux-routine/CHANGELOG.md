@@ -37,6 +37,8 @@
 
 ## 5.38.0 (2026-01-16)
 
+## 5.37.0 (2025-12-23)
+
 ## 5.36.0 (2025-11-26)
 
 ## 5.35.0 (2025-11-12)
@@ -275,6 +277,12 @@
 
 -   Account for null value in redux-routine createRuntime (introduces `isAction` and `isActionOfType` methods to assist with that).
 
+## 3.0.1 (2018-10-10)
+
+### Bug Fixes
+
+-   Fix running routines in Firefox.
+
 ## 3.0.0 (2018-09-30)
 
 ### Breaking Changes
@@ -284,7 +292,6 @@
 
 ### Bug Fixes
 
--   Fix running routines in Firefox.
 
 ## 2.0.0 (2018-09-05)
 

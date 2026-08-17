@@ -26,6 +26,10 @@
 
 ## 15.23.0 (2026-07-01)
 
+### Bug Fix
+
+- Paste: Move leading and trailing spaces out of inline formatting elements (such as links) so the formatting wraps only its meaningful content. This corrects markup from editors like Google Docs that place the separating space inside the link.
+
 ## 15.22.0 (2026-06-24)
 
 ### Internal
@@ -49,7 +53,6 @@
 ### Bug Fix
 
 - Fix `mergeSchemas` in `getBlockContentSchemaFromTransforms` to preserve array values (e.g. `classes`) instead of converting them to objects with numeric string keys when merging schemas ([#70615](https://github.com/WordPress/gutenberg/pull/70615)).
-- Paste: Move leading and trailing spaces out of inline formatting elements (such as links) so the formatting wraps only its meaningful content. This corrects markup from editors like Google Docs that place the separating space inside the link.
 
 ## 15.19.0 (2026-05-14)
 
@@ -71,6 +74,8 @@
 ## 15.12.0 (2026-01-29)
 
 ## 15.11.0 (2026-01-16)
+
+## 15.10.0 (2025-12-23)
 
 ## 15.9.0 (2025-11-26)
 
@@ -251,6 +256,10 @@
 
 -   The block attribute sources `children` and `node` have been deprecated. Please use the `html` source instead. See https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/ and the core blocks for examples.
 
+## 11.16.3 (2022-09-27)
+
+- The block attribute sources `children` and `node` have been deprecated. Please use the `html` source instead. See https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/ and the core blocks for examples.
+
 ## 11.16.0 (2022-09-13)
 
 ## 11.15.0 (2022-08-24)
@@ -354,15 +363,21 @@
 
 -   Added a store definition `store` for the blocks namespace to use with `@wordpress/data` API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 
+## 6.14.0 (2020-04-15)
+
+### New Feature
+
+- Blocks can now be registered with an `defaultStylePicker` flag in the `supports` setting, allowing the default style picker to be removed.
+
 ## 6.13.0 (2020-04-01)
 
 ### New Features
 
 -   Blocks can now be registered with an `defaultStylePicker` flag in the `supports` setting, allowing the default style picker to be removed.
 
-## 6.4.0 (2019-08-05)
+## 6.5.0 (2019-08-05)
 
-### Enhancements
+### Improvements
 
 -   Omitting `attributes` or `keywords` settings will now stub default values (an empty object or empty array, respectively).
 
@@ -370,12 +385,23 @@
 
 -   The `'blocks.registerBlockType'` filter is now applied to each of a block's deprecated settings as well as the block's main settings. Ensures `supports` settings like `anchor` work for deprecations.
 
+## 6.4.0 (2019-08-05)
+
+### Enhancements
+
+
+### Bug Fixes
+
+
+### New Feature
+
+-   Added wildcard block transforms which allows for transforming all/any blocks in another block.
+
 ## 6.3.0 (2019-05-21)
 
 ### New Features
 
 -   Added a default implementation for `save` setting in `registerBlockType` which saves no markup in the post content.
--   Added wildcard block transforms which allows for transforming all/any blocks in another block.
 
 ## 6.1.0 (2019-03-06)
 

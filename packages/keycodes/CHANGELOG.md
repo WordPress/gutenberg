@@ -56,6 +56,8 @@
 
 -   Add new `ariaKeyShortcut` function ([#74205](https://github.com/WordPress/gutenberg/pull/74205)).
 
+## 4.37.0 (2025-12-23)
+
 ## 4.36.0 (2025-11-26)
 
 ## 4.35.0 (2025-11-12)

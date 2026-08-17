@@ -49,6 +49,8 @@
 
 ## 9.38.0 (2026-01-16)
 
+## 9.37.0 (2025-12-23)
+
 ## 9.36.0 (2025-11-26)
 
 ## 9.35.0 (2025-11-12)
@@ -173,6 +175,12 @@
 
 -   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
 
+## 6.0.0 (2022-12-14)
+
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+
 ## 5.20.0 (2022-11-16)
 
 ## 5.19.0 (2022-11-02)
@@ -238,9 +246,12 @@
 
 -   Added a store definition `store` for the core data namespace to use with `@wordpress/data` API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 
-# 3.1.0 (2019-06-03)
+## 3.10.0 (2020-01-13)
 
 -   The `@wordpress/nux` package has been deprecated. Please use the `Guide` component in `@wordpress/components` to show a user guide.
+
+# 3.1.0 (2019-06-03)
+
 
 ## 3.0.6 (2019-01-03)
 

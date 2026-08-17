@@ -1,0 +1,159 @@
+{
+	"schemaVersion": 1,
+	"baselineSha": "cd0c368a2e5e2d046306031ddd824d3f5eda60bd",
+	"events": {
+		"01a314d7e46a50101e328fdb11959c441e49372d": {
+			"disposition": "excluded-no-trunk-changelog-backport",
+			"reason": "The wp/latest publication was not synchronized to trunk before the next stable release cut.",
+			"evidenceMethod": "bounded-first-parent-path-and-version-heading-search",
+			"evidence": [
+				"publish:01a314d7e46a50101e328fdb11959c441e49372d",
+				"next-release-cut:ab5c79cd40adbb68898536c50e035b0a734338ea",
+				"trunk-snapshot-before-next-cut:7c641cf335425a6d9e8392aae984308480cafef2"
+			]
+		},
+		"104af00f9abcd7a4d36b87e648f148c72cc4ea5f": {
+			"disposition": "excluded-no-trunk-changelog-backport",
+			"reason": "The wp/latest publication was not synchronized to trunk before the next stable release cut.",
+			"evidenceMethod": "bounded-first-parent-path-and-version-heading-search",
+			"evidence": [
+				"publish:104af00f9abcd7a4d36b87e648f148c72cc4ea5f",
+				"next-release-cut:bbffb7567a47b4af071c0b00c1b653b3d3303809",
+				"trunk-snapshot-before-next-cut:471fa6790be9810436b6baa6a7cb11344f0de6ab"
+			]
+		},
+		"2cf13ec6cf86153c9b3cf369bf5c59046f5cd950": {
+			"disposition": "excluded-no-trunk-changelog-backport",
+			"reason": "The wp/latest publication was not synchronized to trunk. A later targeted commit changed only block-library and date, while the release finalized 102 changelogs, including five other non-empty sections.",
+			"evidenceMethod": "release-finalization-to-targeted-trunk-diff-coverage-comparison",
+			"evidence": [
+				"release-changelog:d096bed11d1917207b1d3eae9ccb8feedf6598d3",
+				"publish:2cf13ec6cf86153c9b3cf369bf5c59046f5cd950",
+				"targeted-trunk-change:ba6883fe7b6494ec9bc6fd1ecc1e7eed85d19724",
+				"next-release-cut:50c4c0f51e4797c217946ce42adfaa5eb026f33f"
+			]
+		},
+		"51264e33b95fadff9a06b68141e674ce9cde9675": {
+			"disposition": "paired-backport-range",
+			"trunkPreSha": "80c5c8816f47b265eb283538249f62c964ee60c4",
+			"trunkPostSha": "1da5f4e782256e922eadace647922d61cf3024a5",
+			"reason": "The manual trunk synchronization copied the wp/latest package versions and release headings in one commit.",
+			"evidenceMethod": "package-version-and-released-section-tree-comparison",
+			"evidence": [
+				"release-changelog:a8d4b3064574523c8930a0d3db7fb810f933f9af",
+				"publish:51264e33b95fadff9a06b68141e674ce9cde9675",
+				"trunk-backport:1da5f4e782256e922eadace647922d61cf3024a5"
+			]
+		},
+		"72476970386146d450c375e5c71a96dda7c9aaa8": {
+			"disposition": "excluded-no-trunk-changelog-backport",
+			"reason": "The wp/latest publication was not synchronized to trunk before the next stable release cut.",
+			"evidenceMethod": "bounded-first-parent-path-and-version-heading-search",
+			"evidence": [
+				"publish:72476970386146d450c375e5c71a96dda7c9aaa8",
+				"next-release-cut:104af00f9abcd7a4d36b87e648f148c72cc4ea5f",
+				"trunk-snapshot-before-next-cut:471fa6790be9810436b6baa6a7cb11344f0de6ab"
+			]
+		},
+		"76eba7cb18dbb129b1b1ddf9fd4a8a87bace0962": {
+			"disposition": "excluded-no-trunk-changelog-backport",
+			"reason": "Only the publish metadata reached trunk; the i18n 3.18.0 changelog finalization did not.",
+			"evidenceMethod": "tag-to-trunk-blob-and-bounded-first-parent-path-comparison",
+			"evidence": [
+				"tag:@wordpress/i18n@3.18.0",
+				"trunk-publish:d9fc6ce71cc3d7e41759df4713a4f3f0a70dc2b7",
+				"trunk-snapshot-before-next-cut:68237f674078fbc47fcfbbc8b5de30e479f4e344"
+			]
+		},
+		"7e8b17a983f9391d3ebc7717af2a1c9ed7efc7ab": {
+			"disposition": "paired-backport-range",
+			"trunkPreSha": "53d9d2fa534c9a6ec06f12791e7347ef4c608660",
+			"trunkPostSha": "69b17c5e98e1fe8cb8f33ac3a8c6cfdf74bb5a8f",
+			"reason": "The recovery commit copied the July 29 wp/latest release metadata after the original backport was lost.",
+			"evidenceMethod": "package-version-and-released-section-tree-comparison",
+			"evidence": [
+				"release-changelog:42ad0804f2136a36eb44261514b6e6d297d4e68b",
+				"publish:7e8b17a983f9391d3ebc7717af2a1c9ed7efc7ab",
+				"trunk-recovery:69b17c5e98e1fe8cb8f33ac3a8c6cfdf74bb5a8f"
+			]
+		},
+		"8c2cd6a5fd8781266da858a2e7d1bdd9a3a279e4": {
+			"disposition": "excluded-non-trunk-release-lane",
+			"reason": "This stable publication belongs only to the wp/5.9 WordPress patch lane, where a trunk changelog backport was not required.",
+			"evidenceMethod": "immutable-first-parent-release-lane-membership",
+			"evidence": [
+				"publish:8c2cd6a5fd8781266da858a2e7d1bdd9a3a279e4",
+				"lane:wp/5.9",
+				"tag:@wordpress/components@19.2.2"
+			]
+		},
+		"989764d42ff93e33684aaf0b96a5b7f3d9bbff52": {
+			"disposition": "paired-backport-range",
+			"trunkPreSha": "b8315bfee408eaee6d864301968d61995a88bc55",
+			"trunkPostSha": "d36bccf8ca2069f0e058feb36c88e2840eeb414c",
+			"reason": "The trunk synchronization copied the August 12 wp/latest release metadata in one commit.",
+			"evidenceMethod": "package-version-and-released-section-tree-comparison",
+			"evidence": [
+				"release-changelog:e18aa00bb4f208647601d4c21f65adfc8ba98225",
+				"publish:989764d42ff93e33684aaf0b96a5b7f3d9bbff52",
+				"trunk-backport:d36bccf8ca2069f0e058feb36c88e2840eeb414c"
+			]
+		},
+		"9a75283890dda96ae1d37197b5070fae8c9cf66f": {
+			"disposition": "paired-backport-range",
+			"trunkPreSha": "35990218edc78648a3778a0cee279dfd30032d78",
+			"trunkPostSha": "f270a4f4ffeb6424ee6f6ee2a33ea677ba04495a",
+			"reason": "Two reviewed trunk commits copied the UI/theme changelogs and the associated package release metadata.",
+			"evidenceMethod": "released-section-and-package-version-tree-comparison",
+			"evidence": [
+				"release-changelog:5e90da06d5cf96a1b84c599e52f36d10db6d140d",
+				"publish:9a75283890dda96ae1d37197b5070fae8c9cf66f",
+				"trunk-changelog-backport:603496ed399be427cba18c84fcbc5aa1cbfa9895",
+				"trunk-metadata-backport:f270a4f4ffeb6424ee6f6ee2a33ea677ba04495a"
+			]
+		},
+		"afe4fb333177642180ac020f1030c5685eab7183": {
+			"disposition": "excluded-no-trunk-changelog-backport",
+			"reason": "The wp/latest publication was not synchronized to trunk before the next stable release cut.",
+			"evidenceMethod": "bounded-first-parent-path-and-version-heading-search",
+			"evidence": [
+				"publish:afe4fb333177642180ac020f1030c5685eab7183",
+				"next-release-cut:d6b0b20fa927b110140dc7fdd906a7e0bf662004",
+				"trunk-snapshot-before-next-cut:d6f5a6dc7cac835cf1436ae5fe234391c7d23d37"
+			]
+		},
+		"bbffb7567a47b4af071c0b00c1b653b3d3303809": {
+			"disposition": "excluded-no-trunk-changelog-backport",
+			"reason": "The standalone wp/latest scripts publication was not synchronized to trunk before the next stable release cut.",
+			"evidenceMethod": "bounded-first-parent-path-and-version-heading-search",
+			"evidence": [
+				"publish:bbffb7567a47b4af071c0b00c1b653b3d3303809",
+				"next-release-cut:01a314d7e46a50101e328fdb11959c441e49372d",
+				"trunk-snapshot-before-next-cut:471fa6790be9810436b6baa6a7cb11344f0de6ab"
+			]
+		},
+		"d6b0b20fa927b110140dc7fdd906a7e0bf662004": {
+			"disposition": "excluded-no-trunk-changelog-backport",
+			"reason": "The wp/latest publication was not synchronized to trunk before the next stable release cut.",
+			"evidenceMethod": "bounded-first-parent-path-and-version-heading-search",
+			"evidence": [
+				"publish:d6b0b20fa927b110140dc7fdd906a7e0bf662004",
+				"next-release-cut:72476970386146d450c375e5c71a96dda7c9aaa8",
+				"trunk-snapshot-before-next-cut:471fa6790be9810436b6baa6a7cb11344f0de6ab"
+			]
+		},
+		"e4603f9843063edf33d32d6d43629f2f1c2c530b": {
+			"disposition": "paired-backport-range",
+			"trunkPreSha": "d0220ea3a8de6f215f82cb2305b6d7ebb12cbe1d",
+			"trunkPostSha": "fc0e1fe57352ee049497d2400f214816212e25be",
+			"reason": "The standalone env release was recreated on trunk with different author metadata.",
+			"evidenceMethod": "exact-released-section-and-package-version-tree-comparison",
+			"evidence": [
+				"release-changelog:c6b341e587bce7cd6f779215ca163481d5e8747a",
+				"publish:e4603f9843063edf33d32d6d43629f2f1c2c530b",
+				"trunk-changelog:cae7b89ac6219732ec14c973746a56164eb0d06c",
+				"trunk-publish:fc0e1fe57352ee049497d2400f214816212e25be"
+			]
+		}
+	}
+}

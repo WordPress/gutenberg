@@ -53,11 +53,20 @@
 
 ## 2.38.0 (2026-01-16)
 
+## 2.37.0 (2025-12-23)
+
 ## 2.36.0 (2025-11-26)
 
 ## 2.35.0 (2025-11-12)
 
 ## 2.34.0 (2025-10-29)
+
+## 2.33.3 (2026-01-30)
+
+### Bug Fixes
+
+-   Prevent router regions with data-wp-key from being recreated on navigation. ([#74750](https://github.com/WordPress/gutenberg/pull/74750))
+-   Fix initial router regions with `attachTo` being duplicated after `navigate()`. ([#74857](https://github.com/WordPress/gutenberg/pull/74857))
 
 ## 2.33.0 (2025-10-17)
 
@@ -73,13 +82,16 @@
 
 ## 2.28.0 (2025-08-07)
 
+### Bug Fixes
+
+-   Ignores `<noscript>` elements while preparing DOM. ([70905](https://github.com/WordPress/gutenberg/pull/70905))
+
 ## 2.27.0 (2025-07-23)
 
 ### Bug Fixes
 
 -   Preserve `media` attribute on intial style sheets after client-side navigation. ([70668](https://github.com/WordPress/gutenberg/pull/70668))
 
--   Ignores `<noscript>` elements while preparing DOM. ([70905](https://github.com/WordPress/gutenberg/pull/70905))
 
 ## 2.26.0 (2025-06-25)
 
@@ -190,6 +202,12 @@
 -   Fix navigate() issues related to initial state merges. ([#57134](https://github.com/WordPress/gutenberg/pull/57134))
 
 ## 1.2.0 (2024-02-21)
+
+## 1.1.2 (2024-02-27)
+
+### Bug Fixes
+
+-   Fix navigate() issues related to initial state merges. ([#57134](https://github.com/WordPress/gutenberg/pull/57134))
 
 ## 1.1.0 (2024-02-09)
 

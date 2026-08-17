@@ -57,6 +57,8 @@
 
 ## 6.38.0 (2026-01-16)
 
+## 6.37.0 (2025-12-23)
+
 ## 6.36.0 (2025-11-26)
 
 ### Internal
@@ -214,16 +216,29 @@
 
 ## 5.4.0 (2023-02-15)
 
+## 5.3.3 (2023-02-14)
+
+### Bug Fix
+
+-   Style Book: Exclude blocks that are not allowed to insert ([#47461](https://github.com/WordPress/gutenberg/pull/47461)).
+
 ## 5.3.0 (2023-02-01)
 
 ### Bug Fixes
 
 -   Force visual editor in browse mode ([#47329](https://github.com/WordPress/gutenberg/pull/47329)).
--   Style Book: Exclude blocks that are not allowed to insert ([#47461](https://github.com/WordPress/gutenberg/pull/47461)).
 
 ## 5.2.0 (2023-01-11)
 
 ## 5.1.0 (2023-01-02)
+
+### Bug Fix
+
+-   Don't show block inserter when the canvas is view mode ([#46763](https://github.com/WordPress/gutenberg/pull/46763)).
+
+### Enhancements
+
+-   Fluid typography: add configurable fluid typography settings for minimum font size to theme.json ([#42489](https://github.com/WordPress/gutenberg/pull/42489)).
 
 ## 5.0.0 (2022-12-14)
 
@@ -233,11 +248,9 @@
 
 ### Enhancements
 
--   Fluid typography: add configurable fluid typography settings for minimum font size to theme.json ([#42489](https://github.com/WordPress/gutenberg/pull/42489)).
 
 ### Bug Fixes
 
--   Don't show block inserter when the canvas is view mode ([#46763](https://github.com/WordPress/gutenberg/pull/46763)).
 
 ## 4.19.0 (2022-11-16)
 
@@ -306,10 +319,14 @@
 -   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at <https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/>.
 -   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at <https://nodejs.org/en/about/releases/>.
 
+### New Feature
+
+-   Initial version of the package.
+
 ## 1.17.0 (2021-03-17)
 
 ## 1.0.0 (2020-01-13)
 
 ### New Features
 
--   Initial version of the package.
+- Initial version of the module.

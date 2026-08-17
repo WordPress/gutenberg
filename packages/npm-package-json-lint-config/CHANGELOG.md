@@ -37,6 +37,8 @@
 
 ## 5.38.0 (2026-01-16)
 
+## 5.37.0 (2025-12-23)
+
 ## 5.36.0 (2025-11-26)
 
 ## 5.35.0 (2025-11-12)
@@ -211,11 +213,14 @@
 
 -   Packages: Replace `is-plain-obj` with native functionality ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
 
+### Breaking Change
+
+-   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
+
 ## 4.0.0 (2021-01-21)
 
 ### Breaking Changes
 
--   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
 ### Breaking Changes
 
