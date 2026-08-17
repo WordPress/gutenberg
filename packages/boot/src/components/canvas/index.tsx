@@ -3,6 +3,7 @@ import { Spinner } from '@wordpress/components';
 import { useNavigate } from '@wordpress/route';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { store as bootStore } from '../../store';
 import type { CanvasData } from '../../store/types';
 import BootBackButton from './back-button';
@@ -28,16 +29,35 @@ export default function Canvas( { canvas }: CanvasProps ) {
 		useNavigateToEntityRecord();
 	const onActionPerformed = useActionPerformed( canvas.postType );
 
-	// Where clicking a previewed canvas goes, resolved the same way the editor
-	// resolves anywhere else it sends you to edit an entity.
-	const editLink = useSelect(
-		( select ) =>
-			canvas.postType && canvas.postId
-				? select( bootStore ).getEntityLink(
-						canvas.postType,
-						canvas.postId
-				  )
-				: undefined,
+	/*
+	 * Where clicking a previewed canvas goes, resolved the same way the editor
+	 * resolves anywhere else it sends you to edit an entity, and whether it
+	 * should go anywhere at all: a trashed entity has to be restored before it
+	 * can be edited.
+	 *
+	 * The record is the one the editor loads for this canvas, so reading it
+	 * here costs no request of its own.
+	 */
+	const { editLink, isTrashed } = useSelect(
+		( select ) => {
+			if ( ! canvas.postType || ! canvas.postId ) {
+				return { editLink: undefined, isTrashed: false };
+			}
+
+			const record = select( coreStore ).getEntityRecord(
+				'postType',
+				canvas.postType,
+				canvas.postId
+			) as { status?: string } | undefined;
+
+			return {
+				editLink: select( bootStore ).getEntityLink(
+					canvas.postType,
+					canvas.postId
+				),
+				isTrashed: record?.status === 'trash',
+			};
+		},
 		[ canvas.postType, canvas.postId ]
 	);
 
@@ -117,8 +137,15 @@ export default function Canvas( { canvas }: CanvasProps ) {
 			</div>
 			{ canvas.isPreview && editLink && (
 				<div
-					onClick={ () => navigate( { to: editLink } ) }
+					onClick={
+						isTrashed
+							? undefined
+							: () => navigate( { to: editLink } )
+					}
 					onKeyDown={ ( e ) => {
+						if ( isTrashed ) {
+							return;
+						}
 						if ( e.key === 'Enter' || e.key === ' ' ) {
 							e.preventDefault();
 							navigate( { to: editLink } );
@@ -127,11 +154,12 @@ export default function Canvas( { canvas }: CanvasProps ) {
 					style={ {
 						position: 'absolute',
 						inset: 0,
-						cursor: 'pointer',
+						cursor: isTrashed ? 'default' : 'pointer',
 						zIndex: 1,
 					} }
 					role="button"
 					tabIndex={ 0 }
+					aria-disabled={ isTrashed }
 					aria-label={ __( 'Edit' ) }
 				/>
 			) }

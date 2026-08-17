@@ -9,7 +9,11 @@ import { useEditorSettings } from '../../hooks/use-editor-settings';
 import { useEditorAssets } from '../../hooks/use-editor-assets';
 import { unlock } from '../../lock-unlock';
 
-const { Editor: PrivateEditor, BackButton } = unlock( editorPrivateApis );
+const {
+	Editor: PrivateEditor,
+	BackButton,
+	PreferencesModal,
+} = unlock( editorPrivateApis );
 
 interface EditorProps {
 	postType?: string;
@@ -115,6 +119,12 @@ export function Editor( {
 			onActionPerformed={ onActionPerformed }
 		>
 			{ backButton && <BackButton>{ backButton }</BackButton> }
+			{ /*
+			   Opened from the editor's own menu and from the command the editor
+			   registers, both of which exist only while it is mounted. Renders
+			   nothing until one of them opens it.
+			 */ }
+			<PreferencesModal />
 		</PrivateEditor>
 	);
 }
