@@ -1,9 +1,10 @@
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useViewportMatch } from '@wordpress/compose';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as editorStore } from '../../store';
-import { SIDEBARS } from './constants';
+import { ALL_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
 
 export const NOTE_FORMAT_NAME = 'core/note';
@@ -30,6 +31,7 @@ function NoteFormat( { isActive, activeAttributes } ) {
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
+	const isLargeViewport = useViewportMatch( 'medium' );
 	const noteId = activeAttributes?.[ 'data-id' ];
 
 	useEffect( () => {
@@ -37,9 +39,15 @@ function NoteFormat( { isActive, activeAttributes } ) {
 			return;
 		}
 
-		// Sync an already-open sidebar to the marker under the caret. Read
-		// imperatively so it triggers on caret movement, not sidebar state.
-		if ( ! SIDEBARS.includes( getActiveComplementaryArea( 'core' ) ) ) {
+		// Sync an already-visible notes surface to the marker under the
+		// caret. Read imperatively so it triggers on caret movement, not
+		// sidebar state. The floating panel is not a complementary area: on
+		// large viewports it is the surface, and a marker under the caret
+		// means its note is unresolved, so the panel is already showing.
+		if (
+			! isLargeViewport &&
+			getActiveComplementaryArea( 'core' ) !== ALL_NOTES_SIDEBAR
+		) {
 			return;
 		}
 
@@ -54,6 +62,7 @@ function NoteFormat( { isActive, activeAttributes } ) {
 	}, [
 		isActive,
 		noteId,
+		isLargeViewport,
 		getActiveComplementaryArea,
 		getSelectedNote,
 		selectNote,

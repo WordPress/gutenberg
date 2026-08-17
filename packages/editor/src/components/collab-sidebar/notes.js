@@ -19,7 +19,7 @@ import { store as editorStore } from '../../store';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
+export function Notes( { notes, sidebarRef, isFloating = false } ) {
 	const {
 		onCreate: onAddReply,
 		onEdit: onEditNote,
@@ -250,7 +250,6 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 	return (
 		<Stack
 			className="editor-collab-sidebar-panel"
-			style={ styles }
 			role="tree"
 			direction="column"
 			gap="md"

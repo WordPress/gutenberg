@@ -8,18 +8,14 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import PluginSidebar from '../plugin-sidebar';
-import {
-	ALL_NOTES_SIDEBAR,
-	FLOATING_NOTES_SIDEBAR,
-	SIDEBARS,
-} from './constants';
+import { ALL_NOTES_SIDEBAR } from './constants';
 import { Notes } from './notes';
+import { FloatingNotes, FloatingNotesFill } from './floating-notes';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { NoteHighlightStyles } from './note-highlight-styles';
-import { useGlobalStyles } from '../global-styles';
-import { useEnableFloatingSidebar, useNoteThreads } from './hooks';
+import { useNoteThreads } from './hooks';
 import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
@@ -63,14 +59,24 @@ function NotesSidebar( { postId } ) {
 
 	const { notes, unresolvedNotes } = useNoteThreads( postId );
 
-	// Only enable the floating sidebar for large viewports.
-	const showFloatingSidebar = isLargeViewport;
-	// Fallback to "All notes" sidebar on smaller viewports.
-	const showAllNotesSidebar = notes.length > 0 || ! showFloatingSidebar;
-	useEnableFloatingSidebar(
-		showFloatingSidebar &&
-			( unresolvedNotes.length > 0 || selectedNoteId !== undefined )
+	const isAllNotesSidebarOpen = useSelect(
+		( select ) =>
+			select( interfaceStore ).getActiveComplementaryArea( 'core' ) ===
+			ALL_NOTES_SIDEBAR,
+		[]
 	);
+
+	// Only show the floating notes for large viewports.
+	const showFloatingNotes = isLargeViewport;
+	// Fallback to "All notes" sidebar on smaller viewports.
+	const showAllNotesSidebar = notes.length > 0 || ! showFloatingNotes;
+	// The floating notes are part of the canvas surface: they don't occupy
+	// a sidebar and can coexist with the Settings sidebar. They yield to
+	// the "All notes" sidebar, which lists the same threads.
+	const hasVisibleFloatingNotes =
+		showFloatingNotes &&
+		( unresolvedNotes.length > 0 || selectedNoteId !== undefined ) &&
+		! isAllNotesSidebarOpen;
 
 	async function focusNote( {
 		targetClientId,
@@ -81,19 +87,17 @@ function NotesSidebar( { postId } ) {
 			return;
 		}
 
-		const prevArea = await getActiveComplementaryArea( 'core' );
-		if ( isApproved ) {
+		// Approved (resolved) notes only appear in the "All notes" sidebar.
+		// On small viewports it is also the only notes surface; on large
+		// viewports the floating notes show automatically once a note is
+		// selected, so no sidebar needs to be opened.
+		if ( isApproved || ! showFloatingNotes ) {
 			enableComplementaryArea( 'core', ALL_NOTES_SIDEBAR );
-		} else if ( ! SIDEBARS.includes( prevArea ) || ! showAllNotesSidebar ) {
-			enableComplementaryArea(
-				'core',
-				showFloatingSidebar ? FLOATING_NOTES_SIDEBAR : ALL_NOTES_SIDEBAR
-			);
 		}
 
 		const currentArea = await getActiveComplementaryArea( 'core' );
-		// Bail out if the current active area is not one of note sidebars.
-		if ( ! SIDEBARS.includes( currentArea ) ) {
+		// Bail out when no notes surface will be visible.
+		if ( currentArea !== ALL_NOTES_SIDEBAR && ! showFloatingNotes ) {
 			return;
 		}
 
@@ -135,10 +139,6 @@ function NotesSidebar( { postId } ) {
 			isDisabled: isDistractionFree || isClassicBlock || ! clientId,
 		}
 	);
-
-	// Get the global styles to set the background color of the sidebar.
-	const { merged: GlobalStyles } = useGlobalStyles();
-	const backgroundColor = GlobalStyles?.styles?.color?.background;
 
 	// Surface one thread for the avatar indicator.
 	const currentThreads =
@@ -184,22 +184,13 @@ function NotesSidebar( { postId } ) {
 					<Notes notes={ notes } sidebarRef={ sidebarRef } />
 				</PluginSidebar>
 			) }
-			{ isLargeViewport && (
-				<PluginSidebar
-					isPinnable={ false }
-					header={ false }
-					identifier={ FLOATING_NOTES_SIDEBAR }
-					className="editor-collab-sidebar"
-					headerClassName="editor-collab-sidebar__header"
-					backgroundColor={ backgroundColor }
-				>
-					<Notes
+			{ hasVisibleFloatingNotes && (
+				<FloatingNotesFill>
+					<FloatingNotes
 						notes={ unresolvedNotes }
 						sidebarRef={ sidebarRef }
-						styles={ { backgroundColor } }
-						isFloating
 					/>
-				</PluginSidebar>
+				</FloatingNotesFill>
 			) }
 		</>
 	);
