@@ -1,30 +1,39 @@
-const fs = require( 'fs/promises' );
-const os = require( 'os' );
-const path = require( 'path' );
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 /**
- * Writes an OpenEXR file to a temporary directory and returns its path.
+ * Selects an OpenEXR file with no mime type on a file input.
  *
- * WordPress does not allow OpenEXR uploads, and browsers do not map the
- * extension to a mime type either, so `File.type` is empty and both upload
- * paths deliberately pass the file to the server rather than guessing at its
- * type — which is why the rejection only arrives once the upload is under way.
- * The file has to come off disk for that: given a buffer, Playwright supplies a
- * mime type of its own, and the upload then fails in the browser instead.
+ * WordPress does not allow OpenEXR uploads, and Chrome on macOS does not map
+ * the extension to a mime type either, so `File.type` is empty. Both upload
+ * paths deliberately pass a file with no detected type to the server rather
+ * than guessing at it, which is why the rejection only arrives once the upload
+ * is already under way.
+ *
+ * The empty type is the whole point of the fixture, so the `File` is built in
+ * the page with `type: ''` rather than handed to `setInputFiles`: given a
+ * buffer Playwright supplies a mime type of its own, and given a path the type
+ * comes from the mime map of whichever OS the test runs on (`''` on macOS, but
+ * `image/aces` on Linux, which fails in the browser and never reaches the
+ * server). Building the file in the canvas realm is also what a real file
+ * picker does there.
  *
  * The bytes are the OpenEXR magic number, so anything that sniffs content sees
  * a plausible file rather than a truncated one.
  *
- * @return {Promise<string>} Path to the file.
+ * @param {Object} fileInput Locator for the file input.
  */
-async function writeUnsupportedFile() {
-	const directory = await fs.mkdtemp(
-		path.join( os.tmpdir(), 'gutenberg-test-media-' )
-	);
-	const filePath = path.join( directory, 'openEXR.exr' );
-	await fs.writeFile( filePath, Buffer.from( [ 0x76, 0x2f, 0x31, 0x01 ] ) );
-	return filePath;
+async function selectUnsupportedFile( fileInput ) {
+	await fileInput.evaluate( ( input ) => {
+		const file = new File(
+			[ new Uint8Array( [ 0x76, 0x2f, 0x31, 0x01 ] ) ],
+			'openEXR.exr',
+			{ type: '' }
+		);
+		const dataTransfer = new DataTransfer();
+		dataTransfer.items.add( file );
+		input.files = dataTransfer.files;
+		input.dispatchEvent( new Event( 'change', { bubbles: true } ) );
+	} );
 }
 
 /**
@@ -67,9 +76,9 @@ async function expectNoCompletionForRejectedUpload( editor, page ) {
 	const imageBlock = editor.canvas.locator(
 		'role=document[name="Block: Image"i]'
 	);
-	await imageBlock
-		.locator( 'data-testid=form-file-upload-input' )
-		.setInputFiles( await writeUnsupportedFile() );
+	await selectUnsupportedFile(
+		imageBlock.locator( 'data-testid=form-file-upload-input' )
+	);
 
 	// The rejection reaches the user.
 	const snackbarList = page.locator( '.components-snackbar-list' );
