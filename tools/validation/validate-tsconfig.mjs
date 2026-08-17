@@ -124,13 +124,18 @@ function packageProjects( packageName ) {
 	 * default project checks src along with the dev files.
 	 */
 	if ( isDevProject( defaultProject ) ) {
-		return { srcProject: undefined, devProject: defaultProject };
+		return {
+			srcProject: undefined,
+			devProject: defaultProject,
+			storiesProject: undefined,
+		};
 	}
 
 	const testProject = join( packageDir, 'tsconfig.test.json' );
 	return {
 		srcProject: join( packageDir, 'tsconfig.json' ),
 		devProject: existsSync( testProject ) ? testProject : undefined,
+		storiesProject: undefined,
 	};
 }
 
