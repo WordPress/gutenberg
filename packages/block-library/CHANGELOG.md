@@ -4,8 +4,7 @@
 
 ### Enhancements
 
--   List: Add align (wide/full), layout, and block gap support ([#68002](https://github.com/WordPress/gutenberg/pull/68002)).
--   List: Make layout justification move list items with or without a custom content width ([#68002](https://github.com/WordPress/gutenberg/pull/68002)).
+- `List`: Add layout support (align wide/full, block gap, justification) ([#68002](https://github.com/WordPress/gutenberg/pull/68002)).
 
 ### Internal
 
