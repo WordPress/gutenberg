@@ -108,6 +108,11 @@ if ( ! class_exists( 'WP_Sync_Config' ) ) {
 				if ( 'root' === $entity_kind && 'comment' === $entity_name ) {
 					return current_user_can( 'edit_comment', $object_id );
 				}
+
+				// A comment type entity, notes included, is a comment row.
+				if ( 'commentType' === $entity_kind ) {
+					return current_user_can( 'edit_comment', $object_id );
+				}
 			}
 
 			if ( null !== $object_id ) {
@@ -124,6 +129,7 @@ if ( ! class_exists( 'WP_Sync_Config' ) ) {
 			}
 
 			$allowed_collection_entity_kinds = array(
+				'commentType',
 				'postType',
 				'root',
 				'taxonomy',

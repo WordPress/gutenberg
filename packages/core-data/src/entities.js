@@ -138,6 +138,33 @@ export const rootEntitiesConfig = [
 		syncConfig: defaultCollectionSyncConfig,
 	},
 	{
+		/*
+		 * Editorial notes. Backed by `note` comments, but served from a
+		 * dedicated collection that returns whole threads - each record carries
+		 * its replies in a `replies` array - so a page break never separates a
+		 * reply from its parent and replies arrive in the same context as the
+		 * thread.
+		 *
+		 * Keyed under a `commentType` kind, mirroring `postType`. Comment types
+		 * have no registry to discover them from yet, so the kind carries no
+		 * loader in `additionalEntityConfigLoaders` and its entities are
+		 * declared here instead; `getEntitiesConfig` no-ops for a kind without
+		 * one. The existing `root`, `comment` entity moves under the same kind
+		 * separately, since that rename reaches consumers beyond notes.
+		 */
+		name: 'note',
+		kind: 'commentType',
+		baseURL: '/wp/v2/notes',
+		baseURLParams: { context: 'edit' },
+		plural: 'notes',
+		label: __( 'Note' ),
+		supportsPagination: true,
+		// Notes are broadcast as a collection: a peer's change invalidates the
+		// whole list rather than one record, since a reply lands inside its
+		// thread rather than alongside it.
+		syncConfig: defaultCollectionSyncConfig,
+	},
+	{
 		name: 'menu',
 		kind: 'root',
 		baseURL: '/wp/v2/menus',

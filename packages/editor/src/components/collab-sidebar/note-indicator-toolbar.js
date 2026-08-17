@@ -72,7 +72,7 @@ export function NoteAvatarIndicator( { onClick, note } ) {
 		// Track thread participants (original author + repliers), sorted by
 		// date so they appear in chronological order.
 		const participantsMap = new Map();
-		const allNotes = [ note, ...note.reply ].sort(
+		const allNotes = [ note, ...note.replies ].sort(
 			( a, b ) => new Date( a.date ) - new Date( b.date )
 		);
 
