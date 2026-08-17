@@ -1,0 +1,118 @@
+import { Markdown, Meta } from '@storybook/addon-docs/blocks';
+import * as InputControlStories from './index.story';
+
+<Meta of={ InputControlStories } name="Migration Guide" />
+
+# InputControl migration guide
+
+Migrate from [`InputControl`](?path=/docs/components-inputcontrol--docs) in `@wordpress/components` to [`InputControl`](?path=/docs/design-system-components-form-inputcontrol--docs) in `@wordpress/ui`.
+
+The same guidance applies when replacing legacy [`TextControl`](?path=/docs/components-textcontrol--docs) and [`NumberControl`](?path=/docs/components-numbercontrol--docs) usages.
+
+## Basic migration
+
+Update the import and swap the callback prop:
+
+```jsx
+// Before
+import { __experimentalInputControl as InputControl } from '@wordpress/components';
+
+<InputControl
+	label="Width"
+	value={ value }
+	onChange={ ( nextValue ) => setValue( nextValue ?? '' ) }
+	help="Enter a value in pixels."
+/>;
+
+// After
+import { InputControl } from '@wordpress/ui';
+
+<InputControl
+	label="Width"
+	value={ value }
+	onValueChange={ ( nextValue ) => setValue( nextValue ) }
+	description="Enter a value in pixels."
+/>;
+```
+
+## Prop mapping
+
+<Markdown>{ `
+| \`@wordpress/components\` | \`@wordpress/ui\` | Notes |
+| --- | --- | --- |
+| \`onChange\` | \`onValueChange\` | Receives the next string value. |
+| \`help\` | \`description\` | Use plain text only. |
+| \`help\` with links or other markup | \`details\` | Use when the help text needs semantic content. |
+| \`hideLabelFromVision\` | \`hideLabelFromVision\` | Same behavior. |
+| \`prefix\` / \`suffix\` | \`prefix\` / \`suffix\` | Wrap slot content in [\`InputLayout.Slot\`](?path=/docs/design-system-components-form-primitives-input--docs#with-prefix) instead of \`InputControlPrefixWrapper\` / \`InputControlSuffixWrapper\`. |
+| \`size\` | \`size\` | Supports \`default\` and \`compact\`. |
+| \`type\` | \`type\` | Same HTML input types, including \`number\`. |
+` }</Markdown>
+
+## Prefix and suffix slots
+
+Replace the wrapper components with `InputLayout.Slot`:
+
+```jsx
+// Before
+import {
+	__experimentalInputControl as InputControl,
+	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+} from '@wordpress/components';
+
+<InputControl
+	prefix={
+		<InputControlPrefixWrapper variant="icon">
+			<Icon icon={ link } />
+		</InputControlPrefixWrapper>
+	}
+/>;
+
+// After
+import { Icon, InputControl, InputLayout } from '@wordpress/ui';
+
+<InputControl
+	prefix={
+		<InputLayout.Slot padding="minimal">
+			<Icon icon={ link } />
+		</InputLayout.Slot>
+	}
+/>;
+```
+
+Use `padding="minimal"` for icons and controls. Omit it for text prefixes and suffixes such as `@` or `%`.
+
+## Number inputs
+
+Replace `NumberControl` usages with `InputControl` and `type="number"`:
+
+```jsx
+import { InputControl } from '@wordpress/ui';
+
+<InputControl
+	label="Quantity"
+	type="number"
+	value={ value }
+	onValueChange={ setValue }
+/>;
+```
+
+The `@wordpress/ui` `InputControl` does not support these `@wordpress/components` `NumberControl` features:
+
+-   **`spinControls`** — When desired, use explicit controls in a `suffix` slot. See the [`NumberWithSteppers` story](?path=/story/design-system-components-form-inputcontrol--number-with-steppers).
+-   **`isShiftStepEnabled` / `shiftStep`** — Apply larger increments in your stepper handlers or `onValueChange` logic.
+-   **Mouse-drag value changes** — Not recommended, as they can be confusing and are not supported on touch devices.
+
+## Removed features
+
+The `@wordpress/ui` `InputControl` does not support these `@wordpress/components` features:
+
+-   **`labelPosition`** — Only top labels are recommended. If other layouts are necessary, compose using the [`Input`](?path=/docs/design-system-components-form-primitives-input--docs) and [`Field`](?path=/docs/design-system-components-form-primitives-field--docs) primitives.
+-   **`isPressEnterToChange`** — Keep a local draft value and commit to your state on `Enter` or `blur` if you need deferred updates.
+-   **`onValidate`** — Run validation in your `onValueChange` handler instead.
+-   **`isDragEnabled`, `dragDirection`, and related drag callbacks** — Not recommended, as they can be confusing and are not supported on touch devices.
+-   **`__unstableInputWidth`** — If the label needs to be a different width from the input field, compose using the [`Input`](?path=/docs/design-system-components-form-primitives-input--docs) and [`Field`](?path=/docs/design-system-components-form-primitives-field--docs) primitives.
+-   **`__unstableStateReducer`** — This hook intercepted the internal state machine. Some workarounds for known patterns:
+    -   **Display formatting** (for example, zero-padded time segments): format the value in `onValueChange` when the field commits, or always pass a formatted `value`.
+    -   **Paste normalization**: normalize in `onValueChange`, or handle `onPaste` on `InputControl`.
+    -   **Custom step or spin behavior**: apply adjustments in `onValueChange` by inspecting the event, or use explicit controls in a `suffix` slot.
