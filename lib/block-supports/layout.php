@@ -380,8 +380,17 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 		}
 	}
 
-	$column_start = $child_layout['columnStart'] ?? null;
-	$column_span  = $child_layout['columnSpan'] ?? null;
+	/*
+	 * Grid line numbers and spans are whole numbers. The editor stores them as numbers, but
+	 * content saved by WordPress 6.3 to 6.6 stored them as numeric strings, and that
+	 * migration only runs when a block is parsed in JavaScript, so the front end still sees
+	 * strings. Accept any numeric value and cast it, and treat anything else as absent
+	 * because it can't render as valid CSS.
+	 */
+	$column_start_attr = $child_layout['columnStart'] ?? null;
+	$column_start      = is_numeric( $column_start_attr ) ? (int) $column_start_attr : null;
+	$column_span_attr  = $child_layout['columnSpan'] ?? null;
+	$column_span       = is_numeric( $column_span_attr ) ? (int) $column_span_attr : null;
 	if ( null === $viewport_overrides || $has_viewport_property_override( 'columnStart' ) || $has_viewport_property_override( 'columnSpan' ) ) {
 		if ( $column_start && $column_span ) {
 			$child_layout_declarations['grid-column'] = "$column_start / span $column_span";
@@ -392,8 +401,10 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 		}
 	}
 
-	$row_start = $child_layout['rowStart'] ?? null;
-	$row_span  = $child_layout['rowSpan'] ?? null;
+	$row_start_attr = $child_layout['rowStart'] ?? null;
+	$row_start      = is_numeric( $row_start_attr ) ? (int) $row_start_attr : null;
+	$row_span_attr  = $child_layout['rowSpan'] ?? null;
+	$row_span       = is_numeric( $row_span_attr ) ? (int) $row_span_attr : null;
 	if ( null === $viewport_overrides || $has_viewport_property_override( 'rowStart' ) || $has_viewport_property_override( 'rowSpan' ) ) {
 		if ( $row_start && $row_span ) {
 			$child_layout_declarations['grid-row'] = "$row_start / span $row_span";
@@ -823,6 +834,15 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		}
 	} elseif ( 'grid' === $layout_type ) {
 		/*
+		 * Column and row counts are whole numbers, for the same reason as the grid line
+		 * numbers in gutenberg_get_child_layout_style_rules().
+		 */
+		$column_count_attr = $layout_for_styles['columnCount'] ?? null;
+		$column_count      = is_numeric( $column_count_attr ) ? (int) $column_count_attr : null;
+		$row_count_attr    = $layout_for_styles['rowCount'] ?? null;
+		$row_count         = is_numeric( $row_count_attr ) ? (int) $row_count_attr : null;
+
+		/*
 		 * If the gap value is an array, we use the "left" value because it represents the vertical gap, which
 		 * is the relevant one for computation of responsive grid columns.
 		 */
@@ -867,12 +887,12 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		 * value for any of the grid properties.
 		 */
 		$should_output_grid_columns = null === $viewport_overrides || $has_viewport_property_override( 'minimumColumnWidth' ) || $has_viewport_property_override( 'columnCount' ) || $has_viewport_property_override( 'autoFit' );
-		$uses_gap_in_grid_columns   = ! empty( $layout_for_styles['columnCount'] ) && ! empty( $layout_for_styles['minimumColumnWidth'] );
+		$uses_gap_in_grid_columns   = ! empty( $column_count ) && ! empty( $layout_for_styles['minimumColumnWidth'] );
 		if ( $has_block_gap_override && $uses_gap_in_grid_columns ) {
 			$should_output_grid_columns = true;
 		}
 
-		$should_output_grid_rows = ( null === $viewport_overrides || $has_viewport_property_override( 'rowCount' ) ) && ! empty( $layout_for_styles['columnCount'] ) && ! empty( $layout_for_styles['rowCount'] );
+		$should_output_grid_rows = ( null === $viewport_overrides || $has_viewport_property_override( 'rowCount' ) ) && ! empty( $column_count ) && ! empty( $row_count );
 		$grid_declarations       = array();
 
 		/* When enabled, columns stretch to fill the available space using
@@ -880,11 +900,11 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		 */
 		$auto_placement = ! empty( $layout_for_styles['autoFit'] ) ? 'auto-fit' : 'auto-fill';
 
-		if ( $should_output_grid_columns && ! empty( $layout_for_styles['columnCount'] ) && ! empty( $layout_for_styles['minimumColumnWidth'] ) ) {
-			$max_value                                  = 'max(min(' . $layout_for_styles['minimumColumnWidth'] . ', 100%), (100% - (' . $responsive_gap_value . ' * (' . $layout_for_styles['columnCount'] . ' - 1))) /' . $layout_for_styles['columnCount'] . ')';
+		if ( $should_output_grid_columns && ! empty( $column_count ) && ! empty( $layout_for_styles['minimumColumnWidth'] ) ) {
+			$max_value                                  = 'max(min(' . $layout_for_styles['minimumColumnWidth'] . ', 100%), (100% - (' . $responsive_gap_value . ' * (' . $column_count . ' - 1))) /' . $column_count . ')';
 			$grid_declarations['grid-template-columns'] = 'repeat(' . $auto_placement . ', minmax(' . $max_value . ', 1fr))';
-		} elseif ( $should_output_grid_columns && ! empty( $layout_for_styles['columnCount'] ) ) {
-			$grid_declarations['grid-template-columns'] = 'repeat(' . $layout_for_styles['columnCount'] . ', minmax(0, 1fr))';
+		} elseif ( $should_output_grid_columns && ! empty( $column_count ) ) {
+			$grid_declarations['grid-template-columns'] = 'repeat(' . $column_count . ', minmax(0, 1fr))';
 		} elseif ( $should_output_grid_columns ) {
 			$minimum_column_width                       = ! empty( $layout_for_styles['minimumColumnWidth'] ) ? $layout_for_styles['minimumColumnWidth'] : '12rem';
 			$grid_declarations['grid-template-columns'] = 'repeat(' . $auto_placement . ', minmax(min(' . $minimum_column_width . ', 100%), 1fr))';
@@ -892,7 +912,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 
 		if ( ! empty( $grid_declarations ) ) {
 			$base_has_container_type = empty( $base_layout['columnCount'] ) || ( ! empty( $base_layout['columnCount'] ) && ! empty( $base_layout['minimumColumnWidth'] ) );
-			if ( empty( $layout_for_styles['columnCount'] ) || ! empty( $layout_for_styles['minimumColumnWidth'] ) ) {
+			if ( empty( $column_count ) || ! empty( $layout_for_styles['minimumColumnWidth'] ) ) {
 				if ( null === $viewport_overrides || ! $base_has_container_type ) {
 					$grid_declarations['container-type'] = 'inline-size';
 				}
@@ -906,7 +926,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		if ( $should_output_grid_rows ) {
 			$layout_styles[] = array(
 				'selector'     => $selector,
-				'declarations' => array( 'grid-template-rows' => 'repeat(' . $layout_for_styles['rowCount'] . ', minmax(1rem, auto))' ),
+				'declarations' => array( 'grid-template-rows' => 'repeat(' . $row_count . ', minmax(1rem, auto))' ),
 			);
 		}
 
