@@ -4,24 +4,16 @@ import pluginModeOverrides from '../index';
 const cwd = new URL( 'file:///virtual/' );
 
 async function buildModeOverrides( {
-	sourceDocuments,
 	modeTokens,
 	resolvedModeTokens = modeTokens,
 	sourceByToken,
 	removeTokensBeforeBuild = false,
 }: {
-	sourceDocuments: Record< string, Record< string, unknown > >;
 	modeTokens: Record< string, Record< string, unknown > >;
 	resolvedModeTokens?: Record< string, Record< string, unknown > >;
 	sourceByToken: Record< string, string >;
 	removeTokensBeforeBuild?: boolean;
 } ) {
-	const sources = Object.entries( sourceDocuments ).map(
-		( [ filename, document ] ) => ( {
-			filename: new URL( filename, cwd ),
-			src: JSON.stringify( document ),
-		} )
-	);
 	const tokens = Object.fromEntries(
 		Object.entries( sourceByToken ).map( ( [ id, filename ] ) => [
 			id,
@@ -61,7 +53,6 @@ async function buildModeOverrides( {
 
 	await plugin.build?.( {
 		tokens,
-		sources,
 		resolver,
 		outputFile: ( filename: string, contents: string | Buffer ) => {
 			outputFiles.set( filename, contents.toString() );
@@ -74,39 +65,6 @@ async function buildModeOverrides( {
 describe( 'pluginModeOverrides', () => {
 	it( 'generates a mode override file for each source', async () => {
 		const outputFiles = await buildModeOverrides( {
-			sourceDocuments: {
-				'border.json': {
-					'wpds-border': {
-						$type: 'dimension',
-						radius: {
-							sm: {
-								$value: { value: 2, unit: 'px' },
-								$extensions: {
-									mode: {
-										compact: {
-											value: 1,
-											unit: 'px',
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-				'dimension.json': {
-					'wpds-dimension': {
-						$type: 'dimension',
-						gap: {
-							$value: { value: 8, unit: 'px' },
-							$extensions: {
-								mode: {
-									compact: { value: 4, unit: 'px' },
-								},
-							},
-						},
-					},
-				},
-			},
 			modeTokens: {
 				'wpds-border.radius.sm': {
 					$type: 'dimension',
@@ -167,24 +125,6 @@ describe( 'pluginModeOverrides', () => {
 
 	it( 'preserves unresolved aliases in generated mode overrides', async () => {
 		const outputFiles = await buildModeOverrides( {
-			sourceDocuments: {
-				'dimension.json': {
-					'wpds-dimension': {
-						$type: 'dimension',
-						base: {
-							$value: { value: 8, unit: 'px' },
-						},
-						gap: {
-							$value: '{wpds-dimension.base}',
-							$extensions: {
-								mode: {
-									compact: '{wpds-dimension.base}',
-								},
-							},
-						},
-					},
-				},
-			},
 			modeTokens: {
 				'wpds-dimension.gap': {
 					$type: 'dimension',
@@ -210,21 +150,6 @@ describe( 'pluginModeOverrides', () => {
 
 	it( 'generates mode overrides after other transforms remove tokens', async () => {
 		const outputFiles = await buildModeOverrides( {
-			sourceDocuments: {
-				'dimension.json': {
-					'wpds-dimension': {
-						$type: 'dimension',
-						primitive: {
-							$value: { value: 8, unit: 'px' },
-							$extensions: {
-								mode: {
-									compact: { value: 4, unit: 'px' },
-								},
-							},
-						},
-					},
-				},
-			},
 			modeTokens: {
 				'wpds-dimension.primitive': {
 					$type: 'dimension',
