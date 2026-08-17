@@ -1,3 +1,4 @@
+import type { DEFAULT_SEED_COLORS } from './color-ramps/lib/constants';
 import { getContrast } from './color-ramps/lib/color-utils';
 import type { Ramp, RampResult } from './color-ramps/lib/types';
 import {
@@ -6,14 +7,7 @@ import {
 	type SemanticColorToken,
 } from './semantic-color-contrast-pairs';
 
-export type ThemeProviderColorRampName =
-	| 'background'
-	| 'primary'
-	| 'info'
-	| 'success'
-	| 'caution'
-	| 'warning'
-	| 'error';
+export type ThemeProviderColorRampName = keyof typeof DEFAULT_SEED_COLORS;
 
 export type ThemeProviderSemanticColorToken = SemanticColorToken;
 

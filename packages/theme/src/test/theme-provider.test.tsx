@@ -8,6 +8,7 @@ import { join } from 'path';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ThemeProvider } from '../theme-provider';
+import type { ThemeProviderColorWarning } from '../theme-provider-color-warnings';
 
 // Give the wrapper a stable class so tests can locate it and read its
 // computed custom properties.
@@ -155,7 +156,10 @@ describe( 'ThemeProvider', () => {
 	} );
 
 	it( 'reports color warning changes through the callback', () => {
-		const onColorWarningsChange = jest.fn();
+		const onColorWarningsChange = jest.fn<
+			void,
+			[ readonly ThemeProviderColorWarning[] ]
+		>();
 		const warn = jest
 			.spyOn( console, 'warn' )
 			.mockImplementation( () => {} );
@@ -204,6 +208,31 @@ describe( 'ThemeProvider', () => {
 		expect( onColorWarningsChange ).toHaveBeenCalledWith( [] );
 
 		warn.mockRestore();
+	} );
+
+	it( 'does not report unchanged warnings again when the callback identity changes', () => {
+		const onColorWarningsChange = jest.fn<
+			void,
+			[ readonly ThemeProviderColorWarning[] ]
+		>();
+		const renderProvider = () => (
+			<ThemeProvider
+				color={ {
+					primary: ACCESSIBLE_PRIMARY,
+					background: ACCESSIBLE_BACKGROUND,
+				} }
+				onColorWarningsChange={ ( warnings ) =>
+					onColorWarningsChange( warnings )
+				}
+			/>
+		);
+		const { rerender } = render( renderProvider() );
+
+		expect( onColorWarningsChange ).toHaveBeenCalledTimes( 1 );
+
+		rerender( renderProvider() );
+
+		expect( onColorWarningsChange ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'does not define the custom property outside of the provider', () => {
