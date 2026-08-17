@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Register the content module for routes that only export a `canvas`, so a route without a stage or inspector can render a custom canvas ([#81578](https://github.com/WordPress/gutenberg/pull/81578)).
+-   Pages: use the boot module that ships with Core when the plugin has no local one, so plugin pages are no longer empty ([#81761](https://github.com/WordPress/gutenberg/pull/81761)).
 
 ### Documentation
 

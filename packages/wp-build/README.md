@@ -302,6 +302,12 @@ This generates two page modes:
 
 Each mode provides route/menu registration functions and a render callback. Routes are automatically registered for both modes.
 
+**Boot module:**
+
+Pages boot through the `@wordpress/boot` script module, which ships with WordPress Core 7.0+ and the Gutenberg plugin. Plugins do not need their own `packages/boot`.
+
+The generated page files use a plugin-local `build/modules/boot/index.min.asset.php` if it exists, and Core's copy in `wp-includes/js/dist/script-modules/boot/` otherwise. If neither is available, the page enqueues nothing and shows only the "This screen requires JavaScript" notice.
+
 **Registering a menu item for WP-Admin mode:**
 
 WP-Admin mode integrates within the standard WordPress admin interface (keeping the sidebar and header). Menu items should be registered with a simple slug and callback:
