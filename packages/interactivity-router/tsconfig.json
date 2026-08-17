@@ -1,11 +1,6 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.dev.base.json",
-	"compilerOptions": {
-		"allowJs": false,
-		"checkJs": false,
-		"strict": false
-	},
 	"files": [ "global.d.ts" ],
 	"references": [
 		{ "path": "./tsconfig.main.json" },

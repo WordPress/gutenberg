@@ -9,10 +9,10 @@ import { shortestCommonSupersequence } from '../scs';
  * @param isEqual  Optional comparator.
  * @return True if the passed array is contained. False otherwise.
  */
-function isSubsequence(
-	arr: unknown[],
-	superseq: unknown[],
-	isEqual = ( a: unknown, b: unknown ): boolean => a === b
+function isSubsequence< E = unknown >(
+	arr: E[],
+	superseq: E[],
+	isEqual = ( a: E, b: E ): boolean => a === b
 ) {
 	let i = 0;
 	let j = 0;
@@ -277,7 +277,8 @@ describe( 'shortestCommonSupersequence', () => {
 			];
 
 			// Custom equality function that only compares 'id' property.
-			const isEqual = ( a, b ) => a.id === b.id;
+			const isEqual = ( a: { id: number }, b: { id: number } ) =>
+				a.id === b.id;
 
 			const result = shortestCommonSupersequence( X, Y, isEqual );
 
@@ -300,7 +301,8 @@ describe( 'shortestCommonSupersequence', () => {
 			const Y = [ 'a', 'b', 'D' ];
 
 			// Case-insensitive comparison.
-			const isEqual = ( a, b ) => a.toLowerCase() === b.toLowerCase();
+			const isEqual = ( a: string, b: string ) =>
+				a.toLowerCase() === b.toLowerCase();
 
 			const result = shortestCommonSupersequence( X, Y, isEqual );
 
