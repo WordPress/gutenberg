@@ -2,13 +2,11 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import {
-	EditorKeyboardShortcutsRegister,
 	privateApis as editorPrivateApis,
 	store as editorStore,
 } from '@wordpress/editor';
 import { __, isRTL, sprintf } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
-import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 import { useCallback } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -39,7 +37,6 @@ import SitePreview from './site-preview';
 
 const { Editor, BackButton } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
-const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
 function getListPathForPostType( postType ) {
 	switch ( postType ) {
@@ -167,8 +164,6 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 		<SitePreview />
 	) : (
 		<>
-			<EditorKeyboardShortcutsRegister />
-			{ isEditMode && <BlockKeyboardShortcuts /> }
 			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
 			{ isEditMode && isReady && (
 				<WelcomeGuide

@@ -55,7 +55,13 @@ function Root( { className, ...settings } ) {
 		} = getSettings();
 		return {
 			isOutlineMode: outlineMode && ! isTyping(),
-			isFocusMode: focusMode || hasBlockSpotlight(),
+			/*
+			 * Spotlight fades everything but the block being worked on, which
+			 * has nothing to offer a canvas that cannot be edited — a preview
+			 * would just render most of its content faded out.
+			 */
+			isFocusMode:
+				! _isPreviewMode && ( focusMode || hasBlockSpotlight() ),
 			isPreviewMode: _isPreviewMode,
 			editedContentOnlySection: getEditedContentOnlySection(),
 		};

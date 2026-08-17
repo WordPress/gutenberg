@@ -33,6 +33,18 @@ const variations = [
 		scope: [ 'block', 'transform' ],
 		keywords: [ `h${ level }` ],
 		isActive: ( blockAttributes ) => blockAttributes.level === level,
+		shortcut: {
+			name: `core/block-editor/transform-paragraph-to-heading-${ level }`,
+			description: sprintf(
+				/* translators: %d: heading level e.g: "1", "2", "3" */
+				__( 'Transform the selected block into a heading %d.' ),
+				level
+			),
+			keyCombination: {
+				modifier: 'access',
+				character: `${ level }`,
+			},
+		},
 	} ) ),
 ];
 

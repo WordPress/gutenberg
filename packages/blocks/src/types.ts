@@ -1,4 +1,5 @@
 import type { ComponentType, ReactElement } from 'react';
+import type { WPKeycodeModifier } from '@wordpress/keycodes';
 
 /**
  * An icon type definition. One of a Dashicon slug, an element,
@@ -48,6 +49,48 @@ export type BlockTypeIcon = BlockTypeIconDescriptor | BlockTypeIconRender;
  * Named block variation scopes.
  */
 export type BlockVariationScope = 'block' | 'inserter' | 'transform';
+
+/**
+ * A key combination that triggers a block shortcut.
+ */
+export interface BlockShortcutKeyCombination {
+	/**
+	 * The modifier the character is pressed with. When omitted, the character
+	 * is matched on its own.
+	 */
+	modifier?: WPKeycodeModifier;
+	/**
+	 * The character, e.g. `2`, or a special key such as `escape`.
+	 */
+	character: string;
+}
+
+/**
+ * A keyboard shortcut declared by a block variation or a block transform.
+ *
+ * Shortcuts are registered with the `core/keyboard-shortcuts` store while the
+ * block editor is mounted, and apply to the selected block.
+ */
+export interface BlockShortcut {
+	/**
+	 * The unique and machine-readable shortcut name, e.g.
+	 * `core/block-editor/transform-heading-to-paragraph`.
+	 */
+	name: string;
+	/**
+	 * A human-readable description, shown in the keyboard shortcuts help
+	 * modal.
+	 */
+	description: string;
+	/**
+	 * The key combination that triggers the shortcut.
+	 */
+	keyCombination: BlockShortcutKeyCombination;
+	/**
+	 * Alternative key combinations that trigger the same shortcut.
+	 */
+	aliases?: BlockShortcutKeyCombination[];
+}
 
 /**
  * An object describing a variation defined for the block type.
@@ -110,6 +153,15 @@ export interface BlockVariation<
 	 */
 	scope?: BlockVariationScope[];
 	/**
+	 * A keyboard shortcut that applies this variation to the selected block.
+	 *
+	 * When the selected block is already of this block type, the variation's
+	 * attributes are applied to it, unless `isActive` reports the variation as
+	 * already active. Otherwise the selected block is transformed to this block
+	 * type first, which requires a matching block transform to exist.
+	 */
+	shortcut?: BlockShortcut;
+	/**
 	 * An array of terms (which can be translated)
 	 * that help users discover the variation
 	 * while searching.
@@ -164,6 +216,15 @@ export interface BlockTransform<
 	 * variation of the transformed block type.
 	 */
 	variationName?: string;
+	/**
+	 * A keyboard shortcut that applies this transform to the selected block.
+	 * Only supported on transforms of type `block`.
+	 *
+	 * On a `to` transform the shortcut applies to the block declaring it, and
+	 * produces the first entry of `blocks`. On a `from` transform it applies to
+	 * any block listed in `blocks`, and produces the block declaring it.
+	 */
+	shortcut?: BlockShortcut;
 	priority?: number;
 	isMultiBlock?: boolean;
 	isMatch?: (

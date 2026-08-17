@@ -42,6 +42,11 @@
 	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": false,
+	"devDependencies": {
+		"@testing-library/jest-dom": "^6.9.1",
+		"@types/jest": "^30.0.0",
+		"@types/node": "^20.19.39"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

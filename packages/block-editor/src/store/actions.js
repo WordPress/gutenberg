@@ -1371,7 +1371,20 @@ export const mergeBlocks =
 			return;
 		}
 
-		if ( isUnmodifiedDefaultBlock( blockA ) ) {
+		// An unmodified default block adds nothing to the merge. Neither
+		// does an empty text block of a different type, where merging would
+		// transform blockB into blockA's type instead (a paragraph deleted
+		// into an empty heading became a heading), so remove blockA in both
+		// cases. The merge function requirement keeps containers out: a
+		// columns block has no content attributes, so it would otherwise
+		// always count as empty and be removed on Backspace instead of
+		// selected.
+		if (
+			isUnmodifiedDefaultBlock( blockA ) ||
+			( !! blockAType.merge &&
+				blockA.name !== blockB.name &&
+				isUnmodifiedBlock( blockA, 'content' ) )
+		) {
 			const isASelected = select.isBlockSelected( clientIdA );
 
 			if ( isASelected ) {
