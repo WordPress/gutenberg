@@ -13,13 +13,14 @@
 -   A link action whose target the host recognizes as one of its own routes
     (the `links` capability from `useWidgetHost`) mounts the host router's
     link and navigates client-side; `download` and `openInNewTab` keep the
-    plain anchor.
+    plain anchor ([#81740](https://github.com/WordPress/gutenberg/pull/81740)).
 
 ### Documentation
 
 -   Add a `HostLinks` story: a demo host whose `links` capability turns an
     in-app action target into a client-side route link, beside a plain
-    anchor and a download.
+    anchor and a download
+    ([#81740](https://github.com/WordPress/gutenberg/pull/81740)).
 
 ### Internal
 
