@@ -74,8 +74,7 @@ export function createUndoManager(): SyncUndoManager {
 			// Ensure that we only scope the undo/redo to the current editor.
 			// The editor origin is only tracked while this is the active scope,
 			// so that editing in one editing context can't be undone from
-			// another one. The yjs document's clientID is added once it's
-			// available.
+			// another one.
 			trackedOrigins: new Set(),
 		} );
 

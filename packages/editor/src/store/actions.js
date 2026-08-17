@@ -156,7 +156,7 @@ export const setEditedPost =
 				? `postType/${ postType }/${ postId }`
 				: undefined
 		);
-		dispatch( {
+		return dispatch( {
 			type: 'SET_EDITED_POST',
 			postType,
 			postId,
