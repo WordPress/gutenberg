@@ -129,14 +129,16 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 		}
 	};
 
-	// Pick the most relevant thread for the selected block. Derived outside
-	// the effect so the effect body stays minimal.
-	const targetNoteId = useMemo( () => {
-		const blockNoteIds = getNoteIdsFromMetadata( { noteId } );
-		const blockThreads = notes.filter( ( t ) =>
-			blockNoteIds.includes( t.id )
-		);
-		return pickPrimaryNote( blockThreads )?.id;
+	// Pick the most relevant thread for the selected block, and note which
+	// threads belong to it. Derived outside the effect so the effect body
+	// stays minimal.
+	const { targetNoteId, blockNoteIds } = useMemo( () => {
+		const ids = getNoteIdsFromMetadata( { noteId } );
+		const blockThreads = notes.filter( ( t ) => ids.includes( t.id ) );
+		return {
+			targetNoteId: pickPrimaryNote( blockThreads )?.id,
+			blockNoteIds: ids,
+		};
 	}, [ noteId, notes ] );
 
 	// Sync the selected note to the new block's primary thread when the
@@ -149,8 +151,25 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 			return;
 		}
 		prevBlockIdRef.current = selectedBlockClientId;
+		/*
+		 * Selecting a thread selects its block too, which lands here as a block
+		 * transition. On a block carrying several notes the primary one is not
+		 * necessarily the one just clicked, so syncing would move the selection
+		 * to a sibling — leaving the clicked thread merely focused while another
+		 * thread takes the reply form. An explicit selection already pointing at
+		 * this block is the answer; only sync when it isn't.
+		 */
+		if ( selectedNote && blockNoteIds.includes( selectedNote ) ) {
+			return;
+		}
 		selectNote( targetNoteId );
-	}, [ selectedBlockClientId, targetNoteId, selectNote ] );
+	}, [
+		selectedBlockClientId,
+		targetNoteId,
+		selectNote,
+		selectedNote,
+		blockNoteIds,
+	] );
 
 	// Focus the selected note when requested.
 	useEffect( () => {
