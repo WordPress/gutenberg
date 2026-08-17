@@ -94,7 +94,11 @@ function UncontrolledInnerBlocks( props ) {
 		EMPTY_OBJECT;
 
 	const { allowSizingOnChildren = false } = defaultLayoutBlockSupport;
-	const usedLayout = layout || defaultLayoutBlockSupport;
+	// The support is a config object, e.g. `{ allowSwitching: false, default: { type: 'flex' } }`,
+	// so the layout itself lives under `default`. Passing the config through would leave the
+	// context without a `type`, and consumers would resolve it to the flow layout.
+	const usedLayout =
+		layout || defaultLayoutBlockSupport.default || EMPTY_OBJECT;
 
 	const memoedLayout = useMemo(
 		() => ( {
