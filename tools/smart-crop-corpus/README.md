@@ -1,0 +1,138 @@
+# Smart crop review harness
+
+A scripted A/B test for the smart cropping proposal in
+[#81706](https://github.com/WordPress/gutenberg/issues/81706).
+
+It pulls a fresh mix of public images, crops each one twice with the same
+libvips build the browser upload path uses, and writes a self-contained HTML
+report where a reviewer grades whether smart crop is an improvement.
+
+**This directory is not meant to be merged.** It is a measurement tool for the
+issue discussion, kept in a branch so the numbers behind any claim about
+`attention` can be reproduced rather than asserted.
+
+## Why it exists
+
+The issue argues that `attention` should position hard-cropped sizes instead of
+the centre. That is a claim about output quality, and the thread so far has
+compared specifications rather than pictures. This makes the comparison concrete:
+run it, look at the pairs, record verdicts.
+
+## Running it
+
+Requires the repository's dependencies (`npm install`) and network access. No
+API keys.
+
+```sh
+node tools/smart-crop-corpus/index.mjs
+```
+
+```
+--count N        images to collect (default 20)
+--sizes LIST     thumbnail, square, wide, tall (default square,wide)
+--sources LIST   photos, themes, plugins (default: all three)
+--seed STRING    reproduce a previous run (default: random)
+--out DIR        output directory (default artifacts/smart-crop)
+--quality N      JPEG quality for the review renditions (default 82)
+```
+
+Every run picks a different set of images. Pass the seed printed at the top of a
+run back in with `--seed` to collect the same set again.
+
+Output lands in `artifacts/smart-crop/<date>-<seed>/`, which is already
+gitignored:
+
+| File            | For                                                           |
+| --------------- | ------------------------------------------------------------- |
+| `report.html`   | A human. Self-contained; open it directly.                    |
+| `manifest.json` | Automation. Every row, its source, and its measurements.      |
+| `images/*.jpg`  | An AI reviewer, which can read the crops as individual files. |
+
+## Grading
+
+The report is a table: one row per image per size, showing the centre crop
+(what WordPress does today) beside the attention crop.
+
+-   👍 attention keeps the subject better than centre
+-   👎 attention is worse than centre
+-   ≈ no meaningful difference
+
+Keyboard: `1` / `2` / `3` to grade and advance, `j` / `k` to move, click either
+crop to enlarge both. Grades are held in `localStorage`; "Copy results JSON"
+takes them elsewhere. Rows tagged "no visible change" are ones where attention
+picked the centre anyway and there is nothing to judge.
+
+A tally at the top reports what share of decided calls favoured smart crop.
+
+## What it crops
+
+For a standard 8-bit image, `applyResizeAndCrop()` in `packages/vips` reduces to
+a single libvips call per size:
+
+```js
+vips.Image.thumbnailBuffer( buffer, width, {
+	size: 'down',
+	height,
+	crop: smartCrop ? 'attention' : 'centre',
+} );
+```
+
+The harness makes exactly that call, against the `wasm-vips` version pinned in
+this repository, so the pixels it grades are the pixels the browser produces.
+The only difference is that it loads the module's Node entry point instead of
+the browser one; the libvips build underneath is the same.
+
+`thumbnail` is the one size WordPress core registers with `'crop' => true`, so
+it is the size this proposal actually changes. At 150px square it is also hard
+to judge by eye, so the larger theme-style shapes are the defaults and
+`thumbnail` is opt-in via `--sizes`.
+
+## Where the images come from
+
+Nothing is vendored. Each run fetches from public endpoints and records the URLs
+in the manifest, which keeps licensing with the original hosts and the
+repository small.
+
+| Source                                                       | What it contributes                                                                                                         |
+| ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| [Photo Directory](https://wordpress.org/photos/)             | ~43,000 CC0 photographs submitted by the community. The closest public stand-in for what people upload to WordPress.        |
+| [Theme Directory](https://wordpress.org/themes/) screenshots | Flat regions, dense text, a subject filling the frame. Nothing like a photograph.                                           |
+| [Plugin Directory](https://wordpress.org/plugins/) banners   | Logos and wordmarks on flat backgrounds — the failure class the issue calls out, where attention has nothing to latch onto. |
+
+The Photo Directory is 63% `nature` and 3.8% `people`. Sampling it
+proportionally would mostly grade landscapes, which are the case where centre
+cropping already does fine, so the harness weights towards subjects that have a
+subject to miss.
+
+## Signals
+
+libvips returns no confidence score, which the issue names as the crux of the
+proposal. It does return the attention centre, so each row records that plus the
+candidate derivations floated in the thread:
+
+-   **focal** — the attention centre, normalised. This is a real focal point from
+    libvips, not a derivation.
+-   **off-centre** — how far that point sits from the image centre. Candidate 1.
+-   **entropy agree** — agreement between the `attention` and `entropy`
+    strategies. Candidate 2, measured on their outputs rather than their crop
+    rectangles, because libvips does not expose the rectangle.
+-   **changed** — how much smart crop altered the picture at all. Near zero means
+    attention landed on the centre.
+-   **aspectStability** (manifest only) — how far the focal point moves across the
+    requested shapes. Candidate 3.
+
+Once a run is graded, these become the x-axis against a known-good/known-bad
+y-axis, which is what picking a threshold needs.
+
+One observation already worth noting: the attention centre comes back quantised
+to a coarse grid, because libvips analyses a heavily shrunk copy. A stored focal
+point inherits that precision.
+
+## Limitations
+
+-   Verdicts are not blind. A reviewer can see which column is which, so this
+    measures preference with knowledge of the condition. Randomising the columns
+    would be the next improvement if the numbers start carrying weight.
+-   Sources skew towards curated photography and wordpress.org assets. Neither is
+    a random sample of real media libraries.
+-   Grades live in one browser's `localStorage`. Export them.

@@ -1,0 +1,375 @@
+#!/usr/bin/env node
+/**
+ * Smart crop review harness.
+ *
+ * Pulls a fresh mix of public images, crops each one twice with the same
+ * libvips build the browser upload path uses -- from the centre, which is what
+ * WordPress does today, and with the `attention` strategy -- and writes a
+ * self-contained HTML report where a reviewer grades whether smart crop is an
+ * improvement.
+ *
+ * Usage:
+ *
+ *     node tools/smart-crop-corpus/index.mjs
+ *     node tools/smart-crop-corpus/index.mjs --count 40 --sizes thumbnail,square,wide
+ *     node tools/smart-crop-corpus/index.mjs --seed my-run   # reproducible
+ *
+ * See tools/smart-crop-corpus/README.md.
+ * See https://github.com/WordPress/gutenberg/issues/81706.
+ */
+
+import { mkdir, writeFile } from 'node:fs/promises';
+import path from 'node:path';
+import process from 'node:process';
+import { aspectStability, createVips, cropPair } from './crop.mjs';
+import { buildCorpus, download, SOURCES } from './sources.mjs';
+import { renderReport } from './report.mjs';
+
+/**
+ * Target sizes.
+ *
+ * `thumbnail` is the one size WordPress core registers with `'crop' => true`,
+ * so it is the size this proposal actually changes. It is also 150px square,
+ * which is hard to grade by eye, so the larger shapes -- the kind a theme
+ * registers -- are the defaults and `thumbnail` is opt-in.
+ */
+const SIZES = {
+	thumbnail: { name: 'thumbnail', width: 150, height: 150 },
+	square: { name: 'square', width: 400, height: 400 },
+	wide: { name: 'wide', width: 640, height: 360 },
+	tall: { name: 'tall', width: 480, height: 640 },
+};
+
+const DEFAULTS = {
+	count: 20,
+	sizes: 'square,wide',
+	sources: Object.keys( SOURCES ).join( ',' ),
+	out: 'artifacts/smart-crop',
+	quality: 82,
+	concurrency: 6,
+};
+
+/**
+ * Parses `--flag value` arguments.
+ *
+ * @param {string[]} argv Raw arguments.
+ * @return {Object} Options merged over the defaults.
+ */
+function parseArgs( argv ) {
+	const options = { ...DEFAULTS };
+
+	for ( let index = 0; index < argv.length; index += 1 ) {
+		const arg = argv[ index ];
+
+		if ( ! arg.startsWith( '--' ) ) {
+			continue;
+		}
+
+		const key = arg.slice( 2 );
+		const value = argv[ index + 1 ];
+
+		if ( key === 'help' ) {
+			options.help = true;
+		} else if ( key in options && value !== undefined ) {
+			options[ key ] =
+				typeof options[ key ] === 'number' ? Number( value ) : value;
+			index += 1;
+		} else if ( key === 'seed' && value !== undefined ) {
+			options.seed = value;
+			index += 1;
+		} else {
+			throw new Error( `Unknown option: ${ arg }` );
+		}
+	}
+
+	return options;
+}
+
+/**
+ * A small seeded generator, so a run can be reproduced from its seed.
+ *
+ * @param {string} seed Seed string.
+ * @return {Function} Generator returning 0..1.
+ */
+/* eslint-disable no-bitwise -- xmur3/mulberry32 is defined in terms of 32-bit integer operations. */
+function createRng( seed ) {
+	let hash = 1779033703 ^ seed.length;
+
+	for ( let index = 0; index < seed.length; index += 1 ) {
+		hash = Math.imul( hash ^ seed.charCodeAt( index ), 3432918353 );
+		hash = ( hash << 13 ) | ( hash >>> 19 );
+	}
+
+	return function rng() {
+		hash = ( hash + 0x6d2b79f5 ) | 0;
+		let t = Math.imul( hash ^ ( hash >>> 15 ), 1 | hash );
+		t = ( t + Math.imul( t ^ ( t >>> 7 ), 61 | t ) ) ^ t;
+		return ( ( t ^ ( t >>> 14 ) ) >>> 0 ) / 4294967296;
+	};
+}
+/* eslint-enable no-bitwise */
+
+/**
+ * Runs an async worker over a list with a concurrency cap, so the harness is a
+ * polite client of wordpress.org.
+ *
+ * @param {Array}    items  Items to process.
+ * @param {number}   limit  Maximum in flight.
+ * @param {Function} worker Async worker receiving `( item, index )`.
+ * @return {Promise<Array>} Settled results, in input order.
+ */
+async function mapLimit( items, limit, worker ) {
+	const results = new Array( items.length );
+	let cursor = 0;
+
+	async function drain() {
+		while ( cursor < items.length ) {
+			const index = cursor++;
+			try {
+				results[ index ] = await worker( items[ index ], index );
+			} catch ( error ) {
+				results[ index ] = { error };
+			}
+		}
+	}
+
+	await Promise.all(
+		Array.from( { length: Math.min( limit, items.length ) }, drain )
+	);
+
+	return results;
+}
+
+const log = ( message ) => process.stdout.write( `${ message }\n` );
+
+/**
+ * Entry point.
+ */
+async function main() {
+	const options = parseArgs( process.argv.slice( 2 ) );
+
+	if ( options.help ) {
+		log(
+			[
+				'Smart crop review harness',
+				'',
+				'  --count N        images to collect (default 20)',
+				`  --sizes LIST     any of ${ Object.keys( SIZES ).join(
+					', '
+				) } (default ${ DEFAULTS.sizes })`,
+				`  --sources LIST   any of ${ Object.keys( SOURCES ).join(
+					', '
+				) }`,
+				'  --seed STRING    reproduce a previous run (default: random)',
+				'  --out DIR        output directory (default artifacts/smart-crop)',
+				'  --quality N      JPEG quality for review renditions (default 82)',
+			].join( '\n' )
+		);
+		return;
+	}
+
+	// A random seed by default, so every run grades a different set of images.
+	const seed = options.seed || Math.random().toString( 36 ).slice( 2, 10 );
+	const rng = createRng( seed );
+
+	const sizes = String( options.sizes )
+		.split( ',' )
+		.map( ( key ) => SIZES[ key.trim() ] )
+		.filter( Boolean );
+
+	if ( ! sizes.length ) {
+		throw new Error(
+			`No valid sizes. Choose from: ${ Object.keys( SIZES ).join(
+				', '
+			) }`
+		);
+	}
+
+	const runId = `${ new Date().toISOString().slice( 0, 10 ) }-${ seed }`;
+	const outDir = path.resolve( options.out, runId );
+	const imageDir = path.join( outDir, 'images' );
+	await mkdir( imageDir, { recursive: true } );
+
+	log( `Smart crop review run ${ runId }` );
+	log( `Seed ${ seed } — pass --seed ${ seed } to reproduce this set.\n` );
+
+	const corpus = await buildCorpus( {
+		count: options.count,
+		sources: String( options.sources )
+			.split( ',' )
+			.map( ( key ) => key.trim() ),
+		rng,
+		onLog: log,
+	} );
+
+	if ( ! corpus.length ) {
+		throw new Error( 'Collected no images. Is the network reachable?' );
+	}
+
+	log( `\nDownloading ${ corpus.length } images…` );
+
+	const downloaded = await mapLimit(
+		corpus,
+		options.concurrency,
+		async ( entry ) => ( { entry, buffer: await download( entry.url ) } )
+	);
+
+	const vips = await createVips();
+	const vipsVersion = [ 0, 1, 2 ]
+		.map( ( part ) => vips.version( part ) )
+		.join( '.' );
+
+	log( `Cropping with libvips ${ vipsVersion }…\n` );
+
+	const rows = [];
+	const stats = { bySource: {}, unchanged: 0, imageCount: 0, skipped: 0 };
+
+	for ( const item of downloaded ) {
+		if ( item.error || ! item.buffer ) {
+			stats.skipped += 1;
+			continue;
+		}
+
+		const { entry, buffer } = item;
+		let source;
+
+		try {
+			// The decoded image is freed straight away; only the sRGB copy is
+			// kept, and the wasm heap does not reclaim anything on its own.
+			const decoded = vips.Image.newFromBuffer( buffer );
+			source = decoded.colourspace( 'srgb' );
+			decoded.delete();
+		} catch {
+			log( `  ! could not decode ${ entry.id }` );
+			stats.skipped += 1;
+			continue;
+		}
+
+		try {
+			const results = sizes
+				.map( ( size ) =>
+					cropPair( {
+						vips,
+						source,
+						buffer,
+						size,
+						quality: options.quality,
+					} )
+				)
+				.filter( Boolean );
+
+			if ( ! results.length ) {
+				log( `  - ${ entry.id } is smaller than every target size` );
+				stats.skipped += 1;
+				continue;
+			}
+
+			// A small preview of the uncropped original, so a reviewer can see
+			// what the crops were taken from.
+			const previewImage = vips.Image.thumbnailBuffer( buffer, 220, {
+				size: 'down',
+			} );
+			const preview = Buffer.from(
+				previewImage.writeToBuffer( '.jpg', { Q: 70 } )
+			);
+			previewImage.delete();
+
+			const image = {
+				...entry,
+				preview,
+				width: entry.width || source.width,
+				height: entry.height || source.height,
+			};
+			const stability = aspectStability( results );
+
+			await writeFile(
+				path.join( imageDir, `${ entry.id }-source.jpg` ),
+				preview
+			);
+
+			for ( const result of results ) {
+				const rowId = `${ entry.id }-${ result.size }`;
+				const files = {
+					centre: `images/${ rowId }-centre.jpg`,
+					attention: `images/${ rowId }-attention.jpg`,
+					source: `images/${ entry.id }-source.jpg`,
+				};
+
+				await writeFile(
+					path.join( outDir, files.centre ),
+					result.renditions.centre
+				);
+				await writeFile(
+					path.join( outDir, files.attention ),
+					result.renditions.attention
+				);
+
+				rows.push( {
+					id: rowId,
+					image,
+					result,
+					files,
+					aspectStability: stability,
+				} );
+
+				if ( result.unchanged ) {
+					stats.unchanged += 1;
+				}
+			}
+
+			stats.imageCount += 1;
+			stats.bySource[ entry.source ] =
+				( stats.bySource[ entry.source ] || 0 ) + 1;
+		} finally {
+			source.delete();
+		}
+	}
+
+	if ( ! rows.length ) {
+		throw new Error( 'No comparisons were produced.' );
+	}
+
+	const run = {
+		id: runId,
+		seed,
+		createdAt: new Date().toISOString(),
+		vipsVersion,
+		sizes: sizes.map( ( size ) => size.name ),
+		rows,
+		stats,
+	};
+
+	const reportPath = path.join( outDir, 'report.html' );
+	await writeFile( reportPath, renderReport( run ) );
+	await writeFile(
+		path.join( outDir, 'manifest.json' ),
+		JSON.stringify(
+			{
+				...run,
+				rows: rows.map( ( row ) => ( {
+					id: row.id,
+					image: { ...row.image, preview: undefined },
+					size: row.result.size,
+					signals: row.result.signals,
+					aspectStability: row.aspectStability,
+					unchanged: row.result.unchanged,
+					files: row.files,
+				} ) ),
+			},
+			null,
+			2
+		)
+	);
+
+	log( `${ rows.length } comparisons from ${ stats.imageCount } images` );
+	log(
+		`${ stats.unchanged } produced no visible change; ${ stats.skipped } images skipped`
+	);
+	log( `\nReport:   ${ reportPath }` );
+	log( `Manifest: ${ path.join( outDir, 'manifest.json' ) }` );
+}
+
+main().catch( ( error ) => {
+	process.stderr.write( `\n${ error.stack || error.message }\n` );
+	process.exitCode = 1;
+} );
