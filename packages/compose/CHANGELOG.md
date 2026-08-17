@@ -12,7 +12,8 @@
 
 -   `useFixedWindowList`: Remove a duplicate `resize` listener registration, and page by the measured viewport height rather than the initial window size ([#80935](https://github.com/WordPress/gutenberg/pull/80935)).
 -   `useViewportMatch`: Scope the generated media query to `screen`, so that printing does not report the viewport as having become narrower ([#81367](https://github.com/WordPress/gutenberg/pull/81367)).
-
+-   `useFocusOnMount`: In `firstInputElement` mode, retry focus until the input element is available (up to 200ms) before falling back, so async-loaded controls (e.g. DataViews select fields) receive focus correctly ([#76019](https://github.com/WordPress/gutenberg/pull/76019)).
+  
 ## 8.5.0 (2026-07-29)
 
 ## 8.4.0 (2026-07-14)
