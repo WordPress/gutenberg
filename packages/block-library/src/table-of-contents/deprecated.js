@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useBlockProps } from '@wordpress/block-editor';
 
 const ENTRY_CLASS_NAME = 'wp-block-table-of-contents__entry';
