@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Render the editor preferences modal, so the Preferences menu item and command open it ([#81630](https://github.com/WordPress/gutenberg/pull/81630)).
+
 ## 1.19.0 (2026-08-12)
 
 
