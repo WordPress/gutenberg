@@ -52,7 +52,6 @@ function getDisplayFontFace( font: FontFamily | FontFace ): FontFace {
 
 function FontDemo( { font, text }: FontDemoProps ) {
 	const ref = useRef< HTMLDivElement >( null );
-	const imgRef = useRef< HTMLImageElement >( null );
 
 	const fontFace = getDisplayFontFace( font );
 	const style = getFamilyPreviewStyle( font );
@@ -65,10 +64,16 @@ function FontDemo( { font, text }: FontDemoProps ) {
 	);
 
 	const [ isIntersecting, setIsIntersecting ] = useState< boolean >( false );
-	const [ isAssetLoaded, setIsAssetLoaded ] = useState< boolean >(
-		() => !! previewUrl && loadedPreviews.has( previewUrl )
-	);
+	const [ isFontLoaded, setIsFontLoaded ] = useState< boolean >( false );
+	const [ resolvedUrl, setResolvedUrl ] = useState< string >();
 	const { loadFontFaceAsset } = useContext( FontLibraryContext );
+
+	// The same component instance gets reused for different fonts, so the
+	// loaded state is tracked per URL.
+	const isAssetLoaded = isPreviewImage
+		? !! previewUrl &&
+		  ( loadedPreviews.has( previewUrl ) || resolvedUrl === previewUrl )
+		: isFontLoaded;
 
 	// The previews scale with the label, so estimate ~12px per character.
 	const estimatedImageWidth = Math.min(
@@ -86,8 +91,8 @@ function FontDemo( { font, text }: FontDemoProps ) {
 	};
 
 	useEffect( () => {
-		// Only font files need the viewport check. Image previews are lazy
-		// loaded by the browser, and every row in the collection has one.
+		// Image previews are lazy loaded by the browser, so only font files
+		// need the viewport check.
 		if ( isPreviewImage ) {
 			return;
 		}
@@ -100,22 +105,13 @@ function FontDemo( { font, text }: FontDemoProps ) {
 		return () => observer.disconnect();
 	}, [ isPreviewImage ] );
 
-	// Re-check on preview change, since an already complete image won't fire
-	// onLoad and the component is reused across fonts.
-	useEffect( () => {
-		setIsAssetLoaded(
-			( !! previewUrl && loadedPreviews.has( previewUrl ) ) ||
-				!! imgRef.current?.complete
-		);
-	}, [ previewUrl ] );
-
 	useEffect( () => {
 		const loadAsset = async () => {
 			if ( isIntersecting && ! isPreviewImage ) {
 				if ( fontFace.src ) {
 					await loadFontFaceAsset( fontFace );
 				}
-				setIsAssetLoaded( true );
+				setIsFontLoaded( true );
 			}
 		};
 		loadAsset();
@@ -132,7 +128,6 @@ function FontDemo( { font, text }: FontDemoProps ) {
 						/>
 					) }
 					<img
-						ref={ imgRef }
 						src={ previewUrl }
 						loading="lazy"
 						alt={ text }
@@ -140,10 +135,10 @@ function FontDemo( { font, text }: FontDemoProps ) {
 							if ( previewUrl ) {
 								loadedPreviews.add( previewUrl );
 							}
-							setIsAssetLoaded( true );
+							setResolvedUrl( previewUrl );
 						} }
 						// Also on failure, otherwise skeleton will pulse forever.
-						onError={ () => setIsAssetLoaded( true ) }
+						onError={ () => setResolvedUrl( previewUrl ) }
 						className={ clsx(
 							'font-library__font-variant_demo-image',
 							{ 'is-loading': ! isAssetLoaded }
