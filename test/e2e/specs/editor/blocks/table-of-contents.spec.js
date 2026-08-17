@@ -21,27 +21,8 @@ ${ content }
 <!-- /wp:html -->`;
 }
 
-function tableOfContentsBlock( {
-	ordered = true,
-	maxLevel,
-	onlyIncludeCurrentPage,
-} = {} ) {
-	const attributes = {};
-	if ( ! ordered ) {
-		attributes.ordered = false;
-	}
-	if ( maxLevel ) {
-		attributes.maxLevel = maxLevel;
-	}
-	if ( onlyIncludeCurrentPage ) {
-		attributes.onlyIncludeCurrentPage = true;
-	}
-
-	const attrsStr = Object.keys( attributes ).length
-		? ` ${ JSON.stringify( attributes ) }`
-		: '';
-
-	return `<!-- wp:table-of-contents${ attrsStr } /-->`;
+function tableOfContentsBlock() {
+	return '<!-- wp:table-of-contents /-->';
 }
 
 function postContentWithTocAndHeadings( headings, extraBlocks = '' ) {
