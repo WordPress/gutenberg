@@ -220,6 +220,14 @@ const VALID_ELEMENT_PSEUDO_SELECTORS: Record< string, string[] > = {
 		':focus-visible',
 		':active',
 	],
+	textInput: [
+		':required',
+		':valid',
+		':invalid',
+		':focus',
+		':focus-visible',
+		'::placeholder',
+	],
 };
 
 /**
@@ -990,6 +998,10 @@ function getPseudoStyleNodes( node: StylesNode ): StylesNode[] {
 	} );
 }
 
+function isPseudoElementSelector( selectorSuffix?: string ): boolean {
+	return selectorSuffix?.startsWith( '::' ) ?? false;
+}
+
 /**
  * Creates style nodes for configured responsive breakpoint states.
  *
@@ -1663,8 +1675,13 @@ function renderStylesNode(
 					selectorForRule = selectorSuffix
 						? appendToSelector( selectorForRule, selectorSuffix )
 						: selectorForRule;
+					const featureRuleSelector = isPseudoElementSelector(
+						selectorSuffix
+					)
+						? selectorForRule
+						: `:root :where(${ selectorForRule })`;
 					const rules = declarations.join( ';' );
-					ruleset += `:root :where(${ selectorForRule }){${ rules };}`;
+					ruleset += `${ featureRuleSelector }{${ rules };}`;
 				}
 			}
 		);
@@ -1711,9 +1728,10 @@ function renderStylesNode(
 		disableRootPadding
 	);
 	if ( styleDeclarations?.length ) {
-		const generalSelector = skipSelectorWrapper
-			? effectiveSelector
-			: `:root :where(${ effectiveSelector })`;
+		const generalSelector =
+			skipSelectorWrapper || isPseudoElementSelector( selectorSuffix )
+				? effectiveSelector
+				: `:root :where(${ effectiveSelector })`;
 		ruleset += `${ generalSelector }{${ styleDeclarations.join( ';' ) };}`;
 	}
 	if ( styles?.css ) {
