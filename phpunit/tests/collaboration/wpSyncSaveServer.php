@@ -38,23 +38,27 @@ class Tests_Collaboration_WpSyncSaveServer extends WP_Test_REST_Controller_Testc
 
 		// Enable option for tests.
 		update_option( 'wp_collaboration_enabled', 1 );
+		delete_post_meta( self::$post_id, WP_Sync_Save_Server::CRDT_DOC_META_KEY );
 	}
 
 	/**
 	 * Dispatches a CRDT document save request.
 	 *
-	 * @param string $room Room identifier.
-	 * @param string $doc  Serialized CRDT document.
+	 * @param string $room         Room identifier.
+	 * @param string $doc          Serialized CRDT document.
+	 * @param string|null $expected_doc Expected persisted CRDT document.
 	 * @return WP_REST_Response Response object.
 	 */
-	private function dispatch_save( $room, $doc = 'serialized-crdt-doc' ) {
+	private function dispatch_save( $room, $doc = 'serialized-crdt-doc', $expected_doc = null ) {
 		$request = new WP_REST_Request( 'POST', '/wp-sync/v1/save' );
-		$request->set_body_params(
-			array(
-				'room' => $room,
-				'doc'  => $doc,
-			)
+		$body    = array(
+			'room' => $room,
+			'doc'  => $doc,
 		);
+		if ( null !== $expected_doc ) {
+			$body['expected_doc'] = $expected_doc;
+		}
+		$request->set_body_params( $body );
 		return rest_get_server()->dispatch( $request );
 	}
 
@@ -180,10 +184,30 @@ class Tests_Collaboration_WpSyncSaveServer extends WP_Test_REST_Controller_Testc
 		wp_set_current_user( self::$editor_id );
 		update_post_meta( self::$post_id, WP_Sync_Save_Server::CRDT_DOC_META_KEY, 'serialized-crdt-doc' );
 
-		$response = $this->dispatch_save( $this->get_post_room(), 'serialized-crdt-doc' );
+		$response = $this->dispatch_save( $this->get_post_room(), 'serialized-crdt-doc', 'serialized-crdt-doc' );
 
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertSame( 'serialized-crdt-doc', get_post_meta( self::$post_id, WP_Sync_Save_Server::CRDT_DOC_META_KEY, true ) );
+	}
+
+	public function test_save_without_expected_doc_preserves_existing_client_behavior() {
+		wp_set_current_user( self::$editor_id );
+		update_post_meta( self::$post_id, WP_Sync_Save_Server::CRDT_DOC_META_KEY, 'current-crdt-doc' );
+
+		$response = $this->dispatch_save( $this->get_post_room(), 'updated-crdt-doc' );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 'updated-crdt-doc', get_post_meta( self::$post_id, WP_Sync_Save_Server::CRDT_DOC_META_KEY, true ) );
+	}
+
+	public function test_save_rejects_stale_crdt_doc() {
+		wp_set_current_user( self::$editor_id );
+		update_post_meta( self::$post_id, WP_Sync_Save_Server::CRDT_DOC_META_KEY, 'current-crdt-doc' );
+
+		$response = $this->dispatch_save( $this->get_post_room(), 'stale-crdt-doc', 'older-crdt-doc' );
+
+		$this->assertErrorResponse( 'rest_sync_document_conflict', $response, 409 );
+		$this->assertSame( 'current-crdt-doc', get_post_meta( self::$post_id, WP_Sync_Save_Server::CRDT_DOC_META_KEY, true ) );
 	}
 
 	public function test_save_rejects_taxonomy_entity() {
