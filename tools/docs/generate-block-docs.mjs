@@ -52,6 +52,10 @@ const FIXTURES_DIR = path.resolve(
 	ROOT_DIR,
 	'test/integration/fixtures/blocks'
 );
+// Blocks whose generated source links should highlight a non-standard source set.
+const SOURCE_FILE_LIST_OVERRIDES = {
+	'table-of-contents': [ 'edit.js', 'index.php' ],
+};
 
 /**
  * Reference path and heading anchors for the Block Attributes docs page.
@@ -572,6 +576,22 @@ function getBlockType( files, blockJson ) {
 }
 
 /**
+ * Format source files to highlight in the generated source directory link.
+ *
+ * @param {string} blockDir Directory name.
+ * @return {string} Source files sentence fragment.
+ */
+function formatSourceFilesList( blockDir ) {
+	const sourceFiles = SOURCE_FILE_LIST_OVERRIDES[ blockDir ] || [
+		'edit.js',
+		'save.js',
+		'index.php',
+	];
+
+	return sourceFiles.map( ( file ) => `\`${ file }\`` ).join( ', ' );
+}
+
+/**
  * Generate a block comment example from block.json data.
  *
  * @param {string} slug       Block slug without core/ prefix.
@@ -805,7 +825,9 @@ function generateBlockApiSection( blockDir ) {
 		`- [block.json](${ SOURCE_URL_BASE }${ blockDir }/block.json) ([reference](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/))`
 	);
 	lines.push(
-		`- [Source directory](${ SOURCE_URL_BASE }${ blockDir }/) — browse \`edit.js\`, \`save.js\`, \`index.php\`, and more.`
+		`- [Source directory](${ SOURCE_URL_BASE }${ blockDir }/) — browse ${ formatSourceFilesList(
+			blockDir
+		) }, and more.`
 	);
 	lines.push( '' );
 
