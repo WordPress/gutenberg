@@ -62,6 +62,9 @@ if ( ! rootSolutionReferences.has( buildSolutionPath ) ) {
 	);
 }
 
+/* Ambient types only test files may use. */
+const TEST_TYPES = new Set( [ 'jest', 'gutenberg-test-env' ] );
+
 const packagesWithTypes = glob
 	.sync( 'packages/*/tsconfig.json', { cwd: repoRoot } )
 	.map( ( tsconfigPath ) => basename( dirname( tsconfigPath ) ) );
@@ -160,6 +163,35 @@ for ( const packageName of packagesWithTypes ) {
 				devProject
 			) }" in tsconfig.json`
 		);
+	}
+
+	/*
+	 * Tests import the sources, so a dev project must see every ambient type
+	 * the build project sees, and the build must not see any test type.
+	 */
+	if ( srcProject && devProject && isDevProject( devProject ) ) {
+		const buildTypes =
+			readTsconfig( srcProject ).compilerOptions?.types ?? [];
+		const devTypes = readTsconfig( devProject ).compilerOptions?.types ?? [
+			'jest',
+		];
+		for ( const type of buildTypes ) {
+			if ( TEST_TYPES.has( type ) ) {
+				reportError(
+					`Test type "${ type }" in ${ relative(
+						repoRoot,
+						srcProject
+					) }`
+				);
+			} else if ( ! devTypes.includes( type ) ) {
+				reportError(
+					`Missing type "${ type }" in ${ relative(
+						repoRoot,
+						devProject
+					) }`
+				);
+			}
+		}
 	}
 
 	let packageJson;

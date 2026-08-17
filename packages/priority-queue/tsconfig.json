@@ -1,5 +1,8 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.dev.base.json",
+	"compilerOptions": {
+		"types": [ "jest", "requestidlecallback" ]
+	},
 	"references": [ { "path": "./tsconfig.build.json" } ]
 }

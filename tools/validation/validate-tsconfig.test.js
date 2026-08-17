@@ -316,3 +316,63 @@ test( 'fails when a package without a build project is missing from the root sol
 		'Missing reference to "packages/jest-console/tsconfig.json" in tsconfig.json'
 	);
 } );
+
+function typedSplitPackage( buildTypes, devTypes ) {
+	return {
+		tsconfigs: {
+			'tsconfig.json': {
+				extends: '../../tsconfig.dev.base.json',
+				compilerOptions: { types: devTypes },
+				references: [ './tsconfig.build.json' ],
+			},
+			'tsconfig.build.json': {
+				compilerOptions: { types: buildTypes },
+				references: [],
+			},
+		},
+	};
+}
+
+test( 'passes when the dev project carries the build project types', () => {
+	const result = runValidator(
+		createRepo( {
+			packages: {
+				blob: typedSplitPackage( [ 'node' ], [ 'jest', 'node' ] ),
+			},
+			build: [ 'packages/blob/tsconfig.build.json' ],
+			root: [ './tsconfig.build.json', 'packages/blob' ],
+		} )
+	);
+
+	expect( result.status ).toBe( 0 );
+} );
+
+test( 'fails when the dev project misses a build project type', () => {
+	const result = runValidator(
+		createRepo( {
+			packages: { blob: typedSplitPackage( [ 'node' ], [ 'jest' ] ) },
+			build: [ 'packages/blob/tsconfig.build.json' ],
+			root: [ './tsconfig.build.json', 'packages/blob' ],
+		} )
+	);
+
+	expect( result.status ).not.toBe( 0 );
+	expect( result.stderr ).toContain(
+		'Missing type "node" in packages/blob/tsconfig.json'
+	);
+} );
+
+test( 'fails when the build project carries a test type', () => {
+	const result = runValidator(
+		createRepo( {
+			packages: { blob: typedSplitPackage( [ 'jest' ], [ 'jest' ] ) },
+			build: [ 'packages/blob/tsconfig.build.json' ],
+			root: [ './tsconfig.build.json', 'packages/blob' ],
+		} )
+	);
+
+	expect( result.status ).not.toBe( 0 );
+	expect( result.stderr ).toContain(
+		'Test type "jest" in packages/blob/tsconfig.build.json'
+	);
+} );
