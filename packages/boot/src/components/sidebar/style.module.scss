@@ -1,6 +1,6 @@
 @use "@wordpress/base-styles/variables";
 
-:global(.boot-sidebar__scrollable) {
+.scrollable {
 	overflow: auto;
 	height: 100%;
 	position: relative;
@@ -8,20 +8,20 @@
 	flex-direction: column;
 }
 
-:global(.boot-sidebar__content) {
+.content {
 	flex-grow: 1;
 	contain: content;
 	position: relative;
 }
 
-:global(.boot-sidebar__footer) {
+.footer {
 	padding-block-start: variables.$grid-unit-20;
 	padding-inline-end: variables.$grid-unit-10;
 	padding-block-end: variables.$grid-unit-10;
 	padding-inline-start: variables.$grid-unit-20;
 }
 
-:global(.boot-sidebar__back-button) {
+.back-button {
 	margin-block-start: variables.$grid-unit-20;
 	margin-inline-end: variables.$grid-unit-15;
 	margin-block-end: variables.$grid-unit-10;
