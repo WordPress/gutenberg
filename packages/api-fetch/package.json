@@ -49,8 +49,7 @@
 		"@wordpress/url": "file:../url"
 	},
 	"devDependencies": {
-		"@types/jest": "^30.0.0",
-		"@types/node": "^20.19.39"
+		"@types/jest": "^30.0.0"
 	},
 	"publishConfig": {
 		"access": "public"
