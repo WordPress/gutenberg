@@ -529,6 +529,11 @@
 			"count": 3
 		}
 	},
+	"packages/boot/src/components/error-boundary/index.tsx": {
+		"@wordpress/no-non-module-stylesheet-imports": {
+			"count": 1
+		}
+	},
 	"packages/boot/src/components/navigation/drilldown-item/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
@@ -1190,11 +1195,6 @@
 	"packages/editor/src/components/document-outline/index.js": {
 		"react-hooks/refs": {
 			"count": 1
-		}
-	},
-	"packages/editor/src/components/error-boundary/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
 		}
 	},
 	"packages/editor/src/components/global-styles-sidebar/welcome-guide.js": {

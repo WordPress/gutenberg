@@ -2,9 +2,14 @@
 
 ## Unreleased
 
+### Internal
+
+-   Heading: Declare the heading level and paragraph keyboard shortcuts on the block's variations and transforms, rather than in a `BlockKeyboardShortcuts` component that every editor had to render. The `BlockKeyboardShortcuts` private export has been removed ([#81588](https://github.com/WordPress/gutenberg/pull/81588)).
+
 ### Bug Fixes
 
 -   Icon: Apply only padding to the inner SVG in the editor, so margin is no longer applied twice compared to the front end ([#81292](https://github.com/WordPress/gutenberg/pull/81292)).
+-   Playlist Track: Mark track media fields as content so toolbar inserters add an empty track instead of duplicating the selected track.
 -   Term Description: Apply the term description display filters when rendering with term context inside a Terms Query loop, so multi-paragraph descriptions keep their paragraphs and match the taxonomy archive rendering ([#81290](https://github.com/WordPress/gutenberg/pull/81290)).
 
 ## 10.4.0 (2026-08-12)
@@ -25,6 +30,7 @@
 ### Bug Fixes
 
 -   Footnotes: Treat unreadable `footnotes` post meta as no footnotes instead of throwing, so the block shows its placeholder rather than the block crash warning ([#81201](https://github.com/WordPress/gutenberg/pull/81201)).
+-   Playlist Track: Show the upload loading indicator inline with the track row.
 -   Playlist: Improve handling of declarative waveform player configuration ([#81342](https://github.com/WordPress/gutenberg/pull/81342)).
 -   Playlist: Update `@arraypress/waveform-player` to `^1.26.0`, disable automatic initialization, and prevent custom SVG icons from being configured through HTML data attributes.
 -   Cover: Pass `'full'` instead of `null` as the featured image size for parallax and repeated backgrounds, so a null array offset is no longer reached on PHP 8.5 ([#81444](https://github.com/WordPress/gutenberg/pull/81444)).

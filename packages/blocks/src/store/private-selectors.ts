@@ -4,7 +4,36 @@ import { getBlockType } from './selectors';
 import { getValueFromObjectPath } from './utils';
 import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '../api/constants';
 import type { BlockStoreState } from './types';
-import type { BlockAttribute, BlockBindingsSource, BlockType } from '../types';
+import type {
+	BlockAttribute,
+	BlockBindingsSource,
+	BlockShortcut,
+	BlockType,
+} from '../types';
+
+/**
+ * A keyboard shortcut declared by a block variation or transform, normalized
+ * into the block type it produces and the block types it applies to.
+ */
+export interface NormalizedBlockShortcut {
+	/**
+	 * The shortcut as declared by the block.
+	 */
+	shortcut: BlockShortcut;
+	/**
+	 * The block type the shortcut produces.
+	 */
+	targetBlockName: string;
+	/**
+	 * The block types the shortcut applies to. When undefined, the shortcut
+	 * applies to any block that can be transformed to `targetBlockName`.
+	 */
+	blockNames?: string[];
+	/**
+	 * The variation of `targetBlockName` the shortcut produces, if any.
+	 */
+	variationName?: string;
+}
 
 const ROOT_BLOCK_SUPPORTS: string[] = [
 	'background',
@@ -284,6 +313,78 @@ export const getBlockBindingsSourceFieldsList = createRegistrySelector(
 				blockContext: Record< string, unknown >
 			) => [ source.getFieldsList, source.usesContext, blockContext ]
 		)
+);
+
+/**
+ * Returns every keyboard shortcut declared by a registered block type, through
+ * either a block variation or a block transform.
+ *
+ * @param state Data state.
+ *
+ * @return The declared shortcuts, normalized for the block editor to apply.
+ */
+export const getBlockKeyboardShortcuts = createSelector(
+	( state: BlockStoreState ): NormalizedBlockShortcut[] => {
+		const shortcuts: NormalizedBlockShortcut[] = [];
+
+		for ( const blockName of Object.keys( state.blockTypes ) ) {
+			// A variation shortcut produces the variation of the block type it
+			// is declared on. It is not restricted to a source block type: any
+			// block with a transform to this block type can be its subject,
+			// which is what makes `access+2` on a paragraph produce a heading.
+			for ( const variation of state.blockVariations[ blockName ] ??
+				[] ) {
+				if ( ! variation.shortcut ) {
+					continue;
+				}
+				shortcuts.push( {
+					shortcut: variation.shortcut,
+					targetBlockName: blockName,
+					variationName: variation.name,
+				} );
+			}
+
+			const transforms = state.blockTypes[ blockName ]?.transforms;
+
+			for ( const transform of transforms?.to ?? [] ) {
+				// A `to` transform can list several targets, but a shortcut can
+				// only produce one. The first entry wins.
+				const targetBlockName = transform.blocks?.[ 0 ];
+				if (
+					! transform.shortcut ||
+					transform.type !== 'block' ||
+					! targetBlockName
+				) {
+					continue;
+				}
+				shortcuts.push( {
+					shortcut: transform.shortcut,
+					targetBlockName,
+					blockNames: [ blockName ],
+					variationName: transform.variationName,
+				} );
+			}
+
+			for ( const transform of transforms?.from ?? [] ) {
+				if (
+					! transform.shortcut ||
+					transform.type !== 'block' ||
+					! transform.blocks?.length
+				) {
+					continue;
+				}
+				shortcuts.push( {
+					shortcut: transform.shortcut,
+					targetBlockName: blockName,
+					blockNames: transform.blocks,
+					variationName: transform.variationName,
+				} );
+			}
+		}
+
+		return shortcuts;
+	},
+	( state: BlockStoreState ) => [ state.blockTypes, state.blockVariations ]
 );
 
 /**

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { useDispatch } from '@wordpress/data';
 import PlaylistTrackEdit from '../edit';
 import { PlaylistContext } from '../../playlist/context';
@@ -169,6 +169,7 @@ describe( 'PlaylistTrackEdit', () => {
 		renderEdit( {
 			attributes: {
 				blob: 'blob:https://example.com/temporary-track',
+				length: undefined,
 				src: undefined,
 			},
 		} );
@@ -178,6 +179,13 @@ describe( 'PlaylistTrackEdit', () => {
 				url: 'blob:https://example.com/temporary-track',
 			} )
 		);
+		const trackButton = screen.getByRole( 'button', {
+			name: /Song One/,
+		} );
+
+		expect(
+			within( trackButton ).getByRole( 'presentation', { hidden: true } )
+		).toBeInTheDocument();
 	} );
 
 	it( 'preserves the current track source when a replacement upload fails', () => {
