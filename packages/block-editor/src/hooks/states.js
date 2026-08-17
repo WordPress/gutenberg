@@ -10,10 +10,24 @@ import { unlock } from '../lock-unlock';
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
 export const PSEUDO_STATE_LABELS = {
-	':hover': __( 'Hover' ),
-	':focus': __( 'Focus' ),
-	':focus-visible': __( 'Focus-visible' ),
-	':active': __( 'Active' ),
+	':hover': {
+		label: __( 'Hover' ),
+		info: __( 'Applies when the pointer is over the element.' ),
+	},
+	':focus': {
+		label: __( 'Focus' ),
+		info: __( 'Applies when the element has focus.' ),
+	},
+	':focus-visible': {
+		label: __( 'Focus-visible' ),
+		info: __(
+			'Applies when the element has focus from keyboard navigation.'
+		),
+	},
+	':active': {
+		label: __( 'Active' ),
+		info: __( 'Applies while the element is pressed.' ),
+	},
 };
 
 export const RESPONSIVE_STATE_LABELS = {
@@ -51,7 +65,7 @@ function getPseudoStateOptions( name ) {
 		.filter( ( state ) => PSEUDO_STATE_LABELS[ state ] )
 		.map( ( state ) => ( {
 			value: state,
-			label: PSEUDO_STATE_LABELS[ state ],
+			label: PSEUDO_STATE_LABELS[ state ].label,
 		} ) );
 }
 
