@@ -52,9 +52,13 @@
 		// so each thread tracks the canvas scroll.
 		transform: translateY(var(--canvas-scroll, 0));
 		will-change: transform;
-		// Keep the reply input reachable when a thread is taller than the viewport
-		// (e.g. many replies on short content where the canvas can't scroll).
-		max-height: calc(100dvh - var(--wp-admin--admin-bar--height, 0px) - #{$header-height + $grid-unit-80});
+		// Keep the reply input reachable when a thread is taller than the board
+		// (e.g. an expanded long note, or many replies on short content where the
+		// canvas can't scroll). `useFloatingBoard` shifts a thread up so it fits;
+		// one taller than the board itself scrolls internally instead. The
+		// percentage resolves against the panel, so it stays exact whatever the
+		// admin bar, header and canvas add up to.
+		max-height: calc(100% - #{2 * $grid-unit-20});
 		overflow-y: auto;
 	}
 }

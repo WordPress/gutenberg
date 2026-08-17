@@ -569,6 +569,81 @@ describe( 'calculateNotePositions', () => {
 		expect( positions ).toEqual( { 1: 334, new: 234 } );
 		expect( positions[ 1 ] ).toBeGreaterThan( blockRects[ 1 ].top - 50 );
 	} );
+
+	describe( 'board clamping', () => {
+		it( 'leaves the anchor on its block when it fits within the board', () => {
+			const { positions } = calculateNotePositions( {
+				threads: [ { id: 1 } ],
+				selectedNoteId: 1,
+				blockRects: { 1: makeRect( 300 ) },
+				heights: { 1: 200 },
+				scrollTop: 0,
+				boardHeight: 600,
+			} );
+
+			// 300 + 200 = 500, inside 600 - 16, so no shift: 300 - 16 = 284.
+			expect( positions ).toEqual( { 1: 284 } );
+		} );
+
+		it( 'shifts an anchor that overflows the bottom of the board up', () => {
+			const { positions } = calculateNotePositions( {
+				threads: [ { id: 1 } ],
+				selectedNoteId: 1,
+				blockRects: { 1: makeRect( 300 ) },
+				heights: { 1: 400 },
+				scrollTop: 0,
+				boardHeight: 600,
+			} );
+
+			// Overflow is 300 + 400 - (600 - 16) = 116, so shift up by 116:
+			// 300 - 16 - 116 = 168. The thread's own 16px margin puts its top
+			// 184px down the board, so it ends at 584 — 16px clear of the bottom.
+			expect( positions ).toEqual( { 1: 168 } );
+		} );
+
+		it( 'stops shifting at the top of the board', () => {
+			const { positions } = calculateNotePositions( {
+				threads: [ { id: 1 } ],
+				selectedNoteId: 1,
+				blockRects: { 1: makeRect( 300 ) },
+				heights: { 1: 2000 },
+				scrollTop: 0,
+				boardHeight: 600,
+			} );
+
+			// A thread taller than the board can't fit; it lands 16px from the
+			// top (300 - 16 - 284 = 0, plus the thread's own 16px margin) and
+			// scrolls internally from there.
+			expect( positions ).toEqual( { 1: 0 } );
+		} );
+
+		it( 'offsets the threads after a shifted anchor from its new position', () => {
+			const { positions } = calculateNotePositions( {
+				threads: [ { id: 1 }, { id: 2 } ],
+				selectedNoteId: 1,
+				blockRects: { 1: makeRect( 300 ), 2: makeRect( 320 ) },
+				heights: { 1: 400, 2: 50 },
+				scrollTop: 0,
+				boardHeight: 600,
+			} );
+
+			// 1 (anchor, shifted up by 116): 168
+			// 2 (downward): (168 + 400) - 320 + 20 = 268 → 320 + 268 = 588
+			expect( positions ).toEqual( { 1: 168, 2: 588 } );
+		} );
+
+		it( 'does not clamp when the board height is unknown', () => {
+			const { positions } = calculateNotePositions( {
+				threads: [ { id: 1 } ],
+				selectedNoteId: 1,
+				blockRects: { 1: makeRect( 300 ) },
+				heights: { 1: 2000 },
+				scrollTop: 0,
+			} );
+
+			expect( positions ).toEqual( { 1: 284 } );
+		} );
+	} );
 } );
 
 describe( 'findNoteRange', () => {
