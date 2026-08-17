@@ -6,12 +6,12 @@ Each section links to the reference page that documents the API in full, so trea
 
 There are four extension points, and picking the right one is usually the whole decision:
 
--   **SlotFills** render your own React components inside places the Editor sets aside for them, such as the sidebar or the block settings menu.
--   **Editor and block filters** change the behavior of blocks and Editor internals that are already registered, without adding an interface of your own.
--   **Block variations** ship a preconfigured version of an existing block instead of a new block type.
--   **Custom blocks** are the right choice when the content itself is new, not just its presentation.
+-   [**SlotFills**](#extend-the-interface-with-slotfills) render your own React components inside places the Editor sets aside for them, such as the sidebar or the block settings menu. Reference: [SlotFills](/docs/reference-guides/slotfills/README.md).
+-   [**Editor and block filters**](#modify-blocks-with-filters) change the behavior of blocks and Editor internals that are already registered, without adding an interface of your own. Reference: [Block filters](/docs/reference-guides/filters/block-filters.md) and [Editor filters](/docs/reference-guides/filters/editor-filters.md).
+-   [**Block variations**](#register-a-block-variation) ship a preconfigured version of an existing block instead of a new block type. Reference: [Block variations](/docs/reference-guides/block-api/block-variations.md).
+-   **Custom blocks** are the right choice when the content itself is new, not just its presentation. Start with [Build your first block](/docs/getting-started/tutorial.md).
 
-Custom blocks are covered by [Build your first block](/docs/getting-started/tutorial.md); the other three are covered below.
+Custom blocks are covered by that tutorial; the other three are covered below.
 
 The examples below build up one small plugin, a subtitle field stored in post meta with a few pieces of interface around it. They are meant to be pasted into a single script file in that order; [Register the fills](#register-the-fills) at the end wires them together and is what makes any of them appear.
 
@@ -19,11 +19,11 @@ The examples below build up one small plugin, a subtitle field stored in post me
 
 The Editor exposes a set of slots. A plugin renders a fill into one of them, and the Editor places it in the right part of the interface. Nothing renders until the fills are mounted by a plugin registered with [`registerPlugin`](/packages/plugins/README.md), which is the last step of this section.
 
-The components below are exported from `@wordpress/editor`. `@wordpress/edit-post` still re-exports them, but those aliases have been deprecated since WordPress 6.6 and log a warning, so import from `@wordpress/editor`. For the full list of slots, see the [SlotFills reference](/docs/reference-guides/slotfills/README.md).
+Import the components below from `@wordpress/editor`; older tutorials import them from `@wordpress/edit-post`, which has been deprecated since WordPress 6.6. For the full list of slots, see the [SlotFills reference](/docs/reference-guides/slotfills/README.md).
 
 ### Add a sidebar
 
-`PluginSidebar` adds a panel alongside the block settings sidebar, together with an icon to open it.
+[`PluginSidebar`](/docs/reference-guides/slotfills/plugin-sidebar.md) adds a panel of your own to the sidebar region, in the same place the block settings sidebar opens, together with an icon in the header to switch to it.
 
 ```jsx
 import { PluginSidebar, store as editorStore } from '@wordpress/editor';
@@ -66,7 +66,7 @@ function SubtitleSidebar() {
 
 ### Add a panel to the Document sidebar
 
-`PluginDocumentSettingPanel` renders in the Post tab of the document sidebar, below the post's own summary of Status, Publish, Slug, and so on, and above Categories and Tags. Use it for a setting that belongs to the document, where a dedicated sidebar would be too much.
+[`PluginDocumentSettingPanel`](/docs/reference-guides/slotfills/plugin-document-setting-panel.md) renders in the Post tab of the document sidebar, below the post's own summary of Status, Publish, Slug, and so on, and above Categories and Tags. Use it for a setting that belongs to the document, where a dedicated sidebar would be too much.
 
 ```jsx
 import {
@@ -108,7 +108,7 @@ The `name` is required and must be unique within your plugin; it is what identif
 
 ### Add an item to the block settings menu
 
-`PluginBlockSettingsMenuItem` adds an entry to the menu behind the three-dot button on a block.
+[`PluginBlockSettingsMenuItem`](/docs/reference-guides/slotfills/plugin-block-settings-menu-item.md) adds an entry to the menu behind the three-dot button on a block.
 
 ```jsx
 import { PluginBlockSettingsMenuItem } from '@wordpress/editor';
@@ -155,7 +155,7 @@ Without `allowedBlocks` the item shows for every block. With it, and with severa
 
 ### Add a pre-publish check
 
-`PluginPrePublishPanel` renders in the panel that opens when a user first presses Publish, which makes it the place for a last check before the post goes live.
+[`PluginPrePublishPanel`](/docs/reference-guides/slotfills/plugin-pre-publish-panel.md) renders in the panel that opens when a user first presses Publish, which makes it the place for a last check before the post goes live.
 
 ```jsx
 import { PluginPrePublishPanel, store as editorStore } from '@wordpress/editor';
@@ -245,9 +245,9 @@ addFilter(
 );
 ```
 
-Unless it has a `source`, the attribute is stored in the block's comment delimiter rather than in its markup. That is safe for existing content: validation compares the output of the block's `save` function against the markup already in the post, and the delimiter is not part of that comparison.
+Unless it has a [`source`](/docs/reference-guides/block-api/block-attributes.md#value-source), the attribute is stored in the block's comment delimiter rather than in its markup. That is safe for existing content: [block validation](/docs/reference-guides/block-api/block-edit-save.md#validation) compares the output of the block's `save` function against the markup already in the post, and the delimiter is not part of that comparison.
 
-Getting the value into the saved markup is the separate step, and the one to be careful with. `blocks.getSaveContent.extraProps` changes what `save` produces, so posts written before your filter existed no longer match and are flagged as invalid. [Block filters](/docs/reference-guides/filters/block-filters.md) covers that filter and the deprecation strategies for it.
+Getting the value into the saved markup is the separate step, and the one to be careful with. [`blocks.getSaveContent.extraProps`](/docs/reference-guides/filters/block-filters.md#blocksgetsavecontentextraprops) changes what `save` produces, so posts written before your filter existed no longer match and are flagged as invalid. Handling that is what [block deprecations](/docs/reference-guides/block-api/block-deprecation.md) are for: each deprecation describes an older shape of the block so the Editor can migrate it instead of showing a recovery prompt.
 
 ### Wrap a block's edit component
 
@@ -299,7 +299,7 @@ For filters on the Editor itself rather than on blocks, see [Editor filters](/do
 
 ## Register a block variation
 
-A variation is an existing block with different starting attributes and inner blocks, listed in the inserter under its own name. Reach for one when the block you need already exists and only its defaults differ.
+A variation is an existing block with different starting attributes and inner blocks, listed in the inserter under its own name. Reach for one when the block you need already exists and only its defaults differ. [`registerBlockVariation`](/docs/reference-guides/block-api/block-variations.md) takes the block name and the variation.
 
 ```js
 import { registerBlockVariation } from '@wordpress/blocks';
@@ -320,7 +320,7 @@ registerBlockVariation( 'core/group', {
 
 ## Store data in post meta
 
-Meta fields are the usual place for data an extension collects about a post. The sidebar and the document panel above both write to one, so register each in PHP with `show_in_rest` so the Editor can read and write it:
+Post meta is the usual place for data an extension collects about a post, and the sidebar and the document panel above each write to a field of their own. The Editor reaches meta through the REST API, so a field is only visible to it once it is registered with `show_in_rest`:
 
 ```php
 function my_plugin_register_meta() {
@@ -342,16 +342,18 @@ function my_plugin_register_meta() {
 add_action( 'init', 'my_plugin_register_meta' );
 ```
 
-From JavaScript, read a field with `getEditedPostAttribute( 'meta' )` and write it with `editPost`, as in the two examples above. Both go through the `core/editor` store, so the value is part of the post's unsaved edits and is saved with the post rather than in a request of its own.
+Read a meta field with `getEditedPostAttribute( 'meta' )` and write it with `editPost`, as in the two examples above. Both go through the [`core/editor` store](/docs/reference-guides/data/data-core-editor.md), so the value becomes part of the post's unsaved edits instead of being saved in a request of its own.
 
 ## Guidelines
 
-Build the interface out of [`@wordpress/components`](/packages/components/README.md) so your extension inherits the Editor's styling, keyboard behavior, and accessibility work rather than reimplementing it. Wrap every string a user reads in `__()` from [`@wordpress/i18n`](/packages/i18n/README.md), and follow the [copy guidelines](/docs/contributors/documentation/copy-guide.md) when writing them.
+Compose the interface from [`@wordpress/components`](/packages/components/README.md), as every example above does. Those components already carry the Editor's styling, keyboard behavior, and accessibility work, so your extension inherits all three instead of reimplementing them and drifting from the rest of the Editor as it changes.
+
+Wrap every string a user reads in `__()` from [`@wordpress/i18n`](/packages/i18n/README.md) so it can be translated, and follow the [copy guidelines](/docs/contributors/documentation/copy-guide.md) when writing them.
 
 ## Related resources
 
 -   [SlotFills reference](/docs/reference-guides/slotfills/README.md)
 -   [Block filters](/docs/reference-guides/filters/block-filters.md) and [Editor filters](/docs/reference-guides/filters/editor-filters.md)
--   [Plugin sidebar tutorial](/docs/how-to-guides/plugin-sidebar-0.md), a worked example of the sidebar and meta field above
+-   [Plugin sidebar tutorial](/docs/how-to-guides/plugin-sidebar-0.md), a working example of the sidebar and meta field above
 -   [Block variations](/docs/reference-guides/block-api/block-variations.md)
 -   [Curating the Editor experience](/docs/how-to-guides/curating-the-editor-experience/README.md), for locking down the Editor rather than adding to it
