@@ -29,6 +29,7 @@
 		"**/benchmark",
 		"**/test/**",
 		"**/tests/**",
+		"**/__tests__/**",
 		"**/stories/**",
 		"**/*.story.*",
 		"src/font-library/lib/**/*"
