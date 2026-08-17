@@ -6,6 +6,31 @@ The atomic steps that build the feature. Read `ARCHITECTURE.md` first and
 Status: `todo` | `in-progress` (+ branch/owner) | `done`. Keep this table the
 single source of truth for progress.
 
+## Upstream in flight, 2026-08-17
+
+Three PRs opened on trunk after this round's re-homing, all touching ground
+this plan builds on. The next round reconciles them once merged:
+
+-   **WordPress/gutenberg#81740, the widget host links seam.** `WidgetHost` /
+    `WidgetHostProvider` / `useWidgetHost` land in `widget-primitives` with
+    the `links` capability (`match` + the router's `Link`), consumed by the
+    actions menu and the footer, provided by the dashboard route. This is the
+    seam step 17 planned to create: on landing, 17 shrinks to extending the
+    bag with `navigate` / `notify` for the operations of step 16, plus one
+    decision it must settle: `renderBlocks` (step 10) travels as a prop while
+    capabilities travel by context; unify the mechanism.
+-   **WordPress/gutenberg#81738, module-less widget resolution.**
+    `useWidgetTypes` resolves a record without a metadata module from its own
+    fields (`apiVersion` default, record metadata, wire actions, icon
+    stand-in). This is most of step 07's no-module branch: on landing, 07's
+    diff shrinks to the genuinely server-defined additions (`origin`,
+    `definition_id`, `content` and their runtime mapping).
+-   **WordPress/gutenberg#81729, the Site Health page.** The dashboard app's
+    second route, reached from the widget through a plain link action, page
+    titles replaced by breadcrumbs. Gives link fulfillments a real in-app
+    target for demos, and the breadcrumb back-link already navigates
+    client-side.
+
 ## Trunk re-homing, 2026-08-17
 
 Steps 00-10 sat 292 commits behind `trunk`. Same procedure as the previous
