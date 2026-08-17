@@ -496,6 +496,33 @@ test.describe( 'List View', () => {
 		).toBeFocused();
 	} );
 
+	test( 'should place focus on the first block when no block is selected', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { content: 'First' },
+		} );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+
+		// Clicking the title deselects the blocks.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.click();
+
+		// Open List View.
+		await pageUtils.pressKeys( 'access+o' );
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		await expect(
+			listView.getByRole( 'link', { name: 'First' } )
+		).toBeFocused();
+	} );
+
 	test( 'should duplicate block using keyboard', async ( {
 		editor,
 		pageUtils,
