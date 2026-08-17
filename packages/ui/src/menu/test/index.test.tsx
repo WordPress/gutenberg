@@ -1,6 +1,13 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createRef, useId } from '@wordpress/element';
+import { useFocusReturn } from '@wordpress/compose';
+import {
+	createRef,
+	useCallback,
+	useId,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 import * as Menu from '../index';
 
@@ -117,6 +124,139 @@ describe( 'Menu', () => {
 		} );
 		expect(
 			screen.getByRole( 'button', { name: 'Actions' } )
+		).toHaveFocus();
+	} );
+
+	it.each( [
+		{ location: 'root menu', nested: false },
+		{ location: 'submenu', nested: true },
+	] )(
+		'restores focus to the trigger after an overlay opened from the $location closes',
+		async ( { nested } ) => {
+			const user = userEvent.setup();
+
+			function FocusReturningOverlay( {
+				onClose,
+			}: {
+				onClose: () => void;
+			} ) {
+				const focusReturnRef = useFocusReturn();
+				const ref = useCallback(
+					( node: HTMLDivElement | null ) => {
+						focusReturnRef( node );
+						node?.focus();
+					},
+					[ focusReturnRef ]
+				);
+
+				return (
+					<div ref={ ref } role="dialog" tabIndex={ -1 }>
+						<button onClick={ onClose }>Close overlay</button>
+					</div>
+				);
+			}
+
+			function MenuWithOverlay() {
+				const [ isOverlayOpen, setIsOverlayOpen ] = useState( false );
+				const overlayItem = (
+					<Menu.Item onClick={ () => setIsOverlayOpen( true ) }>
+						Open overlay
+					</Menu.Item>
+				);
+
+				return (
+					<>
+						<Menu.Root>
+							<Menu.Trigger>Actions</Menu.Trigger>
+							<Menu.Popup>
+								{ nested ? (
+									<Menu.SubmenuRoot>
+										<Menu.SubmenuTrigger
+											openOnHover={ false }
+										>
+											More actions
+										</Menu.SubmenuTrigger>
+										<Menu.Popup>{ overlayItem }</Menu.Popup>
+									</Menu.SubmenuRoot>
+								) : (
+									overlayItem
+								) }
+							</Menu.Popup>
+						</Menu.Root>
+						{ isOverlayOpen && (
+							<FocusReturningOverlay
+								onClose={ () => setIsOverlayOpen( false ) }
+							/>
+						) }
+					</>
+				);
+			}
+
+			render( <MenuWithOverlay /> );
+
+			const trigger = screen.getByRole( 'button', { name: 'Actions' } );
+			await user.click( trigger );
+			if ( nested ) {
+				await user.click(
+					await screen.findByRole( 'menuitem', {
+						name: 'More actions',
+					} )
+				);
+			}
+			await user.click(
+				await screen.findByRole( 'menuitem', { name: 'Open overlay' } )
+			);
+
+			await waitFor( () => {
+				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+			} );
+			expect( screen.getByRole( 'dialog' ) ).toHaveFocus();
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Close overlay' } )
+			);
+
+			await waitFor( () => expect( trigger ).toHaveFocus() );
+		}
+	);
+
+	it( 'does not override focus moved by onOpenChange when an item closes', async () => {
+		const user = userEvent.setup();
+
+		function MenuWithExternalFocusDestination() {
+			const destinationRef = useRef< HTMLButtonElement >( null );
+
+			return (
+				<>
+					<Menu.Root
+						onOpenChange={ ( open, eventDetails ) => {
+							if (
+								! open &&
+								eventDetails.reason === 'item-press'
+							) {
+								destinationRef.current?.focus();
+							}
+						} }
+					>
+						<Menu.Trigger>Actions</Menu.Trigger>
+						<Menu.Popup>
+							<Menu.Item>Move focus</Menu.Item>
+						</Menu.Popup>
+					</Menu.Root>
+					<button ref={ destinationRef }>Focus destination</button>
+				</>
+			);
+		}
+
+		render( <MenuWithExternalFocusDestination /> );
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+		await user.click(
+			await screen.findByRole( 'menuitem', { name: 'Move focus' } )
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Focus destination' } )
 		).toHaveFocus();
 	} );
 
