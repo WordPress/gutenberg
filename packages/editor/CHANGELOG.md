@@ -5,7 +5,6 @@
 ### Bug Fixes
 
 -   Register the editor and block editor keyboard shortcuts from the editor provider, so shortcuts work for consumers that mount the editor without rendering `EditorKeyboardShortcutsRegister` themselves ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
--   Notes: Shift a floating thread up so it stays within the notes board, instead of leaving the bottom of a tall thread (an expanded long note, or one with many replies) clipped and unreachable ([#81730](https://github.com/WordPress/gutenberg/issues/81730)).
 
 ## 14.53.0 (2026-08-12)
 
