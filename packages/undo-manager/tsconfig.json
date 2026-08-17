@@ -4,5 +4,5 @@
 	"compilerOptions": {
 		"types": [ "node" ]
 	},
-	"references": [ { "path": "../is-shallow-equal" } ]
+	"references": [ { "path": "../is-shallow-equal/tsconfig.build.json" } ]
 }

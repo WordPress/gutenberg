@@ -549,3 +549,20 @@ test( 'passes when a build project keeps every dev-file pattern of the base', ()
 
 	expect( result.status ).toBe( 0 );
 } );
+
+test( 'fails when a package with TypeScript test files has no dev project', () => {
+	const repoRoot = createRepo( {
+		packages: { blob: { tsconfigs: { 'tsconfig.json': [] } } },
+		build: [ 'packages/blob' ],
+		root: [ './tsconfig.build.json' ],
+	} );
+	mkdirSync( join( repoRoot, 'packages/blob/test' ), { recursive: true } );
+	writeFileSync( join( repoRoot, 'packages/blob/test/index.ts' ), '' );
+
+	const result = runValidator( repoRoot );
+
+	expect( result.status ).not.toBe( 0 );
+	expect( result.stderr ).toContain(
+		'Missing dev project for the TypeScript test or story files of packages/blob'
+	);
+} );

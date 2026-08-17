@@ -9,6 +9,6 @@
 		{ "path": "./tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
-		{ "path": "../style-runtime" }
+		{ "path": "../style-runtime/tsconfig.build.json" }
 	]
 }

@@ -9,7 +9,7 @@
 		{ "path": "../deprecated/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../private-apis" },
-		{ "path": "../is-shallow-equal" },
+		{ "path": "../is-shallow-equal/tsconfig.build.json" },
 		{ "path": "../priority-queue/tsconfig.build.json" },
 		{ "path": "../redux-routine" }
 	]

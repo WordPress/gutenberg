@@ -8,7 +8,7 @@
 		{ "path": "../deprecated/tsconfig.build.json" },
 		{ "path": "../dom" },
 		{ "path": "../element/tsconfig.build.json" },
-		{ "path": "../is-shallow-equal" },
+		{ "path": "../is-shallow-equal/tsconfig.build.json" },
 		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../priority-queue/tsconfig.build.json" },
 		{ "path": "../private-apis" },

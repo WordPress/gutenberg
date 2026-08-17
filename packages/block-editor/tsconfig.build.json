@@ -25,7 +25,7 @@
 		{ "path": "../icons/tsconfig.build.json" },
 		{ "path": "../image-cropper/tsconfig.build.json" },
 		{ "path": "../interactivity/tsconfig.build.json" },
-		{ "path": "../is-shallow-equal" },
+		{ "path": "../is-shallow-equal/tsconfig.build.json" },
 		{ "path": "../kebab-case" },
 		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../keyboard-shortcuts" },
