@@ -389,6 +389,7 @@ function gutenberg_register_widget_types() {
 					'description'   => $definition['description'] ?? '',
 					'icon'          => gutenberg_sanitize_widget_icon( $definition['icon'] ?? null ),
 					'category'      => $definition['category'] ?? '',
+					'actions'       => gutenberg_sanitize_widget_actions( $definition['actions'] ?? null ),
 					'content'       => $definition['content'] ?? '',
 				)
 			);

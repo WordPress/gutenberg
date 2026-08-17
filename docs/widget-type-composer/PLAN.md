@@ -127,6 +127,7 @@ Open after the re-home:
        2 ──▶ 4 ─┤
        2 ──▶ 5  │
               3,4 ──▶ 6
+       3 ──▶ 22
 1,5 ──▶ 7 ──▶ 8 ──▶ 9 ─┬─▶ 11 ─▶ 13 ─┐
                        ├─▶ 12         │
               9,6 ──▶ 10              │
@@ -165,6 +166,7 @@ Parallelizable once their deps are on the feature branch: {3,4,5}, {11,12},
 | 19  | collection-block      | DataViews-as-block  | 18         | todo   |
 | 20  | style-control         | Style control       | 16         | todo   |
 | 21  | demos-and-docs        | Demos + docs        | 19, 17     | todo   |
+| 22  | def-actions           | Server framework    | 03         | done   |
 
 ## Step details
 
@@ -172,6 +174,21 @@ Oracle paths below are on `recovered/widget-type-composer`. `WP-PRIM` =
 `packages/widget-primitives/src`, `WP-DASH` = `packages/widget-dashboard/src`,
 `COMP` = `lib/experimental/widget-type-composer`, `DASH` =
 `lib/experimental/dashboard-widgets`, `ABR` = `WP-PRIM/components/admin-block-renderer`.
+
+### 22 · def-actions
+
+Actions on code-registered definitions: `gutenberg_register_widget_def()`
+accepts `actions`, and the resolver passes them through
+`gutenberg_sanitize_widget_actions()`, the same registration gate manifest
+actions go through. The composition demo declares an external link action,
+surfaced by the chrome in the full-bleed overlay menu.
+
+-   Files: `COMP/widget-definitions.php` (docblock), `DASH/widget-types.php`
+    (code-registered loop), `COMP/core-widget-defs.php` (demo action), tests.
+-   Accept: a def action survives the gate sanitized; a malformed href drops
+    with `_doing_it_wrong`; REST emits `actions` for code-registered records;
+    the demo widget shows the action in its overlay menu. (JS needs nothing:
+    step 07's server-defined branch already resolves record actions.)
 
 ### 00 · gate-scaffold
 
