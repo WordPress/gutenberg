@@ -139,10 +139,20 @@ function UnforwardedUnitControl(
 	) => {
 		const { data } = changeProps;
 
-		let nextValue = `${ parsedQuantity ?? '' }${ nextUnitValue }`;
+		let nextValue = getValidParsedQuantityAndUnit(
+			'',
+			units,
+			parsedQuantity ?? 0,
+			nextUnitValue
+		).join( '' );
 
 		if ( isResetValueOnUnitChange && data?.default !== undefined ) {
-			nextValue = `${ data.default }${ nextUnitValue }`;
+			nextValue = getValidParsedQuantityAndUnit(
+				data.default,
+				units,
+				parsedQuantity ?? 0,
+				nextUnitValue
+			).join( '' );
 		}
 
 		onChangeProp?.( nextValue, changeProps );

@@ -441,7 +441,7 @@ describe( 'BoxControl', () => {
 			} );
 		} );
 
-		it( 'should not pass invalid CSS unit only values to onChange', async () => {
+		it( 'should preserve CSS unit when passing to onChange', async () => {
 			const user = userEvent.setup();
 			const setState = jest.fn();
 
@@ -455,10 +455,10 @@ describe( 'BoxControl', () => {
 			);
 
 			expect( setState ).toHaveBeenCalledWith( {
-				top: undefined,
-				right: undefined,
-				bottom: undefined,
-				left: undefined,
+				top: '0rem',
+				right: '0rem',
+				bottom: '0rem',
+				left: '0rem',
 			} );
 		} );
 	} );
