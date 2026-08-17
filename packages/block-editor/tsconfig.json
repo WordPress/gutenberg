@@ -40,7 +40,10 @@
 		{ "path": "../warning" },
 		{ "path": "../wordcount/tsconfig.build.json" }
 	],
-	// These stories import components not yet in the typed allowlist.
+	/*
+	 * The package has no TypeScript tests, and its two stories import
+	 * components the build allowlist does not type yet, so nothing is checked.
+	 */
 	"exclude": [
 		"**/benchmark",
 		"src/components/block-icon/stories/index.story.ts",
