@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Mount the plugins registered with `registerPlugin`, so the sidebars, panels and menu items they fill render ([#81754](https://github.com/WordPress/gutenberg/pull/81754)).
 -   Canvas: Show the site's front end where a route names no entity and the theme has no block templates to resolve one from, instead of an editor with nothing open. Was previously handled by the home route alone, leaving `/identity` broken on a classic theme ([#81749](https://github.com/WordPress/gutenberg/pull/81749)).
 -   Canvas: Do not offer to edit a trashed entity from its preview ([#81632](https://github.com/WordPress/gutenberg/pull/81632)).
 -   Translate the click-to-edit label on a previewed canvas, and name the action rather than the gesture ([#81620](https://github.com/WordPress/gutenberg/pull/81620)).

@@ -22,6 +22,7 @@
 		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../lazy-editor" },
 		{ "path": "../notices/tsconfig.build.json" },
+		{ "path": "../plugins" },
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
 		{ "path": "../route" },
