@@ -102,12 +102,13 @@
 	.media-editor__sidebar {
 		@include reset;
 
-		// Left gutter so focus rings (outline + offset) and the zoom slider
-		// thumb at its minimum sit inside the sidebar. The complementary area
-		// uses overflow: auto and the skeleton sidebar overflow: hidden, so
-		// a 1px inset still clips the 2px focus outline on the left edge.
+		// Equal inline gutter so focus rings (outline + offset) and the zoom
+		// slider thumb at its minimum sit inside the sidebar without shifting
+		// the panel toward one edge. The complementary area uses overflow: auto
+		// and the skeleton sidebar overflow: hidden, so a 1px-only left inset
+		// still clips the 2px focus outline.
 		@include break-small() {
-			padding-left: $grid-unit-10;
+			padding-inline: $grid-unit-10;
 		}
 	}
 
