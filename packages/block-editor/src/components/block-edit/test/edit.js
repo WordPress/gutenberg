@@ -3,9 +3,12 @@ import {
 	registerBlockType,
 	unregisterBlockType,
 	getBlockTypes,
+	registerBlockBindingsSource,
+	unregisterBlockBindingsSource,
 } from '@wordpress/blocks';
 import Edit from '../edit';
 import { BlockContextProvider } from '../../block-context';
+import { PrivateBlockContext } from '../../block-list/private-block-context';
 
 const noop = () => {};
 
@@ -100,6 +103,105 @@ describe( 'Edit', () => {
 		);
 
 		expect( container ).toHaveTextContent( 'Ok' );
+	} );
+
+	describe( 'bound `url` attributes', () => {
+		const SOURCE_NAME = 'test/url-source';
+		let view;
+
+		function renderBoundBlock( value ) {
+			const edit = ( { attributes } ) => (
+				<div
+					data-testid="foo-bar"
+					data-url={ String( attributes.url ) }
+				/>
+			);
+
+			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
+				category: 'text',
+				title: 'block title',
+				attributes: { url: { type: 'string' } },
+				edit,
+				save: noop,
+			} );
+
+			registerBlockBindingsSource( {
+				name: SOURCE_NAME,
+				label: 'Test source',
+				getValues: () => ( { url: value } ),
+			} );
+
+			view = render(
+				<PrivateBlockContext.Provider
+					value={ { bindableAttributes: [ 'url' ] } }
+				>
+					<Edit
+						name="core/test-block"
+						clientId="test-client-id"
+						attributes={ {
+							url: 'https://wordpress.org',
+							metadata: {
+								bindings: { url: { source: SOURCE_NAME } },
+							},
+						} }
+					/>
+				</PrivateBlockContext.Provider>
+			);
+
+			return view;
+		}
+
+		afterEach( () => {
+			// Unmount before unregistering, so that the store update does not
+			// re-render a still mounted subscriber outside of `act`.
+			view?.unmount();
+			view = undefined;
+			unregisterBlockBindingsSource( SOURCE_NAME );
+		} );
+
+		// Sources return raw values (e.g. post meta registered as `integer` or
+		// `array`), which previously threw inside `isURLLike` and crashed the
+		// block. See https://github.com/WordPress/gutenberg/pull/67523.
+		it.each( [
+			[ 'an integer', 123 ],
+			[ 'a float', 1.5 ],
+			[ 'a boolean', true ],
+			[ 'an array', [ 'https://wordpress.org' ] ],
+			[ 'an object', { url: 'https://wordpress.org' } ],
+		] )( 'nulls the url when the source returns %s', ( _label, value ) => {
+			renderBoundBlock( value );
+
+			expect( screen.getByTestId( 'foo-bar' ) ).toHaveAttribute(
+				'data-url',
+				'null'
+			);
+		} );
+
+		// These already returned `null` via the falsy check preceding
+		// `isURLLike`, which is what masked the crash for non-string values.
+		it.each( [
+			[ 'zero', 0 ],
+			[ 'an empty string', '' ],
+			[ 'null', null ],
+			[ 'false', false ],
+		] )( 'nulls the url when the source returns %s', ( _label, value ) => {
+			renderBoundBlock( value );
+
+			expect( screen.getByTestId( 'foo-bar' ) ).toHaveAttribute(
+				'data-url',
+				'null'
+			);
+		} );
+
+		it( 'keeps the url when the source returns a URL-like string', () => {
+			renderBoundBlock( 'https://example.com/image.png' );
+
+			expect( screen.getByTestId( 'foo-bar' ) ).toHaveAttribute(
+				'data-url',
+				'https://example.com/image.png'
+			);
+		} );
 	} );
 
 	describe( 'light wrapper', () => {

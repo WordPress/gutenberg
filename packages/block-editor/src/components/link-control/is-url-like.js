@@ -43,6 +43,13 @@ export function isRelativePath( val ) {
  * @return {boolean} whether or not the value is potentially a URL.
  */
 export default function isURLLike( val ) {
+	// Values can arrive from arbitrary sources. Block Bindings, for example,
+	// passes raw post meta values here, which may be numbers, arrays or
+	// objects. Anything that isn't a string cannot be URL-like.
+	if ( typeof val !== 'string' ) {
+		return false;
+	}
+
 	const hasSpaces = val.includes( ' ' );
 
 	if ( hasSpaces ) {
