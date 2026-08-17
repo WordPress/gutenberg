@@ -23,12 +23,4 @@
 		{ "path": "../private-apis" },
 		{ "path": "../ui/tsconfig.build.json" }
 	]
-	"exclude": [
-		"**/benchmark",
-		"**/test/**",
-		"**/tests/**",
-		"**/__tests__/**",
-		"**/stories/**",
-		"**/*.story.*"
-	]
 }

@@ -19,13 +19,5 @@
 		{ "path": "../private-apis" },
 		{ "path": "../style-runtime" },
 		{ "path": "../theme/tsconfig.build.json" }
-	],
-	"exclude": [
-		"**/benchmark",
-		"**/test/**",
-		"**/tests/**",
-		"**/__tests__/**",
-		"**/stories/**",
-		"**/*.story.*"
 	]
 }

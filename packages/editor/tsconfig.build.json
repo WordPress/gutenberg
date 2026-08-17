@@ -48,13 +48,5 @@
 		{ "path": "../views/tsconfig.build.json" },
 		{ "path": "../warning" },
 		{ "path": "../wordcount/tsconfig.build.json" }
-	],
-	"exclude": [
-		"**/benchmark",
-		"**/test/**",
-		"**/tests/**",
-		"**/__tests__/**",
-		"**/stories/**",
-		"**/*.story.*"
 	]
 }

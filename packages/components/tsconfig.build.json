@@ -30,13 +30,5 @@
 		{ "path": "../style-runtime" },
 		{ "path": "../ui/tsconfig.build.json" },
 		{ "path": "../warning" }
-	],
-	"exclude": [
-		"**/benchmark",
-		"**/test/**",
-		"**/tests/**",
-		"**/__tests__/**",
-		"**/stories/**",
-		"**/*.story.*"
 	]
 }
