@@ -68,6 +68,13 @@ const config: StorybookConfig = {
 		import.meta.resolve( './addons/design-system-theme/preset.ts' ),
 	],
 	framework: getAbsolutePath( '@storybook/react-vite' ),
+	tags: {
+		'docs-only': {
+			// Keep stories available to attached MDX while hiding their
+			// standalone pages from the sidebar.
+			excludeFromSidebar: true,
+		},
+	},
 	features: {
 		componentsManifest: NODE_ENV !== 'development',
 		// Use experimental TypeScript LanguageService prop extractor for the
@@ -244,8 +251,10 @@ const config: StorybookConfig = {
 				},
 				rolldownOptions: {
 					checks: {
-						// Storybook's docgen transforms are expected to dominate the
-						// build. Keep them enabled without emitting timing warnings.
+						// Storybook's legacy `react-docgen` and
+						// `react-docgen-typescript` transforms are expected to
+						// dominate the build. Keep them enabled without emitting
+						// timing warnings.
 						pluginTimings: false,
 					},
 				},

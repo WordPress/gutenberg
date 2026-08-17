@@ -57,6 +57,7 @@ const meta: Meta< typeof LayoutCardSaveExample > = {
 	parameters: {
 		controls: { disable: true },
 	},
+	tags: [ 'docs-only' ],
 };
 
 export default meta;
