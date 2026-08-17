@@ -8,6 +8,22 @@ let mediaReplaceFlowProps;
 // The tracks the playlist holds. The inner blocks mock renders these, so a
 // test can look at what ended up in the tracklist.
 let mockTracks = [];
+// Blocks the playlist creates need distinct client IDs, because a single
+// Media Library selection can hold more than one track.
+let mockCreatedBlockCount;
+
+const mockLibraryTracks = [
+	{
+		id: 2,
+		url: 'https://example.com/second-track.mp3',
+		title: 'Second track',
+	},
+	{
+		id: 3,
+		url: 'https://example.com/third-track.mp3',
+		title: 'Third track',
+	},
+];
 
 vi.mock( '@wordpress/block-editor', () => ( {
 	store: {},
@@ -16,7 +32,11 @@ vi.mock( '@wordpress/block-editor', () => ( {
 	InspectorControls: ( { children } ) => <div>{ children }</div>,
 	MediaPlaceholder: ( props ) => {
 		mediaPlaceholderProps = props;
-		return <div />;
+		return (
+			<button onClick={ () => props.onSelect( mockLibraryTracks ) }>
+				Media Library
+			</button>
+		);
 	},
 	MediaReplaceFlow: ( props ) => {
 		mediaReplaceFlowProps = props;
@@ -56,12 +76,8 @@ vi.mock( '@wordpress/blocks', () => ( {
 	createBlock: vi.fn( ( name, attributes ) => ( {
 		name,
 		attributes,
-		clientId: 'new-track',
+		clientId: `new-track-${ ++mockCreatedBlockCount }`,
 	} ) ),
-} ) );
-
-vi.mock( '@wordpress/blob', () => ( {
-	createBlobURL: vi.fn( () => 'blob:track' ),
 } ) );
 
 vi.mock( '@wordpress/components', () => ( {
@@ -75,15 +91,6 @@ vi.mock( '@wordpress/components', () => ( {
 vi.mock( '@wordpress/data', () => ( {
 	useDispatch: vi.fn(),
 	useSelect: vi.fn(),
-} ) );
-
-vi.mock( '@wordpress/i18n', () => ( {
-	__: ( text ) => text,
-	_x: ( text ) => text,
-} ) );
-
-vi.mock( '@wordpress/icons', () => ( {
-	playlist: 'playlist',
 } ) );
 
 vi.mock( '@wordpress/notices', () => ( {
@@ -111,6 +118,18 @@ const defaultAttributes = {
 	showArtists: true,
 	showTrackLength: true,
 };
+
+function renderEdit( attributes = {} ) {
+	return render(
+		<PlaylistEdit
+			attributes={ { ...defaultAttributes, ...attributes } }
+			clientId="playlist-1"
+			insertBlocksAfter={ vi.fn() }
+			isSelected={ false }
+			setAttributes={ vi.fn() }
+		/>
+	);
+}
 
 describe( 'PlaylistEdit', () => {
 	let replaceInnerBlocks;
@@ -142,6 +161,7 @@ describe( 'PlaylistEdit', () => {
 	beforeEach( () => {
 		mediaPlaceholderProps = undefined;
 		mediaReplaceFlowProps = undefined;
+		mockCreatedBlockCount = 0;
 		replaceInnerBlocks = vi.fn();
 		insertBlocks = vi.fn();
 		selectBlock = vi.fn();
@@ -167,46 +187,32 @@ describe( 'PlaylistEdit', () => {
 	it( 'lets users select audio tracks individually from the Media Library', () => {
 		trackStore( [] );
 
-		render(
-			<PlaylistEdit
-				attributes={ defaultAttributes }
-				clientId="playlist-1"
-				insertBlocksAfter={ vi.fn() }
-				isSelected={ false }
-				setAttributes={ vi.fn() }
-			/>
-		);
+		renderEdit();
 
 		expect( mediaPlaceholderProps.multiple ).toBe( 'add' );
+
+		fireEvent.click(
+			screen.getByRole( 'button', { name: 'Media Library' } )
+		);
+
+		// Each selected file becomes its own track, rather than one track
+		// holding the first of them.
+		expect( trackClientIds() ).toEqual( [ 'new-track-1', 'new-track-2' ] );
+		expect(
+			screen
+				.getAllByTestId( 'playlist-track' )
+				.map( ( track ) => track.textContent )
+		).toEqual( [ 'Second track', 'Third track' ] );
 	} );
 
 	it( 'lets users select additional audio tracks individually from the Media Library', () => {
-		render(
-			<PlaylistEdit
-				attributes={ defaultAttributes }
-				clientId="playlist-1"
-				insertBlocksAfter={ vi.fn() }
-				isSelected={ false }
-				setAttributes={ vi.fn() }
-			/>
-		);
+		renderEdit();
 
 		expect( mediaReplaceFlowProps.multiple ).toBe( 'add' );
 	} );
 
 	it( 'keeps track blocks mounted when the tracklist is hidden', () => {
-		render(
-			<PlaylistEdit
-				attributes={ {
-					...defaultAttributes,
-					showTracklist: false,
-				} }
-				clientId="playlist-1"
-				insertBlocksAfter={ vi.fn() }
-				isSelected={ false }
-				setAttributes={ vi.fn() }
-			/>
-		);
+		renderEdit( { showTracklist: false } );
 
 		const tracklist = screen.getByRole( 'list' );
 
@@ -230,43 +236,23 @@ describe( 'PlaylistEdit', () => {
 			{ clientId: 'placeholder-track', attributes: {} },
 		] );
 
-		render(
-			<PlaylistEdit
-				attributes={ defaultAttributes }
-				clientId="playlist-1"
-				insertBlocksAfter={ vi.fn() }
-				isSelected={ false }
-				setAttributes={ vi.fn() }
-			/>
-		);
+		renderEdit();
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'Add track' } ) );
 
 		expect( trackClientIds() ).toEqual( [
 			'track-1',
 			'placeholder-track',
-			'new-track',
+			'new-track-1',
 		] );
 	} );
 
 	it( 'adds tracks from the add track control', () => {
-		render(
-			<PlaylistEdit
-				attributes={ defaultAttributes }
-				clientId="playlist-1"
-				insertBlocksAfter={ vi.fn() }
-				isSelected={ false }
-				setAttributes={ vi.fn() }
-			/>
-		);
+		renderEdit();
 
-		fireEvent.click(
-			screen.getByRole( 'button', {
-				name: 'Add track',
-			} )
-		);
+		fireEvent.click( screen.getByRole( 'button', { name: 'Add track' } ) );
 
-		expect( trackClientIds() ).toEqual( [ 'track-1', 'new-track' ] );
-		expect( selectBlock ).toHaveBeenCalledWith( 'new-track' );
+		expect( trackClientIds() ).toEqual( [ 'track-1', 'new-track-1' ] );
+		expect( selectBlock ).toHaveBeenCalledWith( 'new-track-1' );
 	} );
 } );
