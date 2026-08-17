@@ -67,6 +67,7 @@ describe( 'getGlobalStylesChanges and utils', () => {
 			dimensions: {
 				minHeight: '10px',
 			},
+			css: 'body { color: red; }',
 			blocks: {
 				'core/test-fiori-di-zucca': {
 					color: {
@@ -218,7 +219,7 @@ describe( 'getGlobalStylesChanges and utils', () => {
 		it( 'returns a list of changes', () => {
 			const result = getGlobalStylesChanges( next, previous );
 			expect( result ).toEqual( [
-				'Background, Colors, Typography, Border, Shadow, Outline, Filter, Dimensions styles.',
+				'Background, Colors, Typography, Border, Shadow, Outline, Filter, Dimensions, Custom CSS styles.',
 				'Test pumpkin flowers block.',
 				'H3, Caption, H6, Link elements.',
 				'Color, Typography settings.',
@@ -284,6 +285,7 @@ describe( 'getGlobalStylesChanges and utils', () => {
 				[ 'styles', 'Outline' ],
 				[ 'styles', 'Filter' ],
 				[ 'styles', 'Dimensions' ],
+				[ 'styles', 'Custom CSS' ],
 				[ 'blocks', 'Test pumpkin flowers' ],
 				[ 'elements', 'H3' ],
 				[ 'elements', 'Caption' ],
