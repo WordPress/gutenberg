@@ -54,6 +54,19 @@ describe( 'getGlobalStylesChanges and utils', () => {
 			color: {
 				text: 'var(--wp--preset--color--tomato)',
 			},
+			border: {
+				width: '2px',
+			},
+			shadow: 'var(--wp--preset--shadow--natural)',
+			outline: {
+				style: 'dotted',
+			},
+			filter: {
+				opacity: '40',
+			},
+			dimensions: {
+				minHeight: '10px',
+			},
 			blocks: {
 				'core/test-fiori-di-zucca': {
 					color: {
@@ -205,7 +218,7 @@ describe( 'getGlobalStylesChanges and utils', () => {
 		it( 'returns a list of changes', () => {
 			const result = getGlobalStylesChanges( next, previous );
 			expect( result ).toEqual( [
-				'Background, Colors, Typography styles.',
+				'Background, Colors, Typography, Border, Shadow, Outline, Filter, Dimensions styles.',
 				'Test pumpkin flowers block.',
 				'H3, Caption, H6, Link elements.',
 				'Color, Typography settings.',
@@ -217,8 +230,7 @@ describe( 'getGlobalStylesChanges and utils', () => {
 				maxResults: 4,
 			} );
 			expect( resultA ).toEqual( [
-				'Background, Colors, Typography styles.',
-				'Test pumpkin flowers block.',
+				'Background, Colors, Typography, Border styles.',
 			] );
 		} );
 
@@ -267,6 +279,11 @@ describe( 'getGlobalStylesChanges and utils', () => {
 				[ 'styles', 'Background' ],
 				[ 'styles', 'Colors' ],
 				[ 'styles', 'Typography' ],
+				[ 'styles', 'Border' ],
+				[ 'styles', 'Shadow' ],
+				[ 'styles', 'Outline' ],
+				[ 'styles', 'Filter' ],
+				[ 'styles', 'Dimensions' ],
 				[ 'blocks', 'Test pumpkin flowers' ],
 				[ 'elements', 'H3' ],
 				[ 'elements', 'Caption' ],

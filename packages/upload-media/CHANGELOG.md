@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.38.0 (2026-08-12)
+
 ### Enhancements
 
 -   The error shown when a HEIC file cannot be converted now explains the failure in terms of the browser and operating system in use, and points at the browsers that do decode HEIC there, since HEIC decoding depends on OS-provided codecs. Exposed as the new `getHeicUnsupportedMessage` and `getHeicConversionAdvice` exports ([#81123](https://github.com/WordPress/gutenberg/issues/81123)).
