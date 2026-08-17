@@ -17,6 +17,7 @@
 		"**/benchmark",
 		"**/test/**",
 		"**/tests/**",
+		"**/__tests__/**",
 		"**/stories/**",
 		"**/*.story.*"
 	]
