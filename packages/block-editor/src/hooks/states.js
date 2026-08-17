@@ -66,6 +66,7 @@ function getPseudoStateOptions( name ) {
 		.map( ( state ) => ( {
 			value: state,
 			label: PSEUDO_STATE_LABELS[ state ].label,
+			info: PSEUDO_STATE_LABELS[ state ].info,
 		} ) );
 }
 
