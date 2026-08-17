@@ -1,13 +1,5 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
-	"references": [ { "path": "../worker-threads/tsconfig.build.json" } ],
-	"exclude": [
-		"**/benchmark",
-		"**/test/**",
-		"**/tests/**",
-		"**/__tests__/**",
-		"**/stories/**",
-		"**/*.story.*"
-	]
+	"references": [ { "path": "../worker-threads/tsconfig.build.json" } ]
 }

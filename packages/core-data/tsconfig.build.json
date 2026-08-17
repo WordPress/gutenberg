@@ -27,13 +27,5 @@
 		{ "path": "../undo-manager" },
 		{ "path": "../url" },
 		{ "path": "../warning" }
-	],
-	"exclude": [
-		"**/benchmark",
-		"**/test/**",
-		"**/tests/**",
-		"**/__tests__/**",
-		"**/stories/**",
-		"**/*.story.*"
 	]
 }

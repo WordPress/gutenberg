@@ -12,13 +12,5 @@
 		{ "path": "../route" },
 		{ "path": "../style-runtime" },
 		{ "path": "../ui" }
-	],
-	"exclude": [
-		"**/benchmark",
-		"**/test/**",
-		"**/tests/**",
-		"**/__tests__/**",
-		"**/stories/**",
-		"**/*.story.*"
 	]
 }

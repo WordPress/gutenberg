@@ -3,13 +3,5 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"types": [ "node" ]
-	},
-	"exclude": [
-		"**/benchmark",
-		"**/test/**",
-		"**/tests/**",
-		"**/__tests__/**",
-		"**/stories/**",
-		"**/*.story.*"
-	]
+	}
 }

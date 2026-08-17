@@ -20,13 +20,5 @@
 		{ "path": "../ui" },
 		{ "path": "../viewport" },
 		{ "path": "../widget-primitives/tsconfig.build.json" }
-	],
-	"exclude": [
-		"**/benchmark",
-		"**/test/**",
-		"**/tests/**",
-		"**/__tests__/**",
-		"**/stories/**",
-		"**/*.story.*"
 	]
 }

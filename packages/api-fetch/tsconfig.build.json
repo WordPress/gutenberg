@@ -5,13 +5,5 @@
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../private-apis" },
 		{ "path": "../url" }
-	],
-	"exclude": [
-		"**/benchmark",
-		"**/test/**",
-		"**/tests/**",
-		"**/__tests__/**",
-		"**/stories/**",
-		"**/*.story.*"
 	]
 }

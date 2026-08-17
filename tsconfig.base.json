@@ -53,6 +53,10 @@
 		"**/benchmark",
 		"packages/*/build-*/**",
 		"packages/*/build/**",
-		"**/test/**"
+		"**/test/**",
+		"**/tests/**",
+		"**/__tests__/**",
+		"**/stories/**",
+		"**/*.story.*"
 	]
 }

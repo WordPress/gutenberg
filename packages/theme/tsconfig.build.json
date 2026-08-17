@@ -4,14 +4,6 @@
 	"compilerOptions": {
 		"types": [ "node", "style-imports", "react-css-custom-properties" ]
 	},
-	"exclude": [
-		"**/benchmark",
-		"**/test/**",
-		"**/tests/**",
-		"**/__tests__/**",
-		"**/stories/**",
-		"**/*.story.*"
-	],
 	"references": [
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../deprecated/tsconfig.build.json" },
