@@ -10,7 +10,8 @@ import type { ComponentProps } from 'react';
 
 /* Every async site health test core exposes over REST. The remaining core
    checks are direct (PHP-only) and have no endpoint; they appear only on
-   the classic Site Health screen. */
+   the classic Site Health screen. The site-health widget reads the same
+   set; keep `widgets/site-health/render.tsx` in sync. */
 const ASYNC_TEST_PATHS = [
 	'/wp-site-health/v1/tests/background-updates',
 	'/wp-site-health/v1/tests/loopback-requests',
@@ -216,8 +217,14 @@ function SiteHealthPage() {
 					</Badge>
 				),
 				sort: ( a, b, direction ) => {
+					/*
+					 * DataViews invokes a field comparator with the field
+					 * values, though its public type declares items:
+					 * `normalizeFields` wraps it over `getValue`.
+					 */
 					const delta =
-						STATUS_ORDER[ a.status ] - STATUS_ORDER[ b.status ];
+						STATUS_ORDER[ a as unknown as HealthCheckStatus ] -
+						STATUS_ORDER[ b as unknown as HealthCheckStatus ];
 					return direction === 'asc' ? delta : -delta;
 				},
 			},
