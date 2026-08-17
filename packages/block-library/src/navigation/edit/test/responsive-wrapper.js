@@ -1,7 +1,14 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useSelect } from '@wordpress/data';
+import { useViewportMatch } from '@wordpress/compose';
 import ResponsiveWrapper from '../responsive-wrapper';
+
+// jsdom has no layout, so the viewport match is stubbed.
+jest.mock( '@wordpress/compose', () => ( {
+	...jest.requireActual( '@wordpress/compose' ),
+	useViewportMatch: jest.fn(),
+} ) );
 
 // Mock block-editor to avoid private API issues
 jest.mock( '@wordpress/block-editor', () => ( {
@@ -163,6 +170,90 @@ describe( 'ResponsiveWrapper', () => {
 				postId: 'custom-theme//my-overlay',
 				postType: 'wp_template_part',
 			} );
+		} );
+	} );
+
+	describe( 'Closing the overlay on viewport changes', () => {
+		// Stands in for a resize of the editor canvas.
+		function resizeTo( { isAboveBreakpoint }, rerender, props = {} ) {
+			useViewportMatch.mockReturnValue( isAboveBreakpoint );
+			rerender(
+				<ResponsiveWrapper { ...defaultProps } isOpen { ...props } />
+			);
+		}
+
+		it( 'should close an open overlay when the viewport widens past the breakpoint', () => {
+			useViewportMatch.mockReturnValue( false );
+
+			const { rerender } = render(
+				<ResponsiveWrapper { ...defaultProps } isOpen />
+			);
+
+			expect( mockOnToggle ).not.toHaveBeenCalled();
+
+			resizeTo( { isAboveBreakpoint: true }, rerender );
+
+			expect( mockOnToggle ).toHaveBeenCalledWith( false );
+		} );
+
+		it( 'should close an open overlay that is already rendered above the breakpoint', () => {
+			useViewportMatch.mockReturnValue( true );
+
+			render( <ResponsiveWrapper { ...defaultProps } isOpen /> );
+
+			expect( mockOnToggle ).toHaveBeenCalledWith( false );
+		} );
+
+		it( 'should keep an open overlay below the breakpoint', () => {
+			useViewportMatch.mockReturnValue( false );
+
+			render( <ResponsiveWrapper { ...defaultProps } isOpen /> );
+
+			expect( mockOnToggle ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should not close an overlay that is set to show at every viewport size', () => {
+			useViewportMatch.mockReturnValue( false );
+
+			const { rerender } = render(
+				<ResponsiveWrapper
+					{ ...defaultProps }
+					isOpen
+					isHiddenByDefault
+				/>
+			);
+
+			resizeTo( { isAboveBreakpoint: true }, rerender, {
+				isHiddenByDefault: true,
+			} );
+
+			expect( mockOnToggle ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should not toggle a closed overlay when the viewport changes', () => {
+			useViewportMatch.mockReturnValue( false );
+
+			const { rerender } = render(
+				<ResponsiveWrapper { ...defaultProps } />
+			);
+
+			useViewportMatch.mockReturnValue( true );
+			rerender( <ResponsiveWrapper { ...defaultProps } /> );
+
+			expect( mockOnToggle ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should match the breakpoint against the window the navigation renders in', () => {
+			useViewportMatch.mockReturnValue( false );
+
+			render( <ResponsiveWrapper { ...defaultProps } isOpen /> );
+
+			// The canvas window is passed through, not the admin window.
+			expect( useViewportMatch ).toHaveBeenLastCalledWith(
+				'small',
+				'>=',
+				window
+			);
 		} );
 	} );
 } );

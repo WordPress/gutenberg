@@ -4,6 +4,8 @@ import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { getColorClassName } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
+import { useEffect, useState } from '@wordpress/element';
+import { useViewportMatch } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import OverlayMenuIcon from './overlay-menu-icon';
 import { createTemplatePartId } from '../../template-part/edit/utils/create-template-part-id';
@@ -26,6 +28,32 @@ export default function ResponsiveWrapper( {
 		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
 		[]
 	);
+
+	// In state so the viewport match re-runs once the container has mounted.
+	const [ container, setContainer ] = useState();
+
+	// Match against the canvas window, which the device preview resizes.
+	const rawCanvasView = container?.ownerDocument?.defaultView;
+	const canvasView = rawCanvasView === null ? undefined : rawCanvasView;
+
+	// `small` mirrors the `$break-small` breakpoint used by the overlay styles.
+	const isAboveOverlayBreakpoint = useViewportMatch(
+		'small',
+		'>=',
+		canvasView
+	);
+
+	// CSS decides when the overlay applies, but JS opens it. Resizing the canvas
+	// skips the toggle, so close it here. An "always" overlay ignores the
+	// viewport, so leave that one to the user.
+	const shouldCloseOverlay =
+		isOpen && ! isHiddenByDefault && isAboveOverlayBreakpoint;
+
+	useEffect( () => {
+		if ( shouldCloseOverlay ) {
+			onToggle( false );
+		}
+	}, [ shouldCloseOverlay, onToggle ] );
 
 	if ( ! isResponsive ) {
 		return children;
@@ -115,6 +143,7 @@ export default function ResponsiveWrapper( {
 			) }
 
 			<div
+				ref={ setContainer }
 				className={ responsiveContainerClasses }
 				style={ styles }
 				id={ modalId }
