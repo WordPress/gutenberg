@@ -109,9 +109,8 @@ interface BlockStyle {
  * A changed style variation is named rather than described: whatever was
  * changed inside it, it contributes one "{Label} variation" entry.
  *
- * Returns an empty string when nothing can be named. `getGlobalStylesChangelist`
- * only reports background, color, typography and spacing, so a block changed
- * only through, say, its border counts as customized but has nothing to show.
+ * Returns an empty string when nothing can be named: a block changed only
+ * through its custom CSS counts as customized but has nothing to show.
  *
  * @param user             The user's global styles config.
  * @param blockName        The block to summarize, e.g. `core/quote`.
@@ -247,9 +246,17 @@ function BlockMenuItem( { block, summary }: BlockMenuItemProps ) {
 	);
 }
 
-function EmptyBlockList( { styleFilter }: { styleFilter: StyleFilter } ) {
+function EmptyBlockList( {
+	filterValue,
+	styleFilter,
+}: {
+	filterValue: string;
+	styleFilter: StyleFilter;
+} ) {
+	// While searching, an empty list means the search matched nothing, whether
+	// or not the customized filter is also on.
 	const label =
-		'customized' === styleFilter
+		'customized' === styleFilter && ! filterValue
 			? __( "You haven't customized any blocks yet." )
 			: __( 'No blocks found.' );
 	return (
@@ -343,7 +350,10 @@ function BlockList( { filterValue, styleFilter }: BlockListProps ) {
 			role="list"
 		>
 			{ filteredBlockTypes.length === 0 ? (
-				<EmptyBlockList styleFilter={ styleFilter } />
+				<EmptyBlockList
+					filterValue={ filterValue }
+					styleFilter={ styleFilter }
+				/>
 			) : (
 				filteredBlockTypes.map( ( block ) => (
 					<BlockMenuItem

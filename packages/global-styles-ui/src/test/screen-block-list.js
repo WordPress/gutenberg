@@ -229,11 +229,20 @@ describe( 'getUserStylesSummary', () => {
 		).toBe( 'Colors' );
 	} );
 
-	it( 'returns an empty string when no category can be named', () => {
-		// Border is a real user change, but the changelist does not report it.
+	it( 'names a border change', () => {
 		const user = {
 			styles: {
 				blocks: { 'core/quote': { border: { width: '2px' } } },
+			},
+		};
+		expect( getUserStylesSummary( user, 'core/quote' ) ).toBe( 'Border' );
+	} );
+
+	it( 'returns an empty string when no category can be named', () => {
+		// Custom CSS is a real user change that the changelist does not report.
+		const user = {
+			styles: {
+				blocks: { 'core/quote': { css: 'color: red;' } },
 			},
 		};
 		expect( getUserStylesSummary( user, 'core/quote' ) ).toBe( '' );
