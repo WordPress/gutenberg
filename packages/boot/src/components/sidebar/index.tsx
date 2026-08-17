@@ -5,7 +5,7 @@ import { chevronLeft, chevronRight } from '@wordpress/icons';
 import Navigation from '../navigation';
 import SaveButton from '../save-button';
 import { store as bootStore } from '../../store';
-import './style.scss';
+import './style.module.scss';
 
 function DashboardBackButton() {
 	const dashboardLink = useSelect(

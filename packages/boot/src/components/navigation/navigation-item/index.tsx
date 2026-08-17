@@ -8,7 +8,7 @@ import {
 import RouterLinkItem from '../router-link-item';
 import { wrapIcon } from '../items';
 import type { IconType } from '../../../store/types';
-import './style.scss';
+import './style.module.scss';
 
 interface NavigationItemProps {
 	/**

@@ -7,7 +7,7 @@ import { check } from '@wordpress/icons';
 import { EntitiesSavedStates } from '@wordpress/editor';
 import { Button, Modal } from '@wordpress/components';
 import { Tooltip } from '@wordpress/ui';
-import './style.scss';
+import './style.module.scss';
 import useSaveShortcut from '../save-panel/use-save-shortcut';
 
 export default function SaveButton() {

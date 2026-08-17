@@ -23,7 +23,7 @@ import useRouteTitle from '../app/use-route-title';
 import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
 import useSyncBodyBackground from './use-sync-body-background';
-import './style.scss';
+import './style.module.scss';
 
 const { useLocation, useMatches, Outlet } = unlock( routePrivateApis );
 
