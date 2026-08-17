@@ -491,7 +491,7 @@ export default function PostFeaturedImageEdit( {
 	return (
 		<>
 			{ ! temporaryURL && controls }
-			{ !! media && ! isDescendentOfQueryLoop && (
+			{ !! media && (
 				<BlockControls group="other">
 					<MediaReplaceFlow
 						mediaId={ featuredImage }
@@ -501,6 +501,11 @@ export default function PostFeaturedImageEdit( {
 						onSelect={ onSelectImage }
 						onError={ onUploadError }
 						onReset={ onResetImage }
+						name={
+							! mediaUrl
+								? __( 'Add featured image' )
+								: __( 'Replace featured image' )
+						}
 					/>
 				</BlockControls>
 			) }
