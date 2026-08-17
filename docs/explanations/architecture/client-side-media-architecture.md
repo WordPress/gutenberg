@@ -122,7 +122,7 @@ When an upload completes, the attachment REST response carries a size-aware `ima
 }
 ```
 
-The client converts the 1–100 WordPress scale to the 0–1 scale the vips worker expects and applies the per-size value during sub-size resize and transcode. When the field is absent (an older server), the client falls back to the hardcoded default of `0.82`.
+The client converts the 1–100 WordPress scale to the 0–1 scale the vips worker expects and applies the per-size value as the **provisional** quality when queuing sub-sizes. Plugins can refine that value in the browser with `uploadMedia.planImageSize` (enqueue time) and `uploadMedia.encodeImage` (immediately before each vips resize or format conversion) — see the [editor filters reference](/docs/reference-guides/filters/editor-filters.md#javascript-filters). When the field is absent (an older server), the client falls back to the hardcoded default of `0.82`.
 
 ## Hook firing: client path vs server path
 

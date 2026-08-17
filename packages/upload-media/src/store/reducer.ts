@@ -5,6 +5,7 @@ import {
 	type CacheBlobUrlAction,
 	type CancelAction,
 	ItemStatus,
+	type MergeFinalizeDataAction,
 	type OperationFinishAction,
 	type OperationStartAction,
 	type PauseItemAction,
@@ -27,6 +28,7 @@ import {
 	DEFAULT_MAX_CONCURRENT_IMAGE_PROCESSING,
 	DEFAULT_RETRY_SETTINGS,
 } from './constants';
+import { mergeFinalizeDataRecords } from '../merge-finalize-data';
 
 const noop = () => {};
 
@@ -44,6 +46,7 @@ const DEFAULT_STATE: State = {
 
 type Action =
 	| AccumulateSubSizeAction
+	| MergeFinalizeDataAction
 	| AddAction
 	| RemoveAction
 	| CancelAction
@@ -285,6 +288,23 @@ function reducer(
 										...( item.subSizes || [] ),
 										action.subSize,
 									],
+							  }
+							: item
+				),
+			};
+
+		case Type.MergeFinalizeData:
+			return {
+				...state,
+				queue: state.queue.map(
+					( item ): QueueItem =>
+						item.id === action.id
+							? {
+									...item,
+									finalizeData: mergeFinalizeDataRecords(
+										item.finalizeData || {},
+										action.data
+									),
 							  }
 							: item
 				),

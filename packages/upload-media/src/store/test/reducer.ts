@@ -639,4 +639,88 @@ describe( 'reducer', () => {
 			expect( state.queue[ 0 ].progress ).toBe( 50 );
 		} );
 	} );
+
+	describe( `${ Type.MergeFinalizeData }`, () => {
+		it( 'deep-merges nested plain objects across successive merges', () => {
+			const initialState: State = {
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+						finalizeData: {
+							encode_quality: { thumbnail: 0.55 },
+						},
+					} as QueueItem,
+				],
+			};
+
+			const afterMedium = reducer( initialState, {
+				type: Type.MergeFinalizeData,
+				id: '1',
+				data: {
+					encode_quality: { medium: 0.7 },
+				},
+			} );
+
+			expect( afterMedium.queue[ 0 ].finalizeData ).toEqual( {
+				encode_quality: {
+					thumbnail: 0.55,
+					medium: 0.7,
+				},
+			} );
+
+			const afterReplace = reducer( afterMedium, {
+				type: Type.MergeFinalizeData,
+				id: '1',
+				data: {
+					encode_quality: { thumbnail: 0.4 },
+					flag: true,
+				},
+			} );
+
+			expect( afterReplace.queue[ 0 ].finalizeData ).toEqual( {
+				encode_quality: {
+					thumbnail: 0.4,
+					medium: 0.7,
+				},
+				flag: true,
+			} );
+		} );
+
+		it( 'replaces arrays instead of merging them', () => {
+			const initialState: State = {
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+						finalizeData: {
+							sizes: [ 'thumbnail' ],
+						},
+					} as QueueItem,
+				],
+			};
+
+			const state = reducer( initialState, {
+				type: Type.MergeFinalizeData,
+				id: '1',
+				data: {
+					sizes: [ 'medium' ],
+				},
+			} );
+
+			expect( state.queue[ 0 ].finalizeData ).toEqual( {
+				sizes: [ 'medium' ],
+			} );
+		} );
+	} );
 } );

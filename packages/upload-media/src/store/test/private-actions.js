@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createBlobURL, revokeBlobURL } from '@wordpress/blob';
+import { addFilter, removeAllFilters } from '@wordpress/hooks';
 import {
 	generateThumbnails,
 	getTranscodeImageOperation,
@@ -10,6 +11,8 @@ import {
 	detectUltraHdr,
 	removeItem,
 	uploadItem,
+	resizeCropItem,
+	transcodeImageItem,
 } from '../private-actions';
 import { OperationType, Type } from '../types';
 import { ErrorCode } from '../../upload-error';
@@ -17,12 +20,16 @@ import {
 	vipsHasTransparency,
 	vipsGetUltraHdrInfo,
 	vipsRotateImage,
+	vipsResizeImage,
+	vipsConvertImageFormat,
 	terminateVipsWorker,
 } from '../utils';
 import {
 	convertGifToVideo,
 	terminateVideoConversionWorker,
 } from '../utils/video-conversion';
+import { PLAN_IMAGE_SIZE_HOOK, ENCODE_IMAGE_HOOK } from '../../filters';
+import { ImageFile } from '../../image-file';
 
 // Mock @wordpress/blob
 jest.mock( '@wordpress/blob', () => ( {
@@ -38,6 +45,8 @@ jest.mock( '../utils', () => {
 		vipsHasTransparency: jest.fn(),
 		vipsGetUltraHdrInfo: jest.fn(),
 		vipsRotateImage: jest.fn(),
+		vipsResizeImage: jest.fn(),
+		vipsConvertImageFormat: jest.fn(),
 		terminateVipsWorker: jest.fn(),
 		maybeRecycleVipsWorker: jest.fn(),
 		isAnimatedGif: actual.isAnimatedGif,
@@ -334,8 +343,10 @@ describe( 'private actions', () => {
 			const finishOperation = jest.fn();
 			const select = {
 				getItem: () => ( {
+					id: 'test-id',
 					attachment: { id: 42 },
 					subSizes: mockSubSizes,
+					finalizeData: { encode_quality: { thumbnail: 0.55 } },
 				} ),
 				getSettings: () => ( { mediaFinalize } ),
 			};
@@ -344,7 +355,9 @@ describe( 'private actions', () => {
 			const thunk = finalizeItem( 'test-id' );
 			await thunk( { select, dispatch } );
 
-			expect( mediaFinalize ).toHaveBeenCalledWith( 42, mockSubSizes );
+			expect( mediaFinalize ).toHaveBeenCalledWith( 42, mockSubSizes, {
+				encode_quality: { thumbnail: 0.55 },
+			} );
 			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
 		} );
 
@@ -353,6 +366,7 @@ describe( 'private actions', () => {
 			const finishOperation = jest.fn();
 			const select = {
 				getItem: () => ( {
+					id: 'test-id',
 					attachment: { id: 42 },
 				} ),
 				getSettings: () => ( { mediaFinalize } ),
@@ -362,7 +376,7 @@ describe( 'private actions', () => {
 			const thunk = finalizeItem( 'test-id' );
 			await thunk( { select, dispatch } );
 
-			expect( mediaFinalize ).toHaveBeenCalledWith( 42, [] );
+			expect( mediaFinalize ).toHaveBeenCalledWith( 42, [], {} );
 			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
 		} );
 
@@ -432,7 +446,7 @@ describe( 'private actions', () => {
 			const thunk = finalizeItem( 'test-id' );
 			await thunk( { select, dispatch } );
 
-			expect( mediaFinalize ).toHaveBeenCalledWith( 42, mockSubSizes );
+			expect( mediaFinalize ).toHaveBeenCalledWith( 42, mockSubSizes, {} );
 			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {
 				attachment: updatedAttachment,
 			} );
@@ -468,7 +482,7 @@ describe( 'private actions', () => {
 			const thunk = finalizeItem( 'test-id' );
 			await thunk( { select, dispatch } );
 
-			expect( mediaFinalize ).toHaveBeenCalledWith( 42, mockSubSizes );
+			expect( mediaFinalize ).toHaveBeenCalledWith( 42, mockSubSizes, {} );
 			expect( warnSpy ).toHaveBeenCalledWith(
 				'Media finalization failed:',
 				restError
@@ -1562,6 +1576,243 @@ describe( 'private actions', () => {
 
 			expect( terminateVipsWorker ).not.toHaveBeenCalled();
 			expect( terminateVideoConversionWorker ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'client-side media plan and encode filters', () => {
+		const ALL_IMAGE_SIZES = {
+			thumbnail: { width: 150, height: 150, crop: true },
+			medium: { width: 300, height: 0, crop: false },
+		};
+
+		afterEach( () => {
+			removeAllFilters( PLAN_IMAGE_SIZE_HOOK );
+			removeAllFilters( ENCODE_IMAGE_HOOK );
+		} );
+
+		it( 'applies uploadMedia.planImageSize quality when enqueueing sub-sizes', async () => {
+			addFilter(
+				PLAN_IMAGE_SIZE_HOOK,
+				'test/plan-quality',
+				( plan ) => ( {
+					...plan,
+					quality: plan.sizeNames.includes( 'thumbnail' )
+						? 0.4
+						: plan.quality,
+				} )
+			);
+
+			const item = {
+				id: 'plan-parent',
+				file: new File( [ 'fake' ], 'photo.jpg', {
+					type: 'image/jpeg',
+				} ),
+				sourceFile: new File( [ 'fake' ], 'photo.jpg', {
+					type: 'image/jpeg',
+				} ),
+				attachment: {
+					id: 7,
+					filename: 'photo.jpg',
+					missing_image_sizes: [ 'thumbnail', 'medium' ],
+					exif_orientation: 1,
+				},
+			};
+			const addSideloadItem = jest.fn();
+			await generateThumbnails( item.id )( {
+				select: {
+					getItem: () => item,
+					getSettings: () => ( { allImageSizes: ALL_IMAGE_SIZES } ),
+				},
+				dispatch: {
+					addSideloadItem,
+					finishOperation: jest.fn(),
+				},
+			} );
+
+			const thumbnailCall = addSideloadItem.mock.calls.find(
+				( [ args ] ) => args.additionalData.image_size === 'thumbnail'
+			);
+			expect( thumbnailCall[ 0 ].operations[ 0 ][ 1 ].quality ).toBe(
+				0.4
+			);
+		} );
+
+		it( 'skips a sub-size when uploadMedia.planImageSize returns null', async () => {
+			addFilter( PLAN_IMAGE_SIZE_HOOK, 'test/skip-thumb', ( plan ) =>
+				plan.sizeNames.includes( 'thumbnail' ) ? null : plan
+			);
+
+			const item = {
+				id: 'skip-parent',
+				file: new File( [ 'fake' ], 'photo.jpg', {
+					type: 'image/jpeg',
+				} ),
+				sourceFile: new File( [ 'fake' ], 'photo.jpg', {
+					type: 'image/jpeg',
+				} ),
+				attachment: {
+					id: 8,
+					filename: 'photo.jpg',
+					missing_image_sizes: [ 'thumbnail', 'medium' ],
+					exif_orientation: 1,
+				},
+			};
+			const addSideloadItem = jest.fn();
+			await generateThumbnails( item.id )( {
+				select: {
+					getItem: () => item,
+					getSettings: () => ( { allImageSizes: ALL_IMAGE_SIZES } ),
+				},
+				dispatch: {
+					addSideloadItem,
+					finishOperation: jest.fn(),
+				},
+			} );
+
+			const sizes = addSideloadItem.mock.calls.map(
+				( [ args ] ) => args.additionalData.image_size
+			);
+			expect( sizes ).toEqual( [ 'medium' ] );
+		} );
+
+		it( 'enqueues separate sideloads when planImageSize returns an array', async () => {
+			const sizes = {
+				medium_large: { width: 768, height: 0, crop: false },
+				large: { width: 768, height: 0, crop: false },
+			};
+
+			addFilter( PLAN_IMAGE_SIZE_HOOK, 'test/split-group', ( plan ) => {
+				if ( plan.sizeNames.length < 2 ) {
+					return plan;
+				}
+				return plan.sizeNames.map( ( name ) => ( {
+					...plan,
+					sizeNames: [ name ],
+					quality: name === 'large' ? 0.9 : 0.4,
+				} ) );
+			} );
+
+			const item = {
+				id: 'split-parent',
+				file: new File( [ 'fake' ], 'photo.jpg', {
+					type: 'image/jpeg',
+				} ),
+				sourceFile: new File( [ 'fake' ], 'photo.jpg', {
+					type: 'image/jpeg',
+				} ),
+				attachment: {
+					id: 9,
+					filename: 'photo.jpg',
+					missing_image_sizes: [ 'medium_large', 'large' ],
+					exif_orientation: 1,
+				},
+			};
+			const addSideloadItem = jest.fn();
+			await generateThumbnails( item.id )( {
+				select: {
+					getItem: () => item,
+					getSettings: () => ( { allImageSizes: sizes } ),
+				},
+				dispatch: {
+					addSideloadItem,
+					finishOperation: jest.fn(),
+				},
+			} );
+
+			expect( addSideloadItem ).toHaveBeenCalledTimes( 2 );
+			expect(
+				addSideloadItem.mock.calls.map( ( [ args ] ) => ( {
+					image_size: args.additionalData.image_size,
+					quality: args.operations[ 0 ][ 1 ].quality,
+				} ) )
+			).toEqual( [
+				{ image_size: 'medium_large', quality: 0.4 },
+				{ image_size: 'large', quality: 0.9 },
+			] );
+		} );
+
+		it( 'applies uploadMedia.encodeImage before resizing', async () => {
+			addFilter(
+				ENCODE_IMAGE_HOOK,
+				'test/encode-resize',
+				( encode ) => ( { ...encode, quality: 0.33 } )
+			);
+
+			const file = new File( [ 'fake' ], 'thumb.jpg', {
+				type: 'image/jpeg',
+			} );
+			const resized = new ImageFile( file, 150, 150, 800, 600 );
+			vipsResizeImage.mockResolvedValue( resized );
+
+			const finishOperation = jest.fn();
+			const dispatch = Object.assign( jest.fn(), { finishOperation } );
+			await resizeCropItem( 'resize-1', {
+				resize: { width: 150, height: 150, crop: true },
+				quality: 0.82,
+			} )( {
+				select: {
+					getItem: () => ( {
+						id: 'resize-1',
+						file,
+						parentId: 'parent',
+						additionalData: { image_size: 'thumbnail' },
+						abortController: new AbortController(),
+					} ),
+					getSettings: () => ( {} ),
+				},
+				dispatch,
+			} );
+
+			expect( vipsResizeImage ).toHaveBeenCalledWith(
+				'resize-1',
+				file,
+				{ width: 150, height: 150, crop: true },
+				expect.objectContaining( { quality: 0.33 } )
+			);
+			expect( finishOperation ).toHaveBeenCalled();
+		} );
+
+		it( 'applies uploadMedia.encodeImage before transcoding', async () => {
+			addFilter(
+				ENCODE_IMAGE_HOOK,
+				'test/encode-transcode',
+				( encode ) => ( { ...encode, quality: 0.25 } )
+			);
+
+			const file = new File( [ 'fake' ], 'photo.jpg', {
+				type: 'image/jpeg',
+			} );
+			const converted = new File( [ 'webp' ], 'photo.webp', {
+				type: 'image/webp',
+			} );
+			vipsConvertImageFormat.mockResolvedValue( converted );
+
+			const finishOperation = jest.fn();
+			const dispatch = Object.assign( jest.fn(), { finishOperation } );
+			await transcodeImageItem( 'transcode-1', {
+				outputFormat: 'webp',
+				outputQuality: 0.82,
+				interlaced: false,
+			} )( {
+				select: {
+					getItem: () => ( {
+						id: 'transcode-1',
+						file,
+						additionalData: { image_size: 'medium' },
+						abortController: new AbortController(),
+					} ),
+					getSettings: () => ( {} ),
+				},
+				dispatch,
+			} );
+
+			expect( vipsConvertImageFormat ).toHaveBeenCalledWith(
+				'transcode-1',
+				file,
+				'image/webp',
+				expect.objectContaining( { quality: 0.25 } )
+			);
+			expect( finishOperation ).toHaveBeenCalled();
 		} );
 	} );
 } );

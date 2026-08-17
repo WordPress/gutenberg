@@ -51,6 +51,34 @@ describe( 'mediaFinalize', () => {
 		} );
 	} );
 
+	it( 'should include client_extended_data when non-empty', async () => {
+		apiFetch.mockResolvedValue( mockRestAttachment );
+
+		const clientData = { encode_quality: { thumbnail: 0.55 } };
+		await mediaFinalize( 123, [], clientData );
+
+		expect( apiFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/media/123/finalize',
+			method: 'POST',
+			data: {
+				sub_sizes: [],
+				client_extended_data: clientData,
+			},
+		} );
+	} );
+
+	it( 'should omit client_extended_data when empty', async () => {
+		apiFetch.mockResolvedValue( mockRestAttachment );
+
+		await mediaFinalize( 123, [], {} );
+
+		expect( apiFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/media/123/finalize',
+			method: 'POST',
+			data: { sub_sizes: [] },
+		} );
+	} );
+
 	it( 'should return the transformed attachment with the scaled URL so the block can pick up srcset', async () => {
 		apiFetch.mockResolvedValue( mockRestAttachment );
 

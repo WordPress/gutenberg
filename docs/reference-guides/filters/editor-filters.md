@@ -288,9 +288,151 @@ Client-side processing reads the following existing WordPress filters from the s
 -   **`image_editor_output_format`** — Maps input MIME types to output MIME types for automatic format conversion (e.g., JPEG → WebP). Applied during client-side transcoding.
 -   **`image_save_progressive`** — Controls progressive (JPEG) or interlaced (PNG, GIF) encoding. Applied during client-side compression and format conversion.
 -   **`wp_image_maybe_exif_rotate`** — Controls EXIF-based image rotation. When client-side processing is active, server-side rotation is disabled and the client handles it instead.
--   **`wp_editor_set_quality`** (and **`jpeg_quality`** for JPEG output) — Encode quality (1–100). The server resolves these filters per registered size and reports the result in the upload response's size-aware `image_quality` field, which the client applies during sub-size resize and transcode. There is no separate JavaScript quality filter.
+-   **`wp_editor_set_quality`** (and **`jpeg_quality`** for JPEG output) — Encode quality (1–100). The server resolves these filters per registered size and reports the result in the upload response's size-aware `image_quality` field, which the client applies as the provisional quality during sub-size resize and transcode. Plugins can further adjust quality in the browser via the JavaScript filters `uploadMedia.planImageSize` and `uploadMedia.encodeImage` (see below).
 -   **`image_strip_meta`** — Controls whether metadata is stripped from generated images. Exported on the REST index; when `false`, the client keeps all metadata (EXIF, XMP, IPTC) instead of stripping everything but color profiles (and HDR gain maps).
 -   **`image_max_bit_depth`** — Caps the bit depth of generated images (relevant for high-bit-depth AVIF/HDR sources). Exported on the REST index and honored by the client encoder, snapped to the depths the AVIF encoder supports (8, 10, or 12 bits).
+
+### JavaScript filters
+
+Client-side sub-size generation exposes two async filters on `@wordpress/hooks`. Keep planning callbacks fast; put detailed analysis and trial encodes in the encode filter (it already runs inside the image-processing concurrency limit).
+
+#### `uploadMedia.planImageSize`
+
+Runs while thumbnails are being queued. Receive size name(s), MIME types, and the provisional quality from `image_quality`, and return:
+
+- a modified plan object,
+- an **array of plans** to enqueue separate encodes (for example same dimensions but different quality per size name),
+- or `null` (or `[]`) to skip that size group.
+
+By default, sizes that share width/height/crop are grouped into one plan so one physical file is registered under multiple names. Returning an array opts out of that sharing for the sizes you list.
+
+```js
+import { addFilter } from '@wordpress/hooks';
+import { PLAN_IMAGE_SIZE_HOOK } from '@wordpress/upload-media';
+
+addFilter(
+	PLAN_IMAGE_SIZE_HOOK,
+	'my-plugin/provisional-quality',
+	( plan ) => {
+		if (
+			plan.sizeNames.includes( 'thumbnail' ) &&
+			plan.sourceMimeType === 'image/jpeg'
+		) {
+			return { ...plan, quality: 0.6 };
+		}
+		return plan;
+	}
+);
+
+// Split a dimension group into per-size encodes with different quality:
+addFilter(
+	PLAN_IMAGE_SIZE_HOOK,
+	'my-plugin/split-same-dimensions',
+	( plan ) => {
+		if ( plan.sizeNames.length < 2 ) {
+			return plan;
+		}
+		return plan.sizeNames.map( ( name ) => ( {
+			...plan,
+			sizeNames: [ name ],
+			quality: name === 'large' ? 0.9 : 0.5,
+		} ) );
+	}
+);
+```
+
+#### `uploadMedia.encodeImage`
+
+Runs immediately before a vips resize or format conversion. Use this for pixel-level analysis. The second argument is a context object with `resizeImage` / `convertImageFormat` helpers that match the production path, plus `provisionalQuality` (the quality stamped at plan/enqueue time, unchanged even if earlier encode filters mutate `encode.quality`) and `mergeFinalizeData` (shallow-merges into the parent item's finalize payload).
+
+When format conversion is configured, prefer refining quality on the `'transcode'` operation — that is the final encode. Resize-only uploads (including UltraHDR) use `'resize'`.
+
+```js
+import { addFilter } from '@wordpress/hooks';
+import { ENCODE_IMAGE_HOOK } from '@wordpress/upload-media';
+
+addFilter(
+	ENCODE_IMAGE_HOOK,
+	'my-plugin/adaptive-quality',
+	async ( encode, context ) => {
+		const quality = Math.min( encode.quality, 0.7 );
+		context.mergeFinalizeData( {
+			encode_quality: {
+				...( encode.sizeNames?.[ 0 ]
+					? { [ encode.sizeNames[ 0 ] ]: quality }
+					: {} ),
+			},
+		} );
+		return { ...encode, quality };
+	}
+);
+```
+
+#### `uploadMedia.finalizeData`
+
+Runs just before `POST /wp/v2/media/{id}/finalize`. Receives the accumulated `finalizeData` bag (from `mergeFinalizeData` / the encode context helper) and may extend it. The result is sent as `client_extended_data`.
+
+```js
+import { addFilter } from '@wordpress/hooks';
+import { dispatch } from '@wordpress/data';
+import {
+	FINALIZE_DATA_HOOK,
+	store as uploadStore,
+} from '@wordpress/upload-media';
+
+// During encode (or anytime before finalize):
+dispatch( uploadStore ).mergeFinalizeData( parentItemId, {
+	encode_quality: { thumbnail: 0.55 },
+} );
+
+addFilter(
+	FINALIZE_DATA_HOOK,
+	'my-plugin/finalize',
+	( data, { attachmentId } ) => ( {
+		...data,
+		attachmentId,
+	} )
+);
+```
+
+On the server, `client_extended_data` is structurally sanitized and then **allowlisted**. Only keys registered via `wp_client_side_media_finalize_data_schema` survive; unregistered keys are dropped. Nothing is written automatically — persist from PHP after registering a schema:
+
+```php
+add_filter(
+	'wp_client_side_media_finalize_data_schema',
+	function ( $schema ) {
+		$schema['encode_quality'] = array(
+			'sanitize_callback' => static function ( $value ) {
+				if ( ! is_array( $value ) ) {
+					return array();
+				}
+				$out = array();
+				foreach ( $value as $size => $quality ) {
+					if ( ! is_string( $size ) || ! is_numeric( $quality ) ) {
+						continue;
+					}
+					$out[ sanitize_key( $size ) ] = min( 1, max( 0, (float) $quality ) );
+				}
+				return $out;
+			},
+		);
+		return $schema;
+	}
+);
+
+add_action(
+	'rest_after_client_side_media_finalize',
+	function ( $attachment_id, $client_extended_data ) {
+		if ( isset( $client_extended_data['encode_quality'] ) ) {
+			update_post_meta( $attachment_id, 'encode_quality', $client_extended_data['encode_quality'] );
+		}
+	},
+	10,
+	2
+);
+```
+
+On the JavaScript side, a throwing or invalid filter callback falls back to the provisional values so uploads are not blocked. On the PHP side, a throwing or `WP_Error`-returning `sanitize_callback` skips that key; finalize still succeeds.
 
 > **Note:** Three server-side hooks never fire when client-side processing is active, because no server-side `WP_Image_Editor` is involved: `wp_image_editors`, `image_make_intermediate_size`, and `image_memory_limit`. See [Server-side plugin compatibility](/docs/how-to-guides/client-side-media.md#server-side-plugin-compatibility) in the how-to guide for replacement signals.
 

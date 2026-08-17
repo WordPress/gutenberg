@@ -1910,6 +1910,203 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
+	 * Unregistered client_extended_data keys are discarded during sanitize.
+	 *
+	 * @covers ::finalize_item
+	 * @covers ::sanitize_client_extended_data
+	 */
+	public function test_finalize_strips_unregistered_client_extended_data() {
+		wp_set_current_user( self::$admin_id );
+		$attachment_id = $this->create_attachment_for_sideload( 'client-data.jpg' );
+
+		$seen = null;
+		$action = function ( $id, $client_extended_data ) use ( &$seen ) {
+			$seen = $client_extended_data;
+		};
+		add_action( 'rest_after_client_side_media_finalize', $action, 10, 2 );
+
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/finalize" );
+		$request->set_param(
+			'client_extended_data',
+			array(
+				'encode_quality' => array( 'thumbnail' => 0.55 ),
+				'script'         => '<script>alert(1)</script>',
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_action( 'rest_after_client_side_media_finalize', $action, 10 );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( array(), $seen, 'Without a schema registration, client_extended_data must be empty.' );
+	}
+
+	/**
+	 * Registered client_extended_data keys are kept after sanitize_callback.
+	 *
+	 * @covers ::finalize_item
+	 * @covers ::sanitize_client_extended_data
+	 */
+	public function test_finalize_keeps_registered_client_extended_data() {
+		wp_set_current_user( self::$admin_id );
+		$attachment_id = $this->create_attachment_for_sideload( 'client-data-ok.jpg' );
+
+		$schema_filter = static function ( $schema ) {
+			$schema['encode_quality'] = array(
+				'sanitize_callback' => static function ( $value ) {
+					if ( ! is_array( $value ) ) {
+						return array();
+					}
+					$out = array();
+					foreach ( $value as $size => $quality ) {
+						if ( ! is_string( $size ) || ! is_numeric( $quality ) ) {
+							continue;
+						}
+						$out[ sanitize_key( $size ) ] = min( 1, max( 0, (float) $quality ) );
+					}
+					return $out;
+				},
+			);
+			return $schema;
+		};
+		add_filter( 'wp_client_side_media_finalize_data_schema', $schema_filter );
+
+		$seen = null;
+		$action = function ( $id, $client_extended_data ) use ( &$seen ) {
+			$seen = $client_extended_data;
+		};
+		add_action( 'rest_after_client_side_media_finalize', $action, 10, 2 );
+
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/finalize" );
+		$request->set_param(
+			'client_extended_data',
+			array(
+				'encode_quality' => array(
+					'thumbnail' => 0.55,
+					'ignored'   => 'nope',
+				),
+				'other'          => 'drop-me',
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'wp_client_side_media_finalize_data_schema', $schema_filter );
+		remove_action( 'rest_after_client_side_media_finalize', $action, 10 );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame(
+			array(
+				'encode_quality' => array(
+					'thumbnail' => 0.55,
+				),
+			),
+			$seen
+		);
+	}
+
+	/**
+	 * A throwing sanitize_callback skips the key without failing finalize.
+	 *
+	 * @covers ::finalize_item
+	 * @covers ::sanitize_client_extended_data
+	 */
+	public function test_finalize_skips_key_when_sanitize_callback_throws() {
+		wp_set_current_user( self::$admin_id );
+		$attachment_id = $this->create_attachment_for_sideload( 'client-data-throw.jpg' );
+
+		$schema_filter = static function ( $schema ) {
+			$schema['encode_quality'] = array(
+				'sanitize_callback' => static function () {
+					throw new Exception( 'bad plugin' );
+				},
+			);
+			$schema['safe'] = array(
+				'sanitize_callback' => static function ( $value ) {
+					return sanitize_text_field( (string) $value );
+				},
+			);
+			return $schema;
+		};
+		add_filter( 'wp_client_side_media_finalize_data_schema', $schema_filter );
+
+		$seen = null;
+		$action = function ( $id, $client_extended_data ) use ( &$seen ) {
+			$seen = $client_extended_data;
+		};
+		add_action( 'rest_after_client_side_media_finalize', $action, 10, 2 );
+
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/finalize" );
+		$request->set_param(
+			'client_extended_data',
+			array(
+				'encode_quality' => array( 'thumbnail' => 0.55 ),
+				'safe'           => 'ok',
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'wp_client_side_media_finalize_data_schema', $schema_filter );
+		remove_action( 'rest_after_client_side_media_finalize', $action, 10 );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( array( 'safe' => 'ok' ), $seen );
+	}
+
+	/**
+	 * Keys injected by wp_client_side_media_finalize_data after allowlisting are dropped.
+	 *
+	 * @covers ::finalize_item
+	 */
+	public function test_finalize_drops_keys_injected_after_allowlist() {
+		wp_set_current_user( self::$admin_id );
+		$attachment_id = $this->create_attachment_for_sideload( 'client-data-inject.jpg' );
+
+		$schema_filter = static function ( $schema ) {
+			$schema['encode_quality'] = array(
+				'sanitize_callback' => static function ( $value ) {
+					return is_array( $value ) ? $value : array();
+				},
+			);
+			return $schema;
+		};
+		add_filter( 'wp_client_side_media_finalize_data_schema', $schema_filter );
+
+		$data_filter = static function ( $data ) {
+			$data['injected'] = 'nope';
+			return $data;
+		};
+		add_filter( 'wp_client_side_media_finalize_data', $data_filter );
+
+		$seen = null;
+		$action = function ( $id, $client_extended_data ) use ( &$seen ) {
+			$seen = $client_extended_data;
+		};
+		add_action( 'rest_after_client_side_media_finalize', $action, 10, 2 );
+
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/finalize" );
+		$request->set_param(
+			'client_extended_data',
+			array(
+				'encode_quality' => array( 'thumbnail' => 0.55 ),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'wp_client_side_media_finalize_data_schema', $schema_filter );
+		remove_filter( 'wp_client_side_media_finalize_data', $data_filter );
+		remove_action( 'rest_after_client_side_media_finalize', $action, 10 );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame(
+			array(
+				'encode_quality' => array( 'thumbnail' => 0.55 ),
+			),
+			$seen
+		);
+		$this->assertArrayNotHasKey( 'injected', $seen );
+	}
+
+	/**
 	 * Verifies that finalize preserves existing image_meta when adding sub-sizes.
 	 *
 	 * @covers ::finalize_item

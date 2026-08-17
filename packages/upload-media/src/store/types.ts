@@ -57,6 +57,11 @@ export interface QueueItem {
 	abortController?: AbortController;
 	parentId?: QueueItemId;
 	subSizes?: SubSizeData[];
+	/**
+	 * Extra data merged into the finalize request's `client_extended_data` payload.
+	 * Use `mergeFinalizeData` / `uploadMedia.finalizeData` to populate.
+	 */
+	finalizeData?: Record< string, unknown >;
 }
 
 export interface State {
@@ -85,6 +90,7 @@ export enum Type {
 	RevokeBlobUrls = 'REVOKE_BLOB_URLS',
 	UpdateProgress = 'UPDATE_PROGRESS',
 	AccumulateSubSize = 'ACCUMULATE_SUB_SIZE',
+	MergeFinalizeData = 'MERGE_FINALIZE_DATA',
 	UpdateSettings = 'UPDATE_SETTINGS',
 }
 
@@ -149,6 +155,10 @@ export type UpdateProgressAction = Action<
 export type AccumulateSubSizeAction = Action<
 	Type.AccumulateSubSize,
 	{ id: QueueItemId; subSize: SubSizeData }
+>;
+export type MergeFinalizeDataAction = Action<
+	Type.MergeFinalizeData,
+	{ id: QueueItemId; data: Record< string, unknown > }
 >;
 export type UpdateSettingsAction = Action<
 	Type.UpdateSettings,
@@ -233,7 +243,8 @@ export interface Settings {
 	// up the post-finalize URL (the scaled file), which is required for `srcset`.
 	mediaFinalize?: (
 		id: number,
-		subSizes: SubSizeData[]
+		subSizes: SubSizeData[],
+		clientData?: Record< string, unknown >
 	) => Promise< Partial< Attachment > | void >;
 	// Whether to convert animated GIFs to video (MP4/WebM) during upload.
 	// When enabled, animated GIFs are transcoded to video for smaller file sizes.

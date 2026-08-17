@@ -5,6 +5,7 @@ type WPDataRegistry = ReturnType< typeof createRegistry >;
 import type {
 	AdditionalData,
 	CancelAction,
+	MergeFinalizeDataAction,
 	OnBatchSuccessHandler,
 	OnChangeHandler,
 	OnErrorHandler,
@@ -133,6 +134,31 @@ export function addItems( {
 				additionalData,
 			} );
 		}
+	};
+}
+
+/**
+ * Merges data into a queue item's `finalizeData` bag.
+ *
+ * Plain objects are merged recursively so successive calls for the same
+ * top-level key (for example `encode_quality` per size) accumulate. Arrays
+ * and other values replace the previous entry. Contents are sent as
+ * `client_extended_data` on the finalize request. For sub-size encodes, pass
+ * the parent item ID (`item.parentId`) so data lands on the attachment that
+ * will be finalized.
+ *
+ * @param id   Queue item ID (typically the parent upload item).
+ * @param data Data to merge into the finalize payload.
+ * @return Action object.
+ */
+export function mergeFinalizeData(
+	id: QueueItemId,
+	data: Record< string, unknown >
+): MergeFinalizeDataAction {
+	return {
+		type: Type.MergeFinalizeData,
+		id,
+		data,
 	};
 }
 

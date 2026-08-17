@@ -37,6 +37,12 @@ import {
 	isUnsupportedConversionError,
 	terminateVideoConversionWorker,
 } from './utils/video-conversion';
+import {
+	applyEncodeImageFilter,
+	applyFinalizeDataFilter,
+	applyPlanImageSizeFilter,
+	sizeNamesFromImageSize,
+} from '../filters';
 import type {
 	AccumulateSubSizeAction,
 	AddAction,
@@ -68,7 +74,7 @@ import type {
 	UpdateSettingsAction,
 } from './types';
 import { ItemStatus, OperationType, Type } from './types';
-import type { cancelItem, executeRetry } from './actions';
+import type { cancelItem, executeRetry, mergeFinalizeData } from './actions';
 import { clearRetryTimer } from './utils/retry';
 
 const DEFAULT_OUTPUT_QUALITY = 0.82;
@@ -85,6 +91,7 @@ const ultraHdrItems = new Set< QueueItemId >();
 type ActionCreators = {
 	cancelItem: typeof cancelItem;
 	executeRetry: typeof executeRetry;
+	mergeFinalizeData: typeof mergeFinalizeData;
 	addItem: typeof addItem;
 	addSideloadItem: typeof addSideloadItem;
 	removeItem: typeof removeItem;
@@ -1139,17 +1146,51 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 		// and `image_max_bit_depth` filters, carried in the editor settings.
 		const { imageStripMeta, imageMaxBitDepth } = select.getSettings();
 
+		const sizeNames = sizeNamesFromImageSize(
+			( item.additionalData as SideloadAdditionalData | undefined )
+				?.image_size
+		);
+
+		const finalizeTargetId = item.parentId ?? item.id;
+
 		try {
+			const provisionalQuality = args.quality ?? DEFAULT_OUTPUT_QUALITY;
+
+			// Allow plugins to refine quality / swap the source after
+			// inspecting pixels. Runs inside the image-processing slot.
+			const encoded = await applyEncodeImageFilter(
+				{
+					file: item.file,
+					quality: provisionalQuality,
+					operation: 'resize',
+					resize: args.resize,
+					sizeNames,
+					isThresholdResize: scaledSuffix,
+				},
+				{
+					itemId: item.id,
+					signal: item.abortController?.signal,
+					stripMeta: imageStripMeta,
+					maxBitdepth: imageMaxBitDepth,
+					provisionalQuality,
+					mergeFinalizeData: ( data ) => {
+						dispatch.mergeFinalizeData( finalizeTargetId, data );
+					},
+					resizeImage: vipsResizeImage,
+					convertImageFormat: vipsConvertImageFormat,
+				}
+			);
+
 			const file = await vipsResizeImage(
 				item.id,
-				item.file,
-				args.resize,
+				encoded.file,
+				encoded.resize ?? args.resize,
 				{
 					smartCrop: false,
 					addSuffix,
 					signal: item.abortController?.signal,
 					scaledSuffix,
-					quality: args.quality,
+					quality: encoded.quality,
 					stripMeta: imageStripMeta,
 					maxBitdepth: imageMaxBitDepth,
 				}
@@ -1314,14 +1355,47 @@ export function transcodeImageItem(
 		// and `image_max_bit_depth` filters, carried in the editor settings.
 		const { imageStripMeta, imageMaxBitDepth } = select.getSettings();
 
+		const sizeNames = sizeNamesFromImageSize(
+			( item.additionalData as SideloadAdditionalData | undefined )
+				?.image_size
+		);
+
+		const finalizeTargetId = item.parentId ?? item.id;
+
 		try {
+			// Final encode when format conversion is configured — prefer
+			// detailed analysis here over the preceding resize step.
+			const encoded = await applyEncodeImageFilter(
+				{
+					file: item.file,
+					quality,
+					operation: 'transcode',
+					outputMimeType,
+					interlaced,
+					sizeNames,
+				},
+				{
+					itemId: item.id,
+					signal: item.abortController?.signal,
+					stripMeta: imageStripMeta,
+					maxBitdepth: imageMaxBitDepth,
+					provisionalQuality: quality,
+					mergeFinalizeData: ( data ) => {
+						dispatch.mergeFinalizeData( finalizeTargetId, data );
+					},
+					resizeImage: vipsResizeImage,
+					convertImageFormat: vipsConvertImageFormat,
+				}
+			);
+
 			const file = await vipsConvertImageFormat(
 				item.id,
-				item.file,
-				outputMimeType,
+				encoded.file,
+				( encoded.outputMimeType ??
+					outputMimeType ) as typeof outputMimeType,
 				{
-					quality,
-					interlaced,
+					quality: encoded.quality,
+					interlaced: encoded.interlaced ?? interlaced,
 					stripMeta: imageStripMeta,
 					maxBitdepth: imageMaxBitDepth,
 				}
@@ -1771,49 +1845,84 @@ export function generateThumbnails( id: QueueItemId ) {
 				// every name in the group.
 				const sizeQuality = qualityForSize( names[ 0 ] );
 
-				// Build operations list for this thumbnail. The resize step
-				// is UltraHDR-aware and will preserve the gain map automatically.
-				const thumbnailOperations: Operation[] = [
-					[
-						OperationType.ResizeCrop,
-						{ resize: imageSize, quality: sizeQuality },
-					],
-				];
+				// Provisional plan from size name / MIME metadata. Keep this
+				// filter fast — detailed analysis belongs in encodeImage.
+				const plannedResult = await applyPlanImageSizeFilter( {
+					sizeNames: names,
+					resize: imageSize,
+					quality: sizeQuality,
+					sourceMimeType: thumbnailSource.type,
+					outputMimeType:
+						! isUltraHdr &&
+						thumbnailTranscodeOperation &&
+						outputMimeType
+							? outputMimeType
+							: undefined,
+					file,
+				} );
 
-				// Add transcoding if format conversion is configured and
-				// the transparency check passed. For UltraHDR sources the
-				// transcode is skipped so the gain map survives the resize.
-				// Otherwise override the template's quality with this size's
-				// resolved value.
-				if ( ! isUltraHdr && thumbnailTranscodeOperation ) {
-					thumbnailOperations.push( [
-						thumbnailTranscodeOperation[ 0 ],
-						{
-							...thumbnailTranscodeOperation[ 1 ],
-							outputQuality: sizeQuality,
-						},
-					] );
+				if ( ! plannedResult ) {
+					continue;
 				}
 
-				thumbnailOperations.push( OperationType.Upload );
+				const plans = Array.isArray( plannedResult )
+					? plannedResult
+					: [ plannedResult ];
 
-				// Pass all size names so the server registers the same
-				// file under every matching size name in metadata.
-				const imageSizeParam = names.length === 1 ? names[ 0 ] : names;
+				for ( const planned of plans ) {
+					// Build operations list for this thumbnail. The resize step
+					// is UltraHDR-aware and will preserve the gain map automatically.
+					const thumbnailOperations: Operation[] = [
+						[
+							OperationType.ResizeCrop,
+							{
+								resize: planned.resize,
+								quality: planned.quality,
+							},
+						],
+					];
 
-				dispatch.addSideloadItem( {
-					file,
-					batchId,
-					parentId: item.id,
-					additionalData: {
-						// Sideloading does not use the parent post ID but the
-						// attachment ID as the image sizes need to be added to it.
-						post: attachment.id,
-						image_size: imageSizeParam,
-						convert_format: false,
-					},
-					operations: thumbnailOperations,
-				} );
+					// Add transcoding if format conversion is configured and
+					// the transparency check passed. For UltraHDR sources the
+					// transcode is skipped so the gain map survives the resize.
+					// Otherwise override the template's quality with this size's
+					// resolved value.
+					if ( ! isUltraHdr && thumbnailTranscodeOperation ) {
+						thumbnailOperations.push( [
+							thumbnailTranscodeOperation[ 0 ],
+							{
+								...thumbnailTranscodeOperation[ 1 ],
+								outputQuality: planned.quality,
+							},
+						] );
+					}
+
+					thumbnailOperations.push( OperationType.Upload );
+
+					// Pass all size names so the server registers the same
+					// file under every matching size name in metadata.
+					const plannedNames = planned.sizeNames?.length
+						? planned.sizeNames
+						: names;
+					const imageSizeParam =
+						plannedNames.length === 1
+							? plannedNames[ 0 ]
+							: plannedNames;
+
+					dispatch.addSideloadItem( {
+						file: planned.file,
+						batchId,
+						parentId: item.id,
+						additionalData: {
+							// Sideloading does not use the parent post ID but the
+							// attachment ID as the image sizes need to be added to it.
+							post: attachment.id,
+							image_size: imageSizeParam,
+							convert_format: false,
+						},
+						operations: thumbnailOperations,
+					} );
+				}
 			}
 
 			// Create and sideload the scaled version if it exceeds the threshold.
@@ -1835,42 +1944,85 @@ export function generateThumbnails( id: QueueItemId ) {
 							? renameFile( thumbnailSource, attachment.filename )
 							: thumbnailSource;
 
-						// Add scaling to queue. The resize step is UltraHDR-aware
-						// and will preserve the gain map automatically.
-						const scaledOperations: Operation[] = [
-							[
-								OperationType.ResizeCrop,
-								{
-									resize: {
-										width: bigImageSizeThreshold,
-										height: bigImageSizeThreshold,
-									},
-									isThresholdResize: true,
-									quality: defaultQuality,
+						const plannedScaledResult =
+							await applyPlanImageSizeFilter( {
+								sizeNames: [ 'scaled' ],
+								resize: {
+									width: bigImageSizeThreshold,
+									height: bigImageSizeThreshold,
 								},
-							],
-						];
+								quality: defaultQuality,
+								sourceMimeType: thumbnailSource.type,
+								outputMimeType:
+									! isUltraHdr &&
+									thumbnailTranscodeOperation &&
+									outputMimeType
+										? outputMimeType
+										: undefined,
+								isThresholdResize: true,
+								file: sourceForScaled,
+							} );
 
-						if ( ! isUltraHdr && thumbnailTranscodeOperation ) {
-							// Add transcoding if format conversion is configured.
-							scaledOperations.push(
-								thumbnailTranscodeOperation
-							);
+						if ( plannedScaledResult ) {
+							const scaledPlans = Array.isArray(
+								plannedScaledResult
+							)
+								? plannedScaledResult
+								: [ plannedScaledResult ];
+
+							for ( const plannedScaled of scaledPlans ) {
+								// Add scaling to queue. The resize step is UltraHDR-aware
+								// and will preserve the gain map automatically.
+								const scaledOperations: Operation[] = [
+									[
+										OperationType.ResizeCrop,
+										{
+											resize: plannedScaled.resize,
+											isThresholdResize: true,
+											quality: plannedScaled.quality,
+										},
+									],
+								];
+
+								if (
+									! isUltraHdr &&
+									thumbnailTranscodeOperation
+								) {
+									// Add transcoding if format conversion is configured.
+									scaledOperations.push( [
+										thumbnailTranscodeOperation[ 0 ],
+										{
+											...thumbnailTranscodeOperation[ 1 ],
+											outputQuality:
+												plannedScaled.quality,
+										},
+									] );
+								}
+
+								scaledOperations.push( OperationType.Upload );
+
+								const plannedScaledNames =
+									plannedScaled.sizeNames?.length
+										? plannedScaled.sizeNames
+										: [ 'scaled' ];
+								const scaledImageSizeParam =
+									plannedScaledNames.length === 1
+										? plannedScaledNames[ 0 ]
+										: plannedScaledNames;
+
+								dispatch.addSideloadItem( {
+									file: plannedScaled.file,
+									batchId,
+									parentId: item.id,
+									additionalData: {
+										post: attachment.id,
+										image_size: scaledImageSizeParam,
+										convert_format: false,
+									},
+									operations: scaledOperations,
+								} );
+							}
 						}
-
-						scaledOperations.push( OperationType.Upload );
-
-						dispatch.addSideloadItem( {
-							file: sourceForScaled,
-							batchId,
-							parentId: item.id,
-							additionalData: {
-								post: attachment.id,
-								image_size: 'scaled',
-								convert_format: false,
-							},
-							operations: scaledOperations,
-						} );
 					}
 				}
 			}
@@ -1903,6 +2055,16 @@ export function finalizeItem( id: QueueItemId ) {
 		// Only finalize if we have an attachment ID and a mediaFinalize callback.
 		if ( attachment?.id && mediaFinalize ) {
 			try {
+				const subSizes = item.subSizes || [];
+				const clientData = await applyFinalizeDataFilter(
+					{ ...( item.finalizeData || {} ) },
+					{
+						itemId: item.id,
+						attachmentId: attachment.id,
+						subSizes,
+					}
+				);
+
 				// Pass the post-finalize attachment through so the reducer
 				// merges the updated URL (now pointing at the `-scaled` file)
 				// into item.attachment. The next processItem pass fires
@@ -1911,7 +2073,8 @@ export function finalizeItem( id: QueueItemId ) {
 				// match a known size and emit srcset on the front end.
 				const updatedAttachment = await mediaFinalize(
 					attachment.id,
-					item.subSizes || []
+					subSizes,
+					clientData
 				);
 				if ( updatedAttachment ) {
 					updates.attachment = updatedAttachment;

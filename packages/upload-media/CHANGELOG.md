@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add async JavaScript filters `uploadMedia.planImageSize` (provisional quality / size plan at enqueue time; may return one plan or an array of plans to split a dimension group) and `uploadMedia.encodeImage` (refine encode args immediately before vips resize or format conversion), with vips helpers on the encode context for trial encodes.
+-   Add `mergeFinalizeData` / `getFinalizeData` and the `uploadMedia.finalizeData` filter so plugins can accumulate client data that is sent automatically as `client_extended_data` on finalize. The encode context exposes `mergeFinalizeData` targeting the parent item. Nested plain objects are deep-merged so per-size data accumulates across encodes.
+
 ## 0.38.0 (2026-08-12)
 
 ### Enhancements

@@ -95,6 +95,26 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	const META_KEY_SIDELOAD_FILE_NAME = '_wp_sideloaded_file';
 
 	/**
+	 * Maximum nesting depth for client_extended_data during structural sanitize.
+	 *
+	 * Limits recursive descent so a hostile finalize payload cannot force deep
+	 * traversal. Typical plugin data (e.g. encode_quality maps) is far shallower.
+	 *
+	 * @var int
+	 */
+	const CLIENT_EXTENDED_DATA_MAX_DEPTH = 5;
+
+	/**
+	 * Maximum number of keys kept per array level in client_extended_data.
+	 *
+	 * Caps breadth at each nesting level during structural sanitize. Excess
+	 * keys are truncated before schema allowlisting.
+	 *
+	 * @var int
+	 */
+	const CLIENT_EXTENDED_DATA_MAX_ARRAY_KEYS = 50;
+
+	/**
 	 * Registers the routes for attachments.
 	 *
 	 * @see register_rest_route()
@@ -261,6 +281,12 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 									),
 								),
 							),
+						),
+						'client_extended_data' => array(
+							'description'          => __( 'Client-supplied extended data for finalize (for example encode quality). Only keys registered via wp_client_side_media_finalize_data_schema survive sanitization; nothing is persisted automatically.', 'gutenberg' ),
+							'type'                 => 'object',
+							'default'              => array(),
+							'additionalProperties' => true,
 						),
 					),
 				),
@@ -1688,6 +1714,53 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		wp_update_attachment_metadata( $attachment_id, $metadata );
 
+		$client_extended_data = $request['client_extended_data'] ?? array();
+		if ( ! is_array( $client_extended_data ) ) {
+			$client_extended_data = array();
+		}
+
+		$client_extended_data = $this->sanitize_client_extended_data( $client_extended_data, $attachment_id, $request );
+		$allowed_keys         = array_fill_keys( array_keys( $client_extended_data ), true );
+
+		/**
+		 * Filters client-supplied extended data included with a client-side media finalize request.
+		 *
+		 * Runs after structural sanitization and schema allowlisting. The REST
+		 * endpoint does not persist this data automatically. Plugins that need
+		 * to store values should save them from
+		 * {@see 'rest_after_client_side_media_finalize'} after validating the payload.
+		 *
+		 * Only keys that survived schema allowlisting are kept after this filter
+		 * runs; newly injected keys are discarded.
+		 *
+		 * @since 23.9.0
+		 *
+		 * @param array           $client_extended_data Sanitized data from `client_extended_data`.
+		 * @param int             $attachment_id        Attachment ID.
+		 * @param WP_REST_Request $request              Full request object.
+		 */
+		$client_extended_data = apply_filters( 'wp_client_side_media_finalize_data', $client_extended_data, $attachment_id, $request );
+		if ( ! is_array( $client_extended_data ) ) {
+			$client_extended_data = array();
+		} else {
+			$client_extended_data = array_intersect_key( $client_extended_data, $allowed_keys );
+		}
+
+		/**
+		 * Fires after client-side media finalize has updated attachment metadata.
+		 *
+		 * Use this to persist `client_extended_data` (for example per-size encode quality)
+		 * after validating it. Nothing is written automatically.
+		 *
+		 * @since 23.9.0
+		 *
+		 * @param int             $attachment_id        Attachment ID.
+		 * @param array           $client_extended_data Sanitized client extended data from the request.
+		 * @param array           $metadata             Attachment metadata after the update pass.
+		 * @param WP_REST_Request $request              Full request object.
+		 */
+		do_action( 'rest_after_client_side_media_finalize', $attachment_id, $client_extended_data, $metadata, $request );
+
 		/*
 		 * Drop only the provenance rows this request consumed, now that the
 		 * names are recorded in the metadata itself. A row is dropped only once
@@ -1799,5 +1872,148 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		}
 
 		return $quality;
+	}
+
+	/**
+	 * Sanitizes client_extended_data from a finalize request.
+	 *
+	 * Allowlists first: only keys registered through
+	 * {@see 'wp_client_side_media_finalize_data_schema'} are considered, so a
+	 * flood of junk keys cannot push a registered key past the breadth limit.
+	 * Each allowed value then receives a structural pass (JSON-safe scalars and
+	 * arrays; strings via sanitize_text_field; depth/breadth limited by
+	 * {@see self::CLIENT_EXTENDED_DATA_MAX_DEPTH} and
+	 * {@see self::CLIENT_EXTENDED_DATA_MAX_ARRAY_KEYS}) and its
+	 * sanitize_callback. Throwing callbacks or WP_Error returns skip that key.
+	 *
+	 * @param array           $data           Raw client_extended_data.
+	 * @param int             $attachment_id  Attachment ID.
+	 * @param WP_REST_Request $request        Full request object.
+	 * @return array Sanitized data.
+	 */
+	protected function sanitize_client_extended_data( array $data, int $attachment_id, WP_REST_Request $request ): array {
+		/**
+		 * Filters the allowlist schema for client_extended_data on finalize.
+		 *
+		 * Return an associative array of key => args. Each entry should provide
+		 * a `sanitize_callback` callable; keys without a callable are ignored.
+		 * The default schema is empty, so no client keys survive unless a plugin
+		 * registers them.
+		 *
+		 * Example:
+		 *
+		 *     add_filter( 'wp_client_side_media_finalize_data_schema', function ( $schema ) {
+		 *         $schema['encode_quality'] = array(
+		 *             'sanitize_callback' => static function ( $value ) {
+		 *                 if ( ! is_array( $value ) ) {
+		 *                     return array();
+		 *                 }
+		 *                 $out = array();
+		 *                 foreach ( $value as $size => $quality ) {
+		 *                     if ( ! is_string( $size ) || ! is_numeric( $quality ) ) {
+		 *                         continue;
+		 *                     }
+		 *                     $out[ sanitize_key( $size ) ] = min( 1, max( 0, (float) $quality ) );
+		 *                 }
+		 *                 return $out;
+		 *             },
+		 *         );
+		 *         return $schema;
+		 *     } );
+		 *
+		 * @since 23.9.0
+		 *
+		 * @param array           $schema         Map of allowed key => schema args.
+		 * @param int             $attachment_id  Attachment ID.
+		 * @param WP_REST_Request $request        Full request object.
+		 */
+		$schema = apply_filters( 'wp_client_side_media_finalize_data_schema', array(), $attachment_id, $request );
+		if ( ! is_array( $schema ) || empty( $schema ) ) {
+			return array();
+		}
+
+		$sanitized = array();
+		foreach ( $schema as $key => $args ) {
+			if ( ! is_string( $key ) || '' === $key || ! array_key_exists( $key, $data ) ) {
+				continue;
+			}
+			if ( ! is_array( $args ) || ! isset( $args['sanitize_callback'] ) || ! is_callable( $args['sanitize_callback'] ) ) {
+				continue;
+			}
+
+			$structured = $this->sanitize_client_extended_data_value( $data[ $key ], 1 );
+
+			try {
+				$value = call_user_func(
+					$args['sanitize_callback'],
+					$structured,
+					$key,
+					$attachment_id,
+					$request
+				);
+			} catch ( Throwable $e ) {
+				// A faulty plugin callback must not abort finalize after metadata
+				// has already been written; skip the key.
+				continue;
+			}
+
+			if ( is_wp_error( $value ) ) {
+				continue;
+			}
+
+			$sanitized[ $key ] = $value;
+		}
+
+		return $sanitized;
+	}
+
+	/**
+	 * Recursively sanitizes a client_extended_data value.
+	 *
+	 * @param mixed $value Raw value.
+	 * @param int   $depth Current nesting depth.
+	 * @return mixed Sanitized value, or null when the value must be dropped.
+	 */
+	protected function sanitize_client_extended_data_value( $value, int $depth ) {
+		if ( $depth > self::CLIENT_EXTENDED_DATA_MAX_DEPTH ) {
+			return null;
+		}
+
+		if ( null === $value || is_bool( $value ) || is_int( $value ) || is_float( $value ) ) {
+			if ( is_float( $value ) && ( is_nan( $value ) || is_infinite( $value ) ) ) {
+				return null;
+			}
+			return $value;
+		}
+
+		if ( is_string( $value ) ) {
+			return sanitize_text_field( $value );
+		}
+
+		if ( ! is_array( $value ) ) {
+			return null;
+		}
+
+		if ( count( $value ) > self::CLIENT_EXTENDED_DATA_MAX_ARRAY_KEYS ) {
+			$value = array_slice( $value, 0, self::CLIENT_EXTENDED_DATA_MAX_ARRAY_KEYS, true );
+		}
+
+		$out = array();
+		foreach ( $value as $key => $child ) {
+			if ( ! is_string( $key ) && ! is_int( $key ) ) {
+				continue;
+			}
+			$clean_key = is_string( $key ) ? sanitize_text_field( $key ) : $key;
+			if ( '' === $clean_key && 0 !== $clean_key ) {
+				continue;
+			}
+			$clean_child = $this->sanitize_client_extended_data_value( $child, $depth + 1 );
+			if ( null === $clean_child && null !== $child ) {
+				continue;
+			}
+			$out[ $clean_key ] = $clean_child;
+		}
+
+		return $out;
 	}
 }

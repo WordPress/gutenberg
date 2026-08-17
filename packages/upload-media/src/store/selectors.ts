@@ -62,3 +62,19 @@ export function isUploadingById( state: State, attachmentId: number ): boolean {
 export function getSettings( state: State ): Settings {
 	return state.settings;
 }
+
+/**
+ * Returns client data accumulated for the finalize request.
+ *
+ * @param state Upload state.
+ * @param id    Queue item ID.
+ *
+ * @return Finalize data bag, or an empty object when absent.
+ */
+export function getFinalizeData(
+	state: State,
+	id: string
+): Record< string, unknown > {
+	const item = state.queue.find( ( queueItem ) => queueItem.id === id );
+	return item?.finalizeData ? { ...item.finalizeData } : {};
+}

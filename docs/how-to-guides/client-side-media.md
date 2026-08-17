@@ -257,6 +257,7 @@ Client-side encoding honors the same PHP filters that control server-side image 
 ```php
 /*
  * Size-aware: drop JPEG thumbnails (300px wide or less) to quality 60,
+```
  * leave larger sizes untouched.
  */
 add_filter(
@@ -272,7 +273,51 @@ add_filter(
 );
 ```
 
-Quality uses the WordPress 1–100 scale; the client converts it to the 0–1 scale the vips worker expects and applies it per sub-size during resize and transcode. When the server does not report the field, the client falls back to a default of `0.82`. There is no separate JavaScript quality filter.
+Quality uses the WordPress 1–100 scale; the client converts it to the 0–1 scale the vips worker expects and applies it per sub-size as the provisional quality when queuing thumbnails. When the server does not report the field, the client falls back to a default of `0.82`.
+
+### Refining quality in JavaScript
+
+Two async filters let plugins adjust quality (and related encode args) in the browser:
+
+1. **`uploadMedia.planImageSize`** — while sub-sizes are queued. Use size name / MIME metadata to set a provisional quality, return an array of plans to split a same-dimension group into separate encodes, or return `null` to skip. Keep this path fast.
+2. **`uploadMedia.encodeImage`** — immediately before each vips resize or format conversion. Use for detailed analysis or trial encodes; the filter context exposes `resizeImage` / `convertImageFormat` helpers and `mergeFinalizeData` for attaching data to the finalize request. Prefer refining on `'transcode'` when format conversion is enabled (that is the final encode).
+3. **`uploadMedia.finalizeData`** — just before finalize. Accumulated data (from `mergeFinalizeData`) is filtered and sent as `client_extended_data`. On the server the payload is sanitized and allowlisted via `wp_client_side_media_finalize_data_schema`; use `rest_after_client_side_media_finalize` to persist (nothing is auto-saved).
+
+```js
+import { addFilter } from '@wordpress/hooks';
+import {
+	PLAN_IMAGE_SIZE_HOOK,
+	ENCODE_IMAGE_HOOK,
+	FINALIZE_DATA_HOOK,
+} from '@wordpress/upload-media';
+
+addFilter(
+	PLAN_IMAGE_SIZE_HOOK,
+	'my-plugin/provisional-quality',
+	( plan ) => {
+		if ( plan.sizeNames.includes( 'thumbnail' ) ) {
+			return { ...plan, quality: 0.6 };
+		}
+		return plan;
+	}
+);
+
+addFilter(
+	ENCODE_IMAGE_HOOK,
+	'my-plugin/adaptive-quality',
+	async ( encode, context ) => {
+		const quality = Math.min( encode.quality, 0.7 );
+		if ( encode.sizeNames?.[ 0 ] ) {
+			context.mergeFinalizeData( {
+				encode_quality: { [ encode.sizeNames[ 0 ] ]: quality },
+			} );
+		}
+		return { ...encode, quality };
+	}
+);
+```
+
+See the [editor filters reference](/docs/reference-guides/filters/editor-filters.md#javascript-filters) for the full argument shapes. A throwing or invalid callback falls back to the provisional values so uploads continue.
 
 ## Using the finalize endpoint
 
@@ -283,6 +328,8 @@ POST /wp/v2/media/{id}/finalize
 ```
 
 This endpoint applies the `wp_generate_attachment_metadata` filter with context `'update'`, then saves the updated metadata. It requires `edit_post` and `upload_files` capabilities. This is the second of two passes during a client-side upload — see [Server-side plugin compatibility](#server-side-plugin-compatibility) for the full picture.
+
+Optional request body field `client_extended_data` carries plugin data from the browser (for example encode quality). The controller structurally sanitizes it and allowlists keys via `wp_client_side_media_finalize_data_schema`; unregistered keys are discarded. Persist values from `rest_after_client_side_media_finalize` — see the [editor filters reference](/docs/reference-guides/filters/editor-filters.md#javascript-filters).
 
 WordPress calls this endpoint automatically as part of the client-side upload pipeline. Plugin developers do not need to call it manually — it is documented here for context on how server-side hooks are preserved.
 

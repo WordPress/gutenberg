@@ -19,3 +19,15 @@ export {
 export type { ImageFormat } from './store/types';
 export type { FeatureDetectionResult } from './feature-detection';
 export type { ErrorMessageConfig } from './error-messages';
+export {
+	PLAN_IMAGE_SIZE_HOOK,
+	ENCODE_IMAGE_HOOK,
+	FINALIZE_DATA_HOOK,
+} from './filters';
+export type {
+	PlanImageSizeArgs,
+	EncodeImageArgs,
+	EncodeImageContext,
+	EncodeImageOperation,
+	FinalizeDataContext,
+} from './filters';
