@@ -62,13 +62,13 @@
 	.global-styles-ui-block-types-item__icon {
 		min-width: variables.$grid-unit-30;
 	}
-}
 
-.global-styles-ui-block-types-item {
 	&__no-results {
 		padding-top: variables.$grid-unit-20;
 	}
+}
 
+.global-styles-ui-block-types-item {
 	&__indicator {
 		background: var(--wp-admin-theme-color);
 		border-radius: 50%;
