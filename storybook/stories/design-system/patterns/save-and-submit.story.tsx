@@ -57,7 +57,6 @@ const meta: Meta< typeof LayoutCardSaveExample > = {
 	parameters: {
 		controls: { disable: true },
 	},
-	tags: [ '!dev' /* Hide individual story pages from sidebar */ ],
 };
 
 export default meta;
