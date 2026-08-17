@@ -3,6 +3,8 @@
 	box-sizing: border-box;
 }
 
-:where(.wp-block-archives-dropdown label) {
-	display: block;
+.wp-block-archives-dropdown {
+	label {
+		display: block;
+	}
 }

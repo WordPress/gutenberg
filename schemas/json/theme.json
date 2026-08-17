@@ -264,11 +264,6 @@
 							"description": "Allow users to set caption colors in a block.",
 							"type": "boolean",
 							"default": true
-						},
-						"label": {
-							"description": "Allow users to set label colors in a block.",
-							"type": "boolean",
-							"default": true
 						}
 					},
 					"additionalProperties": false
