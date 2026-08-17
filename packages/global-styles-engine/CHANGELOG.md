@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Report site-wide custom CSS changes in the global styles changelist, which reported nothing when the CSS was the only change.
+
 ## 1.20.0 (2026-08-12)
 
 ### Bug Fixes
