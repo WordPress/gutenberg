@@ -1,0 +1,9 @@
+[
+	{
+		"blockName": "core/description-detail",
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n<dd>Description</dd>\n",
+		"innerContent": [ "\n<dd>Description</dd>\n" ]
+	}
+]

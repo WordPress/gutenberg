@@ -46,6 +46,9 @@ import * as commentsPaginationNext from './comments-pagination-next';
 import * as commentsPaginationNumbers from './comments-pagination-numbers';
 import * as commentsTitle from './comments-title';
 import * as cover from './cover';
+import * as descriptionList from './description-list';
+import * as descriptionTerm from './description-term';
+import * as descriptionDetail from './description-detail';
 import * as details from './details';
 import * as embed from './embed';
 import * as file from './file';
@@ -152,6 +155,9 @@ const getAllBlocks = () => {
 		gallery,
 		list,
 		listItem,
+		descriptionList,
+		descriptionTerm,
+		descriptionDetail,
 		quote,
 
 		// Register all remaining core blocks.

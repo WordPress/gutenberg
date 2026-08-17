@@ -1,0 +1,33 @@
+[
+	{
+		"name": "core/description-list",
+		"isValid": true,
+		"attributes": {},
+		"innerBlocks": [
+			{
+				"name": "core/description-term",
+				"isValid": true,
+				"attributes": {
+					"content": "Term A"
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/description-term",
+				"isValid": true,
+				"attributes": {
+					"content": "Term B"
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/description-detail",
+				"isValid": true,
+				"attributes": {
+					"content": "Shared description"
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]
