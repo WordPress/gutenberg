@@ -4,9 +4,10 @@
 	"compilerOptions": {
 		"types": [
 			"jest",
-			"node",
+			"gutenberg-env",
 			"style-imports",
-			"react-css-custom-properties"
+			"react-css-custom-properties",
+			"node"
 		]
 	},
 	"files": [ "global.d.ts" ],
