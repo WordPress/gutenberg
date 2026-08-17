@@ -7,10 +7,12 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Renders the site's front end in an iframe.
  *
- * Used for themes that have no block templates for the canvas to edit, so that
- * the home route still shows what the site looks like.
+ * Shown where the canvas has no entity to edit, so that a route still says
+ * something about the site it is configuring.
+ *
+ * @return The preview, or nothing until the site's address is known.
  */
-function SitePreview() {
+export default function SitePreview() {
 	const siteUrl = useSelect( ( select ) => {
 		const siteData = select( coreStore ).getEntityRecord(
 			'root',
@@ -60,5 +62,3 @@ function SitePreview() {
 		/>
 	);
 }
-
-export const canvas = SitePreview;
