@@ -1,6 +1,9 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.dev.base.json",
+	"compilerOptions": {
+		"types": []
+	},
 	"references": [
 		{ "path": "./tsconfig.build.json" },
 		{ "path": "../a11y/tsconfig.build.json" },
