@@ -1,10 +1,12 @@
 import apiFetch from '@wordpress/api-fetch';
+import { parse, serialize } from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { STORE_NAME } from './name';
 import { getSyncManager, hasSyncManager } from './sync';
+import { enqueueCRDTDocSave, saveCRDTDoc, setPersistedCRDTDoc } from './utils';
 
 /**
  * Returns an action object used in signalling that the registered post meta
@@ -178,6 +180,287 @@ export const setCollaborationSupported =
 				hasRedo: false,
 			} );
 		}
+	};
+
+/**
+ * Creates a persisted CRDT snapshot with isolated entity changes without
+ * applying those changes to the live collaborative document.
+ *
+ * @param {string}        kind     Entity kind.
+ * @param {string}        name     Entity name.
+ * @param {number|string} recordId Entity record ID.
+ * @param {Object}        changes  Changes to include in the snapshot.
+ * @return {Promise<string|null>} Serialized CRDT document, when loaded.
+ */
+export const createEntityCRDTPersistenceSnapshot =
+	( kind, name, recordId, changes ) => () =>
+		getSyncManager()?.createPersistedCRDTDoc(
+			`${ kind }/${ name }`,
+			recordId,
+			changes
+		);
+
+/**
+ * Persists the current CRDT document for a sync-enabled entity.
+ *
+ * @param {string}        kind     Entity kind.
+ * @param {string}        name     Entity name.
+ * @param {number|string} recordId Entity record ID.
+ * @return {Promise<boolean>} Whether a CRDT document was persisted.
+ */
+export const persistEntityCRDTDoc =
+	( kind, name, recordId ) =>
+	async ( { select } ) => {
+		const entityConfig = select.getEntityConfig( kind, name );
+		if ( ! entityConfig?.syncConfig?.supportsPersistence ) {
+			return false;
+		}
+
+		const record = select.getRawEntityRecord?.( kind, name, recordId );
+		return saveCRDTDoc(
+			`${ kind }/${ name }`,
+			recordId,
+			record?.meta?._crdt_document || ''
+		);
+	};
+
+function getRawContent( record ) {
+	const content = record?.content;
+	if ( typeof content === 'string' ) {
+		return content;
+	}
+	return typeof content?.raw === 'string' ? content.raw : '';
+}
+
+function findBlockPaths( blocks, isMatch ) {
+	const paths = [];
+	for ( let index = 0; index < blocks.length; index++ ) {
+		const block = blocks[ index ];
+		if ( isMatch( block ) ) {
+			paths.push( [ index ] );
+		}
+
+		paths.push(
+			...findBlockPaths( block.innerBlocks || [], isMatch ).map(
+				( childPath ) => [ index, ...childPath ]
+			)
+		);
+	}
+
+	return paths;
+}
+
+function countBlocks( blocks ) {
+	return blocks.reduce(
+		( count, block ) => count + 1 + countBlocks( block.innerBlocks || [] ),
+		0
+	);
+}
+
+function getBlockAtPath( blocks, path ) {
+	return path.reduce(
+		( currentBlock, index ) =>
+			Array.isArray( currentBlock )
+				? currentBlock[ index ]
+				: currentBlock?.innerBlocks?.[ index ],
+		blocks
+	);
+}
+
+function updateBlockAttributesAtPath( blocks, path, attributes ) {
+	const [ index, ...rest ] = path;
+	const block = blocks[ index ];
+	if ( ! block ) {
+		return null;
+	}
+
+	const nextBlocks = [ ...blocks ];
+	if ( rest.length ) {
+		const innerBlocks = updateBlockAttributesAtPath(
+			block.innerBlocks || [],
+			rest,
+			attributes
+		);
+		if ( ! innerBlocks ) {
+			return null;
+		}
+
+		nextBlocks[ index ] = {
+			...block,
+			innerBlocks,
+		};
+		return nextBlocks;
+	}
+
+	const attributeChanges =
+		typeof attributes === 'function'
+			? attributes( block.attributes || {} )
+			: attributes;
+	if ( ! attributeChanges ) {
+		return null;
+	}
+
+	nextBlocks[ index ] = {
+		...block,
+		attributes: {
+			...block.attributes,
+			...attributeChanges,
+		},
+	};
+	return nextBlocks;
+}
+
+/**
+ * Persists targeted block attribute changes against a sync-enabled entity's
+ * saved content and CRDT document without using unrelated dirty editor state.
+ *
+ * @param {string}          kind                     Entity kind.
+ * @param {string}          name                     Entity name.
+ * @param {number|string}   recordId                 Entity record ID.
+ * @param {Object}          options                  Options.
+ * @param {Object}          options.record           Saved entity record snapshot.
+ * @param {number[]}        options.blockPath        Path to the block in saved content.
+ * @param {Object|Function} options.attributes       Attribute changes or updater.
+ * @param {Function}        options.isMatch          Optional block matcher for path validation.
+ * @param {number}          options.matchIndex       Zero-based occurrence of the matched live block.
+ * @param {number}          options.matchCount       Number of matching blocks in the live tree.
+ * @param {Function}        options.isDirtyPathValid Validates the saved tree before using a dirty path.
+ * @param {number}          options.blockCount       Number of blocks in the live tree.
+ * @param {string}          options.blockName        Name of the live target block.
+ * @return {Promise<boolean>} Whether block attributes were persisted.
+ */
+export const persistEntityBlockAttributes =
+	(
+		kind,
+		name,
+		recordId,
+		{
+			record,
+			blockPath,
+			attributes,
+			isMatch,
+			matchIndex,
+			matchCount,
+			isDirtyPathValid,
+			blockCount,
+			blockName,
+		}
+	) =>
+	async ( { select } ) => {
+		const entityConfig = select.getEntityConfig( kind, name );
+		if (
+			! entityConfig?.baseURL ||
+			! entityConfig?.syncConfig?.supportsPersistence ||
+			! Array.isArray( blockPath )
+		) {
+			return false;
+		}
+
+		const objectType = `${ kind }/${ name }`;
+		const room = `${ objectType }:${ recordId }`;
+		return enqueueCRDTDocSave( objectType, recordId, async () => {
+			const initialRecord =
+				select.getRawEntityRecord?.( kind, name, recordId ) || record;
+			if ( ! getRawContent( initialRecord ) ) {
+				return false;
+			}
+
+			for ( let attempt = 0; attempt < 20; attempt++ ) {
+				const persistedRecord = await apiFetch( {
+					path: `${ entityConfig.baseURL }/${ recordId }?context=edit`,
+				} );
+				const content = getRawContent( persistedRecord || record );
+				if ( ! content ) {
+					return false;
+				}
+
+				const parsedBlocks = parse( content );
+				let targetPath = blockPath;
+				if ( isMatch ) {
+					const matchingPaths = findBlockPaths(
+						parsedBlocks,
+						isMatch
+					);
+					if (
+						! Number.isInteger( matchIndex ) ||
+						! Number.isInteger( matchCount )
+					) {
+						return false;
+					}
+
+					if ( matchingPaths.length === matchCount ) {
+						targetPath = matchingPaths[ matchIndex ];
+					} else {
+						const pathBlock = getBlockAtPath(
+							parsedBlocks,
+							blockPath
+						);
+						const canUseDirtyPath =
+							matchingPaths.length === 0 &&
+							matchCount === 1 &&
+							Number.isInteger( blockCount ) &&
+							countBlocks( parsedBlocks ) === blockCount &&
+							pathBlock?.name === blockName &&
+							typeof isDirtyPathValid === 'function' &&
+							isDirtyPathValid( parsedBlocks );
+						if ( ! canUseDirtyPath ) {
+							return false;
+						}
+					}
+				}
+
+				if ( ! targetPath ) {
+					return false;
+				}
+
+				const blocks = updateBlockAttributesAtPath(
+					parsedBlocks,
+					targetPath,
+					attributes
+				);
+				if ( ! blocks ) {
+					return false;
+				}
+
+				const serializedDoc =
+					await getSyncManager()?.createPersistedCRDTDoc(
+						objectType,
+						recordId,
+						{ blocks }
+					);
+				if ( ! serializedDoc ) {
+					return false;
+				}
+				const expectedDoc = persistedRecord?.meta?._crdt_document || '';
+
+				try {
+					await apiFetch( {
+						path: '/wp-sync/v1/save-entity',
+						method: 'POST',
+						data: {
+							room,
+							expected_content: content,
+							expected_doc: expectedDoc,
+							content: serialize( blocks ),
+							doc: serializedDoc,
+						},
+					} );
+				} catch ( error ) {
+					if (
+						error?.code === 'rest_sync_content_conflict' ||
+						error?.code === 'rest_sync_document_conflict'
+					) {
+						continue;
+					}
+					throw error;
+				}
+
+				setPersistedCRDTDoc( objectType, recordId, serializedDoc );
+				return true;
+			}
+
+			return false;
+		} );
 	};
 
 /**

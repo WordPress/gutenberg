@@ -268,7 +268,8 @@ export const getEntityRecord =
 
 									await saveCRDTDoc(
 										`${ kind }/${ name }`,
-										entityId
+										entityId,
+										meta._crdt_document || ''
 									);
 								} );
 						},
