@@ -34,6 +34,28 @@ function extractFontWeights( fontFaces: FontFace[] ): number[] {
 }
 
 /*
+ * Resolve a font-weight range (e.g. "200 900") to a single value.
+ * Ranges that cover 400 resolve to 400; otherwise to the closest end.
+ */
+function resolveFontWeight( fontWeight: FontFace[ 'fontWeight' ] ): string {
+	const range = String( fontWeight ?? '' )
+		.trim()
+		.split( /\s+/ );
+
+	if ( range.length !== 2 ) {
+		return String( fontWeight || '400' );
+	}
+
+	const [ start, end ] = range.map( Number );
+
+	if ( ! Number.isFinite( start ) || ! Number.isFinite( end ) ) {
+		return '400';
+	}
+
+	return String( Math.min( Math.max( 400, start ), end ) );
+}
+
+/*
  * Format the font family to use in the CSS font-family property of a CSS rule.
  *
  * The input can be a string with the font family name or a string with multiple font family names separated by commas.
@@ -136,14 +158,16 @@ export function getFamilyPreviewStyle(
 			style.fontStyle = 'normal';
 			const normalWeights = extractFontWeights( normalFaces );
 			const nearestWeight = findNearest( 400, normalWeights );
-			style.fontWeight = String( nearestWeight ) || '400';
+			style.fontWeight = Number.isFinite( nearestWeight )
+				? String( nearestWeight )
+				: '400';
 		} else {
 			style.fontStyle =
 				( family.fontFace.length && family.fontFace[ 0 ].fontStyle ) ||
 				'normal';
 			style.fontWeight =
 				( family.fontFace.length &&
-					String( family.fontFace[ 0 ].fontWeight ) ) ||
+					resolveFontWeight( family.fontFace[ 0 ].fontWeight ) ) ||
 				'400';
 		}
 	}
@@ -155,6 +179,6 @@ export function getFacePreviewStyle( face: FontFace ): CSSProperties {
 	return {
 		fontFamily: formatFontFamily( face.fontFamily ),
 		fontStyle: face.fontStyle || 'normal',
-		fontWeight: face.fontWeight || '400',
+		fontWeight: resolveFontWeight( face.fontWeight ),
 	};
 }
