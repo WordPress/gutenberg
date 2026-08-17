@@ -10,9 +10,9 @@
 		"**/benchmark",
 		"**/test/**",
 		"**/tests/**",
+		"**/__tests__/**",
 		"**/stories/**",
 		"**/*.story.*",
-		"src/__tests__",
 		"src/__fixtures__"
 	]
 }
