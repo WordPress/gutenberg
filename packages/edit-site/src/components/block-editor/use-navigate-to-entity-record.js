@@ -5,11 +5,10 @@ import { addQueryArgs } from '@wordpress/url';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 import { unlock } from '../../lock-unlock';
-import { DEFAULT_DEVICE_TYPE } from './use-viewport-sync';
+import { DEFAULT_DEVICE_TYPE, isValidViewport } from './viewport';
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 
-const VALID_VIEWPORTS = [ 'desktop', 'tablet', 'mobile' ];
 /**
  * Hook to handle navigation to entity records.
  *
@@ -58,7 +57,7 @@ export default function useNavigateToEntityRecord() {
 					? params.viewport.toLowerCase()
 					: undefined;
 			const isValidRequestedViewport =
-				VALID_VIEWPORTS.includes( requestedViewport );
+				isValidViewport( requestedViewport );
 
 			if ( isValidRequestedViewport ) {
 				const currentViewportLower = (

@@ -5,7 +5,8 @@
 ### Bug Fixes
 
 -   Canvas: Show the site's front end where a route names no entity and the theme has no block templates to resolve one from, instead of an editor with nothing open. Was previously handled by the home route alone, leaving `/identity` broken on a classic theme ([#81749](https://github.com/WordPress/gutenberg/pull/81749)).
--   Canvas: Clear the `viewport` search param when leaving an entity at the default width, so returning to it no longer restores the width it carried before.
+-   Canvas: Open an entity at the width its `viewport` param asks for through the editor provider, so the width comes from the theme's breakpoints rather than the defaults ([#81750](https://github.com/WordPress/gutenberg/pull/81750)).
+-   Canvas: Clear the `viewport` search param when leaving an entity at the default width, so returning to it no longer restores the width it carried before ([#81750](https://github.com/WordPress/gutenberg/pull/81750)).
 -   Canvas: Do not offer to edit a trashed entity from its preview ([#81632](https://github.com/WordPress/gutenberg/pull/81632)).
 -   Translate the click-to-edit label on a previewed canvas, and name the action rather than the gesture ([#81620](https://github.com/WordPress/gutenberg/pull/81620)).
 

@@ -11,7 +11,7 @@ import {
 	privateApis as routePrivateApis,
 } from '@wordpress/route';
 import { store as bootStore } from '../../store';
-import { DEFAULT_DEVICE_TYPE } from './use-viewport-sync';
+import { DEFAULT_DEVICE_TYPE, isValidViewport } from './viewport';
 import { unlock } from '../../lock-unlock';
 
 const { useCanGoBack, useRouter } = unlock( routePrivateApis );
@@ -34,8 +34,6 @@ interface NavigateParams {
 	postId: string;
 	viewport?: string;
 }
-
-const VALID_VIEWPORTS = [ 'desktop', 'tablet', 'mobile' ];
 
 /**
  * Builds the editor's entity navigation callbacks.
@@ -87,9 +85,7 @@ export default function useNavigateToEntityRecord() {
 			 * is being viewed at behind, so returning restores it.
 			 */
 			const requestedViewport = params.viewport?.toLowerCase();
-			const hasRequestedViewport =
-				!! requestedViewport &&
-				VALID_VIEWPORTS.includes( requestedViewport );
+			const hasRequestedViewport = isValidViewport( requestedViewport );
 			const currentViewport = (
 				( registry.select( editorStore ) as any ).getDeviceType() ??
 				DEFAULT_DEVICE_TYPE
