@@ -16,7 +16,7 @@ import {
 	Tooltip,
 	useKeyboardShortcutProps,
 } from '@wordpress/ui';
-import './style.scss';
+import './style.module.scss';
 import useSaveShortcut from '../save-panel/use-save-shortcut';
 
 export default function SaveButton() {

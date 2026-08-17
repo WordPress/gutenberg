@@ -9,7 +9,7 @@ import {
 import { isRTL, __ } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
 import { useReducedMotion } from '@wordpress/compose';
-import './style.scss';
+import './style.module.scss';
 
 const ANIMATION_DURATION = 0.3;
 const slideVariants = {

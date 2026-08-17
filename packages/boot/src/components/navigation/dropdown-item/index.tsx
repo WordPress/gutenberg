@@ -15,7 +15,7 @@ import { STORE_NAME } from '../../../store';
 import NavigationItem from '../navigation-item';
 import { wrapIcon } from '../items';
 import type { IconType, MenuItem } from '../../../store/types';
-import './style.scss';
+import './style.module.scss';
 
 const ANIMATION_DURATION = 0.2;
 

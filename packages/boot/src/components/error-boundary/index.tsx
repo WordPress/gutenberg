@@ -5,7 +5,7 @@ import { Button } from '@wordpress/components';
 import { EmptyState } from '@wordpress/ui';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { caution } from '@wordpress/icons';
-import './style.scss';
+import './style.module.scss';
 
 interface Props {
 	children: ReactNode;
