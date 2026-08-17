@@ -17,6 +17,7 @@ const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 export interface StateDefinition {
 	value: string;
 	label: string;
+	info?: string;
 }
 
 /**
