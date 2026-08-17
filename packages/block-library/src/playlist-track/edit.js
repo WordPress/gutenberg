@@ -22,7 +22,7 @@ import {
 import { Link } from '@wordpress/ui';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { PlaylistContext } from '../playlist/context';
@@ -53,12 +53,6 @@ const PlaylistTrackEdit = ( {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
 	const hasTrackSource = !! src || !! temporaryURL;
-	const trackTitle = stripHTML( title || '' ) || __( 'Unknown title' );
-	const trackButtonLabel = sprintf(
-		/* translators: %s: track title. */
-		__( 'Play %s' ),
-		trackTitle
-	);
 
 	useEffect( () => {
 		if (
@@ -260,7 +254,6 @@ const PlaylistTrackEdit = ( {
 				<button
 					className="wp-block-playlist-track__button"
 					onClick={ () => setCurrentTrackClientId( clientId ) }
-					aria-label={ trackButtonLabel }
 					aria-current={
 						currentTrackClientId === clientId ? 'true' : 'false'
 					}

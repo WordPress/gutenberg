@@ -180,7 +180,7 @@ describe( 'PlaylistTrackEdit', () => {
 			} )
 		);
 		const trackButton = screen.getByRole( 'button', {
-			name: 'Play Song One',
+			name: /Song One/,
 		} );
 
 		expect(
