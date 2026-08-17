@@ -133,4 +133,89 @@ class Tests_Blocks_Render_Tabs extends WP_UnitTestCase {
 			}
 		}
 	}
+
+	/**
+	 * Builds a two tab block.
+	 *
+	 * @return string The serialized block content.
+	 */
+	private function get_two_tab_block(): string {
+		return <<<'BLOCK_CONTENT'
+			<!-- wp:tabs -->
+			<div class="wp-block-tabs"><!-- wp:tab-list -->
+			<div role="tablist" class="wp-block-tab-list"><button type="button" role="tab">Description</button><button type="button" role="tab">Reviews</button></div>
+			<!-- /wp:tab-list -->
+
+			<!-- wp:tab-panels -->
+			<div class="wp-block-tab-panels"><!-- wp:tab-panel {"label":"Description"} -->
+			<section role="tabpanel" tabindex="0" class="wp-block-tab-panel"></section>
+			<!-- /wp:tab-panel -->
+
+			<!-- wp:tab-panel {"label":"Reviews"} -->
+			<section role="tabpanel" tabindex="0" class="wp-block-tab-panel"></section>
+			<!-- /wp:tab-panel --></div>
+			<!-- /wp:tab-panels --></div>
+			<!-- /wp:tabs -->
+		BLOCK_CONTENT;
+	}
+
+	/**
+	 * Collects the directives each rendered tab panel carries, along with the
+	 * attributes they resolve.
+	 *
+	 * @param string $rendered_block The rendered block markup.
+	 *
+	 * @return array<int, array<string, string|bool|null>> Attributes per panel.
+	 */
+	private function get_rendered_panel_attributes( string $rendered_block ): array {
+		$processor = new WP_HTML_Tag_Processor( $rendered_block );
+		$panels    = array();
+
+		while ( $processor->next_tag( array( 'class_name' => 'wp-block-tab-panel' ) ) ) {
+			$panels[] = array(
+				'hidden'           => $processor->get_attribute( 'hidden' ),
+				'hidden_binding'   => $processor->get_attribute( 'data-wp-bind--hidden' ),
+				'tabindex_binding' => $processor->get_attribute( 'data-wp-bind--tabindex' ),
+				'beforematch'      => $processor->get_attribute( 'data-wp-on--beforematch' ),
+			);
+		}
+
+		return $panels;
+	}
+
+	/**
+	 * An inactive panel is hidden with `until-found` rather than outright, so
+	 * that the browser's find-in-page can still reach its content. Which panel
+	 * is hidden is left to the client, so a visitor without JavaScript is given
+	 * the content of every panel rather than none of it.
+	 *
+	 * @covers ::block_core_tab_panel_render
+	 */
+	public function test_should_leave_hiding_tab_panels_to_the_client(): void {
+		$panels = $this->get_rendered_panel_attributes( do_blocks( $this->get_two_tab_block() ) );
+
+		$this->assertCount( 2, $panels, 'Both tab panels should be rendered.' );
+
+		foreach ( $panels as $index => $panel ) {
+			$this->assertNull(
+				$panel['hidden'],
+				"Panel $index should not be hidden before the block hydrates."
+			);
+			$this->assertSame(
+				'state.isHidden',
+				$panel['hidden_binding'],
+				"Panel $index should be hidden by the client when its tab is inactive."
+			);
+			$this->assertSame(
+				'state.tabIndexAttribute',
+				$panel['tabindex_binding'],
+				"Panel $index should leave the tab sequence while it is hidden."
+			);
+			$this->assertSame(
+				'actions.handleBeforeMatch',
+				$panel['beforematch'],
+				"Panel $index should activate its tab when the browser reveals it."
+			);
+		}
+	}
 }
