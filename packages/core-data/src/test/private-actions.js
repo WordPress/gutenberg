@@ -3,14 +3,23 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '..';
-import { editMediaEntity, setCollaborationSupported } from '../private-actions';
+import {
+	editMediaEntity,
+	persistEntityCRDTDoc,
+	setCollaborationSupported,
+} from '../private-actions';
 import { getSyncManager, hasSyncManager } from '../sync';
+import { saveCRDTDoc } from '../utils';
 import { unlock } from '../lock-unlock';
 
 jest.mock( '@wordpress/api-fetch' );
 jest.mock( '../sync', () => ( {
 	getSyncManager: jest.fn(),
 	hasSyncManager: jest.fn(),
+} ) );
+jest.mock( '../utils', () => ( {
+	...jest.requireActual( '../utils' ),
+	saveCRDTDoc: jest.fn(),
 } ) );
 
 describe( 'editMediaEntity', () => {
@@ -212,6 +221,55 @@ describe( 'editMediaEntity', () => {
 
 		expect( dispatch.receiveEntityRecords ).not.toHaveBeenCalled();
 		expect( result ).toBeUndefined();
+	} );
+} );
+
+describe( 'persistEntityCRDTDoc', () => {
+	let entityConfig;
+	let select;
+
+	beforeEach( () => {
+		saveCRDTDoc.mockReset();
+		saveCRDTDoc.mockResolvedValue( true );
+		entityConfig = {
+			syncConfig: {
+				supportsPersistence: true,
+			},
+		};
+		select = {
+			getEntityConfig: jest.fn( () => entityConfig ),
+			getRawEntityRecord: jest.fn( () => ( {
+				meta: { _crdt_document: 'persisted-doc' },
+			} ) ),
+		};
+	} );
+
+	it( 'persists CRDT docs for sync-enabled entities', async () => {
+		const didPersist = await persistEntityCRDTDoc(
+			'postType',
+			'post',
+			123
+		)( { select } );
+
+		expect( saveCRDTDoc ).toHaveBeenCalledWith(
+			'postType/post',
+			123,
+			'persisted-doc'
+		);
+		expect( didPersist ).toBe( true );
+	} );
+
+	it( 'does not persist entities without persistence support', async () => {
+		select.getEntityConfig.mockReturnValue( { syncConfig: {} } );
+
+		const didPersist = await persistEntityCRDTDoc(
+			'taxonomy',
+			'category',
+			123
+		)( { select } );
+
+		expect( saveCRDTDoc ).not.toHaveBeenCalled();
+		expect( didPersist ).toBe( false );
 	} );
 } );
 
