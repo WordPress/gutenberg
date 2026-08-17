@@ -928,6 +928,12 @@ describe( 'SyncManager', () => {
 				mockRecord,
 				mockHandlers
 			);
+			manager.update(
+				'post',
+				'123',
+				{ meta: { pending: true } },
+				'local'
+			);
 
 			const serialized = await manager.createPersistedCRDTDoc(
 				'post',
@@ -939,11 +945,22 @@ describe( 'SyncManager', () => {
 			expect(
 				snapshot?.getMap( CRDT_RECORD_MAP_KEY ).get( 'title' )
 			).toBe( 'Repaired title' );
+			expect( snapshot?.getMap( CRDT_RECORD_MAP_KEY ).get( 'id' ) ).toBe(
+				'123'
+			);
+			expect(
+				snapshot?.getMap( CRDT_RECORD_MAP_KEY ).get( 'meta' )
+			).toEqual( { pending: true } );
 			expect(
 				( liveDoc as unknown as Y.Doc )
 					.getMap( CRDT_RECORD_MAP_KEY )
 					.get( 'title' )
 			).toBe( 'Test Post' );
+			expect(
+				( liveDoc as unknown as Y.Doc )
+					.getMap( CRDT_RECORD_MAP_KEY )
+					.get( 'meta' )
+			).toEqual( { pending: true } );
 			snapshot?.destroy();
 		} );
 	} );
