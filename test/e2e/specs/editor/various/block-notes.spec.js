@@ -1204,6 +1204,86 @@ test.describe( 'Block Notes', () => {
 			expect( noteIds ).toHaveLength( 2 );
 		} );
 
+		// Long enough that the note is clamped and offers "Show more".
+		const longNote = ( tag ) =>
+			`${ tag } note. ` +
+			'Padding sentence to push the note past the three line clamp. '.repeat(
+				6
+			);
+
+		test( "selects the clicked thread, not the block's primary note", async ( {
+			editor,
+			page,
+		} ) => {
+			// `blockNoteUtils.addNote` waits on a thread named after the whole
+			// note, but a long note's accessible name is only its first words.
+			async function addLongNote( tag ) {
+				await editor.clickBlockOptionsMenuItem( 'Add note' );
+				await page
+					.getByRole( 'textbox', { name: 'New note', exact: true } )
+					.fill( longNote( tag ) );
+				await page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'button', { name: 'Add note', exact: true } )
+					.click();
+				await expect(
+					page
+						.getByRole( 'region', { name: 'Editor settings' } )
+						.getByRole( 'treeitem', {
+							name: new RegExp( `Note: ${ tag }` ),
+						} )
+				).toBeVisible();
+			}
+
+			// Selecting a thread selects its block too. On a block carrying
+			// several notes that block transition used to re-sync the selection
+			// to the block's primary note, so the clicked thread was left
+			// focused while a sibling took the reply form (#81730).
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Paragraph one' },
+			} );
+			await addLongNote( 'Alpha' );
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.filter( { hasText: 'Paragraph one' } )
+				.click();
+			await addLongNote( 'Bravo' );
+
+			// A note on another block, to park the selection off paragraph one.
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Paragraph two' },
+			} );
+			await addLongNote( 'Charlie' );
+
+			const board = page.getByRole( 'tree', {
+				name: 'Unresolved notes',
+			} );
+			const bravo = board
+				.getByRole( 'treeitem', { name: /Note: Bravo/ } )
+				.first();
+			const alpha = board
+				.getByRole( 'treeitem', { name: /Note: Alpha/ } )
+				.first();
+
+			// Press "Show more" on the second note of paragraph one. The button
+			// does not stop the click, which reaches the thread and selects it.
+			await bravo.getByRole( 'button', { name: 'Show more' } ).click();
+
+			// The note that was clicked is the one that expands...
+			await expect(
+				bravo.getByRole( 'button', { name: 'Show less' } )
+			).toBeVisible();
+			// ...and the one that is selected.
+			await expect( bravo ).toHaveAttribute( 'aria-expanded', 'true' );
+			await expect( alpha ).toHaveAttribute( 'aria-expanded', 'false' );
+			// The reply form belongs to the selected thread.
+			await expect(
+				bravo.getByRole( 'textbox', { name: /Reply to note/ } )
+			).toBeVisible();
+		} );
+
 		test( 'auto-selects first unresolved note when clicking a block with multiple notes', async ( {
 			editor,
 			page,
