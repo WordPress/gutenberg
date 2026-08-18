@@ -43,8 +43,8 @@ Example:
 ```json
 {
 	"fontFamily": {
-		"description": "CSS @font-face font-family descriptor.\n\nA single font family name, quoted.\nNot the CSS font-family property, which takes a comma-separated list.\n\nMind the quoting: JSON quotes the whole string, then CSS quotes the name inside it.\n\nSee https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-family",
-		"markdownDescription": "CSS [`@font-face` `font-family`](https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-family) descriptor.\n\nA single font family name, quoted. This is *not* the CSS `font-family` property, which takes a comma-separated list.\n\nMind the quoting: JSON quotes the whole string, then CSS quotes the name inside it.",
+		"description": "CSS @font-face font-family descriptor.\n\nA single font family name; quoting is recommended.\nNot the CSS font-family property, which takes a comma-separated list.\n\nMind the quoting: JSON quotes the whole string, then CSS quotes the name inside it.\n\nSee https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-family",
+		"markdownDescription": "CSS [`@font-face` `font-family`](https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-family) descriptor.\n\nA single font family name; quoting is recommended. This is *not* the CSS `font-family` property, which takes a comma-separated list.\n\nMind the quoting: JSON quotes the whole string, then CSS quotes the name inside it."
 		"examples": [
 			"\"Source Serif Pro\"",
 			"'CSS single-quoted font name'",
