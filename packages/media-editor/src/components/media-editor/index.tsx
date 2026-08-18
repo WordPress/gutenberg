@@ -8,8 +8,10 @@ import { useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
+	createContext,
 	createPortal,
 	useCallback,
+	useContext,
 	useEffect,
 	useMemo,
 	useRef,
@@ -68,32 +70,13 @@ interface EditorTab {
 
 export interface MediaEditorFrameProps {
 	children: ReactNode;
-	headerActions: ReactNode;
 	/**
-	 * Reset / Undo / Redo. `null` for non-image media, which has no edit
-	 * history.
+	 * Whether the media being edited is an image. The history and transform
+	 * clusters render nothing for other media types, so a frame uses this to
+	 * decide whether the container it would put them in is worth rendering at
+	 * all.
 	 */
-	historyActions: ReactNode;
-	/**
-	 * Cancel / Save.
-	 */
-	saveActions: ReactNode;
-	/**
-	 * Rotate / flip / zoom and the aspect-ratio control, as a flat toolbar —
-	 * but only when placing them is the frame's job. `null` for non-image
-	 * media, and `null` in the `wide` layout, where the Crop panel renders
-	 * them itself.
-	 *
-	 * Frames render this wherever it suits them without checking the layout;
-	 * a frame that never places it leaves the transform controls unreachable
-	 * once the Crop panel is gone.
-	 */
-	imageControls: ReactNode;
-	/**
-	 * Which layout the editor is in, tracking the sidebar-collapse breakpoint
-	 * (`small`). `wide` is a side-by-side canvas and sidebar; `narrow` stacks,
-	 * leaving the frame to house the clusters the Crop panel no longer holds.
-	 */
+	isImage: boolean;
 	layout: 'wide' | 'narrow';
 	onRequestClose: () => void;
 	onKeyDown: ( event: ReactKeyboardEvent< HTMLElement > ) => void;
@@ -112,7 +95,6 @@ export interface MediaEditorProps {
 	renderFrame: ( props: MediaEditorFrameProps ) => JSX.Element;
 	noticesClassName?: string;
 	noticesPortalElement?: Element | null;
-	showCloseButton?: boolean;
 	shouldCloseOnEsc?: boolean;
 	/**
 	 * The `@wordpress/interface` scope for the details sidebar and its pinned
@@ -126,14 +108,6 @@ export interface MediaEditorProps {
 	 * @default 'media-editor'
 	 */
 	scope?: string;
-	/**
-	 * Size applied to the Cancel/Save buttons. Footers use the 40px default;
-	 * frames that host these actions in a page header should pass `compact` so
-	 * they match the header's other controls.
-	 *
-	 * @default 'default'
-	 */
-	saveActionsSize?: 'default' | 'compact';
 }
 
 interface MediaEditorSidebarProps {
@@ -189,21 +163,58 @@ function MediaEditorSidebar( {
 	);
 }
 
-interface HeaderActionsProps {
-	isSaving: boolean;
+/**
+ * Everything the frame's action clusters need from the editor. Supplied by
+ * context rather than by props so the clusters can be module-level components:
+ * a component created during a render has a new identity on every pass, which
+ * remounts its subtree and drops focus mid-interaction.
+ */
+interface MediaEditorFrameContextValue {
 	isImage: boolean;
-	showCloseButton?: boolean;
-	onCancel: () => void;
+	isSaving: boolean;
+	hasMedia: boolean;
+	hasChanges: boolean;
+	isUndoRedoDisabled: boolean;
+	layout: 'wide' | 'narrow';
 	scope: string;
+	aspectRatioPresets?: AspectRatioPreset[];
+	onCancel: () => void;
+	onSave: () => void;
+	onReset: () => void;
 }
 
-function HeaderActions( {
-	isSaving,
-	isImage,
-	showCloseButton = false,
-	onCancel,
-	scope,
-}: HeaderActionsProps ) {
+const MediaEditorFrameContext =
+	createContext< MediaEditorFrameContextValue | null >( null );
+
+/**
+ * Hook to access the media editor's frame context.
+ *
+ * Must be used within a MediaEditor component.
+ *
+ * @return MediaEditorFrameContextValue the action clusters render from.
+ */
+function useMediaEditorFrameContext(): MediaEditorFrameContextValue {
+	const context = useContext( MediaEditorFrameContext );
+	if ( ! context ) {
+		throw new Error(
+			'useMediaEditorFrameContext must be used within MediaEditor'
+		);
+	}
+	return context;
+}
+
+export interface HeaderActionsProps {
+	/**
+	 * Whether to include a Close button. Frames with a dismissal affordance of
+	 * their own — a route's breadcrumbs, say — leave it out.
+	 *
+	 * @default false
+	 */
+	showCloseButton?: boolean;
+}
+
+function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
+	const { isImage, isSaving, onCancel, scope } = useMediaEditorFrameContext();
 	const [ isShortcutsModalOpen, setIsShortcutsModalOpen ] = useState( false );
 	return (
 		<Stack
@@ -240,15 +251,9 @@ function HeaderActions( {
 	);
 }
 
-interface HistoryActionsProps {
-	isUndoRedoDisabled?: boolean;
-	onReset: () => void;
-}
-
-function HistoryActions( {
-	isUndoRedoDisabled = false,
-	onReset,
-}: HistoryActionsProps ) {
+function HistoryActions() {
+	const { isImage, isUndoRedoDisabled, onReset } =
+		useMediaEditorFrameContext();
 	const {
 		reset,
 		isDirty,
@@ -259,6 +264,11 @@ function HistoryActions( {
 		beginGesture,
 		endGesture,
 	} = useMediaEditor();
+	// Non-image media has no edit history. Checked after the hooks above so
+	// the hook order stays stable across renders.
+	if ( ! isImage ) {
+		return null;
+	}
 	const handleUndo = () => {
 		if ( isUndoRedoDisabled ) {
 			return;
@@ -320,23 +330,19 @@ function HistoryActions( {
 	);
 }
 
-interface SaveActionsProps {
-	isSaving: boolean;
-	hasMedia: boolean;
-	hasChanges: boolean;
-	size: 'default' | 'compact';
-	onCancel: () => void;
-	onSave: () => void;
+export interface SaveActionsProps {
+	/**
+	 * Button height. Footers take the 40px default; frames placing these in a
+	 * page header pass `compact` to match the header's other controls.
+	 *
+	 * @default 'default'
+	 */
+	size?: 'default' | 'compact';
 }
 
-function SaveActions( {
-	isSaving,
-	hasMedia,
-	hasChanges,
-	size,
-	onCancel,
-	onSave,
-}: SaveActionsProps ) {
+function SaveActions( { size = 'default' }: SaveActionsProps ) {
+	const { isSaving, hasMedia, hasChanges, onCancel, onSave } =
+		useMediaEditorFrameContext();
 	const saveDisabled = isSaving || ! hasMedia || ! hasChanges;
 	return (
 		<Stack
@@ -370,6 +376,23 @@ function SaveActions( {
 	);
 }
 
+function ImageControls() {
+	const { isImage, layout, aspectRatioPresets } =
+		useMediaEditorFrameContext();
+	// Renders only where the frame is responsible for these: in the `wide`
+	// layout the Crop panel holds them, so a frame that places this
+	// unconditionally still won't show them twice.
+	if ( ! isImage || layout !== 'narrow' ) {
+		return null;
+	}
+	return (
+		<MediaEditorImageControls
+			showAspectRatioControl
+			aspectRatioPresets={ aspectRatioPresets }
+		/>
+	);
+}
+
 function MediaEditorContent( {
 	fields = [],
 	id,
@@ -379,10 +402,8 @@ function MediaEditorContent( {
 	renderFrame,
 	noticesClassName = 'media-editor__snackbar',
 	noticesPortalElement,
-	showCloseButton = false,
 	shouldCloseOnEsc = false,
 	scope = 'media-editor',
-	saveActionsSize = 'default',
 }: MediaEditorProps ) {
 	const cropper = useMediaEditor();
 	// The sidebar is a side column from the `small` breakpoint up and collapses
@@ -704,53 +725,37 @@ function MediaEditorContent( {
 		</MediaEditorProvider>
 	);
 
-	const history = isImage ? (
-		<HistoryActions
-			isUndoRedoDisabled={ isCropInteractionActive }
-			onReset={ resetCropOptions }
-		/>
-	) : null;
-	const imageControls = isImage ? (
-		<MediaEditorImageControls
-			showAspectRatioControl
-			aspectRatioPresets={ aspectRatioPresets }
-		/>
-	) : null;
-	const actions = (
-		<SaveActions
-			isSaving={ isSaving }
-			hasMedia={ !! media }
-			hasChanges={ hasChanges }
-			size={ saveActionsSize }
-			onCancel={ handleRequestClose }
-			onSave={ saveMediaEditor }
-		/>
-	);
-
-	return renderFrame( {
-		children,
-		headerActions: (
-			<HeaderActions
-				isSaving={ isSaving }
-				isImage={ isImage }
-				showCloseButton={ showCloseButton }
-				onCancel={ handleRequestClose }
-				scope={ scope }
-			/>
-		),
-		historyActions: history,
-		saveActions: actions,
-		// Withheld in the `wide` layout: the Crop panel already renders these,
-		// so the frame has nothing to place.
-		imageControls: layout === 'narrow' ? imageControls : null,
-		layout,
-		onRequestClose: handleRequestClose,
-		onKeyDown: handleKeyDown,
-		shouldCloseOnClickOutside: ! hasChanges && ! isSaving,
+	// Rebuilt each render, like the elements it replaces: consumers re-render
+	// as they always did, but the cluster component types stay stable.
+	const contextValue: MediaEditorFrameContextValue = {
+		isImage,
 		isSaving,
-		hasChanges,
 		hasMedia: !! media,
-	} );
+		hasChanges,
+		isUndoRedoDisabled: isCropInteractionActive,
+		layout,
+		scope,
+		aspectRatioPresets,
+		onCancel: handleRequestClose,
+		onSave: saveMediaEditor,
+		onReset: resetCropOptions,
+	};
+
+	return (
+		<MediaEditorFrameContext.Provider value={ contextValue }>
+			{ renderFrame( {
+				children,
+				isImage,
+				layout,
+				onRequestClose: handleRequestClose,
+				onKeyDown: handleKeyDown,
+				shouldCloseOnClickOutside: ! hasChanges && ! isSaving,
+				isSaving,
+				hasChanges,
+				hasMedia: !! media,
+			} ) }
+		</MediaEditorFrameContext.Provider>
+	);
 }
 
 export function MediaEditor( props: MediaEditorProps ) {
@@ -760,5 +765,13 @@ export function MediaEditor( props: MediaEditorProps ) {
 		</MediaEditorStateProvider>
 	);
 }
+
+// Attached to `MediaEditor` so frames import and arrange them, the way
+// `DataViewsPicker` exposes its own sub-components. They read what they need
+// from context, so a frame only chooses where they go and how they look.
+MediaEditor.HeaderActions = HeaderActions;
+MediaEditor.HistoryActions = HistoryActions;
+MediaEditor.SaveActions = SaveActions;
+MediaEditor.ImageControls = ImageControls;
 
 export default MediaEditor;

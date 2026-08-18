@@ -4,7 +4,7 @@ import { __ } from '@wordpress/i18n';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
 import type { Field } from '@wordpress/dataviews';
-import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react';
+import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
 import MediaEditor from '../media-editor';
 import type { Media } from '../media-editor-provider';
 import { store as mediaEditorStore } from '../../store';
@@ -28,9 +28,6 @@ interface MediaEditorModalProps {
 
 interface ModalFooterProps {
 	layout: 'wide' | 'narrow';
-	historyActions: ReactNode;
-	saveActions: ReactNode;
-	imageControls: ReactNode;
 }
 
 /**
@@ -39,12 +36,7 @@ interface ModalFooterProps {
  * the canvas column at every viewport. One JSX tree per layout; DOM order
  * matches visual order.
  */
-function ModalFooter( {
-	layout,
-	historyActions,
-	saveActions,
-	imageControls,
-}: ModalFooterProps ) {
+function ModalFooter( { layout }: ModalFooterProps ) {
 	return (
 		<div
 			className={ `media-editor-modal__footer is-${ layout }` }
@@ -55,16 +47,16 @@ function ModalFooter( {
 				// Sidebar is a column: the image controls live in the Crop
 				// panel, so the footer is just History + Cancel/Save.
 				<>
-					{ historyActions }
-					{ saveActions }
+					<MediaEditor.HistoryActions />
+					<MediaEditor.SaveActions />
 				</>
 			) : (
 				// Sidebar collapsed: the image controls drop into the footer.
 				<>
-					{ imageControls }
+					<MediaEditor.ImageControls />
 					<div className="media-editor-modal__footer-row">
-						{ historyActions }
-						{ saveActions }
+						<MediaEditor.HistoryActions />
+						<MediaEditor.SaveActions />
 					</div>
 				</>
 			) }
@@ -117,7 +109,6 @@ export function MediaEditorModal( {
 			id={ id }
 			fields={ fields }
 			aspectRatioPresets={ aspectRatioPresets }
-			showCloseButton
 			shouldCloseOnEsc
 			noticesClassName="media-editor-modal__snackbar"
 			noticesPortalElement={ portalElement }
@@ -153,10 +144,6 @@ export function MediaEditorModal( {
 			} }
 			renderFrame={ ( {
 				children,
-				headerActions,
-				historyActions,
-				saveActions,
-				imageControls,
 				layout,
 				onRequestClose,
 				onKeyDown,
@@ -174,15 +161,12 @@ export function MediaEditorModal( {
 						shouldCloseOnClickOutside={ shouldCloseOnClickOutside }
 						onKeyDown={ onKeyDown }
 						onRequestClose={ onRequestClose }
-						headerActions={ headerActions }
+						headerActions={
+							<MediaEditor.HeaderActions showCloseButton />
+						}
 					>
 						{ children }
-						<ModalFooter
-							layout={ layout }
-							historyActions={ historyActions }
-							saveActions={ saveActions }
-							imageControls={ imageControls }
-						/>
+						<ModalFooter layout={ layout } />
 					</Modal>
 				</ShortcutProvider>
 			) }

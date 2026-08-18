@@ -74,24 +74,13 @@ function MediaEditorRoute() {
 			// A scope of its own, so that the details sidebar opens by default
 			// here regardless of whether it was last collapsed in the modal.
 			scope={ MEDIA_EDITOR_SCOPE }
-			// The actions sit in the page header rather than a footer, so they
-			// match the height of the header's other controls.
-			saveActionsSize="compact"
 			onClose={ navigateBack }
 			onSaved={ ( { id: savedId } ) => {
 				if ( savedId !== attachmentId ) {
 					navigate( { to: `/media-editor/${ savedId }` } );
 				}
 			} }
-			renderFrame={ ( {
-				children,
-				headerActions,
-				historyActions,
-				saveActions,
-				imageControls,
-				layout,
-				onKeyDown,
-			} ) => {
+			renderFrame={ ( { children, isImage, layout, onKeyDown } ) => {
 				// Below the sidebar-collapse breakpoint the header has no room
 				// for the history cluster: it already carries the breadcrumbs,
 				// Cancel/Save, and (under `medium`) the framework's navigation
@@ -131,22 +120,25 @@ function MediaEditorRoute() {
 							}
 							actions={
 								<>
-									{ ! isNarrow && historyActions }
-									{ headerActions }
-									{ saveActions }
+									{ ! isNarrow && (
+										<MediaEditor.HistoryActions />
+									) }
+									<MediaEditor.HeaderActions />
+									{ /* Compact to match the header's other
+									     controls, as elsewhere in wp-admin. */ }
+									<MediaEditor.SaveActions size="compact" />
 								</>
 							}
 						>
 							<div className="media-editor-route__content">
 								{ children }
 							</div>
-							{ isNarrow &&
-								( imageControls || historyActions ) && (
-									<div className="media-editor-route__toolbar">
-										{ imageControls }
-										{ historyActions }
-									</div>
-								) }
+							{ isNarrow && isImage && (
+								<div className="media-editor-route__toolbar">
+									<MediaEditor.ImageControls />
+									<MediaEditor.HistoryActions />
+								</div>
+							) }
 						</Page>
 					</div>
 				);
