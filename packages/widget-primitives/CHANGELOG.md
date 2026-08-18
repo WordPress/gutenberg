@@ -14,6 +14,10 @@
     icon reference resolves; an unresolvable reference clears it
     ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
 
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
 ## 0.5.0 (2026-08-12)
 
 ### New Features
