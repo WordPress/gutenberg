@@ -6,9 +6,9 @@
 	},
 	"references": [
 		{ "path": "../components" },
-		{ "path": "../compose" },
-		{ "path": "../deprecated" },
-		{ "path": "../element" },
+		{ "path": "../compose/tsconfig.build.json" },
+		{ "path": "../deprecated/tsconfig.build.json" },
+		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../hooks" },
 		{ "path": "../icons" },
 		{ "path": "../is-shallow-equal" }

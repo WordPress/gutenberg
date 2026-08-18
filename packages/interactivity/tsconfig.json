@@ -2,7 +2,13 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.dev.base.json",
 	"references": [ { "path": "./tsconfig.build.json" } ],
-	// Other test files have type errors; widen this once they are fixed.
-	"files": [ "src/test/types.ts" ],
-	"include": []
+	// Listed files have pre-existing type errors; include them once fixed.
+	"exclude": [
+		"**/benchmark",
+		"src/proxies/test/context-proxy.ts",
+		"src/proxies/test/state-proxy.ts",
+		"src/proxies/test/store-proxy.ts",
+		"src/test/utils.ts",
+		"src/test/vdom.ts"
+	]
 }

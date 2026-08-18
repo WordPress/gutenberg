@@ -11,8 +11,11 @@
 -   Keep the Details sidebar from clipping focus outlines, with balanced horizontal padding ([#81634](https://github.com/WordPress/gutenberg/issues/81634)).
 -   Keep initial focus on the modal dialog frame instead of moving it to the crop area once the image loads ([#81541](https://github.com/WordPress/gutenberg/pull/81541)).
 
-## 0.16.0 (2026-08-12)
+### Internal
 
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 0.16.0 (2026-08-12)
 
 ## 0.15.0 (2026-07-29)
 
