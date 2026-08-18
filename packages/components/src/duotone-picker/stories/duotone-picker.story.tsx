@@ -47,9 +47,9 @@ const Template: StoryFn< typeof DuotonePicker > = ( { onChange, ...args } ) => {
 	return (
 		<DuotonePicker
 			{ ...args }
-			onChange={ ( ...changeArgs ) => {
-				setValue( ...changeArgs );
-				onChange( ...changeArgs );
+			onChange={ ( newValue, ...rest ) => {
+				setValue( newValue );
+				onChange( newValue, ...rest );
 			} }
 			value={ value }
 		/>

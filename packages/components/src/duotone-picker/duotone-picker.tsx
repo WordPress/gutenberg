@@ -81,41 +81,47 @@ function DuotonePicker( {
 		/>
 	);
 
-	const duotoneOptions = duotonePalette.map( ( { colors, slug, name } ) => {
-		const style = {
-			background: getGradientFromCSSColors( colors, '135deg' ),
-			color: 'transparent',
-		};
-		const tooltipText =
-			name ??
-			sprintf(
-				// translators: %s: duotone code e.g: "dark-grayscale" or "7f7f7f-ffffff".
-				__( 'Duotone code: %s' ),
-				slug
-			);
-		const label = name
-			? sprintf(
-					// translators: %s: The name of the option e.g: "Dark grayscale".
-					__( 'Duotone: %s' ),
-					name
-			  )
-			: tooltipText;
-		const isSelected = fastDeepEqual( colors, value );
+	const duotoneOptions = duotonePalette.map(
+		( { colors, slug, name }, index ) => {
+			const style = {
+				background: getGradientFromCSSColors( colors, '135deg' ),
+				color: 'transparent',
+			};
+			const tooltipText =
+				name ??
+				sprintf(
+					// translators: %s: duotone code e.g: "dark-grayscale" or "7f7f7f-ffffff".
+					__( 'Duotone code: %s' ),
+					slug
+				);
+			const label = name
+				? sprintf(
+						// translators: %s: The name of the option e.g: "Dark grayscale".
+						__( 'Duotone: %s' ),
+						name
+				  )
+				: tooltipText;
+			const isSelected = fastDeepEqual( colors, value );
 
-		return (
-			<CircularOptionPicker.Option
-				key={ slug }
-				value={ colors }
-				isSelected={ isSelected }
-				aria-label={ label }
-				tooltipText={ tooltipText }
-				style={ style }
-				onClick={ () => {
-					onChange( isSelected ? undefined : colors );
-				} }
-			/>
-		);
-	} );
+			return (
+				<CircularOptionPicker.Option
+					key={ slug }
+					value={ colors }
+					isSelected={ isSelected }
+					aria-label={ label }
+					tooltipText={ tooltipText }
+					style={ style }
+					onClick={ () => {
+						onChange(
+							isSelected ? undefined : colors,
+							index,
+							slug
+						);
+					} }
+				/>
+			);
+		}
+	);
 
 	const { metaProps, labelProps } = getComputeCircularOptionPickerCommonProps(
 		asButtons,

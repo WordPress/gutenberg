@@ -643,16 +643,15 @@ export function PaletteEdit( {
 		[ variant, elements ]
 	);
 
-	// `DuotonePicker` reports the selected colors rather than an index, so the
-	// matching element has to be looked up by value.
+	// Two duotones can hold the same pair of colors, so the picker's reported
+	// index is what identifies the one that was clicked. Matching on the colors
+	// instead would edit whichever duotone happened to come first.
 	const onSelectDuotoneItem = useCallback(
-		( value?: string[] | 'unset' ) => {
-			const newEditingElementIndex = ( duotones ?? [] ).findIndex(
-				( element ) =>
-					Array.isArray( value ) &&
-					getDuotoneColors( element ).join() === value.join()
-			);
-			if ( newEditingElementIndex > -1 ) {
+		( value?: string[] | 'unset', newEditingElementIndex?: number ) => {
+			if (
+				newEditingElementIndex !== undefined &&
+				( duotones ?? [] )[ newEditingElementIndex ]
+			) {
 				setEditingElement( newEditingElementIndex );
 			} else {
 				setIsEditing( true );

@@ -615,4 +615,67 @@ describe( 'PaletteEdit', () => {
 			] );
 		} );
 	} );
+
+	it( 'can update duotone palette value', async () => {
+		const onChange = jest.fn();
+
+		render(
+			<PaletteEdit
+				{ ...defaultProps }
+				duotones={ duotones }
+				colorPalette={ colors }
+				onChange={ onChange }
+			/>
+		);
+
+		await click( screen.getByLabelText( 'Duotone: Blue and red' ) );
+		await click( screen.getByRole( 'button', { name: /Shadows/ } ) );
+		await click( screen.getByRole( 'option', { name: 'Primary' } ) );
+
+		await waitFor( () => {
+			expect( onChange ).toHaveBeenCalledWith( [
+				duotones[ 0 ],
+				{
+					...duotones[ 1 ],
+					colors: [ '#1a4548', duotones[ 1 ].colors[ 1 ] ],
+				},
+			] );
+		} );
+	} );
+
+	// Adding two duotones with the `+` button seeds both from the palette's
+	// darkest and lightest colors, so duplicate values are the normal case
+	// rather than an edge one. The duotone that was clicked has to be the one
+	// that gets edited.
+	it( 'updates the clicked duotone when two share the same colors', async () => {
+		const onChange = jest.fn();
+		const twins = [
+			{ colors: [ '#000000', '#ffffff' ], name: 'First', slug: 'first' },
+			{
+				colors: [ '#000000', '#ffffff' ],
+				name: 'Second',
+				slug: 'second',
+			},
+		];
+
+		render(
+			<PaletteEdit
+				{ ...defaultProps }
+				duotones={ twins }
+				colorPalette={ colors }
+				onChange={ onChange }
+			/>
+		);
+
+		await click( screen.getByLabelText( 'Duotone: Second' ) );
+		await click( screen.getByRole( 'button', { name: /Shadows/ } ) );
+		await click( screen.getByRole( 'option', { name: 'Primary' } ) );
+
+		await waitFor( () => {
+			expect( onChange ).toHaveBeenCalledWith( [
+				twins[ 0 ],
+				{ ...twins[ 1 ], colors: [ '#1a4548', '#ffffff' ] },
+			] );
+		} );
+	} );
 } );
