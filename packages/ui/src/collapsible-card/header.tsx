@@ -18,6 +18,9 @@ import focusStyles from '../utils/css/focus.module.scss';
 import { HeaderDescriptionIdContext } from './context';
 import type { HeaderProps } from './types';
 
+const HEADER_DESCRIPTION_ATTR =
+	'data-wp-ui-collapsible-card-header-description';
+
 /**
  * The header of a collapsible card. Always visible, and acts as the
  * toggle trigger — clicking anywhere on it expands or collapses the
@@ -74,7 +77,9 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 		useIsomorphicLayoutEffect( () => {
 			const registeredDescriptionIds = new Set( descriptionIds );
 			const nextDescriptionIds = Array.from(
-				headerContentRef.current?.querySelectorAll( '[id]' ) ?? []
+				headerContentRef.current?.querySelectorAll(
+					`[${ HEADER_DESCRIPTION_ATTR }]`
+				) ?? []
 			)
 				.map( ( element ) => element.id )
 				.filter( ( id ) => registeredDescriptionIds.has( id ) );

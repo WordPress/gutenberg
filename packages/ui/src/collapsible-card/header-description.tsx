@@ -52,6 +52,7 @@ export const HeaderDescription = forwardRef<
 			aria-hidden="true"
 			className={ clsx( styles[ 'header-description' ], className ) }
 			{ ...restProps }
+			data-wp-ui-collapsible-card-header-description=""
 		>
 			{ children }
 		</Text>
