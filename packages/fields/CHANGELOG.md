@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Export `build-style/*`, so the stylesheet can be imported as `@wordpress/fields/build-style/style.css` [#81769](https://github.com/WordPress/gutenberg/pull/81769)).
+
 ### Internal
 
 -   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509), [#81514](https://github.com/WordPress/gutenberg/pull/81514))
