@@ -7,30 +7,14 @@ export type PortalProps = ComponentProps< typeof _Menu.Portal >;
 
 export type PositionerProps = ComponentProps< typeof _Menu.Positioner >;
 
-export interface RootProps
-	extends Pick<
-		_Menu.Root.Props,
-		| 'open'
-		| 'onOpenChange'
-		| 'onOpenChangeComplete'
-		| 'defaultOpen'
-		| 'modal'
-		| 'loopFocus'
-		| 'highlightItemOnHover'
-		| 'disabled'
-		| 'actionsRef'
-		| 'triggerId'
-		| 'defaultTriggerId'
-	> {
+export interface RootProps extends ComponentProps< typeof _Menu.Root > {
 	/**
 	 * The menu subcomponents (`Menu.Trigger`, `Menu.Popup`, etc.).
 	 */
 	children?: ReactNode;
 }
 
-export interface TriggerProps
-	extends ComponentProps< 'button' >,
-		Pick< _Menu.Trigger.Props, 'openOnHover' | 'delay' | 'closeDelay' > {
+export interface TriggerProps extends ComponentProps< typeof _Menu.Trigger > {
 	/**
 	 * The content to be rendered inside the trigger.
 	 */
@@ -38,18 +22,7 @@ export interface TriggerProps
 }
 
 export interface SubmenuRootProps
-	extends Pick<
-		_Menu.SubmenuRoot.Props,
-		| 'open'
-		| 'onOpenChange'
-		| 'onOpenChangeComplete'
-		| 'defaultOpen'
-		| 'loopFocus'
-		| 'highlightItemOnHover'
-		| 'disabled'
-		| 'closeParentOnEsc'
-		| 'actionsRef'
-	> {
+	extends ComponentProps< typeof _Menu.SubmenuRoot > {
 	/**
 	 * The submenu subcomponents (`Menu.SubmenuTrigger`, `Menu.Popup`, etc.).
 	 */
