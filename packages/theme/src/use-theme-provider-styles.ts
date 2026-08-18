@@ -264,7 +264,7 @@ export function useThemeProviderStyles( {
 		if ( primary === undefined || background === undefined ) {
 			return {
 				styles: {},
-				warnings: [] as ThemeProviderColorWarning[],
+				warnings: undefined,
 			};
 		}
 

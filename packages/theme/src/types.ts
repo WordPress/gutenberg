@@ -75,11 +75,11 @@ export interface ThemeProviderProps extends ThemeProviderSettings {
 	children?: ReactNode;
 
 	/**
-	 * Called after the provider resolves its colors whenever the current color
-	 * warnings change. Receives an empty array when all contrast targets are met.
+	 * Called after the provider calculates its colors. Receives an empty array
+	 * when all contrast targets are met.
 	 * The callback may run more than once in development under React Strict Mode.
 	 */
-	onColorWarningsChange?: (
+	onColorWarnings?: (
 		warnings: readonly ThemeProviderColorWarning[]
 	) => void;
 

@@ -21,7 +21,7 @@ export const ThemeProvider = ( {
 	cursor,
 	cornerRadius,
 	isRoot = false,
-	onColorWarningsChange,
+	onColorWarnings,
 }: ThemeProviderProps ) => {
 	const { themeProviderStyles, resolvedSettings, colorWarnings } =
 		useThemeProviderStyles( {
@@ -31,8 +31,7 @@ export const ThemeProvider = ( {
 		} );
 
 	const cornerRadiusPreset = resolvedSettings.cornerRadius ?? 'subtle';
-	const hasColorWarningsChangeHandler = onColorWarningsChange !== undefined;
-	const onColorWarningsChangeEvent = useEvent( onColorWarningsChange );
+	const onColorWarningsEvent = useEvent( onColorWarnings );
 
 	const contextValue = useMemo(
 		() => ( {
@@ -44,14 +43,10 @@ export const ThemeProvider = ( {
 	const wrapperRef = useRef< HTMLDivElement >( null );
 
 	useEffect( () => {
-		if ( hasColorWarningsChangeHandler ) {
-			onColorWarningsChangeEvent( colorWarnings );
+		if ( colorWarnings !== undefined ) {
+			onColorWarningsEvent( colorWarnings );
 		}
-	}, [
-		colorWarnings,
-		hasColorWarningsChangeHandler,
-		onColorWarningsChangeEvent,
-	] );
+	}, [ colorWarnings, onColorWarningsEvent ] );
 
 	// For root providers, mirror the wrapper's custom properties and preset
 	// attributes onto the document element of the wrapper's own document

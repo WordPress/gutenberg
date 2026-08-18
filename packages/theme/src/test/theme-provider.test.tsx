@@ -25,7 +25,7 @@ const BRAND_BG = '--wpds-color-background-interactive-brand-strong';
 const SURFACE_BG = '--wpds-color-background-surface-neutral';
 const CURSOR_CONTROL = '--wpds-cursor-control';
 const BORDER_RADIUS_SM = '--wpds-border-radius-sm';
-const PRIMARY = '#1e3a5f';
+const PRIMARY = '#1e90ff';
 const OTHER_PRIMARY = '#8e44ad';
 const BACKGROUND = '#f8f8f8';
 const INACCESSIBLE_PRIMARY = '#608010';
@@ -131,8 +131,16 @@ describe( 'ThemeProvider', () => {
 		expect( readProp( provider, '--wp-admin-theme-color' ) ).toBe( '' );
 	} );
 
-	it( 'reports color warning changes through the callback', () => {
-		const onColorWarningsChange = jest.fn<
+	it( 'does not report color warnings when no colors are calculated', () => {
+		const onColorWarnings = jest.fn();
+
+		render( <ThemeProvider onColorWarnings={ onColorWarnings } /> );
+
+		expect( onColorWarnings ).not.toHaveBeenCalled();
+	} );
+
+	it( 'reports color warnings through the callback', () => {
+		const onColorWarnings = jest.fn<
 			void,
 			[ readonly ThemeProviderColorWarning[] ]
 		>();
@@ -142,11 +150,11 @@ describe( 'ThemeProvider', () => {
 					primary: INACCESSIBLE_PRIMARY,
 					background: INACCESSIBLE_BACKGROUND,
 				} }
-				onColorWarningsChange={ onColorWarningsChange }
+				onColorWarnings={ onColorWarnings }
 			/>
 		);
 
-		const warning = onColorWarningsChange.mock.calls[ 0 ][ 0 ].find(
+		const warning = onColorWarnings.mock.calls[ 0 ][ 0 ].find(
 			( item ) =>
 				item.type === 'contrast' &&
 				item.backgroundToken ===
@@ -167,22 +175,22 @@ describe( 'ThemeProvider', () => {
 				: Number.POSITIVE_INFINITY
 		).toBeLessThan( 4.5 );
 
-		onColorWarningsChange.mockClear();
+		onColorWarnings.mockClear();
 		rerender(
 			<ThemeProvider
 				color={ {
 					primary: ACCESSIBLE_PRIMARY,
 					background: ACCESSIBLE_BACKGROUND,
 				} }
-				onColorWarningsChange={ onColorWarningsChange }
+				onColorWarnings={ onColorWarnings }
 			/>
 		);
 
-		expect( onColorWarningsChange ).toHaveBeenCalledWith( [] );
+		expect( onColorWarnings ).toHaveBeenCalledWith( [] );
 	} );
 
-	it( 'does not report unchanged warnings again when the callback identity changes', () => {
-		const onColorWarningsChange = jest.fn<
+	it( 'does not report warnings again when only the callback identity changes', () => {
+		const onColorWarnings = jest.fn<
 			void,
 			[ readonly ThemeProviderColorWarning[] ]
 		>();
@@ -192,18 +200,16 @@ describe( 'ThemeProvider', () => {
 					primary: ACCESSIBLE_PRIMARY,
 					background: ACCESSIBLE_BACKGROUND,
 				} }
-				onColorWarningsChange={ ( warnings ) =>
-					onColorWarningsChange( warnings )
-				}
+				onColorWarnings={ ( warnings ) => onColorWarnings( warnings ) }
 			/>
 		);
 		const { rerender } = render( renderProvider() );
 
-		expect( onColorWarningsChange ).toHaveBeenCalledTimes( 1 );
+		expect( onColorWarnings ).toHaveBeenCalledTimes( 1 );
 
 		rerender( renderProvider() );
 
-		expect( onColorWarningsChange ).toHaveBeenCalledTimes( 1 );
+		expect( onColorWarnings ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'does not define the custom property outside of the provider', () => {
