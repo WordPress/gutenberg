@@ -135,7 +135,12 @@ export function SidebarNavigationScreenWrapper( {
 		<SidebarNavigationScreen
 			title={ title || __( 'Navigation' ) }
 			actions={ actions }
-			description={ description || __( 'Manage your Navigation Menus.' ) }
+			description={
+				description ||
+				__(
+					'Manage the menus that help visitors find their way around your site.'
+				)
+			}
 			backPath={ backPath }
 			content={ children }
 		/>

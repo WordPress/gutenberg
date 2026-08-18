@@ -550,7 +550,7 @@ test.describe( 'undo', () => {
 		// This cleanup runs through `withMultiEntityRecordEdits`, which
 		// real-time collaboration bypasses in favor of its own undo manager.
 		const isCollaborationEnabled = await page.evaluate(
-			() => window._wpCollaborationEnabled === true
+			() => window.__experimentalEnableRealTimeCollaboration === true
 		);
 
 		// The entity is no longer dirty, so the "Save" button is disabled.
@@ -689,6 +689,77 @@ test.describe( 'undo', () => {
 		// browser's redo stack with it.
 		await pageUtils.pressKeys( 'primaryShift+z', { times: 4 } );
 		await expect( field ).toHaveValue( '<p>markup</p>EDIT' );
+	} );
+} );
+
+test.describe( 'Media Library modal undo', () => {
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
+	test( 'does not remove block on undo while media modal is open', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Media Library' } )
+			.click();
+
+		const modal = page.locator( '.media-modal' );
+		await expect( modal ).toBeVisible();
+
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( modal ).toBeVisible();
+		await expect( modal.locator( '.media-frame-content' ) ).toBeVisible();
+
+		const closeButton = page.locator( '.media-modal-close' );
+		await expect( closeButton ).toBeVisible();
+		await closeButton.focus();
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect( modal ).toBeVisible();
+
+		await closeButton.click();
+		await expect( modal ).toBeHidden();
+
+		await expect(
+			editor.canvas.locator( '[data-type="core/image"]' )
+		).toHaveCount( 1 );
+	} );
+
+	test( 'cleans up modal and backdrop when component unmounts', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Media Library' } )
+			.click();
+
+		const modal = page.locator( '.media-modal' );
+		const backdrop = page.locator( '.media-modal-backdrop' );
+
+		await expect( modal ).toBeVisible();
+		await expect( backdrop ).toBeVisible();
+
+		await page.evaluate( () => {
+			const { select, dispatch } = window.wp.data;
+			const blocks = select( 'core/block-editor' ).getBlocks();
+			const imageBlock = blocks.find(
+				( block ) => block.name === 'core/image'
+			);
+
+			if ( imageBlock ) {
+				dispatch( 'core/block-editor' ).removeBlock(
+					imageBlock.clientId
+				);
+			}
+		} );
+
+		await expect( modal ).toHaveCount( 0 );
+		await expect( backdrop ).toHaveCount( 0 );
 	} );
 } );
 
