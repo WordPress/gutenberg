@@ -485,6 +485,7 @@ const getEditedEntityContextualCommands = () =>
 					name: 'core/view-link',
 					label,
 					icon: external,
+					category: 'view',
 					callback: ( { close } ) => {
 						close();
 						if ( link ) {
