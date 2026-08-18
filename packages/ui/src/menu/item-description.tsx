@@ -6,7 +6,8 @@ import styles from './style.module.css';
 import type { ItemDescriptionProps } from './types';
 
 /**
- * Renders supplementary text below a menu item label.
+ * Renders supplementary text below a menu item label. Use it as a direct child
+ * alongside `Menu.ItemLabel`.
  */
 const ItemDescription = forwardRef< HTMLSpanElement, ItemDescriptionProps >(
 	function MenuItemDescription( { className, id, render, ...props }, ref ) {

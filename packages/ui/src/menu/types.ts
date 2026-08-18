@@ -133,14 +133,16 @@ export interface MenuItemLayoutProps {
 
 export interface ItemLabelProps extends ComponentProps< 'span' > {
 	/**
-	 * The primary label for a menu item.
+	 * The primary label for a menu item. Required when the item also includes
+	 * `Menu.ItemDescription`.
 	 */
 	children?: ReactNode;
 }
 
 export interface ItemDescriptionProps extends ComponentProps< 'span' > {
 	/**
-	 * Supplementary text displayed below a menu item label.
+	 * Supplementary text displayed below a menu item label. Use as a direct
+	 * child alongside `Menu.ItemLabel`.
 	 */
 	children?: ReactNode;
 }
@@ -153,7 +155,8 @@ type MenuItemComponentProps< T extends ElementType > = Omit<
 export type ItemProps = MenuItemComponentProps< typeof _Menu.Item > &
 	MenuItemLayoutProps & {
 		/**
-		 * The content to be rendered inside the menu item.
+		 * The item label, or direct `Menu.ItemLabel` and
+		 * `Menu.ItemDescription` children for structured content.
 		 */
 		children?: ReactNode;
 	};
@@ -172,7 +175,8 @@ export type LinkItemProps = Omit<
 		openInNewTab?: boolean;
 
 		/**
-		 * The content to be rendered inside the link menu item.
+		 * The item label, or direct `Menu.ItemLabel` and
+		 * `Menu.ItemDescription` children for structured content.
 		 */
 		children?: ReactNode;
 	};
@@ -182,7 +186,8 @@ export type CheckboxItemProps = MenuItemComponentProps<
 > &
 	MenuItemLayoutProps & {
 		/**
-		 * The content to be rendered inside the checkbox menu item.
+		 * The item label, or direct `Menu.ItemLabel` and
+		 * `Menu.ItemDescription` children for structured content.
 		 */
 		children?: ReactNode;
 	};
@@ -190,7 +195,8 @@ export type CheckboxItemProps = MenuItemComponentProps<
 export type RadioItemProps = MenuItemComponentProps< typeof _Menu.RadioItem > &
 	MenuItemLayoutProps & {
 		/**
-		 * The content to be rendered inside the radio menu item.
+		 * The item label, or direct `Menu.ItemLabel` and
+		 * `Menu.ItemDescription` children for structured content.
 		 */
 		children?: ReactNode;
 	};
@@ -200,7 +206,8 @@ export type SubmenuTriggerProps = MenuItemComponentProps<
 > &
 	MenuItemLayoutProps & {
 		/**
-		 * The content to be rendered inside the submenu trigger item.
+		 * The item label, or direct `Menu.ItemLabel` and
+		 * `Menu.ItemDescription` children for structured content.
 		 */
 		children?: ReactNode;
 	};

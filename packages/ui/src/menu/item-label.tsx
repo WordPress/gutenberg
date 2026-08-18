@@ -6,7 +6,8 @@ import styles from './style.module.css';
 import type { ItemLabelProps } from './types';
 
 /**
- * Renders the primary label within a menu item.
+ * Renders the primary label within a menu item. Use it as a direct child when
+ * composing an item with `Menu.ItemDescription`.
  */
 const ItemLabel = forwardRef< HTMLSpanElement, ItemLabelProps >(
 	function MenuItemLabel( { className, id, render, ...props }, ref ) {
