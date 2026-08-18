@@ -10,7 +10,7 @@
 
 ### Enhancements
 
--   `PaletteEdit`: Add a duotone variant. Passing `duotones` (with an optional `colorPalette` for the shadows and highlights pickers) edits duotone presets with the same UI as colors and gradients. Palette colors that do not resolve to a concrete value, such as `color-mix()`, are left out of the duotone pickers, since a duotone built from one cannot be rendered ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
+-   `PaletteEdit`: Add a duotone variant. Passing `duotones` (with an optional `colorPalette` for the shadows and highlights pickers) edits duotone presets with the same UI as colors and gradients. Palette colors that do not resolve to a concrete value, such as `color-mix()`, are left out of the duotone pickers, since a duotone built from one cannot be rendered ([#81605](https://github.com/WordPress/gutenberg/pull/81605)).
 -   `TextControl`, `TextareaControl`, `FormTokenField`, `ContentEditableControl`, `ComboboxControl`: Align focus and hover styles with the design system ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
 -   `InputControl`, `SelectControl`, `CustomSelectControl`: Align focus rings with the design system ([#80417](https://github.com/WordPress/gutenberg/pull/80417)).
 

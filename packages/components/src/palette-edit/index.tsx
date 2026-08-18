@@ -362,10 +362,13 @@ function ColorPickerPopover< T extends PaletteElement >( {
 						<CustomDuotoneBar
 							value={ getDuotoneColors( element ) }
 							onChange={ ( newColors ) => {
-								onChange( {
-									...element,
-									colors: newColors ?? [],
-								} );
+								// A duotone needs two colors to render, and the
+								// bar refuses to drop below two stops, so an
+								// empty value means there is nothing to save.
+								if ( ! newColors?.length ) {
+									return;
+								}
+								onChange( { ...element, colors: newColors } );
 							} }
 						/>
 						<ColorListPicker
@@ -379,8 +382,11 @@ function ColorPickerPopover< T extends PaletteElement >( {
 								onChange( {
 									...element,
 									colors: [
-										newColors[ 0 ] ?? defaultDark,
-										newColors[ 1 ] ?? defaultLight,
+										// Falsy rather than nullish, to match
+										// how `DuotonePicker` fills a cleared
+										// shadow or highlight.
+										newColors[ 0 ] || defaultDark,
+										newColors[ 1 ] || defaultLight,
 									],
 								} );
 							} }

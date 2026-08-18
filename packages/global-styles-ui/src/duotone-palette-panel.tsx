@@ -1,4 +1,5 @@
 import { useViewportMatch } from '@wordpress/compose';
+import { useMemo } from '@wordpress/element';
 import { __experimentalPaletteEdit as PaletteEdit } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
@@ -65,11 +66,17 @@ export default function DuotonePalettePanel( {
 		name
 	);
 
-	const colorPalette = [
-		...asArray( customColors ),
-		...asArray( themeColors ),
-		...( defaultPaletteEnabled ? asArray( defaultColors ) : [] ),
-	];
+	// A stable array, so the filtering and darkest/lightest lookups that
+	// `PaletteEdit` and `DuotonePicker` memoize on it are not redone on every
+	// render.
+	const colorPalette = useMemo(
+		() => [
+			...asArray( customColors ),
+			...asArray( themeColors ),
+			...( defaultPaletteEnabled ? asArray( defaultColors ) : [] ),
+		],
+		[ customColors, themeColors, defaultColors, defaultPaletteEnabled ]
+	);
 
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const popoverProps = isMobileViewport ? mobilePopoverProps : undefined;
