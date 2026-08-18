@@ -1,5 +1,5 @@
 import { useSelect } from '@wordpress/data';
-import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
+import { canAppendBlocks } from '../block-appender-button/can-append';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
@@ -16,7 +16,6 @@ export function useParentInserter() {
 			getBlockParents,
 			getSelectedBlockClientIds,
 			getParentSectionBlock,
-			getBlockName,
 			getNextBlockClientId,
 		} = unlock( select( blockEditorStore ) );
 		// Not getSelectedBlockClientId: a text selection crossing into a
@@ -27,24 +26,15 @@ export function useParentInserter() {
 		const parents = getBlockParents( selectedBlockClientId );
 		const immediateParentClientId = parents[ parents.length - 1 ];
 		const parentClientId = parentSection ?? immediateParentClientId;
-		const parentBlockType = getBlockType( getBlockName( parentClientId ) );
-		// A wrapper that merges with the text flow (list, quote) grows
-		// by typing: Enter continues it, and users know that. Any
-		// other parent gets a plus button to add a child; the Inserter
-		// hides itself when nothing is insertable.
-		const isTextFlowWrapper =
-			parentBlockType?.merge ||
-			hasBlockSupport( parentBlockType, '__experimentalOnMerge' );
 		return {
 			parentClientId,
 			nextSiblingClientId: getNextBlockClientId( selectedBlockClientId ),
-			// When the shown parent is a section further up the tree
-			// rather than the direct parent, its content is locked and
-			// nothing can be inserted, so no button.
+			// The same rule as the add button in the parent's own
+			// toolbar, so both appear and disappear together.
 			showInserter:
 				!! parentClientId &&
 				parentClientId === immediateParentClientId &&
-				! isTextFlowWrapper,
+				canAppendBlocks( select, parentClientId ),
 		};
 	}, [] );
 }
