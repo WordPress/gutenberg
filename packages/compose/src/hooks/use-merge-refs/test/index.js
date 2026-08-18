@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen, fireEvent } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useCallback, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import useMergeRefs from '../';
 
 describe( 'useMergeRefs', () => {

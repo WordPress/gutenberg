@@ -1,15 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
-/**
- * Internal dependencies
- */
 import { store as editWidgetsStore } from '../../store';
-
-/**
- * Internal dependencies
- */
 import InserterSidebar from './inserter-sidebar';
 import ListViewSidebar from './list-view-sidebar';
 

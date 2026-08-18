@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { notFound } from '@wordpress/route';
-
-/**
- * Internal dependencies
- */
 import { ensureView, viewToQuery } from './view-utils';
 
 /**
@@ -64,7 +57,6 @@ export const route = {
 				postType: params.type,
 				postId,
 				isPreview: true,
-				editLink: `/types/${ params.type }/edit/${ postId }`,
 			};
 		}
 
@@ -83,7 +75,6 @@ export const route = {
 				postType: params.type,
 				postId,
 				isPreview: true,
-				editLink: `/types/${ params.type }/edit/${ postId }`,
 			};
 		}
 

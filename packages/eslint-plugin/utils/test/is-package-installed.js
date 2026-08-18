@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import isPackageInstalled from '../is-package-installed';
 
 describe( 'isPackageInstalled', () => {

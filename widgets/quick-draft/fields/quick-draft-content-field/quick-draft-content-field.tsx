@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { TextareaControl } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import type { DataFormControlProps, FieldValidity } from '@wordpress/dataviews';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import styles from './quick-draft-content-field.module.css';
 
 /*

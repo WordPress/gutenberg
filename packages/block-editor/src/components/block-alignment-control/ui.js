@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	ToolbarDropdownMenu,
@@ -13,10 +6,6 @@ import {
 	MenuGroup,
 	MenuItem,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import useAvailableAlignments from './use-available-alignments';
 import { BLOCK_ALIGNMENTS_CONTROLS, DEFAULT_CONTROL } from './constants';
 

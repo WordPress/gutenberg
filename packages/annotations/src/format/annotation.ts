@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { applyFormat, removeFormat } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import { STORE_NAME } from '../store/constants';
 import type { Annotation, AnnotationFormat } from '../types';
 

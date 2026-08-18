@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	InnerBlocks,
 	BlockControls,
@@ -24,10 +17,6 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { sprintf, __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 function ColumnInspectorControls( { width, setAttributes } ) {
@@ -66,6 +55,20 @@ function ColumnInspectorControls( { width, setAttributes } ) {
 	);
 }
 
+/**
+ * Renders the `core/column` block in the editor.
+ *
+ * @param {Object}         props                                Component props.
+ * @param {Object}         props.attributes                     Block attributes.
+ * @param {string}         [props.attributes.verticalAlignment] Vertical alignment of the column, one of `top`, `center`, `bottom` or `stretch`. Setting it resets the alignment on the parent Columns block.
+ * @param {string|number}  [props.attributes.width]             Column width, used as its `flex-basis`. A number is treated as a percentage, for content saved before the attribute became a CSS length.
+ * @param {string|boolean} [props.attributes.templateLock]      Template lock applied to the inner blocks, one of `all`, `insert`, `contentOnly` or `false`.
+ * @param {string[]}       [props.attributes.allowedBlocks]     Names of the blocks allowed as inner blocks, added by the `allowedBlocks` block support.
+ * @param {Function}       props.setAttributes                  Callback for updating block attributes.
+ * @param {string}         props.clientId                       Client ID of the block.
+ *
+ * @return {React.JSX.Element} React element.
+ */
 function ColumnEdit( {
 	attributes: { verticalAlignment, width, templateLock, allowedBlocks },
 	setAttributes,
@@ -124,7 +127,7 @@ function ColumnEdit( {
 			templateLock,
 			allowedBlocks,
 			renderAppender: hasChildBlocks
-				? undefined
+				? false
 				: InnerBlocks.ButtonBlockAppender,
 		}
 	);

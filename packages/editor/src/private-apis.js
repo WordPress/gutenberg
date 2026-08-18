@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import {
 	CreateTemplatePartModal,
 	patternTitleField,
 	templateTitleField,
 } from '@wordpress/fields';
 import * as interfaceApis from '@wordpress/interface';
-
-/**
- * Internal dependencies
- */
 import { lock } from './lock-unlock';
 import BackButton from './components/header/back-button';
 import Editor from './components/editor';

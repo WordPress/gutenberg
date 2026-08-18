@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { wrap, terminate } from '../main-thread';
 import { WORKER_SYMBOL } from '../types';
 
@@ -47,7 +44,7 @@ class MockWorker {
 	 * @param type  Event type.
 	 * @param event Event object.
 	 */
-	simulateEvent( type: string, event: Partial< Event > = {} ) {
+	simulateEvent( type: string, event: Partial< ErrorEvent > = {} ) {
 		for ( const handler of this.listeners.get( type ) || [] ) {
 			handler( event as Event );
 		}

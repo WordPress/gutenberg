@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	hasBlockSupport,
@@ -20,11 +17,8 @@ import {
 	unseen,
 	blockDefault as blockDefaultIcon,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
+import { groupBlocks } from '../../utils/group-blocks';
 import { unlock } from '../../lock-unlock';
 
 const getTransformCommands = () =>
@@ -202,8 +196,7 @@ const getQuickActionsCommands = () =>
 
 			const groupingBlockName = getGroupingBlockName();
 
-			// Activate the `transform` on `core/group` which does the conversion.
-			const newBlocks = switchToBlockType( blocks, groupingBlockName );
+			const newBlocks = groupBlocks( blocks, groupingBlockName );
 
 			if ( ! newBlocks ) {
 				return;

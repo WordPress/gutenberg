@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { Button } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import PublishButtonLabel from './label';
 import { store as editorStore } from '../../store';
 

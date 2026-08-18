@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { ToolbarButton } from '@wordpress/components';
 import { NavigableToolbar } from '@wordpress/block-editor';
 import { createPortal, useEffect, useState } from '@wordpress/element';
 import { displayShortcut, isAppleOS } from '@wordpress/keycodes';
 import { __, _x, isRTL } from '@wordpress/i18n';
 import { plus, undo as undoIcon, redo as redoIcon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import Inserter from '../inserter';
 import MoreMenu from '../more-menu';
 

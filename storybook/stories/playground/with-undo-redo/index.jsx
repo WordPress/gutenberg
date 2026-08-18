@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEffect } from '@wordpress/element';
 import { useStateWithHistory } from '@wordpress/compose';
 import { registerCoreBlocks } from '@wordpress/block-library';
@@ -11,10 +8,6 @@ import {
 } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
 import { undo as undoIcon, redo as redoIcon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { editorStyles } from '../editor-styles';
 import './style.css';
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
@@ -10,15 +7,7 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-
-/**
- * Internal dependencies
- */
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
 function PostAuthorNameEdit( props ) {
