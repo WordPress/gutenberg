@@ -1,20 +1,30 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
+	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
-		"types": [ "gutenberg-env" ]
+		"types": [ "jest", "gutenberg-env", "node" ]
 	},
 	"references": [
-		{ "path": "../api-fetch" },
+		{ "path": "./tsconfig.build.json" },
+		{ "path": "../api-fetch/tsconfig.build.json" },
 		{ "path": "../blob/tsconfig.build.json" },
-		{ "path": "../compose" },
+		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../data" },
-		{ "path": "../element" },
-		{ "path": "../i18n" },
-		{ "path": "../preferences" },
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../i18n/tsconfig.build.json" },
+		{ "path": "../preferences/tsconfig.build.json" },
 		{ "path": "../private-apis" },
 		{ "path": "../url" },
-		{ "path": "../vips" },
-		{ "path": "../video-conversion" }
+		{ "path": "../vips/tsconfig.build.json" },
+		{ "path": "../video-conversion/tsconfig.build.json" }
+	],
+	// Listed files have pre-existing type errors; include them once fixed.
+	"exclude": [
+		"**/benchmark",
+		"src/store/test/reducer.ts",
+		"src/store/test/actions.ts",
+		"src/store/test/selectors.ts",
+		"src/test/heic-parser.ts",
+		"src/store/test/vips.ts"
 	]
 }

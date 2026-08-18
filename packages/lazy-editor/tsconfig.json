@@ -10,12 +10,12 @@
 		{ "path": "../block-editor" },
 		{ "path": "../blocks" },
 		{ "path": "../components" },
-		{ "path": "../core-data" },
+		{ "path": "../core-data/tsconfig.build.json" },
 		{ "path": "../data" },
-		{ "path": "../element" },
+		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../editor" },
-		{ "path": "../global-styles-engine" },
-		{ "path": "../i18n" },
+		{ "path": "../global-styles-engine/tsconfig.build.json" },
+		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../private-apis" }
 	]
 }

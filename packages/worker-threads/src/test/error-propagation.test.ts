@@ -8,6 +8,13 @@
  * a rejection. See https://github.com/WordPress/gutenberg/issues/80259.
  */
 
+/*
+ * Scope the mock globals to this file; test files without imports would
+ * otherwise share one global scope and collide.
+ */
+// eslint-disable-next-line jest/no-export
+export {};
+
 // Store the original self.
 const originalSelf = globalThis.self;
 
