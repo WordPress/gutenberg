@@ -750,6 +750,56 @@ _Returns_
 
 -   `React.ReactNode`: The rendered component.
 
+### PluginPostRevisionInfo
+
+Renders in the visual revisions document sidebar, under the revision post card.
+
+`children` may be a node or a function receiving `{ context: PluginPostRevisionInfoContext }`. `context.revision` is null while the record is loading.
+
+_Usage_
+
+```js
+// Using ES5 syntax
+var __ = wp.i18n.__;
+var PluginPostRevisionInfo = wp.editor.PluginPostRevisionInfo;
+
+function MyPluginPostRevisionInfo() {
+	return React.createElement(
+		PluginPostRevisionInfo,
+		{
+			className: 'my-plugin-post-revision-info',
+		},
+		__( 'My post revision info' )
+	);
+}
+```
+
+```jsx
+// Using ESNext syntax
+import { PluginPostRevisionInfo } from '@wordpress/editor';
+
+const MyPluginPostRevisionInfo = () => (
+	<PluginPostRevisionInfo className="my-plugin-post-revision-info">
+		{ ( { context } ) => (
+			<div>
+				{ context.revisionId }
+				{ context.revision && context.revision.date }
+			</div>
+		) }
+	</PluginPostRevisionInfo>
+);
+```
+
+_Parameters_
+
+-   _props_ `Object`: Component properties.
+-   _props.className_ `[string]`: An optional class name added to the wrapper.
+-   _props.children_ `React.ReactNode|Function`: Children to be rendered, or a function receiving `{ context }`.
+
+_Returns_
+
+-   `React.ReactNode`: The rendered component.
+
 ### PluginPostStatusInfo
 
 Renders a row in the Summary panel of the Document sidebar. It should be noted that this is named and implemented around the function it serves and not its location, which may change in future iterations.

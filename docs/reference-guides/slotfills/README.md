@@ -347,6 +347,7 @@ The following SlotFills are available in the `edit-post` or `editor` packages. P
 -   [PluginDocumentSettingPanel](/docs/reference-guides/slotfills/plugin-document-setting-panel.md)
 -   [PluginMoreMenuItem](/docs/reference-guides/slotfills/plugin-more-menu-item.md)
 -   [PluginPostPublishPanel](/docs/reference-guides/slotfills/plugin-post-publish-panel.md)
+-   [PluginPostRevisionInfo](/docs/reference-guides/slotfills/plugin-post-revision-info.md)
 -   [PluginPostStatusInfo](/docs/reference-guides/slotfills/plugin-post-status-info.md)
 -   [PluginPrePublishPanel](/docs/reference-guides/slotfills/plugin-pre-publish-panel.md)
 -   [PluginSidebar](/docs/reference-guides/slotfills/plugin-sidebar.md)

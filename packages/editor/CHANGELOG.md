@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+
+### New Features
+
+-   Add a `PluginPostRevisionInfo` slot under the visual revisions post card. Fills receive the selected revision as `fillProps.context`.
+
 ### Internal
 
 -   Check the `window.__experimentalEnableRealTimeCollaboration` flag set by the Real-Time Collaboration experiment, instead of `window._wpCollaborationEnabled`, when determining whether collaboration is enabled for the current post ([#80658](https://github.com/WordPress/gutenberg/pull/80658)).
