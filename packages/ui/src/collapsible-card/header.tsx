@@ -1,6 +1,13 @@
 import { mergeProps, useRender } from '@base-ui/react';
 import clsx from 'clsx';
-import { forwardRef, useCallback, useMemo, useState } from '@wordpress/element';
+import { useIsomorphicLayoutEffect } from '@wordpress/compose';
+import {
+	forwardRef,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { chevronDown } from '@wordpress/icons';
 import * as Card from '../card';
 import * as Collapsible from '../collapsible';
@@ -36,6 +43,10 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 		const [ descriptionIds, setDescriptionIds ] = useState< string[] >(
 			[]
 		);
+		const [ orderedDescriptionIds, setOrderedDescriptionIds ] = useState<
+			string[]
+		>( [] );
+		const headerContentRef = useRef< HTMLDivElement >( null );
 
 		const registerDescriptionId = useCallback( ( id: string ) => {
 			setDescriptionIds( ( currentDescriptionIds ) => {
@@ -59,8 +70,32 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 			() => ( { registerDescriptionId } ),
 			[ registerDescriptionId ]
 		);
+
+		useIsomorphicLayoutEffect( () => {
+			const registeredDescriptionIds = new Set( descriptionIds );
+			const nextDescriptionIds = Array.from(
+				headerContentRef.current?.querySelectorAll( '[id]' ) ?? []
+			)
+				.map( ( element ) => element.id )
+				.filter( ( id ) => registeredDescriptionIds.has( id ) );
+
+			setOrderedDescriptionIds( ( currentDescriptionIds ) => {
+				if (
+					currentDescriptionIds.length ===
+						nextDescriptionIds.length &&
+					currentDescriptionIds.every(
+						( id, index ) => id === nextDescriptionIds[ index ]
+					)
+				) {
+					return currentDescriptionIds;
+				}
+
+				return nextDescriptionIds;
+			} );
+		} );
+
 		const ariaDescribedBy =
-			[ restProps[ 'aria-describedby' ], ...descriptionIds ]
+			[ restProps[ 'aria-describedby' ], ...orderedDescriptionIds ]
 				.filter( Boolean )
 				.join( ' ' ) || undefined;
 
@@ -82,7 +117,10 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 							nativeButton={ false }
 							aria-describedby={ ariaDescribedBy }
 						>
-							<div className={ styles[ 'header-content' ] }>
+							<div
+								ref={ headerContentRef }
+								className={ styles[ 'header-content' ] }
+							>
 								{ children }
 							</div>
 							<div

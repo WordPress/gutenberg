@@ -29,6 +29,10 @@
 			}
 		}
 
+		.content {
+			color: var(--wpds-color-foreground-content-neutral-weak);
+		}
+
 		/* Custom vertical gap between header and content */
 		.header + .content {
 			padding-block-start: 0;

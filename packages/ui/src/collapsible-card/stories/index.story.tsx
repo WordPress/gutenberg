@@ -1,24 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { forwardRef } from '@wordpress/element';
 import * as Card from '../../card';
 import { Stack } from '../../stack';
 import { Text } from '../../text';
 import * as CollapsibleCard from '../index';
-
-const BodyText = forwardRef<
-	HTMLSpanElement,
-	React.ComponentProps< typeof Text >
->( ( props, ref ) => (
-	<Text
-		{ ...props }
-		ref={ ref }
-		render={ props.render ?? <p /> }
-		style={ {
-			color: 'var(--wpds-color-foreground-content-neutral-weak)',
-			...props.style,
-		} }
-	/>
-) );
 
 const meta: Meta< typeof CollapsibleCard.Root > = {
 	tags: [ 'manifest' ],
@@ -51,13 +35,13 @@ export const Default: Story = {
 				<Card.Title>Collapsible card (closed by default)</Card.Title>
 			</CollapsibleCard.Header>,
 			<CollapsibleCard.Content key="content">
-				<BodyText>
+				<Text render={ <p /> }>
 					This is the collapsible content area. It can contain any
 					elements, just like a regular Card.Content.
-				</BodyText>
-				<BodyText>
+				</Text>
+				<Text render={ <p /> }>
 					When collapsed, only the header and chevron are visible.
-				</BodyText>
+				</Text>
 			</CollapsibleCard.Content>,
 		],
 	},
@@ -78,9 +62,9 @@ export const InitiallyOpened: Story = {
 				<Card.Title>Collapsed by default</Card.Title>
 			</CollapsibleCard.Header>,
 			<CollapsibleCard.Content key="content">
-				<BodyText>
+				<Text render={ <p /> }>
 					This content was hidden until you expanded it.
-				</BodyText>
+				</Text>
 			</CollapsibleCard.Content>,
 		],
 	},
@@ -98,9 +82,9 @@ export const Disabled: Story = {
 				<Card.Title>Disabled card</Card.Title>
 			</CollapsibleCard.Header>,
 			<CollapsibleCard.Content key="content">
-				<BodyText>
+				<Text render={ <p /> }>
 					The header is not interactive when disabled.
-				</BodyText>
+				</Text>
 			</CollapsibleCard.Content>,
 		],
 	},
@@ -127,23 +111,23 @@ export const Stacked: Story = {
 						<Card.Title>{ title }</Card.Title>
 					</CollapsibleCard.Header>
 					<CollapsibleCard.Content>
-						<BodyText>
+						<Text render={ <p /> }>
 							Configure all { title.toLowerCase() } settings for
 							your site. Changes here affect how your site behaves
 							across all pages and posts.
-						</BodyText>
-						<BodyText>
+						</Text>
+						<Text render={ <p /> }>
 							Review each option carefully before saving. Some
 							changes may require a page reload to take effect.
 							Hover over individual options for more details about
 							what they control.
-						</BodyText>
-						<BodyText>
+						</Text>
+						<Text render={ <p /> }>
 							If you&apos;re unsure about a setting, you can
 							always reset to defaults using the button at the
 							bottom of this section. Your previous configuration
 							will be saved as a backup.
-						</BodyText>
+						</Text>
 					</CollapsibleCard.Content>
 				</CollapsibleCard.Root>
 			) ) }
@@ -167,10 +151,10 @@ export const WithHeadingElement: Story = {
 					<Card.Title>Heading level 2</Card.Title>
 				</CollapsibleCard.Header>
 				<CollapsibleCard.Content>
-					<BodyText>
+					<Text render={ <p /> }>
 						The wrapper renders as an h2 element when the consumer
 						passes an h2 React element to the render prop.
-					</BodyText>
+					</Text>
 				</CollapsibleCard.Content>
 			</CollapsibleCard.Root>
 			<CollapsibleCard.Root>
@@ -178,10 +162,10 @@ export const WithHeadingElement: Story = {
 					<Card.Title>Heading level 3</Card.Title>
 				</CollapsibleCard.Header>
 				<CollapsibleCard.Content>
-					<BodyText>
+					<Text render={ <p /> }>
 						Pass any of h1–h6 to choose the level that fits the
 						surrounding document outline.
-					</BodyText>
+					</Text>
 				</CollapsibleCard.Content>
 			</CollapsibleCard.Root>
 			<CollapsibleCard.Root>
@@ -189,11 +173,11 @@ export const WithHeadingElement: Story = {
 					<Card.Title>No heading (default)</Card.Title>
 				</CollapsibleCard.Header>
 				<CollapsibleCard.Content>
-					<BodyText>
+					<Text render={ <p /> }>
 						Without a render prop, the header wraps the trigger in a
 						plain div and does not contribute to the document
 						outline.
-					</BodyText>
+					</Text>
 				</CollapsibleCard.Content>
 			</CollapsibleCard.Root>
 		</Stack>
@@ -201,9 +185,9 @@ export const WithHeadingElement: Story = {
 };
 
 /**
- * A collapsible card with `HeaderDescription` components that provide
+ * A collapsible card with a `HeaderDescription` that provides
  * supplementary information (e.g. status, summary) as an `aria-describedby`
- * relationship. The examples show inline and second-row layouts.
+ * relationship.
  */
 export const WithHeaderDescription: Story = {
 	argTypes: {
@@ -217,38 +201,21 @@ export const WithHeaderDescription: Story = {
 		onOpenChange: _onOpenChange,
 		...restArgs
 	} ) => (
-		<Stack direction="column" gap="lg">
-			<CollapsibleCard.Root { ...restArgs }>
-				<CollapsibleCard.Header>
-					<Stack justify="space-between" align="center">
-						<Card.Title>Settings</Card.Title>
-						<CollapsibleCard.HeaderDescription>
-							3 items configured
-						</CollapsibleCard.HeaderDescription>
-					</Stack>
-				</CollapsibleCard.Header>
-				<CollapsibleCard.Content>
-					<BodyText>
-						The description appears next to the title.
-					</BodyText>
-				</CollapsibleCard.Content>
-			</CollapsibleCard.Root>
-			<CollapsibleCard.Root { ...restArgs }>
-				<CollapsibleCard.Header>
-					<Stack direction="column" gap="xs">
-						<Card.Title>Settings</Card.Title>
-						<CollapsibleCard.HeaderDescription>
-							Review your settings here.
-						</CollapsibleCard.HeaderDescription>
-					</Stack>
-				</CollapsibleCard.Header>
-				<CollapsibleCard.Content>
-					<BodyText>
-						The description appears below the title.
-					</BodyText>
-				</CollapsibleCard.Content>
-			</CollapsibleCard.Root>
-		</Stack>
+		<CollapsibleCard.Root { ...restArgs }>
+			<CollapsibleCard.Header>
+				<Stack justify="space-between" align="center">
+					<Card.Title>Settings</Card.Title>
+					<CollapsibleCard.HeaderDescription>
+						3 items configured
+					</CollapsibleCard.HeaderDescription>
+				</Stack>
+			</CollapsibleCard.Header>
+			<CollapsibleCard.Content>
+				<Text render={ <p /> }>
+					The description appears next to the title.
+				</Text>
+			</CollapsibleCard.Content>
+		</CollapsibleCard.Root>
 	),
 };
 
@@ -277,9 +244,9 @@ export const ComparedToCard: Story = {
 					<Card.Title>CollapsibleCard (open)</Card.Title>
 				</CollapsibleCard.Header>
 				<CollapsibleCard.Content>
-					<BodyText>
+					<Text render={ <p /> }>
 						Content should align with the regular card below.
-					</BodyText>
+					</Text>
 				</CollapsibleCard.Content>
 			</CollapsibleCard.Root>
 			<Card.Root { ...restArgs }>
@@ -287,9 +254,9 @@ export const ComparedToCard: Story = {
 					<Card.Title>Regular Card</Card.Title>
 				</Card.Header>
 				<Card.Content>
-					<BodyText>
+					<Text render={ <p /> }>
 						Content should align with the collapsible card above.
-					</BodyText>
+					</Text>
 				</Card.Content>
 			</Card.Root>
 		</Stack>
@@ -352,7 +319,7 @@ export const WithFullBleed: Story = {
 						} }
 					/>
 				</Card.FullBleed>
-				<BodyText>Content below the full-bleed area.</BodyText>
+				<Text render={ <p /> }>Content below the full-bleed area.</Text>
 			</CollapsibleCard.Content>,
 		],
 	},

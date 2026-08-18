@@ -331,7 +331,7 @@ describe( 'CollapsibleCard', () => {
 			);
 		} );
 
-		it( 'updates the trigger accessible description when one description unmounts', () => {
+		it( 'keeps descriptions in visual order when a conditional description remounts', () => {
 			const getCard = ( showFirstDescription: boolean ) => (
 				<CollapsibleCard.Root>
 					<CollapsibleCard.Header>
@@ -360,6 +360,13 @@ describe( 'CollapsibleCard', () => {
 			expect( trigger ).toHaveAccessibleName( 'Settings' );
 			expect( trigger ).toHaveAccessibleDescription(
 				'Requires attention'
+			);
+
+			rerender( getCard( true ) );
+
+			expect( trigger ).toHaveAccessibleName( 'Settings' );
+			expect( trigger ).toHaveAccessibleDescription(
+				'3 errors Requires attention'
 			);
 		} );
 

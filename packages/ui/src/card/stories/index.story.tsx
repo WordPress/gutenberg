@@ -1,23 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { forwardRef } from '@wordpress/element';
 import { Stack } from '../../stack';
 import { Text } from '../../text';
 import * as Card from '../index';
-
-const BodyText = forwardRef<
-	HTMLSpanElement,
-	React.ComponentProps< typeof Text >
->( ( props, ref ) => (
-	<Text
-		{ ...props }
-		ref={ ref }
-		render={ props.render ?? <p /> }
-		style={ {
-			color: 'var(--wpds-color-foreground-content-neutral-weak)',
-			...props.style,
-		} }
-	/>
-) );
 
 const meta: Meta< typeof Card.Root > = {
 	tags: [ 'manifest' ],
@@ -47,17 +31,17 @@ export const Default: Story = {
 				<Card.Title>Card title</Card.Title>
 			</Card.Header>,
 			<Card.Content key="content">
-				<BodyText>
+				<Text render={ <p /> }>
 					This is the main content area. It can contain any elements.
 					This is the main content area. It can contain any elements.
 					This is the main content area. It can contain any elements.
 					This is the main content area. It can contain any elements.
 					This is the main content area. It can contain any elements.
 					This is the main content area. It can contain any elements.
-				</BodyText>
-				<BodyText>
+				</Text>
+				<Text render={ <p /> }>
 					This is the main content area. It can contain any elements.
-				</BodyText>
+				</Text>
 			</Card.Content>,
 		],
 	},
@@ -134,7 +118,7 @@ export const WithFullBleed: Story = {
 						} }
 					/>
 				</Card.FullBleed>
-				<BodyText>Content below the full-bleed area.</BodyText>
+				<Text render={ <p /> }>Content below the full-bleed area.</Text>
 			</Card.Content>,
 		],
 	},
@@ -177,10 +161,10 @@ export const FullBleedHeroWithTitle: Story = {
 				<Card.Title>Hero image card</Card.Title>
 			</Card.Header>,
 			<Card.Content key="content">
-				<BodyText>
+				<Text render={ <p /> }>
 					The image above bleeds to the card&apos;s top and side
 					edges.
-				</BodyText>
+				</Text>
 			</Card.Content>,
 		],
 	},
@@ -206,10 +190,10 @@ export const FullBleedHeroOnly: Story = {
 				</Card.FullBleed>
 			</Card.Header>,
 			<Card.Content key="content">
-				<BodyText>
+				<Text render={ <p /> }>
 					The image above bleeds to the card&apos;s top and side
 					edges.
-				</BodyText>
+				</Text>
 			</Card.Content>,
 		],
 	},
@@ -228,7 +212,9 @@ export const CustomSemantics: Story = {
 				<Card.Title render={ <h2 /> }>Section heading</Card.Title>
 			</Card.Header>,
 			<Card.Content key="content">
-				<BodyText>Semantically meaningful card content.</BodyText>
+				<Text render={ <p /> }>
+					Semantically meaningful card content.
+				</Text>
 			</Card.Content>,
 		],
 	},
