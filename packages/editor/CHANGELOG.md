@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Register the editor and block editor keyboard shortcuts from the editor provider, so shortcuts work for consumers that mount the editor without rendering `EditorKeyboardShortcutsRegister` themselves ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
+-   Header: Allow the Back button column to grow when "Show button text labels" is enabled so the label is not obscured by the following controls ([#81701](https://github.com/WordPress/gutenberg/pull/81701)).
+
+## 14.53.0 (2026-08-12)
+
 ### Internal
 
 -   Notes: Move the rich text control the note form renders from `@wordpress/dataviews` into this package, where `@wordpress/rich-text` is the same copy the block editor uses ([#81430](https://github.com/WordPress/gutenberg/pull/81430)).

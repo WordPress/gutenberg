@@ -1268,6 +1268,21 @@ test.describe( 'List (@firefox)', () => {
 		);
 	} );
 
+	test( 'remove empty list graciously through UI', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( '* 1' );
+
+		await editor.clickBlockToolbarButton( 'Options' );
+		await page.getByRole( 'menuitem', { name: 'Delete' } ).click();
+
+		expect( await editor.getEditedPostContent() ).toBe( '' );
+	} );
+
 	test( 'should not change the contents when you change the list type to Ordered', async ( {
 		editor,
 		page,
@@ -2159,14 +2174,10 @@ test.describe( 'List (@firefox)', () => {
 			editor.canvas.locator( '.is-multi-selected' )
 		).toHaveCount( 2 );
 
-		// Both items, including the nested one, are removed.
+		// Both items, including the nested one, are removed, and with
+		// them the emptied list itself.
 		await page.keyboard.press( 'Backspace' );
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/list',
-				innerBlocks: [],
-			},
-		] );
+		await expect.poll( editor.getBlocks ).toEqual( [] );
 	} );
 
 	test( 'should multi-select the top level items when extending a selection from a nested item to the previous top level item', async ( {
@@ -2221,19 +2232,16 @@ test.describe( 'List (@firefox)', () => {
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 
 		// The endpoints are promoted to the top level items, which are
-		// multi-selected as blocks.
+		// multi-selected as blocks. The announcement discloses the list
+		// nested in the second item.
 		await expect( page.locator( '[aria-live="assertive"]' ) ).toHaveText(
-			'2 blocks selected.'
+			'2 blocks selected, 4 including nested blocks.'
 		);
 
-		// Both items, including the nested one, are removed.
+		// Both items, including the nested one, are removed, and with
+		// them the emptied list itself.
 		await page.keyboard.press( 'Backspace' );
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/list',
-				innerBlocks: [],
-			},
-		] );
+		await expect.poll( editor.getBlocks ).toEqual( [] );
 	} );
 
 	test( 'should merge a following paragraph into the outermost list with Delete from a nested item (#77245)', async ( {
@@ -2452,6 +2460,46 @@ test.describe( 'List (@firefox)', () => {
 				],
 			},
 		] );
+	} );
+
+	test( 'should remove an anchored list when deleting its last item', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/list',
+			attributes: { anchor: 'list' },
+			innerBlocks: [
+				{ name: 'core/list-item', attributes: { anchor: 'item' } },
+			],
+		} );
+		// Inserting selects the list container; ArrowDown moves the caret
+		// into the sole empty item.
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.type( 'x' );
+
+		// Typing lands in the sole item, verifying both the setup and the
+		// caret position.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				attributes: { anchor: 'list' },
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'x', anchor: 'item' },
+					},
+				],
+			},
+		] );
+
+		// Delete the text, then the emptied item: the anchors are not
+		// content, so the item and the list are removed together instead
+		// of the item being lifted out as a paragraph first.
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect.poll( editor.getBlocks ).toEqual( [] );
 	} );
 
 	test( 'should leave nested list intact when deleting the parent item', async ( {

@@ -6,6 +6,8 @@ import { __ } from '@wordpress/i18n';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Card, Notice, Stack, VisuallyHidden } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
+import { splitWidgetActions } from '../../utils/split-widget-actions';
+import { WidgetFooter } from '../widget-footer';
 import { WidgetHeader } from '../widget-header';
 import { WidgetRender } from '../widget-render';
 import styles from './widget-frame.module.css';
@@ -69,8 +71,9 @@ export interface WidgetFrameProps {
 }
 
 /**
- * Shared framing: `presentation` into header + content, with the error/loading
- * boundaries. Hosts supply the `Card.Root` and their own concerns.
+ * Shared framing: `presentation` into header, content, and the actions footer,
+ * with the error/loading boundaries. Hosts supply the `Card.Root` and their
+ * own concerns.
  *
  * @param {WidgetFrameProps} props Component props.
  */
@@ -86,6 +89,8 @@ export function WidgetFrame( {
 	const isHeaderHidden = presentation === 'full-bleed';
 	const isBodyBleeding =
 		presentation === 'full-bleed' || presentation === 'content-bleed';
+
+	const { footer: footerActions } = splitWidgetActions( widgetType );
 
 	const body = (
 		<WidgetErrorBoundary>
@@ -122,6 +127,10 @@ export function WidgetFrame( {
 				) }
 				{ body }
 			</Card.Content>
+
+			{ footerActions.length > 0 && (
+				<WidgetFooter actions={ footerActions } editMode={ editMode } />
+			) }
 		</>
 	);
 }
