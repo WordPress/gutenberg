@@ -163,41 +163,36 @@ export const WithCustomZIndex: Story = {
 };
 
 /**
- * Example showing composition with a menu. The `AlertDialog.Trigger` is
- * composed with `Menu.Item` using the `render` prop, allowing the menu item to
- * directly trigger the alert dialog.
+ * Control the alert dialog when opening it from a menu item. This lets the
+ * menu close before the dialog opens and keeps the dialog mounted while the
+ * menu popup unmounts.
  */
 export const MenuTrigger: Story = {
 	render: () => {
-		const [ menuOpen, setMenuOpen ] = useState( false );
+		const [ dialogOpen, setDialogOpen ] = useState( false );
+
 		return (
-			<Menu.Root onOpenChange={ setMenuOpen } open={ menuOpen }>
-				<Menu.Trigger>Actions ▾</Menu.Trigger>
-				<Menu.Popup>
-					<Menu.Item>Edit</Menu.Item>
-					<AlertDialog.Root
-						onConfirm={ () => {
-							setMenuOpen( false );
-							action( 'onConfirm' )();
-						} }
-					>
-						<Menu.Item
-							render={
-								<AlertDialog.Trigger render={ <div /> } />
-							}
-							closeOnClick={ false }
-						>
+			<AlertDialog.Root
+				open={ dialogOpen }
+				onOpenChange={ setDialogOpen }
+				onConfirm={ () => action( 'onConfirm' )() }
+			>
+				<Menu.Root>
+					<Menu.Trigger>Actions ▾</Menu.Trigger>
+					<Menu.Popup>
+						<Menu.Item>Edit</Menu.Item>
+						<Menu.Item onClick={ () => setDialogOpen( true ) }>
 							Delete…
 						</Menu.Item>
-						<AlertDialog.Popup
-							intent="irreversible"
-							title="Delete permanently?"
-							description="This action cannot be undone. All data will be lost."
-							confirmButtonText="Delete permanently"
-						/>
-					</AlertDialog.Root>
-				</Menu.Popup>
-			</Menu.Root>
+					</Menu.Popup>
+				</Menu.Root>
+				<AlertDialog.Popup
+					intent="irreversible"
+					title="Delete permanently?"
+					description="This action cannot be undone. All data will be lost."
+					confirmButtonText="Delete permanently"
+				/>
+			</AlertDialog.Root>
 		);
 	},
 };
