@@ -42,6 +42,10 @@ export function getSyncManager(): SyncManager | undefined {
 		return syncManager;
 	}
 
+	if ( ! globalThis.window?.__experimentalEnableRealTimeCollaboration ) {
+		return undefined;
+	}
+
 	syncManager = createSyncManager();
 
 	return syncManager;

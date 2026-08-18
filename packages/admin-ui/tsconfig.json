@@ -1,13 +1,15 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
+	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
-		"types": [ "style-imports" ]
+		"types": [ "jest", "gutenberg-env", "style-imports" ]
 	},
+	"files": [ "global.d.ts", "../jest-console/declarations.d.ts" ],
 	"references": [
+		{ "path": "./tsconfig.build.json" },
 		{ "path": "../components" },
-		{ "path": "../element" },
-		{ "path": "../i18n" },
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../private-apis" },
 		{ "path": "../route" },
 		{ "path": "../style-runtime" },

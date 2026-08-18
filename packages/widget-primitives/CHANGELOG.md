@@ -15,6 +15,10 @@
 
 ### Enhancements
 
+-   `useWidgetTypes` resolves a record without a metadata module from its
+    own fields, so a widget declared entirely by its manifest needs no
+    module stub; `apiVersion` defaults to `1` on both resolution paths
+    ([#81738](https://github.com/WordPress/gutenberg/pull/81738)).
 -   `useWidgetTypes` holds the icon slot with the stand-in while an action's
     icon reference resolves; an unresolvable reference clears it
     ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
@@ -24,6 +28,10 @@
 -   Add a Widget host doc page: the capability seam and the `links`
     contract, with the consumption rules link actions follow
     ([#81740](https://github.com/WordPress/gutenberg/pull/81740)).
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
 
 ## 0.5.0 (2026-08-12)
 

@@ -56,17 +56,12 @@ export const CONTRAST_COMBINATIONS: {
 		target: 4.5,
 	},
 	{
-		bgs: [ 'bgFill1' ],
+		bgs: [ 'bgFill1', 'bgFill2' ],
 		fgs: [ 'fgFill' ],
 		target: 4.5,
 	},
 	{
-		bgs: [ 'bgFillInverted1' ],
-		fgs: [ 'fgFillInverted' ],
-		target: 4.5,
-	},
-	{
-		bgs: [ 'bgFillInverted1' ],
+		bgs: [ 'bgFillInverted1', 'bgFillInverted2' ],
 		fgs: [ 'fgFillInverted' ],
 		target: 4.5,
 	},

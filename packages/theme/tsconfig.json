@@ -23,7 +23,7 @@
 	"references": [
 		{ "path": "./tsconfig.build.json" },
 		{ "path": "./tsconfig.plugins.json" },
-		{ "path": "../compose" },
+		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../style-runtime" }
 	]
 }

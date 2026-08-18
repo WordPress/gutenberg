@@ -1,5 +1,7 @@
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __unstableMotion as motion } from '@wordpress/components';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { useSelect } from '@wordpress/data';
 import FullscreenModeClose from './fullscreen-mode-close';
 import { unlock } from '../../lock-unlock';
 
@@ -12,6 +14,10 @@ const slideX = {
 };
 
 function BackButton( { initialPost } ) {
+	const showIconLabels = useSelect( ( select ) => {
+		return select( preferencesStore ).get( 'core', 'showIconLabels' );
+	}, [] );
+
 	return (
 		<BackButtonFill>
 			{ ( { length } ) =>
@@ -21,7 +27,7 @@ function BackButton( { initialPost } ) {
 						transition={ { type: 'tween', delay: 0.8 } }
 					>
 						<FullscreenModeClose
-							showTooltip
+							showTooltip={ ! showIconLabels }
 							initialPost={ initialPost }
 						/>
 					</motion.div>
