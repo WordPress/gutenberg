@@ -4,6 +4,7 @@
 
 ### Internal
 
+-   Check the `window.__experimentalEnableRealTimeCollaboration` flag set by the Real-Time Collaboration experiment, instead of `window._wpCollaborationEnabled`, when determining whether collaboration is enabled for the current post ([#80658](https://github.com/WordPress/gutenberg/pull/80658)).
 -   Commands: Drop the icons passed by `view` category commands, which the category's fallback arrow has been overriding since [#75669](https://github.com/WordPress/gutenberg/pull/75669) ([#81787](https://github.com/WordPress/gutenberg/pull/81787)).
 
 ### Bug Fixes
