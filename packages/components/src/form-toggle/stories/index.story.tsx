@@ -30,7 +30,7 @@ const Template: StoryFn< typeof FormToggle > = ( { onChange, ...args } ) => {
 	const id = useId();
 
 	return (
-		<>
+		<div style={ { display: 'flex', alignItems: 'center', gap: 8 } }>
 			{ /* FormToggle has no built-in label; paired here so the example is copy-paste safe. */ }
 			<label htmlFor={ id }>Enable feature</label>
 			<FormToggle
@@ -42,7 +42,7 @@ const Template: StoryFn< typeof FormToggle > = ( { onChange, ...args } ) => {
 					onChange( e );
 				} }
 			/>
-		</>
+		</div>
 	);
 };
 
