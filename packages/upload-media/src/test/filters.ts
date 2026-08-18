@@ -13,9 +13,10 @@ import type { EncodeImageContext, PlanImageSizeArgs } from '../filters';
 
 describe( 'upload-media filters', () => {
 	afterEach( () => {
-		removeAllFilters( PLAN_IMAGE_SIZE_HOOK );
-		removeAllFilters( ENCODE_IMAGE_HOOK );
-		removeAllFilters( FINALIZE_DATA_HOOK );
+		// Second arg is required by RemoveHook typing; ignored when removing all.
+		removeAllFilters( PLAN_IMAGE_SIZE_HOOK, '' );
+		removeAllFilters( ENCODE_IMAGE_HOOK, '' );
+		removeAllFilters( FINALIZE_DATA_HOOK, '' );
 	} );
 
 	describe( 'normalizeQuality', () => {
@@ -63,7 +64,7 @@ describe( 'upload-media filters', () => {
 			addFilter(
 				PLAN_IMAGE_SIZE_HOOK,
 				'test/lower-thumb-quality',
-				( plan ) => ( {
+				( plan: PlanImageSizeArgs ) => ( {
 					...plan,
 					quality:
 						plan.sizeNames.includes( 'thumbnail' ) &&
@@ -74,7 +75,9 @@ describe( 'upload-media filters', () => {
 			);
 
 			const result = await applyPlanImageSizeFilter( baseArgs );
-			expect( result?.quality ).toBe( 0.6 );
+			expect(
+				Array.isArray( result ) ? undefined : result?.quality
+			).toBe( 0.6 );
 		} );
 
 		it( 'skips the size when a filter returns null', async () => {
@@ -96,22 +99,31 @@ describe( 'upload-media filters', () => {
 		} );
 
 		it( 'rejects an invalid quality and keeps the provisional value', async () => {
-			addFilter( PLAN_IMAGE_SIZE_HOOK, 'test/bad-quality', ( plan ) => ( {
-				...plan,
-				quality: 'nope',
-			} ) );
+			addFilter(
+				PLAN_IMAGE_SIZE_HOOK,
+				'test/bad-quality',
+				( plan: PlanImageSizeArgs ) => ( {
+					...plan,
+					quality: 'nope',
+				} )
+			);
 
 			const result = await applyPlanImageSizeFilter( baseArgs );
-			expect( result?.quality ).toBe( 0.82 );
+			expect(
+				Array.isArray( result ) ? undefined : result?.quality
+			).toBe( 0.82 );
 		} );
 
 		it( 'accepts an array of plans to split a dimension group', async () => {
-			addFilter( PLAN_IMAGE_SIZE_HOOK, 'test/split', ( plan ) =>
-				plan.sizeNames.map( ( name ) => ( {
-					...plan,
-					sizeNames: [ name ],
-					quality: name === 'medium_large' ? 0.5 : 0.8,
-				} ) )
+			addFilter(
+				PLAN_IMAGE_SIZE_HOOK,
+				'test/split',
+				( plan: PlanImageSizeArgs ) =>
+					plan.sizeNames.map( ( name ) => ( {
+						...plan,
+						sizeNames: [ name ],
+						quality: name === 'medium_large' ? 0.5 : 0.8,
+					} ) )
 			);
 
 			const result = await applyPlanImageSizeFilter( {
