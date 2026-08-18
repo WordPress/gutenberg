@@ -79,6 +79,8 @@
 -   DataViews: Fix the unintended gap between `list` layout items when `groupBy` is set. [#80254](https://github.com/WordPress/gutenberg/pull/80254)
 -   DataViews: Give the search field a fixed width so it no longer resizes when the reset button appears or disappears as the search value changes. [#80315](https://github.com/WordPress/gutenberg/pull/80315)
 
+-   DataViews: Fix the `list` layout mixing `neutral` and `brand` color tokens. The non-selected row hover state now uses `interactive-neutral` tokens instead of `brand`, and the selected row pairs its `brand` background with `content-neutral` text. Field values are now rendered with `foreground-content` tokens since they are static content. [#81074](https://github.com/WordPress/gutenberg/pull/81074)
+
 ### Internal
 
 -   Update `date-fns` to 4.4.0 ([#80763](https://github.com/WordPress/gutenberg/pull/80763)).
