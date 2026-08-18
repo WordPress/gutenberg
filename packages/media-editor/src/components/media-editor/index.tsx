@@ -85,12 +85,11 @@ export interface MediaEditorFrameProps {
 	saveActions: ReactNode;
 	/**
 	 * Rotate / flip / zoom and the aspect-ratio control, as a flat toolbar.
+	 * `null` for non-image media.
 	 *
-	 * Non-null only when `footerLayout` is `narrow`: above that breakpoint the
-	 * Crop panel renders these itself, so a frame that rendered this
-	 * unconditionally would show them twice. A frame that composes the
-	 * clusters by hand must give this a home, or the transform controls become
-	 * unreachable once the sidebar collapses.
+	 * Render this only when `footerLayout` is `narrow`: above that breakpoint
+	 * the Crop panel renders these itself. Below it the panel is gone, so a
+	 * frame that never places this leaves the transform controls unreachable.
 	 */
 	imageControls: ReactNode;
 	/**
@@ -101,7 +100,7 @@ export interface MediaEditorFrameProps {
 	footerActions: ReactNode;
 	/**
 	 * Footer layout selector. Frames apply this to the footer container
-	 * as a modifier class. Tracks the sidebar-collapse breakpoint (`medium`).
+	 * as a modifier class. Tracks the sidebar-collapse breakpoint (`small`).
 	 *
 	 * - `wide`   — sidebar is a column; footer is a single row of History |
 	 *              Cancel/Save (transform controls live in the Crop panel).
@@ -147,7 +146,7 @@ export interface MediaEditorProps {
 	 *
 	 * @default 'default'
 	 */
-	actionsSize?: 'default' | 'compact';
+	saveActionsSize?: 'default' | 'compact';
 }
 
 interface MediaEditorSidebarProps {
@@ -352,10 +351,6 @@ function SaveActions( {
 	onSave,
 }: SaveActionsProps ) {
 	const saveDisabled = isSaving || ! hasMedia || ! hasChanges;
-	// `size="compact"` fully specifies the height on its own, and the 40px
-	// opt-in applies only to the default size, so the two are mutually
-	// exclusive rather than combined.
-	const isCompact = size === 'compact';
 	return (
 		<Stack
 			className="media-editor__save-actions"
@@ -364,8 +359,8 @@ function SaveActions( {
 			gap="sm"
 		>
 			<Button
-				__next40pxDefaultSize={ ! isCompact }
-				size={ isCompact ? 'compact' : undefined }
+				__next40pxDefaultSize
+				size={ size }
 				variant="tertiary"
 				onClick={ onCancel }
 				disabled={ isSaving }
@@ -374,8 +369,8 @@ function SaveActions( {
 				{ __( 'Cancel' ) }
 			</Button>
 			<Button
-				__next40pxDefaultSize={ ! isCompact }
-				size={ isCompact ? 'compact' : undefined }
+				__next40pxDefaultSize
+				size={ size }
 				variant="primary"
 				onClick={ onSave }
 				isBusy={ isSaving }
@@ -400,7 +395,7 @@ function MediaEditorContent( {
 	showCloseButton = false,
 	shouldCloseOnEsc = false,
 	scope = 'media-editor',
-	actionsSize = 'default',
+	saveActionsSize = 'default',
 }: MediaEditorProps ) {
 	const cropper = useMediaEditor();
 	// The sidebar is a side column from the `small` breakpoint up and collapses
@@ -739,7 +734,7 @@ function MediaEditorContent( {
 			isSaving={ isSaving }
 			hasMedia={ !! media }
 			hasChanges={ hasChanges }
-			size={ actionsSize }
+			size={ saveActionsSize }
 			onCancel={ handleRequestClose }
 			onSave={ saveMediaEditor }
 		/>
@@ -785,10 +780,7 @@ function MediaEditorContent( {
 		),
 		historyActions: history,
 		saveActions: actions,
-		// Gated here rather than in the frame: above the breakpoint these
-		// controls already render inside the Crop panel, so handing them to a
-		// frame that placed them unconditionally would show them twice.
-		imageControls: footerLayout === 'narrow' ? imageControls : null,
+		imageControls,
 		footerActions,
 		footerLayout,
 		onRequestClose: handleRequestClose,

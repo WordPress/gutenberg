@@ -76,7 +76,7 @@ function MediaEditorRoute() {
 			scope={ MEDIA_EDITOR_SCOPE }
 			// The actions sit in the page header rather than a footer, so they
 			// match the height of the header's other controls.
-			actionsSize="compact"
+			saveActionsSize="compact"
 			onClose={ navigateBack }
 			onSaved={ ( { id: savedId } ) => {
 				if ( savedId !== attachmentId ) {
@@ -131,29 +131,9 @@ function MediaEditorRoute() {
 							}
 							actions={
 								<>
-									{ ! isNarrow && historyActions && (
-										<>
-											{ historyActions }
-											<div
-												className="media-editor-route__actions-divider"
-												aria-hidden="true"
-											/>
-										</>
-									) }
+									{ ! isNarrow && historyActions }
 									{ headerActions }
-									<div
-										className="media-editor-route__actions-divider"
-										aria-hidden="true"
-									/>
-									{ /* A group rather than a region: the page
-									     is already a landmark, and two buttons
-									     do not warrant a second one. */ }
-									<div
-										role="group"
-										aria-label={ __( 'Save actions' ) }
-									>
-										{ saveActions }
-									</div>
+									{ saveActions }
 								</>
 							}
 						>
@@ -162,11 +142,7 @@ function MediaEditorRoute() {
 							</div>
 							{ isNarrow &&
 								( imageControls || historyActions ) && (
-									<div
-										className="media-editor-route__toolbar"
-										role="region"
-										aria-label={ __( 'Editor actions' ) }
-									>
+									<div className="media-editor-route__toolbar">
 										{ imageControls }
 										{ historyActions }
 									</div>
