@@ -30,7 +30,7 @@ node tools/smart-crop-corpus/index.mjs
 ```
 --count N        images to collect (default 20)
 --sizes LIST     thumbnail, square, wide, tall (default square,wide)
---sources LIST   photos, themes, plugins (default: all three)
+--sources LIST   cropping, photos, themes, plugins (default: all four)
 --seed STRING    reproduce a previous run (default: random)
 --out DIR        output directory (default artifacts/smart-crop)
 --quality N      JPEG quality for the review renditions (default 82)
@@ -117,16 +117,27 @@ Nothing is vendored. Each run fetches from public endpoints and records the URLs
 in the manifest, which keeps licensing with the original hosts and the
 repository small.
 
-| Source                                                       | What it contributes                                                                                                         |
-| ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| [Photo Directory](https://wordpress.org/photos/)             | ~43,000 CC0 photographs submitted by the community. The closest public stand-in for what people upload to WordPress.        |
-| [Theme Directory](https://wordpress.org/themes/) screenshots | Flat regions, dense text, a subject filling the frame. Nothing like a photograph.                                           |
-| [Plugin Directory](https://wordpress.org/plugins/) banners   | Logos and wordmarks on flat backgrounds — the failure class the issue calls out, where attention has nothing to latch onto. |
+| Source                                                                            | What it contributes                                                                                                        |
+| --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| [Flickr cropping dataset](https://github.com/yiling-chen/flickr-cropping-dataset) | 1,743 photographs selected for a cropping benchmark, so every one has a subject a crop can cut off.                        |
+| [Photo Directory](https://wordpress.org/photos/)                                  | ~43,000 CC0 photographs submitted by the community. The closest public stand-in for what people upload to WordPress.       |
+| [Theme Directory](https://wordpress.org/themes/) screenshots                      | Flat regions, dense text, a subject filling the frame. Nothing like a photograph.                                          |
+| [Plugin Directory](https://wordpress.org/plugins/) banners                        | Logos and wordmarks on flat backgrounds, the failure class the issue calls out, where attention has nothing to latch onto. |
 
-The Photo Directory is 63% `nature` and 3.8% `people`. Sampling it
-proportionally would mostly grade landscapes, which are the case where centre
-cropping already does fine, so the harness weights towards subjects that have a
-subject to miss.
+The Photo Directory is sampled by tag rather than by category. Categories name
+scenes and the directory is 63% `nature`, so a category sample comes back mostly
+landscape - and a landscape has no focal point to miss, so centre and attention
+agree and the comparison teaches nothing. Tags name things: `bird`, `bicycle`,
+`statue`, `portrait`, `insect`. Something that occupies part of a frame is
+something a crop can get wrong.
+
+The cropping dataset ships a rectangle drawn by a human alongside each image,
+and the harness deliberately does not score against it. Those annotations are
+free-form aesthetic crops, and aesthetic crops come out centred: median centre
+0.496 of the frame, half within 5% of the middle. Scoring a point against them
+measures how close it is to the middle, which the centre strategy wins by
+construction. The rectangle is carried into the manifest as reference data and
+nothing more.
 
 ## Signals
 
@@ -158,7 +169,8 @@ point inherits that precision.
     measures preference with knowledge of the condition. Randomising the columns
     would be the next improvement if the numbers start carrying weight.
 -   Sources skew towards curated photography and wordpress.org assets. Neither is
-    a random sample of real media libraries.
+    a random sample of real media libraries, and the cropping dataset is skewed
+    further still: its images were chosen because cropping them is interesting.
 -   Grades live in one browser's `localStorage`, and the exported summary is a
     snapshot rather than a live document. Re-export after grading more rows.
 -   Every crop is inlined, so the report grows with the run: 20 images at two

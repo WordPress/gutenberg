@@ -15,29 +15,44 @@ const USER_AGENT =
 	'gutenberg-smart-crop-corpus (https://github.com/WordPress/gutenberg/issues/81706)';
 
 /**
- * Categories in the Photo Directory, weighted towards the subjects where a
- * centre crop is most likely to be wrong.
+ * Photo Directory tags that name a single, findable subject.
  *
- * The directory itself is 63% `nature` and only 3.8% `people`. Sampling it
- * proportionally would mostly grade landscapes, which are the case where centre
- * cropping already does fine. These weights deliberately oversample subjects
- * that have a subject to miss.
+ * The first version of this harness sampled by category, and most of what came
+ * back was landscape: the directory is 63% `nature`, and its categories name
+ * scenes rather than things. A landscape has no focal point to miss, so centre
+ * and attention agree and the comparison teaches nothing.
+ *
+ * Tags name objects instead. Every slug here is something that occupies part of
+ * a frame and can be cropped off, which is the case the proposal is about.
  */
-const PHOTO_CATEGORY_WEIGHTS = {
-	people: 5,
-	animals: 4,
-	'food-drink': 3,
-	objects: 3,
-	fashion: 2,
-	athletics: 2,
-	'arts-culture': 2,
-	transportation: 2,
-	architecture: 1,
-	interiors: 1,
-	technology: 1,
-	nature: 1,
-	patterns: 1,
-};
+const PHOTO_SUBJECT_TAGS = [
+	'bird',
+	'cat',
+	'dog',
+	'insect',
+	'butterfly',
+	'bee',
+	'wildlife',
+	'statue',
+	'sculpture',
+	'boat',
+	'car',
+	'bicycle',
+	'vehicle',
+	'lighthouse',
+	'tower',
+	'mushroom',
+	'door',
+	'window',
+	'sign',
+	'hand',
+	'eye',
+	'hat',
+	'people',
+	'person',
+	'portrait',
+	'child',
+];
 
 /**
  * Fetches JSON with a descriptive user agent and a useful error on failure.
@@ -84,32 +99,12 @@ function sample( items, count, rng ) {
 }
 
 /**
- * Picks a weighted-random key from a `{ key: weight }` map.
- *
- * @param {Object}   weights Map of key to relative weight.
- * @param {Function} rng     Random number generator returning 0..1.
- * @return {string} The chosen key.
- */
-function weightedPick( weights, rng ) {
-	const entries = Object.entries( weights );
-	const total = entries.reduce( ( sum, [ , weight ] ) => sum + weight, 0 );
-	let target = rng() * total;
-
-	for ( const [ key, weight ] of entries ) {
-		target -= weight;
-		if ( target <= 0 ) {
-			return key;
-		}
-	}
-
-	return entries[ entries.length - 1 ][ 0 ];
-}
-
-/**
- * WordPress Photo Directory: 43,000+ CC0 photographs submitted by the community.
+ * WordPress Photo Directory, sampled by subject tag.
  *
  * This is the closest public stand-in for "what people upload to WordPress",
- * and CC0 means there is no attribution burden on the harness.
+ * and CC0 means there is no attribution burden on the harness. Sampling runs
+ * through `PHOTO_SUBJECT_TAGS` so that what comes back has a subject in it
+ * rather than a horizon.
  *
  * @param {number}   count Number of images to collect.
  * @param {Function} rng   Random number generator returning 0..1.
@@ -118,35 +113,34 @@ function weightedPick( weights, rng ) {
 async function fromPhotoDirectory( count, rng ) {
 	const base = 'https://wordpress.org/photos/wp-json/wp/v2';
 
-	const { body: categories } = await fetchJson(
-		`${ base }/photo-categories?per_page=100&_fields=id,slug,count`
+	const { body: tags } = await fetchJson(
+		`${ base }/photo-tags?slug=${ PHOTO_SUBJECT_TAGS.join(
+			','
+		) }&per_page=100&_fields=id,slug,count`
 	);
-	const bySlug = Object.fromEntries(
-		categories.map( ( term ) => [ term.slug, term ] )
-	);
+	const usable = tags.filter( ( tag ) => tag.count > 0 );
+
+	if ( ! usable.length ) {
+		return [];
+	}
 
 	const entries = [];
 	const seen = new Set();
 	let attempts = 0;
 
-	// Each pass picks one weighted-random category and a random offset within
-	// it, so consecutive runs land in completely different parts of the archive.
+	// Each pass picks one tag at random and a random offset within it, so
+	// consecutive runs land in completely different parts of the archive. Tags
+	// are drawn uniformly rather than by size: weighting by count would turn the
+	// run back into mostly birds.
 	while ( entries.length < count && attempts < count * 4 ) {
 		attempts++;
 
-		const slug = weightedPick( PHOTO_CATEGORY_WEIGHTS, rng );
-		const term = bySlug[ slug ];
-		if ( ! term || ! term.count ) {
-			continue;
-		}
-
+		const tag = usable[ Math.floor( rng() * usable.length ) ];
 		const perPage = 20;
-		const offset = Math.floor(
-			rng() * Math.max( 1, term.count - perPage )
-		);
+		const offset = Math.floor( rng() * Math.max( 1, tag.count - perPage ) );
 		const { body: photos } = await fetchJson(
 			`${ base }/photos?per_page=${ perPage }&offset=${ offset }` +
-				`&photo-categories=${ term.id }&_embed=wp:featuredmedia`
+				`&photo-tags=${ tag.id }&_embed=wp:featuredmedia`
 		);
 
 		for ( const photo of sample( photos, 3, rng ) ) {
@@ -182,7 +176,7 @@ async function fromPhotoDirectory( count, rng ) {
 				credit: media.author_name || 'WordPress Photo Directory',
 				license: 'CC0',
 				source: 'WordPress Photo Directory',
-				subject: slug,
+				subject: tag.slug,
 				width: rendition?.width || details.width,
 				height: rendition?.height || details.height,
 			} );
@@ -190,6 +184,65 @@ async function fromPhotoDirectory( count, rng ) {
 	}
 
 	return entries;
+}
+
+/**
+ * The Flickr cropping dataset: images chosen because cropping them is hard.
+ *
+ * 1,743 photographs, each with a rectangle drawn by an expert cropper. The
+ * images were selected for a cropping benchmark, so unlike a directory sample
+ * they all have something worth keeping in frame.
+ *
+ * The images are what this harness wants. The annotation is not: it is a
+ * free-form aesthetic crop, and those come out centred - median centre 0.496
+ * of the frame, half of them within 5% of the middle. Scoring against it asks
+ * "is this point near the middle", which the centre strategy wins by
+ * construction. The rectangle is carried into the manifest as reference data
+ * and deliberately not scored.
+ *
+ * Only the URLs are used. Nothing from the dataset is vendored, and the images
+ * stay on Flickr under their own terms.
+ *
+ * @see https://github.com/yiling-chen/flickr-cropping-dataset
+ *
+ * @param {number}   count Number of images to collect.
+ * @param {Function} rng   Random number generator returning 0..1.
+ * @return {Promise<Array>} Corpus entries.
+ */
+async function fromCroppingDataset( count, rng ) {
+	const base =
+		'https://raw.githubusercontent.com/yiling-chen/flickr-cropping-dataset/master';
+
+	const sets = await Promise.all(
+		[ 'cropping_testing_set.json', 'cropping_training_set.json' ].map(
+			( file ) => fetchJson( `${ base }/${ file }` )
+		)
+	);
+	const all = sets.flatMap( ( set ) => set.body || [] );
+
+	return sample( all, count * 2, rng )
+		.map( ( item ) => {
+			const [ x, y, width, height ] = item.crop || [];
+			if ( ! item.url || ! width || ! height ) {
+				return null;
+			}
+
+			return {
+				id: `crop-${ item.flickr_photo_id }`,
+				url: item.url,
+				title: `Flickr ${ item.flickr_photo_id }`,
+				pageUrl: `https://www.flickr.com/photo.gne?id=${ item.flickr_photo_id }`,
+				credit: 'Flickr contributor',
+				license: 'Referenced by URL; terms on the Flickr page',
+				source: 'Flickr cropping dataset',
+				subject: 'cropping benchmark',
+				// Pixel coordinates in the linked rendition, which is what the
+				// harness downloads. Normalised once the image is decoded.
+				expertCrop: { x, y, width, height },
+			};
+		} )
+		.filter( Boolean )
+		.slice( 0, count );
 }
 
 /**
@@ -278,22 +331,28 @@ async function fromPluginBanners( count, rng ) {
 }
 
 export const SOURCES = {
+	cropping: {
+		label: 'Flickr cropping dataset',
+		collect: fromCroppingDataset,
+		// Images picked for a cropping benchmark, so every one of them has a
+		// subject that a crop can cut off.
+		share: 0.35,
+	},
 	photos: {
 		label: 'WordPress Photo Directory',
 		collect: fromPhotoDirectory,
-		// Most of a run should be photographs, because that is most of what
-		// gets uploaded and where a better crop actually helps.
-		share: 0.6,
+		// Real WordPress uploads, sampled by subject tag rather than category.
+		share: 0.35,
 	},
 	themes: {
 		label: 'Theme screenshots',
 		collect: fromThemeScreenshots,
-		share: 0.2,
+		share: 0.15,
 	},
 	plugins: {
 		label: 'Plugin banners',
 		collect: fromPluginBanners,
-		share: 0.2,
+		share: 0.15,
 	},
 };
 
