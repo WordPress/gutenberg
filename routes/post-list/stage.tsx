@@ -382,6 +382,12 @@ function PostList() {
 						},
 					} );
 				} }
+				isItemClickable={ ( item: Post ) =>
+					// Restoring comes before editing, so a trashed post's title
+					// does not link to the editor. Cast because the assignable
+					// statuses `status` is typed as exclude 'trash'.
+					( item.status as string ) !== 'trash'
+				}
 				renderItemLink={ ( { item, ...props }: { item: Post } ) => (
 					<Link
 						to={ `/types/${ postType }/edit/${ encodeURIComponent(

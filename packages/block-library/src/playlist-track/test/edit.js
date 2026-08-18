@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { useDispatch } from '@wordpress/data';
 import PlaylistTrackEdit from '../edit';
 import { PlaylistContext } from '../../playlist/context';
@@ -6,44 +6,43 @@ import { useUploadMediaFromBlobURL } from '../../utils/hooks';
 
 let mockMediaReplaceFlowProps;
 
-jest.mock( '@wordpress/block-editor', () => ( {
-	BlockControls: ( { children } ) => <div>{ children }</div>,
-	BlockIcon: () => <span />,
-	InspectorControls: ( { children } ) => <div>{ children }</div>,
-	MediaPlaceholder: () => <div />,
-	MediaReplaceFlow: ( props ) => {
-		mockMediaReplaceFlowProps = props;
-		const { name, onSelect } = props;
-		return <button onClick={ () => onSelect( {} ) }>{ name }</button>;
-	},
-	MediaUpload: ( { render: renderMediaUpload } ) =>
-		renderMediaUpload( { open: jest.fn() } ),
-	MediaUploadCheck: ( { children } ) => <div>{ children }</div>,
-	PlainText: ( {
-		onChange,
-		placeholder,
-		tagName: TagName = 'div',
-		value,
-		__experimentalVersion,
-		...props
-	} ) => <TagName { ...props }>{ value || placeholder }</TagName>,
-	useBlockProps: jest.fn( () => ( {} ) ),
-} ) );
+jest.mock( '@wordpress/block-editor', () => {
+	const PlainText = jest.requireActual(
+		'../../../../block-editor/src/components/plain-text'
+	).default;
 
-jest.mock( '@wordpress/data', () => ( {
-	useDispatch: jest.fn(),
-	combineReducers: jest.fn( ( reducers ) => ( state = {}, action ) => {
-		const newState = {};
-		Object.keys( reducers ).forEach( ( key ) => {
-			newState[ key ] = reducers[ key ]( state[ key ], action );
-		} );
-		return newState;
-	} ),
-	createRegistrySelector: jest.fn( ( fn ) => fn ),
-	createReduxStore: jest.fn( () => ( {} ) ),
-	createSelector: jest.fn( ( fn ) => fn ),
-	register: jest.fn(),
-} ) );
+	return {
+		BlockControls: ( { children } ) => <div>{ children }</div>,
+		BlockIcon: () => <span />,
+		InspectorControls: ( { children } ) => <div>{ children }</div>,
+		MediaPlaceholder: () => <div />,
+		MediaReplaceFlow: ( props ) => {
+			mockMediaReplaceFlowProps = props;
+			const { name, onSelect } = props;
+			return <button onClick={ () => onSelect( {} ) }>{ name }</button>;
+		},
+		MediaUpload: ( { render: renderMediaUpload } ) =>
+			renderMediaUpload( { open: jest.fn() } ),
+		MediaUploadCheck: ( { children } ) => <div>{ children }</div>,
+		PlainText,
+		useBlockProps: jest.fn( () => ( {} ) ),
+	};
+} );
+
+jest.mock( '@wordpress/data', () => {
+	const data = jest.requireActual( '@wordpress/data' );
+	const mockUseDispatch = jest.fn();
+
+	return new Proxy( data, {
+		get( target, property ) {
+			if ( property === 'useDispatch' ) {
+				return mockUseDispatch;
+			}
+
+			return target[ property ];
+		},
+	} );
+} );
 
 jest.mock( '@wordpress/notices', () => ( {
 	store: 'core/notices',
@@ -169,6 +168,7 @@ describe( 'PlaylistTrackEdit', () => {
 		renderEdit( {
 			attributes: {
 				blob: 'blob:https://example.com/temporary-track',
+				length: undefined,
 				src: undefined,
 			},
 		} );
@@ -178,6 +178,13 @@ describe( 'PlaylistTrackEdit', () => {
 				url: 'blob:https://example.com/temporary-track',
 			} )
 		);
+		const trackButton = screen.getByRole( 'button', {
+			name: /Song One/,
+		} );
+
+		expect(
+			within( trackButton ).getByRole( 'presentation', { hidden: true } )
+		).toBeInTheDocument();
 	} );
 
 	it( 'preserves the current track source when a replacement upload fails', () => {

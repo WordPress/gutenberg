@@ -62,11 +62,11 @@ export interface WidgetHelp {
 }
 
 /**
- * How relevant a declaration is. Hosts may promote `'high'` to a prominent
- * surface; `'low'` (the default) is not. The widget declares importance,
- * not a surface.
+ * How relevant a declaration is. The widget declares importance, not a
+ * surface; hosts map the scale to surfaces of decreasing prominence.
+ * `'low'` is the default.
  */
-export type WidgetRelevance = 'high' | 'low';
+export type WidgetRelevance = 'high' | 'medium' | 'low';
 
 /**
  * A user-triggerable verb a widget type declares. The declaration is
@@ -99,9 +99,7 @@ export interface WidgetAction {
 	icon?: WidgetIcon;
 
 	/**
-	 * How relevant the action is among the widget's actions. Hosts may
-	 * surface `'high'` prominently; `'low'` (the default) belongs in a
-	 * secondary surface such as a menu.
+	 * How relevant the action is among the widget's actions.
 	 */
 	relevance?: WidgetRelevance;
 

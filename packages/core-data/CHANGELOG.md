@@ -2,11 +2,16 @@
 
 ## Unreleased
 
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
 ## 7.53.0 (2026-08-12)
 
 ### Enhancements
 
 -   Improve error reporting in private action `saveDirtyEntities` ([#81151](https://github.com/WordPress/gutenberg/pull/81151)).
+-   Add the `block-templates` and `block-template-parts` theme features to the `ThemeSupports` type. Both are registered with `show_in_rest`, so they were already present in the response ([#81581](https://github.com/WordPress/gutenberg/pull/81581)).
 
 ### Bug Fixes
 
