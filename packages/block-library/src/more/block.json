@@ -4,7 +4,7 @@
 	"name": "core/more",
 	"title": "More",
 	"category": "design",
-	"description": "Splits a post into a teaser and full content, showing only the teaser with a “Read more” link on archive pages that display full content rather than excerpts.",
+	"description": "Content before this block is shown in the excerpt on blog and archive pages. Where a theme shows the full content instead, visitors get a “Read more” link to the rest of the post.",
 	"keywords": [ "read more" ],
 	"textdomain": "default",
 	"attributes": {
