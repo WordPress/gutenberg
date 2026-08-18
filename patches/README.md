@@ -8,11 +8,10 @@ Existing patches should be described and justified here.
 
 ## Patches
 
-### `patches/@arraypress+waveform-player+1.23.0.patch`
+### `patches/@arraypress+waveform-player+1.26.0.patch`
 
-This patch limits declarative configuration to supported option values and
-requires initialization to be requested explicitly. Programmatic configuration
-used by the Playlist block remains unchanged.
+This patch requires initialization to be requested explicitly and removes passing custom SVG icons
+through HTML data attributes.
 
 ### `patches/react-autosize-textarea+7.1.0.patch`
 

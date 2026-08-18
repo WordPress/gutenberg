@@ -7,7 +7,7 @@
 	},
 	"references": [
 		{ "path": "../components" },
-		{ "path": "../element" },
-		{ "path": "../i18n" }
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../i18n/tsconfig.build.json" }
 	]
 }

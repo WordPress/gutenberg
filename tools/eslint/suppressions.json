@@ -255,11 +255,6 @@
 			"count": 3
 		}
 	},
-	"packages/block-editor/src/components/multi-selection-inspector/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/preset-input-control/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -534,6 +529,11 @@
 			"count": 3
 		}
 	},
+	"packages/boot/src/components/error-boundary/index.tsx": {
+		"@wordpress/no-non-module-stylesheet-imports": {
+			"count": 1
+		}
+	},
 	"packages/boot/src/components/navigation/drilldown-item/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
@@ -711,11 +711,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/dropdown/styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
 	"packages/components/src/elevation/hook.ts": {
 		"no-restricted-imports": {
 			"count": 2
@@ -759,11 +754,6 @@
 	"packages/components/src/input-control/styles/input-control-styles.tsx": {
 		"no-restricted-imports": {
 			"count": 3
-		}
-	},
-	"packages/components/src/menu/stories/index.story.tsx": {
-		"no-restricted-imports": {
-			"count": 1
 		}
 	},
 	"packages/components/src/menu/styles.ts": {
@@ -861,7 +851,7 @@
 	},
 	"packages/components/src/textarea-control/styles/textarea-control-styles.ts": {
 		"no-restricted-imports": {
-			"count": 2
+			"count": 1
 		}
 	},
 	"packages/components/src/toggle-group-control/toggle-group-control/utils.ts": {
@@ -1200,16 +1190,6 @@
 	"packages/editor/src/components/document-outline/index.js": {
 		"react-hooks/refs": {
 			"count": 1
-		}
-	},
-	"packages/editor/src/components/error-boundary/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
-	"packages/editor/src/components/global-styles-sidebar/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
 		}
 	},
 	"packages/editor/src/components/global-styles-sidebar/welcome-guide.js": {
@@ -1719,11 +1699,6 @@
 		}
 	},
 	"packages/global-styles-ui/src/shadows-edit-panel.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 6
-		}
-	},
-	"packages/global-styles-ui/src/shadows-panel.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
 		}
