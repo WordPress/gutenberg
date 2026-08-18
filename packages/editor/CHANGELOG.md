@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Commands: Drop the icons passed by `view` category commands, which the category's fallback arrow has been overriding since [#75669](https://github.com/WordPress/gutenberg/pull/75669) ([#81796](https://github.com/WordPress/gutenberg/pull/81796)).
+
 ### Bug Fixes
 
 -   Register the editor and block editor keyboard shortcuts from the editor provider, so shortcuts work for consumers that mount the editor without rendering `EditorKeyboardShortcutsRegister` themselves ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
