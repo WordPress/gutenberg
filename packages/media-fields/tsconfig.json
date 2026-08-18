@@ -1,26 +1,23 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
+	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
-		"types": [ "gutenberg-env", "gutenberg-test-env", "jest" ]
+		"types": [ "jest", "gutenberg-env", "gutenberg-test-env" ]
 	},
+	"files": [ "global.d.ts" ],
 	"references": [
+		{ "path": "./tsconfig.build.json" },
 		{ "path": "../components" },
-		{ "path": "../compose" },
-		{ "path": "../core-data" },
+		{ "path": "../compose/tsconfig.build.json" },
+		{ "path": "../core-data/tsconfig.build.json" },
 		{ "path": "../data" },
 		{ "path": "../dataviews" },
 		{ "path": "../date" },
-		{ "path": "../element" },
-		{ "path": "../i18n" },
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons" },
 		{ "path": "../primitives" },
 		{ "path": "../ui" },
 		{ "path": "../url" }
-	],
-	"files": [ "global.d.ts" ],
-	"exclude": [
-		"src/**/stories/**/*.js", // only exclude js files, tsx files should be checked
-		"src/**/test/**/*.js" // only exclude js files, ts{x} files should be checked
 	]
 }

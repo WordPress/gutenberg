@@ -25,6 +25,7 @@ add_action( 'admin_menu', 'gutenberg_register_site_editor_admin_page' );
  */
 function gutenberg_site_editor_register_default_menu_items() {
 	gutenberg_register_site_editor_v2_menu_item( 'home', __( 'Home', 'gutenberg' ), '/', '' );
+	gutenberg_register_site_editor_v2_menu_item( 'identity', _x( 'Identity', 'site identity', 'gutenberg' ), '/identity', '' );
 	gutenberg_register_site_editor_v2_menu_item( 'styles', __( 'Styles', 'gutenberg' ), '/styles', '' );
 
 	// The screen edits `wp_navigation` posts, which only block themes render.
