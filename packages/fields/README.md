@@ -12,16 +12,33 @@ npm install @wordpress/fields --save
 
 ## Setup
 
-This package ships a stylesheet, and WordPress does not register a style handle for it. Import it yourself, whether or not your code runs inside WordPress:
+This package requires CSS from this package and from multiple dependency packages.
+
+### Within WordPress
+
+To ensure proper load order, add the `wp-components` stylesheet as a dependency of your plugin's stylesheet. See [wp_enqueue_style documentation](https://developer.wordpress.org/reference/functions/wp_enqueue_style/#parameters) for how to specify dependencies.
+
+WordPress registers no handle for this package's own stylesheet, so load it with your plugin's script:
 
 ```js
+import '@wordpress/fields/build-style/style.css';
+```
+
+### Outside WordPress
+
+Install and load these stylesheets in your application:
+
+```bash
+npm install @wordpress/fields @wordpress/theme @wordpress/components
+```
+
+```js
+import '@wordpress/theme/design-tokens.css';
 import '@wordpress/components/build-style/style.css';
 import '@wordpress/fields/build-style/style.css';
 ```
 
-The `@wordpress/components` stylesheet is needed as well, because the fields are built from those components and adjust them. Import `@wordpress/dataviews/build-style/style.css` too if you render `DataViews` or `DataForm`.
-
-For right-to-left languages, use `style-rtl.css` in place of `style.css` in each path.
+RTL versions of the stylesheets are available in the same paths, but with `-rtl` appended to the filename (`style-rtl.css`). The design tokens stylesheet is universal and does not have a separate RTL version.
 
 ## Usage
 
