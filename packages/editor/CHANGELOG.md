@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Commands: Add a command palette entry that opens the current post or page on the front end, labelled "View" once the record is published and "Preview" while it is not ([#66720](https://github.com/WordPress/gutenberg/pull/66720)).
+
 ### Bug Fixes
 
 -   Register the editor and block editor keyboard shortcuts from the editor provider, so shortcuts work for consumers that mount the editor without rendering `EditorKeyboardShortcutsRegister` themselves ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
