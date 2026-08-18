@@ -82,6 +82,25 @@ describe( 'Modal', () => {
 		expect( onRequestClose ).toHaveBeenCalled();
 	} );
 
+	it( 'should stop an Escape key press from propagating when it dismisses the modal', async () => {
+		const user = userEvent.setup();
+		const documentKeyDownHandler = jest.fn();
+		document.addEventListener( 'keydown', documentKeyDownHandler );
+
+		try {
+			render(
+				<Modal onRequestClose={ noop }>
+					<p>Modal content</p>
+				</Modal>
+			);
+
+			await user.keyboard( '[Escape]' );
+			expect( documentKeyDownHandler ).not.toHaveBeenCalled();
+		} finally {
+			document.removeEventListener( 'keydown', documentKeyDownHandler );
+		}
+	} );
+
 	it( 'should return focus when dismissed by clicking outside', async () => {
 		const user = userEvent.setup();
 		const ReturnDemo = () => {
