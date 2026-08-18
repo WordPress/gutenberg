@@ -58,8 +58,30 @@ if ( ! function_exists( 'gutenberg_register_collaboration_rest_routes' ) ) {
 	 * Registers REST API routes for collaborative editing.
 	 */
 	function gutenberg_register_collaboration_rest_routes(): void {
-		$sync_storage = new WP_Sync_Post_Meta_Storage();
-		$sync_server  = new WP_HTTP_Polling_Sync_Server( $sync_storage );
+		/**
+		 * Filters the sync storage implementation for collaborative editing.
+		 *
+		 * Allows plugins to replace the default post meta storage with alternative
+		 * backends. The primary use case is the realtime-collaboration plugin,
+		 * which uses Presence API for awareness and a dedicated wp_collaboration
+		 * table for CRDT updates, eliminating cache side effects.
+		 *
+		 * This filter is unstable and may change as RTC explores fundamental changes
+		 * to how syncing works. The current interface assumes a pure naïve relay,
+		 * which could change.
+		 *
+		 * @since Gutenberg 21.x
+		 *
+		 * @param WP_Sync_Storage $sync_storage Storage implementation. Must implement
+		 *                                      the WP_Sync_Storage interface.
+		 */
+		$sync_storage = apply_filters( '__unstable_wp_sync_storage', new WP_Sync_Post_Meta_Storage() );
+
+		if ( ! $sync_storage instanceof WP_Sync_Storage ) {
+			$sync_storage = new WP_Sync_Post_Meta_Storage();
+		}
+
+		$sync_server = new WP_HTTP_Polling_Sync_Server( $sync_storage );
 		$sync_server->register_routes();
 
 		$sync_save_server = new WP_Sync_Save_Server();

@@ -34,7 +34,8 @@
 	"dependencies": {
 		"@wordpress/boot": "file:../boot",
 		"@wordpress/data": "file:../data",
-		"@wordpress/icons": "file:../icons"
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/preferences": "file:../preferences"
 	},
 	"publishConfig": {
 		"access": "public"

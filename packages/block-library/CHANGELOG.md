@@ -20,6 +20,7 @@
 
 ### Enhancements
 
+-   Group: Support separate horizontal and vertical block spacing values ([#81476](https://github.com/WordPress/gutenberg/pull/81476)).
 -   Playlist Track: Use a dedicated icon for the block toolbar. ([#80959](https://github.com/WordPress/gutenberg/pull/80959))
 -   Playlist: Expose the parent "Add track" toolbar control to selected Playlist Track child blocks via block toolbar sharing ([#80368](https://github.com/WordPress/gutenberg/pull/80368)).
 -   Playlist: Allow selecting audio tracks individually in the Media Library without holding Shift or Command, transform multiple Audio blocks into a Playlist, and transform a one-track Playlist into Audio. ([#80926](https://github.com/WordPress/gutenberg/pull/80926))
@@ -48,6 +49,7 @@
 
 ### Bug Fixes
 
+-   Table of Contents: Continue rendering saved legacy content until the post is edited and resaved.
 -   Navigation Overlay Close: Inherit typography and color from the overlay, so the button follows the theme font instead of the browser default button styles ([#80751](https://github.com/WordPress/gutenberg/pull/80751)).
 -   Playlist: Update `@arraypress/waveform-player` to `^1.23.0`, which no longer sets `crossorigin="anonymous"` on its audio element, fixing playback of tracks served without CORS headers such as media offloaded to a CDN ([#80533](https://github.com/WordPress/gutenberg/pull/80533)).
 -   Post Content: Restrict the wrapper tag to the supported values offered in the editor.

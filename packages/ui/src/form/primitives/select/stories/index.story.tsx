@@ -53,11 +53,7 @@ export const Compact: Story = {
 			<Select.Trigger size="compact" key="trigger" />,
 			<Select.Popup key="popup">
 				{ defaultItems.map( ( item ) => (
-					<Select.Item
-						key={ item.value }
-						value={ item }
-						size="compact"
-					>
+					<Select.Item key={ item.value } value={ item }>
 						{ item.label }
 					</Select.Item>
 				) ) }
