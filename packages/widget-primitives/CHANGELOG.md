@@ -10,6 +10,10 @@
 
 ### Enhancements
 
+-   `useWidgetTypes` resolves a record without a metadata module from its
+    own fields, so a widget declared entirely by its manifest needs no
+    module stub; `apiVersion` defaults to `1` on both resolution paths
+    ([#81738](https://github.com/WordPress/gutenberg/pull/81738)).
 -   `useWidgetTypes` holds the icon slot with the stand-in while an action's
     icon reference resolves; an unresolvable reference clears it
     ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
