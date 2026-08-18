@@ -1,8 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
-import { useMemo, useState } from '@wordpress/element';
+import { memo, useMemo, useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import {
 	Button,
@@ -13,18 +10,22 @@ import {
 	Flex,
 	FlexItem,
 	SearchControl,
+	Spinner,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useDebounce } from '@wordpress/compose';
-import { store as coreStore } from '@wordpress/core-data';
+import { useDebounce, useEvent } from '@wordpress/compose';
+import {
+	store as coreStore,
+	privateApis as coreDataPrivateApis,
+} from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import { buildTermsTree } from '../../utils/terms';
+import { normalizeTextString } from '../../utils/normalize-text-string';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { RECEIVE_INTERMEDIATE_RESULTS } = unlock( coreDataPrivateApis );
 
 /**
  * Module Constants
@@ -35,11 +36,52 @@ const DEFAULT_QUERY = {
 	order: 'asc',
 	_fields: 'id,name,parent',
 	context: 'view',
+	[ RECEIVE_INTERMEDIATE_RESULTS ]: true,
 };
-
 const MIN_TERMS_COUNT_FOR_FILTER = 8;
-
 const EMPTY_ARRAY = [];
+
+// Memoized on primitive props, so toggling one term does not re-render every
+// checkbox in the list.
+const TermCheckbox = memo( function Checkbox( {
+	id,
+	name,
+	checked,
+	onToggle,
+} ) {
+	return (
+		<CheckboxControl
+			checked={ checked }
+			onChange={ () => onToggle( id ) }
+			label={ decodeEntities( name ) }
+		/>
+	);
+} );
+
+function TermRow( { term, selectedTerms, onToggle } ) {
+	return (
+		<div className="editor-post-taxonomies__hierarchical-terms-choice">
+			<TermCheckbox
+				id={ term.id }
+				name={ term.name }
+				checked={ selectedTerms.has( term.id ) }
+				onToggle={ onToggle }
+			/>
+			{ !! term.children.length && (
+				<div className="editor-post-taxonomies__hierarchical-terms-subchoices">
+					{ term.children.map( ( child ) => (
+						<TermRow
+							key={ child.id }
+							term={ child }
+							selectedTerms={ selectedTerms }
+							onToggle={ onToggle }
+						/>
+					) ) }
+				</div>
+			) }
+		</div>
+	);
+}
 
 /**
  * Sort Terms by Selected.
@@ -50,40 +92,27 @@ const EMPTY_ARRAY = [];
  * @return {Object[]} Sorted array of terms.
  */
 export function sortBySelected( termsTree, terms ) {
+	const selectedTerms = new Set( terms );
 	const treeHasSelection = ( termTree ) => {
-		if ( terms.indexOf( termTree.id ) !== -1 ) {
+		if ( selectedTerms.has( termTree.id ) ) {
 			return true;
 		}
-		if ( undefined === termTree.children ) {
-			return false;
-		}
-		return (
-			termTree.children
-				.map( treeHasSelection )
-				.filter( ( child ) => child ).length > 0
-		);
+		return !! termTree.children?.some( treeHasSelection );
 	};
-	const termOrChildIsSelected = ( termA, termB ) => {
-		const termASelected = treeHasSelection( termA );
-		const termBSelected = treeHasSelection( termB );
 
-		if ( termASelected === termBSelected ) {
-			return 0;
+	// Partition rather than sort: each subtree is walked once, and terms keep
+	// their relative order within each group.
+	const selected = [];
+	const unselected = [];
+	for ( const termTree of termsTree ) {
+		if ( treeHasSelection( termTree ) ) {
+			selected.push( termTree );
+		} else {
+			unselected.push( termTree );
 		}
+	}
 
-		if ( termASelected && ! termBSelected ) {
-			return -1;
-		}
-
-		if ( ! termASelected && termBSelected ) {
-			return 1;
-		}
-
-		return 0;
-	};
-	const newTermTree = [ ...termsTree ];
-	newTermTree.sort( termOrChildIsSelected );
-	return newTermTree;
+	return [ ...selected, ...unselected ];
 }
 
 /**
@@ -111,6 +140,8 @@ export function findTerm( terms, parent, name ) {
  * @return {(function(Object): (Object|boolean))} Matcher function.
  */
 export function getFilterMatcher( filterValue ) {
+	// Normalize once rather than per visited term.
+	const normalizedFilterValue = normalizeTextString( filterValue );
 	const matchTermsForFilter = ( originalTerm ) => {
 		if ( '' === filterValue ) {
 			return originalTerm;
@@ -132,7 +163,9 @@ export function getFilterMatcher( filterValue ) {
 		// (i.e. some child matched at some point in the tree) then return it.
 		if (
 			-1 !==
-				term.name.toLowerCase().indexOf( filterValue.toLowerCase() ) ||
+				normalizeTextString( term.name ).indexOf(
+					normalizedFilterValue
+				) ||
 			term.children.length > 0
 		) {
 			return term;
@@ -175,21 +208,21 @@ export function HierarchicalTermSelector( { slug } ) {
 		( select ) => {
 			const { getCurrentPost, getEditedPostAttribute } =
 				select( editorStore );
-			const { getTaxonomy, getEntityRecords, isResolving } =
+			const { getEntityRecord, getEntityRecords, isResolving } =
 				select( coreStore );
-			const _taxonomy = getTaxonomy( slug );
+			const _taxonomy = getEntityRecord( 'root', 'taxonomy', slug );
 			const post = getCurrentPost();
 
 			return {
 				hasCreateAction: _taxonomy
-					? post._links?.[
+					? !! post._links?.[
 							'wp:action-create-' + _taxonomy.rest_base
-					  ] ?? false
+					  ]
 					: false,
 				hasAssignAction: _taxonomy
-					? post._links?.[
+					? !! post._links?.[
 							'wp:action-assign-' + _taxonomy.rest_base
-					  ] ?? false
+					  ]
 					: false,
 				terms: _taxonomy
 					? getEditedPostAttribute( _taxonomy.rest_base )
@@ -211,12 +244,35 @@ export function HierarchicalTermSelector( { slug } ) {
 	const { editPost } = useDispatch( editorStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
 
+	const selectedTerms = useMemo( () => new Set( terms ), [ terms ] );
 	const availableTermsTree = useMemo(
 		() => sortBySelected( buildTermsTree( availableTerms ), terms ),
 		// Remove `terms` from the dependency list to avoid reordering every time
 		// checking or unchecking a term.
 		[ availableTerms ]
 	);
+
+	/**
+	 * Update terms for post.
+	 *
+	 * @param {number[]} termIds Term ids.
+	 */
+	const onUpdateTerms = ( termIds ) => {
+		editPost( { [ taxonomy.rest_base ]: termIds } );
+	};
+
+	// Stable, so unchanged checkboxes can bail out of re-rendering.
+	const onToggleTerm = useEvent( ( termId ) => {
+		const id = parseInt( termId, 10 );
+		onUpdateTerms(
+			selectedTerms.has( id )
+				? terms.filter( ( term ) => term !== id )
+				: [ ...terms, id ]
+		);
+	} );
+
+	const shownTerms =
+		'' !== filterValue ? filteredTermsTree : availableTermsTree;
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 
@@ -234,28 +290,6 @@ export function HierarchicalTermSelector( { slug } ) {
 		return saveEntityRecord( 'taxonomy', slug, term, {
 			throwOnError: true,
 		} );
-	};
-
-	/**
-	 * Update terms for post.
-	 *
-	 * @param {number[]} termIds Term ids.
-	 */
-	const onUpdateTerms = ( termIds ) => {
-		editPost( { [ taxonomy.rest_base ]: termIds } );
-	};
-
-	/**
-	 * Handler for checking term.
-	 *
-	 * @param {number} termId
-	 */
-	const onChange = ( termId ) => {
-		const hasTerm = terms.includes( termId );
-		const newTerms = hasTerm
-			? terms.filter( ( id ) => id !== termId )
-			: [ ...terms, termId ];
-		onUpdateTerms( newTerms );
 	};
 
 	const onChangeFormName = ( value ) => {
@@ -349,32 +383,6 @@ export function HierarchicalTermSelector( { slug } ) {
 		debouncedSpeak( resultsFoundMessage, 'assertive' );
 	};
 
-	const renderTerms = ( renderedTerms ) => {
-		return renderedTerms.map( ( term ) => {
-			return (
-				<div
-					key={ term.id }
-					className="editor-post-taxonomies__hierarchical-terms-choice"
-				>
-					<CheckboxControl
-						__nextHasNoMarginBottom
-						checked={ terms.indexOf( term.id ) !== -1 }
-						onChange={ () => {
-							const termId = parseInt( term.id, 10 );
-							onChange( termId );
-						} }
-						label={ decodeEntities( term.name ) }
-					/>
-					{ !! term.children.length && (
-						<div className="editor-post-taxonomies__hierarchical-terms-subchoices">
-							{ renderTerms( term.children ) }
-						</div>
-					) }
-				</div>
-			);
-		} );
-	};
-
 	const labelWithFallback = (
 		labelProperty,
 		fallbackIsCategory,
@@ -385,13 +393,13 @@ export function HierarchicalTermSelector( { slug } ) {
 
 	const newTermButtonLabel = labelWithFallback(
 		'add_new_item',
-		__( 'Add new category' ),
-		__( 'Add new term' )
+		__( 'Add Category' ),
+		__( 'Add Term' )
 	);
 	const newTermLabel = labelWithFallback(
 		'new_item_name',
-		__( 'Add new category' ),
-		__( 'Add new term' )
+		__( 'Add Category' ),
+		__( 'Add Term' )
 	);
 	const parentSelectLabel = labelWithFallback(
 		'parent_item',
@@ -406,15 +414,24 @@ export function HierarchicalTermSelector( { slug } ) {
 
 	return (
 		<Flex direction="column" gap="4">
-			{ showFilter && (
+			{ showFilter && ! loading && (
 				<SearchControl
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={ filterLabel }
 					placeholder={ filterLabel }
 					value={ filterValue }
 					onChange={ setFilter }
 				/>
+			) }
+			{ loading && (
+				<Flex
+					justify="center"
+					style={ {
+						// Match SearchControl height to prevent layout shift.
+						height: '40px',
+					} }
+				>
+					<Spinner />
+				</Flex>
 			) }
 			<div
 				className="editor-post-taxonomies__hierarchical-terms-list"
@@ -422,9 +439,14 @@ export function HierarchicalTermSelector( { slug } ) {
 				role="group"
 				aria-label={ groupLabel }
 			>
-				{ renderTerms(
-					'' !== filterValue ? filteredTermsTree : availableTermsTree
-				) }
+				{ shownTerms.map( ( term ) => (
+					<TermRow
+						key={ term.id }
+						term={ term }
+						selectedTerms={ selectedTerms }
+						onToggle={ onToggleTerm }
+					/>
+				) ) }
 			</div>
 			{ ! loading && hasCreateAction && (
 				<FlexItem>
@@ -443,8 +465,6 @@ export function HierarchicalTermSelector( { slug } ) {
 				<form onSubmit={ onAddTerm }>
 					<Flex direction="column" gap="4">
 						<TextControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							className="editor-post-taxonomies__hierarchical-terms-input"
 							label={ newTermLabel }
 							value={ formName }
@@ -453,8 +473,6 @@ export function HierarchicalTermSelector( { slug } ) {
 						/>
 						{ !! availableTerms.length && (
 							<TreeSelect
-								__next40pxDefaultSize
-								__nextHasNoMarginBottom
 								label={ parentSelectLabel }
 								noOptionLabel={ noParentOption }
 								onChange={ onChangeFormParent }

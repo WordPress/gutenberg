@@ -1,13 +1,12 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
+	InspectorControls,
 	useBlockProps,
 	useInnerBlocksProps,
 	RecursionProvider,
 	useHasRecursion,
 	Warning,
+	privateApis as blockEditorPrivateApis,
 	__experimentalUseBlockPreview as useBlockPreview,
 } from '@wordpress/block-editor';
 import { parse } from '@wordpress/blocks';
@@ -18,11 +17,10 @@ import {
 } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { useCanEditEntity } from '../utils/hooks';
+import { unlock } from '../lock-unlock';
+
+const { HTMLElementControl } = unlock( blockEditorPrivateApis );
 
 function ReadOnlyContent( {
 	parentLayout,
@@ -30,6 +28,7 @@ function ReadOnlyContent( {
 	userCanEdit,
 	postType,
 	postId,
+	tagName: TagName = 'div',
 } ) {
 	const [ , , content ] = useEntityProp(
 		'postType',
@@ -60,18 +59,33 @@ function ReadOnlyContent( {
 	}
 
 	return content?.protected ? (
-		<div { ...blockProps }>
+		<TagName { ...blockProps }>
 			<Warning>{ __( 'This content is password protected.' ) }</Warning>
-		</div>
+		</TagName>
 	) : (
-		<div
+		<TagName
 			{ ...blockProps }
 			dangerouslySetInnerHTML={ { __html: content?.rendered } }
-		></div>
+		></TagName>
 	);
 }
 
-function EditableContent( { context = {} } ) {
+function EditableContentLoaded( {
+	blockProps,
+	blocks,
+	onInput,
+	onChange,
+	tagName: TagName = 'div',
+} ) {
+	const props = useInnerBlocksProps( blockProps, {
+		value: blocks,
+		onInput,
+		onChange,
+	} );
+	return <TagName { ...props } />;
+}
+
+function EditableContent( { context = {}, tagName: TagName = 'div' } ) {
 	const { postType, postId } = context;
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
@@ -80,36 +94,47 @@ function EditableContent( { context = {} } ) {
 		{ id: postId }
 	);
 
-	const entityRecord = useSelect(
-		( select ) => {
-			return select( coreStore ).getEntityRecord(
+	// Wait for the entity record before mounting the inner blocks area, so
+	// that an empty `blocks` value means an empty post rather than one that
+	// has not loaded yet.
+	const hasLoadedRecord = useSelect(
+		( select ) =>
+			select( coreStore ).getEntityRecord(
 				'postType',
 				postType,
 				postId
-			);
-		},
+			) !== undefined ||
+			select( coreStore ).hasFinishedResolution( 'getEntityRecord', [
+				'postType',
+				postType,
+				postId,
+			] ),
 		[ postType, postId ]
 	);
 
-	const hasInnerBlocks = !! entityRecord?.content?.raw || blocks?.length;
+	const blockProps = useBlockProps( { className: 'entry-content' } );
 
-	const initialInnerBlocks = [ [ 'core/paragraph' ] ];
+	if ( ! hasLoadedRecord ) {
+		return <TagName { ...blockProps } />;
+	}
 
-	const props = useInnerBlocksProps(
-		useBlockProps( { className: 'entry-content' } ),
-		{
-			value: blocks,
-			onInput,
-			onChange,
-			template: ! hasInnerBlocks ? initialInnerBlocks : undefined,
-		}
+	return (
+		<EditableContentLoaded
+			blockProps={ blockProps }
+			blocks={ blocks }
+			onInput={ onInput }
+			onChange={ onChange }
+			tagName={ TagName }
+		/>
 	);
-	return <div { ...props } />;
 }
 
 function Content( props ) {
-	const { context: { queryId, postType, postId } = {}, layoutClassNames } =
-		props;
+	const {
+		context: { queryId, postType, postId } = {},
+		layoutClassNames,
+		tagName,
+	} = props;
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
 	if ( userCanEdit === undefined ) {
 		return null;
@@ -127,6 +152,7 @@ function Content( props ) {
 			userCanEdit={ userCanEdit }
 			postType={ postType }
 			postId={ postId }
+			tagName={ tagName }
 		/>
 	);
 }
@@ -165,8 +191,39 @@ function RecursionError() {
 	);
 }
 
+/**
+ * Render inspector controls for the PostContent block.
+ *
+ * @param {Object}   props                 Component props.
+ * @param {string}   props.tagName         The HTML tag name.
+ * @param {Function} props.onSelectTagName onChange function for the SelectControl.
+ * @param {string}   props.clientId        The client ID of the current block.
+ *
+ * @return {React.JSX.Element}                The control group.
+ */
+function PostContentEditControls( { tagName, onSelectTagName, clientId } ) {
+	return (
+		<InspectorControls group="advanced">
+			<HTMLElementControl
+				tagName={ tagName }
+				onChange={ onSelectTagName }
+				clientId={ clientId }
+				options={ [
+					{ label: __( 'Default (<div>)' ), value: 'div' },
+					{ label: '<main>', value: 'main' },
+					{ label: '<section>', value: 'section' },
+					{ label: '<article>', value: 'article' },
+				] }
+			/>
+		</InspectorControls>
+	);
+}
+
 export default function PostContentEdit( {
 	context,
+	attributes: { tagName = 'div' },
+	setAttributes,
+	clientId,
 	__unstableLayoutClassNames: layoutClassNames,
 	__unstableParentLayout: parentLayout,
 } ) {
@@ -177,17 +234,28 @@ export default function PostContentEdit( {
 		return <RecursionError />;
 	}
 
+	const handleSelectTagName = ( value ) => {
+		setAttributes( { tagName: value } );
+	};
+
 	return (
-		<RecursionProvider uniqueId={ contextPostId }>
-			{ contextPostId && contextPostType ? (
-				<Content
-					context={ context }
-					parentLayout={ parentLayout }
-					layoutClassNames={ layoutClassNames }
-				/>
-			) : (
-				<Placeholder layoutClassNames={ layoutClassNames } />
-			) }
-		</RecursionProvider>
+		<>
+			<PostContentEditControls
+				tagName={ tagName }
+				onSelectTagName={ handleSelectTagName }
+				clientId={ clientId }
+			/>
+			<RecursionProvider uniqueId={ contextPostId }>
+				{ contextPostId && contextPostType ? (
+					<Content
+						context={ context }
+						parentLayout={ parentLayout }
+						layoutClassNames={ layoutClassNames }
+					/>
+				) : (
+					<Placeholder layoutClassNames={ layoutClassNames } />
+				) }
+			</RecursionProvider>
+		</>
 	);
 }

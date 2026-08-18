@@ -1,25 +1,21 @@
-/**
- * WordPress dependencies
- */
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
-import { Platform } from '@wordpress/element';
 
 const ALIGN_SUPPORT_KEY = 'align';
 const ALIGN_WIDE_SUPPORT_KEY = 'alignWide';
-const BORDER_SUPPORT_KEY = 'border';
+const BORDER_SUPPORT_KEY = '__experimentalBorder';
 const COLOR_SUPPORT_KEY = 'color';
 const CUSTOM_CLASS_NAME_SUPPORT_KEY = 'customClassName';
-const FONT_FAMILY_SUPPORT_KEY = 'typography.fontFamily';
+const FONT_FAMILY_SUPPORT_KEY = 'typography.__experimentalFontFamily';
 const FONT_SIZE_SUPPORT_KEY = 'typography.fontSize';
 const LINE_HEIGHT_SUPPORT_KEY = 'typography.lineHeight';
 /**
  * Key within block settings' support array indicating support for font style.
  */
-const FONT_STYLE_SUPPORT_KEY = 'typography.fontStyle';
+const FONT_STYLE_SUPPORT_KEY = 'typography.__experimentalFontStyle';
 /**
  * Key within block settings' support array indicating support for font weight.
  */
-const FONT_WEIGHT_SUPPORT_KEY = 'typography.fontWeight';
+const FONT_WEIGHT_SUPPORT_KEY = 'typography.__experimentalFontWeight';
 /**
  * Key within block settings' supports array indicating support for text
  * align e.g. settings found in `block.json`.
@@ -34,7 +30,7 @@ const TEXT_COLUMNS_SUPPORT_KEY = 'typography.textColumns';
  * Key within block settings' supports array indicating support for text
  * decorations e.g. settings found in `block.json`.
  */
-const TEXT_DECORATION_SUPPORT_KEY = 'typography.textDecoration';
+const TEXT_DECORATION_SUPPORT_KEY = 'typography.__experimentalTextDecoration';
 /**
  * Key within block settings' supports array indicating support for writing mode
  * e.g. settings found in `block.json`.
@@ -44,13 +40,13 @@ const WRITING_MODE_SUPPORT_KEY = 'typography.__experimentalWritingMode';
  * Key within block settings' supports array indicating support for text
  * transforms e.g. settings found in `block.json`.
  */
-const TEXT_TRANSFORM_SUPPORT_KEY = 'typography.textTransform';
+const TEXT_TRANSFORM_SUPPORT_KEY = 'typography.__experimentalTextTransform';
 
 /**
  * Key within block settings' supports array indicating support for letter-spacing
  * e.g. settings found in `block.json`.
  */
-const LETTER_SPACING_SUPPORT_KEY = 'typography.letterSpacing';
+const LETTER_SPACING_SUPPORT_KEY = 'typography.__experimentalLetterSpacing';
 const LAYOUT_SUPPORT_KEY = 'layout';
 const TYPOGRAPHY_SUPPORT_KEYS = [
 	LINE_HEIGHT_SUPPORT_KEY,
@@ -120,10 +116,6 @@ export const getAlignWideSupport = ( nameOrType ) =>
  * @return {boolean} Whether there is support.
  */
 export function hasBorderSupport( nameOrType, feature = 'any' ) {
-	if ( Platform.OS !== 'web' ) {
-		return false;
-	}
-
 	const support = getBlockSupport( nameOrType, BORDER_SUPPORT_KEY );
 
 	if ( support === true ) {
@@ -177,10 +169,6 @@ export const hasColorSupport = ( nameOrType ) => {
  * @return {boolean} Whether the block supports the feature.
  */
 export const hasLinkColorSupport = ( nameOrType ) => {
-	if ( Platform.OS !== 'web' ) {
-		return false;
-	}
-
 	const colorSupport = getBlockSupport( nameOrType, COLOR_SUPPORT_KEY );
 
 	return (

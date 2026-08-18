@@ -1,30 +1,15 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { Button } from '@wordpress/components';
-import { forwardRef, useRef } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 import { _x, sprintf } from '@wordpress/i18n';
 import { Icon, plus } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import Inserter from '../inserter';
-import { useMergeRefs } from '@wordpress/compose';
 
 function ButtonBlockAppender(
 	{ rootClientId, className, onFocus, tabIndex, onSelect },
 	ref
 ) {
-	const inserterButtonRef = useRef();
-
-	const mergedInserterButtonRef = useMergeRefs( [ inserterButtonRef, ref ] );
 	return (
 		<Inserter
 			position="bottom center"
@@ -34,7 +19,6 @@ function ButtonBlockAppender(
 				if ( onSelect && typeof onSelect === 'function' ) {
 					onSelect( ...args );
 				}
-				inserterButtonRef.current?.focus();
 			} }
 			renderToggle={ ( {
 				onToggle,
@@ -42,26 +26,33 @@ function ButtonBlockAppender(
 				isOpen,
 				blockTitle,
 				hasSingleBlockType,
+				appenderLabel,
 			} ) => {
 				const isToggleButton = ! hasSingleBlockType;
-				const label = hasSingleBlockType
-					? sprintf(
-							// translators: %s: the name of the block when there is only one
-							_x(
-								'Add %s',
-								'directly add the only allowed block'
-							),
-							blockTitle
-					  )
-					: _x(
-							'Add block',
-							'Generic label for block inserter button'
-					  );
+
+				let label;
+				if ( appenderLabel ) {
+					// Block returns the full label; use directly (consistent with getBlockLabel).
+					label = appenderLabel;
+				} else if ( hasSingleBlockType ) {
+					label = sprintf(
+						// translators: %s: the name of the block when there is only one
+						_x( 'Add %s', 'directly add the only allowed block' ),
+						blockTitle.toLowerCase()
+					);
+				} else {
+					label = _x(
+						'Add block',
+						'Generic label for block inserter button'
+					);
+				}
 
 				return (
+					// Disable reason: There shouldn't be a case where this button is disabled but not visually hidden.
+					// eslint-disable-next-line @wordpress/components-no-unsafe-button-disabled
 					<Button
 						__next40pxDefaultSize
-						ref={ mergedInserterButtonRef }
+						ref={ ref }
 						onFocus={ onFocus }
 						tabIndex={ tabIndex }
 						className={ clsx(
@@ -71,8 +62,6 @@ function ButtonBlockAppender(
 						onClick={ onToggle }
 						aria-haspopup={ isToggleButton ? 'true' : undefined }
 						aria-expanded={ isToggleButton ? isOpen : undefined }
-						// Disable reason: There shouldn't be a case where this button is disabled but not visually hidden.
-						// eslint-disable-next-line no-restricted-syntax
 						disabled={ disabled }
 						label={ label }
 						showTooltip

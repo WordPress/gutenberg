@@ -4,7 +4,7 @@ This document introduces the main concepts related to styles that affect the use
 
 ## HTML and CSS
 
-By creating a post in the block editor the user is creating a number of artifacts: a HTML document plus a number of CSS stylesheets, either embedded in the document or external.
+By creating a post in the block editor, the user is creating a number of artifacts: an HTML document plus a number of CSS stylesheets, either embedded in the document or external.
 
 The final HTML document is the result of a few things:
 
@@ -37,10 +37,8 @@ The user may change the state of this block by applying different styles: a text
 After some user modifications to the block, the initial markup may become something like this:
 
 ```html
-<p
-	class="has-color has-green-color has-font-size has-small-font-size my-custom-class"
-	style="line-height: 1em"
-></p>
+<p class="has-color has-green-color has-font-size has-small-font-size my-custom-class"
+	style="line-height: 1em"></p>
 ```
 
 This is what we refer to as "user-provided block styles", also know as "local styles" or "serialized styles". Essentially, each tool (font size, color, etc) ends up adding some classes and/or inline styles to the block markup. The CSS styling for these classes is part of the block, global, or theme stylesheets.
@@ -55,7 +53,7 @@ To build an experience like the one described above a block author needs a few p
 
 1. **A UI control**. It presents the user some choices, for example, to be able to change the font size of the block. The control takes care of reading the data from the block (does this block already have a font size assigned?) and other data it needs (what are the font sizes a user can use in this block?). See available [component library](https://developer.wordpress.org/block-editor/reference-guides/components/).
 2. **A block attribute**. The block needs to hold data to know which modifications were applied to it: whether it has been given a font size already for example. See how blocks can define [attributes](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/).
-3. **Access to style data**. A control may need external information about the styles available for a given block: the list of colors, or the list of font sizes, for example. These are called "style presets", as they are a preselection of styles usually defined by the theme, although WordPress provides some defaults. Check the [list of data](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/#settings) a theme can provide to the editor and how a block author can get access to it via [useSetting](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#usesetting).
+3. **Access to style data**. A control may need external information about the styles available for a given block: the list of colors, or the list of font sizes, for example. These are called "style presets", as they are a preselection of styles usually defined by the theme, although WordPress provides some defaults. Check the [list of data](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/#settings) a theme can provide to the editor and how a block author can get access to it via [useSettings](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#usesettings).
 4. **Serialize the user style into HTML markup**. Upon a user action, the block HTML markup needs to be updated accordingly (apply the proper class or inline style). This process is called serialization and it is the [edit, save](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/), and [render_callback](https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/creating-dynamic-blocks/) functions' responsibility: these functions take block data and convert it into HTML.
 
 In essence, these are the essential mechanics a block author needs to care about for their block to be able to be styled by the user. While this can be done completely manually, there's an API that automates this process for common style needs: block supports.
@@ -125,7 +123,7 @@ The block supports API only serializes the font size value to the wrapper, resul
 
 This is an active area of work you can follow [in the tracking issue](https://github.com/WordPress/gutenberg/issues/38167). The linked proposal is exploring a different way to serialize the user changes: instead of each block support serializing its own data (for example, classes such as `has-small-font-size`, `has-green-color`) the idea is the block would get a single class instead (for example, `wp-style-UUID`) and the CSS styling for that class will be generated in the server by WordPress.
 
-While work continues in that proposal, there's an escape hatch, an experimental option block authors can use. Any block support can skip the serialization to HTML markup by using `skipSerialization`. For example:
+While work continues in that proposal, there's an escape hatch, an experimental option block authors can use. Any block support can skip the serialization to HTML markup by using `__experimentalSkipSerialization`. For example:
 
 ```json
 {
@@ -134,7 +132,7 @@ While work continues in that proposal, there's an escape hatch, an experimental 
 	"supports": {
 		"typography": {
 			"fontSize": true,
-			"skipSerialization": true
+			"__experimentalSkipSerialization": true
 		}
 	}
 }
@@ -142,7 +140,7 @@ While work continues in that proposal, there's an escape hatch, an experimental 
 
 This means that the typography block support will do all of the things (create a UI control, bind the block attribute to the control, etc) except serializing the user values into the HTML markup. The classes and inline styles will not be automatically applied to the wrapper and it is the block author's responsibility to implement this in the `edit`, `save`, and `render_callback` functions. See [this issue](https://github.com/WordPress/gutenberg/issues/28913) for examples of how it was done for some blocks provided by WordPress.
 
-Note that, if `skipSerialization` is enabled for a group (typography, color, spacing) it affects _all_ block supports within this group. In the example above _all_ the properties within the `typography` group will be affected (e.g. `fontSize`, `lineHeight`, `fontFamily` .etc).
+Note that, if `__experimentalSkipSerialization` is enabled for a group (typography, color, spacing) it affects _all_ block supports within this group. In the example above _all_ the properties within the `typography` group will be affected (e.g. `fontSize`, `lineHeight`, `fontFamily` .etc).
 
 To enable for a _single_ property only, you may use an array to declare which properties are to be skipped. In the example below, only `fontSize` will skip serialization, leaving other items within the `typography` group (e.g. `lineHeight`, `fontFamily` .etc) unaffected.
 
@@ -154,7 +152,7 @@ To enable for a _single_ property only, you may use an array to declare which pr
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
-			"skipSerialization": [ "fontSize" ]
+			"__experimentalSkipSerialization": [ "fontSize" ]
 		}
 	}
 }
@@ -170,7 +168,7 @@ This mechanism was [introduced in WordPress 5.8](https://make.wordpress.org/core
 
 This is the general data flow:
 
-![Data flow of Global Styles](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/explanations/architecture/assets/global-styles-input-output.png)
+![Data flow of Global Styles](https://developer.wordpress.org/files/2026/06/global-styles-input-output.png)
 
 The process of generating the stylesheet has, in essence, three steps:
 
@@ -475,7 +473,7 @@ If blocks do this, they need to be registered in the server using the `block.jso
 
 Every chunk of styles can only use a single selector.
 
-This is particularly relevant if the block is using `skipSerialization` to serialize the different style properties to different nodes other than the wrapper. See "Current limitations of blocks supports" for more.
+This is particularly relevant if the block is using `__experimentalSkipSerialization` to serialize the different style properties to different nodes other than the wrapper. See "Current limitations of blocks supports" for more.
 
 #### 3. **Only a single property per block**
 

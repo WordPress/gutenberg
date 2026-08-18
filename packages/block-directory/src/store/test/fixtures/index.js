@@ -48,3 +48,9 @@ export const blockList = [
 		innerBlocks: [],
 	},
 ];
+
+export const blockListIds = blockList.map( ( block ) => block.clientId );
+export const blockListNameMap = blockList.reduce( ( acc, block ) => {
+	acc[ block.clientId ] = block.name;
+	return acc;
+}, {} );

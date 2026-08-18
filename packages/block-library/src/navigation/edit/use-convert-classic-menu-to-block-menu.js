@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useRegistry, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState, useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import menuItemsToBlocks from '../menu-items-to-blocks';
 
 export const CLASSIC_MENU_CONVERSION_SUCCESS = 'success';
@@ -47,7 +40,7 @@ function useConvertClassicToBlockMenu(
 			} catch ( err ) {
 				throw new Error(
 					sprintf(
-						// translators: %s: the name of a menu (e.g. Header navigation).
+						// translators: %s: The name of a menu (e.g. Header menu).
 						__( `Unable to fetch classic menu "%s" from API.` ),
 						menuName
 					),
@@ -61,7 +54,7 @@ function useConvertClassicToBlockMenu(
 			if ( classicMenuItems === null ) {
 				throw new Error(
 					sprintf(
-						// translators: %s: the name of a menu (e.g. Header navigation).
+						// translators: %s: The name of a menu (e.g. Header menu).
 						__( `Unable to fetch classic menu "%s" from API.` ),
 						menuName
 					)
@@ -98,7 +91,7 @@ function useConvertClassicToBlockMenu(
 			} catch ( err ) {
 				throw new Error(
 					sprintf(
-						// translators: %s: the name of a menu (e.g. Header navigation).
+						// translators: %s: The name of a menu (e.g. Header menu).
 						__( `Unable to create Navigation Menu "%s".` ),
 						menuName
 					),
@@ -155,7 +148,7 @@ function useConvertClassicToBlockMenu(
 					if ( throwOnError ) {
 						throw new Error(
 							sprintf(
-								// translators: %s: the name of a menu (e.g. Header navigation).
+								// translators: %s: The name of a menu (e.g. Header menu).
 								__( `Unable to create Navigation Menu "%s".` ),
 								menuName
 							),

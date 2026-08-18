@@ -2,20 +2,37 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types",
-		"checkJs": false
+		"types": [
+			"gutenberg-env",
+			"gutenberg-test-env",
+			"jest",
+			"style-imports",
+			"react-css-custom-properties"
+		]
 	},
 	"references": [
+		{ "path": "../a11y/tsconfig.build.json" },
 		{ "path": "../components" },
-		{ "path": "../compose" },
+		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../data" },
-		{ "path": "../element" },
-		{ "path": "../i18n" },
+		{ "path": "../date" },
+		{ "path": "../deprecated/tsconfig.build.json" },
+		{ "path": "../dom" },
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons" },
+		{ "path": "../kebab-case" },
+		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
+		{ "path": "../theme/tsconfig.build.json" },
+		{ "path": "../ui" },
+		{ "path": "../url" },
 		{ "path": "../warning" }
 	],
-	"include": [ "src" ]
+	"files": [ "global.d.ts" ],
+	"exclude": [
+		"src/**/stories/**/*.jsx", // only exclude js files, tsx files should be checked
+		"src/**/test/**/*.js" // only exclude js files, ts{x} files should be checked
+	]
 }

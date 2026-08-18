@@ -1,9 +1,6 @@
-/**
- * WordPress dependencies
- */
-import { Modal } from '@wordpress/components';
+import { Flex, FlexItem, Modal, CheckboxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState, useMemo } from '@wordpress/element';
+import { useState, useMemo, useEffect } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	__experimentalBlockPatternsList as BlockPatternsList,
@@ -13,12 +10,12 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __unstableSerializeAndClean } from '@wordpress/blocks';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as interfaceStore } from '@wordpress/interface';
-
-/**
- * Internal dependencies
- */
+import {
+	ATTACHMENT_POST_TYPE,
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+} from '../../store/constants';
 import { store as editorStore } from '../../store';
-import { TEMPLATE_POST_TYPE } from '../../store/constants';
 
 export function useStartPatterns() {
 	// A pattern is a start pattern if it includes 'core/post-content' in its blockTypes,
@@ -90,6 +87,8 @@ function PatternSelection( { blockPatterns, onChoosePattern } ) {
 }
 
 function StartPageOptionsModal( { onClose } ) {
+	const [ showStartPatterns, setShowStartPatterns ] = useState( true );
+	const { set: setPreference } = useDispatch( preferencesStore );
 	const startPatterns = useStartPatterns();
 	const hasStartPattern = startPatterns.length > 0;
 
@@ -97,45 +96,104 @@ function StartPageOptionsModal( { onClose } ) {
 		return null;
 	}
 
+	function handleClose() {
+		onClose();
+		setPreference( 'core', 'enableChoosePatternModal', showStartPatterns );
+	}
+
 	return (
 		<Modal
+			className="editor-start-page-options__modal"
 			title={ __( 'Choose a pattern' ) }
 			isFullScreen
-			onRequestClose={ onClose }
+			onRequestClose={ handleClose }
 		>
 			<div className="editor-start-page-options__modal-content">
 				<PatternSelection
 					blockPatterns={ startPatterns }
-					onChoosePattern={ onClose }
+					onChoosePattern={ handleClose }
 				/>
 			</div>
+			<Flex
+				className="editor-start-page-options__modal__actions"
+				justify="flex-start"
+				expanded={ false }
+			>
+				<FlexItem>
+					<CheckboxControl
+						checked={ showStartPatterns }
+						label={ __(
+							'Always show starter patterns for new pages'
+						) }
+						onChange={ ( newValue ) => {
+							setShowStartPatterns( newValue );
+						} }
+					/>
+				</FlexItem>
+			</Flex>
 		</Modal>
 	);
 }
 
 export default function StartPageOptions() {
-	const [ isClosed, setIsClosed ] = useState( false );
-	const shouldEnableModal = useSelect( ( select ) => {
-		const { isEditedPostDirty, isEditedPostEmpty, getCurrentPostType } =
-			select( editorStore );
-		const preferencesModalActive =
-			select( interfaceStore ).isModalActive( 'editor/preferences' );
+	const [ isOpen, setIsOpen ] = useState( false );
+	const { isEditedPostEmpty } = useSelect( editorStore );
+	const { getEntityRecordNonTransientEdits } = useSelect( coreStore );
+	const { isModalActive } = useSelect( interfaceStore );
+	const { enabled, postType, postId } = useSelect( ( select ) => {
+		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
 		const choosePatternModalEnabled = select( preferencesStore ).get(
 			'core',
 			'enableChoosePatternModal'
 		);
-		return (
-			choosePatternModalEnabled &&
-			! preferencesModalActive &&
-			! isEditedPostDirty() &&
-			isEditedPostEmpty() &&
-			TEMPLATE_POST_TYPE !== getCurrentPostType()
-		);
+		const currentPostType = getCurrentPostType();
+		return {
+			postType: currentPostType,
+			postId: getCurrentPostId(),
+			enabled:
+				choosePatternModalEnabled &&
+				ATTACHMENT_POST_TYPE !== currentPostType &&
+				TEMPLATE_POST_TYPE !== currentPostType &&
+				TEMPLATE_PART_POST_TYPE !== currentPostType,
+		};
 	}, [] );
 
-	if ( ! shouldEnableModal || isClosed ) {
+	// Note: The `postId` ensures the effect re-runs when pages are switched without remounting the component.
+	// Examples: changing pages in the List View, creating a new page via Command Palette.
+	useEffect( () => {
+		// Read non-transient edits directly. `isEditedPostDirty` /
+		// `hasEditsForEntityRecord` also return true while the CRDT
+		// sync manager's phantom save (fired off `receiveEntityRecords`
+		// at boot) is in flight, which would suppress the modal.
+		const hasEdits =
+			Object.keys(
+				getEntityRecordNonTransientEdits(
+					'postType',
+					postType,
+					postId
+				) ?? {}
+			).length > 0;
+		const isFreshPage = ! hasEdits && isEditedPostEmpty();
+		// Prevents immediately opening when features is enabled via preferences modal.
+		const isPreferencesModalActive = isModalActive( 'editor/preferences' );
+		if ( ! enabled || ! isFreshPage || isPreferencesModalActive ) {
+			return;
+		}
+
+		// Open the modal after the initial render for a new page.
+		setIsOpen( true );
+	}, [
+		enabled,
+		postType,
+		postId,
+		getEntityRecordNonTransientEdits,
+		isEditedPostEmpty,
+		isModalActive,
+	] );
+
+	if ( ! isOpen ) {
 		return null;
 	}
 
-	return <StartPageOptionsModal onClose={ () => setIsClosed( true ) } />;
+	return <StartPageOptionsModal onClose={ () => setIsOpen( false ) } />;
 }

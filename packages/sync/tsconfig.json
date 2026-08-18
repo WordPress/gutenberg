@@ -1,11 +1,14 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
+	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types",
-		"types": [ "node" ]
+		"types": [ "jest", "node" ]
 	},
-	"include": [ "src/**/*" ],
-	"references": [ { "path": "../url" } ]
+	"references": [
+		{ "path": "./tsconfig.build.json" },
+		{ "path": "../api-fetch/tsconfig.build.json" },
+		{ "path": "../hooks" },
+		{ "path": "../private-apis" },
+		{ "path": "../undo-manager" }
+	]
 }

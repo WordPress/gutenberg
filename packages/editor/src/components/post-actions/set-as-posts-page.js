@@ -1,21 +1,14 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import {
 	Button,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import { getItemTitle } from '../../utils/get-item-title';
 
 const SetAsPostsPageModal = ( { items, closeModal } ) => {
@@ -88,7 +81,7 @@ const SetAsPostsPageModal = ( { items, closeModal } ) => {
 	return (
 		<form onSubmit={ onSetPageAsPostsPage }>
 			<VStack spacing="5">
-				<Text>{ modalText }</Text>
+				<WCText>{ modalText }</WCText>
 				<HStack justify="right">
 					<Button
 						__next40pxDefaultSize
@@ -118,8 +111,14 @@ const SetAsPostsPageModal = ( { items, closeModal } ) => {
 
 export const useSetAsPostsPageAction = () => {
 	const { pageOnFront, pageForPosts } = useSelect( ( select ) => {
-		const { getEntityRecord } = select( coreStore );
-		const siteSettings = getEntityRecord( 'root', 'site' );
+		const { getEntityRecord, canUser } = select( coreStore );
+		const siteSettings = canUser( 'read', {
+			kind: 'root',
+			name: 'site',
+		} )
+			? getEntityRecord( 'root', 'site' )
+			: undefined;
+
 		return {
 			pageOnFront: siteSettings?.page_on_front,
 			pageForPosts: siteSettings?.page_for_posts,
@@ -151,6 +150,7 @@ export const useSetAsPostsPageAction = () => {
 
 				return true;
 			},
+			modalFocusOnMount: 'firstContentElement',
 			RenderModal: SetAsPostsPageModal,
 		} ),
 		[ pageForPosts, pageOnFront ]

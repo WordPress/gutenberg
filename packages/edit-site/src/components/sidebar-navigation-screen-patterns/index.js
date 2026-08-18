@@ -1,18 +1,13 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 } from '@wordpress/components';
-import { getTemplatePartIcon } from '@wordpress/editor';
+import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { file } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-
-/**
- * Internal dependencies
- */
+import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
+import { useViewConfig } from '@wordpress/views';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import CategoryItem from './category-item';
 import {
@@ -25,73 +20,50 @@ import usePatternCategories from './use-pattern-categories';
 import useTemplatePartAreas from './use-template-part-areas';
 import { unlock } from '../../lock-unlock';
 
+const VIEW_CONFIG_FIELDS = [ 'view_list' ];
+
 const { useLocation } = unlock( routerPrivateApis );
+const { getTemplatePartIcon } = unlock( coreDataPrivateApis );
 
 function CategoriesGroup( {
-	templatePartAreas,
-	patternCategories,
+	templatePartViews,
+	patternViews,
+	templatePartCounts,
+	patternCounts,
 	currentCategory,
 	currentType,
 } ) {
-	const [ allPatterns, ...otherPatterns ] = patternCategories;
-
 	return (
 		<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
-			<CategoryItem
-				key="all"
-				count={ Object.values( templatePartAreas )
-					.map( ( { templateParts } ) => templateParts?.length || 0 )
-					.reduce( ( acc, val ) => acc + val, 0 ) }
-				icon={ getTemplatePartIcon() } /* no name, so it provides the fallback icon */
-				label={ __( 'All template parts' ) }
-				id={ TEMPLATE_PART_ALL_AREAS_CATEGORY }
-				type={ TEMPLATE_PART_POST_TYPE }
-				isActive={
-					currentCategory === TEMPLATE_PART_ALL_AREAS_CATEGORY &&
-					currentType === TEMPLATE_PART_POST_TYPE
-				}
-			/>
-			{ Object.entries( templatePartAreas ).map(
-				( [ area, { label, templateParts } ] ) => (
-					<CategoryItem
-						key={ area }
-						count={ templateParts?.length }
-						icon={ getTemplatePartIcon( area ) }
-						label={ label }
-						id={ area }
-						type={ TEMPLATE_PART_POST_TYPE }
-						isActive={
-							currentCategory === area &&
-							currentType === TEMPLATE_PART_POST_TYPE
-						}
-					/>
-				)
-			) }
-			<div className="edit-site-sidebar-navigation-screen-patterns__divider" />
-			{ allPatterns && (
+			{ templatePartViews?.map( ( view ) => (
 				<CategoryItem
-					key={ allPatterns.name }
-					count={ allPatterns.count }
-					label={ allPatterns.label }
-					icon={ file }
-					id={ allPatterns.name }
-					type={ PATTERN_TYPES.user }
+					key={ view.slug }
+					count={ templatePartCounts[ view.slug ] }
+					icon={ getTemplatePartIcon(
+						view.slug === TEMPLATE_PART_ALL_AREAS_CATEGORY
+							? undefined
+							: view.slug
+					) }
+					label={ view.title }
+					id={ view.slug }
+					type={ TEMPLATE_PART_POST_TYPE }
 					isActive={
-						currentCategory === `${ allPatterns.name }` &&
-						currentType === PATTERN_TYPES.user
+						currentCategory === view.slug &&
+						currentType === TEMPLATE_PART_POST_TYPE
 					}
 				/>
-			) }
-			{ otherPatterns.map( ( category ) => (
+			) ) }
+			<div className="edit-site-sidebar-navigation-screen-patterns__divider" />
+			{ patternViews?.map( ( view ) => (
 				<CategoryItem
-					key={ category.name }
-					count={ category.count }
-					label={ category.label }
+					key={ view.slug }
+					count={ patternCounts[ view.slug ] }
+					label={ view.title }
 					icon={ file }
-					id={ category.name }
+					id={ view.slug }
 					type={ PATTERN_TYPES.user }
 					isActive={
-						currentCategory === `${ category.name }` &&
+						currentCategory === `${ view.slug }` &&
 						currentType === PATTERN_TYPES.user
 					}
 				/>
@@ -110,16 +82,48 @@ export default function SidebarNavigationScreenPatterns( { backPath } ) {
 			? PATTERN_DEFAULT_CATEGORY
 			: TEMPLATE_PART_ALL_AREAS_CATEGORY );
 
-	const { templatePartAreas, hasTemplateParts, isLoading } =
+	const { view_list: templatePartViews } = useViewConfig( {
+		kind: 'postType',
+		name: TEMPLATE_PART_POST_TYPE,
+		fields: VIEW_CONFIG_FIELDS,
+	} );
+	const { view_list: patternViews } = useViewConfig( {
+		kind: 'postType',
+		name: PATTERN_TYPES.user,
+		fields: VIEW_CONFIG_FIELDS,
+	} );
+
+	const { templatePartAreas, isLoading, hasTemplateParts } =
 		useTemplatePartAreas();
-	const { patternCategories, hasPatterns } = usePatternCategories();
+	const templatePartCounts = useMemo( () => {
+		const counts = { [ TEMPLATE_PART_ALL_AREAS_CATEGORY ]: 0 };
+		Object.entries( templatePartAreas ).forEach(
+			( [ area, { templateParts } ] ) => {
+				const count = templateParts?.length || 0;
+				counts[ area ] = count;
+				counts[ TEMPLATE_PART_ALL_AREAS_CATEGORY ] += count;
+			}
+		);
+		return counts;
+	}, [ templatePartAreas ] );
+	const { patternCategories } = usePatternCategories();
+	const patternCounts = useMemo( () => {
+		const counts = {};
+		patternCategories.forEach( ( cat ) => {
+			counts[ cat.name ] = cat.count;
+		} );
+		return counts;
+	}, [ patternCategories ] );
+
+	const hasPatterns = patternCounts[ PATTERN_DEFAULT_CATEGORY ] > 0;
 
 	return (
 		<SidebarNavigationScreen
 			title={ __( 'Patterns' ) }
 			description={ __(
-				'Manage what patterns are available when editing the site.'
+				'Manage what patterns are available when editing your site.'
 			) }
+			isRoot={ ! backPath }
 			backPath={ backPath }
 			content={
 				<>
@@ -132,8 +136,10 @@ export default function SidebarNavigationScreenPatterns( { backPath } ) {
 								</ItemGroup>
 							) }
 							<CategoriesGroup
-								templatePartAreas={ templatePartAreas }
-								patternCategories={ patternCategories }
+								templatePartViews={ templatePartViews }
+								patternViews={ patternViews }
+								templatePartCounts={ templatePartCounts }
+								patternCounts={ patternCounts }
 								currentCategory={ currentCategory }
 								currentType={ postType }
 							/>

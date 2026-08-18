@@ -1,47 +1,39 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef, useContext } from '@wordpress/element';
 import { Icon, check } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
-import { MenuContext } from './context';
-import type { MenuCheckboxItemProps } from './types';
+import { Context } from './context';
+import type { CheckboxItemProps } from './types';
 import * as Styled from './styles';
+import { useMenuItemHideOnClick } from './use-menu-item-hide-on-click';
 
-export const MenuCheckboxItem = forwardRef<
+export const CheckboxItem = forwardRef<
 	HTMLDivElement,
-	WordPressComponentProps< MenuCheckboxItemProps, 'div', false >
->( function MenuCheckboxItem(
-	{ suffix, children, hideOnClick = false, ...props },
+	WordPressComponentProps< CheckboxItemProps, 'div', false >
+>( function CheckboxItem(
+	{ suffix, children, disabled = false, hideOnClick = false, ...props },
 	ref
 ) {
-	const menuContext = useContext( MenuContext );
+	const menuContext = useContext( Context );
+	const store = menuContext?.store;
+	const computedHideOnClick = useMenuItemHideOnClick( store, hideOnClick );
 
-	if ( ! menuContext?.store ) {
+	if ( ! store ) {
 		throw new Error(
 			'Menu.CheckboxItem can only be rendered inside a Menu component'
 		);
 	}
-
 	return (
-		<Styled.MenuCheckboxItem
+		<Styled.CheckboxItem
 			ref={ ref }
 			{ ...props }
 			accessibleWhenDisabled
-			hideOnClick={ hideOnClick }
-			store={ menuContext.store }
+			disabled={ disabled }
+			store={ store }
+			hideOnClick={ computedHideOnClick }
 		>
 			<Ariakit.MenuItemCheck
-				store={ menuContext.store }
+				store={ store }
 				render={ <Styled.ItemPrefixWrapper /> }
 				// Override some ariakit inline styles
 				style={ { width: 'auto', height: 'auto' } }
@@ -49,17 +41,17 @@ export const MenuCheckboxItem = forwardRef<
 				<Icon icon={ check } size={ 24 } />
 			</Ariakit.MenuItemCheck>
 
-			<Styled.MenuItemContentWrapper>
-				<Styled.MenuItemChildrenWrapper>
+			<Styled.ItemContentWrapper>
+				<Styled.ItemChildrenWrapper>
 					{ children }
-				</Styled.MenuItemChildrenWrapper>
+				</Styled.ItemChildrenWrapper>
 
 				{ suffix && (
 					<Styled.ItemSuffixWrapper>
 						{ suffix }
 					</Styled.ItemSuffixWrapper>
 				) }
-			</Styled.MenuItemContentWrapper>
-		</Styled.MenuCheckboxItem>
+			</Styled.ItemContentWrapper>
+		</Styled.CheckboxItem>
 	);
 } );

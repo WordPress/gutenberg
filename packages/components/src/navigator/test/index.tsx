@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import type { ComponentPropsWithoutRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import { Navigator, useNavigator } from '..';
 import { NavigatorToParentButton } from '../legacy';
@@ -20,7 +9,7 @@ import type { NavigateOptions } from '../types';
 
 const INVALID_HTML_ATTRIBUTE = {
 	raw: '/ "\'><=invalid_path',
-	escaped: "/ &quot;'&gt;<=invalid_path",
+	escaped: "/ &quot;'&gt;&lt;=invalid_path",
 };
 
 const PATHS = {
@@ -75,6 +64,7 @@ function CustomNavigatorButton( {
 } ) {
 	return (
 		<Navigator.Button
+			__next40pxDefaultSize
 			onClick={ () => {
 				// Used to spy on the values passed to `navigator.goTo`.
 				onClick?.( { type: 'goTo', path } );
@@ -95,6 +85,7 @@ function CustomNavigatorGoToBackButton( {
 	const { goTo } = useNavigator();
 	return (
 		<Button
+			__next40pxDefaultSize
 			onClick={ () => {
 				goTo( path, { isBack: true } );
 				// Used to spy on the values passed to `navigator.goTo`.
@@ -115,6 +106,7 @@ function CustomNavigatorGoToSkipFocusButton( {
 	const { goTo } = useNavigator();
 	return (
 		<Button
+			__next40pxDefaultSize
 			onClick={ () => {
 				goTo( path, { skipFocus: true } );
 				// Used to spy on the values passed to `navigator.goTo`.
@@ -136,6 +128,7 @@ function CustomNavigatorBackButton( {
 } ) {
 	return (
 		<Navigator.BackButton
+			__next40pxDefaultSize
 			onClick={ () => {
 				// Used to spy on the values passed to `navigator.goBack`.
 				onClick?.( { type: 'goBack' } );
@@ -465,30 +458,6 @@ const getNavigationButton = ( buttonKey: keyof typeof BUTTON_TEXT ) =>
 	screen.getByRole( 'button', { name: BUTTON_TEXT[ buttonKey ] } );
 
 describe( 'Navigator', () => {
-	const originalGetClientRects = window.Element.prototype.getClientRects;
-
-	// `getClientRects` needs to be mocked so that `isVisible` from the `@wordpress/dom`
-	// `focusable` module can pass, in a JSDOM env where the DOM elements have no width/height.
-	const mockedGetClientRects = jest.fn( () => [
-		{
-			x: 0,
-			y: 0,
-			width: 100,
-			height: 100,
-		},
-	] );
-
-	beforeAll( () => {
-		// @ts-expect-error There's no need for an exact mock, this is just needed
-		// for the tests to pass (see `mockedGetClientRects` inline comments).
-		window.Element.prototype.getClientRects =
-			jest.fn( mockedGetClientRects );
-	} );
-
-	afterAll( () => {
-		window.Element.prototype.getClientRects = originalGetClientRects;
-	} );
-
 	it( 'should render', () => {
 		render( <MyNavigation /> );
 

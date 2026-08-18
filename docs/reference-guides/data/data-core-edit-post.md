@@ -65,7 +65,7 @@ Retrieves the template of the currently edited post.
 
 _Returns_
 
--   `Object?`: Post Template.
+-   `?Object`: Post Template.
 
 ### getEditorMode
 

@@ -1,0 +1,20 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"allowJs": false,
+		"checkJs": false,
+		"strict": false
+	},
+	"references": [
+		{ "path": "../a11y/tsconfig.build.json" },
+		{ "path": "../interactivity/tsconfig.build.json" }
+	],
+	"exclude": [
+		"**/benchmark",
+		"build-*/**",
+		"build/**",
+		"**/test/**",
+		"src/full-page.ts"
+	]
+}

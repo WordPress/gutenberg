@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const EDITOR_ZOOM_OUT_CONTENT = `
@@ -81,18 +78,18 @@ test.describe( 'Zoom Out', () => {
 		await requestUtils.activateTheme( 'twentytwentyfour' );
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-		await requestUtils.deleteAllTemplates( 'wp_template' );
-		await requestUtils.deleteAllTemplates( 'wp_template_part' );
-	} );
-
 	test.beforeEach( async ( { admin } ) => {
 		await admin.visitSiteEditor( {
 			postId: 'twentytwentyfour//index',
 			postType: 'wp_template',
 			canvas: 'edit',
 		} );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
+		await requestUtils.deleteAllTemplates( 'wp_template' );
+		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 	} );
 
 	test( 'Entering zoomed out mode zooms the canvas', async ( {
@@ -234,7 +231,7 @@ test.describe( 'Zoom Out', () => {
 		await expect( fourthSectionStart ).not.toBeInViewport();
 	} );
 
-	test( 'Zoom out selected section has three items in options menu', async ( {
+	test( 'Zoom out selected section has four items in options menu', async ( {
 		page,
 	} ) => {
 		// open the inserter
@@ -263,8 +260,8 @@ test.describe( 'Zoom Out', () => {
 			.getByRole( 'menu', { name: 'Options' } )
 			.getByRole( 'menuitem' );
 
-		// we expect 3 items in the options menu
-		await expect( optionsMenu ).toHaveCount( 3 );
+		// we expect 2 items in the options menu: Duplicate and Delete.
+		await expect( optionsMenu ).toHaveCount( 2 );
 	} );
 
 	test( 'Zoom Out cannot be activated when the section root is missing', async ( {

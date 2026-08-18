@@ -4,22 +4,20 @@
 	"name": "core/post-date",
 	"title": "Date",
 	"category": "theme",
-	"description": "Display the publish date for an entry such as a post or page.",
+	"description": "Display a custom date.",
 	"textdomain": "default",
 	"attributes": {
-		"textAlign": {
-			"type": "string"
+		"datetime": {
+			"type": "string",
+			"role": "content"
 		},
 		"format": {
 			"type": "string"
 		},
 		"isLink": {
 			"type": "boolean",
-			"default": false
-		},
-		"displayType": {
-			"type": "string",
-			"default": "date"
+			"default": false,
+			"role": "content"
 		}
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],
@@ -27,6 +25,7 @@
 		"viewportWidth": 350
 	},
 	"supports": {
+		"anchor": true,
 		"html": false,
 		"color": {
 			"gradients": true,
@@ -44,6 +43,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,

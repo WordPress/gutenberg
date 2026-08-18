@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	ToolbarButton,
 	ToolbarGroup,
@@ -11,10 +8,6 @@ import { __ } from '@wordpress/i18n';
 import { cloneBlock } from '@wordpress/blocks';
 import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import BlockPatternsList from '../block-patterns-list';
 

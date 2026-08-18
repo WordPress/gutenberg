@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import type { ButtonGroupProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
@@ -20,13 +9,15 @@ function UnforwardedButtonGroup(
 	props: WordPressComponentProps< ButtonGroupProps, 'div', false >,
 	ref: ForwardedRef< HTMLDivElement >
 ) {
-	const { className, ...restProps } = props;
+	const { className, __shouldNotWarnDeprecated, ...restProps } = props;
 	const classes = clsx( 'components-button-group', className );
 
-	deprecated( 'wp.components.ButtonGroup', {
-		since: '6.8',
-		alternative: 'wp.components.ToggleGroupControl',
-	} );
+	if ( ! __shouldNotWarnDeprecated ) {
+		deprecated( 'wp.components.ButtonGroup', {
+			since: '6.8',
+			alternative: 'wp.components.__experimentalToggleGroupControl',
+		} );
+	}
 
 	return (
 		<div ref={ ref } role="group" className={ classes } { ...restProps } />
@@ -51,5 +42,6 @@ function UnforwardedButtonGroup(
  * ```
  */
 export const ButtonGroup = forwardRef( UnforwardedButtonGroup );
+ButtonGroup.displayName = 'ButtonGroup';
 
 export default ButtonGroup;

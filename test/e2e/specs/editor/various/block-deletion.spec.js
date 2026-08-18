@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Block deletion', () => {
@@ -26,14 +23,16 @@ test.describe( 'Block deletion', () => {
 			attributes: { content: 'Third' },
 		} );
 
-		// Ensure the last paragraph is focused.
-		await expect(
-			editor.canvas
-				.getByRole( 'document', {
-					name: 'Block: Paragraph',
-				} )
-				.last()
-		).toBeFocused();
+		// Ensure the last paragraph holds the selection.
+		await expect
+			.poll( () =>
+				editor.ownsSelection(
+					editor.canvas
+						.getByRole( 'document', { name: 'Block: Paragraph' } )
+						.last()
+				)
+			)
+			.toBe( true );
 
 		// Remove the current paragraph via the Block Toolbar options menu.
 		await editor.showBlockToolbar();
@@ -65,9 +64,12 @@ test.describe( 'Block deletion', () => {
 		editor,
 		page,
 	} ) => {
-		// Add a group with a paragraph in it.
+		// Add a group with a paragraph in it. The anchor keeps the group
+		// from being removed along with its last child: emptying an
+		// unmodified wrapper removes the wrapper too.
 		await editor.insertBlock( {
 			name: 'core/group',
+			attributes: { anchor: 'group' },
 			innerBlocks: [
 				{
 					name: 'core/paragraph',
@@ -93,7 +95,9 @@ test.describe( 'Block deletion', () => {
 		// Ensure the paragraph was removed.
 		await expect
 			.poll( editor.getBlocks )
-			.toMatchObject( [ { name: 'core/group', attributes: {} } ] );
+			.toMatchObject( [
+				{ name: 'core/group', attributes: { anchor: 'group' } },
+			] );
 
 		// Ensure the group block is focused.
 		await expect(
@@ -124,14 +128,16 @@ test.describe( 'Block deletion', () => {
 			attributes: { content: 'Third' },
 		} );
 
-		// Ensure the last paragraph is focused.
-		await expect(
-			editor.canvas
-				.getByRole( 'document', {
-					name: 'Block: Paragraph',
-				} )
-				.last()
-		).toBeFocused();
+		// Ensure the last paragraph holds the selection.
+		await expect
+			.poll( () =>
+				editor.ownsSelection(
+					editor.canvas
+						.getByRole( 'document', { name: 'Block: Paragraph' } )
+						.last()
+				)
+			)
+			.toBe( true );
 
 		// Remove the current paragraph via dedicated keyboard shortcut.
 		await pageUtils.pressKeys( 'access+z' );
@@ -171,9 +177,15 @@ test.describe( 'Block deletion', () => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 		} );
-		await expect(
-			editor.canvas.getByRole( 'document', { name: 'Empty block' } )
-		).toBeFocused();
+		await expect
+			.poll( () =>
+				editor.ownsSelection(
+					editor.canvas.getByRole( 'document', {
+						name: 'Empty block',
+					} )
+				)
+			)
+			.toBe( true );
 
 		// Hit backspace to remove the empty paragraph.
 		await page.keyboard.press( 'Backspace' );
@@ -262,12 +274,16 @@ test.describe( 'Block deletion', () => {
 			name: 'core/paragraph',
 		} );
 
-		// Ensure the empty paragraph is focused.
-		await expect(
-			editor.canvas.getByRole( 'document', {
-				name: 'Empty block',
-			} )
-		).toBeFocused();
+		// Ensure the empty paragraph holds the selection.
+		await expect
+			.poll( () =>
+				editor.ownsSelection(
+					editor.canvas.getByRole( 'document', {
+						name: 'Empty block',
+					} )
+				)
+			)
+			.toBe( true );
 
 		// Select the last two paragraphs.
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
@@ -290,13 +306,17 @@ test.describe( 'Block deletion', () => {
 			{ name: 'core/paragraph', attributes: { content: '' } },
 		] );
 
-		// Ensure that the newly created empty block is focused.
+		// Ensure that the newly created empty block holds the selection.
 		await expect.poll( editor.getBlocks ).toHaveLength( 3 );
-		await expect(
-			editor.canvas.getByRole( 'document', {
-				name: 'Empty block',
-			} )
-		).toBeFocused();
+		await expect
+			.poll( () =>
+				editor.ownsSelection(
+					editor.canvas.getByRole( 'document', {
+						name: 'Empty block',
+					} )
+				)
+			)
+			.toBe( true );
 	} );
 
 	test( 'deleting all blocks', async ( { editor, page } ) => {
@@ -305,11 +325,15 @@ test.describe( 'Block deletion', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Test' },
 		} );
-		await expect(
-			editor.canvas.getByRole( 'document', {
-				name: 'Block: Paragraph',
-			} )
-		).toBeFocused();
+		await expect
+			.poll( () =>
+				editor.ownsSelection(
+					editor.canvas.getByRole( 'document', {
+						name: 'Block: Paragraph',
+					} )
+				)
+			)
+			.toBe( true );
 
 		// Remove that paragraph via its options menu.
 		await editor.showBlockToolbar();
@@ -319,12 +343,16 @@ test.describe( 'Block deletion', () => {
 			.click();
 		await page.getByRole( 'menuitem', { name: 'Delete' } ).click();
 
-		// Ensure an empty block was created and focused.
-		await expect(
-			editor.canvas.getByRole( 'document', {
-				name: 'Empty block',
-			} )
-		).toBeFocused();
+		// Ensure an empty block was created and holds the selection.
+		await expect
+			.poll( () =>
+				editor.ownsSelection(
+					editor.canvas.getByRole( 'document', {
+						name: 'Empty block',
+					} )
+				)
+			)
+			.toBe( true );
 		await expect.poll( editor.getBlocks ).toEqual( [] );
 	} );
 
@@ -386,5 +414,51 @@ test.describe( 'Block deletion', () => {
 
 		// TODO: There should be expectations around where focus is placed in
 		// this scenario. Currently, a focus loss occurs, which is unacceptable.
+	} );
+
+	test( 'empty heading block below image block should be deleted on backspace', async ( {
+		editor,
+		page,
+	} ) => {
+		// Add an image block first
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				url: 'https://cldup.com/cXyG__fTLN.jpg',
+			},
+		} );
+
+		// Add an empty heading block
+		await editor.insertBlock( {
+			name: 'core/heading',
+		} );
+
+		// Verify initial state - should have both blocks
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/image' },
+				{ name: 'core/heading' },
+			] );
+
+		// Focus on the heading block (it should be empty by default)
+		const headingBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Heading',
+		} );
+		await headingBlock.click();
+
+		// Press backspace to trigger merge - this should remove the empty heading
+		await page.keyboard.press( 'Backspace' );
+
+		// After the fix: heading block should be removed, only image block should remain
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [ { name: 'core/image' } ] );
+
+		// Image block should now be focused
+		const imageBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Image',
+		} );
+		await expect( imageBlock ).toBeFocused();
 	} );
 } );

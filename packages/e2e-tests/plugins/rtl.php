@@ -11,6 +11,8 @@
 
 /**
  * Set the locale's and styles' text direction to RTL.
+ * @global WP_Locale $wp_locale WordPress Locale object.
+ * @global WP_Styles $wp_styles WordPress Styles object.
  */
 function gutenberg_test_plugin_activate_rtl_set_direction() {
 	global $wp_locale, $wp_styles;

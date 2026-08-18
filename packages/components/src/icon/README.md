@@ -11,9 +11,14 @@ import { wordpress } from '@wordpress/icons';
 
 <Icon icon={ wordpress } />
 ```
+
 ## Props
 
 ### `icon`
+
+ - Type: `IconType | null`
+ - Required: No
+ - Default: `null`
 
 The icon to render. In most cases, you should use an icon from
 [the `@wordpress/icons` package](https://wordpress.github.io/gutenberg/?path=/story/icons-icon--library).
@@ -24,16 +29,12 @@ Other supported values are: component instances, functions,
 
 The `size` value, as well as any other additional props, will be passed through.
 
- - Type: `IconType`
- - Required: No
- - Default: `null`
-
 ### `size`
-
-The size (width and height) of the icon.
-
-Defaults to `20` when `icon` is a string (i.e. a Dashicon id), otherwise `24`.
 
  - Type: `number`
  - Required: No
  - Default: `'string' === typeof icon ? 20 : 24`
+
+The size (width and height) of the icon.
+
+Defaults to `20` when `icon` is a string (i.e. a Dashicon id), otherwise `24`.

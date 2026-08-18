@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as coreStore } from '@wordpress/core-data';
@@ -9,10 +6,6 @@ import {
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 const { interfaceStore } = unlock( editorPrivateApis );
 const EMPTY_ARRAY = [];
@@ -550,7 +543,7 @@ export function areMetaBoxesInitialized( state ) {
 /**
  * Retrieves the template of the currently edited post.
  *
- * @return {Object?} Post Template.
+ * @return {?Object} Post Template.
  */
 export const getEditedPostTemplate = createRegistrySelector(
 	( select ) => () => {

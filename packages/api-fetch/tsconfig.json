@@ -1,11 +1,20 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
+	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types"
+		"types": [ "jest" ]
 	},
-	"references": [ { "path": "../i18n" }, { "path": "../url" } ],
-	"include": [ "src/**/*" ],
-	"exclude": [ "**/test/**/*" ]
+	"references": [
+		{ "path": "./tsconfig.build.json" },
+		{ "path": "../i18n/tsconfig.build.json" },
+		{ "path": "../private-apis" },
+		{ "path": "../url" }
+	],
+	// Listed files have pre-existing type errors; include them once fixed.
+	"exclude": [
+		"**/benchmark",
+		"src/middlewares/test/preloading.ts",
+		"src/middlewares/test/fetch-all-middleware.ts",
+		"src/middlewares/test/media-upload.ts"
+	]
 }

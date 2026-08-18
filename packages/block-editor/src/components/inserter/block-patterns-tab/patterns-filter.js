@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	SVG,
 	Path,
@@ -12,10 +9,6 @@ import {
 import { __, _x } from '@wordpress/i18n';
 import { Icon } from '@wordpress/icons';
 import { useMemo, createInterpolateElement } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import {
 	myPatternsCategory,
 	INSERTER_SYNC_TYPES,
@@ -57,7 +50,7 @@ export function PatternsFilter( {
 } ) {
 	// If the category is `myPatterns` then we need to set the source filter to `user`, but
 	// we do this by deriving from props rather than calling setPatternSourceFilter otherwise
-	// the user may be confused when switching to another category if the haven't explicity set
+	// the user may be confused when switching to another category if the haven't explicitly set
 	// this filter themselves.
 	const currentPatternSourceFilter =
 		category.name === myPatternsCategory.name

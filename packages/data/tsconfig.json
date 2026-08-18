@@ -2,18 +2,15 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types",
 		"checkJs": false
 	},
 	"references": [
-		{ "path": "../compose" },
-		{ "path": "../deprecated" },
-		{ "path": "../element" },
+		{ "path": "../compose/tsconfig.build.json" },
+		{ "path": "../deprecated/tsconfig.build.json" },
+		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../private-apis" },
 		{ "path": "../is-shallow-equal" },
-		{ "path": "../priority-queue" },
+		{ "path": "../priority-queue/tsconfig.build.json" },
 		{ "path": "../redux-routine" }
-	],
-	"include": [ "src/**/*" ]
+	]
 }

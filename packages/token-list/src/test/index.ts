@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import TokenList from '../';
 
 describe( 'token-list', () => {
@@ -26,7 +23,7 @@ describe( 'token-list', () => {
 			expect( list ).toHaveLength( 1 );
 		} );
 
-		describe( 'array method inheritence', () => {
+		describe( 'array method inheritance', () => {
 			it( 'entries', () => {
 				const list = new TokenList( 'abc   ' );
 

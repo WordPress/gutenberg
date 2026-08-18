@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	Notice,
@@ -13,8 +6,8 @@ import {
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
-
 import {
 	InspectorControls,
 	useInnerBlocksProps,
@@ -30,10 +23,6 @@ import {
 	createBlocksFromInnerBlocksTemplate,
 	store as blocksStore,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import {
 	hasExplicitPercentColumnWidths,
 	getMappedColumnWidths,
@@ -152,7 +141,6 @@ function ColumnInspectorControls( {
 		<ToolsPanel
 			label={ __( 'Settings' ) }
 			resetAll={ () => {
-				updateColumns( count, minCount );
 				setAttributes( {
 					isStackedOnMobile: true,
 				} );
@@ -160,15 +148,8 @@ function ColumnInspectorControls( {
 			dropdownMenuProps={ dropdownMenuProps }
 		>
 			{ canInsertColumnBlock && (
-				<ToolsPanelItem
-					label={ __( 'Columns' ) }
-					isShownByDefault
-					hasValue={ () => count }
-					onDeselect={ () => updateColumns( count, minCount ) }
-				>
+				<VStack spacing={ 4 } style={ { gridColumn: '1 / -1' } }>
 					<RangeControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
 						label={ __( 'Columns' ) }
 						value={ count }
 						onChange={ ( value ) =>
@@ -184,7 +165,7 @@ function ColumnInspectorControls( {
 							) }
 						</Notice>
 					) }
-				</ToolsPanelItem>
+				</VStack>
 			) }
 			<ToolsPanelItem
 				label={ __( 'Stack on mobile' ) }
@@ -197,7 +178,6 @@ function ColumnInspectorControls( {
 				}
 			>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={ __( 'Stack on mobile' ) }
 					checked={ isStackedOnMobile }
 					onChange={ () =>
@@ -236,7 +216,7 @@ function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 	/**
 	 * Update all child Column blocks with a new vertical alignment setting
 	 * based on whatever alignment is passed in. This allows change to parent
-	 * to overide anything set on a individual column basis.
+	 * to override anything set on a individual column basis.
 	 *
 	 * @param {string} newVerticalAlignment The vertical alignment setting.
 	 */
@@ -274,17 +254,12 @@ function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 }
 
 function Placeholder( { clientId, name, setAttributes } ) {
-	const { blockType, defaultVariation, variations } = useSelect(
+	const { blockType, variations } = useSelect(
 		( select ) => {
-			const {
-				getBlockVariations,
-				getBlockType,
-				getDefaultBlockVariation,
-			} = select( blocksStore );
+			const { getBlockVariations, getBlockType } = select( blocksStore );
 
 			return {
 				blockType: getBlockType( name ),
-				defaultVariation: getDefaultBlockVariation( name, 'block' ),
 				variations: getBlockVariations( name, 'block' ),
 			};
 		},
@@ -300,7 +275,7 @@ function Placeholder( { clientId, name, setAttributes } ) {
 				label={ blockType?.title }
 				variations={ variations }
 				instructions={ __( 'Divide into columns. Select a layout:' ) }
-				onSelect={ ( nextVariation = defaultVariation ) => {
+				onSelect={ ( nextVariation ) => {
 					if ( nextVariation.attributes ) {
 						setAttributes( nextVariation.attributes );
 					}
@@ -314,12 +289,29 @@ function Placeholder( { clientId, name, setAttributes } ) {
 						);
 					}
 				} }
-				allowSkip
 			/>
 		</div>
 	);
 }
 
+/**
+ * Renders the `core/columns` block in the editor.
+ *
+ * Until the block has inner blocks it renders a variation picker; afterwards it
+ * renders the columns container. Every prop is forwarded to whichever of the two
+ * is rendered.
+ *
+ * @param {Object}         props                                Component props.
+ * @param {string}         props.clientId                       Client ID of the block.
+ * @param {string}         props.name                           Block name, used to look up the variations offered by the picker.
+ * @param {Object}         props.attributes                     Block attributes.
+ * @param {string}         [props.attributes.verticalAlignment] Vertical alignment applied to the block and to every child Column block.
+ * @param {boolean}        [props.attributes.isStackedOnMobile] Whether the columns stack on small viewports. Defaults to `true`.
+ * @param {string|boolean} [props.attributes.templateLock]      Template lock applied to the inner blocks, one of `all`, `insert`, `contentOnly` or `false`.
+ * @param {Function}       props.setAttributes                  Callback for updating block attributes.
+ *
+ * @return {React.JSX.Element} React element.
+ */
 const ColumnsEdit = ( props ) => {
 	const { clientId } = props;
 	const hasInnerBlocks = useSelect(

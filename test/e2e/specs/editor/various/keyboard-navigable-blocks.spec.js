@@ -1,8 +1,4 @@
 /* eslint-disable playwright/expect-expect */
-
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -114,16 +110,9 @@ class KeyboardNavigableBlocks {
 	}
 
 	async expectLabelToHaveFocus( label ) {
-		const ariaLabel = await this.page.evaluate( () => {
-			const { activeElement } =
-				document.activeElement.contentDocument ?? document;
-			return (
-				activeElement.getAttribute( 'aria-label' ) ||
-				activeElement.innerText
-			);
-		} );
-
-		expect( ariaLabel ).toBe( label );
+		// Poll: the focused element and its label may settle asynchronously
+		// (selection changes sync to the store on `selectionchange`).
+		await expect.poll( this.editor.getFocusOwnerLabel ).toBe( label );
 	}
 
 	async navigateThroughBlockToolbar() {
@@ -134,6 +123,9 @@ class KeyboardNavigableBlocks {
 
 		await this.page.keyboard.press( 'ArrowRight' );
 		await this.expectLabelToHaveFocus( 'Move down' );
+
+		await this.page.keyboard.press( 'ArrowRight' );
+		await this.expectLabelToHaveFocus( 'Align block' );
 
 		await this.page.keyboard.press( 'ArrowRight' );
 		await this.expectLabelToHaveFocus( 'Align text' );

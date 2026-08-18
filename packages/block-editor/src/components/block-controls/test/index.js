@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import {
 	registerBlockType,
 	unregisterBlockType,
@@ -13,10 +6,6 @@ import {
 } from '@wordpress/blocks';
 import { SlotFillProvider, ToolbarGroup } from '@wordpress/components';
 import { alignCenter, alignLeft, alignRight } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import BlockControls from '../';
 import BlockEdit from '../../block-edit';
 
@@ -43,6 +32,7 @@ describe( 'BlockControls', () => {
 		const edit = ( { children } ) => <>{ children }</>;
 
 		registerBlockType( 'core/test-block', {
+			apiVersion: 3,
 			save: () => {},
 			category: 'text',
 			title: 'block title',
