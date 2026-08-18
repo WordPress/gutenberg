@@ -55,7 +55,7 @@ export type PostEditorAwarenessState = EnhancedState< PostEditorState >;
 
 // Keep the established debug export shape while allowing fallback collaborators.
 export type DebugCollaboratorData = Pick< CollaboratorInfo, 'name' > & {
-	wpUserId: User< 'view' >[ 'id' ] | null;
+	wpUserId: CollaboratorInfo[ 'id' ];
 };
 
 export interface YDocDebugData {

@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from '@wordpress/element';
 import type { Y } from '@wordpress/sync';
 import { getSyncManager } from '../sync';
 import { usePostContentBlocks } from '../awareness/block-lookup';
-import { hasPresentableCollaboratorInfo } from '../awareness/utils';
+import { isCollaboratorInfo } from '../awareness/utils';
 import type { EditorStoreBlock } from '../awareness/block-lookup';
 import type {
 	PostEditorAwarenessState as ActiveCollaborator,
@@ -47,7 +47,7 @@ function getAwarenessState(
 	const activeCollaborators = (
 		newState ?? awareness.getCurrentState()
 	).filter( ( collaborator ) =>
-		hasPresentableCollaboratorInfo( collaborator.collaboratorInfo )
+		isCollaboratorInfo( collaborator.collaboratorInfo )
 	);
 
 	return {

@@ -108,7 +108,7 @@ function hasValidAvatarUrls(
  * @param value - The collaborator information to check.
  * @return Whether the collaborator can be presented safely.
  */
-export function hasPresentableCollaboratorInfo(
+export function isCollaboratorInfo(
 	value: unknown
 ): value is CollaboratorInfo {
 	if ( 'object' !== typeof value || null === value ) {
@@ -170,7 +170,7 @@ export function generateCollaboratorInfo(
 			};
 
 			if (
-				hasPresentableCollaboratorInfo( collaboratorInfo ) &&
+				isCollaboratorInfo( collaboratorInfo ) &&
 				null !== collaboratorInfo.id
 			) {
 				return collaboratorInfo;

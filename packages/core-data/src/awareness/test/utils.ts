@@ -1,7 +1,7 @@
 import {
 	areCollaboratorInfosEqual,
 	generateCollaboratorInfo,
-	hasPresentableCollaboratorInfo,
+	isCollaboratorInfo,
 } from '../utils';
 import type { CollaboratorInfo } from '../types';
 import type { User } from '../../entity-types';
@@ -314,10 +314,10 @@ describe( 'Awareness Utils', () => {
 		} );
 	} );
 
-	describe( 'hasPresentableCollaboratorInfo', () => {
+	describe( 'isCollaboratorInfo', () => {
 		test( 'accepts complete named and fallback collaborator information', () => {
 			expect(
-				hasPresentableCollaboratorInfo( {
+				isCollaboratorInfo( {
 					avatar_urls: {
 						'48': 'https://example.com/medium.png',
 					},
@@ -329,7 +329,7 @@ describe( 'Awareness Utils', () => {
 				} )
 			).toBe( true );
 			expect(
-				hasPresentableCollaboratorInfo( {
+				isCollaboratorInfo( {
 					browserType: 'Chrome',
 					enteredAt: 1704067200000,
 					id: null,
@@ -340,11 +340,9 @@ describe( 'Awareness Utils', () => {
 		} );
 
 		test( 'rejects incomplete or malformed collaborator information', () => {
-			expect( hasPresentableCollaboratorInfo( { id: 42 } ) ).toBe(
-				false
-			);
+			expect( isCollaboratorInfo( { id: 42 } ) ).toBe( false );
 			expect(
-				hasPresentableCollaboratorInfo( {
+				isCollaboratorInfo( {
 					avatar_urls: { '48': 42 },
 					browserType: 'Chrome',
 					enteredAt: 1704067200000,
@@ -354,7 +352,7 @@ describe( 'Awareness Utils', () => {
 				} )
 			).toBe( false );
 			expect(
-				hasPresentableCollaboratorInfo( {
+				isCollaboratorInfo( {
 					avatar_urls: {},
 					browserType: 'Chrome',
 					enteredAt: 1704067200000,

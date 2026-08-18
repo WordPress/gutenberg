@@ -3,7 +3,7 @@ import { Y } from '@wordpress/sync';
 // @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { BaseAwarenessState, baseEqualityFieldChecks } from './base-awareness';
-import { hasPresentableCollaboratorInfo } from './utils';
+import { isCollaboratorInfo } from './utils';
 import {
 	getBlockPathInYdoc,
 	getContainingBlockYMap,
@@ -356,9 +356,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		const collaboratorMapData = new Map< string, DebugCollaboratorData >(
 			Array.from( this.getSeenStates().entries() )
 				.filter( ( [ , collaboratorState ] ) =>
-					hasPresentableCollaboratorInfo(
-						collaboratorState.collaboratorInfo
-					)
+					isCollaboratorInfo( collaboratorState.collaboratorInfo )
 				)
 				.map( ( [ clientId, collaboratorState ] ) => [
 					String( clientId ),
