@@ -5,7 +5,7 @@
 ### Enhancements
 
 -   Add a `scope` prop to `MediaEditor` so each frame can keep its own persisted details-sidebar visibility ([#81559](https://github.com/WordPress/gutenberg/pull/81559)).
--   Pass the history (reset/undo/redo), save (cancel/save) and image control clusters to `renderFrame` individually, so a frame without a footer can place them itself ([#81563](https://github.com/WordPress/gutenberg/pull/81563)).
+-   Pass the history (reset/undo/redo), save (cancel/save) and image control clusters to `renderFrame` individually, replacing the pre-composed `footerActions`, so each frame arranges them to suit its own chrome ([#81563](https://github.com/WordPress/gutenberg/pull/81563)).
 -   Add a `saveActionsSize` prop to `MediaEditor` so frames hosting the cancel/save actions in a page header can render them at the compact size ([#81563](https://github.com/WordPress/gutenberg/pull/81563)).
 
 ### Bug Fixes

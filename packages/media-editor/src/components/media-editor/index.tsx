@@ -72,11 +72,6 @@ export interface MediaEditorFrameProps {
 	/**
 	 * Reset / Undo / Redo. `null` for non-image media, which has no edit
 	 * history.
-	 *
-	 * A frame with no footer — the wp-admin route, where a footer would be out
-	 * of place — places this itself, alongside `saveActions` and
-	 * `imageControls`. A frame with a footer renders the pre-composed
-	 * `footerActions` instead. Render one or the other, never both.
 	 */
 	historyActions: ReactNode;
 	/**
@@ -93,19 +88,12 @@ export interface MediaEditorFrameProps {
 	 */
 	imageControls: ReactNode;
 	/**
-	 * `historyActions`, `saveActions` and `imageControls` pre-composed into the
-	 * layout selected by `footerLayout`. A convenience for frames with a
-	 * footer; frames that place the clusters themselves should ignore it.
-	 */
-	footerActions: ReactNode;
-	/**
-	 * Footer layout selector. Frames apply this to the footer container
-	 * as a modifier class. Tracks the sidebar-collapse breakpoint (`small`).
+	 * Layout selector, tracking the sidebar-collapse breakpoint (`small`).
+	 * Frames arrange the action clusters to suit:
 	 *
-	 * - `wide`   — sidebar is a column; footer is a single row of History |
-	 *              Cancel/Save (transform controls live in the Crop panel).
-	 * - `narrow` — sidebar collapsed; transform controls sit above a
-	 *              History | Cancel/Save row.
+	 * - `wide`   — sidebar is a column, so the transform controls live in the
+	 *              Crop panel and `imageControls` should not be rendered.
+	 * - `narrow` — sidebar is collapsed, so `imageControls` needs a home.
 	 */
 	footerLayout: 'wide' | 'narrow';
 	onRequestClose: () => void;
@@ -740,33 +728,6 @@ function MediaEditorContent( {
 		/>
 	);
 
-	// The fine-rotation ruler always lives under the canvas (in
-	// `media-editor__content`), never the footer, so it stays constrained to
-	// the canvas column at every viewport. One JSX tree per layout; DOM order
-	// matches visual order.
-	let footerActions: ReactNode;
-	if ( footerLayout === 'wide' ) {
-		// Sidebar is a column: image controls live in the Crop panel, so
-		// the footer is just History + Cancel/Save.
-		footerActions = (
-			<>
-				{ history }
-				{ actions }
-			</>
-		);
-	} else {
-		// Sidebar collapsed: the image controls drop into the footer.
-		footerActions = (
-			<>
-				{ imageControls }
-				<div className="media-editor-modal__footer-row">
-					{ history }
-					{ actions }
-				</div>
-			</>
-		);
-	}
-
 	return renderFrame( {
 		children,
 		headerActions: (
@@ -781,7 +742,6 @@ function MediaEditorContent( {
 		historyActions: history,
 		saveActions: actions,
 		imageControls,
-		footerActions,
 		footerLayout,
 		onRequestClose: handleRequestClose,
 		onKeyDown: handleKeyDown,

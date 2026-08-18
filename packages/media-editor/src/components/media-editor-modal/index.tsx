@@ -4,7 +4,7 @@ import { __ } from '@wordpress/i18n';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
 import type { Field } from '@wordpress/dataviews';
-import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
+import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react';
 import MediaEditor from '../media-editor';
 import type { Media } from '../media-editor-provider';
 import { store as mediaEditorStore } from '../../store';
@@ -24,6 +24,52 @@ interface MediaEditorModalProps {
 	 * always provided by the media editor.
 	 */
 	aspectRatioPresets?: AspectRatioPreset[];
+}
+
+interface ModalFooterProps {
+	layout: 'wide' | 'narrow';
+	historyActions: ReactNode;
+	saveActions: ReactNode;
+	imageControls: ReactNode;
+}
+
+/**
+ * The modal's footer chrome. The fine-rotation ruler always lives under the
+ * canvas (in `media-editor__content`), never here, so it stays constrained to
+ * the canvas column at every viewport. One JSX tree per layout; DOM order
+ * matches visual order.
+ */
+function ModalFooter( {
+	layout,
+	historyActions,
+	saveActions,
+	imageControls,
+}: ModalFooterProps ) {
+	return (
+		<div
+			className={ `media-editor-modal__footer is-${ layout }` }
+			role="region"
+			aria-label={ __( 'Editor actions' ) }
+		>
+			{ layout === 'wide' ? (
+				// Sidebar is a column: the image controls live in the Crop
+				// panel, so the footer is just History + Cancel/Save.
+				<>
+					{ historyActions }
+					{ saveActions }
+				</>
+			) : (
+				// Sidebar collapsed: the image controls drop into the footer.
+				<>
+					{ imageControls }
+					<div className="media-editor-modal__footer-row">
+						{ historyActions }
+						{ saveActions }
+					</div>
+				</>
+			) }
+		</div>
+	);
 }
 
 export function MediaEditorModal( {
@@ -108,7 +154,9 @@ export function MediaEditorModal( {
 			renderFrame={ ( {
 				children,
 				headerActions,
-				footerActions,
+				historyActions,
+				saveActions,
+				imageControls,
 				footerLayout,
 				onRequestClose,
 				onKeyDown,
@@ -129,13 +177,12 @@ export function MediaEditorModal( {
 						headerActions={ headerActions }
 					>
 						{ children }
-						<div
-							className={ `media-editor-modal__footer is-${ footerLayout }` }
-							role="region"
-							aria-label={ __( 'Editor actions' ) }
-						>
-							{ footerActions }
-						</div>
+						<ModalFooter
+							layout={ footerLayout }
+							historyActions={ historyActions }
+							saveActions={ saveActions }
+							imageControls={ imageControls }
+						/>
 					</Modal>
 				</ShortcutProvider>
 			) }
