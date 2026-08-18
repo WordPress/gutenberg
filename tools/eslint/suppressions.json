@@ -711,11 +711,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/dropdown/styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
 	"packages/components/src/elevation/hook.ts": {
 		"no-restricted-imports": {
 			"count": 2

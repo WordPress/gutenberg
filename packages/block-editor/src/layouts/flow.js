@@ -20,7 +20,7 @@ export default {
 		hasBlockGapSupport,
 		layoutDefinitions = LAYOUT_DEFINITIONS,
 	} ) {
-		const blockGapStyleValue = getGapCSSValue( style?.spacing?.blockGap );
+		const blockGapStyleValue = style?.spacing?.blockGap;
 
 		// If a block's block.json skips serialization for spacing or
 		// spacing.blockGap, don't apply the user-defined value to the styles.

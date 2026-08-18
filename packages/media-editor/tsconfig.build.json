@@ -1,0 +1,26 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"types": [ "gutenberg-env", "style-imports" ],
+		"checkJs": false
+	},
+	"references": [
+		{ "path": "../a11y/tsconfig.build.json" },
+		{ "path": "../api-fetch/tsconfig.build.json" },
+		{ "path": "../components" },
+		{ "path": "../compose/tsconfig.build.json" },
+		{ "path": "../core-data/tsconfig.build.json" },
+		{ "path": "../data" },
+		{ "path": "../dataviews" },
+		{ "path": "../date" },
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../i18n/tsconfig.build.json" },
+		{ "path": "../icons" },
+		{ "path": "../keyboard-shortcuts" },
+		{ "path": "../keycodes/tsconfig.build.json" },
+		{ "path": "../notices/tsconfig.build.json" },
+		{ "path": "../private-apis" },
+		{ "path": "../ui" }
+	]
+}

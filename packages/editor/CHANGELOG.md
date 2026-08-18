@@ -2,9 +2,14 @@
 
 ## Unreleased
 
+### Internal
+
+-   Check the `window.__experimentalEnableRealTimeCollaboration` flag set by the Real-Time Collaboration experiment, instead of `window._wpCollaborationEnabled`, when determining whether collaboration is enabled for the current post ([#80658](https://github.com/WordPress/gutenberg/pull/80658)).
+
 ### Bug Fixes
 
 -   Register the editor and block editor keyboard shortcuts from the editor provider, so shortcuts work for consumers that mount the editor without rendering `EditorKeyboardShortcutsRegister` themselves ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
+-   Header: Allow the Back button column to grow when "Show button text labels" is enabled so the label is not obscured by the following controls ([#81701](https://github.com/WordPress/gutenberg/pull/81701)).
 -   Upload progress snackbar: Stop announcing "Upload complete" for a batch in which everything failed. The snackbar treated the queue draining as success, so a failed upload showed a completion checkmark right next to its own error. A batch that fails outright now just takes the progress snackbar down, and a partly failed one reports "Uploaded 3 of 5 files" ([#81132](https://github.com/WordPress/gutenberg/issues/81132)).
 
 ## 14.53.0 (2026-08-12)

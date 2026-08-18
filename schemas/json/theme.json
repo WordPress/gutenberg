@@ -2368,6 +2368,9 @@
 						}
 					]
 				},
+				"label": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
 				"select": {
 					"allOf": [
 						{
