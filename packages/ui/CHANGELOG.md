@@ -15,6 +15,10 @@
 
 -   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509), [#81514](https://github.com/WordPress/gutenberg/pull/81514))
 
+### Bug Fixes
+
+-   `Card`: Use the normal neutral surface stroke for the default border. ([#81746](https://github.com/WordPress/gutenberg/pull/81746))
+
 ## 0.20.0 (2026-08-12)
 
 ### Breaking Changes
