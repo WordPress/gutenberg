@@ -17,6 +17,8 @@ The chrome reads the widget type and materializes each field in one of three are
 
 The header takes the identity (`icon`, `title`, `help`), the high-relevance `attributes` inline plus the settings trigger for the full schema, and the low-relevance `actions` in the More menu. The content belongs to the render module, fed the attribute values. The footer takes the promoted `actions`.
 
+Wherever a link action lands, one rule applies: a target the host recognizes as one of its own routes mounts the host router's link and navigates client-side; every other link, and any `download` or `openInNewTab`, keeps the plain anchor.
+
 ## The frame
 
 The dashboard widget interprets `presentation` and determines how much chrome a widget gets.
@@ -37,7 +39,7 @@ The sections are semantic. A control belongs to a section by its nature, not by 
 
 -   **Identity.** The widget's icon, title, and help. It names the tile, and its title truncates rather than wrapping when the row runs short.
 -   **Attributes.** The widget's high-relevance attributes: quick in-place editing or a dropdown button when there isn't enough space.
--   **More.** The widget's low-relevance actions, gathered in a menu on the trailing edge. A link whose target the host recognizes as one of its own routes mounts the host router's link, so it navigates client-side.
+-   **More.** The widget's low-relevance actions, gathered in a menu on the trailing edge.
 
 ### Fitting the row
 
@@ -67,7 +69,7 @@ A persistent strip under the body, for the actions the widget promotes.
 -   **`medium`.** Compact affordances on the trailing edge: icon-only with a declared icon, text links otherwise.
 -   **`low`** (default). The header's More menu.
 
-Every affordance is a real anchor: middle-click, copy address, and download survive. A link whose target the host recognizes as one of its own routes mounts the host router's link, so it navigates client-side; `download` and `openInNewTab` keep the plain anchor.
+Every affordance is a real anchor: middle-click, copy address, and download survive.
 
 The divider spans the tile, and the body above keeps no bottom padding, so scrolled content runs flush against it.
 

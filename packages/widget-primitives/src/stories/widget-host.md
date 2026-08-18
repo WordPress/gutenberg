@@ -14,22 +14,21 @@ A widget renders inside a host, and the host inside an application. Some of what
 
 The provider merges its value over the inherited one, so an application can mount a base host once and layer capabilities per subtree. Reading without any provider yields `{}`.
 
-The provider belongs to the application layer, wrapping the dashboard or whatever surface renders widgets. The rendering engine never mounts one for itself, and stays free of router or notification dependencies.
+The provider belongs to the application layer, wrapping the dashboard or whatever surface renders widgets. The rendering engine never mounts one for itself, and keeps no dependency on the application's router.
 
 ## The `links` capability
 
 ```ts
-{
-	links: {
-		match: ( href ) => ( { to: '/reports' } ) | null,
-		Link, // the router's link primitive; must render a real anchor
-	}
+links: {
+	match: ( href: string ) => WidgetHostRouteMatch | null;
+	// The router's link primitive. Must render a real anchor.
+	Link: ComponentType< { to: string } & ComponentProps< 'a' > >;
 }
 ```
 
-`match` answers one question: does this href target one of the application's own routes? On a hit it returns the in-app route, and the consumer mounts `Link` with it, so the navigation is client-side. On `null` the consumer falls back to a plain anchor.
+`match` answers one question: does this href target one of the application's own routes? On a hit it returns the in-app route, `{ to: '/reports' }`, and the consumer mounts `Link` with it, so the navigation is client-side. On `null` the consumer falls back to a plain anchor.
 
-The action declaration does not change either way. A widget declares the portable URL of its target, `admin.php?page=analytics&p=/reports`; in the owning application that materializes as a router link, everywhere else as a plain anchor that full-loads to the same place. Recognition is the host's because reachability depends on the routes it registered, which change per host and over time.
+The action declaration does not change either way. A widget declares the portable URL of its target, `admin.php?page=analytics&p=/reports`; in the owning application that materializes as a router link, everywhere else as a plain anchor that full-loads to the same place. Recognition is the application's: reachability depends on the routes it registered, which change per application and over time.
 
 Only plain navigations are matched. `download` and `openInNewTab` keep the plain anchor: both mean a new document, so a router link buys nothing.
 
@@ -47,4 +46,4 @@ A route that renders the dashboard supplies its matcher and its router's link:
 </WidgetHostProvider>
 ```
 
-See the Actions page for the materialization doctrine this serves: the widget declares where to go, the host decides how to get there.
+See the Actions page for the materialization rules this serves: the widget declares where to go, the host decides how to get there.
