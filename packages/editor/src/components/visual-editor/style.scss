@@ -24,6 +24,7 @@
 	// container defaults to `row`, where `align-items` centers vertically
 	// instead and horizontal centering falls to the canvas's own auto margins.
 	flex-direction: column;
+	justify-content: center;
 
 	@media (prefers-reduced-motion: no-preference) {
 		transition: padding 0.2s ease-out;
