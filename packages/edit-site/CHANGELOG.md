@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   Explain what templates are in the Templates sidebar description. ([#60304](https://github.com/WordPress/gutenberg/issues/60304))
+-   Unify the Site Editor sidebar section descriptions for Templates, Pages, Navigation, and Patterns. ([#60304](https://github.com/WordPress/gutenberg/issues/60304))
 
 ### Internal
 
