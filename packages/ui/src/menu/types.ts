@@ -133,32 +133,40 @@ export interface MenuItemLayoutProps {
 
 export interface ItemLabelProps extends ComponentProps< 'span' > {
 	/**
-	 * The primary label for a menu item. Required when the item also includes
-	 * `Menu.ItemDescription`.
+	 * The primary label for a menu item. Use as the first direct child of every
+	 * menu item.
 	 */
-	children?: ReactNode;
+	children: ReactNode;
 }
 
 export interface ItemDescriptionProps extends ComponentProps< 'span' > {
 	/**
-	 * Supplementary text displayed below a menu item label. Use as a direct
-	 * child alongside `Menu.ItemLabel`.
+	 * Optional supplementary content displayed below a menu item label. Use as
+	 * the second direct child, after `Menu.ItemLabel`. Content should be text or
+	 * non-interactive inline markup.
 	 */
-	children?: ReactNode;
+	children: ReactNode;
 }
+
+type MenuItemChildren =
+	| ReactElement< ItemLabelProps >
+	| [
+			ReactElement< ItemLabelProps >,
+			ReactElement< ItemDescriptionProps > | false | null | undefined,
+	  ];
 
 type MenuItemComponentProps< T extends ElementType > = Omit<
 	ComponentProps< T >,
-	keyof MenuItemLayoutProps
+	keyof MenuItemLayoutProps | 'children'
 >;
 
 export type ItemProps = MenuItemComponentProps< typeof _Menu.Item > &
 	MenuItemLayoutProps & {
 		/**
-		 * The item label, or direct `Menu.ItemLabel` and
-		 * `Menu.ItemDescription` children for structured content.
+		 * One direct `Menu.ItemLabel`, followed by an optional direct
+		 * `Menu.ItemDescription`.
 		 */
-		children?: ReactNode;
+		children: MenuItemChildren;
 	};
 
 export type LinkItemProps = Omit<
@@ -175,10 +183,10 @@ export type LinkItemProps = Omit<
 		openInNewTab?: boolean;
 
 		/**
-		 * The item label, or direct `Menu.ItemLabel` and
-		 * `Menu.ItemDescription` children for structured content.
+		 * One direct `Menu.ItemLabel`, followed by an optional direct
+		 * `Menu.ItemDescription`.
 		 */
-		children?: ReactNode;
+		children: MenuItemChildren;
 	};
 
 export type CheckboxItemProps = MenuItemComponentProps<
@@ -186,19 +194,19 @@ export type CheckboxItemProps = MenuItemComponentProps<
 > &
 	MenuItemLayoutProps & {
 		/**
-		 * The item label, or direct `Menu.ItemLabel` and
-		 * `Menu.ItemDescription` children for structured content.
+		 * One direct `Menu.ItemLabel`, followed by an optional direct
+		 * `Menu.ItemDescription`.
 		 */
-		children?: ReactNode;
+		children: MenuItemChildren;
 	};
 
 export type RadioItemProps = MenuItemComponentProps< typeof _Menu.RadioItem > &
 	MenuItemLayoutProps & {
 		/**
-		 * The item label, or direct `Menu.ItemLabel` and
-		 * `Menu.ItemDescription` children for structured content.
+		 * One direct `Menu.ItemLabel`, followed by an optional direct
+		 * `Menu.ItemDescription`.
 		 */
-		children?: ReactNode;
+		children: MenuItemChildren;
 	};
 
 export type SubmenuTriggerProps = MenuItemComponentProps<
@@ -206,8 +214,8 @@ export type SubmenuTriggerProps = MenuItemComponentProps<
 > &
 	MenuItemLayoutProps & {
 		/**
-		 * The item label, or direct `Menu.ItemLabel` and
-		 * `Menu.ItemDescription` children for structured content.
+		 * One direct `Menu.ItemLabel`, followed by an optional direct
+		 * `Menu.ItemDescription`.
 		 */
-		children?: ReactNode;
+		children: MenuItemChildren;
 	};

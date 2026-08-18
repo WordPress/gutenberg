@@ -6,11 +6,14 @@ import styles from './style.module.css';
 import type { ItemLabelProps } from './types';
 
 /**
- * Renders the primary label within a menu item. Use it as a direct child when
- * composing an item with `Menu.ItemDescription`.
+ * Renders the primary label within a menu item. Use it as the first direct
+ * child of every item.
  */
 const ItemLabel = forwardRef< HTMLSpanElement, ItemLabelProps >(
-	function MenuItemLabel( { className, id, render, ...props }, ref ) {
+	function MenuItemLabel(
+		{ children, className, id, render, ...props },
+		ref
+	) {
 		const itemContentContext = useMenuItemContentContext();
 
 		return useRender( {
@@ -18,6 +21,12 @@ const ItemLabel = forwardRef< HTMLSpanElement, ItemLabelProps >(
 			ref,
 			render,
 			props: mergeProps< 'span' >( props, {
+				children: (
+					<>
+						{ children }
+						{ itemContentContext?.labelTrailing }
+					</>
+				),
 				id: id ?? itemContentContext?.labelId,
 				className: clsx( styles[ 'item-label' ], className ),
 			} ),

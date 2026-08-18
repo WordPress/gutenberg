@@ -2,7 +2,6 @@ import { Menu as _Menu } from '@base-ui/react/menu';
 import clsx from 'clsx';
 import {
 	Children,
-	cloneElement,
 	forwardRef,
 	isValidElement,
 	useId,
@@ -24,36 +23,37 @@ type ItemAriaProps = Pick<
 	'aria-describedby' | 'aria-keyshortcuts' | 'aria-label' | 'aria-labelledby'
 >;
 type UseItemContentOptions = ItemAriaProps & {
+	labelTrailing?: ItemProps[ 'suffix' ];
 	shortcut?: ItemProps[ 'shortcut' ];
 };
 
-function getStructuredItemContent( children: ItemProps[ 'children' ] ) {
+const VALIDATION_ENABLED = process.env.NODE_ENV !== 'production';
+
+function getItemContent( children: ItemProps[ 'children' ] ) {
 	const childArray = Children.toArray( children );
-	const label = childArray.find(
-		( child ) =>
-			isValidElement< { id?: string } >( child ) &&
-			child.type === ItemLabel
-	);
-	const description = childArray.find(
-		( child ) =>
-			isValidElement< { id?: string } >( child ) &&
-			child.type === ItemDescription
-	);
+	const [ label, description, ...unexpectedChildren ] = childArray;
+	const hasLabel =
+		isValidElement< { id?: string } >( label ) && label.type === ItemLabel;
+	const hasDescription =
+		isValidElement< { id?: string } >( description ) &&
+		description.type === ItemDescription;
+
+	if (
+		VALIDATION_ENABLED &&
+		( ! hasLabel ||
+			( description !== undefined && ! hasDescription ) ||
+			unexpectedChildren.length > 0 )
+	) {
+		throw new Error(
+			'Menu.ItemLabel must be the first direct child of every menu item, followed only by an optional Menu.ItemDescription.'
+		);
+	}
 
 	return {
-		descriptionId: isValidElement< { id?: string } >( description )
-			? description.props.id
-			: undefined,
-		hasDescription: !! description,
-		hasLabel: !! label,
-		hasStructuredContent: childArray.some(
-			( child ) =>
-				isValidElement( child ) &&
-				( child.type === ItemLabel || child.type === ItemDescription )
-		),
-		labelId: isValidElement< { id?: string } >( label )
-			? label.props.id
-			: undefined,
+		descriptionId: hasDescription ? description.props.id : undefined,
+		hasDescription,
+		hasLabel,
+		labelId: hasLabel ? label.props.id : undefined,
 	};
 }
 
@@ -64,22 +64,18 @@ function useItemContent(
 		'aria-keyshortcuts': ariaKeyShortcuts,
 		'aria-label': ariaLabel,
 		'aria-labelledby': ariaLabelledBy,
+		labelTrailing,
 		shortcut,
 	}: UseItemContentOptions
 ) {
 	const generatedLabelId = useId();
 	const generatedDescriptionId = useId();
-	const {
-		descriptionId,
-		hasDescription,
-		hasLabel,
-		hasStructuredContent,
-		labelId,
-	} = getStructuredItemContent( children );
-	const resolvedLabelId =
-		labelId ??
-		( hasLabel || ! hasStructuredContent ? generatedLabelId : undefined );
-	const resolvedDescriptionId = descriptionId ?? generatedDescriptionId;
+	const { descriptionId, hasDescription, hasLabel, labelId } =
+		getItemContent( children );
+	const resolvedLabelId = hasLabel ? labelId ?? generatedLabelId : undefined;
+	const resolvedDescriptionId = hasDescription
+		? descriptionId ?? generatedDescriptionId
+		: undefined;
 	const itemDescribedBy = [
 		ariaDescribedBy,
 		hasDescription && resolvedDescriptionId,
@@ -107,6 +103,7 @@ function useItemContent(
 		contentContextValue: {
 			descriptionId: resolvedDescriptionId,
 			labelId: resolvedLabelId,
+			labelTrailing,
 		},
 		itemAriaProps: {
 			...shortcutAriaProps,
@@ -119,46 +116,15 @@ function useItemContent(
 
 function ItemContent( {
 	children,
-	labelTrailing,
 	prefix,
 	shortcut,
 	shortcutDescriptionId,
 	suffix,
 	trailing,
 }: Pick< ItemProps, 'children' | 'prefix' | 'shortcut' | 'suffix' > & {
-	labelTrailing?: ItemProps[ 'suffix' ];
 	shortcutDescriptionId?: string;
 	trailing?: ItemProps[ 'suffix' ];
 } ) {
-	const hasStructuredContent =
-		getStructuredItemContent( children ).hasStructuredContent;
-	const itemChildren = hasStructuredContent ? (
-		Children.map( children, ( child ) => {
-			if (
-				isValidElement< { children?: ItemProps[ 'children' ] } >(
-					child
-				) &&
-				child.type === ItemLabel
-			) {
-				return cloneElement( child, {
-					children: (
-						<>
-							{ child.props.children }
-							{ labelTrailing }
-						</>
-					),
-				} );
-			}
-
-			return child;
-		} )
-	) : (
-		<ItemLabel>
-			{ children }
-			{ labelTrailing }
-		</ItemLabel>
-	);
-
 	/*
 	 * Content comes first in the DOM because Base UI falls back to the item's
 	 * textContent for typeahead. CSS grid still places the optional
@@ -168,7 +134,7 @@ function ItemContent( {
 		<>
 			<span className={ styles[ 'item-content' ] }>
 				<span className={ styles[ 'item-children' ] }>
-					{ itemChildren }
+					{ children }
 				</span>
 				{ suffix && (
 					<span className={ styles[ 'item-suffix' ] }>

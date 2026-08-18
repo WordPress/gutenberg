@@ -180,9 +180,11 @@ export const MenuTrigger: Story = {
 				<Menu.Root>
 					<Menu.Trigger>Actions ▾</Menu.Trigger>
 					<Menu.Popup>
-						<Menu.Item>Edit</Menu.Item>
+						<Menu.Item>
+							<Menu.ItemLabel>Edit</Menu.ItemLabel>
+						</Menu.Item>
 						<Menu.Item onClick={ () => setDialogOpen( true ) }>
-							Delete…
+							<Menu.ItemLabel>Delete…</Menu.ItemLabel>
 						</Menu.Item>
 					</Menu.Popup>
 				</Menu.Root>

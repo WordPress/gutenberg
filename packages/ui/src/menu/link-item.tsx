@@ -45,6 +45,7 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 			'aria-keyshortcuts': ariaKeyShortcuts,
 			'aria-label': ariaLabel,
 			'aria-labelledby': ariaLabelledBy,
+			labelTrailing: externalLinkIndicator,
 			shortcut,
 		} );
 
@@ -64,7 +65,6 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 		>
 			<MenuItemContentContext.Provider value={ contentContextValue }>
 				<ItemContent
-					labelTrailing={ externalLinkIndicator }
 					prefix={ prefix }
 					shortcut={ shortcut }
 					shortcutDescriptionId={ shortcutDescriptionId }

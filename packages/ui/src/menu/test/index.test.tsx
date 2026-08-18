@@ -75,12 +75,16 @@ describe( 'Menu', () => {
 			<Menu.Root>
 				<Menu.Trigger>Actions</Menu.Trigger>
 				<Menu.Popup>
-					<Menu.Item>Duplicate</Menu.Item>
+					<Menu.Item>
+						<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+					</Menu.Item>
 					<Menu.Separator />
 					<Menu.LinkItem href="https://wordpress.org">
-						WordPress.org
+						<Menu.ItemLabel>WordPress.org</Menu.ItemLabel>
 					</Menu.LinkItem>
-					<Menu.Item>Delete</Menu.Item>
+					<Menu.Item>
+						<Menu.ItemLabel>Delete</Menu.ItemLabel>
+					</Menu.Item>
 				</Menu.Popup>
 			</Menu.Root>
 		);
@@ -109,7 +113,9 @@ describe( 'Menu', () => {
 					Actions
 				</Menu.Trigger>
 				<Menu.Popup>
-					<Menu.Item>Duplicate</Menu.Item>
+					<Menu.Item>
+						<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+					</Menu.Item>
 				</Menu.Popup>
 			</Menu.Root>
 		);
@@ -139,7 +145,9 @@ describe( 'Menu', () => {
 			<Menu.Root>
 				<Menu.Trigger>Actions</Menu.Trigger>
 				<Menu.Popup>
-					<Menu.Item>Duplicate</Menu.Item>
+					<Menu.Item>
+						<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+					</Menu.Item>
 				</Menu.Popup>
 			</Menu.Root>
 		);
@@ -198,11 +206,11 @@ describe( 'Menu', () => {
 						closeOnClick
 						onCheckedChange={ () => setIsOverlayOpen( true ) }
 					>
-						Open overlay
+						<Menu.ItemLabel>Open overlay</Menu.ItemLabel>
 					</Menu.CheckboxItem>
 				) : (
 					<Menu.Item onClick={ () => setIsOverlayOpen( true ) }>
-						Open overlay
+						<Menu.ItemLabel>Open overlay</Menu.ItemLabel>
 					</Menu.Item>
 				);
 
@@ -216,7 +224,9 @@ describe( 'Menu', () => {
 										<Menu.SubmenuTrigger
 											openOnHover={ false }
 										>
-											More actions
+											<Menu.ItemLabel>
+												More actions
+											</Menu.ItemLabel>
 										</Menu.SubmenuTrigger>
 										<Menu.Popup>{ overlayItem }</Menu.Popup>
 									</Menu.SubmenuRoot>
@@ -285,7 +295,9 @@ describe( 'Menu', () => {
 					>
 						<Menu.Trigger>Actions</Menu.Trigger>
 						<Menu.Popup>
-							<Menu.Item>Move focus</Menu.Item>
+							<Menu.Item>
+								<Menu.ItemLabel>Move focus</Menu.ItemLabel>
+							</Menu.Item>
 						</Menu.Popup>
 					</Menu.Root>
 					<button ref={ destinationRef }>Focus destination</button>
@@ -315,10 +327,12 @@ describe( 'Menu', () => {
 				<Menu.Popup>
 					<Menu.SubmenuRoot>
 						<Menu.SubmenuTrigger openOnHover={ false }>
-							Move to
+							<Menu.ItemLabel>Move to</Menu.ItemLabel>
 						</Menu.SubmenuTrigger>
 						<Menu.Popup>
-							<Menu.Item>Archive</Menu.Item>
+							<Menu.Item>
+								<Menu.ItemLabel>Archive</Menu.ItemLabel>
+							</Menu.Item>
 						</Menu.Popup>
 					</Menu.SubmenuRoot>
 				</Menu.Popup>
@@ -354,18 +368,20 @@ describe( 'Menu', () => {
 						onCheckedChange={ onCheckedChange }
 						prefix="Checkbox prefix"
 					>
-						Show sidebar
+						<Menu.ItemLabel>Show sidebar</Menu.ItemLabel>
 					</Menu.CheckboxItem>
 					<Menu.RadioGroup
 						value="comfortable"
 						onValueChange={ onValueChange }
 					>
-						<Menu.RadioItem value="compact">Compact</Menu.RadioItem>
+						<Menu.RadioItem value="compact">
+							<Menu.ItemLabel>Compact</Menu.ItemLabel>
+						</Menu.RadioItem>
 						<Menu.RadioItem
 							value="comfortable"
 							prefix="Radio prefix"
 						>
-							Comfortable
+							<Menu.ItemLabel>Comfortable</Menu.ItemLabel>
 						</Menu.RadioItem>
 					</Menu.RadioGroup>
 				</Menu.Popup>
@@ -405,7 +421,7 @@ describe( 'Menu', () => {
 					<Menu.Item>
 						<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
 						<Menu.ItemDescription>
-							Create a separate copy.
+							Create a <strong>separate</strong> copy.
 						</Menu.ItemDescription>
 					</Menu.Item>
 				</Menu.Popup>
@@ -419,6 +435,42 @@ describe( 'Menu', () => {
 		} );
 
 		expect( item ).toHaveAccessibleDescription( 'Create a separate copy.' );
+		expect( screen.getByText( 'separate' ).tagName ).toBe( 'STRONG' );
+	} );
+
+	it( 'requires an ItemLabel as a direct child of every item', () => {
+		expect( () =>
+			render(
+				<Menu.Root defaultOpen>
+					<Menu.Trigger>Actions</Menu.Trigger>
+					<Menu.Popup>
+						{ /* @ts-expect-error Intentionally exercise runtime validation. */ }
+						<Menu.Item>Duplicate</Menu.Item>
+					</Menu.Popup>
+				</Menu.Root>
+			)
+		).toThrow( 'Menu.ItemLabel must be the first direct child' );
+		// @ts-expect-error Provided by the @wordpress/jest-console environment.
+		expect( console ).toHaveErrored();
+	} );
+
+	it( 'rejects an ItemLabel wrapped in a fragment', () => {
+		expect( () =>
+			render(
+				<Menu.Root defaultOpen>
+					<Menu.Trigger>Actions</Menu.Trigger>
+					<Menu.Popup>
+						<Menu.Item>
+							<>
+								<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+							</>
+						</Menu.Item>
+					</Menu.Popup>
+				</Menu.Root>
+			)
+		).toThrow( 'Menu.ItemLabel must be the first direct child' );
+		// @ts-expect-error Provided by the @wordpress/jest-console environment.
+		expect( console ).toHaveErrored();
 	} );
 
 	it( 'uses shortcut metadata for visual and accessible item descriptions', async () => {
@@ -494,7 +546,7 @@ describe( 'Menu', () => {
 							label: 'Command L',
 						} }
 					>
-						WordPress.org
+						<Menu.ItemLabel>WordPress.org</Menu.ItemLabel>
 					</Menu.LinkItem>
 					<Menu.CheckboxItem
 						checked
@@ -504,7 +556,7 @@ describe( 'Menu', () => {
 							label: 'Command B',
 						} }
 					>
-						Bookmarks
+						<Menu.ItemLabel>Bookmarks</Menu.ItemLabel>
 					</Menu.CheckboxItem>
 					<Menu.RadioGroup value="list">
 						<Menu.RadioItem
@@ -515,7 +567,7 @@ describe( 'Menu', () => {
 								label: 'Command 1',
 							} }
 						>
-							List
+							<Menu.ItemLabel>List</Menu.ItemLabel>
 						</Menu.RadioItem>
 					</Menu.RadioGroup>
 					<Menu.SubmenuRoot>
@@ -526,10 +578,12 @@ describe( 'Menu', () => {
 								label: 'Command M',
 							} }
 						>
-							Move to
+							<Menu.ItemLabel>Move to</Menu.ItemLabel>
 						</Menu.SubmenuTrigger>
 						<Menu.Popup>
-							<Menu.Item>Archive</Menu.Item>
+							<Menu.Item>
+								<Menu.ItemLabel>Archive</Menu.ItemLabel>
+							</Menu.Item>
 						</Menu.Popup>
 					</Menu.SubmenuRoot>
 				</Menu.Popup>
@@ -568,10 +622,12 @@ describe( 'Menu', () => {
 								label: 'Command M',
 							} }
 						>
-							Move to
+							<Menu.ItemLabel>Move to</Menu.ItemLabel>
 						</Menu.SubmenuTrigger>
 						<Menu.Popup>
-							<Menu.Item>Archive</Menu.Item>
+							<Menu.Item>
+								<Menu.ItemLabel>Archive</Menu.ItemLabel>
+							</Menu.Item>
 						</Menu.Popup>
 					</Menu.SubmenuRoot>
 				</Menu.Popup>
@@ -605,8 +661,12 @@ describe( 'Menu', () => {
 			<Menu.Root>
 				<Menu.Trigger>Actions</Menu.Trigger>
 				<Menu.Popup>
-					<Menu.Item>No prefix</Menu.Item>
-					<Menu.Item prefix="Prefix">With prefix</Menu.Item>
+					<Menu.Item>
+						<Menu.ItemLabel>No prefix</Menu.ItemLabel>
+					</Menu.Item>
+					<Menu.Item prefix="Prefix">
+						<Menu.ItemLabel>With prefix</Menu.ItemLabel>
+					</Menu.Item>
 				</Menu.Popup>
 			</Menu.Root>
 		);
@@ -633,7 +693,9 @@ describe( 'Menu', () => {
 			<Menu.Root>
 				<Menu.Trigger>Actions</Menu.Trigger>
 				<Menu.Popup>
-					<Menu.Item prefix="Decorative prefix">Item label</Menu.Item>
+					<Menu.Item prefix="Decorative prefix">
+						<Menu.ItemLabel>Item label</Menu.ItemLabel>
+					</Menu.Item>
 				</Menu.Popup>
 			</Menu.Root>
 		);
@@ -657,8 +719,12 @@ describe( 'Menu', () => {
 			<Menu.Root>
 				<Menu.Trigger>Actions</Menu.Trigger>
 				<Menu.Popup>
-					<Menu.Item>Duplicate</Menu.Item>
-					<Menu.Item prefix="Decorative prefix">Archive</Menu.Item>
+					<Menu.Item>
+						<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+					</Menu.Item>
+					<Menu.Item prefix="Decorative prefix">
+						<Menu.ItemLabel>Archive</Menu.ItemLabel>
+					</Menu.Item>
 				</Menu.Popup>
 			</Menu.Root>
 		);
@@ -688,7 +754,7 @@ describe( 'Menu', () => {
 						} }
 						suffix="Suffix"
 					>
-						Save
+						<Menu.ItemLabel>Save</Menu.ItemLabel>
 					</Menu.CheckboxItem>
 				</Menu.Popup>
 			</Menu.Root>
@@ -721,7 +787,7 @@ describe( 'Menu', () => {
 				<Menu.Trigger>Actions</Menu.Trigger>
 				<Menu.Popup>
 					<Menu.LinkItem href="https://wordpress.org" openInNewTab>
-						WordPress.org
+						<Menu.ItemLabel>WordPress.org</Menu.ItemLabel>
 					</Menu.LinkItem>
 					<Menu.LinkItem
 						href="https://developer.wordpress.org"
@@ -729,14 +795,14 @@ describe( 'Menu', () => {
 						rel="nofollow"
 						suffix="Docs"
 					>
-						Developer resources
+						<Menu.ItemLabel>Developer resources</Menu.ItemLabel>
 					</Menu.LinkItem>
 					<Menu.LinkItem
 						aria-label="WordPress project"
 						href="https://make.wordpress.org"
 						openInNewTab
 					>
-						Make WordPress
+						<Menu.ItemLabel>Make WordPress</Menu.ItemLabel>
 					</Menu.LinkItem>
 				</Menu.Popup>
 			</Menu.Root>
@@ -897,7 +963,9 @@ describe( 'Menu', () => {
 							<Menu.Positioner data-testid="custom-positioner" />
 						}
 					>
-						<Menu.Item>Duplicate</Menu.Item>
+						<Menu.Item>
+							<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+						</Menu.Item>
 					</Menu.Popup>
 				</Menu.Root>
 			</div>
@@ -925,17 +993,21 @@ describe( 'Menu', () => {
 						<Menu.Positioner data-testid="root-positioner" />
 					}
 				>
-					<Menu.Item>Duplicate</Menu.Item>
+					<Menu.Item>
+						<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+					</Menu.Item>
 					<Menu.SubmenuRoot>
 						<Menu.SubmenuTrigger openOnHover={ false }>
-							Move to
+							<Menu.ItemLabel>Move to</Menu.ItemLabel>
 						</Menu.SubmenuTrigger>
 						<Menu.Popup
 							positioner={
 								<Menu.Positioner data-testid="submenu-positioner" />
 							}
 						>
-							<Menu.Item>Archive</Menu.Item>
+							<Menu.Item>
+								<Menu.ItemLabel>Archive</Menu.ItemLabel>
+							</Menu.Item>
 						</Menu.Popup>
 					</Menu.SubmenuRoot>
 				</Menu.Popup>

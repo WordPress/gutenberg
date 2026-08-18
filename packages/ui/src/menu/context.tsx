@@ -1,4 +1,5 @@
 import { createContext, useContext } from '@wordpress/element';
+import type { ReactNode } from 'react';
 
 type MenuContextValue = {
 	isSubmenu: boolean;
@@ -12,7 +13,8 @@ const useMenuContext = () => useContext( MenuContext );
 
 type MenuItemContentContextValue = {
 	labelId?: string;
-	descriptionId: string;
+	descriptionId?: string;
+	labelTrailing?: ReactNode;
 };
 
 const MenuItemContentContext =

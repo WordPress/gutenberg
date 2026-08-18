@@ -96,29 +96,29 @@ export const Default: Story = {
 				<Menu.Trigger>Open menu</Menu.Trigger>
 				<Menu.Popup>
 					<Menu.Item prefix={ <Icon icon={ archive } /> }>
-						Rename…
+						<Menu.ItemLabel>Rename…</Menu.ItemLabel>
 					</Menu.Item>
 					<Menu.Item prefix={ <Icon icon={ archive } /> }>
-						Archive
+						<Menu.ItemLabel>Archive</Menu.ItemLabel>
 					</Menu.Item>
 					<Menu.Item
 						prefix={ <Icon icon={ archive } /> }
 						shortcut={ SHORTCUTS.save }
 						suffix="Draft"
 					>
-						Save
+						<Menu.ItemLabel>Save</Menu.ItemLabel>
 					</Menu.Item>
 					<Menu.Separator />
 					<Menu.Group>
 						<Menu.GroupLabel>Links</Menu.GroupLabel>
 						<Menu.LinkItem href="#menu-default-example">
-							View details
+							<Menu.ItemLabel>View details</Menu.ItemLabel>
 						</Menu.LinkItem>
 						<Menu.LinkItem
 							href="https://wordpress.org"
 							openInNewTab
 						>
-							WordPress.org
+							<Menu.ItemLabel>WordPress.org</Menu.ItemLabel>
 						</Menu.LinkItem>
 					</Menu.Group>
 					<Menu.Separator />
@@ -167,35 +167,49 @@ export const Default: Story = {
 						</Menu.RadioItem>
 					</Menu.RadioGroup>
 					<Menu.Separator />
-					<Menu.SubmenuRoot>
-						<Menu.SubmenuTrigger
-							shortcut={ SHORTCUTS.move }
-							suffix="3"
-						>
-							<Menu.ItemLabel>Move to</Menu.ItemLabel>
-							<Menu.ItemDescription>
-								Choose another collection.
-							</Menu.ItemDescription>
-						</Menu.SubmenuTrigger>
-						<Menu.Popup>
-							<Menu.Item>Favorites</Menu.Item>
-							<Menu.Item prefix={ <Icon icon={ archive } /> }>
-								Archive
-							</Menu.Item>
-							<Menu.SubmenuRoot>
-								<Menu.SubmenuTrigger>
-									<Menu.ItemLabel>
-										More destinations
-									</Menu.ItemLabel>
-								</Menu.SubmenuTrigger>
-								<Menu.Popup>
-									<Menu.Item>Reviewed</Menu.Item>
-									<Menu.Item>Shared</Menu.Item>
-								</Menu.Popup>
-							</Menu.SubmenuRoot>
-						</Menu.Popup>
-					</Menu.SubmenuRoot>
-					<Menu.Item disabled>Unavailable action</Menu.Item>
+					<Menu.Group aria-label="More actions">
+						<Menu.SubmenuRoot>
+							<Menu.SubmenuTrigger
+								shortcut={ SHORTCUTS.move }
+								suffix="3"
+							>
+								<Menu.ItemLabel>Move to</Menu.ItemLabel>
+								<Menu.ItemDescription>
+									Choose another collection.
+								</Menu.ItemDescription>
+							</Menu.SubmenuTrigger>
+							<Menu.Popup>
+								<Menu.Item>
+									<Menu.ItemLabel>Favorites</Menu.ItemLabel>
+								</Menu.Item>
+								<Menu.Item prefix={ <Icon icon={ archive } /> }>
+									<Menu.ItemLabel>Archive</Menu.ItemLabel>
+								</Menu.Item>
+								<Menu.SubmenuRoot>
+									<Menu.SubmenuTrigger>
+										<Menu.ItemLabel>
+											More destinations
+										</Menu.ItemLabel>
+									</Menu.SubmenuTrigger>
+									<Menu.Popup>
+										<Menu.Item>
+											<Menu.ItemLabel>
+												Reviewed
+											</Menu.ItemLabel>
+										</Menu.Item>
+										<Menu.Item>
+											<Menu.ItemLabel>
+												Shared
+											</Menu.ItemLabel>
+										</Menu.Item>
+									</Menu.Popup>
+								</Menu.SubmenuRoot>
+							</Menu.Popup>
+						</Menu.SubmenuRoot>
+						<Menu.Item disabled>
+							<Menu.ItemLabel>Unavailable action</Menu.ItemLabel>
+						</Menu.Item>
+					</Menu.Group>
 				</Menu.Popup>
 			</Menu.Root>
 		);
@@ -301,7 +315,7 @@ export const GroupedItems: Story = {
 							prefix={ <Icon icon={ archive } /> }
 							shortcut={ SHORTCUTS.save }
 						>
-							Save
+							<Menu.ItemLabel>Save</Menu.ItemLabel>
 						</Menu.Item>
 						<Menu.Item suffix="Edited">
 							<Menu.ItemLabel>Save as copy…</Menu.ItemLabel>
@@ -327,7 +341,7 @@ export const GroupedItems: Story = {
 							prefix={ <Icon icon={ archive } /> }
 							suffix="12"
 						>
-							Archive
+							<Menu.ItemLabel>Archive</Menu.ItemLabel>
 						</Menu.Item>
 					</Menu.Group>
 				</Menu.Popup>
@@ -342,7 +356,9 @@ export const Submenu: Story = {
 			<>
 				<Menu.Trigger>Open menu</Menu.Trigger>
 				<Menu.Popup>
-					<Menu.Item>Rename…</Menu.Item>
+					<Menu.Item>
+						<Menu.ItemLabel>Rename…</Menu.ItemLabel>
+					</Menu.Item>
 					<Menu.SubmenuRoot>
 						<Menu.SubmenuTrigger shortcut={ SHORTCUTS.move }>
 							<Menu.ItemLabel>
@@ -350,8 +366,12 @@ export const Submenu: Story = {
 							</Menu.ItemLabel>
 						</Menu.SubmenuTrigger>
 						<Menu.Popup>
-							<Menu.Item>Archive</Menu.Item>
-							<Menu.Item>Favorites</Menu.Item>
+							<Menu.Item>
+								<Menu.ItemLabel>Archive</Menu.ItemLabel>
+							</Menu.Item>
+							<Menu.Item>
+								<Menu.ItemLabel>Favorites</Menu.ItemLabel>
+							</Menu.Item>
 							<Menu.SubmenuRoot>
 								<Menu.SubmenuTrigger>
 									<Menu.ItemLabel>
@@ -359,13 +379,21 @@ export const Submenu: Story = {
 									</Menu.ItemLabel>
 								</Menu.SubmenuTrigger>
 								<Menu.Popup>
-									<Menu.Item>Reviewed</Menu.Item>
-									<Menu.Item>Shared</Menu.Item>
+									<Menu.Item>
+										<Menu.ItemLabel>
+											Reviewed
+										</Menu.ItemLabel>
+									</Menu.Item>
+									<Menu.Item>
+										<Menu.ItemLabel>Shared</Menu.ItemLabel>
+									</Menu.Item>
 								</Menu.Popup>
 							</Menu.SubmenuRoot>
 						</Menu.Popup>
 					</Menu.SubmenuRoot>
-					<Menu.Item>Delete…</Menu.Item>
+					<Menu.Item>
+						<Menu.ItemLabel>Delete…</Menu.ItemLabel>
+					</Menu.Item>
 				</Menu.Popup>
 			</>
 		),
@@ -469,7 +497,9 @@ export const RadioItems: Story = {
 							<Menu.ItemLabel>Right</Menu.ItemLabel>
 						</Menu.RadioItem>
 					</Menu.RadioGroup>
-					<Menu.Item>Reset alignment</Menu.Item>
+					<Menu.Item>
+						<Menu.ItemLabel>Reset alignment</Menu.ItemLabel>
+					</Menu.Item>
 					<Menu.Separator />
 					<Menu.RadioGroup
 						value={ density }
@@ -514,8 +544,12 @@ export const Positioning: Story = {
 						<Menu.Positioner side="right" align="start" />
 					}
 				>
-					<Menu.Item>Duplicate</Menu.Item>
-					<Menu.Item>Move</Menu.Item>
+					<Menu.Item>
+						<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+					</Menu.Item>
+					<Menu.Item>
+						<Menu.ItemLabel>Move</Menu.ItemLabel>
+					</Menu.Item>
 				</Menu.Popup>
 			</>
 		),
@@ -549,8 +583,12 @@ export const WithCustomZIndex: Story = {
 				}
 				key="popup"
 			>
-				<Menu.Item>Duplicate</Menu.Item>
-				<Menu.Item>Move…</Menu.Item>
+				<Menu.Item>
+					<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+				</Menu.Item>
+				<Menu.Item>
+					<Menu.ItemLabel>Move…</Menu.ItemLabel>
+				</Menu.Item>
 			</Menu.Popup>,
 		],
 	},

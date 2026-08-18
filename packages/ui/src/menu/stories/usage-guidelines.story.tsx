@@ -48,10 +48,14 @@ export const MenuForCommands: Story = {
 		<Menu.Root>
 			<Menu.Trigger>Actions</Menu.Trigger>
 			<Menu.Popup>
-				<Menu.Item>Duplicate</Menu.Item>
-				<Menu.Item>Download</Menu.Item>
+				<Menu.Item>
+					<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+				</Menu.Item>
+				<Menu.Item>
+					<Menu.ItemLabel>Download</Menu.ItemLabel>
+				</Menu.Item>
 				<Menu.LinkItem href="#menu-usage-guidelines-destination">
-					View details
+					<Menu.ItemLabel>View details</Menu.ItemLabel>
 				</Menu.LinkItem>
 			</Menu.Popup>
 		</Menu.Root>
@@ -106,7 +110,9 @@ export const CheckedOptionsWithinACommandMenu: Story = {
 			<Menu.Root>
 				<Menu.Trigger>View options</Menu.Trigger>
 				<Menu.Popup>
-					<Menu.Item>Reset view</Menu.Item>
+					<Menu.Item>
+						<Menu.ItemLabel>Reset view</Menu.ItemLabel>
+					</Menu.Item>
 					<Menu.Separator />
 					<Menu.Group>
 						<Menu.GroupLabel>Visible columns</Menu.GroupLabel>
@@ -114,13 +120,13 @@ export const CheckedOptionsWithinACommandMenu: Story = {
 							checked={ showAuthor }
 							onCheckedChange={ setShowAuthor }
 						>
-							Author
+							<Menu.ItemLabel>Author</Menu.ItemLabel>
 						</Menu.CheckboxItem>
 						<Menu.CheckboxItem
 							checked={ showDate }
 							onCheckedChange={ setShowDate }
 						>
-							Date
+							<Menu.ItemLabel>Date</Menu.ItemLabel>
 						</Menu.CheckboxItem>
 					</Menu.Group>
 					<Menu.Separator />
@@ -129,9 +135,11 @@ export const CheckedOptionsWithinACommandMenu: Story = {
 						onValueChange={ setDensity }
 					>
 						<Menu.GroupLabel>Density</Menu.GroupLabel>
-						<Menu.RadioItem value="compact">Compact</Menu.RadioItem>
+						<Menu.RadioItem value="compact">
+							<Menu.ItemLabel>Compact</Menu.ItemLabel>
+						</Menu.RadioItem>
 						<Menu.RadioItem value="comfortable">
-							Comfortable
+							<Menu.ItemLabel>Comfortable</Menu.ItemLabel>
 						</Menu.RadioItem>
 					</Menu.RadioGroup>
 				</Menu.Popup>

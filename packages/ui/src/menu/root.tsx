@@ -15,7 +15,9 @@ import type { RootProps } from './types';
  * <Menu.Root>
  *   <Menu.Trigger>Open menu</Menu.Trigger>
  *   <Menu.Popup>
- *     <Menu.Item>Action</Menu.Item>
+ *     <Menu.Item>
+ *       <Menu.ItemLabel>Action</Menu.ItemLabel>
+ *     </Menu.Item>
  *   </Menu.Popup>
  * </Menu.Root>
  * ```
