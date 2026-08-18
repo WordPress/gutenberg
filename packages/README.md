@@ -366,7 +366,12 @@ Both extend shared base configurations (comments are not necessary):
 
 A migrated package registers both projects at the root: `packages/<name>/tsconfig.build.json` in the root `tsconfig.build.json` references, and `packages/<name>` in the root `tsconfig.json` references.
 
-Ambient types used only by dev files (`@types/jest`, `@types/node`, `@testing-library/jest-dom`) belong in the package's own `devDependencies`, listed via `types` in the dev project, so jest globals do not apply to `src`.
+Two rules keep the projects consistent, and `npm run lint:tsconfig` enforces both:
+
+-   The build project excludes every dev file (`**/test/**`, `**/tests/**`, `**/__tests__/**`, `**/stories/**`, `**/*.story.*`) and never lists a test type such as `jest` or `gutenberg-test-env` in `types`, so `src` cannot use test globals and no dev declaration is published. A package `exclude` replaces the inherited one, so list all of them.
+-   The dev project's `types` starts from the build project's list and adds `jest`, so tests see every ambient type the sources see. Ambient types only dev files need (`@types/jest`, `@types/node`, `@testing-library/jest-dom`) belong in the package's own `devDependencies`.
+
+The build project inherits `rootDir`, `declarationDir`, and `include` from the base configuration, so a package only sets what differs. Test files that do not type check yet are listed in the dev project's `exclude` with a comment, so the debt stays visible per file.
 
 Type declarations will be produced in the `build-types` which should be included in the published package.
 For consumers to use the published type declarations, we'll set the `types` field in `package.json`:
