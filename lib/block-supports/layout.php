@@ -843,7 +843,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$row_count         = is_numeric( $row_count_attr ) ? (int) $row_count_attr : null;
 
 		/*
-		 * If the gap value is an array, we use the "left" value because it represents the vertical gap, which
+		 * If the gap value is an array, we use the "left" value because it represents the horizontal gap, which
 		 * is the relevant one for computation of responsive grid columns.
 		 */
 		if ( is_array( $fallback_gap_value ) ) {
@@ -872,10 +872,12 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 					$slug            = _wp_to_kebab_case( substr( $process_value, $index_to_splice ) );
 					$process_value   = "var(--wp--preset--spacing--$slug)";
 				}
+				if ( ! is_array( $gap_value ) || 'left' === $gap_side ) {
+					$responsive_gap_value = $process_value;
+				}
 				$combined_gap_value .= "$process_value ";
 			}
-			$gap_value            = trim( $combined_gap_value );
-			$responsive_gap_value = $gap_value;
+			$gap_value = trim( $combined_gap_value );
 		}
 
 		// Ensure 0 values have a unit so they work in calc().

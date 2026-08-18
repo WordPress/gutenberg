@@ -1,6 +1,6 @@
 import { useMemo } from '@wordpress/element';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import StateControl from '../components/global-styles/state-control';
 import StateControlBadges from '../components/global-styles/state-control-badges';
 import { useToolsPanelDropdownMenuProps } from '../components/global-styles/utils';
@@ -11,21 +11,21 @@ const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
 export const PSEUDO_STATE_LABELS = {
 	':hover': {
-		label: __( 'Hover' ),
+		label: _x( 'Hover', 'Name for the CSS pseudo-class selector' ),
 		info: __( 'Applies when the pointer is over the element.' ),
 	},
 	':focus': {
-		label: __( 'Focus' ),
+		label: _x( 'Focus', 'Name for the CSS pseudo-class selector' ),
 		info: __( 'Applies when the element has focus.' ),
 	},
 	':focus-visible': {
-		label: __( 'Focus-visible' ),
+		label: _x( 'Focus-visible', 'Name for the CSS pseudo-class selector' ),
 		info: __(
 			'Applies when the element has focus from keyboard navigation.'
 		),
 	},
 	':active': {
-		label: __( 'Active' ),
+		label: _x( 'Active', 'Name for the CSS pseudo-class selector' ),
 		info: __( 'Applies while the element is pressed.' ),
 	},
 };
