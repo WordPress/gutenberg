@@ -1,5 +1,5 @@
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback, useContext, useState } from '@wordpress/element';
 import {
 	useThrottle,
 	__experimentalUseDropZone as useDropZone,
@@ -18,6 +18,7 @@ import {
 } from '../../utils/math';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { BlockRefs } from '../provider/block-refs-provider';
 
 const THRESHOLD_DISTANCE = 30;
 const MINIMUM_HEIGHT_FOR_THRESHOLD = 120;
@@ -311,6 +312,7 @@ export default function useBlockDropZone( {
 	isDisabled = false,
 } = {} ) {
 	const registry = useRegistry();
+	const { refsMap } = useContext( BlockRefs );
 	const [ dropTarget, setDropTarget ] = useState( {
 		index: null,
 		operation: 'insert',
@@ -351,7 +353,7 @@ export default function useBlockDropZone( {
 	);
 	const throttled = useThrottle(
 		useCallback(
-			( event, ownerDocument ) => {
+			( event ) => {
 				if ( ! isDragging() ) {
 					// When dragging from the desktop, no drag start event is fired.
 					// So, ensure that the drag state is set when the user drags over a drop zone.
@@ -435,9 +437,19 @@ export default function useBlockDropZone( {
 						isUnmodifiedDefaultBlock:
 							getIsUnmodifiedDefaultBlock( block ),
 						getBoundingClientRect: () => {
-							const blockElement = ownerDocument.getElementById(
-								`block-${ clientId }`
-							);
+							/*
+							 * The element is read from the block refs registry
+							 * rather than looked up by its `block-` id. Live
+							 * block previews render the same blocks, and so the
+							 * same ids, which makes an id lookup resolve to
+							 * whichever copy comes first in the document — for
+							 * example a Post Template preview above the post
+							 * being edited. Each preview has its own block
+							 * editor provider, so the registry only ever holds
+							 * the elements of the block list this drop zone
+							 * belongs to.
+							 */
+							const blockElement = refsMap.get( clientId );
 							return blockElement
 								? blockElement.getBoundingClientRect()
 								: null;
@@ -551,6 +563,7 @@ export default function useBlockDropZone( {
 				isZoomOut,
 				getBlocks,
 				getBlockListSettings,
+				refsMap,
 				dropZoneElement,
 				parentBlockClientId,
 				getBlockIndex,
@@ -571,10 +584,7 @@ export default function useBlockDropZone( {
 		isDisabled,
 		onDrop: onBlockDrop,
 		onDragOver( event ) {
-			// `currentTarget` is only available while the event is being
-			// handled, so get it now and pass it to the thottled function.
-			// https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
-			throttled( event, event.currentTarget.ownerDocument );
+			throttled( event );
 		},
 		onDragLeave( event ) {
 			const { ownerDocument } = event.currentTarget;

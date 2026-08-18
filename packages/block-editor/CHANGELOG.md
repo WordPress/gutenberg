@@ -18,6 +18,7 @@
 -   `DimensionsTool`: Reflect aspect ratio and scale values that are updated from outside the component, such as by undo or `updateBlockAttributes`. The scale control no longer displays a stale value, and an aspect ratio that is written differently to its preset, e.g. `1/1` rather than `1`, is displayed as that preset instead of as "Original" ([#80747](https://github.com/WordPress/gutenberg/pull/80747)).
 -   `ListView`: Only move focus into the list when the new `focusOnMount` prop is set, so that a list mounted as a side effect of a selection no longer pulls focus out of the editor canvas ([#81659](https://github.com/WordPress/gutenberg/pull/81659)).
 -   `RichText`: Handle Enter using the current record, so pressing it right after moving the caret splits at the caret's new position instead of the previous one ([#81696](https://github.com/WordPress/gutenberg/pull/81696)).
+-   Read a block's position from the block refs registry when working out a drop target, rather than looking the element up by its `block-` id. Live block previews render the same blocks, and so the same ids, which made a drop inside a Post Template resolve against a preview of another post whenever the post being edited was not the first one in the loop ([#73239](https://github.com/WordPress/gutenberg/issues/73239)).
 
 ## 16.2.0 (2026-08-12)
 
