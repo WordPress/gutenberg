@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getDistanceFromPointToEdge, getDistanceToNearestEdge } from '../math';
 
 describe( 'getDistanceFromPointToEdge', () => {

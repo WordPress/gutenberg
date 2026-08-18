@@ -1,24 +1,15 @@
-/**
- * WordPress dependencies
- */
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import type { FontFamily, FontFace } from '@wordpress/core-data';
 import type { DataRegistry } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
+import { kebabCase } from '@wordpress/kebab-case';
 import { FONT_WEIGHTS, FONT_STYLES } from './constants';
 import { createCssString } from './create-css-string';
 import { fetchInstallFontFace } from '../api';
 import type { FontFamilyToUpload, FontUploadResult } from '../types';
-import { unlock } from '../../lock-unlock';
 
 /**
  * Browser dependencies
  */
 const { File } = window;
-const { kebabCase } = unlock( componentsPrivateApis );
 
 export function setUIValuesNeeded(
 	font: FontFamily,

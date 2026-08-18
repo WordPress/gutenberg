@@ -15,8 +15,8 @@ export interface ThemeProviderSettings {
 		 * (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and throw an
 		 * error.
 		 *
-		 * By default, it inherits from parent `ThemeProvider`,
-		 * and fallbacks to statically built CSS.
+		 * When omitted, inherits from the parent `ThemeProvider`. If there is
+		 * no parent value, the prebuilt default applies.
 		 */
 		primary?: string;
 		/**
@@ -27,8 +27,8 @@ export interface ThemeProviderSettings {
 		 * (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and throw an
 		 * error.
 		 *
-		 * By default, it inherits from parent `ThemeProvider`,
-		 * and fallbacks to statically built CSS.
+		 * When omitted, inherits from the parent `ThemeProvider`. If there is
+		 * no parent value, the prebuilt default applies.
 		 */
 		background?: string;
 	};
@@ -41,8 +41,8 @@ export interface ThemeProviderSettings {
 		 * The cursor style for interactive controls that are not links
 		 * (e.g. buttons, checkboxes, and toggles).
 		 *
-		 * By default, it inherits from the parent `ThemeProvider`,
-		 * and falls back to the prebuilt default (`default`).
+		 * When omitted, inherits from the parent `ThemeProvider`. If there is
+		 * no parent value, the prebuilt default applies (`pointer`).
 		 */
 		control?: 'default' | 'pointer';
 	};
@@ -55,8 +55,8 @@ export interface ThemeProviderSettings {
 	 * subtree; it sets the overall amount of roundness, not a single token
 	 * size.
 	 *
-	 * By default, it inherits from the parent `ThemeProvider`,
-	 * and falls back to the prebuilt default (`subtle`).
+	 * When omitted, inherits from the parent `ThemeProvider`. If there is no
+	 * parent value, the prebuilt default applies (`subtle`).
 	 */
 	cornerRadius?: CornerRadiusPreset;
 }
@@ -79,6 +79,9 @@ export interface ThemeProviderProps extends ThemeProviderSettings {
 	 * This is useful, for example, to make sure that the `html` element can
 	 * consume the right background color, or that overlays rendered inside a
 	 * portal can inherit the correct color scheme.
+	 *
+	 * Render at most one root provider per document. Multiple root providers
+	 * that share the same document are unsupported.
 	 *
 	 * @default false
 	 */

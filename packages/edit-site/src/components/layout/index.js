@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { NavigableRegion, getAdminThemeColors } from '@wordpress/admin-ui';
 import {
 	__unstableMotion as motion,
@@ -34,10 +27,6 @@ import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { Tooltip } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { SiteHubMobile } from '../site-hub';
 import ResizableFrame from '../resizable-frame';
 import { unlock } from '../../lock-unlock';
@@ -104,7 +93,6 @@ function Layout() {
 			{ canvas === 'view' && <SaveKeyboardShortcut /> }
 			<div
 				{ ...navigateRegionsProps }
-				ref={ navigateRegionsProps.ref }
 				className={ clsx(
 					'edit-site-layout',
 					navigateRegionsProps.className,
@@ -325,8 +313,16 @@ export default function LayoutWithGlobalStylesProvider( props ) {
 			<Tooltip.Provider>
 				{ /** This needs to be within the SlotFillProvider */ }
 				<PluginArea onError={ onPluginAreaError } />
-				<ThemeProvider color={ themeColors }>
-					<Layout { ...props } />
+				<ThemeProvider
+					isRoot
+					color={ {
+						primary: themeColors.primary,
+						...CONTENT_COLOR,
+					} }
+				>
+					<ThemeProvider color={ themeColors }>
+						<Layout { ...props } />
+					</ThemeProvider>
 				</ThemeProvider>
 			</Tooltip.Provider>
 		</SlotFillProvider>

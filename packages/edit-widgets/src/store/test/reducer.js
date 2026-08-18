@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import deepFreeze from 'deep-freeze';
-
-/**
- * Internal dependencies
- */
 import { widgetSavingLock } from '../reducer';
 
 describe( 'state', () => {

@@ -16,7 +16,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | Attribute | [Type](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
 | `queryId` | `number` | — | — |
-| `query` | `object` | `{"perPage":null,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":true,"taxQuery":null,"parents":[],"format":[]}` | — |
+| `query` | `object` | `{"perPage":null,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":true,"taxQuery":null,"parents":[],"format":[],"excludeCurrent":null}` | — |
 | `tagName` | `string` | `"div"` | — |
 | `namespace` | `string` | — | — |
 | `enhancedPagination` | `boolean` | `false` | — |
@@ -29,6 +29,8 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`align`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#align): `"wide"`, `"full"`
 - [`html`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#html): `false`
 - [`layout`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout): `true`
+- [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - `blockGap`: `true`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity): `true`
 
 ## Context
@@ -38,6 +40,7 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 **Uses context:**
 
 - `templateSlug`
+- `postType`
 
 **Provides context:**
 

@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { Spinner } from '@wordpress/components';
 import { useResizeObserver } from '@wordpress/compose';
 import { ImageCropper as ImageCropperComponent } from '@wordpress/image-cropper';
-
-/**
- * Internal dependencies
- */
 import { useImageEditingContext } from './context';
 
 export default function ImageCropper( {

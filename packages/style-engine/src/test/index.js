@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getCSSRules, compileCSS } from '../index';
 
 describe( 'generate', () => {

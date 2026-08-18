@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { TextDecoder, TextEncoder } from 'node:util';
 import { Blob as BlobPolyfill, File as FilePolyfill } from 'node:buffer';
 import timezoneMock from 'timezone-mock';
@@ -127,6 +124,14 @@ if ( typeof window !== 'undefined' ) {
 	// jsdom lacks Element.getAnimations (needed by Base UI ScrollArea ≥1.3)
 	if ( ! global.HTMLElement.prototype.getAnimations ) {
 		global.HTMLElement.prototype.getAnimations = () => [];
+	}
+
+	// jsdom lacks CSS.supports (needed by Ariakit's modal scroll locking).
+	if ( ! global.CSS ) {
+		global.CSS = {};
+	}
+	if ( ! global.CSS.supports ) {
+		global.CSS.supports = jest.fn( () => false );
 	}
 
 	/**

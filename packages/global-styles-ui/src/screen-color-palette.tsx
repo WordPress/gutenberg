@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { Tabs } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { ScreenHeader } from './screen-header';
 import ColorPalettePanel from './color-palette-panel';
 import GradientPalettePanel from './gradients-palette-panel';

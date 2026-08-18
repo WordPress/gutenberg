@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 
 /**
  * Returns a recompute token and a debounced callback that bumps it.
@@ -29,4 +29,37 @@ export function useDebouncedRecompute(
 	}, [ delayMs ] );
 
 	return [ recomputeToken, rerenderAfterDelay ];
+}
+
+/**
+ * Returns a recompute token and a callback that bumps it on the next
+ * animation frame. Successive calls within the same frame are coalesced.
+ * Use this for resize-triggered recomputes so the DOM is measured after
+ * the browser has finished layout, without an arbitrary fixed delay.
+ *
+ * @return A tuple of [recomputeToken, rerenderOnNextFrame].
+ */
+export function useRequestAnimationFrameRecompute(): [ number, () => void ] {
+	const [ recomputeToken, setRecomputeToken ] = useState( 0 );
+	const requestAnimationFrameRef = useRef< number | null >( null );
+
+	useEffect( () => {
+		return () => {
+			if ( requestAnimationFrameRef.current !== null ) {
+				cancelAnimationFrame( requestAnimationFrameRef.current );
+			}
+		};
+	}, [] );
+
+	const rerenderOnNextFrame = useCallback( () => {
+		if ( requestAnimationFrameRef.current !== null ) {
+			cancelAnimationFrame( requestAnimationFrameRef.current );
+		}
+		requestAnimationFrameRef.current = requestAnimationFrame( () => {
+			requestAnimationFrameRef.current = null;
+			setRecomputeToken( ( t ) => t + 1 );
+		} );
+	}, [] );
+
+	return [ recomputeToken, rerenderOnNextFrame ];
 }

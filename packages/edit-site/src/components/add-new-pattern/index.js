@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { DropdownMenu } from '@wordpress/components';
 import { useState, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -14,10 +11,6 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import {
 	PATTERN_TYPES,

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import {
 	getDefaultRenderingMode,
 	getPostBlocksByName,

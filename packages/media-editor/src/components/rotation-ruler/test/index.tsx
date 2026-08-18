@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * Internal dependencies
- */
 import { pxToValueDelta, clampValue, quantize } from '../use-ruler-drag';
 import RotationRuler from '../index';
 

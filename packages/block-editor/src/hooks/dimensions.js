@@ -1,24 +1,14 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { getBlockSupport } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import InspectorControls from '../components/inspector-controls';
 import {
 	DimensionsPanel as StylesDimensionsPanel,
 	useHasDimensionsPanel,
 } from '../components/global-styles';
+import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
 import { MarginVisualizer, PaddingVisualizer } from './spacing-visualizer';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
@@ -29,6 +19,7 @@ import {
 	setStyleForState,
 	useBlockStyleState,
 } from './block-style-state';
+import { isAxialBlockGapAllowed } from './gap';
 
 export const DIMENSIONS_SUPPORT_KEY = 'dimensions';
 export const SPACING_SUPPORT_KEY = 'spacing';
@@ -78,17 +69,29 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 	const selectedState = useBlockStyleState();
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 	const isEnabled = useHasDimensionsPanel( settings, selectedState );
-	const style = useSelect(
+	const { style, className, layout } = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled
 			if ( ! isEnabled ) {
-				return undefined;
+				return {};
 			}
-			return select( blockEditorStore ).getBlockAttributes( clientId )
-				?.style;
+			const attributes =
+				select( blockEditorStore ).getBlockAttributes( clientId ) || {};
+			return {
+				style: attributes.style,
+				className: attributes.className,
+				layout: attributes.layout,
+			};
 		},
 		[ clientId, isEnabled ]
 	);
+
+	const { value: inheritedValue } = useResolvedStyle(
+		name,
+		className,
+		selectedState
+	);
+
 	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
 	const value = isStateSelected
 		? getStyleForState( style, selectedState )
@@ -117,6 +120,7 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 		SPACING_SUPPORT_KEY,
 		'__experimentalDefaultControls',
 	] );
+	const { default: defaultLayout } = getBlockSupport( name, 'layout' ) || {};
 	const defaultControls = {
 		// In the block inspector, minHeight and minWidth should not
 		// be shown by default unless the block explicitly opts in.
@@ -132,6 +136,10 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 				as={ DimensionsInspectorControl }
 				panelId={ clientId }
 				settings={ settings }
+				allowAxialBlockGap={ isAxialBlockGapAllowed(
+					layout,
+					defaultLayout
+				) }
 				value={ value }
 				onChange={ onChange }
 				defaultControls={ defaultControls }
@@ -139,6 +147,7 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 				onVisualize={
 					isStateSelected ? undefined : setVisualizedProperty
 				}
+				inheritedValue={ inheritedValue }
 			/>
 			{ ! isStateSelected &&
 				!! settings?.spacing?.padding &&
