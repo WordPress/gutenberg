@@ -357,16 +357,21 @@ function isAcceptedSuggestionChange( coreSelect, currentAttributes, delta ) {
  * "apply-and-tag" rationale.
  *
  * @typedef {Object} SuggestionMarker
- * @property {'pending-remove'|'pending-insert'|'pending-move'} type        Op type
- *                                                                          the marker represents.
- * @property {number}                                           [commentId] Filled in by auto-save once a note comment
- *                                                                          exists for this marker.
- * @property {number|null}                                      [authorId]  ID of the user who proposed this
- *                                                                          suggestion. Captured at marker-write
- *                                                                          time so the rendering layer can tint
- *                                                                          the preview with the author's avatar
- *                                                                          color. `null` when the current user
- *                                                                          can't be resolved (e.g., unit tests).
+ * @property {'pending-remove'|'pending-insert'|'pending-move'} type             Op type
+ *                                                                               the marker represents.
+ * @property {number}                                           [commentId]      Filled in by auto-save once a note comment
+ *                                                                               exists for this marker.
+ * @property {number|null}                                      [authorId]       ID of the user who proposed this
+ *                                                                               suggestion. Captured at marker-write
+ *                                                                               time so the rendering layer can tint
+ *                                                                               the preview with the author's avatar
+ *                                                                               color. `null` when the current user
+ *                                                                               can't be resolved (e.g., unit tests).
+ * @property {boolean}                                          [crossedParents] `pending-move` only. True when the move changed parents,
+ *                                                                               which makes `fromIndex` meaningless to
+ *                                                                               any consumer that only sees the block's
+ *                                                                               current sibling list. Absent on markers
+ *                                                                               written before this field existed.
  */
 
 /**
@@ -683,6 +688,17 @@ function detectMovedBlocks( liveClientIds, tree, blockEditor ) {
 			fromParentClientId: oldParent,
 			fromAnchorClientId,
 			fromIndex: oldIndex,
+			/*
+			 * Whether the block changed parents. Recorded as a plain boolean
+			 * because client IDs are session-local and never reach the
+			 * server: `fromParentClientId` alone only tells the front end
+			 * whether the origin was the root, so a move between two
+			 * different nested parents is indistinguishable from a reorder
+			 * inside one. Applying `fromIndex` in that case drops the block
+			 * at an offset of a parent it never belonged to, so the renderer
+			 * needs to be told to leave it alone.
+			 */
+			crossedParents: oldParent !== newParent,
 			toParentClientId: newParent,
 			toAnchorClientId,
 		};
@@ -1199,11 +1215,21 @@ export default function SuggestionStoreInterceptor() {
 								fromParentClientId:
 									existingMarker.fromParentClientId ?? null,
 								fromIndex: existingMarker.fromIndex ?? 0,
+								/*
+								 * Sticky: a block that crossed parents and is
+								 * then nudged within its new parent has still
+								 * left its origin, so the origin index stays
+								 * unusable.
+								 */
+								crossedParents:
+									existingMarker.crossedParents === true ||
+									move.crossedParents,
 						  }
 						: {
 								fromAnchorClientId: move.fromAnchorClientId,
 								fromParentClientId: move.fromParentClientId,
 								fromIndex: move.fromIndex,
+								crossedParents: move.crossedParents,
 						  };
 				isDispatchingOwnWrite = true;
 				try {
