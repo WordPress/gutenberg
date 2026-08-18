@@ -247,7 +247,7 @@ export default {
 		const hasViewportOverride = ( key ) =>
 			Object.hasOwn( viewportOverrides || {}, key );
 		const { contentSize, wideSize, justifyContent } = effectiveLayout;
-		const blockGapStyleValue = getGapCSSValue( style?.spacing?.blockGap );
+		const blockGapStyleValue = style?.spacing?.blockGap;
 		const hasBlockGapOverride =
 			! hasViewportOverrides ||
 			Object.hasOwn( style?.spacing || {}, 'blockGap' );

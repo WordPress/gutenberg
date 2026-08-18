@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
 ### Enhancements
 
 -   Add async JavaScript filters `uploadMedia.planImageSize` (provisional quality / size plan at enqueue time; may return one plan or an array of plans to split a dimension group) and `uploadMedia.encodeImage` (refine encode args immediately before vips resize or format conversion), with vips helpers on the encode context for trial encodes.
@@ -16,7 +20,6 @@
 ### Bug Fixes
 
 -   A failed `/finalize` request is no longer reported as a successful upload. Finalize is the server's commit point for the attachment metadata (responsive sub-sizes and the final `-scaled` file reference); when it fails, the item is now cancelled and the error surfaced instead of showing "upload complete" and keeping an attachment that is missing its registered sizes ([#80673](https://github.com/WordPress/gutenberg/issues/80673)).
-
 ## 0.37.0 (2026-07-29)
 
 ### Breaking Changes
