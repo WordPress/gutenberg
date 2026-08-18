@@ -43,7 +43,7 @@ const meta: Meta< typeof Menu.Root > = {
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components` and overlays compatibility. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
+			notes: 'Not yet recommended while the APIs are still in flux and early Gutenberg migrations are being evaluated. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
@@ -519,5 +519,39 @@ export const Positioning: Story = {
 				</Menu.Popup>
 			</>
 		),
+	},
+};
+
+/**
+ * Popovers in Gutenberg are managed with explicit z-index values, which can
+ * create situations where a menu renders below another popover when you want
+ * it above.
+ *
+ * The `--wp-ui-menu-z-index` CSS variable controls the z-index of the Menu
+ * positioner. Override it either:
+ *
+ * - **Globally**, by setting the variable on `:root` or `body` (raises every
+ *   Menu popup in the page), or
+ * - **Per instance**, by passing a `Menu.Portal` with a `style` (or
+ *   `className`) to `Menu.Popup`'s `portal` prop. The variable cascades from
+ *   the portal wrapper to everything rendered inside it.
+ *
+ * This story demonstrates the per-instance approach.
+ */
+export const WithCustomZIndex: Story = {
+	name: 'With Custom z-index',
+	args: {
+		children: [
+			<Menu.Trigger key="trigger">Open menu</Menu.Trigger>,
+			<Menu.Popup
+				portal={
+					<Menu.Portal style={ { '--wp-ui-menu-z-index': '9999' } } />
+				}
+				key="popup"
+			>
+				<Menu.Item>Duplicate</Menu.Item>
+				<Menu.Item>Move…</Menu.Item>
+			</Menu.Popup>,
+		],
 	},
 };
