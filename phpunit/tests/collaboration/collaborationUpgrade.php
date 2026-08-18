@@ -48,7 +48,9 @@ class Tests_Collaboration_Upgrade extends WP_UnitTestCase {
 	}
 
 	public function test_removes_legacy_collaboration_options_without_enabling_the_experiment() {
-		update_option( 'gutenberg_version_migration', '22.8.0' );
+		// 23.7.2 shipped without this migration, so sites upgrading from any
+		// 23.7.x release must still run it.
+		update_option( 'gutenberg_version_migration', '23.7.2' );
 		update_option( 'enable_real_time_collaboration', '1' );
 		update_option( 'wp_enable_real_time_collaboration', '1' );
 		update_option( 'wp_collaboration_enabled', '1' );
