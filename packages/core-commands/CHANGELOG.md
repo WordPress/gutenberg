@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Internal
-
--   Commands: Drop the icons passed by `view` category commands, which the category's fallback arrow has been overriding since [#75669](https://github.com/WordPress/gutenberg/pull/75669) ([#81787](https://github.com/WordPress/gutenberg/pull/81787)).
-
 ## 1.53.0 (2026-08-12)
 
 ## 1.52.0 (2026-07-29)
