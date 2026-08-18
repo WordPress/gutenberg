@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   Keep the Details sidebar from clipping focus outlines, with balanced horizontal padding ([#81703](https://github.com/WordPress/gutenberg/pull/81703)).
 -   Keep initial focus on the modal dialog frame instead of moving it to the crop area once the image loads ([#81541](https://github.com/WordPress/gutenberg/pull/81541)).
 
 ### Internal
