@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Command Palette: Treat the per-category icon as a fallback used only when a command passes no `icon`, instead of an override that discards the command's own icon ([#81796](https://github.com/WordPress/gutenberg/pull/81796)).
+-   Command Palette: Treat the per-category icon as a fallback used only when a command passes no `icon`, instead of an override that discards the command's own icon ([#81787](https://github.com/WordPress/gutenberg/pull/81787)).
 
 ## 1.53.0 (2026-08-12)
 
