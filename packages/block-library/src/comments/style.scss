@@ -84,16 +84,6 @@
 		font-size: 0.875em;
 	}
 
-	.comment-form-comment,
-	.comment-form-author,
-	.comment-form-email,
-	.comment-form-url {
-		label {
-			display: block;
-			margin-bottom: 0.25em;
-		}
-	}
-
 	.comment-form {
 
 		textarea,
@@ -140,6 +130,13 @@
 	}
 }
 
+:where(.wp-block-post-comments .comment-form-comment label),
+:where(.wp-block-post-comments .comment-form-author label),
+:where(.wp-block-post-comments .comment-form-email label),
+:where(.wp-block-post-comments .comment-form-url label) {
+	display: block;
+	margin-bottom: 0.25em;
+}
 
 // Using :where to give this a low specificity so that element styles take precedence.
 // Needed for backwards compatibility.
