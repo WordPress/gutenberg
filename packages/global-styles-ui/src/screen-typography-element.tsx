@@ -36,6 +36,10 @@ const elements = {
 		description: __( 'Manage the fonts and typography used on buttons.' ),
 		title: __( 'Buttons' ),
 	},
+	label: {
+		description: __( 'Manage the fonts and typography used on labels.' ),
+		title: __( 'Labels' ),
+	},
 	textInput: {
 		description: __( 'Manage the fonts and typography used on inputs.' ),
 		title: __( 'Inputs' ),
@@ -51,7 +55,7 @@ interface ScreenTypographyElementProps {
 	showColorControls?: boolean;
 }
 
-const ADDITIONAL_COLOR_ELEMENTS = [ 'cite', 'textInput', 'select' ];
+const ADDITIONAL_COLOR_ELEMENTS = [ 'cite', 'label', 'textInput', 'select' ];
 
 function getColorSettingsForElement(
 	settings: GlobalStylesSettings,

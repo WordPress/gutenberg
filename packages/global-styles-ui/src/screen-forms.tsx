@@ -6,11 +6,13 @@ import TypographyElements from './typography-elements';
 import { ElementColors } from './element-colors';
 
 const FORM_ELEMENTS = [
+	{ element: 'label', label: __( 'Labels' ) },
 	{ element: 'textInput', label: __( 'Inputs' ) },
 	{ element: 'select', label: __( 'Selects' ) },
 ];
 
 const COLOR_ELEMENTS = [
+	{ name: 'label', label: __( 'Labels' ) },
 	{ name: 'textInput', label: __( 'Inputs' ) },
 	{ name: 'select', label: __( 'Selects' ) },
 ];
@@ -20,6 +22,7 @@ const DEFAULT_COLOR_CONTROLS = {
 	heading: false,
 	button: false,
 	caption: false,
+	label: true,
 	textInput: true,
 	select: true,
 };
@@ -43,7 +46,7 @@ function ScreenForms() {
 			<ScreenHeader
 				title={ __( 'Form controls' ) }
 				description={ __(
-					'Customize the typography and colors of inputs and selects.'
+					'Customize the typography and colors of labels, inputs, and selects.'
 				) }
 			/>
 			<ScreenBody>

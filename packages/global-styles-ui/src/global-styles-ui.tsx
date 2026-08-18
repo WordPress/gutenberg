@@ -260,6 +260,12 @@ export function GlobalStylesUI( {
 					<GlobalStylesNavigationScreen path="/elements/button">
 						<ScreenTypographyElement element="button" />
 					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/elements/form-controls/typography/label">
+						<ScreenTypographyElement
+							element="label"
+							showColorControls={ false }
+						/>
+					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/elements/form-controls/typography/textInput">
 						<ScreenTypographyElement
 							element="textInput"
