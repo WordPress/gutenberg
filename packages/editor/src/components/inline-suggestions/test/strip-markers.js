@@ -5,6 +5,7 @@ import {
 } from '@wordpress/rich-text';
 import { select } from '@wordpress/data';
 import {
+	hasSuggestionMarkers,
 	stripSuggestionMarkers,
 	stripSuggestionMarkersFromAttributes,
 } from '../strip-markers';
@@ -26,6 +27,30 @@ afterAll( () => {
 	if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
 		unregisterFormatType( SUGGESTION_FORMAT_NAME );
 	}
+} );
+
+describe( 'hasSuggestionMarkers', () => {
+	it( 'detects a marker in a string and in a RichTextData value', () => {
+		const html = `keep ${ del( 1, 'doomed' ) }`;
+		expect( hasSuggestionMarkers( html ) ).toBe( true );
+		expect(
+			hasSuggestionMarkers( RichTextData.fromHTMLString( html ) )
+		).toBe( true );
+	} );
+
+	it( 'is false for unmarked and non-string-like values', () => {
+		expect( hasSuggestionMarkers( 'plain <strong>text</strong>' ) ).toBe(
+			false
+		);
+		expect(
+			hasSuggestionMarkers( RichTextData.fromHTMLString( 'plain' ) )
+		).toBe( false );
+		expect( hasSuggestionMarkers( 3 ) ).toBe( false );
+		expect( hasSuggestionMarkers( undefined ) ).toBe( false );
+		expect( hasSuggestionMarkers( { content: del( 1, 'x' ) } ) ).toBe(
+			false
+		);
+	} );
 } );
 
 describe( 'stripSuggestionMarkers', () => {
