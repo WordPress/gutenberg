@@ -7,7 +7,7 @@
 		"strict": false
 	},
 	"references": [
-		{ "path": "../a11y" },
+		{ "path": "../a11y/tsconfig.build.json" },
 		{ "path": "../interactivity/tsconfig.build.json" }
 	],
 	"exclude": [
