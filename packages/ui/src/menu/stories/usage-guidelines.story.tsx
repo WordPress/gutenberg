@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
+import * as Autocomplete from '../../form/primitives/autocomplete';
 import { SelectControl } from '../../form/select-control';
-import { Stack } from '../../stack';
 import * as Menu from '../';
 
 const meta: Meta = {
@@ -20,29 +20,75 @@ const viewItems = [
 	{ value: 'grid', label: 'Grid' },
 ];
 
+const commandItems = [
+	{ id: 'duplicate', value: 'Duplicate' },
+	{ id: 'download', value: 'Download' },
+	{ id: 'view-details', value: 'View details' },
+];
+
 /**
  * Use SelectControl when the trigger represents a value and opens choices for
- * replacing it. Use Menu when the trigger opens commands or destinations.
+ * replacing it.
  */
-export const SelectForValuesMenuForCommands: Story = {
+export const SelectForValues: Story = {
 	render: () => (
-		<Stack direction="row" gap="lg" wrap="wrap" align="start">
-			<SelectControl
-				label="View"
-				items={ viewItems }
-				defaultValue={ viewItems[ 0 ] }
+		<SelectControl
+			label="View"
+			items={ viewItems }
+			defaultValue={ viewItems[ 0 ] }
+		/>
+	),
+};
+
+/**
+ * Use Menu when the trigger opens commands or destinations.
+ */
+export const MenuForCommands: Story = {
+	render: () => (
+		<Menu.Root>
+			<Menu.Trigger>Actions</Menu.Trigger>
+			<Menu.Popup>
+				<Menu.Item>Duplicate</Menu.Item>
+				<Menu.Item>Download</Menu.Item>
+				<Menu.LinkItem href="#menu-usage-guidelines-destination">
+					View details
+				</Menu.LinkItem>
+			</Menu.Popup>
+		</Menu.Root>
+	),
+};
+
+/**
+ * Use Autocomplete when users need to type to filter a menu-like list of
+ * commands or suggestions. The input also accepts free-form text.
+ */
+export const AutocompleteForSearchableCommands: Story = {
+	render: () => (
+		<Autocomplete.Root items={ commandItems }>
+			<Autocomplete.Input
+				aria-label="Search commands"
+				placeholder="Search commands"
 			/>
-			<Menu.Root>
-				<Menu.Trigger>Actions</Menu.Trigger>
-				<Menu.Popup>
-					<Menu.Item>Duplicate</Menu.Item>
-					<Menu.Item>Download</Menu.Item>
-					<Menu.LinkItem href="#menu-usage-guidelines-destination">
-						View details
-					</Menu.LinkItem>
-				</Menu.Popup>
-			</Menu.Root>
-		</Stack>
+			<Autocomplete.Popup>
+				<Autocomplete.Empty>No commands found.</Autocomplete.Empty>
+				<Autocomplete.List>
+					<Autocomplete.ListBody>
+						<Autocomplete.Collection>
+							{ (
+								command: ( typeof commandItems )[ number ]
+							) => (
+								<Autocomplete.Item
+									key={ command.id }
+									value={ command }
+								>
+									{ command.value }
+								</Autocomplete.Item>
+							) }
+						</Autocomplete.Collection>
+					</Autocomplete.ListBody>
+				</Autocomplete.List>
+			</Autocomplete.Popup>
+		</Autocomplete.Root>
 	),
 };
 

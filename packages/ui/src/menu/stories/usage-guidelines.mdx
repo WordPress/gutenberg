@@ -5,9 +5,9 @@ import * as UsageGuidelinesStories from './usage-guidelines.story';
 
 # Menu usage guidelines
 
-Choose between Menu and Select based on what the options represent.
+Choose between Menu, Select, and Autocomplete based on what the options represent and whether users need to search them.
 
-> If the trigger represents a current value and opens choices for replacing that value, use Select. If the trigger opens commands, actions, or navigation destinations, use Menu.
+> If the trigger represents a current value and opens choices for replacing that value, use Select. If the trigger opens commands, actions, or navigation destinations, use Menu. If users need to type to filter a menu-like list of commands or suggestions, use Autocomplete.
 
 ## Quick reference
 
@@ -17,6 +17,7 @@ Choose between Menu and Select based on what the options represent.
 | Choose one predefined value | [SelectControl](?path=/docs/design-system-components-form-selectcontrol--docs) | The trigger represents the current value. Choosing an option replaces it. |
 | Build a custom value-selection control | [Select](?path=/docs/design-system-components-form-primitives-select--docs) | The primitives provide a custom composition while preserving Select semantics. |
 | Offer commands, actions, or destinations | [Menu](?path=/docs/design-system-components-menu--docs) | Activating an item runs a command, opens a submenu, or navigates to a destination. |
+| Search commands or suggestions with free-form input | [Autocomplete](?path=/docs/design-system-components-form-primitives-autocomplete--docs) | Typing filters the suggestions while focus remains in the input. |
 | Change settings within a broader command menu | [Menu](?path=/docs/design-system-components-menu--docs) | Checkbox items toggle independent states. Radio items choose one state within a group. |
 ` }</Markdown>
 
@@ -28,11 +29,21 @@ The trigger should represent the current value. The popup options should represe
 
 Use the lower-level [Select](?path=/docs/design-system-components-form-primitives-select--docs) primitives only when a custom composition cannot be expressed with `SelectControl`.
 
+<Canvas of={ UsageGuidelinesStories.SelectForValues } />
+
 ## Use `Menu` for commands and destinations
 
 Use `Menu.Item` for commands or actions. Use `Menu.LinkItem` for navigation destinations. Activating a regular item usually performs its command and closes the menu.
 
-<Canvas of={ UsageGuidelinesStories.SelectForValuesMenuForCommands } />
+<Canvas of={ UsageGuidelinesStories.MenuForCommands } />
+
+## Use `Autocomplete` when users need to search
+
+Use [Autocomplete](?path=/docs/design-system-components-form-primitives-autocomplete--docs) for a menu-like list of commands or suggestions that users filter by typing. Unlike `Menu`, focus remains in a text input while users navigate the suggestions.
+
+Autocomplete accepts free-form text. If the control must contain one predefined value, use `SelectControl` or the lower-level `Select` primitives instead.
+
+<Canvas of={ UsageGuidelinesStories.AutocompleteForSearchableCommands } />
 
 ## Use checked items for settings within a menu
 
@@ -58,6 +69,7 @@ The consumer must add the ellipsis because `Menu.Item` cannot infer what happens
 
 -   **Using Menu to choose the control's only value.** Use `SelectControl` so the trigger and options communicate value selection.
 -   **Putting commands or links in Select.** Use `Menu.Item` for commands and `Menu.LinkItem` for destinations.
+-   **Using Menu for a large set of searchable commands.** Use `Autocomplete` when users need to filter commands or suggestions by typing.
 -   **Using radio items only because they show a checkmark.** Use `Menu.RadioItem` only when the state belongs inside a broader command menu.
 -   **Adding an ellipsis to every item that opens more content.** Reserve it for commands that require more input before completion, not submenu triggers.
 
@@ -70,3 +82,4 @@ The consumer must add the ellipsis because `Menu.Item` cannot infer what happens
 -   [HTML Standard: The `select` element](https://html.spec.whatwg.org/dev/form-elements.html#the-select-element)
 -   [Base UI: Menu](https://base-ui.com/react/components/menu)
 -   [Base UI: Select](https://base-ui.com/react/components/select)
+-   [Base UI: Autocomplete](https://base-ui.com/react/components/autocomplete)
