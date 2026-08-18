@@ -378,6 +378,16 @@ const SCRIPT = `
 		return ( sum / values.length ).toFixed( 3 );
 	}
 
+	/** Mean share of the source surviving the crop, as a percentage. */
+	function meanCoverage() {
+		var values = run.rows
+			.map( function ( row ) { return row.coverage; } )
+			.filter( function ( value ) { return typeof value === 'number'; } );
+		if ( ! values.length ) { return 'n/a'; }
+		var sum = values.reduce( function ( a, b ) { return a + b; }, 0 );
+		return Math.round( ( sum / values.length ) * 100 ) + '%';
+	}
+
 	function buildSummary() {
 		var all = run.rows.map( function ( row ) { return row.id; } );
 		var total = tallyOf( all );
@@ -400,6 +410,7 @@ const SCRIPT = `
 		out.push( '- Cropped ' + run.createdAt + ', graded ' + new Date().toISOString() );
 		out.push( '- libvips ' + run.vipsVersion + ', sizes: ' + run.sizes.join( ', ' ) );
 		out.push( '- ' + run.rows.length + ' comparisons across ' + distinct( run.rows ) + ' images' );
+		out.push( '- crops keep ' + meanCoverage() + ' of the source on average' );
 		out.push( '' );
 		out.push( '## Result' );
 		out.push( '' );
@@ -556,7 +567,10 @@ function renderRow( row, index ) {
 				</div>
 			</td>
 			<td class="idx">${ escapeHtml( result.size ) }<br>
-				<span class="attr">${ result.width }&times;${ result.height }</span>
+				<span class="attr">${ result.width }&times;${ result.height }<br>
+					from ${ result.sourceWidth }&times;${ result.sourceHeight }<br>
+					keeps ${ Math.round( result.coverage * 100 ) }%
+				</span>
 			</td>
 			<td class="crop">
 				<img src="${ dataUri(
@@ -626,6 +640,7 @@ export function renderReport( run ) {
 			size: row.result.size,
 			width: row.result.width,
 			height: row.result.height,
+			coverage: row.result.coverage,
 			signals: row.result.signals,
 			aspectStability: row.aspectStability,
 			unchanged: row.result.unchanged,

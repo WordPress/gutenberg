@@ -22,31 +22,73 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import { aspectStability, createVips, cropPair } from './crop.mjs';
-import { buildCorpus, download, SOURCES } from './sources.mjs';
+import {
+	buildCorpus,
+	download,
+	hasUsableShape,
+	SHAPE,
+	SOURCES,
+} from './sources.mjs';
 import { renderReport } from './report.mjs';
 
 /**
  * Target sizes.
  *
  * `thumbnail` is the one size WordPress core registers with `'crop' => true`,
- * so it is the size this proposal actually changes. It is also 150px square,
- * which is hard to grade by eye, so the larger shapes -- the kind a theme
- * registers -- are the defaults and `thumbnail` is opt-in.
+ * so it is the size this proposal actually changes. At 150px it is hard to
+ * grade by eye, so `focus` is the default: the same square shape at 250px,
+ * large enough to see and small enough that a 1024px source is being reduced to
+ * a quarter of its width. The larger shapes are opt-in via `--sizes`.
  */
 const SIZES = {
 	thumbnail: { name: 'thumbnail', width: 150, height: 150 },
+	focus: { name: 'focus', width: 250, height: 250 },
 	square: { name: 'square', width: 400, height: 400 },
 	wide: { name: 'wide', width: 640, height: 360 },
 	tall: { name: 'tall', width: 480, height: 640 },
 };
 
+/**
+ * How many extra images to collect per image actually wanted.
+ *
+ * Theme screenshots and dataset entries do not publish dimensions, so whether
+ * they clear the shape gate is only knowable after downloading them.
+ */
+const OVER_COLLECT = 1.8;
+
+/**
+ * Mean share of the source that survives the crop, across every comparison.
+ *
+ * @param {Array} rows Comparison rows.
+ * @return {number} 0..1.
+ */
+function meanCoverage( rows ) {
+	return (
+		rows.reduce( ( total, row ) => total + row.result.coverage, 0 ) /
+		rows.length
+	);
+}
+
+/**
+ * Formats a 0..1 share as a percentage.
+ *
+ * @param {number} value Share.
+ * @return {string} Formatted percentage.
+ */
+function percent( value ) {
+	return `${ Math.round( value * 100 ) }%`;
+}
+
 const DEFAULTS = {
 	count: 20,
-	sizes: 'square,wide',
+	sizes: 'focus',
 	sources: Object.keys( SOURCES ).join( ',' ),
 	out: 'artifacts/smart-crop',
 	quality: 82,
 	concurrency: 6,
+	'min-long-edge': SHAPE.minLongEdge,
+	'min-short-edge': SHAPE.minShortEdge,
+	'min-aspect': SHAPE.minAspect,
 };
 
 /**
@@ -163,6 +205,11 @@ async function main() {
 				'  --seed STRING    reproduce a previous run (default: random)',
 				'  --out DIR        output directory (default artifacts/smart-crop)',
 				'  --quality N      JPEG quality for review renditions (default 82)',
+				'',
+				'Only images large enough and far enough from square are graded:',
+				`  --min-long-edge N   long edge floor (default ${ SHAPE.minLongEdge })`,
+				`  --min-short-edge N  short edge floor (default ${ SHAPE.minShortEdge })`,
+				`  --min-aspect N      long/short ratio floor (default ${ SHAPE.minAspect })`,
 			].join( '\n' )
 		);
 		return;
@@ -193,11 +240,26 @@ async function main() {
 	log( `Smart crop review run ${ runId }` );
 	log( `Seed ${ seed } — pass --seed ${ seed } to reproduce this set.\n` );
 
+	const shape = {
+		minLongEdge: Number( options[ 'min-long-edge' ] ),
+		minShortEdge: Number( options[ 'min-short-edge' ] ),
+		minAspect: Number( options[ 'min-aspect' ] ),
+	};
+
+	log(
+		`Grading images at least ${ shape.minLongEdge }x${ shape.minShortEdge } ` +
+			`and at least ${ shape.minAspect }:1.\n`
+	);
+
+	// Most sources do not publish dimensions, so their entries can only be
+	// measured once decoded. Over-collecting covers the ones that get rejected;
+	// the run stops as soon as it has `count` usable images.
 	const corpus = await buildCorpus( {
-		count: options.count,
+		count: Math.ceil( options.count * OVER_COLLECT ),
 		sources: String( options.sources )
 			.split( ',' )
 			.map( ( key ) => key.trim() ),
+		shape,
 		rng,
 		onLog: log,
 	} );
@@ -211,7 +273,10 @@ async function main() {
 	const downloaded = await mapLimit(
 		corpus,
 		options.concurrency,
-		async ( entry ) => ( { entry, buffer: await download( entry.url ) } )
+		async ( entry ) => ( {
+			entry,
+			buffer: await download( entry.url, entry.fallbackUrl ),
+		} )
 	);
 
 	const vips = await createVips();
@@ -222,10 +287,21 @@ async function main() {
 	log( `Cropping with libvips ${ vipsVersion }…\n` );
 
 	const rows = [];
-	const stats = { bySource: {}, unchanged: 0, imageCount: 0, skipped: 0 };
+	const stats = {
+		bySource: {},
+		unchanged: 0,
+		imageCount: 0,
+		skipped: 0,
+		wrongShape: 0,
+	};
 
 	for ( const item of downloaded ) {
+		if ( stats.imageCount >= options.count ) {
+			break;
+		}
+
 		if ( item.error || ! item.buffer ) {
+			log( `  ! download failed: ${ item.error?.message || 'no data' }` );
 			stats.skipped += 1;
 			continue;
 		}
@@ -242,6 +318,18 @@ async function main() {
 		} catch {
 			log( `  ! could not decode ${ entry.id }` );
 			stats.skipped += 1;
+			continue;
+		}
+
+		// Dimensions the source published can be wrong or absent, so the gate is
+		// applied again to what actually decoded.
+		if ( ! hasUsableShape( source.width, source.height, shape ) ) {
+			log(
+				`  - ${ entry.id } is ${ source.width }x${ source.height }, ` +
+					'too small or too close to square'
+			);
+			stats.wrongShape += 1;
+			source.delete();
 			continue;
 		}
 
@@ -334,6 +422,7 @@ async function main() {
 		seed,
 		createdAt: new Date().toISOString(),
 		vipsVersion,
+		shape,
 		sizes: sizes.map( ( size ) => size.name ),
 		rows,
 		stats,
@@ -350,6 +439,7 @@ async function main() {
 					id: row.id,
 					image: { ...row.image, preview: undefined },
 					size: row.result.size,
+					coverage: row.result.coverage,
 					signals: row.result.signals,
 					aspectStability: row.aspectStability,
 					unchanged: row.result.unchanged,
@@ -364,6 +454,12 @@ async function main() {
 	log( `${ rows.length } comparisons from ${ stats.imageCount } images` );
 	log(
 		`${ stats.unchanged } produced no visible change; ${ stats.skipped } images skipped`
+	);
+	log(
+		`${ stats.wrongShape } images rejected for size or shape; ` +
+			`crops keep ${ percent(
+				meanCoverage( rows )
+			) } of the source on average`
 	);
 	log( `\nReport:   ${ reportPath }` );
 	log( `Manifest: ${ path.join( outDir, 'manifest.json' ) }` );

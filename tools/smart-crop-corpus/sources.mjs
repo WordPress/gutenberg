@@ -15,6 +15,52 @@ const USER_AGENT =
 	'gutenberg-smart-crop-corpus (https://github.com/WordPress/gutenberg/issues/81706)';
 
 /**
+ * What an image has to look like to be worth grading.
+ *
+ * A square crop keeps `short / long` of a source and throws the rest away, so
+ * the shape of the input decides how much of the picture the crop is choosing
+ * between. A 4:3 photo keeps 75% no matter which strategy runs, which leaves
+ * little room for the two to disagree. Requiring a wider frame is what makes
+ * the choice matter: at 3:2 the crop discards a third of the image, at 3:1 it
+ * discards two thirds.
+ *
+ * The size floor is there so the crop is a real downscale rather than a
+ * near-copy: a 250px crop out of a 1024px frame is choosing from four times its
+ * own width.
+ */
+export const SHAPE = {
+	minLongEdge: 1024,
+	minShortEdge: 450,
+	// 3:2, the commonest photographic frame, comes out at 1.4993 once a 1024px
+	// rendition rounds its short edge. A floor of exactly 1.5 would reject the
+	// whole shape by a rounding error.
+	minAspect: 1.45,
+};
+
+/**
+ * Whether an image is large enough and far enough from square.
+ *
+ * @param {number} width  Image width.
+ * @param {number} height Image height.
+ * @param {Object} shape  Constraints in the shape of `SHAPE`.
+ * @return {boolean} True when the image is worth grading.
+ */
+export function hasUsableShape( width, height, shape = SHAPE ) {
+	if ( ! width || ! height ) {
+		return false;
+	}
+
+	const long = Math.max( width, height );
+	const short = Math.min( width, height );
+
+	return (
+		long >= shape.minLongEdge &&
+		short >= shape.minShortEdge &&
+		long / short >= shape.minAspect
+	);
+}
+
+/**
  * Photo Directory tags that name a single, findable subject.
  *
  * The first version of this harness sampled by category, and most of what came
@@ -108,9 +154,10 @@ function sample( items, count, rng ) {
  *
  * @param {number}   count Number of images to collect.
  * @param {Function} rng   Random number generator returning 0..1.
+ * @param {Object}   shape Shape constraints, in the form of `SHAPE`.
  * @return {Promise<Array>} Corpus entries.
  */
-async function fromPhotoDirectory( count, rng ) {
+async function fromPhotoDirectory( count, rng, shape ) {
 	const base = 'https://wordpress.org/photos/wp-json/wp/v2';
 
 	const { body: tags } = await fetchJson(
@@ -124,6 +171,10 @@ async function fromPhotoDirectory( count, rng ) {
 		return [];
 	}
 
+	// Twice what is wanted, so the sort at the end has something to choose
+	// between. Rejected candidates cost an API page, not a download, so this is
+	// the cheapest place in the harness to be picky.
+	const wanted = count * 2;
 	const entries = [];
 	const seen = new Set();
 	let attempts = 0;
@@ -132,7 +183,7 @@ async function fromPhotoDirectory( count, rng ) {
 	// consecutive runs land in completely different parts of the archive. Tags
 	// are drawn uniformly rather than by size: weighting by count would turn the
 	// run back into mostly birds.
-	while ( entries.length < count && attempts < count * 4 ) {
+	while ( entries.length < wanted && attempts < wanted * 6 ) {
 		attempts++;
 
 		const tag = usable[ Math.floor( rng() * usable.length ) ];
@@ -144,7 +195,7 @@ async function fromPhotoDirectory( count, rng ) {
 		);
 
 		for ( const photo of sample( photos, 3, rng ) ) {
-			if ( entries.length >= count ) {
+			if ( entries.length >= wanted ) {
 				break;
 			}
 
@@ -162,6 +213,15 @@ async function fromPhotoDirectory( count, rng ) {
 				details.sizes?.[ '2048x2048' ] ||
 				details.sizes?.large;
 
+			const width = rendition?.width || details.width;
+			const height = rendition?.height || details.height;
+
+			// The directory publishes dimensions, so badly shaped photos are
+			// dropped here rather than after downloading them.
+			if ( ! hasUsableShape( width, height, shape ) ) {
+				continue;
+			}
+
 			const url = rendition?.source_url || media.source_url;
 			if ( seen.has( url ) ) {
 				continue;
@@ -177,13 +237,21 @@ async function fromPhotoDirectory( count, rng ) {
 				license: 'CC0',
 				source: 'WordPress Photo Directory',
 				subject: tag.slug,
-				width: rendition?.width || details.width,
-				height: rendition?.height || details.height,
+				width,
+				height,
 			} );
 		}
 	}
 
-	return entries;
+	// Widest first, then take what was asked for. A wider frame is one where the
+	// crop is choosing between more of the picture.
+	const aspect = ( entry ) =>
+		Math.max( entry.width, entry.height ) /
+		Math.min( entry.width, entry.height );
+
+	return entries
+		.sort( ( a, b ) => aspect( b ) - aspect( a ) )
+		.slice( 0, count );
 }
 
 /**
@@ -227,9 +295,16 @@ async function fromCroppingDataset( count, rng ) {
 				return null;
 			}
 
+			// The dataset links the 800px rendition for about half its entries.
+			// Flickr serves a 1024px `_b` for most of those, which is the size
+			// floor this harness wants; the linked URL stays as a fallback for
+			// the ones where it does not exist.
+			const large = item.url.replace( /_c\.jpg$/, '_b.jpg' );
+
 			return {
 				id: `crop-${ item.flickr_photo_id }`,
-				url: item.url,
+				url: large,
+				fallbackUrl: large === item.url ? undefined : item.url,
 				title: `Flickr ${ item.flickr_photo_id }`,
 				pageUrl: `https://www.flickr.com/photo.gne?id=${ item.flickr_photo_id }`,
 				credit: 'Flickr contributor',
@@ -331,30 +406,69 @@ async function fromPluginBanners( count, rng ) {
 }
 
 export const SOURCES = {
-	cropping: {
-		label: 'Flickr cropping dataset',
-		collect: fromCroppingDataset,
-		// Images picked for a cropping benchmark, so every one of them has a
-		// subject that a crop can cut off.
-		share: 0.35,
-	},
 	photos: {
 		label: 'WordPress Photo Directory',
 		collect: fromPhotoDirectory,
-		// Real WordPress uploads, sampled by subject tag rather than category.
-		share: 0.35,
-	},
-	themes: {
-		label: 'Theme screenshots',
-		collect: fromThemeScreenshots,
-		share: 0.15,
+		// The only source that publishes dimensions, so it is the only one that
+		// can be filtered and sorted for shape without downloading anything.
+		// That makes it the cheapest place to get wide frames, so it carries
+		// most of a run.
+		share: 0.55,
 	},
 	plugins: {
 		label: 'Plugin banners',
 		collect: fromPluginBanners,
-		share: 0.15,
+		// A 1544x500 banner discards two thirds of itself to a square crop,
+		// which is the hardest shape in the mix. Held below the photo share so a
+		// run does not turn into a wall of logos.
+		share: 0.2,
+	},
+	cropping: {
+		label: 'Flickr cropping dataset',
+		collect: fromCroppingDataset,
+		// Images picked for a cropping benchmark, so every one has a subject a
+		// crop can cut off. Held to a small share because the set is mostly 4:3
+		// and most of what it offers gets rejected for shape after downloading.
+		share: 0.2,
+	},
+	themes: {
+		label: 'Theme screenshots',
+		collect: fromThemeScreenshots,
+		// Screenshots are 1200x900 by convention, which is too close to square
+		// to clear the default shape gate. Most of these get dropped; lower
+		// `--min-aspect` to grade them.
+		share: 0.05,
 	},
 };
+
+/**
+ * Deals entries out one source at a time.
+ *
+ * @param {Array} entries Entries grouped by source.
+ * @return {Array} The same entries, round-robin by source.
+ */
+function interleave( entries ) {
+	const groups = new Map();
+
+	for ( const entry of entries ) {
+		const group = groups.get( entry.source ) || [];
+		group.push( entry );
+		groups.set( entry.source, group );
+	}
+
+	const queues = [ ...groups.values() ];
+	const out = [];
+
+	while ( out.length < entries.length ) {
+		for ( const queue of queues ) {
+			if ( queue.length ) {
+				out.push( queue.shift() );
+			}
+		}
+	}
+
+	return out;
+}
 
 /**
  * Builds a mixed corpus across the enabled sources.
@@ -362,11 +476,18 @@ export const SOURCES = {
  * @param {Object}   options
  * @param {number}   options.count   Total number of images.
  * @param {string[]} options.sources Source keys to draw from.
+ * @param {Object}   options.shape   Shape constraints, in the form of `SHAPE`.
  * @param {Function} options.rng     Random number generator returning 0..1.
  * @param {Function} options.onLog   Progress reporter.
  * @return {Promise<Array>} Corpus entries.
  */
-export async function buildCorpus( { count, sources, rng, onLog } ) {
+export async function buildCorpus( {
+	count,
+	sources,
+	shape = SHAPE,
+	rng,
+	onLog,
+} ) {
 	const enabled = sources.filter( ( key ) => SOURCES[ key ] );
 	const totalShare = enabled.reduce(
 		( sum, key ) => sum + SOURCES[ key ].share,
@@ -390,27 +511,36 @@ export async function buildCorpus( { count, sources, rng, onLog } ) {
 		onLog( `Collecting ${ wanted } from ${ source.label }…` );
 
 		try {
-			collected.push( ...( await source.collect( wanted, rng ) ) );
+			collected.push( ...( await source.collect( wanted, rng, shape ) ) );
 		} catch ( error ) {
 			onLog( `  ! ${ source.label } failed: ${ error.message }` );
 		}
 	}
 
-	return collected;
+	// Sources are collected one after another, and the run stops once it has
+	// enough usable images. Handing back the concatenation would let whichever
+	// source came first fill the whole quota, so deal them out round-robin and
+	// keep the mix intact however many get rejected downstream.
+	return interleave( collected );
 }
 
 /**
  * Downloads an image.
  *
- * @param {string} url Image URL.
+ * @param {string} url           Image URL.
+ * @param {string} [fallbackUrl] URL to try when the first one is missing.
  * @return {Promise<Uint8Array>} Image bytes.
  */
-export async function download( url ) {
+export async function download( url, fallbackUrl ) {
 	const response = await fetch( url, {
 		headers: { 'user-agent': USER_AGENT },
 	} );
 
 	if ( ! response.ok ) {
+		if ( fallbackUrl ) {
+			return download( fallbackUrl );
+		}
+
 		throw new Error( `${ response.status } ${ response.statusText }` );
 	}
 

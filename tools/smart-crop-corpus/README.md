@@ -29,11 +29,15 @@ node tools/smart-crop-corpus/index.mjs
 
 ```
 --count N        images to collect (default 20)
---sizes LIST     thumbnail, square, wide, tall (default square,wide)
---sources LIST   cropping, photos, themes, plugins (default: all four)
+--sizes LIST     thumbnail, focus, square, wide, tall (default focus)
+--sources LIST   photos, plugins, cropping, themes (default: all four)
 --seed STRING    reproduce a previous run (default: random)
 --out DIR        output directory (default artifacts/smart-crop)
 --quality N      JPEG quality for the review renditions (default 82)
+
+--min-long-edge N   long edge floor (default 1024)
+--min-short-edge N  short edge floor (default 450)
+--min-aspect N      long/short ratio floor (default 1.45)
 ```
 
 Every run picks a different set of images. Pass the seed printed at the top of a
@@ -107,9 +111,34 @@ The only difference is that it loads the module's Node entry point instead of
 the browser one; the libvips build underneath is the same.
 
 `thumbnail` is the one size WordPress core registers with `'crop' => true`, so
-it is the size this proposal actually changes. At 150px square it is also hard
-to judge by eye, so the larger theme-style shapes are the defaults and
-`thumbnail` is opt-in via `--sizes`.
+it is the size this proposal actually changes. At 150px it is hard to judge by
+eye, so the default is `focus`: the same square shape at 250px, big enough to
+see and small enough that a 1024px source is being reduced to a quarter of its
+width. The larger shapes are opt-in via `--sizes`.
+
+## Which images get graded
+
+A square crop keeps `short / long` of its source and discards the rest, and that
+fraction is fixed by the shape of the input, not by the strategy. A 4:3 photo
+keeps 75% of itself whichever way it is cropped, which leaves the two strategies
+almost nothing to disagree about. Grading those is how the first runs of this
+harness produced so little.
+
+So an image has to earn its place in a run:
+
+| Requirement  | Default | Why                                                      |
+| ------------ | ------- | -------------------------------------------------------- |
+| Long edge    | 1024px  | The crop is a real reduction, not close to a copy.       |
+| Short edge   | 450px   | Still at least a 2x downscale into a 250px crop.         |
+| Long / short | 1.45    | Far enough from square that the crop discards something. |
+
+At 3:2, the commonest photographic frame, a square crop throws away a third of
+the picture. At the 3:1 of a plugin banner it throws away two thirds. Runs come
+out keeping about half the source on average, and the report prints the figure
+per row so it is clear how much was at stake in each comparison.
+
+The floors are adjustable. `--min-aspect 1.2` lets 4:3 back in, including the
+1200x900 theme screenshots that the default excludes.
 
 ## Where the images come from
 
@@ -119,10 +148,21 @@ repository small.
 
 | Source                                                                            | What it contributes                                                                                                        |
 | --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| [Flickr cropping dataset](https://github.com/yiling-chen/flickr-cropping-dataset) | 1,743 photographs selected for a cropping benchmark, so every one has a subject a crop can cut off.                        |
 | [Photo Directory](https://wordpress.org/photos/)                                  | ~43,000 CC0 photographs submitted by the community. The closest public stand-in for what people upload to WordPress.       |
-| [Theme Directory](https://wordpress.org/themes/) screenshots                      | Flat regions, dense text, a subject filling the frame. Nothing like a photograph.                                          |
 | [Plugin Directory](https://wordpress.org/plugins/) banners                        | Logos and wordmarks on flat backgrounds, the failure class the issue calls out, where attention has nothing to latch onto. |
+| [Flickr cropping dataset](https://github.com/yiling-chen/flickr-cropping-dataset) | 1,743 photographs selected for a cropping benchmark, so every one has a subject a crop can cut off.                        |
+| [Theme Directory](https://wordpress.org/themes/) screenshots                      | Flat regions, dense text, a subject filling the frame. Nothing like a photograph.                                          |
+
+The Photo Directory carries most of a run because it is the only source that
+publishes dimensions. That means its images can be filtered and sorted for shape
+before anything is downloaded, so it collects a surplus, sorts widest first, and
+keeps the top of the pile. The other three can only be measured after decoding,
+which is why a run over-collects and stops once it has enough usable images.
+
+Two consequences worth knowing. Theme screenshots are 1200x900 by convention, so
+almost all of them fail the 1.45 ratio floor and a default run grades none of
+them. The cropping dataset is mostly 4:3 as well, and contributes a couple of
+images per run out of the handful it offers.
 
 The Photo Directory is sampled by tag rather than by category. Categories name
 scenes and the directory is 63% `nature`, so a category sample comes back mostly
@@ -153,8 +193,12 @@ candidate derivations floated in the thread:
     rectangles, because libvips does not expose the rectangle.
 -   **changed** — how much smart crop altered the picture at all. Near zero means
     attention landed on the centre.
+-   **keeps** — the share of the source that survives the crop. Fixed by the two
+    aspect ratios rather than by the strategy, so it says how much was at stake
+    in the comparison rather than how well it went.
 -   **aspectStability** (manifest only) — how far the focal point moves across the
-    requested shapes. Candidate 3.
+    requested shapes. Candidate 3, and it needs two or more `--sizes` to mean
+    anything.
 
 Once a run is graded, these become the x-axis against a known-good/known-bad
 y-axis, which is what picking a threshold needs.
@@ -173,7 +217,10 @@ point inherits that precision.
     further still: its images were chosen because cropping them is interesting.
 -   Grades live in one browser's `localStorage`, and the exported summary is a
     snapshot rather than a live document. Re-export after grading more rows.
--   Every crop is inlined, so the report grows with the run: 20 images at two
-    sizes is about 5 MB, 50 images at four sizes about 18 MB. Past roughly 40
-    images a run gets unwieldy to open and tedious to grade in one sitting.
-    Several smaller runs beat one large one.
+-   Every crop is inlined, so the report grows with the run: 30 images at the
+    default single size is about 4 MB, and adding sizes multiplies it. Past
+    roughly 40 images a run gets unwieldy to open and tedious to grade in one
+    sitting. Several smaller runs beat one large one.
+-   The shape gate makes the corpus less representative on purpose. Real media
+    libraries are full of 4:3 and square images; this grades the shapes where
+    the choice is hardest, not the shapes people upload most.

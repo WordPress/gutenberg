@@ -184,6 +184,18 @@ export function cropPair( { vips, source, buffer, size, quality = 82 } ) {
 	const attention = thumbnail( 'attention' );
 	const entropy = thumbnail( 'entropy' );
 
+	// How much of the source survives the crop. This is fixed by the two aspect
+	// ratios rather than by the strategy, and it is what decides whether the
+	// two strategies have room to disagree: a crop that keeps 90% of the frame
+	// is barely a choice.
+	const kept = fitAspect(
+		source.width,
+		source.height,
+		size.width / size.height
+	);
+	const coverage =
+		( kept.width * kept.height ) / ( source.width * source.height );
+
 	try {
 		const changeFromCentre = meanAbsoluteDifference( attention, centre );
 		const entropyDifference = meanAbsoluteDifference( attention, entropy );
@@ -197,6 +209,9 @@ export function cropPair( { vips, source, buffer, size, quality = 82 } ) {
 			size: size.name,
 			width: size.width,
 			height: size.height,
+			sourceWidth: source.width,
+			sourceHeight: source.height,
+			coverage: Number( coverage.toFixed( 3 ) ),
 			renditions: {
 				centre: Buffer.from(
 					centre.writeToBuffer( '.jpg', { Q: quality } )
