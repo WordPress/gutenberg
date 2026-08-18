@@ -87,6 +87,9 @@ const getEditorCommandLoader = () =>
 			isFocusMode,
 			isPreviewMode,
 			isViewable,
+			isPublished,
+			postType,
+			viewLink,
 			isCodeEditingEnabled,
 			isRichEditingEnabled,
 			isPublishSidebarEnabled,
@@ -94,10 +97,20 @@ const getEditorCommandLoader = () =>
 			disableContentOnlyForTemplateParts,
 		} = useSelect( ( select ) => {
 			const { get } = select( preferencesStore );
-			const { isListViewOpened, getCurrentPostType, getEditorSettings } =
-				select( editorStore );
+			const {
+				isListViewOpened,
+				getCurrentPostType,
+				getEditorSettings,
+				getEditedPostAttribute,
+				getEditedPostPreviewLink,
+				isCurrentPostPublished,
+			} = select( editorStore );
 			const { getSettings } = select( blockEditorStore );
 			const { getPostType } = select( coreStore );
+			const _postType = getCurrentPostType();
+			// Private posts and posts scheduled in the past are published as
+			// far as the front end is concerned.
+			const _isPublished = isCurrentPostPublished();
 
 			return {
 				editorMode: get( 'core', 'editorMode' ) ?? 'visual',
@@ -106,8 +119,12 @@ const getEditorCommandLoader = () =>
 				isDistractionFree: get( 'core', 'distractionFree' ),
 				isFocusMode: get( 'core', 'focusMode' ),
 				isPreviewMode: getSettings().isPreviewMode,
-				isViewable:
-					getPostType( getCurrentPostType() )?.viewable ?? false,
+				isViewable: getPostType( _postType )?.viewable ?? false,
+				isPublished: _isPublished,
+				postType: _postType,
+				viewLink: _isPublished
+					? getEditedPostAttribute( 'link' )
+					: getEditedPostPreviewLink?.() ?? '',
 				isCodeEditingEnabled: getEditorSettings().codeEditingEnabled,
 				isRichEditingEnabled: getEditorSettings().richEditingEnabled,
 				isPublishSidebarEnabled:
@@ -341,6 +358,32 @@ const getEditorCommandLoader = () =>
 					window.open( link, `wp-preview-${ postId }` );
 				},
 			} );
+
+			if ( postType === 'post' || postType === 'page' ) {
+				const isPage = postType === 'page';
+				let label;
+
+				if ( isPublished ) {
+					label = isPage ? __( 'View page' ) : __( 'View post' );
+				} else {
+					label = isPage
+						? __( 'Preview page' )
+						: __( 'Preview post' );
+				}
+
+				commands.push( {
+					name: 'core/view-link',
+					label,
+					icon: external,
+					category: 'view',
+					callback: ( { close } ) => {
+						close();
+						if ( viewLink ) {
+							window.open( viewLink, '_blank' );
+						}
+					},
+				} );
+			}
 		}
 
 		return {
@@ -421,30 +464,12 @@ const getPatternEditingContextualCommands = () =>
 
 const getEditedEntityContextualCommands = () =>
 	function useEditedEntityContextualCommands() {
-		const { postType, isViewable, isPublished, link } = useSelect(
-			( select ) => {
-				const {
-					getCurrentPostType,
-					getEditedPostAttribute,
-					getEditedPostPreviewLink,
-					isCurrentPostPublished,
-				} = select( editorStore );
-				const { getPostType } = select( coreStore );
-				// Private posts and posts scheduled in the past are published
-				// as far as the front end is concerned.
-				const _isPublished = isCurrentPostPublished();
-				const _postType = getCurrentPostType();
-				return {
-					postType: _postType,
-					isViewable: getPostType( _postType )?.viewable ?? false,
-					isPublished: _isPublished,
-					link: _isPublished
-						? getEditedPostAttribute( 'link' )
-						: getEditedPostPreviewLink?.() ?? '',
-				};
-			},
-			[]
-		);
+		const { postType } = useSelect( ( select ) => {
+			const { getCurrentPostType } = select( editorStore );
+			return {
+				postType: getCurrentPostType(),
+			};
+		}, [] );
 		const { openModal } = useDispatch( interfaceStore );
 		const commands = [];
 
@@ -469,33 +494,6 @@ const getEditedEntityContextualCommands = () =>
 					close();
 				},
 			} );
-		}
-		if ( isViewable ) {
-			if ( postType === 'post' || postType === 'page' ) {
-				const isPage = postType === 'page';
-				let label;
-
-				if ( isPublished ) {
-					label = isPage ? __( 'View page' ) : __( 'View post' );
-				} else {
-					label = isPage
-						? __( 'Preview page' )
-						: __( 'Preview post' );
-				}
-
-				commands.push( {
-					name: 'core/view-link',
-					label,
-					icon: external,
-					category: 'view',
-					callback: ( { close } ) => {
-						close();
-						if ( link ) {
-							window.open( link, '_blank' );
-						}
-					},
-				} );
-			}
 		}
 
 		return { isLoading: false, commands };
