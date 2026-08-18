@@ -24,9 +24,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function MenuPopup(
 				ref={ ref }
 				className={ clsx(
 					styles.popup,
-					isSubmenu
-						? styles[ 'popup--submenu' ]
-						: styles[ 'popup--root' ],
+					isSubmenu ? styles[ 'is-submenu' ] : styles[ 'is-root' ],
 					className
 				) }
 				{ ...props }

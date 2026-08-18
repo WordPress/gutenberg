@@ -37,11 +37,11 @@
 			}
 		}
 
-		.popup--root {
+		.is-root {
 			composes: dropdown-motion from "../utils/css/dropdown-motion.module.css";
 		}
 
-		.popup--submenu {
+		.is-submenu {
 			composes: dropdown-motion--fade-only from "../utils/css/dropdown-motion.module.css";
 		}
 
