@@ -243,6 +243,7 @@ function BlockList( { filterValue, styleFilter }: BlockListProps ) {
 	const blockTypesListRef = useRef< HTMLDivElement >( null );
 
 	// Announce result count on change
+	const hasResults = filteredBlockTypes.length > 0;
 	useEffect( () => {
 		if ( ! filterValue && styleFilter === 'all' ) {
 			return;
@@ -255,14 +256,18 @@ function BlockList( { filterValue, styleFilter }: BlockListProps ) {
 		// fragile and depends on the number of rendered elements of `BlockMenuItem`,
 		// which is now one.
 		// @see https://github.com/WordPress/gutenberg/pull/39117#discussion_r816022116
-		const count = blockTypesListRef.current?.childElementCount || 0;
+		// An empty list renders the empty state message as its only child, so
+		// only count the children when there are results to count.
+		const count = hasResults
+			? blockTypesListRef.current?.childElementCount || 0
+			: 0;
 		const resultsFoundMessage = sprintf(
 			/* translators: %d: number of results. */
 			_n( '%d result found.', '%d results found.', count ),
 			count
 		);
 		debouncedSpeak( resultsFoundMessage, 'polite' );
-	}, [ filterValue, styleFilter, debouncedSpeak ] );
+	}, [ filterValue, styleFilter, hasResults, debouncedSpeak ] );
 
 	return (
 		<div
