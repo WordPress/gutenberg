@@ -30,7 +30,7 @@ node tools/smart-crop-corpus/index.mjs
 ```
 --count N        images to collect (default 20)
 --sizes LIST     thumbnail, focus, square, wide, tall (default focus)
---sources LIST   photos, plugins, cropping, themes (default: all four)
+--sources LIST   photos, plugins, cropping, themes (default: all but themes)
 --seed STRING    reproduce a previous run (default: random)
 --out DIR        output directory (default artifacts/smart-crop)
 --quality N      JPEG quality for the review renditions (default 82)
@@ -160,9 +160,17 @@ keeps the top of the pile. The other three can only be measured after decoding,
 which is why a run over-collects and stops once it has enough usable images.
 
 Two consequences worth knowing. Theme screenshots are 1200x900 by convention, so
-almost all of them fail the 1.45 ratio floor and a default run grades none of
-them. The cropping dataset is mostly 4:3 as well, and contributes a couple of
-images per run out of the handful it offers.
+almost all of them fail the 1.45 ratio floor. Rather than spend a run's
+downloads on images that will never be graded, they are left out of the default
+sources; ask for them with `--sources photos,plugins,cropping,themes` alongside
+a lower `--min-aspect`. The cropping dataset is mostly 4:3 as well, and about a
+quarter of what it offers survives the gate.
+
+Larger runs make a few hundred API requests, so requests retry on 5xx and a page
+that fails outright is skipped rather than taken as the source failing. A run
+reports when a source could not supply its full share; a source coming up short
+no longer has its allocation quietly handed to whichever source happened to be
+last.
 
 The Photo Directory is sampled by tag rather than by category. Categories name
 scenes and the directory is 63% `nature`, so a category sample comes back mostly

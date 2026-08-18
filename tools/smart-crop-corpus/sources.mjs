@@ -14,6 +14,9 @@
 const USER_AGENT =
 	'gutenberg-smart-crop-corpus (https://github.com/WordPress/gutenberg/issues/81706)';
 
+const FETCH_ATTEMPTS = 3;
+const FETCH_BACKOFF_MS = 500;
+
 /**
  * What an image has to look like to be worth grading.
  *
@@ -105,18 +108,45 @@ const PHOTO_SUBJECT_TAGS = [
  *
  * @param {string} url       URL to fetch.
  * @param {Object} [options] Fetch options.
+ * @param {number} [attempt] Which try this is.
  * @return {Promise<any>} Parsed JSON body.
  */
-async function fetchJson( url, options = {} ) {
-	const response = await fetch( url, {
-		...options,
-		headers: { 'user-agent': USER_AGENT, ...options.headers },
-	} );
+async function fetchJson( url, options = {}, attempt = 1 ) {
+	// A hundred-image run makes a few hundred requests, at which point a
+	// transient 502 from wordpress.org stops being unlikely. Retrying the ones
+	// that can succeed on a second go keeps one bad response from costing the
+	// whole source.
+	const retry = async ( reason ) => {
+		if ( attempt >= FETCH_ATTEMPTS ) {
+			throw reason;
+		}
+
+		await new Promise( ( resolve ) =>
+			setTimeout( resolve, FETCH_BACKOFF_MS * attempt )
+		);
+
+		return fetchJson( url, options, attempt + 1 );
+	};
+
+	let response;
+
+	try {
+		response = await fetch( url, {
+			...options,
+			headers: { 'user-agent': USER_AGENT, ...options.headers },
+		} );
+	} catch ( error ) {
+		return retry( error );
+	}
 
 	if ( ! response.ok ) {
-		throw new Error(
+		const error = new Error(
 			`Request failed (${ response.status } ${ response.statusText }): ${ url }`
 		);
+
+		return response.status >= 500
+			? retry( error )
+			: Promise.reject( error );
 	}
 
 	return {
@@ -189,12 +219,23 @@ async function fromPhotoDirectory( count, rng, shape ) {
 		const tag = usable[ Math.floor( rng() * usable.length ) ];
 		const perPage = 20;
 		const offset = Math.floor( rng() * Math.max( 1, tag.count - perPage ) );
-		const { body: photos } = await fetchJson(
-			`${ base }/photos?per_page=${ perPage }&offset=${ offset }` +
-				`&photo-tags=${ tag.id }&_embed=wp:featuredmedia`
-		);
+		let photos;
 
-		for ( const photo of sample( photos, 3, rng ) ) {
+		try {
+			( { body: photos } = await fetchJson(
+				`${ base }/photos?per_page=${ perPage }&offset=${ offset }` +
+					`&photo-tags=${ tag.id }&_embed=wp:featuredmedia`
+			) );
+		} catch {
+			// One bad page is not a reason to abandon the ones already
+			// collected. Move on to a different tag and offset.
+			continue;
+		}
+
+		// Six of twenty rather than one or two: a hundred-image run needs a few
+		// hundred candidates, and taking more per page is far kinder to
+		// wordpress.org than making three times as many requests.
+		for ( const photo of sample( photos, 6, rng ) ) {
 			if ( entries.length >= wanted ) {
 				break;
 			}
@@ -367,7 +408,9 @@ async function fromThemeScreenshots( count, rng ) {
  * @return {Promise<Array>} Corpus entries.
  */
 async function fromPluginBanners( count, rng ) {
-	const perPage = 40;
+	// Only a fraction of plugins publish a high-resolution banner, so a run
+	// asking for a lot of them needs a page big enough to find them in.
+	const perPage = Math.min( 100, Math.max( 40, count * 3 ) );
 	const page = 1 + Math.floor( rng() * 60 );
 	const url =
 		'https://api.wordpress.org/plugins/info/1.2/?action=query_plugins' +
@@ -496,13 +539,13 @@ export async function buildCorpus( {
 
 	const collected = [];
 
-	for ( const [ index, key ] of enabled.entries() ) {
+	for ( const key of enabled ) {
 		const source = SOURCES[ key ];
-		// The last source absorbs the rounding remainder so the run hits `count`.
-		const wanted =
-			index === enabled.length - 1
-				? count - collected.length
-				: Math.round( ( count * source.share ) / totalShare );
+		// Strictly by share. Letting the last source absorb whatever the others
+		// came up short by means one failing source silently rewrites the mix,
+		// and the source that ends up last is not necessarily one that can
+		// usefully supply the difference.
+		const wanted = Math.round( ( count * source.share ) / totalShare );
 
 		if ( wanted <= 0 ) {
 			continue;
@@ -511,7 +554,14 @@ export async function buildCorpus( {
 		onLog( `Collecting ${ wanted } from ${ source.label }…` );
 
 		try {
-			collected.push( ...( await source.collect( wanted, rng, shape ) ) );
+			const entries = await source.collect( wanted, rng, shape );
+			collected.push( ...entries );
+
+			if ( entries.length < wanted ) {
+				onLog(
+					`  only ${ entries.length } of ${ wanted } available from ${ source.label }`
+				);
+			}
 		} catch ( error ) {
 			onLog( `  ! ${ source.label } failed: ${ error.message }` );
 		}

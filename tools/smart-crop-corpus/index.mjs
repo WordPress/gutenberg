@@ -57,6 +57,16 @@ const SIZES = {
 const OVER_COLLECT = 1.8;
 
 /**
+ * Sources a run draws from unless told otherwise.
+ *
+ * `themes` is left out. Theme screenshots are 1200x900 by convention, so the
+ * default shape gate rejects effectively all of them, and including them would
+ * spend a run's downloads on images that never get graded. Ask for them
+ * explicitly alongside a lower `--min-aspect`.
+ */
+const DEFAULT_SOURCES = [ 'photos', 'plugins', 'cropping' ];
+
+/**
  * Mean share of the source that survives the crop, across every comparison.
  *
  * @param {Array} rows Comparison rows.
@@ -82,7 +92,7 @@ function percent( value ) {
 const DEFAULTS = {
 	count: 20,
 	sizes: 'focus',
-	sources: Object.keys( SOURCES ).join( ',' ),
+	sources: DEFAULT_SOURCES.join( ',' ),
 	out: 'artifacts/smart-crop',
 	quality: 82,
 	concurrency: 6,
@@ -201,7 +211,7 @@ async function main() {
 				) } (default ${ DEFAULTS.sizes })`,
 				`  --sources LIST   any of ${ Object.keys( SOURCES ).join(
 					', '
-				) }`,
+				) } (default ${ DEFAULT_SOURCES.join( ',' ) })`,
 				'  --seed STRING    reproduce a previous run (default: random)',
 				'  --out DIR        output directory (default artifacts/smart-crop)',
 				'  --quality N      JPEG quality for review renditions (default 82)',
