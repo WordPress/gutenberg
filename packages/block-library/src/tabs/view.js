@@ -155,28 +155,22 @@ const { actions, state } = store(
 				}
 			},
 			activateTabByHash: () => {
-				if ( ! window?.location?.hash?.length ) {
-					return;
-				}
-
 				const { tabsList } = state;
 
 				if ( ! tabsList || tabsList.length === 0 ) {
 					return;
 				}
 
-				const hash = decodeURIComponent(
-					window.location.hash.slice( 1 )
-				);
-
-				const panelIndex = tabsList.findIndex( ( t ) => t === hash );
-				if ( panelIndex >= 0 ) {
-					actions.setActiveTab( panelIndex, true );
+				const targetElement = document.querySelector( ':target' );
+				if ( ! targetElement ) {
 					return;
 				}
 
-				const targetElement = document.getElementById( hash );
-				if ( ! targetElement ) {
+				const panelIndex = tabsList.findIndex(
+					( t ) => t === targetElement.id
+				);
+				if ( panelIndex >= 0 ) {
+					actions.setActiveTab( panelIndex, true );
 					return;
 				}
 
