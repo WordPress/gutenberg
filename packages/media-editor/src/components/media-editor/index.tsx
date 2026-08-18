@@ -544,6 +544,12 @@ function MediaEditorContent( {
 	};
 
 	const handleKeyDown = ( event: ReactKeyboardEvent< HTMLElement > ) => {
+		// Ignore events from nested components rendered outside this modal's DOM,
+		// such as portaled dialogs.
+		if ( ! event.currentTarget.contains( event.target as Node ) ) {
+			return;
+		}
+
 		const isUndoShortcut = isKeyboardEvent.primary( event, 'z' );
 		const isRedoShortcut =
 			isKeyboardEvent.primaryShift( event, 'z' ) ||
