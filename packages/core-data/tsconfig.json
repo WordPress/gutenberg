@@ -1,34 +1,30 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
+	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
-		"checkJs": false,
-		"noImplicitAny": false,
 		"types": [ "jest", "node" ]
 	},
 	"references": [
-		{ "path": "../api-fetch" },
+		{ "path": "./tsconfig.build.json" },
+		{ "path": "../api-fetch/tsconfig.build.json" },
 		{ "path": "../components" },
 		{ "path": "../block-editor" },
 		{ "path": "../blocks" },
-		{ "path": "../compose" },
+		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../data" },
-		{ "path": "../deprecated" },
-		{ "path": "../element" },
-		{ "path": "../global-styles-engine" },
-		{ "path": "../html-entities" },
-		{ "path": "../i18n" },
+		{ "path": "../deprecated/tsconfig.build.json" },
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../global-styles-engine/tsconfig.build.json" },
+		{ "path": "../html-entities/tsconfig.build.json" },
+		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons" },
 		{ "path": "../is-shallow-equal" },
-		{ "path": "../notices" },
+		{ "path": "../notices/tsconfig.build.json" },
 		{ "path": "../private-apis" },
 		{ "path": "../rich-text" },
-		{ "path": "../sync" },
+		{ "path": "../sync/tsconfig.build.json" },
 		{ "path": "../undo-manager" },
 		{ "path": "../url" },
 		{ "path": "../warning" }
-	],
-	"exclude": [
-		"src/**/test/**/*.js" // only exclude js files, ts files should be checked
 	]
 }

@@ -4,14 +4,24 @@
 	"compilerOptions": {
 		"noEmit": true,
 		"emitDeclarationOnly": false,
+		"checkJs": false,
 		"types": [ "jest" ]
 	},
+	/*
+	 * JavaScript dev files stay unchecked: `checkJs` would report errors in
+	 * files the build never checked either.
+	 */
 	"include": [
-		"${configDir}/src/**/test/**/*",
-		"${configDir}/src/**/tests/**/*",
-		"${configDir}/src/**/__tests__/**/*",
-		"${configDir}/src/**/stories/**/*",
-		"${configDir}/src/**/*.story.*"
+		"${configDir}/src/**/test/**/*.ts",
+		"${configDir}/src/**/test/**/*.tsx",
+		"${configDir}/src/**/tests/**/*.ts",
+		"${configDir}/src/**/tests/**/*.tsx",
+		"${configDir}/src/**/__tests__/**/*.ts",
+		"${configDir}/src/**/__tests__/**/*.tsx",
+		"${configDir}/src/**/stories/**/*.ts",
+		"${configDir}/src/**/stories/**/*.tsx",
+		"${configDir}/src/**/*.story.ts",
+		"${configDir}/src/**/*.story.tsx"
 	],
 	"exclude": [ "**/benchmark" ]
 }
