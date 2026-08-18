@@ -102,6 +102,36 @@ describe( 'Menu', () => {
 		expect( screen.getByRole( 'separator' ) ).toBeVisible();
 	} );
 
+	it( 'supports rendering the trigger as a non-native button', () => {
+		render(
+			<Menu.Root>
+				<Menu.Trigger nativeButton={ false } render={ <div /> }>
+					Actions
+				</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.Item>Duplicate</Menu.Item>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		const trigger = screen.getByRole( 'button', { name: 'Actions' } );
+		expect( trigger.tagName ).toBe( 'DIV' );
+	} );
+
+	it( 'does not expose detached trigger props', () => {
+		const triggerWithHandle = (
+			// @ts-expect-error Menu does not expose Base UI's handle utility.
+			<Menu.Trigger handle={ undefined }>Actions</Menu.Trigger>
+		);
+		const triggerWithPayload = (
+			// @ts-expect-error Menu roots do not support trigger payloads.
+			<Menu.Trigger payload={ undefined }>Actions</Menu.Trigger>
+		);
+
+		expect( triggerWithHandle ).toBeDefined();
+		expect( triggerWithPayload ).toBeDefined();
+	} );
+
 	it( 'closes when Escape is pressed', async () => {
 		const user = userEvent.setup();
 

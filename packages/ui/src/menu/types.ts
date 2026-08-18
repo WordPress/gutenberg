@@ -7,13 +7,8 @@ export type PortalProps = ComponentProps< typeof _Menu.Portal >;
 
 export type PositionerProps = ComponentProps< typeof _Menu.Positioner >;
 
-/*
- * Keep these compound-component surfaces explicit. Base UI's detached
- * trigger/payload APIs require handle utilities that Menu does not expose, and
- * horizontal orientation is not supported by the styled Menu layout. Using
- * allowlists also prevents future Base UI props from becoming public here
- * without an intentional API decision.
- */
+// Keep the menu vertical, expose Escape bubbling only on SubmenuRoot, and omit
+// Base UI's detached-trigger handle and payload-rendering API.
 export interface RootProps
 	extends Pick<
 		_Menu.Root.Props,
@@ -35,15 +30,20 @@ export interface RootProps
 	children?: ReactNode;
 }
 
-export interface TriggerProps
-	extends ComponentProps< 'button' >,
-		Pick< _Menu.Trigger.Props, 'openOnHover' | 'delay' | 'closeDelay' > {
+// Detached triggers require handle utilities and payload roots that Menu does
+// not expose.
+export type TriggerProps = Omit<
+	ComponentProps< typeof _Menu.Trigger >,
+	'handle' | 'payload'
+> & {
 	/**
 	 * The content to be rendered inside the trigger.
 	 */
 	children?: ReactNode;
-}
+};
 
+// Keep submenus vertical; horizontal orientation is not supported by the
+// styled Menu layout.
 export interface SubmenuRootProps
 	extends Pick<
 		_Menu.SubmenuRoot.Props,
