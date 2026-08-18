@@ -157,7 +157,7 @@ export function MediaEditorModal( {
 				historyActions,
 				saveActions,
 				imageControls,
-				footerLayout,
+				layout,
 				onRequestClose,
 				onKeyDown,
 				shouldCloseOnClickOutside,
@@ -178,7 +178,7 @@ export function MediaEditorModal( {
 					>
 						{ children }
 						<ModalFooter
-							layout={ footerLayout }
+							layout={ layout }
 							historyActions={ historyActions }
 							saveActions={ saveActions }
 							imageControls={ imageControls }

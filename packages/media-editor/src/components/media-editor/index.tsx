@@ -79,23 +79,22 @@ export interface MediaEditorFrameProps {
 	 */
 	saveActions: ReactNode;
 	/**
-	 * Rotate / flip / zoom and the aspect-ratio control, as a flat toolbar.
-	 * `null` for non-image media.
+	 * Rotate / flip / zoom and the aspect-ratio control, as a flat toolbar —
+	 * but only when placing them is the frame's job. `null` for non-image
+	 * media, and `null` in the `wide` layout, where the Crop panel renders
+	 * them itself.
 	 *
-	 * Render this only when `footerLayout` is `narrow`: above that breakpoint
-	 * the Crop panel renders these itself. Below it the panel is gone, so a
-	 * frame that never places this leaves the transform controls unreachable.
+	 * Frames render this wherever it suits them without checking the layout;
+	 * a frame that never places it leaves the transform controls unreachable
+	 * once the Crop panel is gone.
 	 */
 	imageControls: ReactNode;
 	/**
-	 * Layout selector, tracking the sidebar-collapse breakpoint (`small`).
-	 * Frames arrange the action clusters to suit:
-	 *
-	 * - `wide`   — sidebar is a column, so the transform controls live in the
-	 *              Crop panel and `imageControls` should not be rendered.
-	 * - `narrow` — sidebar is collapsed, so `imageControls` needs a home.
+	 * Which layout the editor is in, tracking the sidebar-collapse breakpoint
+	 * (`small`). `wide` is a side-by-side canvas and sidebar; `narrow` stacks,
+	 * leaving the frame to house the clusters the Crop panel no longer holds.
 	 */
-	footerLayout: 'wide' | 'narrow';
+	layout: 'wide' | 'narrow';
 	onRequestClose: () => void;
 	onKeyDown: ( event: ReactKeyboardEvent< HTMLElement > ) => void;
 	shouldCloseOnClickOutside: boolean;
@@ -390,11 +389,11 @@ function MediaEditorContent( {
 	// to an overlay below it — mirroring InterfaceSkeleton's behaviour, shifted
 	// from `medium` to `small` (see the matching CSS overrides in style.scss).
 	// Track that single breakpoint: in "panel mode" (≥ small) the
-	// rotate/flip/zoom controls live in the Crop panel and the footer is just
-	// History + Cancel/Save; below it the controls drop into the footer. (The
-	// fine-rotation ruler always sits under the canvas.)
+	// rotate/flip/zoom controls live in the Crop panel; below it they have no
+	// panel to live in and the frame places them instead. (The fine-rotation
+	// ruler always sits under the canvas.)
 	const isPanelLayout = useViewportMatch( 'small' );
-	const footerLayout: 'wide' | 'narrow' = isPanelLayout ? 'wide' : 'narrow';
+	const layout: 'wide' | 'narrow' = isPanelLayout ? 'wide' : 'narrow';
 
 	const { media, hasEdits } = useSelect(
 		( select ) => {
@@ -741,8 +740,10 @@ function MediaEditorContent( {
 		),
 		historyActions: history,
 		saveActions: actions,
-		imageControls,
-		footerLayout,
+		// Withheld in the `wide` layout: the Crop panel already renders these,
+		// so the frame has nothing to place.
+		imageControls: layout === 'narrow' ? imageControls : null,
+		layout,
 		onRequestClose: handleRequestClose,
 		onKeyDown: handleKeyDown,
 		shouldCloseOnClickOutside: ! hasChanges && ! isSaving,

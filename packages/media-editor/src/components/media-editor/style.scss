@@ -209,16 +209,3 @@
 .media-editor__snackbar {
 	@include snackbar-container();
 }
-
-// Active (enabled) undo/redo icon buttons take the admin accent colour so
-// they read as live alongside the Reset/Cancel/Save actions. Disabled
-// buttons (rendered with `aria-disabled` via `accessibleWhenDisabled`)
-// keep the default muted icon colour.
-// Deliberately outside `.media-editor`: each frame places this cluster in its
-// own chrome — the modal's footer, the route's page header — so neither is a
-// descendant of the editor itself.
-// NOTE: overrides @wordpress/components Button internals (`.components-button`,
-// `.has-icon`), scoped to our history-actions wrapper. Update if renamed.
-.media-editor__history-actions .components-button.has-icon:not([aria-disabled="true"]) {
-	color: var(--wp-admin-theme-color);
-}

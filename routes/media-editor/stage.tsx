@@ -89,7 +89,7 @@ function MediaEditorRoute() {
 				historyActions,
 				saveActions,
 				imageControls,
-				footerLayout,
+				layout,
 				onKeyDown,
 			} ) => {
 				// Below the sidebar-collapse breakpoint the header has no room
@@ -98,7 +98,7 @@ function MediaEditorRoute() {
 				// toggle, in a single row that does not wrap. History joins the
 				// transform controls in a bar under the canvas instead, which
 				// is what the modal's narrow footer does.
-				const isNarrow = footerLayout === 'narrow';
+				const isNarrow = layout === 'narrow';
 				return (
 					// The keydown handler covers the whole frame, not just the
 					// canvas: undo/redo live in the header, so after clicking
