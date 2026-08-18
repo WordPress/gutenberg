@@ -36,7 +36,7 @@
 		{ "path": "packages/eslint-plugin" },
 		{ "path": "packages/fields" },
 		{ "path": "packages/global-styles-engine/tsconfig.build.json" },
-		{ "path": "packages/global-styles-ui" },
+		{ "path": "packages/global-styles-ui/tsconfig.build.json" },
 		{ "path": "packages/grid/tsconfig.build.json" },
 		{ "path": "packages/hooks" },
 		{ "path": "packages/html-entities/tsconfig.build.json" },

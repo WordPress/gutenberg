@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Font Library: Escape uploaded font family names into CSS values before sending them to the server, and decode the escapes when loading font previews, so fonts whose names contain special characters (quotes, ampersands, angle brackets, …) install and render correctly instead of producing broken CSS ([#76782](https://github.com/WordPress/gutenberg/pull/76782)).
+
 ### Enhancements
 
 -   Expose typography and color controls for citations, inputs, and selects in Global Styles ([#80852](https://github.com/WordPress/gutenberg/pull/80852)).

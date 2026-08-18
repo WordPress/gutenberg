@@ -76,10 +76,44 @@ export function formatFontFamily( input: string ) {
 }
 
 /*
+ * Decode CSS escape sequences (`\XXXXXX` fixed six-digit form or `\X…` with
+ * an optional whitespace terminator) into their literal characters.
+ *
+ * Uploaded font family names are stored as escaped CSS values (see
+ * `createCssString`), but the `FontFace` API expects a plain family name, so
+ * the escapes must be reversed before the name reaches the browser API.
+ * https://www.w3.org/TR/css-syntax-3/#consume-escaped-code-point
+ *
+ * @param {string} input - CSS text possibly containing escape sequences.
+ * @return {string} The input with escape sequences decoded.
+ */
+function decodeCssEscapes( input: string ) {
+	return input.replace(
+		/\\([0-9a-fA-F]{1,6})[\t\n\f\r ]?|\\([^0-9a-fA-F\n])/g,
+		( _match, hex, literal ) => {
+			if ( hex === undefined ) {
+				return literal;
+			}
+			const codePoint = parseInt( hex, 16 );
+			// NULL, surrogates, and out-of-range code points decode to U+FFFD.
+			if (
+				codePoint === 0 ||
+				codePoint > 0x10ffff ||
+				( codePoint >= 0xd800 && codePoint <= 0xdfff )
+			) {
+				return '�';
+			}
+			return String.fromCodePoint( codePoint );
+		}
+	);
+}
+
+/*
  * Format the font face name to use in the font-family property of a font face.
  *
  * The input can be a string with the font face name or a string with multiple font face names separated by commas.
- * It removes the leading and trailing quotes from the font face name.
+ * It removes the leading and trailing quotes from the font face name and
+ * decodes CSS escape sequences into the plain family name.
  *
  * @param {string} input - The font face name.
  * @return {string} The formatted font face name.
@@ -88,6 +122,7 @@ export function formatFontFamily( input: string ) {
  * formatFontFaceName("Open Sans") => "Open Sans"
  * formatFontFaceName("'Open Sans', sans-serif") => "Open Sans"
  * formatFontFaceName(", 'Open Sans', 'Helvetica Neue', sans-serif") => "Open Sans"
+ * formatFontFaceName('"O\\000027Reilly\\000020Sans"') => "O'Reilly Sans"
  */
 export function formatFontFaceName( input: string ) {
 	if ( ! input ) {
@@ -105,6 +140,8 @@ export function formatFontFaceName( input: string ) {
 	}
 	// removes leading and trailing quotes.
 	output = output.replace( /^["']|["']$/g, '' );
+
+	output = decodeCssEscapes( output );
 
 	// Firefox needs the font name to be wrapped in double quotes meanwhile other browsers don't.
 	if ( window.navigator.userAgent.toLowerCase().includes( 'firefox' ) ) {
