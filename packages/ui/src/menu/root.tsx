@@ -21,7 +21,7 @@ import type { RootProps } from './types';
  * ```
  */
 function Root( props: RootProps ) {
-	const { highlightItemOnHover = false, onOpenChange, ...rootProps } = props;
+	const { onOpenChange, ...rootProps } = props;
 
 	const handleOpenChange: NonNullable< RootProps[ 'onOpenChange' ] > = (
 		open,
@@ -65,7 +65,6 @@ function Root( props: RootProps ) {
 			<MenuContext.Provider value={ { isSubmenu: false } }>
 				<_Menu.Root
 					{ ...rootProps }
-					highlightItemOnHover={ highlightItemOnHover }
 					onOpenChange={ handleOpenChange }
 				/>
 			</MenuContext.Provider>

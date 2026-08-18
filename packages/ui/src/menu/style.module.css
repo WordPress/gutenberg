@@ -154,22 +154,14 @@
 				grid-template-columns: subgrid;
 			}
 
-			&[data-highlighted] {
-				--_gcd-a-outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
-
-				outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
-				outline-offset: var(--wpds-border-width-focus);
-
-				@media ( forced-colors: active ) {
-					--_gcd-a-outline: var(--wpds-border-width-focus) solid Highlight;
-
-					outline-color: Highlight;
-				}
-			}
-
-			&:hover:not([aria-disabled]) {
+			&[data-highlighted]:not([aria-disabled]) {
 				background-color: var(--wpds-color-background-interactive-brand-weak-active);
 				color: var(--wpds-color-foreground-interactive-neutral);
+				outline: none;
+
+				@media ( forced-colors: active ) {
+					outline: var(--wpds-border-width-xs) solid Highlight;
+				}
 			}
 
 			&[aria-disabled] {
@@ -181,17 +173,6 @@
 				}
 			}
 
-		}
-
-		/*
-		 * `highlightItemOnHover={ false }` keeps keyboard highlighting on the
-		 * focused item while CSS handles pointer hover. Hide the stale keyboard
-		 * ring only while the pointer is over a different item.
-		 */
-		.list:has(.item:hover:not([data-highlighted])) .item[data-highlighted] {
-			--_gcd-a-outline: var(--wpds-border-width-focus) solid transparent;
-
-			outline-color: transparent;
 		}
 
 		/*
@@ -338,12 +319,12 @@
 			content: "\2196";
 		}
 
-		.item:hover:not([aria-disabled]) .item-prefix,
-		.item:hover:not([aria-disabled]) .item-description,
-		.item:hover:not([aria-disabled]) .item-suffix,
-		.item:hover:not([aria-disabled]) .item-shortcut,
-		.item:hover:not([aria-disabled]) .item-trailing,
-		.item:hover:not([aria-disabled]) .item-selection-indicator,
+		.item[data-highlighted]:not([aria-disabled]) .item-prefix,
+		.item[data-highlighted]:not([aria-disabled]) .item-description,
+		.item[data-highlighted]:not([aria-disabled]) .item-suffix,
+		.item[data-highlighted]:not([aria-disabled]) .item-shortcut,
+		.item[data-highlighted]:not([aria-disabled]) .item-trailing,
+		.item[data-highlighted]:not([aria-disabled]) .item-selection-indicator,
 		.item[aria-disabled] .item-prefix,
 		.item[aria-disabled] .item-description,
 		.item[aria-disabled] .item-suffix,
