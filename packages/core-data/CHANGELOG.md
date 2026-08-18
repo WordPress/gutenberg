@@ -5,6 +5,7 @@
 ### Internal
 
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+-   Gate entity sync configuration and sync manager creation on the `window.__experimentalEnableRealTimeCollaboration` flag set by the Real-Time Collaboration experiment, replacing the `window._wpCollaborationEnabled` option flag ([#80658](https://github.com/WordPress/gutenberg/pull/80658)).
 
 ## 7.53.0 (2026-08-12)
 
