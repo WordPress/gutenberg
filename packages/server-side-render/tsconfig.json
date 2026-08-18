@@ -1,18 +1,19 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
+	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
-		"types": [ "gutenberg-env", "gutenberg-test-env", "jest" ]
+		"types": [ "jest", "gutenberg-env" ]
 	},
 	"references": [
-		{ "path": "../api-fetch" },
+		{ "path": "./tsconfig.build.json" },
+		{ "path": "../api-fetch/tsconfig.build.json" },
 		{ "path": "../blocks" },
 		{ "path": "../components" },
-		{ "path": "../compose" },
+		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../data" },
-		{ "path": "../deprecated" },
-		{ "path": "../element" },
-		{ "path": "../i18n" },
+		{ "path": "../deprecated/tsconfig.build.json" },
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../url" }
 	]
 }

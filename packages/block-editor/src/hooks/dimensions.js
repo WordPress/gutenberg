@@ -19,6 +19,7 @@ import {
 	setStyleForState,
 	useBlockStyleState,
 } from './block-style-state';
+import { isAxialBlockGapAllowed } from './gap';
 
 export const DIMENSIONS_SUPPORT_KEY = 'dimensions';
 export const SPACING_SUPPORT_KEY = 'spacing';
@@ -68,7 +69,7 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 	const selectedState = useBlockStyleState();
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 	const isEnabled = useHasDimensionsPanel( settings, selectedState );
-	const { style, className } = useSelect(
+	const { style, className, layout } = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled
 			if ( ! isEnabled ) {
@@ -79,6 +80,7 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 			return {
 				style: attributes.style,
 				className: attributes.className,
+				layout: attributes.layout,
 			};
 		},
 		[ clientId, isEnabled ]
@@ -118,6 +120,7 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 		SPACING_SUPPORT_KEY,
 		'__experimentalDefaultControls',
 	] );
+	const { default: defaultLayout } = getBlockSupport( name, 'layout' ) || {};
 	const defaultControls = {
 		// In the block inspector, minHeight and minWidth should not
 		// be shown by default unless the block explicitly opts in.
@@ -133,6 +136,10 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 				as={ DimensionsInspectorControl }
 				panelId={ clientId }
 				settings={ settings }
+				allowAxialBlockGap={ isAxialBlockGapAllowed(
+					layout,
+					defaultLayout
+				) }
 				value={ value }
 				onChange={ onChange }
 				defaultControls={ defaultControls }
