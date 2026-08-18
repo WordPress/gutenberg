@@ -53,11 +53,12 @@
 
 		/*
 		 * The list is the implicit alignment group for direct items. Explicit
-		 * groups each establish an independent prefix track while inheriting the
-		 * menu-wide selection tracks. Radio groups are transparent to layout.
+		 * groups and radio groups each establish an independent prefix track while
+		 * inheriting the menu-wide selection tracks.
 		 */
 		.list,
-		.group {
+		.group,
+		.radio-group {
 			--wp-ui-menu-group-prefix-gap: 0px;
 
 			display: grid;
@@ -73,18 +74,14 @@
 			min-width: 0;
 		}
 
-		.group {
+		.group,
+		.radio-group {
 			grid-column: 1 / -1;
 		}
 
-		.radio-group {
-			display: contents;
-		}
-
 		.list:has(> .item > .item-prefix),
-		.list:has(> .radio-group > .item > .item-prefix),
 		.group:has(> .item > .item-prefix),
-		.group:has(> .radio-group > .item > .item-prefix) {
+		.radio-group:has(> .item > .item-prefix) {
 			--wp-ui-menu-group-prefix-gap: var(--wpds-dimension-gap-xs);
 		}
 

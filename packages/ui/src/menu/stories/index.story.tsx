@@ -146,27 +146,25 @@ export const Default: Story = {
 					</Menu.Group>
 					<Menu.Separator />
 					<Menu.RadioGroup value={ view } onValueChange={ setView }>
-						<Menu.Group>
-							<Menu.GroupLabel>View</Menu.GroupLabel>
-							<Menu.RadioItem
-								value="list"
-								prefix={ <Icon icon={ archive } /> }
-							>
-								<Menu.ItemLabel>List</Menu.ItemLabel>
-								<Menu.ItemDescription>
-									Show compact rows.
-								</Menu.ItemDescription>
-							</Menu.RadioItem>
-							<Menu.RadioItem
-								value="grid"
-								prefix={ <Icon icon={ archive } /> }
-							>
-								<Menu.ItemLabel>Grid</Menu.ItemLabel>
-								<Menu.ItemDescription>
-									Show larger preview tiles.
-								</Menu.ItemDescription>
-							</Menu.RadioItem>
-						</Menu.Group>
+						<Menu.GroupLabel>View</Menu.GroupLabel>
+						<Menu.RadioItem
+							value="list"
+							prefix={ <Icon icon={ archive } /> }
+						>
+							<Menu.ItemLabel>List</Menu.ItemLabel>
+							<Menu.ItemDescription>
+								Show compact rows.
+							</Menu.ItemDescription>
+						</Menu.RadioItem>
+						<Menu.RadioItem
+							value="grid"
+							prefix={ <Icon icon={ archive } /> }
+						>
+							<Menu.ItemLabel>Grid</Menu.ItemLabel>
+							<Menu.ItemDescription>
+								Show larger preview tiles.
+							</Menu.ItemDescription>
+						</Menu.RadioItem>
 					</Menu.RadioGroup>
 					<Menu.Separator />
 					<Menu.SubmenuRoot>
@@ -447,63 +445,58 @@ export const RadioItems: Story = {
 			<Menu.Root>
 				<Menu.Trigger>View options</Menu.Trigger>
 				<Menu.Popup>
-					<Menu.Group>
+					<Menu.RadioGroup
+						value={ alignment }
+						onValueChange={ setAlignment }
+					>
 						<Menu.GroupLabel>Alignment</Menu.GroupLabel>
-
-						<Menu.RadioGroup
-							value={ alignment }
-							onValueChange={ setAlignment }
+						<Menu.RadioItem
+							value="left"
+							prefix={ <Icon icon={ alignLeft } /> }
 						>
-							<Menu.RadioItem
-								value="left"
-								prefix={ <Icon icon={ alignLeft } /> }
-							>
-								<Menu.ItemLabel>Left</Menu.ItemLabel>
-							</Menu.RadioItem>
-							<Menu.RadioItem
-								value="center"
-								prefix={ <Icon icon={ alignCenter } /> }
-							>
-								<Menu.ItemLabel>Center</Menu.ItemLabel>
-							</Menu.RadioItem>
-							<Menu.RadioItem
-								value="right"
-								prefix={ <Icon icon={ alignRight } /> }
-							>
-								<Menu.ItemLabel>Right</Menu.ItemLabel>
-							</Menu.RadioItem>
-						</Menu.RadioGroup>
-						<Menu.Item>Reset alignment</Menu.Item>
-					</Menu.Group>
+							<Menu.ItemLabel>Left</Menu.ItemLabel>
+						</Menu.RadioItem>
+						<Menu.RadioItem
+							value="center"
+							prefix={ <Icon icon={ alignCenter } /> }
+						>
+							<Menu.ItemLabel>Center</Menu.ItemLabel>
+						</Menu.RadioItem>
+						<Menu.RadioItem
+							value="right"
+							prefix={ <Icon icon={ alignRight } /> }
+						>
+							<Menu.ItemLabel>Right</Menu.ItemLabel>
+						</Menu.RadioItem>
+					</Menu.RadioGroup>
+					<Menu.Item>Reset alignment</Menu.Item>
 					<Menu.Separator />
 					<Menu.RadioGroup
 						value={ density }
 						onValueChange={ setDensity }
 					>
-						<Menu.Group>
-							<Menu.GroupLabel>Density</Menu.GroupLabel>
-							<Menu.RadioItem value="compact">
-								<Menu.ItemLabel>Compact</Menu.ItemLabel>
-								<Menu.ItemDescription>
-									Show shorter rows.
-								</Menu.ItemDescription>
-							</Menu.RadioItem>
-							<Menu.RadioItem
-								value="comfortable"
-								shortcut={ SHORTCUTS.comfortableDensity }
-							>
-								<Menu.ItemLabel>Comfortable</Menu.ItemLabel>
-								<Menu.ItemDescription>
-									Show more spacing between rows.
-								</Menu.ItemDescription>
-							</Menu.RadioItem>
-							<Menu.RadioItem value="spacious">
-								<Menu.ItemLabel>Spacious</Menu.ItemLabel>
-								<Menu.ItemDescription>
-									Show the largest row spacing.
-								</Menu.ItemDescription>
-							</Menu.RadioItem>
-						</Menu.Group>
+						<Menu.GroupLabel>Density</Menu.GroupLabel>
+						<Menu.RadioItem value="compact">
+							<Menu.ItemLabel>Compact</Menu.ItemLabel>
+							<Menu.ItemDescription>
+								Show shorter rows.
+							</Menu.ItemDescription>
+						</Menu.RadioItem>
+						<Menu.RadioItem
+							value="comfortable"
+							shortcut={ SHORTCUTS.comfortableDensity }
+						>
+							<Menu.ItemLabel>Comfortable</Menu.ItemLabel>
+							<Menu.ItemDescription>
+								Show more spacing between rows.
+							</Menu.ItemDescription>
+						</Menu.RadioItem>
+						<Menu.RadioItem value="spacious">
+							<Menu.ItemLabel>Spacious</Menu.ItemLabel>
+							<Menu.ItemDescription>
+								Show the largest row spacing.
+							</Menu.ItemDescription>
+						</Menu.RadioItem>
 					</Menu.RadioGroup>
 				</Menu.Popup>
 			</Menu.Root>

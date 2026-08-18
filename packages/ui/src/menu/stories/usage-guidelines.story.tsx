@@ -128,15 +128,11 @@ export const CheckedOptionsWithinACommandMenu: Story = {
 						value={ density }
 						onValueChange={ setDensity }
 					>
-						<Menu.Group>
-							<Menu.GroupLabel>Density</Menu.GroupLabel>
-							<Menu.RadioItem value="compact">
-								Compact
-							</Menu.RadioItem>
-							<Menu.RadioItem value="comfortable">
-								Comfortable
-							</Menu.RadioItem>
-						</Menu.Group>
+						<Menu.GroupLabel>Density</Menu.GroupLabel>
+						<Menu.RadioItem value="compact">Compact</Menu.RadioItem>
+						<Menu.RadioItem value="comfortable">
+							Comfortable
+						</Menu.RadioItem>
 					</Menu.RadioGroup>
 				</Menu.Popup>
 			</Menu.Root>
