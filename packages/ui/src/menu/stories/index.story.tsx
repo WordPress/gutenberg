@@ -43,7 +43,7 @@ const meta: Meta< typeof Menu.Root > = {
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',
-			notes: 'Not yet recommended while the APIs are still in flux and early Gutenberg migrations are being evaluated. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
+			notes: 'Not yet recommended while the APIs are still in flux, early Gutenberg migrations are being evaluated, and compatibility with overlays from `@wordpress/components` remains under review. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
