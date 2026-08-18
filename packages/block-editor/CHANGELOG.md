@@ -6,6 +6,10 @@
 
 -   Register and handle the keyboard shortcuts that blocks declare on their variations and transforms, so that any block can contribute a shortcut without the editor knowing about it. Shortcuts apply to the selected block, and are listed under "Block shortcuts" in the keyboard shortcuts help modal ([#81588](https://github.com/WordPress/gutenberg/pull/81588)).
 
+### Enhancements
+
+-   Show separate horizontal and vertical block spacing controls in the block inspector only for Flex and Grid layouts, while retaining axial gap support in Global Styles. Responsive Grid column calculations use the horizontal gap, while Flow and Constrained layouts use the vertical gap when receiving an axial value ([#81476](https://github.com/WordPress/gutenberg/pull/81476)).
+
 ### Bug Fixes
 
 -   `InnerBlocks`: Resolve the `default` of a block's `layout` support before providing it to inner blocks. A block that declared its layout only as a support default, such as the Gallery, previously handed its children the raw support config, which has no `type`, so the children resolved to the flow layout instead. As a result an Image nested in a Gallery offered left/center/right alignment, which the flex layout does not permit ([#81606](https://github.com/WordPress/gutenberg/pull/81606)).

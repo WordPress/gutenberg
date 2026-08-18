@@ -814,7 +814,7 @@ An advanced block that allows displaying post types based on different query par
 
 -	**Name:** [core/query](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** align (full, wide), anchor, interactivity, layout, ~~html~~
+-	**Supports:** align (full, wide), anchor, interactivity, layout, spacing (blockGap), ~~html~~
 -	**Attributes:** enhancedPagination, namespace, query, queryId, tagName
 
 ## No Results
