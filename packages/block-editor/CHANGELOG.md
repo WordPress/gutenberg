@@ -31,6 +31,7 @@
 -   Client-side media processing: Refuse a batch of more than one file when the caller only takes one, such as a Cover block placeholder, matching what the server-side upload path already did. Every dropped file was uploaded instead, and the block kept whichever one finished last ([#82041](https://github.com/WordPress/gutenberg/issues/82041)).
 -   `BlockVariationPicker`: Set icon colors with `color` so stroke-based variation icons retain their intended unfilled appearance, while keeping a non-important `fill` fallback for third-party icons that do not use `currentColor`. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 -   `BlockIcon`, List View: Remove the obsolete `fill: CanvasText` override for forced colors mode. ([#82481](https://github.com/WordPress/gutenberg/pull/82481))
+-   Read a block's position from the block refs registry when working out a drop target, rather than looking the element up by its `block-` id. Live block previews render the same blocks, and so the same ids, which made a drop inside a Post Template resolve against a preview of another post whenever the post being edited was not the first one in the loop ([#73239](https://github.com/WordPress/gutenberg/issues/73239)).
 
 ### Internal
 
