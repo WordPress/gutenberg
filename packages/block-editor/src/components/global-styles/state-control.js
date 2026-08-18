@@ -49,8 +49,18 @@ export default function StateControl( {
 
 	const hasViewportOptions = viewportStates.length > 0;
 	const hasPseudoStateOptions = pseudoStates.length > 0;
-	const triggerLabel = __( 'States' );
 	const activeStates = [];
+
+	let triggerLabel;
+	if ( hasViewportOptions && hasPseudoStateOptions ) {
+		triggerLabel = __( 'Styling variants' );
+	} else if ( hasViewportOptions ) {
+		triggerLabel = __( 'Viewports' );
+	} else if ( hasPseudoStateOptions ) {
+		triggerLabel = __( 'States' );
+	} else {
+		triggerLabel = __( 'States' );
+	}
 
 	if ( hasViewportOptions && viewportValue !== 'default' ) {
 		const selectedViewport = viewportOptions.find(
