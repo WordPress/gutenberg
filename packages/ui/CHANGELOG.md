@@ -4,6 +4,21 @@
 
 ### Breaking Changes
 
+-   `Select.Item`: Remove `'compact'` from the `size` prop. Use `'default'` instead ([#81354](https://github.com/WordPress/gutenberg/pull/81354)).
+-   `Combobox.Item`, `SelectControl.Item`: The `size` prop is removed ([#81354](https://github.com/WordPress/gutenberg/pull/81354)).
+
+### Enhancements
+
+-   `Select.Item`, `Combobox.Item`, and `Autocomplete.Item`: Default item height is now 32px (previously 40px) ([#81354](https://github.com/WordPress/gutenberg/pull/81354)).
+
+### Internal
+
+-   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509), [#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 0.20.0 (2026-08-12)
+
+### Breaking Changes
+
 -   `IconButton`: Require `shortcut.label` for a human-readable accessible shortcut description. Generate it with `shortcutAriaLabel` from `@wordpress/keycodes`. ([#80402](https://github.com/WordPress/gutenberg/pull/80402))
 
 ### Enhancements
