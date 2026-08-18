@@ -63,3 +63,34 @@ export function getComputedAcceptAttribute(
 
 	return allowedTypes.map( ( type ) => `${ type }/*` ).join( ',' );
 }
+
+/**
+ * Decides whether a block drag may be dropped on a media placeholder.
+ *
+ * Block names are accepted either fully qualified (`core/image`, as reported
+ * by the block editor store for canvas drags) or bare (`image`, as advertised
+ * in the `dataTransfer` type names of inserter drags).
+ *
+ * @param {Object}   options
+ * @param {string[]} options.blockNames   Names of the blocks being dragged.
+ * @param {string[]} options.allowedTypes Media types the placeholder accepts.
+ * @param {boolean}  options.multiple     Whether more than one item is
+ *                                        accepted.
+ *
+ * @return {boolean} Whether the drag is eligible.
+ */
+export function isMediaDragEligible( { blockNames, allowedTypes, multiple } ) {
+	// An unidentified drag is never eligible. Without this, `every` below
+	// would vacuously accept a drag whose contents are unknown.
+	if ( ! blockNames?.length || ! allowedTypes?.length ) {
+		return false;
+	}
+
+	if ( ! multiple && blockNames.length > 1 ) {
+		return false;
+	}
+
+	return blockNames.every( ( name ) =>
+		allowedTypes.includes( name.split( '/' ).pop() )
+	);
+}

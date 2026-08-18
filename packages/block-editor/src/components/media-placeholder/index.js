@@ -18,7 +18,7 @@ import MediaUploadCheck from '../media-upload/check';
 import URLPopover from '../url-popover';
 import { store as blockEditorStore } from '../../store';
 import { parseDropEvent } from '../use-on-block-drop';
-import { getComputedAcceptAttribute } from './utils';
+import { getComputedAcceptAttribute, isMediaDragEligible } from './utils';
 
 const noop = () => {};
 
@@ -147,6 +147,12 @@ export function MediaPlaceholder( {
 			allowedMimeTypes: settings.allowedMimeTypes,
 		};
 	}, [] );
+
+	// Canvas drags announce what they carry through the store rather than
+	// through the `dataTransfer`, so the drop zone needs selector access.
+	const { getDraggedBlockClientIds, getBlockNamesByClientId } =
+		useSelect( blockEditorStore );
+
 	const [ src, setSrc ] = useState( '' );
 
 	useEffect( () => {
@@ -363,6 +369,54 @@ export function MediaPlaceholder( {
 	};
 	const renderPlaceholder = placeholder ?? defaultRenderPlaceholder;
 
+	/**
+	 * Identifies what is being dragged, during dragover.
+	 *
+	 * Block drags reach the drop zone in two shapes, and each publishes what
+	 * it carries in a different place:
+	 *
+	 * - Inserter drags advertise their block names as `dataTransfer` type
+	 *   names, because the blocks do not exist in the store yet.
+	 * - Canvas drags carry only a client id reference, and announce the
+	 *   dragged blocks through the block editor store instead.
+	 *
+	 * File drags never get here; `DropZone` routes those to `onFilesDrop`
+	 * before `isEligible` is consulted.
+	 *
+	 * Note the two sources currently report different shapes: the inserter
+	 * prefix is still `wp-block:core/`, so its names come back bare
+	 * (`image`) and non-core blocks are ignored, while the store reports
+	 * fully qualified names (`core/image`). Reconciling those is a follow-up.
+	 *
+	 * @param {DataTransfer} dataTransfer The drag's data transfer.
+	 *
+	 * @return {{source: string, blockNames: string[]}} The drag's origin and
+	 * the names of the blocks it carries.
+	 */
+	const getDragInfo = ( dataTransfer ) => {
+		const prefix = 'wp-block:core/';
+		const namesFromTypes = [];
+		for ( const type of dataTransfer.types ) {
+			if ( type.startsWith( prefix ) ) {
+				namesFromTypes.push( type.slice( prefix.length ) );
+			}
+		}
+
+		if ( namesFromTypes.length ) {
+			return { source: 'inserter', blockNames: namesFromTypes };
+		}
+
+		const draggedClientIds = getDraggedBlockClientIds();
+		if ( draggedClientIds.length ) {
+			return {
+				source: 'canvas',
+				blockNames: getBlockNamesByClientId( draggedClientIds ),
+			};
+		}
+
+		return { source: 'unknown', blockNames: [] };
+	};
+
 	const renderDropZone = () => {
 		if ( disableDropZone ) {
 			return null;
@@ -373,18 +427,13 @@ export function MediaPlaceholder( {
 				onFilesDrop={ onFilesUpload }
 				onDrop={ handleBlocksDrop }
 				isEligible={ ( dataTransfer ) => {
-					const prefix = 'wp-block:core/';
-					const types = [];
-					for ( const type of dataTransfer.types ) {
-						if ( type.startsWith( prefix ) ) {
-							types.push( type.slice( prefix.length ) );
-						}
-					}
-					return (
-						types.every( ( type ) =>
-							allowedTypes.includes( type )
-						) && ( multiple ? true : types.length === 1 )
-					);
+					const { blockNames } = getDragInfo( dataTransfer );
+
+					return isMediaDragEligible( {
+						blockNames,
+						allowedTypes,
+						multiple,
+					} );
 				} }
 			/>
 		);
