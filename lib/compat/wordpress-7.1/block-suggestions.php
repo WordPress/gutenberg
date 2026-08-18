@@ -418,6 +418,14 @@ add_filter( 'render_block', 'gutenberg_strip_pending_structural_suggestions', 10
  * treated as unrestorable: that block joins the un-moved blocks rather than
  * displacing one.
  *
+ * Only a sibling list holding exactly ONE pending move is restored. `fromIndex`
+ * is recorded against the order the list was in at the time of the move, so a
+ * second move in the same list carries an index the first one already shifted
+ * and replaying both would invent an order that never existed. See the gate
+ * below for why that case cannot be detected and has to be skipped wholesale.
+ * The slot machinery stays general so lifting the gate is a one-line change
+ * once the marker writer records a baseline-relative index.
+ *
  * A move that crossed parents cannot be undone from a single sibling list, and
  * blindly applying `fromIndex` to the new parent would misplace the block. The
  * two detectable cases are skipped: a block whose marker records a root origin
@@ -460,7 +468,8 @@ function gutenberg_restore_pending_move_block_order( $blocks, $is_root, &$change
 	$count = count( $siblings );
 
 	// Map each moved block's current offset to the offset it came from.
-	$moved = array();
+	$moved         = array();
+	$pending_moves = 0;
 	foreach ( $siblings as $offset => $block ) {
 		$suggestion = isset( $block['attrs']['metadata']['suggestion'] )
 			? $block['attrs']['metadata']['suggestion']
@@ -471,6 +480,12 @@ function gutenberg_restore_pending_move_block_order( $blocks, $is_root, &$change
 		if ( ! isset( $suggestion['type'] ) || 'pending-move' !== $suggestion['type'] ) {
 			continue;
 		}
+		/*
+		 * Counted ahead of the guards below: a marker this function declines
+		 * to act on still sits in the list, so it still shifts the indices
+		 * every other marker in the list was measured against.
+		 */
+		++$pending_moves;
 		if ( ! isset( $suggestion['fromIndex'] ) || ! is_numeric( $suggestion['fromIndex'] ) ) {
 			continue;
 		}
@@ -484,6 +499,31 @@ function gutenberg_restore_pending_move_block_order( $blocks, $is_root, &$change
 			continue;
 		}
 		$moved[ $offset ] = $from_index;
+	}
+
+	/*
+	 * `fromIndex` is measured against the sibling order the list was in when
+	 * the move was made, not against the pristine baseline: the marker writer
+	 * diffs each tick against the previous one. For a lone pending move those
+	 * are the same order and the restore below is exact. For two or more they
+	 * are not — the first move already shifted the indices the second marker
+	 * was measured against, and replaying both invents a third order that
+	 * neither the author nor the suggester ever saw.
+	 *
+	 * Nothing in the serialized markers separates a skewed pair from an
+	 * honest one: the skewed values describe a perfectly self-consistent
+	 * baseline, and re-applying the moves to it reproduces the current order.
+	 * With no way to tell them apart, a level holding more than one pending
+	 * move keeps its proposed order — what readers saw before this restore
+	 * existed — rather than risk publishing an order nobody wrote.
+	 *
+	 * Recording a baseline-relative index is the real fix and belongs with
+	 * the marker writer, where it has to be reconciled with Reject: undoing
+	 * one move while the rest stay pending wants the tick-relative meaning,
+	 * so the two consumers need separate fields.
+	 */
+	if ( $pending_moves > 1 ) {
+		return $blocks;
 	}
 
 	if ( empty( $moved ) ) {

@@ -123,7 +123,13 @@ class Tests_Strip_Pending_Structural_Suggestions extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_two_pending_moves_are_both_restored() {
+	public function test_two_pending_moves_in_one_list_are_left_in_the_proposed_order() {
+		/*
+		 * `fromIndex` is measured against the order the list was in when the
+		 * move was made, so a second move in the same list carries an index
+		 * an earlier pending move already shifted. Replaying both would
+		 * invent a third order. The level is left alone instead.
+		 */
 		$content = $this->paragraph(
 			'Fourth',
 			array(
@@ -143,7 +149,116 @@ class Tests_Strip_Pending_Structural_Suggestions extends WP_UnitTestCase {
 		) . "\n\n" . $this->paragraph( 'Third' );
 
 		$this->assertSame(
-			array( 'First', 'Second', 'Third', 'Fourth' ),
+			array( 'Fourth', 'Second', 'First', 'Third' ),
+			$this->rendered_order( $this->render_the_content( $content ) )
+		);
+	}
+
+	public function test_a_second_move_never_renders_an_order_nobody_authored() {
+		/*
+		 * The skew this gate exists for. Baseline [A, B, C]:
+		 *   1. Suggest moving C to the top -> editor shows [C, A, B] and C's
+		 *      marker records fromIndex 2.
+		 *   2. Suggest moving A to the end -> editor shows [C, B, A]. The
+		 *      marker writer diffs against the PREVIOUS tick, where A sat at
+		 *      index 1 of [C, A, B], so A's marker records fromIndex 1 - not
+		 *      the 0 it held in the baseline.
+		 *
+		 * Replaying both indices places A at 1 and C at 2 and lets B fall
+		 * into slot 0, rendering [B, A, C]: not the baseline, not the
+		 * proposal, an order that existed in no version of the document.
+		 * Readers get the proposed order until the marker writer records a
+		 * baseline-relative index.
+		 */
+		$content = $this->paragraph(
+			'C',
+			array(
+				'type'               => 'pending-move',
+				'authorId'           => 2,
+				'fromIndex'          => 2,
+				'fromParentClientId' => null,
+			)
+		) . "\n\n" . $this->paragraph( 'B' ) . "\n\n" . $this->paragraph(
+			'A',
+			array(
+				'type'               => 'pending-move',
+				'authorId'           => 2,
+				'fromIndex'          => 1,
+				'fromParentClientId' => null,
+			)
+		);
+
+		$rendered = $this->rendered_order( $this->render_the_content( $content ) );
+
+		$this->assertNotSame( array( 'B', 'A', 'C' ), $rendered, 'Rendered a sibling order that never existed.' );
+		$this->assertSame( array( 'C', 'B', 'A' ), $rendered );
+	}
+
+	public function test_a_second_move_in_a_different_parent_still_restores() {
+		/*
+		 * The gate is per sibling list: a pending move inside a Group cannot
+		 * shift the indices of the root list, so one move at each level is
+		 * still restored.
+		 */
+		$content = $this->paragraph(
+			'Root second',
+			array(
+				'type'               => 'pending-move',
+				'authorId'           => 2,
+				'fromIndex'          => 1,
+				'fromParentClientId' => null,
+			)
+		) . "\n\n" . $this->paragraph( 'Root first' ) . "\n\n"
+			. '<!-- wp:group --><div class="wp-block-group">'
+			. $this->paragraph(
+				'Inner second',
+				array(
+					'type'               => 'pending-move',
+					'authorId'           => 2,
+					'fromIndex'          => 1,
+					'fromParentClientId' => 'abc-123',
+				)
+			)
+			. $this->paragraph( 'Inner first' )
+			. '</div><!-- /wp:group -->';
+
+		$this->assertSame(
+			array( 'Root first', 'Root second', 'Inner first', 'Inner second' ),
+			$this->rendered_order( $this->render_the_content( $content ) )
+		);
+	}
+
+	public function test_an_unrestorable_marker_still_blocks_a_second_move_in_the_list() {
+		/*
+		 * A marker the restore declines to act on - here one that crossed the
+		 * root boundary - still occupies a slot, so it still shifts the
+		 * indices the other marker was measured against. It counts toward the
+		 * gate.
+		 */
+		$content = '<!-- wp:group --><div class="wp-block-group">'
+			. $this->paragraph( 'Inner first' )
+			. $this->paragraph(
+				'Arrived from the root',
+				array(
+					'type'               => 'pending-move',
+					'authorId'           => 2,
+					'fromIndex'          => 0,
+					'fromParentClientId' => null,
+				)
+			)
+			. $this->paragraph(
+				'Inner third',
+				array(
+					'type'               => 'pending-move',
+					'authorId'           => 2,
+					'fromIndex'          => 0,
+					'fromParentClientId' => 'abc-123',
+				)
+			)
+			. '</div><!-- /wp:group -->';
+
+		$this->assertSame(
+			array( 'Inner first', 'Arrived from the root', 'Inner third' ),
 			$this->rendered_order( $this->render_the_content( $content ) )
 		);
 	}
