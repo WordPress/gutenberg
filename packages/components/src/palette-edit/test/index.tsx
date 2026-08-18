@@ -440,6 +440,42 @@ describe( 'PaletteEdit', () => {
 		} );
 	} );
 
+	// The front end parses duotone colors with a PHP port of colord that only
+	// accepts hex, `rgb()` and `hsl()`, so a named color saved as-is would
+	// render in the editor and be dropped on the front end.
+	it( 'normalizes palette colors to hex when adding a duotone', async () => {
+		const onChange = jest.fn();
+
+		render(
+			<PaletteEdit
+				{ ...defaultProps }
+				duotones={ duotones }
+				colorPalette={ [
+					{ color: 'black', name: 'Black', slug: 'black' },
+					{ color: 'white', name: 'White', slug: 'white' },
+				] }
+				onChange={ onChange }
+			/>
+		);
+
+		await click(
+			screen.getByRole( 'button', {
+				name: 'Add duotone',
+			} )
+		);
+
+		await waitFor( () => {
+			expect( onChange ).toHaveBeenCalledWith( [
+				...duotones,
+				{
+					colors: [ '#000000', '#ffffff' ],
+					name: 'Duotone 1',
+					slug: 'duotone-1',
+				},
+			] );
+		} );
+	} );
+
 	it( 'falls back to black and white when adding a duotone without a color palette', async () => {
 		const onChange = jest.fn();
 

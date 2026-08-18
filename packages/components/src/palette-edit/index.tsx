@@ -61,20 +61,36 @@ const DEFAULT_COLOR = '#000';
 
 /**
  * Filters a color palette down to the colors a duotone can actually be built
- * from. Duotone values are turned into SVG filter matrices, so each color has
- * to resolve to a concrete value. A theme palette may legitimately contain CSS
+ * from, and normalizes each one to hex.
+ *
+ * Duotone values are turned into SVG filter matrices, so each color has to
+ * resolve to a concrete value. A theme palette may legitimately contain CSS
  * that does not, such as `color-mix()` or `currentColor` — Twenty Twenty-Five
  * ships one — and picking such a color would produce a duotone that neither the
  * editor nor the front end can render.
  *
+ * Surviving colors are normalized because the two ends disagree on syntax. The
+ * front end parses duotone colors with a PHP port of colord that only accepts
+ * hex, `rgb()` and `hsl()` (`WP_Duotone::colord_parse`), while colord in the
+ * editor also accepts CSS named colors such as `red`, since `namesPlugin` is
+ * registered. Passing a palette value straight through would let a named color
+ * be saved as a duotone that renders in the editor and is dropped, with a
+ * `_doing_it_wrong` notice, on the front end.
+ *
  * @param colorPalette The colors to filter.
  *
- * @return The colors usable in a duotone.
+ * @return The colors usable in a duotone, as hex.
  */
 function getUsableDuotoneColors( colorPalette: Color[] = [] ) {
-	return colorPalette.filter(
-		( { color } ) => typeof color === 'string' && colord( color ).isValid()
-	);
+	return colorPalette.flatMap( ( paletteColor ) => {
+		if ( typeof paletteColor.color !== 'string' ) {
+			return [];
+		}
+		const parsed = colord( paletteColor.color );
+		return parsed.isValid()
+			? [ { ...paletteColor, color: parsed.toHex() } ]
+			: [];
+	} );
 }
 
 /**
