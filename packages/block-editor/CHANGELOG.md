@@ -9,6 +9,7 @@
 ### Enhancements
 
 -   Show separate horizontal and vertical block spacing controls in the block inspector only for Flex and Grid layouts, while retaining axial gap support in Global Styles. Responsive Grid column calculations use the horizontal gap, while Flow and Constrained layouts use the vertical gap when receiving an axial value ([#81476](https://github.com/WordPress/gutenberg/pull/81476)).
+-   `BlockStyles`: Present the registered block styles as a select instead of a grid of buttons, so that long style labels are shown in full rather than truncated ([#40331](https://github.com/WordPress/gutenberg/issues/40331)).
 
 ### Bug Fixes
 

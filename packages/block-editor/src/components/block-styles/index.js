@@ -1,13 +1,12 @@
-import clsx from 'clsx';
 import { useState, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { debounce } from '@wordpress/compose';
 import {
-	Button,
-	__experimentalTruncate as Truncate,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Use the portal-based popup to avoid inspector clipping.
+import { SelectControl } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import PreviewBlockPopover from '../block-switcher/preview-block-popover';
 import useStylesForBlocks from './use-styles-for-block';
@@ -36,6 +35,18 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 	const [ hoveredStyle, setHoveredStyle ] = useState( null );
 	const [ blockStylesAnchor, setBlockStylesAnchor ] = useState( null );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
+	// The select items double as the select values, so both the current value
+	// and the rendered items must come from this same list of objects.
+	const items = useMemo(
+		() =>
+			stylesToRender.map( ( style ) => ( {
+				value: style.name,
+				label: style.label || style.name,
+				style,
+			} ) ),
+		[ stylesToRender ]
+	);
 
 	const previewBlocks = useMemo( () => {
 		if ( ! hoveredStyle || ! genericPreviewBlock ) {
@@ -108,48 +119,38 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 					ref={ setBlockStylesAnchor }
 					className="block-editor-block-styles"
 				>
-					<div className="block-editor-block-styles__variants">
-						{ stylesToRender.map( ( style ) => {
-							const buttonText = style.label || style.name;
-
-							return (
-								<Button
-									__next40pxDefaultSize
-									className={ clsx(
-										'block-editor-block-styles__item',
-										{
-											'is-active':
-												activeStyle.name === style.name,
-										}
-									) }
-									key={ style.name }
-									variant="secondary"
-									label={ buttonText }
-									onMouseEnter={ () =>
-										styleItemHandler( style )
-									}
-									onFocus={ () => styleItemHandler( style ) }
-									onMouseLeave={ () =>
-										styleItemHandler( null )
-									}
-									onBlur={ () => styleItemHandler( null ) }
-									onClick={ () =>
-										onSelectStylePreview( style )
-									}
-									aria-current={
-										activeStyle.name === style.name
-									}
-								>
-									<Truncate
-										numberOfLines={ 1 }
-										className="block-editor-block-styles__item-text"
-									>
-										{ buttonText }
-									</Truncate>
-								</Button>
-							);
-						} ) }
-					</div>
+					<SelectControl
+						label={ __( 'Variation' ) }
+						hideLabelFromVision
+						items={ items }
+						value={ items.find(
+							( item ) => item.value === activeStyle?.name
+						) }
+						onValueChange={ ( item ) =>
+							onSelectStylePreview( item.style )
+						}
+						onOpenChange={ ( isOpen ) => {
+							if ( ! isOpen ) {
+								styleItemHandler( null );
+							}
+						} }
+					>
+						{ items.map( ( item ) => (
+							<SelectControl.Item
+								key={ item.value }
+								value={ item }
+								label={ item.label }
+								onMouseEnter={ () =>
+									styleItemHandler( item.style )
+								}
+								onMouseLeave={ () => styleItemHandler( null ) }
+								onFocus={ () => styleItemHandler( item.style ) }
+								onBlur={ () => styleItemHandler( null ) }
+							>
+								{ item.label }
+							</SelectControl.Item>
+						) ) }
+					</SelectControl>
 					{ previewBlocks && (
 						<PreviewBlockPopover
 							blocks={ previewBlocks }
