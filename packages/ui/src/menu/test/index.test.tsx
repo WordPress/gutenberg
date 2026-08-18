@@ -128,11 +128,16 @@ describe( 'Menu', () => {
 	} );
 
 	it.each( [
-		{ location: 'root menu', nested: false },
-		{ location: 'submenu', nested: true },
+		{ location: 'root menu', nested: false, checkbox: false },
+		{ location: 'submenu', nested: true, checkbox: false },
+		{
+			location: 'closing checkbox item',
+			nested: false,
+			checkbox: true,
+		},
 	] )(
 		'restores focus to the trigger after an overlay opened from the $location closes',
-		async ( { nested } ) => {
+		async ( { nested, checkbox } ) => {
 			const user = userEvent.setup();
 
 			function FocusReturningOverlay( {
@@ -158,7 +163,14 @@ describe( 'Menu', () => {
 
 			function MenuWithOverlay() {
 				const [ isOverlayOpen, setIsOverlayOpen ] = useState( false );
-				const overlayItem = (
+				const overlayItem = checkbox ? (
+					<Menu.CheckboxItem
+						closeOnClick
+						onCheckedChange={ () => setIsOverlayOpen( true ) }
+					>
+						Open overlay
+					</Menu.CheckboxItem>
+				) : (
 					<Menu.Item onClick={ () => setIsOverlayOpen( true ) }>
 						Open overlay
 					</Menu.Item>
@@ -204,7 +216,10 @@ describe( 'Menu', () => {
 				);
 			}
 			await user.click(
-				await screen.findByRole( 'menuitem', { name: 'Open overlay' } )
+				await screen.findByRole(
+					checkbox ? 'menuitemcheckbox' : 'menuitem',
+					{ name: 'Open overlay' }
+				)
 			);
 
 			await waitFor( () => {
