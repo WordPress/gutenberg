@@ -416,26 +416,6 @@ HTML;
 	}
 
 	/**
-	 * Asserts that one substring appears before another in rendered HTML.
-	 *
-	 * Layout support can add classes and attributes to nested lists, so tests
-	 * should not depend on an exact `<ul class="wp-block-list">` string.
-	 *
-	 * @param string $first   Substring that should appear first.
-	 * @param string $second  Substring that should appear later.
-	 * @param string $html    Rendered HTML.
-	 * @param string $message Failure message.
-	 */
-	private function assert_substring_appears_before( $first, $second, $html, $message ) {
-		$first_pos  = strpos( $html, $first );
-		$second_pos = strpos( $html, $second );
-
-		$this->assertNotFalse( $first_pos, $message );
-		$this->assertNotFalse( $second_pos, $message );
-		$this->assertLessThan( $second_pos, $first_pos, $message );
-	}
-
-	/**
 	 * Tests if list item content is updated with a plain text value returned by the source.
 	 *
 	 * @covers WP_Block::render
@@ -585,9 +565,8 @@ HTML;
 			$result,
 			'The original list item content should be replaced by the source value.'
 		);
-		$this->assert_substring_appears_before(
-			'Bound list item',
-			'Nested child',
+		$this->assertMatchesRegularExpression(
+			'#<li>Bound list item\s*<ul class="wp-block-list"><li>Nested child</li></ul></li>#',
 			$normalized,
 			'The list item should render the source text and preserve nested list inner blocks.'
 		);
@@ -618,9 +597,8 @@ HTML;
 			$result,
 			'Raw list markup before the nested block should be replaced by the source value.'
 		);
-		$this->assert_substring_appears_before(
-			'Bound list item',
-			'Nested child should remain',
+		$this->assertMatchesRegularExpression(
+			'#<li>Bound list item\s*<ul class="wp-block-list"><li>Nested child should remain</li></ul></li>#',
 			$normalized,
 			'The list item should preserve only the delimiter-backed nested list inner block.'
 		);
@@ -651,8 +629,8 @@ HTML;
 			$result,
 			'An empty source value should clear the original list item content.'
 		);
-		$this->assertStringContainsString(
-			'Nested child',
+		$this->assertMatchesRegularExpression(
+			'#<li>\s*<ul class="wp-block-list"><li>Nested child</li></ul></li>#',
 			$normalized,
 			'An empty source value should still preserve nested list inner blocks.'
 		);
@@ -683,9 +661,8 @@ HTML;
 			$result,
 			'The original list item content should be replaced by the source value.'
 		);
-		$this->assert_substring_appears_before(
-			'Bound list item',
-			'Nested ordered child',
+		$this->assertMatchesRegularExpression(
+			'#<li>Bound list item\s*<ol class="wp-block-list"><li>Nested ordered child</li></ol></li>#',
 			$normalized,
 			'The list item should render the source text and preserve the nested ordered list.'
 		);
@@ -813,9 +790,13 @@ HTML;
 			$result,
 			'The original list item content should be replaced by the pattern override.'
 		);
-		$this->assert_substring_appears_before(
-			'Pattern <em>override</em>',
-			'Nested child',
+		$this->assertStringContainsString(
+			'<li>Nested child</li>',
+			$normalized,
+			'Nested list inner blocks should remain in the rendered output.'
+		);
+		$this->assertMatchesRegularExpression(
+			'#<li>Pattern <em>override</em><ul class="wp-block-list"><li>Nested child</li></ul></li>#',
 			$normalized,
 			'The list item should render the pattern override before its nested list.'
 		);
