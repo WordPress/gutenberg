@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `Spinner` component ([#81358](https://github.com/WordPress/gutenberg/pull/81358)).
+
 ### Breaking Changes
 
 -   `Select.Item`: Remove `'compact'` from the `size` prop. Use `'default'` instead ([#81354](https://github.com/WordPress/gutenberg/pull/81354)).
