@@ -421,22 +421,24 @@ const getPatternEditingContextualCommands = () =>
 
 const getEditedEntityContextualCommands = () =>
 	function useEditedEntityContextualCommands() {
-		const { postType, isViewable, status, link } = useSelect(
+		const { postType, isViewable, isPublished, link } = useSelect(
 			( select ) => {
 				const {
 					getCurrentPostType,
 					getEditedPostAttribute,
 					getEditedPostPreviewLink,
+					isCurrentPostPublished,
 				} = select( editorStore );
 				const { getPostType } = select( coreStore );
-				const isPublished =
-					getEditedPostAttribute( 'status' ) === 'publish';
+				// Private posts and posts scheduled in the past are published
+				// as far as the front end is concerned.
+				const _isPublished = isCurrentPostPublished();
 				const _postType = getCurrentPostType();
 				return {
 					postType: _postType,
 					isViewable: getPostType( _postType )?.viewable ?? false,
-					status: getEditedPostAttribute( 'status' ),
-					link: isPublished
+					isPublished: _isPublished,
+					link: _isPublished
 						? getEditedPostAttribute( 'link' )
 						: getEditedPostPreviewLink?.() ?? '',
 				};
@@ -473,7 +475,7 @@ const getEditedEntityContextualCommands = () =>
 				const isPage = postType === 'page';
 				let label;
 
-				if ( status === 'publish' ) {
+				if ( isPublished ) {
 					label = isPage ? __( 'View page' ) : __( 'View post' );
 				} else {
 					label = isPage
