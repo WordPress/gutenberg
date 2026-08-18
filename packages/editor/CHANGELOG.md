@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Check the `window.__experimentalEnableRealTimeCollaboration` flag set by the Real-Time Collaboration experiment, instead of `window._wpCollaborationEnabled`, when determining whether collaboration is enabled for the current post ([#80658](https://github.com/WordPress/gutenberg/pull/80658)).
+
 ## 14.53.0 (2026-08-12)
 
 ### Internal

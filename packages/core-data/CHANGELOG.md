@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Gate entity sync configuration and sync manager creation on the `window.__experimentalEnableRealTimeCollaboration` flag set by the Real-Time Collaboration experiment, replacing the `window._wpCollaborationEnabled` option flag ([#80658](https://github.com/WordPress/gutenberg/pull/80658)).
+
 ## 7.53.0 (2026-08-12)
 
 ### Enhancements

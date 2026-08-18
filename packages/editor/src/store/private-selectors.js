@@ -594,7 +594,7 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 		return Boolean(
 			syncConfig &&
 				syncConfig.supportsPersistence &&
-				window._wpCollaborationEnabled &&
+				window.__experimentalEnableRealTimeCollaboration &&
 				false !==
 					syncConfig.shouldSync?.(
 						`postType/${ currentPostType }`,
