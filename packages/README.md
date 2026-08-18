@@ -366,7 +366,7 @@ Both extend shared base configurations (comments are not necessary):
 
 A migrated package registers both projects at the root: `packages/<name>/tsconfig.build.json` in the root `tsconfig.build.json` references, and `packages/<name>` in the root `tsconfig.json` references.
 
-Packages whose components feed the Storybook components manifest (`components`, `dataviews`, `ui`) carry a third project, `tsconfig.stories.json`, registered in the root `tsconfig.json` only. It type checks the stories against component sources without jest types. Storybook's component meta extractor reads props through the closest `tsconfig.json` that lists a story, or through its own inferred project when none does; the inferred project produces the complete manifest and the dev project does not, so stories stay out of `tsconfig.json` and this project is what checks them.
+Packages whose components feed the Storybook components manifest (`components`, `dataviews`, `ui`) carry a third project, `tsconfig.stories.json`, registered in the root `tsconfig.json` only. It type checks the stories against component sources without jest types. Storybook's component meta extractor reads props through the closest `tsconfig.json` that lists a story, or through its own inferred project when none does; the inferred project produces the complete manifest and the dev project does not, so stories stay out of `tsconfig.json`. The dev project cannot reference this one either, because a referenced project may not disable emit (TS6310), which is why it is registered at the root only.
 
 Two rules keep the projects consistent, and `npm run lint:tsconfig` enforces both:
 
