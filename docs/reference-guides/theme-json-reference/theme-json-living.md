@@ -110,6 +110,7 @@ Settings related to colors.
 | heading | Allow users to set heading colors in a block. | `boolean` | `true` |
 | button | Allow users to set button colors in a block. | `boolean` | `true` |
 | caption | Allow users to set caption colors in a block. | `boolean` | `true` |
+| pre | Allow users to set preformatted text colors in a block. | `boolean` | `true` |
 
 ---
 

@@ -264,6 +264,11 @@
 							"description": "Allow users to set caption colors in a block.",
 							"type": "boolean",
 							"default": true
+						},
+						"pre": {
+							"description": "Allow users to set preformatted text colors in a block.",
+							"type": "boolean",
+							"default": true
 						}
 					},
 					"additionalProperties": false
@@ -2362,6 +2367,29 @@
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
+									}
+								]
+							}
+						}
+					]
+				},
+				"pre": {
+					"allOf": [
+						{
+							"$ref": "#/definitions/stylesProperties"
+						},
+						{
+							"$ref": "#/definitions/stylesElementsResponsiveSelectorsProperties"
+						},
+						{
+							"type": "object",
+							"propertyNames": {
+								"anyOf": [
+									{
+										"$ref": "#/definitions/stylesPropertyNames"
+									},
+									{
+										"$ref": "#/definitions/stylesElementsResponsiveSelectorsPropertyNames"
 									}
 								]
 							}
