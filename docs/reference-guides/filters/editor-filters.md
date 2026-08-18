@@ -193,50 +193,6 @@ addFilter(
 );
 ```
 
-### `editor.PostRevision.badges`
-
-This filter extends the badges shown on each row of the visual revisions timeline. It also updates the picker option’s accessible name. The filter receives the default descriptor list (the core Autosave badge) and should return an array of descriptors.
-
-Each descriptor needs:
-
--   `id` — a namespaced string, such as `my-plugin/public`.
--   `label` — a translated string, or a function that returns one from the revision record.
--   `isMatch` — a synchronous function that returns whether the badge applies to that revision.
--   `intent` — optional Badge intent (`none` by default).
-
-`isMatch` runs against the revision record from the timeline query. That record includes `slug`, `meta` (keys registered with `show_in_rest`), `author`, dates, and raw title, excerpt, and content. Callbacks must be pure and cheap.
-
-```js
-import { addFilter } from '@wordpress/hooks';
-import { __ } from '@wordpress/i18n';
-
-addFilter(
-	'editor.PostRevision.badges',
-	'my-plugin/public-version',
-	( badges ) => [
-		...badges,
-		{
-			id: 'my-plugin/public',
-			label: __( 'Public' ),
-			intent: 'informational',
-			isMatch: ( item ) => !! item.meta?.my_plugin_is_public,
-		},
-	]
-);
-```
-
-To hide the core Autosave badge:
-
-```js
-import { addFilter } from '@wordpress/hooks';
-
-addFilter(
-	'editor.PostRevision.badges',
-	'my-plugin/hide-autosave',
-	( badges ) => badges.filter( ( badge ) => badge.id !== 'core/autosave' )
-);
-```
-
 ### `editor.PostPreview.interstitialMarkup`
 
 You can also filter the interstitial message shown when generating previews. Here's an example:

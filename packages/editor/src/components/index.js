@@ -27,7 +27,6 @@ export { default as PluginDocumentSettingPanel } from './plugin-document-setting
 export { default as PluginBlockSettingsMenuItem } from './block-settings-menu/plugin-block-settings-menu-item';
 export { default as PluginMoreMenuItem } from './plugin-more-menu-item';
 export { default as PluginPostPublishPanel } from './plugin-post-publish-panel';
-export { default as PluginPostRevisionHeader } from './plugin-post-revision-header';
 export { default as PluginPostRevisionInfo } from './plugin-post-revision-info';
 export { default as PluginPostStatusInfo } from './plugin-post-status-info';
 export { default as PluginPrePublishPanel } from './plugin-pre-publish-panel';

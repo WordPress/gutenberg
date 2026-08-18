@@ -750,56 +750,6 @@ _Returns_
 
 -   `React.ReactNode`: The rendered component.
 
-### PluginPostRevisionHeader
-
-Renders in the visual revisions header settings cluster, after Settings and before Exit.
-
-`children` may be a node or a function receiving `{ context: PluginPostRevisionInfoContext }`. `context.revision` is null while the record is loading.
-
-_Usage_
-
-```js
-// Using ES5 syntax
-var __ = wp.i18n.__;
-var PluginPostRevisionHeader = wp.editor.PluginPostRevisionHeader;
-
-function MyPluginPostRevisionHeader() {
-	return React.createElement(
-		PluginPostRevisionHeader,
-		{
-			className: 'my-plugin-post-revision-header',
-		},
-		__( 'My post revision header' )
-	);
-}
-```
-
-```jsx
-// Using ESNext syntax
-import { PluginPostRevisionHeader } from '@wordpress/editor';
-
-const MyPluginPostRevisionHeader = () => (
-	<PluginPostRevisionHeader className="my-plugin-post-revision-header">
-		{ ( { context } ) => (
-			<div>
-				{ context.revisionId }
-				{ context.revision && context.revision.date }
-			</div>
-		) }
-	</PluginPostRevisionHeader>
-);
-```
-
-_Parameters_
-
--   _props_ `Object`: Component properties.
--   _props.className_ `[string]`: An optional class name added to the wrapper.
--   _props.children_ `React.ReactNode|Function`: Children to be rendered, or a function receiving `{ context }`.
-
-_Returns_
-
--   `React.ReactNode`: The rendered component.
-
 ### PluginPostRevisionInfo
 
 Renders in the visual revisions document sidebar, under the revision post card.

@@ -4,7 +4,7 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 /**
- * Selected revision context shared by PluginPostRevisionInfo and PluginPostRevisionHeader.
+ * Selected revision context for PluginPostRevisionInfo.
  *
  * @return {Object} PluginPostRevisionInfoContext
  */

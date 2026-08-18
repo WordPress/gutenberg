@@ -6,8 +6,6 @@ import { drawerLeft, drawerRight, seen } from '@wordpress/icons';
 import HeaderSkeleton from '../header/header-skeleton';
 import MoreMenu from '../more-menu';
 import PostPreviewButton from '../post-preview-button';
-import PluginPostRevisionHeader from '../plugin-post-revision-header';
-import usePluginPostRevisionInfoContext from '../plugin-post-revision-info/use-plugin-post-revision-info-context';
 import RevisionsSlider from './revisions-slider';
 import { store as editorStore } from '../../store';
 import { sidebars } from '../sidebar/constants';
@@ -22,12 +20,17 @@ import { unlock } from '../../lock-unlock';
  * @return {React.JSX.Element} The revisions header component.
  */
 function RevisionsHeader( { showDiff, onToggleDiff } ) {
-	const context = usePluginPostRevisionInfoContext();
-	const sidebarIsOpened = useSelect(
-		( select ) =>
-			!! select( interfaceStore ).getActiveComplementaryArea( 'core' ),
-		[]
-	);
+	const { currentRevisionId, sidebarIsOpened } = useSelect( ( select ) => {
+		return {
+			currentRevisionId: unlock(
+				select( editorStore )
+			).getCurrentRevisionId(),
+			sidebarIsOpened:
+				!! select( interfaceStore ).getActiveComplementaryArea(
+					'core'
+				),
+		};
+	}, [] );
 
 	const { setCurrentRevisionId, restoreRevision } = unlock(
 		useDispatch( editorStore )
@@ -36,11 +39,11 @@ function RevisionsHeader( { showDiff, onToggleDiff } ) {
 	const { enableComplementaryArea, disableComplementaryArea } =
 		useDispatch( interfaceStore );
 
-	const canRestore = !! context.revisionId;
+	const canRestore = !! currentRevisionId;
 
 	const handleRestore = () => {
-		if ( context.revisionId ) {
-			restoreRevision( context.revisionId );
+		if ( currentRevisionId ) {
+			restoreRevision( currentRevisionId );
 		}
 	};
 
@@ -80,8 +83,6 @@ function RevisionsHeader( { showDiff, onToggleDiff } ) {
 						} }
 						size="compact"
 					/>
-
-					<PluginPostRevisionHeader.Slot fillProps={ { context } } />
 
 					<Button
 						__next40pxDefaultSize
