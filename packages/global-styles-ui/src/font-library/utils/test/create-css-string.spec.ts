@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { describe, expect, test } from '@jest/globals';
-
-/**
- * Internal dependencies
- */
 import { createCssString } from '../create-css-string';
 
 describe( 'createCssString', () => {
