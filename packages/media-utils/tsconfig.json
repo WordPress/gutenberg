@@ -1,24 +1,30 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
+	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
-		"types": [ "gutenberg-env" ],
-		"checkJs": false
+		"types": [ "jest", "gutenberg-env" ]
 	},
+	"files": [ "global.d.ts" ],
 	"references": [
-		{ "path": "../api-fetch" },
+		{ "path": "./tsconfig.build.json" },
+		{ "path": "../api-fetch/tsconfig.build.json" },
 		{ "path": "../blob/tsconfig.build.json" },
 		{ "path": "../components" },
-		{ "path": "../core-data" },
+		{ "path": "../core-data/tsconfig.build.json" },
 		{ "path": "../data" },
 		{ "path": "../dataviews" },
-		{ "path": "../element" },
-		{ "path": "../i18n" },
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons" },
-		{ "path": "../media-fields" },
-		{ "path": "../notices" },
+		{ "path": "../media-fields/tsconfig.build.json" },
+		{ "path": "../notices/tsconfig.build.json" },
 		{ "path": "../private-apis" },
 		{ "path": "../ui" },
-		{ "path": "../views" }
+		{ "path": "../views/tsconfig.build.json" }
+	],
+	// Listed files have pre-existing type errors; include them once fixed.
+	"exclude": [
+		"**/benchmark",
+		"src/components/media-upload-modal/test/index.test.tsx"
 	]
 }
