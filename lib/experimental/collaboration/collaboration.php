@@ -58,8 +58,30 @@ if ( ! function_exists( 'gutenberg_register_collaboration_rest_routes' ) ) {
 	 * Registers REST API routes for collaborative editing.
 	 */
 	function gutenberg_register_collaboration_rest_routes(): void {
-		$sync_storage = new WP_Sync_Post_Meta_Storage();
-		$sync_server  = new WP_HTTP_Polling_Sync_Server( $sync_storage );
+		/**
+		 * Filters the sync storage implementation for collaborative editing.
+		 *
+		 * Allows plugins to replace the default post meta storage with alternative
+		 * backends. The primary use case is the realtime-collaboration plugin,
+		 * which uses Presence API for awareness and a dedicated wp_collaboration
+		 * table for CRDT updates, eliminating cache side effects.
+		 *
+		 * This filter is unstable and may change as RTC explores fundamental changes
+		 * to how syncing works. The current interface assumes a pure naïve relay,
+		 * which could change.
+		 *
+		 * @since Gutenberg 21.x
+		 *
+		 * @param WP_Sync_Storage $sync_storage Storage implementation. Must implement
+		 *                                      the WP_Sync_Storage interface.
+		 */
+		$sync_storage = apply_filters( '__unstable_wp_sync_storage', new WP_Sync_Post_Meta_Storage() );
+
+		if ( ! $sync_storage instanceof WP_Sync_Storage ) {
+			$sync_storage = new WP_Sync_Post_Meta_Storage();
+		}
+
+		$sync_server = new WP_HTTP_Polling_Sync_Server( $sync_storage );
 		$sync_server->register_routes();
 
 		$sync_save_server = new WP_Sync_Save_Server();
@@ -590,3 +612,54 @@ function gutenberg_post_list_collaboration_row_actions( $actions, $post ) {
 
 	return $actions;
 }
+
+/**
+ * Adds the autosave's CRDT snapshot to the block editor settings when
+ * real-time collaboration is enabled.
+ *
+ * The snapshot describes the document state the autosave captured. The editor
+ * verifies its own shared document against it, and suppresses the "there is a
+ * more recent autosave" notice when the shared document already contains
+ * everything the autosave holds.
+ *
+ * @param array                   $settings             Editor settings.
+ * @param WP_Block_Editor_Context $block_editor_context The current block editor context.
+ * @return array Filtered editor settings.
+ */
+function gutenberg_add_autosave_details_to_editor_settings( $settings, $block_editor_context ) {
+	if ( ! isset( $settings['autosave'] ) || empty( $block_editor_context->post ) ) {
+		return $settings;
+	}
+
+	if ( ! wp_is_collaboration_enabled() ) {
+		return $settings;
+	}
+
+	$post = $block_editor_context->post;
+
+	if ( wp_is_post_type_collaboration_disabled( $post->post_type ) ) {
+		return $settings;
+	}
+
+	$autosave = wp_get_post_autosave( $post->ID );
+
+	if ( ! $autosave ) {
+		return $settings;
+	}
+
+	$snapshot = get_post_meta( $autosave->ID, Gutenberg_REST_Autosaves_Controller::CRDT_SNAPSHOT_META_KEY, true );
+
+	/*
+	 * Snapshots can be missing from a pre-collaboration autosave, classic editor autosave,
+	 * and other paths. The worst case is a "more recent autosave" notice when newer CRDT
+	 * content is already present in the shared document.
+	 */
+	if ( ! is_string( $snapshot ) || '' === $snapshot ) {
+		return $settings;
+	}
+
+	$settings['autosave']['crdtSnapshot'] = $snapshot;
+
+	return $settings;
+}
+add_filter( 'block_editor_settings_all', 'gutenberg_add_autosave_details_to_editor_settings', 10, 2 );

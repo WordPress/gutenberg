@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import {
 	getBlockTypes,
 	registerBlockType,
 	unregisterBlockType,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import {
 	getValidTextAlignments,
 	addAssignedTextAlign,

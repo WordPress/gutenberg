@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import {
 	useRef,
 	useState,
@@ -23,13 +16,13 @@ import { Popover } from '@wordpress/components';
 import { getBlockBindingsSource } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useBlockEditorAutocompleteProps } from '../autocomplete';
 import { useBlockEditContext } from '../block-edit';
-import { blockBindingsKey, isPreviewModeKey } from '../block-edit/context';
+import {
+	blockBindingsKey,
+	blockEditingModeKey,
+	isPreviewModeKey,
+} from '../block-edit/context';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
 import { useMarkPersistent } from './use-mark-persistent';
@@ -39,8 +32,8 @@ import { getAllowedFormats } from './utils';
 import { Content, valueToHTMLString } from './content';
 import { withDeprecations } from './with-deprecations';
 import BlockContext from '../block-context';
-import { useHasEditableRoot } from '../writing-flow/use-editable-root';
 import { unlock } from '../../lock-unlock';
+import { PrivateBlockContext } from '../block-list/private-block-context';
 
 // `RichTextShortcut` and `RichTextInputEvent` now live in
 // `@wordpress/rich-text` so they share the shortcut and input-event contexts
@@ -56,7 +49,7 @@ const {
 
 const instanceIdKey = Symbol( 'instanceId' );
 
-export function RichTextWrapper(
+function RichTextWrapper(
 	{
 		children,
 		tagName = 'div',
@@ -95,12 +88,14 @@ export function RichTextWrapper(
 		} );
 	}
 
+	const { supportsSplitting } = useContext( PrivateBlockContext );
 	const instanceId = useInstanceId( RichTextWrapper );
 	const anchorRef = useRef();
 	const [ anchorElement, setAnchorElement ] = useState( null );
 	const context = useBlockEditContext();
 	const { clientId, isSelected: isBlockSelected, name: blockName } = context;
 	const blockBindings = context[ blockBindingsKey ];
+	const hasDefaultEditingMode = context[ blockEditingModeKey ] === 'default';
 	const blockContext = useContext( BlockContext );
 	const registry = useRegistry();
 	const selector = ( select ) => {
@@ -243,13 +238,27 @@ export function RichTextWrapper(
 	const shouldDisableEditing =
 		readOnly || disableBoundBlock || shouldDisableForPattern;
 
-	const hasEditableRoot = useHasEditableRoot();
-	const hasDefaultEditingMode = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getBlockEditingMode( clientId ) ===
-			'default',
-		[ clientId ]
+	// Whether the wrapper is the editing host, which depends on the selected
+	// block, not necessarily this one. Only the selected, default-mode block
+	// can be it, so others skip the subscription entirely.
+	const isEditingHost = useSelect(
+		( select ) => {
+			if (
+				shouldDisableEditing ||
+				! hasDefaultEditingMode ||
+				! isBlockSelected
+			) {
+				return false;
+			}
+
+			const { getSelectedBlockClientId, canHostEditableRoot } = unlock(
+				select( blockEditorStore )
+			);
+			return canHostEditableRoot( getSelectedBlockClientId() );
+		},
+		[ shouldDisableEditing, hasDefaultEditingMode, isBlockSelected ]
 	);
+
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
 	const { selectionChange } = useDispatch( blockEditorStore );
@@ -365,7 +374,7 @@ export function RichTextWrapper(
 		'aria-activedescendant': ariaActiveDescendant,
 	} = autocompleteProps;
 	useEffect( () => {
-		if ( ! hasEditableRoot || ! isSelected ) {
+		if ( ! isSelected ) {
 			return;
 		}
 
@@ -399,7 +408,6 @@ export function RichTextWrapper(
 			}
 		};
 	}, [
-		hasEditableRoot,
 		isSelected,
 		ariaAutocomplete,
 		ariaHasPopup,
@@ -427,12 +435,10 @@ export function RichTextWrapper(
 	// focusable areas on their own, so an explicit tabIndex restores their
 	// focusability.
 	let tabIndex = props.tabIndex;
-	if ( ! shouldDisableEditing ) {
-		if ( hasEditableRoot && hasDefaultEditingMode && isBlockSelected ) {
-			tabIndex = props.tabIndex ?? 0;
-		} else if ( props.tabIndex === 0 ) {
-			tabIndex = null;
-		}
+	if ( isEditingHost ) {
+		tabIndex = props.tabIndex ?? 0;
+	} else if ( ! shouldDisableEditing && props.tabIndex === 0 ) {
+		tabIndex = null;
 	}
 
 	const TagName = tagName;
@@ -507,6 +513,7 @@ export function RichTextWrapper(
 						onSplitAtDoubleLineEnd,
 						keyboardShortcuts,
 						inputEvents,
+						supportsSplitting,
 					} ),
 					anchorRef,
 					setAnchorElement,
@@ -525,11 +532,13 @@ export function RichTextWrapper(
 	);
 }
 
+const ForwardedRichTextWrapper = forwardRef( RichTextWrapper );
+
+export { ForwardedRichTextWrapper as RichTextWrapper };
+
 // This is the private API for the RichText component.
 // It allows access to all props, not just the public ones.
-export const PrivateRichText = withDeprecations(
-	forwardRef( RichTextWrapper )
-);
+export const PrivateRichText = withDeprecations( ForwardedRichTextWrapper );
 
 PrivateRichText.Content = Content;
 PrivateRichText.isEmpty = ( value ) => {

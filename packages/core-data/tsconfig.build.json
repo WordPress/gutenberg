@@ -1,0 +1,31 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"checkJs": false,
+		"noImplicitAny": false,
+		"types": [ "node" ]
+	},
+	"references": [
+		{ "path": "../api-fetch/tsconfig.build.json" },
+		{ "path": "../components" },
+		{ "path": "../block-editor" },
+		{ "path": "../blocks" },
+		{ "path": "../compose/tsconfig.build.json" },
+		{ "path": "../data" },
+		{ "path": "../deprecated/tsconfig.build.json" },
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../global-styles-engine/tsconfig.build.json" },
+		{ "path": "../html-entities/tsconfig.build.json" },
+		{ "path": "../i18n/tsconfig.build.json" },
+		{ "path": "../icons" },
+		{ "path": "../is-shallow-equal" },
+		{ "path": "../notices/tsconfig.build.json" },
+		{ "path": "../private-apis" },
+		{ "path": "../rich-text" },
+		{ "path": "../sync/tsconfig.build.json" },
+		{ "path": "../undo-manager" },
+		{ "path": "../url" },
+		{ "path": "../warning" }
+	]
+}

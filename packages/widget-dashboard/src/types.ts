@@ -6,15 +6,7 @@
  * `ResolveWidgetModule`) live in `@wordpress/widget-primitives` and are
  * imported from there directly; this module does not re-export them.
  */
-
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import type {
 	DashboardGridLayoutItem,
 	DashboardLanesLayoutItem,

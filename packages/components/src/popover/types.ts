@@ -66,7 +66,7 @@ export type PopoverProps = {
 	/**
 	 * Determines whether tabbing is constrained to within the popover,
 	 * preventing keyboard focus from leaving the popover content without
-	 * explicit focus elswhere, or whether the popover remains part of the wider
+	 * explicit focus elsewhere, or whether the popover remains part of the wider
 	 * tab order. If no value is passed, it will be derived from `focusOnMount`.
 	 *
 	 * @default `focusOnMount` !== false

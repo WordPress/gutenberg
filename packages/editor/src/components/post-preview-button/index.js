@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { renderToString } from '@wordpress/element';
 import { Button, MenuItem, Path, SVG } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
@@ -9,10 +6,6 @@ import { applyFilters } from '@wordpress/hooks';
 import { store as coreStore } from '@wordpress/core-data';
 import { external } from '@wordpress/icons';
 import { VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 
 function buildInterstitialMarkup() {

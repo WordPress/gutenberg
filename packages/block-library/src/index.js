@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	setDefaultBlockName,
 	setFreeformContentHandlerName,
@@ -14,15 +11,7 @@ import { select } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import HtmlRenderer from './utils/html-renderer';
-
-/**
- * Internal dependencies
- */
 // Experimental blocks are only registered in the Gutenberg plugin (see
 // `__experimentalRegisterExperimentalCoreBlocks`). `registerCoreBlocks`
 // filters them out via `isBlockMetadataExperimental`, so they are never
@@ -147,7 +136,6 @@ import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
 import * as footnotes from './footnotes';
-
 import isBlockMetadataExperimental from './utils/is-block-metadata-experimental';
 import { unlock } from './lock-unlock';
 

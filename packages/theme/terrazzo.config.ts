@@ -7,6 +7,7 @@ import pluginDsTokenDocs from './bin/terrazzo-plugin-ds-tokens-docs/index';
 import pluginDsTokenFallbacks from './bin/terrazzo-plugin-ds-token-fallbacks/index';
 import inlineAliasValues from './bin/terrazzo-plugin-inline-alias-values/index';
 import typescriptTypes from './bin/terrazzo-plugin-typescript-types/index';
+import { SEMANTIC_COLOR_CONTRAST_PAIRS } from './src/semantic-color-contrast-pairs';
 
 const config: Config = {
 	tokens: [
@@ -48,39 +49,36 @@ const config: Config = {
 				},
 				// Each corner-radius preset is applied via the
 				// `data-wpds-corner-radius` attribute that `ThemeProvider`
-				// sets on its scoping element. The additional
-				// `:root:has([data-wpds-root-provider="true"]…)` selector lets
-				// a root `ThemeProvider` forward its preset to the document
-				// element, matching how `color` and `cursor` tokens already
-				// behave so the whole token surface stays consistent on
-				// `<html>` (e.g. for PHP-rendered admin UI outside the React
-				// app).
+				// sets on its scoping element. A root `ThemeProvider` mirrors
+				// its preset attributes directly to the document element so
+				// the whole token surface stays consistent on `<html>` (e.g.
+				// for PHP-rendered admin UI outside the React app).
 				{
 					mode: 'corner-radius-none',
 					selectors: [
 						'[data-wpds-corner-radius="none"]',
-						':root:has([data-wpds-root-provider="true"][data-wpds-corner-radius="none"])',
+						':root[data-wpds-root-provider="true"][data-wpds-corner-radius="none"]',
 					],
 				},
 				{
 					mode: 'corner-radius-subtle',
 					selectors: [
 						'[data-wpds-corner-radius="subtle"]',
-						':root:has([data-wpds-root-provider="true"][data-wpds-corner-radius="subtle"])',
+						':root[data-wpds-root-provider="true"][data-wpds-corner-radius="subtle"]',
 					],
 				},
 				{
 					mode: 'corner-radius-moderate',
 					selectors: [
 						'[data-wpds-corner-radius="moderate"]',
-						':root:has([data-wpds-root-provider="true"][data-wpds-corner-radius="moderate"])',
+						':root[data-wpds-root-provider="true"][data-wpds-corner-radius="moderate"]',
 					],
 				},
 				{
 					mode: 'corner-radius-pronounced',
 					selectors: [
 						'[data-wpds-corner-radius="pronounced"]',
-						':root:has([data-wpds-root-provider="true"][data-wpds-corner-radius="pronounced"])',
+						':root[data-wpds-root-provider="true"][data-wpds-corner-radius="pronounced"]',
 					],
 				},
 			],
@@ -269,49 +267,25 @@ const config: Config = {
 		} ),
 		pluginModeOverrides(),
 	],
-
-	// Linter rules current error when multiple entry files are used
-	// See https://github.com/terrazzoapp/terrazzo/issues/505
-	// lint: {
-	// 	rules: {
-	// 		'a11y/min-contrast': [
-	// 			'error',
-	// 			{
-	// 				level: 'AA',
-	// 				pairs: [
-	// 					// Standard BG / FG pairs
-	// 					...[
-	// 						'color.primitive.neutral.1',
-	// 						'color.primitive.neutral.2',
-	// 						'color.primitive.neutral.3',
-	// 						'color.primitive.primary.1',
-	// 						'color.primitive.primary.2',
-	// 						'color.primitive.primary.3',
-	// 					].flatMap( ( bgToken ) =>
-	// 						[
-	// 							'color.primitive.neutral.11',
-	// 							'color.primitive.neutral.12',
-	// 							'color.primitive.primary.11',
-	// 							'color.primitive.primary.12',
-	// 						].map( ( fgToken ) => ( {
-	// 							foreground: fgToken,
-	// 							background: bgToken,
-	// 						} ) )
-	// 					),
-	// 					// Action pairs (ie. using step 9 as background)
-	// 					{
-	// 						foreground: 'color.primitive.primary.contrast',
-	// 						background: 'color.primitive.primary.9',
-	// 					},
-	// 					{
-	// 						foreground: 'color.primitive.primary.1',
-	// 						background: 'color.primitive.primary.9',
-	// 					},
-	// 				],
-	// 			},
-	// 		],
-	// 	},
-	// },
+	lint: {
+		rules: {
+			'a11y/min-contrast': [
+				'error',
+				{
+					level: 'AA',
+					pairs: SEMANTIC_COLOR_CONTRAST_PAIRS.map(
+						( { foreground, background } ) => ( {
+							foreground: `wpds-color.${ foreground }`,
+							background: `wpds-color.${ background }`,
+						} )
+					),
+				},
+			],
+			// Primitive color names are generated outside this package and use
+			// camelCase names that do not match Terrazzo's kebab-case default.
+			'core/consistent-naming': [ 'off', {} ],
+		},
+	},
 };
 
 export default defineConfig( config, {

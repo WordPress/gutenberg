@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import {
@@ -21,10 +18,6 @@ import {
 	useBlockEditingMode,
 	__experimentalUseBlockPreview as useBlockPreview,
 } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { sharedIcon } from './shared-icon';
 import { Caption } from '../utils/caption';
 import { DEFAULT_ORDERBY, DEFAULT_ORDER, MAX_IMAGES } from './dynamic-source';

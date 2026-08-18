@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
@@ -11,10 +8,6 @@ import { file } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 import { useViewConfig } from '@wordpress/views';
-
-/**
- * Internal dependencies
- */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import CategoryItem from './category-item';
 import {
@@ -128,7 +121,7 @@ export default function SidebarNavigationScreenPatterns( { backPath } ) {
 		<SidebarNavigationScreen
 			title={ __( 'Patterns' ) }
 			description={ __(
-				'Manage what patterns are available when editing the site.'
+				'Manage what patterns are available when editing your site.'
 			) }
 			isRoot={ ! backPath }
 			backPath={ backPath }

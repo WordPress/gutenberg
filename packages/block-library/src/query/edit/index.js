@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import QueryContent from './query-content';
 import QueryPlaceholder from './query-placeholder';
 import { PatternSelectionModal } from './pattern-selection';

@@ -1,23 +1,14 @@
-/**
- * WordPress dependencies
- */
 import { createRegistry } from '@wordpress/data';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
-
-/**
- * Internal dependencies
- */
 import { store as uploadStore } from '..';
 import { ItemStatus, OperationType } from '../types';
 import { unlock } from '../../lock-unlock';
-
 jest.mock( '@wordpress/blob', () => ( {
 	__esModule: true,
 	createBlobURL: jest.fn( () => 'blob:foo' ),
 	isBlobURL: jest.fn( ( str: string ) => str.startsWith( 'blob:' ) ),
 	revokeBlobURL: jest.fn(),
 } ) );
-
 jest.mock( '../utils', () => ( {
 	vipsCancelOperations: jest.fn( () => Promise.resolve( true ) ),
 	vipsResizeImage: jest.fn( () =>
@@ -32,7 +23,6 @@ jest.mock( '../utils', () => ( {
 	vipsConvertImageFormat: jest.fn(),
 	terminateVipsWorker: jest.fn(),
 } ) );
-
 /*
  * actions.ts transitively imports private-actions, which also pulls in
  * convertGifToVideo / isUnsupportedConversionError, so the mock must cover the
@@ -47,7 +37,6 @@ jest.mock( '../utils/video-conversion', () => {
 		isUnsupportedConversionError: actual.isUnsupportedConversionError,
 	};
 } );
-
 // Import the mocked modules to access the mock functions.
 import { vipsCancelOperations } from '../utils';
 import { cancelGifToVideoOperations } from '../utils/video-conversion';
@@ -55,7 +44,6 @@ import { cancelGifToVideoOperations } from '../utils/video-conversion';
 function createRegistryWithStores() {
 	// Create a registry and register used stores.
 	const registry = createRegistry();
-	// @ts-ignore
 	[ uploadStore ].forEach( registry.register );
 	return registry;
 }
@@ -1778,7 +1766,7 @@ describe( 'actions', () => {
 
 		afterEach( () => {
 			// Clean up global mock.
-			// @ts-ignore
+			// @ts-expect-error The operand of `delete` must be optional.
 			delete global.createImageBitmap;
 		} );
 

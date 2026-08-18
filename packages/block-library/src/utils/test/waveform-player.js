@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import '@testing-library/jest-dom';
 import { act, render } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { WaveformPlayer } from '../waveform-player';
 import {
 	applyWaveformPlayerStyles,

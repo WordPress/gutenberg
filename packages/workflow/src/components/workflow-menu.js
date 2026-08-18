@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { Command, useCommandState } from 'cmdk';
-
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useEffect, useRef, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -13,22 +6,15 @@ import {
 	Modal,
 	TextHighlight,
 	__experimentalHStack as HStack,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import {
 	store as keyboardShortcutsStore,
 	useShortcut,
 } from '@wordpress/keyboard-shortcuts';
+import { withIgnoreIMEEvents } from '@wordpress/keycodes';
 import { Icon, search as inputIcon } from '@wordpress/icons';
 import { executeAbility, store as abilitiesStore } from '@wordpress/abilities';
-
-/**
- * Internal dependencies
- */
 import './workflow-menu.scss';
-import { unlock } from '../lock-unlock';
-
-const { withIgnoreIMEEvents } = unlock( componentsPrivateApis );
 
 /**
  * Constants

@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { render, renderHook, screen } from '@testing-library/react';
 import { click, render as renderAriakit } from '@ariakit/test/react';
-
-/**
- * Internal dependencies
- */
 import ColorPanel, {
 	useHasColorPanel,
 	useHasTextPanel,
@@ -16,6 +9,17 @@ import ColorPanel, {
 	useHasButtonPanel,
 	useHasCaptionPanel,
 } from '../color-panel';
+
+// The inheritance treatment sits behind the
+// `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these
+// tests exercise the inheriting path.
+beforeEach( () => {
+	window.__experimentalGlobalStylesInheritanceUI = true;
+} );
+
+afterEach( () => {
+	delete window.__experimentalGlobalStylesInheritanceUI;
+} );
 
 const settingsWithColors = ( overrides = {} ) => ( {
 	color: {
@@ -251,6 +255,30 @@ describe( 'ColorPanel — duplicate-hex preset slug identity', () => {
 		// must follow the stored slug; matching by hex would mark both.
 		expect( swatches[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
 		expect( swatches[ 0 ] ).toHaveAttribute( 'aria-selected', 'false' );
+	} );
+} );
+
+describe( 'ColorPanel — additional elements', () => {
+	it( 'renders additional element color controls', () => {
+		render(
+			<ColorPanel
+				value={ {} }
+				settings={ settingsWithColors( {
+					text: true,
+					background: true,
+				} ) }
+				onChange={ () => {} }
+				panelId="test-panel"
+				additionalElements={ [
+					{ name: 'textInput', label: 'Inputs' },
+				] }
+				defaultControls={ { textInput: true } }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: /^Inputs/ } )
+		).toBeVisible();
 	} );
 } );
 
