@@ -8,12 +8,10 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { Badge, Stack, Text } from '@wordpress/ui';
 import type { ComponentProps } from 'react';
 
-/*
- * Every async site health test core exposes over REST. The remaining core
- * checks are direct (PHP-only) and have no endpoint; they appear only on
- * the classic Site Health screen. The site-health widget reads the same
- * set; keep `widgets/site-health/render.tsx` in sync.
- */
+/* Every async site health test core exposes over REST. The remaining core
+   checks are direct (PHP-only) and have no endpoint; they appear only on
+   the classic Site Health screen. The site-health widget reads the same
+   set; keep `widgets/site-health/render.tsx` in sync. */
 const ASYNC_TEST_PATHS = [
 	'/wp-site-health/v1/tests/background-updates',
 	'/wp-site-health/v1/tests/loopback-requests',
