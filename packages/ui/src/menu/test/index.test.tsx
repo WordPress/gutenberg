@@ -127,6 +127,37 @@ describe( 'Menu', () => {
 		).toHaveFocus();
 	} );
 
+	it( 'keeps pointer hover separate from keyboard highlighting', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.Item>Duplicate</Menu.Item>
+					<Menu.Item disabled>Unavailable action</Menu.Item>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+		await user.keyboard( '{ArrowDown}' );
+
+		const duplicateItem = screen.getByRole( 'menuitem', {
+			name: 'Duplicate',
+		} );
+		const disabledItem = screen.getByRole( 'menuitem', {
+			name: 'Unavailable action',
+		} );
+
+		expect( duplicateItem ).toHaveAttribute( 'data-highlighted' );
+
+		await user.hover( disabledItem );
+
+		expect( disabledItem ).not.toHaveAttribute( 'data-highlighted' );
+		expect( duplicateItem ).toHaveAttribute( 'data-highlighted' );
+	} );
+
 	it.each( [
 		{ location: 'root menu', nested: false, checkbox: false },
 		{ location: 'submenu', nested: true, checkbox: false },

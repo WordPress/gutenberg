@@ -5,10 +5,16 @@ import type { SubmenuRootProps } from './types';
 /**
  * Groups all parts of a nested submenu.
  */
-function SubmenuRoot( props: SubmenuRootProps ) {
+function SubmenuRoot( {
+	highlightItemOnHover = false,
+	...props
+}: SubmenuRootProps ) {
 	return (
 		<MenuContext.Provider value={ { isSubmenu: true } }>
-			<_Menu.SubmenuRoot { ...props } />
+			<_Menu.SubmenuRoot
+				{ ...props }
+				highlightItemOnHover={ highlightItemOnHover }
+			/>
 		</MenuContext.Provider>
 	);
 }
