@@ -251,7 +251,6 @@ const PlaylistTrackEdit = ( {
 				</PanelBody>
 			</InspectorControls>
 			<li { ...blockProps }>
-				{ !! temporaryURL && <Spinner /> }
 				<button
 					className="wp-block-playlist-track__button"
 					onClick={ () => setCurrentTrackClientId( clientId ) }
@@ -271,7 +270,8 @@ const PlaylistTrackEdit = ( {
 							tagName="span"
 							className="wp-block-playlist-track__title"
 							value={ title }
-							placeholder={ __( 'Add title' ) }
+							aria-label={ __( 'Track title' ) }
+							placeholder={ __( 'Track title' ) }
 							onChange={ ( value ) => {
 								setAttributes( { title: value } );
 							} }
@@ -282,7 +282,8 @@ const PlaylistTrackEdit = ( {
 								tagName="span"
 								className="wp-block-playlist-track__artist"
 								value={ artist }
-								placeholder={ __( 'Add artist' ) }
+								aria-label={ __( 'Track artist' ) }
+								placeholder={ __( 'Track artist' ) }
 								onChange={ ( value ) =>
 									setAttributes( { artist: value } )
 								}
@@ -300,6 +301,9 @@ const PlaylistTrackEdit = ( {
 							</span>
 						) }
 						{ length }
+						{ !! temporaryURL && (
+							<Spinner className="wp-block-playlist-track__spinner" />
+						) }
 					</span>
 					<span className="screen-reader-text">{ __( 'Play' ) }</span>
 				</button>

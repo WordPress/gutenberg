@@ -1190,6 +1190,13 @@ describe( 'filterURLForDisplay', () => {
 		);
 		expect( url ).toBe( 'superlongti…ion.jpeg' );
 	} );
+	it( 'should not return more than the shortest truncation when maxLength is tiny', () => {
+		const url = filterURLForDisplay(
+			'https://example.com/averylongfilename.png',
+			5
+		);
+		expect( url ).toBe( '…ame.png' );
+	} );
 	it( 'should remove query arguments', () => {
 		const url = filterURLForDisplay(
 			'http://www.wordpress.org/wp-content/uploads/myimage.jpeg?query_args=a',
@@ -1297,5 +1304,25 @@ describe( 'normalizePath', () => {
 	it( 'sorts urldecoded values and returns property urlencoded query string', () => {
 		const ab = normalizePath( '/foo/bar?a%2Ca=5,5&a,b=1,1' );
 		expect( ab ).toBe( '/foo/bar?a%2Ca=5%2C5&a%2Cb=1%2C1' );
+	} );
+
+	it( 'should not blow up on malformed params', () => {
+		const path = '/foo/bar?baz=%E0%A4%A';
+
+		expect( () => normalizePath( path ) ).not.toThrow();
+		expect( normalizePath( path ) ).toBe( '/foo/bar?baz=%25E0%25A4%25A' );
+	} );
+
+	it( 'returns a stable path when a param is malformed', () => {
+		const ab = normalizePath( '/foo/bar?a=5&b=50%off' );
+		const ba = normalizePath( '/foo/bar?b=50%off&a=5' );
+
+		expect( ab ).toBe( ba );
+	} );
+
+	it( 'keeps the query beyond a second question mark', () => {
+		expect( normalizePath( '/foo/bar?redirect=/watch?v=abc' ) ).toBe(
+			'/foo/bar?redirect=%2Fwatch%3Fv=abc'
+		);
 	} );
 } );

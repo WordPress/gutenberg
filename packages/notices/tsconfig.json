@@ -1,13 +1,20 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
+	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
-		"types": [ "gutenberg-env", "style-imports" ],
-		"checkJs": false
+		"types": [ "jest", "gutenberg-env", "style-imports" ]
 	},
+	"files": [ "global.d.ts" ],
 	"references": [
-		{ "path": "../a11y" },
+		{ "path": "./tsconfig.build.json" },
+		{ "path": "../a11y/tsconfig.build.json" },
 		{ "path": "../components" },
 		{ "path": "../data" }
+	],
+	// Listed files have pre-existing type errors; include them once fixed.
+	"exclude": [
+		"**/benchmark",
+		"src/components/inline-notices/test/index.test.tsx",
+		"src/store/test/reducer.ts"
 	]
 }
