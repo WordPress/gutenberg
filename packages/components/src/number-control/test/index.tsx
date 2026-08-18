@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import _NumberControl from '..';
@@ -551,6 +551,44 @@ describe( 'NumberControl', () => {
 			await user.keyboard( '{Shift>}[ArrowDown]{/Shift}' );
 
 			expect( input ).toHaveValue( 4 );
+		} );
+	} );
+
+	describe( 'drag to change value', () => {
+		// jsdom implements neither `PointerEvent` nor `Touch`, so the drag
+		// gesture falls back to touch events that have to be built by hand.
+		const fireTouchEvent = (
+			type: string,
+			input: HTMLElement,
+			clientY: number
+		) => {
+			const event = new Event( type, {
+				bubbles: true,
+				cancelable: true,
+			} );
+			const touches = [
+				{ identifier: 1, target: input, clientX: 0, clientY },
+			];
+			Object.assign( event, {
+				touches,
+				targetTouches: touches,
+				changedTouches: touches,
+			} );
+			fireEvent( type === 'touchstart' ? input : window, event );
+		};
+
+		it( 'should not change the value when dragging on a touch device', () => {
+			const onChange = jest.fn();
+			render( <NumberControl value="5" onChange={ onChange } /> );
+
+			const input = screen.getByRole( 'spinbutton' );
+			fireTouchEvent( 'touchstart', input, 0 );
+			fireTouchEvent( 'touchmove', input, -20 );
+			fireTouchEvent( 'touchmove', input, -60 );
+			fireTouchEvent( 'touchend', input, -60 );
+
+			expect( onChange ).not.toHaveBeenCalled();
+			expect( input ).toHaveValue( 5 );
 		} );
 	} );
 
