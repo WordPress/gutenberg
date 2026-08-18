@@ -1,5 +1,11 @@
 /* eslint-disable no-console */
 import '../matchers';
+import type { ExtendedMock } from '../types';
+
+// The matchers replace the console methods with counting spies.
+function getSpy( methodName: 'error' | 'info' | 'log' | 'warn' ) {
+	return console[ methodName ] as unknown as ExtendedMock;
+}
 
 describe( 'jest-console', () => {
 	describe.each( [
@@ -7,8 +13,8 @@ describe( 'jest-console', () => {
 		[ 'info', 'toHaveInformed' ],
 		[ 'log', 'toHaveLogged' ],
 		[ 'warn', 'toHaveWarned' ],
-	] )( 'console.%s', ( methodName, matcherName ) => {
-		const matcherNameWith = `${ matcherName }With`;
+	] as const )( 'console.%s', ( methodName, matcherName ) => {
+		const matcherNameWith = `${ matcherName }With` as const;
 		const message = `This is ${ methodName }!`;
 
 		test( `${ matcherName } works`, () => {
@@ -52,7 +58,7 @@ describe( 'jest-console', () => {
 		} );
 
 		test( 'assertions number gets incremented after every matcher call', () => {
-			const spy = console[ methodName ];
+			const spy = getSpy( methodName );
 
 			expect( spy.assertionsNumber ).toBe( 0 );
 
@@ -74,7 +80,7 @@ describe( 'jest-console', () => {
 				// method as being a spy.
 				// eslint-disable-next-line jest/no-standalone-expect
 				expect(
-					console[ methodName ].assertionsNumber
+					getSpy( methodName ).assertionsNumber
 				).toBeGreaterThanOrEqual( 0 );
 			} );
 

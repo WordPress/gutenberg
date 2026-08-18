@@ -62,9 +62,38 @@ if ( ! rootSolutionReferences.has( buildSolutionPath ) ) {
 	);
 }
 
+/* Ambient types only test files may use. */
+const TEST_TYPES = new Set( [ 'jest', 'gutenberg-test-env' ] );
+
+/*
+ * A package exclude replaces the inherited one, so a build project that sets
+ * its own must keep every dev-file pattern the base config excludes.
+ */
+const baseConfigPath = resolve( repoRoot, 'tsconfig.base.json' );
+const REQUIRED_BUILD_EXCLUDES = existsSync( baseConfigPath )
+	? ( readTsconfig( baseConfigPath ).exclude ?? [] ).filter( ( pattern ) =>
+			/test|stories|story/.test( pattern )
+	  )
+	: [];
+
 const packagesWithTypes = glob
 	.sync( 'packages/*/tsconfig.json', { cwd: repoRoot } )
 	.map( ( tsconfigPath ) => basename( dirname( tsconfigPath ) ) );
+
+/**
+ * Whether a project extends the shared dev configuration, which packages use
+ * for the files they never publish declarations for.
+ *
+ * @param {string} tsconfigPath Absolute path of the project.
+ * @return {boolean} Whether the project is a dev project.
+ */
+function isDevProject( tsconfigPath ) {
+	const extended = readTsconfig( tsconfigPath ).extends;
+	return (
+		typeof extended === 'string' &&
+		basename( extended ) === 'tsconfig.dev.base.json'
+	);
+}
 
 /**
  * Returns the projects a package builds its declarations from and, if any,
@@ -77,12 +106,18 @@ const packagesWithTypes = glob
 function packageProjects( packageName ) {
 	const packageDir = resolve( repoRoot, 'packages', packageName );
 	const buildProject = join( packageDir, 'tsconfig.build.json' );
+	const defaultProject = join( packageDir, 'tsconfig.json' );
 
 	if ( existsSync( buildProject ) ) {
-		return {
-			srcProject: buildProject,
-			devProject: join( packageDir, 'tsconfig.json' ),
-		};
+		return { srcProject: buildProject, devProject: defaultProject };
+	}
+
+	/*
+	 * A package that emits no declarations needs no build project: its
+	 * default project checks src along with the dev files.
+	 */
+	if ( isDevProject( defaultProject ) ) {
+		return { srcProject: undefined, devProject: defaultProject };
 	}
 
 	const testProject = join( packageDir, 'tsconfig.test.json' );
@@ -123,7 +158,7 @@ function srcProjectReferences( srcProject, packageName ) {
 for ( const packageName of packagesWithTypes ) {
 	const { srcProject, devProject } = packageProjects( packageName );
 
-	if ( ! buildSolutionReferences.has( srcProject ) ) {
+	if ( srcProject && ! buildSolutionReferences.has( srcProject ) ) {
 		reportError(
 			`Missing reference to "${ relative(
 				repoRoot,
@@ -139,6 +174,51 @@ for ( const packageName of packagesWithTypes ) {
 				devProject
 			) }" in tsconfig.json`
 		);
+	}
+
+	if ( srcProject && devProject && isDevProject( devProject ) ) {
+		const buildExclude = readTsconfig( srcProject ).exclude;
+		if ( buildExclude ) {
+			for ( const pattern of REQUIRED_BUILD_EXCLUDES ) {
+				if ( ! buildExclude.includes( pattern ) ) {
+					reportError(
+						`Missing exclude "${ pattern }" in ${ relative(
+							repoRoot,
+							srcProject
+						) }`
+					);
+				}
+			}
+		}
+	}
+
+	/*
+	 * Tests import the sources, so a dev project must see every ambient type
+	 * the build project sees, and the build must not see any test type.
+	 */
+	if ( srcProject && devProject && isDevProject( devProject ) ) {
+		const buildTypes =
+			readTsconfig( srcProject ).compilerOptions?.types ?? [];
+		const devTypes = readTsconfig( devProject ).compilerOptions?.types ?? [
+			'jest',
+		];
+		for ( const type of buildTypes ) {
+			if ( TEST_TYPES.has( type ) ) {
+				reportError(
+					`Test type "${ type }" in ${ relative(
+						repoRoot,
+						srcProject
+					) }`
+				);
+			} else if ( ! devTypes.includes( type ) ) {
+				reportError(
+					`Missing type "${ type }" in ${ relative(
+						repoRoot,
+						devProject
+					) }`
+				);
+			}
+		}
 	}
 
 	let packageJson;
@@ -158,9 +238,11 @@ for ( const packageName of packagesWithTypes ) {
 
 	/*
 	 * Only what the src project reaches counts: a reference that lives in
-	 * the dev project alone leaves the package build without it.
+	 * the dev project alone leaves the package build without it. Packages
+	 * without a build project check their dependencies in the dev project.
 	 */
-	const references = srcProjectReferences( srcProject, packageName );
+	const dependingProject = srcProject ?? devProject;
+	const references = srcProjectReferences( dependingProject, packageName );
 
 	if ( packageJson.dependencies ) {
 		for ( const dependency of Object.keys( packageJson.dependencies ) ) {
@@ -174,12 +256,15 @@ for ( const packageName of packagesWithTypes ) {
 				const dependencyProject = packageProjects(
 					dependencyPackageName
 				).srcProject;
+				if ( ! dependencyProject ) {
+					continue;
+				}
 				if ( ! references.has( dependencyProject ) ) {
 					reportError(
 						`Missing reference to "${ relative(
 							resolve( repoRoot, 'packages', packageName ),
 							dependencyProject
-						) }" in ${ relative( repoRoot, srcProject ) }`
+						) }" in ${ relative( repoRoot, dependingProject ) }`
 					);
 				}
 			}

@@ -54,7 +54,6 @@
 		"memize": "^2.1.1"
 	},
 	"devDependencies": {
-		"@testing-library/jest-dom": "^6.9.1",
 		"@types/jest": "^30.0.0"
 	},
 	"publishConfig": {

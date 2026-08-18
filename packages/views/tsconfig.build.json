@@ -1,0 +1,12 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"references": [
+		{ "path": "../core-data/tsconfig.build.json" },
+		{ "path": "../data" },
+		{ "path": "../dataviews" },
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../preferences/tsconfig.build.json" },
+		{ "path": "../private-apis" }
+	]
+}
