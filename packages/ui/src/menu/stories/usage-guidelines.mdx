@@ -60,6 +60,8 @@ Do not use checked menu items only to recreate a Select. If choosing a value is 
 Append an ellipsis (`…`) when activating an item opens another interface that requires more user input before the command can finish, such as a dialog.
 
 -   Use **Rename…** when activation opens a dialog where the user enters a new name.
+-   Use **Delete…** when activation opens a confirmation dialog that requires a decision.
+-   Use **Preferences** without an ellipsis when activation completes the command by opening the preferences interface.
 -   Use **Duplicate** when activation completes the command immediately.
 -   Use **Move to** without an ellipsis when the item opens a submenu.
 
@@ -70,8 +72,8 @@ The consumer must add the ellipsis because `Menu.Item` cannot infer what happens
 -   **Using Menu to choose the control's only value.** Use `SelectControl` so the trigger and options communicate value selection.
 -   **Putting commands or links in Select.** Use `Menu.Item` for commands and `Menu.LinkItem` for destinations.
 -   **Using Menu for a large set of searchable commands.** Use `Autocomplete` when users need to filter commands or suggestions by typing.
--   **Using radio items only because they show a checkmark.** Use `Menu.RadioItem` only when the state belongs inside a broader command menu.
--   **Adding an ellipsis to every item that opens more content.** Reserve it for commands that require more input before completion, not submenu triggers.
+-   **Using radio items to recreate a Select.** Use `Menu.RadioItem` only when the state belongs inside a broader command menu.
+-   **Adding an ellipsis to every item that opens another interface.** Reserve it for commands that require more input before completion. Do not add it when opening the interface completes the command, as with **Preferences**.
 
 ## References
 
