@@ -4,11 +4,11 @@ The collection of schemas used in WordPress, including the `theme.json`, `block.
 
 JSON schemas are used by code editors to offer tooltips, autocomplete, and validation.
 
-## What the schema does and does not check
+## What a schema does and does not check
 
-The schema checks the _shape_ of your file, not whether it does anything. It is deliberately more permissive than WordPress itself.
+A schema checks the _shape_ of your file, not whether what you wrote does anything. Every one of these files is read by something: WordPress reads most of them, the `wp-env` tool reads `.wp-env.json`. The schema is deliberately more permissive than that code.
 
-Three sets, each contained in the one above it:
+Take `theme.json`. Three sets, each contained in the one above it:
 
 ```
 +- validates against the schema -------------------+
@@ -19,14 +19,14 @@ Three sets, each contained in the one above it:
 +--------------------------------------------------+
 ```
 
-The schema is the widest ring on purpose. JSON Schema can check key names, types, enums and string patterns. It cannot run WordPress, and it cannot tell whether a string is valid CSS. So a file can validate and still be rejected or ignored at runtime.
+The schema is the widest ring on purpose. JSON Schema can check key names, types, enums and string patterns. It cannot run WordPress, and it cannot tell whether a string is valid CSS. So a file can validate and still be rejected or ignored when it is read.
 
 ## Changing a schema
 
 ### Requirements
 
--   **If it works, the schema must accept it.** Marking a key invalid when WordPress acts on it is a bug. Fix the schema.
--   **The schema must not be the only place a rejection is explained.** If WordPress drops or ignores a value, say so at runtime, with `_doing_it_wrong()` or a notice. Don't rely on an editor squiggle nobody sees.
+-   **If it works, the schema must accept it.** Marking a key invalid when the code that reads the file acts on it is a bug. Fix the schema.
+-   **The schema must not be the only place a rejection is explained.** If the code drops or ignores a value, say so where the author will see it. In PHP that means `_doing_it_wrong()` or a notice. Don't rely on an editor squiggle nobody sees.
 
 ### Suggestions
 
