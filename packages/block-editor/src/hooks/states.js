@@ -3,7 +3,7 @@
  */
 import { useMemo } from '@wordpress/element';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -17,10 +17,13 @@ import { unlock } from '../lock-unlock';
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
 export const PSEUDO_STATE_LABELS = {
-	':hover': __( 'Hover' ),
-	':focus': __( 'Focus' ),
-	':focus-visible': __( 'Focus-visible' ),
-	':active': __( 'Active' ),
+	':hover': _x( 'Hover', 'Name for the CSS pseudo-class selector' ),
+	':focus': _x( 'Focus', 'Name for the CSS pseudo-class selector' ),
+	':focus-visible': _x(
+		'Focus-visible',
+		'Name for the CSS pseudo-class selector'
+	),
+	':active': _x( 'Active', 'Name for the CSS pseudo-class selector' ),
 };
 
 export const RESPONSIVE_STATE_LABELS = {
