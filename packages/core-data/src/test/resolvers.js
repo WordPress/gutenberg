@@ -380,6 +380,7 @@ describe( 'getEntityRecord', () => {
 			data: {
 				room: 'postType/post:1',
 				doc: SERIALIZED_DOC,
+				expected_doc: 'doc2',
 			},
 		} );
 		expect( syncManager.update ).not.toHaveBeenCalled();
@@ -440,6 +441,7 @@ describe( 'getEntityRecord', () => {
 			data: {
 				room: 'postType/post:1',
 				doc: SERIALIZED_DOC,
+				expected_doc: '',
 			},
 		} );
 		expect( syncManager.update ).not.toHaveBeenCalled();

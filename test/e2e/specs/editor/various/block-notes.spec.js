@@ -1,8 +1,48 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const {
+	setCollaboration,
+} = require( '../collaboration/fixtures/collaboration-utils' );
+
+function getRestPath( url ) {
+	const parsedUrl = new URL( url );
+	return (
+		parsedUrl.searchParams.get( 'rest_route' ) ||
+		parsedUrl.pathname.replace( /^\/wp-json/, '' )
+	);
+}
+
+function isTargetedRepairRequest( request ) {
+	return (
+		request.method() === 'POST' &&
+		getRestPath( request.url() ) === '/wp-sync/v1/save-entity' &&
+		typeof request.postDataJSON()?.doc === 'string'
+	);
+}
+
+async function selectInlineText( page, paragraph, endOffset ) {
+	await paragraph.click();
+	await page.keyboard.press( 'ControlOrMeta+a' );
+	await expect
+		.poll( () =>
+			page.evaluate( () => {
+				const { getSelectionStart, getSelectionEnd } =
+					window.wp.data.select( 'core/block-editor' );
+				return [
+					getSelectionStart()?.offset,
+					getSelectionEnd()?.offset,
+				];
+			} )
+		)
+		.toEqual( [ 0, endOffset ] );
+}
 
 test.use( {
 	blockNoteUtils: async ( { page, editor, pageUtils }, use ) => {
 		await use( new BlockNoteUtils( { page, editor, pageUtils } ) );
+	},
+	enableCollaboration: async ( { requestUtils }, use ) => {
+		await use( () => setCollaboration( requestUtils, true ) );
+		await setCollaboration( requestUtils, false );
 	},
 } );
 
@@ -1051,6 +1091,215 @@ test.describe( 'Block Notes', () => {
 
 			await expect( thread ).toBeVisible();
 			await expect( thread ).toBeFocused();
+		} );
+	} );
+
+	test.describe( 'Attachment persistence', () => {
+		test.beforeEach( async ( { enableCollaboration, page } ) => {
+			await enableCollaboration();
+			await page.reload();
+			await page.waitForFunction( () => {
+				const postId = window.wp?.data
+					.select( 'core/editor' )
+					.getCurrentPostId();
+				return (
+					window._wpCollaborationEnabled === true &&
+					postId &&
+					window.wp.data
+						.select( 'core' )
+						.hasFinishedResolution( 'getEntityRecord', [
+							'postType',
+							'post',
+							postId,
+						] )
+				);
+			} );
+		} );
+
+		test( 'persists an attachment without saving unrelated dirty edits', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Saved note target.' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Saved sibling.' },
+			} );
+			await editor.saveDraft();
+			await page.reload();
+
+			const paragraphs = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraphs.nth( 1 ).click();
+			await page.keyboard.press( 'ControlOrMeta+a' );
+			await page.keyboard.type( 'Unsaved sibling edit.' );
+			await paragraphs.nth( 0 ).click();
+			await blockNoteUtils.addNote( 'Persistent attachment' );
+			await page.reload();
+
+			const blocks = await editor.getBlocks();
+			expect( blocks[ 0 ].attributes.metadata.noteId ).toHaveLength( 1 );
+			expect( blocks[ 1 ].attributes.content ).toBe( 'Saved sibling.' );
+		} );
+
+		test( 'refuses a divergent dirty path', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Saved sibling' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Saved target' },
+			} );
+			await editor.saveDraft();
+
+			await page.evaluate( () => {
+				window.wp.data.dispatch( 'core/block-editor' ).insertBlock(
+					window.wp.blocks.createBlock( 'core/paragraph', {
+						content: 'Dirty insertion',
+					} ),
+					0
+				);
+			} );
+			const target = editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.filter( { hasText: 'Saved target' } );
+			await target.click();
+			await page.keyboard.press( 'ControlOrMeta+a' );
+			await page.keyboard.type( 'Dirty target' );
+			await blockNoteUtils.addNote( 'Do not attach to the sibling' );
+			await page.reload();
+
+			const blocks = await editor.getBlocks();
+			expect(
+				blocks.some( ( block ) => block.attributes.metadata?.noteId )
+			).toBe( false );
+		} );
+
+		test( 'persists the selected duplicate contentless block', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( { name: 'core/separator' } );
+			await editor.insertBlock( { name: 'core/separator' } );
+			await editor.saveDraft();
+			await page.reload();
+
+			const separators = editor.canvas.getByRole( 'document', {
+				name: 'Block: Separator',
+			} );
+			await editor.selectBlocks( separators.nth( 1 ) );
+			await blockNoteUtils.addNote( 'Second separator note' );
+			await page.reload();
+
+			const blocks = await editor.getBlocks();
+			expect( blocks[ 0 ].attributes.metadata?.noteId ).toBeUndefined();
+			expect( blocks[ 1 ].attributes.metadata?.noteId ).toHaveLength( 1 );
+		} );
+
+		test( 'persists an inline note marker without a post save', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const post = await requestUtils.createPost( {
+				content:
+					'<!-- wp:paragraph --><p>Persist this inline note.</p><!-- /wp:paragraph -->',
+				status: 'draft',
+			} );
+			await admin.editPost( post.id );
+
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await selectInlineText(
+				page,
+				paragraph,
+				'Persist this inline note.'.length
+			);
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await page
+				.getByRole( 'textbox', { name: 'New note', exact: true } )
+				.fill( 'Persistent inline note' );
+			const repairCompleted = page.waitForResponse(
+				( response ) =>
+					response.ok() &&
+					isTargetedRepairRequest( response.request() )
+			);
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+			await repairCompleted;
+			await page.reload();
+
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveText(
+				'Persist this inline note.'
+			);
+		} );
+
+		test( 'does not fall back to a full post save when repair fails', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Clean fallback host.' },
+			} );
+			await editor.saveDraft();
+			await page.reload();
+			await editor.selectBlocks(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+			);
+
+			await page.route( '**/*', async ( route ) => {
+				if ( isTargetedRepairRequest( route.request() ) ) {
+					await route.fulfill( {
+						status: 500,
+						contentType: 'application/json',
+						body: JSON.stringify( {
+							code: 'forced_attachment_failure',
+							message: 'Forced attachment repair failure.',
+						} ),
+					} );
+					return;
+				}
+				await route.continue();
+			} );
+			const postUpdates = [];
+			page.on( 'request', ( request ) => {
+				if (
+					request.method() === 'POST' &&
+					/^\/wp\/v2\/posts\/\d+$/.test(
+						getRestPath( request.url() )
+					)
+				) {
+					postUpdates.push( request.postDataJSON() );
+				}
+			} );
+
+			await blockNoteUtils.addNote( 'No fallback save' );
+
+			expect( postUpdates ).toEqual( [] );
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Forced attachment repair failure.' } )
+			).toBeVisible();
 		} );
 	} );
 

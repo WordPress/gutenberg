@@ -35,6 +35,104 @@ import {
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
+function getBlockAttributeText( block, attributeName ) {
+	const value = block?.attributes?.[ attributeName ];
+	return typeof value === 'string' ? value : value?.toString?.() || '';
+}
+
+function mergeNoteMetadata( savedMetadata, liveMetadata ) {
+	const noteId = [
+		...new Set( [
+			...getNoteIdsFromMetadata( savedMetadata ),
+			...getNoteIdsFromMetadata( liveMetadata ),
+		] ),
+	];
+
+	return {
+		...savedMetadata,
+		...liveMetadata,
+		noteId,
+	};
+}
+
+function getBlockPath( blocks, clientId ) {
+	for ( let index = 0; index < blocks.length; index++ ) {
+		const block = blocks[ index ];
+		if ( block.clientId === clientId ) {
+			return [ index ];
+		}
+
+		const childPath = getBlockPath( block.innerBlocks || [], clientId );
+		if ( childPath ) {
+			return [ index, ...childPath ];
+		}
+	}
+
+	return null;
+}
+
+function getBlockMatchPosition( blocks, clientId, isMatch ) {
+	let matchCount = 0;
+	let matchIndex = null;
+
+	const visit = ( blockList ) => {
+		for ( const block of blockList ) {
+			if ( isMatch( block ) ) {
+				if ( block.clientId === clientId ) {
+					matchIndex = matchCount;
+				}
+				matchCount++;
+			}
+			visit( block.innerBlocks || [] );
+		}
+	};
+
+	visit( blocks );
+	return { matchCount, matchIndex };
+}
+
+function getBlockCount( blocks ) {
+	return blocks.reduce(
+		( count, block ) =>
+			count + 1 + getBlockCount( block.innerBlocks || [] ),
+		0
+	);
+}
+
+function hasStableBlockTree(
+	savedBlocks,
+	liveBlocks,
+	targetPath,
+	parentPath = []
+) {
+	if ( savedBlocks.length !== liveBlocks.length ) {
+		return false;
+	}
+
+	return savedBlocks.every( ( savedBlock, index ) => {
+		const liveBlock = liveBlocks[ index ];
+		const path = [ ...parentPath, index ];
+		const isTarget =
+			path.length === targetPath?.length &&
+			path.every(
+				( pathIndex, offset ) => pathIndex === targetPath[ offset ]
+			);
+
+		return (
+			savedBlock?.name === liveBlock?.name &&
+			( isTarget ||
+				getBlockAttributeText( savedBlock, 'content' ) ===
+					getBlockAttributeText( liveBlock, 'content' ) ) &&
+			hasStableBlockTree(
+				savedBlock?.innerBlocks || [],
+				liveBlock?.innerBlocks || [],
+				targetPath,
+				path
+			)
+		);
+	} );
+}
+
 export function useNoteThreads( postId ) {
 	const queryArgs = {
 		post: postId,
@@ -205,9 +303,23 @@ function readInlineSelection( getSelectionStart, getSelectionEnd ) {
 }
 
 /**
- * Wrap a rich-text range with a core/note marker. Returns a new
- * RichTextData ready to write back into block attributes, or null when the
- * incoming value isn't a rich-text instance (legacy/string attributes).
+ * Convert live or serialized rich text into the representation used by the
+ * block editor.
+ *
+ * @param {*} value Block attribute value.
+ * @return {?RichTextData} Rich text value, or null for unsupported attributes.
+ */
+function toRichTextData( value ) {
+	if ( value instanceof RichTextData ) {
+		return value;
+	}
+	return typeof value === 'string'
+		? RichTextData.fromHTMLString( value )
+		: null;
+}
+
+/**
+ * Wrap a rich-text range with a core/note marker.
  *
  * @param {*}      value Existing block attribute value.
  * @param {number} id    New note id to embed as `data-id`.
@@ -216,11 +328,12 @@ function readInlineSelection( getSelectionStart, getSelectionEnd ) {
  * @return {?RichTextData} Wrapped value or null when the attribute isn't rich text.
  */
 function wrapInlineNote( value, id, start, end ) {
-	if ( ! ( value instanceof RichTextData ) ) {
+	const richTextValue = toRichTextData( value );
+	if ( ! richTextValue ) {
 		return null;
 	}
 	const record = applyNoteFormat(
-		create( { html: value.toHTMLString() } ),
+		create( { html: richTextValue.toHTMLString() } ),
 		{ type: NOTE_FORMAT_NAME, attributes: { 'data-id': String( id ) } },
 		start,
 		end
@@ -270,9 +383,13 @@ function clearInlineNoteMarker(
 export function useNoteActions() {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
-	const { getCurrentPostId } = useSelect( editorStore );
+	const { persistEntityBlockAttributes } = unlock( useDispatch( coreStore ) );
+	const { getCurrentPost, getCurrentPostId, getCurrentPostType } =
+		useSelect( editorStore );
 	const {
+		getBlock,
 		getBlockAttributes,
+		getBlocks,
 		getClientIdsWithDescendants,
 		getSelectedBlockClientId,
 		getSelectionStart,
@@ -302,6 +419,17 @@ export function useNoteActions() {
 			const clientId = ! parent
 				? inlineSelection?.clientId || getSelectedBlockClientId()
 				: null;
+			const inlineSelectionValue = inlineSelection
+				? getBlockAttributes( inlineSelection.clientId )?.[
+						inlineSelection.attributeKey
+				  ]
+				: null;
+			const inlineSelectionText =
+				inlineSelectionValue instanceof RichTextData
+					? inlineSelectionValue
+							.toString()
+							.slice( inlineSelection.start, inlineSelection.end )
+					: null;
 
 			const savedRecord = await saveEntityRecord(
 				'root',
@@ -326,30 +454,117 @@ export function useNoteActions() {
 			 */
 			if ( ! parent && savedRecord?.id && clientId ) {
 				const attributes = getBlockAttributes( clientId );
+				if (
+					inlineSelection &&
+					( ! (
+						attributes?.[ inlineSelection.attributeKey ] instanceof
+						RichTextData
+					) ||
+						attributes[ inlineSelection.attributeKey ]
+							.toString()
+							.slice(
+								inlineSelection.start,
+								inlineSelection.end
+							) !== inlineSelectionText )
+				) {
+					throw new Error(
+						__(
+							'The note was added, but its selected text changed before the attachment could be saved.'
+						)
+					);
+				}
 				const metadata = attributes?.metadata;
+				const selectedBlock = getBlock( clientId );
 				const updatedMetadata = addNoteIdToMetadata(
 					metadata,
 					savedRecord.id
 				);
-				const newAttributes = {
-					metadata: cleanEmptyObject( updatedMetadata ),
+				const getRepairedAttributes = ( blockAttributes ) => {
+					const repairedAttributes = {
+						metadata: cleanEmptyObject(
+							mergeNoteMetadata(
+								blockAttributes?.metadata,
+								updatedMetadata
+							)
+						),
+					};
+					if ( inlineSelection ) {
+						const inlineContent = toRichTextData(
+							blockAttributes?.[ inlineSelection.attributeKey ]
+						);
+						if (
+							! inlineContent ||
+							inlineContent
+								.toString()
+								.slice(
+									inlineSelection.start,
+									inlineSelection.end
+								) !== inlineSelectionText
+						) {
+							return null;
+						}
+
+						const wrapped = wrapInlineNote(
+							inlineContent,
+							savedRecord.id,
+							inlineSelection.start,
+							inlineSelection.end
+						);
+						if ( wrapped ) {
+							repairedAttributes[ inlineSelection.attributeKey ] =
+								wrapped;
+						}
+					}
+					return repairedAttributes;
 				};
 
-				// Inline path: also wrap the selected text with a core/note
-				// marker so the anchor survives later edits.
-				if ( inlineSelection ) {
-					const wrapped = wrapInlineNote(
-						attributes?.[ inlineSelection.attributeKey ],
-						savedRecord.id,
-						inlineSelection.start,
-						inlineSelection.end
-					);
-					if ( wrapped ) {
-						newAttributes[ inlineSelection.attributeKey ] = wrapped;
-					}
-				}
+				const blocks = getBlocks();
+				const blockPath = getBlockPath( blocks, clientId );
+				const isMatch = ( block ) =>
+					block?.name === selectedBlock?.name &&
+					getBlockAttributeText( block, 'content' ) ===
+						getBlockAttributeText( selectedBlock, 'content' );
+				const { matchCount, matchIndex } = getBlockMatchPosition(
+					blocks,
+					clientId,
+					isMatch
+				);
+				const isDirtyPathValid = ( savedBlocks ) =>
+					hasStableBlockTree( savedBlocks, blocks, blockPath );
 
-				updateBlockAttributes( clientId, newAttributes );
+				updateBlockAttributes(
+					clientId,
+					getRepairedAttributes( attributes )
+				);
+
+				if (
+					! persistEntityBlockAttributes ||
+					! ( await persistEntityBlockAttributes(
+						'postType',
+						getCurrentPostType(),
+						getCurrentPostId(),
+						{
+							record: getCurrentPost(),
+							blockPath,
+							isMatch,
+							matchCount,
+							matchIndex,
+							isDirtyPathValid,
+							blockCount: getBlockCount( blocks ),
+							blockName: selectedBlock?.name,
+							attributes: getRepairedAttributes,
+						}
+					) )
+				) {
+					onError(
+						new Error(
+							__(
+								'The note was added, but its block attachment could not be saved.'
+							)
+						)
+					);
+					return savedRecord;
+				}
 			}
 
 			createNotice(
