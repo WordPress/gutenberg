@@ -23,10 +23,15 @@ The schema is the widest ring on purpose. JSON Schema can check key names, types
 
 ## Changing a schema
 
-The first two are the contract. The rest are suggestions for clarity, not hard rules.
+### Requirements
 
 -   **If it works, the schema must accept it.** Marking a key invalid when WordPress acts on it is a bug. Fix the schema.
 -   **The schema must not be the only place a rejection is explained.** If WordPress drops or ignores a value, say so at runtime, with `_doing_it_wrong()` or a notice. Don't rely on an editor squiggle nobody sees.
+
+### Suggestions
+
+These are for clarity, not hard rules.
+
 -   **Say when a value is CSS.** If a string has to be valid CSS source text, write that in the description. Nothing else will catch it.
 -   **Disambiguate similar keys.** Two keys with the same name in different places need descriptions that tell them apart, not the same sentence twice. `fontFamilies[].fontFamily` takes a comma-separated list; `fontFamilies[].fontFace[].fontFamily` takes a single family name. The types are identical, so only the description can tell you which is which.
 -   **Break descriptions into lines with `\n`.** A single long paragraph is unreadable in a hover.
