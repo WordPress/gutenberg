@@ -355,6 +355,12 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 					'relevance' => 'high',
 				),
 				array(
+					'id'        => 'export',
+					'label'     => 'Export',
+					'href'      => 'https://example.com/export',
+					'relevance' => 'medium',
+				),
+				array(
 					'id'        => 'about',
 					'label'     => 'About',
 					'href'      => 'https://example.com/about',
@@ -372,6 +378,12 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 					'href'      => 'https://example.com/report',
 					'icon'      => 'core/chart-bar',
 					'relevance' => 'high',
+				),
+				array(
+					'id'        => 'export',
+					'label'     => 'Export',
+					'href'      => 'https://example.com/export',
+					'relevance' => 'medium',
 				),
 				array(
 					'id'    => 'about',

@@ -61,12 +61,6 @@ export type ComboboxInputGroupProps = ComponentProps<
 export type ComboboxItemProps = ComponentProps< typeof _Combobox.Item > & {
 	children?: React.ReactNode;
 	/**
-	 * The size of the item.
-	 *
-	 * @default 'default'
-	 */
-	size?: ComboboxSize;
-	/**
 	 * The variant of the item.
 	 *
 	 * - `'default'`: A standard item.

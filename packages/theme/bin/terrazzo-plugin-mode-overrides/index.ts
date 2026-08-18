@@ -2,60 +2,6 @@ import { basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Plugin } from '@terrazzo/parser';
 
-type DTCGPrimitiveValue =
-	| string
-	| number
-	| boolean
-	| { value: number; unit: string }
-	| { r: number; g: number; b: number; a?: number };
-
-type DTCGValue = DTCGPrimitiveValue | Record< string, DTCGPrimitiveValue >;
-
-interface DTCGExtensions {
-	[ key: string ]: unknown;
-	mode?: Record< string, DTCGValue >;
-}
-
-/**
- * @see https://tr.designtokens.org/format/
- */
-interface DTCGToken {
-	$value: DTCGValue;
-	$type?: string;
-	$description?: string;
-	$extensions?: DTCGExtensions;
-}
-
-interface DTCGGroup {
-	$type?: string;
-	$description?: string;
-	$extensions?: DTCGExtensions;
-	[ key: string ]:
-		| DTCGToken
-		| DTCGGroup
-		| string
-		| DTCGExtensions
-		| undefined;
-}
-
-type DTCGDocument = Record< string, DTCGGroup >;
-
-interface ModeOverride {
-	path: string[];
-	$value: DTCGValue;
-	$type?: string;
-}
-
-/**
- * Type guard to check if a value is a DTCG token (has $value).
- *
- * @param value - The value to check.
- * @return True if the value is a DTCG token.
- */
-function isDTCGToken( value: DTCGToken | DTCGGroup ): value is DTCGToken {
-	return '$value' in value;
-}
-
 /**
  * Set a nested value in an object from a path array.
  *
@@ -66,7 +12,7 @@ function isDTCGToken( value: DTCGToken | DTCGGroup ): value is DTCGToken {
 function setNestedValue(
 	object: Record< string, unknown >,
 	pathParts: string[],
-	value: any
+	value: unknown
 ): void {
 	let current = object;
 
@@ -84,108 +30,85 @@ function setNestedValue(
 }
 
 /**
- * Recursively extracts mode overrides from a DTCG token tree.
- *
- * @param object      - The DTCG group to extract from.
- * @param currentPath - The current path in the token tree.
- * @param currentType - The $type inherited from parent groups.
- * @return A map of mode names to their token overrides.
- */
-function getModeOverrides(
-	object: DTCGGroup,
-	currentPath: string[] = [],
-	currentType?: string
-): Map< string, ModeOverride[] > {
-	const modeOverrides = new Map< string, ModeOverride[] >();
-
-	// Check if this group defines a $type that should be inherited by children
-	const groupType = object.$type ?? currentType;
-
-	for ( const [ key, value ] of Object.entries( object ) ) {
-		// Skip DTCG metadata keys
-		if ( key.startsWith( '$' ) ) {
-			continue;
-		}
-
-		const node = value as DTCGToken | DTCGGroup;
-
-		if ( isDTCGToken( node ) ) {
-			// Extract mode-specific values from extensions
-			const modes = node.$extensions?.mode;
-			if ( modes ) {
-				for ( const [ mode, modeValue ] of Object.entries( modes ) ) {
-					modeOverrides.set( mode, [
-						...( modeOverrides.get( mode ) ?? [] ),
-						{
-							path: [ ...currentPath, key ],
-							$value: modeValue,
-							$type: node.$type ?? groupType,
-						},
-					] );
-				}
-			}
-		} else {
-			// Recurse into nested groups, passing down the type
-			const nextPath = [ ...currentPath, key ];
-			const childOverrides = getModeOverrides(
-				node,
-				nextPath,
-				groupType
-			);
-
-			// Merge child results
-			for ( const [ mode, overrides ] of childOverrides ) {
-				modeOverrides.set( mode, [
-					...( modeOverrides.get( mode ) ?? [] ),
-					...overrides,
-				] );
-			}
-		}
-	}
-
-	return modeOverrides;
-}
-
-/**
  * Terrazzo plugin that generates mode-specific DTCG override files.
- *
- * For each mode found in tokens (via $extensions.mode), generates a separate
- * JSON file per source file containing tokens that have values for that mode.
  *
  * @return A Terrazzo plugin that generates mode-specific DTCG override files.
  */
 export default function pluginModeOverrides(): Plugin {
+	const sourceByToken = new Map< string, string >();
+
 	return {
 		name: '@wordpress/terrazzo-plugin-mode-overrides',
-		async build( { outputFile, sources } ) {
-			for ( const { filename, src } of sources ) {
-				if ( ! filename ) {
+		enforce: 'pre',
+		async transform( { tokens } ) {
+			sourceByToken.clear();
+			for ( const [ id, token ] of Object.entries( tokens ) ) {
+				const { filename } = token.source;
+
+				if ( filename ) {
+					sourceByToken.set( id, filename );
+				}
+			}
+		},
+		async build( { outputFile, resolver } ) {
+			const permutations = resolver.listPermutations?.();
+
+			if ( ! permutations ) {
+				throw new Error(
+					'Could not enumerate mode permutations from the Terrazzo resolver.'
+				);
+			}
+
+			const modifierNames = new Set(
+				permutations.flatMap( ( input ) => Object.keys( input ) )
+			);
+
+			if ( modifierNames.size !== 1 ) {
+				throw new Error(
+					`Expected one mode modifier, received ${ modifierNames.size }.`
+				);
+			}
+
+			const [ modeModifier ] = modifierNames;
+
+			for ( const input of permutations ) {
+				const mode = input[ modeModifier ];
+
+				if ( ! mode || mode === '.' ) {
 					continue;
 				}
 
-				// Parse the source JSON file
-				let document: DTCGDocument;
-				try {
-					document = JSON.parse( src ) as DTCGDocument;
-				} catch ( error ) {
-					throw new Error(
-						`Could not parse ${ filename }\n\n${ error }`
-					);
-				}
+				const modeTokens = resolver.apply( input, {
+					sets: [],
+					modifiers: [ modeModifier ],
+					resolveAliases: false,
+				} );
+				const outputs = new Map<
+					string,
+					{ filename: URL; document: Record< string, unknown > }
+				>();
 
-				// Extract mode overrides from this file
-				const fileOverrides = getModeOverrides( document );
+				for ( const [ id, token ] of Object.entries( modeTokens ) ) {
+					const sourceFilename = sourceByToken.get( id );
 
-				// Generate a DTCG file for each mode found in this source file
-				for ( const [ mode, overrides ] of fileOverrides ) {
-					const output: Record< string, unknown > = {};
-
-					for ( const override of overrides ) {
-						const { path, $value, $type } = override;
-						setNestedValue( output, path, { $type, $value } );
+					if ( ! sourceFilename ) {
+						throw new Error( `Could not find source for ${ id }.` );
 					}
 
-					// Output as {basename}.{mode}.json (e.g., dimension.compact.json)
+					const sourceUrl = new URL( sourceFilename );
+					const output = outputs.get( sourceUrl.href ) ?? {
+						filename: sourceUrl,
+						document: {},
+					};
+
+					setNestedValue( output.document, id.split( '.' ), {
+						$type: token.$type,
+						$value: token.$value,
+					} );
+					outputs.set( sourceUrl.href, output );
+				}
+
+				for ( const { filename, document } of outputs.values() ) {
 					const sourceDir = new URL( './', filename );
 					const outFileName = `${ basename(
 						filename.pathname,
@@ -195,9 +118,10 @@ export default function pluginModeOverrides(): Plugin {
 						`modes/${ outFileName }`,
 						sourceDir
 					);
+
 					outputFile(
 						fileURLToPath( outFileUrl ),
-						JSON.stringify( output, null, '\t' )
+						JSON.stringify( document, null, '\t' )
 					);
 				}
 			}
