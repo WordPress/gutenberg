@@ -343,6 +343,147 @@ class Tests_Strip_Pending_Structural_Suggestions extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'fromIndex', $rendered );
 	}
 
+	public function test_a_move_that_crossed_parents_is_left_where_it_sits() {
+		/*
+		 * Nested-to-nested. `fromParentClientId` is a non-empty client ID and
+		 * the block now sits nested, so the root-boundary fallback sees
+		 * nothing wrong; only the writer's `crossedParents` flag reveals that
+		 * index 0 counts positions in a list this block has left. Without it
+		 * the block would be dropped at the front of a Group it never
+		 * belonged to.
+		 */
+		$content = '<!-- wp:group --><div class="wp-block-group">'
+			. $this->paragraph( 'Inner first' )
+			. $this->paragraph( 'Inner second' )
+			. $this->paragraph(
+				'Arrived from another group',
+				array(
+					'type'               => 'pending-move',
+					'authorId'           => 2,
+					'fromIndex'          => 0,
+					'fromParentClientId' => 'group-a-client-id',
+					'crossedParents'     => true,
+				)
+			)
+			. '</div><!-- /wp:group -->';
+
+		$this->assertSame(
+			array( 'Inner first', 'Inner second', 'Arrived from another group' ),
+			$this->rendered_order( $this->render_the_content( $content ) )
+		);
+	}
+
+	public function test_a_same_parent_move_is_still_restored_when_the_writer_says_it_did_not_cross() {
+		// The flag is only a veto: `crossedParents => false` must not block a
+		// perfectly ordinary reorder inside one Group.
+		$content = '<!-- wp:group --><div class="wp-block-group">'
+			. $this->paragraph(
+				'Inner second',
+				array(
+					'type'               => 'pending-move',
+					'authorId'           => 2,
+					'fromIndex'          => 1,
+					'fromParentClientId' => 'abc-123',
+					'crossedParents'     => false,
+				)
+			)
+			. $this->paragraph( 'Inner first' )
+			. '</div><!-- /wp:group -->';
+
+		$this->assertSame(
+			array( 'Inner first', 'Inner second' ),
+			$this->rendered_order( $this->render_the_content( $content ) )
+		);
+	}
+
+	/**
+	 * The placement helper is exercised directly: the caller declines any list
+	 * holding more than one pending move, so multi-move placement cannot be
+	 * reached through `the_content`. These pin the rules the helper will be
+	 * held to when that gate is lifted.
+	 */
+	public function test_reorder_helper_puts_a_moved_block_back_and_closes_the_gap() {
+		$siblings = array( 'C', 'A', 'B' );
+		// C is at offset 0 and came from index 2.
+		$this->assertSame(
+			array( 'A', 'B', 'C' ),
+			gutenberg_reorder_pending_move_siblings( $siblings, array( 0 => 2 ) )
+		);
+	}
+
+	public function test_reorder_helper_resolves_two_moves_lowest_from_index_first() {
+		$siblings = array( 'D', 'B', 'A', 'C' );
+		// D came from index 3, A came from index 0.
+		$this->assertSame(
+			array( 'A', 'B', 'C', 'D' ),
+			gutenberg_reorder_pending_move_siblings(
+				$siblings,
+				array(
+					0 => 3,
+					2 => 0,
+				)
+			)
+		);
+	}
+
+	public function test_reorder_helper_leaves_a_duplicate_claim_in_place_rather_than_at_the_end() {
+		/*
+		 * Two moves claiming index 2: the first wins the slot and the second
+		 * is unrestorable. An unrestorable block must keep its position among
+		 * the un-moved blocks - appending it would relocate a block the
+		 * function just decided it could not place.
+		 */
+		$siblings  = array( 'A', 'M1', 'M2', 'B' );
+		$reordered = gutenberg_reorder_pending_move_siblings(
+			$siblings,
+			array(
+				1 => 2,
+				2 => 2,
+			)
+		);
+
+		$this->assertSame( array( 'A', 'M2', 'M1', 'B' ), $reordered );
+		// M2 keeps its offset relative to the blocks that did not move.
+		$this->assertLessThan(
+			array_search( 'B', $reordered, true ),
+			array_search( 'M2', $reordered, true )
+		);
+	}
+
+	public function test_only_post_types_that_render_through_the_content_can_author_a_move() {
+		/*
+		 * The restore hooks `the_content`. Render paths that parse post
+		 * content themselves never apply it - `render_block_core_block()`
+		 * calls `parse_blocks()` on a synced pattern's `post_content`
+		 * directly - so a pending move stored in one of those would publish
+		 * in its proposed order.
+		 *
+		 * That is currently unreachable: Suggest mode is gated on the
+		 * `editor.notes` post-type support, which only `post` and `page`
+		 * declare, and both render through `the_content`. This is the canary
+		 * for that assumption. If it fails because a new post type gained
+		 * `editor.notes`, check how that type renders before deleting it.
+		 */
+		foreach ( array( 'post', 'page' ) as $post_type ) {
+			$this->assertTrue(
+				post_type_supports( $post_type, 'editor' ),
+				"{$post_type} should support the editor."
+			);
+		}
+
+		foreach ( array( 'wp_block', 'wp_template', 'wp_template_part' ) as $post_type ) {
+			$supports = get_all_post_type_supports( $post_type );
+			$editor   = isset( $supports['editor'] ) ? $supports['editor'] : null;
+			$notes    = is_array( $editor ) && isset( $editor[0]['notes'] )
+				? $editor[0]['notes']
+				: false;
+			$this->assertFalse(
+				(bool) $notes,
+				"{$post_type} gained editor.notes support, so Suggest mode can now author a pending move in content that never runs through `the_content`. gutenberg_restore_pending_move_order() needs to cover that render path."
+			);
+		}
+	}
+
 	public function test_content_without_a_pending_move_is_returned_unchanged() {
 		$content  = $this->paragraph( 'First' ) . "\n\n" . $this->paragraph( 'Second' );
 		$filtered = gutenberg_restore_pending_move_order( $content );

@@ -403,6 +403,66 @@ function gutenberg_strip_pending_structural_suggestions( $block_content, $block 
 add_filter( 'render_block', 'gutenberg_strip_pending_structural_suggestions', 10, 2 );
 
 /**
+ * Puts moved blocks back into their original slots and closes the gaps.
+ *
+ * Split out from `gutenberg_restore_pending_move_block_order()` so the
+ * placement rules can be exercised directly: the caller currently declines to
+ * restore a list holding more than one pending move (see the gate there), so
+ * the multi-move behaviour this function defines is otherwise unreachable.
+ *
+ * Moved blocks claim their slots lowest `fromIndex` first, which makes two
+ * moves resolve deterministically. Every block that did not move keeps its
+ * current relative order and flows into whatever slots are left, which is also
+ * its original relative order, since only the moved blocks left their place.
+ *
+ * A `fromIndex` already claimed by another move is unrestorable. That block is
+ * put back into the queue of un-moved blocks AT ITS OWN OFFSET rather than
+ * appended after them, so failing to restore a block leaves it where it is
+ * instead of pushing it to the end of the list.
+ *
+ * @param array $siblings Blocks at one level, in their current (proposed) order.
+ * @param array $moved    Map of current offset => `fromIndex`, for moved blocks only.
+ * @return array `$siblings` reordered, same length.
+ */
+function gutenberg_reorder_pending_move_siblings( $siblings, $moved ) {
+	$count = count( $siblings );
+	asort( $moved );
+
+	$slots    = array_fill( 0, $count, null );
+	$unplaced = array();
+	foreach ( $moved as $offset => $from_index ) {
+		if ( null === $slots[ $from_index ] ) {
+			$slots[ $from_index ] = $siblings[ $offset ];
+		} else {
+			$unplaced[ $offset ] = true;
+		}
+	}
+
+	/*
+	 * Keyed by offset and then sorted, so an unrestorable move rejoins the
+	 * un-moved blocks in its own position among them rather than at the end.
+	 */
+	$rest = array();
+	foreach ( $siblings as $offset => $block ) {
+		if ( ! isset( $moved[ $offset ] ) || isset( $unplaced[ $offset ] ) ) {
+			$rest[ $offset ] = $block;
+		}
+	}
+	ksort( $rest );
+	$rest = array_values( $rest );
+
+	$next = 0;
+	foreach ( $slots as $slot => $block ) {
+		if ( null === $block ) {
+			$slots[ $slot ] = $rest[ $next ];
+			++$next;
+		}
+	}
+
+	return $slots;
+}
+
+/**
  * Restores the pre-move sibling order of a list of parsed blocks.
  *
  * A pending move is stored as the block sitting at its PROPOSED position with
@@ -410,29 +470,25 @@ add_filter( 'render_block', 'gutenberg_strip_pending_structural_suggestions', 10
  * for the front end means putting each moved block back at that index and
  * letting its siblings close up behind it.
  *
- * The moved blocks are placed into their original slots first (lowest
- * `fromIndex` first, so two moves resolve deterministically) and the blocks
- * that did not move fill the gaps in their current relative order — which is
- * their original relative order, since only the moved blocks left their place.
- * A `fromIndex` that is out of range, or already claimed by another move, is
- * treated as unrestorable: that block joins the un-moved blocks rather than
- * displacing one.
+ * Placement itself lives in `gutenberg_reorder_pending_move_siblings()`; this
+ * function decides which markers are safe to act on and hands it the survivors.
+ * A `fromIndex` that is out of range is treated as unrestorable, and the block
+ * stays where it is.
  *
  * Only a sibling list holding exactly ONE pending move is restored. `fromIndex`
  * is recorded against the order the list was in at the time of the move, so a
  * second move in the same list carries an index the first one already shifted
  * and replaying both would invent an order that never existed. See the gate
  * below for why that case cannot be detected and has to be skipped wholesale.
- * The slot machinery stays general so lifting the gate is a one-line change
+ * The placement helper stays general so lifting the gate is a one-line change
  * once the marker writer records a baseline-relative index.
  *
- * A move that crossed parents cannot be undone from a single sibling list, and
- * blindly applying `fromIndex` to the new parent would misplace the block. The
- * two detectable cases are skipped: a block whose marker records a root origin
- * (`fromParentClientId` null or empty) but now sits nested, and a block that
- * records a nested origin but now sits at the root. Client IDs do not survive
- * to the server, so a move between two different nested parents is not
- * detectable and is restored within its current parent.
+ * A move that crossed parents cannot be undone from a single sibling list,
+ * because `fromIndex` counts positions in a list the block has left. The
+ * marker writer records `crossedParents` for exactly this reason and such
+ * markers are skipped. Markers saved before that field existed fall back to
+ * the root-boundary check, which catches a root origin now sitting nested (or
+ * the reverse) but cannot see a move between two different nested parents.
  *
  * @param array $blocks  Parsed blocks for a single level of the tree.
  * @param bool  $is_root Whether this level is the top level of the document.
@@ -489,6 +545,22 @@ function gutenberg_restore_pending_move_block_order( $blocks, $is_root, &$change
 		if ( ! isset( $suggestion['fromIndex'] ) || ! is_numeric( $suggestion['fromIndex'] ) ) {
 			continue;
 		}
+		/*
+		 * A move that changed parents cannot be undone from a single sibling
+		 * list: `fromIndex` counts positions in a list this block is no
+		 * longer in. The writer records that outright, since client IDs are
+		 * session-local and never reach the server.
+		 */
+		if ( isset( $suggestion['crossedParents'] ) && $suggestion['crossedParents'] ) {
+			continue;
+		}
+		/*
+		 * Fallback for markers saved before `crossedParents` existed. It only
+		 * catches a move across the root boundary — a root origin recorded as
+		 * a null/empty parent against a block that now sits nested, or the
+		 * reverse. Nested-to-nested is invisible to it, which is why the
+		 * writer now states the answer instead of leaving it to be inferred.
+		 */
 		$from_parent = isset( $suggestion['fromParentClientId'] ) ? $suggestion['fromParentClientId'] : null;
 		$was_at_root = null === $from_parent || '' === $from_parent;
 		if ( $was_at_root !== (bool) $is_root ) {
@@ -530,34 +602,7 @@ function gutenberg_restore_pending_move_block_order( $blocks, $is_root, &$change
 		return $blocks;
 	}
 
-	asort( $moved );
-	$slots    = array_fill( 0, $count, null );
-	$unplaced = array();
-	foreach ( $moved as $offset => $from_index ) {
-		if ( null === $slots[ $from_index ] ) {
-			$slots[ $from_index ] = $siblings[ $offset ];
-		} else {
-			$unplaced[] = $siblings[ $offset ];
-		}
-	}
-
-	$rest = array();
-	foreach ( $siblings as $offset => $block ) {
-		if ( ! isset( $moved[ $offset ] ) ) {
-			$rest[] = $block;
-		}
-	}
-	foreach ( $unplaced as $block ) {
-		$rest[] = $block;
-	}
-
-	$next = 0;
-	foreach ( $slots as $slot => $block ) {
-		if ( null === $block ) {
-			$slots[ $slot ] = $rest[ $next ];
-			++$next;
-		}
-	}
+	$slots = gutenberg_reorder_pending_move_siblings( $siblings, $moved );
 
 	foreach ( $positions as $offset => $index ) {
 		if ( $blocks[ $index ] !== $slots[ $offset ] ) {
