@@ -198,9 +198,9 @@ const { actions, state } = store(
 				}
 
 				actions.setActiveTab( tabIndex );
-				setTimeout( () => {
-					targetElement.scrollIntoView( { behavior: 'smooth' } );
-				}, 100 );
+				window.setTimeout( () => {
+					targetElement.scrollIntoView();
+				}, 0 );
 			},
 		},
 		callbacks: {
