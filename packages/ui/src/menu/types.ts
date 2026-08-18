@@ -7,14 +7,37 @@ export type PortalProps = ComponentProps< typeof _Menu.Portal >;
 
 export type PositionerProps = ComponentProps< typeof _Menu.Positioner >;
 
-export interface RootProps extends ComponentProps< typeof _Menu.Root > {
+/*
+ * Keep these compound-component surfaces explicit. Base UI's detached
+ * trigger/payload APIs require handle utilities that Menu does not expose, and
+ * horizontal orientation is not supported by the styled Menu layout. Using
+ * allowlists also prevents future Base UI props from becoming public here
+ * without an intentional API decision.
+ */
+export interface RootProps
+	extends Pick<
+		_Menu.Root.Props,
+		| 'open'
+		| 'onOpenChange'
+		| 'onOpenChangeComplete'
+		| 'defaultOpen'
+		| 'modal'
+		| 'loopFocus'
+		| 'highlightItemOnHover'
+		| 'disabled'
+		| 'actionsRef'
+		| 'triggerId'
+		| 'defaultTriggerId'
+	> {
 	/**
 	 * The menu subcomponents (`Menu.Trigger`, `Menu.Popup`, etc.).
 	 */
 	children?: ReactNode;
 }
 
-export interface TriggerProps extends ComponentProps< typeof _Menu.Trigger > {
+export interface TriggerProps
+	extends ComponentProps< 'button' >,
+		Pick< _Menu.Trigger.Props, 'openOnHover' | 'delay' | 'closeDelay' > {
 	/**
 	 * The content to be rendered inside the trigger.
 	 */
@@ -22,7 +45,18 @@ export interface TriggerProps extends ComponentProps< typeof _Menu.Trigger > {
 }
 
 export interface SubmenuRootProps
-	extends ComponentProps< typeof _Menu.SubmenuRoot > {
+	extends Pick<
+		_Menu.SubmenuRoot.Props,
+		| 'open'
+		| 'onOpenChange'
+		| 'onOpenChangeComplete'
+		| 'defaultOpen'
+		| 'loopFocus'
+		| 'highlightItemOnHover'
+		| 'disabled'
+		| 'closeParentOnEsc'
+		| 'actionsRef'
+	> {
 	/**
 	 * The submenu subcomponents (`Menu.SubmenuTrigger`, `Menu.Popup`, etc.).
 	 */
