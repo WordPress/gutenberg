@@ -31,6 +31,9 @@ function createRepo( { packages, build, root } ) {
 	const repoRoot = mkdtempSync( join( tmpdir(), 'validate-tsconfig-' ) );
 	temporaryRoots.push( repoRoot );
 
+	writeJson( join( repoRoot, 'tsconfig.base.json' ), {
+		exclude: [ '**/benchmark', '**/test/**', '**/stories/**' ],
+	} );
 	writeJson( join( repoRoot, 'tsconfig.build.json' ), {
 		references: build.map( ( path ) => ( { path } ) ),
 	} );
@@ -375,4 +378,66 @@ test( 'fails when the build project carries a test type', () => {
 	expect( result.stderr ).toContain(
 		'Test type "jest" in packages/blob/tsconfig.build.json'
 	);
+} );
+
+test( 'fails when a build project exclude omits a dev-file pattern of the base', () => {
+	const result = runValidator(
+		createRepo( {
+			packages: {
+				blob: {
+					tsconfigs: {
+						'tsconfig.json': {
+							extends: '../../tsconfig.dev.base.json',
+							references: [ './tsconfig.build.json' ],
+						},
+						'tsconfig.build.json': {
+							exclude: [
+								'**/benchmark',
+								'**/test/**',
+								'src/legacy.js',
+							],
+							references: [],
+						},
+					},
+				},
+			},
+			build: [ 'packages/blob/tsconfig.build.json' ],
+			root: [ './tsconfig.build.json', 'packages/blob' ],
+		} )
+	);
+
+	expect( result.status ).not.toBe( 0 );
+	expect( result.stderr ).toContain(
+		'Missing exclude "**/stories/**" in packages/blob/tsconfig.build.json'
+	);
+} );
+
+test( 'passes when a build project keeps every dev-file pattern of the base', () => {
+	const result = runValidator(
+		createRepo( {
+			packages: {
+				blob: {
+					tsconfigs: {
+						'tsconfig.json': {
+							extends: '../../tsconfig.dev.base.json',
+							references: [ './tsconfig.build.json' ],
+						},
+						'tsconfig.build.json': {
+							exclude: [
+								'**/benchmark',
+								'**/test/**',
+								'**/stories/**',
+								'src/legacy.js',
+							],
+							references: [],
+						},
+					},
+				},
+			},
+			build: [ 'packages/blob/tsconfig.build.json' ],
+			root: [ './tsconfig.build.json', 'packages/blob' ],
+		} )
+	);
+
+	expect( result.status ).toBe( 0 );
 } );

@@ -65,6 +65,17 @@ if ( ! rootSolutionReferences.has( buildSolutionPath ) ) {
 /* Ambient types only test files may use. */
 const TEST_TYPES = new Set( [ 'jest', 'gutenberg-test-env' ] );
 
+/*
+ * A package exclude replaces the inherited one, so a build project that sets
+ * its own must keep every dev-file pattern the base config excludes.
+ */
+const baseConfigPath = resolve( repoRoot, 'tsconfig.base.json' );
+const REQUIRED_BUILD_EXCLUDES = existsSync( baseConfigPath )
+	? ( readTsconfig( baseConfigPath ).exclude ?? [] ).filter( ( pattern ) =>
+			/test|stories|story/.test( pattern )
+	  )
+	: [];
+
 const packagesWithTypes = glob
 	.sync( 'packages/*/tsconfig.json', { cwd: repoRoot } )
 	.map( ( tsconfigPath ) => basename( dirname( tsconfigPath ) ) );
@@ -163,6 +174,22 @@ for ( const packageName of packagesWithTypes ) {
 				devProject
 			) }" in tsconfig.json`
 		);
+	}
+
+	if ( srcProject && devProject && isDevProject( devProject ) ) {
+		const buildExclude = readTsconfig( srcProject ).exclude;
+		if ( buildExclude ) {
+			for ( const pattern of REQUIRED_BUILD_EXCLUDES ) {
+				if ( ! buildExclude.includes( pattern ) ) {
+					reportError(
+						`Missing exclude "${ pattern }" in ${ relative(
+							repoRoot,
+							srcProject
+						) }`
+					);
+				}
+			}
+		}
 	}
 
 	/*
