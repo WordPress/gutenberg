@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __unstableStripHTML as stripHTML, focus } from '@wordpress/dom';
 import {
 	Popover,
@@ -21,10 +18,6 @@ import { plus } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
 import { VisuallyHidden } from '@wordpress/ui';
 import { isURL } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { LinkUIPageCreator } from './page-creator';
 import LinkUIBlockInserter from './block-inserter';
 import { useEntityBinding, useLinkPreview } from '../shared';

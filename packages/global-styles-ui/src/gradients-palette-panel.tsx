@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	__experimentalVStack as VStack,
@@ -10,10 +7,6 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import type { Gradient } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { Subtitle } from './subtitle';
 import { useSetting } from './hooks';
 

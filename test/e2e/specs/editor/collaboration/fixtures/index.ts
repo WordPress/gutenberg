@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { test as base } from '@wordpress/e2e-test-utils-playwright';
 export { expect } from '@wordpress/e2e-test-utils-playwright';
-
-/**
- * Internal dependencies
- */
 import CollaborationUtils, {
 	SECOND_USER,
 	setCollaboration,

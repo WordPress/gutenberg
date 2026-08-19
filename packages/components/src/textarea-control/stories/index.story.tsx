@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import TextareaControl from '..';
 
 const meta: Meta< typeof TextareaControl > = {

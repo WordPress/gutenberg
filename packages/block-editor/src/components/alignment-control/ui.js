@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, isRTL } from '@wordpress/i18n';
 import { ToolbarDropdownMenu, ToolbarGroup } from '@wordpress/components';
 import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';

@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button, SearchControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import useBlockTypesState from './hooks/use-block-types-state';

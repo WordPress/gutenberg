@@ -5,6 +5,14 @@
 ### Bug Fixes
 
 -   Undo manager: Capture undo levels in, and undo them from, the history of the active editing scope ([#56178](https://github.com/WordPress/gutenberg/issues/56178)).
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+-   Provide the default HTTP polling provider only when the Real-Time Collaboration experiment sets `window.__experimentalEnableRealTimeCollaboration`, replacing the `window._wpCollaborationEnabled` option flag ([#80658](https://github.com/WordPress/gutenberg/pull/80658)).
+
+## 1.53.0 (2026-08-12)
+
+## 1.52.0 (2026-07-29)
 
 ## 1.51.0 (2026-07-14)
 

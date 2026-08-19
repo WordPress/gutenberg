@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	InnerBlocks,
 	getColorClassName,
@@ -13,10 +6,6 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { compose } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { DEFAULT_MEDIA_SIZE_SLUG } from './constants';
 
 const v1ToV5ImageFillStyles = ( url, focalPoint ) => {

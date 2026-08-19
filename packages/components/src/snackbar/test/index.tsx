@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { render, screen, within } from '@testing-library/react';
 import { click } from '@ariakit/test';
-
-/**
- * WordPress dependencies
- */
 import { speak } from '@wordpress/a11y';
 import { SVG, Path } from '@wordpress/primitives';
-
-/**
- * Internal dependencies
- */
 import Snackbar from '../index';
 
 jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );

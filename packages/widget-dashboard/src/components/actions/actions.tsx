@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { useCallback, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -8,10 +5,6 @@ import { plus } from '@wordpress/icons';
 import { store as viewportStore } from '@wordpress/viewport';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Button, Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
 import { ActionsMenu } from '../actions-menu';

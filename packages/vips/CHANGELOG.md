@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 3.1.0 (2026-08-12)
+
+## 3.0.0 (2026-07-29)
+
 ### Breaking Changes
 
 - `resizeImage`, `compressImage`, and `convertImageFormat` now accept their optional parameters (`quality`, `interlaced`, `smartCrop`, `stripMeta`, `maxBitdepth`) as a single trailing `options` object instead of positional arguments ([#80328](https://github.com/WordPress/gutenberg/issues/80328)).

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	getBlockType,
 	getBlockTypes,
@@ -17,10 +14,6 @@ import { symbol } from '@wordpress/icons';
 import { create, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 import { createSelector, createRegistrySelector } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import {
 	isFiltered,
 	checkAllowListRecursive,
@@ -34,7 +27,6 @@ import {
 import { orderBy } from '../utils/sorting';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
-
 import {
 	getContentLockingParent,
 	getEditedContentOnlySection,
@@ -149,14 +141,26 @@ export function getBlockAttributes( state, clientId ) {
  * blocks module registration store.
  *
  * getBlock recurses through its inner blocks until all its children blocks have
- * been retrieved. Note that getBlock will not return the child inner blocks of
- * an inner block controller. This is because an inner block controller syncs
- * itself with its own entity, and should therefore not be included with the
- * blocks of a different entity. For example, say you call `getBlocks( TP )` to
- * get the blocks of a template part. If another template part is a child of TP,
- * then the nested template part's child blocks will not be returned. This way,
- * the template block itself is considered part of the parent, but the children
- * are not.
+ * been retrieved, with one exception: the children of an "inner block
+ * controller" are not part of its tree, so `innerBlocks` usually comes back
+ * empty even though the block clearly has children in the editor. Never rely on
+ * a controller's `innerBlocks`; ask for its children directly:
+ *
+ * ```js
+ * getBlock( syncedPatternClientId ).innerBlocks; // Usually [].
+ * getBlocks( syncedPatternClientId ); // The pattern's blocks.
+ * ```
+ *
+ * A block is an inner block controller when its children belong to, and are
+ * synced with, an entity other than the one being edited. Synced patterns
+ * (`core/block`) and template parts (`core/template-part`) are the usual
+ * examples: each owns its own blocks, and editing them saves to that pattern or
+ * template part, not to the post or template it sits in. Leaving their children
+ * out of the tree is what keeps the two entities separate, so walking a
+ * template's blocks stops at a template part placed inside it.
+ *
+ * `areInnerBlocksControlled( clientId )` tells whether a block is such a
+ * controller.
  *
  * @param {Object} state    Editor state.
  * @param {string} clientId Block client ID.
@@ -1301,8 +1305,39 @@ export function isBlockSelected( state, clientId ) {
 		return false;
 	}
 
-	return selectionStart.clientId === clientId;
+	// Both sides are `undefined` when nothing is selected and the caller
+	// passes an optional client ID.
+	return !! clientId && selectionStart.clientId === clientId;
 }
+
+/**
+ * Returns the ancestors of the current selection, as a set. A block is not its
+ * own ancestor, so the selected blocks themselves are not in the set.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Set<string>} Client IDs of the ancestors of the selection.
+ */
+const getSelectedBlockAncestors = createSelector(
+	( state ) => {
+		const ancestors = new Set();
+
+		for ( const clientId of getSelectedBlockClientIds( state ) ) {
+			let current = clientId;
+			while ( ( current = state.blocks.parents.get( current ) ) ) {
+				// An earlier block already walked the rest of this chain.
+				if ( ancestors.has( current ) ) {
+					break;
+				}
+
+				ancestors.add( current );
+			}
+		}
+
+		return ancestors;
+	},
+	( state ) => getSelectedBlockClientIds.getDependants( state )
+);
 
 /**
  * Returns true if one of the block's inner blocks is selected.
@@ -1314,18 +1349,19 @@ export function isBlockSelected( state, clientId ) {
  * @return {boolean} Whether the block has an inner block selected
  */
 export function hasSelectedInnerBlock( state, clientId, deep = false ) {
-	const selectedBlockClientIds = getSelectedBlockClientIds( state );
+	if ( ! clientId ) {
+		return false;
+	}
 
+	const selectedBlockClientIds = getSelectedBlockClientIds( state );
 	if ( ! selectedBlockClientIds.length ) {
 		return false;
 	}
 
 	if ( deep ) {
-		return selectedBlockClientIds.some( ( id ) =>
-			// Pass true because we don't care about order and it's more
-			// performant.
-			getBlockParents( state, id, true ).includes( clientId )
-		);
+		// Callers ask once per rendered block, so the set is built once per
+		// selection rather than walking the selection on every call.
+		return getSelectedBlockAncestors( state ).has( clientId );
 	}
 
 	return selectedBlockClientIds.some(
@@ -2723,15 +2759,14 @@ export const __experimentalGetAllowedBlocks = createSelector(
 /**
  * Returns the block to be directly inserted by the block appender.
  *
- * @param    {Object}         state            Editor state.
- * @param    {?string}        rootClientId     Optional root client ID of block list.
+ * @param    {Object}  state        Editor state.
+ * @param    {?string} rootClientId Optional root client ID of block list.
  *
- * @return {WPDirectInsertBlock|undefined}              The block type to be directly inserted.
+ * @return {WPDirectInsertBlock|undefined} The block type to be directly inserted.
  *
  * @typedef {Object} WPDirectInsertBlock
- * @property {string}         name             The type of block.
- * @property {?Object}        attributes       Attributes to pass to the newly created block.
- * @property {?Array<string>} attributesToCopy Attributes to be copied from adjacent blocks when inserted.
+ * @property {string}  name         The type of block.
+ * @property {?Object} attributes   Attributes to pass to the newly created block.
  */
 export function getDirectInsertBlock( state, rootClientId = null ) {
 	if ( ! rootClientId ) {

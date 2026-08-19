@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import type { ComponentProps } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import { BorderBoxControl } from '../';
 

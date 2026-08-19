@@ -5,6 +5,33 @@
 ### Bug Fixes
 
 -   Keep a separate undo history per editing context, so that undoing in an editor can no longer revert changes made in another one, for instance after opening an entity in a focused editor ([#56178](https://github.com/WordPress/gutenberg/issues/56178)).
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+-   Gate entity sync configuration and sync manager creation on the `window.__experimentalEnableRealTimeCollaboration` flag set by the Real-Time Collaboration experiment, replacing the `window._wpCollaborationEnabled` option flag ([#80658](https://github.com/WordPress/gutenberg/pull/80658)).
+
+## 7.53.0 (2026-08-12)
+
+### Enhancements
+
+-   Improve error reporting in private action `saveDirtyEntities` ([#81151](https://github.com/WordPress/gutenberg/pull/81151)).
+-   Add the `block-templates` and `block-template-parts` theme features to the `ThemeSupports` type. Both are registered with `show_in_rest`, so they were already present in the response ([#81581](https://github.com/WordPress/gutenberg/pull/81581)).
+
+### Bug Fixes
+
+-   Footnotes: Treat unreadable `footnotes` post meta as no footnotes instead of throwing. Malformed JSON, or valid JSON that is not an array, threw inside a store subscriber where no error boundary catches it, so the edit was dropped and the post silently stopped saving ([#81201](https://github.com/WordPress/gutenberg/pull/81201)).
+-   `saveEntityRecord`: Reset persisted edits using the original edits instead of the `__unstablePrePersist`-augmented request payload. With collaborative editing enabled, the injected CRDT snapshot made the post-save comparison against the state edits fail, leaving the record dirty after a successful save whenever `meta` was edited.
+-   Ensure revision resolvers finish after fetched revisions are stored.
+
+### Internal
+
+-   Add missing `@wordpress/base-styles` dependency ([#81012](https://github.com/WordPress/gutenberg/pull/81012)).
+
+## 7.52.0 (2026-07-29)
+
+### Internal
+
+-   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).
 
 ## 7.51.0 (2026-07-14)
 

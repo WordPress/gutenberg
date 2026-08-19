@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { screen } from '@testing-library/react';
 import { click, render } from '@ariakit/test/react';
-
-/**
- * Internal dependencies
- */
 import ColorGradientControl from '../control';
 
 const noop = () => {};

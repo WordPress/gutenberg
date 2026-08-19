@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	createPortal,
 	useState,
@@ -46,10 +39,6 @@ import {
 	mimeTypeField,
 } from '@wordpress/media-fields';
 import { store as noticesStore, SnackbarNotices } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import type { Attachment, RestAttachment } from '../../utils/types';
 import { transformAttachment } from '../../utils/transform-attachment';
 import { uploadMedia } from '../../utils/upload-media';

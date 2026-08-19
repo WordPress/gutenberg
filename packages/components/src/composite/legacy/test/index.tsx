@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import {
 	queryByAttribute,
 	render,
@@ -8,10 +5,6 @@ import {
 	renderHook,
 } from '@testing-library/react';
 import { press, waitFor } from '@ariakit/test';
-
-/**
- * Internal dependencies
- */
 import {
 	Composite,
 	CompositeGroup,

@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
-import {
-	hasBlockSupport,
-	switchToBlockType,
-	store as blocksStore,
-} from '@wordpress/blocks';
+import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import {
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
@@ -30,10 +19,6 @@ import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { speak } from '@wordpress/a11y';
-
-/**
- * Internal dependencies
- */
 import ListViewLeaf from './leaf';
 import useListViewScrollIntoView from './use-list-view-scroll-into-view';
 import {
@@ -48,16 +33,16 @@ import {
 	focusListItem,
 } from './utils';
 import { store as blockEditorStore } from '../../store';
-import useBlockDisplayInformation from '../use-block-display-information';
-import { useBlockLock } from '../block-lock';
-import { useBlockRename, BlockRenameModal } from '../block-rename';
+import { groupBlocks } from '../../utils/group-blocks';
+import { getPositionTypeLabel } from '../use-block-display-information';
+import { BlockRenameModal } from '../block-rename';
 import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
 import { getBlockVisibilityLabel } from '../block-visibility';
 
 function ListViewBlock( {
-	block: { clientId },
+	clientId,
 	displacement,
 	isAfterDraggedBlocks,
 	isDragged,
@@ -81,7 +66,6 @@ function ListViewBlock( {
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ settingsAnchorRect, setSettingsAnchorRect ] = useState();
 	const [ isRenameModalOpen, setIsRenameModalOpen ] = useState( false );
-	const { isLocked } = useBlockLock( clientId );
 
 	const isFirstSelectedBlock =
 		isSelected && selectedClientIds[ 0 ] === clientId;
@@ -122,32 +106,36 @@ function ListViewBlock( {
 	} = useSelect( blockEditorStore );
 	const { getGroupingBlockName } = useSelect( blocksStore );
 
-	const blockInformation = useBlockDisplayInformation( clientId );
-
 	const pasteStyles = usePasteStyles();
 
 	const {
-		block,
 		blockName,
+		blockVisibility,
 		blockEditingMode,
 		allowRightClickOverrides,
 		editedSection,
 		viewportSettings,
 		blockVisibilitySetting,
+		positionLabel,
+		isSynced,
+		isLocked,
 	} = useSelect(
 		( select ) => {
 			const {
-				getBlock,
 				getBlockName,
+				getBlockAttributes,
 				getBlockEditingMode: getBlockEditingModeForClientId,
 				getSettings,
 				getEditedContentOnlySection,
+				isSyncedBlock,
+				isLockedBlock,
 			} = unlock( select( blockEditorStore ) );
 			const settings = getSettings();
+			const attributes = getBlockAttributes( clientId );
 
 			return {
-				block: getBlock( clientId ),
 				blockName: getBlockName( clientId ),
+				blockVisibility: attributes?.metadata?.blockVisibility,
 				blockEditingMode: getBlockEditingModeForClientId( clientId ),
 				allowRightClickOverrides: settings.allowRightClickOverrides,
 				editedSection: getEditedContentOnlySection(),
@@ -155,13 +143,17 @@ function ListViewBlock( {
 				blockVisibilitySetting:
 					settings.__experimentalFeatures?.blockVisibility
 						?.allowEditing,
+				positionLabel: getPositionTypeLabel( attributes ),
+				isSynced: isSyncedBlock( clientId ),
+				isLocked: isLockedBlock( clientId ),
 			};
 		},
 		[ clientId ]
 	);
 
 	const isDisabled = blockEditingMode === 'disabled';
-	const { canRename } = useBlockRename( blockName );
+	const canRename =
+		!! blockName && hasBlockSupport( blockName, 'renaming', true );
 
 	const showBlockActions =
 		// When a block hides its toolbar it also hides the block settings menu,
@@ -172,13 +164,10 @@ function ListViewBlock( {
 	const descriptionId = `list-view-block-select-button__description-${ instanceId }`;
 
 	const {
-		expand,
-		collapse,
-		collapseAll,
 		BlockSettingsMenu,
 		listViewInstanceId,
-		expandedState,
-		setInsertedBlock,
+		updateExpansion,
+		setInsertedBlockClientId,
 		treeGridElementRef,
 		rootClientId,
 	} = useListViewContext();
@@ -375,20 +364,15 @@ function ListViewBlock( {
 			event.preventDefault();
 			const { firstBlockClientId } = getBlocksToUpdate();
 			const blockParents = getBlockParents( firstBlockClientId, false );
-			// Collapse all blocks.
-			collapseAll();
-			// Expand all parents of the current block.
-			expand( blockParents );
+			// Collapse all blocks and expand the block's parents.
+			updateExpansion( { type: 'replace', clientIds: blockParents } );
 		} else if ( isMatch( 'core/block-editor/group', event ) ) {
 			const { blocksToUpdate } = getBlocksToUpdate();
 			if ( blocksToUpdate.length > 1 && isGroupable( blocksToUpdate ) ) {
 				event.preventDefault();
 				const blocks = getBlocksByClientId( blocksToUpdate );
 				const groupingBlockName = getGroupingBlockName();
-				const newBlocks = switchToBlockType(
-					blocks,
-					groupingBlockName
-				);
+				const newBlocks = groupBlocks( blocks, groupingBlockName );
 				replaceBlocks( blocksToUpdate, newBlocks );
 				speak( __( 'Selected blocks are grouped.' ) );
 				const newlySelectedBlocks = getSelectedBlockClientIds();
@@ -473,13 +457,15 @@ function ListViewBlock( {
 			// Prevent shift+click from opening link in a new window when toggling.
 			event.preventDefault();
 			event.stopPropagation();
-			if ( isExpanded === true ) {
-				collapse( clientId );
-			} else if ( isExpanded === false ) {
-				expand( clientId );
+			if ( isExpanded === undefined ) {
+				return;
 			}
+			updateExpansion( {
+				type: isExpanded ? 'collapse' : 'expand',
+				clientIds: [ clientId ],
+			} );
 		},
-		[ clientId, expand, collapse, isExpanded ]
+		[ clientId, updateExpansion, isExpanded ]
 	);
 
 	// Allow right-clicking an item in the List View to open up the block settings dropdown.
@@ -549,7 +535,7 @@ function ListViewBlock( {
 	// When switching between rendering modes (such as template preview and content only),
 	// it is possible for a block to temporarily be unavailable. In this case, we should not
 	// render the leaf, to avoid errors further down the tree.
-	if ( ! block ) {
+	if ( ! blockName ) {
 		return null;
 	}
 
@@ -560,13 +546,13 @@ function ListViewBlock( {
 	);
 
 	const blockPropertiesDescription = getBlockPropertiesDescription(
-		blockInformation,
+		positionLabel,
 		isLocked
 	);
 
 	// Determine label based on where block is hidden (not when/current viewport)
 	const blockVisibilityDescription = getBlockVisibilityLabel(
-		block?.attributes?.metadata?.blockVisibility,
+		blockVisibility,
 		viewportSettings
 	);
 
@@ -598,7 +584,7 @@ function ListViewBlock( {
 		'is-synced-branch': isSyncedBranch,
 		'is-dragging': isDragged,
 		'has-single-cell': ! showBlockActions,
-		'is-synced': blockInformation?.isSynced,
+		'is-synced': isSynced,
 		'is-draggable': canMoveBlock && ! isDisabled,
 		'is-displacement-normal': displacement === 'normal',
 		'is-displacement-up': displacement === 'up',
@@ -656,7 +642,7 @@ function ListViewBlock( {
 				{ ( { ref, tabIndex, onFocus } ) => (
 					<div className="block-editor-list-view-block__contents-container">
 						<ListViewBlockContents
-							block={ block }
+							clientId={ clientId }
 							onClick={ selectEditorBlock }
 							onContextMenu={
 								isDisabled ? undefined : onContextMenu
@@ -665,10 +651,6 @@ function ListViewBlock( {
 							onToggleExpanded={
 								isDisabled ? undefined : toggleExpanded
 							}
-							isSelected={ isSelected }
-							position={ position }
-							siblingBlockCount={ siblingBlockCount }
-							level={ level }
 							ref={ ref }
 							tabIndex={ getListViewBlockTabIndex( tabIndex ) }
 							onFocus={ onFocus }
@@ -730,8 +712,8 @@ function ListViewBlock( {
 				>
 					{ ( { ref, tabIndex, onFocus } ) => (
 						<BlockSettingsMenu
+							clientId={ clientId }
 							clientIds={ dropdownClientIds }
-							block={ block }
 							icon={ moreVertical }
 							label={ __( 'Options' ) }
 							popoverProps={ {
@@ -746,9 +728,10 @@ function ListViewBlock( {
 								size: 'small',
 							} }
 							disableOpenOnArrowDown
-							expand={ expand }
-							expandedState={ expandedState }
-							setInsertedBlock={ setInsertedBlock }
+							updateExpansion={ updateExpansion }
+							setInsertedBlockClientId={
+								setInsertedBlockClientId
+							}
 							__experimentalSelectBlock={
 								updateFocusAndSelection
 							}

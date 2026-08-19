@@ -7,17 +7,9 @@
 // should no longer be necessary.
 //
 // See: https://github.com/npm/cli/issues/1138
-
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const { readFileSync } = require( 'fs' );
 const { red, yellow } = require( 'chalk' );
-
-/**
- * Internal dependencies
- */
 const packageLockPath = path.resolve( __dirname, '../../package-lock.json' );
 const packageLock = JSON.parse( readFileSync( packageLockPath, 'utf8' ) );
 

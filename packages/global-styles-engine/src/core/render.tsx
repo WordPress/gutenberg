@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
@@ -11,10 +8,6 @@ import {
 import type { BlockType } from '@wordpress/blocks';
 import { getCSSRules, getCSSValueFromRawStyle } from '@wordpress/style-engine';
 import { select } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import {
 	PRESET_METADATA,
 	ROOT_BLOCK_SELECTOR,
@@ -773,9 +766,8 @@ export function getLayoutStyles( {
 	fallbackGapValue?: string;
 } ): string {
 	let ruleset = '';
-	let gapValue = hasBlockGapSupport
-		? getGapCSSValue( style?.spacing?.blockGap )
-		: '';
+	const blockGapValue = style?.spacing?.blockGap;
+	let gapValue = hasBlockGapSupport ? getGapCSSValue( blockGapValue ) : '';
 
 	// Ensure a fallback gap value for the root layout definitions,
 	// and use a fallback value if one is provided for the current block.
@@ -786,6 +778,10 @@ export function getLayoutStyles( {
 			gapValue = fallbackGapValue;
 		}
 	}
+	const rowGapValue =
+		hasBlockGapSupport && blockGapValue && typeof blockGapValue !== 'string'
+			? getGapCSSValue( blockGapValue.top )
+			: gapValue;
 
 	if ( gapValue && layoutDefinitions ) {
 		Object.values( layoutDefinitions ).forEach(
@@ -798,6 +794,11 @@ export function getLayoutStyles( {
 				) {
 					return;
 				}
+				const layoutGapValue = [ 'default', 'constrained' ].includes(
+					name
+				)
+					? rowGapValue
+					: gapValue;
 
 				if ( spacingStyles?.length ) {
 					spacingStyles.forEach( ( spacingStyle: any ) => {
@@ -808,7 +809,7 @@ export function getLayoutStyles( {
 								( [ cssProperty, cssValue ] ) => {
 									declarations.push(
 										`${ cssProperty }: ${
-											cssValue ? cssValue : gapValue
+											cssValue ? cssValue : layoutGapValue
 										}`
 									);
 								}
@@ -1059,6 +1060,35 @@ function getResponsiveStyleNodes(
 	);
 }
 
+/**
+ * Collects element styles from the default and responsive branches of a style
+ * node. Responsive styles are copied onto the element node so they can be
+ * expanded by `getResponsiveStyleNodes`.
+ *
+ * @param styleNode              Style node that may contain element styles.
+ * @param responsiveMediaQueries Media queries keyed by responsive state name.
+ * @return Element styles keyed by element name.
+ */
+function getElementStylesByName(
+	styleNode: BlockNode | BlockVariation,
+	responsiveMediaQueries: Record< string, string >
+): Record< string, any > {
+	const elementStylesByName = { ...( styleNode?.elements ?? {} ) };
+
+	Object.keys( responsiveMediaQueries ).forEach( ( breakpointKey ) => {
+		Object.entries( styleNode?.[ breakpointKey ]?.elements ?? {} ).forEach(
+			( [ elementName, styles ] ) => {
+				elementStylesByName[ elementName ] = {
+					...( elementStylesByName[ elementName ] ?? {} ),
+					[ breakpointKey ]: styles,
+				};
+			}
+		);
+	} );
+
+	return elementStylesByName;
+}
+
 export const getNodesWithStyles = (
 	tree: GlobalStylesConfig,
 	blockSelectors: string | BlockSelectors
@@ -1159,7 +1189,10 @@ export const getNodesWithStyles = (
 						// element styles within the block type styles take
 						// precedence over these.
 						Object.entries(
-							typedVariation?.elements ?? {}
+							getElementStylesByName(
+								typedVariation,
+								responsiveMediaQueries
+							)
 						).forEach( ( [ element, elementStyles ] ) => {
 							if (
 								elementStyles &&
@@ -1248,7 +1281,10 @@ export const getNodesWithStyles = (
 								// Process element styles for the inner blocks
 								// of the variation.
 								Object.entries(
-									variationBlockStyles.elements ?? {}
+									getElementStylesByName(
+										variationBlockStyles,
+										responsiveMediaQueries
+									)
 								).forEach(
 									( [
 										variationBlockElement,
@@ -1302,34 +1338,34 @@ export const getNodesWithStyles = (
 
 			nodes.push( ...variationStyleNodesToAdd );
 
-			Object.entries( typedNode?.elements ?? {} ).forEach(
-				( [ elementName, value ] ) => {
-					if (
-						typeof blockSelectors !== 'string' &&
-						value &&
-						blockSelectors?.[ blockName ] &&
-						ELEMENTS[ elementName as ElementName ]
-					) {
-						nodes.push( {
-							styles: value,
-							selector: blockSelectors[ blockName ]?.selector
-								.split( ',' )
-								.map( ( sel: string ) => {
-									const elementSelectors =
-										ELEMENTS[
-											elementName as ElementName
-										].split( ',' );
-									return elementSelectors.map(
-										( elementSelector: string ) =>
-											sel + ' ' + elementSelector
-									);
-								} )
-								.join( ',' ),
-							elementName,
-						} );
-					}
+			Object.entries(
+				getElementStylesByName( typedNode, responsiveMediaQueries )
+			).forEach( ( [ elementName, value ] ) => {
+				if (
+					typeof blockSelectors !== 'string' &&
+					value &&
+					blockSelectors?.[ blockName ] &&
+					ELEMENTS[ elementName as ElementName ]
+				) {
+					nodes.push( {
+						styles: value,
+						selector: blockSelectors[ blockName ]?.selector
+							.split( ',' )
+							.map( ( sel: string ) => {
+								const elementSelectors =
+									ELEMENTS[
+										elementName as ElementName
+									].split( ',' );
+								return elementSelectors.map(
+									( elementSelector: string ) =>
+										sel + ' ' + elementSelector
+								);
+							} )
+							.join( ',' ),
+						elementName,
+					} );
 				}
-			);
+			} );
 
 			// Add variation nodes AFTER the main block and its elements
 			// to match PHP processing order.
@@ -1921,9 +1957,12 @@ export const getBlockSelectors = (
 		const hasLayoutSupport =
 			!! blockType?.supports?.layout ||
 			!! blockType?.supports?.__experimentalLayout;
+		const blockGapSupport = blockType?.supports?.spacing?.blockGap;
 		const fallbackGapValue =
-			// @ts-expect-error
-			blockType?.supports?.spacing?.blockGap?.__experimentalDefault;
+			typeof blockGapSupport === 'object' &&
+			! Array.isArray( blockGapSupport )
+				? blockGapSupport.__experimentalDefault
+				: undefined;
 
 		const blockStyleVariations = getBlockStyles( name );
 		const styleVariationSelectors: Record< string, string > = {};

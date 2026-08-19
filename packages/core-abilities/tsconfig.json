@@ -6,7 +6,7 @@
 	},
 	"references": [
 		{ "path": "../abilities" },
-		{ "path": "../api-fetch" },
+		{ "path": "../api-fetch/tsconfig.build.json" },
 		{ "path": "../url" }
 	],
 	"include": [ "src/**/*" ]

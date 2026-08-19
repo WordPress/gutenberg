@@ -6,7 +6,6 @@ import {
 	shortcutAriaLabel,
 	ariaKeyShortcut,
 } from '@wordpress/keycodes';
-
 import { Button } from '../index';
 import * as Tooltip from '../../tooltip';
 import { VisuallyHidden } from '../../visually-hidden';

@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { act, renderHook } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useRegistry, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import {
 	getImageBlockMetadataFromAttachment,
 	getSyncedImageBlockAttributes,

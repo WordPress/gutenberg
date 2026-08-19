@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { useCallback, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import CircularOptionPicker, {
 	getComputeCircularOptionPickerCommonProps,
 } from '../circular-option-picker';

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	useBlockProps,
@@ -12,10 +9,6 @@ import {
 } from '@wordpress/components';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 
 const { ValidatedTextareaControl } = unlock( componentsPrivateApis );

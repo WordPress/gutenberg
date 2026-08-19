@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * Internal dependencies
- */
 import SandBox from '..';
 
 const meta: Meta< typeof SandBox > = {
@@ -36,4 +29,11 @@ const Template: StoryFn< typeof SandBox > = ( args ) => <SandBox { ...args } />;
 export const Default = Template.bind( {} );
 Default.args = {
 	html: '<p>Arbitrary HTML content</p>',
+	allowForms: false,
+};
+
+export const WithForm = Template.bind( {} );
+WithForm.args = {
+	html: '<form action="#"><label for="name">Name</label><input id="name" type="text" /><button type="submit">Submit</button></form>',
+	allowForms: true,
 };

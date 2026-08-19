@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalHStack as HStack, // eslint-disable-line @wordpress/use-recommended-components
@@ -24,17 +17,13 @@ import { __, _x } from '@wordpress/i18n';
 import { useCallback, useMemo, useRef } from '@wordpress/element';
 import { reset as resetIcon } from '@wordpress/icons';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import {
 	getInheritanceProps,
 	InheritanceToolsPanelItem,
 	InheritanceResetButton,
-	ENABLE_GLOBAL_STYLES_INHERITANCE,
+	isGlobalStylesInheritanceEnabled,
 } from './inheritance';
 
 const EMPTY_ARRAY = [];
@@ -187,7 +176,7 @@ export default function FiltersPanel( {
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
-	showInheritanceLabelIndicators = ENABLE_GLOBAL_STYLES_INHERITANCE,
+	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
 } ) {
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );

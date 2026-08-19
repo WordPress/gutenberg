@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import { select } from '@wordpress/data';
 import { transformAttachment } from '@wordpress/media-utils';
-
-/**
- * Internal dependencies
- */
 import mediaSideloadFromUrl from '..';
 
 jest.mock( '@wordpress/api-fetch', () => jest.fn() );

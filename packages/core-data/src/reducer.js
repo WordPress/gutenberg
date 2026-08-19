@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import { compose } from '@wordpress/compose';
 import { combineReducers } from '@wordpress/data';
 import { createUndoManager } from '@wordpress/undo-manager';
-
-/**
- * Internal dependencies
- */
 import { clearUnchangedEdits, ifMatchingAction, replaceAction } from './utils';
 import { reducer as queriedDataReducer } from './queried-data';
 import { rootEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalTruncate as Truncate,
 	__experimentalHStack as HStack,
@@ -10,10 +7,6 @@ import {
 } from '@wordpress/components';
 import { Icon, chevronDown } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 
 const { Badge: WCBadge } = unlock( componentsPrivateApis );

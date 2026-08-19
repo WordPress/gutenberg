@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	InspectorControls,
 	useBlockProps,
@@ -14,10 +11,6 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Icon, close } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function NavigationOverlayCloseEdit( {

@@ -2,10 +2,6 @@
  * Tests for utility functions
  * Ported from Gutenberg's utils.js tests
  */
-
-/**
- * Internal dependencies
- */
 import type { GlobalStylesConfig } from '../types';
 import {
 	getBlockStyleVariationFeatureSelector,

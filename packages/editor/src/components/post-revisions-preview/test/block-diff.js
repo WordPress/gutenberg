@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	createBlock,
 	registerBlockType,
@@ -11,10 +8,6 @@ import {
 import { RichTextData } from '@wordpress/rich-text';
 import * as paragraphBlock from '@wordpress/block-library/build-module/paragraph/index.mjs';
 import * as groupBlock from '@wordpress/block-library/build-module/group/index.mjs';
-
-/**
- * Internal dependencies
- */
 import { diffRevisionContent } from '../block-diff';
 import {
 	registerDiffFormatTypes,

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * WordPress dependencies
- */
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import {
 	TextControl,

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, isRTL, sprintf } from '@wordpress/i18n';
 import {
@@ -12,9 +9,7 @@ import {
 	formatListBullets,
 	listView,
 	external,
-	keyboard,
 	symbol,
-	page,
 	layout,
 	rotateRight,
 	rotateLeft,
@@ -26,10 +21,6 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 import {
@@ -160,7 +151,6 @@ const getEditorCommandLoader = () =>
 		commands.push( {
 			name: 'core/open-shortcut-help',
 			label: __( 'Keyboard shortcuts' ),
-			icon: keyboard,
 			category: 'view',
 			callback: ( { close } ) => {
 				close();
@@ -532,7 +522,6 @@ const getPageContentFocusCommands = () =>
 			commands.push( {
 				name: 'core/switch-to-previous-entity',
 				label: __( 'Go back' ),
-				icon: page,
 				category: 'view',
 				callback: ( { close } ) => {
 					goBack();

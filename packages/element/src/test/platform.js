@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import Platform from '../platform';
 
 describe( 'Platform', () => {

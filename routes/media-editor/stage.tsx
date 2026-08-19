@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Breadcrumbs, Page } from '@wordpress/admin-ui';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
@@ -13,10 +10,6 @@ import {
 } from '@wordpress/media-editor';
 import { useNavigate, useParams } from '@wordpress/route';
 import { unlock } from '@wordpress/routes-lock-unlock';
-
-/**
- * Internal dependencies
- */
 import './style.scss';
 
 const { usePostFields } = unlock( editorPrivateApis );
@@ -25,6 +18,7 @@ const { MediaEditor } = unlock( mediaEditorPrivateApis );
 const MEDIA_LIST_PATH = '/types/attachment/list/all';
 const MEDIA_LIBRARY_ADMIN_PATH = 'upload.php';
 const MEDIA_EDITOR_ADMIN_PAGE = 'media-editor-wp-admin';
+const MEDIA_EDITOR_SCOPE = 'media-editor-route';
 
 function isMediaEditorAdminPage() {
 	return (
@@ -77,6 +71,9 @@ function MediaEditorRoute() {
 		<MediaEditor
 			id={ attachmentId }
 			fields={ fields }
+			// A scope of its own, so that the details sidebar opens by default
+			// here regardless of whether it was last collapsed in the modal.
+			scope={ MEDIA_EDITOR_SCOPE }
 			onClose={ navigateBack }
 			onSaved={ ( { id: savedId } ) => {
 				if ( savedId !== attachmentId ) {

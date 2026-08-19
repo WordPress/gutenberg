@@ -6,22 +6,23 @@
 		"checkJs": false
 	},
 	"references": [
-		{ "path": "../a11y" },
-		{ "path": "../api-fetch" },
+		{ "path": "../a11y/tsconfig.build.json" },
+		{ "path": "../api-fetch/tsconfig.build.json" },
 		{ "path": "../block-editor" },
 		{ "path": "../blocks" },
-		{ "path": "../components" },
-		{ "path": "../compose" },
-		{ "path": "../core-data" },
+		{ "path": "../components/tsconfig.build.json" },
+		{ "path": "../compose/tsconfig.build.json" },
+		{ "path": "../core-data/tsconfig.build.json" },
 		{ "path": "../date" },
 		{ "path": "../data" },
-		{ "path": "../element" },
-		{ "path": "../global-styles-engine" },
-		{ "path": "../i18n" },
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../global-styles-engine/tsconfig.build.json" },
+		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons" },
-		{ "path": "../keycodes" },
+		{ "path": "../kebab-case" },
+		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../private-apis" },
-		{ "path": "../ui" }
+		{ "path": "../ui/tsconfig.build.json" }
 	],
 	"include": [ "src/**/*" ],
 	"exclude": [ "src/font-library/lib/**/*" ]

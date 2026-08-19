@@ -17,6 +17,10 @@
 		box-shadow: none;
 	}
 
+	&:focus {
+		outline: none;
+	}
+
 	&:focus:not(:active) {
 		@include mixins.outset-ring__focus();
 	}

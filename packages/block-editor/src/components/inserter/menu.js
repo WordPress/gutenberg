@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	forwardRef,
 	useState,
@@ -20,10 +13,6 @@ import { VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useDebouncedInput, useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import Tips from './tips';
 import InserterPreviewPanel from './preview-panel';
 import BlockTypesTab from './block-types-tab';

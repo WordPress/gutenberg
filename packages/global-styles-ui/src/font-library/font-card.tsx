@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { _n, sprintf, isRTL } from '@wordpress/i18n';
 import { useEffect, useRef } from '@wordpress/element';
 import {
@@ -12,10 +9,6 @@ import {
 } from '@wordpress/components';
 import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
 import type { FontFamily } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import FontDemo from './font-demo';
 
 function FontCard( {

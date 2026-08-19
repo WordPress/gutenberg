@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
@@ -10,10 +7,6 @@ import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import PluginSidebar from '../plugin-sidebar';
 import {
 	ALL_NOTES_SIDEBAR,

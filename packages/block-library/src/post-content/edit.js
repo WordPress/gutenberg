@@ -1,9 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
-	InnerBlocks,
 	InspectorControls,
 	useBlockProps,
 	useInnerBlocksProps,
@@ -21,10 +17,6 @@ import {
 } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { useCanEditEntity } from '../utils/hooks';
 import { unlock } from '../lock-unlock';
 
@@ -89,11 +81,6 @@ function EditableContentLoaded( {
 		value: blocks,
 		onInput,
 		onChange,
-		// Show a writing prompt for empty content, even when the block
-		// is not selected, so the content area remains discoverable.
-		renderAppender: blocks?.length
-			? undefined
-			: InnerBlocks.DefaultBlockAppender,
 	} );
 	return <TagName { ...props } />;
 }

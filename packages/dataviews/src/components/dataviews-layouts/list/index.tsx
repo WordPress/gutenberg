@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId, usePrevious } from '@wordpress/compose';
 import {
 	Button,
@@ -25,10 +18,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
 import { Stack, VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../../lock-unlock';
 import { ActionsMenuGroup, ActionModal } from '../../dataviews-item-actions';
 import DataViewsContext from '../../dataviews-context';

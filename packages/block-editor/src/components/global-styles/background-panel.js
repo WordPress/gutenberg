@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import BackgroundImageControl from '../background-image-control';
 import ColorGradientDropdownItem from './color-gradient-dropdown-item';
 import { useHasBackgroundColorPanel } from './color-panel';
@@ -21,7 +14,7 @@ import {
 import {
 	getInheritanceProps,
 	InheritanceToolsPanelItem,
-	ENABLE_GLOBAL_STYLES_INHERITANCE,
+	isGlobalStylesInheritanceEnabled,
 } from './inheritance';
 
 const DEFAULT_CONTROLS = {
@@ -170,7 +163,7 @@ export default function BackgroundImagePanel( {
 	defaultValues = {},
 	headerLabel = __( 'Background' ),
 	contrastWarning,
-	showInheritanceLabelIndicators = ENABLE_GLOBAL_STYLES_INHERITANCE,
+	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
 } ) {
 	const {
 		colors,

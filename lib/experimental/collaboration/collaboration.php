@@ -18,6 +18,10 @@ if ( ! function_exists( 'gutenberg_register_sync_storage_post_type' ) ) {
 	 * Registers the custom post type for sync storage.
 	 */
 	function gutenberg_register_sync_storage_post_type() {
+		if ( ! wp_is_collaboration_enabled() ) {
+			return;
+		}
+
 		register_post_type(
 			'wp_sync_storage',
 			array(
@@ -58,8 +62,34 @@ if ( ! function_exists( 'gutenberg_register_collaboration_rest_routes' ) ) {
 	 * Registers REST API routes for collaborative editing.
 	 */
 	function gutenberg_register_collaboration_rest_routes(): void {
-		$sync_storage = new WP_Sync_Post_Meta_Storage();
-		$sync_server  = new WP_HTTP_Polling_Sync_Server( $sync_storage );
+		if ( ! wp_is_collaboration_enabled() ) {
+			return;
+		}
+
+		/**
+		 * Filters the sync storage implementation for collaborative editing.
+		 *
+		 * Allows plugins to replace the default post meta storage with alternative
+		 * backends. The primary use case is the realtime-collaboration plugin,
+		 * which uses Presence API for awareness and a dedicated wp_collaboration
+		 * table for CRDT updates, eliminating cache side effects.
+		 *
+		 * This filter is unstable and may change as RTC explores fundamental changes
+		 * to how syncing works. The current interface assumes a pure naïve relay,
+		 * which could change.
+		 *
+		 * @since Gutenberg 21.x
+		 *
+		 * @param WP_Sync_Storage $sync_storage Storage implementation. Must implement
+		 *                                      the WP_Sync_Storage interface.
+		 */
+		$sync_storage = apply_filters( '__unstable_wp_sync_storage', new WP_Sync_Post_Meta_Storage() );
+
+		if ( ! $sync_storage instanceof WP_Sync_Storage ) {
+			$sync_storage = new WP_Sync_Post_Meta_Storage();
+		}
+
+		$sync_server = new WP_HTTP_Polling_Sync_Server( $sync_storage );
 		$sync_server->register_routes();
 
 		$sync_save_server = new WP_Sync_Save_Server();
@@ -73,6 +103,10 @@ if ( ! function_exists( 'wp_collaboration_register_meta' ) ) {
 	 * Registers post meta for persisting CRDT documents.
 	 */
 	function gutenberg_rest_api_crdt_post_meta() {
+		if ( ! wp_is_collaboration_enabled() ) {
+			return;
+		}
+
 		// This string must match POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE in @wordpress/core-data.
 		$persisted_crdt_post_meta_key = '_crdt_document';
 
@@ -108,103 +142,16 @@ if ( ! function_exists( 'wp_collaboration_register_meta' ) ) {
 	add_action( 'init', 'gutenberg_rest_api_crdt_post_meta' );
 }
 
-if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
-	/**
-	 * Registers the real-time collaboration setting.
-	 */
-	function gutenberg_register_real_time_collaboration_setting() {
-		$option_name = 'wp_collaboration_enabled';
-
-		register_setting(
-			'writing',
-			$option_name,
-			array(
-				'type'              => 'boolean',
-				'description'       => __( 'Enable Real-Time Collaboration', 'gutenberg' ),
-				'sanitize_callback' => 'rest_sanitize_boolean',
-				'default'           => true,
-				'show_in_rest'      => true,
-			)
-		);
-
-		add_settings_field(
-			$option_name,
-			__( 'Collaboration', 'gutenberg' ),
-			function () use ( $option_name ) {
-				$option_value = get_option( $option_name );
-
-				if ( wp_is_collaboration_allowed() ) :
-					?>
-					<label for="wp_collaboration_enabled">
-						<input name="wp_collaboration_enabled" type="checkbox" id="wp_collaboration_enabled" value="1" <?php checked( '1', $option_value ); ?>/>
-						<?php _e( "Enable early access to real-time collaboration. Real-time collaboration may affect your website's performance.", 'gutenberg' ); ?>
-					</label>
-				<?php else : ?>
-					<div class="notice notice-warning inline">
-						<?php
-						printf(
-								/* translators: %s: Prefix "Note:". */
-							'<p>' . __( '%s Real-time collaboration has been disabled.', 'gutenberg' ) . '</p>',
-							'<strong>' . __( 'Note:', 'gutenberg' ) . '</strong>'
-						);
-						?>
-					</div>
-					<?php
-				endif;
-			},
-			'writing'
-		);
-	}
-	add_action( 'admin_init', 'gutenberg_register_real_time_collaboration_setting' );
-}
-
 if ( ! function_exists( 'wp_is_collaboration_enabled' ) ) {
 	/**
 	 * Determines whether real-time collaboration is enabled.
-	 *
-	 * If the WP_ALLOW_COLLABORATION constant is false,
-	 * collaboration is always disabled regardless of the database option.
-	 * Otherwise, falls back to the 'wp_collaboration_enabled' option.
 	 *
 	 * @since 7.0.0
 	 *
 	 * @return bool Whether real-time collaboration is enabled.
 	 */
 	function wp_is_collaboration_enabled() {
-		return ( wp_is_collaboration_allowed() && (bool) get_option( 'wp_collaboration_enabled' ) );
-	}
-}
-
-if ( ! function_exists( 'wp_is_collaboration_allowed' ) ) {
-	/**
-	 * Determines whether real-time collaboration is allowed.
-	 *
-	 * If the WP_ALLOW_COLLABORATION constant is false,
-	 * collaboration is not allowed and cannot be enabled.
-	 * The constant defaults to true, unless the WP_ALLOW_COLLABORATION
-	 * environment variable is set to string "false".
-	 *
-	 * @since 7.0.0
-	 *
-	 * @return bool Whether real-time collaboration is allowed.
-	 */
-	function wp_is_collaboration_allowed() {
-		if ( ! defined( 'WP_ALLOW_COLLABORATION' ) ) {
-			$env_value = getenv( 'WP_ALLOW_COLLABORATION' );
-			if ( false === $env_value ) {
-				// Environment variable is not defined, default to allowing collaboration.
-				define( 'WP_ALLOW_COLLABORATION', true );
-			} else {
-				/*
-				* Environment variable is defined, let's confirm it is actually set to
-				* "true" as it may still have a string value "false" – the preceding
-				* `if` branch only tests for the boolean `false`.
-				*/
-				define( 'WP_ALLOW_COLLABORATION', 'true' === $env_value );
-			}
-		}
-
-		return WP_ALLOW_COLLABORATION;
+		return gutenberg_is_experiment_enabled( 'gutenberg-real-time-collaboration' );
 	}
 }
 
@@ -271,24 +218,11 @@ if ( ! function_exists( 'gutenberg_get_active_edit_lock_user' ) ) {
 }
 
 /**
- * Injects the real-time collaboration setting into a global variable.
- *
- * @global string $pagenow The filename of the current screen.
+ * Injects the post types for which real-time collaboration is disabled.
  */
-function gutenberg_inject_real_time_collaboration_setting() {
-	global $pagenow;
-
+function gutenberg_inject_collaboration_disabled_post_types() {
 	if ( ! wp_is_collaboration_enabled() ) {
 		return;
-	}
-
-	// Disable real-time collaboration on the site editor.
-	$enabled = true;
-	if (
-		'site-editor.php' === $pagenow ||
-		( 'admin.php' === $pagenow && isset( $_GET['page'] ) && 'site-editor-v2' === $_GET['page'] )
-	) {
-		$enabled = false;
 	}
 
 	$disabled_post_types = array_values(
@@ -300,24 +234,11 @@ function gutenberg_inject_real_time_collaboration_setting() {
 
 	wp_add_inline_script(
 		'wp-core-data',
-		'window._wpCollaborationEnabled = ' . wp_json_encode( $enabled ) . ';' .
 		'window._wpCollaborationDisabledPostTypes = ' . wp_json_encode( $disabled_post_types ) . ';',
 		'after'
 	);
 }
-add_action( 'admin_init', 'gutenberg_inject_real_time_collaboration_setting' );
-
-/**
- * Core adds an option with the default value, so we need to set the option to
- * our intended default when the Gutenberg plugin is activated, provided
- * collaboration is allowed.
- */
-function gutenberg_set_collaboration_option_on_activation() {
-	if ( wp_is_collaboration_allowed() ) {
-		update_option( 'wp_collaboration_enabled', '1' );
-	}
-}
-add_action( 'activate_' . plugin_basename( dirname( __DIR__, 3 ) . '/gutenberg.php' ), 'gutenberg_set_collaboration_option_on_activation' );
+add_action( 'admin_init', 'gutenberg_inject_collaboration_disabled_post_types' );
 
 /**
  * Modifies the post list UI and heartbeat responses for real-time collaboration.
@@ -590,3 +511,54 @@ function gutenberg_post_list_collaboration_row_actions( $actions, $post ) {
 
 	return $actions;
 }
+
+/**
+ * Adds the autosave's CRDT snapshot to the block editor settings when
+ * real-time collaboration is enabled.
+ *
+ * The snapshot describes the document state the autosave captured. The editor
+ * verifies its own shared document against it, and suppresses the "there is a
+ * more recent autosave" notice when the shared document already contains
+ * everything the autosave holds.
+ *
+ * @param array                   $settings             Editor settings.
+ * @param WP_Block_Editor_Context $block_editor_context The current block editor context.
+ * @return array Filtered editor settings.
+ */
+function gutenberg_add_autosave_details_to_editor_settings( $settings, $block_editor_context ) {
+	if ( ! isset( $settings['autosave'] ) || empty( $block_editor_context->post ) ) {
+		return $settings;
+	}
+
+	if ( ! wp_is_collaboration_enabled() ) {
+		return $settings;
+	}
+
+	$post = $block_editor_context->post;
+
+	if ( wp_is_post_type_collaboration_disabled( $post->post_type ) ) {
+		return $settings;
+	}
+
+	$autosave = wp_get_post_autosave( $post->ID );
+
+	if ( ! $autosave ) {
+		return $settings;
+	}
+
+	$snapshot = get_post_meta( $autosave->ID, Gutenberg_REST_Autosaves_Controller::CRDT_SNAPSHOT_META_KEY, true );
+
+	/*
+	 * Snapshots can be missing from a pre-collaboration autosave, classic editor autosave,
+	 * and other paths. The worst case is a "more recent autosave" notice when newer CRDT
+	 * content is already present in the shared document.
+	 */
+	if ( ! is_string( $snapshot ) || '' === $snapshot ) {
+		return $settings;
+	}
+
+	$settings['autosave']['crdtSnapshot'] = $snapshot;
+
+	return $settings;
+}
+add_filter( 'block_editor_settings_all', 'gutenberg_add_autosave_details_to_editor_settings', 10, 2 );

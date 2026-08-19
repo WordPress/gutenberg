@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useContext, useMemo } from '@wordpress/element';
 import {
 	privateApis,
@@ -9,10 +6,6 @@ import {
 	__experimentalUseSlotFills as useSlotFills,
 } from '@wordpress/components';
 import warning from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import groups from './groups';
 import { unlock } from '../../lock-unlock';
 

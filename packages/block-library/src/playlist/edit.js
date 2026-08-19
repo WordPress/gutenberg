@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import {
 	store as blockEditorStore,
@@ -32,10 +25,6 @@ import { __, _x } from '@wordpress/i18n';
 import { playlist as icon } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
 import { createBlobURL } from '@wordpress/blob';
-
-/**
- * Internal dependencies
- */
 import { Caption } from '../utils/caption';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { WaveformPlayer } from '../utils/waveform-player';
@@ -278,9 +267,8 @@ const PlaylistEdit = ( {
 		() => ( {
 			currentTrackClientId,
 			setCurrentTrackClientId,
-			addTracks: onAddTracks,
 		} ),
-		[ currentTrackClientId, onAddTracks, setCurrentTrackClientId ]
+		[ currentTrackClientId, setCurrentTrackClientId ]
 	);
 
 	// Get current track data by finding the track with matching client ID.
@@ -472,7 +460,7 @@ const PlaylistEdit = ( {
 					} }
 					onSelect={ onSelectTracks }
 					accept="audio/*"
-					multiple
+					multiple="add"
 					handleUpload={ false }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onError={ onUploadError }
@@ -483,12 +471,12 @@ const PlaylistEdit = ( {
 
 	return (
 		<>
-			<BlockControls group="other">
+			<BlockControls group="other" __experimentalShareWithChildBlocks>
 				<MediaReplaceFlow
-					name={ __( 'Add' ) }
+					name={ __( 'Add track' ) }
 					onSelect={ onAddTracks }
 					accept="audio/*"
-					multiple
+					multiple="add"
 					handleUpload={ false }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onError={ onUploadError }
@@ -683,7 +671,7 @@ const PlaylistEdit = ( {
 				<MediaPlaceholder
 					onSelect={ onAddTracks }
 					accept="audio/*"
-					multiple
+					multiple="add"
 					handleUpload={ false }
 					disableMediaButtons
 					allowedTypes={ ALLOWED_MEDIA_TYPES }

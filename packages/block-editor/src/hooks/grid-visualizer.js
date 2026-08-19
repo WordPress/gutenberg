@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { GridVisualizer, useGridLayoutSync } from '../components/grid';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	PluginMoreMenuItem as EditorPluginMoreMenuItem,
 	PluginSidebar as EditorPluginSidebar,

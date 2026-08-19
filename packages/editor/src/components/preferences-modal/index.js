@@ -1,7 +1,3 @@
-/**
- * WordPress dependencies
- */
-
 import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -11,10 +7,6 @@ import {
 	privateApis as preferencesPrivateApis,
 } from '@wordpress/preferences';
 import { store as interfaceStore } from '@wordpress/interface';
-
-/**
- * Internal dependencies
- */
 import EnablePanelOption from './enable-panel';
 import EnablePluginDocumentSettingPanelOption from './enable-plugin-document-setting-panel';
 import EnablePublishSidebarOption from './enable-publish-sidebar';

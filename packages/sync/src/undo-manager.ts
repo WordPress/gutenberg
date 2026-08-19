@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type * as Y from 'yjs';
-
-/**
- * WordPress dependencies
- */
 import type { HistoryRecord } from '@wordpress/undo-manager';
 
 /**

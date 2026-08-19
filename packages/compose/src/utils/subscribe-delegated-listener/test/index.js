@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import subscribeDelegatedListener from '..';
 
 describe( 'subscribeDelegatedListener', () => {

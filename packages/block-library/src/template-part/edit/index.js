@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { serialize } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -25,10 +22,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import TemplatePartPlaceholder from './placeholder';
 import TemplatePartSelectionModal from './selection-modal';
 import { TemplatePartAdvancedControls } from './advanced-controls';

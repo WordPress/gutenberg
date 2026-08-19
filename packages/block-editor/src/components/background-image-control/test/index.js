@@ -1,7 +1,3 @@
-/**
- * Internal dependencies
- */
-
 import { backgroundPositionToCoords, coordsToBackgroundPosition } from '../';
 
 describe( 'backgroundPositionToCoords', () => {

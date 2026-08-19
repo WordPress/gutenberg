@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -10,10 +7,6 @@ import {
 	SearchControl,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import {
 	useAlternativeBlockPatterns,
 	useAlternativeTemplateParts,

@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { Position } from './utils';
 import { POSITIONS } from './utils';
 import {

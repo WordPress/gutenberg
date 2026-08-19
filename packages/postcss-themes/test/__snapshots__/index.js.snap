@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`postcss-themes add the prefix selector to all subselectors 1`] = `
 "a, span{ color: #ccc }

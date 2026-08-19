@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { applyFilters, hasFilter } from '@wordpress/hooks';
 import {
 	Autocomplete as WCAutocomplete,
@@ -8,10 +5,6 @@ import {
 } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { getDefaultBlockName, getBlockSupport } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { useBlockEditContext } from '../block-edit/context';
 import blockAutocompleter from '../../autocompleters/block';
 

@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { hasBlockSupport, getBlockSupport } from '@wordpress/blocks';
 import { __experimentalHasSplitBorders as hasSplitBorders } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { getColorClassName } from '../components/colors';
 import InspectorControls from '../components/inspector-controls';
 import useMultipleOriginColorsAndGradients from '../components/colors-gradients/use-multiple-origin-colors-and-gradients';

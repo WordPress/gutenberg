@@ -1,18 +1,12 @@
-/**
- * External dependencies
- */
 import { renderHook } from '@testing-library/react';
-
 // Mock the entire @wordpress/block-editor module
 jest.mock( '@wordpress/block-editor', () => ( {
 	store: {},
 } ) );
-
 // Mock the entire @wordpress/core-data module
 jest.mock( '@wordpress/core-data', () => ( {
 	store: {},
 } ) );
-
 // Mock useDispatch specifically to avoid needing to set up full data store
 jest.mock( '@wordpress/data', () => ( {
 	useDispatch: jest.fn(),
@@ -28,15 +22,7 @@ jest.mock( '@wordpress/data', () => ( {
 	} ),
 	register: jest.fn(),
 } ) );
-
-/**
- * WordPress dependencies
- */
 import { useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { useHandleLinkChange } from '../use-handle-link-change';
 import { updateAttributes } from '../update-attributes';
 import { useEntityBinding } from '../use-entity-binding';

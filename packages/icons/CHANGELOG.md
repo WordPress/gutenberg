@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+### Internal
+
+-   Point tsconfig references at split dependencies' build projects. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 15.4.0 (2026-08-12)
+
+### Enhancements
+
+-   Add the `inlineImage` icon. ([#81271](https://github.com/WordPress/gutenberg/pull/81271))
+-   Add the `playlistTrack` icon. ([#80959](https://github.com/WordPress/gutenberg/pull/80959))
+
+### Internal
+
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
+
+## 15.3.0 (2026-07-29)
+
 ### Enhancements
 
 -   Normalize `keyboard-close`, `offline`, and `wordpress` to use the standard `viewBox="0 0 24 24"`. ([#80273](https://github.com/WordPress/gutenberg/pull/80273))
@@ -264,8 +281,6 @@
 ## 9.23.0 (2023-04-26)
 
 ## 9.22.0 (2023-04-12)
-
-### New Features
 
 ## 9.21.0 (2023-03-29)
 

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { useStyleOverride } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { getAvatarBorderColor, getNoteMarkerSelector } from './utils';
 
 // Hex alpha suffixes for the rest / active states. Kept low so the marker

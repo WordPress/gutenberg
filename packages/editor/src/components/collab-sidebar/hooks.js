@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import {
@@ -20,10 +17,6 @@ import { getScrollContainer } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as interfaceStore } from '@wordpress/interface';
 import { RichTextData, create } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { FLOATING_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
@@ -403,9 +396,14 @@ export function useNoteActions() {
 					},
 				};
 
-				await saveEntityRecord( 'root', 'comment', newNoteData, {
-					throwOnError: true,
-				} );
+				const savedRecord = await saveEntityRecord(
+					'root',
+					'comment',
+					newNoteData,
+					{
+						throwOnError: true,
+					}
+				);
 
 				// Resolving a note drops its inline highlight: strip the marker
 				// so the note falls back to a block-level note in the content.
@@ -425,22 +423,31 @@ export function useNoteActions() {
 						? __( 'Note marked as resolved.' )
 						: __( 'Note reopened.' )
 				);
-			} else {
-				const updateData = {
-					id,
-					content,
-					status,
-				};
 
-				await saveEntityRecord( 'root', 'comment', updateData, {
-					throwOnError: true,
-				} );
-
-				createNotice( 'snackbar', __( 'Note updated.' ), {
-					type: 'snackbar',
-					isDismissible: true,
-				} );
+				return savedRecord;
 			}
+
+			const updateData = {
+				id,
+				content,
+				status,
+			};
+
+			const savedRecord = await saveEntityRecord(
+				'root',
+				'comment',
+				updateData,
+				{
+					throwOnError: true,
+				}
+			);
+
+			createNotice( 'snackbar', __( 'Note updated.' ), {
+				type: 'snackbar',
+				isDismissible: true,
+			} );
+
+			return savedRecord;
 		} catch ( error ) {
 			onError( error );
 		}
@@ -448,17 +455,18 @@ export function useNoteActions() {
 
 	const onDelete = async ( note ) => {
 		try {
+			// Capture the target block *before* the async delete: selection may
+			// shift during the round-trip, pointing the attribute cleanup at the
+			// wrong block.
+			const clientId = ! note.parent
+				? note.blockClientId || getSelectedBlockClientId()
+				: null;
+
 			await deleteEntityRecord( 'root', 'comment', note.id, undefined, {
 				throwOnError: true,
 			} );
 
-			if ( ! note.parent ) {
-				// Use blockClientId if available, otherwise fall back to selected block.
-				const clientId =
-					note.blockClientId || getSelectedBlockClientId();
-				if ( ! clientId ) {
-					return;
-				}
+			if ( clientId ) {
 				const attributes = getBlockAttributes( clientId );
 				const newAttributes = {
 					metadata: cleanEmptyObject(
@@ -488,6 +496,8 @@ export function useNoteActions() {
 				type: 'snackbar',
 				isDismissible: true,
 			} );
+
+			return true;
 		} catch ( error ) {
 			onError( error );
 		}

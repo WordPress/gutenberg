@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { Modal } from '@wordpress/components';
 import { DataViewsPicker } from '@wordpress/dataviews';
 import { __, sprintf } from '@wordpress/i18n';
 import { getBlockType } from '@wordpress/blocks';
 import { useMemo, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { useGlobalStyles } from '../../components/global-styles/hooks';
 import { useReviewRows } from './use-review-rows';
 

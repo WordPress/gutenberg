@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	Modal,
@@ -10,10 +7,6 @@ import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { useUnsupportedBlocks } from '../utils';
 
 const modalDescriptionId =

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useState, useCallback, useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { EntityProvider } from '@wordpress/core-data';
@@ -10,10 +7,6 @@ import {
 	PanelBody,
 } from '@wordpress/components';
 import { useBlockProps } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import WidgetAreaInnerBlocks from './inner-blocks';
 import { store as editWidgetsStore } from '../../../store';
 import useIsDraggingWithin from './use-is-dragging-within';

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { autop, removep } from '../';
 
 test( 'empty string', () => {

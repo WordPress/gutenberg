@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import {
 	Component,
@@ -17,10 +10,7 @@ import {
 import { useInstanceId } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { closeSmall } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
+import { withIgnoreIMEEvents } from '@wordpress/keycodes';
 import { InputWrapperFlex } from './styles';
 import TokenInput from '../form-token-field/token-input';
 import SuggestionsList from '../form-token-field/suggestions-list';
@@ -32,7 +22,6 @@ import { useControlledValue } from '../utils/hooks';
 import { normalizeTextString } from '../utils/strings';
 import type { ComboboxControlOption, ComboboxControlProps } from './types';
 import type { TokenInputProps } from '../form-token-field/types';
-import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 import Spinner from '../spinner';
 
 const noop = () => {};

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { FlexItem } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { NoteByline } from './note-byline';
 
 export function NoteCard( { note, actions, className, children, ...props } ) {

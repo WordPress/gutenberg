@@ -1,9 +1,5 @@
-/**
- * WordPress dependencies
- */
 import {
 	Button,
-	Flex,
 	Spinner,
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
@@ -32,14 +28,9 @@ import {
 	ComplementaryArea,
 	InterfaceSkeleton,
 	PinnedItems,
-	// No type declarations available for @wordpress/interface.
-	// @ts-expect-error
+	// @ts-expect-error `@wordpress/interface` is not typed yet.
 } from '@wordpress/interface';
 import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import { MediaEditorProvider } from '../media-editor-provider';
 import type { Media } from '../media-editor-provider';
 import MediaPreview from '../media-preview';
@@ -108,16 +99,36 @@ export interface MediaEditorProps {
 	noticesPortalElement?: Element | null;
 	showCloseButton?: boolean;
 	shouldCloseOnEsc?: boolean;
+	/**
+	 * The `@wordpress/interface` scope for the details sidebar and its pinned
+	 * items. Frames should pass a distinct scope so that sidebar visibility —
+	 * which is persisted per scope to user meta — is remembered separately for
+	 * each surface. The modal is a transient surface where a collapsed sidebar
+	 * is a reasonable choice; the full-screen route is one where the sidebar is
+	 * the primary metadata surface and should open by default. Sharing a scope
+	 * would let a choice made in one decide the other's starting state.
+	 *
+	 * @default 'media-editor'
+	 */
+	scope?: string;
 }
 
-function MediaEditorSidebar( { tabs }: { tabs: EditorTab[] } ) {
-	// The tab list and panels must share one `<Tabs.Root>`, but they render in
-	// separate `ComplementaryArea` regions (header vs body). A non-virtual Slot
-	// reconciles both inline at the Slot, so the `Root` is lifted to wrap this
-	// Fill and that Slot together — see `MediaEditorContent`.
+interface MediaEditorSidebarProps {
+	tabs: EditorTab[];
+	activeTabId?: string;
+	onTabChange: ( tabId: string ) => void;
+	scope: string;
+}
+
+function MediaEditorSidebar( {
+	tabs,
+	activeTabId,
+	onTabChange,
+	scope,
+}: MediaEditorSidebarProps ) {
 	return (
 		<ComplementaryArea
-			scope="media-editor"
+			scope={ scope }
 			identifier="media-editor/details"
 			title={ __( 'Details' ) }
 			icon={ drawerRight }
@@ -126,6 +137,16 @@ function MediaEditorSidebar( { tabs }: { tabs: EditorTab[] } ) {
 			panelClassName="media-editor__sidebar-panel"
 			headerClassName="media-editor__sidebar-header"
 			closeLabel={ __( 'Close media panel' ) }
+			// Makes `Tabs.Root` the container, so the tab list passed as
+			// `header` and the panels below share a subtree across the fill.
+			render={
+				<Tabs.Root
+					value={ activeTabId }
+					onValueChange={ ( value ) =>
+						onTabChange( value as string )
+					}
+				/>
+			}
 			header={
 				<Tabs.List variant="minimal">
 					{ tabs.map( ( tab ) => (
@@ -150,6 +171,7 @@ interface HeaderActionsProps {
 	isImage: boolean;
 	showCloseButton?: boolean;
 	onCancel: () => void;
+	scope: string;
 }
 
 function HeaderActions( {
@@ -157,14 +179,15 @@ function HeaderActions( {
 	isImage,
 	showCloseButton = false,
 	onCancel,
+	scope,
 }: HeaderActionsProps ) {
 	const [ isShortcutsModalOpen, setIsShortcutsModalOpen ] = useState( false );
 	return (
-		<Flex
+		<Stack
 			className="media-editor__header-actions"
 			justify="flex-end"
-			expanded={ false }
-			gap={ 2 }
+			align="center"
+			gap="sm"
 		>
 			{ isImage && (
 				<Button
@@ -174,7 +197,7 @@ function HeaderActions( {
 					onClick={ () => setIsShortcutsModalOpen( true ) }
 				/>
 			) }
-			<PinnedItems.Slot scope="media-editor" />
+			<PinnedItems.Slot scope={ scope } />
 			{ showCloseButton && (
 				<Button
 					size="compact"
@@ -190,7 +213,7 @@ function HeaderActions( {
 					onClose={ () => setIsShortcutsModalOpen( false ) }
 				/>
 			) }
-		</Flex>
+		</Stack>
 	);
 }
 
@@ -232,10 +255,10 @@ function HistoryActions( {
 		endGesture();
 	};
 	return (
-		<Flex
+		<Stack
 			className="media-editor__history-actions"
-			expanded={ false }
-			gap={ 2 }
+			align="center"
+			gap="sm"
 		>
 			<Button
 				size="compact"
@@ -270,7 +293,7 @@ function HistoryActions( {
 				accessibleWhenDisabled
 				onClick={ handleRedo }
 			/>
-		</Flex>
+		</Stack>
 	);
 }
 
@@ -291,11 +314,11 @@ function FooterActions( {
 }: FooterActionsProps ) {
 	const saveDisabled = isSaving || ! hasMedia || ! hasChanges;
 	return (
-		<Flex
+		<Stack
 			className="media-editor__footer-actions"
 			justify="flex-end"
-			expanded={ false }
-			gap={ 2 }
+			align="center"
+			gap="sm"
 		>
 			<Button
 				__next40pxDefaultSize
@@ -316,7 +339,7 @@ function FooterActions( {
 			>
 				{ __( 'Save' ) }
 			</Button>
-		</Flex>
+		</Stack>
 	);
 }
 
@@ -331,6 +354,7 @@ function MediaEditorContent( {
 	noticesPortalElement,
 	showCloseButton = false,
 	shouldCloseOnEsc = false,
+	scope = 'media-editor',
 }: MediaEditorProps ) {
 	const cropper = useMediaEditor();
 	// The sidebar is a side column from the `small` breakpoint up and collapses
@@ -578,62 +602,60 @@ function MediaEditorContent( {
 			onChange={ handleChange }
 			settings={ { fields } }
 		>
-			{ ! media ? (
-				<div className="media-editor">
+			<div className="media-editor">
+				{ ! media ? (
 					<div className="media-editor__loading">
 						<Spinner />
 					</div>
-				</div>
-			) : (
-				<Tabs.Root
-					className="media-editor"
-					value={ activeTabId }
-					onValueChange={ ( value ) =>
-						setSelectedTabId( value as string )
-					}
-				>
-					<MediaEditorSidebar tabs={ tabs } />
-					<InterfaceSkeleton
-						className="media-editor__skeleton"
-						labels={ {
-							body: isImage
-								? __( 'Image editor' )
-								: __( 'Media preview' ),
-							sidebar: __( 'Media details' ),
-						} }
-						content={
-							<div className="media-editor__content">
-								<div className="media-editor__canvas-area">
-									{ isImage ? (
-										<MediaEditorCanvas
-											focusOnMount
-											isPlacementActive={
-												isPlacementActive
-											}
-											onGestureStart={
-												handleCanvasGestureStart
-											}
-											onGestureEnd={
-												handleCanvasGestureEnd
-											}
-										/>
-									) : (
-										<MediaPreview />
+				) : (
+					<>
+						<MediaEditorSidebar
+							tabs={ tabs }
+							activeTabId={ activeTabId }
+							onTabChange={ setSelectedTabId }
+							scope={ scope }
+						/>
+						<InterfaceSkeleton
+							className="media-editor__skeleton"
+							labels={ {
+								body: isImage
+									? __( 'Image editor' )
+									: __( 'Media preview' ),
+								sidebar: __( 'Media details' ),
+							} }
+							content={
+								<div className="media-editor__content">
+									<div className="media-editor__canvas-area">
+										{ isImage ? (
+											<MediaEditorCanvas
+												isPlacementActive={
+													isPlacementActive
+												}
+												onGestureStart={
+													handleCanvasGestureStart
+												}
+												onGestureEnd={
+													handleCanvasGestureEnd
+												}
+											/>
+										) : (
+											<MediaPreview />
+										) }
+									</div>
+									{ isImage && (
+										<div className="media-editor__canvas-toolbar">
+											{ ruler }
+										</div>
 									) }
 								</div>
-								{ isImage && (
-									<div className="media-editor__canvas-toolbar">
-										{ ruler }
-									</div>
-								) }
-							</div>
-						}
-						sidebar={
-							<ComplementaryArea.Slot scope="media-editor" />
-						}
-					/>
-				</Tabs.Root>
-			) }
+							}
+							sidebar={
+								<ComplementaryArea.Slot scope={ scope } />
+							}
+						/>
+					</>
+				) }
+			</div>
 			<ConfirmDialog
 				isOpen={ isDiscardDialogOpen }
 				confirmButtonText={ __( 'Discard' ) }
@@ -711,6 +733,7 @@ function MediaEditorContent( {
 				isImage={ isImage }
 				showCloseButton={ showCloseButton }
 				onCancel={ handleRequestClose }
+				scope={ scope }
 			/>
 		),
 		footerActions,

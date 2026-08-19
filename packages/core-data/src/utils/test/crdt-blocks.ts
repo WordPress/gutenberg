@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { Y } from '@wordpress/sync';
-
-/**
- * External dependencies
- */
 import {
 	describe,
 	expect,
@@ -14,14 +7,12 @@ import {
 	beforeEach,
 	afterEach,
 } from '@jest/globals';
-
 /**
  * Mock uuid module
  */
 jest.mock( 'uuid', () => ( {
 	v4: () => 'mocked-uuid-' + Math.random(),
 } ) );
-
 /**
  * Mock @wordpress/blocks module
  */
@@ -101,15 +92,7 @@ jest.mock( '@wordpress/blocks', () => ( {
 		},
 	],
 } ) );
-
-/**
- * WordPress dependencies
- */
 import { RichTextData } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import {
 	mergeCrdtBlocks,
 	mergeRichTextUpdate,

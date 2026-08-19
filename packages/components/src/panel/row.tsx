@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
 import type { ForwardedRef } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { PanelRowProps } from './types';
 
 function UnforwardedPanelRow(

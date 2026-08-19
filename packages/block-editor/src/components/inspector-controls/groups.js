@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createSlotFill } from '@wordpress/components';
 
 const InspectorControlsDefault = createSlotFill( 'InspectorControls' );

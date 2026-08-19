@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useCallback, useState, useEffect, useRef } from '@wordpress/element';
 import {
 	InspectorControls,
@@ -45,10 +38,6 @@ import { speak } from '@wordpress/a11y';
 import { page } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import useNavigationMenu from '../use-navigation-menu';
 import Placeholder from './placeholder';
 import ResponsiveWrapper from './responsive-wrapper';

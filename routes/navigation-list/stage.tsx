@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useNavigate, useSearch } from '@wordpress/route';
 import type { View, Action } from '@wordpress/dataviews';
 import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
@@ -13,17 +10,9 @@ import { DataViews } from '@wordpress/dataviews';
 import { Button } from '@wordpress/components';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { unlock } from '@wordpress/routes-lock-unlock';
-
-/**
- * Internal dependencies
- */
 import { getDefaultView } from './view-utils';
 import { useEditNavigationAction } from './actions/edit-navigation';
 import { AddNavigationModal } from './add-navigation';
-
-/**
- * Style dependencies
- */
 import './style.scss';
 
 // Unlock WordPress private APIs
