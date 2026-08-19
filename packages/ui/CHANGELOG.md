@@ -18,6 +18,7 @@
 ### Enhancements
 
 -   `Autocomplete.Popup`, `Combobox.Popup`, `SearchableChipSelect`, `SearchableChipSelectControl`, `Select.Popup`, and `SelectControl`: Add `width` on Popups and `popupWidth` on composites, with preset width constraints (`anchor`, `content`, `sm`, `md`, `lg`, and `available`) for the item popup. `SelectControl` defaults to `content` to preserve prior popup sizing ([#82087](https://github.com/WordPress/gutenberg/pull/82087), [#82193](https://github.com/WordPress/gutenberg/pull/82193)).
+-   `Menu`: Support multiple item descriptions. ([#81825](https://github.com/WordPress/gutenberg/pull/81825))
 -   `Menu`: Use `Text` for item labels and descriptions to share typography and apply `text-wrap: pretty`. ([#82237](https://github.com/WordPress/gutenberg/pull/82237))
 -   `Text`: Apply `text-wrap: pretty` by default to improve line wrapping. ([#82133](https://github.com/WordPress/gutenberg/pull/82133))
 
