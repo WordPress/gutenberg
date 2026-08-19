@@ -243,6 +243,126 @@ describe( 'transforms', () => {
 		] );
 	} );
 
+	it( 'transforms the Row variation of Group to Columns with one Column per Row child', () => {
+		const block = createBlock(
+			'core/group',
+			{
+				align: 'wide',
+				layout: {
+					type: 'flex',
+					flexWrap: 'nowrap',
+					verticalAlignment: 'center',
+				},
+			},
+			[
+				createBlock( 'core/paragraph', { content: 'One' } ),
+				createBlock(
+					'core/group',
+					{ layout: { type: 'constrained' } },
+					[
+						createBlock( 'core/paragraph', { content: 'Two' } ),
+						createBlock( 'core/paragraph', { content: 'Three' } ),
+					]
+				),
+			]
+		);
+
+		const transformedBlocks = switchToBlockType( block, 'core/columns' );
+
+		expect( transformedBlocks[ 0 ] ).toMatchObject( {
+			name: 'core/columns',
+			attributes: {
+				align: 'wide',
+				verticalAlignment: 'center',
+			},
+		} );
+		expect( transformedBlocks[ 0 ].attributes ).not.toHaveProperty(
+			'layout'
+		);
+		expect( transformedBlocks[ 0 ].innerBlocks ).toHaveLength( 2 );
+		expect( transformedBlocks[ 0 ].innerBlocks[ 0 ] ).toMatchObject( {
+			name: 'core/column',
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'One' },
+				},
+			],
+		} );
+		expect( transformedBlocks[ 0 ].innerBlocks[ 1 ] ).toMatchObject( {
+			name: 'core/column',
+			innerBlocks: [
+				{
+					name: 'core/group',
+					attributes: { layout: { type: 'constrained' } },
+					innerBlocks: [
+						{ attributes: { content: 'Two' } },
+						{ attributes: { content: 'Three' } },
+					],
+				},
+			],
+		} );
+	} );
+
+	it( 'migrates fixed Row child sizes to Column widths', () => {
+		const block = createBlock(
+			'core/group',
+			{ layout: { type: 'flex', flexWrap: 'nowrap' } },
+			[
+				createBlock( 'core/paragraph', {
+					content: 'One',
+					style: {
+						color: { text: '#123456' },
+						layout: {
+							columnSpan: 2,
+							selfStretch: 'fixed',
+							flexSize: '320px',
+						},
+					},
+				} ),
+				createBlock( 'core/paragraph', {
+					content: 'Two',
+					style: {
+						layout: {
+							selfStretch: 'fixedNoShrink',
+							flexSize: '50%',
+						},
+					},
+				} ),
+				createBlock( 'core/paragraph', {
+					content: 'Three',
+					style: {
+						layout: {
+							selfStretch: 'fill',
+							flexSize: '25%',
+						},
+					},
+				} ),
+			]
+		);
+
+		const transformedBlocks = switchToBlockType( block, 'core/columns' );
+
+		expect(
+			transformedBlocks[ 0 ].innerBlocks.map(
+				( column ) => column.attributes.width
+			)
+		).toEqual( [ '320px', '50%', undefined ] );
+		expect(
+			transformedBlocks[ 0 ].innerBlocks[ 0 ].innerBlocks[ 0 ].attributes
+				.style
+		).toEqual( {
+			color: { text: '#123456' },
+			layout: { columnSpan: 2 },
+		} );
+		expect(
+			transformedBlocks[ 0 ].innerBlocks[ 1 ].innerBlocks[ 0 ].attributes
+		).not.toHaveProperty( 'style' );
+		expect(
+			transformedBlocks[ 0 ].innerBlocks[ 2 ].innerBlocks[ 0 ].attributes
+		).not.toHaveProperty( 'style' );
+	} );
+
 	it( 'transforms Grid variation of Group to Columns using the explicit grid column count', () => {
 		const block = createBlock(
 			'core/group',

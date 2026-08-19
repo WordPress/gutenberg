@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   Columns: Add a transform to the Row variation that preserves column widths through flex child sizing controls.
+-   Columns: Add transforms between Columns and the Row variation that preserve column widths through flex child sizing controls.
 
 ### Bug Fixes
 
