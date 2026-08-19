@@ -24,7 +24,6 @@
 		{ "path": "packages/escape-html" },
 		{ "path": "packages/fields" },
 		{ "path": "packages/global-styles-engine" },
-		{ "path": "packages/global-styles-ui" },
 		{ "path": "packages/grid" },
 		{ "path": "packages/html-entities" },
 		{ "path": "packages/i18n" },
