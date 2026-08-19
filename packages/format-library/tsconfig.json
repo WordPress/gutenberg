@@ -7,18 +7,18 @@
 	},
 	"references": [
 		{ "path": "../a11y/tsconfig.build.json" },
-		{ "path": "../block-editor" },
-		{ "path": "../components" },
+		{ "path": "../block-editor/tsconfig.build.json" },
+		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../data" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../html-entities/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
-		{ "path": "../icons" },
+		{ "path": "../icons/tsconfig.build.json" },
 		{ "path": "../latex-to-mathml" },
 		{ "path": "../private-apis" },
 		{ "path": "../rich-text" },
-		{ "path": "../ui" },
+		{ "path": "../ui/tsconfig.build.json" },
 		{ "path": "../url" }
 	]
 }
