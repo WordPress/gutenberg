@@ -4,13 +4,13 @@
 	"references": [
 		{ "path": "./tsconfig.build.json" },
 		{ "path": "../a11y/tsconfig.build.json" },
-		{ "path": "../components" },
+		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../data" },
 		{ "path": "../deprecated/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
-		{ "path": "../icons" },
+		{ "path": "../icons/tsconfig.build.json" },
 		{ "path": "../private-apis" }
 	],
 	// Listed files have pre-existing type errors; include them once fixed.
