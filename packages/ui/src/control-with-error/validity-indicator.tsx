@@ -11,6 +11,14 @@ const ICON = {
 	invalid: error,
 };
 
+/**
+ * Displays a validity message for a form control, with an icon matching the
+ * validity state: invalid, valid, or validating (a spinner while an async
+ * check is pending).
+ *
+ * `ControlWithError` renders it automatically; use it directly to give a
+ * custom validated control the same presentation.
+ */
 export function ValidityIndicator( {
 	id,
 	type,

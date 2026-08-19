@@ -281,6 +281,16 @@
       - onCancel
       - onConfirm
       - size
+- name: ControlWithError
+  props:
+      - children
+      - className
+      - customValidity
+      - getValidityTarget
+      - markWhenOptional
+      - render
+      - required
+      - style
 - name: CustomSelectControl
   props:
       - __experimentalShowSelectedHint
@@ -1165,6 +1175,11 @@
       - unit
       - units
       - value
+- name: ValidityIndicator
+  props:
+      - id
+      - message
+      - type
 - name: VisuallyHidden
   props:
       - children
