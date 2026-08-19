@@ -7,7 +7,6 @@ The rule checks named imports and direct destructuring from `unlock( privateApis
 ## Migration guides
 
 - `__experimentalInputControl` — [`InputControl` migration guide][inputcontrol-migration-guide]
-- `__experimentalNumberControl` — [`InputControl` migration guide][inputcontrol-migration-guide]
 - `TextControl` — [`InputControl` migration guide][inputcontrol-migration-guide]
 
 [inputcontrol-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-inputcontrol--migration-guide

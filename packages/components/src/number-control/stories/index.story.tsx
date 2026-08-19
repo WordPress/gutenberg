@@ -21,7 +21,7 @@ const meta: Meta< typeof NumberControl > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Use [`InputControl`](?path=/docs/design-system-components-form-inputcontrol--docs) with `type="number"` from `@wordpress/ui` instead. See the [migration guide](?path=/docs/components-inputcontrol--migration-guide).',
+			notes: 'For new use cases, use [`InputControl`](?path=/docs/design-system-components-form-inputcontrol--docs) with `type="number"` from `@wordpress/ui` instead. Existing usages should migrate with caution, due to significant differences in behavior. See the [migration guide](?path=/docs/components-inputcontrol--migration-guide).',
 		},
 	},
 };
