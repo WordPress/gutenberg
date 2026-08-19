@@ -11,6 +11,6 @@
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../hooks" },
 		{ "path": "../icons/tsconfig.build.json" },
-		{ "path": "../is-shallow-equal" }
+		{ "path": "../is-shallow-equal/tsconfig.build.json" }
 	]
 }

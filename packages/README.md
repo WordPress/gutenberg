@@ -327,9 +327,7 @@ Gutenberg uses TypeScript for several reasons, including:
 Gutenberg uses TypeScript by running the TypeScript compiler (`tsc`) on select packages.
 These packages benefit from type checking and produced type declarations in the published packages.
 
-A package opts in to TypeScript tooling with a `tsconfig.json` in its root, registered in the root `tsconfig.build.json` references.
-
-Packages are being migrated to a two project layout, one package at a time:
+A package opts in to TypeScript tooling with a build project registered in the root `tsconfig.build.json` references: `tsconfig.json` for a package without TypeScript dev files, `tsconfig.build.json` for one that splits. Packages with TypeScript test or story files split into two projects:
 
 -   `tsconfig.build.json` is the build project: it covers `src`, emits declarations to `build-types`, and is what other packages and `npm run build` consume.
 -   `tsconfig.json` is the dev project: it covers test and story files with `noEmit`, so `npm run typecheck` and the IDE can check them without their declarations ending up in the published package.
@@ -343,8 +341,8 @@ Both extend shared base configurations (comments are not necessary):
 	"extends": "../../tsconfig.base.json",
 
 	// Dependencies that have opted in to TypeScript are referenced here: a
-	// migrated one by its build project, one still on a single config by
-	// its directory.
+	// split one by its build project, one on a single config by its
+	// directory.
 	"references": [
 		{ "path": "../dom-ready/tsconfig.build.json" },
 		{ "path": "../hooks" }
@@ -364,7 +362,7 @@ Both extend shared base configurations (comments are not necessary):
 }
 ```
 
-A migrated package registers both projects at the root: `packages/<name>/tsconfig.build.json` in the root `tsconfig.build.json` references, and `packages/<name>` in the root `tsconfig.json` references.
+Register both projects at the root: `packages/<name>/tsconfig.build.json` in the root `tsconfig.build.json` references, and `packages/<name>` in the root `tsconfig.json` references.
 
 Packages whose components feed the Storybook components manifest (`components`, `dataviews`, `ui`) carry a third project, `tsconfig.stories.json`, registered in the root `tsconfig.json` only. It type checks the stories against component sources without jest types. Storybook's component meta extractor reads props through the closest `tsconfig.json` that lists a story, or through its own inferred project when none does; the inferred project produces the complete manifest and the dev project does not, so stories stay out of `tsconfig.json`. The dev project cannot reference this one either, because a referenced project may not disable emit (TS6310), which is why it is registered at the root only.
 
