@@ -45,6 +45,7 @@ export interface MediaEditorCanvasProps {
  * @param props.onGestureStart
  * @param props.onGestureEnd
  * @param props.disabled
+ * @param props.srcOverride
  */
 export default function MediaEditorCanvas( {
 	isPlacementActive = false,
