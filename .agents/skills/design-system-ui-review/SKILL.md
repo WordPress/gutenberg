@@ -8,7 +8,7 @@ description: Use when reviewing a Gutenberg, plugin, or application UI/UX change
 ## Start shallow
 
 1. Define the changed user-facing behaviour, affected users, runtime document,
-   and target versions.
+   target versions, and dependency deployment boundary.
 2. Scan the complete diff once for semantics and accessibility, interaction
    and focus, styling and tokens, integration, tests, and compatibility.
    Account for every changed file before deep research; finding one defect
@@ -20,9 +20,9 @@ description: Use when reviewing a Gutenberg, plugin, or application UI/UX change
    - **Deep:** migrations, public-contract risk, or separate documents and
      overlays.
 
-On the lightweight path, verify the installed API, every changed consumer, and
-required changelog coverage. State what the change improves and what behaviour
-and semantics remain unchanged, then stop. Do not reopen component selection
+On the lightweight path, verify the target runtime API, every changed consumer,
+and required changelog coverage. State what the change improves and what
+behaviour and semantics remain unchanged, then stop. Do not reopen component selection
 without evidence that the existing component is unsuitable.
 
 ## Deepen only material questions

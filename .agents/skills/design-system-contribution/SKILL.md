@@ -22,6 +22,7 @@ matches the change:
 - [`docs/contributors/design/design-system-packages.md`](../../../docs/contributors/design/design-system-packages.md)
 - [`packages/components/CONTRIBUTING.md`](../../../packages/components/CONTRIBUTING.md)
 - [`packages/ui/CONTRIBUTING.md`](../../../packages/ui/CONTRIBUTING.md)
+- [`packages/theme/README.md`](../../../packages/theme/README.md)
 - [`packages/theme/tokens/README.md`](../../../packages/theme/tokens/README.md)
 
 Use an available WordPress Design System MCP server to learn current direction
@@ -44,7 +45,7 @@ changelog policy for production code changes.
 
 Use the public guide's
 [package completion gate](../../../docs/contributors/design/design-system-packages.md#change-a-package-safely)
-with the applicable package contribution guide. Mark each relevant contract
+with the applicable package source guidance. Mark each relevant contract
 surface complete, not applicable, or blocked.
 
 Run focused tests and required lint, type, generation, or build checks. Verify

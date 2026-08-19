@@ -7,8 +7,9 @@ description: Use when building or changing a Gutenberg feature, plugin interface
 
 ## Classify before searching
 
-1. State the user-visible behaviour, target package version, rendering owner,
-   and runtime document.
+1. State the user-visible behaviour, minimum runtime and package versions,
+   rendering owner, runtime document, and whether each Design System dependency
+   is bundled or externalized.
 2. Inspect the changed surface and its nearest same-surface precedent once.
 3. Choose the narrowest path:
    - **Lightweight:** keep an existing supported component when behaviour,
@@ -26,8 +27,8 @@ When selection is material, write the required interaction contract before
 choosing a component. Follow the maintained recommendation sources and
 target-version checks in
 [Working with WordPress Design System packages](../../../docs/contributors/design/design-system-packages.md#choose-a-recommended-component),
-then verify the selected public API in the target checkout or installed
-version.
+then verify the selected public API in the deployed runtime or installed
+version, as applicable.
 
 Choose the smallest public composition that owns exactly the required
 behaviour. Do not turn a trigger into a menu, dialog, or state owner merely

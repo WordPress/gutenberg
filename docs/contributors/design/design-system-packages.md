@@ -8,10 +8,16 @@ changing, those packages.
 ## Choose the work boundary
 
 Use the public packages when building a Gutenberg feature, plugin, or
-standalone application. An application consumer may use documented components,
-props, semantic `--wpds-*` tokens, and public theming/setup APIs. It must not
-depend on package-private source paths, CSS modules, Base UI implementation
-details, or a Gutenberg checkout.
+standalone application. An application consumer may use public package
+entrypoints, documented props, semantic `--wpds-*` tokens, and public
+theming/setup APIs. It must not depend on package-private source paths, CSS
+modules, Base UI implementation details, private API bridges, or a Gutenberg
+checkout.
+
+Do not treat an API as private only because its name starts with
+`__experimental`. Legacy experimental APIs shipped by WordPress can carry
+public compatibility obligations. Verify their status against the
+[canonical API boundary guidance](/docs/contributors/code/coding-guidelines.md#legacy-experimental-apis-plugin-only-apis-and-private-apis).
 
 Use the package contribution workflows only when changing
 `packages/components`, `packages/ui`, or `packages/theme`. A package change
@@ -23,10 +29,16 @@ not bypass that decision with a package-private import.
 
 ## Check the target version
 
-1. Identify the target: a Gutenberg checkout/PR head, or the application’s
-   installed package versions.
-2. Verify the relevant public contract in the target’s package README,
-   generated token reference, exports, and types.
+1. Identify the deployed target: a Gutenberg checkout/PR head, or the
+   application's minimum supported runtime, WordPress (when applicable), and
+   package versions.
+2. For an application, determine whether each package is bundled or
+   externalized. Inspect the build configuration and generated asset metadata;
+   the default
+   [`@wordpress/dependency-extraction-webpack-plugin`](/packages/dependency-extraction-webpack-plugin/README.md)
+   externalizes many WordPress packages.
+3. Verify bundled APIs against the installed package. Verify externalized
+   exports and script or style handles against the minimum WordPress runtime.
 
 Use the package documentation as the source of durable facts:
 
@@ -37,8 +49,9 @@ Use the package documentation as the source of durable facts:
 
 Use evidence for the state it actually describes:
 
-- The target checkout or installed package is authoritative for available
-  exports, types, styles, and runtime behaviour.
+- The deployed checkout or runtime is authoritative for available exports,
+  styles, and runtime behaviour. An installed package proves compile-time
+  types, not an externalized runtime API.
 - In a review, the supplied diff describes the proposed post-change state;
   use the checkout as its baseline and supporting context. Do not reject a
   change merely because the diff has not been applied to that checkout.
@@ -64,10 +77,10 @@ instead of copying component mappings into documentation or agent instructions:
    `get_components`, then use `get_component_details` for the relevant
    component. Its component catalog is generated from the curated Storybook
    manifest and returns the currently recommended package and import.
-2. Otherwise, follow the
-   [`use-recommended-components` ESLint rule](/packages/eslint-plugin/docs/rules/use-recommended-components.md).
-   It lists explicit replacements and the `@wordpress/ui` components currently
-   recommended for WordPress environments.
+2. Otherwise, inspect the maintained `ALLOWLIST` and `DENYLIST` in the
+   [`use-recommended-components` ESLint rule source](/packages/eslint-plugin/rules/use-recommended-components.js).
+   Its [documentation](/packages/eslint-plugin/docs/rules/use-recommended-components.md)
+   explains rule behaviour and links migration guides.
 3. When the rule does not cover a component, consult its
    [Storybook documentation](https://wordpress.github.io/gutenberg/)
    `componentStatus` and notes. That status is more authoritative than an
@@ -110,6 +123,7 @@ enough. Then follow the source guidance for the package being changed:
 
 - [`@wordpress/components` contribution guide](/packages/components/CONTRIBUTING.md)
 - [`@wordpress/ui` contribution guide](/packages/ui/CONTRIBUTING.md)
+- [`@wordpress/theme` package guide](/packages/theme/README.md)
 - [Design Tokens Maintainer's Guide](/packages/theme/tokens/README.md)
 
 Keep implementation details distinct from public API. For public changes,
@@ -117,8 +131,8 @@ decide and document compatibility, migration, release, generated-output, and
 consumer implications. Verify CSS and interaction behaviour in a browser where
 unit tests cannot establish cascade order, focus geometry, or portal behaviour.
 
-Before declaring package work complete, follow the applicable package
-contribution guide and account for each relevant contract surface: public
+Before declaring package work complete, follow the applicable package source
+guidance and account for each relevant contract surface: public
 exports and types; semantics, states, interaction, and refs; compatibility and
 migration; focused tests and stories; public documentation and recommendation
 metadata; generated output; and the required changelog. Mark a surface not
