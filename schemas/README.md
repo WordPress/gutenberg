@@ -35,22 +35,15 @@ These are for clarity, not hard rules.
 -   **Say when a value is CSS.** If a string has to be valid CSS source text, write that in the description. Nothing else will catch it.
 -   **Disambiguate similar keys.** Two keys with the same name in different places need descriptions that tell them apart, not the same sentence twice. `fontFamilies[].fontFamily` takes a comma-separated list; `fontFamilies[].fontFace[].fontFamily` takes a single family name. The types are identical, so only the description can tell you which is which.
 -   **Break descriptions into lines with `\n`.** A single long paragraph is unreadable in a hover.
--   **Consider adding `markdownDescription` alongside `description`.** Not required, and not standard JSON Schema, it's a VS Code extension. But plain `description` gets no links, no code formatting and no rendered examples, so a hover is much clearer with it. Editors that don't understand it fall back to `description`, so keep both saying the same thing. Writing markdown inside a JSON string is fiddly: `\n` for every line break, doubled backslashes for CSS escapes.
--   **Add `examples`.** Cover the cases that are easy to get wrong. For CSS values that is usually quoting: JSON quotes the whole string, then CSS quotes the value inside it. Remember a CSS escape needs a doubled backslash in JSON: `\\26` in the file is `\26` in the CSS.
+-   **Consider adding `markdownDescription` alongside `description`.** It is a VS Code extension, not standard JSON Schema, but it is the only way to get links and code formatting into a hover. Editors that don't understand it fall back to `description`, so keep both saying the same thing.
+-   **Put examples in the description.** `examples` is standard JSON Schema, but common editors ignore it, so an example is only seen if it sits in the description text. Show the case that is easy to get wrong. For CSS values that is usually quoting.
 
 Example:
 
 ```json
 {
 	"fontFamily": {
-		"description": "CSS @font-face font-family descriptor.\n\nA single font family name; quoting is recommended.\nNot the CSS font-family property, which takes a comma-separated list.\n\nMind the quoting: JSON quotes the whole string, then CSS quotes the name inside it.\n\nSee https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-family",
-		"markdownDescription": "CSS [`@font-face` `font-family`](https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-family) descriptor.\n\nA single font family name; quoting is recommended. This is *not* the CSS `font-family` property, which takes a comma-separated list.\n\nMind the quoting: JSON quotes the whole string, then CSS quotes the name inside it."
-		"examples": [
-			"\"Source Serif Pro\"",
-			"'CSS single-quoted font name'",
-			"\"Single quotes aren't a problem\"",
-			"'Escape awkward characters: \\26  is an ampersand'"
-		],
+		"description": "CSS @font-face font-family descriptor: a single font family name, not the comma-separated list the CSS font-family property takes.\n\nQuoting is recommended. JSON quotes the string and CSS quotes the name inside it, so write \"Source Serif Pro\", quotes included.",
 		"type": "string",
 		"default": ""
 	}
