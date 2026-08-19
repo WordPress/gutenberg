@@ -1,7 +1,8 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
+	"extends": "../../tsconfig.dev.base.json",
 	"references": [
+		{ "path": "./tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../primitives" }
 	]
