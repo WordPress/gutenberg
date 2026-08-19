@@ -11,11 +11,17 @@
 			--wp-ui-menu-min-width: 160px;
 			--wp-ui-menu-max-width: var(--wpds-dimension-surface-width-md);
 			--wp-ui-menu-item-padding-inline: var(--wpds-dimension-padding-md);
-			--wp-ui-menu-group-head-padding-inline: var(--wpds-dimension-padding-md);
+			--wp-ui-menu-group-head-padding-inline: var(
+				--wpds-dimension-padding-md
+			);
 			--wp-ui-menu-selection-indicator-track-size: 0px;
-			--wp-ui-menu-selection-indicator-size: var(--wpds-dimension-size-sm);
+			--wp-ui-menu-selection-indicator-size: var(
+				--wpds-dimension-size-sm
+			);
 			--wp-ui-menu-selection-indicator-gap: 0px;
-			--_wp-ui-menu-elevation-md: 0px 2px 3px 0px #0000000d, 0px 4px 5px 0px #0000000a, 0px 12px 12px 0px #00000008, 0px 16px 16px 0px #00000005;
+			--_wp-ui-menu-elevation-md: 0px 2px 3px 0px #0000000d,
+				0px 4px 5px 0px #0000000a, 0px 12px 12px 0px #00000008,
+				0px 16px 16px 0px #00000005;
 
 			max-height: min(var(--available-height), 480px, 60dvh);
 			min-width: min(var(--available-width), var(--wp-ui-menu-min-width));
@@ -25,15 +31,24 @@
 			padding: var(--wp-ui-menu-popup-padding);
 			scroll-padding: var(--wp-ui-menu-popup-padding);
 			border-radius: var(--wpds-border-radius-md);
-			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+			border: var(--wpds-border-width-xs) solid
+				var(--wpds-color-stroke-surface-neutral);
 			box-shadow: var(--_wp-ui-menu-elevation-md);
-			background-color: var(--wpds-color-background-surface-neutral-strong);
+			background-color: var(
+				--wpds-color-background-surface-neutral-strong
+			);
 			outline: none;
 
 			&:has(.item-selection-indicator) {
-				--wp-ui-menu-item-padding-inline: var(--wpds-dimension-padding-sm);
-				--wp-ui-menu-selection-indicator-track-size: var(--wpds-dimension-size-2xs);
-				--wp-ui-menu-selection-indicator-gap: var(--wpds-dimension-gap-sm);
+				--wp-ui-menu-item-padding-inline: var(
+					--wpds-dimension-padding-sm
+				);
+				--wp-ui-menu-selection-indicator-track-size: var(
+					--wpds-dimension-size-2xs
+				);
+				--wp-ui-menu-selection-indicator-gap: var(
+					--wpds-dimension-gap-sm
+				);
 			}
 		}
 
@@ -46,9 +61,8 @@
 		}
 
 		.list {
-			font-family: var(--wpds-typography-font-family-body);
-			font-size: var(--wpds-typography-font-size-md);
-			line-height: var(--wpds-typography-line-height-sm);
+			composes: body-md from "../text/style.module.css";
+
 			color: var(--wpds-color-foreground-interactive-neutral);
 		}
 
@@ -65,7 +79,9 @@
 			display: grid;
 			grid-template-columns:
 				[item-padding-start] var(--wp-ui-menu-item-padding-inline)
-				[selection-start] var(--wp-ui-menu-selection-indicator-track-size)
+				[selection-start] var(
+					--wp-ui-menu-selection-indicator-track-size
+				)
 				[selection-end] var(--wp-ui-menu-selection-indicator-gap)
 				[prefix-start] max-content
 				[prefix-end] var(--wp-ui-menu-group-prefix-gap)
@@ -108,7 +124,7 @@
 			margin-inline: var(--wp-ui-menu-group-head-padding-inline);
 			background-color: var(--wpds-color-stroke-surface-neutral-weak);
 
-			@media ( forced-colors: active ) {
+			@media (forced-colors: active) {
 				background-color: CanvasText;
 			}
 		}
@@ -122,7 +138,9 @@
 			grid-column: 1 / -1;
 			grid-template-columns:
 				[item-padding-start] var(--wp-ui-menu-item-padding-inline)
-				[selection-start] var(--wp-ui-menu-selection-indicator-track-size)
+				[selection-start] var(
+					--wp-ui-menu-selection-indicator-track-size
+				)
 				[selection-end] var(--wp-ui-menu-selection-indicator-gap)
 				[prefix-start] max-content
 				[prefix-end] var(--wp-ui-menu-group-prefix-gap)
@@ -150,29 +168,34 @@
 				cursor: pointer;
 			}
 
-			@supports ( grid-template-columns: subgrid ) {
+			@supports (grid-template-columns: subgrid) {
 				grid-template-columns: subgrid;
 			}
 
 			&[data-highlighted]:not([aria-disabled="true"]) {
-				background-color: var(--wpds-color-background-interactive-brand-weak-active);
+				background-color: var(
+					--wpds-color-background-interactive-brand-weak-active
+				);
 				color: var(--wpds-color-foreground-interactive-neutral);
 				outline: none;
 
-				@media ( forced-colors: active ) {
+				@media (forced-colors: active) {
 					outline: var(--wpds-border-width-xs) solid Highlight;
 				}
 			}
 
 			&[aria-disabled="true"] {
-				background-color: var(--wpds-color-background-interactive-brand-weak-disabled);
-				color: var(--wpds-color-foreground-interactive-neutral-disabled);
+				background-color: var(
+					--wpds-color-background-interactive-brand-weak-disabled
+				);
+				color: var(
+					--wpds-color-foreground-interactive-neutral-disabled
+				);
 
-				@media ( forced-colors: active ) {
+				@media (forced-colors: active) {
 					color: GrayText;
 				}
 			}
-
 		}
 
 		/*
@@ -244,20 +267,16 @@
 		}
 
 		.item-label {
+			composes: body-md from "../text/style.module.css";
+
 			min-width: 0;
 			overflow-wrap: anywhere;
-			font-family: var(--wpds-typography-font-family-body);
-			font-size: var(--wpds-typography-font-size-md);
-			line-height: var(--wpds-typography-line-height-sm);
-			font-weight: var(--wpds-typography-font-weight-default);
 			color: inherit;
 		}
 
 		.item-description {
-			font-family: var(--wpds-typography-font-family-body);
-			font-size: var(--wpds-typography-font-size-sm);
-			line-height: var(--wpds-typography-line-height-xs);
-			font-weight: var(--wpds-typography-font-weight-default);
+			composes: body-sm from "../text/style.module.css";
+
 			color: var(--wpds-color-foreground-content-neutral-weak);
 			overflow-wrap: anywhere;
 			/* For better optical alignment and spacing */
@@ -324,7 +343,8 @@
 		.item[data-highlighted]:not([aria-disabled="true"]) .item-suffix,
 		.item[data-highlighted]:not([aria-disabled="true"]) .item-shortcut,
 		.item[data-highlighted]:not([aria-disabled="true"]) .item-trailing,
-		.item[data-highlighted]:not([aria-disabled="true"]) .item-selection-indicator,
+		.item[data-highlighted]:not([aria-disabled="true"])
+			.item-selection-indicator,
 		.item[aria-disabled="true"] .item-prefix,
 		.item[aria-disabled="true"] .item-description,
 		.item[aria-disabled="true"] .item-suffix,

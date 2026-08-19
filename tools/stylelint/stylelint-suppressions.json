@@ -103,5 +103,33 @@
 		"selector-class-pattern": {
 			"count": 5
 		}
+	},
+	"packages/ui/src/menu/style.module.css": {
+		"@stylistic/declaration-colon-newline-after": {
+			"count": 11
+		},
+		"@stylistic/function-parentheses-space-inside": {
+			"count": 22
+		},
+		"@stylistic/indentation": {
+			"count": 1
+		},
+		"@stylistic/value-list-comma-newline-after": {
+			"count": 1
+		}
+	},
+	"packages/ui/src/utils/css/item-popup.module.css": {
+		"@stylistic/declaration-colon-newline-after": {
+			"count": 10
+		},
+		"@stylistic/function-parentheses-space-inside": {
+			"count": 14
+		},
+		"@stylistic/indentation": {
+			"count": 1
+		},
+		"@stylistic/value-list-comma-newline-after": {
+			"count": 1
+		}
 	}
 }
