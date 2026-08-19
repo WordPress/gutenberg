@@ -211,8 +211,9 @@ Oracle paths below are on `recovered/widget-type-composer`. `WP-PRIM` =
 
 The `widget-def/site-health-counts` dynamic block: a `render_callback` that
 reads the `health-check-site-status-result` transient (the cached counts
-core's Site Health screen maintains) and renders the three counts, gated on
-`view_site_health_checks`. The Site Health Overview composition swaps its
+core's Site Health screen maintains) and renders the three counts as a
+core-block composition (a group wrapping a status list) resolved by a
+nested `do_blocks()`, gated on `view_site_health_checks`. The Site Health Overview composition swaps its
 static list for the block, so the same definition now carries live backend
 data through `do_blocks()` with no dedicated data endpoint: the server lane
 for composition data.

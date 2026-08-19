@@ -50,9 +50,11 @@ function gutenberg_render_site_health_counts_block() {
 	$counts = gutenberg_get_site_health_counts();
 
 	if ( null === $counts ) {
-		return '<p style="margin:0;">' .
+		return do_blocks(
+			'<!-- wp:paragraph --><p style="margin:0;">' .
 			esc_html__( 'No health check results yet. Visit Site Health to run the checks.', 'gutenberg' ) .
-			'</p>';
+			'</p><!-- /wp:paragraph -->'
+		);
 	}
 
 	$items = array(
@@ -62,11 +64,17 @@ function gutenberg_render_site_health_counts_block() {
 	);
 
 	/*
-	 * Inline styles: no stylesheet ships with a composition. The WPDS tokens
-	 * resolve because this HTML mounts inside the admin page; each status
-	 * uses the background-surface/foreground-content pair, the badge recipe.
+	 * The render is itself a composition: the callback assembles core blocks
+	 * and resolves them through a nested `do_blocks()`, the way synced
+	 * patterns render, so the server lane stays blocks all the way down.
+	 *
+	 * Structural styles are inline on the saved markup: the `layout`
+	 * attribute's generated CSS travels through the page's style engine,
+	 * which a REST render never reaches. The WPDS tokens resolve because
+	 * this HTML mounts inside the admin page; each status uses the
+	 * background-surface/foreground-content pair, the badge recipe.
 	 */
-	$html = '<div style="display:flex;flex-direction:column;gap:var(--wpds-dimension-gap-sm);margin:0;">';
+	$list_items = '';
 
 	foreach ( $items as $item ) {
 		list( $label, $count, $status ) = $item;
@@ -79,15 +87,24 @@ function gutenberg_render_site_health_counts_block() {
 			'background:var(--wpds-color-background-surface-' . $status . ');' .
 			'color:var(--wpds-color-foreground-content-' . $status . ');';
 
-		$html .= '<div style="display:flex;align-items:center;gap:var(--wpds-dimension-gap-sm);">' .
+		$list_items .= '<!-- wp:list-item -->' .
+			'<li style="display:flex;align-items:center;gap:var(--wpds-dimension-gap-sm);">' .
 			'<span style="' . esc_attr( $pill_style ) . '">' .
 			(int) $count .
 			'</span>' .
 			'<span>' . esc_html( $label ) . '</span>' .
-			'</div>';
+			'</li><!-- /wp:list-item -->';
 	}
 
-	return $html . '</div>';
+	return do_blocks(
+		'<!-- wp:group {"layout":{"type":"flex","orientation":"vertical"}} -->' .
+		'<div class="wp-block-group" style="display:flex;flex-direction:column;margin:0;">' .
+		'<!-- wp:list -->' .
+		'<ul class="wp-block-list" style="display:flex;flex-direction:column;gap:var(--wpds-dimension-gap-sm);list-style:none;margin:0;padding:0;">' .
+		$list_items .
+		'</ul><!-- /wp:list -->' .
+		'</div><!-- /wp:group -->'
+	);
 }
 
 /**

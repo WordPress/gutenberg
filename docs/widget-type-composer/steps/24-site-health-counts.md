@@ -19,7 +19,9 @@ live counts.
     fallback is the lane under test). The render callback re-applies
     `view_site_health_checks` (the endpoint itself gates at `read`), reads
     the `health-check-site-status-result` transient, and renders the three
-    counts; absent or malformed results render an empty state naming the
+    counts as a core-block composition: a flex-vertical group wrapping a
+    list, one status row per item, each count in a badge-recipe pill.
+    Absent or malformed results render an empty-state paragraph naming the
     next step ("Visit Site Health to run the checks").
 -   `gutenberg_get_site_health_counts()`: the boundary guard. One
     `json_decode`, shape-checked before any offset (`is_array`, then
@@ -37,8 +39,15 @@ live counts.
     the `widget-def/` namespace: it is not a `core/` block and not a
     `core-admin/` admin block (those carry client components; this one is
     server-rendered by design).
--   Layout-only inline styles, no colors: the demo is about the data lane,
-    and semantic coloring of the counts belongs with a real design pass.
+-   The render is itself a composition: the callback assembles core blocks
+    and resolves them through a nested `do_blocks()`, the synced-pattern
+    precedent, so the server lane stays blocks all the way down. Structural
+    styles ride inline on the saved markup because the `layout` attribute's
+    generated CSS travels through the page style engine, which a REST
+    render never reaches; colors are the WPDS badge-recipe pairs
+    (`background-surface-*` / `foreground-content-*`).
+-   No heading inside the render: the chrome materializes the widget's
+    identity, and the body never re-renders it.
 -   The capability check inside the render callback is the pattern the
     endpoint's `read` gate forces: any dynamic block reachable through
     composed markup guards its own data. Recorded as a step 06 follow-up.
