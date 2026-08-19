@@ -19,36 +19,36 @@ import { createInterpolateElement } from '@wordpress/element';
 import { sprintf } from '@wordpress/i18n';
 
 const ExampleComponent = () => {
-    const allShortcutKeyCombinations = useSelect(
-        ( select ) =>
-            select( keyboardShortcutsStore ).getAllShortcutKeyCombinations(
-                'core/editor/next-region'
-            ),
-        []
-    );
+	const allShortcutKeyCombinations = useSelect(
+		( select ) =>
+			select( keyboardShortcutsStore ).getAllShortcutKeyCombinations(
+				'core/editor/next-region'
+			),
+		[]
+	);
 
-    return (
-        allShortcutKeyCombinations.length > 0 && (
-            <ul>
-                { allShortcutKeyCombinations.map(
-                    ( { character, modifier }, index ) => (
-                        <li key={ index }>
-                            { createInterpolateElement(
-                                sprintf(
-                                    'Character: <code>%s</code> / Modifier: <code>%s</code>',
-                                    character,
-                                    modifier
-                                ),
-                                {
-                                    code: <code />,
-                                }
-                            ) }
-                        </li>
-                    )
-                ) }
-            </ul>
-        )
-    );
+	return (
+		allShortcutKeyCombinations.length > 0 && (
+			<ul>
+				{ allShortcutKeyCombinations.map(
+					( { character, modifier }, index ) => (
+						<li key={ index }>
+							{ createInterpolateElement(
+								sprintf(
+									'Character: <code>%s</code> / Modifier: <code>%s</code>',
+									character,
+									modifier
+								),
+								{
+									code: <code />,
+								}
+							) }
+						</li>
+					)
+				) }
+			</ul>
+		)
+	);
 };
 ```
 
@@ -74,35 +74,35 @@ import { createInterpolateElement } from '@wordpress/element';
 import { sprintf } from '@wordpress/i18n';
 
 const ExampleComponent = () => {
-    const allShortcutRawKeyCombinations = useSelect(
-        ( select ) =>
-            select( keyboardShortcutsStore ).getAllShortcutRawKeyCombinations(
-                'core/editor/next-region'
-            ),
-        []
-    );
+	const allShortcutRawKeyCombinations = useSelect(
+		( select ) =>
+			select( keyboardShortcutsStore ).getAllShortcutRawKeyCombinations(
+				'core/editor/next-region'
+			),
+		[]
+	);
 
-    return (
-        allShortcutRawKeyCombinations.length > 0 && (
-            <ul>
-                { allShortcutRawKeyCombinations.map(
-                    ( shortcutRawKeyCombination, index ) => (
-                        <li key={ index }>
-                            { createInterpolateElement(
-                                sprintf(
-                                    ' <code>%s</code>',
-                                    shortcutRawKeyCombination
-                                ),
-                                {
-                                    code: <code />,
-                                }
-                            ) }
-                        </li>
-                    )
-                ) }
-            </ul>
-        )
-    );
+	return (
+		allShortcutRawKeyCombinations.length > 0 && (
+			<ul>
+				{ allShortcutRawKeyCombinations.map(
+					( shortcutRawKeyCombination, index ) => (
+						<li key={ index }>
+							{ createInterpolateElement(
+								sprintf(
+									' <code>%s</code>',
+									shortcutRawKeyCombination
+								),
+								{
+									code: <code />,
+								}
+							) }
+						</li>
+					)
+				) }
+			</ul>
+		)
+	);
 };
 ```
 
@@ -126,23 +126,21 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { useSelect } from '@wordpress/data';
 
 const ExampleComponent = () => {
-    const categoryShortcuts = useSelect(
-        ( select ) =>
-            select( keyboardShortcutsStore ).getCategoryShortcuts(
-                'block'
-            ),
-        []
-    );
+	const categoryShortcuts = useSelect(
+		( select ) =>
+			select( keyboardShortcutsStore ).getCategoryShortcuts( 'block' ),
+		[]
+	);
 
-    return (
-        categoryShortcuts.length > 0 && (
-            <ul>
-                { categoryShortcuts.map( ( categoryShortcut ) => (
-                    <li key={ categoryShortcut }>{ categoryShortcut }</li>
-                ) ) }
-            </ul>
-        )
-    );
+	return (
+		categoryShortcuts.length > 0 && (
+			<ul>
+				{ categoryShortcuts.map( ( categoryShortcut ) => (
+					<li key={ categoryShortcut }>{ categoryShortcut }</li>
+				) ) }
+			</ul>
+		)
+	);
 };
 ```
 
@@ -167,34 +165,34 @@ import { useSelect } from '@wordpress/data';
 import { createInterpolateElement } from '@wordpress/element';
 import { sprintf } from '@wordpress/i18n';
 const ExampleComponent = () => {
-    const shortcutAliases = useSelect(
-        ( select ) =>
-            select( keyboardShortcutsStore ).getShortcutAliases(
-                'core/editor/next-region'
-            ),
-        []
-    );
+	const shortcutAliases = useSelect(
+		( select ) =>
+			select( keyboardShortcutsStore ).getShortcutAliases(
+				'core/editor/next-region'
+			),
+		[]
+	);
 
-    return (
-        shortcutAliases.length > 0 && (
-            <ul>
-                { shortcutAliases.map( ( { character, modifier }, index ) => (
-                    <li key={ index }>
-                        { createInterpolateElement(
-                            sprintf(
-                                'Character: <code>%s</code> / Modifier: <code>%s</code>',
-                                character,
-                                modifier
-                            ),
-                            {
-                                code: <code />,
-                            }
-                        ) }
-                    </li>
-                ) ) }
-            </ul>
-        )
-    );
+	return (
+		shortcutAliases.length > 0 && (
+			<ul>
+				{ shortcutAliases.map( ( { character, modifier }, index ) => (
+					<li key={ index }>
+						{ createInterpolateElement(
+							sprintf(
+								'Character: <code>%s</code> / Modifier: <code>%s</code>',
+								character,
+								modifier
+							),
+							{
+								code: <code />,
+							}
+						) }
+					</li>
+				) ) }
+			</ul>
+		)
+	);
 };
 ```
 
@@ -218,17 +216,19 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 const ExampleComponent = () => {
-    const shortcutDescription = useSelect(
-        ( select ) =>
-            select( keyboardShortcutsStore ).getShortcutDescription( 'core/editor/next-region' ),
-        []
-    );
+	const shortcutDescription = useSelect(
+		( select ) =>
+			select( keyboardShortcutsStore ).getShortcutDescription(
+				'core/editor/next-region'
+			),
+		[]
+	);
 
-    return shortcutDescription ? (
-        <div>{ shortcutDescription }</div>
-    ) : (
-        <div>{ __( 'No description.' ) }</div>
-    );
+	return shortcutDescription ? (
+		<div>{ shortcutDescription }</div>
+	) : (
+		<div>{ __( 'No description.' ) }</div>
+	);
 };
 ```
 
@@ -253,28 +253,28 @@ import { useSelect } from '@wordpress/data';
 import { createInterpolateElement } from '@wordpress/element';
 import { sprintf } from '@wordpress/i18n';
 const ExampleComponent = () => {
-    const {character, modifier} = useSelect(
-        ( select ) =>
-            select( keyboardShortcutsStore ).getShortcutKeyCombination(
-                'core/editor/next-region'
-            ),
-        []
-    );
+	const { character, modifier } = useSelect(
+		( select ) =>
+			select( keyboardShortcutsStore ).getShortcutKeyCombination(
+				'core/editor/next-region'
+			),
+		[]
+	);
 
-    return (
-        <div>
-            { createInterpolateElement(
-                sprintf(
-                    'Character: <code>%s</code> / Modifier: <code>%s</code>',
-                    character,
-                    modifier
-                ),
-                {
-                    code: <code />,
-                }
-            ) }
-        </div>
-    );
+	return (
+		<div>
+			{ createInterpolateElement(
+				sprintf(
+					'Character: <code>%s</code> / Modifier: <code>%s</code>',
+					character,
+					modifier
+				),
+				{
+					code: <code />,
+				}
+			) }
+		</div>
+	);
 };
 ```
 
@@ -299,24 +299,31 @@ import { useSelect } from '@wordpress/data';
 import { sprintf } from '@wordpress/i18n';
 
 const ExampleComponent = () => {
-    const {display, raw, ariaLabel} = useSelect(
-        ( select ) =>{
-            return {
-                display: select( keyboardShortcutsStore ).getShortcutRepresentation('core/editor/next-region' ),
-                raw: select( keyboardShortcutsStore ).getShortcutRepresentation('core/editor/next-region','raw' ),
-                ariaLabel: select( keyboardShortcutsStore ).getShortcutRepresentation('core/editor/next-region', 'ariaLabel')
-            }
-        },
-        []
-    );
+	const { display, raw, ariaLabel } = useSelect( ( select ) => {
+		return {
+			display: select( keyboardShortcutsStore ).getShortcutRepresentation(
+				'core/editor/next-region'
+			),
+			raw: select( keyboardShortcutsStore ).getShortcutRepresentation(
+				'core/editor/next-region',
+				'raw'
+			),
+			ariaLabel: select(
+				keyboardShortcutsStore
+			).getShortcutRepresentation(
+				'core/editor/next-region',
+				'ariaLabel'
+			),
+		};
+	}, [] );
 
-    return (
-        <ul>
-            <li>{ sprintf( 'display string: %s', display ) }</li>
-            <li>{ sprintf( 'raw string: %s', raw ) }</li>
-            <li>{ sprintf( 'ariaLabel string: %s', ariaLabel ) }</li>
-        </ul>
-    );
+	return (
+		<ul>
+			<li>{ sprintf( 'display string: %s', display ) }</li>
+			<li>{ sprintf( 'raw string: %s', raw ) }</li>
+			<li>{ sprintf( 'ariaLabel string: %s', ariaLabel ) }</li>
+		</ul>
+	);
 };
 ```
 
@@ -349,33 +356,33 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 const ExampleComponent = () => {
-    const { registerShortcut } = useDispatch( keyboardShortcutsStore );
+	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 
-    useEffect( () => {
-        registerShortcut( {
-            name: 'custom/my-custom-shortcut',
-            category: 'my-category',
-            description: __( 'My custom shortcut' ),
-            keyCombination: {
-                modifier: 'primary',
-                character: 'j',
-            },
-        } );
-    }, [] );
+	useEffect( () => {
+		registerShortcut( {
+			name: 'custom/my-custom-shortcut',
+			category: 'my-category',
+			description: __( 'My custom shortcut' ),
+			keyCombination: {
+				modifier: 'primary',
+				character: 'j',
+			},
+		} );
+	}, [] );
 
-    const shortcut = useSelect(
-        ( select ) =>
-            select( keyboardShortcutsStore ).getShortcutKeyCombination(
-                'custom/my-custom-shortcut'
-            ),
-        []
-    );
+	const shortcut = useSelect(
+		( select ) =>
+			select( keyboardShortcutsStore ).getShortcutKeyCombination(
+				'custom/my-custom-shortcut'
+			),
+		[]
+	);
 
-    return shortcut ? (
-        <p>{ __( 'Shortcut is registered.' ) }</p>
-    ) : (
-        <p>{ __( 'Shortcut is not registered.' ) }</p>
-    );
+	return shortcut ? (
+		<p>{ __( 'Shortcut is registered.' ) }</p>
+	) : (
+		<p>{ __( 'Shortcut is not registered.' ) }</p>
+	);
 };
 ```
 
@@ -400,25 +407,25 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 const ExampleComponent = () => {
-    const { unregisterShortcut } = useDispatch( keyboardShortcutsStore );
+	const { unregisterShortcut } = useDispatch( keyboardShortcutsStore );
 
-    useEffect( () => {
-        unregisterShortcut( 'core/editor/next-region' );
-    }, [] );
+	useEffect( () => {
+		unregisterShortcut( 'core/editor/next-region' );
+	}, [] );
 
-    const shortcut = useSelect(
-        ( select ) =>
-            select( keyboardShortcutsStore ).getShortcutKeyCombination(
-                'core/editor/next-region'
-            ),
-        []
-    );
+	const shortcut = useSelect(
+		( select ) =>
+			select( keyboardShortcutsStore ).getShortcutKeyCombination(
+				'core/editor/next-region'
+			),
+		[]
+	);
 
-    return shortcut ? (
-        <p>{ __( 'Shortcut is not unregistered.' ) }</p>
-    ) : (
-        <p>{ __( 'Shortcut is unregistered.' ) }</p>
-    );
+	return shortcut ? (
+		<p>{ __( 'Shortcut is not unregistered.' ) }</p>
+	) : (
+		<p>{ __( 'Shortcut is unregistered.' ) }</p>
+	);
 };
 ```
 
@@ -429,6 +436,5 @@ _Parameters_
 _Returns_
 
 -   `Object`: action.
-
 
 <!-- END TOKEN(Autogenerated actions|../../../packages/keyboard-shortcuts/src/store/actions.ts) -->

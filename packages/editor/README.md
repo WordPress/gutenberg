@@ -347,11 +347,11 @@ _Usage_
 
 ```jsx
 <EditorProvider
-  post={ post }
-  settings={ settings }
-  __unstableTemplate={ template }
+	post={ post }
+	settings={ settings }
+	__unstableTemplate={ template }
 >
-  { children }
+	{ children }
 </EditorProvider>
 ```
 
@@ -549,20 +549,17 @@ _Usage_
 var __ = wp.i18n.__;
 var PluginBlockSettingsMenuItem = wp.editor.PluginBlockSettingsMenuItem;
 
-function doOnClick(){
+function doOnClick() {
 	// To be called when the user clicks the menu item.
 }
 
 function MyPluginBlockSettingsMenuItem() {
-	return React.createElement(
-		PluginBlockSettingsMenuItem,
-		{
-			allowedBlocks: [ 'core/paragraph' ],
-			icon: 'dashicon-name',
-			label: __( 'Menu item text' ),
-			onClick: doOnClick,
-		}
-	);
+	return React.createElement( PluginBlockSettingsMenuItem, {
+		allowedBlocks: [ 'core/paragraph' ],
+		icon: 'dashicon-name',
+		label: __( 'Menu item text' ),
+		onClick: doOnClick,
+	} );
 }
 ```
 
@@ -571,16 +568,17 @@ function MyPluginBlockSettingsMenuItem() {
 import { __ } from '@wordpress/i18n';
 import { PluginBlockSettingsMenuItem } from '@wordpress/editor';
 
-const doOnClick = ( ) => {
-    // To be called when the user clicks the menu item.
+const doOnClick = () => {
+	// To be called when the user clicks the menu item.
 };
 
 const MyPluginBlockSettingsMenuItem = () => (
-    <PluginBlockSettingsMenuItem
+	<PluginBlockSettingsMenuItem
 		allowedBlocks={ [ 'core/paragraph' ] }
-		icon='dashicon-name'
+		icon="dashicon-name"
 		label={ __( 'Menu item text' ) }
-		onClick={ doOnClick } />
+		onClick={ doOnClick }
+	/>
 );
 ```
 
@@ -624,7 +622,7 @@ function MyDocumentSettingPlugin() {
 }
 
 registerPlugin( 'my-document-setting-plugin', {
-		render: MyDocumentSettingPlugin
+	render: MyDocumentSettingPlugin,
 } );
 ```
 
@@ -634,12 +632,16 @@ import { registerPlugin } from '@wordpress/plugins';
 import { PluginDocumentSettingPanel } from '@wordpress/editor';
 
 const MyDocumentSettingTest = () => (
-		<PluginDocumentSettingPanel className="my-document-setting-plugin" title="My Panel" name="my-panel">
+	<PluginDocumentSettingPanel
+		className="my-document-setting-plugin"
+		title="My Panel"
+		name="my-panel"
+	>
 		<p>My Document Setting Panel</p>
 	</PluginDocumentSettingPanel>
 );
 
- registerPlugin( 'document-setting-test', { render: MyDocumentSettingTest } );
+registerPlugin( 'document-setting-test', { render: MyDocumentSettingTest } );
 ```
 
 _Parameters_
@@ -694,10 +696,7 @@ function onButtonClick() {
 }
 
 const MyButtonMoreMenuItem = () => (
-	<PluginMoreMenuItem
-		icon={ more }
-		onClick={ onButtonClick }
-	>
+	<PluginMoreMenuItem icon={ more } onClick={ onButtonClick }>
 		{ __( 'My button title' ) }
 	</PluginMoreMenuItem>
 );
@@ -733,7 +732,7 @@ const MyPluginPostPublishPanel = () => (
 		title={ __( 'My panel title' ) }
 		initialOpen={ true }
 	>
-        { __( 'My panel content' ) }
+		{ __( 'My panel content' ) }
 	</PluginPostPublishPanel>
 );
 ```
@@ -769,7 +768,7 @@ function MyPluginPostStatusInfo() {
 			className: 'my-plugin-post-status-info',
 		},
 		__( 'My post status info' )
-	)
+	);
 }
 ```
 
@@ -779,9 +778,7 @@ import { __ } from '@wordpress/i18n';
 import { PluginPostStatusInfo } from '@wordpress/editor';
 
 const MyPluginPostStatusInfo = () => (
-	<PluginPostStatusInfo
-		className="my-plugin-post-status-info"
-	>
+	<PluginPostStatusInfo className="my-plugin-post-status-info">
 		{ __( 'My post status info' ) }
 	</PluginPostStatusInfo>
 );
@@ -814,7 +811,7 @@ const MyPluginPrePublishPanel = () => (
 		title={ __( 'My panel title' ) }
 		initialOpen={ true }
 	>
-	    { __( 'My panel content' ) }
+		{ __( 'My panel content' ) }
 	</PluginPrePublishPanel>
 );
 ```
@@ -844,19 +841,16 @@ import { PluginPreviewMenuItem } from '@wordpress/editor';
 import { external } from '@wordpress/icons';
 
 function onPreviewClick() {
-  // Handle preview action
+	// Handle preview action
 }
 
 const ExternalPreviewMenuItem = () => (
-  <PluginPreviewMenuItem
-    icon={ external }
-    onClick={ onPreviewClick }
-  >
-    { __( 'Preview in new tab' ) }
-  </PluginPreviewMenuItem>
+	<PluginPreviewMenuItem icon={ external } onClick={ onPreviewClick }>
+		{ __( 'Preview in new tab' ) }
+	</PluginPreviewMenuItem>
 );
 registerPlugin( 'external-preview-menu-item', {
-    render: ExternalPreviewMenuItem,
+	render: ExternalPreviewMenuItem,
 } );
 ```
 
@@ -878,7 +872,9 @@ _Returns_
 Renders a sidebar when activated. The contents within the `PluginSidebar` will appear as content within the sidebar. It also automatically renders a corresponding `PluginSidebarMenuItem` component when `isPinnable` flag is set to `true`. If you wish to display the sidebar, you can with use the `PluginSidebarMoreMenuItem` component or the `wp.data.dispatch` API:
 
 ```js
-wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/sidebar-name' );
+wp.data
+	.dispatch( 'core/edit-post' )
+	.openGeneralSidebar( 'plugin-name/sidebar-name' );
 ```
 
 _Related_
@@ -897,17 +893,13 @@ var moreIcon = React.createElement( 'svg' ); //... svg element.
 
 function MyPluginSidebar() {
 	return el(
-			PluginSidebar,
-			{
-				name: 'my-sidebar',
-				title: 'My sidebar title',
-				icon: moreIcon,
-			},
-			el(
-				PanelBody,
-				{},
-				__( 'My sidebar content' )
-			)
+		PluginSidebar,
+		{
+			name: 'my-sidebar',
+			title: 'My sidebar title',
+			icon: moreIcon,
+		},
+		el( PanelBody, {}, __( 'My sidebar content' ) )
 	);
 }
 ```
@@ -920,14 +912,8 @@ import { PluginSidebar } from '@wordpress/editor';
 import { more } from '@wordpress/icons';
 
 const MyPluginSidebar = () => (
-	<PluginSidebar
-		name="my-sidebar"
-		title="My sidebar title"
-		icon={ more }
-	>
-		<PanelBody>
-			{ __( 'My sidebar content' ) }
-		</PanelBody>
+	<PluginSidebar name="my-sidebar" title="My sidebar title" icon={ more }>
+		<PanelBody>{ __( 'My sidebar content' ) }</PanelBody>
 	</PluginSidebar>
 );
 ```
@@ -962,7 +948,7 @@ function MySidebarMoreMenuItem() {
 			icon: moreIcon,
 		},
 		__( 'My sidebar title' )
-	)
+	);
 }
 ```
 
@@ -973,10 +959,7 @@ import { PluginSidebarMoreMenuItem } from '@wordpress/editor';
 import { more } from '@wordpress/icons';
 
 const MySidebarMoreMenuItem = () => (
-	<PluginSidebarMoreMenuItem
-		target="my-sidebar"
-		icon={ more }
-	>
+	<PluginSidebarMoreMenuItem target="my-sidebar" icon={ more }>
 		{ __( 'My sidebar title' ) }
 	</PluginSidebarMoreMenuItem>
 );
@@ -1427,7 +1410,7 @@ Renders the `PostTitle` component.
 
 _Parameters_
 
--   _\__ `Object`: Unused parameter.
+-   \_\_\_ `Object`: Unused parameter.
 -   _forwardedRef_ `Element`: Forwarded ref for the component.
 
 _Returns_
@@ -1788,7 +1771,6 @@ _Returns_
 ### WritingFlow
 
 > **Deprecated** since 5.3, use `wp.blockEditor.WritingFlow` instead.
-
 
 <!-- END TOKEN(Autogenerated API docs) -->
 

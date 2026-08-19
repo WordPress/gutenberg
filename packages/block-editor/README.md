@@ -140,16 +140,16 @@ _Usage_
 
 ```jsx
 function MyBlockEditor() {
-  const [ blocks, updateBlocks ] = useState([]);
-  return (
-    <BlockEditorProvider
-      value={ blocks }
-      onInput={ updateBlocks }
-      onChange={ persistBlocks }
-     >
-       <BlockCanvas height="400px" />
-     </BlockEditorProvider>
-   );
+	const [ blocks, updateBlocks ] = useState( [] );
+	return (
+		<BlockEditorProvider
+			value={ blocks }
+			onInput={ updateBlocks }
+			onChange={ persistBlocks }
+		>
+			<BlockCanvas height="400px" />
+		</BlockEditorProvider>
+	);
 }
 ```
 
@@ -178,7 +178,7 @@ _Related_
 
 _Parameters_
 
--   _props_ `BlockContextProviderProps`: 
+-   _props_ `BlockContextProviderProps`:
 
 ### BlockControls
 
@@ -283,12 +283,15 @@ Renders the block's configured title as a string, or empty if the title cannot b
 _Usage_
 
 ```jsx
-<BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" maximumLength={ 17 }/>
+<BlockTitle
+	clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1"
+	maximumLength={ 17 }
+/>
 ```
 
 _Parameters_
 
--   _props_ `Object`: 
+-   _props_ `Object`:
 -   _props.clientId_ `string`: Client ID of block.
 -   _props.maximumLength_ `number|undefined`: The maximum length that the block title string may be before truncated.
 -   _props.context_ `string|undefined`: The context to pass to `getBlockLabel`.
@@ -341,7 +344,7 @@ _Related_
 
 ### ButtonBlockerAppender
 
-> **Deprecated** 
+> **Deprecated**
 
 Use `ButtonBlockAppender` instead.
 
@@ -361,11 +364,11 @@ _Related_
 
 ### CopyHandler
 
-> **Deprecated** 
+> **Deprecated**
 
 _Parameters_
 
--   _props_ `Object`: 
+-   _props_ `Object`:
 
 ### createCustomColorsHOC
 
@@ -376,12 +379,15 @@ Use this higher-order component to work with a custom set of colors.
 _Usage_
 
 ```jsx
-const CUSTOM_COLORS = [ { name: 'Red', slug: 'red', color: '#ff0000' }, { name: 'Blue', slug: 'blue', color: '#0000ff' } ];
+const CUSTOM_COLORS = [
+	{ name: 'Red', slug: 'red', color: '#ff0000' },
+	{ name: 'Blue', slug: 'blue', color: '#0000ff' },
+];
 const withCustomColors = createCustomColorsHOC( CUSTOM_COLORS );
 // ...
 export default compose(
-    withCustomColors( 'backgroundColor', 'borderColor' ),
-    MyColorfulComponent,
+	withCustomColors( 'backgroundColor', 'borderColor' ),
+	MyColorfulComponent
 );
 ```
 
@@ -407,7 +413,7 @@ _Related_
 
 _Parameters_
 
--   _props_ `Object`: 
+-   _props_ `Object`:
 -   _props.label_ `?string`: A label for the control.
 -   _props.onChange_ `( value: string ) => void`: Called when the dimension value changes.
 -   _props.value_ `string`: The current dimension value.
@@ -476,18 +482,18 @@ _Usage_
 ```js
 // Calculate fluid font-size value from a minimum and maximum value.
 const fontSize = getComputedFluidTypographyValue( {
-    minimumFontSize: '20px',
-    maximumFontSize: '45px'
+	minimumFontSize: '20px',
+	maximumFontSize: '45px',
 } );
 // Calculate fluid font-size value from a single font size.
 const fontSize = getComputedFluidTypographyValue( {
-    fontSize: '30px',
+	fontSize: '30px',
 } );
 ```
 
 _Parameters_
 
--   _args_ `Object`: 
+-   _args_ `Object`:
 -   _args.minimumViewportWidth_ `?string`: Minimum viewport size from which type will have fluidity. Optional if fontSize is specified.
 -   _args.maximumViewportWidth_ `?string`: Maximum size up to which type will have fluidity. Optional if fontSize is specified.
 -   _args.fontSize_ `[string|number]`: Size to derive maximumFontSize and minimumFontSize from, if necessary. Optional if minimumFontSize and maximumFontSize are specified.
@@ -527,7 +533,7 @@ _Returns_
 
 ### getFontSize
 
- Returns the font size object based on an array of named font sizes and the namedFontSize and customFontSize values. 	If namedFontSize is undefined or not found in fontSizes an object with just the size value based on customFontSize is returned.
+Returns the font size object based on an array of named font sizes and the namedFontSize and customFontSize values. If namedFontSize is undefined or not found in fontSizes an object with just the size value based on customFontSize is returned.
 
 _Parameters_
 
@@ -592,7 +598,7 @@ _Returns_
 
 ### getPxFromCssUnit
 
-> **Deprecated** 
+> **Deprecated**
 
 This function was accidentally exposed for mobile/native usage.
 
@@ -649,7 +655,7 @@ _Related_
 
 _Parameters_
 
--   _props_ `Object`: 
+-   _props_ `Object`:
 -   _props.label_ `?string`: A label for the control.
 -   _props.onChange_ `( value: string ) => void`: Called when the height changes.
 -   _props.value_ `string`: The current height value.
@@ -730,9 +736,9 @@ Observe input changes without controlling the value:
 
 ```jsx
 <LinkControl
-  value={ link }
-  onChange={ setLink }
-  onInputChange={ ( newValue ) => console.log( newValue ) }
+	value={ link }
+	onChange={ setLink }
+	onInputChange={ ( newValue ) => console.log( newValue ) }
 />
 ```
 
@@ -742,10 +748,10 @@ Pre-populate the search input with a default value:
 
 ```jsx
 <LinkControl
-  value={ link }
-  onChange={ setLink }
-  inputValue="wordpress"
-  onInputChange={ ( newValue ) => console.log( newValue ) }
+	value={ link }
+	onChange={ setLink }
+	inputValue="wordpress"
+	onInputChange={ ( newValue ) => console.log( newValue ) }
 />
 ```
 
@@ -779,7 +785,7 @@ _Related_
 
 ### MultiSelectScrollIntoView
 
-> **Deprecated** 
+> **Deprecated**
 
 Scrolls the multi block selection end into view if not in view already. This is important to do after selection by keyboard.
 
@@ -812,23 +818,23 @@ import { registerBlockType } from '@wordpress/blocks';
 import { PlainText } from '@wordpress/block-editor';
 
 registerBlockType( 'my-plugin/example-block', {
-  // ...
+	// ...
 
-  attributes: {
-    content: {
-      type: 'string',
-    },
-  },
+	attributes: {
+		content: {
+			type: 'string',
+		},
+	},
 
-  edit( { className, attributes, setAttributes } ) {
-    return (
-      <PlainText
-        className={ className }
-        value={ attributes.content }
-        onChange={ ( content ) => setAttributes( { content } ) }
-      />
-    );
-  },
+	edit( { className, attributes, setAttributes } ) {
+		return (
+			<PlainText
+				className={ className }
+				value={ attributes.content }
+				onChange={ ( content ) => setAttributes( { content } ) }
+			/>
+		);
+	},
 } );
 ```
 
@@ -855,7 +861,7 @@ Wrap block content with this provider and provide the same `uniqueId` prop as us
 
 _Parameters_
 
--   _props_ `Object`: 
+-   _props_ `Object`:
 -   _props.uniqueId_ `*`: Any value that acts as a unique identifier for a block instance.
 -   _props.blockName_ `string`: Optional block name.
 -   _props.children_ `React.JSX.Element`: React children.
@@ -992,23 +998,23 @@ It contains the following utils:
 _Usage_
 
 ```js
-import { useBlockBindingsUtils } from '@wordpress/block-editor'
+import { useBlockBindingsUtils } from '@wordpress/block-editor';
 const { updateBlockBindings, removeAllBlockBindings } = useBlockBindingsUtils();
 
 // Update url and alt attributes.
 updateBlockBindings( {
-    url: {
-        source: 'core/post-meta',
-        args: {
-            key: 'url_custom_field',
-        },
-    },
-    alt: {
-        source: 'core/post-meta',
-        args: {
-            key: 'text_custom_field',
-        },
-    },
+	url: {
+		source: 'core/post-meta',
+		args: {
+			key: 'url_custom_field',
+		},
+	},
+	alt: {
+		source: 'core/post-meta',
+		args: {
+			key: 'text_custom_field',
+		},
+	},
 } );
 
 // Remove binding from url attribute.
@@ -1064,8 +1070,8 @@ _Usage_
 
 ```js
 function MyBlock( { attributes, setAttributes } ) {
-    useBlockEditingMode( 'disabled' );
-    return <div { ...useBlockProps() }></div>;
+	useBlockEditingMode( 'disabled' );
+	return <div { ...useBlockProps() }></div>;
 }
 ```
 
@@ -1102,20 +1108,15 @@ _Usage_
 import { useBlockProps } from '@wordpress/block-editor';
 
 export default function Edit() {
+	const blockProps = useBlockProps( {
+		className: 'my-custom-class',
+		style: {
+			color: '#222222',
+			backgroundColor: '#eeeeee',
+		},
+	} );
 
-  const blockProps = useBlockProps( {
-    className: 'my-custom-class',
-    style: {
-      color: '#222222',
-      backgroundColor: '#eeeeee'
-    }
-  } )
-
-  return (
-    <div { ...blockProps }>
-
-    </div>
-  )
+	return <div { ...blockProps }></div>;
 }
 ```
 
@@ -1123,7 +1124,7 @@ _Parameters_
 
 -   _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
 -   _options_ `Object`: Options for internal use only.
--   _options.\_\_unstableIsHtml_ `boolean`: 
+-   _options.\_\_unstableIsHtml_ `boolean`:
 
 _Returns_
 
@@ -1135,7 +1136,7 @@ Keeps an up-to-date copy of the passed value and returns it. If value becomes fa
 
 _Parameters_
 
--   _value_ `any`: 
+-   _value_ `any`:
 
 _Returns_
 
@@ -1241,8 +1242,8 @@ _Usage_
 
 ```jsx
 export default compose(
-    withColors( 'backgroundColor', { textColor: 'color' } ),
-    MyColorfulComponent,
+	withColors( 'backgroundColor', { textColor: 'color' } ),
+	MyColorfulComponent
 );
 ```
 
@@ -1274,7 +1275,6 @@ _Parameters_
 
 -   _props_ `Object`: Component properties.
 -   _props.children_ `Element`: Children to be rendered.
-
 
 <!-- END TOKEN(Autogenerated API docs) -->
 
