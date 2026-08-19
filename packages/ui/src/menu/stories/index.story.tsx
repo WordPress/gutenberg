@@ -43,7 +43,7 @@ const meta: Meta< typeof Menu.Root > = {
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',
-			notes: 'Not yet recommended while the APIs are still in flux, early Gutenberg migrations are being evaluated, and compatibility with overlays from `@wordpress/components` remains under review. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
+			notes: 'Not yet recommended while the APIs are still in flux. The editor Options menu demonstrates a SlotFill-based migration to this component. See the [migration guide](?path=/docs/design-system-components-menu-migration-guide--docs) for the compatibility requirements. Compatibility with overlays from `@wordpress/components` remains under review in [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
