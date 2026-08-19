@@ -49,13 +49,34 @@ test.describe( 'Suggestion mode - Viewing intent is read-only', () => {
 		editor,
 		page,
 	} ) => {
+		// F-01 was reported as the post going dirty, so start from a clean one.
+		await editor.saveDraft();
+
+		/*
+		 * Select across both paragraphs before switching. Preview mode drops
+		 * the per-block selection state, so a click in the read-only canvas
+		 * places no caret and a keystroke reaches no handler at all. A
+		 * selection carried in from Editing is what keeps the cross-block
+		 * branch of `useInput` live, and on Enter that branch hands the whole
+		 * selection to `replaceBlocks` - which is exactly what a stale
+		 * `canInsertBlockType` lets through.
+		 */
+		const paragraphs = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await editor.selectBlocks( paragraphs.first(), paragraphs.last() );
+
 		await switchIntent( page, 'Viewing' );
 
-		const paragraph = editor.canvas
-			.getByRole( 'document', { name: 'Block: Paragraph' } )
-			.first();
-		await paragraph.click();
-		for ( const key of [ 'Enter', 'a', 'Backspace', 'Delete', 'Enter' ] ) {
+		// The writing flow ref lands on the iframed canvas' body element.
+		const writingFlow = editor.canvas.locator( 'body' );
+		await expect( writingFlow ).toHaveAttribute(
+			'data-has-multi-selection',
+			'true'
+		);
+		await writingFlow.focus();
+
+		for ( const key of [ 'Enter', 'a', 'Backspace', 'Delete' ] ) {
 			await page.keyboard.press( key );
 		}
 
@@ -63,6 +84,13 @@ test.describe( 'Suggestion mode - Viewing intent is read-only', () => {
 		expect( blocks ).toHaveLength( 2 );
 		expect( blocks[ 0 ].attributes.content ).toBe( 'First paragraph' );
 		expect( blocks[ 1 ].attributes.content ).toBe( 'Second paragraph' );
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data.select( 'core/editor' ).isEditedPostDirty()
+				)
+			)
+			.toBe( false );
 	} );
 
 	test( 'the block inserter is disabled in Viewing mode', async ( {
