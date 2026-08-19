@@ -174,9 +174,9 @@ export const Validation = {
 };
 
 /**
- * In the `panel` layout, a field's error indicator overlays the edit button's
- * stretched hit area, so it relays its clicks to the button. The interaction
- * test covers what jsdom cannot: the real stacking and focus behavior.
+ * In the `panel` layout, the edit button's stretched hit area remains the only
+ * pointer target when an error indicator is visible. The interaction test
+ * covers what jsdom cannot: the real hit testing and focus behavior.
  */
 export const ValidationPanelErrorIndicator = {
 	render: ValidationPanelComponent,
@@ -197,10 +197,20 @@ export const ValidationPanelErrorIndicator = {
 		const editButton = await canvas.findByRole( 'button', {
 			name: 'Edit Title (has errors)',
 		} );
+		await expect( editButton ).toHaveAccessibleDescription(
+			/A required field is empty/
+		);
 
-		// The error indicator wraps the label, stacking above the edit
-		// button's stretched hit area, so it delegates clicks to it.
-		await userEvent.click( canvas.getByText( 'Title' ) );
+		// The visible error label is presentation-only. At its coordinates,
+		// the edit button's stretched hit area remains the pointer target.
+		const errorLabel = canvas.getByText( 'Title' );
+		const { left, top, width, height } = errorLabel.getBoundingClientRect();
+		const hitTarget = canvasElement.ownerDocument.elementFromPoint(
+			left + width / 2,
+			top + height / 2
+		);
+		await expect( hitTarget ).toBe( editButton );
+		await userEvent.click( editButton );
 		await expect( await body.findByRole( 'textbox' ) ).toBeVisible();
 		await expect( editButton ).toHaveAttribute( 'aria-expanded', 'true' );
 

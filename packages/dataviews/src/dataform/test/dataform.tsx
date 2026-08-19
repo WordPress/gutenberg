@@ -610,7 +610,7 @@ describe( 'DataForm component', () => {
 			expect( titleEditField ).toBeInTheDocument();
 		} );
 
-		it( 'should open the field when the error indicator next to the label is clicked', async () => {
+		it( 'should describe an invalid field trigger with its error message', async () => {
 			const user = userEvent.setup();
 			render(
 				<Dataform
@@ -633,24 +633,15 @@ describe( 'DataForm component', () => {
 			// open once.
 			await user.click( fieldsSelector.title.view() );
 			await user.keyboard( '{Escape}' );
-			await screen.findByRole( 'button', {
+			const titleButton = await screen.findByRole( 'button', {
 				name: 'Edit Title (has errors)',
 			} );
-
-			// The error indicator wraps the label and stacks above the edit
-			// button's stretched hit area, so it delegates clicks to it.
-			await user.click( screen.getByText( 'Title' ) );
-			expect( fieldsSelector.title.edit() ).toBeVisible();
-
-			// Dismissing the flyout returns focus to the edit button, as if
-			// it had been clicked directly.
-			await user.keyboard( '{Escape}' );
-			await waitFor( () =>
-				expect( fieldsSelector.title.view() ).toHaveFocus()
+			expect( titleButton ).toHaveAccessibleDescription(
+				/Title is required\./
 			);
 		} );
 
-		it( 'should open the field when the error indicator is clicked and labels are hidden', async () => {
+		it( 'should describe an invalid field trigger when labels are hidden', async () => {
 			const user = userEvent.setup();
 			const formPanelNoLabel = {
 				...form,
@@ -681,15 +672,12 @@ describe( 'DataForm component', () => {
 			await user.click( fieldsSelector.title.view() );
 			await user.keyboard( '{Escape}' );
 
-			// Without a label the error indicator is a standalone icon that
-			// stacks above the edit button's stretched hit area, so it
-			// delegates clicks to it.
-			await user.click(
-				await screen.findByRole( 'img', {
-					name: 'Title is required.',
-				} )
+			const titleButton = await screen.findByRole( 'button', {
+				name: 'Edit Title (has errors)',
+			} );
+			expect( titleButton ).toHaveAccessibleDescription(
+				/Title is required\./
 			);
-			expect( fieldsSelector.title.edit() ).toBeVisible();
 		} );
 	} );
 

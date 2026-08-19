@@ -1,10 +1,8 @@
 import clsx from 'clsx';
-import { Button, Icon as WCIcon } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { sprintf, _x } from '@wordpress/i18n';
-import { error as errorIcon, pencil } from '@wordpress/icons';
+import { pencil } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
-import { Tooltip } from '@wordpress/ui';
-import { useRef } from '@wordpress/element';
 import type {
 	FieldValidity,
 	NormalizedField,
@@ -42,15 +40,6 @@ export default function SummaryButton< Item >( {
 	const showError = touched && !! errorMessage;
 	const labelClassName = getLabelClassName( labelPosition, showError );
 
-	const editButtonRef = useRef< HTMLButtonElement >( null );
-	// The error label/icon stacks above the edit button's stretched hit area
-	// so that its tooltip stays hoverable, which also intercepts clicks: relay
-	// them to the edit button, keeping it the single real trigger.
-	const activateEditButton = () => {
-		editButtonRef.current?.focus();
-		editButtonRef.current?.click();
-	};
-
 	const className = clsx(
 		'dataforms-layouts-panel__field-trigger',
 		`dataforms-layouts-panel__field-trigger--label-${ labelPosition }`,
@@ -65,6 +54,7 @@ export default function SummaryButton< Item >( {
 		SummaryButton,
 		'dataforms-layouts-panel__field-control'
 	);
+	const errorId = `${ controlId }-error`;
 
 	const ariaLabel = showError
 		? sprintf(
@@ -86,26 +76,16 @@ export default function SummaryButton< Item >( {
 						showError={ showError }
 						errorMessage={ errorMessage }
 						fieldLabel={ fieldLabel }
-						onErrorClick={ activateEditButton }
+						errorId={ errorId }
 					/>
 				</span>
 			) }
 			{ labelPosition === 'none' && showError && (
-				<Tooltip.Root>
-					<Tooltip.Trigger
-						onClick={ activateEditButton }
-						render={
-							<span
-								className="dataforms-layouts-panel__field-label-error-content"
-								role="img"
-								aria-label={ errorMessage }
-							>
-								<WCIcon icon={ errorIcon } size={ 16 } />
-							</span>
-						}
-					/>
-					<Tooltip.Popup>{ errorMessage }</Tooltip.Popup>
-				</Tooltip.Root>
+				<FieldLabelContent
+					showError
+					errorMessage={ errorMessage }
+					errorId={ errorId }
+				/>
 			) }
 			<span
 				id={ `${ controlId }` }
@@ -145,14 +125,15 @@ export default function SummaryButton< Item >( {
 			</span>
 			{ ! disabled && (
 				<Button
-					ref={ editButtonRef }
 					className="dataforms-layouts-panel__field-trigger-icon"
 					label={ ariaLabel }
 					icon={ pencil }
 					size="small"
 					aria-expanded={ isOpen }
 					aria-haspopup="dialog"
-					aria-describedby={ `${ controlId }` }
+					aria-describedby={
+						showError ? `${ controlId } ${ errorId }` : controlId
+					}
 					onClick={ onClick }
 				/>
 			) }
