@@ -118,13 +118,15 @@ function DuotonePicker( {
 					aria-label={ label }
 					tooltipText={ tooltipText }
 					style={ style }
-					onClick={ () => {
-						onChange(
-							isSelected ? undefined : colors,
-							index,
-							slug
-						);
-					} }
+					onClick={
+						// Deselecting reports no preset, matching
+						// `ColorPalette` and `GradientPicker`. Passing the slug
+						// back would leave a controlled consumer marking the
+						// swatch as selected after its value had been cleared.
+						isSelected
+							? () => onChange( undefined )
+							: () => onChange( colors, index, slug )
+					}
 				/>
 			);
 		}

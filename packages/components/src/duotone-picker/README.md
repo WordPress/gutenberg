@@ -71,7 +71,9 @@ An empty string is treated the same as `undefined`: selection falls back to matc
 -   Type: `(value: string[] | 'unset' | undefined, index?: number | undefined, slug?: string | undefined) => void`
 -   Required: Yes
 
-The function called when the duotone colors change. It is passed the new `value` as an argument. When a preset from `duotonePalette` is picked, the second argument is its index and the third is its slug. Both are omitted for the custom, unset and clear controls, which do not correspond to a preset.
+The function called when the duotone colors change. It is passed the new `value` as an argument. When a preset from `duotonePalette` is picked, the second argument is its index and the third is its slug.
+
+Both are omitted whenever no preset is being picked: the custom, unset and clear controls, and deselecting the currently selected preset, which reports `undefined` alone.
 
 ### `asButtons`: `boolean`
 

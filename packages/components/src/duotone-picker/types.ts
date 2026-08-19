@@ -52,8 +52,11 @@ export type DuotonePickerProps = {
 	 * When the change comes from picking a preset out of `duotonePalette`, the
 	 * preset's index and slug are passed too. Two presets can hold the same
 	 * pair of colors, so the value alone does not identify which one was
-	 * picked. Both are omitted for the custom, unset and clear controls, which
-	 * do not correspond to a preset.
+	 * picked.
+	 *
+	 * Both are omitted whenever no preset is being picked: the custom, unset
+	 * and clear controls, and deselecting the currently selected preset, which
+	 * reports `undefined` alone.
 	 */
 	onChange: (
 		value: DuotonePickerProps[ 'value' ] | undefined,

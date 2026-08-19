@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useState } from '@wordpress/element';
 import { DuotonePicker } from '..';
+import type { DuotonePickerProps } from '../types';
 
 const COLORS_A = [ '#000000', '#ffffff' ];
 const COLORS_B = [ '#8c00b7', '#fcff41' ];
@@ -152,6 +154,78 @@ describe( 'DuotonePicker', () => {
 				0,
 				'dark-background'
 			);
+		} );
+	} );
+
+	describe( 'controlled usage', () => {
+		// Mirrors how a consumer wires the picker up: value and slug both held
+		// in state and fed back in.
+		function Controlled( {
+			duotonePalette,
+		}: Pick< DuotonePickerProps, 'duotonePalette' > ) {
+			const [ value, setValue ] =
+				useState< DuotonePickerProps[ 'value' ] >();
+			const [ slug, setSlug ] = useState< string | undefined >();
+			return (
+				<DuotonePicker
+					aria-label="Duotone"
+					duotonePalette={ duotonePalette }
+					colorPalette={ COLOR_PALETTE }
+					value={ value }
+					selectedSlug={ slug }
+					onChange={ ( newValue, index, newSlug ) => {
+						setValue( newValue );
+						setSlug( newSlug );
+					} }
+					unsetable={ false }
+					disableCustomDuotone
+					disableCustomColors
+				/>
+			);
+		}
+
+		it( 'should clear both the value and the selected state when the selected preset is clicked again', async () => {
+			const user = userEvent.setup();
+			render( <Controlled duotonePalette={ DUPLICATE_DUOTONES } /> );
+
+			const option = () =>
+				screen.getByRole( 'option', { name: 'Duotone: Dark Text' } );
+
+			await user.click( option() );
+			expect( option() ).toHaveAttribute( 'aria-selected', 'true' );
+
+			// Clicking it again deselects. If the slug were reported back on
+			// deselection, the swatch would stay selected with no value.
+			await user.click( option() );
+			expect( option() ).toHaveAttribute( 'aria-selected', 'false' );
+			expect(
+				screen.getByRole( 'option', {
+					name: 'Duotone: Dark Background',
+				} )
+			).toHaveAttribute( 'aria-selected', 'false' );
+		} );
+
+		it( 'should move the selection when a different preset is clicked', async () => {
+			const user = userEvent.setup();
+			render( <Controlled duotonePalette={ DUPLICATE_DUOTONES } /> );
+
+			await user.click(
+				screen.getByRole( 'option', { name: 'Duotone: Dark Text' } )
+			);
+			await user.click(
+				screen.getByRole( 'option', {
+					name: 'Duotone: Dark Background',
+				} )
+			);
+
+			expect(
+				screen.getByRole( 'option', {
+					name: 'Duotone: Dark Background',
+				} )
+			).toHaveAttribute( 'aria-selected', 'true' );
+			expect(
+				screen.getByRole( 'option', { name: 'Duotone: Dark Text' } )
+			).toHaveAttribute( 'aria-selected', 'false' );
 		} );
 	} );
 
