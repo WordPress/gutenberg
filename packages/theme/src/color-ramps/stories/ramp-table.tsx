@@ -187,6 +187,13 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 										? '3px solid #d63638'
 										: '',
 									outlineOffset: '-3px',
+									boxShadow: hasColorWarningForStep(
+										warnings,
+										name,
+										tokenName
+									)
+										? 'inset 0 0 0 6px #fff'
+										: '',
 									position: 'relative',
 								} }
 							>
