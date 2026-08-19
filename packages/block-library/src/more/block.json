@@ -4,7 +4,7 @@
 	"name": "core/more",
 	"title": "More",
 	"category": "design",
-	"description": "Content before this block will be shown in the excerpt on your archives page.",
+	"description": "Content before this block is shown in the excerpt on blog and archive pages. Where a theme shows the full content instead, visitors get a “Read more” link to the rest of the post.",
 	"keywords": [ "read more" ],
 	"textdomain": "default",
 	"attributes": {
