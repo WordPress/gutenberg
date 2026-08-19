@@ -56,18 +56,31 @@ function gutenberg_render_site_health_counts_block() {
 	}
 
 	$items = array(
-		array( __( 'Good', 'gutenberg' ), $counts['good'] ),
-		array( __( 'Should be improved', 'gutenberg' ), $counts['recommended'] ),
-		array( __( 'Critical', 'gutenberg' ), $counts['critical'] ),
+		array( __( 'Good', 'gutenberg' ), $counts['good'], 'success' ),
+		array( __( 'Should be improved', 'gutenberg' ), $counts['recommended'], 'caution' ),
+		array( __( 'Critical', 'gutenberg' ), $counts['critical'], 'error' ),
 	);
 
-	$html = '<div style="display:flex;gap:32px;margin:0;">';
+	/*
+	 * Inline styles: no stylesheet ships with a composition. The WPDS tokens
+	 * resolve because this HTML mounts inside the admin page; each status
+	 * uses the background-surface/foreground-content pair, the badge recipe.
+	 */
+	$html = '<div style="display:flex;flex-direction:column;gap:var(--wpds-dimension-gap-sm);margin:0;">';
 
 	foreach ( $items as $item ) {
-		list( $label, $count ) = $item;
+		list( $label, $count, $status ) = $item;
 
-		$html .= '<div>' .
-			'<span style="display:block;font-size:24px;font-weight:600;line-height:1.2;">' .
+		$pill_style = 'display:inline-flex;align-items:center;justify-content:center;' .
+			'min-width:28px;' .
+			'padding:var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-sm);' .
+			'border-radius:var(--wpds-border-radius-xl);' .
+			'font-weight:600;line-height:1;' .
+			'background:var(--wpds-color-background-surface-' . $status . ');' .
+			'color:var(--wpds-color-foreground-content-' . $status . ');';
+
+		$html .= '<div style="display:flex;align-items:center;gap:var(--wpds-dimension-gap-sm);">' .
+			'<span style="' . esc_attr( $pill_style ) . '">' .
 			(int) $count .
 			'</span>' .
 			'<span>' . esc_html( $label ) . '</span>' .

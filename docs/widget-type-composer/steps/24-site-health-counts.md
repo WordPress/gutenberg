@@ -58,8 +58,11 @@ live counts.
 
 ## Follow-ups
 
--   [ ] A design pass on the counts row (typography scale, semantic color
-    for the critical count) once the widget graduates from demo.
+-   [x] Status colors landed as a hub follow-up: three stacked rows, each
+    count in a badge-recipe pill (the `background-surface-*` /
+    `foreground-content-*` WPDS pairs: success, caution, error), spacing
+    from the `--wpds-dimension` scale. A fuller design pass (typography
+    scale, iconography) still belongs with graduation.
 -   [ ] If the dashboard ever surfaces to roles below
     `view_site_health_checks`, the composition renders a paragraph and an
     empty gap; the definition would need a capability of its own.
