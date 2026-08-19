@@ -416,7 +416,7 @@
 	},
 	"packages/block-library/src/home-link/edit.js": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
+			"count": 2
 		}
 	},
 	"packages/block-library/src/html/edit.js": {
@@ -472,12 +472,7 @@
 	},
 	"packages/block-library/src/navigation-link/shared/controls.js": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/navigation-link/shared/controls.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
+			"count": 2
 		}
 	},
 	"packages/block-library/src/navigation/edit/index.js": {
@@ -2065,7 +2060,7 @@
 			"count": 1
 		},
 		"@wordpress/use-recommended-components": {
-			"count": 3
+			"count": 4
 		}
 	},
 	"routes/guidelines/components/block-guidelines.tsx": {
