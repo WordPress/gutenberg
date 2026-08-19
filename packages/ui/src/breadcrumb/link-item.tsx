@@ -109,10 +109,9 @@ function OverflowLinkItem( {
 			ref={ forwardedRef as ForwardedRef< Element > }
 			closeOnClick
 			href={ href }
-			label={ children }
 			render={ enforcedRender }
 		>
-			{ children }
+			<Menu.ItemLabel>{ children }</Menu.ItemLabel>
 		</Menu.LinkItem>
 	);
 }

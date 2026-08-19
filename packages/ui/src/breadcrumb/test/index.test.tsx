@@ -812,7 +812,7 @@ describe( 'Breadcrumb', () => {
 			expect( screen.getAllByRole( 'link' ) ).toHaveLength( 2 );
 		} );
 
-		it( 'discards a deferred layout when newer geometry supersedes it', () => {
+		it( 'discards a deferred layout when newer geometry supersedes it', async () => {
 			availableWidth = 140;
 			labelWidths.set( 'Section', 80 );
 			renderDefaultTrail();
@@ -821,6 +821,7 @@ describe( 'Breadcrumb', () => {
 			} );
 
 			act( () => trigger.focus() );
+			await screen.findByText( 'Show 1 hidden breadcrumb item' );
 			availableWidth = 500;
 			notifyResize();
 			availableWidth = 140;
@@ -831,7 +832,7 @@ describe( 'Breadcrumb', () => {
 			expect( screen.getAllByRole( 'link' ) ).toHaveLength( 1 );
 		} );
 
-		it( 'keeps keyed layout state paired while the trigger is focused', () => {
+		it( 'keeps keyed layout state paired while the trigger is focused', async () => {
 			availableWidth = 140;
 			labelWidths.set( 'Section', 80 );
 			const { rerender } = render(
@@ -852,6 +853,7 @@ describe( 'Breadcrumb', () => {
 			} );
 
 			act( () => trigger.focus() );
+			await screen.findByText( 'Show 1 hidden breadcrumb item' );
 			labelWidths.set( 'Reports', 80 );
 			rerender(
 				<Breadcrumb.Root>
@@ -880,7 +882,7 @@ describe( 'Breadcrumb', () => {
 			).toBeInTheDocument();
 		} );
 
-		it( 'pins a focused link or deliberately moves focus to overflow', () => {
+		it( 'pins a focused link or deliberately moves focus to overflow', async () => {
 			availableWidth = 500;
 			labelWidths.set( 'Beta', 100 );
 			render(
@@ -907,11 +909,11 @@ describe( 'Breadcrumb', () => {
 
 			availableWidth = 100;
 			notifyResize();
-			expect(
-				screen.getByRole( 'button', {
-					name: 'Show 3 hidden breadcrumb items',
-				} )
-			).toHaveFocus();
+			const trigger = screen.getByRole( 'button', {
+				name: 'Show 3 hidden breadcrumb items',
+			} );
+			expect( trigger ).toHaveFocus();
+			await screen.findByText( 'Show 3 hidden breadcrumb items' );
 		} );
 	} );
 
