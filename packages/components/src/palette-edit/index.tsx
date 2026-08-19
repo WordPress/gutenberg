@@ -10,7 +10,7 @@ import {
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { lineSolid, moreVertical, plus } from '@wordpress/icons';
-import { useDebounce } from '@wordpress/compose';
+import { useDebounce, useInstanceId } from '@wordpress/compose';
 import { kebabCase } from '@wordpress/kebab-case';
 import Button from '../button';
 import { ColorPicker } from '../color-picker';
@@ -678,10 +678,20 @@ export function PaletteEdit( {
 
 	const addColorRef = useRef< HTMLButtonElement >( null );
 
+	// Names the swatch picker after this palette's heading, so a screen reader
+	// announces "Theme", "Default" or "Custom" rather than an unlabelled list.
+	const paletteLabelId = useInstanceId(
+		PaletteEdit,
+		'components-palette-edit__heading'
+	);
+
 	return (
 		<PaletteEditStyles>
 			<HStack>
-				<PaletteHeading level={ paletteLabelHeadingLevel }>
+				<PaletteHeading
+					id={ paletteLabelId }
+					level={ paletteLabelHeadingLevel }
+				>
 					{ paletteLabel }
 				</PaletteHeading>
 				<PaletteActionsContainer>
@@ -862,6 +872,7 @@ export function PaletteEdit( {
 					) }
 					{ ! isEditing && variant === 'gradient' && (
 						<GradientPicker
+							aria-labelledby={ paletteLabelId }
 							gradients={ gradients }
 							onChange={ onSelectPaletteItem }
 							clearable={ false }
@@ -870,6 +881,7 @@ export function PaletteEdit( {
 					) }
 					{ ! isEditing && variant === 'duotone' && (
 						<DuotonePicker
+							aria-labelledby={ paletteLabelId }
 							duotonePalette={ duotones ?? [] }
 							colorPalette={ duotoneColorPalette }
 							onChange={ onSelectDuotoneItem }
@@ -881,6 +893,7 @@ export function PaletteEdit( {
 					) }
 					{ ! isEditing && variant === 'color' && (
 						<ColorPalette
+							aria-labelledby={ paletteLabelId }
 							colors={ colors }
 							onChange={ onSelectPaletteItem }
 							clearable={ false }

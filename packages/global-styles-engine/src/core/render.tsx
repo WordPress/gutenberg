@@ -296,10 +296,7 @@ function getPresetsSvgFilters(
 			metadata.path,
 			{}
 		) as PresetsByOrigin;
-		// User-defined duotones are included too. The front end renders every
-		// origin (`WP_Duotone::get_all_global_styles_presets`), so leaving
-		// `custom` out here meant a duotone a user had created applied on the
-		// front end but pointed at a filter that did not exist in the editor.
+		// Includes `custom`, since the front end renders every origin.
 		return [ 'default', 'theme', 'custom' ]
 			.filter( ( origin ) => presetByOrigin[ origin ] )
 			.flatMap( ( origin ) =>

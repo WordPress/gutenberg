@@ -54,6 +54,7 @@ function DuotonePicker( {
 	disableCustomColors,
 	disableCustomDuotone,
 	value,
+	selectedSlug,
 	onChange,
 	'aria-label': ariaLabel,
 	'aria-labelledby': ariaLabelledby,
@@ -101,7 +102,13 @@ function DuotonePicker( {
 						name
 				  )
 				: tooltipText;
-			const isSelected = fastDeepEqual( colors, value );
+			// When a non-empty selectedSlug is provided, selection is decided
+			// strictly by slug, which keeps two presets holding the same
+			// colors apart. Otherwise selection falls back to matching the
+			// colors themselves.
+			const isSelected = selectedSlug
+				? slug === selectedSlug
+				: fastDeepEqual( colors, value );
 
 			return (
 				<CircularOptionPicker.Option

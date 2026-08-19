@@ -679,6 +679,53 @@ describe( 'PaletteEdit', () => {
 		} );
 	} );
 
+	// The same filtering and normalization that applies when adding a duotone
+	// has to apply when editing one, or the shadows and highlights picker can
+	// offer a color the saved duotone cannot be built from.
+	it( 'hides unusable colors and saves named ones as hex when editing a duotone', async () => {
+		const onChange = jest.fn();
+
+		render(
+			<PaletteEdit
+				{ ...defaultProps }
+				duotones={ duotones }
+				colorPalette={ [
+					{
+						color: 'black',
+						name: 'Named black',
+						slug: 'named-black',
+					},
+					{
+						color: 'color-mix(in srgb, currentColor 20%, transparent)',
+						name: 'Contrast overlay',
+						slug: 'contrast-overlay',
+					},
+				] }
+				onChange={ onChange }
+			/>
+		);
+
+		await click( screen.getByLabelText( 'Duotone: Blue and red' ) );
+		await click( screen.getByRole( 'button', { name: /Shadows/ } ) );
+
+		// The unusable color must not be offered at all.
+		expect(
+			screen.queryByRole( 'option', { name: 'Contrast overlay' } )
+		).not.toBeInTheDocument();
+
+		await click( screen.getByRole( 'option', { name: 'Named black' } ) );
+
+		await waitFor( () => {
+			expect( onChange ).toHaveBeenCalledWith( [
+				duotones[ 0 ],
+				{
+					...duotones[ 1 ],
+					colors: [ '#000000', duotones[ 1 ].colors[ 1 ] ],
+				},
+			] );
+		} );
+	} );
+
 	// Adding two duotones with the `+` button seeds both from the palette's
 	// darkest and lightest colors, so duplicate values are the normal case
 	// rather than an edge one. The duotone that was clicked has to be the one

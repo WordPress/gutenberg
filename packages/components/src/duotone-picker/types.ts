@@ -36,6 +36,17 @@ export type DuotonePickerProps = {
 	 */
 	value?: string[] | 'unset';
 	/**
+	 * The slug of the selected duotone preset. When a non-empty `selectedSlug`
+	 * is provided, selection is decided strictly by slug, which keeps two
+	 * presets holding the same pair of colors apart. Presets whose slug does
+	 * not match will not appear selected in this mode, even if their colors
+	 * match `value`.
+	 *
+	 * An empty string is treated the same as `undefined`: selection falls back
+	 * to matching by color value.
+	 */
+	selectedSlug?: string;
+	/**
 	 * Callback which is called when the duotone colors change.
 	 *
 	 * When the change comes from picking a preset out of `duotonePalette`, the
