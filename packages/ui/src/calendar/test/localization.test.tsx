@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { startOfDay } from 'date-fns';
-import { ckb, enUS, faIR, ug } from 'date-fns/locale';
+import { ckb, faIR, ug } from 'date-fns/locale';
 import { Calendar, RangeCalendar } from '..';
 import {
 	dateNumberFormatter,
@@ -47,7 +47,7 @@ describe.each( [
 	[ 'RangeCalendar', RangeCalendar ],
 ] as const )( '%s localization', ( _name, Component ) => {
 	it( 'localizes visible text from a BCP 47 locale code', () => {
-		render( <Component defaultMonth={ TEST_DATE } localeCode="fr-FR" /> );
+		render( <Component defaultMonth={ TEST_DATE } locale="fr-FR" /> );
 
 		expect(
 			screen.getByText(
@@ -58,7 +58,7 @@ describe.each( [
 
 	it( 'keeps Persian date text on the Gregorian calendar', () => {
 		expect.hasAssertions();
-		render( <Component defaultMonth={ TEST_DATE } localeCode="fa-IR" /> );
+		render( <Component defaultMonth={ TEST_DATE } locale="fa-IR" /> );
 
 		expectGregorianDate( 'fa-IR' );
 	} );
@@ -87,14 +87,8 @@ describe( 'Calendar locale inputs', () => {
 		expectGregorianDate( 'fa-IR' );
 	} );
 
-	it( 'uses the locale code for Intl formatting and direction when both locale inputs are supplied', () => {
-		render(
-			<Calendar
-				defaultMonth={ TEST_DATE }
-				locale={ enUS }
-				localeCode="fa-IR"
-			/>
-		);
+	it( 'derives Intl formatting and direction from a locale string', () => {
+		render( <Calendar defaultMonth={ TEST_DATE } locale="fa-IR" /> );
 
 		expectGregorianDate( 'fa-IR' );
 		expect(
@@ -103,52 +97,103 @@ describe( 'Calendar locale inputs', () => {
 	} );
 
 	it.each( [ 'not_a_locale', 'xx-XX' ] )(
-		'falls back to the date-fns locale for invalid or unsupported locale code %s',
-		( localeCode ) => {
+		'falls back to en-US for invalid or unsupported locale string %s',
+		( locale ) => {
 			expect( () =>
 				render(
-					<Calendar
-						defaultMonth={ TEST_DATE }
-						locale={ faIR }
-						localeCode={ localeCode }
-					/>
+					<Calendar defaultMonth={ TEST_DATE } locale={ locale } />
 				)
 			).not.toThrow();
 
-			expectGregorianDate( 'fa-IR' );
+			expectGregorianDate( 'en-US' );
 		}
 	);
 
 	it( 'lets an explicit direction override the locale-derived direction', () => {
-		render( <Calendar localeCode="fa-IR" dir="ltr" /> );
+		render( <Calendar locale="fa-IR" dir="ltr" /> );
 
 		expect(
 			screen.getByRole( 'application', { name: 'Date calendar' } )
 		).toHaveAttribute( 'dir', 'ltr' );
 	} );
 
-	it( 'keeps the date-fns locale as the default source for the week start', () => {
-		render(
-			<Calendar
-				defaultMonth={ TEST_DATE }
-				locale={ faIR }
-				localeCode="en-US"
-			/>
-		);
+	it( 'derives the week start from a locale string', () => {
+		render( <Calendar defaultMonth={ TEST_DATE } locale="fa-IR" /> );
 
 		expect(
 			screen.getAllByRole( 'columnheader', { hidden: true } )[ 0 ]
 		).toHaveAccessibleName(
-			weekdayFormatter( 'en-US' ).format( new Date( 2026, 0, 10 ) )
+			weekdayFormatter( 'fa-IR' ).format( new Date( 2026, 0, 10 ) )
 		);
 	} );
 
-	it( 'lets an explicit weekStartsOn override the date-fns locale', () => {
+	it( 'derives the week start from legacy browser week information', () => {
+		const IntlLocale = Intl.Locale;
+		const localeSpy = jest
+			.spyOn( Intl, 'Locale' )
+			.mockImplementation( ( locale ) => {
+				const intlLocale = new IntlLocale( locale );
+				Object.defineProperties( intlLocale, {
+					getWeekInfo: { value: undefined },
+					weekInfo: { value: { firstDay: 6 } },
+				} );
+				return intlLocale;
+			} );
+
+		try {
+			render( <Calendar defaultMonth={ TEST_DATE } locale="fa-IR" /> );
+
+			expect(
+				screen.getAllByRole( 'columnheader', { hidden: true } )[ 0 ]
+			).toHaveAccessibleName(
+				weekdayFormatter( 'fa-IR' ).format( new Date( 2026, 0, 10 ) )
+			);
+		} finally {
+			localeSpy.mockRestore();
+		}
+	} );
+
+	it( 'uses the existing default when browser week information is unavailable', () => {
+		const IntlLocale = Intl.Locale;
+		const localeSpy = jest
+			.spyOn( Intl, 'Locale' )
+			.mockImplementation( ( locale ) => {
+				const intlLocale = new IntlLocale( locale );
+				Object.defineProperties( intlLocale, {
+					getWeekInfo: { value: undefined },
+					weekInfo: { value: undefined },
+				} );
+				return intlLocale;
+			} );
+
+		try {
+			render( <Calendar defaultMonth={ TEST_DATE } locale="fa-IR" /> );
+
+			expect(
+				screen.getAllByRole( 'columnheader', { hidden: true } )[ 0 ]
+			).toHaveAccessibleName(
+				weekdayFormatter( 'fa-IR' ).format( new Date( 2026, 0, 11 ) )
+			);
+		} finally {
+			localeSpy.mockRestore();
+		}
+	} );
+
+	it( 'keeps the date-fns locale as the default source for the week start', () => {
+		render( <Calendar defaultMonth={ TEST_DATE } locale={ faIR } /> );
+
+		expect(
+			screen.getAllByRole( 'columnheader', { hidden: true } )[ 0 ]
+		).toHaveAccessibleName(
+			weekdayFormatter( 'fa-IR' ).format( new Date( 2026, 0, 10 ) )
+		);
+	} );
+
+	it( 'lets an explicit weekStartsOn override the derived week start', () => {
 		render(
 			<Calendar
 				defaultMonth={ TEST_DATE }
-				locale={ faIR }
-				localeCode="fa-IR"
+				locale="fa-IR"
 				weekStartsOn={ 1 }
 			/>
 		);

@@ -1,10 +1,15 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
+import { enUS } from 'date-fns/locale';
 import type { Modifiers, BaseProps } from '../types';
 
-function isLocaleRTL( localeCode: string ) {
-	const localeObj = new Intl.Locale( localeCode );
-	const direction = localeObj.getTextInfo?.().direction;
+type IntlLocaleWithWeekInfo = Intl.Locale & {
+	getWeekInfo?: () => { firstDay?: number };
+	weekInfo?: { firstDay?: number };
+};
+
+function isLocaleRTL( locale: Intl.Locale ) {
+	const direction = locale.getTextInfo?.().direction;
 	if ( direction ) {
 		return direction === 'rtl';
 	}
@@ -20,7 +25,7 @@ function isLocaleRTL( localeCode: string ) {
 		'ckb', // Central Kurdish (Sorani)
 		'ug', // Uyghur
 		'yi', // Yiddish
-	].includes( localeObj.language );
+	].includes( locale.language );
 }
 
 function getSupportedLocaleCode( localeCode: string | undefined ) {
@@ -39,6 +44,14 @@ function getSupportedLocaleCode( localeCode: string | undefined ) {
 	return supportedLocaleCode;
 }
 
+function getWeekStartsOn( locale: IntlLocaleWithWeekInfo ) {
+	const firstDay = ( locale.getWeekInfo?.() ?? locale.weekInfo )?.firstDay;
+	if ( firstDay === undefined || firstDay < 1 || firstDay > 7 ) {
+		return;
+	}
+	return ( firstDay % 7 ) as NonNullable< BaseProps[ 'weekStartsOn' ] >;
+}
+
 /**
  * Returns localization props for the calendar components.
  *
@@ -53,26 +66,29 @@ function getSupportedLocaleCode( localeCode: string | undefined ) {
  *   translation context and date-text locale are consistent.
  * @param props
  * @param props.locale
- * @param props.localeCode
  * @param props.timeZone
  * @param props.mode
  */
 export const useLocalizationProps = ( {
 	locale,
-	localeCode: localeCodeProp,
 	timeZone,
 	mode,
 }: {
 	locale: NonNullable< BaseProps[ 'locale' ] >;
-	localeCode: BaseProps[ 'localeCode' ];
 	timeZone: BaseProps[ 'timeZone' ];
 	mode: 'single' | 'range';
 } ) => {
 	return useMemo( () => {
+		const isLocaleCode = typeof locale === 'string';
 		const localeCode =
-			getSupportedLocaleCode( localeCodeProp ) ??
-			getSupportedLocaleCode( locale.code ) ??
+			getSupportedLocaleCode( isLocaleCode ? locale : locale.code ) ??
 			'en-US';
+		const intlLocale = new Intl.Locale(
+			localeCode
+		) as IntlLocaleWithWeekInfo;
+		const weekStartsOn = isLocaleCode
+			? getWeekStartsOn( intlLocale )
+			: undefined;
 
 		// ie. April 2025
 		const monthNameFormatter = new Intl.DateTimeFormat( localeCode, {
@@ -188,9 +204,10 @@ export const useLocalizationProps = ( {
 				labelWeekday: ( date: Date ) =>
 					weekdayLongFormatter.format( date ),
 			},
-			locale,
+			locale: isLocaleCode ? enUS : locale,
 			lang: localeCode,
-			dir: isLocaleRTL( localeCode ) ? 'rtl' : 'ltr',
+			dir: isLocaleRTL( intlLocale ) ? 'rtl' : 'ltr',
+			...( weekStartsOn === undefined ? {} : { weekStartsOn } ),
 			formatters: {
 				formatDay: ( date: Date ) => {
 					return dayNumberFormatter.format( date );
@@ -204,5 +221,5 @@ export const useLocalizationProps = ( {
 			},
 			timeZone,
 		} as const;
-	}, [ locale, localeCodeProp, timeZone, mode ] );
+	}, [ locale, timeZone, mode ] );
 };

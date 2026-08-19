@@ -266,32 +266,28 @@ export interface BaseProps
 	};
 
 	/**
-	 * The date-fns locale object used for calendar rules such as the default
-	 * first day of the week. Its `code` also localizes date text unless
-	 * `localeCode` is provided.
+	 * A BCP 47 locale code or date-fns locale object used to localize date text,
+	 * numerals, the default text direction, and the first day of the week.
+	 *
+	 * A locale code derives the first day of the week when the browser provides
+	 * that information. Otherwise, the component uses its default. A date-fns
+	 * locale object preserves the existing date-fns locale behavior.
+	 *
+	 * Invalid or unsupported locale codes fall back to `en-US`.
 	 *
 	 * For a correct localized experience, consumers should make sure the locale
 	 * used for translated labels and date text is consistent.
+	 *
+	 * The calendar always uses a Gregorian date grid. The locale does not change
+	 * the underlying calendar system.
 	 * @see https://github.com/date-fns/date-fns/tree/main/src/locale for a list of the supported locales
 	 * @default The `enUS` locale from `date-fns/locale`
 	 */
-	locale?: Locale;
-	/**
-	 * The BCP 47 locale code used for date text, numerals, and the default text
-	 * direction. When provided, this takes precedence over `locale.code` for
-	 * those concerns. Invalid or unsupported codes fall back to `locale.code`,
-	 * then `en-US`.
-	 *
-	 * The calendar always uses a Gregorian date grid. This prop does not change
-	 * date-fns calendar rules such as the default first day of the week. Use the
-	 * `locale` or `weekStartsOn` prop for those rules.
-	 * @default The `code` from the `locale` prop
-	 */
-	localeCode?: string;
+	locale?: Locale | string;
 	/**
 	 * The index of the first day of the week (0 - Sunday). Overrides the locale's
 	 * one.
-	 * @default Based on the `locale` prop
+	 * @default Based on the `locale` prop when available
 	 */
 	weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | undefined;
 	/**
