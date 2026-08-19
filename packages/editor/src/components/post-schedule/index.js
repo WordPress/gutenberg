@@ -32,6 +32,7 @@ export default function PostSchedule( props ) {
 
 export function PrivatePostSchedule( {
 	onClose,
+	showPopoverHeader,
 	showPopoverHeaderActions,
 	isCompact,
 } ) {
@@ -112,6 +113,7 @@ export function PrivatePostSchedule( {
 			}
 			onClose={ onClose }
 			isCompact={ isCompact }
+			showPopoverHeader={ showPopoverHeader }
 			showPopoverHeaderActions={ showPopoverHeaderActions }
 		/>
 	);

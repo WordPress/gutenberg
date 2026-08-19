@@ -1,4 +1,4 @@
-import { DateTimePicker, TimePicker } from '@wordpress/components';
+import { Button, DateTimePicker, TimePicker } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { forwardRef } from '@wordpress/element';
 import { getSettings } from '@wordpress/date';
@@ -8,6 +8,7 @@ export function PublishDateTimePicker(
 	{
 		onClose,
 		onChange,
+		showPopoverHeader = true,
 		showPopoverHeaderActions,
 		isCompact,
 		currentDate,
@@ -24,22 +25,37 @@ export function PublishDateTimePicker(
 		...additionalProps,
 	};
 	const DatePickerComponent = isCompact ? TimePicker : DateTimePicker;
+	const resetDate = () => onChange?.( null );
 	return (
 		<div ref={ ref } className="block-editor-publish-date-time-picker">
-			<InspectorPopoverHeader
-				title={ title || __( 'Publish' ) }
-				actions={
-					showPopoverHeaderActions
-						? [
-								{
-									label: __( 'Now' ),
-									onClick: () => onChange?.( null ),
-								},
-						  ]
-						: undefined
-				}
-				onClose={ onClose }
-			/>
+			{ showPopoverHeader && (
+				<InspectorPopoverHeader
+					title={ title || __( 'Publish' ) }
+					actions={
+						showPopoverHeaderActions
+							? [
+									{
+										label: __( 'Now' ),
+										onClick: resetDate,
+									},
+							  ]
+							: undefined
+					}
+					onClose={ onClose }
+				/>
+			) }
+			{ /* Without the popover header there is nowhere for the reset
+			     action to live, so it leads the picker as a button. */ }
+			{ ! showPopoverHeader && (
+				<Button
+					className="block-editor-publish-date-time-picker__reset"
+					variant="secondary"
+					__next40pxDefaultSize
+					onClick={ resetDate }
+				>
+					{ __( 'Now' ) }
+				</Button>
+			) }
 			<DatePickerComponent { ...datePickerProps } />
 		</div>
 	);

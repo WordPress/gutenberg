@@ -59,3 +59,14 @@ Called when the user presses the close button.
 
 - Type: `Function`
 - Required: No
+
+### showPopoverHeader
+
+Whether to render the popover header, which holds the title, the close button
+and a "Now" action that resets the date. Set it to `false` when the picker is
+rendered inline, where the surrounding UI already provides a heading; the "Now"
+action then renders as a button above the picker.
+
+- Type: `Boolean`
+- Required: No
+- Default: `true`
