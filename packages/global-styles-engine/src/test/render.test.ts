@@ -36,6 +36,8 @@ jest.mock( '@wordpress/blocks', () => ( {
 		h6: 'h6',
 		button: '.wp-element-button',
 		caption: '.wp-element-caption',
+		textInput:
+			'textarea, input:where([type=email],[type=number],[type=password],[type=search],[type=text],[type=tel],[type=url])',
 	},
 	getBlockSupport: jest.fn(),
 	getBlockTypes: jest.fn(),
@@ -402,6 +404,24 @@ describe( 'global styles renderer', () => {
 			presets: false,
 			rootPadding: false,
 		};
+		const textInputSelectorWith = ( pseudoSelector: string ) =>
+			`textarea${ pseudoSelector }, input:where([type=email],[type=number],[type=password],[type=search],[type=text],[type=tel],[type=url])${ pseudoSelector }`;
+		const transformTextInputStyles = (
+			textInputStyles: Record< string, unknown >
+		) =>
+			transformToStyles(
+				Object.freeze( {
+					styles: {
+						elements: { textInput: textInputStyles },
+					},
+				} as unknown as GlobalStylesConfig ),
+				{},
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
 
 		it( 'uses the row value for Flow and Constrained layouts and both values for Flex and Grid layouts when block spacing is axial', () => {
 			const tree: GlobalStylesConfig = {
@@ -815,6 +835,58 @@ describe( 'global styles renderer', () => {
 
 			expect( result ).toEqual(
 				':root :where(.wp-block-button){color: red;}:root :where(.wp-block-button:hover){color: blue;}'
+			);
+		} );
+
+		it( 'renders text input focus color styles with capped specificity', () => {
+			const css = transformTextInputStyles( {
+				':focus': { color: { text: 'blue' } },
+			} );
+
+			expect( css ).toEqual(
+				`:root :where(${ textInputSelectorWith(
+					':focus'
+				) }){color: blue;}`
+			);
+		} );
+
+		it( 'renders text input invalid spacing styles with capped specificity', () => {
+			const css = transformTextInputStyles( {
+				':invalid': { spacing: { padding: { top: '1rem' } } },
+			} );
+
+			expect( css ).toEqual(
+				`:root :where(${ textInputSelectorWith(
+					':invalid'
+				) }){padding-top: 1rem;}`
+			);
+		} );
+
+		it( 'renders text input placeholder typography styles outside :where()', () => {
+			const css = transformTextInputStyles( {
+				'::placeholder': { typography: { fontStyle: 'italic' } },
+			} );
+
+			expect( css ).toEqual(
+				`${ textInputSelectorWith(
+					'::placeholder'
+				) }{font-style: italic;}`
+			);
+		} );
+
+		it( 'outputs invalid after focus so validation color wins when both states match', () => {
+			const css = transformTextInputStyles( {
+				':invalid': { color: { text: 'red' } },
+				':focus': { color: { text: 'blue' } },
+			} );
+
+			expect( css ).toEqual(
+				`:root :where(${ textInputSelectorWith(
+					':focus'
+				) }){color: blue;}` +
+					`:root :where(${ textInputSelectorWith(
+						':invalid'
+					) }){color: red;}`
 			);
 		} );
 

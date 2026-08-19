@@ -616,7 +616,8 @@ class WP_Theme_JSON_Gutenberg {
 	const VALID_ELEMENT_PSEUDO_SELECTORS = array(
 		'link'      => array( ':link', ':any-link', ':visited', ':hover', ':focus', ':focus-visible', ':active' ),
 		'button'    => array( ':link', ':any-link', ':visited', ':hover', ':focus', ':focus-visible', ':active' ),
-		'textInput' => array( ':required', ':valid', ':invalid', ':focus', ':focus-visible', '::placeholder' ),
+		// Validation states follow focus states so validation styles win when declarations overlap.
+		'textInput' => array( ':focus', ':focus-visible', ':required', ':valid', ':invalid', '::placeholder' ),
 	);
 
 	/**

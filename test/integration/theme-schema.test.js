@@ -31,6 +31,46 @@ describe( 'theme.json schema', () => {
 		expect( jsonFiles.length ).toBeGreaterThan( 0 );
 	} );
 
+	test( 'accepts supported text input pseudo-selectors', () => {
+		const theme = {
+			version: 3,
+			styles: {
+				elements: {
+					textInput: {
+						':focus': {
+							color: { text: 'blue' },
+						},
+						':invalid': {
+							spacing: { padding: { top: '1rem' } },
+						},
+						'::placeholder': {
+							typography: { fontStyle: 'italic' },
+						},
+					},
+				},
+			},
+		};
+
+		expect( ajv.validate( themeSchema, theme ) ).toBe( true );
+	} );
+
+	test( 'rejects unsupported text input pseudo-selectors', () => {
+		const theme = {
+			version: 3,
+			styles: {
+				elements: {
+					textInput: {
+						':hover': {
+							color: { text: 'green' },
+						},
+					},
+				},
+			},
+		};
+
+		expect( ajv.validate( themeSchema, theme ) ).toBe( false );
+	} );
+
 	test.each( jsonFiles )( 'validates schema for `%s`', ( filepath ) => {
 		// We want to validate the theme.json file using the local schema.
 		const { $schema, ...metadata } = require( filepath );

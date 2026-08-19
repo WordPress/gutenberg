@@ -220,12 +220,13 @@ const VALID_ELEMENT_PSEUDO_SELECTORS: Record< string, string[] > = {
 		':focus-visible',
 		':active',
 	],
+	// Validation states follow focus states so validation styles win when declarations overlap.
 	textInput: [
+		':focus',
+		':focus-visible',
 		':required',
 		':valid',
 		':invalid',
-		':focus',
-		':focus-visible',
 		'::placeholder',
 	],
 };

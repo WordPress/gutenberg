@@ -2168,16 +2168,10 @@
 		"stylesTextInputPseudoSelectorsProperties": {
 			"type": "object",
 			"properties": {
-				"::placeholder": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
-				},
 				":focus": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				},
 				":focus-visible": {
-					"$ref": "#/definitions/stylesPropertiesComplete"
-				},
-				":invalid": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				},
 				":required": {
@@ -2185,17 +2179,23 @@
 				},
 				":valid": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":invalid": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				"::placeholder": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
 				}
 			}
 		},
 		"stylesTextInputPseudoSelectorsPropertyNames": {
 			"enum": [
-				"::placeholder",
 				":focus",
 				":focus-visible",
-				":invalid",
 				":required",
-				":valid"
+				":valid",
+				":invalid",
+				"::placeholder"
 			]
 		},
 		"stylesElementsPropertiesComplete": {

@@ -1901,6 +1901,77 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'a:levitate{', $theme_json->get_stylesheet( array( 'styles' ) ) );
 	}
 
+	public function test_get_stylesheet_renders_text_input_focus_color_styles() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'elements' => array(
+						'textInput' => array(
+							':focus' => array(
+								'color' => array(
+									'text' => 'blue',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = ':root :where(textarea:focus, input:where([type=email],[type=number],[type=password],[type=search],[type=text],[type=tel],[type=url]):focus){color: blue;}';
+
+		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
+	}
+
+	public function test_get_stylesheet_renders_text_input_invalid_spacing_styles() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'elements' => array(
+						'textInput' => array(
+							':invalid' => array(
+								'spacing' => array(
+									'padding' => array(
+										'top' => '1rem',
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = ':root :where(textarea:invalid, input:where([type=email],[type=number],[type=password],[type=search],[type=text],[type=tel],[type=url]):invalid){padding-top: 1rem;}';
+
+		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
+	}
+
+	public function test_get_stylesheet_renders_text_input_placeholder_typography_styles() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'elements' => array(
+						'textInput' => array(
+							'::placeholder' => array(
+								'typography' => array(
+									'fontStyle' => 'italic',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = 'textarea::placeholder, input:where([type=email],[type=number],[type=password],[type=search],[type=text],[type=tel],[type=url])::placeholder{font-style: italic;}';
+
+		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
+	}
+
 	/**
 	 * Tests that element pseudo selectors are output before block element pseudo selectors, and that whitelisted
 	 * block element pseudo selectors are output correctly.
@@ -4244,6 +4315,67 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							'color' => array(
 								'text'       => 'red',
 								'background' => 'blue',
+							),
+						),
+					),
+				),
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
+	public function test_remove_insecure_properties_preserves_supported_text_input_pseudo_selectors() {
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'elements' => array(
+						'textInput' => array(
+							':focus'        => array(
+								'color' => array(
+									'text' => 'blue',
+								),
+							),
+							':invalid'      => array(
+								'spacing' => array(
+									'padding' => array(
+										'top' => '1rem',
+									),
+								),
+							),
+							'::placeholder' => array(
+								'typography' => array(
+									'fontStyle' => 'italic',
+								),
+							),
+						),
+					),
+				),
+			),
+			'theme'
+		);
+
+		$expected = array(
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'styles'  => array(
+				'elements' => array(
+					'textInput' => array(
+						':focus'        => array(
+							'color' => array(
+								'text' => 'blue',
+							),
+						),
+						':invalid'      => array(
+							'spacing' => array(
+								'padding' => array(
+									'top' => '1rem',
+								),
+							),
+						),
+						'::placeholder' => array(
+							'typography' => array(
+								'fontStyle' => 'italic',
 							),
 						),
 					),
