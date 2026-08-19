@@ -24,6 +24,10 @@
  *     provider after creating a note comment) is folded into the snapshot
  *     before diffing so it's invisible to the diff and never leaks into the
  *     user-pending overlay.
+ *   - A `resetBlocks` — content handed down by the controlling entity rather
+ *     than typed by this user — re-seeds the baseline instead of being
+ *     diffed, so another session's document isn't captured as a page of
+ *     insertions.
  *
  * Why subscribe rather than React state:
  *   - The interceptor must run after the dispatch lands but before any
@@ -914,8 +918,61 @@ export default function SuggestionStoreInterceptor() {
 			tree = captureTreeSnapshot( blockEditor );
 		};
 
+		/*
+		 * Content that did not come from this user replaces the whole block
+		 * tree through `resetBlocks`: the sync manager applying another
+		 * session's changes, a revision restore, a refetch. Every block in the
+		 * replacement carries a fresh clientId, so the diff below would read
+		 * the arriving document as "the local user inserted all of this" and
+		 * the previous document as "the local user removed all of that" —
+		 * duplicating the post in the canvas and opening a note per block.
+		 *
+		 * `resetBlocks` is the reliable signal because no editing action
+		 * dispatches it: in the post editor it is reached only from
+		 * `useBlockSync`, which calls it when the controlling entity hands
+		 * down a new value (and with `[]` on unmount), plus `synchronizeTemplate`,
+		 * which is a template resync rather than a content edit. Wrapping the
+		 * store's action object is the same interception `SuggestionUndoGuard`
+		 * uses for undo/redo; the original is restored on cleanup.
+		 *
+		 * Subscribers fire synchronously from within the dispatch, so the flag
+		 * is read by the very fire the reset triggers and needs no token
+		 * bookkeeping.
+		 */
+		let isExternalReset = false;
+		const originalResetBlocks = blockEditorDispatch.resetBlocks;
+		if ( originalResetBlocks ) {
+			blockEditorDispatch.resetBlocks = ( ...args ) => {
+				isExternalReset = true;
+				try {
+					return originalResetBlocks( ...args );
+				} finally {
+					isExternalReset = false;
+				}
+			};
+		}
+
 		const unsubscribe = registry.subscribe( () => {
 			if ( isDispatchingOwnWrite ) {
+				return;
+			}
+
+			// Externally-supplied content (see above): adopt it as the new
+			// capture baseline rather than diffing it as user intent.
+			if ( isExternalReset ) {
+				/*
+				 * An undo/redo lands here too: in the post editor it is
+				 * applied as a `resetBlocks`, so this branch — not the
+				 * drift branch below — is where the guard's armed adoption
+				 * token comes due. Consume it, because a token left armed
+				 * stays live for UNDO_ADOPTION_TTL_MS and the user's next
+				 * keystroke would spend it, adopting that edit as baseline
+				 * instead of capturing it as a suggestion. Resets that are
+				 * not an undo have no token armed, so this is a no-op for
+				 * them.
+				 */
+				consumeUndoRedoAdoptionRef.current?.();
+				adoptLiveTreeAsBaseline();
 				return;
 			}
 
@@ -1412,7 +1469,12 @@ export default function SuggestionStoreInterceptor() {
 			tree = captureTreeSnapshot( blockEditor );
 		}, BLOCK_EDITOR_STORE_NAME );
 
-		return unsubscribe;
+		return () => {
+			unsubscribe();
+			if ( originalResetBlocks ) {
+				blockEditorDispatch.resetBlocks = originalResetBlocks;
+			}
+		};
 	}, [
 		isSuggestMode,
 		registry,
