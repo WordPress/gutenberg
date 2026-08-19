@@ -32,6 +32,7 @@ import { PlaylistContext } from './context';
 import { getTrackAttributes } from './utils';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
+const EMPTY_ARRAY = [];
 const AUDIO_FILE_EXTENSION =
 	/\.(aac|aif|aiff|flac|m4a|m4b|mp3|oga|ogg|opus|wav|weba)$/i;
 const DEFAULT_WAVEFORM_STYLE = 'bars';
@@ -124,7 +125,8 @@ const PlaylistEdit = ( {
 		( select ) => {
 			const { getBlock: _getBlock } = select( blockEditorStore );
 			return {
-				innerBlockTracks: _getBlock( clientId )?.innerBlocks ?? [],
+				innerBlockTracks:
+					_getBlock( clientId )?.innerBlocks ?? EMPTY_ARRAY,
 			};
 		},
 		[ clientId ]
