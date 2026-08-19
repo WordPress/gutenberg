@@ -5,7 +5,7 @@ import type {
 	ThemeProviderColorRampName,
 	ThemeProviderColorWarning,
 } from '../../theme-provider-color-warnings';
-import { ColorWarningDetails } from '../../stories/color-warning-details';
+import { ColorWarningDetails } from './color-warning-details';
 import { RampTable } from './ramp-table';
 import { buildBgRamp, buildAccentRamp } from '..';
 import { DEFAULT_SEED_COLORS } from '../lib/constants';
@@ -41,6 +41,7 @@ export default meta;
 
 type Combination = {
 	label: string;
+	source: string;
 	background: string;
 	primary: string;
 };
@@ -97,6 +98,7 @@ function buildDisplayedRamps( {
 
 function ColorScaleCombination( {
 	label,
+	source,
 	background,
 	primary,
 	includeAllRamps = false,
@@ -128,8 +130,8 @@ function ColorScaleCombination( {
 			<header>
 				<h2 id={ headingId }>{ label }</h2>
 				<p>
-					Primary seed: <code>{ primary }</code>. Background seed:{ ' ' }
-					<code>{ background }</code>.
+					Source: { source }. Primary seed: <code>{ primary }</code>.
+					Background seed: <code>{ background }</code>.
 				</p>
 			</header>
 			<RampTable ramps={ ramps } warnings={ warnings } />
@@ -147,6 +149,7 @@ export const Default: StoryObj< typeof ColorGen > = {
 			<ColorScaleCombination
 				key={ `${ primary }-${ background }` }
 				label="Custom color scales"
+				source="Storybook controls"
 				background={ background }
 				primary={ primary }
 				includeAllRamps
@@ -158,52 +161,80 @@ export const Default: StoryObj< typeof ColorGen > = {
 
 const SAMPLE_COMBINATIONS = [
 	{
-		label: 'WordPress light',
-		background: '#f8f8f8',
+		label: 'Default light',
+		source: 'ThemeProvider defaults',
+		background: '#fcfcfc',
 		primary: '#3858e9',
 	},
 	{
-		label: 'WordPress dark',
+		label: 'Tooltip dark',
+		source: 'Tooltip and WordPress dark admin scheme',
 		background: '#1e1e1e',
 		primary: '#3858e9',
 	},
 	{
+		label: 'Modern admin dark',
+		source: 'WordPress admin',
+		background: '#222524',
+		primary: '#3858e9',
+	},
+	{
+		label: '#81162 reproduction',
+		source: 'GitHub issue #81162',
+		background: '#4f386e',
+		primary: '#608010',
+	},
+	{
+		label: 'WordPress light',
+		source: 'WordPress light admin scheme',
+		background: '#f8f8f8',
+		primary: '#3858e9',
+	},
+	{
 		label: 'Fresh',
+		source: 'WordPress admin scheme',
 		background: '#25292b',
 		primary: '#3858e9',
 	},
 	{
 		label: 'Light',
+		source: 'WordPress admin scheme',
 		background: '#eaeeed',
 		primary: '#007cba',
 	},
 	{
 		label: 'Blue',
+		source: 'WordPress admin scheme',
 		background: '#3876a8',
 		primary: '#437aa8',
 	},
 	{
 		label: 'Coffee',
+		source: 'WordPress admin scheme',
 		background: '#5b534d',
 		primary: '#916745',
 	},
 	{
 		label: 'Ectoplasm',
+		source: 'WordPress admin scheme',
 		background: '#4f386e',
 		primary: '#646c3e',
 	},
 	{
 		label: 'Ocean',
+		source: 'WordPress admin scheme',
 		background: '#5f787f',
 		primary: '#567958',
 	},
 	{
 		label: 'Midnight',
+		source: 'WordPress admin scheme',
 		background: '#3d4042',
 		primary: '#cf4339',
 	},
 	{
 		label: 'Sunrise',
+		source: 'WordPress admin scheme',
 		background: '#cc4541',
 		primary: '#ad631e',
 	},

@@ -1,4 +1,4 @@
-import type { ThemeProviderColorWarning } from '../theme-provider-color-warnings';
+import type { ThemeProviderColorWarning } from '../../theme-provider-color-warnings';
 
 export function ColorWarningDetails( {
 	warnings,
