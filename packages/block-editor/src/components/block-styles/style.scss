@@ -23,8 +23,13 @@
 
 .block-editor-block-styles__variants {
 	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
 	gap: $grid-unit-10;
+
+	.block-editor-block-styles__row {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: $grid-unit-10;
+	}
 
 	.block-editor-block-styles__item-text {
 		// Without this, the ellipsis can sometimes be partially hidden by the Button padding.

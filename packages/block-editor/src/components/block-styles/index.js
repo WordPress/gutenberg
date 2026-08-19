@@ -1,7 +1,8 @@
 import { useState, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { debounce } from '@wordpress/compose';
+import { debounce, useInstanceId } from '@wordpress/compose';
 import {
+	Composite,
 	__experimentalTruncate as Truncate,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -36,6 +37,18 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 	const [ hoveredStyle, setHoveredStyle ] = useState( null );
 	const [ blockStylesAnchor, setBlockStylesAnchor ] = useState( null );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const instanceId = useInstanceId(
+		BlockStyles,
+		'block-editor-block-styles'
+	);
+
+	const styleRows = useMemo( () => {
+		const rows = [];
+		for ( let i = 0; i < ( stylesToRender?.length ?? 0 ); i += 2 ) {
+			rows.push( stylesToRender.slice( i, i + 2 ) );
+		}
+		return rows;
+	}, [ stylesToRender ] );
 
 	const previewBlocks = useMemo( () => {
 		if ( ! hoveredStyle || ! genericPreviewBlock ) {
@@ -108,44 +121,67 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 					ref={ setBlockStylesAnchor }
 					className="block-editor-block-styles"
 				>
-					<div className="block-editor-block-styles__variants">
-						{ stylesToRender.map( ( style ) => {
-							const buttonText = style.label || style.name;
-							return (
-								<Button
-									className="block-editor-block-styles__item"
-									key={ style.name }
-									tone="neutral"
-									variant={
-										activeStyle.name === style.name
-											? 'solid'
-											: 'outline'
-									}
-									onMouseEnter={ () =>
-										styleItemHandler( style )
-									}
-									onFocus={ () => styleItemHandler( style ) }
-									onMouseLeave={ () =>
-										styleItemHandler( null )
-									}
-									onBlur={ () => styleItemHandler( null ) }
-									onClick={ () =>
-										onSelectStylePreview( style )
-									}
-									aria-current={
-										activeStyle.name === style.name
-									}
-								>
-									<Truncate
-										numberOfLines={ 3 }
-										className="block-editor-block-styles__item-text"
+					<Composite
+						role="radiogroup"
+						aria-label={ __( 'Styles' ) }
+						className="block-editor-block-styles__variants"
+						defaultActiveId={ `${ instanceId }-${ activeStyle.name }` }
+						focusLoop
+						focusWrap
+						focusShift
+					>
+						{ styleRows.map( ( row, rowIndex ) => (
+							<Composite.Row
+								key={ rowIndex }
+								className="block-editor-block-styles__row"
+							>
+								{ row.map( ( style ) => (
+									<Composite.Item
+										key={ style.name }
+										id={ `${ instanceId }-${ style.name }` }
+										render={
+											<Button
+												className="block-editor-block-styles__item"
+												tone="neutral"
+												variant={
+													activeStyle.name ===
+													style.name
+														? 'solid'
+														: 'outline'
+												}
+											/>
+										}
+										role="radio"
+										aria-checked={
+											activeStyle.name === style.name
+										}
+										onMouseEnter={ () =>
+											styleItemHandler( style )
+										}
+										onFocus={ () =>
+											styleItemHandler( style )
+										}
+										onMouseLeave={ () =>
+											styleItemHandler( null )
+										}
+										onBlur={ () =>
+											styleItemHandler( null )
+										}
+										onClick={ () =>
+											onSelectStylePreview( style )
+										}
 									>
-										{ buttonText }
-									</Truncate>
-								</Button>
-							);
-						} ) }
-					</div>
+										<Truncate
+											numberOfLines={ 3 }
+											className="block-editor-block-styles__item-text"
+										>
+											{ style.label || style.name }
+										</Truncate>
+									</Composite.Item>
+								) ) }
+							</Composite.Row>
+						) ) }
+					</Composite>
 					{ previewBlocks && (
 						<PreviewBlockPopover
 							blocks={ previewBlocks }

@@ -12,7 +12,7 @@
 
 ### Enhancements
 
--   `BlockStyles`: Use the `Button` component from `@wordpress/ui`, and let a style label wrap onto up to three lines before it is truncated with an ellipsis, so that longer names stay readable without hovering ([#40331](https://github.com/WordPress/gutenberg/issues/40331)).
+-   `BlockStyles`: Use `Button` from `@wordpress/ui`, truncate long labels after three lines, and navigate the variations as a radio group ([#40331](https://github.com/WordPress/gutenberg/issues/40331)).
 -   Patterns explorer: Refactor the category sidebar to use `Tabs` ([#81807](https://github.com/WordPress/gutenberg/pull/81807)).
 -   Show separate horizontal and vertical block spacing controls in the block inspector only for Flex and Grid layouts, while retaining axial gap support in Global Styles. Responsive Grid column calculations use the horizontal gap, while Flow and Constrained layouts use the vertical gap when receiving an axial value ([#81476](https://github.com/WordPress/gutenberg/pull/81476)).
 
