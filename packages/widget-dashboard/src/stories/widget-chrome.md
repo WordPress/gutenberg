@@ -17,6 +17,8 @@ The chrome reads the widget type and materializes each field in one of three are
 
 The header takes the identity (`icon`, `title`, `help`), the high-relevance `attributes` inline plus the settings trigger for the full schema, and the low-relevance `actions` in the More menu. The content belongs to the render module, fed the attribute values. The footer takes the promoted `actions`.
 
+Wherever a link action lands, one rule applies: a target the host recognizes as one of its own routes mounts the host router's link and navigates client-side; every other link, and any `download` or `openInNewTab`, keeps the plain anchor.
+
 ## The frame
 
 The dashboard widget interprets `presentation` and determines how much chrome a widget gets.

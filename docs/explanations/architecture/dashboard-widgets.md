@@ -90,6 +90,7 @@ The dashboard engine ([`@wordpress/widget-dashboard`](https://github.com/WordPre
 -   Owns the layout array and its persistence.
 -   Wraps every instance in its own chrome: header, toolbars, error boundary, Suspense fallback.
 -   Passes `resolveWidgetModule` down through its context, overridable for tests and Storybook.
+-   Provides the `links` host capability at its route layer: an action href it recognizes as one of its own routes mounts the router's link and navigates client-side.
 
 The same `WidgetType` could be rendered by any other host, and where and how to render belongs entirely to the host. Every host is a consumer of the package, but not every consumer is a host: tests, Storybook, or a picker that only lists widget types consume the same contract without rendering anything.
 
