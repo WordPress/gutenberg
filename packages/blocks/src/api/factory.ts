@@ -514,40 +514,10 @@ export function getBlockTransforms(
 		return [];
 	}
 
-	const usingMobileTransformations =
-		transforms.supportedMobileTransforms &&
-		Array.isArray( transforms.supportedMobileTransforms );
-	const filteredTransforms = usingMobileTransformations
-		? directionTransforms.filter( ( t ) => {
-				if ( t.type === 'raw' ) {
-					return true;
-				}
-
-				if ( t.type === 'prefix' ) {
-					return true;
-				}
-
-				if ( ! t.blocks || ! t.blocks.length ) {
-					return false;
-				}
-
-				if ( isWildcardBlockTransform( t ) ) {
-					return true;
-				}
-
-				return t.blocks.every( ( transformBlockName ) =>
-					transforms.supportedMobileTransforms!.includes(
-						transformBlockName
-					)
-				);
-		  } )
-		: directionTransforms;
-
 	// Map transforms to normal form.
-	return filteredTransforms.map( ( transform ) => ( {
+	return directionTransforms.map( ( transform ) => ( {
 		...transform,
 		blockName: blockType.name,
-		usingMobileTransformations,
 	} ) );
 }
 

@@ -232,16 +232,6 @@ interface BlockTransformBase {
 	 * block type itself.
 	 */
 	blockName?: string;
-	/**
-	 * Whether the transforms of the declaring block type are filtered by
-	 * `transforms.supportedMobileTransforms`. Added by `getBlockTransforms`
-	 * when normalizing a transform, not declared by the block type itself.
-	 */
-	usingMobileTransformations?: boolean;
-	/**
-	 * The transformations available for mobile devices.
-	 */
-	supportedMobileTransforms?: string[];
 }
 
 /**
@@ -667,10 +657,6 @@ export interface BlockType<
 		 * Transforms from this block type to another block type.
 		 */
 		to?: BlockTransform[];
-		/**
-		 * The transformations available for mobile devices.
-		 */
-		supportedMobileTransforms?: string[];
 	};
 	/**
 	 * Array of the names of context values to inherit from
