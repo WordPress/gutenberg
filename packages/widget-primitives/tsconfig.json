@@ -6,7 +6,7 @@
 	},
 	"references": [
 		{ "path": "./tsconfig.build.json" },
-		{ "path": "../dataviews" },
+		{ "path": "../dataviews/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" }
 	]
 }
