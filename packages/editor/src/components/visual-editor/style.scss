@@ -17,13 +17,9 @@
 		background-color: transparent;
 	}
 
-	// Centralize the editor horizontally.
-	align-items: center;
-	// The canvas is the single flex item, stacked on the block axis so that
-	// `align-items: center` below centers it horizontally. Without this the
-	// container defaults to `row`, where `align-items` centers vertically
-	// instead and horizontal centering falls to the canvas's own auto margins.
+	// Centralize the editor.
 	flex-direction: column;
+	align-items: center;
 	justify-content: center;
 
 	@media (prefers-reduced-motion: no-preference) {

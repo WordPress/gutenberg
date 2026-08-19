@@ -6,6 +6,7 @@
 
 -   Register the editor and block editor keyboard shortcuts from the editor provider, so shortcuts work for consumers that mount the editor without rendering `EditorKeyboardShortcutsRegister` themselves ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
 -   Header: Allow the Back button column to grow when "Show button text labels" is enabled so the label is not obscured by the following controls ([#81701](https://github.com/WordPress/gutenberg/pull/81701)).
+-   Device Preview: Center the editor canvas with the canvas container's own flex alignment rather than the canvas's auto margins, which were conditional on the resize handles being active. Switching from the mobile or tablet preview back to desktop no longer expands the canvas from the left edge ([#81484](https://github.com/WordPress/gutenberg/pull/81484)).
 
 ## 14.53.0 (2026-08-12)
 
@@ -27,7 +28,6 @@
 
 -   Device Preview: Keep tablet and mobile iframe widths inside their responsive breakpoints so media queries remain accurate at browser zoom levels.
 -   Document tools: Fix icon button focus styles to use the design system `outset-ring__focus` mixin ([#81115](https://github.com/WordPress/gutenberg/pull/81115)).
--   Device Preview: Center the editor canvas with the canvas container's own flex alignment rather than the canvas's auto margins, which were conditional on the resize handles being active. Switching from the mobile or tablet preview back to desktop no longer expands the canvas from the left edge ([#81484](https://github.com/WordPress/gutenberg/pull/81484)).
 
 ## 14.52.0 (2026-07-29)
 
