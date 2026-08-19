@@ -686,6 +686,30 @@ describe( 'Menu', () => {
 		);
 	} );
 
+	it( 'renders numeric zero in item layout slots', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Menu.Root>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.Item prefix={ 0 } suffix={ 0 }>
+						<Menu.ItemLabel>Zero values</Menu.ItemLabel>
+					</Menu.Item>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+
+		const item = await screen.findByRole( 'menuitem', {
+			name: 'Zero values',
+		} );
+
+		expect( queryItemPrefix( item ) ).toHaveTextContent( '0' );
+		expect( queryItemSuffix( item ) ).toHaveTextContent( '0' );
+	} );
+
 	it( 'hides presentational prefixes from assistive technology', async () => {
 		const user = userEvent.setup();
 

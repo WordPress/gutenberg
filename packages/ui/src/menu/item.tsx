@@ -125,6 +125,16 @@ function ItemContent( {
 	shortcutDescriptionId?: string;
 	trailing?: ItemProps[ 'suffix' ];
 } ) {
+	const hasPrefix = Children.toArray( prefix ).some(
+		( child ) => child !== ''
+	);
+	const hasSuffix = Children.toArray( suffix ).some(
+		( child ) => child !== ''
+	);
+	const hasTrailing = Children.toArray( trailing ).some(
+		( child ) => child !== ''
+	);
+
 	/*
 	 * Content comes first in the DOM because Base UI falls back to the item's
 	 * textContent for typeahead. CSS grid still places the optional
@@ -136,7 +146,7 @@ function ItemContent( {
 				<span className={ styles[ 'item-children' ] }>
 					{ children }
 				</span>
-				{ suffix && (
+				{ hasSuffix && (
 					<span className={ styles[ 'item-suffix' ] }>
 						{ suffix }
 					</span>
@@ -146,13 +156,13 @@ function ItemContent( {
 						<KeyboardShortcutDisplay shortcut={ shortcut } />
 					</span>
 				) }
-				{ trailing && (
+				{ hasTrailing && (
 					<span className={ styles[ 'item-trailing' ] }>
 						{ trailing }
 					</span>
 				) }
 			</span>
-			{ prefix && (
+			{ hasPrefix && (
 				<span aria-hidden="true" className={ styles[ 'item-prefix' ] }>
 					{ prefix }
 				</span>
