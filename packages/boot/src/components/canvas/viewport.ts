@@ -1,4 +1,4 @@
-export const DEFAULT_DEVICE_TYPE = 'Desktop';
+const DEFAULT_DEVICE_TYPE = 'Desktop';
 
 /*
  * Lowercase in the URL, PascalCase in the editor store. Duplicated in

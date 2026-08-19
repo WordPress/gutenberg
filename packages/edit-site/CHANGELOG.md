@@ -16,7 +16,7 @@
 
 ### Bug Fixes
 
--   Open an entity at the width its `viewport` param asks for through the editor provider rather than a sync effect, so the width comes from the theme's breakpoints rather than the defaults ([#81750](https://github.com/WordPress/gutenberg/pull/81750)).
+-   Open an entity at the width its `viewport` param asks for through the editor provider rather than a sync effect, so the width comes from the theme's breakpoints rather than the defaults, and stop writing the current width back into the param when leaving an entity ([#81750](https://github.com/WordPress/gutenberg/pull/81750)).
 
 ## 7.2.0 (2026-08-12)
 

@@ -144,7 +144,7 @@ function useBlockEditorProps( post, template, mode ) {
  * @param {Object}  props.settings                       The editor settings.
  * @param {boolean} props.recovery                       Indicates if the editor is in recovery mode.
  * @param {Array}   props.initialEdits                   The initial edits for the editor.
- * @param {string}  [props.initialViewport]              The device type an entity opens at, one of those `setDeviceType` accepts. Applied whenever it or the entity changes, so a width set from the device preview does not follow the user into the next entity. The current width is left alone when omitted.
+ * @param {string}  [props.initialViewport]              The device type an entity opens at, one of those `setDeviceType` accepts. Each entity opens at the width it names, so a width set from the device preview is view state that does not follow the user into the next one. The current width is left alone when omitted.
  * @param {Object}  props.children                       The child components.
  * @param {Object}  [props.BlockEditorProviderComponent] The block editor provider component to use. Defaults to ExperimentalBlockEditorProvider.
  * @param {Object}  [props.__unstableTemplate]           The template object.
@@ -375,9 +375,9 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			return () => setEditedPost( null, null );
 		}, [ post.type, post.id, setEditedPost, removeNotice ] );
 
-		// Opens the entity at the width it asks for. Keyed on the entity rather
-		// than on the width alone, so that moving to another one leaves a width
-		// set from the device preview behind.
+		// Opens the entity at the width it asks for. Keyed on the entity as well
+		// as the width, so that moving to another one leaves a width set from
+		// the device preview behind.
 		useEffect( () => {
 			if ( initialViewport ) {
 				setCanvasWidth( initialCanvasWidth );
