@@ -6,7 +6,7 @@ JSON schemas are used by code editors to offer tooltips, autocomplete, and valid
 
 ## What a schema does and does not check
 
-A schema checks the _shape_ of a file, not whether that file does anything. Every one of these files is read by something: WordPress reads most of them, the `wp-env` tool reads `.wp-env.json`. The schema is deliberately more permissive than that code.
+A schema checks the _shape_ of a file, not whether that file does anything in the system. In that way, the schema is deliberately more permissive than WordPress itself.
 
 Take `theme.json`. Three sets, each contained in the one above it:
 
