@@ -12,7 +12,7 @@ import {
 	BaseControl,
 	Button,
 	Icon as WCIcon,
-	__experimentalInputControl as InputControl,
+	__experimentalInputControl as WCInputControl,
 } from '@wordpress/components';
 import { speak } from '@wordpress/a11y';
 import {
@@ -425,7 +425,7 @@ function CalendarDateControl< Item >( {
 					</Stack>
 
 					{ /* Manual date input */ }
-					<InputControl
+					<WCInputControl
 						ref={ validityTargetRef }
 						type="date"
 						label={ __( 'Date' ) }
@@ -661,7 +661,7 @@ function CalendarDateRangeControl< Item >( {
 						justify="space-between"
 						className="dataviews-controls__date-range-inputs"
 					>
-						<InputControl
+						<WCInputControl
 							ref={ fromInputRef }
 							type="date"
 							label={ __( 'From' ) }
@@ -675,7 +675,7 @@ function CalendarDateRangeControl< Item >( {
 							min={ minConstraint }
 							max={ maxConstraint }
 						/>
-						<InputControl
+						<WCInputControl
 							ref={ toInputRef }
 							type="date"
 							label={ __( 'To' ) }

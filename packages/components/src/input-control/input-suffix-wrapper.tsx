@@ -19,11 +19,11 @@ function UnconnectedInputControlSuffixWrapper(
  *
  * ```jsx
  * import {
- *   __experimentalInputControl as InputControl,
+ *   __experimentalInputControl as WCInputControl,
  *   __experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
  * } from '@wordpress/components';
  *
- * <InputControl
+ * <WCInputControl
  *   suffix={<InputControlSuffixWrapper>%</InputControlSuffixWrapper>}
  * />
  * ```

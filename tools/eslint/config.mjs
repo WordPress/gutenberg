@@ -320,7 +320,7 @@ export default dedupePlugins( [
 						Autocomplete: 'WCAutocomplete',
 						Badge: 'WCBadge',
 						Icon: 'WCIcon',
-						InputControl: 'WCInputControl',
+						__experimentalInputControl: 'WCInputControl',
 						Tooltip: 'WCTooltip',
 					},
 				},
