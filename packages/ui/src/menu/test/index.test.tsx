@@ -9,7 +9,9 @@ import {
 	useState,
 } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
+import type { ReactNode } from 'react';
 import * as Menu from '../index';
+import { useEnableWpCompatOverlaySlot } from '../../utils/use-enable-wp-compat-overlay-slot';
 
 jest.mock( '@wordpress/i18n', () => ( {
 	...jest.requireActual( '@wordpress/i18n' ),
@@ -971,6 +973,83 @@ describe( 'Menu', () => {
 			'EM'
 		);
 	} );
+
+	// Slot is identified by a data attribute, not a user-facing role/text.
+	/* eslint-disable testing-library/no-node-access */
+	describe( 'wp compat overlay slot', () => {
+		const SLOT_SELECTOR = '[data-wp-compat-overlay-slot]';
+
+		// Exercises the public opt-in path rather than poking the flag.
+		function WithSlotEnabled( { children }: { children: ReactNode } ) {
+			useEnableWpCompatOverlaySlot();
+			return <>{ children }</>;
+		}
+
+		afterEach( () => {
+			// The hook is one-way at runtime; reset explicitly between tests.
+			delete ( window as { __wpUiCompatOverlaySlotEnabled?: boolean } )
+				.__wpUiCompatOverlaySlotEnabled;
+			document
+				.querySelectorAll( SLOT_SELECTOR )
+				.forEach( ( element ) => element.remove() );
+		} );
+
+		it( 'portals the popup into the slot when the consumer opts in', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<WithSlotEnabled>
+					<Menu.Root>
+						<Menu.Trigger>Actions</Menu.Trigger>
+						<Menu.Popup>
+							<Menu.Item>
+								<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+							</Menu.Item>
+						</Menu.Popup>
+					</Menu.Root>
+				</WithSlotEnabled>
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Actions' } )
+			);
+
+			const item = await screen.findByRole( 'menuitem', {
+				name: 'Duplicate',
+			} );
+			expect( item ).toBeVisible();
+
+			const slot = document.querySelector( SLOT_SELECTOR );
+			expect( slot ).not.toBeNull();
+			expect( slot ).toContainElement( item );
+		} );
+
+		it( 'does not create a slot when the consumer has not opted in (dormant default)', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<Menu.Root>
+					<Menu.Trigger>Actions</Menu.Trigger>
+					<Menu.Popup>
+						<Menu.Item>
+							<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+						</Menu.Item>
+					</Menu.Popup>
+				</Menu.Root>
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Actions' } )
+			);
+
+			const item = await screen.findByRole( 'menuitem', {
+				name: 'Duplicate',
+			} );
+			expect( item ).toBeVisible();
+			expect( document.querySelector( SLOT_SELECTOR ) ).toBeNull();
+		} );
+	} );
+	/* eslint-enable testing-library/no-node-access */
 
 	it( 'supports custom portal and positioner elements', async () => {
 		const user = userEvent.setup();
