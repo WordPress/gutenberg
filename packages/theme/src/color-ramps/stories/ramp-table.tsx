@@ -1,4 +1,8 @@
 import { forwardRef } from '@wordpress/element';
+import type {
+	ThemeProviderColorRampName,
+	ThemeProviderColorWarning,
+} from '../../theme-provider-color-warnings';
 import type { Ramp } from '../lib/types';
 
 // TODO: show token groups better
@@ -29,16 +33,31 @@ const RAMP_TOKENS_ORDER: { tokenName: keyof Ramp; abbr: string }[] = [
 
 type RampTableProps = {
 	ramps: {
+		name: ThemeProviderColorRampName;
 		seed: {
 			name: keyof Ramp;
 			value: string;
 		};
 		ramp: Record< keyof Ramp, string >;
-		warnings?: string[];
 	}[];
+	warnings?: readonly ThemeProviderColorWarning[];
 };
+
+function hasRampWarning(
+	warnings: readonly ThemeProviderColorWarning[],
+	ramp: ThemeProviderColorRampName,
+	step: keyof Ramp
+) {
+	return warnings.some(
+		( warning ) =>
+			warning.type === 'ramp' &&
+			warning.ramp === ramp &&
+			warning.step === step
+	);
+}
+
 export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
-	function RampTable( { ramps }, forwardedRef ) {
+	function RampTable( { ramps, warnings = [] }, forwardedRef ) {
 		return (
 			<div
 				style={ { width: '100%', overflowX: 'scroll' } }
@@ -67,10 +86,15 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 							{ abbr }
 						</div>
 					) ) }
-					{ ramps.map( ( { seed, ramp, warnings = [] }, i ) =>
+					{ ramps.map( ( { name, seed, ramp }, i ) =>
 						RAMP_TOKENS_ORDER.map( ( { tokenName } ) => (
 							<div
-								key={ `${ seed }-${ i }-${ tokenName }` }
+								key={ `${ name }-${ tokenName }` }
+								title={
+									hasRampWarning( warnings, name, tokenName )
+										? `${ name } ramp, ${ tokenName } step: warning`
+										: undefined
+								}
 								style={ {
 									marginBlockStart: i !== 0 ? 4 : 0,
 									backgroundColor: ramp[ tokenName ],
@@ -80,12 +104,38 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 									height: tokenName === seed.name ? 60 : 40,
 									minWidth: 32,
 									fontSize: 14,
-									outline: warnings.includes( tokenName )
-										? '2px solid red'
+									outline: hasRampWarning(
+										warnings,
+										name,
+										tokenName
+									)
+										? '3px solid #d63638'
 										: '',
-									outlineOffset: '-2px',
+									outlineOffset: '-3px',
+									position: 'relative',
 								} }
 							>
+								{ hasRampWarning(
+									warnings,
+									name,
+									tokenName
+								) ? (
+									<strong
+										aria-hidden="true"
+										style={ {
+											background: '#d63638',
+											color: '#fff',
+											fontSize: 10,
+											insetBlockStart: 0,
+											insetInlineEnd: 0,
+											lineHeight: 1,
+											padding: 2,
+											position: 'absolute',
+										} }
+									>
+										!
+									</strong>
+								) : null }
 								{ tokenName === seed.name ? (
 									<div
 										style={ {
