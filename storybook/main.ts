@@ -274,13 +274,22 @@ const config: StorybookConfig = {
 						{
 							// `postcss-modules` turns CSS composed from another module into a
 							// string before it prepends it to the current stylesheet. Parsing
-							// that string discards the declarations' source metadata. Vite's
-							// later URL-rewrite plugin requires that metadata.
+							// that string discards the declarations' source metadata, which
+							// makes Vite warn even when no asset resolution is needed.
 							postcssPlugin:
-								'restore-composed-css-module-sources',
+								'supply-composed-css-module-source-fallback',
 							OnceExit( root ) {
 								root.walkDecls( ( declaration ) => {
-									if ( ! declaration.source?.input.file ) {
+									const requiresSourceForAssetResolution =
+										/(?:url|image-set)\(/i.test(
+											declaration.value
+										);
+
+									// The fallback file is unsafe when Vite uses it to resolve assets.
+									if (
+										! declaration.source?.input.file &&
+										! requiresSourceForAssetResolution
+									) {
 										declaration.source = root.source;
 									}
 								} );
