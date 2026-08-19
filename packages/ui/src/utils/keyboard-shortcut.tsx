@@ -31,6 +31,12 @@ type ShortcutAriaProps = Pick<
 	'aria-describedby' | 'aria-keyshortcuts'
 >;
 
+/**
+ * Returns shortcut accessibility metadata for an interactive element.
+ *
+ * Render `KeyboardShortcutDescription` with the returned `descriptionId` when
+ * a shortcut is provided.
+ */
 function useKeyboardShortcutProps( {
 	'aria-describedby': ariaDescribedBy,
 	'aria-keyshortcuts': ariaKeyShortcuts,
@@ -51,6 +57,9 @@ function useKeyboardShortcutProps( {
 	};
 }
 
+/**
+ * Renders a localized, visually hidden description for a keyboard shortcut.
+ */
 function KeyboardShortcutDescription( {
 	descriptionId,
 	shortcut,
@@ -73,6 +82,10 @@ function KeyboardShortcutDescription( {
 	);
 }
 
+/**
+ * Renders a visual keyboard shortcut while hiding it from assistive
+ * technology.
+ */
 function KeyboardShortcutDisplay( {
 	className,
 	shortcut,
