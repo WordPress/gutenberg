@@ -7,6 +7,7 @@
 -   Register the editor and block editor keyboard shortcuts from the editor provider, so shortcuts work for consumers that mount the editor without rendering `EditorKeyboardShortcutsRegister` themselves ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
 -   Header: Allow the Back button column to grow when "Show button text labels" is enabled so the label is not obscured by the following controls ([#81701](https://github.com/WordPress/gutenberg/pull/81701)).
 -   Notes: Stop forcing capitalization of the user name in a note byline, so the name is shown as the user set it ([#81788](https://github.com/WordPress/gutenberg/pull/81788)).
+-   Update the admin bar's site icon as the Site Icon is chosen, rather than showing the previous icon until the page is reloaded ([#81501](https://github.com/WordPress/gutenberg/pull/81501)).
 
 ### Internal
 
@@ -33,7 +34,6 @@
 
 -   Device Preview: Keep tablet and mobile iframe widths inside their responsive breakpoints so media queries remain accurate at browser zoom levels.
 -   Document tools: Fix icon button focus styles to use the design system `outset-ring__focus` mixin ([#81115](https://github.com/WordPress/gutenberg/pull/81115)).
--   Update the admin bar's site icon when the Site Icon is saved, instead of showing the previous icon until the page is reloaded. Saving the icon also refetches the site's base data, which holds the icon URL derived from it ([#81483](https://github.com/WordPress/gutenberg/issues/81483)).
 
 ## 14.52.0 (2026-07-29)
 
