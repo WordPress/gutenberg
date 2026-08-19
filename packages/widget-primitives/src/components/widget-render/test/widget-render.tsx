@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import { Suspense } from '@wordpress/element';
 import { WidgetRender } from '../widget-render';
@@ -22,6 +23,8 @@ describe( 'WidgetRender routing', () => {
 		const resolveWidgetModule = jest.fn();
 		const widgetType = {
 			name: 'plugin/code-def',
+			apiVersion: 1,
+			title: 'Code def',
 			renderModule: '',
 			origin: 'code-registered',
 			content: '<!-- wp:test/echo {"label":"routed"} /-->',
@@ -46,6 +49,8 @@ describe( 'WidgetRender routing', () => {
 		} ) );
 		const widgetType = {
 			name: 'core/built-in',
+			apiVersion: 1,
+			title: 'Built-in',
 			renderModule: 'core/built-in/render',
 			origin: 'built-in',
 		} as WidgetType;

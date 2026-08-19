@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom';
 import { render, screen, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { AdminBlockRenderer } from '../admin-block-renderer';
