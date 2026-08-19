@@ -246,11 +246,6 @@ async function preloadResolutions( postType, postId ) {
 			coreSelect.__experimentalGetCurrentGlobalStylesId();
 		if ( globalStylesId ) {
 			tasks.push(
-				core.canUser( 'read', {
-					kind: 'root',
-					name: 'globalStyles',
-					id: globalStylesId,
-				} ),
 				core.canUser( 'update', {
 					kind: 'root',
 					name: 'globalStyles',
@@ -289,19 +284,28 @@ async function preloadResolutions( postType, postId ) {
 		}
 
 		// Phase 3: requests whose capability check only resolved in phase 2.
-		if (
-			globalStylesId &&
-			coreSelect.canUser( 'update', {
-				kind: 'root',
-				name: 'globalStyles',
-				id: globalStylesId,
-			} )
-		) {
-			await core.getEntityRecord(
-				'root',
-				'globalStyles',
-				globalStylesId
-			);
+		if ( globalStylesId ) {
+			if (
+				coreSelect.canUser( 'update', {
+					kind: 'root',
+					name: 'globalStyles',
+					id: globalStylesId,
+				} )
+			) {
+				await core.getEntityRecord(
+					'root',
+					'globalStyles',
+					globalStylesId
+				);
+			} else {
+				// Fetch for non-admin users using view context.
+				await core.getEntityRecord(
+					'root',
+					'globalStyles',
+					globalStylesId,
+					{ context: 'view' }
+				);
+			}
 		}
 	} catch {
 		// Resolver failures here would also surface on demand; don't block render.
