@@ -15,7 +15,7 @@ import {
 	Button,
 	PanelBody,
 	TextControl,
-	TextareaControl,
+	TextareaControl as WCTextareaControl,
 	BaseControl,
 	Spinner,
 } from '@wordpress/components';
@@ -225,7 +225,7 @@ const PlaylistTrackEdit = ( {
 						</BaseControl>
 					</MediaUploadCheck>
 					{ !! image && (
-						<TextareaControl
+						<WCTextareaControl
 							label={ __( 'Alternative text' ) }
 							value={ imageAlt || '' }
 							onChange={ ( value ) =>

@@ -61,14 +61,14 @@ function UnforwardedTextareaControl(
  * vertically when the cursor reaches the bottom of the field.
  *
  * ```jsx
- * import { TextareaControl } from '@wordpress/components';
+ * import { TextareaControl as WCTextareaControl } from '@wordpress/components';
  * import { useState } from '@wordpress/element';
  *
  * const MyTextareaControl = () => {
  *   const [ text, setText ] = useState( '' );
  *
  *   return (
- *     <TextareaControl
+ *     <WCTextareaControl
  *       label="Text"
  *       help="Enter some text"
  *       value={ text }
