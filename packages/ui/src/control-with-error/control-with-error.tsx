@@ -232,6 +232,18 @@ export const ControlWithError = forwardRef<
 		}
 	};
 
+	// Keep the message in sync while the user edits the control. Editing does
+	// not necessarily re-render this component (e.g. when the child control is
+	// uncontrolled), so the validity must be re-read from the DOM when an
+	// `input` event bubbles up from the control.
+	const onInput = () => {
+		// While async validation is pending, keep its indicator instead of
+		// showing a message its result may supersede.
+		if ( customValidity?.type !== 'validating' ) {
+			setErrorMessage( getValidityTarget()?.validationMessage );
+		}
+	};
+
 	const messageId = useId();
 
 	const message = ( () => {
@@ -294,6 +306,7 @@ export const ControlWithError = forwardRef<
 		ref: [ forwardedRef, wrapperRef ],
 		props: mergeProps< 'div' >( restProps, {
 			onBlur,
+			onInput,
 			children: (
 				<>
 					{ cloneElement( children, {

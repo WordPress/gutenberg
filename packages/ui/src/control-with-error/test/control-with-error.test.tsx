@@ -358,6 +358,45 @@ describe( 'ControlWithError', () => {
 			// Form is not submitted
 			expect( onSubmit ).not.toHaveBeenCalled();
 		} );
+
+		it( 'should clear the native error message while typing resolves the constraint violation', async () => {
+			const user = userEvent.setup();
+			render(
+				<form onSubmit={ ( event ) => event.preventDefault() }>
+					{ /* Uncontrolled, so typing does not re-render the component. */ }
+					<ValidatedInputControl label="Text" required />
+					<button type="submit">Submit</button>
+				</form>
+			);
+
+			const input = screen.getByRole< HTMLInputElement >( 'textbox', {
+				name: 'Text (Required)',
+			} );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Submit' } )
+			);
+
+			const errorMessage = input.validationMessage;
+			expect( errorMessage ).not.toBe( '' );
+			await waitFor( () => {
+				expect( screen.getByText( errorMessage ) ).toBeVisible();
+			} );
+
+			await user.type( input, 'some text' );
+
+			await waitFor( () => {
+				expect(
+					screen.queryByText( errorMessage )
+				).not.toBeInTheDocument();
+			} );
+
+			// Clearing the input brings the constraint violation back.
+			await user.clear( input );
+			await waitFor( () => {
+				expect( screen.getByText( errorMessage ) ).toBeVisible();
+			} );
+		} );
 	} );
 
 	describe( 'aria-describedby', () => {
