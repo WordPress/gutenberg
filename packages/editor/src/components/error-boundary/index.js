@@ -22,45 +22,66 @@ function getContent() {
 }
 
 // A boundary catches whatever was thrown, which is not always an `Error`.
+function getErrorName( error ) {
+	return ( error instanceof Error && error.name ) || 'Error';
+}
+
 function getErrorMessage( error ) {
-	if ( error instanceof Error ) {
-		const message = [ error.name, error.message ]
-			.filter( Boolean )
-			.join( ': ' );
-		if ( message ) {
-			return message;
-		}
-	} else if ( typeof error === 'string' && error ) {
+	if ( typeof error === 'string' && error ) {
 		return error;
-	} else if ( typeof error?.message === 'string' && error.message ) {
+	}
+
+	if ( typeof error?.message === 'string' && error.message ) {
 		return error.message;
 	}
 
-	return __( 'An unknown error occurred.' );
+	return 'An unknown error occurred.';
+}
+
+// The sections of the report, shared by the copied Markdown and the details
+// panel so that the two cannot drift apart. Deliberately untranslated: both
+// are developer-facing, and the report is pasted into a bug report.
+function getErrorSections( error, componentStack ) {
+	const sections = [
+		{ label: getErrorName( error ), content: getErrorMessage( error ) },
+	];
+
+	if ( componentStack ) {
+		sections.push( {
+			label: 'Component stack',
+			content: componentStack.trim(),
+			preformatted: true,
+		} );
+	}
+
+	if ( error?.stack ) {
+		sections.push( {
+			label: 'Stack',
+			content: error.stack.trim(),
+			preformatted: true,
+		} );
+	}
+
+	sections.push( {
+		label: 'Environment',
+		content: `User agent: ${ window.navigator.userAgent }`,
+		preformatted: true,
+	} );
+
+	return sections;
 }
 
 // Markdown, so the report stays readable as plain text and renders when pasted
-// into a bug report. Deliberately untranslated: the audience is a developer.
+// into a bug report.
 function getErrorReport( error, componentStack ) {
-	const sections = [ `### Editor error\n\n${ getErrorMessage( error ) }` ];
-
-	if ( error?.stack ) {
-		sections.push(
-			`#### Stack trace\n\n\`\`\`\n${ error.stack.trim() }\n\`\`\``
-		);
-	}
-
-	if ( componentStack ) {
-		sections.push(
-			`#### Component stack\n\n\`\`\`\n${ componentStack.trim() }\n\`\`\``
-		);
-	}
-
-	sections.push(
-		`#### Environment\n\n- User agent: ${ window.navigator.userAgent }`
+	const sections = getErrorSections( error, componentStack ).map(
+		( { label, content, preformatted } ) =>
+			`**${ label }**\n\n${
+				preformatted ? `\`\`\`\n${ content }\n\`\`\`` : content
+			}`
 	);
 
-	return sections.join( '\n\n' );
+	return [ '### Error report', ...sections ].join( '\n\n' );
 }
 
 function CopyButton( { text, children, variant = 'outline' } ) {
@@ -72,11 +93,29 @@ function CopyButton( { text, children, variant = 'outline' } ) {
 	);
 }
 
-function ErrorDetail( { label, children } ) {
+function ErrorReport( { error, componentStack } ) {
 	return (
-		<Stack direction="column" gap="xs">
-			<Text variant="heading-sm">{ label }</Text>
-			<pre className="editor-error-boundary__detail">{ children }</pre>
+		<Stack
+			className="editor-error-boundary__report"
+			direction="column"
+			gap="md"
+		>
+			<Text
+				className="editor-error-boundary__report-title"
+				variant="body-sm"
+			>
+				{ __( 'Error report' ) }
+			</Text>
+			{ getErrorSections( error, componentStack ).map(
+				( { label, content } ) => (
+					<Stack key={ label } direction="column" gap="xs">
+						<Text variant="heading-sm">{ label }</Text>
+						<pre className="editor-error-boundary__report-section">
+							{ content }
+						</pre>
+					</Stack>
+				)
+			) }
 		</Stack>
 	);
 }
@@ -97,16 +136,10 @@ function ErrorDetails( { error, componentStack } ) {
 				{ __( 'Show error details' ) }
 			</Collapsible.Trigger>
 			<Collapsible.Panel>
-				<Stack direction="column" gap="md">
-					<ErrorDetail label={ __( 'Error' ) }>
-						{ getErrorMessage( error ) }
-					</ErrorDetail>
-					{ componentStack && (
-						<ErrorDetail label={ __( 'Component stack' ) }>
-							{ componentStack.trim() }
-						</ErrorDetail>
-					) }
-				</Stack>
+				<ErrorReport
+					error={ error }
+					componentStack={ componentStack }
+				/>
 			</Collapsible.Panel>
 		</Collapsible.Root>
 	);

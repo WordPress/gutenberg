@@ -21,18 +21,27 @@
 	padding-top: $grid-unit-15;
 }
 
-.editor-error-boundary__detail {
-	margin: 0;
-	padding: $grid-unit-10;
-	max-height: 180px;
+.editor-error-boundary__report {
+	max-height: 320px;
+	padding: $grid-unit-15;
 	overflow: auto;
 	overflow-anchor: none;
+	color: $gray-900;
+	background-color: $gray-100;
+	border-radius: $radius-small;
+}
+
+.editor-error-boundary__report-title {
+	color: $gray-700;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.editor-error-boundary__report-section {
+	margin: 0;
 	font-family: $font-family-mono;
 	font-size: $helptext-font-size;
 	line-height: 1.6;
 	white-space: pre-wrap;
 	overflow-wrap: break-word;
-	color: $gray-900;
-	background-color: $gray-100;
-	border-radius: $radius-small;
 }
