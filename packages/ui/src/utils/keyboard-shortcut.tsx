@@ -1,5 +1,5 @@
 import type { AriaAttributes } from 'react';
-import { useId } from '@wordpress/element';
+import { forwardRef, useId } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { VisuallyHidden } from '../visually-hidden';
 
@@ -60,18 +60,18 @@ function useKeyboardShortcutProps( {
 /**
  * Renders a localized, visually hidden description for a keyboard shortcut.
  */
-function KeyboardShortcutDescription( {
-	descriptionId,
-	shortcut,
-}: {
-	descriptionId: string;
-	shortcut: KeyboardShortcut;
-} ) {
+const KeyboardShortcutDescription = forwardRef<
+	HTMLSpanElement,
+	{
+		descriptionId: string;
+		shortcut: KeyboardShortcut;
+	}
+>( function KeyboardShortcutDescription( { descriptionId, shortcut }, ref ) {
 	return (
 		<VisuallyHidden
 			id={ descriptionId }
 			aria-hidden="true"
-			render={ <span /> }
+			render={ <span ref={ ref } /> }
 		>
 			{ sprintf(
 				/* translators: %s: keyboard shortcut. */
@@ -80,25 +80,25 @@ function KeyboardShortcutDescription( {
 			) }
 		</VisuallyHidden>
 	);
-}
+} );
 
 /**
  * Renders a visual keyboard shortcut while hiding it from assistive
  * technology.
  */
-function KeyboardShortcutDisplay( {
-	className,
-	shortcut,
-}: {
-	className?: string;
-	shortcut: KeyboardShortcut;
-} ) {
+const KeyboardShortcutDisplay = forwardRef<
+	HTMLSpanElement,
+	{
+		className?: string;
+		shortcut: KeyboardShortcut;
+	}
+>( function KeyboardShortcutDisplay( { className, shortcut }, ref ) {
 	return (
-		<span aria-hidden="true" className={ className } dir="ltr">
+		<span ref={ ref } aria-hidden="true" className={ className } dir="ltr">
 			{ shortcut.displayShortcut }
 		</span>
 	);
-}
+} );
 
 export {
 	KeyboardShortcutDescription,

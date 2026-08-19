@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { useId } from '@wordpress/element';
+import { createRef, useId } from '@wordpress/element';
 import {
 	KeyboardShortcutDescription,
 	KeyboardShortcutDisplay,
@@ -61,6 +61,33 @@ function ShortcutTargetWithExternalDescription( {
 }
 
 describe( 'keyboard shortcut utilities', () => {
+	it( 'forwards the description ref to its span', () => {
+		const ref = createRef< HTMLSpanElement >();
+		const descriptionId = 'shortcut-description';
+
+		render(
+			<KeyboardShortcutDescription
+				ref={ ref }
+				descriptionId={ descriptionId }
+				shortcut={ shortcut }
+			/>
+		);
+
+		expect( ref.current ).toBe(
+			screen.getByText( 'Keyboard shortcut: Command S' )
+		);
+		expect( ref.current ).toBeInstanceOf( HTMLSpanElement );
+	} );
+
+	it( 'forwards the display ref to its span', () => {
+		const ref = createRef< HTMLSpanElement >();
+
+		render( <KeyboardShortcutDisplay ref={ ref } shortcut={ shortcut } /> );
+
+		expect( ref.current ).toBe( screen.getByText( '⌘S' ) );
+		expect( ref.current ).toBeInstanceOf( HTMLSpanElement );
+	} );
+
 	it( 'adds shortcut metadata and a human-readable accessible description to the target', () => {
 		render( <ShortcutTarget /> );
 
