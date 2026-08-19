@@ -156,7 +156,10 @@ export const Default: StoryObj< typeof ColorGen > = {
 			/>
 		);
 	},
-	args: {},
+	args: {
+		background: DEFAULT_SEED_COLORS.background,
+		primary: DEFAULT_SEED_COLORS.primary,
+	},
 };
 
 const SAMPLE_COMBINATIONS = [
