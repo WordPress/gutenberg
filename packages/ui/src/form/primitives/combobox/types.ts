@@ -49,7 +49,7 @@ export type ComboboxGroupLabelProps = ComponentProps<
 
 export type ComboboxInputProps = Omit<
 	ComponentProps< typeof _Combobox.Input >,
-	'size'
+	'size' | 'type' // The combobox role is only valid on input type="text".
 >;
 
 export type ComboboxInputGroupProps = ComponentProps<
