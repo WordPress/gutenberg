@@ -1,18 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { MenuItem } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
-/**
- * Internal dependencies
- */
 import usePatternCategories from '../sidebar-navigation-screen-patterns/use-pattern-categories';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 
 const { RenamePatternCategoryModal } = unlock( patternsPrivateApis );

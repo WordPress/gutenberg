@@ -199,15 +199,9 @@ Begin by opening the main `src/index.js` file. Then pull in the required JavaScr
 
 ```js
 // File: src/index.js
-
-// External dependencies.
 import { createRoot } from 'react-dom';
-
-// WordPress dependencies.
 import domReady from '@wordpress/dom-ready';
 import { registerCoreBlocks } from '@wordpress/block-library';
-
-// Internal dependencies.
 import Editor from './editor';
 import './styles.scss';
 ```

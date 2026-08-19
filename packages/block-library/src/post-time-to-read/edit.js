@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
@@ -12,10 +9,6 @@ import {
 import { __unstableSerializeAndClean } from '@wordpress/blocks';
 import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
 import { count as wordCount } from '@wordpress/wordcount';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 function PostTimeToReadEdit( { attributes, setAttributes, context } ) {

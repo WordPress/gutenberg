@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState, useCallback, useEffect, useRef } from '@wordpress/element';
 import {
 	Button,
@@ -24,10 +17,6 @@ import {
 	cloudUpload,
 	download as downloadIcon,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { Cropper } from '../react/components/cropper';
 import { useCropperReducer } from '../react/hooks/use-cropper-reducer';
 import {
@@ -395,7 +384,6 @@ const WithControlsComponent = () => {
 					</FlexItem>
 					<FlexItem>
 						<SelectControl
-							__next40pxDefaultSize
 							label="Aspect ratio"
 							hideLabelFromVision
 							value={ aspectRatioValue }
@@ -417,7 +405,6 @@ const WithControlsComponent = () => {
 					</FlexItem>
 					<FlexItem>
 						<SelectControl
-							__next40pxDefaultSize
 							label="Grid"
 							hideLabelFromVision
 							value={ gridMode }
@@ -829,7 +816,6 @@ const DebugComponent = () => {
 					</FlexItem>
 					<FlexItem>
 						<SelectControl
-							__next40pxDefaultSize
 							label="Format"
 							hideLabelFromVision
 							value={ exportFormat as 'image/jpeg' }

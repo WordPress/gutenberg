@@ -1,22 +1,11 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as coreStore } from '@wordpress/core-data';
 import { SlotFillProvider } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import EditPostPreferencesModal from '../';
 import { store as editorStore } from '../../../store';
 import { lock } from '../../../lock-unlock';

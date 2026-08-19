@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import { renderHook, act } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import {
 	useBlockBindingsUtils,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import {
 	useEntityBinding,
 	buildNavigationLinkEntityBinding,

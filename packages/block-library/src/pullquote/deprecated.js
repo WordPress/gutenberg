@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	getColorClassName,
 	getColorObjectByAttributeValues,
@@ -14,10 +7,6 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { select } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { SOLID_COLOR_CLASS } from './shared';
 import migrateTextAlignAttributeToBlockSupport from '../utils/migrate-text-align';
 

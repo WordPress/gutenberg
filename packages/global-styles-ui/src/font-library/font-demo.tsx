@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalText as WCText } from '@wordpress/components';
 import { useContext, useEffect, useState, useRef } from '@wordpress/element';
 import type { FontFamily, FontFace } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { FontLibraryContext } from './context';
 import {
 	getFacePreviewStyle,

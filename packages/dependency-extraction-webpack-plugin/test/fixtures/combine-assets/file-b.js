@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import TokenList from '@wordpress/token-list';
 
 const tokens = new TokenList( 'abc def' );

@@ -29,6 +29,7 @@ export {
 	getResolvedValue,
 	splitSelectorList,
 } from './utils/common';
+export { privateApis } from './private-apis';
 
 // Types
 export type * from './types';

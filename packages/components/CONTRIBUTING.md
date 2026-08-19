@@ -627,14 +627,10 @@ Each component that is exported from the `@wordpress/components` package should 
 # `ComponentName`
 
 <!-- If component is experimental, add the following section: -->
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
+<p class="callout callout-alert">This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.</p>
 
 <!-- If component is deprecated, add the following section: -->
-<div class="callout callout-alert">
-This component is deprecated. Please use `{other component}` from the `{other package}` package instead.
-</div>
+<p class="callout callout-alert">This component is deprecated. Please use `{other component}` from the `{other package}` package instead.</p>
 
 Description of the component.
 

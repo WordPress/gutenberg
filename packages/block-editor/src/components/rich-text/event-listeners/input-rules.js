@@ -1,13 +1,9 @@
-/**
- * WordPress dependencies
- */
-import { insert, toHTMLString } from '@wordpress/rich-text';
+import {
+	insert,
+	toHTMLString,
+	privateApis as richTextPrivateApis,
+} from '@wordpress/rich-text';
 import { getBlockTransforms, findTransform } from '@wordpress/blocks';
-import { privateApis as composePrivateApis } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../../store';
 import { preventEventDiscovery } from '../prevent-event-discovery';
 import {
@@ -16,7 +12,7 @@ import {
 } from '../../../utils/selection';
 import { unlock } from '../../../lock-unlock';
 
-const { subscribeDelegatedListener } = unlock( composePrivateApis );
+const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
 export function findSelection( blocks ) {
 	let i = blocks.length;
@@ -117,19 +113,21 @@ export default ( props ) => ( element ) => {
 
 		const value = getValue();
 
-		const transforms = getBlockTransforms( 'from' ).filter(
-			( transform ) => transform.type === 'input'
-		);
-		const transformation = findTransform( transforms, ( item ) => {
-			return item.regExp.test( value.text );
-		} );
+		if ( onReplace ) {
+			const transforms = getBlockTransforms( 'from' ).filter(
+				( transform ) => transform.type === 'input'
+			);
+			const transformation = findTransform( transforms, ( item ) =>
+				item.regExp.test( value.text )
+			);
 
-		if ( transformation ) {
-			onReplace( transformation.transform() );
-			registry
-				.dispatch( blockEditorStore )
-				.__unstableMarkAutomaticChange();
-			return;
+			if ( transformation ) {
+				onReplace( transformation.transform() );
+				registry
+					.dispatch( blockEditorStore )
+					.__unstableMarkAutomaticChange();
+				return;
+			}
 		}
 
 		const transformed = formatTypes.reduce(
@@ -160,13 +158,13 @@ export default ( props ) => ( element ) => {
 
 	// Capture phase so these run before ancestor (writing flow) bubble
 	// handlers, matching the timing of the previous raw element listeners.
-	const unsubscribeInput = subscribeDelegatedListener(
+	const unsubscribeInput = subscribeOwnedListener(
 		element,
 		'input',
 		onInput,
 		true
 	);
-	const unsubscribeCompositionEnd = subscribeDelegatedListener(
+	const unsubscribeCompositionEnd = subscribeOwnedListener(
 		element,
 		'compositionend',
 		onInput,

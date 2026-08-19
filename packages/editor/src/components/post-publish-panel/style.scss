@@ -182,7 +182,7 @@
 }
 
 .post-publish-panel__postpublish-header {
-	font-weight: $font-weight-medium;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 }
 
 .post-publish-panel__postpublish-subheader {

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	DropZone,
@@ -28,6 +21,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 import {
 	archive,
 	audio,
@@ -41,16 +35,13 @@ import {
 	chevronRight,
 } from '@wordpress/icons';
 import { VisuallyHidden, Tooltip } from '@wordpress/ui';
+import { speak } from '@wordpress/a11y';
 import {
 	MediaUpload,
 	uploadMedia,
 	privateApis as mediaUtilsPrivateApis,
 } from '@wordpress/media-utils';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import type { MediaEditProps } from '../../types';
 import useMovingAnimation from './use-moving-animation';
@@ -211,7 +202,7 @@ const archiveMimeTypes = [
 function MediaTitle( { attachment }: { attachment: Attachment< 'view' > } ) {
 	return (
 		<Truncate className="fields__media-edit-filename">
-			{ attachment.title.rendered }
+			{ decodeEntities( attachment.title.rendered ) }
 		</Truncate>
 	);
 }
@@ -355,9 +346,11 @@ function ExpandedMediaEditAttachments( {
 									? sprintf(
 											/* translators: %s: The title of the media item. */
 											__( 'Replace %s' ),
-											(
-												attachment as Attachment< 'view' >
-											 ).title.rendered
+											decodeEntities(
+												(
+													attachment as Attachment< 'view' >
+												 ).title.rendered
+											)
 									  )
 									: __( 'Replace' )
 							}
@@ -838,6 +831,13 @@ export default function MediaEdit< Item >( {
 			setCustomValidity( undefined );
 		}
 	}, [ isTouched, field.isValid, validity ] );
+
+	useEffect( () => {
+		if ( isTouched && customValidity?.message ) {
+			speak( customValidity.message );
+		}
+	}, [ isTouched, customValidity?.message ] );
+
 	const onBlur = useCallback(
 		( event: React.FocusEvent< HTMLElement > ) => {
 			if ( isTouched ) {
@@ -961,25 +961,23 @@ export default function MediaEdit< Item >( {
 				/>
 			</VisuallyHidden>
 			{ customValidity && (
-				<div aria-live="polite">
-					<p
-						className={ clsx(
-							'components-validated-control__indicator',
-							{
-								'is-invalid': customValidity.type === 'invalid',
-								'is-valid': customValidity.type === 'valid',
-							}
-						) }
-					>
-						<WCIcon
-							className="components-validated-control__indicator-icon"
-							icon={ errorIcon }
-							size={ 16 }
-							fill="currentColor"
-						/>
-						{ customValidity.message }
-					</p>
-				</div>
+				<p
+					className={ clsx(
+						'components-validated-control__indicator',
+						{
+							'is-invalid': customValidity.type === 'invalid',
+							'is-valid': customValidity.type === 'valid',
+						}
+					) }
+				>
+					<WCIcon
+						className="components-validated-control__indicator-icon"
+						icon={ errorIcon }
+						size={ 16 }
+						fill="currentColor"
+					/>
+					{ customValidity.message }
+				</p>
 			) }
 		</div>
 	);

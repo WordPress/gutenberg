@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { createPortal, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Popover from '../..';
 import { Provider as SlotFillProvider } from '../../../slot-fill';
 import type { WordPressComponentProps } from '../../../context';

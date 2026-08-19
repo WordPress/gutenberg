@@ -22,7 +22,7 @@
 }
 
 .block-editor-block-card__title {
-	font-weight: $font-weight-medium;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 	display: flex;
 	align-items: center;
 	flex-wrap: wrap;

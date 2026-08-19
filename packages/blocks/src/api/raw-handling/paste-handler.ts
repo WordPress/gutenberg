@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { getPhrasingContentSchema, removeInvalidHTML } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import { htmlToBlocks } from './html-to-blocks';
 import { hasBlockSupport } from '../registration';
 import { getBlockInnerHTML } from '../serializer';

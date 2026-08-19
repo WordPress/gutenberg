@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { act } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { withFakeTimers } from './with-fake-timers';
 
 /**

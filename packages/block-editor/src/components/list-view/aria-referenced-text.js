@@ -1,29 +1,22 @@
 /**
- * WordPress dependencies
- */
-import { useRef, useEffect } from '@wordpress/element';
-
-/**
  * A component specifically designed to be used as an element referenced
  * by ARIA attributes such as `aria-labelledby` or `aria-describedby`.
  *
- * @param {Object}          props          Props.
- * @param {React.ReactNode} props.children
+ * Keying on the text is what makes this component more than a plain `div`:
+ * it makes React replace the element rather than update the existing text
+ * node in place. Firefox fails to recompute the accessible description when
+ * only the text node of a hidden element changes, so screen readers announce
+ * a stale value.
+ *
+ * @see https://github.com/WordPress/gutenberg/pull/51035
+ *
+ * @param {Object} props          Props.
+ * @param {string} props.children Text to reference. Must be a string, since
+ *                                it is used as the key.
  */
 export default function AriaReferencedText( { children, ...props } ) {
-	const ref = useRef();
-
-	useEffect( () => {
-		if ( ref.current ) {
-			// This seems like a no-op, but it fixes a bug in Firefox where
-			// it fails to recompute the text when only the text node changes.
-			// @see https://github.com/WordPress/gutenberg/pull/51035
-			ref.current.textContent = ref.current.textContent;
-		}
-	}, [ children ] );
-
 	return (
-		<div hidden { ...props } ref={ ref }>
+		<div hidden { ...props } key={ children }>
 			{ children }
 		</div>
 	);

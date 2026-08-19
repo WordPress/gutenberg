@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { link, more, check } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import MenuGroup from '../../menu-group';
 import MenuItem from '..';
 import Shortcut from '../../shortcut';

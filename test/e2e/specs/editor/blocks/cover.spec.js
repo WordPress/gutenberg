@@ -1,16 +1,8 @@
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
 const os = require( 'os' );
 const { randomUUID } = require( 'crypto' );
-
 /** @typedef {import('@playwright/test').Page} Page */
-
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -594,7 +586,7 @@ test.describe( 'Cover', () => {
 
 		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
 		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Responsive editing' } )
+			.getByRole( 'menuitemcheckbox', { name: 'Responsive styles' } )
 			.click();
 		await page.getByRole( 'menuitemradio', { name: 'Tablet' } ).click();
 		await page.keyboard.press( 'Escape' );

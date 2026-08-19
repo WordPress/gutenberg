@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	SelectControl,
 	__experimentalNumberControl as NumberControl,
@@ -10,10 +7,6 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import useDimensionHandler from './use-dimension-handler';
 
 const IMAGE_SIZE_PRESETS = [ 25, 50, 75, 100 ];
@@ -96,7 +89,6 @@ export default function ImageSizeControl( {
 					options={ imageSizeOptions }
 					onChange={ onChangeImage }
 					help={ imageSizeHelp }
-					size="__unstable-large"
 				/>
 			) }
 			{ isResizable && (
@@ -109,7 +101,6 @@ export default function ImageSizeControl( {
 							onChange={ ( value ) =>
 								updateDimension( 'width', value )
 							}
-							size="__unstable-large"
 						/>
 						<NumberControl
 							label={ __( 'Height' ) }
@@ -118,7 +109,6 @@ export default function ImageSizeControl( {
 							onChange={ ( value ) =>
 								updateDimension( 'height', value )
 							}
-							size="__unstable-large"
 						/>
 					</HStack>
 					<ToggleGroupControl

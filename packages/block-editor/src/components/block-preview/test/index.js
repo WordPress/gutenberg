@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import {
 	registerBlockType,
 	unregisterBlockType,
 	createBlock,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { useBlockPreview } from '../';
 import { useBlockProps } from '../../block-list/use-block-props';
 

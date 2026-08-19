@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+## 1.53.0 (2026-08-12)
+
+### Internal
+
+-   Remove `@wordpress/content-types` from the list of core modules using private APIs, as part of removing the content types experiment. [#81340](https://github.com/WordPress/gutenberg/pull/81340)
+
+## 1.52.0 (2026-07-29)
+
+## 1.51.0 (2026-07-14)
+
+### Enhancements
+
+- Allow `@wordpress/global-styles-engine` to opt in to private APIs. ([#79104](https://github.com/WordPress/gutenberg/pull/79104))
+
 ## 1.50.0 (2026-07-01)
 
 ## 1.49.0 (2026-06-24)

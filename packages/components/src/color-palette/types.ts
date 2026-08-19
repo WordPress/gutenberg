@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { CSSProperties, ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { DropdownProps } from '../dropdown/types';
 import type { HeadingSize } from '../heading/types';
 

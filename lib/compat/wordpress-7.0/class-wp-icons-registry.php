@@ -156,6 +156,8 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 					);
 					return false;
 				}
+
+				$icon_properties['content'] = $sanitized_icon_content;
 			}
 
 			$icon = array_merge(

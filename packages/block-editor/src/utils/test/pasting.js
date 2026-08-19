@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { shouldDismissPastedFiles } from '../pasting';
 
 const mocks = {

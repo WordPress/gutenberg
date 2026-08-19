@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { describe, expect, it } from '@jest/globals';
 import { Y } from '@wordpress/sync';
-
-/**
- * Internal dependencies
- */
 import {
 	asHtmlStringIndex,
 	asRichTextOffset,

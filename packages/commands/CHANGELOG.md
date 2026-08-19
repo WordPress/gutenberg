@@ -2,6 +2,29 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Command Palette: Treat the per-category icon as a fallback used only when a command passes no `icon`, instead of an override that discards the command's own icon ([#81787](https://github.com/WordPress/gutenberg/pull/81787)).
+
+## 1.53.0 (2026-08-12)
+
+### Internal
+
+-   Import `withIgnoreIMEEvents` from `@wordpress/keycodes` instead of unlocking it from `@wordpress/components`. Adds a `@wordpress/keycodes` dependency ([#81343](https://github.com/WordPress/gutenberg/pull/81343)).
+
+## 1.52.0 (2026-07-29)
+
+### Internal
+
+-   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
+
+## 1.51.0 (2026-07-14)
+
+### Enhancements
+
+-   Use the emphasis font-weight token for UI emphasis ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
 ## 1.50.0 (2026-07-01)
 
 ## 1.49.0 (2026-06-24)
@@ -33,6 +56,7 @@
 ## 1.41.0 (2026-03-04)
 
 ## 1.40.0 (2026-02-18)
+
 -   Add `category` property to command config, used to visually differentiate commands in the Command Palette.
 
 ## 1.39.0 (2026-01-29)

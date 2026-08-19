@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { _x, __ } from '@wordpress/i18n';
 import { dateI18n, humanTimeDiff } from '@wordpress/date';
 import { useState, createInterpolateElement } from '@wordpress/element';
@@ -123,7 +120,6 @@ function NonDefaultControls( { format, onChange } ) {
 	return (
 		<VStack>
 			<CustomSelectControl
-				__next40pxDefaultSize
 				label={ __( 'Choose a format' ) }
 				options={ [ ...suggestedOptions, customOption ] }
 				value={

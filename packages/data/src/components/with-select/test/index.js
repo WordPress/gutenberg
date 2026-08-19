@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { compose } from '@wordpress/compose';
 import { Component, createRef, forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import withSelect from '../';
 import withDispatch from '../../with-dispatch';
 import { createRegistry } from '../../../registry';

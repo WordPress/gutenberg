@@ -1,8 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
 import {
 	BaseControl,
 	Flex,
@@ -17,10 +13,6 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../hooks/gap';
 import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
@@ -281,7 +273,12 @@ export default {
 			minimumColumnWidth &&
 			columnCount > 0
 		) {
-			let blockGapToUse = blockGapValue || fallbackGapValue;
+			const blockGapBoxControlValue = blockGapValue
+				? getGapBoxControlValueFromStyle( style.spacing.blockGap )
+				: undefined;
+			let blockGapToUse =
+				getSpacingPresetCssVar( blockGapBoxControlValue?.left ) ||
+				fallbackGapValue;
 			// Ensure 0 values have a unit so they work in calc().
 			if ( blockGapToUse === '0' || blockGapToUse === 0 ) {
 				blockGapToUse = '0px';
@@ -452,7 +449,6 @@ function GridLayoutColumnsAndRowsControl( {
 				<Flex gap={ 4 }>
 					<FlexItem isBlock>
 						<NumberControl
-							size="__unstable-large"
 							onChange={ ( value ) => {
 								// Allow unsetting the column count when in auto mode.
 								const defaultNewColumnCount = isManualPlacement
@@ -477,7 +473,6 @@ function GridLayoutColumnsAndRowsControl( {
 					<FlexItem isBlock>
 						{ allowSizingOnChildren && isManualPlacement ? (
 							<NumberControl
-								size="__unstable-large"
 								onChange={ ( value ) => {
 									// Don't allow unsetting the row count.
 									const newRowCount =

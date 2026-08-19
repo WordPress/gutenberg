@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createContext, useContext, useMemo } from '@wordpress/element';
 
 /** @typedef {React.ReactNode} ReactNode */

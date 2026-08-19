@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 0.10.0 (2026-08-12)
+
+## 0.9.0 (2026-07-29)
+
+## 0.8.0 (2026-07-14)
+
+### Bug Fixes
+
+-   Fix error caused by changes in upstream package APIs prerelease version ([#80061](https://github.com/WordPress/gutenberg/pull/80061)).
+
 ## 0.7.0 (2026-07-01)
 
 ## 0.6.0 (2026-06-24)

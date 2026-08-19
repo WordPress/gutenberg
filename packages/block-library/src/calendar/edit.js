@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import memoize from 'memize';
-
-/**
- * WordPress dependencies
- */
 import { calendar as icon } from '@wordpress/icons';
 import { Placeholder, Spinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -14,10 +7,6 @@ import { useBlockProps } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useDisabled } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import HtmlRenderer from '../utils/html-renderer';
 
 /**

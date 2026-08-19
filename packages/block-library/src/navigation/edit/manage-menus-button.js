@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { addQueryArgs } from '@wordpress/url';
 import { Button, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';

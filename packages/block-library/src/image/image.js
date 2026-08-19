@@ -1,7 +1,4 @@
-/**
- * WordPress dependencies
- */
-import { isBlobURL } from '@wordpress/blob';
+import clsx from 'clsx';
 import {
 	ExternalLink,
 	FocalPointPicker,
@@ -53,10 +50,6 @@ import { getBlockBindingsSource, switchToBlockType } from '@wordpress/blocks';
 import { crop, overlayText, upload, chevronDown } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 import { createUpgradedEmbedBlock } from '../embed/util';
 import { isExternalImage } from './edit';
@@ -70,7 +63,6 @@ import {
 	getStyleStateKey,
 } from '../utils/style-state';
 import { useOpenImageMediaEditorModal } from './use-open-image-media-editor-modal';
-import AnimatedGifConvertControl from './animated-gif-convert-control';
 import {
 	MIN_SIZE,
 	ALLOWED_MEDIA_TYPES,
@@ -84,6 +76,7 @@ const {
 	isDefaultBlockStyleState,
 	ResolutionTool,
 	mediaEditKey,
+	mediaSideloadFromUrlKey,
 } = unlock( blockEditorPrivateApis );
 
 const scaleOptions = [
@@ -391,6 +384,12 @@ export default function Image( {
 	);
 	const { getBlock, getSettings } = useSelect( blockEditorStore );
 	const cropButtonRef = useRef();
+	// URL of a freshly generated file (crop/rotate result) from the media
+	// editor that the browser may not have finished loading; cleared by the
+	// <img> load/error handlers, or by the settle effect below when the
+	// rendered image already shows it.
+	const [ pendingSwapUrl, setPendingSwapUrl ] = useState();
+	const isSwappingMedia = !! pendingSwapUrl;
 	const handleMediaEditorModalClose = useCallback(
 		() => cropButtonRef.current?.focus(),
 		[]
@@ -399,6 +398,7 @@ export default function Image( {
 		attributes,
 		setAttributes,
 		onClose: handleMediaEditorModalClose,
+		onUrlChange: setPendingSwapUrl,
 	} );
 
 	const {
@@ -416,7 +416,6 @@ export default function Image( {
 		{ loadedNaturalWidth, loadedNaturalHeight },
 		setLoadedNaturalSize,
 	] = useState( {} );
-	const [ externalBlob, setExternalBlob ] = useState();
 	const [ hasImageErrored, setHasImageErrored ] = useState( false );
 	const hasNonContentControls = blockEditingMode === 'default';
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
@@ -463,31 +462,16 @@ export default function Image( {
 		__unstableMarkNextChangeAsNotPersistent,
 	] );
 
-	// If an image is externally hosted, try to fetch the image data. This may
-	// fail if the image host doesn't allow CORS with the domain. If it works,
-	// we can enable a button in the toolbar to upload the image.
-	useEffect( () => {
-		if (
-			! isExternalImage( id, url ) ||
-			! isSingleSelected ||
-			! getSettings().mediaUpload
-		) {
-			setExternalBlob();
-			return;
-		}
-
-		if ( externalBlob ) {
-			return;
-		}
-
-		window
-			// Avoid cache, which seems to help avoid CORS problems.
-			.fetch( url.includes( '?' ) ? url : url + '?' )
-			.then( ( response ) => response.blob() )
-			.then( ( blob ) => setExternalBlob( blob ) )
-			// Do nothing, cannot upload.
-			.catch( () => {} );
-	}, [ id, url, isSingleSelected, externalBlob, getSettings ] );
+	/*
+	 * Externally hosted images can be uploaded to the media library. The
+	 * server sideloads the URL (see mediaSideloadFromUrl), so this works even
+	 * when the editor is cross-origin isolated and the browser cannot read the
+	 * cross-origin image's bytes itself.
+	 */
+	const canUploadExternalImage =
+		isSingleSelected &&
+		isExternalImage( id, url ) &&
+		!! getSettings()[ mediaSideloadFromUrlKey ];
 
 	// Get naturalWidth and naturalHeight from image, and fall back to loaded natural
 	// width and height. This resolves an issue in Safari where the loaded natural
@@ -502,18 +486,34 @@ export default function Image( {
 		};
 	}, [ loadedNaturalWidth, loadedNaturalHeight, imageElement?.complete ] );
 
+	// A media editor update can be undone or superseded before its
+	// attributes land, leaving the rendered image untouched. No load event
+	// fires in that case, so clear the pending swap whenever the rendered
+	// image already shows the pending URL.
+	useEffect( () => {
+		if (
+			pendingSwapUrl &&
+			pendingSwapUrl === url &&
+			imageElement?.complete
+		) {
+			setPendingSwapUrl( undefined );
+		}
+	}, [ pendingSwapUrl, url, imageElement ] );
+
 	function onImageError() {
+		setPendingSwapUrl( undefined );
 		setHasImageErrored( true );
 
 		// Check if there's an embed block that handles this URL, e.g., instagram URL.
 		// See: https://github.com/WordPress/gutenberg/pull/11472
 		const embedBlock = createUpgradedEmbedBlock( { attributes: { url } } );
-		if ( undefined !== embedBlock ) {
+		if ( undefined !== embedBlock && onReplace ) {
 			onReplace( embedBlock );
 		}
 	}
 
 	function onImageLoad( event ) {
+		setPendingSwapUrl( undefined );
 		setHasImageErrored( false );
 		setLoadedNaturalSize( {
 			loadedNaturalWidth: event.target?.naturalWidth,
@@ -604,31 +604,18 @@ export default function Image( {
 	}
 
 	function uploadExternal() {
-		const { mediaUpload } = getSettings();
-		if ( ! mediaUpload ) {
+		const mediaSideloadFromUrl = getSettings()[ mediaSideloadFromUrlKey ];
+		if ( ! mediaSideloadFromUrl ) {
 			return;
 		}
-		let notified = false;
-		mediaUpload( {
-			filesList: [ externalBlob ],
-			onFileChange( [ img ] ) {
+		mediaSideloadFromUrl( {
+			url,
+			onSuccess( img ) {
 				onSelectImage( img );
-
-				if ( isBlobURL( img.url ) ) {
-					return;
-				}
-
-				// With client-side media processing, onFileChange fires
-				// for each generated sub-size. Only show the notice once.
-				if ( ! notified ) {
-					notified = true;
-					setExternalBlob();
-					createSuccessNotice( __( 'Image uploaded.' ), {
-						type: 'snackbar',
-					} );
-				}
+				createSuccessNotice( __( 'Image uploaded.' ), {
+					type: 'snackbar',
+				} );
 			},
-			allowedTypes: ALLOWED_MEDIA_TYPES,
 			onError( message ) {
 				createErrorNotice( message, { type: 'snackbar' } );
 			},
@@ -883,21 +870,23 @@ export default function Image( {
 
 	const showBlockControls = showUrlInput || allowCrop || showCoverControls;
 
-	const mediaReplaceFlow = isSingleSelected && ! lockUrlControls && (
-		// For contentOnly mode, put this button in its own area so it has borders around it.
-		<BlockControls group={ isContentOnlyMode ? 'inline' : 'other' }>
-			<MediaReplaceFlow
-				mediaId={ id }
-				mediaURL={ url }
-				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				onSelect={ onSelectImage }
-				onSelectURL={ onSelectURL }
-				onError={ onUploadError }
-				name={ ! url ? __( 'Add image' ) : __( 'Replace' ) }
-				onReset={ () => onSelectImage( undefined ) }
-				variant="toolbar"
-			/>
-		</BlockControls>
+	const mediaControls = isSingleSelected && ! lockUrlControls && (
+		<>
+			{ /* For contentOnly mode, put this button in its own area so it has borders around it. */ }
+			<BlockControls group={ isContentOnlyMode ? 'inline' : 'other' }>
+				<MediaReplaceFlow
+					mediaId={ id }
+					mediaURL={ url }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					onSelect={ onSelectImage }
+					onSelectURL={ onSelectURL }
+					onError={ onUploadError }
+					name={ ! url ? __( 'Add image' ) : __( 'Replace' ) }
+					onReset={ () => onSelectImage( undefined ) }
+					variant="toolbar"
+				/>
+			</BlockControls>
+		</>
 	);
 
 	const hasDataFormBlockFields =
@@ -929,7 +918,11 @@ export default function Image( {
 							onClick={ openImageMediaEditorModal }
 							aria-haspopup="dialog"
 							icon={ crop }
-							label={ __( 'Crop' ) }
+							label={ __( 'Edit image' ) }
+							// Disable rather than hide while the edited image
+							// loads, so the button keeps focus when the modal
+							// closes instead of dropping it to the canvas.
+							disabled={ isSwappingMedia }
 						/>
 					) }
 					{ showCoverControls && (
@@ -941,7 +934,7 @@ export default function Image( {
 					) }
 				</BlockControls>
 			) }
-			{ isSingleSelected && externalBlob && (
+			{ canUploadExternalImage && (
 				<BlockControls>
 					<ToolbarGroup>
 						<ToolbarButton
@@ -1201,7 +1194,9 @@ export default function Image( {
 						onError={ onImageError }
 						onLoad={ onImageLoad }
 						ref={ setRefs }
-						className={ borderProps.className }
+						className={ clsx( borderProps.className, {
+							'is-swapping-media': isSwappingMedia,
+						} ) }
 						width={ naturalWidth }
 						height={ naturalHeight }
 						style={ {
@@ -1250,7 +1245,7 @@ export default function Image( {
 							...shadowProps.style,
 						} }
 					/>
-					{ isUploading && <Spinner /> }
+					{ ( isUploading || isSwappingMedia ) && <Spinner /> }
 				</>
 			) }
 		</ImageWrapper>
@@ -1384,7 +1379,7 @@ export default function Image( {
 	if ( ! url && ! temporaryURL ) {
 		return (
 			<>
-				{ mediaReplaceFlow }
+				{ mediaControls }
 				{ controls }
 			</>
 		);
@@ -1419,13 +1414,7 @@ export default function Image( {
 
 	return (
 		<>
-			{ isSingleSelected && ! lockUrlControls && (
-				<AnimatedGifConvertControl
-					attributes={ attributes }
-					clientId={ clientId }
-				/>
-			) }
-			{ mediaReplaceFlow }
+			{ mediaControls }
 			{ controls }
 			{ featuredImageControl }
 			{ img }

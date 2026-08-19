@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { error, published } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import Icon from '../icon';
 import Spinner from '../spinner';
 

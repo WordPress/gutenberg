@@ -14,11 +14,7 @@ const { hasTruthyJsxAttribute } = require( '../utils' );
 const COMPONENTS_REQUIRING_40PX = new Set( [
 	'Button',
 	'ClipboardButton',
-	'CustomSelectControl',
 	'IconButton',
-	'InputControl',
-	'NumberControl',
-	'SelectControl',
 ] );
 
 module.exports = {

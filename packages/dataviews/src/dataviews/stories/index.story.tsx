@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import DataViews from '../index';
 import LayoutActivityComponent from './layout-activity';
 import LayoutTableComponent from './layout-table';
@@ -13,11 +6,11 @@ import LayoutGridComponent from './layout-grid';
 import LayoutListComponent from './layout-list';
 import LayoutCustomComponent from './layout-custom';
 import InfiniteScrollComponent from './infinite-scroll';
+import AsyncInfiniteScrollComponent from './async-infinite-scroll';
 import WithCardComponent from './with-card';
 import FreeCompositionComponent from './free-composition';
 import MinimalUIComponent from './minimal-ui';
 import EmptyComponent from './empty';
-
 import './style.css';
 
 const meta = {
@@ -273,6 +266,27 @@ export const InfiniteScroll = {
 	render: InfiniteScrollComponent,
 	parameters: {
 		containerHeight: '600px',
+	},
+	argTypes: {
+		containerHeight: {
+			control: false,
+			table: {
+				disable: true,
+			},
+		},
+	},
+};
+
+/**
+ * Infinite scroll where pages load asynchronously (with `isLoading`), like a
+ * real network-backed consumer that fetches one window at a time. Reproduces
+ * the scroll-position jump that the synchronous story does not.
+ */
+export const AsyncInfiniteScroll = {
+	render: AsyncInfiniteScrollComponent,
+	parameters: {
+		// Fill the viewport so the list bottom is the window bottom.
+		containerHeight: 'calc(100vh - 2rem)',
 	},
 	argTypes: {
 		containerHeight: {

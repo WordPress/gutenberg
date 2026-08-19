@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getImageDimensions } from '../get-image-dimensions';
 
 /**

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { ResizableBox } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
 import { getComputedCSS, getGridTracks, getClosestTrack } from './utils';

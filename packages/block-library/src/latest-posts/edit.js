@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	Placeholder,
 	QueryControls,
@@ -42,10 +35,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as noticeStore } from '@wordpress/notices';
 import { useInstanceId } from '@wordpress/compose';
 import { createInterpolateElement } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import {
 	MIN_EXCERPT_LENGTH,
 	MAX_EXCERPT_LENGTH,
@@ -162,13 +151,10 @@ function Controls( { attributes, setAttributes } ) {
 			label: name,
 		} ) );
 	const categorySuggestions =
-		categoriesList?.reduce(
-			( accumulator, category ) => ( {
-				...accumulator,
-				[ category.name ]: category,
-			} ),
-			{}
-		) ?? {};
+		categoriesList?.reduce( ( accumulator, category ) => {
+			accumulator[ category.name ] = category;
+			return accumulator;
+		}, {} ) ?? {};
 	const selectCategories = ( tokens ) => {
 		const hasNoSuggestion = tokens.some(
 			( token ) =>
@@ -807,7 +793,7 @@ export default function LatestPostsEdit( {
 									<div
 										className="wp-block-latest-posts__post-full-content"
 										dangerouslySetInnerHTML={ {
-											__html: post.content.raw.trim(),
+											__html: post.content.rendered.trim(),
 										} }
 									/>
 								) }

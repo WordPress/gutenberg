@@ -62,6 +62,25 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 				'category'      => 'dashboard',
 				'title'         => 'Widget A',
 				'description'   => 'The first test widget.',
+				'help'          => array(
+					'content' => 'Everything about A, briefly.',
+					'links'   => array(
+						array(
+							'label' => 'Learn more',
+							'href'  => 'options-general.php',
+						),
+					),
+				),
+				'icon'          => 'core/calendar',
+				'actions'       => array(
+					array(
+						'id'        => 'open-settings',
+						'label'     => 'Open settings',
+						'href'      => 'options-general.php',
+						'icon'      => 'core/cog',
+						'relevance' => 'low',
+					),
+				),
 				'keywords'      => array( 'alpha', 'first' ),
 			)
 		);
@@ -131,6 +150,31 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 		$this->assertSame( 'dashboard', $data['category'] );
 		$this->assertSame( 'Widget A', $data['title'] );
 		$this->assertSame( 'The first test widget.', $data['description'] );
+		$this->assertSame(
+			array(
+				'content' => 'Everything about A, briefly.',
+				'links'   => array(
+					array(
+						'label' => 'Learn more',
+						'href'  => 'options-general.php',
+					),
+				),
+			),
+			$data['help']
+		);
+		$this->assertSame( 'core/calendar', $data['icon'] );
+		$this->assertSame(
+			array(
+				array(
+					'id'        => 'open-settings',
+					'label'     => 'Open settings',
+					'href'      => 'options-general.php',
+					'icon'      => 'core/cog',
+					'relevance' => 'low',
+				),
+			),
+			$data['actions']
+		);
 		$this->assertSame( array( 'alpha', 'first' ), $data['keywords'] );
 	}
 
@@ -180,6 +224,9 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'category', $properties );
 		$this->assertArrayHasKey( 'title', $properties );
 		$this->assertArrayHasKey( 'description', $properties );
+		$this->assertArrayHasKey( 'help', $properties );
+		$this->assertArrayHasKey( 'icon', $properties );
+		$this->assertArrayHasKey( 'actions', $properties );
 		$this->assertArrayHasKey( 'keywords', $properties );
 		$this->assertSame( 'string', $properties['name']['type'] );
 		$this->assertSame( array( 'string', 'null' ), $properties['render_module']['type'] );
@@ -187,6 +234,17 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 		$this->assertSame( array( 'string', 'null' ), $properties['category']['type'] );
 		$this->assertSame( array( 'string', 'null' ), $properties['title']['type'] );
 		$this->assertSame( array( 'string', 'null' ), $properties['description']['type'] );
+		$this->assertSame( array( 'object', 'null' ), $properties['help']['type'] );
+		$this->assertSame( array( 'string', 'null' ), $properties['icon']['type'] );
+		$this->assertSame( array( 'array', 'null' ), $properties['actions']['type'] );
 		$this->assertSame( array( 'array', 'null' ), $properties['keywords']['type'] );
+
+		$action_properties = $properties['actions']['items']['properties'];
+		$this->assertArrayHasKey( 'icon', $action_properties );
+		$this->assertArrayHasKey( 'relevance', $action_properties );
+		$this->assertSame(
+			array( 'high', 'medium', 'low' ),
+			$action_properties['relevance']['enum']
+		);
 	}
 }

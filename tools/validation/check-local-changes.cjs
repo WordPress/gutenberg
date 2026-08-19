@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const SimpleGit = require( 'simple-git' );
 
 SimpleGit()
@@ -45,6 +42,7 @@ SimpleGit()
 
 - npm install
 - npm run lint:js:prune-suppressions
+- npm run lint:css:update-suppressions
 - npm run docs:build
 - npm run --workspace @wordpress/theme build
 

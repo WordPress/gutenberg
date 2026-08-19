@@ -1,9 +1,7 @@
-/**
- * Internal dependencies
- */
+import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import * as globalStyles from './components/global-styles';
 import { ExperimentalBlockEditorProvider } from './components/provider';
-import { lock } from './lock-unlock';
+import { lock, unlock } from './lock-unlock';
 import { getRichTextValues } from './components/rich-text/get-rich-text-values';
 import ResizableBoxPopover from './components/resizable-box-popover';
 import { default as PrivateQuickInserter } from './components/inserter/quick-inserter';
@@ -40,7 +38,6 @@ import {
 	ExperimentalBlockCanvas,
 	BlockCanvasCover,
 } from './components/block-canvas';
-import { getDuotoneFilter } from './components/duotone/utils';
 import { useFlashEditableBlocks } from './components/use-flash-editable-blocks';
 import {
 	selectBlockPatternsKey,
@@ -56,6 +53,7 @@ import {
 	isNavigationOverlayContextKey,
 	isNavigationPostEditorKey,
 	mediaUploadOnSuccessKey,
+	mediaSideloadFromUrlKey,
 	openMediaEditorModalKey,
 } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
@@ -78,10 +76,13 @@ import useRemoteUrlData from './components/link-control/use-rich-url-data';
 import { PrivateBlockContext } from './components/block-list/private-block-context';
 import useListViewPanelState from './components/use-list-view-panel-state';
 import InnerContent from './components/inner-content';
+import { useNativeUndo, usesNativeUndo } from './utils/native-undo';
 import {
 	isHashLink,
 	isRelativePath,
 } from './components/link-control/is-url-like';
+
+const { getDuotoneFilter } = unlock( globalStylesEnginePrivateApis );
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -145,6 +146,7 @@ lock( privateApis, {
 	isNavigationOverlayContextKey,
 	isNavigationPostEditorKey,
 	mediaUploadOnSuccessKey,
+	mediaSideloadFromUrlKey,
 	openMediaEditorModalKey,
 	useBlockElement,
 	useBlockElementRef,
@@ -155,4 +157,6 @@ lock( privateApis, {
 	isHashLink,
 	isRelativePath,
 	InnerContent,
+	useNativeUndo,
+	usesNativeUndo,
 } );

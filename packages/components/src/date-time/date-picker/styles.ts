@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import styled from '@emotion/styled';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import { boxSizingReset, COLORS, CONFIG } from '../../utils';
 import { HStack } from '../../h-stack';
@@ -38,7 +31,7 @@ export const NavigatorHeading = styled( Heading )`
 	grid-column: 2 / 7;
 
 	strong {
-		font-weight: ${ CONFIG.fontWeightHeading };
+		font-weight: ${ CONFIG.fontWeightEmphasis };
 	}
 `;
 

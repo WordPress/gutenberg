@@ -2,6 +2,29 @@
 
 ## Unreleased
 
+### Internal
+
+-   Point tsconfig references at split dependencies' build projects. ([#81514](https://github.com/WordPress/gutenberg/pull/81514), [#81518](https://github.com/WordPress/gutenberg/pull/81518))
+-   Split tsconfig into a build project and a default dev project; story and test declarations are no longer published to npm. ([#81509](https://github.com/WordPress/gutenberg/pull/81509))
+
+## 0.5.0 (2026-08-12)
+
+### Internal
+
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
+
+## 0.4.0 (2026-07-29)
+
+### Internal
+
+-   Update Jest type definitions to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
+
+## 0.3.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
 ## 0.2.0 (2026-07-01)
 
 ## 0.1.0 (2026-06-24)

@@ -24,6 +24,8 @@ claude mcp add wordpress-design-system -- npx -y --ignore-scripts --min-release-
 
 ### OpenAI Codex
 
+The [Codex CLI](https://developers.openai.com/codex/cli) must be installed first.
+
 ```bash
 codex mcp add wordpress-design-system -- npx -y --ignore-scripts --min-release-age=2 @wordpress/design-system-mcp@latest
 ```

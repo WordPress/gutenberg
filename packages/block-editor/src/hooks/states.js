@@ -1,20 +1,22 @@
-/**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
+import { useMemo } from '@wordpress/element';
+import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
+import { __, _x } from '@wordpress/i18n';
 import StateControl from '../components/global-styles/state-control';
 import StateControlBadges from '../components/global-styles/state-control-badges';
 import { useToolsPanelDropdownMenuProps } from '../components/global-styles/utils';
+import { useSettings } from '../components/use-settings';
+import { unlock } from '../lock-unlock';
+
+const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
 export const PSEUDO_STATE_LABELS = {
-	':hover': __( 'Hover' ),
-	':focus': __( 'Focus' ),
-	':focus-visible': __( 'Focus-visible' ),
-	':active': __( 'Active' ),
+	':hover': _x( 'Hover', 'Name for the CSS pseudo-class selector' ),
+	':focus': _x( 'Focus', 'Name for the CSS pseudo-class selector' ),
+	':focus-visible': _x(
+		'Focus-visible',
+		'Name for the CSS pseudo-class selector'
+	),
+	':active': _x( 'Active', 'Name for the CSS pseudo-class selector' ),
 };
 
 export const RESPONSIVE_STATE_LABELS = {
@@ -22,18 +24,21 @@ export const RESPONSIVE_STATE_LABELS = {
 	'@mobile': __( 'Mobile' ),
 };
 
-// Viewport states are selected globally via the editor's device preview
-// (Responsive editing). 'default' maps to the Desktop device, the remaining
-// options are derived from the shared responsive-state labels.
-const DEVICE_STATE_OPTIONS = [
-	{ value: 'default', label: __( 'Desktop' ) },
-	...Object.entries( RESPONSIVE_STATE_LABELS ).map(
-		( [ value, label ] ) => ( {
+// Viewport states are selected globally via the editor's device preview.
+function getDeviceStateOptions( viewportSettings ) {
+	const breakpoints = getViewportBreakpoints( viewportSettings );
+
+	return Object.entries( RESPONSIVE_STATE_LABELS )
+		.filter(
+			( [ value ] ) =>
+				( value !== '@tablet' || breakpoints.tablet !== undefined ) &&
+				( value !== '@mobile' || breakpoints.mobile !== undefined )
+		)
+		.map( ( [ value, label ] ) => ( {
 			value,
 			label,
-		} )
-	),
-];
+		} ) );
+}
 
 // Keep in sync with WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS
 // and packages/global-styles-engine/src/core/render.tsx.
@@ -54,6 +59,7 @@ function getPseudoStateOptions( name ) {
 }
 
 const DEFAULT_STATE_VALUE = 'default';
+const EMPTY_STATE_OPTIONS = [];
 
 /**
  * Renders a pseudo-state selector in the block card header.
@@ -68,7 +74,10 @@ const DEFAULT_STATE_VALUE = 'default';
  * @return {Element|null} State control component, or null if not applicable.
  */
 export function BlockStatesControl( { name, value, onChange } ) {
-	const pseudoStateOptions = getPseudoStateOptions( name );
+	const pseudoStateOptions = useMemo(
+		() => getPseudoStateOptions( name ),
+		[ name ]
+	);
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	if ( ! pseudoStateOptions.length ) {
@@ -96,7 +105,15 @@ export function BlockStatesControl( { name, value, onChange } ) {
  * @return {Element|null} Badges component, or null if there is nothing to show.
  */
 export function BlockStateBadges( { name, value, isResponsiveEditing } ) {
-	const pseudoStateOptions = getPseudoStateOptions( name );
+	const pseudoStateOptions = useMemo(
+		() => getPseudoStateOptions( name ),
+		[ name ]
+	);
+	const [ viewportSettings ] = useSettings( 'viewport' );
+	const deviceStateOptions = useMemo(
+		() => getDeviceStateOptions( viewportSettings ),
+		[ viewportSettings ]
+	);
 
 	if ( ! pseudoStateOptions.length && ! isResponsiveEditing ) {
 		return null;
@@ -104,7 +121,9 @@ export function BlockStateBadges( { name, value, isResponsiveEditing } ) {
 
 	return (
 		<StateControlBadges
-			viewportStates={ isResponsiveEditing ? DEVICE_STATE_OPTIONS : [] }
+			viewportStates={
+				isResponsiveEditing ? deviceStateOptions : EMPTY_STATE_OPTIONS
+			}
 			pseudoStates={ pseudoStateOptions }
 			viewportValue={ value?.viewport ?? DEFAULT_STATE_VALUE }
 			pseudoStateValue={ value?.pseudo ?? DEFAULT_STATE_VALUE }

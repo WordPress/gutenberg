@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	PanelBody,
 	Button,
@@ -16,10 +13,6 @@ import { useCopyToClipboard } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { external } from '@wordpress/icons';
 import { VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import PostScheduleLabel from '../post-schedule/label';
 import { store as editorStore } from '../../store';
 

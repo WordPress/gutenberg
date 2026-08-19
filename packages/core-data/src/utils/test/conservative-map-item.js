@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import conservativeMapItem from '../conservative-map-item';
 
 describe( 'conservativeMapItem', () => {

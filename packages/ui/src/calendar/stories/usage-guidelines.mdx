@@ -1,0 +1,133 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Design System/Components/Calendar/Usage Guidelines" />
+
+# Calendar
+
+`Calendar` selects a **single date**. `RangeCalendar` selects a **date range**. Both share the same prop surface apart from the shape of `value` / `defaultValue` / `onValueChange`, and the range-only `min`, `max` and `excludeDisabled` props.
+
+Both are built for accessibility and follow ARIA best practices for calendar widgets: keyboard navigation, screen reader support, and customizable labels for internationalization.
+
+## Usage
+
+### Uncontrolled Mode
+
+The component manages its own selection. Use `defaultValue` to set the initial value, and `onValueChange` to react to changes.
+
+```jsx
+import { Calendar } from '@wordpress/ui';
+
+const MyUncontrolledCalendar = () => (
+	<Calendar
+		defaultValue={ new Date() }
+		onValueChange={ ( date ) => console.log( 'Selected: ', date ) }
+	/>
+);
+```
+
+### Controlled Mode
+
+Pass `value` and update it from `onValueChange`. Pass `null` to represent no selection while staying controlled.
+
+```jsx
+import { useState } from 'react';
+import { Calendar } from '@wordpress/ui';
+
+const MyControlledCalendar = () => {
+	const [ value, setValue ] = useState( new Date() );
+
+	return <Calendar value={ value } onValueChange={ setValue } />;
+};
+```
+
+The displayed month is a separate piece of state, controlled the same way through `month` / `defaultMonth` and `onMonthChange`.
+
+### Range Selection
+
+```jsx
+import { useState } from 'react';
+import { RangeCalendar } from '@wordpress/ui';
+
+const MyRangeCalendar = () => {
+	const [ range, setRange ] = useState( null );
+
+	return <RangeCalendar value={ range } onValueChange={ setRange } />;
+};
+```
+
+Use `min` and `max` to constrain how many nights a range may span, and `excludeDisabled` to reset the range when a disabled day falls inside it.
+
+## Disabling Days
+
+The `disabled` prop takes a matcher, or an array of matchers. Every shape below is supported:
+
+```jsx
+// Always matches — disables every day.
+const booleanMatcher = true;
+
+// Matches a specific day.
+const dateMatcher = new Date();
+
+// Matches any of the days in the array.
+const arrayMatcher = [ new Date( 2019, 1, 2 ), new Date( 2019, 1, 4 ) ];
+
+// Matches days after the 2nd of February 2019 (exclusive).
+const afterMatcher = { after: new Date( 2019, 1, 2 ) };
+
+// Matches days before the 2nd of February 2019 (exclusive).
+const beforeMatcher = { before: new Date( 2019, 1, 2 ) };
+
+// Matches the days between the 2nd and the 5th of February 2019 (exclusive).
+const intervalMatcher = {
+	after: new Date( 2019, 1, 2 ),
+	before: new Date( 2019, 1, 5 ),
+};
+
+// Matches the days between the 2nd and the 5th of February 2019 (inclusive).
+const rangeMatcher = {
+	from: new Date( 2019, 1, 2 ),
+	to: new Date( 2019, 1, 5 ),
+};
+
+// Matches Sundays; an array matches weekends.
+const dayOfWeekMatcher = { dayOfWeek: 0 };
+const weekendMatcher = { dayOfWeek: [ 0, 6 ] };
+
+// Matches when the function returns true.
+const functionMatcher = ( day ) => day.getMonth() === 2;
+```
+
+## Localization
+
+Dates are formatted with the `locale` prop, which takes a locale object from [`date-fns`](https://github.com/date-fns/date-fns/tree/main/src/locale). Text direction is derived from that locale, so an RTL locale flips the layout and the navigation chevrons automatically.
+
+```jsx
+import { fr } from 'date-fns/locale';
+import { Calendar } from '@wordpress/ui';
+
+const MyFrenchCalendar = () => <Calendar locale={ fr } />;
+```
+
+The visible strings (button labels, the "today" announcement) come from `@wordpress/i18n`, which uses the site locale rather than the `locale` prop. For a coherent experience, make sure the two agree — or override the strings through the `labels` prop.
+
+Use `weekStartsOn` to override the first day of the week that the locale would otherwise imply.
+
+## Time Zones
+
+Set the `timeZone` prop to an [IANA time zone name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) to render the calendar in a zone other than the browser's.
+
+When you do, pass `TZDate` objects rather than native `Date` objects, otherwise the value you hand in is interpreted in the browser's zone and the selection can land on the wrong day. `TZDate` comes from [`@date-fns/tz`](https://www.npmjs.com/package/@date-fns/tz):
+
+```jsx
+import { TZDate } from '@date-fns/tz';
+import { Calendar } from '@wordpress/ui';
+
+const timeZone = 'America/New_York';
+
+const MyCalendarWithTimeZone = () => (
+	<Calendar
+		timeZone={ timeZone }
+		defaultValue={ new TZDate( 2024, 11, 10, timeZone ) }
+	/>
+);
+```

@@ -1,20 +1,17 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-
-/**
- * Internal dependencies
- */
 const {
 	recordRequests,
 	waitForRequestsToSettle,
 } = require( './record-requests' );
+const {
+	setCollaboration,
+} = require( '../editor/collaboration/fixtures/collaboration-utils' );
 
 test.describe( 'Preload', () => {
 	let postId;
 
 	test.beforeAll( async ( { requestUtils } ) => {
+		await setCollaboration( requestUtils, true );
 		const post = await requestUtils.createPost( {
 			content:
 				'<!-- wp:heading -->\n<h2 class="wp-block-heading">Hello</h2>\n<!-- /wp:heading -->',
@@ -24,7 +21,11 @@ test.describe( 'Preload', () => {
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllPosts();
+		try {
+			await requestUtils.deleteAllPosts();
+		} finally {
+			await setCollaboration( requestUtils, false );
+		}
 	} );
 
 	test( 'Should fetch a known set of routes during startup', async ( {
@@ -89,3 +90,59 @@ test.describe( 'Preload', () => {
 		);
 	} );
 } );
+
+test.describe( 'Preload with the DataForm inspector experiment', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.setGutenbergExperiments( [
+			'gutenberg-dataform-inspector',
+		] );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.setGutenbergExperiments( [] );
+	} );
+
+	test( 'Should serve the view config form request from the preload cache', async ( {
+		page,
+		admin,
+		editor,
+	} ) => {
+		const { requests, stop } = recordRequests( page );
+
+		// `clearPreloadedData` warns if any preload entry went unused —
+		// including the view config path, should it drift from the request
+		// issued by the `getViewConfig` resolver kickoff.
+		let preloadStatus;
+		page.on( 'console', ( msg ) => {
+			const text = msg.text();
+			if ( text.startsWith( '[api-fetch][preload] ' ) ) {
+				preloadStatus = text;
+			}
+		} );
+
+		await admin.createNewPost();
+		await openPostSummary( { editor, page } );
+		await waitForRequestsToSettle( requests );
+		stop();
+
+		// Every preloaded path — including the view config form request —
+		// should be consumed by the kickoff.
+		expect( preloadStatus ).toBe(
+			'[api-fetch][preload] All preloads consumed.'
+		);
+		// The DataForm-based inspector's form config must be served from the
+		// preload cache; a real request here means the sidebar renders an
+		// empty form first and flashes once the response arrives.
+		expect(
+			requests.filter( ( request ) =>
+				request.includes( '/wp/v2/view-config' )
+			)
+		).toEqual( [] );
+	} );
+} );
+
+async function openPostSummary( { editor, page } ) {
+	await editor.openDocumentSettingsSidebar();
+
+	await expect( page.locator( '.editor-post-summary' ) ).toBeVisible();
+}

@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState, useRef, useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import { Popover } from '..';
 import { PopoverInsideIframeRenderedInExternalSlot } from '../test/utils';

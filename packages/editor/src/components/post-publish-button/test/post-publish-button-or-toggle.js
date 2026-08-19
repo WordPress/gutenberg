@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import PostPublishButtonOrToggle from '../post-publish-button-or-toggle';
 
 jest.mock( '@wordpress/compose/src/hooks/use-viewport-match' );

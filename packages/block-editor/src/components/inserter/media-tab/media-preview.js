@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	DropdownMenu,
 	MenuGroup,
@@ -26,12 +19,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { isBlobURL } from '@wordpress/blob';
 import { getFilename } from '@wordpress/url';
-
 import { Tooltip } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import InserterDraggableBlocks from '../../inserter-draggable-blocks';
 import { getBlockAndPreviewFromMedia } from './utils';
 import { store as blockEditorStore } from '../../../store';

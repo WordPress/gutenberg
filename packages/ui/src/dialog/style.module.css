@@ -30,6 +30,11 @@
 		 */
 		.popup {
 			--viewport-inset: var(--wpds-dimension-padding-2xl);
+			--_wp-ui-elevation-lg:
+				0 5px 15px rgba(0, 0, 0, 0.08),
+				0 15px 27px rgba(0, 0, 0, 0.07),
+				0 30px 36px rgba(0, 0, 0, 0.04),
+				0 50px 43px rgba(0, 0, 0, 0.02);
 
 			position: fixed;
 			top: 50%;
@@ -46,7 +51,7 @@
 			background-color: var(--wpds-color-background-surface-neutral-strong);
 			border-radius: var(--wpds-border-radius-lg);
 			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
-			box-shadow: var(--wpds-elevation-lg);
+			box-shadow: var(--_wp-ui-elevation-lg);
 			overflow: hidden;
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-md);

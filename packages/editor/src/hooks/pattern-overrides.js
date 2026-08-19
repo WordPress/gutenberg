@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { addFilter } from '@wordpress/hooks';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { createHigherOrderComponent } from '@wordpress/compose';
@@ -10,10 +7,6 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { getBlockBindingsSource } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../store';
 import { unlock } from '../lock-unlock';
 

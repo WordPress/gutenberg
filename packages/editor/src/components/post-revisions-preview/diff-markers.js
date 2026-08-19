@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useState,
 	useMemo,
@@ -16,10 +13,6 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { Tooltip } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 
 const { useBlockElementRef } = unlock( blockEditorPrivateApis );
