@@ -1,7 +1,8 @@
 @use "@wordpress/base-styles/variables";
 @use "@wordpress/base-styles/mixins";
 
-.item:global(.components-item) {
+// Override Item's default styles without depending on its class names.
+.item.item {
 	color: var(--wpds-color-foreground-interactive-neutral);
 	padding-inline: variables.$grid-unit-05;
 	padding-block: 0;
@@ -37,4 +38,8 @@
 	&:focus-visible {
 		transform: translateZ(0);
 	}
+}
+
+.item.is-compact {
+	min-height: variables.$grid-unit-30;
 }

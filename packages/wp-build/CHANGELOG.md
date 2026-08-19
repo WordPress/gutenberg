@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Generated wp-admin page templates no longer add the `boot-layout-container` class to their mount element. Target the generated page-specific mount ID instead ([#81756](https://github.com/WordPress/gutenberg/pull/81756)).
+
 ### Bug Fixes
 
 -   Register the content module for routes that only export a `canvas`, so a route without a stage or inspector can render a custom canvas ([#81578](https://github.com/WordPress/gutenberg/pull/81578)).

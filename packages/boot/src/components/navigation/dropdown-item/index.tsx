@@ -109,6 +109,9 @@ export default function DropdownItem( {
 						{ items.map( ( item, index ) => (
 							<NavigationItem
 								key={ index }
+								className={
+									navigationItemStyles[ 'is-compact' ]
+								}
 								to={ item.to }
 								shouldShowPlaceholder={ false }
 							>

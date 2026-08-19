@@ -2,7 +2,15 @@
 @use "@wordpress/base-styles/variables";
 @use "@wordpress/base-styles/mixins";
 
-:global(.boot-layout-container) .layout {
+.layout {
+	height: 100%;
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	color: var(--wpds-color-foreground-content-neutral);
+	isolation: isolate;
+	background: var(--wpds-color-background-surface-neutral-weak);
+
 	@include mixins.break-small {
 		position: absolute;
 		top: 0;
@@ -28,16 +36,6 @@
 
 .layout .notices-snackbar {
 	@include mixins.snackbar-container();
-}
-
-.layout {
-	height: 100%;
-	width: 100%;
-	display: flex;
-	flex-direction: row;
-	color: var(--wpds-color-foreground-content-neutral);
-	isolation: isolate;
-	background: var(--wpds-color-background-surface-neutral-weak);
 }
 
 .sidebar-backdrop {
