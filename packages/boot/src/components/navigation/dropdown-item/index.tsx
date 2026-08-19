@@ -15,8 +15,8 @@ import { STORE_NAME } from '../../../store';
 import NavigationItem from '../navigation-item';
 import { wrapIcon } from '../items';
 import type { IconType, MenuItem } from '../../../store/types';
-import styles from './style.module.scss';
 import navigationItemStyles from '../navigation-item/style.module.scss';
+import styles from './style.module.scss';
 
 const ANIMATION_DURATION = 0.2;
 
@@ -111,7 +111,6 @@ export default function DropdownItem( {
 								key={ index }
 								to={ item.to }
 								shouldShowPlaceholder={ false }
-								isNested
 							>
 								{ item.label }
 							</NavigationItem>

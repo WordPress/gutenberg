@@ -15,8 +15,6 @@ interface NavigationItemProps {
 	 * Optional CSS class name.
 	 */
 	className?: string;
-	/** Whether this item is nested inside an expanded dropdown. */
-	isNested?: boolean;
 	/**
 	 * Icon to display with the navigation item.
 	 */
@@ -41,7 +39,6 @@ export default function NavigationItem( {
 	shouldShowPlaceholder = true,
 	children,
 	to,
-	isNested = false,
 }: NavigationItemProps ) {
 	// Check if the 'to' prop is an external URL
 	const isExternal = ! String(
@@ -61,11 +58,7 @@ export default function NavigationItem( {
 			<Item
 				as="a"
 				href={ to }
-				className={ clsx(
-					styles.item,
-					isNested && styles[ 'nested-item' ],
-					className
-				) }
+				className={ clsx( styles.item, className ) }
 			>
 				{ content }
 			</Item>
@@ -73,14 +66,7 @@ export default function NavigationItem( {
 	}
 
 	return (
-		<RouterLinkItem
-			to={ to }
-			className={ clsx(
-				styles.item,
-				isNested && styles[ 'nested-item' ],
-				className
-			) }
-		>
+		<RouterLinkItem to={ to } className={ clsx( styles.item, className ) }>
 			{ content }
 		</RouterLinkItem>
 	);

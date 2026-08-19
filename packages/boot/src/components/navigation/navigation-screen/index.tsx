@@ -117,11 +117,7 @@ export default function NavigationScreen( {
 						) }
 					</HStack>
 
-					{ description && (
-						<div className={ styles.description }>
-							{ description }
-						</div>
-					) }
+					{ description && <div>{ description }</div> }
 
 					{ content }
 				</motion.div>

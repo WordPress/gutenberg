@@ -14,10 +14,6 @@
 	align-items: center;
 	@include mixins.body-medium();
 
-	&.nested-item {
-		min-height: variables.$grid-unit-30;
-	}
-
 	// Rounded focus ring
 	border-radius: var(--wpds-border-radius-sm);
 
@@ -41,5 +37,4 @@
 	&:focus-visible {
 		transform: translateZ(0);
 	}
-
 }

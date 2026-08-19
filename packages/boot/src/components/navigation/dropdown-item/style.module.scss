@@ -20,6 +20,10 @@
 		variables.$grid-unit-40 -
 		$padding-to-avoid-cutting-focus-ring;
 	overflow: hidden;
+
+	:global(.components-item) {
+		min-height: variables.$grid-unit-30;
+	}
 }
 
 .chevron.is-up {
