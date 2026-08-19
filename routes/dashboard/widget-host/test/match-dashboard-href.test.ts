@@ -58,6 +58,33 @@ describe( 'matchDashboardHref', () => {
 		).toBeNull();
 	} );
 
+	it( 'rejects a href with search params beyond page and p', () => {
+		expect(
+			matchDashboardHref(
+				'admin.php?page=dashboard&p=/reports&period=7d',
+				BASE
+			)
+		).toBeNull();
+	} );
+
+	it( 'rejects a p that carries its own query string', () => {
+		expect(
+			matchDashboardHref(
+				'admin.php?page=dashboard&p=/reports?period=7d',
+				BASE
+			)
+		).toBeNull();
+	} );
+
+	it( 'rejects a p that carries an encoded hash', () => {
+		expect(
+			matchDashboardHref(
+				'admin.php?page=dashboard&p=/reports%23section',
+				BASE
+			)
+		).toBeNull();
+	} );
+
 	it( 'rejects an unparsable base', () => {
 		expect( matchDashboardHref( 'admin.php', 'not a url' ) ).toBeNull();
 	} );
