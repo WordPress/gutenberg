@@ -72,6 +72,11 @@ live counts.
     `foreground-content-*` WPDS pairs: success, caution, error), spacing
     from the `--wpds-dimension` scale. A fuller design pass (typography
     scale, iconography) still belongs with graduation.
+-   [ ] Replace the hand-styled pill with the real `Badge` once steps 12
+    and 13 land: `core-admin/badge` in the widget's own composition, fed
+    the counts through a binding source. The pill is the server-lane
+    stand-in; its tokens are the exact pairs `@wordpress/ui`'s Badge
+    intents use, so the swap is visual identity, not redesign.
 -   [ ] If the dashboard ever surfaces to roles below
     `view_site_health_checks`, the composition renders a paragraph and an
     empty gap; the definition would need a capability of its own.
