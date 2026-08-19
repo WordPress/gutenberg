@@ -21,9 +21,29 @@ describe( 'isMediaDropEligible', () => {
 		expect( result ).toBe( true );
 	} );
 
+	it( 'returns true for an allowed third-party inserter media block drag', () => {
+		const result = isMediaDropEligible(
+			[ 'wp-block:plugin/audio' ],
+			[ 'audio' ],
+			true
+		);
+
+		expect( result ).toBe( true );
+	} );
+
 	it( 'returns false for a disallowed inserter block drag', () => {
 		const result = isMediaDropEligible(
 			[ 'wp-block:core/paragraph' ],
+			[ 'audio' ],
+			true
+		);
+
+		expect( result ).toBe( false );
+	} );
+
+	it( 'returns false for a disallowed third-party inserter block drag', () => {
+		const result = isMediaDropEligible(
+			[ 'wp-block:plugin/paragraph' ],
 			[ 'audio' ],
 			true
 		);

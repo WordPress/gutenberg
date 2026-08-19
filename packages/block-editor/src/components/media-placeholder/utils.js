@@ -15,12 +15,12 @@ export function isMediaDropEligible(
 ) {
 	// This dropzone only accepts block drags from the inserter, not
 	// canvas block drags. Only the inserter publishes the dragged
-	// blocks' names, as wp-block:core/{name}, so no matches means it
+	// blocks' names, as wp-block:{namespace}/{name}, so no matches means it
 	// isn't an inserter drag.
-	const prefix = 'wp-block:core/';
+	const prefix = 'wp-block:';
 	const types = dataTransferTypes
 		.filter( ( type ) => type.startsWith( prefix ) )
-		.map( ( type ) => type.slice( prefix.length ) );
+		.map( ( type ) => type.slice( prefix.length ).split( '/' ).pop() );
 	return (
 		types.length > 0 &&
 		types.every( ( type ) => allowedTypes.includes( type ) ) &&
