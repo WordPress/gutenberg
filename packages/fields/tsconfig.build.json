@@ -1,30 +1,34 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.dev.base.json",
+	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"types": [ "jest", "gutenberg-env" ]
+		"checkJs": false
 	},
-	"files": [ "global.d.ts" ],
 	"references": [
-		{ "path": "./tsconfig.build.json" },
+		{ "path": "../a11y/tsconfig.build.json" },
 		{ "path": "../api-fetch/tsconfig.build.json" },
 		{ "path": "../blob/tsconfig.build.json" },
 		{ "path": "../components/tsconfig.build.json" },
+		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../core-data/tsconfig.build.json" },
+		{ "path": "../block-editor/tsconfig.build.json" },
+		{ "path": "../blocks" },
 		{ "path": "../data" },
 		{ "path": "../dataviews/tsconfig.build.json" },
+		{ "path": "../date" },
 		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../hooks" },
+		{ "path": "../html-entities/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
-		{ "path": "../media-fields/tsconfig.build.json" },
+		{ "path": "../media-utils/tsconfig.build.json" },
 		{ "path": "../notices/tsconfig.build.json" },
+		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
+		{ "path": "../router" },
 		{ "path": "../ui/tsconfig.build.json" },
-		{ "path": "../views/tsconfig.build.json" }
-	],
-	// Listed files have pre-existing type errors; include them once fixed.
-	"exclude": [
-		"**/benchmark",
-		"src/components/media-upload-modal/test/index.test.tsx"
+		{ "path": "../url" },
+		{ "path": "../warning" },
+		{ "path": "../wordcount/tsconfig.build.json" }
 	]
 }

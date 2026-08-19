@@ -13,7 +13,7 @@
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../grid/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
-		{ "path": "../icons" },
+		{ "path": "../icons/tsconfig.build.json" },
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
 		{ "path": "../style-runtime" },
