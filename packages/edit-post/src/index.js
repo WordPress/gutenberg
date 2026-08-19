@@ -194,7 +194,6 @@ async function preloadResolutions( postType, postId ) {
 			core.__experimentalGetCurrentThemeBaseGlobalStyles(),
 			core.__experimentalGetCurrentThemeGlobalStylesVariations(),
 			core.getEntityRecord( 'root', '__unstableBase' ),
-			core.getEntityRecord( 'root', 'site' ),
 			core.canUser( 'read', { kind: 'root', name: 'site' } ),
 			core.canUser( 'create', { kind: 'postType', name: 'attachment' } ),
 			core.canUser( 'create', { kind: 'postType', name: 'page' } ),
@@ -238,12 +237,21 @@ async function preloadResolutions( postType, postId ) {
 
 		// Phase 2: read derived data out of state.
 		const tasks = [];
+
+		if ( coreSelect.canUser( 'read', { kind: 'root', name: 'site' } ) ) {
+			tasks.push( core.getEntityRecord( 'root', 'site' ) );
+		}
+
 		const globalStylesId =
 			coreSelect.__experimentalGetCurrentGlobalStylesId();
 		if ( globalStylesId ) {
 			tasks.push(
-				core.getEntityRecord( 'root', 'globalStyles', globalStylesId ),
 				core.canUser( 'read', {
+					kind: 'root',
+					name: 'globalStyles',
+					id: globalStylesId,
+				} ),
+				core.canUser( 'update', {
 					kind: 'root',
 					name: 'globalStyles',
 					id: globalStylesId,
@@ -278,6 +286,22 @@ async function preloadResolutions( postType, postId ) {
 
 		if ( tasks.length ) {
 			await Promise.all( tasks );
+		}
+
+		// Phase 3: requests whose capability check only resolved in phase 2.
+		if (
+			globalStylesId &&
+			coreSelect.canUser( 'update', {
+				kind: 'root',
+				name: 'globalStyles',
+				id: globalStylesId,
+			} )
+		) {
+			await core.getEntityRecord(
+				'root',
+				'globalStyles',
+				globalStylesId
+			);
 		}
 	} catch {
 		// Resolver failures here would also surface on demand; don't block render.
