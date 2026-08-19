@@ -915,11 +915,6 @@
 			"count": 2
 		}
 	},
-	"packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/scrollable/styles.ts": {
 		"no-restricted-imports": {
 			"count": 1
