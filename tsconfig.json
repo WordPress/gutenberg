@@ -59,6 +59,7 @@
 		{ "path": "packages/wordcount" },
 		{ "path": "packages/worker-threads" },
 		{ "path": "routes/dashboard" },
+		{ "path": "routes/dashboard/tsconfig.test.json" },
 		{ "path": "routes/site-health" },
 		{ "path": "storybook" },
 		{ "path": "test/e2e" },

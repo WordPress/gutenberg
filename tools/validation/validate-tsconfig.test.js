@@ -2,7 +2,7 @@
 const { spawnSync } = require( 'node:child_process' );
 const { mkdtempSync, mkdirSync, rmSync, writeFileSync } = require( 'node:fs' );
 const { tmpdir } = require( 'node:os' );
-const { join } = require( 'node:path' );
+const { dirname, join } = require( 'node:path' );
 
 const validatorPath = join( __dirname, 'validate-tsconfig.mjs' );
 const temporaryRoots = [];
@@ -44,7 +44,7 @@ function createRepo( { packages, routes, build, root } ) {
 
 	for ( const [
 		name,
-		{ tsconfigs, dependencies, devDependencies, manifest = true },
+		{ tsconfigs, dependencies, devDependencies, manifest = true, files },
 	] of Object.entries( routes ?? {} ) ) {
 		const routeDir = join( repoRoot, 'routes', name );
 		mkdirSync( routeDir, { recursive: true } );
@@ -60,6 +60,12 @@ function createRepo( { packages, routes, build, root } ) {
 			writeJson( join( routeDir, fileName ), {
 				references: references.map( ( path ) => ( { path } ) ),
 			} );
+		}
+		for ( const file of files ?? [] ) {
+			mkdirSync( join( routeDir, dirname( file ) ), {
+				recursive: true,
+			} );
+			writeFileSync( join( routeDir, file ), 'export {};\n' );
 		}
 	}
 
@@ -711,6 +717,74 @@ test( 'ignores route devDependencies and routes without a manifest', () => {
 				'packages/blob',
 				'routes/dashboard',
 				'routes/site-health',
+			],
+		} )
+	);
+	expect( stderr ).toBe( '' );
+	expect( status ).toBe( 0 );
+} );
+
+test( 'fails when a route has TypeScript test files but no test project', () => {
+	const { status, stderr } = runValidator(
+		createRepo( {
+			packages: {},
+			routes: {
+				dashboard: {
+					tsconfigs: { 'tsconfig.json': [] },
+					files: [ 'hooks/test/layout.test.ts' ],
+				},
+			},
+			build: [],
+			root: [ './tsconfig.build.json', 'routes/dashboard' ],
+		} )
+	);
+	expect( stderr ).toContain(
+		'Missing test project for the TypeScript test files of routes/dashboard'
+	);
+	expect( status ).toBe( 1 );
+} );
+
+test( 'fails when a route test project is missing from the root solution', () => {
+	const { status, stderr } = runValidator(
+		createRepo( {
+			packages: {},
+			routes: {
+				dashboard: {
+					tsconfigs: {
+						'tsconfig.json': [],
+						'tsconfig.test.json': [],
+					},
+					files: [ 'hooks/test/layout.test.ts' ],
+				},
+			},
+			build: [],
+			root: [ './tsconfig.build.json', 'routes/dashboard' ],
+		} )
+	);
+	expect( stderr ).toContain(
+		'Missing reference to "routes/dashboard/tsconfig.test.json" in tsconfig.json'
+	);
+	expect( status ).toBe( 1 );
+} );
+
+test( 'passes when a route test project covers the test files', () => {
+	const { status, stderr } = runValidator(
+		createRepo( {
+			packages: {},
+			routes: {
+				dashboard: {
+					tsconfigs: {
+						'tsconfig.json': [],
+						'tsconfig.test.json': [],
+					},
+					files: [ 'hooks/test/layout.test.ts' ],
+				},
+			},
+			build: [],
+			root: [
+				'./tsconfig.build.json',
+				'routes/dashboard',
+				'routes/dashboard/tsconfig.test.json',
 			],
 		} )
 	);

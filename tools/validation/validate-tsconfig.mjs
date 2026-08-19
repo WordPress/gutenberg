@@ -346,10 +346,34 @@ const routesWithTypes = glob
 for ( const routeName of routesWithTypes ) {
 	const routeDir = resolve( repoRoot, 'routes', routeName );
 	const routeProject = join( routeDir, 'tsconfig.json' );
+	const routeTestProject = join( routeDir, 'tsconfig.test.json' );
 
 	if ( ! rootSolutionReferences.has( routeProject ) ) {
 		reportError(
 			`Missing reference to "routes/${ routeName }" in tsconfig.json`
+		);
+	}
+
+	/*
+	 * The route project excludes test directories, so TypeScript test files
+	 * are only checked when a registered test project covers them.
+	 */
+	const hasTestFiles =
+		glob.sync( '**/{test,tests,__tests__}/**/*.{ts,tsx}', {
+			cwd: routeDir,
+			ignore: [ 'node_modules/**', 'build/**' ],
+		} ).length > 0;
+	if ( hasTestFiles && ! existsSync( routeTestProject ) ) {
+		reportError(
+			`Missing test project for the TypeScript test files of routes/${ routeName }`
+		);
+	}
+	if (
+		existsSync( routeTestProject ) &&
+		! rootSolutionReferences.has( routeTestProject )
+	) {
+		reportError(
+			`Missing reference to "routes/${ routeName }/tsconfig.test.json" in tsconfig.json`
 		);
 	}
 
