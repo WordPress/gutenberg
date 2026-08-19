@@ -1,9 +1,14 @@
 import {
+	cloneSanitizedBlock,
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 } from '@wordpress/blocks';
 
 const MAXIMUM_SELECTED_BLOCKS = 6;
+const ROW_VERTICAL_ALIGNMENTS = [ 'top', 'center', 'bottom', 'stretch' ];
+
+const getObjectValue = ( value ) =>
+	value && typeof value === 'object' && ! Array.isArray( value ) ? value : {};
 
 const getColumnBlocksFromGrid = ( innerBlocks, columnCount ) => {
 	const columnWidth = +( 100 / columnCount ).toFixed( 2 );
@@ -36,6 +41,50 @@ const getGridInnerBlocks = ( innerBlocks ) =>
 		}
 		return columnInnerBlocks;
 	} );
+
+const getRowInnerBlocks = ( innerBlocks ) => {
+	return innerBlocks.map( ( column ) => {
+		const columnInnerBlocks = Array.isArray( column?.innerBlocks )
+			? column.innerBlocks
+			: [];
+		const width = column?.attributes?.width;
+		let columnWidth;
+		if ( Number.isFinite( width ) ) {
+			columnWidth = `${ width }%`;
+		} else if ( typeof width === 'string' && /\d/.test( width ) ) {
+			columnWidth = width;
+		}
+		const childLayout = columnWidth
+			? { selfStretch: 'fixed', flexSize: columnWidth }
+			: { selfStretch: 'fill' };
+
+		if ( columnInnerBlocks.length === 1 ) {
+			const innerBlock = columnInnerBlocks[ 0 ];
+			const style = getObjectValue( innerBlock.attributes?.style );
+			const layout = getObjectValue( style.layout );
+			const updatedLayout = { ...layout, ...childLayout };
+			if ( ! columnWidth ) {
+				delete updatedLayout.flexSize;
+			}
+
+			return cloneSanitizedBlock( innerBlock, {
+				style: {
+					...style,
+					layout: updatedLayout,
+				},
+			} );
+		}
+
+		return createBlock(
+			'core/group',
+			{
+				layout: { type: 'constrained' },
+				style: { layout: childLayout },
+			},
+			columnInnerBlocks
+		);
+	} );
+};
 
 const transforms = {
 	from: [
@@ -161,6 +210,33 @@ const transforms = {
 		},
 	],
 	to: [
+		{
+			type: 'block',
+			blocks: [ 'core/group' ],
+			variationName: 'group-row',
+			transform: ( attributes, innerBlocks ) => {
+				const { verticalAlignment } = attributes;
+				const rowVerticalAlignment = ROW_VERTICAL_ALIGNMENTS.includes(
+					verticalAlignment
+				)
+					? verticalAlignment
+					: 'stretch';
+				return createBlock(
+					'core/group',
+					{
+						...attributes,
+						isStackedOnMobile: undefined,
+						verticalAlignment: undefined,
+						layout: {
+							type: 'flex',
+							flexWrap: 'nowrap',
+							verticalAlignment: rowVerticalAlignment,
+						},
+					},
+					getRowInnerBlocks( innerBlocks )
+				);
+			},
+		},
 		{
 			type: 'block',
 			blocks: [ 'core/group' ],
