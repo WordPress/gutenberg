@@ -58,7 +58,7 @@ function validateNestedArrayKeys( children: ReactNode ) {
 		for ( const arrayChild of child ) {
 			if ( isValidElement( arrayChild ) && arrayChild.key === null ) {
 				throw new Error(
-					'Breadcrumb: Items rendered from an array need stable React keys.'
+					'Breadcrumbs: Items rendered from an array need stable React keys.'
 				);
 			}
 		}
@@ -78,7 +78,7 @@ function getBreadcrumbItems( children: ReactNode ) {
 		if ( ! isValidElement< LinkItemProps | CurrentItemProps >( child ) ) {
 			if ( process.env.NODE_ENV !== 'production' ) {
 				throw new Error(
-					'Breadcrumb: <Breadcrumb.Root> only accepts <Breadcrumb.LinkItem> and <Breadcrumb.CurrentItem> as direct children.'
+					'Breadcrumbs: <Breadcrumbs.Root> only accepts <Breadcrumbs.LinkItem> and <Breadcrumbs.CurrentItem> as direct children.'
 				);
 			}
 			return;
@@ -94,7 +94,7 @@ function getBreadcrumbItems( children: ReactNode ) {
 		if ( ! kind ) {
 			if ( process.env.NODE_ENV !== 'production' ) {
 				throw new Error(
-					'Breadcrumb: <Breadcrumb.Root> only accepts <Breadcrumb.LinkItem> and <Breadcrumb.CurrentItem> as direct children.'
+					'Breadcrumbs: <Breadcrumbs.Root> only accepts <Breadcrumbs.LinkItem> and <Breadcrumbs.CurrentItem> as direct children.'
 				);
 			}
 			return;
@@ -104,7 +104,7 @@ function getBreadcrumbItems( children: ReactNode ) {
 		if ( typeof label !== 'string' || ! label.trim() ) {
 			if ( process.env.NODE_ENV !== 'production' ) {
 				throw new Error(
-					`Breadcrumb: <Breadcrumb.${
+					`Breadcrumbs: <Breadcrumbs.${
 						kind === 'link' ? 'LinkItem' : 'CurrentItem'
 					}> requires a non-empty text label.`
 				);
@@ -119,7 +119,7 @@ function getBreadcrumbItems( children: ReactNode ) {
 		) {
 			if ( process.env.NODE_ENV !== 'production' ) {
 				throw new Error(
-					'Breadcrumb: <Breadcrumb.LinkItem> requires a usable `href`.'
+					'Breadcrumbs: <Breadcrumbs.LinkItem> requires a usable `href`.'
 				);
 			}
 			return;
@@ -156,22 +156,22 @@ function getBreadcrumbItems( children: ReactNode ) {
 
 		if ( linkItems.length === 0 ) {
 			throw new Error(
-				'Breadcrumb: <Breadcrumb.Root> requires at least one <Breadcrumb.LinkItem>.'
+				'Breadcrumbs: <Breadcrumbs.Root> requires at least one <Breadcrumbs.LinkItem>.'
 			);
 		}
 		if ( currentItems.length === 0 ) {
 			throw new Error(
-				'Breadcrumb: <Breadcrumb.Root> requires one final <Breadcrumb.CurrentItem>.'
+				'Breadcrumbs: <Breadcrumbs.Root> requires one final <Breadcrumbs.CurrentItem>.'
 			);
 		}
 		if ( currentItems.length > 1 ) {
 			throw new Error(
-				'Breadcrumb: <Breadcrumb.Root> accepts exactly one <Breadcrumb.CurrentItem>.'
+				'Breadcrumbs: <Breadcrumbs.Root> accepts exactly one <Breadcrumbs.CurrentItem>.'
 			);
 		}
 		if ( items.at( -1 )?.kind !== 'current' ) {
 			throw new Error(
-				'Breadcrumb: <Breadcrumb.CurrentItem> must be the final child of <Breadcrumb.Root>.'
+				'Breadcrumbs: <Breadcrumbs.CurrentItem> must be the final child of <Breadcrumbs.Root>.'
 			);
 		}
 	}
@@ -222,13 +222,13 @@ function getContentBoxInlineSize( element: HTMLElement ) {
  * ancestors that do not fit into an accessible overflow menu.
  *
  * ```jsx
- * <Breadcrumb.Root aria-label="Breadcrumbs">
- *   <Breadcrumb.LinkItem href="/">Dashboard</Breadcrumb.LinkItem>
- *   <Breadcrumb.CurrentItem>Settings</Breadcrumb.CurrentItem>
- * </Breadcrumb.Root>
+ * <Breadcrumbs.Root aria-label="Breadcrumbs">
+ *   <Breadcrumbs.LinkItem href="/">Dashboard</Breadcrumbs.LinkItem>
+ *   <Breadcrumbs.CurrentItem>Settings</Breadcrumbs.CurrentItem>
+ * </Breadcrumbs.Root>
  * ```
  */
-const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
+const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbsRoot(
 	{
 		'aria-label': ariaLabel,
 		'aria-labelledby': ariaLabelledBy,
@@ -697,6 +697,6 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 	return root;
 } );
 
-Root.displayName = 'Breadcrumb.Root';
+Root.displayName = 'Breadcrumbs.Root';
 
 export { Root };

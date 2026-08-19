@@ -17,7 +17,7 @@ import { useIsTruncated } from './use-is-truncated';
  * Renders the current, non-navigable page in a breadcrumb trail.
  */
 const CurrentItem = forwardRef< HTMLSpanElement, CurrentItemProps >(
-	function BreadcrumbCurrentItem(
+	function BreadcrumbsCurrentItem(
 		{ children, className, onBlur, onFocus, render, ...props },
 		forwardedRef
 	) {
@@ -85,6 +85,6 @@ const CurrentItem = forwardRef< HTMLSpanElement, CurrentItemProps >(
 	}
 );
 
-CurrentItem.displayName = 'Breadcrumb.CurrentItem';
+CurrentItem.displayName = 'Breadcrumbs.CurrentItem';
 
 export { CurrentItem };

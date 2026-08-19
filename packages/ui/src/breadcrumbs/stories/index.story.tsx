@@ -1,15 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { forwardRef } from '@wordpress/element';
 import type { ComponentProps } from 'react';
-import * as Breadcrumb from '../';
+import * as Breadcrumbs from '../';
 
-const meta: Meta< typeof Breadcrumb.Root > = {
-	title: 'Design System/Components/Breadcrumb',
-	component: Breadcrumb.Root,
+const meta: Meta< typeof Breadcrumbs.Root > = {
+	title: 'Design System/Components/Breadcrumbs',
+	component: Breadcrumbs.Root,
 	tags: [ 'manifest' ],
 	subcomponents: {
-		'Breadcrumb.LinkItem': Breadcrumb.LinkItem,
-		'Breadcrumb.CurrentItem': Breadcrumb.CurrentItem,
+		'Breadcrumbs.LinkItem': Breadcrumbs.LinkItem,
+		'Breadcrumbs.CurrentItem': Breadcrumbs.CurrentItem,
 	},
 	argTypes: {
 		children: { control: false },
@@ -25,21 +25,23 @@ const meta: Meta< typeof Breadcrumb.Root > = {
 
 export default meta;
 
-type Story = StoryObj< typeof Breadcrumb.Root >;
+type Story = StoryObj< typeof Breadcrumbs.Root >;
 
 function ExampleTrail() {
 	return (
-		<Breadcrumb.Root>
-			<Breadcrumb.LinkItem href="/">Dashboard</Breadcrumb.LinkItem>
-			<Breadcrumb.LinkItem href="/products">Products</Breadcrumb.LinkItem>
-			<Breadcrumb.LinkItem href="/products/themes">
+		<Breadcrumbs.Root>
+			<Breadcrumbs.LinkItem href="/">Dashboard</Breadcrumbs.LinkItem>
+			<Breadcrumbs.LinkItem href="/products">
+				Products
+			</Breadcrumbs.LinkItem>
+			<Breadcrumbs.LinkItem href="/products/themes">
 				Themes
-			</Breadcrumb.LinkItem>
-			<Breadcrumb.LinkItem href="/products/themes/twentytwentyfive">
+			</Breadcrumbs.LinkItem>
+			<Breadcrumbs.LinkItem href="/products/themes/twentytwentyfive">
 				Twenty Twenty-Five
-			</Breadcrumb.LinkItem>
-			<Breadcrumb.CurrentItem>Style variations</Breadcrumb.CurrentItem>
-		</Breadcrumb.Root>
+			</Breadcrumbs.LinkItem>
+			<Breadcrumbs.CurrentItem>Style variations</Breadcrumbs.CurrentItem>
+		</Breadcrumbs.Root>
 	);
 }
 
@@ -75,18 +77,20 @@ export const ResponsiveStates: Story = {
 export const LongLabelsAndRtl: Story = {
 	render: () => (
 		<div dir="rtl" style={ { inlineSize: 420, maxInlineSize: '100%' } }>
-			<Breadcrumb.Root aria-label="مسار التنقل">
-				<Breadcrumb.LinkItem href="/">لوحة التحكم</Breadcrumb.LinkItem>
-				<Breadcrumb.LinkItem href="/appearance">
+			<Breadcrumbs.Root aria-label="مسار التنقل">
+				<Breadcrumbs.LinkItem href="/">
+					لوحة التحكم
+				</Breadcrumbs.LinkItem>
+				<Breadcrumbs.LinkItem href="/appearance">
 					المظهر وإعدادات التخصيص
-				</Breadcrumb.LinkItem>
-				<Breadcrumb.LinkItem href="/appearance/themes">
+				</Breadcrumbs.LinkItem>
+				<Breadcrumbs.LinkItem href="/appearance/themes">
 					القوالب المثبتة على هذا الموقع
-				</Breadcrumb.LinkItem>
-				<Breadcrumb.CurrentItem>
+				</Breadcrumbs.LinkItem>
+				<Breadcrumbs.CurrentItem>
 					إعدادات القالب الحالي وتخصيص أنماط العرض
-				</Breadcrumb.CurrentItem>
-			</Breadcrumb.Root>
+				</Breadcrumbs.CurrentItem>
+			</Breadcrumbs.Root>
 		</div>
 	),
 };
@@ -103,17 +107,17 @@ const RouterLink = forwardRef< HTMLAnchorElement, ComponentProps< 'a' > >(
 
 export const RouterLinkComposition: Story = {
 	render: () => (
-		<Breadcrumb.Root>
-			<Breadcrumb.LinkItem href="/" render={ <RouterLink /> }>
+		<Breadcrumbs.Root>
+			<Breadcrumbs.LinkItem href="/" render={ <RouterLink /> }>
 				Dashboard
-			</Breadcrumb.LinkItem>
-			<Breadcrumb.LinkItem
+			</Breadcrumbs.LinkItem>
+			<Breadcrumbs.LinkItem
 				href="/settings?section=writing#defaults"
 				render={ <RouterLink /> }
 			>
 				Writing settings
-			</Breadcrumb.LinkItem>
-			<Breadcrumb.CurrentItem>Defaults</Breadcrumb.CurrentItem>
-		</Breadcrumb.Root>
+			</Breadcrumbs.LinkItem>
+			<Breadcrumbs.CurrentItem>Defaults</Breadcrumbs.CurrentItem>
+		</Breadcrumbs.Root>
 	),
 };

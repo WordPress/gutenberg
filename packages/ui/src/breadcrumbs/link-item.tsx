@@ -134,7 +134,7 @@ function OverflowLinkItem( {
  * standard `render` prop.
  */
 const LinkItem = forwardRef< HTMLAnchorElement, LinkItemProps >(
-	function BreadcrumbLinkItem( props, ref ) {
+	function BreadcrumbsLinkItem( props, ref ) {
 		const { mode } = useBreadcrumbItemRenderContext();
 
 		return mode === 'overflow' ? (
@@ -145,6 +145,6 @@ const LinkItem = forwardRef< HTMLAnchorElement, LinkItemProps >(
 	}
 );
 
-LinkItem.displayName = 'Breadcrumb.LinkItem';
+LinkItem.displayName = 'Breadcrumbs.LinkItem';
 
 export { LinkItem };

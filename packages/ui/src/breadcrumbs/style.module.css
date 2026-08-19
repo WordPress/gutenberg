@@ -10,16 +10,16 @@
 		}
 
 		.list {
-			--wp-ui-breadcrumb-focus-ring-space: var(--wpds-dimension-padding-xs);
+			--wp-ui-breadcrumbs-focus-ring-space: var(--wpds-dimension-padding-xs);
 
 			display: flex;
 			align-items: center;
 			min-inline-size: 0;
-			min-block-size: calc(var(--wpds-dimension-size-sm) + var(--wp-ui-breadcrumb-focus-ring-space) * 2);
+			min-block-size: calc(var(--wpds-dimension-size-sm) + var(--wp-ui-breadcrumbs-focus-ring-space) * 2);
 			max-inline-size: 100%;
 			margin: 0;
-			padding-block: var(--wp-ui-breadcrumb-focus-ring-space);
-			padding-inline: var(--wp-ui-breadcrumb-focus-ring-space);
+			padding-block: var(--wp-ui-breadcrumbs-focus-ring-space);
+			padding-inline: var(--wp-ui-breadcrumbs-focus-ring-space);
 			overflow-x: auto;
 			overflow-y: hidden;
 			list-style: none;

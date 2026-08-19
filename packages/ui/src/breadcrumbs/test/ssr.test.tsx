@@ -1,16 +1,16 @@
 import { renderToStaticMarkup } from 'react-dom/server';
-import * as Breadcrumb from '../index';
+import * as Breadcrumbs from '../index';
 
-describe( 'Breadcrumb server rendering', () => {
+describe( 'Breadcrumbs server rendering', () => {
 	it( 'renders the complete semantic trail before client measurement', () => {
 		const view = renderToStaticMarkup(
-			<Breadcrumb.Root>
-				<Breadcrumb.LinkItem href="/">Home</Breadcrumb.LinkItem>
-				<Breadcrumb.LinkItem href="/section?view=all#latest">
+			<Breadcrumbs.Root>
+				<Breadcrumbs.LinkItem href="/">Home</Breadcrumbs.LinkItem>
+				<Breadcrumbs.LinkItem href="/section?view=all#latest">
 					Section
-				</Breadcrumb.LinkItem>
-				<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
-			</Breadcrumb.Root>
+				</Breadcrumbs.LinkItem>
+				<Breadcrumbs.CurrentItem>Current</Breadcrumbs.CurrentItem>
+			</Breadcrumbs.Root>
 		);
 
 		expect( view ).toContain( '<nav' );

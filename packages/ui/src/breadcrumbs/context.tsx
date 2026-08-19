@@ -18,7 +18,7 @@ function useBreadcrumbItemRenderContext() {
 
 	if ( process.env.NODE_ENV !== 'production' && ! context ) {
 		throw new Error(
-			'Breadcrumb: <Breadcrumb.LinkItem> and <Breadcrumb.CurrentItem> must be direct children of <Breadcrumb.Root>.'
+			'Breadcrumbs: <Breadcrumbs.LinkItem> and <Breadcrumbs.CurrentItem> must be direct children of <Breadcrumbs.Root>.'
 		);
 	}
 
