@@ -167,15 +167,27 @@ export default function NavigationMenuContent( { rootClientId } ) {
 	return (
 		<>
 			{ ! isLoading && (
-				<PrivateListView
-					ref={ listViewRef }
-					rootClientId={ listViewRootClientId }
-					onSelect={ offCanvasOnselect }
-					blockSettingsMenu={ LeafMoreMenuWithEditingBlock }
-					showAppender
-					additionalBlockContent={ NavigationLinkUIWithEditingBlock }
-					isExpanded
-				/>
+				<>
+					<PrivateListView
+						ref={ listViewRef }
+						rootClientId={ listViewRootClientId }
+						onSelect={ offCanvasOnselect }
+						blockSettingsMenu={ LeafMoreMenuWithEditingBlock }
+						showAppender
+						additionalBlockContent={
+							NavigationLinkUIWithEditingBlock
+						}
+						isExpanded
+					/>
+					{ editingBlock?.clientId && (
+						<NavigationLinkUI
+							editingBlock={ editingBlock }
+							editingPopoverAnchor={ editingPopoverAnchor }
+							editingPopoverProps={ editingPopoverProps }
+							setEditingBlock={ setEditingBlock }
+						/>
+					) }
+				</>
 			) }
 			<div className="edit-site-sidebar-navigation-screen-navigation-menus__helper-block-editor">
 				<BlockList />
