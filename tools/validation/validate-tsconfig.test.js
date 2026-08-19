@@ -23,7 +23,7 @@ function writeJson( path, contents ) {
  *
  * @param {Object} repo          Repository description.
  * @param {Object} repo.packages Package name to `{ tsconfigs, dependencies }`.
- * @param {Object} [repo.routes] Route name to `{ tsconfigs, dependencies }`.
+ * @param {Object} [repo.routes] Route name to `{ tsconfigs, dependencies, devDependencies, manifest }`.
  * @param {Array}  repo.build    References of the build solution.
  * @param {Array}  repo.root     References of the root solution.
  * @return {string} Path of the created repository root.
@@ -42,16 +42,20 @@ function createRepo( { packages, routes, build, root } ) {
 		references: root.map( ( path ) => ( { path } ) ),
 	} );
 
-	for ( const [ name, { tsconfigs, dependencies } ] of Object.entries(
-		routes ?? {}
-	) ) {
+	for ( const [
+		name,
+		{ tsconfigs, dependencies, devDependencies, manifest = true },
+	] of Object.entries( routes ?? {} ) ) {
 		const routeDir = join( repoRoot, 'routes', name );
 		mkdirSync( routeDir, { recursive: true } );
-		writeJson( join( routeDir, 'package.json' ), {
-			name: `@wordpress/route-${ name }`,
-			version: '1.0.0',
-			...( dependencies && { dependencies } ),
-		} );
+		if ( manifest ) {
+			writeJson( join( routeDir, 'package.json' ), {
+				name: `@wordpress/route-${ name }`,
+				version: '1.0.0',
+				...( dependencies && { dependencies } ),
+				...( devDependencies && { devDependencies } ),
+			} );
+		}
 		for ( const [ fileName, references ] of Object.entries( tsconfigs ) ) {
 			writeJson( join( routeDir, fileName ), {
 				references: references.map( ( path ) => ( { path } ) ),
@@ -657,4 +661,59 @@ test( 'fails when a route does not reference a dependency', () => {
 		'Missing reference to "../../packages/blob/tsconfig.build.json" in routes/dashboard/tsconfig.json'
 	);
 	expect( status ).toBe( 1 );
+} );
+
+test( 'passes when a route references an unsplit dependency by directory', () => {
+	const { status, stderr } = runValidator(
+		createRepo( {
+			packages: {
+				hooks: { tsconfigs: { 'tsconfig.json': [] } },
+				'jest-console': devOnlyPackage,
+			},
+			routes: {
+				dashboard: {
+					tsconfigs: { 'tsconfig.json': [ '../../packages/hooks' ] },
+					dependencies: {
+						'@wordpress/hooks': 'file:../..',
+						'@wordpress/jest-console': 'file:../..',
+					},
+				},
+			},
+			build: [ 'packages/hooks' ],
+			root: [
+				'./tsconfig.build.json',
+				'packages/jest-console',
+				'routes/dashboard',
+			],
+		} )
+	);
+	expect( stderr ).toBe( '' );
+	expect( status ).toBe( 0 );
+} );
+
+test( 'ignores route devDependencies and routes without a manifest', () => {
+	const { status, stderr } = runValidator(
+		createRepo( {
+			packages: { blob: splitPackage },
+			routes: {
+				dashboard: {
+					tsconfigs: { 'tsconfig.json': [] },
+					devDependencies: { '@wordpress/blob': 'file:../..' },
+				},
+				'site-health': {
+					tsconfigs: { 'tsconfig.json': [] },
+					manifest: false,
+				},
+			},
+			build: [ 'packages/blob/tsconfig.build.json' ],
+			root: [
+				'./tsconfig.build.json',
+				'packages/blob',
+				'routes/dashboard',
+				'routes/site-health',
+			],
+		} )
+	);
+	expect( stderr ).toBe( '' );
+	expect( status ).toBe( 0 );
 } );
