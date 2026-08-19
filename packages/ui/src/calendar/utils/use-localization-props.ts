@@ -79,14 +79,15 @@ export const useLocalizationProps = ( {
 	mode: 'single' | 'range';
 } ) => {
 	return useMemo( () => {
-		const isLocaleCode = typeof locale === 'string';
+		const isLocaleString = typeof locale === 'string';
+		const dateFnsLocale = isLocaleString ? enUS : locale;
 		const localeCode =
-			getSupportedLocaleCode( isLocaleCode ? locale : locale.code ) ??
+			getSupportedLocaleCode( isLocaleString ? locale : locale.code ) ??
 			'en-US';
 		const intlLocale = new Intl.Locale(
 			localeCode
 		) as IntlLocaleWithWeekInfo;
-		const weekStartsOn = isLocaleCode
+		const weekStartsOn = isLocaleString
 			? getWeekStartsOn( intlLocale )
 			: undefined;
 
@@ -204,7 +205,7 @@ export const useLocalizationProps = ( {
 				labelWeekday: ( date: Date ) =>
 					weekdayLongFormatter.format( date ),
 			},
-			locale: isLocaleCode ? enUS : locale,
+			locale: dateFnsLocale,
 			lang: localeCode,
 			dir: isLocaleRTL( intlLocale ) ? 'rtl' : 'ltr',
 			...( weekStartsOn === undefined ? {} : { weekStartsOn } ),
