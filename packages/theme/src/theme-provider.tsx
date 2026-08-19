@@ -1,5 +1,5 @@
-import { useMemo, useRef } from '@wordpress/element';
-import { useIsomorphicLayoutEffect } from '@wordpress/compose';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
+import { useEvent, useIsomorphicLayoutEffect } from '@wordpress/compose';
 import { ThemeContext } from './context';
 import { useThemeProviderStyles } from './use-theme-provider-styles';
 import { type ThemeProviderProps } from './types';
@@ -21,14 +21,17 @@ export const ThemeProvider = ( {
 	cursor,
 	cornerRadius,
 	isRoot = false,
+	onColorWarnings,
 }: ThemeProviderProps ) => {
-	const { themeProviderStyles, resolvedSettings } = useThemeProviderStyles( {
-		color,
-		cursor,
-		cornerRadius,
-	} );
+	const { themeProviderStyles, resolvedSettings, colorWarnings } =
+		useThemeProviderStyles( {
+			color,
+			cursor,
+			cornerRadius,
+		} );
 
 	const cornerRadiusPreset = resolvedSettings.cornerRadius ?? 'subtle';
+	const onColorWarningsEvent = useEvent( onColorWarnings );
 
 	const contextValue = useMemo(
 		() => ( {
@@ -38,6 +41,12 @@ export const ThemeProvider = ( {
 	);
 
 	const wrapperRef = useRef< HTMLDivElement >( null );
+
+	useEffect( () => {
+		if ( colorWarnings !== undefined ) {
+			onColorWarningsEvent( colorWarnings );
+		}
+	}, [ colorWarnings, onColorWarningsEvent ] );
 
 	// For root providers, mirror the wrapper's custom properties and preset
 	// attributes onto the document element of the wrapper's own document

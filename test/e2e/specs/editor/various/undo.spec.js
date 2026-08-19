@@ -550,7 +550,7 @@ test.describe( 'undo', () => {
 		// This cleanup runs through `withMultiEntityRecordEdits`, which
 		// real-time collaboration bypasses in favor of its own undo manager.
 		const isCollaborationEnabled = await page.evaluate(
-			() => window._wpCollaborationEnabled === true
+			() => window.__experimentalEnableRealTimeCollaboration === true
 		);
 
 		// The entity is no longer dirty, so the "Save" button is disabled.
