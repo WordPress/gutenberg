@@ -58,5 +58,6 @@ router's link with no definition change.
 -   [ ] When WordPress/gutenberg#81740 lands and step 17 provides the seam
     on the chain, confirm `Details` mounts the router link on the dashboard
     with no change to this definition.
--   [ ] When bindings land (step 13), the overview can carry live check
-    counts through a binding source instead of a static list.
+-   [x] Step 24 replaced the static list with the server-rendered
+    `widget-def/site-health-counts` block. A binding source (step 13) stays
+    the client-side alternative if the counts ever need to be reactive.

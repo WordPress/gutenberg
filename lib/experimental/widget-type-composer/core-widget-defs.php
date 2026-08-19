@@ -82,9 +82,11 @@ function gutenberg_get_composition_demo_content() {
 /**
  * Returns the composition for the Site Health Overview definition.
  *
- * Static core blocks, every one resolved through the SSR fallback. The
- * overview stays declarative; the live results belong to the Site Health
- * page its `Details` action targets.
+ * A paragraph plus the `widget-def/site-health-counts` dynamic block, every
+ * piece resolved through the SSR fallback. The counts block reads the cached
+ * Site Health results on the server at render time, so the composition
+ * carries backend data while staying declarative; the full results belong to
+ * the Site Health page its `Details` action targets.
  *
  * Spacing is inline because the dashboard does not enqueue
  * `wp-block-library`, so the block classes resolve to nothing.
@@ -92,24 +94,11 @@ function gutenberg_get_composition_demo_content() {
  * @return string Block markup.
  */
 function gutenberg_get_site_health_overview_content() {
-	$item_style = 'margin:0 0 4px;';
-
 	return '<!-- wp:paragraph -->' .
 		'<p style="margin:0 0 12px;">' .
 		esc_html__( 'WordPress runs periodic health checks covering performance and security.', 'gutenberg' ) .
 		'</p><!-- /wp:paragraph -->' .
-		'<!-- wp:list -->' .
-		'<ul class="wp-block-list" style="margin:0;padding-left:20px;">' .
-		'<!-- wp:list-item --><li style="' . esc_attr( $item_style ) . '">' .
-		esc_html__( 'Background updates', 'gutenberg' ) .
-		'</li><!-- /wp:list-item -->' .
-		'<!-- wp:list-item --><li style="' . esc_attr( $item_style ) . '">' .
-		esc_html__( 'Loopback requests', 'gutenberg' ) .
-		'</li><!-- /wp:list-item -->' .
-		'<!-- wp:list-item --><li style="margin:0;">' .
-		esc_html__( 'HTTPS status', 'gutenberg' ) .
-		'</li><!-- /wp:list-item -->' .
-		'</ul><!-- /wp:list -->';
+		'<!-- wp:widget-def/site-health-counts /-->';
 }
 
 /**
