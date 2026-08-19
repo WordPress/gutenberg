@@ -9,9 +9,7 @@ import {
 	formatListBullets,
 	listView,
 	external,
-	keyboard,
 	symbol,
-	page,
 	layout,
 	rotateRight,
 	rotateLeft,
@@ -170,7 +168,6 @@ const getEditorCommandLoader = () =>
 		commands.push( {
 			name: 'core/open-shortcut-help',
 			label: __( 'Keyboard shortcuts' ),
-			icon: keyboard,
 			category: 'view',
 			callback: ( { close } ) => {
 				close();
@@ -568,7 +565,6 @@ const getPageContentFocusCommands = () =>
 			commands.push( {
 				name: 'core/switch-to-previous-entity',
 				label: __( 'Go back' ),
-				icon: page,
 				category: 'view',
 				callback: ( { close } ) => {
 					goBack();
