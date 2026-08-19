@@ -1,13 +1,13 @@
-import clsx from 'clsx';
 import { useState, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { debounce } from '@wordpress/compose';
 import {
-	Button,
 	__experimentalTruncate as Truncate,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Button } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import PreviewBlockPopover from '../block-switcher/preview-block-popover';
 import useStylesForBlocks from './use-styles-for-block';
@@ -111,20 +111,16 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 					<div className="block-editor-block-styles__variants">
 						{ stylesToRender.map( ( style ) => {
 							const buttonText = style.label || style.name;
-
 							return (
 								<Button
-									__next40pxDefaultSize
-									className={ clsx(
-										'block-editor-block-styles__item',
-										{
-											'is-active':
-												activeStyle.name === style.name,
-										}
-									) }
+									className="block-editor-block-styles__item"
 									key={ style.name }
-									variant="secondary"
-									label={ buttonText }
+									tone="neutral"
+									variant={
+										activeStyle.name === style.name
+											? 'solid'
+											: 'outline'
+									}
 									onMouseEnter={ () =>
 										styleItemHandler( style )
 									}
@@ -141,7 +137,7 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 									}
 								>
 									<Truncate
-										numberOfLines={ 1 }
+										numberOfLines={ 3 }
 										className="block-editor-block-styles__item-text"
 									>
 										{ buttonText }
