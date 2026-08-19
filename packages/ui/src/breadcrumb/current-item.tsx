@@ -49,7 +49,7 @@ const CurrentItem = forwardRef< HTMLSpanElement, CurrentItemProps >(
 						resetStyles[ 'box-sizing' ],
 						styles.label,
 						styles.current,
-						isTruncated &&
+						( isTruncated || isFocusPinned ) &&
 							focusStyles[ 'outset-ring--focus-visible' ],
 						className
 					),

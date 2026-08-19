@@ -91,15 +91,26 @@ function OverflowLinkItem( {
 	target,
 	...props
 }: LinkItemImplementationProps ) {
+	let resolvedRender = render;
+	if ( typeof render === 'function' && target === undefined ) {
+		const renderFunction = render;
+		resolvedRender = ( ...args: Parameters< typeof renderFunction > ) => {
+			const [ renderProps, ...rest ] = args;
+			const renderPropsWithoutTarget = { ...renderProps };
+			Reflect.deleteProperty( renderPropsWithoutTarget, 'target' );
+
+			return renderFunction( renderPropsWithoutTarget, ...rest );
+		};
+	}
 	const enforcedRender = enforceRenderProps(
-		render ?? (
+		resolvedRender ?? (
 			/* eslint-disable-next-line jsx-a11y/anchor-has-content, jsx-a11y/anchor-is-valid -- Menu.LinkItem clones this template with the required href and accessible content. */
 			<a />
 		),
 		{
 			'aria-current': undefined,
 			href,
-			target,
+			...( target !== undefined && { target } ),
 		}
 	);
 

@@ -192,6 +192,31 @@ function responsiveStatesAreEqual(
 	);
 }
 
+function getContentBoxInlineSize( element: HTMLElement ) {
+	const computedStyles = getComputedStyle( element );
+	const shorthandValues = computedStyles.paddingInline
+		.split( /\s+/ )
+		.map( ( value ) => Number.parseFloat( value ) )
+		.filter( Number.isFinite );
+	const shorthandStart = shorthandValues[ 0 ] ?? 0;
+	const shorthandEnd = shorthandValues[ 1 ] ?? shorthandStart;
+	const paddingInlineStart =
+		Number.parseFloat( computedStyles.paddingInlineStart ) ||
+		Number.parseFloat( computedStyles.paddingLeft ) ||
+		shorthandStart;
+	const paddingInlineEnd =
+		Number.parseFloat( computedStyles.paddingInlineEnd ) ||
+		Number.parseFloat( computedStyles.paddingRight ) ||
+		shorthandEnd;
+	const paddingBoxWidth =
+		element.clientWidth || element.getBoundingClientRect().width;
+
+	return Math.max(
+		0,
+		paddingBoxWidth - paddingInlineStart - paddingInlineEnd
+	);
+}
+
 /**
  * Renders a labelled breadcrumb navigation landmark and automatically moves
  * ancestors that do not fit into an accessible overflow menu.
@@ -300,11 +325,10 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 				return;
 			}
 
-			const availableWidth =
-				visibleListRef.current?.clientWidth ||
-				visibleListRef.current?.getBoundingClientRect().width ||
-				rootElement.clientWidth ||
-				rootElement.getBoundingClientRect().width;
+			const availableWidth = visibleListRef.current
+				? getContentBoxInlineSize( visibleListRef.current )
+				: rootElement.clientWidth ||
+				  rootElement.getBoundingClientRect().width;
 			const currentItemWidth = currentItem
 				? measureElement(
 						intrinsicItemRefs.current.get( currentItem.itemKey ) ??

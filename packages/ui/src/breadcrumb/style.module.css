@@ -19,7 +19,7 @@
 			max-inline-size: 100%;
 			margin: 0;
 			padding-block: var(--wp-ui-breadcrumb-focus-ring-space);
-			padding-inline: 0;
+			padding-inline: var(--wp-ui-breadcrumb-focus-ring-space);
 			overflow-x: auto;
 			overflow-y: hidden;
 			list-style: none;

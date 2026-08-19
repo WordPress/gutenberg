@@ -701,7 +701,7 @@ describe( 'Breadcrumb', () => {
 					children: linkChildren,
 					...linkProps
 				}: HTMLAttributes< HTMLElement > ) => (
-					<a data-router-link { ...linkProps }>
+					<a data-router-link target="docs-frame" { ...linkProps }>
 						{ linkChildren }
 					</a>
 				)
@@ -712,7 +712,6 @@ describe( 'Breadcrumb', () => {
 					<Breadcrumb.LinkItem
 						href="/settings?tab=writing#defaults"
 						render={ renderLink }
-						target="docs-frame"
 					>
 						Settings
 					</Breadcrumb.LinkItem>
@@ -957,10 +956,14 @@ describe( 'Breadcrumb', () => {
 			notifyResize();
 			await waitFor( () => expect( current ).toHaveFocus() );
 			expect( current ).toHaveAttribute( 'tabindex', '0' );
+			expect( current ).toHaveClass( 'style-outset-ring-focus-visible' );
 
 			act( () => current.blur() );
 			await waitFor( () =>
 				expect( current ).not.toHaveAttribute( 'tabindex' )
+			);
+			expect( current ).not.toHaveClass(
+				'style-outset-ring-focus-visible'
 			);
 		} );
 
@@ -1021,6 +1024,24 @@ describe( 'Breadcrumb', () => {
 	} );
 
 	describe( 'measurement lifecycle', () => {
+		it( 'subtracts focus-ring padding from the available inline size', () => {
+			availableWidth = 164;
+			labelWidths.set( 'Section', 80 );
+			renderDefaultTrail();
+
+			const list = screen.getByRole( 'list' );
+			expect(
+				screen.queryByRole( 'button', { name: /hidden breadcrumb/ } )
+			).not.toBeInTheDocument();
+
+			list.style.paddingInline = '4px';
+			notifyResize( list );
+
+			expect(
+				screen.getByRole( 'button', { name: /hidden breadcrumb/ } )
+			).toBeInTheDocument();
+		} );
+
 		it( 'measures the visible list content box inside a padded Root', () => {
 			availableWidth = 500;
 			listAvailableWidth = 140;
