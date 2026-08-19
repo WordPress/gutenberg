@@ -26,15 +26,9 @@
 	padding: $grid-unit-15;
 	overflow: auto;
 	overflow-anchor: none;
-	color: $gray-900;
-	background-color: $gray-100;
-	border-radius: $radius-small;
-}
-
-.editor-error-boundary__report-title {
-	color: $gray-700;
-	text-transform: uppercase;
-	letter-spacing: 0.05em;
+	color: $gray-200;
+	background-color: $gray-800;
+	border-radius: $radius-medium;
 }
 
 .editor-error-boundary__report-section {

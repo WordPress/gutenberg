@@ -100,16 +100,10 @@ function ErrorReport( { error, componentStack } ) {
 			direction="column"
 			gap="md"
 		>
-			<Text
-				className="editor-error-boundary__report-title"
-				variant="body-sm"
-			>
-				{ __( 'Error report' ) }
-			</Text>
 			{ getErrorSections( error, componentStack ).map(
 				( { label, content } ) => (
 					<Stack key={ label } direction="column" gap="xs">
-						<Text variant="heading-sm">{ label }</Text>
+						<Text variant="heading-md">{ label }</Text>
 						<pre className="editor-error-boundary__report-section">
 							{ content }
 						</pre>
