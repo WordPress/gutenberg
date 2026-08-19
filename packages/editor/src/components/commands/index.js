@@ -86,8 +86,8 @@ const getEditorCommandLoader = () =>
 			isPreviewMode,
 			isViewable,
 			isPublished,
-			postType,
 			viewLink,
+			viewItemLabel,
 			isCodeEditingEnabled,
 			isRichEditingEnabled,
 			isPublishSidebarEnabled,
@@ -100,15 +100,11 @@ const getEditorCommandLoader = () =>
 				getCurrentPostType,
 				getEditorSettings,
 				getEditedPostAttribute,
-				getEditedPostPreviewLink,
 				isCurrentPostPublished,
 			} = select( editorStore );
 			const { getSettings } = select( blockEditorStore );
 			const { getPostType } = select( coreStore );
-			const _postType = getCurrentPostType();
-			// Private posts and posts scheduled in the past are published as
-			// far as the front end is concerned.
-			const _isPublished = isCurrentPostPublished();
+			const postType = getPostType( getCurrentPostType() );
 
 			return {
 				editorMode: get( 'core', 'editorMode' ) ?? 'visual',
@@ -117,12 +113,10 @@ const getEditorCommandLoader = () =>
 				isDistractionFree: get( 'core', 'distractionFree' ),
 				isFocusMode: get( 'core', 'focusMode' ),
 				isPreviewMode: getSettings().isPreviewMode,
-				isViewable: getPostType( _postType )?.viewable ?? false,
-				isPublished: _isPublished,
-				postType: _postType,
-				viewLink: _isPublished
-					? getEditedPostAttribute( 'link' )
-					: getEditedPostPreviewLink?.() ?? '',
+				isViewable: postType?.viewable ?? false,
+				isPublished: isCurrentPostPublished(),
+				viewLink: getEditedPostAttribute( 'link' ),
+				viewItemLabel: postType?.labels?.view_item,
 				isCodeEditingEnabled: getEditorSettings().codeEditingEnabled,
 				isRichEditingEnabled: getEditorSettings().richEditingEnabled,
 				isPublishSidebarEnabled:
@@ -356,28 +350,15 @@ const getEditorCommandLoader = () =>
 				},
 			} );
 
-			if ( postType === 'post' || postType === 'page' ) {
-				const isPage = postType === 'page';
-				let label;
-
-				if ( isPublished ) {
-					label = isPage ? __( 'View page' ) : __( 'View post' );
-				} else {
-					label = isPage
-						? __( 'Preview page' )
-						: __( 'Preview post' );
-				}
-
+			if ( isPublished && viewLink ) {
 				commands.push( {
 					name: 'core/view-link',
-					label,
+					label: viewItemLabel || __( 'View post' ),
 					icon: external,
 					category: 'view',
 					callback: ( { close } ) => {
 						close();
-						if ( viewLink ) {
-							window.open( viewLink, '_blank' );
-						}
+						window.open( viewLink, '_blank' );
 					},
 				} );
 			}

@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Commands: Add a command palette entry that opens the current post or page on the front end, labelled "View" once the record is published and "Preview" while it is not ([#66720](https://github.com/WordPress/gutenberg/pull/66720)).
+-   Commands: Add a command palette entry that opens the current post on the front end once it is published, labelled with the post type's `view_item` label ([#66720](https://github.com/WordPress/gutenberg/pull/66720)).
 
 ### Bug Fixes
 
