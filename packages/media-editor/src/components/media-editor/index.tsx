@@ -506,8 +506,6 @@ function MediaEditorContent( {
 		[ id ]
 	);
 
-	const hasChanges = cropper.isCropperDirty || hasEdits;
-
 	const { clearEntityRecordEdits, editEntityRecord, invalidateResolution } =
 		useDispatch( coreStore );
 	const { removeAllNotices } = useDispatch( noticesStore );
@@ -516,6 +514,11 @@ function MediaEditorContent( {
 	const [ isPlacementActive, setIsPlacementActive ] = useState( false );
 	const [ isCanvasGestureActive, setIsCanvasGestureActive ] =
 		useState( false );
+	// Whether the user has loaded the lineage root into the cropper this
+	// session. Stays a distinct flag (not derived from the cropper) so a bare
+	// restore counts as a change even though swapping the source resets the
+	// cropper's own dirty baseline.
+	const [ isOriginalRestored, setIsOriginalRestored ] = useState( false );
 	const placementControlTimerRef =
 		useRef< ReturnType< typeof setTimeout > >();
 
@@ -543,6 +546,7 @@ function MediaEditorContent( {
 	useEffect( () => {
 		setIsPlacementActive( false );
 		setIsCanvasGestureActive( false );
+		setIsOriginalRestored( false );
 	}, [ id ] );
 
 	// Bust the cached `_embed` resolution each time the editor mounts (or the
@@ -556,6 +560,65 @@ function MediaEditorContent( {
 			ATTACHMENT_EMBED_QUERY,
 		] );
 	}, [ id, invalidateResolution ] );
+
+	// Restore-original: the lineage root the edited attachment descends from,
+	// exposed by the server on `media_details.original_attachment`. Fetch its
+	// record for the natural dimensions the cropper needs to seed itself (the
+	// field itself carries only the id and url).
+	const originalAttachment = media?.media_details?.original_attachment;
+	const originalId: number | undefined = originalAttachment?.attachment_id;
+	const originalRecord = useSelect(
+		( select ) =>
+			originalId
+				? ( select( coreStore ).getEntityRecord(
+						'postType',
+						'attachment',
+						originalId
+				  ) as Media | undefined )
+				: undefined,
+		[ originalId ]
+	);
+	const originalWidth = Number( originalRecord?.media_details?.width );
+	const originalHeight = Number( originalRecord?.media_details?.height );
+	const originalSource =
+		originalAttachment &&
+		originalRecord &&
+		Number.isFinite( originalWidth ) &&
+		originalWidth > 0 &&
+		Number.isFinite( originalHeight ) &&
+		originalHeight > 0
+			? {
+					id: originalAttachment.attachment_id as number,
+					url: originalAttachment.source_url as string,
+					width: originalWidth,
+					height: originalHeight,
+					media: originalRecord,
+			  }
+			: undefined;
+	const canRestoreOriginal = !! originalSource;
+	const restoredSource =
+		isOriginalRestored && originalSource
+			? {
+					id: originalSource.id,
+					url: originalSource.url,
+					media: originalSource.media,
+			  }
+			: undefined;
+	const canvasSrcOverride =
+		isOriginalRestored && originalSource
+			? {
+					url: originalSource.url,
+					width: originalSource.width,
+					height: originalSource.height,
+			  }
+			: undefined;
+	const handleRestoreOriginal = useCallback( () => {
+		setIsOriginalRestored( true );
+	}, [] );
+
+	// A bare restore has no cropper diff, so OR the flag in explicitly.
+	const hasChanges =
+		cropper.isCropperDirty || hasEdits || isOriginalRestored;
 
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type ).type;
 	const isImage = !! media && mediaType === 'image';
@@ -597,6 +660,7 @@ function MediaEditorContent( {
 		isImage,
 		media,
 		onSaved,
+		restoredSource,
 	} );
 
 	const handleChange = ( updates: Partial< Media > ) => {
@@ -606,6 +670,7 @@ function MediaEditorContent( {
 	const discardAndClose = () => {
 		removeAllNotices( 'snackbar', MEDIA_EDITOR_NOTICES_CONTEXT );
 		clearEntityRecordEdits( 'postType', 'attachment', id );
+		setIsOriginalRestored( false );
 		onClose?.();
 	};
 
@@ -694,6 +759,9 @@ function MediaEditorContent( {
 								aspectRatioValue={ aspectRatioValue }
 								onAspectRatioChange={ setAspectRatioValue }
 								aspectRatioOptions={ aspectRatioOptions }
+								canRestoreOriginal={ canRestoreOriginal }
+								isOriginalRestored={ isOriginalRestored }
+								onRestoreOriginal={ handleRestoreOriginal }
 							/>
 						),
 					},
@@ -745,6 +813,7 @@ function MediaEditorContent( {
 											handleCanvasGestureStart
 										}
 										onGestureEnd={ handleCanvasGestureEnd }
+										srcOverride={ canvasSrcOverride }
 									/>
 								) : (
 									<MediaPreview />
