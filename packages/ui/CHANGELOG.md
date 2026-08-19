@@ -21,6 +21,10 @@
 
 -   `Card`: Use the normal neutral surface stroke for the default border. ([#81746](https://github.com/WordPress/gutenberg/pull/81746))
 
+### Documentation
+
+-   Document design principles and route coding agents to the package's canonical documentation. ([#81400](https://github.com/WordPress/gutenberg/pull/81400))
+
 ### Internal
 
 -   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509), [#81514](https://github.com/WordPress/gutenberg/pull/81514), [#81516](https://github.com/WordPress/gutenberg/pull/81516), [#81518](https://github.com/WordPress/gutenberg/pull/81518))
