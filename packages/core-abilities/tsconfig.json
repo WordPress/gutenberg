@@ -5,7 +5,7 @@
 		"rootDir": "src"
 	},
 	"references": [
-		{ "path": "../abilities" },
+		{ "path": "../abilities/tsconfig.build.json" },
 		{ "path": "../api-fetch/tsconfig.build.json" },
 		{ "path": "../url" }
 	],

@@ -2,7 +2,7 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"references": [
 		{ "path": "packages/a11y/tsconfig.build.json" },
-		{ "path": "packages/abilities" },
+		{ "path": "packages/abilities/tsconfig.build.json" },
 		{ "path": "packages/admin-ui/tsconfig.build.json" },
 		{ "path": "packages/annotations/tsconfig.build.json" },
 		{ "path": "packages/api-fetch/tsconfig.build.json" },
@@ -44,7 +44,8 @@
 		{ "path": "packages/icons/tsconfig.build.json" },
 		{ "path": "packages/image-cropper/tsconfig.build.json" },
 		{ "path": "packages/interactivity/tsconfig.build.json" },
-		{ "path": "packages/interactivity-router" },
+		{ "path": "packages/interactivity-router/tsconfig.main.json" },
+		{ "path": "packages/interactivity-router/tsconfig.full-page.json" },
 		{ "path": "packages/is-shallow-equal" },
 		{ "path": "packages/kebab-case" },
 		{ "path": "packages/keycodes/tsconfig.build.json" },
@@ -66,7 +67,7 @@
 		{ "path": "packages/project-management-automation" },
 		{ "path": "packages/react-i18n" },
 		{ "path": "packages/redux-routine" },
-		{ "path": "packages/report-flaky-tests" },
+		{ "path": "packages/report-flaky-tests/tsconfig.build.json" },
 		{ "path": "packages/rich-text" },
 		{ "path": "packages/route" },
 		{ "path": "packages/router" },
@@ -91,12 +92,7 @@
 		{ "path": "packages/widget-primitives/tsconfig.build.json" },
 		{ "path": "packages/wordcount/tsconfig.build.json" },
 		{ "path": "packages/worker-threads/tsconfig.build.json" },
-		{ "path": "packages/wp-build" },
-		{ "path": "storybook" },
-		{ "path": "test/e2e" },
-		{ "path": "test/storybook-playwright" },
-		{ "path": "test/performance" },
-		{ "path": "widgets" }
+		{ "path": "packages/wp-build" }
 	],
 	"files": []
 }
