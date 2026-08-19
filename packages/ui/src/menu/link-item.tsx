@@ -39,15 +39,19 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 			}
 		/>
 	) : null;
-	const { contentContextValue, itemAriaProps, shortcutDescriptionId } =
-		useItemContent( children, {
-			'aria-describedby': ariaDescribedBy,
-			'aria-keyshortcuts': ariaKeyShortcuts,
-			'aria-label': ariaLabel,
-			'aria-labelledby': ariaLabelledBy,
-			labelTrailing: externalLinkIndicator,
-			shortcut,
-		} );
+	const {
+		contentChildren,
+		contentContextValue,
+		itemAriaProps,
+		shortcutDescriptionId,
+	} = useItemContent( children, {
+		'aria-describedby': ariaDescribedBy,
+		'aria-keyshortcuts': ariaKeyShortcuts,
+		'aria-label': ariaLabel,
+		'aria-labelledby': ariaLabelledBy,
+		labelTrailing: externalLinkIndicator,
+		shortcut,
+	} );
 
 	return (
 		<_Menu.LinkItem
@@ -70,7 +74,7 @@ const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
 					shortcutDescriptionId={ shortcutDescriptionId }
 					suffix={ suffix }
 				>
-					{ children }
+					{ contentChildren }
 				</ItemContent>
 			</MenuItemContentContext.Provider>
 		</_Menu.LinkItem>
