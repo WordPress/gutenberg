@@ -96,8 +96,8 @@ function isDevProject( tsconfigPath ) {
 }
 
 /**
- * Returns the projects of a package: src, dev files, and, where Storybook's
- * meta extractor needs stories and sources together, `tsconfig.stories.json`.
+ * Returns the projects of a package: src, dev files, and, where stories are
+ * type checked against sources without jest types, `tsconfig.stories.json`.
  *
  * @param {string} packageName Package directory name.
  * @return {{srcProject: string|undefined, devProject: string|undefined, storiesProject: string|undefined}} Absolute paths.
