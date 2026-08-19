@@ -18,7 +18,7 @@ import MediaUploadCheck from '../media-upload/check';
 import URLPopover from '../url-popover';
 import { store as blockEditorStore } from '../../store';
 import { parseDropEvent } from '../use-on-block-drop';
-import { getComputedAcceptAttribute, isMediaDropEligible } from './utils';
+import { getComputedAcceptAttribute } from './utils';
 
 const noop = () => {};
 
@@ -372,13 +372,19 @@ export function MediaPlaceholder( {
 			<DropZone
 				onFilesDrop={ onFilesUpload }
 				onDrop={ handleBlocksDrop }
-				isEligible={ ( dataTransfer ) =>
-					isMediaDropEligible(
-						dataTransfer.types,
-						allowedTypes,
-						multiple
-					)
-				}
+				isEligible={ ( dataTransfer ) => {
+					const prefix = 'wp-block:core/';
+					const types = dataTransfer.types
+						.filter( ( type ) => type.startsWith( prefix ) )
+						.map( ( type ) => type.slice( prefix.length ) );
+					return (
+						types.length > 0 &&
+						types.every( ( type ) =>
+							allowedTypes.includes( type )
+						) &&
+						( multiple ? true : types.length === 1 )
+					);
+				} }
 			/>
 		);
 	};
