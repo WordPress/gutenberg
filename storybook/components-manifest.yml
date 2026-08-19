@@ -170,6 +170,26 @@
         props:
             - as
             - children
+- name: Breadcrumbs.Root
+  props:
+      - children
+      - className
+      - render
+      - style
+  subcomponents:
+      - name: Breadcrumbs.CurrentItem
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Breadcrumbs.LinkItem
+        props:
+            - children
+            - className
+            - href
+            - render
+            - style
 - name: Button
   props:
       - __experimentalIsFocusable
