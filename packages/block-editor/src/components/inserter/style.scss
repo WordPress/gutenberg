@@ -369,27 +369,12 @@ $block-inserter-tabs-height: 44px;
 	padding: 0;
 }
 
-.block-editor-inserter__quick-inserter-expand.components-button {
-	display: block;
-	background: $gray-900;
-	color: $white;
+.block-editor-inserter__quick-inserter-expand {
+	padding: 0 $grid-unit-20 $grid-unit-20;
+}
+.block-editor-inserter__quick-inserter-expand-toggle {
 	width: 100%;
-	border-radius: 0;
-
-	&:hover {
-		color: $white;
-	}
-
-	&:active {
-		color: $gray-400;
-	}
-
-	// Specificity is needed for the border color.
-	&.components-button:focus:not(:disabled) {
-		box-shadow: none;
-		background: var(--wp-admin-theme-color);
-		border-color: var(--wp-admin-theme-color);
-	}
+	justify-content: center;
 }
 
 .block-editor-block-patterns-explorer__sidebar {
