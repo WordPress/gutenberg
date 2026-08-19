@@ -67,7 +67,6 @@ function useInsertionPoint( {
 	const {
 		getSelectedBlock,
 		getClosestAllowedInsertionPoint,
-		isBlockInsertionPointVisible,
 		getBlockInsertionPoint,
 	} = unlock( useSelect( blockEditorStore ) );
 	const { destinationRootClientId, destinationIndex } = useSelect(
@@ -202,7 +201,7 @@ function useInsertionPoint( {
 
 	const onToggleInsertionPoint = useCallback(
 		( item ) => {
-			if ( item && ! isBlockInsertionPointVisible() ) {
+			if ( item ) {
 				const allowedDestinationRootClientId =
 					getClosestAllowedInsertionPoint(
 						item.name,
@@ -230,7 +229,6 @@ function useInsertionPoint( {
 		},
 		[
 			getClosestAllowedInsertionPoint,
-			isBlockInsertionPointVisible,
 			getBlockInsertionPoint,
 			showInsertionPoint,
 			hideInsertionPoint,
