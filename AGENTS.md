@@ -12,7 +12,6 @@ npm run wp-env-test start       # Only start if not already running.
 # Development
 npm start     # Development with watch
 npm run build # Production build
-npm run build -- --skip-types # Faster build; skips type generation
 ```
 
 ### Key Directories
