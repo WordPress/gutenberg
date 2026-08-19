@@ -258,13 +258,11 @@ export function useShadowPresets( settings ) {
 		// specific definition is output as a CSS variable. Keeping the ones it
 		// overrides would offer swatches that apply a different shadow than
 		// the one they show.
-		const shadowPresets = allPresets.filter(
+		return allPresets.filter(
 			( preset, index ) =>
 				allPresets.findLastIndex(
 					( { slug } ) => slug === preset.slug
 				) === index
 		);
-
-		return shadowPresets.length ? shadowPresets : EMPTY_ARRAY;
 	}, [ settings ] );
 }
