@@ -18,7 +18,7 @@ import {
 import {
 	LinkControl,
 	store as blockEditorStore,
-	// @ts-ignore
+	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import type { RichTextValue } from '@wordpress/rich-text';

@@ -13,20 +13,13 @@ import {
 	MediaUpload,
 	RichTextToolbarButton,
 	MediaUploadCheck,
-	// @ts-ignore
+	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import type { EditImageProps } from '../types';
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const name = 'core/image';
 const title = __( 'Inline image' );
-
-const RichTextToolbarButtonUnsafe =
-	RichTextToolbarButton as React.ComponentType< any >;
 
 /**
  * Extracts the image ID from the className attribute.
@@ -175,7 +168,6 @@ function Edit( {
 	return (
 		<MediaUploadCheck>
 			<MediaUpload
-				// @ts-ignore -- MediaUpload types are incomplete in @wordpress/block-editor
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				value={ getCurrentImageId( activeObjectAttributes ) }
 				onSelect={ ( {
@@ -205,7 +197,7 @@ function Edit( {
 					);
 					onFocus?.();
 				} }
-				render={ ( { open } ) => (
+				render={ ( { open }: { open: () => void } ) => (
 					<RichTextToolbarButton
 						icon={ inlineImage }
 						title={ isObjectActive ? __( 'Replace image' ) : title }

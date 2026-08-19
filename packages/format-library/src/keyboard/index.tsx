@@ -1,12 +1,8 @@
 import { __ } from '@wordpress/i18n';
 import { toggleFormat } from '@wordpress/rich-text';
-// @ts-ignore
+// @ts-expect-error Block Editor not fully typed yet.
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { button } from '@wordpress/icons';
-
-/*
- * Internal dependencies
- */
 import type { CodeEditProps } from '../types';
 
 const name = 'core/keyboard';

@@ -1,10 +1,9 @@
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
-
 import {
 	RichTextToolbarButton,
 	useSettings,
-	// @ts-ignore
+	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import {
 	Icon,

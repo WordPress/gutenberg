@@ -3,7 +3,7 @@ import { toggleFormat } from '@wordpress/rich-text';
 import {
 	RichTextShortcut,
 	__unstableRichTextInputEvent,
-	// @ts-ignore
+	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import type { RichTextValue } from '@wordpress/rich-text';
 

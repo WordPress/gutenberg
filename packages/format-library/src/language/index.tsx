@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-// @ts-ignore
+// @ts-expect-error Block Editor not fully typed yet.
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import {
 	TextControl,
@@ -28,7 +28,7 @@ export const language: {
 		lang: string;
 		dir: string;
 	};
-	edit: ( props: LanguageEditProps ) => JSX.Element;
+	edit: ( props: LanguageEditProps ) => React.ReactNode;
 } = {
 	name,
 	title,

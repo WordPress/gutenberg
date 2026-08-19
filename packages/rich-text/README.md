@@ -378,7 +378,7 @@ formats: [ ... ] } )`.
 
 ### RichTextFormat
 
-An object which represents a formatted string. See main `@wordpress/rich-text` documentation for more information.
+A single format, such as `core/bold`, applied to a range of characters within a `RichTextValue`. See main `@wordpress/rich-text` documentation for more information.
 
 ### RichTextValue
 

@@ -11,10 +11,6 @@ import {
 	isValidFragment,
 } from '@wordpress/url';
 import type { RichTextValue, RichTextFormat } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import type { LinkFormat, LinkFormatOptions } from '../types';
 /**
  * Check for issues with the provided href.
@@ -128,7 +124,8 @@ export function createLinkFormat( {
  * Get the start and end boundaries of a given format from a rich text value.
  *
  * @param value      the rich text value to interrogate.
- * @param format     the identifier for the target format (e.g. `core/link`, `core/bold`).
+ * @param format     the target format object, identified by its `type` (e.g.
+ *                   `core/link`, `core/bold`).
  * @param startIndex optional startIndex to seek from.
  * @param endIndex   optional endIndex to seek from.
  * @return object containing start and end values for the given format.

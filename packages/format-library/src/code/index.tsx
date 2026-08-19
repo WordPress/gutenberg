@@ -1,17 +1,12 @@
 import { __ } from '@wordpress/i18n';
-import type { ReactElement } from 'react';
 import { toggleFormat, remove, applyFormat } from '@wordpress/rich-text';
 import {
 	RichTextToolbarButton,
 	RichTextShortcut,
-	// @ts-ignore
+	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import { code as codeIcon } from '@wordpress/icons';
 import type { RichTextValue } from '@wordpress/rich-text';
-
-/*
- * Internal dependencies
- */
 import type { CodeEditProps } from '../types';
 
 const RichTextToolbarButtonUnsafe =
@@ -67,7 +62,7 @@ export const code = {
 		onChange,
 		onFocus,
 		isActive,
-	}: CodeEditProps ): ReactElement {
+	}: CodeEditProps ): React.ReactNode {
 		function onClick() {
 			onChange( toggleFormat( value, { type: name, title } ) );
 			onFocus();

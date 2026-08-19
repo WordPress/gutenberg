@@ -3,7 +3,7 @@ import { toggleFormat } from '@wordpress/rich-text';
 import {
 	RichTextToolbarButton,
 	RichTextShortcut,
-	// @ts-ignore
+	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import { formatStrikethrough } from '@wordpress/icons';
 import type { StrikethroughEditProps } from '../types';

@@ -4,13 +4,9 @@ import {
 	RichTextToolbarButton,
 	RichTextShortcut,
 	__unstableRichTextInputEvent,
-	// @ts-ignore
+	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import { formatBold } from '@wordpress/icons';
-
-/*
- * Internal dependencies
- */
 import type { BoldEditProps } from '../types';
 
 const name = 'core/bold';

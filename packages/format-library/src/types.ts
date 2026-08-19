@@ -1,6 +1,3 @@
-/*
- * WordPress dependencies
- */
 import type { RichTextValue } from '@wordpress/rich-text';
 
 interface BaseFormatEditProps {

@@ -1,11 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { insert } from '@wordpress/rich-text';
-// @ts-ignore
+// @ts-expect-error Block Editor not fully typed yet.
 import { RichTextShortcut } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import type { NonBreakingSpaceEditProps } from '../types';
 
 const name = 'core/non-breaking-space';

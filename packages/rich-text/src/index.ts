@@ -35,7 +35,14 @@ export function __experimentalRichText() {}
  * An object which represents a formatted string. See main `@wordpress/rich-text`
  * documentation for more information.
  */
-export type { RichTextValue, RichTextFormat } from './types';
+export type { RichTextValue } from './types';
+
+/**
+ * A single format, such as `core/bold`, applied to a range of characters within
+ * a `RichTextValue`. See main `@wordpress/rich-text` documentation for more
+ * information.
+ */
+export type { RichTextFormat } from './types';
 
 /**
  * The callback-Set refs the private event-listener helpers dispatch from.

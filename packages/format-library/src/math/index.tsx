@@ -7,7 +7,7 @@ import {
 	getTextContent,
 	useAnchor,
 } from '@wordpress/rich-text';
-// @ts-ignore
+// @ts-expect-error Block Editor not fully typed yet.
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import {
 	Popover,
@@ -36,17 +36,16 @@ function InlineUI( {
 		activeAttributes?.[ 'data-latex' ] || ''
 	);
 	const [ error, setError ] = useState< string | null >( null );
-	const formRef = useRef();
+	const formRef = useRef< HTMLFormElement >( null );
 
 	const popoverAnchor = useAnchor( {
+		// eslint-disable-next-line react-hooks/refs
 		editableContentElement: contentRef.current as HTMLElement | null,
 		settings: math,
 	} );
 
 	// Update the math object in real-time as the user types
 	const handleLatexChange = ( newLatex: string ) => {
-		let mathML = '';
-
 		setLatex( newLatex );
 
 		let mathML = '';
