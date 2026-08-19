@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import DateView from '../date-view';
 import type { BasePost } from '../../../types';
 
@@ -14,19 +7,14 @@ describe( 'DateView', () => {
 		// `getDate( null )` falls back to the current time, so a missing date
 		// used to render "now" — a value the post has no relation to. This is
 		// what bulk Quick Edit hits, where the form starts from an empty record.
-		const { container } = render(
-			<DateView item={ {} as BasePost } field={ {} as never } />
-		);
+		const { container } = render( <DateView item={ {} as BasePost } /> );
 
 		expect( container ).toBeEmptyDOMElement();
 	} );
 
 	it( 'renders nothing when the post has no date but a status', () => {
 		const { container } = render(
-			<DateView
-				item={ { status: 'draft' } as BasePost }
-				field={ {} as never }
-			/>
+			<DateView item={ { status: 'draft' } as BasePost } />
 		);
 
 		expect( container ).toBeEmptyDOMElement();
@@ -38,8 +26,7 @@ describe( 'DateView', () => {
 		// date, the current time is the right thing to show for it.
 		render(
 			<DateView
-				item={ { status: 'draft', date: null } as BasePost }
-				field={ {} as never }
+				item={ { status: 'draft', date: null } as unknown as BasePost }
 			/>
 		);
 
@@ -55,7 +42,6 @@ describe( 'DateView', () => {
 						date: '2026-01-05T10:30:00',
 					} as BasePost
 				}
-				field={ {} as never }
 			/>
 		);
 
@@ -72,7 +58,6 @@ describe( 'DateView', () => {
 						date: '2026-01-05T10:30:00',
 					} as BasePost
 				}
-				field={ {} as never }
 			/>
 		);
 
@@ -88,7 +73,6 @@ describe( 'DateView', () => {
 						date: '2026-01-05T10:30:00',
 					} as BasePost
 				}
-				field={ {} as never }
 			/>
 		);
 
@@ -102,9 +86,8 @@ describe( 'DateView', () => {
 					{
 						status: 'some-custom-status',
 						date: '2026-01-05T10:30:00',
-					} as BasePost
+					} as unknown as BasePost
 				}
-				field={ {} as never }
 			/>
 		);
 
