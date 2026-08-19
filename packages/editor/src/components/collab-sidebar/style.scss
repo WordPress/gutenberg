@@ -59,13 +59,17 @@
 	}
 }
 
+.editor-collab-sidebar-panel__user-info {
+	flex: 1;
+}
+
 .editor-collab-sidebar-panel__user-name {
 	font-size: 12px;
 	font-weight: 400;
 	line-height: 16px;
 	text-align: left;
 	color: $gray-700;
-	text-transform: capitalize;
+	overflow-wrap: anywhere;
 }
 
 .editor-collab-sidebar-panel__user-time {

@@ -22,10 +22,10 @@ function block_core_tab_panel_render( array $attributes, string $content, \WP_Bl
 	static $tab_counters = array();
 
 	if ( ! isset( $tab_counters[ $tabs_id ] ) ) {
-		$tab_counters[ $tabs_id ] = 0;
+		$tab_counters[ $tabs_id ] = 1;
 	}
 
-	$tab_index = $tab_counters[ $tabs_id ];
+	$tab_number = $tab_counters[ $tabs_id ];
 	++$tab_counters[ $tabs_id ];
 
 	$tag_processor = new WP_HTML_Tag_Processor( $content );
@@ -36,8 +36,8 @@ function block_core_tab_panel_render( array $attributes, string $content, \WP_Bl
 	$tab_id = (string) $tag_processor->get_attribute( 'id' );
 	if ( empty( $tab_id ) ) {
 		$tab_id = ! empty( $tabs_id )
-			? $tabs_id . '-tab-' . $tab_index
-			: 'tab-' . $tab_index;
+			? $tabs_id . '-tab-' . $tab_number
+			: 'tab-' . $tab_number;
 		$tag_processor->set_attribute( 'id', $tab_id );
 	}
 
