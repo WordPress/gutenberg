@@ -187,6 +187,44 @@ describe( 'PlaylistTrackEdit', () => {
 		).toBeInTheDocument();
 	} );
 
+	it( 'removes the track when its initial upload fails', () => {
+		const removeBlock = jest.fn();
+		useDispatch.mockReturnValue( {
+			createErrorNotice: jest.fn(),
+			removeBlock,
+		} );
+
+		renderEdit( {
+			attributes: {
+				blob: 'blob:https://example.com/temporary-track',
+				id: undefined,
+				length: undefined,
+				src: undefined,
+			},
+			clientId: 'temporary-track',
+		} );
+
+		const { onError } = useUploadMediaFromBlobURL.mock.calls[ 0 ][ 0 ];
+		onError( 'Sorry, you are not allowed to upload this file type.' );
+
+		expect( removeBlock ).toHaveBeenCalledWith( 'temporary-track' );
+	} );
+
+	it( 'keeps a track that already has a source when an upload fails', () => {
+		const removeBlock = jest.fn();
+		useDispatch.mockReturnValue( {
+			createErrorNotice: jest.fn(),
+			removeBlock,
+		} );
+
+		renderEdit( { clientId: 'existing-track' } );
+
+		const { onError } = useUploadMediaFromBlobURL.mock.calls[ 0 ][ 0 ];
+		onError( 'Sorry, you are not allowed to upload this file type.' );
+
+		expect( removeBlock ).not.toHaveBeenCalled();
+	} );
+
 	it( 'preserves the current track source when a replacement upload fails', () => {
 		const { setAttributes } = renderEdit();
 
