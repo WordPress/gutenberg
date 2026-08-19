@@ -1,16 +1,21 @@
-import { useMemo } from '@wordpress/element';
+import { forwardRef, useMemo } from '@wordpress/element';
 import { Link } from '@wordpress/route';
 import { WidgetHostProvider } from '@wordpress/widget-primitives';
 import type { WidgetHost } from '@wordpress/widget-primitives';
-import type { ComponentProps, ReactNode } from 'react';
+import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 import { matchDashboardHref } from './match-dashboard-href';
 
-function DashboardRouteLink( {
-	to,
-	...props
-}: { to: string } & ComponentProps< 'a' > ): React.ReactNode {
-	return <Link to={ to } { ...props } />;
-}
+/*
+ * Consumers mount this through render-prop composition, where the ref
+ * carries the anchor to menu items and tooltip triggers; `forwardRef`
+ * keeps that path unbroken.
+ */
+const DashboardRouteLink = forwardRef<
+	HTMLAnchorElement,
+	{ to: string } & ComponentPropsWithoutRef< 'a' >
+>( function DashboardRouteLink( { to, ...props }, ref ) {
+	return <Link ref={ ref } to={ to } { ...props } />;
+} );
 
 type DashboardWidgetHostProviderProps = {
 	/**

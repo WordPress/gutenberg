@@ -5,7 +5,9 @@ import type { WidgetHostRouteMatch } from '@wordpress/widget-primitives';
  *
  * A href belongs here when it targets the same document (origin and
  * pathname) and the same admin `page`; the route is then whatever `p`
- * carries. Hrefs with a hash stay plain anchors.
+ * carries. Anything a route navigation cannot deliver faithfully stays
+ * a plain anchor: a hash, search params beyond `page` and `p`, or a
+ * `p` with its own query or hash.
  *
  * @param {string} href Action href, absolute or relative.
  * @param {string} base Document URL the href is judged against; defaults
@@ -39,5 +41,17 @@ export function matchDashboardHref(
 		return null;
 	}
 
-	return { to: url.searchParams.get( 'p' ) || '/' };
+	for ( const key of url.searchParams.keys() ) {
+		if ( key !== 'page' && key !== 'p' ) {
+			return null;
+		}
+	}
+
+	const to = url.searchParams.get( 'p' ) || '/';
+
+	if ( to.includes( '?' ) || to.includes( '#' ) ) {
+		return null;
+	}
+
+	return { to };
 }

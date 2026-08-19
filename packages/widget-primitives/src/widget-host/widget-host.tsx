@@ -1,5 +1,10 @@
 import { createContext, useContext, useMemo } from '@wordpress/element';
-import type { ComponentProps, ComponentType, ReactNode } from 'react';
+import type {
+	ComponentPropsWithoutRef,
+	ComponentType,
+	ReactNode,
+	RefAttributes,
+} from 'react';
 
 /**
  * The in-app route a href resolves to.
@@ -24,9 +29,14 @@ export interface WidgetHostLinks {
 	match: ( href: string ) => WidgetHostRouteMatch | null;
 
 	/**
-	 * The host router's link primitive. Must render a real anchor.
+	 * The host router's link primitive. Must render a real anchor and
+	 * forward `ref` to it: consumers compose the link into render props,
+	 * where menus and tooltips reach their anchor through the ref.
 	 */
-	Link: ComponentType< { to: string } & ComponentProps< 'a' > >;
+	Link: ComponentType<
+		{ to: string } & ComponentPropsWithoutRef< 'a' > &
+			RefAttributes< HTMLAnchorElement >
+	>;
 }
 
 /**

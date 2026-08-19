@@ -21,8 +21,12 @@ The provider belongs to the application layer, wrapping the dashboard or whateve
 ```ts
 links: {
 	match: ( href: string ) => WidgetHostRouteMatch | null;
-	// The router's link primitive. Must render a real anchor.
-	Link: ComponentType< { to: string } & ComponentProps< 'a' > >;
+	// The router's link primitive. Must render a real anchor and
+	// forward `ref` to it.
+	Link: ComponentType<
+		{ to: string } & ComponentPropsWithoutRef< 'a' > &
+			RefAttributes< HTMLAnchorElement >
+	>;
 }
 ```
 
@@ -34,14 +38,14 @@ Only plain navigations are matched. `download` and `openInNewTab` keep the plain
 
 ## Providing it
 
-A route that renders the dashboard supplies its matcher and its router's link:
+A route that renders the dashboard supplies its matcher and its router's link. The value's identity drives the provider's memoized merge, so keep it stable: a module constant when it is static, `useMemo` when it derives from component state:
 
 ```tsx
-<WidgetHostProvider
-	value={ {
-		links: { match: matchDashboardHref, Link: RouteLink },
-	} }
->
+const host: WidgetHost = {
+	links: { match: matchDashboardHref, Link: RouteLink },
+};
+
+<WidgetHostProvider value={ host }>
 	<WidgetDashboard { ...props } />
 </WidgetHostProvider>
 ```
