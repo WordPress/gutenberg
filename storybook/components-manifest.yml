@@ -967,14 +967,29 @@
       - render
       - style
       - variant
+- name: Textarea
+  props:
+      - className
+      - defaultValue
+      - disabled
+      - onValueChange
+      - render
+      - rows
+      - style
+      - value
 - name: TextareaControl
   props:
-      - __nextHasNoMarginBottom
-      - help
+      - className
+      - defaultValue
+      - description
+      - details
+      - disabled
       - hideLabelFromVision
       - label
-      - onChange
+      - onValueChange
+      - render
       - rows
+      - style
       - value
 - name: TextHighlight
   props:
