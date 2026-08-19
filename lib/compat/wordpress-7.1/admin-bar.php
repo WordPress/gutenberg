@@ -23,43 +23,30 @@ function gutenberg_admin_bar_site_icon( WP_Admin_Bar $wp_admin_bar ): void {
 		return;
 	}
 
-	// Bail if this has already run, or if core or another plugin has added an
-	// icon. Matches `supports-site-icon` as well as `has-site-icon`.
-	if ( isset( $node->meta['class'] ) && false !== strpos( $node->meta['class'], 'site-icon' ) ) {
+	if ( isset( $node->meta['class'] ) && false !== strpos( $node->meta['class'], 'has-site-icon' ) ) {
 		return;
 	}
 
 	/** This filter is documented in wp-includes/admin-bar.php */
 	$show_site_icons = apply_filters( 'wp_admin_bar_show_site_icons', true );
-	if ( true !== $show_site_icons ) {
+	if ( true !== $show_site_icons || ! has_site_icon() ) {
 		return;
 	}
 
-	/*
-	 * `supports-site-icon` is added whether or not an icon is set, so that the
-	 * editor can tell an unset icon apart from icons being filtered off and
-	 * knows whether it may render one after the Site Icon is saved.
-	 */
-	$classes   = array( 'supports-site-icon' );
-	$site_icon = '';
-
-	if ( has_site_icon() ) {
-		$site_icon_url    = get_site_icon_url( 32 );
-		$site_icon_url_2x = get_site_icon_url( 64 );
-		$srcset           = ( $site_icon_url_2x && $site_icon_url !== $site_icon_url_2x ) ? sprintf( ' srcset="%s 2x"', esc_url( $site_icon_url_2x ) ) : '';
-		$site_icon        = sprintf(
-			'<img class="site-icon" src="%s"%s alt="" width="20" height="20" />',
-			esc_url( $site_icon_url ),
-			$srcset
-		);
-		$classes[]        = 'has-site-icon';
-	}
+	$site_icon_url    = get_site_icon_url( 32 );
+	$site_icon_url_2x = get_site_icon_url( 64 );
+	$srcset           = ( $site_icon_url_2x && $site_icon_url !== $site_icon_url_2x ) ? sprintf( ' srcset="%s 2x"', esc_url( $site_icon_url_2x ) ) : '';
+	$site_icon        = sprintf(
+		'<img class="site-icon" src="%s"%s alt="" width="20" height="20" />',
+		esc_url( $site_icon_url ),
+		$srcset
+	);
 
 	$wp_admin_bar->add_node(
 		array(
 			'id'    => 'site-name',
 			'title' => $site_icon . $node->title,
-			'meta'  => array( 'class' => implode( ' ', $classes ) ),
+			'meta'  => array( 'class' => 'has-site-icon' ),
 		)
 	);
 }

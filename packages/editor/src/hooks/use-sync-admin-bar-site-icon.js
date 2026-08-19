@@ -4,7 +4,6 @@ import { store as coreStore } from '@wordpress/core-data';
 
 const SITE_NAME_SELECTOR = '#wp-admin-bar-site-name';
 const SITE_ICON_SELECTOR = ':scope > img.site-icon';
-const SUPPORTS_SITE_ICON_CLASS = 'supports-site-icon';
 const HAS_SITE_ICON_CLASS = 'has-site-icon';
 const SITE_ICON_SIZE = 20;
 const ADMIN_BAR_ICON_SIZE = 'site_icon-32x32';
@@ -18,13 +17,7 @@ const ADMIN_BAR_ICON_SIZE = 'site_icon-32x32';
 function updateAdminBarIcon( url ) {
 	const siteName = document.querySelector( SITE_NAME_SELECTOR );
 
-	if (
-		! siteName ||
-		! (
-			siteName.classList.contains( SUPPORTS_SITE_ICON_CLASS ) ||
-			siteName.classList.contains( HAS_SITE_ICON_CLASS )
-		)
-	) {
+	if ( ! siteName ) {
 		return;
 	}
 
@@ -62,8 +55,7 @@ function updateAdminBarIcon( url ) {
  * The admin bar is rendered by PHP before the editor mounts, so its icon would
  * otherwise keep showing the previous icon until the page is reloaded. The
  * markup mirrored here is built by `gutenberg_admin_bar_site_icon()` in
- * lib/compat/wordpress-7.1/admin-bar.php, which also marks the node with
- * `supports-site-icon` to say whether an icon may be shown at all.
+ * lib/compat/wordpress-7.1/admin-bar.php.
  */
 export default function useSyncAdminBarSiteIcon() {
 	const { canEditSite, savedIconId, iconUrl } = useSelect( ( select ) => {
