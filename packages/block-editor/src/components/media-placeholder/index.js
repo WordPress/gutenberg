@@ -19,7 +19,6 @@ import URLPopover from '../url-popover';
 import { store as blockEditorStore } from '../../store';
 import { parseDropEvent } from '../use-on-block-drop';
 import { getComputedAcceptAttribute } from './utils';
-
 const noop = () => {};
 
 const InsertFromURLPopover = ( {
@@ -373,10 +372,16 @@ export function MediaPlaceholder( {
 				onFilesDrop={ onFilesUpload }
 				onDrop={ handleBlocksDrop }
 				isEligible={ ( dataTransfer ) => {
+					// This dropzone only accepts block drags from the inserter, not
+					// canvas block drags. Only the inserter publishes the dragged
+					// blocks' names, as wp-block:core/{name}, so no matches means it
+					// isn't an inserter drag.
 					const prefix = 'wp-block:core/';
+
 					const types = dataTransfer.types
 						.filter( ( type ) => type.startsWith( prefix ) )
 						.map( ( type ) => type.slice( prefix.length ) );
+
 					return (
 						types.length > 0 &&
 						types.every( ( type ) =>
