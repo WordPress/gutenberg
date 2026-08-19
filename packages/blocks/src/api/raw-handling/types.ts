@@ -1,13 +1,13 @@
-export interface RawTransform {
-	type: string;
+import type { BlockRawTransform } from '../../types';
+
+/**
+ * A raw transform as returned by `getRawTransforms`, where the declaring block
+ * name and a matcher are always present.
+ */
+export type RawTransform = BlockRawTransform & {
 	blockName: string;
-	selector?: string;
-	schema?:
-		| Record< string, unknown >
-		| ( ( args: Record< string, unknown > ) => Record< string, unknown > );
-	isMatch: ( node: Element ) => boolean;
-	transform?: ( node: Node, handler: Function ) => unknown;
-}
+	isMatch: NonNullable< BlockRawTransform[ 'isMatch' ] >;
+};
 
 export type NodeFilterFunction = (
 	node: Node,

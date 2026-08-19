@@ -12,7 +12,12 @@ import {
 	normalizeBlockType,
 	sanitizeBlockAttributes,
 } from './utils';
-import type { Block, BlockType, BlockTransform } from '../types';
+import type {
+	Block,
+	BlockBlockTransform,
+	BlockTransform,
+	BlockType,
+} from '../types';
 
 type BlockTypeWithTransformMetadata = BlockType & {
 	variationName?: string;
@@ -24,6 +29,17 @@ type TemplateBlock = [
 	Array< unknown >?,
 	Array< string | null >?,
 ];
+
+/**
+ * Returns whether a transform is a transform from or to another block type.
+ *
+ * @param transform The transform object to test.
+ *
+ * @return Whether the transform is of type `block`.
+ */
+const isBlockTypeTransform = (
+	transform: BlockTransform
+): transform is BlockBlockTransform => transform.type === 'block';
 
 const getBlockTypeWithTransformMetadata = (
 	blockType: BlockType,
@@ -229,6 +245,11 @@ const isPossibleTransformForSource = (
 		return false;
 	}
 
+	// Only consider 'block' type transforms as valid.
+	if ( ! isBlockTypeTransform( transform ) ) {
+		return false;
+	}
+
 	// If multiple blocks are selected, only multi block transforms
 	// or wildcard transforms are allowed.
 	const isMultiBlock = blocks.length > 1;
@@ -247,12 +268,6 @@ const isPossibleTransformForSource = (
 		! isWildcardBlockTransform( transform ) &&
 		! blocks.every( ( block ) => block.name === firstBlockName )
 	) {
-		return false;
-	}
-
-	// Only consider 'block' type transforms as valid.
-	const isBlockType = transform.type === 'block';
-	if ( ! isBlockType ) {
 		return false;
 	}
 
@@ -377,7 +392,7 @@ export const isWildcardBlockTransform = (
 	t: BlockTransform | null | undefined
 ): boolean =>
 	!! t &&
-	t.type === 'block' &&
+	isBlockTypeTransform( t ) &&
 	Array.isArray( t.blocks ) &&
 	t.blocks.includes( '*' );
 
@@ -445,10 +460,10 @@ export function getPossibleBlockTransformations(
  *
  * @return Highest-priority transform candidate.
  */
-export function findTransform(
-	transforms: BlockTransform[],
-	predicate: ( transform: BlockTransform ) => boolean
-): BlockTransform | null {
+export function findTransform< T extends BlockTransform >(
+	transforms: T[],
+	predicate: ( transform: T ) => boolean
+): T | null {
 	// The hooks library already has built-in mechanisms for managing priority
 	// queue, so leverage via locally-defined instance.
 	const hooks = createHooks();
@@ -466,7 +481,7 @@ export function findTransform(
 	}
 
 	// Filter name is arbitrarily chosen but consistent with above aggregation.
-	return hooks.applyFilters( 'transform', null ) as BlockTransform | null;
+	return hooks.applyFilters( 'transform', null ) as T | null;
 }
 
 /**
@@ -545,7 +560,7 @@ export function getBlockTransforms(
  * @return True if given blocks are a match for the transform.
  */
 function maybeCheckTransformIsMatch(
-	transform: BlockTransform,
+	transform: BlockBlockTransform,
 	blocks: Block[]
 ): boolean {
 	if ( typeof transform.isMatch !== 'function' ) {
@@ -581,16 +596,19 @@ export function switchToBlockType(
 
 	// Find the right transformation by giving priority to the "to"
 	// transformation.
-	const transformationsFrom = getBlockTransforms( 'from', name );
-	const transformationsTo = getBlockTransforms( 'to', sourceName );
-	const isMatchingVariation = ( t: BlockTransform ) =>
+	const transformationsFrom = getBlockTransforms( 'from', name ).filter(
+		isBlockTypeTransform
+	);
+	const transformationsTo = getBlockTransforms( 'to', sourceName ).filter(
+		isBlockTypeTransform
+	);
+	const isMatchingVariation = ( t: BlockBlockTransform ) =>
 		variationName ? t.variationName === variationName : ! t.variationName;
 
 	const transformation =
 		findTransform(
 			transformationsTo,
 			( t ) =>
-				t.type === 'block' &&
 				isMatchingVariation( t ) &&
 				( isWildcardBlockTransform( t ) ||
 					t.blocks!.indexOf( name ) !== -1 ) &&
@@ -600,7 +618,6 @@ export function switchToBlockType(
 		findTransform(
 			transformationsFrom,
 			( t ) =>
-				t.type === 'block' &&
 				isMatchingVariation( t ) &&
 				( isWildcardBlockTransform( t ) ||
 					t.blocks!.indexOf( sourceName ) !== -1 ) &&

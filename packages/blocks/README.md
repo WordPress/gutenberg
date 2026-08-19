@@ -96,12 +96,12 @@ Given an array of transforms, returns the highest-priority transform where the p
 
 _Parameters_
 
--   _transforms_ `BlockTransform[]`: Transforms to search.
--   _predicate_ `( transform: BlockTransform ) => boolean`: Function returning true on matching transform.
+-   _transforms_ `T[]`: Transforms to search.
+-   _predicate_ `( transform: T ) => boolean`: Function returning true on matching transform.
 
 _Returns_
 
--   `BlockTransform | null`: Highest-priority transform candidate.
+-   `T | null`: Highest-priority transform candidate.
 
 ### getBlockAttributes
 

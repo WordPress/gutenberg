@@ -24,13 +24,9 @@ export function htmlToBlocks(
 
 	return Array.from( doc.body.children ).flatMap( ( node ) => {
 		const transforms = getRawTransforms();
-		const rawTransform = findTransform(
-			transforms as unknown as Parameters< typeof findTransform >[ 0 ],
-			( ( t: unknown ) => {
-				const transform = t as ( typeof transforms )[ number ];
-				return transform.isMatch( node );
-			} ) as Parameters< typeof findTransform >[ 1 ]
-		) as unknown as ( typeof transforms )[ number ] | null;
+		const rawTransform = findTransform( transforms, ( transform ) =>
+			transform.isMatch( node )
+		);
 
 		if ( ! rawTransform ) {
 			return createBlock(
@@ -53,8 +49,8 @@ export function htmlToBlocks(
 		}
 
 		return createBlock(
-			blockName!,
-			getBlockAttributes( blockName!, node.outerHTML )
+			blockName,
+			getBlockAttributes( blockName, node.outerHTML )
 		);
 	} );
 }
