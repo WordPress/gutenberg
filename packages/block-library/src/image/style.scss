@@ -379,6 +379,15 @@
 	// to scroll fully covers the image as it moves up over it.
 	.wp-lightbox-caption-panel {
 		padding-block: 24px;
+		// Aligns the caption's left and right edges with the enlarged image
+		// above it. The image is centered and its width is published as
+		// `--wp--lightbox-container-width`, so its inset from each edge is half
+		// of the leftover space. Because that width is recomputed on resize,
+		// the caption follows the image at every breakpoint — the two are
+		// separate elements, so a fixed padding could only match at one size.
+		// The `max()` floor keeps a sane gutter in the brief moment before
+		// `setOverlayStyles()` publishes the variable.
+		padding-inline: max(16px, calc((100% - var(--wp--lightbox-container-width, 100%)) / 2));
 		cursor: default;
 	}
 
@@ -391,7 +400,6 @@
 		// classic themes and block themes that set no content size, where the
 		// variable is not emitted) keeps the measure readable.
 		max-width: min(90vw, var(--wp--style--global--content-size, 480px));
-		padding-inline: 16px;
 
 		// Do not set `text-align` here. The element carries the
 		// `wp-element-caption` class, so caption alignment defined in
