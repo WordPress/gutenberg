@@ -7,8 +7,8 @@
 	"files": [ "global.d.ts" ],
 	"references": [
 		{ "path": "./tsconfig.build.json" },
-		{ "path": "../compose" },
-		{ "path": "../element" },
+		{ "path": "../compose/tsconfig.build.json" },
+		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../style-runtime" }
 	]
 }

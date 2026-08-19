@@ -1,20 +1,27 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
+	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types",
-		"types": [ "gutenberg-env" ]
+		"types": [ "jest", "gutenberg-env" ]
 	},
 	"references": [
-		{ "path": "../deprecated" },
+		{ "path": "./tsconfig.build.json" },
+		{ "path": "../deprecated/tsconfig.build.json" },
 		{ "path": "../dom" },
-		{ "path": "../element" },
+		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../is-shallow-equal" },
-		{ "path": "../keycodes" },
-		{ "path": "../priority-queue" },
+		{ "path": "../keycodes/tsconfig.build.json" },
+		{ "path": "../priority-queue/tsconfig.build.json" },
 		{ "path": "../private-apis" },
 		{ "path": "../undo-manager" }
 	],
-	"include": [ "src/**/*" ]
+	// Listed files have pre-existing type errors; include them once fixed.
+	"exclude": [
+		"**/benchmark",
+		"src/higher-order/test/pipe.ts",
+		"src/higher-order/test/compose.ts",
+		"src/hooks/use-copy-on-click/test/index.tsx",
+		"src/utils/debounce/test/index.ts",
+		"src/utils/throttle/test/index.ts"
+	]
 }

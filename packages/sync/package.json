@@ -55,6 +55,7 @@
 	},
 	"devDependencies": {
 		"@jest/globals": "^30.4.1",
+		"@types/jest": "^30.0.0",
 		"@types/node": "^20.19.39"
 	},
 	"publishConfig": {

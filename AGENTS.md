@@ -18,6 +18,7 @@ npm run build -- --skip-types # Faster build; skips type generation
 ### Key Directories
 
 -   `/packages/` - JavaScript packages (each has README.md and CHANGELOG.md)
+-   `/routes/` - Route entry points for the admin single-page apps, one directory per route; each declares the page(s) it belongs to (the extensible site editor, the dashboard, the media editor, and others)
 -   `/lib/` - PHP code
 -   `/lib/compat/wordpress-X.Y/` - Version-specific features (new PHP features usually go here)
 -   `/phpunit/` - PHP tests
@@ -52,6 +53,7 @@ vendor/bin/phpcbf <path_to_php_file.php>
 ## Architectural decisions
 
 -   **Package layering**: Three editor layers — `block-editor` (generic, WP-agnostic) → `editor` (WordPress post-type-aware) → `edit-post`/`edit-site` (full screens). Lower layers MUST NOT depend on higher ones.
+-   **Site editor parity**: the site editor exists twice — `packages/edit-site` (v1) and the extensible site editor (v2: the `routes/*` entry points declaring the `site-editor-v2` page, booted by `packages/boot`, behind the `gutenberg-extensible-site-editor` experiment). Any feature or enhancement added to the site editor MUST be added to the extensible site editor in the same change, so the two do not drift. If a feature deliberately does not belong in v2, say so explicitly instead of silently skipping it.
 -   **Block data model**: Blocks are in-memory tree structures during editing, serialized as HTML with comment delimiters (`<!-- wp:name -->`). Work with the block tree via APIs, not the serialized HTML.
 -   **Data layer**: Uses `@wordpress/data` (Redux-like stores). Edit entities through `core-data` actions (`editEntityRecord` / `saveEditedEntityRecord`), not direct state manipulation.
 -   **Styles system**: Three-layer merge — WordPress defaults < `theme.json` < user preferences. Use Block Supports API and CSS custom properties (`--wp--preset--*`), not hardcoded values.

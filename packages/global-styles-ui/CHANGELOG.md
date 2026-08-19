@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Expose typography and color controls for citations, inputs, and selects in Global Styles ([#80852](https://github.com/WordPress/gutenberg/pull/80852)).
+-   Mark blocks that have user styles in the block list, and add a filter to show only those blocks ([#81373](https://github.com/WordPress/gutenberg/pull/81373)).
 
 ## 1.20.0 (2026-08-12)
 
