@@ -18,6 +18,7 @@
 -   `DimensionsTool`: Reflect aspect ratio and scale values that are updated from outside the component, such as by undo or `updateBlockAttributes`. The scale control no longer displays a stale value, and an aspect ratio that is written differently to its preset, e.g. `1/1` rather than `1`, is displayed as that preset instead of as "Original" ([#80747](https://github.com/WordPress/gutenberg/pull/80747)).
 -   `ListView`: Only move focus into the list when the new `focusOnMount` prop is set, so that a list mounted as a side effect of a selection no longer pulls focus out of the editor canvas ([#81659](https://github.com/WordPress/gutenberg/pull/81659)).
 -   `RichText`: Handle Enter using the current record, so pressing it right after moving the caret splits at the caret's new position instead of the previous one ([#81696](https://github.com/WordPress/gutenberg/pull/81696)).
+-   `useInsertionPoint`: Leave the insertion cue alone when it belongs to the in-between inserter. The cue is shared state and the in-between inserter mounts inside its popover, so the sidebar inserter hiding it tore down the inline inserter that had just been opened ([#76241](https://github.com/WordPress/gutenberg/pull/76241)).
 
 ## 16.2.0 (2026-08-12)
 
@@ -57,7 +58,6 @@
 -   `LinkControl`: Restore the preview title underline by slightly increasing the title's line height, which was too tight for the underline to be visible ([#81083](https://github.com/WordPress/gutenberg/pull/81083)).
 -   `URLInput`: Skip link search requests while an IME composition is in progress; the search now fires once with the confirmed value on `compositionend` ([#80602](https://github.com/WordPress/gutenberg/pull/80602)).
 -   `SpacingSizesControl`: Give the control's visible label its own translation context instead of sharing an entry with the side input's aria label, which feeds the same placeholders in the opposite order — a single shared translation could not be correct for both ([#81240](https://github.com/WordPress/gutenberg/pull/81240)).
--   `useInsertionPoint`: Only hide the insertion cue that the inserter itself showed. The cue is shared state, and the in-between inserter mounts inside its popover, so hiding another component's cue unmounted the open inline inserter — clicking the in-between inserter while the Block Library panel was open closed the panel, which in turn tore down the inline inserter it had just opened ([#76241](https://github.com/WordPress/gutenberg/pull/76241)).
 
 ## 16.1.0 (2026-07-29)
 
