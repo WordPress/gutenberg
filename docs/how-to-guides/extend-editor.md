@@ -33,36 +33,38 @@ import { __ } from '@wordpress/i18n';
 import { pencil } from '@wordpress/icons';
 
 function SubtitleSidebar() {
-	const subtitle = useSelect(
-		( select ) =>
-			select( editorStore ).getEditedPostAttribute( 'meta' )
-				?.my_plugin_subtitle ?? '',
-		[]
-	);
-	const { editPost } = useDispatch( editorStore );
+    const subtitle = useSelect(
+        ( select ) =>
+            select( editorStore ).getEditedPostAttribute( 'meta' )
+                ?.my_plugin_subtitle ?? '',
+        []
+    );
+    const { editPost } = useDispatch( editorStore );
 
-	return (
-		<PluginSidebar
-			name="my-plugin-subtitle"
-			title={ __( 'Subtitle' ) }
-			icon={ pencil }
-		>
-			<PanelBody>
-				<TextControl
-					__nextHasNoMarginBottom
-					label={ __( 'Subtitle' ) }
-					value={ subtitle }
-					onChange={ ( value ) =>
-						editPost( { meta: { my_plugin_subtitle: value } } )
-					}
-				/>
-			</PanelBody>
-		</PluginSidebar>
-	);
+    return (
+        <PluginSidebar
+            name="my-plugin-subtitle"
+            title={ __( 'Subtitle' ) }
+            icon={ pencil }
+        >
+            <PanelBody>
+                <TextControl
+                    __nextHasNoMarginBottom
+                    label={ __( 'Subtitle' ) }
+                    value={ subtitle }
+                    onChange={ ( value ) =>
+                        editPost( { meta: { my_plugin_subtitle: value } } )
+                    }
+                />
+            </PanelBody>
+        </PluginSidebar>
+    );
 }
 ```
 
 `getEditedPostAttribute` returns the value including edits the user has not saved yet, which is what you want for a control that writes back to the same field. The meta key has to be registered in PHP before either call works; see [Store data in post meta](#store-data-in-post-meta).
+
+![The sidebar, open next to the editor canvas, with its icon active in the header](https://developer.wordpress.org/files/2026/08/extend-editor-plugin-sidebar.png)
 
 ### Add a panel to the Document sidebar
 
@@ -70,41 +72,43 @@ function SubtitleSidebar() {
 
 ```jsx
 import {
-	PluginDocumentSettingPanel,
-	store as editorStore,
+    PluginDocumentSettingPanel,
+    store as editorStore,
 } from '@wordpress/editor';
 import { TextControl } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 function ReviewPanel() {
-	const reviewer = useSelect(
-		( select ) =>
-			select( editorStore ).getEditedPostAttribute( 'meta' )
-				?.my_plugin_reviewer ?? '',
-		[]
-	);
-	const { editPost } = useDispatch( editorStore );
+    const reviewer = useSelect(
+        ( select ) =>
+            select( editorStore ).getEditedPostAttribute( 'meta' )
+                ?.my_plugin_reviewer ?? '',
+        []
+    );
+    const { editPost } = useDispatch( editorStore );
 
-	return (
-		<PluginDocumentSettingPanel
-			name="my-plugin-review"
-			title={ __( 'Editorial review' ) }
-		>
-			<TextControl
-				__nextHasNoMarginBottom
-				label={ __( 'Reviewer' ) }
-				value={ reviewer }
-				onChange={ ( value ) =>
-					editPost( { meta: { my_plugin_reviewer: value } } )
-				}
-			/>
-		</PluginDocumentSettingPanel>
-	);
+    return (
+        <PluginDocumentSettingPanel
+            name="my-plugin-review"
+            title={ __( 'Editorial review' ) }
+        >
+            <TextControl
+                __nextHasNoMarginBottom
+                label={ __( 'Reviewer' ) }
+                value={ reviewer }
+                onChange={ ( value ) =>
+                    editPost( { meta: { my_plugin_reviewer: value } } )
+                }
+            />
+        </PluginDocumentSettingPanel>
+    );
 }
 ```
 
 The `name` is required and must be unique within your plugin; it is what identifies the panel under Preferences → Panels, where a user can hide it. Unlike `PluginSidebar`, a document panel cannot be pinned to the toolbar.
+
+![The Editorial review panel expanded in the Post tab of the document sidebar, below Format and above Categories](https://developer.wordpress.org/files/2026/08/extend-editor-document-setting-panel.png)
 
 ### Add an item to the block settings menu
 
@@ -118,40 +122,42 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf, _n } from '@wordpress/i18n';
 
 function SendToReviewMenuItem() {
-	const selectedBlockCount = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getSelectedBlockClientIds().length,
-		[]
-	);
-	const { createSuccessNotice } = useDispatch( noticesStore );
+    const selectedBlockCount = useSelect(
+        ( select ) =>
+            select( blockEditorStore ).getSelectedBlockClientIds().length,
+        []
+    );
+    const { createSuccessNotice } = useDispatch( noticesStore );
 
-	return (
-		<PluginBlockSettingsMenuItem
-			allowedBlocks={ [ 'core/paragraph' ] }
-			icon="admin-tools"
-			label={ __( 'Send to review' ) }
-			onClick={ () =>
-				createSuccessNotice(
-					sprintf(
-						/* translators: %d: number of blocks sent for review. */
-						_n(
-							'%d block sent for review.',
-							'%d blocks sent for review.',
-							selectedBlockCount
-						),
-						selectedBlockCount
-					),
-					{ type: 'snackbar' }
-				)
-			}
-		/>
-	);
+    return (
+        <PluginBlockSettingsMenuItem
+            allowedBlocks={ [ 'core/paragraph' ] }
+            icon="admin-tools"
+            label={ __( 'Send to review' ) }
+            onClick={ () =>
+                createSuccessNotice(
+                    sprintf(
+                        /* translators: %d: number of blocks sent for review. */
+                        _n(
+                            '%d block sent for review.',
+                            '%d blocks sent for review.',
+                            selectedBlockCount
+                        ),
+                        selectedBlockCount
+                    ),
+                    { type: 'snackbar' }
+                )
+            }
+        />
+    );
 }
 ```
 
 The notice stands in for whatever your plugin does with the selection; the point is that `onClick` runs in a component, so the `core/block-editor` store tells you which blocks the user has selected.
 
 Without `allowedBlocks` the item shows for every block. With it, and with several blocks selected, the item only shows when every selected block is in the list.
+
+![The block settings menu open on a paragraph, with a Send to review item between Hide and Create pattern](https://developer.wordpress.org/files/2026/08/extend-editor-block-settings-menu-item.png)
 
 ### Add a pre-publish check
 
@@ -163,29 +169,31 @@ import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 function ChecklistPanel() {
-	const hasSubtitle = useSelect(
-		( select ) =>
-			!! select( editorStore ).getEditedPostAttribute( 'meta' )
-				?.my_plugin_subtitle,
-		[]
-	);
+    const hasSubtitle = useSelect(
+        ( select ) =>
+            !! select( editorStore ).getEditedPostAttribute( 'meta' )
+                ?.my_plugin_subtitle,
+        []
+    );
 
-	return (
-		<PluginPrePublishPanel
-			title={ __( 'Publishing checklist' ) }
-			initialOpen
-		>
-			<p>
-				{ hasSubtitle
-					? __( 'This post has a subtitle.' )
-					: __( 'This post has no subtitle yet.' ) }
-			</p>
-		</PluginPrePublishPanel>
-	);
+    return (
+        <PluginPrePublishPanel
+            title={ __( 'Publishing checklist' ) }
+            initialOpen
+        >
+            <p>
+                { hasSubtitle
+                    ? __( 'This post has a subtitle.' )
+                    : __( 'This post has no subtitle yet.' ) }
+            </p>
+        </PluginPrePublishPanel>
+    );
 }
 ```
 
 The panel starts collapsed unless you pass `initialOpen`, except when no `title` is given, in which case it is always open.
+
+![The pre-publish panel with a Publishing checklist section open below Visibility and Publish](https://developer.wordpress.org/files/2026/08/extend-editor-pre-publish-panel.png)
 
 ### Register the fills
 
@@ -195,14 +203,14 @@ None of the four components above render on their own. Mount them with a single 
 import { registerPlugin } from '@wordpress/plugins';
 
 function MyPluginFills() {
-	return (
-		<>
-			<SubtitleSidebar />
-			<ReviewPanel />
-			<SendToReviewMenuItem />
-			<ChecklistPanel />
-		</>
-	);
+    return (
+        <>
+            <SubtitleSidebar />
+            <ReviewPanel />
+            <SendToReviewMenuItem />
+            <ChecklistPanel />
+        </>
+    );
 }
 
 registerPlugin( 'my-plugin', { render: MyPluginFills } );
@@ -222,26 +230,26 @@ Filters let you change registered blocks without owning them. They are added wit
 import { addFilter } from '@wordpress/hooks';
 
 function addSubtitleAttribute( settings, name ) {
-	if ( name !== 'core/paragraph' ) {
-		return settings;
-	}
+    if ( name !== 'core/paragraph' ) {
+        return settings;
+    }
 
-	return {
-		...settings,
-		attributes: {
-			...settings.attributes,
-			mySubtitle: {
-				type: 'string',
-				default: '',
-			},
-		},
-	};
+    return {
+        ...settings,
+        attributes: {
+            ...settings.attributes,
+            mySubtitle: {
+                type: 'string',
+                default: '',
+            },
+        },
+    };
 }
 
 addFilter(
-	'blocks.registerBlockType',
-	'my-plugin/subtitle-attribute',
-	addSubtitleAttribute
+    'blocks.registerBlockType',
+    'my-plugin/subtitle-attribute',
+    addSubtitleAttribute
 );
 ```
 
@@ -261,35 +269,35 @@ import { PanelBody, TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 const withSubtitleControl = createHigherOrderComponent( ( BlockEdit ) => {
-	return ( props ) => {
-		if ( props.name !== 'core/paragraph' ) {
-			return <BlockEdit { ...props } />;
-		}
+    return ( props ) => {
+        if ( props.name !== 'core/paragraph' ) {
+            return <BlockEdit { ...props } />;
+        }
 
-		return (
-			<>
-				<BlockEdit { ...props } />
-				<InspectorControls>
-					<PanelBody title={ __( 'Subtitle' ) }>
-						<TextControl
-							__nextHasNoMarginBottom
-							label={ __( 'Subtitle' ) }
-							value={ props.attributes.mySubtitle }
-							onChange={ ( mySubtitle ) =>
-								props.setAttributes( { mySubtitle } )
-							}
-						/>
-					</PanelBody>
-				</InspectorControls>
-			</>
-		);
-	};
+        return (
+            <>
+                <BlockEdit { ...props } />
+                <InspectorControls>
+                    <PanelBody title={ __( 'Subtitle' ) }>
+                        <TextControl
+                            __nextHasNoMarginBottom
+                            label={ __( 'Subtitle' ) }
+                            value={ props.attributes.mySubtitle }
+                            onChange={ ( mySubtitle ) =>
+                                props.setAttributes( { mySubtitle } )
+                            }
+                        />
+                    </PanelBody>
+                </InspectorControls>
+            </>
+        );
+    };
 }, 'withSubtitleControl' );
 
 addFilter(
-	'editor.BlockEdit',
-	'my-plugin/subtitle-control',
-	withSubtitleControl
+    'editor.BlockEdit',
+    'my-plugin/subtitle-control',
+    withSubtitleControl
 );
 ```
 
@@ -306,13 +314,13 @@ import { registerBlockVariation } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
 registerBlockVariation( 'core/group', {
-	name: 'my-plugin-callout',
-	title: __( 'Callout' ),
-	attributes: {
-		className: 'my-plugin-callout',
-	},
-	innerBlocks: [ [ 'core/heading', { level: 3 } ], [ 'core/paragraph' ] ],
-	scope: [ 'inserter' ],
+    name: 'my-plugin-callout',
+    title: __( 'Callout' ),
+    attributes: {
+        className: 'my-plugin-callout',
+    },
+    innerBlocks: [ [ 'core/heading', { level: 3 } ], [ 'core/paragraph' ] ],
+    scope: [ 'inserter' ],
 } );
 ```
 
@@ -324,20 +332,20 @@ Post meta is the usual place for data an extension collects about a post, and th
 
 ```php
 function my_plugin_register_meta() {
-	$fields = array( 'my_plugin_subtitle', 'my_plugin_reviewer' );
+    $fields = array( 'my_plugin_subtitle', 'my_plugin_reviewer' );
 
-	foreach ( $fields as $field ) {
-		register_post_meta(
-			'post',
-			$field,
-			array(
-				'show_in_rest' => true,
-				'single'       => true,
-				'type'         => 'string',
-				'default'      => '',
-			)
-		);
-	}
+    foreach ( $fields as $field ) {
+        register_post_meta(
+            'post',
+            $field,
+            array(
+                'show_in_rest' => true,
+                'single'       => true,
+                'type'         => 'string',
+                'default'      => '',
+            )
+        );
+    }
 }
 add_action( 'init', 'my_plugin_register_meta' );
 ```
@@ -357,3 +365,4 @@ Wrap every string a user reads in `__()` from [`@wordpress/i18n`](/packages/i18n
 -   [Plugin sidebar tutorial](/docs/how-to-guides/plugin-sidebar-0.md), a working example of the sidebar and meta field above
 -   [Block variations](/docs/reference-guides/block-api/block-variations.md)
 -   [Curating the Editor experience](/docs/how-to-guides/curating-the-editor-experience/README.md), for locking down the Editor rather than adding to it
+
