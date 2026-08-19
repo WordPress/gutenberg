@@ -43,15 +43,20 @@ export function ColorWarningDetails( {
 			style={ {
 				background: '#fcf0f1',
 				borderInlineStart: '4px solid #d63638',
-				padding: '0.75rem 1rem',
+				padding: '0.5rem 1rem',
 			} }
 		>
-			<h3>
+			<h3 style={ { marginBlock: '0.5rem' } }>
 				{ warnings.length === 1
 					? '1 color warning'
 					: `${ warnings.length } color warnings` }
 			</h3>
-			<ol>
+			<ol
+				style={ {
+					marginBlock: '0.5rem',
+					paddingInlineStart: '1.5rem',
+				} }
+			>
 				{ warnings.map( ( warning ) => (
 					<li
 						key={
@@ -61,22 +66,22 @@ export function ColorWarningDetails( {
 						}
 					>
 						{ warning.type === 'ramp' ? (
-							<p>
-								<strong>Ramp warning:</strong> Ramp{ ' ' }
-								<code>{ warning.ramp }</code>, step{ ' ' }
-								<code>{ warning.step }</code>.
+							<p style={ { marginBlock: '0.25rem' } }>
+								<strong>Ramp:</strong>{ ' ' }
+								<code>{ warning.ramp }</code>.{ ' ' }
+								<strong>Step:</strong>{ ' ' }
+								<code>{ warning.step }</code>
 							</p>
 						) : (
-							<p>
-								<strong>Contrast warning:</strong> Foreground
-								token <code>{ warning.foregroundToken }</code> ({ ' ' }
-								<code>{ warning.foregroundColor }</code> ) on
-								background token{ ' ' }
-								<code>{ warning.backgroundToken }</code> ({ ' ' }
-								<code>{ warning.backgroundColor }</code> ).
-								Required contrast: { warning.requiredContrast }
-								:1. Achieved contrast:{ ' ' }
-								{ warning.achievedContrast.toFixed( 2 ) }:1.
+							<p style={ { marginBlock: '0.25rem' } }>
+								<strong>Contrast:</strong>{ ' ' }
+								<code>{ warning.foregroundToken }</code>{ ' ' }
+								<code>{ warning.foregroundColor }</code> on{ ' ' }
+								<code>{ warning.backgroundToken }</code>{ ' ' }
+								<code>{ warning.backgroundColor }</code>.{ ' ' }
+								{ warning.achievedContrast.toFixed( 2 ) }:1
+								achieved; { warning.requiredContrast }:1
+								required.
 							</p>
 						) }
 					</li>

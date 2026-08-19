@@ -3,6 +3,7 @@ import type {
 	ThemeProviderColorRampName,
 	ThemeProviderColorWarning,
 } from '../../theme-provider-color-warnings';
+import { getColorString } from '../lib/color-utils';
 import type { Ramp } from '../lib/types';
 
 // TODO: show token groups better
@@ -56,13 +57,32 @@ function hasRampWarning(
 	);
 }
 
+function isSeedAdjusted( seed: string, generatedAnchor: string ) {
+	return getColorString( seed ) !== getColorString( generatedAnchor );
+}
+
 export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 	function RampTable( { ramps, warnings = [] }, forwardedRef ) {
+		const hasAdjustedSeed = ramps.some( ( { seed, ramp } ) =>
+			isSeedAdjusted( seed.value, ramp[ seed.name ] )
+		);
+		const hasAnyRampWarning = warnings.some(
+			( warning ) => warning.type === 'ramp'
+		);
+
 		return (
 			<div
 				style={ { width: '100%', overflowX: 'scroll' } }
 				ref={ forwardedRef }
 			>
+				{ hasAdjustedSeed || hasAnyRampWarning ? (
+					<p style={ { marginBlock: '0 0.5rem' } }>
+						<strong>Markers:</strong>{ ' ' }
+						{ hasAnyRampWarning ? '! ramp warning' : null }
+						{ hasAnyRampWarning && hasAdjustedSeed ? ' · ' : null }
+						{ hasAdjustedSeed ? 'SEED ≠ generated anchor' : null }
+					</p>
+				) : null }
 				<div
 					style={ {
 						display: 'grid',
@@ -138,6 +158,14 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 								) : null }
 								{ tokenName === seed.name ? (
 									<div
+										title={
+											isSeedAdjusted(
+												seed.value,
+												ramp[ tokenName ]
+											)
+												? `${ name } input seed ${ seed.value }; generated ${ tokenName } anchor ${ ramp[ tokenName ] }`
+												: undefined
+										}
 										style={ {
 											backgroundColor: seed.value,
 											height: 20,
@@ -149,13 +177,25 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 											fontSize: 8,
 											fontWeight:
 												'var(--wpds-typography-font-weight-emphasis)',
+											outline: isSeedAdjusted(
+												seed.value,
+												ramp[ tokenName ]
+											)
+												? '3px dashed #996800'
+												: '',
+											outlineOffset: '-3px',
 											color:
 												tokenName === 'surface2'
 													? ramp.fgSurface4
 													: ramp.fgFill,
 										} }
 									>
-										SEED
+										{ isSeedAdjusted(
+											seed.value,
+											ramp[ tokenName ]
+										)
+											? 'SEED ≠'
+											: 'SEED' }
 									</div>
 								) : null }
 								{ [
