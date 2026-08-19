@@ -936,7 +936,7 @@ test.describe( 'Copy/cut/paste', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'Copy ' );
 		await pageUtils.pressKeys( 'primary+b' );
@@ -1015,7 +1015,7 @@ test.describe( 'Copy/cut/paste', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'First' );
 		await page.keyboard.press( 'Enter' );
