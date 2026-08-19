@@ -1478,31 +1478,6 @@
 			"count": 1
 		}
 	},
-	"packages/format-library/src/image/index.js": {
-		"react-hooks/refs": {
-			"count": 2
-		}
-	},
-	"packages/format-library/src/language/index.js": {
-		"react-hooks/refs": {
-			"count": 2
-		}
-	},
-	"packages/format-library/src/link/inline.js": {
-		"react-hooks/refs": {
-			"count": 2
-		}
-	},
-	"packages/format-library/src/math/index.js": {
-		"react-hooks/refs": {
-			"count": 2
-		}
-	},
-	"packages/format-library/src/text-color/inline.js": {
-		"react-hooks/refs": {
-			"count": 2
-		}
-	},
 	"packages/global-styles-ui/src/block-preview-panel.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
