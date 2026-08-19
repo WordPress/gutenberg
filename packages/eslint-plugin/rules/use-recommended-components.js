@@ -29,6 +29,7 @@ const ALLOWLIST = {
 			'Link',
 			'RangeCalendar',
 			'Skeleton',
+			'Spinner',
 			'Stack',
 			'Tabs',
 			'Text',
