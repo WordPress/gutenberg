@@ -5,12 +5,12 @@
 		"types": [ "gutenberg-env", "style-imports" ]
 	},
 	"references": [
-		{ "path": "../components" },
+		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../private-apis" },
 		{ "path": "../route" },
 		{ "path": "../style-runtime" },
-		{ "path": "../ui" }
+		{ "path": "../ui/tsconfig.build.json" }
 	]
 }

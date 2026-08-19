@@ -4,7 +4,7 @@
 	"references": [
 		{ "path": "./tsconfig.build.json" },
 		{ "path": "../a11y/tsconfig.build.json" },
-		{ "path": "../components" },
+		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../data" },
 		{ "path": "../deprecated/tsconfig.build.json" },

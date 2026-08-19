@@ -1,26 +1,30 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.dev.base.json",
+	"extends": "../../tsconfig.base.json",
+	/*
+	 * Type checks stories against sources without jest types. Kept out of the
+	 * package tsconfig.json so Storybook's meta extractor stays on its inferred
+	 * project.
+	 */
 	"compilerOptions": {
+		"noEmit": true,
+		"emitDeclarationOnly": false,
 		"types": [
-			"jest",
 			"gutenberg-env",
-			"gutenberg-test-env",
 			"react-css-custom-properties",
 			"style-imports"
 		]
 	},
-	"files": [ "global.d.ts" ],
-	"include": [
-		"src/**/test/**/*.ts",
-		"src/**/test/**/*.tsx",
-		"src/**/tests/**/*.ts",
-		"src/**/tests/**/*.tsx",
-		"src/**/__tests__/**/*.ts",
-		"src/**/__tests__/**/*.tsx"
+	"files": [ "storybook.d.ts", "src/popover/test/utils/index.tsx" ],
+	// Same JS-only exclusion the package used before the split.
+	"exclude": [
+		"**/benchmark",
+		"**/test/**",
+		"**/tests/**",
+		"**/__tests__/**",
+		"src/**/stories/**/*.jsx"
 	],
 	"references": [
-		{ "path": "./tsconfig.build.json" },
 		{ "path": "../a11y/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../date" },

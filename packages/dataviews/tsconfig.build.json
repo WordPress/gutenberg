@@ -2,34 +2,30 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"checkJs": false
+		"types": [
+			"gutenberg-env",
+			"style-imports",
+			"react-css-custom-properties"
+		]
 	},
 	"references": [
 		{ "path": "../a11y/tsconfig.build.json" },
-		{ "path": "../api-fetch/tsconfig.build.json" },
-		{ "path": "../blob/tsconfig.build.json" },
 		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
-		{ "path": "../core-data/tsconfig.build.json" },
-		{ "path": "../block-editor" },
-		{ "path": "../blocks" },
 		{ "path": "../data" },
-		{ "path": "../dataviews/tsconfig.build.json" },
 		{ "path": "../date" },
+		{ "path": "../deprecated/tsconfig.build.json" },
+		{ "path": "../dom" },
 		{ "path": "../element/tsconfig.build.json" },
-		{ "path": "../hooks" },
-		{ "path": "../html-entities/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons" },
-		{ "path": "../media-utils/tsconfig.build.json" },
-		{ "path": "../notices/tsconfig.build.json" },
+		{ "path": "../kebab-case" },
+		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
-		{ "path": "../router" },
+		{ "path": "../theme/tsconfig.build.json" },
 		{ "path": "../ui/tsconfig.build.json" },
 		{ "path": "../url" },
-		{ "path": "../block-editor" },
-		{ "path": "../warning" },
-		{ "path": "../wordcount/tsconfig.build.json" }
+		{ "path": "../warning" }
 	]
 }

@@ -8,7 +8,7 @@
 	},
 	"references": [
 		{ "path": "../api-fetch/tsconfig.build.json" },
-		{ "path": "../components" },
+		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../block-editor" },
 		{ "path": "../blocks" },
 		{ "path": "../compose/tsconfig.build.json" },

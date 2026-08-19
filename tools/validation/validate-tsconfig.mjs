@@ -96,20 +96,27 @@ function isDevProject( tsconfigPath ) {
 }
 
 /**
- * Returns the projects a package builds its declarations from and, if any,
- * type checks its dev files with. Packages that are not split yet build from
- * `tsconfig.json` and may carry a separate `tsconfig.test.json`.
+ * Returns the projects of a package: src, dev files, and, where stories are
+ * type checked against sources without jest types, `tsconfig.stories.json`.
  *
  * @param {string} packageName Package directory name.
- * @return {{srcProject: string, devProject: string|undefined}} Absolute paths.
+ * @return {{srcProject: string|undefined, devProject: string|undefined, storiesProject: string|undefined}} Absolute paths.
  */
 function packageProjects( packageName ) {
 	const packageDir = resolve( repoRoot, 'packages', packageName );
 	const buildProject = join( packageDir, 'tsconfig.build.json' );
 	const defaultProject = join( packageDir, 'tsconfig.json' );
+	const storiesConfig = join( packageDir, 'tsconfig.stories.json' );
+	const storiesProject = existsSync( storiesConfig )
+		? storiesConfig
+		: undefined;
 
 	if ( existsSync( buildProject ) ) {
-		return { srcProject: buildProject, devProject: defaultProject };
+		return {
+			srcProject: buildProject,
+			devProject: defaultProject,
+			storiesProject,
+		};
 	}
 
 	/*
@@ -117,13 +124,18 @@ function packageProjects( packageName ) {
 	 * default project checks src along with the dev files.
 	 */
 	if ( isDevProject( defaultProject ) ) {
-		return { srcProject: undefined, devProject: defaultProject };
+		return {
+			srcProject: undefined,
+			devProject: defaultProject,
+			storiesProject,
+		};
 	}
 
 	const testProject = join( packageDir, 'tsconfig.test.json' );
 	return {
 		srcProject: join( packageDir, 'tsconfig.json' ),
 		devProject: existsSync( testProject ) ? testProject : undefined,
+		storiesProject,
 	};
 }
 
@@ -156,7 +168,8 @@ function srcProjectReferences( srcProject, packageName ) {
 }
 
 for ( const packageName of packagesWithTypes ) {
-	const { srcProject, devProject } = packageProjects( packageName );
+	const { srcProject, devProject, storiesProject } =
+		packageProjects( packageName );
 
 	if ( srcProject && ! buildSolutionReferences.has( srcProject ) ) {
 		reportError(
@@ -172,6 +185,15 @@ for ( const packageName of packagesWithTypes ) {
 			`Missing reference to "${ relative(
 				repoRoot,
 				devProject
+			) }" in tsconfig.json`
+		);
+	}
+
+	if ( storiesProject && ! rootSolutionReferences.has( storiesProject ) ) {
+		reportError(
+			`Missing reference to "${ relative(
+				repoRoot,
+				storiesProject
 			) }" in tsconfig.json`
 		);
 	}
@@ -243,6 +265,10 @@ for ( const packageName of packagesWithTypes ) {
 	 */
 	const dependingProject = srcProject ?? devProject;
 	const references = srcProjectReferences( dependingProject, packageName );
+	// The stories project includes the sources, so it needs the same references.
+	const storiesReferences = storiesProject
+		? srcProjectReferences( storiesProject, packageName )
+		: null;
 
 	if ( packageJson.dependencies ) {
 		for ( const dependency of Object.keys( packageJson.dependencies ) ) {
@@ -265,6 +291,17 @@ for ( const packageName of packagesWithTypes ) {
 							resolve( repoRoot, 'packages', packageName ),
 							dependencyProject
 						) }" in ${ relative( repoRoot, dependingProject ) }`
+					);
+				}
+				if (
+					storiesReferences &&
+					! storiesReferences.has( dependencyProject )
+				) {
+					reportError(
+						`Missing reference to "${ relative(
+							resolve( repoRoot, 'packages', packageName ),
+							dependencyProject
+						) }" in ${ relative( repoRoot, storiesProject ) }`
 					);
 				}
 			}
