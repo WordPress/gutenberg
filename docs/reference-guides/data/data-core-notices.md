@@ -17,16 +17,14 @@ import { useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 
 const ExampleComponent = () => {
-	const notices = useSelect( ( select ) =>
-		select( noticesStore ).getNotices()
-	);
-	return (
-		<ul>
-			{ notices.map( ( notice ) => (
-				<li key={ notice.ID }>{ notice.content }</li>
-			) ) }
-		</ul>
-	);
+    const notices = useSelect( ( select ) => select( noticesStore ).getNotices() );
+    return (
+        <ul>
+        { notices.map( ( notice ) => (
+            <li key={ notice.ID }>{ notice.content }</li>
+        ) ) }
+       </ul>
+   )
 };
 ```
 
@@ -62,21 +60,21 @@ import { store as noticesStore } from '@wordpress/notices';
 import { Button } from '@wordpress/components';
 
 const ExampleComponent = () => {
-	const { createErrorNotice } = useDispatch( noticesStore );
-	return (
-		<Button
-			onClick={ () =>
-				createErrorNotice( __( 'An error occurred!' ), {
-					type: 'snackbar',
-					explicitDismiss: true,
-				} )
-			}
-		>
-			{ __(
-				'Generate a snackbar error notice with explicit dismiss button.'
-			) }
-		</Button>
-	);
+    const { createErrorNotice } = useDispatch( noticesStore );
+    return (
+        <Button
+            onClick={ () =>
+                createErrorNotice( __( 'An error occurred!' ), {
+                    type: 'snackbar',
+                    explicitDismiss: true,
+                } )
+            }
+        >
+            { __(
+                'Generate a snackbar error notice with explicit dismiss button.'
+            ) }
+        </Button>
+    );
 };
 ```
 
@@ -106,18 +104,18 @@ import { store as noticesStore } from '@wordpress/notices';
 import { Button } from '@wordpress/components';
 
 const ExampleComponent = () => {
-	const { createInfoNotice } = useDispatch( noticesStore );
-	return (
-		<Button
-			onClick={ () =>
-				createInfoNotice( __( 'Something happened!' ), {
-					isDismissible: false,
-				} )
-			}
-		>
-			{ __( 'Generate a notice that cannot be dismissed.' ) }
-		</Button>
-	);
+    const { createInfoNotice } = useDispatch( noticesStore );
+    return (
+        <Button
+            onClick={ () =>
+               createInfoNotice( __( 'Something happened!' ), {
+                  isDismissible: false,
+               } )
+            }
+        >
+        { __( 'Generate a notice that cannot be dismissed.' ) }
+      </Button>
+      );
 };
 ```
 
@@ -143,14 +141,14 @@ import { store as noticesStore } from '@wordpress/notices';
 import { Button } from '@wordpress/components';
 
 const ExampleComponent = () => {
-	const { createNotice } = useDispatch( noticesStore );
-	return (
-		<Button
-			onClick={ () => createNotice( 'success', __( 'Notice message' ) ) }
-		>
-			{ __( 'Generate a success notice!' ) }
-		</Button>
-	);
+    const { createNotice } = useDispatch( noticesStore );
+    return (
+        <Button
+            onClick={ () => createNotice( 'success', __( 'Notice message' ) ) }
+        >
+            { __( 'Generate a success notice!' ) }
+        </Button>
+    );
 };
 ```
 
@@ -181,19 +179,19 @@ import { store as noticesStore } from '@wordpress/notices';
 import { Button } from '@wordpress/components';
 
 const ExampleComponent = () => {
-	const { createSuccessNotice } = useDispatch( noticesStore );
-	return (
-		<Button
-			onClick={ () =>
-				createSuccessNotice( __( 'Success!' ), {
-					type: 'snackbar',
-					icon: '🔥',
-				} )
-			}
-		>
-			{ __( 'Generate a snackbar success notice!' ) }
-		</Button>
-	);
+    const { createSuccessNotice } = useDispatch( noticesStore );
+    return (
+        <Button
+            onClick={ () =>
+                createSuccessNotice( __( 'Success!' ), {
+                    type: 'snackbar',
+                    icon: '🔥',
+                } )
+            }
+        >
+            { __( 'Generate a snackbar success notice!' ) }
+       </Button>
+    );
 };
 ```
 
@@ -223,23 +221,22 @@ import { store as noticesStore } from '@wordpress/notices';
 import { Button } from '@wordpress/components';
 
 const ExampleComponent = () => {
-	const { createWarningNotice, createInfoNotice } =
-		useDispatch( noticesStore );
-	return (
-		<Button
-			onClick={ () =>
-				createWarningNotice( __( 'Warning!' ), {
-					onDismiss: () => {
-						createInfoNotice(
-							__( 'The warning has been dismissed!' )
-						);
-					},
-				} )
-			}
-		>
-			{ __( 'Generates a warning notice with onDismiss callback' ) }
-		</Button>
-	);
+    const { createWarningNotice, createInfoNotice } = useDispatch( noticesStore );
+    return (
+        <Button
+            onClick={ () =>
+                createWarningNotice( __( 'Warning!' ), {
+                    onDismiss: () => {
+                        createInfoNotice(
+                            __( 'The warning has been dismissed!' )
+                        );
+                    },
+                } )
+            }
+        >
+            { __( 'Generates a warning notice with onDismiss callback' ) }
+        </Button>
+    );
 };
 ```
 
@@ -276,14 +273,19 @@ export const ExampleComponent = () => {
 					<li key={ notice.id }>{ notice.content }</li>
 				) ) }
 			</ul>
-			<Button onClick={ () => removeAllNotices() }>
+			<Button
+				onClick={ () =>
+					removeAllNotices()
+				}
+			>
 				{ __( 'Clear all notices', 'woo-gutenberg-products-block' ) }
 			</Button>
-			<Button onClick={ () => removeAllNotices( 'snackbar' ) }>
-				{ __(
-					'Clear all snackbar notices',
-					'woo-gutenberg-products-block'
-				) }
+			<Button
+				onClick={ () =>
+					removeAllNotices( 'snackbar' )
+				}
+			>
+				{ __( 'Clear all snackbar notices', 'woo-gutenberg-products-block' ) }
 			</Button>
 		</>
 	);
@@ -312,29 +314,27 @@ import { store as noticesStore } from '@wordpress/notices';
 import { Button } from '@wordpress/components';
 
 const ExampleComponent = () => {
-	const notices = useSelect( ( select ) =>
-		select( noticesStore ).getNotices()
-	);
-	const { createWarningNotice, removeNotice } = useDispatch( noticesStore );
+   const notices = useSelect( ( select ) => select( noticesStore ).getNotices() );
+   const { createWarningNotice, removeNotice } = useDispatch( noticesStore );
 
-	return (
-		<>
-			<Button
-				onClick={ () =>
-					createWarningNotice( __( 'Warning!' ), {
-						isDismissible: false,
-					} )
-				}
-			>
-				{ __( 'Generate a notice' ) }
-			</Button>
-			{ notices.length > 0 && (
-				<Button onClick={ () => removeNotice( notices[ 0 ].id ) }>
-					{ __( 'Remove the notice' ) }
-				</Button>
-			) }
-		</>
-	);
+   return (
+        <>
+            <Button
+                onClick={ () =>
+                    createWarningNotice( __( 'Warning!' ), {
+                        isDismissible: false,
+                    } )
+                }
+            >
+                { __( 'Generate a notice' ) }
+            </Button>
+            { notices.length > 0 && (
+                <Button onClick={ () => removeNotice( notices[ 0 ].id ) }>
+                    { __( 'Remove the notice' ) }
+                </Button>
+            ) }
+        </>
+    );
 };
 ```
 
@@ -391,5 +391,6 @@ _Parameters_
 _Returns_
 
 -   `Extract< ReducerAction, { type: 'REMOVE_NOTICES'; } >`: Action object.
+
 
 <!-- END TOKEN(Autogenerated actions|../../../packages/notices/src/store/actions.ts) -->

@@ -573,7 +573,7 @@ _Returns_
 
 ### getHoveredBlockClientId
 
-> **Deprecated**
+> **Deprecated** 
 
 Returns the currently hovered block.
 
@@ -744,34 +744,34 @@ Returns the currently selected block, or null if there is no selected block.
 _Usage_
 
 ```js
-import { select } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import { select } from '@wordpress/data'
+import { store as blockEditorStore } from '@wordpress/block-editor'
 
 // Set initial active block client ID
-let activeBlockClientId = null;
+let activeBlockClientId = null
 
 const getActiveBlockData = () => {
-	const activeBlock = select( blockEditorStore ).getSelectedBlock();
+	const activeBlock = select(blockEditorStore).getSelectedBlock()
 
-	if ( activeBlock && activeBlock.clientId !== activeBlockClientId ) {
-		activeBlockClientId = activeBlock.clientId;
+	if (activeBlock && activeBlock.clientId !== activeBlockClientId) {
+		activeBlockClientId = activeBlock.clientId
 
 		// Get active block name and attributes
-		const activeBlockName = activeBlock.name;
-		const activeBlockAttributes = activeBlock.attributes;
+		const activeBlockName = activeBlock.name
+		const activeBlockAttributes = activeBlock.attributes
 
 		// Log active block name and attributes
-		console.log( activeBlockName, activeBlockAttributes );
+		console.log(activeBlockName, activeBlockAttributes)
+		}
 	}
-};
 
-// Subscribe to changes in the editor
-// wp.data.subscribe(() => {
-// getActiveBlockData()
-// })
+	// Subscribe to changes in the editor
+	// wp.data.subscribe(() => {
+		// getActiveBlockData()
+	// })
 
-// Update active block data on click
-// onclick="getActiveBlockData()"
+	// Update active block data on click
+	// onclick="getActiveBlockData()"
 ```
 
 _Parameters_
@@ -872,7 +872,7 @@ Returns the defined block template
 
 _Parameters_
 
--   _state_ `boolean`:
+-   _state_ `boolean`: 
 
 _Returns_
 
@@ -893,7 +893,7 @@ _Returns_
 
 ### hasBlockMovingClientId
 
-> **Deprecated**
+> **Deprecated** 
 
 Returns whether block moving mode is enabled.
 
@@ -1095,7 +1095,7 @@ _Returns_
 
 ### isCaretWithinFormattedText
 
-> **Deprecated**
+> **Deprecated** 
 
 Returns true if the caret is within formatted text, or false otherwise.
 
@@ -1212,7 +1212,7 @@ Returns whether the blocks matches the template or not.
 
 _Parameters_
 
--   _state_ `boolean`:
+-   _state_ `boolean`: 
 
 _Returns_
 
@@ -1252,12 +1252,12 @@ Action that duplicates a list of blocks.
 
 _Parameters_
 
--   _clientIds_ `string[]`:
--   _updateSelection_ `boolean`:
+-   _clientIds_ `string[]`: 
+-   _updateSelection_ `boolean`: 
 
 ### enterFormattedText
 
-> **Deprecated**
+> **Deprecated** 
 
 Returns an action object used in signalling that the caret has entered formatted text.
 
@@ -1267,7 +1267,7 @@ _Returns_
 
 ### exitFormattedText
 
-> **Deprecated**
+> **Deprecated** 
 
 Returns an action object used in signalling that the user caret has exited formatted text.
 
@@ -1290,7 +1290,7 @@ Action that hides the insertion point.
 
 ### hoverBlock
 
-> **Deprecated**
+> **Deprecated** 
 
 Returns an action object used in signalling that the block with the specified client ID has been hovered.
 
@@ -1300,7 +1300,7 @@ Action that inserts a default block after a given block.
 
 _Parameters_
 
--   _clientId_ `string`:
+-   _clientId_ `string`: 
 
 ### insertBeforeBlock
 
@@ -1308,7 +1308,7 @@ Action that inserts a default block before a given block.
 
 _Parameters_
 
--   _clientId_ `string`:
+-   _clientId_ `string`: 
 
 ### insertBlock
 
@@ -1340,7 +1340,7 @@ _Parameters_
 -   _blocks_ `Object[]`: Block objects to insert.
 -   _index_ `?number`: Index at which block should be inserted.
 -   _rootClientId_ `?string`: Optional root client ID of block list on which to insert.
--   _updateSelection_ `?boolean`: If true block selection will be updated. If false, block selection will not change. Defaults to true.
+-   _updateSelection_ `?boolean`: If true block selection will be updated.  If false, block selection will not change. Defaults to true.
 -   _initialPosition_ `0|-1|null`: Initial focus position. Setting it to null prevent focusing the inserted block.
 -   _meta_ `?Object`: Optional Meta values to be passed to the action object.
 
@@ -1409,7 +1409,7 @@ _Parameters_
 
 ### receiveBlocks
 
-> **Deprecated**
+> **Deprecated** 
 
 Returns an action object used in signalling that blocks have been received. Unlike resetBlocks, these should be appended to the existing known set, not replacing.
 
@@ -1464,54 +1464,54 @@ _Properties_
 _Usage_
 
 ```js
-wp.data.dispatch( 'core/block-editor' ).registerInserterMediaCategory( {
-	name: 'openverse',
-	labels: {
-		name: 'Openverse',
-		search_items: 'Search Openverse',
-	},
-	mediaType: 'image',
-	async fetch( query = {} ) {
-		const defaultArgs = {
-			mature: false,
-			excluded_source: 'flickr,inaturalist,wikimedia',
-			license: 'pdm,cc0',
-		};
-		const finalQuery = { ...query, ...defaultArgs };
-		// Sometimes you might need to map the supported request params according to `InserterMediaRequest`.
-		// interface. In this example the `search` query param is named `q`.
-		const mapFromInserterMediaRequest = {
-			per_page: 'page_size',
-			search: 'q',
-		};
-		const url = new URL( 'https://api.openverse.org/v1/images/' );
-		Object.entries( finalQuery ).forEach( ( [ key, value ] ) => {
-			const queryKey = mapFromInserterMediaRequest[ key ] || key;
-			url.searchParams.set( queryKey, value );
-		} );
-		const response = await window.fetch( url, {
-			headers: {
-				'User-Agent': 'WordPress/inserter-media-fetch',
-			},
-		} );
-		const jsonResponse = await response.json();
-		const results = jsonResponse.results;
-		return results.map( ( result ) => ( {
-			...result,
-			// If your response result includes an `id` prop that you want to access later, it should
-			// be mapped to `InserterMediaItem`'s `sourceId` prop. This can be useful if you provide
-			// a report URL getter.
-			// Additionally you should always clear the `id` value of your response results because
-			// it is used to identify WordPress media items.
-			sourceId: result.id,
-			id: undefined,
-			caption: result.caption,
-			previewUrl: result.thumbnail,
-		} ) );
-	},
-	getReportUrl: ( { sourceId } ) =>
-		`https://wordpress.org/openverse/image/${ sourceId }/report/`,
-	isExternalResource: true,
+wp.data.dispatch('core/block-editor').registerInserterMediaCategory( {
+	 name: 'openverse',
+	 labels: {
+	 	name: 'Openverse',
+	 	search_items: 'Search Openverse',
+	 },
+	 mediaType: 'image',
+	 async fetch( query = {} ) {
+	 	const defaultArgs = {
+	 		mature: false,
+	 		excluded_source: 'flickr,inaturalist,wikimedia',
+	 		license: 'pdm,cc0',
+	 	};
+	 	const finalQuery = { ...query, ...defaultArgs };
+	 	// Sometimes you might need to map the supported request params according to `InserterMediaRequest`.
+	 	// interface. In this example the `search` query param is named `q`.
+	 	const mapFromInserterMediaRequest = {
+	 		per_page: 'page_size',
+	 		search: 'q',
+	 	};
+	 	const url = new URL( 'https://api.openverse.org/v1/images/' );
+	 	Object.entries( finalQuery ).forEach( ( [ key, value ] ) => {
+	 		const queryKey = mapFromInserterMediaRequest[ key ] || key;
+	 		url.searchParams.set( queryKey, value );
+	 	} );
+	 	const response = await window.fetch( url, {
+	 		headers: {
+	 			'User-Agent': 'WordPress/inserter-media-fetch',
+	 		},
+	 	} );
+	 	const jsonResponse = await response.json();
+	 	const results = jsonResponse.results;
+	 	return results.map( ( result ) => ( {
+	 		...result,
+	 		// If your response result includes an `id` prop that you want to access later, it should
+	 		// be mapped to `InserterMediaItem`'s `sourceId` prop. This can be useful if you provide
+	 		// a report URL getter.
+	 		// Additionally you should always clear the `id` value of your response results because
+	 		// it is used to identify WordPress media items.
+	 		sourceId: result.id,
+	 		id: undefined,
+	 		caption: result.caption,
+	 		previewUrl: result.thumbnail,
+	 	} ) );
+	 },
+	 getReportUrl: ( { sourceId } ) =>
+	 	`https://wordpress.org/openverse/image/${ sourceId }/report/`,
+	 isExternalResource: true,
 } );
 ```
 
@@ -1687,7 +1687,7 @@ _Returns_
 
 ### setBlockMovingClientId
 
-> **Deprecated**
+> **Deprecated** 
 
 Set the block moving client ID.
 
@@ -1912,5 +1912,6 @@ Block validity is a function of blocks state (at the point of a reset) and the t
 _Parameters_
 
 -   _blocks_ `Array`: Array of blocks.
+
 
 <!-- END TOKEN(Autogenerated actions|../../../packages/block-editor/src/store/actions.js) -->
