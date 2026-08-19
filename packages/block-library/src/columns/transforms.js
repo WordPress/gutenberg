@@ -43,17 +43,30 @@ const getGridInnerBlocks = ( innerBlocks ) =>
 	} );
 
 const getRowInnerBlocks = ( innerBlocks ) => {
-	return innerBlocks.map( ( column ) => {
+	const columnWidths = innerBlocks.map( ( column ) => {
+		const width = column?.attributes?.width;
+		if ( Number.isFinite( width ) ) {
+			return `${ width }%`;
+		}
+		if ( typeof width === 'string' && /\d/.test( width ) ) {
+			return width;
+		}
+		return undefined;
+	} );
+	const allColumnWidthsUnavailable = columnWidths.every(
+		( columnWidth ) => ! columnWidth
+	);
+	const equalColumnWidth = innerBlocks.length
+		? `${ +( 100 / innerBlocks.length ).toFixed( 2 ) }%`
+		: undefined;
+
+	return innerBlocks.map( ( column, index ) => {
 		const columnInnerBlocks = Array.isArray( column?.innerBlocks )
 			? column.innerBlocks
 			: [];
-		const width = column?.attributes?.width;
-		let columnWidth;
-		if ( Number.isFinite( width ) ) {
-			columnWidth = `${ width }%`;
-		} else if ( typeof width === 'string' && /\d/.test( width ) ) {
-			columnWidth = width;
-		}
+		const columnWidth =
+			columnWidths[ index ] ||
+			( allColumnWidthsUnavailable ? equalColumnWidth : undefined );
 		const childLayout = columnWidth
 			? { selfStretch: 'fixed', flexSize: columnWidth }
 			: { selfStretch: 'fill' };

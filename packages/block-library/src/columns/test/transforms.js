@@ -213,12 +213,12 @@ describe( 'transforms', () => {
 		).toEqual( { text: '#123456' } );
 	} );
 
-	it( 'uses Grow sizing when Column widths are unavailable', () => {
+	it( 'sets equal fixed widths when no Column widths are set', () => {
 		const block = createBlock( 'core/columns', {}, [
 			createBlock( 'core/column', {}, [
 				createBlock( 'core/paragraph', { content: 'One' } ),
 			] ),
-			createBlock( 'core/column', { width: 'invalid' }, [
+			createBlock( 'core/column', {}, [
 				createBlock( 'core/paragraph', { content: 'Two' } ),
 			] ),
 			createBlock( 'core/column', {}, [
@@ -237,9 +237,9 @@ describe( 'transforms', () => {
 				( innerBlock ) => innerBlock.attributes.style.layout
 			)
 		).toEqual( [
-			{ selfStretch: 'fill' },
-			{ selfStretch: 'fill' },
-			{ selfStretch: 'fill' },
+			{ selfStretch: 'fixed', flexSize: '33.33%' },
+			{ selfStretch: 'fixed', flexSize: '33.33%' },
+			{ selfStretch: 'fixed', flexSize: '33.33%' },
 		] );
 	} );
 
