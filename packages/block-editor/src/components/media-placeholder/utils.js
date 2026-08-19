@@ -1,4 +1,41 @@
 /**
+ * Determines whether a block drag over a media placeholder's drop zone should
+ * be treated as an eligible media drop.
+ *
+ * Blocks dragged from the inserter expose their name as a `wp-block:<name>`
+ * entry in `dataTransfer.types`, so the dragged block can be matched against
+ * the placeholder's allowed media types. Blocks dragged within the canvas
+ * (e.g. reordering an inner block) only carry the bare `wp-blocks` transfer
+ * type, so they can't be identified as media and must not be treated as
+ * eligible -- otherwise the drop zone activates on top of the block being
+ * reordered and swallows the drop.
+ *
+ * @param {Array}   dataTransferTypes The drag's `dataTransfer.types`.
+ * @param {Array}   allowedTypes      Allowed media types (e.g. `['audio']`).
+ * @param {boolean} multiple          Whether multiple items may be dropped.
+ *
+ * @return {boolean} Whether the drag is an eligible media drop.
+ */
+export function isMediaDropEligible(
+	dataTransferTypes,
+	allowedTypes = [],
+	multiple
+) {
+	const prefix = 'wp-block:core/';
+	const blockTypes = [];
+	for ( const type of dataTransferTypes ) {
+		if ( type.startsWith( prefix ) ) {
+			blockTypes.push( type.slice( prefix.length ) );
+		}
+	}
+	return (
+		blockTypes.length > 0 &&
+		blockTypes.every( ( type ) => allowedTypes.includes( type ) ) &&
+		( multiple ? true : blockTypes.length === 1 )
+	);
+}
+
+/**
  * Computes the accept attribute for file inputs based on allowed types
  * and server-supported MIME types.
  *
