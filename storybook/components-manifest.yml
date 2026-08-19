@@ -595,7 +595,31 @@
             - style
             - variant
 - name: Fieldset.Root
-  props: []
+  props:
+      - children
+      - className
+      - render
+      - style
+  subcomponents:
+      - name: Fieldset.Description
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Fieldset.Details
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Fieldset.Legend
+        props:
+            - children
+            - className
+            - hideFromVision
+            - render
+            - style
 - name: FormFileUpload
   props:
       - __next40pxDefaultSize

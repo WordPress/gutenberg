@@ -6,6 +6,11 @@ const meta: Meta< typeof Fieldset.Root > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/Primitives/Fieldset',
 	component: Fieldset.Root,
+	// Temporary: Due to an upstream bug, render the root explicitly so the
+	// components manifest extractor can resolve props from the JSX.
+	//
+	// See: https://github.com/storybookjs/storybook/issues/34877
+	render: ( args ) => <Fieldset.Root { ...args } />,
 	subcomponents: {
 		'Fieldset.Legend': Fieldset.Legend,
 		'Fieldset.Description': Fieldset.Description,
