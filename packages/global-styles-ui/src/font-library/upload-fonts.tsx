@@ -99,34 +99,21 @@ function UploadFonts() {
 	 * @return {void}
 	 */
 	const loadFiles = async ( files: File[] ) => {
-		const fontFacesLoaded = (
-			await Promise.all(
-				files.map< Promise< FontFileMetadata | null > >(
-					async ( fontFile: File ) => {
-						const fontFaceMetadata =
-							await getFontFaceMetadata( fontFile );
-						const { fontDisplayName, file, ...metadata } =
-							fontFaceMetadata;
-
-						// It's technically possible to use "" as a font's family name, but
-						// that's disallowed here.
-						if ( ! fontDisplayName ) {
-							return null;
-						}
-
-						loadFontFaceInBrowser(
-							{
-								...metadata,
-								fontFamily: createCssString( fontDisplayName ),
-							},
-							file,
-							'all'
-						);
-						return fontFaceMetadata;
-					}
-				)
-			)
-		).filter( ( nullableFontFace ) => !! nullableFontFace );
+		const fontFacesLoaded = await Promise.all(
+			files.map( async ( fontFile: File ) => {
+				const fontFaceMetadata = await getFontFaceMetadata( fontFile );
+				const { fontDisplayName, file, ...metadata } = fontFaceMetadata;
+				await loadFontFaceInBrowser(
+					{
+						...metadata,
+						fontFamily: createCssString( fontDisplayName ),
+					},
+					file,
+					'all'
+				);
+				return fontFaceMetadata;
+			} )
+		);
 		handleInstall( fontFacesLoaded );
 	};
 

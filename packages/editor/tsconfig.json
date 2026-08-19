@@ -25,7 +25,7 @@
 		{ "path": "../escape-html/tsconfig.build.json" },
 		{ "path": "../fields" },
 		{ "path": "../global-styles-engine/tsconfig.build.json" },
-		{ "path": "../global-styles-ui" },
+		{ "path": "../global-styles-ui/tsconfig.build.json" },
 		{ "path": "../hooks" },
 		{ "path": "../html-entities/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },

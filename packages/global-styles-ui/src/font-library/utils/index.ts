@@ -2,8 +2,8 @@ import type { FontFamily, FontFace } from '@wordpress/core-data';
 import type { DataRegistry } from '@wordpress/data';
 import { kebabCase } from '@wordpress/kebab-case';
 import { FONT_WEIGHTS, FONT_STYLES } from './constants';
-import { createCssString } from './create-css-string';
 import { fetchInstallFontFace } from '../api';
+import { formatFontFaceName } from './preview-styles';
 import type { FontFamilyToUpload, FontUploadResult } from '../types';
 
 /**
@@ -86,220 +86,86 @@ export function mergeFontFamilies(
 	return Array.from( map.values() );
 }
 
-let documentSheet: CSSStyleSheet | undefined;
-let iframeSheetDoc: Document | undefined;
-let iframeSheetInstance: CSSStyleSheet | undefined;
-
-/**
- * Returns managed CSSStyleSheets for the requested targets, lazily creating
- * and adopting them as needed. Uses the iframe's own CSSStyleSheet constructor
- * so the sheet belongs to the correct document realm.
- *
- * @param target Which documents to provide sheets for.
- * @return The managed stylesheets for the requested targets.
+/*
+ * Loads the font face from a URL and adds it to the browser.
+ * It also adds it to the iframe document.
  */
-function ensureTargetSheets(
-	target: 'all' | 'document' | 'iframe'
-): CSSStyleSheet[] {
-	const sheets: CSSStyleSheet[] = [];
-
-	if ( target === 'document' || target === 'all' ) {
-		if ( ! documentSheet ) {
-			documentSheet = new CSSStyleSheet();
-		}
-		if ( ! document.adoptedStyleSheets.includes( documentSheet ) ) {
-			document.adoptedStyleSheets.push( documentSheet );
-		}
-		sheets.push( documentSheet );
-	}
-
-	if ( target === 'iframe' || target === 'all' ) {
-		const iframe = document.querySelector< HTMLIFrameElement >(
-			'iframe[name="editor-canvas"]'
-		);
-		const iframeDoc = iframe?.contentDocument;
-		const iframeGlobal = iframeDoc?.defaultView;
-
-		if ( iframeDoc && iframeGlobal ) {
-			// Recreate sheet when iframe document changes (e.g. navigation).
-			// Use the iframe's own CSSStyleSheet constructor so the sheet
-			// belongs to the iframe's document realm (spec requirement).
-			if ( iframeDoc !== iframeSheetDoc || ! iframeSheetInstance ) {
-				iframeSheetInstance = new iframeGlobal.CSSStyleSheet();
-				iframeSheetDoc = iframeDoc;
-			}
-			if (
-				! iframeDoc.adoptedStyleSheets.includes( iframeSheetInstance )
-			) {
-				iframeDoc.adoptedStyleSheets.push( iframeSheetInstance );
-			}
-			sheets.push( iframeSheetInstance );
-		}
-	}
-
-	return sheets;
-}
-
-/**
- * Builds a CSSFontFaceRule from a FontFace descriptor by inserting into
- * a temporary stylesheet. Returns null if the CSS is invalid.
- *
- * @param fontFace The font face descriptor to convert.
- * @param src      Optional URL to use as the font source.
- * @return The constructed rule, or null on invalid CSS.
- */
-function getCssFontFaceRule(
+export async function loadFontFaceInBrowser(
 	fontFace: FontFace,
-	src?: string
-): CSSFontFaceRule | null {
-	const declarations = [
-		`font-family: ${ fontFace.fontFamily }`,
-		`font-style: ${ fontFace.fontStyle || 'normal' }`,
-		`font-weight: ${ fontFace.fontWeight || '400' }`,
-	];
-
-	if ( src ) {
-		declarations.push( `src: url( ${ createCssString( src.trim() ) } )` );
-	}
-	if ( fontFace.fontDisplay ) {
-		declarations.push( `font-display: ${ fontFace.fontDisplay }` );
-	}
-	if ( fontFace.fontStretch ) {
-		declarations.push( `font-stretch: ${ fontFace.fontStretch }` );
-	}
-	if ( fontFace.fontVariant ) {
-		declarations.push( `font-variant: ${ fontFace.fontVariant }` );
-	}
-	if ( fontFace.fontFeatureSettings ) {
-		declarations.push(
-			`font-feature-settings: ${ fontFace.fontFeatureSettings }`
-		);
-	}
-	if ( fontFace.fontVariationSettings ) {
-		declarations.push(
-			`font-variation-settings: ${ fontFace.fontVariationSettings }`
-		);
-	}
-	if ( fontFace.unicodeRange ) {
-		declarations.push( `unicode-range: ${ fontFace.unicodeRange }` );
-	}
-
-	const ss = new CSSStyleSheet();
-
-	const cssText = `@font-face {\n\t${ declarations.join( ';\n\t' ) }\n}`;
-	let ruleIndex: number;
-	try {
-		ruleIndex = ss.insertRule( cssText );
-	} catch {
-		// Invalid CSS, cannot produce a valid rule.
-		if ( globalThis.SCRIPT_DEBUG ) {
-			// eslint-disable-next-line no-console
-			console.error( 'Failed to insert rule:\n%s', cssText );
-		}
-		return null;
-	}
-	const rule = ss.cssRules[ ruleIndex ];
-	if ( rule instanceof CSSFontFaceRule ) {
-		return rule;
-	}
-	// Unexpected rule
-	if ( globalThis.SCRIPT_DEBUG ) {
-		// eslint-disable-next-line no-console
-		console.error( 'Unexpected rule type:\n%o', rule );
-	}
-	return null;
-}
-
-/**
- * Loads a font face into the browser by inserting an @font-face rule
- * into managed CSSStyleSheets, including the editor iframe.
- *
- * @param fontFace   The font face descriptor to load.
- * @param fontSource URL string or File to use as the font source.
- * @param addTo      Which documents to add the font to.
- */
-export function loadFontFaceInBrowser(
-	fontFace: FontFace,
-	fontSource: string | File,
+	source: string | File,
 	addTo: 'all' | 'document' | 'iframe' = 'all'
-): void {
-	let srcUrl: string;
-	if ( typeof fontSource === 'string' ) {
-		srcUrl = fontSource;
-	} else if ( fontSource instanceof File ) {
-		srcUrl = URL.createObjectURL( fontSource );
+): Promise< void > {
+	let dataSource;
+
+	if ( typeof source === 'string' ) {
+		dataSource = `url(${ source })`;
+	} else if ( source instanceof File ) {
+		dataSource = await source.arrayBuffer();
 	} else {
 		return;
 	}
 
-	const rule = getCssFontFaceRule( fontFace, srcUrl );
-	if ( ! rule ) {
-		if ( fontSource instanceof File ) {
-			URL.revokeObjectURL( srcUrl );
+	const newFont = new window.FontFace(
+		formatFontFaceName( fontFace.fontFamily ),
+		dataSource,
+		{
+			style: fontFace.fontStyle,
+			weight: String( fontFace.fontWeight ),
 		}
-		return;
+	);
+
+	const loadedFace = await newFont.load();
+
+	if ( addTo === 'document' || addTo === 'all' ) {
+		document.fonts.add( loadedFace );
 	}
 
-	for ( const sheet of ensureTargetSheets( addTo ) ) {
-		sheet.insertRule( rule.cssText, sheet.cssRules.length );
+	if ( addTo === 'iframe' || addTo === 'all' ) {
+		const iframe = document.querySelector(
+			'iframe[name="editor-canvas"]'
+		) as HTMLIFrameElement;
+		if ( iframe?.contentDocument ) {
+			iframe.contentDocument.fonts.add( loadedFace );
+		}
 	}
 }
 
-/**
- * Unloads a font face by deleting matching @font-face rules
- * from the managed CSSStyleSheets.
+/*
+ * Unloads the font face and remove it from the browser.
+ * It also removes it from the iframe document.
  *
- * @param fontFace   The font face descriptor to unload.
- * @param removeFrom Which documents to remove the font from.
+ * Note that Font faces that were added to the set using the CSS @font-face rule
+ * remain connected to the corresponding CSS, and cannot be deleted.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/FontFaceSet/delete.
  */
 export function unloadFontFaceInBrowser(
 	fontFace: FontFace,
 	removeFrom: 'all' | 'document' | 'iframe' = 'all'
 ): void {
-	const fontFaceRule = getCssFontFaceRule( fontFace );
-	if ( ! fontFaceRule ) {
-		return;
-	}
-
-	const blobUrls = new Set< string >();
-
-	for ( const sheet of ensureTargetSheets( removeFrom ) ) {
-		// Walk rules in reverse to safely delete by index.
-		ruleLoop: for (
-			let ruleIndex = sheet.cssRules.length - 1;
-			ruleIndex >= 0;
-			ruleIndex--
-		) {
-			const rule = sheet.cssRules[ ruleIndex ];
-			if ( rule instanceof CSSFontFaceRule ) {
-				// Check for a match
-				for (
-					let descriptorIndex = 0;
-					descriptorIndex < fontFaceRule.style.length;
-					descriptorIndex++
-				) {
-					const descriptor = fontFaceRule.style[ descriptorIndex ];
-					const value =
-						fontFaceRule.style.getPropertyValue( descriptor );
-					if (
-						value &&
-						rule.style.getPropertyValue( descriptor ) !== value
-					) {
-						continue ruleLoop;
-					}
-				}
-				const srcValue = rule.style.getPropertyValue( 'src' );
-				const match = srcValue?.match( /\b(blob:[^\s'")]+)/ );
-				if ( match ) {
-					blobUrls.add( match[ 1 ] );
-				}
-				sheet.deleteRule( ruleIndex );
+	const unloadFontFace = ( fonts: FontFaceSet ) => {
+		fonts.forEach( ( f ) => {
+			if (
+				f.family === formatFontFaceName( fontFace?.fontFamily ) &&
+				f.weight === fontFace?.fontWeight &&
+				f.style === fontFace?.fontStyle
+			) {
+				fonts.delete( f );
 			}
-		}
+		} );
+	};
+
+	if ( removeFrom === 'document' || removeFrom === 'all' ) {
+		unloadFontFace( document.fonts );
 	}
 
-	for ( const blobUrl of blobUrls ) {
-		URL.revokeObjectURL( blobUrl );
+	if ( removeFrom === 'iframe' || removeFrom === 'all' ) {
+		const iframe = document.querySelector(
+			'iframe[name="editor-canvas"]'
+		) as HTMLIFrameElement;
+		if ( iframe?.contentDocument ) {
+			unloadFontFace( iframe.contentDocument.fonts );
+		}
 	}
 }
 
