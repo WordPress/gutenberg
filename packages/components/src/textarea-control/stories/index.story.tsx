@@ -23,7 +23,7 @@ const meta: Meta< typeof TextareaControl > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Use [`TextareaControl`](?path=/docs/design-system-components-form-textareacontrol--docs) from `@wordpress/ui` instead.',
+			notes: 'Use [`TextareaControl`](?path=/docs/design-system-components-form-textareacontrol--docs) from `@wordpress/ui` instead. See the [migration guide](?path=/docs/components-textareacontrol--migration-guide).',
 		},
 	},
 };
