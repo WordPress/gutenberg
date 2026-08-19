@@ -27,6 +27,12 @@ module.exports = {
 		'/.git/',
 		'/node_modules/',
 		'/packages/e2e-tests',
+		// packages/env is superseded by the external @wordpress/env
+		// devDependency (see package.json); its own test suite still
+		// requires docker-compose directly and fails to resolve once
+		// that package is no longer hoisted the way the local
+		// workspace symlink used to provide.
+		'/packages/env',
 		'/packages/e2e-test-utils-playwright/src/test.ts',
 		'<rootDir>/.*/build/',
 		'<rootDir>/.*/build-module/',
