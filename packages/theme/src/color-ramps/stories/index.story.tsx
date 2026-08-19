@@ -6,7 +6,7 @@ import type {
 	ThemeProviderColorWarning,
 } from '../../theme-provider-color-warnings';
 import { ColorWarningDetails } from './color-warning-details';
-import { RampTable } from './ramp-table';
+import { hasColorWarningForRamp, RampTable } from './ramp-table';
 import { buildBgRamp, buildAccentRamp } from '..';
 import { DEFAULT_SEED_COLORS } from '../lib/constants';
 
@@ -53,11 +53,9 @@ type RampTableRamp = React.ComponentProps<
 function buildDisplayedRamps( {
 	background,
 	primary,
-	includeAllRamps,
 }: {
 	background: string;
 	primary: string;
-	includeAllRamps: boolean;
 } ): RampTableRamp[] {
 	const bgRamp = buildBgRamp( background );
 	const ramps: RampTableRamp[] = [
@@ -80,9 +78,6 @@ function buildDisplayedRamps( {
 	] as const satisfies readonly [ ThemeProviderColorRampName, string ][];
 
 	for ( const [ name, value ] of accentSeeds ) {
-		if ( ! includeAllRamps && name !== 'primary' ) {
-			continue;
-		}
 		ramps.push( {
 			name,
 			seed: {
@@ -107,11 +102,18 @@ function ColorScaleCombination( {
 	const [ warnings, setWarnings ] = useState<
 		readonly ThemeProviderColorWarning[] | undefined
 	>();
-	const ramps = buildDisplayedRamps( {
+	const allRamps = buildDisplayedRamps( {
 		background,
 		primary,
-		includeAllRamps,
 	} );
+	const ramps = includeAllRamps
+		? allRamps
+		: allRamps.filter(
+				( ramp ) =>
+					ramp.name === 'background' ||
+					ramp.name === 'primary' ||
+					hasColorWarningForRamp( warnings ?? [], ramp.name )
+		  );
 
 	return (
 		<article

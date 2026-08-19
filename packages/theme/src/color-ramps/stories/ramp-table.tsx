@@ -3,6 +3,7 @@ import type {
 	ThemeProviderColorRampName,
 	ThemeProviderColorWarning,
 } from '../../theme-provider-color-warnings';
+import colorTokenAliases from '../../prebuilt/ts/color-tokens';
 import { getColorString } from '../lib/color-utils';
 import type { Ramp } from '../lib/types';
 
@@ -57,6 +58,58 @@ function hasRampWarning(
 	);
 }
 
+function getSemanticTokenAliases(
+	ramp: ThemeProviderColorRampName,
+	step: keyof Ramp
+): readonly string[] {
+	const rampPrefix = ramp === 'background' ? 'bg' : ramp;
+	const primitiveToken = `${ rampPrefix }-${ step }`;
+
+	return (
+		colorTokenAliases[ primitiveToken as keyof typeof colorTokenAliases ] ??
+		[]
+	);
+}
+
+function hasContrastWarning(
+	warnings: readonly ThemeProviderColorWarning[],
+	ramp: ThemeProviderColorRampName,
+	step: keyof Ramp
+) {
+	const semanticTokenAliases = getSemanticTokenAliases( ramp, step );
+
+	return warnings.some(
+		( warning ) =>
+			warning.type === 'contrast' &&
+			( semanticTokenAliases.includes(
+				warning.foregroundToken.replaceAll( '.', '-' )
+			) ||
+				semanticTokenAliases.includes(
+					warning.backgroundToken.replaceAll( '.', '-' )
+				) )
+	);
+}
+
+function hasColorWarningForStep(
+	warnings: readonly ThemeProviderColorWarning[],
+	ramp: ThemeProviderColorRampName,
+	step: keyof Ramp
+) {
+	return (
+		hasRampWarning( warnings, ramp, step ) ||
+		hasContrastWarning( warnings, ramp, step )
+	);
+}
+
+export function hasColorWarningForRamp(
+	warnings: readonly ThemeProviderColorWarning[],
+	ramp: ThemeProviderColorRampName
+) {
+	return RAMP_TOKENS_ORDER.some( ( { tokenName } ) =>
+		hasColorWarningForStep( warnings, ramp, tokenName )
+	);
+}
+
 function isSeedAdjusted( seed: string, generatedAnchor: string ) {
 	return getColorString( seed ) !== getColorString( generatedAnchor );
 }
@@ -66,20 +119,18 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 		const hasAdjustedSeed = ramps.some( ( { seed, ramp } ) =>
 			isSeedAdjusted( seed.value, ramp[ seed.name ] )
 		);
-		const hasAnyRampWarning = warnings.some(
-			( warning ) => warning.type === 'ramp'
-		);
+		const hasAnyColorWarning = warnings.length > 0;
 
 		return (
 			<div
 				style={ { width: '100%', overflowX: 'scroll' } }
 				ref={ forwardedRef }
 			>
-				{ hasAdjustedSeed || hasAnyRampWarning ? (
+				{ hasAdjustedSeed || hasAnyColorWarning ? (
 					<p style={ { marginBlock: '0 0.5rem' } }>
 						<strong>Markers:</strong>{ ' ' }
-						{ hasAnyRampWarning ? '! ramp warning' : null }
-						{ hasAnyRampWarning && hasAdjustedSeed ? ' · ' : null }
+						{ hasAnyColorWarning ? '! color warning' : null }
+						{ hasAnyColorWarning && hasAdjustedSeed ? ' · ' : null }
 						{ hasAdjustedSeed ? 'SEED ≠ generated anchor' : null }
 					</p>
 				) : null }
@@ -111,8 +162,12 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 							<div
 								key={ `${ name }-${ tokenName }` }
 								title={
-									hasRampWarning( warnings, name, tokenName )
-										? `${ name } ramp, ${ tokenName } step: warning`
+									hasColorWarningForStep(
+										warnings,
+										name,
+										tokenName
+									)
+										? `${ name } ramp, ${ tokenName } step: color warning`
 										: undefined
 								}
 								style={ {
@@ -124,7 +179,7 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 									height: tokenName === seed.name ? 60 : 40,
 									minWidth: 32,
 									fontSize: 14,
-									outline: hasRampWarning(
+									outline: hasColorWarningForStep(
 										warnings,
 										name,
 										tokenName
@@ -135,7 +190,7 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 									position: 'relative',
 								} }
 							>
-								{ hasRampWarning(
+								{ hasColorWarningForStep(
 									warnings,
 									name,
 									tokenName
