@@ -2,25 +2,48 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Update `use-recommended-components` rule to mark `Input`, `InputControl`, and `InputLayout` from `@wordpress/ui` as recommended, and to prefer `@wordpress/ui` `InputControl` over legacy `@wordpress/components` `InputControl` and `TextControl` ([#81658](https://github.com/WordPress/gutenberg/pull/81658)).
+
 ## 25.9.0 (2026-08-12)
 
 ### Enhancements
 
 -   The `dependency-group` rule's `"never"` mode now recognizes dependency comments regardless of capitalization or a trailing period while preserving other comments. ([#81246](https://github.com/WordPress/gutenberg/pull/81246))
+-   Update `use-recommended-components` rule to allow `Calendar` and `RangeCalendar` from `@wordpress/ui` ([#81337](https://github.com/WordPress/gutenberg/pull/81337)).
 
 ## 25.8.0 (2026-07-29)
 
+### Enhancements
+
+-   Update `use-recommended-components` rule to flag `Animate`, `Flex`, `FlexBlock`, `FlexItem`, `ResponsiveWrapper`, `TabbableContainer`, and `__experimentalDivider`, `__experimentalElevation`, `__experimentalGrid`, `__experimentalScrollable`, `__experimentalSpacer`, `__experimentalSurface`, and `__experimentalView` from `@wordpress/components` as not recommended ([#80754](https://github.com/WordPress/gutenberg/pull/80754)).
+-   Updated `use-recommended-components` deprecation messages for `Animate` and `__experimentalSurface` to point to design tokens ([#80931](https://github.com/WordPress/gutenberg/pull/80931), [#80943](https://github.com/WordPress/gutenberg/pull/80943)).
+
 ## 25.7.0 (2026-07-14)
+
+### Enhancements
+
+-   Update `use-recommended-components` rule to allow `Skeleton` from `@wordpress/ui` ([#79671](https://github.com/WordPress/gutenberg/pull/79671)).
 
 ## 25.6.0 (2026-07-01)
 
 ## 25.5.0 (2026-06-24)
+
+### Enhancements
+
+-   Update `use-recommended-components` rule to prefer `Tooltip` from `@wordpress/ui` over `@wordpress/components` ([#78693](https://github.com/WordPress/gutenberg/pull/78693)).
 
 ## 25.4.1 (2026-06-16)
 
 ## 25.4.0 (2026-06-10)
 
 ## 25.3.0 (2026-05-27)
+
+### Enhancements
+
+-   Update `use-recommended-components` rule to allow `Icon` and `Tabs` from `@wordpress/ui` ([#78365](https://github.com/WordPress/gutenberg/pull/78365), [#78442](https://github.com/WordPress/gutenberg/pull/78442)).
+-   Extended `use-recommended-components` to flag not-recommended components imported via `unlock( privateApis )` destructuring ([#78451](https://github.com/WordPress/gutenberg/pull/78451)).
 
 ## 25.2.0 (2026-05-14)
 
@@ -38,6 +61,9 @@
 ### Enhancements
 
 -   Improved the Design System token lint rules to recognize CSS declaration strings more accurately, avoiding false bare-token reports for declarations while still flagging invalid token assignments and unknown token names ([#77384](https://github.com/WordPress/gutenberg/pull/77384)).
+-   Update `use-recommended-components` rule to recommend `Card`, `Collapsible`, and `CollapsibleCard` from `@wordpress/ui` over legacy `@wordpress/components` card components ([#77423](https://github.com/WordPress/gutenberg/pull/77423)).
+-   Update `use-recommended-components` rule to prefer `Link` from `@wordpress/ui` over `ExternalLink` from `@wordpress/components` ([#77505](https://github.com/WordPress/gutenberg/pull/77505)).
+-   Update `use-recommended-components` rule to allow `EmptyState` from `@wordpress/ui` ([#77765](https://github.com/WordPress/gutenberg/pull/77765)).
 -   Update `use-recommended-components` rule to prefer `VisuallyHidden` from `@wordpress/ui` over `@wordpress/components` ([#77575](https://github.com/WordPress/gutenberg/pull/77575)).
 
 ## 25.0.0 (2026-04-15)
@@ -58,6 +84,7 @@
 ### Enhancements
 
 -   Disabled the `jsx-a11y/heading-has-content` rule in the recommended configuration, which reports many false positives when heading elements are passed via a `render` prop ([#77073](https://github.com/WordPress/gutenberg/pull/77073)).
+-   Update `use-recommended-components` rule to allow `Text` from `@wordpress/ui` ([#77044](https://github.com/WordPress/gutenberg/pull/77044)).
 
 ## 24.5.0 (2026-04-01)
 

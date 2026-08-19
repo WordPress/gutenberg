@@ -13,7 +13,7 @@
 		{ "path": "../date" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
-		{ "path": "../icons" },
+		{ "path": "../icons/tsconfig.build.json" },
 		{ "path": "../primitives" },
 		{ "path": "../ui/tsconfig.build.json" },
 		{ "path": "../url" }

@@ -1,31 +1,34 @@
 import { paramCase as kebabCase } from 'change-case';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-export const useExistingTemplateParts = () => {
-	return (
-		useSelect(
-			( select ) =>
-				select( coreStore ).getEntityRecords(
-					'postType',
-					'wp_template_part',
-					{
-						per_page: -1,
-					}
-				),
-			[]
-		) ?? []
+import type { WpTemplatePart } from '@wordpress/core-data';
+
+const EMPTY_ARRAY: WpTemplatePart[] = [];
+
+export function useExistingTemplateParts(): WpTemplatePart[] {
+	return useSelect(
+		( select ) =>
+			select( coreStore ).getEntityRecords< WpTemplatePart >(
+				'postType',
+				'wp_template_part',
+				{ per_page: -1 }
+			) ?? EMPTY_ARRAY,
+		[]
 	);
-};
+}
 
 /**
  * Return a unique template part title based on
  * the given title and existing template parts.
  *
- * @param {string} title         The original template part title.
- * @param {Object} templateParts The array of template part entities.
- * @return {string} A unique template part title.
+ * @param title         The original template part title.
+ * @param templateParts The array of template part entities.
+ * @return A unique template part title.
  */
-export const getUniqueTemplatePartTitle = ( title, templateParts ) => {
+export function getUniqueTemplatePartTitle(
+	title: string,
+	templateParts: WpTemplatePart[]
+): string {
 	const lowercaseTitle = title.toLowerCase();
 	const existingTitles = templateParts.map( ( templatePart ) =>
 		templatePart.title.rendered.toLowerCase()
@@ -41,16 +44,16 @@ export const getUniqueTemplatePartTitle = ( title, templateParts ) => {
 	}
 
 	return `${ title } ${ suffix }`;
-};
+}
 
 /**
  * Get a valid slug for a template part.
  * Currently template parts only allow latin chars.
  * The fallback slug will receive suffix by default.
  *
- * @param {string} title The template part title.
- * @return {string} A valid template part slug.
+ * @param title The template part title.
+ * @return A valid template part slug.
  */
-export const getCleanTemplatePartSlug = ( title ) => {
+export function getCleanTemplatePartSlug( title: string ): string {
 	return kebabCase( title ).replace( /[^\w-]+/g, '' ) || 'wp-custom-part';
-};
+}

@@ -85,6 +85,9 @@ const getEditorCommandLoader = () =>
 			isFocusMode,
 			isPreviewMode,
 			isViewable,
+			isPublished,
+			viewLink,
+			viewItemLabel,
 			isCodeEditingEnabled,
 			isRichEditingEnabled,
 			isPublishSidebarEnabled,
@@ -92,10 +95,16 @@ const getEditorCommandLoader = () =>
 			disableContentOnlyForTemplateParts,
 		} = useSelect( ( select ) => {
 			const { get } = select( preferencesStore );
-			const { isListViewOpened, getCurrentPostType, getEditorSettings } =
-				select( editorStore );
+			const {
+				isListViewOpened,
+				getCurrentPostType,
+				getEditorSettings,
+				getEditedPostAttribute,
+				isCurrentPostPublished,
+			} = select( editorStore );
 			const { getSettings } = select( blockEditorStore );
 			const { getPostType } = select( coreStore );
+			const postType = getPostType( getCurrentPostType() );
 
 			return {
 				editorMode: get( 'core', 'editorMode' ) ?? 'visual',
@@ -104,8 +113,10 @@ const getEditorCommandLoader = () =>
 				isDistractionFree: get( 'core', 'distractionFree' ),
 				isFocusMode: get( 'core', 'focusMode' ),
 				isPreviewMode: getSettings().isPreviewMode,
-				isViewable:
-					getPostType( getCurrentPostType() )?.viewable ?? false,
+				isViewable: postType?.viewable ?? false,
+				isPublished: isCurrentPostPublished(),
+				viewLink: getEditedPostAttribute( 'link' ),
+				viewItemLabel: postType?.labels?.view_item,
 				isCodeEditingEnabled: getEditorSettings().codeEditingEnabled,
 				isRichEditingEnabled: getEditorSettings().richEditingEnabled,
 				isPublishSidebarEnabled:
@@ -338,6 +349,19 @@ const getEditorCommandLoader = () =>
 					window.open( link, `wp-preview-${ postId }` );
 				},
 			} );
+
+			if ( isPublished && viewLink ) {
+				commands.push( {
+					name: 'core/view-link',
+					label: viewItemLabel || __( 'View post' ),
+					icon: external,
+					category: 'view',
+					callback: ( { close } ) => {
+						close();
+						window.open( viewLink, '_blank' );
+					},
+				} );
+			}
 		}
 
 		return {
