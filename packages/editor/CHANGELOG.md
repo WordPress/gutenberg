@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Commands: Add a command palette entry that opens the current post on the front end once it is published, labelled with the post type's `view_item` label ([#66720](https://github.com/WordPress/gutenberg/pull/66720)).
+-   Global Styles sidebar: Give the revisions screen a bounded height so its DataViews timeline scrolls internally and the pagination footer stays pinned to the bottom ([#80856](https://github.com/WordPress/gutenberg/pull/80856)).
 
 ### Bug Fixes
 
@@ -29,7 +30,6 @@
 ### Enhancements
 
 -   Add a read-only code diff to the revisions screen ([#80314](https://github.com/WordPress/gutenberg/pull/80314)).
--   Global Styles sidebar: Give the revisions screen a bounded height so its DataViews timeline scrolls internally and the pagination footer stays pinned to the bottom ([#80856](https://github.com/WordPress/gutenberg/pull/80856)).
 
 ### New Features
 
