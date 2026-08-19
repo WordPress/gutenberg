@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useBlockProps, BlockControls } from '@wordpress/block-editor';
 import { ToolbarDropdownMenu } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import {
 	bareNumber,
 	numberInParenthesis,

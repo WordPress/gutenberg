@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 const { cosmiconfigSync } = require( 'cosmiconfig' );
-const babelParser = require( './babel-parser-compat' );
 const globals = require( 'globals' );
-
-/**
- * Internal dependencies
- */
+const babelParser = require( './babel-parser-compat' );
 const es5Config = require( './es5' );
 
 const parserOptions = {

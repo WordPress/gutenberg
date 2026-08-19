@@ -1,20 +1,15 @@
-/**
- * WordPress dependencies
- */
 import {
 	registerBlockType,
 	unregisterBlockType,
 	setFreeformContentHandlerName,
 	setDefaultBlockName,
 	getDefaultBlockName,
+	createBlock,
+	createBlocksFromInnerBlocksTemplate,
 } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
 import { symbol } from '@wordpress/icons';
 import { select, dispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import * as selectors from '../selectors';
 import { store } from '../';
 import { lock } from '../../lock-unlock';
@@ -1943,6 +1938,17 @@ describe( 'selectors', () => {
 
 			expect( isBlockSelected( state, '23' ) ).toBe( false );
 		} );
+
+		it( 'should return false if there is no client ID', () => {
+			const state = {
+				selection: {
+					selectionStart: {},
+					selectionEnd: {},
+				},
+			};
+
+			expect( isBlockSelected( state, undefined ) ).toBe( false );
+		} );
 	} );
 
 	describe( 'hasSelectedInnerBlock', () => {
@@ -2046,6 +2052,138 @@ describe( 'selectors', () => {
 				},
 			};
 			expect( hasSelectedInnerBlock( state, '3' ) ).toBe( false );
+		} );
+
+		it( 'should return true for a deep check if the selected block is a descendant of the given ClientId', () => {
+			const state = {
+				selection: {
+					selectionStart: { clientId: '3' },
+					selectionEnd: { clientId: '3' },
+				},
+				blocks: {
+					order: new Map(
+						Object.entries( {
+							1: [ '2' ],
+							2: [ '3' ],
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							2: '1',
+							3: '2',
+						} )
+					),
+				},
+			};
+
+			expect( hasSelectedInnerBlock( state, '1', true ) ).toBe( true );
+			expect( hasSelectedInnerBlock( state, '2', true ) ).toBe( true );
+			// Without a deep check only the direct parent matches.
+			expect( hasSelectedInnerBlock( state, '1' ) ).toBe( false );
+			expect( hasSelectedInnerBlock( state, '2' ) ).toBe( true );
+		} );
+
+		it( 'should return false for a deep check if the given ClientId is the selected block itself', () => {
+			const state = {
+				selection: {
+					selectionStart: { clientId: '3' },
+					selectionEnd: { clientId: '3' },
+				},
+				blocks: {
+					order: new Map(
+						Object.entries( {
+							1: [ '2' ],
+							2: [ '3' ],
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							2: '1',
+							3: '2',
+						} )
+					),
+				},
+			};
+
+			expect( hasSelectedInnerBlock( state, '3', true ) ).toBe( false );
+		} );
+
+		it( 'should return true for a deep check if a multi selection contains a descendant of the block with the given ClientId', () => {
+			const state = {
+				selection: {
+					selectionStart: { clientId: '2' },
+					selectionEnd: { clientId: '3' },
+				},
+				blocks: {
+					order: new Map(
+						Object.entries( {
+							'': [ '1' ],
+							1: [ '2', '3' ],
+							3: [ '4' ],
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							1: '',
+							2: '1',
+							3: '1',
+							4: '3',
+						} )
+					),
+				},
+			};
+
+			expect( hasSelectedInnerBlock( state, '1', true ) ).toBe( true );
+			// '3' is selected, and it is not its own ancestor.
+			expect( hasSelectedInnerBlock( state, '3', true ) ).toBe( false );
+			expect( hasSelectedInnerBlock( state, '4', true ) ).toBe( false );
+		} );
+
+		it( 'should return an up to date deep check after the selection moves to another branch', () => {
+			// The same blocks throughout, so only the selection changes.
+			const blocks = {
+				order: new Map(
+					Object.entries( {
+						'': [ '1', '4' ],
+						1: [ '2' ],
+						4: [ '5' ],
+					} )
+				),
+				parents: new Map(
+					Object.entries( {
+						1: '',
+						2: '1',
+						4: '',
+						5: '4',
+					} )
+				),
+			};
+
+			const state = {
+				blocks,
+				selection: {
+					selectionStart: { clientId: '2' },
+					selectionEnd: { clientId: '2' },
+				},
+			};
+
+			expect( hasSelectedInnerBlock( state, '1', true ) ).toBe( true );
+			expect( hasSelectedInnerBlock( state, '4', true ) ).toBe( false );
+
+			const nextState = {
+				blocks,
+				selection: {
+					selectionStart: { clientId: '5' },
+					selectionEnd: { clientId: '5' },
+				},
+			};
+
+			expect( hasSelectedInnerBlock( nextState, '1', true ) ).toBe(
+				false
+			);
+			expect( hasSelectedInnerBlock( nextState, '4', true ) ).toBe(
+				true
+			);
 		} );
 	} );
 
@@ -3657,6 +3795,54 @@ describe( 'selectors', () => {
 			} );
 		} );
 
+		it( 'surfaces innerContent on a block variation inserter item', () => {
+			registerBlockType( 'core/html', {
+				apiVersion: 3,
+				save: () => null,
+				category: 'widgets',
+				title: 'Custom HTML',
+				variations: [
+					{
+						name: 'card',
+						title: 'Card',
+						innerContent: [ '<div class="card">', null, '</div>' ],
+						innerBlocks: [ [ 'core/test-block-a' ] ],
+					},
+				],
+			} );
+
+			const items = select( store ).getInserterItems();
+			const variationItem = items.find(
+				( item ) => item.id === 'core/html/card'
+			);
+
+			expect( variationItem.innerContent ).toEqual( [
+				'<div class="card">',
+				null,
+				'</div>',
+			] );
+
+			// Replicate how `useBlockTypesState` builds the block on insert,
+			// to guard the full path from variation to created block.
+			const block = createBlock(
+				variationItem.name,
+				variationItem.initialAttributes,
+				createBlocksFromInnerBlocksTemplate(
+					variationItem.innerBlocks
+				),
+				variationItem.innerContent
+			);
+			expect( block.innerContent ).toEqual( [
+				'<div class="card">',
+				null,
+				'</div>',
+			] );
+			expect( block.innerBlocks ).toHaveLength( 1 );
+			expect( block.innerBlocks[ 0 ].name ).toBe( 'core/test-block-a' );
+
+			unregisterBlockType( 'core/html' );
+		} );
+
 		it( 'should correctly cache the return values', async () => {
 			await dispatch( store ).updateSettings( {
 				__experimentalReusableBlocks: [
@@ -4030,6 +4216,82 @@ describe( 'selectors', () => {
 					frecency: 2.5,
 				} )
 			);
+		} );
+
+		it( 'should use variation metadata for transformation items', () => {
+			registerBlockType( 'core/variation-transform-source', {
+				apiVersion: 3,
+				category: 'text',
+				title: 'Variation Transform Source',
+				edit: () => {},
+				save: () => {},
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/variation-transform-target' ],
+							variationName: 'grid',
+							transform: () => {},
+						},
+					],
+				},
+			} );
+			registerBlockType( 'core/variation-transform-target', {
+				apiVersion: 3,
+				category: 'design',
+				title: 'Group',
+				icon: 'group',
+				edit: () => {},
+				save: () => {},
+				variations: [
+					{
+						name: 'grid',
+						title: 'Grid',
+						icon: 'grid',
+						attributes: { layout: { type: 'grid' } },
+						scope: [ 'transform' ],
+					},
+				],
+			} );
+
+			const state = {
+				blocks: {
+					byClientId: new Map(),
+					attributes: new Map(),
+					order: new Map(),
+					parents: new Map(),
+					cache: {},
+					blockEditingModes: new Map(),
+				},
+				preferences: {
+					insertUsage: {
+						'core/variation-transform-target/grid': {
+							count: 10,
+							time: 1000,
+						},
+					},
+				},
+				blockListSettings: new Map(),
+				settings: {},
+			};
+			const blocks = [ { name: 'core/variation-transform-source' } ];
+
+			try {
+				const items = getBlockTransformItems( state, blocks );
+
+				expect( items ).toHaveLength( 1 );
+				expect( items[ 0 ] ).toMatchObject( {
+					id: 'core/variation-transform-target/grid',
+					name: 'core/variation-transform-target',
+					variationName: 'grid',
+					title: 'Grid',
+					icon: 'grid',
+					frecency: 2.5,
+				} );
+			} finally {
+				unregisterBlockType( 'core/variation-transform-source' );
+				unregisterBlockType( 'core/variation-transform-target' );
+			}
 		} );
 	} );
 
@@ -4726,6 +4988,89 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'static inner content (Custom HTML block)', () => {
+		beforeEach( () => {
+			registerBlockType( 'core/html', {
+				apiVersion: 3,
+				save: () => null,
+				category: 'text',
+				title: 'Custom HTML',
+				icon: 'test',
+			} );
+		} );
+
+		afterEach( () => {
+			unregisterBlockType( 'core/html' );
+		} );
+
+		// The Custom HTML block parent with a child container, which has a
+		// child of its own. The direct child is fixed in place; the grandchild
+		// is regular, fully editable content.
+		const buildState = () => ( {
+			blocks: {
+				byClientId: new Map(
+					Object.entries( {
+						parent: { name: 'core/html' },
+						child: { name: 'core/test-block-b' },
+						grandchild: { name: 'core/test-block-b' },
+					} )
+				),
+				attributes: new Map(
+					Object.entries( {
+						parent: {},
+						child: {},
+						grandchild: {},
+					} )
+				),
+				parents: new Map(
+					Object.entries( {
+						parent: '',
+						child: 'parent',
+						grandchild: 'child',
+					} )
+				),
+				order: new Map( [
+					[ '', [ 'parent' ] ],
+					[ 'parent', [ 'child' ] ],
+					[ 'child', [ 'grandchild' ] ],
+				] ),
+				blockEditingModes: new Map(),
+			},
+			blockListSettings: new Map( [
+				[ 'parent', {} ],
+				[ 'child', {} ],
+			] ),
+			settings: {},
+			derivedBlockEditingModes: new Map(),
+		} );
+
+		it( 'prevents removing a direct child', () => {
+			expect( canRemoveBlock( buildState(), 'child' ) ).toBe( false );
+		} );
+
+		it( 'prevents moving a direct child', () => {
+			expect( canMoveBlock( buildState(), 'child' ) ).toBe( false );
+		} );
+
+		it( 'prevents insertion into the inner content root', () => {
+			expect(
+				canInsertBlockType(
+					buildState(),
+					'core/test-block-b',
+					'parent'
+				)
+			).toBe( false );
+		} );
+
+		it( 'does not cascade to deeper descendants', () => {
+			expect( canRemoveBlock( buildState(), 'grandchild' ) ).toBe( true );
+			expect( canMoveBlock( buildState(), 'grandchild' ) ).toBe( true );
+			expect(
+				canInsertBlockType( buildState(), 'core/test-block-b', 'child' )
+			).toBe( true );
+		} );
+	} );
+
 	describe( 'canMoveBlock', () => {
 		it( 'allows moving within a non-section contentOnly container', () => {
 			// When the parent has contentOnly editing mode but is NOT
@@ -5005,6 +5350,7 @@ describe( '__unstableGetClientIdsTree', () => {
 			},
 			{ clientId: 'baz', innerBlocks: [] },
 		] );
+		expect( console ).toHaveWarned();
 	} );
 
 	it( "should return the full content tree starting from the root, consisting of stripped down block object containing only its client ID and its inner blocks' client IDs", () => {

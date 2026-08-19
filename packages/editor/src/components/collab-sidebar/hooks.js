@@ -1,15 +1,4 @@
-/**
- * External dependencies
- */
-import {
-	useFloating,
-	offset as offsetMiddleware,
-	autoUpdate,
-} from '@floating-ui/react-dom';
-
-/**
- * WordPress dependencies
- */
+import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import {
 	useState,
@@ -24,21 +13,29 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
+import { getScrollContainer } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as interfaceStore } from '@wordpress/interface';
-
-/**
- * Internal dependencies
- */
+import { RichTextData, create } from '@wordpress/rich-text';
 import { store as editorStore } from '../../store';
 import { FLOATING_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
 import { createBoardStore } from './board-store';
-import { calculateAllOffsets } from './utils';
+import { NOTE_FORMAT_NAME } from './format';
+import {
+	applyNoteFormat,
+	calculateNotePositions,
+	findNoteInBlock,
+	getInlineMarkerStart,
+	getNoteIdsFromMetadata,
+	addNoteIdToMetadata,
+	removeNoteFormat,
+	removeNoteIdFromMetadata,
+} from './utils';
 
-const { useBlockElement, cleanEmptyObject } = unlock( blockEditorPrivateApis );
+const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
-export function useBlockComments( postId ) {
+export function useNoteThreads( postId ) {
 	const queryArgs = {
 		post: postId,
 		type: 'note',
@@ -61,115 +58,226 @@ export function useBlockComments( postId ) {
 		};
 	}, [] );
 
-	// Process comments to build the tree structure.
-	const { resultComments, unresolvedSortedThreads } = useMemo( () => {
+	// Process notes to build the tree structure.
+	const { notes, unresolvedNotes } = useMemo( () => {
 		if ( ! threads || threads.length === 0 ) {
-			return { resultComments: [], unresolvedSortedThreads: [] };
+			return { notes: [], unresolvedNotes: [] };
 		}
 
-		const blocksWithComments = clientIds.reduce( ( results, clientId ) => {
-			const commentId = getBlockAttributes( clientId )?.metadata?.noteId;
-			if ( commentId ) {
-				results[ clientId ] = commentId;
+		/*
+		 * Single pass over clientIds builds the forward map and reverse lookup
+		 * together. getNoteIdsFromMetadata returns numeric ids, matching the
+		 * types returned by the comments REST endpoint.
+		 */
+		const blocksWithNotes = {};
+		const clientIdByNoteId = new Map();
+		for ( const clientId of clientIds ) {
+			const metadata = getBlockAttributes( clientId )?.metadata;
+			const noteIds = getNoteIdsFromMetadata( metadata );
+			if ( noteIds.length > 0 ) {
+				blocksWithNotes[ clientId ] = noteIds;
+				for ( const noteId of noteIds ) {
+					clientIdByNoteId.set( noteId, clientId );
+				}
 			}
-			return results;
-		}, {} );
+		}
 
-		// Create a compare to store the references to all objects by id.
-		const compare = {};
-		const result = [];
-
-		// Create a reverse map for faster lookup.
-		const commentIdToBlockClientId = Object.keys(
-			blocksWithComments
-		).reduce( ( mapping, clientId ) => {
-			mapping[ blocksWithComments[ clientId ] ] = clientId;
-			return mapping;
-		}, {} );
-
-		// Initialize each object with an empty `reply` array and map blockClientId.
-		threads.forEach( ( item ) => {
-			const itemBlock = commentIdToBlockClientId[ item.id ];
-
-			compare[ item.id ] = {
+		// Materialize threads; collect roots; replies linked in a second pass
+		// via unshift to invert order (matches prior reverse semantics).
+		const threadsById = new Map();
+		const rootThreads = [];
+		for ( const item of threads ) {
+			const thread = {
 				...item,
 				reply: [],
-				blockClientId: item.parent === 0 ? itemBlock : null,
+				blockClientId:
+					item.parent === 0
+						? clientIdByNoteId.get( item.id ) ?? null
+						: null,
 			};
-		} );
-
-		// Iterate over the data to build the tree structure.
-		threads.forEach( ( item ) => {
+			threadsById.set( item.id, thread );
 			if ( item.parent === 0 ) {
-				// If parent is 0, it's a root item, push it to the result array.
-				result.push( compare[ item.id ] );
-			} else if ( compare[ item.parent ] ) {
-				// Otherwise, find its parent and push it to the parent's `reply` array.
-				compare[ item.parent ].reply.push( compare[ item.id ] );
+				rootThreads.push( thread );
 			}
-		} );
-
-		if ( 0 === result?.length ) {
-			return { resultComments: [], unresolvedSortedThreads: [] };
+		}
+		for ( const item of threads ) {
+			if ( item.parent !== 0 ) {
+				threadsById
+					.get( item.parent )
+					?.reply.unshift( threadsById.get( item.id ) );
+			}
 		}
 
-		const updatedResult = result.map( ( item ) => ( {
-			...item,
-			reply: [ ...item.reply ].reverse(),
-		} ) );
+		if ( rootThreads.length === 0 ) {
+			return { notes: [], unresolvedNotes: [] };
+		}
 
-		const threadIdMap = new Map(
-			updatedResult.map( ( thread ) => [ String( thread.id ), thread ] )
+		// Order within a block: block-level notes (no inline anchor) come
+		// first as the "overall comment", then inline notes ascending by
+		// marker start offset. Ties (rare; two markers at the same offset)
+		// fall back to creation order via thread id. Blocks themselves are
+		// already iterated in document order above.
+		const unresolved = [];
+		const resolved = [];
+		for ( const [ clientId, noteIds ] of Object.entries(
+			blocksWithNotes
+		) ) {
+			const attributes = getBlockAttributes( clientId );
+			const orderedThreads = noteIds
+				.map( ( noteId ) => {
+					const thread = threadsById.get( noteId );
+					if ( ! thread ) {
+						return null;
+					}
+					return {
+						thread,
+						start: getInlineMarkerStart( thread, attributes ),
+					};
+				} )
+				.filter( Boolean )
+				.sort( ( a, b ) => {
+					if ( a.start !== b.start ) {
+						return a.start - b.start;
+					}
+					return a.thread.id - b.thread.id;
+				} );
+			for ( const { thread } of orderedThreads ) {
+				if ( thread.status === 'hold' ) {
+					unresolved.push( thread );
+				} else if ( thread.status === 'approved' ) {
+					resolved.push( thread );
+				}
+			}
+		}
+
+		// Orphans: root threads without a linked block. They stay with the
+		// active notes (above the "Resolved" separator) since they may still
+		// need attention even though their associated block is gone.
+		const orphans = rootThreads.filter(
+			( thread ) => ! thread.blockClientId
 		);
-
-		// Prepare sets to determine which threads are linked to existing blocks.
-		const mappedIds = new Set(
-			Object.values( blocksWithComments ).map( ( id ) => String( id ) )
-		);
-
-		// Get comments by block order, first unresolved, then resolved.
-		const unresolvedSortedComments = Object.values( blocksWithComments )
-			.map( ( commentId ) => threadIdMap.get( String( commentId ) ) )
-			.filter(
-				( thread ) => thread !== undefined && thread.status === 'hold'
-			);
-
-		const resolvedSortedComments = Object.values( blocksWithComments )
-			.map( ( commentId ) => threadIdMap.get( String( commentId ) ) )
-			.filter(
-				( thread ) =>
-					thread !== undefined && thread.status === 'approved'
-			);
-
-		// Append orphaned notes (whose related block was deleted or missing).
-		const orphanedComments = updatedResult.filter(
-			( thread ) => ! mappedIds.has( String( thread.id ) )
-		);
-
-		const allSortedComments = [
-			...unresolvedSortedComments,
-			...resolvedSortedComments,
-			...orphanedComments,
-		];
 
 		return {
-			resultComments: allSortedComments,
-			unresolvedSortedThreads: unresolvedSortedComments,
+			notes: [ ...unresolved, ...orphans, ...resolved ],
+			unresolvedNotes: unresolved,
 		};
 	}, [ clientIds, threads, getBlockAttributes ] );
 
 	return {
-		resultComments,
-		unresolvedSortedThreads,
+		notes,
+		unresolvedNotes,
 	};
 }
 
-export function useBlockCommentsActions() {
+/**
+ * Read an inline selection from block-editor selection state, returning
+ * normalized anchor data when a non-collapsed selection sits inside a single
+ * rich-text attribute. Returns null for block-level or collapsed selections.
+ *
+ * @param {Function} getSelectionStart Block-editor selector.
+ * @param {Function} getSelectionEnd   Block-editor selector.
+ * @return {?Object} { clientId, attributeKey, start, end } or null.
+ */
+function readInlineSelection( getSelectionStart, getSelectionEnd ) {
+	const start = getSelectionStart();
+	const end = getSelectionEnd();
+	if (
+		! start?.clientId ||
+		start.clientId !== end.clientId ||
+		! start.attributeKey ||
+		start.offset === undefined ||
+		end.offset === undefined ||
+		start.offset === end.offset
+	) {
+		return null;
+	}
+	// Normalize direction so callers don't have to think about reversed ranges.
+	const [ startOffset, endOffset ] =
+		start.offset < end.offset
+			? [ start.offset, end.offset ]
+			: [ end.offset, start.offset ];
+	return {
+		clientId: start.clientId,
+		attributeKey: start.attributeKey,
+		start: startOffset,
+		end: endOffset,
+	};
+}
+
+/**
+ * Wrap a rich-text range with a core/note marker. Returns a new
+ * RichTextData ready to write back into block attributes, or null when the
+ * incoming value isn't a rich-text instance (legacy/string attributes).
+ *
+ * @param {*}      value Existing block attribute value.
+ * @param {number} id    New note id to embed as `data-id`.
+ * @param {number} start Range start offset.
+ * @param {number} end   Range end offset.
+ * @return {?RichTextData} Wrapped value or null when the attribute isn't rich text.
+ */
+function wrapInlineNote( value, id, start, end ) {
+	if ( ! ( value instanceof RichTextData ) ) {
+		return null;
+	}
+	const record = applyNoteFormat(
+		create( { html: value.toHTMLString() } ),
+		{ type: NOTE_FORMAT_NAME, attributes: { 'data-id': String( id ) } },
+		start,
+		end
+	);
+	// Round-trip through HTML to normalise format references (applyNoteFormat
+	// leaves them un-normalised) so the stored value matches a fresh reload.
+	return RichTextData.fromHTMLString(
+		new RichTextData( record ).toHTMLString()
+	);
+}
+
+/**
+ * Strip a note's inline `core/note` marker from whichever block holds it, if
+ * any, so a deleted or resolved note's highlight does not linger in the content.
+ * No-op for block-level notes (those carry no marker). Used by the resolve path,
+ * which only knows the note id; the delete path strips the marker inline since
+ * it already has the block.
+ *
+ * @param {number}   noteId                      Note id whose marker to remove.
+ * @param {Function} getClientIdsWithDescendants Block-editor selector.
+ * @param {Function} getBlockAttributes          Block-editor selector.
+ * @param {Function} updateBlockAttributes       Block-editor action.
+ */
+function clearInlineNoteMarker(
+	noteId,
+	getClientIdsWithDescendants,
+	getBlockAttributes,
+	updateBlockAttributes
+) {
+	for ( const clientId of getClientIdsWithDescendants() ) {
+		const attributes = getBlockAttributes( clientId );
+		const found = findNoteInBlock( attributes, noteId );
+		if ( ! found ) {
+			continue;
+		}
+		const next = removeNoteFormat(
+			attributes[ found.attributeKey ],
+			noteId
+		);
+		if ( next ) {
+			updateBlockAttributes( clientId, { [ found.attributeKey ]: next } );
+		}
+		return;
+	}
+}
+
+export function useNoteActions() {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );
-	const { getBlockAttributes, getSelectedBlockClientId } =
-		useSelect( blockEditorStore );
+	const {
+		getBlockAttributes,
+		getClientIdsWithDescendants,
+		getSelectedBlockClientId,
+		getSelectionStart,
+		getSelectionEnd,
+	} = useSelect( blockEditorStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const onError = ( error ) => {
@@ -185,6 +293,16 @@ export function useBlockCommentsActions() {
 
 	const onCreate = async ( { content, parent } ) => {
 		try {
+			// Capture the target block and inline selection *before* the async
+			// save: selection may shift during the round-trip, attaching the
+			// note to the wrong block or collapsing its inline anchor.
+			const inlineSelection = ! parent
+				? readInlineSelection( getSelectionStart, getSelectionEnd )
+				: null;
+			const clientId = ! parent
+				? inlineSelection?.clientId || getSelectedBlockClientId()
+				: null;
+
 			const savedRecord = await saveEntityRecord(
 				'root',
 				'comment',
@@ -198,16 +316,40 @@ export function useBlockCommentsActions() {
 				{ throwOnError: true }
 			);
 
-			// If it's a main comment, update the block attributes with the comment id.
-			if ( ! parent && savedRecord?.id ) {
-				const clientId = getSelectedBlockClientId();
-				const metadata = getBlockAttributes( clientId )?.metadata;
-				updateBlockAttributes( clientId, {
-					metadata: {
-						...metadata,
-						noteId: savedRecord.id,
-					},
-				} );
+			/*
+			 * If it's a top-level note, update the block attributes with the
+			 * note id. Read-modify-write on metadata is racy under concurrent
+			 * edits: two near-simultaneous adds against the same base will each
+			 * write a 2-element array and the later write wins, dropping the
+			 * other id. Tracking issue:
+			 * https://github.com/WordPress/gutenberg/issues/74751.
+			 */
+			if ( ! parent && savedRecord?.id && clientId ) {
+				const attributes = getBlockAttributes( clientId );
+				const metadata = attributes?.metadata;
+				const updatedMetadata = addNoteIdToMetadata(
+					metadata,
+					savedRecord.id
+				);
+				const newAttributes = {
+					metadata: cleanEmptyObject( updatedMetadata ),
+				};
+
+				// Inline path: also wrap the selected text with a core/note
+				// marker so the anchor survives later edits.
+				if ( inlineSelection ) {
+					const wrapped = wrapInlineNote(
+						attributes?.[ inlineSelection.attributeKey ],
+						savedRecord.id,
+						inlineSelection.start,
+						inlineSelection.end
+					);
+					if ( wrapped ) {
+						newAttributes[ inlineSelection.attributeKey ] = wrapped;
+					}
+				}
+
+				updateBlockAttributes( clientId, newAttributes );
 			}
 
 			createNotice(
@@ -225,13 +367,6 @@ export function useBlockCommentsActions() {
 	};
 
 	const onEdit = async ( { id, content, status } ) => {
-		const messageType = status ? status : 'updated';
-		const messages = {
-			approved: __( 'Note marked as resolved.' ),
-			hold: __( 'Note reopened.' ),
-			updated: __( 'Note updated.' ),
-		};
-
 		try {
 			// For resolution or reopen actions, create a new note with metadata.
 			if ( status === 'approved' || status === 'hold' ) {
@@ -248,8 +383,8 @@ export function useBlockCommentsActions() {
 					}
 				);
 
-				// Then create a new comment with the metadata.
-				const newCommentData = {
+				// Then create a new note with the metadata.
+				const newNoteData = {
 					post: getCurrentPostId(),
 					content: content || '', // Empty content for resolve, content for reopen.
 					type: 'note',
@@ -261,61 +396,108 @@ export function useBlockCommentsActions() {
 					},
 				};
 
-				await saveEntityRecord( 'root', 'comment', newCommentData, {
-					throwOnError: true,
-				} );
-			} else {
-				const updateData = {
-					id,
-					content,
-					status,
-				};
+				const savedRecord = await saveEntityRecord(
+					'root',
+					'comment',
+					newNoteData,
+					{
+						throwOnError: true,
+					}
+				);
 
-				await saveEntityRecord( 'root', 'comment', updateData, {
-					throwOnError: true,
-				} );
+				// Resolving a note drops its inline highlight: strip the marker
+				// so the note falls back to a block-level note in the content.
+				if ( status === 'approved' ) {
+					clearInlineNoteMarker(
+						id,
+						getClientIdsWithDescendants,
+						getBlockAttributes,
+						updateBlockAttributes
+					);
+				}
+
+				// The note visibly updates in place, so there is no snackbar,
+				// but screen reader users still need the confirmation.
+				speak(
+					status === 'approved'
+						? __( 'Note marked as resolved.' )
+						: __( 'Note reopened.' )
+				);
+
+				return savedRecord;
 			}
 
-			createNotice(
-				'snackbar',
-				messages[ messageType ] ?? __( 'Note updated.' ),
+			const updateData = {
+				id,
+				content,
+				status,
+			};
+
+			const savedRecord = await saveEntityRecord(
+				'root',
+				'comment',
+				updateData,
 				{
-					type: 'snackbar',
-					isDismissible: true,
+					throwOnError: true,
 				}
 			);
+
+			createNotice( 'snackbar', __( 'Note updated.' ), {
+				type: 'snackbar',
+				isDismissible: true,
+			} );
+
+			return savedRecord;
 		} catch ( error ) {
 			onError( error );
 		}
 	};
 
-	const onDelete = async ( comment ) => {
+	const onDelete = async ( note ) => {
 		try {
-			await deleteEntityRecord(
-				'root',
-				'comment',
-				comment.id,
-				undefined,
-				{
-					throwOnError: true,
-				}
-			);
+			// Capture the target block *before* the async delete: selection may
+			// shift during the round-trip, pointing the attribute cleanup at the
+			// wrong block.
+			const clientId = ! note.parent
+				? note.blockClientId || getSelectedBlockClientId()
+				: null;
 
-			if ( ! comment.parent ) {
-				const clientId = getSelectedBlockClientId();
-				const metadata = getBlockAttributes( clientId )?.metadata;
-				updateBlockAttributes( clientId, {
-					metadata: cleanEmptyObject( {
-						...metadata,
-						noteId: undefined,
-					} ),
-				} );
+			await deleteEntityRecord( 'root', 'comment', note.id, undefined, {
+				throwOnError: true,
+			} );
+
+			if ( clientId ) {
+				const attributes = getBlockAttributes( clientId );
+				const newAttributes = {
+					metadata: cleanEmptyObject(
+						removeNoteIdFromMetadata(
+							attributes?.metadata,
+							note.id
+						)
+					),
+				};
+				// Strip the inline marker too (if any) so the deleted note's
+				// highlight doesn't linger in the content. Folded into the same
+				// attribute update so it's a single undo step.
+				const found = findNoteInBlock( attributes, note.id );
+				if ( found ) {
+					const next = removeNoteFormat(
+						attributes[ found.attributeKey ],
+						note.id
+					);
+					if ( next ) {
+						newAttributes[ found.attributeKey ] = next;
+					}
+				}
+				updateBlockAttributes( clientId, newAttributes );
 			}
 
 			createNotice( 'snackbar', __( 'Note deleted.' ), {
 				type: 'snackbar',
 				isDismissible: true,
 			} );
+
+			return true;
 		} catch ( error ) {
 			onError( error );
 		}
@@ -354,92 +536,81 @@ export function useEnableFloatingSidebar( enabled = false ) {
 	}, [ enabled, registry ] );
 }
 
-export function useFloatingBoard( { threads, selectedNoteId, isFloating } ) {
-	const [ boardOffsets, setBoardOffsets ] = useState( {} );
+export function useFloatingBoard( {
+	threads,
+	selectedNoteId,
+	isFloating,
+	sidebarRef,
+} ) {
+	const [ notePositions, setNotePositions ] = useState( {} );
 	const [ store ] = useState( createBoardStore );
-	const { setCanvasMinHeight } = unlock( useDispatch( editorStore ) );
 
 	const heights = useSyncExternalStore( store.subscribe, store.getSnapshot );
 
-	// Recalc is deferred to a rAF; the cleanup cancels the pending frame
-	// when deps change, so back-to-back updates collapse into one paint.
+	// Notes are positioned in canvas content-space; CSS inherits
+	// `--canvas-scroll` to translate each thread in sync with the canvas.
 	useEffect( () => {
-		if ( ! isFloating ) {
+		if ( ! isFloating || ! sidebarRef?.current ) {
 			return;
 		}
 
-		const rafId = window.requestAnimationFrame( () => {
-			const { offsets, minHeight } = calculateAllOffsets( {
-				threads,
-				selectedNoteId,
-				blockRects: store.getBlockRects(),
-				heights,
-			} );
-			setBoardOffsets( offsets );
-			setCanvasMinHeight( minHeight );
-		} );
+		const panel = sidebarRef.current;
+		const blockEl = store.getFirstBlockElement();
+		// Climb to the block-list root so nested scroll containers
+		// (e.g. a Group with overflow:auto) don't shadow the canvas.
+		const rootEl = blockEl?.closest( '.is-root-container' ) ?? blockEl;
+		const canvas = rootEl ? getScrollContainer( rootEl ) : null;
 
-		return () => window.cancelAnimationFrame( rafId );
-	}, [
-		heights,
-		isFloating,
-		selectedNoteId,
-		setCanvasMinHeight,
-		store,
-		threads,
-	] );
+		const applyScroll = () => {
+			panel.style.setProperty(
+				'--canvas-scroll',
+				`${ -( canvas?.scrollTop ?? 0 ) }px`
+			);
+		};
+
+		// Recalc is deferred to a rAF; back-to-back updates collapse into one paint.
+		let rafId;
+		const schedule = () => {
+			window.cancelAnimationFrame( rafId );
+			rafId = window.requestAnimationFrame( () => {
+				const result = calculateNotePositions( {
+					threads,
+					selectedNoteId,
+					blockRects: store.getAnchorRects(),
+					heights,
+					scrollTop: canvas?.scrollTop ?? 0,
+				} );
+
+				setNotePositions( result.positions );
+				applyScroll();
+			} );
+		};
+
+		schedule();
+
+		// Anchors are read from the DOM, so editing, adding or removing any
+		// block leaves the threads after it stale.
+		const contentObserver = new window.ResizeObserver( schedule );
+		if ( rootEl ) {
+			contentObserver.observe( rootEl );
+		}
+
+		// Root scrolling elements (documentElement/body) don't fire scroll
+		// on themselves; capture on the window catches them in either canvas.
+		const view = canvas?.ownerDocument?.defaultView;
+		const listenerOptions = { passive: true, capture: true };
+		view?.addEventListener( 'scroll', applyScroll, listenerOptions );
+
+		return () => {
+			window.cancelAnimationFrame( rafId );
+			contentObserver.disconnect();
+			view?.removeEventListener( 'scroll', applyScroll, listenerOptions );
+		};
+	}, [ sidebarRef, heights, isFloating, selectedNoteId, store, threads ] );
 
 	return {
-		boardOffsets,
+		notePositions,
 		registerThread: store.registerThread,
 		unregisterThread: store.unregisterThread,
-	};
-}
-
-export function useFloatingThread( {
-	thread,
-	calculatedOffset,
-	registerThread,
-	unregisterThread,
-} ) {
-	const blockElement = useBlockElement( thread.blockClientId );
-
-	// Use floating-ui to track the block element's position with the calculated offset.
-	const { y, refs } = useFloating( {
-		placement: 'right-start',
-		middleware: [
-			offsetMiddleware( {
-				crossAxis: calculatedOffset || -16,
-			} ),
-		],
-		whileElementsMounted: autoUpdate,
-	} );
-
-	// Set the floating-ui reference element.
-	useEffect( () => {
-		if ( blockElement ) {
-			refs.setReference( blockElement );
-		}
-	}, [ blockElement, refs ] );
-
-	// Register block + floating elements with the board.
-	// The board's ResizeObserver tracks height changes automatically.
-	useEffect( () => {
-		const floatingEl = refs.floating?.current;
-		if ( floatingEl && registerThread ) {
-			registerThread( thread.id, blockElement, floatingEl );
-		}
-		return () => unregisterThread?.( thread.id );
-	}, [
-		blockElement,
-		thread.id,
-		refs.floating,
-		registerThread,
-		unregisterThread,
-	] );
-
-	return {
-		y,
-		refs,
 	};
 }

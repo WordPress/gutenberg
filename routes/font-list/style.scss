@@ -12,7 +12,7 @@
 	max-height: calc(100% - 110px); // Subtracting header + tabs
 	overflow: auto;
 
-	.admin-ui-page:has(.font-library__footer) & {
+	.font-library-page:has(.font-library__footer) & {
 		max-height: calc(100% - 198px); // Subtracting header + tabs + footer
 	}
 }

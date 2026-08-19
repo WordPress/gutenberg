@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { GeneratedCSSRule, Style, StyleOptions } from '../../types';
 import { generateRule } from '../utils';
 

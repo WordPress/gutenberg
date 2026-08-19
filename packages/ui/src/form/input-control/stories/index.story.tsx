@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import { plus, reset, seen, unseen } from '@wordpress/icons';
-import { IconButton, InputControl, InputLayout, Stack } from '../../..';
+import { InputControl } from '../';
+import { IconButton } from '../../../icon-button';
+import { InputLayout } from '../../primitives/input-layout';
+import { Stack } from '../../../stack';
 import {
 	WithPrefix,
 	WithSuffixControl,
@@ -19,6 +22,13 @@ const meta: Meta< typeof InputControl > = {
 		onValueChange: { action: 'onValueChange' },
 		value: { control: false },
 		type: { control: 'text' },
+	},
+	parameters: {
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components`. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
+		},
 	},
 };
 export default meta;
@@ -109,44 +119,31 @@ export const NumberWithSteppers: Story = {
 		const [ value, setValue ] = useState( 0 );
 
 		return (
-			<>
-				<style>
-					{ `
-					  .my-number-with-steppers input[type='number'] {
-							-moz-appearance: textfield;
-					  }
-						.my-number-with-steppers ::-webkit-inner-spin-button {
-							appearance: none;
-						}
-					` }
-				</style>
-				<InputControl
-					{ ...args }
-					value={ value }
-					onValueChange={ ( v ) => setValue( parseInt( v, 10 ) ) }
-					className="my-number-with-steppers"
-					suffix={
-						<InputLayout.Slot padding="minimal">
-							<Stack direction="row" gap="xs">
-								<IconButton
-									label="Increment"
-									icon={ plus }
-									onClick={ () => setValue( value + 1 ) }
-									size="small"
-									variant="minimal"
-								/>
-								<IconButton
-									label="Decrement"
-									icon={ reset }
-									onClick={ () => setValue( value - 1 ) }
-									size="small"
-									variant="minimal"
-								/>
-							</Stack>
-						</InputLayout.Slot>
-					}
-				/>
-			</>
+			<InputControl
+				{ ...args }
+				value={ value }
+				onValueChange={ ( v ) => setValue( parseInt( v, 10 ) ) }
+				suffix={
+					<InputLayout.Slot padding="minimal">
+						<Stack direction="row" gap="xs">
+							<IconButton
+								label="Increment"
+								icon={ plus }
+								onClick={ () => setValue( value + 1 ) }
+								size="small"
+								variant="minimal"
+							/>
+							<IconButton
+								label="Decrement"
+								icon={ reset }
+								onClick={ () => setValue( value - 1 ) }
+								size="small"
+								variant="minimal"
+							/>
+						</Stack>
+					</InputLayout.Slot>
+				}
+			/>
 		);
 	},
 	args: {

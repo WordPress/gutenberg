@@ -1,14 +1,8 @@
-/**
- * External dependencies
- */
 import deepmerge from 'deepmerge';
-// @ts-ignore - is-plain-object doesn't have proper types
+// @ts-expect-error Its declaration file is not exposed through the `exports` map.
 import { isPlainObject } from 'is-plain-object';
-
-/**
- * Internal dependencies
- */
 import type { GlobalStylesConfig } from '../types';
+import { normalizeStyleStateAliases } from '../style-state-back-compat';
 
 /**
  * Merges base and user global styles configurations
@@ -21,23 +15,28 @@ export function mergeGlobalStyles(
 	base: GlobalStylesConfig,
 	user: GlobalStylesConfig
 ): GlobalStylesConfig {
-	return deepmerge( base, user, {
-		/*
-		 * We only pass as arrays the presets,
-		 * in which case we want the new array of values
-		 * to override the old array (no merging).
-		 */
-		isMergeableObject: isPlainObject,
-		/*
-		 * Exceptions to the above rule.
-		 * Background images should be replaced, not merged,
-		 * as they themselves are specific object definitions for the style.
-		 */
-		customMerge: ( key ) => {
-			if ( key === 'backgroundImage' ) {
-				return ( baseConfig, userConfig ) => userConfig ?? baseConfig;
-			}
-			return undefined;
-		},
-	} );
+	return deepmerge(
+		normalizeStyleStateAliases( base ),
+		normalizeStyleStateAliases( user ),
+		{
+			/*
+			 * We only pass as arrays the presets,
+			 * in which case we want the new array of values
+			 * to override the old array (no merging).
+			 */
+			isMergeableObject: isPlainObject,
+			/*
+			 * Exceptions to the above rule.
+			 * Background images should be replaced, not merged,
+			 * as they themselves are specific object definitions for the style.
+			 */
+			customMerge: ( key ) => {
+				if ( key === 'backgroundImage' ) {
+					return ( baseConfig, userConfig ) =>
+						userConfig ?? baseConfig;
+				}
+				return undefined;
+			},
+		}
+	);
 }

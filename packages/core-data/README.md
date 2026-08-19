@@ -214,6 +214,7 @@ _Parameters_
 -   _edits_ `Object`: The edits.
 -   _options_ `Object`: Options for the edit.
 -   _options.undoIgnore_ `[boolean]`: Whether to ignore the edit in undo history or not.
+-   _options.isCached_ `[boolean]`: Whether the edit is transient (e.g. typing). Transient edits are staged and eventually merged into the preceding undo level instead of creating a new one.
 
 _Returns_
 
@@ -328,21 +329,6 @@ _Parameters_
 -   _options.isAutosave_ `[boolean]`: Whether this is an autosave.
 -   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
 -   _options.throwOnError_ `[boolean]`: If false, this action suppresses all the exceptions. Defaults to false.
-
-### setSyncConnectionStatus
-
-Returns an action object used to set the sync connection status for an entity or collection.
-
-_Parameters_
-
--   _kind_ `string`: Kind of the entity.
--   _name_ `string`: Name of the entity.
--   _key_ `number|string|null`: The entity key, or null for collections.
--   _status_ `Object|null`: The connection state object or null on unload.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### undo
 
@@ -805,18 +791,6 @@ _Returns_
 
 -   `RevisionRecord[] | null`: Record.
 
-### getSyncConnectionStatus
-
-Returns the current sync connection status across all entities. Prioritizes disconnected states, then connecting, then connected.
-
-_Parameters_
-
--   _state_ `State`: Data state.
-
-_Returns_
-
--   `ConnectionStatus | undefined`: The current sync connection state, prioritized by importance.
-
 ### getThemeSupports
 
 Return theme supports data in the index.
@@ -1161,7 +1135,6 @@ function PageRenameForm( { id } ) {
 	return (
 		<form onSubmit={ onRename }>
 			<TextControl
-				__next40pxDefaultSize
 				label={ __( 'Name' ) }
 				value={ page.editedRecord.title }
 				onChange={ setTitle }

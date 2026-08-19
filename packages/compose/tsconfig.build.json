@@ -1,0 +1,17 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"types": [ "gutenberg-env" ]
+	},
+	"references": [
+		{ "path": "../deprecated/tsconfig.build.json" },
+		{ "path": "../dom" },
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../is-shallow-equal" },
+		{ "path": "../keycodes/tsconfig.build.json" },
+		{ "path": "../priority-queue/tsconfig.build.json" },
+		{ "path": "../private-apis" },
+		{ "path": "../undo-manager" }
+	]
+}

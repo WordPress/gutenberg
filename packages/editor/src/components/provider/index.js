@@ -1,14 +1,10 @@
-/**
- * WordPress dependencies
- */
 import {
 	useCallback,
 	useEffect,
 	useLayoutEffect,
 	useMemo,
 } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import {
 	EntityProvider,
 	useEntityBlockEditor,
@@ -22,13 +18,9 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import { createBlock } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import withRegistryProvider from './with-registry-provider';
 import { store as editorStore } from '../../store';
-import { ATTACHMENT_POST_TYPE } from '../../store/constants';
+import useAutosaveNotice from './use-autosave-notice';
 import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
 import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
@@ -37,14 +29,17 @@ import { useHideBlocksFromInserter } from './use-hide-blocks-from-inserter';
 import { useRevisionBlocks } from './use-revision-blocks';
 import useCommands from '../commands';
 import useUploadSaveLock from './use-upload-save-lock';
+import useNetworkReconnect from './use-network-reconnect';
 import BlockRemovalWarnings from '../block-removal-warnings';
 import StartPageOptions from '../start-page-options';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import StartTemplateOptions from '../start-template-options';
 import EditorKeyboardShortcuts from '../global-keyboard-shortcuts';
+import EditorKeyboardShortcutsRegister from '../global-keyboard-shortcuts/register-shortcuts';
 import PatternRenameModal from '../pattern-rename-modal';
 import PatternDuplicateModal from '../pattern-duplicate-modal';
 import TemplatePartMenuItems from '../template-part-menu-items';
+import MediaEditorModalMount from '../media/media-editor-modal';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
@@ -310,6 +305,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			setRenderingMode,
 		} = unlock( useDispatch( editorStore ) );
 		const { editEntityRecord } = useDispatch( coreStore );
+		const registry = useRegistry();
 
 		const onChangeSelection = useCallback(
 			( newSelection ) => {
@@ -323,8 +319,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			},
 			[ editEntityRecord, post.type, post.id ]
 		);
-		const { createWarningNotice, removeNotice } =
-			useDispatch( noticesStore );
+		const { removeNotice } = useDispatch( noticesStore );
 
 		// Ideally this should be synced on each change and not just something you do once.
 		useLayoutEffect( () => {
@@ -334,28 +329,23 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			}
 
 			updatePostLock( settings.postLock );
-			setupEditor( post, initialEdits, settings.template );
-			if ( settings.autosave ) {
-				createWarningNotice(
-					__(
-						'There is an autosave of this post that is more recent than the version below.'
-					),
-					{
-						id: 'autosave-exists',
-						actions: [
-							{
-								label: __( 'View the autosave' ),
-								url: settings.autosave.editLink,
-							},
-						],
-					}
-				);
+			// `setupEditor` may already have been dispatched by the
+			// editor's pre-mount kickoff (see edit-post's
+			// `initializeEditor`). Skip the redundant dispatch — it
+			// would otherwise re-parse + reset blocks for new posts.
+			if ( ! registry.select( editorStore ).__unstableIsEditorReady() ) {
+				setupEditor( post, initialEdits, settings.template );
 			}
 
 			// The dependencies of the hook are omitted deliberately
 			// We only want to run setupEditor (with initialEdits) only once per post.
 			// A better solution in the future would be to split this effect into multiple ones.
 		}, [] );
+
+		// Manages the "more recent autosave" notice. Called after the mount
+		// effect above so that its own mount effect runs once `setupEditor`
+		// has populated the current post.
+		useAutosaveNotice( { post, recovery, settings } );
 
 		// Synchronizes the active post with the state
 		useEffect( () => {
@@ -372,7 +362,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		}, [ post.type, post.id, setEditedPost, removeNotice ] );
 
 		// Synchronize the editor settings as they change.
-		useEffect( () => {
+		// Do it as a layout effect so that rendered UI with outdated settings is not painted.
+		useLayoutEffect( () => {
 			updateEditorSettings( settings );
 		}, [ settings, updateEditorSettings ] );
 
@@ -396,33 +387,11 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		// Lock post saving when media uploads are in progress (experimental feature).
 		useUploadSaveLock();
 
+		// Pause/resume media upload queue on network disconnect/reconnect.
+		useNetworkReconnect();
+
 		if ( ! isReady || ! mode ) {
 			return null;
-		}
-
-		const isAttachment =
-			post.type === ATTACHMENT_POST_TYPE &&
-			window?.__experimentalMediaEditor;
-
-		// Early return for attachments - no block editor needed
-		if ( isAttachment ) {
-			return (
-				<EntityProvider kind="root" type="site">
-					<EntityProvider
-						kind="postType"
-						type={ post.type }
-						id={ post.id }
-					>
-						{ children }
-						{ ! settings.isPreviewMode && (
-							<>
-								<EditorKeyboardShortcuts />
-								<KeyboardShortcutHelpModal />
-							</>
-						) }
-					</EntityProvider>
-				</EntityProvider>
-			);
 		}
 
 		return (
@@ -458,6 +427,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 									{ type === 'wp_navigation' && (
 										<NavigationBlockEditingMode />
 									) }
+									<EditorKeyboardShortcutsRegister />
 									<EditorKeyboardShortcuts />
 									<KeyboardShortcutHelpModal />
 									<BlockRemovalWarnings />
@@ -465,6 +435,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 									<StartTemplateOptions />
 									<PatternRenameModal />
 									<PatternDuplicateModal />
+									<MediaEditorModalMount />
 								</>
 							) }
 						</BlockEditorProviderComponent>

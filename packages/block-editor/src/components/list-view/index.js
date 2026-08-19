@@ -1,20 +1,13 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	useInstanceId,
 	useMergeRefs,
+	useRefEffect,
 	__experimentalUseFixedWindowList as useFixedWindowList,
 } from '@wordpress/compose';
-import {
-	__experimentalTreeGrid as TreeGrid,
-	VisuallyHidden,
-} from '@wordpress/components';
+import { isShallowEqual } from '@wordpress/is-shallow-equal';
+import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import {
@@ -26,12 +19,12 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import ListViewBranch from './branch';
-import { ListViewContext } from './context';
+import {
+	ListViewContext,
+	ListViewInsertedBlockContext,
+	ListViewTreeStateContext,
+} from './context';
 import ListViewDropIndicatorPreview from './drop-indicator';
 import useBlockSelection from './use-block-selection';
 import useListViewBlockIndexes from './use-list-view-block-indexes';
@@ -41,29 +34,39 @@ import useListViewDropZone from './use-list-view-drop-zone';
 import useListViewExpandSelectedItem from './use-list-view-expand-selected-item';
 import { store as blockEditorStore } from '../../store';
 import { BlockSettingsDropdown } from '../block-settings-menu/block-settings-dropdown';
-import { focusListItem } from './utils';
+import { BLOCK_LIST_ITEM_HEIGHT, focusListItem } from './utils';
 import useClipboardHandler from './use-clipboard-handler';
 
-const expanded = ( state, action ) => {
-	if ( action.type === 'clear' ) {
-		return {};
-	}
-	if ( Array.isArray( action.clientIds ) ) {
-		return {
-			...state,
-			...action.clientIds.reduce(
-				( newState, id ) => ( {
-					...newState,
-					[ id ]: action.type === 'expand',
-				} ),
-				{}
-			),
-		};
-	}
-	return state;
-};
+const expansion = ( state, action ) => {
+	const { type, clientIds } = action;
 
-export const BLOCK_LIST_ITEM_HEIGHT = 32;
+	// Overwrite the state: only the listed blocks stay expanded, every other
+	// block falls back to the list view's default.
+	if ( type === 'replace' ) {
+		const next = Object.fromEntries(
+			clientIds.map( ( id ) => [ id, true ] )
+		);
+		return isShallowEqual( state, next ) ? state : next;
+	}
+
+	if ( type !== 'expand' && type !== 'collapse' ) {
+		return state;
+	}
+
+	const isExpand = type === 'expand';
+	// An unrecorded block is not the same as an explicitly collapsed one,
+	// because the fallback depends on the `isExpanded` prop.
+	const changed = clientIds.filter( ( id ) => state[ id ] !== isExpand );
+
+	if ( ! changed.length ) {
+		return state;
+	}
+
+	return {
+		...state,
+		...Object.fromEntries( changed.map( ( id ) => [ id, isExpand ] ) ),
+	};
+};
 
 /** @typedef {React.ComponentType} ComponentType */
 /** @typedef {React.Ref<HTMLElement>} Ref */
@@ -78,6 +81,7 @@ export const BLOCK_LIST_ITEM_HEIGHT = 32;
  * @param {?boolean}       props.showBlockMovers        Flag to enable block movers. Defaults to `false`.
  * @param {?boolean}       props.isExpanded             Flag to determine whether nested levels are expanded by default. Defaults to `false`.
  * @param {?boolean}       props.showAppender           Flag to show or hide the block appender. Defaults to `false`.
+ * @param {?boolean}       props.focusOnMount           Flag to move focus into the list when it mounts. Defaults to `false`.
  * @param {?ComponentType} props.blockSettingsMenu      Optional more menu substitution. Defaults to the standard `BlockSettingsDropdown` component.
  * @param {string}         props.rootClientId           The client id of the root block from which we determine the blocks to show in the list.
  * @param {string}         props.description            Optional accessible description for the tree grid component.
@@ -93,6 +97,7 @@ function ListViewComponent(
 		showBlockMovers = false,
 		isExpanded = false,
 		showAppender = false,
+		focusOnMount = false,
 		blockSettingsMenu: BlockSettingsMenu = BlockSettingsDropdown,
 		rootClientId,
 		description,
@@ -136,13 +141,14 @@ function ListViewComponent(
 
 	const { updateBlockSelection } = useBlockSelection();
 
-	const [ expandedState, setExpandedState ] = useReducer( expanded, {} );
+	const [ expansionState, updateExpansion ] = useReducer( expansion, {} );
 
-	const [ insertedBlock, setInsertedBlock ] = useState( null );
+	const [ insertedBlockClientId, setInsertedBlockClientId ] =
+		useState( null );
 
 	const { setSelectedTreeId } = useListViewExpandSelectedItem( {
 		firstSelectedBlockClientId: selectedClientIds[ 0 ],
-		setExpandedState,
+		updateExpansion,
 	} );
 	const selectEditorBlock = useCallback(
 		/**
@@ -162,8 +168,7 @@ function ListViewComponent(
 
 	const { ref: dropZoneRef, target: blockDropTarget } = useListViewDropZone( {
 		dropZoneElement,
-		expandedState,
-		setExpandedState,
+		updateExpansion,
 	} );
 	const elementRef = useRef();
 
@@ -172,62 +177,78 @@ function ListViewComponent(
 		selectBlock: selectEditorBlock,
 	} );
 
-	const focusSelectedBlock = useCallback(
+	const focusOnMountRef = useRefEffect(
 		( node ) => {
-			const [ firstSelectedClientId ] = getSelectedBlockClientIds();
-			// If a blocks are already selected when the list view is initially
-			// mounted, shift focus to the first selected block.
-			if ( firstSelectedClientId && node ) {
-				focusListItem( firstSelectedClientId, node );
+			// A list that mounts as a side effect of selecting a block, the
+			// block inspector's for one, would pull focus out of whatever the
+			// user is editing, so taking focus is opt-in.
+			if ( ! focusOnMount ) {
+				return;
 			}
+
+			const controller = new window.AbortController();
+			const focusRow = ( clientId ) =>
+				focusListItem( clientId, node, controller.signal ).then( () =>
+					controller.abort()
+				);
+
+			// Anything that takes focus first has a better claim to it. The row
+			// is not always there yet either, because a nested block waits on
+			// its ancestors expanding.
+			node.ownerDocument.addEventListener(
+				'focusin',
+				() => controller.abort(),
+				{ once: true, signal: controller.signal }
+			);
+
+			const [ firstSelectedClientId ] = getSelectedBlockClientIds();
+
+			if ( firstSelectedClientId ) {
+				focusRow( firstSelectedClientId );
+				return () => controller.abort();
+			}
+
+			// With nothing selected the top of the list gets focus, but only
+			// once the click that opened the list is over. Focusing a row costs
+			// a style and layout pass, and inside that commit it lands on a
+			// document that is still dirty.
+			const timerId = setTimeout( () => {
+				const firstClientId = node.querySelector(
+					'[role=row][data-block]'
+				)?.dataset.block;
+				if ( firstClientId ) {
+					focusRow( firstClientId );
+				}
+			}, 0 );
+
+			return () => {
+				clearTimeout( timerId );
+				controller.abort();
+			};
 		},
-		[ getSelectedBlockClientIds ]
+		[ focusOnMount, getSelectedBlockClientIds ]
 	);
 
 	const treeGridRef = useMergeRefs( [
 		clipBoardRef,
-		focusSelectedBlock,
+		focusOnMountRef,
 		elementRef,
 		dropZoneRef,
 		ref,
 	] );
 
-	const expand = useCallback(
-		( clientId ) => {
-			if ( ! clientId ) {
-				return;
-			}
-			const clientIds = Array.isArray( clientId )
-				? clientId
-				: [ clientId ];
-			setExpandedState( { type: 'expand', clientIds } );
-		},
-		[ setExpandedState ]
-	);
-	const collapse = useCallback(
-		( clientId ) => {
-			if ( ! clientId ) {
-				return;
-			}
-			setExpandedState( { type: 'collapse', clientIds: [ clientId ] } );
-		},
-		[ setExpandedState ]
-	);
-	const collapseAll = useCallback( () => {
-		setExpandedState( { type: 'clear' } );
-	}, [ setExpandedState ] );
-	const expandRow = useCallback(
-		( row ) => {
-			expand( row?.dataset?.block );
-		},
-		[ expand ]
-	);
-	const collapseRow = useCallback(
-		( row ) => {
-			collapse( row?.dataset?.block );
-		},
-		[ collapse ]
-	);
+	const expandRow = useCallback( ( row ) => {
+		const clientId = row?.dataset?.block;
+		if ( clientId ) {
+			updateExpansion( { type: 'expand', clientIds: [ clientId ] } );
+		}
+	}, [] );
+	const collapseRow = useCallback( ( row ) => {
+		const clientId = row?.dataset?.block;
+		if ( clientId ) {
+			updateExpansion( { type: 'collapse', clientIds: [ clientId ] } );
+		}
+	}, [] );
 	const focusRow = useCallback(
 		( event, startRow, endRow ) => {
 			if ( event.shiftKey ) {
@@ -241,10 +262,7 @@ function ListViewComponent(
 		[ updateBlockSelection ]
 	);
 
-	useListViewCollapseItems( {
-		collapseAll,
-		expand,
-	} );
+	useListViewCollapseItems( { updateExpansion } );
 
 	const firstDraggedBlockClientId = draggedClientIds?.[ 0 ];
 
@@ -286,47 +304,47 @@ function ListViewComponent(
 			};
 		}, [ blockDropTarget, blockIndexes, firstDraggedBlockClientId ] );
 
+	// Values that stay stable for the lifetime of the List View.
 	const contextValue = useMemo(
+		() => ( {
+			AdditionalBlockContent,
+			BlockSettingsMenu,
+			listViewInstanceId: instanceId,
+			rootClientId,
+			setInsertedBlockClientId,
+			treeGridElementRef: elementRef,
+			updateExpansion,
+		} ),
+		[
+			AdditionalBlockContent,
+			BlockSettingsMenu,
+			instanceId,
+			rootClientId,
+			setInsertedBlockClientId,
+			updateExpansion,
+		]
+	);
+
+	// Values that change while expanding, collapsing, or dragging.
+	const treeStateContextValue = useMemo(
 		() => ( {
 			blockDropPosition,
 			blockDropTargetIndex,
 			blockIndexes,
 			draggedClientIds,
-			expandedState,
-			expand,
+			expansionState,
 			firstDraggedBlockIndex,
-			collapse,
-			collapseAll,
-			BlockSettingsMenu,
-			listViewInstanceId: instanceId,
-			AdditionalBlockContent,
-			insertedBlock,
-			setInsertedBlock,
-			treeGridElementRef: elementRef,
-			rootClientId,
 		} ),
 		[
 			blockDropPosition,
 			blockDropTargetIndex,
 			blockIndexes,
 			draggedClientIds,
-			expandedState,
-			expand,
+			expansionState,
 			firstDraggedBlockIndex,
-			collapse,
-			collapseAll,
-			BlockSettingsMenu,
-			instanceId,
-			AdditionalBlockContent,
-			insertedBlock,
-			setInsertedBlock,
-			rootClientId,
 		]
 	);
 
-	// List View renders a fixed number of items and relies on each having a fixed item height of 36px.
-	// If this value changes, we should also change the itemHeight value set in useFixedWindowList.
-	// See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
 	const [ fixedListWindow ] = useFixedWindowList(
 		elementRef,
 		BLOCK_LIST_ITEM_HEIGHT,
@@ -337,7 +355,7 @@ function ListViewComponent(
 			// switch the list view to a tall list view with a scrollbar, and vice versa.
 			// When this happens, the windowing logic needs to be recalculated to ensure that
 			// the correct number of blocks are rendered, by rechecking for a scroll container.
-			expandedState,
+			expandedState: expansionState,
 			useWindowing: true,
 			windowOverscan: 40,
 		}
@@ -388,16 +406,24 @@ function ListViewComponent(
 				} }
 			>
 				<ListViewContext.Provider value={ contextValue }>
-					<ListViewBranch
-						blocks={ clientIdsTree }
-						parentId={ rootClientId }
-						selectBlock={ selectEditorBlock }
-						showBlockMovers={ showBlockMovers }
-						fixedListWindow={ fixedListWindow }
-						selectedClientIds={ selectedClientIds }
-						isExpanded={ isExpanded }
-						showAppender={ showAppender }
-					/>
+					<ListViewInsertedBlockContext.Provider
+						value={ insertedBlockClientId }
+					>
+						<ListViewTreeStateContext.Provider
+							value={ treeStateContextValue }
+						>
+							<ListViewBranch
+								blocks={ clientIdsTree }
+								parentId={ rootClientId }
+								selectBlock={ selectEditorBlock }
+								showBlockMovers={ showBlockMovers }
+								fixedListWindow={ fixedListWindow }
+								selectedClientIds={ selectedClientIds }
+								isExpanded={ isExpanded }
+								showAppender={ showAppender }
+							/>
+						</ListViewTreeStateContext.Provider>
+					</ListViewInsertedBlockContext.Provider>
 				</ListViewContext.Provider>
 			</TreeGrid>
 		</AsyncModeProvider>

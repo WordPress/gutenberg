@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { TextControl } from '@wordpress/components';
 import { useEntityProp } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
@@ -14,7 +11,6 @@ export default function NavigationMenuNameControl() {
 
 	return (
 		<TextControl
-			__next40pxDefaultSize
 			label={ __( 'Menu name' ) }
 			value={ title }
 			onChange={ updateTitle }

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import convertComplementaryAreas from '../convert-complementary-areas';
 
 describe( 'convertComplementaryAreas', () => {

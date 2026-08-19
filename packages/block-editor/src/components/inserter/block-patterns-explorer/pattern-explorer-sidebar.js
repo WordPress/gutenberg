@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Button, SearchControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 

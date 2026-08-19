@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 import { InnerBlocks, getColorClassName } from '@wordpress/block-editor';
 

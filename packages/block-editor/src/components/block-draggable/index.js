@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { store as blocksStore } from '@wordpress/blocks';
 import { Draggable } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { throttle } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import BlockDraggableChip from './draggable-chip';
 import useScrollWhenDragging from './use-scroll-when-dragging';
 import { store as blockEditorStore } from '../../store';

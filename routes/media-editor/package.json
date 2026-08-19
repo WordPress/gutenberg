@@ -1,0 +1,24 @@
+{
+	"name": "@wordpress/media-editor-route",
+	"version": "1.0.0",
+	"private": true,
+	"route": {
+		"path": "/media-editor/$id",
+		"page": [
+			"site-editor-v2",
+			"media-editor"
+		]
+	},
+	"dependencies": {
+		"@wordpress/admin-ui": "file:../../packages/admin-ui",
+		"@wordpress/core-data": "file:../../packages/core-data",
+		"@wordpress/data": "file:../../packages/data",
+		"@wordpress/editor": "file:../../packages/editor",
+		"@wordpress/element": "file:../../packages/element",
+		"@wordpress/html-entities": "file:../../packages/html-entities",
+		"@wordpress/i18n": "file:../../packages/i18n",
+		"@wordpress/routes-lock-unlock": "file:../lock-unlock",
+		"@wordpress/media-editor": "file:../../packages/media-editor",
+		"@wordpress/route": "file:../../packages/route"
+	}
+}

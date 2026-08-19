@@ -10,17 +10,28 @@
  *
  * @param array $parsed_block The parsed block.
  * @return array The same parsed block with custom CSS class name added if appropriate.
+ *
+ * @phpstan-param array{
+ *     blockName: string|null,
+ *     attrs: array{
+ *         className?: string,
+ *         style?: array{
+ *             css?: string,
+ *             ...
+ *         },
+ *         ...
+ *     },
+ *     ...
+ * } $parsed_block
  */
 function gutenberg_render_custom_css_support_styles( $parsed_block ) {
-	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $parsed_block['blockName'] );
-
-	if ( ! block_has_support( $block_type, 'customCSS', true ) ) {
+	$custom_css = $parsed_block['attrs']['style']['css'] ?? null;
+	if ( ! is_string( $custom_css ) || '' === trim( $custom_css ) ) {
 		return $parsed_block;
 	}
 
-	$custom_css = trim( $parsed_block['attrs']['style']['css'] ?? '' );
-
-	if ( empty( $custom_css ) ) {
+	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $parsed_block['blockName'] );
+	if ( ! block_has_support( $block_type, 'customCSS', true ) ) {
 		return $parsed_block;
 	}
 
@@ -30,25 +41,36 @@ function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 	}
 
 	// Generate a unique class name for this block instance.
-	$class_name         = wp_unique_id_from_values( $parsed_block, 'wp-custom-css-' );
-	$updated_class_name = isset( $parsed_block['attrs']['className'] )
-		? $parsed_block['attrs']['className'] . " $class_name"
+	$class_name          = wp_unique_id_from_values( $parsed_block, 'wp-custom-css-' );
+	$existing_class_name = $parsed_block['attrs']['className'] ?? null;
+	$updated_class_name  = is_string( $existing_class_name )
+		? "$existing_class_name $class_name"
 		: $class_name;
 
-	_wp_array_set( $parsed_block, array( 'attrs', 'className' ), $updated_class_name );
+	$parsed_block['attrs']['className'] = $updated_class_name;
 
 	// Process the custom CSS using the same method as global styles.
 	$selector      = '.' . $class_name;
 	$processed_css = WP_Theme_JSON_Gutenberg::process_blocks_custom_css( $custom_css, $selector );
 
 	if ( ! empty( $processed_css ) ) {
-		/*
-		 * Register and add inline style for block custom CSS.
-		 * The style depends on global-styles to ensure custom CSS loads after
-		 * and can override global styles.
+		/**
+		 * Reuse one handle so identical custom CSS is enqueued only once via
+		 * {@see wp_unique_id_from_values()}. Explicitly declare the `wp-block-library`
+		 * dependency so `global-styles` is guaranteed to print after it, preventing
+		 * block default styles from unintentionally overriding global styles.
 		 */
-		wp_register_style( 'wp-block-custom-css', false, array( 'global-styles' ) );
-		wp_add_inline_style( 'wp-block-custom-css', $processed_css );
+		$handle = 'wp-block-custom-css';
+		if ( ! wp_style_is( $handle, 'registered' ) ) {
+			wp_register_style( $handle, false, array( 'wp-block-library', 'global-styles' ) );
+		}
+		$after_styles = wp_styles()->get_data( $handle, 'after' );
+		if ( ! is_array( $after_styles ) ) {
+			$after_styles = array();
+		}
+		if ( ! in_array( $processed_css, $after_styles, true ) ) {
+			wp_add_inline_style( $handle, $processed_css );
+		}
 	}
 
 	return $parsed_block;
@@ -64,26 +86,47 @@ function gutenberg_enqueue_block_custom_css() {
 /**
  * Applies the custom CSS class name to the block's rendered HTML.
  *
- * The class name is generated in `gutenberg_render_custom_css_support_styles`
+ * The class name is generated in {@see gutenberg_render_custom_css_support_styles()}
  * and stored in block attributes. This filter adds it to the actual markup.
  *
  * @param string $block_content Rendered block content.
  * @param array  $block         Block object.
  * @return string               Filtered block content.
+ *
+ * @phpstan-param array{
+ *     attrs: array{
+ *         className?: string,
+ *         ...
+ *     },
+ *     ...
+ * } $block
  */
 function gutenberg_render_custom_css_class_name( $block_content, $block ) {
-	$class_string = $block['attrs']['className'] ?? '';
-	preg_match( '/\bwp-custom-css-\S+\b/', $class_string, $matches );
+	$class_name_attr   = $block['attrs']['className'] ?? null;
+	$class_name_prefix = 'wp-custom-css-';
+	if ( ! is_string( $class_name_attr ) || ! str_contains( $class_name_attr, $class_name_prefix ) ) {
+		return $block_content;
+	}
 
-	if ( empty( $matches ) ) {
+	// Parse out the 'wp-custom-css-*' class name added by gutenberg_render_custom_css_support_styles().
+	$matched_class_name = null;
+	$token_delimiter    = " \t\f\r\n";
+	$class_token        = strtok( $class_name_attr, $token_delimiter );
+	while ( false !== $class_token ) {
+		if ( str_starts_with( $class_token, $class_name_prefix ) ) {
+			$matched_class_name = $class_token;
+			break;
+		}
+		$class_token = strtok( $token_delimiter );
+	}
+	if ( null === $matched_class_name ) {
 		return $block_content;
 	}
 
 	$tags = new WP_HTML_Tag_Processor( $block_content );
-
 	if ( $tags->next_tag() ) {
 		$tags->add_class( 'has-custom-css' );
-		$tags->add_class( $matches[0] );
+		$tags->add_class( $matched_class_name );
 	}
 
 	return $tags->get_updated_html();

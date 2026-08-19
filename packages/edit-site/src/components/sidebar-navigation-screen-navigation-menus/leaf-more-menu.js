@@ -1,7 +1,3 @@
-/**
- * WordPress dependencies
- */
-
 import { chevronUp, chevronDown, moreVertical, pencil } from '@wordpress/icons';
 import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -9,6 +5,7 @@ import { useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { unlock } from '../../lock-unlock';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -20,18 +17,13 @@ const BLOCKS_WITH_LINK_EDIT_SUPPORT = [
 	'core/navigation-submenu',
 ];
 
-/**
- * Internal dependencies
- */
-import { unlock } from '../../lock-unlock';
-
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 export default function LeafMoreMenu( props ) {
 	const history = useHistory();
 	const { path } = useLocation();
-	const { block, setEditingBlock } = props;
-	const { clientId } = block;
+	const { block, clientId: propClientId, setEditingBlock } = props;
+	const clientId = block?.clientId ?? propClientId;
 	const { moveBlocksDown, moveBlocksUp, removeBlocks } =
 		useDispatch( blockEditorStore );
 
@@ -47,41 +39,42 @@ export default function LeafMoreMenu( props ) {
 		BlockTitle( { clientId, maximumLength: 25 } )
 	);
 
-	const canEditLink = BLOCKS_WITH_LINK_EDIT_SUPPORT.includes( block?.name );
-
-	const rootClientId = useSelect(
+	const { rootClientId, blockName, attributes } = useSelect(
 		( select ) => {
-			const { getBlockRootClientId } = select( blockEditorStore );
+			const { getBlockRootClientId, getBlockName, getBlockAttributes } =
+				select( blockEditorStore );
 
-			return getBlockRootClientId( clientId );
+			return {
+				rootClientId: getBlockRootClientId( clientId ),
+				blockName: getBlockName( clientId ),
+				attributes: getBlockAttributes( clientId ),
+			};
 		},
 		[ clientId ]
 	);
 
-	const onGoToPage = useCallback(
-		( selectedBlock ) => {
-			const { attributes, name } = selectedBlock;
-			if (
-				attributes.kind === 'post-type' &&
-				attributes.id &&
-				attributes.type &&
-				history
-			) {
-				history.navigate(
-					`/${ attributes.type }/${ attributes.id }?canvas=edit`,
-					{
-						state: { backPath: path },
-					}
-				);
-			}
-			if ( name === 'core/page-list-item' && attributes.id && history ) {
-				history.navigate( `/page/${ attributes.id }?canvas=edit`, {
+	const canEditLink = BLOCKS_WITH_LINK_EDIT_SUPPORT.includes( blockName );
+
+	const onGoToPage = useCallback( () => {
+		if (
+			attributes.kind === 'post-type' &&
+			attributes.id &&
+			attributes.type &&
+			history
+		) {
+			history.navigate(
+				`/${ attributes.type }/${ attributes.id }?canvas=edit`,
+				{
 					state: { backPath: path },
-				} );
-			}
-		},
-		[ path, history ]
-	);
+				}
+			);
+		}
+		if ( blockName === 'core/page-list-item' && attributes.id && history ) {
+			history.navigate( `/page/${ attributes.id }?canvas=edit`, {
+				state: { backPath: path },
+			} );
+		}
+	}, [ path, history, attributes, blockName ] );
 
 	return (
 		<DropdownMenu
@@ -99,7 +92,12 @@ export default function LeafMoreMenu( props ) {
 							<MenuItem
 								icon={ pencil }
 								onClick={ () => {
-									setEditingBlock( block );
+									setEditingBlock?.( {
+										...( block ?? {} ),
+										clientId,
+										name: blockName,
+										attributes,
+									} );
 									onClose();
 								} }
 							>
@@ -124,17 +122,16 @@ export default function LeafMoreMenu( props ) {
 						>
 							{ __( 'Move down' ) }
 						</MenuItem>
-						{ block.attributes?.type === 'page' &&
-							block.attributes?.id && (
-								<MenuItem
-									onClick={ () => {
-										onGoToPage( block );
-										onClose();
-									} }
-								>
-									{ goToLabel }
-								</MenuItem>
-							) }
+						{ attributes?.type === 'page' && attributes?.id && (
+							<MenuItem
+								onClick={ () => {
+									onGoToPage();
+									onClose();
+								} }
+							>
+								{ goToLabel }
+							</MenuItem>
+						) }
 					</MenuGroup>
 					<MenuGroup>
 						<MenuItem

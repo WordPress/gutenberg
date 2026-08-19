@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -43,9 +40,13 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 				{ name: 'core/paragraph' },
 			] );
 
-		await expect(
-			editor.canvas.locator( '[data-type="core/paragraph"]' )
-		).toBeFocused();
+		await expect
+			.poll( () =>
+				editor.ownsSelection(
+					editor.canvas.locator( '[data-type="core/paragraph"]' )
+				)
+			)
+			.toBe( true );
 
 		// Clear block selection.
 		await editor.canvas
@@ -58,10 +59,18 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			},
 		} );
 
-		await expect(
-			editor.canvas.locator( '[data-type="core/paragraph"]' ),
-			'should select and focus the newly inserted paragraph block on second click'
-		).toBeFocused();
+		await expect
+			.poll(
+				() =>
+					editor.ownsSelection(
+						editor.canvas.locator( '[data-type="core/paragraph"]' )
+					),
+				{
+					message:
+						'should select the newly inserted paragraph block on second click',
+				}
+			)
+			.toBe( true );
 	} );
 
 	test( 'inserts blocks by dragging and dropping from the global inserter', async ( {
@@ -91,18 +100,20 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
-		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Block Inserter"i]'
-		);
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Block Inserter' } )
+			.click();
 
-		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
-			'Heading'
-		);
+		await page
+			.getByRole( 'region', { name: 'Block Library' } )
+			.getByRole( 'searchbox', { name: 'Search' } )
+			.fill( 'Heading' );
 
-		await page.hover(
-			'role=listbox[name="Blocks"i] >> role=option[name="Heading"i]'
-		);
+		await page
+			.getByRole( 'listbox', { name: 'Blocks' } )
+			.getByRole( 'option', { name: 'Heading', exact: true } )
+			.hover();
 		const paragraphBoundingBox = await paragraphBlock.boundingBox();
 
 		await expect( insertingBlocksUtils.indicator ).toBeVisible();
@@ -162,18 +173,20 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
-		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Block Inserter"i]'
-		);
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Block Inserter' } )
+			.click();
 
-		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
-			'Heading'
-		);
+		await page
+			.getByRole( 'region', { name: 'Block Library' } )
+			.getByRole( 'searchbox', { name: 'Search' } )
+			.fill( 'Heading' );
 
-		await page.hover(
-			'role=listbox[name="Blocks"i] >> role=option[name="Heading"i]'
-		);
+		await page
+			.getByRole( 'listbox', { name: 'Blocks' } )
+			.getByRole( 'option', { name: 'Heading', exact: true } )
+			.hover();
 		const paragraphBoundingBox = await paragraphBlock.boundingBox();
 
 		await page.mouse.down();
@@ -227,20 +240,22 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
-		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Block Inserter"i]'
-		);
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Block Inserter' } )
+			.click();
 
 		const PATTERN_NAME = 'Standard';
 
-		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
-			PATTERN_NAME
-		);
+		await page
+			.getByRole( 'region', { name: 'Block Library' } )
+			.getByRole( 'searchbox', { name: 'Search' } )
+			.fill( PATTERN_NAME );
 
-		await page.hover(
-			`role=listbox[name="Block Patterns"i] >> role=option[name="${ PATTERN_NAME }"i]`
-		);
+		await page
+			.getByRole( 'listbox', { name: 'Patterns' } )
+			.getByRole( 'option', { name: PATTERN_NAME } )
+			.hover();
 
 		// FIXME: I think we should show the indicator when hovering on patterns as well?
 		// @see https://github.com/WordPress/gutenberg/issues/45183
@@ -325,16 +340,18 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'ArrowUp' );
 
 		// Insert a synced pattern.
-		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Block Inserter"i]'
-		);
-		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
-			PATTERN_NAME
-		);
-		await page.hover(
-			`role=listbox[name="Block Patterns"i] >> role=option[name="${ PATTERN_NAME }"i]`
-		);
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Block Inserter' } )
+			.click();
+		await page
+			.getByRole( 'region', { name: 'Block Library' } )
+			.getByRole( 'searchbox', { name: 'Search' } )
+			.fill( PATTERN_NAME );
+		await page
+			.getByRole( 'listbox', { name: 'Patterns' } )
+			.getByRole( 'option', { name: PATTERN_NAME } )
+			.hover();
 
 		const paragraphBoundingBox = await paragraphBlock.boundingBox();
 
@@ -397,20 +414,22 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
-		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Block Inserter"i]'
-		);
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Block Inserter' } )
+			.click();
 
 		const PATTERN_NAME = 'Standard';
 
-		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
-			PATTERN_NAME
-		);
+		await page
+			.getByRole( 'region', { name: 'Block Library' } )
+			.getByRole( 'searchbox', { name: 'Search' } )
+			.fill( PATTERN_NAME );
 
-		await page.hover(
-			`role=listbox[name="Block Patterns"i] >> role=option[name="${ PATTERN_NAME }"i]`
-		);
+		await page
+			.getByRole( 'listbox', { name: 'Patterns' } )
+			.getByRole( 'option', { name: PATTERN_NAME } )
+			.hover();
 
 		const paragraphBoundingBox = await paragraphBlock.boundingBox();
 
@@ -473,7 +492,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 	} ) => {
 		await admin.createNewPost();
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '/tag cloud' );
 
@@ -495,7 +514,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 	} ) => {
 		await admin.createNewPost();
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'First paragraph' );
 		await page.keyboard.press( 'Enter' );
@@ -549,7 +568,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 	} ) => {
 		await admin.createNewPost();
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'First paragraph' );
 		await editor.insertBlock( { name: 'core/image' } );
@@ -759,6 +778,51 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 	} );
 } );
 
+test.describe( 'Default block ghost', () => {
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
+	test( 'materialises in the same DOM element', async ( {
+		editor,
+		page,
+	} ) => {
+		const ghost = editor.canvas.getByRole( 'document', {
+			name: 'Add default block',
+		} );
+		await expect( ghost ).toBeVisible();
+
+		// The ghost is not part of the content yet.
+		expect( await editor.getBlocks() ).toEqual( [] );
+
+		// Tag the DOM node and record its block id.
+		const idBefore = await ghost.evaluate( ( element ) => {
+			element.__ghostNode = true;
+			return element.getAttribute( 'data-block' );
+		} );
+
+		await ghost.click();
+		await page.keyboard.type( 'Hello' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Hello' },
+			},
+		] );
+
+		// Same client ID, same DOM node: nothing remounted.
+		const after = await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.evaluate( ( element ) => ( {
+				id: element.getAttribute( 'data-block' ),
+				sameNode: element.__ghostNode === true,
+			} ) );
+		expect( after.id ).toBe( idBefore );
+		expect( after.sameNode ).toBe( true );
+	} );
+} );
+
 test.describe( 'insert media from inserter', () => {
 	let uploadedMedia;
 
@@ -785,13 +849,95 @@ test.describe( 'insert media from inserter', () => {
 
 		await page.getByLabel( 'Block Inserter' ).click();
 		await page.getByRole( 'tab', { name: 'Media' } ).click();
-		await page.getByRole( 'tab', { name: 'Images' } ).click();
+		// `exact` so this matches only the "Images" source and not the new
+		// "Attached images" source, which also contains "Images".
+		await page.getByRole( 'tab', { name: 'Images', exact: true } ).click();
 		await page.getByLabel( uploadedMedia.title.raw ).click();
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:image {"id":${ uploadedMedia.id }} -->
 <figure class="wp-block-image"><img src="${ uploadedMedia.source_url }" alt="${ uploadedMedia.alt_text }" class="wp-image-${ uploadedMedia.id }"/></figure>
 <!-- /wp:image -->`
 		);
+	} );
+} );
+
+test.describe( 'Attached images media category', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await Promise.all( [
+			requestUtils.deleteAllMedia(),
+			requestUtils.deleteAllPosts(),
+		] );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await Promise.all( [
+			requestUtils.deleteAllMedia(),
+			requestUtils.deleteAllPosts(),
+		] );
+	} );
+
+	test( 'lists images attached to the current post and empties after detaching', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		const post = await requestUtils.createPost( {
+			title: 'Attached images test',
+			status: 'draft',
+		} );
+		const media = await requestUtils.uploadMedia(
+			'./assets/10x10_e2e_test_image_z9T8jK.png'
+		);
+		// Re-parent the uploaded image to the post so it appears in the
+		// "Attached images" source, which filters by the attachment's parent.
+		await requestUtils.rest( {
+			method: 'POST',
+			path: `/wp/v2/media/${ media.id }`,
+			data: { post: post.id },
+		} );
+
+		await admin.editPost( post.id );
+
+		await page.getByLabel( 'Block Inserter' ).click();
+		await page.getByRole( 'tab', { name: 'Media' } ).click();
+		await page.getByRole( 'tab', { name: 'Attached images' } ).click();
+
+		const mediaPanel = page.locator(
+			'.block-editor-inserter__media-panel'
+		);
+		const attachedImage = mediaPanel.getByRole( 'option', {
+			name: media.title.raw,
+		} );
+		await expect( attachedImage ).toBeVisible();
+
+		// The per-item options button is only revealed once the item is
+		// hovered, matching how a user reaches the detach action.
+		await attachedImage.hover();
+		await mediaPanel.getByRole( 'button', { name: 'Options' } ).click();
+		await page
+			.getByRole( 'menuitem', { name: 'Detach from post' } )
+			.click();
+
+		// Detaching is confirmed in a modal before it takes effect.
+		await page
+			.getByRole( 'dialog', { name: 'Detach image' } )
+			.getByRole( 'button', { name: 'Detach' } )
+			.click();
+
+		// Scope to the snackbar so this doesn't also match the visually hidden
+		// `aria-live` region that mirrors the notice text for screen readers.
+		await expect(
+			page
+				.locator( '.components-snackbar__content' )
+				.filter( { hasText: 'Image detached from' } )
+		).toBeVisible();
+
+		// With its only attachment removed, the source falls back to its empty
+		// state rather than dropping out of the tab list.
+		await expect( attachedImage ).toBeHidden();
+		await expect(
+			page.getByText( 'No images attached to this post.' )
+		).toBeVisible();
 	} );
 } );
 

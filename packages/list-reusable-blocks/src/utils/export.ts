@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { paramCase as kebabCase } from 'change-case';
-
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import { downloadBlob } from '@wordpress/blob';
 import type { Post, PostType } from './types';
 

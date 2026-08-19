@@ -1,18 +1,8 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-/**
- * WordPress dependencies
- */
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { safeHTML } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import { ItemSubmenuIcon } from '../navigation-link/icons';
 import {
 	getColors,

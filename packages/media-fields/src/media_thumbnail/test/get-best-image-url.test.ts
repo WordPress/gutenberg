@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getBestImageUrl } from '../view';
 
 type Media = Parameters< typeof getBestImageUrl >[ 0 ];

@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import _ComboboxControl from '..';
 import type { ComboboxControlOption, ComboboxControlProps } from '../types';
 
@@ -58,7 +47,7 @@ const getOptionSearchString = ( option: ComboboxControlOption ) =>
 	option.label.substring( 0, 11 );
 
 const ComboboxControl = ( props: ComboboxControlProps ) => {
-	return <_ComboboxControl { ...props } __next40pxDefaultSize />;
+	return <_ComboboxControl { ...props } />;
 };
 
 const ControlledComboboxControl = ( {

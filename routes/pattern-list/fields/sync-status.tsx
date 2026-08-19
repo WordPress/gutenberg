@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __, _x } from '@wordpress/i18n';
 import { privateApis as patternPrivateApis } from '@wordpress/patterns';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../lock-unlock';
+import { unlock } from '@wordpress/routes-lock-unlock';
 import type { NormalizedPattern } from '../use-patterns';
 
 const { PATTERN_SYNC_TYPES } = unlock( patternPrivateApis );

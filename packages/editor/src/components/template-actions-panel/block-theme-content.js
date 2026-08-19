@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	useEntityRecord,
@@ -11,19 +8,16 @@ import { BlockPreview } from '@wordpress/block-editor';
 import {
 	PanelBody,
 	Button,
-	Tooltip,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
+import { ENTER, SPACE } from '@wordpress/keycodes';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
+import { Tooltip } from '@wordpress/ui';
 import { store as editorStore } from '../../store';
 import CreateNewTemplateModal from '../post-template/create-new-template-modal';
 import { SwapTemplateModal } from '../post-template/swap-template-button';
@@ -117,18 +111,31 @@ export default function TemplateActionsPanelContent() {
 		if ( hasSwapTargets ) {
 			const tooltipText = __( 'Change template' );
 			return (
-				<Tooltip text={ tooltipText }>
-					<div
-						className="editor-template-actions-panel__preview"
-						role="button"
-						tabIndex={ 0 }
-						aria-label={ tooltipText }
-						onClick={ () => setIsSwapModalOpen( true ) }
-						onKeyPress={ () => setIsSwapModalOpen( true ) }
-					>
-						{ previewContent }
-					</div>
-				</Tooltip>
+				<Tooltip.Root>
+					<Tooltip.Trigger
+						render={
+							<div
+								className="editor-template-actions-panel__preview"
+								role="button"
+								tabIndex={ 0 }
+								aria-label={ tooltipText }
+								onClick={ () => setIsSwapModalOpen( true ) }
+								onKeyDown={ ( event ) => {
+									if (
+										event.keyCode === ENTER ||
+										event.keyCode === SPACE
+									) {
+										event.preventDefault();
+										setIsSwapModalOpen( true );
+									}
+								} }
+							>
+								{ previewContent }
+							</div>
+						}
+					/>
+					<Tooltip.Popup>{ tooltipText }</Tooltip.Popup>
+				</Tooltip.Root>
 			);
 		}
 

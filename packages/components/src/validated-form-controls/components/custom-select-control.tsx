@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { ControlWithError } from '../control-with-error';
 import type { ValidatedControlProps } from './types';
 import CustomSelectControl from '../../custom-select-control';
@@ -16,10 +9,7 @@ const UnforwardedValidatedCustomSelectControl = (
 		customValidity,
 		markWhenOptional,
 		...restProps
-	}: Omit<
-		React.ComponentProps< typeof CustomSelectControl >,
-		'__next40pxDefaultSize'
-	> &
+	}: React.ComponentProps< typeof CustomSelectControl > &
 		ValidatedControlProps,
 	forwardedRef: React.ForwardedRef< HTMLDivElement >
 ) => {
@@ -39,7 +29,6 @@ const UnforwardedValidatedCustomSelectControl = (
 				<CustomSelectControl
 					// TODO: Upstream limitation - Required isn't passed down correctly,
 					// so it needs to be set on a delegate element.
-					__next40pxDefaultSize
 					{ ...restProps }
 				/>
 			</ControlWithError>

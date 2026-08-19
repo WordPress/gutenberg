@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { external } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 
 export default function PostViewLink() {
@@ -24,7 +17,7 @@ export default function PostViewLink() {
 			return {
 				permalink: select( editorStore ).getPermalink(),
 				isPublished: select( editorStore ).isCurrentPostPublished(),
-				label: postType?.labels.view_item,
+				label: postType?.labels?.view_item,
 				hasLoaded: !! postType,
 				showIconLabels: get( 'core', 'showIconLabels' ),
 			};

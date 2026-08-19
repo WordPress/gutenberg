@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useRefEffect, useMergeRefs } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { isTextField } from '@wordpress/dom';
@@ -14,10 +11,6 @@ import {
 	ESCAPE,
 	TAB,
 } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 
 /**
@@ -129,6 +122,12 @@ export function useTypingObserver() {
 			if ( isTyping ) {
 				let timerId;
 
+				// Capture the window reference while the node is still
+				// attached. Reusing the reference we held at mount keeps the
+				// cleanup and the handlers working against the same window
+				// we set things up on.
+				const { defaultView } = node.ownerDocument;
+
 				/**
 				 * Stops typing when focus transitions to a non-text field element.
 				 *
@@ -141,7 +140,7 @@ export function useTypingObserver() {
 					// before the keydown event, wait until after current stack
 					// before evaluating whether typing is to be stopped. Otherwise,
 					// typing will re-start.
-					timerId = node.ownerDocument.defaultView.setTimeout( () => {
+					timerId = defaultView.setTimeout( () => {
 						if ( ! isTextField( target ) ) {
 							stopTyping();
 						}
@@ -168,8 +167,7 @@ export function useTypingObserver() {
 				 * uncollapsed (shift) selection.
 				 */
 				function stopTypingOnSelectionUncollapse() {
-					const selection =
-						node.ownerDocument.defaultView.getSelection();
+					const selection = defaultView.getSelection();
 					if ( ! selection.isCollapsed ) {
 						stopTyping();
 					}
@@ -184,7 +182,7 @@ export function useTypingObserver() {
 				);
 
 				return () => {
-					node.ownerDocument.defaultView.clearTimeout( timerId );
+					defaultView.clearTimeout( timerId );
 					node.removeEventListener(
 						'focus',
 						stopTypingOnNonTextField

@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import type { Field, View, Form } from '@wordpress/dataviews';
 import { DataForm, DataViews } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import {
 	altTextField,
 	attachedToField,

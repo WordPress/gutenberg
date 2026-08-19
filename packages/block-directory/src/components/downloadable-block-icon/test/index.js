@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import DownloadableBlockIcon from '../';
 
 const IMAGE_URL = 'https://ps.w.org/listicles/assets/icon-128x128.png';

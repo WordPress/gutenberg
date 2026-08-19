@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useReducer } from '@wordpress/element';
 import {
@@ -8,10 +5,6 @@ import {
 	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 } from '@wordpress/components';
 import { link, keyboardReturn, arrowLeft } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import URLInput from './';
 
 /**

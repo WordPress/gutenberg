@@ -1,8 +1,4 @@
 /* eslint-disable testing-library/render-result-naming-convention */
-
-/**
- * Internal dependencies
- */
 import {
 	Component,
 	createContext,

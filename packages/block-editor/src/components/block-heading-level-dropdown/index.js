@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { ToolbarDropdownMenu } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import HeadingLevelIcon from './heading-level-icon';
 
 const HEADING_LEVELS = [ 1, 2, 3, 4, 5, 6 ];

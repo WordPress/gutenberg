@@ -2,7 +2,11 @@
 	{
 		"name": "core/icon",
 		"isValid": true,
-		"attributes": {},
+		"attributes": {
+			"flipHorizontal": false,
+			"flipVertical": false,
+			"rotation": 0
+		},
 		"innerBlocks": []
 	}
 ]

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { SVG, Path } from '@wordpress/components';
 import { isRTL } from '@wordpress/i18n';
 

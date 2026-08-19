@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	MenuItem,
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -12,10 +9,6 @@ import { useState } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { addQueryArgs } from '@wordpress/url';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { store as patternsStore } from '../store';
 import { unlock } from '../lock-unlock';
 
@@ -112,25 +105,15 @@ function PatternsManageButton( { clientId, onClose } ) {
 			{ canDetach && (
 				<>
 					<MenuItem onClick={ () => setShowConfirmDialog( true ) }>
-						{ isSyncedPattern
-							? __( 'Disconnect pattern' )
-							: __( 'Detach pattern' ) }
+						{ __( 'Detach' ) }
 					</MenuItem>
 					<ConfirmDialog
 						isOpen={ showConfirmDialog }
 						onConfirm={ handleDetach }
 						onCancel={ () => setShowConfirmDialog( false ) }
-						confirmButtonText={
-							isSyncedPattern
-								? __( 'Disconnect' )
-								: __( 'Detach' )
-						}
+						confirmButtonText={ __( 'Detach' ) }
 						size="medium"
-						title={
-							isSyncedPattern
-								? __( 'Disconnect pattern?' )
-								: __( 'Detach pattern?' )
-						}
+						title={ __( 'Detach pattern?' ) }
 						__experimentalHideHeader={ false }
 					>
 						{ isSyncedPattern

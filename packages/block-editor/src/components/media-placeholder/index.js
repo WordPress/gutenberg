@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	FormFileUpload,
@@ -20,10 +13,6 @@ import { useState, useEffect, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { keyboardReturn } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import MediaUpload from '../media-upload';
 import MediaUploadCheck from '../media-upload/check';
 import URLPopover from '../url-popover';
@@ -46,7 +35,6 @@ const InsertFromURLPopover = ( {
 			onSubmit={ onSubmit }
 		>
 			<InputControl
-				__next40pxDefaultSize
 				label={ __( 'URL' ) }
 				type="text" // Use text instead of URL to allow relative paths (e.g., /image/image.jpg)
 				hideLabelFromVision

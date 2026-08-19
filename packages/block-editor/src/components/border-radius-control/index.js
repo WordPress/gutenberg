@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	BaseControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
@@ -10,10 +7,6 @@ import {
 } from '@wordpress/components';
 import { useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import LinkedButton from './linked-button';
 import { useSettings } from '../use-settings';
 import { hasDefinedValues, hasMixedValues, getAllValue } from './utils';

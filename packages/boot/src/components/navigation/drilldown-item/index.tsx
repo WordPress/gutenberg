@@ -1,25 +1,13 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import {
 	FlexBlock,
 	__experimentalItem as Item,
-	// @ts-ignore
 	__experimentalHStack as HStack,
-	Icon,
+	Icon as WCIcon,
 } from '@wordpress/components';
 import { isRTL } from '@wordpress/i18n';
 import { chevronRightSmall, chevronLeftSmall } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { wrapIcon } from '../items';
 import type { IconType } from '../../../store/types';
 
@@ -81,7 +69,9 @@ export default function DrilldownItem( {
 			>
 				{ wrapIcon( icon, shouldShowPlaceholder ) }
 				<FlexBlock>{ children }</FlexBlock>
-				<Icon icon={ isRTL() ? chevronLeftSmall : chevronRightSmall } />
+				<WCIcon
+					icon={ isRTL() ? chevronLeftSmall : chevronRightSmall }
+				/>
 			</HStack>
 		</Item>
 	);

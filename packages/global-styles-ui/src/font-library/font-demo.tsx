@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
-import { __experimentalText as Text } from '@wordpress/components';
+import { __experimentalText as WCText } from '@wordpress/components';
 import { useContext, useEffect, useState, useRef } from '@wordpress/element';
 import type { FontFamily, FontFace } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { FontLibraryContext } from './context';
 import {
 	getFacePreviewStyle,
@@ -109,12 +102,12 @@ function FontDemo( { font, text }: FontDemoProps ) {
 					className="font-library__font-variant_demo-image"
 				/>
 			) : (
-				<Text
+				<WCText
 					style={ textDemoStyle }
 					className="font-library__font-variant_demo-text"
 				>
 					{ text }
-				</Text>
+				</WCText>
 			) }
 		</div>
 	);

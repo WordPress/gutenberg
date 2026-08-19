@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
@@ -21,7 +18,6 @@ export default function OverlayVisibilityControl( {
 } ) {
 	return (
 		<ToggleGroupControl
-			__next40pxDefaultSize
 			label={ __( 'Overlay Visibility' ) }
 			aria-label={ __( 'Configure overlay visibility' ) }
 			value={ overlayMenu }

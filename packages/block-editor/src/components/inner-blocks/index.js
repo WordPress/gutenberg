@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useMemo, memo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -14,10 +7,6 @@ import {
 	store as blocksStore,
 	__unstableGetInnerBlocksProps as getInnerBlocksProps,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import ButtonBlockAppender from './button-block-appender';
 import DefaultBlockAppender from './default-block-appender';
 import useNestedSettingsUpdate from './use-nested-settings-update';
@@ -105,7 +94,11 @@ function UncontrolledInnerBlocks( props ) {
 		EMPTY_OBJECT;
 
 	const { allowSizingOnChildren = false } = defaultLayoutBlockSupport;
-	const usedLayout = layout || defaultLayoutBlockSupport;
+	// The support is a config object, e.g. `{ allowSwitching: false, default: { type: 'flex' } }`,
+	// so the layout itself lives under `default`. Passing the config through would leave the
+	// context without a `type`, and consumers would resolve it to the flow layout.
+	const usedLayout =
+		layout || defaultLayoutBlockSupport.default || EMPTY_OBJECT;
 
 	const memoedLayout = useMemo(
 		() => ( {

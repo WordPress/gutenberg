@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useNavigate, useSearch } from '@wordpress/route';
 import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
@@ -12,12 +9,8 @@ import { Button, __experimentalHStack as HStack } from '@wordpress/components';
 import { seen } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 import { useEditorSettings } from '@wordpress/lazy-editor';
-
-/**
- * Internal dependencies
- */
+import { unlock } from '@wordpress/routes-lock-unlock';
 import './style.scss';
-import { unlock } from '../lock-unlock';
 
 const { GlobalStylesUIWrapper, GlobalStylesActionMenu } =
 	unlock( editorPrivateApis );
@@ -53,6 +46,7 @@ function Stage() {
 
 	return (
 		<Page
+			headingLevel={ 2 }
 			actions={
 				! isMobileViewport ? (
 					<HStack>
