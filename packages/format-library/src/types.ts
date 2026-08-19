@@ -149,14 +149,14 @@ export interface LinkFormatOptions {
 	cssClasses?: string;
 }
 
-export interface LinkFormatAttributes {
+export type LinkFormatAttributes = {
 	url: string;
 	type?: string;
 	id?: string;
 	target?: string;
 	rel?: string;
 	class?: string;
-}
+};
 
 export interface LinkFormat {
 	type: 'core/link';

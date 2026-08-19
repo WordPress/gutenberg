@@ -143,7 +143,7 @@ function InlineLinkUI( {
 
 			newValue = applyFormat(
 				inserted,
-				linkFormat as any,
+				linkFormat,
 				value.start,
 				value.start + newText.length
 			);
@@ -171,7 +171,7 @@ function InlineLinkUI( {
 			} );
 			newValue = applyFormat(
 				value,
-				linkFormat as any,
+				linkFormat,
 				boundary.start,
 				boundary.end
 			);
@@ -182,12 +182,7 @@ function InlineLinkUI( {
 			// can apply formats to it.
 			newValue = create( { text: newText } );
 			// Apply the new Link format to this new text value.
-			newValue = applyFormat(
-				newValue,
-				linkFormat as any,
-				0,
-				newText.length
-			);
+			newValue = applyFormat( newValue, linkFormat, 0, newText.length );
 
 			// Get the boundaries of the active link format.
 			const boundary = getFormatBoundary( value, {

@@ -110,7 +110,7 @@ function InlineLanguageUI( {
 								lang,
 								dir,
 							},
-						} as any )
+						} )
 					);
 					onClose();
 				} }
