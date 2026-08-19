@@ -58,6 +58,8 @@
 		{ "path": "packages/widget-primitives" },
 		{ "path": "packages/wordcount" },
 		{ "path": "packages/worker-threads" },
+		{ "path": "routes/dashboard" },
+		{ "path": "routes/site-health" },
 		{ "path": "storybook" },
 		{ "path": "test/e2e" },
 		{ "path": "test/performance" },

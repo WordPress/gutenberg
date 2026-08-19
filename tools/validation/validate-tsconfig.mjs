@@ -335,4 +335,53 @@ for ( const packageName of packagesWithTypes ) {
 	}
 }
 
+/*
+ * Route projects emit nothing and no other project references them, so only
+ * the root solution registration puts them under `npm run typecheck`.
+ */
+const routesWithTypes = glob
+	.sync( 'routes/*/tsconfig.json', { cwd: repoRoot } )
+	.map( ( tsconfigPath ) => basename( dirname( tsconfigPath ) ) );
+
+for ( const routeName of routesWithTypes ) {
+	const routeDir = resolve( repoRoot, 'routes', routeName );
+	const routeProject = join( routeDir, 'tsconfig.json' );
+
+	if ( ! rootSolutionReferences.has( routeProject ) ) {
+		reportError(
+			`Missing reference to "routes/${ routeName }" in tsconfig.json`
+		);
+	}
+
+	const packageJsonPath = join( routeDir, 'package.json' );
+	if ( ! existsSync( packageJsonPath ) ) {
+		continue;
+	}
+	const references = referencedProjects( routeProject );
+	const packageJson = JSON.parse( readFileSync( packageJsonPath, 'utf8' ) );
+	for ( const dependency of Object.keys( packageJson.dependencies ?? {} ) ) {
+		if ( ! dependency.startsWith( '@wordpress/' ) ) {
+			continue;
+		}
+		const dependencyPackageName = dependency.slice( '@wordpress/'.length );
+		if ( ! packagesWithTypes.includes( dependencyPackageName ) ) {
+			continue;
+		}
+		const dependencyProject = packageProjects(
+			dependencyPackageName
+		).srcProject;
+		if ( ! dependencyProject ) {
+			continue;
+		}
+		if ( ! references.has( dependencyProject ) ) {
+			reportError(
+				`Missing reference to "${ relative(
+					routeDir,
+					dependencyProject
+				) }" in ${ relative( repoRoot, routeProject ) }`
+			);
+		}
+	}
+}
+
 process.exit( hasErrors ? 1 : 0 );
