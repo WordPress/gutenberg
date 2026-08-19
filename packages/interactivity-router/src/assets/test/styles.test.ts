@@ -1,10 +1,54 @@
-import {
-	normalizeMedia,
-	updateStylesWithSCS,
-	preloadStyles,
-	applyStyles,
-	type StyleElement,
-} from '../styles';
+import type { StyleElement } from '../styles';
+
+type StylesModule = typeof import('../styles');
+
+let normalizeMedia: StylesModule[ 'normalizeMedia' ];
+let updateStylesWithSCS: StylesModule[ 'updateStylesWithSCS' ];
+let preloadStyles: StylesModule[ 'preloadStyles' ];
+let applyStyles: StylesModule[ 'applyStyles' ];
+
+/**
+ * Waits until all pending promises have been resolved.
+ */
+const flushPromises = () => new Promise( ( resolve ) => setTimeout( resolve ) );
+
+/**
+ * Loads a fresh instance of the styles module, mocking the response for the
+ * request of the initial page.
+ *
+ * The module requests the initial page as soon as it is imported, and that
+ * request is memoized, so the modules need to be reset for each test that
+ * requires a different initial page.
+ *
+ * @param html HTML of the initial page. When it is `null`, the response is not
+ *             ok, so the marking of the initial styles fails.
+ */
+const loadStylesModule = async ( html: string | null = null ) => {
+	jest.resetModules();
+	window.fetch = jest.fn( async () =>
+		html === null
+			? ( { ok: false } as unknown as Response )
+			: ( {
+					ok: true,
+					text: async () => html,
+			  } as unknown as Response )
+	);
+	( { normalizeMedia, updateStylesWithSCS, preloadStyles, applyStyles } =
+		await import( '../styles' ) );
+	// The initial page is requested when the module is imported.
+	await flushPromises();
+};
+
+/**
+ * Builds the HTML of an initial page containing the passed style elements.
+ *
+ * @param elements Style elements that the server response contains.
+ * @return HTML of the initial page.
+ */
+const createInitialPageHtml = ( elements: StyleElement[] ): string =>
+	`<html><head>${ elements
+		.map( ( element ) => element.outerHTML )
+		.join( '' ) }</head><body></body></html>`;
 
 /**
  * Mocks the `sheet` property for the
@@ -65,12 +109,16 @@ const createLinkElement = (
 describe( 'Router styles management', () => {
 	const parent = document.head;
 
-	beforeEach( () => {
+	beforeEach( async () => {
 		document.head.replaceChildren();
+		// By default, the initial page is not available, so the router manages
+		// every style element in the document.
+		await loadStylesModule();
 	} );
 
 	afterAll( () => {
 		document.head.replaceChildren();
+		delete ( window as Partial< Window > ).fetch;
 	} );
 
 	describe( 'updateStylesWithSCS', () => {
@@ -642,6 +690,270 @@ describe( 'Router styles management', () => {
 
 			// Check that media was preserved correctly.
 			expect( link.sheet!.media.mediaText ).toBe( 'print' );
+		} );
+	} );
+
+	// Tests for the list of style elements managed by the router, which
+	// excludes those injected by other client-side scripts.
+	describe( 'managed styles', () => {
+		/**
+		 * Mocks the `sheet` property of those style elements in the head that
+		 * don't have a usable one, as jsdom doesn't load link elements and the
+		 * style sheets it creates can lack the `media` object.
+		 */
+		const mockMissingSheets = () => {
+			document.head
+				.querySelectorAll< StyleElement >(
+					'style,link[rel=stylesheet]'
+				)
+				.forEach( ( element ) => {
+					if ( ! element.sheet ) {
+						mockSheet( element, {
+							disabled: false,
+							mediaText: element.media || 'all',
+						} );
+					} else if ( ! element.sheet.media ) {
+						mockSheet( element, {
+							disabled: element.sheet.disabled,
+							mediaText: element.media || 'all',
+						} );
+					}
+				} );
+		};
+
+		/**
+		 * Simulates a client-side navigation to a page containing the passed
+		 * style elements.
+		 *
+		 * @param elements Style elements of the new page.
+		 */
+		const navigateTo = async ( elements: StyleElement[] ) => {
+			const doc = document.implementation.createHTMLDocument();
+			doc.head.append( ...elements );
+
+			const promises = preloadStyles( doc );
+
+			// jsdom doesn't load link elements, so the event is simulated.
+			document.head
+				.querySelectorAll< StyleElement >( 'link[rel=stylesheet]' )
+				.forEach( ( link ) =>
+					link.dispatchEvent( new Event( 'load' ) )
+				);
+
+			mockMissingSheets();
+			applyStyles( await Promise.all( promises ) );
+		};
+
+		it( 'should request the initial page reusing the browser cache', async () => {
+			await loadStylesModule( createInitialPageHtml( [] ) );
+
+			expect( window.fetch ).toHaveBeenCalledWith( window.location.href, {
+				cache: 'force-cache',
+			} );
+		} );
+
+		it( 'should preserve style and link elements injected by other scripts', async () => {
+			const serverStyle = createStyleElement( 'server-style' );
+			const serverLink = createLinkElement( 'server-link' );
+			document.head.append( serverStyle, serverLink );
+			await loadStylesModule(
+				createInitialPageHtml( [ serverStyle, serverLink ] )
+			);
+
+			// Injected after the initial page was rendered.
+			const dynamicStyle = createStyleElement( 'dynamic-style' );
+			const dynamicLink = createLinkElement( 'dynamic-link' );
+			document.head.append( dynamicStyle, dynamicLink );
+
+			mockSheet( serverStyle, { disabled: false, mediaText: 'all' } );
+			mockSheet( serverLink, { disabled: false, mediaText: 'all' } );
+			mockSheet( dynamicStyle, { disabled: false, mediaText: 'all' } );
+			mockSheet( dynamicLink, { disabled: false, mediaText: 'all' } );
+
+			await navigateTo( [ createStyleElement( 'new-style' ) ] );
+
+			// The injected elements are left untouched.
+			expect( document.head.contains( dynamicStyle ) ).toBe( true );
+			expect( dynamicStyle ).not.toHaveAttribute( 'media', 'preload' );
+			expect( dynamicStyle.sheet!.disabled ).toBe( false );
+			expect( document.head.contains( dynamicLink ) ).toBe( true );
+			expect( dynamicLink ).not.toHaveAttribute( 'media', 'preload' );
+			expect( dynamicLink.sheet!.disabled ).toBe( false );
+
+			// The server-rendered elements are not in the new page.
+			expect( serverStyle.sheet!.disabled ).toBe( true );
+			expect( serverLink.sheet!.disabled ).toBe( true );
+		} );
+
+		it( 'should preserve elements injected while the new page is prepared', async () => {
+			const serverStyle = createStyleElement( 'server-style' );
+			document.head.appendChild( serverStyle );
+			await loadStylesModule( createInitialPageHtml( [ serverStyle ] ) );
+			mockSheet( serverStyle, { disabled: false, mediaText: 'all' } );
+
+			const doc = document.implementation.createHTMLDocument();
+			doc.head.append( createStyleElement( 'new-style' ) );
+			const promises = preloadStyles( doc );
+
+			// Injected once the new page has been prepared.
+			const dynamicStyle = createStyleElement( 'dynamic-style' );
+			document.head.appendChild( dynamicStyle );
+			mockSheet( dynamicStyle, { disabled: false, mediaText: 'all' } );
+
+			mockMissingSheets();
+			applyStyles( await Promise.all( promises ) );
+
+			expect( dynamicStyle.sheet!.disabled ).toBe( false );
+			expect( serverStyle.sheet!.disabled ).toBe( true );
+		} );
+
+		it( 'should not enable injected elements that other scripts disabled', async () => {
+			const serverStyle = createStyleElement( 'server-style' );
+			document.head.appendChild( serverStyle );
+			await loadStylesModule( createInitialPageHtml( [ serverStyle ] ) );
+
+			const dynamicStyle = createStyleElement( 'dynamic-style' );
+			document.head.appendChild( dynamicStyle );
+
+			mockSheet( serverStyle, { disabled: false, mediaText: 'all' } );
+			// Disabled by the script that injected it.
+			mockSheet( dynamicStyle, { disabled: true, mediaText: 'all' } );
+
+			await navigateTo( [ createStyleElement( 'new-style' ) ] );
+			expect( dynamicStyle.sheet!.disabled ).toBe( true );
+
+			// Even when the new page contains an equivalent element, which is
+			// inserted separately instead of reusing the injected one.
+			await navigateTo( [ createStyleElement( 'dynamic-style' ) ] );
+			expect( dynamicStyle.sheet!.disabled ).toBe( true );
+			expect(
+				document.head.querySelectorAll( '#dynamic-style' ).length
+			).toBe( 2 );
+		} );
+
+		it( 'should not manage injected elements when the initial page is prepared', async () => {
+			const serverStyle = createStyleElement( 'server-style' );
+			document.head.appendChild( serverStyle );
+			await loadStylesModule( createInitialPageHtml( [ serverStyle ] ) );
+
+			// Injected before the router prepares the initial page.
+			const dynamicStyle = createStyleElement( 'dynamic-style' );
+			document.head.appendChild( dynamicStyle );
+
+			mockSheet( serverStyle, { disabled: false, mediaText: 'all' } );
+			mockSheet( dynamicStyle, { disabled: false, mediaText: 'all' } );
+
+			// The router prepares the initial page with the current document.
+			const initialStyles = await Promise.all(
+				preloadStyles( window.document )
+			);
+
+			// Only the server-rendered element belongs to the initial page,
+			// and the injected one has not been moved.
+			expect( initialStyles ).toEqual( [ serverStyle ] );
+			expect( [ ...document.head.childNodes ] ).toEqual( [
+				serverStyle,
+				dynamicStyle,
+			] );
+			expect( dynamicStyle ).not.toHaveAttribute( 'media', 'preload' );
+
+			await navigateTo( [ createStyleElement( 'new-style' ) ] );
+
+			expect( dynamicStyle.sheet!.disabled ).toBe( false );
+			expect( dynamicStyle ).not.toHaveAttribute( 'media', 'preload' );
+			expect( serverStyle.sheet!.disabled ).toBe( true );
+		} );
+
+		it( 'should manage the elements inserted during a navigation', async () => {
+			const serverStyle = createStyleElement( 'server-style' );
+			document.head.appendChild( serverStyle );
+			await loadStylesModule( createInitialPageHtml( [ serverStyle ] ) );
+			mockSheet( serverStyle, { disabled: false, mediaText: 'all' } );
+
+			const newStyle = createStyleElement( 'new-style' );
+			await navigateTo( [ newStyle ] );
+
+			expect( newStyle.sheet!.disabled ).toBe( false );
+
+			// A second navigation to a page without that element disables it.
+			await navigateTo( [ createStyleElement( 'another-style' ) ] );
+
+			expect( newStyle.sheet!.disabled ).toBe( true );
+		} );
+
+		it( 'should manage every element when the initial page is not ok', async () => {
+			const serverStyle = createStyleElement( 'server-style' );
+			document.head.appendChild( serverStyle );
+			await loadStylesModule( null );
+
+			const dynamicStyle = createStyleElement( 'dynamic-style' );
+			document.head.appendChild( dynamicStyle );
+
+			mockSheet( serverStyle, { disabled: false, mediaText: 'all' } );
+			mockSheet( dynamicStyle, { disabled: false, mediaText: 'all' } );
+
+			await navigateTo( [ createStyleElement( 'new-style' ) ] );
+
+			expect( dynamicStyle.sheet!.disabled ).toBe( true );
+			expect( serverStyle.sheet!.disabled ).toBe( true );
+		} );
+
+		it( 'should manage every element when the initial page request fails', async () => {
+			jest.resetModules();
+			window.fetch = jest.fn( async () => {
+				throw new Error( 'Network error' );
+			} );
+			( {
+				normalizeMedia,
+				updateStylesWithSCS,
+				preloadStyles,
+				applyStyles,
+			} = await import( '../styles' ) );
+			await flushPromises();
+
+			const dynamicStyle = createStyleElement( 'dynamic-style' );
+			document.head.appendChild( dynamicStyle );
+			mockSheet( dynamicStyle, { disabled: false, mediaText: 'all' } );
+
+			await navigateTo( [ createStyleElement( 'new-style' ) ] );
+
+			expect( dynamicStyle.sheet!.disabled ).toBe( true );
+		} );
+
+		it( 'should restore the initial page styles when navigating back', async () => {
+			const serverStyle = createStyleElement( 'server-style' );
+			document.head.appendChild( serverStyle );
+			await loadStylesModule( createInitialPageHtml( [ serverStyle ] ) );
+
+			const dynamicStyle = createStyleElement( 'dynamic-style' );
+			document.head.appendChild( dynamicStyle );
+
+			mockSheet( serverStyle, { disabled: false, mediaText: 'all' } );
+			mockSheet( dynamicStyle, { disabled: false, mediaText: 'all' } );
+
+			// The router prepares and caches the initial page.
+			const initialStyles = await Promise.all(
+				preloadStyles( window.document )
+			);
+
+			// Navigation to another page.
+			const newStyle = createStyleElement( 'new-style' );
+			await navigateTo( [ newStyle ] );
+
+			expect( serverStyle.sheet!.disabled ).toBe( true );
+			expect( newStyle.sheet!.disabled ).toBe( false );
+			expect( dynamicStyle.sheet!.disabled ).toBe( false );
+
+			// Navigation back to the initial page, which applies the styles
+			// cached for it.
+			applyStyles( initialStyles );
+
+			expect( serverStyle.sheet!.disabled ).toBe( false );
+			expect( newStyle.sheet!.disabled ).toBe( true );
+
+			// The injected element was never touched.
+			expect( dynamicStyle.sheet!.disabled ).toBe( false );
+			expect( dynamicStyle ).not.toHaveAttribute( 'media', 'preload' );
 		} );
 	} );
 

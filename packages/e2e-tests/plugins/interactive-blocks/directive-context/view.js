@@ -67,6 +67,10 @@ const html = `
 			<button data-testid="async navigate" data-wp-on--click="actions.asyncNavigate">Async Navigate</button>
 		</div>`;
 
+// URL of the last counted navigation. It starts with the URL of the current
+// page, so the URL that the router assigns when it is imported is not counted.
+let lastNavigationUrl = window.location.href;
+
 const { actions, state } = store( 'directive-context-navigate', {
 	state: {
 		get navigationCount() {
@@ -106,7 +110,20 @@ const { actions, state } = store( 'directive-context-navigate', {
 	callbacks: {
 		updateNavigationCount() {
 			const { state: routerState } = store( 'core/router' );
-			if ( routerState.url && isNaN( state.__navigationCount ) ) {
+			// The URL is read unconditionally to keep the subscription to it.
+			// This callback can run more than once per navigation, e.g., when
+			// the initialization of `state.url` and the assignment of the new
+			// URL happen in different flushes, so notifications that don't
+			// change the URL are ignored. The URL is normalized because
+			// `navigate` can be called with a `URL` instance, while the
+			// popstate handler always assigns a string.
+			const { url } = routerState;
+			const currentUrl = url ? String( url ) : '';
+			if ( ! currentUrl || currentUrl === lastNavigationUrl ) {
+				return;
+			}
+			lastNavigationUrl = currentUrl;
+			if ( isNaN( state.__navigationCount ) ) {
 				state.__navigationCount = 0;
 			}
 			state.__navigationCount++;

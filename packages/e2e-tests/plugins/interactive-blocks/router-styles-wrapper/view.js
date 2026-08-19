@@ -25,6 +25,16 @@ const { state } = store( 'test/router-styles', {
 			yield actions.navigate( e.target.href, { force: true } );
 			state.clientSideNavigation = true;
 		} ),
+		addDynamicStyles() {
+			const style = document.createElement( 'style' );
+			style.textContent = '.dynamic-style { color: rgb(255, 0, 255); }';
+			document.head.appendChild( style );
+
+			const link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.href = state.dynamicLinkUrl;
+			document.head.appendChild( link );
+		},
 		*prefetch() {
 			state.prefetching = true;
 			const { ref } = getElement();

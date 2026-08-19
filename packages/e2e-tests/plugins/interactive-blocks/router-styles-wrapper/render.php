@@ -25,6 +25,16 @@ add_action(
 	}
 );
 
+/*
+ * URL of the style sheet that is injected dynamically from the client. It is
+ * not enqueued on purpose, so it is only present in the DOM after the
+ * `actions.addDynamicStyles` action runs.
+ */
+wp_interactivity_state(
+	'test/router-styles',
+	array( 'dynamicLinkUrl' => plugin_dir_url( __FILE__ ) . 'style-dynamic-link.css' )
+);
+
 $wrapper_attributes = get_block_wrapper_attributes();
 ?>
 <div <?php echo $wrapper_attributes; ?>>
@@ -60,6 +70,21 @@ $wrapper_attributes = get_block_wrapper_attributes();
 	<fieldset>
 		<legend>Rule order checker</legend>
 		<p data-testid="order-checker" class="order-checker">I should remain green</p>
+	</fieldset>
+
+	<!-- These get colored when styles are injected dynamically from the client. -->
+	<fieldset>
+		<legend>Dynamically injected styles</legend>
+		<p data-testid="dynamic-style" class="dynamic-style">Dynamic style</p>
+		<p data-testid="dynamic-link" class="dynamic-link">Dynamic link</p>
+		<div data-wp-interactive="test/router-styles">
+			<button
+				data-testid="add dynamic styles"
+				data-wp-on--click="actions.addDynamicStyles"
+			>
+				Add dynamic styles
+			</button>
+		</div>
 	</fieldset>
 
 	<!-- Links to pages with different blocks combination. -->

@@ -4,6 +4,7 @@ const COLOR_RED = 'rgb(255, 0, 0)';
 const COLOR_GREEN = 'rgb(0, 255, 0)';
 const COLOR_BLUE = 'rgb(0, 0, 255)';
 const COLOR_WRAPPER = 'rgb(160, 12, 60)';
+const COLOR_DYNAMIC = 'rgb(255, 0, 255)';
 
 test.describe( 'Router styles', () => {
 	test.beforeAll( async ( { interactivityUtils: utils } ) => {
@@ -527,6 +528,44 @@ test.describe( 'Router styles', () => {
 
 		// Unroute previous route handler for "red".
 		await page.unroute( redLink );
+	} );
+
+	test( 'should preserve dynamically injected styles across navigations', async ( {
+		page,
+	} ) => {
+		const csn = page.getByTestId( 'client-side navigation' );
+		const dynamicStyle = page.getByTestId( 'dynamic-style' );
+		const dynamicLink = page.getByTestId( 'dynamic-link' );
+
+		// Initially, no dynamic styles have been injected.
+		await expect( dynamicStyle ).toHaveCSS( 'color', COLOR_WRAPPER );
+		await expect( dynamicLink ).toHaveCSS( 'color', COLOR_WRAPPER );
+
+		// Inject a `style` tag and a `link` tag from the client.
+		await page.getByTestId( 'add dynamic styles' ).click();
+
+		await expect( dynamicStyle ).toHaveCSS( 'color', COLOR_DYNAMIC );
+		await expect( dynamicLink ).toHaveCSS( 'color', COLOR_DYNAMIC );
+
+		await page.getByTestId( 'link red' ).click();
+
+		// This element disappears when a navigation starts.
+		// It should be visible again after a successful navigation.
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+
+		// Styles injected from the client should survive the navigation.
+		await expect( dynamicStyle ).toHaveCSS( 'color', COLOR_DYNAMIC );
+		await expect( dynamicLink ).toHaveCSS( 'color', COLOR_DYNAMIC );
+
+		await page.getByTestId( 'link all' ).click();
+
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+
+		// They should also survive subsequent navigations.
+		await expect( dynamicStyle ).toHaveCSS( 'color', COLOR_DYNAMIC );
+		await expect( dynamicLink ).toHaveCSS( 'color', COLOR_DYNAMIC );
 	} );
 
 	test( 'should ignore styles inside noscript elements during navigation', async ( {

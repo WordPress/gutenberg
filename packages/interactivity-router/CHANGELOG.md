@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Preserve style sheets injected dynamically by other client-side scripts across client-side navigations ([#81600](https://github.com/WordPress/gutenberg/pull/81600)).
+
 ## 2.53.0 (2026-08-12)
 
 
