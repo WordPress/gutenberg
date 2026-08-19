@@ -391,14 +391,6 @@
 			"count": 6
 		}
 	},
-	"packages/block-library/src/navigation-link/link-ui/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"react-hooks/refs": {
-			"count": 4
-		}
-	},
 	"packages/block-library/src/navigation-link/link-ui/page-creator.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
