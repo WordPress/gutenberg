@@ -64,6 +64,11 @@ class Gutenberg_Widget_Type_Composer_Site_Health_Counts_Block_Test extends WP_Un
 		$this->assertStringContainsString( '15', $rendered );
 		$this->assertStringContainsString( 'Should be improved', $rendered );
 		$this->assertStringContainsString( 'Critical', $rendered );
+
+		// The render is a core-block composition resolved by a nested
+		// `do_blocks()`, not hand-rolled markup.
+		$this->assertStringContainsString( 'wp-block-group', $rendered );
+		$this->assertStringContainsString( 'wp-block-list', $rendered );
 	}
 
 	public function test_casts_string_counts() {
