@@ -103,20 +103,22 @@ export default function QuickInserter( {
 					selectBlockOnInsert={ selectBlockOnInsert }
 					isQuick
 				/>
+				{ setInserterIsOpened && (
+					<div className="block-editor-inserter__quick-inserter-expand">
+						<Button
+							className="block-editor-inserter__quick-inserter-expand-toggle"
+							__next40pxDefaultSize
+							variant="secondary"
+							onClick={ onBrowseAll }
+							aria-label={ __(
+								'Browse all. This will open the main inserter panel in the editor toolbar.'
+							) }
+						>
+							{ __( 'Browse all' ) }
+						</Button>
+					</div>
+				) }
 			</div>
-
-			{ setInserterIsOpened && (
-				<Button
-					__next40pxDefaultSize
-					className="block-editor-inserter__quick-inserter-expand"
-					onClick={ onBrowseAll }
-					aria-label={ __(
-						'Browse all. This will open the main inserter panel in the editor toolbar.'
-					) }
-				>
-					{ __( 'Browse all' ) }
-				</Button>
-			) }
 		</div>
 	);
 }
