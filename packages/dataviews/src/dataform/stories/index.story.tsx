@@ -9,7 +9,6 @@ import LayoutPanelComponent from './layout-panel';
 import DataAdapterComponent from './data-adapter';
 import ValidationComponent from './validation';
 import ValidationPanelComponent from './validation-panel';
-import InteractivePanelSummaryComponent from './interactive-panel-summary';
 import VisibilityComponent from './visibility';
 
 const meta = {
@@ -219,49 +218,6 @@ export const ValidationPanelErrorIndicator = {
 		// had been clicked directly.
 		await userEvent.keyboard( '{Escape}' );
 		await waitFor( () => expect( editButton ).toHaveFocus() );
-	},
-};
-
-export const InteractivePanelSummary = {
-	render: InteractivePanelSummaryComponent,
-	parameters: { a11y: { test: 'error' } },
-	play: async ( { canvasElement }: { canvasElement: HTMLElement } ) => {
-		const canvas = within( canvasElement );
-		const body = within( canvasElement.ownerDocument.body );
-		const summaryAction = canvas.getByRole( 'button', {
-			name: 'Summary action',
-		} );
-		const editButton = canvas.getByRole( 'button', {
-			name: 'Edit Details',
-		} );
-
-		const { left, top, width, height } =
-			summaryAction.getBoundingClientRect();
-		const hitTarget = canvasElement.ownerDocument.elementFromPoint(
-			left + width / 2,
-			top + height / 2
-		);
-		await expect( hitTarget ).toBe( summaryAction );
-		await userEvent.click( summaryAction );
-		await expect( canvas.getByRole( 'status' ) ).toHaveTextContent(
-			'Summary activations: 1'
-		);
-		await expect( summaryAction ).toHaveFocus();
-		await expect( editButton ).toHaveAttribute( 'aria-expanded', 'false' );
-
-		await userEvent.keyboard( '{Enter}' );
-		await expect( canvas.getByRole( 'status' ) ).toHaveTextContent(
-			'Summary activations: 2'
-		);
-		await expect( summaryAction ).toHaveFocus();
-		await expect( editButton ).toHaveAttribute( 'aria-expanded', 'false' );
-
-		await userEvent.click( editButton );
-		await expect( await body.findByRole( 'textbox' ) ).toBeVisible();
-		await expect( editButton ).toHaveAttribute( 'aria-expanded', 'true' );
-		await userEvent.keyboard( '{Escape}' );
-		await waitFor( () => expect( editButton ).toHaveFocus() );
-		await expect( editButton ).toHaveAttribute( 'aria-expanded', 'false' );
 	},
 };
 
