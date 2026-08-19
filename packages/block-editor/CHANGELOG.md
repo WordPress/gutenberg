@@ -12,6 +12,7 @@
 
 ### Bug Fixes
 
+-   `MediaPlaceholder`: Identify blocks dragged from the canvas when deciding whether a drag may be dropped. Canvas drags carry only a client id reference, so the `wp-block:*` type names the check relied on are only ever present on drags started from the inserter. The check now falls back to the dragged blocks recorded in the store, and no longer treats a drag it cannot identify as eligible.
 -   `InnerBlocks`: Resolve the `default` of a block's `layout` support before providing it to inner blocks. A block that declared its layout only as a support default, such as the Gallery, previously handed its children the raw support config, which has no `type`, so the children resolved to the flow layout instead. As a result an Image nested in a Gallery offered left/center/right alignment, which the flex layout does not permit ([#81606](https://github.com/WordPress/gutenberg/pull/81606)).
 -   Never apply Spotlight mode in a preview canvas, which cannot be edited and so rendered most of its content faded ([#81615](https://github.com/WordPress/gutenberg/pull/81615)).
 -   Grid: Keep child layout changes made with the resizer scoped to the selected viewport.
