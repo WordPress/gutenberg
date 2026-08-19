@@ -29,6 +29,9 @@ export function toDate( value: Date | number | undefined ): Date | undefined {
  * `BaseProps` surface is common to both.
  */
 export const SHARED_ARG_TYPES = {
+	localeCode: {
+		control: 'text',
+	},
 	locale: {
 		options: [
 			'English (US)',

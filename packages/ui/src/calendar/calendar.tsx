@@ -25,6 +25,7 @@ export const Calendar = forwardRef< HTMLDivElement, CalendarProps >(
 			onValueChange,
 			numberOfMonths = 1,
 			locale = enUS,
+			localeCode,
 			timeZone,
 			month,
 			render,
@@ -35,6 +36,7 @@ export const Calendar = forwardRef< HTMLDivElement, CalendarProps >(
 	) {
 		const localizationProps = useLocalizationProps( {
 			locale,
+			localeCode,
 			timeZone,
 			mode: 'single',
 		} );

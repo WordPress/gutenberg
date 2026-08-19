@@ -23,6 +23,22 @@ function isLocaleRTL( localeCode: string ) {
 	].includes( localeObj.language );
 }
 
+function getSupportedLocaleCode( localeCode: string | undefined ) {
+	if ( ! localeCode ) {
+		return;
+	}
+
+	let supportedLocaleCode: string | undefined;
+	try {
+		supportedLocaleCode = Intl.DateTimeFormat.supportedLocalesOf( [
+			localeCode,
+		] )[ 0 ];
+	} catch {
+		// Invalid BCP 47 language tags are expected to use the fallback locale.
+	}
+	return supportedLocaleCode;
+}
+
 /**
  * Returns localization props for the calendar components.
  *
@@ -32,45 +48,62 @@ function isLocaleRTL( localeCode: string ) {
  * - It is possible for the translated strings to use a different locale
  *   than the formatted dates and the computed `dir`. This is because the
  *   translation function doesn't expose the locale used for the translated
- *   strings, meaning that the dates are formatted using the `locale` prop.
+ *   strings, meaning that dates are formatted using the date locale props.
  *   For a correct localized experience, consumers should make sure that
- *   translation context and `locale` prop are consistent.
+ *   translation context and date-text locale are consistent.
  * @param props
  * @param props.locale
+ * @param props.localeCode
  * @param props.timeZone
  * @param props.mode
  */
 export const useLocalizationProps = ( {
 	locale,
+	localeCode: localeCodeProp,
 	timeZone,
 	mode,
 }: {
 	locale: NonNullable< BaseProps[ 'locale' ] >;
+	localeCode: BaseProps[ 'localeCode' ];
 	timeZone: BaseProps[ 'timeZone' ];
 	mode: 'single' | 'range';
 } ) => {
 	return useMemo( () => {
+		const localeCode =
+			getSupportedLocaleCode( localeCodeProp ) ??
+			getSupportedLocaleCode( locale.code ) ??
+			'en-US';
+
 		// ie. April 2025
-		const monthNameFormatter = new Intl.DateTimeFormat( locale.code, {
+		const monthNameFormatter = new Intl.DateTimeFormat( localeCode, {
+			calendar: 'gregory',
 			year: 'numeric',
 			month: 'long',
 			timeZone,
 		} );
 		// ie. M, T, W, T, F, S, S
-		const weekdayNarrowFormatter = new Intl.DateTimeFormat( locale.code, {
+		const weekdayNarrowFormatter = new Intl.DateTimeFormat( localeCode, {
+			calendar: 'gregory',
 			weekday: 'narrow',
 			timeZone,
 		} );
 		// ie. Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday
-		const weekdayLongFormatter = new Intl.DateTimeFormat( locale.code, {
+		const weekdayLongFormatter = new Intl.DateTimeFormat( localeCode, {
+			calendar: 'gregory',
 			weekday: 'long',
 			timeZone,
 		} );
 		// ie. Monday, April 29, 2025
-		const fullDateFormatter = new Intl.DateTimeFormat( locale.code, {
+		const fullDateFormatter = new Intl.DateTimeFormat( localeCode, {
+			calendar: 'gregory',
 			weekday: 'long',
 			year: 'numeric',
 			month: 'long',
+			day: 'numeric',
+			timeZone,
+		} );
+		const dayNumberFormatter = new Intl.DateTimeFormat( localeCode, {
+			calendar: 'gregory',
 			day: 'numeric',
 			timeZone,
 		} );
@@ -156,8 +189,12 @@ export const useLocalizationProps = ( {
 					weekdayLongFormatter.format( date ),
 			},
 			locale,
-			dir: isLocaleRTL( locale.code ) ? 'rtl' : 'ltr',
+			lang: localeCode,
+			dir: isLocaleRTL( localeCode ) ? 'rtl' : 'ltr',
 			formatters: {
+				formatDay: ( date: Date ) => {
+					return dayNumberFormatter.format( date );
+				},
 				formatWeekdayName: ( date: Date ) => {
 					return weekdayNarrowFormatter.format( date );
 				},
@@ -167,5 +204,5 @@ export const useLocalizationProps = ( {
 			},
 			timeZone,
 		} as const;
-	}, [ locale, timeZone, mode ] );
+	}, [ locale, localeCodeProp, timeZone, mode ] );
 };

@@ -141,6 +141,7 @@ export const RangeCalendar = forwardRef< HTMLDivElement, RangeCalendarProps >(
 			max,
 			disabled,
 			locale = enUS,
+			localeCode,
 			timeZone,
 			month,
 			render,
@@ -151,6 +152,7 @@ export const RangeCalendar = forwardRef< HTMLDivElement, RangeCalendarProps >(
 	) {
 		const localizationProps = useLocalizationProps( {
 			locale,
+			localeCode,
 			timeZone,
 			mode: 'range',
 		} );

@@ -225,7 +225,7 @@ export interface BaseProps
 	 * Use custom labels, useful for translating the component.
 	 *
 	 * For a correct localized experience, consumers should make sure the locale
-	 * used for the translated labels and `locale` prop are consistent.
+	 * used for translated labels and date text is consistent.
 	 */
 	labels?: {
 		/**
@@ -266,15 +266,28 @@ export interface BaseProps
 	};
 
 	/**
-	 * The locale object used to localize dates. Pass a locale from
-	 * `date-fns/locale` to localize the calendar.
+	 * The date-fns locale object used for calendar rules such as the default
+	 * first day of the week. Its `code` also localizes date text unless
+	 * `localeCode` is provided.
 	 *
 	 * For a correct localized experience, consumers should make sure the locale
-	 * used for the translated labels and `locale` prop are consistent.
+	 * used for translated labels and date text is consistent.
 	 * @see https://github.com/date-fns/date-fns/tree/main/src/locale for a list of the supported locales
 	 * @default The `enUS` locale from `date-fns/locale`
 	 */
 	locale?: Locale;
+	/**
+	 * The BCP 47 locale code used for date text, numerals, and the default text
+	 * direction. When provided, this takes precedence over `locale.code` for
+	 * those concerns. Invalid or unsupported codes fall back to `locale.code`,
+	 * then `en-US`.
+	 *
+	 * The calendar always uses a Gregorian date grid. This prop does not change
+	 * date-fns calendar rules such as the default first day of the week. Use the
+	 * `locale` or `weekStartsOn` prop for those rules.
+	 * @default The `code` from the `locale` prop
+	 */
+	localeCode?: string;
 	/**
 	 * The index of the first day of the week (0 - Sunday). Overrides the locale's
 	 * one.
