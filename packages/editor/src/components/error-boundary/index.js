@@ -1,12 +1,10 @@
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
 // eslint-disable-next-line @wordpress/use-recommended-components -- The fallback UI renders outside the editor's notice system.
-import { Collapsible, Notice, Stack, Text } from '@wordpress/ui';
+import { Card, CollapsibleCard, Notice, Stack, Text } from '@wordpress/ui';
 import { select } from '@wordpress/data';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { doAction } from '@wordpress/hooks';
-import { chevronDown } from '@wordpress/icons';
 import { store as editorStore } from '../../store';
 
 function getContent() {
@@ -116,26 +114,17 @@ function ErrorReport( { error, componentStack } ) {
 
 function ErrorDetails( { error, componentStack } ) {
 	return (
-		<Collapsible.Root className="editor-error-boundary__details">
-			<Collapsible.Trigger
-				render={
-					<Button
-						variant="tertiary"
-						size="compact"
-						icon={ chevronDown }
-						iconPosition="right"
-					/>
-				}
-			>
-				{ __( 'Show error details' ) }
-			</Collapsible.Trigger>
-			<Collapsible.Panel>
+		<CollapsibleCard.Root className="editor-error-boundary__details">
+			<CollapsibleCard.Header>
+				<Card.Title>{ __( 'Error details' ) }</Card.Title>
+			</CollapsibleCard.Header>
+			<CollapsibleCard.Content>
 				<ErrorReport
 					error={ error }
 					componentStack={ componentStack }
 				/>
-			</Collapsible.Panel>
-		</Collapsible.Root>
+			</CollapsibleCard.Content>
+		</CollapsibleCard.Root>
 	);
 }
 
