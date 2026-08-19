@@ -167,9 +167,35 @@ function srcProjectReferences( srcProject, packageName ) {
 	return collected;
 }
 
+/**
+ * Whether the package has TypeScript test or story files anywhere, which
+ * only a dev project checks. The single build project never sees them.
+ *
+ * @param {string} packageName Package directory name.
+ * @return {boolean} Whether dev files exist.
+ */
+function hasDevFiles( packageName ) {
+	return (
+		glob.sync( '**/{test,tests,__tests__,stories}/**/*.{ts,tsx}', {
+			cwd: resolve( repoRoot, 'packages', packageName ),
+			ignore: [ 'node_modules/**', 'build/**', 'build-*/**' ],
+		} ).length > 0 ||
+		glob.sync( '**/*.story.{ts,tsx}', {
+			cwd: resolve( repoRoot, 'packages', packageName ),
+			ignore: [ 'node_modules/**', 'build/**', 'build-*/**' ],
+		} ).length > 0
+	);
+}
+
 for ( const packageName of packagesWithTypes ) {
 	const { srcProject, devProject, storiesProject } =
 		packageProjects( packageName );
+
+	if ( ! devProject && hasDevFiles( packageName ) ) {
+		reportError(
+			`Missing dev project for the TypeScript test or story files of packages/${ packageName }`
+		);
+	}
 
 	if ( srcProject && ! buildSolutionReferences.has( srcProject ) ) {
 		reportError(
