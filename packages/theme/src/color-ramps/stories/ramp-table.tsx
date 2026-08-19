@@ -243,7 +243,7 @@ export const RampTable = forwardRef< HTMLDivElement, RampTableProps >(
 												seed.value,
 												ramp[ tokenName ]
 											)
-												? '3px dashed #996800'
+												? '3px dashed currentColor'
 												: '',
 											outlineOffset: '-3px',
 											color:
