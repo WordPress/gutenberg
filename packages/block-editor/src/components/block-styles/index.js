@@ -92,6 +92,15 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 		onHoverClassName( item?.name ?? null );
 	};
 
+	const onSetActiveId = ( nextActiveId ) => {
+		const nextStyle = stylesToRender.find(
+			( style ) => `${ instanceId }-${ style.name }` === nextActiveId
+		);
+		if ( nextStyle && nextStyle.name !== activeStyle.name ) {
+			onSelectStylePreview( nextStyle );
+		}
+	};
+
 	const defaultStyle = getDefaultStyle( stylesToRender );
 
 	const hasValue = () => {
@@ -125,7 +134,8 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 						role="radiogroup"
 						aria-label={ __( 'Styles' ) }
 						className="block-editor-block-styles__variants"
-						defaultActiveId={ `${ instanceId }-${ activeStyle.name }` }
+						activeId={ `${ instanceId }-${ activeStyle.name }` }
+						setActiveId={ onSetActiveId }
 						focusLoop
 						focusWrap
 						focusShift
