@@ -944,6 +944,18 @@ export default function SuggestionStoreInterceptor() {
 			// Externally-supplied content (see above): adopt it as the new
 			// capture baseline rather than diffing it as user intent.
 			if ( isExternalReset ) {
+				/*
+				 * An undo/redo lands here too: in the post editor it is
+				 * applied as a `resetBlocks`, so this branch — not the
+				 * drift branch below — is where the guard's armed adoption
+				 * token comes due. Consume it, because a token left armed
+				 * stays live for UNDO_ADOPTION_TTL_MS and the user's next
+				 * keystroke would spend it, adopting that edit as baseline
+				 * instead of capturing it as a suggestion. Resets that are
+				 * not an undo have no token armed, so this is a no-op for
+				 * them.
+				 */
+				consumeUndoRedoAdoptionRef.current?.();
 				adoptLiveTreeAsBaseline();
 				return;
 			}

@@ -661,6 +661,48 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		).toBe( 'Edited' );
 	} );
 
+	it( 'does not leave an undo adoption token armed after a resetBlocks', async () => {
+		// An undo/redo IS a `resetBlocks` in the post editor: the guard arms
+		// an adoption token, core-data reverts the `blocks` edit, and
+		// `useBlockSync` hands the result down. The external-reset branch
+		// adopts that landing, so it must also spend the token — a token left
+		// armed stays live for a second, and the user's very next keystroke
+		// would spend it and be adopted as baseline rather than captured.
+		const { registry, getOverlay } = setup();
+
+		await act( async () => {
+			getOverlay().armUndoRedoAdoption();
+		} );
+
+		const incoming = [
+			createBlock( TEST_BLOCK_NAME, { content: 'Undone' } ),
+		];
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).resetBlocks( incoming );
+		} );
+		await flushSubscribers();
+
+		// The keystroke that follows the undo is an ordinary suggestion.
+		const incomingClientId = incoming[ 0 ].clientId;
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( incomingClientId, {
+					content: 'Undone and typed',
+				} );
+		} );
+		await flushSubscribers();
+
+		expect(
+			registry
+				.select( blockEditorStore )
+				.getBlockAttributes( incomingClientId )?.content
+		).toBe( 'Undone' );
+		expect(
+			getOverlay().entries[ incomingClientId ]?.overlayAttributes?.content
+		).toBe( 'Undone and typed' );
+	} );
+
 	it( 'defers an empty default block, then registers a single insertion once it gains content', async () => {
 		// Regression: typing into a freshly-appended empty paragraph must
 		// produce ONE suggestion (the block insertion, content included) —
