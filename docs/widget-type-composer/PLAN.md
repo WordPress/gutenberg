@@ -157,7 +157,7 @@ Open after the re-home:
        2 ──▶ 4 ─┤
        2 ──▶ 5  │
               3,4 ──▶ 6
-       3 ──▶ 22
+       3 ──▶ 22 ──▶ 23
 1,5 ──▶ 7 ──▶ 8 ──▶ 9 ─┬─▶ 11 ─▶ 13 ─┐
                        ├─▶ 12         │
               9,6 ──▶ 10              │
@@ -197,6 +197,7 @@ Parallelizable once their deps are on the feature branch: {3,4,5}, {11,12},
 | 20  | style-control         | Style control       | 16         | todo   |
 | 21  | demos-and-docs        | Demos + docs        | 19, 17     | todo   |
 | 22  | def-actions           | Server framework    | 03         | done   |
+| 23  | site-health-def       | Server framework    | 22         | done   |
 
 ## Step details
 
@@ -204,6 +205,20 @@ Oracle paths below are on `recovered/widget-type-composer`. `WP-PRIM` =
 `packages/widget-primitives/src`, `WP-DASH` = `packages/widget-dashboard/src`,
 `COMP` = `lib/experimental/widget-type-composer`, `DASH` =
 `lib/experimental/dashboard-widgets`, `ABR` = `WP-PRIM/components/admin-block-renderer`.
+
+### 23 · site-health-def
+
+A second shipped definition, `core/site-health-overview`: a framed
+composition of static core blocks whose `Details` action targets the
+dashboard's own Site Health route, beside a `Status` action to the classic
+screen. The in-repo case for def actions materializing through the chrome,
+and, once the widget host links seam (WordPress/gutenberg#81740) lands, for
+a def action upgrading to the host router's link with no definition change.
+
+-   Files: `COMP/core-widget-defs.php` (composition + registration), tests.
+-   Accept: the def resolves into the registry with both actions surviving
+    the gate and the in-app href intact; the widget renders framed through
+    the SSR fallback with `Details` in the footer.
 
 ### 22 · def-actions
 

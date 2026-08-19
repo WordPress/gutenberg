@@ -80,6 +80,39 @@ function gutenberg_get_composition_demo_content() {
 }
 
 /**
+ * Returns the composition for the Site Health Overview definition.
+ *
+ * Static core blocks, every one resolved through the SSR fallback. The
+ * overview stays declarative; the live results belong to the Site Health
+ * page its `Details` action targets.
+ *
+ * Spacing is inline because the dashboard does not enqueue
+ * `wp-block-library`, so the block classes resolve to nothing.
+ *
+ * @return string Block markup.
+ */
+function gutenberg_get_site_health_overview_content() {
+	$item_style = 'margin:0 0 4px;';
+
+	return '<!-- wp:paragraph -->' .
+		'<p style="margin:0 0 12px;">' .
+		esc_html__( 'WordPress runs periodic health checks covering performance and security.', 'gutenberg' ) .
+		'</p><!-- /wp:paragraph -->' .
+		'<!-- wp:list -->' .
+		'<ul class="wp-block-list" style="margin:0;padding-left:20px;">' .
+		'<!-- wp:list-item --><li style="' . esc_attr( $item_style ) . '">' .
+		esc_html__( 'Background updates', 'gutenberg' ) .
+		'</li><!-- /wp:list-item -->' .
+		'<!-- wp:list-item --><li style="' . esc_attr( $item_style ) . '">' .
+		esc_html__( 'Loopback requests', 'gutenberg' ) .
+		'</li><!-- /wp:list-item -->' .
+		'<!-- wp:list-item --><li style="margin:0;">' .
+		esc_html__( 'HTTPS status', 'gutenberg' ) .
+		'</li><!-- /wp:list-item -->' .
+		'</ul><!-- /wp:list -->';
+}
+
+/**
  * Registers the widget definitions Gutenberg ships.
  */
 function gutenberg_register_core_widget_defs() {
@@ -100,6 +133,34 @@ function gutenberg_register_core_widget_defs() {
 				),
 			),
 			'content'      => gutenberg_get_composition_demo_content(),
+		)
+	);
+
+	gutenberg_register_widget_def(
+		'core/site-health-overview',
+		array(
+			'title'        => __( 'Site Health Overview', 'gutenberg' ),
+			'description'  => __( 'A composed overview of the site health checks, linking to the full results.', 'gutenberg' ),
+			'icon'         => 'core/shield',
+			'category'     => 'site',
+			'presentation' => 'framed',
+			'actions'      => array(
+				array(
+					'id'        => 'site-health-overview-details',
+					'label'     => __( 'Details', 'gutenberg' ),
+					'icon'      => 'core/chart-bar',
+					'relevance' => 'high',
+					'href'      => 'admin.php?page=dashboard-wp-admin&p=/site-health',
+				),
+				array(
+					'id'        => 'site-health-overview-status',
+					'label'     => __( 'Status', 'gutenberg' ),
+					'icon'      => 'dashboard-widgets/seen',
+					'relevance' => 'medium',
+					'href'      => 'site-health.php',
+				),
+			),
+			'content'      => gutenberg_get_site_health_overview_content(),
 		)
 	);
 }
