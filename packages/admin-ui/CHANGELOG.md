@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Update the Ectoplasm admin color scheme's primary color to be brighter ([#81127](https://github.com/WordPress/gutenberg/pull/81127)).
+
 ### Bug Fixes
 
 -   `getAdminThemeColors`: Fix the primary color of the Fresh scheme ([#81618](https://github.com/WordPress/gutenberg/pull/81618)).

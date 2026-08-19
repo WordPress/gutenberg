@@ -23,6 +23,7 @@
 ### Enhancements
 
 -   `outset-ring__focus`: Allow overriding the focus ring color via the `--focus-color` custom property ([#80587](https://github.com/WordPress/gutenberg/pull/80587)).
+-   Update the Ectoplasm admin color scheme's primary color to be brighter ([#81127](https://github.com/WordPress/gutenberg/pull/81127)).
 
 ### Bug Fixes
 

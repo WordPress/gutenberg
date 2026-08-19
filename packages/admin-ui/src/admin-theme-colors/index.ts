@@ -15,7 +15,7 @@ const ADMIN_THEME_COLORS = new Map< string, AdminThemeColors >( [
 	[ 'coffee', { primary: '#916745', background: '#5b534d' } ],
 	[ 'ocean', { primary: '#567958', background: '#5f787f' } ],
 	[ 'blue', { primary: '#437aa8', background: '#3876a8' } ],
-	[ 'ectoplasm', { primary: '#646c3e', background: '#4f386e' } ],
+	[ 'ectoplasm', { primary: '#608010', background: '#4f386e' } ],
 	[ 'sunrise', { primary: '#ad631e', background: '#cc4541' } ],
 	[ 'light', { primary: '#007cba', background: '#eaeeed' } ],
 ] );
