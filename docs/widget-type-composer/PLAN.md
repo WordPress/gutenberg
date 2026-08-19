@@ -157,7 +157,7 @@ Open after the re-home:
        2 ──▶ 4 ─┤
        2 ──▶ 5  │
               3,4 ──▶ 6
-       3 ──▶ 22 ──▶ 23
+       3 ──▶ 22 ──▶ 23 ──▶ 24
 1,5 ──▶ 7 ──▶ 8 ──▶ 9 ─┬─▶ 11 ─▶ 13 ─┐
                        ├─▶ 12         │
               9,6 ──▶ 10              │
@@ -198,6 +198,7 @@ Parallelizable once their deps are on the feature branch: {3,4,5}, {11,12},
 | 21  | demos-and-docs        | Demos + docs        | 19, 17     | todo   |
 | 22  | def-actions           | Server framework    | 03         | done   |
 | 23  | site-health-def       | Server framework    | 22         | done   |
+| 24  | site-health-counts    | Server framework    | 23         | done   |
 
 ## Step details
 
@@ -205,6 +206,23 @@ Oracle paths below are on `recovered/widget-type-composer`. `WP-PRIM` =
 `packages/widget-primitives/src`, `WP-DASH` = `packages/widget-dashboard/src`,
 `COMP` = `lib/experimental/widget-type-composer`, `DASH` =
 `lib/experimental/dashboard-widgets`, `ABR` = `WP-PRIM/components/admin-block-renderer`.
+
+### 24 · site-health-counts
+
+The `widget-def/site-health-counts` dynamic block: a `render_callback` that
+reads the `health-check-site-status-result` transient (the cached counts
+core's Site Health screen maintains) and renders the three counts, gated on
+`view_site_health_checks`. The Site Health Overview composition swaps its
+static list for the block, so the same definition now carries live backend
+data through `do_blocks()` with no dedicated data endpoint: the server lane
+for composition data.
+
+-   Files: `COMP/site-health-counts-block.php` (registration + render),
+    `COMP/core-widget-defs.php` (composition swap), `COMP/load.php`, tests.
+-   Accept: with the transient set the block renders the three counts; absent
+    or malformed results render the empty state naming the next step; below
+    the capability it renders nothing; the shipped composition resolves
+    through the registry unchanged otherwise.
 
 ### 23 · site-health-def
 

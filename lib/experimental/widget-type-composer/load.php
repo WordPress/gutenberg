@@ -22,3 +22,6 @@ require_once __DIR__ . '/core-widget-defs.php';
 
 // The `core/instance-attribute` binding source for per-instance attribute values.
 require_once __DIR__ . '/instance-attribute-source.php';
+
+// The `widget-def/site-health-counts` dynamic block for composed definitions.
+require_once __DIR__ . '/site-health-counts-block.php';

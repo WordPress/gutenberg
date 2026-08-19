@@ -68,3 +68,9 @@ server-defined origins (code-registered and cpt) share.
 - [ ] The client-side SSR fallback (step 10) consumes this endpoint for blocks
   with no admin component; the binding source is consumed by the bindings layer
   (step 13).
+- [ ] The endpoint gates at `current_user_can( 'read' )` while rendering
+  arbitrary posted markup, so its effective surface is every registered
+  dynamic block; per-block capability checks are the only guard (step 24's
+  counts block re-applies `view_site_health_checks`). Revisit whether the
+  endpoint should gate higher, or resolve content by definition name instead
+  of accepting raw markup.
