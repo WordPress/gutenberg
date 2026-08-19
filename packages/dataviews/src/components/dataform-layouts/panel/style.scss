@@ -135,6 +135,12 @@
 	word-break: break-word;
 	font-weight: var(--wpds-typography-font-weight-emphasis);
 
+	// Keep summary links and buttons in front of the edit button's stretched
+	// hit area so they remain independently interactive.
+	&:has(a, button) {
+		z-index: 1;
+	}
+
 	> * {
 		min-width: 0;
 	}
