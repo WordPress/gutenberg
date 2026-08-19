@@ -52,9 +52,10 @@ application-local custom control.
 
 ### Choose a recommended component
 
-`@wordpress/ui` is intended to supersede the global components in
-`@wordpress/components`, but the transition happens component by component.
-Package age alone does not determine which component to use.
+`@wordpress/components` remains supported. The transition to `@wordpress/ui`
+happens component by component, so select the recommended package for each
+component. Do not treat either package's age as a universal selection rule or
+migrate mechanically from one package to the other.
 
 For the current package versions, use the maintained recommendation sources
 instead of copying component mappings into documentation or agent instructions:
@@ -77,9 +78,10 @@ those sources and verify the choice against its installed exports, types, and
 documentation. Preserve behavioural, styling, accessibility, and compatibility
 parity when migrating an existing component.
 
-Use semantic `--wpds-*` custom properties from the generated reference. Token
-names and values change over time, so do not copy a token inventory into a
-guide, application convention, or skill.
+Use semantic `--wpds-*` custom properties for Design System interface styling.
+Use `--wp--preset--*` custom properties for `theme.json` presets and
+block-facing styles. Token names and values change over time, so do not copy a
+token inventory into a guide, application convention, or skill.
 
 ### Setup depends on the document
 

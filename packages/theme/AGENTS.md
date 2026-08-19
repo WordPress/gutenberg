@@ -1,12 +1,8 @@
-# `@wordpress/theme`
+# Guidance
 
-## Maintaining this package
+Before adding or changing code in this directory:
 
-For changes to `@wordpress/theme`, read the package [README](README.md) and
-the cross-package [Design System package guide](../../docs/contributors/design/design-system-packages.md).
-
-Use the `design-system-contribution` or `design-system-code-review` skill for
-package changes or reviews. Treat the public token and theming contract
-separately from compatibility aliases and other implementation details.
-
-For changes under `tokens/`, also follow [the token-specific instructions](tokens/AGENTS.md).
+-   Read [README.md](README.md) for the package's public theming and setup guidance.
+-   Read the [cross-package Design System guide](../../docs/contributors/design/design-system-packages.md) for public-package boundaries and contribution checks.
+-   For changes under `tokens/`, follow [the token-specific instructions](tokens/AGENTS.md).
+-   Use `design-system-contribution` for package changes and `design-system-code-review` for package reviews.
