@@ -8,12 +8,12 @@
 	"references": [
 		{ "path": "../a11y/tsconfig.build.json" },
 		{ "path": "../admin-ui/tsconfig.build.json" },
-		{ "path": "../components" },
+		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../core-data/tsconfig.build.json" },
 		{ "path": "../data" },
 		{ "path": "../dom" },
-		{ "path": "../editor" },
+		{ "path": "../editor/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../html-entities/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
@@ -26,7 +26,7 @@
 		{ "path": "../private-apis" },
 		{ "path": "../route" },
 		{ "path": "../theme/tsconfig.build.json" },
-		{ "path": "../ui" },
+		{ "path": "../ui/tsconfig.build.json" },
 		{ "path": "../url" }
 	]
 }

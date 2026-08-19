@@ -9,11 +9,11 @@
 		{ "path": "../asset-loader" },
 		{ "path": "../block-editor" },
 		{ "path": "../blocks" },
-		{ "path": "../components" },
+		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../core-data/tsconfig.build.json" },
 		{ "path": "../data" },
 		{ "path": "../element/tsconfig.build.json" },
-		{ "path": "../editor" },
+		{ "path": "../editor/tsconfig.build.json" },
 		{ "path": "../global-styles-engine/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../private-apis" }

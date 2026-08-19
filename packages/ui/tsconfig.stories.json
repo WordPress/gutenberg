@@ -1,0 +1,36 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	/*
+	 * Type checks stories against sources without jest types. Kept out of the
+	 * package tsconfig.json so Storybook's meta extractor stays on its inferred
+	 * project.
+	 */
+	"compilerOptions": {
+		"noEmit": true,
+		"emitDeclarationOnly": false,
+		"types": [
+			"gutenberg-env",
+			"style-imports",
+			"react-css-custom-properties"
+		]
+	},
+	"exclude": [
+		"**/benchmark",
+		"**/test/**",
+		"**/tests/**",
+		"**/__tests__/**"
+	],
+	"references": [
+		{ "path": "../a11y/tsconfig.build.json" },
+		{ "path": "../compose/tsconfig.build.json" },
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../i18n/tsconfig.build.json" },
+		{ "path": "../icons" },
+		{ "path": "../keycodes/tsconfig.build.json" },
+		{ "path": "../primitives" },
+		{ "path": "../private-apis" },
+		{ "path": "../style-runtime" },
+		{ "path": "../theme/tsconfig.build.json" }
+	]
+}
