@@ -11,7 +11,7 @@ on:
 
 jobs:
   test:
-    runs-on: macos-latest
+    runs-on: macos-15-intel
     strategy:
       matrix:
         native-test-name: [
