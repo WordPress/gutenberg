@@ -3,7 +3,7 @@ import { Spinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { VisuallyHidden } from '@wordpress/ui';
 import { store as editorStore } from '../../store';
 import { buildRevisionsPageQuery } from '../../store/private-selectors';
@@ -224,7 +224,7 @@ export function RevisionsCodeDiff( {
 						<tr>
 							{ showDiff && <th>{ __( 'Previous line' ) }</th> }
 							<th>{ __( 'Current line' ) }</th>
-							{ showDiff && <th>{ __( 'Change' ) }</th> }
+							{ showDiff && <th>{ _x( 'Change', 'noun' ) }</th> }
 							<th>{ __( 'Code' ) }</th>
 						</tr>
 					</VisuallyHidden>
