@@ -49,7 +49,7 @@ Example:
 			"\"Source Serif Pro\"",
 			"'CSS single-quoted font name'",
 			"\"Single quotes aren't a problem\"",
-			"'Escape awkward characters: \\26 is an ampersand'"
+			"'Escape awkward characters: \\26  is an ampersand'"
 		],
 		"type": "string",
 		"default": ""
