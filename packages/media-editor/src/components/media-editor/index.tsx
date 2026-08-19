@@ -617,8 +617,7 @@ function MediaEditorContent( {
 	}, [] );
 
 	// A bare restore has no cropper diff, so OR the flag in explicitly.
-	const hasChanges =
-		cropper.isCropperDirty || hasEdits || isOriginalRestored;
+	const hasChanges = cropper.isCropperDirty || hasEdits || isOriginalRestored;
 
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type ).type;
 	const isImage = !! media && mediaType === 'image';

@@ -38,6 +38,9 @@ export interface MediaEditorCropPanelProps {
  * @param props.aspectRatioValue
  * @param props.onAspectRatioChange
  * @param props.aspectRatioOptions
+ * @param props.canRestoreOriginal
+ * @param props.isOriginalRestored
+ * @param props.onRestoreOriginal
  */
 export default function MediaEditorCropPanel( {
 	aspectRatioValue,
@@ -71,6 +74,7 @@ export default function MediaEditorCropPanel( {
 			/>
 			{ canRestoreOriginal && onRestoreOriginal && (
 				<Button
+					__next40pxDefaultSize
 					variant="secondary"
 					onClick={ onRestoreOriginal }
 					disabled={ isOriginalRestored }
