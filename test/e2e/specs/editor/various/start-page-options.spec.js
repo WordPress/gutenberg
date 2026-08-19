@@ -26,10 +26,8 @@ test.describe( 'Start page options', () => {
 		// Only the categories containing page start patterns are listed,
 		// together with the synthetic "All" and "Uncategorized" entries. The
 		// category of the pattern restricted to posts is not.
-		const categoryButtons = modal.locator(
-			'.block-editor-block-patterns-explorer__sidebar__categories-list__item'
-		);
-		await expect( categoryButtons ).toHaveText( [
+		const categoryTabs = modal.getByRole( 'tab' );
+		await expect( categoryTabs ).toHaveText( [
 			'All',
 			'Test About',
 			'Test Services',
@@ -45,15 +43,15 @@ test.describe( 'Start page options', () => {
 		] );
 
 		// Filter by a category.
-		await modal.getByRole( 'button', { name: 'Test About' } ).click();
+		await modal.getByRole( 'tab', { name: 'Test About' } ).click();
 		await expect( patterns ).toHaveText( [ 'About page' ] );
 
 		// "Uncategorized" lists the patterns without a registered category.
-		await modal.getByRole( 'button', { name: 'Uncategorized' } ).click();
+		await modal.getByRole( 'tab', { name: 'Uncategorized' } ).click();
 		await expect( patterns ).toHaveText( [ 'Plain page' ] );
 
 		// Search filters the patterns.
-		await modal.getByRole( 'button', { name: 'All' } ).click();
+		await modal.getByRole( 'tab', { name: 'All' } ).click();
 		const searchBox = modal.getByRole( 'searchbox', { name: 'Search' } );
 		await searchBox.fill( 'Services' );
 		await expect( patterns ).toHaveText( [ 'Services page' ] );
@@ -80,11 +78,10 @@ test.describe( 'Start page options', () => {
 		const modal = page.getByRole( 'dialog', { name: 'Choose a pattern' } );
 		await expect( modal ).toBeVisible();
 
-		await expect(
-			modal.locator(
-				'.block-editor-block-patterns-explorer__sidebar__categories-list__item'
-			)
-		).toHaveText( [ 'All', 'Test Post Only' ] );
+		await expect( modal.getByRole( 'tab' ) ).toHaveText( [
+			'All',
+			'Test Post Only',
+		] );
 		await expect( modal.getByRole( 'option' ) ).toHaveText( [
 			'Post call to action',
 		] );
