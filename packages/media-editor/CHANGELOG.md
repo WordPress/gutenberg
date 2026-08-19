@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Add a `scope` prop to `MediaEditor` so each frame can keep its own persisted details-sidebar visibility ([#81559](https://github.com/WordPress/gutenberg/pull/81559)).
+-   Expose the header, history (reset/undo/redo), save (cancel/save) and image control clusters as `MediaEditor` sub-components, so each frame imports and arranges them to suit its own chrome. `renderFrame` now passes data only: `footerActions` is gone, `footerLayout` is now `layout`, and `isImage` is new. `showCloseButton` moves from `MediaEditor` to `MediaEditor.HeaderActions` ([#81563](https://github.com/WordPress/gutenberg/pull/81563)).
 
 ### Bug Fixes
 
