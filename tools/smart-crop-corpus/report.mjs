@@ -593,6 +593,12 @@ function renderRow( row, index ) {
 				off-centre <code>${ signals.centreOffset ?? 'n/a' }</code><br>
 				entropy agree <code>${ signals.entropyAgreement }</code><br>
 				changed <code>${ signals.changeFromCentre }</code>
+				${
+					row.probe
+						? `<br>entropy shift <code>${ row.probe.entropyShift }</code>` +
+						  `<br>detail spread <code>${ row.probe.detailSpread }</code>`
+						: ''
+				}
 				${ result.unchanged ? '<br><span class="pill">no visible change</span>' : '' }
 			</td>
 			<td class="vote">
@@ -643,6 +649,7 @@ export function renderReport( run ) {
 			coverage: row.result.coverage,
 			signals: row.result.signals,
 			aspectStability: row.aspectStability,
+			probe: row.probe,
 			unchanged: row.result.unchanged,
 			files: row.files,
 		} ) ),

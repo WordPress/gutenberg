@@ -21,7 +21,12 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
-import { aspectStability, createVips, cropPair } from './crop.mjs';
+import {
+	aspectStability,
+	createVips,
+	cropPair,
+	probeSubject,
+} from './crop.mjs';
 import {
 	buildCorpus,
 	download,
@@ -52,9 +57,11 @@ const SIZES = {
  * How many extra images to collect per image actually wanted.
  *
  * Theme screenshots and dataset entries do not publish dimensions, so whether
- * they clear the shape gate is only knowable after downloading them.
+ * they clear the shape gate is only knowable after downloading them. Selecting
+ * for an off-centre subject needs a surplus on top of that: a run can only pick
+ * the most off-centre hundred out of a pool bigger than a hundred.
  */
-const OVER_COLLECT = 1.8;
+const OVER_COLLECT = 2.5;
 
 /**
  * Sources a run draws from unless told otherwise.
@@ -65,6 +72,41 @@ const OVER_COLLECT = 1.8;
  * explicitly alongside a lower `--min-aspect`.
  */
 const DEFAULT_SOURCES = [ 'photos', 'plugins', 'cropping' ];
+
+/**
+ * Picks the candidates whose subject sits furthest from the centre.
+ *
+ * The two measures are in different units, so they are combined by rank rather
+ * than by arithmetic: an image's score is its position in the focal-offset
+ * order plus its position in the entropy-shift order. What comes out on top is
+ * what scores well on both, rather than what scores spectacularly on one.
+ *
+ * `detailSpread` is deliberately not part of this. It answers whether there is
+ * a subject at all, which is a floor applied earlier; ranking on it as well
+ * pulls in images with a strong but perfectly central subject, which is the
+ * case this selection exists to avoid.
+ *
+ * @param {Array}  candidates Probed candidates.
+ * @param {number} count      How many to keep.
+ * @return {Array} The best `count`, in rank order.
+ */
+function selectOffCentre( candidates, count ) {
+	const rank = ( key ) => {
+		const order = [ ...candidates ].sort(
+			( a, b ) => b.probe[ key ] - a.probe[ key ]
+		);
+
+		return new Map( order.map( ( item, index ) => [ item, index ] ) );
+	};
+
+	const orders = [ 'focalOffset', 'entropyShift' ].map( rank );
+	const score = ( item ) =>
+		orders.reduce( ( sum, order ) => sum + order.get( item ), 0 );
+
+	return [ ...candidates ]
+		.sort( ( a, b ) => score( a ) - score( b ) )
+		.slice( 0, count );
+}
 
 /**
  * Mean share of the source that survives the crop, across every comparison.
@@ -99,6 +141,8 @@ const DEFAULTS = {
 	'min-long-edge': SHAPE.minLongEdge,
 	'min-short-edge': SHAPE.minShortEdge,
 	'min-aspect': SHAPE.minAspect,
+	select: 'off-centre',
+	'min-detail-spread': 0.2,
 };
 
 /**
@@ -220,6 +264,12 @@ async function main() {
 				`  --min-long-edge N   long edge floor (default ${ SHAPE.minLongEdge })`,
 				`  --min-short-edge N  short edge floor (default ${ SHAPE.minShortEdge })`,
 				`  --min-aspect N      long/short ratio floor (default ${ SHAPE.minAspect })`,
+				'',
+				'  --select MODE    off-centre (default) keeps the images where the',
+				'                   subject is furthest from the middle; random keeps',
+				'                   whatever the sources happened to return',
+				'  --min-detail-spread N  how unevenly detail has to be spread before',
+				'                   an image counts as having a subject (default 0.2)',
 			].join( '\n' )
 		);
 		return;
@@ -255,6 +305,8 @@ async function main() {
 		minShortEdge: Number( options[ 'min-short-edge' ] ),
 		minAspect: Number( options[ 'min-aspect' ] ),
 	};
+
+	const minDetailSpread = Number( options[ 'min-detail-spread' ] );
 
 	log(
 		`Grading images at least ${ shape.minLongEdge }x${ shape.minShortEdge } ` +
@@ -303,13 +355,16 @@ async function main() {
 		imageCount: 0,
 		skipped: 0,
 		wrongShape: 0,
+		noSubject: 0,
+		candidates: 0,
 	};
 
-	for ( const item of downloaded ) {
-		if ( stats.imageCount >= options.count ) {
-			break;
-		}
+	// First pass: measure every candidate and throw away the pixels. Nothing is
+	// cropped yet, because which images are worth cropping depends on how the
+	// whole pool scored.
+	const candidates = [];
 
+	for ( const item of downloaded ) {
 		if ( item.error || ! item.buffer ) {
 			log( `  ! download failed: ${ item.error?.message || 'no data' }` );
 			stats.skipped += 1;
@@ -331,15 +386,68 @@ async function main() {
 			continue;
 		}
 
-		// Dimensions the source published can be wrong or absent, so the gate is
-		// applied again to what actually decoded.
-		if ( ! hasUsableShape( source.width, source.height, shape ) ) {
-			log(
-				`  - ${ entry.id } is ${ source.width }x${ source.height }, ` +
-					'too small or too close to square'
-			);
-			stats.wrongShape += 1;
+		try {
+			// Dimensions the source published can be wrong or absent, so the
+			// gate is applied again to what actually decoded.
+			if ( ! hasUsableShape( source.width, source.height, shape ) ) {
+				stats.wrongShape += 1;
+				continue;
+			}
+
+			const probe = probeSubject( {
+				vips,
+				source,
+				buffer,
+				size: sizes[ 0 ],
+			} );
+
+			if ( ! probe ) {
+				continue;
+			}
+
+			// Evenly detailed all over: a texture, not a photograph of
+			// something. Attention will still name a focal point and it will
+			// still be off centre, but there is nothing there for a crop to
+			// cut off, so grading it teaches nothing.
+			if ( probe.detailSpread < minDetailSpread ) {
+				stats.noSubject += 1;
+				continue;
+			}
+
+			candidates.push( { entry, buffer, probe } );
+		} finally {
 			source.delete();
+		}
+	}
+
+	stats.candidates = candidates.length;
+
+	const chosen =
+		options.select === 'off-centre'
+			? selectOffCentre( candidates, options.count )
+			: candidates.slice( 0, options.count );
+
+	log(
+		`Probed ${ candidates.length } candidates; ${ stats.wrongShape } rejected ` +
+			`for size or shape, ${ stats.noSubject } for having no subject.`
+	);
+	log(
+		options.select === 'off-centre'
+			? `Grading the ${ chosen.length } with the most off-centre subject.\n`
+			: `Grading ${ chosen.length } of them.\n`
+	);
+
+	// Second pass: crop the ones that made the cut.
+	for ( const candidate of chosen ) {
+		const { entry, buffer, probe } = candidate;
+		let source;
+
+		try {
+			const decoded = vips.Image.newFromBuffer( buffer );
+			source = decoded.colourspace( 'srgb' );
+			decoded.delete();
+		} catch {
+			stats.skipped += 1;
 			continue;
 		}
 
@@ -408,6 +516,7 @@ async function main() {
 					result,
 					files,
 					aspectStability: stability,
+					probe,
 				} );
 
 				if ( result.unchanged ) {
@@ -452,6 +561,7 @@ async function main() {
 					coverage: row.result.coverage,
 					signals: row.result.signals,
 					aspectStability: row.aspectStability,
+					probe: row.probe,
 					unchanged: row.result.unchanged,
 					files: row.files,
 				} ) ),
@@ -466,10 +576,9 @@ async function main() {
 		`${ stats.unchanged } produced no visible change; ${ stats.skipped } images skipped`
 	);
 	log(
-		`${ stats.wrongShape } images rejected for size or shape; ` +
-			`crops keep ${ percent(
-				meanCoverage( rows )
-			) } of the source on average`
+		`Chosen from ${ stats.candidates } candidates; crops keep ${ percent(
+			meanCoverage( rows )
+		) } of the source on average`
 	);
 	log( `\nReport:   ${ reportPath }` );
 	log( `Manifest: ${ path.join( outDir, 'manifest.json' ) }` );

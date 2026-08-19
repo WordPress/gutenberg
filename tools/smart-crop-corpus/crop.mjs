@@ -154,6 +154,126 @@ function findFocalPoint( vips, source, aspect ) {
 }
 
 /**
+ * How unevenly detail is spread across an image.
+ *
+ * An image with a subject has somewhere busy and somewhere plain: a statue
+ * against a wall, a bird against sky. An image without one is evenly detailed
+ * all over, and a stack of firewood or a hedge will happily report a strong
+ * off-centre focal point without containing anything a crop could miss.
+ *
+ * Measured as the coefficient of variation of edge energy across an 8x8 grid,
+ * which is scale-free, so a bright image and a dark one are comparable. Uniform
+ * texture lands near 0.1; a subject on a plain ground lands near 0.3.
+ *
+ * @param {any} image Decoded source image.
+ * @return {number} 0 for perfectly even detail, higher for a distinct subject.
+ */
+function detailSpread( image ) {
+	const grid = 8;
+	// Shrink first: the measure wants the shape of the composition, not every
+	// leaf, and it makes the operation cheap enough to run on a whole pool.
+	const small = image.resize( 256 / image.width );
+	const grey = small.colourspace( 'b-w' );
+	small.delete();
+	const edges = grey.sobel();
+	grey.delete();
+	const blocks = edges.resize( grid / edges.width, {
+		vscale: grid / edges.height,
+	} );
+	edges.delete();
+
+	const cells = [];
+	for ( let y = 0; y < grid; y++ ) {
+		for ( let x = 0; x < grid; x++ ) {
+			cells.push( blocks.getpoint( x, y )[ 0 ] );
+		}
+	}
+	blocks.delete();
+
+	const mean =
+		cells.reduce( ( sum, value ) => sum + value, 0 ) / cells.length;
+	if ( ! mean ) {
+		return 0;
+	}
+
+	const variance =
+		cells.reduce( ( sum, value ) => sum + ( value - mean ) ** 2, 0 ) /
+		cells.length;
+
+	return Math.sqrt( variance ) / mean;
+}
+
+/**
+ * Asks whether an image has something worth finding away from its centre.
+ *
+ * This is the selection test, and it is deliberately not attention's opinion
+ * alone. `attention` reports a focal point, and it is the only strategy that
+ * does, so how far that point sits from the middle is one half. The other half
+ * is `entropy`, which scores information content rather than saliency and knows
+ * nothing about faces or skin: if it also declines to crop from the centre,
+ * then two unrelated measures agree the middle is the wrong place.
+ *
+ * Both of those say where the interesting part is, and neither says whether
+ * there is one, so `detailSpread` is the third number: an evenly detailed image
+ * has no subject to miss however confidently attention points at a corner of
+ * it.
+ *
+ * An image that scores well on all three is one where a centre crop is likely
+ * to cut something out, which is the case smart crop exists for.
+ *
+ * @param {Object} options
+ * @param {any}    options.vips   The libvips module.
+ * @param {any}    options.source Decoded source image.
+ * @param {any}    options.buffer Original encoded bytes.
+ * @param {Object} options.size   `{ name, width, height }`.
+ * @return {Object|null} `{ focalOffset, entropyShift, detailSpread }`, or null
+ *                       when the source is too small for the size.
+ */
+export function probeSubject( { vips, source, buffer, size } ) {
+	if ( source.width < size.width || source.height < size.height ) {
+		return null;
+	}
+
+	const focalPoint = findFocalPoint( vips, source, size.width / size.height );
+
+	const thumbnail = ( crop ) =>
+		toComparable(
+			vips.Image.thumbnailBuffer( buffer, size.width, {
+				size: 'down',
+				height: size.height,
+				crop,
+			} )
+		);
+
+	const centre = thumbnail( 'centre' );
+	const entropy = thumbnail( 'entropy' );
+
+	try {
+		return {
+			// How far attention puts the subject from the middle.
+			focalOffset: focalPoint
+				? Number(
+						Math.hypot(
+							focalPoint.x - 0.5,
+							focalPoint.y - 0.5
+						).toFixed( 4 )
+				  )
+				: 0,
+			// How much a strategy that has never heard of saliency still moves
+			// the frame away from the centre.
+			entropyShift: Number(
+				meanAbsoluteDifference( entropy, centre ).toFixed( 4 )
+			),
+			// Whether there is a subject at all, as opposed to where it is.
+			detailSpread: Number( detailSpread( source ).toFixed( 4 ) ),
+		};
+	} finally {
+		centre.delete();
+		entropy.delete();
+	}
+}
+
+/**
  * Produces the centre and attention crops of one image at one target size.
  *
  * @param {Object} options

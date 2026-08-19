@@ -34,10 +34,13 @@ node tools/smart-crop-corpus/index.mjs
 --seed STRING    reproduce a previous run (default: random)
 --out DIR        output directory (default artifacts/smart-crop)
 --quality N      JPEG quality for the review renditions (default 82)
+--select MODE    off-centre (default) or random
 
 --min-long-edge N   long edge floor (default 1024)
 --min-short-edge N  short edge floor (default 450)
 --min-aspect N      long/short ratio floor (default 1.45)
+--min-detail-spread N  how uneven detail must be for an image to
+                    count as having a subject (default 0.2)
 ```
 
 Every run picks a different set of images. Pass the seed printed at the top of a
@@ -139,6 +142,41 @@ per row so it is clear how much was at stake in each comparison.
 
 The floors are adjustable. `--min-aspect 1.2` lets 4:3 back in, including the
 1200x900 theme screenshots that the default excludes.
+
+## Which images get chosen
+
+Clearing the shape gate makes an image croppable. It does not make it worth
+grading. The images this feature exists for are the ones with a subject that is
+not in the middle, so a run downloads about two and a half times what it needs,
+measures every candidate, and keeps the hundred with the most off-centre
+subject.
+
+Three measures, from two questions:
+
+**Is there a subject at all?** `detailSpread` is the coefficient of variation of
+edge energy across an 8x8 grid. A photograph of something has somewhere busy and
+somewhere plain; a stack of firewood or a wall of stickers is evenly detailed
+everywhere, and will happily report a confident off-centre focal point without
+containing anything a crop could miss. Uniform texture measures around 0.1, a
+subject on plain ground around 0.3, and the default floor of 0.2 sits between
+them. This is a floor, not a ranking: an image with a strong but perfectly
+central subject is exactly what the selection is trying to avoid.
+
+**Where is it?** `focalOffset` is how far attention puts the subject from the
+centre. `entropyShift` is how far the `entropy` strategy moves the frame away
+from centre. Attention is the only strategy libvips gives a focal point for, so
+selecting on it alone would be asking smart crop to pick its own exam paper.
+Entropy scores information content and knows nothing about faces or skin, so
+when it also declines to crop from the middle, two unrelated measures agree the
+middle is wrong. Candidates are ranked by position in each ordering and the sum
+taken, so what wins scores well on both rather than spectacularly on one.
+
+Selecting this way moves a batch's mean off-centre distance from 0.36 to 0.45,
+and cuts the rows where attention chose the centre anyway from 9 in 100 to 3.
+
+`--select random` turns all of this off and grades whatever the sources
+returned. Worth doing occasionally: a selected batch is not a sample of a media
+library, it is a sample of the hard cases.
 
 ## Where the images come from
 
