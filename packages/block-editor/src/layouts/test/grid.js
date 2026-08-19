@@ -93,6 +93,52 @@ describe( 'getLayoutStyle', () => {
 
 		expect( result ).toBe( expected );
 	} );
+	it( 'should use the horizontal block gap to calculate responsive Grid column widths', () => {
+		const expected = `.my-container { grid-template-columns: repeat(auto-fill, minmax(max(min( 12rem, 100%), ( 100% - (3rem*2) ) / 3), 1fr)); container-type: inline-size; }.my-container { gap: 2rem 3rem; }`;
+
+		const result = grid.getLayoutStyle( {
+			selector: '.my-container',
+			layout: { minimumColumnWidth: '12rem', columnCount: 3 },
+			style: {
+				spacing: { blockGap: { top: '2rem', left: '3rem' } },
+			},
+			blockName: 'test-block',
+			hasBlockGapSupport: true,
+			layoutDefinitions: undefined,
+		} );
+
+		expect( result ).toBe( expected );
+	} );
+	it( 'should use the fallback gap when an axial value has no horizontal gap', () => {
+		const expected = `.my-container { grid-template-columns: repeat(auto-fill, minmax(max(min( 12rem, 100%), ( 100% - (1.2rem*2) ) / 3), 1fr)); container-type: inline-size; }.my-container { gap: 2rem 1.2rem; }`;
+
+		const result = grid.getLayoutStyle( {
+			selector: '.my-container',
+			layout: { minimumColumnWidth: '12rem', columnCount: 3 },
+			style: { spacing: { blockGap: { top: '2rem' } } },
+			blockName: 'test-block',
+			hasBlockGapSupport: true,
+			layoutDefinitions: undefined,
+		} );
+
+		expect( result ).toBe( expected );
+	} );
+	it( 'should preserve a zero horizontal gap in responsive Grid column widths', () => {
+		const expected = `.my-container { grid-template-columns: repeat(auto-fill, minmax(max(min( 12rem, 100%), ( 100% - (0px*2) ) / 3), 1fr)); container-type: inline-size; }.my-container { gap: 2rem 0; }`;
+
+		const result = grid.getLayoutStyle( {
+			selector: '.my-container',
+			layout: { minimumColumnWidth: '12rem', columnCount: 3 },
+			style: {
+				spacing: { blockGap: { top: '2rem', left: '0' } },
+			},
+			blockName: 'test-block',
+			hasBlockGapSupport: true,
+			layoutDefinitions: undefined,
+		} );
+
+		expect( result ).toBe( expected );
+	} );
 } );
 
 describe( 'GridLayoutInspectorControls', () => {
