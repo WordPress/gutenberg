@@ -403,6 +403,49 @@ describe( 'global styles renderer', () => {
 			rootPadding: false,
 		};
 
+		it( 'uses the row value for Flow and Constrained layouts and both values for Flex and Grid layouts when block spacing is axial', () => {
+			const tree: GlobalStylesConfig = {
+				styles: {
+					blocks: {
+						'core/group': {
+							spacing: {
+								blockGap: { top: '1em', left: '2em' },
+							},
+						},
+					},
+				},
+			};
+			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+					hasLayoutSupport: true,
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				true,
+				false,
+				false,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toContain(
+				':root :where(.wp-block-group-is-layout-flow) > * { margin-block-start: 1em; margin-block-end: 0; }'
+			);
+			expect( result ).toContain(
+				':root :where(.wp-block-group-is-layout-constrained) > * { margin-block-start: 1em; margin-block-end: 0; }'
+			);
+			expect( result ).toContain(
+				':root :where(.wp-block-group-is-layout-flex) { gap: 1em 2em; }'
+			);
+			expect( result ).toContain(
+				':root :where(.wp-block-group-is-layout-grid) { gap: 1em 2em; }'
+			);
+		} );
+
 		it( 'should return a ruleset', () => {
 			const tree = {
 				settings: {

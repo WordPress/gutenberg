@@ -1,8 +1,4 @@
 import { useMemo, useState } from '@wordpress/element';
-// Registers the core format types (bold, italic, link, …) as a side effect so
-// the `richtext` control's keyboard shortcuts (⌘B / ⌘I / ⌘K) and the inline
-// link popover can be exercised in the story.
-import '@wordpress/format-library';
 import DataForm from '../index';
 import type {
 	CardLayout,
@@ -31,7 +27,6 @@ type SamplePost = {
 	comment_status?: string;
 	ping_status?: boolean;
 	longDescription?: string;
-	summary?: string;
 	origin?: string;
 	destination?: string;
 	flight_status?: string;
@@ -188,21 +183,6 @@ const fields: Field< SamplePost >[] = [
 		},
 	},
 	{
-		id: 'summary',
-		label: 'Summary',
-		type: 'text',
-		placeholder: 'Add a summary — try ⌘B, ⌘I, ⌘K or `code`',
-		Edit: {
-			control: 'richtext',
-			allowedFormats: [
-				'core/bold',
-				'core/italic',
-				'core/link',
-				'core/code',
-			],
-		},
-	},
-	{
 		id: 'comment_status',
 		label: 'Comment status',
 		type: 'text',
@@ -351,8 +331,6 @@ const LayoutRegularComponent = ( {
 		dimensions: '1920x1080',
 		tags: [ 'photography' ],
 		description: 'This is a sample description.',
-		summary:
-			'A <strong>bold</strong> summary with <em>emphasis</em> and <code>code</code>.',
 	} );
 
 	// Make fields disabled when control is set to disabled.
@@ -391,7 +369,6 @@ const LayoutRegularComponent = ( {
 				'tags',
 				'description',
 				'longDescription',
-				'summary',
 			],
 		} ),
 		[ labelPosition ]

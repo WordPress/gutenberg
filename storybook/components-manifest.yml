@@ -53,6 +53,30 @@
       - text
       - tooltipPosition
       - variant
+- name: Calendar
+  props:
+      - autoFocus
+      - className
+      - defaultMonth
+      - defaultValue
+      - disabled
+      - disableNavigation
+      - endMonth
+      - fixedWeeks
+      - labels
+      - locale
+      - month
+      - numberOfMonths
+      - onMonthChange
+      - onValueChange
+      - render
+      - required
+      - showOutsideDays
+      - startMonth
+      - style
+      - timeZone
+      - value
+      - weekStartsOn
 - name: Card.Root
   props:
       - children
@@ -731,6 +755,33 @@
       - onChange
       - options
       - selected
+- name: RangeCalendar
+  props:
+      - autoFocus
+      - className
+      - defaultMonth
+      - defaultValue
+      - disabled
+      - disableNavigation
+      - endMonth
+      - excludeDisabled
+      - fixedWeeks
+      - labels
+      - locale
+      - max
+      - min
+      - month
+      - numberOfMonths
+      - onMonthChange
+      - onValueChange
+      - render
+      - required
+      - showOutsideDays
+      - startMonth
+      - style
+      - timeZone
+      - value
+      - weekStartsOn
 - name: RangeControl
   props:
       - __next40pxDefaultSize
