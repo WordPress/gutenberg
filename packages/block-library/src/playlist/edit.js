@@ -471,7 +471,7 @@ const PlaylistEdit = ( {
 
 	return (
 		<>
-			<BlockControls group="other" __experimentalShareWithChildBlocks>
+			<BlockControls group="other">
 				<MediaReplaceFlow
 					name={ __( 'Add track' ) }
 					onSelect={ onAddTracks }
