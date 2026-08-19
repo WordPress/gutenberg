@@ -72,6 +72,30 @@ async function receiveExternalContent( page, content ) {
 }
 
 /**
+ * Counts the post's note comments, pending ones included.
+ *
+ * `status` has to be spelled out: pending suggestion notes are `hold`, and the
+ * comments endpoint defaults to `approve`, so the default query would report
+ * zero however many notes a bug manufactured.
+ *
+ * @param {Object} requestUtils Playwright request utils.
+ * @param {number} postId       Post whose notes are counted.
+ * @return {Promise<number>} Number of notes on the post.
+ */
+async function countNotes( requestUtils, postId ) {
+	const notes = await requestUtils.rest( {
+		path: '/wp/v2/comments',
+		params: {
+			type: 'note',
+			post: postId,
+			per_page: 100,
+			status: 'all',
+		},
+	} );
+	return notes.length;
+}
+
+/**
  * Reads every block's pending-suggestion marker type.
  *
  * @param {import('@playwright/test').Page} page Playwright page.
@@ -139,12 +163,25 @@ test.describe( 'Suggestion mode and externally-supplied content', () => {
 		const postId = await page.evaluate( () =>
 			window.wp.data.select( 'core/editor' ).getCurrentPostId()
 		);
-		const notesBefore = await requestUtils.rest( {
-			path: '/wp/v2/comments',
-			params: { type: 'note', post: postId, per_page: 100 },
-		} );
+		const notesBefore = await countNotes( requestUtils, postId );
 
-		await receiveExternalContent( page, INCOMING_CONTENT );
+		/*
+		 * The other session edits the shared document, so what comes back
+		 * carries this user's pending suggestion untouched and differs only
+		 * where the other author typed. Deriving the incoming markup from the
+		 * live content models that faithfully: a hardcoded replacement would
+		 * drop the suggestion's inline marker, and the note would be collected
+		 * as a genuine orphan rather than by the bug under test.
+		 */
+		const shared = await editor.getEditedPostContent();
+		expect( shared ).toContain( 'plus a word' );
+		const incoming = shared.replace(
+			'<p>Beta</p>',
+			'<p>Beta, edited by someone else</p>'
+		);
+		expect( incoming ).not.toBe( shared );
+
+		await receiveExternalContent( page, incoming );
 
 		// The incoming document replaces the tree; it is not duplicated, and
 		// nothing in it is marked as this user's pending change.
@@ -160,11 +197,8 @@ test.describe( 'Suggestion mode and externally-supplied content', () => {
 		// window and round-trips to the server, so any note opened for the
 		// incoming document exists by the time the count is read.
 		await editor.saveDraft();
-		const notesAfter = await requestUtils.rest( {
-			path: '/wp/v2/comments',
-			params: { type: 'note', post: postId, per_page: 100 },
-		} );
-		expect( notesAfter ).toHaveLength( notesBefore.length );
+		const notesAfter = await countNotes( requestUtils, postId );
+		expect( notesAfter ).toBe( notesBefore );
 
 		// And the reconciled document is what gets saved: three paragraphs,
 		// no pending markers manufactured for them.
