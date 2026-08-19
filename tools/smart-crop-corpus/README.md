@@ -95,6 +95,13 @@ page, because some sandboxed viewers block a download a page starts itself.
 
 **Copy results JSON** is the raw verdict map, for feeding somewhere else.
 
+## Runs already graded
+
+`runs/` holds the four graded runs behind the numbers posted to the issue: the
+exported summary for each, and the review sheet it was graded from. See
+[runs/README.md](runs/README.md), which notes that the sheets are ungraded, a
+download carries no verdicts with it.
+
 ## What it crops
 
 For a standard 8-bit image, `applyResizeAndCrop()` in `packages/vips` reduces to
