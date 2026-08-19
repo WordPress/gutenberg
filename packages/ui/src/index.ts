@@ -16,6 +16,7 @@ export * from './link-button';
 export * as Notice from './notice';
 export * as Popover from './popover';
 export * from './skeleton';
+export * from './spinner';
 export * from './stack';
 export * as Tabs from './tabs';
 export * from './text';

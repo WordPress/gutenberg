@@ -25,6 +25,7 @@ ruleTester.run( 'use-recommended-components', rule, {
 		"import { Stack } from '@wordpress/ui';",
 		"import { Text } from '@wordpress/ui';",
 		"import { Badge, Icon, Link, Stack, Tabs, Text, Tooltip } from '@wordpress/ui';",
+		"import { Spinner } from '@wordpress/ui';",
 
 		// Unlocked private APIs are only checked for denied names.
 		"import { privateApis } from '@wordpress/components'; import { unlock } from '../../lock-unlock'; const { SomethingElse } = unlock( privateApis );",
