@@ -1,7 +1,6 @@
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { Animate } from '..';
 import Notice from '../../notice';
-import Spinner from '../../spinner';
 
 const meta: Meta< typeof Animate > = {
 	title: 'Components/Deprecated/Animate',
@@ -76,12 +75,6 @@ AppearBottomRight.args = {
 			<p>Appear animation. Origin: bottom right.</p>
 		</Notice>
 	),
-};
-
-export const Loading = Template.bind( {} );
-Loading.args = {
-	type: 'loading',
-	children: ( { className } ) => <Spinner className={ className } />,
 };
 
 export const SlideIn = Template.bind( {} );
