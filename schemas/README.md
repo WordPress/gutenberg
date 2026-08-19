@@ -35,7 +35,6 @@ These are for clarity, not hard rules.
 -   **Say when a value is CSS.** If a string has to be valid CSS source text, write that in the description. Nothing else will catch it.
 -   **Disambiguate similar keys.** Two keys with the same name in different places need descriptions that tell them apart, not the same sentence twice. `fontFamilies[].fontFamily` takes a comma-separated list; `fontFamilies[].fontFace[].fontFamily` takes a single family name. The types are identical, so only the description can tell you which is which.
 -   **Break descriptions into lines with `\n`.** A single long paragraph is unreadable in a hover.
--   **Put examples in the description.** `examples` is standard JSON Schema, but common editors ignore it, so an example is only seen if it sits in the description text. Show the case that is easy to get wrong. For CSS values that is usually quoting.
 
 Example:
 
