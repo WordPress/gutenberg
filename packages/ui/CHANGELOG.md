@@ -23,7 +23,7 @@
 
 ### Documentation
 
--   Document design principles and route coding agents to the package's canonical contribution guidelines. ([#81400](https://github.com/WordPress/gutenberg/pull/81400))
+-   Document design principles and route coding agents to the package's canonical documentation. ([#81400](https://github.com/WordPress/gutenberg/pull/81400))
 
 ### Internal
 
