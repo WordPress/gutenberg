@@ -6,30 +6,60 @@ The atomic steps that build the feature. Read `ARCHITECTURE.md` first and
 Status: `todo` | `in-progress` (+ branch/owner) | `done`. Keep this table the
 single source of truth for progress.
 
-## Upstream in flight, 2026-08-17
+## Upstream in flight, 2026-08-19
 
-Three PRs opened on trunk after this round's re-homing, all touching ground
-this plan builds on. The next round reconciles them once merged:
+Of the three PRs the 2026-08-17 round left in flight, two merged and this
+round's re-homing absorbed them; one remains open:
 
--   **WordPress/gutenberg#81740, the widget host links seam.** `WidgetHost` /
-    `WidgetHostProvider` / `useWidgetHost` land in `widget-primitives` with
-    the `links` capability (`match` + the router's `Link`), consumed by the
-    actions menu and the footer, provided by the dashboard route. This is the
-    seam step 17 planned to create: on landing, 17 shrinks to extending the
-    bag with `navigate` / `notify` for the operations of step 16, plus one
-    decision it must settle: `renderBlocks` (step 10) travels as a prop while
-    capabilities travel by context; unify the mechanism.
--   **WordPress/gutenberg#81738, module-less widget resolution.**
-    `useWidgetTypes` resolves a record without a metadata module from its own
-    fields (`apiVersion` default, record metadata, wire actions, icon
-    stand-in). This is most of step 07's no-module branch: on landing, 07's
-    diff shrinks to the genuinely server-defined additions (`origin`,
-    `definition_id`, `content` and their runtime mapping).
--   **WordPress/gutenberg#81729, the Site Health page.** The dashboard app's
-    second route, reached from the widget through a plain link action, page
-    titles replaced by breadcrumbs. Gives link fulfillments a real in-app
-    target for demos, and the breadcrumb back-link already navigates
-    client-side.
+-   **WordPress/gutenberg#81740, the widget host links seam. Open.** The seam
+    step 17 planned to create, now carrying its own doc page (the capability
+    conventions), the `HostLinks` story, and the dashboard providing `links`
+    at its route layer. On landing, 17 shrinks to extending the bag with
+    `navigate` / `notify` for the operations of step 16, plus one decision it
+    must settle: `renderBlocks` (step 10) travels as a prop on
+    `WidgetDashboard` in the same `routes/dashboard/stage.tsx` the PR wraps
+    with `DashboardWidgetHostProvider`, while capabilities travel by context;
+    unify the mechanism.
+-   **WordPress/gutenberg#81738, module-less widget resolution. Merged**,
+    absorbed by this round's re-homing of step 07 (below).
+-   **WordPress/gutenberg#81729, the Site Health page. Merged**, no collision
+    with the steps. Link fulfillments now have their real in-app target.
+
+## Trunk re-homing, 2026-08-19
+
+Steps 00-10 and 22 sat 52 commits behind `trunk`. Same procedure: hub and
+spokes rebased onto current `trunk` preserving the hub-and-spoke shape, every
+spoke re-pointed at its reproduced commit. Backups live in the
+`wtc-backup/2026-08-19/*` tags.
+
+The substantive collisions trace to WordPress/gutenberg#81738 (module-less
+resolution) and #81514 (the tsconfig build/dev split). Re-homed, not restored:
+
+-   **00** · textual: `trunk` added the real-time-collaboration flag beside
+    the step's entry in the phpunit bootstrap. Both stand.
+-   **07** · #81738 landed the no-module resolution, the `apiVersion`
+    defaults, and the shared `recordOverlay` upstream. The step keeps only
+    the three server-defined fields on `recordOverlay` (`origin`,
+    `definition_id` -> `definitionId`, `content`) and relaxes the drop guard
+    so a record with inline `content` and no `render_module` resolves. The
+    `buildRuntimeFields` rename and the step's separate test file dropped;
+    the server-defined cases graft into trunk's `use-widget-types.test.tsx`.
+    Hook diff: 59 lines down to 18.
+-   **09 / 10** · #81514 split the package tsconfig: the grammar-parser and
+    `i18n` references now land in `tsconfig.build.json` (their importers are
+    `src`) and mirror in the dev project.
+-   **cross-step** · the split put the vertical's test files under
+    `npm run typecheck` for the first time. A hub alignment commit (as in
+    both prior rounds) imports `@testing-library/jest-dom` in the renderer
+    tests, declares it in the package's devDependencies (the split packages'
+    convention), and completes two `WidgetType` fixtures the stricter check
+    rejected.
+
+Gates on the rebased tip: `npm run typecheck` clean; scoped jest green
+(`packages/widget-primitives`: 7 suites, 53 tests); `php -l` and `phpcs`
+clean on the vertical; `vendor/bin/phpunit --filter
+Gutenberg_Widget_Type_Composer_` in the wp-env cli container: 27 tests,
+163 assertions, green.
 
 ## Trunk re-homing, 2026-08-17
 
