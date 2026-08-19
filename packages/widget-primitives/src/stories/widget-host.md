@@ -21,8 +21,12 @@ The provider belongs to the application layer, wrapping the dashboard or whateve
 ```ts
 links: {
 	match: ( href: string ) => WidgetHostRouteMatch | null;
-	// The router's link primitive. Must render a real anchor.
-	Link: ComponentType< { to: string } & ComponentProps< 'a' > >;
+	// The router's link primitive. Must render a real anchor and
+	// forward `ref` to it.
+	Link: ComponentType<
+		{ to: string } & ComponentPropsWithoutRef< 'a' > &
+			RefAttributes< HTMLAnchorElement >
+	>;
 }
 ```
 
