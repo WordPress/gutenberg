@@ -56,11 +56,7 @@ export const Default: Story = {
 	args: {
 		items: URLS,
 		children: [
-			<Autocomplete.Input
-				placeholder="Enter a URL"
-				type="url"
-				key="input"
-			/>,
+			<Autocomplete.Input placeholder="Enter a URL" key="input" />,
 			<Autocomplete.Popup key="popup">
 				<Autocomplete.Empty>No matching items.</Autocomplete.Empty>
 				<Autocomplete.List>
@@ -109,7 +105,7 @@ export const OpenOnlyOnMatch: Story = {
 				} }
 				filteredItems={ filteredItems }
 			>
-				<Autocomplete.Input placeholder="Enter a URL" type="url" />
+				<Autocomplete.Input placeholder="Enter a URL" />
 				<Autocomplete.Popup>
 					<Autocomplete.List>
 						<Autocomplete.ListBody>
@@ -157,7 +153,7 @@ export const AsyncItems: Story = {
 					}, 500 );
 				} }
 			>
-				<Autocomplete.Input placeholder="Enter a URL" type="url" />
+				<Autocomplete.Input placeholder="Enter a URL" />
 				<Autocomplete.Popup>
 					<Autocomplete.Empty>
 						{ loading ? 'Loading...' : 'No matching items.' }
@@ -235,7 +231,6 @@ export const WithSearchIconAndClearButton: Story = {
 			<Autocomplete.InputGroup key="inputGroup">
 				<Autocomplete.Input
 					placeholder="Search URLs"
-					type="url"
 					render={
 						<Input
 							prefix={
@@ -429,11 +424,7 @@ export const WithCustomZIndex: Story = {
 	args: {
 		items: URLS,
 		children: [
-			<Autocomplete.Input
-				placeholder="Enter a URL"
-				type="url"
-				key="input"
-			/>,
+			<Autocomplete.Input placeholder="Enter a URL" key="input" />,
 			<Autocomplete.Popup
 				portal={
 					<Autocomplete.Portal
