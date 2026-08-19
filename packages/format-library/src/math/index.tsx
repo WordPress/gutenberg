@@ -50,8 +50,12 @@ function InlineUI( {
 			try {
 				mathML = latexToMathML( newLatex, { displayMode: false } );
 				setError( null );
-			} catch ( err: any ) {
-				setError( err.message );
+			} catch ( err ) {
+				setError(
+					err instanceof Error
+						? err.message
+						: __( 'Could not parse the LaTeX math syntax.' )
+				);
 			}
 		} else {
 			setError( null );
