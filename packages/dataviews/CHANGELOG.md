@@ -89,6 +89,8 @@
 -   DataViews: Add a `mediaFit` option to the `grid` and `pickerGrid` layouts to fit item previews inside their box (`contain`) instead of cropping them (`cover`), so the media's own aspect ratio stays visible. A fitted preview is letterboxed against a neutral background, so each item still reads as a unit. Consumers can offer this to users as an "Original aspect ratio" toggle in the view options via `config.mediaFitControl` ([#81604](https://github.com/WordPress/gutenberg/pull/81604)).
 -   Validated form controls: Align invalid focus styling for `ComboboxControl` and `FormTokenField` with the design system ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
 -   DataViews filters: Align filter search input focus styling with `outset-ring__focus` ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
+-   DataViewsPicker: Footer action buttons now honor an action's `isEligible`, disabling the button when no selected item is eligible and passing only the eligible items to the callback. [#80856](https://github.com/WordPress/gutenberg/pull/80856)
+-   DataViewsPicker: Render the footer selection count only for multiselect pickers. A single-select picker always holds exactly one selection, so the count carried no information. [#80856](https://github.com/WordPress/gutenberg/pull/80856)
 
 ### Bug Fix
 
@@ -142,8 +144,6 @@
 
 -   DataViews: Generalize the ordering filter operators (`on`, `notOn`, `before`, `after`, `beforeInc`, `afterInc`, `between`) from dates to temporal values, so they also compare times of day. Comparisons for `date` and `datetime` are unchanged. [#80830](https://github.com/WordPress/gutenberg/pull/80830)
 -   DataViews: Add an `aspectRatio` layout option to the `grid` and `table` layouts so consumers can configure the aspect ratio of item media previews from a set of preset ratios, instead of the hard-coded square. Defaults to `1/1`, so existing consumers are unaffected. [#79329](https://github.com/WordPress/gutenberg/pull/79329)
--   DataViewsPicker: Footer action buttons now honor an action's `isEligible`, disabling the button when no selected item is eligible and passing only the eligible items to the callback. [#80856](https://github.com/WordPress/gutenberg/pull/80856)
--   DataViewsPicker: Render the footer selection count only for multiselect pickers. A single-select picker always holds exactly one selection, so the count carried no information. [#80856](https://github.com/WordPress/gutenberg/pull/80856)
 
 ### Bug Fix
 

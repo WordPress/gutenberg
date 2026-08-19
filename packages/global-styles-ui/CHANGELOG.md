@@ -16,6 +16,9 @@
 
 -   Font Library: Wait for the current global styles ID before loading its entity record. ([#81863](https://github.com/WordPress/gutenberg/pull/81863))
 -   Background panels: Resolve theme-relative (`file:./…`) background image URLs and `ref` pointers before rendering thumbnails and the focal point picker. The screens render inside the package's own `BlockEditorProvider`, which cannot carry the private settings the panels previously resolved these against ([#82242](https://github.com/WordPress/gutenberg/pull/82242)).
+-   Expose typography and color controls for citations, inputs, and selects in Global Styles ([#80852](https://github.com/WordPress/gutenberg/pull/80852)).
+-   Mark blocks that have user styles in the block list, and add a filter to show only those blocks ([#81373](https://github.com/WordPress/gutenberg/pull/81373)).
+-   Screen Revisions: Use the DataViews `pickerActivity` layout to render the revisions timeline, with Apply / Reset rendered as a picker footer action so the timeline options hold no interactive content ([#80856](https://github.com/WordPress/gutenberg/pull/80856)).
 
 ### Internal
 
@@ -56,7 +59,6 @@
 ### Enhancements
 
 -   Add a `showBlockStateControls` prop to `GlobalStylesUI`, defaulting to `true`, which hides the state controls for blocks when set to `false` ([#80956](https://github.com/WordPress/gutenberg/pull/80956)).
--   Screen Revisions: Use the DataViews `pickerActivity` layout to render the revisions timeline, with Apply / Reset rendered as a picker footer action so the timeline options hold no interactive content ([#80856](https://github.com/WordPress/gutenberg/pull/80856)).
 
 ## 1.19.0 (2026-07-29)
 
