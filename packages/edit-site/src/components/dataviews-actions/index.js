@@ -111,7 +111,7 @@ export const useSiteEditorPostActions = ( options ) => {
 				action.id === viewPostRevisions.id
 					? {
 							...action,
-							callback( items, { onActionPerformed } ) {
+							callback( items ) {
 								const post = items[ 0 ];
 								history.navigate(
 									addQueryArgs(
@@ -125,7 +125,6 @@ export const useSiteEditorPostActions = ( options ) => {
 										}
 									)
 								);
-								onActionPerformed?.( items );
 							},
 					  }
 					: action
