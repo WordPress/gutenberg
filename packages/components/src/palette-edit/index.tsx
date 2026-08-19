@@ -596,6 +596,7 @@ export function PaletteEdit( {
 					{ ! isEditing &&
 						( isGradient ? (
 							<GradientPicker
+								asButtons
 								gradients={ gradients }
 								onChange={ onSelectPaletteItem }
 								clearable={ false }
@@ -603,6 +604,7 @@ export function PaletteEdit( {
 							/>
 						) : (
 							<ColorPalette
+								asButtons
 								colors={ colors }
 								onChange={ onSelectPaletteItem }
 								clearable={ false }
