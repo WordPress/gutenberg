@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Stop reloading the page on `popstate` events for history entries created by third-party code with the History API, e.g., embedded apps saving their state to the URL. ([#60455](https://github.com/WordPress/gutenberg/issues/60455))
+
 ## 2.53.0 (2026-08-12)
 
 
