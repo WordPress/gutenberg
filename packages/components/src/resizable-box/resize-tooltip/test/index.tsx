@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { createRef } from '@wordpress/element';
+import { createRef, createElement } from '@wordpress/element';
 import ResizeTooltip from '../index';
 import styles from '../style.module.scss';
 
@@ -25,12 +25,14 @@ describe( 'ResizeTooltip', () => {
 		const ref = createRef< HTMLElement >();
 
 		render(
-			<ResizeTooltip
-				as="label"
-				data-testid="resize-tooltip"
-				htmlFor="size-field"
-				ref={ ref }
-			/>
+			createElement( ResizeTooltip, {
+				as: 'label',
+				'data-testid': 'resize-tooltip',
+				htmlFor: 'size-field',
+				ref,
+			} as React.ComponentProps< typeof ResizeTooltip > & {
+				htmlFor?: string;
+			} )
 		);
 
 		const root = screen.getByTestId( 'resize-tooltip' );
