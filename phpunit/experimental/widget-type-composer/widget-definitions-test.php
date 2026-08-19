@@ -229,6 +229,24 @@ class Gutenberg_Widget_Type_Composer_Widget_Definitions_Test extends WP_UnitTest
 		$this->assertTrue( $entry->actions[0]['openInNewTab'] );
 	}
 
+	public function test_core_site_health_overview_def_resolves_with_actions() {
+		gutenberg_register_core_widget_defs();
+		gutenberg_register_widget_types();
+
+		$entry = WP_Widget_Type_Registry::get_instance()->get_registered( 'core/site-health-overview' );
+
+		$this->assertNotNull( $entry );
+		$this->assertSame( 'code-registered', $entry->origin );
+		$this->assertSame( 'framed', $entry->presentation );
+		$this->assertSame( 'core/shield', $entry->icon );
+		$this->assertCount( 2, $entry->actions );
+		$this->assertSame( 'site-health-overview-details', $entry->actions[0]['id'] );
+		$this->assertSame( 'admin.php?page=dashboard-wp-admin&p=/site-health', $entry->actions[0]['href'] );
+		$this->assertSame( 'high', $entry->actions[0]['relevance'] );
+		$this->assertSame( 'site-health.php', $entry->actions[1]['href'] );
+		$this->assertSame( 'medium', $entry->actions[1]['relevance'] );
+	}
+
 	public function test_earlier_origin_wins_over_code_registered() {
 		// Simulate an earlier source (e.g. built-in) already holding the name.
 		WP_Widget_Type_Registry::get_instance()->register(
