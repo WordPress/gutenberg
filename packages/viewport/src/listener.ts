@@ -34,8 +34,10 @@ const addDimensionsEventListener = (
 		( [ name, width ] ) => {
 			return operatorEntries.map(
 				( [ operator, condition ] ): [ string, MediaQueryList ] => {
+					// Scoped to `screen` so printing, which matches against
+					// the page box, does not read as a narrower viewport.
 					const list = window.matchMedia(
-						`(${ condition }: ${ width }px)`
+						`screen and (${ condition }: ${ width }px)`
 					);
 					list.addEventListener( 'change', setIsMatching );
 					return [ `${ operator } ${ name }`, list ];

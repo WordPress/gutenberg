@@ -294,6 +294,24 @@ function Placeholder( { clientId, name, setAttributes } ) {
 	);
 }
 
+/**
+ * Renders the `core/columns` block in the editor.
+ *
+ * Until the block has inner blocks it renders a variation picker; afterwards it
+ * renders the columns container. Every prop is forwarded to whichever of the two
+ * is rendered.
+ *
+ * @param {Object}         props                                Component props.
+ * @param {string}         props.clientId                       Client ID of the block.
+ * @param {string}         props.name                           Block name, used to look up the variations offered by the picker.
+ * @param {Object}         props.attributes                     Block attributes.
+ * @param {string}         [props.attributes.verticalAlignment] Vertical alignment applied to the block and to every child Column block.
+ * @param {boolean}        [props.attributes.isStackedOnMobile] Whether the columns stack on small viewports. Defaults to `true`.
+ * @param {string|boolean} [props.attributes.templateLock]      Template lock applied to the inner blocks, one of `all`, `insert`, `contentOnly` or `false`.
+ * @param {Function}       props.setAttributes                  Callback for updating block attributes.
+ *
+ * @return {React.JSX.Element} React element.
+ */
 const ColumnsEdit = ( props ) => {
 	const { clientId } = props;
 	const hasInnerBlocks = useSelect(

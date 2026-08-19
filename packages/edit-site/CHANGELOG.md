@@ -4,6 +4,20 @@
 
 ### Bug Fixes
 
+-   Seed the root `ThemeProvider` with the admin color scheme primary color so portaled popovers and modals receive the scheme's accent colors ([#81653](https://github.com/WordPress/gutenberg/pull/81653)).
+
+### Enhancements
+
+-   Unify the Site Editor sidebar section descriptions for Templates, Pages, Navigation, and Patterns. ([#60304](https://github.com/WordPress/gutenberg/issues/60304))
+
+### Internal
+
+-   Stop rendering `EditorKeyboardShortcutsRegister`, which the editor provider now renders itself ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
+
+## 7.2.0 (2026-08-12)
+
+### Bug Fixes
+
 -   Identity: Decode HTML entities in the Site Title and Site Tagline fields. ([#81269](https://github.com/WordPress/gutenberg/pull/81269))
 -   Open the "View revisions" action in the site editor revisions view instead of the `revision.php` screen. ([#81366](https://github.com/WordPress/gutenberg/pull/81366))
 

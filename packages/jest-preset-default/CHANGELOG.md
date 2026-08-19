@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 14.0.0 (2026-08-12)
+
 ### Breaking Changes
 
 -   Add an `exports` field. Only the package root and `jest-preset` are exposed; deep imports of other files are no longer resolvable ([#80837](https://github.com/WordPress/gutenberg/pull/80837)).

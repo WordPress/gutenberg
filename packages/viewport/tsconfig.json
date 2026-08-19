@@ -5,9 +5,9 @@
 		"types": [ "gutenberg-env" ]
 	},
 	"references": [
-		{ "path": "../compose" },
+		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../data" },
-		{ "path": "../element" }
+		{ "path": "../element/tsconfig.build.json" }
 	],
 	"include": [ "src" ]
 }

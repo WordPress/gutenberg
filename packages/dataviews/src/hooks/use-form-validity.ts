@@ -388,11 +388,37 @@ type PromiseHandler< Item > = {
 	item: Item;
 };
 
+function isFormFieldHidden< Item >(
+	formField: FormFieldToValidate< Item >,
+	item: Item
+): boolean {
+	// `DataFormLayout` only applies `isVisible` to leaf fields; combined
+	// fields are always rendered, so they must always be validated.
+	return (
+		formField.children.length === 0 &&
+		!! formField.field?.isVisible &&
+		! formField.field.isVisible( item )
+	);
+}
+
 function validateFormField< Item >(
 	item: Item,
 	formField: FormFieldToValidate< Item >,
 	promiseHandler: PromiseHandler< Item >
 ): FieldValidity | undefined {
+	if ( isFormFieldHidden( formField, item ) ) {
+		// Invalidate in-flight async validations so a stale result cannot
+		// resurface for a field that is no longer rendered.
+		const { customCounterRef, elementsCounterRef } = promiseHandler;
+		if ( customCounterRef.current[ formField.id ] ) {
+			customCounterRef.current[ formField.id ] += 1;
+		}
+		if ( elementsCounterRef.current[ formField.id ] ) {
+			elementsCounterRef.current[ formField.id ] += 1;
+		}
+		return undefined;
+	}
+
 	// Validate the field: isValid.required
 	if (
 		formField.field?.isValid.required &&
@@ -597,19 +623,22 @@ function getFormFieldValue< Item >(
 	item: Item
 ): any {
 	const fieldValue = formField?.field?.getValue( { item } );
+	// `isHidden` is never read directly. It is folded into the snapshot so
+	// that the `fastDeepEqual` change check in `validate` fails when a
+	// field's visibility toggles with an unchanged value, forcing that
+	// field to re-validate instead of being skipped as untouched.
+	const isHidden = isFormFieldHidden( formField, item );
 	if ( formField.children.length === 0 ) {
-		return fieldValue;
+		return { value: fieldValue, isHidden };
 	}
 
 	const childrenValues = formField.children.map( ( child ) =>
 		getFormFieldValue( child, item )
 	);
-	if ( ! childrenValues ) {
-		return fieldValue;
-	}
 
 	return {
 		value: fieldValue,
+		isHidden,
 		children: childrenValues,
 	};
 }

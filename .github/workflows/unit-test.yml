@@ -78,13 +78,26 @@ jobs:
               with:
                   node-version: ${{ matrix.node }}
 
+            - name: Detect Browser Mode tests
+              id: browser-tests
+              run: |
+                  FOUND="$(node test/unit/scripts/has-browser-tests-for-shard.mjs "${{ matrix.shard }}")"
+                  echo "found=$FOUND" >> "$GITHUB_OUTPUT"
+
+            - name: Install Chromium for Browser Mode tests
+              if: ${{ steps.browser-tests.outputs.found == 'true' }}
+              uses: ./.github/setup-playwright
+              with:
+                  workspace: '@wordpress/unit-tests'
+                  browsers: chromium
+
             - name: Run build scripts
               # It's not necessary to run the full build, since Jest can interpret
               # source files with `babel-jest`. Some packages have their own custom
               # build tasks, however. These must be run.
               run: npx lerna run build
 
-            - name: Running the tests
+            - name: Run the remaining Jest partition
               env:
                   SHARD: ${{ matrix.shard }}
                   # Record the Node.js major as a custom flakiness environment
@@ -97,6 +110,17 @@ jobs:
                     --maxWorkers="$(nproc)" \
                     --shard="$SHARD" \
                     --cacheDirectory="$HOME/.jest-cache"
+
+            - name: Run the migrated Vitest partition
+              env:
+                  SHARD: ${{ matrix.shard }}
+                  # Preserve the same Flakiness.io environment identity used
+                  # by the Jest partition.
+                  FK_ENV_NODEJS: ${{ matrix.node }}
+              run: |
+                  npm run test:unit:vitest -- \
+                    --shard="$SHARD" \
+                    --passWithNoTests
 
     unit-js-date:
         name: JavaScript Date Tests (Node.js ${{ matrix.node }})

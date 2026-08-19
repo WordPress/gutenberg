@@ -73,20 +73,37 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @dataProvider data_sanitize_block_gap_value
+	 *
 	 * @covers ::gutenberg_sanitize_block_gap_value
 	 */
-	public function test_sanitize_block_gap_value_rejects_nested_array_values() {
-		$this->assertSame(
-			array(
-				'top'  => null,
-				'left' => '2rem',
-			),
-			gutenberg_sanitize_block_gap_value(
+	public function test_sanitize_block_gap_value_normalizes_zero_and_rejects_other_non_string_values( $gap_value, $expected ) {
+		$this->assertSame( $expected, gutenberg_sanitize_block_gap_value( $gap_value ) );
+	}
+
+	/**
+	 * Data provider for test_sanitize_block_gap_value_normalizes_zero_and_rejects_other_non_string_values().
+	 *
+	 * @return array[] Test data.
+	 */
+	public function data_sanitize_block_gap_value() {
+		return array(
+			'string value'           => array( '1rem', '1rem' ),
+			'empty string'           => array( '', null ),
+			'whitespace-only string' => array( " \t\n", null ),
+			'integer zero'           => array( 0, '0' ),
+			'floating-point zero'    => array( 0.0, '0' ),
+			'non-zero integer'       => array( 1, null ),
+			'boolean value'          => array( true, null ),
+			'object value'           => array( new stdClass(), null ),
+			'nested array value'     => array(
 				array(
 					'top'  => array( '1rem' ),
 					'left' => '2rem',
-				)
-			)
+				),
+				array( 'left' => '2rem' ),
+			),
+			'empty sanitized array'  => array( array( array( '1rem' ) ), null ),
 		);
 	}
 
@@ -407,6 +424,28 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => '.wp-layout{flex-wrap:nowrap;gap:11px var(--wp--preset--spacing--40);justify-content:flex-start;align-items:flex-end;}',
 			),
+			'flex layout uses the default for malformed gap values' => array(
+				'args'            => array(
+					'selector'              => '.wp-layout',
+					'layout'                => array( 'type' => 'flex' ),
+					'has_block_gap_support' => true,
+					'gap_value'             => array( 'left' => '2rem' ),
+					'fallback_gap_value'    => array(
+						'top'  => array( '1rem' ),
+						'left' => new stdClass(),
+					),
+				),
+				'expected_output' => '.wp-layout{gap:0.5em 2rem;}',
+			),
+			'flex layout ignores an empty block gap'       => array(
+				'args'            => array(
+					'selector'              => '.wp-layout',
+					'layout'                => array( 'type' => 'flex' ),
+					'has_block_gap_support' => true,
+					'gap_value'             => '',
+				),
+				'expected_output' => '',
+			),
 			'vertical flex layout with properties'         => array(
 				'args'            => array(
 					'selector' => '.wp-layout',
@@ -429,6 +468,19 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(min(12rem, 100%), 1fr));container-type:inline-size;}',
 			),
+			'grid layout uses the default for malformed gap values' => array(
+				'args'            => array(
+					'selector'              => '.wp-layout',
+					'layout'                => array( 'type' => 'grid' ),
+					'has_block_gap_support' => true,
+					'gap_value'             => array( 'left' => '2rem' ),
+					'fallback_gap_value'    => array(
+						'top'  => array( '1rem' ),
+						'left' => new stdClass(),
+					),
+				),
+				'expected_output' => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(min(12rem, 100%), 1fr));container-type:inline-size;gap:0.5em 2rem;}',
+			),
 			'grid layout with columnCount'                 => array(
 				'args'            => array(
 					'selector' => '.wp-layout',
@@ -438,6 +490,52 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 					),
 				),
 				'expected_output' => '.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));}',
+			),
+			'grid layout uses horizontal gap for responsive columns' => array(
+				'args'            => array(
+					'selector'              => '.wp-layout',
+					'layout'                => array(
+						'type'               => 'grid',
+						'columnCount'        => 3,
+						'minimumColumnWidth' => '12rem',
+					),
+					'has_block_gap_support' => true,
+					'gap_value'             => array(
+						'top'  => '2rem',
+						'left' => '3rem',
+					),
+				),
+				'expected_output' => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(max(min(12rem, 100%), (100% - (3rem * (3 - 1))) /3), 1fr));container-type:inline-size;gap:2rem 3rem;}',
+			),
+			'grid layout uses fallback when horizontal gap is missing' => array(
+				'args'            => array(
+					'selector'              => '.wp-layout',
+					'layout'                => array(
+						'type'               => 'grid',
+						'columnCount'        => 3,
+						'minimumColumnWidth' => '12rem',
+					),
+					'has_block_gap_support' => true,
+					'gap_value'             => array( 'top' => '2rem' ),
+					'fallback_gap_value'    => '1.2rem',
+				),
+				'expected_output' => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(max(min(12rem, 100%), (100% - (1.2rem * (3 - 1))) /3), 1fr));container-type:inline-size;gap:2rem 1.2rem;}',
+			),
+			'grid layout preserves zero horizontal gap'    => array(
+				'args'            => array(
+					'selector'              => '.wp-layout',
+					'layout'                => array(
+						'type'               => 'grid',
+						'columnCount'        => 3,
+						'minimumColumnWidth' => '12rem',
+					),
+					'has_block_gap_support' => true,
+					'gap_value'             => array(
+						'top'  => '2rem',
+						'left' => '0',
+					),
+				),
+				'expected_output' => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(max(min(12rem, 100%), (100% - (0px * (3 - 1))) /3), 1fr));container-type:inline-size;gap:2rem 0;}',
 			),
 			'default layout with blockGap to verify converting gap value into valid CSS' => array(
 				'args'            => array(
@@ -1360,6 +1458,127 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		$this->assertIsString(
 			gutenberg_restore_group_inner_container( $block_content, $block ),
 			'Group inner container restore should not fatal when tagName is not a string.'
+		);
+	}
+
+	/**
+	 * Tests that non-numeric grid placement values are dropped rather than being
+	 * interpolated into the `grid-column` and `grid-row` declarations.
+	 *
+	 * @covers ::gutenberg_get_child_layout_style_rules
+	 */
+	public function test_gutenberg_get_child_layout_style_rules_with_non_numeric_grid_placement() {
+		$actual_output = gutenberg_get_child_layout_style_rules(
+			'.wp-container-content-test',
+			array(
+				'columnStart' => array( 2 ),
+				'columnSpan'  => array( 3 ),
+				'rowStart'    => array( 1 ),
+				'rowSpan'     => array( 2 ),
+			),
+			array(),
+			null
+		);
+
+		$this->assertSame(
+			array(),
+			$actual_output,
+			'Non-numeric grid placement values should not produce any child layout rules.'
+		);
+	}
+
+	/**
+	 * Tests that grid placement values saved as numeric strings (WordPress 6.3 to 6.6)
+	 * produce the same declarations as numbers.
+	 *
+	 * @covers ::gutenberg_get_child_layout_style_rules
+	 */
+	public function test_gutenberg_get_child_layout_style_rules_with_numeric_string_grid_placement() {
+		$expected_output = array(
+			array(
+				'selector'     => '.wp-container-content-test',
+				'declarations' => array(
+					'grid-column' => '2 / span 3',
+					'grid-row'    => '1 / span 2',
+				),
+			),
+		);
+
+		$actual_output = gutenberg_get_child_layout_style_rules(
+			'.wp-container-content-test',
+			array(
+				'columnStart' => '2',
+				'columnSpan'  => '3',
+				'rowStart'    => '1',
+				'rowSpan'     => '2',
+			),
+			array( 'columnCount' => '3' ),
+			null
+		);
+
+		$this->assertSame( $expected_output, $actual_output );
+	}
+
+	/**
+	 * Tests that non-numeric grid counts are treated as absent instead of leaking into the
+	 * CSS. The rowCount case keeps columnCount valid, because the row track rule is only
+	 * reached when there is a column count.
+	 *
+	 * @dataProvider data_gutenberg_get_layout_style_with_non_numeric_grid_counts
+	 *
+	 * @covers ::gutenberg_get_layout_style
+	 *
+	 * @param array  $layout          Grid layout values.
+	 * @param string $expected_output The expected output.
+	 */
+	public function test_gutenberg_get_layout_style_with_non_numeric_grid_counts( $layout, $expected_output ) {
+		$this->assertSame( $expected_output, gutenberg_get_layout_style( '.wp-layout', $layout ) );
+	}
+
+	/**
+	 * Data provider for test_gutenberg_get_layout_style_with_non_numeric_grid_counts().
+	 *
+	 * @return array
+	 */
+	public function data_gutenberg_get_layout_style_with_non_numeric_grid_counts() {
+		return array(
+			'non-numeric columnCount falls back to the responsive default' => array(
+				'layout'          => array(
+					'type'        => 'grid',
+					'columnCount' => array( 3 ),
+				),
+				'expected_output' => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(min(12rem, 100%), 1fr));container-type:inline-size;}',
+			),
+			'non-numeric rowCount drops the row track rule' => array(
+				'layout'          => array(
+					'type'        => 'grid',
+					'columnCount' => 3,
+					'rowCount'    => array( 2 ),
+				),
+				'expected_output' => '.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));}',
+			),
+		);
+	}
+
+	/**
+	 * Tests that grid counts saved as numeric strings (WordPress 6.3 to 6.6) produce the
+	 * same CSS as numbers.
+	 *
+	 * @covers ::gutenberg_get_layout_style
+	 */
+	public function test_gutenberg_get_layout_style_with_numeric_string_grid_counts() {
+		$layout_styles = gutenberg_get_layout_style(
+			'.wp-layout',
+			array(
+				'type'        => 'grid',
+				'columnCount' => '3',
+				'rowCount'    => '2',
+			)
+		);
+
+		$this->assertSame(
+			'.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));grid-template-rows:repeat(2, minmax(1rem, auto));}',
+			$layout_styles
 		);
 	}
 }

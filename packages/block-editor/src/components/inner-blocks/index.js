@@ -94,7 +94,11 @@ function UncontrolledInnerBlocks( props ) {
 		EMPTY_OBJECT;
 
 	const { allowSizingOnChildren = false } = defaultLayoutBlockSupport;
-	const usedLayout = layout || defaultLayoutBlockSupport;
+	// The support is a config object, e.g. `{ allowSwitching: false, default: { type: 'flex' } }`,
+	// so the layout itself lives under `default`. Passing the config through would leave the
+	// context without a `type`, and consumers would resolve it to the flow layout.
+	const usedLayout =
+		layout || defaultLayoutBlockSupport.default || EMPTY_OBJECT;
 
 	const memoedLayout = useMemo(
 		() => ( {
@@ -174,12 +178,17 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		__unstableDisableLayoutClassNames,
 		__unstableDisableDropZone,
 		dropZoneElement,
+		layout: layoutOverride,
 	} = options;
 	const {
 		clientId,
-		layout = null,
+		layout: contextLayout = null,
 		__unstableLayoutClassNames: layoutClassNames = '',
 	} = useBlockEditContext();
+	// An options layout takes precedence over the context layout, as it does
+	// for the inner blocks settings, so containers whose layout attribute
+	// doesn't apply to their inner blocks (e.g. Post Template) can opt out.
+	const layout = layoutOverride ?? contextLayout;
 	const selected = useSelect(
 		( select ) => {
 			const {
