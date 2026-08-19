@@ -40,7 +40,7 @@ import { InputControl } from '@wordpress/ui';
 <Markdown>{ `
 | \`@wordpress/components\` | \`@wordpress/ui\` | Notes |
 | --- | --- | --- |
-| \`onChange\` | \`onValueChange\` | Receives the next string value. |
+| \`onChange\` | \`onValueChange\` | Receives the next string value on every change. Legacy \`NumberControl\` also rewrites values to match \`min\`, \`max\`, and \`step\` on Enter and blur; see [Number inputs](#number-inputs). |
 | \`help\` | \`description\` | Use plain text only. |
 | \`help\` with links or other markup | \`details\` | Use when the help text needs semantic content. |
 | \`hideLabelFromVision\` | \`hideLabelFromVision\` | Same behavior. |
@@ -49,16 +49,52 @@ import { InputControl } from '@wordpress/ui';
 | \`type\` | \`type\` | Same HTML input types, including \`number\`. |
 ` }</Markdown>
 
+## Labels
+
+`InputControl` requires a `label` prop with a plain `string` value. Legacy `InputControl`, `TextControl`, and `NumberControl` accept an optional `label`, and the legacy `InputControl` `label` can be a `ReactNode`.
+
+When the visible label text already exists elsewhere, pass a descriptive string and hide it visually:
+
+```jsx
+<InputControl
+	label="Search"
+	hideLabelFromVision
+	value={ value }
+	onValueChange={ setValue }
+/>;
+```
+
+When the label is not a plain string, or you need a custom layout, compose the [`Input`](?path=/docs/design-system-components-form-primitives-input--docs) and [`Field`](?path=/docs/design-system-components-form-primitives-field--docs) primitives instead of `InputControl`:
+
+```jsx
+import { Field, Input } from '@wordpress/ui';
+
+<Field.Root>
+	<Field.Label htmlFor={ inputId }>
+		Custom <strong>label</strong> content
+	</Field.Label>
+	<Input
+		id={ inputId }
+		value={ value }
+		onValueChange={ setValue }
+	/>
+</Field.Root>
+```
+
+See the [`Field` stories](?path=/docs/design-system-components-form-primitives-field--docs) for other association patterns, such as external labels with `aria-labelledby`.
+
 ## Prefix and suffix slots
 
 Replace the wrapper components with `InputLayout.Slot`:
 
 ```jsx
 // Before
+import { Icon } from '@wordpress/components';
 import {
 	__experimentalInputControl as InputControl,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 } from '@wordpress/components';
+import { link } from '@wordpress/icons';
 
 <InputControl
 	prefix={
@@ -70,6 +106,7 @@ import {
 
 // After
 import { Icon, InputControl, InputLayout } from '@wordpress/ui';
+import { link } from '@wordpress/icons';
 
 <InputControl
 	prefix={
@@ -92,10 +129,57 @@ import { InputControl } from '@wordpress/ui';
 <InputControl
 	label="Quantity"
 	type="number"
+	min={ 1 }
+	max={ 10 }
+	step={ 1 }
 	value={ value }
 	onValueChange={ setValue }
 />;
 ```
+
+### Value clamping and step alignment
+
+Legacy `NumberControl` rewrites the value on Enter and blur: it clamps to `min`/`max` and aligns to `step`. `@wordpress/ui` `InputControl` passes these constraints to the native `<input type="number">` for validation, but does not rewrite invalid values when the field loses focus.
+
+If you relied on the legacy rewrite behavior, normalize the value yourself. A common pattern is to keep accepting edits in `onValueChange`, then clamp on blur:
+
+```jsx
+import { InputControl } from '@wordpress/ui';
+
+function constrainValue( value, min, max, step ) {
+	const num = parseFloat( value );
+	if ( Number.isNaN( num ) ) {
+		return value;
+	}
+
+	const clamped = Math.min( max, Math.max( min, num ) );
+	if ( step === 'any' ) {
+		return String( clamped );
+	}
+
+	const stepNum = parseFloat( step );
+	const aligned =
+		min + Math.round( ( clamped - min ) / stepNum ) * stepNum;
+	return String( aligned );
+}
+
+<InputControl
+	label="Quantity"
+	type="number"
+	min={ min }
+	max={ max }
+	step={ step }
+	value={ value }
+	onValueChange={ setValue }
+	onBlur={ ( event ) => {
+		setValue( constrainValue( event.target.value, min, max, step ) );
+	} }
+/>;
+```
+
+Adapt the helper to match your product requirements. The legacy component also fires `onChange` while typing with unclamped values, then again with the clamped value on blur.
+
+### Removed NumberControl features
 
 The `@wordpress/ui` `InputControl` does not support these `@wordpress/components` `NumberControl` features:
 
@@ -113,6 +197,6 @@ The `@wordpress/ui` `InputControl` does not support these `@wordpress/components
 -   **`isDragEnabled`, `dragDirection`, and related drag callbacks** — Not recommended, as they can be confusing and are not supported on touch devices.
 -   **`__unstableInputWidth`** — If the label needs to be a different width from the input field, compose using the [`Input`](?path=/docs/design-system-components-form-primitives-input--docs) and [`Field`](?path=/docs/design-system-components-form-primitives-field--docs) primitives.
 -   **`__unstableStateReducer`** — This hook intercepted the internal state machine. Some workarounds for known patterns:
-    -   **Display formatting** (for example, zero-padded time segments): format the value in `onValueChange` when the field commits, or always pass a formatted `value`.
+    -   **Display formatting** (for example, zero-padded time segments): always pass a formatted `value`, or format in an `onBlur` handler if updates should be deferred until the field loses focus.
     -   **Paste normalization**: normalize in `onValueChange`, or handle `onPaste` on `InputControl`.
-    -   **Custom step or spin behavior**: apply adjustments in `onValueChange` by inspecting the event, or use explicit controls in a `suffix` slot.
+    -   **Custom step or spin behavior**: apply adjustments in `onValueChange`, in an `onBlur` handler, or with explicit controls in a `suffix` slot.
