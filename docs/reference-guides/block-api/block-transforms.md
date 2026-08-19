@@ -46,20 +46,21 @@ A transformation of type `block` is an object that takes the following parameter
 -   **isMatch** _(function, optional)_: a callback that receives the block attributes as the first argument and the block object as the second argument and should return a boolean. Returning `false` from this function will prevent the transform from being available and displayed as an option to the user.
 -   **isMultiBlock** _(boolean, optional)_: whether the transformation can be applied when multiple blocks are selected. If true, the `transform` function's first parameter will be an array containing each selected block's attributes, and the second an array of each selected block's inner blocks. False by default.
 -   **priority** _(number, optional)_: controls the priority with which a transformation is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://developer.wordpress.org/reference/#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
--   **shortcut** _(object, optional)_: a keyboard shortcut that applies the transform to the selected block. See [Keyboard shortcuts](#keyboard-shortcuts) below.
+-   **shortcuts** _(array, optional)_: keyboard shortcuts that apply the transform to the selected block. See [Keyboard shortcuts](#keyboard-shortcuts) below.
 
 #### Keyboard shortcuts
 
-A transform of type `block` can declare a keyboard shortcut, which is registered with the editor's keyboard shortcuts store and listed in the keyboard shortcuts help modal. Pressing the key combination transforms the selected block, as long as the block is fully editable.
+A transform of type `block` can declare keyboard shortcuts, which are registered with the editor's keyboard shortcuts store and listed in the keyboard shortcuts help modal. Pressing the key combination transforms the selected block, as long as the block is fully editable.
 
-The `shortcut` object takes the following parameters:
+Each entry of `shortcuts` takes the following parameters:
 
 -   **name** _(string)_: a unique and machine-readable shortcut name, e.g. `core/block-editor/transform-heading-to-paragraph`.
 -   **description** _(string)_: a translated description, displayed in the keyboard shortcuts help modal.
 -   **keyCombination** _(object)_: the key combination that triggers the shortcut, as a `character` and an optional `modifier` (one of the modifiers supported by the [`wp-keycodes` package](/packages/keycodes/README.md), e.g. `access` or `primary`).
 -   **aliases** _(array, optional)_: alternative key combinations that trigger the same shortcut.
+-   **variationName** _(string, optional)_: the variation of the produced block the shortcut targets, defaulting to the transform's own `variationName`. Declaring it per shortcut is what lets a single transform offer one shortcut per variation without appearing more than once in the block switcher.
 
-On a `to` transform the shortcut applies to the block declaring it, and produces the first entry of `blocks`. On a `from` transform it applies to any block listed in `blocks`, and produces the block declaring it.
+On a `to` transform the shortcuts apply to the block declaring them, and produce the first entry of `blocks`. On a `from` transform they apply to any block listed in `blocks`, and produce the block declaring them.
 
 **Example: transform a Heading block into a Paragraph block with <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>0</kbd>**
 
@@ -69,13 +70,15 @@ transforms: {
         {
             type: 'block',
             blocks: [ 'core/paragraph' ],
-            shortcut: {
-                name: 'core/block-editor/transform-heading-to-paragraph',
-                description: __(
-                    'Transform the selected heading into a paragraph.'
-                ),
-                keyCombination: { modifier: 'access', character: '0' },
-            },
+            shortcuts: [
+                {
+                    name: 'core/block-editor/transform-heading-to-paragraph',
+                    description: __(
+                        'Transform the selected heading into a paragraph.'
+                    ),
+                    keyCombination: { modifier: 'access', character: '0' },
+                },
+            ],
             transform: ( { content } ) => {
                 return createBlock( 'core/paragraph', { content } );
             },
@@ -84,9 +87,32 @@ transforms: {
 },
 ```
 
+**Example: transform any block into a specific heading level**
+
+The Heading block hangs one shortcut per level on its single transform from Paragraph, so that <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>2</kbd> on a paragraph produces an H2 while the block switcher still offers "Heading" once:
+
+```js
+transforms: {
+    from: [
+        {
+            type: 'block',
+            blocks: [ 'core/paragraph' ],
+            shortcuts: [ 1, 2, 3, 4, 5, 6 ].map( ( level ) => ( {
+                name: `core/block-editor/transform-to-heading-${ level }`,
+                description: /* … */,
+                keyCombination: { modifier: 'access', character: `${ level }` },
+                variationName: `h${ level }`,
+            } ) ),
+            transform: ( { content } ) =>
+                createBlock( 'core/heading', { content } ),
+        },
+    ],
+},
+```
+
 Key combinations are matched globally, so a combination already claimed by another block or by the editor itself will not reliably reach your transform. In development builds a warning is logged when two blocks declare the same combination.
 
-To apply a variation of a block type rather than the block type itself, declare the shortcut on the [block variation](/docs/reference-guides/block-api/block-variations.md#using-shortcut) instead.
+To switch between variations of a block that is *already* of the target type, declare the shortcut on the [block variation](/docs/reference-guides/block-api/block-variations.md#using-shortcut) instead. A shortcut that should do both — reach the variation from another block type and switch to it within the type — is declared in both places under the same `name`.
 
 **Example: from Paragraph block to Heading block**
 
