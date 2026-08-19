@@ -14,6 +14,7 @@
 
 ### Enhancements
 
+-   Add `TextareaControl` component ([#81359](https://github.com/WordPress/gutenberg/pull/81359)).
 -   `Menu`: Add shortcut display and accessibility metadata support. ([#79560](https://github.com/WordPress/gutenberg/pull/79560))
 -   `Select.Item`, `Combobox.Item`, and `Autocomplete.Item`: Default item height is now 32px (previously 40px) ([#81354](https://github.com/WordPress/gutenberg/pull/81354)).
 
