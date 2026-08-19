@@ -9,9 +9,6 @@ import type { UnknownEditProps } from '../types';
 const name = 'core/unknown';
 const title = __( 'Clear Unknown Formatting' );
 
-const RichTextToolbarButtonUnsafe =
-	RichTextToolbarButton as React.ComponentType< any >;
-
 function selectionContainsUnknownFormats( value: RichTextValue ) {
 	if ( isCollapsed( value ) ) {
 		return false;
@@ -39,7 +36,7 @@ export const unknown = {
 		}
 
 		return (
-			<RichTextToolbarButtonUnsafe
+			<RichTextToolbarButton
 				name="unknown"
 				icon={ help }
 				title={ title }

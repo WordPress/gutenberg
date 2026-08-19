@@ -8,9 +8,6 @@ import type { SubscriptEditProps } from '../types';
 const name = 'core/subscript';
 const title = __( 'Subscript' );
 
-const RichTextToolbarButtonUnsafe =
-	RichTextToolbarButton as React.ComponentType< any >;
-
 export const subscript = {
 	name,
 	title,
@@ -27,7 +24,7 @@ export const subscript = {
 		}
 
 		return (
-			<RichTextToolbarButtonUnsafe
+			<RichTextToolbarButton
 				icon={ subscriptIcon }
 				title={ title }
 				onClick={ onClick }

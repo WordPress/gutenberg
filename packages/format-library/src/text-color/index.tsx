@@ -21,9 +21,6 @@ const title = __( 'Highlight' );
 
 const EMPTY_ARRAY: string[] = [];
 
-const RichTextToolbarButtonUnsafe =
-	RichTextToolbarButton as React.ComponentType< any >;
-
 function getComputedStyleProperty( element: HTMLElement, property: string ) {
 	const { ownerDocument } = element;
 	const { defaultView } = ownerDocument;
@@ -92,7 +89,7 @@ function TextColorEdit( {
 
 	return (
 		<>
-			<RichTextToolbarButtonUnsafe
+			<RichTextToolbarButton
 				className="format-library-text-color-button"
 				isActive={ isActive }
 				icon={

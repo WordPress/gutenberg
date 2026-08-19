@@ -7,8 +7,6 @@ import type { CodeEditProps } from '../types';
 
 const name = 'core/keyboard';
 const title = __( 'Keyboard input' );
-const RichTextToolbarButtonUnsafe =
-	RichTextToolbarButton as React.ComponentType< any >;
 
 export const keyboard = {
 	name,
@@ -26,7 +24,7 @@ export const keyboard = {
 		}
 
 		return (
-			<RichTextToolbarButtonUnsafe
+			<RichTextToolbarButton
 				icon={ button }
 				title={ title }
 				onClick={ onClick }

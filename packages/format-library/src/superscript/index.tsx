@@ -8,9 +8,6 @@ import type { SuperscriptEditProps } from '../types';
 const name = 'core/superscript';
 const title = __( 'Superscript' );
 
-const RichTextToolbarButtonUnsafe =
-	RichTextToolbarButton as React.ComponentType< any >;
-
 export const superscript = {
 	name,
 	title,
@@ -27,7 +24,7 @@ export const superscript = {
 		}
 
 		return (
-			<RichTextToolbarButtonUnsafe
+			<RichTextToolbarButton
 				icon={ superscriptIcon }
 				title={ title }
 				onClick={ onClick }

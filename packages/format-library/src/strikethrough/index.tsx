@@ -10,8 +10,6 @@ import type { StrikethroughEditProps } from '../types';
 
 const name = 'core/strikethrough';
 const title = __( 'Strikethrough' );
-const RichTextToolbarButtonUnsafe =
-	RichTextToolbarButton as React.ComponentType< any >;
 
 export const strikethrough = {
 	name,
@@ -31,7 +29,7 @@ export const strikethrough = {
 					character="d"
 					onUse={ onClick }
 				/>
-				<RichTextToolbarButtonUnsafe
+				<RichTextToolbarButton
 					icon={ formatStrikethrough }
 					title={ title }
 					onClick={ onClick }

@@ -22,9 +22,6 @@ const { ValidatedInputControl } = unlock( componentsPrivateApis );
 const name = 'core/math';
 const title = __( 'Math' );
 
-const RichTextToolbarButtonUnsafe =
-	RichTextToolbarButton as React.ComponentType< any >;
-
 function InlineUI( {
 	value,
 	onChange,
@@ -167,7 +164,7 @@ function Edit( {
 
 	return (
 		<>
-			<RichTextToolbarButtonUnsafe
+			<RichTextToolbarButton
 				icon={ icon }
 				title={ title }
 				onClick={ onClick }

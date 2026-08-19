@@ -13,9 +13,6 @@ import { applyFormat, removeFormat, useAnchor } from '@wordpress/rich-text';
 import { language as languageIcon } from '@wordpress/icons';
 import type { LanguageEditProps, InlineLanguageUIProps } from '../types';
 
-const RichTextToolbarButtonUnsafe =
-	RichTextToolbarButton as React.ComponentType< any >;
-
 const name = 'core/language';
 const title = __( 'Language' );
 
@@ -49,7 +46,7 @@ function Edit( { isActive, value, onChange, contentRef }: LanguageEditProps ) {
 
 	return (
 		<>
-			<RichTextToolbarButtonUnsafe
+			<RichTextToolbarButton
 				icon={ languageIcon }
 				label={ title }
 				title={ title }

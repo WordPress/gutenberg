@@ -9,9 +9,6 @@ import { code as codeIcon } from '@wordpress/icons';
 import type { RichTextValue } from '@wordpress/rich-text';
 import type { CodeEditProps } from '../types';
 
-const RichTextToolbarButtonUnsafe =
-	RichTextToolbarButton as React.ComponentType< any >;
-
 const name = 'core/code';
 const title = __( 'Inline code' );
 
@@ -75,7 +72,7 @@ export const code = {
 					character="x"
 					onUse={ onClick }
 				/>
-				<RichTextToolbarButtonUnsafe
+				<RichTextToolbarButton
 					icon={ codeIcon }
 					title={ title }
 					onClick={ onClick }
