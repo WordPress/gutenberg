@@ -1,7 +1,11 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
+	"extends": "../../tsconfig.dev.base.json",
+	"compilerOptions": {
+		"types": []
+	},
 	"references": [
+		{ "path": "./tsconfig.build.json" },
 		{ "path": "../a11y/tsconfig.build.json" },
 		{ "path": "../block-serialization-default-parser" },
 		{ "path": "../blob/tsconfig.build.json" },
@@ -22,10 +26,10 @@
 		{ "path": "../hooks" },
 		{ "path": "../html-entities/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
-		{ "path": "../icons" },
-		{ "path": "../image-cropper" },
+		{ "path": "../icons/tsconfig.build.json" },
+		{ "path": "../image-cropper/tsconfig.build.json" },
 		{ "path": "../interactivity/tsconfig.build.json" },
-		{ "path": "../is-shallow-equal" },
+		{ "path": "../is-shallow-equal/tsconfig.build.json" },
 		{ "path": "../kebab-case" },
 		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../keyboard-shortcuts" },
@@ -39,14 +43,13 @@
 		{ "path": "../warning" },
 		{ "path": "../wordcount/tsconfig.build.json" }
 	],
-	// NOTE: This package is being progressively typed. You are encouraged to
-	// expand this array with files which can be type-checked. At some point in
-	// the future, this can be simplified to an `includes` of `src/**/*`.
-	"files": [
-		"src/lock-unlock.ts",
-		"src/components/block-context/index.js",
-		"src/components/block-visibility/constants.ts",
-		"src/components/block-visibility/use-block-visibility.ts"
-	],
-	"include": [ "src/utils/**/*.ts" ]
+	/*
+	 * The package has no TypeScript tests, and its two stories import
+	 * components the build allowlist does not type yet, so nothing is checked.
+	 */
+	"exclude": [
+		"**/benchmark",
+		"src/components/block-icon/stories/index.story.ts",
+		"src/components/contrast-checker/stories/index.story.ts"
+	]
 }
