@@ -10,6 +10,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	PlainText,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	Button,
@@ -49,8 +50,16 @@ const PlaylistTrackEdit = ( {
 	const { currentTrackClientId, setCurrentTrackClientId } =
 		useContext( PlaylistContext );
 	const { createErrorNotice } = useDispatch( noticesStore );
+	const { removeBlock } = useDispatch( blockEditorStore );
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
+
+		// A track that never had a source cannot recover from a failed
+		// upload: its blob URL is revoked, so it would sit in the tracklist
+		// loading forever. Remove it and leave the notice as the explanation.
+		if ( ! src && ! id ) {
+			removeBlock( clientId );
+		}
 	}
 	const hasTrackSource = !! src || !! temporaryURL;
 

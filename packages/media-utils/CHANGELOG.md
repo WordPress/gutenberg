@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Validate uploads against the file extension the user is allowed to upload, so files whose browser-reported mime type differs from WordPress's (such as `.m4a` reported as `audio/x-m4a`) are no longer rejected.
 -   Prevent editor block removal by stopping undo/redo event propagation when the Media Library modal is open ([#79898](https://github.com/WordPress/gutenberg/pull/79898)).
 
 ### Internal

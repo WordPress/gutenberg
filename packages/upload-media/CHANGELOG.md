@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Validate uploads against the file extension the user is allowed to upload, so files whose browser-reported mime type differs from WordPress's (such as `.m4a` reported as `audio/x-m4a`) are no longer rejected.
+
 ### Internal
 
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
@@ -15,6 +19,7 @@
 ### Bug Fixes
 
 -   A failed `/finalize` request is no longer reported as a successful upload. Finalize is the server's commit point for the attachment metadata (responsive sub-sizes and the final `-scaled` file reference); when it fails, the item is now cancelled and the error surfaced instead of showing "upload complete" and keeping an attachment that is missing its registered sizes ([#80673](https://github.com/WordPress/gutenberg/issues/80673)).
+
 ## 0.37.0 (2026-07-29)
 
 ### Breaking Changes

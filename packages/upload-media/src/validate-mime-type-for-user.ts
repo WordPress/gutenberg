@@ -1,6 +1,33 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { ErrorCode, UploadError } from './upload-error';
 import { getMimeTypesArray } from './get-mime-types-array';
+import { getFileExtension } from './utils';
+
+/**
+ * Verifies if the file's extension is one the user is allowed to upload.
+ *
+ * @param fileName           File name.
+ * @param wpAllowedMimeTypes List of allowed mime types and file extensions.
+ */
+function isAllowedExtensionForUser(
+	fileName: string,
+	wpAllowedMimeTypes: Record< string, string >
+) {
+	// `mediaUpload` is also called with raw Blobs, which have no name.
+	if ( typeof fileName !== 'string' ) {
+		return false;
+	}
+
+	const extension = getFileExtension( fileName )?.toLowerCase();
+
+	if ( ! extension ) {
+		return false;
+	}
+
+	return Object.keys( wpAllowedMimeTypes ).some( ( extensionsString ) =>
+		extensionsString.toLowerCase().split( '|' ).includes( extension )
+	);
+}
 
 /**
  * Verifies if the user is allowed to upload this mime type.
@@ -15,7 +42,16 @@ export function validateMimeTypeForUser(
 	// Allowed types for the current WP_User.
 	const allowedMimeTypesForUser = getMimeTypesArray( wpAllowedMimeTypes );
 
-	if ( ! allowedMimeTypesForUser ) {
+	if ( ! allowedMimeTypesForUser || ! wpAllowedMimeTypes ) {
+		return;
+	}
+
+	/*
+	 * Browsers derive `file.type` from the extension with their own lookup
+	 * table, which disagrees with WordPress's (`audio/x-m4a` vs `audio/mpeg`).
+	 * WordPress validates uploads by extension, so trust that instead.
+	 */
+	if ( isAllowedExtensionForUser( file.name, wpAllowedMimeTypes ) ) {
 		return;
 	}
 
