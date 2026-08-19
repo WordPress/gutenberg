@@ -1,18 +1,29 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
+	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
 		"types": [
+			"jest",
+			"node",
 			"gutenberg-env",
 			"gutenberg-test-env",
-			"jest",
 			"style-imports",
 			"react-css-custom-properties"
 		]
 	},
+	"files": [ "global.d.ts" ],
+	"include": [
+		"src/**/test/**/*.ts",
+		"src/**/test/**/*.tsx",
+		"src/**/tests/**/*.ts",
+		"src/**/tests/**/*.tsx",
+		"src/**/__tests__/**/*.ts",
+		"src/**/__tests__/**/*.tsx"
+	],
 	"references": [
+		{ "path": "./tsconfig.build.json" },
 		{ "path": "../a11y/tsconfig.build.json" },
-		{ "path": "../components" },
+		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../data" },
 		{ "path": "../date" },
@@ -26,13 +37,8 @@
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
 		{ "path": "../theme/tsconfig.build.json" },
-		{ "path": "../ui" },
+		{ "path": "../ui/tsconfig.build.json" },
 		{ "path": "../url" },
 		{ "path": "../warning" }
-	],
-	"files": [ "global.d.ts" ],
-	"exclude": [
-		"src/**/stories/**/*.jsx", // only exclude js files, tsx files should be checked
-		"src/**/test/**/*.js" // only exclude js files, ts{x} files should be checked
 	]
 }

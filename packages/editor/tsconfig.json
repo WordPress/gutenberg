@@ -1,22 +1,23 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
+	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
-		"types": [ "style-imports", "react-css-custom-properties" ],
-		"checkJs": false
+		"types": [ "jest", "style-imports", "react-css-custom-properties" ]
 	},
+	"files": [ "global.d.ts" ],
 	"references": [
+		{ "path": "./tsconfig.build.json" },
 		{ "path": "../a11y/tsconfig.build.json" },
 		{ "path": "../api-fetch/tsconfig.build.json" },
 		{ "path": "../blob/tsconfig.build.json" },
 		{ "path": "../block-editor" },
 		{ "path": "../block-serialization-default-parser" },
 		{ "path": "../blocks" },
-		{ "path": "../components" },
+		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../core-data/tsconfig.build.json" },
 		{ "path": "../data" },
-		{ "path": "../dataviews" },
+		{ "path": "../dataviews/tsconfig.build.json" },
 		{ "path": "../date" },
 		{ "path": "../deprecated/tsconfig.build.json" },
 		{ "path": "../dom" },
@@ -42,7 +43,7 @@
 		{ "path": "../rich-text" },
 		{ "path": "../server-side-render/tsconfig.build.json" },
 		{ "path": "../theme/tsconfig.build.json" },
-		{ "path": "../ui" },
+		{ "path": "../ui/tsconfig.build.json" },
 		{ "path": "../url" },
 		{ "path": "../upload-media/tsconfig.build.json" },
 		{ "path": "../views/tsconfig.build.json" },

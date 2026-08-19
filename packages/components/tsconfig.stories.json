@@ -1,0 +1,50 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	/*
+	 * Type checks stories against sources without jest types. Kept out of the
+	 * package tsconfig.json so Storybook's meta extractor stays on its inferred
+	 * project.
+	 */
+	"compilerOptions": {
+		"noEmit": true,
+		"emitDeclarationOnly": false,
+		"types": [
+			"gutenberg-env",
+			"react-css-custom-properties",
+			"style-imports"
+		]
+	},
+	"files": [ "storybook.d.ts", "src/popover/test/utils/index.tsx" ],
+	// Same JS-only exclusion the package used before the split.
+	"exclude": [
+		"**/benchmark",
+		"**/test/**",
+		"**/tests/**",
+		"**/__tests__/**",
+		"src/**/stories/**/*.jsx"
+	],
+	"references": [
+		{ "path": "../a11y/tsconfig.build.json" },
+		{ "path": "../compose/tsconfig.build.json" },
+		{ "path": "../date" },
+		{ "path": "../deprecated/tsconfig.build.json" },
+		{ "path": "../dom" },
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../escape-html/tsconfig.build.json" },
+		{ "path": "../hooks" },
+		{ "path": "../html-entities/tsconfig.build.json" },
+		{ "path": "../i18n/tsconfig.build.json" },
+		{ "path": "../icons" },
+		{ "path": "../is-shallow-equal" },
+		{ "path": "../kebab-case" },
+		{ "path": "../keycodes/tsconfig.build.json" },
+		{ "path": "../primitives" },
+		{ "path": "../private-apis" },
+		{ "path": "../react-i18n" },
+		{ "path": "../rich-text" },
+		{ "path": "../style-runtime" },
+		{ "path": "../ui/tsconfig.build.json" },
+		{ "path": "../warning" }
+	]
+}

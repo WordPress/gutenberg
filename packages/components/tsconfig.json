@@ -1,16 +1,26 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
+	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
 		"types": [
+			"jest",
 			"gutenberg-env",
 			"gutenberg-test-env",
-			"jest",
 			"react-css-custom-properties",
 			"style-imports"
 		]
 	},
+	"files": [ "global.d.ts" ],
+	"include": [
+		"src/**/test/**/*.ts",
+		"src/**/test/**/*.tsx",
+		"src/**/tests/**/*.ts",
+		"src/**/tests/**/*.tsx",
+		"src/**/__tests__/**/*.ts",
+		"src/**/__tests__/**/*.tsx"
+	],
 	"references": [
+		{ "path": "./tsconfig.build.json" },
 		{ "path": "../a11y/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../date" },
@@ -30,12 +40,7 @@
 		{ "path": "../react-i18n" },
 		{ "path": "../rich-text" },
 		{ "path": "../style-runtime" },
-		{ "path": "../ui" },
+		{ "path": "../ui/tsconfig.build.json" },
 		{ "path": "../warning" }
-	],
-	"files": [ "global.d.ts", "storybook.d.ts" ],
-	"exclude": [
-		"src/**/stories/**/*.jsx", // only exclude js files, tsx files should be checked
-		"src/**/test/**/*.js" // only exclude js files, ts{x} files should be checked
 	]
 }

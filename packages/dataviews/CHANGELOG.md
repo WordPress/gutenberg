@@ -15,6 +15,7 @@
 
 ### Internal
 
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81515](https://github.com/WordPress/gutenberg/pull/81515))
 -   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509), [#81514](https://github.com/WordPress/gutenberg/pull/81514))
 -   DataForm: Narrow the combobox control's `onChange` handler parameter back to `string | null`, following the upstream `ComboboxControl` type fix that removed the accidental `undefined` from the callback type. [#81568](https://github.com/WordPress/gutenberg/pull/81568)
 -   DataForm: Internalize `ValidatedComboboxControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81449](https://github.com/WordPress/gutenberg/pull/81449)
@@ -78,6 +79,8 @@
 -   Fix Dataviews popover hover text color readability issue on WordPress 7.0. [#80105](https://github.com/WordPress/gutenberg/pull/80105)
 -   DataViews: Fix the unintended gap between `list` layout items when `groupBy` is set. [#80254](https://github.com/WordPress/gutenberg/pull/80254)
 -   DataViews: Give the search field a fixed width so it no longer resizes when the reset button appears or disappears as the search value changes. [#80315](https://github.com/WordPress/gutenberg/pull/80315)
+
+-   DataViews: Fix the `list` layout mixing `neutral` and `brand` color tokens. The non-selected row hover state now uses `interactive-neutral` tokens instead of `brand`, and the selected row pairs its `brand` background with `content-neutral` text. Field values are now rendered with `foreground-content` tokens since they are static content. [#81074](https://github.com/WordPress/gutenberg/pull/81074)
 
 ### Internal
 

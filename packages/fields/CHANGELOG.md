@@ -2,9 +2,13 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Export `build-style/*`, so the stylesheet can be imported as `@wordpress/fields/build-style/style.css` [#81769](https://github.com/WordPress/gutenberg/pull/81769)).
+
 ### Internal
 
--   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509), [#81514](https://github.com/WordPress/gutenberg/pull/81514))
+-   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509), [#81514](https://github.com/WordPress/gutenberg/pull/81514), [#81515](https://github.com/WordPress/gutenberg/pull/81515))
 -   `parent`: Narrow the combobox `onChange` handler parameter to `string | null`, following the upstream `ComboboxControl` type fix that removed the accidental `undefined` from the callback type. ([#81568](https://github.com/WordPress/gutenberg/pull/81568))
 
 ## 0.45.0 (2026-08-12)

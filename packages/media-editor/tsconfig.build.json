@@ -8,11 +8,11 @@
 	"references": [
 		{ "path": "../a11y/tsconfig.build.json" },
 		{ "path": "../api-fetch/tsconfig.build.json" },
-		{ "path": "../components" },
+		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../core-data/tsconfig.build.json" },
 		{ "path": "../data" },
-		{ "path": "../dataviews" },
+		{ "path": "../dataviews/tsconfig.build.json" },
 		{ "path": "../date" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
@@ -21,6 +21,6 @@
 		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../notices/tsconfig.build.json" },
 		{ "path": "../private-apis" },
-		{ "path": "../ui" }
+		{ "path": "../ui/tsconfig.build.json" }
 	]
 }

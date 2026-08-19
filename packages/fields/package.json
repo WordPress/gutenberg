@@ -38,7 +38,8 @@
 			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
-		"./package.json": "./package.json"
+		"./package.json": "./package.json",
+		"./build-style/*": "./build-style/*"
 	},
 	"types": "build-types",
 	"sideEffects": [

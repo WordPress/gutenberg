@@ -7,12 +7,12 @@
 	"files": [ "global.d.ts", "../jest-console/declarations.d.ts" ],
 	"references": [
 		{ "path": "./tsconfig.build.json" },
-		{ "path": "../components" },
+		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../private-apis" },
 		{ "path": "../route" },
 		{ "path": "../style-runtime" },
-		{ "path": "../ui" }
+		{ "path": "../ui/tsconfig.build.json" }
 	]
 }

@@ -5,17 +5,17 @@
 		"types": [ "gutenberg-env" ]
 	},
 	"references": [
-		{ "path": "../components" },
+		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../core-data/tsconfig.build.json" },
 		{ "path": "../data" },
-		{ "path": "../dataviews" },
+		{ "path": "../dataviews/tsconfig.build.json" },
 		{ "path": "../date" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons" },
 		{ "path": "../primitives" },
-		{ "path": "../ui" },
+		{ "path": "../ui/tsconfig.build.json" },
 		{ "path": "../url" }
 	]
 }

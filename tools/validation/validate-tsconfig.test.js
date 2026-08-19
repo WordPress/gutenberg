@@ -320,6 +320,89 @@ test( 'fails when a package without a build project is missing from the root sol
 	);
 } );
 
+const storiesPackage = {
+	tsconfigs: {
+		'tsconfig.json': [ './tsconfig.build.json' ],
+		'tsconfig.build.json': [ '../blob/tsconfig.build.json' ],
+		'tsconfig.stories.json': [ '../blob/tsconfig.build.json' ],
+	},
+	dependencies: { '@wordpress/blob': 'file:../blob' },
+};
+
+test( 'passes when a stories project is registered and references the dependencies', () => {
+	const result = runValidator(
+		createRepo( {
+			packages: { blob: splitPackage, components: storiesPackage },
+			build: [
+				'packages/blob/tsconfig.build.json',
+				'packages/components/tsconfig.build.json',
+			],
+			root: [
+				'./tsconfig.build.json',
+				'packages/blob',
+				'packages/components',
+				'packages/components/tsconfig.stories.json',
+			],
+		} )
+	);
+
+	expect( result.status ).toBe( 0 );
+} );
+
+test( 'fails when a stories project is missing from the root solution', () => {
+	const result = runValidator(
+		createRepo( {
+			packages: { blob: splitPackage, components: storiesPackage },
+			build: [
+				'packages/blob/tsconfig.build.json',
+				'packages/components/tsconfig.build.json',
+			],
+			root: [
+				'./tsconfig.build.json',
+				'packages/blob',
+				'packages/components',
+			],
+		} )
+	);
+
+	expect( result.status ).not.toBe( 0 );
+	expect( result.stderr ).toContain(
+		'Missing reference to "packages/components/tsconfig.stories.json" in tsconfig.json'
+	);
+} );
+
+test( 'fails when a dependency is missing from the stories project', () => {
+	const result = runValidator(
+		createRepo( {
+			packages: {
+				blob: splitPackage,
+				components: {
+					...storiesPackage,
+					tsconfigs: {
+						...storiesPackage.tsconfigs,
+						'tsconfig.stories.json': [],
+					},
+				},
+			},
+			build: [
+				'packages/blob/tsconfig.build.json',
+				'packages/components/tsconfig.build.json',
+			],
+			root: [
+				'./tsconfig.build.json',
+				'packages/blob',
+				'packages/components',
+				'packages/components/tsconfig.stories.json',
+			],
+		} )
+	);
+
+	expect( result.status ).not.toBe( 0 );
+	expect( result.stderr ).toContain(
+		'Missing reference to "../blob/tsconfig.build.json" in packages/components/tsconfig.stories.json'
+	);
+} );
+
 function typedSplitPackage( buildTypes, devTypes ) {
 	return {
 		tsconfigs: {
@@ -377,6 +460,31 @@ test( 'fails when the build project carries a test type', () => {
 	expect( result.status ).not.toBe( 0 );
 	expect( result.stderr ).toContain(
 		'Test type "jest" in packages/blob/tsconfig.build.json'
+	);
+} );
+
+test( 'checks the stories project of a package without a build project', () => {
+	const result = runValidator(
+		createRepo( {
+			packages: {
+				icons: {
+					tsconfigs: {
+						'tsconfig.json': {
+							extends: '../../tsconfig.dev.base.json',
+							references: [],
+						},
+						'tsconfig.stories.json': [],
+					},
+				},
+			},
+			build: [],
+			root: [ './tsconfig.build.json', 'packages/icons' ],
+		} )
+	);
+
+	expect( result.status ).not.toBe( 0 );
+	expect( result.stderr ).toContain(
+		'Missing reference to "packages/icons/tsconfig.stories.json" in tsconfig.json'
 	);
 } );
 

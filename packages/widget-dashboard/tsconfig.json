@@ -7,10 +7,10 @@
 	"files": [ "global.d.ts" ],
 	"references": [
 		{ "path": "./tsconfig.build.json" },
-		{ "path": "../components" },
+		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../data" },
-		{ "path": "../dataviews" },
+		{ "path": "../dataviews/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../grid/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
@@ -18,7 +18,7 @@
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
 		{ "path": "../style-runtime" },
-		{ "path": "../ui" },
+		{ "path": "../ui/tsconfig.build.json" },
 		{ "path": "../viewport" },
 		{ "path": "../widget-primitives/tsconfig.build.json" }
 	],
