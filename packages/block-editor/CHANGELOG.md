@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   Patterns explorer: Refactor the category sidebar to use `Tabs`.
 -   Show separate horizontal and vertical block spacing controls in the block inspector only for Flex and Grid layouts, while retaining axial gap support in Global Styles. Responsive Grid column calculations use the horizontal gap, while Flow and Constrained layouts use the vertical gap when receiving an axial value ([#81476](https://github.com/WordPress/gutenberg/pull/81476)).
 
 ### Bug Fixes
