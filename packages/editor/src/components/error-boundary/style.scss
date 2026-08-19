@@ -4,18 +4,13 @@
 .editor-error-boundary {
 	font-family: $default-font;
 	margin: auto;
-	max-width: 780px;
+	max-width: 720px;
 	padding: $grid-unit-20;
 	margin-top: $header-height;
 	box-shadow: $elevation-large;
 	border: $border-width solid $gray-900;
 	border-radius: $radius-small;
 	background-color: $white;
-}
-
-.editor-error-boundary__details {
-	border-top: $border-width solid $gray-200;
-	padding-top: $grid-unit-15;
 }
 
 .editor-error-boundary__details [data-panel-open] svg {

@@ -1,11 +1,12 @@
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { Collapsible, EmptyState, Stack, Text } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components -- The fallback UI renders outside the editor's notice system.
+import { Collapsible, Notice, Stack, Text } from '@wordpress/ui';
 import { select } from '@wordpress/data';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { doAction } from '@wordpress/hooks';
-import { caution, chevronDown } from '@wordpress/icons';
+import { chevronDown } from '@wordpress/icons';
 import { store as editorStore } from '../../store';
 
 function getContent() {
@@ -62,12 +63,12 @@ function getErrorReport( error, componentStack ) {
 	return sections.join( '\n\n' );
 }
 
-function CopyButton( { text, children, variant = 'secondary' } ) {
+function CopyButton( { text, children, variant = 'outline' } ) {
 	const ref = useCopyToClipboard( text );
 	return (
-		<Button __next40pxDefaultSize variant={ variant } ref={ ref }>
+		<Notice.ActionButton variant={ variant } ref={ ref }>
 			{ children }
-		</Button>
+		</Notice.ActionButton>
 	);
 }
 
@@ -143,34 +144,31 @@ class ErrorBoundary extends Component {
 				direction="column"
 				gap="lg"
 			>
-				<EmptyState.Root>
-					<EmptyState.Icon icon={ caution } />
-					<EmptyState.Title>
+				<Notice.Root intent="error">
+					<Notice.Title>
+						{ __( 'The editor has crashed' ) }
+					</Notice.Title>
+					<Notice.Description>
 						{ __(
-							'The editor has encountered an unexpected error.'
+							'An unknown error occurred. Reload your browser to try again, or copy the error to report the problem or search.'
 						) }
-					</EmptyState.Title>
-					<EmptyState.Description>
-						{ __(
-							'Reload the page to continue. Copy the error to report the problem.'
-						) }
-					</EmptyState.Description>
-					<EmptyState.Actions>
+					</Notice.Description>
+					<Notice.Actions>
 						{ canCopyContent && (
 							<CopyButton text={ getContent }>
 								{ __( 'Copy contents' ) }
 							</CopyButton>
 						) }
 						<CopyButton
-							variant="primary"
+							variant="solid"
 							text={ () =>
 								getErrorReport( error, componentStack )
 							}
 						>
 							{ __( 'Copy error' ) }
 						</CopyButton>
-					</EmptyState.Actions>
-				</EmptyState.Root>
+					</Notice.Actions>
+				</Notice.Root>
 				{ globalThis.SCRIPT_DEBUG ? (
 					<ErrorDetails
 						error={ error }
