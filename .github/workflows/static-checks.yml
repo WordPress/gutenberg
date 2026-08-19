@@ -114,13 +114,16 @@ jobs:
                   npm run lint:css -- --formatter compact
                   npm run lint:css:update-suppressions
 
-            - name: Type check dev projects
-              # TODO: Fold the build type check below into this run once
-              # every package is migrated to the split tsconfig layout.
+            - name: Type checking
               run: npm run typecheck
 
-            - name: Type checking
-              run: npm run build
+            - name: Check type declaration files
+              # Runs against the declarations the type check just emitted;
+              # the bundle build below skips types and with them this check.
+              run: npm run check:type-declarations
+
+            - name: Build packages
+              run: npm run build -- --skip-types
 
             - name: Validate package contents
               run: npm run lint:package-contents

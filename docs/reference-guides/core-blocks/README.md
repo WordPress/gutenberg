@@ -534,7 +534,7 @@ Your site doesn’t include support for this block.
 
 ## More
 
-Content before this block will be shown in the excerpt on your archives page.
+Content before this block is shown in the excerpt on blog and archive pages. Where a theme shows the full content instead, visitors get a “Read more” link to the rest of the post.
 
 -	**Name:** [core/more](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-more/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
