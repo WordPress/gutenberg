@@ -377,11 +377,12 @@ export function MediaPlaceholder( {
 					// blocks' names, as wp-block:core/{name}, so no matches means it
 					// isn't an inserter drag.
 					const prefix = 'wp-block:core/';
-
-					const types = dataTransfer.types
-						.filter( ( type ) => type.startsWith( prefix ) )
-						.map( ( type ) => type.slice( prefix.length ) );
-
+					const types = [];
+					for ( const type of dataTransfer.types ) {
+						if ( type.startsWith( prefix ) ) {
+							types.push( type.slice( prefix.length ) );
+						}
+					}
 					return (
 						types.length > 0 &&
 						types.every( ( type ) =>
