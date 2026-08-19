@@ -175,7 +175,6 @@ interface MediaEditorFrameContextValue {
 	hasMedia: boolean;
 	hasChanges: boolean;
 	isUndoRedoDisabled: boolean;
-	layout: 'wide' | 'narrow';
 	scope: string;
 	aspectRatioPresets?: AspectRatioPreset[];
 	onCancel: () => void;
@@ -377,12 +376,11 @@ function SaveActions( { size = 'default' }: SaveActionsProps ) {
 }
 
 function ImageControls() {
-	const { isImage, layout, aspectRatioPresets } =
-		useMediaEditorFrameContext();
-	// Renders only where the frame is responsible for these: in the `wide`
-	// layout the Crop panel holds them, so a frame that places this
-	// unconditionally still won't show them twice.
-	if ( ! isImage || layout !== 'narrow' ) {
+	const { isImage, aspectRatioPresets } = useMediaEditorFrameContext();
+	// Non-image media has nothing to transform. Placement is the frame's call:
+	// render this only in the `narrow` layout, since above that breakpoint the
+	// Crop panel holds these controls already.
+	if ( ! isImage ) {
 		return null;
 	}
 	return (
@@ -733,7 +731,6 @@ function MediaEditorContent( {
 		hasMedia: !! media,
 		hasChanges,
 		isUndoRedoDisabled: isCropInteractionActive,
-		layout,
 		scope,
 		aspectRatioPresets,
 		onCancel: handleRequestClose,
