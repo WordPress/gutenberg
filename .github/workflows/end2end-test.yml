@@ -61,7 +61,7 @@ jobs:
                   xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e -- --shard="${SHARD_PART}/${SHARD_TOTAL}"
 
             - name: Archive debug artifacts (screenshots, traces)
-              uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               if: ${{ !cancelled() }}
               with:
                   name: failures-artifacts--${{ matrix.part }}
@@ -69,7 +69,7 @@ jobs:
                   if-no-files-found: ignore
 
             - name: Archive flaky tests report
-              uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               if: ${{ !cancelled() }}
               with:
                   name: flaky-tests-report--${{ matrix.part }}
