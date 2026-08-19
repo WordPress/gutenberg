@@ -10,7 +10,7 @@ jobs:
     steps:
       # Checkout defaults to using the branch which triggered the event, which
       # isn't necessarily `master` (e.g. in the case of a merge).
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: master
       # Changing into the action's directory and running `npm install` is much
