@@ -23,7 +23,7 @@ export const bold = {
 		onChange,
 		onFocus,
 		isVisible = true,
-	}: BoldEditProps ): JSX.Element {
+	}: BoldEditProps ): React.ReactNode {
 		function onToggle() {
 			onChange( toggleFormat( value, { type: name, title } ) );
 		}
