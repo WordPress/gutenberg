@@ -13,6 +13,7 @@ export * from './icon';
 export * from './icon-button';
 export * from './link';
 export * from './link-button';
+export * as Menu from './menu';
 export * as Notice from './notice';
 export * as Popover from './popover';
 export * from './skeleton';
