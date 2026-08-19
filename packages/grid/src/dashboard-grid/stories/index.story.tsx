@@ -643,6 +643,87 @@ export const EditMode: Story = {
 };
 
 /**
+ * Per-item minimum sizes via `itemMinSizes`, in pixels. The grid
+ * quantizes each minimum up to whole tracks of its current geometry and
+ * pins both the tile and the snap preview at that floor while the
+ * pointer overshoots; release commits the floored spans, so the layout
+ * never records a size below the minimum. Tiles without an entry still
+ * shrink to a single track.
+ *
+ * Resize the constrained tiles below their declared minimum to feel the
+ * gesture being absorbed; the state panel confirms the committed layout
+ * never dips under the floor.
+ */
+export const MinimumSizes: Story = {
+	name: 'Per-Item Minimum Sizes',
+	args: {
+		columns: 6,
+		rowHeight: 80,
+		editMode: true,
+		itemMinSizes: {
+			chart: { width: 320, height: 160 },
+			preview: { width: 480, height: 240 },
+		},
+		layout: [
+			{ key: 'chart', width: 4, height: 2, order: 1 },
+			{ key: 'free-a', width: 2, height: 2, order: 2 },
+			{ key: 'preview', width: 5, height: 4, order: 3 },
+			{ key: 'free-b', width: 2, height: 1, order: 4 },
+		],
+	},
+	render: function MinimumSizesRender( args ) {
+		const [ layout, setLayout ] = useState< DashboardGridLayoutItem[] >(
+			args.layout
+		);
+		const [ previewLayout, setPreviewLayout ] = useState<
+			DashboardGridLayoutItem[] | null
+		>( null );
+
+		const tiles = useMemo(
+			() => [
+				<Tile key="chart" tone="info">
+					min 320 × 160 px
+				</Tile>,
+				<Tile key="free-a" tone="neutral">
+					no minimum
+				</Tile>,
+				<Tile key="preview" tone="brand">
+					min 480 × 240 px
+				</Tile>,
+				<Tile key="free-b" tone="neutral">
+					no minimum
+				</Tile>,
+			],
+			[]
+		);
+
+		return (
+			<Stack direction="row" gap="lg" align="flex-start">
+				<div style={ { width: '800px' } }>
+					<DashboardGrid
+						{ ...args }
+						layout={ layout }
+						onChangeLayout={ ( next ) => {
+							setLayout( next );
+							setPreviewLayout( null );
+						} }
+						onPreviewLayout={ setPreviewLayout }
+					>
+						{ tiles }
+					</DashboardGrid>
+				</div>
+
+				<LayoutStatePanel
+					label={ previewLayout ? 'Staging' : 'Committed' }
+					layout={ previewLayout ?? layout }
+					tone={ previewLayout ? 'warning' : 'success' }
+				/>
+			</Stack>
+		);
+	},
+};
+
+/**
  * Custom corner-resize glyph: a diagonal line plus a filled triangle,
  * both leaning toward the bottom-right corner of the tile.
  */
