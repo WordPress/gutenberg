@@ -4,16 +4,21 @@ import { InputLayout } from '../';
 import { IconButton } from '../../../../icon-button';
 
 const meta: Meta< typeof InputLayout > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/Primitives/InputLayout',
 	component: InputLayout,
 	subcomponents: {
 		'InputLayout.Slot': InputLayout.Slot,
 	},
+	// Temporary: Due to an upstream bug, render the component explicitly so the
+	// components manifest extractor can resolve props from the JSX.
+	//
+	// See: https://github.com/storybookjs/storybook/issues/34877
+	render: ( args ) => <InputLayout { ...args } />,
 	parameters: {
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components`, and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
