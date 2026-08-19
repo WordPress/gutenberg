@@ -14,6 +14,7 @@
 
 -   Remove unused dependencies `@wordpress/escape-html`, `@wordpress/wordcount` and `deepmerge` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
 -   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
+-   Extract the populated pattern category computation from `usePatternCategories` into a `getPopulatedCategories` util, and expose it and `searchItems` through private APIs for reuse by the start page options modal ([#81396](https://github.com/WordPress/gutenberg/pull/81396)).
 
 ### Bug Fixes
 
@@ -93,7 +94,6 @@
 
 ### Internal
 
--   Extract the populated pattern category computation from `usePatternCategories` into a `getPopulatedCategories` util, and expose it and `searchItems` through private APIs for reuse by the start page options modal ([#81396](https://github.com/WordPress/gutenberg/pull/81396)).
 -   `ListView`: Reimplement the Firefox description-recomputation workaround in `AriaReferencedText` by keying the element on its text, so React replaces it instead of updating the existing text node in place ([#80929](https://github.com/WordPress/gutenberg/pull/80929).
 
 ### Bug Fixes
