@@ -1,5 +1,11 @@
-import clsx from 'clsx';
-import { Flex, FlexItem, Modal, CheckboxControl } from '@wordpress/components';
+import {
+	Flex,
+	FlexItem,
+	Modal,
+	CheckboxControl,
+	SearchControl,
+} from '@wordpress/components';
+import { Stack, Tabs } from '@wordpress/ui';
 import { __, _x } from '@wordpress/i18n';
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import {
@@ -20,7 +26,7 @@ import {
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { PatternExplorerSidebar, getPopulatedCategories, searchItems } = unlock(
+const { getPopulatedCategories, searchItems } = unlock(
 	blockEditorPrivateApis
 );
 
@@ -191,25 +197,53 @@ function StartPageOptionsModal( { onClose } ) {
 			isFullScreen
 			onRequestClose={ handleClose }
 		>
-			{ hasCategories && (
-				<PatternExplorerSidebar
-					selectedCategory={ selectedCategory }
-					patternCategories={ patternCategories }
-					onClickCategory={ setSelectedCategory }
-					searchValue={ searchValue }
-					setSearchValue={ setSearchValue }
-				/>
+			{ hasCategories ? (
+				<Tabs.Root
+					orientation="vertical"
+					value={ selectedCategory }
+					onValueChange={ setSelectedCategory }
+				>
+					<Stack
+						direction="column"
+						gap="lg"
+						className="editor-start-page-options__sidebar"
+					>
+						<SearchControl
+							onChange={ setSearchValue }
+							value={ searchValue }
+							label={ __( 'Search' ) }
+							placeholder={ __( 'Search' ) }
+						/>
+						<Tabs.List>
+							{ patternCategories.map( ( { name, label } ) => (
+								<Tabs.Tab key={ name } value={ name }>
+									{ label }
+								</Tabs.Tab>
+							) ) }
+						</Tabs.List>
+					</Stack>
+					{ patternCategories.map( ( { name } ) => (
+						<Tabs.Panel
+							key={ name }
+							value={ name }
+							tabIndex={ -1 }
+							className="editor-start-page-options__modal-content has-pattern-categories"
+						>
+							<PatternSelection
+								blockPatterns={ filteredStartPatterns }
+								onChoosePattern={ handleClose }
+							/>
+						</Tabs.Panel>
+					) ) }
+				</Tabs.Root>
+			) : (
+				<div className="editor-start-page-options__modal-content">
+					<PatternSelection
+						blockPatterns={ filteredStartPatterns }
+						onChoosePattern={ handleClose }
+					/>
+				</div>
 			) }
-			<div
-				className={ clsx( 'editor-start-page-options__modal-content', {
-					'has-pattern-categories': hasCategories,
-				} ) }
-			>
-				<PatternSelection
-					blockPatterns={ filteredStartPatterns }
-					onChoosePattern={ handleClose }
-				/>
-			</div>
 			<Flex
 				className="editor-start-page-options__modal__actions"
 				justify="flex-start"

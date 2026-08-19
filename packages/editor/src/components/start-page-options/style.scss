@@ -29,14 +29,21 @@ $actions-height: 72px;
 		padding-bottom: $actions-height;
 	}
 
-	.block-editor-block-patterns-explorer__sidebar {
-		// Unlike the pattern explorer, this modal has a footer actions bar the
-		// sidebar must not run under.
-		bottom: $actions-height;
+	.editor-start-page-options__sidebar {
 		display: none;
 
 		@include break-medium() {
-			display: block;
+			display: flex;
+			position: absolute;
+			top: $header-height + $grid-unit-10;
+			left: 0;
+			// Unlike the pattern explorer, this modal has a footer actions bar
+			// the sidebar must not run under.
+			bottom: $actions-height;
+			width: $sidebar-width;
+			padding: $grid-unit-30;
+			overflow-x: visible;
+			overflow-y: auto;
 		}
 	}
 }
