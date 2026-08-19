@@ -169,7 +169,13 @@ export default function useTabNav() {
 		}
 
 		function onFocusOut( event ) {
-			setLastFocus( { ...getLastFocus(), current: event.target } );
+			// `focusout` also fires when focus moves between elements within the
+			// canvas, but only the element focus left the canvas from is of
+			// interest. `contains` is false for a null `relatedTarget`, which is
+			// what focus moving to another document reports.
+			if ( ! node.contains( event.relatedTarget ) ) {
+				setLastFocus( { current: event.target } );
+			}
 
 			const { ownerDocument } = node;
 

@@ -534,7 +534,7 @@ Your site doesn’t include support for this block.
 
 ## More
 
-Content before this block will be shown in the excerpt on your archives page.
+Content before this block is shown in the excerpt on blog and archive pages. Where a theme shows the full content instead, visitors get a “Read more” link to the rest of the post.
 
 -	**Name:** [core/more](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-more/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -814,7 +814,7 @@ An advanced block that allows displaying post types based on different query par
 
 -	**Name:** [core/query](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** align (full, wide), anchor, interactivity, layout, ~~html~~
+-	**Supports:** align (full, wide), anchor, interactivity, layout, spacing (blockGap), ~~html~~
 -	**Attributes:** enhancedPagination, namespace, query, queryId, tagName
 
 ## No Results

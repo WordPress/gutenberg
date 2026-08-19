@@ -1,35 +1,23 @@
 import clsx from 'clsx';
 import {
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 	__experimentalSpacer as Spacer,
 	__experimentalItemGroup as ItemGroup,
-	__experimentalInputControl as InputControl,
 	__experimentalUnitControl as UnitControl,
 	__experimentalGrid as Grid,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	useNavigator,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-	__experimentalConfirmDialog as ConfirmDialog,
 	Dropdown,
 	Button,
-	Flex,
 	FlexItem,
 	ColorPalette,
-	Modal,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	plus,
-	shadow as shadowIcon,
-	reset,
-	moreVertical,
-} from '@wordpress/icons';
+import { plus, shadow as shadowIcon, reset } from '@wordpress/icons';
 import { useState, useMemo, useEffect, useRef } from '@wordpress/element';
+import { Stack } from '@wordpress/ui';
 import { Subtitle } from './subtitle';
-import { ScreenHeader } from './screen-header';
 import { ScreenBody } from './screen-body';
 import { defaultShadow } from './shadows-panel';
 import {
@@ -37,236 +25,127 @@ import {
 	shadowStringToObject,
 	shadowObjectToString,
 } from './shadow-utils';
-import { useSetting } from './hooks';
-import { unlock } from './lock-unlock';
+import { usePresets } from './presets/use-presets';
+import PresetEditHeader from './presets/preset-edit-header';
+import type { PresetEditHeaderMenuItem } from './presets/preset-edit-header';
+import ConfirmDeleteDialog from './presets/dialogs/confirm-delete-dialog';
+import RenameDialog from './presets/dialogs/rename-dialog';
 
-const { Menu } = unlock( componentsPrivateApis );
-
-const customShadowMenuItems = [
-	{
-		label: __( 'Rename' ),
-		action: 'rename',
-	},
-	{
-		label: __( 'Delete' ),
-		action: 'delete',
-	},
-];
-
-const presetShadowMenuItems = [
-	{
-		label: __( 'Reset' ),
-		action: 'reset',
-	},
-];
+interface ShadowPreset {
+	name: string;
+	slug: string;
+	shadow: string;
+}
 
 export default function ShadowsEditPanel() {
 	const { goBack, params } = useNavigator();
-	const { category, slug } = params;
+	const origin = params.category as string;
+	const slug = params.slug as string;
 
-	const [ shadows, setShadows ] = useSetting(
-		`shadow.presets.${ category }`
+	const { presets, basePresets, setPresets } = usePresets< ShadowPreset >(
+		'shadow.presets',
+		origin
 	);
+
+	const shadow = presets.find( ( s ) => s.slug === slug );
+
+	const [ isDeleteOpen, setIsDeleteOpen ] = useState( false );
+	const [ isRenameOpen, setIsRenameOpen ] = useState( false );
 
 	useEffect( () => {
-		const hasCurrentShadow = shadows?.some(
-			( shadow: any ) => shadow.slug === slug
-		);
-		// If the shadow being edited doesn't exist anymore in the global styles setting, navigate back
-		// to prevent the user from editing a non-existent shadow entry.
-		// This can happen, for example:
-		// - when the user deletes the shadow
-		// - when the user resets the styles while editing a custom shadow
-		//
-		// The check on the slug is necessary to prevent a double back navigation when the user triggers
-		// a backward navigation by interacting with the screen's UI.
-		if ( !! slug && ! hasCurrentShadow ) {
+		if ( !! slug && ! shadow ) {
 			goBack();
 		}
-	}, [ shadows, slug, goBack ] );
+	}, [ shadow, slug, goBack ] );
 
-	const [ baseShadows ] = useSetting(
-		`shadow.presets.${ category }`,
-		undefined,
-		'base'
-	);
-	const [ selectedShadow, setSelectedShadow ] = useState( () =>
-		( shadows || [] ).find( ( shadow: any ) => shadow.slug === slug )
-	);
-	const baseSelectedShadow = useMemo(
-		() => ( baseShadows || [] ).find( ( b: any ) => b.slug === slug ),
-		[ baseShadows, slug ]
-	);
-	const [ isConfirmDialogVisible, setIsConfirmDialogVisible ] =
-		useState( false );
-	const [ isRenameModalVisible, setIsRenameModalVisible ] = useState( false );
-	const [ shadowName, setShadowName ] = useState< string | undefined >(
-		selectedShadow?.name
-	);
-
-	if ( ! category || ! slug ) {
+	if ( ! origin || ! slug || ! shadow ) {
 		return null;
 	}
 
-	const onShadowChange = ( shadow: string ) => {
-		setSelectedShadow( { ...selectedShadow, shadow } );
-		const updatedShadows = shadows.map( ( s: any ) =>
-			s.slug === slug ? { ...selectedShadow, shadow } : s
+	const baseShadow = basePresets.find( ( s ) => s.slug === slug );
+
+	const onShadowChange = ( value: string ) =>
+		setPresets(
+			presets.map( ( p ) =>
+				p.slug === slug ? { ...shadow, shadow: value } : p
+			)
 		);
-		setShadows( updatedShadows );
-	};
 
-	const onMenuClick = ( action: string ) => {
-		if ( action === 'reset' ) {
-			const updatedShadows = shadows.map( ( s: any ) =>
-				s.slug === slug ? baseSelectedShadow : s
-			);
-			setSelectedShadow( baseSelectedShadow );
-			setShadows( updatedShadows );
-		} else if ( action === 'delete' ) {
-			setIsConfirmDialogVisible( true );
-		} else if ( action === 'rename' ) {
-			setIsRenameModalVisible( true );
-		}
-	};
+	const menuItems: PresetEditHeaderMenuItem[] =
+		origin === 'custom'
+			? [
+					{
+						label: __( 'Rename' ),
+						onClick: () => setIsRenameOpen( true ),
+					},
+					{
+						label: __( 'Delete' ),
+						onClick: () => setIsDeleteOpen( true ),
+					},
+			  ]
+			: [
+					{
+						label: __( 'Reset' ),
+						onClick: () => {
+							if ( ! baseShadow ) {
+								return;
+							}
+							setPresets(
+								presets.map( ( p ) =>
+									p.slug === slug ? baseShadow : p
+								)
+							);
+						},
+						disabled: shadow.shadow === baseShadow?.shadow,
+					},
+			  ];
 
-	const handleShadowDelete = () => {
-		setShadows( shadows.filter( ( s: any ) => s.slug !== slug ) );
-	};
-
-	const handleShadowRename = ( newName: string | undefined ) => {
-		if ( ! newName ) {
-			return;
-		}
-		const updatedShadows = shadows.map( ( s: any ) =>
-			s.slug === slug ? { ...selectedShadow, name: newName } : s
-		);
-		setSelectedShadow( { ...selectedShadow, name: newName } );
-		setShadows( updatedShadows );
-	};
-
-	return ! selectedShadow ? (
-		<ScreenHeader title="" />
-	) : (
+	return (
 		<>
-			<HStack justify="space-between">
-				<ScreenHeader title={ selectedShadow.name } />
-				<FlexItem>
-					<Spacer marginTop={ 2 } marginBottom={ 0 } paddingX={ 4 }>
-						<Menu>
-							<Menu.TriggerButton
-								render={
-									<Button
-										size="small"
-										icon={ moreVertical }
-										label={ __( 'Menu' ) }
-									/>
-								}
-							/>
-							<Menu.Popover>
-								{ ( category === 'custom'
-									? customShadowMenuItems
-									: presetShadowMenuItems
-								).map( ( item ) => (
-									<Menu.Item
-										key={ item.action }
-										onClick={ () =>
-											onMenuClick( item.action )
-										}
-										disabled={
-											item.action === 'reset' &&
-											selectedShadow.shadow ===
-												baseSelectedShadow?.shadow
-										}
-									>
-										<Menu.ItemLabel>
-											{ item.label }
-										</Menu.ItemLabel>
-									</Menu.Item>
-								) ) }
-							</Menu.Popover>
-						</Menu>
-					</Spacer>
-				</FlexItem>
-			</HStack>
+			<PresetEditHeader
+				title={ shadow.name }
+				menuLabel={ __( 'Menu' ) }
+				menuItems={ menuItems }
+			/>
 			<ScreenBody>
-				<ShadowsPreview shadow={ selectedShadow.shadow } />
+				<ShadowsPreview shadow={ shadow.shadow } />
 				<ShadowEditor
-					shadow={ selectedShadow.shadow }
+					shadow={ shadow.shadow }
 					onChange={ onShadowChange }
 				/>
 			</ScreenBody>
-			{ isConfirmDialogVisible && (
-				<ConfirmDialog
-					isOpen
-					onConfirm={ () => {
-						handleShadowDelete();
-						setIsConfirmDialogVisible( false );
-					} }
-					onCancel={ () => {
-						setIsConfirmDialogVisible( false );
-					} }
-					confirmButtonText={ __( 'Delete' ) }
-					size="medium"
-				>
-					{ sprintf(
+			{ isDeleteOpen && (
+				<ConfirmDeleteDialog
+					message={ sprintf(
 						/* translators: %s: Name of the shadow preset. */
 						__(
 							'Are you sure you want to delete "%s" shadow preset?'
 						),
-						selectedShadow.name
+						shadow.name
 					) }
-				</ConfirmDialog>
+					isOpen={ isDeleteOpen }
+					toggleOpen={ () => setIsDeleteOpen( false ) }
+					onConfirm={ () => {
+						setPresets(
+							presets.filter( ( p ) => p.slug !== slug )
+						);
+						goBack();
+					} }
+				/>
 			) }
-			{ isRenameModalVisible && (
-				<Modal
-					title={ __( 'Rename' ) }
-					onRequestClose={ () => setIsRenameModalVisible( false ) }
-					size="small"
-				>
-					<form
-						onSubmit={ ( event ) => {
-							event.preventDefault();
-							handleShadowRename( shadowName );
-							setIsRenameModalVisible( false );
-						} }
-					>
-						<InputControl
-							autoComplete="off"
-							label={ __( 'Name' ) }
-							placeholder={ __( 'Shadow name' ) }
-							value={ shadowName ?? '' }
-							onChange={ setShadowName }
-						/>
-						<Spacer marginBottom={ 6 } />
-						<Flex
-							className="block-editor-shadow-edit-modal__actions"
-							justify="flex-end"
-							expanded={ false }
-						>
-							<FlexItem>
-								<Button
-									__next40pxDefaultSize
-									variant="tertiary"
-									onClick={ () =>
-										setIsRenameModalVisible( false )
-									}
-								>
-									{ __( 'Cancel' ) }
-								</Button>
-							</FlexItem>
-							<FlexItem>
-								<Button
-									__next40pxDefaultSize
-									variant="primary"
-									type="submit"
-								>
-									{ __( 'Save' ) }
-								</Button>
-							</FlexItem>
-						</Flex>
-					</form>
-				</Modal>
+			{ isRenameOpen && (
+				<RenameDialog
+					initialName={ shadow.name }
+					placeholder={ __( 'Shadow name' ) }
+					toggleOpen={ () => setIsRenameOpen( false ) }
+					onRename={ ( name ) =>
+						setPresets(
+							presets.map( ( p ) =>
+								p.slug === slug ? { ...p, name } : p
+							)
+						)
+					}
+				/>
 			) }
 		</>
 	);
@@ -283,8 +162,9 @@ function ShadowsPreview( { shadow }: ShadowsPreviewProps ) {
 
 	return (
 		<Spacer marginBottom={ 4 } marginTop={ -2 }>
-			<HStack
-				alignment="center"
+			<Stack
+				direction="row"
+				align="center"
 				justify="center"
 				className="global-styles-ui__shadow-preview-panel"
 			>
@@ -292,7 +172,7 @@ function ShadowsPreview( { shadow }: ShadowsPreviewProps ) {
 					className="global-styles-ui__shadow-preview-block"
 					style={ shadowStyle }
 				/>
-			</HStack>
+			</Stack>
 		</Spacer>
 	);
 }
@@ -323,8 +203,8 @@ function ShadowEditor( { shadow, onChange }: ShadowEditorProps ) {
 
 	return (
 		<>
-			<VStack spacing={ 2 }>
-				<HStack justify="space-between">
+			<Stack direction="column" gap="sm">
+				<Stack justify="space-between" align="flex-start">
 					<Subtitle level={ 3 }>{ __( 'Shadows' ) }</Subtitle>
 					<FlexItem className="global-styles-ui__shadows-panel__options-container">
 						<Button
@@ -337,8 +217,8 @@ function ShadowEditor( { shadow, onChange }: ShadowEditorProps ) {
 							ref={ addShadowButtonRef }
 						/>
 					</FlexItem>
-				</HStack>
-			</VStack>
+				</Stack>
+			</Stack>
 			<Spacer />
 			<ItemGroup isBordered isSeparated>
 				{ shadowParts.map( ( part, index ) => (
@@ -464,7 +344,11 @@ function ShadowPopover( { shadowObj, onChange }: ShadowPopoverProps ) {
 	};
 
 	return (
-		<VStack spacing={ 4 } className="global-styles-ui__shadow-editor-panel">
+		<Stack
+			direction="column"
+			gap="md"
+			className="global-styles-ui__shadow-editor-panel"
+		>
 			<ColorPalette
 				clearable={ false }
 				enableAlpha={ enableAlpha }
@@ -514,7 +398,7 @@ function ShadowPopover( { shadowObj, onChange }: ShadowPopoverProps ) {
 					onChange={ ( value ) => onShadowChange( 'spread', value ) }
 				/>
 			</Grid>
-		</VStack>
+		</Stack>
 	);
 }
 

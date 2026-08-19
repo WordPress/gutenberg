@@ -1518,18 +1518,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "DateCalendar",
-		"slug": "date-calendar",
-		"markdown_source": "../packages/components/src/calendar/date-calendar/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "DateRangeCalendar",
-		"slug": "date-range-calendar",
-		"markdown_source": "../packages/components/src/calendar/date-range-calendar/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "CardBody",
 		"slug": "card-body",
 		"markdown_source": "../packages/components/src/card/card-body/README.md",
@@ -2619,6 +2607,12 @@
 		"title": "@wordpress/jest-preset-default",
 		"slug": "packages-jest-preset-default",
 		"markdown_source": "../packages/jest-preset-default/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/kebab-case",
+		"slug": "packages-kebab-case",
+		"markdown_source": "../packages/kebab-case/README.md",
 		"parent": "packages"
 	},
 	{

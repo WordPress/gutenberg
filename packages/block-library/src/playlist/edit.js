@@ -460,7 +460,7 @@ const PlaylistEdit = ( {
 					} }
 					onSelect={ onSelectTracks }
 					accept="audio/*"
-					multiple
+					multiple="add"
 					handleUpload={ false }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onError={ onUploadError }
@@ -471,12 +471,12 @@ const PlaylistEdit = ( {
 
 	return (
 		<>
-			<BlockControls group="other" __experimentalShareWithChildBlocks>
+			<BlockControls group="other">
 				<MediaReplaceFlow
 					name={ __( 'Add track' ) }
 					onSelect={ onAddTracks }
 					accept="audio/*"
-					multiple
+					multiple="add"
 					handleUpload={ false }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onError={ onUploadError }
@@ -671,7 +671,7 @@ const PlaylistEdit = ( {
 				<MediaPlaceholder
 					onSelect={ onAddTracks }
 					accept="audio/*"
-					multiple
+					multiple="add"
 					handleUpload={ false }
 					disableMediaButtons
 					allowedTypes={ ALLOWED_MEDIA_TYPES }

@@ -14,9 +14,9 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	ToggleControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { kebabCase } from '@wordpress/kebab-case';
 import { store as blockEditorStore } from '../store';
 import { InspectorControls } from '../components';
 import { useSettings } from '../components/use-settings';
@@ -47,7 +47,6 @@ const CHILD_LAYOUT_KEYS = [
 	'rowStart',
 	'rowSpan',
 ];
-const { kebabCase } = unlock( componentsPrivateApis );
 const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 
 function getDefaultLayout( layoutBlockSupport = {}, blockVariation ) {

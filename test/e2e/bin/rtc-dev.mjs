@@ -176,6 +176,15 @@ function runWpCli( wpArgs, { allowFailure = false } = {} ) {
 	return promise.catch( () => undefined );
 }
 
+async function enableCollaborationExperiment() {
+	process.stdout.write( 'Enabling collaboration experiment... ' );
+	await runWpCli( [
+		'eval',
+		"$experiments = get_option( 'gutenberg-experiments', array() ); $experiments['gutenberg-real-time-collaboration'] = true; update_option( 'gutenberg-experiments', $experiments );",
+	] );
+	process.stdout.write( 'done\n' );
+}
+
 async function buildProviderBundle() {
 	process.stdout.write( 'Building provider bundle... ' );
 	await esbuildBuild( {
@@ -215,9 +224,7 @@ async function runWebSocketsMode() {
 	await runWpCli( [ 'plugin', 'activate', PLUGIN_SLUG ] );
 	process.stdout.write( 'done\n' );
 
-	process.stdout.write( 'Enabling collaboration option... ' );
-	await runWpCli( [ 'option', 'update', 'wp_collaboration_enabled', '1' ] );
-	process.stdout.write( 'done\n' );
+	await enableCollaborationExperiment();
 
 	const server = spawn(
 		process.execPath,
@@ -262,6 +269,8 @@ async function runHttpMode() {
 	} else {
 		process.stdout.write( 'No mount to remove.\n' );
 	}
+
+	await enableCollaborationExperiment();
 
 	process.stdout.write(
 		'\nRTC switched to HTTP polling (default). http://localhost:8888/wp-admin\n'

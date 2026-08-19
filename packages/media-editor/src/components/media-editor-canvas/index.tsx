@@ -8,8 +8,6 @@ import { Cropper } from '../../image-editor';
 import { useMediaEditor, resolveAspectRatio } from '../../state';
 
 export interface MediaEditorCanvasProps {
-	/** Focus the crop area when the canvas mounts. */
-	focusOnMount?: boolean;
 	/** Whether external placement activity should reveal the grid. */
 	isPlacementActive?: boolean;
 	/** Fires when a canvas cropper gesture begins. */
@@ -27,13 +25,11 @@ export interface MediaEditorCanvasProps {
  * guards can render a spinner or fall through to `<MediaPreview>`.
  *
  * @param props
- * @param props.focusOnMount
  * @param props.isPlacementActive
  * @param props.onGestureStart
  * @param props.onGestureEnd
  */
 export default function MediaEditorCanvas( {
-	focusOnMount,
 	isPlacementActive = false,
 	onGestureStart,
 	onGestureEnd,
@@ -143,10 +139,11 @@ export default function MediaEditorCanvas( {
 			 * The cropper stays mounted while loading (hidden behind the
 			 * spinner) so the image decodes off-screen and reveals in one paint
 			 * instead of streaming in top-to-bottom. Until it's revealed it's
-			 * non-interactive (`pointer-events: none` in CSS), and focus is
-			 * withheld by gating `focusOnMount` on the loaded state — the
-			 * cropper's focus effect keys off that prop, so focus lands on the
-			 * crop area only once it's visible.
+			 * non-interactive (`pointer-events: none` in CSS).
+			 *
+			 * The crop area is never focused programmatically: the modal keeps
+			 * initial focus on the dialog frame, and users reach the crop area
+			 * by tabbing to it.
 			 */ }
 			<div
 				className={ clsx( 'media-editor-canvas__cropper', {
@@ -158,7 +155,6 @@ export default function MediaEditorCanvas( {
 					controller={ controller }
 					aspectRatio={ aspectRatio }
 					freeformCrop
-					focusOnMount={ focusOnMount && status === 'loaded' }
 					showGrid="interactive"
 					isPlacementActive={ isPlacementActive }
 					onGestureStart={ handleGestureStart }

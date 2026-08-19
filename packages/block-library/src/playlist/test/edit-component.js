@@ -2,25 +2,34 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { useDispatch, useSelect } from '@wordpress/data';
 import PlaylistEdit from '../edit';
 
+let mediaPlaceholderProps;
+let mediaReplaceFlowProps;
+
 jest.mock( '@wordpress/block-editor', () => ( {
 	store: {},
 	BlockControls: ( { children } ) => <div>{ children }</div>,
 	BlockIcon: () => <span />,
 	InspectorControls: ( { children } ) => <div>{ children }</div>,
-	MediaPlaceholder: () => <div />,
-	MediaReplaceFlow: ( { name, onSelect } ) => (
-		<button
-			onClick={ () =>
-				onSelect( {
-					id: 2,
-					url: 'https://example.com/second-track.mp3',
-					title: 'Second track',
-				} )
-			}
-		>
-			{ name }
-		</button>
-	),
+	MediaPlaceholder: ( props ) => {
+		mediaPlaceholderProps = props;
+		return <div />;
+	},
+	MediaReplaceFlow: ( props ) => {
+		mediaReplaceFlowProps = props;
+		return (
+			<button
+				onClick={ () =>
+					props.onSelect( {
+						id: 2,
+						url: 'https://example.com/second-track.mp3',
+						title: 'Second track',
+					} )
+				}
+			>
+				{ props.name }
+			</button>
+		);
+	},
 	useBlockProps: () => ( { className: 'wp-block-playlist' } ),
 	useInnerBlocksProps: ( blockProps ) => ( {
 		...blockProps,
@@ -100,6 +109,8 @@ describe( 'PlaylistEdit', () => {
 	let selectBlock;
 
 	beforeEach( () => {
+		mediaPlaceholderProps = undefined;
+		mediaReplaceFlowProps = undefined;
 		replaceInnerBlocks = jest.fn();
 		selectBlock = jest.fn();
 		useDispatch.mockReturnValue( {
@@ -119,6 +130,38 @@ describe( 'PlaylistEdit', () => {
 				},
 			],
 		} );
+	} );
+
+	it( 'lets users select audio tracks individually from the Media Library', () => {
+		useSelect.mockReturnValue( {
+			innerBlockTracks: [],
+		} );
+
+		render(
+			<PlaylistEdit
+				attributes={ defaultAttributes }
+				clientId="playlist-1"
+				insertBlocksAfter={ jest.fn() }
+				isSelected={ false }
+				setAttributes={ jest.fn() }
+			/>
+		);
+
+		expect( mediaPlaceholderProps.multiple ).toBe( 'add' );
+	} );
+
+	it( 'lets users select additional audio tracks individually from the Media Library', () => {
+		render(
+			<PlaylistEdit
+				attributes={ defaultAttributes }
+				clientId="playlist-1"
+				insertBlocksAfter={ jest.fn() }
+				isSelected={ false }
+				setAttributes={ jest.fn() }
+			/>
+		);
+
+		expect( mediaReplaceFlowProps.multiple ).toBe( 'add' );
 	} );
 
 	it( 'keeps track blocks mounted when the tracklist is hidden', () => {

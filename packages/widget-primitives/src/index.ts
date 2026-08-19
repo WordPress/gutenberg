@@ -24,8 +24,11 @@ export { registerIconResolver } from './icon-resolver';
 export type {
 	WidgetName,
 	WidgetIcon,
+	WidgetIconReference,
+	WidgetRelevance,
 	WidgetType,
 	WidgetAction,
+	WidgetActionRecord,
 	WidgetAttributeField,
 	WidgetRenderProps,
 	ResolveWidgetModule,

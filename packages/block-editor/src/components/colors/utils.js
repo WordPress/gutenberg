@@ -1,12 +1,9 @@
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
-import { unlock } from '../../lock-unlock';
+import { kebabCase } from '@wordpress/kebab-case';
 
 extend( [ namesPlugin, a11yPlugin ] );
-
-const { kebabCase } = unlock( componentsPrivateApis );
 
 /**
  * Provided an array of color objects as set by the theme or by the editor defaults,

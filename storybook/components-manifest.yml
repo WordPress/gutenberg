@@ -53,6 +53,30 @@
       - text
       - tooltipPosition
       - variant
+- name: Calendar
+  props:
+      - autoFocus
+      - className
+      - defaultMonth
+      - defaultValue
+      - disabled
+      - disableNavigation
+      - endMonth
+      - fixedWeeks
+      - labels
+      - locale
+      - month
+      - numberOfMonths
+      - onMonthChange
+      - onValueChange
+      - render
+      - required
+      - showOutsideDays
+      - startMonth
+      - style
+      - timeZone
+      - value
+      - weekStartsOn
 - name: Card.Root
   props:
       - children
@@ -465,44 +489,47 @@
   props:
       - icon
       - size
-- name: InputControl
+- name: Input
   props:
-      - __next36pxDefaultSize
-      - __next40pxDefaultSize
-      - __unstableInputWidth
-      - __unstableStateReducer
+      - className
+      - defaultValue
       - disabled
-      - dragDirection
-      - dragThreshold
-      - help
-      - hideLabelFromVision
-      - isDragEnabled
-      - isPressEnterToChange
-      - label
-      - labelPosition
-      - onChange
-      - onDrag
-      - onDragEnd
-      - onDragStart
-      - onValidate
+      - onValueChange
       - prefix
+      - render
       - size
+      - style
       - suffix
       - type
       - value
+- name: InputControl
+  props:
+      - className
+      - defaultValue
+      - description
+      - details
+      - disabled
+      - hideLabelFromVision
+      - label
+      - onValueChange
+      - prefix
+      - render
+      - size
+      - style
+      - suffix
+      - type
+      - value
+- name: InputLayout
+  props:
+      - isBorderless
+      - prefix
+      - size
+      - suffix
+      - visuallyDisabled
   subcomponents:
-      - name: InputControlPrefixWrapper
+      - name: InputLayout.Slot
         props:
-            - as
-            - children
-            - size
-            - variant
-      - name: InputControlSuffixWrapper
-        props:
-            - as
-            - children
-            - size
-            - variant
+            - padding
 - name: ItemGroup
   props:
       - as
@@ -654,40 +681,6 @@
             - children
             - notices
             - onRemove
-- name: NumberControl
-  props:
-      - __next36pxDefaultSize
-      - __next40pxDefaultSize
-      - __unstableInputWidth
-      - __unstableStateReducer
-      - disabled
-      - dragDirection
-      - dragThreshold
-      - help
-      - hideHTMLArrows
-      - hideLabelFromVision
-      - isDragEnabled
-      - isPressEnterToChange
-      - isShiftStepEnabled
-      - label
-      - labelPosition
-      - max
-      - min
-      - onChange
-      - onDrag
-      - onDragEnd
-      - onDragStart
-      - onValidate
-      - prefix
-      - required
-      - shiftStep
-      - size
-      - spinControls
-      - spinFactor
-      - step
-      - suffix
-      - type
-      - value
 - name: Popover
   props:
       - __unstableForcePosition
@@ -731,6 +724,33 @@
       - onChange
       - options
       - selected
+- name: RangeCalendar
+  props:
+      - autoFocus
+      - className
+      - defaultMonth
+      - defaultValue
+      - disabled
+      - disableNavigation
+      - endMonth
+      - excludeDisabled
+      - fixedWeeks
+      - labels
+      - locale
+      - max
+      - min
+      - month
+      - numberOfMonths
+      - onMonthChange
+      - onValueChange
+      - render
+      - required
+      - showOutsideDays
+      - startMonth
+      - style
+      - timeZone
+      - value
+      - weekStartsOn
 - name: RangeControl
   props:
       - __next40pxDefaultSize
@@ -947,25 +967,29 @@
       - render
       - style
       - variant
+- name: Textarea
+  props:
+      - className
+      - defaultValue
+      - disabled
+      - onValueChange
+      - render
+      - rows
+      - style
+      - value
 - name: TextareaControl
   props:
-      - __nextHasNoMarginBottom
-      - help
-      - hideLabelFromVision
-      - label
-      - onChange
-      - rows
-      - value
-- name: TextControl
-  props:
-      - __next40pxDefaultSize
-      - __nextHasNoMarginBottom
       - className
-      - help
+      - defaultValue
+      - description
+      - details
+      - disabled
       - hideLabelFromVision
       - label
-      - onChange
-      - type
+      - onValueChange
+      - render
+      - rows
+      - style
       - value
 - name: TextHighlight
   props:

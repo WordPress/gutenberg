@@ -1,7 +1,8 @@
 import { createSlotFill } from '@wordpress/components';
 
-const { Fill: ToolsMoreMenuGroup, Slot } =
-	createSlotFill( 'ToolsMoreMenuGroup' );
+const { Fill: ToolsMoreMenuGroup, Slot } = createSlotFill(
+	Symbol( 'ToolsMoreMenuGroup' )
+);
 
 ToolsMoreMenuGroup.Slot = ( { fillProps } ) => <Slot fillProps={ fillProps } />;
 

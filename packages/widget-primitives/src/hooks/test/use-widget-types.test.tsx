@@ -30,6 +30,14 @@ jest.mock(
 				},
 				{ id: 'label', label: 'Label', type: 'text' },
 			],
+			actions: [
+				{
+					id: 'module-action',
+					label: 'Module action',
+					href: 'https://example.com/module',
+					icon: mockModuleIcon,
+				},
+			],
 		},
 	} ),
 	{ virtual: true }
@@ -42,6 +50,14 @@ jest.mock(
 		default: {
 			title: 'String icon',
 			icon: 'wordpress',
+			actions: [
+				{
+					id: 'module-docs',
+					label: 'Docs',
+					href: 'https://example.com/docs',
+					icon: 'wordpress',
+				},
+			],
 		},
 	} ),
 	{ virtual: true }
@@ -59,6 +75,29 @@ const iconReferenceRecords: WidgetModuleRecord[] = [
 	{ ...records[ 0 ], icon: 'core/calendar' },
 ];
 
+const emptyRecords: WidgetModuleRecord[] = [
+	{ name: 'test/empty', widget_module: null },
+];
+
+const moduleLessRecords: WidgetModuleRecord[] = [
+	{
+		name: 'test/manifest-only',
+		widget_module: null,
+		render_module: 'test-widget/render-module',
+		title: 'Manifest only',
+		description: 'Declared entirely by widget.json.',
+		icon: 'core/calendar',
+		actions: [
+			{
+				id: 'details',
+				label: 'Details',
+				href: 'admin.php?page=test&p=/details',
+				relevance: 'high',
+			},
+		],
+	},
+];
+
 const stringIconRecords: WidgetModuleRecord[] = [
 	{
 		name: 'test/string-icon',
@@ -69,6 +108,21 @@ const stringIconRecords: WidgetModuleRecord[] = [
 
 const pendingIconRecords: WidgetModuleRecord[] = [
 	{ ...stringIconRecords[ 0 ], icon: 'core/pending' },
+];
+
+const actionIconRecords: WidgetModuleRecord[] = [
+	{
+		...records[ 0 ],
+		actions: [
+			{
+				id: 'report',
+				label: 'Open report',
+				href: 'https://example.com/report',
+				icon: 'core/chart-bar',
+				relevance: 'high',
+			},
+		],
+	},
 ];
 
 describe( 'useWidgetTypes', () => {
@@ -101,6 +155,48 @@ describe( 'useWidgetTypes', () => {
 		} );
 		// …while plain DataViews fields pass through unchanged.
 		expect( label ).toMatchObject( { id: 'label', type: 'text' } );
+	} );
+
+	it( 'defaults apiVersion when the module omits it', async () => {
+		const { result } = renderHook( () =>
+			useWidgetTypes( stringIconRecords )
+		);
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+		expect( result.current[ 0 ][ 0 ].apiVersion ).toBe( 1 );
+	} );
+
+	it( 'resolves a record without a metadata module from its fields', async () => {
+		const resolvedIcon = createElement( 'svg', {
+			viewBox: '0 0 20 20',
+		} ) as WidgetIcon;
+		registerIconResolver( async () => resolvedIcon );
+
+		const { result } = renderHook( () =>
+			useWidgetTypes( moduleLessRecords )
+		);
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+
+		expect( result.current[ 0 ][ 0 ] ).toMatchObject( {
+			name: 'test/manifest-only',
+			apiVersion: 1,
+			renderModule: 'test-widget/render-module',
+			title: 'Manifest only',
+			description: 'Declared entirely by widget.json.',
+		} );
+		expect( result.current[ 0 ][ 0 ].actions ).toHaveLength( 1 );
+
+		await waitFor( () =>
+			expect( result.current[ 0 ][ 0 ].icon ).toBe( resolvedIcon )
+		);
+	} );
+
+	it( 'drops a record with neither metadata nor render module', async () => {
+		const { result } = renderHook( () => useWidgetTypes( emptyRecords ) );
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+		expect( result.current[ 0 ] ).toHaveLength( 0 );
 	} );
 
 	it( 'prefers the resolved record icon over the module element', async () => {
@@ -177,5 +273,79 @@ describe( 'useWidgetTypes', () => {
 		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
 
 		expect( result.current[ 0 ][ 0 ].icon ).toBeUndefined();
+	} );
+
+	it( 'resolves action icon references through the resolver', async () => {
+		const resolvedIcon = createElement( 'svg', {
+			viewBox: '0 0 32 32',
+		} ) as WidgetIcon;
+		registerIconResolver( async () => resolvedIcon );
+
+		const { result } = renderHook( () =>
+			useWidgetTypes( actionIconRecords )
+		);
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+		await waitFor( () =>
+			expect( result.current[ 0 ][ 0 ].actions?.[ 0 ].icon ).toBe(
+				resolvedIcon
+			)
+		);
+	} );
+
+	it( 'clears the action stand-in when the reference does not resolve', async () => {
+		const { result } = renderHook( () =>
+			useWidgetTypes( actionIconRecords )
+		);
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+		await waitFor( () =>
+			expect(
+				result.current[ 0 ][ 0 ].actions?.[ 0 ].icon
+			).toBeUndefined()
+		);
+	} );
+
+	it( 'holds the action icon slot with a stand-in while the reference resolves', async () => {
+		registerIconResolver(
+			() => new Promise< WidgetIcon | null >( () => {} )
+		);
+
+		const { result } = renderHook( () =>
+			useWidgetTypes( actionIconRecords )
+		);
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+
+		expect( result.current[ 0 ][ 0 ].actions?.[ 0 ] ).toMatchObject( {
+			id: 'report',
+			relevance: 'high',
+		} );
+		expect(
+			isValidElement( result.current[ 0 ][ 0 ].actions?.[ 0 ].icon )
+		).toBe( true );
+	} );
+
+	it( "keeps a module action's element icon", async () => {
+		const { result } = renderHook( () => useWidgetTypes( records ) );
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+
+		expect( result.current[ 0 ][ 0 ].actions?.[ 0 ].icon ).toBe(
+			mockModuleIcon
+		);
+	} );
+
+	it( 'drops a module action icon that is not an element', async () => {
+		const { result } = renderHook( () =>
+			useWidgetTypes( stringIconRecords )
+		);
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+
+		expect( result.current[ 0 ][ 0 ].actions?.[ 0 ] ).toMatchObject( {
+			id: 'module-docs',
+		} );
+		expect( result.current[ 0 ][ 0 ].actions?.[ 0 ].icon ).toBeUndefined();
 	} );
 } );

@@ -1,0 +1,13 @@
+@use "@wordpress/base-styles/variables";
+
+// The surfaces this sits in are sized by their container, so fill the height
+// available and centre the message in it rather than leaving it at the top of
+// an otherwise empty area.
+.boot-error-boundary {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	min-height: 100%;
+	padding: variables.$grid-unit-20;
+}
