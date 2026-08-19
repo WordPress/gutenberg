@@ -159,3 +159,22 @@ export interface ResizeHandleProps {
 	 */
 	renderResizeHandle?: React.ComponentType< ResizeHandleRenderProps >;
 }
+
+/**
+ * Per-item minimum tile size, in pixels. The surface quantizes each
+ * minimum up to whole tracks of its current geometry and floors render
+ * and resize gestures at the result; the minimum itself is never written
+ * into the layout.
+ */
+export type GridItemMinSize = {
+	/**
+	 * Minimum tile width in pixels.
+	 */
+	width?: number;
+
+	/**
+	 * Minimum tile height in pixels. Ignored by surfaces with
+	 * content-driven heights.
+	 */
+	height?: number;
+};

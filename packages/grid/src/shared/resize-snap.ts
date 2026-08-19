@@ -61,3 +61,48 @@ export function gridSpanToPixelSize(
 			: rowSpan * rowHeightPx + ( rowSpan - 1 ) * gapPx;
 	return { widthPx, heightPx };
 }
+
+/**
+ * Converts a minimum pixel size to minimum grid spans, using the same
+ * track math as `gridSpanToPixelSize` but rounding up so the derived
+ * span always covers the requested pixels. Width saturates at the
+ * surface's column count; height resolves to `1` when rows are
+ * content-sized.
+ *
+ * @param minSize        Minimum size in pixels.
+ * @param minSize.width  Minimum width in pixels.
+ * @param minSize.height Minimum height in pixels.
+ * @param columnWidth    Width of one column track in pixels.
+ * @param gapPx          Gap between tracks in pixels.
+ * @param rowHeightPx    Row track height in pixels, or `null` when rows
+ *                       are content-sized.
+ * @param maxColumns     Number of column tracks in the surface.
+ */
+export function pixelSizeToMinSpans(
+	minSize: { width?: number; height?: number },
+	columnWidth: number,
+	gapPx: number,
+	rowHeightPx: number | null,
+	maxColumns: number
+): { width: number; height: number } {
+	let width = 1;
+	if ( minSize.width && columnWidth > 0 ) {
+		width = Math.min(
+			Math.max(
+				1,
+				Math.ceil( ( minSize.width + gapPx ) / ( columnWidth + gapPx ) )
+			),
+			maxColumns
+		);
+	}
+
+	let height = 1;
+	if ( minSize.height && rowHeightPx !== null && rowHeightPx > 0 ) {
+		height = Math.max(
+			1,
+			Math.ceil( ( minSize.height + gapPx ) / ( rowHeightPx + gapPx ) )
+		);
+	}
+
+	return { width, height };
+}

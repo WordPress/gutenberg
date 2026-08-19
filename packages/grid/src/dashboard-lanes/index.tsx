@@ -27,7 +27,10 @@ import {
 import { LanesItem } from './lanes-item';
 import { useLanePlacement } from './use-lane-placement';
 import { GridOverlay } from '../shared/grid-overlay';
-import { gridSpanToPixelSize } from '../shared/resize-snap';
+import {
+	gridSpanToPixelSize,
+	pixelSizeToMinSpans,
+} from '../shared/resize-snap';
 import layoutAnimationStyles from '../shared/layout-shift-animation.module.css';
 import { ItemExitOverlay } from '../shared/item-exit-overlay';
 import {
@@ -109,6 +112,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			flowTolerance = 16,
 			rowUnit = 4,
 			minColumnWidth,
+			itemMinSizes,
 			editMode = false,
 			onChangeLayout,
 			onPreviewLayout,
@@ -197,6 +201,29 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			null
 		).widthPx;
 
+		// Per-item width floors: each declared minimum quantized up to
+		// whole lanes. Height minimums do not apply; lane heights are
+		// content-driven.
+		const minSpanByKey = useMemo( () => {
+			const map = new Map< string, number >();
+			if ( ! itemMinSizes ) {
+				return map;
+			}
+			for ( const [ key, minSize ] of Object.entries( itemMinSizes ) ) {
+				map.set(
+					key,
+					pixelSizeToMinSpans(
+						minSize,
+						columnWidth,
+						gapPx,
+						null,
+						effectiveColumns
+					).width
+				);
+			}
+			return map;
+		}, [ itemMinSizes, columnWidth, gapPx, effectiveColumns ] );
+
 		const layoutMap = useMemo( () => {
 			const map = new Map< string, DashboardLanesLayoutItem >();
 			activeLayout.forEach( ( item ) => map.set( item.key, item ) );
@@ -237,9 +264,13 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 					typeof width === 'number'
 						? Math.max( 1, Math.min( width, effectiveColumns ) )
 						: 1;
-				return { key, span, lane: item?.lane };
+				return {
+					key,
+					span: Math.max( span, minSpanByKey.get( key ) ?? 1 ),
+					lane: item?.lane,
+				};
 			} );
-		}, [ items, layoutMap, effectiveColumns ] );
+		}, [ items, layoutMap, effectiveColumns, minSpanByKey ] );
 
 		const { itemStyles } = useLanePlacement( container, {
 			items: placementItems,
@@ -423,7 +454,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			}
 			const baseline = resizeBaselineRef.current;
 			const newWidth = Math.max(
-				1,
+				minSpanByKey.get( id ) ?? 1,
 				Math.min( baseline + relativeDelta, effectiveColumns )
 			);
 
@@ -569,6 +600,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 							if ( ! child ) {
 								return null;
 							}
+							const minSpan = minSpanByKey.get( id );
 							return (
 								<LanesItem
 									key={ id }
@@ -586,7 +618,17 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 											? resizeSnapPreview.snap
 											: null
 									}
-									minResizeWidthPx={ minResizeWidthPx }
+									minResizeWidthPx={
+										minSpan
+											? gridSpanToPixelSize(
+													minSpan,
+													1,
+													columnWidth,
+													gapPx,
+													null
+											  ).widthPx
+											: minResizeWidthPx
+									}
 									actionableArea={ actionableAreaMap.get(
 										id
 									) }

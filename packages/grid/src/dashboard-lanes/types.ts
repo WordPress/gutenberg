@@ -1,5 +1,6 @@
 import type {
 	DragPreviewRenderProps,
+	GridItemMinSize,
 	GridOverlayRenderProps,
 	ResizeHandleRenderProps,
 } from '../shared/types';
@@ -170,4 +171,12 @@ export interface DashboardLanesProps
 	 * down to 1.
 	 */
 	minColumnWidth?: number;
+
+	/**
+	 * Per-item minimum tile width in pixels, keyed by layout item key.
+	 * Lanes quantize each minimum up to whole lanes and floor spans and
+	 * resize gestures at the result; `height` minimums are ignored
+	 * because lane heights are content-driven.
+	 */
+	itemMinSizes?: Record< string, GridItemMinSize >;
 }

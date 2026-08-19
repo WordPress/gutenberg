@@ -1,5 +1,6 @@
 import type {
 	DragPreviewRenderProps,
+	GridItemMinSize,
 	GridOverlayRenderProps,
 	ResizeDelta,
 	ResizeHandleRenderProps,
@@ -265,4 +266,13 @@ export interface DashboardGridProps
 	 * down to 1.
 	 */
 	minColumnWidth?: number;
+
+	/**
+	 * Per-item minimum tile size in pixels, keyed by layout item key.
+	 * The grid quantizes each minimum up to whole tracks, floors the
+	 * item's rendered spans and resize gestures at the result, and never
+	 * writes the floor into the layout. Width saturates at the column
+	 * count.
+	 */
+	itemMinSizes?: Record< string, GridItemMinSize >;
 }

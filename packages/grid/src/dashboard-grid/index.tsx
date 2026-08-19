@@ -26,7 +26,10 @@ import {
 } from '@wordpress/element';
 import { GridItem } from './grid-item';
 import { GridOverlay } from '../shared/grid-overlay';
-import { gridSpanToPixelSize } from '../shared/resize-snap';
+import {
+	gridSpanToPixelSize,
+	pixelSizeToMinSpans,
+} from '../shared/resize-snap';
 import layoutAnimationStyles from '../shared/layout-shift-animation.module.css';
 import { ItemExitOverlay } from '../shared/item-exit-overlay';
 import {
@@ -107,6 +110,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			style,
 			rowHeight = 'auto',
 			minColumnWidth,
+			itemMinSizes,
 			editMode = false,
 			onChangeLayout,
 			onPreviewLayout,
@@ -156,7 +160,6 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		const childrenCacheRef = useRef< Map< string, React.ReactElement > >(
 			new Map()
 		);
-		const activeLayout = temporaryLayout ?? layout;
 
 		const [ gridRoot, setGridRoot ] = useState< HTMLDivElement | null >(
 			null
@@ -226,6 +229,59 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				? undefined
 				: gridSpanToPixelSize( 1, 1, columnWidth, gapPx, rowHeightPx )
 						.heightPx ?? undefined;
+
+		// Per-item floors: each declared minimum quantized up to whole
+		// tracks of the current geometry. Recomputed as geometry changes;
+		// never written back into the consumer's layout.
+		const minSpansByKey = useMemo( () => {
+			const map = new Map< string, { width: number; height: number } >();
+			if ( ! itemMinSizes ) {
+				return map;
+			}
+			for ( const [ key, minSize ] of Object.entries( itemMinSizes ) ) {
+				map.set(
+					key,
+					pixelSizeToMinSpans(
+						minSize,
+						columnWidth,
+						gapPx,
+						rowHeightPx,
+						effectiveColumns
+					)
+				);
+			}
+			return map;
+		}, [
+			itemMinSizes,
+			columnWidth,
+			gapPx,
+			rowHeightPx,
+			effectiveColumns,
+		] );
+
+		// Stored layouts may sit below a floor; render them floored while
+		// the stored data stays untouched.
+		const flooredLayout = useMemo( () => {
+			if ( minSpansByKey.size === 0 ) {
+				return layout;
+			}
+			return layout.map( ( item ) => {
+				const min = minSpansByKey.get( item.key );
+				if ( ! min ) {
+					return item;
+				}
+				const width =
+					typeof item.width === 'number'
+						? Math.max( item.width, min.width )
+						: item.width;
+				return {
+					...item,
+					width,
+					height: Math.max( item.height ?? 1, min.height ),
+				};
+			} );
+		}, [ layout, minSpansByKey ] );
+		const activeLayout = temporaryLayout ?? flooredLayout;
 
 		const layoutMap = useMemo( () => {
 			const map = new Map< string, DashboardGridLayoutItem >();
@@ -482,15 +538,16 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				};
 			}
 			const baseline = resizeBaselineRef.current;
+			const minSpans = minSpansByKey.get( id );
 			const newWidth = Math.max(
-				1,
+				minSpans?.width ?? 1,
 				Math.min(
 					baseline.width + relativeDelta.width,
 					effectiveColumns
 				)
 			);
 			const newHeight = Math.max(
-				1,
+				minSpans?.height ?? 1,
 				baseline.height + relativeDelta.height
 			);
 
@@ -652,34 +709,54 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 						} }
 					>
 						{ gridOverlay }
-						{ items.map( ( id ) => (
-							<GridItem
-								key={ id }
-								item={
-									resolvedItemMap.get(
+						{ items.map( ( id ) => {
+							const minSpans = minSpansByKey.get( id );
+							const minSnap = minSpans
+								? gridSpanToPixelSize(
+										minSpans.width,
+										minSpans.height,
+										columnWidth,
+										gapPx,
+										rowHeightPx
+								  )
+								: null;
+							return (
+								<GridItem
+									key={ id }
+									item={
+										resolvedItemMap.get(
+											id
+										) as DashboardGridLayoutItem
+									}
+									maxColumns={ effectiveColumns }
+									disabled={ ! editMode }
+									verticalResizable={ rowHeight !== 'auto' }
+									interacting={
+										activeId !== null || isResizing
+									}
+									dragging={ activeId !== null }
+									onResize={ handleResize }
+									onResizeEnd={ persistTemporaryLayout }
+									resizeSnapPreview={
+										resizeSnapPreview?.id === id
+											? resizeSnapPreview.snap
+											: null
+									}
+									minResizeWidthPx={
+										minSnap?.widthPx ?? minResizeWidthPx
+									}
+									minResizeHeightPx={
+										minSnap?.heightPx ?? minResizeHeightPx
+									}
+									actionableArea={ actionableAreaMap.get(
 										id
-									) as DashboardGridLayoutItem
-								}
-								maxColumns={ effectiveColumns }
-								disabled={ ! editMode }
-								verticalResizable={ rowHeight !== 'auto' }
-								interacting={ activeId !== null || isResizing }
-								dragging={ activeId !== null }
-								onResize={ handleResize }
-								onResizeEnd={ persistTemporaryLayout }
-								resizeSnapPreview={
-									resizeSnapPreview?.id === id
-										? resizeSnapPreview.snap
-										: null
-								}
-								minResizeWidthPx={ minResizeWidthPx }
-								minResizeHeightPx={ minResizeHeightPx }
-								actionableArea={ actionableAreaMap.get( id ) }
-								renderResizeHandle={ renderResizeHandle }
-							>
-								{ childrenMap.get( id ) }
-							</GridItem>
-						) ) }
+									) }
+									renderResizeHandle={ renderResizeHandle }
+								>
+									{ childrenMap.get( id ) }
+								</GridItem>
+							);
+						} ) }
 						{ remaining }
 						{ exitingItems.map( ( { key, rect, child } ) => (
 							<ItemExitOverlay

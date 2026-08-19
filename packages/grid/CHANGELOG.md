@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### New Features
+
+-   `DashboardGrid` and `DashboardLanes` accept `itemMinSizes`: per-item
+    minimum tile sizes in pixels, quantized up to whole tracks of the
+    current geometry and enforced on rendered spans and resize gestures,
+    without ever being written into the layout
+    ([#81795](https://github.com/WordPress/gutenberg/issues/81795)).
+
 ### Internal
 
 -   Point tsconfig references at split dependencies' build projects. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
