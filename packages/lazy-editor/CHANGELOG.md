@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Stop resolving a parent template for entities that are never queried content — template parts, patterns, and navigation menus. Falling through the template hierarchy for them resolved an unrelated template, which surfaced as a "Show template" option in the View menu, an "Edit template" command, and that template's styles applying to the canvas ([#81868](https://github.com/WordPress/gutenberg/pull/81868)).
 -   Add the styles a host passes to the theme's and the user's instead of replacing them, so an editor canvas keeps the CSS a theme registers with `add_editor_style` ([#81747](https://github.com/WordPress/gutenberg/pull/81747)).
 -   Render the editor preferences modal, so the Preferences menu item and command open it ([#81630](https://github.com/WordPress/gutenberg/pull/81630)).
 

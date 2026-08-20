@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Bug Fixes
-
--   `getTemplateId`: Return `undefined` for post types that do not render inside a parent template (templates, template parts, patterns, navigation menus, and attachments) instead of resolving an unrelated fallback template through the template hierarchy ([#81868](https://github.com/WordPress/gutenberg/pull/81868)).
-
 ### Internal
 
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
