@@ -210,19 +210,25 @@ describe( 'PlaylistTrackEdit', () => {
 		expect( removeBlock ).toHaveBeenCalledWith( 'temporary-track' );
 	} );
 
+	// `onUploadError` also fires when replacing an existing track's media, so
+	// removing the block unconditionally would discard the original track.
 	it( 'keeps a track that already has a source when an upload fails', () => {
+		const createErrorNotice = jest.fn();
 		const removeBlock = jest.fn();
-		useDispatch.mockReturnValue( {
-			createErrorNotice: jest.fn(),
-			removeBlock,
-		} );
+		useDispatch.mockReturnValue( { createErrorNotice, removeBlock } );
 
-		renderEdit( { clientId: 'existing-track' } );
+		const { setAttributes } = renderEdit( { clientId: 'existing-track' } );
 
 		const { onError } = useUploadMediaFromBlobURL.mock.calls[ 0 ][ 0 ];
 		onError( 'Sorry, you are not allowed to upload this file type.' );
 
+		expect( createErrorNotice ).toHaveBeenCalled();
 		expect( removeBlock ).not.toHaveBeenCalled();
+		// The original track is left untouched, so its source still plays.
+		expect( setAttributes ).not.toHaveBeenCalled();
+		expect(
+			screen.getByRole( 'button', { name: /Song One/ } )
+		).toBeInTheDocument();
 	} );
 
 	it( 'preserves the current track source when a replacement upload fails', () => {

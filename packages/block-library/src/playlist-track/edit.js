@@ -54,9 +54,10 @@ const PlaylistTrackEdit = ( {
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 
-		// A track that never had a source cannot recover from a failed
-		// upload: its blob URL is revoked, so it would sit in the tracklist
-		// loading forever. Remove it and leave the notice as the explanation.
+		// This also fires when replacing an existing track's media, where the
+		// original source is still good and must be kept. Only a track that
+		// never had one is unrecoverable: its blob URL is revoked, so it
+		// would sit in the tracklist loading forever.
 		if ( ! src && ! id ) {
 			removeBlock( clientId );
 		}
