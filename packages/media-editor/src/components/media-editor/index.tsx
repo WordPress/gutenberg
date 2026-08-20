@@ -366,18 +366,6 @@ function SaveActions( { size = 'default' }: SaveActionsProps ) {
 	);
 }
 
-/**
- * Kept for frames that still place this cluster themselves. The rotate, flip,
- * zoom and aspect-ratio controls now render under the canvas at every width,
- * so this renders nothing; a frame that drops it loses nothing. Remove once no
- * frame references it.
- *
- * @deprecated
- */
-function ImageControls() {
-	return null;
-}
-
 function MediaEditorContent( {
 	fields = [],
 	id,
@@ -721,6 +709,5 @@ export function MediaEditor( props: MediaEditorProps ) {
 MediaEditor.HeaderActions = HeaderActions;
 MediaEditor.HistoryActions = HistoryActions;
 MediaEditor.SaveActions = SaveActions;
-MediaEditor.ImageControls = ImageControls;
 
 export default MediaEditor;
