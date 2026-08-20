@@ -50,7 +50,35 @@ const styleElementsSelector =
 	'style,link[rel=stylesheet],link[rel=preload][as=style][onload]';
 
 /**
+ * Value of the `data-wp-router-style` attribute, which lets themes and plugins
+ * override how the router handles a style element.
+ *
+ * - `ignore`: the router behaves as if the element didn't exist.
+ * - `persist`: the router loads and enables the element, but never disables it.
+ */
+type RouterStyleMarker = 'ignore' | 'persist';
+
+/**
+ * Returns the marker present in the `data-wp-router-style` attribute of the
+ * passed style element.
+ *
+ * @param element `<style>` or `<link>` element.
+ * @return Marker of the element, or `null` when it doesn't carry a valid one.
+ */
+const getRouterStyleMarker = (
+	element: StyleElement
+): RouterStyleMarker | null => {
+	const value = element.dataset.wpRouterStyle?.trim().toLowerCase();
+	return value === 'ignore' || value === 'persist' ? value : null;
+};
+
+/**
  * Returns all the style elements contained in the passed document.
+ *
+ * The elements marked with `data-wp-router-style="ignore"` are excluded, so the
+ * router doesn't take them into account anywhere: they are never marked as
+ * managed, never inserted from a fetched page, never enabled or disabled, and
+ * never used to place the elements of a new page.
  *
  * @param doc Document instance.
  * @return List of `<style>` and `<link>` elements that contain style sheets.
@@ -58,7 +86,11 @@ const styleElementsSelector =
 const getStyleElements = ( doc: Document ): StyleElement[] =>
 	Array.from(
 		doc.querySelectorAll< StyleElement >( styleElementsSelector )
-	).filter( ( element ) => ! isUnmanagedPreloadLink( element ) );
+	).filter(
+		( element ) =>
+			! isUnmanagedPreloadLink( element ) &&
+			getRouterStyleMarker( element ) !== 'ignore'
+	);
 
 /**
  * Canonical representation of a style element, used to compare elements coming
@@ -412,7 +444,9 @@ const prepareStylePromise = (
  * {@link applyStyles|`applyStyles`} function.
  *
  * Style elements injected by other client-side scripts are excluded from the
- * merge, so they are left untouched and keep applying to the new page.
+ * merge, so they are left untouched and keep applying to the new page. The same
+ * happens with the elements marked with `data-wp-router-style="ignore"`, on both
+ * the current document and the new page.
  *
  * Note that this function alters the passed document, as it can transfer
  * nodes from it to the global document, and rewrites the style elements that
@@ -470,7 +504,9 @@ export const preloadStyles = (
  * original `media` value is restored.
  *
  * Style elements injected by other client-side scripts are skipped, so they
- * are neither enabled nor disabled.
+ * are neither enabled nor disabled. The elements marked with
+ * `data-wp-router-style="persist"` are enabled like the rest, but they are
+ * never disabled.
  *
  * @param styles List of style elements to apply.
  */
@@ -486,7 +522,7 @@ export const applyStyles = ( styles: StyleElement[] ) => {
 						el.sheet.media.mediaText = originalMedia;
 					}
 					el.sheet.disabled = false;
-				} else {
+				} else if ( getRouterStyleMarker( el ) !== 'persist' ) {
 					el.sheet.disabled = true;
 				}
 			}

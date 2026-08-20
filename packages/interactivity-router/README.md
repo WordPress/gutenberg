@@ -106,6 +106,53 @@ Example with `attachTo`:
 </div>
 ```
 
+### Style sheets
+
+On each client-side navigation, the router loads the style sheets of the new page and disables those that only belonged to the previous one, keeping the order of the `<style>` and `<link rel="stylesheet">` elements in the document.
+
+Two kinds of style sheets are left alone by default:
+
+-   Those injected by other client-side scripts once the page has loaded, like the ones added by a dark mode switcher or a lazy-loaded widget.
+-   Plain `<link rel="preload">` resource hints, which are not style sheets.
+
+The asynchronous loading patterns of optimization plugins are handled automatically, so the following style sheets don't need any extra markup to work with client-side navigation:
+
+```html
+<link rel="stylesheet" href="x.css" media="print" onload="this.media='all'" />
+<link rel="preload" as="style" href="x.css" onload="this.rel='stylesheet'" />
+```
+
+#### `data-wp-router-style`
+
+It overrides how the router handles a `<style>` or `<link rel="stylesheet">` element. It accepts two values:
+
+-   `ignore`: The router behaves as if the element didn't exist. It is never enabled, disabled or inserted from another page. Use it for style sheets whose whole lifecycle is controlled by a script.
+-   `persist`: The router loads and enables the element like any other style sheet, but it never disables it, so it keeps applying after navigating to a page that doesn't include it. Use it for page-specific style sheets that must not be turned off, like those that an optimization plugin loads asynchronously.
+
+Example of a style sheet that an optimization plugin defers and the router must keep enabled:
+
+```html
+<link
+	rel="stylesheet"
+	href="/assets/deferred.css"
+	media="print"
+	onload="this.media='all'"
+	data-wp-router-style="persist"
+/>
+```
+
+Example of a style sheet that a script owns:
+
+```html
+<style id="my-plugin-runtime-css" data-wp-router-style="ignore">
+	:root {
+		--my-plugin-accent: #0073aa;
+	}
+</style>
+```
+
+Any other value is ignored, and the element is handled with the default behavior.
+
 ### Actions
 
 #### `navigate`

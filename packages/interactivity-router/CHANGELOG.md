@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Handle the style sheets that optimization plugins load asynchronously during client-side navigation ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+-   Add the `data-wp-router-style` attribute to opt a style sheet out of being managed by the router, or out of being disabled ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
+
 ### Bug Fixes
 
 -   Preserve style sheets injected dynamically by other client-side scripts across client-side navigations ([#81600](https://github.com/WordPress/gutenberg/pull/81600)).

@@ -106,6 +106,28 @@ const createLinkElement = (
 	return element;
 };
 
+/**
+ * Builds a document with the passed markup in its head, simulating the
+ * response of a page fetched by the router.
+ *
+ * @param head Markup contained in the head of the page.
+ * @return Document instance.
+ */
+const createPage = ( head: string ): Document =>
+	new window.DOMParser().parseFromString(
+		`<html><head>${ head }</head><body></body></html>`,
+		'text/html'
+	);
+
+/**
+ * Returns the style element with the passed ID in the current document.
+ *
+ * @param id Value of the `id` attribute.
+ * @return The style element.
+ */
+const getElement = ( id: string ): StyleElement =>
+	document.head.querySelector< StyleElement >( `#${ id }` )!;
+
 describe( 'Router styles management', () => {
 	const parent = document.head;
 
@@ -960,28 +982,6 @@ describe( 'Router styles management', () => {
 	// Tests for the style elements that optimization plugins load
 	// asynchronously, which mutate themselves once they have been loaded.
 	describe( 'asynchronously loaded styles', () => {
-		/**
-		 * Builds a document with the passed markup in its head, simulating the
-		 * response of a page fetched by the router.
-		 *
-		 * @param head Markup contained in the head of the page.
-		 * @return Document instance.
-		 */
-		const createPage = ( head: string ): Document =>
-			new window.DOMParser().parseFromString(
-				`<html><head>${ head }</head><body></body></html>`,
-				'text/html'
-			);
-
-		/**
-		 * Returns the style element with the passed ID in the current document.
-		 *
-		 * @param id Value of the `id` attribute.
-		 * @return The style element.
-		 */
-		const getElement = ( id: string ): StyleElement =>
-			document.head.querySelector< StyleElement >( `#${ id }` )!;
-
 		// Markup of a style sheet deferred with the "print" trick.
 		const printTrick =
 			'<link id="async" rel="stylesheet" href="https://example.com/async.css" media="print" onload="this.onload=null;this.media=\'all\'">';
@@ -1240,6 +1240,183 @@ describe( 'Router styles management', () => {
 				preloadStyles( window.document )
 			);
 			expect( initialStyles ).toEqual( [] );
+		} );
+	} );
+
+	// Tests for the `data-wp-router-style` attribute, which lets themes and
+	// plugins override how the router handles a style element.
+	describe( 'data-wp-router-style', () => {
+		it( 'should not manage the elements marked with "ignore"', async () => {
+			const managed = createLinkElement( 'managed' );
+			const ignored = createLinkElement( 'ignored' );
+			ignored.dataset.wpRouterStyle = 'ignore';
+			document.head.append( managed, ignored );
+			await loadStylesModule(
+				createInitialPageHtml( [ managed, ignored ] )
+			);
+
+			mockSheet( managed, { disabled: false, mediaText: 'all' } );
+			mockSheet( ignored, { disabled: false, mediaText: 'all' } );
+
+			// The router prepares the initial page. The marked element is not
+			// part of its styles, so it was not marked as managed.
+			const initialStyles = await Promise.all(
+				preloadStyles( window.document )
+			);
+			expect( initialStyles ).toEqual( [ managed ] );
+
+			// Navigation to a page that adds a new style sheet.
+			const promises = preloadStyles(
+				createPage(
+					'<link id="managed" rel="stylesheet" href="https://example.com/managed.css">' +
+						'<link id="new" rel="stylesheet" href="https://example.com/new.css">'
+				),
+				'/page/'
+			);
+			const inserted = getElement( 'new' );
+			mockSheet( inserted, { disabled: true, mediaText: 'preload' } );
+			inserted.dispatchEvent( new Event( 'load' ) );
+			applyStyles( await Promise.all( promises ) );
+
+			// The marked element is not used as an anchor, so the new element
+			// is inserted right after the last managed one.
+			expect( [ ...document.head.childNodes ] ).toEqual( [
+				managed,
+				inserted,
+				ignored,
+			] );
+			expect( ignored ).not.toHaveAttribute( 'media', 'preload' );
+			expect( ignored.sheet!.disabled ).toBe( false );
+
+			// A later navigation to a page that contains none of them.
+			applyStyles( [] );
+
+			expect( managed.sheet!.disabled ).toBe( true );
+			expect( inserted.sheet!.disabled ).toBe( true );
+			expect( ignored.sheet!.disabled ).toBe( false );
+		} );
+
+		it( 'should never insert the elements of a new page marked with "ignore"', () => {
+			const promises = preloadStyles(
+				createPage(
+					'<link id="kept" rel="stylesheet" href="https://example.com/kept.css">' +
+						'<link id="skipped" rel="stylesheet" href="https://example.com/skipped.css" data-wp-router-style="ignore">' +
+						'<style id="skipped-inline" data-wp-router-style="ignore">/* Skipped */</style>'
+				),
+				'/page/'
+			);
+
+			expect( promises ).toHaveLength( 1 );
+			expect( getElement( 'kept' ) ).toBeTruthy();
+			expect( getElement( 'skipped' ) ).toBeNull();
+			expect( getElement( 'skipped-inline' ) ).toBeNull();
+		} );
+
+		it( 'should never disable the elements marked with "persist"', async () => {
+			const promises = preloadStyles(
+				createPage(
+					'<link id="regular" rel="stylesheet" href="https://example.com/regular.css">' +
+						'<link id="persisted" rel="stylesheet" href="https://example.com/persisted.css" media="screen" data-wp-router-style="persist">'
+				),
+				'/page/'
+			);
+			const regular = getElement( 'regular' );
+			const persisted = getElement( 'persisted' );
+
+			// The marked element is inserted with the usual sentinel.
+			expect( persisted ).toHaveAttribute( 'media', 'preload' );
+			expect( persisted ).toHaveAttribute(
+				'data-original-media',
+				'screen'
+			);
+
+			mockSheet( regular, { disabled: true, mediaText: 'preload' } );
+			mockSheet( persisted, { disabled: true, mediaText: 'preload' } );
+			[ regular, persisted ].forEach( ( element ) =>
+				element.dispatchEvent( new Event( 'load' ) )
+			);
+			applyStyles( await Promise.all( promises ) );
+
+			// It is enabled with its target media on navigation.
+			expect( regular.sheet!.disabled ).toBe( false );
+			expect( persisted.sheet!.disabled ).toBe( false );
+			expect( persisted.sheet!.media.mediaText ).toBe( 'screen' );
+
+			// A later navigation to a page that contains none of them.
+			applyStyles( [] );
+
+			expect( regular.sheet!.disabled ).toBe( true );
+			expect( persisted.sheet!.disabled ).toBe( false );
+		} );
+
+		it( 'should keep the elements marked with "persist" that are loaded asynchronously', async () => {
+			// A style sheet deferred with the "print" trick that opts out of
+			// being disabled.
+			const asyncPersist =
+				'<link id="boost" rel="stylesheet" href="https://example.com/boost.css" media="print" data-wp-router-style="persist" onload="this.onload=null;this.media=\'all\'">';
+
+			const promises = preloadStyles(
+				createPage( asyncPersist ),
+				'/page/'
+			);
+			const persisted = getElement( 'boost' );
+
+			// The element is canonicalized like any other async style sheet,
+			// and the marker travels with it.
+			expect( persisted ).toHaveAttribute( 'media', 'preload' );
+			expect( persisted ).not.toHaveAttribute( 'data-original-media' );
+			expect( persisted ).not.toHaveAttribute( 'onload' );
+			expect( persisted ).toHaveAttribute(
+				'data-wp-router-style',
+				'persist'
+			);
+
+			mockSheet( persisted, { disabled: true, mediaText: 'preload' } );
+			persisted.dispatchEvent( new Event( 'load' ) );
+			applyStyles( await Promise.all( promises ) );
+
+			expect( persisted.sheet!.disabled ).toBe( false );
+			expect( persisted.sheet!.media.mediaText ).toBe( 'all' );
+
+			// A navigation to another page with the same style sheet matches
+			// it by URL, so it is not duplicated.
+			preloadStyles( createPage( asyncPersist ), '/another-page/' );
+
+			expect( document.head.querySelectorAll( '#boost' ) ).toHaveLength(
+				1
+			);
+			expect( getElement( 'boost' ) ).toBe( persisted );
+
+			// A later navigation to a page without it keeps it enabled.
+			applyStyles( [] );
+
+			expect( persisted.sheet!.disabled ).toBe( false );
+		} );
+
+		it( 'should normalize the value of the attribute', () => {
+			preloadStyles(
+				createPage(
+					'<link id="spaced" rel="stylesheet" href="https://example.com/spaced.css" data-wp-router-style=" Persist ">' +
+						'<link id="uppercase" rel="stylesheet" href="https://example.com/uppercase.css" data-wp-router-style="IGNORE">' +
+						'<link id="unknown" rel="stylesheet" href="https://example.com/unknown.css" data-wp-router-style="whatever">'
+				),
+				'/page/'
+			);
+
+			const spaced = getElement( 'spaced' );
+			const unknown = getElement( 'unknown' );
+
+			// Unknown values fall back to the default behavior.
+			expect( getElement( 'uppercase' ) ).toBeNull();
+			expect( unknown ).toBeTruthy();
+
+			mockSheet( spaced, { disabled: false, mediaText: 'all' } );
+			mockSheet( unknown, { disabled: false, mediaText: 'all' } );
+
+			applyStyles( [] );
+
+			expect( spaced.sheet!.disabled ).toBe( false );
+			expect( unknown.sheet!.disabled ).toBe( true );
 		} );
 	} );
 
