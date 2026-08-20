@@ -1,24 +1,13 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
-import { NavigableToolbar, ToolSelector } from '@wordpress/block-editor';
+import { NavigableToolbar } from '@wordpress/block-editor';
 import { ToolbarButton, ToolbarItem } from '@wordpress/components';
 import { listView, plus } from '@wordpress/icons';
 import { useCallback } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 import EditorHistoryRedo from '../editor-history/redo';
@@ -35,7 +24,6 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 		inserterSidebarToggleRef,
 		listViewToggleRef,
 		showIconLabels,
-		showTools,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const {
@@ -43,8 +31,6 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 			getEditorMode,
 			getInserterSidebarToggleRef,
 			getListViewToggleRef,
-			getRenderingMode,
-			getCurrentPostType,
 		} = unlock( select( editorStore ) );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 
@@ -59,10 +45,6 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			isVisualMode: getEditorMode() === 'visual',
-			showTools:
-				!! window?.__experimentalEditorWriteMode &&
-				( getRenderingMode() !== 'post-only' ||
-					getCurrentPostType() === 'wp_template' ),
 		};
 	}, [] );
 
@@ -79,7 +61,6 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 		}
 	};
 
-	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideViewport = useViewportMatch( 'wide' );
 
 	/* translators: accessibility text for the editor toolbar */
@@ -134,17 +115,6 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 				) }
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<>
-						{ showTools && isLargeViewport && (
-							<ToolbarItem
-								as={ ToolSelector }
-								showTooltip={ ! showIconLabels }
-								variant={
-									showIconLabels ? 'tertiary' : undefined
-								}
-								disabled={ disableBlockTools }
-								size="compact"
-							/>
-						) }
 						<ToolbarItem
 							as={ EditorHistoryUndo }
 							showTooltip={ ! showIconLabels }

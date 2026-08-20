@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { select } from '@wordpress/data';
-import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
+import { store as editorStore } from '@wordpress/editor';
 import PostTaxonomies from '../';
 
 describe( 'PostTaxonomies', () => {
@@ -26,7 +15,7 @@ describe( 'PostTaxonomies', () => {
 			show_ui: true,
 		},
 		labels: {
-			add_new_item: 'Add new genre',
+			add_new_item: 'Add Genre',
 		},
 	};
 
@@ -40,9 +29,22 @@ describe( 'PostTaxonomies', () => {
 			show_ui: true,
 		},
 		labels: {
-			add_new_item: 'Add new category',
+			add_new_item: 'Add Category',
 		},
 	};
+
+	const allTaxonomies = [ genresTaxonomy, categoriesTaxonomy ];
+
+	const hidesUI = [
+		genresTaxonomy,
+		{
+			...categoriesTaxonomy,
+			types: [ 'post', 'page', 'book' ],
+			visibility: {
+				show_ui: false,
+			},
+		},
+	];
 
 	beforeEach( () => {
 		jest.spyOn( select( editorStore ), 'getCurrentPost' ).mockReturnValue( {
@@ -70,8 +72,8 @@ describe( 'PostTaxonomies', () => {
 			},
 		} );
 
-		jest.spyOn( select( coreStore ), 'getTaxonomy' ).mockImplementation(
-			( slug ) => {
+		jest.spyOn( select( coreStore ), 'getEntityRecord' ).mockImplementation(
+			( kind, name, slug ) => {
 				switch ( slug ) {
 					case 'category': {
 						return categoriesTaxonomy;
@@ -91,8 +93,11 @@ describe( 'PostTaxonomies', () => {
 			select( editorStore ),
 			'getCurrentPostType'
 		).mockReturnValue( 'page' );
-		jest.spyOn( select( coreStore ), 'getTaxonomies' ).mockReturnValue(
-			taxonomies
+		jest.spyOn(
+			select( coreStore ),
+			'getEntityRecords'
+		).mockImplementation( ( kind, name ) =>
+			kind === 'root' && name === 'taxonomy' ? taxonomies : null
 		);
 
 		const { container } = render( <PostTaxonomies /> );
@@ -105,10 +110,12 @@ describe( 'PostTaxonomies', () => {
 			select( editorStore ),
 			'getCurrentPostType'
 		).mockReturnValue( 'book' );
-		jest.spyOn( select( coreStore ), 'getTaxonomies' ).mockReturnValue( [
-			genresTaxonomy,
-			categoriesTaxonomy,
-		] );
+		jest.spyOn(
+			select( coreStore ),
+			'getEntityRecords'
+		).mockImplementation( ( kind, name ) =>
+			kind === 'root' && name === 'taxonomy' ? allTaxonomies : null
+		);
 
 		render( <PostTaxonomies /> );
 
@@ -117,10 +124,10 @@ describe( 'PostTaxonomies', () => {
 			screen.queryByRole( 'group', { name: 'Categories' } )
 		).not.toBeInTheDocument();
 		expect(
-			screen.getByRole( 'button', { name: 'Add new genre' } )
+			screen.getByRole( 'button', { name: 'Add Genre' } )
 		).toBeVisible();
 		expect(
-			screen.queryByRole( 'button', { name: 'Add new category' } )
+			screen.queryByRole( 'button', { name: 'Add Category' } )
 		).not.toBeInTheDocument();
 	} );
 
@@ -129,28 +136,24 @@ describe( 'PostTaxonomies', () => {
 			select( editorStore ),
 			'getCurrentPostType'
 		).mockReturnValue( 'book' );
-		jest.spyOn( select( coreStore ), 'getTaxonomies' ).mockReturnValue( [
-			genresTaxonomy,
-			{
-				...categoriesTaxonomy,
-				types: [ 'post', 'page', 'book' ],
-				visibility: {
-					show_ui: false,
-				},
-			},
-		] );
+		jest.spyOn(
+			select( coreStore ),
+			'getEntityRecords'
+		).mockImplementation( ( kind, name ) =>
+			kind === 'root' && name === 'taxonomy' ? hidesUI : null
+		);
 
 		render( <PostTaxonomies /> );
 
 		expect( screen.getByRole( 'group', { name: 'Genres' } ) ).toBeVisible();
 		expect(
-			screen.getByRole( 'button', { name: 'Add new genre' } )
+			screen.getByRole( 'button', { name: 'Add Genre' } )
 		).toBeVisible();
 		expect(
 			screen.queryByRole( 'group', { name: 'Categories' } )
 		).not.toBeInTheDocument();
 		expect(
-			screen.queryByRole( 'button', { name: 'Add new category' } )
+			screen.queryByRole( 'button', { name: 'Add Category' } )
 		).not.toBeInTheDocument();
 	} );
 } );

@@ -1,20 +1,8 @@
-/**
- * External dependencies
- */
-import styled from '@emotion/styled';
-
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-const SingleColumnToolsPanelItem = styled( ToolsPanelItem )`
-	grid-column: span 1;
-`;
 
 /**
  * @typedef {import('@wordpress/components/build-types/unit-control/types').WPUnitControlUnit} WPUnitControlUnit
@@ -46,7 +34,7 @@ const SingleColumnToolsPanelItem = styled( ToolsPanelItem )`
  *
  * @param {WidthHeightToolProps} props The component props.
  *
- * @return {import('react').ReactElement} The width and height tool.
+ * @return {React.ReactElement} The width and height tool.
  */
 export default function WidthHeightTool( {
 	panelId,
@@ -72,7 +60,8 @@ export default function WidthHeightTool( {
 
 	return (
 		<>
-			<SingleColumnToolsPanelItem
+			<ToolsPanelItem
+				style={ { gridColumn: 'span 1' } }
 				label={ __( 'Width' ) }
 				isShownByDefault={ isShownByDefault }
 				hasValue={ () => width !== '' }
@@ -87,10 +76,10 @@ export default function WidthHeightTool( {
 					min={ 0 }
 					value={ width }
 					onChange={ onDimensionChange( 'width' ) }
-					size="__unstable-large"
 				/>
-			</SingleColumnToolsPanelItem>
-			<SingleColumnToolsPanelItem
+			</ToolsPanelItem>
+			<ToolsPanelItem
+				style={ { gridColumn: 'span 1' } }
 				label={ __( 'Height' ) }
 				isShownByDefault={ isShownByDefault }
 				hasValue={ () => height !== '' }
@@ -105,9 +94,8 @@ export default function WidthHeightTool( {
 					min={ 0 }
 					value={ height }
 					onChange={ onDimensionChange( 'height' ) }
-					size="__unstable-large"
 				/>
-			</SingleColumnToolsPanelItem>
+			</ToolsPanelItem>
 		</>
 	);
 }

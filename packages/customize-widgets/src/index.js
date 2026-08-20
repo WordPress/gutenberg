@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createRoot, StrictMode } from '@wordpress/element';
 import {
 	registerCoreBlocks,
@@ -18,10 +15,6 @@ import {
 } from '@wordpress/blocks';
 import { dispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import CustomizeWidgets from './components/customize-widgets';
 import getSidebarSection from './controls/sidebar-section';
 import getSidebarControl from './controls/sidebar-control';
@@ -56,7 +49,8 @@ export function initialize( editorName, blockEditorSettings ) {
 			block.name.startsWith( 'core/post' ) ||
 			block.name.startsWith( 'core/query' ) ||
 			block.name.startsWith( 'core/site' ) ||
-			block.name.startsWith( 'core/navigation' )
+			block.name.startsWith( 'core/navigation' ) ||
+			block.name.startsWith( 'core/term' )
 		);
 	} );
 	registerCoreBlocks( coreBlocks );

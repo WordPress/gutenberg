@@ -4,7 +4,16 @@
 		"isValid": true,
 		"attributes": {
 			"isLink": false,
-			"displayType": "date"
+			"metadata": {
+				"bindings": {
+					"datetime": {
+						"source": "core/post-data",
+						"args": {
+							"field": "date"
+						}
+					}
+				}
+			}
 		},
 		"innerBlocks": []
 	}

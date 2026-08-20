@@ -2,6 +2,9 @@
 https://github.com/WordPress/gutenberg/blob/trunk/CONTRIBUTING.md -->
 
 ## What?
+<!-- Link this PR to its associated issue with an appropriate keyword: Closes, See, Follow up to, etc. -->
+Closes <!-- #ISSUE-NUMBER or URL -->
+
 <!-- In a few words, what is the PR actually doing? -->
 
 ## Why?
@@ -26,3 +29,9 @@ https://github.com/WordPress/gutenberg/blob/trunk/CONTRIBUTING.md -->
 |Before|After|
 |-|-|
 |<!-- Before screenshot here -->|<!-- After screenshot here -->|
+
+## Use of AI Tools
+
+<!--
+You are free to use artificial intelligence (AI) tooling to contribute, but you must disclose what tooling you are using and to what extent a pull request has been authored by AI. It is your responsibility to review and take responsibility for what AI generates. See the WordPress AI Guidelines: <https://make.wordpress.org/ai/handbook/ai-guidelines/>.
+-->

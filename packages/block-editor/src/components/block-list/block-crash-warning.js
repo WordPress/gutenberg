@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import Warning from '../warning';
 
 const warning = (
@@ -14,4 +7,6 @@ const warning = (
 	</Warning>
 );
 
-export default () => warning;
+export default function BlockCrashWarning() {
+	return warning;
+}

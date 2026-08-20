@@ -2,7 +2,7 @@
 
 Using complex whitespace in translatable strings and relying on HTML to collapse it can make translation more difficult and lead to unnecessary retranslation.
 
-Whitespace can be appropriate in longer translatable content, for example a whole blog post. These cases are unlikely to occur in the code scanned by eslint but if they do, [disable the rule with inline comments](http://eslint.org/docs/user-guide/configuring#disabling-rules-with-inline-comments. ( e.g. `// eslint-disable-line i18n-no-collapsible-whitespace` ).
+Whitespace can be appropriate in longer translatable content, for example a whole blog post. These cases are unlikely to occur in the code scanned by eslint but if they do, [disable the rule with inline comments](https://eslint.org/docs/latest/use/configure/rules#disabling-rules) ( e.g. `// eslint-disable-line i18n-no-collapsible-whitespace` ).
 
 ## Rule details
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 function generateRandomNumber() {
@@ -30,7 +27,7 @@ test.describe( 'Taxonomies', () => {
 
 		await page
 			.getByRole( 'button', {
-				name: 'Add New Category',
+				name: 'Add Category',
 				expanded: false,
 			} )
 			.click();
@@ -79,9 +76,7 @@ test.describe( 'Taxonomies', () => {
 		const tagName = 'tag-' + generateRandomNumber();
 		const tags = page.locator( '.components-form-token-field__token-text' );
 
-		await page
-			.getByRole( 'combobox', { name: 'Add New Tag' } )
-			.fill( tagName );
+		await page.getByRole( 'combobox', { name: 'Add tag' } ).fill( tagName );
 		await page.keyboard.press( 'Enter' );
 
 		await expect( tags ).toHaveCount( 1 );
@@ -116,9 +111,7 @@ test.describe( 'Taxonomies', () => {
 		const tagName = "tag'-" + generateRandomNumber();
 		const tags = page.locator( '.components-form-token-field__token-text' );
 
-		await page
-			.getByRole( 'combobox', { name: 'Add New Tag' } )
-			.fill( tagName );
+		await page.getByRole( 'combobox', { name: 'Add tag' } ).fill( tagName );
 		await page.keyboard.press( 'Enter' );
 
 		await expect( tags ).toHaveCount( 1 );

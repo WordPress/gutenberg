@@ -1,7 +1,8 @@
-/**
- * WordPress dependencies
- */
-import { createBlock } from '@wordpress/blocks';
+import {
+	createBlock,
+	hasBlockSupport,
+	store as blocksStore,
+} from '@wordpress/blocks';
 import {
 	addSubmenu,
 	chevronUp,
@@ -12,6 +13,7 @@ import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
+import { DEFAULT_BLOCK } from '../constants';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -24,26 +26,27 @@ const BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU = [
 ];
 
 function AddSubmenuItem( {
-	block,
+	clientId,
 	onClose,
-	expandedState,
-	expand,
-	setInsertedBlock,
+	isDisabled,
+	updateExpansion,
+	setInsertedBlockClientId,
 } ) {
 	const { insertBlock, replaceBlock, replaceInnerBlocks } =
 		useDispatch( blockEditorStore );
+	const { getBlock } = useSelect( blockEditorStore );
 
-	const clientId = block.clientId;
-	const isDisabled = ! BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU.includes(
-		block.name
-	);
 	return (
 		<MenuItem
 			icon={ addSubmenu }
 			disabled={ isDisabled }
 			onClick={ () => {
 				const updateSelectionOnInsert = false;
-				const newLink = createBlock( 'core/navigation-link' );
+				const newLink = createBlock(
+					DEFAULT_BLOCK.name,
+					DEFAULT_BLOCK.attributes
+				);
+				const block = getBlock( clientId );
 
 				if ( block.name === 'core/navigation-submenu' ) {
 					insertBlock(
@@ -78,11 +81,8 @@ function AddSubmenuItem( {
 				// This call sets the local List View state for the "last inserted block".
 				// This is required for the Nav Block to determine whether or not to display
 				// the Link UI for this new block.
-				setInsertedBlock( newLink );
-
-				if ( ! expandedState[ block.clientId ] ) {
-					expand( block.clientId );
-				}
+				setInsertedBlockClientId( newLink.clientId );
+				updateExpansion( { type: 'expand', clientIds: [ clientId ] } );
 				onClose();
 			} }
 		>
@@ -91,12 +91,20 @@ function AddSubmenuItem( {
 	);
 }
 
-export default function LeafMoreMenu( props ) {
-	const { block } = props;
-	const { clientId } = block;
-
-	const { moveBlocksDown, moveBlocksUp, removeBlocks } =
-		useDispatch( blockEditorStore );
+export default function LeafMoreMenu( {
+	clientId,
+	updateExpansion,
+	setInsertedBlockClientId,
+	...props
+} ) {
+	const {
+		moveBlocksDown,
+		moveBlocksUp,
+		removeBlocks,
+		duplicateBlocks,
+		insertBeforeBlock,
+		insertAfterBlock,
+	} = useDispatch( blockEditorStore );
 
 	const removeLabel = sprintf(
 		/* translators: %s: block name */
@@ -104,14 +112,57 @@ export default function LeafMoreMenu( props ) {
 		BlockTitle( { clientId, maximumLength: 25 } )
 	);
 
-	const rootClientId = useSelect(
+	const {
+		blockName,
+		rootClientId,
+		canDuplicate,
+		canInsertBlock,
+		isFirst,
+		isLast,
+	} = useSelect(
 		( select ) => {
-			const { getBlockRootClientId } = select( blockEditorStore );
+			const {
+				getBlockRootClientId,
+				getBlockName,
+				canInsertBlockType,
+				getDirectInsertBlock,
+				getBlockIndex,
+				getBlockCount,
+			} = select( blockEditorStore );
+			const { getDefaultBlockName } = select( blocksStore );
 
-			return getBlockRootClientId( clientId );
+			const _rootClientId = getBlockRootClientId( clientId );
+			const _blockName = getBlockName( clientId );
+			const canInsertDefaultBlock = canInsertBlockType(
+				getDefaultBlockName(),
+				_rootClientId
+			);
+			const directInsertBlock = _rootClientId
+				? getDirectInsertBlock( _rootClientId )
+				: null;
+
+			return {
+				blockName: _blockName,
+				rootClientId: _rootClientId,
+				canDuplicate:
+					!! _blockName &&
+					hasBlockSupport( _blockName, 'multiple', true ) &&
+					canInsertBlockType( _blockName, _rootClientId ),
+				canInsertBlock:
+					( canInsertDefaultBlock || !! directInsertBlock ) &&
+					!! _blockName &&
+					canInsertBlockType( _blockName, _rootClientId ),
+				isFirst: getBlockIndex( clientId ) === 0,
+				isLast:
+					getBlockIndex( clientId ) ===
+					getBlockCount( _rootClientId ) - 1,
+			};
 		},
 		[ clientId ]
 	);
+
+	const isSubmenuDisabled =
+		! BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU.includes( blockName );
 
 	return (
 		<DropdownMenu
@@ -127,6 +178,8 @@ export default function LeafMoreMenu( props ) {
 					<MenuGroup>
 						<MenuItem
 							icon={ chevronUp }
+							disabled={ isFirst }
+							accessibleWhenDisabled
 							onClick={ () => {
 								moveBlocksUp( [ clientId ], rootClientId );
 								onClose();
@@ -136,6 +189,8 @@ export default function LeafMoreMenu( props ) {
 						</MenuItem>
 						<MenuItem
 							icon={ chevronDown }
+							disabled={ isLast }
+							accessibleWhenDisabled
 							onClick={ () => {
 								moveBlocksDown( [ clientId ], rootClientId );
 								onClose();
@@ -144,13 +199,44 @@ export default function LeafMoreMenu( props ) {
 							{ __( 'Move down' ) }
 						</MenuItem>
 						<AddSubmenuItem
-							block={ block }
+							clientId={ clientId }
 							onClose={ onClose }
-							expanded
-							expandedState={ props.expandedState }
-							expand={ props.expand }
-							setInsertedBlock={ props.setInsertedBlock }
+							isDisabled={ isSubmenuDisabled }
+							updateExpansion={ updateExpansion }
+							setInsertedBlockClientId={
+								setInsertedBlockClientId
+							}
 						/>
+						{ canDuplicate && (
+							<MenuItem
+								onClick={ () => {
+									duplicateBlocks( [ clientId ] );
+									onClose();
+								} }
+							>
+								{ __( 'Duplicate' ) }
+							</MenuItem>
+						) }
+						{ canInsertBlock && (
+							<>
+								<MenuItem
+									onClick={ () => {
+										insertBeforeBlock( clientId );
+										onClose();
+									} }
+								>
+									{ __( 'Add before' ) }
+								</MenuItem>
+								<MenuItem
+									onClick={ () => {
+										insertAfterBlock( clientId );
+										onClose();
+									} }
+								>
+									{ __( 'Add after' ) }
+								</MenuItem>
+							</>
+						) }
 					</MenuGroup>
 					<MenuGroup>
 						<MenuItem

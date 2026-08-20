@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -10,15 +7,11 @@ import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import {
 	Button,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import { getItemTitle, isTemplateOrTemplatePart } from './utils';
 import type { CoreDataError, PostWithPermissions } from '../types';
 
@@ -35,6 +28,7 @@ const permanentlyDeletePost: Action< PostWithPermissions > = {
 		return status === 'trash' && permissions?.delete;
 	},
 	hideModalHeader: true,
+	modalFocusOnMount: 'firstContentElement',
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ isBusy, setIsBusy ] = useState( false );
 		const { createSuccessNotice, createErrorNotice } =
@@ -43,7 +37,7 @@ const permanentlyDeletePost: Action< PostWithPermissions > = {
 
 		return (
 			<VStack spacing="5">
-				<Text>
+				<WCText>
 					{ items.length > 1
 						? sprintf(
 								// translators: %d: number of items to delete.
@@ -61,7 +55,7 @@ const permanentlyDeletePost: Action< PostWithPermissions > = {
 								),
 								decodeEntities( getItemTitle( items[ 0 ] ) )
 						  ) }
-				</Text>
+				</WCText>
 				<HStack justify="right">
 					<Button
 						variant="tertiary"
@@ -97,7 +91,7 @@ const permanentlyDeletePost: Action< PostWithPermissions > = {
 								let successMessage;
 								if ( promiseResult.length === 1 ) {
 									successMessage = sprintf(
-										/* translators: The posts's title. */
+										/* translators: %s: The posts's title. */
 										__( '"%s" permanently deleted.' ),
 										getItemTitle( items[ 0 ] )
 									);
@@ -129,7 +123,7 @@ const permanentlyDeletePost: Action< PostWithPermissions > = {
 									}
 									// If we were trying to permanently delete multiple posts
 								} else {
-									const errorMessages = new Set();
+									const errorMessages = new Set< string >();
 									const failedPromises = promiseResult.filter(
 										( { status } ) => status === 'rejected'
 									);

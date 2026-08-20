@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { focus } from '@wordpress/dom';
 import { forwardRef, useCallback } from '@wordpress/element';
 import { UP, DOWN, LEFT, RIGHT, HOME, END } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import RovingTabIndexContainer from './roving-tab-index';
 import type { TreeGridProps } from './types';
 import type { WordPressComponentProps } from '../context';
@@ -386,6 +379,7 @@ function UnforwardedTreeGrid(
  * @see {@link https://www.w3.org/TR/wai-aria-practices/examples/treegrid/treegrid-1.html}
  */
 export const TreeGrid = forwardRef( UnforwardedTreeGrid );
+TreeGrid.displayName = 'TreeGrid';
 
 export default TreeGrid;
 export { default as TreeGridRow } from './row';

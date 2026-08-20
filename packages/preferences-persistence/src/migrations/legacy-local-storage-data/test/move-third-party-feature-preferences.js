@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import moveThirdPartyFeaturePreferences from '../move-third-party-feature-preferences';
 
 describe( 'moveThirdPartyFeaturePreferences', () => {

@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { Placeholder, Button, Spinner } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import {
 	useAlternativeBlockPatterns,
 	useAlternativeTemplateParts,
@@ -17,6 +10,7 @@ import {
 	useTemplatePartArea,
 } from './utils/hooks';
 import TitleModal from './title-modal';
+import { getTemplatePartIcon } from './utils/get-template-part-icon';
 
 export default function TemplatePartPlaceholder( {
 	area,
@@ -54,7 +48,7 @@ export default function TemplatePartPlaceholder( {
 
 	return (
 		<Placeholder
-			icon={ areaObject.icon }
+			icon={ getTemplatePartIcon( areaObject.icon ) }
 			label={ areaObject.label }
 			instructions={
 				isBlockBasedTheme

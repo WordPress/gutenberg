@@ -1,57 +1,72 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 
 // Maximum number of images to display in a list view row.
 const MAX_IMAGES = 3;
+const IMAGE_GETTERS = {
+	'core/image': ( { clientId, attributes } ) => {
+		if ( attributes.url ) {
+			return {
+				url: attributes.url,
+				alt: attributes.alt || '',
+				clientId,
+			};
+		}
+	},
+	'core/cover': ( { clientId, attributes } ) => {
+		if ( attributes.backgroundType === 'image' && attributes.url ) {
+			return {
+				url: attributes.url,
+				alt: attributes.alt || '',
+				clientId,
+			};
+		}
+	},
+	'core/media-text': ( { clientId, attributes } ) => {
+		if ( attributes.mediaType === 'image' && attributes.mediaUrl ) {
+			return {
+				url: attributes.mediaUrl,
+				alt: attributes.mediaAlt || '',
+				clientId,
+			};
+		}
+	},
+	'core/gallery': ( { innerBlocks } ) => {
+		const images = [];
+		const getValues = !! innerBlocks?.length
+			? IMAGE_GETTERS[ innerBlocks[ 0 ].name ]
+			: undefined;
+		if ( ! getValues ) {
+			return images;
+		}
 
-function getImage( block ) {
-	if ( block.name !== 'core/image' ) {
-		return;
-	}
+		for ( const innerBlock of innerBlocks ) {
+			const img = getValues( innerBlock );
+			if ( img ) {
+				images.push( img );
+			}
+			if ( images.length >= MAX_IMAGES ) {
+				return images;
+			}
+		}
 
-	if ( block.attributes?.url ) {
-		return {
-			url: block.attributes.url,
-			alt: block.attributes.alt,
-			clientId: block.clientId,
-		};
-	}
-}
+		return images;
+	},
+};
 
-function getImagesFromGallery( block ) {
-	if ( block.name !== 'core/gallery' || ! block.innerBlocks ) {
+function getImagesFromBlock( block, isExpanded ) {
+	const images = block ? IMAGE_GETTERS[ block.name ]( block ) : undefined;
+
+	if ( ! images ) {
 		return [];
 	}
 
-	const images = [];
-
-	for ( const innerBlock of block.innerBlocks ) {
-		const img = getImage( innerBlock );
-		if ( img ) {
-			images.push( img );
-		}
-		if ( images.length >= MAX_IMAGES ) {
-			return images;
-		}
+	if ( ! Array.isArray( images ) ) {
+		return [ images ];
 	}
 
-	return images;
-}
-
-function getImagesFromBlock( block, isExpanded ) {
-	const img = getImage( block );
-	if ( img ) {
-		return [ img ];
-	}
-	return isExpanded ? [] : getImagesFromGallery( block );
+	return isExpanded ? [] : images;
 }
 
 /**
@@ -69,12 +84,14 @@ function getImagesFromBlock( block, isExpanded ) {
 export default function useListViewImages( { clientId, isExpanded } ) {
 	const { block } = useSelect(
 		( select ) => {
-			const _block = select( blockEditorStore ).getBlock( clientId );
-			return { block: _block };
+			const { getBlockName, getBlock } = select( blockEditorStore );
+			// Reading the block subscribes to its whole subtree, so only
+			// do it for blocks that can show an image.
+			const hasImages = !! IMAGE_GETTERS[ getBlockName( clientId ) ];
+			return { block: hasImages ? getBlock( clientId ) : undefined };
 		},
 		[ clientId ]
 	);
-
 	const images = useMemo( () => {
 		return getImagesFromBlock( block, isExpanded );
 	}, [ block, isExpanded ] );

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as blocksStore } from '@wordpress/blocks';
 import {
 	registerCoreBlocks,
@@ -16,11 +13,6 @@ import {
 	registerLegacyWidgetBlock,
 	registerWidgetGroupBlock,
 } from '@wordpress/widgets';
-
-/**
- * Internal dependencies
- */
-import './hooks';
 import { store as editSiteStore } from './store';
 import { unlock } from './lock-unlock';
 import App from './components/app';
@@ -74,9 +66,13 @@ export function initializeEditor( id, settings ) {
 		showBlockBreadcrumbs: true,
 		showListViewByDefault: false,
 		enableChoosePatternModal: true,
+		showCollaborationCursor: false,
+		showCollaborationJoinNotifications: true,
+		showCollaborationLeaveNotifications: true,
+		showCollaborationPostSaveNotifications: true,
 	} );
 
-	if ( window.__experimentalMediaProcessing ) {
+	if ( window.__clientSideMediaProcessing ) {
 		dispatch( preferencesStore ).setDefaults( 'core/media', {
 			requireApproval: true,
 			optimizeOnUpload: true,
@@ -108,7 +104,3 @@ export function reinitializeEditor() {
 export { default as PluginTemplateSettingPanel } from './components/plugin-template-setting-panel';
 export { store } from './store';
 export * from './deprecated';
-
-// Temporary: While the posts dashboard is being iterated on
-// it's being built in the same package as the site editor.
-export { initializePostsDashboard } from './posts';

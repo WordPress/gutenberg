@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
 import { serialize } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { useAvailablePatterns } from './hooks';
 import {
@@ -34,19 +27,23 @@ function TemplatesList( { availableTemplates, onSelect } ) {
 }
 
 function PostTransform() {
-	const { record, postType, postId } = useSelect( ( select ) => {
+	const { area, name, slug, postType, postId } = useSelect( ( select ) => {
 		const { getCurrentPostType, getCurrentPostId } = select( editorStore );
 		const { getEditedEntityRecord } = select( coreStore );
 		const type = getCurrentPostType();
 		const id = getCurrentPostId();
+		const record = getEditedEntityRecord( 'postType', type, id );
+
 		return {
+			area: record?.area,
+			name: record?.name,
+			slug: record?.slug,
 			postType: type,
 			postId: id,
-			record: getEditedEntityRecord( 'postType', type, id ),
 		};
 	}, [] );
 	const { editEntityRecord } = useDispatch( coreStore );
-	const availablePatterns = useAvailablePatterns( record );
+	const availablePatterns = useAvailablePatterns( { area, name, slug } );
 	const onTemplateSelect = async ( selectedTemplate ) => {
 		await editEntityRecord( 'postType', postType, postId, {
 			blocks: selectedTemplate.blocks,
@@ -60,7 +57,7 @@ function PostTransform() {
 	return (
 		<PanelBody
 			title={ __( 'Design' ) }
-			initialOpen={ record.type === TEMPLATE_PART_POST_TYPE }
+			initialOpen={ postType === TEMPLATE_PART_POST_TYPE }
 		>
 			<TemplatesList
 				availableTemplates={ availablePatterns }

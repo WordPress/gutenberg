@@ -4,10 +4,105 @@ on:
     release:
         types: [published]
 
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
 jobs:
+    validate-github-ref:
+        name: Validate github.ref
+        runs-on: 'ubuntu-24.04'
+        permissions: {}
+        steps:
+            - name: Check github.ref
+              run: |
+                  if [ -z "${{ github.ref }}" ]; then
+                    echo "::error::github.ref is empty ('${{ github.ref }}')"
+                    exit 1
+                  fi
+                  echo "github.ref is valid: ${{ github.ref }}"
+
+    get-release-metadata:
+        name: Get release metadata
+        runs-on: 'ubuntu-24.04'
+        permissions: {}
+        needs: validate-github-ref
+        outputs:
+            plugin_asset_url: ${{ steps.get_plugin_asset.outputs.plugin_asset_url }}
+            version: ${{ steps.get_release_version.outputs.version }}
+
+        steps:
+            - name: Validate release tag
+              id: get_release_version
+              env:
+                  TAG: ${{ github.event.release.tag_name }}
+              run: |
+                  VERSION="${TAG#v}"
+                  if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?$ ]]; then
+                    echo "::error::Release tag '$TAG' does not resolve to a valid Gutenberg plugin version."
+                    exit 1
+                  fi
+                  echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+            - name: Confirm release assets exist
+              env:
+                  RELEASE_ASSETS: ${{ toJson( github.event.release.assets ) }}
+              run: |
+                  asset_count="$(jq 'length' <<< "$RELEASE_ASSETS")"
+                  if [[ "$asset_count" -eq 0 ]]; then
+                    echo "::error::No assets are attached to the release."
+                    exit 1
+                  fi
+
+            - name: Confirm Gutenberg plugin asset exists
+              env:
+                  RELEASE_ASSETS: ${{ toJson( github.event.release.assets ) }}
+              run: |
+                  asset_count="$(jq --arg name 'gutenberg.zip' '[.[] | select(.name == $name)] | length' <<< "$RELEASE_ASSETS")"
+                  if [[ "$asset_count" -eq 0 ]]; then
+                    echo "::error::The gutenberg.zip asset is missing from the release."
+                    exit 1
+                  fi
+
+            - name: Confirm a single Gutenberg plugin asset exists
+              env:
+                  RELEASE_ASSETS: ${{ toJson( github.event.release.assets ) }}
+              run: |
+                  asset_count="$(jq --arg name 'gutenberg.zip' '[.[] | select(.name == $name)] | length' <<< "$RELEASE_ASSETS")"
+                  if [[ "$asset_count" -gt 1 ]]; then
+                    echo "::error::More than one gutenberg.zip asset is attached to the release."
+                    exit 1
+                  fi
+
+            - name: Confirm Gutenberg plugin asset upload completed
+              env:
+                  RELEASE_ASSETS: ${{ toJson( github.event.release.assets ) }}
+              run: |
+                  asset_state="$(jq -r --arg name 'gutenberg.zip' '.[] | select(.name == $name) | .state // empty' <<< "$RELEASE_ASSETS")"
+                  asset_size="$(jq -r --arg name 'gutenberg.zip' '.[] | select(.name == $name) | .size // 0' <<< "$RELEASE_ASSETS")"
+                  if [[ "$asset_state" != "uploaded" || "$asset_size" -le 0 ]]; then
+                    echo "::error::The gutenberg.zip release asset upload is incomplete (state: $asset_state, size: $asset_size bytes). Delete the incomplete asset and upload it again."
+                    exit 1
+                  fi
+
+            - name: Select Gutenberg plugin asset
+              id: get_plugin_asset
+              env:
+                  RELEASE_ASSETS: ${{ toJson( github.event.release.assets ) }}
+              run: |
+                  plugin_asset_url="$(jq -r --arg name 'gutenberg.zip' '.[] | select(.name == $name) | .browser_download_url // empty' <<< "$RELEASE_ASSETS")"
+                  if [[ -z "$plugin_asset_url" ]]; then
+                    echo "::error::The gutenberg.zip release asset is missing a download URL."
+                    exit 1
+                  fi
+
+                  echo "plugin_asset_url=$plugin_asset_url" >> "$GITHUB_OUTPUT"
+
     compute-should-update-trunk:
         name: Decide if trunk or tag
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
+        permissions: {}
+        needs: get-release-metadata
         # Skip this job if the release is a release candidate. This will in turn skip
         # the upload jobs, which are only relevant for non-RC releases.
         # We first check if the release is a prerelease, and then if the ref contains
@@ -25,15 +120,15 @@ jobs:
               run: |
                   latest_version_in_core_repo=$(curl -s 'https://api.wordpress.org/plugins/info/1.2/?action=plugin_information&request\[slug\]=gutenberg' | jq -r '.version')
                   echo "Latest Core Repo version: $latest_version_in_core_repo"
-                  echo "version=$latest_version_in_core_repo" >> $GITHUB_OUTPUT
+                  echo "version=$latest_version_in_core_repo" >> "$GITHUB_OUTPUT"
 
             - name: Decide if it is a trunk or tag update
               id: compute_should_update_trunk
               env:
-                  GITHUB_REF: ${{ github.ref }}
+                  LATEST_VERSION: ${{ steps.compute_latest_version_in_core_repo.outputs.version }}
+                  RELEASE_VERSION: ${{ needs.get-release-metadata.outputs.version }}
               run: |
-                  latestPublishedVersion=$(echo "$GITHUB_REF" | sed -E 's/refs\/tags\/(v?)([0-9.]+)/\2/')
-                  latestVersionInCoreRepo="${{ steps.compute_latest_version_in_core_repo.outputs.version }}"
+                  latestPublishedVersion="$RELEASE_VERSION"
 
                   # Determines if the first version string is greater than the second version string.
                   #
@@ -55,16 +150,18 @@ jobs:
                   # than the version currently published in the WP plugins repo. If not, then it
                   # will upload it as a new tag.
                   shouldUpdateTrunk=false
-                  if is_first_version_greater_than_second "$latestPublishedVersion" "$latestVersionInCoreRepo"; then
+                  if is_first_version_greater_than_second "$latestPublishedVersion" "$LATEST_VERSION"; then
                      shouldUpdateTrunk=true
                   fi
 
                   echo "Should update trunk: $shouldUpdateTrunk"
-                  echo "should_update_trunk=$shouldUpdateTrunk" >> $GITHUB_OUTPUT
+                  echo "should_update_trunk=$shouldUpdateTrunk" >> "$GITHUB_OUTPUT"
 
     get-release-branch:
         name: Get release branch name
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
+        permissions: {}
+        needs: get-release-metadata
         outputs:
             release_branch: ${{ steps.get_release_branch.outputs.release_branch }}
 
@@ -72,19 +169,22 @@ jobs:
             - name: Compute release branch name
               id: get_release_branch
               env:
-                  TAG: ${{ github.event.release.tag_name }}
+                  VERSION: ${{ needs.get-release-metadata.outputs.version }}
               run: |
-                  IFS='.' read -r -a VERSION_ARRAY <<< "${TAG#v}"
+                  IFS='.' read -r -a VERSION_ARRAY <<< "${VERSION}"
                   RELEASE_BRANCH="release/${VERSION_ARRAY[0]}.${VERSION_ARRAY[1]}"
-                  echo "release_branch=${RELEASE_BRANCH}" >> $GITHUB_OUTPUT
+                  echo "release_branch=${RELEASE_BRANCH}" >> "$GITHUB_OUTPUT"
 
     update-changelog:
         name: Update Changelog on ${{ matrix.branch }} branch
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: write
         if: |
-            github.event.release.assets[0]
-        needs: get-release-branch
+            needs.get-release-metadata.outputs.plugin_asset_url
+        needs: [get-release-branch, get-release-metadata]
         env:
+            RELEASE_BRANCH: ${{ needs.get-release-branch.outputs.release_branch }}
             TAG: ${{ github.event.release.tag_name }}
         strategy:
             matrix:
@@ -96,13 +196,16 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   ref: ${{ matrix.branch }}
                   token: ${{ secrets.GUTENBERG_TOKEN }}
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: true
 
             - name: Update the Changelog to include the release notes
+              env:
+                  RELEASE_BODY: ${{ github.event.release.body }}
               run: |
                   # First, determine where to insert the new Changelog entry.
                   SERIES="${RELEASE_BRANCH#release/}"
@@ -119,9 +222,7 @@ jobs:
                   head -n $(( "${BEFORE}" - 1 )) changelog.txt > new_changelog.txt
                   printf '= %s =\n\n' "${TAG#v}" >> new_changelog.txt
                   # Need to use a heredoc in order to preserve special characters.
-                  cat <<- "EOF" > release_notes.txt
-                  ${{ github.event.release.body }}
-                  EOF
+                  echo "$RELEASE_BODY" > release_notes.txt
                   # Normalize empty lines: Trim them from beginning and end of file...
                   awk 'NF {p=1} p' <<< "$(< release_notes.txt)" >> new_changelog.txt
                   # ...then add two empty lines at the end.
@@ -135,6 +236,8 @@ jobs:
                   git config user.email gutenberg@wordpress.org
 
             - name: Commit the Changelog update
+              env:
+                  TARGET_BRANCH: ${{ matrix.branch }}
               run: |
                   git add changelog.txt
                   # Remove files that are not meant to be committed
@@ -143,33 +246,39 @@ jobs:
                   # Only attempt to commit changelog if it has been modified.
                   if ! git diff-index --quiet HEAD --; then
                     git commit -m "Update Changelog for ${TAG#v}"
-                    git push --set-upstream origin "${{ matrix.branch }}"
+                    git push --set-upstream origin "$TARGET_BRANCH"
                   fi
 
             - name: Upload Changelog artifact
-              uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               with:
                   name: changelog ${{ matrix.label }}
                   path: ./changelog.txt
 
     upload:
         name: Publish as trunk (and tag)
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
+        permissions: {}
         environment: wp.org plugin
-        needs: [compute-should-update-trunk, update-changelog]
+        needs:
+            [
+                compute-should-update-trunk,
+                update-changelog,
+                get-release-metadata,
+            ]
         if: |
-            needs.compute-should-update-trunk.outputs.should_update_trunk == 'true' && github.event.release.assets[0]
+            needs.compute-should-update-trunk.outputs.should_update_trunk == 'true' && needs.get-release-metadata.outputs.plugin_asset_url
         env:
             PLUGIN_REPO_URL: 'https://plugins.svn.wordpress.org/gutenberg'
             STABLE_VERSION_REGEX: '[0-9]\+\.[0-9]\+\.[0-9]\+\s*'
             SVN_USERNAME: ${{ secrets.svn_username }}
             SVN_PASSWORD: ${{ secrets.svn_password }}
-            VERSION: ${{ github.event.release.name }}
+            VERSION: ${{ needs.get-release-metadata.outputs.version }}
 
         steps:
             - name: Install Subversion
               run: |
-                  apt-get update -y && apt-get install -y subversion
+                  sudo apt-get update -y && sudo apt-get install -y subversion
 
             - name: Check out Gutenberg trunk from WP.org plugin repo
               run: |
@@ -182,9 +291,9 @@ jobs:
 
             - name: Download and unzip Gutenberg plugin asset into trunk folder
               env:
-                  PLUGIN_URL: ${{ github.event.release.assets[0].browser_download_url }}
+                  PLUGIN_URL: ${{ needs.get-release-metadata.outputs.plugin_asset_url }}
               run: |
-                  curl -L -o gutenberg.zip $PLUGIN_URL
+                  curl -L -o gutenberg.zip "$PLUGIN_URL"
                   unzip gutenberg.zip -d trunk
                   rm gutenberg.zip
 
@@ -195,12 +304,35 @@ jobs:
                   sed -i "s/$STABLE_TAG_PLACEHOLDER/Stable tag: $VERSION/g" ./trunk/readme.txt
 
             - name: Download Changelog Artifact
-              uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
               with:
                   name: changelog trunk
                   path: trunk
 
+            - name: Check if SVN tag already exists
+              id: check_svn_tag
+              run: |
+                  svn_error_file="$(mktemp)"
+                  if svn list "$PLUGIN_REPO_URL/tags/$VERSION" \
+                    --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
+                    --non-interactive --no-auth-cache >/dev/null 2>"$svn_error_file"; then
+                    echo "::warning::SVN tag tags/$VERSION already exists. Skipping release commit to avoid E150002."
+                    echo "exists=true" >> "$GITHUB_OUTPUT"
+                  else
+                    svn_status=$?
+                    # WP.org SVN may report a missing tag as W160013 followed by E200009.
+                    if grep -Eq 'E160013|W160013|E200009|non-existent' "$svn_error_file"; then
+                      echo "exists=false" >> "$GITHUB_OUTPUT"
+                    else
+                      cat "$svn_error_file" >&2
+                      rm -f "$svn_error_file"
+                      exit "$svn_status"
+                    fi
+                  fi
+                  rm -f "$svn_error_file"
+
             - name: Commit the release
+              if: steps.check_svn_tag.outputs.exists != 'true'
               working-directory: ./trunk
               run: |
                   svn st | grep '^?' | awk '{print $2}' | xargs -r svn add
@@ -213,29 +345,35 @@ jobs:
 
     upload-tag:
         name: Publish as tag
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
+        permissions: {}
         environment: wp.org plugin
-        needs: [compute-should-update-trunk, update-changelog]
+        needs:
+            [
+                compute-should-update-trunk,
+                update-changelog,
+                get-release-metadata,
+            ]
         if: |
-            needs.compute-should-update-trunk.outputs.should_update_trunk == 'false' && github.event.release.assets[0]
+            needs.compute-should-update-trunk.outputs.should_update_trunk == 'false' && needs.get-release-metadata.outputs.plugin_asset_url
         env:
             PLUGIN_REPO_URL: 'https://plugins.svn.wordpress.org/gutenberg'
             STABLE_VERSION_REGEX: '[0-9]\+\.[0-9]\+\.[0-9]\+\s*'
             SVN_USERNAME: ${{ secrets.svn_username }}
             SVN_PASSWORD: ${{ secrets.svn_password }}
-            VERSION: ${{ github.event.release.name }}
+            VERSION: ${{ needs.get-release-metadata.outputs.version }}
 
         steps:
             - name: Install Subversion
               run: |
-                  apt-get update -y && apt-get install -y subversion
+                  sudo apt-get update -y && sudo apt-get install -y subversion
 
             - name: Download and unzip Gutenberg plugin asset into tags folder
               env:
-                  PLUGIN_URL: ${{ github.event.release.assets[0].browser_download_url }}
+                  PLUGIN_URL: ${{ needs.get-release-metadata.outputs.plugin_asset_url }}
               run: |
                   # do the magic here
-                  curl -L -o gutenberg.zip $PLUGIN_URL
+                  curl -L -o gutenberg.zip "$PLUGIN_URL"
                   unzip gutenberg.zip -d "$VERSION"
                   rm gutenberg.zip
 
@@ -246,12 +384,35 @@ jobs:
                   sed -i "s/$STABLE_TAG_PLACEHOLDER/Stable tag: $VERSION/g" "$VERSION/readme.txt"
 
             - name: Download Changelog Artifact
-              uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
               with:
                   name: changelog trunk
-                  path: ${{ github.event.release.name }}
+                  path: ${{ needs.get-release-metadata.outputs.version }}
+
+            - name: Check if SVN tag already exists
+              id: check_svn_tag
+              run: |
+                  svn_error_file="$(mktemp)"
+                  if svn list "$PLUGIN_REPO_URL/tags/$VERSION" \
+                    --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
+                    --non-interactive --no-auth-cache >/dev/null 2>"$svn_error_file"; then
+                    echo "::warning::SVN tag tags/$VERSION already exists. Skipping import to avoid E150002."
+                    echo "exists=true" >> "$GITHUB_OUTPUT"
+                  else
+                    svn_status=$?
+                    # WP.org SVN may report a missing tag as W160013 followed by E200009.
+                    if grep -Eq 'E160013|W160013|E200009|non-existent' "$svn_error_file"; then
+                      echo "exists=false" >> "$GITHUB_OUTPUT"
+                    else
+                      cat "$svn_error_file" >&2
+                      rm -f "$svn_error_file"
+                      exit "$svn_status"
+                    fi
+                  fi
+                  rm -f "$svn_error_file"
 
             - name: Add the new version directory and commit changes to the SVN repository
+              if: steps.check_svn_tag.outputs.exists != 'true'
               run: |
                   svn import "$VERSION" "$PLUGIN_REPO_URL/tags/$VERSION" -m "Committing version $VERSION" \
                   --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \

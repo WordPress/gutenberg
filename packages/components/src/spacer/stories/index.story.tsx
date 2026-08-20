@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { Spacer } from '..';
 
 const controls = [
@@ -31,7 +24,7 @@ const controls = [
 
 const meta: Meta< typeof Spacer > = {
 	component: Spacer,
-	title: 'Components (Experimental)/Spacer',
+	title: 'Components/Spacer',
 	argTypes: {
 		as: { control: { type: 'text' } },
 		children: {
@@ -39,11 +32,17 @@ const meta: Meta< typeof Spacer > = {
 		},
 		...controls,
 	},
+	tags: [ 'status-experimental' ],
 	parameters: {
 		controls: {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Planned for deprecation.',
+		},
 	},
 };
 export default meta;
@@ -68,3 +67,11 @@ export const Default: StoryFn< typeof Spacer > = Template.bind( {} );
 Default.args = {
 	children: 'This is the spacer',
 };
+
+export const Nested: StoryFn< typeof Spacer > = () => (
+	<Spacer padding={ 4 } style={ { backgroundColor: '#ddd' } }>
+		<Spacer style={ { backgroundColor: '#fff' } }>
+			<BlackBox />
+		</Spacer>
+	</Spacer>
+);

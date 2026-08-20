@@ -1,6 +1,4 @@
-/**
- * WordPress dependencies
- */
+import { paramCase as kebabCase } from 'change-case';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { serialize, createBlock } from '@wordpress/blocks';
@@ -12,11 +10,6 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { cleanForSlug } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 
@@ -92,9 +85,10 @@ export default function CreateNewTemplateModal( { onClose } ) {
 			] );
 
 		const newTemplate = await createTemplate( {
-			slug: cleanForSlug( title || DEFAULT_TITLE ),
+			slug: kebabCase( title || DEFAULT_TITLE ) || 'wp-custom-template',
 			content: newTemplateContent,
 			title: title || DEFAULT_TITLE,
+			status: 'publish',
 		} );
 
 		setIsBusy( false );
@@ -111,21 +105,18 @@ export default function CreateNewTemplateModal( { onClose } ) {
 			onRequestClose={ cancel }
 			focusOnMount="firstContentElement"
 			size="small"
+			overlayClassName="editor-post-template__create-template-modal"
 		>
-			<form
-				className="editor-post-template__create-form"
-				onSubmit={ submit }
-			>
+			<form onSubmit={ submit }>
 				<VStack spacing="3">
 					<TextControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label={ __( 'Name' ) }
 						value={ title }
 						onChange={ setTitle }
 						placeholder={ DEFAULT_TITLE }
 						disabled={ isBusy }
 						help={ __(
+							// eslint-disable-next-line no-restricted-syntax -- 'sidebar' is a common web design term for layouts
 							'Describe the template, e.g. "Post with sidebar". A custom template can be manually applied to any post or page.'
 						) }
 					/>

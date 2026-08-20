@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import type { Icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import type { ButtonAsButtonProps } from '../button/types';
 import type { DropdownProps } from '../dropdown/types';
 import type { WordPressComponentProps } from '../context';
@@ -40,6 +29,16 @@ type CommonCircularOptionPickerProps = {
 	 * The child elements.
 	 */
 	children?: ReactNode;
+	/**
+	 * The ID reference list of one or more elements that label the wrapper
+	 * element.
+	 */
+	'aria-labelledby'?: string;
+	/**
+	 * The label for the wrapper element. Defaults to 'Custom color picker'. Not
+	 * used if an 'aria-labelledby' is provided.
+	 */
+	'aria-label'?: string;
 };
 
 type WithBaseId = {
@@ -59,16 +58,7 @@ type FullListboxCircularOptionPickerProps = CommonCircularOptionPickerProps & {
 	 * @default true
 	 */
 	loop?: boolean;
-} & (
-		| {
-				'aria-label': string;
-				'aria-labelledby'?: never;
-		  }
-		| {
-				'aria-label'?: never;
-				'aria-labelledby': string;
-		  }
-	);
+};
 
 export type ListboxCircularOptionPickerProps = WithBaseId &
 	Omit< FullListboxCircularOptionPickerProps, 'asButtons' >;

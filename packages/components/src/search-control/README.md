@@ -20,7 +20,6 @@ function MySearchControl( { className, setState } ) {
 
     return (
         <SearchControl
-            __nextHasNoMarginBottom
             label={ __( 'Search posts' ) }
             value={ searchInput }
             onChange={ setSearchInput }
@@ -99,14 +98,6 @@ If true, the label will not be visible, but will be read by screen readers. Defa
 -   Type: `Boolean`
 -   Required: No
 -   Default: `true`
-
-#### __nextHasNoMarginBottom
-
-Start opting into the new margin-free styles that will become the default in a future version.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
 
 #### `size`: `'default'` | `'compact'`
 

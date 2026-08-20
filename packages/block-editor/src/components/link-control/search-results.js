@@ -1,21 +1,10 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { MenuGroup } from '@wordpress/components';
-
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * Internal dependencies
- */
+import deprecated from '@wordpress/deprecated';
 import LinkControlSearchCreate from './search-create-button';
 import LinkControlSearchItem from './search-item';
 import { CREATE_TYPE, LINK_ENTRY_TYPES } from './constants';
-import deprecated from '@wordpress/deprecated';
 
 function LinkControlSearchResults( {
 	withCreateSuggestion,

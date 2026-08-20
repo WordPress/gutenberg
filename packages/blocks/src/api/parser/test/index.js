@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { parseRawBlock, default as parse } from '../';
 import {
 	registerBlockType,
@@ -14,6 +11,7 @@ import serialize from '../../serializer';
 
 describe( 'block parser', () => {
 	const defaultBlockSettings = {
+		apiVersion: 3,
 		attributes: {
 			fruit: {
 				type: 'string',
@@ -25,6 +23,7 @@ describe( 'block parser', () => {
 	};
 
 	const unknownBlockSettings = {
+		apiVersion: 3,
 		category: 'text',
 		title: 'unknown block',
 		attributes: {
@@ -79,6 +78,70 @@ describe( 'block parser', () => {
 			expect( block.attributes ).toEqual( {
 				fruit: 'Bananas',
 				className: 'custom-class another-custom-class',
+			} );
+		} );
+
+		it( 'should apply aria-label block validation fixes', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					fruit: {
+						type: 'string',
+						source: 'text',
+						selector: 'div',
+					},
+				},
+				supports: {
+					ariaLabel: true,
+				},
+				save: ( { attributes } ) => (
+					<div aria-label={ attributes.ariaLabel }>
+						{ attributes.fruit }
+					</div>
+				),
+			} );
+
+			const block = parseRawBlock( {
+				blockName: 'core/test-block',
+				innerHTML: '<div aria-label="custom-label">Bananas</div>',
+				attrs: { fruit: 'Bananas' },
+			} );
+
+			expect( block.name ).toEqual( 'core/test-block' );
+			expect( block.attributes ).toEqual( {
+				fruit: 'Bananas',
+				ariaLabel: 'custom-label',
+			} );
+		} );
+
+		it( 'should apply anchor block validation fixes', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					fruit: {
+						type: 'string',
+						source: 'text',
+						selector: 'div',
+					},
+				},
+				supports: {
+					anchor: true,
+				},
+				save: ( { attributes } ) => (
+					<div id={ attributes.anchor }>{ attributes.fruit }</div>
+				),
+			} );
+
+			const block = parseRawBlock( {
+				blockName: 'core/test-block',
+				innerHTML: '<div id="custom-anchor">Bananas</div>',
+				attrs: { fruit: 'Bananas' },
+			} );
+
+			expect( block.name ).toEqual( 'core/test-block' );
+			expect( block.attributes ).toEqual( {
+				fruit: 'Bananas',
+				anchor: 'custom-anchor',
 			} );
 		} );
 
@@ -229,6 +292,7 @@ describe( 'block parser', () => {
 		// Run the test cases using the PegJS defined parser.
 		it( 'should parse the post content, including block attributes', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					content: {
 						type: 'string',
@@ -268,6 +332,7 @@ describe( 'block parser', () => {
 
 		it( 'should parse the post content, ignoring unknown blocks', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					content: {
 						type: 'string',
@@ -401,6 +466,7 @@ describe( 'block parser', () => {
 
 		it( 'should parse with unicode escaped returned to original representation', () => {
 			registerBlockType( 'core/code', {
+				apiVersion: 3,
 				category: 'text',
 				title: 'Code Block',
 				attributes: {
@@ -416,6 +482,78 @@ describe( 'block parser', () => {
 			const serialized = serialize( block );
 			const parsed = parse( serialized );
 			expect( parsed[ 0 ].attributes.content ).toBe( content );
+		} );
+	} );
+
+	describe( 'Custom HTML block static inner content', () => {
+		const htmlBlockSettings = {
+			apiVersion: 3,
+			category: 'text',
+			title: 'Custom HTML',
+			save: () => null,
+		};
+
+		const innerBlockSettings = {
+			apiVersion: 3,
+			category: 'text',
+			title: 'inner block',
+			attributes: {
+				content: {
+					type: 'string',
+					source: 'html',
+				},
+			},
+			save: ( { attributes } ) => attributes.content || null,
+		};
+
+		it( 'should retain innerContent and mark the block valid', () => {
+			registerBlockType( 'core/html', htmlBlockSettings );
+			registerBlockType( 'core/inner', innerBlockSettings );
+
+			const [ block ] = parse(
+				'<!-- wp:html -->\n' +
+					'<div><!-- wp:inner -->\nBananas\n<!-- /wp:inner --></div>\n' +
+					'<!-- /wp:html -->'
+			);
+
+			expect( block.name ).toBe( 'core/html' );
+			expect( block.isValid ).toBe( true );
+			expect( block.innerContent ).toEqual( [
+				'\n<div>',
+				null,
+				'</div>\n',
+			] );
+			expect( block.innerBlocks ).toHaveLength( 1 );
+			expect( block.innerBlocks[ 0 ].name ).toBe( 'core/inner' );
+			expect( block.innerBlocks[ 0 ].attributes.content ).toBe(
+				'Bananas'
+			);
+		} );
+
+		it( 'should serialize parsed static HTML interleaved with inner blocks back to identical markup', () => {
+			registerBlockType( 'core/html', htmlBlockSettings );
+			registerBlockType( 'core/inner', innerBlockSettings );
+
+			const content =
+				'<!-- wp:html -->\n' +
+				'<div class="banner"><h1>Static</h1><!-- wp:inner -->\n' +
+				'Editable\n' +
+				'<!-- /wp:inner --><footer>Footer</footer></div>\n' +
+				'<!-- /wp:html -->';
+
+			expect( serialize( parse( content ) ) ).toBe( content );
+		} );
+
+		it( 'should serialize parsed static HTML without inner blocks back to identical markup', () => {
+			registerBlockType( 'core/html', htmlBlockSettings );
+
+			const content =
+				'<!-- wp:html -->\n' +
+				'<h1>Some HTML code</h1>\n' +
+				'<div>This is a div</div>\n' +
+				'<!-- /wp:html -->';
+
+			expect( serialize( parse( content ) ) ).toBe( content );
 		} );
 	} );
 } );

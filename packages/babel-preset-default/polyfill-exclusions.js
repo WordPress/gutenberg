@@ -28,4 +28,9 @@ module.exports = [
 	//
 	// @see https://github.com/WordPress/gutenberg/pull/67230
 	/^es(next)?\.set\./,
+	// Remove Iterator feature polyfills.
+	// For the same reasoning as for Set exlusion above, we're excluding all iterator helper polyfills.
+	//
+	// @see https://github.com/WordPress/wordpress-develop/pull/8224#issuecomment-2636390007.
+	/^es(next)?\.iterator\./,
 ];

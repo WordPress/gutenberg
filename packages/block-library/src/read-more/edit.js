@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	InspectorControls,
 	RichText,
@@ -13,10 +10,6 @@ import {
 } from '@wordpress/components';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function ReadMore( {
@@ -44,7 +37,6 @@ export default function ReadMore( {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Open in new tab' ) }
 							onChange={ ( value ) =>
 								setAttributes( {
@@ -65,8 +57,13 @@ export default function ReadMore( {
 				onChange={ ( newValue ) =>
 					setAttributes( { content: newValue } )
 				}
-				__unstableOnSplitAtEnd={ () =>
-					insertBlocksAfter( createBlock( getDefaultBlockName() ) )
+				__unstableOnSplitAtEnd={
+					insertBlocksAfter
+						? () =>
+								insertBlocksAfter(
+									createBlock( getDefaultBlockName() )
+								)
+						: undefined
 				}
 				withoutInteractiveFormatting
 				{ ...blockProps }

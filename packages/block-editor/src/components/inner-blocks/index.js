@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useMemo, memo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -14,10 +7,6 @@ import {
 	store as blocksStore,
 	__unstableGetInnerBlocksProps as getInnerBlocksProps,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import ButtonBlockAppender from './button-block-appender';
 import DefaultBlockAppender from './default-block-appender';
 import useNestedSettingsUpdate from './use-nested-settings-update';
@@ -105,7 +94,11 @@ function UncontrolledInnerBlocks( props ) {
 		EMPTY_OBJECT;
 
 	const { allowSizingOnChildren = false } = defaultLayoutBlockSupport;
-	const usedLayout = layout || defaultLayoutBlockSupport;
+	// The support is a config object, e.g. `{ allowSwitching: false, default: { type: 'flex' } }`,
+	// so the layout itself lives under `default`. Passing the config through would leave the
+	// context without a `type`, and consumers would resolve it to the flow layout.
+	const usedLayout =
+		layout || defaultLayoutBlockSupport.default || EMPTY_OBJECT;
 
 	const memoedLayout = useMemo(
 		() => ( {
@@ -174,23 +167,28 @@ const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
  * returns. Optionally, you can also pass any other props through this hook, and
  * they will be merged and returned.
  *
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md
+ *
  * @param {Object} props   Optional. Props to pass to the element. Must contain
  *                         the ref if one is defined.
  * @param {Object} options Optional. Inner blocks options.
- *
- * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md
  */
 export function useInnerBlocksProps( props = {}, options = {} ) {
 	const {
 		__unstableDisableLayoutClassNames,
 		__unstableDisableDropZone,
 		dropZoneElement,
+		layout: layoutOverride,
 	} = options;
 	const {
 		clientId,
-		layout = null,
+		layout: contextLayout = null,
 		__unstableLayoutClassNames: layoutClassNames = '',
 	} = useBlockEditContext();
+	// An options layout takes precedence over the context layout, as it does
+	// for the inner blocks settings, so containers whose layout attribute
+	// doesn't apply to their inner blocks (e.g. Post Template) can opt out.
+	const layout = layoutOverride ?? contextLayout;
 	const selected = useSelect(
 		( select ) => {
 			const {

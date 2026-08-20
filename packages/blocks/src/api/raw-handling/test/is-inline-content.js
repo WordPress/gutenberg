@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import isInlineContent from '../is-inline-content';
 
 describe( 'isInlineContent', () => {

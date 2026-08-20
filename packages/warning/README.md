@@ -18,7 +18,7 @@ Literal strings aren't minified. Keeping them in your production bundle may incr
 
 To prevent that, you should:
 
-1.  Put `@wordpress/warning/babel-plugin` into your [babel config](https://babeljs.io/docs/en/plugins#plugin-options) or use [`@wordpress/babel-preset-default`](https://www.npmjs.com/package/@wordpress/babel-preset-default), which already includes the babel plugin.
+1.  Put `@wordpress/warning/babel-plugin` into your [babel config](https://babeljs.io/docs/plugins#plugin-options) or use [`@wordpress/babel-preset-default`](https://www.npmjs.com/package/@wordpress/babel-preset-default), which already includes the babel plugin.
 
     This will make sure your `warning` calls are wrapped within a condition that checks if `SCRIPT_DEBUG === true`.
 

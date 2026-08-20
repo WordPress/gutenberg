@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getHorizontalRelativeGradientPosition } from '../utils';
 
 describe( 'getHorizontalRelativeGradientPosition', () => {

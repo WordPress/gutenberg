@@ -1,0 +1,16 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.dev.base.json",
+	"compilerOptions": {
+		"types": [ "jest", "react-css-custom-properties" ]
+	},
+	"references": [
+		{ "path": "./tsconfig.build.json" },
+		{ "path": "../components/tsconfig.build.json" },
+		{ "path": "../data" },
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../i18n/tsconfig.build.json" },
+		{ "path": "../icons/tsconfig.build.json" },
+		{ "path": "../private-apis" }
+	]
+}

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { terms } from './fixtures';
 import {
 	getEntitiesInfo,

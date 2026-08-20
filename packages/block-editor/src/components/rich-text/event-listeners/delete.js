@@ -1,12 +1,16 @@
-/**
- * WordPress dependencies
- */
 import { DELETE, BACKSPACE } from '@wordpress/keycodes';
-import { isCollapsed, isEmpty } from '@wordpress/rich-text';
+import {
+	isCollapsed,
+	isEmpty,
+	privateApis as richTextPrivateApis,
+} from '@wordpress/rich-text';
+import { unlock } from '../../../lock-unlock';
+
+const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
 export default ( props ) => ( element ) => {
 	function onKeyDown( event ) {
-		const { keyCode, shiftKey } = event;
+		const { keyCode } = event;
 
 		if ( event.defaultPrevented ) {
 			return;
@@ -30,11 +34,6 @@ export default ( props ) => ( element ) => {
 				return;
 			}
 
-			// Exclude shift+backspace as they are shortcuts for deleting blocks.
-			if ( shiftKey ) {
-				return;
-			}
-
 			if ( onMerge ) {
 				onMerge( ! isReverse );
 			}
@@ -51,8 +50,5 @@ export default ( props ) => ( element ) => {
 		}
 	}
 
-	element.addEventListener( 'keydown', onKeyDown );
-	return () => {
-		element.removeEventListener( 'keydown', onKeyDown );
-	};
+	return subscribeOwnedListener( element, 'keydown', onKeyDown );
 };

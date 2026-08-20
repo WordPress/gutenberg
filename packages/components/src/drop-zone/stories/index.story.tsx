@@ -1,20 +1,34 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-/**
- * Internal dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { upload, media } from '@wordpress/icons';
+import { fn } from 'storybook/test';
 import DropZone from '..';
 
+const ICONS = { upload, media };
+
 const meta: Meta< typeof DropZone > = {
+	tags: [ 'manifest' ],
 	component: DropZone,
 	id: 'components-dropzone',
 	title: 'Components/Selection & Input/File Upload/DropZone',
+	argTypes: {
+		icon: {
+			control: { type: 'select' },
+			options: Object.keys( ICONS ),
+			mapping: ICONS,
+		},
+	},
+	args: {
+		onFilesDrop: fn(),
+		onHTMLDrop: fn(),
+		onDrop: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { BasePost } from '../../types';
 import { getSlug } from './utils';
 

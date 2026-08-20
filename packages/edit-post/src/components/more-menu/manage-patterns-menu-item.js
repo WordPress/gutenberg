@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { MenuItem } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
@@ -14,7 +11,7 @@ function ManagePatternsMenuItem() {
 			post_type: 'wp_block',
 		} );
 		const patternsUrl = addQueryArgs( 'site-editor.php', {
-			path: '/patterns',
+			p: '/pattern',
 		} );
 
 		// The site editor and templates both check whether the user has

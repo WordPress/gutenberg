@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	privateApis as editorPrivateApis,
 	PluginBlockSettingsMenuItem as EditorPluginBlockSettingsMenuItem,
@@ -14,10 +11,6 @@ import {
 } from '@wordpress/editor';
 import { getPath } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { unlock } from './lock-unlock';
 const { PluginPostExcerpt } = unlock( editorPrivateApis );
 

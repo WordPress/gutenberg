@@ -1,19 +1,13 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useRef, createContext, useContext } from '@wordpress/element';
+import {
+	useRef,
+	createContext,
+	useContext,
+	useCallback,
+} from '@wordpress/element';
 import { __unstableMotion as motion } from '@wordpress/components';
 import { useReducedMotion } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import Inserter from '../inserter';
 import { store as blockEditorStore } from '../../store';
 import BlockPopoverInbetween from '../block-popover/inbetween';
@@ -21,6 +15,7 @@ import BlockDropZonePopover from '../block-popover/drop-zone';
 import { unlock } from '../../lock-unlock';
 
 export const InsertionPointOpenRef = createContext();
+InsertionPointOpenRef.displayName = 'InsertionPointOpenRefContext';
 
 function InbetweenInsertionPointPopover( {
 	__unstablePopoverSlot,
@@ -112,6 +107,18 @@ function InbetweenInsertionPointPopover( {
 		}
 	}
 
+	// Reset the insertion point reference when the Inserter unmounts,
+	// avoids stale references when `onSelectOrClose` is not called.
+	// See: https://github.com/WordPress/gutenberg/issues/65598#issuecomment-3249229264.
+	const maybeResetOpenRef = useCallback(
+		( node ) => {
+			if ( ! node && openRef.current ) {
+				openRef.current = false;
+			}
+		},
+		[ openRef ]
+	);
+
 	const lineVariants = {
 		// Initial position starts from the center and invisible.
 		start: {
@@ -202,6 +209,7 @@ function InbetweenInsertionPointPopover( {
 						) }
 					>
 						<Inserter
+							ref={ maybeResetOpenRef }
 							position="bottom center"
 							clientId={ nextClientId }
 							rootClientId={ rootClientId }

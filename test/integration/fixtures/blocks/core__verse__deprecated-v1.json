@@ -4,7 +4,11 @@
 		"isValid": true,
 		"attributes": {
 			"content": "A <em>verse</em>…<br>And more!",
-			"textAlign": "left"
+			"style": {
+				"typography": {
+					"textAlign": "left"
+				}
+			}
 		},
 		"innerBlocks": []
 	}

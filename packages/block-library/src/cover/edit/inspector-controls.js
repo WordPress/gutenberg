@@ -1,14 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import {
-	ExternalLink,
 	FocalPointPicker,
 	RangeControl,
 	TextareaControl,
 	ToggleControl,
-	SelectControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -28,17 +23,25 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
+import { Link } from '@wordpress/ui';
 import { COVER_MIN_HEIGHT, mediaPosition } from '../shared';
 import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
+import {
+	getActiveDimensionValue,
+	getDimensionResetAttributes,
+	getDimensionUpdateAttributes,
+	getStyleStateKey,
+} from '../../utils/style-state';
 import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
-import { htmlElementMessages } from '../../utils/messages';
+import PosterImage from '../../utils/poster-image';
 
-const { cleanEmptyObject, ResolutionTool } = unlock( blockEditorPrivateApis );
+const {
+	cleanEmptyObject,
+	isDefaultBlockStyleState,
+	ResolutionTool,
+	HTMLElementControl,
+} = unlock( blockEditorPrivateApis );
 
 function CoverHeightInput( {
 	onChange,
@@ -77,7 +80,6 @@ function CoverHeightInput( {
 
 	return (
 		<UnitControl
-			__next40pxDefaultSize
 			label={ __( 'Minimum height' ) }
 			id={ inputId }
 			isResetValueOnUnitChange
@@ -110,6 +112,7 @@ export default function CoverInspectorControls( {
 		minHeightUnit,
 		alt,
 		tagName,
+		poster,
 	} = attributes;
 	const {
 		isVideoBackground,
@@ -122,14 +125,55 @@ export default function CoverInspectorControls( {
 	const sizeSlug = attributes.sizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 
 	const { gradientValue, setGradient } = __experimentalUseGradient();
-	const { getSettings } = useSelect( blockEditorStore );
+	const { imageSizes, selectedStyleState } = useSelect(
+		( select ) => {
+			const { getSettings, getSelectedBlockStyleState } = unlock(
+				select( blockEditorStore )
+			);
 
-	const imageSizes = getSettings()?.imageSizes;
+			return {
+				imageSizes: getSettings()?.imageSizes,
+				selectedStyleState: getSelectedBlockStyleState( clientId ),
+			};
+		},
+		[ clientId ]
+	);
+	const hasSelectedStyleState =
+		! isDefaultBlockStyleState( selectedStyleState );
+	const selectedStyleStateKey = getStyleStateKey( selectedStyleState );
+	const stateMinHeight = getActiveDimensionValue( {
+		attributes,
+		selectedState: selectedStyleState,
+		hasSelectedStyleState,
+		attributeKey: 'minHeight',
+		styleKey: 'minHeight',
+		rootValue: undefined,
+	} );
+	const [ stateMinHeightValue, stateMinHeightUnit ] =
+		parseQuantityAndUnitFromRawValue( stateMinHeight || '' );
+	const activeMinHeight = hasSelectedStyleState
+		? stateMinHeightValue
+		: minHeight;
+	const activeMinHeightUnit = hasSelectedStyleState
+		? stateMinHeightUnit || minHeightUnit
+		: minHeightUnit;
+	const activeAspectRatio = getActiveDimensionValue( {
+		attributes,
+		selectedState: selectedStyleState,
+		hasSelectedStyleState,
+		attributeKey: 'aspectRatio',
+		rootValue: attributes?.style?.dimensions?.aspectRatio,
+	} );
 
 	const image = useSelect(
 		( select ) =>
 			id && isImageBackground
-				? select( coreStore ).getMedia( id, { context: 'view' } )
+				? select( coreStore ).getEntityRecord(
+						'postType',
+						'attachment',
+						id,
+						{ context: 'view' }
+				  )
 				: null,
 		[ id, isImageBackground ]
 	);
@@ -171,9 +215,7 @@ export default function CoverInspectorControls( {
 		} );
 	};
 
-	const showFocalPointPicker =
-		isVideoBackground ||
-		( isImageBackground && ( ! hasParallax || isRepeated ) );
+	const showFocalPointPicker = isVideoBackground || isImageBackground;
 
 	const imperativeFocalPointPreview = ( value ) => {
 		const [ styleOfRef, property ] = mediaElement.current
@@ -184,12 +226,61 @@ export default function CoverInspectorControls( {
 
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 
+	const showOverlayControls =
+		colorGradientSettings.hasColorsOrGradients && ! hasSelectedStyleState;
+
+	const setMinHeightAttributes = ( nextMinHeight, nextUnit ) => {
+		if ( hasSelectedStyleState ) {
+			setAttributes(
+				getDimensionUpdateAttributes( {
+					style: attributes.style,
+					selectedState: selectedStyleState,
+					hasSelectedStyleState,
+					nextDimensions: {
+						minHeight:
+							nextMinHeight === undefined
+								? undefined
+								: `${ nextMinHeight }${
+										nextUnit || activeMinHeightUnit || 'px'
+								  }`,
+						aspectRatio: undefined,
+					},
+				} )
+			);
+			return;
+		}
+
+		setAttributes( {
+			minHeight: nextMinHeight,
+			style: cleanEmptyObject( {
+				...attributes?.style,
+				dimensions: {
+					...attributes?.style?.dimensions,
+					aspectRatio: undefined, // Reset aspect ratio when minHeight is set.
+				},
+			} ),
+		} );
+	};
+
+	const getResetMinHeightAttributes = ( attrs = attributes ) => {
+		return getDimensionResetAttributes( {
+			style: attrs.style,
+			selectedState: selectedStyleState,
+			hasSelectedStyleState,
+			keys: [ 'minHeight' ],
+			defaultAttributes: {
+				minHeight: undefined,
+				minHeightUnit: undefined,
+			},
+		} );
+	};
+
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	return (
 		<>
-			<InspectorControls>
-				{ !! url && (
+			{ ( !! url || useFeaturedImage ) && (
+				<InspectorControls>
 					<ToolsPanel
 						label={ __( 'Settings' ) }
 						resetAll={ () => {
@@ -198,8 +289,9 @@ export default function CoverInspectorControls( {
 								focalPoint: undefined,
 								isRepeated: false,
 								alt: '',
-								sizeSlug: undefined,
+								poster: undefined,
 							} );
+							updateImage( DEFAULT_MEDIA_SIZE_SLUG );
 						} }
 						dropdownMenuProps={ dropdownMenuProps }
 					>
@@ -208,7 +300,7 @@ export default function CoverInspectorControls( {
 								<ToolsPanelItem
 									label={ __( 'Fixed background' ) }
 									isShownByDefault
-									hasValue={ () => hasParallax }
+									hasValue={ () => !! hasParallax }
 									onDeselect={ () =>
 										setAttributes( {
 											hasParallax: false,
@@ -217,9 +309,8 @@ export default function CoverInspectorControls( {
 									}
 								>
 									<ToggleControl
-										__nextHasNoMarginBottom
 										label={ __( 'Fixed background' ) }
-										checked={ hasParallax }
+										checked={ !! hasParallax }
 										onChange={ toggleParallax }
 									/>
 								</ToolsPanelItem>
@@ -235,7 +326,6 @@ export default function CoverInspectorControls( {
 									}
 								>
 									<ToggleControl
-										__nextHasNoMarginBottom
 										label={ __( 'Repeated background' ) }
 										checked={ isRepeated }
 										onChange={ toggleIsRepeated }
@@ -255,7 +345,6 @@ export default function CoverInspectorControls( {
 								}
 							>
 								<FocalPointPicker
-									__nextHasNoMarginBottom
 									label={ __( 'Focal point' ) }
 									url={ url }
 									value={ focalPoint }
@@ -269,6 +358,16 @@ export default function CoverInspectorControls( {
 								/>
 							</ToolsPanelItem>
 						) }
+						{ isVideoBackground && (
+							<PosterImage
+								poster={ poster }
+								onChange={ ( posterImage ) =>
+									setAttributes( {
+										poster: posterImage?.url,
+									} )
+								}
+							/>
+						) }
 						{ ! useFeaturedImage && url && ! isVideoBackground && (
 							<ToolsPanelItem
 								label={ __( 'Alternative text' ) }
@@ -279,7 +378,6 @@ export default function CoverInspectorControls( {
 								}
 							>
 								<TextareaControl
-									__nextHasNoMarginBottom
 									label={ __( 'Alternative text' ) }
 									value={ alt }
 									onChange={ ( newAlt ) =>
@@ -287,7 +385,8 @@ export default function CoverInspectorControls( {
 									}
 									help={
 										<>
-											<ExternalLink
+											<Link
+												openInNewTab
 												href={
 													// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
 													__(
@@ -298,7 +397,7 @@ export default function CoverInspectorControls( {
 												{ __(
 													'Describe the purpose of the image.'
 												) }
-											</ExternalLink>
+											</Link>
 											<br />
 											{ __(
 												'Leave empty if decorative.'
@@ -317,9 +416,9 @@ export default function CoverInspectorControls( {
 							/>
 						) }
 					</ToolsPanel>
-				) }
-			</InspectorControls>
-			{ colorGradientSettings.hasColorsOrGradients && (
+				</InspectorControls>
+			) }
+			{ showOverlayControls && (
 				<InspectorControls group="color">
 					<ColorGradientSettingsDropdown
 						__experimentalIsRenderedInSidebar
@@ -360,7 +459,6 @@ export default function CoverInspectorControls( {
 						panelId={ clientId }
 					>
 						<RangeControl
-							__nextHasNoMarginBottom
 							label={ __( 'Overlay opacity' ) }
 							value={ dimRatio }
 							onChange={ ( newDimRatio ) =>
@@ -370,61 +468,54 @@ export default function CoverInspectorControls( {
 							max={ 100 }
 							step={ 10 }
 							required
-							__next40pxDefaultSize
 						/>
 					</ToolsPanelItem>
 				</InspectorControls>
 			) }
 			<InspectorControls group="dimensions">
 				<ToolsPanelItem
+					key={ selectedStyleStateKey }
 					className="single-column"
-					hasValue={ () => !! minHeight }
+					hasValue={ () => !! activeMinHeight }
 					label={ __( 'Minimum height' ) }
 					onDeselect={ () =>
-						setAttributes( {
-							minHeight: undefined,
-							minHeightUnit: undefined,
-						} )
+						setAttributes( getResetMinHeightAttributes() )
 					}
-					resetAllFilter={ () => ( {
-						minHeight: undefined,
-						minHeightUnit: undefined,
-					} ) }
+					resetAllFilter={ getResetMinHeightAttributes }
 					isShownByDefault
 					panelId={ clientId }
 				>
 					<CoverHeightInput
-						value={
-							attributes?.style?.dimensions?.aspectRatio
-								? ''
-								: minHeight
-						}
-						unit={ minHeightUnit }
+						value={ activeAspectRatio ? '' : activeMinHeight }
+						unit={ activeMinHeightUnit }
 						onChange={ ( newMinHeight ) =>
-							setAttributes( {
-								minHeight: newMinHeight,
-								style: cleanEmptyObject( {
-									...attributes?.style,
-									dimensions: {
-										...attributes?.style?.dimensions,
-										aspectRatio: undefined, // Reset aspect ratio when minHeight is set.
-									},
-								} ),
-							} )
+							setMinHeightAttributes( newMinHeight )
 						}
-						onUnitChange={ ( nextUnit ) =>
+						onUnitChange={ ( nextUnit ) => {
+							if ( hasSelectedStyleState ) {
+								if ( activeMinHeight !== undefined ) {
+									setMinHeightAttributes(
+										activeMinHeight,
+										nextUnit
+									);
+								}
+								return;
+							}
+
 							setAttributes( {
 								minHeightUnit: nextUnit,
-							} )
-						}
+							} );
+						} }
 					/>
 				</ToolsPanelItem>
 			</InspectorControls>
 			<InspectorControls group="advanced">
-				<SelectControl
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-					label={ __( 'HTML element' ) }
+				<HTMLElementControl
+					tagName={ tagName }
+					onChange={ ( value ) =>
+						setAttributes( { tagName: value } )
+					}
+					clientId={ clientId }
 					options={ [
 						{ label: __( 'Default (<div>)' ), value: 'div' },
 						{ label: '<header>', value: 'header' },
@@ -434,11 +525,6 @@ export default function CoverInspectorControls( {
 						{ label: '<aside>', value: 'aside' },
 						{ label: '<footer>', value: 'footer' },
 					] }
-					value={ tagName }
-					onChange={ ( value ) =>
-						setAttributes( { tagName: value } )
-					}
-					help={ htmlElementMessages[ tagName ] }
 				/>
 			</InspectorControls>
 		</>

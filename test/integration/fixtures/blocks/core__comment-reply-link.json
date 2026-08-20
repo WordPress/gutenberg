@@ -3,14 +3,14 @@
 		"name": "core/comment-reply-link",
 		"isValid": true,
 		"attributes": {
-			"textAlign": "right",
 			"fontFamily": "cambria-georgia",
 			"fontSize": "extra-large",
 			"style": {
 				"typography": {
 					"lineHeight": "0.8",
 					"textTransform": "uppercase",
-					"letterSpacing": "10px"
+					"letterSpacing": "10px",
+					"textAlign": "right"
 				},
 				"elements": {
 					"link": {

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Fragment } from '@wordpress/element';
 import { displayShortcutList, shortcutAriaLabel } from '@wordpress/keycodes';
 

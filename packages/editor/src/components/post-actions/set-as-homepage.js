@@ -1,21 +1,14 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import {
 	Button,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import { getItemTitle } from '../../utils/get-item-title';
 
 const SetAsHomepageModal = ( { items, closeModal } ) => {
@@ -92,7 +85,7 @@ const SetAsHomepageModal = ( { items, closeModal } ) => {
 	return (
 		<form onSubmit={ onSetPageAsHomepage }>
 			<VStack spacing="5">
-				<Text>{ modalText }</Text>
+				<WCText>{ modalText }</WCText>
 				<HStack justify="right">
 					<Button
 						__next40pxDefaultSize
@@ -160,6 +153,7 @@ export const useSetAsHomepageAction = () => {
 
 				return true;
 			},
+			modalFocusOnMount: 'firstContentElement',
 			RenderModal: SetAsHomepageModal,
 		} ),
 		[ pageForPosts, pageOnFront ]

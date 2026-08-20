@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { isSavingMetaBoxes, metaBoxLocations } from '../reducer';
 
 describe( 'state', () => {

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	hasBlockSupport,
 	isReusableBlock,
@@ -16,9 +13,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-/**
- * Internal dependencies
- */
 import { store as patternsStore } from '../store';
 import CreatePatternModal from './create-pattern-modal';
 import { unlock } from '../lock-unlock';
@@ -31,7 +25,7 @@ import { PATTERN_SYNC_TYPES } from '../constants';
  * @param {string[]} props.clientIds              Client ids of selected blocks.
  * @param {string}   props.rootClientId           ID of the currently selected top-level block.
  * @param {()=>void} props.closeBlockSettingsMenu Callback to close the block settings menu dropdown.
- * @return {import('react').ComponentType} The menu control or null.
+ * @return {React.ComponentType} The menu control or null.
  */
 export default function PatternConvertButton( {
 	clientIds,
@@ -39,11 +33,13 @@ export default function PatternConvertButton( {
 	closeBlockSettingsMenu,
 } ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
-	const { replaceBlocks } = useDispatch( blockEditorStore );
+	const { replaceBlocks, updateBlockAttributes } =
+		useDispatch( blockEditorStore );
 	// Ignore reason: false positive of the lint rule.
 	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
 	const { setEditingPattern } = unlock( useDispatch( patternsStore ) );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const { getBlockAttributes } = useSelect( blockEditorStore );
 	const canConvert = useSelect(
 		( select ) => {
 			const { canUser } = select( coreStore );
@@ -70,7 +66,7 @@ export default function PatternConvertButton( {
 				return hasBlockSupport( blockName, 'reusable', ! hasParent );
 			};
 
-			const isReusable =
+			const isSyncedPattern =
 				blocks.length === 1 &&
 				blocks[ 0 ] &&
 				isReusableBlock( blocks[ 0 ] ) &&
@@ -80,9 +76,14 @@ export default function PatternConvertButton( {
 					blocks[ 0 ].attributes.ref
 				);
 
+			const isUnsyncedPattern =
+				blocks.length === 1 &&
+				blocks?.[ 0 ]?.attributes?.metadata?.patternName;
+
 			const _canConvert =
-				// Hide when this is already a synced pattern.
-				! isReusable &&
+				// Hide when this is already a pattern.
+				! isUnsyncedPattern &&
+				! isSyncedPattern &&
 				// Hide when patterns are disabled.
 				canInsertBlockType( 'core/block', rootId ) &&
 				blocks.every(
@@ -116,14 +117,26 @@ export default function PatternConvertButton( {
 	}
 
 	const handleSuccess = ( { pattern } ) => {
-		if ( pattern.wp_pattern_sync_status !== PATTERN_SYNC_TYPES.unsynced ) {
+		if ( pattern.wp_pattern_sync_status === PATTERN_SYNC_TYPES.unsynced ) {
+			if ( clientIds?.length === 1 ) {
+				const existingAttributes = getBlockAttributes( clientIds[ 0 ] );
+				updateBlockAttributes( clientIds[ 0 ], {
+					metadata: {
+						...( existingAttributes?.metadata
+							? existingAttributes.metadata
+							: {} ),
+						patternName: `core/block/${ pattern.id }`,
+						name: pattern.title.raw,
+					},
+				} );
+			}
+		} else {
 			const newBlock = createBlock( 'core/block', {
 				ref: pattern.id,
 			} );
 
 			replaceBlocks( clientIds, newBlock );
 			setEditingPattern( newBlock.clientId, true );
-			closeBlockSettingsMenu();
 		}
 
 		createSuccessNotice(
@@ -144,6 +157,7 @@ export default function PatternConvertButton( {
 			}
 		);
 		setIsModalOpen( false );
+		closeBlockSettingsMenu();
 	};
 	return (
 		<>

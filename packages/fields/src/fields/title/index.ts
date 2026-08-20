@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import type { Field } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { CommonPost } from '../../types';
 import { getItemTitle } from '../../actions/utils';
 import TitleView from './view';
@@ -18,8 +11,9 @@ const titleField: Field< CommonPost > = {
 	placeholder: __( 'No title' ),
 	getValue: ( { item } ) => getItemTitle( item ),
 	render: TitleView,
-	enableHiding: false,
+	enableHiding: true,
 	enableGlobalSearch: true,
+	filterBy: false,
 };
 
 /**

@@ -1,26 +1,15 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	useBlockProps,
 	getCustomValueFromPreset,
 	getSpacingPresetCssVar,
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { ResizableBox } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
-import { View } from '@wordpress/primitives';
-import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
+import { useSelect, useDispatch } from '@wordpress/data';
 import { unlock } from '../lock-unlock';
 import SpacerControls from './controls';
 import { MIN_SPACER_SIZE } from './constants';
@@ -123,6 +112,9 @@ const SpacerEdit = ( {
 
 	const onResizeStart = () => toggleSelection( false );
 	const onResizeStop = () => toggleSelection( true );
+
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
 	const handleOnVerticalResizeStop = ( newHeight ) => {
 		onResizeStop();
@@ -256,6 +248,14 @@ const SpacerEdit = ( {
 	};
 
 	useEffect( () => {
+		// To avoid interfering with undo/redo operations any changes in this
+		// effect must not make history and should be preceded by
+		// `__unstableMarkNextChangeAsNotPersistent()`.
+		const setAttributesCovertly = ( nextAttributes ) => {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( nextAttributes );
+		};
+
 		if (
 			isFlexLayout &&
 			selfStretch !== 'fill' &&
@@ -269,7 +269,7 @@ const SpacerEdit = ( {
 					getCustomValueFromPreset( width, spacingSizes ) ||
 					getCustomValueFromPreset( height, spacingSizes ) ||
 					'100px';
-				setAttributes( {
+				setAttributesCovertly( {
 					width: '0px',
 					style: {
 						...blockStyle,
@@ -285,7 +285,7 @@ const SpacerEdit = ( {
 					getCustomValueFromPreset( height, spacingSizes ) ||
 					getCustomValueFromPreset( width, spacingSizes ) ||
 					'100px';
-				setAttributes( {
+				setAttributesCovertly( {
 					height: '0px',
 					style: {
 						...blockStyle,
@@ -301,26 +301,16 @@ const SpacerEdit = ( {
 			isFlexLayout &&
 			( selfStretch === 'fill' || selfStretch === 'fit' )
 		) {
-			if ( inheritedOrientation === 'horizontal' ) {
-				setAttributes( {
-					width: undefined,
-				} );
-			} else {
-				setAttributes( {
-					height: undefined,
-				} );
-			}
+			setAttributesCovertly(
+				inheritedOrientation === 'horizontal'
+					? { width: undefined }
+					: { height: undefined }
+			);
 		} else if ( ! isFlexLayout && ( selfStretch || flexSize ) ) {
-			if ( inheritedOrientation === 'horizontal' ) {
-				setAttributes( {
-					width: flexSize,
-				} );
-			} else {
-				setAttributes( {
-					height: flexSize,
-				} );
-			}
-			setAttributes( {
+			setAttributesCovertly( {
+				...( inheritedOrientation === 'horizontal'
+					? { width: flexSize }
+					: { height: flexSize } ),
 				style: {
 					...blockStyle,
 					layout: {
@@ -342,11 +332,14 @@ const SpacerEdit = ( {
 		setAttributes,
 		spacingSizes,
 		width,
+		__unstableMarkNextChangeAsNotPersistent,
 	] );
+
+	const blockEditingMode = useBlockEditingMode();
 
 	return (
 		<>
-			<View
+			<div
 				{ ...useBlockProps( {
 					style,
 					className: clsx( className, {
@@ -354,8 +347,9 @@ const SpacerEdit = ( {
 					} ),
 				} ) }
 			>
-				{ resizableBoxWithOrientation( inheritedOrientation ) }
-			</View>
+				{ blockEditingMode === 'default' &&
+					resizableBoxWithOrientation( inheritedOrientation ) }
+			</div>
 			{ ! isFlexLayout && (
 				<SpacerControls
 					setAttributes={ setAttributes }
