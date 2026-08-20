@@ -13,14 +13,10 @@
 	max-height: 420px;
 	overflow: auto;
 	overflow-anchor: none;
-	color: var(--wpds-color-foreground-content-neutral-weak);
 }
 
 .editor-error-boundary__report-section {
 	margin: 0;
-	font-family: var(--wpds-typography-font-family-mono);
-	font-size: var(--wpds-typography-font-size-sm);
-	line-height: var(--wpds-typography-line-height-sm);
 	white-space: pre-wrap;
 	overflow-wrap: break-word;
 }
