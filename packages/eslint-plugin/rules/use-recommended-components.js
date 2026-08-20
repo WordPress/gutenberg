@@ -16,13 +16,21 @@ const {
 const ALLOWLIST = {
 	'@wordpress/ui': {
 		allowed: [
+			'Autocomplete',
 			'Badge',
 			'Calendar',
 			'Card',
 			'Collapsible',
 			'CollapsibleCard',
 			'EmptyState',
+			'Field',
+			'Fieldset',
 			'Icon',
+			'Input',
+			'InputControl',
+			'InputLayout',
+			'KeyboardShortcutDescription',
+			'KeyboardShortcutDisplay',
 			'Link',
 			'RangeCalendar',
 			'Skeleton',
@@ -30,8 +38,11 @@ const ALLOWLIST = {
 			'Stack',
 			'Tabs',
 			'Text',
+			'Textarea',
+			'TextareaControl',
 			'Tooltip',
 			'VisuallyHidden',
+			'useKeyboardShortcutProps',
 		],
 		message:
 			'`{{ name }}` from `{{ source }}` is not yet recommended for use in a WordPress environment.',
@@ -80,10 +91,16 @@ const DENYLIST = {
 			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
 		FlexItem:
 			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
+		__experimentalInputControl:
+			'Use `InputControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
 		ResponsiveWrapper: '{{ name }} is planned for deprecation.',
 		TabPanel: 'Use `Tabs` from `@wordpress/ui` instead.',
 		TabbableContainer: '{{ name }} is planned for deprecation.',
 		Tabs: 'Use `Tabs` from `@wordpress/ui` instead.',
+		TextControl:
+			'Use `InputControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
+		TextareaControl:
+			'Use `TextareaControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
 		Tooltip: 'Use `Tooltip` from `@wordpress/ui` instead.',
 		VisuallyHidden: 'Use `{{ name }}` from `@wordpress/ui` instead.',
 	},
