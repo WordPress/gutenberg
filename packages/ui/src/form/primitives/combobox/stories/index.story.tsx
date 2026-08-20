@@ -131,7 +131,7 @@ export const DetachedInline: Story = {
 				key="div"
 			>
 				<Combobox.Empty>No results found.</Combobox.Empty>
-				<Combobox.List>
+				<Combobox.List aria-label="Items">
 					<Combobox.Collection>
 						{ ( item: FixtureItem ) => (
 							<Combobox.Item key={ item.value } value={ item }>
