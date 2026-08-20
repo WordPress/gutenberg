@@ -18,6 +18,7 @@ export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
 		onClick,
 		role = 'listitem',
 		size: sizeProp,
+		wrapperClassName: wrapperClassNameProp,
 		...otherProps
 	} = useContextSystem( props, 'Item' );
 
@@ -36,7 +37,10 @@ export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
 		className
 	);
 
-	const wrapperClassName = styles[ 'item-wrapper' ];
+	const wrapperClassName = clsx(
+		styles[ 'item-wrapper' ],
+		wrapperClassNameProp
+	);
 
 	return {
 		as,

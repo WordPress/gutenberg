@@ -134,5 +134,20 @@ describe( 'ItemGroup', () => {
 
 			expect( mediumSize ).toMatchDiffSnapshot( largeSize );
 		} );
+
+		it( 'should add `wrapperClassName` to the wrapper element without replacing its own class', () => {
+			const { rerender } = render( <Item>Code is poetry</Item> );
+
+			const ownClassName = screen.getByRole( 'listitem' ).className;
+			expect( ownClassName ).not.toBe( '' );
+
+			rerender(
+				<Item wrapperClassName="my-wrapper">Code is poetry</Item>
+			);
+
+			const wrapper = screen.getByRole( 'listitem' );
+			expect( wrapper ).toHaveClass( ownClassName );
+			expect( wrapper ).toHaveClass( 'my-wrapper' );
+		} );
 	} );
 } );
