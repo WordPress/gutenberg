@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { DashboardLanes } from '..';
 import type { DashboardLanesLayoutItem } from '../types';
 import type { GridOverlayRenderProps } from '../../shared/types';

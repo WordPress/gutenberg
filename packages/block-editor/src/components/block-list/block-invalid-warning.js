@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { __, _x } from '@wordpress/i18n';
 import { Button, Modal } from '@wordpress/components';
 import { useState, useCallback, useMemo } from '@wordpress/element';
 import { createBlock, rawHandler } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import Warning from '../warning';
 import BlockCompare from '../block-compare';
 import { store as blockEditorStore } from '../../store';

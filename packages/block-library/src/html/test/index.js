@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	createBlock,
 	registerBlockType,
@@ -9,10 +6,6 @@ import {
 	unregisterBlockType,
 } from '@wordpress/blocks';
 import { create, toHTMLString } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import * as html from '../';
 
 describe( 'core/html', () => {

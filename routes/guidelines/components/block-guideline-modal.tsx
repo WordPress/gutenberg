@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	ComboboxControl,
@@ -16,10 +13,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import { blockSlug, saveGuidelineRow, deleteGuidelineRow } from '../data';
 import type { ContentBlock, GuidelineRow, GuidelineQuery } from '../types';
 import './block-guideline-modal.scss';

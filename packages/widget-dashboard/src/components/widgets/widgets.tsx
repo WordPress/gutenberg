@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef, useCallback, useMemo } from '@wordpress/element';
 import { DashboardGrid, DashboardLanes } from '@wordpress/grid';
 import type {
@@ -15,14 +8,11 @@ import type {
 	ResizeHandleRenderProps,
 } from '@wordpress/grid';
 import type { WidgetName } from '@wordpress/widget-primitives';
-
-/**
- * Internal dependencies
- */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardContainerColumnCount } from '../../hooks/use-dashboard-container-column-count';
+import { splitWidgetActions } from '../../utils/split-widget-actions';
 import { WidgetActions } from '../widget-actions';
-import { WidgetAttributeControls } from '../widget-attribute-controls';
+import { WidgetAttributes } from '../widget-attributes';
 import { WidgetChrome } from '../widget-chrome';
 import { WidgetHeader } from '../widget-header';
 import { WidgetLayoutControls } from '../widget-layout-controls';
@@ -135,14 +125,16 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 				( type ) => type.name === widget.type
 			);
 			const hasSettings = !! widgetType?.attributes?.length;
-			const hasActions = !! widgetType?.actions?.length;
 
 			const isFullBleed = widgetType?.presentation === 'full-bleed';
+
+			const { menu: menuActions } = splitWidgetActions( widgetType );
+			const hasActions = menuActions.length > 0;
 
 			// The active mode's controls: layout while customizing, the
 			// attribute controls (high-relevance fields on the prominent
 			// surface, plus a settings entry point when needed) and the
-			// declared actions otherwise.
+			// menu actions otherwise.
 			let controls: React.ReactNode;
 			if ( editMode ) {
 				controls = <WidgetLayoutControls widget={ widget } />;
@@ -150,14 +142,14 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 				controls = (
 					<>
 						{ hasSettings && (
-							<WidgetAttributeControls
+							<WidgetAttributes
 								widget={ widget }
 								widgetType={ widgetType }
 							/>
 						) }
 
 						{ hasActions && (
-							<WidgetActions widgetType={ widgetType } />
+							<WidgetActions actions={ menuActions } />
 						) }
 					</>
 				);

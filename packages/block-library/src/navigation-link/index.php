@@ -150,6 +150,10 @@ function block_core_navigation_link_render_submenu_icon() {
  * @return string $url Returns the decoded url.
  */
 function block_core_navigation_link_maybe_urldecode( $url ) {
+	if ( ! is_string( $url ) ) {
+		return '';
+	}
+
 	$is_url_encoded = false;
 	$query          = parse_url( $url, PHP_URL_QUERY );
 	$query_params   = wp_parse_args( $query );

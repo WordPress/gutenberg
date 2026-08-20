@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * Internal dependencies
- */
 import BlockAlignmentUI from '../ui';
 
 describe( 'BlockAlignmentUI', () => {
@@ -61,7 +54,7 @@ describe( 'BlockAlignmentUI', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Align',
+				name: 'Align block',
 			} )
 		);
 

@@ -5,15 +5,7 @@
  * context. The @wordpress/worker-threads library handles the RPC
  * communication with the main thread.
  */
-
-/**
- * External dependencies
- */
 import { expose } from '@wordpress/worker-threads';
-
-/**
- * Internal dependencies
- */
 import {
 	cancelOperations,
 	convertImageFormat,

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { memo, RawHTML, useContext, useMemo } from '@wordpress/element';
 import {
 	getBlockType,
@@ -25,10 +18,6 @@ import { withFilters } from '@wordpress/components';
 import { withDispatch, useSelect } from '@wordpress/data';
 import { compose, useRefEffect } from '@wordpress/compose';
 import { safeHTML } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
@@ -357,7 +346,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 
 				if (
 					blockOrder.length === 1 &&
-					isUnmodifiedBlock( getBlock( firstClientId ) )
+					isUnmodifiedBlock( getBlock( firstClientId ), 'content' )
 				) {
 					removeBlock( _clientId );
 				} else if ( isTextualWrapper ) {
@@ -404,7 +393,10 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 
 						if (
 							! getBlockOrder( _clientId ).length &&
-							isUnmodifiedBlock( getBlock( _clientId ) )
+							isUnmodifiedBlock(
+								getBlock( _clientId ),
+								'content'
+							)
 						) {
 							removeBlock( _clientId, false );
 						}
@@ -464,7 +456,23 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 					return;
 				}
 
-				if ( getBlockOrder( nextBlockClientId ).length ) {
+				// Forward deleting an unmodified default block should
+				// remove it and move into the next block, not pull the
+				// next block's first item out of it.
+				if ( isUnmodifiedDefaultBlock( getBlock( clientId ) ) ) {
+					// Select the first leaf block, so the caret starts at
+					// the beginning of the block's content rather than on
+					// a container's shell.
+					let firstLeafClientId = nextBlockClientId;
+					while ( getBlockOrder( firstLeafClientId ).length ) {
+						firstLeafClientId =
+							getBlockOrder( firstLeafClientId )[ 0 ];
+					}
+					registry.batch( () => {
+						removeBlock( clientId );
+						selectBlock( firstLeafClientId );
+					} );
+				} else if ( getBlockOrder( nextBlockClientId ).length ) {
 					moveFirstItemUp( nextBlockClientId, false );
 				} else {
 					mergeBlocks( clientId, nextBlockClientId );
@@ -558,7 +566,19 @@ BlockListBlock = compose(
 // context to pass the rest of the information to the filtered BlockListBlock
 // component, and useBlockProps.
 function BlockListBlockProvider( props ) {
-	const { clientId, rootClientId } = props;
+	const { clientId, rootClientId, ghostBlock } = props;
+	// Stable fallback so the selector returns referentially equal values.
+	const ghostBlockWithoutAttributes = useMemo(
+		() =>
+			ghostBlock
+				? {
+						clientId: ghostBlock.clientId,
+						name: ghostBlock.name,
+						isValid: true,
+				  }
+				: undefined,
+		[ ghostBlock ]
+	);
 	const selectedProps = useSelect(
 		( select ) => {
 			const {
@@ -594,7 +614,12 @@ function BlockListBlockProvider( props ) {
 				getSelectedBlocksInitialCaretPosition,
 			} = unlock( select( blockEditorStore ) );
 			const blockWithoutAttributes =
-				getBlockWithoutAttributes( clientId );
+				getBlockWithoutAttributes( clientId ) ??
+				// An appender ghost renders from its block object until it
+				// is inserted on entry; it is never selected before that.
+				( clientId === ghostBlockWithoutAttributes?.clientId
+					? ghostBlockWithoutAttributes
+					: undefined );
 
 			// This is a temporary fix.
 			// This function should never be called when a block is not
@@ -608,7 +633,8 @@ function BlockListBlockProvider( props ) {
 				hasBlockSupport: _hasBlockSupport,
 				getActiveBlockVariation,
 			} = select( blocksStore );
-			const attributes = getBlockAttributes( clientId );
+			const attributes =
+				getBlockAttributes( clientId ) ?? ghostBlock?.attributes;
 			const { name: blockName, isValid } = blockWithoutAttributes;
 			const blockType = getBlockType( blockName );
 			const settings = getSettings();
@@ -666,9 +692,17 @@ function BlockListBlockProvider( props ) {
 				clientId,
 				checkDeep
 			);
-			const sectionBlockClientId = _isSectionBlock( clientId )
+			const isSectionBlock = _isSectionBlock( clientId );
+			const sectionBlockClientId = isSectionBlock
 				? clientId
 				: getParentSectionBlock( clientId );
+			// Without a section block there is nothing for the deep check to
+			// match, and it walks the parents of every selected block to find
+			// that out.
+			const isSelectionWithinCurrentSection =
+				isBlockSelected( sectionBlockClientId ) ||
+				( !! sectionBlockClientId &&
+					hasSelectedInnerBlock( sectionBlockClientId, checkDeep ) );
 
 			const multiple = hasBlockSupport( blockName, 'multiple', true );
 
@@ -686,11 +720,9 @@ function BlockListBlockProvider( props ) {
 				mode: getBlockMode( clientId ),
 				isSelectionEnabled: isSelectionEnabled(),
 				isLocked: !! getTemplateLock( rootClientId ),
-				isSectionBlock: _isSectionBlock( clientId ),
+				isSectionBlock,
 				isWithinSectionBlock: !! sectionBlockClientId,
-				isSelectionWithinCurrentSection:
-					isBlockSelected( sectionBlockClientId ) ||
-					hasSelectedInnerBlock( sectionBlockClientId, checkDeep ),
+				isSelectionWithinCurrentSection,
 				blockType,
 				canRemove,
 				canMove,
@@ -739,9 +771,14 @@ function BlockListBlockProvider( props ) {
 				blockVisibility,
 				deviceType,
 				viewportSettings,
+				supportsSplitting: hasBlockSupport(
+					blockName,
+					'splitting',
+					false
+				),
 			};
 		},
-		[ clientId, rootClientId ]
+		[ clientId, rootClientId, ghostBlock, ghostBlockWithoutAttributes ]
 	);
 
 	const defaultViewRef = useRefEffect( ( element ) => {
@@ -822,10 +859,13 @@ function BlockListBlockProvider( props ) {
 		blockVisibility,
 		deviceType,
 		viewportSettings,
+		supportsSplitting,
 	} = selectedProps;
 
 	const privateContext = {
 		isPreviewMode,
+		ghostBlock,
+		rootClientId,
 		clientId,
 		className,
 		index,
@@ -862,6 +902,7 @@ function BlockListBlockProvider( props ) {
 		blockVisibility,
 		deviceType,
 		viewportSettings,
+		supportsSplitting,
 	};
 
 	if (

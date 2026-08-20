@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -227,7 +224,7 @@ test.describe( 'Style Revisions', () => {
 			page.getByLabel( 'Global styles revisions list' )
 		).toBeVisible();
 
-		await page.click( 'role=button[name="Back"]' );
+		await page.getByRole( 'button', { name: 'Back', exact: true } ).click();
 
 		await expect(
 			page.getByLabel( 'Global styles revisions list' )

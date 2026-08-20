@@ -1,19 +1,7 @@
-/**
- * WordPress dependencies
- */
 import triggerFetch from '@wordpress/api-fetch';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
-
 jest.mock( '@wordpress/api-fetch' );
-
-/**
- * External dependencies
- */
 import { render, waitFor } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { store as coreDataStore } from '../../index';
 import useResourcePermissions from '../use-resource-permissions';
 

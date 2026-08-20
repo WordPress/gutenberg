@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import Editor from '../editor';
 import { unlock } from '../../lock-unlock';
 import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-global-styles';

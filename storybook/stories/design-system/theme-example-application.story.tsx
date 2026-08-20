@@ -16,7 +16,6 @@ import {
 	Tabs,
 	Text,
 } from '@wordpress/ui';
-
 import { withRouter } from '../../decorators/with-router';
 
 type ThemeProviderCornerRadius = React.ComponentProps<

@@ -1,11 +1,5 @@
-/**
- * Internal dependencies
- */
-import fetchUrlData from '../__experimental-fetch-url-data';
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
+import fetchUrlData from '../__experimental-fetch-url-data';
 
 jest.mock( '@wordpress/api-fetch' );
 

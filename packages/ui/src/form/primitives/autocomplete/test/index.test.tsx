@@ -452,4 +452,49 @@ describe( 'Autocomplete', () => {
 			expect( groupLabelRef.current ).toBeInstanceOf( HTMLDivElement );
 		} );
 	} );
+
+	describe( 'grid rows', () => {
+		const GRID_ITEMS = [
+			{
+				value: 'emojis',
+				label: 'Emojis',
+				items: [
+					{ value: 'grinning', emoji: '😀', label: 'grinning face' },
+					{ value: 'smile', emoji: '😊', label: 'smiling face' },
+				],
+			},
+		];
+
+		it( 'forwards ref', async () => {
+			const rowRef = createRef< HTMLDivElement >();
+
+			render(
+				<Autocomplete.Root items={ GRID_ITEMS } grid inline open>
+					<Autocomplete.List>
+						{ ( group: ( typeof GRID_ITEMS )[ number ] ) => (
+							<Autocomplete.Group
+								key={ group.value }
+								items={ group.items }
+							>
+								<Autocomplete.Row ref={ rowRef }>
+									{ group.items.map( ( item ) => (
+										<Autocomplete.Item
+											key={ item.value }
+											value={ item }
+										>
+											{ item.emoji }
+										</Autocomplete.Item>
+									) ) }
+								</Autocomplete.Row>
+							</Autocomplete.Group>
+						) }
+					</Autocomplete.List>
+				</Autocomplete.Root>
+			);
+
+			await waitFor( () => {
+				expect( rowRef.current ).toBeInstanceOf( HTMLDivElement );
+			} );
+		} );
+	} );
 } );

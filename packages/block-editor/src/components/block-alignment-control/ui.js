@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	ToolbarDropdownMenu,
@@ -13,10 +6,6 @@ import {
 	MenuGroup,
 	MenuItem,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import useAvailableAlignments from './use-available-alignments';
 import { BLOCK_ALIGNMENTS_CONTROLS, DEFAULT_CONTROL } from './constants';
 
@@ -26,6 +15,8 @@ function BlockAlignmentUI( {
 	controls,
 	isToolbar,
 	isCollapsed = true,
+	label = __( 'Align block' ),
+	description,
 } ) {
 	const enabledControls = useAvailableAlignments( controls );
 	const hasEnabledControls = !! enabledControls.length;
@@ -47,7 +38,7 @@ function BlockAlignmentUI( {
 		icon: activeAlignmentControl
 			? activeAlignmentControl.icon
 			: defaultAlignmentControl.icon,
-		label: __( 'Align' ),
+		label,
 	};
 	const extraProps = isToolbar
 		? {
@@ -64,7 +55,7 @@ function BlockAlignmentUI( {
 				} ),
 		  }
 		: {
-				toggleProps: { description: __( 'Change alignment' ) },
+				toggleProps: description ? { description } : {},
 				children: ( { onClose } ) => {
 					return (
 						<>

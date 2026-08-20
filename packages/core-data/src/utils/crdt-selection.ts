@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { dispatch, select } from '@wordpress/data';
 // @ts-expect-error No exported types.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { isUnmodifiedBlock } from '@wordpress/blocks';
 import { type CRDTDoc, Y } from '@wordpress/sync';
-
-/**
- * Internal dependencies
- */
 import {
 	createBlockSelectionHistory,
 	YSelectionType,

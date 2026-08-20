@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+## 7.53.0 (2026-08-12)
+
+
+## 7.52.0 (2026-07-29)
+
+### Internal
+
+-   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).
+
 ## 7.51.0 (2026-07-14)
 
 ### Enhancements

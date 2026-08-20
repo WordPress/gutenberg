@@ -1,20 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { registerBlockType } from '@wordpress/blocks';
-
-/**
- * External dependencies
- */
 import { render } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import useBlockSync from '../use-block-sync';
 import withRegistryProvider from '../with-registry-provider';
 import * as blockEditorActions from '../../../store/actions';
-
 import { store as blockEditorStore } from '../../../store';
 jest.mock( '../../../store/actions', () => {
 	const actions = jest.requireActual( '../../../store/actions' );

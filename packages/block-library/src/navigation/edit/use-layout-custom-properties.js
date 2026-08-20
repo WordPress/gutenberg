@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useSettings, useStyleOverride } from '@wordpress/block-editor';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 
 const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );

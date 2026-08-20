@@ -1,20 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { privateApis as routePrivateApis } from '@wordpress/route';
 import { useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
-
 const { useRouter, useMatches } = unlock( routePrivateApis );
-
-/**
- * Internal dependencies
- */
 import { STORE_NAME } from '../../store';
 import {
 	findDrilldownParent,
@@ -37,7 +25,7 @@ export function useSidebarParent() {
 	const router = useRouter();
 	const menuItems = useSelect(
 		( select ) =>
-			// @ts-ignore
+			// @ts-expect-error Store types are not available when selecting by store name.
 			select( STORE_NAME ).getMenuItems(),
 		[]
 	);

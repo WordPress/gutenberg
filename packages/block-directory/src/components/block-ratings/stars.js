@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { Icon, starEmpty, starFilled, starHalf } from '@wordpress/icons';
 

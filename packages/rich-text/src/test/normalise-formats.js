@@ -1,12 +1,4 @@
-/**
- * External dependencies
- */
 import deepFreeze from 'deep-freeze';
-
-/**
- * Internal dependencies
- */
-
 import { normaliseFormats } from '../normalise-formats';
 import { getSparseArrayLength } from './helpers';
 

@@ -327,32 +327,53 @@ Gutenberg uses TypeScript for several reasons, including:
 Gutenberg uses TypeScript by running the TypeScript compiler (`tsc`) on select packages.
 These packages benefit from type checking and produced type declarations in the published packages.
 
-To opt-in to TypeScript tooling, packages should include a `tsconfig.json` file in the package root and add an entry to the root `tsconfig.json` references.
-The changes will indicate that the package has opted in and will be included in the TypeScript build process.
+A package opts in to TypeScript tooling with a build project registered in the root `tsconfig.build.json` references: `tsconfig.json` for a package without TypeScript dev files, `tsconfig.build.json` for one that splits. Packages that emit declarations through this standard layout and have TypeScript test or story files split into two projects:
 
-A `tsconfig.json` file should look like the following (comments are not necessary):
+-   `tsconfig.build.json` is the build project: it covers `src`, emits declarations to `build-types`, and is what other packages and `npm run build` consume.
+-   `tsconfig.json` is the dev project: it covers test and story files with `noEmit`, so `npm run typecheck` and the IDE can check them without their declarations ending up in the published package.
+
+Both extend shared base configurations (comments are not necessary):
 
 ```jsonc
+// tsconfig.build.json
 {
-	// Extends a base configuration common to most packages
+	// Extends a base configuration common to most packages.
 	"extends": "../../tsconfig.base.json",
 
-	// Options for the TypeScript compiler
-	// We'll usually set our `rootDir` and `declarationDir` as follows, which is specific
-	// to each project.
-	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types"
-	},
-
-	// Which source files should be included
-	"include": [ "src/**/*" ],
-
-	// Other WordPress package dependencies that have opted-in to TypeScript should be listed
-	// here. In this case, our package depends on `@wordpress/dom-ready`.
-	"references": [ { "path": "../dom-ready" } ]
+	// Dependencies that have opted in to TypeScript are referenced here: a
+	// split one by its build project, one on a single config by its
+	// directory.
+	"references": [
+		{ "path": "../dom-ready/tsconfig.build.json" },
+		{ "path": "../hooks" }
+	]
 }
 ```
+
+```jsonc
+// tsconfig.json
+{
+	// Extends the shared dev project configuration (noEmit, jest types,
+	// test and story includes).
+	"extends": "../../tsconfig.dev.base.json",
+
+	// The dev project checks against the build project's declarations.
+	"references": [ { "path": "./tsconfig.build.json" } ]
+}
+```
+
+Register both projects at the root: `packages/<name>/tsconfig.build.json` in the root `tsconfig.build.json` references, and `packages/<name>` in the root `tsconfig.json` references. Route entry points under `routes/` with a `tsconfig.json` register it in the root `tsconfig.json` references only: their projects emit nothing and nothing else references them, so that registration is what puts them under `npm run typecheck`. A route with TypeScript test files pairs it with a `tsconfig.test.json` covering them, registered the same way.
+
+Packages whose components feed the Storybook components manifest (`components`, `dataviews`, `ui`) carry a third project, `tsconfig.stories.json`, registered in the root `tsconfig.json` only. It type checks the stories against component sources without jest types. Storybook's component meta extractor reads props through the closest `tsconfig.json` that lists a story, or through its own inferred project when none does; the inferred project produces the complete manifest and the dev project does not, so stories stay out of `tsconfig.json`. The dev project cannot reference this one either, because a referenced project may not disable emit (TS6310), which is why it is registered at the root only.
+
+Two rules keep the projects consistent, and `npm run lint:tsconfig` enforces both:
+
+-   The build project excludes every dev file (`**/test/**`, `**/tests/**`, `**/__tests__/**`, `**/stories/**`, `**/*.story.*`) and never lists a test type such as `jest` or `gutenberg-test-env` in `types`, so `src` cannot use test globals and no dev declaration is published. A package `exclude` replaces the inherited one, so list all of them.
+-   The dev project's `types` starts from the build project's list and adds `jest`, so tests see every ambient type the sources see. Ambient types only dev files need (`@types/jest`, `@types/node`, `@testing-library/jest-dom`) belong in the package's own `devDependencies`.
+
+A few packages emit declarations through a different layout and keep only the parts of the split that apply. `jest-console` compiles nothing: a dev project checks its TypeScript sources and tests, and the package ships a handwritten `declarations.d.ts` instead of `build-types`. `interactivity-router` pairs its dev project with two specialized build projects (`tsconfig.main.json` and `tsconfig.full-page.json`), which take the standard build project's place in the root `tsconfig.build.json` references. The rules above still apply to whichever projects such a package has.
+
+The build project inherits `rootDir`, `declarationDir`, and `include` from the base configuration, so a package only sets what differs. Test files that do not type check yet are listed in the dev project's `exclude` with a comment, so the debt stays visible per file.
 
 Type declarations will be produced in the `build-types` which should be included in the published package.
 For consumers to use the published type declarations, we'll set the `types` field in `package.json`:

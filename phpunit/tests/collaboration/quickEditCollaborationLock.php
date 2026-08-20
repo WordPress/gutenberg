@@ -59,7 +59,7 @@ class Tests_Collaboration_QuickEditCollaborationLock extends WP_UnitTestCase {
 
 	public function test_deleted_user_lock_is_treated_as_inactive() {
 		$deleted_user_id = self::factory()->user->create();
-		wp_delete_user( $deleted_user_id );
+		self::delete_user( $deleted_user_id );
 		$this->set_edit_lock( $deleted_user_id );
 
 		$this->assertSame( 0, gutenberg_get_active_edit_lock_user( self::$post_id ), 'A lock from a deleted user should be inactive.' );
@@ -119,8 +119,6 @@ class Tests_Collaboration_QuickEditCollaborationLock extends WP_UnitTestCase {
 	}
 
 	public function test_inline_save_guard_is_registered_on_core_quick_edit_ajax_hook() {
-		update_option( 'wp_collaboration_enabled', '1' );
-
 		gutenberg_post_list_collaboration_ui();
 
 		$this->assertSame(

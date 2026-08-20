@@ -1,22 +1,10 @@
-/**
- * External dependencies
- */
 import { describe, expect, it, jest, beforeEach } from '@jest/globals';
-
 // Mock @wordpress/api-fetch
 jest.mock( '@wordpress/api-fetch', () => ( {
 	__esModule: true,
 	default: jest.fn(),
 } ) );
-
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import { SyncUpdateType } from '../types';
 import { MAX_UPDATE_SIZE_IN_BYTES } from '../config';
 import {

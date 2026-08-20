@@ -1,21 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * External dependencies
- */
 import type { StoryObj, Meta } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { seen, unseen } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { ValidatedInputControl } from '../input-control';
 import { formDecorator } from './story-utils';
 import InputControlSuffixWrapper from '../../../input-control/input-suffix-wrapper';

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { isBlobURL } from '@wordpress/blob';
 import { useContext, useEffect, useRef, useState } from '@wordpress/element';
 import {
@@ -28,10 +25,6 @@ import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import { PlaylistContext } from '../playlist/context';
 import { getTrackAttributes, getTrackImageAttributes } from '../playlist/utils';
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
@@ -53,7 +46,7 @@ const PlaylistTrackEdit = ( {
 	const showImages = context?.showImages ?? true;
 	const imageButton = useRef();
 	const blockProps = useBlockProps();
-	const { currentTrackClientId, setCurrentTrackClientId, addTracks } =
+	const { currentTrackClientId, setCurrentTrackClientId } =
 		useContext( PlaylistContext );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
@@ -163,20 +156,6 @@ const PlaylistTrackEdit = ( {
 					variant="toolbar"
 				/>
 			</BlockControls>
-			{ !! addTracks && (
-				<BlockControls group="block">
-					<MediaReplaceFlow
-						name={ __( 'Add track' ) }
-						onSelect={ addTracks }
-						accept="audio/*"
-						multiple
-						handleUpload={ false }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						onError={ onUploadError }
-						variant="toolbar"
-					/>
-				</BlockControls>
-			) }
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<TextControl
@@ -272,7 +251,6 @@ const PlaylistTrackEdit = ( {
 				</PanelBody>
 			</InspectorControls>
 			<li { ...blockProps }>
-				{ !! temporaryURL && <Spinner /> }
 				<button
 					className="wp-block-playlist-track__button"
 					onClick={ () => setCurrentTrackClientId( clientId ) }
@@ -292,7 +270,8 @@ const PlaylistTrackEdit = ( {
 							tagName="span"
 							className="wp-block-playlist-track__title"
 							value={ title }
-							placeholder={ __( 'Add title' ) }
+							aria-label={ __( 'Track title' ) }
+							placeholder={ __( 'Track title' ) }
 							onChange={ ( value ) => {
 								setAttributes( { title: value } );
 							} }
@@ -303,7 +282,8 @@ const PlaylistTrackEdit = ( {
 								tagName="span"
 								className="wp-block-playlist-track__artist"
 								value={ artist }
-								placeholder={ __( 'Add artist' ) }
+								aria-label={ __( 'Track artist' ) }
+								placeholder={ __( 'Track artist' ) }
 								onChange={ ( value ) =>
 									setAttributes( { artist: value } )
 								}
@@ -321,6 +301,9 @@ const PlaylistTrackEdit = ( {
 							</span>
 						) }
 						{ length }
+						{ !! temporaryURL && (
+							<Spinner className="wp-block-playlist-track__spinner" />
+						) }
 					</span>
 					<span className="screen-reader-text">{ __( 'Play' ) }</span>
 				</button>

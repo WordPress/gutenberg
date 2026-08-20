@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { View, SupportedLayouts, Form } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import { unlock } from './lock-unlock';
 
 /**

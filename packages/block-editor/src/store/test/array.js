@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { insertAt, moveTo } from '../array';
 
 describe( 'array', () => {

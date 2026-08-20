@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -8,10 +5,6 @@ import {
 	privateApis as commandsPrivateApis,
 } from '@wordpress/commands';
 import { layout as layoutIcon, plus, trash } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';

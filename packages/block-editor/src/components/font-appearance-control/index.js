@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { CustomSelectControl } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
 
 /**

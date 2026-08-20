@@ -8,6 +8,11 @@ Existing patches should be described and justified here.
 
 ## Patches
 
+### `patches/@arraypress+waveform-player+1.26.0.patch`
+
+This patch requires initialization to be requested explicitly and removes passing custom SVG icons
+through HTML data attributes.
+
 ### `patches/react-autosize-textarea+7.1.0.patch`
 
 This package is unmaintained. It's incompatible with some recent versions of React types in ways

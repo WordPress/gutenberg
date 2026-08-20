@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { colord, extend } from 'colord';
 import a11yPlugin from 'colord/plugins/a11y';
-
-/**
- * WordPress dependencies
- */
 import { useCallback, useContext, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -19,10 +12,6 @@ import {
 	mergeGlobalStyles,
 } from '@wordpress/global-styles-engine';
 import type { StyleVariation, Color } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { GlobalStylesContext } from './context';
 import { removePropertiesFromObject, isVariationWithProperties } from './utils';
 
@@ -34,7 +23,7 @@ extend( [ a11yPlugin ] );
  *
  * @param path               The path to the style value.
  * @param blockName          The name of the block, if applicable.
- * @param readFrom           Which source to read from: "base" (theme), "user" (customizations), or "merged" (final result).
+ * @param readFrom           Which source to read from: "base" (theme), "user" (customizations), or "merged" (final result). Defaults to "merged".
  * @param shouldDecodeEncode Whether to decode and encode the style value.
  * @param state              Optional style state path. Supports viewport states (e.g. `@mobile`),
  *                           pseudo-selector states (e.g. `:hover`) or both (e.g. `@mobile.:hover`).
@@ -129,7 +118,7 @@ export function useStyle< T = any >(
  *
  * @param path      The path to the setting value.
  * @param blockName The name of the block, if applicable.
- * @param readFrom  Which source to read from: "base" (theme), "user" (customizations), or "merged" (final result).
+ * @param readFrom  Which source to read from: "base" (theme), "user" (customizations), or "merged" (final result). Defaults to "merged".
  * @return An array containing the setting value and a function to set the
  * setting value.
  *

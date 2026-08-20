@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useCallback, useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import Layout from '../layout';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';

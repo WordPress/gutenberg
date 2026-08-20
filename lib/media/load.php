@@ -199,17 +199,22 @@ function gutenberg_media_processing_filter_rest_index( WP_REST_Response $respons
 add_filter( 'rest_index', 'gutenberg_media_processing_filter_rest_index' );
 
 /**
- * Sets a global JS variable to indicate that HEIC canvas-based upload support is available.
+ * Sets a global JS variable to indicate that client-side media processing is enabled.
  *
- * This flag is set whenever the media processing feature is enabled,
- * regardless of whether the browser supports full VIPS-based processing.
- * Browsers like Safari can use createImageBitmap() to decode HEIC images
- * and convert them to JPEG for server-side sub-size generation.
+ * The flag gates both processing modes: the full VIPS/WASM pipeline (browsers
+ * that pass feature detection) and the HEIC canvas fallback used by browsers
+ * such as Safari that can decode HEIC via createImageBitmap() but lack
+ * SharedArrayBuffer support. The browser-capability check happens client-side.
  */
-function gutenberg_set_heic_upload_support_flag() {
-	wp_add_inline_script( 'wp-block-editor', 'window.__heicUploadSupport = true', 'before' );
+function gutenberg_set_client_side_media_processing_flag() {
+	// Re-check the filter at action time, since other plugins (loaded after Gutenberg)
+	// may have added a filter to disable client-side media processing.
+	if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
+		return;
+	}
+	wp_add_inline_script( 'wp-block-editor', 'window.__clientSideMediaProcessing = true', 'before' );
 }
-add_action( 'admin_init', 'gutenberg_set_heic_upload_support_flag' );
+add_action( 'admin_init', 'gutenberg_set_client_side_media_processing_flag' );
 
 /**
  * Deletes the source-format companion file when its attachment is deleted.
@@ -257,17 +262,6 @@ add_action( 'delete_attachment', 'gutenberg_delete_heic_companion_file' );
 // ── Tier 2: Full client-side processing (VIPS/WASM) ─────────────────
 // Everything below requires cross-origin isolation (Document-Isolation-Policy)
 // and SharedArrayBuffer support, which is only available in Chromium 137+.
-
-/**
- * Sets a global JS variable to indicate that client-side media processing is enabled.
- */
-function gutenberg_set_client_side_media_processing_flag() {
-	if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
-		return;
-	}
-	wp_add_inline_script( 'wp-block-editor', 'window.__clientSideMediaProcessing = true', 'before' );
-}
-add_action( 'admin_init', 'gutenberg_set_client_side_media_processing_flag' );
 
 /**
  * Filters the list of rewrite rules formatted for output to an .htaccess file.
@@ -469,10 +463,58 @@ function gutenberg_add_crossorigin_attributes( string $html ): string {
 }
 
 /**
+ * Updates `crossorigin` attributes in the printed media templates.
+ *
+ * Adds `crossorigin="anonymous"` to AUDIO and VIDEO tags inside the
+ * Backbone `<script type="text/html">` templates so the media modal can
+ * play cross-origin audio and video under cross-origin isolation. Tags
+ * that already have the attribute are left untouched so the output does
+ * not gain duplicates on WordPress versions where Core adds it itself.
+ *
+ * IMG is intentionally excluded: under
+ * `Document-Isolation-Policy: isolate-and-credentialless` the browser
+ * already loads cross-origin images in credentialless mode, so forcing
+ * `crossorigin="anonymous"` triggers a CORS request that breaks previews
+ * of images served without CORS headers, such as media offloaded to a
+ * CDN. See https://core.trac.wordpress.org/ticket/65673.
+ *
+ * @param string $html The printed media templates.
+ *
+ * @return string Modified media templates.
+ */
+function gutenberg_update_media_template_crossorigin_attributes( string $html ): string {
+	/*
+	 * The media templates are inside <script type="text/html"> tags,
+	 * whose content is treated as raw text by the HTML Tag Processor.
+	 * Extract each script block's content, process it separately,
+	 * then reassemble the full output.
+	 */
+	$script_processor = new WP_HTML_Tag_Processor( $html );
+	while ( $script_processor->next_tag( 'SCRIPT' ) ) {
+		if ( 'text/html' !== $script_processor->get_attribute( 'type' ) ) {
+			continue;
+		}
+		$template_processor = new WP_HTML_Tag_Processor( $script_processor->get_modifiable_text() );
+		while ( $template_processor->next_tag() ) {
+			if (
+				in_array( $template_processor->get_tag(), array( 'AUDIO', 'VIDEO' ), true )
+				&& ! is_string( $template_processor->get_attribute( 'crossorigin' ) )
+			) {
+				$template_processor->set_attribute( 'crossorigin', 'anonymous' );
+			}
+		}
+		$script_processor->set_modifiable_text( $template_processor->get_updated_html() );
+	}
+
+	return $script_processor->get_updated_html();
+}
+
+/**
  * Overrides templates from wp_print_media_templates with custom ones.
  *
- * Adds `crossorigin` attribute to all tags that
- * could have assets loaded from a different domain.
+ * Updates the `crossorigin` attributes on media tags so cross-origin
+ * audio and video can be processed under cross-origin isolation without
+ * breaking previews of images served without CORS headers.
  */
 function gutenberg_override_media_templates(): void {
 	remove_action( 'admin_footer', 'wp_print_media_templates' );
@@ -483,17 +525,7 @@ function gutenberg_override_media_templates(): void {
 			wp_print_media_templates();
 			$html = (string) ob_get_clean();
 
-			$tags = array(
-				'audio',
-				'img',
-				'video',
-			);
-
-			foreach ( $tags as $tag ) {
-				$html = (string) str_replace( "<$tag", "<$tag crossorigin=\"anonymous\"", $html );
-			}
-
-			echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo gutenberg_update_media_template_crossorigin_attributes( $html ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 	);
 }

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 
 function InserterNoResults( { children = __( 'No results found.' ) } ) {

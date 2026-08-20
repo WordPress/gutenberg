@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import Mousetrap from 'mousetrap';
 import 'mousetrap/plugins/global-bind/mousetrap-global-bind.js';
 import type { ExtendedKeyboardEvent } from 'mousetrap';
-
-/**
- * WordPress dependencies
- */
 import type { RefObject } from '@wordpress/element';
 import { useEffect, useRef } from '@wordpress/element';
 import { isAppleOS } from '@wordpress/keycodes';

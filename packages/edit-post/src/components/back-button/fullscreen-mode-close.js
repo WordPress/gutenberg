@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { __, isRTL } from '@wordpress/i18n';

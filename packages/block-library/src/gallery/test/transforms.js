@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	createBlock,
 	getBlockTypes,
@@ -8,10 +5,6 @@ import {
 	switchToBlockType,
 	unregisterBlockType,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import {
 	metadata as galleryMetadata,
 	settings as gallerySettings,

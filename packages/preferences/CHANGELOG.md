@@ -4,6 +4,18 @@
 
 ### Internal
 
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 4.53.0 (2026-08-12)
+
+### Internal
+
+-   Remove unused `isAction` prop from preferences modal tab buttons (`Item` has ignored it since it was replaced by `onClick`) ([#80705](https://github.com/WordPress/gutenberg/pull/80705)).
+
+## 4.52.0 (2026-07-29)
+
+### Internal
+
 -   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
 
 ## 4.51.0 (2026-07-14)

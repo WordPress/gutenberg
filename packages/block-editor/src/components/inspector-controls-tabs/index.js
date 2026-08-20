@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Icon as WCIcon,
 	privateApis as componentsPrivateApis,
@@ -8,12 +5,7 @@ import {
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useSelect, useDispatch } from '@wordpress/data';
-
 import { Tooltip } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { TAB_SETTINGS, TAB_STYLES, TAB_LIST_VIEW, TAB_CONTENT } from './utils';
 import SettingsTab from './settings-tab';
 import StylesTab from './styles-tab';

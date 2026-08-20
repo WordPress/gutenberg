@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Modal,
 	Button,
@@ -13,10 +10,6 @@ import { useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import {
 	PATTERN_DEFAULT_CATEGORY,
 	PATTERN_SYNC_TYPES,

@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as editWidgetsStore } from '../../store';
 
 function SaveButton() {

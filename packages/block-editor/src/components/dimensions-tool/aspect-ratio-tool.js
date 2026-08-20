@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
-import {
-	SelectControl,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
+import { SelectControl } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-/**
- * Internal dependencies
- */
 import { useSettings } from '../use-settings';
+import { InheritanceToolsPanelItem } from '../global-styles/inheritance';
+import { findAspectRatioOption } from './utils';
 
 /**
  * @typedef {import('@wordpress/components/build-types/select-control/types').SelectControlProps} SelectControlProps
@@ -29,6 +22,9 @@ import { useSettings } from '../use-settings';
  * @property {SelectControlProps[]}         [options]          Aspect ratio options.
  * @property {string}                       [defaultValue]     Default aspect ratio value.
  * @property {boolean}                      [isShownByDefault] Whether the tool is shown by default.
+ * @property {string}                       [className]        Additional CSS class on the wrapping panel item.
+ * @property {boolean}                      [isInherited]      Whether the control is displaying an inherited Global Styles value.
+ * @property {boolean}                      [hasLocalOverride] Whether a local value is overriding an inherited Global Styles value.
  */
 
 export default function AspectRatioTool( {
@@ -39,10 +35,10 @@ export default function AspectRatioTool( {
 	defaultValue = 'auto',
 	hasValue,
 	isShownByDefault = true,
+	className,
+	isInherited,
+	hasLocalOverride,
 } ) {
-	// Match the CSS default so if the value is used directly in CSS it will look correct in the control.
-	const displayValue = value ?? 'auto';
-
 	const [ defaultRatios, themeRatios, showDefaultRatios ] = useSettings(
 		'dimensions.aspectRatios.default',
 		'dimensions.aspectRatios.theme',
@@ -77,8 +73,25 @@ export default function AspectRatioTool( {
 		},
 	];
 
+	const resolvedOptions = options ?? aspectRatioOptions;
+
+	// The value is free-form CSS, so it doesn't necessarily match an option as
+	// written, e.g. '1/1' and '1' describe the same ratio. Resolve it to the
+	// option that represents it, falling back to 'custom' so that a ratio
+	// without a matching preset isn't displayed as one of the presets. Values
+	// that are empty match the CSS default, so if the value is used directly in
+	// CSS it will look correct in the control.
+	const displayValue =
+		value === undefined || value === null || value === 'auto'
+			? 'auto'
+			: findAspectRatioOption( value, resolvedOptions )?.value ??
+			  'custom';
+
 	return (
-		<ToolsPanelItem
+		<InheritanceToolsPanelItem
+			className={ className }
+			isInherited={ isInherited }
+			hasLocalOverride={ hasLocalOverride }
 			hasValue={
 				hasValue ? hasValue : () => displayValue !== defaultValue
 			}
@@ -90,9 +103,9 @@ export default function AspectRatioTool( {
 			<SelectControl
 				label={ __( 'Aspect ratio' ) }
 				value={ displayValue }
-				options={ options ?? aspectRatioOptions }
+				options={ resolvedOptions }
 				onChange={ onChange }
 			/>
-		</ToolsPanelItem>
+		</InheritanceToolsPanelItem>
 	);
 }

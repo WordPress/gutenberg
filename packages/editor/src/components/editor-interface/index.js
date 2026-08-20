@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -19,17 +12,18 @@ import { useViewportMatch } from '@wordpress/compose';
 import { useState, useCallback } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { InlineNotices } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
+import { ThemeProvider } from '@wordpress/theme';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import TemplateValidationNotice from '../template-validation-notice';
 import Header from '../header';
 import InserterSidebar from '../inserter-sidebar';
 import ListViewSidebar from '../list-view-sidebar';
-import { RevisionsHeader, RevisionsCanvas } from '../post-revisions-preview';
+import {
+	RevisionsHeader,
+	RevisionsCanvas,
+	RevisionsCodeDiff,
+} from '../post-revisions-preview';
 import { CollaboratorsOverlay } from '../collaborators-overlay';
 import { useCollaboratorNotifications } from '../collaborators-presence/use-collaborator-notifications';
 import SavePublishPanels from '../save-publish-panels';
@@ -56,13 +50,15 @@ function Notices() {
 	}, [] );
 
 	return (
-		<InlineNotices
-			className="editor-notices"
-			pinnedNoticesClassName="editor-notices__pinned"
-			dismissibleNoticesClassName="editor-notices__dismissible"
-		>
-			{ ! isValidTemplate && <TemplateValidationNotice /> }
-		</InlineNotices>
+		<ThemeProvider cornerRadius="none">
+			<InlineNotices
+				className="editor-notices"
+				pinnedNoticesClassName="editor-notices__pinned"
+				dismissibleNoticesClassName="editor-notices__dismissible"
+			>
+				{ ! isValidTemplate && <TemplateValidationNotice /> }
+			</InlineNotices>
+		</ThemeProvider>
 	);
 }
 
@@ -171,7 +167,13 @@ export default function EditorInterface( {
 						onToggleDiff={ () => setShowRevisionDiff( ! showDiff ) }
 					/>
 				}
-				content={ <RevisionsCanvas /> }
+				content={
+					mode === 'text' ? (
+						<RevisionsCodeDiff />
+					) : (
+						<RevisionsCanvas />
+					)
+				}
 				sidebar={ <ComplementaryArea.Slot scope="core" /> }
 			/>
 		);

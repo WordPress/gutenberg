@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { createSlotFill, PanelBody } from '@wordpress/components';
 import { usePluginContext } from '@wordpress/plugins';
 import { useDispatch, useSelect } from '@wordpress/data';
 import warning from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import EnablePluginDocumentSettingPanelOption from '../preferences-modal/enable-plugin-document-setting-panel';
 import { store as editorStore } from '../../store';
 

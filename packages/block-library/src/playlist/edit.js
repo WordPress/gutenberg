@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import {
 	store as blockEditorStore,
@@ -32,10 +25,6 @@ import { __, _x } from '@wordpress/i18n';
 import { playlist as icon } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
 import { createBlobURL } from '@wordpress/blob';
-
-/**
- * Internal dependencies
- */
 import { Caption } from '../utils/caption';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { WaveformPlayer } from '../utils/waveform-player';
@@ -278,9 +267,8 @@ const PlaylistEdit = ( {
 		() => ( {
 			currentTrackClientId,
 			setCurrentTrackClientId,
-			addTracks: onAddTracks,
 		} ),
-		[ currentTrackClientId, onAddTracks, setCurrentTrackClientId ]
+		[ currentTrackClientId, setCurrentTrackClientId ]
 	);
 
 	// Get current track data by finding the track with matching client ID.
@@ -451,10 +439,20 @@ const PlaylistEdit = ( {
 		);
 	}
 
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		__experimentalAppenderTagName: 'li',
-		renderAppender: false,
-	} );
+	const { children: innerBlocks, ...trackListProps } = useInnerBlocksProps(
+		{
+			className: clsx( 'wp-block-playlist__tracklist', {
+				'wp-block-playlist__tracklist-is-hidden': ! showTracklist,
+				'wp-block-playlist__tracklist-show-numbers': showNumbers,
+				'wp-block-playlist__tracklist-length-is-hidden':
+					! showTrackLength,
+			} ),
+		},
+		{
+			__experimentalAppenderTagName: 'li',
+			renderAppender: false,
+		}
+	);
 
 	if ( tracks.length === 0 ) {
 		return (
@@ -472,7 +470,7 @@ const PlaylistEdit = ( {
 					} }
 					onSelect={ onSelectTracks }
 					accept="audio/*"
-					multiple
+					multiple="add"
 					handleUpload={ false }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onError={ onUploadError }
@@ -488,7 +486,7 @@ const PlaylistEdit = ( {
 					name={ __( 'Add track' ) }
 					onSelect={ onAddTracks }
 					accept="audio/*"
-					multiple
+					multiple="add"
 					handleUpload={ false }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onError={ onUploadError }
@@ -683,7 +681,7 @@ const PlaylistEdit = ( {
 				<MediaPlaceholder
 					onSelect={ onAddTracks }
 					accept="audio/*"
-					multiple
+					multiple="add"
 					handleUpload={ false }
 					disableMediaButtons
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
@@ -705,18 +703,9 @@ const PlaylistEdit = ( {
 						showPlayButtonArtwork={ showPlayButtonArtwork === true }
 					/>
 				</Disabled>
-				<ol
-					className={ clsx( 'wp-block-playlist__tracklist', {
-						'wp-block-playlist__tracklist-is-hidden':
-							! showTracklist,
-						'wp-block-playlist__tracklist-show-numbers':
-							showNumbers,
-						'wp-block-playlist__tracklist-length-is-hidden':
-							! showTrackLength,
-					} ) }
-				>
+				<ol { ...trackListProps }>
 					<PlaylistContext.Provider value={ playlistContext }>
-						{ innerBlocksProps.children }
+						{ innerBlocks }
 					</PlaylistContext.Provider>
 				</ol>
 				<Caption

@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useReducedMotion } from '@wordpress/compose';
 import { useCallback, useRef, useState } from '@wordpress/element';
 import warning from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import { CONFIG } from '../utils';
 
 /**

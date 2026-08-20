@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import {
@@ -9,15 +6,10 @@ import {
 	registerBlockType,
 	unregisterBlockType,
 } from '@wordpress/blocks';
-
 import { store as coreStore } from '@wordpress/core-data';
 import apiFetch from '@wordpress/api-fetch';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { logged } from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { store as reusableBlocksStore } from '../index';
 
 jest.mock( '@wordpress/api-fetch', () => ( {

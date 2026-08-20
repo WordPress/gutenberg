@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import fs from 'fs';
 import path from 'path';
-
-/**
- * WordPress dependencies
- */
 import {
 	createBlock,
 	getBlockContent,

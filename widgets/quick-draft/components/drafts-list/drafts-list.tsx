@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { DataViews, type Field, type View } from '@wordpress/dataviews';
@@ -15,10 +12,6 @@ import {
 } from '@wordpress/icons';
 import { EmptyState, IconButton, Link, Stack, Text, Icon } from '@wordpress/ui';
 import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import styles from './drafts-list.module.css';
 
 type FeaturedMedia = {

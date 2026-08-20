@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import { BaseControl } from '../base-control';
 import BoxInputControl from './box-input-control';
 import LinkedButton from './linked-button';

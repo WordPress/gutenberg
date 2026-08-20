@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import RovingTabIndex from '../roving-tab-index';
 import RovingTabIndexItem from '../roving-tab-index-item';
 

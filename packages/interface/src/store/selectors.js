@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import {
 	normalizeComplementaryAreaScope,
 	normalizeComplementaryAreaName,

@@ -1,27 +1,21 @@
-/**
- * External dependencies
- */
-import { render } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
+import { act, render } from '@testing-library/react';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { default as BrowserURL, getPostEditURL } from '../';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
 
-function setupUseSelectMock( { postId, postStatus } ) {
+function setupUseSelectMock( { postId, postStatus, currentRevisionId } ) {
 	useSelect.mockImplementation( () => {
 		return {
 			postId,
 			postStatus,
+			currentRevisionId,
 		};
 	} );
+}
+
+function flushURLWrites() {
+	act( () => jest.runAllTimers() );
 }
 
 describe( 'getPostEditURL', () => {
@@ -40,7 +34,13 @@ describe( 'BrowserURL', () => {
 	} );
 
 	beforeEach( () => {
+		jest.useFakeTimers();
 		replaceStateSpy.mockReset();
+	} );
+
+	afterEach( () => {
+		act( () => jest.runOnlyPendingTimers() );
+		jest.useRealTimers();
 	} );
 
 	afterAll( () => {
@@ -54,15 +54,17 @@ describe( 'BrowserURL', () => {
 		} );
 
 		render( <BrowserURL /> );
+		flushURLWrites();
 		expect( replaceStateSpy ).not.toHaveBeenCalled();
 	} );
 
-	it( 'update URL if post is no longer auto-draft', () => {
+	it( 'updates URL immediately if post is no longer auto-draft', () => {
 		setupUseSelectMock( {
 			postId: 1,
 			postStatus: 'auto-draft',
 		} );
 		const { rerender } = render( <BrowserURL /> );
+		flushURLWrites();
 
 		setupUseSelectMock( {
 			postId: 1,
@@ -77,25 +79,13 @@ describe( 'BrowserURL', () => {
 		);
 	} );
 
-	it( 'not update URL if history is already set', () => {
+	it( 'updates URL immediately if post ID changes', () => {
 		setupUseSelectMock( {
 			postId: 1,
 			postStatus: 'draft',
 		} );
 		const { rerender } = render( <BrowserURL /> );
-
-		replaceStateSpy.mockReset();
-
-		rerender( <BrowserURL /> );
-		expect( replaceStateSpy ).not.toHaveBeenCalled();
-	} );
-
-	it( 'update URL if post ID changes', () => {
-		setupUseSelectMock( {
-			postId: 1,
-			postStatus: 'draft',
-		} );
-		const { rerender } = render( <BrowserURL /> );
+		flushURLWrites();
 
 		setupUseSelectMock( {
 			postId: 2,
@@ -111,9 +101,70 @@ describe( 'BrowserURL', () => {
 		);
 	} );
 
-	it( 'renders nothing', () => {
-		const { container } = render( <BrowserURL /> );
+	it( 'appends the revision arg while previewing a revision', () => {
+		setupUseSelectMock( {
+			postId: 1,
+			postStatus: 'draft',
+			currentRevisionId: 5,
+		} );
 
-		expect( container ).toBeEmptyDOMElement();
+		render( <BrowserURL /> );
+		flushURLWrites();
+		expect( replaceStateSpy ).toHaveBeenCalledWith(
+			{ id: 1 },
+			'Post 1',
+			'post.php?post=1&action=edit&revision=5'
+		);
+	} );
+
+	it( 'writes immediately after a quiet period', () => {
+		setupUseSelectMock( {
+			postId: 1,
+			postStatus: 'draft',
+			currentRevisionId: 5,
+		} );
+		const { rerender } = render( <BrowserURL /> );
+		flushURLWrites();
+
+		act( () => jest.advanceTimersByTime( 301 ) );
+		setupUseSelectMock( {
+			postId: 1,
+			postStatus: 'draft',
+			currentRevisionId: 6,
+		} );
+		replaceStateSpy.mockReset();
+
+		rerender( <BrowserURL /> );
+		expect( replaceStateSpy ).toHaveBeenCalledWith(
+			{ id: 1 },
+			'Post 1',
+			'post.php?post=1&action=edit&revision=6'
+		);
+	} );
+
+	it( 'removes the revision arg after exiting revisions mode', () => {
+		setupUseSelectMock( {
+			postId: 1,
+			postStatus: 'draft',
+			currentRevisionId: 5,
+		} );
+		const { rerender } = render( <BrowserURL /> );
+		flushURLWrites();
+
+		setupUseSelectMock( {
+			postId: 1,
+			postStatus: 'draft',
+			currentRevisionId: null,
+		} );
+		replaceStateSpy.mockReset();
+
+		rerender( <BrowserURL /> );
+		expect( replaceStateSpy ).not.toHaveBeenCalled();
+		flushURLWrites();
+		expect( replaceStateSpy ).toHaveBeenCalledWith(
+			{ id: 1 },
+			'Post 1',
+			'post.php?post=1&action=edit'
+		);
 	} );
 } );

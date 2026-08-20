@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const userList = [
@@ -105,7 +102,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			}
 
 			await editor.canvas
-				.locator( 'role=button[name="Add default block"i]' )
+				.locator( 'role=document[name="Add default block"i]' )
 				.click();
 			await page.keyboard.type( testData.triggerString );
 			await expect(
@@ -116,6 +113,13 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 				.evaluate( () => {
 					return document.activeElement.getAttribute( 'aria-owns' );
 				} );
+			const ariaControls = await editor.canvas
+				.locator( ':root' )
+				.evaluate( () => {
+					return document.activeElement.getAttribute(
+						'aria-controls'
+					);
+				} );
 			const ariaActiveDescendant = await editor.canvas
 				.locator( ':root' )
 				.evaluate( () => {
@@ -123,10 +127,16 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 						'aria-activedescendant'
 					);
 				} );
-			// Ensure `aria-owns` is part of the same document and ensure the
-			// selected option is equal to the active descendant.
+			// Ensure `aria-owns` and `aria-controls` are part of the same
+			// document and ensure the selected option is equal to the active
+			// descendant.
 			await expect(
 				editor.canvas.locator( `#${ ariaOwns } [aria-selected="true"]` )
+			).toHaveAttribute( 'id', ariaActiveDescendant );
+			await expect(
+				editor.canvas.locator(
+					`#${ ariaControls } [aria-selected="true"]`
+				)
 			).toHaveAttribute( 'id', ariaActiveDescendant );
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( '.' );
@@ -157,7 +167,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			}
 
 			await editor.canvas
-				.locator( 'role=button[name="Add default block"i]' )
+				.locator( 'role=document[name="Add default block"i]' )
 				.click();
 			await page.keyboard.type( 'Stuck in the middle with you.' );
 			await pageUtils.pressKeys( 'ArrowLeft', { times: 'you.'.length } );
@@ -200,7 +210,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			}
 
 			await editor.canvas
-				.locator( 'role=button[name="Add default block"i]' )
+				.locator( 'role=document[name="Add default block"i]' )
 				.click();
 			await page.keyboard.type( testData.firstTriggerString );
 			await expect(
@@ -244,7 +254,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			}
 
 			await editor.canvas
-				.locator( 'role=button[name="Add default block"i]' )
+				.locator( 'role=document[name="Add default block"i]' )
 				.click();
 			await page.keyboard.type( testData.triggerString );
 			await page
@@ -282,7 +292,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			}
 
 			await editor.canvas
-				.locator( 'role=button[name="Add default block"i]' )
+				.locator( 'role=document[name="Add default block"i]' )
 				.click();
 			await page.keyboard.type( testData.triggerString );
 			await expect(
@@ -319,7 +329,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			}
 
 			await editor.canvas
-				.locator( 'role=button[name="Add default block"i]' )
+				.locator( 'role=document[name="Add default block"i]' )
 				.click();
 			await page.keyboard.type( testData.triggerString );
 			await expect(
@@ -340,7 +350,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 				editor,
 			} ) => {
 				await editor.canvas
-					.locator( 'role=button[name="Add default block"i]' )
+					.locator( 'role=document[name="Add default block"i]' )
 					.click();
 				// The 'Grapes' option is disabled in our test plugin, so it should not insert the grapes emoji
 				await page.keyboard.type( 'Sorry, we are all out of ~g' );
@@ -408,7 +418,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			}
 
 			await editor.canvas
-				.locator( 'role=button[name="Add default block"i]' )
+				.locator( 'role=document[name="Add default block"i]' )
 				.click();
 
 			for ( let i = 0; i < 4; i++ ) {
@@ -473,7 +483,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 
 		await page.keyboard.type( '@fr' );
@@ -514,7 +524,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '@fr' );
 		await expect(
@@ -532,7 +542,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '@' );
 		await pageUtils.pressKeys( 'primary+b' );
@@ -556,7 +566,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/' );
 		await expect(
@@ -585,7 +595,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		const mentionOption = page.getByRole( 'option', {
 			name: 'Bilbo Baggins thebetterhobbit',
@@ -615,7 +625,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		'should not re-trigger autocomplete after accepting a mention and changing text near it',
 		async ( { editor, page, pageUtils } ) => {
 			await editor.canvas
-				.getByRole( 'button', { name: 'Add default block' } )
+				.getByRole( 'document', { name: 'Add default block' } )
 				.click();
 
 			await page.keyboard.type( '@bi' );
@@ -660,7 +670,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 
 		await page.keyboard.type( '@bi' );
@@ -698,7 +708,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 
 		await page.keyboard.type( 'hello @fr' );
@@ -728,7 +738,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 
 		await page.keyboard.type( '@fr' );
@@ -761,7 +771,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 
 		await page.keyboard.type( '@შოთა' );

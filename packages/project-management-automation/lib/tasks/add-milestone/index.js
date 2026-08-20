@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const debug = require( '../../debug' );
 const getAssociatedPullRequest = require( '../../get-associated-pull-request' );
 
@@ -111,7 +108,7 @@ async function addMilestone( payload, octokit ) {
 	const {
 		// The types for the `getContent` response are incorrect.
 		// see https://github.com/octokit/rest.js/issues/32
-		// @ts-ignore
+		// @ts-expect-error The `getContent` response is a union that may be a directory listing.
 		data: { content, encoding },
 	} = await octokit.rest.repos.getContent( {
 		owner,

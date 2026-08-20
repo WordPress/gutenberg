@@ -1,23 +1,11 @@
-/**
- * External dependencies
- */
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import ColorListPicker from './color-list-picker';
 import CircularOptionPicker, {
 	getComputeCircularOptionPickerCommonProps,
 } from '../circular-option-picker';
 import { VStack } from '../v-stack';
-
 import CustomDuotoneBar from './custom-duotone-bar';
 import { getDefaultColors, getGradientFromCSSColors } from './utils';
 import { Spacer } from '../spacer';

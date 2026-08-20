@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import deepFreeze from 'deep-freeze';
-
-/**
- * WordPress dependencies
- */
 import {
 	registerBlockType,
 	unregisterBlockType,
@@ -16,10 +9,6 @@ import {
 	getBlockTypes,
 } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import * as _selectors from '../selectors';
 
 const selectors = { ..._selectors };

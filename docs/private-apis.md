@@ -29,6 +29,7 @@ Private actions:
 Private selectors:
 - `getAllBlockBindingsSources`
 - `getBlockBindingsSource`
+- `getBlockKeyboardShortcuts`
 - `getBootstrappedBlockType`
 - `getSupportedStyles`
 - `getUnprocessedBlockTypes`
@@ -40,7 +41,6 @@ Private exports:
 - `__experimentalPopoverLegacyPositionToPlacement`
 - `ComponentsContext`
 - `Tabs`
-- `Theme`
 - `Menu`
 - `kebabCase`
 
@@ -191,6 +191,10 @@ Private selectors:
 ## core-data
 
 Private exports:
+- `EntitiesSavedStates`
+- `EntitiesSavedStatesExtensible`
+- `getTemplateInfo`
+- `getTemplatePartIcon`
 - `useEntityRecordsWithPermissions`
 
 ### `core` store
@@ -243,7 +247,8 @@ Private selectors:
 ## block-library
 
 Private exports:
-- `BlockKeyboardShortcuts`
+- `NAVIGATION_OVERLAY_TEMPLATE_PART_AREA`
+- `NavigationLinkUI`
 
 ## router (private exports only)
 
@@ -262,7 +267,6 @@ Private exports:
 Private exports:
 - `CreateTemplatePartModal`
 - `BackButton`
-- `EntitiesSavedStatesExtensible`
 - `Editor`
 - `PluginPostExcerpt`
 - `PostCardPanel`
@@ -302,7 +306,6 @@ Private selectors:
 - `getListViewToggleRef`
 - `getPostBlocksByName`
 - `getPostIcon`
-- `hasPostMetaChanges`
 - `isEntityReady`
 
 ## edit-post
