@@ -55,6 +55,17 @@ test.describe( 'Suggest mode: the code editor', () => {
 		await admin.createNewPost();
 	} );
 
+	/*
+	 * `editorMode` is persisted per user, so it is shared with every other
+	 * test in this worker. Reset it over REST rather than through the UI at
+	 * the end of a test body: a failure part-way through would otherwise
+	 * leave the worker in the code editor and take unrelated specs down with
+	 * it.
+	 */
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.setPreferences( 'core', { editorMode: 'visual' } );
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllComments( 'note' );
 		await requestUtils.setGutenbergExperiments( [] );
@@ -123,11 +134,6 @@ test.describe( 'Suggest mode: the code editor', () => {
 		// The preference was masked, not rewritten, so Editing restores it.
 		await switchIntent( page, 'Editing' );
 		await expect( page.locator( TEXT_EDITOR ) ).toBeVisible();
-
-		// `editorMode` is a persisted preference shared by every test in this
-		// worker, so hand the next one back a visual editor.
-		await switchEditorMode( page, 'Visual editor' );
-		await expect( page.locator( TEXT_EDITOR ) ).toBeHidden();
 	} );
 
 	test( 'the toggle-mode shortcut cannot expose a pending suggestion as raw HTML', async ( {
