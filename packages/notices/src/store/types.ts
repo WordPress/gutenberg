@@ -1,3 +1,5 @@
+import type { MouseEventHandler } from 'react';
+
 /**
  * Object describing a user action option associated with a notice.
  */
@@ -8,14 +10,16 @@ export type NoticeAction = {
 	label: string;
 
 	/**
-	 * Optional URL of resource if action incurs browser navigation.
+	 * Optional URL of resource if action incurs browser navigation. When both
+	 * `url` and `onClick` are provided, `url` takes precedence and the action
+	 * is rendered as an anchor.
 	 */
 	url?: string;
 
 	/**
 	 * Optional function to invoke when action is triggered by user.
 	 */
-	onClick?: VoidFunction;
+	onClick?: MouseEventHandler< HTMLAnchorElement | HTMLButtonElement >;
 };
 
 /**
