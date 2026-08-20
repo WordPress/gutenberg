@@ -47,14 +47,16 @@ export default function SitePreview() {
 	const [ isVisitLoading, setIsVisitLoading ] = useState( false );
 	const [ isEditLoading, setIsEditLoading ] = useState( false );
 	const { siteUrl, siteIconUrl } = useSelect( ( select ) => {
-		const site = select( coreStore ).getEntityRecord< { url: string } >(
+		const site = select( coreStore ).getEntityRecord(
 			'root',
 			'site',
 			undefined
 		);
-		const base = select( coreStore ).getEntityRecord< {
-			site_icon_url?: string;
-		} >( 'root', '__unstableBase', undefined );
+		const base = select( coreStore ).getEntityRecord(
+			'root',
+			'__unstableBase',
+			undefined
+		);
 
 		return {
 			siteUrl: site?.url,
