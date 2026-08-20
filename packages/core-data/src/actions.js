@@ -430,9 +430,7 @@ export const deleteEntityRecord =
  *
  * @param {string}                  kind                 Kind of the edited entity record.
  * @param {string}                  name                 Name of the edited entity record.
- * @param {number|string|undefined} recordId             Record ID of the edited entity record. Pass
- *                                                       `undefined` for keyless entities, such as
- *                                                       site settings.
+ * @param {number|string|undefined} recordId             Pass `undefined` for keyless entities.
  * @param {Object}                  edits                The edits.
  * @param {Object}                  options              Options for the edit.
  * @param {boolean}                 [options.undoIgnore] Whether to ignore the edit in undo history or not.
@@ -542,8 +540,7 @@ export const editEntityRecord =
  *
  * @param {string}        kind       Kind of the entity.
  * @param {string}        name       Name of the entity.
- * @param {number|string} [recordId] Record ID of the entity record. Can be omitted for keyless
- *                                   entities, such as site settings.
+ * @param {number|string} [recordId] Is omitted for keyless entities.
  *
  * @return {Object} Action object.
  */
@@ -992,8 +989,7 @@ export const __experimentalBatch =
  *
  * @param {string}        kind       Kind of the entity.
  * @param {string}        name       Name of the entity.
- * @param {number|string} [recordId] ID of the record. Can be omitted for keyless entities, such as
- *                                   site settings.
+ * @param {number|string} [recordId] Is omitted for keyless entities.
  * @param {Object}        [options]  Saving options.
  */
 export const saveEditedEntityRecord =
