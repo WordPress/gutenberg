@@ -170,6 +170,58 @@ describe( 'getEntityRecord', () => {
 		);
 	} );
 
+	it( 'does not discard a response because a different record was received', async () => {
+		const POST = { slug: 'post' };
+		const PAGE = { slug: 'page' };
+
+		let deliverPostResponse;
+		const postResponseGate = new Promise( ( resolve ) => {
+			deliverPostResponse = resolve;
+		} );
+
+		triggerFetch
+			.mockImplementationOnce( () => ( {
+				json: () => postResponseGate.then( () => POST ),
+			} ) )
+			.mockImplementationOnce( () => ( {
+				json: () => Promise.resolve( PAGE ),
+			} ) );
+
+		// One record's request stays in flight while another one completes,
+		// as happens when several files are uploaded at once.
+		const postRequest = getEntityRecord(
+			'root',
+			'postType',
+			'post'
+		)( { dispatch, registry, resolveSelect } );
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+		await getEntityRecord(
+			'root',
+			'postType',
+			'page'
+		)( { dispatch, registry, resolveSelect } );
+
+		deliverPostResponse();
+		await postRequest;
+
+		// Records are only superseded by a newer response for the same
+		// request, so both are received.
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledTimes( 2 );
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+			'root',
+			'postType',
+			PAGE,
+			undefined
+		);
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+			'root',
+			'postType',
+			POST,
+			undefined
+		);
+	} );
+
 	it( 'loads entity with sync manager', async () => {
 		const POST_RECORD = { id: 1, title: 'Test Post' };
 		const POST_RESPONSE = {
