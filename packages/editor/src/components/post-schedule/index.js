@@ -36,10 +36,11 @@ export function PrivatePostSchedule( {
 	showPopoverHeaderActions,
 	isCompact,
 } ) {
-	const { postDate, postType } = useSelect(
+	const { postDate, postType, isDateFloating } = useSelect(
 		( select ) => ( {
 			postDate: select( editorStore ).getEditedPostAttribute( 'date' ),
 			postType: select( editorStore ).getCurrentPostType(),
+			isDateFloating: select( editorStore ).isEditedPostDateFloating(),
 		} ),
 		[]
 	);
@@ -112,6 +113,7 @@ export function PrivatePostSchedule( {
 				setPreviewedMonth( parseISO( date ) )
 			}
 			onClose={ onClose }
+			canReset={ ! isDateFloating }
 			isCompact={ isCompact }
 			showPopoverHeader={ showPopoverHeader }
 			showPopoverHeaderActions={ showPopoverHeaderActions }

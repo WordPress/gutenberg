@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Commands: Add a command palette entry that opens the current post on the front end once it is published, labelled with the post type's `view_item` label ([#66720](https://github.com/WordPress/gutenberg/pull/66720)).
+-   Pre-publish panel: Remove the "Visibility" and "Publish" headings that repeated the title of the panel containing them. The publish date's reset action, which lived in the removed header, becomes a button below the date picker and appears only when a date is set ([#81806](https://github.com/WordPress/gutenberg/pull/81806)).
 
 ### Bug Fixes
 

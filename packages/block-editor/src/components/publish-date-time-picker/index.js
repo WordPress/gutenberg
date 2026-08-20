@@ -8,6 +8,7 @@ export function PublishDateTimePicker(
 	{
 		onClose,
 		onChange,
+		canReset = true,
 		showPopoverHeader = true,
 		showPopoverHeaderActions,
 		isCompact,
@@ -26,16 +27,20 @@ export function PublishDateTimePicker(
 	};
 	const DatePickerComponent = isCompact ? TimePicker : DateTimePicker;
 	const resetDate = () => onChange?.( null );
+	// Resetting a date that is already unset does nothing, so offer the action
+	// only when there is a date to clear.
+	const showHeaderReset = showPopoverHeaderActions && canReset;
+	const showInlineReset = ! showPopoverHeader && canReset;
 	return (
 		<div ref={ ref } className="block-editor-publish-date-time-picker">
 			{ showPopoverHeader && (
 				<InspectorPopoverHeader
 					title={ title || __( 'Publish' ) }
 					actions={
-						showPopoverHeaderActions
+						showHeaderReset
 							? [
 									{
-										label: __( 'Now' ),
+										label: __( 'Reset' ),
 										onClick: resetDate,
 									},
 							  ]
@@ -44,19 +49,19 @@ export function PublishDateTimePicker(
 					onClose={ onClose }
 				/>
 			) }
+			<DatePickerComponent { ...datePickerProps } />
 			{ /* Without the popover header there is nowhere for the reset
-			     action to live, so it leads the picker as a button. */ }
-			{ ! showPopoverHeader && (
+			     action to live, so it closes the picker as a button. */ }
+			{ showInlineReset && (
 				<Button
 					className="block-editor-publish-date-time-picker__reset"
 					variant="secondary"
 					__next40pxDefaultSize
 					onClick={ resetDate }
 				>
-					{ __( 'Now' ) }
+					{ __( 'Reset' ) }
 				</Button>
 			) }
-			<DatePickerComponent { ...datePickerProps } />
 		</div>
 	);
 }
