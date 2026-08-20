@@ -5,12 +5,18 @@ const mockWriteToBuffer = jest.fn( () => ( {
 	buffer: '',
 } ) );
 
+// Controls the `palette` metadata field reported by the mocked source image,
+// which libvips sets for indexed sources.
+let mockPalette = 0;
+
 class MockImage {
 	width = 100;
 	height = 100;
 	pageHeight = 100;
 	writeToBuffer = mockWriteToBuffer;
-	getInt = jest.fn( () => 0 );
+	getInt = jest.fn( ( name: string ) =>
+		'palette' === name ? mockPalette : 0
+	);
 }
 
 class MockVipsImage {
@@ -29,6 +35,7 @@ jest.mock( 'wasm-vips', () =>
 describe( 'convertImageFormat', () => {
 	afterEach( () => {
 		jest.clearAllMocks();
+		mockPalette = 0;
 	} );
 
 	it( 'loads only the first frame when converting a GIF to JPEG', async () => {
@@ -93,5 +100,69 @@ describe( 'convertImageFormat', () => {
 		);
 
 		expect( mockNewFromBuffer ).toHaveBeenCalledWith( buffer, '', {} );
+	} );
+
+	describe( 'indexed (palette) PNG', () => {
+		/*
+		 * Regression tests for https://core.trac.wordpress.org/ticket/65922.
+		 * libvips decodes an indexed PNG into RGB(A) pixels, so pngsave has to
+		 * be told to quantise back down. Otherwise compressing or converting
+		 * to PNG rewrites the image as truecolour and inflates it.
+		 */
+		it( 'quantises a compressed indexed PNG back to a palette', async () => {
+			mockPalette = 1;
+			const pngFile = new File( [ '<BLOB>' ], 'example.png', {
+				type: 'image/png',
+			} );
+			const buffer = await pngFile.arrayBuffer();
+
+			await compressImage( 'itemId', buffer, 'image/png' );
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.png',
+				expect.objectContaining( { palette: true } )
+			);
+			// `Q` is pngsave's quantisation quality and only applies once
+			// `palette` is on, so the lossy image quality must not leak in.
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.png',
+				expect.not.objectContaining( { Q: expect.anything() } )
+			);
+		} );
+
+		it( 'leaves a truecolour PNG unquantised', async () => {
+			mockPalette = 0;
+			const pngFile = new File( [ '<BLOB>' ], 'example.png', {
+				type: 'image/png',
+			} );
+			const buffer = await pngFile.arrayBuffer();
+
+			await compressImage( 'itemId', buffer, 'image/png' );
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.png',
+				expect.not.objectContaining( { palette: expect.anything() } )
+			);
+		} );
+
+		it( 'does not quantise when converting an indexed source away from PNG', async () => {
+			mockPalette = 1;
+			const pngFile = new File( [ '<BLOB>' ], 'example.png', {
+				type: 'image/png',
+			} );
+			const buffer = await pngFile.arrayBuffer();
+
+			await convertImageFormat(
+				'itemId',
+				buffer,
+				'image/png',
+				'image/webp'
+			);
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.webp',
+				expect.not.objectContaining( { palette: expect.anything() } )
+			);
+		} );
 	} );
 } );

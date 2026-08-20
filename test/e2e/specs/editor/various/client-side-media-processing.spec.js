@@ -45,6 +45,35 @@ async function probeUltraHdrUrl( url ) {
 }
 
 /**
+ * Colour type 3 in a PNG header means the image is palette (indexed) encoded.
+ *
+ * @type {number}
+ */
+const PNG_COLOR_TYPE_INDEXED = 3;
+
+/**
+ * Downloads a PNG and reads its colour type straight out of the IHDR chunk.
+ *
+ * The IHDR chunk always comes first: an 8-byte signature, a 4-byte length, the
+ * 4-byte chunk type, then width (4), height (4), bit depth (1) and colour
+ * type (1). That puts the colour type at a fixed offset of 25.
+ *
+ * @param {string} url PNG URL to fetch.
+ * @return {Promise<{ colorType: number, byteLength: number }>} Probe result.
+ */
+async function probePngUrl( url ) {
+	const response = await fetch( url );
+	if ( ! response.ok ) {
+		throw new Error( `Failed to fetch ${ url }: ${ response.status }` );
+	}
+	const bytes = new Uint8Array( await response.arrayBuffer() );
+	return {
+		colorType: bytes[ 25 ],
+		byteLength: bytes.byteLength,
+	};
+}
+
+/**
  * @typedef {import('@playwright/test').Page} Page
  */
 
@@ -344,6 +373,49 @@ test.describe( 'Client-side media processing', () => {
 			expect( probed.width ).toBe( size.width );
 			expect( probed.height ).toBe( size.height );
 		}
+	} );
+
+	test( 'keeps sub-sizes of an indexed PNG indexed', async ( {
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		/*
+		 * Regression test for https://core.trac.wordpress.org/ticket/65922.
+		 *
+		 * libvips decodes an indexed (palette) PNG into full RGB(A) pixels.
+		 * Without asking pngsave to quantise back down, every sub-size was
+		 * written as truecolour, which for palette artwork is several times
+		 * larger than the indexed original — the "large" sub-size of this
+		 * fixture came out at roughly twice the size of the full-size file.
+		 */
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
+			'2000x1200_e2e_test_image_indexed.png'
+		);
+
+		expect( media.mime_type ).toBe( 'image/png' );
+		expect( media.media_details.width ).toBe( 2000 );
+		expect( media.media_details.height ).toBe( 1200 );
+
+		// The uploaded original must still be indexed, so the sub-sizes below
+		// are compared against a like-for-like baseline.
+		const fullSize = await probePngUrl( media.source_url );
+		expect( fullSize.colorType ).toBe( PNG_COLOR_TYPE_INDEXED );
+
+		const large = media.media_details.sizes.large;
+		expect( large ).toBeDefined();
+
+		const subSize = await probePngUrl( large.source_url );
+
+		// The sub-size must stay indexed rather than being re-encoded as
+		// truecolour RGB/RGBA.
+		expect( subSize.colorType ).toBe( PNG_COLOR_TYPE_INDEXED );
+
+		// And the user-visible symptom: a downscaled sub-size must not be
+		// bigger than the full-size image it was generated from.
+		expect( subSize.byteLength ).toBeLessThan( fullSize.byteLength );
 	} );
 
 	test( 'scales oversized images and generates the standard sub-sizes', async ( {

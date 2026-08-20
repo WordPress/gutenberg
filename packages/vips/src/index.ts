@@ -201,6 +201,19 @@ export async function convertImageFormat(
 			saveOptions.interlace = interlaced;
 		}
 
+		// Keep indexed sources indexed. libvips decodes a palette image into
+		// RGB(A) pixels, so without this a compressed or converted PNG is
+		// written as truecolour and can grow several times larger than the
+		// indexed original. `Q` is dropped for the same reason as in
+		// `buildSaveOptions`: it is pngsave's quantisation quality, it only
+		// applies once `palette` is on, and a lower target makes the file
+		// bigger rather than smaller.
+		// See https://core.trac.wordpress.org/ticket/65922.
+		if ( 'image/png' === outputType && isPaletteImage( image ) ) {
+			saveOptions.palette = true;
+			delete saveOptions.Q;
+		}
+
 		// See https://github.com/swissspidy/media-experiments/issues/324.
 		if ( 'image/avif' === outputType ) {
 			saveOptions.effort = 2;
@@ -394,6 +407,29 @@ function applyResizeAndCrop<
 }
 
 /**
+ * Determines whether a decoded image came from an indexed (palette) source.
+ *
+ * libvips decodes indexed images into full RGB(A) pixels and flags the source
+ * encoding with a `palette` metadata field. Writing such an image back out
+ * without asking for quantisation produces a truecolour PNG, which for
+ * palette-based artwork is typically several times larger than the indexed
+ * original. See https://core.trac.wordpress.org/ticket/65922.
+ *
+ * @param image Decoded vips image.
+ * @return Whether the source image used a palette.
+ */
+function isPaletteImage< T extends { getInt: ( name: string ) => number } >(
+	image: T
+): boolean {
+	try {
+		return image.getInt( 'palette' ) === 1;
+	} catch {
+		// Field absent: the source was not indexed.
+		return false;
+	}
+}
+
+/**
  * Reads the source bit depth of a decoded HEIF/AVIF image.
  *
  * High-bit-depth (10/12-bit) AVIF/HEIF images decode into a 16-bit `ushort`
@@ -449,13 +485,15 @@ function resolveSaveBitdepth(
  * @param bitdepth  Save bit depth; values above 8 are preserved for AVIF.
  * @param stripMeta Whether to strip metadata (except color profiles),
  *                  from the `image_strip_meta` filter.
+ * @param isPalette Whether the source image was indexed (palette) encoded.
  * @return Save options object.
  */
 function buildSaveOptions(
 	type: string,
 	quality: number,
 	bitdepth = 8,
-	stripMeta = true
+	stripMeta = true,
+	isPalette = false
 ): SaveOptions< typeof type > {
 	const saveOptions: SaveOptions< typeof type > = {
 		// Strip metadata except ICC color profiles or gainmaps,
@@ -466,6 +504,23 @@ function buildSaveOptions(
 
 	if ( supportsQuality( type ) ) {
 		saveOptions.Q = quality * 100;
+	}
+
+	// Keep indexed sources indexed. libvips decodes a palette PNG into RGB(A)
+	// pixels, so without this the sub-sizes are written as truecolour and can
+	// end up larger than the indexed original.
+	// See https://core.trac.wordpress.org/ticket/65922.
+	if ( 'image/png' === type && isPalette ) {
+		saveOptions.palette = true;
+		/*
+		 * `Q` is pngsave's quantisation quality, and libvips only reads it
+		 * once `palette` is on. PNG output in WordPress core is lossless, so
+		 * the image quality setting must not start degrading the palette here.
+		 * It would not even trade quality for bytes: libimagequant answers a
+		 * lower target by picking fewer colours and dithering harder, which
+		 * makes the file bigger, not smaller.
+		 */
+		delete saveOptions.Q;
 	}
 
 	// See https://github.com/swissspidy/media-experiments/issues/324.
@@ -650,7 +705,8 @@ export async function resizeImage(
 			type,
 			quality,
 			saveBitdepth,
-			stripMeta
+			stripMeta,
+			isPaletteImage( sourceImage )
 		);
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
 

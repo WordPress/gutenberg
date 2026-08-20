@@ -13,6 +13,10 @@ const mockWriteToBuffer = jest.fn( () => ( {
 // tests can exercise both the standard (8-bit) and high-bit-depth code paths.
 let mockBitdepth = 8;
 
+// Controls the `palette` metadata field reported by the mocked source image,
+// which libvips sets for indexed sources.
+let mockPalette = 0;
+
 class MockImage {
 	width = 100;
 	height = 100;
@@ -20,9 +24,15 @@ class MockImage {
 	crop = mockCrop;
 	resize = mockResize;
 	writeToBuffer = mockWriteToBuffer;
-	getInt = jest.fn( ( name: string ) =>
-		'heif-bitdepth' === name ? mockBitdepth : 0
-	);
+	getInt = jest.fn( ( name: string ) => {
+		if ( 'heif-bitdepth' === name ) {
+			return mockBitdepth;
+		}
+		if ( 'palette' === name ) {
+			return mockPalette;
+		}
+		return 0;
+	} );
 }
 
 class MockVipsImage {
@@ -43,6 +53,7 @@ describe( 'resizeImage', () => {
 	afterEach( () => {
 		jest.clearAllMocks();
 		mockBitdepth = 8;
+		mockPalette = 0;
 	} );
 
 	it( 'resizes without crop', async () => {
@@ -491,6 +502,74 @@ describe( 'resizeImage', () => {
 			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
 				'.avif',
 				expect.objectContaining( { bitdepth: 10 } )
+			);
+		} );
+	} );
+	describe( 'indexed (palette) PNG', () => {
+		/*
+		 * Regression tests for https://core.trac.wordpress.org/ticket/65922.
+		 * libvips decodes an indexed PNG into RGB(A) pixels, so pngsave has to
+		 * be told to quantise back down. Otherwise every sub-size is written
+		 * as truecolour and can be larger than the indexed original.
+		 */
+		it( 'quantises sub-sizes of an indexed PNG back to a palette', async () => {
+			mockPalette = 1;
+			const pngFile = new File( [ '<BLOB>' ], 'example.png', {
+				type: 'image/png',
+			} );
+			const buffer = await pngFile.arrayBuffer();
+
+			await resizeImage( 'itemId', buffer, 'image/png', {
+				width: 50,
+				height: 50,
+			} );
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.png',
+				expect.objectContaining( { palette: true } )
+			);
+			// `Q` is pngsave's quantisation quality and only applies once
+			// `palette` is on, so the lossy image quality must not leak in.
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.png',
+				expect.not.objectContaining( { Q: expect.anything() } )
+			);
+		} );
+
+		it( 'leaves a truecolour PNG unquantised', async () => {
+			mockPalette = 0;
+			const pngFile = new File( [ '<BLOB>' ], 'example.png', {
+				type: 'image/png',
+			} );
+			const buffer = await pngFile.arrayBuffer();
+
+			await resizeImage( 'itemId', buffer, 'image/png', {
+				width: 50,
+				height: 50,
+			} );
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.png',
+				expect.not.objectContaining( { palette: expect.anything() } )
+			);
+		} );
+
+		it( 'does not quantise non-PNG output from an indexed source', async () => {
+			// A GIF is always indexed, but only pngsave takes `palette`.
+			mockPalette = 1;
+			const gifFile = new File( [ '<BLOB>' ], 'example.gif', {
+				type: 'image/gif',
+			} );
+			const buffer = await gifFile.arrayBuffer();
+
+			await resizeImage( 'itemId', buffer, 'image/gif', {
+				width: 50,
+				height: 50,
+			} );
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.gif',
+				expect.not.objectContaining( { palette: expect.anything() } )
 			);
 		} );
 	} );
