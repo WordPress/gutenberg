@@ -3,7 +3,7 @@ import { ValidityIndicator } from '../index';
 
 const meta: Meta< typeof ValidityIndicator > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Form/ValidityIndicator',
+	title: 'Design System/Components/Form/Primitives/ValidityIndicator',
 	component: ValidityIndicator,
 	// Temporary: Due to an upstream bug, render the root explicitly so the
 	// components manifest extractor can resolve props from the JSX.

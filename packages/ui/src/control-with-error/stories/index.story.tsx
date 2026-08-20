@@ -6,7 +6,7 @@ import { InputControl } from '../../form';
 
 const meta: Meta< typeof ControlWithError > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Form/ControlWithError',
+	title: 'Design System/Components/Form/Primitives/ControlWithError',
 	component: ControlWithError,
 	argTypes: {
 		children: { control: false },
