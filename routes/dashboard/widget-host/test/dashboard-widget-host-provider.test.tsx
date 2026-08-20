@@ -5,7 +5,8 @@ import type { Ref } from 'react';
 import { DashboardWidgetHostProvider } from '../dashboard-widget-host-provider';
 
 jest.mock( '@wordpress/route', () => {
-	const { createElement, forwardRef } = require( '@wordpress/element' );
+	const { createElement, forwardRef } =
+		jest.requireActual( '@wordpress/element' );
 	return {
 		Link: forwardRef(
 			(
