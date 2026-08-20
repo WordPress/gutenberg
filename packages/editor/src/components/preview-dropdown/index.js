@@ -21,7 +21,6 @@ import { sidebars } from '../sidebar/constants';
 import { VIEWPORT_STATE_BY_DEVICE_TYPE } from '../../utils/device-type';
 import { unlock } from '../../lock-unlock';
 import { shouldShowTemplateOption } from './utils';
-import { TEMPLATE_PART_POST_TYPE } from '../../store/constants';
 
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
@@ -31,12 +30,12 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		homeUrl,
 		hasMobileViewport,
 		hasTabletViewport,
+		currentPostType,
 		isTemplate,
 		isViewable,
 		showIconLabels,
 		isTemplateHidden,
 		templateId,
-		isFocusedTemplatePart,
 		isResponsiveEditing,
 		isResponsiveEditingEnabled,
 		hasBlockSelection,
@@ -57,7 +56,6 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		const { getEntityRecord, getPostType } = select( coreStore );
 		const { get } = select( preferencesStore );
 		const _currentPostType = getCurrentPostType();
-		const editorSettings = getEditorSettings();
 		const viewportBreakpoints = getViewportBreakpoints(
 			getSettings().__experimentalFeatures?.viewport
 		);
@@ -66,16 +64,15 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			homeUrl: getEntityRecord( 'root', '__unstableBase' )?.home,
 			hasMobileViewport: viewportBreakpoints.mobile !== undefined,
 			hasTabletViewport: viewportBreakpoints.tablet !== undefined,
+			currentPostType: _currentPostType,
 			isTemplate: _currentPostType === 'wp_template',
 			isViewable: getPostType( _currentPostType )?.viewable ?? false,
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isTemplateHidden: getRenderingMode() === 'post-only',
 			templateId: getCurrentTemplateId(),
-			isFocusedTemplatePart:
-				_currentPostType === TEMPLATE_PART_POST_TYPE &&
-				!! editorSettings.onNavigateToPreviousEntityRecord,
 			isResponsiveEditing: _isResponsiveEditing(),
-			isResponsiveEditingEnabled: editorSettings.responsiveEditingEnabled,
+			isResponsiveEditingEnabled:
+				getEditorSettings().responsiveEditingEnabled,
 			hasBlockSelection: !! getBlockSelectionStart(),
 			activeComplementaryArea:
 				select( interfaceStore ).getActiveComplementaryArea( 'core' ),
@@ -237,9 +234,8 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 						</MenuGroup>
 					) }
 					{ shouldShowTemplateOption( {
-						isTemplate,
+						postType: currentPostType,
 						templateId,
-						isFocusedTemplatePart,
 					} ) && (
 						<MenuGroup>
 							<MenuItem

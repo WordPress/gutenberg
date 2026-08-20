@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   View menu: Hide the "Show template" option when editing a focused template part in the site editor.
+-   View menu: Hide the "Show template" option when editing a template part, pattern, or navigation menu in the site editor ([#81868](https://github.com/WordPress/gutenberg/pull/81868)).
 -   Register the editor and block editor keyboard shortcuts from the editor provider, so shortcuts work for consumers that mount the editor without rendering `EditorKeyboardShortcutsRegister` themselves ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
 -   Header: Allow the Back button column to grow when "Show button text labels" is enabled so the label is not obscured by the following controls ([#81701](https://github.com/WordPress/gutenberg/pull/81701)).
 -   Notes: Stop forcing capitalization of the user name in a note byline, so the name is shown as the user set it ([#81788](https://github.com/WordPress/gutenberg/pull/81788)).

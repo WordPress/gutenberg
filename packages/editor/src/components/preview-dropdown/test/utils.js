@@ -4,39 +4,31 @@ describe( 'shouldShowTemplateOption', () => {
 	it( 'shows the template option when editing content with a template', () => {
 		expect(
 			shouldShowTemplateOption( {
-				isTemplate: false,
+				postType: 'post',
 				templateId: 'theme//single',
-				isFocusedTemplatePart: false,
 			} )
 		).toBe( true );
-	} );
-
-	it( 'hides the template option when editing a focused template part', () => {
-		expect(
-			shouldShowTemplateOption( {
-				isTemplate: false,
-				templateId: 'theme//single',
-				isFocusedTemplatePart: true,
-			} )
-		).toBe( false );
-	} );
-
-	it( 'hides the template option when editing a template', () => {
-		expect(
-			shouldShowTemplateOption( {
-				isTemplate: true,
-				templateId: 'theme//single',
-				isFocusedTemplatePart: false,
-			} )
-		).toBe( false );
 	} );
 
 	it( 'hides the template option when there is no template', () => {
 		expect(
 			shouldShowTemplateOption( {
-				isTemplate: false,
+				postType: 'post',
 				templateId: undefined,
-				isFocusedTemplatePart: false,
+			} )
+		).toBe( false );
+	} );
+
+	it.each( [
+		'wp_template',
+		'wp_template_part',
+		'wp_block',
+		'wp_navigation',
+	] )( 'hides the template option when editing a %s', ( postType ) => {
+		expect(
+			shouldShowTemplateOption( {
+				postType,
+				templateId: 'theme//single',
 			} )
 		).toBe( false );
 	} );
