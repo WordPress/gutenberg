@@ -140,7 +140,7 @@ export function WidgetFooter( {
 							<Link
 								key={ action.id }
 								className={ className }
-								render={ <HostLink to={ route.to } /> }
+								render={ <HostLink path={ route.path } /> }
 							>
 								{ children }
 							</Link>
@@ -171,7 +171,7 @@ export function WidgetFooter( {
 							const route = getActionRoute( links, action );
 							const routeRender =
 								route && HostLink ? (
-									<HostLink to={ route.to } />
+									<HostLink path={ route.path } />
 								) : undefined;
 
 							if ( action.icon ) {

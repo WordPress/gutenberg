@@ -47,11 +47,11 @@ export function matchDashboardHref(
 		}
 	}
 
-	const to = url.searchParams.get( 'p' ) || '/';
+	const path = url.searchParams.get( 'p' ) || '/';
 
-	if ( to.includes( '?' ) || to.includes( '#' ) ) {
+	if ( path.includes( '?' ) || path.includes( '#' ) ) {
 		return null;
 	}
 
-	return { to };
+	return { path };
 }

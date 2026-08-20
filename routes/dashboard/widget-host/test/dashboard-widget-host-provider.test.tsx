@@ -34,7 +34,7 @@ function LinkProbe( {
 	const HostLink = links.Link;
 
 	return (
-		<HostLink ref={ linkRef } to="/reports">
+		<HostLink ref={ linkRef } path="/reports">
 			Reports
 		</HostLink>
 	);

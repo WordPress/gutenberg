@@ -13,7 +13,7 @@ export interface WidgetHostRouteMatch {
 	/**
 	 * Route path inside the host's router.
 	 */
-	to: string;
+	path: string;
 }
 
 /**
@@ -34,7 +34,7 @@ export interface WidgetHostLinks {
 	 * where menus and tooltips reach their anchor through the ref.
 	 */
 	Link: ComponentType<
-		{ to: string } & ComponentPropsWithoutRef< 'a' > &
+		{ path: string } & ComponentPropsWithoutRef< 'a' > &
 			RefAttributes< HTMLAnchorElement >
 	>;
 }

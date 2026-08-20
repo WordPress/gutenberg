@@ -36,7 +36,7 @@
   <text x="356" y="180" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10" fill="#475569">useWidgetHost()</text>
   <text x="356" y="198" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10" fill="#475569">links.match( href )</text>
   <line x1="352" y1="210" x2="544" y2="210" stroke="#e2e8f0" stroke-width="1"/>
-  <text x="356" y="230" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10.5" font-weight="700" fill="#1d6b5a">&lt;Link to='/reports' /&gt;</text>
+  <text x="356" y="230" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10.5" font-weight="700" fill="#1d6b5a">&lt;Link path='/reports' /&gt;</text>
   <text x="356" y="248" font-family="-apple-system, system-ui, sans-serif" font-size="9.5" fill="#94a3b8">a real anchor · navigates client-side</text>
 
   <!-- Capability flow -->
