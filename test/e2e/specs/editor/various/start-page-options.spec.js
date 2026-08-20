@@ -55,6 +55,10 @@ test.describe( 'Start page options', () => {
 		const searchBox = modal.getByRole( 'searchbox', { name: 'Search' } );
 		await searchBox.fill( 'Services' );
 		await expect( patterns ).toHaveText( [ 'Services page' ] );
+
+		// A message is displayed when the search matches no patterns.
+		await searchBox.fill( 'Nonexistent' );
+		await expect( modal.getByText( 'No results found.' ) ).toBeVisible();
 		await searchBox.clear();
 
 		// Choosing a pattern applies it to the page content.
