@@ -27,7 +27,7 @@
 
 -   `ConfirmDialog`: Preserve `title` as the dialog's accessible name when the header is hidden ([#81847](https://github.com/WordPress/gutenberg/pull/81847)).
 -   `DuotonePicker`: Do not render the custom controls wrapper when `disableCustomDuotone` is set, so a read-only picker no longer adds trailing padding below its swatches ([#81605](https://github.com/WordPress/gutenberg/pull/81605)).
--   `DuotonePicker`: Stop the duotone bar offering to move its control points. It announced that arrow keys and dragging change the gradient position, but a duotone is two colors with no positions, so the move was discarded. `CustomGradientBar` gains a `disablePositioning` prop for this ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
+-   `DuotonePicker`: Stop the duotone bar offering to move its control points. It announced that arrow keys and dragging change the gradient position, but a duotone is two colors with no positions, so the move was discarded. `CustomGradientBar` gains a `disablePositioning` prop for this ([#81850](https://github.com/WordPress/gutenberg/pull/81850)).
 -   `Modal`: Prevent an Escape key press that dismisses the modal from propagating to underlying overlays. ([#81785](https://github.com/WordPress/gutenberg/pull/81785))
 -   `BoxControl`: Update the opposite side when ALT is held on the left or right input, which each updated themselves instead ([#81530](https://github.com/WordPress/gutenberg/pull/81530)).
 -   `InputControl`: Vertically center the value of date and time inputs in Safari ([#81361](https://github.com/WordPress/gutenberg/pull/81361)).
