@@ -39,6 +39,12 @@ export interface ItemProps {
 	 */
 	size?: ItemSize;
 	/**
+	 * A CSS class to add to the wrapper element that `Item` renders around its
+	 * contents. The class is added alongside the wrapper's own class, which
+	 * `ItemGroup` relies on for its borders and rounded corners.
+	 */
+	wrapperClassName?: string;
+	/**
 	 * The children elements.
 	 */
 	children: React.ReactNode;
