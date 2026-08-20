@@ -1,56 +1,28 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import {
+	fireEvent,
+	render,
+	screen,
+	waitFor,
+	within,
+} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import {
+	BlockContextProvider,
+	BlockControls,
+	BlockEdit,
+	BlockEditorProvider,
+	InspectorControls,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { createBlobURL } from '@wordpress/blob';
+import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
-import PlaylistTrackEdit from '../edit';
+import { useLayoutEffect } from '@wordpress/element';
+import { addFilter, removeFilter } from '@wordpress/hooks';
+import { registerCoreBlocks } from '@wordpress/block-library';
 import { PlaylistContext } from '../../playlist/context';
-import { useUploadMediaFromBlobURL } from '../../utils/hooks';
 
-let mockMediaReplaceFlowProps;
-
-jest.mock( '@wordpress/block-editor', () => {
-	const PlainText = jest.requireActual(
-		'../../../../block-editor/src/components/plain-text'
-	).default;
-
-	return {
-		BlockControls: ( { children } ) => <div>{ children }</div>,
-		BlockIcon: () => <span />,
-		InspectorControls: ( { children } ) => <div>{ children }</div>,
-		MediaPlaceholder: () => <div />,
-		MediaReplaceFlow: ( props ) => {
-			mockMediaReplaceFlowProps = props;
-			const { name, onSelect } = props;
-			return <button onClick={ () => onSelect( {} ) }>{ name }</button>;
-		},
-		MediaUpload: ( { render: renderMediaUpload } ) =>
-			renderMediaUpload( { open: jest.fn() } ),
-		MediaUploadCheck: ( { children } ) => <div>{ children }</div>,
-		PlainText,
-		useBlockProps: jest.fn( () => ( {} ) ),
-	};
-} );
-
-jest.mock( '@wordpress/data', () => {
-	const data = jest.requireActual( '@wordpress/data' );
-	const mockUseDispatch = jest.fn();
-
-	return new Proxy( data, {
-		get( target, property ) {
-			if ( property === 'useDispatch' ) {
-				return mockUseDispatch;
-			}
-
-			return target[ property ];
-		},
-	} );
-} );
-
-jest.mock( '@wordpress/notices', () => ( {
-	store: 'core/notices',
-} ) );
-
-jest.mock( '../../utils/hooks', () => ( {
-	useUploadMediaFromBlobURL: jest.fn(),
-} ) );
+const MEDIA_UPLOAD_FILTER = 'core/playlist-track/test/media-upload';
 
 const defaultAttributes = {
 	id: 1,
@@ -63,44 +35,94 @@ const defaultAttributes = {
 	title: 'Song One',
 };
 
+function MediaUploadSettings( { mediaUpload } ) {
+	const { updateSettings } = useDispatch( blockEditorStore );
+
+	useLayoutEffect( () => {
+		updateSettings( { mediaUpload } );
+	}, [ mediaUpload, updateSettings ] );
+
+	return null;
+}
+
+function addMediaUploadFilter( media ) {
+	addFilter(
+		'editor.MediaUpload',
+		MEDIA_UPLOAD_FILTER,
+		() =>
+			function TestMediaUpload( {
+				render: renderMediaUpload,
+				onSelect,
+			} ) {
+				return renderMediaUpload( {
+					open: () => onSelect( media ),
+				} );
+			}
+	);
+}
+
 function renderEdit( props = {} ) {
 	const setAttributes = jest.fn();
 	const setCurrentTrackClientId = props.setCurrentTrackClientId || jest.fn();
+	const mediaUpload = props.mediaUpload || jest.fn();
 
 	render(
-		<PlaylistContext.Provider
-			value={ {
-				currentTrackClientId: props.currentTrackClientId ?? null,
-				setCurrentTrackClientId,
+		<BlockEditorProvider
+			value={ [] }
+			onInput={ jest.fn() }
+			onChange={ jest.fn() }
+			settings={ {
+				mediaUpload,
 			} }
 		>
-			<PlaylistTrackEdit
-				attributes={ {
-					...defaultAttributes,
-					...props.attributes,
+			<MediaUploadSettings mediaUpload={ mediaUpload } />
+			<PlaylistContext.Provider
+				value={ {
+					currentTrackClientId: props.currentTrackClientId ?? null,
+					setCurrentTrackClientId,
 				} }
-				setAttributes={ setAttributes }
-				context={ {
-					showArtists: true,
-					showImages: true,
-					...props.context,
-				} }
-				clientId={ props.clientId || 'playlist-track-client-id' }
-				isSelected={ props.isSelected ?? false }
-			/>
-		</PlaylistContext.Provider>
+			>
+				<BlockContextProvider
+					value={ {
+						showArtists: true,
+						showImages: true,
+						...props.context,
+					} }
+				>
+					<BlockEdit
+						name="core/playlist-track"
+						attributes={ {
+							...defaultAttributes,
+							...props.attributes,
+						} }
+						setAttributes={ setAttributes }
+						clientId={
+							props.clientId || 'playlist-track-client-id'
+						}
+						isSelected={ props.isSelected ?? false }
+						mayDisplayControls
+					/>
+					<BlockControls.Slot group="other" />
+					<InspectorControls.Slot />
+				</BlockContextProvider>
+			</PlaylistContext.Provider>
+		</BlockEditorProvider>
 	);
 
-	return { setAttributes, setCurrentTrackClientId };
+	return { mediaUpload, setAttributes, setCurrentTrackClientId };
 }
 
 describe( 'PlaylistTrackEdit', () => {
-	beforeEach( () => {
-		mockMediaReplaceFlowProps = undefined;
-		useDispatch.mockReturnValue( {
-			createErrorNotice: jest.fn(),
-		} );
-		useUploadMediaFromBlobURL.mockClear();
+	beforeAll( () => {
+		registerCoreBlocks();
+	} );
+
+	afterEach( () => {
+		removeFilter( 'editor.MediaUpload', MEDIA_UPLOAD_FILTER );
+	} );
+
+	afterAll( () => {
+		getBlockTypes().forEach( ( { name } ) => unregisterBlockType( name ) );
 	} );
 
 	it( 'allows the track image alternative text to be edited', () => {
@@ -164,33 +186,63 @@ describe( 'PlaylistTrackEdit', () => {
 		expect( setCurrentTrackClientId ).not.toHaveBeenCalled();
 	} );
 
-	it( 'uploads temporary blob tracks', () => {
+	it( 'uploads temporary blob tracks', async () => {
+		const originalCreateObjectURL = window.URL.createObjectURL;
+		window.URL.createObjectURL = jest.fn( () => 'blob:temporary-track' );
+		const file = new File( [ 'audio' ], 'temporary-track.mp3', {
+			type: 'audio/mpeg',
+		} );
+		const temporaryURL = createBlobURL( file );
+		const mediaUpload = jest.fn();
+
 		renderEdit( {
 			attributes: {
-				blob: 'blob:https://example.com/temporary-track',
+				blob: temporaryURL,
 				length: undefined,
 				src: undefined,
 			},
+			mediaUpload,
 		} );
 
-		expect( useUploadMediaFromBlobURL ).toHaveBeenCalledWith(
-			expect.objectContaining( {
-				url: 'blob:https://example.com/temporary-track',
-			} )
-		);
-		const trackButton = screen.getByRole( 'button', {
-			name: /Song One/,
-		} );
+		try {
+			await waitFor( () =>
+				expect( mediaUpload ).toHaveBeenCalledWith(
+					expect.objectContaining( {
+						allowedTypes: [ 'audio' ],
+						filesList: [ file ],
+					} )
+				)
+			);
+			const trackButton = screen.getByRole( 'button', {
+				name: /Song One/,
+			} );
 
-		expect(
-			within( trackButton ).getByRole( 'presentation', { hidden: true } )
-		).toBeInTheDocument();
+			expect(
+				within( trackButton ).getByRole( 'presentation', {
+					hidden: true,
+				} )
+			).toBeInTheDocument();
+		} finally {
+			window.URL.createObjectURL = originalCreateObjectURL;
+		}
 	} );
 
-	it( 'preserves the current track source when a replacement upload fails', () => {
+	it( 'preserves the current track source when a replacement upload fails', async () => {
+		addMediaUploadFilter();
 		const { setAttributes } = renderEdit();
 
-		mockMediaReplaceFlowProps.onSelect();
+		const user = userEvent.setup();
+		await user.click(
+			screen.getByRole( 'button', {
+				expanded: false,
+				name: 'Replace',
+			} )
+		);
+		await user.click(
+			screen.getByRole( 'menuitem', {
+				name: 'Open Media Library',
+			} )
+		);
 
 		expect( setAttributes ).toHaveBeenCalledTimes( 1 );
 		expect( setAttributes.mock.calls[ 0 ][ 0 ] ).not.toHaveProperty(
@@ -198,14 +250,26 @@ describe( 'PlaylistTrackEdit', () => {
 		);
 	} );
 
-	it( 'accepts raw uploaded attachment data when replacing a track', () => {
-		const { setAttributes } = renderEdit();
-
-		mockMediaReplaceFlowProps.onSelect( {
+	it( 'accepts raw uploaded attachment data when replacing a track', async () => {
+		addMediaUploadFilter( {
 			id: 2,
 			source_url: 'https://example.com/replacement.mp3',
 			title: { raw: 'Replacement &amp; Track' },
 		} );
+		const { setAttributes } = renderEdit();
+
+		const user = userEvent.setup();
+		await user.click(
+			screen.getByRole( 'button', {
+				expanded: false,
+				name: 'Replace',
+			} )
+		);
+		await user.click(
+			screen.getByRole( 'menuitem', {
+				name: 'Open Media Library',
+			} )
+		);
 
 		expect( setAttributes ).toHaveBeenCalledWith(
 			expect.objectContaining( {
