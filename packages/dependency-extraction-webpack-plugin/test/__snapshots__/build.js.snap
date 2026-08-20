@@ -435,6 +435,24 @@ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`combine-assets\` sh
 ]
 `;
 
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`cyclic-dependency-graph\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array('wp-interactivity'), 'version' => '2f1a57170044bbe4b31e');
+"
+`;
+
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`cyclic-dependency-graph\` should produce expected output: External modules should match snapshot 1`] = `
+[
+  {
+    "externalType": "window",
+    "request": [
+      "wp",
+      "interactivity",
+    ],
+    "userRequest": "@wordpress/interactivity",
+  },
+]
+`;
+
 exports[`DependencyExtractionWebpackPlugin scripts Webpack \`cyclic-dynamic-dependency-graph\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
 "<?php return array('dependencies' => array('wp-interactivity'), 'version' => '44bef434347b4915f1aa');
 "
