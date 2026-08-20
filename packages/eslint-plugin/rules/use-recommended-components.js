@@ -16,12 +16,15 @@ const {
 const ALLOWLIST = {
 	'@wordpress/ui': {
 		allowed: [
+			'Autocomplete',
 			'Badge',
 			'Calendar',
 			'Card',
 			'Collapsible',
 			'CollapsibleCard',
 			'EmptyState',
+			'Field',
+			'Fieldset',
 			'Icon',
 			'Input',
 			'InputControl',

@@ -24,7 +24,7 @@ ruleTester.run( 'use-recommended-components', rule, {
 		"import { Link } from '@wordpress/ui';",
 		"import { Stack } from '@wordpress/ui';",
 		"import { Text } from '@wordpress/ui';",
-		"import { Badge, Icon, Link, Stack, Tabs, Text, Tooltip } from '@wordpress/ui';",
+		"import { Autocomplete, Badge, Field, Fieldset, Icon, Link, Stack, Tabs, Text, Tooltip } from '@wordpress/ui';",
 		"import { Spinner } from '@wordpress/ui';",
 		"import { KeyboardShortcutDescription, KeyboardShortcutDisplay, useKeyboardShortcutProps } from '@wordpress/ui';",
 
