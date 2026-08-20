@@ -14,7 +14,7 @@
 }
 
 .field {
-	.components-panel__row & {
+	:global(.components-panel__row) & {
 		margin-bottom: inherit;
 	}
 }

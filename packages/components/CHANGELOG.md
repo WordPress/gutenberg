@@ -7,6 +7,7 @@
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
     -   `DropdownContentWrapper` ([#81522](https://github.com/WordPress/gutenberg/pull/81522))
     -   `ResizableBox` ([#81792](https://github.com/WordPress/gutenberg/pull/81792))
+    -   `BaseControl` ([#80001](https://github.com/WordPress/gutenberg/pull/80001))
 
 ### Enhancements
 
@@ -33,6 +34,7 @@
 -   Remove `ValidatedToggleControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81492](https://github.com/WordPress/gutenberg/pull/81492)).
 -   Remove `ValidatedToggleGroupControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81450](https://github.com/WordPress/gutenberg/pull/81450)).
 -   `ToggleGroupControl`: Streamline focus ring color styles ([#81242](https://github.com/WordPress/gutenberg/pull/81242)).
+-   `BaseControl`: Migrate styles from Emotion to an SCSS Module ([#80001](https://github.com/WordPress/gutenberg/pull/80001)).
 
 ## 39.0.0 (2026-08-12)
 
@@ -131,7 +133,6 @@
 -   `ToggleGroupControl`: Migrate styles from Emotion to SCSS Modules and use WPDS tokens for migrated visual values ([#80381](https://github.com/WordPress/gutenberg/pull/80381)).
 -   `Disabled`: Migrate styles from Emotion to an SCSS Module ([#80643](https://github.com/WordPress/gutenberg/pull/80643)).
 -   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
--   `BaseControl`: migrate `StyledLabel` styles from Emotion to an SCSS module ([#80001](https://github.com/WordPress/gutenberg/pull/80001)).
 
 ## 37.0.0 (2026-07-14)
 

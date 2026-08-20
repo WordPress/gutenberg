@@ -99,11 +99,6 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`function-output-fil
 "
 `;
 
-exports[`DependencyExtractionWebpackPlugin modules Webpack \`function-output-filename\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array(array('id' => '@wordpress/blob', 'import' => 'dynamic')), 'version' => 'bb58caab8f1f94bf03ed', 'type' => 'module');
-"
-`;
-
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`function-output-filename\` should produce expected output: External modules should match snapshot 1`] = `
 [
   {
@@ -176,11 +171,6 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`nested-dynamic-impo
 
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`no-default\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
 "<?php return array('dependencies' => array(), 'version' => '60d4e92bd289da4738ed', 'type' => 'module');
-"
-`;
-
-exports[`DependencyExtractionWebpackPlugin modules Webpack \`option-function-output-filename\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array(), 'version' => '1d4018004c72e23ff482', 'type' => 'module');
 "
 `;
 
@@ -441,24 +431,6 @@ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`combine-assets\` sh
       "tokenList",
     ],
     "userRequest": "@wordpress/token-list",
-  },
-]
-`;
-
-exports[`DependencyExtractionWebpackPlugin scripts Webpack \`cyclic-dependency-graph\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('wp-interactivity'), 'version' => '2f1a57170044bbe4b31e');
-"
-`;
-
-exports[`DependencyExtractionWebpackPlugin scripts Webpack \`cyclic-dependency-graph\` should produce expected output: External modules should match snapshot 1`] = `
-[
-  {
-    "externalType": "window",
-    "request": [
-      "wp",
-      "interactivity",
-    ],
-    "userRequest": "@wordpress/interactivity",
   },
 ]
 `;
@@ -814,29 +786,6 @@ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`style-imports\` sho
 
 exports[`DependencyExtractionWebpackPlugin scripts Webpack \`wordpress\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
 "<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => 'e9b912dd9bf4a70e4cb0');
-"
-`;
-
-exports[`DependencyExtractionWebpackPlugin scripts Webpack \`style-imports\` should produce expected output: External modules should match snapshot 1`] = `
-[
-  {
-    "externalType": "window",
-    "request": "lodash",
-    "userRequest": "lodash",
-  },
-  {
-    "externalType": "window",
-    "request": [
-      "wp",
-      "blob",
-    ],
-    "userRequest": "@wordpress/blob",
-  },
-]
-`;
-
-exports[`DependencyExtractionWebpackPlugin scripts Webpack \`wordpress\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => '1d90caedf1e59da6332a');
 "
 `;
 

@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type {
 	ElementType,
@@ -9,15 +6,7 @@ import type {
 	ReactNode,
 	ComponentProps,
 } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../../context';
 import { PolymorphicElement } from '../../utils/polymorphic-element';
 import styles from './style.module.scss';
