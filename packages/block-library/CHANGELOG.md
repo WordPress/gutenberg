@@ -13,7 +13,7 @@
 ### Bug Fixes
 
 -   Columns: Preserve individual Column attributes supported by Group, including styles and layouts, when transforming to Row or Grid.
--   Image, Gallery: Media selected from a picker into these blocks, and not already attached to another post, is now offered for attaching to the post being edited. Nothing is written until the user reviews the list before saving ([#66663](https://github.com/WordPress/gutenberg/issues/66663)).
+-   Image, Gallery: Media selected into these blocks, and not already attached to another post, is now proposed for attaching to the post being edited. Nothing is written until saving, and the media appears in the save panel alongside any other pending entity changes, so it can be reviewed or skipped per item ([#66663](https://github.com/WordPress/gutenberg/issues/66663)).
 -   Icon: Apply only padding to the inner SVG in the editor, so margin is no longer applied twice compared to the front end ([#81292](https://github.com/WordPress/gutenberg/pull/81292)).
 -   Playlist: Attach the inner block drop zone to the track list, so Playlist Track blocks show insertion markers while being reordered.
 -   Playlist Track: Mark track media fields as content so toolbar inserters add an empty track instead of duplicating the selected track.

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `EntitiesSavedStates`: Describe the attachment group, so media a block proposes attaching to the post explains itself and its visibility caveat ([#66663](https://github.com/WordPress/gutenberg/issues/66663)).
+
 ### Bug Fixes
 
 -   Validate the shared parsed-blocks cache against the registered block types as well as the content, so a record resolved before the block types register — as happens when the editor's assets load lazily — is re-parsed instead of rendering, and one save later persisting, an empty block list ([#81809](https://github.com/WordPress/gutenberg/pull/81809)).

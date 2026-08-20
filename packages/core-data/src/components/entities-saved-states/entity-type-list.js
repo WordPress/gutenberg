@@ -18,6 +18,16 @@ function getEntityDescription( entity, count ) {
 		case 'page':
 		case 'post':
 			return __( 'The following has been modified.' );
+		case 'attachment':
+			// Attachments reach this panel when a block proposes attaching media
+			// it displays to the post being edited. The visibility caveat is
+			// worth stating here rather than only where it bites: an attachment's
+			// `inherit` status resolves through its parent on every read, so
+			// taking ownership from a post that isn't public hides the file
+			// everywhere it appears, published posts included.
+			return __(
+				'Attaching media records this post as where it is used. Media attached to a post that is not public is hidden from visitors everywhere it appears.'
+			);
 	}
 }
 

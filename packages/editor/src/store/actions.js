@@ -26,7 +26,6 @@ import {
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
-import savePendingAttachedMedia from './utils/save-pending-attached-media';
 import { unlock } from '../lock-unlock';
 import { setCanvasWidth } from './private-actions';
 import { getCanvasWidthByDeviceType } from '../utils/device-type';
@@ -276,23 +275,6 @@ export const savePost =
 				error = err;
 			}
 		}
-
-		// Media the Image and Gallery blocks marked for attaching, and the user
-		// left checked in the pre-publish review. Only for a post that wasn't
-		// already published: once it is, the same choice is made in the
-		// multi-entity save dialog, which does its own saving — see
-		// `hasNonPostEntityChanges`. Never on an autosave, which the user hasn't
-		// reviewed anything for. Failures are swallowed on purpose: the post
-		// saved, and the pending edits simply remain pending.
-		if (
-			! error &&
-			! options.isAutosave &&
-			! options.isPreview &&
-			previousRecord.status !== 'publish'
-		) {
-			await savePendingAttachedMedia( registry, previousRecord.id );
-		}
-
 		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
 
 		if (
