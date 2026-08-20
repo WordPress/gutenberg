@@ -159,9 +159,90 @@ export default function useDynamicGallery( {
 		[ query ]
 	);
 
+	// Media the Image and Gallery blocks have marked for attaching to this post
+	// but that hasn't been saved yet. The REST query above cannot see it — and
+	// couldn't be made to, since `parent` and `include` are ANDed server-side —
+	// so a dynamic gallery would otherwise omit an image the user has just added
+	// and is about to attach, then have it appear on reload.
+	const pendingMedia = useSelect(
+		( select ) => {
+			if ( ! query || ! postId ) {
+				return EMPTY_ARRAY;
+			}
+
+			const {
+				__experimentalGetDirtyEntityRecords,
+				getEntityRecordEdits,
+				getEntityRecord,
+			} = select( coreStore );
+
+			return (
+				__experimentalGetDirtyEntityRecords()
+					.filter(
+						( record ) =>
+							record.kind === 'postType' &&
+							record.name === 'attachment' &&
+							getEntityRecordEdits(
+								'postType',
+								'attachment',
+								record.key
+							)?.post === postId
+					)
+					.map( ( record ) =>
+						getEntityRecord( 'postType', 'attachment', record.key )
+					)
+					// Match the source query, which is image-only: a pending PDF
+					// must not enter the preview.
+					.filter( ( media ) => media?.media_type === 'image' )
+			);
+		},
+		[ query, postId ]
+	);
+
+	// The media the gallery actually shows: what is attached now, plus what is
+	// about to be. Feeding both the preview and `convertToStatic` from one list
+	// keeps "what I see" and "what pinning gives me" the same thing.
+	const resolvedMedia = useMemo( () => {
+		if ( ! pendingMedia.length ) {
+			return dynamicMedia;
+		}
+
+		const byId = new Map();
+
+		// Query records win: they are what the server actually returned, and a
+		// record can legitimately appear in both lists.
+		[ ...pendingMedia, ...dynamicMedia ].forEach( ( media ) =>
+			byId.set( media.id, media )
+		);
+
+		const merged = [ ...byId.values() ].sort( ( a, b ) => {
+			const comparison =
+				sourceOrderby === 'title'
+					? ( a.title?.raw ?? a.title?.rendered ?? '' ).localeCompare(
+							b.title?.raw ?? b.title?.rendered ?? ''
+					  )
+					: Date.parse( a.date_gmt ) - Date.parse( b.date_gmt );
+
+			return sourceOrder === 'desc' ? -comparison : comparison;
+		} );
+
+		// Sorting rather than appending matters: with the default date/desc a
+		// newly uploaded image belongs first, and appending would reorder the
+		// gallery the moment the attach is saved. Re-applying the cap for the
+		// same reason — `per_page` bounded the query, not this merged list.
+		return merged.slice( 0, MAX_IMAGES );
+	}, [ dynamicMedia, pendingMedia, sourceOrderby, sourceOrder ] );
+
 	// The source caps results at `MAX_IMAGES` (matching the frontend), so flag
-	// when the post has more attached images than the gallery can show.
-	const hasMoreImagesThanCap = dynamicMediaTotal > MAX_IMAGES;
+	// when the post has more attached images than the gallery can show. Pending
+	// media counts toward the total it will have after saving, so a gallery
+	// already at the cap doesn't silently drop what is about to be added.
+	const effectiveMediaTotal =
+		dynamicMediaTotal +
+		pendingMedia.filter(
+			( media ) => ! dynamicMedia.some( ( { id } ) => id === media.id )
+		).length;
+	const hasMoreImagesThanCap = effectiveMediaTotal > MAX_IMAGES;
 
 	// The only gallery settings that affect how an image renders, and so the
 	// only ones `buildImageBlockAttributes` reads. Depending on this narrowed
@@ -176,8 +257,8 @@ export default function useDynamicGallery( {
 	// The (non-persisted) `core/image` blocks used for the editor preview.
 	// Rebuilt when the resolved media or an image-relevant setting changes.
 	const dynamicImageBlocks = useMemo(
-		() => buildImageBlocks( dynamicMedia, imageAttributes ),
-		[ dynamicMedia, imageAttributes ]
+		() => buildImageBlocks( resolvedMedia, imageAttributes ),
+		[ resolvedMedia, imageAttributes ]
 	);
 
 	// Context the gallery provides to its (previewed) image blocks.
@@ -226,7 +307,7 @@ export default function useDynamicGallery( {
 		registry.batch( () => {
 			replaceInnerBlocks(
 				clientId,
-				buildImageBlocks( dynamicMedia, imageAttributes )
+				buildImageBlocks( resolvedMedia, imageAttributes )
 			);
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { dynamicContent: undefined } );
@@ -268,10 +349,10 @@ export default function useDynamicGallery( {
 		canUseDynamicSource,
 		sourceDescriptor,
 		hasMoreImagesThanCap,
-		dynamicMediaTotal,
+		dynamicMediaTotal: effectiveMediaTotal,
 		sourceOrderby,
 		sourceOrder,
-		dynamicMedia,
+		dynamicMedia: resolvedMedia,
 		dynamicImageBlocks,
 		isResolvingDynamic,
 		galleryContext,

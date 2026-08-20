@@ -20,6 +20,7 @@ import { useResizeObserver } from '@wordpress/compose';
 import { getProtocol, prependHTTPS } from '@wordpress/url';
 import { store as uploadStore } from '@wordpress/upload-media';
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
+import useMarkMediaForAttachment from '../utils/use-mark-media-for-attachment';
 import Image from './image';
 import { isValidFileType } from './utils';
 import { useMaxWidthObserver } from './use-max-width-observer';
@@ -98,6 +99,8 @@ export function ImageEdit( {
 	} = attributes;
 
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
+
+	const markMediaForAttachment = useMarkMediaForAttachment( context );
 
 	const containerRef = useRef();
 	// Only observe the max width from the parent container when the parent layout is not flex nor grid.
@@ -229,6 +232,13 @@ export function ImageEdit( {
 			setTemporaryURL( media.url );
 			return;
 		}
+
+		// Record that this image should be attached to the post, for the user to
+		// review before it is saved. Called here because `pickRelevantMediaFiles`
+		// below drops everything except the attributes the block stores, the
+		// media item's parent included. Not awaited: nothing is written, and the
+		// selection must not wait on it.
+		markMediaForAttachment( media );
 
 		const { imageDefaultSize } = getSettings();
 

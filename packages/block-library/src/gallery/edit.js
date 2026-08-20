@@ -59,6 +59,7 @@ import GalleryGapCustomProperties from './gap-styles';
 import useDynamicGallery from './use-dynamic-gallery';
 import { GallerySourcePanel, GalleryDynamicView } from './dynamic-gallery';
 import { getDynamicSource, ATTACHED_MEDIA } from './dynamic-source';
+import useMarkMediaForAttachment from '../utils/use-mark-media-for-attachment';
 
 const MAX_COLUMNS = 8;
 const LINK_OPTIONS = [
@@ -126,6 +127,8 @@ export default function GalleryEdit( props ) {
 
 	const postId = context?.postId;
 	const postType = context?.postType;
+
+	const markMediaForAttachment = useMarkMediaForAttachment( context );
 
 	// Entering dynamic mode is a structural change (it discards inner blocks and
 	// switches the block's mode), so the entry point is only offered when the
@@ -392,6 +395,12 @@ export default function GalleryEdit( props ) {
 
 				return file;
 			} );
+
+		// Record which of these should be attached to the post, for the user to
+		// review before anything is saved. Called on the media items rather than
+		// the blocks built below, which keep only the attributes the gallery
+		// stores. Not awaited: nothing is written yet.
+		markMediaForAttachment( processedImages );
 
 		// Because we are reusing existing innerImage blocks any reordering
 		// done in the media library will be lost so we need to reapply that ordering

@@ -70,6 +70,7 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 - `galleryId`
 - `postId`
 - `postType`
+- `queryId`
 
 **Provides context:**
 

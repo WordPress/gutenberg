@@ -118,12 +118,47 @@ export const hasNonPostEntityChanges = createRegistrySelector(
 	( select ) => ( state ) => {
 		const dirtyEntityRecords =
 			select( coreStore ).__experimentalGetDirtyEntityRecords();
-		const { type, id } = getCurrentPost( state );
+		const { type, id, status } = getCurrentPost( state );
+
+		// Media the Image and Gallery blocks have marked for attaching is
+		// reviewed in the pre-publish panel, which the multi-entity save dialog
+		// would replace: `PostPublishButton` diverts to that dialog whenever this
+		// selector is true. Attaching one image must not cost the user the
+		// visibility, schedule and taxonomy checks, so those edits are left out
+		// here while the post is still unpublished.
+		//
+		// On a published post there is no pre-publish panel to protect, so they
+		// count again and the dialog becomes the place the same choice is made.
+		//
+		// Scoped to an edit that *only* sets `post`: an attachment dirtied for
+		// any other reason - a caption, the image editor - still belongs in the
+		// dialog.
+		const isPendingAttachment = ( entityRecord ) => {
+			if (
+				status === 'publish' ||
+				entityRecord.kind !== 'postType' ||
+				entityRecord.name !== 'attachment'
+			) {
+				return false;
+			}
+
+			const edits = select( coreStore ).getEntityRecordEdits(
+				'postType',
+				'attachment',
+				entityRecord.key
+			);
+
+			const editedKeys = Object.keys( edits ?? {} );
+
+			return editedKeys.length === 1 && editedKeys[ 0 ] === 'post';
+		};
+
 		return dirtyEntityRecords.some(
 			( entityRecord ) =>
-				entityRecord.kind !== 'postType' ||
-				entityRecord.name !== type ||
-				entityRecord.key !== id
+				( entityRecord.kind !== 'postType' ||
+					entityRecord.name !== type ||
+					entityRecord.key !== id ) &&
+				! isPendingAttachment( entityRecord )
 		);
 	}
 );
