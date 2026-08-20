@@ -236,6 +236,16 @@ function ControlPoints( {
 									} }
 									onKeyDown={ ( event ) => {
 										if ( disablePositioning ) {
+											// The point cannot move, but the
+											// arrow keys are still consumed so
+											// they do not bubble away and move
+											// focus to another editor area.
+											if (
+												event.code === 'ArrowLeft' ||
+												event.code === 'ArrowRight'
+											) {
+												event.stopPropagation();
+											}
 											return;
 										}
 										if ( event.code === 'ArrowLeft' ) {

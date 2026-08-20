@@ -34,4 +34,47 @@ describe( 'CustomDuotoneBar', () => {
 
 		expect( onChange ).not.toHaveBeenCalled();
 	} );
+
+	// The point cannot move, but the keys still have to be consumed. Letting
+	// them bubble would move focus out of the control, which is what the
+	// gradient bar's own `stopPropagation` guards against.
+	it( 'does not let arrow keys bubble out of the control', async () => {
+		const user = userEvent.setup();
+		const onAncestorKeyDown = jest.fn();
+
+		render(
+			// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+			<div onKeyDown={ onAncestorKeyDown }>
+				<CustomDuotoneBar value={ VALUE } onChange={ jest.fn() } />
+			</div>
+		);
+
+		const [ firstPoint ] = screen.getAllByRole( 'button', {
+			name: /Gradient control point/,
+		} );
+		firstPoint.focus();
+		await user.keyboard( '[ArrowLeft][ArrowRight]' );
+
+		expect( onAncestorKeyDown ).not.toHaveBeenCalled();
+	} );
+
+	it( 'still lets other keys bubble', async () => {
+		const user = userEvent.setup();
+		const onAncestorKeyDown = jest.fn();
+
+		render(
+			// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+			<div onKeyDown={ onAncestorKeyDown }>
+				<CustomDuotoneBar value={ VALUE } onChange={ jest.fn() } />
+			</div>
+		);
+
+		const [ firstPoint ] = screen.getAllByRole( 'button', {
+			name: /Gradient control point/,
+		} );
+		firstPoint.focus();
+		await user.keyboard( '[Escape]' );
+
+		expect( onAncestorKeyDown ).toHaveBeenCalled();
+	} );
 } );
