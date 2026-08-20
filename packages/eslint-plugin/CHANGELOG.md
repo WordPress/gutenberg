@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Update `use-recommended-components` rule to mark `Autocomplete`, `Field`, and `Fieldset` from `@wordpress/ui` as recommended ([#80636](https://github.com/WordPress/gutenberg/pull/80636)).
 -   Update `use-recommended-components` rule to mark `Input`, `InputControl`, and `InputLayout` from `@wordpress/ui` as recommended, and to prefer `@wordpress/ui` `InputControl` over legacy `@wordpress/components` `InputControl` and `TextControl` ([#81658](https://github.com/WordPress/gutenberg/pull/81658)).
 
 ## 25.9.0 (2026-08-12)
