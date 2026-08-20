@@ -23,4 +23,7 @@
 			<group>fontsapi</group>
 		</exclude>
 	</groups>
+	<extensions>
+		<extension class="Gutenberg_Layout_Global_Styles_Cache_Setup" />
+	</extensions>
 </phpunit>

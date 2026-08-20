@@ -1144,6 +1144,13 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	/**
 	 * Tests that block style variations with blockGap values are applied to layout styles.
 	 *
+	 * gutenberg_render_layout_support_flag() memoizes global styles in a function
+	 * static that is populated on the first block render in the process and never
+	 * refreshed. If an earlier test file renders a block before this test's set_up()
+	 * registers the custom-gap variation, the memoized styles lack the variation.
+	 * The Gutenberg_Layout_Global_Styles_Cache_Setup extension primes the memoized
+	 * styles with the variation before any test runs.
+	 *
 	 * @covers ::wp_render_layout_support_flag
 	 */
 	public function test_layout_support_flag_uses_variation_block_gap_value() {

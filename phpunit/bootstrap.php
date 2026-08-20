@@ -105,3 +105,6 @@ require $_tests_dir . '/includes/bootstrap.php';
 
 // Use existing behavior for wp_die during actual test execution.
 remove_filter( 'wp_die_handler', 'fail_if_died' );
+
+// Test suite extension that primes the layout global styles cache.
+require_once __DIR__ . '/fixtures/class-layout-global-styles-cache-setup.php';
