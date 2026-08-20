@@ -81,6 +81,7 @@ function renderEdit( props = {} ) {
 				} }
 				setAttributes={ setAttributes }
 				context={ {
+					showAlbum: false,
 					showArtists: true,
 					showImages: true,
 					...props.context,
@@ -137,6 +138,34 @@ describe( 'PlaylistTrackEdit', () => {
 
 		expect(
 			screen.queryByLabelText( 'Alternative text' )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'renders the track album when album display is enabled', () => {
+		renderEdit( {
+			context: {
+				showAlbum: true,
+			},
+		} );
+
+		const trackButton = screen.getByRole( 'button', {
+			name: /Song One/,
+		} );
+
+		expect( within( trackButton ).getByText( 'Great Album' ) ).toHaveClass(
+			'wp-block-playlist-track__album'
+		);
+	} );
+
+	it( 'does not render the track album when album display is disabled', () => {
+		renderEdit();
+
+		const trackButton = screen.getByRole( 'button', {
+			name: /Song One/,
+		} );
+
+		expect(
+			within( trackButton ).queryByText( 'Great Album' )
 		).not.toBeInTheDocument();
 	} );
 

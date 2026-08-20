@@ -42,6 +42,8 @@ const PlaylistTrackEdit = ( {
 	const { id, src, album, artist, image, imageAlt, length, title } =
 		attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
+	const albumValue = typeof album === 'string' ? album : '';
+	const showAlbum = context?.showAlbum ?? false;
 	const showArtists = context?.showArtists;
 	const showImages = context?.showImages ?? true;
 	const imageButton = useRef();
@@ -167,9 +169,9 @@ const PlaylistTrackEdit = ( {
 					/>
 					<TextControl
 						label={ __( 'Album' ) }
-						value={ album ? stripHTML( album ) : '' }
-						onChange={ ( albumValue ) => {
-							setAttributes( { album: albumValue } );
+						value={ albumValue ? stripHTML( albumValue ) : '' }
+						onChange={ ( value ) => {
+							setAttributes( { album: value } );
 						} }
 					/>
 					<TextControl
@@ -286,6 +288,19 @@ const PlaylistTrackEdit = ( {
 								placeholder={ __( 'Track artist' ) }
 								onChange={ ( value ) =>
 									setAttributes( { artist: value } )
+								}
+								__experimentalVersion={ 2 }
+							/>
+						) }
+						{ showAlbum && (
+							<PlainText
+								tagName="span"
+								className="wp-block-playlist-track__album"
+								value={ albumValue }
+								aria-label={ __( 'Track album' ) }
+								placeholder={ __( 'Track album' ) }
+								onChange={ ( value ) =>
+									setAttributes( { album: value } )
 								}
 								__experimentalVersion={ 2 }
 							/>

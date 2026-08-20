@@ -21,6 +21,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 	$playlist_tracks          = array();
 	$tracks_data              = array();
 	$show_play_button_artwork = ! empty( $attributes['showPlayButtonArtwork'] );
+	$show_album               = ! empty( $attributes['showAlbum'] );
 
 	// Parse inner blocks to extract track data.
 	// This approach avoids duplicating track data in the HTML output.
@@ -167,6 +168,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 				'tracks'                => $playlist_tracks,
 				'waveformStyle'         => $waveform_style,
 				'showPlayButtonArtwork' => $show_play_button_artwork,
+				'showAlbum'             => $show_album,
 				'labelPauseTrack'       => __( 'Pause' ),
 				'labelSelectTrack'      => __( 'Play' ),
 			)

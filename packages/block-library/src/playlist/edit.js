@@ -29,7 +29,7 @@ import { Caption } from '../utils/caption';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { WaveformPlayer } from '../utils/waveform-player';
 import { PlaylistContext } from './context';
-import { getTrackAttributes } from './utils';
+import { getTrackAttributes, getWaveformArtistText } from './utils';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 const AUDIO_FILE_EXTENSION =
@@ -76,6 +76,7 @@ const PlaylistEdit = ( {
 		showImages,
 		showPlayButtonArtwork,
 		showArtists,
+		showAlbum,
 		showTrackLength,
 		waveformStyle = DEFAULT_WAVEFORM_STYLE,
 		waveformColor,
@@ -499,6 +500,7 @@ const PlaylistEdit = ( {
 						setAttributes( {
 							showTracklist: true,
 							showArtists: true,
+							showAlbum: false,
 							showNumbers: true,
 							showTrackLength: true,
 							showImages: true,
@@ -540,6 +542,20 @@ const PlaylistEdit = ( {
 										'showArtists'
 									) }
 									checked={ showArtists }
+								/>
+							</ToolsPanelItem>
+							<ToolsPanelItem
+								label={ __( 'Show album name' ) }
+								isShownByDefault
+								hasValue={ () => showAlbum !== false }
+								onDeselect={ () =>
+									setAttributes( { showAlbum: false } )
+								}
+							>
+								<ToggleControl
+									label={ __( 'Show album name' ) }
+									onChange={ toggleAttribute( 'showAlbum' ) }
+									checked={ showAlbum }
 								/>
 							</ToolsPanelItem>
 							<ToolsPanelItem
@@ -691,7 +707,10 @@ const PlaylistEdit = ( {
 					<WaveformPlayer
 						src={ currentTrackData?.src }
 						title={ currentTrackData?.title }
-						artist={ currentTrackData?.artist }
+						artist={ getWaveformArtistText(
+							currentTrackData,
+							showAlbum === true
+						) }
 						image={ currentTrackData?.image }
 						imageAlt={ currentTrackData?.imageAlt }
 						waveformStyle={ waveformStyle }

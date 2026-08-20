@@ -26,6 +26,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `showImages` | `boolean` | `true` | — |
 | `showPlayButtonArtwork` | `boolean` | `false` | — |
 | `showArtists` | `boolean` | `true` | — |
+| `showAlbum` | `boolean` | `false` | — |
 | `showNumbers` | `boolean` | `true` | — |
 | `showTrackLength` | `boolean` | `true` | — |
 | `waveformStyle` | `string` | `"bars"` | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `bars`, `mirror`, `line`, `blocks`, `dots`, `seekbar` |
@@ -57,6 +58,7 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 
 **Provides context:**
 
+- `showAlbum` → attribute `showAlbum`
 - `showArtists` → attribute `showArtists`
 - `showImages` → attribute `showImages`
 

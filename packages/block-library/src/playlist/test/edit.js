@@ -1,4 +1,4 @@
-import { getTrackAttributes } from '../utils';
+import { getTrackAttributes, getWaveformArtistText } from '../utils';
 
 describe( 'Playlist block edit utilities', () => {
 	describe( 'getTrackAttributes', () => {
@@ -160,6 +160,32 @@ describe( 'Playlist block edit utilities', () => {
 
 			expect( result.image ).toBe( 'https://example.com/cover.jpg' );
 			expect( result.imageAlt ).toBe( 'A black and white portrait' );
+		} );
+	} );
+
+	describe( 'getWaveformArtistText', () => {
+		it( 'should include the album when album display is enabled', () => {
+			const result = getWaveformArtistText(
+				{
+					artist: 'The Artist',
+					album: 'Great Album',
+				},
+				true
+			);
+
+			expect( result ).toBe( 'The Artist - Great Album' );
+		} );
+
+		it( 'should exclude the album when album display is disabled', () => {
+			const result = getWaveformArtistText(
+				{
+					artist: 'The Artist',
+					album: 'Great Album',
+				},
+				false
+			);
+
+			expect( result ).toBe( 'The Artist' );
 		} );
 	} );
 } );

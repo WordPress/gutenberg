@@ -26,9 +26,15 @@ function render_block_core_playlist_track( $attributes, $content = '', $block = 
 	if ( $block instanceof WP_Block && isset( $block->context['showImages'] ) ) {
 		$show_images = $block->context['showImages'];
 	}
+	$show_album = false;
+	if ( $block instanceof WP_Block && isset( $block->context['showAlbum'] ) ) {
+		$show_album = true === $block->context['showAlbum'];
+	}
 
 	$track_image = $attributes['image'] ?? null;
 	$image       = is_string( $track_image ) ? $track_image : '';
+	$track_album = $attributes['album'] ?? null;
+	$album       = is_string( $track_album ) ? $track_album : '';
 	$artist      = $attributes['artist'] ?? '';
 	$alt         = $attributes['imageAlt'] ?? '';
 	$length      = $attributes['length'] ?? '';
@@ -47,6 +53,9 @@ function render_block_core_playlist_track( $attributes, $content = '', $block = 
 	}
 	if ( $artist ) {
 		$html .= '<span class="wp-block-playlist-track__artist">' . esc_html( $artist ) . '</span>';
+	}
+	if ( $show_album && $album ) {
+		$html .= '<span class="wp-block-playlist-track__album">' . esc_html( $album ) . '</span>';
 	}
 	$html .= '</span>';
 

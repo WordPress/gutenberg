@@ -8,7 +8,7 @@
 	"description": "Playlist track.",
 	"keywords": [ "music", "sound" ],
 	"textdomain": "default",
-	"usesContext": [ "showArtists", "showImages" ],
+	"usesContext": [ "showAlbum", "showArtists", "showImages" ],
 	"attributes": {
 		"blob": {
 			"type": "string",

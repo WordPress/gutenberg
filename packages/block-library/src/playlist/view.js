@@ -5,6 +5,7 @@ import {
 	setupPlayButtonArtwork,
 	updateSeekControlLabel,
 } from '../utils/waveform-utils';
+import { getWaveformArtistText } from './utils';
 
 /**
  * Store player state for each element.
@@ -98,6 +99,10 @@ const { state } = store(
 function initPlayer( ref, track, shouldAutoPlay, context ) {
 	const existing = playerState.get( ref );
 	const showPlayButtonArtwork = context.showPlayButtonArtwork === true;
+	const artistText = getWaveformArtistText(
+		track,
+		context.showAlbum === true
+	);
 	const playerArtwork = showPlayButtonArtwork ? '' : track.image;
 
 	// If a player already exists, load the new track without recreating.
@@ -111,7 +116,7 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		} else {
 			playlistPlayerState.set( context.playlistId, existing );
 			existing.instance
-				.loadTrack( track.url, track.title, track.artist, {
+				.loadTrack( track.url, track.title, artistText, {
 					artwork: playerArtwork,
 					artworkAlt: playerArtwork ? track.imageAlt : '',
 				} )
@@ -152,7 +157,7 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 	const player = initWaveformPlayer( ref, {
 		src: track.url,
 		title: track.title,
-		artist: track.artist,
+		artist: artistText,
 		image: track.image,
 		imageAlt: track.imageAlt,
 		waveformColor: ref.dataset.waveformPlayerColor,
