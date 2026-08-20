@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import type { ComponentProps, ComponentType } from 'react';
+import type { ComponentPropsWithoutRef, ComponentType } from 'react';
 // Form controls read these stylesheets, normally enqueued by WordPress.
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '@wordpress/components/build-style/style.css';
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '@wordpress/dataviews/build-style/style.css';
-import { useEffect, useState } from '@wordpress/element';
+import { forwardRef, useEffect, useState } from '@wordpress/element';
 import { chartBar, download, trendingUp } from '@wordpress/icons';
 import { WidgetHostProvider } from '@wordpress/widget-primitives';
 import type {
@@ -458,20 +458,19 @@ Each type also carries a \`help\` note, opened from the info icon in the header,
  */
 const DEMO_NAVIGATE_EVENT = 'widget-dashboard-demo-navigate';
 
-function DemoRouteLink( {
-	to,
-	onClick,
-	children,
-	...props
-}: { to: string } & ComponentProps< 'a' > ): React.ReactNode {
+const DemoRouteLink = forwardRef<
+	HTMLAnchorElement,
+	{ path: string } & ComponentPropsWithoutRef< 'a' >
+>( function DemoRouteLink( { path, onClick, children, ...props }, ref ) {
 	return (
 		<a
+			ref={ ref }
 			{ ...props }
-			href={ `?p=${ to }` }
+			href={ `?p=${ path }` }
 			onClick={ ( event ) => {
 				event.preventDefault();
 				window.dispatchEvent(
-					new CustomEvent( DEMO_NAVIGATE_EVENT, { detail: to } )
+					new CustomEvent( DEMO_NAVIGATE_EVENT, { detail: path } )
 				);
 				onClick?.( event );
 			} }
@@ -479,7 +478,7 @@ function DemoRouteLink( {
 			{ children }
 		</a>
 	);
-}
+} );
 
 const DEMO_PAGE = 'https://demo.example/wp-admin/admin.php?page=demo-dashboard';
 
@@ -500,7 +499,7 @@ const demoHost: WidgetHost = {
 				return null;
 			}
 
-			return { to: url.searchParams.get( 'p' ) ?? '/' };
+			return { path: url.searchParams.get( 'p' ) ?? '/' };
 		},
 		Link: DemoRouteLink,
 	},
@@ -540,14 +539,14 @@ function HostLinksStory() {
 		useState< DashboardWidget[] >( HOST_LINKS_LAYOUT );
 
 	const [ lastNavigation, setLastNavigation ] = useState< {
-		to: string;
+		path: string;
 	} | null >( null );
 
 	useEffect( () => {
 		// A fresh object per event, so repeated clicks restart the timer.
 		const onNavigate = ( event: Event ) =>
 			setLastNavigation( {
-				to: ( event as CustomEvent< string > ).detail,
+				path: ( event as CustomEvent< string > ).detail,
 			} );
 
 		window.addEventListener( DEMO_NAVIGATE_EVENT, onNavigate );
@@ -576,7 +575,7 @@ function HostLinksStory() {
 				} }
 			>
 				{ lastNavigation
-					? `Client-side navigation to ${ lastNavigation.to }; the document never reloaded.`
+					? `Client-side navigation to ${ lastNavigation.path }; the document never reloaded.`
 					: 'Pick "See report" in the widget footer: its target is a route this demo host owns.' }
 			</p>
 

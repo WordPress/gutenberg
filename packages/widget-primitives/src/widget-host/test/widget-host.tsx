@@ -4,7 +4,7 @@ import { WidgetHostProvider, useWidgetHost } from '../widget-host';
 import type { WidgetHostLinks } from '../widget-host';
 
 const links: WidgetHostLinks = {
-	match: () => ( { to: '/reports' } ),
+	match: () => ( { path: '/reports' } ),
 	Link: () => null,
 };
 

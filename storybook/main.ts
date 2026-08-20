@@ -46,7 +46,6 @@ const stories = [
 	'../packages/widget-primitives/src/**/stories/*.story.@(ts|tsx)',
 	'../packages/widget-dashboard/src/**/stories/*.mdx',
 	'../packages/widget-dashboard/src/**/stories/*.story.@(ts|tsx)',
-	'../routes/dashboard/**/stories/*.story.@(ts|tsx)',
 	'../packages/ui/src/**/stories/*.mdx',
 	'../packages/ui/src/**/stories/*.story.@(ts|tsx)',
 	'../packages/admin-ui/src/**/stories/*.story.@(ts|tsx)',
@@ -69,6 +68,13 @@ const config: StorybookConfig = {
 		import.meta.resolve( './addons/design-system-theme/preset.ts' ),
 	],
 	framework: getAbsolutePath( '@storybook/react-vite' ),
+	tags: {
+		'docs-only': {
+			// Keep stories available to attached MDX while hiding their
+			// standalone pages from the sidebar.
+			excludeFromSidebar: true,
+		},
+	},
 	features: {
 		componentsManifest: NODE_ENV !== 'development',
 		// Use experimental TypeScript LanguageService prop extractor for the
@@ -226,6 +232,10 @@ const config: StorybookConfig = {
 				},
 			],
 			build: {
+				// Storybook's preview includes its shared runtime and all stories.
+				// Automatic chunk splitting is already enabled; 3.5 MB leaves a
+				// meaningful budget above the current 3.15 MB largest chunk.
+				chunkSizeWarningLimit: 3_500,
 				/**
 				 * Use terser with keep_fnames to preserve component names in source code display.
 				 * Without this, Vite's default minifier mangles component names (e.g., BoxControl -> J)
@@ -239,6 +249,15 @@ const config: StorybookConfig = {
 						keep_fnames: true,
 					},
 				},
+				rolldownOptions: {
+					checks: {
+						// Storybook's legacy `react-docgen` and
+						// `react-docgen-typescript` transforms are expected to
+						// dominate the build. Keep them enabled without emitting
+						// timing warnings.
+						pluginTimings: false,
+					},
+				},
 			},
 			define: {
 				// Ensures that `@wordpress/warning` can properly detect dev mode.
@@ -250,7 +269,33 @@ const config: StorybookConfig = {
 				postcss: {
 					// Vite bundles its own PostCSS, creating a deep
 					// type incompatibility with the top-level PostCSS.
-					plugins: [ dsTokenFallbacks as any ],
+					plugins: [
+						dsTokenFallbacks as any,
+						{
+							// `postcss-modules` turns CSS composed from another module into a
+							// string before it prepends it to the current stylesheet. Parsing
+							// that string discards the declarations' source metadata, which
+							// makes Vite warn even when no asset resolution is needed.
+							postcssPlugin:
+								'supply-composed-css-module-source-fallback',
+							OnceExit( root ) {
+								root.walkDecls( ( declaration ) => {
+									const requiresSourceForAssetResolution =
+										/(?:url|image-set)\(/i.test(
+											declaration.value
+										);
+
+									// The fallback file is unsafe when Vite uses it to resolve assets.
+									if (
+										! declaration.source?.input.file &&
+										! requiresSourceForAssetResolution
+									) {
+										declaration.source = root.source;
+									}
+								} );
+							},
+						},
+					],
 				},
 			},
 			optimizeDeps: {

@@ -84,7 +84,9 @@ export function WidgetActions( {
 													]
 												}
 												render={
-													<HostLink to={ route.to } />
+													<HostLink
+														path={ route.path }
+													/>
 												}
 											/>
 										) : (
