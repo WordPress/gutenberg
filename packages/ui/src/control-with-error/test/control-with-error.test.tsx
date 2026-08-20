@@ -1,6 +1,7 @@
 import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
+	createRef,
 	forwardRef,
 	useCallback,
 	useId,
@@ -40,6 +41,33 @@ const ValidatedInputControl = forwardRef<
 } );
 
 describe( 'ControlWithError', () => {
+	describe( 'label cloning', () => {
+		const LabelConsumer = forwardRef<
+			HTMLInputElement,
+			{ label?: string }
+		>( function LabelConsumer( { label }, ref ) {
+			return <input ref={ ref } aria-label={ label } />;
+		} );
+
+		it( 'should pass string labels as strings when appending the required indicator', () => {
+			const inputRef = createRef< HTMLInputElement >();
+
+			render(
+				<ControlWithError
+					required
+					getValidityTarget={ () => inputRef.current }
+				>
+					<LabelConsumer ref={ inputRef } label="Opacity" />
+				</ControlWithError>
+			);
+
+			expect( screen.getByRole( 'textbox' ) ).toHaveAttribute(
+				'aria-label',
+				'Opacity (Required)'
+			);
+		} );
+	} );
+
 	describe( 'Async Validation', () => {
 		beforeEach( () => {
 			jest.useFakeTimers();
