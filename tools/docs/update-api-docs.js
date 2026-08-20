@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const { relative, resolve, sep, dirname } = require( 'path' );
 const { Transform } = require( 'stream' );
 const { readFile } = require( 'fs' ).promises;
@@ -201,7 +198,6 @@ function findDefaultSourcePath( dir ) {
 	if ( ! defaultPathMatches.length ) {
 		throw new Error( `Cannot find default source file in ${ dir }` );
 	}
-	// @ts-ignore
 	return defaultPathMatches[ 0 ];
 }
 

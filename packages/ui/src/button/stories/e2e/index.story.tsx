@@ -1,4 +1,5 @@
 import type { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
+import { wordpress } from '@wordpress/icons';
 import { Button } from '../..';
 import type { ButtonProps } from '../../types';
 
@@ -40,7 +41,13 @@ export const VariantStates: StoryFn< typeof Button > = (
 					{ name }
 				</th>
 				{ variants.map( ( variant ) => (
-					<td key={ variant } style={ { padding: 4 } }>
+					<td
+						key={ variant }
+						style={ {
+							padding: 4,
+							textAlign: 'center',
+						} }
+					>
 						<Button
 							{ ...props }
 							variant={ variant }
@@ -66,6 +73,11 @@ export const VariantStates: StoryFn< typeof Button > = (
 			</thead>
 			<tbody>
 				<VariantsRow name="(default)" />
+				<VariantsRow
+					name="compact"
+					buttonProps={ { size: 'compact' } }
+				/>
+				<VariantsRow name="small" buttonProps={ { size: 'small' } } />
 				<VariantsRow
 					name="disabled"
 					buttonProps={ { disabled: true } }
@@ -109,6 +121,15 @@ export const VariantStates: StoryFn< typeof Button > = (
 						tone: 'neutral',
 						'aria-pressed': true,
 						disabled: true,
+					} }
+				/>
+				<VariantsRow
+					name="with icon"
+					buttonProps={ {
+						children: [
+							<Button.Icon icon={ wordpress } key="icon" />,
+							'Code is poetry',
+						],
 					} }
 				/>
 			</tbody>

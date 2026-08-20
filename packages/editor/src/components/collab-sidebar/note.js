@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useRef, useState, useLayoutEffect } from '@wordpress/element';
 import {
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -16,10 +9,6 @@ import {
 import { Button as UIButton } from '@wordpress/ui';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { moreVertical, published } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import { unlock } from '../../lock-unlock';
@@ -138,10 +127,16 @@ export function Note( {
 	if ( actionState === 'edit' ) {
 		body = (
 			<NoteForm
-				onSubmit={ ( value ) => {
-					onEditNote( { id: note.id, content: value } );
-					setActionState( null );
-					actionButtonRef.current?.focus();
+				onSubmit={ async ( value ) => {
+					const saved = await onEditNote( {
+						id: note.id,
+						content: value,
+					} );
+					// Keep the form open on failure so the edit isn't lost.
+					if ( saved ) {
+						handleCancel();
+					}
+					return saved;
 				} }
 				onCancel={ handleCancel }
 				note={ note }

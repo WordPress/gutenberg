@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Page } from '@wordpress/admin-ui';
 import { Button } from '@wordpress/components';
 import {
@@ -15,10 +12,6 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useEvent, usePrevious } from '@wordpress/compose';
 import { addQueryArgs } from '@wordpress/url';
 import { useView, useViewConfig } from '@wordpress/views';
-
-/**
- * Internal dependencies
- */
 import {
 	OPERATOR_IS_ANY,
 	OPERATOR_IS_NONE,
@@ -26,14 +19,12 @@ import {
 	OPERATOR_AFTER,
 	LAYOUT_LIST,
 } from '../../utils/constants';
-
 import AddNewPostModal from '../add-new-post';
 import { unlock } from '../../lock-unlock';
 import {
 	useEditPostAction,
 	useQuickEditPostAction,
 } from '../dataviews-actions';
-
 import useNotesCount from './use-notes-count';
 import { QuickEditModal } from './quick-edit-modal';
 

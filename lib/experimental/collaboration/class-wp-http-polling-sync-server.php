@@ -407,14 +407,11 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 					 * compaction to avoid overwriting it.
 					 */
 					$updates_after_cursor = $this->storage->get_updates_after_cursor( $room, $cursor );
-					$has_newer_compaction = false;
 
-					foreach ( $updates_after_cursor as $existing ) {
-						if ( self::UPDATE_TYPE_COMPACTION === $existing['type'] ) {
-							$has_newer_compaction = true;
-							break;
-						}
-					}
+					$has_newer_compaction = array_any(
+						$updates_after_cursor,
+						fn( $existing ) => self::UPDATE_TYPE_COMPACTION === $existing['type']
+					);
 
 					if ( ! $has_newer_compaction ) {
 						if ( ! $this->storage->remove_updates_before_cursor( $room, $cursor ) ) {

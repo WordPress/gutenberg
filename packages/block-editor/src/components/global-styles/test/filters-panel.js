@@ -1,13 +1,17 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * Internal dependencies
- */
 import FiltersPanel from '../filters-panel';
+
+// The inheritance treatment sits behind the
+// `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these
+// tests exercise the inheriting path.
+beforeEach( () => {
+	window.__experimentalGlobalStylesInheritanceUI = true;
+} );
+
+afterEach( () => {
+	delete window.__experimentalGlobalStylesInheritanceUI;
+} );
 
 /**
  * Tests for the inherited Global Styles label treatment in `FiltersPanel`.

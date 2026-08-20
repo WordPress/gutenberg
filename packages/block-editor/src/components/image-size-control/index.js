@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	SelectControl,
 	__experimentalNumberControl as NumberControl,
@@ -10,10 +7,6 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import useDimensionHandler from './use-dimension-handler';
 
 const IMAGE_SIZE_PRESETS = [ 25, 50, 75, 100 ];

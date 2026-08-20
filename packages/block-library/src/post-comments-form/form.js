@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import {
 	Warning,

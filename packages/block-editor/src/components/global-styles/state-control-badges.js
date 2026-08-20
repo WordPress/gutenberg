@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { Stack, Tooltip, VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 
 const { Badge: WCBadge } = unlock( componentsPrivateApis );

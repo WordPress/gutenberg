@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * Internal dependencies
- */
 import { contextConnect, contextConnectWithoutRef } from '../context-connect';
 import type { WordPressComponentProps } from '../wordpress-component';
 

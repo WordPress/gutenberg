@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import {
 	default as fetchLinkSuggestions,
 	sortResults,

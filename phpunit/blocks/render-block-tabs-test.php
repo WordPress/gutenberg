@@ -72,4 +72,65 @@ class Tests_Blocks_Render_Tabs extends WP_UnitTestCase {
 		$this->assertTrue( $processor->next_tag( array( 'class_name' => 'wp-block-tab-list' ) ) );
 		$this->assertSame( 'Tabbed content', $processor->get_attribute( 'aria-label' ) );
 	}
+
+	/**
+	 * @covers ::block_core_tabs_provide_context
+	 * @covers ::block_core_tab_list_render_callback
+	 * @covers ::block_core_tab_panel_render
+	 */
+	public function test_should_number_tabs_and_tab_ids_from_one(): void {
+		$tabs_block = <<<'BLOCK_CONTENT'
+			<!-- wp:tabs -->
+			<div class="wp-block-tabs"><!-- wp:tab-list -->
+			<div role="tablist" class="wp-block-tab-list"><button type="button" role="tab">Description</button><button type="button" role="tab">Reviews</button></div>
+			<!-- /wp:tab-list -->
+
+			<!-- wp:tab-panels -->
+			<div class="wp-block-tab-panels"><!-- wp:tab-panel {"label":"Description"} -->
+			<section role="tabpanel" tabindex="0" class="wp-block-tab-panel"></section>
+			<!-- /wp:tab-panel -->
+
+			<!-- wp:tab-panel {"label":"Reviews"} -->
+			<section role="tabpanel" tabindex="0" class="wp-block-tab-panel"></section>
+			<!-- /wp:tab-panel --></div>
+			<!-- /wp:tab-panels --></div>
+			<!-- /wp:tabs -->
+		BLOCK_CONTENT;
+
+		// Another block on the page consumes the shared `wp_unique_id()` counter
+		// before each tabs block is rendered.
+		wp_unique_id( 'unrelated-' );
+		$first_block = do_blocks( $tabs_block );
+		wp_unique_id( 'unrelated-' );
+		$second_block = do_blocks( $tabs_block );
+
+		$processor = new WP_HTML_Tag_Processor( $first_block );
+		$processor->next_tag( array( 'class_name' => 'wp-block-tabs' ) );
+
+		$context = json_decode( (string) $processor->get_attribute( 'data-wp-context' ), true );
+		$tabs_id = $context['tabsId'] ?? '';
+		$this->assertStringStartsWith( 'tabs_', $tabs_id );
+
+		$tabs_number = (int) substr( $tabs_id, strlen( 'tabs_' ) );
+
+		$processor = new WP_HTML_Tag_Processor( $first_block . $second_block );
+
+		foreach ( array( $tabs_number, $tabs_number + 1 ) as $number ) {
+			foreach ( array( 1, 2 ) as $tab_number ) {
+				$tab_id = "tabs_{$number}-tab-{$tab_number}";
+
+				$processor->next_tag( array( 'tag_name' => 'button' ) );
+				$this->assertSame( "tab__{$tab_id}", $processor->get_attribute( 'id' ) );
+				$this->assertSame( $tab_id, $processor->get_attribute( 'aria-controls' ) );
+			}
+
+			foreach ( array( 1, 2 ) as $tab_number ) {
+				$tab_id = "tabs_{$number}-tab-{$tab_number}";
+
+				$processor->next_tag( array( 'class_name' => 'wp-block-tab-panel' ) );
+				$this->assertSame( $tab_id, $processor->get_attribute( 'id' ) );
+				$this->assertSame( "tab__{$tab_id}", $processor->get_attribute( 'aria-labelledby' ) );
+			}
+		}
+	}
 }

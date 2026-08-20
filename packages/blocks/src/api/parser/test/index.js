@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { parseRawBlock, default as parse } from '../';
 import {
 	registerBlockType,

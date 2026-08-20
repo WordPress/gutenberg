@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { getBlockType } from '@wordpress/blocks';
 // @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -18,10 +15,6 @@ import {
 	setSetting as setSettingHelper,
 } from '@wordpress/global-styles-engine';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { ScreenHeader } from './screen-header';
 import BlockPreviewPanel from './block-preview-panel';
 import { Subtitle } from './subtitle';
@@ -99,6 +92,7 @@ interface ScreenBlockProps {
 	variation?: string;
 	selectedViewport?: string;
 	showResponsiveStateControls?: boolean;
+	showBlockStateControls?: boolean;
 }
 
 function ScreenBlock( {
@@ -106,6 +100,7 @@ function ScreenBlock( {
 	variation,
 	selectedViewport: controlledSelectedViewport,
 	showResponsiveStateControls = true,
+	showBlockStateControls = true,
 }: ScreenBlockProps ) {
 	const {
 		user: userConfig,
@@ -367,7 +362,7 @@ function ScreenBlock( {
 					variation ? currentBlockStyle?.label! : blockType?.title!
 				}
 				viewportStates={ validViewportStates }
-				pseudoStates={ validPseudoStates }
+				pseudoStates={ showBlockStateControls ? validPseudoStates : [] }
 				selectedViewport={ effectiveSelectedViewport }
 				selectedPseudoState={ selectedPseudoState }
 				onChangeViewport={

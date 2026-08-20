@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { ComponentProps, ReactElement, ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { createContext, createRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type {
 	View,
 	Action,

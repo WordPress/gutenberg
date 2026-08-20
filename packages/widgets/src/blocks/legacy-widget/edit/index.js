@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	useBlockProps,
 	BlockControls,
@@ -17,10 +10,6 @@ import { brush as brushIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useState, useCallback } from '@wordpress/element';
 import { useEntityRecord } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import WidgetTypeSelector from './widget-type-selector';
 import InspectorCard from './inspector-card';
 import Form from './form';

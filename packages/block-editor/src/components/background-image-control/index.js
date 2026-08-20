@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
@@ -34,16 +27,14 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
 import { isBlobURL } from '@wordpress/blob';
 import { getResolvedValue } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { hasBackgroundImageValue } from '../global-styles/background-panel';
-import { InheritanceResetButton } from '../global-styles/inheritance';
+import {
+	InheritanceResetButton,
+	isGlobalStylesInheritanceEnabled,
+} from '../global-styles/inheritance';
 import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
 import { store as blockEditorStore } from '../../store';
-
 import {
 	globalStylesDataKey,
 	globalStylesLinksDataKey,
@@ -665,7 +656,7 @@ export default function BackgroundImagePanel( {
 	inheritedValue = value,
 	settings,
 	defaultValues = {},
-	showInheritanceLabelIndicators = true,
+	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
 } ) {
 	/*
 	 * Resolve inherited `ref` pointers for background controls.

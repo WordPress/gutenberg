@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { InlineNotices, SnackbarNotices } from '@wordpress/notices';
 import { ThemeProvider } from '@wordpress/theme';
 

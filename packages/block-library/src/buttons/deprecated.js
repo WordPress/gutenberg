@@ -1,10 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-/**
- * WordPress dependencies
- */
 import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
 /**

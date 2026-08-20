@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "23.6.0-rc.2",
+	"version": "23.8.0",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -37,10 +37,6 @@
 			"font-library",
 			"options-connectors",
 			{
-				"id": "content-types",
-				"experimental": true
-			},
-			{
 				"id": "dashboard",
 				"init": [
 					"@wordpress/dashboard-init"
@@ -75,7 +71,7 @@
 		"IS_GUTENBERG_PLUGIN": true
 	},
 	"devDependencies": {
-		"@playwright/test": "^1.61.1",
+		"@playwright/test": "^1.62.1",
 		"@types/react": "^18.3.27",
 		"@types/react-dom": "^18.3.1",
 		"@typescript/native": "npm:typescript@^7.0.2",
@@ -84,7 +80,7 @@
 		"@wordpress/release-tools": "file:./tools/release",
 		"@wordpress/scripts": "file:./packages/scripts",
 		"@wordpress/stylelint-tools": "file:./tools/stylelint",
-		"concurrently": "^3.5.0",
+		"concurrently": "^9.2.1",
 		"cross-env": "^7.0.3",
 		"husky": "^7.0.0",
 		"lerna": "^9.0.7",
@@ -98,8 +94,10 @@
 		"jsdom": "26.1.0"
 	},
 	"scripts": {
+		"agents:setup": "npm run --workspace @wordpress/agent-tools setup --",
 		"build": "npm run --workspace @wordpress/build-scripts build:all --",
 		"build:plugin-zip": "bash ./bin/build-plugin-zip.sh",
+		"check:type-declarations": "npm run --workspace @wordpress/build-scripts check-type-declarations --",
 		"clean:package-types": "npm run --workspace @wordpress/build-scripts clean:package-types --",
 		"clean:packages": "npm run --workspace @wordpress/build-scripts clean:packages --",
 		"dev": "npm run --workspace @wordpress/build-scripts dev --",
@@ -144,7 +142,7 @@
 		"other:cherry-pick": "npm run --workspace @wordpress/release-tools cherry-pick --",
 		"other:generate-php-sync-issue": "npm run --workspace @wordpress/release-tools generate-php-sync-issue --",
 		"other:update-packages:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer update --no-interaction",
-		"postinstall": "patch-package",
+		"postinstall": "patch-package && npm run agents:setup -- --if-safe",
 		"prepare": "husky install",
 		"prepublishOnly": "npm run build",
 		"rtc:http": "node ./test/e2e/bin/rtc-dev.mjs --mode=http",
@@ -156,7 +154,8 @@
 		"storybook:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && npm run --workspace @wordpress/storybook storybook:dev\"",
 		"storybook:e2e:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && npm run --workspace @wordpress/storybook-playwright storybook:dev\"",
 		"storybook:e2e:build": "npm run --workspace @wordpress/storybook-playwright storybook:build",
-		"test": "npm-run-all lint test:unit",
+		"storybook:manifest-snapshot": "npm run --workspace @wordpress/storybook manifest-snapshot",
+		"test": "npm-run-all lint test:unit test:unit:vitest",
 		"test:create-block": "npm run --workspace @wordpress/validation-tools test-create-block --",
 		"test:e2e": "npm exec --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-e2e --config playwright.config.ts",
 		"test:e2e:debug": "npm exec --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-e2e --config playwright.config.ts --ui",
@@ -171,6 +170,8 @@
 		"test:php": "npm-run-all lint:php test:unit:php",
 		"test:php:watch": "wp-env --config .wp-env.test.json run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script test:watch",
 		"test:unit": "npm run --workspace @wordpress/unit-tests test:unit --",
+		"test:unit:vitest": "npm run --workspace @wordpress/unit-tests test:unit:vitest --",
+		"test:unit:routing": "npm run --workspace @wordpress/unit-tests test:unit:routing",
 		"test:unit:date": "bash ./bin/unit-test-date.sh",
 		"test:unit:debug": "npm run --workspace @wordpress/unit-tests test:unit:debug --",
 		"test:unit:profile": "npm run --workspace @wordpress/unit-tests test:unit:profile --",
@@ -184,6 +185,8 @@
 		"test:unit:php:multisite:debug": "npm-run-all test:unit:php:setup:debug test:unit:php:multisite:base",
 		"test:unit:update": "npm run --workspace @wordpress/unit-tests test:unit -- --updateSnapshot",
 		"test:unit:watch": "npm run --workspace @wordpress/unit-tests test:unit:watch --",
+		"pretypecheck": "npm run --workspace @wordpress/build-scripts generate-worker-placeholders --",
+		"typecheck": "npm run --workspace @wordpress/build-scripts typecheck --",
 		"wp-env": "wp-env",
 		"wp-env-test": "wp-env --config .wp-env.test.json"
 	},

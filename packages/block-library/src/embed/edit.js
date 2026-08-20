@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -15,10 +8,6 @@ import {
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { Caption } from '../utils/caption';
-
-/**
- * Internal dependencies
- */
 import {
 	createUpgradedEmbedBlock,
 	findMoreSuitableBlock,

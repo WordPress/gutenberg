@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Icon as WCIcon,
 	__experimentalText as WCText,
@@ -10,10 +7,6 @@ import {
 import { useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { unseen } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
 import useBlockVisibility from './use-block-visibility';

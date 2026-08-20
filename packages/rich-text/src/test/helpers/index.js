@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { ZWNBSP, OBJECT_REPLACEMENT_CHARACTER } from '../../special-characters';
 
 export function getSparseArrayLength( array ) {

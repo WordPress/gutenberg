@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { css } from '@emotion/react';
-
-/**
- * Internal dependencies
- */
 import { COLORS, CONFIG } from '../utils';
 import { getPaddingBySize } from './get-padding-by-size';
 import type { FooterProps, HeaderProps, Props } from './types';

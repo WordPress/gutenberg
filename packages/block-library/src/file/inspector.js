@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	RangeControl,
@@ -10,10 +7,6 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { InspectorControls } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { MIN_PREVIEW_HEIGHT, MAX_PREVIEW_HEIGHT } from './edit';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 

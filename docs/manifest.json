@@ -1446,6 +1446,12 @@
 		"parent": "theme-json-reference"
 	},
 	{
+		"title": "View Configuration Reference",
+		"slug": "view-config-reference",
+		"markdown_source": "../docs/reference-guides/view-config-reference.md",
+		"parent": "reference-guides"
+	},
+	{
 		"title": "Component Reference",
 		"slug": "components",
 		"markdown_source": "../packages/components/README.md",
@@ -1509,18 +1515,6 @@
 		"title": "Button",
 		"slug": "button",
 		"markdown_source": "../packages/components/src/button/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "DateCalendar",
-		"slug": "date-calendar",
-		"markdown_source": "../packages/components/src/calendar/date-calendar/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "DateRangeCalendar",
-		"slug": "date-range-calendar",
-		"markdown_source": "../packages/components/src/calendar/date-range-calendar/README.md",
 		"parent": "components"
 	},
 	{
@@ -2616,9 +2610,9 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/jest-puppeteer-axe",
-		"slug": "packages-jest-puppeteer-axe",
-		"markdown_source": "../packages/jest-puppeteer-axe/README.md",
+		"title": "@wordpress/kebab-case",
+		"slug": "packages-kebab-case",
+		"markdown_source": "../packages/kebab-case/README.md",
 		"parent": "packages"
 	},
 	{
@@ -3225,6 +3219,12 @@
 		"title": "Workspace Development",
 		"slug": "workspace-development",
 		"markdown_source": "../docs/contributors/code/workspace-development.md",
+		"parent": "code"
+	},
+	{
+		"title": "Agents and Skills",
+		"slug": "agents-and-skills",
+		"markdown_source": "../docs/contributors/code/agents-and-skills.md",
 		"parent": "code"
 	},
 	{

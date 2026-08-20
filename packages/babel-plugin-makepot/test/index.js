@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { transformSync } from '@babel/core';
 import traverse from '@babel/traverse';
-
-/**
- * Internal dependencies
- */
 import babelPlugin from '..';
 
 describe( 'babel-plugin', () => {

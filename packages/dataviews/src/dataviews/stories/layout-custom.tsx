@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useState, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DataViews from '../index';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { View } from '../../types';

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { colord } from 'colord';
-
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	ColorIndicator,
@@ -17,10 +10,6 @@ import {
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { DataFormControlProps } from '../../types';
 import { unlock } from '../../lock-unlock';
 import getCustomValidity from './utils/get-custom-validity';

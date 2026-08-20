@@ -1,9 +1,7 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
 import { Component, createPortal, useState } from '@wordpress/element';
 import { registerStyle } from '@wordpress/style-runtime';
-
 import { Slot, Fill, Provider, useSlotFills } from '../';
 
 function IframePortal( { children } ) {

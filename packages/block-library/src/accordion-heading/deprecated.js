@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useBlockProps,
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,

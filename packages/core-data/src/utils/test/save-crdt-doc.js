@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import { getSyncManager } from '../../sync';
 import { saveCRDTDoc } from '../save-crdt-doc';
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useState, useEffect } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
 import { getScrollContainer } from '@wordpress/dom';

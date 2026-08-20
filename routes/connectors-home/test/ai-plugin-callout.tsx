@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { AiPluginCallout } from '../ai-plugin-callout';
 
 jest.mock( '@wordpress/a11y', () => ( {

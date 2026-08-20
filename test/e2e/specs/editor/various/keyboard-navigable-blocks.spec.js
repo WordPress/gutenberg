@@ -1,8 +1,4 @@
 /* eslint-disable playwright/expect-expect */
-
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -129,7 +125,7 @@ class KeyboardNavigableBlocks {
 		await this.expectLabelToHaveFocus( 'Move down' );
 
 		await this.page.keyboard.press( 'ArrowRight' );
-		await this.expectLabelToHaveFocus( 'Align' );
+		await this.expectLabelToHaveFocus( 'Align block' );
 
 		await this.page.keyboard.press( 'ArrowRight' );
 		await this.expectLabelToHaveFocus( 'Align text' );

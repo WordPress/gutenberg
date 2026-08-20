@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	__unstableGetAnimateClassName as getAnimateClassName,
 	Button,
@@ -17,10 +10,6 @@ import { __ } from '@wordpress/i18n';
 import { Icon, check, cloud, cloudUpload } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import { STATUS_OPTIONS } from '../../components/post-status';
 import { store as editorStore } from '../../store';
 import { ATTACHMENT_POST_TYPE } from '../../store/constants';

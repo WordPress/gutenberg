@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Button } from '@wordpress/components';
 import { RawHTML } from '@wordpress/element';
 import { safeHTML } from '@wordpress/dom';

@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { BaseControl, useBaseControlProps } from '@wordpress/components';
 import { useMergeRefs } from '@wordpress/compose';
 import { useRegistry } from '@wordpress/data';
 import { useMemo, useRef, useState } from '@wordpress/element';
 import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import { getAllowedFormats } from '../../../components/rich-text/utils';
 import { useEventListeners } from '../../../components/rich-text/event-listeners';
 import FormatEdit from '../../../components/rich-text/format-edit';

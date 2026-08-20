@@ -2,8 +2,109 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
+    -   `DropdownContentWrapper` ([#81522](https://github.com/WordPress/gutenberg/pull/81522))
+    -   `ResizableBox` ([#81792](https://github.com/WordPress/gutenberg/pull/81792))
+
+### Enhancements
+
+-   `TextControl`, `TextareaControl`, `FormTokenField`, `ContentEditableControl`, `ComboboxControl`: Align focus and hover styles with the design system ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
+-   `InputControl`, `SelectControl`, `CustomSelectControl`: Align focus rings with the design system ([#80417](https://github.com/WordPress/gutenberg/pull/80417)).
+
 ### Bug Fixes
 
+-   `Modal`: Prevent an Escape key press that dismisses the modal from propagating to underlying overlays. ([#81785](https://github.com/WordPress/gutenberg/pull/81785))
+-   `BoxControl`: Update the opposite side when ALT is held on the left or right input, which each updated themselves instead ([#81530](https://github.com/WordPress/gutenberg/pull/81530)).
+-   `InputControl`: Vertically center the value of date and time inputs in Safari ([#81361](https://github.com/WordPress/gutenberg/pull/81361)).
+-   `ControlWithError`: Re-read the target's validation message when an `invalid` event is received, so a message that changed without a re-render in between (e.g. a programmatic value change followed by a synthetic `invalid` event) is not revealed stale or empty. While a `validating` custom validity is pending, the message is left untouched so the pending indicator keeps showing ([#81440](https://github.com/WordPress/gutenberg/pull/81440)).
+
+### TypeScript
+
+-   `ComboboxControl`: Narrow the `onChange` callback parameter type to `string | null`, matching the values the component actually passes. The previous indexed-access type on the optional `value` prop leaked an accidental `undefined` into the union ([#81568](https://github.com/WordPress/gutenberg/pull/81568)).
+
+### Internal
+
+-   Point tsconfig references at split dependencies' build projects. ([#81514](https://github.com/WordPress/gutenberg/pull/81514), [#81516](https://github.com/WordPress/gutenberg/pull/81516), [#81518](https://github.com/WordPress/gutenberg/pull/81518))
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81515](https://github.com/WordPress/gutenberg/pull/81515))
+-   Remove `ValidatedComboboxControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81449](https://github.com/WordPress/gutenberg/pull/81449)).
+-   Remove `ValidatedFormTokenField` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81451](https://github.com/WordPress/gutenberg/pull/81451)).
+-   Remove `ValidatedToggleControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81492](https://github.com/WordPress/gutenberg/pull/81492)).
+-   Remove `ValidatedToggleGroupControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81450](https://github.com/WordPress/gutenberg/pull/81450)).
+-   `ToggleGroupControl`: Streamline focus ring color styles ([#81242](https://github.com/WordPress/gutenberg/pull/81242)).
+
+## 39.0.0 (2026-08-12)
+
+### Breaking Changes
+
+-   `ValidatedTextControl`: Remove from private APIs. Use `ValidatedInputControl` instead ([#80680](https://github.com/WordPress/gutenberg/pull/80680)).
+-   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
+    -   `ItemGroup` ([#80797](https://github.com/WordPress/gutenberg/pull/80797))
+    -   `Spinner` ([#80511](https://github.com/WordPress/gutenberg/pull/80511))
+-   Remove the private `DateCalendar`, `DateRangeCalendar` and `TZDate` exports. The calendars now ship as the public `Calendar` and `RangeCalendar` components in `@wordpress/ui`; `TZDate` comes from [`@date-fns/tz`](https://www.npmjs.com/package/@date-fns/tz) ([#81337](https://github.com/WordPress/gutenberg/pull/81337)).
+
+### Deprecations
+
+-   `Animate`: Deprecate the component, planned for removal in WordPress 7.4 ([#80931](https://github.com/WordPress/gutenberg/pull/80931)).
+-   `Surface`: Deprecate the component, planned for removal in WordPress 7.4 ([#80943](https://github.com/WordPress/gutenberg/pull/80943)).
+
+### Enhancements
+
+-   `SandBox`: Add `allowForms` prop to opt into `allow-forms` in the iframe's sandbox attribute ([#76471](https://github.com/WordPress/gutenberg/pull/76471)).
+
+### Bug Fixes
+
+-   `Modal`: Prevent background page scrolling without relying on WordPress global styles when using the default `bodyOpenClassName` ([#81164](https://github.com/WordPress/gutenberg/pull/81164)).
+-   `Menu`: Return focus to the root trigger after closing a legacy `Modal` opened from a menu item, while preserving the menu-to-Modal scroll-lock handoff ([#81164](https://github.com/WordPress/gutenberg/pull/81164)).
+-   `Button`: Suppress the browser focus ring when keyboard-focused and pressed ([#81113](https://github.com/WordPress/gutenberg/pull/81113)).
+
+### TypeScript
+
+-   Further improved `WordPressComponent` typecheck performance: intrinsic `as` values use a shared attribute bag instead of remapping props per HTML tag ([#80705](https://github.com/WordPress/gutenberg/pull/80705)).
+-   `ConfirmDialog`: Type the `size` prop forwarded to `Modal` ([#80705](https://github.com/WordPress/gutenberg/pull/80705)).
+-   `ToggleGroupControl`: Type the `disabled` prop ([#80705](https://github.com/WordPress/gutenberg/pull/80705)).
+-   `DropdownContentWrapper`: Type the `children` prop ([#80705](https://github.com/WordPress/gutenberg/pull/80705)).
+
+### Documentation
+
+-   `ConfirmDialog`: Opt into auto-generated README documentation from types and JSDoc ([#80866](https://github.com/WordPress/gutenberg/pull/80866)).
+
+### Internal
+
+-   Remove `ValidatedCheckboxControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81435](https://github.com/WordPress/gutenberg/pull/81435)).
+-   Remove `ValidatedNumberControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81433](https://github.com/WordPress/gutenberg/pull/81433)).
+-   Remove `ValidatedRadioControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81434](https://github.com/WordPress/gutenberg/pull/81434)).
+-   Remove `ValidatedSelectControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81391](https://github.com/WordPress/gutenberg/pull/81391)).
+-   Move `withIgnoreIMEEvents` to `@wordpress/keycodes`, where it is now a public API, and remove it from this package's private APIs ([#81343](https://github.com/WordPress/gutenberg/pull/81343)).
+-   Extract the private `kebabCase` utility to the new `@wordpress/kebab-case` package and remove it from the private APIs; all consumers now use the package directly ([#81294](https://github.com/WordPress/gutenberg/pull/81294)).
+-   Remove `normalizeTextString` from the private APIs; the utility remains internal to this package ([#81294](https://github.com/WordPress/gutenberg/pull/81294)).
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
+-   `Button`: Expand the Storybook e2e `VariantStates` matrix with compact, small, and with-icon rows ([#80793](https://github.com/WordPress/gutenberg/pull/80793)).
+-   Update `react-day-picker` to 9.14.0 ([#80792](https://github.com/WordPress/gutenberg/pull/80792)).
+-   Update `@ariakit/react` to 0.4.35 and `@ariakit/test` to 0.7.2 ([#80765](https://github.com/WordPress/gutenberg/pull/80765)).
+-   Update `@floating-ui/react-dom` to 2.1.9 ([#80761](https://github.com/WordPress/gutenberg/pull/80761)).
+-   `ItemGroup`: Migrate styles from Emotion to an SCSS Module. ([#80797](https://github.com/WordPress/gutenberg/pull/80797)).
+
+## 38.0.0 (2026-07-29)
+
+### Breaking Changes
+
+-   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
+    -   `ToggleGroupControl` ([#80381](https://github.com/WordPress/gutenberg/pull/80381))
+    -   `Disabled` ([#80643](https://github.com/WordPress/gutenberg/pull/80643))
+    -   `ToolsPanel` ([#80445](https://github.com/WordPress/gutenberg/pull/80445))
+-   Remove the private `Theme` component ([#80691](https://github.com/WordPress/gutenberg/pull/80691)).
+
+### Enhancements
+
+-   `GradientPicker`: Add `selectedSlug` prop for slug-based selection and pass the selected preset's slug to `onChange`, so two presets sharing a gradient keep their identity ([#80554](https://github.com/WordPress/gutenberg/pull/80554)).
+-   `SandBox`: Add `allowPopups` prop to opt into `allow-popups` in the iframe's sandbox attribute ([#69617](https://github.com/WordPress/gutenberg/pull/69617)).
+-   Validated form controls: Only move focus to the invalid control for trusted `invalid` events (form submission, `reportValidity()`). Consumers can now dispatch a synthetic `invalid` event to reveal a control's error message without disturbing the user's place in the form ([#80685](https://github.com/WordPress/gutenberg/pull/80685)).
+
+### Bug Fixes
+
+-   `ToolsPanel`: Migrate styles from Emotion to an SCSS Module and restore the header heading typography after the `View` migration. ([#80445](https://github.com/WordPress/gutenberg/pull/80445)).
 -   `Autocomplete`: Expose the suggestions list to assistive technology with `aria-controls` and `aria-haspopup`, both required alongside `aria-autocomplete="list"` ([#80403](https://github.com/WordPress/gutenberg/pull/80403)).
 -   `Autocomplete`: Omit `aria-activedescendant` while no suggestion is highlighted, instead of returning `null` for it ([#80403](https://github.com/WordPress/gutenberg/pull/80403)).
 -   `ContentEditableControl`: Associate the label with the `contentEditable` field via `aria-labelledby` instead of an invalid `label[for]`, which triggered Chrome console errors ([#80344](https://github.com/WordPress/gutenberg/pull/80344)).
@@ -12,23 +113,24 @@
 
 ### TypeScript
 
+-   Update Jest type definitions to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
 -   `Autocomplete`: `__unstableUseAutocompleteProps` now narrows its returned ARIA props and no longer asks for a `contentRef` it never used, so callers can spread its return value onto an element without a placeholder ref, normalizing, or casting ([#80403](https://github.com/WordPress/gutenberg/pull/80403)).
 -   Improved performance of TypeScript types for internal polymorphic `WordPressComponent` component type ([#80364](https://github.com/WordPress/gutenberg/pull/80364)).
 
-### Breaking Changes
-
--   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
-    -   `ToggleGroupControl` ([#80381](https://github.com/WordPress/gutenberg/pull/80381))
-
 ### Internal
 
+-   Update `date-fns` to 4.4.0 ([#80763](https://github.com/WordPress/gutenberg/pull/80763)).
+-   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).
+-   `TextControl`, `ComboboxControl`, `FormTokenField`, `ContentEditableControl`: Replace `--wp-components-color-accent` with `--wp-admin-theme-color` for focus ring color ([#80595](https://github.com/WordPress/gutenberg/pull/80595)).
 -   `ConfirmDialog`: Migrate styles from Emotion to an SCSS Module ([#80394](https://github.com/WordPress/gutenberg/pull/80394)).
+-   `ExternalLink`: Use the shared `outset-ring__focus` mixin for the focus ring ([#80573](https://github.com/WordPress/gutenberg/pull/80573)).
 -   `SearchControl`: Migrate styles from Emotion to an SCSS Module ([#80474](https://github.com/WordPress/gutenberg/pull/80474)).
 -   `FormTokenField`: Migrate styles from Emotion to an SCSS Module ([#80472](https://github.com/WordPress/gutenberg/pull/80472)).
 -   `GradientPicker`, `ColorPalette`: Migrate styles from Emotion to an SCSS Module ([#80473](https://github.com/WordPress/gutenberg/pull/80473)).
 -   `InputControl`, `SelectControl`, `CustomSelectControl`, `ToggleGroupControl`, and `RangeControl`: Remove obsolete internal `__shouldNotWarnDeprecated36pxSize` prop ([#80323](https://github.com/WordPress/gutenberg/pull/80323)).
 -   `InputControl`, `SelectControl`, `CustomSelectControl`: Remove obsolete `__unstable-large` from the public `size` type. The value continues to work at runtime, and is equivalent to the `default` size. ([#80081](https://github.com/WordPress/gutenberg/pull/80081)).
 -   `ToggleGroupControl`: Migrate styles from Emotion to SCSS Modules and use WPDS tokens for migrated visual values ([#80381](https://github.com/WordPress/gutenberg/pull/80381)).
+-   `Disabled`: Migrate styles from Emotion to an SCSS Module ([#80643](https://github.com/WordPress/gutenberg/pull/80643)).
 -   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
 
 ## 37.0.0 (2026-07-14)

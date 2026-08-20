@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { loadView } from '@wordpress/views';
 import type { View, Filter } from '@wordpress/dataviews';
 

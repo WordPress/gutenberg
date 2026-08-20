@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Card,
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -10,10 +7,6 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import './guideline-actions-section.scss';
 import { exportGuidelines, importGuidelines } from '../import-export';
 import ActionItem from './action-item';

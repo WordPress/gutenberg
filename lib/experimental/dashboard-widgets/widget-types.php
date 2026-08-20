@@ -111,14 +111,74 @@ function gutenberg_sanitize_widget_help( $help ) {
 }
 
 /**
- * Constrains a widget's actions to their allowed shape: each entry keeps
- * `id`, `label`, and `href`; entries missing any of those are dropped.
- * Optional `download` and `openInNewTab` are copied when present.
+ * Resolves a widget-local file href to a plugin URL.
  *
- * @param array|null $actions Actions from the build manifest.
- * @return array|null Sanitized actions, or null when there are none.
+ * Leaves absolute, scheme-relative, root-relative, and single-segment admin
+ * `.php` hrefs unchanged. Returns '' for local path traversal and for
+ * relative hrefs that are not a file under `widgets/{dir}/` (so
+ * `esc_url_raw()` cannot invent `http://filename`). Query strings on local
+ * filenames are not stripped: `report.csv?v=2` will not resolve as a file.
+ *
+ * @param string $href     Action href.
+ * @param string $dir_name Widget directory name.
+ * @return string Plugin URL, original href, or ''.
  */
-function gutenberg_sanitize_widget_actions( $actions ) {
+function gutenberg_resolve_widget_action_href( $href, $dir_name ) {
+	if ( ! is_string( $href ) || '' === $href ) {
+		return '';
+	}
+
+	// Absolute, scheme-relative, or schemed — including URLs with `..` in the path.
+	if ( preg_match( '#^([a-z][a-z0-9+.-]*:)?//#i', $href ) || str_contains( $href, ':' ) ) {
+		return $href;
+	}
+
+	// Root-relative paths (e.g. /wp-admin/…, /report.csv).
+	if ( str_starts_with( $href, '/' ) ) {
+		return $href;
+	}
+
+	if ( str_contains( $href, '..' ) ) {
+		return '';
+	}
+
+	$path_only = preg_split( '/[?#]/', $href, 2 )[0];
+	if ( str_ends_with( strtolower( $path_only ), '.php' ) ) {
+		// Single-segment admin entry points stay as-is. Deeper relative
+		// paths would come out of `esc_url_raw()` as `http://` URLs, and
+		// PHP files never resolve as local widget assets.
+		return str_contains( $path_only, '/' ) ? '' : $href;
+	}
+
+	if ( ! is_string( $dir_name ) || '' === $dir_name ) {
+		return '';
+	}
+
+	$candidate = 'widgets/' . $dir_name . '/' . $href;
+
+	if ( is_file( gutenberg_dir_path() . $candidate ) ) {
+		return gutenberg_url( $candidate );
+	}
+
+	return '';
+}
+
+/**
+ * Sanitizes widget actions to `id` / `label` / `href` (via `esc_url_raw()`),
+ * plus optional `download` / `openInNewTab` / `icon` / `relevance`. Drops
+ * incomplete or unsafe entries; dropped hrefs are reported through
+ * `_doing_it_wrong()`. With `$dir_name`, resolves widget-local file hrefs
+ * first. A malformed `icon` or `relevance` drops the key, never the action.
+ *
+ * This is the registration gate for manifest-sourced widget types. Definitions
+ * registered only on the client do not pass through it; any future CPT/API
+ * source should reuse this helper at that boundary.
+ *
+ * @param array|null $actions  Actions from the build manifest.
+ * @param string     $dir_name Optional widget directory for local asset hrefs.
+ * @return array|null Sanitized actions, or null.
+ */
+function gutenberg_sanitize_widget_actions( $actions, $dir_name = '' ) {
 	if ( ! is_array( $actions ) ) {
 		return null;
 	}
@@ -127,33 +187,89 @@ function gutenberg_sanitize_widget_actions( $actions ) {
 	foreach ( $actions as $action ) {
 		if (
 			! is_array( $action ) ||
-			empty( $action['id'] ) ||
-			empty( $action['label'] ) ||
-			empty( $action['href'] )
+			! isset( $action['id'], $action['label'], $action['href'] ) ||
+			! is_string( $action['id'] ) ||
+			! is_string( $action['label'] ) ||
+			! is_string( $action['href'] ) ||
+			'' === $action['id'] ||
+			'' === $action['label'] ||
+			'' === $action['href']
 		) {
+			continue;
+		}
+
+		$href = gutenberg_resolve_widget_action_href( $action['href'], $dir_name );
+		$href = esc_url_raw( $href );
+		if ( ! $href ) {
+			_doing_it_wrong(
+				__FUNCTION__,
+				sprintf(
+					/* translators: 1: Widget action id. 2: Declared action href. */
+					__( 'Dropped widget action "%1$s": href "%2$s" is neither an allowed URL nor an existing widget file.', 'gutenberg' ),
+					$action['id'],
+					$action['href']
+				),
+				'23.7.0'
+			);
 			continue;
 		}
 
 		$entry = array(
 			'id'    => $action['id'],
 			'label' => $action['label'],
-			'href'  => $action['href'],
+			'href'  => $href,
 		);
 
 		if ( isset( $action['download'] ) ) {
-			$entry['download'] = is_bool( $action['download'] )
-				? $action['download']
-				: (string) $action['download'];
+			if ( is_bool( $action['download'] ) ) {
+				$entry['download'] = $action['download'];
+			} else {
+				$filename = sanitize_file_name( (string) $action['download'] );
+				if ( $filename ) {
+					$entry['download'] = $filename;
+				}
+			}
 		}
 
 		if ( isset( $action['openInNewTab'] ) ) {
 			$entry['openInNewTab'] = (bool) $action['openInNewTab'];
 		}
 
+		if ( isset( $action['icon'] ) ) {
+			$icon = gutenberg_sanitize_widget_icon( $action['icon'] );
+			if ( $icon ) {
+				$entry['icon'] = $icon;
+			}
+		}
+
+		if ( isset( $action['relevance'] ) && in_array( $action['relevance'], array( 'high', 'medium', 'low' ), true ) ) {
+			$entry['relevance'] = $action['relevance'];
+		}
+
 		$sanitized[] = $entry;
 	}
 
 	return $sanitized ? $sanitized : null;
+}
+
+/**
+ * Constrains a widget icon reference to a registered icon name
+ * (`collection/icon-name`). Anything else drops silently, so authoring
+ * forms not accepted yet degrade to no icon rather than warn.
+ *
+ * @param string|null $icon Icon reference from the build manifest.
+ * @return string|null The icon name, or null when the shape does not match.
+ */
+function gutenberg_sanitize_widget_icon( $icon ) {
+	if ( ! is_string( $icon ) || '' === $icon ) {
+		return null;
+	}
+
+	if ( ! preg_match( '#^[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?/[a-z0-9](?:[a-z0-9_-]*[a-z0-9])?$#', $icon ) ) {
+		return null;
+	}
+
+	return $icon;
 }
 
 /**
@@ -189,7 +305,11 @@ function gutenberg_register_widget_types() {
 				'title'         => $widget['title'] ?? null,
 				'description'   => $widget['description'] ?? null,
 				'help'          => gutenberg_sanitize_widget_help( $widget['help'] ?? null ),
-				'actions'       => gutenberg_sanitize_widget_actions( $widget['actions'] ?? null ),
+				'icon'          => gutenberg_sanitize_widget_icon( $widget['icon'] ?? null ),
+				'actions'       => gutenberg_sanitize_widget_actions(
+					$widget['actions'] ?? null,
+					$widget['dir_name'] ?? ''
+				),
 				'keywords'      => $widget['keywords'] ?? null,
 			)
 		);

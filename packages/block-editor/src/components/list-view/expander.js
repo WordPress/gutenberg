@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { chevronRightSmall, chevronLeftSmall, Icon } from '@wordpress/icons';
 import { isRTL } from '@wordpress/i18n';
 

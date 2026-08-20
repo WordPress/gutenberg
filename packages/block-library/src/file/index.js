@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { _x, __ } from '@wordpress/i18n';
 import { file as icon } from '@wordpress/icons';
 import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';

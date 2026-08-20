@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	BlockControls,
 	InspectorControls,
@@ -25,10 +22,6 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { prependHTTPS } from '@wordpress/url';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { useDisabled } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
 

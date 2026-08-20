@@ -55,25 +55,30 @@ It takes host-supplied records (`WidgetModuleRecord[]`, or `null` while loading)
 
 ### Contract types
 
-`WidgetType`, `WidgetName`, `WidgetIcon`, `WidgetRenderProps`, `ResolveWidgetModule`, and `WidgetModuleRecord`. `WidgetIcon` is a rendered SVG element that hosts the pass to its icon primitive as-is.
+`WidgetType`, `WidgetName`, `WidgetIcon`, `WidgetRenderProps`, `ResolveWidgetModule`, and `WidgetModuleRecord`. `WidgetIcon` is a rendered SVG element that hosts pass to their icon primitive as-is; in `widget.json` a widget declares a registered icon name instead, resolved before it reaches hosts.
 
 ### `WidgetAttributeField< Item >`
 
 It's an authoring helper: a DataViews `Field` whose `id` is narrowed to the widget's attribute keys.
-Its optional `relevance` hint (`'high' | 'low'`) marks attributes a host may promote to a prominent surface.
+Its optional `relevance` hint (`'high' | 'medium' | 'low'`) marks attributes a host may promote to a prominent surface.
 
 ### `WidgetAction`
 
-It's a declarative action a widget type exposes.
-Each carries `id`, `label`, `href`, and optional `download` / `openInNewTab`.
+It's a declarative verb a widget type exposes: an envelope (`id`, `label`, optional `icon` and `relevance`) plus exactly one fulfillment, named by the key carrying it.
+Today the only key is `href`, a link target, with optional `download` / `openInNewTab`.
+`data:` and `javascript:` hrefs are rejected at registration. Prefer a file next to the widget, an absolute URL, or `downloadBlob` for generated content.
 
-The widget names the intent and a link target; the host renders it as an anchor and owns placement. Only the `link` target exists today, and navigation and downloads are handled by the browser.
+The widget names the intent and how it is fulfilled; the host mounts the primitive and owns placement.
 
 ### Field types
 
 `registerFieldType( definition )` names a reusable field type — `{ name: 'location', baseType: 'text', Edit, ... }`, typed by `FieldTypeDefinition`. Those attributes reference via `type`.
 
 `useWidgetTypes` resolves those references into the plain per-field `Field` props DataViews understands, inheriting the rest from `baseType`.
+
+### Icons
+
+`registerIconResolver( resolver )` registers how a registered icon name (`"icon": "core/calendar"` in `widget.json`) becomes a renderable element. The application registers it once; `useWidgetTypes` resolves references while assembling each `WidgetType`, so hosts only receive renderable icons. An unresolvable reference degrades to no icon.
 
 ## Architecture
 

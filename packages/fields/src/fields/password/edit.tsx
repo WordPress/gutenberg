@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	CheckboxControl,
 	__experimentalVStack as VStack,
@@ -9,10 +6,6 @@ import {
 import type { DataFormControlProps } from '@wordpress/dataviews';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { BasePost } from '../../types';
 
 function PasswordEdit( {

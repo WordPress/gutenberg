@@ -74,11 +74,18 @@ A plain JS module returning a store created via `createBoardStore()` (one per mo
 
 A single shared `ResizeObserver` watches every registered floating element; when a floating note changes height, it updates `heights`, snapshots, and calls every `listener` in the store's `Set`.
 
+Anchors are read from the DOM, so a thread's position also goes stale whenever content moves under it. That is watched one layer up, in `useFloatingBoard`, not here.
+
 API:
 - `subscribe(listener)` / `getSnapshot()` - wired to React via `useSyncExternalStore`. Disconnects the observer when the last subscriber leaves.
 - `registerThread(id, blockEl, floatingEl)` - called by each `NoteThread` once mounted. Adds the block ref, swaps the floating ref (unobserving the previous one), starts observing the new one, emits.
 - `unregisterThread(id)` - inverse; called on unmount.
-- `getBlockRects()` - returns a batched snapshot of block `getBoundingClientRect()` values. Batches reads so subsequent CSS writes don't trigger layout thrash.
+- `getAnchorRects()` - returns a batched snapshot of each thread's *anchor* rect, so a thread lines up with the text it annotates rather than with the top of its block. The anchor is resolved per thread at read time, because rich-text re-renders replace the marker element:
+  - an inline note anchors to its in-content `mark.wp-note[data-id]` marker (its first run when the marker is split across several runs);
+  - the pending `new` note has no marker yet, so it anchors to the text selection it is about to wrap;
+  - a block-level note - or any note whose marker or selection can't be measured - falls back to the block's own `getBoundingClientRect()`.
+
+  Batches reads so subsequent CSS writes don't trigger layout thrash.
 - `getFirstBlockElement()` - the first registered block, used to locate the canvas scroll container.
 
 The store owns DOM references directly, not through React - floating note height changes must update layout without re-rendering the thread list.
@@ -90,7 +97,8 @@ Lives inside `Notes`. Holds one store instance (`useState(createBoardStore)`) an
 1. Subscribes to `heights` via `useSyncExternalStore(store.subscribe, store.getSnapshot)`.
 2. In a `useEffect` keyed on `threads + heights + selectedNoteId + isFloating + sidebarRef`:
    - Resolves the canvas scroll container by climbing from the first registered block to `.is-root-container` and calling `getScrollContainer()` on it.
-   - Schedules a single `requestAnimationFrame` that calls `calculateNotePositions({ threads, selectedNoteId, blockRects: store.getBlockRects(), heights, scrollTop })` (pure function in `utils.js`) and stores the result in React state (`notePositions`).
+   - Schedules a single `requestAnimationFrame` that calls `calculateNotePositions({ threads, selectedNoteId, blockRects: store.getAnchorRects(), heights, scrollTop })` (pure function in `utils.js`) and stores the result in React state (`notePositions`).
+   - Observes `.is-root-container` with a `ResizeObserver` that reschedules that same frame, so editing, adding or removing any block re-anchors the threads after it. One observation covers the whole canvas, and it only exists while the board is floating.
    - Attaches a capture-phase `scroll` listener on the canvas's `defaultView` that writes a CSS variable `--canvas-scroll` to the sidebar panel. (`window` capture catches scrolls on the document root, which don't bubble.)
 3. Returns `{ notePositions, registerThread, unregisterThread }` - the positions flow down as props; the two register callbacks flow to each `NoteThread`.
 
@@ -100,10 +108,11 @@ Given the list of threads, the currently selected note id, the block rects, the 
 
 Algorithm, keyed on the selected note as an **anchor**:
 
-1. Anchor the selected note at `blockRect.top + THREAD_ALIGN_OFFSET` (−16). If no selected note, anchor the first thread.
-2. Walk forward from the anchor: each subsequent thread starts at its block's top; if it would overlap the previous thread's bottom (plus `THREAD_GAP` of 16), push it further down by `OVERLAP_MARGIN` (20).
-3. Walk backward from the anchor: mirror - push upward into any overlap.
-4. Convert each final offset into content-space by adding `blockRect.top + scrollTop`.
+1. Sort the threads by measured anchor top. The sweeps below assume tops increase with index; document order satisfies that for notes anchored to their markers, but the pending `new` note anchors to the live selection and can sit above notes that precede it in the list.
+2. Anchor the selected note at `anchorRect.top + THREAD_ALIGN_OFFSET` (−16). If no selected note, anchor the first thread.
+3. Walk forward from the anchor: each subsequent thread starts at its own anchor's top; if it would overlap the previous thread's bottom (plus `THREAD_GAP` of 16), push it further down by `OVERLAP_MARGIN` (20).
+4. Walk backward from the anchor: mirror - push upward into any overlap.
+5. Convert each final offset into content-space by adding `anchorRect.top + scrollTop`.
 
 ### 4. `FloatingContainer` - the render shell
 

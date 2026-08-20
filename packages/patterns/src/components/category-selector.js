@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { FormTokenField } from '@wordpress/components';

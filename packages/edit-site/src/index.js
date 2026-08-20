@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as blocksStore } from '@wordpress/blocks';
 import {
 	registerCoreBlocks,
@@ -16,10 +13,6 @@ import {
 	registerLegacyWidgetBlock,
 	registerWidgetGroupBlock,
 } from '@wordpress/widgets';
-
-/**
- * Internal dependencies
- */
 import { store as editSiteStore } from './store';
 import { unlock } from './lock-unlock';
 import App from './components/app';

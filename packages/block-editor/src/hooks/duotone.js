@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
-
-/**
- * WordPress dependencies
- */
 import {
 	getBlockSupport,
 	getBlockType,
@@ -16,33 +9,31 @@ import { useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { useMemo, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { getBlockSelector } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
+import {
+	getBlockSelector,
+	privateApis as globalStylesEnginePrivateApis,
+} from '@wordpress/global-styles-engine';
 import {
 	BlockControls,
 	InspectorControls,
 	__experimentalDuotoneControl as DuotoneControl,
 	useSettings,
 } from '../components';
-import {
-	getDuotoneFilter,
-	getDuotoneStylesheet,
-	getDuotoneUnsetStylesheet,
-} from '../components/duotone/utils';
 import { scopeSelector } from '../components/global-styles/utils';
 import {
 	cleanEmptyObject,
 	useBlockSettings,
 	usePrivateStyleOverride,
 } from './utils';
+import { unlock } from '../lock-unlock';
 import { default as StylesFiltersPanel } from '../components/global-styles/filters-panel';
 import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import { store as blockEditorStore } from '../store';
+
+const { getDuotoneFilter, getDuotoneStylesheet, getDuotoneUnsetStylesheet } =
+	unlock( globalStylesEnginePrivateApis );
 
 const EMPTY_ARRAY = [];
 

@@ -1,20 +1,20 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { useResolvedStyle } from '../inherited-value-context';
 import { BlockContextProvider } from '../../block-context';
-
 import { globalStylesDataKey } from '../../../store/private-keys';
+
+// The inheritance treatment sits behind the
+// `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these
+// tests exercise the resolving path. The off path lives in
+// `inherited-value-context-core.js`.
+beforeEach( () => {
+	window.__experimentalGlobalStylesInheritanceUI = true;
+} );
+
+afterEach( () => {
+	delete window.__experimentalGlobalStylesInheritanceUI;
+} );
 
 jest.mock( '@wordpress/data', () => ( {
 	useSelect: jest.fn(),
@@ -200,6 +200,42 @@ describe( 'useResolvedStyle hook', () => {
 		// Root styles still resolve, so the assertion above means "no heading
 		// layer", not "nothing resolved at all".
 		expect( parsed.value.typography.lineHeight ).toBe( '1.6' );
+	} );
+
+	// A whole-block link block (e.g. Read More) renders as an `<a>`, so the root
+	// `styles.elements.link` layer paints it and folds into its top-level
+	// controls, just as `button` does for core/button.
+	test( 'a whole-block link folds the link element into top-level controls', () => {
+		mockStores( {
+			typography: { lineHeight: '1.6' },
+			elements: {
+				link: {
+					color: { text: '#0073aa' },
+					typography: { fontSize: '14px' },
+				},
+			},
+		} );
+		render( <Probe blockName="core/read-more" /> );
+		const parsed = JSON.parse( screen.getByTestId( 'probe' ).textContent );
+		expect( parsed.value.color.text ).toBe( '#0073aa' );
+		expect( parsed.value.typography.fontSize ).toBe( '14px' );
+		// The link element source is recorded as the element layer.
+		expect( parsed.sources[ 'color.text' ].layer ).toBe( 'element' );
+	} );
+
+	// A block that only *contains* links (Paragraph) must not fold `link` into
+	// its own text controls; the link styles stay under the `elements.link`
+	// passthrough for the Link colour control to read.
+	test( 'a container block does not fold the link element into its text controls', () => {
+		mockStores( {
+			typography: { lineHeight: '1.6' },
+			elements: { link: { color: { text: '#0073aa' } } },
+		} );
+		render( <Probe blockName="core/paragraph" /> );
+		const parsed = JSON.parse( screen.getByTestId( 'probe' ).textContent );
+		expect( parsed.value.color?.text ).toBeUndefined();
+		// It remains available via the passthrough for the Link colour control.
+		expect( parsed.value.elements.link.color.text ).toBe( '#0073aa' );
 	} );
 
 	test( 'returns empty value and sources when no block name is given', () => {
