@@ -304,6 +304,12 @@ describe( 'Snackbar', () => {
 			);
 		} );
 
+		it( 'should not speak when spokenMessage is null', () => {
+			render( <Snackbar spokenMessage={ null }>FYI</Snackbar> );
+
+			expect( speak ).not.toHaveBeenCalled();
+		} );
+
 		it( 'should speak a message containing components that use hooks', () => {
 			render(
 				<Snackbar>

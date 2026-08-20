@@ -135,6 +135,12 @@ describe( 'Notice', () => {
 			);
 		} );
 
+		it( 'should not speak when spokenMessage is null', () => {
+			render( <Notice spokenMessage={ null }>FYI</Notice> );
+
+			expect( speak ).not.toHaveBeenCalled();
+		} );
+
 		it( 'should speak a message containing components that use hooks', () => {
 			render(
 				<Notice>

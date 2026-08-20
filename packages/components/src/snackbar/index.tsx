@@ -20,7 +20,8 @@ const NOTICE_TIMEOUT = 6000;
 
 /**
  * Custom hook which announces the message with the given politeness, if a
- * valid message is provided.
+ * valid message is provided. Passing `null` or `undefined` as the message
+ * skips the announcement.
  *
  * A non-string message is read from the DOM node the returned ref is attached
  * to, rather than serialized with `renderToString`. Serializing during render
@@ -43,10 +44,12 @@ function useSpokenMessage(
 	} >();
 
 	useEffect( () => {
-		const spokenMessage =
-			typeof message === 'string'
-				? message
-				: messageContainerRef.current?.innerHTML;
+		let spokenMessage;
+		if ( typeof message === 'string' ) {
+			spokenMessage = message;
+		} else if ( message !== null && message !== undefined ) {
+			spokenMessage = messageContainerRef.current?.innerHTML;
+		}
 
 		if (
 			spokenMessage &&
