@@ -366,8 +366,29 @@ export function getBorderClasses( attributes ) {
 	const { borderColor, style } = attributes;
 	const borderColorClass = getColorClassName( 'border-color', borderColor );
 
+	const hasBorder =
+		style?.border?.width ||
+		style?.border?.style ||
+		style?.border?.top?.width ||
+		style?.border?.right?.width ||
+		style?.border?.bottom?.width ||
+		style?.border?.left?.width ||
+		style?.border?.top?.style ||
+		style?.border?.right?.style ||
+		style?.border?.bottom?.style ||
+		style?.border?.left?.style;
+
+	const hasBorderRadius =
+		style?.border?.radius ||
+		style?.border?.topLeft?.radius ||
+		style?.border?.topRight?.radius ||
+		style?.border?.bottomLeft?.radius ||
+		style?.border?.bottomRight?.radius;
+
 	return clsx( {
 		'has-border-color': borderColor || style?.border?.color,
+		'has-border': hasBorder,
+		'has-border-radius': hasBorderRadius,
 		[ borderColorClass ]: !! borderColorClass,
 	} );
 }

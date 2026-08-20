@@ -4,6 +4,7 @@ import {
 	getColorClassName,
 	__experimentalGetGradientClass,
 	useBlockProps,
+	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 } from '@wordpress/block-editor';
 import {
 	IMAGE_BACKGROUND_TYPE,
@@ -74,7 +75,10 @@ export default function save( { attributes } ) {
 
 	const backgroundPosition = mediaPosition( focalPoint );
 
+	const borderProps = getBorderClassesAndStyles( attributes );
+
 	const classes = clsx(
+		borderProps.className,
 		{
 			'is-light': ! isDark,
 			'has-parallax': hasParallax,

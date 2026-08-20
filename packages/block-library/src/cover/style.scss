@@ -10,11 +10,6 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	// Prevent the `wp-block-cover__background` span from overflowing the container when border-radius is applied.
-	// `overflow: hidden` is provided as a fallback for browsers that don't support `overflow: clip`.
-	overflow: hidden;
-	// Use clip instead of overflow: hidden so that sticky position works on child elements.
-	overflow: clip;
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
 	// Keep the flex layout direction to the physical direction (LTR) in RTL languages.
@@ -223,6 +218,14 @@
 			transform: translate(-50%, -50%);
 			pointer-events: none; // Prevent interaction with the iframe
 		}
+	}
+
+	&.has-border-radius.has-border {
+		// Prevent the `wp-block-cover__background` span from overflowing the container when border-radius is applied.
+		// `overflow: hidden` is provided as a fallback for browsers that don't support `overflow: clip`.
+		overflow: hidden;
+		// Use clip instead of overflow: hidden so that sticky position works on child elements.
+		overflow: clip;
 	}
 }
 

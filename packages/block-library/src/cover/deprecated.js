@@ -13,6 +13,7 @@ import { compose } from '@wordpress/compose';
 import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
+	EMBED_VIDEO_BACKGROUND_TYPE,
 	getPositionClassName,
 	isContentPositionCenter,
 	dimRatioToClass,
@@ -165,6 +166,23 @@ const v12toV13BlockAttributes = {
 	},
 };
 
+const v15BlockAttributes = {
+	...v12toV13BlockAttributes,
+	isUserOverlayColor: {
+		type: 'boolean',
+	},
+	sizeSlug: {
+		type: 'string',
+	},
+	alt: {
+		type: 'string',
+		default: '',
+	},
+	poster: {
+		type: 'string',
+	},
+};
+
 const v14BlockAttributes = {
 	...v12toV13BlockAttributes,
 	isUserOverlayColor: {
@@ -247,6 +265,20 @@ const v12BlockSupports = {
 	},
 };
 
+const v15BlockSupports = {
+	...v12BlockSupports,
+	shadow: true,
+	dimensions: {
+		aspectRatio: true,
+	},
+	interactivity: {
+		clientNavigation: true,
+	},
+	filter: {
+		duotone: true,
+	},
+};
+
 const v14BlockSupports = {
 	...v12BlockSupports,
 	shadow: true,
@@ -255,6 +287,181 @@ const v14BlockSupports = {
 	},
 	interactivity: {
 		clientNavigation: true,
+	},
+};
+
+// Deprecation for blocks that have border/border-radius but are missing has-border and has-border-radius classes.
+const v15 = {
+	attributes: v15BlockAttributes,
+	supports: v15BlockSupports,
+	save( { attributes } ) {
+		const {
+			backgroundType,
+			gradient,
+			contentPosition,
+			customGradient,
+			customOverlayColor,
+			dimRatio,
+			focalPoint,
+			useFeaturedImage,
+			hasParallax,
+			isDark,
+			isRepeated,
+			overlayColor,
+			url,
+			alt,
+			id,
+			minHeight: minHeightProp,
+			minHeightUnit,
+			tagName: Tag,
+			sizeSlug,
+			poster,
+		} = attributes;
+		const overlayColorClass = getColorClassName(
+			'background-color',
+			overlayColor
+		);
+		const gradientClass = __experimentalGetGradientClass( gradient );
+		const minHeight =
+			minHeightProp && minHeightUnit
+				? `${ minHeightProp }${ minHeightUnit }`
+				: minHeightProp;
+
+		const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
+		const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
+		const isEmbedVideoBackground =
+			EMBED_VIDEO_BACKGROUND_TYPE === backgroundType;
+
+		const isImgElement = ! ( hasParallax || isRepeated );
+
+		const style = {
+			minHeight: minHeight || undefined,
+		};
+
+		const bgStyle = {
+			backgroundColor: ! overlayColorClass
+				? customOverlayColor
+				: undefined,
+			background: customGradient ? customGradient : undefined,
+		};
+
+		const objectPosition =
+			// prettier-ignore
+			focalPoint && isImgElement
+				  ? mediaPosition(focalPoint)
+				  : undefined;
+
+		const backgroundImage = url ? `url(${ url })` : undefined;
+
+		const backgroundPosition = mediaPosition( focalPoint );
+
+		const classes = clsx(
+			{
+				'is-light': ! isDark,
+				'has-parallax': hasParallax,
+				'is-repeated': isRepeated,
+				'has-custom-content-position':
+					! isContentPositionCenter( contentPosition ),
+			},
+			getPositionClassName( contentPosition )
+		);
+
+		const imgClasses = clsx(
+			'wp-block-cover__image-background',
+			id ? `wp-image-${ id }` : null,
+			{
+				[ `size-${ sizeSlug }` ]: sizeSlug,
+				'has-parallax': hasParallax,
+				'is-repeated': isRepeated,
+			}
+		);
+
+		const gradientValue = gradient || customGradient;
+
+		return (
+			<Tag { ...useBlockProps.save( { className: classes, style } ) }>
+				{ ! useFeaturedImage &&
+					isImageBackground &&
+					url &&
+					( isImgElement ? (
+						<img
+							className={ imgClasses }
+							alt={ alt }
+							src={ url }
+							style={ { objectPosition } }
+							data-object-fit="cover"
+							data-object-position={ objectPosition }
+						/>
+					) : (
+						<div
+							role={ alt ? 'img' : undefined }
+							aria-label={ alt ? alt : undefined }
+							className={ imgClasses }
+							style={ { backgroundPosition, backgroundImage } }
+						/>
+					) ) }
+				{ isVideoBackground && url && (
+					<video
+						className={ clsx(
+							'wp-block-cover__video-background',
+							'intrinsic-ignore'
+						) }
+						autoPlay
+						muted
+						loop
+						playsInline
+						src={ url }
+						poster={ poster }
+						style={ { objectPosition } }
+						data-object-fit="cover"
+						data-object-position={ objectPosition }
+					/>
+				) }
+				{ isEmbedVideoBackground && url && (
+					<figure
+						className={ clsx(
+							'wp-block-cover__video-background',
+							'wp-block-cover__embed-background',
+							'wp-block-embed'
+						) }
+					>
+						<div className="wp-block-embed__wrapper">{ url }</div>
+					</figure>
+				) }
+
+				{ /* The `wp-block-cover__background` needs to be immediately before
+				the `wp-block-cover__inner-container`, so the exclusion CSS selector
+				`.wp-block-cover__background + .wp-block-cover__inner-container`
+				works properly. If it needs to be changed in the future, the
+				selector for the backward compatibility for v14 deprecation also
+				needs change. */ }
+				<span
+					aria-hidden="true"
+					className={ clsx(
+						'wp-block-cover__background',
+						overlayColorClass,
+						dimRatioToClass( dimRatio ),
+						{
+							'has-background-dim': dimRatio !== undefined,
+							// For backwards compatibility. Former versions of the Cover Block applied
+							// `.wp-block-cover__gradient-background` in the presence of
+							// media, a gradient and a dim.
+							'wp-block-cover__gradient-background':
+								url && gradientValue && dimRatio !== 0,
+							'has-background-gradient': gradientValue,
+							[ gradientClass ]: gradientClass,
+						}
+					) }
+					style={ bgStyle }
+				/>
+
+				<div
+					{ ...useInnerBlocksProps.save( {
+						className: 'wp-block-cover__inner-container',
+					} ) }
+				/>
+			</Tag>
+		);
 	},
 };
 
@@ -2003,4 +2210,20 @@ const v1 = {
 	},
 };
 
-export default [ v14, v13, v12, v11, v10, v9, v8, v7, v6, v5, v4, v3, v2, v1 ];
+export default [
+	v15,
+	v14,
+	v13,
+	v12,
+	v11,
+	v10,
+	v9,
+	v8,
+	v7,
+	v6,
+	v5,
+	v4,
+	v3,
+	v2,
+	v1,
+];
