@@ -15,7 +15,7 @@
 
 ### Bug Fixes
 
--   `Item`: Add a `wrapperClassName` prop for styling the wrapper element the component renders around its contents. The prop was already reaching the wrapper as an unknown prop, but it replaced the wrapper's own class, dropping the layout `ItemGroup` relies on for its borders and rounded corners.
+-   `Item`: Add a `wrapperClassName` prop for styling the wrapper element the component renders around its contents. The prop already reached the wrapper as an unknown prop, but it replaced the wrapper's own class instead of being added to it.
 -   `Modal`: Prevent an Escape key press that dismisses the modal from propagating to underlying overlays. ([#81785](https://github.com/WordPress/gutenberg/pull/81785))
 -   `BoxControl`: Update the opposite side when ALT is held on the left or right input, which each updated themselves instead ([#81530](https://github.com/WordPress/gutenberg/pull/81530)).
 -   `InputControl`: Vertically center the value of date and time inputs in Safari ([#81361](https://github.com/WordPress/gutenberg/pull/81361)).

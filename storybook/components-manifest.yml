@@ -544,6 +544,7 @@
             - as
             - children
             - size
+            - wrapperClassName
 - name: KeyboardShortcuts
   props:
       - bindGlobal

@@ -40,8 +40,8 @@ export interface ItemProps {
 	size?: ItemSize;
 	/**
 	 * A CSS class to add to the wrapper element that `Item` renders around its
-	 * contents. The class is added alongside the wrapper's own class, which
-	 * `ItemGroup` relies on for its borders and rounded corners.
+	 * contents. It is added alongside the wrapper's own class rather than
+	 * replacing it.
 	 */
 	wrapperClassName?: string;
 	/**

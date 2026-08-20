@@ -42,7 +42,7 @@ Determines the amount of padding within the component.
 
 ### `wrapperClassName`: `string`
 
-A CSS class to add to the wrapper element that `Item` renders around its contents. The class is added alongside the wrapper's own class, which [`ItemGroup`](/packages/components/src/item-group/item-group/README.md) relies on for its borders and rounded corners.
+A CSS class to add to the wrapper element that `Item` renders around its contents. It is added alongside the wrapper's own class rather than replacing it.
 
 - Required: No
 
