@@ -136,6 +136,52 @@ test.describe( 'Suggest mode: the code editor', () => {
 		await expect( page.locator( TEXT_EDITOR ) ).toBeVisible();
 	} );
 
+	test( 'stays closed after returning to Editing with suggestions still pending', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Original content' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' plus suggested' );
+		await expect(
+			paragraph.locator(
+				`${ SUGGESTION_MARK }[data-suggestion-type="add"]`
+			)
+		).toContainText( 'plus suggested' );
+
+		// Back in Editing the intent no longer forbids the code editor, but
+		// the marker is still in the document and re-parsing an edited
+		// document is what destroys it - whoever made the edit.
+		await switchIntent( page, 'Editing' );
+
+		await pageUtils.pressKeys( 'secondary+m' );
+		await expect( page.locator( TEXT_EDITOR ) ).toBeHidden();
+
+		// The menu item stays enabled here: answering it up front would mean
+		// serializing the document on every render. The refusal happens on
+		// dispatch instead, so it has to be on screen and not only spoken -
+		// a shortcut that silently does nothing reads as a broken editor.
+		await expect(
+			page
+				.getByTestId( 'snackbar' )
+				.filter( { hasText: 'The code editor is unavailable' } )
+		).toBeVisible();
+
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).toContain( 'data-suggestion-type="add"' );
+	} );
+
 	test( 'the toggle-mode shortcut cannot expose a pending suggestion as raw HTML', async ( {
 		editor,
 		page,
