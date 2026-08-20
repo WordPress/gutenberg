@@ -982,6 +982,229 @@ describe( 'getEntityRecords', () => {
 			expect.objectContaining( { totalItems: 5, totalPages: 1 } )
 		);
 	} );
+
+	it( 'ignores a list response delivered after a newer one for the same query', async () => {
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+			receiveUserPermissions: jest.fn(),
+			finishResolutions: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn(),
+			__unstableReleaseStoreLock: jest.fn(),
+		} );
+
+		const STALE_RECORDS = [ { id: 1 } ];
+		const FRESH_RECORDS = [ { id: 1 }, { id: 2 } ];
+		const QUERY = { media_type: 'image' };
+
+		let deliverStaleResponse;
+		const staleResponseGate = new Promise( ( resolve ) => {
+			deliverStaleResponse = resolve;
+		} );
+
+		const headers = new Map( [
+			[ 'X-WP-Total', '2' ],
+			[ 'X-WP-TotalPages', '1' ],
+		] );
+		triggerFetch
+			.mockImplementationOnce( () => ( {
+				json: () => staleResponseGate.then( () => STALE_RECORDS ),
+				headers,
+			} ) )
+			.mockImplementationOnce( () => ( {
+				json: () => Promise.resolve( FRESH_RECORDS ),
+				headers,
+			} ) );
+
+		// A first request is made and stays in flight...
+		const staleRequest = getEntityRecords(
+			'postType',
+			'attachment',
+			QUERY
+		)( { dispatch, registry, resolveSelect } );
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+		// ...while the resolution is invalidated and requested again.
+		await getEntityRecords(
+			'postType',
+			'attachment',
+			QUERY
+		)( { dispatch, registry, resolveSelect } );
+
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+			'postType',
+			'attachment',
+			FRESH_RECORDS,
+			QUERY,
+			false,
+			undefined,
+			{ totalItems: 2, totalPages: 1 }
+		);
+
+		// The late response must not overwrite the list received since,
+		// nor rewrite its records' individual resolutions.
+		deliverStaleResponse();
+		await staleRequest;
+
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledTimes( 1 );
+		expect( dispatch.finishResolutions ).toHaveBeenCalledTimes( 1 );
+
+		// The lock is still released for the discarded request.
+		expect( dispatch.__unstableReleaseStoreLock ).toHaveBeenCalledTimes(
+			2
+		);
+	} );
+
+	it( 'does not discard a list response because a different query was received', async () => {
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+			receiveUserPermissions: jest.fn(),
+			finishResolutions: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn(),
+			__unstableReleaseStoreLock: jest.fn(),
+		} );
+
+		const IMAGES = [ { id: 1 } ];
+		const VIDEOS = [ { id: 2 } ];
+
+		let deliverImagesResponse;
+		const imagesResponseGate = new Promise( ( resolve ) => {
+			deliverImagesResponse = resolve;
+		} );
+
+		const headers = new Map( [
+			[ 'X-WP-Total', '1' ],
+			[ 'X-WP-TotalPages', '1' ],
+		] );
+		triggerFetch
+			.mockImplementationOnce( () => ( {
+				json: () => imagesResponseGate.then( () => IMAGES ),
+				headers,
+			} ) )
+			.mockImplementationOnce( () => ( {
+				json: () => Promise.resolve( VIDEOS ),
+				headers,
+			} ) );
+
+		// One query's request stays in flight while another one completes.
+		const imagesRequest = getEntityRecords( 'postType', 'attachment', {
+			media_type: 'image',
+		} )( { dispatch, registry, resolveSelect } );
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+		await getEntityRecords( 'postType', 'attachment', {
+			media_type: 'video',
+		} )( { dispatch, registry, resolveSelect } );
+
+		deliverImagesResponse();
+		await imagesRequest;
+
+		// Lists are only superseded by a newer response for the same query,
+		// so both are received.
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledTimes( 2 );
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+			'postType',
+			'attachment',
+			VIDEOS,
+			{ media_type: 'video' },
+			false,
+			undefined,
+			{ totalItems: 1, totalPages: 1 }
+		);
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+			'postType',
+			'attachment',
+			IMAGES,
+			{ media_type: 'image' },
+			false,
+			undefined,
+			{ totalItems: 1, totalPages: 1 }
+		);
+	} );
+
+	it( 'stops delivering intermediate pages once a newer response for the same query arrives', async () => {
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+			finishResolutions: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn(),
+			__unstableReleaseStoreLock: jest.fn(),
+		} );
+
+		const QUERY = { per_page: -1, [ RECEIVE_INTERMEDIATE_RESULTS ]: true };
+
+		let deliverStalePage;
+		const stalePageGate = new Promise( ( resolve ) => {
+			deliverStalePage = resolve;
+		} );
+
+		triggerFetch
+			// The stale run's first page, delivered normally.
+			.mockImplementationOnce( () => ( {
+				json: () => Promise.resolve( [ { id: 1 } ] ),
+				headers: new Map( [
+					[ 'X-WP-Total', '2' ],
+					[ 'X-WP-TotalPages', '2' ],
+				] ),
+			} ) )
+			// The stale run's second page, held in flight.
+			.mockImplementationOnce( () =>
+				stalePageGate.then( () => ( {
+					json: () => Promise.resolve( [ { id: 2 } ] ),
+					headers: new Map( [
+						[ 'X-WP-Total', '2' ],
+						[ 'X-WP-TotalPages', '2' ],
+					] ),
+				} ) )
+			)
+			// The fresh run's single page.
+			.mockImplementationOnce( () => ( {
+				json: () => Promise.resolve( [ { id: 10 } ] ),
+				headers: new Map( [
+					[ 'X-WP-Total', '1' ],
+					[ 'X-WP-TotalPages', '1' ],
+				] ),
+			} ) );
+
+		// A first progressive run delivers its first page, then parks on the
+		// second one...
+		const staleRequest = getEntityRecords(
+			'postType',
+			'attachment',
+			QUERY
+		)( { dispatch, registry, resolveSelect } );
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+		// ...while the resolution is invalidated and a newer run completes.
+		await getEntityRecords(
+			'postType',
+			'attachment',
+			QUERY
+		)( { dispatch, registry, resolveSelect } );
+
+		const callsBeforeStalePage =
+			dispatch.receiveEntityRecords.mock.calls.length;
+
+		// The stale run's remaining pages must not be delivered.
+		deliverStalePage();
+		await staleRequest;
+
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledTimes(
+			callsBeforeStalePage
+		);
+		expect( dispatch.receiveEntityRecords ).toHaveBeenLastCalledWith(
+			'postType',
+			'attachment',
+			[ { id: 10 } ],
+			QUERY,
+			false,
+			undefined,
+			expect.objectContaining( { totalItems: 1, totalPages: 1 } )
+		);
+
+		// The lock is still released for the superseded run.
+		expect( dispatch.__unstableReleaseStoreLock ).toHaveBeenCalledTimes(
+			2
+		);
+	} );
 } );
 
 describe( 'taxonomy pagination', () => {
