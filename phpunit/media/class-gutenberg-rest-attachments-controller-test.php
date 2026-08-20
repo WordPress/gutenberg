@@ -1918,9 +1918,8 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	public function test_finalize_strips_unregistered_client_extended_data() {
 		wp_set_current_user( self::$admin_id );
 		$attachment_id = $this->create_attachment_for_sideload( 'client-data.jpg' );
-
-		$seen = null;   // phpcs:ignore Generic.Formatting.MultipleStatementAlignment
-		$action = function ( $id, $client_extended_data ) use ( &$seen ) {
+		$seen          = null;
+		$action        = function ( $id, $client_extended_data ) use ( &$seen ) {
 			$seen = $client_extended_data;
 		};
 		add_action( 'rest_after_client_side_media_finalize', $action, 10, 2 );
@@ -1971,7 +1970,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		};
 		add_filter( 'wp_client_side_media_finalize_data_schema', $schema_filter );
 
-		$seen = null;   // phpcs:ignore Generic.Formatting.MultipleStatementAlignment
+		$seen   = null;
 		$action = function ( $id, $client_extended_data ) use ( &$seen ) {
 			$seen = $client_extended_data;
 		};
@@ -2020,7 +2019,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 					throw new Exception( 'bad plugin' );
 				},
 			);
-			$schema['safe'] = array(   // phpcs:ignore Generic.Formatting.MultipleStatementAlignment
+			$schema['safe']           = array(
 				'sanitize_callback' => static function ( $value ) {
 					return sanitize_text_field( (string) $value );
 				},
@@ -2029,7 +2028,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		};
 		add_filter( 'wp_client_side_media_finalize_data_schema', $schema_filter );
 
-		$seen = null;   // phpcs:ignore Generic.Formatting.MultipleStatementAlignment
+		$seen   = null;
 		$action = function ( $id, $client_extended_data ) use ( &$seen ) {
 			$seen = $client_extended_data;
 		};
@@ -2077,7 +2076,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		};
 		add_filter( 'wp_client_side_media_finalize_data', $data_filter );
 
-		$seen = null;   // phpcs:ignore Generic.Formatting.MultipleStatementAlignment
+		$seen   = null;
 		$action = function ( $id, $client_extended_data ) use ( &$seen ) {
 			$seen = $client_extended_data;
 		};
