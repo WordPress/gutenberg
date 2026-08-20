@@ -21,6 +21,7 @@ import {
 } from './cursor-dom-utils';
 import { resolveTargetElement } from './compute-selection';
 import { resolveStartPosition } from './resolve-start-position';
+import { getCollaboratorDisplayName } from '../../utils/get-collaborator-display-name';
 
 const { useActiveCollaborators, useResolvedSelection } =
 	unlock( coreDataPrivateApis );
@@ -166,11 +167,16 @@ export function useBlockHighlighting(
 						{
 							blockId,
 							clientId: userState.clientId,
-							userId: userState.collaboratorInfo.id,
+							userId:
+								userState.collaboratorInfo.id ??
+								userState.clientId,
 							color: getAvatarBorderColor(
-								userState.collaboratorInfo.id
+								userState.collaboratorInfo.id ??
+									userState.clientId
 							),
-							userName: userState.collaboratorInfo.name,
+							userName: getCollaboratorDisplayName(
+								userState.collaboratorInfo
+							),
 							avatarUrl: getAvatarUrl(
 								userState.collaboratorInfo.avatar_urls
 							),
@@ -219,11 +225,16 @@ export function useBlockHighlighting(
 						{
 							blockId: containerId,
 							clientId: userState.clientId,
-							userId: userState.collaboratorInfo.id,
+							userId:
+								userState.collaboratorInfo.id ??
+								userState.clientId,
 							color: getAvatarBorderColor(
-								userState.collaboratorInfo.id
+								userState.collaboratorInfo.id ??
+									userState.clientId
 							),
-							userName: userState.collaboratorInfo.name,
+							userName: getCollaboratorDisplayName(
+								userState.collaboratorInfo
+							),
 							avatarUrl: getAvatarUrl(
 								userState.collaboratorInfo.avatar_urls
 							),
@@ -260,9 +271,11 @@ export function useBlockHighlighting(
 
 				const { firstId, lastId, middleEls, sameContainer } = range;
 				const color = getAvatarBorderColor(
-					userState.collaboratorInfo.id
+					userState.collaboratorInfo.id ?? userState.clientId
 				);
-				const userName = userState.collaboratorInfo.name;
+				const userName = getCollaboratorDisplayName(
+					userState.collaboratorInfo
+				);
 				const avatarUrl = getAvatarUrl(
 					userState.collaboratorInfo.avatar_urls
 				);
@@ -273,7 +286,9 @@ export function useBlockHighlighting(
 						{
 							blockId: firstId,
 							clientId: userState.clientId,
-							userId: userState.collaboratorInfo.id,
+							userId:
+								userState.collaboratorInfo.id ??
+								userState.clientId,
 							color,
 							userName,
 							avatarUrl,
@@ -290,7 +305,8 @@ export function useBlockHighlighting(
 					( blockId ) => ( {
 						blockId,
 						clientId: userState.clientId,
-						userId: userState.collaboratorInfo.id,
+						userId:
+							userState.collaboratorInfo.id ?? userState.clientId,
 						color,
 						userName,
 						avatarUrl,
@@ -333,9 +349,9 @@ export function useBlockHighlighting(
 		const results: BlockHighlightData[] = [];
 		const overlayRect = overlayElement?.getBoundingClientRect() ?? null;
 
-		// Track which users already have an avatar placed, keyed by WordPress
-		// user ID. Blocks arrive in document order (top to bottom) so the first
-		// block encountered per user is always the topmost visible one.
+		// Track which users already have an avatar placed. Fallback collaborators
+		// use their Yjs client ID, so anonymous sessions remain distinct while
+		// multiple sessions for a named user stay grouped.
 		const usersWithAvatar = new Set< number >();
 
 		blocksToHighlight.forEach( ( block ) => {

@@ -7,7 +7,7 @@
 
 if ( ! defined( '_GUTENBERG_VERSION_MIGRATION' ) ) {
 	// It's necessary to update this version every time a new migration is needed.
-	define( '_GUTENBERG_VERSION_MIGRATION', '22.8.0' );
+	define( '_GUTENBERG_VERSION_MIGRATION', '23.8.0' );
 }
 
 /**
@@ -25,8 +25,8 @@ function _gutenberg_migrate_database() {
 			_gutenberg_migrate_remove_fse_drafts();
 		}
 
-		if ( version_compare( $gutenberg_installed_version, '22.8.0', '<' ) ) {
-			_gutenberg_migrate_enable_real_time_collaboration();
+		if ( version_compare( $gutenberg_installed_version, '23.8.0', '<' ) ) {
+			_gutenberg_migrate_remove_legacy_collaboration_options();
 		}
 
 		update_option( 'gutenberg_version_migration', _GUTENBERG_VERSION_MIGRATION );
@@ -64,22 +64,18 @@ function _gutenberg_migrate_remove_fse_drafts() {
 }
 
 /**
- * Update RTC option name.
+ * Removes collaboration options replaced by the Real-Time Collaboration experiment.
  *
- * @since 22.8.0
+ * The previous values are intentionally not migrated to the experiment. Real-time
+ * collaboration is now opt-in, so existing sites must explicitly enable the
+ * experiment instead of being opted in by a legacy setting.
+ *
+ * @since 23.8.0
  */
-function _gutenberg_migrate_enable_real_time_collaboration() {
-	$value1 = get_option( 'enable_real_time_collaboration', '1' );
-	$value2 = get_option( 'wp_enable_real_time_collaboration', '1' );
-
-	// RTC is enabled by default in the plugin, so only set the value if it was
-	// previously disabled. Otherwise rely on the default value.
-	if ( ! $value1 || ! $value2 ) {
-		update_option( 'wp_collaboration_enabled', '0' );
-	}
-
+function _gutenberg_migrate_remove_legacy_collaboration_options() {
 	delete_option( 'enable_real_time_collaboration' );
 	delete_option( 'wp_enable_real_time_collaboration' );
+	delete_option( 'wp_collaboration_enabled' );
 }
 
 // Deletion of the `_wp_file_based` term (in _gutenberg_migrate_remove_fse_drafts) must happen
