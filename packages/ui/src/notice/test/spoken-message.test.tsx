@@ -41,4 +41,38 @@ describe( 'Notice spoken messages', () => {
 		expect( speak ).toHaveBeenNthCalledWith( 1, 'Saved', 'polite' );
 		expect( speak ).toHaveBeenNthCalledWith( 2, 'Saved', 'polite' );
 	} );
+
+	it( 'should not announce again when only the intent icon changes', () => {
+		const { rerender } = render(
+			<Notice.Root intent="info">
+				<Notice.Description>Saved</Notice.Description>
+			</Notice.Root>
+		);
+		rerender(
+			<Notice.Root intent="success">
+				<Notice.Description>Saved</Notice.Description>
+			</Notice.Root>
+		);
+
+		expect( speak ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'should not announce text from the icon', () => {
+		render(
+			<Notice.Root
+				icon={
+					<svg>
+						<title>Icon title</title>
+					</svg>
+				}
+			>
+				<Notice.Description>Saved</Notice.Description>
+			</Notice.Root>
+		);
+
+		expect( speak ).toHaveBeenCalledTimes( 1 );
+		expect( mockedSpeak.mock.calls[ 0 ][ 0 ] ).not.toContain(
+			'Icon title'
+		);
+	} );
 } );
