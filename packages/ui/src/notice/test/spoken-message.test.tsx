@@ -19,4 +19,26 @@ describe( 'Notice spoken messages', () => {
 
 		expect( speak ).not.toHaveBeenCalled();
 	} );
+
+	it( 'should speak the same message again after an empty message', () => {
+		const { rerender } = render(
+			<Notice.Root spokenMessage="Saved">
+				<Notice.Description>Content</Notice.Description>
+			</Notice.Root>
+		);
+		rerender(
+			<Notice.Root spokenMessage="">
+				<Notice.Description>Content</Notice.Description>
+			</Notice.Root>
+		);
+		rerender(
+			<Notice.Root spokenMessage="Saved">
+				<Notice.Description>Content</Notice.Description>
+			</Notice.Root>
+		);
+
+		expect( speak ).toHaveBeenCalledTimes( 2 );
+		expect( speak ).toHaveBeenNthCalledWith( 1, 'Saved', 'polite' );
+		expect( speak ).toHaveBeenNthCalledWith( 2, 'Saved', 'polite' );
+	} );
 } );
