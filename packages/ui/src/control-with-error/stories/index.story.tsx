@@ -5,7 +5,6 @@ import { Button } from '../../button';
 import { InputControl } from '../../form';
 
 const meta: Meta< typeof ControlWithError > = {
-	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/Primitives/ControlWithError',
 	component: ControlWithError,
 	argTypes: {
@@ -32,7 +31,9 @@ const meta: Meta< typeof ControlWithError > = {
 	],
 	parameters: {
 		componentStatus: {
-			status: 'recommended',
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'APIs and behavior are still prone to change.',
 		},
 	},
 };
