@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useParams,
 	useNavigate,
@@ -26,11 +23,7 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { drawerRight } from '@wordpress/icons';
 import type { Post } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../lock-unlock';
+import { unlock } from '@wordpress/routes-lock-unlock';
 import {
 	getDefaultView,
 	getActiveViewOverridesForTab,
@@ -39,12 +32,10 @@ import {
 	viewToQuery,
 } from './view-utils';
 import { QuickEditModal } from './quick-edit-modal';
-
 // Unlock WordPress private APIs
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { Tabs } = unlock( componentsPrivateApis );
-
 /**
  * Style dependencies
  */
@@ -320,6 +311,7 @@ function PostList() {
 	return (
 		<Page
 			title={ postTypeObject.labels?.name }
+			headingLevel={ 2 }
 			subTitle={ postTypeObject.labels?.description }
 			className={ `${ postTypeObject.name.toLowerCase() }-page` }
 			actions={
@@ -390,6 +382,12 @@ function PostList() {
 						},
 					} );
 				} }
+				isItemClickable={ ( item: Post ) =>
+					// Restoring comes before editing, so a trashed post's title
+					// does not link to the editor. Cast because the assignable
+					// statuses `status` is typed as exclude 'trash'.
+					( item.status as string ) !== 'trash'
+				}
 				renderItemLink={ ( { item, ...props }: { item: Post } ) => (
 					<Link
 						to={ `/types/${ postType }/edit/${ encodeURIComponent(

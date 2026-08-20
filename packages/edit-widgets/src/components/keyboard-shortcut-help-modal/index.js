@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
@@ -13,10 +6,6 @@ import {
 	store as keyboardShortcutsStore,
 } from '@wordpress/keyboard-shortcuts';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { textFormattingShortcuts } from './config';
 import Shortcut from './shortcut';
 import DynamicShortcut from './dynamic-shortcut';

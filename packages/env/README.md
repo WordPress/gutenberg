@@ -586,6 +586,15 @@ Options:
 
 You can customize the WordPress installation, plugins and themes that the development environment will use by specifying a `.wp-env.json` file in the directory that you run `wp-env` from.
 
+To enable editor autocomplete and validation, add a `$schema` key:
+
+```json
+{
+	"$schema": "https://schemas.wp.org/trunk/wp-env.json",
+	"plugins": [ "." ]
+}
+```
+
 `.wp-env.json` supports the following fields:
 
 | Field                | Type           | Default                                | Description                                                                                                                      |
@@ -709,7 +718,7 @@ This is useful for plugin development when upstream Core changes need to be test
 
 ```json
 {
-	"core": "WordPress/WordPress#master",
+	"core": "WordPress/WordPress#trunk",
 	"plugins": [ "." ]
 }
 ```

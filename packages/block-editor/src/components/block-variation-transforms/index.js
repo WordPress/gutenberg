@@ -1,21 +1,14 @@
-/**
- * WordPress dependencies
- */
 import { store as blocksStore } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	Button,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
-	VisuallyHidden,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
@@ -30,7 +23,7 @@ function VariationsButtons( {
 } ) {
 	return (
 		<fieldset className={ className }>
-			<VisuallyHidden as="legend">
+			<VisuallyHidden render={ <legend /> }>
 				{ __( 'Transform to variation' ) }
 			</VisuallyHidden>
 			{ variations.map( ( variation ) => (
@@ -119,7 +112,6 @@ function VariationsToggleGroupControl( {
 				value={ selectedValue }
 				hideLabelFromVision
 				onChange={ onSelectVariation }
-				__next40pxDefaultSize
 			>
 				{ variations.map( ( variation ) => (
 					<ToggleGroupControlOptionIcon
@@ -144,43 +136,48 @@ function VariationsToggleGroupControl( {
 	);
 }
 
-function __experimentalBlockVariationTransforms( { blockClientId } ) {
+function BlockVariationTransforms( { blockClientId } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const { activeBlockVariation, variations, isContentOnly, isSection } =
-		useSelect(
-			( select ) => {
-				const { getActiveBlockVariation, getBlockVariations } =
-					select( blocksStore );
+	const {
+		activeBlockVariation,
+		variations,
+		canEdit,
+		isContentOnly,
+		isSection,
+	} = useSelect(
+		( select ) => {
+			const { getActiveBlockVariation, getBlockVariations } =
+				select( blocksStore );
 
-				const {
-					getBlockName,
-					getBlockAttributes,
-					getBlockEditingMode,
-					isSectionBlock,
-				} = unlock( select( blockEditorStore ) );
+			const {
+				getBlockName,
+				getBlockAttributes,
+				getBlockEditingMode,
+				isSectionBlock,
+			} = unlock( select( blockEditorStore ) );
+			const { canEditBlock } = select( blockEditorStore );
 
-				const name = blockClientId && getBlockName( blockClientId );
+			const name = blockClientId && getBlockName( blockClientId );
 
-				const { hasContentRoleAttribute } = unlock(
-					select( blocksStore )
-				);
-				const isContentBlock = hasContentRoleAttribute( name );
+			const { hasContentRoleAttribute } = unlock( select( blocksStore ) );
+			const isContentBlock = hasContentRoleAttribute( name );
 
-				return {
-					activeBlockVariation: getActiveBlockVariation(
-						name,
-						getBlockAttributes( blockClientId ),
-						'transform'
-					),
-					variations: name && getBlockVariations( name, 'transform' ),
-					isContentOnly:
-						getBlockEditingMode( blockClientId ) ===
-							'contentOnly' && ! isContentBlock,
-					isSection: isSectionBlock( blockClientId ),
-				};
-			},
-			[ blockClientId ]
-		);
+			return {
+				activeBlockVariation: getActiveBlockVariation(
+					name,
+					getBlockAttributes( blockClientId ),
+					'transform'
+				),
+				variations: name && getBlockVariations( name, 'transform' ),
+				canEdit: canEditBlock( blockClientId ),
+				isContentOnly:
+					getBlockEditingMode( blockClientId ) === 'contentOnly' &&
+					! isContentBlock,
+				isSection: isSectionBlock( blockClientId ),
+			};
+		},
+		[ blockClientId ]
+	);
 
 	const selectedValue = activeBlockVariation?.name;
 
@@ -205,7 +202,7 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 		} );
 	};
 
-	if ( ! variations?.length || isContentOnly || isSection ) {
+	if ( ! variations?.length || ! canEdit || isContentOnly || isSection ) {
 		return null;
 	}
 
@@ -230,4 +227,4 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	);
 }
 
-export default __experimentalBlockVariationTransforms;
+export default BlockVariationTransforms;

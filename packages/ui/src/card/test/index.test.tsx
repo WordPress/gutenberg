@@ -49,7 +49,7 @@ describe( 'Card', () => {
 	} );
 
 	describe( 'fullbleed', () => {
-		it( 'renders children', () => {
+		it( 'renders children inside Content', () => {
 			render(
 				<Card.Root>
 					<Card.Content>
@@ -64,6 +64,23 @@ describe( 'Card', () => {
 			);
 
 			expect( screen.getByRole( 'img', { name: 'test' } ) ).toBeVisible();
+		} );
+
+		it( 'renders children inside Header', () => {
+			render(
+				<Card.Root>
+					<Card.Header>
+						<Card.FullBleed>
+							<img
+								src="https://example.com/hero.jpg"
+								alt="hero"
+							/>
+						</Card.FullBleed>
+					</Card.Header>
+				</Card.Root>
+			);
+
+			expect( screen.getByRole( 'img', { name: 'hero' } ) ).toBeVisible();
 		} );
 	} );
 
@@ -82,7 +99,6 @@ describe( 'Card', () => {
 			render(
 				<Card.Root>
 					<Card.Header>
-						{ /* eslint-disable-next-line jsx-a11y/heading-has-content -- content provided via render prop */ }
 						<Card.Title render={ <h2 /> }>Heading</Card.Title>
 					</Card.Header>
 				</Card.Root>
@@ -91,6 +107,23 @@ describe( 'Card', () => {
 			expect(
 				screen.getByRole( 'heading', { level: 2, name: 'Heading' } )
 			).toBeVisible();
+		} );
+
+		it( 'forwards ref to custom Title render element', () => {
+			const titleRef = createRef< HTMLHeadingElement >();
+
+			render(
+				<Card.Root>
+					<Card.Header>
+						<Card.Title ref={ titleRef } render={ <h3 /> }>
+							Heading
+						</Card.Title>
+					</Card.Header>
+				</Card.Root>
+			);
+
+			expect( titleRef.current ).toBeInstanceOf( HTMLHeadingElement );
+			expect( titleRef.current?.tagName ).toBe( 'H3' );
 		} );
 	} );
 } );

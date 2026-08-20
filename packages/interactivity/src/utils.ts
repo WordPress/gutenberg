@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import {
 	useMemo as _useMemo,
 	useCallback as _useCallback,
@@ -10,10 +7,6 @@ import {
 	type Inputs,
 } from 'preact/hooks';
 import { effect, signal } from '@preact/signals';
-
-/**
- * Internal dependencies
- */
 import { getScope, setScope, resetScope } from './scopes';
 import { getNamespace, setNamespace, resetNamespace } from './namespaces';
 
@@ -401,7 +394,7 @@ export const warn = ( message: string ): void => {
 		// A consumer can use 'pause on caught exceptions'
 		try {
 			throw Error( message );
-		} catch ( e ) {
+		} catch {
 			// Do nothing.
 		}
 		logged.add( message );

@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { BaseControl, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import BlockAllowedBlocksModal from './modal';
 import { store as blockEditorStore } from '../../store';
 

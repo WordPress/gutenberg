@@ -1,17 +1,9 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	Placeholder,
 	SelectControl,
 	Spinner,
 	ToggleControl,
-	VisuallyHidden,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -26,11 +18,8 @@ import { __, sprintf } from '@wordpress/i18n';
 import { pin } from '@wordpress/icons';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
+import { VisuallyHidden } from '@wordpress/ui';
 import { store as noticeStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function CategoriesEdit( {
@@ -146,7 +135,8 @@ export default function CategoriesEdit( {
 						}
 					/>
 				) : (
-					<VisuallyHidden as="label" htmlFor={ selectId }>
+					// eslint-disable-next-line jsx-a11y/label-has-associated-control
+					<VisuallyHidden render={ <label htmlFor={ selectId } /> }>
 						{ label ? label : taxonomy?.name }
 					</VisuallyHidden>
 				) }
@@ -235,7 +225,6 @@ export default function CategoriesEdit( {
 							isShownByDefault
 						>
 							<SelectControl
-								__next40pxDefaultSize
 								label={ __( 'Taxonomy' ) }
 								options={ taxonomies.map( ( t ) => ( {
 									label: t.name,

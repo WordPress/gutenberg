@@ -1,20 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-// diff doesn't tree-shake correctly, so we import from the individual
-// module here, to avoid including too much of the library
-import { diffChars } from 'diff/lib/diff/character';
-
-/**
- * WordPress dependencies
- */
+import { diffChars } from 'diff';
 import { __ } from '@wordpress/i18n';
 import { getSaveContent } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import BlockView from './block-view';
 
 function BlockCompare( {

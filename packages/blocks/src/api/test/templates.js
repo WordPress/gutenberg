@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { createBlock } from '../factory';
 import {
 	getBlockTypes,

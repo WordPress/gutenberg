@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { speak } from '@wordpress/a11y';
-
-/**
- * Internal dependencies
- */
 import Notice from '../index';
 
 jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
@@ -43,14 +32,14 @@ describe( 'Notice', () => {
 		expect( container ).toMatchSnapshot();
 	} );
 
-	it( 'should not have is-dismissible class when isDismissible prop is false', () => {
-		const { container } = render(
+	it( 'should not render a dismiss control when isDismissible prop is false', () => {
+		render(
 			<Notice isDismissible={ false }>I cannot be dismissed!</Notice>
 		);
-		const wrapper = getNoticeWrapper( container );
 
-		expect( wrapper ).toHaveClass( 'components-notice' );
-		expect( wrapper ).not.toHaveClass( 'is-dismissible' );
+		expect(
+			screen.queryByRole( 'button', { name: 'Close' } )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'should default to info status', () => {

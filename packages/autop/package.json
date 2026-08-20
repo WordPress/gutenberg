@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/autop",
-	"version": "4.41.0",
+	"version": "4.53.0",
 	"description": "WordPress's automatic paragraph functions `autop` and `removep`.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -39,10 +39,12 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": false,
+	"devDependencies": {
+		"@types/jest": "^30.0.0"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

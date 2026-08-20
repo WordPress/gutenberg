@@ -1,8 +1,8 @@
-import { Tooltip } from '@base-ui/react/tooltip';
+import { Tooltip as _Tooltip } from '@base-ui/react/tooltip';
 import type { ProviderProps } from './types';
 
-function Provider( { children, ...props }: ProviderProps ) {
-	return <Tooltip.Provider { ...props }>{ children }</Tooltip.Provider>;
+function Provider( { ...props }: ProviderProps ) {
+	return <_Tooltip.Provider { ...props } />;
 }
 
 export { Provider };

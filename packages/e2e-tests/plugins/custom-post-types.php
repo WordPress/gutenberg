@@ -88,6 +88,34 @@ function public_queryable_true_public_true_cpt() {
 add_action( 'init', 'public_queryable_true_public_true_cpt' );
 
 /**
+ * Registers a custom post type with real-time collaboration disabled.
+ */
+function gutenberg_test_register_collaboration_disabled_post_type() {
+	register_post_type(
+		'rtc_disabled',
+		array(
+			'label'        => 'RTC Disabled',
+			'show_in_rest' => true,
+			'public'       => true,
+			'supports'     => array( 'title', 'editor', 'revisions' ),
+		)
+	);
+}
+add_action( 'init', 'gutenberg_test_register_collaboration_disabled_post_type' );
+
+/**
+ * Disables real-time collaboration for the test post type.
+ *
+ * @param bool   $disabled  Whether collaboration is disabled.
+ * @param string $post_type Post type name.
+ * @return bool Whether collaboration is disabled.
+ */
+function gutenberg_test_disable_post_type_collaboration( $disabled, $post_type ) {
+	return 'rtc_disabled' === $post_type ? true : $disabled;
+}
+add_filter( 'wp_is_post_type_collaboration_disabled', 'gutenberg_test_disable_post_type_collaboration', 10, 2 );
+
+/**
  * Registers a custom post type that is hierarchical and does not supports the title attribute.
  */
 function hierarchical_without_title_cpt() {

@@ -3,6 +3,7 @@ import type { ComponentProps } from '../utils/types';
 import type { IconProps } from '../icon/types';
 import type { ButtonProps } from '../button/types';
 import type { IconButtonProps } from '../icon-button/types';
+import type { LinkProps } from '../link/types';
 
 export type NoticeIntent = 'warning' | 'success' | 'error' | 'info' | 'neutral';
 
@@ -92,7 +93,7 @@ export interface ActionButtonProps
 	children?: ReactNode;
 }
 
-export interface ActionLinkProps extends ComponentProps< 'a' > {
+export interface ActionLinkProps extends Omit< LinkProps, 'variant' | 'tone' > {
 	/**
 	 * The content to be rendered inside the component.
 	 */

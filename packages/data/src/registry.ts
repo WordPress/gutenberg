@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import createReduxStore from './redux-store';
 import coreDataStore from './store';
 import { createEmitter } from './utils/emitter';
@@ -261,7 +254,7 @@ export function createRegistry(
 				unlock( store.store ).registerPrivateSelectors(
 					unlock( parent ).privateSelectorsOf( name )
 				);
-			} catch ( e ) {
+			} catch {
 				// unlock() throws if store.store was not locked.
 				// The error indicates there's nothing to do here so let's
 				// ignore it.
@@ -389,7 +382,7 @@ export function createRegistry(
 		privateActionsOf: ( name: string ) => {
 			try {
 				return unlock( stores[ name ].store ).privateActions;
-			} catch ( e ) {
+			} catch {
 				// unlock() throws an error the store was not locked – this means
 				// there no private actions are available
 				return {};
@@ -398,7 +391,7 @@ export function createRegistry(
 		privateSelectorsOf: ( name: string ) => {
 			try {
 				return unlock( stores[ name ].store ).privateSelectors;
-			} catch ( e ) {
+			} catch {
 				return {};
 			}
 		},

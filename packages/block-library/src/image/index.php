@@ -171,13 +171,13 @@ function block_core_image_get_lightbox_settings( $block ) {
  *
  * @since 6.4.0
  *
- * @param string $block_content  Rendered block content.
- * @param array  $block          Block object.
- * @param array  $block_instance Block instance.
+ * @param string   $block_content  Rendered block content.
+ * @param array    $block          Block object.
+ * @param WP_Block $block_instance Block instance.
  *
  * @return string Filtered block content.
  */
-function block_core_image_render_lightbox( $block_content, $block, $block_instance ) {
+function block_core_image_render_lightbox( $block_content, array $block, WP_Block $block_instance ) {
 	/*
 	 * If there's no IMG tag in the block then return the given block content
 	 * as-is. There's nothing that this code can knowingly modify to add the
@@ -205,8 +205,8 @@ function block_core_image_render_lightbox( $block_content, $block, $block_instan
 		array(
 			'defaultAriaLabel' => __( 'Enlarged image' ),
 			'closeButtonText'  => esc_html__( 'Close' ),
-			'prevButtonText'   => esc_html__( 'Previous' ),
-			'nextButtonText'   => esc_html__( 'Next' ),
+			'prevButtonText'   => esc_html_x( 'Previous', 'previous image in lightbox' ),
+			'nextButtonText'   => esc_html_x( 'Next', 'next image in lightbox' ),
 		)
 	);
 
@@ -250,7 +250,7 @@ function block_core_image_render_lightbox( $block_content, $block, $block_instan
 					'galleryId'              => $block_instance->context['galleryId'] ?? null,
 					'customAriaLabel'        => $custom_aria_label ?? null,
 					'navigationButtonType'   => $block_instance->context['navigationButtonType'] ?? 'icon',
-					'triggerButtonAriaLabel' => null,
+					'triggerButtonAriaLabel' => __( 'Enlarge' ),
 				),
 			),
 		)
@@ -323,8 +323,8 @@ function block_core_image_render_lightbox( $block_content, $block, $block_instan
 function block_core_image_print_lightbox_overlay() {
 	$dialog_label      = esc_attr__( 'Enlarged images' );
 	$close_button_text = esc_attr__( 'Close' );
-	$prev_button_text  = esc_attr__( 'Previous' );
-	$next_button_text  = esc_attr__( 'Next' );
+	$prev_button_text  = esc_attr_x( 'Previous', 'previous image in lightbox' );
+	$next_button_text  = esc_attr_x( 'Next', 'next image in lightbox' );
 	$close_button_icon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="m13.06 12 6.47-6.47-1.06-1.06L12 10.94 5.53 4.47 4.47 5.53 10.94 12l-6.47 6.47 1.06 1.06L12 13.06l6.47 6.47 1.06-1.06L13.06 12Z"></path></svg>';
 	$prev_button_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path d="M14.6 7l-1.2-1L8 12l5.4 6 1.2-1-4.6-5z"></path></svg>';
 	$next_button_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"></path></svg>';
@@ -389,7 +389,6 @@ function block_core_image_print_lightbox_overlay() {
 							data-wp-bind--class="state.selectedImage.imgClassNames"
 							data-wp-bind--style="state.imgStyles"
 							data-wp-bind--src="state.enlargedSrc"
-							data-wp-bind--srcset="state.enlargedSrcset"
 							data-wp-bind--srcset="state.enlargedSrcset"
 							sizes="100vw"
 						>

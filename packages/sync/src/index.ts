@@ -44,9 +44,8 @@ export * as Y from 'yjs';
 export const YJS_VERSION = '13';
 
 /**
- * Similar to Yjs, the Awareness protocol should not be considered a public API.
- * It is a third-party library that will experience breaking changes in the
- * future.
+ * The Awareness protocol should not be considered a public API. It is a
+ * third-party library that will experience breaking changes in the future.
  *
  * In general, awareness for core entity types is implemented by the `core-data`
  * package and third-party Yjs providers should not provide their own awareness

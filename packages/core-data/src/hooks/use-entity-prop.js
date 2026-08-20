@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useContext } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { STORE_NAME } from '../name';
 import { DEFAULT_ENTITY_KEY } from '../entities';
 import { EntityContext } from '../entity-context';
@@ -50,6 +43,8 @@ export default function useEntityProp( kind, name, prop, _id ) {
 					{
 						per_page: -1,
 						context: 'edit',
+						_fields:
+							'id,date,author,meta,title.raw,excerpt.raw,content.raw',
 					}
 				);
 				const entityConfig = select( STORE_NAME ).getEntityConfig(
@@ -62,7 +57,7 @@ export default function useEntityProp( kind, name, prop, _id ) {
 				);
 				return revision
 					? {
-							value: revision[ prop ],
+							value: revision[ prop ]?.raw ?? revision[ prop ],
 							fullValue: revision[ prop ],
 					  }
 					: {};

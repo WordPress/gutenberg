@@ -14,18 +14,29 @@ Install the module
 npm install @wordpress/dataviews --save
 ```
 
-## Stylesheet Dependencies
+## Setup
 
-DataViews depends on stylesheets from `@wordpress/components` and `@wordpress/theme`. In a WordPress admin page context, these are loaded automatically. For applications outside WordPress, you will need to include these stylesheets:
+This package requires CSS from this package and from multiple dependency packages.
+
+### Within WordPress
+
+To ensure proper load order, add the `wp-components` stylesheet as a dependency of your plugin's stylesheet. See [wp_enqueue_style documentation](https://developer.wordpress.org/reference/functions/wp_enqueue_style/#parameters) for how to specify dependencies.
+
+### Outside WordPress
+
+Install and load these stylesheets in your application:
 
 ```bash
-npm install @wordpress/components @wordpress/theme
+npm install @wordpress/dataviews @wordpress/theme @wordpress/components
 ```
 
-```tsx
-import '@wordpress/components/build-style/style.css';
+```js
 import '@wordpress/theme/design-tokens.css';
+import '@wordpress/components/build-style/style.css';
+import '@wordpress/dataviews/build-style/style.css';
 ```
+
+RTL versions of the stylesheets are available in the same paths, but with `-rtl` appended to the filename (`style-rtl.css`). The design tokens stylesheet is universal and does not have a separate RTL version.
 
 ## `DataViews`
 
@@ -216,6 +227,7 @@ Properties:
     -   `isLocked`: whether the filter is locked (cannot be edited by the user).
 -   `perPage`: number of records to show per page.
 -   `page`: the page that is visible.
+-   `startPosition`: the first item to load when infinite scroll is enabled. Used instead of `page`.
 -   `sort`:
     -   `field`: the field used for sorting the dataset.
     -   `direction`: the direction to use for sorting, one of `asc` or `desc`.
@@ -240,17 +252,19 @@ Properties:
 
 | Props / Layout | `table` | `pickerTable` | `grid` | `pickerGrid` | `list` | `activity` |
 | -------------- | ------- | ------------- | ------ | ------------ | ------ | ---------- |
-| `density`      | ✓       | ✓             |        |              | ✓      | ✓          |
+| `density`      | ✓       | ✓             | ✓      | ✓            | ✓      | ✓          |
 | `enableMoving` | ✓       | ✓             |        |              |        |            |
 | `styles`       | ✓       | ✓             |        |              |        |            |
 | `badgeFields`  |         |               | ✓      | ✓            |        |            |
 | `previewSize`  |         |               | ✓      | ✓            |        |            |
+| `aspectRatio`  | ✓       |               | ✓      |              |        |            |
 
 `table` and `pickerTable` layouts:
 
 -   `density`: one of `comfortable`, `balanced`, or `compact`. Configures the size and spacing of the layout.
 -   `enableMoving`: whether the table columns should display moving controls.
 -   `styles`: additional `width`, `maxWidth`, `minWidth`, `align` styles for each field column. The `align` property accepts `'start'`, `'center'`, or `'end'`.
+-   `aspectRatio` (`table` only): one of the preset ratios `'1/1'`, `'4/3'`, `'3/4'`, `'3/2'`, `'2/3'`, `'16/9'`, or `'9/16'`, applied to the primary column's media preview. Defaults to `'1/1'`.
 
 **For column alignment (`align` property), follow these guidelines:**
 Right-align (`'end'`) whenever the cell value is fundamentally quantitative—numbers, decimals, currency, percentages—so that digits and decimal points line up, aiding comparison and calculation. Otherwise, default to left-alignment (`'start'`) for all other types (text, codes, labels, dates).
@@ -258,7 +272,9 @@ Right-align (`'end'`) whenever the cell value is fundamentally quantitative—nu
 `grid` and `pickerGrid` layout:
 
 -   `badgeFields`: a list of field's `id` to render without label and styled as badges.
+-   `density`: one of `comfortable`, `balanced`, or `compact`. Configures the gap between items in the grid.
 -   `previewSize`: a `number` representing the size of the preview.
+-   `aspectRatio` (`grid` only): one of the preset ratios `'1/1'`, `'4/3'`, `'3/4'`, `'3/2'`, `'2/3'`, `'16/9'`, or `'9/16'`, applied uniformly to every item preview, keeping rows aligned. Defaults to `'1/1'`.
 
 `list` layout:
 
@@ -388,7 +404,6 @@ const actions = [
 
 -   `totalItems`: the total number of items in the datasets.
 -   `totalPages`: the total number of pages, taking into account the total items in the dataset and the number of items per page provided by the user.
--   `infiniteScrollHandler`: a function that handles infinite scrolling. This function should be called when the user scrolls to the bottom of the page. See [example in storybook](https://wordpress.github.io/gutenberg/?path=/story/dataviews-dataviews--infinite-scroll).
 
 #### `search`: `boolean`
 
@@ -689,7 +704,7 @@ A list of actions that can be performed on the dataset. See "Actions API" for mo
 
 #### `paginationInfo`: `Object`
 
-Same as `DataViews`. Contains `totalItems` and `totalPages` properties, and optionally `infiniteScrollHandler`.
+Same as `DataViews`. Contains `totalItems` and `totalPages` properties.
 
 #### `search`: `boolean`
 
@@ -1244,7 +1259,7 @@ Example:
 
 ### `type`
 
-Field type. One of `text`, `integer`, `number`, `datetime`, `date`, `media`, `boolean`, `email`, `password`, `telephone`, `color`, `url`, `array`.
+Field type. One of `text`, `integer`, `number`, `datetime`, `date`, `time`, `media`, `boolean`, `email`, `password`, `telephone`, `color`, `url`, `array`.
 
 -   Type: `string`.
 -   Optional.
@@ -1535,7 +1550,7 @@ Fields that provide a `type` will have a default Edit control:
 }
 ```
 
-Field authors can override the default Edit control by providing a string that maps to one of the bundled UI controls: `array`, `checkbox`, `color`, `date`, `datetime`, `email`, `integer`, `number`, `password`, `radio`, `select`, `telephone`, `text`, `textarea`, `toggle`, `toggleGroup`, or `url`.
+Field authors can override the default Edit control by providing a string that maps to one of the bundled UI controls: `array`, `checkbox`, `color`, `date`, `datetime`, `email`, `integer`, `number`, `password`, `radio`, `select`, `telephone`, `text`, `textarea`, `time`, `toggle`, `toggleGroup`, or `url`.
 
 ```js
 {
@@ -1577,6 +1592,20 @@ Additionally, some of the bundled Edit controls are configurable via a config ob
 }
 ```
 
+-   `datetime` configuration:
+
+```js
+{
+	id: 'date',
+	type: 'datetime',
+	label: 'Date',
+	Edit: {
+		control: 'datetime',
+		compact: true
+	}
+}
+```
+
 Finally, the field author can always provide its own custom `Edit` control. It receives the following props:
 
 -   `data`: the item to be processed
@@ -1590,6 +1619,7 @@ Finally, the field author can always provide its own custom `Edit` control. It r
     -   `prefix`: a React component to be rendered as a prefix
     -   `suffix`: a React component to be rendered as a suffix
     -   `rows`: the number of rows to display (e.g., in the text area component)
+    -   `compact`: whether to render a compact version without the calendar widget (datetime control)
 
 ```js
 {
@@ -1642,7 +1672,7 @@ When the field declares a type, it gets a default sort function:
 }
 ```
 
-The default sorting can be overriden by providing a custom sort function. It takes the following arguments:
+The default sorting can be overridden by providing a custom sort function. It takes the following arguments:
 
 -   `a`: the first item to compare
 -   `b`: the second item to compare
@@ -1690,7 +1720,7 @@ Fields that define a type come with default validation for the type. For example
 }
 ```
 
-The validation rules can be overriden by the field author. For example, to set the field as required, or to provide a custom validation so that only even numbers are valid:
+The validation rules can be overridden by the field author. For example, to set the field as required, or to provide a custom validation so that only even numbers are valid:
 
 ```js
 {
@@ -1732,6 +1762,8 @@ Function that indicates if the field should be visible.
 -   Args
     -   `item`: the data to be processed
 -   Returns a `boolean` indicating if the field should be visible (`true`) or not (`false`).
+
+A field hidden through `isVisible` is not validated: its validation rules are skipped while it is hidden and re-applied when it becomes visible again.
 
 This can be useful to hide fields based on the state of other fields. For example, a `staticHomepage` field can be hidden depending on the value of the `homepageDisplay` field:
 
@@ -2004,12 +2036,17 @@ Valid operators per field type:
 -   password: none.
 -   email: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
 -   text: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
+-   time: `on`, `notOn`, `before`, `beforeInc`, `after`, `afterInc`, `between`.
 -   url: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
 -   fields with no type: any operator.
 
+`time` shares the ordering operators with `date` and `datetime`, which compare temporal values generically: a date or datetime compares by its position on the calendar, a time by its position within the day. Comparisons are precision-insensitive, so a filter for `'09:00'` matches a stored `'09:00:00'`.
+
+`inThePast` and `over` are the exception, and are not valid for `time`: they measure backwards from now, which a time of day has no way to anchor to.
+
 ### `format`
 
-Display format configuration for fields. Supported for `datetime`, `date`, `number`, and `integer` fields. This configuration affects how the field is displayed in the `render` method, the `Edit` control, and filter controls.
+Display format configuration for fields. Supported for `datetime`, `date`, `time`, `number`, and `integer` fields. This configuration affects how the field is displayed in the `render` method, the `Edit` control, and filter controls.
 
 -   Type: `object`.
 -   Optional.
@@ -2051,6 +2088,30 @@ Example:
 	},
 }
 ```
+
+For `time` fields:
+
+-   Properties:
+    -   `time`: The format string using PHP date format (e.g., `'g:i a'` for `'2:30 pm'`). Optional, defaults to WordPress "Time Format" setting.
+
+Whether the `Edit` control offers a seconds field follows this format: it does when the format string renders seconds (e.g. `'H:i:s'`), and does not otherwise.
+
+Use time tokens only. Because a time carries no date, date and timezone tokens have nothing meaningful to render and will emit the placeholder date the value is internally anchored to — `'F j, Y g:i a'` renders `'January 1, 2000 2:30 pm'`. Use `datetime` if the field needs a date.
+
+Example:
+
+```js
+{
+	id: 'opensAt',
+	type: 'time',
+	label: 'Opens At',
+	format: {
+		time: 'g:i a',
+	},
+}
+```
+
+A `time` value is a time of day with no date attached, stored as `HH:mm` or `HH:mm:ss` (RFC 3339 `partial-time`). Values are wall-clock: a trailing UTC offset is accepted but ignored rather than applied, and the value renders identically no matter which timezone the visitor is in. If a time needs to denote a specific instant, use `datetime` instead.
 
 For `number` fields:
 

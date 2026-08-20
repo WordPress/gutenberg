@@ -1,113 +1,169 @@
-/**
- * External dependencies
- */
 import { renderHook } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { useCollaboratorNotifications } from '../use-collaborator-notifications';
 
 // --- Mocks ---
-
-const mockCreateNotice = jest.fn();
-let mockActiveCollaborators: any[] = [];
-let mockLastPostSave: { savedAt: number; savedByClientId: number } | null =
-	null;
-let mockEditorState = {
-	postStatus: 'draft',
-	isCollaborationEnabled: true,
-};
+//
+// These mocks isolate the hook from `@wordpress/data`, the editor store, and
+// the core-data private APIs it unlocks, so tests can drive the join/leave/
+// save callbacks directly instead of simulating real awareness events.
 
 jest.mock( '@wordpress/data', () => ( {
 	useSelect: jest.fn(),
 	useDispatch: jest.fn(),
 } ) );
 
-jest.mock( '@wordpress/notices', () => ( {
-	store: 'core/notices',
-} ) );
+jest.mock( '@wordpress/notices', () => ( { store: 'core/notices' } ) );
 
-// Mock the editor store to prevent deep import chain (blocks, rich-text, etc.)
-jest.mock( '../../../store', () => ( {
-	store: 'core/editor',
-} ) );
+jest.mock( '@wordpress/preferences', () => ( { store: 'core/preferences' } ) );
 
-// Mock the private APIs and unlock mechanism
-jest.mock( '@wordpress/core-data', () => ( {
-	privateApis: {},
-} ) );
+// Avoids pulling in the full editor store (blocks, rich-text, etc.).
+jest.mock( '../../../store', () => ( { store: 'core/editor' } ) );
+
+jest.mock( '@wordpress/core-data', () => ( { privateApis: {} } ) );
+
+// Captures the callbacks and postIds the hook registers with each of the
+// three core-data subscriptions it unlocks. Must be prefixed with `mock`
+// so jest's module factory hoisting allows referencing it below.
+const mockRegistered: {
+	join: Function | null;
+	leave: Function | null;
+	save: Function | null;
+	joinPostId: unknown;
+	leavePostId: unknown;
+	savePostId: unknown;
+} = {
+	join: null,
+	leave: null,
+	save: null,
+	joinPostId: undefined,
+	leavePostId: undefined,
+	savePostId: undefined,
+};
 
 jest.mock( '../../../lock-unlock', () => ( {
-	unlock: jest.fn( () => ( {
-		useActiveCollaborators: jest.fn( () => mockActiveCollaborators ),
-		useLastPostSave: jest.fn( () => mockLastPostSave ),
+	unlock: jest.fn( ( value: unknown ) => ( {
+		...( value as object ),
+		useOnCollaboratorJoin: (
+			postId: unknown,
+			_t: unknown,
+			cb: Function
+		) => {
+			mockRegistered.joinPostId = postId;
+			mockRegistered.join = cb;
+		},
+		useOnCollaboratorLeave: (
+			postId: unknown,
+			_t: unknown,
+			cb: Function
+		) => {
+			mockRegistered.leavePostId = postId;
+			mockRegistered.leave = cb;
+		},
+		useOnPostSave: ( postId: unknown, _t: unknown, cb: Function ) => {
+			mockRegistered.savePostId = postId;
+			mockRegistered.save = cb;
+		},
 	} ) ),
 } ) );
 
-// --- Helpers ---
+// --- Fixtures ---
 
 const BASE_ENTERED_AT = 1704067200000;
 
-function makeCollaborator( overrides: Record< string, unknown > = {} ) {
+function makeCollaborator(
+	id: number,
+	name: string,
+	enteredAt: number,
+	overrides: Record< string, unknown > = {}
+) {
 	return {
-		clientId: 1,
+		clientId: id,
 		isMe: false,
 		isConnected: true,
 		collaboratorInfo: {
-			id: 100,
-			name: 'Alice',
-			slug: 'alice',
+			id,
+			name,
+			slug: name.toLowerCase(),
 			avatar_urls: {},
 			browserType: 'Chrome',
-			enteredAt: BASE_ENTERED_AT + 1000,
+			enteredAt,
 		},
 		...overrides,
 	};
 }
 
-function makeMe( overrides: Record< string, unknown > = {} ) {
-	return makeCollaborator( {
-		clientId: 999,
-		isMe: true,
-		collaboratorInfo: {
-			id: 1,
-			name: 'Me',
-			slug: 'me',
-			avatar_urls: {},
-			browserType: 'Chrome',
-			enteredAt: BASE_ENTERED_AT + 5000, // joined later than Alice
-		},
-		...overrides,
-	} );
-}
+// "me" is the current user; Alice entered before "me", Bob after.
+const me = makeCollaborator( 1, 'Me', BASE_ENTERED_AT + 5000, {
+	isMe: true,
+} );
+const alice = makeCollaborator( 100, 'Alice', BASE_ENTERED_AT + 1000, {
+	clientId: 1000,
+} );
+const bob = makeCollaborator( 200, 'Bob', BASE_ENTERED_AT + 10000, {
+	clientId: 2000,
+} );
 
 // --- Setup ---
 
-function buildMockSelect() {
-	return () => ( {
+const mockCreateNotice = jest.fn();
+
+type PreferenceState = {
+	postStatus: string | undefined;
+	isCollaborationEnabled: boolean;
+	showCollaborationJoinNotifications: boolean;
+	showCollaborationLeaveNotifications: boolean;
+	showCollaborationPostSaveNotifications: boolean;
+};
+
+const DEFAULT_STATE: PreferenceState = {
+	postStatus: 'draft',
+	isCollaborationEnabled: true,
+	showCollaborationJoinNotifications: true,
+	showCollaborationLeaveNotifications: true,
+	showCollaborationPostSaveNotifications: true,
+};
+
+let state: PreferenceState = { ...DEFAULT_STATE };
+
+function mockSelect( storeKey: string ) {
+	if ( storeKey === 'core/preferences' ) {
+		return {
+			get: ( scope: string, name: string ) =>
+				scope === 'core' && name in state
+					? ( state as unknown as Record< string, boolean > )[ name ]
+					: undefined,
+		};
+	}
+	return {
 		getCurrentPostAttribute: ( attr: string ) =>
-			attr === 'status' ? mockEditorState.postStatus : undefined,
+			attr === 'status' ? state.postStatus : undefined,
 		isCollaborationEnabledForCurrentPost: () =>
-			mockEditorState.isCollaborationEnabled,
-	} );
+			state.isCollaborationEnabled,
+	};
+}
+
+/**
+ * Renders the hook under test with the given preference/state overrides
+ * applied on top of the defaults (everything enabled, status: 'draft').
+ *
+ * @param overrides Partial preference/state overrides.
+ */
+function renderNotifications( overrides: Partial< PreferenceState > = {} ) {
+	state = { ...DEFAULT_STATE, ...overrides };
+	return renderHook( () => useCollaboratorNotifications( 123, 'post' ) );
 }
 
 beforeEach( () => {
-	mockActiveCollaborators = [];
-	mockLastPostSave = null;
-	mockEditorState = {
-		postStatus: 'draft',
-		isCollaborationEnabled: true,
-	};
+	mockRegistered.join = null;
+	mockRegistered.leave = null;
+	mockRegistered.save = null;
+	mockRegistered.joinPostId = undefined;
+	mockRegistered.leavePostId = undefined;
+	mockRegistered.savePostId = undefined;
 	mockCreateNotice.mockClear();
 	( useSelect as jest.Mock ).mockImplementation( ( selector: Function ) =>
-		selector( buildMockSelect() )
+		selector( mockSelect )
 	);
 	( useDispatch as jest.Mock ).mockReturnValue( {
 		createNotice: mockCreateNotice,
@@ -117,338 +173,244 @@ beforeEach( () => {
 // --- Tests ---
 
 describe( 'useCollaboratorNotifications', () => {
-	describe( 'initial mount', () => {
-		it( 'does not fire join notifications for collaborators already present on mount', () => {
-			mockActiveCollaborators = [ makeMe(), makeCollaborator() ];
-
-			renderHook( () => useCollaboratorNotifications( 123, 'post' ) );
-
-			expect( mockCreateNotice ).not.toHaveBeenCalled();
-		} );
-
-		it( 'does not fire any notification when no collaborators are present', () => {
-			mockActiveCollaborators = [];
-
-			renderHook( () => useCollaboratorNotifications( 123, 'post' ) );
-
-			expect( mockCreateNotice ).not.toHaveBeenCalled();
-		} );
-
-		it( 'does not fire join notifications when collaborators load after an initially empty state', () => {
-			// Simulates the store hydrating: first render has no collaborators,
-			// second render receives the full list.
-			mockActiveCollaborators = [];
-			const { rerender } = renderHook( () =>
-				useCollaboratorNotifications( 123, 'post' )
-			);
-
-			mockActiveCollaborators = [ makeMe(), makeCollaborator() ];
-			rerender();
-
-			expect( mockCreateNotice ).not.toHaveBeenCalled();
-		} );
-	} );
-
 	describe( 'collaborator join notifications', () => {
-		it( 'does not fire a join notification for the current user', () => {
-			mockActiveCollaborators = [];
-			const { rerender } = renderHook( () =>
-				useCollaboratorNotifications( 123, 'post' )
-			);
+		it( 'fires when the collaborator entered after the current user', () => {
+			renderNotifications();
 
-			mockActiveCollaborators = [ makeMe() ];
-			rerender();
-
-			expect( mockCreateNotice ).not.toHaveBeenCalled();
-		} );
-
-		it( 'skips join notification for collaborators who joined before current user', () => {
-			// Alice joined BEFORE the current user (smaller enteredAt)
-			const me = makeMe(); // enteredAt: BASE_ENTERED_AT + 5000
-			const aliceJoinedFirst = makeCollaborator( {
-				collaboratorInfo: {
-					id: 100,
-					name: 'Alice',
-					slug: 'alice',
-					avatar_urls: {},
-					browserType: 'Chrome',
-					enteredAt: BASE_ENTERED_AT + 1000, // joined earlier than me
-				},
-			} );
-
-			mockActiveCollaborators = [ me ];
-			const { rerender } = renderHook( () =>
-				useCollaboratorNotifications( 123, 'post' )
-			);
-
-			// Alice appears in the state — but she was there before us
-			mockActiveCollaborators = [ me, aliceJoinedFirst ];
-			rerender();
-
-			expect( mockCreateNotice ).not.toHaveBeenCalled();
-		} );
-
-		it( 'fires join notification for a collaborator who joined after current user', () => {
-			const me = makeMe(); // enteredAt: BASE_ENTERED_AT + 5000
-			const bobJoinedAfter = makeCollaborator( {
-				clientId: 2,
-				collaboratorInfo: {
-					id: 200,
-					name: 'Bob',
-					slug: 'bob',
-					avatar_urls: {},
-					browserType: 'Firefox',
-					enteredAt: BASE_ENTERED_AT + 10000, // joined after me
-				},
-			} );
-
-			mockActiveCollaborators = [ me ];
-			const { rerender } = renderHook( () =>
-				useCollaboratorNotifications( 123, 'post' )
-			);
-
-			mockActiveCollaborators = [ me, bobJoinedAfter ];
-			rerender();
+			mockRegistered.join?.( bob, me );
 
 			expect( mockCreateNotice ).toHaveBeenCalledWith(
 				'info',
 				'Bob has joined the post.',
 				expect.objectContaining( {
 					id: 'collab-user-entered-200',
+					type: 'snackbar',
+					isDismissible: false,
 				} )
 			);
+		} );
+
+		it( 'uses the session ID for a fallback collaborator notification', () => {
+			const fallbackCollaborator = {
+				...bob,
+				clientId: 321,
+				collaboratorInfo: {
+					...bob.collaboratorInfo,
+					id: null,
+					name: 'Anonymous User',
+				},
+			};
+			renderNotifications();
+
+			mockRegistered.join?.( fallbackCollaborator, me );
+
+			expect( mockCreateNotice ).toHaveBeenCalledWith(
+				'info',
+				'Anonymous User has joined the post.',
+				expect.objectContaining( {
+					id: 'collab-user-entered-321',
+				} )
+			);
+		} );
+
+		it( 'is skipped when the collaborator entered before the current user', () => {
+			renderNotifications();
+
+			mockRegistered.join?.( alice, me );
+
+			expect( mockCreateNotice ).not.toHaveBeenCalled();
+		} );
+
+		it( 'does not fire when join notifications are disabled', () => {
+			renderNotifications( {
+				showCollaborationJoinNotifications: false,
+			} );
+
+			// The hook unsubscribes by passing a null postId...
+			expect( mockRegistered.joinPostId ).toBeNull();
+
+			// ...while the other two hooks stay wired to the real post id,
+			// proving this preference doesn't accidentally couple with them.
+			expect( mockRegistered.leavePostId ).toBe( 123 );
+			expect( mockRegistered.savePostId ).toBe( 123 );
+
+			// ...and the callback itself guards against any queued event.
+			mockRegistered.join?.( bob, me );
+			expect( mockCreateNotice ).not.toHaveBeenCalled();
+		} );
+
+		it( 'stops firing once join notifications are toggled off mid-session', () => {
+			const { rerender } = renderNotifications();
+
+			state = {
+				...state,
+				showCollaborationJoinNotifications: false,
+			};
+			rerender();
+
+			mockRegistered.join?.( bob, me );
+
+			expect( mockCreateNotice ).not.toHaveBeenCalled();
 		} );
 	} );
 
 	describe( 'collaborator leave notifications', () => {
-		it( 'fires a leave notification when a collaborator disconnects (isConnected → false)', () => {
-			const alice = makeCollaborator();
-			mockActiveCollaborators = [ makeMe(), alice ];
-			const { rerender } = renderHook( () =>
-				useCollaboratorNotifications( 123, 'post' )
-			);
+		it( 'fires when a collaborator leaves', () => {
+			renderNotifications();
 
-			// Alice disconnects — still in the list but greyed out.
-			mockActiveCollaborators = [
-				makeMe(),
-				{ ...alice, isConnected: false },
-			];
-			rerender();
+			mockRegistered.leave?.( alice );
 
 			expect( mockCreateNotice ).toHaveBeenCalledWith(
 				'info',
 				'Alice has left the post.',
 				expect.objectContaining( {
+					id: 'collab-user-exited-100',
 					type: 'snackbar',
 					isDismissible: false,
-					id: 'collab-user-exited-100',
 				} )
 			);
 		} );
 
-		it( 'does not fire a duplicate leave notification when a disconnected collaborator is removed from the list', () => {
-			const alice = makeCollaborator();
-			mockActiveCollaborators = [ makeMe(), alice ];
-			const { rerender } = renderHook( () =>
-				useCollaboratorNotifications( 123, 'post' )
-			);
+		it( 'does not fire when leave notifications are disabled', () => {
+			renderNotifications( {
+				showCollaborationLeaveNotifications: false,
+			} );
 
-			// Alice disconnects (greyed out).
-			mockActiveCollaborators = [
-				makeMe(),
-				{ ...alice, isConnected: false },
-			];
-			rerender();
-			mockCreateNotice.mockClear();
+			expect( mockRegistered.leavePostId ).toBeNull();
 
-			// After the 5s delay Alice is fully removed from the list.
-			mockActiveCollaborators = [ makeMe() ];
-			rerender();
+			// The other two hooks stay wired to the real post id.
+			expect( mockRegistered.joinPostId ).toBe( 123 );
+			expect( mockRegistered.savePostId ).toBe( 123 );
 
+			mockRegistered.leave?.( alice );
 			expect( mockCreateNotice ).not.toHaveBeenCalled();
 		} );
 
-		it( 'fires a leave notification when a connected collaborator is removed from the list directly', () => {
-			const alice = makeCollaborator();
-			mockActiveCollaborators = [ makeMe(), alice ];
-			const { rerender } = renderHook( () =>
-				useCollaboratorNotifications( 123, 'post' )
-			);
+		it( 'stops firing once leave notifications are toggled off mid-session', () => {
+			const { rerender } = renderNotifications();
 
-			// Alice disappears from the list without going through isConnected=false
-			// (e.g. polling detects the disconnect and removes in one update).
-			mockActiveCollaborators = [ makeMe() ];
+			state = {
+				...state,
+				showCollaborationLeaveNotifications: false,
+			};
 			rerender();
 
-			expect( mockCreateNotice ).toHaveBeenCalledWith(
-				'info',
-				'Alice has left the post.',
-				expect.objectContaining( {
-					type: 'snackbar',
-					isDismissible: false,
-					id: 'collab-user-exited-100',
-				} )
-			);
-		} );
+			mockRegistered.leave?.( alice );
 
-		it( 'does not fire a leave notification for the current user', () => {
-			const me = makeMe();
-			mockActiveCollaborators = [ me, makeCollaborator() ];
-			const { rerender } = renderHook( () =>
-				useCollaboratorNotifications( 123, 'post' )
-			);
-
-			// "Me" disconnects
-			mockActiveCollaborators = [
-				{ ...me, isConnected: false },
-				makeCollaborator(),
-			];
-			rerender();
-
-			// Should not notify about self
-			const selfLeaveCall = mockCreateNotice.mock.calls.find(
-				( [ , message ] ) => message.includes( 'Me' )
-			);
-			expect( selfLeaveCall ).toBeUndefined();
+			expect( mockCreateNotice ).not.toHaveBeenCalled();
 		} );
 	} );
 
-	describe( 'post updated notifications', () => {
-		it( 'fires a post updated notification when a collaborator saves (draft)', () => {
-			const alice = makeCollaborator();
-			mockActiveCollaborators = [ makeMe(), alice ];
-			const { rerender } = renderHook( () =>
-				useCollaboratorNotifications( 123, 'post' )
-			);
-
-			// State map reports Alice saved
-			mockLastPostSave = {
-				savedAt: Date.now(),
-				savedByClientId: alice.clientId,
-			};
-			rerender();
-
-			expect( mockCreateNotice ).toHaveBeenCalledWith(
-				'info',
-				'Draft saved by Alice.',
-				expect.objectContaining( {
-					type: 'snackbar',
-					isDismissible: false,
-					id: 'collab-post-updated-100',
-				} )
-			);
-		} );
-
-		it( 'fires a post updated notification with "Post updated" for published status', () => {
-			mockEditorState = {
-				...mockEditorState,
+	describe( 'post save notifications', () => {
+		it.each( [
+			{
+				description: 'a draft is saved',
+				postStatus: 'draft',
+				saveEventStatus: undefined,
+				prevEvent: null,
+				expected: 'Draft saved by Alice.',
+			},
+			{
+				description: 'an already-published post is updated',
 				postStatus: 'publish',
-			};
-			const alice = makeCollaborator();
-			mockActiveCollaborators = [ makeMe(), alice ];
-			const { rerender } = renderHook( () =>
-				useCollaboratorNotifications( 123, 'post' )
+				saveEventStatus: 'publish',
+				prevEvent: null,
+				expected: 'Post updated by Alice.',
+			},
+			{
+				description:
+					'a post is first published (no previous save event)',
+				postStatus: 'draft',
+				saveEventStatus: 'publish',
+				prevEvent: null,
+				expected: 'Post published by Alice.',
+			},
+			{
+				description:
+					'a post is first published (prevEvent carries the prior draft status)',
+				postStatus: 'publish',
+				saveEventStatus: 'publish',
+				prevEvent: {
+					savedAt: 0,
+					savedByClientId: 1,
+					postStatus: 'draft',
+				},
+				expected: 'Post published by Alice.',
+			},
+		] )(
+			'fires "$expected" when $description',
+			( { postStatus, saveEventStatus, prevEvent, expected } ) => {
+				renderNotifications( { postStatus } );
+
+				mockRegistered.save?.(
+					{
+						savedAt: Date.now(),
+						savedByClientId: alice.clientId,
+						postStatus: saveEventStatus,
+					},
+					alice,
+					prevEvent
+				);
+
+				expect( mockCreateNotice ).toHaveBeenCalledWith(
+					'info',
+					expected,
+					expect.objectContaining( {
+						id: 'collab-post-updated-100',
+						type: 'snackbar',
+						isDismissible: false,
+					} )
+				);
+			}
+		);
+
+		it( 'does not fire when postStatus is unknown', () => {
+			renderNotifications( { postStatus: undefined } );
+
+			mockRegistered.save?.(
+				{
+					savedAt: Date.now(),
+					savedByClientId: alice.clientId,
+					postStatus: undefined,
+				},
+				alice,
+				null
 			);
-
-			mockLastPostSave = {
-				savedAt: Date.now(),
-				savedByClientId: alice.clientId,
-			};
-			rerender();
-
-			expect( mockCreateNotice ).toHaveBeenCalledWith(
-				'info',
-				'Post updated by Alice.',
-				expect.objectContaining( {
-					id: 'collab-post-updated-100',
-				} )
-			);
-		} );
-
-		it( 'does not fire a notification when the current user saves', () => {
-			const me = makeMe();
-			mockActiveCollaborators = [ me, makeCollaborator() ];
-			const { rerender } = renderHook( () =>
-				useCollaboratorNotifications( 123, 'post' )
-			);
-
-			// State map reports "me" saved
-			mockLastPostSave = {
-				savedAt: Date.now(),
-				savedByClientId: me.clientId,
-			};
-			rerender();
 
 			expect( mockCreateNotice ).not.toHaveBeenCalled();
 		} );
 
-		it( 'does not fire duplicate notifications for the same savedAt timestamp', () => {
-			const alice = makeCollaborator();
-			mockActiveCollaborators = [ makeMe(), alice ];
-			const savedAt = Date.now();
+		it( 'does not fire when post-save notifications are disabled', () => {
+			renderNotifications( {
+				showCollaborationPostSaveNotifications: false,
+			} );
 
-			const { rerender } = renderHook( () =>
-				useCollaboratorNotifications( 123, 'post' )
+			expect( mockRegistered.savePostId ).toBeNull();
+
+			// The other two hooks stay wired to the real post id.
+			expect( mockRegistered.joinPostId ).toBe( 123 );
+			expect( mockRegistered.leavePostId ).toBe( 123 );
+
+			mockRegistered.save?.(
+				{
+					savedAt: Date.now(),
+					savedByClientId: alice.clientId,
+					postStatus: 'publish',
+				},
+				alice,
+				null
 			);
-
-			// First save event
-			mockLastPostSave = {
-				savedAt,
-				savedByClientId: alice.clientId,
-			};
-			rerender();
-			mockCreateNotice.mockClear();
-
-			// Rerender with same savedAt — should not notify again
-			rerender();
-
 			expect( mockCreateNotice ).not.toHaveBeenCalled();
 		} );
+	} );
 
-		it( 'does not fire a notification when a peer reconnects without a new save', () => {
-			const alice = makeCollaborator();
-			mockActiveCollaborators = [ makeMe(), alice ];
-			const { rerender } = renderHook( () =>
-				useCollaboratorNotifications( 123, 'post' )
-			);
+	describe( 'when collaboration is disabled entirely', () => {
+		it( 'unsubscribes all three hooks', () => {
+			renderNotifications( { isCollaborationEnabled: false } );
 
-			// Alice disconnects and reconnects — useLastPostSave filters
-			// pre-existing state map values via its baseline check, so
-			// lastPostSave stays null.
-			mockActiveCollaborators = [
-				makeMe(),
-				{ ...alice, isConnected: false },
-			];
-			rerender();
-			mockCreateNotice.mockClear();
-
-			mockActiveCollaborators = [
-				makeMe(),
-				{ ...alice, clientId: 50, isConnected: true },
-			];
-			rerender();
-
-			// Only the leave/join notices should have fired, no save notice.
-			const saveNotice = mockCreateNotice.mock.calls.find(
-				( [ , msg ] ) => ( msg as string ).includes( 'saved' )
-			);
-			expect( saveNotice ).toBeUndefined();
-		} );
-
-		it( 'does not fire a notification when the saver is not in the collaborator list', () => {
-			mockActiveCollaborators = [ makeMe(), makeCollaborator() ];
-			const { rerender } = renderHook( () =>
-				useCollaboratorNotifications( 123, 'post' )
-			);
-
-			// State map reports a save by unknown clientId
-			mockLastPostSave = {
-				savedAt: Date.now(),
-				savedByClientId: 12345,
-			};
-			rerender();
-
-			expect( mockCreateNotice ).not.toHaveBeenCalled();
+			expect( mockRegistered.joinPostId ).toBeNull();
+			expect( mockRegistered.leavePostId ).toBeNull();
+			expect( mockRegistered.savePostId ).toBeNull();
 		} );
 	} );
 } );

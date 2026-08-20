@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, _x } from '@wordpress/i18n';
 import { MenuItem } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
@@ -49,7 +46,7 @@ export default function SiteExport() {
 			let error = {};
 			try {
 				error = await errorResponse.json();
-			} catch ( e ) {}
+			} catch {}
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	reset,
@@ -55,7 +48,6 @@ export default function TextTransformControl( { className, value, onChange } ) {
 	return (
 		<ToggleGroupControl
 			isDeselectable
-			__next40pxDefaultSize
 			label={ __( 'Letter case' ) }
 			className={ clsx(
 				'block-editor-text-transform-control',

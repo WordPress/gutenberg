@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { cleanEmptyObject } from '../../hooks/utils';
 import { useToolsPanelDropdownMenuProps } from '../global-styles/utils';
@@ -16,6 +9,7 @@ export default function BlockSupportToolsPanel( { children, group, label } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const {
 		getBlockAttributes,
+		getBlockName,
 		getMultiSelectedBlockClientIds,
 		getSelectedBlockClientId,
 		hasMultiSelection,
@@ -31,13 +25,19 @@ export default function BlockSupportToolsPanel( { children, group, label } ) {
 				: [ panelId ];
 
 			clientIds.forEach( ( clientId ) => {
-				const { style } = getBlockAttributes( clientId );
+				const blockAttributes = getBlockAttributes( clientId ) || {};
+				const { style } = blockAttributes;
 				let newBlockAttributes = { style };
+				const resetContext = {
+					attributes: blockAttributes,
+					clientId,
+					name: getBlockName( clientId ),
+				};
 
 				resetFilters.forEach( ( resetFilter ) => {
 					newBlockAttributes = {
 						...newBlockAttributes,
-						...resetFilter( newBlockAttributes ),
+						...resetFilter( newBlockAttributes, resetContext ),
 					};
 				} );
 
@@ -54,6 +54,7 @@ export default function BlockSupportToolsPanel( { children, group, label } ) {
 		},
 		[
 			getBlockAttributes,
+			getBlockName,
 			getMultiSelectedBlockClientIds,
 			hasMultiSelection,
 			panelId,

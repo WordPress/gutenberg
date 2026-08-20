@@ -1,29 +1,21 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-import type { ComponentProps, ReactElement, HTMLAttributes } from 'react';
-
-/**
- * WordPress dependencies
- */
-import {
-	Flex,
-	FlexItem,
-	Tooltip,
-	Composite,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import type {
+	ComponentProps,
+	ReactElement,
+	HTMLAttributes,
+	CSSProperties,
+} from 'react';
+import { Flex, FlexItem, Composite } from '@wordpress/components';
+import { Badge, Stack, Tooltip } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
-import { isAppleOS } from '@wordpress/keycodes';
-import { useContext, forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../../lock-unlock';
+import {
+	useCallback,
+	useContext,
+	useRef,
+	forwardRef,
+} from '@wordpress/element';
+import { MEDIA_ASPECT_RATIOS } from '../../../constants';
 import ItemActions from '../../dataviews-item-actions';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
 import DataViewsContext from '../../dataviews-context';
@@ -37,9 +29,14 @@ import type {
 	ViewGrid as ViewGridType,
 } from '../../../types';
 import type { SetSelection } from '../../../types/private';
+import type { SelectionProps } from '../utils/use-selection-props';
 import { ItemClickWrapper } from '../utils/item-click-wrapper';
-const { Badge } = unlock( componentsPrivateApis );
 import { useGridColumns } from './preview-size-picker';
+import { GridItems } from '../utils/grid-items';
+import {
+	useIntersectionObserver,
+	usePlaceholdersNeeded,
+} from '../utils/use-infinite-scroll';
 
 function chunk< T >( array: T[], size: number ): T[][] {
 	const chunks: T[][] = [];
@@ -72,223 +69,248 @@ interface GridItemProps< Item > extends HTMLAttributes< HTMLDivElement > {
 	config: {
 		sizes: string;
 	};
+	posinset?: number;
+	setsize?: number;
 }
 
-const GridItem = forwardRef( function GridItem< Item >(
-	{
-		view,
-		selection,
-		onChangeSelection,
-		onClickItem,
-		isItemClickable,
-		renderItemLink,
-		getItemId,
-		item,
-		actions,
-		mediaField,
-		titleField,
-		descriptionField,
-		regularFields,
-		badgeFields,
-		hasBulkActions,
-		config,
-		...props
-	}: GridItemProps< Item >,
-	ref: React.ForwardedRef< HTMLDivElement >
-) {
-	const { showTitle = true, showMedia = true, showDescription = true } = view;
-	const hasBulkAction = useHasAPossibleBulkAction( actions, item );
-	const id = getItemId( item );
-	const instanceId = useInstanceId( GridItem );
-	const isSelected = selection.includes( id );
-	const mediaPlaceholder = (
-		<span className="dataviews-view-grid__media-placeholder" />
-	);
-	const rendersMediaField = showMedia && mediaField?.render;
-	const renderedMediaField = rendersMediaField ? (
-		<mediaField.render
-			item={ item }
-			field={ mediaField }
-			config={ config }
-		/>
-	) : (
-		mediaPlaceholder
-	);
-	const renderedTitleField =
-		showTitle && titleField?.render ? (
-			<titleField.render item={ item } field={ titleField } />
-		) : null;
-	let mediaA11yProps;
-	let titleA11yProps;
-	if ( isItemClickable( item ) && onClickItem ) {
-		if ( renderedTitleField ) {
-			mediaA11yProps = {
-				'aria-labelledby': `dataviews-view-grid__title-field-${ instanceId }`,
-			};
-			titleA11yProps = {
-				id: `dataviews-view-grid__title-field-${ instanceId }`,
-			};
-		} else {
-			mediaA11yProps = {
-				'aria-label': __( 'Navigate to item' ),
-			};
-		}
-	}
-	return (
-		<Stack
-			direction="column"
-			{ ...props }
-			ref={ ref }
-			className={ clsx(
-				props.className,
-				'dataviews-view-grid__row__gridcell',
-				'dataviews-view-grid__card',
-				{
-					'is-selected': hasBulkAction && isSelected,
+const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
+	function GridItem(
+		{
+			view,
+			selection,
+			onChangeSelection,
+			onClickItem,
+			isItemClickable,
+			renderItemLink,
+			getItemId,
+			item,
+			actions,
+			mediaField,
+			titleField,
+			descriptionField,
+			regularFields,
+			badgeFields,
+			hasBulkActions,
+			config,
+			posinset,
+			setsize,
+			...props
+		},
+		forwardedRef
+	) {
+		const {
+			showTitle = true,
+			showMedia = true,
+			showDescription = true,
+		} = view;
+		const hasBulkAction = useHasAPossibleBulkAction( actions, item );
+		const id = getItemId( item );
+		const elementRef = useRef< HTMLDivElement | null >( null );
+
+		// Merge refs callback
+		const setRefs = useCallback(
+			( node: HTMLDivElement | null ) => {
+				elementRef.current = node;
+				if ( typeof forwardedRef === 'function' ) {
+					forwardedRef( node );
+				} else if ( forwardedRef ) {
+					forwardedRef.current = node;
 				}
-			) }
-			onClickCapture={ ( event ) => {
-				props.onClickCapture?.( event );
-				if ( isAppleOS() ? event.metaKey : event.ctrlKey ) {
-					event.stopPropagation();
-					event.preventDefault();
-					if ( ! hasBulkAction ) {
-						return;
-					}
-					onChangeSelection(
-						selection.includes( id )
-							? selection.filter( ( itemId ) => id !== itemId )
-							: [ ...selection, id ]
-					);
-				}
-			} }
-		>
-			<ItemClickWrapper
+			},
+			[ forwardedRef ]
+		);
+		useIntersectionObserver( elementRef, posinset );
+		const instanceId = useInstanceId( GridItem );
+
+		const isSelected = selection.includes( id );
+
+		const mediaPlaceholder = (
+			<span className="dataviews-view-grid__media-placeholder" />
+		);
+		const rendersMediaField = showMedia && mediaField?.render;
+		const renderedMediaField = rendersMediaField ? (
+			<mediaField.render
 				item={ item }
-				isItemClickable={ isItemClickable }
-				onClickItem={ onClickItem }
-				renderItemLink={ renderItemLink }
-				className={ clsx( 'dataviews-view-grid__media', {
-					'dataviews-view-grid__media--placeholder':
-						! rendersMediaField,
-				} ) }
-				{ ...mediaA11yProps }
+				field={ mediaField }
+				config={ config }
+			/>
+		) : (
+			mediaPlaceholder
+		);
+		const renderedTitleField =
+			showTitle && titleField?.render ? (
+				<titleField.render item={ item } field={ titleField } />
+			) : null;
+		let mediaA11yProps;
+		let titleA11yProps;
+		if ( isItemClickable( item ) && onClickItem ) {
+			if ( renderedTitleField ) {
+				mediaA11yProps = {
+					'aria-labelledby': `dataviews-view-grid__title-field-${ instanceId }`,
+				};
+				titleA11yProps = {
+					id: `dataviews-view-grid__title-field-${ instanceId }`,
+				};
+			} else {
+				mediaA11yProps = {
+					'aria-label': __( 'Navigate to item' ),
+				};
+			}
+		}
+		return (
+			<Stack
+				direction="column"
+				{ ...props }
+				ref={ setRefs }
+				aria-setsize={ setsize }
+				aria-posinset={ posinset }
+				className={ clsx(
+					props.className,
+					'dataviews-view-grid__row__gridcell',
+					'dataviews-view-grid__card',
+					{
+						'is-selected': hasBulkAction && isSelected,
+					}
+				) }
 			>
-				{ renderedMediaField }
-			</ItemClickWrapper>
-			{ hasBulkActions && (
-				<DataViewsSelectionCheckbox
+				<ItemClickWrapper
 					item={ item }
-					selection={ selection }
-					onChangeSelection={ onChangeSelection }
-					getItemId={ getItemId }
-					titleField={ titleField }
-					disabled={ ! hasBulkAction }
-				/>
-			) }
-			{ !! actions?.length && (
-				<div className="dataviews-view-grid__media-actions">
-					<ItemActions item={ item } actions={ actions } isCompact />
-				</div>
-			) }
-			{ showTitle && (
-				<div className="dataviews-view-grid__title">
-					<ItemClickWrapper
+					isItemClickable={ isItemClickable }
+					onClickItem={ onClickItem }
+					renderItemLink={ renderItemLink }
+					className={ clsx( 'dataviews-view-grid__media', {
+						'dataviews-view-grid__media--placeholder':
+							! rendersMediaField,
+					} ) }
+					{ ...mediaA11yProps }
+				>
+					{ renderedMediaField }
+				</ItemClickWrapper>
+				{ hasBulkActions && (
+					<DataViewsSelectionCheckbox
 						item={ item }
-						isItemClickable={ isItemClickable }
-						onClickItem={ onClickItem }
-						renderItemLink={ renderItemLink }
-						className="dataviews-view-grid__title-field dataviews-title-field"
-						{ ...titleA11yProps }
-						title={
-							titleField?.getValueFormatted( {
-								item,
-								field: titleField,
-							} ) || undefined
-						}
-					>
-						{ renderedTitleField }
-					</ItemClickWrapper>
-				</div>
-			) }
-			<Stack direction="column" gap="xs">
-				{ showDescription && descriptionField?.render && (
-					<descriptionField.render
-						item={ item }
-						field={ descriptionField }
+						selection={ selection }
+						onChangeSelection={ onChangeSelection }
+						getItemId={ getItemId }
+						titleField={ titleField }
+						disabled={ ! hasBulkAction }
 					/>
 				) }
-				{ !! badgeFields?.length && (
-					<Stack
-						direction="row"
-						className="dataviews-view-grid__badge-fields"
-						gap="sm"
-						wrap="wrap"
-						align="top"
-						justify="flex-start"
-					>
-						{ badgeFields.map( ( field ) => {
-							return (
-								<Badge
-									key={ field.id }
-									className="dataviews-view-grid__field-value"
-								>
-									<field.render
-										item={ item }
-										field={ field }
-									/>
-								</Badge>
-							);
-						} ) }
-					</Stack>
+				{ !! actions?.length && (
+					<div className="dataviews-view-grid__media-actions">
+						<ItemActions
+							item={ item }
+							actions={ actions }
+							isCompact
+						/>
+					</div>
 				) }
-				{ !! regularFields?.length && (
-					<Stack
-						direction="column"
-						className="dataviews-view-grid__fields"
-						gap="xs"
-					>
-						{ regularFields.map( ( field ) => {
-							return (
-								<Flex
-									className="dataviews-view-grid__field"
-									key={ field.id }
-									gap={ 1 }
-									justify="flex-start"
-									expanded
-									style={ { height: 'auto' } }
-									direction="row"
-								>
-									<>
-										<Tooltip text={ field.label }>
-											<FlexItem className="dataviews-view-grid__field-name">
-												{ field.header }
+				{ showTitle && (
+					<div className="dataviews-view-grid__title-actions">
+						<ItemClickWrapper
+							item={ item }
+							isItemClickable={ isItemClickable }
+							onClickItem={ onClickItem }
+							renderItemLink={ renderItemLink }
+							className="dataviews-view-grid__title-field dataviews-title-field"
+							{ ...titleA11yProps }
+							title={
+								titleField?.getValueFormatted( {
+									item,
+									field: titleField,
+								} ) || undefined
+							}
+						>
+							{ renderedTitleField }
+						</ItemClickWrapper>
+					</div>
+				) }
+				<Stack direction="column" gap="xs">
+					{ showDescription && descriptionField?.render && (
+						<descriptionField.render
+							item={ item }
+							field={ descriptionField }
+						/>
+					) }
+					{ !! badgeFields?.length && (
+						<Stack
+							direction="row"
+							className="dataviews-view-grid__badge-fields"
+							gap="sm"
+							wrap="wrap"
+							align="top"
+							justify="flex-start"
+						>
+							{ badgeFields.map( ( field ) => {
+								return (
+									/* @ts-expect-error `Badge` is text-only, but a badge field renders whatever its `render` returns. */
+									<Badge
+										key={ field.id }
+										className="dataviews-view-grid__field-value"
+									>
+										<field.render
+											item={ item }
+											field={ field }
+										/>
+									</Badge>
+								);
+							} ) }
+						</Stack>
+					) }
+					{ !! regularFields?.length && (
+						<Stack
+							direction="column"
+							className="dataviews-view-grid__fields"
+							gap="xs"
+						>
+							{ regularFields.map( ( field ) => {
+								return (
+									<Flex
+										className="dataviews-view-grid__field"
+										key={ field.id }
+										gap={ 1 }
+										justify="flex-start"
+										expanded
+										style={ { height: 'auto' } }
+										direction="row"
+									>
+										<>
+											<Tooltip.Root>
+												<Tooltip.Trigger
+													render={
+														<FlexItem className="dataviews-view-grid__field-name">
+															{ field.header }
+														</FlexItem>
+													}
+												/>
+												<Tooltip.Popup>
+													{ field.label }
+												</Tooltip.Popup>
+											</Tooltip.Root>
+											<FlexItem
+												className="dataviews-view-grid__field-value"
+												style={ { maxHeight: 'none' } }
+											>
+												<field.render
+													item={ item }
+													field={ field }
+												/>
 											</FlexItem>
-										</Tooltip>
-										<FlexItem
-											className="dataviews-view-grid__field-value"
-											style={ { maxHeight: 'none' } }
-										>
-											<field.render
-												item={ item }
-												field={ field }
-											/>
-										</FlexItem>
-									</>
-								</Flex>
-							);
-						} ) }
-					</Stack>
-				) }
+										</>
+									</Flex>
+								);
+							} ) }
+						</Stack>
+					) }
+				</Stack>
 			</Stack>
-		</Stack>
-	);
-} ) as < Item >(
+		);
+	}
+) as < Item >(
 	props: GridItemProps< Item > & {
 		ref?: React.ForwardedRef< HTMLDivElement >;
 	}
 ) => React.ReactNode;
-
 interface CompositeGridProps< Item > {
 	data: Item[];
 	isInfiniteScroll: boolean;
@@ -308,6 +330,7 @@ interface CompositeGridProps< Item > {
 	) => ReactElement;
 	getItemId: ( item: Item ) => string;
 	actions: Action< Item >[];
+	getSelectionProps: ( id: string ) => SelectionProps;
 }
 
 export default function CompositeGrid< Item >( {
@@ -325,10 +348,24 @@ export default function CompositeGrid< Item >( {
 	renderItemLink,
 	getItemId,
 	actions,
+	getSelectionProps,
 }: CompositeGridProps< Item > ) {
 	const { paginationInfo, resizeObserverRef } =
 		useContext( DataViewsContext );
 	const gridColumns = useGridColumns();
+	// Consumer-configured aspect ratio for item previews, validated against
+	// the presets (like `density`) so arbitrary values are ignored, and
+	// surfaced to CSS as a custom property the media field's stylesheet
+	// reads. Always set (with the square default), so an identically-named
+	// variable set by a consumer on an ancestor can't leak into the previews
+	// when the view doesn't configure a ratio.
+	const gridStyle = {
+		'--wp-dataviews-media-aspect-ratio':
+			view.layout?.aspectRatio &&
+			MEDIA_ASPECT_RATIOS.includes( view.layout.aspectRatio )
+				? view.layout.aspectRatio
+				: '1/1',
+	} as CSSProperties;
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
 	const titleField = fields.find(
 		( field ) => field.id === view?.titleField
@@ -369,84 +406,230 @@ export default function CompositeGrid< Item >( {
 	const size = '900px';
 	const totalRows = Math.ceil( data.length / gridColumns );
 
+	// Calculate placeholders needed for infinite scroll
+	const placeholdersNeeded = usePlaceholdersNeeded(
+		data,
+		isInfiniteScroll,
+		gridColumns
+	);
+
 	return (
-		<Composite
-			role={ isInfiniteScroll ? 'feed' : 'grid' }
-			className={ clsx( 'dataviews-view-grid', className ) }
-			focusWrap
-			aria-busy={ isLoading }
-			aria-rowcount={ isInfiniteScroll ? undefined : totalRows }
-			ref={ resizeObserverRef }
-			// @ts-ignore
-			inert={ inert }
-		>
-			{ chunk( data, gridColumns ).map( ( row, i ) => (
-				<Composite.Row
-					key={ i }
-					render={
-						<div
-							role="row"
-							aria-rowindex={ i + 1 }
-							aria-label={ sprintf(
-								/* translators: %d: The row number in the grid */
-								__( 'Row %d' ),
-								i + 1
-							) }
-							className="dataviews-view-grid__row"
-							style={ {
-								gridTemplateColumns: `repeat( ${ gridColumns }, minmax(0, 1fr) )`,
-							} }
-						/>
-					}
-				>
-					{ row.map( ( item, indexInRow ) => {
-						const index = i * gridColumns + indexInRow;
-						return (
-							<Composite.Item
-								key={ getItemId( item ) }
-								render={ ( props ) => (
-									<GridItem
-										{ ...props }
-										role={
-											isInfiniteScroll
-												? 'article'
-												: 'gridcell'
-										}
-										aria-setsize={
-											isInfiniteScroll
-												? paginationInfo.totalItems
-												: undefined
-										}
-										aria-posinset={
-											isInfiniteScroll
-												? index + 1
-												: undefined
-										}
-										view={ view }
-										selection={ selection }
-										onChangeSelection={ onChangeSelection }
-										onClickItem={ onClickItem }
-										isItemClickable={ isItemClickable }
-										renderItemLink={ renderItemLink }
-										getItemId={ getItemId }
-										item={ item }
-										actions={ actions }
-										mediaField={ mediaField }
-										titleField={ titleField }
-										descriptionField={ descriptionField }
-										regularFields={ regularFields }
-										badgeFields={ badgeFields }
-										hasBulkActions={ hasBulkActions }
-										config={ {
-											sizes: size,
+		<>
+			{
+				// Render infinite scroll layout (no rows, feed semantics)
+				isInfiniteScroll && (
+					<Composite
+						render={
+							<GridItems
+								className={ clsx(
+									'dataviews-view-grid-infinite-scroll',
+									className,
+									{
+										[ `has-${ view.layout?.density }-density` ]:
+											view.layout?.density &&
+											[
+												'compact',
+												'comfortable',
+											].includes( view.layout.density ),
+									}
+								) }
+								previewSize={ view.layout?.previewSize }
+								style={ gridStyle }
+								aria-busy={ isLoading }
+								ref={ resizeObserverRef }
+							/>
+						}
+						role="feed"
+						focusWrap
+						// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+						inert={ inert }
+					>
+						{ /* Render placeholders for unloaded items in first row */ }
+						{ Array.from( { length: placeholdersNeeded } ).map(
+							( _, index ) => (
+								<Composite.Item
+									key={ `placeholder-${ index }` }
+									render={ ( props ) => (
+										<Stack
+											{ ...props }
+											direction="column"
+											role="article"
+											className="dataviews-view-grid__row__gridcell dataviews-view-grid__card dataviews-view-grid__placeholder"
+										/>
+									) }
+									aria-hidden
+									tabIndex={ -1 }
+								/>
+							)
+						) }
+						{ data.map( ( item ) => {
+							const itemId = getItemId( item );
+							const selectionProps = getSelectionProps( itemId );
+							// Use position from item for infinite scroll
+							const stablePosition = ( item as any ).position;
+							return (
+								<Composite.Item
+									key={ itemId }
+									render={ ( props ) => (
+										<GridItem
+											{ ...props }
+											id={ itemId }
+											role="article"
+											view={ view }
+											selection={ selection }
+											onChangeSelection={
+												onChangeSelection
+											}
+											onClickItem={ onClickItem }
+											isItemClickable={ isItemClickable }
+											renderItemLink={ renderItemLink }
+											getItemId={ getItemId }
+											item={ item }
+											actions={ actions }
+											onMouseDown={ ( event ) => {
+												props.onMouseDown?.( event );
+												selectionProps.onMouseDown(
+													event
+												);
+											} }
+											onClickCapture={ ( event ) => {
+												props.onClickCapture?.( event );
+												selectionProps.onClickCapture(
+													event
+												);
+											} }
+											mediaField={ mediaField }
+											titleField={ titleField }
+											descriptionField={
+												descriptionField
+											}
+											regularFields={ regularFields }
+											badgeFields={ badgeFields }
+											hasBulkActions={ hasBulkActions }
+											posinset={ stablePosition }
+											setsize={
+												paginationInfo.totalItems
+											}
+											config={ {
+												sizes: size,
+											} }
+										/>
+									) }
+								/>
+							);
+						} ) }
+					</Composite>
+				)
+			}
+			{
+				// Render standard grid layout (with rows, grid semantics)
+				! isInfiniteScroll && (
+					<Composite
+						role="grid"
+						style={ gridStyle }
+						className={ clsx( 'dataviews-view-grid', className, {
+							[ `has-${ view.layout?.density }-density` ]:
+								view.layout?.density &&
+								[ 'compact', 'comfortable' ].includes(
+									view.layout.density
+								),
+						} ) }
+						focusWrap
+						aria-busy={ isLoading }
+						aria-rowcount={ totalRows }
+						ref={ resizeObserverRef }
+						// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
+						inert={ inert }
+					>
+						{ chunk( data, gridColumns ).map( ( row, i ) => (
+							<Composite.Row
+								key={ i }
+								render={
+									<div
+										role="row"
+										aria-rowindex={ i + 1 }
+										aria-label={ sprintf(
+											/* translators: %d: The row number in the grid */
+											__( 'Row %d' ),
+											i + 1
+										) }
+										className="dataviews-view-grid__row"
+										style={ {
+											gridTemplateColumns: `repeat( ${ gridColumns }, minmax(0, 1fr) )`,
 										} }
 									/>
-								) }
-							/>
-						);
-					} ) }
-				</Composite.Row>
-			) ) }
-		</Composite>
+								}
+							>
+								{ row.map( ( item ) => {
+									const itemId = getItemId( item );
+									const selectionProps =
+										getSelectionProps( itemId );
+									return (
+										<Composite.Item
+											key={ itemId }
+											render={ ( props ) => (
+												<GridItem
+													{ ...props }
+													id={ itemId }
+													role="gridcell"
+													view={ view }
+													selection={ selection }
+													onChangeSelection={
+														onChangeSelection
+													}
+													onClickItem={ onClickItem }
+													isItemClickable={
+														isItemClickable
+													}
+													renderItemLink={
+														renderItemLink
+													}
+													getItemId={ getItemId }
+													item={ item }
+													actions={ actions }
+													onMouseDown={ ( event ) => {
+														props.onMouseDown?.(
+															event
+														);
+														selectionProps.onMouseDown(
+															event
+														);
+													} }
+													onClickCapture={ (
+														event
+													) => {
+														props.onClickCapture?.(
+															event
+														);
+														selectionProps.onClickCapture(
+															event
+														);
+													} }
+													mediaField={ mediaField }
+													titleField={ titleField }
+													descriptionField={
+														descriptionField
+													}
+													regularFields={
+														regularFields
+													}
+													badgeFields={ badgeFields }
+													hasBulkActions={
+														hasBulkActions
+													}
+													config={ {
+														sizes: size,
+													} }
+												/>
+											) }
+										/>
+									);
+								} ) }
+							</Composite.Row>
+						) ) }
+					</Composite>
+				)
+			}
+		</>
 	);
 }

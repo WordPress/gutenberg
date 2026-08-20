@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	RangeControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -75,7 +72,6 @@ const Overlay = ( {
 					max={ 100 }
 					step={ 10 }
 					required
-					__next40pxDefaultSize
 				/>
 			</ToolsPanelItem>
 		</>

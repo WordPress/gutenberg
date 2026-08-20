@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { getActiveFormat, getActiveObject } from '@wordpress/rich-text';
 import { useContext, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import BlockContext from '../block-context';
 
 const DEFAULT_BLOCK_CONTEXT = {};

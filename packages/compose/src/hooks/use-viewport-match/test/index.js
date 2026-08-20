@@ -1,17 +1,8 @@
-/**
- * External dependencies
- */
 import { render } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import useViewportMatch from '../';
-
 jest.mock( '../../use-media-query', () => {
 	return jest.fn();
 } );
-
 import useMediaQueryMock from '../../use-media-query';
 
 describe( 'useViewportMatch', () => {
@@ -44,15 +35,18 @@ describe( 'useViewportMatch', () => {
 		expect( useMediaQueryMock ).toHaveBeenCalledTimes( 3 );
 		expect( useMediaQueryMock ).toHaveBeenNthCalledWith(
 			1,
-			'(max-width: 1280px)'
+			'screen and (max-width: 1280px)',
+			window
 		);
 		expect( useMediaQueryMock ).toHaveBeenNthCalledWith(
 			2,
-			'(min-width: 782px)'
+			'screen and (min-width: 782px)',
+			window
 		);
 		expect( useMediaQueryMock ).toHaveBeenNthCalledWith(
 			3,
-			'(min-width: 600px)'
+			'screen and (min-width: 600px)',
+			window
 		);
 	} );
 
@@ -76,15 +70,18 @@ describe( 'useViewportMatch', () => {
 		expect( useMediaQueryMock ).toHaveBeenCalledTimes( 3 );
 		expect( useMediaQueryMock ).toHaveBeenNthCalledWith(
 			1,
-			'(min-width: 1440px)'
+			'screen and (min-width: 1440px)',
+			window
 		);
 		expect( useMediaQueryMock ).toHaveBeenNthCalledWith(
 			2,
-			'(max-width: 960px)'
+			'screen and (max-width: 960px)',
+			window
 		);
 		expect( useMediaQueryMock ).toHaveBeenNthCalledWith(
 			3,
-			'(max-width: 480px)'
+			'screen and (max-width: 480px)',
+			window
 		);
 	} );
 
@@ -121,9 +118,25 @@ describe( 'useViewportMatch', () => {
 
 		expect( useMediaQueryMock ).toHaveBeenCalledTimes( 4 );
 		// `useMediaQuery` is expected to receive `undefined` when simulating width.
-		expect( useMediaQueryMock ).toHaveBeenNthCalledWith( 1, undefined );
-		expect( useMediaQueryMock ).toHaveBeenNthCalledWith( 2, undefined );
-		expect( useMediaQueryMock ).toHaveBeenNthCalledWith( 3, undefined );
-		expect( useMediaQueryMock ).toHaveBeenNthCalledWith( 4, undefined );
+		expect( useMediaQueryMock ).toHaveBeenNthCalledWith(
+			1,
+			undefined,
+			window
+		);
+		expect( useMediaQueryMock ).toHaveBeenNthCalledWith(
+			2,
+			undefined,
+			window
+		);
+		expect( useMediaQueryMock ).toHaveBeenNthCalledWith(
+			3,
+			undefined,
+			window
+		);
+		expect( useMediaQueryMock ).toHaveBeenNthCalledWith(
+			4,
+			undefined,
+			window
+		);
 	} );
 } );

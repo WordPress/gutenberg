@@ -1,28 +1,16 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import {
 	FlexBlock,
 	__experimentalItem as Item,
-	// @ts-ignore
 	__experimentalHStack as HStack,
-	Icon,
+	Icon as WCIcon,
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
 import { chevronDownSmall } from '@wordpress/icons';
 import { useReducedMotion } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { STORE_NAME } from '../../../store';
 import NavigationItem from '../navigation-item';
 import { wrapIcon } from '../items';
@@ -72,7 +60,7 @@ export default function DropdownItem( {
 }: DropdownItemProps ) {
 	const menuItems: MenuItem[] = useSelect(
 		( select ) =>
-			// @ts-ignore
+			// @ts-expect-error Store types are not available when selecting by store name.
 			select( STORE_NAME ).getMenuItems(),
 		[]
 	);
@@ -96,7 +84,7 @@ export default function DropdownItem( {
 				>
 					{ wrapIcon( icon, false ) }
 					<FlexBlock>{ children }</FlexBlock>
-					<Icon
+					<WCIcon
 						icon={ chevronDownSmall }
 						className={ clsx( 'boot-dropdown-item__chevron', {
 							'is-up': isExpanded,

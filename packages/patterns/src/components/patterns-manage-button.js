@@ -1,21 +1,20 @@
-/**
- * WordPress dependencies
- */
-import { MenuItem } from '@wordpress/components';
+import {
+	MenuItem,
+	__experimentalConfirmDialog as ConfirmDialog,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { isReusableBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { addQueryArgs } from '@wordpress/url';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { store as patternsStore } from '../store';
 import { unlock } from '../lock-unlock';
 
 function PatternsManageButton( { clientId, onClose } ) {
+	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
+
 	const {
 		attributes,
 		canDetach,
@@ -85,31 +84,47 @@ function PatternsManageButton( { clientId, onClose } ) {
 		return null;
 	}
 
+	const handleDetach = () => {
+		if ( isSyncedPattern ) {
+			convertSyncedPatternToStatic( clientId );
+		}
+
+		if ( isUnsyncedPattern ) {
+			const { patternName, ...attributesWithoutPatternName } =
+				attributes?.metadata ?? {};
+			updateBlockAttributes( clientId, {
+				metadata: attributesWithoutPatternName,
+			} );
+		}
+		onClose?.();
+		setShowConfirmDialog( false );
+	};
+
 	return (
 		<>
 			{ canDetach && (
-				<MenuItem
-					onClick={ () => {
-						if ( isSyncedPattern ) {
-							convertSyncedPatternToStatic( clientId );
-						}
-
-						if ( isUnsyncedPattern ) {
-							const {
-								patternName,
-								...attributesWithoutPatternName
-							} = attributes?.metadata ?? {};
-							updateBlockAttributes( clientId, {
-								metadata: attributesWithoutPatternName,
-							} );
-						}
-						onClose?.();
-					} }
-				>
-					{ isSyncedPattern
-						? __( 'Disconnect pattern' )
-						: __( 'Detach pattern' ) }
-				</MenuItem>
+				<>
+					<MenuItem onClick={ () => setShowConfirmDialog( true ) }>
+						{ __( 'Detach' ) }
+					</MenuItem>
+					<ConfirmDialog
+						isOpen={ showConfirmDialog }
+						onConfirm={ handleDetach }
+						onCancel={ () => setShowConfirmDialog( false ) }
+						confirmButtonText={ __( 'Detach' ) }
+						size="medium"
+						title={ __( 'Detach pattern?' ) }
+						__experimentalHideHeader={ false }
+					>
+						{ isSyncedPattern
+							? __(
+									'The blocks will be separated from the original pattern and will be fully editable. Future changes to the pattern will not apply here.'
+							  )
+							: __(
+									'Blocks will no longer be associated with this pattern and will be fully editable.'
+							  ) }
+					</ConfirmDialog>
+				</>
 			) }
 			<MenuItem href={ managePatternsUrl }>
 				{ __( 'Manage patterns' ) }

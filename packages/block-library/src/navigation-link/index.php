@@ -5,14 +5,8 @@
  * @package WordPress
  */
 
-// Path differs between source and build: './shared/' in source, './navigation-link/shared/' in build.
-if ( file_exists( __DIR__ . '/shared/item-should-render.php' ) ) {
-	require_once __DIR__ . '/shared/item-should-render.php';
-	require_once __DIR__ . '/shared/render-submenu-icon.php';
-} else {
-	require_once __DIR__ . '/navigation-link/shared/item-should-render.php';
-	require_once __DIR__ . '/navigation-link/shared/render-submenu-icon.php';
-}
+require_once __DIR__ . '/navigation-link/shared/item-should-render.php';
+require_once __DIR__ . '/navigation-link/shared/render-submenu-icon.php';
 
 /**
  * Build an array with CSS classes and inline styles defining the colors
@@ -90,12 +84,18 @@ function block_core_navigation_link_build_css_colors( $context, $attributes, $is
  * Build an array with CSS classes and inline styles defining the font sizes
  * which will be applied to the navigation markup in the front-end.
  *
+ * This function is no longer used internally and is kept only for backward
+ * compatibility with third-party code that may call it directly.
+ *
  * @since 5.9.0
+ * @deprecated 7.0.0
  *
  * @param  array $context Navigation block context.
  * @return array Font size CSS classes and inline styles.
  */
 function block_core_navigation_link_build_css_font_sizes( $context ) {
+	_deprecated_function( __FUNCTION__, '7.0.0' );
+
 	// CSS classes.
 	$font_sizes = array(
 		'css_classes'   => array(),
@@ -124,6 +124,23 @@ function block_core_navigation_link_build_css_font_sizes( $context ) {
 }
 
 /**
+ * Returns the top-level submenu SVG chevron icon.
+ *
+ * @since 5.9.0
+ * @deprecated 7.0.0 Use block_core_shared_navigation_render_submenu_icon() instead.
+ *
+ * @return string
+ */
+function block_core_navigation_link_render_submenu_icon() {
+	_deprecated_function(
+		__FUNCTION__,
+		'7.0.0',
+		'block_core_shared_navigation_render_submenu_icon()'
+	);
+	return block_core_shared_navigation_render_submenu_icon();
+}
+
+/**
  * Decodes a url if it's encoded, returning the same url if not.
  *
  * @since 6.2.0
@@ -133,6 +150,10 @@ function block_core_navigation_link_build_css_font_sizes( $context ) {
  * @return string $url Returns the decoded url.
  */
 function block_core_navigation_link_maybe_urldecode( $url ) {
+	if ( ! is_string( $url ) ) {
+		return '';
+	}
+
 	$is_url_encoded = false;
 	$query          = parse_url( $url, PHP_URL_QUERY );
 	$query_params   = wp_parse_args( $query );
@@ -170,9 +191,12 @@ function block_core_navigation_link_maybe_urldecode( $url ) {
 function render_block_core_navigation_link( $attributes, $content, $block ) {
 	// Check if this navigation item should render based on post status.
 	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-		if ( ! gutenberg_block_core_shared_navigation_item_should_render( $attributes, $block ) ) {
-			return '';
-		}
+		$should_render = gutenberg_block_core_shared_navigation_item_should_render( $attributes, $block );
+	} else {
+		$should_render = block_core_shared_navigation_item_should_render( $attributes, $block );
+	}
+	if ( ! $should_render ) {
+		return '';
 	}
 
 	// Don't render the block's subtree if it has no label.
@@ -180,11 +204,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$font_sizes      = block_core_navigation_link_build_css_font_sizes( $block->context );
-	$classes         = array_merge(
-		$font_sizes['css_classes']
-	);
-	$style_attribute = $font_sizes['inline_styles'];
+	$classes = array();
 
 	// Render inner blocks first to check if any menu items will actually display.
 	$inner_blocks_html = '';
@@ -208,7 +228,6 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		array(
 			'class' => $css_classes . ' wp-block-navigation-item' . ( $has_submenu ? ' has-child' : '' ) .
 				( $is_active ? ' current-menu-item' : '' ),
-			'style' => $style_attribute,
 		)
 	);
 	$html               = '<li ' . $wrapper_attributes . '>' .
@@ -262,7 +281,13 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 
 	if ( isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'] && $has_submenu ) {
 		// The submenu icon can be hidden by a CSS rule on the Navigation Block.
-		$html .= '<span class="wp-block-navigation__submenu-icon">' . block_core_navigation_render_submenu_icon() . '</span>';
+		$html .= '<span class="wp-block-navigation__submenu-icon">';
+		if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+			$html .= gutenberg_block_core_shared_navigation_render_submenu_icon();
+		} else {
+			$html .= block_core_shared_navigation_render_submenu_icon();
+		}
+		$html .= '</span>';
 	}
 
 	if ( $has_submenu ) {

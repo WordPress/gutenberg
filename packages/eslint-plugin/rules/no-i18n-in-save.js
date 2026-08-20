@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const {
 	TRANSLATION_FUNCTIONS,
 	getTranslateFunctionName,
@@ -22,7 +19,7 @@ module.exports = {
 	},
 	create( context ) {
 		let saveFunctionDepth = 0;
-		const filename = context.getFilename();
+		const filename = context.filename;
 
 		// Skip deprecated files as they preserve old behavior including translation functions
 		const normalizedFilename = filename.replace( /\\/g, '/' );

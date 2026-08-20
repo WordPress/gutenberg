@@ -9,13 +9,17 @@ import type { InputLayoutSlotProps } from './types';
 export const InputLayoutSlot = forwardRef<
 	HTMLDivElement,
 	InputLayoutSlotProps
->( function InputLayoutSlot( { padding = 'default', ...restProps }, ref ) {
+>( function InputLayoutSlot(
+	{ padding = 'default', className, ...restProps },
+	ref
+) {
 	return (
 		<div
 			ref={ ref }
 			className={ clsx(
 				styles[ 'input-layout-slot' ],
-				styles[ `is-padding-${ padding }` ]
+				styles[ `is-padding-${ padding }` ],
+				className
 			) }
 			{ ...restProps }
 		/>

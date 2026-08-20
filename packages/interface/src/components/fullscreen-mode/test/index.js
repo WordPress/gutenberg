@@ -1,10 +1,4 @@
-/**
- * External dependencies
- */
 import { render } from '@testing-library/react';
-/**
- * Internal dependencies
- */
 import FullscreenMode from '..';
 
 describe( 'FullscreenMode', () => {

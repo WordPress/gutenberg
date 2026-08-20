@@ -1,12 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useState, useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import { debounce } from '@wordpress/compose';
 import {
 	Button,
@@ -15,19 +9,20 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import PreviewBlockPopover from '../block-switcher/preview-block-popover';
 import useStylesForBlocks from './use-styles-for-block';
 import { useToolsPanelDropdownMenuProps } from '../global-styles/utils';
 import { getDefaultStyle, replaceActiveStyle } from './utils';
+import { store as blockEditorStore } from '../../store';
 
 const noop = () => {};
 
 // Block Styles component for the Settings Sidebar.
 function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
+	const canEdit = useSelect(
+		( select ) => select( blockEditorStore ).canEditBlock( clientId ),
+		[ clientId ]
+	);
 	const {
 		onSelect,
 		stylesToRender,
@@ -62,7 +57,7 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 		];
 	}, [ hoveredStyle, genericPreviewBlock, className, activeStyle ] );
 
-	if ( ! stylesToRender || stylesToRender.length === 0 ) {
+	if ( ! canEdit || ! stylesToRender || stylesToRender.length === 0 ) {
 		return null;
 	}
 

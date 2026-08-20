@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import parse, { attributesToProps, domToReact } from 'html-react-parser';
-
-/**
- * WordPress dependencies
- */
 import { safeHTML } from '@wordpress/dom';
 
 /**

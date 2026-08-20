@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { act, render } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import {
 	createBlock,
 	registerBlockType,
@@ -16,10 +9,6 @@ import { RichText, useBlockProps } from '@wordpress/block-editor';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { unregisterFormatType } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import { store as coreDataStore } from '../index';
 import useEntityBlockEditor from '../hooks/use-entity-block-editor';
 

@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 // @ts-expect-error -- is-plain-object types don't resolve with package.json "exports".
 import { isPlainObject } from 'is-plain-object';
 import deepmerge from 'deepmerge';
-
-/**
- * Internal dependencies
- */
 import defaultStorage from './storage/default';
 import { combineReducers } from '../../';
 import type {
@@ -94,7 +87,7 @@ export function createPersistenceInterface(
 			} else {
 				try {
 					data = JSON.parse( persisted );
-				} catch ( error ) {
+				} catch {
 					// Similarly, should any error be thrown during parse of
 					// the string (malformed JSON), fall back to empty object.
 					data = {};

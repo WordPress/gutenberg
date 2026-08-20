@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState, useRef, useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import { Popover } from '..';
-import { PopoverInsideIframeRenderedInExternalSlot } from '../test/utils';
+import { PopoverInsideIframeRenderedInExternalSlot } from './utils';
 import type { PopoverProps } from '../types';
 
 const AVAILABLE_PLACEMENTS: PopoverProps[ 'placement' ][] = [
@@ -33,6 +22,7 @@ const AVAILABLE_PLACEMENTS: PopoverProps[ 'placement' ][] = [
 ];
 
 const meta: Meta< typeof Popover > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Overlays/Popover',
 	id: 'components-popover',
 	component: Popover,
@@ -56,7 +46,7 @@ const meta: Meta< typeof Popover > = {
 	parameters: {
 		controls: { expanded: true },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

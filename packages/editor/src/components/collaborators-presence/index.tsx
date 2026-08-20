@@ -1,20 +1,19 @@
 import { Button } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import {
 	privateApis,
 	type PostEditorAwarenessState,
 } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
-
 import Avatar from './avatar';
 import AvatarGroup from './avatar-group';
 import { CollaboratorsList } from './list';
 import { unlock } from '../../lock-unlock';
 import { getAvatarUrl } from '../collaborators-overlay/get-avatar-url';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
-
-import './styles/collaborators-presence.scss';
+import { createCursorRegistry } from '../collaborators-overlay/cursor-registry';
 import { CollaboratorsOverlay } from '../collaborators-overlay';
+import { getCollaboratorDisplayName } from '../../utils/get-collaborator-display-name';
 
 const { useActiveCollaborators } = unlock( privateApis );
 
@@ -40,10 +39,24 @@ export function CollaboratorsPresence( {
 		postType
 	) as PostEditorAwarenessState[];
 
-	// Filter out current user - we never show ourselves in the list
 	const otherActiveCollaborators = activeCollaborators.filter(
-		( collaborator ) => ! collaborator.isMe
+		( c ) => ! c.isMe
 	);
+
+	// Always include self in the list sorted first.
+	const collaboratorsForList = useMemo( () => {
+		return [ ...activeCollaborators ].sort( ( a, b ) => {
+			if ( a.isMe && ! b.isMe ) {
+				return -1;
+			}
+			if ( ! a.isMe && b.isMe ) {
+				return 1;
+			}
+			return 0;
+		} );
+	}, [ activeCollaborators ] );
+
+	const [ cursorRegistry ] = useState( createCursorRegistry );
 
 	const [ isPopoverVisible, setIsPopoverVisible ] = useState( false );
 	const [ popoverAnchor, setPopoverAnchor ] = useState< HTMLElement | null >(
@@ -57,6 +70,8 @@ export function CollaboratorsPresence( {
 		return null;
 	}
 
+	const me = activeCollaborators.find( ( c ) => c.isMe );
+
 	return (
 		<>
 			<div className="editor-collaborators-presence">
@@ -69,10 +84,23 @@ export function CollaboratorsPresence( {
 					aria-label={ sprintf(
 						// translators: %d: number of online collaborators.
 						__( 'Collaborators list, %d online' ),
-						otherActiveCollaborators.length
+						collaboratorsForList.length
 					) }
 				>
 					<AvatarGroup max={ 4 }>
+						{ me && (
+							<Avatar
+								key={ me.clientId }
+								src={ getAvatarUrl(
+									me.collaboratorInfo.avatar_urls
+								) }
+								name={ getCollaboratorDisplayName(
+									me.collaboratorInfo
+								) }
+								borderColor="var(--wp-admin-theme-color)"
+								size="small"
+							/>
+						) }
 						{ otherActiveCollaborators.map(
 							( collaboratorState ) => (
 								<Avatar
@@ -81,11 +109,12 @@ export function CollaboratorsPresence( {
 										collaboratorState.collaboratorInfo
 											.avatar_urls
 									) }
-									name={
-										collaboratorState.collaboratorInfo.name
-									}
+									name={ getCollaboratorDisplayName(
+										collaboratorState.collaboratorInfo
+									) }
 									borderColor={ getAvatarBorderColor(
-										collaboratorState.collaboratorInfo.id
+										collaboratorState.collaboratorInfo.id ??
+											collaboratorState.clientId
 									) }
 									size="small"
 								/>
@@ -95,13 +124,18 @@ export function CollaboratorsPresence( {
 				</Button>
 				{ isPopoverVisible && (
 					<CollaboratorsList
-						activeCollaborators={ otherActiveCollaborators }
+						activeCollaborators={ collaboratorsForList }
 						popoverAnchor={ popoverAnchor }
 						setIsPopoverVisible={ setIsPopoverVisible }
+						cursorRegistry={ cursorRegistry }
 					/>
 				) }
 			</div>
-			<CollaboratorsOverlay postId={ postId } postType={ postType } />
+			<CollaboratorsOverlay
+				postId={ postId }
+				postType={ postType }
+				cursorRegistry={ cursorRegistry }
+			/>
 		</>
 	);
 }

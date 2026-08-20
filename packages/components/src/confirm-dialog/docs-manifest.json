@@ -1,0 +1,5 @@
+{
+	"$schema": "../../schemas/docs-manifest.json",
+	"displayName": "ConfirmDialog",
+	"filePath": "./component.tsx"
+}

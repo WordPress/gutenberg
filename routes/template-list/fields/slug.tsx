@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __, _x } from '@wordpress/i18n';
 import { privateApis as corePrivateApis } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../lock-unlock';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
 const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
 

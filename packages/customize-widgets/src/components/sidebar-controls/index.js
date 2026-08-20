@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createContext, useMemo, useContext } from '@wordpress/element';
 
 export const SidebarControlsContext = createContext();

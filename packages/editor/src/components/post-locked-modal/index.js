@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	Modal,
@@ -16,19 +13,36 @@ import { addAction, removeAction } from '@wordpress/hooks';
 import { useInstanceId } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { unlock } from '../../lock-unlock';
-
-/**
- * Internal dependencies
- */
+import { DOCUMENT_SIZE_LIMIT_EXCEEDED } from '../../utils/sync-error-messages';
 import { store as editorStore } from '../../store';
 
 function CollaborationContext() {
-	const isCollaborationSupported = useSelect( ( select ) => {
-		return unlock( select( coreStore ) ).isCollaborationSupported();
-	}, [] );
+	const { isCollaborationSupported, syncConnectionStatus } = useSelect(
+		( select ) => {
+			const {
+				isCollaborationSupported: isSupported,
+				getSyncConnectionStatus,
+			} = unlock( select( coreStore ) );
+			return {
+				isCollaborationSupported: isSupported(),
+				syncConnectionStatus: getSyncConnectionStatus(),
+			};
+		},
+		[]
+	);
 
 	if ( isCollaborationSupported ) {
 		return null;
+	}
+
+	if ( DOCUMENT_SIZE_LIMIT_EXCEEDED === syncConnectionStatus?.error?.code ) {
+		return (
+			<p>
+				{ __(
+					'Because this post is too large for real-time collaboration, only one person can edit at a time.'
+				) }
+			</p>
+		);
 	}
 
 	return (
@@ -56,7 +70,6 @@ function PostLockedModal() {
 		previewLink,
 	} = useSelect( ( select ) => {
 		const {
-			isCollaborationEnabledForCurrentPost,
 			isPostLocked,
 			isPostLockTakeover,
 			getPostLockUser,
@@ -65,7 +78,8 @@ function PostLockedModal() {
 			getEditedPostAttribute,
 			getEditedPostPreviewLink,
 			getEditorSettings,
-		} = select( editorStore );
+			isCollaborationEnabledForCurrentPost,
+		} = unlock( select( editorStore ) );
 		const { getPostType } = select( coreStore );
 		return {
 			isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),
@@ -164,7 +178,18 @@ function PostLockedModal() {
 			removeAction( 'heartbeat.tick', hookName );
 			window.removeEventListener( 'beforeunload', releasePostLock );
 		};
-	}, [] );
+		// Re-register with fresh values once the lock state is hydrated from
+		// the server, so a stale `isLocked` doesn't keep `sendPostLock`
+		// refreshing a lock this user doesn't hold.
+	}, [
+		hookName,
+		isLocked,
+		activePostLock,
+		postId,
+		postLockUtils,
+		autosave,
+		updatePostLock,
+	] );
 
 	if ( ! isLocked ) {
 		return null;

@@ -49,6 +49,12 @@ export const OVERLAY_IFRAME_STYLES = `
 	box-shadow: ${ ELEVATION_X_SMALL };
 	animation: collaborators-overlay-cursor-blink 1s infinite;
 }
+.collaborators-overlay-selection-rect {
+	position: absolute;
+	opacity: 0.15;
+	pointer-events: none;
+	border-radius: 2px;
+}
 
 /* Overlay-specific positioning applied to the Avatar cursor label. */
 .collaborators-overlay-user-label.editor-avatar {
@@ -59,6 +65,7 @@ export const OVERLAY_IFRAME_STYLES = `
 	pointer-events: auto;
 	overflow: visible;
 	width: max-content;
+	--label-base-transform: translate(-11px, -100%);
 }
 /* Avatar positioned above a highlighted block as a label. */
 .collaborators-overlay-block-label.editor-avatar {
@@ -68,6 +75,7 @@ export const OVERLAY_IFRAME_STYLES = `
 	pointer-events: auto;
 	overflow: visible;
 	width: max-content;
+	--label-base-transform: translateY(calc(-100% - ${ GRID_UNIT_10 }));
 }
 
 @keyframes collaborators-overlay-cursor-blink {
@@ -78,7 +86,8 @@ export const OVERLAY_IFRAME_STYLES = `
 .collaborators-overlay-cursor-highlighted .collaborators-overlay-user-cursor {
 	animation: collaborators-overlay-cursor-highlight 0.6s ease-in-out 3;
 }
-.collaborators-overlay-cursor-highlighted .collaborators-overlay-user-label {
+.collaborators-overlay-cursor-highlighted .collaborators-overlay-user-label,
+.collaborators-overlay-cursor-highlighted .collaborators-overlay-block-label {
 	animation: collaborators-overlay-label-highlight 0.6s ease-in-out 3;
 }
 @keyframes collaborators-overlay-cursor-highlight {
@@ -93,11 +102,11 @@ export const OVERLAY_IFRAME_STYLES = `
 }
 @keyframes collaborators-overlay-label-highlight {
 	0%, 100% {
-		transform: translate(-11px, -100%) scale(1);
+		transform: var(--label-base-transform) scale(1);
 		filter: drop-shadow(0 0 0 transparent);
 	}
 	50% {
-		transform: translate(-11px, -100%) scale(1.1);
+		transform: var(--label-base-transform) scale(1.1);
 		filter: drop-shadow(0 0 6px currentColor);
 	}
 }
@@ -113,12 +122,13 @@ export const OVERLAY_IFRAME_STYLES = `
 	outline-style: solid;
 	outline-width: calc(var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1));
 	outline-offset: calc(-1 * var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1));
-	box-shadow: inset 0 0 0 calc(var(--wp-admin-border-width-focus, ${ BORDER_WIDTH_FOCUS_FALLBACK }) + ${ BORDER_WIDTH }) ${ WHITE }, 0 0 0 ${ BORDER_WIDTH } ${ WHITE }, ${ ELEVATION_X_SMALL };
+	box-shadow: inset 0 0 0 calc((var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1)) + 0.5px) rgba(${ WHITE }, 0.7);
 	z-index: 1;
 }
 @media (prefers-reduced-motion: reduce) {
 	.collaborators-overlay-user-label,
-	.collaborators-overlay-user-cursor {
+	.collaborators-overlay-user-cursor,
+	.collaborators-overlay-block-label {
 		animation: none;
 	}
 }

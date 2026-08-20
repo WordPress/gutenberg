@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	InspectorControls,
 	useBlockProps,
@@ -13,10 +10,6 @@ import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import usePostTerms from './use-post-terms';
 
 // Allowed formats for the prefix and suffix fields.
@@ -65,7 +58,6 @@ export default function PostTermsEdit( {
 		<>
 			<InspectorControls group="advanced">
 				<TextControl
-					__next40pxDefaultSize
 					autoComplete="off"
 					label={ __( 'Separator' ) }
 					value={ separator || '' }
@@ -134,10 +126,13 @@ export default function PostTermsEdit( {
 							setAttributes( { suffix: value } )
 						}
 						tagName="span"
-						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter(
-								createBlock( getDefaultBlockName() )
-							)
+						__unstableOnSplitAtEnd={
+							insertBlocksAfter
+								? () =>
+										insertBlocksAfter(
+											createBlock( getDefaultBlockName() )
+										)
+								: undefined
 						}
 					/>
 				) }

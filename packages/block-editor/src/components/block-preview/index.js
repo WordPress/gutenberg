@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useDisabled, useMergeRefs } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { memo, useMemo } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { ExperimentalBlockEditorProvider } from '../provider';
 import AutoHeightBlockPreview from './auto';
 import EditorStyles from '../editor-styles';
@@ -59,7 +48,6 @@ export function BlockPreview( {
 	const settings = useMemo(
 		() => ( {
 			...originalSettings,
-			focusMode: false, // Disable "Spotlight mode".
 			isPreviewMode: true,
 		} ),
 		[ originalSettings ]
@@ -128,7 +116,6 @@ export function useBlockPreview( { blocks, props = {}, layout } ) {
 		() => ( {
 			...originalSettings,
 			styles: undefined, // Clear styles included by the parent settings, as they are already output by the parent's EditorStyles.
-			focusMode: false, // Disable "Spotlight mode".
 			isPreviewMode: true,
 		} ),
 		[ originalSettings ]

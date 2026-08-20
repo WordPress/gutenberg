@@ -1,16 +1,12 @@
-/**
- * External dependencies
- */
 import { act, renderHook, waitFor } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import {
 	useActiveCollaborators,
 	useResolvedSelection,
 	useGetDebugData,
 	useIsDisconnected,
+	useOnCollaboratorJoin,
+	useOnCollaboratorLeave,
+	useOnPostSave,
 } from '../use-post-editor-awareness-state';
 import { getSyncManager } from '../../sync';
 import { SelectionType } from '../../utils/crdt-user-selections';
@@ -23,6 +19,14 @@ import type { SelectionCursor } from '../../types';
 // Mock the sync module
 jest.mock( '../../sync', () => ( {
 	getSyncManager: jest.fn(),
+} ) );
+
+const mockPostContentBlocks = [
+	{ clientId: 'block-1', name: 'core/paragraph', innerBlocks: [] },
+];
+
+jest.mock( '../../awareness/block-lookup', () => ( {
+	usePostContentBlocks: jest.fn( () => mockPostContentBlocks ),
 } ) );
 
 const mockAvatarUrls = {
@@ -66,6 +70,9 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		onStateChange: jest.Mock;
 		convertSelectionStateToAbsolute: jest.Mock;
 		getDebugData: jest.Mock;
+		doc: {
+			getMap: jest.Mock;
+		};
 	};
 	let mockSyncManager: {
 		getAwareness: jest.Mock;
@@ -73,9 +80,29 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 	let stateChangeCallback:
 		| ( ( newState: PostEditorAwarenessState[] ) => void )
 		| null;
+	let stateMapObserver:
+		| ( ( event: { keysChanged: Set< string > } ) => void )
+		| null;
+	let mockStateMapData: Record< string, unknown >;
+	let mockRecordMapData: Record< string, unknown >;
 
 	beforeEach( () => {
 		stateChangeCallback = null;
+		stateMapObserver = null;
+		mockStateMapData = {};
+		mockRecordMapData = {};
+
+		const mockStateMap = {
+			get: jest.fn( ( key: string ) => mockStateMapData[ key ] ),
+			observe: jest.fn( ( observer: typeof stateMapObserver ) => {
+				stateMapObserver = observer;
+			} ),
+			unobserve: jest.fn(),
+		};
+
+		const mockRecordMap = {
+			get: jest.fn( ( key: string ) => mockRecordMapData[ key ] ),
+		};
 
 		mockAwareness = {
 			setUp: jest.fn(),
@@ -86,6 +113,17 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			} ),
 			convertSelectionStateToAbsolute: jest.fn().mockReturnValue( null ),
 			getDebugData: jest.fn().mockReturnValue( createMockDebugData() ),
+			doc: {
+				getMap: jest.fn( ( name: string ) => {
+					if ( name === 'state' ) {
+						return mockStateMap;
+					}
+					if ( name === 'document' ) {
+						return mockRecordMap;
+					}
+					return null;
+				} ),
+			},
 		};
 
 		mockSyncManager = {
@@ -162,6 +200,22 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			);
 
 			expect( result.current ).toEqual( mockUsers );
+		} );
+
+		test( 'does not expose a collaborator until identity information is available', () => {
+			const incompleteCollaborator = {
+				...createMockActiveUser(),
+				collaboratorInfo: undefined,
+			} as unknown as PostEditorAwarenessState;
+			mockAwareness.getCurrentState.mockReturnValue( [
+				incompleteCollaborator,
+			] );
+
+			const { result } = renderHook( () =>
+				useActiveCollaborators( 123, 'post' )
+			);
+
+			expect( result.current ).toEqual( [] );
 		} );
 
 		test( 'should subscribe to state changes', () => {
@@ -256,12 +310,13 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			};
 
 			expect( result.current( mockSelection ) ).toEqual( {
-				textIndex: null,
+				richTextOffset: null,
 				localClientId: null,
+				attributeKey: null,
 			} );
 		} );
 
-		test( 'should call awareness.convertSelectionStateToAbsolute with selection', () => {
+		test( 'should call awareness.convertSelectionStateToAbsolute with selection and blocks', () => {
 			const mockSelection: SelectionCursor = {
 				type: SelectionType.Cursor,
 				cursorPosition: {
@@ -270,8 +325,9 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 				},
 			};
 			mockAwareness.convertSelectionStateToAbsolute.mockReturnValue( {
-				textIndex: 10,
+				richTextOffset: 10,
 				localClientId: 'block-1',
+				attributeKey: 'content',
 			} );
 
 			const { result } = renderHook( () =>
@@ -282,10 +338,11 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 
 			expect(
 				mockAwareness.convertSelectionStateToAbsolute
-			).toHaveBeenCalledWith( mockSelection );
+			).toHaveBeenCalledWith( mockSelection, mockPostContentBlocks );
 			expect( position ).toEqual( {
-				textIndex: 10,
+				richTextOffset: 10,
 				localClientId: 'block-1',
+				attributeKey: 'content',
 			} );
 		} );
 	} );
@@ -415,7 +472,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 	} );
 
 	describe( 'multiple users scenario', () => {
-		test( 'should handle multiple active users', () => {
+		test( 'should handle resolved and fallback active users together', () => {
 			const user1 = createMockActiveUser( {
 				clientId: 1,
 				isMe: true,
@@ -432,10 +489,9 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 				clientId: 2,
 				isMe: false,
 				collaboratorInfo: {
-					id: 2,
-					name: 'User Two',
-					slug: 'user-two',
-					avatar_urls: mockAvatarUrls,
+					id: null,
+					name: 'Anonymous User',
+					slug: 'anonymous-2',
 					browserType: 'Firefox',
 					enteredAt: 1704067300000,
 				},
@@ -452,7 +508,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 				'User One'
 			);
 			expect( result.current[ 1 ].collaboratorInfo.name ).toBe(
-				'User Two'
+				'Anonymous User'
 			);
 		} );
 
@@ -479,6 +535,412 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 
 			// Should be false because *I* am connected (other user's status doesn't matter)
 			expect( result.current ).toBe( false );
+		} );
+	} );
+
+	describe( 'useOnCollaboratorJoin', () => {
+		const me = createMockActiveUser( {
+			clientId: 1,
+			isMe: true,
+			collaboratorInfo: {
+				id: 1,
+				name: 'Me',
+				slug: 'me',
+				avatar_urls: mockAvatarUrls,
+				browserType: 'Chrome',
+				enteredAt: 1704067200000,
+			},
+		} );
+
+		const alice = createMockActiveUser( {
+			clientId: 2,
+			isMe: false,
+			collaboratorInfo: {
+				id: 100,
+				name: 'Alice',
+				slug: 'alice',
+				avatar_urls: mockAvatarUrls,
+				browserType: 'Chrome',
+				enteredAt: 1704067300000,
+			},
+		} );
+
+		test( 'should not fire on initial mount', () => {
+			const callback = jest.fn();
+			mockAwareness.getCurrentState.mockReturnValue( [ me, alice ] );
+
+			renderHook( () => useOnCollaboratorJoin( 123, 'post', callback ) );
+
+			expect( callback ).not.toHaveBeenCalled();
+		} );
+
+		test( 'should not fire when collaborators load after initially empty state', async () => {
+			const callback = jest.fn();
+			mockAwareness.getCurrentState.mockReturnValue( [] );
+
+			renderHook( () => useOnCollaboratorJoin( 123, 'post', callback ) );
+
+			// Simulate store hydration: collaborators appear
+			act( () => {
+				stateChangeCallback?.( [ me, alice ] );
+			} );
+
+			await waitFor( () => {
+				expect( callback ).not.toHaveBeenCalled();
+			} );
+		} );
+
+		test( 'should fire callback when a new collaborator joins', async () => {
+			const callback = jest.fn();
+			mockAwareness.getCurrentState.mockReturnValue( [ me ] );
+
+			renderHook( () => useOnCollaboratorJoin( 123, 'post', callback ) );
+
+			// Alice joins
+			act( () => {
+				stateChangeCallback?.( [ me, alice ] );
+			} );
+
+			await waitFor( () => {
+				expect( callback ).toHaveBeenCalledWith( alice, me );
+			} );
+		} );
+
+		test( 'should not fire callback for the current user', async () => {
+			const callback = jest.fn();
+			mockAwareness.getCurrentState.mockReturnValue( [] );
+
+			renderHook( () => useOnCollaboratorJoin( 123, 'post', callback ) );
+
+			// First: hydrate with alice so prevCollaborators is non-empty
+			act( () => {
+				stateChangeCallback?.( [ alice ] );
+			} );
+
+			// Now "me" appears
+			act( () => {
+				stateChangeCallback?.( [ alice, me ] );
+			} );
+
+			await waitFor( () => {
+				expect( callback ).not.toHaveBeenCalled();
+			} );
+		} );
+
+		test( 'should not fire when postId is null', () => {
+			const callback = jest.fn();
+
+			renderHook( () => useOnCollaboratorJoin( null, 'post', callback ) );
+
+			expect( callback ).not.toHaveBeenCalled();
+			expect( mockSyncManager.getAwareness ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'useOnCollaboratorLeave', () => {
+		const me = createMockActiveUser( {
+			clientId: 1,
+			isMe: true,
+		} );
+
+		const alice = createMockActiveUser( {
+			clientId: 2,
+			isMe: false,
+			isConnected: true,
+			collaboratorInfo: {
+				id: 100,
+				name: 'Alice',
+				slug: 'alice',
+				avatar_urls: mockAvatarUrls,
+				browserType: 'Chrome',
+				enteredAt: 1704067300000,
+			},
+		} );
+
+		test( 'should fire callback when a connected collaborator disconnects', async () => {
+			const callback = jest.fn();
+			mockAwareness.getCurrentState.mockReturnValue( [ me, alice ] );
+
+			renderHook( () => useOnCollaboratorLeave( 123, 'post', callback ) );
+
+			// Alice disconnects
+			act( () => {
+				stateChangeCallback?.( [
+					me,
+					{ ...alice, isConnected: false },
+				] );
+			} );
+
+			await waitFor( () => {
+				expect( callback ).toHaveBeenCalledWith( alice );
+			} );
+		} );
+
+		test( 'should fire callback when a connected collaborator disappears from the list', async () => {
+			const callback = jest.fn();
+			mockAwareness.getCurrentState.mockReturnValue( [ me, alice ] );
+
+			renderHook( () => useOnCollaboratorLeave( 123, 'post', callback ) );
+
+			// Alice disappears entirely
+			act( () => {
+				stateChangeCallback?.( [ me ] );
+			} );
+
+			await waitFor( () => {
+				expect( callback ).toHaveBeenCalledWith( alice );
+			} );
+		} );
+
+		test( 'should not fire callback when an already-disconnected collaborator is removed', async () => {
+			const callback = jest.fn();
+			const disconnectedAlice = { ...alice, isConnected: false };
+			mockAwareness.getCurrentState.mockReturnValue( [
+				me,
+				disconnectedAlice,
+			] );
+
+			renderHook( () => useOnCollaboratorLeave( 123, 'post', callback ) );
+
+			// Disconnected Alice is removed from list (cleanup after delay)
+			act( () => {
+				stateChangeCallback?.( [ me ] );
+			} );
+
+			await waitFor( () => {
+				expect( callback ).not.toHaveBeenCalled();
+			} );
+		} );
+
+		test( 'should not fire callback for the current user disconnecting', async () => {
+			const callback = jest.fn();
+			mockAwareness.getCurrentState.mockReturnValue( [ me, alice ] );
+
+			renderHook( () => useOnCollaboratorLeave( 123, 'post', callback ) );
+
+			// "Me" disconnects
+			act( () => {
+				stateChangeCallback?.( [
+					{ ...me, isConnected: false },
+					alice,
+				] );
+			} );
+
+			await waitFor( () => {
+				expect( callback ).not.toHaveBeenCalled();
+			} );
+		} );
+
+		test( 'should not fire on initial mount', () => {
+			const callback = jest.fn();
+			mockAwareness.getCurrentState.mockReturnValue( [ me, alice ] );
+
+			renderHook( () => useOnCollaboratorLeave( 123, 'post', callback ) );
+
+			expect( callback ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'useOnPostSave', () => {
+		const me = createMockActiveUser( {
+			clientId: 1,
+			isMe: true,
+		} );
+
+		const alice = createMockActiveUser( {
+			clientId: 2,
+			isMe: false,
+			collaboratorInfo: {
+				id: 100,
+				name: 'Alice',
+				slug: 'alice',
+				avatar_urls: mockAvatarUrls,
+				browserType: 'Chrome',
+				enteredAt: 1704067300000,
+			},
+		} );
+
+		test( 'should fire callback when a remote collaborator saves', async () => {
+			const callback = jest.fn();
+			mockAwareness.getCurrentState.mockReturnValue( [ me, alice ] );
+
+			renderHook( () => useOnPostSave( 123, 'post', callback ) );
+
+			// Simulate a save event via the Y.Doc state map
+			const savedAt = Date.now() + 1000;
+			mockStateMapData = {
+				savedAt,
+				savedBy: alice.clientId,
+			};
+			mockRecordMapData = { status: 'draft' };
+
+			act( () => {
+				stateMapObserver?.( {
+					keysChanged: new Set( [ 'savedAt' ] ),
+				} );
+			} );
+
+			await waitFor( () => {
+				expect( callback ).toHaveBeenCalledWith(
+					{
+						savedAt,
+						savedByClientId: alice.clientId,
+						postStatus: 'draft',
+					},
+					alice,
+					null
+				);
+			} );
+		} );
+
+		test( 'should pass previous save event on subsequent saves', async () => {
+			const callback = jest.fn();
+			mockAwareness.getCurrentState.mockReturnValue( [ me, alice ] );
+
+			renderHook( () => useOnPostSave( 123, 'post', callback ) );
+
+			// First save
+			const firstSavedAt = Date.now() + 1000;
+			mockStateMapData = {
+				savedAt: firstSavedAt,
+				savedBy: alice.clientId,
+			};
+			mockRecordMapData = { status: 'draft' };
+
+			act( () => {
+				stateMapObserver?.( {
+					keysChanged: new Set( [ 'savedAt' ] ),
+				} );
+			} );
+
+			await waitFor( () => {
+				expect( callback ).toHaveBeenCalledTimes( 1 );
+			} );
+
+			// Second save
+			const secondSavedAt = Date.now() + 2000;
+			mockStateMapData = {
+				savedAt: secondSavedAt,
+				savedBy: alice.clientId,
+			};
+			mockRecordMapData = { status: 'publish' };
+
+			act( () => {
+				stateMapObserver?.( {
+					keysChanged: new Set( [ 'savedAt' ] ),
+				} );
+			} );
+
+			await waitFor( () => {
+				expect( callback ).toHaveBeenCalledTimes( 2 );
+			} );
+
+			expect( callback ).toHaveBeenLastCalledWith(
+				{
+					savedAt: secondSavedAt,
+					savedByClientId: alice.clientId,
+					postStatus: 'publish',
+				},
+				alice,
+				{
+					savedAt: firstSavedAt,
+					savedByClientId: alice.clientId,
+					postStatus: 'draft',
+				}
+			);
+		} );
+
+		test( 'should not fire callback when the current user saves', async () => {
+			const callback = jest.fn();
+			mockAwareness.getCurrentState.mockReturnValue( [ me, alice ] );
+
+			renderHook( () => useOnPostSave( 123, 'post', callback ) );
+
+			// Simulate a save event by "me"
+			const savedAt = Date.now() + 1000;
+			mockStateMapData = {
+				savedAt,
+				savedBy: me.clientId,
+			};
+			mockRecordMapData = { status: 'draft' };
+
+			act( () => {
+				stateMapObserver?.( {
+					keysChanged: new Set( [ 'savedAt' ] ),
+				} );
+			} );
+
+			await waitFor( () => {
+				expect( callback ).not.toHaveBeenCalled();
+			} );
+		} );
+
+		test( 'should not fire callback when saver is not in the collaborator list', async () => {
+			const callback = jest.fn();
+			mockAwareness.getCurrentState.mockReturnValue( [ me ] );
+
+			renderHook( () => useOnPostSave( 123, 'post', callback ) );
+
+			// Simulate a save from an unknown client
+			const savedAt = Date.now() + 1000;
+			mockStateMapData = {
+				savedAt,
+				savedBy: 99999,
+			};
+			mockRecordMapData = { status: 'draft' };
+
+			act( () => {
+				stateMapObserver?.( {
+					keysChanged: new Set( [ 'savedAt' ] ),
+				} );
+			} );
+
+			await waitFor( () => {
+				expect( callback ).not.toHaveBeenCalled();
+			} );
+		} );
+
+		test( 'should not fire duplicate callbacks for the same savedAt timestamp', async () => {
+			const callback = jest.fn();
+			mockAwareness.getCurrentState.mockReturnValue( [ me, alice ] );
+
+			renderHook( () => useOnPostSave( 123, 'post', callback ) );
+
+			const savedAt = Date.now() + 1000;
+			mockStateMapData = {
+				savedAt,
+				savedBy: alice.clientId,
+			};
+			mockRecordMapData = { status: 'draft' };
+
+			// First save event
+			act( () => {
+				stateMapObserver?.( {
+					keysChanged: new Set( [ 'savedAt' ] ),
+				} );
+			} );
+
+			await waitFor( () => {
+				expect( callback ).toHaveBeenCalledTimes( 1 );
+			} );
+
+			// Same savedAt again (e.g. component re-render)
+			act( () => {
+				stateMapObserver?.( {
+					keysChanged: new Set( [ 'savedAt' ] ),
+				} );
+			} );
+
+			// Should still be 1 call
+			expect( callback ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		test( 'should not fire when postId is null', () => {
+			const callback = jest.fn();
+
+			renderHook( () => useOnPostSave( null, 'post', callback ) );
+
+			expect( callback ).not.toHaveBeenCalled();
 		} );
 	} );
 } );

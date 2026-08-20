@@ -1,21 +1,11 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useContext, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 import { Composite } from '..';
 import { Tooltip } from '../../tooltip';
 
 const meta: Meta< typeof Composite > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Utilities/Composite',
 	id: 'components-composite',
 	component: Composite,
@@ -29,6 +19,11 @@ const meta: Meta< typeof Composite > = {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.Context': Composite.Context,
 	},
+	// Temporary: Due to an upstream bug, render the root explicitly so the
+	// components manifest extractor can resolve props from the JSX.
+	//
+	// See: https://github.com/storybookjs/storybook/issues/34877
+	render: ( args ) => <Composite { ...args } />,
 	argTypes: {
 		children: { control: false },
 		render: { control: false },
@@ -48,7 +43,7 @@ const meta: Meta< typeof Composite > = {
 			canvas: { sourceState: 'shown' },
 		},
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

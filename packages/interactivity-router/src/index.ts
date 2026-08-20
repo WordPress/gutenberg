@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { store, privateApis, getConfig } from '@wordpress/interactivity';
-
-/**
- * Internal dependencies
- */
 import { preloadStyles, applyStyles, type StyleElement } from './assets/styles';
 import {
 	preloadScriptModules,
@@ -90,7 +83,7 @@ const parseRegionAttribute = ( region: Element ) => {
 	try {
 		const { id, attachTo } = JSON.parse( value );
 		return { id, attachTo };
-	} catch ( e ) {
+	} catch {
 		return { id: value };
 	}
 };
@@ -169,7 +162,7 @@ const fetchPage = async ( url: string, { html }: { html: string } ) => {
 		}
 		const dom = new window.DOMParser().parseFromString( html, 'text/html' );
 		return await preparePage( url, dom );
-	} catch ( e ) {
+	} catch {
 		return false;
 	}
 };
@@ -600,14 +593,14 @@ function a11ySpeak( messageKey: keyof typeof navigationTexts ) {
 			// Fallback to localized strings from Interactivity API state.
 			// @todo This block is for Core < 6.7.0. Remove when support is dropped.
 
-			// @ts-expect-error
+			// @ts-expect-error `texts` is not part of the typed navigation state.
 			if ( state.navigation.texts?.loading ) {
-				// @ts-expect-error
+				// @ts-expect-error `texts` is not part of the typed navigation state.
 				navigationTexts.loading = state.navigation.texts.loading;
 			}
-			// @ts-expect-error
+			// @ts-expect-error `texts` is not part of the typed navigation state.
 			if ( state.navigation.texts?.loaded ) {
-				// @ts-expect-error
+				// @ts-expect-error `texts` is not part of the typed navigation state.
 				navigationTexts.loaded = state.navigation.texts.loaded;
 			}
 		}

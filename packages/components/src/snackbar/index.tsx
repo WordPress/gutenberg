@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef, KeyboardEvent, MouseEvent } from 'react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { speak } from '@wordpress/a11y';
 import {
 	useEffect,
@@ -17,10 +10,6 @@ import {
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import Button from '../button';
 import ExternalLink from '../external-link';
 import type { SnackbarProps } from './types';

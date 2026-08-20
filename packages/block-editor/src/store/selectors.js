@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	getBlockType,
 	getBlockTypes,
@@ -12,16 +9,11 @@ import {
 	store as blocksStore,
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
-import { Platform } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { symbol } from '@wordpress/icons';
 import { create, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 import { createSelector, createRegistrySelector } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import {
 	isFiltered,
 	checkAllowListRecursive,
@@ -35,7 +27,6 @@ import {
 import { orderBy } from '../utils/sorting';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
-
 import {
 	getContentLockingParent,
 	getEditedContentOnlySection,
@@ -44,12 +35,20 @@ import {
 	getParentSectionBlock,
 	isZoomOut,
 	isContainerInsertableToInContentOnlyMode,
+	getClientIdWithClientIdsTree,
+	getClientIdsTree,
 } from './private-selectors';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
 
 /**
  * A block selection object.
+ *
+ * This type is duplicated to avoid creating circular dependencies.
+ *
+ * @see {import("@wordpress/block-editor/src/store/actions").WPBlockSelection}
+ * @see {import("@wordpress/core-data/src/types").WPBlockSelection}
+ * @see {import("@wordpress/editor/src/store/selectors").WPBlockSelection}
  *
  * @typedef {Object} WPBlockSelection
  *
@@ -101,14 +100,6 @@ const DEFAULT_INSERTER_OPTIONS = {
  */
 export function getBlockName( state, clientId ) {
 	const block = state.blocks.byClientId.get( clientId );
-	const socialLinkName = 'core/social-link';
-
-	if ( Platform.OS !== 'web' && block?.name === socialLinkName ) {
-		const attributes = state.blocks.attributes.get( clientId );
-		const { service } = attributes ?? {};
-
-		return service ? `${ socialLinkName }-${ service }` : socialLinkName;
-	}
 	return block ? block.name : null;
 }
 
@@ -150,14 +141,26 @@ export function getBlockAttributes( state, clientId ) {
  * blocks module registration store.
  *
  * getBlock recurses through its inner blocks until all its children blocks have
- * been retrieved. Note that getBlock will not return the child inner blocks of
- * an inner block controller. This is because an inner block controller syncs
- * itself with its own entity, and should therefore not be included with the
- * blocks of a different entity. For example, say you call `getBlocks( TP )` to
- * get the blocks of a template part. If another template part is a child of TP,
- * then the nested template part's child blocks will not be returned. This way,
- * the template block itself is considered part of the parent, but the children
- * are not.
+ * been retrieved, with one exception: the children of an "inner block
+ * controller" are not part of its tree, so `innerBlocks` usually comes back
+ * empty even though the block clearly has children in the editor. Never rely on
+ * a controller's `innerBlocks`; ask for its children directly:
+ *
+ * ```js
+ * getBlock( syncedPatternClientId ).innerBlocks; // Usually [].
+ * getBlocks( syncedPatternClientId ); // The pattern's blocks.
+ * ```
+ *
+ * A block is an inner block controller when its children belong to, and are
+ * synced with, an entity other than the one being edited. Synced patterns
+ * (`core/block`) and template parts (`core/template-part`) are the usual
+ * examples: each owns its own blocks, and editing them saves to that pattern or
+ * template part, not to the post or template it sits in. Leaving their children
+ * out of the tree is what keeps the two entities separate, so walking a
+ * template's blocks stops at a template part placed inside it.
+ *
+ * `areInnerBlocksControlled( clientId )` tells whether a block is such a
+ * controller.
  *
  * @param {Object} state    Editor state.
  * @param {string} clientId Block client ID.
@@ -219,22 +222,16 @@ export function getBlocks( state, rootClientId ) {
  *
  * @return {Object} Client IDs of the post blocks.
  */
-export const __unstableGetClientIdWithClientIdsTree = createSelector(
-	( state, clientId ) => {
-		deprecated(
-			"wp.data.select( 'core/block-editor' ).__unstableGetClientIdWithClientIdsTree",
-			{
-				since: '6.3',
-				version: '6.5',
-			}
-		);
-		return {
-			clientId,
-			innerBlocks: __unstableGetClientIdsTree( state, clientId ),
-		};
-	},
-	( state ) => [ state.blocks.order ]
-);
+export function __unstableGetClientIdWithClientIdsTree( state, clientId ) {
+	deprecated(
+		"wp.data.select( 'core/block-editor' ).__unstableGetClientIdWithClientIdsTree",
+		{
+			since: '6.3',
+			version: '6.5',
+		}
+	);
+	return getClientIdWithClientIdsTree( state, clientId );
+}
 
 /**
  * Returns the block tree represented in the block-editor store from the
@@ -248,21 +245,16 @@ export const __unstableGetClientIdWithClientIdsTree = createSelector(
  *
  * @return {Object[]} Client IDs of the post blocks.
  */
-export const __unstableGetClientIdsTree = createSelector(
-	( state, rootClientId = '' ) => {
-		deprecated(
-			"wp.data.select( 'core/block-editor' ).__unstableGetClientIdsTree",
-			{
-				since: '6.3',
-				version: '6.5',
-			}
-		);
-		return getBlockOrder( state, rootClientId ).map( ( clientId ) =>
-			__unstableGetClientIdWithClientIdsTree( state, clientId )
-		);
-	},
-	( state ) => [ state.blocks.order ]
-);
+export function __unstableGetClientIdsTree( state, rootClientId ) {
+	deprecated(
+		"wp.data.select( 'core/block-editor' ).__unstableGetClientIdsTree",
+		{
+			since: '6.3',
+			version: '6.5',
+		}
+	);
+	return getClientIdsTree( state, rootClientId );
+}
 
 /**
  * Returns an array containing the clientIds of all descendants of the blocks
@@ -802,6 +794,30 @@ export function getSelectedBlocksInitialCaretPosition( state ) {
 }
 
 /**
+ * Returns the ancestor client ID when one selection endpoint is nested
+ * inside the other, or undefined for any other selection shape. Such a
+ * selection has no sibling range; the ancestor contains all of it.
+ *
+ * @param {Object} state Editor state.
+ * @return {?string} The ancestor client ID, if any.
+ */
+function getSelectionNestingAncestor( state ) {
+	const { selectionStart, selectionEnd } = state.selection;
+	const startClientId = selectionStart.clientId;
+	const endClientId = selectionEnd.clientId;
+	if ( ! startClientId || ! endClientId || startClientId === endClientId ) {
+		return undefined;
+	}
+	if ( getBlockParents( state, endClientId ).includes( startClientId ) ) {
+		return startClientId;
+	}
+	if ( getBlockParents( state, startClientId ).includes( endClientId ) ) {
+		return endClientId;
+	}
+	return undefined;
+}
+
+/**
  * Returns the current selection set of block client IDs (multiselection or single selection).
  *
  * @param {Object} state Editor state.
@@ -818,6 +834,11 @@ export const getSelectedBlockClientIds = createSelector(
 
 		if ( selectionStart.clientId === selectionEnd.clientId ) {
 			return [ selectionStart.clientId ];
+		}
+
+		const nestingAncestorClientId = getSelectionNestingAncestor( state );
+		if ( nestingAncestorClientId ) {
+			return [ nestingAncestorClientId ];
 		}
 
 		// Retrieve root client ID to aid in retrieving relevant nested block
@@ -844,6 +865,7 @@ export const getSelectedBlockClientIds = createSelector(
 	},
 	( state ) => [
 		state.blocks.order,
+		state.blocks.parents,
 		state.selection.selectionStart.clientId,
 		state.selection.selectionEnd.clientId,
 	]
@@ -1026,6 +1048,12 @@ export function getMultiSelectedBlocksEndClientId( state ) {
  * @return {boolean} Whether the selection is mergeable.
  */
 export function __unstableIsFullySelected( state ) {
+	// A text selection with one endpoint nested inside the other has no
+	// sibling range; it resolves to the ancestor, which is presented and
+	// treated as fully selected.
+	if ( getSelectionNestingAncestor( state ) ) {
+		return true;
+	}
 	const selectionAnchor = getSelectionStart( state );
 	const selectionFocus = getSelectionEnd( state );
 	return (
@@ -1277,8 +1305,39 @@ export function isBlockSelected( state, clientId ) {
 		return false;
 	}
 
-	return selectionStart.clientId === clientId;
+	// Both sides are `undefined` when nothing is selected and the caller
+	// passes an optional client ID.
+	return !! clientId && selectionStart.clientId === clientId;
 }
+
+/**
+ * Returns the ancestors of the current selection, as a set. A block is not its
+ * own ancestor, so the selected blocks themselves are not in the set.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Set<string>} Client IDs of the ancestors of the selection.
+ */
+const getSelectedBlockAncestors = createSelector(
+	( state ) => {
+		const ancestors = new Set();
+
+		for ( const clientId of getSelectedBlockClientIds( state ) ) {
+			let current = clientId;
+			while ( ( current = state.blocks.parents.get( current ) ) ) {
+				// An earlier block already walked the rest of this chain.
+				if ( ancestors.has( current ) ) {
+					break;
+				}
+
+				ancestors.add( current );
+			}
+		}
+
+		return ancestors;
+	},
+	( state ) => getSelectedBlockClientIds.getDependants( state )
+);
 
 /**
  * Returns true if one of the block's inner blocks is selected.
@@ -1290,18 +1349,19 @@ export function isBlockSelected( state, clientId ) {
  * @return {boolean} Whether the block has an inner block selected
  */
 export function hasSelectedInnerBlock( state, clientId, deep = false ) {
-	const selectedBlockClientIds = getSelectedBlockClientIds( state );
+	if ( ! clientId ) {
+		return false;
+	}
 
+	const selectedBlockClientIds = getSelectedBlockClientIds( state );
 	if ( ! selectedBlockClientIds.length ) {
 		return false;
 	}
 
 	if ( deep ) {
-		return selectedBlockClientIds.some( ( id ) =>
-			// Pass true because we don't care about order and it's more
-			// performant.
-			getBlockParents( state, id, true ).includes( clientId )
-		);
+		// Callers ask once per rendered block, so the set is built once per
+		// selection rather than walking the selection on every call.
+		return getSelectedBlockAncestors( state ).has( clientId );
 	}
 
 	return selectedBlockClientIds.some(
@@ -1704,10 +1764,28 @@ const canInsertBlockTypeUnmemoized = (
 		return false;
 	}
 
+	// No insertion within static inner content: the inner blocks are fixed
+	// at their placeholder positions within the static markup.
+	if ( isInnerContentRoot( state, rootClientId ) ) {
+		return false;
+	}
+
 	const blockEditingMode = getBlockEditingMode( state, rootClientId ?? '' );
+
+	// Compute section context early so the disabled check below can use it.
+	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
+	const sectionClientId = isParentSectionBlock
+		? rootClientId
+		: getParentSectionBlock( state, rootClientId );
+	const isWithinSection = !! sectionClientId;
+
+	// Disabled containers reject all blocks, with one exception: within a
+	// section, the default block (paragraph) is allowed through so it can
+	// reach the content-insertion logic further down (lines 1748-1772)
+	// which conditionally permits it where a sibling paragraph exists.
 	if (
 		blockEditingMode === 'disabled' &&
-		blockName !== getDefaultBlockName()
+		( ! isWithinSection || blockName !== getDefaultBlockName() )
 	) {
 		return false;
 	}
@@ -1723,11 +1801,6 @@ const canInsertBlockTypeUnmemoized = (
 	// It shouldn't be possible to insert inside a section block unless in
 	// some cases when the block is a content block.
 	const isContentRoleBlock = isContentBlock( blockName );
-	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
-	const sectionClientId = isParentSectionBlock
-		? rootClientId
-		: getParentSectionBlock( state, rootClientId );
-	const isWithinSection = !! sectionClientId;
 	if ( isWithinSection && ! isContentRoleBlock ) {
 		return false;
 	}
@@ -1740,14 +1813,23 @@ const canInsertBlockTypeUnmemoized = (
 		return false;
 	}
 
-	// In content only mode, check if this container allows insertion.
-	// We need the `isParentSectionBlock` check because section blocks
-	// (synced patterns, contentOnly groups) have a `getBlockEditingMode`
-	// of 'default', not 'contentOnly' — the 'contentOnly' mode is only
-	// set on their *children*.
+	/*
+	 * In content only mode, check if this container allows insertion.
+	 * We need the `isParentSectionBlock` check because section blocks
+	 * (synced patterns, contentOnly groups) have a `getBlockEditingMode`
+	 * of 'default', not 'contentOnly' — the 'contentOnly' mode is only
+	 * set on their *children*.
+	 *
+	 * Also include `disabled` alongside `contentOnly`: structural inner blocks
+	 * (e.g. Column) inside a content-only section use `disabled` mode, and they
+	 * need the same default-block sibling rules so insertion stays aligned with
+	 * `canRemoveBlock`.
+	 */
 	if (
 		isWithinSection &&
-		( isParentSectionBlock || blockEditingMode === 'contentOnly' ) &&
+		( isParentSectionBlock ||
+			blockEditingMode === 'contentOnly' ||
+			blockEditingMode === 'disabled' ) &&
 		! isContainerInsertableToInContentOnlyMode(
 			state,
 			blockName,
@@ -1755,8 +1837,11 @@ const canInsertBlockTypeUnmemoized = (
 		)
 	) {
 		const defaultBlockName = getDefaultBlockName();
-		// Allow inserting the default block anywhere that another default block already exists
-		// when in contentOnly mode.
+		/*
+		 * Allow inserting the default block anywhere that another default block already exists
+		 * when in contentOnly mode. The same sibling rule applies when the parent is `disabled`
+		 * within a content-only section (see the condition above).
+		 */
 		if ( blockName === defaultBlockName ) {
 			const existingBlocks = getBlockOrder( state, rootClientId );
 			const hasDefaultBlock = existingBlocks.some(
@@ -1893,6 +1978,24 @@ export function canInsertBlocks( state, clientIds, rootClientId = null ) {
 }
 
 /**
+ * Returns whether the given root block keeps its markup as static inner
+ * content (the Custom HTML block). Its inner blocks are fixed at their
+ * positions within the static markup: they can be edited in place, but not
+ * moved or removed, and no blocks can be inserted alongside them. This only
+ * applies to the direct children; deeper descendants are unaffected.
+ *
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Root block client ID.
+ *
+ * @return {boolean} Whether the root block uses static inner content.
+ */
+function isInnerContentRoot( state, rootClientId ) {
+	return (
+		!! rootClientId && getBlockName( state, rootClientId ) === 'core/html'
+	);
+}
+
+/**
  * Determines if the given block is allowed to be deleted.
  *
  * @param {Object} state    Editor state.
@@ -1903,6 +2006,14 @@ export function canInsertBlocks( state, clientIds, rootClientId = null ) {
 export function canRemoveBlock( state, clientId ) {
 	// Disable removal in preview mode.
 	if ( state.settings.isPreviewMode ) {
+		return false;
+	}
+
+	// Blocks within static inner content are fixed in place; a `lock`
+	// attribute can't override the structural constraint.
+	if (
+		isInnerContentRoot( state, getBlockRootClientId( state, clientId ) )
+	) {
 		return false;
 	}
 
@@ -1973,9 +2084,9 @@ export function canRemoveBlock( state, clientId ) {
 			if ( defaultBlocks.length > 1 ) {
 				return true;
 			}
-		} else {
 			return false;
 		}
+		return false;
 	}
 
 	return rootBlockEditingMode !== 'disabled';
@@ -2004,6 +2115,14 @@ export function canRemoveBlocks( state, clientIds ) {
 export function canMoveBlock( state, clientId ) {
 	// Disable moving in preview mode.
 	if ( state.settings.isPreviewMode ) {
+		return false;
+	}
+
+	// Blocks within static inner content are fixed in place; a `lock`
+	// attribute can't override the structural constraint.
+	if (
+		isInnerContentRoot( state, getBlockRootClientId( state, clientId ) )
+	) {
 		return false;
 	}
 
@@ -2168,6 +2287,7 @@ const getItemFromVariation = ( state, item ) => ( variation ) => {
 			...variation.attributes,
 		},
 		innerBlocks: variation.innerBlocks,
+		innerContent: variation.innerContent,
 		keywords: variation.keywords || item.keywords,
 		frecency: calculateFrecency( time, count ),
 		// Pass through search-only flag for block-scope variations.
@@ -2277,6 +2397,19 @@ const buildBlockTypeItem =
 			utility: 1, // Deprecated.
 		};
 	};
+
+const buildBlockVariationItem = ( state, item ) => ( variation ) => {
+	const variationId = `${ item.id }/${ variation.name }`;
+	const { time, count = 0 } = getInsertUsage( state, variationId ) || {};
+	return {
+		...item,
+		id: variationId,
+		icon: variation.icon || item.icon,
+		title: variation.title || item.title,
+		frecency: calculateFrecency( time, count ),
+		variationName: variation.name,
+	};
+};
 
 /**
  * Determines the items that appear in the inserter. Includes both static
@@ -2458,20 +2591,21 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
  *
  * Items are returned ordered descendingly by their 'frecency'.
  *
- * @param    {Object}          state        Editor state.
- * @param    {Object|Object[]} blocks       Block object or array objects.
- * @param    {?string}         rootClientId Optional root client ID of block list.
+ * @param    {Object}          state         Editor state.
+ * @param    {Object|Object[]} blocks        Block object or array objects.
+ * @param    {?string}         rootClientId  Optional root client ID of block list.
  *
  * @return {WPEditorTransformItem[]} Items that appear in inserter.
  *
  * @typedef {Object} WPEditorTransformItem
- * @property {string}          id           Unique identifier for the item.
- * @property {string}          name         The type of block to create.
- * @property {string}          title        Title of the item, as it appears in the inserter.
- * @property {string}          icon         Dashicon for the item, as it appears in the inserter.
- * @property {boolean}         isDisabled   Whether or not the user should be prevented from inserting
- *                                          this item.
- * @property {number}          frecency     Heuristic that combines frequency and recency.
+ * @property {string}          id            Unique identifier for the item.
+ * @property {string}          name          The type of block to create.
+ * @property {?string}         variationName The target block variation name.
+ * @property {string}          title         Title of the item, as it appears in the inserter.
+ * @property {string}          icon          Dashicon for the item, as it appears in the inserter.
+ * @property {boolean}         isDisabled    Whether or not the user should be prevented from inserting
+ *                                           this item.
+ * @property {number}          frecency      Heuristic that combines frequency and recency.
  */
 export const getBlockTransformItems = createRegistrySelector( ( select ) =>
 	createSelector(
@@ -2501,14 +2635,37 @@ export const getBlockTransformItems = createRegistrySelector( ( select ) =>
 			const possibleTransforms = getPossibleBlockTransformations(
 				normalizedBlocks
 			).reduce( ( accumulator, block ) => {
-				if ( itemsByName[ block?.name ] ) {
-					accumulator.push( itemsByName[ block.name ] );
+				const item = itemsByName[ block?.name ];
+
+				if ( ! item ) {
+					return accumulator;
 				}
+
+				const { variationName } = block;
+
+				if ( ! variationName ) {
+					accumulator.push( item );
+					return accumulator;
+				}
+
+				const variation = getBlockVariations(
+					item.name,
+					'transform'
+				)?.find( ( { name } ) => name === variationName );
+
+				if ( ! variation ) {
+					accumulator.push( item );
+					return accumulator;
+				}
+
+				accumulator.push(
+					buildBlockVariationItem( state, item )( variation )
+				);
 				return accumulator;
 			}, [] );
 			return orderBy(
 				possibleTransforms,
-				( block ) => itemsByName[ block.name ].frecency,
+				( block ) => block.frecency,
 				'desc'
 			);
 		},
@@ -2602,22 +2759,21 @@ export const __experimentalGetAllowedBlocks = createSelector(
 /**
  * Returns the block to be directly inserted by the block appender.
  *
- * @param    {Object}         state            Editor state.
- * @param    {?string}        rootClientId     Optional root client ID of block list.
+ * @param    {Object}  state        Editor state.
+ * @param    {?string} rootClientId Optional root client ID of block list.
  *
- * @return {WPDirectInsertBlock|undefined}              The block type to be directly inserted.
+ * @return {WPDirectInsertBlock|undefined} The block type to be directly inserted.
  *
  * @typedef {Object} WPDirectInsertBlock
- * @property {string}         name             The type of block.
- * @property {?Object}        attributes       Attributes to pass to the newly created block.
- * @property {?Array<string>} attributesToCopy Attributes to be copied from adjacent blocks when inserted.
+ * @property {string}  name         The type of block.
+ * @property {?Object} attributes   Attributes to pass to the newly created block.
  */
 export function getDirectInsertBlock( state, rootClientId = null ) {
 	if ( ! rootClientId ) {
 		return;
 	}
 	const { defaultBlock, directInsert } =
-		state.blockListSettings[ rootClientId ] ?? {};
+		state.blockListSettings.get( rootClientId ) ?? {};
 	if ( ! defaultBlock || ! directInsert ) {
 		return;
 	}
@@ -2850,7 +3006,7 @@ export const __experimentalGetPatternTransformItems = createRegistrySelector(
  * @return {?Object} Block settings of the block if set.
  */
 export function getBlockListSettings( state, clientId ) {
-	return state.blockListSettings[ clientId ];
+	return state.blockListSettings.get( clientId );
 }
 
 /**
@@ -2878,6 +3034,25 @@ export function isLastBlockChangePersistent( state ) {
 }
 
 /**
+ * Returns how the most recent block change interacts with undo history.
+ *
+ * - `persistent` changes create a new undo level.
+ * - `merge` changes do not create a new undo level, but may merge into the
+ *    prior stack item history.
+ * - `ignore` changes should never be captured by undo history.
+ *
+ * @param {Object} state Block editor state.
+ *
+ * @return {'persistent'|'merge'|'ignore'} Block change history behavior.
+ */
+export function __unstableGetLastBlockChangeHistoryMode( state ) {
+	if ( state.blocks.lastBlockChangeHistoryMode ) {
+		return state.blocks.lastBlockChangeHistoryMode;
+	}
+	return state.blocks.isPersistentChange === false ? 'merge' : 'persistent';
+}
+
+/**
  * Returns the block list settings for an array of blocks, if any exist.
  *
  * @param {Object} state     Editor state.
@@ -2888,16 +3063,14 @@ export function isLastBlockChangePersistent( state ) {
  */
 export const __experimentalGetBlockListSettingsForBlocks = createSelector(
 	( state, clientIds = [] ) => {
-		return clientIds.reduce( ( blockListSettingsForBlocks, clientId ) => {
-			if ( ! state.blockListSettings[ clientId ] ) {
-				return blockListSettingsForBlocks;
+		const blockListSettingsForBlocks = {};
+		for ( const clientId of clientIds ) {
+			const settings = getBlockListSettings( state, clientId );
+			if ( settings ) {
+				blockListSettingsForBlocks[ clientId ] = settings;
 			}
-
-			return {
-				...blockListSettingsForBlocks,
-				[ clientId ]: state.blockListSettings[ clientId ],
-			};
-		}, {} );
+		}
+		return blockListSettingsForBlocks;
 	},
 	( state ) => [ state.blockListSettings ]
 );
@@ -3014,7 +3187,7 @@ export function isBlockHighlighted( state, clientId ) {
  * @return {boolean} True if the block has controlled inner blocks.
  */
 export function areInnerBlocksControlled( state, clientId ) {
-	return !! state.blocks.controlledInnerBlocks[ clientId ];
+	return state.blocks.controlledInnerBlocks.has( clientId );
 }
 
 /**
@@ -3235,8 +3408,8 @@ export function getBlockEditingMode( state, clientId = '' ) {
 	}
 
 	// In normal mode, consider that an explicitly set editing mode takes over.
-	if ( state.blockEditingModes.has( clientId ) ) {
-		return state.blockEditingModes.get( clientId );
+	if ( state.blocks.blockEditingModes.has( clientId ) ) {
+		return state.blocks.blockEditingModes.get( clientId );
 	}
 
 	return 'default';

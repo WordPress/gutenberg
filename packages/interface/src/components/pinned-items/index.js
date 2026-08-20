@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { Slot, Fill } from '@wordpress/components';
 
 function PinnedItems( { scope, ...props } ) {

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	LinkUI,
 	updateAttributes,
@@ -19,26 +12,29 @@ const BLOCKS_WITH_LINK_UI_SUPPORT = [
 ];
 
 export function NavigationLinkUI( {
-	block,
-	insertedBlock,
-	setInsertedBlock,
-	editingBlock,
-	setEditingBlock,
+	insertedBlockClientId,
+	setInsertedBlockClientId,
 } ) {
 	const { updateBlockAttributes, removeBlock } =
 		useDispatch( blockEditorStore );
 
-	// Handle editing existing blocks
-	const isEditingExistingBlock =
-		editingBlock?.clientId === block.clientId &&
-		BLOCKS_WITH_LINK_UI_SUPPORT.includes( editingBlock?.name );
+	const { insertedBlockName, insertedBlockAttributes } = useSelect(
+		( select ) => {
+			const { getBlockName, getBlockAttributes } =
+				select( blockEditorStore );
 
-	// Handle newly inserted blocks
-	const supportsLinkControls = BLOCKS_WITH_LINK_UI_SUPPORT?.includes(
-		insertedBlock?.name
+			return {
+				insertedBlockName: getBlockName( insertedBlockClientId ),
+				insertedBlockAttributes: getBlockAttributes(
+					insertedBlockClientId
+				),
+			};
+		},
+		[ insertedBlockClientId ]
 	);
-	const blockWasJustInserted = insertedBlock?.clientId === block.clientId;
-	const showLinkControls = supportsLinkControls && blockWasJustInserted;
+
+	const showLinkControls =
+		BLOCKS_WITH_LINK_UI_SUPPORT?.includes( insertedBlockName );
 
 	// Determine which block is active
 	const activeBlock = isEditingExistingBlock ? editingBlock : insertedBlock;
@@ -51,8 +47,8 @@ export function NavigationLinkUI( {
 	const activeClientId = activeBlock?.clientId || '';
 	const activeAttributes = activeBlock?.attributes || {};
 	const { createBinding, clearBinding } = useEntityBinding( {
-		clientId: activeClientId,
-		attributes: activeAttributes,
+		clientId: insertedBlockClientId,
+		attributes: insertedBlockAttributes || {},
 	} );
 
 	if ( ! showLinkControls && ! isEditingExistingBlock ) {
@@ -72,16 +68,12 @@ export function NavigationLinkUI( {
 
 		// Follows the exact same pattern as Navigation Link block's onClose handler
 		// If there is no URL then remove the auto-inserted block to avoid empty blocks
-		if (
-			! activeBlock?.attributes?.url &&
-			activeBlock?.clientId &&
-			! isEditingExistingBlock
-		) {
+		if ( ! insertedBlockAttributes?.url && insertedBlockClientId ) {
 			// Remove the block entirely to avoid poor UX
 			// This matches the Navigation Link block's behavior
-			removeBlock( activeBlock.clientId, shouldAutoSelectBlock );
+			removeBlock( insertedBlockClientId, shouldAutoSelectBlock );
 		}
-		setActiveBlock( null );
+		setInsertedBlockClientId( null );
 	};
 
 	const setActiveBlockAttributes =
@@ -100,23 +92,17 @@ export function NavigationLinkUI( {
 
 		// If we have an existing inserted block and a new block is being set,
 		// remove the original block to avoid duplicates
-		// Only do this for inserted blocks, not for editing existing blocks
-		if ( ! isEditingExistingBlock && activeBlock?.clientId && newBlock ) {
-			removeBlock( activeBlock.clientId, shouldAutoSelectBlock );
+		if ( insertedBlockClientId && newBlock ) {
+			removeBlock( insertedBlockClientId, shouldAutoSelectBlock );
 		}
-		setActiveBlock( newBlock );
+		setInsertedBlockClientId( newBlock?.clientId ?? null );
 	};
 
 	return (
 		<LinkUI
-			clientId={ activeBlock?.clientId }
-			link={ {
-				...activeBlock?.attributes,
-				// When editing an existing link, allow searching all content types
-				// instead of restricting to the current link's type
-				allowAllContentTypes: isEditingExistingBlock,
-			} }
-			onBlockInsert={ handleSetActiveBlock }
+			clientId={ insertedBlockClientId }
+			link={ insertedBlockAttributes }
+			onBlockInsert={ handleSetInsertedBlock }
 			onClose={ () => {
 				// Use cleanup function
 				cleanupInsertedBlock();
@@ -126,8 +112,8 @@ export function NavigationLinkUI( {
 				const { isEntityLink, attributes: updatedAttributes } =
 					updateAttributes(
 						updatedValue,
-						setActiveBlockAttributes( activeBlock?.clientId ),
-						activeBlock?.attributes
+						setInsertedBlockAttributes( insertedBlockClientId ),
+						insertedBlockAttributes
 					);
 
 				// Handle URL binding based on the final computed state
@@ -139,7 +125,7 @@ export function NavigationLinkUI( {
 					clearBinding();
 				}
 
-				setActiveBlock( null );
+				setInsertedBlockClientId( null );
 			} }
 		/>
 	);
