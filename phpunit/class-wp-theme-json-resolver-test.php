@@ -1448,4 +1448,90 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 
 		$this->assertSameSetsWithIndex( $expected, $actual, 'Merged variation styles do not match.' );
 	}
+
+	/**
+	 * @covers WP_Theme_JSON_Resolver_Gutenberg::get_merged_data
+	 */
+	public function test_get_merged_data_returns_a_separate_instance_per_call() {
+		$first  = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
+		$second = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
+
+		$this->assertNotSame( $first, $second, 'Each call should return its own instance.' );
+		$this->assertSameSetsWithIndex(
+			$first->get_raw_data(),
+			$second->get_raw_data(),
+			'Repeated calls should return equivalent data.'
+		);
+	}
+
+	/**
+	 * Callers are free to modify the returned data. WP_Theme_JSON_Gutenberg::resolve_variables()
+	 * does exactly that, so a modification must not be observable by the next caller.
+	 *
+	 * @covers WP_Theme_JSON_Resolver_Gutenberg::get_merged_data
+	 */
+	public function test_get_merged_data_is_not_affected_by_modifying_the_result() {
+		/*
+		 * A theme with presets is required: resolving variables is a no-op when
+		 * the active theme's styles contain no variable references, which would
+		 * leave this test asserting nothing.
+		 */
+		switch_theme( 'twentytwentyfour' );
+
+		$before   = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_raw_data();
+		$resolved = WP_Theme_JSON_Gutenberg::resolve_variables( WP_Theme_JSON_Resolver_Gutenberg::get_merged_data() )->get_raw_data();
+
+		$this->assertNotEquals(
+			$before['styles'],
+			$resolved['styles'],
+			'Resolving variables should change the styles, otherwise this test asserts nothing.'
+		);
+
+		$this->assertSameSetsWithIndex(
+			$before,
+			WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_raw_data(),
+			'Resolving variables should not affect subsequent calls.'
+		);
+	}
+
+	/**
+	 * @covers WP_Theme_JSON_Resolver_Gutenberg::get_merged_data
+	 */
+	public function test_get_merged_data_reflects_blocks_registered_after_a_previous_call() {
+		WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
+
+		register_block_type(
+			'test/block-gap',
+			array(
+				'supports' => array(
+					'__experimentalStyle' => array(
+						'spacing' => array( 'blockGap' => '77px' ),
+					),
+				),
+			)
+		);
+
+		$styles = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_raw_data()['styles'];
+
+		unregister_block_type( 'test/block-gap' );
+
+		$this->assertSame(
+			'77px',
+			$styles['blocks']['test/block-gap']['spacing']['blockGap'] ?? null,
+			'Data for a block registered after a previous call should be present.'
+		);
+	}
+
+	/**
+	 * @covers WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data
+	 */
+	public function test_clean_cached_data_refreshes_merged_data() {
+		switch_theme( 'block-theme' );
+		$before = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_raw_data();
+
+		switch_theme( 'default' );
+		$after = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_raw_data();
+
+		$this->assertNotEquals( $before, $after, 'Switching themes should refresh the merged data.' );
+	}
 }

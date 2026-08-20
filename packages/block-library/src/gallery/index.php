@@ -307,8 +307,6 @@ function block_core_gallery_render_dynamic_image( $attachment_id, $attributes, $
  * @return string The content of the block being rendered.
  */
 function block_core_gallery_render( $attributes, $content, $block ) {
-	static $global_styles = null;
-
 	// In dynamic mode the gallery's images are resolved at render time instead of
 	// being authored as inner blocks, so `save.js` persists at most the
 	// gallery-level caption — a bare `<figcaption>`, or nothing when there is no
@@ -402,9 +400,7 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 	// gap on the gallery.
 	$fallback_gap = 'var( --wp--style--gallery-gap-default, var( --gallery-block--gutter-size, var( --wp--style--block-gap, 0.5em ) ) )';
 
-	if ( null === $global_styles ) {
-		$global_styles = function_exists( 'wp_get_global_styles' ) ? wp_get_global_styles() : array();
-	}
+	$global_styles = function_exists( 'wp_get_global_styles' ) ? wp_get_global_styles() : array();
 
 	$global_gallery_styles = $global_styles['blocks']['core/gallery'] ?? array();
 	$global_gallery_gap    = $global_gallery_styles['spacing']['blockGap'] ?? $fallback_gap;
