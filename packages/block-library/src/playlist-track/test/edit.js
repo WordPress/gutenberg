@@ -1,6 +1,5 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { useDispatch, useSelect } from '@wordpress/data';
-import mockPlainText from '../../../../block-editor/src/components/plain-text';
 import PlaylistTrackEdit from '../edit';
 import { PlaylistContext } from '../../playlist/context';
 import { useUploadMediaFromBlobURL } from '../../utils/hooks';
@@ -9,6 +8,10 @@ let mockMediaReplaceFlowProps;
 let isMultiSelectingPlaylistTracks;
 
 jest.mock( '@wordpress/block-editor', () => {
+	const PlainText = jest.requireActual(
+		'../../../../block-editor/src/components/plain-text'
+	).default;
+
 	return {
 		store: 'core/block-editor',
 		BlockControls: ( { children } ) => <div>{ children }</div>,
@@ -23,7 +26,7 @@ jest.mock( '@wordpress/block-editor', () => {
 		MediaUpload: ( { render: renderMediaUpload } ) =>
 			renderMediaUpload( { open: jest.fn() } ),
 		MediaUploadCheck: ( { children } ) => <div>{ children }</div>,
-		PlainText: mockPlainText,
+		PlainText,
 		useBlockProps: jest.fn( () => ( {} ) ),
 	};
 } );
