@@ -23,12 +23,20 @@ $padding-y-large: calc((calc(#{$control-height} * 1.2) - #{$base-font-height} - 
 		border: 1px solid $surface-border-color;
 	}
 
+	/*
+	 * The separator and the rounded corners are applied to the element inside
+	 * each item wrapper (the element that carries the padding and the
+	 * background). Only the first child is targeted, so that consumers
+	 * rendering more than one element per item (e.g. a toggle plus an action
+	 * button) get a single separator for the whole item instead of one per
+	 * element.
+	 */
 	&.is-separated {
-		> *:not(marquee) > * {
+		> *:not(marquee) > *:first-child {
 			border-block-end: 1px solid $surface-border-color;
 		}
 
-		> *:last-of-type > * {
+		> *:last-of-type > *:first-child {
 			border-block-end-color: transparent;
 		}
 	}
@@ -36,12 +44,12 @@ $padding-y-large: calc((calc(#{$control-height} * 1.2) - #{$base-font-height} - 
 	&.is-rounded {
 		border-radius: var(--wpds-border-radius-sm);
 
-		> *:first-of-type > * {
+		> *:first-of-type > *:first-child {
 			border-start-start-radius: var(--wpds-border-radius-sm);
 			border-start-end-radius: var(--wpds-border-radius-sm);
 		}
 
-		> *:last-of-type > * {
+		> *:last-of-type > *:first-child {
 			border-end-start-radius: var(--wpds-border-radius-sm);
 			border-end-end-radius: var(--wpds-border-radius-sm);
 		}

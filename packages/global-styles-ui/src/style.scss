@@ -188,10 +188,7 @@
 	right: 8px;
 	top: 8px;
 	opacity: 0;
-
-	&.global-styles-ui__shadow-editor__remove-button {
-		border: none;
-	}
+	border: none;
 
 	.global-styles-ui__shadow-editor__dropdown-toggle:hover + &,
 	&:focus,
