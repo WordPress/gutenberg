@@ -2,12 +2,17 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove `src/default-editor-styles.scss`. Consumers importing it should supply their own ([#81793](https://github.com/WordPress/gutenberg/pull/81793)).
+
 ### New Features
 
 -   Register and handle the keyboard shortcuts that blocks declare on their variations and transforms, so that any block can contribute a shortcut without the editor knowing about it. Shortcuts apply to the selected block, and are listed under "Block shortcuts" in the keyboard shortcuts help modal ([#81588](https://github.com/WordPress/gutenberg/pull/81588)).
 
 ### Enhancements
 
+-   Patterns explorer: Refactor the category sidebar to use `Tabs` ([#81807](https://github.com/WordPress/gutenberg/pull/81807)).
 -   Show separate horizontal and vertical block spacing controls in the block inspector only for Flex and Grid layouts, while retaining axial gap support in Global Styles. Responsive Grid column calculations use the horizontal gap, while Flow and Constrained layouts use the vertical gap when receiving an axial value ([#81476](https://github.com/WordPress/gutenberg/pull/81476)).
 
 ### Bug Fixes
@@ -18,6 +23,12 @@
 -   `DimensionsTool`: Reflect aspect ratio and scale values that are updated from outside the component, such as by undo or `updateBlockAttributes`. The scale control no longer displays a stale value, and an aspect ratio that is written differently to its preset, e.g. `1/1` rather than `1`, is displayed as that preset instead of as "Original" ([#80747](https://github.com/WordPress/gutenberg/pull/80747)).
 -   `ListView`: Only move focus into the list when the new `focusOnMount` prop is set, so that a list mounted as a side effect of a selection no longer pulls focus out of the editor canvas ([#81659](https://github.com/WordPress/gutenberg/pull/81659)).
 -   `RichText`: Handle Enter using the current record, so pressing it right after moving the caret splits at the caret's new position instead of the previous one ([#81696](https://github.com/WordPress/gutenberg/pull/81696)).
+-   `useInnerBlocksProps`: Resolve the manual grid placement check that disables the standard drop zone against a layout passed through the options, when provided, instead of always using the block edit context layout ([#81120](https://github.com/WordPress/gutenberg/pull/81120)).
+-   `BorderPanel`: Match a chosen drop shadow against the presets from every origin rather than the first origin that defines any, so theme and default presets keep being stored as `var:preset|shadow|<slug>` once a custom preset exists ([#81346](https://github.com/WordPress/gutenberg/pull/81346)).
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81516](https://github.com/WordPress/gutenberg/pull/81516))
 
 ## 16.2.0 (2026-08-12)
 
@@ -48,6 +59,7 @@
 
 ### Bug Fixes
 
+-   `MediaPlaceholder`: Stop the drop zone activating for canvas block-reorder drags. Dragging an inner block within a block that renders a media placeholder (e.g. reordering a Playlist Track) no longer shows a media drop zone and blocks the reorder.
 -   `isBlockSelected`: Return `false` when called without a client ID, instead of matching the `undefined` client ID of an empty selection ([#81212](https://github.com/WordPress/gutenberg/pull/81212)).
 -   `URLInput`: Collapse a text selection reaching the start of the field before letting an up arrow press through to the editor, so selecting to the start and pressing up no longer navigates out of the field instead of collapsing the caret ([#80780](https://github.com/WordPress/gutenberg/pull/80780)).
 -   `URLInput`: Leave Shift-modified arrow keys to the browser, so extending a selection with Shift+Up or Shift+Down no longer collapses it to the start or end of the field ([#80780](https://github.com/WordPress/gutenberg/pull/80780)).
