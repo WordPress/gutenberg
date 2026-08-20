@@ -522,8 +522,8 @@ export const autosave =
 /**
  * Save for preview.
  *
- * @param {Object}  options                     Options object.
- * @param {boolean} options.forceIsAutosaveable Whether to force the post to be autosaveable.
+ * @param {Object}  [options]                     Options object.
+ * @param {boolean} [options.forceIsAutosaveable] Whether to force the post to be autosaveable.
  *
  * @return {Function} Thunk that saves for preview and returns the preview link.
  */
