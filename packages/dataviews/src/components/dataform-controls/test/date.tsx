@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getSettings, setSettings } from '@wordpress/date';
 import { useState } from '@wordpress/element';
@@ -152,6 +152,101 @@ describe( 'DateControl', () => {
 			await user.click( getDayButton( new Date( 2024, 3, 10 ) ) );
 
 			expect( getMonthGrid( 'April 2024' ) ).toBeInTheDocument();
+		} );
+	} );
+
+	describe( 'when the value changes from outside the control while the calendar has focus', () => {
+		it( 'should restore focus to the selected day when the month changes', () => {
+			const { rerender } = render(
+				<DateControl
+					data={ { published: '2026-03-15' } as TestItem }
+					field={ field }
+					onChange={ noop }
+				/>
+			);
+
+			const day = screen.getByRole( 'button', {
+				name: /March 15, 2026/,
+			} );
+			act( () => day.focus() );
+			expect( day ).toHaveFocus();
+
+			rerender(
+				<DateControl
+					data={ { published: '2026-11-15' } as TestItem }
+					field={ field }
+					onChange={ noop }
+				/>
+			);
+
+			expect( getMonthGrid( 'November 2026' ) ).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', { name: /November 15, 2026/ } )
+			).toHaveFocus();
+		} );
+
+		it( 'should restore focus to the start of a range when the month changes', () => {
+			const { rerender } = render(
+				<DateControl
+					data={
+						{
+							published: [ '2026-03-10', '2026-03-12' ],
+						} as TestItem
+					}
+					field={ field }
+					onChange={ noop }
+					operator={ OPERATOR_BETWEEN }
+				/>
+			);
+
+			const day = screen.getByRole( 'button', {
+				name: /March 10, 2026/,
+			} );
+			act( () => day.focus() );
+			expect( day ).toHaveFocus();
+
+			rerender(
+				<DateControl
+					data={
+						{
+							published: [ '2026-11-05', '2026-11-25' ],
+						} as TestItem
+					}
+					field={ field }
+					onChange={ noop }
+					operator={ OPERATOR_BETWEEN }
+				/>
+			);
+
+			expect( getMonthGrid( 'November 2026' ) ).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', { name: /November 5, 2026/ } )
+			).toHaveFocus();
+		} );
+
+		it( 'should not move focus from outside the day grid when the month changes', () => {
+			const { rerender } = render(
+				<DateControl
+					data={ { published: '2026-03-15' } as TestItem }
+					field={ field }
+					onChange={ noop }
+				/>
+			);
+
+			const input = screen.getByLabelText( 'Date' );
+			act( () => input.focus() );
+			expect( input ).toHaveFocus();
+
+			rerender(
+				<DateControl
+					data={ { published: '2026-11-15' } as TestItem }
+					field={ field }
+					onChange={ noop }
+				/>
+			);
+
+			expect( getMonthGrid( 'November 2026' ) ).toBeInTheDocument();
+			expect( input ).toHaveFocus();
 		} );
 	} );
 
