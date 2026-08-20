@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { getSettings, setSettings } from '@wordpress/date';
 import { useState } from '@wordpress/element';
 import normalizeFields from '../../../field-types';
 import { OPERATOR_BETWEEN } from '../../../constants';
@@ -151,6 +152,87 @@ describe( 'DateControl', () => {
 			await user.click( getDayButton( new Date( 2024, 3, 10 ) ) );
 
 			expect( getMonthGrid( 'April 2024' ) ).toBeInTheDocument();
+		} );
+	} );
+
+	describe( 'with a site time zone ahead of the browser', () => {
+		let originalSettings: ReturnType< typeof getSettings >;
+
+		beforeAll( () => {
+			originalSettings = getSettings();
+			// UTC+14, ahead of every possible browser time zone.
+			setSettings( {
+				...originalSettings,
+				timezone: {
+					...originalSettings.timezone,
+					string: 'Pacific/Kiritimati',
+					offset: 14,
+				},
+			} );
+		} );
+
+		afterAll( () => {
+			setSettings( originalSettings );
+		} );
+
+		it( 'should move the calendar to the month of a value changed across a month boundary', () => {
+			const { rerender } = render(
+				<DateControl
+					data={ { published: '2026-02-15' } as TestItem }
+					field={ field }
+					onChange={ noop }
+				/>
+			);
+
+			expect( getMonthGrid( 'February 2026' ) ).toBeInTheDocument();
+
+			// March 1 in the site time zone is still February in the
+			// browser's, so a comparison in the wrong time zone keeps the
+			// calendar on February and hides the selected day.
+			rerender(
+				<DateControl
+					data={ { published: '2026-03-01' } as TestItem }
+					field={ field }
+					onChange={ noop }
+				/>
+			);
+
+			expect( getMonthGrid( 'March 2026' ) ).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', { name: /March 1, 2026/ } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should move the calendar when a range changes across a month boundary', () => {
+			const { rerender } = render(
+				<DateControl
+					data={
+						{
+							published: [ '2026-02-10', '2026-02-15' ],
+						} as TestItem
+					}
+					field={ field }
+					onChange={ noop }
+					operator={ OPERATOR_BETWEEN }
+				/>
+			);
+
+			expect( getMonthGrid( 'February 2026' ) ).toBeInTheDocument();
+
+			rerender(
+				<DateControl
+					data={
+						{
+							published: [ '2026-03-01', '2026-03-05' ],
+						} as TestItem
+					}
+					field={ field }
+					onChange={ noop }
+					operator={ OPERATOR_BETWEEN }
+				/>
+			);
+
+			expect( getMonthGrid( 'March 2026' ) ).toBeInTheDocument();
 		} );
 	} );
 } );
