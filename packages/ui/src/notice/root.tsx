@@ -115,7 +115,8 @@ export const Root = forwardRef< HTMLDivElement, RootProps >( function Notice(
 	// When `spokenMessage` is a distinct element (not the default `children`
 	// and not a string), it has no place in the rendered output to read the
 	// announcement from, so render it in a hidden container. Otherwise the
-	// message is read from the root element itself.
+	// message is read from a wrapper around the children, so that the
+	// generated icon is not part of it.
 	const isSpokenMessageDistinctElement =
 		typeof spokenMessage !== 'string' &&
 		spokenMessage !== children &&
@@ -133,13 +134,26 @@ export const Root = forwardRef< HTMLDivElement, RootProps >( function Notice(
 	const element = useRender( {
 		defaultTagName: 'div',
 		render,
-		ref: isSpokenMessageDistinctElement ? ref : [ ref, spokenMessageRef ],
+		ref,
 		props: mergeProps< 'div' >(
 			{
 				className: mergedClassName,
 				children: (
 					<>
-						{ children }
+						{ /* `display: contents` keeps the wrapper out of the
+						grid layout while providing a node scoped to the
+						default spoken message (the children) for
+						`useSpokenMessage` to read. */ }
+						<div
+							ref={
+								isSpokenMessageDistinctElement
+									? undefined
+									: spokenMessageRef
+							}
+							style={ { display: 'contents' } }
+						>
+							{ children }
+						</div>
 						{ iconElement && (
 							<Icon
 								className={ styles.icon }
