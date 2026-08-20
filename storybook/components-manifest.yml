@@ -281,16 +281,6 @@
       - onCancel
       - onConfirm
       - size
-- name: ControlWithError
-  props:
-      - children
-      - className
-      - customValidity
-      - getValidityTarget
-      - markWhenOptional
-      - render
-      - required
-      - style
 - name: CustomSelectControl
   props:
       - __experimentalShowSelectedHint
