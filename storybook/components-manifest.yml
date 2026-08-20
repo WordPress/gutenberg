@@ -1362,6 +1362,11 @@
       - unit
       - units
       - value
+- name: ValidityIndicator
+  props:
+      - id
+      - message
+      - type
 - name: VisuallyHidden
   props:
       - children
