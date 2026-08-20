@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Undo manager: Capture undo levels in, and undo them from, the history of the active editing scope ([#56178](https://github.com/WordPress/gutenberg/issues/56178)).
 ### Internal
 
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))

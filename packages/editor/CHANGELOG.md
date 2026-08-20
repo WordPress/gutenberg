@@ -53,6 +53,7 @@
 ### Bug Fixes
 
 -   `mediaUpload`: Add an `isTransportOnly` parameter, set by the `@wordpress/upload-media` queue, which owns progress tracking and save locking for its own items and uses this function only as its server transport. Fixes the progress snackbar showing "1 of 2" for a single HEIC upload in Safari ([#80369](https://github.com/WordPress/gutenberg/issues/80369)).
+-   Give each edited post its own undo history, so that undoing in a focused editor no longer reverts changes made to the post or template it was opened from ([#56178](https://github.com/WordPress/gutenberg/issues/56178)).
 
 ### Internal
 

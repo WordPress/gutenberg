@@ -54,6 +54,76 @@ describe( 'SyncUndoManager', () => {
 		expect( second.handlers.onUndoStackChange ).not.toHaveBeenCalled();
 	} );
 
+	it( 'keeps a separate undo history for each scope', () => {
+		const undoManager = createUndoManager();
+		const template = createScopedMap();
+		const navigation = createScopedMap();
+
+		undoManager.addToScope( template.map, template.handlers );
+		undoManager.addToScope( navigation.map, navigation.handlers );
+
+		undoManager.setScope( 'postType/wp_template/1' );
+
+		template.doc.transact( () => {
+			template.map.set( 'title', 'Template changed' );
+		}, LOCAL_EDITOR_ORIGIN );
+
+		expect( undoManager.hasUndo() ).toBe( true );
+
+		// Opening an entity in a focused editor starts a new history.
+		undoManager.setScope( 'postType/wp_navigation/2' );
+
+		expect( undoManager.hasUndo() ).toBe( false );
+
+		// Undoing there must not revert the changes of the other scope.
+		undoManager.undo();
+
+		expect( template.map.get( 'title' ) ).toBe( 'Template changed' );
+
+		navigation.doc.transact( () => {
+			navigation.map.set( 'title', 'Navigation changed' );
+		}, LOCAL_EDITOR_ORIGIN );
+
+		expect( undoManager.hasUndo() ).toBe( true );
+
+		undoManager.undo();
+
+		expect( navigation.map.get( 'title' ) ).toBeUndefined();
+		expect( template.map.get( 'title' ) ).toBe( 'Template changed' );
+
+		// Navigating back restores the history of the previous scope.
+		undoManager.setScope( 'postType/wp_template/1' );
+
+		expect( undoManager.hasUndo() ).toBe( true );
+		expect( undoManager.hasRedo() ).toBe( false );
+
+		undoManager.undo();
+
+		expect( template.map.get( 'title' ) ).toBeUndefined();
+		expect( undoManager.hasRedo() ).toBe( true );
+	} );
+
+	it( 'notifies scoped handlers when the scope changes', () => {
+		const undoManager = createUndoManager();
+		const first = createScopedMap();
+
+		undoManager.addToScope( first.map, first.handlers );
+		undoManager.setScope( 'postType/wp_template/1' );
+
+		first.doc.transact( () => {
+			first.map.set( 'title', 'Template changed' );
+		}, LOCAL_EDITOR_ORIGIN );
+
+		first.handlers.onUndoStackChange.mockClear();
+
+		undoManager.setScope( 'postType/wp_navigation/2' );
+
+		expect( first.handlers.onUndoStackChange ).toHaveBeenCalledWith( {
+			hasRedo: false,
+			hasUndo: false,
+		} );
+	} );
+
 	it( 'only runs metadata handlers for the document that created the stack item', () => {
 		const undoManager = createUndoManager();
 		const first = createScopedMap();

@@ -903,4 +903,49 @@ describe( 'Editor actions', () => {
 			);
 		} );
 	} );
+
+	describe( 'setEditedPost', () => {
+		it( 'gives the edited post its own undo history', () => {
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', {
+					id: postId,
+					type: 'post',
+					title: 'Post',
+				} );
+
+			registry.dispatch( editorStore ).setEditedPost( 'post', postId );
+			registry.dispatch( editorStore ).editPost( { title: 'Edited' } );
+
+			expect( registry.select( editorStore ).hasEditorUndo() ).toBe(
+				true
+			);
+
+			// Opening another entity, e.g. in a focused editor, starts a new
+			// undo history.
+			registry
+				.dispatch( editorStore )
+				.setEditedPost( 'wp_navigation', 2 );
+
+			expect( registry.select( editorStore ).hasEditorUndo() ).toBe(
+				false
+			);
+
+			// Undoing there can't revert the edits of the other post.
+			registry.dispatch( editorStore ).undo();
+
+			registry.dispatch( editorStore ).setEditedPost( 'post', postId );
+
+			expect(
+				registry
+					.select( coreStore )
+					.getEditedEntityRecord( 'postType', 'post', postId ).title
+			).toBe( 'Edited' );
+			expect( registry.select( editorStore ).hasEditorUndo() ).toBe(
+				true
+			);
+		} );
+	} );
 } );

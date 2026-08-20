@@ -199,6 +199,32 @@ export function receiveViewConfig( kind, name, config ) {
 }
 
 /**
+ * Returns an action object used to set the active undo scope.
+ *
+ * Undo levels are recorded in, and undone from, the undo history of the active
+ * scope. Editors are expected to set a scope of their own so that undoing in
+ * one editing context can't revert changes made in another one, for example
+ * when opening an entity in a focused editor.
+ *
+ * Switching back to a scope that was already active restores its undo history,
+ * so navigating back and forth between two editors preserves both histories.
+ *
+ * @param {?string} scope Scope identifier. Defaults to the shared default
+ *                        scope when not provided.
+ */
+export const setUndoScope =
+	( scope ) =>
+	( { dispatch } ) => {
+		// The sync manager keeps its own undo history per scope when
+		// real-time collaboration is enabled.
+		getSyncManager()?.setUndoScope( scope );
+		dispatch( {
+			type: 'SET_UNDO_SCOPE',
+			scope,
+		} );
+	};
+
+/**
  * Returns an action object used to notify core-data that the sync undo manager
  * state changed outside of the core-data reducer, e.g. The Yjs UndoManager
  * captured an undo level.

@@ -4,6 +4,7 @@ import {
 	CRDT_RECORD_MAP_KEY,
 	CRDT_STATE_MAP_KEY,
 	CRDT_STATE_MAP_SAVED_AT_KEY as SAVED_AT_KEY,
+	DEFAULT_UNDO_SCOPE,
 	LOCAL_SYNC_MANAGER_ORIGIN,
 } from './config';
 import { logPerformanceTiming, passThru } from './performance';
@@ -106,6 +107,12 @@ export function createSyncManager( debug = false ): SyncManager {
 	 * etc.), so this limitation may be temporary.
 	 */
 	let undoManager: SyncUndoManager | undefined;
+
+	/**
+	 * The editing scope undo levels are captured in. It is kept here because
+	 * editors may set a scope before the undo manager is created.
+	 */
+	let undoScope: string = DEFAULT_UNDO_SCOPE;
 
 	/**
 	 * Log debug messages if debugging is enabled.
@@ -254,6 +261,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		// Lazily create the undo manager when the first entity is loaded.
 		if ( ! undoManager ) {
 			undoManager = createUndoManager();
+			undoManager.setScope( undoScope );
 		}
 
 		const { addUndoMeta, onUndoStackChange, restoreUndoMeta } = handlers;
@@ -863,6 +871,10 @@ export function createSyncManager( debug = false ): SyncManager {
 		getEntitySnapshot: debugWrap( getEntitySnapshot ),
 		load: debugWrap( loadEntity ),
 		loadCollection: debugWrap( loadCollection ),
+		setUndoScope( scope: string = DEFAULT_UNDO_SCOPE ): void {
+			undoScope = scope;
+			undoManager?.setScope( scope );
+		},
 		// Use getter to ensure we always return the current value of `undoManager`.
 		get undoManager(): SyncUndoManager | undefined {
 			return undoManager;

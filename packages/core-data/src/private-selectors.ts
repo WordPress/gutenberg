@@ -11,8 +11,7 @@ type EntityRecordKey = string | number;
 const EMPTY_OBJECT = {};
 
 /**
- * Returns the previous edit from the current undo offset
- * for the entity records edits history, if any.
+ * Returns the undo manager of the active undo scope.
  *
  * @param state State tree.
  *
@@ -20,7 +19,11 @@ const EMPTY_OBJECT = {};
  */
 export function getUndoManager( state: State ) {
 	// undoManager is undefined until the first sync-enabled entity is loaded.
-	return getSyncManager()?.undoManager ?? state.undoManager;
+	// It keeps a history per scope of its own, see `setUndoScope`.
+	return (
+		getSyncManager()?.undoManager ??
+		state.undoManagers.managers[ state.undoManagers.scope ]
+	);
 }
 
 /**

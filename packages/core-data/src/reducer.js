@@ -8,6 +8,7 @@ import { rootEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 import { ConnectionErrorCode } from './sync';
 
 /** @typedef {import('./types').AnyFunction} AnyFunction */
+/** @typedef {import('@wordpress/undo-manager').UndoManager} UndoManager */
 
 /**
  * Reducer managing authors state. Keyed by id.
@@ -447,9 +448,50 @@ export const entities = ( state = {}, action ) => {
 };
 
 /**
- * @type {UndoManager}
+ * The undo scope used when no editing context has been set, e.g. when edits
+ * are made outside of an editor.
  */
-export function undoManager( state = createUndoManager() ) {
+export const DEFAULT_UNDO_SCOPE = 'default';
+
+const getInitialUndoManagersState = () => ( {
+	scope: DEFAULT_UNDO_SCOPE,
+	managers: { [ DEFAULT_UNDO_SCOPE ]: createUndoManager() },
+} );
+
+/**
+ * Reducer keeping track of the undo manager of each editing scope, and of the
+ * scope that is currently active.
+ *
+ * Each editing context gets its own undo history: the post being edited in the
+ * post editor, the template being edited in the site editor, or an entity
+ * opened in a focused editor (e.g. the navigation editor). This way, undoing
+ * in one context can't silently revert changes made in another one.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {{ scope: string, managers: Record<string, UndoManager> }} Updated state.
+ */
+export function undoManagers( state = getInitialUndoManagersState(), action ) {
+	switch ( action.type ) {
+		case 'SET_UNDO_SCOPE': {
+			const scope = action.scope ?? DEFAULT_UNDO_SCOPE;
+			if ( scope === state.scope ) {
+				return state;
+			}
+
+			return {
+				scope,
+				managers: state.managers[ scope ]
+					? state.managers
+					: {
+							...state.managers,
+							[ scope ]: createUndoManager(),
+					  },
+			};
+		}
+	}
+
 	return state;
 }
 
@@ -767,7 +809,7 @@ export default combineReducers( {
 	entities,
 	editsReference,
 	syncUndoManagerState,
-	undoManager,
+	undoManagers,
 	embedPreviews,
 	userPermissions,
 	autosaves,

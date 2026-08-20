@@ -6,7 +6,7 @@ import {
 	autosaves,
 	currentUser,
 	syncUndoManagerState,
-	undoManager,
+	undoManagers,
 } from '../reducer';
 
 describe( 'entities', () => {
@@ -527,11 +527,73 @@ describe( 'currentUser', () => {
 	} );
 } );
 
-describe( 'undoManager', () => {
+describe( 'undoManagers', () => {
 	it( 'returns the same reference for unrelated actions', () => {
-		const originalState = undoManager( undefined, {} );
-		const state = undoManager( originalState, {
+		const originalState = undoManagers( undefined, {} );
+		const state = undoManagers( originalState, {
 			type: 'UNRELATED',
+		} );
+
+		expect( state ).toBe( originalState );
+	} );
+
+	it( 'starts with an undo manager for the default scope', () => {
+		const state = undoManagers( undefined, {} );
+
+		expect( state.scope ).toBe( 'default' );
+		expect( state.managers.default.hasUndo() ).toBe( false );
+	} );
+
+	it( 'creates an undo manager when entering a new scope', () => {
+		const originalState = undoManagers( undefined, {} );
+		const state = undoManagers( originalState, {
+			type: 'SET_UNDO_SCOPE',
+			scope: 'postType/wp_navigation/1',
+		} );
+
+		expect( state.scope ).toBe( 'postType/wp_navigation/1' );
+		expect( state.managers.default ).toBe( originalState.managers.default );
+		expect( state.managers[ 'postType/wp_navigation/1' ] ).toBeDefined();
+	} );
+
+	it( 'preserves the undo manager of a scope that was already visited', () => {
+		let state = undoManagers( undefined, {} );
+		state = undoManagers( state, {
+			type: 'SET_UNDO_SCOPE',
+			scope: 'postType/page/1',
+		} );
+		const manager = state.managers[ 'postType/page/1' ];
+		state = undoManagers( state, {
+			type: 'SET_UNDO_SCOPE',
+			scope: 'postType/wp_navigation/2',
+		} );
+		state = undoManagers( state, {
+			type: 'SET_UNDO_SCOPE',
+			scope: 'postType/page/1',
+		} );
+
+		expect( state.managers[ 'postType/page/1' ] ).toBe( manager );
+	} );
+
+	it( 'falls back to the default scope when no scope is provided', () => {
+		let state = undoManagers( undefined, {} );
+		state = undoManagers( state, {
+			type: 'SET_UNDO_SCOPE',
+			scope: 'postType/page/1',
+		} );
+		state = undoManagers( state, {
+			type: 'SET_UNDO_SCOPE',
+			scope: undefined,
+		} );
+
+		expect( state.scope ).toBe( 'default' );
+	} );
+
+	it( 'returns the same reference when the scope is unchanged', () => {
+		const originalState = undoManagers( undefined, {} );
+		const state = undoManagers( originalState, {
+			type: 'SET_UNDO_SCOPE',
+			scope: 'default',
 		} );
 
 		expect( state ).toBe( originalState );

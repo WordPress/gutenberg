@@ -37,7 +37,10 @@ export interface State {
 	themeBaseGlobalStyles: Record< string, Object >;
 	themeGlobalStyleVariations: Record< string, string >;
 	themeGlobalStyleRevisions: Record< number, Object >;
-	undoManager: UndoManager;
+	undoManagers: {
+		scope: string;
+		managers: Record< string, UndoManager >;
+	};
 	syncUndoManagerState: {
 		hasRedo: boolean;
 		hasUndo: boolean;

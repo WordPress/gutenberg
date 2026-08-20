@@ -1,6 +1,7 @@
 import triggerFetch from '@wordpress/api-fetch';
 import { createRegistry } from '@wordpress/data';
 import { store as coreDataStore } from '../index';
+import { unlock } from '../lock-unlock';
 
 jest.mock( '@wordpress/api-fetch' );
 
@@ -315,5 +316,65 @@ describe( 'getRevisions', () => {
 			.select( coreDataStore )
 			.getRevisions( KIND, NAME, RECORD_KEY, { context: 'edit' } );
 		expect( allRevisions.map( ( r ) => r.id ) ).toEqual( [ 2, 3, 4 ] );
+	} );
+} );
+
+describe( 'undo scopes', () => {
+	let registry;
+
+	beforeEach( () => {
+		registry = createTestRegistry();
+		triggerFetch.mockReset();
+	} );
+
+	it( 'does not offer to undo edits made in another scope', () => {
+		const post = createTestPost( 1 );
+		const dispatch = registry.dispatch( coreDataStore );
+		const select = registry.select( coreDataStore );
+
+		dispatch.receiveEntityRecords( 'postType', 'post', post );
+
+		unlock( dispatch ).setUndoScope( 'postType/post/1' );
+		dispatch.editEntityRecord( 'postType', 'post', post.id, {
+			slug: 'updated-slug',
+		} );
+
+		expect( select.hasUndo() ).toBe( true );
+
+		// Entering a focused editor for another entity starts a new history.
+		unlock( dispatch ).setUndoScope( 'postType/wp_navigation/2' );
+
+		expect( select.hasUndo() ).toBe( false );
+
+		// Undoing there must not revert the edits of the previous scope.
+		dispatch.undo();
+
+		expect(
+			select.getEditedEntityRecord( 'postType', 'post', post.id ).slug
+		).toBe( 'updated-slug' );
+	} );
+
+	it( 'restores the history of a scope when it becomes active again', () => {
+		const post = createTestPost( 1 );
+		const dispatch = registry.dispatch( coreDataStore );
+		const select = registry.select( coreDataStore );
+
+		dispatch.receiveEntityRecords( 'postType', 'post', post );
+
+		unlock( dispatch ).setUndoScope( 'postType/post/1' );
+		dispatch.editEntityRecord( 'postType', 'post', post.id, {
+			slug: 'updated-slug',
+		} );
+		unlock( dispatch ).setUndoScope( 'postType/wp_navigation/2' );
+		unlock( dispatch ).setUndoScope( 'postType/post/1' );
+
+		expect( select.hasUndo() ).toBe( true );
+
+		dispatch.undo();
+
+		expect(
+			select.getEditedEntityRecord( 'postType', 'post', post.id ).slug
+		).toBe( post.slug );
+		expect( select.hasRedo() ).toBe( true );
 	} );
 } );

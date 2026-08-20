@@ -58,7 +58,12 @@ describe( 'hasUndo/hasRedo', () => {
 		};
 		getSyncManager.mockReturnValue( undefined );
 
-		const state = { undoManager };
+		const state = {
+			undoManagers: {
+				scope: 'default',
+				managers: { default: undoManager },
+			},
+		};
 
 		expect( hasUndo( state ) ).toBe( true );
 		expect( hasRedo( state ) ).toBe( false );

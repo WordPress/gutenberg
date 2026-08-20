@@ -30,7 +30,10 @@ describe( 'getUndoManager', () => {
 		} );
 
 		const state = {
-			undoManager: fallbackUndoManager,
+			undoManagers: {
+				scope: 'default',
+				managers: { default: fallbackUndoManager },
+			},
 			syncUndoManagerState: {
 				hasRedo: false,
 				hasUndo: false,
@@ -52,12 +55,33 @@ describe( 'getUndoManager', () => {
 
 		expect(
 			getUndoManager( {
-				undoManager: fallbackUndoManager,
+				undoManagers: {
+					scope: 'default',
+					managers: { default: fallbackUndoManager },
+				},
 				syncUndoManagerState: {
 					hasRedo: false,
 					hasUndo: false,
 				},
 			} )
 		).toBe( fallbackUndoManager );
+	} );
+
+	it( 'returns the undo manager of the active scope', () => {
+		const defaultUndoManager = { hasUndo: jest.fn() };
+		const scopedUndoManager = { hasUndo: jest.fn() };
+		getSyncManager.mockReturnValue( undefined );
+
+		expect(
+			getUndoManager( {
+				undoManagers: {
+					scope: 'postType/wp_navigation/1',
+					managers: {
+						default: defaultUndoManager,
+						'postType/wp_navigation/1': scopedUndoManager,
+					},
+				},
+			} )
+		).toBe( scopedUndoManager );
 	} );
 } );

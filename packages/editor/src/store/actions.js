@@ -148,16 +148,24 @@ export function setupEditorState( post ) {
  *
  * @param {string} postType Post Type.
  * @param {string} postId   Post ID.
- *
- * @return {Object} Action object.
  */
-export function setEditedPost( postType, postId ) {
-	return {
-		type: 'SET_EDITED_POST',
-		postType,
-		postId,
+export const setEditedPost =
+	( postType, postId ) =>
+	( { dispatch, registry } ) => {
+		// Give each edited post its own undo history so that undoing can't
+		// revert changes made to another post, for instance after opening an
+		// entity in a focused editor.
+		unlock( registry.dispatch( coreStore ) ).setUndoScope(
+			postType && postId
+				? `postType/${ postType }/${ postId }`
+				: undefined
+		);
+		return dispatch( {
+			type: 'SET_EDITED_POST',
+			postType,
+			postId,
+		} );
 	};
-}
 
 /**
  * Returns an action object used in signalling that attributes of the post have
