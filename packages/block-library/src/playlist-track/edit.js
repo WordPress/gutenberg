@@ -32,6 +32,132 @@ import { useUploadMediaFromBlobURL } from '../utils/hooks';
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 const TRACK_IMAGE_ALLOWED_MEDIA_TYPES = [ 'image' ];
 
+function TrackImageControl( {
+	image,
+	hasImage,
+	imageAlt,
+	onSelectImage,
+	onRemoveImage,
+	onChangeImageAlt,
+	imageButtonRef,
+} ) {
+	return (
+		<>
+			<MediaUploadCheck>
+				<BaseControl>
+					<BaseControl.VisualLabel>
+						{ __( 'Track image' ) }
+					</BaseControl.VisualLabel>
+					<div className="editor-video-poster-control">
+						{ !! image && (
+							<img
+								src={ image }
+								alt={ __( 'Preview of the track image' ) }
+							/>
+						) }
+						<MediaUpload
+							title={ __( 'Select image' ) }
+							onSelect={ onSelectImage }
+							allowedTypes={ TRACK_IMAGE_ALLOWED_MEDIA_TYPES }
+							render={ ( { open } ) => (
+								<Button
+									__next40pxDefaultSize
+									variant="primary"
+									onClick={ open }
+									ref={ imageButtonRef }
+								>
+									{ ! hasImage
+										? __( 'Select' )
+										: __( 'Replace' ) }
+								</Button>
+							) }
+						/>
+						{ hasImage && (
+							<Button
+								__next40pxDefaultSize
+								onClick={ onRemoveImage }
+								variant="tertiary"
+							>
+								{ __( 'Remove' ) }
+							</Button>
+						) }
+					</div>
+				</BaseControl>
+			</MediaUploadCheck>
+			{ hasImage && (
+				<TextareaControl
+					label={ __( 'Alternative text' ) }
+					value={ imageAlt }
+					onChange={ onChangeImageAlt }
+					help={
+						<Link
+							openInNewTab
+							href={
+								// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+								__(
+									'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+								)
+							}
+						>
+							{ __( 'Describe the purpose of the image.' ) }
+						</Link>
+					}
+				/>
+			) }
+		</>
+	);
+}
+
+function TrackInspectorControls( {
+	panelTitle,
+	artist,
+	onChangeArtist,
+	album,
+	onChangeAlbum,
+	title,
+	onChangeTitle,
+	image,
+	hasImage,
+	imageAlt,
+	onSelectImage,
+	onRemoveImage,
+	onChangeImageAlt,
+	imageButtonRef,
+} ) {
+	return (
+		<InspectorControls>
+			<PanelBody title={ panelTitle }>
+				{ onChangeTitle && (
+					<TextControl
+						label={ __( 'Title' ) }
+						value={ stripHTML( title || '' ) }
+						onChange={ onChangeTitle }
+					/>
+				) }
+				<TextControl
+					label={ __( 'Artist' ) }
+					value={ stripHTML( artist || '' ) }
+					onChange={ onChangeArtist }
+				/>
+				<TextControl
+					label={ __( 'Album' ) }
+					value={ stripHTML( album || '' ) }
+					onChange={ onChangeAlbum }
+				/>
+				<TrackImageControl
+					image={ image }
+					hasImage={ hasImage }
+					imageAlt={ imageAlt }
+					onSelectImage={ onSelectImage }
+					onRemoveImage={ onRemoveImage }
+					onChangeImageAlt={ onChangeImageAlt }
+					imageButtonRef={ imageButtonRef }
+				/>
+			</PanelBody>
+		</InspectorControls>
+	);
+}
+
 const PlaylistTrackEdit = ( {
 	attributes,
 	setAttributes,
@@ -156,100 +282,30 @@ const PlaylistTrackEdit = ( {
 					variant="toolbar"
 				/>
 			</BlockControls>
-			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
-					<TextControl
-						label={ __( 'Artist' ) }
-						value={ artist ? stripHTML( artist ) : '' }
-						onChange={ ( artistValue ) => {
-							setAttributes( { artist: artistValue } );
-						} }
-					/>
-					<TextControl
-						label={ __( 'Album' ) }
-						value={ album ? stripHTML( album ) : '' }
-						onChange={ ( albumValue ) => {
-							setAttributes( { album: albumValue } );
-						} }
-					/>
-					<TextControl
-						label={ __( 'Title' ) }
-						value={ title ? stripHTML( title ) : '' }
-						onChange={ ( titleValue ) => {
-							setAttributes( { title: titleValue } );
-						} }
-					/>
-					<MediaUploadCheck>
-						<BaseControl>
-							<BaseControl.VisualLabel>
-								{ __( 'Track image' ) }
-							</BaseControl.VisualLabel>
-							<div className="editor-video-poster-control">
-								{ !! image && (
-									<img
-										src={ image }
-										alt={ __(
-											'Preview of the track image'
-										) }
-									/>
-								) }
-								<MediaUpload
-									title={ __( 'Select image' ) }
-									onSelect={ onSelectTrackImage }
-									allowedTypes={
-										TRACK_IMAGE_ALLOWED_MEDIA_TYPES
-									}
-									render={ ( { open } ) => (
-										<Button
-											__next40pxDefaultSize
-											variant="primary"
-											onClick={ open }
-											ref={ imageButton }
-										>
-											{ ! image
-												? __( 'Select' )
-												: __( 'Replace' ) }
-										</Button>
-									) }
-								/>
-								{ !! image && (
-									<Button
-										__next40pxDefaultSize
-										onClick={ onRemoveTrackImage }
-										variant="tertiary"
-									>
-										{ __( 'Remove' ) }
-									</Button>
-								) }
-							</div>
-						</BaseControl>
-					</MediaUploadCheck>
-					{ !! image && (
-						<TextareaControl
-							label={ __( 'Alternative text' ) }
-							value={ imageAlt || '' }
-							onChange={ ( value ) =>
-								setAttributes( { imageAlt: value } )
-							}
-							help={
-								<Link
-									openInNewTab
-									href={
-										// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
-										__(
-											'https://www.w3.org/WAI/tutorials/images/decision-tree/'
-										)
-									}
-								>
-									{ __(
-										'Describe the purpose of the image.'
-									) }
-								</Link>
-							}
-						/>
-					) }
-				</PanelBody>
-			</InspectorControls>
+			<TrackInspectorControls
+				panelTitle={ __( 'Settings' ) }
+				artist={ artist }
+				onChangeArtist={ ( artistValue ) => {
+					setAttributes( { artist: artistValue } );
+				} }
+				album={ album }
+				onChangeAlbum={ ( albumValue ) => {
+					setAttributes( { album: albumValue } );
+				} }
+				title={ title }
+				onChangeTitle={ ( titleValue ) => {
+					setAttributes( { title: titleValue } );
+				} }
+				image={ image }
+				hasImage={ !! image }
+				imageAlt={ imageAlt || '' }
+				onSelectImage={ onSelectTrackImage }
+				onRemoveImage={ onRemoveTrackImage }
+				onChangeImageAlt={ ( value ) =>
+					setAttributes( { imageAlt: value } )
+				}
+				imageButtonRef={ imageButton }
+			/>
 			<li { ...blockProps }>
 				<button
 					className="wp-block-playlist-track__button"

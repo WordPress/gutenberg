@@ -103,6 +103,18 @@ describe( 'PlaylistTrackEdit', () => {
 		useUploadMediaFromBlobURL.mockClear();
 	} );
 
+	it( 'shows the title before artist and album controls', () => {
+		renderEdit();
+
+		const formFields = screen.getAllByRole( 'textbox' );
+
+		expect( formFields.slice( 0, 3 ) ).toEqual( [
+			screen.getByRole( 'textbox', { name: 'Title' } ),
+			screen.getByRole( 'textbox', { name: 'Artist' } ),
+			screen.getByRole( 'textbox', { name: 'Album' } ),
+		] );
+	} );
+
 	it( 'allows the track image alternative text to be edited', () => {
 		const { setAttributes } = renderEdit();
 
