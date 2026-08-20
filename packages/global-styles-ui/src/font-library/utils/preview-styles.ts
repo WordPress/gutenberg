@@ -33,23 +33,40 @@ function extractFontWeights( fontFaces: FontFace[] ): number[] {
 	return result;
 }
 
+const FONT_WEIGHT_KEYWORDS: Record< string, number | undefined > = {
+	normal: 400,
+	bold: 700,
+};
+
+function isValidWeight( weight: number | undefined ): weight is number {
+	return (
+		weight !== undefined &&
+		Number.isFinite( weight ) &&
+		weight >= 1 &&
+		weight <= 1000
+	);
+}
+
 /*
  * Resolve a font-weight range (e.g. "200 900") to a single value.
  * Ranges that cover 400 resolve to 400; otherwise to the closest end.
  */
 function resolveFontWeight( fontWeight: FontFace[ 'fontWeight' ] ): string {
-	const range = String( fontWeight ?? '' )
+	const weights = String( fontWeight ?? '' )
 		.trim()
-		.split( /\s+/ );
+		.toLowerCase()
+		.split( /\s+/ )
+		.filter( Boolean )
+		.map( ( value ) => FONT_WEIGHT_KEYWORDS[ value ] ?? Number( value ) );
 
-	if ( range.length !== 2 ) {
-		return String( fontWeight || '400' );
+	const [ start, end ] = weights;
+
+	if ( ! isValidWeight( start ) ) {
+		return '400';
 	}
 
-	const [ start, end ] = range.map( Number );
-
-	if ( ! Number.isFinite( start ) || ! Number.isFinite( end ) ) {
-		return '400';
+	if ( weights.length !== 2 || ! isValidWeight( end ) ) {
+		return String( start );
 	}
 
 	return String( Math.min( Math.max( 400, start ), end ) );
