@@ -33,7 +33,7 @@ export default function SidebarHeader() {
 			<Tabs.Tab value={ sidebars.document }>{ documentLabel }</Tabs.Tab>
 			<Tabs.Tab value={ sidebars.block }>
 				{ /* translators: Text label for the Block Settings Sidebar tab. */ }
-				{ __( 'Block' ) }
+				{ __( 'Selected Block' ) }
 			</Tabs.Tab>
 		</Tabs.List>
 	);

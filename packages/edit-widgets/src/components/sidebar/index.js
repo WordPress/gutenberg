@@ -31,7 +31,7 @@ function SidebarHeader( { selectedWidgetAreaBlock } ) {
 					: __( 'Widget Areas' ) }
 			</Tabs.Tab>
 			<Tabs.Tab tabId={ BLOCK_INSPECTOR_IDENTIFIER }>
-				{ __( 'Block' ) }
+				{ __( 'Selected Block' ) }
 			</Tabs.Tab>
 		</Tabs.TabList>
 	);
