@@ -121,8 +121,10 @@
 	"devDependencies": {
 		"@storybook/react-vite": "^10.4.3",
 		"@testing-library/dom": "^10.4.1",
+		"@testing-library/jest-dom": "^6.9.1",
 		"@testing-library/react": "^16.3.2",
 		"@testing-library/user-event": "^14.6.1",
+		"@types/jest": "^30.0.0",
 		"@wordpress/block-library": "file:../block-library",
 		"deep-freeze": "^0.0.1"
 	},

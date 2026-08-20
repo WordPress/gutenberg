@@ -1,12 +1,25 @@
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
+import { notFound } from '@wordpress/route';
 import { ensureView, viewToQuery } from './view-utils';
 
 /**
  * Route configuration for template part list.
  */
 export const route = {
+	async beforeLoad() {
+		// `block-template-parts` lets a classic theme opt into template parts
+		// alone, as the Template Part block itself allows.
+		const theme = await resolveSelect( coreStore ).getCurrentTheme();
+		const supports = theme?.theme_supports;
+		if (
+			! supports?.[ 'block-templates' ] &&
+			! supports?.[ 'block-template-parts' ]
+		) {
+			throw notFound();
+		}
+	},
 	title: () => __( 'Template Parts' ),
 	async canvas( context: {
 		params: {
@@ -38,9 +51,6 @@ export const route = {
 				postType: 'wp_template_part',
 				postId,
 				isPreview: true,
-				editLink: `/types/wp_template_part/edit/${ encodeURIComponent(
-					postId
-				) }`,
 			};
 		}
 
@@ -59,9 +69,6 @@ export const route = {
 				postType: 'wp_template_part',
 				postId,
 				isPreview: true,
-				editLink: `/types/wp_template_part/edit/${ encodeURIComponent(
-					postId
-				) }`,
 			};
 		}
 

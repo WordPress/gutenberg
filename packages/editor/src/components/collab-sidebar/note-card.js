@@ -1,4 +1,3 @@
-import { FlexItem } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { NoteByline } from './note-byline';
 
@@ -13,14 +12,14 @@ export function NoteCard( { note, actions, className, children, ...props } ) {
 					userId={ note?.author }
 				/>
 				{ actions && (
-					<FlexItem
+					<Stack
+						direction="row"
+						align="center"
 						className="editor-collab-sidebar-panel__note-actions"
 						onClick={ ( event ) => event.stopPropagation() }
 					>
-						<Stack direction="row" align="center">
-							{ actions }
-						</Stack>
-					</FlexItem>
+						{ actions }
+					</Stack>
 				) }
 			</Stack>
 			{ children }
