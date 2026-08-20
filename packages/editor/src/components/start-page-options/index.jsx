@@ -108,7 +108,7 @@ function useStartPatternCategories( startPatterns ) {
 
 		// Filtering is not useful when no start pattern belongs to a
 		// registered category.
-		if ( ! categories.some( ( { name } ) => name !== 'uncategorized' ) ) {
+		if ( categories.every( ( { name } ) => name === 'uncategorized' ) ) {
 			return [];
 		}
 
