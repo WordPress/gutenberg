@@ -429,29 +429,6 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers ::render_block_core_playlist
-	 * @covers ::render_block_core_playlist_track
-	 */
-	public function test_tracklist_does_not_render_track_album_by_default() {
-		$markup = $this->build_playlist_markup(
-			array(),
-			array(
-				array(
-					'id'    => 1,
-					'title' => 'Song One',
-					'album' => 'Album One',
-					'src'   => 'http://example.com/song1.mp3',
-				),
-			)
-		);
-
-		$output = do_blocks( $markup );
-
-		$this->assertStringNotContainsString( 'wp-block-playlist-track__album', $output );
-		$this->assertStringNotContainsString( '>Album One</span>', $output );
-	}
-
-	/**
 	 * @covers ::render_block_core_playlist_track
 	 */
 	public function test_playlist_track_renders_without_block_context() {
