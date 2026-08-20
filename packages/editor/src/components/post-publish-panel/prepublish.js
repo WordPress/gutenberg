@@ -103,7 +103,6 @@ function PostPublishPanelPrepublish( { children } ) {
 				</div>
 			</div>
 			<MaybeUploadMedia />
-			<MaybeAttachMedia />
 			{ hasPublishAction && (
 				<>
 					<PanelBody
@@ -139,6 +138,7 @@ function PostPublishPanelPrepublish( { children } ) {
 			<MaybePostFormatPanel />
 			<MaybeTagsPanel />
 			<MaybeCategoryPanel />
+			<MaybeAttachMedia />
 			{ children }
 		</div>
 	);

@@ -129,6 +129,45 @@
 		text-wrap: balance; // Fallback for Safari.
 		text-wrap: pretty;
 	}
+
+	// Body text opening a panel sits directly beneath its heading, where the
+	// default paragraph top margin reads as a gap rather than as separation.
+	// Matches `.post-publish-panel__postpublish-subheader`, which already drops
+	// it for the post-publish side.
+	//
+	// Anchored to the heading rather than written as `p:first-of-type`, which
+	// would match the first paragraph whatever preceded it — collapsing the gap
+	// below some other element a third party opened its panel with. This only
+	// ever matches copy sitting directly against the heading, and leaves the
+	// follow-on paragraphs in the post format and external media panels alone.
+	.components-panel__body > .components-panel__body-title + p {
+		margin-top: 0;
+	}
+
+	// A media title is a filename, so it can be arbitrarily long and carries no
+	// useful line breaks. Hold each to its own row and ellipsize the overflow,
+	// the same way the post address below does.
+	//
+	// The `min-width` floors are what make that work: a flex item refuses to
+	// shrink below its content by default, so without clearing it at every step
+	// from the row down to the label, the title stretches the panel instead of
+	// truncating. `CheckboxControl` nests the label two levels deep, inside a
+	// `BaseControl` field and an `HStack`.
+	.editor-post-publish-panel__attach-media-item {
+		min-width: 0;
+
+		.components-checkbox-control,
+		.components-base-control__field,
+		.components-checkbox-control__label {
+			min-width: 0;
+		}
+
+		.components-checkbox-control__label {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+	}
 }
 
 .post-publish-panel__postpublish .components-panel__body {
