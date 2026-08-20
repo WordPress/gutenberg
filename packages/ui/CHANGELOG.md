@@ -5,6 +5,7 @@
 ### New Features
 
 -   Add `Spinner` component ([#81358](https://github.com/WordPress/gutenberg/pull/81358)).
+-   Add a `Menu` component. ([#79560](https://github.com/WordPress/gutenberg/pull/79560))
 
 ### Breaking Changes
 
@@ -13,11 +14,17 @@
 
 ### Enhancements
 
+-   Add `TextareaControl` component ([#81359](https://github.com/WordPress/gutenberg/pull/81359)).
+-   `Menu`: Add shortcut display and accessibility metadata support. ([#79560](https://github.com/WordPress/gutenberg/pull/79560))
 -   `Select.Item`, `Combobox.Item`, and `Autocomplete.Item`: Default item height is now 32px (previously 40px) ([#81354](https://github.com/WordPress/gutenberg/pull/81354)).
 
 ### Bug Fixes
 
 -   `Card`: Use the normal neutral surface stroke for the default border. ([#81746](https://github.com/WordPress/gutenberg/pull/81746))
+
+### Documentation
+
+-   Document design principles and route coding agents to the package's canonical documentation. ([#81400](https://github.com/WordPress/gutenberg/pull/81400))
 
 ### Internal
 
