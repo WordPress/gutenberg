@@ -21,25 +21,28 @@ import { restoreSelection, getSelectionHistory } from './utils/crdt-selection';
 import { setCachedBlocks } from './parsed-blocks-cache';
 
 /**
- * Sequence number handed to each record request, and the highest sequence
- * number whose response has already been written to the store, per registry
- * and per resolution.
+ * Sequence number handed to each record or list request, and the highest
+ * sequence number whose response has already been written to the store, per
+ * registry and per resolution.
  */
 let responseSequence = 0;
 const lastReceivedResponse = new WeakMap();
 
 /**
- * Reserves a slot in the response order for a record request that is about to
- * be made, and returns a predicate telling whether that request's response is
- * still the freshest one for the same resolution.
+ * Reserves a slot in the response order for a record or list request that is
+ * about to be made, and returns a predicate telling whether that request's
+ * response is still the freshest one for the same resolution.
  *
- * `invalidateResolution` starts a second request for a record while the first
- * one may still be in flight, and the store keeps whichever response is
- * *delivered* last - even when its body was read from the database before the
- * newer one. Client-side media uploads hit this: the record fetched while
+ * `invalidateResolution` starts a second request for a record or a list while
+ * the first one may still be in flight, and the store keeps whichever response
+ * is *delivered* last - even when its body was read from the database before
+ * the newer one. Client-side media uploads hit this: the record fetched while
  * sub-sizes are still being generated carries an empty `media_details.sizes`,
- * and when it lands after the post-upload refetch it hides the sizes again.
- * See https://github.com/WordPress/gutenberg/issues/81844.
+ * and when it lands after the post-upload refetch it hides the sizes again;
+ * likewise a batch upload invalidates the attachment list once per file, and a
+ * list read before an upload could replace the refetched one that already
+ * contains it. See https://github.com/WordPress/gutenberg/issues/81844 and
+ * https://github.com/WordPress/gutenberg/issues/81885.
  *
  * Only responses to an identical request are compared, so a request for a
  * different set of `_fields` never discards another one's data.
@@ -448,6 +451,11 @@ export const getEntityRecords =
 		const rawQuery = { ...query };
 		const key = entityConfig.key || DEFAULT_ENTITY_KEY;
 
+		const isFreshestResponse = claimResponseOrder(
+			registry,
+			JSON.stringify( [ kind, name, rawQuery ] )
+		);
+
 		function getResolutionsArgs( records, recordsQuery ) {
 			const normalizedQuery = normalizeQueryForResolution( recordsQuery );
 			return records
@@ -541,6 +549,15 @@ export const getEntityRecords =
 						};
 					}
 
+					// A response to the same query has been received since
+					// this run's last delivery, so its remaining pages are
+					// known to be out of date. The pages it already delivered
+					// were overwritten by that newer response.
+					if ( ! isFreshestResponse() ) {
+						dispatch.__unstableReleaseStoreLock( lock );
+						return;
+					}
+
 					records.push( ...pageRecords );
 					registry.batch( () => {
 						dispatch.receiveEntityRecords(
@@ -565,6 +582,16 @@ export const getEntityRecords =
 					totalItems: records.length,
 					totalPages: 1,
 				};
+			}
+
+			// A response to the same query has already been received since
+			// this one was made, so these records are known to be out of
+			// date. Discarding them also keeps the stale list from writing
+			// its records over fresher individual ones and from marking
+			// their resolutions finished below.
+			if ( ! isFreshestResponse() ) {
+				dispatch.__unstableReleaseStoreLock( lock );
+				return;
 			}
 
 			if ( entityConfig.syncConfig && -1 === query.per_page ) {

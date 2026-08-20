@@ -7,6 +7,7 @@
 -   Validate the shared parsed-blocks cache against the registered block types as well as the content, so a record resolved before the block types register — as happens when the editor's assets load lazily — is re-parsed instead of rendering, and one save later persisting, an empty block list ([#81809](https://github.com/WordPress/gutenberg/pull/81809)).
 -   Allow keyless entities to be addressed without a record ID in the entity record selectors and actions ([#81857](https://github.com/WordPress/gutenberg/pull/81857)).
 -   `getEntityRecord`: Discard a REST response that is delivered after a newer response for the same request. Invalidating a resolution starts a second request while the first may still be in flight, and the store kept whichever one arrived last, so a record read from the database before an update could overwrite the updated one ([#81846](https://github.com/WordPress/gutenberg/pull/81846)).
+-   `getEntityRecords`: Discard a list response that is delivered after a newer response for the same query, so a list read from the database before an update — as happens when a batch upload invalidates the attachment list once per file — can no longer replace a fresher one, overwrite the records it contains, or mark their resolutions finished ([#81886](https://github.com/WordPress/gutenberg/pull/81886)).
 
 ### Internal
 
