@@ -635,62 +635,23 @@
 			"count": 4
 		}
 	},
-	"packages/boot/src/components/error-boundary/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
 	"packages/boot/src/components/navigation/drilldown-item/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
 		}
 	},
 	"packages/boot/src/components/navigation/dropdown-item/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		},
 		"@wordpress/use-recommended-components": {
 			"count": 2
 		}
 	},
 	"packages/boot/src/components/navigation/navigation-item/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		},
 		"@wordpress/use-recommended-components": {
 			"count": 2
 		}
 	},
 	"packages/boot/src/components/navigation/navigation-screen/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		},
 		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
-	"packages/boot/src/components/root/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
-	"packages/boot/src/components/root/single-page.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
-	"packages/boot/src/components/save-button/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
-	"packages/boot/src/components/sidebar/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
-	"packages/boot/src/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 2
 		}
 	},
@@ -913,11 +874,6 @@
 	"packages/components/src/range-control/styles/range-control-styles.ts": {
 		"no-restricted-imports": {
 			"count": 2
-		}
-	},
-	"packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
 		}
 	},
 	"packages/components/src/scrollable/styles.ts": {
@@ -1291,11 +1247,6 @@
 		}
 	},
 	"packages/editor/src/components/blog-title/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/collab-sidebar/note-card.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		}

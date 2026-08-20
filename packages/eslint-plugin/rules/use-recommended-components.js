@@ -29,6 +29,8 @@ const ALLOWLIST = {
 			'Input',
 			'InputControl',
 			'InputLayout',
+			'KeyboardShortcutDescription',
+			'KeyboardShortcutDisplay',
 			'Link',
 			'RangeCalendar',
 			'Skeleton',
@@ -40,6 +42,7 @@ const ALLOWLIST = {
 			'TextareaControl',
 			'Tooltip',
 			'VisuallyHidden',
+			'useKeyboardShortcutProps',
 		],
 		message:
 			'`{{ name }}` from `{{ source }}` is not yet recommended for use in a WordPress environment.',
