@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `NoticeAction`: Type `onClick` as a mouse event handler. The `Notice` component wires the callback up to a `Button`, which calls it with the click event, but the type declared it as taking no arguments, so a handler that reads the event did not type check.
+
 ### Internal
 
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
