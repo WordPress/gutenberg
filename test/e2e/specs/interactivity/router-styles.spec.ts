@@ -5,6 +5,24 @@ const COLOR_GREEN = 'rgb(0, 255, 0)';
 const COLOR_BLUE = 'rgb(0, 0, 255)';
 const COLOR_WRAPPER = 'rgb(160, 12, 60)';
 const COLOR_DYNAMIC = 'rgb(255, 0, 255)';
+const COLOR_ASYNC_PRINT = 'rgb(255, 140, 0)';
+const COLOR_ASYNC_DATA_MEDIA = 'rgb(0, 128, 128)';
+const COLOR_ASYNC_PRELOAD = 'rgb(75, 0, 130)';
+const COLOR_ASYNC_PERSIST = 'rgb(0, 100, 0)';
+const COLOR_ASYNC_IGNORE = 'rgb(255, 215, 0)';
+
+/**
+ * Returns the media the style sheet of the passed `<link>` applies to.
+ *
+ * The router restores the media of the elements it inserts through the CSSOM,
+ * so the `media` attribute is not a reliable source: it keeps the `preload`
+ * sentinel that the router set to load the style sheet without applying it.
+ *
+ * @param element `<link>` element.
+ * @return Media of the style sheet, or `undefined` when it is not loaded.
+ */
+const getEffectiveMedia = ( element: HTMLLinkElement ) =>
+	element.sheet?.media.mediaText;
 
 test.describe( 'Router styles', () => {
 	test.beforeAll( async ( { interactivityUtils: utils } ) => {
@@ -46,6 +64,23 @@ test.describe( 'Router styles', () => {
 		await utils.addPostWithBlock( 'test/router-styles-wrapper', {
 			alias: 'none',
 			attributes: { links: { red, green, blue, all } },
+		} );
+
+		/*
+		 * Pages that contain both the navigation links and one of the blocks
+		 * that print a style sheet loaded asynchronously. They are needed to
+		 * start a test with a style element that the browser has already
+		 * mutated, which only happens on a full page load.
+		 */
+		await utils.addPostWithBlock( 'test/router-styles-wrapper', {
+			alias: 'red with links',
+			attributes: { links: { red, green, blue, all } },
+			innerBlocks: [ [ 'test/router-styles-red' ] ],
+		} );
+		await utils.addPostWithBlock( 'test/router-styles-wrapper', {
+			alias: 'blue with links',
+			attributes: { links: { red, green, blue, all } },
+			innerBlocks: [ [ 'test/router-styles-blue' ] ],
 		} );
 	} );
 
@@ -558,5 +593,336 @@ test.describe( 'Router styles', () => {
 		// After navigating to the page with all blocks, the element should
 		// still maintain its original styling and not be affected by noscript styles
 		await expect( noscriptStyleTest ).toHaveCSS( 'color', COLOR_WRAPPER );
+	} );
+
+	test( 'should apply style sheets loaded with the print trick', async ( {
+		page,
+	} ) => {
+		const csn = page.getByTestId( 'client-side navigation' );
+		const asyncPrint = page.getByTestId( 'async-print' );
+		const asyncPrintLink = page.locator(
+			'link[href*="style-async-print.css"]'
+		);
+
+		// The style sheet is only printed by the red block.
+		await expect( asyncPrint ).toHaveCSS( 'color', COLOR_WRAPPER );
+		await expect( asyncPrintLink ).toHaveCount( 0 );
+
+		await page.getByTestId( 'link red' ).click();
+
+		// This element disappears when a navigation starts.
+		// It should be visible again after a successful navigation.
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+		await expect( asyncPrint ).toHaveCSS( 'color', COLOR_ASYNC_PRINT );
+
+		/*
+		 * The router canonicalizes the element to the state it ends up in: the
+		 * inline handler is stripped and the media resolves to `all`, so no
+		 * original media is stashed and the style sheet applies to all media.
+		 *
+		 * Note that the router restores the media through the CSSOM, so the
+		 * `media` attribute keeps the `preload` sentinel.
+		 */
+		await expect( asyncPrintLink ).not.toHaveAttribute( 'onload' );
+		await expect( asyncPrintLink ).not.toHaveAttribute(
+			'data-original-media'
+		);
+		await expect
+			.poll( () => asyncPrintLink.evaluate( getEffectiveMedia ) )
+			.toBe( 'all' );
+
+		await page.getByTestId( 'link green' ).click();
+
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+		await expect( asyncPrint ).toHaveCSS( 'color', COLOR_WRAPPER );
+
+		// Second round trip: the element already in the document must match the
+		// markup of the freshly fetched page, so it is reused, not duplicated.
+		await page.getByTestId( 'link red' ).click();
+
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+		await expect( asyncPrint ).toHaveCSS( 'color', COLOR_ASYNC_PRINT );
+
+		await page.getByTestId( 'link green' ).click();
+
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+		await expect( asyncPrint ).toHaveCSS( 'color', COLOR_WRAPPER );
+
+		await page.getByTestId( 'link red' ).click();
+
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+		await expect( asyncPrint ).toHaveCSS( 'color', COLOR_ASYNC_PRINT );
+		await expect( asyncPrintLink ).toHaveCount( 1 );
+	} );
+
+	test( 'should not apply preloaded style sheets loaded with the print trick', async ( {
+		page,
+	} ) => {
+		const csn = page.getByTestId( 'client-side navigation' );
+		const asyncPrint = page.getByTestId( 'async-print' );
+		const asyncPrintLink = page.locator(
+			'link[href*="style-async-print.css"]'
+		);
+		const prefetching = page.getByTestId( 'prefetching' );
+
+		await expect( asyncPrint ).toHaveCSS( 'color', COLOR_WRAPPER );
+
+		await page.getByTestId( 'link red' ).hover();
+		await expect( prefetching ).toHaveText( 'true' );
+
+		// Wait until the prefetching has finished. At this point the style
+		// sheet has been downloaded, so the inline handler of the original
+		// markup would have already applied it to the current page.
+		await expect( prefetching ).toHaveText( 'false' );
+
+		await expect( asyncPrintLink ).toHaveAttribute( 'media', 'preload' );
+		await expect( asyncPrint ).toHaveCSS( 'color', COLOR_WRAPPER );
+
+		await page.getByTestId( 'link red' ).click();
+
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+		await expect( asyncPrint ).toHaveCSS( 'color', COLOR_ASYNC_PRINT );
+	} );
+
+	test( 'should apply style sheets that read the media from a data attribute', async ( {
+		page,
+	} ) => {
+		const csn = page.getByTestId( 'client-side navigation' );
+		const asyncDataMedia = page.getByTestId( 'async-data-media' );
+		const asyncDataMediaLink = page.locator(
+			'link[href*="style-async-data-media.css"]'
+		);
+
+		// The style sheet is only printed by the green block.
+		await expect( asyncDataMedia ).toHaveCSS( 'color', COLOR_WRAPPER );
+
+		await page.getByTestId( 'link green' ).click();
+
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+		await expect( asyncDataMedia ).toHaveCSS(
+			'color',
+			COLOR_ASYNC_DATA_MEDIA
+		);
+
+		// The media of the applied element is the one the inline handler would
+		// have copied from the data attribute, not its `not all` face value.
+		await expect( asyncDataMediaLink ).toHaveCount( 1 );
+		await expect( asyncDataMediaLink ).not.toHaveAttribute( 'data-media' );
+		await expect( asyncDataMediaLink ).not.toHaveAttribute(
+			'data-original-media'
+		);
+		await expect
+			.poll( () => asyncDataMediaLink.evaluate( getEffectiveMedia ) )
+			.toBe( 'all' );
+
+		await page.getByTestId( 'link red' ).click();
+
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+		await expect( asyncDataMedia ).toHaveCSS( 'color', COLOR_WRAPPER );
+
+		await page.getByTestId( 'link green' ).click();
+
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+		await expect( asyncDataMedia ).toHaveCSS(
+			'color',
+			COLOR_ASYNC_DATA_MEDIA
+		);
+		await expect( asyncDataMediaLink ).toHaveCount( 1 );
+	} );
+
+	test( 'should apply preloads that turn themselves into style sheets', async ( {
+		page,
+	} ) => {
+		const csn = page.getByTestId( 'client-side navigation' );
+		const asyncPreload = page.getByTestId( 'async-preload' );
+		const asyncPreloadLink = page.locator(
+			'link[href*="style-async-preload.css"]'
+		);
+
+		// The style sheet is only printed by the blue block.
+		await expect( asyncPreload ).toHaveCSS( 'color', COLOR_WRAPPER );
+
+		await page.getByTestId( 'link blue' ).click();
+
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+		await expect( asyncPreload ).toHaveCSS( 'color', COLOR_ASYNC_PRELOAD );
+
+		// The router canonicalizes the preload into a regular style sheet.
+		await expect( asyncPreloadLink ).toHaveAttribute( 'rel', 'stylesheet' );
+		await expect( asyncPreloadLink ).not.toHaveAttribute( 'as' );
+
+		await page.getByTestId( 'link red' ).click();
+
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+		await expect( asyncPreload ).toHaveCSS( 'color', COLOR_WRAPPER );
+
+		await page.getByTestId( 'link blue' ).click();
+
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+		await expect( asyncPreload ).toHaveCSS( 'color', COLOR_ASYNC_PRELOAD );
+		await expect( asyncPreloadLink ).toHaveCount( 1 );
+	} );
+
+	test( 'should reuse style sheets that the browser already mutated', async ( {
+		page,
+		interactivityUtils: utils,
+	} ) => {
+		// Full page load, so the inline handler of the print trick runs and
+		// mutates the element before the router sees it.
+		await page.goto( utils.getLink( 'red with links' ) );
+		await expect( page.getByTestId( 'hydrated' ) ).toBeVisible();
+
+		const csn = page.getByTestId( 'client-side navigation' );
+		const asyncPrint = page.getByTestId( 'async-print' );
+		const asyncPrintLink = page.locator(
+			'link[href*="style-async-print.css"]'
+		);
+
+		await expect( asyncPrint ).toHaveCSS( 'color', COLOR_ASYNC_PRINT );
+		await expect( asyncPrintLink ).toHaveCount( 1 );
+
+		// The "all" page also contains the red block, so the mutated element
+		// must match its markup and be kept, without inserting a copy.
+		await page.getByTestId( 'link all' ).click();
+
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+		await expect( asyncPrint ).toHaveCSS( 'color', COLOR_ASYNC_PRINT );
+		await expect( asyncPrintLink ).toHaveCount( 1 );
+
+		await page.getByTestId( 'link green' ).click();
+
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+		await expect( asyncPrint ).toHaveCSS( 'color', COLOR_WRAPPER );
+
+		await page.getByTestId( 'link all' ).click();
+
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+		await expect( asyncPrint ).toHaveCSS( 'color', COLOR_ASYNC_PRINT );
+		await expect( asyncPrintLink ).toHaveCount( 1 );
+	} );
+
+	test( 'should reuse preloads that the browser already turned into style sheets', async ( {
+		page,
+		interactivityUtils: utils,
+	} ) => {
+		// Full page load, so the inline handler of the preload runs and turns
+		// the element into a style sheet before the router sees it.
+		await page.goto( utils.getLink( 'blue with links' ) );
+		await expect( page.getByTestId( 'hydrated' ) ).toBeVisible();
+
+		const csn = page.getByTestId( 'client-side navigation' );
+		const asyncPreload = page.getByTestId( 'async-preload' );
+		const asyncPreloadLink = page.locator(
+			'link[href*="style-async-preload.css"]'
+		);
+
+		await expect( asyncPreload ).toHaveCSS( 'color', COLOR_ASYNC_PRELOAD );
+		await expect( asyncPreloadLink ).toHaveCount( 1 );
+
+		// The "all" page also contains the blue block, so the element must
+		// remain enabled instead of being disabled and duplicated.
+		await page.getByTestId( 'link all' ).click();
+
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+		await expect( asyncPreload ).toHaveCSS( 'color', COLOR_ASYNC_PRELOAD );
+		await expect( asyncPreloadLink ).toHaveCount( 1 );
+
+		await page.getByTestId( 'link red' ).click();
+
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+		await expect( asyncPreload ).toHaveCSS( 'color', COLOR_WRAPPER );
+	} );
+
+	test( 'should never disable style sheets marked as persistent', async ( {
+		page,
+	} ) => {
+		const csn = page.getByTestId( 'client-side navigation' );
+		const asyncPersist = page.getByTestId( 'async-persist' );
+		const asyncPreload = page.getByTestId( 'async-preload' );
+
+		// Both style sheets are only printed by the blue block.
+		await expect( asyncPersist ).toHaveCSS( 'color', COLOR_WRAPPER );
+		await expect( asyncPreload ).toHaveCSS( 'color', COLOR_WRAPPER );
+
+		await page.getByTestId( 'link blue' ).click();
+
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+		await expect( asyncPersist ).toHaveCSS( 'color', COLOR_ASYNC_PERSIST );
+		await expect( asyncPreload ).toHaveCSS( 'color', COLOR_ASYNC_PRELOAD );
+
+		await page.getByTestId( 'link red' ).click();
+
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+
+		// The persistent style sheet is kept, the regular one is disabled.
+		await expect( asyncPersist ).toHaveCSS( 'color', COLOR_ASYNC_PERSIST );
+		await expect( asyncPreload ).toHaveCSS( 'color', COLOR_WRAPPER );
+
+		await page.getByTestId( 'link green' ).click();
+
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+		await expect( asyncPersist ).toHaveCSS( 'color', COLOR_ASYNC_PERSIST );
+		await expect( asyncPreload ).toHaveCSS( 'color', COLOR_WRAPPER );
+	} );
+
+	test( 'should not manage style sheets marked to be ignored', async ( {
+		page,
+	} ) => {
+		const csn = page.getByTestId( 'client-side navigation' );
+		const asyncIgnore = page.getByTestId( 'async-ignore' );
+		const asyncIgnoreLink = page.locator(
+			'link[href*="style-async-ignore.css"]'
+		);
+
+		// The inline handler applies the style sheet, and the router does not
+		// interfere with it.
+		await expect( asyncIgnore ).toHaveCSS( 'color', COLOR_ASYNC_IGNORE );
+		await expect( asyncIgnoreLink ).toHaveAttribute( 'media', 'all' );
+
+		// The pages the router fetches don't contain this style sheet, so a
+		// managed element would be disabled after navigating.
+		await page.getByTestId( 'link red' ).click();
+
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+		await expect( asyncIgnore ).toHaveCSS( 'color', COLOR_ASYNC_IGNORE );
+
+		await page.getByTestId( 'link all' ).click();
+
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+		await expect( asyncIgnore ).toHaveCSS( 'color', COLOR_ASYNC_IGNORE );
+
+		// The element is left untouched: it is not duplicated, its media is not
+		// replaced with the router's sentinel, and its handler is not stripped.
+		await expect( asyncIgnoreLink ).toHaveCount( 1 );
+		await expect( asyncIgnoreLink ).toHaveAttribute( 'media', 'all' );
+		await expect( asyncIgnoreLink ).toHaveAttribute(
+			'onload',
+			"this.onload=null;this.media='all'"
+		);
+		await expect( asyncIgnoreLink ).not.toHaveAttribute(
+			'data-original-media'
+		);
 	} );
 } );

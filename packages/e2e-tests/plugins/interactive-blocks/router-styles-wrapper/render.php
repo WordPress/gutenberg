@@ -35,6 +35,32 @@ wp_interactivity_state(
 	array( 'dynamicLinkUrl' => plugin_dir_url( __FILE__ ) . 'style-dynamic-link.css' )
 );
 
+/*
+ * Style sheet loaded asynchronously with the "print trick" that opts out of the
+ * router's style management with `data-wp-router-style="ignore"`, so the router
+ * never touches it.
+ *
+ * It is only printed on the pages that contain the navigation links, i.e., the
+ * pages the tests start from, so it is absent from every page the router
+ * fetches.
+ *
+ * The markup is printed directly instead of enqueued because
+ * `wp_enqueue_style()` cannot output the `onload` attribute. It is printed in
+ * `wp_head` so it stays outside of the router regions, which are re-rendered
+ * by the vdom.
+ */
+if ( ! empty( $attributes['links'] ) ) {
+	add_action(
+		'wp_head',
+		function () {
+			printf(
+				'<link rel="stylesheet" href="%s" media="print" onload="this.onload=null;this.media=\'all\'" data-wp-router-style="ignore">',
+				esc_url( plugin_dir_url( __FILE__ ) . 'style-async-ignore.css' )
+			);
+		}
+	);
+}
+
 $wrapper_attributes = get_block_wrapper_attributes();
 ?>
 <div <?php echo $wrapper_attributes; ?>>
@@ -64,6 +90,16 @@ $wrapper_attributes = get_block_wrapper_attributes();
 		<p data-testid="green-from-inline" class="green-from-inline">Green</p>
 		<p data-testid="blue-from-inline" class="blue-from-inline">Blue</p>
 		<p data-testid="all-from-inline" class="red-from-inline green-from-inline blue-from-inline">All</p>
+	</fieldset>
+
+	<!-- These get colored when the corresponding block prints a style sheet that is loaded asynchronously. -->
+	<fieldset>
+		<legend>Styles loaded asynchronously</legend>
+		<p data-testid="async-print" class="async-print">Print trick</p>
+		<p data-testid="async-data-media" class="async-data-media">Media from data attribute</p>
+		<p data-testid="async-preload" class="async-preload">Preload turned into a style sheet</p>
+		<p data-testid="async-persist" class="async-persist">Persisted style sheet</p>
+		<p data-testid="async-ignore" class="async-ignore">Ignored style sheet</p>
 	</fieldset>
 
 	<!-- This one should remain green after navigation. -->
