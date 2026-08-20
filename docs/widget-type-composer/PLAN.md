@@ -14,7 +14,12 @@ round's re-homing absorbed them; one remains open:
 -   **WordPress/gutenberg#81740, the widget host links seam. Open.** The seam
     step 17 planned to create, now carrying its own doc page (the capability
     conventions), the `HostLinks` story, and the dashboard providing `links`
-    at its route layer. On landing, 17 shrinks to extending the bag with
+    at its route layer. The 2026-08-21 review round hardened the contract:
+    `Link` must forward its ref to the anchor (`RefAttributes` in the type),
+    the match result field is `path`, renamed from `to`, and the matcher
+    rejects hrefs a route navigation cannot deliver faithfully (search params
+    beyond `page`/`p`, a `p` smuggling its own query or hash). On landing, 17
+    shrinks to extending the bag with
     `navigate` / `notify` for the operations of step 16, plus one decision it
     must settle: `renderBlocks` (step 10) travels as a prop on
     `WidgetDashboard` in the same `routes/dashboard/stage.tsx` the PR wraps
