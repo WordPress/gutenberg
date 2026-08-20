@@ -33,6 +33,8 @@ const ALLOWLIST = {
 			'Stack',
 			'Tabs',
 			'Text',
+			'Textarea',
+			'TextareaControl',
 			'Tooltip',
 			'VisuallyHidden',
 		],
@@ -91,6 +93,8 @@ const DENYLIST = {
 		Tabs: 'Use `Tabs` from `@wordpress/ui` instead.',
 		TextControl:
 			'Use `InputControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
+		TextareaControl:
+			'Use `TextareaControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
 		Tooltip: 'Use `Tooltip` from `@wordpress/ui` instead.',
 		VisuallyHidden: 'Use `{{ name }}` from `@wordpress/ui` instead.',
 	},

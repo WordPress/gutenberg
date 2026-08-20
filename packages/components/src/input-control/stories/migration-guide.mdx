@@ -70,11 +70,10 @@ When the label is not a plain string, or you need a custom layout, compose the [
 import { Field, Input } from '@wordpress/ui';
 
 <Field.Root>
-	<Field.Label htmlFor={ inputId }>
+	<Field.Label>
 		Custom <strong>label</strong> content
 	</Field.Label>
 	<Input
-		id={ inputId }
 		value={ value }
 		onValueChange={ setValue }
 	/>
