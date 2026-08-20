@@ -10,6 +10,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	PlainText,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	Button,
@@ -18,12 +19,13 @@ import {
 	TextareaControl,
 	BaseControl,
 	Spinner,
+	ToolbarButton,
 } from '@wordpress/components';
 import { Link } from '@wordpress/ui';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
-import { audio as icon } from '@wordpress/icons';
+import { audio as icon, trash } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { PlaylistContext } from '../playlist/context';
 import { getTrackAttributes, getTrackImageAttributes } from '../playlist/utils';
@@ -49,6 +51,11 @@ const PlaylistTrackEdit = ( {
 	const { currentTrackClientId, setCurrentTrackClientId } =
 		useContext( PlaylistContext );
 	const { createErrorNotice } = useDispatch( noticesStore );
+	const { removeBlock } = useDispatch( blockEditorStore );
+	const canRemoveTrack = useSelect(
+		( select ) => select( blockEditorStore ).canRemoveBlock( clientId ),
+		[ clientId ]
+	);
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
@@ -155,6 +162,14 @@ const PlaylistTrackEdit = ( {
 					onError={ onUploadError }
 					variant="toolbar"
 				/>
+				{ canRemoveTrack && (
+					<ToolbarButton
+						icon={ trash }
+						label={ __( 'Delete track' ) }
+						onClick={ () => removeBlock( clientId ) }
+						isDestructive
+					/>
+				) }
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>

@@ -9,6 +9,7 @@
 ### Enhancements
 
 -   Columns: Add transforms between Columns and the Row variation that preserve column widths through flex child sizing controls.
+-   Playlist Track: Add a toolbar button for deleting the selected track.
 
 ### Bug Fixes
 
