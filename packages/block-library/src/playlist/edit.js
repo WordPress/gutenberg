@@ -86,7 +86,8 @@ const PlaylistEdit = ( {
 
 	const blockProps = useBlockProps();
 	const waveformPanelId = `${ clientId }-waveform`;
-	const { replaceInnerBlocks, selectBlock } = useDispatch( blockEditorStore );
+	const { replaceInnerBlocks, replaceBlocks, selectBlock } =
+		useDispatch( blockEditorStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
@@ -263,12 +264,26 @@ const PlaylistEdit = ( {
 		]
 	);
 
+	const removeTrack = useCallback(
+		( trackClientId ) => {
+			/*
+			 * `removeBlock` would also remove this playlist: removing the last
+			 * inner block of a container whose own attributes are unmodified
+			 * removes the container with it. Replacing the track with nothing
+			 * leaves the playlist in place, showing its placeholder.
+			 */
+			replaceBlocks( trackClientId, [] );
+		},
+		[ replaceBlocks ]
+	);
+
 	const playlistContext = useMemo(
 		() => ( {
 			currentTrackClientId,
 			setCurrentTrackClientId,
+			removeTrack,
 		} ),
-		[ currentTrackClientId, setCurrentTrackClientId ]
+		[ currentTrackClientId, setCurrentTrackClientId, removeTrack ]
 	);
 
 	// Get current track data by finding the track with matching client ID.

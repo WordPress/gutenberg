@@ -10,7 +10,6 @@ import {
 	BlockControls,
 	InspectorControls,
 	PlainText,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	Button,
@@ -47,20 +46,22 @@ const PlaylistTrackEdit = ( {
 	const showImages = context?.showImages ?? true;
 	const imageButton = useRef();
 	const blockProps = useBlockProps();
-	const { currentTrackClientId, setCurrentTrackClientId } =
+	const { currentTrackClientId, setCurrentTrackClientId, removeTrack } =
 		useContext( PlaylistContext );
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const { removeBlock } = useDispatch( blockEditorStore );
-	function onUploadError( message ) {
+	function onUploadError( message, removeTrackOnError = false ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 
-		// This also fires when replacing an existing track's media, where the
-		// original source is still good and must be kept. Only a track that
-		// never had one is unrecoverable: its blob URL is revoked, so it
-		// would sit in the tracklist loading forever.
-		if ( ! src && ! id ) {
-			removeBlock( clientId );
+		// If the file was uploaded via drag/drop, remove the
+		// optimistically added track
+		if ( removeTrackOnError ) {
+			removeTrack( clientId );
+			return;
 		}
+
+		// Otherwise the track already existed, so drop the pending upload
+		// and let it fall back to its previous state.
+		setTemporaryURL();
 	}
 	const hasTrackSource = !! src || !! temporaryURL;
 
@@ -80,11 +81,15 @@ const PlaylistTrackEdit = ( {
 		setCurrentTrackClientId,
 	] );
 
+	// Handles drag/drop uploads
 	useUploadMediaFromBlobURL( {
 		url: temporaryURL,
 		allowedTypes: ALLOWED_MEDIA_TYPES,
 		onChange: onSelectTrack,
-		onError: onUploadError,
+		onError: ( message ) => {
+			const removeTrackOnError = true;
+			onUploadError( message, removeTrackOnError );
+		},
 	} );
 
 	function onSelectTrack( media ) {

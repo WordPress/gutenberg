@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { useDispatch } from '@wordpress/data';
 import PlaylistTrackEdit from '../edit';
 import { PlaylistContext } from '../../playlist/context';
@@ -66,12 +66,14 @@ const defaultAttributes = {
 function renderEdit( props = {} ) {
 	const setAttributes = jest.fn();
 	const setCurrentTrackClientId = props.setCurrentTrackClientId || jest.fn();
+	const removeTrack = props.removeTrack || jest.fn();
 
 	render(
 		<PlaylistContext.Provider
 			value={ {
 				currentTrackClientId: props.currentTrackClientId ?? null,
 				setCurrentTrackClientId,
+				removeTrack,
 			} }
 		>
 			<PlaylistTrackEdit
@@ -91,7 +93,7 @@ function renderEdit( props = {} ) {
 		</PlaylistContext.Provider>
 	);
 
-	return { setAttributes, setCurrentTrackClientId };
+	return { setAttributes, setCurrentTrackClientId, removeTrack };
 }
 
 describe( 'PlaylistTrackEdit', () => {
@@ -194,7 +196,7 @@ describe( 'PlaylistTrackEdit', () => {
 			removeBlock,
 		} );
 
-		renderEdit( {
+		const { removeTrack } = renderEdit( {
 			attributes: {
 				blob: 'blob:https://example.com/temporary-track',
 				id: undefined,
@@ -205,9 +207,14 @@ describe( 'PlaylistTrackEdit', () => {
 		} );
 
 		const { onError } = useUploadMediaFromBlobURL.mock.calls[ 0 ][ 0 ];
-		onError( 'Sorry, you are not allowed to upload this file type.' );
+		act( () => {
+			onError( 'Sorry, you are not allowed to upload this file type.' );
+		} );
 
-		expect( removeBlock ).toHaveBeenCalledWith( 'temporary-track' );
+		// The playlist owns its inner blocks: removing the track directly
+		// would take an unmodified playlist with it.
+		expect( removeTrack ).toHaveBeenCalledWith( 'temporary-track' );
+		expect( removeBlock ).not.toHaveBeenCalled();
 	} );
 
 	// `onUploadError` also fires when replacing an existing track's media, so
@@ -219,8 +226,13 @@ describe( 'PlaylistTrackEdit', () => {
 
 		const { setAttributes } = renderEdit( { clientId: 'existing-track' } );
 
-		const { onError } = useUploadMediaFromBlobURL.mock.calls[ 0 ][ 0 ];
-		onError( 'Sorry, you are not allowed to upload this file type.' );
+		// A failed replacement is reported by MediaReplaceFlow, not the
+		// blob uploader, which never runs for a track that has a source.
+		act( () => {
+			mockMediaReplaceFlowProps.onError(
+				'Sorry, you are not allowed to upload this file type.'
+			);
+		} );
 
 		expect( createErrorNotice ).toHaveBeenCalled();
 		expect( removeBlock ).not.toHaveBeenCalled();
