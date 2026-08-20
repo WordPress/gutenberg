@@ -1,10 +1,12 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { useDispatch, useSelect } from '@wordpress/data';
+import mockPlainText from '../../../../block-editor/src/components/plain-text';
 import PlaylistTrackEdit from '../edit';
 import { PlaylistContext } from '../../playlist/context';
 import { useUploadMediaFromBlobURL } from '../../utils/hooks';
 
 let mockMediaReplaceFlowProps;
+let isMultiSelectingPlaylistTracks;
 
 jest.mock( '@wordpress/block-editor', () => {
 	return {
@@ -21,7 +23,7 @@ jest.mock( '@wordpress/block-editor', () => {
 		MediaUpload: ( { render: renderMediaUpload } ) =>
 			renderMediaUpload( { open: jest.fn() } ),
 		MediaUploadCheck: ( { children } ) => <div>{ children }</div>,
-		PlainText: ( { value } ) => <span>{ value }</span>,
+		PlainText: mockPlainText,
 		useBlockProps: jest.fn( () => ( {} ) ),
 	};
 } );
@@ -99,15 +101,45 @@ function renderEdit( props = {} ) {
 describe( 'PlaylistTrackEdit', () => {
 	beforeEach( () => {
 		mockMediaReplaceFlowProps = undefined;
+		isMultiSelectingPlaylistTracks = false;
 		useDispatch.mockReturnValue( {
 			createErrorNotice: jest.fn(),
+			selectionChange: jest.fn(),
 		} );
-		useSelect.mockReturnValue( false );
+		useSelect.mockImplementation( ( selector ) => {
+			const select = ( store ) => {
+				if ( store?.name === 'core/rich-text' ) {
+					return {
+						getFormatTypes: () => [],
+					};
+				}
+
+				return {
+					getBlockName: () => 'core/playlist-track',
+					getBlockRootClientId: () => 'playlist-client-id',
+					getMultiSelectedBlockClientIds: () =>
+						isMultiSelectingPlaylistTracks
+							? [
+									'playlist-track-client-id',
+									'another-playlist-track-client-id',
+							  ]
+							: [],
+					getSelectionStart: () => ( {} ),
+					getSelectionEnd: () => ( {} ),
+					getSettings: () => ( {} ),
+					getBlockAttributes: () => ( {} ),
+				};
+			};
+
+			return typeof selector === 'function'
+				? selector( select )
+				: select( selector );
+		} );
 		useUploadMediaFromBlobURL.mockClear();
 	} );
 
 	it( 'does not show the title control when multiple playlist tracks are selected', () => {
-		useSelect.mockReturnValue( true );
+		isMultiSelectingPlaylistTracks = true;
 
 		renderEdit();
 
