@@ -7,6 +7,8 @@ import { __ } from '@wordpress/i18n';
 import {
 	privateApis as mediaEditorPrivateApis,
 	type Media,
+	type MediaEditorFrameProps,
+	type MediaEditorSaveResult,
 } from '@wordpress/media-editor';
 import { useNavigate, useParams } from '@wordpress/route';
 import { unlock } from '@wordpress/routes-lock-unlock';
@@ -46,15 +48,16 @@ function MediaEditorRoute() {
 
 	const media = useSelect(
 		( select ) =>
+			/* The record of an attachment is always assignable to `Media`. */
 			select( coreStore ).getEditedEntityRecord(
 				'postType',
 				'attachment',
 				attachmentId
-			),
+			) as Media | false,
 		[ attachmentId ]
 	);
 
-	const title = getMediaTitle( media ?? null );
+	const title = getMediaTitle( media || null );
 	const navigateBack = () => {
 		if ( typeof window !== 'undefined' && window.history.length > 1 ) {
 			window.history.back();
@@ -75,12 +78,17 @@ function MediaEditorRoute() {
 			// here regardless of whether it was last collapsed in the modal.
 			scope={ MEDIA_EDITOR_SCOPE }
 			onClose={ navigateBack }
-			onSaved={ ( { id: savedId } ) => {
+			onSaved={ ( { id: savedId }: MediaEditorSaveResult ) => {
 				if ( savedId !== attachmentId ) {
 					navigate( { to: `/media-editor/${ savedId }` } );
 				}
 			} }
-			renderFrame={ ( { children, isImage, layout, onKeyDown } ) => {
+			renderFrame={ ( {
+				children,
+				isImage,
+				layout,
+				onKeyDown,
+			}: MediaEditorFrameProps ) => {
 				// Below the sidebar-collapse breakpoint the header has no room
 				// for the history cluster: it already carries the breadcrumbs,
 				// Cancel/Save, and (under `medium`) the framework's navigation

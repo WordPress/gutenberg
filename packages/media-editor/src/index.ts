@@ -10,6 +10,10 @@ export type {
 } from './components/media-editor-provider';
 export type { MediaPreviewProps } from './components/media-preview';
 export type { MediaFormProps } from './components/media-form';
+export type {
+	MediaEditorFrameProps,
+	MediaEditorSaveResult,
+} from './components/media-editor';
 
 // Re-export commonly used dataviews types for convenience
 export type { Field, Form } from '@wordpress/dataviews';

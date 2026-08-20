@@ -53,4 +53,10 @@ export type ConfirmDialogProps = {
 	 * Both buttons will be disabled.
 	 */
 	isBusy?: boolean;
+	/**
+	 * Whether the underlying `Modal` should hide its header, `title` included.
+	 *
+	 * @default true
+	 */
+	__experimentalHideHeader?: ModalProps[ '__experimentalHideHeader' ];
 };
