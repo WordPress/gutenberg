@@ -30,8 +30,8 @@
 		min-height: 0;
 	}
 
-	// Canvas column: image fills the available height, with the fine-rotation
-	// ruler and the image controls directly beneath it.
+	// Canvas column: the grey stage on top, the controls that act on it
+	// beneath. The column itself is transparent — only the stage is grey.
 	.media-editor__content {
 		display: flex;
 		flex: 1;
@@ -39,8 +39,6 @@
 		min-width: 0;
 		min-height: 0;
 		margin: $grid-unit-30;
-		border-radius: $radius-large;
-		overflow: hidden;
 
 		// Docked beside the 400px panel, the canvas keeps a workable crop area.
 		// The figure has to close at the dock breakpoint itself: at 960px the
@@ -54,22 +52,22 @@
 		}
 	}
 
-	// Holds the fine-rotation ruler and the rotate/flip/zoom/aspect-ratio
-	// controls directly beneath the image: ruler on top, controls below,
-	// centred, at every width. Sized to its content (`flex: 0 0 auto`) so the
-	// canvas above keeps every pixel the toolbar doesn't need — as the only
-	// flexible child of `media-editor__content`, the canvas absorbs whatever
-	// is left.
+	// The fine-rotation ruler and the rotate/flip/zoom/aspect-ratio controls,
+	// between the stage and the footer: ruler on top, controls below, centred.
+	// They sit on the modal's own background rather than on the stage, so the
+	// grey reads as the surface the image sits on and nothing else. Sized to
+	// its content (`flex: 0 0 auto`) so the stage above keeps every pixel the
+	// toolbar doesn't need.
 	.media-editor__canvas-toolbar {
 		display: flex;
 		flex: 0 0 auto;
 		flex-direction: column;
 		align-items: center;
 		gap: $grid-unit-15;
-		// Share the canvas grey so the ruler strip blends into the same
-		// surface as the area around the image.
-		background: $gray-200;
-		padding: $grid-unit-10 $grid-unit-20;
+		padding: $grid-unit-20 $grid-unit-20 0;
+		// The ruler masks the ticks behind its active number; tell it which
+		// surface to paint that mask in, now that it is off the grey stage.
+		--rotation-ruler-surface: #{$white};
 
 		.media-editor-fine-rotation {
 			// A column item stretches to the container's width by default;
@@ -81,11 +79,13 @@
 		}
 	}
 
+	// The stage: the surface the image sits on, and the only grey area.
 	.media-editor__canvas-area {
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		background: $gray-200;
+		border-radius: $radius-large;
 		overflow: auto;
 		flex: 1;
 		min-height: 0;
