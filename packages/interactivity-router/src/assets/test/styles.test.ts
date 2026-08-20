@@ -957,6 +957,292 @@ describe( 'Router styles management', () => {
 		} );
 	} );
 
+	// Tests for the style elements that optimization plugins load
+	// asynchronously, which mutate themselves once they have been loaded.
+	describe( 'asynchronously loaded styles', () => {
+		/**
+		 * Builds a document with the passed markup in its head, simulating the
+		 * response of a page fetched by the router.
+		 *
+		 * @param head Markup contained in the head of the page.
+		 * @return Document instance.
+		 */
+		const createPage = ( head: string ): Document =>
+			new window.DOMParser().parseFromString(
+				`<html><head>${ head }</head><body></body></html>`,
+				'text/html'
+			);
+
+		/**
+		 * Returns the style element with the passed ID in the current document.
+		 *
+		 * @param id Value of the `id` attribute.
+		 * @return The style element.
+		 */
+		const getElement = ( id: string ): StyleElement =>
+			document.head.querySelector< StyleElement >( `#${ id }` )!;
+
+		// Markup of a style sheet deferred with the "print" trick.
+		const printTrick =
+			'<link id="async" rel="stylesheet" href="https://example.com/async.css" media="print" onload="this.onload=null;this.media=\'all\'">';
+
+		// Markup of a style sheet deferred with a preload link.
+		const preloadFlip =
+			'<link id="flip" rel="preload" as="style" fetchpriority="high" href="https://example.com/flip.css" onload="this.onload=null;this.rel=\'stylesheet\'">';
+
+		it( 'should reuse the live element of an async style sheet that already mutated', async () => {
+			document.head.innerHTML = printTrick;
+			const live = getElement( 'async' ) as HTMLLinkElement;
+			// The optimization plugin flips the media once it is loaded.
+			live.media = 'all';
+
+			const promises = preloadStyles(
+				createPage( printTrick ),
+				'/other-page/'
+			);
+
+			// The element is reused instead of inserting a duplicate.
+			expect( document.head.querySelectorAll( '#async' ) ).toHaveLength(
+				1
+			);
+			expect( getElement( 'async' ) ).toBe( live );
+			expect( await promises[ 0 ] ).toBe( live );
+
+			// Elements of the current document keep their own handlers.
+			expect( live ).toHaveAttribute( 'onload' );
+		} );
+
+		it( 'should insert an async style sheet with its target media', () => {
+			preloadStyles(
+				createPage(
+					'<link id="async" rel="stylesheet" href="https://example.com/async.css" media="not all" onload="this.media=\'all\'">'
+				),
+				'/page/'
+			);
+
+			const inserted = getElement( 'async' );
+			expect( inserted ).toHaveAttribute( 'media', 'preload' );
+			expect( inserted ).not.toHaveAttribute( 'data-original-media' );
+			expect( inserted ).not.toHaveAttribute( 'onload' );
+
+			mockSheet( inserted, { disabled: true, mediaText: 'preload' } );
+			applyStyles( [ inserted ] );
+
+			// The target media is restored, not the placeholder.
+			expect( inserted.sheet!.media.mediaText ).toBe( 'all' );
+		} );
+
+		it( 'should resolve the target media from the attribute the handler reads', () => {
+			preloadStyles(
+				createPage(
+					'<link id="dataset" rel="stylesheet" href="https://example.com/a.css" media="not all" data-media="print" onload="this.media=this.dataset.media;delete this.dataset.media;">' +
+						'<link id="attribute" rel="stylesheet" href="https://example.com/b.css" media="not all" data-css-media="screen" onload="this.media=this.getAttribute(\'data-css-media\')">' +
+						'<link id="missing" rel="stylesheet" href="https://example.com/c.css" media="not all" onload="this.media=this.dataset.media">'
+				),
+				'/page/'
+			);
+
+			expect( getElement( 'dataset' ) ).toHaveAttribute(
+				'data-original-media',
+				'print'
+			);
+			// The consumed attribute is removed from the adopted element.
+			expect( getElement( 'dataset' ) ).not.toHaveAttribute(
+				'data-media'
+			);
+			expect( getElement( 'attribute' ) ).toHaveAttribute(
+				'data-original-media',
+				'screen'
+			);
+			// When the attribute is missing, the style sheet applies to all.
+			expect( getElement( 'missing' ) ).not.toHaveAttribute(
+				'data-original-media'
+			);
+		} );
+
+		it( 'should resolve the target media when the handler removes the attribute', () => {
+			preloadStyles(
+				createPage(
+					'<link id="async" rel="stylesheet" href="https://example.com/a.css" media="print" onload="this.onload=null;this.removeAttribute(\'media\')">'
+				),
+				'/page/'
+			);
+
+			const inserted = getElement( 'async' );
+			expect( inserted ).toHaveAttribute( 'media', 'preload' );
+			expect( inserted ).not.toHaveAttribute( 'data-original-media' );
+		} );
+
+		it( 'should adopt a preload link that turns itself into a style sheet', () => {
+			preloadStyles( createPage( preloadFlip ), '/page/' );
+
+			const inserted = getElement( 'flip' );
+			expect( inserted ).toHaveAttribute( 'rel', 'stylesheet' );
+			expect( inserted ).not.toHaveAttribute( 'as' );
+			expect( inserted ).not.toHaveAttribute( 'fetchpriority' );
+			expect( inserted ).not.toHaveAttribute( 'onload' );
+			expect( inserted ).toHaveAttribute( 'media', 'preload' );
+
+			// A later navigation to a page with the same style sheet reuses it.
+			preloadStyles( createPage( preloadFlip ), '/another-page/' );
+
+			expect( document.head.querySelectorAll( '#flip' ) ).toHaveLength(
+				1
+			);
+			expect( getElement( 'flip' ) ).toBe( inserted );
+		} );
+
+		it( 'should ignore preload links that are plain resource hints', () => {
+			const promises = preloadStyles(
+				createPage(
+					'<link id="hint" rel="preload" as="style" href="https://example.com/hint.css">' +
+						'<link id="other" rel="preload" as="style" href="https://example.com/other.css" onload="window.reportLoad()">'
+				),
+				'/page/'
+			);
+
+			expect( promises ).toHaveLength( 0 );
+			expect( getElement( 'hint' ) ).toBeNull();
+			expect( getElement( 'other' ) ).toBeNull();
+		} );
+
+		it( 'should remove the inline handlers of the adopted elements', async () => {
+			preloadStyles(
+				createPage(
+					`${ printTrick }<link id="plain" rel="stylesheet" href="https://example.com/plain.css" onload="this.media=\'screen\'" onerror="this.media=\'screen\'">`
+				),
+				'/page/'
+			);
+
+			const asyncLink = getElement( 'async' );
+			const plainLink = getElement( 'plain' );
+
+			expect( asyncLink ).not.toHaveAttribute( 'onload' );
+			expect( plainLink ).not.toHaveAttribute( 'onload' );
+			expect( plainLink ).not.toHaveAttribute( 'onerror' );
+
+			// An element with its handler still in place mutates itself, which
+			// is what the removal above prevents.
+			const untouched = document.createElement( 'link' );
+			untouched.setAttribute( 'rel', 'stylesheet' );
+			untouched.setAttribute( 'media', 'print' );
+			untouched.setAttribute( 'onload', "this.media='all'" );
+			document.head.appendChild( untouched );
+			untouched.dispatchEvent( new Event( 'load' ) );
+			expect( untouched ).toHaveAttribute( 'media', 'all' );
+
+			// The sentinel of a page that has only been prefetched survives.
+			asyncLink.dispatchEvent( new Event( 'load' ) );
+			expect( asyncLink ).toHaveAttribute( 'media', 'preload' );
+		} );
+
+		it( 'should keep the face value of the media when there is no handler', () => {
+			// A print style sheet and a style sheet toggled by another script.
+			document.head.innerHTML =
+				'<link id="print" rel="stylesheet" href="https://example.com/print.css" media="print">';
+			const live = getElement( 'print' );
+
+			preloadStyles(
+				createPage(
+					'<link id="print" rel="stylesheet" href="https://example.com/print.css" media="print">' +
+						'<link id="dark" rel="stylesheet" href="https://example.com/dark.css" media="not all">'
+				),
+				'/page/'
+			);
+
+			// The print style sheet is compared at face value and reused.
+			expect( document.head.querySelectorAll( '#print' ) ).toHaveLength(
+				1
+			);
+			expect( getElement( 'print' ) ).toBe( live );
+			expect( live ).toHaveAttribute( 'media', 'print' );
+
+			// The media of the new element is not rewritten either.
+			expect( getElement( 'dark' ) ).toHaveAttribute(
+				'data-original-media',
+				'not all'
+			);
+		} );
+
+		it( 'should match style sheets by their resolved URL', () => {
+			document.head.innerHTML =
+				'<link id="live" rel="stylesheet" href="/assets/a.css">';
+			const live = getElement( 'live' );
+
+			// A relative URL is resolved against the URL of the fetched page.
+			preloadStyles(
+				createPage(
+					'<link id="relative" rel="stylesheet" href="../assets/a.css">'
+				),
+				'/blog/page'
+			);
+
+			expect( getElement( 'relative' ) ).toBeNull();
+			expect( document.head.childNodes ).toHaveLength( 1 );
+
+			// The same style sheet referenced with an absolute URL matches too.
+			preloadStyles(
+				createPage(
+					'<link id="absolute" rel="stylesheet" href="http://localhost/assets/a.css">'
+				),
+				'/blog/page'
+			);
+
+			expect( getElement( 'absolute' ) ).toBeNull();
+			expect( document.head.childNodes ).toHaveLength( 1 );
+			expect( document.head.firstChild ).toBe( live );
+		} );
+
+		it( 'should treat style sheets with a different version as different', () => {
+			document.head.innerHTML =
+				'<link id="live" rel="stylesheet" href="/assets/a.css?ver=1">';
+
+			preloadStyles(
+				createPage(
+					'<link id="new" rel="stylesheet" href="/assets/a.css?ver=2">'
+				),
+				'/page/'
+			);
+
+			expect( document.head.childNodes ).toHaveLength( 2 );
+			expect( getElement( 'new' ) ).toBeTruthy();
+		} );
+
+		it( 'should mark the mutated async elements of the initial page as managed', async () => {
+			document.head.innerHTML = `${ printTrick }${ preloadFlip }`;
+			const asyncLink = getElement( 'async' ) as HTMLLinkElement;
+			const flipLink = getElement( 'flip' ) as HTMLLinkElement;
+
+			// Both elements mutate themselves once they have been loaded.
+			asyncLink.media = 'all';
+			flipLink.rel = 'stylesheet';
+			flipLink.removeAttribute( 'as' );
+
+			await loadStylesModule(
+				`<html><head>${ printTrick }${ preloadFlip }</head><body></body></html>`
+			);
+
+			// The elements of the initial page are managed by the router.
+			const initialStyles = await Promise.all(
+				preloadStyles( window.document )
+			);
+			expect( initialStyles ).toEqual( [ asyncLink, flipLink ] );
+		} );
+
+		it( 'should not mark async elements injected by other scripts', async () => {
+			await loadStylesModule( createInitialPageHtml( [] ) );
+
+			// Injected after the initial page was rendered.
+			document.head.innerHTML = printTrick;
+			( getElement( 'async' ) as HTMLLinkElement ).media = 'all';
+
+			const initialStyles = await Promise.all(
+				preloadStyles( window.document )
+			);
+			expect( initialStyles ).toEqual( [] );
+		} );
+	} );
+
 	describe( 'normalizeMedia', () => {
 		let linkElement: HTMLLinkElement;
 		let styleElement: HTMLStyleElement;

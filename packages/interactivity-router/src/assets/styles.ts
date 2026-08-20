@@ -1,17 +1,11 @@
 import { shortestCommonSupersequence } from './scs';
+import {
+	canonicalizeStyleElement,
+	getTargetMedia,
+	isUnmanagedPreloadLink,
+} from './async-styles';
 
 export type StyleElement = HTMLLinkElement | HTMLStyleElement;
-
-/**
- * Compares the passed style or link elements to check if they can be
- * considered equal.
- *
- * @param a `<style>` or `<link>` element.
- * @param b `<style>` or `<link>` element.
- * @return Whether they are considered equal.
- */
-const areNodesEqual = ( a: StyleElement, b: StyleElement ): boolean =>
-	a.isEqualNode( b );
 
 /**
  * Normalizes the passed style or link element, reverting the changes
@@ -45,15 +39,106 @@ export const normalizeMedia = ( element: StyleElement ): StyleElement => {
 };
 
 /**
+ * Selector of the style elements handled by the router.
+ *
+ * Apart from the regular style sheets, it includes the preloads that turn
+ * themselves into style sheets once they have been loaded, which are discarded
+ * later if they are plain resource hints. Note that `[rel=stylesheet]` doesn't
+ * match `rel="alternate stylesheet"`, which is intentionally excluded.
+ */
+const styleElementsSelector =
+	'style,link[rel=stylesheet],link[rel=preload][as=style][onload]';
+
+/**
  * Returns all the style elements contained in the passed document.
  *
  * @param doc Document instance.
- * @return List of `<style>` and `<link rel=stylesheet>` elements.
+ * @return List of `<style>` and `<link>` elements that contain style sheets.
  */
 const getStyleElements = ( doc: Document ): StyleElement[] =>
 	Array.from(
-		doc.querySelectorAll< StyleElement >( 'style,link[rel=stylesheet]' )
-	);
+		doc.querySelectorAll< StyleElement >( styleElementsSelector )
+	).filter( ( element ) => ! isUnmanagedPreloadLink( element ) );
+
+/**
+ * Canonical representation of a style element, used to compare elements coming
+ * from different documents.
+ *
+ * `<link>` elements are identified by the URL they point to and the media they
+ * end up applying to, so an element that an optimization plugin mutated in the
+ * browser still matches its server-rendered markup. The rest of the elements,
+ * and the links without a usable URL, fall back to comparing a normalized clone
+ * of the node.
+ */
+interface StyleDescriptor {
+	/** Canonical key of a `<link>` element, `null` when there is none. */
+	key: string | null;
+	/** Normalized clone, used when there is no canonical key. */
+	node: StyleElement;
+}
+
+/**
+ * Returns the canonical key of the passed element, if it can be computed.
+ *
+ * @param element `<style>` or `<link>` element.
+ * @param baseUrl URL of the document the element belongs to, used to resolve
+ *                relative URLs.
+ * @return Canonical key, or `null` when the element is not a `<link>` or its
+ * URL cannot be resolved.
+ */
+const getLinkKey = (
+	element: StyleElement,
+	baseUrl: string
+): string | null => {
+	if ( element.localName !== 'link' ) {
+		return null;
+	}
+	const href = element.getAttribute( 'href' );
+	if ( ! href ) {
+		return null;
+	}
+	try {
+		return `${ new URL( href, baseUrl ).href }|${ getTargetMedia(
+			element
+		) }`;
+	} catch {
+		return null;
+	}
+};
+
+/**
+ * Returns the canonical descriptor of the passed style element.
+ *
+ * The passed element is never modified.
+ *
+ * @param element `<style>` or `<link>` element.
+ * @param baseUrl URL of the document the element belongs to, used to resolve
+ *                relative URLs.
+ * @return Descriptor of the passed element.
+ */
+const getStyleDescriptor = (
+	element: StyleElement,
+	baseUrl: string
+): StyleDescriptor => ( {
+	key: getLinkKey( element, baseUrl ),
+	node: normalizeMedia( element ),
+} );
+
+/**
+ * Compares the passed descriptors to check if they refer to style elements that
+ * can be considered equal.
+ *
+ * @param a Descriptor of a `<style>` or `<link>` element.
+ * @param b Descriptor of a `<style>` or `<link>` element.
+ * @return Whether they are considered equal.
+ */
+const areDescriptorsEqual = (
+	a: StyleDescriptor,
+	b: StyleDescriptor
+): boolean =>
+	a.key !== null && b.key !== null
+		? a.key === b.key
+		: a.node.isEqualNode( b.node );
 
 /**
  * Style elements that are managed by the router.
@@ -112,17 +197,23 @@ const markInitialStylesAsManaged = async (): Promise< void > => {
 		const html = await res.text();
 		const doc = new window.DOMParser().parseFromString( html, 'text/html' );
 
-		// Normalized elements of the server response, consumed as they are
-		// matched so each of them marks at most one element in the document.
-		const serverElements = getStyleElements( doc ).map( normalizeMedia );
+		// Descriptors of the elements of the server response, consumed as they
+		// are matched so each of them marks at most one element in the
+		// document.
+		const serverDescriptors = getStyleElements( doc ).map( ( element ) =>
+			getStyleDescriptor( element, url.href )
+		);
 
 		getStyleElements( window.document ).forEach( ( element ) => {
-			const normalized = normalizeMedia( element );
-			const index = serverElements.findIndex( ( serverElement ) =>
-				areNodesEqual( normalized, serverElement )
+			const descriptor = getStyleDescriptor(
+				element,
+				window.document.baseURI
+			);
+			const index = serverDescriptors.findIndex( ( serverDescriptor ) =>
+				areDescriptorsEqual( descriptor, serverDescriptor )
 			);
 			if ( index !== -1 ) {
-				serverElements.splice( index, 1 );
+				serverDescriptors.splice( index, 1 );
 				managedStyles.add( element );
 			}
 		} );
@@ -157,15 +248,19 @@ export const initialStylesMarked: Promise< void > =
  * document (or the passed `parent` element) are in the correct order
  * and they are included in either X or Y.
  *
- * @param X      Base list of style elements.
- * @param Y      List of style elements.
- * @param parent Optional parent element to append to the new style elements.
+ * @param X       Base list of style elements, which belong to the current
+ *                document.
+ * @param Y       List of style elements.
+ * @param parent  Optional parent element to append to the new style elements.
+ * @param baseUrl Optional URL of the document the elements in Y come from, used
+ *                to resolve their relative URLs.
  * @return List of promises that resolve once the elements in Y are ready.
  */
 export function updateStylesWithSCS(
 	X: StyleElement[],
 	Y: StyleElement[],
-	parent: Element = window.document.head
+	parent: Element = window.document.head,
+	baseUrl: string = window.document.baseURI
 ) {
 	if ( X.length === 0 ) {
 		return Y.map( ( element ) => {
@@ -177,15 +272,20 @@ export function updateStylesWithSCS(
 		} );
 	}
 
-	// Create normalized arrays for comparison.
-	const xNormalized = X.map( normalizeMedia );
-	const yNormalized = Y.map( normalizeMedia );
+	// Create the descriptors used for comparison, computed only once as the
+	// algorithm below compares every element in X with every element in Y.
+	const xDescriptors = X.map( ( element ) =>
+		getStyleDescriptor( element, window.document.baseURI )
+	);
+	const yDescriptors = Y.map( ( element ) =>
+		getStyleDescriptor( element, baseUrl )
+	);
 
-	// The `scs` array contains normalized elements.
+	// The `scs` array contains descriptors.
 	const scs = shortestCommonSupersequence(
-		xNormalized,
-		yNormalized,
-		areNodesEqual
+		xDescriptors,
+		yDescriptors,
+		areDescriptorsEqual
 	);
 	const xLength = X.length;
 	const yLength = Y.length;
@@ -198,11 +298,17 @@ export function updateStylesWithSCS(
 		// Actual elements that will end up in the DOM.
 		const xElement = X[ xIndex ];
 		const yElement = Y[ yIndex ];
-		// Normalized elements for comparison.
-		const xNormEl = xNormalized[ xIndex ];
-		const yNormEl = yNormalized[ yIndex ];
-		if ( xIndex < xLength && areNodesEqual( xNormEl, scsElement ) ) {
-			if ( yIndex < yLength && areNodesEqual( yNormEl, scsElement ) ) {
+		// Descriptors for comparison.
+		const xDescriptor = xDescriptors[ xIndex ];
+		const yDescriptor = yDescriptors[ yIndex ];
+		if (
+			xIndex < xLength &&
+			areDescriptorsEqual( xDescriptor, scsElement )
+		) {
+			if (
+				yIndex < yLength &&
+				areDescriptorsEqual( yDescriptor, scsElement )
+			) {
 				promises.push( prepareStylePromise( xElement ) );
 				yIndex++;
 			}
@@ -309,12 +415,27 @@ const prepareStylePromise = (
  * merge, so they are left untouched and keep applying to the new page.
  *
  * Note that this function alters the passed document, as it can transfer
- * nodes from it to the global document.
+ * nodes from it to the global document, and rewrites the style elements that
+ * are loaded asynchronously to the state they end up in once they are loaded.
  *
- * @param doc Document instance.
+ * @param doc     Document instance.
+ * @param pageUrl Optional URL of the passed document, used to resolve the
+ *                relative URLs of its style elements.
  * @return A list of promises for each style element in the passed document.
  */
-export const preloadStyles = ( doc: Document ): Promise< StyleElement >[] => {
+export const preloadStyles = (
+	doc: Document,
+	pageUrl?: string
+): Promise< StyleElement >[] => {
+	const isCurrentDocument = doc === window.document;
+	let baseUrl = window.document.baseURI;
+
+	if ( ! isCurrentDocument && pageUrl ) {
+		try {
+			baseUrl = new URL( pageUrl, window.location.href ).href;
+		} catch {}
+	}
+
 	const currentStyleElements = getStyleElements( window.document ).filter(
 		isManaged
 	);
@@ -322,13 +443,23 @@ export const preloadStyles = ( doc: Document ): Promise< StyleElement >[] => {
 	// Elements parsed from a page fetched by the router are server-rendered by
 	// definition. That's not the case when the passed document is the current
 	// one, which happens when the router prepares the initial page.
-	const newStyleElements =
-		doc === window.document
-			? getStyleElements( doc ).filter( isManaged )
-			: getStyleElements( doc );
+	const newStyleElements = isCurrentDocument
+		? getStyleElements( doc ).filter( isManaged )
+		: getStyleElements( doc );
+
+	// Only the elements that the router adopts are rewritten. Those of the
+	// current document are managed by the scripts that inserted them.
+	if ( ! isCurrentDocument ) {
+		newStyleElements.forEach( canonicalizeStyleElement );
+	}
 
 	// Set styles in order.
-	return updateStylesWithSCS( currentStyleElements, newStyleElements );
+	return updateStylesWithSCS(
+		currentStyleElements,
+		newStyleElements,
+		window.document.head,
+		baseUrl
+	);
 };
 
 /**
