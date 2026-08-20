@@ -1,7 +1,6 @@
 import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
-	createRef,
 	forwardRef,
 	useCallback,
 	useId,
@@ -10,9 +9,17 @@ import {
 } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import { ControlWithError } from '../index';
-import { InputControl } from '../../form';
 
-type ValidatedInputControlProps = React.ComponentProps< typeof InputControl > &
+const ValidatedInput = forwardRef<
+	HTMLInputElement,
+	React.InputHTMLAttributes< HTMLInputElement > & { label?: string }
+>( function ValidatedInput( { label, ...restProps }, ref ) {
+	return <input ref={ ref } aria-label={ label } { ...restProps } />;
+} );
+
+type ValidatedInputControlProps = React.ComponentProps<
+	typeof ValidatedInput
+> &
 	Pick<
 		React.ComponentProps< typeof ControlWithError >,
 		'required' | 'markWhenOptional' | 'customValidity'
@@ -35,31 +42,15 @@ const ValidatedInputControl = forwardRef<
 			customValidity={ customValidity }
 			getValidityTarget={ () => validityTargetRef.current }
 		>
-			<InputControl ref={ mergedRefs } { ...restProps } />
+			<ValidatedInput ref={ mergedRefs } { ...restProps } />
 		</ControlWithError>
 	);
 } );
 
 describe( 'ControlWithError', () => {
 	describe( 'label cloning', () => {
-		const LabelConsumer = forwardRef<
-			HTMLInputElement,
-			{ label?: string }
-		>( function LabelConsumer( { label }, ref ) {
-			return <input ref={ ref } aria-label={ label } />;
-		} );
-
 		it( 'should pass string labels as strings when appending the required indicator', () => {
-			const inputRef = createRef< HTMLInputElement >();
-
-			render(
-				<ControlWithError
-					required
-					getValidityTarget={ () => inputRef.current }
-				>
-					<LabelConsumer ref={ inputRef } label="Opacity" />
-				</ControlWithError>
-			);
+			render( <ValidatedInputControl required label="Opacity" /> );
 
 			expect( screen.getByRole( 'textbox' ) ).toHaveAttribute(
 				'aria-label',
@@ -84,7 +75,7 @@ describe( 'ControlWithError', () => {
 			serverDelayMs: number;
 		} & Omit<
 			React.ComponentProps< typeof ValidatedInputControl >,
-			'value' | 'label' | 'onValueChange'
+			'value' | 'label' | 'onChange'
 		> ) => {
 			const [ text, setText ] = useState( '' );
 			const [ customValidity, setCustomValidity ] =
@@ -94,8 +85,10 @@ describe( 'ControlWithError', () => {
 					>[ 'customValidity' ]
 				>( undefined );
 
-			const onValueChange = useCallback(
-				( value?: string ) => {
+			const onChange = useCallback(
+				( event: React.ChangeEvent< HTMLInputElement > ) => {
+					const { value } = event.target;
+
 					setCustomValidity( {
 						type: 'validating',
 						message: 'Validating...',
@@ -103,7 +96,7 @@ describe( 'ControlWithError', () => {
 
 					// Simulate delayed server response
 					setTimeout( () => {
-						if ( value?.toLowerCase() === 'error' ) {
+						if ( value.toLowerCase() === 'error' ) {
 							setCustomValidity( {
 								type: 'invalid',
 								message: 'The word "error" is not allowed.',
@@ -116,7 +109,7 @@ describe( 'ControlWithError', () => {
 						}
 					}, serverDelayMs );
 
-					setText( value ?? '' );
+					setText( value );
 				},
 				[ serverDelayMs ]
 			);
@@ -125,7 +118,7 @@ describe( 'ControlWithError', () => {
 				<ValidatedInputControl
 					label="Text"
 					value={ text }
-					onValueChange={ onValueChange }
+					onChange={ onChange }
 					customValidity={ customValidity }
 					{ ...restProps }
 				/>
@@ -289,7 +282,6 @@ describe( 'ControlWithError', () => {
 							ref={ ref }
 							label="Text"
 							required
-							value=""
 							customValidity={ {
 								type: 'validating',
 								message: 'Validating...',
@@ -338,8 +330,8 @@ describe( 'ControlWithError', () => {
 				>( undefined );
 			return (
 				<ValidatedInputControl
-					onValueChange={ ( value ) =>
-						value === 'error'
+					onChange={ ( event ) =>
+						event.target.value === 'error'
 							? setCustomValidity( {
 									type: 'invalid',
 									message: 'The word "error" is not allowed.',
