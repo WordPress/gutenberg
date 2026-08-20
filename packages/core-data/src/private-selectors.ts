@@ -189,8 +189,25 @@ export const getPostsPageId = createRegistrySelector( ( select ) => () => {
 		: null;
 } );
 
+/**
+ * Post types that do not render inside a parent template on the frontend.
+ * Falling through to the template hierarchy for them would resolve an
+ * unrelated fallback template (ultimately `index`).
+ */
+const POST_TYPES_WITHOUT_PARENT_TEMPLATE = [
+	'wp_template',
+	'wp_template_part',
+	'wp_block',
+	'wp_navigation',
+	'attachment',
+];
+
 export const getTemplateId = createRegistrySelector(
 	( select ) => ( state, postType, postId ) => {
+		if ( POST_TYPES_WITHOUT_PARENT_TEMPLATE.includes( postType ) ) {
+			return;
+		}
+
 		const homepage = unlock( select( STORE_NAME ) ).getHomePage();
 
 		if ( ! homepage ) {
