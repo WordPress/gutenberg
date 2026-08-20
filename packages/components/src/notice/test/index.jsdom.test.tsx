@@ -141,6 +141,18 @@ describe( 'Notice', () => {
 			expect( speak ).not.toHaveBeenCalled();
 		} );
 
+		it( 'should speak the same message again after an empty message', () => {
+			const { rerender } = render(
+				<Notice spokenMessage="Saved">Content</Notice>
+			);
+			rerender( <Notice spokenMessage="">Content</Notice> );
+			rerender( <Notice spokenMessage="Saved">Content</Notice> );
+
+			expect( speak ).toHaveBeenCalledTimes( 2 );
+			expect( speak ).toHaveBeenNthCalledWith( 1, 'Saved', 'polite' );
+			expect( speak ).toHaveBeenNthCalledWith( 2, 'Saved', 'polite' );
+		} );
+
 		it( 'should speak a message containing components that use hooks', () => {
 			render(
 				<Notice>

@@ -310,6 +310,18 @@ describe( 'Snackbar', () => {
 			expect( speak ).not.toHaveBeenCalled();
 		} );
 
+		it( 'should speak the same message again after an empty message', () => {
+			const { rerender } = render(
+				<Snackbar spokenMessage="Saved">Content</Snackbar>
+			);
+			rerender( <Snackbar spokenMessage="">Content</Snackbar> );
+			rerender( <Snackbar spokenMessage="Saved">Content</Snackbar> );
+
+			expect( speak ).toHaveBeenCalledTimes( 2 );
+			expect( speak ).toHaveBeenNthCalledWith( 1, 'Saved', 'polite' );
+			expect( speak ).toHaveBeenNthCalledWith( 2, 'Saved', 'polite' );
+		} );
+
 		it( 'should speak a message containing components that use hooks', () => {
 			render(
 				<Snackbar>
