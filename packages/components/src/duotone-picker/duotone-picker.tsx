@@ -161,15 +161,17 @@ function DuotonePicker( {
 				)
 			}
 		>
-			<Spacer paddingTop={ options.length === 0 ? 0 : 4 }>
-				<VStack spacing={ 3 }>
-					{ ! disableCustomColors && ! disableCustomDuotone && (
-						<CustomDuotoneBar
-							value={ isUnset ? undefined : value }
-							onChange={ onChange }
-						/>
-					) }
-					{ ! disableCustomDuotone && (
+			{ /* Both controls are hidden when custom duotones are disabled,
+			   so the wrapper would contribute only its padding. */ }
+			{ ! disableCustomDuotone && (
+				<Spacer paddingTop={ options.length === 0 ? 0 : 4 }>
+					<VStack spacing={ 3 }>
+						{ ! disableCustomColors && (
+							<CustomDuotoneBar
+								value={ isUnset ? undefined : value }
+								onChange={ onChange }
+							/>
+						) }
 						<ColorListPicker
 							labels={ [ __( 'Shadows' ), __( 'Highlights' ) ] }
 							colors={ colorPalette }
@@ -193,9 +195,9 @@ function DuotonePicker( {
 								onChange( newValue );
 							} }
 						/>
-					) }
-				</VStack>
-			</Spacer>
+					</VStack>
+				</Spacer>
+			) }
 		</CircularOptionPicker>
 	);
 }
