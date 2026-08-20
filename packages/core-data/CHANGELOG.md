@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Allow the record ID to be omitted for keyless entities in `getRawEntityRecord`, `getEntityRecordEdits`, `getEntityRecordNonTransientEdits`, `hasEditsForEntityRecord`, `getEditedEntityRecord`, `isSavingEntityRecord`, `getLastEntitySaveError`, `editEntityRecord`, `clearEntityRecordEdits` and `saveEditedEntityRecord`. The `root`/`site` entity is registered with `key: false` and is already addressed without an ID throughout the editor, but the published types required one. `saveEditedEntityRecord` also documented its record ID as an `Object`.
+-   Allow the record ID to be omitted for keyless entities in `getRawEntityRecord`, `getEntityRecordEdits`, `getEntityRecordNonTransientEdits`, `hasEditsForEntityRecord`, `getEditedEntityRecord`, `isSavingEntityRecord`, `getLastEntitySaveError`, `editEntityRecord`, `clearEntityRecordEdits` and `saveEditedEntityRecord`. The `root`/`site` entity is registered with `key: false` and is already addressed without an ID throughout the editor, but the published types required one. `saveEditedEntityRecord` also documented its record ID as an `Object` ([#81857](https://github.com/WordPress/gutenberg/pull/81857)).
 
 ### Internal
 
