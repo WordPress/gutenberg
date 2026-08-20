@@ -403,6 +403,7 @@
             - render
 - name: ConfirmDialog
   props:
+      - __experimentalHideHeader
       - cancelButtonText
       - children
       - confirmButtonText

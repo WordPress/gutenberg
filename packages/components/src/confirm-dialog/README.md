@@ -81,6 +81,14 @@ function Example() {
 
 ## Props
 
+### `__experimentalHideHeader`
+
+ - Type: `boolean`
+ - Required: No
+ - Default: `true`
+
+Whether the underlying `Modal` should hide its header, `title` included.
+
 ### `children`
 
  - Type: `ReactNode`
