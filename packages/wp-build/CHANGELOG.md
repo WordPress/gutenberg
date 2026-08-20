@@ -2,9 +2,9 @@
 
 ## Unreleased
 
-### Breaking Changes
+### Internal
 
--   Generated wp-admin page templates no longer add the `boot-layout-container` class to their mount element. Target the generated page-specific mount ID instead ([#81756](https://github.com/WordPress/gutenberg/pull/81756)).
+-   Identify generated wp-admin page mount elements by their page-specific ID instead of a Boot class ([#81756](https://github.com/WordPress/gutenberg/pull/81756)).
 
 ### Bug Fixes
 

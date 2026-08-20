@@ -1,17 +1,5 @@
 @use "@wordpress/base-styles/colors";
 
-// View transitions are scoped to documents that contain the Boot layout.
-@media (max-width: 782px) {
-	:root:has(.layout) * {
-		view-transition-name: none !important;
-	}
-}
-
-:root:has(.layout)::view-transition-old(root),
-:root:has(.layout)::view-transition-new(root) {
-	animation-duration: 250ms;
-}
-
 @media not (prefers-reduced-motion: reduce) {
 	.canvas :global(.interface-interface-skeleton__header) {
 		view-transition-name: boot--canvas-header;
@@ -46,62 +34,110 @@
 			view-transition-name: boot-safari--canvas;
 		}
 	}
+}
 
-	:root:has(.layout) :global(.components-popover):first-of-type {
-		view-transition-name: boot--components-popover;
+// View transitions are scoped to documents that contain the Boot layout.
+:root:has(.layout) {
+	@media (max-width: 782px) {
+		* {
+			view-transition-name: none !important;
+		}
 	}
-}
 
-:root:has(.layout)::view-transition-group(boot--canvas-header),
-:root:has(.layout)::view-transition-group(boot--canvas-sidebar),
-:root:has(.layout)::view-transition-group(boot-safari--canvas),
-:root:has(.layout)::view-transition-group(boot--canvas) {
-	z-index: 1;
-}
+	&::view-transition-old(root),
+	&::view-transition-new(root) {
+		animation-duration: 250ms;
+	}
 
-:root:has(.layout)::view-transition-new(boot-safari--canvas),
-:root:has(.layout)::view-transition-old(boot-safari--canvas),
-:root:has(.layout)::view-transition-new(boot-safari--stage),
-:root:has(.layout)::view-transition-old(boot-safari--stage),
-:root:has(.layout)::view-transition-old(boot-safari--inspector),
-:root:has(.layout)::view-transition-new(boot-safari--inspector) {
-	width: auto;
-}
+	@media not (prefers-reduced-motion: reduce) {
+		:global(.components-popover):first-of-type {
+			view-transition-name: boot--components-popover;
+		}
+	}
 
-:root:has(.layout)::view-transition-new(boot--canvas),
-:root:has(.layout)::view-transition-old(boot--canvas),
-:root:has(.layout)::view-transition-new(boot--stage),
-:root:has(.layout)::view-transition-old(boot--stage),
-:root:has(.layout)::view-transition-new(boot--inspector),
-:root:has(.layout)::view-transition-old(boot--inspector) {
-	background: colors.$white;
-	border-radius: var(--wpds-border-radius-xl);
-	width: 100%;
-	height: 100%;
-	object-fit: none;
-	object-position: left top;
-	overflow: hidden;
-}
+	&::view-transition-group(boot--canvas-header),
+	&::view-transition-group(boot--canvas-sidebar),
+	&::view-transition-group(boot-safari--canvas),
+	&::view-transition-group(boot--canvas) {
+		z-index: 1;
+	}
 
-:root:has(.layout)::view-transition-new(boot--canvas),
-:root:has(.layout)::view-transition-old(boot--canvas) {
-	object-position: center top;
-}
+	&::view-transition-new(boot-safari--canvas),
+	&::view-transition-old(boot-safari--canvas),
+	&::view-transition-new(boot-safari--stage),
+	&::view-transition-old(boot-safari--stage),
+	&::view-transition-old(boot-safari--inspector),
+	&::view-transition-new(boot-safari--inspector) {
+		width: auto;
+	}
 
-:root:has(.layout)::view-transition-old(boot-safari--inspector):only-child,
-:root:has(.layout)::view-transition-old(boot--inspector):only-child,
-:root:has(.layout)::view-transition-old(boot-safari--stage):only-child,
-:root:has(.layout)::view-transition-old(boot--stage):only-child {
-	animation-name: zoomOut;
-	will-change: transform, opacity;
-}
+	&::view-transition-new(boot--canvas),
+	&::view-transition-old(boot--canvas),
+	&::view-transition-new(boot--stage),
+	&::view-transition-old(boot--stage),
+	&::view-transition-new(boot--inspector),
+	&::view-transition-old(boot--inspector) {
+		background: colors.$white;
+		border-radius: var(--wpds-border-radius-xl);
+		width: 100%;
+		height: 100%;
+		object-fit: none;
+		object-position: left top;
+		overflow: hidden;
+	}
 
-:root:has(.layout)::view-transition-new(boot-safari--inspector):only-child,
-:root:has(.layout)::view-transition-new(boot--inspector):only-child,
-:root:has(.layout)::view-transition-new(boot-safari--stage):only-child,
-:root:has(.layout)::view-transition-new(boot--stage):only-child {
-	animation-name: zoomIn;
-	will-change: transform, opacity;
+	&::view-transition-new(boot--canvas),
+	&::view-transition-old(boot--canvas) {
+		object-position: center top;
+	}
+
+	&::view-transition-old(boot-safari--inspector):only-child,
+	&::view-transition-old(boot--inspector):only-child,
+	&::view-transition-old(boot-safari--stage):only-child,
+	&::view-transition-old(boot--stage):only-child {
+		animation-name: zoomOut;
+		will-change: transform, opacity;
+	}
+
+	&::view-transition-new(boot-safari--inspector):only-child,
+	&::view-transition-new(boot--inspector):only-child,
+	&::view-transition-new(boot-safari--stage):only-child,
+	&::view-transition-new(boot--stage):only-child {
+		animation-name: zoomIn;
+		will-change: transform, opacity;
+	}
+
+	&::view-transition-new(boot-safari--canvas):only-child,
+	&::view-transition-new(boot--canvas):only-child {
+		animation-name: slideFromRight;
+		will-change: transform;
+	}
+
+	&::view-transition-old(boot-safari--canvas):only-child,
+	&::view-transition-old(boot--canvas):only-child {
+		animation-name: slideToRight;
+		will-change: transform;
+	}
+
+	&::view-transition-new(boot--canvas-header):only-child {
+		animation-name: slideHeaderFromTop;
+		will-change: transform;
+	}
+
+	&::view-transition-old(boot--canvas-header):only-child {
+		animation-name: slideHeaderToTop;
+		will-change: transform;
+	}
+
+	&::view-transition-new(boot--canvas-sidebar):only-child {
+		animation-name: slideSidebarFromRight;
+		will-change: transform;
+	}
+
+	&::view-transition-old(boot--canvas-sidebar):only-child {
+		animation-name: slideSidebarToRight;
+		will-change: transform;
+	}
 }
 
 @keyframes zoomOut {
@@ -126,18 +162,6 @@
 	}
 }
 
-:root:has(.layout)::view-transition-new(boot-safari--canvas):only-child,
-:root:has(.layout)::view-transition-new(boot--canvas):only-child {
-	animation-name: slideFromRight;
-	will-change: transform;
-}
-
-:root:has(.layout)::view-transition-old(boot-safari--canvas):only-child,
-:root:has(.layout)::view-transition-old(boot--canvas):only-child {
-	animation-name: slideToRight;
-	will-change: transform;
-}
-
 @keyframes slideFromRight {
 	from {
 		transform: translateX(100vw);
@@ -156,16 +180,6 @@
 	}
 }
 
-:root:has(.layout)::view-transition-new(boot--canvas-header):only-child {
-	animation-name: slideHeaderFromTop;
-	will-change: transform;
-}
-
-:root:has(.layout)::view-transition-old(boot--canvas-header):only-child {
-	animation-name: slideHeaderToTop;
-	will-change: transform;
-}
-
 @keyframes slideHeaderFromTop {
 	from {
 		transform: translateY(-100%);
@@ -176,16 +190,6 @@
 	to {
 		transform: translateY(-100%);
 	}
-}
-
-:root:has(.layout)::view-transition-new(boot--canvas-sidebar):only-child {
-	animation-name: slideSidebarFromRight;
-	will-change: transform;
-}
-
-:root:has(.layout)::view-transition-old(boot--canvas-sidebar):only-child {
-	animation-name: slideSidebarToRight;
-	will-change: transform;
 }
 
 @keyframes slideSidebarFromRight {
