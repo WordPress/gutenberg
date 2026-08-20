@@ -1,5 +1,11 @@
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
-import { memo, useMemo, useState } from '@wordpress/element';
+import {
+	memo,
+	useDeferredValue,
+	useEffect,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import {
 	Button,
@@ -40,6 +46,18 @@ const DEFAULT_QUERY = {
 };
 const MIN_TERMS_COUNT_FOR_FILTER = 8;
 const EMPTY_ARRAY = [];
+const SPEAK_DEBOUNCE_MS = 500;
+
+function getResultCount( termsTree ) {
+	let count = 0;
+	for ( const term of termsTree ) {
+		count++;
+		if ( undefined !== term.children ) {
+			count += getResultCount( term.children );
+		}
+	}
+	return count;
+}
 
 // Memoized on primitive props, so toggling one term does not re-render every
 // checkbox in the list.
@@ -194,8 +212,10 @@ export function HierarchicalTermSelector( { slug } ) {
 	const [ formParent, setFormParent ] = useState( '' );
 	const [ showForm, setShowForm ] = useState( false );
 	const [ filterValue, setFilterValue ] = useState( '' );
-	const [ filteredTermsTree, setFilteredTermsTree ] = useState( [] );
-	const debouncedSpeak = useDebounce( speak, 500 );
+	// Filtering rebuilds the visible list, so let typing stay responsive and
+	// render the results in a lower priority pass.
+	const deferredFilterValue = useDeferredValue( filterValue );
+	const debouncedSpeak = useDebounce( speak, SPEAK_DEBOUNCE_MS );
 
 	const {
 		hasCreateAction,
@@ -243,6 +263,7 @@ export function HierarchicalTermSelector( { slug } ) {
 
 	const { editPost } = useDispatch( editorStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const selectedTerms = useMemo( () => new Set( terms ), [ terms ] );
 	const availableTermsTree = useMemo(
@@ -251,6 +272,33 @@ export function HierarchicalTermSelector( { slug } ) {
 		// checking or unchecking a term.
 		[ availableTerms ]
 	);
+
+	const shownTerms = useMemo( () => {
+		if ( '' === deferredFilterValue ) {
+			return availableTermsTree;
+		}
+		return availableTermsTree
+			.map( getFilterMatcher( deferredFilterValue ) )
+			.filter( ( term ) => term );
+	}, [ availableTermsTree, deferredFilterValue ] );
+
+	const resultCount = getResultCount( shownTerms );
+
+	useEffect( () => {
+		if ( '' === deferredFilterValue ) {
+			return;
+		}
+		debouncedSpeak(
+			sprintf(
+				/* translators: %d: number of results. */
+				_n( '%d result found.', '%d results found.', resultCount ),
+				resultCount
+			),
+			'polite'
+		);
+
+		return () => debouncedSpeak.cancel();
+	}, [ resultCount, deferredFilterValue, debouncedSpeak ] );
 
 	/**
 	 * Update terms for post.
@@ -270,11 +318,6 @@ export function HierarchicalTermSelector( { slug } ) {
 				: [ ...terms, id ]
 		);
 	} );
-
-	const shownTerms =
-		'' !== filterValue ? filteredTermsTree : availableTermsTree;
-
-	const { createErrorNotice } = useDispatch( noticesStore );
 
 	if ( ! hasAssignAction ) {
 		return null;
@@ -355,34 +398,6 @@ export function HierarchicalTermSelector( { slug } ) {
 		onUpdateTerms( [ ...terms, newTerm.id ] );
 	};
 
-	const setFilter = ( value ) => {
-		const newFilteredTermsTree = availableTermsTree
-			.map( getFilterMatcher( value ) )
-			.filter( ( term ) => term );
-		const getResultCount = ( termsTree ) => {
-			let count = 0;
-			for ( let i = 0; i < termsTree.length; i++ ) {
-				count++;
-				if ( undefined !== termsTree[ i ].children ) {
-					count += getResultCount( termsTree[ i ].children );
-				}
-			}
-			return count;
-		};
-
-		setFilterValue( value );
-		setFilteredTermsTree( newFilteredTermsTree );
-
-		const resultCount = getResultCount( newFilteredTermsTree );
-		const resultsFoundMessage = sprintf(
-			/* translators: %d: number of results. */
-			_n( '%d result found.', '%d results found.', resultCount ),
-			resultCount
-		);
-
-		debouncedSpeak( resultsFoundMessage, 'assertive' );
-	};
-
 	const labelWithFallback = (
 		labelProperty,
 		fallbackIsCategory,
@@ -419,7 +434,7 @@ export function HierarchicalTermSelector( { slug } ) {
 					label={ filterLabel }
 					placeholder={ filterLabel }
 					value={ filterValue }
-					onChange={ setFilter }
+					onChange={ setFilterValue }
 				/>
 			) }
 			{ loading && (
