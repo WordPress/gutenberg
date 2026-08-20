@@ -9,9 +9,28 @@ const COLUMN_VERTICAL_ALIGNMENTS = [ 'top', 'center', 'bottom' ];
 const ROW_VERTICAL_ALIGNMENTS = [ ...COLUMN_VERTICAL_ALIGNMENTS, 'stretch' ];
 const FLEX_SIZE_LAYOUT_VALUES = [ 'fixed', 'fixedNoShrink' ];
 const DEFAULT_COLUMN_LAYOUT = { type: 'default' };
+const ROOT_STYLE_ATTRIBUTE_NAMES = [
+	'backgroundColor',
+	'borderColor',
+	'className',
+	'fontFamily',
+	'fontSize',
+	'gradient',
+	'textColor',
+];
 
 const getObjectValue = ( value ) =>
 	value && typeof value === 'object' && ! Array.isArray( value ) ? value : {};
+
+const getRootStyleAttributes = ( attributes ) => {
+	const normalizedAttributes = getObjectValue( attributes );
+	return ROOT_STYLE_ATTRIBUTE_NAMES.reduce( ( rootStyleAttributes, name ) => {
+		if ( typeof normalizedAttributes[ name ] === 'string' ) {
+			rootStyleAttributes[ name ] = normalizedAttributes[ name ];
+		}
+		return rootStyleAttributes;
+	}, {} );
+};
 
 const getColumnWidth = ( width ) => {
 	if ( Number.isFinite( width ) ) {
@@ -74,17 +93,24 @@ const getGridInnerBlocks = ( innerBlocks ) =>
 		const columnInnerBlocks = column.innerBlocks || [];
 		const columnStyle = getObjectValue( column?.attributes?.style );
 		const columnLayout = getObjectValue( column?.attributes?.layout );
+		const rootStyleAttributes = getRootStyleAttributes(
+			column?.attributes
+		);
 		const hasColumnStyle = Object.keys( columnStyle ).length > 0;
 		const hasColumnLayout = Object.keys( columnLayout ).length > 0;
+		const hasRootStyleAttributes =
+			Object.keys( rootStyleAttributes ).length > 0;
 		if (
 			columnInnerBlocks.length > 1 ||
 			hasColumnStyle ||
-			hasColumnLayout
+			hasColumnLayout ||
+			hasRootStyleAttributes
 		) {
 			return [
 				createBlock(
 					'core/group',
 					{
+						...rootStyleAttributes,
 						layout: hasColumnLayout
 							? columnLayout
 							: DEFAULT_COLUMN_LAYOUT,
@@ -122,13 +148,19 @@ const getRowInnerBlocks = ( innerBlocks ) => {
 			: { selfStretch: 'fill' };
 		const columnStyle = getObjectValue( column?.attributes?.style );
 		const columnLayout = getObjectValue( column?.attributes?.layout );
+		const rootStyleAttributes = getRootStyleAttributes(
+			column?.attributes
+		);
 		const hasColumnStyle = Object.keys( columnStyle ).length > 0;
 		const hasColumnLayout = Object.keys( columnLayout ).length > 0;
+		const hasRootStyleAttributes =
+			Object.keys( rootStyleAttributes ).length > 0;
 
 		if (
 			columnInnerBlocks.length === 1 &&
 			! hasColumnStyle &&
-			! hasColumnLayout
+			! hasColumnLayout &&
+			! hasRootStyleAttributes
 		) {
 			const innerBlock = columnInnerBlocks[ 0 ];
 			const style = getObjectValue( innerBlock.attributes?.style );
@@ -149,6 +181,7 @@ const getRowInnerBlocks = ( innerBlocks ) => {
 		return createBlock(
 			'core/group',
 			{
+				...rootStyleAttributes,
 				layout: hasColumnLayout ? columnLayout : DEFAULT_COLUMN_LAYOUT,
 				style: {
 					...columnStyle,

@@ -346,6 +346,40 @@ describe( 'transforms', () => {
 		}
 	);
 
+	it.each( [
+		[ 'Grid', 'group-grid' ],
+		[ 'Row', 'group-row' ],
+	] )(
+		'preserves root-level style attributes when transforming Columns to %s',
+		( _variationTitle, variationName ) => {
+			const rootStyleAttributes = {
+				backgroundColor: 'primary',
+				borderColor: 'accent',
+				className: 'is-style-example custom-class',
+				fontFamily: 'heading',
+				fontSize: 'large',
+				gradient: 'vivid-cyan-blue-to-vivid-purple',
+				textColor: 'contrast',
+			};
+			const block = createBlock( 'core/columns', {}, [
+				createBlock( 'core/column', rootStyleAttributes, [
+					createBlock( 'core/paragraph' ),
+				] ),
+			] );
+
+			const transformedBlocks = switchToBlockType(
+				block,
+				'core/group',
+				variationName
+			);
+
+			expect( transformedBlocks[ 0 ].innerBlocks[ 0 ] ).toMatchObject( {
+				name: 'core/group',
+				attributes: rootStyleAttributes,
+			} );
+		}
+	);
+
 	it( 'migrates Column widths to Row child sizing controls', () => {
 		const block = createBlock( 'core/columns', {}, [
 			createBlock( 'core/column', { width: '320px' }, [
