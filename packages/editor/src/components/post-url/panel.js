@@ -2,7 +2,6 @@ import { useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { Dropdown, Button, ExternalLink } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { safeDecodeURIComponent } from '@wordpress/url';
 import { store as coreStore } from '@wordpress/core-data';
 import PostURLCheck from './check';
 import PostURL from './index';
@@ -74,12 +73,21 @@ export default function PostURLPanel() {
 }
 
 function PostURLToggle( { isOpen, onClick } ) {
-	const { slug } = useSelect( ( select ) => {
+	const { permalink, homeUrl } = useSelect( ( select ) => {
+		const { getPermalink } = select( editorStore );
+		const { getEditedEntityRecord } = select( coreStore );
+		const siteSettings = getEditedEntityRecord( 'root', 'site' );
+
 		return {
-			slug: select( editorStore ).getEditedPostSlug(),
+			permalink: getPermalink(),
+			homeUrl: siteSettings?.url || '',
 		};
 	}, [] );
-	const decodedSlug = safeDecodeURIComponent( slug );
+
+	const croppedPermalink = permalink?.startsWith( homeUrl )
+		? permalink.slice( homeUrl.length )
+		: permalink;
+
 	return (
 		<Button
 			size="compact"
@@ -88,11 +96,11 @@ function PostURLToggle( { isOpen, onClick } ) {
 			aria-expanded={ isOpen }
 			aria-label={
 				// translators: %s: Current post link.
-				sprintf( __( 'Change link: %s' ), decodedSlug )
+				sprintf( __( 'Change link: %s' ), croppedPermalink || '' )
 			}
 			onClick={ onClick }
 		>
-			<>{ decodedSlug }</>
+			{ croppedPermalink }
 		</Button>
 	);
 }
