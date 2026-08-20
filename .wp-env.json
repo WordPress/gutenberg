@@ -1,6 +1,6 @@
 {
 	"$schema": "./schemas/json/wp-env.json",
-	"core": "WordPress/WordPress",
+	"core": "WordPress/WordPress#6.8-branch",
 	"plugins": [ "." ],
 	"themes": [ "./test/emptytheme" ],
 	"env": {
