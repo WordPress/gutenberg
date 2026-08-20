@@ -38,7 +38,7 @@
 		flex-direction: column;
 		min-width: 0;
 		min-height: 0;
-		margin: $grid-unit-30;
+		margin: $grid-unit-30 $grid-unit-30 $grid-unit-10 $grid-unit-30;
 
 		// Docked beside the 400px panel, the canvas keeps a workable crop area.
 		// The figure has to close at the dock breakpoint itself: at 960px the
@@ -48,7 +48,7 @@
 		// shrinking the canvas.
 		@include break-large() {
 			min-width: 440px;
-			margin: 0 $grid-unit-10 0 $grid-unit-30;
+			margin: 0 $grid-unit-30;
 		}
 	}
 
@@ -64,7 +64,7 @@
 		flex-direction: column;
 		align-items: center;
 		gap: $grid-unit-15;
-		padding: $grid-unit-20 $grid-unit-20 0;
+		padding: $grid-unit-10 $grid-unit-20 0 $grid-unit-20;
 		// The ruler masks the ticks behind its active number; tell it which
 		// surface to paint that mask in, now that it is off the grey stage.
 		--rotation-ruler-surface: #{$white};
@@ -132,11 +132,12 @@
 
 	// Below `large` the open panel owns the body, so the canvas steps aside
 	// rather than being squeezed into an unusable sliver.
-	.media-editor__body:has(.media-editor__sidebar) .media-editor__content {
+	.media-editor__body.has-details-open .media-editor__content {
 		display: none;
 
 		@include break-large() {
 			display: flex;
+			margin: 0 $grid-unit-10 0 $grid-unit-30;
 		}
 	}
 

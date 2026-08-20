@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
 	Button,
 	Spinner,
@@ -593,7 +594,11 @@ function MediaEditorContent( {
 						<Spinner />
 					</div>
 				) : (
-					<div className="media-editor__body">
+					<div
+						className={ clsx( 'media-editor__body', {
+							'has-details-open': isSidebarOpen,
+						} ) }
+					>
 						<NavigableRegion
 							className="media-editor__content"
 							ariaLabel={
