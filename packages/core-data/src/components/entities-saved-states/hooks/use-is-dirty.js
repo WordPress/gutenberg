@@ -21,7 +21,34 @@ export const useIsDirty = () => {
 			} = select( STORE_NAME );
 
 			return {
-				editedEntities: __experimentalGetDirtyEntityRecords(),
+				editedEntities: __experimentalGetDirtyEntityRecords().filter(
+					// Media a block proposes attaching to the post it is used in
+					// is reviewed where it makes sense — beside the post being
+					// published — rather than here among templates and patterns.
+					// Scoped to an edit that *only* sets `post`, so an attachment
+					// dirtied for any other reason still belongs in this panel.
+					( record ) => {
+						if (
+							record.kind !== 'postType' ||
+							record.name !== 'attachment'
+						) {
+							return true;
+						}
+
+						const editedKeys = Object.keys(
+							getEntityRecordEdits(
+								'postType',
+								'attachment',
+								record.key
+							) ?? {}
+						);
+
+						return ! (
+							editedKeys.length === 1 &&
+							editedKeys[ 0 ] === 'post'
+						);
+					}
+				),
 				siteEdits: getEntityRecordEdits( 'root', 'site' ),
 				siteEntityConfig: getEntityConfig( 'root', 'site' ),
 			};

@@ -2,9 +2,9 @@
 
 ## Unreleased
 
-### Enhancements
+### Bug Fixes
 
--   `EntitiesSavedStates`: Describe the attachment group, so media a block proposes attaching to the post explains itself and its visibility caveat ([#66663](https://github.com/WordPress/gutenberg/issues/66663)).
+-   `EntitiesSavedStates`: Leave out media a block has proposed attaching to the post it is used in, which is reviewed beside the post being published rather than among templates and patterns ([#66663](https://github.com/WordPress/gutenberg/issues/66663)).
 
 ### Bug Fixes
 

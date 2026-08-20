@@ -26,6 +26,7 @@ import {
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
+import savePendingAttachedMedia from './utils/save-pending-attached-media';
 import { unlock } from '../lock-unlock';
 import { setCanvasWidth } from './private-actions';
 import { getCanvasWidthByDeviceType } from '../utils/device-type';
@@ -275,6 +276,33 @@ export const savePost =
 				error = err;
 			}
 		}
+
+		// Media the Image and Gallery blocks proposed attaching, and the user
+		// left checked in the pre-publish review.
+		//
+		// Only on the save that takes the post out of drafting, because that is
+		// the only save the review is shown for: a plain "Save draft" dispatches
+		// this action directly, with no panel, so writing there would be exactly
+		// the unseen change this feature exists to avoid. Pending edits simply
+		// wait for the publish they were reviewed against.
+		//
+		// Failures are swallowed on purpose: the post saved, and anything that
+		// didn't write stays pending for the next attempt.
+		const isLeavingDraft =
+			previousRecord.status !== 'publish' &&
+			[ 'publish', 'future', 'private' ].includes(
+				select.getCurrentPost().status
+			);
+
+		if (
+			! error &&
+			! options.isAutosave &&
+			! options.isPreview &&
+			isLeavingDraft
+		) {
+			await savePendingAttachedMedia( registry, previousRecord.id );
+		}
+
 		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
 
 		if (
