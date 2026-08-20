@@ -63,18 +63,8 @@ Called when the user presses the close button.
 ### showPopoverHeader
 
 Whether to render the popover header, which holds the title, the close button
-and a "Reset" action that clears the date. Set it to `false` when the picker is
-rendered inline, where the surrounding UI already provides a heading; the
-"Reset" action then renders as a button below the picker.
-
-- Type: `Boolean`
-- Required: No
-- Default: `true`
-
-### canReset
-
-Whether there is a date to reset. When `false` the "Reset" action is not
-rendered at all, since clearing an already unset date does nothing.
+and a "Reset" action. Set it to `false` when the picker is rendered inline,
+where the surrounding UI already provides a heading.
 
 - Type: `Boolean`
 - Required: No
