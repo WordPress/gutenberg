@@ -8,6 +8,7 @@ const MAXIMUM_SELECTED_BLOCKS = 6;
 const COLUMN_VERTICAL_ALIGNMENTS = [ 'top', 'center', 'bottom' ];
 const ROW_VERTICAL_ALIGNMENTS = [ ...COLUMN_VERTICAL_ALIGNMENTS, 'stretch' ];
 const FLEX_SIZE_LAYOUT_VALUES = [ 'fixed', 'fixedNoShrink' ];
+const DEFAULT_COLUMN_LAYOUT = { type: 'default' };
 
 const getObjectValue = ( value ) =>
 	value && typeof value === 'object' && ! Array.isArray( value ) ? value : {};
@@ -71,11 +72,26 @@ const getColumnBlocksFromRow = ( innerBlocks ) =>
 const getGridInnerBlocks = ( innerBlocks ) =>
 	innerBlocks.flatMap( ( column ) => {
 		const columnInnerBlocks = column.innerBlocks || [];
-		if ( columnInnerBlocks.length > 1 ) {
+		const columnStyle = getObjectValue( column?.attributes?.style );
+		const columnLayout = getObjectValue( column?.attributes?.layout );
+		const hasColumnStyle = Object.keys( columnStyle ).length > 0;
+		const hasColumnLayout = Object.keys( columnLayout ).length > 0;
+		if (
+			columnInnerBlocks.length > 1 ||
+			hasColumnStyle ||
+			hasColumnLayout
+		) {
 			return [
 				createBlock(
 					'core/group',
-					{ layout: { type: 'constrained' } },
+					{
+						layout: hasColumnLayout
+							? columnLayout
+							: DEFAULT_COLUMN_LAYOUT,
+						...( hasColumnStyle && {
+							style: columnStyle,
+						} ),
+					},
 					columnInnerBlocks
 				),
 			];
@@ -104,8 +120,16 @@ const getRowInnerBlocks = ( innerBlocks ) => {
 		const childLayout = columnWidth
 			? { selfStretch: 'fixed', flexSize: columnWidth }
 			: { selfStretch: 'fill' };
+		const columnStyle = getObjectValue( column?.attributes?.style );
+		const columnLayout = getObjectValue( column?.attributes?.layout );
+		const hasColumnStyle = Object.keys( columnStyle ).length > 0;
+		const hasColumnLayout = Object.keys( columnLayout ).length > 0;
 
-		if ( columnInnerBlocks.length === 1 ) {
+		if (
+			columnInnerBlocks.length === 1 &&
+			! hasColumnStyle &&
+			! hasColumnLayout
+		) {
 			const innerBlock = columnInnerBlocks[ 0 ];
 			const style = getObjectValue( innerBlock.attributes?.style );
 			const layout = getObjectValue( style.layout );
@@ -125,8 +149,14 @@ const getRowInnerBlocks = ( innerBlocks ) => {
 		return createBlock(
 			'core/group',
 			{
-				layout: { type: 'constrained' },
-				style: { layout: childLayout },
+				layout: hasColumnLayout ? columnLayout : DEFAULT_COLUMN_LAYOUT,
+				style: {
+					...columnStyle,
+					layout: {
+						...getObjectValue( columnStyle.layout ),
+						...childLayout,
+					},
+				},
 			},
 			columnInnerBlocks
 		);
