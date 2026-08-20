@@ -75,6 +75,9 @@ export function AiPluginCallout() {
 				( name ) => !! siteSettings?.[ name ]
 			);
 
+		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+		const plugin = store.getEntityRecord( 'root', 'plugin', AI_PLUGIN_ID );
+
 		const hasFinished = store.hasFinishedResolution( 'getEntityRecord', [
 			'root',
 			'plugin',
@@ -89,8 +92,6 @@ export function AiPluginCallout() {
 				hasConnectedProvider: hasConnected,
 			};
 		}
-
-		const plugin = store.getEntityRecord( 'root', 'plugin', AI_PLUGIN_ID );
 
 		if ( ! plugin ) {
 			return {

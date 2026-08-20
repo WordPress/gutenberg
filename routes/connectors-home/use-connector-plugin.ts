@@ -128,6 +128,13 @@ export function useConnectorPlugin( {
 				};
 			}
 
+			// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+			const plugin = store.getEntityRecord(
+				'root',
+				'plugin',
+				pluginBasename
+			);
+
 			const hasFinished = store.hasFinishedResolution(
 				'getEntityRecord',
 				[ 'root', 'plugin', pluginBasename ]
@@ -140,12 +147,6 @@ export function useConnectorPlugin( {
 					canManagePlugins: undefined as boolean | undefined,
 				};
 			}
-
-			const plugin = store.getEntityRecord(
-				'root',
-				'plugin',
-				pluginBasename
-			);
 
 			// Plugin data resolved — user has API permissions.
 			if ( plugin ) {
