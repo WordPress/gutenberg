@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `getEntityRecord`: Discard a REST response that is delivered after a newer response for the same request. Invalidating a resolution starts a second request while the first may still be in flight, and the store kept whichever one arrived last, so a record read from the database before an update could overwrite the updated one ([#81846](https://github.com/WordPress/gutenberg/pull/81846)).
+
 ## 7.53.0 (2026-08-12)
 
 ### Enhancements
