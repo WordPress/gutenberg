@@ -54,10 +54,16 @@ function useSpokenMessage(
 			spokenMessage = messageContainerRef.current?.innerHTML;
 		}
 
+		if ( ! spokenMessage ) {
+			// An empty message resets the deduplication, so that a
+			// subsequent identical message is announced again.
+			previouslySpokenRef.current = undefined;
+			return;
+		}
+
 		if (
-			spokenMessage &&
-			( spokenMessage !== previouslySpokenRef.current?.message ||
-				politeness !== previouslySpokenRef.current?.politeness )
+			spokenMessage !== previouslySpokenRef.current?.message ||
+			politeness !== previouslySpokenRef.current?.politeness
 		) {
 			previouslySpokenRef.current = {
 				message: spokenMessage,
