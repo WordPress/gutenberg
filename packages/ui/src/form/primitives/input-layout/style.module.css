@@ -61,6 +61,9 @@
 			 * control's validation state should be reported to the user.
 			 */
 			&:has(:is(input, select, textarea):invalid[data-validity-visible]) {
+				/* Read by the shared focus-ring mixin, so the ring matches the border. */
+				--focus-color: var(--wpds-color-stroke-interactive-error);
+
 				border-color: var(--wpds-color-stroke-interactive-error);
 
 				&:hover {
