@@ -19,7 +19,6 @@
 			"source": "html",
 			"selector": "ol,ul",
 			"multiline": "li",
-			"__unstableMultilineWrapperTags": [ "ol", "ul" ],
 			"default": "",
 			"role": "content"
 		},
@@ -79,7 +78,8 @@
 		"__experimentalSlashInserter": true,
 		"interactivity": {
 			"clientNavigation": true
-		}
+		},
+		"listView": true
 	},
 	"selectors": {
 		"border": ".wp-block-list:not(.wp-block-list .wp-block-list)"

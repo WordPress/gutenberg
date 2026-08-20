@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { isBlobURL, createBlobURL } from '@wordpress/blob';
 import { createBlock, getBlockBindingsSource } from '@wordpress/blocks';
 import { Placeholder } from '@wordpress/components';
@@ -24,24 +17,19 @@ import { __, sprintf } from '@wordpress/i18n';
 import { image as icon, plugins as pluginsIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { useResizeObserver } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
+import { getProtocol, prependHTTPS } from '@wordpress/url';
+import { store as uploadStore } from '@wordpress/upload-media';
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
 import Image from './image';
 import { isValidFileType } from './utils';
 import { useMaxWidthObserver } from './use-max-width-observer';
-
-/**
- * Module constants
- */
 import {
 	LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_CUSTOM,
 	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_NONE,
 	ALLOWED_MEDIA_TYPES,
+	DEFAULT_MEDIA_SIZE_SLUG,
 } from './constants';
 
 export const pickRelevantMediaFiles = ( image, size ) => {
@@ -98,7 +86,6 @@ export function ImageEdit( {
 } ) {
 	const {
 		url = '',
-		alt,
 		caption,
 		id,
 		width,
@@ -126,11 +113,6 @@ export function ImageEdit( {
 
 	const isSmallContainer = placeholderWidth && placeholderWidth < 160;
 
-	const altRef = useRef();
-	useEffect( () => {
-		altRef.current = alt;
-	}, [ alt ] );
-
 	const captionRef = useRef();
 	useEffect( () => {
 		captionRef.current = caption;
@@ -145,8 +127,6 @@ export function ImageEdit( {
 			setAttributes( {
 				width: undefined,
 				height: undefined,
-				aspectRatio: undefined,
-				scale: undefined,
 			} );
 		}
 	}, [ __unstableMarkNextChangeAsNotPersistent, align, setAttributes ] );
@@ -161,13 +141,28 @@ export function ImageEdit( {
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
-		createErrorNotice( message, { type: 'snackbar' } );
+		/*
+		 * Upload errors explain what went wrong and what to do about it, which
+		 * can take a couple of sentences, so they stay put until dismissed
+		 * instead of timing out like a success message.
+		 */
+		createErrorNotice( message, {
+			type: 'snackbar',
+			explicitDismiss: true,
+		} );
+		setTemporaryURL();
 		setAttributes( {
 			src: undefined,
 			id: undefined,
 			url: undefined,
 			blob: undefined,
 		} );
+	}
+
+	function onFilesPreUpload( files ) {
+		if ( files.length === 1 ) {
+			setTemporaryURL( createBlobURL( files[ 0 ] ) );
+		}
 	}
 
 	function onSelectImagesList( images ) {
@@ -239,7 +234,7 @@ export function ImageEdit( {
 
 		// Try to use the previous selected image size if its available
 		// otherwise try the default image size or fallback to "full"
-		let newSize = 'full';
+		let newSize = DEFAULT_MEDIA_SIZE_SLUG;
 		if ( sizeSlug && hasSize( media, sizeSlug ) ) {
 			newSize = sizeSlug;
 		} else if ( hasSize( media, imageDefaultSize ) ) {
@@ -247,6 +242,18 @@ export function ImageEdit( {
 		}
 
 		let mediaAttributes = pickRelevantMediaFiles( media, newSize );
+
+		// Normalize newline characters in caption to <br />
+		// to preserve line breaks in both editor and frontend.
+		if (
+			typeof mediaAttributes.caption === 'string' &&
+			mediaAttributes.caption.includes( '\n' )
+		) {
+			mediaAttributes.caption = mediaAttributes.caption.replace(
+				/\n/g,
+				'<br>'
+			);
+		}
 
 		// If a caption text was meanwhile written by the user,
 		// make sure the text is not overwritten by empty captions.
@@ -269,7 +276,6 @@ export function ImageEdit( {
 		if ( ! linkDestination ) {
 			// Use the WordPress option to determine the proper default.
 			// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
-			// TODO: fix this in a follow up PR, requires updating media-text and ui component.
 			switch (
 				window?.wp?.media?.view?.settings?.defaultProps?.link ||
 				LINK_DESTINATION_NONE
@@ -313,10 +319,14 @@ export function ImageEdit( {
 	}
 
 	function onSelectURL( newURL ) {
-		if ( newURL !== url ) {
+		// Handle URLs without protocol.
+		const normalizedNewURL = getProtocol( newURL )
+			? newURL
+			: prependHTTPS( newURL );
+		if ( normalizedNewURL !== url ) {
 			setAttributes( {
 				blob: undefined,
-				url: newURL,
+				url: normalizedNewURL,
 				id: undefined,
 				sizeSlug: getSettings().imageDefaultSize,
 			} );
@@ -333,6 +343,17 @@ export function ImageEdit( {
 
 	const isExternal = isExternalImage( id, url );
 	const src = isExternal ? url : undefined;
+
+	const isSideloading = useSelect(
+		( select ) => {
+			if ( ! window.__clientSideMediaProcessing || ! id ) {
+				return false;
+			}
+			return select( uploadStore ).isUploadingById( id );
+		},
+		[ id ]
+	);
+
 	const mediaPreview = !! url && (
 		<img
 			alt={ __( 'Edit image' ) }
@@ -346,7 +367,7 @@ export function ImageEdit( {
 	const shadowProps = getShadowClassesAndStyles( attributes );
 
 	const classes = clsx( className, {
-		'is-transient': !! temporaryURL,
+		'is-transient': !! temporaryURL || isSideloading,
 		'is-resized': !! width || !! height,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'has-custom-border':
@@ -390,6 +411,11 @@ export function ImageEdit( {
 		},
 		[ context, isSingleSelected, metadata?.bindings?.url ]
 	);
+	// `height: 'auto'` is not a pinned dimension (it lets the height follow the
+	// aspect ratio, e.g. for an image pasted with both width and height). Treat
+	// it as absent so the placeholder box keeps its aspect ratio and pinned
+	// width instead of collapsing to a 100%×100% fill.
+	const pinnedHeight = height === 'auto' ? undefined : height;
 	const placeholder = ( content ) => {
 		return (
 			<Placeholder
@@ -412,11 +438,11 @@ export function ImageEdit( {
 				}
 				style={ {
 					aspectRatio:
-						! ( width && height ) && aspectRatio
+						! ( width && pinnedHeight ) && aspectRatio
 							? aspectRatio
 							: undefined,
-					width: height && aspectRatio ? '100%' : width,
-					height: width && aspectRatio ? '100%' : height,
+					width: pinnedHeight && aspectRatio ? '100%' : width,
+					height: width && aspectRatio ? '100%' : pinnedHeight,
 					objectFit: scale,
 					...borderProps.style,
 					...shadowProps.style,
@@ -437,6 +463,7 @@ export function ImageEdit( {
 			<figure { ...blockProps }>
 				<Image
 					temporaryURL={ temporaryURL }
+					isSideloading={ isSideloading }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					isSingleSelected={ isSingleSelected }
@@ -455,9 +482,9 @@ export function ImageEdit( {
 					icon={ <BlockIcon icon={ icon } /> }
 					onSelect={ onSelectImage }
 					onSelectURL={ onSelectURL }
+					onFilesPreUpload={ onFilesPreUpload }
 					onError={ onUploadError }
 					placeholder={ placeholder }
-					accept="image/*"
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					handleUpload={ ( files ) => files.length === 1 }
 					value={ { id, src } }

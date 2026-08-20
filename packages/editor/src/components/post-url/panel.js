@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { Dropdown, Button, ExternalLink } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { safeDecodeURIComponent } from '@wordpress/url';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import PostURLCheck from './check';
 import PostURL from './index';
 import PostPanelRow from '../post-panel-row';

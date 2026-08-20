@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { DateTimePicker, TimePicker } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { forwardRef } from '@wordpress/element';
 import { getSettings } from '@wordpress/date';
-
-/**
- * Internal dependencies
- */
 import InspectorPopoverHeader from '../inspector-popover-header';
 
 export function PublishDateTimePicker(
@@ -18,6 +11,7 @@ export function PublishDateTimePicker(
 		showPopoverHeaderActions,
 		isCompact,
 		currentDate,
+		title,
 		...additionalProps
 	},
 	ref
@@ -33,7 +27,7 @@ export function PublishDateTimePicker(
 	return (
 		<div ref={ ref } className="block-editor-publish-date-time-picker">
 			<InspectorPopoverHeader
-				title={ __( 'Publish' ) }
+				title={ title || __( 'Publish' ) }
 				actions={
 					showPopoverHeaderActions
 						? [

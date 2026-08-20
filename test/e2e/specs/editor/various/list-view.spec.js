@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'List View', () => {
@@ -58,7 +55,7 @@ test.describe( 'List View', () => {
 			exact: true,
 		} );
 		const headingBlockItem = listView.getByRole( 'gridcell', {
-			name: 'Heading',
+			name: 'Heading 2',
 			exact: true,
 		} );
 
@@ -356,7 +353,7 @@ test.describe( 'List View', () => {
 			name: 'Block navigation structure',
 		} );
 
-		// The paragraph item should be selected.
+		// The paragraph item should be selected and focused.
 		await expect(
 			listView.getByRole( 'gridcell', {
 				name: 'Paragraph',
@@ -364,6 +361,9 @@ test.describe( 'List View', () => {
 				selected: true,
 			} )
 		).toBeVisible();
+		await expect(
+			listView.getByRole( 'link', { name: 'Paragraph' } )
+		).toBeFocused();
 
 		// Navigate to the image block item.
 		await page.keyboard.press( 'ArrowUp' );
@@ -403,6 +403,7 @@ test.describe( 'List View', () => {
 
 		// Open List View.
 		await pageUtils.pressKeys( 'access+o' );
+		await expect( imageItem ).toBeFocused();
 
 		// Focus the list view close button and make sure the shortcut will
 		// close the list view. This is to catch a bug where elements could be
@@ -424,6 +425,7 @@ test.describe( 'List View', () => {
 
 		// Open List View.
 		await pageUtils.pressKeys( 'access+o' );
+		await expect( imageItem ).toBeFocused();
 
 		// Focus the outline tab and select it. This test ensures the outline
 		// tab receives similar focus events based on the shortcut.
@@ -496,6 +498,33 @@ test.describe( 'List View', () => {
 			listView.getByRole( 'link', {
 				name: 'Image',
 			} )
+		).toBeFocused();
+	} );
+
+	test( 'should place focus on the first block when no block is selected', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { content: 'First' },
+		} );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+
+		// Clicking the title deselects the blocks.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.click();
+
+		// Open List View.
+		await pageUtils.pressKeys( 'access+o' );
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		await expect(
+			listView.getByRole( 'link', { name: 'First' } )
 		).toBeFocused();
 	} );
 
@@ -640,6 +669,17 @@ test.describe( 'List View', () => {
 				name: 'Copy Styles',
 			} )
 			.click();
+
+		// Wait for the copy confirmation. It only shows up once the styles
+		// have actually been written to the clipboard: the click on "Copy
+		// Styles" resolves before the asynchronous clipboard write settles,
+		// so pasting right away can read the clipboard before the styles
+		// are in it.
+		await expect(
+			page
+				.getByTestId( 'snackbar' )
+				.getByText( 'Styles copied to clipboard.' )
+		).toBeVisible();
 
 		// Open List View.
 		await listViewUtils.openListView();
@@ -1095,7 +1135,7 @@ test.describe( 'List View', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		// Move focus and select the Heading block.
 		await listView
-			.getByRole( 'gridcell', { name: 'Heading', exact: true } )
+			.getByRole( 'gridcell', { name: 'Heading 2', exact: true } )
 			.dblclick();
 		// Select both inner blocks in the column.
 		await page.keyboard.press( 'Shift+ArrowDown' );
@@ -1163,7 +1203,7 @@ test.describe( 'List View', () => {
 			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
 		);
 		await listView
-			.getByRole( 'gridcell', { name: 'Paragraph' } )
+			.getByRole( 'gridcell', { name: 'Paragraph', exact: true } )
 			.getByRole( 'link' )
 			.focus();
 		await expect
@@ -1193,7 +1233,7 @@ test.describe( 'List View', () => {
 		} );
 		// Click on the Heading block to select it.
 		await listView
-			.getByRole( 'gridcell', { name: 'Heading', exact: true } )
+			.getByRole( 'gridcell', { name: 'Heading 2', exact: true } )
 			.click();
 		await listView
 			.getByRole( 'gridcell', { name: 'File' } )
@@ -1313,6 +1353,11 @@ test.describe( 'List View', () => {
 		const optionsForFileMenu = page.getByRole( 'menu', {
 			name: 'Options',
 		} );
+		// The menu moves focus to its first item on mount. Keys sent before
+		// that lands are handled by the toggle button instead of the menu.
+		const firstMenuItem = optionsForFileMenu
+			.getByRole( 'menuitem' )
+			.first();
 		await expect(
 			optionsForFileToggle,
 			'Pressing arrow right should move focus to the menu dropdown toggle button'
@@ -1323,6 +1368,7 @@ test.describe( 'List View', () => {
 			optionsForFileMenu,
 			'Pressing Enter should open the menu dropdown'
 		).toBeVisible();
+		await expect( firstMenuItem ).toBeFocused();
 
 		await page.keyboard.press( 'Escape' );
 		await expect(
@@ -1339,6 +1385,7 @@ test.describe( 'List View', () => {
 			optionsForFileMenu,
 			'Pressing Space should also open the menu dropdown'
 		).toBeVisible();
+		await expect( firstMenuItem ).toBeFocused();
 
 		await pageUtils.pressKeys( 'primaryAlt+t' ); // Keyboard shortcut for Insert before.
 		await expect
@@ -1360,6 +1407,7 @@ test.describe( 'List View', () => {
 			optionsForFileMenu,
 			'Pressing Space should also open the menu dropdown'
 		).toBeVisible();
+		await expect( firstMenuItem ).toBeFocused();
 		await pageUtils.pressKeys( 'access+z' ); // Keyboard shortcut for Delete.
 		await expect
 			.poll(
@@ -1380,6 +1428,7 @@ test.describe( 'List View', () => {
 			optionsForFileMenu.getByRole( 'menuitem', { name: 'Delete' } ),
 			'The delete menu item should be hidden for locked blocks'
 		).toBeHidden();
+		await expect( firstMenuItem ).toBeFocused();
 		await pageUtils.pressKeys( 'access+z' );
 		await expect
 			.poll(
@@ -1394,6 +1443,54 @@ test.describe( 'List View', () => {
 			optionsForFileMenu,
 			'The dropdown menu should also be visible'
 		).toBeVisible();
+	} );
+
+	test( 'should place the caret at the end of the block when activating from List View', async ( {
+		editor,
+		page,
+		listViewUtils,
+	} ) => {
+		// Insert a paragraph with some text.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First paragraph' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second paragraph' },
+		} );
+
+		// Open List View.
+		const listView = await listViewUtils.openListView();
+
+		// Click the first paragraph in List View to select it,
+		// then press Enter to activate it (transfer focus to canvas).
+		// Keyboard activation (Enter/Space) places the caret at the end
+		// of the block, while mouse click keeps focus in the list view.
+		await listView
+			.getByRole( 'gridcell', { name: 'Paragraph' } )
+			.first()
+			.click();
+		await page.keyboard.press( 'Enter' );
+
+		// Press Enter to split the block at the caret position.
+		// If the caret is at the end, this creates a new block after the first paragraph.
+		// If the caret is at the start, this creates a new block before the first paragraph.
+		await page.keyboard.press( 'Enter' );
+
+		// Verify the block order: if the caret was at the end, the new empty
+		// block should be after the first paragraph, not before it.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'First paragraph' },
+			},
+			{ name: 'core/paragraph', attributes: { content: '' } },
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Second paragraph' },
+			},
+		] );
 	} );
 } );
 

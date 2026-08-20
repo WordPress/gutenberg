@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "test/get-server-context",
 	"title": "E2E Interactivity tests - getServerContext",
 	"category": "text",

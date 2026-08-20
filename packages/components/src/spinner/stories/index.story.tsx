@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
-import type { StoryFn, Meta } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
+import type { StoryFn, Meta } from '@storybook/react-vite';
 import Spinner from '../';
 import { space } from '../../utils/space';
 
@@ -18,6 +11,11 @@ const meta: Meta< typeof Spinner > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Use [`Spinner`](?path=/docs/design-system-components-spinner--docs) from `@wordpress/ui` instead.',
+		},
 	},
 };
 export default meta;

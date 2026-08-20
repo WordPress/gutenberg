@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/mixins" as *;
+
 .wp-block-post-template {
 	margin-top: 0;
 	margin-bottom: 0;
@@ -29,9 +32,9 @@
 	}
 }
 
-@media ( max-width: $break-small ) {
+@media (max-width: $break-small) {
 	// Temporary specificity bump until "wp-container" layout specificity is revisited.
-	.wp-block-post-template-is-layout-grid.wp-block-post-template-is-layout-grid.wp-block-post-template-is-layout-grid.wp-block-post-template-is-layout-grid {
+	.wp-block-post-template-is-layout-grid[class*="columns-"]:not(.has-native-responsive-grid) {
 		grid-template-columns: 1fr;
 	}
 }

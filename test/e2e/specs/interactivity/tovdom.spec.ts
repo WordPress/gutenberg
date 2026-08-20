@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 
 test.describe( 'toVdom', () => {
@@ -8,9 +5,11 @@ test.describe( 'toVdom', () => {
 		await utils.activatePlugins();
 		await utils.addPostWithBlock( 'test/tovdom' );
 	} );
+
 	test.beforeEach( async ( { interactivityUtils: utils, page } ) => {
 		await page.goto( utils.getLink( 'test/tovdom' ) );
 	} );
+
 	test.afterAll( async ( { interactivityUtils: utils } ) => {
 		await utils.deactivatePlugins();
 		await utils.deleteAllPosts();
@@ -19,6 +18,7 @@ test.describe( 'toVdom', () => {
 	test( 'it should delete comments', async ( { page } ) => {
 		const el = page.getByTestId( 'it should delete comments' );
 		const c = await el.innerHTML();
+		expect( c ).not.toContain( '##last-child##' );
 		expect( c ).not.toContain( '##1##' );
 		expect( c ).not.toContain( '##2##' );
 		const el2 = page.getByTestId(
@@ -32,6 +32,7 @@ test.describe( 'toVdom', () => {
 			'it should delete processing instructions'
 		);
 		const c = await el.innerHTML();
+		expect( c ).not.toContain( '##last-child##' );
 		expect( c ).not.toContain( '##1##' );
 		expect( c ).not.toContain( '##2##' );
 		const el2 = page.getByTestId(

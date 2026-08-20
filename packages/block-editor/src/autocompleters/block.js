@@ -1,18 +1,11 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import {
+	cloneBlock,
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
-	parse,
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { searchBlockItems } from '../components/inserter/search-items';
 import useBlockTypesState from '../components/inserter/hooks/use-block-types-state';
 import BlockIcon from '../components/block-icon';
@@ -129,23 +122,25 @@ function createBlockCompleter() {
 				name,
 				initialAttributes,
 				innerBlocks,
+				innerContent,
 				syncStatus,
-				content,
+				blocks,
 			} = inserterItem;
 
 			return {
 				action: 'replace',
 				value:
 					syncStatus === 'unsynced'
-						? parse( content, {
-								__unstableSkipMigrationLogs: true,
-						  } )
+						? ( blocks ?? [] ).map( ( block ) =>
+								cloneBlock( block )
+						  )
 						: createBlock(
 								name,
 								initialAttributes,
 								createBlocksFromInnerBlocksTemplate(
 									innerBlocks
-								)
+								),
+								innerContent
 						  ),
 			};
 		},

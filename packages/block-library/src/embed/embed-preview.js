@@ -1,25 +1,10 @@
-/**
- * Internal dependencies
- */
-import { getPhotoHtml } from './util';
-
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { Placeholder, SandBox } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import { getAuthority } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
+import { getPhotoHtml } from './util';
 import WpEmbedPreview from './wp-embed-preview';
 
 export default function EmbedPreview( {
@@ -75,6 +60,7 @@ export default function EmbedPreview( {
 		) : (
 			<div className="wp-block-embed__wrapper">
 				<SandBox
+					allowSameOrigin
 					html={ html }
 					scripts={ scripts }
 					title={ iframeTitle }

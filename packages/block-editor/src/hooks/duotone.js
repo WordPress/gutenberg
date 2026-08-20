@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
-
-/**
- * WordPress dependencies
- */
 import {
 	getBlockSupport,
 	getBlockType,
@@ -15,27 +8,32 @@ import {
 import { useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { useMemo, useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { useSelect } from '@wordpress/data';
+import {
+	getBlockSelector,
+	privateApis as globalStylesEnginePrivateApis,
+} from '@wordpress/global-styles-engine';
 import {
 	BlockControls,
 	InspectorControls,
 	__experimentalDuotoneControl as DuotoneControl,
 	useSettings,
 } from '../components';
-import {
-	getDuotoneFilter,
-	getDuotoneStylesheet,
-	getDuotoneUnsetStylesheet,
-} from '../components/duotone/utils';
-import { getBlockCSSSelector } from '../components/global-styles/get-block-css-selector';
 import { scopeSelector } from '../components/global-styles/utils';
-import { useBlockSettings, usePrivateStyleOverride } from './utils';
+import {
+	cleanEmptyObject,
+	useBlockSettings,
+	usePrivateStyleOverride,
+} from './utils';
+import { unlock } from '../lock-unlock';
 import { default as StylesFiltersPanel } from '../components/global-styles/filters-panel';
+import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
+import { store as blockEditorStore } from '../store';
+
+const { getDuotoneFilter, getDuotoneStylesheet, getDuotoneUnsetStylesheet } =
+	unlock( globalStylesEnginePrivateApis );
 
 const EMPTY_ARRAY = [];
 
@@ -94,10 +92,20 @@ export function getDuotonePresetFromColors( colors, duotonePalette ) {
 	return preset ? `var:preset|duotone|${ preset.slug }` : undefined;
 }
 
-function DuotonePanelPure( { style, setAttributes, name } ) {
+function DuotonePanelPure( { style, setAttributes, name, clientId } ) {
 	const duotoneStyle = style?.color?.duotone;
 	const settings = useBlockSettings( name );
 	const blockEditingMode = useBlockEditingMode();
+
+	const className = useSelect(
+		( select ) =>
+			clientId
+				? select( blockEditorStore ).getBlockAttributes( clientId )
+						?.className
+				: undefined,
+		[ clientId ]
+	);
+	const { value: inheritedValue } = useResolvedStyle( name, className );
 
 	const duotonePalette = useMultiOriginPresets( {
 		presetSetting: 'color.duotone',
@@ -124,15 +132,18 @@ function DuotonePanelPure( { style, setAttributes, name } ) {
 		return null;
 	}
 
-	const duotonePresetOrColors = ! Array.isArray( duotoneStyle )
-		? getColorsFromDuotonePreset( duotoneStyle, duotonePalette )
-		: duotoneStyle;
+	const duotonePresetOrColors =
+		duotoneStyle === 'unset' || Array.isArray( duotoneStyle )
+			? duotoneStyle
+			: getColorsFromDuotonePreset( duotoneStyle, duotonePalette );
 
 	return (
 		<>
 			<InspectorControls group="filter">
 				<StylesFiltersPanel
-					value={ { filter: { duotone: duotonePresetOrColors } } }
+					value={ {
+						filter: { duotone: duotonePresetOrColors },
+					} }
 					onChange={ ( newDuotone ) => {
 						const newStyle = {
 							...style,
@@ -140,9 +151,12 @@ function DuotonePanelPure( { style, setAttributes, name } ) {
 								...newDuotone?.filter,
 							},
 						};
-						setAttributes( { style: newStyle } );
+						setAttributes( {
+							style: cleanEmptyObject( newStyle ),
+						} );
 					} }
 					settings={ settings }
+					inheritedValue={ inheritedValue }
 				/>
 			</InspectorControls>
 			<BlockControls group="block" __experimentalShareWithChildBlocks>
@@ -165,7 +179,9 @@ function DuotonePanelPure( { style, setAttributes, name } ) {
 								duotone: maybePreset ?? newDuotone, // use preset or fallback to custom colors.
 							},
 						};
-						setAttributes( { style: newStyle } );
+						setAttributes( {
+							style: cleanEmptyObject( newStyle ),
+						} );
 					} }
 					settings={ settings }
 				/>
@@ -345,14 +361,14 @@ function useBlockProps( { clientId, name, style } ) {
 				false
 			);
 			if ( experimentalDuotone ) {
-				const rootSelector = getBlockCSSSelector( blockType );
+				const rootSelector = getBlockSelector( blockType );
 				return typeof experimentalDuotone === 'string'
 					? scopeSelector( rootSelector, experimentalDuotone )
 					: rootSelector;
 			}
 
 			// Regular filter.duotone support uses filter.duotone selectors with fallbacks.
-			return getBlockCSSSelector( blockType, 'filter.duotone', {
+			return getBlockSelector( blockType, 'filter.duotone', {
 				fallback: true,
 			} );
 		}

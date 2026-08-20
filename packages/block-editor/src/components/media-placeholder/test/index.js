@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { MediaPlaceholder } from '../';
 
 jest.mock( '../../media-upload/check', () => () => null );

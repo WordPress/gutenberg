@@ -1,0 +1,88 @@
+{
+	"name": "@wordpress/ui",
+	"version": "0.20.0",
+	"description": "Themeable React UI components for the WordPress Design System.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"components"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/ui/README.md",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/ui"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": "^20.19.0 || >=22.13.0",
+		"npm": ">=10.2.3"
+	},
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"default": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpScript": false,
+	"types": "build-types",
+	"sideEffects": false,
+	"dependencies": {
+		"@base-ui/react": "^1.6.0",
+		"@daypicker/react": "^10.0.1",
+		"@wordpress/a11y": "file:../a11y",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/element": "file:../element",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/keycodes": "file:../keycodes",
+		"@wordpress/primitives": "file:../primitives",
+		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/style-runtime": "file:../style-runtime",
+		"@wordpress/theme": "file:../theme",
+		"clsx": "^2.1.1",
+		"date-fns": "^4.4.0",
+		"tabbable": "^6.4.0"
+	},
+	"devDependencies": {
+		"@storybook/addon-docs": "^10.4.3",
+		"@storybook/react-vite": "^10.4.3",
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/jest-dom": "^6.9.1",
+		"@testing-library/react": "^16.3.2",
+		"@testing-library/user-event": "^14.6.1",
+		"@types/jest": "^30.0.0",
+		"@types/node": "^20.19.39",
+		"@wordpress/base-styles": "file:../base-styles",
+		"fast-glob": "^3.2.7",
+		"storybook": "^10.4.3"
+	},
+	"peerDependencies": {
+		"@types/react": "^18 || ^19",
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

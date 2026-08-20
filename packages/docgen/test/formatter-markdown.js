@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const formatter = require( '../lib/markdown/formatter' );
 
 describe( 'Formatter', () => {

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	SelectControl,
@@ -8,10 +5,6 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { htmlElementMessages } from './messages';
 
@@ -22,7 +15,7 @@ import { htmlElementMessages } from './messages';
  * @param {Object}   props          Component props.
  * @param {string}   props.tagName  The current HTML tag name.
  * @param {Function} props.onChange Function to call when the tag is changed.
- * @param {string}   props.clientId The client ID of the current block.
+ * @param {string}   props.clientId Optional. The client ID of the block. Used to check for existing <main> elements.
  * @param {Array}    props.options  SelectControl options (optional).
  *
  * @return {Component} The HTML element select control with validation.
@@ -88,8 +81,6 @@ export default function HTMLElementControl( {
 	return (
 		<VStack spacing={ 2 } className="block-editor-html-element-control">
 			<SelectControl
-				__nextHasNoMarginBottom
-				__next40pxDefaultSize
 				label={ __( 'HTML element' ) }
 				options={ modifiedOptions }
 				value={ tagName }

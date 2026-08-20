@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	createContext,
 	useContext,
@@ -16,6 +9,8 @@ import {
 import { focus } from '@wordpress/dom';
 
 export const SidebarNavigationContext = createContext( () => {} );
+SidebarNavigationContext.displayName = 'SidebarNavigationContext';
+
 // Focus a sidebar element after a navigation. The element to focus is either
 // specified by `focusSelector` (when navigating back) or it is the first
 // tabbable element (usually the "Back" button).

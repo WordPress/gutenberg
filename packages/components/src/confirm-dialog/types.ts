@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { MouseEvent, KeyboardEvent, ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { ModalProps } from '../modal/types';
 
 export type DialogInputEvent =
@@ -18,6 +11,10 @@ export type ConfirmDialogProps = {
 	 * The actual message for the dialog. It's passed as children and any valid `ReactNode` is accepted.
 	 */
 	children: ReactNode;
+	/**
+	 * Size of the underlying Modal. See `Modal`'s `size` prop.
+	 */
+	size?: ModalProps[ 'size' ];
 	/**
 	 * The callback that's called when the user confirms.
 	 * A confirmation can happen when the `OK` button is clicked or when `Enter` is pressed.
@@ -50,4 +47,10 @@ export type ConfirmDialogProps = {
 	 * It also implicitly toggles the controlled mode if set or the uncontrolled mode if it's not set.
 	 */
 	isOpen?: boolean;
+	/**
+	 * Indicates activity while an action is being performed.
+	 * When `true`, the confirm button will show a busy state.
+	 * Both buttons will be disabled.
+	 */
+	isBusy?: boolean;
 };

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, _x } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -9,14 +6,10 @@ import {
 	Dropdown,
 	RadioControl,
 	__experimentalVStack as VStack,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 } from '@wordpress/components';
 import { useState, useMemo } from '@wordpress/element';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { TEMPLATE_POST_TYPE } from '../../store/constants';
 import PostPanelRow from '../post-panel-row';
 import { store as editorStore } from '../../store';
@@ -109,11 +102,11 @@ export default function SiteDiscussion() {
 							onClose={ onClose }
 						/>
 						<VStack spacing={ 3 }>
-							<Text>
+							<WCText>
 								{ __(
 									'Changes will apply to new posts only. Individual posts may override these settings.'
 								) }
-							</Text>
+							</WCText>
 							<RadioControl
 								className="editor-site-discussion__options"
 								hideLabelFromVision

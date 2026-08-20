@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	InspectorControls,
@@ -17,11 +14,6 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
-import { View } from '@wordpress/primitives';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 import { MIN_SPACER_SIZE } from './constants';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
@@ -62,10 +54,9 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 					value={ computedValue }
 					units={ units }
 					label={ label }
-					__next40pxDefaultSize
 				/>
 			) : (
-				<View className="tools-panel-item-spacing">
+				<div className="tools-panel-item-spacing">
 					<SpacingSizesControl
 						values={ { all: computedValue } }
 						onChange={ ( { all } ) => {
@@ -78,7 +69,7 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 						splitOnAxis={ false }
 						showSideInLabel={ false }
 					/>
-				</View>
+				</div>
 			) }
 		</>
 	);

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { isBlobURL } from '@wordpress/blob';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -15,6 +8,7 @@ import {
 	Button,
 	Spinner,
 	TextControl,
+	ExternalLink,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -30,22 +24,29 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useMemo, useEffect, useState } from '@wordpress/element';
+import {
+	useMemo,
+	useEffect,
+	useState,
+	createInterpolateElement,
+} from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import DimensionControls from './dimension-controls';
 import OverlayControls from './overlay-controls';
 import Overlay from './overlay';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { unlock } from '../lock-unlock';
+import { getDimensionResetAttributes } from '../utils/style-state';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
-const { ResolutionTool } = unlock( blockEditorPrivateApis );
+const { isDefaultBlockStyleState, ResolutionTool } = unlock(
+	blockEditorPrivateApis
+);
+
+const hasDimensionValue = ( value ) =>
+	value !== undefined && value !== null && value !== '';
 const DEFAULT_MEDIA_SIZE_SLUG = 'full';
 
 function FeaturedImageResolutionTool( { image, value, onChange } ) {
@@ -131,14 +132,17 @@ export default function PostFeaturedImageEdit( {
 		return imageId;
 	}, [ storedFeaturedImage, useFirstImageFromPost, postContent ] );
 
-	const { media, postType, postPermalink } = useSelect(
+	const { media, postType, postPermalink, selectedStyleState } = useSelect(
 		( select ) => {
-			const { getMedia, getPostType, getEditedEntityRecord } =
+			const { getEntityRecord, getPostType, getEditedEntityRecord } =
 				select( coreStore );
+			const { getSelectedBlockStyleState } = unlock(
+				select( blockEditorStore )
+			);
 			return {
 				media:
 					featuredImage &&
-					getMedia( featuredImage, {
+					getEntityRecord( 'postType', 'attachment', featuredImage, {
 						context: 'view',
 					} ),
 				postType: postTypeSlug && getPostType( postTypeSlug ),
@@ -147,17 +151,19 @@ export default function PostFeaturedImageEdit( {
 					postTypeSlug,
 					postId
 				)?.link,
+				selectedStyleState: getSelectedBlockStyleState( clientId ),
 			};
 		},
-		[ featuredImage, postTypeSlug, postId ]
+		[ clientId, featuredImage, postTypeSlug, postId ]
 	);
+	const hasSelectedStyleState =
+		! isDefaultBlockStyleState( selectedStyleState );
 
 	const mediaUrl =
 		media?.media_details?.sizes?.[ sizeSlug ]?.source_url ||
 		media?.source_url;
 
 	const blockProps = useBlockProps( {
-		style: { width, height, aspectRatio },
 		className: clsx( {
 			'is-transient': temporaryURL,
 		} ),
@@ -165,6 +171,7 @@ export default function PostFeaturedImageEdit( {
 	const borderProps = useBorderProps( attributes );
 	const shadowProps = getShadowClassesAndStyles( attributes );
 	const blockEditingMode = useBlockEditingMode();
+	const aspectRatioStyle = aspectRatio === 'auto' ? undefined : aspectRatio;
 
 	const placeholder = ( content ) => {
 		return (
@@ -175,8 +182,13 @@ export default function PostFeaturedImageEdit( {
 				) }
 				withIllustration
 				style={ {
-					height: !! aspectRatio && '100%',
-					width: !! aspectRatio && '100%',
+					aspectRatio: aspectRatioStyle,
+					height: hasDimensionValue( height )
+						? height
+						: hasDimensionValue( width ) && 'auto',
+					width: hasDimensionValue( width )
+						? width
+						: !! aspectRatio && '100%',
 					...borderProps.style,
 					...shadowProps.style,
 				} }
@@ -231,12 +243,30 @@ export default function PostFeaturedImageEdit( {
 					clientId={ clientId }
 				/>
 			</InspectorControls>
-			<InspectorControls group="dimensions">
+			<InspectorControls
+				group="dimensions"
+				resetAllFilter={ ( attrs ) => {
+					return getDimensionResetAttributes( {
+						attributes: attrs,
+						selectedState: selectedStyleState,
+						hasSelectedStyleState,
+						keys: [ 'aspectRatio', 'height', 'objectFit', 'width' ],
+						defaultAttributes: {
+							aspectRatio: undefined,
+							height: undefined,
+							scale: undefined,
+							width: undefined,
+						},
+					} );
+				} }
+			>
 				<DimensionControls
 					clientId={ clientId }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					media={ media }
+					selectedStyleState={ selectedStyleState }
+					hasSelectedStyleState={ hasSelectedStyleState }
 				/>
 			</InspectorControls>
 			{ ( featuredImage || isDescendentOfQueryLoop || ! postId ) && (
@@ -248,13 +278,14 @@ export default function PostFeaturedImageEdit( {
 								isLink: false,
 								linkTarget: '_self',
 								rel: '',
+								sizeSlug: DEFAULT_MEDIA_SIZE_SLUG,
 							} );
 						} }
 						dropdownMenuProps={ dropdownMenuProps }
 					>
 						<ToolsPanelItem
 							label={
-								postType?.labels.singular_name
+								postType?.labels?.singular_name
 									? sprintf(
 											// translators: %s: Name of the post type e.g: "post".
 											__( 'Link to %s' ),
@@ -271,16 +302,7 @@ export default function PostFeaturedImageEdit( {
 							}
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
-								label={
-									postType?.labels.singular_name
-										? sprintf(
-												// translators: %s: Name of the post type e.g: "post".
-												__( 'Link to %s' ),
-												postType.labels.singular_name
-										  )
-										: __( 'Link to post' )
-								}
+								label={ __( 'Make image a link' ) }
 								onChange={ () =>
 									setAttributes( { isLink: ! isLink } )
 								}
@@ -300,7 +322,6 @@ export default function PostFeaturedImageEdit( {
 								}
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={ __( 'Open in new tab' ) }
 									onChange={ ( value ) =>
 										setAttributes( {
@@ -315,7 +336,7 @@ export default function PostFeaturedImageEdit( {
 						) }
 						{ isLink && (
 							<ToolsPanelItem
-								label={ __( 'Link rel' ) }
+								label={ __( 'Link relation' ) }
 								isShownByDefault
 								hasValue={ () => !! rel }
 								onDeselect={ () =>
@@ -325,9 +346,17 @@ export default function PostFeaturedImageEdit( {
 								}
 							>
 								<TextControl
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
-									label={ __( 'Link rel' ) }
+									label={ __( 'Link relation' ) }
+									help={ createInterpolateElement(
+										__(
+											'The <a>Link Relation</a> attribute defines the relationship between a linked resource and the current document.'
+										),
+										{
+											a: (
+												<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel" />
+											),
+										}
+									) }
 									value={ rel }
 									onChange={ ( newRel ) =>
 										setAttributes( { rel: newRel } )
@@ -387,8 +416,11 @@ export default function PostFeaturedImageEdit( {
 	const imageStyles = {
 		...borderProps.style,
 		...shadowProps.style,
-		height: aspectRatio ? '100%' : height,
-		width: !! aspectRatio && '100%',
+		aspectRatio: aspectRatioStyle,
+		height: hasDimensionValue( height )
+			? height
+			: hasDimensionValue( width ) && 'auto',
+		width: hasDimensionValue( width ) ? width : !! aspectRatio && '100%',
 		objectFit: !! ( height || aspectRatio ) && scale,
 	};
 

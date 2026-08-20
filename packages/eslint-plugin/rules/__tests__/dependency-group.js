@@ -1,15 +1,8 @@
-/**
- * External dependencies
- */
 import { RuleTester } from 'eslint';
-
-/**
- * Internal dependencies
- */
 import rule from '../dependency-group';
 
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		sourceType: 'module',
 		ecmaVersion: 6,
 	},
@@ -52,6 +45,22 @@ const { Component } = require( '@wordpress/element' );
  * Internal dependencies
  */
 const edit = require( './edit' );`,
+		},
+		{
+			code: `
+import { camelCase } from 'change-case';
+import clsx from 'clsx';
+import { Component } from '@wordpress/element';
+import edit from './edit';`,
+			options: [ 'never' ],
+		},
+		{
+			code: `
+/**
+ * Keep external dependencies up to date.
+ */
+import clsx from 'clsx';`,
+			options: [ 'never' ],
 		},
 	],
 	invalid: [
@@ -130,6 +139,83 @@ const { Component } = require( '@wordpress/element' );
  * Internal dependencies
  */
 const edit = require( './edit' );`,
+		},
+		{
+			code: `
+/**
+ * External dependencies
+ */
+import { camelCase } from 'change-case';
+
+/**
+ * WordPress dependencies
+ */
+
+import { Component } from '@wordpress/element';`,
+			options: [ 'never' ],
+			errors: [
+				{
+					message: 'Unexpected dependency group comment block',
+				},
+				{
+					message: 'Unexpected dependency group comment block',
+				},
+			],
+			output: `
+import { camelCase } from 'change-case';
+import { Component } from '@wordpress/element';`,
+		},
+		{
+			code: `
+/*
+ * external Dependencies.
+ */
+import { camelCase } from 'change-case';
+
+/**
+ * Keep external dependencies up to date.
+ */
+import clsx from 'clsx';
+
+/**
+ * NODE DEPENDENCIES
+ */
+import 'node:fs';
+
+/**
+ * wordpress dependencies.
+ */
+import { Component } from '@wordpress/element';
+
+/**
+ * internal Dependencies.
+ */
+import edit from './edit';`,
+			options: [ 'never' ],
+			errors: [
+				{
+					message: 'Unexpected dependency group comment block',
+				},
+				{
+					message: 'Unexpected dependency group comment block',
+				},
+				{
+					message: 'Unexpected dependency group comment block',
+				},
+				{
+					message: 'Unexpected dependency group comment block',
+				},
+			],
+			output: `
+import { camelCase } from 'change-case';
+
+/**
+ * Keep external dependencies up to date.
+ */
+import clsx from 'clsx';
+import 'node:fs';
+import { Component } from '@wordpress/element';
+import edit from './edit';`,
 		},
 	],
 } );

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useState, useLayoutEffect, useEffect } from '@wordpress/element';
 import {
@@ -20,10 +17,6 @@ import {
 import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
-
-/**
- * Internal dependencies
- */
 import InlineLinkUI from './inline';
 import { isValidHref } from './utils';
 
@@ -37,6 +30,7 @@ function Edit( {
 	onChange,
 	onFocus,
 	contentRef,
+	isVisible = true,
 } ) {
 	const [ addingLink, setAddingLink ] = useState( false );
 
@@ -186,20 +180,22 @@ function Edit( {
 				character="k"
 				onUse={ onRemoveFormat }
 			/>
-			<RichTextToolbarButton
-				name="link"
-				icon={ linkIcon }
-				title={ isActive ? __( 'Link' ) : title }
-				onClick={ ( event ) => {
-					addLink( event.currentTarget );
-				} }
-				isActive={ isActive || addingLink }
-				shortcutType="primary"
-				shortcutCharacter="k"
-				aria-haspopup="true"
-				aria-expanded={ addingLink }
-			/>
-			{ addingLink && (
+			{ isVisible && (
+				<RichTextToolbarButton
+					name="link"
+					icon={ linkIcon }
+					title={ isActive ? __( 'Link' ) : title }
+					onClick={ ( event ) => {
+						addLink( event.currentTarget );
+					} }
+					isActive={ isActive || addingLink }
+					shortcutType="primary"
+					shortcutCharacter="k"
+					aria-haspopup="true"
+					aria-expanded={ addingLink }
+				/>
+			) }
+			{ isVisible && addingLink && (
 				<InlineLinkUI
 					stopAddingLink={ stopAddingLink }
 					onFocusOutside={ onFocusOutside }
@@ -227,6 +223,7 @@ export const link = {
 		_id: 'id',
 		target: 'target',
 		rel: 'rel',
+		class: 'class',
 	},
 	__unstablePasteRule( value, { html, plainText } ) {
 		const pastedText = ( html || plainText )

@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { addFilter } from '@wordpress/hooks';
 import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { InspectorControls } from '../components';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 
@@ -47,8 +36,6 @@ function CustomClassNameControlsPure( { className, setAttributes } ) {
 	return (
 		<InspectorControls group="advanced">
 			<TextControl
-				__nextHasNoMarginBottom
-				__next40pxDefaultSize
 				autoComplete="off"
 				label={ __( 'Additional CSS class(es)' ) }
 				value={ className || '' }
@@ -145,6 +132,6 @@ addFilter(
 
 addFilter(
 	'blocks.switchToBlockType.transformedBlock',
-	'core/color/addTransforms',
+	'core/customClassName/addTransforms',
 	addTransforms
 );

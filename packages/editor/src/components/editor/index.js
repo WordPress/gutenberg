@@ -1,18 +1,15 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
+import { store as editorStore } from '../../store';
 import { TEMPLATE_POST_TYPE } from '../../store/constants';
 import EditorInterface from '../editor-interface';
 import { ExperimentalEditorProvider } from '../provider';
 import Sidebar from '../sidebar';
+import NotesSidebar from '../collab-sidebar';
+import GlobalStylesSidebar from '../global-styles-sidebar';
+import { GlobalStylesRenderer } from '../global-styles-renderer';
 
 function Editor( {
 	postType,
@@ -31,15 +28,39 @@ function Editor( {
 	extraSidebarPanels,
 	...props
 } ) {
-	const { post, template, hasLoadedPost, error } = useSelect(
+	const {
+		post,
+		template,
+		hasLoadedPost,
+		error,
+		isBlockTheme,
+		showGlobalStyles,
+	} = useSelect(
 		( select ) => {
 			const {
 				getEntityRecord,
 				getResolutionError,
 				hasFinishedResolution,
+				getCurrentTheme,
+				__experimentalGetCurrentGlobalStylesId,
+				canUser,
 			} = select( coreStore );
+			const { getRenderingMode, getCurrentPostType } =
+				select( editorStore );
 
 			const postArgs = [ 'postType', postType, postId ];
+			const renderingMode = getRenderingMode();
+			const currentPostType = getCurrentPostType();
+			const _isBlockTheme = getCurrentTheme()?.is_block_theme;
+			const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+			const userCanEditGlobalStyles = globalStylesId
+				? canUser( 'update', {
+						kind: 'root',
+						name: 'globalStyles',
+						id: globalStylesId,
+				  } )
+				: false;
+
 			return {
 				post: getEntityRecord( ...postArgs ),
 				template: templateId
@@ -55,6 +76,12 @@ function Editor( {
 				),
 				error: getResolutionError( 'getEntityRecord', postArgs )
 					?.message,
+				isBlockTheme: _isBlockTheme,
+				showGlobalStyles:
+					_isBlockTheme &&
+					userCanEditGlobalStyles &&
+					( currentPostType === 'wp_template' ||
+						renderingMode === 'template-locked' ),
 			};
 		},
 		[ postType, postId, templateId ]
@@ -90,6 +117,9 @@ function Editor( {
 						onActionPerformed={ onActionPerformed }
 						extraPanels={ extraSidebarPanels }
 					/>
+					<NotesSidebar />
+					{ isBlockTheme && <GlobalStylesRenderer /> }
+					{ showGlobalStyles && <GlobalStylesSidebar /> }
 				</ExperimentalEditorProvider>
 			) }
 		</>

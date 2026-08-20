@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { FormTokenField } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState, useEffect, useMemo } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { getEntitiesInfo, mapToIHasNameAndId } from '../../utils';
 
 const EMPTY_ARRAY = [];
@@ -132,14 +125,12 @@ function ParentControl( { parents, postType, onChange } ) {
 	};
 	return (
 		<FormTokenField
-			__next40pxDefaultSize
 			label={ __( 'Parents' ) }
 			value={ value }
 			onInputChange={ debouncedSearch }
 			suggestions={ suggestions }
 			onChange={ onParentChange }
-			__experimentalShowHowTo={ false }
-			__nextHasNoMarginBottom
+			help=""
 		/>
 	);
 }

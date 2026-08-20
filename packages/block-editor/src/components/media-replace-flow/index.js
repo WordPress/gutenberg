@@ -1,6 +1,4 @@
-/**
- * WordPress dependencies
- */
+import clsx from 'clsx';
 import { __, _x } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import {
@@ -21,14 +19,12 @@ import {
 import { compose } from '@wordpress/compose';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
+import { useMemo } from '@wordpress/element';
 import MediaUpload from '../media-upload';
 import MediaUploadCheck from '../media-upload/check';
 import LinkControl from '../link-control';
 import { store as blockEditorStore } from '../../store';
+import { getComputedAcceptAttribute } from '../media-placeholder/utils';
 
 const noop = () => {};
 let uniqueId = 0;
@@ -53,11 +49,30 @@ const MediaReplaceFlow = ( {
 	multiple = false,
 	addToGallery,
 	handleUpload = true,
+	variant,
 	popoverProps,
 	renderToggle,
+	className,
 } ) => {
-	const { getSettings } = useSelect( blockEditorStore );
+	const { mediaUpload, allowedMimeTypes } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const settings = getSettings();
+		return {
+			mediaUpload: settings.mediaUpload,
+			allowedMimeTypes: settings.allowedMimeTypes,
+		};
+	}, [] );
 	const errorNoticeID = `block-editor/media-replace-flow/error-notice/${ ++uniqueId }`;
+
+	const computedAccept = useMemo(
+		() =>
+			getComputedAcceptAttribute(
+				allowedTypes,
+				allowedMimeTypes,
+				accept
+			),
+		[ allowedTypes, allowedMimeTypes, accept ]
+	);
 
 	const onUploadError = ( message ) => {
 		const safeMessage = stripHTML( message );
@@ -98,7 +113,7 @@ const MediaReplaceFlow = ( {
 			return onSelect( files );
 		}
 		onFilesUpload( files );
-		getSettings().mediaUpload( {
+		mediaUpload( {
 			allowedTypes,
 			filesList: files,
 			onFileChange: ( [ media ] ) => {
@@ -128,10 +143,19 @@ const MediaReplaceFlow = ( {
 
 	const gallery = multiple && onlyAllowsImages();
 
+	const mergedPopoverProps = {
+		...popoverProps,
+		variant,
+	};
+
 	return (
 		<Dropdown
-			popoverProps={ popoverProps }
-			contentClassName="block-editor-media-replace-flow__options"
+			popoverProps={ mergedPopoverProps }
+			className={ className }
+			contentClassName={ clsx(
+				'block-editor-media-replace-flow__options',
+				variant && `is-variant-${ variant }`
+			) }
 			renderToggle={ ( { isOpen, onToggle } ) => {
 				if ( renderToggle ) {
 					return renderToggle( {
@@ -179,7 +203,7 @@ const MediaReplaceFlow = ( {
 								onChange={ ( event ) => {
 									uploadFiles( event, onClose );
 								} }
-								accept={ accept }
+								accept={ computedAccept }
 								multiple={ !! multiple }
 								render={ ( { openFileDialog } ) => {
 									return (
@@ -204,6 +228,9 @@ const MediaReplaceFlow = ( {
 								{ __( 'Use featured image' ) }
 							</MenuItem>
 						) }
+						{ typeof children === 'function'
+							? children( { onClose } )
+							: children }
 						{ mediaURL && onReset && (
 							<MenuItem
 								onClick={ () => {
@@ -214,12 +241,8 @@ const MediaReplaceFlow = ( {
 								{ __( 'Reset' ) }
 							</MenuItem>
 						) }
-						{ typeof children === 'function'
-							? children( { onClose } )
-							: children }
 					</NavigableMenu>
 					{ onSelectURL && (
-						// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
 						<form className="block-editor-media-flow__url-input">
 							<span className="block-editor-media-replace-flow__image-url-label">
 								{ __( 'Current media URL:' ) }

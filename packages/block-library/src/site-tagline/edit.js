@@ -1,15 +1,6 @@
-/**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
-	AlignmentControl,
 	useBlockProps,
 	BlockControls,
 	HeadingLevelDropdown,
@@ -17,13 +8,13 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
-export default function SiteTaglineEdit( {
-	attributes,
-	setAttributes,
-	insertBlocksAfter,
-} ) {
-	const { textAlign, level, levelOptions } = attributes;
+export default function SiteTaglineEdit( props ) {
+	useDeprecatedTextAlign( props );
+
+	const { attributes, setAttributes, insertBlocksAfter } = props;
+	const { level, levelOptions } = attributes;
 	const { canUserEdit, tagline } = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEditedEntityRecord } =
 			select( coreStore );
@@ -52,11 +43,10 @@ export default function SiteTaglineEdit( {
 	}
 
 	const blockProps = useBlockProps( {
-		className: clsx( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-			'wp-block-site-tagline__placeholder': ! canUserEdit && ! tagline,
-		} ),
+		className:
+			! canUserEdit && ! tagline && 'wp-block-site-tagline__placeholder',
 	} );
+
 	const siteTaglineContent = canUserEdit ? (
 		<RichText
 			allowedFormats={ [] }
@@ -66,8 +56,13 @@ export default function SiteTaglineEdit( {
 			tagName={ TagName }
 			value={ tagline }
 			disableLineBreaks
-			__unstableOnSplitAtEnd={ () =>
-				insertBlocksAfter( createBlock( getDefaultBlockName() ) )
+			__unstableOnSplitAtEnd={
+				insertBlocksAfter
+					? () =>
+							insertBlocksAfter(
+								createBlock( getDefaultBlockName() )
+							)
+					: undefined
 			}
 			{ ...blockProps }
 		/>
@@ -85,12 +80,6 @@ export default function SiteTaglineEdit( {
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
 					}
-				/>
-				<AlignmentControl
-					onChange={ ( newAlign ) =>
-						setAttributes( { textAlign: newAlign } )
-					}
-					value={ textAlign }
 				/>
 			</BlockControls>
 			{ siteTaglineContent }

@@ -7,7 +7,7 @@
 
 if ( ! defined( '_GUTENBERG_VERSION_MIGRATION' ) ) {
 	// It's necessary to update this version every time a new migration is needed.
-	define( '_GUTENBERG_VERSION_MIGRATION', '9.8.0' );
+	define( '_GUTENBERG_VERSION_MIGRATION', '23.8.0' );
 }
 
 /**
@@ -23,6 +23,10 @@ function _gutenberg_migrate_database() {
 	if ( _GUTENBERG_VERSION_MIGRATION !== $gutenberg_installed_version ) {
 		if ( version_compare( $gutenberg_installed_version, '9.8.0', '<' ) ) {
 			_gutenberg_migrate_remove_fse_drafts();
+		}
+
+		if ( version_compare( $gutenberg_installed_version, '23.8.0', '<' ) ) {
+			_gutenberg_migrate_remove_legacy_collaboration_options();
 		}
 
 		update_option( 'gutenberg_version_migration', _GUTENBERG_VERSION_MIGRATION );
@@ -57,6 +61,21 @@ function _gutenberg_migrate_remove_fse_drafts() {
 	// Delete useless options.
 	delete_option( 'gutenberg_last_synchronize_theme_template_checks' );
 	delete_option( 'gutenberg_last_synchronize_theme_template-part_checks' );
+}
+
+/**
+ * Removes collaboration options replaced by the Real-Time Collaboration experiment.
+ *
+ * The previous values are intentionally not migrated to the experiment. Real-time
+ * collaboration is now opt-in, so existing sites must explicitly enable the
+ * experiment instead of being opted in by a legacy setting.
+ *
+ * @since 23.8.0
+ */
+function _gutenberg_migrate_remove_legacy_collaboration_options() {
+	delete_option( 'enable_real_time_collaboration' );
+	delete_option( 'wp_enable_real_time_collaboration' );
+	delete_option( 'wp_collaboration_enabled' );
 }
 
 // Deletion of the `_wp_file_based` term (in _gutenberg_migrate_remove_fse_drafts) must happen

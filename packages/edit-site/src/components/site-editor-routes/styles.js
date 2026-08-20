@@ -1,41 +1,60 @@
-/**
- * WordPress dependencies
- */
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-
-/**
- * Internal dependencies
- */
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { addQueryArgs } from '@wordpress/url';
 import Editor from '../editor';
 import { unlock } from '../../lock-unlock';
 import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-global-styles';
-import GlobalStylesUIWrapper from '../sidebar-global-styles-wrapper';
-import { StyleBookPreview } from '../style-book';
+import SidebarGlobalStyles from '../sidebar-global-styles';
 
-const { useLocation } = unlock( routerPrivateApis );
+const { useLocation, useHistory } = unlock( routerPrivateApis );
+const { StyleBookPreview, useGlobalStyles } = unlock( editorPrivateApis );
 
-function MobileGlobalStylesUI() {
-	const { query = {} } = useLocation();
-	const { canvas } = query;
+function StyleBookPreviewArea( { siteData } ) {
+	const { path, query } = useLocation();
+	const history = useHistory();
+	const { user: userConfig } = useGlobalStyles();
 
-	if ( canvas === 'edit' ) {
-		return <Editor />;
+	// Get section from URL query params
+	const section = query.section ?? '/';
+	const onChangeSection = ( updatedSection ) => {
+		history.navigate(
+			addQueryArgs( path, {
+				section: updatedSection,
+			} )
+		);
+	};
+
+	return (
+		<StyleBookPreview
+			path={ section }
+			onPathChange={ onChangeSection }
+			settings={ siteData.editorSettings }
+			// Without userConfig the preview falls back to the static `settings` styles and unsaved global styles edits are not shown.
+			userConfig={ userConfig }
+		/>
+	);
+}
+
+function StylesPreviewArea( { siteData } ) {
+	const { query } = useLocation();
+
+	if ( query.preview === 'stylebook' ) {
+		return <StyleBookPreviewArea siteData={ siteData } />;
 	}
 
-	return <GlobalStylesUIWrapper />;
+	return <Editor />;
 }
 
 export const stylesRoute = {
 	name: 'styles',
 	path: '/styles',
 	areas: {
-		content: <GlobalStylesUIWrapper />,
+		content: <SidebarGlobalStyles />,
 		sidebar: <SidebarNavigationScreenGlobalStyles backPath="/" />,
-		preview( { query } ) {
-			const isStylebook = query.preview === 'stylebook';
-			return isStylebook ? <StyleBookPreview /> : <Editor />;
-		},
-		mobile: <MobileGlobalStylesUI />,
+		preview: ( { siteData } ) => (
+			<StylesPreviewArea siteData={ siteData } />
+		),
+		mobileContent: <SidebarGlobalStyles />,
 	},
 	widths: {
 		content: 380,

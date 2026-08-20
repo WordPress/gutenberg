@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render, waitFor } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { addFilter, removeAllFilters, removeFilter } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
 import withFilters from '..';
 
 describe( 'withFilters', () => {

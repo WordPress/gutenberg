@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	RichText,
 	useBlockProps,
@@ -18,10 +15,7 @@ import {
 } from '@wordpress/icons';
 import { useMergeRefs } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
+import { displayShortcut } from '@wordpress/keycodes';
 import {
 	useEnter,
 	useSpace,
@@ -53,6 +47,7 @@ export function IndentUI( { clientId } ) {
 			<ToolbarButton
 				icon={ isRTL() ? formatOutdentRTL : formatOutdent }
 				title={ __( 'Outdent' ) }
+				shortcut={ displayShortcut.shift( 'Tab' ) }
 				description={ __( 'Outdent list item' ) }
 				disabled={ ! canOutdent }
 				onClick={ () => outdentListItem() }
@@ -60,6 +55,7 @@ export function IndentUI( { clientId } ) {
 			<ToolbarButton
 				icon={ isRTL() ? formatIndentRTL : formatIndent }
 				title={ __( 'Indent' ) }
+				shortcut="Tab"
 				description={ __( 'Indent list item' ) }
 				disabled={ ! canIndent }
 				onClick={ () => indentListItem() }
@@ -80,7 +76,7 @@ export default function ListItemEdit( {
 		renderAppender: false,
 		__unstableDisableDropZone: true,
 	} );
-	const useEnterRef = useEnter( { content, clientId } );
+	const useEnterRef = useEnter( clientId );
 	const useSpaceRef = useSpace( clientId );
 	const onMerge = useMerge( clientId, mergeBlocks );
 	return (

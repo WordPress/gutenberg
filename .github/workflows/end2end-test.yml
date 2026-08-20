@@ -20,12 +20,64 @@ concurrency:
 permissions: {}
 
 jobs:
+    build:
+        name: Build
+        runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
+        permissions:
+            contents: read
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        timeout-minutes: 30
+
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            - name: Npm build
+              run: npm run build -- --skip-types
+
+            # Wider than the `build*` directories, because the build also emits
+            # generated files next to sources: the block parsers, the icon
+            # library, and the worker entry points.
+            - name: Upload build output
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              with:
+                  name: build-output
+                  path: |
+                      build
+                      packages/*/build
+                      packages/*/build-module
+                      packages/*/build-style
+                      packages/*/build-types
+                      packages/*/build-wp
+                      packages/*/src/library/*.tsx
+                      packages/*/src/library/index.ts
+                      packages/*/src/worker-code.ts
+                      packages/block-serialization-spec-parser/parser.js
+                      packages/block-serialization-spec-parser/parser.php
+                  retention-days: 3
+                  if-no-files-found: error
+                  # Allow re-running the workflow over a previous attempt.
+                  overwrite: true
+
     e2e-playwright:
         name: Playwright - ${{ matrix.part }}
-        runs-on: ubuntu-latest
+        runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
+        needs: build
+        timeout-minutes: 45
+        # A skipped check counts as passing for required status checks, so a
+        # broken build must not skip these jobs — they have to start and go red
+        # (see the guard step below). `!cancelled()` is what drops the implicit
+        # `success()`; `!= 'skipped'` keeps the fork/repository filter that now
+        # lives on the build job.
+        if: ${{ !cancelled() && needs.build.result != 'skipped' }}
         permissions:
-          contents: read
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+            contents: read
+            id-token: write
         strategy:
             fail-fast: false
             matrix:
@@ -33,7 +85,12 @@ jobs:
                 totalParts: [8]
 
         steps:
-            - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+            # Bail out before checkout and `npm ci` rather than after.
+            - name: Fail if the build job failed
+              if: ${{ needs.build.result != 'success' }}
+              run: exit 1
+
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -41,104 +98,186 @@ jobs:
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
 
-            - name: Npm build
-              run: npm run build
+            - name: Download build output
+              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+              with:
+                  name: build-output
 
             - name: Install Playwright dependencies
-              run: |
-                  npx playwright install chromium firefox webkit --with-deps
+              uses: ./.github/setup-playwright
+              with:
+                  workspace: '@wordpress/e2e-tests-playwright'
+                  browsers: chromium firefox webkit
 
             - name: Install WordPress and start the server
               run: |
-                  npm run wp-env start
+                  npm run wp-env-test start
 
             - name: Run the tests
               env:
                   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
-                  SHARD_PART: ${{ matrix.part }}
-                  SHARD_TOTAL: ${{ matrix.totalParts }}
               run: |
-                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e -- --shard="${SHARD_PART}/${SHARD_TOTAL}"
+                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run --workspace @wordpress/e2e-tests-playwright test:e2e -- --shard=${{ matrix.part }}/${{ matrix.totalParts }}
 
-            - name: Archive debug artifacts (screenshots, traces)
-              uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+            - name: Archive blob reports (HTML)
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               if: ${{ !cancelled() }}
               with:
-                  name: failures-artifacts--${{ matrix.part }}
-                  path: artifacts/test-results
+                  name: blob-reports--${{ matrix.part }}
+                  path: test/e2e/blob-report
                   if-no-files-found: ignore
 
             - name: Archive flaky tests report
-              uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               if: ${{ !cancelled() }}
               with:
                   name: flaky-tests-report--${{ matrix.part }}
-                  path: flaky-tests
+                  path: test/e2e/flaky-tests
+                  if-no-files-found: ignore
+
+    e2e-playwright-rtc-websocket:
+        name: Playwright - RTC WebSocket
+        runs-on: ${{ vars.RUNNERS_NAME || 'ubuntu-24.04' }}
+        needs: build
+        timeout-minutes: 20
+        # A skipped check counts as passing for required status checks, so a
+        # broken build must not skip these jobs — they have to start and go red
+        # (see the guard step below). `!cancelled()` is what drops the implicit
+        # `success()`; `!= 'skipped'` keeps the fork/repository filter that now
+        # lives on the build job.
+        if: ${{ !cancelled() && needs.build.result != 'skipped' }}
+        permissions:
+            contents: read
+            id-token: write
+
+        steps:
+            # Bail out before checkout and `npm ci` rather than after.
+            - name: Fail if the build job failed
+              if: ${{ needs.build.result != 'success' }}
+              run: exit 1
+
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            - name: Download build output
+              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+              with:
+                  name: build-output
+
+            # No collaboration spec is tagged `@webkit` or `@firefox`.
+            - name: Install Playwright dependencies
+              uses: ./.github/setup-playwright
+              with:
+                  workspace: '@wordpress/e2e-tests-playwright'
+                  browsers: chromium
+
+            - name: Install WordPress and start the server
+              run: |
+                  npm run wp-env-test start
+
+            - name: Run the tests
+              env:
+                  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+                  # Run against the "slow" profile (a short simulated send
+                  # delay) for better coverage of real-world timing.
+                  RTC_WS_DELAY: 50
+                  # Label flaky reports so this job's diagnostics don't collide
+                  # with the default suite's when artifacts are merged, and so
+                  # WebSocket-provider flakes are reported as their own issues.
+                  FLAKY_TESTS_REPORT_LABEL: 'RTC WebSocket'
+              run: |
+                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run --workspace @wordpress/e2e-tests-playwright test:e2e:rtc-websocket
+
+            - name: Archive blob reports (HTML)
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              if: ${{ !cancelled() }}
+              with:
+                  name: blob-reports--rtc-websocket
+                  path: test/e2e/blob-report
+                  if-no-files-found: ignore
+
+            - name: Archive flaky tests report
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              if: ${{ !cancelled() }}
+              with:
+                  name: flaky-tests-report--rtc-websocket
+                  path: test/e2e/flaky-tests
                   if-no-files-found: ignore
 
     merge-artifacts:
         name: Merge Artifacts
         if: ${{ !cancelled() }}
-        needs: [e2e-playwright]
-        runs-on: ubuntu-latest
-        permissions: {}
-        outputs:
-            has-flaky-test-report: ${{ !!steps.merge-flaky-tests-reports.outputs.artifact-id }}
+        needs: [e2e-playwright, e2e-playwright-rtc-websocket]
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+            # Needed to comment the flaky tests report on the pull request.
+            pull-requests: write
+        timeout-minutes: 5
         steps:
-            - name: Merge failures artifacts
-              uses: actions/upload-artifact/merge@v4
-              # Don't fail the job if there aren't any artifacts to merge.
-              continue-on-error: true
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
-                  name: failures-artifacts
-                  # Retain the merged artifacts in case of a rerun.
-                  pattern: failures-artifacts*
-                  delete-merged: true
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
 
             - name: Merge flaky tests reports
               id: merge-flaky-tests-reports
-              uses: actions/upload-artifact/merge@v4
+              uses: actions/upload-artifact/merge@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               continue-on-error: true
               with:
                   name: flaky-tests-report
                   pattern: flaky-tests-report*
                   delete-merged: true
 
-    report-to-issues:
-        name: Report to GitHub
-        needs: [merge-artifacts]
-        if: ${{ needs.merge-artifacts.outputs.has-flaky-test-report == 'true' }}
-        runs-on: ubuntu-latest
-        permissions:
-          contents: read
-          issues: write
-          pull-requests: write
-        steps:
-            # Checkout defaults to using the branch which triggered the event, which
-            # isn't necessarily `trunk` (e.g. in the case of a merge).
-            - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-              with:
-                  ref: trunk
-                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
-                  persist-credentials: false
-
-            - uses: actions/download-artifact@v4.3.0
-              # Don't fail the job if there isn't any flaky tests report.
+            - name: Merge blob reports
+              uses: actions/upload-artifact/merge@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               continue-on-error: true
+              with:
+                  name: blob-reports-merged
+                  pattern: blob-reports--*
+                  delete-merged: true
+
+            - name: Download merged blob reports
+              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+              continue-on-error: true
+              with:
+                  name: blob-reports-merged
+                  path: all-blob-reports
+
+            - name: Merge blob reports into HTML report
+              run: npx playwright merge-reports --reporter html ./all-blob-reports
+              continue-on-error: true
+
+            - name: Upload merged HTML report
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              continue-on-error: true
+              with:
+                  name: html-report--attempt-${{ github.run_attempt }}
+                  path: playwright-report
+                  if-no-files-found: ignore
+
+            # Flaky tests are only reported as a comment on the pull request. The
+            # merge step above only sets `artifact-id` when a report was produced,
+            # so both steps are skipped on runs without any flaky test.
+            - name: Download merged flaky tests report
+              id: download-flaky-tests-report
+              if: ${{ github.event_name == 'pull_request' && steps.merge-flaky-tests-reports.outputs.artifact-id }}
+              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
               with:
                   name: flaky-tests-report
                   path: flaky-tests
 
-            - name: Setup Node.js and install dependencies
-              uses: ./.github/setup-node
-
-            - name: Npm build
-              # TODO: We don't have to build the entire project, just the action itself.
-              run: npm run build:packages
-
             - name: Report flaky tests
+              if: ${{ steps.download-flaky-tests-report.outcome == 'success' }}
               uses: ./packages/report-flaky-tests
               with:
                   repo-token: '${{ secrets.GITHUB_TOKEN }}'
-                  label: '[Type] Flaky Test'
                   artifact-path: flaky-tests

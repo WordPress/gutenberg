@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	InspectorControls,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 
 const { HTMLElementControl } = unlock( blockEditorPrivateApis );
@@ -17,7 +10,6 @@ const { HTMLElementControl } = unlock( blockEditorPrivateApis );
 export default function CommentsInspectorControls( {
 	attributes: { tagName },
 	setAttributes,
-	clientId,
 } ) {
 	return (
 		<InspectorControls>
@@ -27,7 +19,6 @@ export default function CommentsInspectorControls( {
 					onChange={ ( value ) =>
 						setAttributes( { tagName: value } )
 					}
-					clientId={ clientId }
 					options={ [
 						{ label: __( 'Default (<div>)' ), value: 'div' },
 						{ label: '<section>', value: 'section' },

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	BlockList,
 	BlockToolbar,
@@ -13,10 +10,6 @@ import { useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import Notices from '../notices';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 

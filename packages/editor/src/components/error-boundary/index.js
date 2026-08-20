@@ -1,20 +1,10 @@
-/**
- * WordPress dependencies
- */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import {
-	Button,
-	__experimentalHStack as HStack,
-	__experimentalText as Text,
-} from '@wordpress/components';
+import { Button } from '@wordpress/components';
+import { Stack, Text } from '@wordpress/ui';
 import { select } from '@wordpress/data';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { doAction } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 
 function getContent() {
@@ -26,7 +16,7 @@ function getContent() {
 		// content serialization throughout the lifetime of a non-erroring
 		// application.
 		return select( editorStore ).getEditedPostContent();
-	} catch ( error ) {}
+	} catch {}
 }
 
 function CopyButton( { text, children, variant = 'secondary' } ) {
@@ -63,18 +53,17 @@ class ErrorBoundary extends Component {
 		}
 
 		return (
-			<HStack
+			<Stack
 				className="editor-error-boundary"
-				alignment="baseline"
-				spacing={ 4 }
+				align="baseline"
+				gap="lg"
 				justify="space-between"
-				expanded={ false }
-				wrap
+				wrap="wrap"
 			>
-				<Text as="p">
+				<Text render={ <p /> }>
 					{ __( 'The editor has encountered an unexpected error.' ) }
 				</Text>
-				<HStack expanded={ false }>
+				<Stack align="center" gap="sm">
 					{ canCopyContent && (
 						<CopyButton text={ getContent }>
 							{ __( 'Copy contents' ) }
@@ -83,8 +72,8 @@ class ErrorBoundary extends Component {
 					<CopyButton variant="primary" text={ error?.stack }>
 						{ __( 'Copy error' ) }
 					</CopyButton>
-				</HStack>
-			</HStack>
+				</Stack>
+			</Stack>
 		);
 	}
 }

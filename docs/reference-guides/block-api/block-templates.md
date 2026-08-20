@@ -176,7 +176,7 @@ $template = array(
 		) ),
 		array( 'core/column', array(), array(
 			array( 'core/paragraph', array(
-				'placeholder' => 'Add a inner paragraph'
+				'placeholder' => 'Add an inner paragraph'
 			) ),
 		) ),
 	) )

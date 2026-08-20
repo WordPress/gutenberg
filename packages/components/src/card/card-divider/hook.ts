@@ -1,20 +1,17 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import * as styles from '../styles';
 import { useCx } from '../../utils/hooks/use-cx';
 import type { DividerProps } from '../../divider';
 
+/*
+ * The explicit return type keeps the emitted declaration from inlining the inferred type,
+ * which references `WrapElement` from @ariakit/react-utils
+ */
 export function useCardDivider(
 	props: WordPressComponentProps< DividerProps, 'hr', false >
-) {
+): WordPressComponentProps< DividerProps, 'hr', false > {
 	const { className, ...otherProps } = useContextSystem(
 		props,
 		'CardDivider'

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { uploadMedia } from '../upload-media';
 import { UploadError } from '../upload-error';
 import { uploadToServer } from '../upload-to-server';
@@ -215,7 +212,7 @@ describe( 'uploadMedia', () => {
 		( uploadToServer as jest.Mock ).mockImplementation( () => {
 			throw {
 				code: 'fetch_error',
-				message: 'You are probably offline.',
+				message: 'Could not get a valid response from the server.',
 			};
 		} );
 
@@ -229,7 +226,7 @@ describe( 'uploadMedia', () => {
 		expect( onError ).toHaveBeenCalledWith(
 			new UploadError( {
 				code: 'GENERAL',
-				message: 'You are probably offline.',
+				message: 'Could not get a valid response from the server.',
 				file: imageFile,
 			} )
 		);

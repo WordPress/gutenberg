@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { Placeholder, Button, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { navigation, Icon } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
 import { useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import useNavigationEntities from '../../use-navigation-entities';
+import { useEntityRecords } from '@wordpress/core-data';
 import PlaceholderPreview from './placeholder-preview';
 import NavigationMenuSelector from '../navigation-menu-selector';
 
@@ -24,7 +17,8 @@ export default function NavigationPlaceholder( {
 	onSelectClassicMenu,
 	onCreateEmpty,
 } ) {
-	const { isResolvingMenus, hasResolvedMenus } = useNavigationEntities();
+	const { isResolving: isResolvingMenus, hasResolved: hasResolvedMenus } =
+		useEntityRecords( 'root', 'menu', { per_page: -1, context: 'view' } );
 
 	useEffect( () => {
 		if ( ! isSelected ) {
