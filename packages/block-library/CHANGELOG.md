@@ -14,6 +14,7 @@
 -   Playlist: Stop sharing the parent "Add track" toolbar control with selected Playlist Track child blocks ([#81432](https://github.com/WordPress/gutenberg/pull/81432)).
 -   Term Description: Apply the term description display filters when rendering with term context inside a Terms Query loop, so multi-paragraph descriptions keep their paragraphs and match the taxonomy archive rendering ([#81290](https://github.com/WordPress/gutenberg/pull/81290)).
 -   Accordion: Resolve the URL fragment with the `:target` pseudo-class instead of decoding `window.location.hash`, so a hash containing malformed percent-encoding no longer throws a `URIError` when a panel is opened ([#81780](https://github.com/WordPress/gutenberg/pull/81780)).
+-   Accordion: Render collapsed panels as `hidden` on the server so the page is not laid out with every panel expanded, which shifted the content away from the target of an anchor link ([#81882](https://github.com/WordPress/gutenberg/pull/81882)).
 
 ## 10.4.0 (2026-08-12)
 
