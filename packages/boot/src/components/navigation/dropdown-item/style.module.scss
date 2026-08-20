@@ -1,6 +1,10 @@
 @use "@wordpress/base-styles/variables";
 
-.boot-dropdown-item__children {
+.dropdown {
+	display: block;
+}
+
+.dropdown-children {
 	display: flex;
 	flex-direction: column;
 
@@ -18,6 +22,6 @@
 	overflow: hidden;
 }
 
-.boot-dropdown-item__chevron.is-up {
+.chevron.is-up {
 	transform: rotate(180deg);
 }
