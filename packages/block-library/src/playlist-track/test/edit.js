@@ -5,7 +5,7 @@ import { PlaylistContext } from '../../playlist/context';
 import { useUploadMediaFromBlobURL } from '../../utils/hooks';
 
 let mockMediaReplaceFlowProps;
-let isMultiSelectingPlaylistTracks;
+let isTrackMultiSelected;
 
 jest.mock( '@wordpress/block-editor', () => {
 	const PlainText = jest.requireActual(
@@ -104,7 +104,7 @@ function renderEdit( props = {} ) {
 describe( 'PlaylistTrackEdit', () => {
 	beforeEach( () => {
 		mockMediaReplaceFlowProps = undefined;
-		isMultiSelectingPlaylistTracks = false;
+		isTrackMultiSelected = false;
 		useDispatch.mockReturnValue( {
 			createErrorNotice: jest.fn(),
 			selectionChange: jest.fn(),
@@ -118,15 +118,7 @@ describe( 'PlaylistTrackEdit', () => {
 				}
 
 				return {
-					getBlockName: () => 'core/playlist-track',
-					getBlockRootClientId: () => 'playlist-client-id',
-					getMultiSelectedBlockClientIds: () =>
-						isMultiSelectingPlaylistTracks
-							? [
-									'playlist-track-client-id',
-									'another-playlist-track-client-id',
-							  ]
-							: [],
+					isBlockMultiSelected: () => isTrackMultiSelected,
 					getSelectionStart: () => ( {} ),
 					getSelectionEnd: () => ( {} ),
 					getSettings: () => ( {} ),
@@ -142,7 +134,7 @@ describe( 'PlaylistTrackEdit', () => {
 	} );
 
 	it( 'does not show the title control when multiple playlist tracks are selected', () => {
-		isMultiSelectingPlaylistTracks = true;
+		isTrackMultiSelected = true;
 
 		renderEdit();
 
