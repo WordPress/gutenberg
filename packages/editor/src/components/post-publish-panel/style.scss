@@ -120,7 +120,14 @@
 		margin-right: -$grid-unit-20;
 	}
 
-	.editor-post-visibility__dialog-legend {
+	// Each panel's own title already names the section, so the heading that
+	// `InspectorPopoverHeader` renders inside it repeats what is directly
+	// above. Hide the heading rather than the whole header, which also carries
+	// the publish date's "Now" action. `display: none` takes it out of the
+	// accessibility tree too, so it is not a duplicate for screen readers
+	// either. This replaces the same rule for the `<legend>` the visibility
+	// options used before the heading existed.
+	.block-editor-inspector-popover-header {
 		display: none;
 	}
 
