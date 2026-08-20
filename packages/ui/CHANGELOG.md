@@ -21,7 +21,7 @@
 ### Bug Fixes
 
 -   `Card`: Use the normal neutral surface stroke for the default border. ([#81746](https://github.com/WordPress/gutenberg/pull/81746))
--   `Select`, `Combobox`, `SelectControl`: Fix the trigger placeholder failing the 4.5:1 text contrast minimum. A placeholder is live text rather than disabled text, so it no longer uses the disabled foreground token.
+-   `Select`, `Combobox`, `SelectControl`: Fix the trigger placeholder failing the 4.5:1 text contrast minimum. A placeholder is live text rather than disabled text, so it no longer uses the disabled foreground token. ([#81853](https://github.com/WordPress/gutenberg/pull/81853))
 
 ### Documentation
 
