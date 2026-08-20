@@ -105,6 +105,8 @@ This package is written in TypeScript and exports all relevant types:
 import type {
 	Media,
 	MediaEditorProviderProps,
+	MediaEditorFrameProps,
+	MediaEditorSaveResult,
 	MediaPreviewProps,
 	MediaFormProps,
 	Field,
