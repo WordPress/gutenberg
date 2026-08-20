@@ -26,4 +26,13 @@ export type ValidatedControlProps = {
 		type: 'validating' | 'valid' | 'invalid';
 		message: string;
 	};
+	/**
+	 * When to revalidate the control.
+	 *
+	 * - `change` (default): Revalidate whenever the user inputs data.
+	 * - `blur`: Revalidate only when the user finishes interacting with the control and focuses away.
+	 *
+	 * @default 'change'
+	 */
+	revalidateOn?: 'change' | 'blur';
 };
