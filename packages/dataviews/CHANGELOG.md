@@ -6,6 +6,8 @@
 
 -   Validated form controls: Align invalid focus styling for `ComboboxControl` and `FormTokenField` with the design system ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
 -   DataViews filters: Align filter search input focus styling with `outset-ring__focus` ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
+-   DataViewsPicker: Footer action buttons now honor an action's `isEligible`, disabling the button when no selected item is eligible and passing only the eligible items to the callback. [#80856](https://github.com/WordPress/gutenberg/pull/80856)
+-   DataViewsPicker: Render the footer selection count only for multiselect pickers. A single-select picker always holds exactly one selection, so the count carried no information. [#80856](https://github.com/WordPress/gutenberg/pull/80856)
 
 ### Bug Fix
 

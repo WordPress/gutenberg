@@ -124,11 +124,10 @@ test.describe( 'Style Revisions', () => {
 			.last();
 		await expect( lastRevisionItem ).toContainText( 'Default styles' );
 		await lastRevisionItem.click();
+		// The footer action relabels for the reset entry.
 		await expect(
-			page.getByRole( 'button', {
-				name: 'Apply the selected revision to your site.',
-			} )
-		).toBeVisible();
+			page.getByRole( 'button', { name: 'Reset' } )
+		).toBeEnabled();
 	} );
 
 	test( 'should access from the site editor sidebar', async ( {
@@ -276,10 +275,17 @@ test.describe( 'Style Revisions', () => {
 		}
 		await userGlobalStylesRevisions.openStylesPanel();
 		await page.getByRole( 'button', { name: 'Revisions' } ).click();
-		const pagination = page.getByLabel( 'Global Styles pagination' );
-		await expect( pagination ).toContainText( '1 of 2' );
-		await pagination.getByRole( 'button', { name: 'Next page' } ).click();
-		await expect( pagination ).toContainText( '2 of 2' );
+		// The page select is the screen's single pagination control; the
+		// prev/next buttons are hidden at the sidebar's width.
+		const currentPage = page.getByLabel( 'Current page' );
+		await expect( currentPage ).toHaveValue( '1' );
+		await currentPage.selectOption( '2' );
+		await expect( currentPage ).toHaveValue( '2' );
+		await expect(
+			page.getByRole( 'option', {
+				name: 'Reset the styles to the theme defaults',
+			} )
+		).toBeVisible();
 	} );
 } );
 

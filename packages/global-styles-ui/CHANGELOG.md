@@ -6,6 +6,7 @@
 
 -   Expose typography and color controls for citations, inputs, and selects in Global Styles ([#80852](https://github.com/WordPress/gutenberg/pull/80852)).
 -   Mark blocks that have user styles in the block list, and add a filter to show only those blocks ([#81373](https://github.com/WordPress/gutenberg/pull/81373)).
+-   Screen Revisions: Use the DataViews `pickerActivity` layout to render the revisions timeline, with Apply / Reset rendered as a picker footer action so the timeline options hold no interactive content ([#80856](https://github.com/WordPress/gutenberg/pull/80856)).
 
 ### Internal
 

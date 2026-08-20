@@ -52,6 +52,7 @@
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
+		"@wordpress/dataviews": "file:../dataviews",
 		"@wordpress/date": "file:../date",
 		"@wordpress/element": "file:../element",
 		"@wordpress/global-styles-engine": "file:../global-styles-engine",
@@ -67,7 +68,8 @@
 	},
 	"devDependencies": {
 		"@testing-library/dom": "^10.4.1",
-		"@testing-library/react": "^16.3.2"
+		"@testing-library/react": "^16.3.2",
+		"@testing-library/user-event": "^14.6.1"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",
