@@ -9,6 +9,7 @@
 ### Enhancements
 
 -   Unify the Site Editor sidebar section descriptions for Templates, Pages, Navigation, and Patterns. ([#60304](https://github.com/WordPress/gutenberg/issues/60304))
+-   Add an "Edit link" option to the navigation menu list view more menu, allowing inline editing of navigation links from the sidebar. ([#76428](https://github.com/WordPress/gutenberg/pull/76428))
 
 ### Internal
 

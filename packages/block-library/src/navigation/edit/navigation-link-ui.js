@@ -36,22 +36,13 @@ export function NavigationLinkUI( {
 	const showLinkControls =
 		BLOCKS_WITH_LINK_UI_SUPPORT?.includes( insertedBlockName );
 
-	// Determine which block is active
-	const activeBlock = isEditingExistingBlock ? editingBlock : insertedBlock;
-	const setActiveBlock = isEditingExistingBlock
-		? setEditingBlock
-		: setInsertedBlock;
-
-	// Get binding utilities for the active block
-	// Use a valid clientId or empty string to satisfy hook rules
-	const activeClientId = activeBlock?.clientId || '';
-	const activeAttributes = activeBlock?.attributes || {};
+	// Get binding utilities for the inserted block
 	const { createBinding, clearBinding } = useEntityBinding( {
 		clientId: insertedBlockClientId,
 		attributes: insertedBlockAttributes || {},
 	} );
 
-	if ( ! showLinkControls && ! isEditingExistingBlock ) {
+	if ( ! showLinkControls ) {
 		return null;
 	}
 
@@ -76,16 +67,16 @@ export function NavigationLinkUI( {
 		setInsertedBlockClientId( null );
 	};
 
-	const setActiveBlockAttributes =
-		( _activeBlockClientId ) => ( _updatedAttributes ) => {
-			if ( ! _activeBlockClientId ) {
+	const setInsertedBlockAttributes =
+		( _insertedBlockClientId ) => ( _updatedAttributes ) => {
+			if ( ! _insertedBlockClientId ) {
 				return;
 			}
-			updateBlockAttributes( _activeBlockClientId, _updatedAttributes );
+			updateBlockAttributes( _insertedBlockClientId, _updatedAttributes );
 		};
 
 	// Wrapper function to clean up original block when a new block is selected
-	const handleSetActiveBlock = ( newBlock ) => {
+	const handleSetInsertedBlock = ( newBlock ) => {
 		// Prevent automatic block selection when removing blocks in list view context
 		// This avoids focus stealing that would close the list view and switch to canvas
 		const shouldAutoSelectBlock = false;

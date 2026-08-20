@@ -1,4 +1,4 @@
-import { chevronUp, chevronDown, moreVertical } from '@wordpress/icons';
+import { chevronUp, chevronDown, moreVertical, pencil } from '@wordpress/icons';
 import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
@@ -13,10 +13,15 @@ import { unlock } from '../../lock-unlock';
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 
+const BLOCKS_WITH_LINK_EDIT_SUPPORT = [
+	'core/navigation-link',
+	'core/navigation-submenu',
+];
+
 export default function LeafMoreMenu( props ) {
 	const history = useHistory();
 	const { path } = useLocation();
-	const { clientId } = props;
+	const { clientId, setInsertedBlockClientId } = props;
 	const { moveBlocksDown, moveBlocksUp, removeBlocks } =
 		useDispatch( blockEditorStore );
 
@@ -45,6 +50,8 @@ export default function LeafMoreMenu( props ) {
 		},
 		[ clientId ]
 	);
+
+	const canEditLink = BLOCKS_WITH_LINK_EDIT_SUPPORT.includes( blockName );
 
 	const onGoToPage = useCallback( () => {
 		if (
@@ -79,11 +86,11 @@ export default function LeafMoreMenu( props ) {
 			{ ( { onClose } ) => (
 				<>
 					<MenuGroup>
-						{ canEditLink && (
+						{ canEditLink && setInsertedBlockClientId && (
 							<MenuItem
 								icon={ pencil }
 								onClick={ () => {
-									setEditingBlock( block );
+									setInsertedBlockClientId( clientId );
 									onClose();
 								} }
 							>
