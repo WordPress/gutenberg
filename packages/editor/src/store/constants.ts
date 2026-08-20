@@ -48,6 +48,12 @@ export const DESIGN_POST_TYPES = [
  * `getEditorMode` masks the preference rather than changing it, and the
  * user's stored mode returns with the `edit` intent.
  *
+ * Because `suggest` is visual-only it also depends on the visual editor
+ * being available at all: `setEditorIntent` refuses it when the
+ * `richEditingEnabled` setting is off (the "Disable the visual editor when
+ * writing" profile option), and the intent menu offers it disabled with a
+ * pointer to that setting.
+ *
  * Storage and defaults:
  *   - Session-scoped: held in the editor store's reducer, not the
  *     preferences store, so reloading the editor always returns to the
@@ -75,3 +81,16 @@ export const EDITOR_INTENTS = [
 	EDITOR_INTENT_VIEW,
 ] as const;
 export type EditorIntent = ( typeof EDITOR_INTENTS )[ number ];
+
+/**
+ * Class token carried by an inline suggestion marker
+ * (`<mark class="wp-suggestion">`) in serialized block content.
+ *
+ * Mirrors `SUGGESTION_CLASS` in `components/inline-suggestions/format.js`,
+ * duplicated here for the same reason `components/suggestion-mode/constants.js`
+ * mirrors the intent value: the store must not import from the component tree.
+ * Used as a cheap containment probe over serialized content - the editor-only
+ * `wp-suggestion-a11y` decoration never serializes, so a hit means a real
+ * pending marker.
+ */
+export const SUGGESTION_MARKER_CLASS = 'wp-suggestion';

@@ -28,6 +28,7 @@ function ModeSwitcher() {
 		isRichEditingEnabled,
 		isCodeEditingEnabled,
 		isSuggestIntent,
+		codeEditorUnavailableReason,
 		mode,
 	} = useSelect(
 		( select ) => ( {
@@ -42,6 +43,16 @@ function ModeSwitcher() {
 			isSuggestIntent:
 				unlock( select( editorStore ) ).getEditorIntent() ===
 				EDITOR_INTENT_SUGGEST,
+			/*
+			 * Shared with the refusal in `switchEditorMode` so the disabled
+			 * item and the announcement say the same thing. Left on its cheap
+			 * intent-only check: the pending-marker probe serializes the
+			 * document, which is too expensive for a render pass, so that
+			 * case is refused at dispatch with a notice instead.
+			 */
+			codeEditorUnavailableReason: unlock(
+				select( editorStore )
+			).getCodeEditorUnavailableReason(),
 			mode: select( editorStore ).getEditorMode(),
 		} ),
 		[]
@@ -67,16 +78,26 @@ function ModeSwitcher() {
 				disabled: true,
 			};
 		}
-		if ( isSuggestIntent && choice.value === 'text' ) {
+		if ( codeEditorUnavailableReason && choice.value === 'text' ) {
 			choice = {
 				...choice,
 				disabled: true,
-				info: __(
-					'Raw HTML edits cannot be captured as suggestions. Switch to Editing to use the code editor.'
-				),
+				info: codeEditorUnavailableReason,
 			};
 		}
-		if ( ! isRichEditingEnabled && choice.value === 'visual' ) {
+		/*
+		 * Suggesting forces the visual editor, so it stays selectable even
+		 * with rich editing turned off - disabling it alongside the code
+		 * editor would leave both choices dead and the checked one
+		 * unreachable. Entering the intent is refused in that configuration
+		 * (see `setEditorIntent`), so this only covers a setting flipped
+		 * mid-session.
+		 */
+		if (
+			! isRichEditingEnabled &&
+			! isSuggestIntent &&
+			choice.value === 'visual'
+		) {
 			choice = {
 				...choice,
 				disabled: true,

@@ -814,6 +814,75 @@ describe( 'Editor actions', () => {
 			);
 		} );
 
+		it( 'refuses the code editor while suggestions are pending, whatever the intent', () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				status: 'draft',
+				title: 'bar',
+				content:
+					'<!-- wp:paragraph --><p>Hello <mark class="wp-suggestion" data-suggestion-id="7" data-suggestion-type="add">there</mark></p><!-- /wp:paragraph -->',
+				excerpt: '',
+			};
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post );
+
+			// Precondition: the marker is in the document the code editor
+			// would hand back to be re-parsed.
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toContain( 'wp-suggestion' );
+
+			// The Edit intent, not Suggest: re-parsing an edited document
+			// destroys the markers whoever made the edit.
+			expect(
+				unlock( registry.select( editorStore ) ).getEditorIntent()
+			).toEqual( 'edit' );
+
+			registry.dispatch( editorStore ).switchEditorMode( 'text' );
+
+			expect(
+				registry.select( preferencesStore ).get( 'core', 'editorMode' )
+			).toBeUndefined();
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'visual'
+			);
+		} );
+
+		it( 'surfaces the refusal as a notice, not only as an announcement', () => {
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+			speak.mockClear();
+
+			registry.dispatch( editorStore ).switchEditorMode( 'text' );
+
+			// A sighted keyboard user pressing the shortcut sees nothing
+			// change unless the refusal is also on screen.
+			expect( speak ).toHaveBeenCalledWith(
+				expect.stringContaining( 'suggestions' ),
+				'assertive'
+			);
+			expect(
+				registry
+					.select( noticesStore )
+					.getNotices()
+					.map( ( notice ) => notice.content )
+			).toContain(
+				'Raw HTML edits cannot be captured as suggestions. Switch to Editing to use the code editor.'
+			);
+		} );
+
+		it( 'still opens the code editor with no suggestions pending', () => {
+			registry.dispatch( editorStore ).switchEditorMode( 'text' );
+
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'text'
+			);
+		} );
+
 		it( 'reports the visual editor while suggesting, and restores the stored mode on the way out', () => {
 			registry.dispatch( editorStore ).switchEditorMode( 'text' );
 			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
@@ -882,6 +951,66 @@ describe( 'Editor actions', () => {
 			expect(
 				unlock( registry.select( editorStore ) ).getEditorIntent()
 			).toEqual( 'suggest' );
+		} );
+
+		it( 'refuses the suggest intent when the visual editor is unavailable', () => {
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				richEditingEnabled: false,
+			} );
+
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+
+			// Suggestions are inline markers the code editor cannot render,
+			// so entering the intent here would either strand the user or
+			// force back the visual editor they turned off.
+			expect(
+				unlock( registry.select( editorStore ) ).getEditorIntent()
+			).toEqual( 'edit' );
+			expect(
+				registry
+					.select( noticesStore )
+					.getNotices()
+					.map( ( notice ) => notice.content )
+			).toEqual( [ expect.stringContaining( 'visual editor' ) ] );
+		} );
+
+		it( 'announces the canvas swap when the intent changes the effective mode', () => {
+			registry.dispatch( editorStore ).switchEditorMode( 'text' );
+			speak.mockClear();
+
+			// `switchEditorMode` - which owns the mode announcement - is
+			// never dispatched here, so the intent action has to carry it.
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+			expect( speak ).toHaveBeenCalledWith(
+				expect.stringContaining( 'Visual editor selected' ),
+				'assertive'
+			);
+
+			speak.mockClear();
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'edit'
+			);
+			expect( speak ).toHaveBeenCalledWith(
+				expect.stringContaining( 'Code editor selected' ),
+				'assertive'
+			);
+		} );
+
+		it( 'leaves the announcement alone when the mode is unaffected', () => {
+			speak.mockClear();
+
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'view'
+			);
+
+			expect( speak ).toHaveBeenCalledWith(
+				"You're viewing",
+				'assertive'
+			);
 		} );
 
 		it( 'does not write to the preferences store (session-scoped only)', () => {

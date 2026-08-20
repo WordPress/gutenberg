@@ -41,6 +41,10 @@ function renderWithProviders( ui, { intent = 'edit', blocks = null } = {} ) {
 	// the intent actually changes, so the store needs to be registered even
 	// in tests that only care about the overlay HOC.
 	registry.register( noticesStore );
+	// `setEditorIntent` compares the editor mode across the change so it can
+	// announce a canvas swap, and `getEditorMode` reads the preferences
+	// store.
+	registry.register( preferencesStore );
 	registry.register( editorStore );
 	// `blockEditorStore` is only registered when the test passes `blocks`.
 	// Registering it unconditionally activates the overlay provider's
@@ -51,7 +55,6 @@ function renderWithProviders( ui, { intent = 'edit', blocks = null } = {} ) {
 	// register a matching block, so the entry would be pruned the
 	// moment `captureBaseline` creates it.
 	if ( blocks ) {
-		registry.register( preferencesStore );
 		registry.register( blockEditorStore );
 		registry.dispatch( blockEditorStore ).resetBlocks( blocks );
 	}

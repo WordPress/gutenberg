@@ -9,12 +9,13 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
-import { useState, useCallback } from '@wordpress/element';
+import { useState, useCallback, useEffect, useRef } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { InlineNotices } from '@wordpress/notices';
 import { ThemeProvider } from '@wordpress/theme';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import TemplateValidationNotice from '../template-validation-notice';
 import Header from '../header';
 import InserterSidebar from '../inserter-sidebar';
@@ -100,11 +101,28 @@ export default function EditorInterface( {
 			getShowStylebook,
 			isRevisionsMode: _isRevisionsMode,
 			isShowingRevisionDiff,
+			getEditorIntent,
 		} = unlock( select( editorStore ) );
 		const editorSettings = getEditorSettings();
 
 		let _mode = select( editorStore ).getEditorMode();
-		if ( ! editorSettings.richEditingEnabled && _mode === 'visual' ) {
+		/*
+		 * `getEditorMode` already reports `visual` while suggesting, whatever
+		 * the stored preference says, because the code editor has nowhere to
+		 * render an inline suggestion marker. Re-deriving `text` from
+		 * `richEditingEnabled` here would put that raw `post_content`
+		 * textarea back on screen and undo the mask - the exact bypass it
+		 * exists to close - while the header and the document tools, which
+		 * read the selector directly, went on reporting `visual`. Entering
+		 * the intent is refused outright when rich editing is off (see
+		 * `setEditorIntent`); this holds the line if the setting is flipped
+		 * mid-session.
+		 */
+		if (
+			! editorSettings.richEditingEnabled &&
+			_mode === 'visual' &&
+			getEditorIntent() !== EDITOR_INTENT_SUGGEST
+		) {
 			_mode = 'text';
 		}
 		if ( ! editorSettings.codeEditingEnabled && _mode === 'text' ) {
@@ -132,6 +150,38 @@ export default function EditorInterface( {
 	// Runs unconditionally so join/leave/save notifications are dispatched
 	// regardless of viewport width or whether the header centre area is visible.
 	useCollaboratorNotifications( postId, postType );
+
+	/*
+	 * Swapping the canvas unmounts whatever held focus, and on an
+	 * already-loaded post the incoming visual editor does not claim it back,
+	 * so focus falls to `<body>` and keyboard navigation restarts from the
+	 * top of the page. The Suggest intent reaches that swap without any
+	 * deliberate mode switch - `getEditorMode` masks the stored preference,
+	 * so entering the intent from the code editor replaces the canvas on its
+	 * own - which leaves the user nowhere with nothing announced.
+	 *
+	 * Put focus on the editor content region, the landmark the swapped-in
+	 * canvas lives in. Only when focus was genuinely orphaned: any other
+	 * active element means the swap came from somewhere still focused (a
+	 * menu, the header) and taking focus away from it would be worse.
+	 */
+	const skeletonRef = useRef();
+	const previousModeRef = useRef( mode );
+	useEffect( () => {
+		const previousMode = previousModeRef.current;
+		previousModeRef.current = mode;
+		if ( previousMode === mode ) {
+			return;
+		}
+		const { activeElement, body } =
+			skeletonRef.current?.ownerDocument ?? {};
+		if ( activeElement && activeElement !== body ) {
+			return;
+		}
+		skeletonRef.current
+			?.querySelector( '.interface-interface-skeleton__content' )
+			?.focus();
+	}, [ mode ] );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const secondarySidebarLabel = isListViewOpened
@@ -181,6 +231,7 @@ export default function EditorInterface( {
 
 	return (
 		<InterfaceSkeleton
+			ref={ skeletonRef }
 			isDistractionFree={ isDistractionFree }
 			className={ clsx( 'editor-editor-interface', className, {
 				'is-entity-save-view-open': !! entitiesSavedStatesCallback,
