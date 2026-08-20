@@ -12,27 +12,6 @@ function findNearest( input: number, numbers: number[] ) {
 	return numbers[ 0 ];
 }
 
-function extractFontWeights( fontFaces: FontFace[] ): number[] {
-	const result: number[] = [];
-
-	fontFaces.forEach( ( face ) => {
-		const weights = String( face.fontWeight ).split( ' ' );
-
-		if ( weights.length === 2 ) {
-			const start = parseInt( weights[ 0 ] );
-			const end = parseInt( weights[ 1 ] );
-
-			for ( let i = start; i <= end; i += 100 ) {
-				result.push( i );
-			}
-		} else if ( weights.length === 1 ) {
-			result.push( parseInt( weights[ 0 ] ) );
-		}
-	} );
-
-	return result;
-}
-
 const FONT_WEIGHT_KEYWORDS: Record< string, number | undefined > = {
 	normal: 400,
 	bold: 700,
@@ -173,11 +152,12 @@ export function getFamilyPreviewStyle(
 		);
 		if ( normalFaces.length > 0 ) {
 			style.fontStyle = 'normal';
-			const normalWeights = extractFontWeights( normalFaces );
-			const nearestWeight = findNearest( 400, normalWeights );
-			style.fontWeight = Number.isFinite( nearestWeight )
-				? String( nearestWeight )
-				: '400';
+			const normalWeights = normalFaces.map( ( face ) =>
+				Number( resolveFontWeight( face.fontWeight ) )
+			);
+			style.fontWeight = String(
+				findNearest( 400, normalWeights ) ?? 400
+			);
 		} else {
 			style.fontStyle =
 				( family.fontFace.length && family.fontFace[ 0 ].fontStyle ) ||
