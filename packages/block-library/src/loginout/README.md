@@ -17,6 +17,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 |-----------|------|---------|-------------|
 | `displayLoginAsForm` | `boolean` | `false` | — |
 | `redirectToCurrent` | `boolean` | `true` | — |
+| `loginUrl` | `string` | `""` | — |
 
 ## Supports
 

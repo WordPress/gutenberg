@@ -4,7 +4,8 @@
 		"isValid": true,
 		"attributes": {
 			"displayLoginAsForm": false,
-			"redirectToCurrent": true
+			"redirectToCurrent": true,
+			"loginUrl": ""
 		},
 		"innerBlocks": []
 	}
