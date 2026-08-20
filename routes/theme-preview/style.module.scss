@@ -1,0 +1,30 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.content {
+	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
+	padding: $grid-unit-30;
+}
+
+.frame {
+	border: $border-width solid $gray-300;
+	border-radius: $radius-large;
+	overflow: hidden;
+	max-width: 1200px;
+	margin: 0 auto;
+}
+
+.loading {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+}
+
+.empty {
+	color: $gray-700;
+	text-align: center;
+	margin: $grid-unit-40 0;
+}
