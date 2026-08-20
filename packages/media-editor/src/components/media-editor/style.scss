@@ -130,9 +130,11 @@
 		}
 	}
 
-	// Below `large` the open panel owns the body, so the canvas steps aside
-	// rather than being squeezed into an unusable sliver.
-	.media-editor__body.has-details-open .media-editor__content {
+	// Below `large` an open panel owns the body, so the canvas steps aside
+	// rather than being squeezed into an unusable sliver. Keyed on any panel
+	// being open, not on which one; `data-active-panel` on the same element
+	// carries the id when a rule needs to tell them apart.
+	.media-editor__body.has-panel-open .media-editor__content {
 		display: none;
 
 		@include break-large() {
