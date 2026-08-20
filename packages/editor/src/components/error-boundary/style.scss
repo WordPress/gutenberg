@@ -1,29 +1,26 @@
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
 .editor-error-boundary {
-	font-family: $default-font;
+	font-family: var(--wpds-typography-font-family-body);
 	margin: auto;
-	max-width: 720px;
-	padding: $grid-unit-20;
+	width: 100%;
+	max-width: var(--wpds-dimension-surface-width-lg);
+	padding: var(--wpds-dimension-padding-xl);
 	margin-top: $header-height;
 }
 
 .editor-error-boundary__report {
-	max-height: 320px;
-	padding: $grid-unit-15;
+	max-height: 420px;
 	overflow: auto;
 	overflow-anchor: none;
-	color: $gray-200;
-	background-color: $gray-800;
-	border-radius: $radius-medium;
+	color: var(--wpds-color-foreground-content-neutral-weak);
 }
 
 .editor-error-boundary__report-section {
 	margin: 0;
-	font-family: $font-family-mono;
-	font-size: $helptext-font-size;
-	line-height: 1.6;
+	font-family: var(--wpds-typography-font-family-mono);
+	font-size: var(--wpds-typography-font-size-sm);
+	line-height: var(--wpds-typography-line-height-sm);
 	white-space: pre-wrap;
 	overflow-wrap: break-word;
 }
