@@ -23,6 +23,10 @@
 
 -   Remove `editLink` from a route's canvas data. Register the post type's `edit` path with `registerEntityLinks` instead ([#81590](https://github.com/WordPress/gutenberg/pull/81590)).
 
+### Internal
+
+-   Migrate Boot styles to CSS Modules and encapsulate its internal DOM classes ([#81756](https://github.com/WordPress/gutenberg/pull/81756)).
+
 ## 0.20.0 (2026-08-12)
 
 ### Bug Fixes

@@ -1,11 +1,13 @@
 import { parseISO, endOfMonth, startOfMonth } from 'date-fns';
+import { speak } from '@wordpress/a11y';
 import { getSettings } from '@wordpress/date';
-import { _x } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useState, useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '../../store';
+import { getFullPostScheduleLabel } from './label';
 import { unlock } from '../../lock-unlock';
 
 const { PrivatePublishDateTimePicker } = unlock( blockEditorPrivateApis );
@@ -42,7 +44,19 @@ export function PrivatePostSchedule( {
 	);
 
 	const { editPost } = useDispatch( editorStore );
-	const onUpdateDate = ( date ) => editPost( { date } );
+	const onUpdateDate = ( date ) => {
+		editPost( { date } );
+		speak(
+			date
+				? sprintf(
+						// translators: %s: The new publish date and time, e.g. "June 3, 2025 12:00 pm UTC+0".
+						__( 'Publish date set to %s.' ),
+						getFullPostScheduleLabel( date )
+				  )
+				: __( 'Publish date set to now.' ),
+			'assertive'
+		);
+	};
 
 	const [ previewedMonth, setPreviewedMonth ] = useState(
 		startOfMonth( new Date( postDate ) )
