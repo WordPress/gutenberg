@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 9.38.0 (2026-08-12)
+
 ### Enhancements
 
 -   `ComplementaryArea`: Add a `render` prop to replace the default container element with a given React element ([#81054](https://github.com/WordPress/gutenberg/pull/81054)).

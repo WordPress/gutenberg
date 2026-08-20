@@ -492,7 +492,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 	} ) => {
 		await admin.createNewPost();
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '/tag cloud' );
 
@@ -514,7 +514,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 	} ) => {
 		await admin.createNewPost();
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'First paragraph' );
 		await page.keyboard.press( 'Enter' );
@@ -568,7 +568,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 	} ) => {
 		await admin.createNewPost();
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'First paragraph' );
 		await editor.insertBlock( { name: 'core/image' } );
@@ -775,6 +775,51 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			// Restore the viewport.
 			await pageUtils.setBrowserViewport( 'large' );
 		} );
+	} );
+} );
+
+test.describe( 'Default block ghost', () => {
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
+	test( 'materialises in the same DOM element', async ( {
+		editor,
+		page,
+	} ) => {
+		const ghost = editor.canvas.getByRole( 'document', {
+			name: 'Add default block',
+		} );
+		await expect( ghost ).toBeVisible();
+
+		// The ghost is not part of the content yet.
+		expect( await editor.getBlocks() ).toEqual( [] );
+
+		// Tag the DOM node and record its block id.
+		const idBefore = await ghost.evaluate( ( element ) => {
+			element.__ghostNode = true;
+			return element.getAttribute( 'data-block' );
+		} );
+
+		await ghost.click();
+		await page.keyboard.type( 'Hello' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Hello' },
+			},
+		] );
+
+		// Same client ID, same DOM node: nothing remounted.
+		const after = await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.evaluate( ( element ) => ( {
+				id: element.getAttribute( 'data-block' ),
+				sameNode: element.__ghostNode === true,
+			} ) );
+		expect( after.id ).toBe( idBefore );
+		expect( after.sameNode ).toBe( true );
 	} );
 } );
 

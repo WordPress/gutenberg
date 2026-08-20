@@ -2,10 +2,41 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Validated form controls: Align invalid focus styling for `ComboboxControl` and `FormTokenField` with the design system ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
+-   DataViews filters: Align filter search input focus styling with `outset-ring__focus` ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
+
+### Bug Fix
+
+-   Validated form controls: Align invalid focus styling for InputBase-based controls with the design system ([#80417](https://github.com/WordPress/gutenberg/pull/80417)).
+-   DataViews: Prevent the filter operator select focus ring from being clipped. [#80417](https://github.com/WordPress/gutenberg/pull/80417)
+-   DataForm: Send a single update per calendar interaction in the `datetime` control instead of two identical ones. Selecting or clearing a date now reveals the validation message by firing a synthetic `invalid` event on the input, rather than briefly moving focus into it and re-sending the value, and announces it to screen readers since focus stays on the calendar. [#81440](https://github.com/WordPress/gutenberg/pull/81440)
+
+### Internal
+
+-   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509), [#81514](https://github.com/WordPress/gutenberg/pull/81514), [#81516](https://github.com/WordPress/gutenberg/pull/81516))
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81515](https://github.com/WordPress/gutenberg/pull/81515))
+-   DataForm: Narrow the combobox control's `onChange` handler parameter back to `string | null`, following the upstream `ComboboxControl` type fix that removed the accidental `undefined` from the callback type. [#81568](https://github.com/WordPress/gutenberg/pull/81568)
+-   DataForm: Internalize `ValidatedComboboxControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81449](https://github.com/WordPress/gutenberg/pull/81449)
+-   DataForm: Internalize `ValidatedFormTokenField` instead of unlocking it from the `@wordpress/components` private APIs. [#81451](https://github.com/WordPress/gutenberg/pull/81451)
+-   DataForm: Internalize `ValidatedToggleControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81492](https://github.com/WordPress/gutenberg/pull/81492)
+-   DataForm: Internalize `ValidatedToggleGroupControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81450](https://github.com/WordPress/gutenberg/pull/81450)
+-   `ValidatedToggleGroupControl`: Use `--focus-color` for the error focus ring so ancestor overrides apply correctly ([#81242](https://github.com/WordPress/gutenberg/pull/81242)).
+
+## 18.0.0 (2026-08-12)
+
+### Breaking Changes
+
+-   DataForms: Remove the built-in `richtext` control, its `EditConfigRichText` type, and the package's `privateApis` export, whose only member was that control. Assembling `@wordpress/rich-text` inside a bundled package broke plugins that install DataViews from npm ([#81233](https://github.com/WordPress/gutenberg/issues/81233)), so the control moved to `@wordpress/editor`, next to its only consumer. `@wordpress/rich-text` is no longer a dependency of this package, and a rich text field now needs a custom `Edit` component ([#81430](https://github.com/WordPress/gutenberg/pull/81430)).
+
 ### Internal
 
 -   DataViews: Replace the inlined `kebabCase` utility with the new `@wordpress/kebab-case` package. [#81294](https://github.com/WordPress/gutenberg/pull/81294)
 -   DataForm: Internalize `ValidatedSelectControl` and its `ControlWithError` foundation instead of unlocking them from the `@wordpress/components` private APIs. The foundation is a temporary copy slated to be replaced by the upcoming `@wordpress/ui` implementation. [#81391](https://github.com/WordPress/gutenberg/pull/81391)
+-   DataForm: Internalize `ValidatedCheckboxControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81435](https://github.com/WordPress/gutenberg/pull/81435)
+-   DataForm: Internalize `ValidatedNumberControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81433](https://github.com/WordPress/gutenberg/pull/81433)
+-   DataForm: Internalize `ValidatedRadioControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81434](https://github.com/WordPress/gutenberg/pull/81434)
 
 ### New Features
 
@@ -48,6 +79,8 @@
 -   Fix Dataviews popover hover text color readability issue on WordPress 7.0. [#80105](https://github.com/WordPress/gutenberg/pull/80105)
 -   DataViews: Fix the unintended gap between `list` layout items when `groupBy` is set. [#80254](https://github.com/WordPress/gutenberg/pull/80254)
 -   DataViews: Give the search field a fixed width so it no longer resizes when the reset button appears or disappears as the search value changes. [#80315](https://github.com/WordPress/gutenberg/pull/80315)
+
+-   DataViews: Fix the `list` layout mixing `neutral` and `brand` color tokens. The non-selected row hover state now uses `interactive-neutral` tokens instead of `brand`, and the selected row pairs its `brand` background with `content-neutral` text. Field values are now rendered with `foreground-content` tokens since they are static content. [#81074](https://github.com/WordPress/gutenberg/pull/81074)
 
 ### Internal
 

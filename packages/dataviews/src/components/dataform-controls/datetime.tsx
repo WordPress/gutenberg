@@ -4,6 +4,7 @@ import {
 } from '@wordpress/components';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { speak } from '@wordpress/a11y';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { Calendar, Stack } from '@wordpress/ui';
 import type { DataFormControlProps, FormatDatetime } from '../../types';
@@ -47,7 +48,6 @@ function CalendarDateTimeControl< Item >( {
 	const inputControlRef = useRef< HTMLInputElement >( null );
 	const validationTimeoutRef =
 		useRef< ReturnType< typeof setTimeout > >( undefined );
-	const previousFocusRef = useRef< Element | null >( null );
 
 	const { minConstraint, maxConstraint, disabledMatchers } =
 		useDisabledDateMatchers( isValid, parseDateTime );
@@ -60,16 +60,11 @@ function CalendarDateTimeControl< Item >( {
 
 	// Cleanup timeout on unmount
 	useEffect( () => {
-		return () => {
-			if ( validationTimeoutRef.current ) {
-				clearTimeout( validationTimeoutRef.current );
-			}
-		};
+		return () => clearTimeout( validationTimeoutRef.current );
 	}, [] );
 
 	const onSelectDate = useCallback(
 		( newDate: Date | null ) => {
-			let dateTimeValue: string | undefined;
 			if ( newDate ) {
 				// Extract the date part in WP timezone from the calendar selection
 				const wpDate = dateI18n( 'Y-m-d', newDate );
@@ -84,36 +79,33 @@ function CalendarDateTimeControl< Item >( {
 
 				// Combine date and time in WP timezone and convert to ISO
 				const finalDateTime = getDate( `${ wpDate }T${ wpTime }` );
-				dateTimeValue = finalDateTime.toISOString();
-				onChangeCallback( dateTimeValue );
-
-				// Clear any existing timeout
-				if ( validationTimeoutRef.current ) {
-					clearTimeout( validationTimeoutRef.current );
-				}
+				onChangeCallback( finalDateTime.toISOString() );
 			} else {
 				onChangeCallback( undefined );
 			}
-			// Save the currently focused element
-			previousFocusRef.current =
-				inputControlRef.current &&
-				inputControlRef.current.ownerDocument.activeElement;
 
-			// Trigger validation display by simulating focus, blur, and changes.
-			// Use a timeout to ensure it runs after the value update.
+			// A calendar interaction counts as touching the field: reveal the
+			// input's validity state by firing a synthetic `invalid` event,
+			// which the validated control listens to in order to display its
+			// error message without moving focus (unlike `reportValidity()`).
+			// The control re-reads the message on this event, so dispatching
+			// unconditionally is also what clears a stale error once a valid
+			// date is selected.
+			// The timeout ensures the input has re-rendered with the new
+			// value before its validity is sampled.
+			clearTimeout( validationTimeoutRef.current );
 			validationTimeoutRef.current = setTimeout( () => {
-				if ( inputControlRef.current ) {
-					inputControlRef.current.focus();
-					inputControlRef.current.blur();
-					onChangeCallback( dateTimeValue );
-
-					// Restore focus to the previously focused element
-					if (
-						previousFocusRef.current &&
-						previousFocusRef.current instanceof HTMLElement
-					) {
-						previousFocusRef.current.focus();
-					}
+				const input = inputControlRef.current;
+				if ( ! input ) {
+					return;
+				}
+				input.dispatchEvent(
+					new Event( 'invalid', { cancelable: true } )
+				);
+				// Focus stays on the calendar, so announce the message;
+				// revealing it alone would go unnoticed by screen readers.
+				if ( input.validationMessage ) {
+					speak( input.validationMessage );
 				}
 			}, 0 );
 		},

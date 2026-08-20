@@ -223,7 +223,6 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 ### Tools
 
 - Label enforcer workflow: Make accessibility a focus instead of a type. ([54941](https://github.com/WordPress/gutenberg/pull/54941))
-- Scripts: Update webpack and related dependencies to the latest version. ([54657](https://github.com/WordPress/gutenberg/pull/54657))
 - Update changelog automation and test fixtures to match the last a11y label renaming. ([54974](https://github.com/WordPress/gutenberg/pull/54974))
 
 #### Testing
@@ -251,6 +250,9 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 - Update the default JSX pragma to React instead of @wordpress/element. ([54494](https://github.com/WordPress/gutenberg/pull/54494))
 - Upgrade wp-prettier to v3.0.3 (final). ([54775](https://github.com/WordPress/gutenberg/pull/54775))
 - [RNMobile] Upgrade \`compileSdkVersion\` to 34 (Android). ([54437](https://github.com/WordPress/gutenberg/pull/54437))
+
+#### Scripts
+- Update webpack and related dependencies to the latest version. ([54657](https://github.com/WordPress/gutenberg/pull/54657))
 
 
 ### Security

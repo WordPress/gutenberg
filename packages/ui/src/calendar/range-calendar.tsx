@@ -1,6 +1,6 @@
 import { differenceInCalendarDays } from 'date-fns';
-import { DayPicker, rangeContainsModifiers } from 'react-day-picker';
-import { enUS } from 'react-day-picker/locale';
+import { DayPicker, rangeContainsModifiers } from '@daypicker/react';
+import { enUS } from '@daypicker/react/locale';
 import { forwardRef, useMemo, useState, useCallback } from '@wordpress/element';
 import { COMMON_PROPS, MODIFIER_CLASSNAMES } from './utils/constants';
 import { clampNumberOfMonths } from './utils/misc';

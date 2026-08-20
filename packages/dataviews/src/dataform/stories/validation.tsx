@@ -12,7 +12,7 @@ import type {
 import DateControl from '../../components/dataform-controls/date';
 import { unlock } from '../../lock-unlock';
 
-const { ValidatedTextControl } = unlock( privateApis );
+const { ValidatedInputControl } = unlock( privateApis );
 
 function getCustomValidity< Item >(
 	isValid: NormalizedRules< Item >,
@@ -52,7 +52,7 @@ function CustomEditControl< Item >( {
 	);
 
 	return (
-		<ValidatedTextControl
+		<ValidatedInputControl
 			required={ !! isValid?.required }
 			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }

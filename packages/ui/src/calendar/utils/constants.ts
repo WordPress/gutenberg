@@ -29,7 +29,7 @@ const CLASSNAMES = {
 	 * Disabled days are styled through `:has(.day-button:disabled)` rather than
 	 * a modifier class on the cell, because the two are not equivalent: the
 	 * focused day keeps its button enabled so it stays reachable. Mapped to
-	 * `undefined` on purpose, so `react-day-picker` doesn't fall back to its
+	 * `undefined` on purpose, so `@daypicker/react` doesn't fall back to its
 	 * own `rdp-disabled` class for a modifier we don't style.
 	 */
 	disabled: undefined,

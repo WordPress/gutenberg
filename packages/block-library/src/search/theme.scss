@@ -1,7 +1,5 @@
-.wp-block-search {
-	.wp-block-search__label {
-		font-weight: bold;
-	}
+:where(.wp-block-search .wp-block-search__label) {
+	font-weight: bold;
 }
 
 .wp-block-search__button {

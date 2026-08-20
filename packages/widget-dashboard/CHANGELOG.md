@@ -4,6 +4,22 @@
 
 ### New Features
 
+-   Widget chrome footer: `relevance: 'high'` actions mount as leading text
+    links (declared icon as prefix) in a persistent strip under the widget
+    body, `'medium'` as trailing compact affordances (icon-only with a
+    declared icon); the "More" menu keeps the rest, and full-bleed widgets
+    keep every action in the menu
+    ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
+
+### Internal
+
+-   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509), [#81515](https://github.com/WordPress/gutenberg/pull/81515), [#81516](https://github.com/WordPress/gutenberg/pull/81516), [#81518](https://github.com/WordPress/gutenberg/pull/81518))
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 0.5.0 (2026-08-12)
+
+### New Features
+
 -   Tile spacing is host-tunable via `--wp-widget-dashboard-tile-padding` and
     `--wp-widget-dashboard-tile-header-gap`; the header gap follows the tile
     padding unless set apart ([#81352](https://github.com/WordPress/gutenberg/pull/81352)).

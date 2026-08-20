@@ -9,6 +9,7 @@ import {
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import Root from '../root';
+import ErrorBoundary from '../error-boundary';
 import type { Route, RouteConfig, RouteLoaderContext } from '../../store/types';
 import { unlock } from '../../lock-unlock';
 
@@ -94,10 +95,16 @@ function createRouteFromDefinition( route: Route, parentRoute: AnyRoute ) {
 				inspector = await routeConfig.inspector( context );
 			}
 
+			let stage = true;
+			if ( routeConfig.stage ) {
+				stage = await routeConfig.stage( context );
+			}
+
 			return {
 				...( loaderData as any ),
 				canvas: canvasData,
 				inspector,
+				stage,
 				title: titleData,
 				routeContentModule: route.content_module,
 			};
@@ -116,19 +123,23 @@ function createRouteFromDefinition( route: Route, parentRoute: AnyRoute ) {
 
 		return createLazyRoute( route.path )( {
 			component: function RouteComponent() {
-				const { inspector: showInspector } =
+				const { inspector: showInspector, stage: showStage } =
 					useLoaderData( { from: route.path } ) ?? {};
 
 				return (
 					<>
-						{ Stage && (
+						{ Stage && showStage && (
 							<div className="boot-layout__stage">
-								<Stage />
+								<ErrorBoundary>
+									<Stage />
+								</ErrorBoundary>
 							</div>
 						) }
 						{ Inspector && showInspector && (
 							<div className="boot-layout__inspector">
-								<Inspector />
+								<ErrorBoundary>
+									<Inspector />
+								</ErrorBoundary>
 							</div>
 						) }
 					</>

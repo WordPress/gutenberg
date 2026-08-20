@@ -41,6 +41,9 @@ export const pagesRoute = {
 			return siteData.currentTheme.is_block_theme ? (
 				<SidebarNavigationScreen
 					title={ __( 'Pages' ) }
+					description={ __(
+						'Manage or edit the pages that make up your site, and their appearance.'
+					) }
 					backPath="/"
 					content={ <DataViewsSidebarContent postType="page" /> }
 				/>
