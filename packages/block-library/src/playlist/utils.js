@@ -83,5 +83,7 @@ export function getWaveformArtistText( track, showAlbum = false ) {
 	const album =
 		showAlbum && typeof track?.album === 'string' ? track.album : '';
 
+	// The separator is not translatable because this util is shared with the
+	// frontend view module, which avoids importing `@wordpress/i18n`.
 	return [ artist, album ].filter( Boolean ).join( ' - ' );
 }

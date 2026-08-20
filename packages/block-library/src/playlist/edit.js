@@ -709,7 +709,7 @@ const PlaylistEdit = ( {
 						title={ currentTrackData?.title }
 						artist={ getWaveformArtistText(
 							currentTrackData,
-							showAlbum === true
+							showAlbum
 						) }
 						image={ currentTrackData?.image }
 						imageAlt={ currentTrackData?.imageAlt }

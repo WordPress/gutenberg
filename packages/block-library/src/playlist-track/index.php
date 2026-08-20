@@ -28,7 +28,7 @@ function render_block_core_playlist_track( $attributes, $content = '', $block = 
 	}
 	$show_album = false;
 	if ( $block instanceof WP_Block && isset( $block->context['showAlbum'] ) ) {
-		$show_album = true === $block->context['showAlbum'];
+		$show_album = $block->context['showAlbum'];
 	}
 
 	$track_image = $attributes['image'] ?? null;
