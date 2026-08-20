@@ -6,6 +6,7 @@ import {
 	MediaUpload,
 	MediaUploadCheck,
 	BlockIcon,
+	store as blockEditorStore,
 	useBlockProps,
 	BlockControls,
 	InspectorControls,
@@ -20,7 +21,7 @@ import {
 	Spinner,
 } from '@wordpress/components';
 import { Link } from '@wordpress/ui';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
@@ -175,6 +176,30 @@ const PlaylistTrackEdit = ( {
 	const { currentTrackClientId, setCurrentTrackClientId } =
 		useContext( PlaylistContext );
 	const { createErrorNotice } = useDispatch( noticesStore );
+	const isMultiSelectingPlaylistTracks = useSelect(
+		( select ) => {
+			const {
+				getBlockName,
+				getBlockRootClientId,
+				getMultiSelectedBlockClientIds,
+			} = select( blockEditorStore );
+			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
+			const playlistClientId = getBlockRootClientId( clientId );
+
+			return (
+				multiSelectedClientIds.length > 1 &&
+				!! playlistClientId &&
+				multiSelectedClientIds.every(
+					( selectedClientId ) =>
+						getBlockName( selectedClientId ) ===
+							'core/playlist-track' &&
+						getBlockRootClientId( selectedClientId ) ===
+							playlistClientId
+				)
+			);
+		},
+		[ clientId ]
+	);
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
@@ -293,9 +318,13 @@ const PlaylistTrackEdit = ( {
 					setAttributes( { album: albumValue } );
 				} }
 				title={ title }
-				onChangeTitle={ ( titleValue ) => {
-					setAttributes( { title: titleValue } );
-				} }
+				onChangeTitle={
+					! isMultiSelectingPlaylistTracks
+						? ( titleValue ) => {
+								setAttributes( { title: titleValue } );
+						  }
+						: undefined
+				}
 				image={ image }
 				hasImage={ !! image }
 				imageAlt={ imageAlt || '' }

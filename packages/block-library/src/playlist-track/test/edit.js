@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import PlaylistTrackEdit from '../edit';
 import { PlaylistContext } from '../../playlist/context';
 import { useUploadMediaFromBlobURL } from '../../utils/hooks';
@@ -7,11 +7,8 @@ import { useUploadMediaFromBlobURL } from '../../utils/hooks';
 let mockMediaReplaceFlowProps;
 
 jest.mock( '@wordpress/block-editor', () => {
-	const PlainText = jest.requireActual(
-		'../../../../block-editor/src/components/plain-text'
-	).default;
-
 	return {
+		store: 'core/block-editor',
 		BlockControls: ( { children } ) => <div>{ children }</div>,
 		BlockIcon: () => <span />,
 		InspectorControls: ( { children } ) => <div>{ children }</div>,
@@ -24,7 +21,7 @@ jest.mock( '@wordpress/block-editor', () => {
 		MediaUpload: ( { render: renderMediaUpload } ) =>
 			renderMediaUpload( { open: jest.fn() } ),
 		MediaUploadCheck: ( { children } ) => <div>{ children }</div>,
-		PlainText,
+		PlainText: ( { value } ) => <span>{ value }</span>,
 		useBlockProps: jest.fn( () => ( {} ) ),
 	};
 } );
@@ -32,11 +29,16 @@ jest.mock( '@wordpress/block-editor', () => {
 jest.mock( '@wordpress/data', () => {
 	const data = jest.requireActual( '@wordpress/data' );
 	const mockUseDispatch = jest.fn();
+	const mockUseSelect = jest.fn();
 
 	return new Proxy( data, {
 		get( target, property ) {
 			if ( property === 'useDispatch' ) {
 				return mockUseDispatch;
+			}
+
+			if ( property === 'useSelect' ) {
+				return mockUseSelect;
 			}
 
 			return target[ property ];
@@ -100,7 +102,24 @@ describe( 'PlaylistTrackEdit', () => {
 		useDispatch.mockReturnValue( {
 			createErrorNotice: jest.fn(),
 		} );
+		useSelect.mockReturnValue( false );
 		useUploadMediaFromBlobURL.mockClear();
+	} );
+
+	it( 'does not show the title control when multiple playlist tracks are selected', () => {
+		useSelect.mockReturnValue( true );
+
+		renderEdit();
+
+		expect(
+			screen.queryByRole( 'textbox', { name: 'Title' } )
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByRole( 'textbox', { name: 'Artist' } )
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'textbox', { name: 'Album' } )
+		).toBeInTheDocument();
 	} );
 
 	it( 'allows the track image alternative text to be edited', () => {
