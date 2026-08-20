@@ -27,6 +27,7 @@ ruleTester.run( 'use-recommended-components', rule, {
 		"import { Autocomplete, Badge, Field, Fieldset, Icon, Link, Stack, Tabs, Text, Tooltip } from '@wordpress/ui';",
 		"import { Spinner } from '@wordpress/ui';",
 		"import { KeyboardShortcutDescription, KeyboardShortcutDisplay, useKeyboardShortcutProps } from '@wordpress/ui';",
+		"import { ControlWithError } from '@wordpress/ui';",
 
 		// Unlocked private APIs are only checked for denied names.
 		"import { privateApis } from '@wordpress/components'; import { unlock } from '../../lock-unlock'; const { SomethingElse } = unlock( privateApis );",
