@@ -20,6 +20,8 @@ import { PostPreviewMenuItem } from '../post-preview-button';
 import { sidebars } from '../sidebar/constants';
 import { VIEWPORT_STATE_BY_DEVICE_TYPE } from '../../utils/device-type';
 import { unlock } from '../../lock-unlock';
+import { shouldShowTemplateOption } from './utils';
+import { TEMPLATE_PART_POST_TYPE } from '../../store/constants';
 
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
@@ -34,6 +36,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		showIconLabels,
 		isTemplateHidden,
 		templateId,
+		isFocusedTemplatePart,
 		isResponsiveEditing,
 		isResponsiveEditingEnabled,
 		hasBlockSelection,
@@ -54,6 +57,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		const { getEntityRecord, getPostType } = select( coreStore );
 		const { get } = select( preferencesStore );
 		const _currentPostType = getCurrentPostType();
+		const editorSettings = getEditorSettings();
 		const viewportBreakpoints = getViewportBreakpoints(
 			getSettings().__experimentalFeatures?.viewport
 		);
@@ -67,9 +71,11 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isTemplateHidden: getRenderingMode() === 'post-only',
 			templateId: getCurrentTemplateId(),
+			isFocusedTemplatePart:
+				_currentPostType === TEMPLATE_PART_POST_TYPE &&
+				!! editorSettings.onNavigateToPreviousEntityRecord,
 			isResponsiveEditing: _isResponsiveEditing(),
-			isResponsiveEditingEnabled:
-				getEditorSettings().responsiveEditingEnabled,
+			isResponsiveEditingEnabled: editorSettings.responsiveEditingEnabled,
 			hasBlockSelection: !! getBlockSelectionStart(),
 			activeComplementaryArea:
 				select( interfaceStore ).getActiveComplementaryArea( 'core' ),
@@ -230,7 +236,11 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 							</MenuItem>
 						</MenuGroup>
 					) }
-					{ ! isTemplate && !! templateId && (
+					{ shouldShowTemplateOption( {
+						isTemplate,
+						templateId,
+						isFocusedTemplatePart,
+					} ) && (
 						<MenuGroup>
 							<MenuItem
 								icon={ ! isTemplateHidden ? check : undefined }
