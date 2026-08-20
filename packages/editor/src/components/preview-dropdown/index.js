@@ -20,7 +20,6 @@ import { PostPreviewMenuItem } from '../post-preview-button';
 import { sidebars } from '../sidebar/constants';
 import { VIEWPORT_STATE_BY_DEVICE_TYPE } from '../../utils/device-type';
 import { unlock } from '../../lock-unlock';
-import { shouldShowTemplateOption } from './utils';
 
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
@@ -30,7 +29,6 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		homeUrl,
 		hasMobileViewport,
 		hasTabletViewport,
-		currentPostType,
 		isTemplate,
 		isViewable,
 		showIconLabels,
@@ -64,7 +62,6 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			homeUrl: getEntityRecord( 'root', '__unstableBase' )?.home,
 			hasMobileViewport: viewportBreakpoints.mobile !== undefined,
 			hasTabletViewport: viewportBreakpoints.tablet !== undefined,
-			currentPostType: _currentPostType,
 			isTemplate: _currentPostType === 'wp_template',
 			isViewable: getPostType( _currentPostType )?.viewable ?? false,
 			showIconLabels: get( 'core', 'showIconLabels' ),
@@ -233,10 +230,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 							</MenuItem>
 						</MenuGroup>
 					) }
-					{ shouldShowTemplateOption( {
-						postType: currentPostType,
-						templateId,
-					} ) && (
+					{ ! isTemplate && !! templateId && (
 						<MenuGroup>
 							<MenuItem
 								icon={ ! isTemplateHidden ? check : undefined }
