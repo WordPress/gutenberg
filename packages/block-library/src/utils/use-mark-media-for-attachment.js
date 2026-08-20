@@ -102,8 +102,6 @@ export default function useMarkMediaForAttachment( {
 				return;
 			}
 
-			const { editEntityRecord } = registry.dispatch( coreStore );
-
 			const items = Array.isArray( mediaItems )
 				? mediaItems
 				: [ mediaItems ];
@@ -120,6 +118,28 @@ export default function useMarkMediaForAttachment( {
 						.filter( Boolean )
 				),
 			];
+
+			if ( ! attachmentIds.length ) {
+				return;
+			}
+			// Only once the post is live. While it is still being drafted the
+			// pre-publish review derives its own list from the post's blocks, so
+			// recording an edit here would propose the same thing twice - and
+			// the copy that lived in core-data would be lost on reload anyway.
+			// After publishing there is no such review, and a pending edit is
+			// exactly right: it rides the multi-entity save dialog on Update,
+			// the same way an edited synced pattern does.
+			//
+			// Read from core-data rather than the editor store, which is a layer
+			// `block-library` cannot reach. This is the saved status, which is
+			// what "already published" means here.
+			const post = await getEntityRecord( 'postType', postType, postId );
+
+			if ( ! [ 'publish', 'private' ].includes( post?.status ) ) {
+				return;
+			}
+
+			const { editEntityRecord } = registry.dispatch( coreStore );
 
 			await Promise.all(
 				attachmentIds.map( async ( attachmentId ) => {

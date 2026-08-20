@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   Add a pre-publish suggestion listing media the Image and Gallery blocks propose attaching to the post, with a checkbox per item to skip any ([#66663](https://github.com/WordPress/gutenberg/issues/66663)).
+-   Add a pre-publish suggestion listing media the post uses that is not attached to any post, with a checkbox per item to skip any ([#66663](https://github.com/WordPress/gutenberg/issues/66663)).
 -   Pre-publish panel: Drop the top margin on the paragraph opening each suggestion panel, so its copy sits with the heading rather than adrift of it ([#66663](https://github.com/WordPress/gutenberg/issues/66663)).
 -   Register the editor and block editor keyboard shortcuts from the editor provider, so shortcuts work for consumers that mount the editor without rendering `EditorKeyboardShortcutsRegister` themselves ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
 -   Header: Allow the Back button column to grow when "Show button text labels" is enabled so the label is not obscured by the following controls ([#81701](https://github.com/WordPress/gutenberg/pull/81701)).

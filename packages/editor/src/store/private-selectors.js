@@ -603,3 +603,28 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 		);
 	}
 );
+
+/**
+ * Returns the media the pre-publish review is offering to attach to this post,
+ * minus anything the user has declined.
+ *
+ * @param {Object} state Global application state.
+ * @return {number[]} Attachment IDs to attach on the next publishing save.
+ */
+export function getMediaToAttach( state ) {
+	const { candidates, excluded } = state.mediaToAttach;
+
+	return candidates.filter( ( id ) => ! excluded.includes( id ) );
+}
+
+/**
+ * Returns whether a media item is currently offered for attaching, and whether
+ * the user has left it checked.
+ *
+ * @param {Object} state Global application state.
+ * @param {number} id    Attachment ID.
+ * @return {boolean} Whether it will be attached.
+ */
+export function isMediaToAttachSelected( state, id ) {
+	return ! state.mediaToAttach.excluded.includes( id );
+}

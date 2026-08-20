@@ -479,6 +479,51 @@ export function selectedNote( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer tracking the media a post proposes attaching to itself before it is
+ * published, and which of it the user has declined.
+ *
+ * The pre-publish panel derives `candidates` from the post's blocks each time it
+ * opens, and records a declined id in `excluded`. The write happens later, from
+ * `savePost`, because the panel is unmounted the moment Publish is pressed — so
+ * this is what carries the user's decision across that gap.
+ *
+ * Deliberately not entity edits: those would surface in the multi-entity save
+ * dialog as well, and the same choice offered in two places with two meanings is
+ * how this went wrong before. Deliberately not persisted either — it is derived,
+ * so it costs nothing to rebuild.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ * @return {Object} Updated state.
+ */
+export function mediaToAttach(
+	state = { candidates: [], excluded: [] },
+	action
+) {
+	switch ( action.type ) {
+		case 'SET_MEDIA_TO_ATTACH_CANDIDATES':
+			return {
+				// Anything no longer proposed cannot stay declined, or a stale
+				// id would suppress the same file if it were added again.
+				excluded: state.excluded.filter( ( id ) =>
+					action.candidates.includes( id )
+				),
+				candidates: action.candidates,
+			};
+
+		case 'SET_MEDIA_TO_ATTACH_EXCLUDED':
+			return {
+				...state,
+				excluded: action.isExcluded
+					? [ ...new Set( [ ...state.excluded, action.id ] ) ]
+					: state.excluded.filter( ( id ) => id !== action.id ),
+			};
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
@@ -504,5 +549,6 @@ export default combineReducers( {
 	revisionPage,
 	showRevisionDiff,
 	selectedNote,
+	mediaToAttach,
 	dataviews: dataviewsReducer,
 } );

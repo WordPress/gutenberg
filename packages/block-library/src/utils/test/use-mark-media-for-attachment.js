@@ -20,15 +20,25 @@ jest.mock( '@wordpress/core-data', () => ( { store: 'core' } ) );
  * @param {Object}  options
  * @param {Object}  [options.postTypeObject] What `getPostType` resolves to.
  * @param {Object}  [options.record]         What `getEntityRecord` resolves to.
+ * @param {string}  [options.postStatus]     Saved status of the post being edited.
  * @param {boolean} [options.canUpdate]      What `canUser` resolves to.
  */
 function setupRegistry( {
 	postTypeObject = { viewable: true },
 	record = { id: 12, post: null },
+	postStatus = 'publish',
 	canUpdate = true,
 } = {} ) {
 	const getPostType = jest.fn().mockResolvedValue( postTypeObject );
-	const getEntityRecord = jest.fn().mockResolvedValue( record );
+	// The hook resolves the parent post first, to check it is already live, then
+	// the attachment.
+	const getEntityRecord = jest
+		.fn()
+		.mockImplementation( ( kind, name ) =>
+			Promise.resolve(
+				name === 'attachment' ? record : { status: postStatus }
+			)
+		);
 	const canUser = jest.fn().mockResolvedValue( canUpdate );
 	const editEntityRecord = jest.fn();
 
@@ -161,5 +171,26 @@ describe( 'useMarkMediaForAttachment', () => {
 		] );
 
 		expect( editEntityRecord ).toHaveBeenCalledTimes( 1 );
+	} );
+	it( 'does nothing while the post is still a draft, where the pre-publish review derives its own list', async () => {
+		const { editEntityRecord } = setupRegistry( { postStatus: 'draft' } );
+		const { result } = renderHook( () =>
+			useMarkMediaForAttachment( POST_CONTEXT )
+		);
+
+		await result.current( { id: 12, post: null } );
+
+		expect( editEntityRecord ).not.toHaveBeenCalled();
+	} );
+
+	it( 'records a pending attach on a private post, which is also live', async () => {
+		const { editEntityRecord } = setupRegistry( { postStatus: 'private' } );
+		const { result } = renderHook( () =>
+			useMarkMediaForAttachment( POST_CONTEXT )
+		);
+
+		await result.current( { id: 12, post: null } );
+
+		expect( editEntityRecord ).toHaveBeenCalled();
 	} );
 } );
