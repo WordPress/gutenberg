@@ -273,7 +273,7 @@ _Parameters_
 -   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Record ID.
+-   _recordId_ `EntityRecordKey`: Optional record ID. Can be omitted for keyless entities, such as site settings.
 
 _Returns_
 
@@ -375,7 +375,7 @@ _Parameters_
 -   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Record ID.
+-   _recordId_ `EntityRecordKey`: Optional record ID. Can be omitted for keyless entities, such as site settings.
 
 _Returns_
 
@@ -392,7 +392,7 @@ _Parameters_
 -   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Record ID.
+-   _recordId_ `EntityRecordKey`: Optional record ID. Can be omitted for keyless entities, such as site settings.
 
 _Returns_
 
@@ -467,7 +467,7 @@ _Parameters_
 -   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Record ID.
+-   _recordId_ `EntityRecordKey`: Optional record ID. Can be omitted for keyless entities, such as site settings.
 
 _Returns_
 
@@ -482,7 +482,7 @@ _Parameters_
 -   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _key_ `EntityRecordKey`: Record's key.
+-   _key_ `EntityRecordKey`: Optional record's key. Can be omitted for keyless entities, such as site settings.
 
 _Returns_
 
@@ -614,7 +614,7 @@ _Parameters_
 -   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Record ID.
+-   _recordId_ `EntityRecordKey`: Optional record ID. Can be omitted for keyless entities, such as site settings.
 
 _Returns_
 
@@ -777,7 +777,7 @@ _Parameters_
 -   _state_ `State`: State tree.
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
--   _recordId_ `EntityRecordKey`: Record ID.
+-   _recordId_ `EntityRecordKey`: Optional record ID. Can be omitted for keyless entities, such as site settings.
 
 _Returns_
 
@@ -809,7 +809,7 @@ _Parameters_
 
 -   _kind_ `string`: Kind of the entity.
 -   _name_ `string`: Name of the entity.
--   _recordId_ `number|string`: Record ID of the entity record.
+-   _recordId_ `[number|string]`: Record ID of the entity record. Can be omitted for keyless entities, such as site settings.
 
 _Returns_
 
@@ -837,7 +837,7 @@ _Parameters_
 
 -   _kind_ `string`: Kind of the edited entity record.
 -   _name_ `string`: Name of the edited entity record.
--   _recordId_ `number|string`: Record ID of the edited entity record.
+-   _recordId_ `number|string|undefined`: Record ID of the edited entity record. Pass `undefined` for keyless entities, such as site settings.
 -   _edits_ `Object`: The edits.
 -   _options_ `Object`: Options for the edit.
 -   _options.undoIgnore_ `[boolean]`: Whether to ignore the edit in undo history or not.
@@ -940,8 +940,8 @@ _Parameters_
 
 -   _kind_ `string`: Kind of the entity.
 -   _name_ `string`: Name of the entity.
--   _recordId_ `Object`: ID of the record.
--   _options_ `Object=`: Saving options.
+-   _recordId_ `[number|string]`: ID of the record. Can be omitted for keyless entities, such as site settings.
+-   _options_ `[Object]`: Saving options.
 
 ### saveEntityRecord
 

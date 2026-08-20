@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Allow the record ID to be omitted for keyless entities in `getRawEntityRecord`, `getEntityRecordEdits`, `getEntityRecordNonTransientEdits`, `hasEditsForEntityRecord`, `getEditedEntityRecord`, `isSavingEntityRecord`, `getLastEntitySaveError`, `editEntityRecord`, `clearEntityRecordEdits` and `saveEditedEntityRecord`. The `root`/`site` entity is registered with `key: false` and is already addressed without an ID throughout the editor, but the published types required one. `saveEditedEntityRecord` also documented its record ID as an `Object`.
+
 ### Internal
 
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))

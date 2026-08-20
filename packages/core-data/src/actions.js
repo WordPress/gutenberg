@@ -428,15 +428,17 @@ export const deleteEntityRecord =
  * Returns an action object that triggers an
  * edit to an entity record.
  *
- * @param {string}        kind                 Kind of the edited entity record.
- * @param {string}        name                 Name of the edited entity record.
- * @param {number|string} recordId             Record ID of the edited entity record.
- * @param {Object}        edits                The edits.
- * @param {Object}        options              Options for the edit.
- * @param {boolean}       [options.undoIgnore] Whether to ignore the edit in undo history or not.
- * @param {boolean}       [options.isCached]   Whether the edit is transient (e.g. typing). Transient
- *                                             edits are staged and eventually merged into the
- *                                             preceding undo level instead of creating a new one.
+ * @param {string}                  kind                 Kind of the edited entity record.
+ * @param {string}                  name                 Name of the edited entity record.
+ * @param {number|string|undefined} recordId             Record ID of the edited entity record. Pass
+ *                                                       `undefined` for keyless entities, such as
+ *                                                       site settings.
+ * @param {Object}                  edits                The edits.
+ * @param {Object}                  options              Options for the edit.
+ * @param {boolean}                 [options.undoIgnore] Whether to ignore the edit in undo history or not.
+ * @param {boolean}                 [options.isCached]   Whether the edit is transient (e.g. typing). Transient
+ *                                                       edits are staged and eventually merged into the
+ *                                                       preceding undo level instead of creating a new one.
  *
  * @return {Object} Action object.
  */
@@ -538,9 +540,10 @@ export const editEntityRecord =
  * Action triggered to clear all edits from
  * an entity record.
  *
- * @param {string}        kind     Kind of the entity.
- * @param {string}        name     Name of the entity.
- * @param {number|string} recordId Record ID of the entity record.
+ * @param {string}        kind       Kind of the entity.
+ * @param {string}        name       Name of the entity.
+ * @param {number|string} [recordId] Record ID of the entity record. Can be omitted for keyless
+ *                                   entities, such as site settings.
  *
  * @return {Object} Action object.
  */
@@ -987,10 +990,11 @@ export const __experimentalBatch =
 /**
  * Action triggered to save an entity record's edits.
  *
- * @param {string}  kind     Kind of the entity.
- * @param {string}  name     Name of the entity.
- * @param {Object}  recordId ID of the record.
- * @param {Object=} options  Saving options.
+ * @param {string}        kind       Kind of the entity.
+ * @param {string}        name       Name of the entity.
+ * @param {number|string} [recordId] ID of the record. Can be omitted for keyless entities, such as
+ *                                   site settings.
+ * @param {Object}        [options]  Saving options.
  */
 export const saveEditedEntityRecord =
 	( kind, name, recordId, options ) =>

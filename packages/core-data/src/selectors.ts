@@ -502,7 +502,7 @@ export function __experimentalGetEntityRecordNoResolver<
  * @param state State tree.
  * @param kind  Entity kind.
  * @param name  Entity name.
- * @param key   Record's key.
+ * @param key   Optional record's key. Can be omitted for keyless entities, such as site settings.
  *
  * @return Object with the entity's raw attributes.
  */
@@ -511,7 +511,7 @@ export const getRawEntityRecord = createSelector(
 		state: State,
 		kind: string,
 		name: string,
-		key: EntityRecordKey
+		key?: EntityRecordKey
 	): EntityRecord | undefined => {
 		logEntityDeprecation( kind, name, 'getRawEntityRecord' );
 
@@ -546,7 +546,7 @@ export const getRawEntityRecord = createSelector(
 		state: State,
 		kind: string,
 		name: string,
-		recordId: EntityRecordKey,
+		recordId?: EntityRecordKey,
 		query?: GetRecordsHttpQuery
 	) => {
 		const context = query?.context ?? 'default';
@@ -853,7 +853,7 @@ export const __experimentalGetEntitiesBeingSaved = createSelector(
  * @param state    State tree.
  * @param kind     Entity kind.
  * @param name     Entity name.
- * @param recordId Record ID.
+ * @param recordId Optional record ID. Can be omitted for keyless entities, such as site settings.
  *
  * @return The entity record's edits.
  */
@@ -861,7 +861,7 @@ export function getEntityRecordEdits(
 	state: State,
 	kind: string,
 	name: string,
-	recordId: EntityRecordKey
+	recordId?: EntityRecordKey
 ): Optional< any > {
 	logEntityDeprecation( kind, name, 'getEntityRecordEdits' );
 	return state.entities.records?.[ kind ]?.[ name ]?.edits?.[
@@ -879,7 +879,7 @@ export function getEntityRecordEdits(
  * @param state    State tree.
  * @param kind     Entity kind.
  * @param name     Entity name.
- * @param recordId Record ID.
+ * @param recordId Optional record ID. Can be omitted for keyless entities, such as site settings.
  *
  * @return The entity record's non transient edits.
  */
@@ -888,7 +888,7 @@ export const getEntityRecordNonTransientEdits = createSelector(
 		state: State,
 		kind: string,
 		name: string,
-		recordId: EntityRecordKey
+		recordId?: EntityRecordKey
 	): Optional< any > => {
 		logEntityDeprecation( kind, name, 'getEntityRecordNonTransientEdits' );
 		const { transientEdits } = getEntityConfig( state, kind, name ) || {};
@@ -903,9 +903,16 @@ export const getEntityRecordNonTransientEdits = createSelector(
 			return acc;
 		}, {} );
 	},
-	( state: State, kind: string, name: string, recordId: EntityRecordKey ) => [
+	(
+		state: State,
+		kind: string,
+		name: string,
+		recordId?: EntityRecordKey
+	) => [
 		state.entities.config,
-		state.entities.records?.[ kind ]?.[ name ]?.edits?.[ recordId ],
+		state.entities.records?.[ kind ]?.[ name ]?.edits?.[
+			recordId as EntityRecordKey
+		],
 	]
 );
 
@@ -916,7 +923,7 @@ export const getEntityRecordNonTransientEdits = createSelector(
  * @param state    State tree.
  * @param kind     Entity kind.
  * @param name     Entity name.
- * @param recordId Record ID.
+ * @param recordId Optional record ID. Can be omitted for keyless entities, such as site settings.
  *
  * @return Whether the entity record has edits or not.
  */
@@ -924,7 +931,7 @@ export function hasEditsForEntityRecord(
 	state: State,
 	kind: string,
 	name: string,
-	recordId: EntityRecordKey
+	recordId?: EntityRecordKey
 ): boolean {
 	logEntityDeprecation( kind, name, 'hasEditsForEntityRecord' );
 	return (
@@ -941,7 +948,7 @@ export function hasEditsForEntityRecord(
  * @param state    State tree.
  * @param kind     Entity kind.
  * @param name     Entity name.
- * @param recordId Record ID.
+ * @param recordId Optional record ID. Can be omitted for keyless entities, such as site settings.
  *
  * @return The entity record, merged with its edits.
  */
@@ -950,7 +957,7 @@ export const getEditedEntityRecord = createSelector(
 		state: State,
 		kind: string,
 		name: string,
-		recordId: EntityRecordKey
+		recordId?: EntityRecordKey
 	): ET.Updatable< EntityRecord > | false => {
 		logEntityDeprecation( kind, name, 'getEditedEntityRecord' );
 		const raw = getRawEntityRecord( state, kind, name, recordId );
@@ -971,7 +978,7 @@ export const getEditedEntityRecord = createSelector(
 		state: State,
 		kind: string,
 		name: string,
-		recordId: EntityRecordKey,
+		recordId?: EntityRecordKey,
 		query?: GetRecordsHttpQuery
 	) => {
 		const context = query?.context ?? 'default';
@@ -982,7 +989,9 @@ export const getEditedEntityRecord = createSelector(
 			]?.[ recordId ],
 			state.entities.records?.[ kind ]?.[ name ]?.queriedData
 				.itemIsComplete[ context ]?.[ recordId ],
-			state.entities.records?.[ kind ]?.[ name ]?.edits?.[ recordId ],
+			state.entities.records?.[ kind ]?.[ name ]?.edits?.[
+				recordId as EntityRecordKey
+			],
 		];
 	}
 );
@@ -1015,7 +1024,7 @@ export function isAutosavingEntityRecord(
  * @param state    State tree.
  * @param kind     Entity kind.
  * @param name     Entity name.
- * @param recordId Record ID.
+ * @param recordId Optional record ID. Can be omitted for keyless entities, such as site settings.
  *
  * @return Whether the entity record is saving or not.
  */
@@ -1023,7 +1032,7 @@ export function isSavingEntityRecord(
 	state: State,
 	kind: string,
 	name: string,
-	recordId: EntityRecordKey
+	recordId?: EntityRecordKey
 ): boolean {
 	logEntityDeprecation( kind, name, 'isSavingEntityRecord' );
 	return (
@@ -1063,7 +1072,7 @@ export function isDeletingEntityRecord(
  * @param state    State tree.
  * @param kind     Entity kind.
  * @param name     Entity name.
- * @param recordId Record ID.
+ * @param recordId Optional record ID. Can be omitted for keyless entities, such as site settings.
  *
  * @return The entity record's save error.
  */
@@ -1071,11 +1080,12 @@ export function getLastEntitySaveError(
 	state: State,
 	kind: string,
 	name: string,
-	recordId: EntityRecordKey
+	recordId?: EntityRecordKey
 ): any {
 	logEntityDeprecation( kind, name, 'getLastEntitySaveError' );
-	return state.entities.records?.[ kind ]?.[ name ]?.saving?.[ recordId ]
-		?.error;
+	return state.entities.records?.[ kind ]?.[ name ]?.saving?.[
+		recordId as EntityRecordKey
+	]?.error;
 }
 
 /**
