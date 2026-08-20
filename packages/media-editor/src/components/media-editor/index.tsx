@@ -56,6 +56,13 @@ const ATTACHMENT_EMBED_QUERY = { _embed: 'author,wp:attached-to' } as const;
 
 const PLACEMENT_CONTROL_IDLE_MS = 300;
 
+/**
+ * Identifier for the details panel. The sidebar tracks which panel is open
+ * rather than whether one is, so a second panel is a new id here and a new
+ * entry wherever panels are rendered — not a change to the state's shape.
+ */
+const DETAILS_PANEL = 'details';
+
 export interface MediaEditorFrameProps {
 	children: ReactNode;
 	/**
@@ -97,22 +104,23 @@ export interface MediaEditorProps {
 	scope?: string;
 }
 
-function MediaEditorSidebar() {
+interface MediaEditorSidebarProps {
+	/** Names the panel's region, and its heading for screen readers. */
+	title: string;
+	children: ReactNode;
+}
+
+function MediaEditorSidebar( { title, children }: MediaEditorSidebarProps ) {
 	return (
-		<NavigableRegion
-			className="media-editor__sidebar"
-			ariaLabel={ __( 'Media details' ) }
-		>
+		<NavigableRegion className="media-editor__sidebar" ariaLabel={ title }>
 			{ /* No visible heading and no close button: the header's pressed
-			     "Details" toggle names this panel and dismisses it at every
-			     width, so a second control inside would be the same job twice.
-			     The heading stays for screen readers, which do not read a
-			     pressed button in the header as this region's title. */ }
-			<VisuallyHidden render={ <h2 /> }>
-				{ __( 'Details' ) }
-			</VisuallyHidden>
+			     toggle names the open panel and dismisses it at every width, so
+			     a second control inside would be the same job twice. The
+			     heading stays for screen readers, which do not read a pressed
+			     button in the header as this region's title. */ }
+			<VisuallyHidden render={ <h2 /> }>{ title }</VisuallyHidden>
 			<Stack className="media-editor__panel" direction="column" gap="lg">
-				<MediaForm />
+				{ children }
 			</Stack>
 		</NavigableRegion>
 	);
@@ -135,8 +143,10 @@ interface MediaEditorFrameContextValue {
 	isWide: boolean;
 	/** Hidden below `small`, where the header has least room. */
 	showKeyboardShortcuts: boolean;
-	isSidebarOpen: boolean;
-	onToggleSidebar: () => void;
+	/** The open panel's id, or `null` when none is. */
+	activePanel: string | null;
+	/** Opens the given panel, or closes the open one when passed `null`. */
+	onSelectPanel: ( panel: string | null ) => void;
 	onCancel: () => void;
 	onSave: () => void;
 	onReset: () => void;
@@ -179,9 +189,10 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 		onCancel,
 		isWide,
 		showKeyboardShortcuts,
-		isSidebarOpen,
-		onToggleSidebar,
+		activePanel,
+		onSelectPanel,
 	} = useMediaEditorFrameContext();
+	const isDetailsOpen = activePanel === DETAILS_PANEL;
 	const [ isShortcutsModalOpen, setIsShortcutsModalOpen ] = useState( false );
 	return (
 		<Stack
@@ -202,12 +213,14 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 				size="compact"
 				icon={ drawerRight }
 				label={ __( 'Details' ) }
-				isPressed={ isSidebarOpen }
+				isPressed={ isDetailsOpen }
 				// Only a docked column really expands beside the canvas; below
 				// that the panel replaces the view, which the pressed state
 				// already describes.
-				aria-expanded={ isWide ? isSidebarOpen : undefined }
-				onClick={ onToggleSidebar }
+				aria-expanded={ isWide ? isDetailsOpen : undefined }
+				onClick={ () =>
+					onSelectPanel( isDetailsOpen ? null : DETAILS_PANEL )
+				}
 			/>
 			{ showCloseButton && (
 				<Button
@@ -386,11 +399,14 @@ function MediaEditorContent( {
 	// and re-opening with the panel hidden on a wide screen is how #81487 read
 	// to people in the first place.
 	const isWide = useViewportMatch( 'large' );
-	const [ isSidebarOpen, setIsSidebarOpen ] = useState( isWide );
+	// `null` when nothing is open, otherwise the open panel's id.
+	const [ activePanel, setActivePanel ] = useState< string | null >(
+		isWide ? DETAILS_PANEL : null
+	);
 	// Follow the breakpoint when it changes, so dragging a window narrow hands
 	// the canvas the full width instead of leaving a panel wedged beside it.
 	useEffect( () => {
-		setIsSidebarOpen( isWide );
+		setActivePanel( isWide ? DETAILS_PANEL : null );
 	}, [ isWide ] );
 	// Keyboard shortcuts are a pointer-and-keyboard affordance and the header
 	// is tightest on a phone, so the icon drops below `small`. Shift+Alt+H
@@ -596,8 +612,9 @@ function MediaEditorContent( {
 				) : (
 					<div
 						className={ clsx( 'media-editor__body', {
-							'has-details-open': isSidebarOpen,
+							'has-panel-open': !! activePanel,
 						} ) }
+						data-active-panel={ activePanel ?? undefined }
 					>
 						<NavigableRegion
 							className="media-editor__content"
@@ -627,7 +644,11 @@ function MediaEditorContent( {
 								</div>
 							) }
 						</NavigableRegion>
-						{ isSidebarOpen && <MediaEditorSidebar /> }
+						{ activePanel === DETAILS_PANEL && (
+							<MediaEditorSidebar title={ __( 'Details' ) }>
+								<MediaForm />
+							</MediaEditorSidebar>
+						) }
 					</div>
 				) }
 			</div>
@@ -662,8 +683,8 @@ function MediaEditorContent( {
 		aspectRatioPresets,
 		isWide,
 		showKeyboardShortcuts,
-		isSidebarOpen,
-		onToggleSidebar: () => setIsSidebarOpen( ( open ) => ! open ),
+		activePanel,
+		onSelectPanel: setActivePanel,
 		onCancel: handleRequestClose,
 		onSave: saveMediaEditor,
 		onReset: resetCropOptions,
