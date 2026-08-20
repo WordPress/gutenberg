@@ -44,18 +44,18 @@ function getErrorSections( error, componentStack ) {
 		{ label: getErrorName( error ), content: getErrorMessage( error ) },
 	];
 
-	if ( componentStack ) {
-		sections.push( {
-			label: 'Component stack',
-			content: componentStack.trim(),
-			preformatted: true,
-		} );
-	}
-
 	if ( error?.stack ) {
 		sections.push( {
 			label: 'Stack',
 			content: error.stack.trim(),
+			preformatted: true,
+		} );
+	}
+
+	if ( componentStack ) {
+		sections.push( {
+			label: 'Component stack',
+			content: componentStack.trim(),
 			preformatted: true,
 		} );
 	}
