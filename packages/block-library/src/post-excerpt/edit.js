@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { store as coreStore } from '@wordpress/core-data';
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import {
 	InspectorControls,
 	RichText,
@@ -15,6 +15,7 @@ import {
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useDebounce } from '@wordpress/compose';
 import {
 	useCanEditEntity,
 	useToolsPanelDropdownMenuProps,
@@ -44,13 +45,32 @@ export default function PostExcerptEditor( props ) {
 		},
 		[ editEntityRecord, postType, postId ]
 	);
+
+	/*
+	 * The excerpt length is sent to the REST API so that the excerpt is
+	 * trimmed on the server, using the same filters that run on the front end.
+	 * Dragging the range control would otherwise trigger a request for every
+	 * intermediate value, so the length used for the request is debounced.
+	 * The control itself and the client-side trimming below keep using the
+	 * attribute directly, so the UI stays responsive while dragging.
+	 */
+	const [ requestedExcerptLength, setRequestedExcerptLength ] =
+		useState( excerptLength );
+	const debouncedSetRequestedExcerptLength = useDebounce(
+		setRequestedExcerptLength,
+		300
+	);
+	useEffect( () => {
+		debouncedSetRequestedExcerptLength( excerptLength );
+	}, [ excerptLength, debouncedSetRequestedExcerptLength ] );
+
 	const { rawExcerpt, renderedExcerpt, isProtected } = useSelect(
 		( select ) => {
 			const record = select( coreStore ).getEntityRecord(
 				'postType',
 				postType,
 				postId,
-				{ excerpt_length: excerptLength }
+				{ excerpt_length: requestedExcerptLength }
 			);
 			const editedRecord = select( coreStore ).getEditedEntityRecord(
 				'postType',
@@ -61,11 +81,11 @@ export default function PostExcerptEditor( props ) {
 			return {
 				rawExcerpt:
 					record && editedRecord ? editedRecord.excerpt : null,
-				renderedExcerpt: record?.excerpt.rendered,
-				isProtected: record?.excerpt.protected,
+				renderedExcerpt: record?.excerpt?.rendered,
+				isProtected: record?.excerpt?.protected,
 			};
 		},
-		[ postType, postId, excerptLength ]
+		[ postType, postId, requestedExcerptLength ]
 	);
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
