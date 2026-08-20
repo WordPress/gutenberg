@@ -3,15 +3,19 @@ import {
 	handlePreloadError,
 } from '../load-error-recovery';
 
-function createStorage( reloadAttempt ) {
-	const values = new Map();
+function createStorage(
+	reloadAttempt?: string
+): Pick< Storage, 'getItem' | 'setItem' > {
+	const values = new Map< string, string >();
 	if ( reloadAttempt !== undefined ) {
 		values.set( 'storybook-preload-error-reload-attempt', reloadAttempt );
 	}
 
 	return {
-		getItem: jest.fn( ( key ) => values.get( key ) ?? null ),
-		setItem: jest.fn( ( key, value ) => values.set( key, value ) ),
+		getItem: jest.fn( ( key: string ) => values.get( key ) ?? null ),
+		setItem: jest.fn( ( key: string, value: string ) => {
+			values.set( key, value );
+		} ),
 	};
 }
 

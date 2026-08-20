@@ -3,13 +3,19 @@ const PRELOAD_ERROR_RELOAD_ATTEMPT_KEY =
 
 export const PRELOAD_ERROR_RELOAD_GUARD_INTERVAL = 60_000;
 
+type PreloadErrorRecoveryOptions = {
+	now?: number;
+	reload?: () => void;
+	storage?: Pick< Storage, 'getItem' | 'setItem' >;
+};
+
 export function handlePreloadError(
-	event,
+	event: Pick< Event, 'preventDefault' >,
 	{
 		now = Date.now(),
-		reload = () => window.top.location.reload(),
+		reload = () => window.top?.location.reload(),
 		storage = window.sessionStorage,
-	} = {}
+	}: PreloadErrorRecoveryOptions = {}
 ) {
 	let lastReloadAttempt;
 	try {
