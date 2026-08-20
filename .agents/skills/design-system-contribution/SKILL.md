@@ -41,6 +41,11 @@ stories, public documentation, release notes, or compatibility machinery for
 an unchanged public capability. Still follow the repository's required package
 changelog policy for production code changes.
 
+For an `@wordpress/ui` public-contract change or a dependency boundary that can
+mix bundled and WordPress-provided package versions, also apply the
+[`design-system-ui-compatibility`](../design-system-ui-compatibility/SKILL.md)
+skill before implementation.
+
 ## Finish
 
 Use the public guide's

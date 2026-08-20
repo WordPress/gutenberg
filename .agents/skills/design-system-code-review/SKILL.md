@@ -34,6 +34,11 @@ For either classification, use the public guide's
 [package completion gate](../../../docs/contributors/design/design-system-packages.md#change-a-package-safely)
 and inspect only the surfaces applicable to the change.
 
+For an `@wordpress/ui` public-contract change or a dependency boundary that can
+mix bundled and WordPress-provided package versions, also apply the
+[`design-system-ui-compatibility`](../design-system-ui-compatibility/SKILL.md)
+skill before concluding the review.
+
 Use browser evidence when source or class assertions cannot establish visual,
 focus, motion, or layout parity.
 
