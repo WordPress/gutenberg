@@ -52,9 +52,14 @@
 			text-overflow: ellipsis;
 			white-space: nowrap;
 
-			/* Supports placeholder styling for both Select and Combobox triggers. */
+			/*
+			 * Supports placeholder styling for both Select and Combobox triggers.
+			 * A placeholder is live text, not disabled text, so it must meet the
+			 * 4.5:1 contrast minimum: the disabled foreground token is only 3.32:1
+			 * against the surface.
+			 */
 			.trigger[data-placeholder] & {
-				color: var(--wpds-color-foreground-interactive-neutral-disabled);
+				color: var(--wpds-color-foreground-content-neutral-weak);
 			}
 		}
 
