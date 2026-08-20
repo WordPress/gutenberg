@@ -1,6 +1,5 @@
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import type { WpTemplate } from '@wordpress/core-data';
 import { getItemTitle } from '../../actions/utils';
 import { unlock } from '../../lock-unlock';
 import type { BasePost } from '../../types';
@@ -105,11 +104,13 @@ export function useDefaultTemplateLabel(
 				homePage?.postType === 'page' &&
 				homePage?.postId === postIdStr
 			) {
-				const templates = select(
-					coreStore
-				).getEntityRecords< WpTemplate >( 'postType', 'wp_template', {
-					per_page: -1,
-				} );
+				const templates = select( coreStore ).getEntityRecords(
+					'postType',
+					'wp_template',
+					{
+						per_page: -1,
+					}
+				);
 				const frontPage = templates?.find(
 					( t ) => t.slug === 'front-page'
 				);
@@ -131,9 +132,7 @@ export function useDefaultTemplateLabel(
 					return NAME_NOT_FOUND;
 				}
 
-				const template = select(
-					coreStore
-				).getEntityRecord< WpTemplate >(
+				const template = select( coreStore ).getEntityRecord(
 					'postType',
 					'wp_template',
 					templateId
@@ -150,7 +149,7 @@ export function useDefaultTemplateLabel(
 				return NAME_NOT_FOUND;
 			}
 
-			const template = select( coreStore ).getEntityRecord< WpTemplate >(
+			const template = select( coreStore ).getEntityRecord(
 				'postType',
 				'wp_template',
 				templateId

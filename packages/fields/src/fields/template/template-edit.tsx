@@ -1,5 +1,4 @@
 import { useCallback, useMemo } from '@wordpress/element';
-import type { WpTemplate } from '@wordpress/core-data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { DataFormControlProps } from '@wordpress/dataviews';
 import { SelectControl } from '@wordpress/components';
@@ -76,7 +75,7 @@ function BlockThemeTemplateEdit( {
 	const { templates, canSwitchTemplate } = useSelect(
 		( select ) => {
 			const allTemplates =
-				select( coreStore ).getEntityRecords< WpTemplate >(
+				select( coreStore ).getEntityRecords(
 					'postType',
 					'wp_template',
 					{

@@ -75,12 +75,6 @@ export function AiPluginCallout() {
 				( name ) => !! siteSettings?.[ name ]
 			);
 
-		const plugin = store.getEntityRecord(
-			'root',
-			'plugin',
-			AI_PLUGIN_ID
-		) as { plugin: string; status: string } | undefined;
-
 		const hasFinished = store.hasFinishedResolution( 'getEntityRecord', [
 			'root',
 			'plugin',
@@ -95,6 +89,8 @@ export function AiPluginCallout() {
 				hasConnectedProvider: hasConnected,
 			};
 		}
+
+		const plugin = store.getEntityRecord( 'root', 'plugin', AI_PLUGIN_ID );
 
 		if ( ! plugin ) {
 			return {

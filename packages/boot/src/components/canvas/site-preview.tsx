@@ -17,7 +17,7 @@ export default function SitePreview() {
 		const siteData = select( coreStore ).getEntityRecord(
 			'root',
 			'__unstableBase'
-		) as { home?: unknown } | undefined;
+		);
 		return siteData?.home;
 	}, [] );
 

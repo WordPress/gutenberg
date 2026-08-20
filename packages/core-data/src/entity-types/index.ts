@@ -1,4 +1,10 @@
-import type { Context, Updatable } from './helpers';
+import type {
+	Context,
+	OmitNevers,
+	PostStatus,
+	RenderedText,
+	Updatable,
+} from './helpers';
 import type { Attachment } from './attachment';
 import type { Base, TemplatePartArea, TemplateType } from './base';
 import type { Comment } from './comment';
@@ -8,6 +14,7 @@ import type {
 	CollectionFontFace,
 } from './font-collection';
 import type { FontFamily, FontFace, WpFontFamily } from './font-family';
+import type { GlobalStyles } from './global-styles';
 import type { GlobalStylesRevision } from './global-styles-revision';
 import type { Icon } from './icon';
 import type { MenuLocation } from './menu-location';
@@ -27,6 +34,8 @@ import type { User } from './user';
 import type { Type } from './type';
 import type { Widget } from './widget';
 import type { WidgetType } from './widget-type';
+import type { WpBlock } from './wp-block';
+import type { WpNavigation } from './wp-navigation';
 import type { WpTemplate } from './wp-template';
 import type { WpTemplatePart } from './wp-template-part';
 
@@ -42,16 +51,20 @@ export type {
 	FontCollection,
 	FontFace,
 	FontFamily,
+	GlobalStyles,
 	GlobalStylesRevision,
 	Icon,
 	MenuLocation,
 	NavMenu,
 	NavMenuItem,
+	OmitNevers,
 	Page,
 	Plugin,
 	Post,
 	PostRevision,
+	PostStatus,
 	PostStatusObject,
+	RenderedText,
 	Settings,
 	Sidebar,
 	Taxonomy,
@@ -64,7 +77,9 @@ export type {
 	User,
 	Widget,
 	WidgetType,
+	WpBlock,
 	WpFontFamily,
+	WpNavigation,
 	WpTemplate,
 	WpTemplatePart,
 };
@@ -107,6 +122,7 @@ export interface PerPackageEntityRecords< C extends Context > {
 		| Attachment< C >
 		| Comment< C >
 		| FontCollection< C >
+		| GlobalStyles< C >
 		| GlobalStylesRevision< C >
 		| Icon< C >
 		| MenuLocation< C >
@@ -127,6 +143,8 @@ export interface PerPackageEntityRecords< C extends Context > {
 		| Widget< C >
 		| WidgetType< C >
 		| WpFontFamily< C >
+		| WpBlock< C >
+		| WpNavigation< C >
 		| WpTemplate< C >
 		| WpTemplatePart< C >;
 }
@@ -136,3 +154,124 @@ export interface PerPackageEntityRecords< C extends Context > {
  */
 export type EntityRecord< C extends Context = 'edit' > =
 	PerPackageEntityRecords< C >[ keyof PerPackageEntityRecords< C > ];
+
+/**
+ * Maps an entity's `kind` and `name` to the record type it returns.
+ *
+ * `getEntityRecord( 'postType', 'post', 1 )` names the record it wants with
+ * two strings. Without this map those strings are just `string`, so the
+ * selector can only promise `EntityRecord` — the union of every known record
+ * type — and reading a property off the result fails unless that property
+ * exists on all of them.
+ *
+ * The map is intentionally open: entities are registered at runtime, so a
+ * `kind`/`name` pair missing here keeps resolving to the union rather than
+ * raising an error. Custom post types and plugin entities therefore behave
+ * exactly as they did before.
+ *
+ * A plugin adds its own entities by merging into this interface, the same way
+ * it would extend `PerPackageEntityRecords`:
+ *
+ * ```ts
+ * declare module '@wordpress/core-data' {
+ *     export interface EntityRecordTypes< C extends Context > {
+ *         myPlugin: { order: Order< C > };
+ *     }
+ * }
+ * ```
+ *
+ * @see EntityRecordOf
+ */
+export interface EntityRecordTypes< C extends Context > {
+	root: {
+		__unstableBase: Base< C >;
+		comment: Comment< C >;
+		fontCollection: FontCollection< C >;
+		globalStyles: GlobalStyles< C >;
+		icon: Icon< C >;
+		media: Attachment< C >;
+		menu: NavMenu< C >;
+		menuItem: NavMenuItem< C >;
+		menuLocation: MenuLocation< C >;
+		plugin: Plugin< C >;
+		postType: Type< C >;
+		sidebar: Sidebar< C >;
+		site: Settings< C >;
+		status: PostStatusObject< C >;
+		taxonomy: Taxonomy< C >;
+		theme: Theme< C >;
+		user: User< C >;
+		widget: Widget< C >;
+		widgetType: WidgetType< C >;
+	};
+	postType: {
+		attachment: Attachment< C >;
+		page: Page< C >;
+		post: Post< C >;
+		wp_block: WpBlock< C >;
+		wp_font_family: WpFontFamily< C >;
+		wp_navigation: WpNavigation< C >;
+		wp_template: WpTemplate< C >;
+		wp_template_part: WpTemplatePart< C >;
+	};
+	taxonomy: {
+		category: Term< C >;
+		post_tag: Term< C >;
+	};
+}
+
+/**
+ * The entity kinds the map knows about. Keys do not vary by context, so the
+ * lookup is done against a single context.
+ */
+export type EntityKind = keyof EntityRecordTypes< 'edit' >;
+
+/**
+ * The entity names the map knows about for a given kind.
+ */
+export type EntityNameOf< Kind extends EntityKind > =
+	keyof EntityRecordTypes< 'edit' >[ Kind ] & string;
+
+/**
+ * Resolves a `kind`/`name` pair to the record type it returns.
+ *
+ * Only accepts pairs the map knows about. Selectors express the fallback for
+ * everything else through overload resolution instead: a pair that fails these
+ * constraints matches the original, wider signature, so entities registered at
+ * runtime behave exactly as they did before the map existed.
+ */
+export type EntityRecordOf<
+	Kind extends EntityKind,
+	Name extends EntityNameOf< Kind >,
+	C extends Context = 'edit',
+	/*
+	 * `Name` is constrained against the `'edit'` map. The keys do not vary by
+	 * context, but TypeScript cannot see that, so the lookup is re-narrowed
+	 * against the map for the context actually being resolved.
+	 */
+> = EntityRecordTypes< C >[ Kind ][ Name &
+	keyof EntityRecordTypes< C >[ Kind ] ];
+
+/**
+ * Resolves a `kind`/`name` pair against the query it was requested with.
+ *
+ * `context` selects which fields the REST API serialises, so a `'view'`
+ * request must not be typed with the edit-context fields.
+ *
+ * `_fields` is deliberately not modelled. Narrowing to the named fields makes
+ * the type rigid for what is a small number of call sites, and the useful
+ * shape there varies per consumer. Call sites that request a subset and want
+ * that reflected should say so locally -- with `Pick`, or their own interface
+ * -- rather than have it imposed here.
+ */
+type ContextOfQuery< Query > = Query extends {
+	context: infer Requested extends Context;
+}
+	? Requested
+	: 'edit';
+
+export type EntityRecordOfQuery<
+	Kind extends EntityKind,
+	Name extends EntityNameOf< Kind >,
+	Query,
+> = EntityRecordOf< Kind, Name, ContextOfQuery< Query > >;

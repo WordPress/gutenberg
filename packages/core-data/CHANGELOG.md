@@ -6,6 +6,13 @@
 
 -   Keep a query's `totalItems` in sync when records are removed from it, so the page count is correct after a deletion instead of only after the next fetch ([#82244](https://github.com/WordPress/gutenberg/pull/82244)).
 
+### Enhancements
+
+-   `getEntityRecord` and `getEntityRecords` now infer the record type from their `kind` and `name` arguments, so `getEntityRecord( 'postType', 'post', id ).title` type checks without naming `Post` by hand. Pairs the new `EntityRecordTypes` map does not cover, including entities registered at runtime, keep resolving to the previous union type.
+-   `getEntityRecord` and `getEntityRecords` now resolve the record's context from the query, so a `context: 'view'` request is no longer typed with the edit-context fields.
+-   Add `WpBlock` and `WpNavigation` entity record types and map them to `postType`/`wp_block` and `postType`/`wp_navigation`. Both are modelled from the post types' registered `supports`, so neither carries the `author`, `featured_media` or comment fields the REST API omits for them; `WpBlock` also follows `WP_REST_Blocks_Controller` in exposing `title.raw`/`content.raw` without a `rendered` form.
+-   Add a `GlobalStyles` entity record type and map `root`/`globalStyles` to it. The entity returns a styles config, not the `GlobalStylesRevision` it was previously paired with -- revisions come from a separate endpoint and carry metadata the record does not have.
+
 ### Internal
 
 -   Remove the template activation (`active_templates`) experiment: drop the `registeredTemplate` entity and the experiment-only `wp_template` endpoint rewrites and query params ([#82241](https://github.com/WordPress/gutenberg/pull/82241)).

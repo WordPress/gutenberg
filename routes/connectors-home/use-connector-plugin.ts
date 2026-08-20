@@ -128,12 +128,6 @@ export function useConnectorPlugin( {
 				};
 			}
 
-			const plugin = store.getEntityRecord(
-				'root',
-				'plugin',
-				pluginBasename
-			) as { plugin: string; status: string } | undefined;
-
 			const hasFinished = store.hasFinishedResolution(
 				'getEntityRecord',
 				[ 'root', 'plugin', pluginBasename ]
@@ -146,6 +140,12 @@ export function useConnectorPlugin( {
 					canManagePlugins: undefined as boolean | undefined,
 				};
 			}
+
+			const plugin = store.getEntityRecord(
+				'root',
+				'plugin',
+				pluginBasename
+			);
 
 			// Plugin data resolved — user has API permissions.
 			if ( plugin ) {
