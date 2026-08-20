@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useRegistry, useSelect } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -11,14 +8,11 @@ import {
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
+import { kebabCase } from '@wordpress/kebab-case';
 import { unlock } from '../../lock-unlock';
 import { usePostActions } from './actions';
 
-const { Menu, kebabCase } = unlock( componentsPrivateApis );
+const { Menu } = unlock( componentsPrivateApis );
 
 export default function PostActions( { postType, postId, onActionPerformed } ) {
 	const [ activeModalAction, setActiveModalAction ] = useState( null );

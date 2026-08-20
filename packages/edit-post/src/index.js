@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as blocksStore } from '@wordpress/blocks';
 import {
 	registerCoreBlocks,
@@ -10,7 +7,6 @@ import deprecated from '@wordpress/deprecated';
 import { createRoot, StrictMode } from '@wordpress/element';
 import { dispatch, resolveSelect, select } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { applyFilters } from '@wordpress/hooks';
 import {
 	registerLegacyWidgetBlock,
 	registerWidgetGroupBlock,
@@ -21,10 +17,6 @@ import {
 } from '@wordpress/editor';
 import { store as coreDataStore } from '@wordpress/core-data';
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import Layout from './components/layout';
 import { unlock } from './lock-unlock';
 
@@ -66,16 +58,6 @@ export function initializeEditor(
 		welcomeGuideTemplate: true,
 	} );
 
-	const collaborationNotificationPreferenceDefaults = applyFilters(
-		'editor.CollaborationNotificationPreferenceDefaults',
-		{
-			showCollaborationJoinNotifications: true,
-			showCollaborationLeaveNotifications: true,
-			showCollaborationPostSaveNotifications: true,
-		},
-		'core/edit-post'
-	);
-
 	dispatch( preferencesStore ).setDefaults( 'core', {
 		allowRightClickOverrides: true,
 		editorMode: 'visual',
@@ -90,12 +72,9 @@ export function initializeEditor(
 		enableChoosePatternModal: true,
 		isPublishSidebarEnabled: true,
 		showCollaborationCursor: false,
-		showCollaborationJoinNotifications:
-			collaborationNotificationPreferenceDefaults.showCollaborationJoinNotifications,
-		showCollaborationLeaveNotifications:
-			collaborationNotificationPreferenceDefaults.showCollaborationLeaveNotifications,
-		showCollaborationPostSaveNotifications:
-			collaborationNotificationPreferenceDefaults.showCollaborationPostSaveNotifications,
+		showCollaborationJoinNotifications: true,
+		showCollaborationLeaveNotifications: true,
+		showCollaborationPostSaveNotifications: true,
 	} );
 
 	if ( window.__clientSideMediaProcessing ) {
@@ -136,36 +115,6 @@ export function initializeEditor(
 		console.warn(
 			"Your browser is using Quirks Mode. \nThis can cause rendering issues such as blocks overlaying meta boxes in the editor. Quirks Mode can be triggered by PHP errors or HTML code appearing before the opening <!DOCTYPE html>. Try checking the raw page source or your site's PHP error log and resolving errors there, removing any HTML before the doctype, or disabling plugins."
 		);
-	}
-
-	// This is a temporary fix for a couple of issues specific to Webkit on iOS.
-	// Without this hack the browser scrolls the mobile toolbar off-screen.
-	// Once supported in Safari we can replace this in favor of preventScroll.
-	// For details see issue #18632 and PR #18686
-	// Specifically, we scroll `interface-interface-skeleton__body` to enable a fixed top toolbar.
-	// But Mobile Safari forces the `html` element to scroll upwards, hiding the toolbar.
-
-	const isIphone = window.navigator.userAgent.indexOf( 'iPhone' ) !== -1;
-	if ( isIphone ) {
-		window.addEventListener( 'scroll', ( event ) => {
-			const editorScrollContainer = document.getElementsByClassName(
-				'interface-interface-skeleton__body'
-			)[ 0 ];
-			if ( event.target === document ) {
-				// Scroll element into view by scrolling the editor container by the same amount
-				// that Mobile Safari tried to scroll the html element upwards.
-				if ( window.scrollY > 100 ) {
-					editorScrollContainer.scrollTop =
-						editorScrollContainer.scrollTop + window.scrollY;
-				}
-				// Undo unwanted scroll on html element, but only in the visual editor.
-				if (
-					document.getElementsByClassName( 'is-mode-visual' )[ 0 ]
-				) {
-					window.scrollTo( 0, 0 );
-				}
-			}
-		} );
 	}
 
 	// Prevent the default browser action for files dropped outside of dropzones.
@@ -245,7 +194,6 @@ async function preloadResolutions( postType, postId ) {
 			core.__experimentalGetCurrentThemeBaseGlobalStyles(),
 			core.__experimentalGetCurrentThemeGlobalStylesVariations(),
 			core.getEntityRecord( 'root', '__unstableBase' ),
-			core.getEntityRecord( 'root', 'site' ),
 			core.canUser( 'read', { kind: 'root', name: 'site' } ),
 			core.canUser( 'create', { kind: 'postType', name: 'attachment' } ),
 			core.canUser( 'create', { kind: 'postType', name: 'page' } ),
@@ -254,6 +202,17 @@ async function preloadResolutions( postType, postId ) {
 				kind: 'postType',
 				name: 'wp_template',
 			} ),
+			// The DataForm-based inspector requests the entity form config
+			// when the document sidebar mounts. The args must match the
+			// `useViewConfig` call in `@wordpress/views` exactly for the
+			// resolution (and its preload entry) to be shared.
+			...( postType && window?.__experimentalDataFormInspector
+				? [
+						unlock( core ).getViewConfig( 'postType', postType, {
+							fields: 'form',
+						} ),
+				  ]
+				: [] ),
 			// Per-post resolvers. `getPostType` and `getEditedEntityRecord`
 			// are shorthand/forward-resolver aliases with their own
 			// resolution metadata, so they need separate kicks.
@@ -278,12 +237,16 @@ async function preloadResolutions( postType, postId ) {
 
 		// Phase 2: read derived data out of state.
 		const tasks = [];
+
+		if ( coreSelect.canUser( 'read', { kind: 'root', name: 'site' } ) ) {
+			tasks.push( core.getEntityRecord( 'root', 'site' ) );
+		}
+
 		const globalStylesId =
 			coreSelect.__experimentalGetCurrentGlobalStylesId();
 		if ( globalStylesId ) {
 			tasks.push(
-				core.getEntityRecord( 'root', 'globalStyles', globalStylesId ),
-				core.canUser( 'read', {
+				core.canUser( 'update', {
 					kind: 'root',
 					name: 'globalStyles',
 					id: globalStylesId,
@@ -318,6 +281,31 @@ async function preloadResolutions( postType, postId ) {
 
 		if ( tasks.length ) {
 			await Promise.all( tasks );
+		}
+
+		// Phase 3: requests whose capability check only resolved in phase 2.
+		if ( globalStylesId ) {
+			if (
+				coreSelect.canUser( 'update', {
+					kind: 'root',
+					name: 'globalStyles',
+					id: globalStylesId,
+				} )
+			) {
+				await core.getEntityRecord(
+					'root',
+					'globalStyles',
+					globalStylesId
+				);
+			} else {
+				// Fetch for non-admin users using view context.
+				await core.getEntityRecord(
+					'root',
+					'globalStyles',
+					globalStylesId,
+					{ context: 'view' }
+				);
+			}
 		}
 	} catch {
 		// Resolver failures here would also surface on demand; don't block render.

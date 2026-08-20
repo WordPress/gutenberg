@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { useCallback } from '@wordpress/element';
@@ -14,19 +7,16 @@ import {
 	hasBlockSupport,
 	store as blocksStore,
 } from '@wordpress/blocks';
+import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import { useSelect } from '@wordpress/data';
 import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	ToggleControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
+import { kebabCase } from '@wordpress/kebab-case';
 import { store as blockEditorStore } from '../store';
 import { InspectorControls } from '../components';
 import { useSettings } from '../components/use-settings';
@@ -49,12 +39,6 @@ import {
 const VARIATION_PREFIX = 'is-style-';
 
 const layoutBlockSupportKey = 'layout';
-// Keep in sync with WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS and
-// packages/global-styles-engine/src/core/render.tsx.
-const RESPONSIVE_BREAKPOINTS = {
-	'@mobile': '@media (width <= 480px)',
-	'@tablet': '@media (480px < width <= 782px)',
-};
 const CHILD_LAYOUT_KEYS = [
 	'selfStretch',
 	'flexSize',
@@ -63,7 +47,7 @@ const CHILD_LAYOUT_KEYS = [
 	'rowStart',
 	'rowSpan',
 ];
-const { kebabCase } = unlock( componentsPrivateApis );
+const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 
 function getDefaultLayout( layoutBlockSupport = {}, blockVariation ) {
 	const defaultBlockLayout = layoutBlockSupport?.default;
@@ -85,7 +69,7 @@ export function getResetLayout( layoutBlockSupport = {}, blockVariation ) {
 	} );
 }
 
-function getLayoutStateOverrides(
+export function getLayoutStateOverrides(
 	layout = {},
 	baseLayout = {},
 	existingLayout = {}
@@ -98,11 +82,13 @@ function getLayoutStateOverrides(
 	);
 
 	Object.entries( layout || {} ).forEach( ( [ key, value ] ) => {
+		const baseHasValue = Object.hasOwn( baseLayout || {}, key );
 		if (
 			! CHILD_LAYOUT_KEYS.includes( key ) &&
 			value !== baseLayout?.[ key ]
 		) {
-			overrides[ key ] = value;
+			overrides[ key ] =
+				value === undefined && baseHasValue ? null : value;
 		}
 	} );
 
@@ -239,6 +225,7 @@ export function useLayoutStyles( blockAttributes = {}, blockName, selector ) {
  * @param { Object }  options.layout              Active block layout.
  * @param { boolean } options.hasBlockGapSupport  Whether block gap is supported.
  * @param { * }       options.globalBlockGapValue Global block gap fallback.
+ * @param { Object }  options.viewportSettings    Viewport breakpoint settings.
  *
  * @return { string } CSS rule.
  */
@@ -249,8 +236,9 @@ export function getResponsiveLayoutStyles( {
 	layout = {},
 	hasBlockGapSupport,
 	globalBlockGapValue,
+	viewportSettings,
 } ) {
-	return Object.entries( RESPONSIVE_BREAKPOINTS )
+	return Object.entries( getResponsiveMediaQueries( viewportSettings ) )
 		.map( ( [ viewport, mediaQuery ] ) => {
 			const viewportStyle = getStyleForState( attributes?.style, {
 				viewport,
@@ -301,29 +289,34 @@ function LayoutPanelPure( {
 	const settings = useBlockSettings( blockName );
 	// Block settings come from theme.json under settings.[blockName].
 	const { layout: layoutSettings } = settings;
-	const { themeSupportsLayout, activeBlockVariation, selectedState } =
-		useSelect(
-			( select ) => {
-				const blockEditorSelect = select( blockEditorStore );
-				const { getBlockAttributes, getSettings } = blockEditorSelect;
-				const { getSelectedBlockStyleState } =
-					unlock( blockEditorSelect );
-				return {
-					activeBlockVariation: select(
-						blocksStore
-					).getActiveBlockVariation(
-						blockName,
-						getBlockAttributes( clientId ) || {},
-						'block'
-					),
-					themeSupportsLayout: getSettings().supportsLayout,
-					selectedState:
-						getSelectedBlockStyleState?.( clientId ) ??
-						DEFAULT_BLOCK_STYLE_STATE,
-				};
-			},
-			[ blockName, clientId ]
-		);
+	const {
+		themeSupportsLayout,
+		activeBlockVariation,
+		selectedState,
+		isResponsiveEditing,
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlockAttributes,
+				getSettings,
+				getSelectedBlockStyleState,
+				isResponsiveEditing: getIsResponsiveEditing,
+			} = unlock( select( blockEditorStore ) );
+			return {
+				activeBlockVariation: select(
+					blocksStore
+				).getActiveBlockVariation(
+					blockName,
+					getBlockAttributes( clientId ) || {},
+					'block'
+				),
+				themeSupportsLayout: getSettings().supportsLayout,
+				selectedState: getSelectedBlockStyleState( clientId ),
+				isResponsiveEditing: getIsResponsiveEditing(),
+			};
+		},
+		[ blockName, clientId ]
+	);
 
 	const blockEditingMode = useBlockEditingMode();
 	const isViewportLayoutState =
@@ -466,7 +459,7 @@ function LayoutPanelPure( {
 			const nextStateStyle = cleanEmptyObject( {
 				...stateStyle,
 				layout: getLayoutStateOverrides(
-					cleanEmptyObject( newLayout ),
+					newLayout,
 					baseLayout,
 					stateStyle?.layout
 				),
@@ -573,6 +566,13 @@ function LayoutPanelPure( {
 					layout={ usedLayout }
 					onChange={ onChangeLayout }
 					layoutBlockSupport={ layoutBlockSupport }
+					controlsGroup={
+						isResponsiveEditing &&
+						hasViewportBlockStyleState( selectedState ) &&
+						! hasPseudoBlockStyleState( selectedState )
+							? 'style-state'
+							: 'block'
+					}
 					name={ blockName }
 					clientId={ clientId }
 				/>
@@ -593,7 +593,6 @@ export default {
 function LayoutTypeSwitcher( { type, onChange } ) {
 	return (
 		<ToggleGroupControl
-			__next40pxDefaultSize
 			isBlock
 			label={ __( 'Layout type' ) }
 			hideLabelFromVision
@@ -642,6 +641,7 @@ function BlockWithLayoutStyles( {
 	props,
 	blockGapSupport,
 	globalBlockGapValue,
+	viewportSettings,
 	layoutClasses,
 } ) {
 	const { name, attributes } = props;
@@ -677,6 +677,7 @@ function BlockWithLayoutStyles( {
 		layout: usedLayout,
 		hasBlockGapSupport,
 		globalBlockGapValue,
+		viewportSettings,
 	} );
 	const css = [ baseLayoutCSS, responsiveLayoutCSS ]
 		.filter( Boolean )
@@ -762,7 +763,12 @@ export const withLayoutStyles = createHigherOrderComponent(
 						globalStyles?.blocks?.[ name ]?.spacing?.blockGap ??
 						globalStyles?.spacing?.blockGap;
 
-					return { blockGapSupport, globalBlockGapValue };
+					return {
+						blockGapSupport,
+						globalBlockGapValue,
+						viewportSettings:
+							settings?.__experimentalFeatures?.viewport,
+					};
 				},
 				[ blockSupportsLayout, clientId, attributes?.className, name ]
 			);

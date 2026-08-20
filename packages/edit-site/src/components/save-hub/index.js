@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { Stack } from '@wordpress/ui';
 import { store as coreStore } from '@wordpress/core-data';
 import { check } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import SaveButton from '../save-button';
 import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 

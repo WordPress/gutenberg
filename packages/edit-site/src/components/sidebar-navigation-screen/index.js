@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalHStack as HStack,
 	__experimentalHeading as Heading,
@@ -17,10 +10,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import SidebarButton from '../sidebar-button';

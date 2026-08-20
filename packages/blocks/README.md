@@ -36,6 +36,20 @@ _Returns_
 
 -   `Block`: A cloned block.
 
+### cloneSanitizedBlock
+
+Given a block object, returns a copy of the block object while sanitizing its attributes, optionally merging new attributes and/or replacing its inner blocks.
+
+_Parameters_
+
+-   _block_ `Block`: Block instance.
+-   _mergeAttributes_ `Record< string, unknown >`: Block attributes.
+-   _newInnerBlocks_ `Block[]`: Nested blocks.
+
+_Returns_
+
+-   `Block`: A cloned block.
+
 ### createBlock
 
 Returns a block object given its type and attributes.
@@ -45,6 +59,7 @@ _Parameters_
 -   _name_ `string`: Block name.
 -   _attributes_ `Record< string, unknown >`: Block attributes.
 -   _innerBlocks_ `Block[]`: Nested blocks.
+-   _innerContent_ `Array< string | null >`: Static HTML fragments interleaved with inner blocks, where `null` entries mark inner block positions. Only applies to the Custom HTML block.
 
 _Returns_
 
@@ -56,7 +71,7 @@ Given an array of InnerBlocks templates or Block Objects, returns an array of cr
 
 _Parameters_
 
--   _innerBlocksOrTemplate_ `Array< Block | [ string, Record< string, unknown >?, Array< unknown >? ] >`: Nested blocks or InnerBlocks templates.
+-   _innerBlocksOrTemplate_ `Array< Block | TemplateBlock >`: Nested blocks or InnerBlocks templates.
 
 _Returns_
 
@@ -675,6 +690,19 @@ _Parameters_
 
 -   _blockName_ `string`: Name of the block (example: “core/columns”).
 -   _variation_ `BlockVariation | BlockVariation[]`: Object describing a block variation.
+
+### sanitizeBlockAttributes
+
+Ensure attributes contains only values defined by block type, and merge default values for missing attributes.
+
+_Parameters_
+
+-   _name_ `string`: The block's name.
+-   _attributes_ `Record< string, unknown >`: The block's attributes.
+
+_Returns_
+
+-   `Record< string, unknown >`: The sanitized attributes.
 
 ### serialize
 

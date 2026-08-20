@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { TextareaControl, Notice } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { default as transformStyles } from '../../utils/transform-styles';
 
 /**

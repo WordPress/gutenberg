@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
 import { useState, forwardRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { Button } from '../button';
 import RangeControl from '../range-control';
 import { Flex, FlexItem } from '../flex';
@@ -184,7 +173,6 @@ const UnforwardedFontSizePicker = (
 					<Flex className="components-font-size-picker__custom-size-control">
 						<FlexItem isBlock>
 							<UnitControl
-								__next40pxDefaultSize
 								label={ __( 'Font size' ) }
 								labelPosition="top"
 								hideLabelFromVision
@@ -220,7 +208,6 @@ const UnforwardedFontSizePicker = (
 							<FlexItem isBlock>
 								<Spacer marginX={ 2 } marginBottom={ 0 }>
 									<RangeControl
-										__next40pxDefaultSize
 										className="components-font-size-picker__custom-input"
 										label={ __( 'Font size' ) }
 										hideLabelFromVision

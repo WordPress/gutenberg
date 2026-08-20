@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import type { ComponentType, HTMLProps, SVGProps } from 'react';
-
-/**
- * WordPress dependencies
- */
 import {
 	cloneElement,
 	createElement,
 	isValidElement,
 } from '@wordpress/element';
 import { SVG } from '@wordpress/primitives';
-
-/**
- * Internal dependencies
- */
 import Dashicon from '../dashicon';
 import type { IconKey as DashiconIconKey } from '../dashicon/types';
 
@@ -24,6 +13,13 @@ export type IconType =
 	| ComponentType< { size?: number } >
 	| ( ( props: { size?: number } ) => React.JSX.Element )
 	| React.JSX.Element;
+
+/* The sizing props forwarded to an icon element that is not an `SVG` or a `Dashicon`. */
+type SizeProps = {
+	size?: number;
+	width?: number | string;
+	height?: number | string;
+};
 
 type AdditionalProps< T > = T extends ComponentType< infer U >
 	? U
@@ -103,9 +99,8 @@ function Icon( {
 		return <SVG { ...appliedProps } />;
 	}
 
-	if ( isValidElement( icon ) ) {
+	if ( isValidElement< SizeProps >( icon ) ) {
 		return cloneElement( icon, {
-			// @ts-ignore Just forwarding the size prop along
 			size,
 			width: size,
 			height: size,

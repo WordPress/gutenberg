@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { transform } from '@babel/core';
-
-/**
- * Internal dependencies
- */
 import babelPlugin from '../babel-plugin';
 
 function join( ...strings ) {

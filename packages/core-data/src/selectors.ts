@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 import type { UndoManager } from '@wordpress/undo-manager';
 import deprecated from '@wordpress/deprecated';
 import type { ConnectionStatus } from '@wordpress/sync';
-
-/**
- * Internal dependencies
- */
 import { STORE_NAME } from './name';
 import {
 	getQueriedItems,

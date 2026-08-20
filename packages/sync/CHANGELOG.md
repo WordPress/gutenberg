@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+-   Provide the default HTTP polling provider only when the Real-Time Collaboration experiment sets `window.__experimentalEnableRealTimeCollaboration`, replacing the `window._wpCollaborationEnabled` option flag ([#80658](https://github.com/WordPress/gutenberg/pull/80658)).
+
+## 1.53.0 (2026-08-12)
+
+## 1.52.0 (2026-07-29)
+
+## 1.51.0 (2026-07-14)
+
+## 1.50.0 (2026-07-01)
+
 ## 1.49.0 (2026-06-24)
 
 ## 1.48.1 (2026-06-16)

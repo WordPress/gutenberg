@@ -29,7 +29,6 @@ export default function CategorySelect( {
 					: undefined
 			}
 			{ ...props }
-			__next40pxDefaultSize
 		/>
 	);
 }

@@ -1,8 +1,8 @@
 import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
-import { ThemeProvider } from '@wordpress/theme';
 import { renderSlotWithChildren } from '../../../utils/render-slot-with-children';
+import { ThemeProvider } from '../../../utils/theme-provider';
 import itemPopupStyles from '../../../utils/css/item-popup.module.css';
 import { Portal } from './portal';
 import { Positioner } from './positioner';

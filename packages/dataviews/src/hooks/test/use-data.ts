@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { renderHook, act } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import useData from '../use-data';
 import type { View } from '../../types';
 

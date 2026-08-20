@@ -1,10 +1,10 @@
 import { Select as _Select } from '@base-ui/react/select';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
-import { ThemeProvider } from '@wordpress/theme';
 import { Portal } from './portal';
 import { Positioner } from './positioner';
 import { renderSlotWithChildren } from '../../../utils/render-slot-with-children';
+import { ThemeProvider } from '../../../utils/theme-provider';
 import itemPopupStyles from '../../../utils/css/item-popup.module.css';
 import type { SelectPopupProps } from './types';
 

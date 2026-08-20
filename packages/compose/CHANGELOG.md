@@ -2,6 +2,34 @@
 
 ## Unreleased
 
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 8.6.0 (2026-08-12)
+
+### Enhancements
+
+-   `useFixedWindowList`: Only re-render when the rendered window is missing items, avoiding a second style recalculation before the list is first painted ([#80935](https://github.com/WordPress/gutenberg/pull/80935)).
+
+### Bug Fixes
+
+-   `useFixedWindowList`: Remove a duplicate `resize` listener registration, and page by the measured viewport height rather than the initial window size ([#80935](https://github.com/WordPress/gutenberg/pull/80935)).
+-   `useViewportMatch`: Scope the generated media query to `screen`, so that printing does not report the viewport as having become narrower ([#81367](https://github.com/WordPress/gutenberg/pull/81367)).
+## 8.5.0 (2026-07-29)
+
+## 8.4.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+### Bug Fixes
+
+-   `useMergeRefs`: Apply ref changes when the element attached outside a render of the calling component (e.g. a merged ref passed to a child that mounts the element in its own commit); previously the first ref change after such an attachment was skipped, leaving stale callbacks on the element ([#80133](https://github.com/WordPress/gutenberg/pull/80133)).
+
+## 8.3.0 (2026-07-01)
+
 ## 8.2.0 (2026-06-24)
 
 ## 8.1.1 (2026-06-16)

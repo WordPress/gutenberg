@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import {
 	NavigableMenu,
@@ -28,10 +25,6 @@ import { upload, media } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { useState, useRef, useEffect } from '@wordpress/element';
 import { getFilename } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 
 const { Badge: WCBadge } = unlock( componentsPrivateApis );
@@ -144,7 +137,6 @@ function SingleTrackEditor( {
 			</Grid>
 			<VStack spacing="4">
 				<SelectControl
-					__next40pxDefaultSize
 					className="block-library-video-tracks-editor__single-track-editor-kind-select"
 					options={ KIND_OPTIONS }
 					value={ kind }
@@ -157,7 +149,6 @@ function SingleTrackEditor( {
 					}
 				/>
 				<ToggleControl
-					__next40pxDefaultSize
 					label={ __( 'Set as default track' ) }
 					checked={ isDefaultTrack }
 					disabled={ ! allowSettingDefault }

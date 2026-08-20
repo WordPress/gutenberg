@@ -1,8 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
 import {
 	BaseControl,
 	Flex,
@@ -17,10 +13,6 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../hooks/gap';
 import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
@@ -281,7 +273,12 @@ export default {
 			minimumColumnWidth &&
 			columnCount > 0
 		) {
-			let blockGapToUse = blockGapValue || fallbackGapValue;
+			const blockGapBoxControlValue = blockGapValue
+				? getGapBoxControlValueFromStyle( style.spacing.blockGap )
+				: undefined;
+			let blockGapToUse =
+				getSpacingPresetCssVar( blockGapBoxControlValue?.left ) ||
+				fallbackGapValue;
 			// Ensure 0 values have a unit so they work in calc().
 			if ( blockGapToUse === '0' || blockGapToUse === 0 ) {
 				blockGapToUse = '0px';
@@ -391,7 +388,6 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 			<Flex gap={ 4 }>
 				<FlexItem isBlock>
 					<UnitControl
-						size="__unstable-large"
 						onChange={ ( newValue ) => {
 							onChange( {
 								...layout,
@@ -409,7 +405,6 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 				</FlexItem>
 				<FlexItem isBlock>
 					<RangeControl
-						__next40pxDefaultSize
 						onChange={ handleSliderChange }
 						value={ quantity || 0 }
 						min={ 0 }
@@ -454,7 +449,6 @@ function GridLayoutColumnsAndRowsControl( {
 				<Flex gap={ 4 }>
 					<FlexItem isBlock>
 						<NumberControl
-							size="__unstable-large"
 							onChange={ ( value ) => {
 								// Allow unsetting the column count when in auto mode.
 								const defaultNewColumnCount = isManualPlacement
@@ -469,7 +463,7 @@ function GridLayoutColumnsAndRowsControl( {
 									columnCount: newColumnCount,
 								} );
 							} }
-							value={ columnCount }
+							value={ columnCount ?? '' }
 							min={ 1 }
 							label={ __( 'Columns' ) }
 							hideLabelFromVision={ ! isManualPlacement }
@@ -479,7 +473,6 @@ function GridLayoutColumnsAndRowsControl( {
 					<FlexItem isBlock>
 						{ allowSizingOnChildren && isManualPlacement ? (
 							<NumberControl
-								size="__unstable-large"
 								onChange={ ( value ) => {
 									// Don't allow unsetting the row count.
 									const newRowCount =
@@ -497,7 +490,6 @@ function GridLayoutColumnsAndRowsControl( {
 							/>
 						) : (
 							<RangeControl
-								__next40pxDefaultSize
 								value={ columnCount ?? 1 }
 								onChange={ ( value ) =>
 									onChange( {
@@ -591,7 +583,6 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 
 	return (
 		<ToggleGroupControl
-			__next40pxDefaultSize
 			label={ __( 'Grid item position' ) }
 			value={ gridPlacement }
 			onChange={ onChangeType }

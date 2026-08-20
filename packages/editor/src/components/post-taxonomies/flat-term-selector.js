@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { FormTokenField, withFilters } from '@wordpress/components';
@@ -10,10 +7,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { unescapeString, unescapeTerm } from '../../utils/terms';
 import MostUsedTerms from './most-used-terms';
@@ -87,7 +80,10 @@ export function FlatTermSelector( { slug } ) {
 
 			const query = {
 				...DEFAULT_QUERY,
-				include: _termIds?.join( ',' ),
+				// Sort ids so reordering alone doesn't produce a new query key and re-fetch.
+				include: _termIds?.length
+					? [ ..._termIds ].sort( ( a, b ) => a - b ).join( ',' )
+					: undefined,
 				per_page: -1,
 			};
 
@@ -206,6 +202,7 @@ export function FlatTermSelector( { slug } ) {
 		// Optimistically update term values.
 		// The selector will always re-fetch terms later.
 		setValues( uniqueTerms );
+		setSearch( '' );
 
 		if ( newTermNames.length === 0 ) {
 			onUpdateTerms( termNamesToIds( uniqueTerms, availableTerms ) );
@@ -279,7 +276,6 @@ export function FlatTermSelector( { slug } ) {
 	return (
 		<Stack direction="column" gap="lg">
 			<FormTokenField
-				__next40pxDefaultSize
 				value={ values }
 				suggestions={ suggestions }
 				onChange={ onChange }

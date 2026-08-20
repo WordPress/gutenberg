@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getFileBasename } from '../utils';
 
 describe( 'getFileBasename', () => {

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalUnitControl as UnitControl,
@@ -19,16 +16,15 @@ import {
 	justifyRight,
 } from '@wordpress/icons';
 import { getCSSRules } from '@wordpress/style-engine';
-
-/**
- * Internal dependencies
- */
 import { useSettings } from '../components/use-settings';
 import { appendSelectors, getBlockGapCSS, getAlignmentsInfo } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import { BlockControls, JustifyContentControl } from '../components';
 import { cleanEmptyObject, shouldSkipSerialization } from '../hooks/utils';
 import { LAYOUT_DEFINITIONS } from './definitions';
+
+const GLOBAL_CONTENT_SIZE = 'var(--wp--style--global--content-size, none)';
+const GLOBAL_WIDE_SIZE = 'var(--wp--style--global--wide-size, none)';
 
 export default {
 	name: 'constrained',
@@ -112,24 +108,25 @@ export default {
 							panelId={ clientId }
 						>
 							<UnitControl
-								__next40pxDefaultSize
 								label={ __( 'Content width' ) }
 								labelPosition="top"
-								value={ contentSize || wideSize || '' }
+								value={
+									contentSize === null
+										? ''
+										: contentSize || wideSize || ''
+								}
 								onChange={ ( nextWidth ) => {
 									nextWidth =
 										0 > parseFloat( nextWidth )
 											? '0'
 											: nextWidth;
-									onChange(
-										cleanEmptyObject( {
-											...layout,
-											contentSize:
-												nextWidth !== ''
-													? nextWidth
-													: undefined,
-										} )
-									);
+									onChange( {
+										...layout,
+										contentSize:
+											nextWidth !== ''
+												? nextWidth
+												: undefined,
+									} );
 								} }
 								units={ units }
 								prefix={
@@ -146,24 +143,25 @@ export default {
 							panelId={ clientId }
 						>
 							<UnitControl
-								__next40pxDefaultSize
 								label={ __( 'Wide width' ) }
 								labelPosition="top"
-								value={ wideSize || contentSize || '' }
+								value={
+									wideSize === null
+										? ''
+										: wideSize || contentSize || ''
+								}
 								onChange={ ( nextWidth ) => {
 									nextWidth =
 										0 > parseFloat( nextWidth )
 											? '0'
 											: nextWidth;
-									onChange(
-										cleanEmptyObject( {
-											...layout,
-											wideSize:
-												nextWidth !== ''
-													? nextWidth
-													: undefined,
-										} )
-									);
+									onChange( {
+										...layout,
+										wideSize:
+											nextWidth !== ''
+												? nextWidth
+												: undefined,
+									} );
 								} }
 								units={ units }
 								prefix={
@@ -188,7 +186,6 @@ export default {
 						panelId={ clientId }
 					>
 						<ToggleGroupControl
-							__next40pxDefaultSize
 							label={ __( 'Justification' ) }
 							value={ justifyContent }
 							onChange={ onJustificationChange }
@@ -215,6 +212,7 @@ export default {
 		layout = {},
 		onChange,
 		layoutBlockSupport,
+		controlsGroup = 'block',
 	} ) {
 		const { allowJustification = true } = layoutBlockSupport;
 
@@ -222,7 +220,10 @@ export default {
 			return null;
 		}
 		return (
-			<BlockControls group="block" __experimentalShareWithChildBlocks>
+			<BlockControls
+				group={ controlsGroup }
+				__experimentalShareWithChildBlocks
+			>
 				<DefaultLayoutJustifyContentControl
 					layout={ layout }
 					onChange={ onChange }
@@ -246,7 +247,7 @@ export default {
 		const hasViewportOverride = ( key ) =>
 			Object.hasOwn( viewportOverrides || {}, key );
 		const { contentSize, wideSize, justifyContent } = effectiveLayout;
-		const blockGapStyleValue = getGapCSSValue( style?.spacing?.blockGap );
+		const blockGapStyleValue = style?.spacing?.blockGap;
 		const hasBlockGapOverride =
 			! hasViewportOverrides ||
 			Object.hasOwn( style?.spacing || {}, 'blockGap' );
@@ -273,12 +274,30 @@ export default {
 
 		const hasJustificationOverride =
 			hasViewportOverrides && hasViewportOverride( 'justifyContent' );
+		const hasContentSizeOverride =
+			hasViewportOverrides && hasViewportOverride( 'contentSize' );
+		const hasWideSizeOverride =
+			hasViewportOverrides && hasViewportOverride( 'wideSize' );
 		const shouldOutputConstrainedSizes =
 			! hasViewportOverrides ||
-			hasViewportOverride( 'contentSize' ) ||
-			hasViewportOverride( 'wideSize' );
+			hasContentSizeOverride ||
+			hasWideSizeOverride;
+		const isResettingConstrainedSizes =
+			hasViewportOverrides &&
+			( ( hasContentSizeOverride && ! contentSize ) ||
+				( hasWideSizeOverride && ! wideSize ) );
+		const contentMaxWidth =
+			contentSize ||
+			( wideSize && ! hasContentSizeOverride
+				? wideSize
+				: GLOBAL_CONTENT_SIZE );
+		const wideMaxWidth =
+			wideSize ||
+			( contentSize && ! hasWideSizeOverride
+				? contentSize
+				: GLOBAL_WIDE_SIZE );
 		const constrainedSizeDeclarations = [
-			`max-width: ${ contentSize ?? wideSize }`,
+			`max-width: ${ contentMaxWidth }`,
 		];
 		if ( ! hasViewportOverrides || hasJustificationOverride ) {
 			constrainedSizeDeclarations.push(
@@ -287,7 +306,8 @@ export default {
 			);
 		}
 		let output =
-			shouldOutputConstrainedSizes && ( !! contentSize || !! wideSize )
+			shouldOutputConstrainedSizes &&
+			( !! contentSize || !! wideSize || isResettingConstrainedSizes )
 				? `
 						${ appendSelectors(
 							selector,
@@ -296,7 +316,7 @@ export default {
 						${ constrainedSizeDeclarations.join( '; ' ) };
 					}
 					${ appendSelectors( selector, '> .alignwide' ) }  {
-						max-width: ${ wideSize ?? contentSize };
+						max-width: ${ wideMaxWidth };
 					}
 					${ appendSelectors( selector, '> .alignfull' ) } {
 						max-width: none;

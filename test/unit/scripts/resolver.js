@@ -1,9 +1,30 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-module.exports = ( path, options ) => {
+const nodePath = require( 'node:path' );
+
+module.exports = ( request, options ) => {
+	// Jest 30's resolver enforces package exports before applying packageFilter.
+	// Resolve workspace source imports explicitly so unit-test mocks keep using source files.
+	const sourceImport = request.match( /^@wordpress\/([^/]+)\/src\/(.+)$/ );
+
+	if ( sourceImport ) {
+		const [ , packageName, sourcePath ] = sourceImport;
+
+		return options.defaultResolver(
+			nodePath.join(
+				options.rootDir,
+				'packages',
+				packageName,
+				'src',
+				sourcePath
+			),
+			options
+		);
+	}
+
 	// Call the defaultResolver, so we leverage its cache, error handling, etc.
-	return options.defaultResolver( path, {
+	return options.defaultResolver( request, {
 		...options,
 		// Use packageFilter to process parsed `package.json` before the resolution (see https://www.npmjs.com/package/resolve#resolveid-opts-cb)
 		packageFilter: ( pkg ) => {

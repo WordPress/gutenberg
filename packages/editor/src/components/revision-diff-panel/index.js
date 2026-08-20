@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { PanelBody } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import PostPanelRow from '../post-panel-row';
 
 /**

@@ -7,7 +7,8 @@
 	@layer utilities, components, compositions, overrides;
 
 	@layer utilities {
-		.dropdown-motion {
+		.dropdown-motion,
+		.dropdown-motion--fade-only {
 			--wp-ui-dropdown-slide-distance: 4px;
 			--wp-ui-dropdown-slide-duration: var(--wpds-motion-duration-md);
 			--wp-ui-dropdown-slide-easing: var(--wpds-motion-easing-expressive);
@@ -30,12 +31,15 @@
 			}
 
 			opacity: 1;
-			transform: translate(0);
 
 			&[data-starting-style],
 			&[data-ending-style] {
 				opacity: 0;
 			}
+		}
+
+		.dropdown-motion {
+			transform: translate(0);
 
 			&[data-side="bottom"][data-starting-style],
 			&[data-side="bottom"][data-ending-style] {
@@ -55,6 +59,26 @@
 			&[data-side="right"][data-starting-style],
 			&[data-side="right"][data-ending-style] {
 				transform: translateX(calc(-1 * var(--wp-ui-dropdown-slide-distance)));
+			}
+
+			&[data-side="inline-start"][data-starting-style],
+			&[data-side="inline-start"][data-ending-style] {
+				transform: translateX(var(--wp-ui-dropdown-slide-distance));
+			}
+
+			&[data-side="inline-end"][data-starting-style],
+			&[data-side="inline-end"][data-ending-style] {
+				transform: translateX(calc(-1 * var(--wp-ui-dropdown-slide-distance)));
+			}
+
+			&:dir(rtl)[data-side="inline-start"][data-starting-style],
+			&:dir(rtl)[data-side="inline-start"][data-ending-style] {
+				transform: translateX(calc(-1 * var(--wp-ui-dropdown-slide-distance)));
+			}
+
+			&:dir(rtl)[data-side="inline-end"][data-starting-style],
+			&:dir(rtl)[data-side="inline-end"][data-ending-style] {
+				transform: translateX(var(--wp-ui-dropdown-slide-distance));
 			}
 		}
 	}

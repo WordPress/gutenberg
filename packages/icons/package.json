@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/icons",
-	"version": "15.0.0",
+	"version": "15.4.0",
 	"description": "WordPress Icons package, based on dashicon.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -48,11 +48,12 @@
 		"change-case": "^4.1.2"
 	},
 	"devDependencies": {
-		"@storybook/react-vite": "^10.4.3"
+		"@storybook/react-vite": "^10.4.3",
+		"@types/jest": "^30.0.0"
 	},
 	"peerDependencies": {
-		"@types/react": "^18.3.27",
-		"react": "^18.0.0"
+		"@types/react": "^18 || ^19",
+		"react": "^18 || ^19"
 	},
 	"peerDependenciesMeta": {
 		"@types/react": {

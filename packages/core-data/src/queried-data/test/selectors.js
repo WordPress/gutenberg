@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getQueriedItems } from '../selectors';
 import { getMergedItemIds } from '../reducer';
 

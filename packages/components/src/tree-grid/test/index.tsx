@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { fireEvent, render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { LEFT, RIGHT, UP, DOWN, HOME, END } from '@wordpress/keycodes';
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import TreeGrid from '..';
 import TreeGridRow from '../row';
 import TreeGridCell from '../cell';

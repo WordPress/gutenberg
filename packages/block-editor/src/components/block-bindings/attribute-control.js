@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	getBlockBindingsSource,
@@ -21,10 +14,6 @@ import {
 import { useSelect } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import BlockContext from '../block-context';
 import BlockBindingsSourceFieldsList from './source-fields-list';
 import useBlockBindingsUtils from './use-block-bindings-utils';
@@ -33,6 +22,16 @@ import { store as blockEditorStore } from '../../store';
 
 const { Menu } = unlock( componentsPrivateApis );
 
+/**
+ * Renders a control for viewing and editing a block attribute binding.
+ *
+ * @param {Object} root0           Component props.
+ * @param {string} root0.attribute The block attribute name.
+ * @param {Object} [root0.binding] The current block binding.
+ * @param {string} root0.blockName The block type name.
+ *
+ * @return {Element} The block attribute binding control.
+ */
 export default function BlockBindingsAttributeControl( {
 	attribute,
 	binding,

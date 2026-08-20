@@ -1,23 +1,12 @@
-/**
- * WordPress dependencies
- */
 import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { mapMarker } from '@wordpress/icons';
-import { Icon, Link, Stack, Text, Tooltip } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
-import {
-	EventsList,
-	LocationPicker,
-	type EventsWidgetAttributes,
-	type WPEvent,
-} from './components';
+import { Icon, Stack, EmptyState } from '@wordpress/ui';
+import { EventsList, type WPEvent } from './components';
+import type { EventsWidgetAttributes } from './types';
 import styles from './style.module.css';
 
 interface WPEventsResponse {
@@ -60,13 +49,13 @@ function EventsListSection( {
 	);
 }
 
+type WordPressEventsProps = {
+	attributes?: EventsWidgetAttributes;
+};
+
 export default function WordPressEvents( {
 	attributes = {},
-	setAttributes,
-}: {
-	attributes?: EventsWidgetAttributes;
-	setAttributes?: ( next: Partial< EventsWidgetAttributes > ) => void;
-} ) {
+}: WordPressEventsProps ) {
 	const userLocale = useSelect(
 		( select ) =>
 			( ( select( coreStore ) as any ).getCurrentUser()
@@ -128,27 +117,24 @@ export default function WordPressEvents( {
 	}, [ activeLocation, hasSelectedLocation, userLocale ] );
 
 	return (
-		<Stack
-			direction="column"
-			justify="space-between"
-			className={ styles.container }
-		>
+		<Stack direction="column" className={ styles.container }>
 			{ ! hasSelectedLocation && (
 				<Stack
-					className={ styles.locationPickerInWidget }
-					direction="column"
 					align="center"
 					justify="center"
+					className={ styles.noLocationSelected }
 				>
-					<LocationPicker
-						onSubmit={ ( location ) => {
-							const next = location.trim();
-							setActiveLocation( next );
-							setAttributes?.( { location: next } );
-						} }
-						seedInput={ activeLocation }
-						hideLabelFromVision
-					/>
+					<EmptyState.Root>
+						<EmptyState.Visual>
+							<Icon icon={ mapMarker } />
+						</EmptyState.Visual>
+						<EmptyState.Title>
+							{ __( 'Attend an upcoming event near you.' ) }
+						</EmptyState.Title>
+						<EmptyState.Description>
+							{ __( 'Select a city to view events.' ) }
+						</EmptyState.Description>
+					</EmptyState.Root>
 				</Stack>
 			) }
 			{ hasSelectedLocation && eventsLoading && (
@@ -170,55 +156,6 @@ export default function WordPressEvents( {
 					location={ locationLabel || activeLocation }
 				/>
 			) }
-			<div className={ styles.footer }>
-				<Stack direction="row" align="center" gap="sm" wrap="wrap">
-					<Link
-						href="https://make.wordpress.org/community/meetups-landing-page"
-						openInNewTab
-					>
-						{ __( 'Meetups' ) }
-					</Link>
-					<Link
-						href="https://central.wordcamp.org/schedule/"
-						openInNewTab
-					>
-						{ __( 'WordCamps' ) }
-					</Link>
-
-					{ locationLabel && (
-						<div className={ styles.footerLocation }>
-							<Tooltip.Root>
-								<Tooltip.Trigger
-									aria-label={ __( 'Change from settings.' ) }
-									render={
-										<Stack
-											direction="row"
-											align="center"
-											gap="xs"
-										>
-											<Icon
-												icon={ mapMarker }
-												size={ 16 }
-											/>
-											<Text
-												variant="body-sm"
-												className={
-													styles.locationSummary
-												}
-											>
-												{ locationLabel }
-											</Text>
-										</Stack>
-									}
-								/>
-								<Tooltip.Popup>
-									{ __( 'Change from settings.' ) }
-								</Tooltip.Popup>
-							</Tooltip.Root>
-						</div>
-					) }
-				</Stack>
-			</div>
 		</Stack>
 	);
 }

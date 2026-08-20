@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { dispatch, select } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import PostPublishButton from '../';
 import { store as editorStore } from '../../../store';
 

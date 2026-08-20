@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
@@ -8,11 +5,8 @@ import { DataForm } from '@wordpress/dataviews';
 import { Stack } from '@wordpress/ui';
 import { useMemo } from '@wordpress/element';
 import { useViewConfig } from '@wordpress/views';
-
-/**
- * Internal dependencies
- */
 import PostCardPanel from '../post-card-panel';
+import PluginPostStatusInfo from '../plugin-post-status-info';
 import PostPanelSection from '../post-panel-section';
 import { store as editorStore } from '../../store';
 import PostTrash from '../post-trash';
@@ -394,7 +388,18 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 					onChange={ onChange }
 				/>
 				{ ! isPostStatusRemoved && (
-					<PostTrash onActionPerformed={ onActionPerformed } />
+					<>
+						<PluginPostStatusInfo.Slot>
+							{ ( fills ) =>
+								fills.length > 0 && (
+									<Stack direction="column" gap="xs">
+										{ fills }
+									</Stack>
+								)
+							}
+						</PluginPostStatusInfo.Slot>
+						<PostTrash onActionPerformed={ onActionPerformed } />
+					</>
 				) }
 			</Stack>
 		</PostPanelSection>

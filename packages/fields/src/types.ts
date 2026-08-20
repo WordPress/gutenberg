@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import type { DataFormControlProps } from '@wordpress/dataviews';
 
 type PostStatus =
@@ -119,7 +116,9 @@ export interface TemplatePart extends CommonPost, TemplateAuthorFields {
 export interface Pattern extends CommonPost {
 	slug: string;
 	title: { raw: string };
-	wp_pattern_sync_status: string;
+	excerpt?: string | { raw: string; rendered: string };
+	meta?: Record< string, any >;
+	wp_pattern_sync_status?: string;
 }
 
 export interface SiteSettings {

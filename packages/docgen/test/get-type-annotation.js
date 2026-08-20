@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const engine = require( '../lib/engine' );
 const getTypeAnnotation = require( '../lib/get-type-annotation' );
 

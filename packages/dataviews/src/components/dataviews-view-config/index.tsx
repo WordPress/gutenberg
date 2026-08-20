@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ChangeEvent } from 'react';
-
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
@@ -23,10 +16,6 @@ import { cog } from '@wordpress/icons';
 import warning from '@wordpress/warning';
 import { useInstanceId } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { SORTING_DIRECTIONS, sortIcons, sortLabels } from '../../constants';
 import { VIEW_LAYOUTS } from '../dataviews-layouts';
 import type { View } from '../../types';
@@ -125,7 +114,6 @@ function SortFieldControl() {
 
 	return (
 		<SelectControl
-			__next40pxDefaultSize
 			label={ __( 'Sort by' ) }
 			value={ view.sort?.field }
 			options={ orderOptions }
@@ -160,7 +148,6 @@ function SortDirectionControl() {
 	return (
 		<ToggleGroupControl
 			className="dataviews-view-config__sort-direction"
-			__next40pxDefaultSize
 			isBlock
 			label={ __( 'Order' ) }
 			value={ value }
@@ -214,7 +201,6 @@ function ItemsPerPageControl() {
 
 	return (
 		<ToggleGroupControl
-			__next40pxDefaultSize
 			isBlock
 			label={ __( 'Items per page' ) }
 			value={ view.perPage || 10 }

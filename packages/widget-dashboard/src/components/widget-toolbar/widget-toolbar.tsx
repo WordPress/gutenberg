@@ -1,44 +1,44 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
+import { useReserveHeaderPadding } from '../widget-header/widget-header-fit';
 import styles from './widget-toolbar.module.css';
 
 export interface WidgetToolbarProps {
-	/** Toolbar controls, laid out in one row. */
+	/**
+	 * The active mode's controls.
+	 */
 	children: ReactNode;
 
-	/** Variant surface class (background, reveal). */
-	className?: string;
+	/**
+	 * Lift the toolbar with a shadow while customizing.
+	 */
+	editMode?: boolean;
 }
 
 /**
- * Shared shell for the per-tile action toolbars. Anchors to the tile's
- * top-right corner and lays controls out in the row the header also uses, so
- * a toolbar lines up with the title when they overlap.
+ * The per-tile toolbar chip holding the active mode's controls.
+ * Always visible; lifted with a shadow only while customizing.
  *
  * @param {WidgetToolbarProps} props Component props.
  */
 export function WidgetToolbar( {
 	children,
-	className,
+	editMode = false,
 }: WidgetToolbarProps ): React.ReactNode {
+	const paddingReserveRef =
+		useReserveHeaderPadding< HTMLDivElement >( 'chip' );
+
 	return (
 		<Stack
+			ref={ paddingReserveRef }
 			direction="row"
 			align="center"
 			gap="xs"
-			className={ clsx( styles.widgetToolbar, className ) }
+			className={ clsx(
+				styles[ 'widget-toolbar' ],
+				editMode && styles.elevated
+			) }
 		>
 			{ children }
 		</Stack>

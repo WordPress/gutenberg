@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { isBlobURL } from '@wordpress/blob';
 import {
 	__unstableGetAnimateClassName as getAnimateClassName,
@@ -30,10 +23,6 @@ import { file as icon } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { getFilename } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import FileBlockInspector from './inspector';
 import { browserSupportsPdfs } from './utils';
 import removeAnchorTag from '../utils/remove-anchor-tag';
@@ -77,14 +66,14 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 	const { media } = useSelect(
 		( select ) => ( {
-			media:
-				id === undefined
-					? undefined
-					: select( coreStore ).getEntityRecord(
-							'postType',
-							'attachment',
-							id
-					  ),
+			media: !! id
+				? select( coreStore ).getEntityRecord(
+						'postType',
+						'attachment',
+						id,
+						{ context: 'view' }
+				  )
+				: undefined,
 		} ),
 		[ id ]
 	);

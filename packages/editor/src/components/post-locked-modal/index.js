@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	Modal,
@@ -17,10 +14,6 @@ import { useInstanceId } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { unlock } from '../../lock-unlock';
 import { DOCUMENT_SIZE_LIMIT_EXCEEDED } from '../../utils/sync-error-messages';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 
 function CollaborationContext() {
@@ -185,7 +178,18 @@ function PostLockedModal() {
 			removeAction( 'heartbeat.tick', hookName );
 			window.removeEventListener( 'beforeunload', releasePostLock );
 		};
-	}, [] );
+		// Re-register with fresh values once the lock state is hydrated from
+		// the server, so a stale `isLocked` doesn't keep `sendPostLock`
+		// refreshing a lock this user doesn't hold.
+	}, [
+		hookName,
+		isLocked,
+		activePostLock,
+		postId,
+		postLockUtils,
+		autosave,
+		updatePostLock,
+	] );
 
 	if ( ! isLocked ) {
 		return null;

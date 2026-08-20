@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getAdjustedCursorPosition } from '../utils';
 
 describe( 'PostTextEditor', () => {

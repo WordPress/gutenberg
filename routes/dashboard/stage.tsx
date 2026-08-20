@@ -1,7 +1,4 @@
-/**
- * WordPress dependencies
- */
-import { Page } from '@wordpress/admin-ui';
+import { Breadcrumbs, Page } from '@wordpress/admin-ui';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
@@ -16,18 +13,17 @@ import {
 	useWidgetTypes,
 	type WidgetModuleRecord,
 } from '@wordpress/widget-primitives';
-
-/**
- * Internal dependencies
- */
+import { registerDashboardFieldTypes } from './field-types';
 import { useDashboardGridSettings, useDashboardLayout } from './hooks';
+
+registerDashboardFieldTypes();
 
 function Dashboard() {
 	const [ layout, setLayout, resetLayout ] = useDashboardLayout(
 		'gutenberg_dashboard'
 	);
 
-	const [ gridSettings, setGridSettings ] = useDashboardGridSettings();
+	const gridSettings = useDashboardGridSettings();
 
 	const widgetsModules = useSelect(
 		( select ) =>
@@ -69,12 +65,15 @@ function Dashboard() {
 			onLayoutChange={ handleLayoutChange }
 			onLayoutReset={ resetLayout }
 			gridSettings={ gridSettings }
-			onGridSettingsChange={ setGridSettings }
 			editMode={ editMode }
 			onEditChange={ setEditMode }
 		>
 			<Page
-				title={ editMode && isMobileViewport ? undefined : pageTitle }
+				breadcrumbs={
+					editMode && isMobileViewport ? undefined : (
+						<Breadcrumbs items={ [ { label: pageTitle } ] } />
+					)
+				}
 				ariaLabel={ pageTitle }
 				actions={ <WidgetDashboard.Actions /> }
 				hasPadding

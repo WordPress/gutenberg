@@ -1,8 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
@@ -10,10 +7,6 @@ import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import PluginSidebar from '../plugin-sidebar';
 import {
 	ALL_NOTES_SIDEBAR,
@@ -24,8 +17,9 @@ import { Notes } from './notes';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
+import { NoteHighlightStyles } from './note-highlight-styles';
 import { useGlobalStyles } from '../global-styles';
-import { useNoteThreads, useEnableFloatingSidebar } from './hooks';
+import { useEnableFloatingSidebar, useNoteThreads } from './hooks';
 import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
@@ -62,7 +56,7 @@ function NotesSidebar( { postId } ) {
 			isDistractionFree: get( 'core', 'distractionFree' ),
 		};
 	}, [] );
-	const selectedNote = useSelect(
+	const selectedNoteId = useSelect(
 		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
 		[]
 	);
@@ -75,7 +69,7 @@ function NotesSidebar( { postId } ) {
 	const showAllNotesSidebar = notes.length > 0 || ! showFloatingSidebar;
 	useEnableFloatingSidebar(
 		showFloatingSidebar &&
-			( unresolvedNotes.length > 0 || selectedNote !== undefined )
+			( unresolvedNotes.length > 0 || selectedNoteId !== undefined )
 	);
 
 	async function focusNote( {
@@ -159,6 +153,10 @@ function NotesSidebar( { postId } ) {
 
 	return (
 		<>
+			<NoteHighlightStyles
+				threads={ unresolvedNotes }
+				selectedId={ selectedNoteId }
+			/>
 			{ !! currentThread && (
 				<NoteAvatarIndicator
 					note={ currentThread }

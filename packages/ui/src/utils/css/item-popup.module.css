@@ -6,6 +6,11 @@
 			composes: dropdown-motion from "./dropdown-motion.module.css";
 
 			--wp-ui-popup-padding: var(--wpds-dimension-padding-xs);
+			--_wp-ui-elevation-md:
+				0 2px 3px rgba(0, 0, 0, 0.05),
+				0 4px 5px rgba(0, 0, 0, 0.04),
+				0 12px 12px rgba(0, 0, 0, 0.03),
+				0 16px 16px rgba(0, 0, 0, 0.02);
 
 			display: grid;
 			grid-template-rows: auto minmax(0, 1fr);
@@ -15,7 +20,7 @@
 			max-width: var(--available-width);
 			border-radius: var(--wpds-border-radius-md);
 			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
-			box-shadow: var(--wpds-elevation-md);
+			box-shadow: var(--_wp-ui-elevation-md);
 			background-color: var(--wpds-color-background-surface-neutral-strong);
 		}
 
@@ -63,7 +68,7 @@
 		}
 
 		.item {
-			--wp-ui-popup-item-height: var(--wpds-dimension-size-lg);
+			--wp-ui-popup-item-height: var(--wpds-dimension-size-md);
 			--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-md);
 			--wp-ui-popup-item-padding-block: var(--wpds-dimension-padding-xs);
 
@@ -83,11 +88,6 @@
 
 			&:not([data-disabled]) {
 				cursor: var(--wpds-cursor-control);
-			}
-
-			&.is-size-compact {
-				--wp-ui-popup-item-height: var(--wpds-dimension-size-md);
-				--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-sm);
 			}
 
 			&.is-size-small {
@@ -133,7 +133,7 @@
 		/* Only style when there is content, because otherwise the element would block clicks
 		on the .list beneath it (both share grid-area: main and overlap). */
 		.empty:not(:empty) {
-			--wp-ui-popup-empty-min-height: var(--wpds-dimension-size-lg);
+			--wp-ui-popup-empty-min-height: var(--wpds-dimension-size-md);
 			--wp-ui-popup-empty-padding-inline: var(--wpds-dimension-padding-md);
 
 			grid-area: main;

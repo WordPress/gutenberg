@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { DELETE, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -33,10 +26,6 @@ import { useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { keyboardReturn } from '@wordpress/icons';
 import { store as blocksStore } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { getSocialService } from './social-list';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 

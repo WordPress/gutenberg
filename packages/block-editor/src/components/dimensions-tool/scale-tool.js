@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalToggleGroupControl as ToggleGroupControl,
@@ -109,7 +106,6 @@ export default function ScaleTool( {
 				help={ scaleHelp[ displayValue ] }
 				value={ displayValue }
 				onChange={ onChange }
-				size="__unstable-large"
 			>
 				{ options.map( ( option ) => (
 					<ToggleGroupControlOption

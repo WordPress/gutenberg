@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import type { Meta } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import { Modal, Button } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import DataViewsPicker from '../index';
 import { LAYOUT_PICKER_GRID } from '../../constants';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';

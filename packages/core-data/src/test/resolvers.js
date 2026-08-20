@@ -1,22 +1,10 @@
-/**
- * WordPress dependencies
- */
 import triggerFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import { getSyncManager } from '../sync';
-
 jest.mock( '@wordpress/api-fetch' );
 jest.mock( '../sync', () => ( {
 	getSyncManager: jest.fn(),
 	LOCAL_UNDO_IGNORED_ORIGIN: 'local-undo-ignored',
 } ) );
-
-/**
- * Internal dependencies
- */
 import {
 	getEntityRecord,
 	getEntityRecords,
@@ -180,6 +168,51 @@ describe( 'getEntityRecord', () => {
 				refetchRecord: expect.any( Function ),
 				restoreUndoMeta: expect.any( Function ),
 			}
+		);
+	} );
+
+	it( 'does not load entity with sync manager when collaboration is unsupported', async () => {
+		const POST_RECORD = { id: 1, title: 'Test Post' };
+		const POST_RESPONSE = {
+			json: () => Promise.resolve( POST_RECORD ),
+		};
+		const ENTITIES_WITH_SYNC = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				baseURLParams: { context: 'edit' },
+				syncConfig: {},
+			},
+		];
+
+		const resolveSelectWithSync = {
+			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
+		};
+		const select = {
+			isCollaborationSupported: jest.fn( () => false ),
+		};
+
+		triggerFetch.mockImplementation( () => POST_RESPONSE );
+
+		await getEntityRecord(
+			'postType',
+			'post',
+			1
+		)( {
+			select,
+			dispatch,
+			registry,
+			resolveSelect: resolveSelectWithSync,
+		} );
+
+		expect( syncManager.load ).not.toHaveBeenCalled();
+		expect( select.isCollaborationSupported ).toHaveBeenCalledTimes( 1 );
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+			'postType',
+			'post',
+			POST_RECORD,
+			undefined
 		);
 	} );
 

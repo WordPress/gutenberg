@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { DragEvent, ReactNode } from 'react';
 
 export type DraggableProps = {

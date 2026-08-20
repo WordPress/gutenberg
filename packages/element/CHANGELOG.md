@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 8.5.0 (2026-08-12)
+
+## 8.4.0 (2026-07-29)
+
+### Bug Fixes
+
+-   `createInterpolateElement`: Warn and stop interpolating instead of throwing when an unmatched closing tag is present ([#60843](https://github.com/WordPress/gutenberg/issues/60843)).
+
+## 8.3.0 (2026-07-14)
+
+### Breaking Changes
+
+-   Move `react` and `react-dom` from `dependencies` to `peerDependencies`. Consumers must now provide `react` and `react-dom` themselves. `@types/react` and `@types/react-dom` become optional peer dependencies ([#80053](https://github.com/WordPress/gutenberg/pull/80053)).
+
+## 8.2.0 (2026-07-01)
+
 ## 8.1.0 (2026-06-24)
 
 ## 8.0.1 (2026-06-16)

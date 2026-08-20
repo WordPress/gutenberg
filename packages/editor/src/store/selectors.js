@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	getFreeformContentHandlerName,
 	getDefaultBlockName,
@@ -12,12 +9,11 @@ import { addQueryArgs, cleanForSlug } from '@wordpress/url';
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	privateApis as coreDataPrivateApis,
+} from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import {
 	ATTACHMENT_POST_TYPE,
 	EDIT_MERGE_PROPERTIES,
@@ -26,9 +22,10 @@ import {
 	AUTOSAVE_PROPERTIES,
 } from './constants';
 import { getPostRawValue } from './reducer';
-import { getTemplatePartIcon } from '../utils/get-template-part-icon';
 import { unlock } from '../lock-unlock';
-import { getTemplateInfo } from '../utils/get-template-info';
+import { getDeviceTypeByCanvasWidth } from '../utils/device-type';
+
+const { getTemplateInfo, getTemplatePartIcon } = unlock( coreDataPrivateApis );
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -1348,11 +1345,15 @@ export function getRenderingMode( state ) {
  */
 export const getDeviceType = createRegistrySelector(
 	( select ) => ( state ) => {
-		const isZoomOut = unlock( select( blockEditorStore ) ).isZoomOut();
+		const blockEditorSelect = unlock( select( blockEditorStore ) );
+		const isZoomOut = blockEditorSelect.isZoomOut();
 		if ( isZoomOut ) {
 			return 'Desktop';
 		}
-		return state.deviceType;
+		const canvasWidth = state.canvasWidth;
+		const viewportSettings =
+			blockEditorSelect.getSettings().__experimentalFeatures?.viewport;
+		return getDeviceTypeByCanvasWidth( canvasWidth, viewportSettings );
 	}
 );
 

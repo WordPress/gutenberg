@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { wordpress } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import Icon from '../../icon';
 import Snackbar from '..';
 

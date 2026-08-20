@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Breadcrumbs, Page } from '@wordpress/admin-ui';
 import { useState } from '@wordpress/element';
 import { wordpress } from '@wordpress/icons';
-import { ThemeProvider, type CornerRadiusPreset } from '@wordpress/theme';
+import { ThemeProvider } from '@wordpress/theme';
 import {
 	Badge,
 	Button,
@@ -16,8 +16,12 @@ import {
 	Tabs,
 	Text,
 } from '@wordpress/ui';
-
 import { withRouter } from '../../decorators/with-router';
+
+type ThemeProviderCornerRadius = React.ComponentProps<
+	typeof ThemeProvider
+>[ 'cornerRadius' ];
+type CornerRadiusPreset = NonNullable< ThemeProviderCornerRadius >;
 
 const sidebarNavItems = [
 	'Dashboard',
@@ -117,7 +121,7 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 							value={ cornerRadiusPreset }
 							onChange={ ( e ) =>
 								setCornerRadiusPreset(
-									e.target.value as typeof cornerRadiusPreset
+									e.target.value as CornerRadiusPreset
 								)
 							}
 						>

@@ -1,14 +1,25 @@
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
 	type InlineConfig,
 	type PluginOption,
 	mergeConfig,
-	transformWithEsbuild,
+	transformWithOxc,
 } from 'vite';
 import react from '@vitejs/plugin-react';
 import type { StorybookConfig } from '@storybook/react-vite';
 import dsTokenFallbacks from '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks';
 import dsTokenFallbacksJs from '@wordpress/theme/vite-plugins/vite-ds-token-fallbacks';
+import babel from './vite-babel-plugin.js';
+
+/**
+ * @see https://storybook.js.org/docs/faq#how-do-i-fix-module-resolution-in-special-environments
+ */
+function getAbsolutePath( packageName: string ) {
+	return path.dirname(
+		fileURLToPath( import.meta.resolve( `${ packageName }/package.json` ) )
+	);
+}
 
 const { NODE_ENV = 'development' } = process.env;
 
@@ -18,6 +29,7 @@ const stories = [
 	'./stories/design-system/**/*.story.@(ts|tsx)',
 	'../packages/block-editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
 	'../packages/editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
+	'../packages/global-styles-ui/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
 	'../packages/components/src/**/stories/*.story.@(jsx|tsx)',
 	'../packages/components/src/**/stories/*.mdx',
 	'../packages/icons/src/**/stories/*.story.@(js|tsx|mdx)',
@@ -32,7 +44,8 @@ const stories = [
 	'../packages/grid/src/**/stories/*.story.@(ts|tsx)',
 	'../packages/widget-primitives/src/**/stories/*.mdx',
 	'../packages/widget-primitives/src/**/stories/*.story.@(ts|tsx)',
-	'../routes/dashboard/**/stories/*.story.@(ts|tsx)',
+	'../packages/widget-dashboard/src/**/stories/*.mdx',
+	'../packages/widget-dashboard/src/**/stories/*.story.@(ts|tsx)',
 	'../packages/ui/src/**/stories/*.mdx',
 	'../packages/ui/src/**/stories/*.story.@(ts|tsx)',
 	'../packages/admin-ui/src/**/stories/*.story.@(ts|tsx)',
@@ -46,15 +59,22 @@ const config: StorybookConfig = {
 	staticDirs: [ './static' ],
 	addons: [
 		{
-			name: '@storybook/addon-docs',
+			name: getAbsolutePath( '@storybook/addon-docs' ),
 			options: { configureJSX: true },
 		},
-		'@storybook/addon-a11y',
+		getAbsolutePath( '@storybook/addon-a11y' ),
 		import.meta.resolve( './addons/source-link/preset.ts' ),
-		'storybook-addon-tag-badges',
+		getAbsolutePath( 'storybook-addon-tag-badges' ),
 		import.meta.resolve( './addons/design-system-theme/preset.ts' ),
 	],
-	framework: '@storybook/react-vite',
+	framework: getAbsolutePath( '@storybook/react-vite' ),
+	tags: {
+		'docs-only': {
+			// Keep stories available to attached MDX while hiding their
+			// standalone pages from the sidebar.
+			excludeFromSidebar: true,
+		},
+	},
 	features: {
 		componentsManifest: NODE_ENV !== 'development',
 		// Use experimental TypeScript LanguageService prop extractor for the
@@ -113,23 +133,45 @@ const config: StorybookConfig = {
 		return mergeConfig( viteConfig, {
 			plugins: [
 				dsTokenFallbacksJs(),
-				react( {
-					jsxImportSource: '@emotion/react',
-					babel: {
-						plugins: [ '@emotion/babel-plugin' ],
+				react() as PluginOption,
+				// @rolldown/plugin-babel requires Node 22, but Gutenberg still
+				// supports Node 20. Keep the same call shape so this fallback can
+				// be replaced with the package after the Node upgrade.
+				await babel( {
+					generatorOpts: {
+						decoratorsBeforeExport: true,
+						importAttributesKeyword: 'with',
 					},
-				} ) as PluginOption,
+					overrides: [
+						{
+							test: /x(?:$|\?)/,
+							retainLines: NODE_ENV !== 'production',
+						},
+					],
+					plugins: [ getAbsolutePath( '@emotion/babel-plugin' ) ],
+				} ),
 				{
 					name: 'load-js-files-as-jsx',
+					enforce: 'pre',
 					async transform( code: string, id: string ) {
 						if ( ! id.match( /.*\.js$/ ) ) {
 							return null;
 						}
 
-						return transformWithEsbuild( code, id, {
-							loader: 'jsx',
-							jsx: 'automatic',
+						const result = await transformWithOxc( code, id, {
+							lang: 'jsx',
+							jsx: { runtime: 'automatic' },
 						} );
+
+						for ( const warning of result.warnings ) {
+							this.warn( warning );
+						}
+
+						return {
+							code: result.code,
+							map: result.map,
+							moduleType: 'js',
+						};
 					},
 				},
 				// Stub the vips and wasm-vips packages for Storybook since they use WASM modules that Vite can't handle.
@@ -190,9 +232,13 @@ const config: StorybookConfig = {
 				},
 			],
 			build: {
+				// Storybook's preview includes its shared runtime and all stories.
+				// Automatic chunk splitting is already enabled; 3.5 MB leaves a
+				// meaningful budget above the current 3.15 MB largest chunk.
+				chunkSizeWarningLimit: 3_500,
 				/**
 				 * Use terser with keep_fnames to preserve component names in source code display.
-				 * Without this, Vite's esbuild minifier mangles component names (e.g., BoxControl -> J)
+				 * Without this, Vite's default minifier mangles component names (e.g., BoxControl -> J)
 				 * which breaks the Storybook docs source code display.
 				 * @see https://github.com/storybookjs/storybook/issues/20769
 				 */
@@ -201,6 +247,15 @@ const config: StorybookConfig = {
 					keep_fnames: true,
 					mangle: {
 						keep_fnames: true,
+					},
+				},
+				rolldownOptions: {
+					checks: {
+						// Storybook's legacy `react-docgen` and
+						// `react-docgen-typescript` transforms are expected to
+						// dominate the build. Keep them enabled without emitting
+						// timing warnings.
+						pluginTimings: false,
 					},
 				},
 			},
@@ -214,12 +269,38 @@ const config: StorybookConfig = {
 				postcss: {
 					// Vite bundles its own PostCSS, creating a deep
 					// type incompatibility with the top-level PostCSS.
-					plugins: [ dsTokenFallbacks as any ],
+					plugins: [
+						dsTokenFallbacks as any,
+						{
+							// `postcss-modules` turns CSS composed from another module into a
+							// string before it prepends it to the current stylesheet. Parsing
+							// that string discards the declarations' source metadata, which
+							// makes Vite warn even when no asset resolution is needed.
+							postcssPlugin:
+								'supply-composed-css-module-source-fallback',
+							OnceExit( root ) {
+								root.walkDecls( ( declaration ) => {
+									const requiresSourceForAssetResolution =
+										/(?:url|image-set)\(/i.test(
+											declaration.value
+										);
+
+									// The fallback file is unsafe when Vite uses it to resolve assets.
+									if (
+										! declaration.source?.input.file &&
+										! requiresSourceForAssetResolution
+									) {
+										declaration.source = root.source;
+									}
+								} );
+							},
+						},
+					],
 				},
 			},
 			optimizeDeps: {
-				esbuildOptions: {
-					loader: {
+				rolldownOptions: {
+					moduleTypes: {
 						'.js': 'tsx',
 					},
 				},

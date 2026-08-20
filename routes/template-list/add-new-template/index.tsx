@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	Modal,
@@ -42,10 +35,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useNavigate, useInvalidate } from '@wordpress/route';
 import { focus } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import AddCustomTemplateModalContent, {
 	type EntityForSuggestions,
 } from './add-custom-template-modal-content';
@@ -136,7 +125,7 @@ function TemplateListItem( {
 				>
 					<WCText
 						align="center"
-						weight={ 500 }
+						weight="var(--wpds-typography-font-weight-emphasis)"
 						lineHeight={ 1.53846153846 } // 20px
 					>
 						{ title }

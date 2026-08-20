@@ -12,7 +12,7 @@ export function register( server: McpServer ): void {
 		{
 			title: 'Get Design Tokens',
 			description:
-				'Get the WordPress Design System design tokens reference (colors, spacing, typography, elevation, etc.).',
+				'Get the WordPress Design System design tokens reference (colors, spacing, typography, motion, etc.).',
 			annotations: {
 				readOnlyHint: true,
 			},

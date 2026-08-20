@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useRef } from '@wordpress/element';
 import {
 	focus,
@@ -9,10 +6,6 @@ import {
 	placeCaretAtHorizontalEdge,
 } from '@wordpress/dom';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { isInsideRootBlock } from '../../../utils/dom';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
@@ -29,9 +22,8 @@ import { unlock } from '../../../lock-unlock';
  */
 export function useFocusFirstElement( { clientId, initialPosition } ) {
 	const ref = useRef();
-	const { isBlockSelected, isMultiSelecting, isZoomOut } = unlock(
-		useSelect( blockEditorStore )
-	);
+	const { isBlockSelected, isMultiSelecting, isZoomOut, getSelectionStart } =
+		unlock( useSelect( blockEditorStore ) );
 
 	useEffect( () => {
 		// Check if the block is still selected at the time this effect runs.
@@ -55,6 +47,11 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 
 		// Do not focus the block if it already contains the active element.
 		if ( isInsideRootBlock( ref.current, ownerDocument.activeElement ) ) {
+			return;
+		}
+
+		if ( initialPosition === true ) {
+			ref.current.focus();
 			return;
 		}
 
@@ -87,7 +84,27 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 				return;
 			}
 		}
-		placeCaretAtHorizontalEdge( target, isReverse );
+		// Do not place a caret when the target already contains one:
+		// while a focused editing host contains the target (the block
+		// supports `editableRoot`), the caret can be inside it without the
+		// target holding focus. Only a caret the rich text synchronized to
+		// the store (offsets present) is deliberate; a leftover one yields
+		// to an explicitly requested edge position (initialPosition -1).
+		const { activeElement } = ownerDocument;
+		const selection = ownerDocument.defaultView.getSelection();
+		const { clientId: selectionClientId, offset } = getSelectionStart();
+		const hasCaret =
+			activeElement?.isContentEditable &&
+			activeElement.contains( target ) &&
+			!! selection.anchorNode &&
+			target.contains( selection.anchorNode );
+		const isDeliberate =
+			initialPosition === 0 ||
+			( offset !== undefined && selectionClientId === clientId );
+
+		if ( ! ( hasCaret && isDeliberate ) ) {
+			placeCaretAtHorizontalEdge( target, isReverse );
+		}
 	}, [ initialPosition, clientId ] );
 
 	return ref;

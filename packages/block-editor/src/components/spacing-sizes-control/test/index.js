@@ -19,21 +19,9 @@
  * The tests ensure that when the SpacingSizesControl is refactored to use
  * PresetInputControl, the existing user experience and behavior is preserved.
  */
-
-/**
- * External dependencies
- */
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import SpacingSizesControl from '../index';
 
 // Mock useSelect

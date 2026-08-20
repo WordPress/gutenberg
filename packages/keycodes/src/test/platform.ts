@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { isAppleOS } from '../platform';
 
 describe( 'isAppleOS helper', () => {

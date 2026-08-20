@@ -3,18 +3,17 @@ import clsx from 'clsx';
 import { forwardRef, useContext } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { ThemeProvider } from '@wordpress/theme';
-
 import { renderSlotWithChildren } from '../utils/render-slot-with-children';
 import { Button } from '../button';
 import dialogStyles from '../dialog/style.module.css';
-import focusStyles from '../utils/css/focus.module.css';
+import focusStyles from '../utils/css/focus.module.scss';
 import overlayChromeStyles from '../utils/css/overlay-chrome.module.css';
 import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
 import {
 	SCROLL_CONTAINER_ATTR,
 	useOverlayScrollStateAttributes,
 } from '../utils/use-overlay-scroll-state-attributes';
+import { ThemeProvider } from '../utils/theme-provider';
 import { Stack } from '../stack';
 import { Text } from '../text';
 import { AlertDialogContext } from './context';

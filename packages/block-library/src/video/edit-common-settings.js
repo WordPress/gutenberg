@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, _x } from '@wordpress/i18n';
 import {
 	ToggleControl,
@@ -150,7 +147,6 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 				} }
 			>
 				<SelectControl
-					__next40pxDefaultSize
 					label={ __( 'Preload' ) }
 					value={ preload }
 					onChange={ onChangePreload }

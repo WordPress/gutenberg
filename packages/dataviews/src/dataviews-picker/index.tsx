@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	useContext,
 	useEffect,
@@ -16,10 +9,6 @@ import {
 } from '@wordpress/element';
 import { useResizeObserver } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import DataViewsContext from '../components/dataviews-context';
 import { VIEW_LAYOUTS } from '../components/dataviews-layouts';
 import {
@@ -269,6 +258,11 @@ function DataViewsPicker< Item >( {
 	);
 }
 
+/**
+ * `DataViewsPicker` renders a dataset allowing users to select one or multiple
+ * items. It shares the layouts, search, and filtering of `DataViews` but is
+ * geared toward choosing items rather than managing them.
+ */
 // Populate the DataViews sub components
 const DataViewsPickerSubComponents =
 	DataViewsPicker as typeof DataViewsPicker & {

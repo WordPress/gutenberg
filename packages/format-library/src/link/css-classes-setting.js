@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -77,7 +74,6 @@ const CSSClassesSettingComponent = ( { setting, value, onChange } ) => {
 								'Separate multiple classes with spaces.'
 							) }
 							__unstableInputWidth="100%"
-							__next40pxDefaultSize
 						/>
 					</div>
 				) }

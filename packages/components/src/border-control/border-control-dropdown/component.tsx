@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import BorderControlStylePicker from '../border-control-style-picker';
 import Button from '../../button';
 import ColorIndicator from '../../color-indicator';
@@ -21,7 +10,6 @@ import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { useBorderControlDropdown } from './hook';
 import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
-
 import type { ColorObject } from '../../color-palette/types';
 import { isMultiplePaletteArray } from '../../color-palette/utils';
 import type { DropdownProps as DropdownComponentProps } from '../../dropdown/types';
@@ -158,7 +146,6 @@ const BorderControlDropdown = (
 		popoverContentClassName,
 		popoverControlsClassName,
 		resetButtonWrapperClassName,
-		size,
 		__unstablePopoverProps,
 		...otherProps
 	} = useBorderControlDropdown( props );
@@ -188,7 +175,7 @@ const BorderControlDropdown = (
 			tooltipPosition={ dropdownPosition }
 			label={ __( 'Border color and style picker' ) }
 			showTooltip
-			__next40pxDefaultSize={ size === '__unstable-large' }
+			__next40pxDefaultSize
 		>
 			<span className={ indicatorWrapperClassName }>
 				<ColorIndicator

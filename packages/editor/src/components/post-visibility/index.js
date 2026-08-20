@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import {
@@ -11,10 +8,6 @@ import {
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { VISIBILITY_OPTIONS } from './utils';
 import { store as editorStore } from '../../store';
 

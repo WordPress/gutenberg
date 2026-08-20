@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { Link, Stack, Text } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { HeaderBackground } from '../header-background';
 import styles from './banner.module.css';
 

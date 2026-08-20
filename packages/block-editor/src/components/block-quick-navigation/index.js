@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { getBlockType } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -12,10 +9,6 @@ import {
 	FlexItem,
 } from '@wordpress/components';
 import { Icon, chevronRight } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
 import useBlockDisplayInformation from '../use-block-display-information';

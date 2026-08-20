@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { TextControl } from '@wordpress/components';
 import { useEntityProp } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';

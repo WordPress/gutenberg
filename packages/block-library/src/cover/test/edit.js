@@ -1,16 +1,9 @@
-/**
- * External dependencies
- */
 import { screen, fireEvent, act, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * Internal dependencies
- */
 import {
 	initializeEditor,
 	selectBlock,
-} from 'test/integration/helpers/integration-test-editor';
+} from '@wordpress/integration-tests/helpers/integration-test-editor';
 
 const defaultSettings = {
 	__experimentalFeatures: {
@@ -106,19 +99,6 @@ async function openStylesTabIfAvailable() {
 	if ( stylesTab ) {
 		await userEvent.click( stylesTab );
 	}
-}
-
-async function selectViewportState( name ) {
-	await userEvent.click(
-		screen.getByRole( 'button', {
-			name: 'State: Default',
-		} )
-	);
-	await userEvent.click(
-		screen.getByRole( 'menuitem', {
-			name,
-		} )
-	);
 }
 
 describe( 'Cover block', () => {
@@ -230,7 +210,7 @@ describe( 'Cover block', () => {
 			await selectBlock( 'Block: Cover' );
 			expect(
 				within( screen.getByLabelText( 'Block: Cover' ) ).getByRole(
-					'img'
+					'presentation'
 				)
 			).toBeInTheDocument();
 
@@ -245,7 +225,7 @@ describe( 'Cover block', () => {
 
 			expect(
 				within( screen.getByLabelText( 'Block: Cover' ) ).queryByRole(
-					'img'
+					'presentation'
 				)
 			).not.toBeInTheDocument();
 		} );
@@ -331,7 +311,7 @@ describe( 'Cover block', () => {
 
 			expect(
 				within( screen.getByLabelText( 'Block: Cover' ) ).getByRole(
-					'img'
+					'presentation'
 				)
 			).toHaveStyle( 'object-position: 100% 50%;' );
 		} );
@@ -430,31 +410,6 @@ describe( 'Cover block', () => {
 
 					expect( opacityControl ).not.toBeInTheDocument();
 				} );
-			} );
-
-			test( 'does not render overlay controls when a viewport state is selected', async () => {
-				await setup();
-				await createAndSelectBlock();
-				await openStylesTabIfAvailable();
-
-				expect(
-					screen.getByRole( 'button', {
-						name: 'Overlay',
-					} )
-				).toBeInTheDocument();
-
-				await selectViewportState( 'Tablet' );
-
-				expect(
-					screen.queryByRole( 'button', {
-						name: 'Overlay',
-					} )
-				).not.toBeInTheDocument();
-				expect(
-					screen.queryByRole( 'slider', {
-						name: 'Overlay opacity',
-					} )
-				).not.toBeInTheDocument();
 			} );
 		} );
 

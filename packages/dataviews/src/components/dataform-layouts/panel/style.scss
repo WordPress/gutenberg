@@ -43,7 +43,7 @@
 
 		.dataforms-layouts-panel__field-control {
 			color: var(--wpds-color-foreground-content-neutral-weak);
-			font-weight: var(--wpds-typography-font-weight-regular);
+			font-weight: var(--wpds-typography-font-weight-default);
 		}
 	}
 }
@@ -127,7 +127,7 @@
 	padding-inline: var(--wpds-border-width-focus);
 	margin-inline: calc(-1 * var(--wpds-border-width-focus));
 	word-break: break-word;
-	font-weight: var(--wpds-typography-font-weight-medium);
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 
 	> * {
 		min-width: 0;

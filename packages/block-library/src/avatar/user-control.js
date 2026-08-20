@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { ComboboxControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -47,7 +44,6 @@ export default function UserControl( { value, onChange } ) {
 
 	return (
 		<ComboboxControl
-			__next40pxDefaultSize
 			label={ __( 'User' ) }
 			help={ __(
 				'Select the avatar user to display, if it is blank it will use the post/page author.'

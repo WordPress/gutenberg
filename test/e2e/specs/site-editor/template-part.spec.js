@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Template Part', () => {
@@ -37,7 +34,10 @@ test.describe( 'Template Part', () => {
 			.click();
 
 		// Fill in a name in the dialog that pops up.
-		await page.type( 'role=dialog >> role=textbox[name="Name"i]', 'New' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'textbox', { name: 'Name' } )
+			.type( 'New' );
 		await page.keyboard.press( 'Enter' );
 
 		// The template part should be visible with a block appender.
@@ -68,9 +68,10 @@ test.describe( 'Template Part', () => {
 		// Insert a new template block and choose an existing header pattern.
 		await editor.insertBlock( { name: 'core/template-part' } );
 		await editor.canvas.locator( 'role=button[name="Choose"i]' ).click();
-		await page.click(
-			'role=listbox[name="Patterns"i] >> role=option[name="header"i]'
-		);
+		await page
+			.getByRole( 'listbox', { name: 'Patterns' } )
+			.getByRole( 'option', { name: 'header' } )
+			.click();
 
 		// There are now two header template parts.
 		await expect( headerTemplateParts ).toHaveCount( 2 );
@@ -98,7 +99,10 @@ test.describe( 'Template Part', () => {
 
 		// Convert block to a template part.
 		await editor.clickBlockOptionsMenuItem( 'Create Template part' );
-		await page.type( 'role=dialog >> role=textbox[name="Name"i]', 'Test' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'textbox', { name: 'Name' } )
+			.type( 'Test' );
 		await page.keyboard.press( 'Enter' );
 
 		await page.waitForSelector(
@@ -147,7 +151,10 @@ test.describe( 'Template Part', () => {
 
 		// Convert block to a template part.
 		await editor.clickBlockOptionsMenuItem( 'Create template part' );
-		await page.type( 'role=dialog >> role=textbox[name="Name"i]', 'Test' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'textbox', { name: 'Name' } )
+			.type( 'Test' );
 		await page.keyboard.press( 'Enter' );
 
 		await page.waitForSelector(

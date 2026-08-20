@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import { useRegistry, createRegistry, RegistryProvider } from '@wordpress/data';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { storeConfig as blockEditorStoreConfig } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { storeConfig } from '../../store';
 
 function getSubRegistry( subRegistries, registry, useSubRegistry ) {
