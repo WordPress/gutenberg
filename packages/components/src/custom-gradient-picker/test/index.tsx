@@ -2,6 +2,8 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import CustomGradientPicker from '../';
+import CustomGradientBar from '../gradient-bar';
+import { KEYBOARD_CONTROL_POINT_VARIATION } from '../gradient-bar/constants';
 
 function ControlledCustomGradientPicker( {
 	initialValue = 'linear-gradient(90deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)',
@@ -176,5 +178,62 @@ describe( 'CustomGradientPicker', () => {
 				onChange.mock.calls[ onChange.mock.calls.length - 1 ][ 0 ];
 			expect( lastCall ).not.toContain( 'deg' );
 		} );
+	} );
+} );
+
+describe( 'CustomGradientBar', () => {
+	const POINTS = [
+		{ position: 0, color: 'rgb(0,0,0)' },
+		{ position: 100, color: 'rgb(255,255,255)' },
+	];
+
+	// The counterpart to the duotone bar's tests: positioning is on unless a
+	// consumer opts out, so arrow keys must still move a control point.
+	it( 'moves a control point with the arrow keys', async () => {
+		const user = userEvent.setup();
+		const onChange = jest.fn();
+
+		render(
+			<CustomGradientBar
+				background="linear-gradient(90deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)"
+				hasGradient
+				value={ POINTS }
+				onChange={ onChange }
+			/>
+		);
+
+		const [ firstPoint ] = screen.getAllByRole( 'button', {
+			name: /Gradient control point/,
+		} );
+		firstPoint.focus();
+		await user.keyboard( '[ArrowRight]' );
+
+		expect( onChange ).toHaveBeenCalledWith( [
+			{ position: KEYBOARD_CONTROL_POINT_VARIATION, color: 'rgb(0,0,0)' },
+			POINTS[ 1 ],
+		] );
+	} );
+
+	it( 'does not move a control point when positioning is disabled', async () => {
+		const user = userEvent.setup();
+		const onChange = jest.fn();
+
+		render(
+			<CustomGradientBar
+				background="linear-gradient(90deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)"
+				hasGradient
+				disablePositioning
+				value={ POINTS }
+				onChange={ onChange }
+			/>
+		);
+
+		const [ firstPoint ] = screen.getAllByRole( 'button', {
+			name: /Gradient control point/,
+		} );
+		firstPoint.focus();
+		await user.keyboard( '[ArrowRight]' );
+
+		expect( onChange ).not.toHaveBeenCalled();
 	} );
 } );

@@ -58,6 +58,24 @@ describe( 'CustomDuotoneBar', () => {
 		expect( onAncestorKeyDown ).not.toHaveBeenCalled();
 	} );
 
+	// Disabling positioning must not disable the one thing a duotone control
+	// point can still do.
+	it( 'still opens the color picker when a control point is clicked', async () => {
+		const user = userEvent.setup();
+
+		render( <CustomDuotoneBar value={ VALUE } onChange={ jest.fn() } /> );
+
+		await user.click(
+			screen.getAllByRole( 'button', {
+				name: /Gradient control point/,
+			} )[ 0 ]
+		);
+
+		expect(
+			await screen.findByRole( 'slider', { name: 'Color' } )
+		).toBeVisible();
+	} );
+
 	it( 'still lets other keys bubble', async () => {
 		const user = userEvent.setup();
 		const onAncestorKeyDown = jest.fn();
