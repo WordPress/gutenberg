@@ -11,7 +11,6 @@ import { useInstanceId } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { closeSmall } from '@wordpress/icons';
 import { withIgnoreIMEEvents } from '@wordpress/keycodes';
-import { InputWrapperFlex } from './styles';
 import TokenInput from '../form-token-field/token-input';
 import SuggestionsList from '../form-token-field/suggestions-list';
 import BaseControl from '../base-control';
