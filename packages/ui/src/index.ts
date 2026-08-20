@@ -4,7 +4,6 @@ export * from './calendar';
 export * as Card from './card';
 export * as Collapsible from './collapsible';
 export * as CollapsibleCard from './collapsible-card';
-export * from './control-with-error';
 export * as AlertDialog from './alert-dialog';
 export * as Dialog from './dialog';
 export * as Drawer from './drawer';

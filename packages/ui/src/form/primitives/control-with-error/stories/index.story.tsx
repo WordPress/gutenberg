@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useRef, useState } from '@wordpress/element';
 import { ControlWithError } from '../index';
-import { Button } from '../../button';
-import { InputControl } from '../../form';
+import { Button } from '../../../../button';
+import { InputControl } from '../../../input-control';
 
 const meta: Meta< typeof ControlWithError > = {
 	title: 'Design System/Components/Form/Primitives/ControlWithError',

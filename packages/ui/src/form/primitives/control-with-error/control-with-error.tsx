@@ -9,7 +9,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import type { ControlWithErrorProps, ValidityTarget } from './types';
-import { ValidityIndicator } from './validity-indicator';
+import { ValidityIndicator } from '../validity-indicator';
 
 function appendRequiredIndicator(
 	label: React.ReactNode,

@@ -1,2 +1,2 @@
-export { ControlWithError } from './control-with-error';
 export { ValidityIndicator } from './validity-indicator';
+export type { ValidityIndicatorProps } from './types';
