@@ -49,24 +49,10 @@ describe( 'MediaEditorImageControls', () => {
 			screen.getByRole( 'button', { name: 'Zoom out' } )
 		).toBeInTheDocument();
 
-		// No visible group labels in the flat (footer) layout.
+		// Icon buttons only — no visible group labels.
 		expect( screen.queryByText( 'Rotate' ) ).not.toBeInTheDocument();
 		expect( screen.queryByText( 'Flip' ) ).not.toBeInTheDocument();
 		expect( screen.queryByText( 'Zoom' ) ).not.toBeInTheDocument();
-	} );
-
-	it( 'renders labelled rotate, flip and zoom groups when withLabels is set', () => {
-		setup( { withLabels: true } );
-
-		expect( screen.getByText( 'Rotate' ) ).toBeInTheDocument();
-		expect( screen.getByText( 'Flip' ) ).toBeInTheDocument();
-		expect( screen.getByText( 'Zoom' ) ).toBeInTheDocument();
-		expect(
-			screen.getByRole( 'button', { name: 'Rotate 90° clockwise' } )
-		).toBeInTheDocument();
-		expect(
-			screen.getByRole( 'button', { name: 'Zoom in' } )
-		).toBeInTheDocument();
 	} );
 
 	it( 'zoom in multiplies the zoom and zoom out divides it', () => {
@@ -128,16 +114,5 @@ describe( 'MediaEditorImageControls', () => {
 				screen.getByTestId( 'current-aspect-ratio' )
 			).toHaveTextContent( '1' )
 		);
-	} );
-
-	it( 'omits the aspect ratio dropdown from the labelled panel layout', () => {
-		setup( {
-			withLabels: true,
-			showAspectRatioControl: true,
-		} );
-
-		expect(
-			screen.queryByRole( 'button', { name: 'Aspect ratio' } )
-		).not.toBeInTheDocument();
 	} );
 } );

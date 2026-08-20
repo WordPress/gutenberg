@@ -34,16 +34,7 @@ export const DEFAULT_ZOOM_FACTOR = 1.2;
 
 export interface MediaEditorImageControlsProps {
 	/**
-	 * When `true`, render rotate, flip and zoom as labelled groups — the Crop
-	 * panel layout used on wide viewports. When `false` (default), render a
-	 * single flat row of icon buttons — the footer layout used at narrower
-	 * widths.
-	 */
-	withLabels?: boolean;
-	/**
-	 * When `true`, include an aspect-ratio dropdown in the flat toolbar.
-	 * Omitted from the labelled panel layout because the Crop panel already
-	 * renders the full aspect-ratio select control.
+	 * When `true`, include an aspect-ratio dropdown in the toolbar.
 	 */
 	showAspectRatioControl?: boolean;
 	/** Optional caller-supplied aspect-ratio presets. */
@@ -57,19 +48,16 @@ export interface MediaEditorImageControlsProps {
 }
 
 /**
- * Image editing controls placed independently per viewport: on wide viewports
- * rotate/flip/zoom render inside the Crop panel (`withLabels`), and at narrower
- * widths they fall back into the footer toolbar (flat row), where the
- * aspect-ratio dropdown can also be shown.
+ * Image editing controls — rotate, flip, zoom and (optionally) aspect ratio as
+ * a single flat row of icon buttons. Rendered under the canvas beside the
+ * fine-rotation ruler at every viewport, since each control acts on the image.
  *
  * @param props
- * @param props.withLabels
  * @param props.showAspectRatioControl
  * @param props.aspectRatioPresets
  * @param props.zoomFactor
  */
 export default function MediaEditorImageControls( {
-	withLabels = false,
 	showAspectRatioControl = false,
 	aspectRatioPresets,
 	zoomFactor = DEFAULT_ZOOM_FACTOR,
@@ -77,7 +65,6 @@ export default function MediaEditorImageControls( {
 	const { state, setFlip, snapRotate90, setZoom } = useMediaEditor();
 	const { aspectRatioValue, setAspectRatioValue, aspectRatioOptions } =
 		useCropOptions( { aspectRatioPresets } );
-	const hasAspectRatioControl = ! withLabels && showAspectRatioControl;
 	const minZoom = getMinZoom( state );
 	const zoomByFactor = ( factor: number ) => {
 		setZoom(
@@ -158,7 +145,7 @@ export default function MediaEditorImageControls( {
 		</>
 	);
 
-	const aspectRatioDropdown = hasAspectRatioControl ? (
+	const aspectRatioDropdown = showAspectRatioControl ? (
 		<DropdownMenu
 			icon={ aspectRatioIcon }
 			label={ __( 'Aspect ratio' ) }
@@ -189,60 +176,6 @@ export default function MediaEditorImageControls( {
 			) }
 		</DropdownMenu>
 	) : null;
-
-	if ( withLabels ) {
-		return (
-			<div className="media-editor-image-controls is-stacked">
-				<div className="media-editor-image-controls__transforms">
-					<div
-						className="media-editor-image-controls__group"
-						role="group"
-						aria-label={ __( 'Rotate' ) }
-					>
-						<span
-							className="media-editor-image-controls__label"
-							aria-hidden="true"
-						>
-							{ __( 'Rotate' ) }
-						</span>
-						<div className="media-editor-image-controls__buttons">
-							{ rotateButtons }
-						</div>
-					</div>
-					<div
-						className="media-editor-image-controls__group"
-						role="group"
-						aria-label={ __( 'Flip' ) }
-					>
-						<span
-							className="media-editor-image-controls__label"
-							aria-hidden="true"
-						>
-							{ __( 'Flip' ) }
-						</span>
-						<div className="media-editor-image-controls__buttons">
-							{ flipButtons }
-						</div>
-					</div>
-				</div>
-				<div
-					className="media-editor-image-controls__group"
-					role="group"
-					aria-label={ __( 'Zoom' ) }
-				>
-					<span
-						className="media-editor-image-controls__label"
-						aria-hidden="true"
-					>
-						{ __( 'Zoom' ) }
-					</span>
-					<div className="media-editor-image-controls__buttons">
-						{ zoomButtons }
-					</div>
-				</div>
-			</div>
-		);
-	}
 
 	return (
 		<div className="media-editor-image-controls">
