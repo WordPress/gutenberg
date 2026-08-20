@@ -186,6 +186,42 @@ describe( 'PlaylistEdit', () => {
 		expect( screen.getByTestId( 'playlist-track' ) ).toBeInTheDocument();
 	} );
 
+	it( 'keeps an empty placeholder track when adding tracks', () => {
+		useSelect.mockReturnValue( {
+			innerBlockTracks: [
+				{
+					clientId: 'track-1',
+					attributes: {
+						id: 1,
+						src: 'https://example.com/audio.mp3',
+						title: 'Sample track',
+					},
+				},
+				// A track the user added but has not filled in yet.
+				{ clientId: 'placeholder-track', attributes: {} },
+			],
+		} );
+
+		render(
+			<PlaylistEdit
+				attributes={ defaultAttributes }
+				clientId="playlist-1"
+				insertBlocksAfter={ jest.fn() }
+				isSelected={ false }
+				setAttributes={ jest.fn() }
+			/>
+		);
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'Add track' } ) );
+
+		expect( replaceInnerBlocks ).toHaveBeenCalledWith(
+			'playlist-1',
+			expect.arrayContaining( [
+				expect.objectContaining( { clientId: 'placeholder-track' } ),
+			] )
+		);
+	} );
+
 	it( 'adds tracks from the add track control', () => {
 		render(
 			<PlaylistEdit

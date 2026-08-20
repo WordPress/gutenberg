@@ -249,7 +249,9 @@ const PlaylistEdit = ( {
 				return;
 			}
 
-			const nextBlocks = [ ...validTracks, ...newBlocks ];
+			// Keep every existing track, not just the valid ones: a track the
+			// user has added but not filled in yet must survive the drop.
+			const nextBlocks = [ ...innerBlockTracks, ...newBlocks ];
 			setCurrentTrackClientId( newBlocks[ 0 ].clientId );
 			replaceInnerBlocks( clientId, nextBlocks );
 			selectBlock( newBlocks[ 0 ].clientId );
@@ -257,6 +259,7 @@ const PlaylistEdit = ( {
 		[
 			clientId,
 			createTrackBlocks,
+			innerBlockTracks,
 			replaceInnerBlocks,
 			selectBlock,
 			setCurrentTrackClientId,
