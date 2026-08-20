@@ -1,9 +1,11 @@
 # Working with WordPress Design System packages
 
-The WordPress Design System is available through the public
-`@wordpress/components`, `@wordpress/ui`, and `@wordpress/theme` packages.
-This guide helps contributors choose the right boundary when building with, or
-changing, those packages.
+The [Design System introduction](/storybook/stories/design-system/introduction.mdx)
+lists its foundational and compositional packages. This guide focuses on
+`@wordpress/components`, `@wordpress/ui`, and `@wordpress/theme`, the public
+packages contributors must compare during the current component transition.
+`@wordpress/components` remains supported, even though the introduction
+distinguishes it from the newer Design System packages.
 
 ## Choose the work boundary
 
@@ -29,19 +31,25 @@ not bypass that decision with a package-private import.
 
 ## Check the target version
 
-1. Identify the deployed target: a Gutenberg checkout/PR head, or the
-   application's minimum supported runtime, WordPress (when applicable), and
-   package versions.
-2. For an application, determine whether each package is bundled or
-   externalized. Inspect the build configuration and generated asset metadata;
-   the default
-   [`@wordpress/dependency-extraction-webpack-plugin`](/packages/dependency-extraction-webpack-plugin/README.md)
-   externalizes many WordPress packages.
-3. Verify bundled APIs against the installed package. Verify externalized
-   exports and script or style handles against the minimum WordPress runtime.
+Before choosing or reviewing an API, identify where the application gets it in
+production:
+
+1. For a Gutenberg change, use the PR head or current checkout.
+2. If the application bundles the package, check the installed package version.
+3. If WordPress provides the package at runtime, check the application's minimum
+   supported WordPress version. Verify that version provides the required export
+   and script or style handle.
+
+Build tools call the third case "externalized": the package is not included in
+the application bundle. Inspect the build configuration and generated asset
+metadata to confirm which case applies. The default
+[`@wordpress/dependency-extraction-webpack-plugin`](/packages/dependency-extraction-webpack-plugin/README.md)
+externalizes many WordPress packages.
 
 Use the package documentation as the source of durable facts:
 
+- [Design System introduction](/storybook/stories/design-system/introduction.mdx)
+  for current package roles and layering
 - [`@wordpress/components` README](/packages/components/README.md)
 - [`@wordpress/ui` README](/packages/ui/README.md)
 - [`@wordpress/theme` README](/packages/theme/README.md)
@@ -73,18 +81,21 @@ migrate mechanically from one package to the other.
 For the current package versions, use the maintained recommendation sources
 instead of copying component mappings into documentation or agent instructions:
 
-1. When available, query the WordPress Design System MCP server with
-   `get_components`, then use `get_component_details` for the relevant
+1. When available, query the
+   [WordPress Design System MCP server](/packages/design-system-mcp/README.md)
+   with `get_components`, then use `get_component_details` for the relevant
    component. Its component catalog is generated from the curated Storybook
    manifest and returns the currently recommended package and import.
 2. Otherwise, inspect the maintained `ALLOWLIST` and `DENYLIST` in the
    [`use-recommended-components` ESLint rule source](/packages/eslint-plugin/rules/use-recommended-components.js).
    Its [documentation](/packages/eslint-plugin/docs/rules/use-recommended-components.md)
    explains rule behaviour and links migration guides.
-3. When the rule does not cover a component, consult its
-   [Storybook documentation](https://wordpress.github.io/gutenberg/)
-   `componentStatus` and notes. That status is more authoritative than an
-   `experimental` tag or component prefix.
+3. When the rule does not cover a component, inspect that component's
+   `*.story.*` source file in the target checkout. Use its `componentStatus` and
+   notes. The [rendered Storybook](https://wordpress.github.io/gutenberg/) is a
+   human-readable companion, but the source file is available to agents and can
+   be checked against the target version. That status is more authoritative
+   than an `experimental` tag or component prefix.
 
 For an application on older package versions, use the corresponding version of
 those sources and verify the choice against its installed exports, types, and

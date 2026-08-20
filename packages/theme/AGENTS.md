@@ -4,5 +4,3 @@ Before adding or changing code in this directory:
 
 -   Read [README.md](README.md) for the package's public theming and setup guidance.
 -   Read the [cross-package Design System guide](../../docs/contributors/design/design-system-packages.md) for public-package boundaries and contribution checks.
--   For changes under `tokens/`, follow [the token-specific instructions](tokens/AGENTS.md).
--   Use `design-system-contribution` for package changes and `design-system-code-review` for package reviews.
