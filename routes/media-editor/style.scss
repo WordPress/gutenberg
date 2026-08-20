@@ -14,10 +14,11 @@
 	overflow: hidden;
 }
 
-// Below the sidebar-collapse breakpoint the transform controls have no Crop
-// panel to live in, and History has no room in the header, so both get a bar
-// under the canvas. Centered rather than pushed to the edges: with Cancel/Save
-// staying in the page header, there is no cluster to anchor the inline end.
+// Below the sidebar-collapse breakpoint History has no room in the page
+// header, so it gets a bar of its own under the canvas. Centered rather than
+// pushed to the edges: with Cancel/Save staying in the page header, there is
+// no cluster to anchor the inline end. (The transform controls are not here —
+// they sit under the canvas at every width, placed by the editor itself.)
 .media-editor-route__toolbar {
 	flex-shrink: 0;
 	display: flex;

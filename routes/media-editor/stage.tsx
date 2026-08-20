@@ -157,7 +157,6 @@ function MediaEditorRoute() {
 							</div>
 							{ isNarrow && isImage && (
 								<div className="media-editor-route__toolbar">
-									<MediaEditor.ImageControls />
 									<MediaEditor.HistoryActions />
 								</div>
 							) }
