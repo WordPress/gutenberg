@@ -5,7 +5,7 @@ import {
 	CheckboxControl,
 	SearchControl,
 } from '@wordpress/components';
-import { Stack, Tabs } from '@wordpress/ui';
+import { Stack, Tabs, Text } from '@wordpress/ui';
 import { __, _x } from '@wordpress/i18n';
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import {
@@ -229,10 +229,19 @@ function StartPageOptionsModal( { onClose } ) {
 							tabIndex={ -1 }
 							className="editor-start-page-options__modal-content has-pattern-categories"
 						>
-							<PatternSelection
-								blockPatterns={ filteredStartPatterns }
-								onChoosePattern={ handleClose }
-							/>
+							{ filteredStartPatterns.length > 0 ? (
+								<PatternSelection
+									blockPatterns={ filteredStartPatterns }
+									onChoosePattern={ handleClose }
+								/>
+							) : (
+								<Text
+									render={ <p /> }
+									className="editor-start-page-options__no-results"
+								>
+									{ __( 'No results found.' ) }
+								</Text>
+							) }
 						</Tabs.Panel>
 					) ) }
 				</Tabs.Root>
