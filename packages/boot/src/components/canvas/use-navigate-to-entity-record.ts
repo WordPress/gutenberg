@@ -11,6 +11,7 @@ import {
 	privateApis as routePrivateApis,
 } from '@wordpress/route';
 import { store as bootStore } from '../../store';
+import { DEFAULT_DEVICE_TYPE } from './use-viewport-sync';
 import { unlock } from '../../lock-unlock';
 
 const { useCanGoBack, useRouter } = unlock( routePrivateApis );
@@ -31,7 +32,10 @@ type Navigate = ( options: {
 interface NavigateParams {
 	postType: string;
 	postId: string;
+	viewport?: string;
 }
+
+const VALID_VIEWPORTS = [ 'desktop', 'tablet', 'mobile' ];
 
 /**
  * Builds the editor's entity navigation callbacks.
@@ -77,11 +81,33 @@ export default function useNavigateToEntityRecord() {
 				) as { selection?: { selectionStart?: { clientId?: string } } };
 			const selectedBlock = edits?.selection?.selectionStart?.clientId;
 
-			if ( selectedBlock ) {
+			/*
+			 * An entity can ask to be edited at a particular width — a
+			 * navigation overlay meant for mobile. Leave the width this entity
+			 * is being viewed at behind, so returning restores it.
+			 */
+			const requestedViewport = params.viewport?.toLowerCase();
+			const hasRequestedViewport =
+				!! requestedViewport &&
+				VALID_VIEWPORTS.includes( requestedViewport );
+			const currentViewport = hasRequestedViewport
+				? (
+						(
+							registry.select( editorStore ) as any
+						 ).getDeviceType() ?? DEFAULT_DEVICE_TYPE
+				  ).toLowerCase()
+				: undefined;
+
+			if ( selectedBlock || currentViewport ) {
 				navigate( {
 					search: ( previous: Record< string, unknown > ) => ( {
 						...previous,
-						selectedBlock,
+						...( selectedBlock ? { selectedBlock } : {} ),
+						// The default needs no entry; its absence means it.
+						...( currentViewport &&
+						currentViewport !== DEFAULT_DEVICE_TYPE.toLowerCase()
+							? { viewport: currentViewport }
+							: {} ),
 					} ),
 					replace: true,
 				} );
@@ -96,7 +122,15 @@ export default function useNavigateToEntityRecord() {
 			const to = getEntityLink( params.postType, params.postId );
 
 			if ( to ) {
-				navigate( { to, search: () => ( { focusMode: true } ) } );
+				navigate( {
+					to,
+					search: () => ( {
+						focusMode: true,
+						...( hasRequestedViewport
+							? { viewport: requestedViewport }
+							: {} ),
+					} ),
+				} );
 			}
 		},
 		[ navigate, registry, getEntityLink ]

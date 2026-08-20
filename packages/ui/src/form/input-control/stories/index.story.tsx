@@ -15,6 +15,7 @@ import {
 } from '../../stories/shared';
 
 const meta: Meta< typeof InputControl > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/InputControl',
 	component: InputControl,
 	argTypes: {
@@ -25,9 +26,8 @@ const meta: Meta< typeof InputControl > = {
 	},
 	parameters: {
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components`. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
