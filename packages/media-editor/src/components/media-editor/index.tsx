@@ -3,17 +3,17 @@ import {
 	Spinner,
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
-import { Stack, Tabs } from '@wordpress/ui';
+import { Stack, VisuallyHidden } from '@wordpress/ui';
 import { useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { NavigableRegion } from '@wordpress/admin-ui';
 import {
 	createContext,
 	createPortal,
 	useCallback,
 	useContext,
 	useEffect,
-	useMemo,
 	useRef,
 	useState,
 } from '@wordpress/element';
@@ -26,12 +26,6 @@ import {
 } from '@wordpress/keycodes';
 import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
 import type { Field } from '@wordpress/dataviews';
-import {
-	ComplementaryArea,
-	InterfaceSkeleton,
-	PinnedItems,
-	// @ts-expect-error `@wordpress/interface` is not typed yet.
-} from '@wordpress/interface';
 import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react';
 import { MediaEditorProvider } from '../media-editor-provider';
 import type { Media } from '../media-editor-provider';
@@ -39,7 +33,6 @@ import MediaPreview from '../media-preview';
 import MediaEditorCanvas from '../media-editor-canvas';
 import MediaEditorFineRotation from '../media-editor-fine-rotation';
 import MediaEditorImageControls from '../media-editor-image-controls';
-import MediaEditorCropPanel from '../media-editor-crop-panel';
 import MediaForm from '../media-form';
 import { getMediaTypeFromMimeType } from '../../utils';
 import { MediaEditorStateProvider, useMediaEditor } from '../../state';
@@ -61,12 +54,6 @@ export type { MediaEditorSaveResult } from './use-save-media-editor';
 const ATTACHMENT_EMBED_QUERY = { _embed: 'author,wp:attached-to' } as const;
 
 const PLACEMENT_CONTROL_IDLE_MS = 300;
-
-interface EditorTab {
-	id: string;
-	title: string;
-	panel: JSX.Element;
-}
 
 export interface MediaEditorFrameProps {
 	children: ReactNode;
@@ -97,69 +84,36 @@ export interface MediaEditorProps {
 	noticesPortalElement?: Element | null;
 	shouldCloseOnEsc?: boolean;
 	/**
-	 * The `@wordpress/interface` scope for the details sidebar and its pinned
-	 * items. Frames should pass a distinct scope so that sidebar visibility —
-	 * which is persisted per scope to user meta — is remembered separately for
-	 * each surface. The modal is a transient surface where a collapsed sidebar
-	 * is a reasonable choice; the full-screen route is one where the sidebar is
-	 * the primary metadata surface and should open by default. Sharing a scope
-	 * would let a choice made in one decide the other's starting state.
+	 * Formerly the `@wordpress/interface` scope for the details sidebar, which
+	 * persisted the panel's open state per scope to user meta.
 	 *
-	 * @default 'media-editor'
+	 * The sidebar no longer uses `ComplementaryArea`, so nothing reads this.
+	 * The panel now opens or closes based on width alone and is not remembered
+	 * between openings. Still accepted so callers that pass it keep compiling.
+	 *
+	 * @deprecated
 	 */
 	scope?: string;
 }
 
-interface MediaEditorSidebarProps {
-	tabs: EditorTab[];
-	activeTabId?: string;
-	onTabChange: ( tabId: string ) => void;
-	scope: string;
-}
-
-function MediaEditorSidebar( {
-	tabs,
-	activeTabId,
-	onTabChange,
-	scope,
-}: MediaEditorSidebarProps ) {
+function MediaEditorSidebar() {
 	return (
-		<ComplementaryArea
-			scope={ scope }
-			identifier="media-editor/details"
-			title={ __( 'Details' ) }
-			icon={ drawerRight }
-			isActiveByDefault
+		<NavigableRegion
 			className="media-editor__sidebar"
-			panelClassName="media-editor__sidebar-panel"
-			headerClassName="media-editor__sidebar-header"
-			closeLabel={ __( 'Close media panel' ) }
-			// Makes `Tabs.Root` the container, so the tab list passed as
-			// `header` and the panels below share a subtree across the fill.
-			render={
-				<Tabs.Root
-					value={ activeTabId }
-					onValueChange={ ( value ) =>
-						onTabChange( value as string )
-					}
-				/>
-			}
-			header={
-				<Tabs.List variant="minimal">
-					{ tabs.map( ( tab ) => (
-						<Tabs.Tab key={ tab.id } value={ tab.id }>
-							{ tab.title }
-						</Tabs.Tab>
-					) ) }
-				</Tabs.List>
-			}
+			ariaLabel={ __( 'Media details' ) }
 		>
-			{ tabs.map( ( tab ) => (
-				<Tabs.Panel key={ tab.id } value={ tab.id } tabIndex={ -1 }>
-					{ tab.panel }
-				</Tabs.Panel>
-			) ) }
-		</ComplementaryArea>
+			{ /* No visible heading and no close button: the header's pressed
+			     "Details" toggle names this panel and dismisses it at every
+			     width, so a second control inside would be the same job twice.
+			     The heading stays for screen readers, which do not read a
+			     pressed button in the header as this region's title. */ }
+			<VisuallyHidden render={ <h2 /> }>
+				{ __( 'Details' ) }
+			</VisuallyHidden>
+			<Stack className="media-editor__panel" direction="column" gap="lg">
+				<MediaForm />
+			</Stack>
+		</NavigableRegion>
 	);
 }
 
@@ -175,8 +129,13 @@ interface MediaEditorFrameContextValue {
 	hasMedia: boolean;
 	hasChanges: boolean;
 	isUndoRedoDisabled: boolean;
-	scope: string;
 	aspectRatioPresets?: AspectRatioPreset[];
+	/** `true` above `large`, where the panel docks beside the canvas. */
+	isWide: boolean;
+	/** Hidden below `small`, where the header has least room. */
+	showKeyboardShortcuts: boolean;
+	isSidebarOpen: boolean;
+	onToggleSidebar: () => void;
 	onCancel: () => void;
 	onSave: () => void;
 	onReset: () => void;
@@ -213,7 +172,15 @@ export interface HeaderActionsProps {
 }
 
 function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
-	const { isImage, isSaving, onCancel, scope } = useMediaEditorFrameContext();
+	const {
+		isImage,
+		isSaving,
+		onCancel,
+		isWide,
+		showKeyboardShortcuts,
+		isSidebarOpen,
+		onToggleSidebar,
+	} = useMediaEditorFrameContext();
 	const [ isShortcutsModalOpen, setIsShortcutsModalOpen ] = useState( false );
 	return (
 		<Stack
@@ -222,7 +189,7 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 			align="center"
 			gap="sm"
 		>
-			{ isImage && (
+			{ isImage && showKeyboardShortcuts && (
 				<Button
 					size="compact"
 					icon={ keyboard }
@@ -230,7 +197,17 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 					onClick={ () => setIsShortcutsModalOpen( true ) }
 				/>
 			) }
-			<PinnedItems.Slot scope={ scope } />
+			<Button
+				size="compact"
+				icon={ drawerRight }
+				label={ __( 'Details' ) }
+				isPressed={ isSidebarOpen }
+				// Only a docked column really expands beside the canvas; below
+				// that the panel replaces the view, which the pressed state
+				// already describes.
+				aria-expanded={ isWide ? isSidebarOpen : undefined }
+				onClick={ onToggleSidebar }
+			/>
 			{ showCloseButton && (
 				<Button
 					size="compact"
@@ -375,20 +352,16 @@ function SaveActions( { size = 'default' }: SaveActionsProps ) {
 	);
 }
 
+/**
+ * Kept for frames that still place this cluster themselves. The rotate, flip,
+ * zoom and aspect-ratio controls now render under the canvas at every width,
+ * so this renders nothing; a frame that drops it loses nothing. Remove once no
+ * frame references it.
+ *
+ * @deprecated
+ */
 function ImageControls() {
-	const { isImage, aspectRatioPresets } = useMediaEditorFrameContext();
-	// Non-image media has nothing to transform. Placement is the frame's call:
-	// render this only in the `narrow` layout, since above that breakpoint the
-	// Crop panel holds these controls already.
-	if ( ! isImage ) {
-		return null;
-	}
-	return (
-		<MediaEditorImageControls
-			showAspectRatioControl
-			aspectRatioPresets={ aspectRatioPresets }
-		/>
-	);
+	return null;
 }
 
 function MediaEditorContent( {
@@ -401,18 +374,30 @@ function MediaEditorContent( {
 	noticesClassName = 'media-editor__snackbar',
 	noticesPortalElement,
 	shouldCloseOnEsc = false,
-	scope = 'media-editor',
 }: MediaEditorProps ) {
 	const cropper = useMediaEditor();
-	// The sidebar is a side column from the `small` breakpoint up and collapses
-	// to an overlay below it — mirroring InterfaceSkeleton's behaviour, shifted
-	// from `medium` to `small` (see the matching CSS overrides in style.scss).
-	// Track that single breakpoint: in "panel mode" (≥ small) the
-	// rotate/flip/zoom controls live in the Crop panel; below it they have no
-	// panel to live in and the frame places them instead. (The fine-rotation
-	// ruler always sits under the canvas.)
-	const isPanelLayout = useViewportMatch( 'small' );
-	const layout: 'wide' | 'narrow' = isPanelLayout ? 'wide' : 'narrow';
+	// Width decides whether the Details panel docks beside the canvas or takes
+	// the whole body. The dock needs room for a 400px panel plus a workable
+	// canvas and the modal's gutters, so it starts above `large` (960px). At
+	// `medium` (782px) the panel was clipped by the modal's right edge.
+	//
+	// The choice is not remembered between openings: the modal is transient,
+	// and re-opening with the panel hidden on a wide screen is how #81487 read
+	// to people in the first place.
+	const isWide = useViewportMatch( 'large' );
+	const [ isSidebarOpen, setIsSidebarOpen ] = useState( isWide );
+	// Follow the breakpoint when it changes, so dragging a window narrow hands
+	// the canvas the full width instead of leaving a panel wedged beside it.
+	useEffect( () => {
+		setIsSidebarOpen( isWide );
+	}, [ isWide ] );
+	// Keyboard shortcuts are a pointer-and-keyboard affordance and the header
+	// is tightest on a phone, so the icon drops below `small`. Shift+Alt+H
+	// still works for anyone with a keyboard attached.
+	const showKeyboardShortcuts = useViewportMatch( 'small' );
+	// One layout at every width now that the image controls sit under the
+	// canvas; retained for the frame contract.
+	const layout = 'wide' as const;
 
 	const { media, hasEdits } = useSelect(
 		( select ) => {
@@ -500,14 +485,9 @@ function MediaEditorContent( {
 
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type ).type;
 	const isImage = !! media && mediaType === 'image';
-	const {
-		aspectRatioValue,
-		setAspectRatioValue,
-		aspectRatioOptions,
-		resetCropOptions,
-	} = useCropOptions( {
-		aspectRatioPresets,
-	} );
+	// Only `resetCropOptions` is needed here, for the Reset button; the
+	// aspect-ratio members are read by `MediaEditorImageControls` itself.
+	const { resetCropOptions } = useCropOptions( { aspectRatioPresets } );
 	const { isSaving, save: saveMediaEditor } = useSaveMediaEditor( {
 		cropper,
 		id,
@@ -515,59 +495,6 @@ function MediaEditorContent( {
 		media,
 		onSaved,
 	} );
-
-	const tabs = useMemo< EditorTab[] >( () => {
-		const detailsTab: EditorTab = {
-			id: 'details',
-			title: __( 'Details' ),
-			panel: (
-				<Stack
-					className="media-editor__panel"
-					direction="column"
-					gap="lg"
-				>
-					<MediaForm />
-				</Stack>
-			),
-		};
-		if ( ! isImage ) {
-			return [ detailsTab ];
-		}
-		return [
-			{
-				id: 'crop',
-				title: __( 'Crop' ),
-				panel: (
-					<Stack
-						className="media-editor__panel"
-						direction="column"
-						gap="lg"
-					>
-						<MediaEditorCropPanel
-							aspectRatioValue={ aspectRatioValue }
-							onAspectRatioChange={ setAspectRatioValue }
-							aspectRatioOptions={ aspectRatioOptions }
-							showTransformControls={ isPanelLayout }
-						/>
-					</Stack>
-				),
-			},
-			detailsTab,
-		];
-	}, [
-		isImage,
-		aspectRatioValue,
-		setAspectRatioValue,
-		aspectRatioOptions,
-		isPanelLayout,
-	] );
-
-	// Control the active tab from state here so the selection survives the
-	// sidebar closing (which unmounts the `ComplementaryArea` Fill and its
-	// tabs). Fall back to the first tab until one is picked, so images open on
-	// Crop.
-	const [ selectedTabId, setSelectedTabId ] = useState< string >();
-	const activeTabId = selectedTabId ?? tabs[ 0 ]?.id;
 
 	const handleChange = ( updates: Partial< Media > ) => {
 		editEntityRecord( 'postType', 'attachment', id, updates );
@@ -637,6 +564,17 @@ function MediaEditorContent( {
 		/>
 	);
 
+	// Rotate, flip, zoom and aspect ratio act on the image, so they sit with
+	// the image: under the canvas next to the fine-rotation ruler, at every
+	// viewport. One layout instead of two, and the controls stay reachable
+	// whether or not the Details panel is open.
+	const imageControls = isImage ? (
+		<MediaEditorImageControls
+			showAspectRatioControl
+			aspectRatioPresets={ aspectRatioPresets }
+		/>
+	) : null;
+
 	const ruler = isImage ? (
 		<MediaEditorFineRotation
 			onPlacementControlInteraction={ signalPlacementControlInteraction }
@@ -655,52 +593,37 @@ function MediaEditorContent( {
 						<Spinner />
 					</div>
 				) : (
-					<>
-						<MediaEditorSidebar
-							tabs={ tabs }
-							activeTabId={ activeTabId }
-							onTabChange={ setSelectedTabId }
-							scope={ scope }
-						/>
-						<InterfaceSkeleton
-							className="media-editor__skeleton"
-							labels={ {
-								body: isImage
+					<div className="media-editor__body">
+						<NavigableRegion
+							className="media-editor__content"
+							ariaLabel={
+								isImage
 									? __( 'Image editor' )
-									: __( 'Media preview' ),
-								sidebar: __( 'Media details' ),
-							} }
-							content={
-								<div className="media-editor__content">
-									<div className="media-editor__canvas-area">
-										{ isImage ? (
-											<MediaEditorCanvas
-												isPlacementActive={
-													isPlacementActive
-												}
-												onGestureStart={
-													handleCanvasGestureStart
-												}
-												onGestureEnd={
-													handleCanvasGestureEnd
-												}
-											/>
-										) : (
-											<MediaPreview />
-										) }
-									</div>
-									{ isImage && (
-										<div className="media-editor__canvas-toolbar">
-											{ ruler }
-										</div>
-									) }
+									: __( 'Media preview' )
+							}
+						>
+							<div className="media-editor__canvas-area">
+								{ isImage ? (
+									<MediaEditorCanvas
+										isPlacementActive={ isPlacementActive }
+										onGestureStart={
+											handleCanvasGestureStart
+										}
+										onGestureEnd={ handleCanvasGestureEnd }
+									/>
+								) : (
+									<MediaPreview />
+								) }
+							</div>
+							{ isImage && (
+								<div className="media-editor__canvas-toolbar">
+									{ ruler }
+									{ imageControls }
 								</div>
-							}
-							sidebar={
-								<ComplementaryArea.Slot scope={ scope } />
-							}
-						/>
-					</>
+							) }
+						</NavigableRegion>
+						{ isSidebarOpen && <MediaEditorSidebar /> }
+					</div>
 				) }
 			</div>
 			<ConfirmDialog
@@ -731,8 +654,11 @@ function MediaEditorContent( {
 		hasMedia: !! media,
 		hasChanges,
 		isUndoRedoDisabled: isCropInteractionActive,
-		scope,
 		aspectRatioPresets,
+		isWide,
+		showKeyboardShortcuts,
+		isSidebarOpen,
+		onToggleSidebar: () => setIsSidebarOpen( ( open ) => ! open ),
 		onCancel: handleRequestClose,
 		onSave: saveMediaEditor,
 		onReset: resetCropOptions,

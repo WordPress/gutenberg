@@ -7,10 +7,20 @@
 ### Enhancements
 
 -   Add a `scope` prop to `MediaEditor` so each frame can keep its own persisted details-sidebar visibility ([#81559](https://github.com/WordPress/gutenberg/pull/81559)).
+-   `MediaEditor`: move rotate, flip, zoom and aspect ratio out of the sidebar to a toolbar under the canvas, at every viewport. Frees the sidebar for Details alone.
+-   `MediaEditor`: replace `ComplementaryArea` and `InterfaceSkeleton` with a layout the media editor owns. Both were built for the post and site editors and imposed breakpoints the media editor could not control.
+-   `MediaEditor`: widen the docked details panel to 400px and dock it above the `large` breakpoint; below that it takes the whole body.
+-   `MediaForm`: put alternative text above title in the details form.
 -   Expose the header, history (reset/undo/redo), save (cancel/save) and image control clusters as `MediaEditor` sub-components, so each frame imports and arranges them to suit its own chrome. `renderFrame` now passes data only: `footerActions` is gone, `footerLayout` is now `layout`, and `isImage` is new. `showCloseButton` moves from `MediaEditor` to `MediaEditor.HeaderActions` ([#81563](https://github.com/WordPress/gutenberg/pull/81563)).
+
+### Breaking Changes
+
+-   `MediaEditor`: the `scope` prop no longer does anything. It selected the `@wordpress/interface` scope that persisted the details sidebar's visibility; the sidebar no longer uses `ComplementaryArea` and its open state is decided by width rather than remembered. The prop is still accepted so existing callers compile.
+-   `MediaEditor.ImageControls` renders nothing. Rotate, flip, zoom and aspect ratio now sit under the canvas at every width, so a frame no longer places them.
 
 ### Bug Fixes
 
+-   `MediaEditor`: make the Details fields reachable below the `small` breakpoint. `ComplementaryArea` closed the sidebar on small viewports and offered no way to re-open it, so the fields could not be edited on a phone at all.
 -   Keep the Details sidebar from clipping focus outlines, with balanced horizontal padding ([#81703](https://github.com/WordPress/gutenberg/pull/81703)).
 -   Keep initial focus on the modal dialog frame instead of moving it to the crop area once the image loads ([#81541](https://github.com/WordPress/gutenberg/pull/81541)).
 

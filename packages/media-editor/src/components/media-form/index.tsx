@@ -41,14 +41,24 @@ export default function MediaForm( {
 	}
 
 	// Fields that use a regular (non-panel) layout, rendered at the top.
-	const regularFieldIds = [ 'title', 'alt_text', 'caption', 'description' ];
+	// Alt text leads: it is the field with the most impact on how the image is
+	// experienced, and the one most often left empty.
+	const regularFieldIds = [ 'alt_text', 'title', 'caption', 'description' ];
 
-	// Place the non-panel (regular layout) fields at the top of the array,
-	// with the remaining panel fields below.
+	// Place the non-panel (regular layout) fields at the top of the array, in
+	// the order `regularFieldIds` lists them rather than the order the caller
+	// happened to supply, with the remaining panel fields below.
+	const regularFields: Field< Media >[] = [];
+	for ( const id of regularFieldIds ) {
+		const match = fields.find(
+			( field: Field< Media > ) => field.id === id
+		);
+		if ( match ) {
+			regularFields.push( match );
+		}
+	}
 	const sortedFields = [
-		...fields.filter( ( field: Field< Media > ) =>
-			regularFieldIds.includes( field.id )
-		),
+		...regularFields,
 		...fields.filter(
 			( field: Field< Media > ) => ! regularFieldIds.includes( field.id )
 		),
