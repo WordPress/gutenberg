@@ -30,9 +30,7 @@
 	flex-direction: row;
 	align-items: center;
 	gap: $grid-unit-20;
-	// Borderless: sections are demarcated by the inset canvas panel and
-	// spacing, not divider lines. 16px top / 32px sides / 24px bottom.
-	padding: $grid-unit-20 $grid-unit-40 $grid-unit-30;
+	padding: $grid-unit-10 $grid-unit-40 $grid-unit-30;
 	background: $white;
 	// Raised to clear `InterfaceSkeleton`'s sidebar (z-index 100000) when the
 	// editor still used it. The footer is now an ordinary flex sibling with
