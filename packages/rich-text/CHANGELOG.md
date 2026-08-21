@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `getTextContent`: Remove every object replacement character from the returned text, not just the first one ([#81526](https://github.com/WordPress/gutenberg/pull/81526)).
+
 ## 7.53.0 (2026-08-12)
 
 
