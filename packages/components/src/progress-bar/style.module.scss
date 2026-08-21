@@ -1,5 +1,7 @@
 @use "../utils/theme-variables" as *;
 
+$indeterminate-indicator-width: 50%;
+
 .track {
 	position: relative;
 	overflow: hidden;
@@ -32,18 +34,16 @@
 
 	width: var(--indicator-width);
 	transition: width 0.4s ease-in-out;
+
+	&.is-indeterminate {
+		--indicator-width: #{$indeterminate-indicator-width};
+		animation: indeterminate-slide 1.5s ease-in-out infinite;
+	}
 }
 
-.indicator-indeterminate {
-	// Width is applied inline via the `INDETERMINATE_TRACK_WIDTH` constant.
-	animation: components-progress-bar-indeterminate 1.5s ease-in-out infinite;
-}
-
-// Using the logical `inset-inline-start` property keeps the animation
-// direction correct in both LTR and RTL without a JS branch.
-@keyframes components-progress-bar-indeterminate {
+@keyframes indeterminate-slide {
 	0% {
-		inset-inline-start: -50%;
+		inset-inline-start: -$indeterminate-indicator-width;
 	}
 
 	100% {

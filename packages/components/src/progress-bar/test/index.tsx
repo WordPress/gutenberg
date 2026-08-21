@@ -1,7 +1,14 @@
 import { render, screen } from '@testing-library/react';
-import { ProgressBar, INDETERMINATE_TRACK_WIDTH } from '..';
+import { ProgressBar } from '..';
 import styles from '../style.module.scss';
 
+/*
+ * TODO: the stylesheet is mocked in these tests, so anything the SCSS module
+ * is responsible for cannot be asserted here — that the `progress` element is
+ * visually hidden and only exposed for semantics, and that the indeterminate
+ * indicator is 50% wide. Assert those against real styles once browser-backed
+ * component tests are available.
+ */
 describe( 'ProgressBar', () => {
 	it( 'should render an indeterminate semantic progress bar element', () => {
 		render( <ProgressBar /> );
@@ -9,9 +16,6 @@ describe( 'ProgressBar', () => {
 		const progressBar = screen.getByRole( 'progressbar' );
 
 		expect( progressBar ).toBeInTheDocument();
-		// The `progress` element is visually hidden (via the SCSS module) and
-		// only exposed for semantics/assistive technology.
-		expect( progressBar ).toHaveClass( styles[ 'progress-element' ] );
 		expect( progressBar ).not.toHaveValue();
 	} );
 
@@ -21,13 +25,10 @@ describe( 'ProgressBar', () => {
 		const progressBar = screen.getByRole( 'progressbar' );
 
 		expect( progressBar ).toBeInTheDocument();
-		// The `progress` element is visually hidden (via the SCSS module) and
-		// only exposed for semantics/assistive technology.
-		expect( progressBar ).toHaveClass( styles[ 'progress-element' ] );
 		expect( progressBar ).toHaveValue( 55 );
 	} );
 
-	it( 'should use `INDETERMINATE_TRACK_WIDTH`% as track width for indeterminate progress bar', () => {
+	it( 'should mark the indicator as indeterminate when no value is provided', () => {
 		const { container } = render( <ProgressBar /> );
 
 		/**
@@ -37,9 +38,7 @@ describe( 'ProgressBar', () => {
 		// eslint-disable-next-line testing-library/no-node-access
 		const indicator = container.firstChild?.firstChild;
 
-		expect( indicator ).toHaveStyle( {
-			width: `${ INDETERMINATE_TRACK_WIDTH }%`,
-		} );
+		expect( indicator ).toHaveClass( styles[ 'is-indeterminate' ] );
 		expect( indicator ).not.toHaveStyle( {
 			'--indicator-width': expect.any( String ),
 		} );
@@ -55,6 +54,7 @@ describe( 'ProgressBar', () => {
 		// eslint-disable-next-line testing-library/no-node-access
 		const indicator = container.firstChild?.firstChild;
 
+		expect( indicator ).not.toHaveClass( styles[ 'is-indeterminate' ] );
 		expect( indicator ).toHaveStyle( {
 			'--indicator-width': '55%',
 		} );

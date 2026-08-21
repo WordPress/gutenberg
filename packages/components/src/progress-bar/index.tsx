@@ -6,9 +6,6 @@ import styles from './style.module.scss';
 import type { ProgressBarProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
-// Width of the indicator for the indeterminate progress bar
-export const INDETERMINATE_TRACK_WIDTH = 50;
-
 function UnforwardedProgressBar(
 	props: WordPressComponentProps< ProgressBarProps, 'progress', false >,
 	ref: ForwardedRef< HTMLProgressElement >
@@ -20,14 +17,11 @@ function UnforwardedProgressBar(
 		<div className={ clsx( styles.track, className ) }>
 			<div
 				className={ clsx( styles.indicator, {
-					[ styles[ 'indicator-indeterminate' ] ]: isIndeterminate,
+					[ styles[ 'is-indeterminate' ] ]: isIndeterminate,
 				} ) }
 				style={ {
 					'--indicator-width': ! isIndeterminate
 						? `${ value }%`
-						: undefined,
-					width: isIndeterminate
-						? `${ INDETERMINATE_TRACK_WIDTH }%`
 						: undefined,
 				} }
 			/>
