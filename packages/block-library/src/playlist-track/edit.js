@@ -144,20 +144,33 @@ const PlaylistTrackEdit = ( {
 
 	return (
 		<>
-			<BlockControls group="other">
-				<MediaReplaceFlow
-					name={ __( 'Replace' ) }
-					onSelect={ onSelectTrack }
-					accept="audio/*"
-					mediaId={ id }
-					mediaURL={ src }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					onError={ onUploadError }
-					variant="toolbar"
-				/>
-			</BlockControls>
+			{ /* Only show if this is a single selection (not multiselect) */ }
+			{ isSelected && (
+				<BlockControls group="other">
+					<MediaReplaceFlow
+						name={ __( 'Replace' ) }
+						onSelect={ onSelectTrack }
+						accept="audio/*"
+						mediaId={ id }
+						mediaURL={ src }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						onError={ onUploadError }
+						variant="toolbar"
+					/>
+				</BlockControls>
+			) }
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
+					{ /* Only show if this is a single selection (not multiselect) */ }
+					{ isSelected && (
+						<TextControl
+							label={ __( 'Title' ) }
+							value={ title ? stripHTML( title ) : '' }
+							onChange={ ( titleValue ) => {
+								setAttributes( { title: titleValue } );
+							} }
+						/>
+					) }
 					<TextControl
 						label={ __( 'Artist' ) }
 						value={ artist ? stripHTML( artist ) : '' }
@@ -170,13 +183,6 @@ const PlaylistTrackEdit = ( {
 						value={ album ? stripHTML( album ) : '' }
 						onChange={ ( albumValue ) => {
 							setAttributes( { album: albumValue } );
-						} }
-					/>
-					<TextControl
-						label={ __( 'Title' ) }
-						value={ title ? stripHTML( title ) : '' }
-						onChange={ ( titleValue ) => {
-							setAttributes( { title: titleValue } );
 						} }
 					/>
 					<MediaUploadCheck>

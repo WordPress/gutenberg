@@ -103,6 +103,43 @@ describe( 'PlaylistTrackEdit', () => {
 		useUploadMediaFromBlobURL.mockClear();
 	} );
 
+	it( 'shows the title control for a single selected playlist track', () => {
+		renderEdit( { isSelected: true } );
+
+		expect(
+			screen.getByRole( 'textbox', { name: 'Title' } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'shows the replace track control for a single selected playlist track', () => {
+		renderEdit( { isSelected: true } );
+
+		expect( mockMediaReplaceFlowProps ).toBeDefined();
+	} );
+
+	it( 'does not show the replace track control when multiple playlist tracks are selected', () => {
+		renderEdit( { isSelected: false } );
+
+		expect( mockMediaReplaceFlowProps ).toBeUndefined();
+	} );
+
+	it( 'does not show the title control when multiple playlist tracks are selected', () => {
+		// The track inspector only renders for the selected block, or for the
+		// first block of a same-type multi-selection, where `isSelected` is
+		// false.
+		renderEdit( { isSelected: false } );
+
+		expect(
+			screen.queryByRole( 'textbox', { name: 'Title' } )
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByRole( 'textbox', { name: 'Artist' } )
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'textbox', { name: 'Album' } )
+		).toBeInTheDocument();
+	} );
+
 	it( 'allows the track image alternative text to be edited', () => {
 		const { setAttributes } = renderEdit();
 
@@ -188,7 +225,7 @@ describe( 'PlaylistTrackEdit', () => {
 	} );
 
 	it( 'preserves the current track source when a replacement upload fails', () => {
-		const { setAttributes } = renderEdit();
+		const { setAttributes } = renderEdit( { isSelected: true } );
 
 		mockMediaReplaceFlowProps.onSelect();
 
@@ -199,7 +236,7 @@ describe( 'PlaylistTrackEdit', () => {
 	} );
 
 	it( 'accepts raw uploaded attachment data when replacing a track', () => {
-		const { setAttributes } = renderEdit();
+		const { setAttributes } = renderEdit( { isSelected: true } );
 
 		mockMediaReplaceFlowProps.onSelect( {
 			id: 2,
