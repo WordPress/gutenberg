@@ -16,10 +16,6 @@
 -   `PublishDateTimePicker`: Add a `showPopoverHeader` prop so the picker can be rendered inline, without the popover title and close button. Rename the header's reset action from "Now" to "Reset", which reads as an action rather than a status ([#81806](https://github.com/WordPress/gutenberg/pull/81806)).
 -   Show separate horizontal and vertical block spacing controls in the block inspector only for Flex and Grid layouts, while retaining axial gap support in Global Styles. Responsive Grid column calculations use the horizontal gap, while Flow and Constrained layouts use the vertical gap when receiving an axial value ([#81476](https://github.com/WordPress/gutenberg/pull/81476)).
 
-### Internal
-
--   `URLInput`: Compose validation with `ControlWithError` from `@wordpress/ui` instead of unlocking `ValidatedInputControl` from the `@wordpress/components` private APIs ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81627](https://github.com/WordPress/gutenberg/pull/81627)).
-
 ### Bug Fixes
 
 -   `DuotoneControl`: Keep the picked preset's identity when applying a duotone to a block. Two presets can hold the same pair of colors, and the applied preset was resolved by matching colors, so the first of any duplicate pair was saved and both appeared selected ([#81605](https://github.com/WordPress/gutenberg/pull/81605)).

@@ -6,20 +6,18 @@ import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
 import {
 	BaseControl,
 	Button,
-	__experimentalInputControl as InputControl,
+	__experimentalInputControl as WCInputControl,
 	Spinner,
 	Popover,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { ControlWithError } from '@wordpress/ui';
-import {
-	useDebounce,
-	useEvent,
-	useInstanceId,
-	useMergeRefs,
-} from '@wordpress/compose';
+import { useDebounce, useEvent, useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { isURL } from '@wordpress/url';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { ValidatedInputControl } = unlock( componentsPrivateApis );
 
 const noop = () => {};
 
@@ -432,31 +430,28 @@ function Control( {
 		setIsValidated( true );
 	}
 
-	const validityTargetRef = useRef();
-	const inputRef = useMergeRefs( [ inputProps.ref, validityTargetRef ] );
-
 	if ( renderControl ) {
 		return renderControl( controlProps, inputProps, isLoading );
 	}
 
+	const MaybeValidatedInputControl = isValidated
+		? ValidatedInputControl
+		: WCInputControl;
+
 	return (
 		<BaseControl { ...controlProps }>
-			{ isValidated ? (
-				<ControlWithError
-					className="components-validated-control"
-					required={ inputProps.required }
+			<MaybeValidatedInputControl
+				{ ...inputProps }
+				{ ...( isValidated && {
+					customValidity,
 					// Suppress the "(Required)" indicator in the label.
 					// The field is still required for validation, but the indicator
 					// can be hidden when markWhenOptional is set to true.
-					markWhenOptional={ markWhenOptional }
-					customValidity={ customValidity }
-					getValidityTarget={ () => validityTargetRef.current }
-				>
-					<InputControl { ...inputProps } ref={ inputRef } />
-				</ControlWithError>
-			) : (
-				<InputControl { ...inputProps } ref={ inputRef } />
-			) }
+					...( markWhenOptional !== undefined && {
+						markWhenOptional,
+					} ),
+				} ) }
+			/>
 			{ isLoading && <Spinner /> }
 		</BaseControl>
 	);
