@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `useCoalescedEntityEdit`, which edits an entity record immediately but coalesces a run of rapid successive edits into a single undo level, so typing into an entity-backed field builds undo levels at the same rate as typing into a block ([#37171](https://github.com/WordPress/gutenberg/issues/37171)).
+
 ## 7.54.0 (2026-08-26)
 
 ### Bug Fixes

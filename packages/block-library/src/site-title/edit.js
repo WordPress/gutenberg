@@ -1,5 +1,8 @@
-import { useDispatch, useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import {
+	store as coreStore,
+	useCoalescedEntityEdit,
+} from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import {
 	RichText,
@@ -39,14 +42,12 @@ export default function SiteTitleEdit( props ) {
 			title: canEdit ? settings?.title : readOnlySettings?.name,
 		};
 	}, [] );
-	const { editEntityRecord } = useDispatch( coreStore );
+	const editSite = useCoalescedEntityEdit( 'root', 'site' );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const blockEditingMode = useBlockEditingMode();
 
 	function setTitle( newTitle ) {
-		editEntityRecord( 'root', 'site', undefined, {
-			title: newTitle.trim(),
-		} );
+		editSite( { title: newTitle.trim() } );
 	}
 
 	const TagName = level === 0 ? 'p' : `h${ level }`;
