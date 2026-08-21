@@ -191,13 +191,12 @@ export function useNoteThreads( postId ) {
  * shown rather than the current time, which keeps the comparison immune to
  * clock skew between the browser and the server.
  *
- * @param {Object}  options                 Options.
- * @param {?number} options.postId          Post the notes belong to.
- * @param {Array}   options.notes           Every note thread loaded for the post.
- * @param {Array}   options.unresolvedNotes Threads eligible to badge.
+ * @param {Object}  options        Options.
+ * @param {?number} options.postId Post the notes belong to.
+ * @param {Array}   options.notes  Every note thread loaded for the post.
  * @return {number} Number of threads with unseen activity.
  */
-export function useUnseenNotes( { postId, notes, unresolvedNotes } ) {
+export function useUnseenNotes( { postId, notes } ) {
 	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const { lastSeenByPost, currentUserId, isAllNotesOpen } = useSelect(
@@ -218,6 +217,16 @@ export function useUnseenNotes( { postId, notes, unresolvedNotes } ) {
 	const lastSeen = postId ? lastSeenByPost?.[ postId ] : undefined;
 	const latestActivity = useMemo(
 		() => getLatestNoteActivity( notes ),
+		[ notes ]
+	);
+	/*
+	 * Resolving a thread is not activity worth badging, so only open threads
+	 * are eligible. This deliberately reads the full list rather than
+	 * `unresolvedNotes`, which drops threads whose block has been deleted -
+	 * those still need attention and still appear under "All notes".
+	 */
+	const openThreads = useMemo(
+		() => ( notes ?? [] ).filter( ( thread ) => thread.status === 'hold' ),
 		[ notes ]
 	);
 
@@ -250,8 +259,8 @@ export function useUnseenNotes( { postId, notes, unresolvedNotes } ) {
 	] );
 
 	return useMemo(
-		() => getUnseenNoteCount( unresolvedNotes, lastSeen, currentUserId ),
-		[ unresolvedNotes, lastSeen, currentUserId ]
+		() => getUnseenNoteCount( openThreads, lastSeen, currentUserId ),
+		[ openThreads, lastSeen, currentUserId ]
 	);
 }
 

@@ -66,11 +66,7 @@ function NotesSidebar( { postId } ) {
 	);
 
 	const { notes, unresolvedNotes } = useNoteThreads( postId );
-	const unseenNoteCount = useUnseenNotes( {
-		postId,
-		notes,
-		unresolvedNotes,
-	} );
+	const unseenNoteCount = useUnseenNotes( { postId, notes } );
 
 	// Only enable the floating sidebar for large viewports.
 	const showFloatingSidebar = isLargeViewport;
