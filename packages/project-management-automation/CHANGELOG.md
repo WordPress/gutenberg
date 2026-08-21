@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to 20.10.0.
+-   Convert the package to ES modules. It can no longer be loaded with `require()`.
+
+### Internal
+
+-   Update `@actions/core` to `^3.0.1`, `@actions/github` to `^9.1.1`, and `@octokit/webhooks-types` to `^7.6.1`. Remove the unused `@octokit/request-error`, `@octokit/types`, and `@octokit/webhooks` dependencies.
+-   Run the GitHub Action on the `node24` runtime.
+
 ## 2.53.0 (2026-08-12)
 
 

@@ -1,10 +1,10 @@
-const debug = require( '../../debug' );
-const getAssociatedPullRequest = require( '../../get-associated-pull-request' );
-const hasWordPressProfile = require( '../../has-wordpress-profile' );
+import debug from '../../debug.js';
+import getAssociatedPullRequest from '../../get-associated-pull-request.js';
+import hasWordPressProfile from '../../has-wordpress-profile.js';
 
 /** @typedef {ReturnType<typeof import('@actions/github').getOctokit>} GitHub */
 /** @typedef {import('@octokit/webhooks-types').EventPayloadMap['push']} WebhookPayloadPush */
-/** @typedef {import('../../get-associated-pull-request').WebhookPayloadPushCommit} WebhookPayloadPushCommit */
+/** @typedef {import('../../get-associated-pull-request.js').WebhookPayloadPushCommit} WebhookPayloadPushCommit */
 
 /**
  * Returns the message text to be used for the comment prompting contributor to
@@ -120,4 +120,4 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 	} );
 }
 
-module.exports = firstTimeContributorAccountLink;
+export default firstTimeContributorAccountLink;

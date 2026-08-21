@@ -34,17 +34,28 @@ const mockGetContext = jest.fn(
 	(): typeof mockPushEventContext | typeof mockPullRequestEventContext =>
 		mockPullRequestEventContext
 );
-jest.mock( '@actions/github', () => ( {
-	get context() {
-		return mockGetContext();
-	},
-} ) );
+// `@actions/github` and `@actions/core` are ESM-only, and their `exports`
+// maps hide them from Jest's CommonJS resolver. The factories replace the
+// modules in full, so mark the mocks virtual to skip resolving the real ones.
+jest.mock(
+	'@actions/github',
+	() => ( {
+		get context() {
+			return mockGetContext();
+		},
+	} ),
+	{ virtual: true }
+);
 
-jest.mock( '@actions/core', () => ( {
-	error: jest.fn(),
-	info: jest.fn(),
-	getInput: jest.fn(),
-} ) );
+jest.mock(
+	'@actions/core',
+	() => ( {
+		error: jest.fn(),
+		info: jest.fn(),
+		getInput: jest.fn(),
+	} ),
+	{ virtual: true }
+);
 
 const mockAPI = {
 	createCommentOnPR: jest.fn(),
