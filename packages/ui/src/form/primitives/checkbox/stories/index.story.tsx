@@ -5,7 +5,7 @@ const meta: Meta< typeof Checkbox > = {
 	title: 'Design System/Components/Form/Primitives/Checkbox',
 	component: Checkbox,
 	parameters: {
-		// FIXME: Stories show the checkbox primitive without a visible label (aria-toggle-field-name). Update them to include Field.Label (or an equivalent labeled composition) so examples are copy-paste safe.
+		// FIXME: Stories show the checkbox primitive without a visible label (aria-toggle-field-name).
 		// See: https://github.com/WordPress/gutenberg/issues/81596
 		a11y: { test: 'todo' },
 		componentStatus: {
