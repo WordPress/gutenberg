@@ -8,6 +8,7 @@
 -   Add a `Menu` component. ([#79560](https://github.com/WordPress/gutenberg/pull/79560))
 -   Add `ControlWithError` component, ported from `@wordpress/components` and `@wordpress/dataviews` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574)).
 -   Export `ValidityIndicator`, so custom validated controls can render the same validity message as `ControlWithError` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574)).
+-   Add `SearchableChipSelectControl` component ([#80980](https://github.com/WordPress/gutenberg/pull/80980)).
 
 ### Breaking Changes
 
@@ -17,7 +18,6 @@
 
 ### Enhancements
 
--   Add `SearchableChipSelectControl` component ([#80980](https://github.com/WordPress/gutenberg/pull/80980)).
 -   Add `TextareaControl` component ([#81359](https://github.com/WordPress/gutenberg/pull/81359)).
 -   Export shared keyboard shortcut presentation and accessibility utilities. ([#81826](https://github.com/WordPress/gutenberg/pull/81826))
 -   `Menu`: Add shortcut display and accessibility metadata support. ([#79560](https://github.com/WordPress/gutenberg/pull/79560))
