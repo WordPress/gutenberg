@@ -1,7 +1,14 @@
 import { Menu as _Menu } from '@base-ui/react/menu';
+import {
+	useCallback,
+	useImperativeHandle,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { DirectionProvider } from '../utils/direction-provider';
 import { MenuContext } from './context';
 import type { RootProps } from './types';
+import { useCloseOnIframePointerDown } from './use-close-on-iframe-pointer-down';
 
 /**
  * Groups all parts of a menu.
@@ -23,10 +30,42 @@ import type { RootProps } from './types';
  * ```
  */
 function Root( props: RootProps ) {
-	const { onOpenChange, ...rootProps } = props;
+	const {
+		actionsRef,
+		defaultOpen,
+		modal,
+		onOpenChange,
+		open: openProp,
+		...rootProps
+	} = props;
+	const internalActionsRef = useRef< _Menu.Root.Actions | null >( null );
+	const [ uncontrolledOpen, setUncontrolledOpen ] = useState(
+		defaultOpen ?? false
+	);
+	const [ ownerDocument, setOwnerDocument ] = useState< Document | null >(
+		() => ( typeof document === 'undefined' ? null : document )
+	);
+	const open = openProp ?? uncontrolledOpen;
+	const close = useCallback( () => {
+		internalActionsRef.current?.close();
+	}, [] );
+
+	useImperativeHandle(
+		actionsRef,
+		() => ( {
+			close,
+			unmount: () => internalActionsRef.current?.unmount(),
+		} ),
+		[ close ]
+	);
+	useCloseOnIframePointerDown( {
+		enabled: open && modal === false,
+		onPointerDown: close,
+		ownerDocument,
+	} );
 
 	const handleOpenChange: NonNullable< RootProps[ 'onOpenChange' ] > = (
-		open,
+		nextOpen,
 		eventDetails
 	) => {
 		const trigger = eventDetails.trigger;
@@ -40,10 +79,17 @@ function Root( props: RootProps ) {
 				? eventTarget.closest( '[role="menu"]' )
 				: null;
 
-		onOpenChange?.( open, eventDetails );
+		onOpenChange?.( nextOpen, eventDetails );
+
+		if ( ! eventDetails.isCanceled ) {
+			setUncontrolledOpen( nextOpen );
+			if ( nextOpen && trigger ) {
+				setOwnerDocument( trigger.ownerDocument );
+			}
+		}
 
 		if (
-			! open &&
+			! nextOpen &&
 			eventDetails.reason === 'item-press' &&
 			! eventDetails.isCanceled &&
 			TriggerElement &&
@@ -67,7 +113,11 @@ function Root( props: RootProps ) {
 			<MenuContext.Provider value={ { isSubmenu: false } }>
 				<_Menu.Root
 					{ ...rootProps }
+					actionsRef={ internalActionsRef }
+					defaultOpen={ defaultOpen }
+					modal={ modal }
 					onOpenChange={ handleOpenChange }
+					open={ openProp }
 				/>
 			</MenuContext.Provider>
 		</DirectionProvider>

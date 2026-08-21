@@ -140,6 +140,34 @@ describe( 'Menu', () => {
 		expect( triggerWithPayload ).toBeDefined();
 	} );
 
+	it( 'preserves the public imperative actions ref', async () => {
+		const user = userEvent.setup();
+		const actionsRef = createRef< {
+			close: () => void;
+			unmount: () => void;
+		} >();
+
+		render(
+			<Menu.Root actionsRef={ actionsRef }>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.Item>
+						<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+					</Menu.Item>
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
+
+		act( () => actionsRef.current?.close() );
+
+		await waitFor( () => {
+			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+		} );
+	} );
+
 	it( 'closes when Escape is pressed', async () => {
 		const user = userEvent.setup();
 
@@ -165,6 +193,189 @@ describe( 'Menu', () => {
 		expect(
 			screen.getByRole( 'button', { name: 'Actions' } )
 		).toHaveFocus();
+	} );
+
+	it( 'closes a non-modal menu without consuming an iframe pointer interaction', async () => {
+		const user = userEvent.setup();
+		const onCanvasClick = jest.fn();
+
+		render(
+			<>
+				<Menu.Root modal={ false }>
+					<Menu.Trigger>Actions</Menu.Trigger>
+					<Menu.Popup>
+						<Menu.Item>
+							<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+						</Menu.Item>
+					</Menu.Popup>
+				</Menu.Root>
+				<iframe title="Editor canvas" />
+			</>
+		);
+
+		const iframe = screen.getByTitle( 'Editor canvas' );
+		const iframeDocument = document.implementation.createHTMLDocument();
+		Object.defineProperty( iframe, 'contentDocument', {
+			configurable: true,
+			get: () => iframeDocument,
+		} );
+		const canvasTarget = iframeDocument.createElement( 'button' );
+		canvasTarget.addEventListener( 'click', onCanvasClick );
+		iframeDocument.body.appendChild( canvasTarget );
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
+
+		act( () => {
+			canvasTarget.dispatchEvent(
+				new MouseEvent( 'pointerdown', { bubbles: true } )
+			);
+			canvasTarget.click();
+		} );
+
+		await waitFor( () => {
+			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+		} );
+		expect( onCanvasClick ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'reattaches the iframe listener after reload and removes it when closed', async () => {
+		const user = userEvent.setup();
+
+		const { unmount } = render(
+			<>
+				<Menu.Root modal={ false }>
+					<Menu.Trigger>Actions</Menu.Trigger>
+					<Menu.Popup>
+						<Menu.Item>
+							<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+						</Menu.Item>
+					</Menu.Popup>
+				</Menu.Root>
+				<iframe title="Editor canvas" />
+			</>
+		);
+
+		const iframe = screen.getByTitle( 'Editor canvas' );
+		const firstDocument = document.implementation.createHTMLDocument();
+		const reloadedDocument = document.implementation.createHTMLDocument();
+		let iframeDocument = firstDocument;
+		Object.defineProperty( iframe, 'contentDocument', {
+			configurable: true,
+			get: () => iframeDocument,
+		} );
+		const firstRemoveEventListener = jest.spyOn(
+			firstDocument,
+			'removeEventListener'
+		);
+		const reloadedAddEventListener = jest.spyOn(
+			reloadedDocument,
+			'addEventListener'
+		);
+		const reloadedRemoveEventListener = jest.spyOn(
+			reloadedDocument,
+			'removeEventListener'
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
+
+		iframeDocument = reloadedDocument;
+		act( () => iframe.dispatchEvent( new Event( 'load' ) ) );
+
+		expect( firstRemoveEventListener ).toHaveBeenCalledWith(
+			'pointerdown',
+			expect.any( Function ),
+			true
+		);
+		expect( reloadedAddEventListener ).toHaveBeenCalledWith(
+			'pointerdown',
+			expect.any( Function ),
+			true
+		);
+
+		await user.keyboard( '{Escape}' );
+		await waitFor( () => {
+			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+		} );
+		expect( reloadedRemoveEventListener ).toHaveBeenCalledWith(
+			'pointerdown',
+			expect.any( Function ),
+			true
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
+		unmount();
+		expect( reloadedRemoveEventListener ).toHaveBeenCalledTimes( 2 );
+	} );
+
+	it( 'moves the listener when an iframe remounts while the menu is open', async () => {
+		const user = userEvent.setup();
+
+		function MenuWithIframe( { iframeKey }: { iframeKey: string } ) {
+			return (
+				<>
+					<Menu.Root modal={ false }>
+						<Menu.Trigger>Actions</Menu.Trigger>
+						<Menu.Popup>
+							<Menu.Item>
+								<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+							</Menu.Item>
+						</Menu.Popup>
+					</Menu.Root>
+					<iframe key={ iframeKey } title="Editor canvas" />
+				</>
+			);
+		}
+
+		const { rerender } = render( <MenuWithIframe iframeKey="first" /> );
+		const firstIframe = screen.getByTitle( 'Editor canvas' );
+		const firstDocument = document.implementation.createHTMLDocument();
+		Object.defineProperty( firstIframe, 'contentDocument', {
+			configurable: true,
+			get: () => firstDocument,
+		} );
+		const firstRemoveEventListener = jest.spyOn(
+			firstDocument,
+			'removeEventListener'
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
+		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
+
+		rerender( <MenuWithIframe iframeKey="second" /> );
+		await waitFor( () => {
+			expect( firstRemoveEventListener ).toHaveBeenCalledWith(
+				'pointerdown',
+				expect.any( Function ),
+				true
+			);
+		} );
+
+		act( () => {
+			firstDocument.dispatchEvent(
+				new MouseEvent( 'pointerdown', { bubbles: true } )
+			);
+		} );
+		expect( screen.getByRole( 'menu' ) ).toBeVisible();
+
+		const secondIframe = screen.getByTitle( 'Editor canvas' );
+		const secondDocument = document.implementation.createHTMLDocument();
+		Object.defineProperty( secondIframe, 'contentDocument', {
+			configurable: true,
+			get: () => secondDocument,
+		} );
+		act( () => secondIframe.dispatchEvent( new Event( 'load' ) ) );
+		act( () => {
+			secondDocument.dispatchEvent(
+				new MouseEvent( 'pointerdown', { bubbles: true } )
+			);
+		} );
+
+		await waitFor( () => {
+			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+		} );
 	} );
 
 	it.each( [
