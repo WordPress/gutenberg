@@ -6,7 +6,6 @@ import {
 	MediaUpload,
 	MediaUploadCheck,
 	BlockIcon,
-	store as blockEditorStore,
 	useBlockProps,
 	BlockControls,
 	InspectorControls,
@@ -21,7 +20,7 @@ import {
 	Spinner,
 } from '@wordpress/components';
 import { Link } from '@wordpress/ui';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
@@ -50,11 +49,6 @@ const PlaylistTrackEdit = ( {
 	const { currentTrackClientId, setCurrentTrackClientId } =
 		useContext( PlaylistContext );
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const isTrackMultiSelected = useSelect(
-		( select ) =>
-			select( blockEditorStore ).isBlockMultiSelected( clientId ),
-		[ clientId ]
-	);
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
@@ -150,24 +144,28 @@ const PlaylistTrackEdit = ( {
 
 	return (
 		<>
-			<BlockControls group="other">
-				<MediaReplaceFlow
-					name={ __( 'Replace' ) }
-					onSelect={ onSelectTrack }
-					accept="audio/*"
-					mediaId={ id }
-					mediaURL={ src }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					onError={ onUploadError }
-					variant="toolbar"
-				/>
-			</BlockControls>
+			{ /* Only show if this is a single selection (not multiselect) */ }
+			{ isSelected && (
+				<BlockControls group="other">
+					<MediaReplaceFlow
+						name={ __( 'Replace' ) }
+						onSelect={ onSelectTrack }
+						accept="audio/*"
+						mediaId={ id }
+						mediaURL={ src }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						onError={ onUploadError }
+						variant="toolbar"
+					/>
+				</BlockControls>
+			) }
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
-					{ ! isTrackMultiSelected && (
+					{ /* Only show if this is a single selection (not multiselect) */ }
+					{ isSelected && (
 						<TextControl
 							label={ __( 'Title' ) }
-							value={ stripHTML( title || '' ) }
+							value={ title ? stripHTML( title ) : '' }
 							onChange={ ( titleValue ) => {
 								setAttributes( { title: titleValue } );
 							} }
