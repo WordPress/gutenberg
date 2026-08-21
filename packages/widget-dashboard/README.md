@@ -178,6 +178,23 @@ The "Add widget" button in `<WidgetDashboard.Actions />` opens a modal inserter.
 
 On confirmation, the inserter creates instances (using each type's `example.attributes` as the initial values) and appends them to the staged layout. The dialog closes after a successful insertion or when the user dismisses it.
 
+### Scoping what the inserter offers
+
+Every type passes through the `widgetDashboard.canInsertWidgetType` filter when the inserter opens. Extensions scope what users can insert with a plain callback:
+
+```js
+import { addFilter } from '@wordpress/hooks';
+
+addFilter(
+	'widgetDashboard.canInsertWidgetType',
+	'my-plugin/dashboard-widgets-only',
+	( canInsert, widgetType ) =>
+		canInsert && widgetType.category === 'dashboard'
+);
+```
+
+Callbacks receive the current result, the full `WidgetType` (so `category`, `keywords`, and `name` rules need no extra plumbing), and `{ layout }`, the widgets currently on the dashboard, for instance-count policies. A type the filter excludes stays out of the inserter but keeps rendering where already placed; to remove a type entirely, filter the `widgetTypes` prop instead.
+
 ## Grid settings
 
 The dashboard supports two grid models, configured through the `gridSettings` prop: the 2D packed `grid` model, where tiles declare explicit spans over uniform rows, and the content-driven `masonry` model, where heights follow content and resize is horizontal-only. The settings are read-only for the dashboard: there is no in-dashboard editing UI. The consumer owns the values and their persistence.

@@ -91,6 +91,8 @@ The dashboard engine ([`@wordpress/widget-dashboard`](https://github.com/WordPre
 -   Wraps every instance in its own chrome: header, toolbars, error boundary, Suspense fallback.
 -   Passes `resolveWidgetModule` down through its context, overridable for tests and Storybook.
 
+Insertion is separately scopeable: the engine passes every widget type through the `widgetDashboard.canInsertWidgetType` filter (`@wordpress/hooks`) before the inserter lists it, the seam for extensions that narrow what users can add without hiding what is already placed.
+
 The same `WidgetType` could be rendered by any other host, and where and how to render belongs entirely to the host. Every host is a consumer of the package, but not every consumer is a host: tests, Storybook, or a picker that only lists widget types consume the same contract without rendering anything.
 
 ## Why a standalone package
