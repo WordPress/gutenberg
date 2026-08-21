@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Update git sources to the latest commit when `--update` is passed. Previously, a source pointing at a branch (such as `"core": "WordPress/WordPress"`) stayed at the commit it was first cloned at, no matter how many times it was updated.
+-   Do not fail `wp-env start` when Docker images cannot be pulled (e.g., the Docker registry is unreachable); fall back to locally cached images and show a notice instead. ([#81631](https://github.com/WordPress/gutenberg/issues/81631))
 
 ## 11.13.0 (2026-08-12)
 

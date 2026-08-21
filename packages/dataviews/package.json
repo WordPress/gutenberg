@@ -51,7 +51,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@ariakit/react": "^0.4.35",
+		"@ariakit/react": "^0.4.37",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/components": "file:../components",
@@ -83,6 +83,7 @@
 		"@testing-library/react": "^16.3.2",
 		"@testing-library/user-event": "^14.6.1",
 		"@types/jest": "^30.0.0",
+		"@types/node": "^20.19.39",
 		"esbuild": "^0.27.2",
 		"storybook": "^10.4.3"
 	},
