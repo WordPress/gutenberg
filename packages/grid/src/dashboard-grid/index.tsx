@@ -318,13 +318,14 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		);
 		const items = sortedItems;
 
-		// Resolve `width: 'fill'` items to concrete column spans, bounded
-		// by the item's limits.
+		// Resolve `width: 'fill'` items to concrete column spans; the
+		// resolver plans the row around each fill's span bounds.
 		const resolvedItemMap = useMemo( () => {
 			const fillWidths = resolveFillWidths(
 				items,
 				layoutMap,
-				effectiveColumns
+				effectiveColumns,
+				spanBoundsByKey
 			);
 			if ( fillWidths.size === 0 ) {
 				return layoutMap;
@@ -332,18 +333,10 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			const map = new Map< string, DashboardGridLayoutItem >();
 			for ( const [ key, item ] of layoutMap ) {
 				const fillW = fillWidths.get( key );
-				if ( fillW === undefined ) {
-					map.set( key, item );
-					continue;
-				}
-				const bounds = spanBoundsByKey.get( key );
-				const width = bounds
-					? Math.min(
-							Math.max( fillW, bounds.minWidth ),
-							bounds.maxWidth
-					  )
-					: fillW;
-				map.set( key, { ...item, width } );
+				map.set(
+					key,
+					fillW !== undefined ? { ...item, width: fillW } : item
+				);
 			}
 			return map;
 		}, [ items, layoutMap, effectiveColumns, spanBoundsByKey ] );

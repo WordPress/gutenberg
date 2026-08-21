@@ -15,15 +15,22 @@ import type { DashboardGridLayoutItem } from './types';
  *   scanned (rows bounded by the sum of item heights), not only on
  *   `maxColumns`.
  *
+ * Fill items honor per-item span bounds: the row plan reserves at least
+ * the fill's minimum span (wrapping it to the next free run when the
+ * current one is too narrow), and the resolved span never exceeds its
+ * maximum. Fixed-width items arrive already bounded by the caller.
+ *
  * @param sortedKeys - Item keys in display order.
  * @param layoutMap  - Map of key to DashboardGridLayoutItem.
  * @param maxColumns - Total columns in the grid.
+ * @param itemBounds - Optional per-key span bounds for fill items.
  * @return Map of fill item keys to their resolved column spans.
  */
 export function resolveFillWidths(
 	sortedKeys: string[],
 	layoutMap: Map< string, DashboardGridLayoutItem >,
-	maxColumns: number
+	maxColumns: number,
+	itemBounds?: Map< string, { minWidth: number; maxWidth: number } >
 ): Map< string, number > {
 	const resolved = new Map< string, number >();
 	const n = sortedKeys.length;
@@ -75,6 +82,13 @@ export function resolveFillWidths(
 			}
 
 			if ( item.width === 'fill' ) {
+				const bounds = itemBounds?.get( item.key );
+				const minW = Math.min( bounds?.minWidth ?? 1, maxColumns );
+				const maxW = bounds?.maxWidth ?? maxColumns;
+				// Wrap first when the row cannot host the fill's floor.
+				if ( currentCol + minW > maxColumns ) {
+					currentCol = 0;
+				}
 				let reserved = 0;
 				for ( let j = i + 1; j < n; j++ ) {
 					const next = items[ j ];
@@ -86,15 +100,15 @@ export function resolveFillWidths(
 						break;
 					}
 					const nextW = widths[ j ];
-					if ( currentCol + 1 + reserved + nextW <= maxColumns ) {
+					if ( currentCol + minW + reserved + nextW <= maxColumns ) {
 						reserved += nextW;
 					} else {
 						break;
 					}
 				}
-				const fillCols = Math.max(
-					1,
-					maxColumns - currentCol - reserved
+				const fillCols = Math.min(
+					Math.max( minW, maxColumns - currentCol - reserved ),
+					maxW
 				);
 				resolved.set( item.key, fillCols );
 				currentCol += fillCols;
@@ -145,19 +159,32 @@ export function resolveFillWidths(
 		}
 
 		if ( item.width === 'fill' ) {
+			const bounds = itemBounds?.get( item.key );
+			const minW = Math.min( bounds?.minWidth ?? 1, maxColumns );
+			const maxW = bounds?.maxWidth ?? maxColumns;
+			// Scan for the first free run wide enough for the fill's
+			// floor, like a fixed item of width `minW`.
 			let r = cursorRow;
 			let c = cursorCol;
-			scan: for ( ; r <= totalRows; r++ ) {
-				const start = r === cursorRow ? cursorCol : 0;
-				for ( c = start; c < maxColumns; c++ ) {
-					if ( rowOccupancy[ c ] <= r ) {
-						break scan;
+			place: for ( ; r <= totalRows; r++ ) {
+				c = r === cursorRow ? cursorCol : 0;
+				while ( c + minW <= maxColumns ) {
+					let blocked = -1;
+					for ( let k = 0; k < minW; k++ ) {
+						if ( rowOccupancy[ c + k ] > r ) {
+							blocked = c + k;
+							break;
+						}
 					}
+					if ( blocked === -1 ) {
+						break place;
+					}
+					c = blocked + 1;
 				}
 			}
 			const fillStartRow = r;
 			const fillStartCol = c;
-			let runLength = 0;
+			let runLength = minW;
 			while (
 				fillStartCol + runLength < maxColumns &&
 				rowOccupancy[ fillStartCol + runLength ] <= fillStartRow
@@ -175,13 +202,16 @@ export function resolveFillWidths(
 					break;
 				}
 				const nextW = widths[ j ];
-				if ( 1 + reserved + nextW <= runLength ) {
+				if ( minW + reserved + nextW <= runLength ) {
 					reserved += nextW;
 				} else {
 					break;
 				}
 			}
-			const fillCols = Math.max( 1, runLength - reserved );
+			const fillCols = Math.min(
+				Math.max( minW, runLength - reserved ),
+				maxW
+			);
 			resolved.set( item.key, fillCols );
 			for ( let k = 0; k < fillCols; k++ ) {
 				rowOccupancy[ fillStartCol + k ] = fillStartRow + h;
