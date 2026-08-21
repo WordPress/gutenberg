@@ -124,8 +124,13 @@ describe( 'PlaylistEdit', () => {
 		useSelect.mockImplementation( () => ( {
 			innerBlockTracks: mockTracks,
 		} ) );
-		insertBlocks.mockImplementation( ( blocks ) => {
-			mockTracks = [ ...mockTracks, ...blocks ];
+		insertBlocks.mockImplementation( ( blocks, index ) => {
+			const at = index ?? mockTracks.length;
+			mockTracks = [
+				...mockTracks.slice( 0, at ),
+				...blocks,
+				...mockTracks.slice( at ),
+			];
 		} );
 		replaceInnerBlocks.mockImplementation( ( _clientId, next ) => {
 			mockTracks = next;

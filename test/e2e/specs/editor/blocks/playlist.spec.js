@@ -1,20 +1,10 @@
-const path = require( 'path' );
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-const audioPath = path.join(
-	__dirname,
-	'../../../assets/playlist-e2e-test.wav'
-);
-const imagePath = path.join(
-	__dirname,
-	'../../../assets/10x10_e2e_test_image_green.png'
-);
+const audioPath = './assets/playlist-e2e-test.wav';
+const imagePath = './assets/10x10_e2e_test_image_green.png';
 // An audio file WordPress does not accept uploads for, so adding it always
 // fails after the track block has optimistically been created.
-const rejectedAudioPath = path.join(
-	__dirname,
-	'../../../assets/e2e-test-audio.aiff'
-);
+const rejectedAudioPath = './assets/e2e-test-audio.aiff';
 
 test.describe( 'Playlist block', () => {
 	let uploadedAudio;
