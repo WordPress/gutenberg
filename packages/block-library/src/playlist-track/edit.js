@@ -49,18 +49,23 @@ const PlaylistTrackEdit = ( {
 	const { currentTrackClientId, setCurrentTrackClientId, removeTrack } =
 		useContext( PlaylistContext );
 	const { createErrorNotice } = useDispatch( noticesStore );
-	function onUploadError( message, removeTrackOnError = false ) {
+
+	/**
+	 * Handle audio upload errors.
+	 *
+	 * @param {string}  message                      Error message to show.
+	 * @param {Object}  [options]
+	 * @param {boolean} [options.removeTrackOnError] Remove the track as well. Useful for drag/drop where a track is optimistically created before upload finishes.
+	 */
+	function onUploadError( message, { removeTrackOnError = false } = {} ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 
-		// If the file was uploaded via drag/drop, remove the
-		// optimistically added track
 		if ( removeTrackOnError ) {
 			removeTrack( clientId );
 			return;
 		}
 
-		// Otherwise the track already existed, so drop the pending upload
-		// and let it fall back to its previous state.
+		// Set temporaryURL back to default state
 		setTemporaryURL();
 	}
 	const hasTrackSource = !! src || !! temporaryURL;
@@ -87,8 +92,7 @@ const PlaylistTrackEdit = ( {
 		allowedTypes: ALLOWED_MEDIA_TYPES,
 		onChange: onSelectTrack,
 		onError: ( message ) => {
-			const removeTrackOnError = true;
-			onUploadError( message, removeTrackOnError );
+			onUploadError( message, { removeTrackOnError: true } );
 		},
 	} );
 

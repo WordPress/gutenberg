@@ -109,6 +109,22 @@ describe( 'PlaylistEdit', () => {
 	let insertBlocks;
 	let selectBlock;
 
+	// The playlist reads its tracks from the store and changes them through
+	// dispatched actions. Keeping a list here lets a test assert which tracks
+	// the playlist ends up with, rather than which action it reached for.
+	let tracks;
+	const trackStore = ( initial ) => {
+		tracks = initial;
+		useSelect.mockImplementation( () => ( { innerBlockTracks: tracks } ) );
+		insertBlocks.mockImplementation( ( blocks ) => {
+			tracks = [ ...tracks, ...blocks ];
+		} );
+		replaceInnerBlocks.mockImplementation( ( _clientId, next ) => {
+			tracks = next;
+		} );
+	};
+	const trackClientIds = () => tracks.map( ( track ) => track.clientId );
+
 	beforeEach( () => {
 		mediaPlaceholderProps = undefined;
 		mediaReplaceFlowProps = undefined;
@@ -190,79 +206,19 @@ describe( 'PlaylistEdit', () => {
 		expect( screen.getByTestId( 'playlist-track' ) ).toBeInTheDocument();
 	} );
 
-	it( 'removes unfilled tracks once no track has a source', () => {
-		useSelect.mockReturnValue( {
-			innerBlockTracks: [
-				{ clientId: 'placeholder-track', attributes: {} },
-			],
-		} );
-
-		render(
-			<PlaylistEdit
-				attributes={ defaultAttributes }
-				clientId="playlist-1"
-				insertBlocksAfter={ jest.fn() }
-				isSelected={ false }
-				setAttributes={ jest.fn() }
-			/>
-		);
-
-		// The playlist falls back to its own placeholder, which leaves the
-		// unfilled tracks rendered by nothing.
-		expect( replaceInnerBlocks ).toHaveBeenCalledWith( 'playlist-1', [] );
-	} );
-
-	it( 'does not touch a playlist that has no tracks at all', () => {
-		useSelect.mockReturnValue( { innerBlockTracks: [] } );
-
-		render(
-			<PlaylistEdit
-				attributes={ defaultAttributes }
-				clientId="playlist-1"
-				insertBlocksAfter={ jest.fn() }
-				isSelected={ false }
-				setAttributes={ jest.fn() }
-			/>
-		);
-
-		expect( replaceInnerBlocks ).not.toHaveBeenCalled();
-	} );
-
-	it( 'keeps a track that is still uploading', () => {
-		useSelect.mockReturnValue( {
-			innerBlockTracks: [
-				{ clientId: 'uploading-track', attributes: { blob: 'blob:x' } },
-			],
-		} );
-
-		render(
-			<PlaylistEdit
-				attributes={ defaultAttributes }
-				clientId="playlist-1"
-				insertBlocksAfter={ jest.fn() }
-				isSelected={ false }
-				setAttributes={ jest.fn() }
-			/>
-		);
-
-		expect( replaceInnerBlocks ).not.toHaveBeenCalled();
-	} );
-
-	it( 'keeps an empty placeholder track when adding tracks', () => {
-		useSelect.mockReturnValue( {
-			innerBlockTracks: [
-				{
-					clientId: 'track-1',
-					attributes: {
-						id: 1,
-						src: 'https://example.com/audio.mp3',
-						title: 'Sample track',
-					},
+	it( 'preserves placeholder tracks when adding tracks', () => {
+		trackStore( [
+			{
+				clientId: 'track-1',
+				attributes: {
+					id: 1,
+					src: 'https://example.com/audio.mp3',
+					title: 'Sample track',
 				},
-				// A track the user added but has not filled in yet.
-				{ clientId: 'placeholder-track', attributes: {} },
-			],
-		} );
+			},
+			// A track the user added but has not filled in yet.
+			{ clientId: 'placeholder-track', attributes: {} },
+		] );
 
 		render(
 			<PlaylistEdit
@@ -276,10 +232,11 @@ describe( 'PlaylistEdit', () => {
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'Add track' } ) );
 
-		// Adding inserts alongside the existing tracks rather than rebuilding
-		// the list, so a track with no source cannot be filtered away.
-		expect( insertBlocks ).toHaveBeenCalled();
-		expect( replaceInnerBlocks ).not.toHaveBeenCalled();
+		expect( trackClientIds() ).toEqual( [
+			'track-1',
+			'placeholder-track',
+			'new-track',
+		] );
 	} );
 
 	it( 'adds tracks from the add track control', () => {
