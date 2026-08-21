@@ -11,6 +11,10 @@ import { ValidatedInputControl } from '../validated-input-control';
 
 This section documents form controls in `@wordpress/ui` that wrap higher-level `*Control` components with inline validation feedback via [`ControlWithError`](?path=/docs/design-system-components-form-primitives-controlwitherror--docs).
 
+## Status
+
+We are still gathering feedback and iterating on these components. APIs and behavior may change before they stabilize. Please get in touch with `@WordPress/gutenberg-components` if you are interested in trying them out in the Gutenberg app.
+
 ## Usage
 
 Component APIs are the same as the underlying control, with the addition of some optional props:
@@ -39,9 +43,15 @@ These components are designed to work with the native HTML5 [Constraint Validati
 
 We don't foresee these being needed much, but it is technically possible by the consumer accessing the target element's validation APIs via `ref`. Better docs or ergonomics can be added when we have actual use cases.
 
+### Delegate elements
+
+Some validated controls may not be able to use their visible interactive element for constraint validation directly — for example, when the underlying component renders a custom widget rather than a native form control.
+
+In those cases, the implementation may use a delegate element: a visually hidden native form element that handles Constraint Validation API concerns on behalf of the visible control. This keeps behavior consistent across validated controls, such as scrolling to the first invalid field on submit and blocking form submission when there are errors.
+
 ### Controlled mode only
 
-Some of the underlying WordPress components currently do not fully support uncontrolled mode. For now, we recommend sticking to controlled mode to avoid any issues.
+Some of the `@wordpress/components` controls currently do not fully support uncontrolled mode, and the validation components are not tested to work when uncontrolled. For now, we recommend sticking to controlled mode to avoid any issues.
 
 ## Examples
 
