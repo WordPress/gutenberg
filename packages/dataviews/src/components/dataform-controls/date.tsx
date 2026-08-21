@@ -131,6 +131,10 @@ const DATE_RANGE_PRESETS = [
 // A `date` value is a plain calendar day with no timezone attached, and the
 // calendar reads and reports the `Date`s it is given in the browser timezone.
 // Anchoring the day there keeps the visible day aligned with the field value.
+// A native Date cannot represent a civil day skipped by the browser timezone
+// (for example, 2011-12-30 in Pacific/Apia). That rare historical edge remains
+// outside this browser-frame approach; using a neutral frame would also make
+// Calendar's built-in today marker follow that frame instead of the browser.
 const parseDate = ( dateString?: string ): Date | null => {
 	if ( ! dateString ) {
 		return null;
