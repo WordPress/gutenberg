@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Update the bundled `markdownlint-cli` from `^0.31.1` to `^0.48.0`, which moves `markdownlint` from 0.25 to 0.40. `lint-md-docs` now runs the rules added since then (MD051 through MD060) by default, so projects may see new reports. The `header` rule aliases (for example `header-increment`) no longer work in configuration files; use the `heading` names. `markdownlint-cli` 0.48 requires Node.js 20 or later.
+
+### Enhancements
+
+-   `lint-md-docs`: Detect `.markdownlint.jsonc` so the bundled default config is not used when one is present.
+
 ## 34.1.0 (2026-08-12)
 
 ### Bug Fixes
