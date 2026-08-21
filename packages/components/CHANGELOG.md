@@ -6,19 +6,26 @@
 
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
     -   `DropdownContentWrapper` ([#81522](https://github.com/WordPress/gutenberg/pull/81522))
+    -   `ResizableBox` ([#81792](https://github.com/WordPress/gutenberg/pull/81792))
+    -   `ComboboxControl`: ([#80471](https://github.com/WordPress/gutenberg/pull/80471))
 
 ### Enhancements
 
+-   `PaletteEdit`: Add a duotone variant. Passing `duotones` (with an optional `colorPalette` for the shadows and highlights pickers) edits duotone presets with the same UI as colors and gradients. Palette colors that do not resolve to a concrete value, such as `color-mix()`, are left out of the duotone pickers, since a duotone built from one cannot be rendered, and the rest are normalized to hex, since the front end's duotone parser does not accept CSS named colors ([#81605](https://github.com/WordPress/gutenberg/pull/81605)).
+-   `DuotonePicker`: Add `selectedSlug` prop for slug-based selection and pass the picked preset's index and slug to `onChange`, so two presets sharing a pair of colors keep their identity ([#81605](https://github.com/WordPress/gutenberg/pull/81605)).
+-   `PaletteEdit`: Name the swatch picker after the palette's heading, so it is announced as Theme, Default or Custom rather than an unlabelled list ([#81605](https://github.com/WordPress/gutenberg/pull/81605)).
 -   `TextControl`, `TextareaControl`, `FormTokenField`, `ContentEditableControl`, `ComboboxControl`: Align focus and hover styles with the design system ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
 -   `InputControl`, `SelectControl`, `CustomSelectControl`: Align focus rings with the design system ([#80417](https://github.com/WordPress/gutenberg/pull/80417)).
 
 ### Bug Fixes
 
+-   `DuotonePicker`: Do not render the custom controls wrapper when `disableCustomDuotone` is set, so a read-only picker no longer adds trailing padding below its swatches ([#81605](https://github.com/WordPress/gutenberg/pull/81605)).
 -   `Modal`: Prevent an Escape key press that dismisses the modal from propagating to underlying overlays. ([#81785](https://github.com/WordPress/gutenberg/pull/81785))
 -   `BoxControl`: Update the opposite side when ALT is held on the left or right input, which each updated themselves instead ([#81530](https://github.com/WordPress/gutenberg/pull/81530)).
--   `PaletteEdit`: Expose palette swatches as buttons instead of a listbox, since activating a swatch opens the editor rather than selecting a value ([#81800](https://github.com/WordPress/gutenberg/issues/81800)).
+-   `PaletteEdit`: Expose palette swatches as buttons instead of a listbox, since activating a swatch opens the editor rather than selecting a value ([#81836](https://github.com/WordPress/gutenberg/pull/81836)).
 -   `InputControl`: Vertically center the value of date and time inputs in Safari ([#81361](https://github.com/WordPress/gutenberg/pull/81361)).
 -   `ControlWithError`: Re-read the target's validation message when an `invalid` event is received, so a message that changed without a re-render in between (e.g. a programmatic value change followed by a synthetic `invalid` event) is not revealed stale or empty. While a `validating` custom validity is pending, the message is left untouched so the pending indicator keeps showing ([#81440](https://github.com/WordPress/gutenberg/pull/81440)).
+-   `Button`: Apply the `has-text` class when the children that render the label are conditional, wrapped in an element, or preceded by other children, so that such buttons are no longer styled as icon-only buttons ([#81521](https://github.com/WordPress/gutenberg/pull/81521)).
 
 ### TypeScript
 
@@ -26,13 +33,17 @@
 
 ### Internal
 
+-   Update `@ariakit/react` to 0.4.37 and `@ariakit/test` to 0.7.4 ([#81080](https://github.com/WordPress/gutenberg/pull/81080)).
 -   Point tsconfig references at split dependencies' build projects. ([#81514](https://github.com/WordPress/gutenberg/pull/81514), [#81516](https://github.com/WordPress/gutenberg/pull/81516), [#81518](https://github.com/WordPress/gutenberg/pull/81518))
+-   Update `is-plain-object` to 5.1.0, which ships its own types, and drop the `@ts-expect-error` that the missing declaration required ([#81926](https://github.com/WordPress/gutenberg/pull/81926)).
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81515](https://github.com/WordPress/gutenberg/pull/81515))
 -   Remove `ValidatedComboboxControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81449](https://github.com/WordPress/gutenberg/pull/81449)).
 -   Remove `ValidatedFormTokenField` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81451](https://github.com/WordPress/gutenberg/pull/81451)).
 -   Remove `ValidatedToggleControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81492](https://github.com/WordPress/gutenberg/pull/81492)).
 -   Remove `ValidatedToggleGroupControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81450](https://github.com/WordPress/gutenberg/pull/81450)).
 -   `ToggleGroupControl`: Streamline focus ring color styles ([#81242](https://github.com/WordPress/gutenberg/pull/81242)).
+-   `ControlWithError`: Remove the internal implementation in favor of the `ControlWithError` component from `@wordpress/ui` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574)).
+-   Remove the unused `components-validated-control__indicator*` styles; the indicator is now rendered and styled by `ValidityIndicator` from `@wordpress/ui` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574)).
 
 ## 39.0.0 (2026-08-12)
 
