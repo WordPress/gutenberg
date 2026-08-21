@@ -5,15 +5,6 @@
 	flex: 1;
 	min-height: 0;
 	overflow-y: auto;
-	padding: $grid-unit-30;
-}
-
-.frame {
-	border: $border-width solid $gray-300;
-	border-radius: $radius-large;
-	overflow: hidden;
-	max-width: 1200px;
-	margin: 0 auto;
 }
 
 .loading {

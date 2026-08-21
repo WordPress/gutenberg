@@ -128,13 +128,11 @@ function ThemePreviewStage() {
 		);
 	} else {
 		content = (
-			<div className={ styles.frame }>
-				<Preview
-					content={ template.content?.raw }
-					blocks={ template.blocks }
-					description={ previewDescription }
-				/>
-			</div>
+			<Preview
+				content={ template.content?.raw }
+				blocks={ template.blocks }
+				description={ previewDescription }
+			/>
 		);
 	}
 
