@@ -242,6 +242,14 @@
 	}
 }
 
+.global-styles-ui-spacing-presets__list {
+	padding: 0 variables.$grid-unit-20;
+}
+
+.global-styles-ui-spacing-presets__edit {
+	padding: 0 variables.$grid-unit-20 variables.$grid-unit-30;
+}
+
 // Spacing preview styles
 .global-styles-ui-spacing-preview {
 	padding: variables.$grid-unit-40;

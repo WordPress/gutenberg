@@ -1,30 +1,28 @@
 import { __, isRTL } from '@wordpress/i18n';
-import {
-	__experimentalItemGroup as ItemGroup,
-	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
-	FlexItem,
-} from '@wordpress/components';
+import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
+import { Stack } from '@wordpress/ui';
 import { Subtitle } from '../subtitle';
 import { NavigationButtonAsItem } from '../navigation-button';
 
-function Spacings() {
+function SpacingsCount() {
 	return (
-		<VStack spacing={ 2 }>
-			<HStack justify="space-between">
-				<Subtitle level={ 3 }>{ __( 'Spacing Sizes' ) }</Subtitle>
-			</HStack>
+		<Stack direction="column" gap="sm">
+			<Subtitle level={ 3 }>{ __( 'Spacing Sizes' ) }</Subtitle>
 			<ItemGroup isBordered isSeparated>
 				<NavigationButtonAsItem path="/layout/spacing">
-					<HStack direction="row">
-						<FlexItem>{ __( 'Spacing size presets' ) }</FlexItem>
+					<Stack
+						direction="row"
+						justify="space-between"
+						align="center"
+					>
+						<span>{ __( 'Spacing size presets' ) }</span>
 						<Icon icon={ isRTL() ? chevronLeft : chevronRight } />
-					</HStack>
+					</Stack>
 				</NavigationButtonAsItem>
 			</ItemGroup>
-		</VStack>
+		</Stack>
 	);
 }
 
-export default Spacings;
+export default SpacingsCount;

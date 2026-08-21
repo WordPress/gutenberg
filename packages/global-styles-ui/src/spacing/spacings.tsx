@@ -1,8 +1,4 @@
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	__experimentalSpacer as Spacer,
-	__experimentalView as View,
-} from '@wordpress/components';
 import type { SpacingSize } from '@wordpress/global-styles-engine';
 import { Stack } from '@wordpress/ui';
 import { ScreenHeader } from '../screen-header';
@@ -57,81 +53,77 @@ export default function Spacings() {
 					'Create and edit the presets used for spacing sizes across the site.'
 				) }
 			/>
-			<View>
-				<Spacer paddingX={ 4 }>
-					<Stack direction="column" gap="xl">
-						{ !! theme.presets.length && (
-							<PresetGroup
-								label={ __( 'Theme' ) }
-								items={ theme.presets }
-								getEditPath={ ( slug ) =>
-									`/layout/spacing/theme/${ slug }`
-								}
-								menuAction={
-									hasSameSizeValues(
-										theme.presets,
-										theme.basePresets
-									)
-										? undefined
-										: resetMenu( () =>
-												theme.setPresets(
-													theme.basePresets
-												)
-										  )
-								}
-							/>
-						) }
-						{ defaultEnabled && !! def.presets.length && (
-							<PresetGroup
-								label={ __( 'Default' ) }
-								items={ def.presets }
-								getEditPath={ ( slug ) =>
-									`/layout/spacing/default/${ slug }`
-								}
-								menuAction={
-									hasSameSizeValues(
-										def.presets,
-										def.basePresets
-									)
-										? undefined
-										: resetMenu( () =>
-												def.setPresets(
-													def.basePresets
-												)
-										  )
-								}
-							/>
-						) }
+			<div className="global-styles-ui-spacing-presets__list">
+				<Stack direction="column" gap="xl">
+					{ !! theme.presets.length && (
 						<PresetGroup
-							label={ __( 'Custom' ) }
-							items={ custom.presets }
+							label={ __( 'Theme' ) }
+							items={ theme.presets }
 							getEditPath={ ( slug ) =>
-								`/layout/spacing/custom/${ slug }`
+								`/layout/spacing/theme/${ slug }`
 							}
-							addLabel={ __( 'Add spacing size' ) }
-							onAdd={ addSpacingSize }
 							menuAction={
-								custom.presets.length > 0
-									? {
-											label: __(
-												'Remove spacing size presets'
-											),
-											optionsLabel: __(
-												'Spacing size presets options'
-											),
-											confirmText: __(
-												'Are you sure you want to remove all custom spacing size presets?'
-											),
-											confirmButtonText: __( 'Remove' ),
-											onConfirm: () =>
-												custom.setPresets( [] ),
-									  }
-									: undefined
+								hasSameSizeValues(
+									theme.presets,
+									theme.basePresets
+								)
+									? undefined
+									: resetMenu( () =>
+											theme.setPresets(
+												theme.basePresets
+											)
+									  )
 							}
 						/>
-					</Stack>
-				</Spacer>
-			</View>
+					) }
+					{ defaultEnabled && !! def.presets.length && (
+						<PresetGroup
+							label={ __( 'Default' ) }
+							items={ def.presets }
+							getEditPath={ ( slug ) =>
+								`/layout/spacing/default/${ slug }`
+							}
+							menuAction={
+								hasSameSizeValues(
+									def.presets,
+									def.basePresets
+								)
+									? undefined
+									: resetMenu( () =>
+											def.setPresets( def.basePresets )
+									  )
+							}
+						/>
+					) }
+					<PresetGroup
+						label={ __( 'Custom' ) }
+						items={ custom.presets }
+						getEditPath={ ( slug ) =>
+							`/layout/spacing/custom/${ slug }`
+						}
+						addLabel={ __( 'Add spacing size' ) }
+						onAdd={ addSpacingSize }
+						menuAction={
+							custom.presets.length > 0
+								? {
+										label: __(
+											'Remove spacing size presets'
+										),
+										optionsLabel: __(
+											'Spacing size presets options'
+										),
+										confirmText: __(
+											'Are you sure you want to remove all custom spacing size presets?'
+										),
+										confirmButtonText: __( 'Remove' ),
+										onConfirm: () =>
+											custom.setPresets( [] ),
+								  }
+								: undefined
+						}
+					/>
+				</Stack>
+			</div>
 		</Stack>
 	);
 }

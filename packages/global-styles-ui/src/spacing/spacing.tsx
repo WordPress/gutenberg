@@ -1,11 +1,5 @@
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	__experimentalSpacer as Spacer,
-	__experimentalView as View,
-	useNavigator,
-	FlexItem,
-	ToggleControl,
-} from '@wordpress/components';
+import { useNavigator, ToggleControl } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
 import type {
 	SpacingSize,
@@ -20,6 +14,17 @@ import type { PresetEditHeaderMenuItem } from '../presets/preset-edit-header';
 import ConfirmDeleteDialog from '../presets/dialogs/confirm-delete-dialog';
 import RenameDialog from '../presets/dialogs/rename-dialog';
 import { parseClampValue, generateClampValue } from './utils';
+
+// Spacing values run bigger than the control defaults, which are for font
+// sizes. px/em/rem get equivalent max values (500px is about 32rem at a
+// 16px root); vw/vh go up to 100.
+const SPACING_RANGE_SETTINGS = {
+	px: { max: 500 },
+	em: { max: 32 },
+	rem: { max: 32 },
+	vw: { max: 100 },
+	vh: { max: 100 },
+};
 
 function Spacing() {
 	const { params, goBack } = useNavigator();
@@ -169,88 +174,77 @@ function Spacing() {
 					menuLabel={ __( 'Spacing size options' ) }
 					menuItems={ menuItems }
 				/>
-				<View>
-					<Spacer
-						paddingX={ 4 }
-						marginBottom={ 0 }
-						paddingBottom={ 6 }
-					>
-						<Stack direction="column" gap="md">
-							<FlexItem>
-								<SpacingPreview spacingSize={ spacingSize } />
-							</FlexItem>
-							<SizeControl
-								label={ __( 'Size' ) }
-								value={
-									! isCustomFluid
-										? ( spacingSize.size as string )
-										: ''
-								}
-								onChange={ ( value ) => set( 'size', value ) }
-								disabled={ isCustomFluid }
-								max={ 500 }
-							/>
-							<ToggleControl
-								label={ __( 'Fluid spacing' ) }
-								help={ __(
-									'Scale the spacing size dynamically to fit the screen or viewport.'
-								) }
-								checked={ isFluid }
-								onChange={ ( value ) => set( 'fluid', value ) }
-							/>
-							{ isFluid && (
-								<ToggleControl
-									label={ __( 'Custom fluid values' ) }
-									help={ __(
-										'Set custom min, preferred, and max values for the fluid spacing size.'
-									) }
-									checked={ isCustomFluid }
-									onChange={ handleCustomFluidValues }
-								/>
+				<div className="global-styles-ui-spacing-presets__edit">
+					<Stack direction="column" gap="md">
+						<SpacingPreview spacingSize={ spacingSize } />
+						<SizeControl
+							label={ __( 'Size' ) }
+							value={
+								! isCustomFluid
+									? ( spacingSize.size as string )
+									: ''
+							}
+							onChange={ ( value ) => set( 'size', value ) }
+							disabled={ isCustomFluid }
+							rangeSettings={ SPACING_RANGE_SETTINGS }
+						/>
+						<ToggleControl
+							label={ __( 'Fluid spacing' ) }
+							help={ __(
+								'Scale the spacing size dynamically to fit the screen or viewport.'
 							) }
-							{ isFluid &&
-								isCustomFluid &&
-								typeof spacingSize.fluid === 'object' && (
-									<>
-										<SizeControl
-											label={ __( 'Minimum' ) }
-											value={
-												spacingSize.fluid.min as string
-											}
-											onChange={ ( value ) =>
-												setFluidPart( 'min', value )
-											}
-											max={ 500 }
-										/>
-										<SizeControl
-											label={ __( 'Preferred' ) }
-											value={
-												spacingSize.fluid
-													.preferred as string
-											}
-											onChange={ ( value ) =>
-												setFluidPart(
-													'preferred',
-													value
-												)
-											}
-											max={ 500 }
-										/>
-										<SizeControl
-											label={ __( 'Maximum' ) }
-											value={
-												spacingSize.fluid.max as string
-											}
-											onChange={ ( value ) =>
-												setFluidPart( 'max', value )
-											}
-											max={ 500 }
-										/>
-									</>
+							checked={ isFluid }
+							onChange={ ( value ) => set( 'fluid', value ) }
+						/>
+						{ isFluid && (
+							<ToggleControl
+								label={ __( 'Custom fluid values' ) }
+								help={ __(
+									'Set custom min, preferred, and max values for the fluid spacing size.'
 								) }
-						</Stack>
-					</Spacer>
-				</View>
+								checked={ isCustomFluid }
+								onChange={ handleCustomFluidValues }
+							/>
+						) }
+						{ isFluid &&
+							isCustomFluid &&
+							typeof spacingSize.fluid === 'object' && (
+								<>
+									<SizeControl
+										label={ __( 'Minimum' ) }
+										value={
+											spacingSize.fluid.min as string
+										}
+										onChange={ ( value ) =>
+											setFluidPart( 'min', value )
+										}
+										rangeSettings={ SPACING_RANGE_SETTINGS }
+									/>
+									<SizeControl
+										label={ __( 'Preferred' ) }
+										value={
+											spacingSize.fluid
+												.preferred as string
+										}
+										onChange={ ( value ) =>
+											setFluidPart( 'preferred', value )
+										}
+										rangeSettings={ SPACING_RANGE_SETTINGS }
+									/>
+									<SizeControl
+										label={ __( 'Maximum' ) }
+										value={
+											spacingSize.fluid.max as string
+										}
+										onChange={ ( value ) =>
+											setFluidPart( 'max', value )
+										}
+										rangeSettings={ SPACING_RANGE_SETTINGS }
+									/>
+								</>
+							) }
+					</Stack>
+				</div>
 			</Stack>
 			{ isDeleteOpen && (
 				<ConfirmDeleteDialog
