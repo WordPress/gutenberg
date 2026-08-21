@@ -4,16 +4,14 @@ import {
 	Button,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { VisuallyHidden } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { Menu, VisuallyHidden } from '@wordpress/ui';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-
-const { Menu } = unlock( componentsPrivateApis );
 
 function VariationsButtons( {
 	className,
@@ -59,42 +57,45 @@ function VariationsDropdown( {
 } ) {
 	return (
 		<div className={ className }>
-			<Menu>
-				<Menu.TriggerButton
+			<Menu.Root>
+				<Menu.Trigger
 					render={
 						<Button
 							className="block-editor-block-variation-transforms__button"
 							__next40pxDefaultSize
 							variant="secondary"
-						>
-							{ __( 'Transform to variation' ) }
-						</Button>
+						/>
 					}
-				/>
-				<Menu.Popover position="bottom">
-					<Menu.Group>
+				>
+					{ __( 'Transform to variation' ) }
+				</Menu.Trigger>
+				<Menu.Popup
+					positioner={
+						<Menu.Positioner side="bottom" align="start" />
+					}
+				>
+					<Menu.RadioGroup
+						value={ selectedValue }
+						onValueChange={ onSelectVariation }
+					>
 						{ variations.map( ( variation ) => (
 							<Menu.RadioItem
 								key={ variation.name }
 								value={ variation.name }
-								checked={ selectedValue === variation.name }
-								onChange={ () =>
-									onSelectVariation( variation.name )
-								}
 							>
 								<Menu.ItemLabel>
 									{ variation.title }
 								</Menu.ItemLabel>
 								{ variation.description && (
-									<Menu.ItemHelpText>
+									<Menu.ItemDescription>
 										{ variation.description }
-									</Menu.ItemHelpText>
+									</Menu.ItemDescription>
 								) }
 							</Menu.RadioItem>
 						) ) }
-					</Menu.Group>
-				</Menu.Popover>
-			</Menu>
+					</Menu.RadioGroup>
+				</Menu.Popup>
+			</Menu.Root>
 		</div>
 	);
 }
