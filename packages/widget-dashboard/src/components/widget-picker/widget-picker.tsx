@@ -1,6 +1,7 @@
 import { DataViewsPicker, filterSortAndPaginate } from '@wordpress/dataviews';
 import type { Field, View } from '@wordpress/dataviews';
 import { useMemo, useState } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import type { WidgetType } from '@wordpress/widget-primitives';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
@@ -74,18 +75,38 @@ interface WidgetPickerProps {
  * exposes a single "Select" action with bulk support so users can insert one
  * or several widgets at once.
  *
+ * Each type first passes through the `widgetDashboard.canInsertWidgetType`
+ * filter, called with `( canInsert, widgetType, { layout } )`, so extensions
+ * can scope what is insertable without hiding already-placed widgets.
+ *
  * @param {WidgetPickerProps} props Component props.
  */
 export function WidgetPicker( {
 	onSelect,
 	itemListLabel = __( 'Widget list' ),
 }: WidgetPickerProps ) {
-	const { widgetTypes: registeredTypes } = useDashboardInternalContext();
+	const { widgetTypes: registeredTypes, layout } =
+		useDashboardInternalContext();
 	const [ selection, setSelection ] = useState< string[] >( [] );
 	const [ view, setView ] = useState< View >( DEFAULT_VIEW );
 
+	const insertableTypes = useMemo(
+		() =>
+			registeredTypes.filter( ( widgetType ) =>
+				Boolean(
+					applyFilters(
+						'widgetDashboard.canInsertWidgetType',
+						true,
+						widgetType,
+						{ layout }
+					)
+				)
+			),
+		[ registeredTypes, layout ]
+	);
+
 	const { data: widgetTypes } = filterSortAndPaginate(
-		registeredTypes,
+		insertableTypes,
 		view,
 		fields
 	);

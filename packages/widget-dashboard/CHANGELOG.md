@@ -4,6 +4,10 @@
 
 ### New Features
 
+-   The inserter passes every widget type through the
+    `widgetDashboard.canInsertWidgetType` hooks filter before listing it, so
+    extensions can scope what users can insert without hiding already-placed
+    widgets.
 -   Widget chrome footer: `relevance: 'high'` actions mount as leading text
     links (declared icon as prefix) in a persistent strip under the widget
     body, `'medium'` as trailing compact affordances (icon-only with a

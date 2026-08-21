@@ -3,6 +3,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentType } from 'react';
 import { useState } from '@wordpress/element';
+import { addFilter, removeFilter } from '@wordpress/hooks';
 import type {
 	ResolveWidgetModule,
 	WidgetRenderProps,
@@ -195,5 +196,89 @@ describe( 'WidgetDashboard.WidgetInserter', () => {
 		expect( updated ).toHaveLength( 2 );
 		expect( updated[ 0 ] ).toEqual( existing );
 		expect( updated[ 1 ] ).toMatchObject( { type: 'wordpress/notes' } );
+	} );
+
+	describe( 'widgetDashboard.canInsertWidgetType filter', () => {
+		const FILTER_NAME = 'widgetDashboard.canInsertWidgetType';
+
+		afterEach( () => {
+			removeFilter( FILTER_NAME, 'test/scope' );
+		} );
+
+		it( 'scopes the picker to the types the filter allows', async () => {
+			addFilter(
+				FILTER_NAME,
+				'test/scope',
+				( canInsert, widgetType ) =>
+					canInsert && widgetType.name === 'wordpress/notes'
+			);
+
+			const user = userEvent.setup();
+			render( <Harness /> );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add widget' } )
+			);
+
+			const dialog = await screen.findByRole( 'dialog', {
+				name: 'Add widget',
+			} );
+			expect( within( dialog ).getAllByRole( 'option' ) ).toHaveLength(
+				1
+			);
+			// The title renders in the card and in the preview chrome.
+			expect(
+				within( dialog ).queryAllByText( 'Notes' ).length
+			).toBeGreaterThan( 0 );
+			expect(
+				within( dialog ).queryByText( 'Welcome' )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'calls back with the widget type and the current layout', async () => {
+			const callback = jest.fn( ( canInsert ) => canInsert );
+			addFilter( FILTER_NAME, 'test/scope', callback );
+
+			const user = userEvent.setup();
+			render( <Harness /> );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add widget' } )
+			);
+			await screen.findByRole( 'dialog', { name: 'Add widget' } );
+
+			expect( callback ).toHaveBeenCalledWith( true, widgetTypes[ 0 ], {
+				layout: [],
+			} );
+			expect( callback ).toHaveBeenCalledWith( true, widgetTypes[ 1 ], {
+				layout: [],
+			} );
+		} );
+
+		it( 'leaves placed widgets of excluded types rendering', async () => {
+			addFilter( FILTER_NAME, 'test/scope', () => false );
+
+			const existing: DashboardWidget = {
+				uuid: 'existing-1',
+				type: 'wordpress/welcome',
+				attributes: { label: 'kept' },
+				placement: { width: 1, height: 1 },
+			};
+
+			const user = userEvent.setup();
+			render( <Harness initialLayout={ [ existing ] } /> );
+
+			expect( await screen.findByText( 'kept' ) ).toBeInTheDocument();
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add widget' } )
+			);
+			const dialog = await screen.findByRole( 'dialog', {
+				name: 'Add widget',
+			} );
+			expect(
+				within( dialog ).queryByRole( 'option' )
+			).not.toBeInTheDocument();
+		} );
 	} );
 } );
