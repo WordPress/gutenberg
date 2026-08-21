@@ -16,7 +16,7 @@
 	font-size: $helptext-font-size;
 
 	svg {
-		fill: $gray-600 !important;
+		color: $gray-600 !important;
 	}
 
 	.components-button {
@@ -28,7 +28,7 @@
 	}
 
 	.components-button:hover svg {
-		fill: var(--wp-admin-theme-color) !important;
+		color: var(--wp-admin-theme-color) !important;
 	}
 
 	& > li {
@@ -39,4 +39,3 @@
 		gap: $grid-unit-05;
 	}
 }
-
