@@ -21,7 +21,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0",
+		"node": ">=22.19.0",
 		"npm": ">=8.19.2"
 	},
 	"files": [
@@ -39,7 +39,7 @@
 	"dependencies": {
 		"change-case": "^4.1.2",
 		"get-port": "^5.1.1",
-		"lighthouse": "^12.2.2",
+		"lighthouse": "^13.4.1",
 		"mime": "^3.0.0",
 		"web-vitals": "^4.2.1"
 	},
