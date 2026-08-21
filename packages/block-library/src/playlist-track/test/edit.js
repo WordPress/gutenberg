@@ -107,28 +107,16 @@ describe( 'PlaylistTrackEdit', () => {
 		isTrackMultiSelected = false;
 		useDispatch.mockReturnValue( {
 			createErrorNotice: jest.fn(),
-			selectionChange: jest.fn(),
 		} );
 		useSelect.mockImplementation( ( selector ) => {
-			const select = ( store ) => {
-				if ( store?.name === 'core/rich-text' ) {
-					return {
-						getFormatTypes: () => [],
-					};
-				}
-
-				return {
-					isBlockMultiSelected: () => isTrackMultiSelected,
-					getSelectionStart: () => ( {} ),
-					getSelectionEnd: () => ( {} ),
-					getSettings: () => ( {} ),
-					getBlockAttributes: () => ( {} ),
-				};
+			const selectors = {
+				getFormatTypes: () => [],
+				isBlockMultiSelected: () => isTrackMultiSelected,
 			};
 
 			return typeof selector === 'function'
-				? selector( select )
-				: select( selector );
+				? selector( () => selectors )
+				: selectors;
 		} );
 		useUploadMediaFromBlobURL.mockClear();
 	} );

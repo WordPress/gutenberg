@@ -175,14 +175,14 @@ const PlaylistTrackEdit = ( {
 					) }
 					<TextControl
 						label={ __( 'Artist' ) }
-						value={ stripHTML( artist || '' ) }
+						value={ artist ? stripHTML( artist ) : '' }
 						onChange={ ( artistValue ) => {
 							setAttributes( { artist: artistValue } );
 						} }
 					/>
 					<TextControl
 						label={ __( 'Album' ) }
-						value={ stripHTML( album || '' ) }
+						value={ album ? stripHTML( album ) : '' }
 						onChange={ ( albumValue ) => {
 							setAttributes( { album: albumValue } );
 						} }
