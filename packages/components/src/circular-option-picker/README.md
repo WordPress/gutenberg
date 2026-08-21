@@ -77,16 +77,28 @@ The child elements.
 
 - Required: No
 
+### `presentation`: `'listbox' | 'toggle-buttons' | 'command-buttons'`
+
+How options are presented to assistive technology.
+
+- `listbox`: a composite listbox with `role="option"` and `aria-selected`.
+- `toggle-buttons`: individual buttons with `aria-pressed` for selection.
+- `command-buttons`: individual buttons without a pressed state, for actions such as opening an editor.
+
+- Required: No
+- Default: `listbox`
+
 ### `asButtons`: `boolean`
 
 Whether the control should present as a set of buttons, each with its own tab stop.
 
 - Required: No
 - Default: `false`
+- Deprecated: Use `presentation="toggle-buttons"` instead. `asButtons={ true }` maps to `presentation="toggle-buttons"`.
 
 ### `loop`: `boolean`
 
-Prevents keyboard interaction from wrapping around. Only used when `asButtons` is not true.
+Prevents keyboard interaction from wrapping around. Only used when `presentation` is `listbox` (or `asButtons` is not true).
 
 - Required: No
 - Default: `true`

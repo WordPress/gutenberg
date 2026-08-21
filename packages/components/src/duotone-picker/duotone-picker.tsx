@@ -46,6 +46,7 @@ import type { DuotonePickerProps } from './types';
  */
 function DuotonePicker( {
 	asButtons,
+	presentation,
 	loop,
 	clearable = true,
 	unsetable = true,
@@ -136,7 +137,8 @@ function DuotonePicker( {
 		asButtons,
 		loop,
 		ariaLabel,
-		ariaLabelledby
+		ariaLabelledby,
+		presentation
 	);
 
 	const options = unsetable

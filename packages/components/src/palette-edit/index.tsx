@@ -872,7 +872,7 @@ export function PaletteEdit( {
 					) }
 					{ ! isEditing && variant === 'gradient' && (
 						<GradientPicker
-							asButtons
+							presentation="command-buttons"
 							aria-labelledby={ paletteLabelId }
 							gradients={ gradients }
 							onChange={ onSelectPaletteItem }
@@ -882,7 +882,7 @@ export function PaletteEdit( {
 					) }
 					{ ! isEditing && variant === 'duotone' && (
 						<DuotonePicker
-							asButtons
+							presentation="command-buttons"
 							aria-labelledby={ paletteLabelId }
 							duotonePalette={ duotones ?? [] }
 							colorPalette={ duotoneColorPalette }
@@ -895,7 +895,7 @@ export function PaletteEdit( {
 					) }
 					{ ! isEditing && variant === 'color' && (
 						<ColorPalette
-							asButtons
+							presentation="command-buttons"
 							aria-labelledby={ paletteLabelId }
 							colors={ colors }
 							onChange={ onSelectPaletteItem }

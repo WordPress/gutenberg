@@ -75,16 +75,24 @@ The function called when the duotone colors change. It is passed the new `value`
 
 Both are omitted whenever no preset is being picked: the custom, unset and clear controls, and deselecting the currently selected preset, which reports `undefined` alone.
 
+### `presentation`: `'listbox' | 'toggle-buttons' | 'command-buttons'`
+
+How options are presented to assistive technology. See `CircularOptionPicker` for details.
+
+- Required: No
+- Default: `listbox`
+
 ### `asButtons`: `boolean`
 
 Whether the control should present as a set of buttons, each with its own tab stop.
 
 - Required: No
 - Default: `false`
+- Deprecated: Use `presentation="toggle-buttons"` instead.
 
 ### `loop`: `boolean`
 
-Prevents keyboard interaction from wrapping around. Only used when `asButtons` is not true.
+Prevents keyboard interaction from wrapping around. Only used when `presentation` is `listbox` (or `asButtons` is not true).
 
 - Required: No
 - Default: `true`

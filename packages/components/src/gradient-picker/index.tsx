@@ -125,6 +125,7 @@ function MultipleOrigin( {
 function Component( props: PickerProps< any > ) {
 	const {
 		asButtons,
+		presentation,
 		loop,
 		actions,
 		headingLevel,
@@ -142,7 +143,8 @@ function Component( props: PickerProps< any > ) {
 		asButtons,
 		loop,
 		ariaLabel,
-		ariaLabelledby
+		ariaLabelledby,
+		presentation
 	);
 
 	return (

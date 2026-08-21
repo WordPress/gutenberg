@@ -45,13 +45,76 @@ describe( 'CircularOptionPicker', () => {
 	} );
 
 	describe( 'when `asButtons` is true', () => {
-		it( 'should render as buttons', async () => {
+		it( 'should render as toggle buttons', async () => {
 			render( <CircularOptionPicker { ...DEFAULT_PROPS } asButtons /> );
 
 			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 			expect( screen.queryByRole( 'option' ) ).not.toBeInTheDocument();
 			expect( screen.getByRole( 'group' ) ).toBeInTheDocument();
 			expect( screen.getByRole( 'button' ) ).toBeInTheDocument();
+			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
+				'aria-pressed',
+				'false'
+			);
+		} );
+	} );
+
+	describe( 'when `presentation` is `listbox`', () => {
+		it( 'should render as a listbox', async () => {
+			render(
+				<CircularOptionPicker
+					{ ...DEFAULT_PROPS }
+					presentation="listbox"
+				/>
+			);
+
+			expect( screen.getByRole( 'listbox' ) ).toBeInTheDocument();
+			expect( screen.getByRole( 'option' ) ).toBeInTheDocument();
+			expect( screen.queryByRole( 'button' ) ).not.toBeInTheDocument();
+		} );
+	} );
+
+	describe( 'when `presentation` is `toggle-buttons`', () => {
+		it( 'should render buttons with a pressed state', async () => {
+			render(
+				<CircularOptionPicker
+					{ ...DEFAULT_PROPS }
+					presentation="toggle-buttons"
+					options={ [
+						<CircularOptionPicker.Option
+							key="option"
+							isSelected
+							aria-label="Selected"
+						/>,
+					] }
+				/>
+			);
+
+			const button = screen.getByRole( 'button', { name: 'Selected' } );
+			expect( screen.getByRole( 'group' ) ).toBeInTheDocument();
+			expect( button ).toHaveAttribute( 'aria-pressed', 'true' );
+		} );
+	} );
+
+	describe( 'when `presentation` is `command-buttons`', () => {
+		it( 'should render buttons without a pressed state', async () => {
+			render(
+				<CircularOptionPicker
+					{ ...DEFAULT_PROPS }
+					presentation="command-buttons"
+					options={ [
+						<CircularOptionPicker.Option
+							key="option"
+							isSelected
+							aria-label="Edit"
+						/>,
+					] }
+				/>
+			);
+
+			const button = screen.getByRole( 'button', { name: 'Edit' } );
+			expect( screen.getByRole( 'group' ) ).toBeInTheDocument();
+			expect( button ).not.toHaveAttribute( 'aria-pressed' );
 		} );
 	} );
 

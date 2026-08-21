@@ -180,6 +180,7 @@ function UnforwardedColorPalette(
 ) {
 	const {
 		asButtons,
+		presentation,
 		loop,
 		clearable = true,
 		colors = [],
@@ -262,7 +263,8 @@ function UnforwardedColorPalette(
 		asButtons,
 		loop,
 		ariaLabel,
-		ariaLabelledby
+		ariaLabelledby,
+		presentation
 	);
 
 	// If disableCustomColors is true and colors.length is 0, return null to avoid rendering an empty palette wrapper.

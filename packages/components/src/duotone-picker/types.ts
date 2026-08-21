@@ -64,15 +64,26 @@ export type DuotonePickerProps = {
 		slug?: string
 	) => void;
 	/**
+	 * How options are presented to assistive technology.
+	 *
+	 * - `listbox`: a composite listbox with selected state.
+	 * - `toggle-buttons`: individual buttons with a pressed state.
+	 * - `command-buttons`: individual buttons without a pressed state.
+	 *
+	 * @default 'listbox'
+	 */
+	presentation?: 'listbox' | 'toggle-buttons' | 'command-buttons';
+	/**
 	 * Whether the control should present as a set of buttons,
 	 * each with its own tab stop.
 	 *
+	 * @deprecated Use `presentation="toggle-buttons"` instead.
 	 * @default false
 	 */
 	asButtons?: boolean;
 	/**
 	 * Prevents keyboard interaction from wrapping around.
-	 * Only used when `asButtons` is not true.
+	 * Only used when `presentation` is `listbox` (or `asButtons` is not true).
 	 *
 	 * @default true
 	 */
