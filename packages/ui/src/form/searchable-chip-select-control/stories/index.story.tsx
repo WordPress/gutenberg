@@ -2,6 +2,10 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 import { SearchableChipSelectControl } from '../';
 import * as SearchableChipSelectStories from '../../primitives/searchable-chip-select/stories/index.story';
+import {
+	WITH_DETAILS_DESCRIPTION,
+	DETAILS_EXAMPLE,
+} from '../../stories/shared';
 
 const meta: Meta< typeof SearchableChipSelectControl > = {
 	tags: [ 'manifest' ],
@@ -44,6 +48,59 @@ export const Default: Story = {
 		...SearchableChipSelectStories.Default.args,
 		label: 'Label',
 		description: 'This is a description.',
+	},
+};
+
+export const VisuallyHiddenLabel: Story = {
+	args: {
+		...Default.args,
+		hideLabelFromVision: true,
+	},
+};
+
+export const WithDetails: Story = {
+	parameters: {
+		docs: { description: { story: WITH_DETAILS_DESCRIPTION } },
+	},
+	args: {
+		...Default.args,
+		description: undefined,
+		details: DETAILS_EXAMPLE,
+	},
+};
+
+/**
+ * Use the `searchPlaceholder` prop to customize the search input placeholder
+ * text. Prefer a concise label without a trailing ellipsis.
+ */
+export const WithCustomSearchPlaceholder: Story = {
+	args: {
+		...Default.args,
+		searchPlaceholder: 'Search fruit',
+	},
+};
+
+const disabledOptionItems = [
+	{
+		value: 'apple',
+		label: 'Apple',
+	},
+	{
+		value: 'banana',
+		label: 'Banana',
+		disabled: true,
+	},
+	{
+		value: 'cherry',
+		label: 'Cherry',
+	},
+];
+
+export const WithDisabledOption: Story = {
+	args: {
+		...Default.args,
+		items: disabledOptionItems,
+		defaultValue: [ disabledOptionItems[ 0 ] ],
 	},
 };
 
@@ -91,6 +148,15 @@ export const Grouped: Story = {
 	args: {
 		...Default.args,
 		...SearchableChipSelectStories.Grouped.args,
+		label: 'Fruit',
+		description: 'Choose your favorite fruits.',
+	},
+};
+
+export const GroupedCreatable: Story = {
+	...SearchableChipSelectStories.GroupedCreatable,
+	args: {
+		...Default.args,
 		label: 'Fruit',
 		description: 'Choose your favorite fruits.',
 	},
