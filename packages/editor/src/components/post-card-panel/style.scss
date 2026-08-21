@@ -33,6 +33,10 @@
 		justify-content: space-between;
 	}
 
+	&__header > .components-button {
+		margin-top: -$grid-unit-05;
+	}
+
 	&.has-description &__header {
 		margin-bottom: $grid-unit-10;
 	}
