@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Use the row block spacing value for Flow and Constrained layouts when Global Styles defines separate row and column values ([#81476](https://github.com/WordPress/gutenberg/pull/81476)).
+-   Generate SVG filters for user-defined duotone presets, not just theme and default ones. A duotone a user had created rendered on the front end but had no filter in the editor, so applying it showed no preview ([#81605](https://github.com/WordPress/gutenberg/pull/81605)).
 
 ### Internal
 

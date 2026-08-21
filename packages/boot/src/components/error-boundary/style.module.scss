@@ -3,7 +3,7 @@
 // The surfaces this sits in are sized by their container, so fill the height
 // available and centre the message in it rather than leaving it at the top of
 // an otherwise empty area.
-.boot-error-boundary {
+.error-boundary {
 	display: flex;
 	align-items: center;
 	justify-content: center;

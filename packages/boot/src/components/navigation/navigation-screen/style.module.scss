@@ -1,34 +1,35 @@
 @use "@wordpress/base-styles/variables";
 
-.boot-navigation-screen {
+.screen {
 	// Avoid cutting off focus ring of the last menu item
 	padding-block-end: variables.$grid-unit-05;
 }
 
-.boot-navigation-screen .components-text {
+.screen :global(.components-text) {
 	color: var(--wpds-color-foreground-content-neutral);
 }
 
-.boot-navigation-screen__title-icon {
+.title-icon {
 	position: sticky;
 	top: 0;
-	padding:
-		variables.$grid-unit-15 variables.$grid-unit-20
-		variables.$grid-unit-10 variables.$grid-unit-20;
+	padding-block-start: variables.$grid-unit-15;
+	padding-inline-end: variables.$grid-unit-20;
+	padding-block-end: variables.$grid-unit-10;
+	padding-inline-start: variables.$grid-unit-20;
 }
 
-.boot-navigation-screen__title {
+.title {
 	flex-grow: 1;
 	overflow-wrap: break-word;
 
 	&#{&},
-	&#{&} .boot-navigation-screen__title {
+	&#{&} .title {
 		line-height: variables.$font-line-height-x-large;
 		color: var(--wpds-color-foreground-content-neutral);
 	}
 }
 
-.boot-navigation-screen__actions {
+.actions {
 	display: flex;
 	flex-shrink: 0;
 }

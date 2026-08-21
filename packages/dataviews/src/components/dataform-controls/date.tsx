@@ -1,4 +1,3 @@
-import clsx from 'clsx';
 import {
 	format,
 	isValid as isValidDate,
@@ -11,7 +10,6 @@ import {
 import {
 	BaseControl,
 	Button,
-	Icon as WCIcon,
 	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
 import { speak } from '@wordpress/a11y';
@@ -24,8 +22,12 @@ import {
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getDate, getSettings } from '@wordpress/date';
-import { error as errorIcon } from '@wordpress/icons';
-import { Calendar, RangeCalendar, Stack } from '@wordpress/ui';
+import {
+	Calendar,
+	RangeCalendar,
+	Stack,
+	ValidityIndicator,
+} from '@wordpress/ui';
 import RelativeDateControl from './utils/relative-date-control';
 import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
 import {
@@ -253,22 +255,10 @@ function ValidatedDateControl< Item >( {
 		<div onBlur={ onBlur }>
 			{ children }
 			{ customValidity && (
-				<p
-					className={ clsx(
-						'components-validated-control__indicator',
-						customValidity.type === 'invalid'
-							? 'is-invalid'
-							: undefined
-					) }
-				>
-					<WCIcon
-						className="components-validated-control__indicator-icon"
-						icon={ errorIcon }
-						size={ 16 }
-						fill="currentColor"
-					/>
-					{ customValidity.message }
-				</p>
+				<ValidityIndicator
+					type={ customValidity.type }
+					message={ customValidity.message }
+				/>
 			) }
 		</div>
 	);
