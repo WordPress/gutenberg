@@ -32,12 +32,6 @@
 	gap: $grid-unit-20;
 	padding: $grid-unit-10 $grid-unit-40 $grid-unit-30;
 	background: $white;
-	// Raised to clear `InterfaceSkeleton`'s sidebar (z-index 100000) when the
-	// editor still used it. The footer is now an ordinary flex sibling with
-	// nothing overlapping it, so both this and the registered token in
-	// base-styles look removable — left in place to keep this change scoped to
-	// the media editor.
-	z-index: z-index(".media-editor-modal__footer");
 
 	// `margin-left: auto` pins the actions to the right edge whether or not
 	// History renders (e.g. non-image attachments show only `SaveActions`).

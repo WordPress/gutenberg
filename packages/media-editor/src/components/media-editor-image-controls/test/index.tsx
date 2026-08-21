@@ -31,7 +31,7 @@ function CurrentState() {
 }
 
 describe( 'MediaEditorImageControls', () => {
-	it( 'renders a flat row of rotate, flip and zoom buttons by default', () => {
+	it( 'renders a flat row of rotate, flip and zoom buttons', () => {
 		setup();
 
 		expect(
