@@ -142,72 +142,11 @@ decide and document compatibility, migration, release, generated-output, and
 consumer implications. Verify CSS and interaction behaviour in a browser where
 unit tests cannot establish cascade order, focus geometry, or portal behaviour.
 
-### Assess bundled and externalized compatibility
-
-For a change to `@wordpress/ui`'s own public API, verify representative existing
-consumer source against the candidate package. Compile its types, build it, and
-exercise the affected behaviour. Migrating Gutenberg call sites proves the new
-contract, but it does not prove whether previously valid consumer code still
-works or has adequate migration guidance.
-
-`@wordpress/ui` is published as a package that applications bundle, while some
-of its `@wordpress/*` dependencies can be provided by WordPress at runtime.
-This allows the UI bundle and the externalized dependency to update on separate
-schedules. A current Gutenberg checkout tests only one of the resulting version
-combinations.
-
-When a change crosses that boundary, name and assess the exact pairings instead
-of relying on the terms "backward" and "forward" alone:
-
-| Bundled `@wordpress/ui` | Externalized dependency | Required result                                                                                                               |
-| ----------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| Old                     | Old                     | Preserve the existing baseline.                                                                                               |
-| Old                     | New                     | The updated dependency preserves the exports and behaviour used by the published UI bundle.                                   |
-| New                     | Old                     | The new UI bundle works with each supported WordPress runtime, or the minimum supported WordPress version changes explicitly. |
-| New                     | New                     | The intended new contract and behaviour work together.                                                                        |
-
-Use the last published version before the change as the old package baseline.
-Include an earlier version when the declared support window requires it. Build
-the new side from the candidate change rather than treating unbuilt source as a
-published artifact. Resolve old externalized dependencies from the WordPress
-versions the consumer supports, and verify the runtime that WordPress actually
-ships rather than relying only on locally installed types.
-
-For every supported pairing, collect evidence at each applicable layer:
-
-1. Install the exact dependency versions together in an isolated consumer.
-2. Compile against their published TypeScript declarations.
-3. Build with the dependency bundled and with WordPress dependency extraction,
-   when both deployments are supported.
-4. Verify the export shape in the corresponding WordPress runtime.
-5. Exercise the affected component behaviour, including its fallback or
-   compatibility route.
-
-Record each layer as `pass`, `fail`, or `unverified`. A unit mock can verify that
-capability detection selects the correct branch, but it does not reproduce a
-duplicate private-API package, dependency extraction, or an older WordPress
-runtime. Use a representative built consumer and real runtime evidence when
-those conditions are material.
-
-The `ThemeProvider` promotion is the relevant precedent:
-
--   [#78958](https://github.com/WordPress/gutenberg/pull/78958) made the API public
-    and removed its private route in the same release.
--   [#79594](https://github.com/WordPress/gutenberg/pull/79594) restored the private
-    route after published bundled consumers broke.
--   [#79620](https://github.com/WordPress/gutenberg/pull/79620) completed the safer
-    transition: the public export became authoritative, the private route remained
-    temporarily available, and `@wordpress/ui` detected which runtime shape was
-    present.
-
-The private API did not become a supported consumer contract; it was a
-time-bounded bridge between independently deployed packages.
-
-If either cross-version pairing fails, keep or add the smallest centralized
-compatibility route. Remove it only after the replacement has shipped through
-the relevant npm and WordPress release channels and every supported pairing is
-verified. If a required pairing cannot be tested, report that gap instead of
-assuming compatibility.
+When a Design System package is bundled while one or more dependencies are
+supplied separately by WordPress, follow the general
+[cross-version package compatibility procedure](/packages/README.md#maintaining-cross-version-compatibility).
+Assess every supported entrypoint and version pairing before removing or
+changing the dependency contract.
 
 Before declaring package work complete, follow the applicable package source
 guidance and account for each relevant contract surface: public

@@ -250,6 +250,88 @@ Content within the HTML comment will be replaced by the generated documentation.
 
 It's very important to have a good plan for what a new package will include. All constants, methods, and components exposed from the package will ultimately become part of the public API in WordPress core (exposed via the `wp` global - eg: `wp.blockEditor`) and as such will need to be supported indefinitely. You should be very selective in what is exposed by your package and [ensure it is well documented](#maintaining-api-documentation).
 
+## Maintaining Cross-Version Compatibility
+
+A published package can be bundled into an application or plugin while one or
+more of its dependencies are supplied separately by WordPress. The bundle and
+its runtime dependencies can then update on different schedules. A current
+Gutenberg checkout tests only one of the resulting version combinations.
+
+Before changing or removing a dependency contract, inspect every documented
+entrypoint and build output. Use package metadata, build configuration,
+dependency extraction, and generated asset data to identify which dependencies
+are bundled, externally supplied, or can be deployed either way. Also identify
+identity-sensitive dependencies such as private API locks, contexts,
+registries, symbols, and other singletons. Two runtime copies can be
+incompatible even when their exports have the same shape.
+
+For a change to the package's own public API, verify representative existing
+consumer source against the candidate package. Compile its published types,
+build it, and exercise the affected behaviour. Migrating repository call sites
+proves the new contract, but not whether previously valid consumer code still
+works or has adequate migration guidance.
+
+For each independently deployed bundle/provider boundary, name and assess the
+exact pairings instead of relying on the terms "backward" and "forward" alone:
+
+| Published bundled package | Independently supplied dependency | Required result                                                                                                                 |
+| ------------------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Old                       | Old                               | Preserve the existing baseline.                                                                                                 |
+| Old                       | New                               | The updated dependency preserves the exports, identity, and behaviour used by the published bundle.                             |
+| New                       | Old                               | The new bundle works with each supported WordPress runtime, or the minimum supported WordPress version changes explicitly.       |
+| New                       | New                               | The intended new contract and behaviour work together.                                                                          |
+
+An affected dependency that always ships in the same artifact does not create
+a cross-version cell. The package's own public API still needs the direct
+consumer check above.
+
+Use the last published version before the change as the old package baseline.
+Include earlier versions when the declared support window requires them. Build
+the new side from the candidate change rather than treating unbuilt source as a
+published artifact. Resolve external dependencies from the WordPress versions
+the consumer supports, and verify what those runtimes actually ship instead of
+relying only on locally installed types.
+
+For every supported pairing and entrypoint, collect evidence at each applicable
+layer:
+
+1. Install the exact dependency versions together in an isolated consumer.
+2. Compile against their published TypeScript declarations.
+3. Build each supported entrypoint with its actual bundling and WordPress
+   dependency extraction configuration.
+4. Verify the corresponding WordPress runtime exports and shared identity.
+5. Exercise the affected behaviour, including any compatibility route.
+
+Record each layer as `pass`, `fail`, or `unverified`. Current repository source
+proves only the new/new cell for its current topology. A mock can verify that
+capability detection selects the correct branch, but it does not reproduce
+dependency extraction, duplicate package identity, or an older WordPress
+runtime.
+
+Two incidents show different forms of this problem:
+
+-   The `ThemeProvider` promotion in [#78958](https://github.com/WordPress/gutenberg/pull/78958)
+    made the API public and removed its private route together. After published
+    bundled consumers broke, [#79594](https://github.com/WordPress/gutenberg/pull/79594)
+    restored the private route. [#79620](https://github.com/WordPress/gutenberg/pull/79620)
+    completed the safer transition with a public export, a temporary private
+    bridge, and runtime capability detection.
+-   The [DataViews cleanup discussion in #81230](https://github.com/WordPress/gutenberg/issues/81230#issuecomment-5358110498)
+    shows that an older bundled `@wordpress/dataviews` can still request a
+    private `@wordpress/components` API after a newer WordPress runtime removes
+    it. A bundled `@wordpress/private-apis` copy also cannot unlock an object
+    created by a different runtime copy. DataViews has a `/wp` entrypoint that
+    bundles a different dependency set, so each supported entrypoint needs its
+    own topology assessment.
+
+A private API bridge does not become a supported consumer contract. Keep or add
+the smallest centralized compatibility route when a required pairing fails,
+and remove it only after the replacement has shipped through the relevant npm
+and WordPress release channels and every supported pairing is verified. If a
+required pairing cannot be tested, report that gap instead of assuming
+compatibility. If compatibility requires dropping a supported WordPress version
+or entrypoint, make that an explicit release decision with migration guidance.
+
 ## Maintaining Changelogs
 
 When maintaining dozens of npm packages, it can be tough to keep track of changes. To simplify the release process, each package includes a `CHANGELOG.md` file which details all published releases and the unreleased ("Unreleased") changes, if any exist.
