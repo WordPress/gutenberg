@@ -642,6 +642,14 @@ export const EditMode: Story = {
 	},
 };
 
+// Human-readable summary of each constrained tile's `itemLimits` entry,
+// rendered inside the tile beside its live width label.
+const LIMIT_LABELS: Record< string, string > = {
+	floor: 'min 320 × 160 px',
+	ceiling: 'max 360 × 200 px',
+	ranged: 'min 200, max 480 wide',
+};
+
 /**
  * Per-item size limits via `itemLimits`, in pixels. The grid quantizes
  * each limit to whole tracks of its current geometry (minimums round
@@ -650,9 +658,11 @@ export const EditMode: Story = {
  * release commits spans inside the limits, so the layout never records
  * a size outside them. Tiles without an entry keep the full range.
  *
- * Resize each constrained tile past its bound to feel the gesture being
- * absorbed; the state panel confirms the committed layout stays inside
- * the limits.
+ * The `'full'` and `'fill'` width modes respect the limits too: use the
+ * per-tile toggles to make the capped tile full- or fill-width and
+ * watch it stop at its maximum span instead of taking the whole row.
+ * The state panel confirms the committed layout stays inside the
+ * limits.
  */
 export const SizeLimits: Story = {
 	name: 'Per-Item Size Limits',
@@ -665,37 +675,96 @@ export const SizeLimits: Story = {
 			ceiling: { maxWidth: 360, maxHeight: 200 },
 			ranged: { minWidth: 200, maxWidth: 480 },
 		},
-		layout: [
-			{ key: 'floor', width: 4, height: 2, order: 1 },
-			{ key: 'ceiling', width: 2, height: 2, order: 2 },
-			{ key: 'ranged', width: 3, height: 1, order: 3 },
-			{ key: 'free', width: 3, height: 1, order: 4 },
-		],
 	},
 	render: function SizeLimitsRender( args ) {
-		const [ layout, setLayout ] = useState< DashboardGridLayoutItem[] >(
-			args.layout
-		);
+		const initialLayout: ( DashboardGridLayoutItem & {
+			tone: Tone;
+		} )[] = [
+			{ key: 'floor', width: 4, height: 2, order: 1, tone: 'info' },
+			{ key: 'ceiling', width: 2, height: 2, order: 2, tone: 'warning' },
+			{ key: 'ranged', width: 3, height: 1, order: 3, tone: 'brand' },
+			{ key: 'free', width: 3, height: 1, order: 4, tone: 'neutral' },
+		];
+
+		const [ tiles, setTiles ] = useState( initialLayout );
 		const [ previewLayout, setPreviewLayout ] = useState<
 			DashboardGridLayoutItem[] | null
 		>( null );
 
-		const tiles = useMemo(
-			() => [
-				<Tile key="floor" tone="info">
-					min 320 × 160 px
-				</Tile>,
-				<Tile key="ceiling" tone="warning">
-					max 360 × 200 px
-				</Tile>,
-				<Tile key="ranged" tone="brand">
-					min 200, max 480 wide
-				</Tile>,
-				<Tile key="free" tone="neutral">
-					no limits
-				</Tile>,
-			],
-			[]
+		const layout: DashboardGridLayoutItem[] = tiles.map(
+			( { tone: _tone, ...item } ) => item
+		);
+
+		const onChangeLayout = ( next: DashboardGridLayoutItem[] ) => {
+			setTiles(
+				next.map( ( item ) => {
+					const existing = tiles.find( ( t ) => t.key === item.key );
+					return {
+						...item,
+						tone: existing?.tone ?? 'neutral',
+					};
+				} )
+			);
+			setPreviewLayout( null );
+		};
+
+		const removeTile = ( key: string ) => {
+			setTiles( tiles.filter( ( tile ) => tile.key !== key ) );
+		};
+
+		const toggleFill = ( key: string ) => {
+			setTiles(
+				tiles.map( ( tile ) =>
+					tile.key === key
+						? {
+								...tile,
+								width:
+									tile.width === 'fill' ? undefined : 'fill',
+						  }
+						: tile
+				)
+			);
+		};
+
+		const toggleFull = ( key: string ) => {
+			setTiles(
+				tiles.map( ( tile ) =>
+					tile.key === key
+						? {
+								...tile,
+								width:
+									tile.width === 'full' ? undefined : 'full',
+						  }
+						: tile
+				)
+			);
+		};
+
+		const tileElements = useMemo(
+			() =>
+				tiles.map( ( tile ) => (
+					<Tile
+						key={ tile.key }
+						tone={ tile.tone }
+						actionableArea={
+							<TileActions
+								isFill={ tile.width === 'fill' }
+								isFull={ tile.width === 'full' }
+								onToggleFill={ () => toggleFill( tile.key ) }
+								onToggleFull={ () => toggleFull( tile.key ) }
+								onRemove={ () => removeTile( tile.key ) }
+							/>
+						}
+					>
+						<span style={ { textAlign: 'center' } }>
+							{ formatTileLabel( tile ) }
+							<br />
+							{ LIMIT_LABELS[ tile.key ] ?? 'no limits' }
+						</span>
+					</Tile>
+				) ),
+			// eslint-disable-next-line react-hooks/exhaustive-deps
+			[ tiles ]
 		);
 
 		return (
@@ -704,13 +773,10 @@ export const SizeLimits: Story = {
 					<DashboardGrid
 						{ ...args }
 						layout={ layout }
-						onChangeLayout={ ( next ) => {
-							setLayout( next );
-							setPreviewLayout( null );
-						} }
+						onChangeLayout={ onChangeLayout }
 						onPreviewLayout={ setPreviewLayout }
 					>
-						{ tiles }
+						{ tileElements }
 					</DashboardGrid>
 				</div>
 
