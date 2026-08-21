@@ -397,17 +397,30 @@ function MediaEditorContent( {
 	// canvas and the modal's gutters, so it starts above `large` (960px). At
 	// `medium` (782px) the panel was clipped by the modal's right edge.
 	//
-	// The choice is not remembered between openings: the modal is transient,
-	// and re-opening with the panel hidden on a wide screen is how #81487 read
-	// to people in the first place.
+	// The choice is not carried across openings: the modal is transient, and
+	// re-opening with the panel hidden on a wide screen is how #81487 read to
+	// people in the first place. Within one opening it does hold — see
+	// `hasChosenPanelRef` below.
 	const isWide = useViewportMatch( 'large' );
 	// `null` when nothing is open, otherwise the open panel's id.
 	const [ activePanel, setActivePanel ] = useState< string | null >(
 		isWide ? DETAILS_PANEL : null
 	);
-	// Follow the breakpoint when it changes, so dragging a window narrow hands
-	// the canvas the full width instead of leaving a panel wedged beside it.
+	// Width picks the starting panel, but only until the user picks one. After
+	// that their choice holds for the rest of the session: closing the panel
+	// and then resizing — or crossing the breakpoint by rotating a tablet —
+	// should not reopen something they just dismissed.
+	const hasChosenPanelRef = useRef( false );
+	const selectPanel = useCallback( ( panel: string | null ) => {
+		hasChosenPanelRef.current = true;
+		setActivePanel( panel );
+	}, [] );
+	// Until then, follow the breakpoint: dragging a window narrow hands the
+	// canvas the full width instead of leaving a panel wedged beside it.
 	useEffect( () => {
+		if ( hasChosenPanelRef.current ) {
+			return;
+		}
 		setActivePanel( isWide ? DETAILS_PANEL : null );
 	}, [ isWide ] );
 	// Keyboard shortcuts are a pointer-and-keyboard affordance and the header
@@ -686,7 +699,7 @@ function MediaEditorContent( {
 		isWide,
 		showKeyboardShortcuts,
 		activePanel,
-		onSelectPanel: setActivePanel,
+		onSelectPanel: selectPanel,
 		onCancel: handleRequestClose,
 		onSave: saveMediaEditor,
 		onReset: resetCropOptions,
