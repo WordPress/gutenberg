@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { forwardRef, useRef } from '@wordpress/element';
-import { ControlWithError } from '../control-with-error';
+import { ControlWithError } from '@wordpress/ui';
 import type { ValidatedControlProps } from './types';
 import ContentEditableControl from '../../content-editable-control';
 
@@ -34,6 +34,7 @@ const UnforwardedValidatedContentEditableControl = (
 	return (
 		<div className="components-validated-control__wrapper-with-error-delegate">
 			<ControlWithError
+				className="components-validated-control"
 				required={ required }
 				markWhenOptional={ markWhenOptional }
 				customValidity={ customValidity }
