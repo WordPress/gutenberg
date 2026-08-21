@@ -106,10 +106,11 @@
 			"uuid": "^11.1.1"
 		},
 		"lerna": {
-			"js-yaml": "4.3.1"
+			"js-yaml": "4.3.2",
+			"pacote": "21.5.1"
 		},
 		"markdownlint-cli": {
-			"js-yaml": "~4.3.1",
+			"js-yaml": "~4.3.2",
 			"markdown-it": "~14.3.0",
 			"run-con": "1.3.2"
 		}
