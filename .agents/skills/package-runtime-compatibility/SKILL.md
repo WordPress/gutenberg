@@ -53,10 +53,24 @@ version.
 
 -   Prefer adding the replacement, migrating maintained consumers, and removing
     the old route only after every supported matrix cell is verified.
--   Keep a compatibility bridge when an old bundle must run with a new provider,
-    or a new bundle must run with an old provider. Centralize capability
-    detection or adaptation rather than spreading version checks through the
-    package.
+-   Bridge the end responsible for each supported skew direction. When both
+    directions are supported and old and new routes can safely coexist, use a
+    bidirectional overlap window:
+    1. The provider exposes the new route and retains the old route as a
+       deprecated bridge. This supports old bundles with the new provider.
+    2. The new consumer prefers the new route and falls back to the old route by
+       capability detection. This supports new bundles with the old provider.
+    3. Both sides test their route, prevent new direct use of the deprecated
+       route outside the centralized fallback, and publish before either bridge
+       is removed.
+-   Detect capabilities from the actual exports rather than version strings.
+    Centralize the fallback or adapter in the consuming package.
+-   Treat removal of the provider bridge and consumer fallback as separate
+    release events. Remove each only after its supported pairings and release
+    channels no longer need it.
+-   Verify that the old route can cross the real deployment boundary. A bridge
+    tied to package identity, such as a private API lock, can still fail across
+    duplicate runtime copies even when the export remains present.
 -   Do not treat a private or pre-1.0 label as proof that a removal is harmless.
     Assess published packages that carry or consume the dependency.
 -   If compatibility requires dropping a supported version or entrypoint, make

@@ -308,14 +308,41 @@ capability detection selects the correct branch, but it does not reproduce
 dependency extraction, duplicate package identity, or an older WordPress
 runtime.
 
+### Use a bidirectional overlap window
+
+Bridge the end responsible for each supported skew direction. When both
+directions are supported and the old and new routes can safely coexist, use a
+bidirectional overlap window:
+
+1. The provider exposes the new route and keeps the old route as a deprecated,
+   time-bounded bridge. This lets an old bundle run with the new provider.
+2. The new consumer prefers the new route and falls back to the old route when
+   the provider does not expose the replacement. This lets a new bundle run
+   with the old provider.
+3. Both packages test their route, prevent new direct use of the deprecated
+   route outside the centralized fallback, and publish through the relevant
+   release channels before either bridge is removed.
+
+Detect capabilities from actual exports instead of comparing version strings.
+Centralize the fallback or adapter in the consuming package. Treat removal of
+the provider bridge and consumer fallback as separate release events, and
+remove each only after its supported pairings no longer need it.
+
+Verify the overlap with the real artifacts and runtime. An identity-bound route,
+such as a private API lock, can still fail across duplicate package copies even
+when the provider retains the export. In that case, use a different adapter or
+make the supported entrypoint or version change explicit.
+
 Two incidents show different forms of this problem:
 
 -   The `ThemeProvider` promotion in [#78958](https://github.com/WordPress/gutenberg/pull/78958)
     made the API public and removed its private route together. After published
     bundled consumers broke, [#79594](https://github.com/WordPress/gutenberg/pull/79594)
     restored the private route. [#79620](https://github.com/WordPress/gutenberg/pull/79620)
-    completed the safer transition with a public export, a temporary private
-    bridge, and runtime capability detection.
+    completed the safer transition: `@wordpress/theme` exposed both routes with
+    the private route scheduled for removal in WordPress 7.3, while
+    `@wordpress/ui` preferred the public export and fell back to the private
+    route on older runtimes.
 -   The [DataViews cleanup discussion in #81230](https://github.com/WordPress/gutenberg/issues/81230#issuecomment-5358110498)
     shows that an older bundled `@wordpress/dataviews` can still request a
     private `@wordpress/components` API after a newer WordPress runtime removes
