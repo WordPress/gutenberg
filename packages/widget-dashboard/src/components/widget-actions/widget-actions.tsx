@@ -55,6 +55,7 @@ export function WidgetActions( {
 						{ actions.map( ( action ) => (
 							<Menu.LinkItem
 								key={ action.id }
+								closeOnClick
 								prefix={
 									action.icon ? (
 										<Icon icon={ action.icon } />
