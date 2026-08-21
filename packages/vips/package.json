@@ -58,6 +58,10 @@
 		"@wordpress/worker-threads": "file:../worker-threads",
 		"wasm-vips": "^0.0.18"
 	},
+	"devDependencies": {
+		"@types/jest": "^30.0.0",
+		"@types/node": "^20.19.39"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

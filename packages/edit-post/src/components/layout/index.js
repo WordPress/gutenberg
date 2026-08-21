@@ -4,7 +4,6 @@ import {
 	AutosaveMonitor,
 	LocalAutosaveMonitor,
 	UnsavedChangesWarning,
-	EditorKeyboardShortcutsRegister,
 	ErrorBoundary,
 	PostLockedModal,
 	store as editorStore,
@@ -26,7 +25,6 @@ import { chevronDown, chevronUp } from '@wordpress/icons';
 import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { privateApis as commandsPrivateApis } from '@wordpress/commands';
-import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
@@ -63,7 +61,6 @@ const { useCommandContext } = unlock( commandsPrivateApis );
 const { useDrag } = unlock( componentsPrivateApis );
 const { Editor, FullscreenMode, UploadProgressSnackbar } =
 	unlock( editorPrivateApis );
-const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 const DESIGN_POST_TYPES = [
 	'wp_template',
 	'wp_template_part',
@@ -593,8 +590,6 @@ function Layout( {
 								<AutosaveMonitor />
 								<LocalAutosaveMonitor />
 								<EditPostKeyboardShortcuts />
-								<EditorKeyboardShortcutsRegister />
-								<BlockKeyboardShortcuts />
 								{ currentPostType === 'wp_block' && (
 									<InitPatternModal />
 								) }

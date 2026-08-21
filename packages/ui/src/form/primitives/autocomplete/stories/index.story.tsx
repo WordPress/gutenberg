@@ -6,7 +6,6 @@ import * as Autocomplete from '../index';
 import { Icon } from '../../../../icon';
 import { Input } from '../../input';
 import { InputLayout } from '../../input-layout';
-import { Textarea } from '../../textarea';
 import {
 	COMMANDS,
 	EMOJI_GROUPS,
@@ -18,6 +17,7 @@ import {
 } from './fixtures';
 
 const meta: Meta< typeof Autocomplete.Root > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/Primitives/Autocomplete',
 	component: Autocomplete.Root,
 	subcomponents: {
@@ -39,9 +39,8 @@ const meta: Meta< typeof Autocomplete.Root > = {
 	},
 	parameters: {
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components`, overlays compatibility, and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
@@ -56,11 +55,7 @@ export const Default: Story = {
 	args: {
 		items: URLS,
 		children: [
-			<Autocomplete.Input
-				placeholder="Enter a URL"
-				type="url"
-				key="input"
-			/>,
+			<Autocomplete.Input placeholder="Enter a URL" key="input" />,
 			<Autocomplete.Popup key="popup">
 				<Autocomplete.Empty>No matching items.</Autocomplete.Empty>
 				<Autocomplete.List>
@@ -109,7 +104,7 @@ export const OpenOnlyOnMatch: Story = {
 				} }
 				filteredItems={ filteredItems }
 			>
-				<Autocomplete.Input placeholder="Enter a URL" type="url" />
+				<Autocomplete.Input placeholder="Enter a URL" />
 				<Autocomplete.Popup>
 					<Autocomplete.List>
 						<Autocomplete.ListBody>
@@ -157,7 +152,7 @@ export const AsyncItems: Story = {
 					}, 500 );
 				} }
 			>
-				<Autocomplete.Input placeholder="Enter a URL" type="url" />
+				<Autocomplete.Input placeholder="Enter a URL" />
 				<Autocomplete.Popup>
 					<Autocomplete.Empty>
 						{ loading ? 'Loading...' : 'No matching items.' }
@@ -235,7 +230,6 @@ export const WithSearchIconAndClearButton: Story = {
 			<Autocomplete.InputGroup key="inputGroup">
 				<Autocomplete.Input
 					placeholder="Search URLs"
-					type="url"
 					render={
 						<Input
 							prefix={
@@ -274,11 +268,11 @@ export const WithSearchIconAndClearButton: Story = {
 };
 
 /**
- * Experimental: Textarea with inline autocomplete triggered by `@`.
+ * Experimental: Inline autocomplete triggered by `@`.
  */
-export const TextareaInlineAutocomplete: Story = {
+export const InlineMentionAutocomplete: Story = {
 	render: function Template() {
-		const textareaRef = useRef< HTMLTextAreaElement >( null );
+		const inputRef = useRef< HTMLInputElement >( null );
 		const [ value, setValue ] = useState( '' );
 		const [ open, setOpen ] = useState( false );
 		const [ filteredItems, setFilteredItems ] = useState< FixtureItem[] >(
@@ -327,23 +321,20 @@ export const TextareaInlineAutocomplete: Story = {
 
 				const caretPos = before.length + inserted.length;
 				requestAnimationFrame( () => {
-					textareaRef.current?.setSelectionRange(
-						caretPos,
-						caretPos
-					);
-					textareaRef.current?.focus();
+					inputRef.current?.setSelectionRange( caretPos, caretPos );
+					inputRef.current?.focus();
 				} );
 				return;
 			}
 
 			setValue( newValue );
 
-			const textarea = textareaRef.current;
-			if ( ! textarea ) {
+			const input = inputRef.current;
+			if ( ! input ) {
 				return;
 			}
 
-			const caretPos = textarea.selectionStart ?? 0;
+			const caretPos = input.selectionStart ?? 0;
 			const detected = findTrigger( newValue, caretPos );
 
 			if ( detected ) {
@@ -379,12 +370,8 @@ export const TextareaInlineAutocomplete: Story = {
 				autoHighlight
 			>
 				<Autocomplete.Input
-					render={
-						<Textarea
-							ref={ textareaRef }
-							placeholder="Type @ to mention someone"
-						/>
-					}
+					ref={ inputRef }
+					placeholder="Type @ to mention someone"
 				/>
 
 				<Autocomplete.Popup>
@@ -429,11 +416,7 @@ export const WithCustomZIndex: Story = {
 	args: {
 		items: URLS,
 		children: [
-			<Autocomplete.Input
-				placeholder="Enter a URL"
-				type="url"
-				key="input"
-			/>,
+			<Autocomplete.Input placeholder="Enter a URL" key="input" />,
 			<Autocomplete.Popup
 				portal={
 					<Autocomplete.Portal

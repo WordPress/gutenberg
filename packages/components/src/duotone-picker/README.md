@@ -57,12 +57,23 @@ Array of duotone presets of the form `{ colors: [ '#000000', '#ffffff' ], name: 
 
 An array of colors for the duotone effect.
 
+### `selectedSlug`
+
+-   Type: `string`
+-   Required: No
+
+The slug of the selected duotone preset. When a non-empty `selectedSlug` is given, selection is decided strictly by slug, which keeps two presets holding the same pair of colors apart. Presets whose slug does not match will not appear selected in this mode, even if their colors match `value`.
+
+An empty string is treated the same as `undefined`: selection falls back to matching by color value.
+
 ### `onChange`
 
--   Type: `Function`
+-   Type: `(value: string[] | 'unset' | undefined, index?: number | undefined, slug?: string | undefined) => void`
 -   Required: Yes
 
-Callback which is called when the duotone colors change.
+The function called when the duotone colors change. It is passed the new `value` as an argument. When a preset from `duotonePalette` is picked, the second argument is its index and the third is its slug.
+
+Both are omitted whenever no preset is being picked: the custom, unset and clear controls, and deselecting the currently selected preset, which reports `undefined` alone.
 
 ### `asButtons`: `boolean`
 
