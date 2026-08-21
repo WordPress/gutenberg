@@ -12,7 +12,7 @@ import {
 	ToolbarGroup,
 	TextControl,
 	ExternalLink,
-	__experimentalInputControl as InputControl,
+	__experimentalInputControl as WCInputControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -88,7 +88,7 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 						onSubmit={ onSubmitURL }
 						className="wp-block-rss__placeholder-form"
 					>
-						<InputControl
+						<WCInputControl
 							label={ label }
 							type="url"
 							hideLabelFromVision
