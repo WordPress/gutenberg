@@ -1364,11 +1364,6 @@
 			"count": 2
 		}
 	},
-	"packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
 	"packages/editor/src/components/post-template/create-new-template-modal.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
