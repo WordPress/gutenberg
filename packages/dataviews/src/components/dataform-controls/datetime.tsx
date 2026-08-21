@@ -1,3 +1,4 @@
+import { isSameMonth } from 'date-fns';
 import {
 	BaseControl,
 	privateApis as componentsPrivateApis,
@@ -10,6 +11,7 @@ import { Calendar, Stack } from '@wordpress/ui';
 import type { DataFormControlProps, FormatDatetime } from '../../types';
 import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../../constants';
 import RelativeDateControl from './utils/relative-date-control';
+import toCalendarDate from './utils/to-calendar-date';
 import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
 import getCustomValidity from './utils/get-custom-validity';
 import parseDateTime from '../../field-types/utils/parse-date-time';
@@ -58,11 +60,33 @@ function CalendarDateTimeControl< Item >( {
 		},
 		[ getCalendarDate ]
 	);
+	const isSameCalendarMonth = useCallback(
+		( first: Date, second: Date ) =>
+			usesUTCCalendarFrame
+				? first.getUTCFullYear() === second.getUTCFullYear() &&
+				  first.getUTCMonth() === second.getUTCMonth()
+				: isSameMonth(
+						toCalendarDate( first, timeZone ),
+						toCalendarDate( second, timeZone )
+				  ),
+		[ timeZone, usesUTCCalendarFrame ]
+	);
 
 	const [ calendarMonth, setCalendarMonth ] = useState< Date >( () => {
 		const parsedDate = parseCalendarDateTime( value );
 		return parsedDate || getCalendarDate( new Date() );
 	} );
+	// Follow external value changes in the same timezone frame as the calendar.
+	useEffect( () => {
+		const parsedDate = parseCalendarDateTime( value );
+		if ( parsedDate ) {
+			setCalendarMonth( ( currentMonth ) =>
+				isSameCalendarMonth( parsedDate, currentMonth )
+					? currentMonth
+					: parsedDate
+			);
+		}
+	}, [ isSameCalendarMonth, parseCalendarDateTime, value ] );
 
 	const inputControlRef = useRef< HTMLInputElement >( null );
 	const validationTimeoutRef =
@@ -254,4 +278,3 @@ export default function DateTime< Item >( {
 		/>
 	);
 }
-

@@ -71,6 +71,22 @@ const startOfUTCMonth = ( date: Date ) =>
 const startOfUTCYear = ( date: Date ) =>
 	new Date( Date.UTC( date.getUTCFullYear(), 0, 1 ) );
 
+const getUTCMonthIndex = ( date: Date ) =>
+	date.getUTCFullYear() * 12 + date.getUTCMonth();
+
+const isSameUTCMonth = ( first: Date, second: Date ) =>
+	getUTCMonthIndex( first ) === getUTCMonthIndex( second );
+
+const isUTCMonthWithinRange = ( month: Date, from: Date, to: Date ) => {
+	const monthIndex = getUTCMonthIndex( month );
+	const fromIndex = getUTCMonthIndex( from );
+	const toIndex = getUTCMonthIndex( to );
+	return (
+		monthIndex >= Math.min( fromIndex, toIndex ) &&
+		monthIndex <= Math.max( fromIndex, toIndex )
+	);
+};
+
 const DATE_PRESETS: {
 	id: string;
 	label: string;
@@ -329,6 +345,18 @@ function CalendarDateControl< Item >( {
 		const parsedDate = parseDate( value );
 		return parsedDate || getBrowserToday(); // Default to current month
 	} );
+	// Follow external value changes, such as undo, reset, or switching the
+	// edited item. Both dates are already in the calendar's UTC frame.
+	useEffect( () => {
+		const parsedDate = parseDate( value );
+		if ( parsedDate ) {
+			setCalendarMonth( ( currentMonth ) =>
+				isSameUTCMonth( parsedDate, currentMonth )
+					? currentMonth
+					: parsedDate
+			);
+		}
+	}, [ value ] );
 
 	const [ isTouched, setIsTouched ] = useState( false );
 	const validityTargetRef = useRef< HTMLInputElement >( null );
@@ -540,6 +568,24 @@ function CalendarDateRangeControl< Item >( {
 	const [ calendarMonth, setCalendarMonth ] = useState< Date >( () => {
 		return selectedRange?.from || getBrowserToday();
 	} );
+	// Follow external range changes while keeping the current view when it
+	// already contains an endpoint or falls between the range endpoints.
+	const [ fromValue, toValue ] = value ?? [];
+	useEffect( () => {
+		setCalendarMonth( ( currentMonth ) => {
+			const from = parseDate( fromValue );
+			const to = parseDate( toValue );
+			const targetMonth = from ?? to;
+			const isRangeVisible =
+				from && to
+					? isUTCMonthWithinRange( currentMonth, from, to )
+					: [ from, to ].some(
+							( date ) =>
+								date && isSameUTCMonth( date, currentMonth )
+					  );
+			return targetMonth && ! isRangeVisible ? targetMonth : currentMonth;
+		} );
+	}, [ fromValue, toValue ] );
 
 	const [ isTouched, setIsTouched ] = useState( false );
 	const fromInputRef = useRef< HTMLInputElement >( null );
@@ -770,4 +816,3 @@ export default function DateControl< Item >( {
 		/>
 	);
 }
-

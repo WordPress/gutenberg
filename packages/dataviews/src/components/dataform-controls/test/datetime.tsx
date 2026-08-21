@@ -17,6 +17,11 @@ const fields: Field< TestItem >[] = [
 
 const form = { fields: [ 'publishedAt' ] };
 
+const noop = () => {};
+
+const getMonthGrid = ( monthLabel: string ) =>
+	screen.getByRole( 'grid', { name: monthLabel } );
+
 function ControlledDataForm( { initialValue }: { initialValue: string } ) {
 	const [ item, setItem ] = useState< TestItem >( {
 		id: 1,
@@ -42,6 +47,75 @@ describe( 'dataform-controls/datetime', () => {
 		jest.useRealTimers();
 	} );
 
+	it( 'moves the calendar to an externally changed value', () => {
+		const { rerender } = render(
+			<DataForm
+				data={ {
+					id: 1,
+					publishedAt: '2024-03-15T10:30:00.000Z',
+				} }
+				fields={ fields }
+				form={ form }
+				onChange={ noop }
+			/>
+		);
+
+		expect( getMonthGrid( 'March 2024' ) ).toBeInTheDocument();
+
+		rerender(
+			<DataForm
+				data={ {
+					id: 1,
+					publishedAt: '2024-11-20T10:30:00.000Z',
+				} }
+				fields={ fields }
+				form={ form }
+				onChange={ noop }
+			/>
+		);
+
+		expect( getMonthGrid( 'November 2024' ) ).toBeInTheDocument();
+	} );
+
+	it( 'compares external month changes in the named site timezone', () => {
+		setSettings( {
+			...originalSettings,
+			timezone: {
+				offset: 14,
+				offsetFormatted: '14',
+				string: 'Pacific/Kiritimati',
+				abbr: '+14',
+			},
+		} );
+		const { rerender } = render(
+			<DataForm
+				data={ {
+					id: 1,
+					publishedAt: '2026-02-15T10:00:00.000Z',
+				} }
+				fields={ fields }
+				form={ form }
+				onChange={ noop }
+			/>
+		);
+
+		expect( getMonthGrid( 'February 2026' ) ).toBeInTheDocument();
+
+		rerender(
+			<DataForm
+				data={ {
+					id: 1,
+					publishedAt: '2026-02-28T12:00:00.000Z',
+				} }
+				fields={ fields }
+				form={ form }
+				onChange={ noop }
+			/>
+		);
+
+		expect( getMonthGrid( 'March 2026' ) ).toBeInTheDocument();
+	} );
+
 	/**
 	 * Jest pins the browser timezone to UTC, so the mismatch is created from
 	 * the WordPress side. A site configured with a manual UTC offset — which is
@@ -63,6 +137,37 @@ describe( 'dataform-controls/datetime', () => {
 	}
 
 	describe( 'manual UTC offsets', () => {
+		it( 'moves to the site month after an external value change', () => {
+			setSiteOffset( 14 );
+			const { rerender } = render(
+				<DataForm
+					data={ {
+						id: 1,
+						publishedAt: '2026-02-15T10:00:00.000Z',
+					} }
+					fields={ fields }
+					form={ form }
+					onChange={ noop }
+				/>
+			);
+
+			expect( getMonthGrid( 'February 2026' ) ).toBeInTheDocument();
+
+			rerender(
+				<DataForm
+					data={ {
+						id: 1,
+						publishedAt: '2026-02-28T12:00:00.000Z',
+					} }
+					fields={ fields }
+					form={ form }
+					onChange={ noop }
+				/>
+			);
+
+			expect( getMonthGrid( 'March 2026' ) ).toBeInTheDocument();
+		} );
+
 		// A negative offset puts the site behind UTC, so the clicked day's midnight
 		// lands on the previous day when it is re-anchored to the site timezone.
 		it.each( [ -8, -5, 5.5, 9 ] )(
@@ -183,4 +288,3 @@ describe( 'dataform-controls/datetime', () => {
 		).toBeInTheDocument();
 	} );
 } );
-

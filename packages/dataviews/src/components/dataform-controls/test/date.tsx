@@ -6,7 +6,12 @@ import DataForm from '../../../dataform';
 import type { DataFormControlProps, Field } from '../../../types';
 import DateControl, { parseDate } from '../date';
 
-type TestItem = { id: number; publishedOn: string };
+type TestItem = { id: number; publishedOn?: string };
+
+const noop = () => {};
+
+const getMonthGrid = ( monthLabel: string ) =>
+	screen.getByRole( 'grid', { name: monthLabel } );
 
 const fields: Field< TestItem >[] = [
 	{
@@ -51,10 +56,14 @@ const dateRangeFields: Field< DateRangeTestItem >[] = [
 	},
 ];
 
-function ControlledDateRangeDataForm() {
+function ControlledDateRangeDataForm( {
+	initialValue = [ '2026-08-20', '2026-08-22' ],
+}: {
+	initialValue?: [ string, string ];
+} ) {
 	const [ item, setItem ] = useState< DateRangeTestItem >( {
 		id: 1,
-		publishedOn: [ '2026-08-20', '2026-08-22' ],
+		publishedOn: initialValue,
 	} );
 	return (
 		<DataForm
@@ -73,6 +82,216 @@ describe( 'dataform-controls/date', () => {
 
 	afterEach( () => {
 		setSettings( originalSettings );
+	} );
+
+	it( 'moves the calendar to an externally changed value', () => {
+		const { rerender } = render(
+			<DataForm
+				data={ { id: 1, publishedOn: '2024-03-15' } }
+				fields={ fields }
+				form={ form }
+				onChange={ noop }
+			/>
+		);
+
+		expect( getMonthGrid( 'March 2024' ) ).toBeInTheDocument();
+
+		rerender(
+			<DataForm
+				data={ { id: 1, publishedOn: '2024-11-15' } }
+				fields={ fields }
+				form={ form }
+				onChange={ noop }
+			/>
+		);
+
+		expect( getMonthGrid( 'November 2024' ) ).toBeInTheDocument();
+	} );
+
+	it( 'keeps the displayed month when an external change clears the value', () => {
+		const { rerender } = render(
+			<DataForm
+				data={ { id: 1, publishedOn: '2024-03-15' } }
+				fields={ fields }
+				form={ form }
+				onChange={ noop }
+			/>
+		);
+
+		rerender(
+			<DataForm
+				data={ { id: 1 } }
+				fields={ fields }
+				form={ form }
+				onChange={ noop }
+			/>
+		);
+
+		expect( getMonthGrid( 'March 2024' ) ).toBeInTheDocument();
+	} );
+
+	it( 'moves the calendar to an externally changed range', () => {
+		const { rerender } = render(
+			<DataForm
+				data={
+					{
+						id: 1,
+						publishedOn: [ '2024-03-10', '2024-03-20' ],
+					} as DateRangeTestItem
+				}
+				fields={ dateRangeFields }
+				form={ form }
+				onChange={ noop }
+			/>
+		);
+
+		expect( getMonthGrid( 'March 2024' ) ).toBeInTheDocument();
+
+		rerender(
+			<DataForm
+				data={
+					{
+						id: 1,
+						publishedOn: [ '2024-11-05', '2024-11-25' ],
+					} as DateRangeTestItem
+				}
+				fields={ dateRangeFields }
+				form={ form }
+				onChange={ noop }
+			/>
+		);
+
+		expect( getMonthGrid( 'November 2024' ) ).toBeInTheDocument();
+	} );
+
+	it( 'keeps the displayed month while selecting a cross-month range', async () => {
+		const user = userEvent.setup();
+		render(
+			<ControlledDateRangeDataForm
+				initialValue={ [ '2024-03-10', '2024-03-12' ] }
+			/>
+		);
+
+		await user.click(
+			screen.getByRole( 'button', { name: /march 20, 2024/i } )
+		);
+		await user.click(
+			screen.getByRole( 'button', { name: /next month/i } )
+		);
+		expect( getMonthGrid( 'April 2024' ) ).toBeInTheDocument();
+
+		await user.click(
+			screen.getByRole( 'button', { name: /april 1, 2024/i } )
+		);
+
+		expect( getMonthGrid( 'April 2024' ) ).toBeInTheDocument();
+	} );
+
+	it( 'keeps the displayed month when it falls within an external range', () => {
+		const { rerender } = render(
+			<DataForm
+				data={
+					{
+						id: 1,
+						publishedOn: [ '2026-02-10', '2026-02-15' ],
+					} as DateRangeTestItem
+				}
+				fields={ dateRangeFields }
+				form={ form }
+				onChange={ noop }
+			/>
+		);
+
+		rerender(
+			<DataForm
+				data={
+					{
+						id: 1,
+						publishedOn: [ '2026-01-10', '2026-03-20' ],
+					} as DateRangeTestItem
+				}
+				fields={ dateRangeFields }
+				form={ form }
+				onChange={ noop }
+			/>
+		);
+
+		expect( getMonthGrid( 'February 2026' ) ).toBeInTheDocument();
+	} );
+
+	it( 'moves to an external value across a month boundary with a named site timezone', () => {
+		setSettings( {
+			...originalSettings,
+			timezone: {
+				offset: 14,
+				offsetFormatted: '14',
+				string: 'Pacific/Kiritimati',
+				abbr: '+14',
+			},
+		} );
+		const { rerender } = render(
+			<DataForm
+				data={ { id: 1, publishedOn: '2026-02-15' } }
+				fields={ fields }
+				form={ form }
+				onChange={ noop }
+			/>
+		);
+
+		rerender(
+			<DataForm
+				data={ { id: 1, publishedOn: '2026-03-01' } }
+				fields={ fields }
+				form={ form }
+				onChange={ noop }
+			/>
+		);
+
+		expect( getMonthGrid( 'March 2026' ) ).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: /march 1, 2026/i } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'moves to an external range across a month boundary with a named site timezone', () => {
+		setSettings( {
+			...originalSettings,
+			timezone: {
+				offset: 14,
+				offsetFormatted: '14',
+				string: 'Pacific/Kiritimati',
+				abbr: '+14',
+			},
+		} );
+		const { rerender } = render(
+			<DataForm
+				data={
+					{
+						id: 1,
+						publishedOn: [ '2026-02-10', '2026-02-15' ],
+					} as DateRangeTestItem
+				}
+				fields={ dateRangeFields }
+				form={ form }
+				onChange={ noop }
+			/>
+		);
+
+		rerender(
+			<DataForm
+				data={
+					{
+						id: 1,
+						publishedOn: [ '2026-03-01', '2026-03-05' ],
+					} as DateRangeTestItem
+				}
+				fields={ dateRangeFields }
+				form={ form }
+				onChange={ noop }
+			/>
+		);
+
+		expect( getMonthGrid( 'March 2026' ) ).toBeInTheDocument();
 	} );
 
 	// Jest pins the browser timezone to UTC, so the mismatch is created from the
@@ -206,4 +425,3 @@ describe( 'dataform-controls/date', () => {
 		).toBe( '2026-08-25' );
 	} );
 } );
-
