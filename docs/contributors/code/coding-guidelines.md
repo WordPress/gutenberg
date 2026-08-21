@@ -72,7 +72,7 @@ Examples of styles that appear in both the theme and the editor include gallery 
 
 ## JavaScript
 
-All new code in Gutenberg is expected to be written in [TypeScript](https://www.typescriptlang.org/), with a `.ts` file extension, or a `.tsx` file extension for files including JSX syntax. The exception to this rule is JavaScript code which is expected to be run directly in the browser or by Node.js in environments where TypeScript syntax is not supported. Note that as of Node.js v22.18.0 and newer, [TypeScript files containing erasable syntax can be executed directly by the Node.js runtime](https://nodejs.org/learn/typescript/run-natively).
+All new code in Gutenberg should be written in [TypeScript](https://www.typescriptlang.org/), with a `.ts` file extension, or a `.tsx` file extension for files including JSX syntax. The exception to this rule is JavaScript code which is expected to be run directly in the browser or by Node.js in environments where TypeScript syntax is not supported. Note that as of Node.js v22.18.0 and newer, [TypeScript files containing erasable syntax can be executed directly by the Node.js runtime](https://nodejs.org/learn/typescript/run-natively).
 
 JavaScript in Gutenberg uses modern language features of the [ECMAScript language specification](https://www.ecma-international.org/ecma-262/) as well as the [JSX language syntax extension](https://react.dev/learn/writing-markup-with-jsx). These are enabled through a combination of preset configurations, notably [`@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default) which is used as a preset in the project's [Babel](https://babeljs.io/) configuration.
 
