@@ -1,19 +1,15 @@
-/**
- * Internal copy of the validated-form-controls foundation, pending its
- * planned move to `@wordpress/ui` (see
- * https://github.com/WordPress/gutenberg/issues/81230). Once `ControlWithError`
- * ships there, this file should be replaced with a re-export.
- */
+import { mergeProps, useRender } from '@base-ui/react';
 import { __ } from '@wordpress/i18n';
 import {
 	cloneElement,
 	forwardRef,
 	useEffect,
 	useId,
+	useRef,
 	useState,
 } from '@wordpress/element';
-import type { ValidatedControlProps } from './types';
-import { ValidityIndicator } from './validity-indicator';
+import type { ControlWithErrorProps, ValidityTarget } from './types';
+import { ValidityIndicator } from '../validity-indicator';
 
 function appendRequiredIndicator(
 	label: React.ReactNode,
@@ -43,54 +39,31 @@ function appendRequiredIndicator(
 }
 
 const VALIDITY_VISIBLE_ATTRIBUTE = 'data-validity-visible';
-const className = 'dataviews-validated-control';
 
 /**
- * HTML elements that support the Constraint Validation API.
+ * A wrapper that adds inline validation feedback to a form control, based on
+ * the native Constraint Validation API.
  *
- * Here, we exclude HTMLButtonElement because although it does technically support the API,
- * normal buttons are actually exempted from any validation.
- * @see https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Forms/Form_validation
- * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLButtonElement/willValidate
+ * The wrapped control is cloned with `label` and `required` props, and the
+ * validity state is read from the element returned by `getValidityTarget`.
+ * Validation messages become visible once the control has been touched
+ * (blurred at least once), when the enclosing form is submitted, or when an
+ * `invalid` event is dispatched on the validity target.
  */
-type ValidityTarget =
-	| HTMLFieldSetElement
-	| HTMLInputElement
-	| HTMLSelectElement
-	| HTMLTextAreaElement;
-
-function UnforwardedControlWithError< C extends React.ReactElement >(
+export const ControlWithError = forwardRef<
+	HTMLDivElement,
+	ControlWithErrorProps
+>( function ControlWithError(
 	{
 		required,
 		markWhenOptional,
 		customValidity,
 		getValidityTarget,
 		children,
-	}: {
-		/**
-		 * Whether the control is required.
-		 */
-		required?: boolean;
-		/**
-		 * Label the control as "optional" when _not_ `required`, instead of the inverse.
-		 */
-		markWhenOptional?: boolean;
-		customValidity?: ValidatedControlProps[ 'customValidity' ];
-		/**
-		 * A function that returns the actual element on which the validity data should be applied.
-		 */
-		getValidityTarget: () => ValidityTarget | null | undefined;
-		/**
-		 * The control component to apply validation to.
-		 *
-		 * As `children` will be cloned with additional props,
-		 * the component at the root of `children` should accept
-		 * `label`, `onChange`, and `required` props, and process them
-		 * appropriately.
-		 */
-		children: C;
+		render,
+		...restProps
 	},
-	forwardedRef: React.ForwardedRef< HTMLDivElement >
+	forwardedRef
 ) {
 	const [ errorMessage, setErrorMessage ] = useState< string | undefined >();
 	const [ statusMessage, setStatusMessage ] = useState<
@@ -102,6 +75,8 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 	>();
 	const [ showMessage, setShowMessage ] = useState( false );
 	const [ isTouched, setIsTouched ] = useState( false );
+
+	const wrapperRef = useRef< HTMLDivElement >( null );
 
 	// Ensure that error messages are visible when an `invalid` event is triggered,
 	// e.g. when a form is submitted or reportValidity() is called.
@@ -152,19 +127,17 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 		// Radio inputs need special handling because all radio inputs with the
 		// same `name` will be marked as invalid. Without this handling, the last radio option
 		// will be focused with an unsuppressed native popover.
-		const radioSibilings =
+		const radioSiblings =
 			validityTarget?.type === 'radio' && validityTarget?.name
 				? Array.from(
-						validityTarget
-							?.closest( `.${ className }` )
-							?.querySelectorAll< HTMLInputElement >(
-								`input[type="radio"][name="${ validityTarget?.name }"]`
-							) ?? []
+						wrapperRef.current?.querySelectorAll< HTMLInputElement >(
+							`input[type="radio"][name="${ validityTarget?.name }"]`
+						) ?? []
 				  ).filter( ( sibling ) => sibling !== validityTarget )
 				: [];
 
 		validityTarget?.addEventListener( 'invalid', suppressNativePopover );
-		radioSibilings.forEach( ( sibling ) =>
+		radioSiblings.forEach( ( sibling ) =>
 			sibling.addEventListener( 'invalid', suppressNativePopover )
 		);
 
@@ -173,7 +146,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 				'invalid',
 				suppressNativePopover
 			);
-			radioSibilings.forEach( ( sibling ) =>
+			radioSiblings.forEach( ( sibling ) =>
 				sibling.removeEventListener( 'invalid', suppressNativePopover )
 			);
 		};
@@ -315,20 +288,25 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 		return () => setDescribedBy( target, false );
 	}, [ visibleMessage, messageId, getValidityTarget ] );
 
-	return (
-		<div className={ className } ref={ forwardedRef } onBlur={ onBlur }>
-			{ cloneElement( children, {
-				label: appendRequiredIndicator(
-					children.props.label,
-					required,
-					markWhenOptional
-				),
-				required,
-			} ) }
-			{ visibleMessage }
-		</div>
-	);
-}
-
-export const ControlWithError = forwardRef( UnforwardedControlWithError );
-ControlWithError.displayName = 'ControlWithError';
+	return useRender( {
+		render,
+		defaultTagName: 'div',
+		ref: [ forwardedRef, wrapperRef ],
+		props: mergeProps< 'div' >( restProps, {
+			onBlur,
+			children: (
+				<>
+					{ cloneElement( children, {
+						label: appendRequiredIndicator(
+							children.props.label,
+							required,
+							markWhenOptional
+						),
+						required,
+					} ) }
+					{ visibleMessage }
+				</>
+			),
+		} ),
+	} );
+} );

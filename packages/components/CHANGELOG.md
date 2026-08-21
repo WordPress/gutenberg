@@ -10,11 +10,15 @@
 
 ### Enhancements
 
+-   `PaletteEdit`: Add a duotone variant. Passing `duotones` (with an optional `colorPalette` for the shadows and highlights pickers) edits duotone presets with the same UI as colors and gradients. Palette colors that do not resolve to a concrete value, such as `color-mix()`, are left out of the duotone pickers, since a duotone built from one cannot be rendered, and the rest are normalized to hex, since the front end's duotone parser does not accept CSS named colors ([#81605](https://github.com/WordPress/gutenberg/pull/81605)).
+-   `DuotonePicker`: Add `selectedSlug` prop for slug-based selection and pass the picked preset's index and slug to `onChange`, so two presets sharing a pair of colors keep their identity ([#81605](https://github.com/WordPress/gutenberg/pull/81605)).
+-   `PaletteEdit`: Name the swatch picker after the palette's heading, so it is announced as Theme, Default or Custom rather than an unlabelled list ([#81605](https://github.com/WordPress/gutenberg/pull/81605)).
 -   `TextControl`, `TextareaControl`, `FormTokenField`, `ContentEditableControl`, `ComboboxControl`: Align focus and hover styles with the design system ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
 -   `InputControl`, `SelectControl`, `CustomSelectControl`: Align focus rings with the design system ([#80417](https://github.com/WordPress/gutenberg/pull/80417)).
 
 ### Bug Fixes
 
+-   `DuotonePicker`: Do not render the custom controls wrapper when `disableCustomDuotone` is set, so a read-only picker no longer adds trailing padding below its swatches ([#81605](https://github.com/WordPress/gutenberg/pull/81605)).
 -   `Modal`: Prevent an Escape key press that dismisses the modal from propagating to underlying overlays. ([#81785](https://github.com/WordPress/gutenberg/pull/81785))
 -   `BoxControl`: Update the opposite side when ALT is held on the left or right input, which each updated themselves instead ([#81530](https://github.com/WordPress/gutenberg/pull/81530)).
 -   `InputControl`: Vertically center the value of date and time inputs in Safari ([#81361](https://github.com/WordPress/gutenberg/pull/81361)).
@@ -33,6 +37,8 @@
 -   Remove `ValidatedToggleControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81492](https://github.com/WordPress/gutenberg/pull/81492)).
 -   Remove `ValidatedToggleGroupControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81450](https://github.com/WordPress/gutenberg/pull/81450)).
 -   `ToggleGroupControl`: Streamline focus ring color styles ([#81242](https://github.com/WordPress/gutenberg/pull/81242)).
+-   `ControlWithError`: Remove the internal implementation in favor of the `ControlWithError` component from `@wordpress/ui` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574)).
+-   Remove the unused `components-validated-control__indicator*` styles; the indicator is now rendered and styled by `ValidityIndicator` from `@wordpress/ui` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574)).
 
 ## 39.0.0 (2026-08-12)
 
