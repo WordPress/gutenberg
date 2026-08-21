@@ -15,7 +15,7 @@ import {
 	Button,
 	PanelBody,
 	TextControl,
-	TextareaControl,
+	TextareaControl as WCTextareaControl,
 	BaseControl,
 	Spinner,
 } from '@wordpress/components';
@@ -225,7 +225,7 @@ const PlaylistTrackEdit = ( {
 						</BaseControl>
 					</MediaUploadCheck>
 					{ !! image && (
-						<TextareaControl
+						<WCTextareaControl
 							label={ __( 'Alternative text' ) }
 							value={ imageAlt || '' }
 							onChange={ ( value ) =>
@@ -270,7 +270,8 @@ const PlaylistTrackEdit = ( {
 							tagName="span"
 							className="wp-block-playlist-track__title"
 							value={ title }
-							placeholder={ __( 'Add title' ) }
+							aria-label={ __( 'Track title' ) }
+							placeholder={ __( 'Track title' ) }
 							onChange={ ( value ) => {
 								setAttributes( { title: value } );
 							} }
@@ -281,7 +282,8 @@ const PlaylistTrackEdit = ( {
 								tagName="span"
 								className="wp-block-playlist-track__artist"
 								value={ artist }
-								placeholder={ __( 'Add artist' ) }
+								aria-label={ __( 'Track artist' ) }
+								placeholder={ __( 'Track artist' ) }
 								onChange={ ( value ) =>
 									setAttributes( { artist: value } )
 								}

@@ -6,11 +6,19 @@
 
 -   Seed the root `ThemeProvider` with the admin color scheme primary color so portaled popovers and modals receive the scheme's accent colors ([#81653](https://github.com/WordPress/gutenberg/pull/81653)).
 
+### Enhancements
+
+-   Unify the Site Editor sidebar section descriptions for Templates, Pages, Navigation, and Patterns. ([#60304](https://github.com/WordPress/gutenberg/issues/60304))
+
 ### Internal
 
 -   Seed content-surface `ThemeProvider` backgrounds with `#fcfcfc` instead of `#ffffff`, matching the design system default and preserving room for stronger and weaker neutral surface tokens ([#81646](https://github.com/WordPress/gutenberg/pull/81646)).
 
 -   Stop rendering `EditorKeyboardShortcutsRegister`, which the editor provider now renders itself ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
+
+### Bug Fixes
+
+-   Open an entity at the width its `viewport` param asks for through the editor provider rather than a sync effect, so the width comes from the theme's breakpoints rather than the defaults, and stop writing the current width back into the param when leaving an entity ([#81750](https://github.com/WordPress/gutenberg/pull/81750)).
 
 ## 7.2.0 (2026-08-12)
 

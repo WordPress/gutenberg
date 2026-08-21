@@ -423,6 +423,9 @@
 			},
 			{
 				"docs/contributors/design/README.md": [
+					{
+						"docs/contributors/design/design-system-packages.md": []
+					},
 					{ "docs/contributors/design/the-block.md": [] }
 				]
 			},

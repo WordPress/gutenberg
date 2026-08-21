@@ -11,7 +11,14 @@ import { WithMaxWidthWrapper } from './decorators/with-max-width-wrapper';
 import { WithRTL } from './decorators/with-rtl';
 import { WithDesignSystemTheme } from './decorators/with-design-system-theme';
 import { ComponentStatusIndicator } from './components/component-status-indicator';
+import { handlePreloadError } from './load-error-recovery';
 import theme from './theme';
+
+if ( typeof window !== 'undefined' ) {
+	window.addEventListener( 'vite:preloadError', handlePreloadError, {
+		once: true,
+	} );
+}
 
 export const globalTypes = {
 	direction: {

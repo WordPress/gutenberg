@@ -439,10 +439,20 @@ const PlaylistEdit = ( {
 		);
 	}
 
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		__experimentalAppenderTagName: 'li',
-		renderAppender: false,
-	} );
+	const { children: innerBlocks, ...trackListProps } = useInnerBlocksProps(
+		{
+			className: clsx( 'wp-block-playlist__tracklist', {
+				'wp-block-playlist__tracklist-is-hidden': ! showTracklist,
+				'wp-block-playlist__tracklist-show-numbers': showNumbers,
+				'wp-block-playlist__tracklist-length-is-hidden':
+					! showTrackLength,
+			} ),
+		},
+		{
+			__experimentalAppenderTagName: 'li',
+			renderAppender: false,
+		}
+	);
 
 	if ( tracks.length === 0 ) {
 		return (
@@ -471,7 +481,7 @@ const PlaylistEdit = ( {
 
 	return (
 		<>
-			<BlockControls group="other" __experimentalShareWithChildBlocks>
+			<BlockControls group="other">
 				<MediaReplaceFlow
 					name={ __( 'Add track' ) }
 					onSelect={ onAddTracks }
@@ -693,18 +703,9 @@ const PlaylistEdit = ( {
 						showPlayButtonArtwork={ showPlayButtonArtwork === true }
 					/>
 				</Disabled>
-				<ol
-					className={ clsx( 'wp-block-playlist__tracklist', {
-						'wp-block-playlist__tracklist-is-hidden':
-							! showTracklist,
-						'wp-block-playlist__tracklist-show-numbers':
-							showNumbers,
-						'wp-block-playlist__tracklist-length-is-hidden':
-							! showTrackLength,
-					} ) }
-				>
+				<ol { ...trackListProps }>
 					<PlaylistContext.Provider value={ playlistContext }>
-						{ innerBlocksProps.children }
+						{ innerBlocks }
 					</PlaylistContext.Provider>
 				</ol>
 				<Caption
