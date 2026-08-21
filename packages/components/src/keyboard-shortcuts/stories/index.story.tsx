@@ -7,9 +7,6 @@ const meta: Meta< typeof KeyboardShortcuts > = {
 	title: 'Components/Utilities/KeyboardShortcuts',
 	id: 'components-keyboardshortcuts',
 	parameters: {
-		// FIXME: Story harness includes an unlabeled form control (label).
-		// See: https://github.com/WordPress/gutenberg/issues/81596
-		a11y: { test: 'todo' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {

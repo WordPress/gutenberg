@@ -16,9 +16,6 @@ const meta: Meta< typeof Scrollable > = {
 	},
 	tags: [ 'status-experimental' ],
 	parameters: {
-		// FIXME: Story includes an unlabeled form control (label).
-		// See: https://github.com/WordPress/gutenberg/issues/81596
-		a11y: { test: 'todo' },
 		controls: {
 			expanded: true,
 		},

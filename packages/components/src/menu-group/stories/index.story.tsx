@@ -21,9 +21,6 @@ const meta: Meta< typeof MenuGroup > = {
 			whereUsed: 'global',
 			notes: 'Subcomponent of `DropdownMenu`.',
 		},
-		// FIXME: Stories render menuitem outside a menu parent (aria-required-parent). Update examples to compose inside DropdownMenu (or NavigableMenu) so they match real usage.
-		// See: https://github.com/WordPress/gutenberg/issues/81596
-		a11y: { test: 'todo' },
 	},
 };
 export default meta;
