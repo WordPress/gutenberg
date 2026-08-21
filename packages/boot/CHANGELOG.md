@@ -10,6 +10,7 @@
 
 ### Enhancements
 
+-   Save button: Use the shared UI keyboard shortcut utilities for its tooltip and accessibility metadata. ([#81826](https://github.com/WordPress/gutenberg/pull/81826))
 -   Contain a failure to the surface it happened in, so a stage, inspector or canvas that throws leaves the rest of the screen working ([#81622](https://github.com/WordPress/gutenberg/pull/81622)).
 -   Warn before leaving the page with unsaved changes ([#81625](https://github.com/WordPress/gutenberg/pull/81625)).
 -   Keep the editor's device preview in step with a `viewport` search param, so an entity that asks to be edited at a particular width — a navigation overlay meant for mobile — opens there and restores the previous width on the way back ([#81617](https://github.com/WordPress/gutenberg/pull/81617)).
@@ -21,6 +22,10 @@
 ### Breaking Changes
 
 -   Remove `editLink` from a route's canvas data. Register the post type's `edit` path with `registerEntityLinks` instead ([#81590](https://github.com/WordPress/gutenberg/pull/81590)).
+
+### Internal
+
+-   Migrate Boot styles to CSS Modules and encapsulate its internal DOM classes ([#81756](https://github.com/WordPress/gutenberg/pull/81756)).
 
 ## 0.20.0 (2026-08-12)
 

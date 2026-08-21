@@ -1,5 +1,5 @@
 import { forwardRef, useRef } from '@wordpress/element';
-import { ControlWithError } from '../control-with-error';
+import { ControlWithError } from '@wordpress/ui';
 import type { ValidatedControlProps } from './types';
 import CustomSelectControl from '../../custom-select-control';
 
@@ -21,6 +21,7 @@ const UnforwardedValidatedCustomSelectControl = (
 			ref={ forwardedRef }
 		>
 			<ControlWithError
+				className="components-validated-control"
 				required={ required }
 				markWhenOptional={ markWhenOptional }
 				customValidity={ customValidity }

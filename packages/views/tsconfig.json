@@ -5,7 +5,7 @@
 		{ "path": "./tsconfig.build.json" },
 		{ "path": "../core-data/tsconfig.build.json" },
 		{ "path": "../data" },
-		{ "path": "../dataviews" },
+		{ "path": "../dataviews/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../preferences/tsconfig.build.json" },
 		{ "path": "../private-apis" }
