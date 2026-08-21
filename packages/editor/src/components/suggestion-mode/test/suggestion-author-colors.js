@@ -110,6 +110,19 @@ describe( 'buildSuggestionAuthorAnnouncementCss', () => {
 		expect( css ).toContain( 'Renée \\"Rex\\" O\'Hara' );
 	} );
 
+	it( 'names an author whose first thread carried no display name', () => {
+		// Threads are scanned in order and the name is memoized per author. A
+		// response that omitted author_name must not be the one that sticks:
+		// every marker that author owns would fall back to the anonymous
+		// announcement even though a later thread names them.
+		const css = buildSuggestionAuthorAnnouncementCss( [
+			inlineThread( 1, 5 ),
+			inlineThread( 2, 5, 'Robin' ),
+		] );
+		expect( css ).toContain( 'Start of suggested addition by Robin.' );
+		expect( css.match( /data-author="5"/g ) ).toHaveLength( 6 );
+	} );
+
 	it( 'emits one block of rules per distinct author', () => {
 		const css = buildSuggestionAuthorAnnouncementCss( [
 			inlineThread( 1, 7, 'Sam' ),

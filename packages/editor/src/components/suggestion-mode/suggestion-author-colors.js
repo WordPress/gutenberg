@@ -33,7 +33,13 @@ function getInlineSuggestionAuthors( threads ) {
 		if ( ! Number.isInteger( author ) || author < 0 ) {
 			continue;
 		}
-		if ( authors.has( author ) ) {
+		/*
+		 * Keep the first name that is actually a name. `author_name` is
+		 * absent on some responses, and memoizing the empty string would drop
+		 * every marker this author owns back to the anonymous announcement
+		 * even when a later thread names them.
+		 */
+		if ( authors.get( author ) ) {
 			continue;
 		}
 		authors.set( author, decodeEntities( thread.author_name ?? '' ) );
