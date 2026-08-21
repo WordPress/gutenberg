@@ -117,6 +117,7 @@ describe( 'PlaylistEdit', () => {
 			createErrorNotice: jest.fn(),
 			replaceInnerBlocks,
 			selectBlock,
+			__unstableMarkNextChangeAsNotPersistent: jest.fn(),
 		} );
 		useSelect.mockReturnValue( {
 			innerBlockTracks: [
@@ -184,6 +185,64 @@ describe( 'PlaylistEdit', () => {
 			'wp-block-playlist__tracklist-is-hidden'
 		);
 		expect( screen.getByTestId( 'playlist-track' ) ).toBeInTheDocument();
+	} );
+
+	it( 'removes unfilled tracks once no track has a source', () => {
+		useSelect.mockReturnValue( {
+			innerBlockTracks: [
+				{ clientId: 'placeholder-track', attributes: {} },
+			],
+		} );
+
+		render(
+			<PlaylistEdit
+				attributes={ defaultAttributes }
+				clientId="playlist-1"
+				insertBlocksAfter={ jest.fn() }
+				isSelected={ false }
+				setAttributes={ jest.fn() }
+			/>
+		);
+
+		// The playlist falls back to its own placeholder, which leaves the
+		// unfilled tracks rendered by nothing.
+		expect( replaceInnerBlocks ).toHaveBeenCalledWith( 'playlist-1', [] );
+	} );
+
+	it( 'does not touch a playlist that has no tracks at all', () => {
+		useSelect.mockReturnValue( { innerBlockTracks: [] } );
+
+		render(
+			<PlaylistEdit
+				attributes={ defaultAttributes }
+				clientId="playlist-1"
+				insertBlocksAfter={ jest.fn() }
+				isSelected={ false }
+				setAttributes={ jest.fn() }
+			/>
+		);
+
+		expect( replaceInnerBlocks ).not.toHaveBeenCalled();
+	} );
+
+	it( 'keeps a track that is still uploading', () => {
+		useSelect.mockReturnValue( {
+			innerBlockTracks: [
+				{ clientId: 'uploading-track', attributes: { blob: 'blob:x' } },
+			],
+		} );
+
+		render(
+			<PlaylistEdit
+				attributes={ defaultAttributes }
+				clientId="playlist-1"
+				insertBlocksAfter={ jest.fn() }
+				isSelected={ false }
+				setAttributes={ jest.fn() }
+			/>
+		);
+
+		expect( replaceInnerBlocks ).not.toHaveBeenCalled();
 	} );
 
 	it( 'keeps an empty placeholder track when adding tracks', () => {

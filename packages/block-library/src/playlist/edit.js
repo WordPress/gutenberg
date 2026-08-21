@@ -86,8 +86,12 @@ const PlaylistEdit = ( {
 
 	const blockProps = useBlockProps();
 	const waveformPanelId = `${ clientId }-waveform`;
-	const { replaceInnerBlocks, replaceBlocks, selectBlock } =
-		useDispatch( blockEditorStore );
+	const {
+		replaceInnerBlocks,
+		replaceBlocks,
+		selectBlock,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
@@ -164,6 +168,23 @@ const PlaylistEdit = ( {
 			setCurrentTrackClientId( validTracks[ 0 ].clientId );
 		}
 	}, [ currentTrackClientId, setCurrentTrackClientId, validTracks ] );
+
+	// Clean up placeholder tracks when reverting back to playlist placeholder state
+	useEffect( () => {
+		if ( validTracks.length > 0 || innerBlockTracks.length === 0 ) {
+			return;
+		}
+
+		// Remove any lingering placeholder track blocks
+		__unstableMarkNextChangeAsNotPersistent();
+		replaceInnerBlocks( clientId, [] );
+	}, [
+		clientId,
+		innerBlockTracks,
+		replaceInnerBlocks,
+		validTracks,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
 
 	const createTrackBlocks = useCallback(
 		( media ) => {

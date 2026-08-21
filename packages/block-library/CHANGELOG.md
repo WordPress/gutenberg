@@ -14,6 +14,7 @@
 
 -   Icon: Apply only padding to the inner SVG in the editor, so margin is no longer applied twice compared to the front end ([#81292](https://github.com/WordPress/gutenberg/pull/81292)).
 -   Playlist: Attach the inner block drop zone to the track list, so Playlist Track blocks show insertion markers while being reordered.
+-   Playlist: Remove tracks that have no source once no track has one, so they do not linger in the list view while the playlist shows its placeholder.
 -   Playlist: Keep tracks that have no source yet when adding tracks, so a track the user has added but not filled in is no longer discarded by a drop.
 -   Playlist Track: Remove a newly added track when its upload fails, instead of leaving it in the tracklist with a revoked blob URL and no way to recover. The playlist removes the track itself, so removing the only track no longer removes the playlist with it.
 -   Playlist Track: Mark track media fields as content so toolbar inserters add an empty track instead of duplicating the selected track.
