@@ -72,7 +72,13 @@ Examples of styles that appear in both the theme and the editor include gallery 
 
 ## JavaScript
 
-All new code in Gutenberg should be written in [TypeScript](https://www.typescriptlang.org/), with a `.ts` file extension, or a `.tsx` file extension for files including JSX syntax. The exception to this rule is JavaScript code which is expected to be run directly in the browser or by Node.js in environments where TypeScript syntax is not supported. Note that as of Node.js v22.18.0 and newer, [TypeScript files containing erasable syntax can be executed directly by the Node.js runtime](https://nodejs.org/learn/typescript/run-natively).
+All new code in Gutenberg should be written in [TypeScript](https://www.typescriptlang.org/), with a `.ts` file extension, or a `.tsx` file extension for files including JSX syntax.
+
+There are some exceptions where writing plain JavaScript (`.js`) is permitted:
+
+-   If the code is expected to be run directly in the browser or by Node.js in environments where TypeScript syntax is not supported. Note that as of Node.js v22.18.0 and newer, [TypeScript files containing erasable syntax can be executed directly by the Node.js runtime](https://nodejs.org/learn/typescript/run-natively).
+-   If authoring new code in an existing `.js` or `.jsx` file. Migrating existing files to the equivalent `.ts` or `.tsx` is encouraged if it is trivial to do so.
+-   If authoring new files in a package which is largely untyped, such that the new file would not have reasonable access to existing package typings.
 
 JavaScript in Gutenberg uses modern language features of the [ECMAScript language specification](https://www.ecma-international.org/ecma-262/) as well as the [JSX language syntax extension](https://react.dev/learn/writing-markup-with-jsx). These are enabled through a combination of preset configurations, notably [`@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default) which is used as a preset in the project's [Babel](https://babeljs.io/) configuration.
 
