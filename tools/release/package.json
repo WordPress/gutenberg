@@ -24,7 +24,7 @@
 	},
 	"dependencies": {
 		"@inquirer/prompts": "^7.2.0",
-		"@octokit/rest": "^16.26.0",
+		"@octokit/rest": "^20.1.2",
 		"chalk": "^4.1.1",
 		"commander": "^9.2.0",
 		"execa": "^4.0.2",

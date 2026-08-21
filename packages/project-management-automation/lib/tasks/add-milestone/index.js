@@ -1,7 +1,6 @@
-const debug = require( '../../debug' );
-const getAssociatedPullRequest = require( '../../get-associated-pull-request' );
+import debug from '../../debug.js';
+import getAssociatedPullRequest from '../../get-associated-pull-request.js';
 
-/** @typedef {import('@octokit/request-error').RequestError} RequestError */
 /** @typedef {ReturnType<typeof import('@actions/github').getOctokit>} GitHub */
 /** @typedef {import('@octokit/webhooks-types').EventPayloadMap['push']} WebhookPayloadPush */
 
@@ -199,4 +198,4 @@ async function addMilestone( payload, octokit ) {
 	} );
 }
 
-module.exports = addMilestone;
+export default addMilestone;

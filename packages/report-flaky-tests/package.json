@@ -20,8 +20,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0",
-		"npm": ">=8.19.2"
+		"node": ">=20.10.0",
+		"npm": ">=10.2.3"
 	},
 	"type": "module",
 	"main": "src/index.ts",
@@ -34,10 +34,10 @@
 	},
 	"types": "build-types",
 	"dependencies": {
-		"@actions/core": "^1.9.1",
-		"@actions/github": "^5.0.1",
+		"@actions/core": "^3.0.1",
+		"@actions/github": "^9.1.1",
 		"@jest/test-result": "^30.4.1",
-		"@octokit/webhooks-types": "^5.8.0",
+		"@octokit/webhooks-types": "^7.6.1",
 		"@playwright/test": "^1.62.1",
 		"jest-message-util": "^30.4.1"
 	},

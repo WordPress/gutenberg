@@ -1,4 +1,4 @@
-const debug = require( '../../debug' );
+import debug from '../../debug.js';
 
 /** @typedef {ReturnType<typeof import('@actions/github').getOctokit>} GitHub */
 /** @typedef {import('@octokit/webhooks-types').EventPayloadMap['pull_request']} WebhookPayloadPullRequest */
@@ -82,4 +82,4 @@ async function firstTimeContributorLabel( payload, octokit ) {
 	} );
 }
 
-module.exports = firstTimeContributorLabel;
+export default firstTimeContributorLabel;
