@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Revisions: close the screen on the first click of the back arrow after a revision has been selected, instead of requiring a second click ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
 -   Color palette panel: do not render the theme colors wrapper when the theme provides no colors, which left an empty gap above the Custom section ([#81894](https://github.com/WordPress/gutenberg/pull/81894)).
 
 ### Enhancements
