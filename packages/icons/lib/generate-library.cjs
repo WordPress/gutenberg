@@ -223,83 +223,6 @@ async function generateIndex() {
 	await writeFile( path.join( ICON_LIBRARY_DIR, 'index.ts' ), indexTemplate );
 }
 
-/**
- * Parses a CSS declaration list (the contents of a `style` attribute) into an
- * array of `[ key, value ]` tuples. Splits on `;` and the first un-quoted /
- * un-parenthesised `:` per declaration, so semicolons and colons inside an
- * `url()` value or a quoted string (e.g. a base64 `data:` URI) stay intact.
- *
- * Malformed declarations without a `key: value` colon, and declarations with
- * an empty key, are dropped.
- *
- * @param {string} cssString String of CSS properties.
- * @return {Array<[string, string]>} Declarations as `[ key, value ]` tuples.
- */
-function parseStyleDeclarations( cssString ) {
-	const declarations = [];
-	let key = '';
-	let value = '';
-	let inValue = false;
-	let parenDepth = 0;
-	let quote = null;
-	let escaped = false;
-
-	const finishDeclaration = () => {
-		const trimmedKey = key.trim();
-		if ( trimmedKey && inValue ) {
-			declarations.push( [ trimmedKey, value.trim() ] );
-		}
-		key = '';
-		value = '';
-		inValue = false;
-	};
-
-	const append = ( ch ) => {
-		if ( inValue ) {
-			value += ch;
-		} else {
-			key += ch;
-		}
-	};
-
-	for ( const char of cssString ) {
-		if ( escaped ) {
-			// Previous char was a backslash; this char is taken literally.
-			append( char );
-			escaped = false;
-		} else if ( char === '\\' ) {
-			append( char );
-			escaped = true;
-		} else if ( quote ) {
-			// Inside a quoted string; only the matching quote closes it.
-			if ( char === quote ) {
-				quote = null;
-			}
-			append( char );
-		} else if ( char === '"' || char === "'" ) {
-			quote = char;
-			append( char );
-		} else if ( char === '(' ) {
-			parenDepth++;
-			append( char );
-		} else if ( char === ')' ) {
-			parenDepth = Math.max( 0, parenDepth - 1 );
-			append( char );
-		} else if ( char === ';' && parenDepth === 0 ) {
-			finishDeclaration();
-		} else if ( char === ':' && parenDepth === 0 && ! inValue ) {
-			// First un-quoted, un-parenthesised colon separates key/value.
-			// Subsequent colons (e.g. in a `data:` URI) stay in the value.
-			inValue = true;
-		} else {
-			append( char );
-		}
-	}
-	finishDeclaration();
-
-	return declarations;
-}
-
 // "Transform" to TSX by interpolating the SVG source into a simple TS module
 // with a single default export.
 //
@@ -331,22 +254,17 @@ function svgToTsx( svgContent ) {
 		}
 	);
 
-	// Convert CSS-string style attributes (e.g. `style="fill: none"`) into JSX
-	// style object syntax (e.g. `style={ { fill: 'none' } }`). Source SVGs use
-	// the CSS-string form so they remain valid SVG when read by non-React
-	// renderers (the PHP path, webpack SVG loaders, raw file preview).
+	// Convert the source convention `style="fill: none"` into JSX style object
+	// syntax. Reject other inline styles so this targeted conversion cannot
+	// silently generate an incomplete JSX style object.
 	jsxContent = jsxContent.replace( /\sstyle="([^"]*)"/g, ( _, cssString ) => {
-		const declarations = parseStyleDeclarations( cssString )
-			.map( ( [ key, value ] ) => {
-				const camelKey = key.startsWith( '--' )
-					? JSON.stringify( key )
-					: key.replace( /-([a-z])/g, ( _m, c ) => c.toUpperCase() );
-				// JSON.stringify yields a safely-escaped, double-quoted JS
-				// string, so values containing quotes/backslashes stay valid.
-				return `${ camelKey }: ${ JSON.stringify( value ) }`;
-			} )
-			.join( ', ' );
-		return ` style={ { ${ declarations } } }`;
+		if ( ! /^fill\s*:\s*none\s*;?$/.test( cssString.trim() ) ) {
+			throw new Error(
+				`Unsupported inline SVG style: "${ cssString }". Only "fill: none" is supported.`
+			);
+		}
+
+		return ' style={ { fill: "none" } }';
 	} );
 
 	// Tags that ought to be converted to WordPress primitives when converting
@@ -409,7 +327,5 @@ if ( module === require.main ) {
 
 module.exports = {
 	generateTsxFiles,
-	// Exported for unit testing.
-	parseStyleDeclarations,
 	svgToTsx,
 };
