@@ -91,6 +91,11 @@ export const LayoutTable = {
 };
 
 export const LayoutGrid = {
+	parameters: {
+		// FIXME: Grid media buttons lack names (button-name).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: LayoutGridComponent,
 	args: {
 		groupBy: false,
@@ -239,6 +244,11 @@ export const Empty = {
 };
 
 export const MinimalUI = {
+	parameters: {
+		// FIXME: Scroll region is not keyboard-accessible (scrollable-region-focusable).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: MinimalUIComponent,
 	argTypes: {
 		layout: {
@@ -280,6 +290,9 @@ export const InfiniteScroll = {
 export const AsyncInfiniteScroll = {
 	render: AsyncInfiniteScrollComponent,
 	parameters: {
+		// FIXME: List items lack a required parent (aria-required-parent).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
 		// Fill the viewport so the list bottom is the window bottom.
 		containerHeight: 'calc(100vh - 2rem)',
 	},
