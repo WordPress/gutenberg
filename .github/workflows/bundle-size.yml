@@ -74,4 +74,4 @@ jobs:
                   repo-token: '${{ secrets.GITHUB_TOKEN }}'
                   pattern: '{build/scripts/**/*.min.js,build/styles/**/*.css,build/modules/**/*.min.js}'
                   clean-script: 'distclean'
-                  build-script: 'build -- --skip-types'
+                  build-script: 'build'

@@ -2,10 +2,21 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Revisions: close the screen on the first click of the back arrow after a revision has been selected, instead of requiring a second click ([#81897](https://github.com/WordPress/gutenberg/pull/81897)).
+-   Revisions: close the screen after applying a revision, which stopped happening when the screen moved into this package ([#81897](https://github.com/WordPress/gutenberg/pull/81897)).
+-   Color palette panel: do not render the theme colors wrapper when the theme provides no colors, which left an empty gap above the Custom section ([#81894](https://github.com/WordPress/gutenberg/pull/81894)).
+
 ### Enhancements
 
 -   Expose typography and color controls for citations, inputs, and selects in Global Styles ([#80852](https://github.com/WordPress/gutenberg/pull/80852)).
 -   Mark blocks that have user styles in the block list, and add a filter to show only those blocks ([#81373](https://github.com/WordPress/gutenberg/pull/81373)).
+-   Add a Duotone tab to the Edit palette screen, so theme and default duotones can be edited and custom duotones added, alongside Color and Gradient. Replaces the read-only duotone list previously shown at the bottom of the Gradient tab ([#81605](https://github.com/WordPress/gutenberg/pull/81605)).
+
+### Bug Fixes
+
+-   Shadow editor: Group each row as one item so separators do not cross row actions ([#81871](https://github.com/WordPress/gutenberg/pull/81871)).
 
 ### Internal
 
