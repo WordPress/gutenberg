@@ -82,6 +82,12 @@ export default function TermTemplateEdit( {
 			showNested = false,
 			perPage,
 			include,
+			// We gather extra query args to pass to the REST API call.
+			// This way extenders of Terms Query can add their own query args,
+			// and have accurate previews in the editor.
+			// Noting though that these args should either be supported by the
+			// REST API or be handled by custom REST filters like `rest_{$taxonomy}_query`.
+			...restQueryArgs
 		} = {},
 	},
 	__unstableLayoutClassNames,
@@ -112,11 +118,10 @@ export default function TermTemplateEdit( {
 		queryArgs.order = 'asc';
 	}
 
-	const { records: terms } = useEntityRecords(
-		'taxonomy',
-		taxonomy,
-		queryArgs
-	);
+	const { records: terms } = useEntityRecords( 'taxonomy', taxonomy, {
+		...queryArgs,
+		...restQueryArgs,
+	} );
 
 	const blocks = useSelect(
 		( select ) => select( blockEditorStore ).getBlocks( clientId ),
