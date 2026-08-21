@@ -1693,6 +1693,88 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
+	 * Verifies that the finalize response carries the generated sub-sizes.
+	 *
+	 * The response is prepared after the sub-size metadata has been written, so
+	 * it is the finished attachment record. The editor stores it as-is instead
+	 * of fetching the attachment again to pick the sizes up, which is what
+	 * keeps a client-side upload correct when a refetch would be answered with
+	 * the pre-finalize record - either by an out-of-order response or by a host
+	 * cache keyed on the request URL.
+	 *
+	 * @link https://github.com/WordPress/gutenberg/issues/81844
+	 *
+	 * @covers ::finalize_item
+	 */
+	public function test_finalize_response_contains_generated_sub_sizes() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=finalize-response-test.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+
+		$response      = rest_get_server()->dispatch( $request );
+		$data          = $response->get_data();
+		$attachment_id = $data['id'];
+
+		// Nothing has generated sub-sizes yet, which is the window in which the
+		// editor's first read of the attachment happens.
+		$this->assertEmpty(
+			(array) $data['media_details']['sizes'],
+			'The create response should not carry sub-sizes yet.'
+		);
+
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=finalize-response-test-150x150.jpg' );
+		$request->set_param( 'image_size', 'thumbnail' );
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/test-image.jpg' ) );
+
+		$response       = rest_get_server()->dispatch( $request );
+		$thumbnail_data = $response->get_data();
+		$this->assertSame( 200, $response->get_status(), 'Sideloading the thumbnail should succeed.' );
+
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/finalize" );
+		$request->set_param( 'sub_sizes', array( $thumbnail_data ) );
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 200, $response->get_status() );
+
+		$data = $response->get_data();
+		$this->assertArrayHasKey( 'media_details', $data );
+		$this->assertArrayHasKey(
+			'thumbnail',
+			$data['media_details']['sizes'],
+			'The finalize response should list the sideloaded sub-size.'
+		);
+
+		// source_url is what the Image block's Resolution control offers.
+		$this->assertArrayHasKey(
+			'source_url',
+			$data['media_details']['sizes']['thumbnail'],
+			'Each sub-size in the finalize response should carry its URL.'
+		);
+		$this->assertStringEndsWith(
+			'finalize-response-test-150x150.jpg',
+			$data['media_details']['sizes']['thumbnail']['source_url']
+		);
+
+		// The finalize response must match what a later read would return, as
+		// the editor stores it in place of that read.
+		$request = new WP_REST_Request( 'GET', "/wp/v2/media/$attachment_id" );
+		$request->set_param( 'context', 'view' );
+		$fetched = rest_get_server()->dispatch( $request )->get_data();
+
+		$this->assertSame(
+			array_keys( (array) $fetched['media_details']['sizes'] ),
+			array_keys( (array) $data['media_details']['sizes'] ),
+			'The finalize response should carry the same sizes a refetch would.'
+		);
+	}
+
+	/**
 	 * Verifies that finalize writes scaled sub-size metadata correctly.
 	 *
 	 * @covers ::finalize_item

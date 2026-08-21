@@ -14,6 +14,7 @@
 -   Notes: Stop forcing capitalization of the user name in a note byline, so the name is shown as the user set it ([#81788](https://github.com/WordPress/gutenberg/pull/81788)).
 -   Device Preview: Center the editor canvas with the canvas container's own flex alignment rather than the canvas's auto margins, which were conditional on the resize handles being active. Switching from the mobile or tablet preview back to desktop no longer expands the canvas from the left edge ([#81484](https://github.com/WordPress/gutenberg/pull/81484)).
 -   `PostSchedule`: Announce the new publish date to screen readers when the date is changed ([#81629](https://github.com/WordPress/gutenberg/pull/81629)).
+-   Media: Store the attachment record returned by the `finalize` endpoint instead of refetching the attachment once a client-side upload completes. The finalize response is prepared after the sub-size metadata is written, so it already carries `media_details.sizes`; the refetch it replaces could be answered with the pre-finalize record - by an out-of-order response, or by a host cache keyed on the request URL - leaving the Image block without its Resolution control ([#81844](https://github.com/WordPress/gutenberg/issues/81844)).
 
 ### Internal
 
