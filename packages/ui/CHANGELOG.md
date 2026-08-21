@@ -17,6 +17,7 @@
 
 ### Enhancements
 
+-   `Calendar`, `RangeCalendar`: Add a `today` prop to override the date marked as today. [#81498](https://github.com/WordPress/gutenberg/pull/81498)
 -   Add `TextareaControl` component ([#81359](https://github.com/WordPress/gutenberg/pull/81359)).
 -   Export shared keyboard shortcut presentation and accessibility utilities. ([#81826](https://github.com/WordPress/gutenberg/pull/81826))
 -   `Menu`: Add shortcut display and accessibility metadata support. ([#79560](https://github.com/WordPress/gutenberg/pull/79560))

@@ -206,6 +206,11 @@ export interface BaseProps
 	 */
 	endMonth?: Date;
 	/**
+	 * The date to mark as today.
+	 * @default The current date
+	 */
+	today?: Date;
+	/**
 	 * Focus the first selected day (if set) or today's date (if not disabled).
 	 *
 	 * Use this prop when the calendar should receive initial focus as it opens,

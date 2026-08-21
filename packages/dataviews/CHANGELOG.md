@@ -10,6 +10,7 @@
 ### Bug Fix
 
 -   DataForm: Keep the displayed calendar month of the `date` and `datetime` controls in sync when the value changes from outside the control, e.g. after an undo, a reset, or switching the edited item. [#81635](https://github.com/WordPress/gutenberg/pull/81635)
+-   DataForms: Fix the `date` and `datetime` controls selecting and highlighting the day next to the one clicked. Date-only values now use a neutral UTC calendar frame, while datetimes on sites configured with a manual UTC offset are converted to and from that frame. [#81498](https://github.com/WordPress/gutenberg/pull/81498)
 -   Validated form controls: Align invalid focus styling for InputBase-based controls with the design system ([#80417](https://github.com/WordPress/gutenberg/pull/80417)).
 -   DataViews: Prevent the filter operator select focus ring from being clipped. [#80417](https://github.com/WordPress/gutenberg/pull/80417)
 -   DataForm: Send a single update per calendar interaction in the `datetime` control instead of two identical ones. Selecting or clearing a date now reveals the validation message by firing a synthetic `invalid` event on the input, rather than briefly moving focus into it and re-sending the value, and announces it to screen readers since focus stays on the calendar. [#81440](https://github.com/WordPress/gutenberg/pull/81440)
@@ -55,7 +56,6 @@
 
 ### Bug Fix
 
--   DataForms: Fix the `date` and `datetime` controls selecting and highlighting the day next to the one clicked. A site configured with a UTC offset rather than a named timezone reports no timezone the calendar can work in, so it fell back to the browser's while the values stayed anchored to the site's. The `datetime` calendar is now given the site's UTC offset itself — which also keeps the day it marks as today the site's — and a `date` value is treated as a plain calendar day, parsed in the same browser timezone the calendar reads it in. [#81498](https://github.com/WordPress/gutenberg/pull/81498)
 -   DataForms: Skip validation for fields hidden through the `isVisible` API, so a hidden field with validation rules (e.g. `required`) no longer makes the form invalid. Toggling a field's visibility now clears or restores its validity accordingly. [#81377](https://github.com/WordPress/gutenberg/pull/81377)
 -   DataViews: Pass only the eligible items to a bulk action's `callback`. A bulk action is offered when any one selected item is eligible for it, so the callback could run against items it had declared, through `isEligible`, that it could not handle. [#81198](https://github.com/WordPress/gutenberg/pull/81198)
 -   DataViews: Fix the `between` date filter discarding a manually entered `From`/`To` date on blur. The control now commits an incomplete range with an unfilled bound — which neither filters nor renders a chip — instead of waiting for both dates, so a typed date survives tabbing away and a range can be entered manually at all. [#81150](https://github.com/WordPress/gutenberg/pull/81150)

@@ -46,7 +46,7 @@ describe( 'dataform-controls/datetime', () => {
 	 * Jest pins the browser timezone to UTC, so the mismatch is created from
 	 * the WordPress side. A site configured with a manual UTC offset — which is
 	 * what a default install has — reports an empty `timezone.string`, and the
-	 * control passes the offset itself to the calendar.
+	 * control maps the site's wall-clock fields into the UTC calendar frame.
 	 *
 	 * @param offset Site UTC offset, in hours.
 	 */
@@ -62,70 +62,94 @@ describe( 'dataform-controls/datetime', () => {
 		} );
 	}
 
-	// A negative offset puts the site behind UTC, so the clicked day's midnight
-	// lands on the previous day when it is re-anchored to the site timezone.
-	it.each( [ -8, -5, 5.5, 9 ] )(
-		'commits the day that was clicked on a site at UTC%s',
-		async ( offset ) => {
-			setSiteOffset( offset );
+	describe( 'manual UTC offsets', () => {
+		// A negative offset puts the site behind UTC, so the clicked day's midnight
+		// lands on the previous day when it is re-anchored to the site timezone.
+		it.each( [ -8, -5, 5.5, 9 ] )(
+			'commits the day that was clicked on a site at UTC%s',
+			async ( offset ) => {
+				setSiteOffset( offset );
+				const user = userEvent.setup();
+
+				render(
+					<ControlledDataForm initialValue="2026-08-15T12:30:00.000Z" />
+				);
+
+				// The wall clock the input shows depends on the site offset, so the
+				// time of day is read off rather than hard-coded.
+				const timeOfDay = screen
+					.getByLabelText< HTMLInputElement >( 'Date time' )
+					.value.split( 'T' )[ 1 ];
+
+				await user.click(
+					screen.getByRole( 'button', { name: /august 20, 2026/i } )
+				);
+
+				// The input renders the committed instant as a wall clock in the
+				// site timezone, so it reads back the day that was clicked, with
+				// the time of day preserved.
+				expect(
+					screen.getByLabelText< HTMLInputElement >( 'Date time' )
+						.value
+				).toBe( `2026-08-20T${ timeOfDay }` );
+			}
+		);
+
+		it( 'keeps the clicked day highlighted after it is committed', async () => {
+			setSiteOffset( -8 );
 			const user = userEvent.setup();
 
 			render(
 				<ControlledDataForm initialValue="2026-08-15T12:30:00.000Z" />
 			);
 
-			// The wall clock the input shows depends on the site offset, so the
-			// time of day is read off rather than hard-coded.
-			const timeOfDay = screen
-				.getByLabelText< HTMLInputElement >( 'Date time' )
-				.value.split( 'T' )[ 1 ];
-
 			await user.click(
 				screen.getByRole( 'button', { name: /august 20, 2026/i } )
 			);
 
-			// The input renders the committed instant as a wall clock in the
-			// site timezone, so it reads back the day that was clicked, with
-			// the time of day preserved.
+			expect(
+				screen.getByRole( 'button', {
+					name: /august 20, 2026, selected/i,
+				} )
+			).toBeInTheDocument();
+		} );
+
+		it( 'starts a datetime selected from the calendar at midnight', async () => {
+			setSiteOffset( -8 );
+			const user = userEvent.setup();
+
+			render( <ControlledDataForm initialValue="" /> );
+
+			await user.click(
+				screen.getByRole( 'button', { name: /august 25, 2026/i } )
+			);
+
 			expect(
 				screen.getByLabelText< HTMLInputElement >( 'Date time' ).value
-			).toBe( `2026-08-20T${ timeOfDay }` );
-		}
-	);
+			).toBe( '2026-08-25T00:00' );
+		} );
 
-	it( 'keeps the clicked day highlighted after it is committed', async () => {
-		setSiteOffset( -8 );
-		const user = userEvent.setup();
+		it( 'marks the site today, not the browser today', () => {
+			jest.useFakeTimers();
+			// 20:00 UTC on Aug 15 is already Aug 16, 10:00 on a UTC+14 site.
+			jest.setSystemTime( new Date( '2026-08-15T20:00:00.000Z' ) );
+			setSiteOffset( 14 );
 
-		render(
-			<ControlledDataForm initialValue="2026-08-15T12:30:00.000Z" />
-		);
+			render(
+				<ControlledDataForm initialValue="2026-08-10T12:30:00.000Z" />
+			);
 
-		await user.click(
-			screen.getByRole( 'button', { name: /august 20, 2026/i } )
-		);
-
-		expect(
-			screen.getByRole( 'button', { name: /august 20, 2026, selected/i } )
-		).toBeInTheDocument();
-	} );
-
-	it( 'marks the site today, not the browser today', () => {
-		jest.useFakeTimers();
-		// 20:00 UTC on Aug 15 is already Aug 16, 10:00 on a UTC+14 site.
-		jest.setSystemTime( new Date( '2026-08-15T20:00:00.000Z' ) );
-		setSiteOffset( 14 );
-
-		render(
-			<ControlledDataForm initialValue="2026-08-10T12:30:00.000Z" />
-		);
-
-		expect(
-			screen.getByRole( 'button', { name: /today,.*august 16, 2026/i } )
-		).toBeInTheDocument();
-		expect(
-			screen.queryByRole( 'button', { name: /today,.*august 15, 2026/i } )
-		).not.toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', {
+					name: /today,.*august 16, 2026/i,
+				} )
+			).toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', {
+					name: /today,.*august 15, 2026/i,
+				} )
+			).not.toBeInTheDocument();
+		} );
 	} );
 
 	// A named timezone kept the two frames aligned all along, through the

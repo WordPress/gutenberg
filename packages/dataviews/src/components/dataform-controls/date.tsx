@@ -1,13 +1,4 @@
-import {
-	format,
-	isValid as isValidDate,
-	parseISO,
-	subMonths,
-	subDays,
-	subYears,
-	startOfMonth,
-	startOfYear,
-} from 'date-fns';
+import { isValid as isValidDate } from 'date-fns';
 import {
 	BaseControl,
 	Button,
@@ -22,7 +13,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { getDate, getSettings } from '@wordpress/date';
+import { getSettings } from '@wordpress/date';
 import {
 	Calendar,
 	RangeCalendar,
@@ -46,6 +37,40 @@ import getCustomValidity from './utils/get-custom-validity';
 
 type DateRange = [ string, string ] | undefined;
 
+const getBrowserToday = () => {
+	const today = new Date();
+	return new Date(
+		Date.UTC( today.getFullYear(), today.getMonth(), today.getDate() )
+	);
+};
+
+const subtractDays = ( date: Date, days: number ) => {
+	const result = new Date( date );
+	result.setUTCDate( result.getUTCDate() - days );
+	return result;
+};
+
+const subtractMonths = ( date: Date, months: number ) => {
+	const day = date.getUTCDate();
+	const result = new Date(
+		Date.UTC( date.getUTCFullYear(), date.getUTCMonth() - months, 1 )
+	);
+	const lastDayOfMonth = new Date(
+		Date.UTC( result.getUTCFullYear(), result.getUTCMonth() + 1, 0 )
+	).getUTCDate();
+	result.setUTCDate( Math.min( day, lastDayOfMonth ) );
+	return result;
+};
+
+const subtractYears = ( date: Date, years: number ) =>
+	subtractMonths( date, years * 12 );
+
+const startOfUTCMonth = ( date: Date ) =>
+	new Date( Date.UTC( date.getUTCFullYear(), date.getUTCMonth(), 1 ) );
+
+const startOfUTCYear = ( date: Date ) =>
+	new Date( Date.UTC( date.getUTCFullYear(), 0, 1 ) );
+
 const DATE_PRESETS: {
 	id: string;
 	label: string;
@@ -54,30 +79,30 @@ const DATE_PRESETS: {
 	{
 		id: 'today',
 		label: __( 'Today' ),
-		getValue: () => getDate( null ),
+		getValue: getBrowserToday,
 	},
 	{
 		id: 'yesterday',
 		label: __( 'Yesterday' ),
 		getValue: () => {
-			const today = getDate( null );
-			return subDays( today, 1 );
+			const today = getBrowserToday();
+			return subtractDays( today, 1 );
 		},
 	},
 	{
 		id: 'past-week',
 		label: __( 'Past week' ),
 		getValue: () => {
-			const today = getDate( null );
-			return subDays( today, 7 );
+			const today = getBrowserToday();
+			return subtractDays( today, 7 );
 		},
 	},
 	{
 		id: 'past-month',
 		label: __( 'Past month' ),
 		getValue: () => {
-			const today = getDate( null );
-			return subMonths( today, 1 );
+			const today = getBrowserToday();
+			return subtractMonths( today, 1 );
 		},
 	},
 ];
@@ -87,61 +112,64 @@ const DATE_RANGE_PRESETS = [
 		id: 'last-7-days',
 		label: __( 'Last 7 days' ),
 		getValue: () => {
-			const today = getDate( null );
-			return [ subDays( today, 7 ), today ];
+			const today = getBrowserToday();
+			return [ subtractDays( today, 7 ), today ];
 		},
 	},
 	{
 		id: 'last-30-days',
 		label: __( 'Last 30 days' ),
 		getValue: () => {
-			const today = getDate( null );
-			return [ subDays( today, 30 ), today ];
+			const today = getBrowserToday();
+			return [ subtractDays( today, 30 ), today ];
 		},
 	},
 	{
 		id: 'month-to-date',
 		label: __( 'Month to date' ),
 		getValue: () => {
-			const today = getDate( null );
-			return [ startOfMonth( today ), today ];
+			const today = getBrowserToday();
+			return [ startOfUTCMonth( today ), today ];
 		},
 	},
 	{
 		id: 'last-year',
 		label: __( 'Last year' ),
 		getValue: () => {
-			const today = getDate( null );
-			return [ subYears( today, 1 ), today ];
+			const today = getBrowserToday();
+			return [ subtractYears( today, 1 ), today ];
 		},
 	},
 	{
 		id: 'year-to-date',
 		label: __( 'Year to date' ),
 		getValue: () => {
-			const today = getDate( null );
-			return [ startOfYear( today ), today ];
+			const today = getBrowserToday();
+			return [ startOfUTCYear( today ), today ];
 		},
 	},
 ];
 
-// A `date` value is a plain calendar day with no timezone attached, and the
-// calendar reads and reports the `Date`s it is given in the browser timezone.
-// Anchoring the day there — rather than to the site timezone, which shifts it
-// onto an adjacent day — keeps the day shown the day the field holds.
-const parseDate = ( dateString?: string ): Date | null => {
+const formatUTCDate = ( date: Date ) => date.toISOString().slice( 0, 10 );
+
+// A `date` value is a plain calendar day with no timezone attached. Keep it in
+// a neutral UTC frame, so every day remains representable even when the
+// browser's named timezone contains a historical transition that skipped it.
+export const parseDate = ( dateString?: string ): Date | null => {
 	if ( ! dateString ) {
 		return null;
 	}
-	const parsed = parseISO( dateString );
-	return isValidDate( parsed ) ? parsed : null;
+	const parsed = new Date( `${ dateString }T00:00:00.000Z` );
+	return isValidDate( parsed ) && formatUTCDate( parsed ) === dateString
+		? parsed
+		: null;
 };
 
 const formatDate = ( date?: Date | string ): string => {
 	if ( ! date ) {
 		return '';
 	}
-	return typeof date === 'string' ? date : format( date, 'yyyy-MM-dd' );
+	return typeof date === 'string' ? date : formatUTCDate( date );
 };
 
 function ValidatedDateControl< Item >( {
@@ -299,7 +327,7 @@ function CalendarDateControl< Item >( {
 	const value = typeof fieldValue === 'string' ? fieldValue : undefined;
 	const [ calendarMonth, setCalendarMonth ] = useState< Date >( () => {
 		const parsedDate = parseDate( value );
-		return parsedDate || new Date(); // Default to current month
+		return parsedDate || getBrowserToday(); // Default to current month
 	} );
 
 	const [ isTouched, setIsTouched ] = useState( false );
@@ -316,9 +344,7 @@ function CalendarDateControl< Item >( {
 
 	const onSelectDate = useCallback(
 		( newDate: Date | null ) => {
-			const dateValue = newDate
-				? format( newDate, 'yyyy-MM-dd' )
-				: undefined;
+			const dateValue = newDate ? formatDate( newDate ) : undefined;
 			onChangeCallback( dateValue );
 			setSelectedPresetId( null );
 			setIsTouched( true );
@@ -436,6 +462,8 @@ function CalendarDateControl< Item >( {
 						onValueChange={ onSelectDate }
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
+						timeZone="UTC"
+						today={ getBrowserToday() }
 						weekStartsOn={ weekStartsOn }
 						disabled={ disabled || disabledMatchers }
 						disableNavigation={ disabled }
@@ -510,7 +538,7 @@ function CalendarDateRangeControl< Item >( {
 	}, [ value ] );
 
 	const [ calendarMonth, setCalendarMonth ] = useState< Date >( () => {
-		return selectedRange?.from || new Date();
+		return selectedRange?.from || getBrowserToday();
 	} );
 
 	const [ isTouched, setIsTouched ] = useState( false );
@@ -685,6 +713,8 @@ function CalendarDateRangeControl< Item >( {
 						onValueChange={ onSelectCalendarRange }
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
+						timeZone="UTC"
+						today={ getBrowserToday() }
 						weekStartsOn={ weekStartsOn }
 						disabled={ disabled || disabledMatchers }
 					/>

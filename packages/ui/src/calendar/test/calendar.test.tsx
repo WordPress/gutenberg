@@ -127,6 +127,17 @@ describe( 'Calendar', () => {
 			expect( todayButton ).toHaveAccessibleName( /today/i );
 		} );
 
+		it( 'should mark the date provided through the `today` prop', () => {
+			render( <Calendar today={ tomorrow } /> );
+
+			expect( getDateButton( tomorrow ) ).toHaveAccessibleName(
+				/today/i
+			);
+			expect( getDateButton( today ) ).not.toHaveAccessibleName(
+				/today/i
+			);
+		} );
+
 		it( 'should show multiple months at once via the `numberOfMonths` prop', () => {
 			render( <Calendar numberOfMonths={ 2 } /> );
 
