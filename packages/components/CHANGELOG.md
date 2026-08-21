@@ -7,6 +7,7 @@
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
     -   `DropdownContentWrapper` ([#81522](https://github.com/WordPress/gutenberg/pull/81522))
     -   `ResizableBox` ([#81792](https://github.com/WordPress/gutenberg/pull/81792))
+    -   `ComboboxControl`: ([#80471](https://github.com/WordPress/gutenberg/pull/80471))
 
 ### Enhancements
 
@@ -40,7 +41,6 @@
 -   `ToggleGroupControl`: Streamline focus ring color styles ([#81242](https://github.com/WordPress/gutenberg/pull/81242)).
 -   `ControlWithError`: Remove the internal implementation in favor of the `ControlWithError` component from `@wordpress/ui` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574)).
 -   Remove the unused `components-validated-control__indicator*` styles; the indicator is now rendered and styled by `ValidityIndicator` from `@wordpress/ui` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574)).
--   `ComboboxControl`: Migrate styles from Emotion to an SCSS Module ([#80471](https://github.com/WordPress/gutenberg/pull/80471)).
 
 ## 39.0.0 (2026-08-12)
 
