@@ -1,0 +1,22 @@
+{
+	"name": "gutenberg-pr-review-evals",
+	"private": true,
+	"type": "module",
+	"engines": {
+		"node": "^20.20.0 || >=22.22.0"
+	},
+	"scripts": {
+		"eval": "node scripts/run-eval.mjs codex",
+		"eval:codex": "node scripts/run-eval.mjs codex",
+		"eval:claude": "node scripts/run-eval.mjs claude",
+		"reset": "node scripts/reset-workspaces.mjs",
+		"clean": "node scripts/clean-workspaces.mjs",
+		"validate:codex": "promptfoo validate -c promptfooconfig.yaml",
+		"validate:claude": "promptfoo validate -c promptfooconfig.claude.yaml"
+	},
+	"devDependencies": {
+		"@anthropic-ai/claude-agent-sdk": "^0.3.211",
+		"@openai/codex-sdk": "^0.144.5",
+		"promptfoo": "^0.121.19"
+	}
+}

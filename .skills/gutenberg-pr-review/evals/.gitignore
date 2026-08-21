@@ -1,0 +1,4 @@
+node_modules/
+.workspaces/
+results/raw/
+.DS_Store

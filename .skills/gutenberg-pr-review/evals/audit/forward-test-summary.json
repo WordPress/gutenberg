@@ -1,0 +1,56 @@
+{
+	"skill": "../../SKILL.md",
+	"cases": 8,
+	"completed": 8,
+	"failed": 0,
+	"statuses": [
+		{
+			"case": "component-api",
+			"commit": "839f5c67e0d2a869611c6f5d3f1a9201ffc34ab1",
+			"status": "completed",
+			"returncode": 0
+		},
+		{
+			"case": "scss-migration",
+			"commit": "94db96e4ffbbf522efa7daf8269b2b20267abd80",
+			"status": "completed",
+			"returncode": 0
+		},
+		{
+			"case": "richtext-regression",
+			"commit": "1cfca19c6b1c763892a7511c3a16219e0be4bc7a",
+			"status": "completed",
+			"returncode": 0
+		},
+		{
+			"case": "keyboard-selection",
+			"commit": "c6c8e71cfef82fe01b189ad58b00af4ea921f743",
+			"status": "completed",
+			"returncode": 0
+		},
+		{
+			"case": "theme-css",
+			"commit": "02cfe19f92e4fcdb085d1525f24bc4f9b2a2874e",
+			"status": "completed",
+			"returncode": 0
+		},
+		{
+			"case": "workflow-forks",
+			"commit": "7546d82f37427d2ca3b4204c9d76641d2012fdb7",
+			"status": "completed",
+			"returncode": 0
+		},
+		{
+			"case": "toolchain-pinning",
+			"commit": "658cb29d541b946538231697017b450755a2c209",
+			"status": "completed",
+			"returncode": 0
+		},
+		{
+			"case": "documentation-only",
+			"commit": "4fa4b6c05ea8c8f5d6009c5f74191dee6fcef3ac",
+			"status": "completed",
+			"returncode": 0
+		}
+	]
+}

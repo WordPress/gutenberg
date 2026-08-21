@@ -1,0 +1,109 @@
+description: Compare Gutenberg PR reviews with and without the gutenberg-pr-review skill
+
+prompts:
+    - label: Review a Gutenberg pull request
+      raw: |
+          Use the `gutenberg-pr-review` skill if it is available in this workspace.
+
+          Read `cases/{{case}}/PR_CONTEXT.md` and review the proposed Gutenberg pull
+          request. Do not modify files or run commands. Report only actionable
+          findings, ordered by severity, with file references and concise remedies.
+
+providers:
+    - id: anthropic:claude-agent-sdk
+      label: Claude Code without gutenberg-pr-review
+      config:
+          working_dir: ./.workspaces/without-skill
+          setting_sources: ['project']
+          permission_mode: dontAsk
+          apiKeyRequired: false
+          persist_session: false
+
+    - id: anthropic:claude-agent-sdk
+      label: Claude Code with gutenberg-pr-review
+      config:
+          working_dir: ./.workspaces/with-skill
+          setting_sources: ['project']
+          skills: ['gutenberg-pr-review']
+          permission_mode: dontAsk
+          apiKeyRequired: false
+          persist_session: false
+
+defaultTest:
+    options:
+        bustCache: true
+    assert:
+        - type: javascript
+          value: file://assertions/grade-gutenberg-review.cjs
+          threshold: 1
+          metric: Seeded review checks
+        - type: llm-rubric
+          value: '{{rubric}}'
+          threshold: 0.8
+          metric: Review usefulness
+          provider:
+              id: anthropic:claude-agent-sdk
+              config:
+                  permission_mode: dontAsk
+                  apiKeyRequired: false
+                  persist_session: false
+
+tests:
+    - description: Preserve serialized block markup
+      vars:
+          case: block-serialized-markup
+          rubric: |
+              Judge whether this review would help a Gutenberg maintainer catch the
+              seeded compatibility regression.
+
+              The pull request changes the Call to Action block's serialized class
+              name in save.js. Existing posts still contain the old class, so those
+              blocks fail validation when reopened. There is no deprecated block
+              version or migration, and tests cover only newly serialized markup.
+              The Block API version does not need to be bumped.
+
+              Pass only if the review prioritizes the existing-content validation
+              failure, identifies the missing compatibility/deprecation path, and
+              requests meaningful old-content coverage. Fail reviews that demand an
+              API-version bump or bury the defect in generic checklist advice.
+
+    - description: Ignore stale async responses
+      vars:
+          case: async-stale-response
+          rubric: |
+              Judge whether this review would help a Gutenberg maintainer catch the
+              seeded async lifecycle regression.
+
+              When templateId changes quickly, the earlier request can resolve last
+              and overwrite the newer template preview. The effect already lists
+              templateId as a dependency. The implementation needs cancellation,
+              request identity, or an equivalent stale-result guard, plus a
+              regression test with out-of-order completion.
+
+              Pass only if the review explains the concrete stale-response sequence,
+              proposes a proportionate guard, and requests meaningful race coverage.
+              Fail reviews that claim templateId is missing from the dependency array
+              or provide only generic async advice.
+
+    - description: Preserve explicit false REST values
+      vars:
+          case: rest-false-update
+          rubric: |
+              Judge whether this review would help a Gutenberg maintainer catch the
+              seeded REST update regression.
+
+              The truthiness guard skips update_option when allow_comments is
+              explicitly false, so a user cannot turn an existing true value off.
+              The route already has an appropriate permission callback, boolean
+              schema, and sanitization. The fix must distinguish parameter presence
+              from truthiness and test a true-to-false update.
+
+              Pass only if the review explains the false-value failure, recommends a
+              presence-aware or unconditional update, and requests the consequential
+              regression test. Fail reviews that invent missing permission or
+              sanitization findings.
+
+evaluateOptions:
+    maxConcurrency: 2
+
+outputPath: results/raw/claude.json
