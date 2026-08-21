@@ -7,6 +7,7 @@
 -   Revisions: close the screen on the first click of the back arrow after a revision has been selected, instead of requiring a second click ([#81897](https://github.com/WordPress/gutenberg/pull/81897)).
 -   Revisions: close the screen after applying a revision, which stopped happening when the screen moved into this package ([#81897](https://github.com/WordPress/gutenberg/pull/81897)).
 -   Color palette panel: do not render the theme colors wrapper when the theme provides no colors, which left an empty gap above the Custom section ([#81894](https://github.com/WordPress/gutenberg/pull/81894)).
+-   Font Library: Resolve variable font weight ranges to a single value so the previews no longer fall back to the surrounding font weight ([#81748](https://github.com/WordPress/gutenberg/pull/81748)).
 
 ### Enhancements
 
