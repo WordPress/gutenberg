@@ -16,16 +16,22 @@ const {
 const ALLOWLIST = {
 	'@wordpress/ui': {
 		allowed: [
+			'Autocomplete',
 			'Badge',
 			'Calendar',
 			'Card',
 			'Collapsible',
 			'CollapsibleCard',
+			'ControlWithError',
 			'EmptyState',
+			'Field',
+			'Fieldset',
 			'Icon',
 			'Input',
 			'InputControl',
 			'InputLayout',
+			'KeyboardShortcutDescription',
+			'KeyboardShortcutDisplay',
 			'Link',
 			'RangeCalendar',
 			'Skeleton',
@@ -36,7 +42,9 @@ const ALLOWLIST = {
 			'Textarea',
 			'TextareaControl',
 			'Tooltip',
+			'ValidityIndicator',
 			'VisuallyHidden',
+			'useKeyboardShortcutProps',
 		],
 		message:
 			'`{{ name }}` from `{{ source }}` is not yet recommended for use in a WordPress environment.',

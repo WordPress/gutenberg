@@ -635,62 +635,23 @@
 			"count": 4
 		}
 	},
-	"packages/boot/src/components/error-boundary/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
 	"packages/boot/src/components/navigation/drilldown-item/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
 		}
 	},
 	"packages/boot/src/components/navigation/dropdown-item/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		},
 		"@wordpress/use-recommended-components": {
 			"count": 2
 		}
 	},
 	"packages/boot/src/components/navigation/navigation-item/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		},
 		"@wordpress/use-recommended-components": {
 			"count": 2
 		}
 	},
 	"packages/boot/src/components/navigation/navigation-screen/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		},
 		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
-	"packages/boot/src/components/root/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
-	"packages/boot/src/components/root/single-page.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
-	"packages/boot/src/components/save-button/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
-	"packages/boot/src/components/sidebar/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
-	"packages/boot/src/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 2
 		}
 	},
@@ -1727,7 +1688,7 @@
 	},
 	"packages/global-styles-ui/src/gradients-palette-panel.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 2
+			"count": 1
 		}
 	},
 	"packages/global-styles-ui/src/navigation-button.tsx": {
