@@ -131,17 +131,6 @@ describe( 'RangeCalendar', () => {
 			expect( todayButton ).toHaveAccessibleName( /today/i );
 		} );
 
-		it( 'should mark the date provided through the `today` prop', () => {
-			render( <RangeCalendar today={ tomorrow } /> );
-
-			expect( getDateButton( tomorrow ) ).toHaveAccessibleName(
-				/today/i
-			);
-			expect( getDateButton( today ) ).not.toHaveAccessibleName(
-				/today/i
-			);
-		} );
-
 		it( 'should show multiple months at once via the `numberOfMonths` prop', () => {
 			render( <RangeCalendar numberOfMonths={ 2 } /> );
 

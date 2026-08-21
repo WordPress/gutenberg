@@ -221,7 +221,6 @@
       - startMonth
       - style
       - timeZone
-      - today
       - value
       - weekStartsOn
 - name: Card.Root
@@ -971,7 +970,6 @@
       - startMonth
       - style
       - timeZone
-      - today
       - value
       - weekStartsOn
 - name: RangeControl

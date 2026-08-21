@@ -19,8 +19,6 @@ import { unlock } from '../../lock-unlock';
 
 const { ValidatedInputControl } = unlock( componentsPrivateApis );
 
-const formatUTCDate = ( date: Date ) => date.toISOString().slice( 0, 10 );
-
 const formatDateTime = ( value?: string ): string => {
 	if ( ! value ) {
 		return '';
@@ -44,56 +42,34 @@ function CalendarDateTimeControl< Item >( {
 	const fieldValue = getValue( { item: data } );
 	const value = typeof fieldValue === 'string' ? fieldValue : undefined;
 	const { timezone } = getSettings();
-	const usesUTCCalendarFrame = ! timezone.string;
-	const timeZone = timezone.string || 'UTC';
-	const getCalendarDate = useCallback(
-		( date: Date ) =>
-			usesUTCCalendarFrame
-				? new Date( date.getTime() + timezone.offset * 60 * 60_000 )
-				: date,
-		[ timezone.offset, usesUTCCalendarFrame ]
-	);
-	const parseCalendarDateTime = useCallback(
-		( dateString?: string ) => {
-			const parsedDate = parseDateTime( dateString );
-			return parsedDate ? getCalendarDate( parsedDate ) : null;
-		},
-		[ getCalendarDate ]
-	);
-	const isSameCalendarMonth = useCallback(
-		( first: Date, second: Date ) =>
-			usesUTCCalendarFrame
-				? first.getUTCFullYear() === second.getUTCFullYear() &&
-				  first.getUTCMonth() === second.getUTCMonth()
-				: isSameMonth(
-						toCalendarDate( first, timeZone ),
-						toCalendarDate( second, timeZone )
-				  ),
-		[ timeZone, usesUTCCalendarFrame ]
-	);
+	const timeZone = timezone.string || dateI18n( 'P' );
 
 	const [ calendarMonth, setCalendarMonth ] = useState< Date >( () => {
-		const parsedDate = parseCalendarDateTime( value );
-		return parsedDate || getCalendarDate( new Date() );
+		const parsedDate = parseDateTime( value );
+		return toCalendarDate( parsedDate || new Date(), timeZone );
 	} );
 	// Follow external value changes in the same timezone frame as the calendar.
 	useEffect( () => {
-		const parsedDate = parseCalendarDateTime( value );
+		const parsedDate = parseDateTime( value );
 		if ( parsedDate ) {
+			const targetMonth = toCalendarDate( parsedDate, timeZone );
 			setCalendarMonth( ( currentMonth ) =>
-				isSameCalendarMonth( parsedDate, currentMonth )
+				isSameMonth(
+					targetMonth,
+					toCalendarDate( currentMonth, timeZone )
+				)
 					? currentMonth
-					: parsedDate
+					: targetMonth
 			);
 		}
-	}, [ isSameCalendarMonth, parseCalendarDateTime, value ] );
+	}, [ timeZone, value ] );
 
 	const inputControlRef = useRef< HTMLInputElement >( null );
 	const validationTimeoutRef =
 		useRef< ReturnType< typeof setTimeout > >( undefined );
 
 	const { minConstraint, maxConstraint, disabledMatchers } =
-		useDisabledDateMatchers( isValid, parseCalendarDateTime );
+		useDisabledDateMatchers( isValid, parseDateTime );
 
 	const onChangeCallback = useCallback(
 		( newValue: string | undefined ) =>
@@ -109,12 +85,8 @@ function CalendarDateTimeControl< Item >( {
 	const onSelectDate = useCallback(
 		( newDate: Date | null ) => {
 			if ( newDate ) {
-				// A manual site offset uses a synthetic UTC calendar date whose
-				// UTC fields are the site's wall-clock fields. Named timezones can
-				// use the selected date directly.
-				const wpDate = usesUTCCalendarFrame
-					? formatUTCDate( newDate )
-					: dateI18n( 'Y-m-d', newDate );
+				// Extract the date part in the WordPress timezone.
+				const wpDate = dateI18n( 'Y-m-d', newDate );
 
 				// Preserve time if it exists. A new value starts at midnight in
 				// the site timezone.
@@ -154,7 +126,7 @@ function CalendarDateTimeControl< Item >( {
 				}
 			}, 0 );
 		},
-		[ onChangeCallback, usesUTCCalendarFrame, value ]
+		[ onChangeCallback, value ]
 	);
 
 	const handleManualDateTimeChange = useCallback(
@@ -165,17 +137,15 @@ function CalendarDateTimeControl< Item >( {
 				onChangeCallback( dateTime.toISOString() );
 
 				// Update calendar month to match
-				const parsedDate = parseCalendarDateTime(
-					dateTime.toISOString()
-				);
+				const parsedDate = parseDateTime( dateTime.toISOString() );
 				if ( parsedDate ) {
-					setCalendarMonth( parsedDate );
+					setCalendarMonth( toCalendarDate( parsedDate, timeZone ) );
 				}
 			} else {
 				onChangeCallback( undefined );
 			}
 		},
-		[ onChangeCallback, parseCalendarDateTime ]
+		[ onChangeCallback, timeZone ]
 	);
 
 	const { format: fieldFormat } = field;
@@ -228,12 +198,11 @@ function CalendarDateTimeControl< Item >( {
 				{ ! compact && (
 					<Calendar
 						style={ { width: '100%' } }
-						value={ value ? parseCalendarDateTime( value ) : null }
+						value={ value ? parseDateTime( value ) : null }
 						onValueChange={ onSelectDate }
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timeZone }
-						today={ getCalendarDate( new Date() ) }
 						weekStartsOn={ weekStartsOn }
 						disabled={ disabled || disabledMatchers }
 					/>

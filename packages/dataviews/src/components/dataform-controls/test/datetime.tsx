@@ -1,75 +1,91 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { getSettings, setSettings } from '@wordpress/date';
 import { useState } from '@wordpress/element';
-import { setSettings, getSettings } from '@wordpress/date';
-import DataForm from '../../../dataform';
-import type { Field } from '../../../types';
+import normalizeFields from '../../../field-types';
+import DateTime from '../datetime';
+import type { DataFormControlProps } from '../../../types';
 
-type TestItem = { id: number; publishedAt: string };
-
-const fields: Field< TestItem >[] = [
-	{
-		id: 'publishedAt',
-		label: 'Published at',
-		type: 'datetime',
-	},
-];
-
-const form = { fields: [ 'publishedAt' ] };
+jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
 
 const noop = () => {};
+
+type TestItem = {
+	published?: string;
+};
+
+const field = normalizeFields< TestItem >( [
+	{
+		id: 'published',
+		label: 'Published',
+		type: 'datetime',
+	},
+] )[ 0 ];
 
 const getMonthGrid = ( monthLabel: string ) =>
 	screen.getByRole( 'grid', { name: monthLabel } );
 
-function ControlledDataForm( { initialValue }: { initialValue: string } ) {
-	const [ item, setItem ] = useState< TestItem >( {
-		id: 1,
-		publishedAt: initialValue,
+const supportsOffsetTimeZones = () => {
+	try {
+		new Intl.DateTimeFormat( 'en', { timeZone: '+05:30' } );
+		return true;
+	} catch {
+		return false;
+	}
+};
+
+// Raw offset identifiers are supported by the target browsers and Node 22+.
+// Node 20 cannot mount Calendar with them because its Intl implementation
+// rejects the identifier before the interaction can be tested.
+const describeWithOffsetTimeZones = supportsOffsetTimeZones()
+	? describe
+	: describe.skip;
+
+function DateTimeHarness( { initialValue }: { initialValue: string } ) {
+	const [ data, setData ] = useState< TestItem >( {
+		published: initialValue,
 	} );
-	return (
-		<DataForm
-			data={ item }
-			fields={ fields }
-			form={ form }
-			onChange={ ( edits ) =>
-				setItem( ( previous ) => ( { ...previous, ...edits } ) )
-			}
-		/>
-	);
+	const onChange: DataFormControlProps< TestItem >[ 'onChange' ] = (
+		edits
+	) => setData( ( current ) => ( { ...current, ...edits } ) as TestItem );
+	return <DateTime data={ data } field={ field } onChange={ onChange } />;
 }
 
-describe( 'dataform-controls/datetime', () => {
+describe( 'DateTime control', () => {
 	const originalSettings = getSettings();
+
+	beforeEach( () => {
+		setSettings( {
+			...originalSettings,
+			timezone: {
+				...originalSettings.timezone,
+				string: 'UTC',
+			},
+		} );
+	} );
 
 	afterEach( () => {
 		setSettings( originalSettings );
 		jest.useRealTimers();
 	} );
 
-	it( 'moves the calendar to an externally changed value', () => {
+	it( 'should move the calendar to the month of a value changed from outside the control', () => {
 		const { rerender } = render(
-			<DataForm
-				data={ {
-					id: 1,
-					publishedAt: '2024-03-15T10:30:00.000Z',
-				} }
-				fields={ fields }
-				form={ form }
+			<DateTime
+				data={ { published: '2024-03-15T10:30:00.000Z' } }
+				field={ field }
 				onChange={ noop }
 			/>
 		);
 
 		expect( getMonthGrid( 'March 2024' ) ).toBeInTheDocument();
 
+		// External value change, e.g. an undo, a reset, or switching the
+		// edited item.
 		rerender(
-			<DataForm
-				data={ {
-					id: 1,
-					publishedAt: '2024-11-20T10:30:00.000Z',
-				} }
-				fields={ fields }
-				form={ form }
+			<DateTime
+				data={ { published: '2024-11-20T10:30:00.000Z' } }
+				field={ field }
 				onChange={ noop }
 			/>
 		);
@@ -77,50 +93,49 @@ describe( 'dataform-controls/datetime', () => {
 		expect( getMonthGrid( 'November 2024' ) ).toBeInTheDocument();
 	} );
 
-	it( 'compares external month changes in the named site timezone', () => {
-		setSettings( {
-			...originalSettings,
-			timezone: {
-				offset: 14,
-				offsetFormatted: '14',
-				string: 'Pacific/Kiritimati',
-				abbr: '+14',
-			},
+	describe( 'with a site time zone ahead of the browser', () => {
+		beforeEach( () => {
+			// UTC+14, ahead of every possible browser time zone.
+			setSettings( {
+				...originalSettings,
+				timezone: {
+					...originalSettings.timezone,
+					string: 'Pacific/Kiritimati',
+					offset: 14,
+				},
+			} );
 		} );
-		const { rerender } = render(
-			<DataForm
-				data={ {
-					id: 1,
-					publishedAt: '2026-02-15T10:00:00.000Z',
-				} }
-				fields={ fields }
-				form={ form }
-				onChange={ noop }
-			/>
-		);
 
-		expect( getMonthGrid( 'February 2026' ) ).toBeInTheDocument();
+		it( 'should move the calendar to the month of a value changed across a month boundary', () => {
+			const { rerender } = render(
+				<DateTime
+					data={ { published: '2026-02-15T10:00:00.000Z' } }
+					field={ field }
+					onChange={ noop }
+				/>
+			);
 
-		rerender(
-			<DataForm
-				data={ {
-					id: 1,
-					publishedAt: '2026-02-28T12:00:00.000Z',
-				} }
-				fields={ fields }
-				form={ form }
-				onChange={ noop }
-			/>
-		);
+			expect( getMonthGrid( 'February 2026' ) ).toBeInTheDocument();
 
-		expect( getMonthGrid( 'March 2026' ) ).toBeInTheDocument();
+			// This instant is March 1 in the site time zone, but still
+			// February in the browser's, so a comparison in the wrong time
+			// zone keeps the calendar on February and hides the selected day.
+			rerender(
+				<DateTime
+					data={ { published: '2026-02-28T12:00:00.000Z' } }
+					field={ field }
+					onChange={ noop }
+				/>
+			);
+
+			expect( getMonthGrid( 'March 2026' ) ).toBeInTheDocument();
+		} );
 	} );
 
 	/**
 	 * Jest pins the browser timezone to UTC, so the mismatch is created from
-	 * the WordPress side. A site configured with a manual UTC offset — which is
-	 * what a default install has — reports an empty `timezone.string`, and the
-	 * control maps the site's wall-clock fields into the UTC calendar frame.
+	 * the WordPress side. A site configured with a manual UTC offset reports an
+	 * empty `timezone.string`, and the control passes the offset to Calendar.
 	 *
 	 * @param offset Site UTC offset, in hours.
 	 */
@@ -136,17 +151,13 @@ describe( 'dataform-controls/datetime', () => {
 		} );
 	}
 
-	describe( 'manual UTC offsets', () => {
-		it( 'moves to the site month after an external value change', () => {
+	describeWithOffsetTimeZones( 'with a manual UTC offset', () => {
+		it( 'should move to the site month after an external value change', () => {
 			setSiteOffset( 14 );
 			const { rerender } = render(
-				<DataForm
-					data={ {
-						id: 1,
-						publishedAt: '2026-02-15T10:00:00.000Z',
-					} }
-					fields={ fields }
-					form={ form }
+				<DateTime
+					data={ { published: '2026-02-15T10:00:00.000Z' } }
+					field={ field }
 					onChange={ noop }
 				/>
 			);
@@ -154,13 +165,9 @@ describe( 'dataform-controls/datetime', () => {
 			expect( getMonthGrid( 'February 2026' ) ).toBeInTheDocument();
 
 			rerender(
-				<DataForm
-					data={ {
-						id: 1,
-						publishedAt: '2026-02-28T12:00:00.000Z',
-					} }
-					fields={ fields }
-					form={ form }
+				<DateTime
+					data={ { published: '2026-02-28T12:00:00.000Z' } }
+					field={ field }
 					onChange={ noop }
 				/>
 			);
@@ -168,20 +175,16 @@ describe( 'dataform-controls/datetime', () => {
 			expect( getMonthGrid( 'March 2026' ) ).toBeInTheDocument();
 		} );
 
-		// A negative offset puts the site behind UTC, so the clicked day's midnight
-		// lands on the previous day when it is re-anchored to the site timezone.
 		it.each( [ -8, -5, 5.5, 9 ] )(
-			'commits the day that was clicked on a site at UTC%s',
+			'should commit the day clicked on a site at UTC%s',
 			async ( offset ) => {
 				setSiteOffset( offset );
 				const user = userEvent.setup();
 
 				render(
-					<ControlledDataForm initialValue="2026-08-15T12:30:00.000Z" />
+					<DateTimeHarness initialValue="2026-08-15T12:30:00.000Z" />
 				);
 
-				// The wall clock the input shows depends on the site offset, so the
-				// time of day is read off rather than hard-coded.
 				const timeOfDay = screen
 					.getByLabelText< HTMLInputElement >( 'Date time' )
 					.value.split( 'T' )[ 1 ];
@@ -190,9 +193,6 @@ describe( 'dataform-controls/datetime', () => {
 					screen.getByRole( 'button', { name: /august 20, 2026/i } )
 				);
 
-				// The input renders the committed instant as a wall clock in the
-				// site timezone, so it reads back the day that was clicked, with
-				// the time of day preserved.
 				expect(
 					screen.getByLabelText< HTMLInputElement >( 'Date time' )
 						.value
@@ -200,12 +200,12 @@ describe( 'dataform-controls/datetime', () => {
 			}
 		);
 
-		it( 'keeps the clicked day highlighted after it is committed', async () => {
+		it( 'should keep the clicked day highlighted after it is committed', async () => {
 			setSiteOffset( -8 );
 			const user = userEvent.setup();
 
 			render(
-				<ControlledDataForm initialValue="2026-08-15T12:30:00.000Z" />
+				<DateTimeHarness initialValue="2026-08-15T12:30:00.000Z" />
 			);
 
 			await user.click(
@@ -219,11 +219,11 @@ describe( 'dataform-controls/datetime', () => {
 			).toBeInTheDocument();
 		} );
 
-		it( 'starts a datetime selected from the calendar at midnight', async () => {
+		it( 'should start a datetime selected from the calendar at midnight', async () => {
 			setSiteOffset( -8 );
 			const user = userEvent.setup();
 
-			render( <ControlledDataForm initialValue="" /> );
+			render( <DateTimeHarness initialValue="" /> );
 
 			await user.click(
 				screen.getByRole( 'button', { name: /august 25, 2026/i } )
@@ -234,14 +234,14 @@ describe( 'dataform-controls/datetime', () => {
 			).toBe( '2026-08-25T00:00' );
 		} );
 
-		it( 'marks the site today, not the browser today', () => {
+		it( "should mark the site's today", () => {
 			jest.useFakeTimers();
-			// 20:00 UTC on Aug 15 is already Aug 16, 10:00 on a UTC+14 site.
+			// 20:00 UTC on Aug 15 is already Aug 16 on a UTC+14 site.
 			jest.setSystemTime( new Date( '2026-08-15T20:00:00.000Z' ) );
 			setSiteOffset( 14 );
 
 			render(
-				<ControlledDataForm initialValue="2026-08-10T12:30:00.000Z" />
+				<DateTimeHarness initialValue="2026-08-10T12:30:00.000Z" />
 			);
 
 			expect(
@@ -257,9 +257,7 @@ describe( 'dataform-controls/datetime', () => {
 		} );
 	} );
 
-	// A named timezone kept the two frames aligned all along, through the
-	// calendar's `timeZone` prop; this guards that path.
-	it( 'commits the clicked day on a site with a named timezone', async () => {
+	it( 'should commit the clicked day on a site with a named timezone', async () => {
 		setSettings( {
 			...originalSettings,
 			timezone: {
@@ -271,20 +269,19 @@ describe( 'dataform-controls/datetime', () => {
 		} );
 		const user = userEvent.setup();
 
-		render(
-			<ControlledDataForm initialValue="2026-08-15T12:30:00.000Z" />
-		);
+		render( <DateTimeHarness initialValue="2026-08-15T12:30:00.000Z" /> );
 
 		await user.click(
 			screen.getByRole( 'button', { name: /august 20, 2026/i } )
 		);
 
-		// 12:30 UTC is 21:30 in Tokyo; the clicked day keeps that wall clock.
 		expect(
 			screen.getByLabelText< HTMLInputElement >( 'Date time' ).value
 		).toBe( '2026-08-20T21:30' );
 		expect(
-			screen.getByRole( 'button', { name: /august 20, 2026, selected/i } )
+			screen.getByRole( 'button', {
+				name: /august 20, 2026, selected/i,
+			} )
 		).toBeInTheDocument();
 	} );
 } );
