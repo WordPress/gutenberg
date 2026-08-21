@@ -23,6 +23,7 @@ import {
 	EDITOR_INTENT_SUGGEST,
 } from './constants';
 import { getPostRawValue } from './reducer';
+import { hasPendingSuggestionMarkers } from './utils/pending-suggestion-markers';
 import { unlock } from '../lock-unlock';
 import { getDeviceTypeByCanvasWidth } from '../utils/device-type';
 
@@ -1409,9 +1410,32 @@ export const getEditorMode = createRegistrySelector(
 			return 'visual';
 		}
 
-		return (
-			select( preferencesStore ).get( 'core', 'editorMode' ) ?? 'visual'
-		);
+		const mode =
+			select( preferencesStore ).get( 'core', 'editorMode' ) ?? 'visual';
+
+		/*
+		 * The same refusal, for the same reason, one intent later. Markers
+		 * left unresolved when the user goes back to Editing - or already in
+		 * the post when it loads - are just as destructible, and neither
+		 * route dispatches `switchEditorMode`, so its guard never runs: the
+		 * mask simply lifts and the stored `text` preference puts the raw
+		 * `post_content` textarea back on screen with the markers in it.
+		 * Answering here covers both, and leaves the preference alone so the
+		 * code editor returns once the suggestions are resolved.
+		 *
+		 * Probing costs a serialization of the document, so it is gated on
+		 * the preference actually being `text`: a visual-editor session -
+		 * every session by default - never pays for it, and a code-editor
+		 * session is not re-serializing per keystroke the way the canvas is.
+		 */
+		if (
+			mode === 'text' &&
+			hasPendingSuggestionMarkers( getEditedPostContent( state ) )
+		) {
+			return 'visual';
+		}
+
+		return mode;
 	}
 );
 

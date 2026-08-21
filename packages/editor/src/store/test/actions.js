@@ -903,6 +903,125 @@ describe( 'Editor actions', () => {
 				'text'
 			);
 		} );
+
+		it( 'reports the visual editor on load when the post already carries markers', () => {
+			// The stored preference is the code editor, as it would be for
+			// someone who works in raw HTML.
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core', 'editorMode', 'text' );
+
+			const post = {
+				id: postId,
+				type: 'post',
+				status: 'draft',
+				title: 'bar',
+				content:
+					'<!-- wp:paragraph --><p>Hello <mark class="wp-suggestion" data-suggestion-id="7" data-suggestion-type="add">there</mark></p><!-- /wp:paragraph -->',
+				excerpt: '',
+			};
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post );
+
+			// Nothing was dispatched: opening a post with suggestions left to
+			// resolve is enough to put the code editor on screen, and the
+			// markers with it.
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'visual'
+			);
+			// The preference itself is untouched, so the code editor returns
+			// once the suggestions are resolved.
+			expect(
+				registry.select( preferencesStore ).get( 'core', 'editorMode' )
+			).toEqual( 'text' );
+		} );
+
+		it( 'keeps the code editor masked when leaving Suggesting with markers pending', () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				status: 'draft',
+				title: 'bar',
+				content:
+					'<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph -->',
+				excerpt: '',
+			};
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post );
+
+			// A code-editor user with nothing to resolve yet.
+			registry.dispatch( editorStore ).switchEditorMode( 'text' );
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'text'
+			);
+
+			// Suggesting masks the preference and swaps in the canvas.
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'visual'
+			);
+
+			// A suggestion is made, leaving a marker in the document.
+			registry
+				.dispatch( coreStore )
+				.editEntityRecord( 'postType', 'post', postId, {
+					content:
+						'<!-- wp:paragraph --><p>Hello <mark class="wp-suggestion" data-suggestion-id="7" data-suggestion-type="add">there</mark></p><!-- /wp:paragraph -->',
+				} );
+
+			// Back to Editing with the suggestion still unresolved. Lifting
+			// the mask here hands the marker to the code editor as writable
+			// raw HTML - the corruption `switchEditorMode` refuses, reached
+			// without dispatching it.
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'edit'
+			);
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'visual'
+			);
+		} );
+
+		it( 'does not mistake unrelated markup for a pending marker', () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				status: 'draft',
+				title: 'bar',
+				content:
+					'<!-- wp:paragraph {"className":"wp-suggestion-box"} --><p class="wp-suggestion-box">A callout.</p><!-- /wp:paragraph -->' +
+					'<!-- wp:code --><pre class="wp-block-code"><code>&lt;mark class="wp-suggestion" data-suggestion-id="1"&gt;</code></pre><!-- /wp:code -->',
+				excerpt: '',
+			};
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post );
+
+			// Precondition: the cheap containment probe hits, but neither a
+			// class named after the marker nor a code sample showing its
+			// markup is a marker.
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toContain( 'wp-suggestion' );
+
+			registry.dispatch( editorStore ).switchEditorMode( 'text' );
+
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'text'
+			);
+			expect(
+				registry
+					.select( noticesStore )
+					.getNotices()
+					.map( ( notice ) => notice.content )
+			).toEqual( [] );
+		} );
 	} );
 
 	describe( 'setEditorIntent', () => {

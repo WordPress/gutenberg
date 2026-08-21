@@ -649,10 +649,13 @@ export function getEditorIntent( state ) {
  *     Re-parsing an edited document corrupts markers whatever the intent was
  *     when the edit was made, so the intent alone is not a sufficient guard.
  *
- * The marker probe serializes the whole document, which is too expensive to
- * run from a render pass, so it is opt-in: `switchEditorMode` asks for it once
- * on an explicit user action, while the menu item and the command palette gate
- * on the intent only and let the action refuse the rarer case with a notice.
+ * The marker probe serializes the whole document, so it is opt-in:
+ * `switchEditorMode` asks for it once on an explicit user action, while the
+ * menu item and the command palette gate on the intent only and let the action
+ * refuse the rarer case with a notice. `getEditorMode` runs the same probe on
+ * the render path for the routes that never dispatch an action at all - a
+ * reload, or the mask lifting as the user leaves Suggesting - but only once
+ * the stored preference is `text`, so a visual session never pays for it.
  *
  * Returns the user-facing reason rather than a boolean so the disabled menu
  * item, the refused shortcut, and the announcement cannot drift apart.

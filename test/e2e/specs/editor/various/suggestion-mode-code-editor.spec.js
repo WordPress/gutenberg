@@ -11,7 +11,9 @@
  * shortcut, and the command palette - are all closed off.
  *
  * The preference itself is left alone, so a user who was in the code editor
- * before suggesting lands back in it when they return to Editing.
+ * before suggesting lands back in it when they return to Editing - unless
+ * they leave a suggestion unresolved behind them, which keeps the code editor
+ * shut until it is accepted or rejected.
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
@@ -177,6 +179,47 @@ test.describe( 'Suggest mode: the code editor', () => {
 				.getByTestId( 'snackbar' )
 				.filter( { hasText: 'The code editor is unavailable' } )
 		).toBeVisible();
+
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).toContain( 'data-suggestion-type="add"' );
+	} );
+
+	test( 'does not hand the code editor back with a suggestion still pending', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Original content' },
+		} );
+
+		// A user whose stored preference is the code editor.
+		await switchEditorMode( page, 'Code editor' );
+		await expect( page.locator( TEXT_EDITOR ) ).toBeVisible();
+
+		await switchIntent( page, 'Suggesting' );
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' plus suggested' );
+		await expect(
+			paragraph.locator(
+				`${ SUGGESTION_MARK }[data-suggestion-type="add"]`
+			)
+		).toContainText( 'plus suggested' );
+
+		/*
+		 * Returning to Editing lifts the mask, and nothing dispatches
+		 * `switchEditorMode` on the way - so its refusal never runs and the
+		 * restored `text` preference would put the pending marker on screen
+		 * as writable raw HTML. Suggestions still to resolve outrank the
+		 * preference until they are gone.
+		 */
+		await switchIntent( page, 'Editing' );
+		await expect( page.locator( TEXT_EDITOR ) ).toBeHidden();
+		await expect( paragraph ).toBeVisible();
 
 		const serialized = await editor.getEditedPostContent();
 		expect( serialized ).toContain( 'data-suggestion-type="add"' );
