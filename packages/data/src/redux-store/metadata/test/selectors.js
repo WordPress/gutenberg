@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createRegistry } from '@wordpress/data';
 
 const getFooSelector = ( state ) => state;

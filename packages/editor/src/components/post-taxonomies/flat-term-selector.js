@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { FormTokenField, withFilters } from '@wordpress/components';
@@ -10,10 +7,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { unescapeString, unescapeTerm } from '../../utils/terms';
 import MostUsedTerms from './most-used-terms';

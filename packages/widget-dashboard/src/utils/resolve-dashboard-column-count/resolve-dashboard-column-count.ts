@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { WIDGET_DASHBOARD_COLUMN_COUNT } from '../../types';
 
 /**

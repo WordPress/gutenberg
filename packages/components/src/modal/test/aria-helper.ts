@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { elementShouldBeHidden } from '../aria-helper';
 
 describe( 'aria-helper', () => {

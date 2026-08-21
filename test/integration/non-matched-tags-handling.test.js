@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { pasteHandler, unregisterBlockType } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
 

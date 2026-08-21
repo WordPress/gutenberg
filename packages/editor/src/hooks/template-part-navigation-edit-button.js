@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { addFilter } from '@wordpress/hooks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useCallback } from '@wordpress/element';
@@ -12,10 +9,6 @@ import {
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 
 // Block name constants

@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useState, useEffect } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@wordpress/components';
 import { Link, Stack, Text } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { CircleProgress, type HealthTone } from './components';
 import styles from './style.module.css';
 
@@ -25,13 +18,15 @@ type IssueCounts = {
 	critical: number;
 };
 
-// Async site health tests exposed via the REST API.
+// Async site health tests exposed via the REST API. The Site Health page
+// reads the same set; keep `routes/site-health/stage.tsx` in sync.
 const ASYNC_TEST_PATHS = [
 	'/wp-site-health/v1/tests/background-updates',
 	'/wp-site-health/v1/tests/loopback-requests',
 	'/wp-site-health/v1/tests/https-status',
 	'/wp-site-health/v1/tests/dotorg-communication',
 	'/wp-site-health/v1/tests/authorization-header',
+	'/wp-site-health/v1/tests/page-cache',
 ] as const;
 
 /**

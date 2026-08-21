@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { CheckboxControl } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import BlockIcon from '../block-icon';
 
 function BlockTypesChecklist( { blockTypes, value, onItemChange } ) {

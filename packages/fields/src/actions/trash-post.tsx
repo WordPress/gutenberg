@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { trash } from '@wordpress/icons';
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -14,10 +11,6 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import type { Action } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import { getItemTitle } from './utils';
 import type { CoreDataError, PostWithPermissions } from '../types';
 

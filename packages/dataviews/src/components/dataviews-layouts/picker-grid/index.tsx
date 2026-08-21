@@ -1,28 +1,10 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
-import {
-	Spinner,
-	Flex,
-	FlexItem,
-	privateApis as componentsPrivateApis,
-	Composite,
-} from '@wordpress/components';
+import { Spinner, Flex, FlexItem, Composite } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { useContext, useRef } from '@wordpress/element';
-import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../../lock-unlock';
+import { Badge, Stack } from '@wordpress/ui';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
 import DataViewsContext from '../../dataviews-context';
 import { useIsMultiselectPicker } from '../../dataviews-picker-footer';
@@ -33,7 +15,6 @@ import type {
 } from '../../../types';
 import type { SetSelection } from '../../../types/private';
 import { GridItems } from '../utils/grid-items';
-const { Badge: WCBadge } = unlock( componentsPrivateApis );
 import getDataByGroup from '../utils/get-data-by-group';
 import useSelectionProps from '../utils/use-selection-props';
 import type { SelectionProps } from '../utils/use-selection-props';
@@ -165,7 +146,8 @@ function GridItem< Item >( {
 					>
 						{ badgeFields.map( ( field ) => {
 							return (
-								<WCBadge
+								/* @ts-expect-error `Badge` is text-only, but a badge field renders whatever its `render` returns. */
+								<Badge
 									key={ field.id }
 									className="dataviews-view-picker-grid__field-value"
 								>
@@ -173,7 +155,7 @@ function GridItem< Item >( {
 										item={ item }
 										field={ field }
 									/>
-								</WCBadge>
+								</Badge>
 							);
 						} ) }
 					</Stack>

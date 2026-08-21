@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
 import TokenList from '@wordpress/token-list';
 import { getTypographyFontSizeValue } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import {
 	getFontSize,
 	getFontSizeClass,

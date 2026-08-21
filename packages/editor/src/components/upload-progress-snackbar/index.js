@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -9,10 +6,6 @@ import { store as uploadStore } from '@wordpress/upload-media';
 import { store as noticesStore } from '@wordpress/notices';
 import { Icon as WCIcon, Spinner } from '@wordpress/components';
 import { check } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { useTracker } from './tracker';
 
 const NOTICE_ID = 'upload-progress';

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, _x } from '@wordpress/i18n';
 import { ToolbarGroup, ToolbarDropdownMenu } from '@wordpress/components';
 import {

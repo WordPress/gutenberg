@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import BackgroundImageControl from '../background-image-control';
 import ColorGradientDropdownItem from './color-gradient-dropdown-item';
 import { useHasBackgroundColorPanel } from './color-panel';

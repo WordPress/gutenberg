@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	ToolbarButton,
 	ToolbarGroup,
@@ -11,10 +8,6 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import useStylesForBlocks from '../block-styles/use-styles-for-block';
 import { replaceActiveStyle } from '../block-styles/utils';
 import { store as blockEditorStore } from '../../store';

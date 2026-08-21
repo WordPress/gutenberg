@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { WidgetDashboardProvider } from './context/dashboard-context';
 import { WidgetDashboardUIProvider } from './context/ui-context';
 import { Actions } from './components/actions';

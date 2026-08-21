@@ -6,10 +6,6 @@
  *
  * @package
  */
-
-/**
- * External dependencies
- */
 import { readFile, writeFile, access } from 'fs/promises';
 import path from 'path';
 import esbuild from 'esbuild';

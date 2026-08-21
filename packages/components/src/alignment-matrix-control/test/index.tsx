@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { press, click } from '@ariakit/test';
-
-/**
- * Internal dependencies
- */
 import AlignmentMatrixControl from '..';
 
 const getControl = () => {

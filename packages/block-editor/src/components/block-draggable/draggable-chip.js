@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { Flex, FlexItem } from '@wordpress/components';
 import { dragHandle } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import BlockIcon from '../block-icon';
 
 export default function BlockDraggableChip( {

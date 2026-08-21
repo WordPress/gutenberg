@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { PanelBody, PanelRow } from '@wordpress/components';
 import { getGlobalStylesChanges } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import EntityRecordItem from './entity-record-item';
 import { STORE_NAME } from '../../name';
 

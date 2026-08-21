@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { isBlobURL } from '@wordpress/blob';
 import {
 	createInterpolateElement,
@@ -41,10 +34,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { crop, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import { MIN_SIZE } from '../image/constants';
 import { MediaControl, MediaControlPreview } from '../utils/media-control';
 import { unlock } from '../lock-unlock';
@@ -355,7 +344,7 @@ const SiteLogo = ( {
 							}
 							aria-haspopup="dialog"
 							icon={ crop }
-							label={ __( 'Crop' ) }
+							label={ __( 'Edit image' ) }
 						/>
 					</BlockControls>
 				) }

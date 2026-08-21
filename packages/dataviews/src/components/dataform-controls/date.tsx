@@ -1,7 +1,3 @@
-/**
- * External dependencies
- */
-import clsx from 'clsx';
 import {
 	format,
 	isValid as isValidDate,
@@ -11,16 +7,10 @@ import {
 	startOfMonth,
 	startOfYear,
 } from 'date-fns';
-
-/**
- * WordPress dependencies
- */
 import {
 	BaseControl,
 	Button,
-	Icon as WCIcon,
-	privateApis as componentsPrivateApis,
-	__experimentalInputControl as InputControl,
+	__experimentalInputControl as WCInputControl,
 } from '@wordpress/components';
 import { speak } from '@wordpress/a11y';
 import {
@@ -32,12 +22,12 @@ import {
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getDate, getSettings } from '@wordpress/date';
-import { error as errorIcon } from '@wordpress/icons';
-import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
+import {
+	Calendar,
+	RangeCalendar,
+	Stack,
+	ValidityIndicator,
+} from '@wordpress/ui';
 import RelativeDateControl from './utils/relative-date-control';
 import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
 import {
@@ -45,7 +35,6 @@ import {
 	OPERATOR_OVER,
 	OPERATOR_BETWEEN,
 } from '../../constants';
-import { unlock } from '../../lock-unlock';
 import type {
 	DataFormControlProps,
 	FieldValidity,
@@ -53,8 +42,6 @@ import type {
 	NormalizedField,
 } from '../../types';
 import getCustomValidity from './utils/get-custom-validity';
-
-const { DateCalendar, DateRangeCalendar } = unlock( componentsPrivateApis );
 
 type DateRange = [ string, string ] | undefined;
 
@@ -268,22 +255,10 @@ function ValidatedDateControl< Item >( {
 		<div onBlur={ onBlur }>
 			{ children }
 			{ customValidity && (
-				<p
-					className={ clsx(
-						'components-validated-control__indicator',
-						customValidity.type === 'invalid'
-							? 'is-invalid'
-							: undefined
-					) }
-				>
-					<WCIcon
-						className="components-validated-control__indicator-icon"
-						icon={ errorIcon }
-						size={ 16 }
-						fill="currentColor"
-					/>
-					{ customValidity.message }
-				</p>
+				<ValidityIndicator
+					type={ customValidity.type }
+					message={ customValidity.message }
+				/>
 			) }
 		</div>
 	);
@@ -335,7 +310,7 @@ function CalendarDateControl< Item >( {
 	);
 
 	const onSelectDate = useCallback(
-		( newDate: Date | undefined | null ) => {
+		( newDate: Date | null ) => {
 			const dateValue = newDate
 				? format( newDate, 'yyyy-MM-dd' )
 				: undefined;
@@ -440,7 +415,7 @@ function CalendarDateControl< Item >( {
 					</Stack>
 
 					{ /* Manual date input */ }
-					<InputControl
+					<WCInputControl
 						ref={ validityTargetRef }
 						type="date"
 						label={ __( 'Date' ) }
@@ -454,12 +429,10 @@ function CalendarDateControl< Item >( {
 					/>
 
 					{ /* Calendar widget */ }
-					<DateCalendar
+					<Calendar
 						style={ { width: '100%' } }
-						selected={
-							value ? parseDate( value ) || undefined : undefined
-						}
-						onSelect={ onSelectDate }
+						value={ value ? parseDate( value ) : null }
+						onValueChange={ onSelectDate }
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezoneString || undefined }
@@ -526,7 +499,7 @@ function CalendarDateRangeControl< Item >( {
 
 	const selectedRange = useMemo( () => {
 		if ( ! value ) {
-			return { from: undefined, to: undefined };
+			return null;
 		}
 
 		const [ from, to ] = value;
@@ -537,7 +510,7 @@ function CalendarDateRangeControl< Item >( {
 	}, [ value ] );
 
 	const [ calendarMonth, setCalendarMonth ] = useState< Date >( () => {
-		return selectedRange.from || new Date();
+		return selectedRange?.from || new Date();
 	} );
 
 	const [ isTouched, setIsTouched ] = useState( false );
@@ -546,24 +519,25 @@ function CalendarDateRangeControl< Item >( {
 
 	const updateDateRange = useCallback(
 		( fromDate?: Date | string, toDate?: Date | string ) => {
-			if ( fromDate && toDate ) {
-				onChangeCallback( [
-					formatDate( fromDate ),
-					formatDate( toDate ),
-				] );
-			} else if ( ! fromDate && ! toDate ) {
+			if ( ! fromDate && ! toDate ) {
 				onChangeCallback( undefined );
+				return;
 			}
-			// Do nothing if only one date is set - wait for both
+			// An incomplete range is committed with an empty-string bound
+			// rather than held back until both dates are set: the inputs are
+			// controlled, so an uncommitted date would be wiped on blur. The
+			// `between` operator does not filter while a bound is unfilled.
+			onChangeCallback( [
+				formatDate( fromDate ),
+				formatDate( toDate ),
+			] );
 		},
 		[ onChangeCallback ]
 	);
 
 	const onSelectCalendarRange = useCallback(
 		(
-			newRange:
-				| { from: Date | undefined; to?: Date | undefined }
-				| undefined
+			newRange: { from: Date | undefined; to?: Date | undefined } | null
 		) => {
 			updateDateRange( newRange?.from, newRange?.to );
 			setSelectedPresetId( null );
@@ -677,7 +651,7 @@ function CalendarDateRangeControl< Item >( {
 						justify="space-between"
 						className="dataviews-controls__date-range-inputs"
 					>
-						<InputControl
+						<WCInputControl
 							ref={ fromInputRef }
 							type="date"
 							label={ __( 'From' ) }
@@ -691,7 +665,7 @@ function CalendarDateRangeControl< Item >( {
 							min={ minConstraint }
 							max={ maxConstraint }
 						/>
-						<InputControl
+						<WCInputControl
 							ref={ toInputRef }
 							type="date"
 							label={ __( 'To' ) }
@@ -707,10 +681,10 @@ function CalendarDateRangeControl< Item >( {
 						/>
 					</Stack>
 
-					<DateRangeCalendar
+					<RangeCalendar
 						style={ { width: '100%' } }
-						selected={ selectedRange }
-						onSelect={ onSelectCalendarRange }
+						value={ selectedRange }
+						onValueChange={ onSelectCalendarRange }
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezone.string || undefined }

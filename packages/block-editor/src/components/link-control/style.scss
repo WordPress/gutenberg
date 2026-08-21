@@ -215,7 +215,7 @@ $block-editor-link-control-number-of-actions: 1;
 	}
 
 	.block-editor-link-control__preview-title {
-		line-height: 1.1;
+		line-height: var(--wpds-typography-line-height-sm);
 
 		&:focus {
 			box-shadow: none;

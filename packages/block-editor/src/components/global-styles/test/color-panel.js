@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { render, renderHook, screen } from '@testing-library/react';
 import { click, render as renderAriakit } from '@ariakit/test/react';
-
-/**
- * Internal dependencies
- */
 import ColorPanel, {
 	useHasColorPanel,
 	useHasTextPanel,
@@ -262,6 +255,30 @@ describe( 'ColorPanel — duplicate-hex preset slug identity', () => {
 		// must follow the stored slug; matching by hex would mark both.
 		expect( swatches[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
 		expect( swatches[ 0 ] ).toHaveAttribute( 'aria-selected', 'false' );
+	} );
+} );
+
+describe( 'ColorPanel — additional elements', () => {
+	it( 'renders additional element color controls', () => {
+		render(
+			<ColorPanel
+				value={ {} }
+				settings={ settingsWithColors( {
+					text: true,
+					background: true,
+				} ) }
+				onChange={ () => {} }
+				panelId="test-panel"
+				additionalElements={ [
+					{ name: 'textInput', label: 'Inputs' },
+				] }
+				defaultControls={ { textInput: true } }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: /^Inputs/ } )
+		).toBeVisible();
 	} );
 } );
 

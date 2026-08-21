@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { GlobalStylesUI } from '@wordpress/global-styles-ui';
 import { uploadMedia } from '@wordpress/media-utils';
-
-/**
- * Internal dependencies
- */
 import { GlobalStylesBlockLink } from './block-link';
 import { useGlobalStyles } from './hooks';
 
@@ -27,6 +20,8 @@ function useServerData( settings ) {
 		settings?.__experimentalDiscussionSettings;
 	const fontLibraryEnabled = settings?.fontLibraryEnabled ?? true;
 	const responsiveEditingEnabled = settings?.responsiveEditingEnabled ?? true;
+	const blockStatesEditingEnabled =
+		settings?.blockStatesEditingEnabled ?? true;
 
 	const mediaUploadHandler = useSelect( ( select ) => {
 		const { canUser } = select( coreStore );
@@ -78,6 +73,7 @@ function useServerData( settings ) {
 		serverSettings,
 		fontLibraryEnabled,
 		responsiveEditingEnabled,
+		blockStatesEditingEnabled,
 	};
 }
 
@@ -99,6 +95,7 @@ export default function GlobalStylesUIWrapper( {
 		serverSettings,
 		fontLibraryEnabled,
 		responsiveEditingEnabled,
+		blockStatesEditingEnabled,
 	} = useServerData( settings );
 
 	// Show loading state while data is being fetched
@@ -121,6 +118,7 @@ export default function GlobalStylesUIWrapper( {
 				showResponsiveStateControls={
 					showResponsiveStateControls && responsiveEditingEnabled
 				}
+				showBlockStateControls={ blockStatesEditingEnabled }
 			/>
 			<GlobalStylesBlockLink
 				path={ path }

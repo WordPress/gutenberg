@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import DataViews from '../index';
 import LayoutActivityComponent from './layout-activity';
 import LayoutTableComponent from './layout-table';
@@ -18,18 +11,12 @@ import WithCardComponent from './with-card';
 import FreeCompositionComponent from './free-composition';
 import MinimalUIComponent from './minimal-ui';
 import EmptyComponent from './empty';
-
 import './style.css';
 
 const meta = {
 	tags: [ 'manifest' ],
 	title: 'DataViews/DataViews',
 	component: DataViews,
-	// Temporary: Due to an upstream bug, render the root explicitly so the
-	// components manifest extractor can resolve props from the JSX.
-	//
-	// See: https://github.com/storybookjs/storybook/issues/34877
-	render: ( args ) => <DataViews { ...args } />,
 	args: {
 		containerHeight: 'auto',
 	},

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import {
 	getBlockType,
@@ -8,10 +5,6 @@ import {
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import {
 	getBlockOrder,
 	getBlockParents,
@@ -366,12 +359,13 @@ function getListViewClientIdsTreeUnmemoized( state, rootClientId ) {
  *
  * @return {Object[]} Tree of block objects with only clientID and innerBlocks set.
  */
-export const getEnabledClientIdsTree = createRegistrySelector( () =>
-	createSelector( getEnabledClientIdsTreeUnmemoized, ( state ) => [
+export const getEnabledClientIdsTree = createSelector(
+	getEnabledClientIdsTreeUnmemoized,
+	( state ) => [
 		state.blocks.order,
 		state.derivedBlockEditingModes,
 		state.blocks.blockEditingModes,
-	] )
+	]
 );
 
 /**
@@ -388,18 +382,27 @@ export const getEnabledClientIdsTree = createRegistrySelector( () =>
  *
  * @return {Object[]} Tree of block objects with only clientID and innerBlocks set.
  */
-export const getListViewClientIdsTree = createRegistrySelector( () =>
-	createSelector( getListViewClientIdsTreeUnmemoized, ( state ) => [
+export const getListViewClientIdsTree = createSelector(
+	getListViewClientIdsTreeUnmemoized,
+	( state ) => [
 		state.blocks.order,
 		state.derivedBlockEditingModes,
 		state.blocks.blockEditingModes,
 		state.blocks.parents,
-		state.blocks.byClientId,
-		state.blocks.attributes,
-		state.blockListSettings,
 		state.editedContentOnlySection,
-		state.settings,
-	] )
+		// The state below is only read to resolve a block's parent section,
+		// which the tree does only while a content-only section is being
+		// edited. Depending on it otherwise rebuilds the tree on every
+		// attribute change, i.e. on every keystroke.
+		...( state.editedContentOnlySection
+			? [
+					state.blocks.byClientId,
+					state.blocks.attributes,
+					state.blockListSettings,
+					state.settings,
+			  ]
+			: [] ),
+	]
 );
 
 /**
@@ -835,6 +838,29 @@ export function isSectionBlock( state, clientId ) {
 	}
 
 	return isSectionBlockCandidate( state, clientId );
+}
+
+/**
+ * Returns whether the block is displayed as a synced block, meaning a synced
+ * pattern or a template part. A block that carries pattern metadata is
+ * displayed as a pattern instead, so it is not considered synced.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client Id of the block.
+ *
+ * @return {boolean} Whether the block is displayed as a synced block.
+ */
+export function isSyncedBlock( state, clientId ) {
+	const blockName = getBlockName( state, clientId );
+	// Checked first so that the section lookup below, which walks the block's
+	// ancestors, is only reached for the few blocks that can be synced.
+	if ( blockName !== 'core/block' && blockName !== 'core/template-part' ) {
+		return false;
+	}
+
+	const patternName = getBlockAttributes( state, clientId )?.metadata
+		?.patternName;
+	return ! ( patternName && isSectionBlock( state, clientId ) );
 }
 
 /**

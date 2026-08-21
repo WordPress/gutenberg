@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useEntityRecords } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import OverlayTemplatePartSelector from '../overlay-template-part-selector';
 import useCreateOverlayTemplatePart from '../use-create-overlay';
 

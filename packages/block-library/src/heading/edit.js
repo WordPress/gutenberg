@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -9,10 +6,6 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { generateAnchor, setAnchor } from './autogenerate-anchors';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "37.0.0",
+	"version": "39.0.0",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -50,7 +50,7 @@
 		"src/**/*.scss"
 	],
 	"dependencies": {
-		"@ariakit/react": "^0.4.35",
+		"@ariakit/react": "^0.4.37",
 		"@date-fns/utc": "^2.1.1",
 		"@emotion/cache": "^11.14.0",
 		"@emotion/css": "^11.13.5",
@@ -75,6 +75,7 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+		"@wordpress/kebab-case": "file:../kebab-case",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/private-apis": "file:../private-apis",
@@ -97,14 +98,13 @@
 		"path-to-regexp": "^6.2.1",
 		"re-resizable": "^6.4.0",
 		"react-colorful": "^5.6.1",
-		"react-day-picker": "^9.14.0",
 		"remove-accents": "^0.5.0",
 		"uuid": "^14.0.0"
 	},
 	"devDependencies": {
-		"@ariakit/test": "^0.7.2",
-		"@storybook/addon-docs": "^10.4.3",
-		"@storybook/react-vite": "^10.4.3",
+		"@ariakit/test": "^0.7.4",
+		"@storybook/addon-docs": "^10.5.3",
+		"@storybook/react-vite": "^10.5.3",
 		"@testing-library/dom": "^10.4.1",
 		"@testing-library/jest-dom": "^6.9.1",
 		"@testing-library/react": "^16.3.2",
@@ -114,7 +114,7 @@
 		"@wordpress/jest-console": "file:../jest-console",
 		"@wordpress/stylelint-tools": "file:../../tools/stylelint",
 		"snapshot-diff": "^0.10.0",
-		"storybook": "^10.4.3",
+		"storybook": "^10.5.3",
 		"timezone-mock": "^1.3.6"
 	},
 	"peerDependencies": {

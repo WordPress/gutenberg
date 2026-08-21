@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { renderHook } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useSettings, useStyleOverride } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import useLayoutCustomProperties from '../use-layout-custom-properties';
 
 const mockGetResponsiveMediaQueries = jest.fn();

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Icon as WCIcon } from '@wordpress/components';
 import { error as errorIcon } from '@wordpress/icons';
 import { Tooltip, VisuallyHidden } from '@wordpress/ui';

@@ -1,8 +1,4 @@
 /* eslint-disable testing-library/render-result-naming-convention */
-
-/**
- * WordPress dependencies
- */
 import {
 	createBlock,
 	getBlockTypes,
@@ -12,10 +8,6 @@ import {
 	unregisterBlockType,
 } from '@wordpress/blocks';
 import { renderToString } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import InnerBlocks from '../';
 
 describe( 'InnerBlocks', () => {

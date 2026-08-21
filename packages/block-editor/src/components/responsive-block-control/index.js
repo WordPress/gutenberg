@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 import { ToggleControl } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import ResponsiveBlockControlLabel from './label';
 
 function ResponsiveBlockControl( props ) {

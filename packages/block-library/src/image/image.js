@@ -1,17 +1,10 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	ExternalLink,
 	FocalPointPicker,
 	ResizableBox,
 	Spinner,
-	TextareaControl,
+	TextareaControl as WCTextareaControl,
 	TextControl,
 	CheckboxControl,
 	ToolbarButton,
@@ -57,10 +50,6 @@ import { getBlockBindingsSource, switchToBlockType } from '@wordpress/blocks';
 import { crop, overlayText, upload, chevronDown } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 import { createUpgradedEmbedBlock } from '../embed/util';
 import { isExternalImage } from './edit';
@@ -196,7 +185,7 @@ function ContentOnlyControls( {
 					variant="toolbar"
 				>
 					<div className="wp-block-image__toolbar_content_textarea__container">
-						<TextareaControl
+						<WCTextareaControl
 							className="wp-block-image__toolbar_content_textarea"
 							label={ __( 'Alternative text' ) }
 							value={ attributes.alt || '' }
@@ -929,7 +918,7 @@ export default function Image( {
 							onClick={ openImageMediaEditorModal }
 							aria-haspopup="dialog"
 							icon={ crop }
-							label={ __( 'Crop' ) }
+							label={ __( 'Edit image' ) }
 							// Disable rather than hide while the edited image
 							// loads, so the button keeps focus when the modal
 							// closes instead of dropping it to the canvas.
@@ -1017,7 +1006,7 @@ export default function Image( {
 									setAttributes( { alt: undefined } )
 								}
 							>
-								<TextareaControl
+								<WCTextareaControl
 									label={ __( 'Alternative text' ) }
 									value={ alt || '' }
 									onChange={ updateAlt }

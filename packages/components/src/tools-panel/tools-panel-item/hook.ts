@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { usePrevious } from '@wordpress/compose';
 import { useCallback, useEffect, useLayoutEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import styles from '../style.module.scss';
 import { useToolsPanelContext } from '../context';
 import type { WordPressComponentProps } from '../../context';

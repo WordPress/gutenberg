@@ -1,24 +1,12 @@
-/**
- * External dependencies
- */
 import deepMerge from 'deepmerge';
-
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalSpacer as Spacer,
 	Button,
 	Modal,
 } from '@wordpress/components';
-
 import { useContext, useMemo, useRef, useState } from '@wordpress/element';
 import { useFocusOnMount, useMergeRefs } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type {
 	Field,
 	NormalizedForm,

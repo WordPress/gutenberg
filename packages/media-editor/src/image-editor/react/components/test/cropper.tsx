@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import {
 	act,
 	fireEvent,
@@ -8,10 +5,6 @@ import {
 	screen,
 	waitFor,
 } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { Cropper } from '../cropper';
 import type { CropperController } from '../../hooks/use-cropper-reducer';
 import { DEFAULT_STATE } from '../../../core/constants';

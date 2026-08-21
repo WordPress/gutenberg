@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * Internal dependencies
- */
 import SelectControl from '..';
 import { InputControlPrefixWrapper } from '../../input-control/input-prefix-wrapper';
 

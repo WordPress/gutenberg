@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { useSortable } from '@dnd-kit/sortable';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useState, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import actionableAreaStyles from '../shared/actionable-area-slot.module.css';
 import ResizeHandle from '../shared/resize-handle';
 import { clampResizeDelta, type ResizeSnapSize } from '../shared/resize-snap';

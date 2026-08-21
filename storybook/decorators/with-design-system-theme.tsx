@@ -1,6 +1,5 @@
 import { ThemeProvider } from '@wordpress/theme';
 import type { StoryContext } from 'storybook/internal/types';
-import { storyIdMatchesDesignSystemTheme } from './utils/design-system-theme-story-matchers';
 
 type ThemeProviderCornerRadius = React.ComponentProps<
 	typeof ThemeProvider
@@ -17,13 +16,6 @@ export function WithDesignSystemTheme(
 	Story: React.ComponentType< any >,
 	context: StoryContext
 ) {
-	const shouldApplyDesignSystemTheme = storyIdMatchesDesignSystemTheme(
-		context.id
-	);
-	if ( ! shouldApplyDesignSystemTheme ) {
-		return <Story { ...context } />;
-	}
-
 	const colorTheme = context.globals.dsColorTheme;
 	const cursorControl = context.globals.dsCursorControl || undefined;
 	const cornerRadiusPreset: ThemeProviderCornerRadius =

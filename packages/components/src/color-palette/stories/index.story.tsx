@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import ColorPalette from '..';
 
 const meta: Meta< typeof ColorPalette > = {

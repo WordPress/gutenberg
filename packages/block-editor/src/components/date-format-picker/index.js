@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { _x, __ } from '@wordpress/i18n';
 import { dateI18n, humanTimeDiff } from '@wordpress/date';
 import { useState, createInterpolateElement } from '@wordpress/element';

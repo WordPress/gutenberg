@@ -72,6 +72,14 @@ Examples of styles that appear in both the theme and the editor include gallery 
 
 ## JavaScript
 
+All new code in Gutenberg should be written in [TypeScript](https://www.typescriptlang.org/), with a `.ts` file extension, or a `.tsx` file extension for files including JSX syntax.
+
+There are some exceptions where writing plain JavaScript (`.js`) is permitted:
+
+-   If the code is expected to be run directly in the browser or by Node.js in environments where TypeScript syntax is not supported. Note that as of Node.js v22.18.0 and newer, [TypeScript files containing erasable syntax can be executed directly by the Node.js runtime](https://nodejs.org/learn/typescript/run-natively).
+-   If authoring new code in an existing `.js` or `.jsx` file. Migrating existing files to the equivalent `.ts` or `.tsx` is encouraged if it is trivial to do so.
+-   If authoring new files in a package which is largely untyped, such that the new file would not have reasonable access to existing package typings.
+
 JavaScript in Gutenberg uses modern language features of the [ECMAScript language specification](https://www.ecma-international.org/ecma-262/) as well as the [JSX language syntax extension](https://react.dev/learn/writing-markup-with-jsx). These are enabled through a combination of preset configurations, notably [`@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default) which is used as a preset in the project's [Babel](https://babeljs.io/) configuration.
 
 While the [staged process](https://tc39.es/process-document/) for introducing a new JavaScript language feature offers an opportunity to use new features before they are considered complete, **the Gutenberg project and the `@wordpress/babel-preset-default` configuration will only target support for proposals which have reached Stage 4 ("Finished")**.
@@ -80,7 +88,9 @@ While the [staged process](https://tc39.es/process-document/) for introducing a 
 
 In the Gutenberg project, we use [the ES2015 import syntax](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import) to enable us to create modular code with clear separations between code of a specific feature, code shared across distinct WordPress features, and third-party dependencies.
 
-These separations are identified by multi-line comments at the top of a file which imports code from another file or source.
+Imports can reference third-party packages, WordPress packages, or local files.
+
+Write imports as one contiguous block. Do not separate dependency types with comments or blank lines.
 
 #### External dependencies
 
@@ -89,9 +99,6 @@ An external dependency is third-party code that is not maintained by WordPress c
 Example:
 
 ```js
-/**
- * External dependencies
- */
 import moment from 'moment';
 ```
 
@@ -102,9 +109,6 @@ To encourage reusability between features, our JavaScript is split into domain-s
 Example:
 
 ```js
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 ```
 
@@ -115,9 +119,6 @@ Within a specific feature, code is organized into separate files and folders. As
 Example:
 
 ```js
-/**
- * Internal dependencies
- */
 import VisualEditor from '../visual-editor';
 ```
 
@@ -542,14 +543,15 @@ It is preferred to implement all components as [function components](https://rea
 
 ## JavaScript documentation using JSDoc
 
-Gutenberg follows the [WordPress JavaScript Documentation Standards](https://make.wordpress.org/core/handbook/best-practices/inline-documentation-standards/javascript/), with additional guidelines relevant for its distinct use of [import semantics](/docs/contributors/code/coding-guidelines.md#imports) in organizing files, the [use of TypeScript tooling](/docs/contributors/code/testing-overview.md#javascript-testing) for types validation, and automated documentation generation using [`@wordpress/docgen`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/docgen).
+Gutenberg follows the [WordPress JavaScript Documentation Standards](https://make.wordpress.org/core/handbook/best-practices/inline-documentation-standards/javascript/), with additional guidelines relevant for its distinct use of [import semantics](/docs/contributors/code/coding-guidelines.md#imports) in organizing files, and automated documentation generation using [`@wordpress/docgen`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/docgen).
 
-For additional guidance, consult the following resources:
-
--   [JSDoc Official Documentation](https://jsdoc.app/index.html)
--   [TypeScript Supported JSDoc](https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html)
+For additional guidance, consult the [JSDoc Official Documentation](https://jsdoc.app/index.html).
 
 ### Custom types
+
+<div class="callout callout-warning">
+Prefer defining types using TypeScript syntax when possible. This guidance applies to files which have not yet been migrated to TypeScript.
+</div>
 
 Define custom types using the [JSDoc `@typedef` tag](https://jsdoc.app/tags-typedef.html).
 
@@ -586,6 +588,10 @@ Note the use of quotes when defining a set of string literals. As in the [JavaSc
 
 ### Importing and exporting types
 
+<div class="callout callout-warning">
+Prefer importing and exporting types using TypeScript syntax when possible. This guidance applies to files which have not yet been migrated to TypeScript.
+</div>
+
 Use the [TypeScript `import` function](https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html#import-types) to import type declarations from other files or third-party dependencies.
 
 Since an imported type declaration can occupy an excess of the available line length and become verbose when referenced multiple times, you are encouraged to create an alias of the external type using a `@typedef` declaration at the top of the file, immediately following [the `import` groupings](/docs/contributors/code/coding-guidelines.md#imports).
@@ -617,6 +623,10 @@ If you use a [TypeScript integration](https://github.com/Microsoft/TypeScript/wi
 For packages which do not distribute their own TypeScript types, you are welcomed to install and use the [DefinitelyTyped](https://definitelytyped.org/) community-maintained types definitions, if one exists.
 
 ### Generic types
+
+<div class="callout callout-warning">
+Prefer annotating types using TypeScript syntax when possible. This guidance applies to files which have not yet been migrated to TypeScript.
+</div>
 
 When documenting a generic type such as `Object`, `Function`, `Promise`, etc., always include details about the expected record types.
 
@@ -667,6 +677,10 @@ const BREAKPOINTS = { huge: 1440 /* , ... */ };
 ```
 
 ### Nullable, undefined, and void types
+
+<div class="callout callout-warning">
+Prefer using TypeScript types when possible. This guidance applies to files which have not yet been migrated to TypeScript.
+</div>
 
 You can express a nullable type using a leading `?`. Use the nullable form of a type only if you're describing either the type or an explicit `null` value. Do not use the nullable form as an indicator of an optional parameter.
 
@@ -765,6 +779,10 @@ When documenting an example, use the markdown <code>\`\`\`</code> code block to 
 
 ### Documenting React components
 
+<div class="callout callout-warning">
+Component prop types should be written using TypeScript syntax when possible. This guidance applies to files which have not yet been migrated to TypeScript.
+</div>
+
 When possible, all components should be implemented as [function components](https://react.dev/learn/your-first-component), using [hooks](https://react.dev/reference/react/hooks) for managing component lifecycle and state.
 
 Documenting a function component should be treated the same as any other function. The primary caveat in documenting a component is being aware that the function typically accepts only a single argument (the "props"), which may include many property members. Use the [dot syntax for parameter properties](https://jsdoc.app/tags-param.html#parameters-with-properties) to document individual prop types.
@@ -804,9 +822,9 @@ GitHub Actions workflows operate in a privileged software supply chain environme
 
 These files are statically scanned when modified using [Actionlint](https://github.com/rhysd/actionlint) and [Zizmor](https://github.com/zizmorcore/zizmor). Actionlint scans the YAML workflow files within the `.github/workflows` directory, while Zizmor additionally scans any action file (`action.yml`) located anywhere in the repository. It's recommended that you install both of these tools locally using a package manager to run prior to submitting changes to workflow or action files.
 
-- [GitHub Actions Workflow Standards for WordPress](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/github-actions/)
-- [Actionlint installations instructions](https://github.com/rhysd/actionlint/blob/main/docs/install.md)
-- [Zizmor installation instructions](https://docs.zizmor.sh/installation/)
+-   [GitHub Actions Workflow Standards for WordPress](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/github-actions/)
+-   [Actionlint installations instructions](https://github.com/rhysd/actionlint/blob/main/docs/install.md)
+-   [Zizmor installation instructions](https://docs.zizmor.sh/installation/)
 
 To run Actionlint:
 

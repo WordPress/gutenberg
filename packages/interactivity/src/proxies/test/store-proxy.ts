@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { proxifyStore, proxifyState } from '../';
 import { setScope, resetScope, getContext } from '../../scopes';
 import { setNamespace, resetNamespace } from '../../namespaces';

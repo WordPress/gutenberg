@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useMemo, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DataViews from '../index';
 import {
 	LAYOUT_ACTIVITY,
@@ -351,7 +340,7 @@ describe( 'DataViews component', () => {
 					isItemClickable={ () => true }
 					renderItemLink={ ( { item, ...props } ) => (
 						<button
-							// @ts-expect-error
+							// @ts-expect-error The spread `props.onClick` may be an anchor handler, not a button one.
 							onClick={ ( event ) => {
 								event.preventDefault();
 								onClickItemCallback( item );
@@ -629,6 +618,54 @@ describe( 'DataViews component', () => {
 			).toBeChecked();
 			expect( onClickItem ).not.toHaveBeenCalled();
 		} );
+
+		it( 'passes only eligible items to a bulk action callback', async () => {
+			const restore = jest.fn();
+			render(
+				<DataViewWrapper
+					view={ {
+						...DEFAULT_VIEW,
+						fields: [ 'author' ],
+						titleField: 'title',
+					} }
+					actions={ [
+						{
+							id: 'restore',
+							label: 'Restore',
+							supportsBulk: true,
+							// Only the first item can be restored.
+							isEligible: ( item: Data ) => item.id === 1,
+							callback: restore,
+						},
+						{
+							id: 'trash',
+							label: 'Trash',
+							supportsBulk: true,
+							// Makes the second item selectable even though it
+							// is not eligible for the restore action.
+							isEligible: ( item: Data ) => item.id !== 1,
+							callback: jest.fn(),
+						},
+					] }
+				/>
+			);
+			const user = userEvent.setup();
+			await user.click(
+				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+			);
+			await user.click(
+				screen.getByRole( 'checkbox', { name: data[ 1 ].title } )
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Restore' } )
+			);
+
+			expect( restore ).toHaveBeenCalledTimes( 1 );
+			expect(
+				restore.mock.calls[ 0 ][ 0 ].map( ( item: Data ) => item.id )
+			).toEqual( [ 1 ] );
+		} );
 	} );
 
 	describe( 'in grid view', () => {
@@ -690,7 +727,7 @@ describe( 'DataViews component', () => {
 					isItemClickable={ () => true }
 					renderItemLink={ ( { item, ...props } ) => (
 						<button
-							// @ts-expect-error
+							// @ts-expect-error The spread `props.onClick` may be an anchor handler, not a button one.
 							onClick={ ( event ) => {
 								event.preventDefault();
 								mediaClickItemCallback( item );

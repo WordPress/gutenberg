@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useEffect, useState } from '@wordpress/element';
 import {
 	getWpCompatOverlaySlot,
 	useEnableWpCompatOverlaySlot,
 } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import Modal from '../';
 import type { ModalProps } from '../types';
 
@@ -91,6 +80,25 @@ describe( 'Modal', () => {
 		);
 		await user.keyboard( '[Escape]' );
 		expect( onRequestClose ).toHaveBeenCalled();
+	} );
+
+	it( 'should stop an Escape key press from propagating when it dismisses the modal', async () => {
+		const user = userEvent.setup();
+		const documentKeyDownHandler = jest.fn();
+		document.addEventListener( 'keydown', documentKeyDownHandler );
+
+		try {
+			render(
+				<Modal onRequestClose={ noop }>
+					<p>Modal content</p>
+				</Modal>
+			);
+
+			await user.keyboard( '[Escape]' );
+			expect( documentKeyDownHandler ).not.toHaveBeenCalled();
+		} finally {
+			document.removeEventListener( 'keydown', documentKeyDownHandler );
+		}
 	} );
 
 	it( 'should return focus when dismissed by clicking outside', async () => {

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, isRTL } from '@wordpress/i18n';
 import {
 	BlockControls,
@@ -9,10 +6,6 @@ import {
 import { ToolbarButton } from '@wordpress/components';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import useTabActions from '../tabs/use-tab-actions';
 
 /**

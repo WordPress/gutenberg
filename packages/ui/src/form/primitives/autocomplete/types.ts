@@ -34,7 +34,7 @@ export type AutocompleteGroupLabelProps = ComponentProps<
 
 export type AutocompleteInputProps = Omit<
 	ComponentProps< typeof _Autocomplete.Input >,
-	'size'
+	'size' | 'type' // The combobox role is only valid on input type="text".
 >;
 
 export type AutocompleteInputGroupProps = ComponentProps<

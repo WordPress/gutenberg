@@ -2,6 +2,7 @@
 	"name": "core/hello-world",
 	"title": "Hello World",
 	"description": "A minimal example widget.",
+	"icon": "dashboard-widgets/wordpress",
 	"category": "demo",
 	"presentation": "full-bleed",
 	"textdomain": "default"

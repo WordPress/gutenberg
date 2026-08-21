@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	useBlockProps,
 	getCustomValueFromPreset,
@@ -17,10 +10,6 @@ import {
 import { ResizableBox } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 import SpacerControls from './controls';
 import { MIN_SPACER_SIZE } from './constants';

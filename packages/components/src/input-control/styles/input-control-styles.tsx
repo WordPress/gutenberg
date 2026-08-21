@@ -1,14 +1,7 @@
-/**
- * External dependencies
- */
 import type { SerializedStyles } from '@emotion/react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import type { CSSProperties, ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../../context';
 import { Flex, FlexItem } from '../../flex';
 import { Text } from '../../text';
@@ -79,17 +72,6 @@ export const Root = styled( Flex )`
 	position: relative;
 	border-radius: ${ CONFIG.radiusSmall };
 	padding-top: 0;
-
-	// Focus within, excluding cases where auxiliary controls in prefix or suffix have focus.
-	&:focus-within:not( :has( :is( ${ Prefix }, ${ Suffix } ):focus-within ) ) {
-		${ BackdropUI } {
-			border-color: ${ COLORS.ui.borderFocus };
-			box-shadow: ${ CONFIG.controlBoxShadowFocus };
-			// Windows High Contrast mode will show this outline, but not the box-shadow.
-			outline: 2px solid transparent;
-			outline-offset: -2px;
-		}
-	}
 `;
 
 const containerDisabledStyles = ( { disabled }: ContainerProps ) => {
@@ -278,6 +260,18 @@ export const Input = styled.input< InputProps >`
 
 		&:-ms-input-placeholder {
 			color: ${ COLORS.ui.darkGrayPlaceholder };
+		}
+
+		&[type='date'],
+		&[type='datetime-local'],
+		&[type='month'],
+		&[type='time'],
+		&[type='week'] {
+			&::-webkit-datetime-edit {
+				display: flex;
+				align-items: center;
+				height: 100%;
+			}
 		}
 
 		&[type='email'],

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import removeAccents from 'remove-accents';
-
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	Button,
@@ -24,10 +17,6 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 import { filterURLForDisplay } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import PostPanelRow from '../post-panel-row';
 import { buildTermsTree } from '../../utils/terms';
 import { store as editorStore } from '../../store';

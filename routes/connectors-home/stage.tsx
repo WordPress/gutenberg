@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Page } from '@wordpress/admin-ui';
 import {
 	Button,
@@ -19,10 +16,6 @@ import { store as coreStore } from '@wordpress/core-data';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Notice } from '@wordpress/ui';
 import { unlock } from '@wordpress/routes-lock-unlock';
-
-/**
- * Internal dependencies
- */
 import './style.scss';
 import { AiPluginCallout } from './ai-plugin-callout';
 import {
