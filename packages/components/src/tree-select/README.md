@@ -136,11 +136,11 @@ the provided `<InputControlPrefixWrapper>` component.
 
 ```jsx
 import {
-  __experimentalInputControl as WCInputControl,
+  __experimentalInputControl as InputControl,
   __experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 } from '@wordpress/components';
 
-<WCInputControl
+<InputControl
   prefix={<InputControlPrefixWrapper>@</InputControlPrefixWrapper>}
 />
 ```
@@ -173,11 +173,11 @@ the provided `<InputControlSuffixWrapper>` component.
 
 ```jsx
 import {
-  __experimentalInputControl as WCInputControl,
+  __experimentalInputControl as InputControl,
   __experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 } from '@wordpress/components';
 
-<WCInputControl
+<InputControl
   suffix={<InputControlSuffixWrapper>%</InputControlSuffixWrapper>}
 />
 ```

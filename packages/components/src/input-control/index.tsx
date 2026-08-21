@@ -100,14 +100,14 @@ export function UnforwardedInputControl(
  * intended to (in time) merge with or replace `TextControl`.
  *
  * ```jsx
- * import { __experimentalInputControl as WCInputControl } from '@wordpress/components';
+ * import { __experimentalInputControl as InputControl } from '@wordpress/components';
  * import { useState } from 'react';
  *
  * const Example = () => {
  *   const [ value, setValue ] = useState( '' );
  *
  *   return (
- *  	<WCInputControl
+ *  	<InputControl
  *  		value={ value }
  *  		onChange={ ( nextValue ) => setValue( nextValue ?? '' ) }
  *  	/>
