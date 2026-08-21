@@ -7,7 +7,6 @@ import { InputLayout } from '../../../primitives/input-layout';
 import { formDecorator } from '../../../stories/shared';
 
 const meta: Meta< typeof ValidatedInputControl > = {
-	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/With Validation/ValidatedInputControl',
 	component: ValidatedInputControl,
 	argTypes: {
