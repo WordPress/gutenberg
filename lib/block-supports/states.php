@@ -513,6 +513,8 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 		return $block_content;
 	}
 
+	$block_name = $block['blockName'];
+
 	/*
 	 * Every CSS rule this function can produce is keyed off the block's `style`
 	 * attribute. Without it there is nothing to generate, so bail before doing
@@ -526,7 +528,6 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$block_name = $block['blockName'];
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
 	if ( ! $block_type ) {
 		return $block_content;
