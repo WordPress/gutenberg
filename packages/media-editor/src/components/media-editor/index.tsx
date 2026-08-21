@@ -149,8 +149,6 @@ interface MediaEditorFrameContextValue {
 	aspectRatioPresets?: AspectRatioPreset[];
 	/** `true` above `large`, where the panel docks beside the canvas. */
 	isWide: boolean;
-	/** Hidden below `small`, where the header has least room. */
-	showKeyboardShortcuts: boolean;
 	/** The open panel's id, or `null` when none is. */
 	activePanel: string | null;
 	/** Opens the given panel, or closes the open one when passed `null`. */
@@ -191,15 +189,8 @@ export interface HeaderActionsProps {
 }
 
 function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
-	const {
-		isImage,
-		isSaving,
-		onCancel,
-		isWide,
-		showKeyboardShortcuts,
-		activePanel,
-		onSelectPanel,
-	} = useMediaEditorFrameContext();
+	const { isImage, isSaving, onCancel, isWide, activePanel, onSelectPanel } =
+		useMediaEditorFrameContext();
 	const isDetailsOpen = activePanel === DETAILS_PANEL;
 	const [ isShortcutsModalOpen, setIsShortcutsModalOpen ] = useState( false );
 	return (
@@ -209,7 +200,7 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 			align="center"
 			gap="sm"
 		>
-			{ isImage && showKeyboardShortcuts && (
+			{ isImage && (
 				<Button
 					size="compact"
 					icon={ keyboard }
@@ -423,10 +414,6 @@ function MediaEditorContent( {
 		}
 		setActivePanel( isWide ? DETAILS_PANEL : null );
 	}, [ isWide ] );
-	// Keyboard shortcuts are a pointer-and-keyboard affordance and the header
-	// is tightest on a phone, so the icon drops below `small`. Shift+Alt+H
-	// still works for anyone with a keyboard attached.
-	const showKeyboardShortcuts = useViewportMatch( 'small' );
 	// One layout at every width now that the image controls sit under the
 	// canvas; retained for the frame contract.
 	const layout = 'wide' as const;
@@ -697,7 +684,6 @@ function MediaEditorContent( {
 		isUndoRedoDisabled: isCropInteractionActive,
 		aspectRatioPresets,
 		isWide,
-		showKeyboardShortcuts,
 		activePanel,
 		onSelectPanel: selectPanel,
 		onCancel: handleRequestClose,
