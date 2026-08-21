@@ -4,7 +4,8 @@
 
 ### Breaking Changes
 
--   Stroke-based icons now declare `fill` via inline `style` on the outer `<svg>` instead of the `fill` attribute, so the source's intent survives ordinary 3rd-party CSS overrides like `.foo svg { fill: currentColor }` without using `!important`. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+-   Stroke-based icons now declare `fill: none` via inline `style` on the outer `<svg>` instead of the `fill` attribute, so the source's intent survives ordinary third-party CSS overrides like `.foo svg { fill: currentColor }` without using `!important`. Consumers should use CSS `color` to recolor icons. A `fill` prop or ordinary CSS `fill` declaration no longer overrides the intrinsic `fill: none`; pass `style={ { fill: value } }` to deliberately replace it. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+-   Stroke-based icons use `vector-effect="non-scaling-stroke"`, so their stroke width stays constant when rendered outside the Icon block at sizes other than 24px. The Icon block deliberately restores the previous proportional stroke scaling. When new bundled icon elements run with an older externalized `wp.components.Icon`, supplying an unrelated `style` prop can replace the icon's intrinsic style; update the paired packages together to retain merged styles. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 
 ### Enhancements
 
