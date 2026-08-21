@@ -153,6 +153,36 @@ describe( 'DateControl', () => {
 
 			expect( getMonthGrid( 'April 2024' ) ).toBeInTheDocument();
 		} );
+
+		it( 'should keep the displayed month when it falls inside a range changed from outside the control', () => {
+			const { rerender } = render(
+				<DateControl
+					data={
+						{
+							published: [ '2026-02-10', '2026-02-15' ],
+						} as TestItem
+					}
+					field={ field }
+					onChange={ noop }
+					operator={ OPERATOR_BETWEEN }
+				/>
+			);
+
+			rerender(
+				<DateControl
+					data={
+						{
+							published: [ '2026-01-10', '2026-03-20' ],
+						} as TestItem
+					}
+					field={ field }
+					onChange={ noop }
+					operator={ OPERATOR_BETWEEN }
+				/>
+			);
+
+			expect( getMonthGrid( 'February 2026' ) ).toBeInTheDocument();
+		} );
 	} );
 
 	describe( 'with a site time zone ahead of the browser', () => {

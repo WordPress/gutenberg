@@ -1,4 +1,6 @@
 import {
+	areIntervalsOverlapping,
+	endOfMonth,
 	format,
 	isSameMonth,
 	isValid as isValidDate,
@@ -558,14 +560,22 @@ function CalendarDateRangeControl< Item >( {
 				currentMonth,
 				timezoneString
 			);
-			const isRangeVisible = [ from, to ].some(
-				( date ) =>
-					date &&
-					isSameMonth(
-						toCalendarDate( date, timezoneString ),
-						currentCalendarMonth
-					)
-			);
+			const calendarFrom = from && toCalendarDate( from, timezoneString );
+			const calendarTo = to && toCalendarDate( to, timezoneString );
+			const isRangeVisible =
+				calendarFrom && calendarTo
+					? areIntervalsOverlapping(
+							{ start: calendarFrom, end: calendarTo },
+							{
+								start: startOfMonth( currentCalendarMonth ),
+								end: endOfMonth( currentCalendarMonth ),
+							}
+					  )
+					: [ calendarFrom, calendarTo ].some(
+							( date ) =>
+								date &&
+								isSameMonth( date, currentCalendarMonth )
+					  );
 			return targetMonth && ! isRangeVisible
 				? toCalendarDate( targetMonth, timezoneString )
 				: currentMonth;
