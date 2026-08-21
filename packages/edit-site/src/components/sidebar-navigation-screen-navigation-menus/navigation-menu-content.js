@@ -172,14 +172,6 @@ export default function NavigationMenuContent( { rootClientId } ) {
 						}
 						isExpanded
 					/>
-					{ editingBlock?.clientId && (
-						<NavigationLinkUI
-							editingBlock={ editingBlock }
-							editingPopoverAnchor={ editingPopoverAnchor }
-							editingPopoverProps={ editingPopoverProps }
-							setEditingBlock={ setEditingBlock }
-						/>
-					) }
 				</>
 			) }
 			<div className="edit-site-sidebar-navigation-screen-navigation-menus__helper-block-editor">

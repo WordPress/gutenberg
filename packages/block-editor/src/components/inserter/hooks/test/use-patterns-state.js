@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { getPatternBlocksForInsertion } from '../use-patterns-state';
 import { INSERTER_PATTERN_TYPES } from '../../block-patterns-tab/utils';
 
