@@ -333,13 +333,15 @@ function InserterMenu(
 	// Focus first active tab, if any
 	const tabsRef = useRef();
 	useLayoutEffect( () => {
-		if ( tabsRef.current ) {
-			window.requestAnimationFrame( () => {
-				tabsRef.current
-					.querySelector( '[role="tab"][aria-selected="true"]' )
-					?.focus();
-			} );
+		if ( ! tabsRef.current ) {
+			return;
 		}
+		const frame = window.requestAnimationFrame( () => {
+			tabsRef.current
+				?.querySelector( '[role="tab"][aria-selected="true"]' )
+				?.focus();
+		} );
+		return () => window.cancelAnimationFrame( frame );
 	}, [] );
 
 	return (
