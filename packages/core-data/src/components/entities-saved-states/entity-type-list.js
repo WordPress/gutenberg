@@ -58,9 +58,70 @@ function GlobalStylesDescription( { record } ) {
 	) : null;
 }
 
-function EntityDescription( { record, count } ) {
+/**
+ * Describes what saving a group of attachment records will do.
+ *
+ * Keyed on what actually changed rather than on the entity type. An attachment
+ * can be staged here for more than one reason — today a block proposing to
+ * attach media the post displays, tomorrow an edit to alt text or a caption —
+ * and each needs its own sentence. Anything this doesn't recognise gets no
+ * description rather than a wrong one.
+ *
+ * It matters more for attachments than for the other entities in this panel:
+ * the checkbox label is a filename, which says nothing about what saving it
+ * does.
+ *
+ * @param {Object}   props
+ * @param {Object[]} props.list The group's dirty records.
+ */
+function AttachmentDescription( { list } ) {
+	const changes = useSelect(
+		( select ) => {
+			const { getEntityRecordNonTransientEdits } = select( STORE_NAME );
+
+			return list.map( ( record ) =>
+				Object.keys(
+					getEntityRecordNonTransientEdits(
+						record.kind,
+						record.name,
+						record.key
+					) ?? {}
+				)
+					.sort()
+					.join()
+			);
+		},
+		[ list ]
+	);
+
+	// Every record in the group has to be the same kind of change for one
+	// sentence to describe them all.
+	const isAttaching =
+		changes.length && changes.every( ( change ) => change === 'post' );
+
+	if ( ! isAttaching ) {
+		return null;
+	}
+
+	return (
+		<PanelRow>
+			{ 1 === changes.length
+				? __(
+						'Attaching this file records this post as where it is used.'
+				  )
+				: __(
+						'Attaching these files records this post as where they are used.'
+				  ) }
+		</PanelRow>
+	);
+}
+
+function EntityDescription( { record, count, list } ) {
 	if ( 'globalStyles' === record?.name ) {
 		return null;
+	}
+	if ( 'attachment' === record?.name ) {
+		return <AttachmentDescription list={ list } />;
 	}
 	const description = getEntityDescription( record?.name, count );
 	return description ? <PanelRow>{ description }</PanelRow> : null;
@@ -94,7 +155,11 @@ export default function EntityTypeList( {
 			initialOpen
 			className="entities-saved-states__panel-body"
 		>
-			<EntityDescription record={ firstRecord } count={ count } />
+			<EntityDescription
+				record={ firstRecord }
+				count={ count }
+				list={ list }
+			/>
 			{ list.map( ( record ) => {
 				return (
 					<EntityRecordItem
