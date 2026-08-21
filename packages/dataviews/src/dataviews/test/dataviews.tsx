@@ -962,7 +962,8 @@ describe( 'DataViews component', () => {
 			// pass something the `mediaFit` union rejects.
 			const renderGrid = (
 				layout: Record< string, unknown > = {},
-				props = {}
+				props = {},
+				view: Record< string, unknown > = {}
 			) =>
 				render(
 					<DataViewWrapper
@@ -971,11 +972,29 @@ describe( 'DataViews component', () => {
 								type: 'grid',
 								mediaField: 'image',
 								layout,
+								...view,
 							} as unknown as View
 						}
 						{ ...props }
 					/>
 				);
+
+			const optedIn = {
+				config: {
+					perPageSizes: [ 10, 20 ],
+					mediaFitControl: true,
+				},
+			};
+
+			const queryControl = async () => {
+				const user = userEvent.setup();
+				await user.click(
+					screen.getByRole( 'button', { name: 'View options' } )
+				);
+				return screen.queryByRole( 'checkbox', {
+					name: 'Original aspect ratio',
+				} );
+			};
 
 			// The standard (non-infinite-scroll) grid root, which carries the
 			// custom properties the previews read.
@@ -1004,36 +1023,24 @@ describe( 'DataViews component', () => {
 
 			it( 'hides the control unless the consumer opts in', async () => {
 				renderGrid();
-				const user = userEvent.setup();
-				await user.click(
-					screen.getByRole( 'button', { name: 'View options' } )
-				);
-				expect(
-					screen.queryByRole( 'checkbox', {
-						name: 'Original aspect ratio',
-					} )
-				).not.toBeInTheDocument();
+				expect( await queryControl() ).not.toBeInTheDocument();
+			} );
+
+			it( 'hides the control when the view is not showing media', async () => {
+				renderGrid( {}, optedIn, { showMedia: false } );
+				expect( await queryControl() ).not.toBeInTheDocument();
+			} );
+
+			it( 'hides the control when the media field is not one of the fields', async () => {
+				renderGrid( {}, optedIn, { mediaField: 'not-a-field' } );
+				expect( await queryControl() ).not.toBeInTheDocument();
 			} );
 
 			it( 'toggles the fit from the view options when opted in', async () => {
-				renderGrid(
-					{},
-					{
-						config: {
-							perPageSizes: [ 10, 20 ],
-							mediaFitControl: true,
-						},
-					}
-				);
+				renderGrid( {}, optedIn );
+				const control = await queryControl();
 				const user = userEvent.setup();
-				await user.click(
-					screen.getByRole( 'button', { name: 'View options' } )
-				);
-				await user.click(
-					screen.getByRole( 'checkbox', {
-						name: 'Original aspect ratio',
-					} )
-				);
+				await user.click( control as HTMLElement );
 				expect( getGrid() ).toHaveStyle( {
 					'--wp-dataviews-media-fit': 'contain',
 				} );

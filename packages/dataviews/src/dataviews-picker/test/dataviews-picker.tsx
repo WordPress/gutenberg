@@ -496,6 +496,77 @@ describe( 'DataViews Picker', () => {
 				);
 			} );
 		} );
+
+		describe( 'media fit', () => {
+			// The flat branch renders `GridItems` as the listbox itself, so
+			// the element carrying the custom property is the listbox.
+			it( 'crops previews by default', () => {
+				render( <Picker /> );
+				expect( screen.getByRole( 'listbox' ) ).toHaveStyle( {
+					'--wp-dataviews-media-fit': 'cover',
+				} );
+			} );
+
+			it( 'fits previews when configured to contain', () => {
+				render(
+					<Picker
+						view={
+							{
+								layout: { mediaFit: 'contain' },
+							} as Partial< ViewPickerGrid >
+						}
+					/>
+				);
+				expect( screen.getByRole( 'listbox' ) ).toHaveStyle( {
+					'--wp-dataviews-media-fit': 'contain',
+				} );
+			} );
+
+			it( 'ignores an unsupported value and falls back to cropping', () => {
+				render(
+					<Picker
+						view={
+							{
+								// Deliberately outside the `MediaFit` union.
+								layout: { mediaFit: 'fill' },
+							} as unknown as Partial< ViewPickerGrid >
+						}
+					/>
+				);
+				expect( screen.getByRole( 'listbox' ) ).toHaveStyle( {
+					'--wp-dataviews-media-fit': 'cover',
+				} );
+			} );
+
+			// Grouping renders one `GridItems` per group, nested inside the
+			// listbox rather than being it, so each has to carry the property.
+			it( 'applies the fit to every group when the data is grouped', () => {
+				const { container } = render(
+					<Picker
+						fields={ groupingFields }
+						view={
+							{
+								groupBy: { field: 'parity', direction: 'asc' },
+								layout: { mediaFit: 'contain' },
+							} as Partial< ViewPickerGrid >
+						}
+					/>
+				);
+
+				// No role distinguishes the per-group grids from each other,
+				// so reach for them by class, as the DataViews tests do.
+				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+				const groups = container.querySelectorAll(
+					'.dataviews-view-grid-items'
+				);
+				expect( groups ).toHaveLength( 2 );
+				groups.forEach( ( group ) => {
+					expect( group ).toHaveStyle( {
+						'--wp-dataviews-media-fit': 'contain',
+					} );
+				} );
+			} );
+		} );
 	} );
 
 	describe.each( [

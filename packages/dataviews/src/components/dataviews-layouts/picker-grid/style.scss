@@ -77,6 +77,9 @@
 		min-height: 0;
 		background-color: var(--wpds-color-background-surface-neutral-strong);
 		border-radius: var(--wpds-border-radius-md);
+		// Clip the preview to the rounded corners, as the grid layout does.
+		// The selection checkbox is a sibling, so it isn't affected.
+		overflow: hidden;
 		position: relative;
 
 		img {
