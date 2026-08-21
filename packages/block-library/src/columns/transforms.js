@@ -2,15 +2,31 @@ import {
 	cloneSanitizedBlock,
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
+	getBlockType,
 } from '@wordpress/blocks';
 
 const MAXIMUM_SELECTED_BLOCKS = 6;
 const COLUMN_VERTICAL_ALIGNMENTS = [ 'top', 'center', 'bottom' ];
 const ROW_VERTICAL_ALIGNMENTS = [ ...COLUMN_VERTICAL_ALIGNMENTS, 'stretch' ];
 const FLEX_SIZE_LAYOUT_VALUES = [ 'fixed', 'fixedNoShrink' ];
+const DEFAULT_COLUMN_LAYOUT = { type: 'default' };
 
 const getObjectValue = ( value ) =>
 	value && typeof value === 'object' && ! Array.isArray( value ) ? value : {};
+
+const getGroupAttributes = ( attributes ) => {
+	const groupAttributeDefinitions = getBlockType( 'core/group' )?.attributes;
+	if ( ! groupAttributeDefinitions ) {
+		return {};
+	}
+	const normalizedAttributes = getObjectValue( attributes );
+
+	return Object.fromEntries(
+		Object.entries( normalizedAttributes ).filter( ( [ name ] ) =>
+			Object.hasOwn( groupAttributeDefinitions, name )
+		)
+	);
+};
 
 const getColumnWidth = ( width ) => {
 	if ( Number.isFinite( width ) ) {
@@ -71,11 +87,34 @@ const getColumnBlocksFromRow = ( innerBlocks ) =>
 const getGridInnerBlocks = ( innerBlocks ) =>
 	innerBlocks.flatMap( ( column ) => {
 		const columnInnerBlocks = column.innerBlocks || [];
-		if ( columnInnerBlocks.length > 1 ) {
+		const {
+			layout: layoutAttribute,
+			style: styleAttribute,
+			...groupAttributes
+		} = getGroupAttributes( column?.attributes );
+		const columnStyle = getObjectValue( styleAttribute );
+		const columnLayout = getObjectValue( layoutAttribute );
+		const hasGroupAttributes = Object.keys( groupAttributes ).length > 0;
+		const hasColumnStyle = Object.keys( columnStyle ).length > 0;
+		const hasColumnLayout = Object.keys( columnLayout ).length > 0;
+		if (
+			columnInnerBlocks.length > 1 ||
+			hasGroupAttributes ||
+			hasColumnStyle ||
+			hasColumnLayout
+		) {
 			return [
 				createBlock(
 					'core/group',
-					{ layout: { type: 'constrained' } },
+					{
+						...groupAttributes,
+						layout: hasColumnLayout
+							? columnLayout
+							: DEFAULT_COLUMN_LAYOUT,
+						...( hasColumnStyle && {
+							style: columnStyle,
+						} ),
+					},
 					columnInnerBlocks
 				),
 			];
@@ -104,8 +143,23 @@ const getRowInnerBlocks = ( innerBlocks ) => {
 		const childLayout = columnWidth
 			? { selfStretch: 'fixed', flexSize: columnWidth }
 			: { selfStretch: 'fill' };
+		const {
+			layout: layoutAttribute,
+			style: styleAttribute,
+			...groupAttributes
+		} = getGroupAttributes( column?.attributes );
+		const columnStyle = getObjectValue( styleAttribute );
+		const columnLayout = getObjectValue( layoutAttribute );
+		const hasGroupAttributes = Object.keys( groupAttributes ).length > 0;
+		const hasColumnStyle = Object.keys( columnStyle ).length > 0;
+		const hasColumnLayout = Object.keys( columnLayout ).length > 0;
 
-		if ( columnInnerBlocks.length === 1 ) {
+		if (
+			columnInnerBlocks.length === 1 &&
+			! hasGroupAttributes &&
+			! hasColumnStyle &&
+			! hasColumnLayout
+		) {
 			const innerBlock = columnInnerBlocks[ 0 ];
 			const style = getObjectValue( innerBlock.attributes?.style );
 			const layout = getObjectValue( style.layout );
@@ -125,8 +179,15 @@ const getRowInnerBlocks = ( innerBlocks ) => {
 		return createBlock(
 			'core/group',
 			{
-				layout: { type: 'constrained' },
-				style: { layout: childLayout },
+				...groupAttributes,
+				layout: hasColumnLayout ? columnLayout : DEFAULT_COLUMN_LAYOUT,
+				style: {
+					...columnStyle,
+					layout: {
+						...getObjectValue( columnStyle.layout ),
+						...childLayout,
+					},
+				},
 			},
 			columnInnerBlocks
 		);
