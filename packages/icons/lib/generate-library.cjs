@@ -338,9 +338,9 @@ function svgToTsx( svgContent ) {
 	jsxContent = jsxContent.replace( /\sstyle="([^"]*)"/g, ( _, cssString ) => {
 		const declarations = parseStyleDeclarations( cssString )
 			.map( ( [ key, value ] ) => {
-				const camelKey = key.replace( /-([a-z])/g, ( _m, c ) =>
-					c.toUpperCase()
-				);
+				const camelKey = key.startsWith( '--' )
+					? JSON.stringify( key )
+					: key.replace( /-([a-z])/g, ( _m, c ) => c.toUpperCase() );
 				// JSON.stringify yields a safely-escaped, double-quoted JS
 				// string, so values containing quotes/backslashes stay valid.
 				return `${ camelKey }: ${ JSON.stringify( value ) }`;

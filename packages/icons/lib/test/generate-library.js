@@ -114,6 +114,16 @@ describe( 'svgToTsx style attribute conversion', () => {
 		);
 	} );
 
+	it( 'preserves CSS custom property names', () => {
+		const tsx = svgToTsx(
+			'<svg style="--wp-admin-theme-color: red"><path d="M0 0" /></svg>'
+		);
+
+		expect( tsx ).toContain(
+			'style={ { "--wp-admin-theme-color": "red" } }'
+		);
+	} );
+
 	it( 'skips malformed declarations that have no colon', () => {
 		const tsx = svgToTsx(
 			'<svg style="; fill: none ;"><path d="M0 0" /></svg>'

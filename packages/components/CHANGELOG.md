@@ -51,6 +51,8 @@
 -   `ConfirmDialog`: Preserve `title` as the dialog's accessible name when the header is hidden ([#81847](https://github.com/WordPress/gutenberg/pull/81847)).
 -   `DuotonePicker`: Do not render the custom controls wrapper when `disableCustomDuotone` is set, so a read-only picker no longer adds trailing padding below its swatches ([#81605](https://github.com/WordPress/gutenberg/pull/81605)).
 -   `DuotonePicker`: Stop the duotone bar offering to move its control points. It announced that arrow keys and dragging change the gradient position, but a duotone is two colors with no positions, so the move was discarded. `CustomGradientBar` gains a `disablePositioning` prop for this ([#81850](https://github.com/WordPress/gutenberg/pull/81850)).
+-   `Icon`: Merge a consumer-supplied `style` prop with the icon's intrinsic styles instead of replacing them, so styles like `fill: none` on stroke-based icons survive unless the consumer overrides the same property explicitly. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+-   `ItemGroup`: Drop the blanket `path { fill: currentColor }` rule that was overriding stroke-based icons' intended fill via inheritance bypass. Old fill-based icons remain coloured via the surrounding `svg { fill: currentColor }` rule plus normal SVG inheritance. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 -   `Modal`: Prevent an Escape key press that dismisses the modal from propagating to underlying overlays. ([#81785](https://github.com/WordPress/gutenberg/pull/81785))
 -   `BoxControl`: Update the opposite side when ALT is held on the left or right input, which each updated themselves instead ([#81530](https://github.com/WordPress/gutenberg/pull/81530)).
 -   `InputControl`: Vertically center the value of date and time inputs in Safari ([#81361](https://github.com/WordPress/gutenberg/pull/81361)).
@@ -316,11 +318,6 @@
 -   `Tabs`: Update `@ariakit/react` to `0.4.29`, adopting the upstream fix that moves focus to the selected tab on a controlled selection change, and removing the now-unnecessary controlled-mode focus workarounds ([#79055](https://github.com/WordPress/gutenberg/pull/79055)).
 -   `ToggleGroupControl`: Radio options now render an auto-generated `name` attribute, following Ariakit's `Radio` behavior ([#79055](https://github.com/WordPress/gutenberg/pull/79055)).
 -   Dependency updates ([#77954](https://github.com/WordPress/gutenberg/pull/77954)).
-
-### Bug Fixes
-
--   `Icon`: Merge a consumer-supplied `style` prop with the icon's intrinsic styles instead of replacing them, so styles like `fill: none` on stroke-based icons survive unless the consumer overrides the same property explicitly. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
--   `ItemGroup`: Drop the blanket `path { fill: currentColor }` rule that was overriding stroke-based icons' intended fill via inheritance bypass. Old fill-based icons remain coloured via the surrounding `svg { fill: currentColor }` rule plus normal SVG inheritance. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 
 ## 34.0.0 (2026-05-27)
 

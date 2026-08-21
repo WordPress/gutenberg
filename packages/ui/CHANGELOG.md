@@ -50,6 +50,7 @@
 -   `Calendar`, `RangeCalendar`: Align day states with neutral WPDS color tokens. ([#81438](https://github.com/WordPress/gutenberg/pull/81438))
 -   `Calendar`, `RangeCalendar`: Show tooltips for the previous and next month buttons. ([#81983](https://github.com/WordPress/gutenberg/pull/81983))
 -   `Calendar`, `RangeCalendar`: Make the navigation label translatable and use the same locale-derived default first day of the week for locale strings and date-fns locale objects. Existing object-based calendars may use a different default; pass `weekStartsOn` to preserve it. ([#81814](https://github.com/WordPress/gutenberg/pull/81814))
+-   `Icon`: Merge a consumer-supplied `style` prop with the icon's intrinsic styles instead of replacing them, so styles like `fill: none` on stroke-based icons survive unless the consumer overrides the same property explicitly. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 -   `Autocomplete.Input`, `Combobox.Input`: Omit the `type` prop, since the combobox role is only valid on `input type="text"` ([#80636](https://github.com/WordPress/gutenberg/pull/80636)).
 -   `Card`: Use the normal neutral surface stroke for the default border. ([#81746](https://github.com/WordPress/gutenberg/pull/81746))
 -   `Calendar`, `RangeCalendar`: Preserve day focus when a controlled month change removes the focused day. ([#81635](https://github.com/WordPress/gutenberg/pull/81635))

@@ -12,7 +12,7 @@ import type { IconProps } from './types';
  * ```
  */
 export const Icon = forwardRef< SVGSVGElement, IconProps >( function Icon(
-	{ icon, size = 24, ...restProps },
+	{ icon, size = 24, style, ...restProps },
 	ref
 ) {
 	return (
@@ -20,6 +20,7 @@ export const Icon = forwardRef< SVGSVGElement, IconProps >( function Icon(
 			ref={ ref }
 			{ ...icon.props }
 			{ ...restProps }
+			style={ { ...icon.props.style, ...style } }
 			width={ size }
 			height={ size }
 		/>

@@ -17,6 +17,7 @@
 
 ### Bug Fixes
 
+-   `SidebarNavigationItem`: Stop forcing `style={ { fill: 'currentcolor' } }` on the icon. The explicit override was clobbering stroke-based icons' intrinsic styling. Colour is inherited via CSS `color` and the icon's own declared fills/strokes. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 -   Seed the root `ThemeProvider` with the admin color scheme primary color so portaled popovers and modals receive the scheme's accent colors ([#81653](https://github.com/WordPress/gutenberg/pull/81653)).
 
 ### Enhancements
@@ -61,10 +62,6 @@
 ### Enhancements
 
 -   The Site Editor now follows the user's admin color scheme ([#78397](https://github.com/WordPress/gutenberg/pull/78397)).
-
-### Bug Fixes
-
--   `SidebarNavigationItem`: Stop forcing `style={ { fill: 'currentcolor' } }` on the icon. The explicit override was clobbering stroke-based icons' intrinsic styling. Colour is inherited via CSS `color` and the icon's own declared fills/strokes. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 
 ## 6.47.0 (2026-05-27)
 

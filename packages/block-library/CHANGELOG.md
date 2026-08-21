@@ -37,6 +37,7 @@
 -   Cover: Use the new toggle-button presentation for the placeholder overlay color palette ([#82023](https://github.com/WordPress/gutenberg/pull/82023)).
 -   Columns: Preserve individual Column attributes supported by Group, including styles and layouts, when transforming to Row or Grid.
 -   Gallery: Don't offer the Image and Grid transforms while the block is in dynamic mode, where it has no inner blocks to convert ([#82009](https://github.com/WordPress/gutenberg/pull/82009)).
+-   Icon: Preserve intrinsic SVG styles when applying block styles, and keep stroke widths scaling with the block's size for compatibility ([#78808](https://github.com/WordPress/gutenberg/pull/78808)).
 -   Icon: Apply only padding to the inner SVG in the editor, so margin is no longer applied twice compared to the front end ([#81292](https://github.com/WordPress/gutenberg/pull/81292)).
 -   Playlist: Attach the inner block drop zone to the track list, so Playlist Track blocks show insertion markers while being reordered.
 -   Playlist Track: Hide the Title and Replace audio controls when multiple tracks are selected.

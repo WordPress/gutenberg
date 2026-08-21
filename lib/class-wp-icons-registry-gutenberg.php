@@ -199,47 +199,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	 * @return string The sanitized icon SVG content.
 	 */
 	protected function sanitize_icon_content( $icon_content ) {
-		$allowed_tags = array(
-			'svg'     => array(
-				'class'             => true,
-				'xmlns'             => true,
-				'width'             => true,
-				'height'            => true,
-				'viewbox'           => true,
-				'aria-hidden'       => true,
-				'role'              => true,
-				'focusable'         => true,
-				'style'             => true,
-				'stroke'            => true,
-				'stroke-width'      => true,
-				'stroke-linecap'    => true,
-				'stroke-linejoin'   => true,
-				'stroke-miterlimit' => true,
-				'vector-effect'     => true,
-			),
-			'path'    => array(
-				'fill'              => true,
-				'fill-rule'         => true,
-				'd'                 => true,
-				'transform'         => true,
-				'style'             => true,
-				'stroke'            => true,
-				'stroke-width'      => true,
-				'stroke-linecap'    => true,
-				'stroke-linejoin'   => true,
-				'stroke-miterlimit' => true,
-				'vector-effect'     => true,
-			),
-			'polygon' => array(
-				'fill'      => true,
-				'fill-rule' => true,
-				'points'    => true,
-				'transform' => true,
-				'focusable' => true,
-			),
-		);
-
-		return wp_kses( $icon_content, $allowed_tags );
+		return wp_kses( $icon_content, gutenberg_get_allowed_icon_svg_tags() );
 	}
 
 	/**

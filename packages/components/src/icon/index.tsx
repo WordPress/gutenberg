@@ -19,6 +19,7 @@ type SizeProps = {
 	size?: number;
 	width?: number | string;
 	height?: number | string;
+	style?: CSSProperties;
 };
 
 type AdditionalProps< T > = T extends ComponentType< infer U >

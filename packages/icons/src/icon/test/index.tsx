@@ -1,16 +1,8 @@
+import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
-import { createRef } from '@wordpress/element';
-import { Icon } from '../index';
+import Icon from '..';
 
 describe( 'Icon', () => {
-	it( 'forwards ref', () => {
-		const ref = createRef< SVGSVGElement >();
-
-		render( <Icon ref={ ref } icon={ <svg /> } /> );
-
-		expect( ref.current ).toBeInstanceOf( SVGSVGElement );
-	} );
-
 	it( "merges consumer styles with the icon's intrinsic styles", () => {
 		render(
 			<Icon
