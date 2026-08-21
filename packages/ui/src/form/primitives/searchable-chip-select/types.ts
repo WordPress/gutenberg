@@ -155,14 +155,18 @@ export type SearchableChipSelectProps = Omit<
 		>
 	> & {
 		/**
-		 * The array of option items. When using grouped `children`, pass an
-		 * array of groups instead of a flat list of items. Mark a creatable
-		 * action with `creatable: true`; it renders in the list footer and is
-		 * excluded from the main list automatically.
+		 * The array of option items.
+		 *
+		 * When using grouped `children`, pass an array of groups instead of a
+		 * flat list of items. Grouped items require a custom `children` renderer.
+		 *
+		 * Mark a creatable action with  `creatable: true`. It renders in the
+		 * list footer and is excluded from the main list automatically.
 		 */
 		items?: Item[] | ItemGroup[];
 		/**
 		 * A render function for custom rendering the list of matching items.
+		 * Required when `items` contains groups.
 		 */
 		children?: ComboboxCollectionProps[ 'children' ];
 		/**

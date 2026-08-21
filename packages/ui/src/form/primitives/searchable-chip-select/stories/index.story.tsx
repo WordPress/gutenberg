@@ -143,7 +143,8 @@ export const WithCustomEmptyContent: Story = {
  * To render grouped items, pass an array of groups to `items` (each with
  * `label` and `items` properties) and provide `children` that renders each
  * group using `SearchableChipSelect.Group`, `SearchableChipSelect.GroupLabel`,
- * and `SearchableChipSelect.Collection`.
+ * and `SearchableChipSelect.Collection`. Grouped items have no default
+ * renderer, so `children` is required.
  */
 export const Grouped: Story = {
 	args: {
