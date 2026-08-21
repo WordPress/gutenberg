@@ -9,13 +9,13 @@ const mockWriteToBuffer = jest.fn( () => ( {
 	buffer: '',
 } ) );
 
-// Controls the `heif-bitdepth` value reported by the mocked source image so
-// tests can exercise both the standard (8-bit) and high-bit-depth code paths.
-let mockBitdepth = 8;
-
-// Controls the `palette` metadata field reported by the mocked source image,
-// which libvips sets for indexed sources.
-let mockPalette = 0;
+/*
+ * Controls the metadata fields reported by the mocked source image.
+ * `undefined` means the field is absent, which is the common case: a JPEG
+ * carries neither `heif-bitdepth` nor `palette`.
+ */
+let mockBitdepth: number | undefined;
+let mockPalette: number | undefined;
 
 class MockImage {
 	width = 100;
@@ -24,14 +24,19 @@ class MockImage {
 	crop = mockCrop;
 	resize = mockResize;
 	writeToBuffer = mockWriteToBuffer;
+	/*
+	 * Mirrors libvips: reading a field the image does not carry throws rather
+	 * than returning a falsy default. The production helpers rely on that, so
+	 * the mock has to throw too or their fallbacks would never be exercised.
+	 */
 	getInt = jest.fn( ( name: string ) => {
-		if ( 'heif-bitdepth' === name ) {
+		if ( 'heif-bitdepth' === name && undefined !== mockBitdepth ) {
 			return mockBitdepth;
 		}
-		if ( 'palette' === name ) {
+		if ( 'palette' === name && undefined !== mockPalette ) {
 			return mockPalette;
 		}
-		return 0;
+		throw new Error( `${ name }: no such field` );
 	} );
 }
 
@@ -52,8 +57,8 @@ jest.mock( 'wasm-vips', () =>
 describe( 'resizeImage', () => {
 	afterEach( () => {
 		jest.clearAllMocks();
-		mockBitdepth = 8;
-		mockPalette = 0;
+		mockBitdepth = undefined;
+		mockPalette = undefined;
 	} );
 
 	it( 'resizes without crop', async () => {
@@ -538,6 +543,26 @@ describe( 'resizeImage', () => {
 
 		it( 'leaves a truecolour PNG unquantised', async () => {
 			mockPalette = 0;
+			const pngFile = new File( [ '<BLOB>' ], 'example.png', {
+				type: 'image/png',
+			} );
+			const buffer = await pngFile.arrayBuffer();
+
+			await resizeImage( 'itemId', buffer, 'image/png', {
+				width: 50,
+				height: 50,
+			} );
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.png',
+				expect.not.objectContaining( { palette: expect.anything() } )
+			);
+		} );
+
+		it( 'leaves a PNG carrying no palette metadata unquantised', async () => {
+			// libvips throws when the field is absent, which is what a
+			// truecolour source looks like to `isPaletteImage`.
+			mockPalette = undefined;
 			const pngFile = new File( [ '<BLOB>' ], 'example.png', {
 				type: 'image/png',
 			} );
