@@ -28,7 +28,7 @@
 
 ### Bug Fixes
 
--   `Calendar`, `RangeCalendar`: Use the same locale-derived default first day of the week for locale strings and date-fns locale objects. Existing object-based calendars may use a different default; pass `weekStartsOn` to preserve it. ([#81814](https://github.com/WordPress/gutenberg/pull/81814))
+-   `Calendar`, `RangeCalendar`: Make the navigation label translatable and use the same locale-derived default first day of the week for locale strings and date-fns locale objects. Existing object-based calendars may use a different default; pass `weekStartsOn` to preserve it. ([#81814](https://github.com/WordPress/gutenberg/pull/81814))
 -   `Autocomplete.Input`, `Combobox.Input`: Omit the `type` prop, since the combobox role is only valid on `input type="text"` ([#80636](https://github.com/WordPress/gutenberg/pull/80636)).
 -   `Card`: Use the normal neutral surface stroke for the default border. ([#81746](https://github.com/WordPress/gutenberg/pull/81746))
 -   `Calendar`, `RangeCalendar`: Preserve day focus when a controlled month change removes the focused day. ([#81635](https://github.com/WordPress/gutenberg/pull/81635))

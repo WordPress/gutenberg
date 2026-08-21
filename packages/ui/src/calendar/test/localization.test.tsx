@@ -33,6 +33,7 @@ jest.mock( '@wordpress/i18n', () => {
 	const actual = jest.requireActual( '@wordpress/i18n' );
 	const translations: Record< string, string > = {
 		'Go to the Previous Month': 'Translated previous month',
+		'Navigation bar': 'Translated navigation bar',
 		'Today, %s, selected': 'Today and selected: %s',
 	};
 
@@ -61,6 +62,16 @@ describe.each( [
 		render( <Component defaultMonth={ TEST_DATE } locale="fa-IR" /> );
 
 		expectGregorianDate( 'fa-IR' );
+	} );
+
+	it( 'localizes the navigation label through WordPress i18n', () => {
+		render( <Component locale="de" /> );
+
+		expect(
+			screen.getByRole( 'navigation', {
+				name: 'Translated navigation bar',
+			} )
+		).toBeVisible();
 	} );
 
 	it( 'should preserve localized defaults when overriding one label', () => {

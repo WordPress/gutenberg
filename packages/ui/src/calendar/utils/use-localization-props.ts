@@ -136,6 +136,8 @@ export const useLocalizationProps = ( {
 					? __( 'Date calendar' )
 					: __( 'Date range calendar' ),
 			labels: {
+				/** The label for the navigation toolbar. */
+				labelNav: () => __( 'Navigation bar' ),
 				/**
 				 * The label for the month grid.
 				 * @param date
