@@ -97,11 +97,11 @@ function Icon( {
 			...icon.props,
 			width: size,
 			height: size,
+			...restProps,
 			// Merge styles so the icon's intrinsic style (e.g. `fill: none` on
 			// stroke-based icons) is preserved unless the consumer overrides
 			// the same property explicitly.
 			style: { ...icon.props.style, ...consumerStyle },
-			...restProps,
 		};
 
 		return <SVG { ...appliedProps } />;
@@ -115,13 +115,13 @@ function Icon( {
 			size,
 			width: size,
 			height: size,
+			...restProps,
 			// Merge styles so the icon's intrinsic style is preserved unless
 			// the consumer overrides the same property explicitly.
 			style: {
 				...( icon.props as { style?: CSSProperties } ).style,
 				...consumerStyle,
 			},
-			...restProps,
 		} );
 	}
 
