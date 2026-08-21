@@ -10,6 +10,11 @@
 
 -   Expose typography and color controls for citations, inputs, and selects in Global Styles ([#80852](https://github.com/WordPress/gutenberg/pull/80852)).
 -   Mark blocks that have user styles in the block list, and add a filter to show only those blocks ([#81373](https://github.com/WordPress/gutenberg/pull/81373)).
+-   Add a Duotone tab to the Edit palette screen, so theme and default duotones can be edited and custom duotones added, alongside Color and Gradient. Replaces the read-only duotone list previously shown at the bottom of the Gradient tab ([#81605](https://github.com/WordPress/gutenberg/pull/81605)).
+
+### Bug Fixes
+
+-   Shadow editor: Group each row as one item so separators do not cross row actions ([#81871](https://github.com/WordPress/gutenberg/pull/81871)).
 
 ### Internal
 

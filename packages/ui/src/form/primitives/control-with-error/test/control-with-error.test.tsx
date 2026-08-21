@@ -1,9 +1,64 @@
 import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useState, useCallback, useId, useRef } from '@wordpress/element';
-import { ValidatedInputControl, ValidatedRangeControl } from '../components';
+import {
+	forwardRef,
+	useCallback,
+	useId,
+	useRef,
+	useState,
+} from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
+import { ControlWithError } from '../index';
+
+const ValidatedInput = forwardRef<
+	HTMLInputElement,
+	React.InputHTMLAttributes< HTMLInputElement > & { label?: string }
+>( function ValidatedInput( { label, ...restProps }, ref ) {
+	return <input ref={ ref } aria-label={ label } { ...restProps } />;
+} );
+
+type ValidatedInputControlProps = React.ComponentProps<
+	typeof ValidatedInput
+> &
+	Pick<
+		React.ComponentProps< typeof ControlWithError >,
+		'required' | 'markWhenOptional' | 'customValidity'
+	>;
+
+const ValidatedInputControl = forwardRef<
+	HTMLInputElement,
+	ValidatedInputControlProps
+>( function ValidatedInputControl(
+	{ required, markWhenOptional, customValidity, ...restProps },
+	forwardedRef
+) {
+	const validityTargetRef = useRef< HTMLInputElement >( null );
+	const mergedRefs = useMergeRefs( [ forwardedRef, validityTargetRef ] );
+
+	return (
+		<ControlWithError
+			required={ required }
+			markWhenOptional={ markWhenOptional }
+			customValidity={ customValidity }
+			getValidityTarget={ () => validityTargetRef.current }
+		>
+			<ValidatedInput ref={ mergedRefs } { ...restProps } />
+		</ControlWithError>
+	);
+} );
 
 describe( 'ControlWithError', () => {
+	describe( 'label cloning', () => {
+		it( 'should pass string labels as strings when appending the required indicator', () => {
+			render( <ValidatedInputControl required label="Opacity" /> );
+
+			expect( screen.getByRole( 'textbox' ) ).toHaveAttribute(
+				'aria-label',
+				'Opacity (Required)'
+			);
+		} );
+	} );
+
 	describe( 'Async Validation', () => {
 		beforeEach( () => {
 			jest.useFakeTimers();
@@ -18,7 +73,10 @@ describe( 'ControlWithError', () => {
 			...restProps
 		}: {
 			serverDelayMs: number;
-		} & React.ComponentProps< typeof ValidatedInputControl > ) => {
+		} & Omit<
+			React.ComponentProps< typeof ValidatedInputControl >,
+			'value' | 'label' | 'onChange'
+		> ) => {
 			const [ text, setText ] = useState( '' );
 			const [ customValidity, setCustomValidity ] =
 				useState<
@@ -28,7 +86,9 @@ describe( 'ControlWithError', () => {
 				>( undefined );
 
 			const onChange = useCallback(
-				( value?: string ) => {
+				( event: React.ChangeEvent< HTMLInputElement > ) => {
+					const { value } = event.target;
+
 					setCustomValidity( {
 						type: 'validating',
 						message: 'Validating...',
@@ -36,7 +96,7 @@ describe( 'ControlWithError', () => {
 
 					// Simulate delayed server response
 					setTimeout( () => {
-						if ( value?.toLowerCase() === 'error' ) {
+						if ( value.toLowerCase() === 'error' ) {
 							setCustomValidity( {
 								type: 'invalid',
 								message: 'The word "error" is not allowed.',
@@ -49,7 +109,7 @@ describe( 'ControlWithError', () => {
 						}
 					}, serverDelayMs );
 
-					setText( value ?? '' );
+					setText( value );
 				},
 				[ serverDelayMs ]
 			);
@@ -222,8 +282,6 @@ describe( 'ControlWithError', () => {
 							ref={ ref }
 							label="Text"
 							required
-							value=""
-							onChange={ () => {} }
 							customValidity={ {
 								type: 'validating',
 								message: 'Validating...',
@@ -272,8 +330,8 @@ describe( 'ControlWithError', () => {
 				>( undefined );
 			return (
 				<ValidatedInputControl
-					onChange={ ( value ) =>
-						value === 'error'
+					onChange={ ( event ) =>
+						event.target.value === 'error'
 							? setCustomValidity( {
 									type: 'invalid',
 									message: 'The word "error" is not allowed.',
@@ -500,33 +558,6 @@ describe( 'ControlWithError', () => {
 			await waitFor( () => {
 				expect( input ).not.toHaveAttribute( 'aria-describedby' );
 			} );
-		} );
-	} );
-
-	describe( 'ValidatedRangeControl', () => {
-		it( 'should accessibly label the internal slider and spin button', () => {
-			render(
-				<ValidatedRangeControl
-					label="Opacity"
-					required
-					min={ 0 }
-					max={ 100 }
-					onChange={ () => {} }
-				/>
-			);
-
-			// The slider is styled with `opacity: 0`, so it's not "visible"
-			// in the DOM sense, but it's still accessible.
-			expect(
-				screen.getByRole( 'slider', {
-					name: 'Opacity (Required)',
-				} )
-			).toBeInTheDocument();
-			expect(
-				screen.getByRole( 'spinbutton', {
-					name: 'Opacity (Required)',
-				} )
-			).toBeVisible();
 		} );
 	} );
 

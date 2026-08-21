@@ -1,6 +1,136 @@
 # Auto-generated snapshot of the Storybook components manifest.
 # Do not edit by hand. Regenerate with `npm run storybook:manifest-snapshot`
 # and commit the result. See `storybook/README.md` for details.
+- name: Autocomplete.Root
+  props:
+      - actionsRef
+      - autoHighlight
+      - children
+      - defaultOpen
+      - defaultValue
+      - disabled
+      - filter
+      - filteredItems
+      - form
+      - grid
+      - highlightItemOnHover
+      - id
+      - inline
+      - inputRef
+      - items
+      - itemToStringValue
+      - keepHighlight
+      - limit
+      - locale
+      - loopFocus
+      - modal
+      - mode
+      - name
+      - onItemHighlighted
+      - onOpenChange
+      - onOpenChangeComplete
+      - onValueChange
+      - open
+      - openOnInputClick
+      - readOnly
+      - required
+      - submitOnItemClick
+      - value
+      - virtualized
+  subcomponents:
+      - name: Autocomplete.Clear
+        props:
+            - children
+            - className
+            - disabled
+            - keepMounted
+            - nativeButton
+            - render
+            - style
+      - name: Autocomplete.Collection
+        props:
+            - children
+      - name: Autocomplete.Empty
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Autocomplete.Group
+        props:
+            - children
+            - className
+            - items
+            - render
+            - style
+      - name: Autocomplete.GroupLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Autocomplete.Input
+        props:
+            - className
+            - disabled
+            - render
+            - style
+      - name: Autocomplete.InputGroup
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Autocomplete.Item
+        props:
+            - children
+            - className
+            - disabled
+            - index
+            - nativeButton
+            - onClick
+            - render
+            - style
+            - value
+      - name: Autocomplete.List
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Autocomplete.ListBody
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Autocomplete.Popup
+        props:
+            - children
+            - className
+            - finalFocus
+            - initialFocus
+            - portal
+            - positioner
+            - render
+            - style
+      - name: Autocomplete.Portal
+        props:
+            - className
+            - container
+            - keepMounted
+            - render
+            - style
+      - name: Autocomplete.Positioner
+        props: []
+      - name: Autocomplete.Row
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Autocomplete.Value
+        props: []
 - name: Badge
   props:
       - children
@@ -421,6 +551,73 @@
         props:
             - children
             - className
+            - render
+            - style
+- name: Field.Root
+  props:
+      - actionsRef
+      - children
+      - className
+      - disabled
+      - name
+      - render
+      - style
+  subcomponents:
+      - name: Field.Control
+        props:
+            - children
+            - className
+            - defaultValue
+            - onValueChange
+            - render
+            - style
+      - name: Field.Description
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Field.Details
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Field.Item
+        props: []
+      - name: Field.Label
+        props:
+            - children
+            - className
+            - hideFromVision
+            - nativeLabel
+            - render
+            - style
+            - variant
+- name: Fieldset.Root
+  props:
+      - children
+      - className
+      - render
+      - style
+  subcomponents:
+      - name: Fieldset.Description
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Fieldset.Details
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Fieldset.Legend
+        props:
+            - children
+            - className
+            - hideFromVision
             - render
             - style
 - name: FormFileUpload
@@ -1165,6 +1362,11 @@
       - unit
       - units
       - value
+- name: ValidityIndicator
+  props:
+      - id
+      - message
+      - type
 - name: VisuallyHidden
   props:
       - children
