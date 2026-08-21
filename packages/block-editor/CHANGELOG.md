@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Suggest mode: Paint the screen-reader announcements that bracket an inline suggestion marker, so its state reaches assistive technology rather than being carried by color and text decoration alone ([#81663](https://github.com/WordPress/gutenberg/pull/81663)).
 -   `DimensionsTool`: Reflect aspect ratio and scale values that are updated from outside the component, such as by undo or `updateBlockAttributes`. The scale control no longer displays a stale value, and an aspect ratio that is written differently to its preset, e.g. `1/1` rather than `1`, is displayed as that preset instead of as "Original" ([#80747](https://github.com/WordPress/gutenberg/pull/80747)).
 
 ## 16.2.0 (2026-08-12)
