@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v22.19.0. The `lighthouse` dependency is now `^13.4.1`, which requires it. Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
 ## 1.53.0 (2026-08-12)
 
 ### Bug Fixes
