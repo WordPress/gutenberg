@@ -89,8 +89,11 @@ export type EditorIntent = ( typeof EDITOR_INTENTS )[ number ];
  * Mirrors `SUGGESTION_CLASS` in `components/inline-suggestions/format.js`,
  * duplicated here for the same reason `components/suggestion-mode/constants.js`
  * mirrors the intent value: the store must not import from the component tree.
- * Used as a cheap containment probe over serialized content - the editor-only
- * `wp-suggestion-a11y` decoration never serializes, so a hit means a real
- * pending marker.
+ * A serialization contract: `utils/pending-suggestion-markers.js` reads it back
+ * out of saved content, so the two copies must not drift.
+ *
+ * On its own the token is only a cheap pre-filter, never the answer - it also
+ * appears in block class names and in prose about the feature. See
+ * `hasPendingSuggestionMarkers` for what actually identifies a marker.
  */
 export const SUGGESTION_MARKER_CLASS = 'wp-suggestion';

@@ -27,11 +27,8 @@ import {
 	getEntityFields as _getEntityFields,
 	isEntityReady as _isEntityReady,
 } from '../dataviews/store/private-selectors';
-import {
-	EDITOR_INTENT_EDIT,
-	EDITOR_INTENT_SUGGEST,
-	SUGGESTION_MARKER_CLASS,
-} from './constants';
+import { EDITOR_INTENT_EDIT, EDITOR_INTENT_SUGGEST } from './constants';
+import { hasPendingSuggestionMarkers } from './utils/pending-suggestion-markers';
 import { unlock } from '../lock-unlock';
 
 const EMPTY_INSERTION_POINT = {
@@ -680,7 +677,7 @@ export function getCodeEditorUnavailableReason(
 
 	if (
 		checkPendingSuggestions &&
-		getEditedPostContent( state ).includes( SUGGESTION_MARKER_CLASS )
+		hasPendingSuggestionMarkers( getEditedPostContent( state ) )
 	) {
 		return __(
 			'The code editor is unavailable while this post has suggestions to resolve. Accept or reject them first.'
