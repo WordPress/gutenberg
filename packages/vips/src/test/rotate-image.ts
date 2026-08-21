@@ -10,6 +10,17 @@ import { rotateImage } from '../';
 let calls: string[];
 let removed: string[];
 
+/*
+ * Controls the `palette` metadata field reported by the mocked source image,
+ * which libvips sets for indexed sources. `undefined` means the field is
+ * absent, matching a truecolour source.
+ */
+let mockPalette: number | undefined;
+
+const mockWriteToBuffer = jest.fn( () => ( {
+	buffer: new ArrayBuffer( 0 ),
+} ) );
+
 class MockImage {
 	width = 100;
 	height = 100;
@@ -41,9 +52,17 @@ class MockImage {
 		removed.push( field );
 		return true;
 	} );
-	writeToBuffer = jest.fn( () => ( {
-		buffer: new ArrayBuffer( 0 ),
-	} ) );
+	writeToBuffer = mockWriteToBuffer;
+	/*
+	 * Mirrors libvips: reading a field the image does not carry throws rather
+	 * than returning a falsy default.
+	 */
+	getInt = jest.fn( ( name: string ) => {
+		if ( 'palette' === name && undefined !== mockPalette ) {
+			return mockPalette;
+		}
+		throw new Error( `${ name }: no such field` );
+	} );
 }
 
 class MockVipsImage {
@@ -63,6 +82,7 @@ describe( 'rotateImage', () => {
 	beforeEach( () => {
 		calls = [];
 		removed = [];
+		mockPalette = undefined;
 	} );
 
 	afterEach( () => {
@@ -103,5 +123,72 @@ describe( 'rotateImage', () => {
 		await rotate( 6 );
 
 		expect( removed ).toContain( 'orientation' );
+	} );
+
+	describe( 'indexed (palette) PNG', () => {
+		/*
+		 * Rotating is the third path that writes a PNG, alongside resizing and
+		 * converting. libvips decodes an indexed PNG into RGB(A) pixels, so
+		 * without asking pngsave to quantise back down a rotated PNG is
+		 * rewritten as truecolour and inflates - here on the full-size file
+		 * rather than a sub-size.
+		 * See https://github.com/WordPress/gutenberg/issues/81895.
+		 */
+		async function rotatePng( orientation: number ) {
+			const file = new File( [ '<BLOB>' ], 'example.png', {
+				type: 'image/png',
+			} );
+			const buffer = await file.arrayBuffer();
+			await rotateImage( 'itemId', buffer, 'image/png', orientation );
+		}
+
+		it( 'quantises a rotated indexed PNG back to a palette', async () => {
+			mockPalette = 1;
+
+			await rotatePng( 6 );
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.png',
+				expect.objectContaining( { palette: true } )
+			);
+		} );
+
+		it( 'leaves a rotated truecolour PNG unquantised', async () => {
+			mockPalette = 0;
+
+			await rotatePng( 6 );
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.png',
+				expect.not.objectContaining( { palette: expect.anything() } )
+			);
+		} );
+
+		it( 'leaves a rotated PNG carrying no palette metadata unquantised', async () => {
+			mockPalette = undefined;
+
+			await rotatePng( 6 );
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.png',
+				expect.not.objectContaining( { palette: expect.anything() } )
+			);
+		} );
+
+		it( 'does not quantise a rotated non-PNG', async () => {
+			// A GIF is indexed too, but only pngsave takes `palette`.
+			mockPalette = 1;
+			const file = new File( [ '<BLOB>' ], 'example.gif', {
+				type: 'image/gif',
+			} );
+			const buffer = await file.arrayBuffer();
+
+			await rotateImage( 'itemId', buffer, 'image/gif', 6 );
+
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.gif',
+				expect.not.objectContaining( { palette: expect.anything() } )
+			);
+		} );
 	} );
 } );

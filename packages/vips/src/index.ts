@@ -840,6 +840,10 @@ export async function rotateImage(
 			}
 		};
 
+		// Read this off the source, before the transforms below replace
+		// `image` with their result.
+		const isPalette = isPaletteImage( image );
+
 		// Apply transformation based on EXIF orientation.
 		// See: https://exiftool.org/TagNames/EXIF.html#:~:text=0x0112,Orientation
 		switch ( orientation ) {
@@ -886,6 +890,15 @@ export async function rotateImage(
 		image.remove( 'orientation' );
 
 		const saveOptions: SaveOptions< typeof type > = {};
+
+		// Keep indexed sources indexed, as the resize and convert paths do.
+		// Rotating writes the full-size file, so losing the palette here
+		// inflates the image the user actually uploaded.
+		// See https://github.com/WordPress/gutenberg/issues/81895.
+		if ( 'image/png' === type && isPalette ) {
+			saveOptions.palette = true;
+		}
+
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
 
 		const result = {
