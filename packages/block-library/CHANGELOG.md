@@ -9,6 +9,7 @@
 ### Enhancements
 
 -   Columns: Add transforms between Columns and the Row variation that preserve column widths through flex child sizing controls.
+-   Playlist: Shorten, indent, and hide tracklist inspector controls when the tracklist is disabled.
 
 ### Bug Fixes
 
