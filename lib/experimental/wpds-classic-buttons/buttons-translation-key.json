@@ -20,11 +20,30 @@
 
 	"scopePrefix": ".wp-core-ui",
 
+	"stateClassMap": {
+		"__doc": "Core drives button state from CLASSES as well as pseudo-classes, because legacy admin JS toggles them directly. React has no equivalent concept, so each rule carrying one of these pseudos also emits a class form built from the SAME declarations — the class-driven states then render identically to React rather than merely being present. Only a top-level pseudo on the subject is swapped; guards inside `:not(...)` survive untouched.",
+		":hover": ".hover",
+		":focus": ".focus",
+		":disabled": ".disabled"
+	},
+
+	"stateClassVariantMap": {
+		"__doc": "Extra legacy class forms for a state that exist only for certain variants. Core writes these as bare selectors (`.wp-core-ui .button-disabled`), but always applies them to an element that ALSO carries `.button`, so they are APPENDED to the mapped subject rather than replacing it. Appending is not cosmetic: our re-scoped base rule uses `:is()`/`:not()` and so outranks Core original specificity, and a bare `.button-disabled` would silently lose the colour battle to it. Not emitted for the link variant: classic has no link equivalent, and it would leak link styling onto every disabled button.",
+		":disabled": {
+			"is-primary": ".button-primary-disabled",
+			"(other)": ".button-disabled"
+		}
+	},
+
+	"stateClassNotMapped": {
+		":active": "DELIBERATELY NOT MAPPED to `.active`. In classic admin the two are different states: `:active` is the transient mouse-down state, while `.active` is a PERSISTENT `selected setting` (the segmented-control pressed state), which Core styles with an extra inset shadow and outline. Mapping them together looks plausible in a screenshot but silently breaks every segmented control. `.active` stays in buttons-exceptions.css until React's `is-pressed` is deliberately mapped onto it and the visual change is recorded."
+	},
+
 	"forced": {
 		"height": {
-			"selector": ".wp-core-ui :is(.button, .button-primary, .button-secondary):not(.button-small):not(.button-compact)",
+			"selector": ".wp-core-ui :is(.button, .button-primary, .button-secondary):not(.button-small):not(.button-compact):not(.button-hero)",
 			"value": "var(--wpds-dimension-size-lg)",
-			"why": "40px is always the default button size (Joen's ruling). React's base height is 36px with 40px behind `.is-next-40px-default-size`; classic has no such class, so we fold 40px into the base and drop the opt-in rule. Excludes small (24px) and compact (32px) so those keep their own heights, and excludes link (auto height)."
+			"why": "40px is always the default button size (Joen's ruling). React's base height is 36px with 40px behind `.is-next-40px-default-size`; classic has no such class, so we fold 40px into the base and drop the opt-in rule. Excludes small (24px), compact (32px) and hero (48px) so those keep their own heights, and excludes link (auto height). The exclusions are load-bearing: this selector's :is()/:not() specificity beats the plain compound in buttons-exceptions.css, so a size omitted here is silently forced to 40px no matter what the exceptions file says."
 		},
 		"focusBoxShadowReset": {
 			"selector": ".wp-core-ui :is(.button, .button-primary, .button-secondary, .button-link):focus",
@@ -33,7 +52,7 @@
 	},
 
 	"dropped": {
-		"note": "React selectors with no classic equivalent are dropped; where dropped, classic keeps Core's own buttons.css rule for that case (our stylesheet overrides only what it emits).",
+		"note": "React selectors with no classic equivalent are dropped. Core's buttons.css is dequeued, so a dropped case is genuinely unstyled unless a classic supplement covers it — see the coverage gaps in README.md.",
 		"selectors": [
 			{
 				"match": "is-tertiary",
@@ -41,7 +60,7 @@
 			},
 			{
 				"match": "is-destructive",
-				"reason": "Classic uses `.button-link-delete`; kept from Core's buttons.css."
+				"reason": "Classic uses `.button-link-delete`, which has no React equivalent. Currently unstyled under the dequeue — needs porting."
 			},
 			{
 				"match": "is-busy",

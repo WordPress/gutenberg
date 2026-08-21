@@ -1,0 +1,254 @@
+/**
+ * WPDS classic buttons — exceptions.
+ *
+ * THIS FILE IS A TO-DO LIST. Every rule in it is CSS that the generation step
+ * could not produce from the React `Button`, and each one is a small task
+ * standing between this experiment and full automation. The goal is for this
+ * file to shrink to nothing. It is hand-authored; `buttons.css` beside it is
+ * generated and must not be edited.
+ *
+ * Because Core's `buttons.css` is dequeued wholesale (see load.php), anything
+ * absent here AND absent from the generated file is genuinely unstyled — so
+ * this file is also what keeps the experiment free of regressions today.
+ *
+ * Rules are grouped by WHY they resist automation, because the three groups
+ * have very different lifetimes:
+ *
+ *   1. Awaiting design-system coverage — the React Button has no equivalent
+ *      variant yet. Delete once the component gains one.
+ *   2. Classic-only by nature — tied to classic markup, classic screens, or
+ *      legacy browser quirks. May never move; treat as documented exceptions.
+ *
+ * A third group, "automatable now", has already been emptied: Core's
+ * class-driven states (`.hover`, `.focus`, `.disabled`, `.button-disabled`,
+ * `.button-primary-disabled`) are generated from the React declarations via
+ * stateClassMap in the translation key. That is the pattern to repeat — move
+ * rules OUT of this file and INTO the generator wherever a React equivalent
+ * exists. `.button.active` is the notable holdout, and deliberately so: see
+ * stateClassNotMapped in the key for why it must not be folded in with
+ * `:active`.
+ *
+ * Every rule carries a note saying what would let us remove it. If you add a
+ * rule without such a note, it does not belong here.
+ *
+ * Declarations are lifted from Core's buttons.css so the dequeue stays
+ * regression-free. Where a value should become a token, it is flagged inline
+ * rather than changed, so this file stays a faithful safety net and the
+ * tokenisation lands as a deliberate step.
+ */
+
+/* ---------------------------------------------------------------------------
+ * 1. AWAITING DESIGN-SYSTEM COVERAGE
+ *
+ * The React Button has no equivalent for these, so there is nothing to
+ * generate from. Each is a candidate feature request against the component.
+ * ------------------------------------------------------------------------ */
+
+/*
+ * Destructive / delete button.
+ * TO REMOVE: map React's `is-destructive` onto `.button-link-delete` once
+ * `--wpds-color-stroke-focus` gains its dual (accent + destructive) role — see
+ * README finding. The hardcoded red should become a `--wpds-*` error token; it
+ * is left as Core's literal value here deliberately, so this file does not
+ * invent a token binding that the design system has not yet decided.
+ */
+.wp-core-ui .button-link-delete {
+	color: #d63638;
+}
+
+.wp-core-ui .button-link-delete:hover,
+.wp-core-ui .button-link-delete:focus {
+	color: #d63638;
+	background: transparent;
+}
+
+.wp-core-ui .button-link-delete:disabled {
+	/* Overrides the default disabled background. */
+	background: transparent !important;
+}
+
+/*
+ * Pressed state, e.g. a selected setting.
+ * TO REMOVE: map React's `is-pressed` onto `.button.active`. Blocked only on
+ * deciding whether classic adopts React's pressed treatment (a filled
+ * background) over Core's (a tinted background plus inset shadow) — a visual
+ * change that must be recorded when taken.
+ */
+.wp-core-ui .button.active,
+.wp-core-ui .button.active:hover {
+	background-color: rgba(var(--wp-admin-theme-color--rgb, 56, 88, 233), 0.08);
+	color: var(--wp-admin-theme-color-darker-20, #183ad6);
+	border-color: var(--wp-admin-theme-color, #3858e9);
+	box-shadow: inset 0 2px 6px -2px var(--wp-admin-theme-color-darker-20);
+	outline: 3px solid transparent;
+	outline-offset: -3px;
+}
+
+.wp-core-ui .button-primary.active,
+.wp-core-ui .button-primary.active:hover,
+.wp-core-ui .button-primary.active:focus {
+	background: var(--wp-admin-theme-color-darker-20, #183ad6);
+	border-color: var(--wp-admin-theme-color-darker-20, #183ad6);
+	box-shadow: none;
+	color: #fff;
+}
+
+.wp-core-ui .button-group > .button.active {
+	border-color: var(--wp-admin-theme-color);
+	box-shadow: inset 0 2px 6px -2px var(--wp-admin-theme-color-darker-20);
+}
+
+/*
+ * Classic size variants with no React counterpart.
+ *
+ * `.button-compact` is the sharpest case: the translation key maps React's
+ * `is-compact` onto it, but React carries no compact height rule of its own, so
+ * nothing is generated and the variant would otherwise have no size at all.
+ *
+ * TO REMOVE: give the React Button a 32px (compact), 48px (hero) and explicit
+ * large size, then map them. Until then these are the only rules keeping the
+ * four classic sizes distinguishable.
+ */
+.wp-core-ui .button.button-compact,
+.wp-core-ui .button-group.button-compact .button {
+	min-height: 32px;
+	padding: 0 12px;
+}
+
+.wp-core-ui .button.button-large,
+.wp-core-ui .button-group.button-large .button {
+	min-height: 40px;
+	padding: 0 16px;
+}
+
+.wp-core-ui .button.button-hero,
+.wp-core-ui .button-group.button-hero .button {
+	font-size: 14px;
+	line-height: 3.28571429; /* 46px — allows 48px min-height with 1px border. */
+	min-height: 48px;
+	padding: 0 36px;
+}
+
+/* ---------------------------------------------------------------------------
+ * 2. CLASSIC-ONLY BY NATURE
+ *
+ * Tied to classic markup, classic screens, or browser quirks the React admin
+ * does not meet. These may never be automatable; they are documented
+ * exceptions rather than pending work.
+ * ------------------------------------------------------------------------ */
+
+/*
+ * FUNCTIONAL, not cosmetic: classic admin JS shows and hides buttons with a
+ * `.hidden` class. Without this rule those buttons stay visible.
+ * TO REMOVE: never — this is classic markup convention, not styling.
+ */
+.wp-core-ui .button.hidden {
+	display: none;
+}
+
+/*
+ * Firefox paints an inner dotted focus ring on button elements.
+ * TO REMOVE: never, until the supported browser matrix drops it.
+ */
+.wp-core-ui button::-moz-focus-inner,
+.wp-core-ui input[type="reset"]::-moz-focus-inner,
+.wp-core-ui input[type="button"]::-moz-focus-inner,
+.wp-core-ui input[type="submit"]::-moz-focus-inner {
+	border-width: 0;
+	border-style: none;
+	padding: 0;
+}
+
+/*
+ * Dashicons centring. React uses `.dashicon` (singular) inside an icon slot and
+ * sizes it with flexbox; classic uses `.dashicons` (plural) inline, centred by
+ * line-height. Different class, different mechanism — not a rename away.
+ * TO REMOVE: only if classic button markup adopts the React icon slot.
+ */
+.wp-core-ui .button .dashicons,
+.wp-core-ui .button-primary .dashicons,
+.wp-core-ui .button-secondary .dashicons {
+	line-height: 1.9; /* 38px (20px * 1.9) — matches default button. */
+	vertical-align: top;
+}
+
+.wp-core-ui .button.button-compact .dashicons {
+	line-height: 1.5; /* 30px — matches compact button. */
+}
+
+.wp-core-ui .button.button-small .dashicons {
+	line-height: 1.1; /* 22px — matches small button. */
+}
+
+.wp-core-ui .button.button-hero .dashicons {
+	line-height: 2.3; /* 46px — matches hero button. */
+}
+
+/*
+ * Reset inputs render as plain text links in classic admin. React has no reset
+ * button at all.
+ * TO REMOVE: never — `input[type="reset"]` is classic-form-only.
+ */
+.wp-core-ui input[type="reset"],
+.wp-core-ui input[type="reset"]:hover,
+.wp-core-ui input[type="reset"]:active,
+.wp-core-ui input[type="reset"]:focus {
+	background: none;
+	border: none;
+	box-shadow: none;
+	padding: 0 2px 1px;
+	width: auto;
+	color: var(--wp-admin-theme-color, #3858e9);
+	text-decoration: underline;
+	transition-property: border, background, color;
+	transition-duration: 0.05s;
+	transition-timing-function: ease-in-out;
+	height: auto;
+}
+
+/*
+ * Touch-target sizing on small screens. The React admin handles responsive
+ * sizing in component logic, not media queries, so there is nothing to
+ * generate from.
+ * TO REMOVE: only if the design system takes a position on responsive control
+ * sizing that classic can defer to.
+ */
+@media screen and (max-width: 782px) {
+
+	.wp-core-ui .button,
+	.wp-core-ui .button.button-large,
+	.wp-core-ui .button.button-compact,
+	.wp-core-ui .button.button-small,
+	input#publish,
+	input#save-post,
+	a.preview {
+		padding: 0 14px;
+		line-height: 2.71428571; /* 38px — allows 40px min-height with 1px border. */
+		font-size: 14px;
+		vertical-align: middle;
+		min-height: 40px;
+		margin-bottom: 4px;
+	}
+
+	.wp-core-ui .button .dashicons,
+	.wp-core-ui .button-primary .dashicons,
+	.wp-core-ui .button-secondary .dashicons {
+		line-height: 1.9; /* 38px — matches responsive button. */
+	}
+
+	/* Copy attachment URL button on the legacy edit media page. */
+	.wp-core-ui .copy-to-clipboard-container .copy-attachment-url {
+		margin-bottom: 0;
+	}
+
+	#media-upload.wp-core-ui .button {
+		padding: 0 10px;
+		line-height: 1.69230769; /* 22px */
+		min-height: 24px;
+		font-size: 13px;
+	}
+
+	.media-frame.mode-grid .bulk-select .button {
+		margin-bottom: 0;
+	}
+}

@@ -79,5 +79,17 @@ function gutenberg_wpds_classic_buttons_enqueue() {
 		array_merge( array( 'colors' ), $token_deps ),
 		$version
 	);
+
+	// 4. Enqueue the hand-authored exceptions: the classic-only rules the
+	//    generator cannot produce from the React Button. Without these the
+	//    dequeue above would drop real styling (and, for `.button.hidden`, real
+	//    behaviour). Loads after the generated file so its overrides win.
+	//    See buttons-exceptions.css — it is a shrinking to-do list.
+	wp_enqueue_style(
+		'gutenberg-wpds-classic-buttons-exceptions',
+		$base_url . 'buttons-exceptions.css',
+		array( 'gutenberg-wpds-classic-buttons' ),
+		$version
+	);
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_wpds_classic_buttons_enqueue', 20 );
