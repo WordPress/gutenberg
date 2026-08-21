@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   The `no-unused-vars-before-return` rule no longer reports variables assigned from a method which mutates the object it is called on (`push`, `pop`, `shift`, `unshift`, `splice`, `sort`, `reverse`), since following its advice would move the mutation past the return and change behavior. ([#71568](https://github.com/WordPress/gutenberg/issues/71568))
+
 ### Enhancements
 
 -   Update `use-recommended-components` rule to mark `Autocomplete`, `Field`, and `Fieldset` from `@wordpress/ui` as recommended ([#80636](https://github.com/WordPress/gutenberg/pull/80636)).
