@@ -79,9 +79,19 @@ test.describe( 'Editor intent switcher', () => {
 		);
 	} );
 
-	test( 'keyboard shortcut cycles between intents', async ( { page } ) => {
+	test( 'keyboard shortcut cycles between intents', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		/*
+		 * The intent shortcuts are registered with the `secondary` modifier,
+		 * which is Ctrl+Alt+Shift on Windows and Linux but Cmd+Opt+Shift on
+		 * macOS. Press it through `pageUtils` so the test resolves the same
+		 * combination the editor is listening for, rather than passing on
+		 * every platform CI happens to run.
+		 */
 		// Default is Edit.
-		await page.keyboard.press( 'Control+Alt+Shift+X' );
+		await pageUtils.pressKeys( 'secondary+x' );
 		await openIntentSwitcher( page );
 		await expect(
 			page.getByRole( 'menuitemradio', { name: /^Suggesting/ } )
@@ -89,7 +99,7 @@ test.describe( 'Editor intent switcher', () => {
 
 		// Close menu and switch to View via shortcut.
 		await page.keyboard.press( 'Escape' );
-		await page.keyboard.press( 'Control+Alt+Shift+C' );
+		await pageUtils.pressKeys( 'secondary+c' );
 		await openIntentSwitcher( page );
 		await expect(
 			page.getByRole( 'menuitemradio', { name: /^Viewing\s+Read-only/ } )
@@ -97,7 +107,7 @@ test.describe( 'Editor intent switcher', () => {
 
 		// Back to Edit.
 		await page.keyboard.press( 'Escape' );
-		await page.keyboard.press( 'Control+Alt+Shift+Z' );
+		await pageUtils.pressKeys( 'secondary+z' );
 		await openIntentSwitcher( page );
 		await expect(
 			page.getByRole( 'menuitemradio', {
