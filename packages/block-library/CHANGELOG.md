@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   Group: Add an aspect ratio control to the Group block and its Row, Stack, and Grid variations. The control is hidden by default, and content taller than the ratio expands the block rather than overflowing it.
 -   Columns: Add transforms between Columns and the Row variation that preserve column widths through flex child sizing controls.
 
 ### Bug Fixes
