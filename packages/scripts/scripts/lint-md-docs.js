@@ -17,6 +17,7 @@ const defaultFilesArgs = hasFileArgInCLI() ? [] : [ '**/*.md' ];
 const hasLintConfig =
 	hasArgInCLI( '-c' ) ||
 	hasArgInCLI( '--config' ) ||
+	hasProjectFile( '.markdownlint.jsonc' ) ||
 	hasProjectFile( '.markdownlint.json' ) ||
 	hasProjectFile( '.markdownlint.yaml' ) ||
 	hasProjectFile( '.markdownlint.yml' ) ||
