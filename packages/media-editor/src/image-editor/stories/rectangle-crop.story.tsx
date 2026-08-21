@@ -149,7 +149,7 @@ const DefaultComponent = () => {
 
 export const Default: Story = {
 	parameters: {
-		// FIXME: Editor chrome fails color-contrast.
+		// FIXME: Image credit text and its link fail color-contrast.
 		// See: https://github.com/WordPress/gutenberg/issues/81596
 		a11y: { test: 'todo' },
 	},
@@ -516,6 +516,11 @@ const WithControlsComponent = () => {
 };
 
 export const WithControls: Story = {
+	parameters: {
+		// FIXME: The state dump scrolls once its content overflows, and is not keyboard-accessible (scrollable-region-focusable). Whether it overflows depends on the numbers rendered, so this appears intermittently.
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: WithControlsComponent,
 };
 
@@ -1059,7 +1064,7 @@ aspect ratio: ${ ( sourceRegion.width / sourceRegion.height ).toFixed( 2 ) }
 
 export const Debug: Story = {
 	parameters: {
-		// FIXME: Editor chrome fails color-contrast; the debug view has a non-keyboard-accessible scroll region (color-contrast, scrollable-region-focusable).
+		// FIXME: Image credit text and its link fail color-contrast.
 		// See: https://github.com/WordPress/gutenberg/issues/81596
 		a11y: { test: 'todo' },
 	},
