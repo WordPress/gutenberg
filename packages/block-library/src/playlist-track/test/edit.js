@@ -12,6 +12,7 @@ jest.mock( '@wordpress/block-editor', () => {
 	).default;
 
 	return {
+		store: 'core/block-editor',
 		BlockControls: ( { children } ) => <div>{ children }</div>,
 		BlockIcon: () => <span />,
 		InspectorControls: ( { children } ) => <div>{ children }</div>,
@@ -25,7 +26,11 @@ jest.mock( '@wordpress/block-editor', () => {
 			renderMediaUpload( { open: jest.fn() } ),
 		MediaUploadCheck: ( { children } ) => <div>{ children }</div>,
 		PlainText,
-		useBlockProps: jest.fn( () => ( {} ) ),
+		useBlockProps: jest.fn( ( props = {} ) => ( {
+			'data-testid': 'playlist-track-block',
+			tabIndex: 0,
+			...props,
+		} ) ),
 	};
 } );
 
@@ -66,6 +71,19 @@ const defaultAttributes = {
 function renderEdit( props = {} ) {
 	const setAttributes = jest.fn();
 	const setCurrentTrackClientId = props.setCurrentTrackClientId || jest.fn();
+	const selectBlock = props.selectBlock || jest.fn();
+
+	useDispatch.mockImplementation( ( store ) => {
+		if ( store === 'core/block-editor' ) {
+			return {
+				selectBlock,
+			};
+		}
+
+		return {
+			createErrorNotice: jest.fn(),
+		};
+	} );
 
 	render(
 		<PlaylistContext.Provider
@@ -91,15 +109,17 @@ function renderEdit( props = {} ) {
 		</PlaylistContext.Provider>
 	);
 
-	return { setAttributes, setCurrentTrackClientId };
+	return {
+		selectBlock,
+		setAttributes,
+		setCurrentTrackClientId,
+	};
 }
 
 describe( 'PlaylistTrackEdit', () => {
 	beforeEach( () => {
 		mockMediaReplaceFlowProps = undefined;
-		useDispatch.mockReturnValue( {
-			createErrorNotice: jest.fn(),
-		} );
+		useDispatch.mockReset();
 		useUploadMediaFromBlobURL.mockClear();
 	} );
 
@@ -162,6 +182,34 @@ describe( 'PlaylistTrackEdit', () => {
 		} );
 
 		expect( setCurrentTrackClientId ).not.toHaveBeenCalled();
+	} );
+
+	it( 'selects and focuses the track block when the duration safe area is clicked', () => {
+		const selectBlock = jest.fn();
+		const { setCurrentTrackClientId } = renderEdit( { selectBlock } );
+		const duration = screen.getByText( '3:45' );
+
+		fireEvent.click( duration );
+
+		expect( setCurrentTrackClientId ).toHaveBeenCalledWith(
+			'playlist-track-client-id'
+		);
+		expect( selectBlock ).toHaveBeenCalledWith(
+			'playlist-track-client-id'
+		);
+		expect( screen.getByTestId( 'playlist-track-block' ) ).toHaveFocus();
+	} );
+
+	it( 'does not select the track block when editable track content is clicked', () => {
+		const selectBlock = jest.fn();
+		const { setCurrentTrackClientId } = renderEdit( { selectBlock } );
+
+		fireEvent.click( screen.getByLabelText( 'Track title' ) );
+
+		expect( setCurrentTrackClientId ).toHaveBeenCalledWith(
+			'playlist-track-client-id'
+		);
+		expect( selectBlock ).not.toHaveBeenCalled();
 	} );
 
 	it( 'uploads temporary blob tracks', () => {

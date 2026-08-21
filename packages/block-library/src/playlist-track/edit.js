@@ -1,6 +1,7 @@
 import { isBlobURL } from '@wordpress/blob';
 import { useContext, useEffect, useRef, useState } from '@wordpress/element';
 import {
+	store as blockEditorStore,
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	MediaUpload,
@@ -45,14 +46,31 @@ const PlaylistTrackEdit = ( {
 	const showArtists = context?.showArtists;
 	const showImages = context?.showImages ?? true;
 	const imageButton = useRef();
-	const blockProps = useBlockProps();
+	const blockRef = useRef();
+	const blockProps = useBlockProps( { ref: blockRef } );
 	const { currentTrackClientId, setCurrentTrackClientId } =
 		useContext( PlaylistContext );
+	const { selectBlock } = useDispatch( blockEditorStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
 	const hasTrackSource = !! src || !! temporaryURL;
+
+	function isTrackContentTarget( target ) {
+		return target.closest?.( '.wp-block-playlist-track__content' );
+	}
+
+	function selectTrackBlock( event ) {
+		setCurrentTrackClientId( clientId );
+
+		if ( isTrackContentTarget( event.target ) ) {
+			return;
+		}
+
+		selectBlock( clientId );
+		blockRef.current?.focus();
+	}
 
 	useEffect( () => {
 		if (
@@ -253,7 +271,7 @@ const PlaylistTrackEdit = ( {
 			<li { ...blockProps }>
 				<button
 					className="wp-block-playlist-track__button"
-					onClick={ () => setCurrentTrackClientId( clientId ) }
+					onClick={ selectTrackBlock }
 					aria-current={
 						currentTrackClientId === clientId ? 'true' : 'false'
 					}

@@ -31,6 +31,103 @@ test.describe( 'Playlist block', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
+	test( 'deletes playlist tracks selected from list view and track row safe areas', async ( {
+		admin,
+		editor,
+		listViewUtils,
+		page,
+	} ) => {
+		await admin.createNewPost();
+
+		const createTrackComment = ( title ) =>
+			`<!-- wp:playlist-track ${ JSON.stringify( {
+				id: uploadedAudio.id,
+				src: uploadedAudio.source_url,
+				title,
+				artist: 'Test Artist',
+				length: '0:12',
+			} ) } /-->`;
+
+		await editor.setContent(
+			[
+				'<!-- wp:playlist -->',
+				'<figure class="wp-block-playlist">',
+				'<ol class="wp-block-playlist__tracklist wp-block-playlist__tracklist-show-numbers">',
+				createTrackComment( 'First track' ),
+				createTrackComment( 'Second track' ),
+				createTrackComment( 'Third track' ),
+				createTrackComment( 'Fourth track' ),
+				'</ol></figure>',
+				'<!-- /wp:playlist -->',
+			].join( '' )
+		);
+
+		const expectTrackTitles = async ( titles ) =>
+			expect
+				.poll( async () => {
+					const [ playlist ] = await editor.getBlocks();
+					return playlist.innerBlocks.map(
+						( block ) => block.attributes.title
+					);
+				} )
+				.toEqual( titles );
+
+		await expectTrackTitles( [
+			'First track',
+			'Second track',
+			'Third track',
+			'Fourth track',
+		] );
+
+		const listView = await listViewUtils.openListView();
+		await expect( listView ).toBeVisible();
+
+		await listView
+			.getByRole( 'gridcell', {
+				name: 'Playlist track',
+				exact: true,
+			} )
+			.first()
+			.dblclick();
+		await page.keyboard.press( 'Delete' );
+
+		await expectTrackTitles( [
+			'Second track',
+			'Third track',
+			'Fourth track',
+		] );
+
+		const getTrackBlock = ( title ) =>
+			editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Playlist track',
+				} )
+				.filter( {
+					has: editor.canvas.getByText( title ),
+				} );
+
+		const secondTrack = getTrackBlock( 'Second track' );
+		await secondTrack.locator( '.wp-block-playlist-track__length' ).click();
+		await expect
+			.poll( () => editor.ownsSelection( secondTrack ) )
+			.toBe( true );
+		await page.keyboard.press( 'Delete' );
+
+		await expectTrackTitles( [ 'Third track', 'Fourth track' ] );
+
+		const thirdTrackButton =
+			getTrackBlock( 'Third track' ).getByRole( 'button' );
+		await thirdTrackButton.click( { position: { x: 8, y: 8 } } );
+		await expect
+			.poll( () =>
+				editor.ownsSelection( getTrackBlock( 'Third track' ) )
+			)
+			.toBe( true );
+		await page.keyboard.press( 'Backspace' );
+
+		await expectTrackTitles( [ 'Fourth track' ] );
+	} );
+
 	test( 'waveform seek control can be reached and operated with the keyboard on the frontend', async ( {
 		page,
 		requestUtils,
