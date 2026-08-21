@@ -411,7 +411,7 @@ class WP_Navigation_Block_Renderer {
 	 * @since 6.5.0
 	 *
 	 * @param string $overlay_template_part_id The overlay template part ID in format "theme//slug".
-	 * @param array  $attributes                The block attributes.
+	 * @param array  $attributes               The block attributes.
 	 * @return WP_Block_List Returns the inner blocks for the overlay template part.
 	 */
 	private static function get_overlay_blocks_from_template_part( $overlay_template_part_id, $attributes ) {
@@ -512,7 +512,7 @@ class WP_Navigation_Block_Renderer {
 	 * @since 6.5.0
 	 *
 	 * @param array    $attributes The block attributes.
-	 * @param WP_Block $block The parsed block.
+	 * @param WP_Block $block      The parsed block.
 	 * @return WP_Block_List Returns the inner blocks for the navigation block.
 	 */
 	private static function get_inner_blocks( $attributes, $block ) {
@@ -734,8 +734,8 @@ class WP_Navigation_Block_Renderer {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param array         $attributes The block attributes.
-	 * @param WP_Block_List $inner_blocks The list of inner blocks.
+	 * @param array         $attributes        The block attributes.
+	 * @param WP_Block_List $inner_blocks      The list of inner blocks.
 	 * @param string        $inner_blocks_html The markup for the inner blocks.
 	 * @return string Returns the container markup.
 	 */
@@ -973,7 +973,7 @@ class WP_Navigation_Block_Renderer {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param array         $attributes The block attributes.
+	 * @param array         $attributes   The block attributes.
 	 * @param WP_Block_List $inner_blocks The list of inner blocks.
 	 * @return string Returns the navigation wrapper markup.
 	 */
@@ -1885,7 +1885,7 @@ function block_core_navigation_get_classic_menu_fallback() {
  *
  * @deprecated 6.3.0 Use WP_Navigation_Fallback::get_classic_menu_fallback_blocks() instead.
  *
- * @param  object $classic_nav_menu WP_Term The classic navigation object to convert.
+ * @param object $classic_nav_menu WP_Term The classic navigation object to convert.
  * @return array the normalized parsed blocks.
  */
 function block_core_navigation_get_classic_menu_fallback_blocks( $classic_nav_menu ) {

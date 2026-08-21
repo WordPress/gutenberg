@@ -128,14 +128,14 @@ function block_core_page_list_build_css_colors( $attributes, $context ) {
  *
  * @since 5.8.0
  *
- * @param string  $submenu_visibility The submenu visibility mode: 'hover', 'click', or 'always'.
- * @param boolean $show_submenu_icons Whether to show submenu indicator icons.
- * @param boolean $is_navigation_child If block is a child of Navigation block.
- * @param array   $nested_pages The array of nested pages.
- * @param boolean $is_nested Whether the submenu is nested or not.
+ * @param string  $submenu_visibility       The submenu visibility mode: 'hover', 'click', or 'always'.
+ * @param boolean $show_submenu_icons       Whether to show submenu indicator icons.
+ * @param boolean $is_navigation_child      If block is a child of Navigation block.
+ * @param array   $nested_pages             The array of nested pages.
+ * @param boolean $is_nested                Whether the submenu is nested or not.
  * @param array   $active_page_ancestor_ids An array of ancestor ids for active page.
- * @param array   $colors Color information for overlay styles.
- * @param integer $depth The nesting depth.
+ * @param array   $colors                   Color information for overlay styles.
+ * @param integer $depth                    The nesting depth.
  *
  * @return string List markup.
  */
@@ -227,7 +227,7 @@ function block_core_page_list_render_nested_page_list( $submenu_visibility, $sho
  * @since 5.8.0
  *
  * @param array $current_level The level being iterated through.
- * @param array $children The children grouped by parent post ID.
+ * @param array $children      The children grouped by parent post ID.
  *
  * @return array The nested array of pages.
  */

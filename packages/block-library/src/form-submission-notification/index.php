@@ -9,7 +9,7 @@
  * Renders the `core/form-submission-notification` block on server.
  *
  * @param array  $attributes The block attributes.
- * @param string $content The saved content.
+ * @param string $content    The saved content.
  *
  * @return string The content of the block being rendered.
  */
