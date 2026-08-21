@@ -57,6 +57,7 @@ export {
 	applyFormatPlan,
 } from './reconcile-format';
 export {
+	hasSuggestionMarkers,
 	stripSuggestionMarkers,
 	stripSuggestionMarkersFromAttributes,
 } from './strip-markers';

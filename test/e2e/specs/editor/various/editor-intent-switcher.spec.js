@@ -6,6 +6,23 @@ async function openIntentSwitcher( page ) {
 	);
 }
 
+/*
+ * `MenuItemsChoice` keeps its dropdown open on selection, and Escape does not
+ * reliably dismiss it. Leaving it open is what made this test flaky: the
+ * Options button toggles, so reopening a menu that never closed shuts it
+ * instead, and the assertion that follows finds no menu item at all. Close it
+ * through the same toggle and wait for it to actually go.
+ */
+async function closeIntentSwitcher( page ) {
+	await page
+		.getByRole( 'region', { name: 'Editor top bar' } )
+		.getByRole( 'button', { name: 'Options' } )
+		.click();
+	await expect(
+		page.getByRole( 'menuitemradio', { name: /^Suggesting/ } )
+	).toBeHidden();
+}
+
 test.describe( 'Editor intent switcher', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.setGutenbergExperiments( [
@@ -79,25 +96,35 @@ test.describe( 'Editor intent switcher', () => {
 		);
 	} );
 
-	test( 'keyboard shortcut cycles between intents', async ( { page } ) => {
+	test( 'keyboard shortcut cycles between intents', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		/*
+		 * The intent shortcuts are registered with the `secondary` modifier,
+		 * which is Ctrl+Alt+Shift on Windows and Linux but Cmd+Opt+Shift on
+		 * macOS. Press it through `pageUtils` so the test resolves the same
+		 * combination the editor is listening for, rather than passing on
+		 * every platform CI happens to run.
+		 */
 		// Default is Edit.
-		await page.keyboard.press( 'Control+Alt+Shift+X' );
+		await pageUtils.pressKeys( 'secondary+x' );
 		await openIntentSwitcher( page );
 		await expect(
 			page.getByRole( 'menuitemradio', { name: /^Suggesting/ } )
 		).toHaveAttribute( 'aria-checked', 'true' );
 
 		// Close menu and switch to View via shortcut.
-		await page.keyboard.press( 'Escape' );
-		await page.keyboard.press( 'Control+Alt+Shift+C' );
+		await closeIntentSwitcher( page );
+		await pageUtils.pressKeys( 'secondary+c' );
 		await openIntentSwitcher( page );
 		await expect(
 			page.getByRole( 'menuitemradio', { name: /^Viewing\s+Read-only/ } )
 		).toHaveAttribute( 'aria-checked', 'true' );
 
 		// Back to Edit.
-		await page.keyboard.press( 'Escape' );
-		await page.keyboard.press( 'Control+Alt+Shift+Z' );
+		await closeIntentSwitcher( page );
+		await pageUtils.pressKeys( 'secondary+z' );
 		await openIntentSwitcher( page );
 		await expect(
 			page.getByRole( 'menuitemradio', {
