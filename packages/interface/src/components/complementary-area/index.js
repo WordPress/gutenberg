@@ -8,7 +8,7 @@ import {
 	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf, _x } from '@wordpress/i18n';
 import { check, starEmpty, starFilled } from '@wordpress/icons';
 import {
 	cloneElement,
@@ -119,6 +119,48 @@ function ComplementaryAreaFill( {
 	);
 }
 
+/**
+ * Counts above this are truncated on the pinned toggle badge, which has to stay
+ * legible inside a compact toolbar button. The untruncated count is still
+ * announced through the toggle's `badgeLabel`.
+ */
+const MAX_BADGE_COUNT = 9;
+
+/**
+ * Overlays a count badge on the pinned toolbar toggle.
+ *
+ * Without a badge the toggle is returned untouched, so the pinned items row -
+ * and the flex layout every other sidebar relies on - gains no extra wrapper.
+ *
+ * @param {Object}          props          Component props.
+ * @param {number}          [props.badge]  Count to display; falsy renders nothing.
+ * @param {React.ReactNode} props.children The pinned toggle.
+ */
+function PinnedToggle( { badge, children } ) {
+	if ( ! badge ) {
+		return children;
+	}
+
+	return (
+		<div className="interface-complementary-area__pinned-toggle">
+			{ children }
+			{ /* The count is announced through the toggle's accessible label. */ }
+			<span
+				className="interface-complementary-area__badge"
+				aria-hidden="true"
+			>
+				{ badge > MAX_BADGE_COUNT
+					? sprintf(
+							/* translators: %d: Highest count a badge shows before truncating, e.g. "9+". */
+							_x( '%d+', 'truncated badge count' ),
+							MAX_BADGE_COUNT
+					  )
+					: badge }
+			</span>
+		</div>
+	);
+}
+
 function useAdjustComplementaryListener(
 	scope,
 	identifier,
@@ -175,6 +217,8 @@ function useAdjustComplementaryListener(
 }
 
 function ComplementaryArea( {
+	badge,
+	badgeLabel,
 	children,
 	className,
 	closeLabel = __( 'Close plugin' ),
@@ -276,21 +320,27 @@ function ComplementaryArea( {
 			{ isPinnable && (
 				<PinnedItems scope={ scope }>
 					{ isPinned && (
-						<ComplementaryAreaToggle
-							scope={ scope }
-							identifier={ identifier }
-							isPressed={
-								isActive && ( ! showIconLabels || isLarge )
-							}
-							aria-expanded={ isActive }
-							aria-disabled={ isLoading }
-							label={ title }
-							icon={ showIconLabels ? check : icon }
-							showTooltip={ ! showIconLabels }
-							variant={ showIconLabels ? 'tertiary' : undefined }
-							size="compact"
-							shortcut={ toggleShortcut }
-						/>
+						<PinnedToggle badge={ badge }>
+							<ComplementaryAreaToggle
+								scope={ scope }
+								identifier={ identifier }
+								isPressed={
+									isActive && ( ! showIconLabels || isLarge )
+								}
+								aria-expanded={ isActive }
+								aria-disabled={ isLoading }
+								label={
+									badge && badgeLabel ? badgeLabel : title
+								}
+								icon={ showIconLabels ? check : icon }
+								showTooltip={ ! showIconLabels }
+								variant={
+									showIconLabels ? 'tertiary' : undefined
+								}
+								size="compact"
+								shortcut={ toggleShortcut }
+							/>
+						</PinnedToggle>
 					) }
 				</PinnedItems>
 			) }

@@ -927,6 +927,8 @@ _Parameters_
 -   _props.title_ `string`: Title displayed at the top of the sidebar.
 -   _props.isPinnable_ `[boolean]`: Whether to allow to pin sidebar to the toolbar. When set to `true` it also automatically renders a corresponding menu item.
 -   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+-   _props.badge_ `[number]`: A count rendered over the pinned toolbar toggle. Counts above 9 display as "9+"; pass `badgeLabel` so the exact number is still announced.
+-   _props.badgeLabel_ `[string]`: Accessible label for the pinned toolbar toggle while a badge is shown, replacing `title` so the exact count is announced.
 
 ### PluginSidebarMoreMenuItem
 

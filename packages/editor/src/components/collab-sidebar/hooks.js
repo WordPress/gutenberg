@@ -16,9 +16,16 @@ import { store as noticesStore } from '@wordpress/notices';
 import { getScrollContainer } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 import { RichTextData, create } from '@wordpress/rich-text';
 import { store as editorStore } from '../../store';
-import { FLOATING_NOTES_SIDEBAR } from './constants';
+import {
+	ALL_NOTES_SIDEBAR,
+	FLOATING_NOTES_SIDEBAR,
+	NOTES_LAST_SEEN_LIMIT,
+	NOTES_LAST_SEEN_PREFERENCE,
+	NOTES_LAST_SEEN_SCOPE,
+} from './constants';
 import { unlock } from '../../lock-unlock';
 import { createBoardStore } from './board-store';
 import { NOTE_FORMAT_NAME } from './format';
@@ -29,8 +36,11 @@ import {
 	getInlineMarkerStart,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
+	getLatestNoteActivity,
+	getUnseenNoteCount,
 	removeNoteFormat,
 	removeNoteIdFromMetadata,
+	setNotesLastSeen,
 } from './utils';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
@@ -167,6 +177,82 @@ export function useNoteThreads( postId ) {
 		notes,
 		unresolvedNotes,
 	};
+}
+
+/**
+ * Counts the note threads carrying activity the current user has not seen, and
+ * marks the post's notes as seen while the "All notes" sidebar is open.
+ *
+ * The floating notes panel opens itself whenever a post has unresolved notes,
+ * so it cannot stand in for "the user looked at the notes"; only the pinned
+ * "All notes" sidebar - the one the badge sits on - clears the count.
+ *
+ * The recorded timestamp is the newest `date_gmt` the user has actually been
+ * shown rather than the current time, which keeps the comparison immune to
+ * clock skew between the browser and the server.
+ *
+ * @param {Object}  options                 Options.
+ * @param {?number} options.postId          Post the notes belong to.
+ * @param {Array}   options.notes           Every note thread loaded for the post.
+ * @param {Array}   options.unresolvedNotes Threads eligible to badge.
+ * @return {number} Number of threads with unseen activity.
+ */
+export function useUnseenNotes( { postId, notes, unresolvedNotes } ) {
+	const { set: setPreference } = useDispatch( preferencesStore );
+
+	const { lastSeenByPost, currentUserId, isAllNotesOpen } = useSelect(
+		( select ) => ( {
+			lastSeenByPost: select( preferencesStore ).get(
+				NOTES_LAST_SEEN_SCOPE,
+				NOTES_LAST_SEEN_PREFERENCE
+			),
+			currentUserId: select( coreStore ).getCurrentUser()?.id,
+			isAllNotesOpen:
+				select( interfaceStore ).getActiveComplementaryArea(
+					'core'
+				) === ALL_NOTES_SIDEBAR,
+		} ),
+		[]
+	);
+
+	const lastSeen = postId ? lastSeenByPost?.[ postId ] : undefined;
+	const latestActivity = useMemo(
+		() => getLatestNoteActivity( notes ),
+		[ notes ]
+	);
+
+	useEffect( () => {
+		if ( ! isAllNotesOpen || ! postId || ! latestActivity ) {
+			return;
+		}
+		// Already recorded, including for activity arriving while the sidebar
+		// stays open.
+		if ( lastSeen && lastSeen >= latestActivity ) {
+			return;
+		}
+		setPreference(
+			NOTES_LAST_SEEN_SCOPE,
+			NOTES_LAST_SEEN_PREFERENCE,
+			setNotesLastSeen(
+				lastSeenByPost,
+				postId,
+				latestActivity,
+				NOTES_LAST_SEEN_LIMIT
+			)
+		);
+	}, [
+		isAllNotesOpen,
+		postId,
+		latestActivity,
+		lastSeen,
+		lastSeenByPost,
+		setPreference,
+	] );
+
+	return useMemo(
+		() => getUnseenNoteCount( unresolvedNotes, lastSeen, currentUserId ),
+		[ unresolvedNotes, lastSeen, currentUserId ]
+	);
 }
 
 /**

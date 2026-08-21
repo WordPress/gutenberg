@@ -645,3 +645,91 @@ export function scrollNoteThreadIntoView( noteId, container ) {
 		element?.scrollIntoView( { block: 'nearest' } );
 	} );
 }
+
+/*
+ * Note timestamps are compared as strings throughout the helpers below.
+ * `date_gmt` arrives from the comments endpoint as a fixed-width, zero-padded
+ * `Y-m-d\TH:i:s` string, so lexicographic order is chronological order. Parsing
+ * these into `Date` objects would be worse than useless here: a date-time
+ * without an offset is interpreted as *local* time, so a value produced by the
+ * client would not be comparable with one produced by the server.
+ */
+
+/**
+ * Returns the most recent activity timestamp across the given note threads,
+ * counting both the threads themselves and their replies.
+ *
+ * @param {Array} threads Note threads, each optionally carrying a `reply` array.
+ * @return {?string} Newest `date_gmt` found, or `null` when there is none.
+ */
+export function getLatestNoteActivity( threads ) {
+	let latest = null;
+	for ( const thread of threads ?? [] ) {
+		for ( const entry of [ thread, ...( thread?.reply ?? [] ) ] ) {
+			const date = entry?.date_gmt;
+			if ( date && ( latest === null || date > latest ) ) {
+				latest = date;
+			}
+		}
+	}
+	return latest;
+}
+
+/**
+ * Counts the note threads carrying activity the current user has not seen yet.
+ *
+ * A thread counts once however many unseen replies it holds, and only activity
+ * authored by somebody else counts - your own note never badges your own
+ * toolbar. Pass only the threads that should be eligible (unresolved ones);
+ * resolving a thread is not activity a badge should surface.
+ *
+ * @param {Array}   threads       Eligible note threads, each optionally carrying a `reply` array.
+ * @param {?string} lastSeen      `date_gmt` the user last looked at this post's notes. A missing value means nothing has been seen yet.
+ * @param {?number} currentUserId Id of the user the count is for.
+ * @return {number} Number of threads with unseen activity.
+ */
+export function getUnseenNoteCount( threads, lastSeen, currentUserId ) {
+	// Without a known viewer there is no way to tell whose activity is whose,
+	// and counting every thread would badge the user for their own notes.
+	if ( ! threads?.length || ! currentUserId ) {
+		return 0;
+	}
+
+	return threads.filter( ( thread ) =>
+		[ thread, ...( thread?.reply ?? [] ) ].some(
+			( entry ) =>
+				!! entry?.date_gmt &&
+				entry.author !== currentUserId &&
+				( ! lastSeen || entry.date_gmt > lastSeen )
+		)
+	).length;
+}
+
+/**
+ * Records a post's "notes last seen" timestamp, keeping the map bounded.
+ *
+ * @param {?Object} lastSeen  Existing `{ [ postId ]: date_gmt }` map.
+ * @param {number}  postId    Post the timestamp belongs to.
+ * @param {string}  timestamp `date_gmt` of the newest activity the user has been shown.
+ * @param {number}  limit     How many posts to keep.
+ * @return {Object} New map. The existing one is never mutated.
+ */
+export function setNotesLastSeen( lastSeen, postId, timestamp, limit ) {
+	const next = { ...lastSeen, [ postId ]: timestamp };
+	const postIds = Object.keys( next );
+	if ( postIds.length <= limit ) {
+		return next;
+	}
+
+	// Keep the most recently seen posts and drop the rest.
+	postIds.sort( ( a, b ) => {
+		if ( next[ a ] === next[ b ] ) {
+			return 0;
+		}
+		return next[ a ] > next[ b ] ? -1 : 1;
+	} );
+
+	return Object.fromEntries(
+		postIds.slice( 0, limit ).map( ( id ) => [ id, next[ id ] ] )
+	);
+}

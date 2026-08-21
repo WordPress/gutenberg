@@ -1,4 +1,4 @@
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
@@ -19,7 +19,11 @@ import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { NoteHighlightStyles } from './note-highlight-styles';
 import { useGlobalStyles } from '../global-styles';
-import { useEnableFloatingSidebar, useNoteThreads } from './hooks';
+import {
+	useEnableFloatingSidebar,
+	useNoteThreads,
+	useUnseenNotes,
+} from './hooks';
 import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
@@ -62,6 +66,11 @@ function NotesSidebar( { postId } ) {
 	);
 
 	const { notes, unresolvedNotes } = useNoteThreads( postId );
+	const unseenNoteCount = useUnseenNotes( {
+		postId,
+		notes,
+		unresolvedNotes,
+	} );
 
 	// Only enable the floating sidebar for large viewports.
 	const showFloatingSidebar = isLargeViewport;
@@ -179,6 +188,20 @@ function NotesSidebar( { postId } ) {
 						</h2>
 					}
 					icon={ commentIcon }
+					badge={ unseenNoteCount }
+					badgeLabel={
+						unseenNoteCount > 0
+							? sprintf(
+									/* translators: %d: Number of note threads with activity the user has not seen. */
+									_n(
+										'All notes, %d unseen',
+										'All notes, %d unseen',
+										unseenNoteCount
+									),
+									unseenNoteCount
+							  )
+							: undefined
+					}
 					closeLabel={ __( 'Close Notes' ) }
 				>
 					<Notes notes={ notes } sidebarRef={ sidebarRef } />

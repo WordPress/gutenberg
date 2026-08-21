@@ -20,6 +20,9 @@ import {
 	BLOCK_LEVEL_NOTE_START,
 	getInlineMarkerStart,
 	getNoteMarkerSelector,
+	getLatestNoteActivity,
+	getUnseenNoteCount,
+	setNotesLastSeen,
 } from '../utils';
 import { noteFormat } from '../format';
 
@@ -1051,5 +1054,205 @@ describe( 'getNoteMarkerSelector / noteFormat', () => {
 		marker.setAttribute( noteFormat.attributes[ 'data-id' ], '7' );
 
 		expect( marker.matches( getNoteMarkerSelector( 7 ) ) ).toBe( true );
+	} );
+} );
+
+const ME = 7;
+const SOMEONE_ELSE = 9;
+
+function makeThread( { id = 1, author = SOMEONE_ELSE, date, replies = [] } ) {
+	return {
+		id,
+		author,
+		date_gmt: date,
+		reply: replies,
+	};
+}
+
+describe( 'getLatestNoteActivity', () => {
+	it( 'returns null without threads', () => {
+		expect( getLatestNoteActivity( undefined ) ).toBeNull();
+		expect( getLatestNoteActivity( [] ) ).toBeNull();
+	} );
+
+	it( 'returns the newest thread timestamp', () => {
+		expect(
+			getLatestNoteActivity( [
+				makeThread( { id: 1, date: '2026-08-01T10:00:00' } ),
+				makeThread( { id: 2, date: '2026-08-03T10:00:00' } ),
+				makeThread( { id: 3, date: '2026-08-02T10:00:00' } ),
+			] )
+		).toBe( '2026-08-03T10:00:00' );
+	} );
+
+	it( 'counts replies as activity', () => {
+		expect(
+			getLatestNoteActivity( [
+				makeThread( {
+					id: 1,
+					date: '2026-08-01T10:00:00',
+					replies: [
+						makeThread( { id: 2, date: '2026-08-05T10:00:00' } ),
+					],
+				} ),
+			] )
+		).toBe( '2026-08-05T10:00:00' );
+	} );
+
+	it( 'ignores entries without a timestamp', () => {
+		expect(
+			getLatestNoteActivity( [
+				makeThread( { id: 1, date: undefined } ),
+				makeThread( { id: 2, date: '2026-08-01T10:00:00' } ),
+			] )
+		).toBe( '2026-08-01T10:00:00' );
+	} );
+} );
+
+describe( 'getUnseenNoteCount', () => {
+	it( 'returns 0 when the current user is unknown', () => {
+		expect(
+			getUnseenNoteCount(
+				[ makeThread( { date: '2026-08-01T10:00:00' } ) ],
+				undefined,
+				undefined
+			)
+		).toBe( 0 );
+	} );
+
+	it( 'counts every thread by others when nothing has been seen', () => {
+		expect(
+			getUnseenNoteCount(
+				[
+					makeThread( { id: 1, date: '2026-08-01T10:00:00' } ),
+					makeThread( { id: 2, date: '2026-08-02T10:00:00' } ),
+				],
+				undefined,
+				ME
+			)
+		).toBe( 2 );
+	} );
+
+	it( 'ignores activity at or before the last seen timestamp', () => {
+		const threads = [
+			makeThread( { id: 1, date: '2026-08-01T10:00:00' } ),
+			makeThread( { id: 2, date: '2026-08-03T10:00:00' } ),
+		];
+		expect( getUnseenNoteCount( threads, '2026-08-02T10:00:00', ME ) ).toBe(
+			1
+		);
+		expect( getUnseenNoteCount( threads, '2026-08-03T10:00:00', ME ) ).toBe(
+			0
+		);
+	} );
+
+	it( 'never counts the current user’s own activity', () => {
+		expect(
+			getUnseenNoteCount(
+				[
+					makeThread( {
+						id: 1,
+						author: ME,
+						date: '2026-08-05T10:00:00',
+					} ),
+				],
+				'2026-08-01T10:00:00',
+				ME
+			)
+		).toBe( 0 );
+	} );
+
+	it( 'counts a thread once however many unseen replies it holds', () => {
+		expect(
+			getUnseenNoteCount(
+				[
+					makeThread( {
+						id: 1,
+						date: '2026-08-01T10:00:00',
+						replies: [
+							makeThread( {
+								id: 2,
+								date: '2026-08-04T10:00:00',
+							} ),
+							makeThread( {
+								id: 3,
+								date: '2026-08-05T10:00:00',
+							} ),
+						],
+					} ),
+				],
+				'2026-08-02T10:00:00',
+				ME
+			)
+		).toBe( 1 );
+	} );
+
+	it( 'counts a seen thread that gained a reply from somebody else', () => {
+		expect(
+			getUnseenNoteCount(
+				[
+					makeThread( {
+						id: 1,
+						author: ME,
+						date: '2026-08-01T10:00:00',
+						replies: [
+							makeThread( {
+								id: 2,
+								date: '2026-08-04T10:00:00',
+							} ),
+						],
+					} ),
+				],
+				'2026-08-02T10:00:00',
+				ME
+			)
+		).toBe( 1 );
+	} );
+} );
+
+describe( 'setNotesLastSeen', () => {
+	it( 'adds an entry without mutating the existing map', () => {
+		const existing = { 10: '2026-08-01T10:00:00' };
+		const next = setNotesLastSeen( existing, 11, '2026-08-02T10:00:00', 5 );
+		expect( next ).toEqual( {
+			10: '2026-08-01T10:00:00',
+			11: '2026-08-02T10:00:00',
+		} );
+		expect( existing ).toEqual( { 10: '2026-08-01T10:00:00' } );
+	} );
+
+	it( 'works from an empty map', () => {
+		expect(
+			setNotesLastSeen( undefined, 10, '2026-08-01T10:00:00', 5 )
+		).toEqual( { 10: '2026-08-01T10:00:00' } );
+	} );
+
+	it( 'overwrites an existing entry for the same post', () => {
+		expect(
+			setNotesLastSeen(
+				{ 10: '2026-08-01T10:00:00' },
+				10,
+				'2026-08-09T10:00:00',
+				5
+			)
+		).toEqual( { 10: '2026-08-09T10:00:00' } );
+	} );
+
+	it( 'drops the least recently seen posts past the limit', () => {
+		expect(
+			setNotesLastSeen(
+				{
+					1: '2026-08-01T10:00:00',
+					2: '2026-08-02T10:00:00',
+					3: '2026-08-03T10:00:00',
+				},
+				4,
+				'2026-08-04T10:00:00',
+				2
+			)
+		).toEqual( {
+			3: '2026-08-03T10:00:00',
+			4: '2026-08-04T10:00:00',
+		} );
 	} );
 } );
