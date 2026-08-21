@@ -12,72 +12,65 @@ import {
 
 const DEFAULT_UNITS = [ 'px', 'em', 'rem', 'vw', 'vh' ];
 
+interface RangeSetting {
+	max: number;
+	step: number;
+}
+
+/**
+ * Default slider max and step per unit. Dragging stops at a max;
+ * typing does not.
+ */
+const DEFAULT_RANGE_SETTINGS: Record< string, RangeSetting > = {
+	px: { max: 100, step: 1 },
+	em: { max: 10, step: 0.1 },
+	rem: { max: 10, step: 0.1 },
+	vw: { max: 10, step: 0.1 },
+	vh: { max: 10, step: 0.1 },
+};
+
+const FALLBACK_RANGE_SETTING: RangeSetting = { max: 100, step: 1 };
+
 interface SizeControlProps {
 	value?: string;
 	onChange?: ( value: string | undefined ) => void;
 	fallbackValue?: number;
 	disabled?: boolean;
 	label?: string;
-	max?: number;
+	/**
+	 * Override the slider max and step per unit, merged over the defaults.
+	 * A max that works for `px` won't for `rem`, so set each unit separately.
+	 */
+	rangeSettings?: Record< string, Partial< RangeSetting > >;
 }
 
 function SizeControl( props: SizeControlProps ) {
 	const { baseControlProps } = useBaseControlProps( props );
-	const { value, onChange, fallbackValue, disabled, label, max } = props;
+	const { value, onChange, fallbackValue, disabled, label, rangeSettings } =
+		props;
 
 	const units = useCustomUnits( {
 		availableUnits: DEFAULT_UNITS,
 	} );
 
-	const maxRelativeValue = 10;
-	const maxNonRelativeValue = 100;
-
-	// Helper function to check if a unit is relative
-	const isUnitRelative = ( unit: string ) =>
-		!! unit && [ 'em', 'rem', 'vw', 'vh' ].includes( unit );
-
 	const [ valueQuantity, valueUnit = 'px' ] =
 		parseQuantityAndUnitFromRawValue( value, units );
 
-	const isValueUnitRelative = isUnitRelative( valueUnit );
-
-	// Determine the max value for the range control
-	const getMaxValue = () => {
-		// For relative units, always use 10
-		if ( isValueUnitRelative ) {
-			return maxRelativeValue;
-		}
-		// For non-relative units, use custom max from props or default 500
-		return max !== undefined ? max : maxNonRelativeValue;
-	};
+	const unitDefaults =
+		DEFAULT_RANGE_SETTINGS[ valueUnit ] ?? FALLBACK_RANGE_SETTING;
+	const unitOverrides = rangeSettings?.[ valueUnit ];
+	const max = unitOverrides?.max ?? unitDefaults.max;
+	const step = unitOverrides?.step ?? unitDefaults.step;
 
 	// Receives the new value from the UnitControl component as a string containing the value and unit.
 	const handleUnitControlChange = ( newValue: string | undefined ) => {
-		if ( ! onChange ) {
-			return;
-		}
-
-		const [ newQuantity, newUnit = 'px' ] =
-			parseQuantityAndUnitFromRawValue( newValue, units );
-
-		const isNewUnitRelative = isUnitRelative( newUnit );
-
-		// If switching to a relative unit and the value exceeds the max, clamp it
-		if (
-			isNewUnitRelative &&
-			newQuantity &&
-			newQuantity > maxRelativeValue
-		) {
-			onChange( maxRelativeValue + newUnit );
-		} else {
-			onChange( newValue );
-		}
+		onChange?.( newValue );
 	};
 
 	// Receives the new value from the RangeControl component as a number.
 	const handleRangeControlChange = ( newValue: number | undefined ) => {
 		if ( newValue !== undefined ) {
-			onChange?.( newValue + valueUnit );
+			onChange?.( `${ newValue }${ valueUnit }` );
 		} else {
 			onChange?.( undefined );
 		}
@@ -107,8 +100,8 @@ function SizeControl( props: SizeControlProps ) {
 							withInputField={ false }
 							onChange={ handleRangeControlChange }
 							min={ 0 }
-							max={ getMaxValue() }
-							step={ isValueUnitRelative ? 0.1 : 1 }
+							max={ max }
+							step={ step }
 							disabled={ disabled }
 						/>
 					</Spacer>
