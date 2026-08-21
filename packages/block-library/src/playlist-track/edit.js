@@ -46,11 +46,27 @@ const PlaylistTrackEdit = ( {
 	const showImages = context?.showImages ?? true;
 	const imageButton = useRef();
 	const blockProps = useBlockProps();
-	const { currentTrackClientId, setCurrentTrackClientId } =
+	const { currentTrackClientId, setCurrentTrackClientId, removeTrack } =
 		useContext( PlaylistContext );
 	const { createErrorNotice } = useDispatch( noticesStore );
-	function onUploadError( message ) {
+
+	/**
+	 * Handle audio upload errors.
+	 *
+	 * @param {string}  message                      Error message to show.
+	 * @param {Object}  [options]
+	 * @param {boolean} [options.removeTrackOnError] Remove the track as well. Useful for drag/drop where a track is optimistically created before upload finishes.
+	 */
+	function onUploadError( message, { removeTrackOnError = false } = {} ) {
 		createErrorNotice( message, { type: 'snackbar' } );
+
+		if ( removeTrackOnError ) {
+			removeTrack( clientId );
+			return;
+		}
+
+		// Set temporaryURL back to default state
+		setTemporaryURL();
 	}
 	const hasTrackSource = !! src || !! temporaryURL;
 
@@ -70,11 +86,14 @@ const PlaylistTrackEdit = ( {
 		setCurrentTrackClientId,
 	] );
 
+	// Handles drag/drop uploads
 	useUploadMediaFromBlobURL( {
 		url: temporaryURL,
 		allowedTypes: ALLOWED_MEDIA_TYPES,
 		onChange: onSelectTrack,
-		onError: onUploadError,
+		onError: ( message ) => {
+			onUploadError( message, { removeTrackOnError: true } );
+		},
 	} );
 
 	function onSelectTrack( media ) {
