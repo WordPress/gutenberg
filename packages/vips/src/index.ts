@@ -204,14 +204,10 @@ export async function convertImageFormat(
 		// Keep indexed sources indexed. libvips decodes a palette image into
 		// RGB(A) pixels, so without this a compressed or converted PNG is
 		// written as truecolour and can grow several times larger than the
-		// indexed original. `Q` is dropped for the same reason as in
-		// `buildSaveOptions`: it is pngsave's quantisation quality, it only
-		// applies once `palette` is on, and a lower target makes the file
-		// bigger rather than smaller.
+		// indexed original.
 		// See https://core.trac.wordpress.org/ticket/65922.
 		if ( 'image/png' === outputType && isPaletteImage( image ) ) {
 			saveOptions.palette = true;
-			delete saveOptions.Q;
 		}
 
 		// See https://github.com/swissspidy/media-experiments/issues/324.
@@ -515,15 +511,6 @@ function buildSaveOptions( {
 	// See https://core.trac.wordpress.org/ticket/65922.
 	if ( 'image/png' === type && isPalette ) {
 		saveOptions.palette = true;
-		/*
-		 * `Q` is pngsave's quantisation quality, and libvips only reads it
-		 * once `palette` is on. PNG output in WordPress core is lossless, so
-		 * the image quality setting must not start degrading the palette here.
-		 * It would not even trade quality for bytes: libimagequant answers a
-		 * lower target by picking fewer colours and dithering harder, which
-		 * makes the file bigger, not smaller.
-		 */
-		delete saveOptions.Q;
 	}
 
 	// See https://github.com/swissspidy/media-experiments/issues/324.
