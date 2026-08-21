@@ -14,11 +14,7 @@ import Pagination from '../pagination';
 
 const PAGE_SIZE = 10;
 
-interface ScreenRevisionsProps {
-	onClose?: () => void;
-}
-
-function ScreenRevisions( { onClose }: ScreenRevisionsProps = {} ) {
+function ScreenRevisions() {
 	const { user: currentEditorGlobalStyles, onChange: setUserConfig } =
 		useContext( GlobalStylesContext );
 	const { params, goTo } = useNavigator();
@@ -55,24 +51,18 @@ function ScreenRevisions( { onClose }: ScreenRevisionsProps = {} ) {
 		currentEditorGlobalStyles
 	);
 
-	const onCloseRevisions = () => {
-		if ( onClose ) {
-			onClose();
-		}
-	};
-
-	// Selecting a revision appends its id to the path (`/revisions/12`), so the
-	// navigator's default back action would only strip the id and leave the
-	// user on the same screen. Go straight back to the root screen instead.
-	const onBack = () => {
+	// Both the back arrow and Apply leave the revisions screen. Selecting a
+	// revision appends its id to the path (`/revisions/12`), so the navigator's
+	// default back action would only strip the id and leave the user on the
+	// same screen. Go straight to the root screen instead.
+	const closeRevisions = () => {
 		goTo( '/', { isBack: true } );
-		onCloseRevisions();
 	};
 
 	const restoreRevision = ( revision: any ) => {
 		setUserConfig( revision );
 		setIsLoadingRevisionWithUnsavedChanges( false );
-		onCloseRevisions();
+		closeRevisions();
 	};
 
 	const handleRevisionSelect = ( revision: any ) => {
@@ -106,7 +96,7 @@ function ScreenRevisions( { onClose }: ScreenRevisionsProps = {} ) {
 				description={ __(
 					'Click on previously saved styles to preview them. To restore a selected version to the editor, hit "Apply." When you\'re ready, use the Save button to save your changes.'
 				) }
-				onBack={ onBack }
+				onBack={ closeRevisions }
 			/>
 			{ ! hasRevisions && (
 				<Spinner className="global-styles-ui-screen-revisions__loading" />

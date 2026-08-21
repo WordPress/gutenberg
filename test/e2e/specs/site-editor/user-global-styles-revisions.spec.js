@@ -226,6 +226,32 @@ test.describe( 'Style Revisions', () => {
 		).toBeHidden();
 	} );
 
+	test( 'should close the revisions panel after applying a revision', async ( {
+		page,
+		editor,
+		userGlobalStylesRevisions,
+	} ) => {
+		await editor.canvas.locator( 'body' ).click();
+		await userGlobalStylesRevisions.openStylesPanel();
+		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+
+		await page
+			.getByLabel( 'Global styles revisions list' )
+			.getByRole( 'option' )
+			.last()
+			.click();
+
+		await page
+			.getByRole( 'button', {
+				name: 'Apply the selected revision to your site.',
+			} )
+			.click();
+
+		await expect(
+			page.getByLabel( 'Global styles revisions list' )
+		).toBeHidden();
+	} );
+
 	test( 'should close revisions panel and leave style book open if activated', async ( {
 		page,
 		editor,
