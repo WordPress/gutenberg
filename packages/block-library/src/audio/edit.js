@@ -94,7 +94,7 @@ function AudioEdit( {
 	function getAutoplayHelp( checked ) {
 		return checked
 			? __(
-					'Most browsers block audio until a visitor interacts with the page, so autoplay often won’t work, especially on mobile. Unexpected sound can also be disruptive, especially for screen reader users.'
+					'Most browsers block audio until a visitor interacts with the page, so autoplay often won’t work, especially on mobile. Unexpected sound can also be disruptive for screen reader users.'
 			  )
 			: null;
 	}
