@@ -4,17 +4,12 @@
 
 ### Enhancements
 
--   Add a `scope` prop to `MediaEditor` so each frame can keep its own persisted details-sidebar visibility ([#81559](https://github.com/WordPress/gutenberg/pull/81559)).
 -   `MediaEditor`: move rotate, flip, zoom and aspect ratio out of the sidebar to a toolbar under the canvas, at every viewport. Frees the sidebar for Details alone.
 -   `MediaEditor`: replace `ComplementaryArea` and `InterfaceSkeleton` with a layout the media editor owns. Both were built for the post and site editors and imposed breakpoints the media editor could not control.
 -   `MediaEditor`: widen the docked details panel to 400px and dock it above the `large` breakpoint; below that it takes the whole body.
--   Expose the header, history (reset/undo/redo), save (cancel/save) and image control clusters as `MediaEditor` sub-components, so each frame imports and arranges them to suit its own chrome. `renderFrame` now passes data only: `footerActions` is gone, `footerLayout` is now `layout`, and `isImage` is new. `showCloseButton` moves from `MediaEditor` to `MediaEditor.HeaderActions` ([#81563](https://github.com/WordPress/gutenberg/pull/81563)).
-
-### Breaking Changes
-
--   `MediaEditor`: the `scope` prop no longer does anything. It selected the `@wordpress/interface` scope that persisted the details sidebar's visibility; the sidebar no longer uses `ComplementaryArea` and its open state is decided by width rather than remembered. The prop is still accepted so existing callers compile.
 -   `MediaEditor.HistoryActions` renders nothing while a panel covers the canvas. Reset, undo and redo act on the cropper, so leaving them beside the metadata fields put an enabled, destructive Reset next to a crop the user could not see. `renderFrame` gains `hasCanvas` so a frame can drop the container it would have put them in.
--   `MediaEditor.ImageControls` is removed. Rotate, flip, zoom and aspect ratio now sit under the canvas at every width, placed by the editor itself, so there is nothing for a frame to position.
+-   `MediaEditor.ImageControls` is removed, and the `scope` prop is now inert. Both were added in the same unreleased cycle; the controls sit under the canvas at every width, and the sidebar's open state comes from width rather than a persisted preference. `scope` is still accepted so existing callers compile.
+-   Expose the header, history (reset/undo/redo), save (cancel/save) and image control clusters as `MediaEditor` sub-components, so each frame imports and arranges them to suit its own chrome. `renderFrame` now passes data only: `footerActions` is gone, `footerLayout` is now `layout`, and `isImage` is new. `showCloseButton` moves from `MediaEditor` to `MediaEditor.HeaderActions` ([#81563](https://github.com/WordPress/gutenberg/pull/81563)).
 
 ### Bug Fixes
 
