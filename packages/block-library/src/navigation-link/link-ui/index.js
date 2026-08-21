@@ -4,8 +4,15 @@ import {
 	Button,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { LinkControl, useBlockEditingMode } from '@wordpress/block-editor';
+import { __, sprintf } from '@wordpress/i18n';
+import {
+	LinkControl,
+	useBlockEditingMode,
+	store as blockEditorStore,
+	BlockIcon,
+} from '@wordpress/block-editor';
+import { createBlock, store as blocksStore } from '@wordpress/blocks';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	useMemo,
 	useState,
@@ -63,8 +70,28 @@ export function getSuggestionsQuery( type, kind ) {
 	}
 }
 
+const EXCLUDED = new Set( [
+	'core/navigation-link',
+	'core/navigation-submenu',
+] );
+
+function getVariationBadgeLabel( variation ) {
+	if ( variation.attributes?.kind === 'post-type' ) {
+		/* translators: %s: Post type name (e.g. "Post", "Page", "CPT", "Taxonomy"). */
+		return sprintf( __( '%s link' ), variation.attributes?.type );
+	}
+	if ( variation.attributes?.kind === 'taxonomy' ) {
+		return __( 'taxonomy' );
+	}
+	return __( 'Link' );
+}
+const matchesQuery = ( query, title = '', keywords = [] ) =>
+	title.toLowerCase().includes( query ) ||
+	keywords.some( ( kw ) => kw.toLowerCase().includes( query ) );
+
 function UnforwardedLinkUI( props, ref ) {
 	const { label, url, opensInNewTab, type, kind, id } = props.link;
+	const { onBlockInsert, onClose } = props;
 
 	const { entityRecord, hasBinding, isEntityAvailable } = props.entity || {};
 
@@ -90,11 +117,13 @@ function UnforwardedLinkUI( props, ref ) {
 	const [ initialSearchValue, setInitialSearchValue ] = useState( '' );
 	// Tracks the live search input between renders without causing re-renders.
 	const searchInputValueRef = useRef( '' );
+	const [ searchInputValue, setSearchInputValue ] = useState( '' );
 	// Call this instead of setting searchInputValueRef.current and
 	// setInitialSearchValue separately, to keep both in sync.
 	const updateSearchValue = ( value ) => {
 		searchInputValueRef.current = value;
 		setInitialSearchValue( value );
+		setSearchInputValue( value );
 	};
 	const linkControlWrapperRef = useRef();
 	const addPageButtonRef = useRef();
@@ -179,6 +208,106 @@ function UnforwardedLinkUI( props, ref ) {
 	}, [ shouldFocusPane ] );
 
 	const blockEditingMode = useBlockEditingMode();
+	const {
+		rootClientId,
+		insertionIndex,
+		allBlockTypes,
+		canInsertBlockType,
+		navigationLinkVariations,
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlockRootClientId,
+				getBlockIndex,
+				canInsertBlockType: _canInsert,
+			} = select( blockEditorStore );
+			const { getBlockVariations } = select( blocksStore );
+			const root = getBlockRootClientId( props.clientId );
+
+			return {
+				rootClientId: root,
+				insertionIndex: getBlockIndex( props.clientId ) + 1,
+				allBlockTypes: root
+					? select( blocksStore ).getBlockTypes()
+					: [],
+				canInsertBlockType: _canInsert,
+				navigationLinkVariations: root
+					? getBlockVariations( 'core/navigation-link', 'inserter' )
+					: [],
+			};
+		},
+		[ props.clientId ]
+	);
+
+	const { insertBlock } = useDispatch( blockEditorStore );
+
+	// Filter insertable blocks by both capabilities AND the live search input in one pass.
+	// Empty query > no results (avoids flooding the UI before the user types).
+	const matchingItems = useMemo( () => {
+		const query = searchInputValue.trim().toLowerCase();
+
+		if ( ! query || ! rootClientId || ( type && url ) ) {
+			return [];
+		}
+
+		const variations = ( navigationLinkVariations ?? [] )
+			.filter(
+				( v ) =>
+					( v.title ?? '' ).toLowerCase() !== 'page link' &&
+					matchesQuery( query, v.title, v.keywords )
+			)
+			.map( ( v ) => ( {
+				key: `${ v.name }-${ v.title }`,
+				icon: v.icon ?? 'admin-links',
+				/* translators: %s: Variation title (e.g., "Category", "Posts") */
+				label: sprintf( __( 'Add %s' ), v.title ),
+				badge: getVariationBadgeLabel( v ),
+				onInsert() {
+					const block = createBlock(
+						'core/navigation-link',
+						v.attributes ?? {}
+					);
+					insertBlock( block, insertionIndex, rootClientId );
+					onBlockInsert?.( block );
+					onClose?.();
+				},
+			} ) );
+
+		const blocks = allBlockTypes
+			.filter(
+				( bt ) =>
+					! EXCLUDED.has( bt.name ) &&
+					canInsertBlockType( bt.name, rootClientId ) &&
+					matchesQuery( query, bt.title, bt.keywords )
+			)
+			.map( ( bt ) => ( {
+				key: bt.name,
+				icon: bt.icon,
+				/* translators: %s: Block title (e.g., "Site Logo") */
+				label: sprintf( __( 'Add %s Block' ), bt.title ),
+				badge: __( 'Block' ),
+				onInsert() {
+					const block = createBlock( bt.name );
+					insertBlock( block, insertionIndex, rootClientId );
+					onBlockInsert?.( block );
+					onClose?.();
+				},
+			} ) );
+
+		return [ ...variations, ...blocks ];
+	}, [
+		searchInputValue,
+		navigationLinkVariations,
+		allBlockTypes,
+		canInsertBlockType,
+		rootClientId,
+		insertionIndex,
+		insertBlock,
+		onBlockInsert,
+		onClose,
+		type,
+		url,
+	] );
 
 	return (
 		<Popover
@@ -218,6 +347,7 @@ function UnforwardedLinkUI( props, ref ) {
 							// Observe the input value so we can pass the value to the page creator
 							// and restore it on back button click
 							searchInputValueRef.current = value;
+							setSearchInputValue( value );
 						} }
 						inputValue={ initialSearchValue }
 						onRemove={ props.onRemove }
@@ -248,6 +378,7 @@ function UnforwardedLinkUI( props, ref ) {
 									canAddBlock={
 										blockEditingMode !== 'disabled'
 									}
+									matchingItems={ matchingItems }
 								/>
 							);
 						} }
@@ -297,16 +428,36 @@ const LinkUITools = ( {
 	setAddingPage,
 	canAddPage,
 	canAddBlock,
+	matchingItems = [],
 } ) => {
 	const blockInserterAriaRole = 'listbox';
 
 	// Don't render anything if neither button should be shown
-	if ( ! canAddPage && ! canAddBlock ) {
+	if ( ! canAddPage && ! canAddBlock && matchingItems.length === 0 ) {
 		return null;
 	}
 
 	return (
 		<VStack spacing={ 0 } className="link-ui-tools">
+			{ canAddPage &&
+				canAddBlock &&
+				matchingItems.map( ( item ) => (
+					<Button
+						__next40pxDefaultSize
+						key={ item.key }
+						icon={ <BlockIcon icon={ item.icon } /> }
+						onClick={ ( e ) => {
+							e.preventDefault();
+							item.onInsert();
+						} }
+						aria-haspopup={ blockInserterAriaRole }
+					>
+						{ item.label }
+						<span className="link-ui-suggestion-item__badge">
+							{ item.badge }
+						</span>
+					</Button>
+				) ) }
 			{ canAddPage && (
 				<Button
 					__next40pxDefaultSize

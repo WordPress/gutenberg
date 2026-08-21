@@ -31,3 +31,19 @@
 	margin-left: $grid-unit-10;
 	text-transform: uppercase;
 }
+
+.link-ui-suggestion-item__badge {
+	font-size: 10px;
+	font-weight: 500;
+	text-transform: uppercase;
+	color: $gray-600;
+	background-color: $gray-100;
+	padding: 2px 4px;
+	border-radius: 2px;
+	flex-shrink: 0;
+	margin-left: auto;
+	max-width: 30%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
