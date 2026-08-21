@@ -7,7 +7,7 @@
 -   The inserter passes every widget type through the
     `widgetDashboard.canInsertWidgetType` hooks filter before listing it, so
     extensions can scope what users can insert without hiding already-placed
-    widgets.
+    widgets ([#81893](https://github.com/WordPress/gutenberg/pull/81893)).
 -   Widget chrome footer: `relevance: 'high'` actions mount as leading text
     links (declared icon as prefix) in a persistent strip under the widget
     body, `'medium'` as trailing compact affordances (icon-only with a
