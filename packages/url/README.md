@@ -437,7 +437,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: True if the argument is a valid protocol (e.g. http\:, tel:).
+-   `boolean`: True if the argument is a valid protocol (e.g. http:, tel:).
 
 ### isValidQueryString
 
@@ -492,7 +492,7 @@ _Returns_
 
 Prepends "https\://" to a url, if it looks like something that is meant to be a TLD.
 
-Note: this will not replace "http\://" with "<https://">.
+Note: this will not replace "http\://" with "https\://".
 
 _Usage_
 

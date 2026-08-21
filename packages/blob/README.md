@@ -28,7 +28,7 @@ _Returns_
 
 ### downloadBlob
 
-Downloads a file, e.g., a text or readable stream, in the browser. Appropriate for downloading smaller file sizes, e.g., \< 5 MB.
+Downloads a file, e.g., a text or readable stream, in the browser. Appropriate for downloading smaller file sizes, e.g., < 5 MB.
 
 Example usage:
 

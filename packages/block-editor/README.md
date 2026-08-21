@@ -243,8 +243,8 @@ _Related_
 _Parameters_
 
 -   _preview_ `Object`: options for how the preview should be shown
--   _preview.blocks_ `Array|Object`: A block instance (object) or an array of blocks to be previewed.
--   _preview.viewportWidth_ `number`: Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
+-   _preview\.blocks_ `Array|Object`: A block instance (object) or an array of blocks to be previewed.
+-   _preview\.viewportWidth_ `number`: Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
 
 _Returns_
 
@@ -1042,7 +1042,10 @@ Undocumented declaration.
 
 ### useBlockDisplayInformation
 
-Hook used to try to find a matching block variation and return the appropriate information for display reasons. In order to to try to find a match we need to things: 1. Block's client id to extract it's current attributes. 2. A block variation should have set `isActive` prop to a proper function.
+Hook used to try to find a matching block variation and return the appropriate information for display reasons. In order to to try to find a match we need to things:
+
+1.  Block's client id to extract it's current attributes.
+2.  A block variation should have set `isActive` prop to a proper function.
 
 If for any reason a block variation match cannot be found, the returned information come from the Block Type. If no blockType is found with the provided clientId, returns null.
 

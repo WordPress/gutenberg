@@ -40,7 +40,7 @@ Returns an escaped attribute value.
 
 _Related_
 
--   <https://w3c.github.io/html/syntax.html#elements-attributes> "[...] the text cannot contain an ambiguous ampersand [...] must not contain
+-   <https://w3c.github.io/html/syntax.html#elements-attributes> "\[...] the text cannot contain an ambiguous ampersand \[...] must not contain
     any literal U+0022 QUOTATION MARK characters (")"
 
 Note we also escape the greater than symbol, as this is used by wptexturize to
@@ -80,7 +80,7 @@ Returns an escaped HTML element value.
 
 _Related_
 
--   <https://w3c.github.io/html/syntax.html#writing-html-documents-elements> "the text must not contain the character U+003C LESS-THAN SIGN (\<) or an
+-   <https://w3c.github.io/html/syntax.html#writing-html-documents-elements> "the text must not contain the character U+003C LESS-THAN SIGN (<) or an
     ambiguous ampersand."
 
 _Parameters_

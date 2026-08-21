@@ -504,7 +504,7 @@ _Parameters_
 -   _options_ `{ HTML?: string; plainText?: string; mode?: 'AUTO' | 'INLINE' | 'BLOCKS'; tagName?: string; }`:
 -   _options.HTML_ `string`: The HTML to convert.
 -   _options.plainText_ `string`: Plain text version.
--   _options.mode_ `'AUTO' | 'INLINE' | 'BLOCKS'`: Handle content as blocks or inline content. _ 'AUTO': Decide based on the content passed. _ 'INLINE': Always handle as inline content, and return string. \* 'BLOCKS': Always handle as blocks, and return array of blocks.
+-   _options.mode_ `'AUTO' | 'INLINE' | 'BLOCKS'`: Handle content as blocks or inline content. \* 'AUTO': Decide based on the content passed. \* 'INLINE': Always handle as inline content, and return string. \* 'BLOCKS': Always handle as blocks, and return array of blocks.
 -   _options.tagName_ `string`: The tag into which content will be inserted.
 
 _Returns_

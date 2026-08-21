@@ -59,7 +59,7 @@ _Returns_
 
 Default budget for total decoded pixels (width × height × frame count) beyond which conversion is not attempted.
 
-Conversion cost is roughly proportional to the total number of decoded pixels. 300 megapixels approximates what a mid-range machine converts within the ~30s the caller is willing to wait (e.g. a 1920x1080 GIF at ~145 frames); anything larger would likely be abandoned anyway, so it is cheaper to not start. Pass `0` to disable the check.
+Conversion cost is roughly proportional to the total number of decoded pixels. 300 megapixels approximates what a mid-range machine converts within the \~30s the caller is willing to wait (e.g. a 1920x1080 GIF at \~145 frames); anything larger would likely be abandoned anyway, so it is cheaper to not start. Pass `0` to disable the check.
 
 ### SIZE_LIMIT_ERROR_PREFIX
 
