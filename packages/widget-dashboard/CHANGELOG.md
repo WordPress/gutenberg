@@ -13,6 +13,8 @@
 
 ### Internal
 
+-   Migrate dashboard menus from the private Components API to the public
+    `@wordpress/ui` Menu.
 -   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509), [#81515](https://github.com/WordPress/gutenberg/pull/81515), [#81516](https://github.com/WordPress/gutenberg/pull/81516), [#81518](https://github.com/WordPress/gutenberg/pull/81518))
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
 
