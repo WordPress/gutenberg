@@ -480,21 +480,30 @@ function resolveSaveBitdepth(
 /**
  * Builds save options for writing an image to a buffer.
  *
- * @param type      Output mime type.
- * @param quality   Desired quality (0-1).
- * @param bitdepth  Save bit depth; values above 8 are preserved for AVIF.
- * @param stripMeta Whether to strip metadata (except color profiles),
- *                  from the `image_strip_meta` filter.
- * @param isPalette Whether the source image was indexed (palette) encoded.
+ * @param options           Save option inputs.
+ * @param options.type      Output mime type.
+ * @param options.quality   Desired quality (0-1).
+ * @param options.bitdepth  Save bit depth; values above 8 are preserved for
+ *                          AVIF.
+ * @param options.stripMeta Whether to strip metadata (except color
+ *                          profiles), from the `image_strip_meta` filter.
+ * @param options.isPalette Whether the source image was indexed (palette)
+ *                          encoded.
  * @return Save options object.
  */
-function buildSaveOptions(
-	type: string,
-	quality: number,
+function buildSaveOptions( {
+	type,
+	quality,
 	bitdepth = 8,
 	stripMeta = true,
-	isPalette = false
-): SaveOptions< typeof type > {
+	isPalette = false,
+}: {
+	type: string;
+	quality: number;
+	bitdepth?: number;
+	stripMeta?: boolean;
+	isPalette?: boolean;
+} ): SaveOptions< string > {
 	const saveOptions: SaveOptions< typeof type > = {
 		// Strip metadata except ICC color profiles or gainmaps,
 		// matching WordPress core's behavior. The `image_strip_meta`
@@ -701,13 +710,13 @@ export async function resizeImage(
 			}
 		);
 
-		const saveOptions = buildSaveOptions(
+		const saveOptions = buildSaveOptions( {
 			type,
 			quality,
-			saveBitdepth,
+			bitdepth: saveBitdepth,
 			stripMeta,
-			isPaletteImage( sourceImage )
-		);
+			isPalette: isPaletteImage( sourceImage ),
+		} );
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
 
 		const result = {
