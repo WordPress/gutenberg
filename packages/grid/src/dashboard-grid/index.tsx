@@ -523,6 +523,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			// with the live (already mutated) `activeLayout` width would
 			// compound and oscillate — and stepping back through the
 			// zero-delta zone would never restore the original size.
+			const bounds = spanBoundsByKey.get( id );
 			if ( ! resizeBaselineRef.current ) {
 				const baseItem = activeLayout.find(
 					( item ) => item.key === id
@@ -532,7 +533,10 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				// and convert to a numeric width.
 				let baseWidth: number;
 				if ( baseItem?.width === 'full' ) {
-					baseWidth = effectiveColumns;
+					baseWidth = Math.min(
+						effectiveColumns,
+						bounds?.maxWidth ?? effectiveColumns
+					);
 				} else if ( baseItem?.width === 'fill' ) {
 					baseWidth =
 						typeof resolvedItem?.width === 'number'
@@ -547,7 +551,6 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				};
 			}
 			const baseline = resizeBaselineRef.current;
-			const bounds = spanBoundsByKey.get( id );
 			const newWidth = Math.min(
 				Math.max(
 					baseline.width + relativeDelta.width,
