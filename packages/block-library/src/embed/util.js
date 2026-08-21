@@ -243,7 +243,46 @@ export function getClassNames(
 
 	// If we have a fixed aspect iframe, and it's a responsive embed block.
 	if ( iframe && iframe.height && iframe.width ) {
-		const aspectRatio = ( iframe.width / iframe.height ).toFixed( 2 );
+		// Skip aspect ratio calculation if width or height is a percentage (e.g., Spotify embeds use "100%").
+		const widthAttr = iframe.getAttribute( 'width' );
+		const heightAttr = iframe.getAttribute( 'height' );
+		const hasPercentageWidth = widthAttr && widthAttr.includes( '%' );
+		const hasPercentageHeight = heightAttr && heightAttr.includes( '%' );
+
+		// Handle embeds with percentage-based dimensions.
+		// If only one dimension is a percentage, we handle it specially.
+		// If both dimensions are percentages, we fall through to calculate the ratio.
+		if ( hasPercentageWidth !== hasPercentageHeight ) {
+			// Only one dimension is a percentage. Check if the fixed dimension is unreasonably large.
+			const numericHeight = parseFloat( heightAttr );
+			const numericWidth = parseFloat( widthAttr );
+
+			// Check if we have an unreasonably large dimension that needs constraining
+			const hasLargeHeight =
+				hasPercentageWidth &&
+				! isNaN( numericHeight ) &&
+				numericHeight > 800;
+			const hasLargeWidth =
+				hasPercentageHeight &&
+				! isNaN( numericWidth ) &&
+				numericWidth > 800;
+
+			if ( hasLargeHeight || hasLargeWidth ) {
+				// Apply a vertical aspect ratio (9:16) to constrain the oversized embed
+				return clsx(
+					removeAspectRatioClasses( existingClassNames ),
+					'wp-embed-aspect-9-16',
+					'wp-has-aspect-ratio'
+				);
+			}
+
+			// For normal percentage embeds (like Spotify), skip aspect ratio
+			return removeAspectRatioClasses( existingClassNames );
+		}
+		const aspectRatio = (
+			parseFloat( iframe.width ) / parseFloat( iframe.height )
+		).toFixed( 2 );
+
 		// Given the actual aspect ratio, find the widest ratio to support it.
 		for (
 			let ratioIndex = 0;
