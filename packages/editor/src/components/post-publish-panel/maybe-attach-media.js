@@ -1,6 +1,6 @@
 import { PanelBody, CheckboxControl } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
@@ -22,18 +22,18 @@ const EMPTY_ARRAY = [];
  * still shows what it showed today — and it also catches media that was already
  * in the post rather than only what was chosen this session.
  *
- * The decision is carried in the editor store rather than as entity edits. This
- * panel is unmounted the instant Publish is pressed, so it cannot do the write
- * itself; `savePost` does it once the post has saved. Entity edits would also
- * put the same choice in the multi-entity save dialog, where unchecking means
- * something subtly different — offering it twice, with two meanings, is how this
- * went wrong before. On an already-published post there is no pre-publish panel,
- * and entity edits *are* the right carrier: see `useMarkMediaForAttachment`.
+ * What the user unchecks is component state, like every other choice made in
+ * this panel. Only the settled list goes to the editor store, and only because
+ * this panel is unmounted the instant Publish is pressed — `savePost` is what
+ * does the write. Entity edits would put the same choice in the multi-entity
+ * save dialog as well, where unchecking means something subtly different;
+ * offering it twice, with two meanings, is how this went wrong before. On an
+ * already-published post there is no pre-publish panel, and entity edits *are*
+ * the right carrier: see `useMarkMediaForAttachment`.
  */
 export default function MaybeAttachMediaPanel() {
-	const { setMediaToAttachCandidates, setMediaToAttachExcluded } = unlock(
-		useDispatch( editorStore )
-	);
+	const { setMediaToAttach } = unlock( useDispatch( editorStore ) );
+	const [ excludedIds, setExcludedIds ] = useState( EMPTY_ARRAY );
 
 	const mediaIds = useSelect(
 		( select ) =>
@@ -69,20 +69,19 @@ export default function MaybeAttachMediaPanel() {
 	// post, which is never taken over.
 	const candidates = media.filter( ( item ) => ! item.post );
 
-	const selectedIds = useSelect(
-		( select ) => unlock( select( editorStore ) ).getMediaToAttach(),
-		[]
-	);
+	const selectedIds = candidates
+		.map( ( { id } ) => id )
+		.filter( ( id ) => ! excludedIds.includes( id ) );
 
-	// A primitive, so the effect below runs when the derived set actually
+	// A primitive, so the effect below runs when the settled list actually
 	// changes rather than on every render.
-	const candidateIds = candidates.map( ( { id } ) => id ).join();
+	const selectedKey = selectedIds.join();
 
 	useEffect( () => {
-		setMediaToAttachCandidates(
-			candidateIds ? candidateIds.split( ',' ).map( Number ) : []
+		setMediaToAttach(
+			selectedKey ? selectedKey.split( ',' ).map( Number ) : []
 		);
-	}, [ candidateIds, setMediaToAttachCandidates ] );
+	}, [ selectedKey, setMediaToAttach ] );
 
 	if ( ! candidates.length ) {
 		return null;
@@ -151,9 +150,12 @@ export default function MaybeAttachMediaPanel() {
 								checked={ selectedIds.includes( item.id ) }
 								label={ title }
 								onChange={ ( isChecked ) =>
-									setMediaToAttachExcluded(
-										item.id,
-										! isChecked
+									setExcludedIds( ( ids ) =>
+										isChecked
+											? ids.filter(
+													( id ) => id !== item.id
+											  )
+											: [ ...ids, item.id ]
 									)
 								}
 							/>

@@ -480,45 +480,24 @@ export function selectedNote( state = {}, action ) {
 }
 
 /**
- * Reducer tracking the media a post proposes attaching to itself before it is
- * published, and which of it the user has declined.
+ * Reducer tracking the media the pre-publish review will attach to this post.
  *
- * The pre-publish panel derives `candidates` from the post's blocks each time it
- * opens, and records a declined id in `excluded`. The write happens later, from
- * `savePost`, because the panel is unmounted the moment Publish is pressed — so
- * this is what carries the user's decision across that gap.
+ * The review derives its list from the post's blocks and owns the user's
+ * choices; this is only what it settled on, so the write can happen later. It
+ * has to live outside the component because the pre-publish panel is unmounted
+ * the moment Publish is pressed, and `savePost` does the writing.
  *
  * Deliberately not entity edits: those would surface in the multi-entity save
- * dialog as well, and the same choice offered in two places with two meanings is
- * how this went wrong before. Deliberately not persisted either — it is derived,
- * so it costs nothing to rebuild.
+ * dialog too, and the same choice offered twice with two meanings is how this
+ * went wrong before.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
- * @return {Object} Updated state.
+ * @return {number[]} Attachment IDs to attach on the next publishing save.
  */
-export function mediaToAttach(
-	state = { candidates: [], excluded: [] },
-	action
-) {
-	switch ( action.type ) {
-		case 'SET_MEDIA_TO_ATTACH_CANDIDATES':
-			return {
-				// Anything no longer proposed cannot stay declined, or a stale
-				// id would suppress the same file if it were added again.
-				excluded: state.excluded.filter( ( id ) =>
-					action.candidates.includes( id )
-				),
-				candidates: action.candidates,
-			};
-
-		case 'SET_MEDIA_TO_ATTACH_EXCLUDED':
-			return {
-				...state,
-				excluded: action.isExcluded
-					? [ ...new Set( [ ...state.excluded, action.id ] ) ]
-					: state.excluded.filter( ( id ) => id !== action.id ),
-			};
+export function mediaToAttach( state = [], action ) {
+	if ( action.type === 'SET_MEDIA_TO_ATTACH' ) {
+		return action.mediaIds;
 	}
 
 	return state;

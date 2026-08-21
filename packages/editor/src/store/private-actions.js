@@ -763,32 +763,14 @@ export function selectNote( noteId, options = { focus: false } ) {
 }
 
 /**
- * Records the media the pre-publish review is offering to attach to this post.
+ * Records the media the pre-publish review will attach to this post.
  *
- * Derived from the post's blocks each time the panel opens, so it stays correct
- * across reloads without anything being persisted.
- *
- * @param {number[]} candidates Attachment IDs on offer.
+ * @param {number[]} mediaIds Attachment IDs the user has left checked.
  * @return {Object} Action object.
  */
-export function setMediaToAttachCandidates( candidates ) {
+export function setMediaToAttach( mediaIds ) {
 	return {
-		type: 'SET_MEDIA_TO_ATTACH_CANDIDATES',
-		candidates,
-	};
-}
-
-/**
- * Records whether the user has declined to attach a given media item.
- *
- * @param {number}  id         Attachment ID.
- * @param {boolean} isExcluded Whether it should be left unattached.
- * @return {Object} Action object.
- */
-export function setMediaToAttachExcluded( id, isExcluded ) {
-	return {
-		type: 'SET_MEDIA_TO_ATTACH_EXCLUDED',
-		id,
-		isExcluded,
+		type: 'SET_MEDIA_TO_ATTACH',
+		mediaIds,
 	};
 }
