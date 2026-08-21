@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Build `build/polyfill.js` and `build/polyfill.min.js` with `core-js-compat` and `webpack` 5 instead of `core-js-builder`, which requires `webpack` 4. The module list and wrapper are unchanged. The banner now takes its copyright line from the `core-js` license.
+
 ## 8.53.0 (2026-08-12)
 
 

@@ -51,8 +51,9 @@
 		"react": "^18.3.1"
 	},
 	"devDependencies": {
-		"core-js-builder": "^3.39.0",
-		"terser": "^5.37.0"
+		"core-js-compat": "^3.39.0",
+		"terser": "^5.37.0",
+		"webpack": "^5.108.1"
 	},
 	"publishConfig": {
 		"access": "public"
