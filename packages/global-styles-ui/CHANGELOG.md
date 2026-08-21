@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Color palette panel: do not render the theme colors wrapper when the theme provides no colors, which left an empty gap above the Custom section.
+-   Color palette panel: do not render the theme colors wrapper when the theme provides no colors, which left an empty gap above the Custom section ([#81894](https://github.com/WordPress/gutenberg/pull/81894)).
 
 ### Enhancements
 
