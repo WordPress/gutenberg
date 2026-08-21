@@ -2,7 +2,7 @@ import { forwardRef, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import { ControlWithError } from '../../primitives/control-with-error';
 import { InputControl } from '../../input-control';
-import type { ValidatedInputControlProps } from './types';
+import type { ValidatedControlProps } from '../types';
 
 /**
  * An `InputControl` with inline validation feedback, based on the native
@@ -15,7 +15,7 @@ import type { ValidatedInputControlProps } from './types';
  */
 export const ValidatedInputControl = forwardRef<
 	HTMLInputElement,
-	ValidatedInputControlProps
+	React.ComponentProps< typeof InputControl > & ValidatedControlProps
 >( function ValidatedInputControl(
 	{ required, markWhenOptional, customValidity, ...restProps },
 	forwardedRef
