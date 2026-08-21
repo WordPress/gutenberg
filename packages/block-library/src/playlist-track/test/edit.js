@@ -264,7 +264,10 @@ describe( 'PlaylistTrackEdit', () => {
 		const removeBlock = jest.fn();
 		useDispatch.mockReturnValue( { createErrorNotice, removeBlock } );
 
-		const { setAttributes } = renderEdit( { clientId: 'existing-track' } );
+		const { setAttributes } = renderEdit( {
+			clientId: 'existing-track',
+			isSelected: true,
+		} );
 
 		// A failed replacement is reported by MediaReplaceFlow, not the
 		// blob uploader, which never runs for a track that has a source.
