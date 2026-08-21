@@ -89,6 +89,7 @@ const PlaylistEdit = ( {
 	const {
 		replaceInnerBlocks,
 		replaceBlocks,
+		insertBlocks,
 		selectBlock,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
@@ -270,18 +271,16 @@ const PlaylistEdit = ( {
 				return;
 			}
 
-			// Keep every existing track, not just the valid ones: a track the
-			// user has added but not filled in yet must survive the drop.
-			const nextBlocks = [ ...innerBlockTracks, ...newBlocks ];
 			setCurrentTrackClientId( newBlocks[ 0 ].clientId );
-			replaceInnerBlocks( clientId, nextBlocks );
+			// Insert rather than rebuild the inner blocks, so tracks that have
+			// no source yet are left alone instead of being filtered away.
+			insertBlocks( newBlocks, undefined, clientId, false );
 			selectBlock( newBlocks[ 0 ].clientId );
 		},
 		[
 			clientId,
 			createTrackBlocks,
-			innerBlockTracks,
-			replaceInnerBlocks,
+			insertBlocks,
 			selectBlock,
 			setCurrentTrackClientId,
 			validTracks,

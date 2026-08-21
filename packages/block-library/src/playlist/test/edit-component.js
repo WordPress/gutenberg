@@ -106,16 +106,19 @@ const defaultAttributes = {
 
 describe( 'PlaylistEdit', () => {
 	let replaceInnerBlocks;
+	let insertBlocks;
 	let selectBlock;
 
 	beforeEach( () => {
 		mediaPlaceholderProps = undefined;
 		mediaReplaceFlowProps = undefined;
 		replaceInnerBlocks = jest.fn();
+		insertBlocks = jest.fn();
 		selectBlock = jest.fn();
 		useDispatch.mockReturnValue( {
 			createErrorNotice: jest.fn(),
 			replaceInnerBlocks,
+			insertBlocks,
 			selectBlock,
 			__unstableMarkNextChangeAsNotPersistent: jest.fn(),
 		} );
@@ -273,12 +276,10 @@ describe( 'PlaylistEdit', () => {
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'Add track' } ) );
 
-		expect( replaceInnerBlocks ).toHaveBeenCalledWith(
-			'playlist-1',
-			expect.arrayContaining( [
-				expect.objectContaining( { clientId: 'placeholder-track' } ),
-			] )
-		);
+		// Adding inserts alongside the existing tracks rather than rebuilding
+		// the list, so a track with no source cannot be filtered away.
+		expect( insertBlocks ).toHaveBeenCalled();
+		expect( replaceInnerBlocks ).not.toHaveBeenCalled();
 	} );
 
 	it( 'adds tracks from the add track control', () => {
@@ -298,18 +299,22 @@ describe( 'PlaylistEdit', () => {
 			} )
 		);
 
-		expect( replaceInnerBlocks ).toHaveBeenCalledWith( 'playlist-1', [
-			expect.objectContaining( { clientId: 'track-1' } ),
-			expect.objectContaining( {
-				clientId: 'new-track',
-				name: 'core/playlist-track',
-				attributes: expect.objectContaining( {
-					id: 2,
-					src: 'https://example.com/second-track.mp3',
-					title: 'Second track',
+		expect( insertBlocks ).toHaveBeenCalledWith(
+			[
+				expect.objectContaining( {
+					clientId: 'new-track',
+					name: 'core/playlist-track',
+					attributes: expect.objectContaining( {
+						id: 2,
+						src: 'https://example.com/second-track.mp3',
+						title: 'Second track',
+					} ),
 				} ),
-			} ),
-		] );
+			],
+			undefined,
+			'playlist-1',
+			false
+		);
 		expect( selectBlock ).toHaveBeenCalledWith( 'new-track' );
 	} );
 } );
