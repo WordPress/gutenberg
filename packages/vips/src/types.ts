@@ -191,6 +191,14 @@ export interface SaveOptions< T extends string > {
 	 * flattening them to 8-bit.
 	 */
 	bitdepth?: number;
+	/**
+	 * Write the image with a colour palette rather than as truecolour.
+	 *
+	 * Used for PNG to keep an indexed source indexed. libvips decodes an
+	 * indexed PNG into full RGB(A) pixels, so without this every output is
+	 * written as truecolour and inflates well past the size of its source.
+	 */
+	palette?: boolean;
 }
 
 export interface ThumbnailOptions {

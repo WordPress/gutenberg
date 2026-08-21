@@ -222,6 +222,16 @@ export async function convertImageFormat(
 			}
 		}
 
+		// libvips decodes an indexed PNG into full RGB(A) pixels, so an output
+		// written without asking for a palette comes back as truecolour and can
+		// end up larger than the source it was derived from. Imagick keeps the
+		// palette server-side, so the same upload through the classic path
+		// produces much smaller files.
+		// See https://github.com/WordPress/gutenberg/issues/81895.
+		if ( 'image/png' === outputType && isSourceIndexed( image ) ) {
+			saveOptions.palette = true;
+		}
+
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
 		const result = outBuffer.buffer;
 
@@ -427,6 +437,27 @@ function getSourceBitdepth< T extends { getInt: ( name: string ) => number } >(
  * @param maxBitdepth    Maximum bit depth from the `image_max_bit_depth` filter.
  * @return The bit depth to save at.
  */
+/**
+ * Whether the source image was stored with a colour palette.
+ *
+ * libvips decodes an indexed PNG into full RGB(A) pixels and records the source
+ * encoding in a `palette` field, so this is the only way to tell afterwards
+ * that the original was indexed.
+ *
+ * @param image Decoded image.
+ * @return Whether the source was an indexed (palette) image.
+ */
+function isSourceIndexed< T extends { getInt: ( name: string ) => number } >(
+	image: T
+): boolean {
+	try {
+		return image.getInt( 'palette' ) === 1;
+	} catch {
+		// Field absent: source was not indexed.
+		return false;
+	}
+}
+
 function resolveSaveBitdepth(
 	sourceBitdepth: number,
 	maxBitdepth: number
@@ -455,7 +486,8 @@ function buildSaveOptions(
 	type: string,
 	quality: number,
 	bitdepth = 8,
-	stripMeta = true
+	stripMeta = true,
+	indexed = false
 ): SaveOptions< typeof type > {
 	const saveOptions: SaveOptions< typeof type > = {
 		// Strip metadata except ICC color profiles or gainmaps,
@@ -477,6 +509,14 @@ function buildSaveOptions(
 		if ( bitdepth > 8 ) {
 			saveOptions.bitdepth = bitdepth;
 		}
+	}
+
+	// Keep an indexed source indexed. libvips decodes an indexed PNG into full
+	// RGB(A) pixels, so without this the output is written as truecolour and can
+	// end up larger than the source it was derived from.
+	// See https://github.com/WordPress/gutenberg/issues/81895.
+	if ( 'image/png' === type && indexed ) {
+		saveOptions.palette = true;
 	}
 
 	return saveOptions;
@@ -650,7 +690,8 @@ export async function resizeImage(
 			type,
 			quality,
 			saveBitdepth,
-			stripMeta
+			stripMeta,
+			isSourceIndexed( image )
 		);
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
 
@@ -830,6 +871,16 @@ export async function rotateImage(
 		image.remove( 'orientation' );
 
 		const saveOptions: SaveOptions< typeof type > = {};
+
+		// libvips decodes an indexed PNG into full RGB(A) pixels, so an output
+		// written without asking for a palette comes back as truecolour and can
+		// end up larger than the source it was derived from. Imagick keeps the
+		// palette server-side, so the same upload through the classic path
+		// produces much smaller files.
+		// See https://github.com/WordPress/gutenberg/issues/81895.
+		if ( 'image/png' === type && isSourceIndexed( image ) ) {
+			saveOptions.palette = true;
+		}
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
 
 		const result = {
