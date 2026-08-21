@@ -11,8 +11,11 @@
 -   `input-control`: Use `outset-ring__focus` for focus styling, WPDS tokens for border styling, and a hover border treatment aligned with `@wordpress/ui`. If you also define custom `:focus` box-shadow styles on the same selector, remove them to avoid duplicate focus rings ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
 -   `outset-ring__focus`: Use a `--focus-color` fallback in the outline instead of declaring the custom property locally, so ancestor overrides apply correctly ([#81242](https://github.com/WordPress/gutenberg/pull/81242)).
 
-## 12.1.0 (2026-08-12)
+### Bug Fixes
 
+-   Show the block settings menu beneath the media modal, so an open ⋮ menu no longer covers the media library when it is opened from the block behind it ([#54018](https://github.com/WordPress/gutenberg/issues/54018)).
+
+## 12.1.0 (2026-08-12)
 
 ## 12.0.0 (2026-07-29)
 
@@ -54,7 +57,7 @@
 ### Breaking Changes
 
 -   Remove the following entries from the `z-index()` helper ([#77773](https://github.com/WordPress/gutenberg/pull/77773)):
-   -   `.nux-dot-tip`
+-   `.nux-dot-tip`
 
 ## 9.0.0 (2026-05-27)
 
