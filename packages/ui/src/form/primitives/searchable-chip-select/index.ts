@@ -17,25 +17,9 @@ GroupLabel.displayName = 'SearchableChipSelect.GroupLabel';
  * Prefer `SearchableChipSelectControl` when using with a standard label and description.
  */
 export const SearchableChipSelect = Object.assign( _SearchableChipSelect, {
-	/**
-	 * Groups related items together with an associated label rendered by
-	 * `SearchableChipSelect.GroupLabel`.
-	 */
-	Group,
-	/**
-	 * Renders a label for a `SearchableChipSelect.Group`.
-	 */
-	GroupLabel,
-	/**
-	 * An item rendered inside a `SearchableChipSelect` popup.
-	 */
 	Item,
-	/**
-	 * A chip rendered inside a `SearchableChipSelect`.
-	 */
 	ChipWithRemove,
-	/**
-	 * Iterates over the items in a `SearchableChipSelect.Group`.
-	 */
+	Group,
+	GroupLabel,
 	Collection,
 } );
