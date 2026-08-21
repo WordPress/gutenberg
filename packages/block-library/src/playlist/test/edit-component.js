@@ -4,6 +4,9 @@ import PlaylistEdit from '../edit';
 
 let mediaPlaceholderProps;
 let mediaReplaceFlowProps;
+// The tracks the playlist holds. The inner blocks mock renders these, so a
+// test can look at what ended up in the tracklist.
+let mockTracks = [];
 
 jest.mock( '@wordpress/block-editor', () => ( {
 	store: {},
@@ -33,7 +36,11 @@ jest.mock( '@wordpress/block-editor', () => ( {
 	useBlockProps: () => ( { className: 'wp-block-playlist' } ),
 	useInnerBlocksProps: ( blockProps ) => ( {
 		...blockProps,
-		children: <li data-testid="playlist-track" />,
+		children: mockTracks.map( ( track ) => (
+			<li key={ track.clientId } data-testid="playlist-track">
+				{ track.attributes.title }
+			</li>
+		) ),
 	} ),
 	__experimentalColorGradientSettingsDropdown: () => <div />,
 	__experimentalUseMultipleOriginColorsAndGradients: () => ( {
@@ -112,18 +119,19 @@ describe( 'PlaylistEdit', () => {
 	// The playlist reads its tracks from the store and changes them through
 	// dispatched actions. Keeping a list here lets a test assert which tracks
 	// the playlist ends up with, rather than which action it reached for.
-	let tracks;
 	const trackStore = ( initial ) => {
-		tracks = initial;
-		useSelect.mockImplementation( () => ( { innerBlockTracks: tracks } ) );
+		mockTracks = initial;
+		useSelect.mockImplementation( () => ( {
+			innerBlockTracks: mockTracks,
+		} ) );
 		insertBlocks.mockImplementation( ( blocks ) => {
-			tracks = [ ...tracks, ...blocks ];
+			mockTracks = [ ...mockTracks, ...blocks ];
 		} );
 		replaceInnerBlocks.mockImplementation( ( _clientId, next ) => {
-			tracks = next;
+			mockTracks = next;
 		} );
 	};
-	const trackClientIds = () => tracks.map( ( track ) => track.clientId );
+	const trackClientIds = () => mockTracks.map( ( track ) => track.clientId );
 
 	beforeEach( () => {
 		mediaPlaceholderProps = undefined;
@@ -138,24 +146,20 @@ describe( 'PlaylistEdit', () => {
 			selectBlock,
 			__unstableMarkNextChangeAsNotPersistent: jest.fn(),
 		} );
-		useSelect.mockReturnValue( {
-			innerBlockTracks: [
-				{
-					clientId: 'track-1',
-					attributes: {
-						id: 1,
-						src: 'https://example.com/audio.mp3',
-						title: 'Sample track',
-					},
+		trackStore( [
+			{
+				clientId: 'track-1',
+				attributes: {
+					id: 1,
+					src: 'https://example.com/audio.mp3',
+					title: 'Sample track',
 				},
-			],
-		} );
+			},
+		] );
 	} );
 
 	it( 'lets users select audio tracks individually from the Media Library', () => {
-		useSelect.mockReturnValue( {
-			innerBlockTracks: [],
-		} );
+		trackStore( [] );
 
 		render(
 			<PlaylistEdit
@@ -256,22 +260,7 @@ describe( 'PlaylistEdit', () => {
 			} )
 		);
 
-		expect( insertBlocks ).toHaveBeenCalledWith(
-			[
-				expect.objectContaining( {
-					clientId: 'new-track',
-					name: 'core/playlist-track',
-					attributes: expect.objectContaining( {
-						id: 2,
-						src: 'https://example.com/second-track.mp3',
-						title: 'Second track',
-					} ),
-				} ),
-			],
-			undefined,
-			'playlist-1',
-			false
-		);
+		expect( trackClientIds() ).toEqual( [ 'track-1', 'new-track' ] );
 		expect( selectBlock ).toHaveBeenCalledWith( 'new-track' );
 	} );
 } );
