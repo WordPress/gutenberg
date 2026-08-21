@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Update `copy-webpack-plugin` from `^10.2.0` to `^14.0.0`. It needs Node.js 20.9.0 or later. The package now declares `engines.node` as `>=20.19.0`, which the bundled `eslint` v10 has required since version 32.0.0.
+
 ## 34.1.0 (2026-08-12)
 
 ### Bug Fixes
