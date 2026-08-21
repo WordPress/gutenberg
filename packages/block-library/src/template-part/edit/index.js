@@ -32,6 +32,7 @@ import {
 	useAlternativeTemplateParts,
 	useTemplatePartArea,
 } from './utils/hooks';
+import ContentPanel from './content-panel';
 
 const SUPPORTED_AREAS = [ 'header', 'footer', 'navigation-overlay' ];
 
@@ -305,6 +306,7 @@ export default function TemplatePartEdit( {
 				</BlockSettingsMenuControls>
 
 				<InspectorControls group="settings">
+					<ContentPanel clientId={ clientId } />
 					<TemplatesList
 						area={ area }
 						clientId={ clientId }
