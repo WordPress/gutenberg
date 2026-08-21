@@ -17,26 +17,10 @@ ChipWithRemove.displayName = 'SearchableChipSelectControl.ChipWithRemove';
 export const SearchableChipSelectControl = Object.assign(
 	_SearchableChipSelectControl,
 	{
-		/**
-		 * Groups related items together with an associated label rendered by
-		 * `SearchableChipSelectControl.GroupLabel`.
-		 */
 		Group,
-		/**
-		 * Renders a label for a `SearchableChipSelectControl.Group`.
-		 */
 		GroupLabel,
-		/**
-		 * An item rendered inside a `SearchableChipSelectControl` popup.
-		 */
 		Item,
-		/**
-		 * A chip rendered inside a `SearchableChipSelectControl`.
-		 */
 		ChipWithRemove,
-		/**
-		 * Iterates over the items in a `SearchableChipSelectControl.Group`.
-		 */
 		Collection,
 	}
 );
