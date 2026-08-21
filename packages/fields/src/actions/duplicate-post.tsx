@@ -57,7 +57,7 @@ const duplicatePost: Action< BasePost > = {
 
 			const isTemplate = item.type === 'wp_template';
 
-			const newItemObject = {
+			const newItemObject: Record< string, unknown > = {
 				status: isTemplate ? 'publish' : 'draft',
 				title: item.title,
 				slug: isTemplate ? item.slug : item.title || __( 'No title' ),
@@ -70,7 +70,6 @@ const duplicatePost: Action< BasePost > = {
 					typeof item.excerpt === 'string'
 						? item.excerpt
 						: item.excerpt?.raw,
-				meta: item.meta,
 				parent: item.parent,
 				password: item.password,
 				template: item.template,
@@ -79,6 +78,20 @@ const duplicatePost: Action< BasePost > = {
 				menu_order: item.menu_order,
 				ping_status: item.ping_status,
 			};
+			if ( item.meta ) {
+				const metaKeys = Object.keys( item.meta );
+				if ( metaKeys.length > 0 ) {
+					const { footnotes, ...restMeta } = item.meta;
+					if (
+						footnotes ||
+						Object.keys( restMeta ).length > 0
+					) {
+						newItemObject.meta = footnotes
+							? { footnotes, ...restMeta }
+							: restMeta;
+					}
+				}
+			}
 			const assignablePropertiesPrefix = 'wp:action-assign-';
 			// Get all the properties that the current user is able to assign normally author, categories, tags,
 			// and custom taxonomies.
