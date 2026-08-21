@@ -2,13 +2,9 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
 import warning from '@wordpress/warning';
-import {
-	GROUPED_ITEMS,
-	type FixtureGroup,
-	type FixtureItem,
-} from '../../combobox/stories/fixtures';
-import { ITEMS } from '../stories/fixtures';
 import { SearchableChipSelect } from '../index';
+import type { Item, ItemGroup } from '../types';
+import { GROUPED_ITEMS, ITEMS } from './fixtures';
 
 jest.mock( '@wordpress/warning', () => jest.fn() );
 
@@ -90,7 +86,7 @@ describe( 'SearchableChipSelect', () => {
 		render(
 			<SearchableChipSelect
 				items={ GROUPED_ITEMS }
-				children={ ( group: FixtureGroup ) => (
+				children={ ( group: ItemGroup ) => (
 					<SearchableChipSelect.Group
 						key={ group.label }
 						items={ group.items }
@@ -99,7 +95,7 @@ describe( 'SearchableChipSelect', () => {
 							{ group.label }
 						</SearchableChipSelect.GroupLabel>
 						<SearchableChipSelect.Collection>
-							{ ( item: FixtureItem ) => (
+							{ ( item: Item ) => (
 								<SearchableChipSelect.Item
 									key={ item.value }
 									value={ item }
@@ -131,7 +127,7 @@ describe( 'SearchableChipSelect', () => {
 			<SearchableChipSelect
 				items={ GROUPED_ITEMS }
 				onValueChange={ onValueChange }
-				children={ ( group: FixtureGroup ) => (
+				children={ ( group: ItemGroup ) => (
 					<SearchableChipSelect.Group
 						key={ group.label }
 						items={ group.items }
@@ -140,7 +136,7 @@ describe( 'SearchableChipSelect', () => {
 							{ group.label }
 						</SearchableChipSelect.GroupLabel>
 						<SearchableChipSelect.Collection>
-							{ ( item: FixtureItem ) => (
+							{ ( item: Item ) => (
 								<SearchableChipSelect.Item
 									key={ item.value }
 									value={ item }
@@ -246,7 +242,7 @@ describe( 'SearchableChipSelect', () => {
 			render(
 				<SearchableChipSelect
 					items={ items }
-					children={ ( group: FixtureGroup ) => (
+					children={ ( group: ItemGroup ) => (
 						<SearchableChipSelect.Group
 							key={ group.label }
 							items={ group.items }
@@ -255,7 +251,7 @@ describe( 'SearchableChipSelect', () => {
 								{ group.label }
 							</SearchableChipSelect.GroupLabel>
 							<SearchableChipSelect.Collection>
-								{ ( item: FixtureItem ) => (
+								{ ( item: Item ) => (
 									<SearchableChipSelect.Item
 										key={ item.value }
 										value={ item }
@@ -298,7 +294,7 @@ describe( 'SearchableChipSelect', () => {
 					items={ items }
 					inputValue="zzzzz"
 					onValueChange={ onValueChange }
-					children={ ( group: FixtureGroup ) => (
+					children={ ( group: ItemGroup ) => (
 						<SearchableChipSelect.Group
 							key={ group.label }
 							items={ group.items }
@@ -307,7 +303,7 @@ describe( 'SearchableChipSelect', () => {
 								{ group.label }
 							</SearchableChipSelect.GroupLabel>
 							<SearchableChipSelect.Collection>
-								{ ( item: FixtureItem ) => (
+								{ ( item: Item ) => (
 									<SearchableChipSelect.Item
 										key={ item.value }
 										value={ item }
