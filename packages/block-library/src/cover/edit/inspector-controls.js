@@ -2,7 +2,7 @@ import { useMemo } from '@wordpress/element';
 import {
 	FocalPointPicker,
 	RangeControl,
-	TextareaControl,
+	TextareaControl as WCTextareaControl,
 	ToggleControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalToolsPanel as ToolsPanel,
@@ -377,7 +377,7 @@ export default function CoverInspectorControls( {
 									setAttributes( { alt: '' } )
 								}
 							>
-								<TextareaControl
+								<WCTextareaControl
 									label={ __( 'Alternative text' ) }
 									value={ alt }
 									onChange={ ( newAlt ) =>
