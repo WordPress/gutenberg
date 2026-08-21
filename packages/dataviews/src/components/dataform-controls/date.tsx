@@ -32,7 +32,6 @@ import {
 import RelativeDateControl from './utils/relative-date-control';
 import toCalendarDate from './utils/to-calendar-date';
 import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
-import useRestoreCalendarFocus from './utils/use-restore-calendar-focus';
 import {
 	OPERATOR_IN_THE_PAST,
 	OPERATOR_OVER,
@@ -303,23 +302,15 @@ function CalendarDateControl< Item >( {
 		// Default to current month
 		return toCalendarDate( parsedDate || new Date(), timezoneString );
 	} );
-	const calendarRef = useRef< HTMLDivElement >( null );
-	const markFocusForRestore = useRestoreCalendarFocus(
-		calendarRef,
-		calendarMonth
-	);
-
 	// Follow the value when it changes, so that a change from outside the
 	// control, e.g. an undo, a reset, or switching the edited item, brings
 	// the selection into view. Months are compared in the calendar's time
 	// zone: near a month boundary, a date can belong to a different month
-	// there than in the browser's time zone. A month change unmounts the
-	// focused day button, so focus is restored to the selected day.
+	// there than in the browser's time zone.
 	useEffect( () => {
 		const parsedDate = parseDate( value );
 		if ( parsedDate ) {
 			const targetMonth = toCalendarDate( parsedDate, timezoneString );
-			markFocusForRestore();
 			setCalendarMonth( ( currentMonth ) =>
 				isSameMonth(
 					targetMonth,
@@ -329,7 +320,7 @@ function CalendarDateControl< Item >( {
 					: targetMonth
 			);
 		}
-	}, [ value, timezoneString, markFocusForRestore ] );
+	}, [ value, timezoneString ] );
 
 	const [ isTouched, setIsTouched ] = useState( false );
 	const validityTargetRef = useRef< HTMLInputElement >( null );
@@ -462,7 +453,6 @@ function CalendarDateControl< Item >( {
 
 					{ /* Calendar widget */ }
 					<Calendar
-						ref={ calendarRef }
 						style={ { width: '100%' } }
 						value={ value ? parseDate( value ) : null }
 						onValueChange={ onSelectDate }
@@ -551,23 +541,15 @@ function CalendarDateRangeControl< Item >( {
 			timezoneString
 		);
 	} );
-	const calendarRef = useRef< HTMLDivElement >( null );
-	const markFocusForRestore = useRestoreCalendarFocus(
-		calendarRef,
-		calendarMonth
-	);
-
 	// Follow the value when it changes, so that a change from outside the
 	// control, e.g. an undo, a reset, or switching the edited item, brings
 	// the range into view. Keep the current view when part of the new range
 	// is already visible, so that selecting the end of a cross-month range
 	// doesn't move the view away. Months are compared in the calendar's
 	// time zone: near a month boundary, a date can belong to a different
-	// month there than in the browser's time zone. A month change unmounts
-	// the focused day button, so focus is restored to the selected day.
+	// month there than in the browser's time zone.
 	const [ fromValue, toValue ] = value ?? [];
 	useEffect( () => {
-		markFocusForRestore();
 		setCalendarMonth( ( currentMonth ) => {
 			const from = parseDate( fromValue );
 			const to = parseDate( toValue );
@@ -588,7 +570,7 @@ function CalendarDateRangeControl< Item >( {
 				? toCalendarDate( targetMonth, timezoneString )
 				: currentMonth;
 		} );
-	}, [ fromValue, toValue, timezoneString, markFocusForRestore ] );
+	}, [ fromValue, toValue, timezoneString ] );
 
 	const [ isTouched, setIsTouched ] = useState( false );
 	const fromInputRef = useRef< HTMLInputElement >( null );
@@ -759,7 +741,6 @@ function CalendarDateRangeControl< Item >( {
 					</Stack>
 
 					<RangeCalendar
-						ref={ calendarRef }
 						style={ { width: '100%' } }
 						value={ selectedRange }
 						onValueChange={ onSelectCalendarRange }

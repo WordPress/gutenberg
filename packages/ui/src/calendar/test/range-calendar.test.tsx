@@ -1,4 +1,10 @@
-import { render, screen, within, renderHook } from '@testing-library/react';
+import {
+	act,
+	render,
+	screen,
+	within,
+	renderHook,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
 	startOfDay,
@@ -1093,6 +1099,26 @@ describe( 'RangeCalendar', () => {
 	} );
 
 	describe( 'Keyboard focus and navigation', () => {
+		it( 'should keep day focus when the controlled month changes', () => {
+			const nextRange = {
+				from: addMonths( today, 1 ),
+				to: addMonths( tomorrow, 1 ),
+			};
+			const { rerender } = render(
+				<RangeCalendar
+					month={ currentMonth }
+					value={ { from: today, to: tomorrow } }
+				/>
+			);
+
+			act( () => getDateButton( today ).focus() );
+			rerender(
+				<RangeCalendar month={ nextMonth } value={ nextRange } />
+			);
+
+			expect( getDateButton( nextRange.from ) ).toHaveFocus();
+		} );
+
 		it( 'should auto-focus the selected day when the `autoFocus` prop is set to `true`', async () => {
 			render(
 				<RangeCalendar

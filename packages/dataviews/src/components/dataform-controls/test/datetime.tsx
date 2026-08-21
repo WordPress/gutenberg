@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { getSettings, setSettings } from '@wordpress/date';
 import normalizeFields from '../../../field-types';
 import DateTime from '../datetime';
@@ -46,37 +46,6 @@ describe( 'DateTime control', () => {
 		expect(
 			screen.getByRole( 'grid', { name: 'November 2024' } )
 		).toBeInTheDocument();
-	} );
-
-	it( 'should restore focus to the selected day when the month changes from outside the control', () => {
-		const { rerender } = render(
-			<DateTime
-				data={ { published: '2024-03-15T10:30:00.000Z' } }
-				field={ field }
-				onChange={ noop }
-			/>
-		);
-
-		const day = screen.getByRole( 'button', {
-			name: /March 15, 2024/,
-		} );
-		act( () => day.focus() );
-		expect( day ).toHaveFocus();
-
-		rerender(
-			<DateTime
-				data={ { published: '2024-11-20T10:30:00.000Z' } }
-				field={ field }
-				onChange={ noop }
-			/>
-		);
-
-		expect(
-			screen.getByRole( 'grid', { name: 'November 2024' } )
-		).toBeInTheDocument();
-		expect(
-			screen.getByRole( 'button', { name: /November 20, 2024/ } )
-		).toHaveFocus();
 	} );
 
 	describe( 'with a site time zone ahead of the browser', () => {

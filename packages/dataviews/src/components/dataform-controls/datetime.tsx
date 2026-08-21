@@ -13,7 +13,6 @@ import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../../constants';
 import RelativeDateControl from './utils/relative-date-control';
 import toCalendarDate from './utils/to-calendar-date';
 import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
-import useRestoreCalendarFocus from './utils/use-restore-calendar-focus';
 import getCustomValidity from './utils/get-custom-validity';
 import parseDateTime from '../../field-types/utils/parse-date-time';
 import { unlock } from '../../lock-unlock';
@@ -51,23 +50,15 @@ function CalendarDateTimeControl< Item >( {
 		// Default to current month
 		return toCalendarDate( parsedDate || new Date(), timezoneString );
 	} );
-	const calendarRef = useRef< HTMLDivElement >( null );
-	const markFocusForRestore = useRestoreCalendarFocus(
-		calendarRef,
-		calendarMonth
-	);
-
 	// Follow the value when it changes, so that a change from outside the
 	// control, e.g. an undo, a reset, or switching the edited item, brings
 	// the selection into view. Months are compared in the calendar's time
 	// zone: near a month boundary, a date can belong to a different month
-	// there than in the browser's time zone. A month change unmounts the
-	// focused day button, so focus is restored to the selected day.
+	// there than in the browser's time zone.
 	useEffect( () => {
 		const parsedDate = parseDateTime( value );
 		if ( parsedDate ) {
 			const targetMonth = toCalendarDate( parsedDate, timezoneString );
-			markFocusForRestore();
 			setCalendarMonth( ( currentMonth ) =>
 				isSameMonth(
 					targetMonth,
@@ -77,7 +68,7 @@ function CalendarDateTimeControl< Item >( {
 					: targetMonth
 			);
 		}
-	}, [ value, timezoneString, markFocusForRestore ] );
+	}, [ value, timezoneString ] );
 
 	const inputControlRef = useRef< HTMLInputElement >( null );
 	const validationTimeoutRef =
@@ -216,7 +207,6 @@ function CalendarDateTimeControl< Item >( {
 				{ /* Calendar widget */ }
 				{ ! compact && (
 					<Calendar
-						ref={ calendarRef }
 						style={ { width: '100%' } }
 						value={ value ? parseDateTime( value ) : null }
 						onValueChange={ onSelectDate }
