@@ -300,26 +300,34 @@ test.describe( 'Playlist block', () => {
 						title: 'Existing Track',
 					},
 				},
+				// A track the user has added but not filled in yet.
+				{ name: 'core/playlist-track' },
 			],
 		} );
 
 		const playlist = editor.canvas.locator(
 			'role=document[name="Block: Playlist"i]'
 		);
+		const tracks = editor.canvas.locator(
+			'[data-type="core/playlist-track"]'
+		);
 		await expect( playlist ).toBeVisible();
+		await expect( tracks ).toHaveCount( 2 );
 
 		const { dragOver, drop } =
 			await pageUtils.dragFiles( rejectedAudioPath );
-		await dragOver( playlist );
+		// Drop on the player, so the file lands on the playlist rather than
+		// on the placeholder track's own drop zone.
+		await dragOver( playlist, { position: { x: 10, y: 10 } } );
 		await drop();
 
 		await expect( page.locator( '.components-snackbar' ) ).toContainText(
 			/not allowed to upload this file type/
 		);
 
-		await expect(
-			editor.canvas.locator( '[data-type="core/playlist-track"]' )
-		).toHaveCount( 1 );
+		// The rejected file adds nothing, and neither the filled track nor
+		// the unfilled one is disturbed.
+		await expect( tracks ).toHaveCount( 2 );
 		await expect(
 			editor.canvas.getByRole( 'button', { name: /Existing Track/ } )
 		).toBeVisible();
