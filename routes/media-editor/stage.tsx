@@ -1,3 +1,4 @@
+import type { KeyboardEvent, ReactNode } from 'react';
 import { Breadcrumbs, Page } from '@wordpress/admin-ui';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
@@ -7,8 +8,6 @@ import { __ } from '@wordpress/i18n';
 import {
 	privateApis as mediaEditorPrivateApis,
 	type Media,
-	type MediaEditorFrameProps,
-	type MediaEditorSaveResult,
 } from '@wordpress/media-editor';
 import { useNavigate, useParams } from '@wordpress/route';
 import { unlock } from '@wordpress/routes-lock-unlock';
@@ -21,6 +20,21 @@ const MEDIA_LIST_PATH = '/types/attachment/list/all';
 const MEDIA_LIBRARY_ADMIN_PATH = 'upload.php';
 const MEDIA_EDITOR_ADMIN_PAGE = 'media-editor-wp-admin';
 const MEDIA_EDITOR_SCOPE = 'media-editor-route';
+
+/*
+ * The `MediaEditor` callback arguments this route reads. The private API
+ * does not publish its types, so these stay local until it stabilizes.
+ */
+interface SaveResult {
+	id: number;
+}
+
+interface FrameProps {
+	children: ReactNode;
+	isImage: boolean;
+	layout: 'wide' | 'narrow';
+	onKeyDown: ( event: KeyboardEvent< HTMLElement > ) => void;
+}
 
 function isMediaEditorAdminPage() {
 	return (
@@ -78,7 +92,7 @@ function MediaEditorRoute() {
 			// here regardless of whether it was last collapsed in the modal.
 			scope={ MEDIA_EDITOR_SCOPE }
 			onClose={ navigateBack }
-			onSaved={ ( { id: savedId }: MediaEditorSaveResult ) => {
+			onSaved={ ( { id: savedId }: SaveResult ) => {
 				if ( savedId !== attachmentId ) {
 					navigate( { to: `/media-editor/${ savedId }` } );
 				}
@@ -88,7 +102,7 @@ function MediaEditorRoute() {
 				isImage,
 				layout,
 				onKeyDown,
-			}: MediaEditorFrameProps ) => {
+			}: FrameProps ) => {
 				// Below the sidebar-collapse breakpoint the header has no room
 				// for the history cluster: it already carries the breadcrumbs,
 				// Cancel/Save, and (under `medium`) the framework's navigation

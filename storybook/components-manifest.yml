@@ -412,6 +412,7 @@
       - onCancel
       - onConfirm
       - size
+      - title
 - name: CustomSelectControl
   props:
       - __experimentalShowSelectedHint

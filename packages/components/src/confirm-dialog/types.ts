@@ -54,6 +54,11 @@ export type ConfirmDialogProps = {
 	 */
 	isBusy?: boolean;
 	/**
+	 * The title of the underlying `Modal`: its accessible name, and the
+	 * visible heading unless `__experimentalHideHeader` is `true`.
+	 */
+	title?: ModalProps[ 'title' ];
+	/**
 	 * Whether the underlying `Modal` should hide its header, `title` included.
 	 *
 	 * @default true
