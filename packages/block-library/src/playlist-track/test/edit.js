@@ -1,11 +1,10 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import PlaylistTrackEdit from '../edit';
 import { PlaylistContext } from '../../playlist/context';
 import { useUploadMediaFromBlobURL } from '../../utils/hooks';
 
 let mockMediaReplaceFlowProps;
-let isTrackMultiSelected;
 
 jest.mock( '@wordpress/block-editor', () => {
 	const PlainText = jest.requireActual(
@@ -13,7 +12,6 @@ jest.mock( '@wordpress/block-editor', () => {
 	).default;
 
 	return {
-		store: 'core/block-editor',
 		BlockControls: ( { children } ) => <div>{ children }</div>,
 		BlockIcon: () => <span />,
 		InspectorControls: ( { children } ) => <div>{ children }</div>,
@@ -34,16 +32,11 @@ jest.mock( '@wordpress/block-editor', () => {
 jest.mock( '@wordpress/data', () => {
 	const data = jest.requireActual( '@wordpress/data' );
 	const mockUseDispatch = jest.fn();
-	const mockUseSelect = jest.fn();
 
 	return new Proxy( data, {
 		get( target, property ) {
 			if ( property === 'useDispatch' ) {
 				return mockUseDispatch;
-			}
-
-			if ( property === 'useSelect' ) {
-				return mockUseSelect;
 			}
 
 			return target[ property ];
@@ -104,27 +97,37 @@ function renderEdit( props = {} ) {
 describe( 'PlaylistTrackEdit', () => {
 	beforeEach( () => {
 		mockMediaReplaceFlowProps = undefined;
-		isTrackMultiSelected = false;
 		useDispatch.mockReturnValue( {
 			createErrorNotice: jest.fn(),
-		} );
-		useSelect.mockImplementation( ( selector ) => {
-			const selectors = {
-				getFormatTypes: () => [],
-				isBlockMultiSelected: () => isTrackMultiSelected,
-			};
-
-			return typeof selector === 'function'
-				? selector( () => selectors )
-				: selectors;
 		} );
 		useUploadMediaFromBlobURL.mockClear();
 	} );
 
-	it( 'does not show the title control when multiple playlist tracks are selected', () => {
-		isTrackMultiSelected = true;
+	it( 'shows the title control for a single selected playlist track', () => {
+		renderEdit( { isSelected: true } );
 
-		renderEdit();
+		expect(
+			screen.getByRole( 'textbox', { name: 'Title' } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'shows the replace track control for a single selected playlist track', () => {
+		renderEdit( { isSelected: true } );
+
+		expect( mockMediaReplaceFlowProps ).toBeDefined();
+	} );
+
+	it( 'does not show the replace track control when multiple playlist tracks are selected', () => {
+		renderEdit( { isSelected: false } );
+
+		expect( mockMediaReplaceFlowProps ).toBeUndefined();
+	} );
+
+	it( 'does not show the title control when multiple playlist tracks are selected', () => {
+		// The track inspector only renders for the selected block, or for the
+		// first block of a same-type multi-selection, where `isSelected` is
+		// false.
+		renderEdit( { isSelected: false } );
 
 		expect(
 			screen.queryByRole( 'textbox', { name: 'Title' } )
@@ -222,7 +225,7 @@ describe( 'PlaylistTrackEdit', () => {
 	} );
 
 	it( 'preserves the current track source when a replacement upload fails', () => {
-		const { setAttributes } = renderEdit();
+		const { setAttributes } = renderEdit( { isSelected: true } );
 
 		mockMediaReplaceFlowProps.onSelect();
 
@@ -233,7 +236,7 @@ describe( 'PlaylistTrackEdit', () => {
 	} );
 
 	it( 'accepts raw uploaded attachment data when replacing a track', () => {
-		const { setAttributes } = renderEdit();
+		const { setAttributes } = renderEdit( { isSelected: true } );
 
 		mockMediaReplaceFlowProps.onSelect( {
 			id: 2,
