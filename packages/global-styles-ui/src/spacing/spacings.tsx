@@ -1,270 +1,137 @@
-/**
- * WordPress dependencies
- */
-import { __, sprintf, isRTL } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
-	privateApis as componentsPrivateApis,
 	__experimentalSpacer as Spacer,
 	__experimentalView as View,
-	__experimentalItemGroup as ItemGroup,
-	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
-	FlexItem,
-	Button,
 } from '@wordpress/components';
-import {
-	Icon,
-	plus,
-	moreVertical,
-	chevronLeft,
-	chevronRight,
-} from '@wordpress/icons';
-import { useState } from '@wordpress/element';
 import type { SpacingSize } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
-import { Subtitle } from '../subtitle';
-import { NavigationButtonAsItem } from '../navigation-button';
-import { getNewIndexFromPresets } from '../utils';
+import { Stack } from '@wordpress/ui';
 import { ScreenHeader } from '../screen-header';
-import ConfirmResetSpacingsDialog from './confirm-reset-spacings-dialog';
+import PresetGroup from '../presets/preset-group';
+import { usePresets } from '../presets/use-presets';
 import { useSetting } from '../hooks';
-import { unlock } from '../lock-unlock';
+import { getNewIndexFromPresets } from '../utils';
 
-const { Menu } = unlock( componentsPrivateApis );
+const hasSameSizeValues = ( a: SpacingSize[], b: SpacingSize[] ): boolean =>
+	a.map( ( item ) => item.size ).join( '' ) ===
+	b.map( ( item ) => item.size ).join( '' );
 
-interface SpacingGroupProps {
-	label: string;
-	origin: string;
-	spacings: SpacingSize[];
-	handleAddSpacing: () => void;
-	handleResetSpacings?: ( () => void ) | undefined | null;
-}
+const resetMenu = ( onConfirm: () => void ) => ( {
+	label: __( 'Reset spacing size presets' ),
+	optionsLabel: __( 'Spacing size presets options' ),
+	confirmText: __(
+		'Are you sure you want to reset all spacing size presets to their default values?'
+	),
+	confirmButtonText: __( 'Reset' ),
+	onConfirm,
+} );
 
-function SpacingGroup( {
-	label,
-	origin,
-	spacings,
-	handleAddSpacing,
-	handleResetSpacings,
-}: SpacingGroupProps ) {
-	const [ isResetDialogOpen, setIsResetDialogOpen ] = useState( false );
-
-	const toggleResetDialog = () => setIsResetDialogOpen( ! isResetDialogOpen );
-
-	const resetDialogText =
-		origin === 'custom'
-			? __(
-					'Are you sure you want to remove all custom spacing size presets?'
-			  )
-			: __(
-					'Are you sure you want to reset all spacing size presets to their default values?'
-			  );
-
-	return (
-		<>
-			{ handleResetSpacings && isResetDialogOpen && (
-				<ConfirmResetSpacingsDialog
-					text={ resetDialogText }
-					confirmButtonText={
-						origin === 'custom' ? __( 'Remove' ) : __( 'Reset' )
-					}
-					isOpen={ isResetDialogOpen }
-					toggleOpen={ toggleResetDialog }
-					onConfirm={ handleResetSpacings }
-				/>
-			) }
-			<VStack spacing={ 4 }>
-				<HStack>
-					<Subtitle level={ 3 }>{ label }</Subtitle>
-					<FlexItem className="edit-site-global-styles__spacing-panel__options-container">
-						{ origin === 'custom' && (
-							<Button
-								label={ __( 'Add spacing size' ) }
-								icon={ plus }
-								size="small"
-								onClick={ handleAddSpacing }
-							/>
-						) }
-						{ !! handleResetSpacings && (
-							<Menu>
-								<Menu.TriggerButton
-									render={
-										<Button
-											size="small"
-											icon={ moreVertical }
-											label={ __(
-												'Spacing size presets options'
-											) }
-										/>
-									}
-								/>
-								<Menu.Popover>
-									<Menu.Item onClick={ toggleResetDialog }>
-										<Menu.ItemLabel>
-											{ origin === 'custom'
-												? __(
-														'Remove spacing size presets'
-												  )
-												: __(
-														'Reset spacing size presets'
-												  ) }
-										</Menu.ItemLabel>
-									</Menu.Item>
-								</Menu.Popover>
-							</Menu>
-						) }
-					</FlexItem>
-				</HStack>
-
-				{ !! spacings.length && (
-					<ItemGroup isBordered isSeparated>
-						{ spacings.map( ( spacing ) => (
-							<NavigationButtonAsItem
-								key={ spacing.slug }
-								path={ `/layout/spacing/${ origin }/${ spacing.slug }` }
-							>
-								<HStack>
-									<FlexItem className="edit-site-spacing__item">
-										{ spacing.name }
-									</FlexItem>
-									<FlexItem display="flex">
-										<Icon
-											icon={
-												isRTL()
-													? chevronLeft
-													: chevronRight
-											}
-										/>
-									</FlexItem>
-								</HStack>
-							</NavigationButtonAsItem>
-						) ) }
-					</ItemGroup>
-				) }
-			</VStack>
-		</>
-	);
-}
-
-function Spacings() {
-	const [ themeSpacingSizes, setThemeSpacingSizes ] = useSetting(
-		'spacing.spacingSizes.theme'
-	);
-
-	const [ baseThemeSpacingSizes ] = useSetting(
-		'spacing.spacingSizes.theme',
-		undefined,
-		'base'
-	);
-	const [ defaultSpacingSizes, setDefaultSpacingSizes ] = useSetting(
-		'spacing.spacingSizes.default'
-	);
-
-	const [ baseDefaultSpacingSizes ] = useSetting(
-		'spacing.spacingSizes.default',
-		undefined,
-		'base'
-	);
-
-	const [ customSpacingSizes = [], setCustomSpacingSizes ] = useSetting(
-		'spacing.spacingSizes.custom'
-	);
-
-	const [ defaultSpacingSizesEnabled ] = useSetting(
+export default function Spacings() {
+	const [ defaultEnabled ] = useSetting< boolean >(
 		'spacing.defaultSpacingSizes'
 	);
+	const theme = usePresets< SpacingSize >( 'spacing.spacingSizes', 'theme' );
+	const def = usePresets< SpacingSize >( 'spacing.spacingSizes', 'default' );
+	const custom = usePresets< SpacingSize >(
+		'spacing.spacingSizes',
+		'custom'
+	);
 
-	const handleAddSpacing = () => {
-		const index = getNewIndexFromPresets( customSpacingSizes, 'custom-' );
-		const newSpacing = {
-			/* translators: %d: spacing size index */
-			name: sprintf( __( 'New Spacing Size %d' ), index ),
-			size: '1rem',
-			slug: `custom-${ index }`,
-		};
-
-		setCustomSpacingSizes( [ ...customSpacingSizes, newSpacing ] );
+	const addSpacingSize = () => {
+		const index = getNewIndexFromPresets( custom.presets, 'custom-' );
+		custom.setPresets( [
+			...custom.presets,
+			{
+				/* translators: %d: spacing size index */
+				name: sprintf( __( 'New Spacing Size %d' ), index ),
+				size: '1rem',
+				slug: `custom-${ index }`,
+			},
+		] );
 	};
 
-	const hasSameSizeValues = (
-		arr1: SpacingSize[],
-		arr2: SpacingSize[]
-	): boolean =>
-		arr1.map( ( item ) => item.size ).join( '' ) ===
-		arr2.map( ( item ) => item.size ).join( '' );
-
 	return (
-		<VStack spacing={ 2 }>
+		<Stack direction="column" gap="sm">
 			<ScreenHeader
 				title={ __( 'Spacing size presets' ) }
 				description={ __(
 					'Create and edit the presets used for spacing sizes across the site.'
 				) }
 			/>
-
 			<View>
 				<Spacer paddingX={ 4 }>
-					<VStack spacing={ 8 }>
-						{ !! themeSpacingSizes?.length && (
-							<SpacingGroup
+					<Stack direction="column" gap="xl">
+						{ !! theme.presets.length && (
+							<PresetGroup
 								label={ __( 'Theme' ) }
-								origin="theme"
-								spacings={ themeSpacingSizes }
-								handleAddSpacing={ handleAddSpacing }
-								handleResetSpacings={
+								items={ theme.presets }
+								getEditPath={ ( slug ) =>
+									`/layout/spacing/theme/${ slug }`
+								}
+								menuAction={
 									hasSameSizeValues(
-										themeSpacingSizes,
-										baseThemeSpacingSizes
+										theme.presets,
+										theme.basePresets
 									)
-										? null
-										: () =>
-												setThemeSpacingSizes(
-													baseThemeSpacingSizes
+										? undefined
+										: resetMenu( () =>
+												theme.setPresets(
+													theme.basePresets
 												)
+										  )
 								}
 							/>
 						) }
-
-						{ defaultSpacingSizesEnabled &&
-							!! defaultSpacingSizes?.length && (
-								<SpacingGroup
-									label={ __( 'Default' ) }
-									origin="default"
-									spacings={ defaultSpacingSizes }
-									handleAddSpacing={ handleAddSpacing }
-									handleResetSpacings={
-										hasSameSizeValues(
-											defaultSpacingSizes,
-											baseDefaultSpacingSizes
-										)
-											? null
-											: () =>
-													setDefaultSpacingSizes(
-														baseDefaultSpacingSizes
-													)
-									}
-								/>
-							) }
-
-						<SpacingGroup
+						{ defaultEnabled && !! def.presets.length && (
+							<PresetGroup
+								label={ __( 'Default' ) }
+								items={ def.presets }
+								getEditPath={ ( slug ) =>
+									`/layout/spacing/default/${ slug }`
+								}
+								menuAction={
+									hasSameSizeValues(
+										def.presets,
+										def.basePresets
+									)
+										? undefined
+										: resetMenu( () =>
+												def.setPresets(
+													def.basePresets
+												)
+										  )
+								}
+							/>
+						) }
+						<PresetGroup
 							label={ __( 'Custom' ) }
-							origin="custom"
-							spacings={ customSpacingSizes }
-							handleAddSpacing={ handleAddSpacing }
-							handleResetSpacings={
-								customSpacingSizes.length > 0
-									? () => setCustomSpacingSizes( [] )
-									: null
+							items={ custom.presets }
+							getEditPath={ ( slug ) =>
+								`/layout/spacing/custom/${ slug }`
+							}
+							addLabel={ __( 'Add spacing size' ) }
+							onAdd={ addSpacingSize }
+							menuAction={
+								custom.presets.length > 0
+									? {
+											label: __(
+												'Remove spacing size presets'
+											),
+											optionsLabel: __(
+												'Spacing size presets options'
+											),
+											confirmText: __(
+												'Are you sure you want to remove all custom spacing size presets?'
+											),
+											confirmButtonText: __( 'Remove' ),
+											onConfirm: () =>
+												custom.setPresets( [] ),
+									  }
+									: undefined
 							}
 						/>
-					</VStack>
+					</Stack>
 				</Spacer>
 			</View>
-		</VStack>
+		</Stack>
 	);
 }
-
-export default Spacings;

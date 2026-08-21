@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import type { GlobalStylesSettings } from '@wordpress/global-styles-engine';
 
 /**

@@ -1,179 +1,111 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalSpacer as Spacer,
-	useNavigator,
 	__experimentalView as View,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-	privateApis as componentsPrivateApis,
-	Button,
+	useNavigator,
 	FlexItem,
 	ToggleControl,
 } from '@wordpress/components';
-import { moreVertical } from '@wordpress/icons';
 import { useState, useEffect } from '@wordpress/element';
 import type {
 	SpacingSize,
 	FluidSpacingConfig,
 } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
-import { ScreenHeader } from '../screen-header';
+import { Stack } from '@wordpress/ui';
 import SpacingPreview from './spacing-preview';
-import ConfirmDeleteSpacingDialog from './confirm-delete-spacing-dialog';
-import RenameSpacingDialog from './rename-spacing-dialog';
 import { SizeControl } from '../size-control';
-import { useSetting } from '../hooks';
-import { unlock } from '../lock-unlock';
+import { usePresets } from '../presets/use-presets';
+import PresetEditHeader from '../presets/preset-edit-header';
+import type { PresetEditHeaderMenuItem } from '../presets/preset-edit-header';
+import ConfirmDeleteDialog from '../presets/dialogs/confirm-delete-dialog';
+import RenameDialog from '../presets/dialogs/rename-dialog';
 import { parseClampValue, generateClampValue } from './utils';
 
-const { Menu } = unlock( componentsPrivateApis );
-
 function Spacing() {
-	const [ isDeleteConfirmOpen, setIsDeleteConfirmOpen ] = useState( false );
-	const [ isRenameDialogOpen, setIsRenameDialogOpen ] = useState( false );
+	const { params, goBack } = useNavigator();
+	const origin = params.origin as string;
+	const slug = params.slug as string;
 
-	const {
-		params: { origin, slug },
-		goBack,
-	} = useNavigator();
-
-	const [ spacingSizes, setSpacingSizes ] = useSetting<
-		Record< string, SpacingSize[] > | undefined
-	>( 'spacing.spacingSizes' );
-
-	// Get the spacing sizes from the origin, default to empty array.
-	const sizes = spacingSizes?.[ origin as string ] ?? [];
-
-	// Get the spacing size by slug.
-	const originalSpacingSize: SpacingSize | undefined = sizes.find(
-		( size ) => size.slug === slug
+	const { presets, setPresets } = usePresets< SpacingSize >(
+		'spacing.spacingSizes',
+		origin
 	);
 
-	// Navigate to the spacing sizes list if the spacing size is not available.
+	const preset = presets.find( ( p ) => p.slug === slug );
+
+	const [ isDeleteOpen, setIsDeleteOpen ] = useState( false );
+	const [ isRenameOpen, setIsRenameOpen ] = useState( false );
+
+	// The preset can disappear while its screen is open, e.g. when presets are
+	// reset globally. Navigate back to the spacing sizes list in that case.
 	useEffect( () => {
-		if ( !! slug && ! originalSpacingSize ) {
+		if ( !! slug && ! preset ) {
 			goBack();
 		}
-	}, [ slug, originalSpacingSize, goBack ] );
+	}, [ slug, preset, goBack ] );
 
-	if ( ! origin || ! slug || ! originalSpacingSize ) {
+	if ( ! origin || ! slug || ! preset ) {
 		return null;
 	}
 
-	// Parse clamp value if it exists
-	const clampValues = parseClampValue(
-		String( originalSpacingSize?.size ) as string | undefined
-	);
+	const clampValues = parseClampValue( String( preset.size ) );
 	const isClampValue = !! clampValues;
 
-	// Create normalized spacingSize for UI purposes
-	let spacingSize = originalSpacingSize;
-	if ( isClampValue ) {
-		spacingSize = {
-			...originalSpacingSize,
-			size: String( clampValues?.min ) as string | number | null,
-			fluid: {
-				min: clampValues.min,
-				preferred: clampValues.preferred,
-				max: clampValues.max,
-			},
-		};
-	}
+	// Themes commonly author spacing presets directly as a `clamp()` string
+	// rather than as a fluid object. Present those as their three parts so
+	// they can be edited part by part, without rewriting the stored value.
+	const spacingSize: SpacingSize = isClampValue
+		? {
+				...preset,
+				size: String( clampValues.min ),
+				fluid: {
+					min: clampValues.min,
+					preferred: clampValues.preferred,
+					max: clampValues.max,
+				},
+		  }
+		: preset;
 
-	// Whether the spacing size is fluid - check the original spacing size
-	// If fluid property is explicitly set, use that value.
-	// If no fluid property but there's a clamp value, default to true (fluid).
-	// Otherwise default to false.
-	const isFluid =
-		originalSpacingSize?.fluid !== undefined
-			? !! originalSpacingSize.fluid
-			: isClampValue;
+	// If the fluid property is explicitly set, use it. Otherwise a `clamp()`
+	// value counts as fluid, and anything else does not.
+	const isFluid = preset.fluid !== undefined ? !! preset.fluid : isClampValue;
 
-	// Whether custom fluid values are used - check the original spacing size
-	// For clamp values without explicit fluid setting, they are considered custom fluid
 	const isCustomFluid =
-		typeof originalSpacingSize?.fluid === 'object' ||
-		( isClampValue && originalSpacingSize?.fluid === undefined );
+		typeof preset.fluid === 'object' ||
+		( isClampValue && preset.fluid === undefined );
 
-	const handleNameChange = ( value: string ) => {
-		updateSpacingSize( 'name', value );
-	};
+	const set = ( key: keyof SpacingSize, value: unknown ) =>
+		setPresets(
+			presets.map( ( p ) => {
+				if ( p.slug !== slug ) {
+					return p;
+				}
 
-	const handleSpacingSizeChange = ( value: string | undefined ) => {
-		updateSpacingSize( 'size', value );
-	};
+				let updated = { ...p, [ key ]: value } as SpacingSize;
 
-	const handleFluidChange = ( value: boolean | FluidSpacingConfig ) => {
-		updateSpacingSize( 'fluid', value );
-	};
-
-	const handleCustomFluidValues = ( value: boolean | FluidSpacingConfig ) => {
-		if ( value ) {
-			// If custom values are used, init the values with the current ones.
-			updateSpacingSize( 'fluid', {
-				min: spacingSize.size,
-				preferred: spacingSize.size,
-				max: spacingSize.size,
-			} );
-		} else {
-			// If custom fluid values are disabled, set fluid to true.
-			updateSpacingSize( 'fluid', true );
-		}
-	};
-
-	const handleMinChange = ( value: string | undefined ) => {
-		updateSpacingSize( 'fluid', {
-			...( spacingSize.fluid as FluidSpacingConfig ),
-			min: value,
-		} );
-	};
-
-	const handlePreferredChange = ( value: string | undefined ) => {
-		updateSpacingSize( 'fluid', {
-			...( spacingSize.fluid as FluidSpacingConfig ),
-			preferred: value,
-		} );
-	};
-
-	const handleMaxChange = ( value: string | undefined ) => {
-		updateSpacingSize( 'fluid', {
-			...( spacingSize.fluid as FluidSpacingConfig ),
-			max: value,
-		} );
-	};
-
-	const updateSpacingSize = ( key: string, value: any ) => {
-		const newSpacingSizes = sizes.map( ( size ) => {
-			if ( size.slug === slug ) {
-				let updatedSize = { ...size, [ key ]: value };
-
-				// Handle clamp values specially
-				if ( isClampValue ) {
-					if ( key === 'fluid' && typeof value === 'object' ) {
-						// Convert fluid object back to clamp format
-						const clampValue = generateClampValue(
-							value.min,
-							value.preferred,
-							value.max
-						);
-						updatedSize = { ...updatedSize, size: clampValue };
-					} else if ( key === 'fluid' && value === false ) {
-						// When disabling fluid, convert to min value
-						updatedSize = {
-							...updatedSize,
-							size: clampValues.min ?? updatedSize.size,
+				// Keep the stored `size` string in sync for presets authored
+				// as a `clamp()`, so the CSS variable stays fluid.
+				if ( isClampValue && key === 'fluid' ) {
+					if ( value && typeof value === 'object' ) {
+						const fluid = value as FluidSpacingConfig;
+						updated = {
+							...updated,
+							size: generateClampValue(
+								fluid.min as string | undefined,
+								fluid.preferred as string | undefined,
+								fluid.max as string | undefined
+							),
+						};
+					} else if ( value === false ) {
+						// Disabling fluid collapses the clamp to its minimum.
+						updated = {
+							...updated,
+							size: clampValues.min ?? updated.size,
 							fluid: false,
 						};
-					} else if ( key === 'fluid' && value === true ) {
-						// When enabling simple fluid, keep original clamp
-						updatedSize = {
-							...updatedSize,
+					} else if ( value === true ) {
+						updated = {
+							...updated,
 							size: generateClampValue(
 								clampValues.min,
 								clampValues.preferred,
@@ -184,112 +116,69 @@ function Spacing() {
 					}
 				}
 
-				return updatedSize;
-			}
-			return size;
-		} );
+				return updated;
+			} )
+		);
 
-		setSpacingSizes( {
-			...( spacingSizes as Record< string, SpacingSize[] > ),
-			[ origin as string ]: newSpacingSizes,
-		} );
+	const handleCustomFluidValues = ( value: boolean ) => {
+		if ( value ) {
+			// Seed the custom values from the size currently in use.
+			set( 'fluid', {
+				min: spacingSize.size,
+				preferred: spacingSize.size,
+				max: spacingSize.size,
+			} );
+		} else {
+			set( 'fluid', true );
+		}
 	};
 
-	const handleRemoveSpacingSize = () => {
-		const newSpacingSizes = sizes.filter( ( size ) => size.slug !== slug );
-		setSpacingSizes( {
-			...( spacingSizes as Record< string, SpacingSize[] > ),
-			[ origin as string ]: newSpacingSizes,
-		} );
+	const setFluidPart = (
+		part: keyof FluidSpacingConfig,
+		value: string | undefined
+	) => {
+		const fluid: FluidSpacingConfig =
+			typeof spacingSize.fluid === 'object' ? spacingSize.fluid : {};
+		set( 'fluid', { ...fluid, [ part ]: value } );
 	};
 
-	const toggleDeleteConfirm = () => {
-		setIsDeleteConfirmOpen( ! isDeleteConfirmOpen );
-	};
-
-	const toggleRenameDialog = () => {
-		setIsRenameDialogOpen( ! isRenameDialogOpen );
-	};
+	const menuItems: PresetEditHeaderMenuItem[] =
+		origin === 'custom'
+			? [
+					{
+						label: __( 'Rename' ),
+						onClick: () => setIsRenameOpen( true ),
+					},
+					{
+						label: __( 'Delete' ),
+						onClick: () => setIsDeleteOpen( true ),
+					},
+			  ]
+			: [];
 
 	return (
 		<>
-			<ConfirmDeleteSpacingDialog
-				spacingSize={ spacingSize }
-				isOpen={ isDeleteConfirmOpen }
-				toggleOpen={ toggleDeleteConfirm }
-				handleRemoveSpacingSize={ handleRemoveSpacingSize }
-			/>
-
-			{ isRenameDialogOpen && (
-				<RenameSpacingDialog
-					spacingSize={ spacingSize }
-					toggleOpen={ toggleRenameDialog }
-					handleRename={ handleNameChange }
-				/>
-			) }
-
-			<VStack spacing={ 4 }>
-				<HStack justify="space-between" alignment="flex-start">
-					<ScreenHeader
-						title={ spacingSize.name as string }
-						description={ sprintf(
-							/* translators: %s: spacing size preset name. */
-							__( 'Manage the spacing size %s.' ),
-							spacingSize.name
-						) }
-					/>
-					{ origin === 'custom' && (
-						<FlexItem>
-							<Spacer
-								marginTop={ 3 }
-								marginBottom={ 0 }
-								paddingX={ 4 }
-							>
-								<Menu>
-									<Menu.TriggerButton
-										render={
-											<Button
-												size="small"
-												icon={ moreVertical }
-												label={ __(
-													'Spacing size options'
-												) }
-											/>
-										}
-									/>
-									<Menu.Popover>
-										<Menu.Item
-											onClick={ toggleRenameDialog }
-										>
-											<Menu.ItemLabel>
-												{ __( 'Rename' ) }
-											</Menu.ItemLabel>
-										</Menu.Item>
-										<Menu.Item
-											onClick={ toggleDeleteConfirm }
-										>
-											<Menu.ItemLabel>
-												{ __( 'Delete' ) }
-											</Menu.ItemLabel>
-										</Menu.Item>
-									</Menu.Popover>
-								</Menu>
-							</Spacer>
-						</FlexItem>
+			<Stack direction="column" gap="md">
+				<PresetEditHeader
+					title={ spacingSize.name }
+					description={ sprintf(
+						/* translators: %s: spacing size preset name. */
+						__( 'Manage the spacing size %s.' ),
+						spacingSize.name
 					) }
-				</HStack>
-
+					menuLabel={ __( 'Spacing size options' ) }
+					menuItems={ menuItems }
+				/>
 				<View>
 					<Spacer
 						paddingX={ 4 }
 						marginBottom={ 0 }
 						paddingBottom={ 6 }
 					>
-						<VStack spacing={ 4 }>
+						<Stack direction="column" gap="md">
 							<FlexItem>
 								<SpacingPreview spacingSize={ spacingSize } />
 							</FlexItem>
-
 							<SizeControl
 								label={ __( 'Size' ) }
 								value={
@@ -297,21 +186,18 @@ function Spacing() {
 										? ( spacingSize.size as string )
 										: ''
 								}
-								onChange={ handleSpacingSizeChange }
+								onChange={ ( value ) => set( 'size', value ) }
 								disabled={ isCustomFluid }
 								max={ 500 }
 							/>
-
 							<ToggleControl
 								label={ __( 'Fluid spacing' ) }
 								help={ __(
 									'Scale the spacing size dynamically to fit the screen or viewport.'
 								) }
 								checked={ isFluid }
-								onChange={ handleFluidChange }
-								__nextHasNoMarginBottom
+								onChange={ ( value ) => set( 'fluid', value ) }
 							/>
-
 							{ isFluid && (
 								<ToggleControl
 									label={ __( 'Custom fluid values' ) }
@@ -320,10 +206,8 @@ function Spacing() {
 									) }
 									checked={ isCustomFluid }
 									onChange={ handleCustomFluidValues }
-									__nextHasNoMarginBottom
 								/>
 							) }
-
 							{ isFluid &&
 								isCustomFluid &&
 								typeof spacingSize.fluid === 'object' && (
@@ -333,7 +217,9 @@ function Spacing() {
 											value={
 												spacingSize.fluid.min as string
 											}
-											onChange={ handleMinChange }
+											onChange={ ( value ) =>
+												setFluidPart( 'min', value )
+											}
 											max={ 500 }
 										/>
 										<SizeControl
@@ -342,7 +228,12 @@ function Spacing() {
 												spacingSize.fluid
 													.preferred as string
 											}
-											onChange={ handlePreferredChange }
+											onChange={ ( value ) =>
+												setFluidPart(
+													'preferred',
+													value
+												)
+											}
 											max={ 500 }
 										/>
 										<SizeControl
@@ -350,15 +241,50 @@ function Spacing() {
 											value={
 												spacingSize.fluid.max as string
 											}
-											onChange={ handleMaxChange }
+											onChange={ ( value ) =>
+												setFluidPart( 'max', value )
+											}
 											max={ 500 }
 										/>
 									</>
 								) }
-						</VStack>
+						</Stack>
 					</Spacer>
 				</View>
-			</VStack>
+			</Stack>
+			{ isDeleteOpen && (
+				<ConfirmDeleteDialog
+					message={ sprintf(
+						/* translators: %s: Name of the spacing size preset. */
+						__(
+							'Are you sure you want to delete "%s" spacing size preset?'
+						),
+						spacingSize.name
+					) }
+					isOpen={ isDeleteOpen }
+					toggleOpen={ () => setIsDeleteOpen( false ) }
+					onConfirm={ () => {
+						setPresets(
+							presets.filter( ( p ) => p.slug !== slug )
+						);
+						goBack();
+					} }
+				/>
+			) }
+			{ isRenameOpen && (
+				<RenameDialog
+					initialName={ spacingSize.name }
+					placeholder={ __( 'Spacing size preset name' ) }
+					toggleOpen={ () => setIsRenameOpen( false ) }
+					onRename={ ( name ) =>
+						setPresets(
+							presets.map( ( p ) =>
+								p.slug === slug ? { ...p, name } : p
+							)
+						)
+					}
+				/>
+			) }
 		</>
 	);
 }

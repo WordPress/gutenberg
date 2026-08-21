@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import type { SpacingSize } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { parseComparisonValue } from './utils';
 
 /**
@@ -28,20 +21,19 @@ function SpacingPreview( { spacingSize }: SpacingPreviewProps ) {
 		String( spacingValue ) as string | undefined
 	);
 
+	const fluid = spacingSize?.fluid;
 	const hasFluidObject =
-		spacingSize?.fluid &&
-		typeof spacingSize.fluid === 'object' &&
-		spacingSize.fluid.min &&
-		spacingSize.fluid.preferred &&
-		spacingSize.fluid.max;
+		!! fluid &&
+		typeof fluid === 'object' &&
+		!! fluid.min &&
+		!! fluid.preferred &&
+		!! fluid.max;
 
 	let boxSize = previewValue;
 	let label = displayValue;
-	if ( hasFluidObject ) {
-		// @ts-ignore
-		const { min, preferred, max } = spacingSize.fluid;
-		const preferredValue = preferred || spacingSize.size || '1rem';
-		boxSize = preferredValue;
+	if ( hasFluidObject && typeof fluid === 'object' ) {
+		const { min, preferred, max } = fluid;
+		boxSize = String( preferred || spacingSize.size || '1rem' );
 		label = `${ min } → ${ max }`;
 	}
 
@@ -51,7 +43,9 @@ function SpacingPreview( { spacingSize }: SpacingPreviewProps ) {
 				className="global-styles-ui-spacing-preview__box"
 				style={ { width: boxSize, height: boxSize } }
 			/>
-			<div className="global-styles-ui-spacing-preview__value">{ label }</div>
+			<div className="global-styles-ui-spacing-preview__value">
+				{ label }
+			</div>
 		</div>
 	);
 }

@@ -1786,6 +1786,21 @@
 			"count": 3
 		}
 	},
+	"packages/global-styles-ui/src/spacing/spacing.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 3
+		}
+	},
+	"packages/global-styles-ui/src/spacing/spacings-count.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 3
+		}
+	},
+	"packages/global-styles-ui/src/spacing/spacings.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 2
+		}
+	},
 	"packages/global-styles-ui/src/style-variations-container.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
