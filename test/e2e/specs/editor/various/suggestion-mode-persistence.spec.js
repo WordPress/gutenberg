@@ -11,6 +11,9 @@
  *     can still be accepted or rejected afterwards.
  *   - Un-accepted insertions never render on the public front end (the
  *     type-aware render_block strip), while pending removals still do.
+ *   - An un-accepted move does not change what readers see: the front end
+ *     renders the pre-move order even though `post_content` holds the
+ *     proposed one.
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
@@ -268,6 +271,234 @@ test.describe( 'Suggestion mode persistence', () => {
 		await expect(
 			page.locator( 'body' ).getByText( 'Proposed new paragraph' )
 		).toBeHidden();
+	} );
+
+	test( 'a pending move renders in its original order on the front end', async ( {
+		editor,
+		page,
+	} ) => {
+		/*
+		 * A move is the one structural suggestion with nothing to strip: the
+		 * block is real content and the proposal is its POSITION. The editor
+		 * keeps the proposed order (that is what a reviewer needs to see), so
+		 * the pre-render pass has to put it back for readers.
+		 */
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Alpha the first' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Bravo the second' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const mover = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Alpha the first' } );
+		await editor.selectBlocks( mover );
+
+		const suggestionSaved = suggestionSavedPromise( page );
+		await editor.clickBlockToolbarButton( 'Move down' );
+		await expect( mover ).toHaveClass( /is-suggestion-pending-move/ );
+		await suggestionSaved;
+
+		/*
+		 * The editor - and `post_content` - hold the PROPOSED order. Both
+		 * texts are asserted present first: comparing two `indexOf` results
+		 * alone passes vacuously when the expected text is missing, since a
+		 * -1 is less than any real offset.
+		 */
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).toContain( 'Alpha the first' );
+		expect( serialized ).toContain( 'Bravo the second' );
+		expect( serialized.indexOf( 'Bravo the second' ) ).toBeLessThan(
+			serialized.indexOf( 'Alpha the first' )
+		);
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const rendered = await page.locator( 'body' ).innerText();
+		expect( rendered ).toContain( 'Alpha the first' );
+		expect( rendered ).toContain( 'Bravo the second' );
+		// Readers still see the order the post is actually in.
+		expect( rendered.indexOf( 'Alpha the first' ) ).toBeLessThan(
+			rendered.indexOf( 'Bravo the second' )
+		);
+	} );
+
+	test( 'two pending moves in one list keep the proposed order on the front end', async ( {
+		editor,
+		page,
+	} ) => {
+		/*
+		 * `fromIndex` is measured against the order the list was in when the
+		 * move was made, so the second move records an index the first move
+		 * already shifted. Replaying both would publish an order that existed
+		 * in no version of the document - here [Bravo, Alpha, Charlie], which
+		 * is neither the baseline [Alpha, Bravo, Charlie] nor the proposal.
+		 * The renderer declines the whole list instead.
+		 */
+		for ( const content of [
+			'Alpha the first',
+			'Bravo the second',
+			'Charlie the third',
+		] ) {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content },
+			} );
+		}
+
+		await switchIntent( page, 'Suggesting' );
+
+		const blockNamed = ( text ) =>
+			editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.filter( { hasText: text } );
+
+		// Move Charlie to the top: [Charlie, Alpha, Bravo].
+		const charlie = blockNamed( 'Charlie the third' );
+		await editor.selectBlocks( charlie );
+		let saved = suggestionSavedPromise( page );
+		await editor.clickBlockToolbarButton( 'Move up' );
+		await editor.clickBlockToolbarButton( 'Move up' );
+		await expect( charlie ).toHaveClass( /is-suggestion-pending-move/ );
+		await saved;
+
+		// Move Alpha to the end: [Charlie, Bravo, Alpha].
+		const alpha = blockNamed( 'Alpha the first' );
+		await editor.selectBlocks( alpha );
+		saved = suggestionSavedPromise( page );
+		await editor.clickBlockToolbarButton( 'Move down' );
+		await expect( alpha ).toHaveClass( /is-suggestion-pending-move/ );
+		await saved;
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const rendered = await page.locator( 'body' ).innerText();
+		for ( const text of [
+			'Alpha the first',
+			'Bravo the second',
+			'Charlie the third',
+		] ) {
+			expect( rendered ).toContain( text );
+		}
+		const order = [
+			'Alpha the first',
+			'Bravo the second',
+			'Charlie the third',
+		]
+			.map( ( text ) => [ text, rendered.indexOf( text ) ] )
+			.sort( ( a, b ) => a[ 1 ] - b[ 1 ] )
+			.map( ( [ text ] ) => text );
+
+		// The proposed order, untouched - not a fabricated third order.
+		expect( order ).toEqual( [
+			'Charlie the third',
+			'Bravo the second',
+			'Alpha the first',
+		] );
+	} );
+
+	test( 'a pending move between two groups renders where the block sits', async ( {
+		editor,
+		page,
+	} ) => {
+		/*
+		 * Client IDs never reach the server, so a move between two different
+		 * nested parents cannot be identified from `fromParentClientId`
+		 * alone: it is a non-empty ID either way. Applying its `fromIndex`
+		 * inside the destination Group would drop the block at an offset of a
+		 * list it never belonged to, so the marker records `crossedParents`
+		 * and the renderer leaves the block alone.
+		 */
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: { layout: { type: 'default' } },
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Group A traveller' },
+				},
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Group A resident' },
+				},
+			],
+		} );
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: { layout: { type: 'default' } },
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Group B first' },
+				},
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Group B second' },
+				},
+			],
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const traveller = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Group A traveller' } );
+		await editor.selectBlocks( traveller );
+
+		/*
+		 * Dispatched rather than driven through the toolbar: the "Move down"
+		 * button will not carry a block across a Group boundary from the tail
+		 * of its parent, and drag-and-drop needs lower-level input injection
+		 * than Playwright exposes here. `moveBlocksToPosition` is the same
+		 * store action a drag ends in, so the interceptor sees exactly what a
+		 * dragged block would produce.
+		 */
+		const saved = suggestionSavedPromise( page );
+		await page.evaluate( () => {
+			const { select, dispatch } = window.wp.data;
+			const [ groupA, groupB ] =
+				select( 'core/block-editor' ).getBlocks();
+			dispatch( 'core/block-editor' ).moveBlocksToPosition(
+				[ groupA.innerBlocks[ 0 ].clientId ],
+				groupA.clientId,
+				groupB.clientId,
+				groupB.innerBlocks.length
+			);
+		} );
+		await expect( traveller ).toHaveClass( /is-suggestion-pending-move/ );
+		await saved;
+
+		// It really did change parents: it now trails Group B's children.
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).toContain( '"crossedParents":true' );
+		expect( serialized.indexOf( 'Group B first' ) ).toBeGreaterThan( -1 );
+		expect( serialized.indexOf( 'Group A traveller' ) ).toBeGreaterThan(
+			serialized.indexOf( 'Group B first' )
+		);
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const rendered = await page.locator( 'body' ).innerText();
+		expect( rendered ).toContain( 'Group A traveller' );
+		expect( rendered ).toContain( 'Group B first' );
+		/*
+		 * Left where it sits. The bug this guards is the block being hoisted
+		 * to the FRONT of Group B, the offset it held back in Group A.
+		 */
+		expect( rendered.indexOf( 'Group A traveller' ) ).toBeGreaterThan(
+			rendered.indexOf( 'Group B first' )
+		);
+		expect( rendered.indexOf( 'Group A traveller' ) ).toBeGreaterThan(
+			rendered.indexOf( 'Group B second' )
+		);
 	} );
 
 	test( 'pending inline suggestions on the front end: additions are hidden, deletions and format runs render their text', async ( {

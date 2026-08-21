@@ -838,6 +838,13 @@ export const setEditorIntent =
 
 		dispatch( { type: 'SET_EDITOR_INTENT', intent } );
 
+		// The view intent puts the canvas in preview mode, where nothing can
+		// be inserted. An inserter left open over it offers a library that
+		// can't do anything, so close it on the way in.
+		if ( intent === EDITOR_INTENT_VIEW && select.isInserterOpened() ) {
+			dispatch.setIsInserterOpened( false );
+		}
+
 		// Skip the snackbar/announcement on the initial set (when there is no
 		// previous intent, e.g. during editor boot) so the user isn't greeted
 		// with a mode notice they didn't trigger.

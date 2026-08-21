@@ -2,6 +2,28 @@ import { RichTextData, create, removeFormat } from '@wordpress/rich-text';
 import { SUGGESTION_CLASS, SUGGESTION_FORMAT_NAME } from './format';
 
 /**
+ * Whether an attribute value carries a live inline suggestion marker.
+ *
+ * A containment probe on the serialized marker class, not a rich-text parse:
+ * callers use it on every edit to decide whether the whole-content overlay
+ * fallback would strip a marker that is still rendering, so it has to be cheap.
+ * False positives are limited to values that mention the class in text, which
+ * would only cost an edit its overlay capture.
+ *
+ * @param {*} value Attribute value (string, RichTextData, or anything else).
+ * @return {boolean} True when the value contains a `core/suggestion` marker.
+ */
+export function hasSuggestionMarkers( value ) {
+	if ( typeof value === 'string' ) {
+		return value.includes( SUGGESTION_CLASS );
+	}
+	if ( value instanceof RichTextData ) {
+		return value.toHTMLString().includes( SUGGESTION_CLASS );
+	}
+	return false;
+}
+
+/**
  * Strip inline `core/suggestion` markers from a single attribute value,
  * unwrapping the `<mark class="wp-suggestion">` format while keeping the text
  * and every other format (bold, links, and nested notes markers included).

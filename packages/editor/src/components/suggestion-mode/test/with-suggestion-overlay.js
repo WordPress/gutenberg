@@ -78,11 +78,18 @@ function FakeBlock( { attributes, setAttributes } ) {
 	return (
 		<>
 			<div data-testid="content">{ attributes?.content ?? '' }</div>
+			<div data-testid="level">{ attributes?.level ?? '' }</div>
 			<button
 				type="button"
 				onClick={ () => setAttributes( { content: 'proposed' } ) }
 			>
 				edit
+			</button>
+			<button
+				type="button"
+				onClick={ () => setAttributes( { level: 3 } ) }
+			>
+				edit level
 			</button>
 		</>
 	);
@@ -185,12 +192,67 @@ describe( 'withSuggestionOverlay', () => {
 		expect( screen.getByTestId( 'content' ) ).toHaveTextContent( 'Hello' );
 	} );
 
-	it( 'strips live suggestion markers from overlay baseline and after snapshots', () => {
-		// Another author's pending marker lives in the block content. When an
-		// edit falls through to the attribute overlay, neither the baseline
-		// nor the proposed value may capture that marker - replaying `after`
-		// on accept would otherwise resurrect a marker whose suggestion was
-		// resolved in the interim.
+	it( 'declines an edit that would bury a live marker under an overlay', () => {
+		// An overlay snapshot is marker-free by construction and renders in
+		// place of the block's live value, so capturing one for an attribute
+		// that still holds a marker hides that marker while its note keeps
+		// describing it - the block would carry both representations of a
+		// pending change at once (#73411, F-09). The edit is declined instead.
+		registerSuggestionFormat();
+		try {
+			const marked =
+				'Hello <mark class="wp-suggestion" data-suggestion-id="9" data-suggestion-type="del">doomed</mark>';
+			let overlayHandle;
+			function CaptureOverlay() {
+				const overlay = useSuggestionOverlay();
+				useEffect( () => {
+					overlayHandle = overlay;
+				}, [ overlay ] );
+				return null;
+			}
+
+			const setAttributes = jest.fn();
+			const { registry } = renderWithProviders(
+				<>
+					<CaptureOverlay />
+					<Wrapped
+						clientId="a"
+						name="core/paragraph"
+						attributes={ { content: marked } }
+						setAttributes={ setAttributes }
+					/>
+				</>,
+				{ intent: 'suggest' }
+			);
+
+			fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
+
+			// No overlay entry, and the block was not written through either:
+			// the marker and its note are left exactly as they were.
+			expect( overlayHandle.entries.a ).toBeUndefined();
+			expect( setAttributes ).not.toHaveBeenCalled();
+			// The user is told why, rather than the edit vanishing silently.
+			// (The intent switch itself announces a snackbar, hence the find.)
+			const refusal = registry
+				.select( noticesStore )
+				.getNotices()
+				.find( ( notice ) =>
+					notice.content.includes( 'overlaps a pending suggestion' )
+				);
+			expect( refusal ).toBeDefined();
+			expect( refusal.status ).toBe( 'warning' );
+		} finally {
+			unregisterFormatType( SUGGESTION_FORMAT_NAME );
+		}
+	} );
+
+	it( 'strips live suggestion markers from an attribute-only overlay baseline', () => {
+		// An attribute suggestion that leaves the marked attribute alone (a
+		// heading level change on a block whose content holds someone's
+		// marker) still goes to the overlay - it neither hides the marker nor
+		// competes with it. The baseline snapshot must still be marker-free:
+		// replaying it on accept would otherwise resurrect a marker whose
+		// suggestion was resolved in the interim.
 		registerSuggestionFormat();
 		try {
 			const marked =
@@ -209,15 +271,17 @@ describe( 'withSuggestionOverlay', () => {
 					<CaptureOverlay />
 					<Wrapped
 						clientId="a"
-						name="core/paragraph"
-						attributes={ { content: marked } }
+						name="core/heading"
+						attributes={ { content: marked, level: 2 } }
 						setAttributes={ jest.fn() }
 					/>
 				</>,
 				{ intent: 'suggest' }
 			);
 
-			fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
+			fireEvent.click(
+				screen.getByRole( 'button', { name: 'edit level' } )
+			);
 
 			const entry = overlayHandle.entries.a;
 			expect( entry ).toBeDefined();
@@ -226,8 +290,15 @@ describe( 'withSuggestionOverlay', () => {
 			expect( entry.baselineAttributes.content ).not.toContain(
 				'wp-suggestion'
 			);
-			// The proposed value is clean too.
-			expect( entry.overlayAttributes.content ).toBe( 'proposed' );
+			// Only the attribute the user actually changed is proposed, so the
+			// marked content is never replayed on accept.
+			expect( entry.overlayAttributes ).toEqual( { level: 3 } );
+			// The block renders the proposed level over its still-marked
+			// content: the overlay covers one attribute, not the whole block.
+			expect( screen.getByTestId( 'level' ) ).toHaveTextContent( '3' );
+			expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
+				'wp-suggestion'
+			);
 		} finally {
 			unregisterFormatType( SUGGESTION_FORMAT_NAME );
 		}
