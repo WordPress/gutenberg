@@ -2,7 +2,6 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	Button,
 	FlexItem,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { isRTL } from '@wordpress/i18n';
 import {
@@ -13,13 +12,11 @@ import {
 	moreVertical,
 } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
-import { Stack } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { Menu, Stack } from '@wordpress/ui';
 import { Subtitle } from '../subtitle';
 import { NavigationButtonAsItem } from '../navigation-button';
-import { unlock } from '../lock-unlock';
 import ConfirmResetDialog from './dialogs/confirm-reset-dialog';
-
-const { Menu } = unlock( componentsPrivateApis );
 
 interface PresetGroupItem {
 	name: string;
@@ -77,8 +74,8 @@ export default function PresetGroup( {
 						/>
 					) }
 					{ showMenu && (
-						<Menu>
-							<Menu.TriggerButton
+						<Menu.Root>
+							<Menu.Trigger
 								render={
 									<Button
 										size="small"
@@ -87,7 +84,7 @@ export default function PresetGroup( {
 									/>
 								}
 							/>
-							<Menu.Popover>
+							<Menu.Popup>
 								<Menu.Item
 									onClick={ () => setIsResetOpen( true ) }
 								>
@@ -95,8 +92,8 @@ export default function PresetGroup( {
 										{ menuAction.label }
 									</Menu.ItemLabel>
 								</Menu.Item>
-							</Menu.Popover>
-						</Menu>
+							</Menu.Popup>
+						</Menu.Root>
 					) }
 				</FlexItem>
 			</Stack>

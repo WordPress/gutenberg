@@ -6,6 +6,10 @@
 
 -   Add a text shadow presets screen under Typography ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
 
+### Internal
+
+-   Global Styles UI: replace the private `Menu` from `@wordpress/components` with the public `Menu` from `@wordpress/ui` for preset actions and the block filter.
+
 ## 1.22.0 (2026-09-10)
 
 ### Enhancements
