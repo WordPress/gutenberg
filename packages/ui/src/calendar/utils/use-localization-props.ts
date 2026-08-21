@@ -87,6 +87,8 @@ export const useLocalizationProps = ( {
 		const intlLocale = new Intl.Locale(
 			localeCode
 		) as IntlLocaleWithWeekInfo;
+		// Date-fns locale objects already define their own week start. Preserve
+		// that value for backward compatibility.
 		const weekStartsOn = isLocaleString
 			? getWeekStartsOn( intlLocale )
 			: undefined;
@@ -210,9 +212,7 @@ export const useLocalizationProps = ( {
 			dir: isLocaleRTL( intlLocale ) ? 'rtl' : 'ltr',
 			...( weekStartsOn === undefined ? {} : { weekStartsOn } ),
 			formatters: {
-				formatDay: ( date: Date ) => {
-					return dayNumberFormatter.format( date );
-				},
+				formatDay: dayNumberFormatter.format,
 				formatWeekdayName: ( date: Date ) => {
 					return weekdayNarrowFormatter.format( date );
 				},
