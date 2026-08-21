@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Color palette panel: do not render the theme colors wrapper when the theme provides no colors, which left an empty gap above the Custom section.
+
 ### Enhancements
 
 -   Expose typography and color controls for citations, inputs, and selects in Global Styles ([#80852](https://github.com/WordPress/gutenberg/pull/80852)).
