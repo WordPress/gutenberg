@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
-import clsx from 'clsx';
 import { useRef, useCallback, useState } from '@wordpress/element';
 import { debounce } from '@wordpress/compose';
 import { Button } from '../../../button';
@@ -57,55 +56,6 @@ export const WithMultipleControls: Story = {
 					onValueChange={ ( next ) => setText2( next ?? '' ) }
 					customValidity={
 						text2.toLowerCase() === 'error'
-							? {
-									type: 'invalid',
-									message: 'The word "error" is not allowed.',
-							  }
-							: undefined
-					}
-				/>
-			</>
-		);
-	},
-};
-
-/**
- * Description text can be configured to be hidden when a custom error is
- * reported. Whether to opt for this approach will depend on context.
- */
-export const WithDescriptionReplacement: Story = {
-	decorators: [ formDecorator ],
-	render: function Template() {
-		const [ text, setText ] = useState( '' );
-		const isInvalid = text.toLowerCase() === 'error';
-
-		return (
-			<>
-				<style>
-					{ `
-				.my-control:has(:invalid[data-validity-visible]) .my-control__details:not(.is-visible) {
-					display: none;
-				}
-				` }
-				</style>
-				<ValidatedInputControl
-					className="my-control"
-					label="Text"
-					required
-					value={ text }
-					details={
-						<span
-							className={ clsx(
-								'my-control__details',
-								! isInvalid && 'is-visible'
-							) }
-						>
-							The word &quot;error&quot; is not allowed.
-						</span>
-					}
-					onValueChange={ ( next ) => setText( next ?? '' ) }
-					customValidity={
-						isInvalid
 							? {
 									type: 'invalid',
 									message: 'The word "error" is not allowed.',
