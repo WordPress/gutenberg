@@ -149,7 +149,7 @@ describe( 'DateControl', () => {
 
 			// …and select the end of the range there. The view must not
 			// jump back to the month of the range start.
-			await user.click( getDayButton( new Date( 2024, 3, 10 ) ) );
+			await user.click( getDayButton( new Date( 2024, 3, 1 ) ) );
 
 			expect( getMonthGrid( 'April 2024' ) ).toBeInTheDocument();
 		} );

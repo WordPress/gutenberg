@@ -569,7 +569,8 @@ function CalendarDateRangeControl< Item >( {
 							{
 								start: startOfMonth( currentCalendarMonth ),
 								end: endOfMonth( currentCalendarMonth ),
-							}
+							},
+							{ inclusive: true }
 					  )
 					: [ calendarFrom, calendarTo ].some(
 							( date ) =>
