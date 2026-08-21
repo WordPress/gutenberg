@@ -94,8 +94,7 @@ _Usage_
 
 For example, for the given string:
 
-"This is a <span>string</span> with <a>a link</a> and a self-closing
-<CustomComponentB/> tag"
+"This is a <span>string</span> with <a>a link</a> and a self-closing <CustomComponentB/> tag"
 
 You would have something like this as the conversionMap value:
 

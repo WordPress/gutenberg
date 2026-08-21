@@ -2,8 +2,11 @@
 
 ## Unreleased
 
-## 2.53.0 (2026-08-12)
+### Internal
 
+-   Update `remark` to 13 and drop the direct `remark-parse` and `unified` dependencies. GFM syntax (autolink literals, tables, strikethrough, task lists) now comes from `micromark-extension-gfm` and `mdast-util-gfm`. The Markdown formatter now follows CommonMark: an ordered list that directly follows a paragraph in a description is emitted as a list, and square brackets and tildes in text are escaped.
+
+## 2.53.0 (2026-08-12)
 
 ## 2.52.0 (2026-07-29)
 

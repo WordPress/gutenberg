@@ -1,5 +1,5 @@
-const remark = require( 'remark' );
 const getSymbolTagsByName = require( '../get-symbol-tags-by-name' );
+const createProcessor = require( './processor' );
 
 const cleanSpaces = ( paragraph ) =>
 	paragraph
@@ -66,7 +66,7 @@ const formatDeprecated = ( tags, docs ) => {
 };
 
 const formatDescription = ( description, docs ) => {
-	const processor = remark().use( () => {
+	const processor = createProcessor().use( () => {
 		return function transformer( tree ) {
 			tree.children.forEach( function ( node ) {
 				if ( node.children ) {
@@ -93,10 +93,13 @@ const getHeading = ( index, text ) => {
 };
 
 const getTypeOutput = ( tag ) => {
+	// Types are copied from the doc comment as written, so `{ Foo }` keeps its
+	// inner whitespace. Trim it so the code span does not carry it.
+	const type = typeof tag.type === 'string' ? tag.type.trim() : tag.type;
 	if ( tag.optional ) {
-		return `\`[${ tag.type }]\``;
+		return `\`[${ type }]\``;
 	}
-	return `\`${ tag.type }\``;
+	return `\`${ type }\``;
 };
 
 module.exports = (

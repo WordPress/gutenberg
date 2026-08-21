@@ -55,7 +55,7 @@ _Related_
 
 _Parameters_
 
--   _domain_ `[ string | undefined ]`: Domain for which to get the data.
+-   _domain_ `[string | undefined]`: Domain for which to get the data.
 
 _Returns_
 
@@ -108,7 +108,7 @@ _Related_
 
 _Parameters_
 
--   _data_ `[LocaleData ]`: Locale data configuration.
+-   _data_ `[LocaleData]`: Locale data configuration.
 -   _domain_ `[string | undefined]`: Domain for which configuration applies.
 
 ### sprintf
