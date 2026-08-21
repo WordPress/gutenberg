@@ -52,6 +52,10 @@ jest.mock( '../../utils/hooks', () => ( {
 	useUploadMediaFromBlobURL: jest.fn(),
 } ) );
 
+// The handler only forwards the message to a notice, so its text is
+// irrelevant to what these tests check.
+const UPLOAD_ERROR = 'Upload failed.';
+
 const defaultAttributes = {
 	id: 1,
 	src: 'https://example.com/song.mp3',
@@ -190,11 +194,9 @@ describe( 'PlaylistTrackEdit', () => {
 	} );
 
 	it( 'removes the track when its initial upload fails', () => {
+		const createErrorNotice = jest.fn();
 		const removeBlock = jest.fn();
-		useDispatch.mockReturnValue( {
-			createErrorNotice: jest.fn(),
-			removeBlock,
-		} );
+		useDispatch.mockReturnValue( { createErrorNotice, removeBlock } );
 
 		const { removeTrack } = renderEdit( {
 			attributes: {
@@ -208,9 +210,10 @@ describe( 'PlaylistTrackEdit', () => {
 
 		const { onError } = useUploadMediaFromBlobURL.mock.calls[ 0 ][ 0 ];
 		act( () => {
-			onError( 'Sorry, you are not allowed to upload this file type.' );
+			onError( UPLOAD_ERROR );
 		} );
 
+		expect( createErrorNotice ).toHaveBeenCalled();
 		// The playlist owns its inner blocks: removing the track directly
 		// would take an unmodified playlist with it.
 		expect( removeTrack ).toHaveBeenCalledWith( 'temporary-track' );
@@ -229,9 +232,7 @@ describe( 'PlaylistTrackEdit', () => {
 		// A failed replacement is reported by MediaReplaceFlow, not the
 		// blob uploader, which never runs for a track that has a source.
 		act( () => {
-			mockMediaReplaceFlowProps.onError(
-				'Sorry, you are not allowed to upload this file type.'
-			);
+			mockMediaReplaceFlowProps.onError( UPLOAD_ERROR );
 		} );
 
 		expect( createErrorNotice ).toHaveBeenCalled();

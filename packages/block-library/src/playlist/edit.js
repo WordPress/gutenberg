@@ -272,8 +272,6 @@ const PlaylistEdit = ( {
 			}
 
 			setCurrentTrackClientId( newBlocks[ 0 ].clientId );
-			// Insert rather than rebuild the inner blocks, so tracks that have
-			// no source yet are left alone instead of being filtered away.
 			insertBlocks( newBlocks, undefined, clientId, false );
 			selectBlock( newBlocks[ 0 ].clientId );
 		},
@@ -289,12 +287,8 @@ const PlaylistEdit = ( {
 
 	const removeTrack = useCallback(
 		( trackClientId ) => {
-			/*
-			 * `removeBlock` would also remove this playlist: removing the last
-			 * inner block of a container whose own attributes are unmodified
-			 * removes the container with it. Replacing the track with nothing
-			 * leaves the playlist in place, showing its placeholder.
-			 */
+			// Not `removeBlock`: it removes the container along with its
+			// last inner block, so this would take the playlist with it.
 			replaceBlocks( trackClientId, [] );
 		},
 		[ replaceBlocks ]
