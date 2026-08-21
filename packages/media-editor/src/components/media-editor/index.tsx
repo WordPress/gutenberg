@@ -72,6 +72,14 @@ export interface MediaEditorFrameProps {
 	 * all.
 	 */
 	isImage: boolean;
+	/**
+	 * Whether the canvas is on screen. `false` when a panel has replaced it,
+	 * which only happens below the dock breakpoint. `HistoryActions` renders
+	 * nothing then — its Reset, undo and redo act on the cropper — so a frame
+	 * uses this the same way it uses `isImage`: to decide whether to render
+	 * the container at all.
+	 */
+	hasCanvas: boolean;
 	layout: 'wide' | 'narrow';
 	onRequestClose: () => void;
 	onKeyDown: ( event: ReactKeyboardEvent< HTMLElement > ) => void;
@@ -242,7 +250,7 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 }
 
 function HistoryActions() {
-	const { isImage, isUndoRedoDisabled, onReset } =
+	const { isImage, isUndoRedoDisabled, onReset, isWide, activePanel } =
 		useMediaEditorFrameContext();
 	const {
 		reset,
@@ -254,9 +262,15 @@ function HistoryActions() {
 		beginGesture,
 		endGesture,
 	} = useMediaEditor();
-	// Non-image media has no edit history. Checked after the hooks above so
-	// the hook order stays stable across renders.
-	if ( ! isImage ) {
+	// Reset, undo and redo act on the cropper, so they only appear where the
+	// canvas does. Non-image media has no edit history at all; below the dock
+	// breakpoint an open panel replaces the canvas, and leaving these behind
+	// would put an enabled, destructive Reset next to metadata fields it does
+	// not touch — clicking it would discard a crop the user cannot see.
+	// (Metadata edits have no undo of their own; a history spanning both is a
+	// larger change than hiding these.) Checked after the hooks above so the
+	// hook order stays stable across renders.
+	if ( ! isImage || ( ! isWide && !! activePanel ) ) {
 		return null;
 	}
 	const handleUndo = () => {
@@ -683,6 +697,7 @@ function MediaEditorContent( {
 			{ renderFrame( {
 				children,
 				isImage,
+				hasCanvas: isWide || ! activePanel,
 				layout,
 				onRequestClose: handleRequestClose,
 				onKeyDown: handleKeyDown,

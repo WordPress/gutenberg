@@ -16,6 +16,7 @@
 ### Breaking Changes
 
 -   `MediaEditor`: the `scope` prop no longer does anything. It selected the `@wordpress/interface` scope that persisted the details sidebar's visibility; the sidebar no longer uses `ComplementaryArea` and its open state is decided by width rather than remembered. The prop is still accepted so existing callers compile.
+-   `MediaEditor.HistoryActions` renders nothing while a panel covers the canvas. Reset, undo and redo act on the cropper, so leaving them beside the metadata fields put an enabled, destructive Reset next to a crop the user could not see. `renderFrame` gains `hasCanvas` so a frame can drop the container it would have put them in.
 -   `MediaEditor.ImageControls` is removed. Rotate, flip, zoom and aspect ratio now sit under the canvas at every width, placed by the editor itself, so there is nothing for a frame to position.
 
 ### Bug Fixes

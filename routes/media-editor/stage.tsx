@@ -32,6 +32,7 @@ interface SaveResult {
 interface FrameProps {
 	children: ReactNode;
 	isImage: boolean;
+	hasCanvas: boolean;
 	layout: 'wide' | 'narrow';
 	onKeyDown: ( event: KeyboardEvent< HTMLElement > ) => void;
 }
@@ -100,6 +101,7 @@ function MediaEditorRoute() {
 			renderFrame={ ( {
 				children,
 				isImage,
+				hasCanvas,
 				layout,
 				onKeyDown,
 			}: FrameProps ) => {
@@ -155,7 +157,7 @@ function MediaEditorRoute() {
 							<div className="media-editor-route__content">
 								{ children }
 							</div>
-							{ isNarrow && isImage && (
+							{ isNarrow && isImage && hasCanvas && (
 								<div className="media-editor-route__toolbar">
 									<MediaEditor.HistoryActions />
 								</div>
