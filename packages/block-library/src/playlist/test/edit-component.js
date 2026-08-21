@@ -60,7 +60,21 @@ jest.mock( '@wordpress/blob', () => ( {
 jest.mock( '@wordpress/components', () => ( {
 	Disabled: ( { children } ) => <div>{ children }</div>,
 	SelectControl: () => <div />,
-	ToggleControl: () => <div />,
+	ToggleControl: ( { checked, label } ) => {
+		const id = `toggle-${ label.replaceAll( ' ', '-' ).toLowerCase() }`;
+
+		return (
+			<label htmlFor={ id }>
+				<input
+					id={ id }
+					type="checkbox"
+					checked={ !! checked }
+					readOnly
+				/>
+				{ label }
+			</label>
+		);
+	},
 	__experimentalToolsPanel: ( { children } ) => <div>{ children }</div>,
 	__experimentalToolsPanelItem: ( { children } ) => <div>{ children }</div>,
 } ) );
@@ -192,6 +206,28 @@ describe( 'PlaylistEdit', () => {
 			'wp-block-playlist__tracklist-is-hidden'
 		);
 		expect( screen.getByTestId( 'playlist-track' ) ).toBeInTheDocument();
+	} );
+
+	it( 'keeps the album display control available when the tracklist is hidden', () => {
+		render(
+			<PlaylistEdit
+				attributes={ {
+					...defaultAttributes,
+					showAlbum: true,
+					showTracklist: false,
+				} }
+				clientId="playlist-1"
+				insertBlocksAfter={ jest.fn() }
+				isSelected={ false }
+				setAttributes={ jest.fn() }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'checkbox', {
+				name: 'Show album name',
+			} )
+		).toBeChecked();
 	} );
 
 	it( 'passes the album name to the waveform player when album display is enabled', () => {

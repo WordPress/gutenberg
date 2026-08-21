@@ -545,20 +545,6 @@ const PlaylistEdit = ( {
 								/>
 							</ToolsPanelItem>
 							<ToolsPanelItem
-								label={ __( 'Show album name' ) }
-								isShownByDefault
-								hasValue={ () => showAlbum !== false }
-								onDeselect={ () =>
-									setAttributes( { showAlbum: false } )
-								}
-							>
-								<ToggleControl
-									label={ __( 'Show album name' ) }
-									onChange={ toggleAttribute( 'showAlbum' ) }
-									checked={ showAlbum }
-								/>
-							</ToolsPanelItem>
-							<ToolsPanelItem
 								label={ __(
 									'Show track numbers in tracklist'
 								) }
@@ -600,6 +586,20 @@ const PlaylistEdit = ( {
 							</ToolsPanelItem>
 						</>
 					) }
+					<ToolsPanelItem
+						label={ __( 'Show album name' ) }
+						isShownByDefault
+						hasValue={ () => showAlbum !== false }
+						onDeselect={ () =>
+							setAttributes( { showAlbum: false } )
+						}
+					>
+						<ToggleControl
+							label={ __( 'Show album name' ) }
+							onChange={ toggleAttribute( 'showAlbum' ) }
+							checked={ showAlbum }
+						/>
+					</ToolsPanelItem>
 					<ToolsPanelItem
 						label={ __( 'Show tracklist images' ) }
 						isShownByDefault
