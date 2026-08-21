@@ -167,10 +167,35 @@ export default function EditorInterface( {
 	 */
 	const skeletonRef = useRef();
 	const previousModeRef = useRef( mode );
+
+	/*
+	 * Whether focus was last inside the editor. There is only focus to
+	 * restore if the editor had some: `mode` also settles a beat after the
+	 * first render, because the editor settings arrive from a layout effect
+	 * and `getEditorMode` cannot answer for a post whose content has not
+	 * loaded yet, and an untouched `<body>` on the way through boot looks
+	 * exactly like the orphaned `<body>` a swap leaves behind. Treating the
+	 * two alike takes focus off the top of the page on load - and scrolls
+	 * the canvas into view - for everyone whose settled mode is not the one
+	 * the first render assumed, the "Disable the visual editor when writing"
+	 * profile option among them.
+	 */
+	const hadFocusRef = useRef( false );
+	useEffect( () => {
+		const handleFocusIn = ( event ) => {
+			hadFocusRef.current = !! skeletonRef.current?.contains(
+				event.target
+			);
+		};
+		document.addEventListener( 'focusin', handleFocusIn, true );
+		return () =>
+			document.removeEventListener( 'focusin', handleFocusIn, true );
+	}, [] );
+
 	useEffect( () => {
 		const previousMode = previousModeRef.current;
 		previousModeRef.current = mode;
-		if ( previousMode === mode ) {
+		if ( previousMode === mode || ! hadFocusRef.current ) {
 			return;
 		}
 		const { activeElement, body } =

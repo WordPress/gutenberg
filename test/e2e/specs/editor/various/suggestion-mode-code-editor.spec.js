@@ -225,6 +225,64 @@ test.describe( 'Suggest mode: the code editor', () => {
 		expect( serialized ).toContain( 'data-suggestion-type="add"' );
 	} );
 
+	test( 'puts focus back in the editor when the canvas swap orphans it', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Original content' },
+		} );
+
+		await switchEditorMode( page, 'Code editor' );
+		await page.locator( TEXT_EDITOR ).click();
+		expect(
+			await page.evaluate( () => document.activeElement?.tagName )
+		).toBe( 'TEXTAREA' );
+
+		// Suggesting swaps the canvas out from under the textarea. Nothing
+		// in the incoming visual editor claims focus back, so it would fall
+		// to `<body>` and keyboard navigation would restart from the top of
+		// the page.
+		await pageUtils.pressKeys( 'secondary+x' );
+		await expect( page.locator( TEXT_EDITOR ) ).toBeHidden();
+
+		expect(
+			await page.evaluate( () => document.activeElement?.className ?? '' )
+		).toContain( 'interface-interface-skeleton__content' );
+	} );
+
+	test( 'takes no focus when the mode settles and the editor never had it', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		const post = await requestUtils.createPost( {
+			title: 'Untouched',
+			content:
+				'<!-- wp:paragraph --><p>Original content</p><!-- /wp:paragraph -->',
+			status: 'draft',
+		} );
+		await admin.editPost( post.id );
+
+		// Nothing has been clicked, so nothing in the editor holds focus -
+		// which is also true part-way through boot, while the settled mode
+		// is still resolving. A swap in that state has no focus to restore,
+		// and helping itself to some drags the reader off the top of the
+		// page and scrolls the canvas into view.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).switchEditorMode( 'text' )
+		);
+		await expect( page.locator( TEXT_EDITOR ) ).toBeVisible();
+
+		expect(
+			await page.evaluate(
+				() => document.activeElement === document.body
+			)
+		).toBe( true );
+	} );
+
 	test( 'the toggle-mode shortcut cannot expose a pending suggestion as raw HTML', async ( {
 		editor,
 		page,
