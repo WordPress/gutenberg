@@ -1,3 +1,4 @@
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { store as interfaceStore } from '@wordpress/interface';
@@ -12,6 +13,65 @@ import { sidebars } from '../sidebar/constants';
 import { unlock } from '../../lock-unlock';
 
 /**
+ * Whether restoring a revision would actually change the post.
+ *
+ * `restoreRevision` writes the revision's content, title, excerpt and meta back
+ * onto the post, so a revision whose fields already match the saved post has
+ * nothing to restore. The newest revision is always in that state, because
+ * WordPress stores a copy of the post as a revision every time it is saved.
+ *
+ * The comparison is against the saved post rather than the last revision ID.
+ * An autosave becomes the post's latest revision while it exists, so comparing
+ * IDs would refuse to restore an autosave, which is the one revision users most
+ * often want back.
+ *
+ * @param {?Object} revision The revision being previewed.
+ * @param {Object}  post     The saved post, with raw attribute values.
+ * @return {boolean} Whether restoring the revision would change the post.
+ */
+export function hasChangesToRestore( revision, post ) {
+	if ( ! revision ) {
+		return false;
+	}
+
+	if ( revision.content?.raw !== post.content ) {
+		return true;
+	}
+
+	if (
+		revision.title?.raw !== undefined &&
+		revision.title.raw !== post.title
+	) {
+		return true;
+	}
+
+	if (
+		revision.excerpt?.raw !== undefined &&
+		revision.excerpt.raw !== post.excerpt
+	) {
+		return true;
+	}
+
+	// Revisions only carry meta registered with `revisions_enabled`, so compare
+	// the keys the revision actually has instead of the whole meta object.
+	//
+	// Protected keys are skipped. They hold internal bookkeeping rather than
+	// authored content, and revisions do not store it faithfully: the
+	// collaborative editing document (`_crdt_document`) is saved empty on every
+	// revision, so comparing it would report a difference against every single
+	// revision and never let the button settle.
+	if ( revision.meta ) {
+		return Object.keys( revision.meta ).some(
+			( key ) =>
+				! key.startsWith( '_' ) &&
+				! fastDeepEqual( revision.meta[ key ], post.meta?.[ key ] )
+		);
+	}
+
+	return false;
+}
+
+/**
  * Header component for revisions preview mode.
  *
  * @param {Object}   props              Component props.
@@ -20,17 +80,32 @@ import { unlock } from '../../lock-unlock';
  * @return {React.JSX.Element} The revisions header component.
  */
 function RevisionsHeader( { showDiff, onToggleDiff } ) {
-	const { currentRevisionId, sidebarIsOpened } = useSelect( ( select ) => {
-		return {
-			currentRevisionId: unlock(
+	const { currentRevisionId, canRestore, sidebarIsOpened } = useSelect(
+		( select ) => {
+			const { getCurrentRevisionId, getCurrentRevision } = unlock(
 				select( editorStore )
-			).getCurrentRevisionId(),
-			sidebarIsOpened:
-				!! select( interfaceStore ).getActiveComplementaryArea(
-					'core'
-				),
-		};
-	}, [] );
+			);
+			const { getCurrentPostAttribute } = select( editorStore );
+			const revisionId = getCurrentRevisionId();
+
+			return {
+				currentRevisionId: revisionId,
+				canRestore:
+					!! revisionId &&
+					hasChangesToRestore( getCurrentRevision(), {
+						content: getCurrentPostAttribute( 'content' ),
+						title: getCurrentPostAttribute( 'title' ),
+						excerpt: getCurrentPostAttribute( 'excerpt' ),
+						meta: getCurrentPostAttribute( 'meta' ),
+					} ),
+				sidebarIsOpened:
+					!! select( interfaceStore ).getActiveComplementaryArea(
+						'core'
+					),
+			};
+		},
+		[]
+	);
 
 	const { setCurrentRevisionId, restoreRevision } = unlock(
 		useDispatch( editorStore )
@@ -38,8 +113,6 @@ function RevisionsHeader( { showDiff, onToggleDiff } ) {
 
 	const { enableComplementaryArea, disableComplementaryArea } =
 		useDispatch( interfaceStore );
-
-	const canRestore = !! currentRevisionId;
 
 	const handleRestore = () => {
 		if ( currentRevisionId ) {

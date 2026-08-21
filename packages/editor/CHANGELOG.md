@@ -44,6 +44,7 @@
 
 -   Device Preview: Keep tablet and mobile iframe widths inside their responsive breakpoints so media queries remain accurate at browser zoom levels.
 -   Document tools: Fix icon button focus styles to use the design system `outset-ring__focus` mixin ([#81115](https://github.com/WordPress/gutenberg/pull/81115)).
+-   Post Revisions: Disable the "Restore" button on a revision that already matches the saved post. The current version was offered as restorable and clicking it reported a successful restore without anything having changed.
 
 ## 14.52.0 (2026-07-29)
 
