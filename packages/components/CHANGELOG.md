@@ -33,6 +33,7 @@
 -   Remove `ValidatedToggleControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81492](https://github.com/WordPress/gutenberg/pull/81492)).
 -   Remove `ValidatedToggleGroupControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81450](https://github.com/WordPress/gutenberg/pull/81450)).
 -   `ToggleGroupControl`: Streamline focus ring color styles ([#81242](https://github.com/WordPress/gutenberg/pull/81242)).
+-   `GradientPicker`, `ColorPalette`: Migrate styles from Emotion to an SCSS Module ([#80473](https://github.com/WordPress/gutenberg/pull/80473)).
 
 ## 39.0.0 (2026-08-12)
 
@@ -126,7 +127,6 @@
 -   `ExternalLink`: Use the shared `outset-ring__focus` mixin for the focus ring ([#80573](https://github.com/WordPress/gutenberg/pull/80573)).
 -   `SearchControl`: Migrate styles from Emotion to an SCSS Module ([#80474](https://github.com/WordPress/gutenberg/pull/80474)).
 -   `FormTokenField`: Migrate styles from Emotion to an SCSS Module ([#80472](https://github.com/WordPress/gutenberg/pull/80472)).
--   `GradientPicker`, `ColorPalette`: Migrate styles from Emotion to an SCSS Module ([#80473](https://github.com/WordPress/gutenberg/pull/80473)).
 -   `InputControl`, `SelectControl`, `CustomSelectControl`, `ToggleGroupControl`, and `RangeControl`: Remove obsolete internal `__shouldNotWarnDeprecated36pxSize` prop ([#80323](https://github.com/WordPress/gutenberg/pull/80323)).
 -   `InputControl`, `SelectControl`, `CustomSelectControl`: Remove obsolete `__unstable-large` from the public `size` type. The value continues to work at runtime, and is equivalent to the `default` size. ([#80081](https://github.com/WordPress/gutenberg/pull/80081)).
 -   `ToggleGroupControl`: Migrate styles from Emotion to SCSS Modules and use WPDS tokens for migrated visual values ([#80381](https://github.com/WordPress/gutenberg/pull/80381)).
