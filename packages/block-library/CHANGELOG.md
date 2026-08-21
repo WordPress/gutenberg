@@ -21,6 +21,7 @@
 ### Enhancements
 
 -   Columns: Add transforms between Columns and the Row variation that preserve column widths through flex child sizing controls.
+-   Gallery: Add an opt-in Grid layout while preserving the existing Flex layout for current galleries.
 
 ### Bug Fixes
 

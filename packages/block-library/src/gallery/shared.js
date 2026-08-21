@@ -2,6 +2,29 @@ export function defaultColumnsNumber( imageCount ) {
 	return imageCount ? Math.min( 3, imageCount ) : 3;
 }
 
+/**
+ * Whether the Gallery should use its legacy Flex layout behavior.
+ *
+ * Gallery blocks created before layout variations existed do not have an
+ * explicit layout attribute. Treat missing and malformed layout data as Flex
+ * so existing galleries keep their current appearance.
+ *
+ * @param {*} layout The Gallery layout attribute.
+ * @return {boolean} Whether the Gallery uses its Flex layout.
+ */
+export function isGalleryFlexLayout( layout ) {
+	const layoutType =
+		layout && typeof layout === 'object' && ! Array.isArray( layout )
+			? layout.type
+			: undefined;
+
+	return (
+		typeof layoutType !== 'string' ||
+		layoutType === '' ||
+		layoutType === 'flex'
+	);
+}
+
 export const pickRelevantMediaFiles = ( image, sizeSlug = 'large' ) => {
 	const imageProps = Object.fromEntries(
 		Object.entries( image ?? {} ).filter( ( [ key ] ) =>

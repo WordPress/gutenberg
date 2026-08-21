@@ -37,7 +37,11 @@ import {
 	fullscreen,
 } from '@wordpress/icons';
 import { sharedIcon } from './shared-icon';
-import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
+import {
+	defaultColumnsNumber,
+	isGalleryFlexLayout,
+	pickRelevantMediaFiles,
+} from './shared';
 import { getHrefAndDestination } from './utils';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import {
@@ -158,7 +162,9 @@ export default function GalleryEdit( props ) {
 		linkTo,
 		sizeSlug,
 		aspectRatio,
+		layout,
 	} = attributes;
+	const isFlexLayout = isGalleryFlexLayout( layout );
 
 	const {
 		__unstableMarkNextChangeAsNotPersistent,
@@ -627,9 +633,10 @@ export default function GalleryEdit( props ) {
 				'blocks-gallery-grid',
 				{
 					[ `align${ align }` ]: align,
-					[ `columns-${ columns }` ]: columns !== undefined,
-					'columns-default': columns === undefined,
-					'is-cropped': imageCrop,
+					[ `columns-${ columns }` ]:
+						isFlexLayout && columns !== undefined,
+					'columns-default': isFlexLayout && columns === undefined,
+					'is-cropped': isFlexLayout && imageCrop,
 				},
 			]
 		),
@@ -711,9 +718,11 @@ export default function GalleryEdit( props ) {
 					resetAll={ () => {
 						setAttributes( {
 							navigationButtonType: 'icon',
-							columns: undefined,
-							imageCrop: true,
 							randomOrder: false,
+							...( isFlexLayout && {
+								columns: undefined,
+								imageCrop: true,
+							} ),
 						} );
 
 						setAspectRatio( 'auto' );
@@ -728,7 +737,7 @@ export default function GalleryEdit( props ) {
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
-					{ displayedImageCount > 1 && (
+					{ isFlexLayout && displayedImageCount > 1 && (
 						<ToolsPanelItem
 							isShownByDefault
 							label={ __( 'Columns' ) }
@@ -779,20 +788,22 @@ export default function GalleryEdit( props ) {
 							/>
 						</ToolsPanelItem>
 					) }
-					<ToolsPanelItem
-						isShownByDefault
-						label={ __( 'Crop images to fit' ) }
-						hasValue={ () => ! imageCrop }
-						onDeselect={ () =>
-							setAttributes( { imageCrop: true } )
-						}
-					>
-						<ToggleControl
+					{ isFlexLayout && (
+						<ToolsPanelItem
+							isShownByDefault
 							label={ __( 'Crop images to fit' ) }
-							checked={ !! imageCrop }
-							onChange={ toggleImageCrop }
-						/>
-					</ToolsPanelItem>
+							hasValue={ () => ! imageCrop }
+							onDeselect={ () =>
+								setAttributes( { imageCrop: true } )
+							}
+						>
+							<ToggleControl
+								label={ __( 'Crop images to fit' ) }
+								checked={ !! imageCrop }
+								onChange={ toggleImageCrop }
+							/>
+						</ToolsPanelItem>
+					) }
 					<ToolsPanelItem
 						isShownByDefault
 						label={ __( 'Randomize order' ) }
@@ -930,10 +941,12 @@ export default function GalleryEdit( props ) {
 						/>
 					</BlockControls>
 				) }
-				<GalleryGapCustomProperties
-					style={ attributes.style }
-					clientId={ clientId }
-				/>
+				{ isFlexLayout && (
+					<GalleryGapCustomProperties
+						style={ attributes.style }
+						clientId={ clientId }
+					/>
+				) }
 			</>
 			{ isDynamic ? (
 				<GalleryDynamicView
