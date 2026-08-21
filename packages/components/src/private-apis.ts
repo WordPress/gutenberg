@@ -7,6 +7,7 @@ import { lock } from './lock-unlock';
 import Badge from './badge';
 import {
 	ValidatedContentEditableControl,
+	ValidatedInputControl,
 	ValidatedTextareaControl,
 } from './validated-form-controls';
 import ContentEditableControl from './content-editable-control';
@@ -21,5 +22,6 @@ lock( privateApis, {
 	Badge,
 	useDrag,
 	ValidatedContentEditableControl,
+	ValidatedInputControl,
 	ValidatedTextareaControl,
 } );

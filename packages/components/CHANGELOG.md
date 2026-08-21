@@ -35,6 +35,7 @@
 -   Update `@ariakit/react` to 0.4.37 and `@ariakit/test` to 0.7.4 ([#81080](https://github.com/WordPress/gutenberg/pull/81080)).
 -   Point tsconfig references at split dependencies' build projects. ([#81514](https://github.com/WordPress/gutenberg/pull/81514), [#81516](https://github.com/WordPress/gutenberg/pull/81516), [#81518](https://github.com/WordPress/gutenberg/pull/81518))
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81515](https://github.com/WordPress/gutenberg/pull/81515))
+-   Deprecate `ValidatedInputControl` in the private APIs; use `ValidatedInputControl` from `@wordpress/ui` instead ([#81230](https://github.com/WordPress/gutenberg/issues/81230)).
 -   Remove `ValidatedComboboxControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81449](https://github.com/WordPress/gutenberg/pull/81449)).
 -   Remove `ValidatedFormTokenField` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81451](https://github.com/WordPress/gutenberg/pull/81451)).
 -   Remove `ValidatedToggleControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81492](https://github.com/WordPress/gutenberg/pull/81492)).
@@ -42,7 +43,6 @@
 -   `ToggleGroupControl`: Streamline focus ring color styles ([#81242](https://github.com/WordPress/gutenberg/pull/81242)).
 -   `ControlWithError`: Remove the internal implementation in favor of the `ControlWithError` component from `@wordpress/ui` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574)).
 -   Remove the unused `components-validated-control__indicator*` styles; the indicator is now rendered and styled by `ValidityIndicator` from `@wordpress/ui` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574)).
--   Remove `ValidatedInputControl` from the private APIs; consumers now use `ValidatedInputControl` from `@wordpress/ui`, or compose `ControlWithError` from `@wordpress/ui` directly ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81627](https://github.com/WordPress/gutenberg/pull/81627)).
 
 ## 39.0.0 (2026-08-12)
 
