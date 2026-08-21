@@ -88,17 +88,60 @@ export function shouldSkipCollectionEntry(
 export function normalizeRootItems(
 	items: Item[] | ItemGroup[] | undefined
 ): Item[] | ItemGroup[] | undefined {
-	if ( ! items || hasGroupedItems( items ) ) {
+	if ( ! items ) {
 		return items;
 	}
 
-	const flatItems = items as Item[];
-	const creatableItems = flatItems.filter( isCreatableItem );
-	const regularItems = flatItems.filter(
-		( item ) => ! isCreatableItem( item )
-	);
+	if ( ! hasGroupedItems( items ) ) {
+		const flatItems = items as Item[];
+		const creatableItems = flatItems.filter( isCreatableItem );
+		const regularItems = flatItems.filter(
+			( item ) => ! isCreatableItem( item )
+		);
 
-	return [ ...regularItems, ...creatableItems ];
+		return [ ...regularItems, ...creatableItems ];
+	}
+
+	const creatableItem = findCreatableItem( items );
+
+	if ( ! creatableItem ) {
+		return items;
+	}
+
+	const groupsWithoutCreatable: ItemGroup[] = [];
+	let creatableOnlyGroup: ItemGroup | undefined;
+
+	for ( const entry of items ) {
+		if ( ! isItemGroup( entry ) ) {
+			continue;
+		}
+
+		const regularItems = entry.items.filter(
+			( item ) => ! isCreatableItem( item )
+		);
+		const isCreatableOnly =
+			entry.items.length > 0 &&
+			entry.items.every( ( item ) => isCreatableItem( item ) );
+
+		if ( isCreatableOnly ) {
+			creatableOnlyGroup = entry;
+			continue;
+		}
+
+		if ( regularItems.length > 0 ) {
+			groupsWithoutCreatable.push( {
+				...entry,
+				items: regularItems,
+			} );
+		}
+	}
+
+	const creatableGroup = creatableOnlyGroup ?? {
+		label: '',
+		items: [ creatableItem ],
+	};
+
+	return [ ...groupsWithoutCreatable, creatableGroup ];
 }
 
 export type SearchableChipSelectProps = Omit<

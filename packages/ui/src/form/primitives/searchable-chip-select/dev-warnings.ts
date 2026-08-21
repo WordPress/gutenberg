@@ -4,7 +4,6 @@ import {
 	findCreatableItems,
 	hasGroupedItems,
 	isCreatableItem,
-	isItemGroup,
 	type Item,
 	type ItemGroup,
 } from './types';
@@ -49,24 +48,6 @@ export function warnSearchableChipSelectProps(
 			warning(
 				'SearchableChipSelect: the creatable item should be last in `items` for predictable keyboard navigation.'
 			);
-		}
-	}
-
-	for ( const entry of items ) {
-		if ( ! isItemGroup( entry ) ) {
-			continue;
-		}
-
-		const hasCreatable = entry.items.some( isCreatableItem );
-		const hasRegular = entry.items.some(
-			( item ) => ! isCreatableItem( item )
-		);
-
-		if ( hasCreatable && hasRegular ) {
-			warning(
-				'SearchableChipSelect: creatable items should be in their own group, not mixed with regular items.'
-			);
-			break;
 		}
 	}
 }
