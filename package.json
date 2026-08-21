@@ -149,7 +149,7 @@
 		"rtc:ws": "node ./test/e2e/bin/rtc-dev.mjs --mode=websockets",
 		"rtc:ws:slow": "cross-env RTC_WS_DELAY=50 npm run rtc:ws",
 		"start": "npm run dev",
-		"prestorybook:build": "npm run build -- --skip-types",
+		"prestorybook:build": "npm run build",
 		"storybook:build": "npm run --workspace @wordpress/storybook storybook:build",
 		"storybook:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && npm run --workspace @wordpress/storybook storybook:dev\"",
 		"storybook:e2e:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && npm run --workspace @wordpress/storybook-playwright storybook:dev\"",

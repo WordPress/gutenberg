@@ -16,16 +16,22 @@ const {
 const ALLOWLIST = {
 	'@wordpress/ui': {
 		allowed: [
+			'Autocomplete',
 			'Badge',
 			'Calendar',
 			'Card',
 			'Collapsible',
 			'CollapsibleCard',
+			'ControlWithError',
 			'EmptyState',
+			'Field',
+			'Fieldset',
 			'Icon',
 			'Input',
 			'InputControl',
 			'InputLayout',
+			'KeyboardShortcutDescription',
+			'KeyboardShortcutDisplay',
 			'Link',
 			'RangeCalendar',
 			'Skeleton',
@@ -33,8 +39,12 @@ const ALLOWLIST = {
 			'Stack',
 			'Tabs',
 			'Text',
+			'Textarea',
+			'TextareaControl',
 			'Tooltip',
+			'ValidityIndicator',
 			'VisuallyHidden',
+			'useKeyboardShortcutProps',
 		],
 		message:
 			'`{{ name }}` from `{{ source }}` is not yet recommended for use in a WordPress environment.',
@@ -91,6 +101,8 @@ const DENYLIST = {
 		Tabs: 'Use `Tabs` from `@wordpress/ui` instead.',
 		TextControl:
 			'Use `InputControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
+		TextareaControl:
+			'Use `TextareaControl` from `@wordpress/ui` instead. See migration guide in the lint rule documentation.',
 		Tooltip: 'Use `Tooltip` from `@wordpress/ui` instead.',
 		VisuallyHidden: 'Use `{{ name }}` from `@wordpress/ui` instead.',
 	},

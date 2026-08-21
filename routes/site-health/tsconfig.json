@@ -9,6 +9,15 @@
 		"composite": false,
 		"types": []
 	},
+	"references": [
+		{ "path": "../../packages/admin-ui/tsconfig.build.json" },
+		{ "path": "../../packages/api-fetch/tsconfig.build.json" },
+		{ "path": "../../packages/dataviews/tsconfig.build.json" },
+		{ "path": "../../packages/dom" },
+		{ "path": "../../packages/element/tsconfig.build.json" },
+		{ "path": "../../packages/i18n/tsconfig.build.json" },
+		{ "path": "../../packages/ui/tsconfig.build.json" }
+	],
 	"include": [ "**/*.ts", "**/*.tsx" ],
 	"exclude": [ "build", "node_modules" ]
 }

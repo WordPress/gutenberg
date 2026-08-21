@@ -189,10 +189,6 @@
 	top: 8px;
 	opacity: 0;
 
-	&.global-styles-ui__shadow-editor__remove-button {
-		border: none;
-	}
-
 	.global-styles-ui__shadow-editor__dropdown-toggle:hover + &,
 	&:focus,
 	&:hover {
@@ -292,6 +288,7 @@
 }
 
 .global-styles-ui-color-palette-panel,
-.global-styles-ui-gradient-palette-panel {
+.global-styles-ui-gradient-palette-panel,
+.global-styles-ui-duotone-palette-panel {
 	padding: variables.$grid-unit-20;
 }
