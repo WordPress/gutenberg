@@ -161,20 +161,33 @@ export interface ResizeHandleProps {
 }
 
 /**
- * Per-item minimum tile size, in pixels. The surface quantizes each
- * minimum up to whole tracks of its current geometry and floors render
- * and resize gestures at the result; the minimum itself is never written
- * into the layout.
+ * Per-item size limits, in pixels. The surface quantizes each limit to
+ * whole tracks of its current geometry (minimums round up so the span
+ * covers the pixels, maximums round down so it fits inside them) and
+ * bounds rendered spans and resize gestures at the result; the limits
+ * themselves are never written into the layout. When a quantized
+ * minimum exceeds a quantized maximum, the minimum wins.
  */
-export type GridItemMinSize = {
+export type GridItemLimits = {
 	/**
 	 * Minimum tile width in pixels.
 	 */
-	width?: number;
+	minWidth?: number;
 
 	/**
 	 * Minimum tile height in pixels. Ignored by surfaces with
 	 * content-driven heights.
 	 */
-	height?: number;
+	minHeight?: number;
+
+	/**
+	 * Maximum tile width in pixels.
+	 */
+	maxWidth?: number;
+
+	/**
+	 * Maximum tile height in pixels. Ignored by surfaces with
+	 * content-driven heights.
+	 */
+	maxHeight?: number;
 };

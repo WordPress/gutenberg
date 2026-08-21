@@ -1,6 +1,6 @@
 import type {
 	DragPreviewRenderProps,
-	GridItemMinSize,
+	GridItemLimits,
 	GridOverlayRenderProps,
 	ResizeDelta,
 	ResizeHandleRenderProps,
@@ -127,6 +127,18 @@ export type GridItemProps = {
 	 * Omitted when vertical resize is disabled.
 	 */
 	minResizeHeightPx?: number;
+
+	/**
+	 * Maximum tile width while resizing, in pixels. Omitted when the
+	 * item declares no width limit.
+	 */
+	maxResizeWidthPx?: number;
+
+	/**
+	 * Maximum tile height while resizing, in pixels. Omitted when
+	 * vertical resize is disabled or the item declares no height limit.
+	 */
+	maxResizeHeightPx?: number;
 
 	/**
 	 * Callback fired when the resize gesture ends.
@@ -268,11 +280,12 @@ export interface DashboardGridProps
 	minColumnWidth?: number;
 
 	/**
-	 * Per-item minimum tile size in pixels, keyed by layout item key.
-	 * The grid quantizes each minimum up to whole tracks, floors the
-	 * item's rendered spans and resize gestures at the result, and never
-	 * writes the floor into the layout. Width saturates at the column
-	 * count.
+	 * Per-item size limits in pixels, keyed by layout item key. The grid
+	 * quantizes each limit to whole tracks (minimums round up, maximums
+	 * round down), bounds the item's rendered spans and resize gestures
+	 * at the result, and never writes the limits into the layout. Width
+	 * bounds saturate at the column count; `'full'` and `'fill'` widths
+	 * respect a maximum.
 	 */
-	itemMinSizes?: Record< string, GridItemMinSize >;
+	itemLimits?: Record< string, GridItemLimits >;
 }

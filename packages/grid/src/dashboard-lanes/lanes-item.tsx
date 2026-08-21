@@ -77,6 +77,12 @@ export type LanesItemProps = {
 	 */
 	minResizeWidthPx: number;
 
+	/**
+	 * Maximum tile width while resizing, in pixels. Omitted when the
+	 * item declares no width limit.
+	 */
+	maxResizeWidthPx?: number;
+
 	onResizeEnd: () => void;
 
 	renderResizeHandle?: React.ComponentType< ResizeHandleRenderProps >;
@@ -93,6 +99,7 @@ export function LanesItem( {
 	onResizeEnd,
 	resizeSnapPreview = null,
 	minResizeWidthPx,
+	maxResizeWidthPx,
 	renderResizeHandle,
 	dragging = false,
 }: LanesItemProps ) {
@@ -141,9 +148,12 @@ export function LanesItem( {
 		}
 		let clamped: ResizeDelta = { width: delta.width, height: 0 };
 		if ( baselineSize ) {
-			clamped = clampResizeDelta( clamped, baselineSize, {
-				width: minResizeWidthPx,
-			} );
+			clamped = clampResizeDelta(
+				clamped,
+				baselineSize,
+				{ width: minResizeWidthPx },
+				{ width: maxResizeWidthPx }
+			);
 		}
 		setResizeDelta( clamped );
 		onResize( itemKey, clamped );

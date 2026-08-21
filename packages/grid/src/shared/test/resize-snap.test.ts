@@ -1,7 +1,7 @@
 import {
 	clampResizeDelta,
 	gridSpanToPixelSize,
-	pixelSizeToMinSpans,
+	pixelLimitsToSpanBounds,
 } from '../resize-snap';
 
 describe( 'gridSpanToPixelSize', () => {
@@ -12,41 +12,136 @@ describe( 'gridSpanToPixelSize', () => {
 	} );
 } );
 
-describe( 'pixelSizeToMinSpans', () => {
-	it( 'rounds a minimum up to whole tracks', () => {
+describe( 'pixelLimitsToSpanBounds', () => {
+	it( 'rounds minimums up to whole tracks', () => {
 		expect(
-			pixelSizeToMinSpans( { width: 480 }, 292, 24, 300, 4 )
-		).toEqual( { width: 2, height: 1 } );
+			pixelLimitsToSpanBounds( { minWidth: 480 }, 292, 24, 300, 4 )
+		).toEqual( {
+			minWidth: 2,
+			minHeight: 1,
+			maxWidth: 4,
+			maxHeight: Infinity,
+		} );
 	} );
 
-	it( 'covers both axes when a row height is known', () => {
+	it( 'covers both minimum axes when a row height is known', () => {
 		expect(
-			pixelSizeToMinSpans( { width: 480, height: 360 }, 292, 24, 300, 4 )
-		).toEqual( { width: 2, height: 2 } );
+			pixelLimitsToSpanBounds(
+				{ minWidth: 480, minHeight: 360 },
+				292,
+				24,
+				300,
+				4
+			)
+		).toEqual( {
+			minWidth: 2,
+			minHeight: 2,
+			maxWidth: 4,
+			maxHeight: Infinity,
+		} );
 	} );
 
-	it( 'keeps an exact single-track fit at one span', () => {
+	it( 'rounds maximums down to whole tracks', () => {
 		expect(
-			pixelSizeToMinSpans( { width: 292 }, 292, 24, null, 4 )
-		).toEqual( { width: 1, height: 1 } );
+			pixelLimitsToSpanBounds( { maxWidth: 700 }, 292, 24, null, 4 )
+		).toEqual( {
+			minWidth: 1,
+			minHeight: 1,
+			maxWidth: 2,
+			maxHeight: Infinity,
+		} );
 	} );
 
-	it( 'saturates width at the column count', () => {
+	it( 'keeps a maximum at one track or more', () => {
 		expect(
-			pixelSizeToMinSpans( { width: 4000 }, 292, 24, null, 4 )
-		).toEqual( { width: 4, height: 1 } );
+			pixelLimitsToSpanBounds( { maxWidth: 100 }, 292, 24, null, 4 )
+				.maxWidth
+		).toBe( 1 );
 	} );
 
-	it( 'resolves height to one when rows are content-sized', () => {
+	it( 'lets the minimum win over a tighter maximum', () => {
 		expect(
-			pixelSizeToMinSpans( { width: 480, height: 360 }, 292, 24, null, 4 )
-		).toEqual( { width: 2, height: 1 } );
+			pixelLimitsToSpanBounds(
+				{ minWidth: 480, maxWidth: 300 },
+				292,
+				24,
+				null,
+				4
+			)
+		).toEqual( {
+			minWidth: 2,
+			minHeight: 1,
+			maxWidth: 2,
+			maxHeight: Infinity,
+		} );
 	} );
 
-	it( 'falls back to one span while the surface is unmeasured', () => {
-		expect( pixelSizeToMinSpans( { width: 480 }, 0, 24, null, 4 ) ).toEqual(
-			{ width: 1, height: 1 }
-		);
+	it( 'saturates width bounds at the column count', () => {
+		expect(
+			pixelLimitsToSpanBounds(
+				{ minWidth: 4000, maxWidth: 9000 },
+				292,
+				24,
+				null,
+				4
+			)
+		).toEqual( {
+			minWidth: 4,
+			minHeight: 1,
+			maxWidth: 4,
+			maxHeight: Infinity,
+		} );
+	} );
+
+	it( 'bounds heights against the row track', () => {
+		expect(
+			pixelLimitsToSpanBounds(
+				{ minHeight: 360, maxHeight: 800 },
+				292,
+				24,
+				300,
+				4
+			)
+		).toEqual( {
+			minWidth: 1,
+			minHeight: 2,
+			maxWidth: 4,
+			maxHeight: 2,
+		} );
+	} );
+
+	it( 'leaves height bounds open when rows are content-sized', () => {
+		expect(
+			pixelLimitsToSpanBounds(
+				{ minHeight: 360, maxHeight: 600 },
+				292,
+				24,
+				null,
+				4
+			)
+		).toEqual( {
+			minWidth: 1,
+			minHeight: 1,
+			maxWidth: 4,
+			maxHeight: Infinity,
+		} );
+	} );
+
+	it( 'falls back to the full range while the surface is unmeasured', () => {
+		expect(
+			pixelLimitsToSpanBounds(
+				{ minWidth: 480, maxWidth: 600 },
+				0,
+				24,
+				null,
+				4
+			)
+		).toEqual( {
+			minWidth: 1,
+			minHeight: 1,
+			maxWidth: 4,
+			maxHeight: Infinity,
+		} );
 	} );
 } );
 
@@ -67,11 +162,29 @@ describe( 'clampResizeDelta', () => {
 		).toEqual( { width: 0, height: -96 } );
 	} );
 
-	it( 'leaves growth deltas unchanged', () => {
+	it( 'leaves growth deltas unchanged without a maximum', () => {
 		const initial = { width: 100, height: 48 };
 		const min = { width: 100, height: 48 };
 		expect(
 			clampResizeDelta( { width: 80, height: 40 }, initial, min )
 		).toEqual( { width: 80, height: 40 } );
+	} );
+
+	it( 'does not grow width past the maximum', () => {
+		const initial = { width: 216, height: 120 };
+		const min = { width: 100 };
+		const max = { width: 300 };
+		expect(
+			clampResizeDelta( { width: 200, height: 0 }, initial, min, max )
+		).toEqual( { width: 84, height: 0 } );
+	} );
+
+	it( 'does not grow height past the maximum when one applies', () => {
+		const initial = { width: 200, height: 144 };
+		const min = { width: 100, height: 48 };
+		const max = { width: 400, height: 200 };
+		expect(
+			clampResizeDelta( { width: 0, height: 120 }, initial, min, max )
+		).toEqual( { width: 0, height: 56 } );
 	} );
 } );

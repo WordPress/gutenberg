@@ -28,7 +28,7 @@ import { GridItem } from './grid-item';
 import { GridOverlay } from '../shared/grid-overlay';
 import {
 	gridSpanToPixelSize,
-	pixelSizeToMinSpans,
+	pixelLimitsToSpanBounds,
 } from '../shared/resize-snap';
 import layoutAnimationStyles from '../shared/layout-shift-animation.module.css';
 import { ItemExitOverlay } from '../shared/item-exit-overlay';
@@ -39,7 +39,7 @@ import {
 import { useItemExitAnimation } from '../shared/use-item-exit-animation';
 import { resolveFillWidths } from './resolve-fill-widths';
 import type { DashboardGridLayoutItem, DashboardGridProps } from './types';
-import type { ResizeSnapSize } from '../shared/resize-snap';
+import type { ResizeSnapSize, SpanBounds } from '../shared/resize-snap';
 import type { ResizeDelta } from '../shared/types';
 import { createDashboardDragDropAnimation } from '../shared/drag-overlay-drop-animation';
 import styles from './grid.module.css';
@@ -110,7 +110,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			style,
 			rowHeight = 'auto',
 			minColumnWidth,
-			itemMinSizes,
+			itemLimits,
 			editMode = false,
 			onChangeLayout,
 			onPreviewLayout,
@@ -230,19 +230,19 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				: gridSpanToPixelSize( 1, 1, columnWidth, gapPx, rowHeightPx )
 						.heightPx ?? undefined;
 
-		// Per-item floors: each declared minimum quantized up to whole
-		// tracks of the current geometry. Recomputed as geometry changes;
-		// never written back into the consumer's layout.
-		const minSpansByKey = useMemo( () => {
-			const map = new Map< string, { width: number; height: number } >();
-			if ( ! itemMinSizes ) {
+		// Per-item bounds: each declared limit quantized to whole tracks
+		// of the current geometry. Recomputed as geometry changes; never
+		// written back into the consumer's layout.
+		const spanBoundsByKey = useMemo( () => {
+			const map = new Map< string, SpanBounds >();
+			if ( ! itemLimits ) {
 				return map;
 			}
-			for ( const [ key, minSize ] of Object.entries( itemMinSizes ) ) {
+			for ( const [ key, limits ] of Object.entries( itemLimits ) ) {
 				map.set(
 					key,
-					pixelSizeToMinSpans(
-						minSize,
+					pixelLimitsToSpanBounds(
+						limits,
 						columnWidth,
 						gapPx,
 						rowHeightPx,
@@ -251,37 +251,37 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				);
 			}
 			return map;
-		}, [
-			itemMinSizes,
-			columnWidth,
-			gapPx,
-			rowHeightPx,
-			effectiveColumns,
-		] );
+		}, [ itemLimits, columnWidth, gapPx, rowHeightPx, effectiveColumns ] );
 
-		// Stored layouts may sit below a floor; render them floored while
-		// the stored data stays untouched.
-		const flooredLayout = useMemo( () => {
-			if ( minSpansByKey.size === 0 ) {
+		// Stored layouts may sit outside an item's limits; render them
+		// bounded while the stored data stays untouched.
+		const boundedLayout = useMemo( () => {
+			if ( spanBoundsByKey.size === 0 ) {
 				return layout;
 			}
 			return layout.map( ( item ) => {
-				const min = minSpansByKey.get( item.key );
-				if ( ! min ) {
+				const bounds = spanBoundsByKey.get( item.key );
+				if ( ! bounds ) {
 					return item;
 				}
 				const width =
 					typeof item.width === 'number'
-						? Math.max( item.width, min.width )
+						? Math.min(
+								Math.max( item.width, bounds.minWidth ),
+								bounds.maxWidth
+						  )
 						: item.width;
 				return {
 					...item,
 					width,
-					height: Math.max( item.height ?? 1, min.height ),
+					height: Math.min(
+						Math.max( item.height ?? 1, bounds.minHeight ),
+						bounds.maxHeight
+					),
 				};
 			} );
-		}, [ layout, minSpansByKey ] );
-		const activeLayout = temporaryLayout ?? flooredLayout;
+		}, [ layout, spanBoundsByKey ] );
+		const activeLayout = temporaryLayout ?? boundedLayout;
 
 		const layoutMap = useMemo( () => {
 			const map = new Map< string, DashboardGridLayoutItem >();
@@ -318,7 +318,8 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		);
 		const items = sortedItems;
 
-		// Resolve `width: 'fill'` items to concrete column spans.
+		// Resolve `width: 'fill'` items to concrete column spans, bounded
+		// by the item's limits.
 		const resolvedItemMap = useMemo( () => {
 			const fillWidths = resolveFillWidths(
 				items,
@@ -331,13 +332,21 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			const map = new Map< string, DashboardGridLayoutItem >();
 			for ( const [ key, item ] of layoutMap ) {
 				const fillW = fillWidths.get( key );
-				map.set(
-					key,
-					fillW !== undefined ? { ...item, width: fillW } : item
-				);
+				if ( fillW === undefined ) {
+					map.set( key, item );
+					continue;
+				}
+				const bounds = spanBoundsByKey.get( key );
+				const width = bounds
+					? Math.min(
+							Math.max( fillW, bounds.minWidth ),
+							bounds.maxWidth
+					  )
+					: fillW;
+				map.set( key, { ...item, width } );
 			}
 			return map;
-		}, [ items, layoutMap, effectiveColumns ] );
+		}, [ items, layoutMap, effectiveColumns, spanBoundsByKey ] );
 
 		const [ childrenMap, actionableAreaMap, remaining, renderedByKey ] =
 			useMemo( () => {
@@ -538,17 +547,21 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				};
 			}
 			const baseline = resizeBaselineRef.current;
-			const minSpans = minSpansByKey.get( id );
-			const newWidth = Math.max(
-				minSpans?.width ?? 1,
-				Math.min(
+			const bounds = spanBoundsByKey.get( id );
+			const newWidth = Math.min(
+				Math.max(
 					baseline.width + relativeDelta.width,
-					effectiveColumns
-				)
+					bounds?.minWidth ?? 1
+				),
+				bounds?.maxWidth ?? effectiveColumns,
+				effectiveColumns
 			);
-			const newHeight = Math.max(
-				minSpans?.height ?? 1,
-				baseline.height + relativeDelta.height
+			const newHeight = Math.min(
+				Math.max(
+					baseline.height + relativeDelta.height,
+					bounds?.minHeight ?? 1
+				),
+				bounds?.maxHeight ?? Infinity
 			);
 
 			setResizeSnapPreview( {
@@ -710,14 +723,27 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 					>
 						{ gridOverlay }
 						{ items.map( ( id ) => {
-							const minSpans = minSpansByKey.get( id );
-							const minSnap = minSpans
+							const bounds = spanBoundsByKey.get( id );
+							const minSnap = bounds
 								? gridSpanToPixelSize(
-										minSpans.width,
-										minSpans.height,
+										bounds.minWidth,
+										bounds.minHeight,
 										columnWidth,
 										gapPx,
 										rowHeightPx
+								  )
+								: null;
+							const maxSnap = bounds
+								? gridSpanToPixelSize(
+										bounds.maxWidth,
+										Number.isFinite( bounds.maxHeight )
+											? bounds.maxHeight
+											: 1,
+										columnWidth,
+										gapPx,
+										Number.isFinite( bounds.maxHeight )
+											? rowHeightPx
+											: null
 								  )
 								: null;
 							return (
@@ -728,7 +754,9 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 											id
 										) as DashboardGridLayoutItem
 									}
-									maxColumns={ effectiveColumns }
+									maxColumns={
+										bounds?.maxWidth ?? effectiveColumns
+									}
 									disabled={ ! editMode }
 									verticalResizable={ rowHeight !== 'auto' }
 									interacting={
@@ -747,6 +775,10 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 									}
 									minResizeHeightPx={
 										minSnap?.heightPx ?? minResizeHeightPx
+									}
+									maxResizeWidthPx={ maxSnap?.widthPx }
+									maxResizeHeightPx={
+										maxSnap?.heightPx ?? undefined
 									}
 									actionableArea={ actionableAreaMap.get(
 										id
