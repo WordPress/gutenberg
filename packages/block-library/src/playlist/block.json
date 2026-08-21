@@ -33,6 +33,10 @@
 			"type": "boolean",
 			"default": true
 		},
+		"showAlbum": {
+			"type": "boolean",
+			"default": false
+		},
 		"showNumbers": {
 			"type": "boolean",
 			"default": true
@@ -63,6 +67,7 @@
 		}
 	},
 	"providesContext": {
+		"showAlbum": "showAlbum",
 		"showArtists": "showArtists",
 		"showImages": "showImages"
 	},

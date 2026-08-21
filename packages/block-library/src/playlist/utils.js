@@ -70,3 +70,20 @@ export function getTrackAttributes( media ) {
 		...getTrackImageAttributes( media?.image ),
 	};
 }
+
+/**
+ * Get the metadata text displayed in the waveform player's secondary line.
+ *
+ * @param {Object}  track     Track attributes.
+ * @param {boolean} showAlbum Whether to include the album name.
+ * @return {string} Secondary metadata text.
+ */
+export function getWaveformArtistText( track, showAlbum = false ) {
+	const artist = typeof track?.artist === 'string' ? track.artist : '';
+	const album =
+		showAlbum && typeof track?.album === 'string' ? track.album : '';
+
+	// The separator is not translatable because this util is shared with the
+	// frontend view module, which avoids importing `@wordpress/i18n`.
+	return [ artist, album ].filter( Boolean ).join( ' - ' );
+}

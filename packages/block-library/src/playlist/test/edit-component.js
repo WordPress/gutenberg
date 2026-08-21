@@ -4,6 +4,7 @@ import PlaylistEdit from '../edit';
 
 let mediaPlaceholderProps;
 let mediaReplaceFlowProps;
+let waveformPlayerProps;
 
 jest.mock( '@wordpress/block-editor', () => ( {
 	store: {},
@@ -59,7 +60,21 @@ jest.mock( '@wordpress/blob', () => ( {
 jest.mock( '@wordpress/components', () => ( {
 	Disabled: ( { children } ) => <div>{ children }</div>,
 	SelectControl: () => <div />,
-	ToggleControl: () => <div />,
+	ToggleControl: ( { checked, label } ) => {
+		const id = `toggle-${ label.replaceAll( ' ', '-' ).toLowerCase() }`;
+
+		return (
+			<label htmlFor={ id }>
+				<input
+					id={ id }
+					type="checkbox"
+					checked={ !! checked }
+					readOnly
+				/>
+				{ label }
+			</label>
+		);
+	},
 	__experimentalToolsPanel: ( { children } ) => <div>{ children }</div>,
 	__experimentalToolsPanelItem: ( { children } ) => <div>{ children }</div>,
 } ) );
@@ -91,7 +106,10 @@ jest.mock( '../../utils/hooks', () => ( {
 } ) );
 
 jest.mock( '../../utils/waveform-player', () => ( {
-	WaveformPlayer: () => <div />,
+	WaveformPlayer: ( props ) => {
+		waveformPlayerProps = props;
+		return <div />;
+	},
 } ) );
 
 const defaultAttributes = {
@@ -101,6 +119,7 @@ const defaultAttributes = {
 	showImages: true,
 	showPlayButtonArtwork: false,
 	showArtists: true,
+	showAlbum: false,
 	showTrackLength: true,
 };
 
@@ -111,6 +130,7 @@ describe( 'PlaylistEdit', () => {
 	beforeEach( () => {
 		mediaPlaceholderProps = undefined;
 		mediaReplaceFlowProps = undefined;
+		waveformPlayerProps = undefined;
 		replaceInnerBlocks = jest.fn();
 		selectBlock = jest.fn();
 		useDispatch.mockReturnValue( {
@@ -126,6 +146,8 @@ describe( 'PlaylistEdit', () => {
 						id: 1,
 						src: 'https://example.com/audio.mp3',
 						title: 'Sample track',
+						artist: 'The Artist',
+						album: 'Great Album',
 					},
 				},
 			],
@@ -184,6 +206,45 @@ describe( 'PlaylistEdit', () => {
 			'wp-block-playlist__tracklist-is-hidden'
 		);
 		expect( screen.getByTestId( 'playlist-track' ) ).toBeInTheDocument();
+	} );
+
+	it( 'keeps the album display control available when the tracklist is hidden', () => {
+		render(
+			<PlaylistEdit
+				attributes={ {
+					...defaultAttributes,
+					showAlbum: true,
+					showTracklist: false,
+				} }
+				clientId="playlist-1"
+				insertBlocksAfter={ jest.fn() }
+				isSelected={ false }
+				setAttributes={ jest.fn() }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'checkbox', {
+				name: 'Show album name',
+			} )
+		).toBeChecked();
+	} );
+
+	it( 'passes the album name to the waveform player when album display is enabled', () => {
+		render(
+			<PlaylistEdit
+				attributes={ {
+					...defaultAttributes,
+					showAlbum: true,
+				} }
+				clientId="playlist-1"
+				insertBlocksAfter={ jest.fn() }
+				isSelected={ false }
+				setAttributes={ jest.fn() }
+			/>
+		);
+
+		expect( waveformPlayerProps.artist ).toBe( 'The Artist - Great Album' );
 	} );
 
 	it( 'adds tracks from the add track control', () => {

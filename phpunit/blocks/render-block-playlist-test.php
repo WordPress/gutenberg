@@ -402,6 +402,33 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @covers ::render_block_core_playlist
+	 * @covers ::render_block_core_playlist_track
+	 */
+	public function test_tracklist_renders_track_album_when_show_album_is_enabled() {
+		$markup = $this->build_playlist_markup(
+			array( 'showAlbum' => true ),
+			array(
+				array(
+					'id'    => 1,
+					'title' => 'Song One',
+					'album' => 'Album One',
+					'src'   => 'http://example.com/song1.mp3',
+				),
+			)
+		);
+
+		$output = do_blocks( $markup );
+		$p      = new WP_HTML_Tag_Processor( $output );
+		$p->next_tag( 'figure' );
+		$context = json_decode( $p->get_attribute( 'data-wp-context' ), true );
+
+		$this->assertTrue( $context['showAlbum'] );
+		$this->assertStringContainsString( 'class="wp-block-playlist-track__album"', $output );
+		$this->assertStringContainsString( '>Album One</span>', $output );
+	}
+
+	/**
 	 * @covers ::render_block_core_playlist_track
 	 */
 	public function test_playlist_track_renders_without_block_context() {

@@ -46,6 +46,7 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 
 **Uses context:**
 
+- `showAlbum`
 - `showArtists`
 - `showImages`
 

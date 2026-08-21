@@ -9,6 +9,7 @@
 			"showImages": true,
 			"showPlayButtonArtwork": false,
 			"showArtists": true,
+			"showAlbum": false,
 			"showNumbers": true,
 			"showTrackLength": true,
 			"waveformStyle": "bars",
