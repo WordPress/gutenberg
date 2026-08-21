@@ -309,6 +309,61 @@ class Tests_Blocks_Render_Gallery extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_gap_styles_skipped_when_theme_opts_out_of_layout_styles() {
+		$attachment_id = self::$attachment_ids[0];
+		$image_url     = wp_get_attachment_image_url( $attachment_id, 'large' );
+		$markup        = sprintf(
+			'<!-- wp:gallery {"linkTo":"none"} --><figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":%1$d,"sizeSlug":"large"} --><figure class="wp-block-image size-large"><img src="%2$s" alt="" class="wp-image-%1$d"/></figure><!-- /wp:image --></figure><!-- /wp:gallery -->',
+			$attachment_id,
+			$image_url
+		);
+
+		// Baseline: the render generates per-instance gap styles, scoped by a
+		// unique classname added to the gallery wrapper.
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+		$output     = $this->render_in_loop( $markup );
+		$stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports' );
+
+		$this->assertMatchesRegularExpression(
+			'/wp-block-gallery-\d/',
+			$output,
+			'By default the gallery wrapper should carry a unique gap-scoping classname.'
+		);
+		$this->assertStringContainsString(
+			'--wp--style--unstable-gallery-gap',
+			$stylesheet,
+			'By default the gallery gap styles should be generated.'
+		);
+
+		// A theme that opts out of layout styles opts out of the generated gap
+		// styles too, and of the unique classname that exists only to scope them.
+		add_theme_support( 'disable-layout-styles' );
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+		try {
+			$output     = $this->render_in_loop( $markup );
+			$stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports' );
+		} finally {
+			remove_theme_support( 'disable-layout-styles' );
+		}
+
+		$this->assertDoesNotMatchRegularExpression(
+			'/wp-block-gallery-\d/',
+			$output,
+			'Themes opting out of layout styles should not get the unique gap-scoping classname.'
+		);
+		$this->assertStringNotContainsString(
+			'--wp--style--unstable-gallery-gap',
+			$stylesheet,
+			'Themes opting out of layout styles should not get generated gallery gap styles.'
+		);
+		// The gallery itself still renders.
+		$this->assertStringContainsString(
+			'wp-image-' . $attachment_id,
+			$output,
+			'Opting out of layout styles should not affect the gallery markup itself.'
+		);
+	}
+
 	public function test_dynamic_lightbox_link_adds_interactivity_directives() {
 		$output = $this->render_in_loop(
 			'<!-- wp:gallery {"dynamicContent":{"source":"core/attached-media"},"linkTo":"lightbox"} /-->'
