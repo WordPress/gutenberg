@@ -278,3 +278,96 @@ describe( 'suggestion a11y role decoration', () => {
 		} );
 	} );
 } );
+
+describe( 'nested suggestion markers', () => {
+	beforeAll( () => {
+		registerSuggestionFormat();
+	} );
+
+	afterAll( () => {
+		for ( const name of [
+			SUGGESTION_FORMAT_NAME,
+			SUGGESTION_A11Y_FORMAT_NAME,
+		] ) {
+			if ( select( richTextStore ).getFormatType( name ) ) {
+				unregisterFormatType( name );
+			}
+		}
+	} );
+
+	/*
+	 * Two people suggesting over overlapping runs serialize as nested markers:
+	 * an inner marker whose text is also covered by an outer one. Offsets 0-2
+	 * are covered by the outer add only, offsets 3-4 by both.
+	 */
+	const nested =
+		'<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add" data-author="4">out' +
+		'<mark class="wp-suggestion" data-suggestion-id="2" data-suggestion-type="del" data-author="7">in</mark>' +
+		'</mark>';
+
+	const decorationAt = ( decorated, offset ) =>
+		decorated[ offset ].find(
+			( f ) => f.type === SUGGESTION_A11Y_FORMAT_NAME
+		);
+
+	it( 'describes the marker that directly wraps the run', () => {
+		// The decoration renders innermost, so it belongs to the innermost
+		// marker covering the character. Taking the outer one announces the
+		// opposite change: a deletion read aloud as an addition.
+		const { formats } = create( { html: nested } );
+		const decorated = addSuggestionRoleFormats( formats );
+		const inner = decorationAt( decorated, 3 );
+		expect( inner.attributes.start ).toBe( 'Start of suggested deletion.' );
+		expect( inner.attributes.end ).toBe( 'End of suggested deletion.' );
+		expect( inner.attributes.role ).toBe( 'deletion' );
+	} );
+
+	it( 'carries the wrapping marker type and author on the decoration', () => {
+		// Announcement CSS names the suggester off these; reading them from an
+		// ancestor instead would let the outer marker claim the inner run.
+		const { formats } = create( { html: nested } );
+		const decorated = addSuggestionRoleFormats( formats );
+		expect( decorationAt( decorated, 0 ).attributes ).toEqual(
+			expect.objectContaining( {
+				author: '4',
+				suggestionType: 'add',
+			} )
+		);
+		expect( decorationAt( decorated, 3 ).attributes ).toEqual(
+			expect.objectContaining( {
+				author: '7',
+				suggestionType: 'del',
+			} )
+		);
+	} );
+
+	it( 'gives the outer and inner runs distinct decorations', () => {
+		const { formats } = create( { html: nested } );
+		const decorated = addSuggestionRoleFormats( formats );
+		expect( decorationAt( decorated, 0 ) ).not.toBe(
+			decorationAt( decorated, 3 )
+		);
+	} );
+
+	it( 'omits the attributes a marker does not carry', () => {
+		// rich-text renders every key in the attribute object, so a missing
+		// author must be absent rather than the string "undefined".
+		const { formats } = create( {
+			html: '<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="del">x</mark>',
+		} );
+		const { attributes } = decorationAt(
+			addSuggestionRoleFormats( formats ),
+			0
+		);
+		expect( attributes ).not.toHaveProperty( 'author' );
+		expect( attributes.suggestionType ).toBe( 'del' );
+	} );
+
+	it( 'never serializes the decoration attributes into content', () => {
+		const value = RichTextData.fromHTMLString( nested );
+		const html = value.toHTMLString();
+		expect( html ).not.toContain( 'wp-suggestion-a11y' );
+		expect( html ).toContain( 'data-author="4"' );
+		expect( html ).toContain( 'data-author="7"' );
+	} );
+} );

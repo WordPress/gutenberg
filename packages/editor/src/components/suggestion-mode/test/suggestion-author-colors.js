@@ -1,7 +1,12 @@
+import { create, toHTMLString } from '@wordpress/rich-text';
 import {
 	buildSuggestionAuthorColorCss,
 	buildSuggestionAuthorAnnouncementCss,
 } from '../suggestion-author-colors';
+import {
+	registerSuggestionFormat,
+	addSuggestionRoleFormats,
+} from '../../inline-suggestions/format';
 
 const inlineThread = ( id, author, authorName ) => ( {
 	id,
@@ -93,13 +98,13 @@ describe( 'buildSuggestionAuthorAnnouncementCss', () => {
 			inlineThread( 1, 4, 'Edith Editor' ),
 		] );
 		expect( css ).toContain(
-			'.wp-suggestion[data-author="4"][data-suggestion-type="add"] .wp-suggestion-a11y::before{content:"Start of suggested addition by Edith Editor.";}'
+			'.wp-suggestion-a11y[data-author="4"][data-suggestion-type="add"]::before{content:"Start of suggested addition by Edith Editor.";}'
 		);
 		expect( css ).toContain(
-			'.wp-suggestion[data-author="4"][data-suggestion-type="del"] .wp-suggestion-a11y::after{content:"End of suggested deletion by Edith Editor.";}'
+			'.wp-suggestion-a11y[data-author="4"][data-suggestion-type="del"]::after{content:"End of suggested deletion by Edith Editor.";}'
 		);
 		expect( css ).toContain(
-			'[data-suggestion-type="format"] .wp-suggestion-a11y::before{content:"Start of suggested formatting change by Edith Editor.";}'
+			'[data-suggestion-type="format"]::before{content:"Start of suggested formatting change by Edith Editor.";}'
 		);
 	} );
 
@@ -129,5 +134,94 @@ describe( 'buildSuggestionAuthorAnnouncementCss', () => {
 			inlineThread( 2, 7, 'Sam' ),
 		] );
 		expect( css.match( /data-author="7"/g ) ).toHaveLength( 6 );
+	} );
+} );
+
+describe( 'announcements against the rendered editable DOM', () => {
+	beforeAll( () => {
+		registerSuggestionFormat();
+	} );
+
+	afterEach( () => {
+		document.body.innerHTML = '';
+	} );
+
+	/**
+	 * Lay out a marker run the way the editable tree does, so the announcement
+	 * selectors are matched against real DOM rather than an assumed shape.
+	 *
+	 * @param {string} html Serialized marker HTML.
+	 * @return {NodeList} The decoration spans, in document order.
+	 */
+	function decorationSpansIn( html ) {
+		const value = create( { html } );
+		document.body.innerHTML = toHTMLString( {
+			value: {
+				...value,
+				formats: addSuggestionRoleFormats( value.formats ),
+			},
+		} );
+		return document.querySelectorAll( '.wp-suggestion-a11y' );
+	}
+
+	/**
+	 * Every announcement the injected stylesheet would paint on `span`, as
+	 * "pseudo: text". More than one pair means the marker is ambiguous: the
+	 * cascade, not the authorship, decides what gets read aloud.
+	 *
+	 * @param {string}  css  Injected stylesheet.
+	 * @param {Element} span A decoration span.
+	 * @return {string[]} Matching announcements.
+	 */
+	function announcementsFor( css, span ) {
+		const found = [];
+		for ( const [ , selector, content ] of css.matchAll(
+			/([^{}]+)\{content:"((?:[^"\\]|\\.)*)"/g
+		) ) {
+			const [ base, pseudo ] = selector.split( '::' );
+			if ( span.matches( base ) ) {
+				found.push( `${ pseudo }: ${ content }` );
+			}
+		}
+		return found;
+	}
+
+	it( 'attributes a marker to its own author, not an enclosing one', () => {
+		// Overlapping runs from two people serialize as nested markers. The
+		// inner run is a descendant of the outer marker too, so an ancestor
+		// selector lets whichever author the stylesheet emits last win.
+		const spans = decorationSpansIn(
+			'<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add" data-author="4">out' +
+				'<mark class="wp-suggestion" data-suggestion-id="2" data-suggestion-type="del" data-author="7">in</mark>' +
+				'</mark>'
+		);
+		const css = buildSuggestionAuthorAnnouncementCss( [
+			inlineThread( 1, 4, 'Ana' ),
+			inlineThread( 2, 7, 'Bo' ),
+		] );
+		expect( spans ).toHaveLength( 2 );
+		expect( announcementsFor( css, spans[ 0 ] ) ).toEqual( [
+			'before: Start of suggested addition by Ana.',
+			'after: End of suggested addition by Ana.',
+		] );
+		expect( announcementsFor( css, spans[ 1 ] ) ).toEqual( [
+			'before: Start of suggested deletion by Bo.',
+			'after: End of suggested deletion by Bo.',
+		] );
+	} );
+
+	it( 'still names the author of a marker holding other formatting', () => {
+		// A bold word inside a marker renders between the marker and the
+		// decoration span, so the span is not a direct child of the marker.
+		const spans = decorationSpansIn(
+			'<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="del" data-author="4"><strong>bold</strong></mark>'
+		);
+		const css = buildSuggestionAuthorAnnouncementCss( [
+			inlineThread( 1, 4, 'Ana' ),
+		] );
+		expect( announcementsFor( css, spans[ 0 ] ) ).toEqual( [
+			'before: Start of suggested deletion by Ana.',
+			'after: End of suggested deletion by Ana.',
+		] );
 	} );
 } );

@@ -140,7 +140,8 @@ export function getSuggestionA11yDescriptor( type ) {
  *
  * One decoration object is reused across each contiguous marker run
  * (rich-text merges adjacent identical format references into a single
- * element), so a marker gains exactly one nested role element.
+ * element), so a marker gains exactly one nested role element. Where markers
+ * nest, each run keeps its own decoration describing the marker that wraps it.
  *
  * @param {Array} formats Per-character format stacks.
  * @return {Array} Format stacks with role decorations added.
@@ -154,8 +155,15 @@ export function addSuggestionRoleFormats( formats ) {
 	let lastDecoration = null;
 	for ( let i = 0; i < formats.length; i++ ) {
 		const stack = formats[ i ];
+		/*
+		 * The innermost marker, not the first: overlapping runs from two
+		 * people serialize as nested markers, and the decoration is appended
+		 * last so it renders inside all of them. Describing an enclosing
+		 * marker would announce the wrong change - a deletion nested inside
+		 * someone else's addition read aloud as an addition.
+		 */
 		const suggestion = Array.isArray( stack )
-			? stack.find( ( f ) => f.type === SUGGESTION_FORMAT_NAME )
+			? stack.findLast( ( f ) => f.type === SUGGESTION_FORMAT_NAME )
 			: undefined;
 		if ( ! suggestion ) {
 			lastSuggestion = null;
@@ -167,17 +175,30 @@ export function addSuggestionRoleFormats( formats ) {
 		}
 		if ( suggestion !== lastSuggestion ) {
 			lastSuggestion = suggestion;
-			const { start, end, role } = getSuggestionA11yDescriptor(
-				suggestion.attributes?.[ SUGGESTION_TYPE_ATTRIBUTE ]
-			);
+			const type = suggestion.attributes?.[ SUGGESTION_TYPE_ATTRIBUTE ];
+			const author =
+				suggestion.attributes?.[ SUGGESTION_AUTHOR_ATTRIBUTE ];
+			const { start, end, role } = getSuggestionA11yDescriptor( type );
 			/*
-			 * `role` is omitted rather than set to a falsy value: rich-text
-			 * renders every key in this object, so an undefined entry would
-			 * serialize as `role="undefined"`.
+			 * Absent values are omitted rather than set to a falsy one:
+			 * rich-text renders every key in this object, so an undefined
+			 * entry would serialize as `role="undefined"`.
+			 *
+			 * Type and author are repeated onto the decoration so the
+			 * per-author announcement stylesheet can select it directly. An
+			 * ancestor selector would also match a decoration nested deeper
+			 * inside an enclosing marker, letting that marker's author claim
+			 * a run they did not suggest.
 			 */
 			lastDecoration = {
 				type: SUGGESTION_A11Y_FORMAT_NAME,
-				attributes: role ? { start, end, role } : { start, end },
+				attributes: {
+					start,
+					end,
+					...( role && { role } ),
+					...( type !== undefined && { suggestionType: type } ),
+					...( author !== undefined && { author } ),
+				},
 			};
 		}
 		out[ i ] = [ ...stack, lastDecoration ];
@@ -200,6 +221,8 @@ export const suggestionA11yFormat = {
 		role: 'role',
 		start: SUGGESTION_A11Y_START_ATTRIBUTE,
 		end: SUGGESTION_A11Y_END_ATTRIBUTE,
+		suggestionType: SUGGESTION_TYPE_ATTRIBUTE,
+		author: SUGGESTION_AUTHOR_ATTRIBUTE,
 	},
 	interactive: false,
 	edit: () => null,

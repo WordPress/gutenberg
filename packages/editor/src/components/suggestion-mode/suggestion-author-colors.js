@@ -102,9 +102,16 @@ export function buildSuggestionAuthorAnnouncementCss( threads ) {
 		for ( const [ type, [ start, end ] ] of Object.entries(
 			announcements
 		) ) {
+			/*
+			 * Matched on the decoration's own attributes. Selecting it through
+			 * the marker would also match a decoration nested deeper inside
+			 * this marker - the overlapping-suggestions case - so two authors'
+			 * rules would match the same span at equal specificity and source
+			 * order, not authorship, would decide what is read aloud.
+			 */
 			const sel =
-				`.wp-suggestion[data-author="${ author }"]` +
-				`[data-suggestion-type="${ type }"] .wp-suggestion-a11y`;
+				`.wp-suggestion-a11y[data-author="${ author }"]` +
+				`[data-suggestion-type="${ type }"]`;
 			rules.push(
 				`${ sel }::before{content:"${ escapeCssString(
 					sprintf( start, name )
