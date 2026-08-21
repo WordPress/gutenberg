@@ -645,9 +645,9 @@ export const EditMode: Story = {
 // Human-readable summary of each constrained tile's `itemLimits` entry,
 // rendered inside the tile beside its live width label.
 const LIMIT_LABELS: Record< string, string > = {
-	floor: 'min 320 × 160 px',
-	ceiling: 'max 360 × 200 px',
-	ranged: 'min 200, max 480 wide',
+	floor: 'min 320 × 200 px',
+	ceiling: 'max 500 × 400 px',
+	ranged: 'min 200, max 600 wide',
 };
 
 /**
@@ -667,13 +667,13 @@ const LIMIT_LABELS: Record< string, string > = {
 export const SizeLimits: Story = {
 	name: 'Per-Item Size Limits',
 	args: {
-		columns: 6,
+		columns: 12,
 		rowHeight: 80,
 		editMode: true,
 		itemLimits: {
-			floor: { minWidth: 320, minHeight: 160 },
-			ceiling: { maxWidth: 360, maxHeight: 200 },
-			ranged: { minWidth: 200, maxWidth: 480 },
+			floor: { minWidth: 320, minHeight: 200 },
+			ceiling: { maxWidth: 500, maxHeight: 400 },
+			ranged: { minWidth: 200, maxWidth: 600 },
 		},
 	},
 	render: function SizeLimitsRender( args ) {

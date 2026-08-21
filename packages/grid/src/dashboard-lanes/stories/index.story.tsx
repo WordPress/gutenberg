@@ -372,11 +372,11 @@ export const EditMode: Story = {
 export const SizeLimits: Story = {
 	name: 'Per-Item Size Limits',
 	args: {
-		columns: 4,
+		columns: 12,
 		editMode: true,
 		itemLimits: {
 			min: { minWidth: 360 },
-			max: { maxWidth: 260 },
+			max: { maxWidth: 500 },
 		},
 	},
 	render: function SizeLimitsStory( args ) {
@@ -394,13 +394,32 @@ export const SizeLimits: Story = {
 			},
 			{
 				key: 'max',
+				width: 3,
 				tone: 'warning',
 				height: 120,
-				label: 'max 260px wide',
+				label: 'max 500px wide',
 			},
-			{ key: 'free-a', tone: 'neutral', height: 180, label: 'no limits' },
-			{ key: 'free-b', tone: 'neutral', height: 100, label: 'no limits' },
-			{ key: 'free-c', tone: 'neutral', height: 160, label: 'no limits' },
+			{
+				key: 'free-a',
+				width: 3,
+				tone: 'neutral',
+				height: 180,
+				label: 'no limits',
+			},
+			{
+				key: 'free-b',
+				width: 2,
+				tone: 'neutral',
+				height: 100,
+				label: 'no limits',
+			},
+			{
+				key: 'free-c',
+				width: 3,
+				tone: 'neutral',
+				height: 160,
+				label: 'no limits',
+			},
 		];
 
 		const [ tiles, setTiles ] = useState( initial );
