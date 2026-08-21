@@ -64,7 +64,7 @@
 		flex-direction: column;
 		align-items: center;
 		gap: $grid-unit-15;
-		padding: $grid-unit-10 $grid-unit-20 0 $grid-unit-20;
+		padding: $grid-unit-10 $grid-unit-20 $grid-unit-05 $grid-unit-20;
 		// The ruler masks the ticks behind its active number; tell it which
 		// surface to paint that mask in, now that it is off the grey stage.
 		--rotation-ruler-surface: #{$white};
