@@ -1,6 +1,6 @@
 import { forwardRef, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-import { ControlWithError } from '../../control-with-error';
+import { ControlWithError } from '../primitives/control-with-error';
 import { InputControl } from '../input-control';
 import type { ValidatedInputControlProps } from './types';
 
