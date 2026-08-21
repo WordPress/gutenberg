@@ -1,11 +1,5 @@
 import { RichTextData, create, removeFormat } from '@wordpress/rich-text';
-import { SUGGESTION_FORMAT_NAME } from './format';
-
-/**
- * The marker class the `core/suggestion` format serializes to. Used as a cheap
- * containment probe so unmarked values skip the rich-text parse entirely.
- */
-const SUGGESTION_MARKER_CLASS = 'wp-suggestion';
+import { SUGGESTION_CLASS, SUGGESTION_FORMAT_NAME } from './format';
 
 /**
  * Whether an attribute value carries a live inline suggestion marker.
@@ -21,10 +15,10 @@ const SUGGESTION_MARKER_CLASS = 'wp-suggestion';
  */
 export function hasSuggestionMarkers( value ) {
 	if ( typeof value === 'string' ) {
-		return value.includes( SUGGESTION_MARKER_CLASS );
+		return value.includes( SUGGESTION_CLASS );
 	}
 	if ( value instanceof RichTextData ) {
-		return value.toHTMLString().includes( SUGGESTION_MARKER_CLASS );
+		return value.toHTMLString().includes( SUGGESTION_CLASS );
 	}
 	return false;
 }
@@ -55,7 +49,7 @@ export function stripSuggestionMarkers( value ) {
 		return value;
 	}
 	const html = isRich ? value.toHTMLString() : value;
-	if ( ! html.includes( SUGGESTION_MARKER_CLASS ) ) {
+	if ( ! html.includes( SUGGESTION_CLASS ) ) {
 		return value;
 	}
 	const record = create( { html } );

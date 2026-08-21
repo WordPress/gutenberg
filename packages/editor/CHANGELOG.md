@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Suggest mode: keep the code editor closed while the Suggest intent is active and while the post still carries unresolved inline suggestion markers, and identify a marker by its element rather than by a substring of the document ([#81662](https://github.com/WordPress/gutenberg/pull/81662)).
+
 ## 14.53.0 (2026-08-12)
 
 ### Internal

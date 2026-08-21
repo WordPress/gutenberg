@@ -12,6 +12,10 @@ export const SUGGESTION_FORMAT_NAME = 'core/suggestion';
  * Exact class token on a suggestion `<mark>`. Kept distinct from `wp-note` (and
  * from any user/`core/text-color` `<mark>`) so the PHP strip and CSS only ever
  * touch suggestion markers.
+ *
+ * Mirrored as `SUGGESTION_MARKER_CLASS` in `store/constants.ts`, which the
+ * store reads saved content back with and cannot import from here. Those two
+ * are the only copies; keep them in step.
  */
 export const SUGGESTION_CLASS = 'wp-suggestion';
 

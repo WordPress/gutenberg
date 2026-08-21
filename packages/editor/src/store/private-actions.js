@@ -774,8 +774,7 @@ export function selectNote( noteId, options = { focus: false } ) {
  *
  * The intent represents the user's editing purpose: directly editing content
  * (`edit`), suggesting changes that the author can apply or reject
- * (`suggest`), or viewing the post in a read-only mode (`view`). It is
- * orthogonal to the `editorMode` preference (visual vs. code).
+ * (`suggest`), or viewing the post in a read-only mode (`view`).
  *
  * The intent is *session-scoped* — held in the editor reducer (not the
  * preferences store), so reloading the editor always returns to `edit`.
@@ -786,6 +785,12 @@ export function selectNote( noteId, options = { focus: false } ) {
  * typos from a bookmarklet, browser extension, or third-party plugin can't
  * poison the editor state; valid values are listed in `EDITOR_INTENTS`.
  *
+ * `suggest` is refused outright when the visual editor is unavailable. It is
+ * a visual-only intent — suggestions live as inline markers the code editor
+ * cannot render — so a user with "Disable the visual editor when writing" set
+ * has nowhere to suggest. Refusing here covers the keyboard shortcut and any
+ * programmatic dispatch; the intent menu offers the choice disabled.
+ *
  * @param {'edit'|'suggest'|'view'} intent The editor intent to set.
  */
 export const setEditorIntent =
@@ -795,7 +800,41 @@ export const setEditorIntent =
 			return;
 		}
 
+		/*
+		 * Suggesting needs the visual canvas: a suggestion is an inline
+		 * marker in block content, and the code editor - the only surface
+		 * left when rich editing is off - has nowhere to render one and
+		 * re-parses whatever it hands back. Refuse rather than force the
+		 * visual editor on someone who turned it off in their profile.
+		 */
+		if (
+			intent === EDITOR_INTENT_SUGGEST &&
+			! select.getEditorSettings().richEditingEnabled
+		) {
+			const refusal = __(
+				'Suggesting needs the visual editor. Enable it in your profile settings to suggest changes.'
+			);
+			speak( refusal, 'assertive' );
+			registry.dispatch( noticesStore ).createNotice( 'info', refusal, {
+				id: 'editor-intent-mode',
+				type: 'snackbar',
+				isDismissible: true,
+			} );
+			return;
+		}
+
 		const previousIntent = select.getEditorIntent();
+		/*
+		 * `getEditorMode` masks the stored preference while suggesting, so
+		 * entering or leaving that intent can swap the whole canvas without
+		 * `switchEditorMode` - the action that owns the mode announcement -
+		 * ever being dispatched. Read the mode before the dispatch so the two
+		 * can be compared after it and the swap announced; it has to be taken
+		 * here, ahead of the early return below, because the dispatch is what
+		 * changes the answer.
+		 */
+		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+		const previousMode = select.getEditorMode();
 
 		dispatch( { type: 'SET_EDITOR_INTENT', intent } );
 
@@ -813,6 +852,8 @@ export const setEditorIntent =
 			return;
 		}
 
+		const nextMode = select.getEditorMode();
+
 		let label;
 		if ( intent === EDITOR_INTENT_EDIT ) {
 			label = __( "You're editing" );
@@ -823,11 +864,28 @@ export const setEditorIntent =
 		}
 
 		if ( label ) {
-			speak( label, 'assertive' );
+			/*
+			 * Fold the canvas swap into the same message instead of speaking
+			 * twice: two `assertive` announcements in a row and the second
+			 * clobbers the first before it has been read out.
+			 */
+			let message = label;
+			if ( nextMode !== previousMode ) {
+				message = sprintf(
+					/* translators: 1: The editing mode that was entered, e.g. "You're suggesting". 2: The editor that is now shown, e.g. "Visual editor selected". */
+					__( '%1$s. %2$s' ),
+					label,
+					nextMode === 'visual'
+						? __( 'Visual editor selected' )
+						: __( 'Code editor selected' )
+				);
+			}
+
+			speak( message, 'assertive' );
 			// Reuse the same notice id across mode changes so rapid keyboard
 			// cycling doesn't pile up multiple snackbars — the new notice
 			// replaces the old one.
-			registry.dispatch( noticesStore ).createNotice( 'info', label, {
+			registry.dispatch( noticesStore ).createNotice( 'info', message, {
 				id: 'editor-intent-mode',
 				type: 'snackbar',
 				isDismissible: true,
