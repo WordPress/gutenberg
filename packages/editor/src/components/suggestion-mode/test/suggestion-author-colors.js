@@ -115,6 +115,18 @@ describe( 'buildSuggestionAuthorAnnouncementCss', () => {
 		expect( css ).toContain( 'Renée \\"Rex\\" O\'Hara' );
 	} );
 
+	it( 'collapses every character CSS treats as a newline', () => {
+		// A form feed terminates a CSS string exactly as a line feed does. The
+		// browser then discards the rest of the declaration and everything
+		// after it, so one name would silence the announcements of every
+		// author emitted later in the stylesheet.
+		const css = buildSuggestionAuthorAnnouncementCss( [
+			inlineThread( 1, 2, 'Lee\fFord' ),
+		] );
+		expect( css ).toContain( 'Lee Ford' );
+		expect( css ).not.toMatch( /[\n\r\f]/ );
+	} );
+
 	it( 'names an author whose first thread carried no display name', () => {
 		// Threads are scanned in order and the name is memoized per author. A
 		// response that omitted author_name must not be the one that sticks:

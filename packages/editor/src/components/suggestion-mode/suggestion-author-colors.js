@@ -52,11 +52,16 @@ function getInlineSuggestionAuthors( threads ) {
  * user-supplied, so a stray quote or backslash would otherwise break out of the
  * `content` value and corrupt the injected stylesheet.
  *
+ * A raw newline ends a CSS string too, and the parser then drops everything
+ * from there to the end of the stylesheet - one such name would silence the
+ * announcements of every author emitted after it. CSS counts three
+ * characters as a newline: line feed, carriage return and form feed.
+ *
  * @param {string} value Decoded display name.
  * @return {string} Value safe to place between double quotes.
  */
 function escapeCssString( value ) {
-	return value.replace( /[\\"]/g, '\\$&' ).replace( /[\n\r]+/g, ' ' );
+	return value.replace( /[\\"]/g, '\\$&' ).replace( /[\n\r\f]+/g, ' ' );
 }
 
 /**
