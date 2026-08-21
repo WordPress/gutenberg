@@ -20,7 +20,7 @@
 
 ### Internal
 
--   Global Styles UI: replace the private `Menu` from `@wordpress/components` with the public `Menu` from `@wordpress/ui` for preset actions and the block filter.
+-   Global Styles UI: replace the private `Menu` from `@wordpress/components` with the public `Menu` from `@wordpress/ui` for preset actions and the block filter. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))
 -   Exclude the JavaScript tests and story from the build project so their declarations are not published. ([#81516](https://github.com/WordPress/gutenberg/pull/81516))
 
 ## 1.20.0 (2026-08-12)
