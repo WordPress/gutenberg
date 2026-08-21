@@ -380,6 +380,50 @@ describe( 'transforms', () => {
 		}
 	);
 
+	it.each( [
+		[ 'Grid', 'group-grid' ],
+		[ 'Row', 'group-row' ],
+	] )(
+		'preserves Group-supported Column attributes when transforming Columns to %s',
+		( _variationTitle, variationName ) => {
+			const block = createBlock( 'core/columns', {}, [
+				createBlock(
+					'core/column',
+					{
+						anchor: 'column-anchor',
+						lock: { move: true, remove: true },
+						templateLock: 'insert',
+						verticalAlignment: 'center',
+						width: '320px',
+					},
+					[ createBlock( 'core/paragraph' ) ]
+				),
+			] );
+
+			const transformedBlocks = switchToBlockType(
+				block,
+				'core/group',
+				variationName
+			);
+			const transformedColumn = transformedBlocks[ 0 ].innerBlocks[ 0 ];
+
+			expect( transformedColumn ).toMatchObject( {
+				name: 'core/group',
+				attributes: {
+					anchor: 'column-anchor',
+					lock: { move: true, remove: true },
+					templateLock: 'insert',
+				},
+			} );
+			expect( transformedColumn.attributes ).not.toHaveProperty(
+				'verticalAlignment'
+			);
+			expect( transformedColumn.attributes ).not.toHaveProperty(
+				'width'
+			);
+		}
+	);
+
 	it( 'migrates Column widths to Row child sizing controls', () => {
 		const block = createBlock( 'core/columns', {}, [
 			createBlock( 'core/column', { width: '320px' }, [
