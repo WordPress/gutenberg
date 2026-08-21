@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Keep indexed (palette) PNGs indexed when resizing, compressing, or converting them, instead of re-encoding them as truecolour, which made sub-sizes several times larger than the original. The image quality setting is not applied to the resulting palette, since PNG output stays lossless ([#65922](https://core.trac.wordpress.org/ticket/65922)).
+-   Keep indexed (palette) PNGs indexed when resizing, compressing, converting, or rotating them, instead of re-encoding them as truecolour, which made sub-sizes several times larger than the original. The image quality setting is not applied to the resulting palette, since PNG output stays lossless. Reported against core as https://core.trac.wordpress.org/ticket/65922 ([#81895](https://github.com/WordPress/gutenberg/issues/81895)).
 
 ### Internal
 
