@@ -1119,6 +1119,39 @@ describe( 'RangeCalendar', () => {
 			expect( getDateButton( nextRange.from ) ).toHaveFocus();
 		} );
 
+		it( 'should keep tracking focus when the focused day remains in a later displayed month', () => {
+			const nextRange = {
+				from: addMonths( today, 1 ),
+				to: addMonths( tomorrow, 1 ),
+			};
+			const { rerender } = render(
+				<RangeCalendar
+					month={ currentMonth }
+					numberOfMonths={ 2 }
+					value={ { from: today, to: tomorrow } }
+				/>
+			);
+
+			act( () => getDateButton( today ).focus() );
+			rerender(
+				<RangeCalendar
+					month={ prevMonth }
+					numberOfMonths={ 2 }
+					value={ { from: today, to: tomorrow } }
+				/>
+			);
+			expect( getDateButton( today ) ).toHaveFocus();
+			rerender(
+				<RangeCalendar
+					month={ nextMonth }
+					numberOfMonths={ 2 }
+					value={ nextRange }
+				/>
+			);
+
+			expect( getDateButton( nextRange.from ) ).toHaveFocus();
+		} );
+
 		it( 'should auto-focus the selected day when the `autoFocus` prop is set to `true`', async () => {
 			render(
 				<RangeCalendar

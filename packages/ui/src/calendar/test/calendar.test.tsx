@@ -601,6 +601,36 @@ describe( 'Calendar', () => {
 			expect( getDateButton( selectedNextMonth ) ).toHaveFocus();
 		} );
 
+		it( 'should keep tracking focus when the focused day remains in a later displayed month', () => {
+			const selectedNextMonth = addMonths( today, 1 );
+			const { rerender } = render(
+				<Calendar
+					month={ currentMonth }
+					numberOfMonths={ 2 }
+					value={ today }
+				/>
+			);
+
+			act( () => getDateButton( today ).focus() );
+			rerender(
+				<Calendar
+					month={ prevMonth }
+					numberOfMonths={ 2 }
+					value={ today }
+				/>
+			);
+			expect( getDateButton( today ) ).toHaveFocus();
+			rerender(
+				<Calendar
+					month={ nextMonth }
+					numberOfMonths={ 2 }
+					value={ selectedNextMonth }
+				/>
+			);
+
+			expect( getDateButton( selectedNextMonth ) ).toHaveFocus();
+		} );
+
 		it( 'should not move outside focus when the controlled month changes', () => {
 			const { rerender } = render(
 				<>

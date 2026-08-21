@@ -43,9 +43,8 @@ export function usePreserveDayFocus(
 		}
 		const { activeElement, body } = root.ownerDocument;
 		if ( activeElement !== body ) {
-			const grid = root.querySelector( '[role="grid"]' );
-			hadDayFocusRef.current =
-				!! activeElement && !! grid?.contains( activeElement );
+			const grid = activeElement?.closest( '[role="grid"]' );
+			hadDayFocusRef.current = !! grid && root.contains( grid );
 			return;
 		}
 		hadDayFocusRef.current = false;
