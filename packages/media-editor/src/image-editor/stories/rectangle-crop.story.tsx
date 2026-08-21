@@ -118,12 +118,6 @@ function resolveAspectRatio(
 }
 
 const meta: Meta< typeof Cropper > = {
-	parameters: {
-		// FIXME: Editor chrome fails color-contrast; debug view has a non-keyboard-accessible scroll region (color-contrast, scrollable-region-focusable).
-		// See: https://github.com/WordPress/gutenberg/issues/81596
-		a11y: { test: 'todo' },
-	},
-
 	title: 'MediaEditor/ImageEditor',
 	component: Cropper,
 	tags: [ 'status-experimental' ],
@@ -154,6 +148,11 @@ const DefaultComponent = () => {
 };
 
 export const Default: Story = {
+	parameters: {
+		// FIXME: Editor chrome fails color-contrast.
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: DefaultComponent,
 };
 
@@ -1059,5 +1058,10 @@ aspect ratio: ${ ( sourceRegion.width / sourceRegion.height ).toFixed( 2 ) }
 };
 
 export const Debug: Story = {
+	parameters: {
+		// FIXME: Editor chrome fails color-contrast; the debug view has a non-keyboard-accessible scroll region (color-contrast, scrollable-region-focusable).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: DebugComponent,
 };

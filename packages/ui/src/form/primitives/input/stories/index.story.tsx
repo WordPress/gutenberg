@@ -46,16 +46,22 @@ export const WithPrefix: Story = {
 	},
 };
 
-WithSuffixControl.args = {
-	...WithSuffixControl.args,
-	children: undefined,
+// Copied rather than mutated: the story object is shared with the InputLayout
+// and InputControl stories, and assigning to it would apply these args and
+// parameters to their copies of the story too.
+const InputWithSuffixControl: typeof WithSuffixControl = {
+	...WithSuffixControl,
+	args: {
+		...WithSuffixControl.args,
+		children: undefined,
+	},
+	parameters: {
+		// FIXME: Story shows Input without a visible label (label). Update it to include Field.Label (or an equivalent labeled composition) so the example is copy-paste safe.
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 };
-WithSuffixControl.parameters = {
-	// FIXME: Story shows Input without a visible label (label). Update it to include Field.Label (or an equivalent labeled composition) so the example is copy-paste safe.
-	// See: https://github.com/WordPress/gutenberg/issues/81596
-	a11y: { test: 'todo' },
-};
-export { WithSuffixControl };
+export { InputWithSuffixControl as WithSuffixControl };
 
 export const Disabled: Story = {
 	args: {

@@ -44,9 +44,6 @@ const meta: Meta< typeof RangeControl > = {
 		onMouseMove: fn(),
 	},
 	parameters: {
-		// FIXME: Mark labels fail color-contrast; some mark stories also render an empty heading when `label` is unset (empty-heading).
-		// See: https://github.com/WordPress/gutenberg/issues/81596
-		a11y: { test: 'todo' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
@@ -171,6 +168,12 @@ const marksWithNegatives = [
 export const WithIntegerStepAndMarks: StoryFn< typeof RangeControl > =
 	MarkTemplate.bind( {} );
 
+WithIntegerStepAndMarks.parameters = {
+	// FIXME: Mark labels fail color-contrast; stories without a `label` arg also render an empty heading (color-contrast, empty-heading).
+	// See: https://github.com/WordPress/gutenberg/issues/81596
+	a11y: { test: 'todo' },
+};
+
 WithIntegerStepAndMarks.args = {
 	label: 'Integer Step',
 	marks: marksBase,
@@ -186,6 +189,12 @@ WithIntegerStepAndMarks.args = {
  */
 export const WithDecimalStepAndMarks: StoryFn< typeof RangeControl > =
 	MarkTemplate.bind( {} );
+
+WithDecimalStepAndMarks.parameters = {
+	// FIXME: Mark labels fail color-contrast; stories without a `label` arg also render an empty heading (color-contrast, empty-heading).
+	// See: https://github.com/WordPress/gutenberg/issues/81596
+	a11y: { test: 'todo' },
+};
 
 WithDecimalStepAndMarks.args = {
 	marks: [
@@ -206,6 +215,12 @@ WithDecimalStepAndMarks.args = {
 export const WithNegativeMinimumAndMarks: StoryFn< typeof RangeControl > =
 	MarkTemplate.bind( {} );
 
+WithNegativeMinimumAndMarks.parameters = {
+	// FIXME: Mark labels fail color-contrast; stories without a `label` arg also render an empty heading (color-contrast, empty-heading).
+	// See: https://github.com/WordPress/gutenberg/issues/81596
+	a11y: { test: 'todo' },
+};
+
 WithNegativeMinimumAndMarks.args = {
 	marks: marksWithNegatives,
 	max: 10,
@@ -221,6 +236,12 @@ WithNegativeMinimumAndMarks.args = {
 export const WithNegativeRangeAndMarks: StoryFn< typeof RangeControl > =
 	MarkTemplate.bind( {} );
 
+WithNegativeRangeAndMarks.parameters = {
+	// FIXME: Mark labels fail color-contrast; stories without a `label` arg also render an empty heading (color-contrast, empty-heading).
+	// See: https://github.com/WordPress/gutenberg/issues/81596
+	a11y: { test: 'todo' },
+};
+
 WithNegativeRangeAndMarks.args = {
 	marks: marksWithNegatives,
 	max: -1,
@@ -235,6 +256,12 @@ WithNegativeRangeAndMarks.args = {
  */
 export const WithAnyStepAndMarks: StoryFn< typeof RangeControl > =
 	MarkTemplate.bind( {} );
+
+WithAnyStepAndMarks.parameters = {
+	// FIXME: Mark labels fail color-contrast; stories without a `label` arg also render an empty heading (color-contrast, empty-heading).
+	// See: https://github.com/WordPress/gutenberg/issues/81596
+	a11y: { test: 'todo' },
+};
 
 WithAnyStepAndMarks.args = {
 	marks: marksBase,

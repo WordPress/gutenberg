@@ -9,12 +9,6 @@ import type { ActionButton, View } from '../../types';
 import { data, fields, type SpaceObject } from './fixtures';
 
 const meta = {
-	parameters: {
-		// FIXME: Picker UI nests interactive controls (nested-interactive).
-		// See: https://github.com/WordPress/gutenberg/issues/81596
-		a11y: { test: 'todo' },
-	},
-
 	tags: [ 'manifest' ],
 	title: 'DataViews/DataViewsPicker',
 	component: DataViewsPicker,
@@ -214,6 +208,11 @@ export const Default = ( {
 
 Default.args = storyArgs;
 Default.argTypes = storyArgTypes;
+Default.parameters = {
+	// FIXME: Picker UI nests interactive controls (nested-interactive).
+	// See: https://github.com/WordPress/gutenberg/issues/81596
+	a11y: { test: 'todo' },
+};
 
 export const WithModal = ( {
 	perPageSizes = [ 10, 25, 50, 100 ],
