@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { Button } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { useEffect, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import PostTextEditor from '../post-text-editor';
 import PostTitleRaw from '../post-title/post-title-raw';

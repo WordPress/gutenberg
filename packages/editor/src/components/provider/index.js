@@ -1,9 +1,10 @@
-/**
- * WordPress dependencies
- */
-import { useEffect, useLayoutEffect, useMemo } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+} from '@wordpress/element';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import {
 	EntityProvider,
 	useEntityBlockEditor,
@@ -17,27 +18,29 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import { createBlock } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import withRegistryProvider from './with-registry-provider';
 import { store as editorStore } from '../../store';
-import { ATTACHMENT_POST_TYPE } from '../../store/constants';
+import useAutosaveNotice from './use-autosave-notice';
 import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
 import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
 import NavigationBlockEditingMode from './navigation-block-editing-mode';
 import { useHideBlocksFromInserter } from './use-hide-blocks-from-inserter';
+import { useRevisionBlocks } from './use-revision-blocks';
 import useCommands from '../commands';
+import useUploadSaveLock from './use-upload-save-lock';
+import useNetworkReconnect from './use-network-reconnect';
 import BlockRemovalWarnings from '../block-removal-warnings';
 import StartPageOptions from '../start-page-options';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import StartTemplateOptions from '../start-template-options';
 import EditorKeyboardShortcuts from '../global-keyboard-shortcuts';
+import EditorKeyboardShortcutsRegister from '../global-keyboard-shortcuts/register-shortcuts';
 import PatternRenameModal from '../pattern-rename-modal';
 import PatternDuplicateModal from '../pattern-duplicate-modal';
 import TemplatePartMenuItems from '../template-part-menu-items';
+import MediaEditorModalMount from '../media/media-editor-modal';
+import { getCanvasWidthByDeviceType } from '../../utils/device-type';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
@@ -72,6 +75,7 @@ const NON_CONTEXTUAL_POST_TYPES = [
  * @return {Array} Block editor props.
  */
 function useBlockEditorProps( post, template, mode ) {
+	const revisionBlocks = useRevisionBlocks();
 	const rootLevelPost = mode === 'template-locked' ? 'template' : 'post';
 	const [ postBlocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
@@ -110,6 +114,11 @@ function useBlockEditorProps( post, template, mode ) {
 		return postBlocks;
 	}, [ maybeNavigationBlocks, rootLevelPost, templateBlocks, postBlocks ] );
 
+	// In revisions mode, use the revision blocks and disable editing.
+	if ( revisionBlocks !== null ) {
+		return [ revisionBlocks, noop, noop ];
+	}
+
 	// Handle fallback to postBlocks outside of the above useMemo, to ensure
 	// that constructed block templates that call `createBlock` are not generated
 	// too frequently. This ensures that clientIds are stable.
@@ -135,6 +144,7 @@ function useBlockEditorProps( post, template, mode ) {
  * @param {Object}  props.settings                       The editor settings.
  * @param {boolean} props.recovery                       Indicates if the editor is in recovery mode.
  * @param {Array}   props.initialEdits                   The initial edits for the editor.
+ * @param {string}  [props.initialViewport]              The device type an entity opens at, one of those `setDeviceType` accepts. Each entity opens at the width it names, so a width set from the device preview is view state that does not follow the user into the next one. The current width is left alone when omitted.
  * @param {Object}  props.children                       The child components.
  * @param {Object}  [props.BlockEditorProviderComponent] The block editor provider component to use. Defaults to ExperimentalBlockEditorProvider.
  * @param {Object}  [props.__unstableTemplate]           The template object.
@@ -159,6 +169,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		settings,
 		recovery,
 		initialEdits,
+		initialViewport,
 		children,
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
 		__unstableTemplate: template,
@@ -171,16 +182,20 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			mode,
 			defaultMode,
 			postTypeEntities,
+			isInRevisionsMode,
+			currentRevisionId,
 		} = useSelect(
 			( select ) => {
 				const {
 					getEditorSettings,
-					getEditorSelection,
 					getRenderingMode,
 					__unstableIsEditorReady,
 					getDefaultRenderingMode,
+					isRevisionsMode: _isRevisionsMode,
+					getCurrentRevisionId: _getCurrentRevisionId,
 				} = unlock( select( editorStore ) );
-				const { getEntitiesConfig } = select( coreStore );
+				const { getEntitiesConfig, getEntityRecordEdits } =
+					select( coreStore );
 
 				const _mode = getRenderingMode();
 				const _defaultMode = getDefaultRenderingMode( post.type );
@@ -198,6 +213,14 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				// Wait until the default mode is retrieved and start rendering canvas.
 				const isRenderingModeReady = _defaultMode !== undefined;
 
+				// Read selection directly from entity edits using the post prop,
+				// bypassing getCurrentPostId() which lags behind in useEffect.
+				const entityEdits = getEntityRecordEdits(
+					'postType',
+					post.type,
+					post.id
+				);
+
 				return {
 					editorSettings: getEditorSettings(),
 					isReady: __unstableIsEditorReady(),
@@ -205,14 +228,16 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					defaultMode: hasResolvedDefaultMode
 						? _defaultMode
 						: undefined,
-					selection: getEditorSelection(),
+					selection: entityEdits?.selection,
 					postTypeEntities:
 						post.type === 'wp_template'
 							? getEntitiesConfig( 'postType' )
 							: null,
+					isInRevisionsMode: _isRevisionsMode(),
+					currentRevisionId: _getCurrentRevisionId(),
 				};
 			},
-			[ post.type, hasTemplate ]
+			[ post.type, post.id, hasTemplate ]
 		);
 
 		const shouldRenderTemplate = hasTemplate && mode !== 'post-only';
@@ -274,6 +299,16 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			mode
 		);
 
+		/*
+		 * Resolved here rather than by dispatching `setDeviceType`, which reads
+		 * the theme's breakpoints from the block editor store — the store this
+		 * provider is the one to fill, and has not yet when it mounts.
+		 */
+		const initialCanvasWidth = getCanvasWidthByDeviceType(
+			initialViewport,
+			blockEditorSettings.__experimentalFeatures?.viewport
+		);
+
 		const {
 			updatePostLock,
 			setupEditor,
@@ -281,9 +316,24 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			setCurrentTemplateId,
 			setEditedPost,
 			setRenderingMode,
+			setCanvasWidth,
 		} = unlock( useDispatch( editorStore ) );
-		const { createWarningNotice, removeNotice } =
-			useDispatch( noticesStore );
+		const { editEntityRecord } = useDispatch( coreStore );
+		const registry = useRegistry();
+
+		const onChangeSelection = useCallback(
+			( newSelection ) => {
+				editEntityRecord(
+					'postType',
+					post.type,
+					post.id,
+					{ selection: newSelection },
+					{ undoIgnore: true }
+				);
+			},
+			[ editEntityRecord, post.type, post.id ]
+		);
+		const { removeNotice } = useDispatch( noticesStore );
 
 		// Ideally this should be synced on each change and not just something you do once.
 		useLayoutEffect( () => {
@@ -293,28 +343,23 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			}
 
 			updatePostLock( settings.postLock );
-			setupEditor( post, initialEdits, settings.template );
-			if ( settings.autosave ) {
-				createWarningNotice(
-					__(
-						'There is an autosave of this post that is more recent than the version below.'
-					),
-					{
-						id: 'autosave-exists',
-						actions: [
-							{
-								label: __( 'View the autosave' ),
-								url: settings.autosave.editLink,
-							},
-						],
-					}
-				);
+			// `setupEditor` may already have been dispatched by the
+			// editor's pre-mount kickoff (see edit-post's
+			// `initializeEditor`). Skip the redundant dispatch — it
+			// would otherwise re-parse + reset blocks for new posts.
+			if ( ! registry.select( editorStore ).__unstableIsEditorReady() ) {
+				setupEditor( post, initialEdits, settings.template );
 			}
 
 			// The dependencies of the hook are omitted deliberately
 			// We only want to run setupEditor (with initialEdits) only once per post.
 			// A better solution in the future would be to split this effect into multiple ones.
 		}, [] );
+
+		// Manages the "more recent autosave" notice. Called after the mount
+		// effect above so that its own mount effect runs once `setupEditor`
+		// has populated the current post.
+		useAutosaveNotice( { post, recovery, settings } );
 
 		// Synchronizes the active post with the state
 		useEffect( () => {
@@ -330,8 +375,24 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			return () => setEditedPost( null, null );
 		}, [ post.type, post.id, setEditedPost, removeNotice ] );
 
-		// Synchronize the editor settings as they change.
+		// Opens the entity at the width it asks for. Keyed on the entity as well
+		// as the width, so that moving to another one leaves a width set from
+		// the device preview behind.
 		useEffect( () => {
+			if ( initialViewport ) {
+				setCanvasWidth( initialCanvasWidth );
+			}
+		}, [
+			post.type,
+			post.id,
+			initialViewport,
+			initialCanvasWidth,
+			setCanvasWidth,
+		] );
+
+		// Synchronize the editor settings as they change.
+		// Do it as a layout effect so that rendered UI with outdated settings is not painted.
+		useLayoutEffect( () => {
 			updateEditorSettings( settings );
 		}, [ settings, updateEditorSettings ] );
 
@@ -352,33 +413,14 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		// Register the editor commands.
 		useCommands();
 
+		// Lock post saving when media uploads are in progress (experimental feature).
+		useUploadSaveLock();
+
+		// Pause/resume media upload queue on network disconnect/reconnect.
+		useNetworkReconnect();
+
 		if ( ! isReady || ! mode ) {
 			return null;
-		}
-
-		const isAttachment =
-			post.type === ATTACHMENT_POST_TYPE &&
-			window?.__experimentalMediaEditor;
-
-		// Early return for attachments - no block editor needed
-		if ( isAttachment ) {
-			return (
-				<EntityProvider kind="root" type="site">
-					<EntityProvider
-						kind="postType"
-						type={ post.type }
-						id={ post.id }
-					>
-						{ children }
-						{ ! settings.isPreviewMode && (
-							<>
-								<EditorKeyboardShortcuts />
-								<KeyboardShortcutHelpModal />
-							</>
-						) }
-					</EntityProvider>
-				</EntityProvider>
-			);
 		}
 
 		return (
@@ -387,13 +429,19 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					kind="postType"
 					type={ post.type }
 					id={ post.id }
+					revisionId={ currentRevisionId ?? undefined }
 				>
 					<BlockContextProvider value={ defaultBlockContext }>
 						<BlockEditorProviderComponent
 							value={ blocks }
 							onChange={ onChange }
 							onInput={ onInput }
-							selection={ selection }
+							selection={
+								isInRevisionsMode ? undefined : selection
+							}
+							onChangeSelection={
+								isInRevisionsMode ? noop : onChangeSelection
+							}
 							settings={ blockEditorSettings }
 							useSubRegistry={ false }
 						>
@@ -408,6 +456,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 									{ type === 'wp_navigation' && (
 										<NavigationBlockEditingMode />
 									) }
+									<EditorKeyboardShortcutsRegister />
 									<EditorKeyboardShortcuts />
 									<KeyboardShortcutHelpModal />
 									<BlockRemovalWarnings />
@@ -415,6 +464,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 									<StartTemplateOptions />
 									<PatternRenameModal />
 									<PatternDuplicateModal />
+									<MediaEditorModalMount />
 								</>
 							) }
 						</BlockEditorProviderComponent>

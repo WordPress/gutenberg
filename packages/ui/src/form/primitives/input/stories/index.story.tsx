@@ -1,14 +1,28 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Input, InputLayout } from '../../../..';
+import { Input } from '../index';
+import { InputLayout } from '../../input-layout';
+import { WithSuffixControl } from '../../input-layout/stories/index.story';
 
 const meta: Meta< typeof Input > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/Primitives/Input',
 	component: Input,
+	// Temporary: Due to an upstream bug, render the root explicitly so the
+	// components manifest extractor can resolve props from the JSX.
+	//
+	// See: https://github.com/storybookjs/storybook/issues/34877
+	render: ( args ) => <Input { ...args } />,
 	argTypes: {
 		defaultValue: { control: false },
 		onValueChange: { action: 'onValueChange' },
 		value: { control: false },
 		type: { control: 'text' },
+	},
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;
@@ -31,6 +45,12 @@ export const WithPrefix: Story = {
 		prefix: <InputLayout.Slot>@</InputLayout.Slot>,
 	},
 };
+
+WithSuffixControl.args = {
+	...WithSuffixControl.args,
+	children: undefined,
+};
+export { WithSuffixControl };
 
 export const Disabled: Story = {
 	args: {

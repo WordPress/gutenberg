@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import type { Field } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
 import { resolveSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import type { BasePostWithEmbeddedAuthor } from '../../types';
 import AuthorView from './author-view';
 
@@ -28,6 +21,9 @@ const authorField: Field< BasePostWithEmbeddedAuthor > = {
 				'user',
 				{
 					per_page: -1,
+					who: 'authors',
+					_fields: 'id,name',
+					context: 'view',
 				}
 			) ) ?? [];
 		return authors.map( ( { id, name } ) => ( {

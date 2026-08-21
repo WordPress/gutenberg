@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { Spinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { getBlockType } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import DownloadableBlocksList from '../downloadable-blocks-list';
 import DownloadableBlocksInserterPanel from './inserter-panel';
 import DownloadableBlocksNoResults from './no-results';

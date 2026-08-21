@@ -1,17 +1,8 @@
-/**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import {
 	RichText,
-	AlignmentControl,
 	InspectorControls,
 	BlockControls,
 	useBlockProps,
@@ -23,20 +14,16 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
-export default function SiteTitleEdit( {
-	attributes,
-	setAttributes,
-	insertBlocksAfter,
-} ) {
-	const { level, levelOptions, textAlign, isLink, linkTarget } = attributes;
+export default function SiteTitleEdit( props ) {
+	useDeprecatedTextAlign( props );
+
+	const { attributes, setAttributes } = props;
+
+	const { level, levelOptions, isLink, linkTarget } = attributes;
 	const { canUserEdit, title } = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEditedEntityRecord } =
 			select( coreStore );
@@ -64,10 +51,8 @@ export default function SiteTitleEdit( {
 
 	const TagName = level === 0 ? 'p' : `h${ level }`;
 	const blockProps = useBlockProps( {
-		className: clsx( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-			'wp-block-site-title__placeholder': ! canUserEdit && ! title,
-		} ),
+		className:
+			! canUserEdit && ! title && 'wp-block-site-title__placeholder',
 	} );
 	const siteTitleContent = canUserEdit ? (
 		<TagName { ...blockProps }>
@@ -80,9 +65,6 @@ export default function SiteTitleEdit( {
 				onChange={ setTitle }
 				allowedFormats={ [] }
 				disableLineBreaks
-				__unstableOnSplitAtEnd={ () =>
-					insertBlocksAfter( createBlock( getDefaultBlockName() ) )
-				}
 			/>
 		</TagName>
 	) : (
@@ -113,12 +95,6 @@ export default function SiteTitleEdit( {
 						onChange={ ( newLevel ) =>
 							setAttributes( { level: newLevel } )
 						}
-					/>
-					<AlignmentControl
-						value={ textAlign }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { textAlign: nextAlign } );
-						} }
 					/>
 				</BlockControls>
 			) }

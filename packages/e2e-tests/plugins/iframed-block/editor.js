@@ -5,6 +5,7 @@
 	const { useRefEffect } = compose;
 
 	registerBlockType( 'test/iframed-block', {
+		apiVersion: 3,
 		edit: function Edit() {
 			const ref = useRefEffect( ( node ) => {
 				$( node ).test();

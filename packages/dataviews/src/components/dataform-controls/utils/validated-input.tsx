@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { privateApis } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { DataFormControlProps } from '../../../types';
 import { unlock } from '../../../lock-unlock';
 import getCustomValidity from './get-custom-validity';
@@ -34,6 +27,7 @@ export default function ValidatedText< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	type,
 	prefix,
 	suffix,
@@ -42,6 +36,7 @@ export default function ValidatedText< Item >( {
 	const { label, placeholder, description, getValue, setValue, isValid } =
 		field;
 	const value = getValue( { item: data } );
+	const disabled = field.isDisabled( { item: data, field } );
 
 	const onChangeControl = useCallback(
 		( newValue: string ) =>
@@ -57,6 +52,7 @@ export default function ValidatedText< Item >( {
 	return (
 		<ValidatedInputControl
 			required={ !! isValid.required }
+			markWhenOptional={ markWhenOptional }
 			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
 			placeholder={ placeholder }
@@ -67,6 +63,7 @@ export default function ValidatedText< Item >( {
 			type={ type }
 			prefix={ prefix }
 			suffix={ suffix }
+			disabled={ disabled }
 			pattern={ isValid.pattern ? isValid.pattern.constraint : undefined }
 			minLength={
 				isValid.minLength ? isValid.minLength.constraint : undefined
@@ -74,7 +71,6 @@ export default function ValidatedText< Item >( {
 			maxLength={
 				isValid.maxLength ? isValid.maxLength.constraint : undefined
 			}
-			__next40pxDefaultSize
 		/>
 	);
 }

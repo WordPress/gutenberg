@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
-import { ControlWithError } from '../control-with-error';
+import { ControlWithError } from '@wordpress/ui';
 import type { ValidatedControlProps } from './types';
 import InputControl from '../../input-control';
 
@@ -17,11 +10,7 @@ const UnforwardedValidatedInputControl = (
 		customValidity,
 		markWhenOptional,
 		...restProps
-	}: Omit<
-		React.ComponentProps< typeof InputControl >,
-		'__next40pxDefaultSize'
-	> &
-		ValidatedControlProps,
+	}: React.ComponentProps< typeof InputControl > & ValidatedControlProps,
 	forwardedRef: React.ForwardedRef< HTMLInputElement >
 ) => {
 	const validityTargetRef = useRef< HTMLInputElement >( null );
@@ -29,16 +18,13 @@ const UnforwardedValidatedInputControl = (
 
 	return (
 		<ControlWithError
+			className="components-validated-control"
 			required={ required }
 			markWhenOptional={ markWhenOptional }
 			customValidity={ customValidity }
 			getValidityTarget={ () => validityTargetRef.current }
 		>
-			<InputControl
-				__next40pxDefaultSize
-				ref={ mergedRefs }
-				{ ...restProps }
-			/>
+			<InputControl ref={ mergedRefs } { ...restProps } />
 		</ControlWithError>
 	);
 };
@@ -46,3 +32,4 @@ const UnforwardedValidatedInputControl = (
 export const ValidatedInputControl = forwardRef(
 	UnforwardedValidatedInputControl
 );
+ValidatedInputControl.displayName = 'ValidatedInputControl';

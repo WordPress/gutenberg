@@ -1,12 +1,4 @@
-/**
- * WordPress dependencies
- */
-import {
-	useEffect,
-	Platform,
-	useContext,
-	useCallback,
-} from '@wordpress/element';
+import { useEffect, useContext, useCallback } from '@wordpress/element';
 import { isRTL, __ } from '@wordpress/i18n';
 import {
 	ComplementaryArea,
@@ -16,25 +8,14 @@ import {
 	BlockInspector,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-
-const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
-	web: true,
-	native: false,
-} );
-
+const SIDEBAR_ACTIVE_BY_DEFAULT = true;
 const BLOCK_INSPECTOR_IDENTIFIER = 'edit-widgets/block-inspector';
-
 // Widget areas were once called block areas, so use 'edit-widgets/block-areas'
 // for backwards compatibility.
 const WIDGET_AREAS_IDENTIFIER = 'edit-widgets/block-areas';
-
-/**
- * Internal dependencies
- */
 import WidgetAreas from './widget-areas';
 import { store as editWidgetsStore } from '../../store';
 import { unlock } from '../../lock-unlock';

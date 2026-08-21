@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { registerPlugin } from '@wordpress/plugins';
 import { addFilter } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
 import AutoBlockUninstaller from '../components/auto-block-uninstaller';
 import InserterMenuDownloadableBlocksPanel from './inserter-menu-downloadable-blocks-panel';
 import InstalledBlocksPrePublishPanel from './installed-blocks-pre-publish-panel';

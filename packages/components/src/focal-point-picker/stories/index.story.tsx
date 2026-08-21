@@ -1,16 +1,6 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-/**
- * Internal dependencies
- */
 import FocalPointPicker from '..';
 
 const meta: Meta< typeof FocalPointPicker > = {
@@ -29,6 +19,10 @@ const meta: Meta< typeof FocalPointPicker > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'editor',
+		},
 	},
 };
 export default meta;

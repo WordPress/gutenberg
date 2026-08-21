@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../../context';
 import type { ToggleGroupControlOptionProps } from '../types';
 import { ToggleGroupControlOptionBase } from '../toggle-group-control-option-base';
@@ -52,7 +41,6 @@ function UnforwardedToggleGroupControlOption(
  *       label="my label"
  *       value="vertical"
  *       isBlock
- *       __next40pxDefaultSize
  *     >
  *       <ToggleGroupControlOption value="horizontal" label="Horizontal" />
  *       <ToggleGroupControlOption value="vertical" label="Vertical" />
@@ -64,5 +52,6 @@ function UnforwardedToggleGroupControlOption(
 export const ToggleGroupControlOption = forwardRef(
 	UnforwardedToggleGroupControlOption
 );
+ToggleGroupControlOption.displayName = 'ToggleGroupControlOption';
 
 export default ToggleGroupControlOption;

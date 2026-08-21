@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { memo, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
@@ -21,28 +14,19 @@ import { Spinner, ToolbarGroup } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { list, grid } from '@wordpress/icons';
 
-const TEMPLATE = [
-	[ 'core/post-title' ],
-	[
-		'core/post-date',
-		{
-			metadata: {
-				bindings: {
-					datetime: {
-						source: 'core/post-data',
-						args: { field: 'date' },
-					},
-				},
-			},
-		},
-	],
-	[ 'core/post-excerpt' ],
-];
+// The Post Template's layout attribute arranges the post items, not the
+// blocks of the template, which always stack vertically inside each post
+// item. Override the inherited layout so inner block UI (movers, inserters,
+// grid controls) doesn't follow the post items' grid.
+const INNER_BLOCKS_LAYOUT = { type: 'default' };
 
 function PostTemplateInnerBlocks( { classList } ) {
 	const innerBlocksProps = useInnerBlocksProps(
 		{ className: clsx( 'wp-block-post', classList ) },
-		{ template: TEMPLATE, __unstableDisableLayoutClassNames: true }
+		{
+			__unstableDisableLayoutClassNames: true,
+			layout: INNER_BLOCKS_LAYOUT,
+		}
 	);
 	return <li { ...innerBlocksProps } />;
 }
@@ -103,6 +87,7 @@ export default function PostTemplateEdit( {
 			parents,
 			pages,
 			format,
+			excludeCurrent,
 			// We gather extra query args to pass to the REST API call.
 			// This way extenders of Query Loop can add their own query args,
 			// and have accurate previews in the editor.
@@ -112,11 +97,16 @@ export default function PostTemplateEdit( {
 		} = {},
 		templateSlug,
 		previewPostType,
+		postId,
 	},
 	attributes: { layout },
 	__unstableLayoutClassNames,
 } ) {
-	const { type: layoutType, columnCount = 3 } = layout || {};
+	const {
+		type: layoutType,
+		columnCount = 3,
+		minimumColumnWidth,
+	} = layout || {};
 	const [ activeBlockContextId, setActiveBlockContextId ] = useState();
 	const { posts, blocks } = useSelect(
 		( select ) => {
@@ -198,6 +188,13 @@ export default function PostTemplateEdit( {
 			}
 			if ( format?.length ) {
 				query.format = format;
+			}
+			if ( excludeCurrent && postId ) {
+				if ( query.exclude ) {
+					query.exclude = [ ...query.exclude, postId ];
+				} else {
+					query.exclude = [ postId ];
+				}
 			}
 
 			/*
@@ -281,6 +278,8 @@ export default function PostTemplateEdit( {
 		className: clsx( __unstableLayoutClassNames, {
 			[ `columns-${ columnCount }` ]:
 				layoutType === 'grid' && columnCount, // Ensure column count is flagged via classname for backwards compatibility.
+			'has-native-responsive-grid':
+				layoutType === 'grid' && columnCount && minimumColumnWidth, // Flag native responsive grid when minimum column width is provided.
 		} ),
 	} );
 

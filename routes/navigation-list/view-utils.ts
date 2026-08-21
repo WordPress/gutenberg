@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { loadView } from '@wordpress/views';
 import type { View } from '@wordpress/dataviews';
 
@@ -27,7 +24,7 @@ export async function ensureView( search?: {
 	return loadView( {
 		kind: 'postType',
 		name: NAVIGATION_POST_TYPE,
-		slug: 'all',
+		slug: 'default-new',
 		defaultView,
 		queryParams: search,
 	} );

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	getBlockType,
 	serialize,
@@ -8,17 +5,13 @@ import {
 } from '@wordpress/blocks';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { moreVertical } from '@wordpress/icons';
+import { chevronDown, chevronUp, moreVertical } from '@wordpress/icons';
 import { Children, cloneElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { pipe, useCopyToClipboard } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import BlockActions from '../block-actions';
-import CommentIconSlotFill from '../../components/collab/block-comment-icon-slot';
+import NoteIconSlotFill from '../../components/collab/note-icon-slot';
 import BlockHTMLConvertButton from './block-html-convert-button';
 import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
@@ -70,10 +63,11 @@ function CopyMenuItem( {
 }
 
 export function BlockSettingsDropdown( {
-	block,
+	clientId,
 	clientIds,
 	children,
 	__experimentalSelectBlock,
+	isContentOnlyListView,
 	...props
 } ) {
 	// Get the client id of the current block for this menu, if one is set.
@@ -87,6 +81,10 @@ export function BlockSettingsDropdown( {
 		selectedBlockClientIds,
 		isContentOnly,
 		isZoomOut,
+		canEdit,
+		canMove,
+		isFirst,
+		isLast,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -97,6 +95,10 @@ export function BlockSettingsDropdown( {
 				getBlockAttributes,
 				getBlockEditingMode,
 				isZoomOut: _isZoomOut,
+				canEditBlock,
+				canMoveBlocks,
+				getBlockIndex,
+				getBlockCount,
 			} = unlock( select( blockEditorStore ) );
 
 			const { getActiveBlockVariation } = select( blocksStore );
@@ -121,13 +123,21 @@ export function BlockSettingsDropdown( {
 				isContentOnly:
 					getBlockEditingMode( firstBlockClientId ) === 'contentOnly',
 				isZoomOut: _isZoomOut(),
+				canEdit: canEditBlock( firstBlockClientId ),
+				canMove: canMoveBlocks( clientIds ),
+				isFirst: getBlockIndex( firstBlockClientId ) === 0,
+				isLast:
+					getBlockIndex( firstBlockClientId ) ===
+					getBlockCount( _firstParentClientId ) - 1,
 			};
 		},
-		[ firstBlockClientId ]
+		[ firstBlockClientId, clientIds ]
 	);
 
 	const { getBlockOrder, getSelectedBlockClientIds } =
 		useSelect( blockEditorStore );
+
+	const { moveBlocksDown, moveBlocksUp } = useDispatch( blockEditorStore );
 
 	const shortcuts = useSelect( ( select ) => {
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
@@ -240,7 +250,37 @@ export function BlockSettingsDropdown( {
 											parentBlockType={ parentBlockType }
 										/>
 									) }
-									{ count === 1 && (
+									{ canMove && isContentOnlyListView && (
+										<>
+											<MenuItem
+												icon={ chevronUp }
+												disabled={ isFirst }
+												accessibleWhenDisabled
+												onClick={ pipe( onClose, () => {
+													moveBlocksUp(
+														clientIds,
+														firstParentClientId
+													);
+												} ) }
+											>
+												{ __( 'Move up' ) }
+											</MenuItem>
+											<MenuItem
+												icon={ chevronDown }
+												disabled={ isLast }
+												accessibleWhenDisabled
+												onClick={ pipe( onClose, () => {
+													moveBlocksDown(
+														clientIds,
+														firstParentClientId
+													);
+												} ) }
+											>
+												{ __( 'Move down' ) }
+											</MenuItem>
+										</>
+									) }
+									{ canEdit && count === 1 && (
 										<BlockHTMLConvertButton
 											clientId={ firstBlockClientId }
 										/>
@@ -252,7 +292,7 @@ export function BlockSettingsDropdown( {
 											shortcut={ shortcuts.copy }
 										/>
 									) }
-									{ ! isContentOnly && (
+									{ canRemove && ! isContentOnly && (
 										<CopyMenuItem
 											clientIds={ clientIds }
 											label={ __( 'Cut' ) }
@@ -301,8 +341,8 @@ export function BlockSettingsDropdown( {
 											</MenuItem>
 										</>
 									) }
-									{ count === 1 && (
-										<CommentIconSlotFill.Slot
+									{ canEdit && count === 1 && (
+										<NoteIconSlotFill.Slot
 											fillProps={ {
 												clientId: firstBlockClientId,
 												onClose,
@@ -318,9 +358,11 @@ export function BlockSettingsDropdown( {
 											label={ __( 'Copy styles' ) }
 											eventType="copyStyles"
 										/>
-										<MenuItem onClick={ onPasteStyles }>
-											{ __( 'Paste styles' ) }
-										</MenuItem>
+										{ canEdit && (
+											<MenuItem onClick={ onPasteStyles }>
+												{ __( 'Paste styles' ) }
+											</MenuItem>
+										) }
 									</MenuGroup>
 								) }
 								{ ! isContentOnly && (

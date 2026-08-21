@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 
 /**
@@ -41,7 +38,6 @@ export default async function defaultProcessor( requests ) {
 
 	const results = [];
 
-	// @ts-ignore We would have crashed or never gotten to this point if we hadn't received the maxItems count.
 	for ( const batchRequests of chunk( requests, maxItems ) ) {
 		const batchResponse = await apiFetch( {
 			path: '/batch/v1',

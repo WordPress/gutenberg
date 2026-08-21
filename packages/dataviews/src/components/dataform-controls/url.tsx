@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import {
-	Icon,
+	Icon as WCIcon,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 } from '@wordpress/components';
 import { link } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import type { DataFormControlProps } from '../../types';
 import ValidatedText from './utils/validated-input';
 
@@ -18,6 +11,7 @@ export default function Url< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	validity,
 }: DataFormControlProps< Item > ) {
 	return (
@@ -27,11 +21,12 @@ export default function Url< Item >( {
 				field,
 				onChange,
 				hideLabelFromVision,
+				markWhenOptional,
 				validity,
 				type: 'url',
 				prefix: (
 					<InputControlPrefixWrapper variant="icon">
-						<Icon icon={ link } />
+						<WCIcon icon={ link } />
 					</InputControlPrefixWrapper>
 				),
 			} }

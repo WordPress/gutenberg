@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import filesizeField from '../index';
 import type { MediaItem } from '../../types';
 

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ReactNode, RefObject } from 'react';
-
-/**
- * WordPress dependencies
- */
 import type { ObservableMap } from '@wordpress/compose';
 
 export type DistributiveOmit< T, K extends keyof any > = T extends any
@@ -113,7 +106,7 @@ export type SlotFillProviderProps = {
 };
 
 export type SlotFillInstance = {};
-export type SlotRef = RefObject< HTMLElement >;
+export type SlotRef = RefObject< HTMLElement | null >;
 export type SlotRecord = { instance: SlotFillInstance } & (
 	| { type: 'children' }
 	| { type: 'portal'; ref: SlotRef; fillProps: FillProps }

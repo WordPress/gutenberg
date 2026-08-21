@@ -1,22 +1,11 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { toggleFormat } from '@wordpress/rich-text';
 import {
 	RichTextToolbarButton,
 	RichTextShortcut,
 	__unstableRichTextInputEvent,
-	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { formatBold } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../lock-unlock';
-
-const { essentialFormatKey } = unlock( blockEditorPrivateApis );
 
 const name = 'core/bold';
 const title = __( 'Bold' );
@@ -26,7 +15,6 @@ export const bold = {
 	title,
 	tagName: 'strong',
 	className: null,
-	[ essentialFormatKey ]: true,
 	edit( { isActive, value, onChange, onFocus, isVisible = true } ) {
 		function onToggle() {
 			onChange( toggleFormat( value, { type: name, title } ) );

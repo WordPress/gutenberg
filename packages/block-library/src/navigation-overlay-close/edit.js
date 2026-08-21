@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	InspectorControls,
 	useBlockProps,
@@ -14,10 +11,6 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Icon, close } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function NavigationOverlayCloseEdit( {
@@ -27,6 +20,9 @@ export default function NavigationOverlayCloseEdit( {
 	const { displayMode, text } = attributes;
 	const showIcon = displayMode === 'icon' || displayMode === 'both';
 	const showText = displayMode === 'text' || displayMode === 'both';
+
+	// Use translated default if text is empty
+	const displayText = text || __( 'Close' );
 
 	const blockProps = useBlockProps( {
 		className: 'wp-block-navigation-overlay-close',
@@ -57,7 +53,6 @@ export default function NavigationOverlayCloseEdit( {
 								setAttributes( { displayMode: value } )
 							}
 							isBlock
-							__next40pxDefaultSize
 						>
 							<ToggleGroupControlOption
 								value="icon"
@@ -84,12 +79,10 @@ export default function NavigationOverlayCloseEdit( {
 				{ showText && (
 					<RichText
 						identifier="text"
-						value={ text }
+						value={ displayText }
 						onChange={ ( value ) =>
 							setAttributes( { text: value } )
 						}
-						placeholder={ __( 'Close' ) }
-						withoutInteractiveFormatting
 						tagName="span"
 						className="wp-block-navigation-overlay-close__text"
 						allowedFormats={ [ 'core/bold', 'core/italic' ] }

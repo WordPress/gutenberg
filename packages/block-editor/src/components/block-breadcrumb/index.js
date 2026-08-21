@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
 import { chevronRightSmall, Icon } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import BlockTitle from '../block-title';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
@@ -103,6 +96,7 @@ function BlockBreadcrumb( { rootLabelText } ) {
 						<BlockTitle
 							clientId={ parentClientId }
 							maximumLength={ 35 }
+							context="breadcrumb"
 						/>
 					</Button>
 					<Icon
@@ -116,7 +110,11 @@ function BlockBreadcrumb( { rootLabelText } ) {
 					className="block-editor-block-breadcrumb__current"
 					aria-current="true"
 				>
-					<BlockTitle clientId={ clientId } maximumLength={ 35 } />
+					<BlockTitle
+						clientId={ clientId }
+						maximumLength={ 35 }
+						context="breadcrumb"
+					/>
 				</li>
 			) }
 		</ul>

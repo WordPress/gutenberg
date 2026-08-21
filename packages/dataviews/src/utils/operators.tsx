@@ -1,14 +1,15 @@
-/**
- * WordPress dependencies
- */
+import { subDays, subWeeks, subMonths, subYears } from 'date-fns';
 import { __, sprintf } from '@wordpress/i18n';
 import { createInterpolateElement } from '@wordpress/element';
+import { getDate } from '@wordpress/date';
 import type { ReactElement } from 'react';
-
-/**
- * Internal dependencies
- */
-import type { NormalizedFilter, Operator, Option } from '../types';
+import type {
+	FilterOperator,
+	NormalizedFilter,
+	Operator,
+	Option,
+} from '../types';
+import parseTime from '../field-types/utils/parse-time';
 import {
 	OPERATOR_AFTER,
 	OPERATOR_AFTER_INC,
@@ -39,6 +40,91 @@ const filterTextWrappers = {
 	Value: <span className="dataviews-filters__summary-filter-text-value" />,
 };
 
+/**
+ * Reduces a value and the value it is compared against to numbers. The filter
+ * value picks the scale: a time filter compares field values as seconds since
+ * midnight, anything else compares as timestamps. `parseTime` accepts only
+ * `HH:mm[:ss]`, so no date or datetime is read as a time.
+ *
+ * A field value that does not parse on a time filter's scale becomes `NaN`:
+ * every ordering operator is false for it, and `notOn` is true — matching how
+ * `is`/`isNot` treat a missing value.
+ *
+ * @param fieldValue  The item's value.
+ * @param filterValue The value it is compared against.
+ * @return            Both values as comparable numbers.
+ */
+function toComparableTemporals(
+	fieldValue: any,
+	filterValue: any
+): [ number, number ] {
+	const filterTime = parseTime( filterValue );
+	if ( filterTime !== null ) {
+		return [ parseTime( fieldValue ) ?? NaN, filterTime ];
+	}
+
+	return [
+		getDate( fieldValue ).getTime(),
+		getDate( filterValue ).getTime(),
+	];
+}
+
+/**
+ * Calculates a date offset from now.
+ *
+ * @param value Number of units to offset.
+ * @param unit  Unit of time to offset (days, weeks, months, years).
+ * @return      Date offset from now.
+ */
+function getRelativeDate( value: number, unit: string ): Date {
+	switch ( unit ) {
+		case 'days':
+			return subDays( new Date(), value );
+		case 'weeks':
+			return subWeeks( new Date(), value );
+		case 'months':
+			return subMonths( new Date(), value );
+		case 'years':
+			return subYears( new Date(), value );
+		default:
+			return new Date();
+	}
+}
+
+// Shared operator definition for IS_NONE and IS_NOT_ALL (deprecated).
+const isNoneOperatorDefinition = {
+	/* translators: DataViews operator name */
+	label: __( 'Is none of' ),
+	filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
+		createInterpolateElement(
+			sprintf(
+				/* translators: 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author is none of: Admin, Editor". */
+				__( '<Name>%1$s is none of: </Name><Value>%2$s</Value>' ),
+				filter.name,
+				activeElements.map( ( element ) => element.label ).join( ', ' )
+			),
+			filterTextWrappers
+		),
+	filter: ( ( item, field, filterValue ) => {
+		if ( ! filterValue?.length ) {
+			return true;
+		}
+
+		const fieldValue = field.getValue( { item } );
+
+		if ( Array.isArray( fieldValue ) ) {
+			return ! filterValue.some( ( fv: any ) =>
+				fieldValue.includes( fv )
+			);
+		} else if ( typeof fieldValue === 'string' ) {
+			return ! filterValue.includes( fieldValue );
+		}
+
+		return false;
+	} ) as FilterOperator< any >,
+	selection: 'multi' as const,
+};
+
 const OPERATORS: {
 	name: Operator;
 	label: string;
@@ -46,6 +132,7 @@ const OPERATORS: {
 		filter: NormalizedFilter,
 		activeElements: Option[]
 	) => ReactElement;
+	filter?: FilterOperator< any >;
 	selection: 'single' | 'multi' | 'custom';
 }[] = [
 	{
@@ -64,25 +151,27 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( ! filterValue?.length ) {
+				return true;
+			}
+			const fieldValue = field.getValue( { item } );
+
+			if ( Array.isArray( fieldValue ) ) {
+				return filterValue.some( ( fv: any ) =>
+					fieldValue.includes( fv )
+				);
+			} else if ( typeof fieldValue === 'string' ) {
+				return filterValue.includes( fieldValue );
+			}
+
+			return false;
+		},
 		selection: 'multi',
 	},
 	{
 		name: OPERATOR_IS_NONE,
-		/* translators: DataViews operator name */
-		label: __( 'Is none of' ),
-		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
-			createInterpolateElement(
-				sprintf(
-					/* translators: 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author is none of: Admin, Editor". */
-					__( '<Name>%1$s is none of: </Name><Value>%2$s</Value>' ),
-					filter.name,
-					activeElements
-						.map( ( element ) => element.label )
-						.join( ', ' )
-				),
-				filterTextWrappers
-			),
-		selection: 'multi',
+		...isNoneOperatorDefinition,
 	},
 	{
 		name: OPERATOR_IS_ALL,
@@ -100,25 +189,20 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( ! filterValue?.length ) {
+				return true;
+			}
+
+			return filterValue.every( ( value: any ) => {
+				return field.getValue( { item } )?.includes( value );
+			} );
+		},
 		selection: 'multi',
 	},
 	{
 		name: OPERATOR_IS_NOT_ALL,
-		/* translators: DataViews operator name */
-		label: __( 'Is none of' ),
-		filterText: ( filter: NormalizedFilter, activeElements: Option[] ) =>
-			createInterpolateElement(
-				sprintf(
-					/* translators: 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author is none of: Admin, Editor". */
-					__( '<Name>%1$s is none of: </Name><Value>%2$s</Value>' ),
-					filter.name,
-					activeElements
-						.map( ( element ) => element.label )
-						.join( ', ' )
-				),
-				filterTextWrappers
-			),
-		selection: 'multi',
+		...isNoneOperatorDefinition,
 	},
 	{
 		name: OPERATOR_BETWEEN,
@@ -137,6 +221,45 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if (
+				! Array.isArray( filterValue ) ||
+				filterValue.length !== 2 ||
+				// An unfilled bound is `undefined` from the controls, `''`
+				// when it arrives from a persisted view, or `null` once
+				// `undefined` round-trips through JSON persistence.
+				filterValue.includes( undefined ) ||
+				filterValue.includes( '' ) ||
+				filterValue.includes( null )
+			) {
+				return true;
+			}
+
+			const fieldValue = field.getValue( { item } );
+
+			// Time bounds pick the scale, as in `toComparableTemporals`:
+			// values compare as seconds since midnight so precision does not
+			// matter, and a value that is not a time is excluded rather than
+			// compared as a string.
+			const [ min, max ] = filterValue.map( parseTime );
+			if ( min !== null && max !== null ) {
+				const value = parseTime( fieldValue );
+				return value !== null && value >= min && value <= max;
+			}
+
+			if (
+				typeof fieldValue === 'number' ||
+				fieldValue instanceof Date ||
+				typeof fieldValue === 'string'
+			) {
+				return (
+					fieldValue >= filterValue[ 0 ] &&
+					fieldValue <= filterValue[ 1 ]
+				);
+			}
+
+			return false;
+		},
 		selection: 'custom',
 	},
 	{
@@ -155,6 +278,22 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if (
+				filterValue?.value === undefined ||
+				filterValue?.unit === undefined
+			) {
+				return true;
+			}
+
+			const targetDate = getRelativeDate(
+				filterValue.value,
+				filterValue.unit
+			);
+			const fieldValue = getDate( field.getValue( { item } ) );
+
+			return fieldValue >= targetDate && fieldValue <= new Date();
+		},
 		selection: 'custom',
 	},
 	{
@@ -171,6 +310,22 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if (
+				filterValue?.value === undefined ||
+				filterValue?.unit === undefined
+			) {
+				return true;
+			}
+
+			const targetDate = getRelativeDate(
+				filterValue.value,
+				filterValue.unit
+			);
+			const fieldValue = getDate( field.getValue( { item } ) );
+
+			return fieldValue < targetDate;
+		},
 		selection: 'custom',
 	},
 	{
@@ -187,6 +342,12 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			return (
+				filterValue === field.getValue( { item } ) ||
+				filterValue === undefined
+			);
+		},
 		selection: 'single',
 	},
 	{
@@ -203,6 +364,9 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			return filterValue !== field.getValue( { item } );
+		},
 		selection: 'single',
 	},
 	{
@@ -219,6 +383,15 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( filterValue === undefined ) {
+				return true;
+			}
+
+			const fieldValue = field.getValue( { item } );
+
+			return fieldValue < filterValue;
+		},
 		selection: 'single',
 	},
 	{
@@ -237,6 +410,15 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( filterValue === undefined ) {
+				return true;
+			}
+
+			const fieldValue = field.getValue( { item } );
+
+			return fieldValue > filterValue;
+		},
 		selection: 'single',
 	},
 	{
@@ -255,6 +437,15 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( filterValue === undefined ) {
+				return true;
+			}
+
+			const fieldValue = field.getValue( { item } );
+
+			return fieldValue <= filterValue;
+		},
 		selection: 'single',
 	},
 	{
@@ -273,6 +464,15 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( filterValue === undefined ) {
+				return true;
+			}
+
+			const fieldValue = field.getValue( { item } );
+
+			return fieldValue >= filterValue;
+		},
 		selection: 'single',
 	},
 	{
@@ -289,6 +489,18 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( filterValue === undefined ) {
+				return true;
+			}
+
+			const [ fieldTemporal, filterTemporal ] = toComparableTemporals(
+				field.getValue( { item } ),
+				filterValue
+			);
+
+			return fieldTemporal < filterTemporal;
+		},
 		selection: 'single',
 	},
 	{
@@ -305,6 +517,18 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( filterValue === undefined ) {
+				return true;
+			}
+
+			const [ fieldTemporal, filterTemporal ] = toComparableTemporals(
+				field.getValue( { item } ),
+				filterValue
+			);
+
+			return fieldTemporal > filterTemporal;
+		},
 		selection: 'single',
 	},
 	{
@@ -323,6 +547,18 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( filterValue === undefined ) {
+				return true;
+			}
+
+			const [ fieldTemporal, filterTemporal ] = toComparableTemporals(
+				field.getValue( { item } ),
+				filterValue
+			);
+
+			return fieldTemporal <= filterTemporal;
+		},
 		selection: 'single',
 	},
 	{
@@ -341,6 +577,18 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( filterValue === undefined ) {
+				return true;
+			}
+
+			const [ fieldTemporal, filterTemporal ] = toComparableTemporals(
+				field.getValue( { item } ),
+				filterValue
+			);
+
+			return fieldTemporal >= filterTemporal;
+		},
 		selection: 'single',
 	},
 	{
@@ -357,6 +605,21 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( filterValue === undefined ) {
+				return true;
+			}
+
+			const fieldValue = field.getValue( { item } );
+
+			return (
+				typeof fieldValue === 'string' &&
+				filterValue &&
+				fieldValue
+					.toLowerCase()
+					.includes( String( filterValue ).toLowerCase() )
+			);
+		},
 		selection: 'single',
 	},
 	{
@@ -375,6 +638,21 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( filterValue === undefined ) {
+				return true;
+			}
+
+			const fieldValue = field.getValue( { item } );
+
+			return (
+				typeof fieldValue === 'string' &&
+				filterValue &&
+				! fieldValue
+					.toLowerCase()
+					.includes( String( filterValue ).toLowerCase() )
+			);
+		},
 		selection: 'single',
 	},
 	{
@@ -391,6 +669,21 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( filterValue === undefined ) {
+				return true;
+			}
+
+			const fieldValue = field.getValue( { item } );
+
+			return (
+				typeof fieldValue === 'string' &&
+				filterValue &&
+				fieldValue
+					.toLowerCase()
+					.startsWith( String( filterValue ).toLowerCase() )
+			);
+		},
 		selection: 'single',
 	},
 	{
@@ -407,6 +700,18 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( filterValue === undefined ) {
+				return true;
+			}
+
+			const [ fieldTemporal, filterTemporal ] = toComparableTemporals(
+				field.getValue( { item } ),
+				filterValue
+			);
+
+			return fieldTemporal === filterTemporal;
+		},
 		selection: 'single',
 	},
 	{
@@ -423,6 +728,18 @@ const OPERATORS: {
 				),
 				filterTextWrappers
 			),
+		filter( item, field, filterValue ) {
+			if ( filterValue === undefined ) {
+				return true;
+			}
+
+			const [ fieldTemporal, filterTemporal ] = toComparableTemporals(
+				field.getValue( { item } ),
+				filterValue
+			);
+
+			return fieldTemporal !== filterTemporal;
+		},
 		selection: 'single',
 	},
 ];

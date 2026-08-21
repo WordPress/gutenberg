@@ -1,12 +1,8 @@
-/**
- * WordPress dependencies
- */
 import {
 	PanelBody,
 	Button,
 	TextControl,
 	ExternalLink,
-	VisuallyHidden,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useEffect, useState, useRef } from '@wordpress/element';
@@ -16,10 +12,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { external } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
+import { VisuallyHidden } from '@wordpress/ui';
 import PostScheduleLabel from '../post-schedule/label';
 import { store as editorStore } from '../../store';
 
@@ -136,7 +129,6 @@ export default function PostPublishPanelPostpublish( {
 				</p>
 				<div className="post-publish-panel__postpublish-post-address-container">
 					<TextControl
-						__next40pxDefaultSize
 						className="post-publish-panel__postpublish-post-address"
 						readOnly
 						label={ sprintf(
@@ -164,7 +156,7 @@ export default function PostPublishPanelPostpublish( {
 							target="_blank"
 						>
 							{ viewPostLabel }
-							<VisuallyHidden as="span">
+							<VisuallyHidden render={ <span /> }>
 								{
 									/* translators: accessibility text */
 									__( '(opens in a new tab)' )

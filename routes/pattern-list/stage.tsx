@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useParams,
 	useNavigate,
@@ -22,23 +19,17 @@ import { useMemo, useCallback, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { privateApis as patternPrivateApis } from '@wordpress/patterns';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../lock-unlock';
+import { unlock } from '@wordpress/routes-lock-unlock';
 import { DEFAULT_VIEW, DEFAULT_VIEWS, DEFAULT_LAYOUTS } from './view-utils';
 import { previewField } from './fields/preview';
 import { patternStatusField } from './fields/sync-status';
 import { usePatternCategoryField } from './fields/category';
 import usePatterns, { useAugmentPatternsWithPermissions } from './use-patterns';
 import type { NormalizedPattern } from './use-patterns';
-
 // Unlock WordPress private APIs
 const { usePostActions, patternTitleField } = unlock( editorPrivateApis );
 const { Tabs } = unlock( componentsPrivateApis );
 const { PATTERN_TYPES, CreatePatternModal } = unlock( patternPrivateApis );
-
 /**
  * Style dependencies
  */
@@ -86,7 +77,7 @@ function PatternList() {
 	const { view, isModified, updateView, resetToDefault } = useView( {
 		kind: 'postType',
 		name: 'wp_block',
-		slug: type,
+		slug: 'default-new',
 		defaultView: DEFAULT_VIEW,
 		queryParams: searchParams,
 		onChangeQueryParams: handleQueryParamsChange,
@@ -258,31 +249,22 @@ function PatternList() {
 	return (
 		<Page
 			title={ __( 'Patterns' ) }
+			headingLevel={ 2 }
 			subTitle={ __(
 				'Reusable design elements for your site. Create once, use everywhere.'
 			) }
 			className="pattern-page"
 			actions={
-				<>
-					{ isModified && (
-						<Button
-							variant="tertiary"
-							size="compact"
-							onClick={ onReset }
-						>
-							{ __( 'Reset view' ) }
-						</Button>
-					) }
-					{ labels?.add_new_item && canCreateRecord && (
-						<Button
-							variant="primary"
-							onClick={ () => setShowPatternModal( true ) }
-							size="compact"
-						>
-							{ labels.add_new_item }
-						</Button>
-					) }
-				</>
+				labels?.add_new_item &&
+				canCreateRecord && (
+					<Button
+						variant="primary"
+						onClick={ () => setShowPatternModal( true ) }
+						size="compact"
+					>
+						{ labels.add_new_item }
+					</Button>
+				)
 			}
 			hasPadding={ false }
 		>
@@ -320,6 +302,7 @@ function PatternList() {
 				} }
 				defaultLayouts={ DEFAULT_LAYOUTS }
 				selection={ selection }
+				onReset={ isModified ? onReset : false }
 				onChangeSelection={ ( items: string[] ) => {
 					navigate( {
 						search: {

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import createElement from './utils/create-element';
 import { find } from '../tabbable';
 

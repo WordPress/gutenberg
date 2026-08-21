@@ -1,10 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useMergeRefs, useFocusableIframe } from '@wordpress/compose';
 import { useRef, useEffect, useMemo } from '@wordpress/element';
 
-/** @typedef {import('react').SyntheticEvent} SyntheticEvent */
+/** @typedef {React.SyntheticEvent} SyntheticEvent */
 
 const attributeMap = {
 	class: 'className',

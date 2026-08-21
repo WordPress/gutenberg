@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUnitControl as UnitControl,
@@ -37,7 +34,7 @@ import { __ } from '@wordpress/i18n';
  *
  * @param {WidthHeightToolProps} props The component props.
  *
- * @return {import('react').ReactElement} The width and height tool.
+ * @return {React.ReactElement} The width and height tool.
  */
 export default function WidthHeightTool( {
 	panelId,
@@ -79,7 +76,6 @@ export default function WidthHeightTool( {
 					min={ 0 }
 					value={ width }
 					onChange={ onDimensionChange( 'width' ) }
-					size="__unstable-large"
 				/>
 			</ToolsPanelItem>
 			<ToolsPanelItem
@@ -98,7 +94,6 @@ export default function WidthHeightTool( {
 					min={ 0 }
 					value={ height }
 					onChange={ onDimensionChange( 'height' ) }
-					size="__unstable-large"
 				/>
 			</ToolsPanelItem>
 		</>

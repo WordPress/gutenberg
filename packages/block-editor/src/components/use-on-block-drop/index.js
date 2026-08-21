@@ -1,10 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useCallback } from '@wordpress/element';
 import {
 	cloneBlock,
 	createBlock,
+	cloneSanitizedBlock,
 	findTransform,
 	getBlockTransforms,
 	pasteHandler,
@@ -12,13 +10,9 @@ import {
 } from '@wordpress/blocks';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 
-/** @typedef {import('react').SyntheticEvent} SyntheticEvent */
+/** @typedef {React.SyntheticEvent} SyntheticEvent */
 /** @typedef {import('./types').WPDropOperation} WPDropOperation */
 
 /**
@@ -46,7 +40,7 @@ export function parseDropEvent( event ) {
 			result,
 			JSON.parse( event.dataTransfer.getData( 'wp-blocks' ) )
 		);
-	} catch ( err ) {
+	} catch {
 		return result;
 	}
 
@@ -266,13 +260,9 @@ export default function useOnBlockDrop(
 					blocks.unshift( targetBlock );
 				}
 
-				const groupInnerBlocks = blocks.map( ( block ) => {
-					return createBlock(
-						block.name,
-						block.attributes,
-						block.innerBlocks
-					);
-				} );
+				const groupInnerBlocks = blocks.map( ( block ) =>
+					cloneSanitizedBlock( block )
+				);
 
 				const areAllImages = blocks.every( ( block ) => {
 					return block.name === 'core/image';

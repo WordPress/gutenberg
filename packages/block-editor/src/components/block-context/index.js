@@ -1,9 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { createContext, useContext, useMemo } from '@wordpress/element';
 
-/** @typedef {import('react').ReactNode} ReactNode */
+/** @typedef {React.ReactNode} ReactNode */
 
 /**
  * @typedef BlockContextProviderProps
@@ -13,7 +10,7 @@ import { createContext, useContext, useMemo } from '@wordpress/element';
  * @property {ReactNode}        children Component children.
  */
 
-/** @type {import('react').Context<Record<string,*>>} */
+/** @type {React.Context<Record<string,*>>} */
 const Context = createContext( {} );
 Context.displayName = 'BlockContext';
 

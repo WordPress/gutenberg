@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { addFilter } from '@wordpress/hooks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useCallback } from '@wordpress/element';
@@ -21,7 +18,7 @@ const SUPPORTED_BLOCKS = [ 'core/navigation-link', 'core/navigation-submenu' ];
  *
  * @param {Object} props            Component props.
  * @param {Object} props.attributes Block attributes.
- * @return {JSX.Element|null} The View button component or null if not applicable.
+ * @return {React.JSX.Element} The View button component or null if not applicable.
  */
 function NavigationViewButton( { attributes } ) {
 	const { kind, id, type } = attributes;

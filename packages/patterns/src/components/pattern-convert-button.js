@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	hasBlockSupport,
 	isReusableBlock,
@@ -16,9 +13,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-/**
- * Internal dependencies
- */
 import { store as patternsStore } from '../store';
 import CreatePatternModal from './create-pattern-modal';
 import { unlock } from '../lock-unlock';
@@ -31,7 +25,7 @@ import { PATTERN_SYNC_TYPES } from '../constants';
  * @param {string[]} props.clientIds              Client ids of selected blocks.
  * @param {string}   props.rootClientId           ID of the currently selected top-level block.
  * @param {()=>void} props.closeBlockSettingsMenu Callback to close the block settings menu dropdown.
- * @return {import('react').ComponentType} The menu control or null.
+ * @return {React.ComponentType} The menu control or null.
  */
 export default function PatternConvertButton( {
 	clientIds,
@@ -83,7 +77,6 @@ export default function PatternConvertButton( {
 				);
 
 			const isUnsyncedPattern =
-				window?.__experimentalContentOnlyPatternInsertion &&
 				blocks.length === 1 &&
 				blocks?.[ 0 ]?.attributes?.metadata?.patternName;
 
@@ -144,7 +137,6 @@ export default function PatternConvertButton( {
 
 			replaceBlocks( clientIds, newBlock );
 			setEditingPattern( newBlock.clientId, true );
-			closeBlockSettingsMenu();
 		}
 
 		createSuccessNotice(
@@ -165,6 +157,7 @@ export default function PatternConvertButton( {
 			}
 		);
 		setIsModalOpen( false );
+		closeBlockSettingsMenu();
 	};
 	return (
 		<>

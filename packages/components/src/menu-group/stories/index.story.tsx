@@ -1,21 +1,12 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import MenuGroup from '..';
 import MenuItem from '../../menu-item';
 import MenuItemsChoice from '../../menu-items-choice';
+import { NavigableMenu } from '../../navigable-container';
 
 const meta: Meta< typeof MenuGroup > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Actions/MenuGroup',
 	component: MenuGroup,
 	id: 'components-menugroup',
@@ -25,16 +16,23 @@ const meta: Meta< typeof MenuGroup > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'Subcomponent of `DropdownMenu`.',
+		},
 	},
 };
 export default meta;
 
 const Template: StoryFn< typeof MenuGroup > = ( args ) => {
 	return (
-		<MenuGroup { ...args }>
-			<MenuItem>Menu Item 1</MenuItem>
-			<MenuItem>Menu Item 2</MenuItem>
-		</MenuGroup>
+		<NavigableMenu>
+			<MenuGroup { ...args }>
+				<MenuItem>Menu Item 1</MenuItem>
+				<MenuItem>Menu Item 2</MenuItem>
+			</MenuGroup>
+		</NavigableMenu>
 	);
 };
 
@@ -54,7 +52,7 @@ const MultiGroupsTemplate: StoryFn< typeof MenuGroup > = ( args ) => {
 	];
 
 	return (
-		<>
+		<NavigableMenu>
 			<MenuGroup label="View">
 				<MenuItem>Top Toolbar</MenuItem>
 				<MenuItem>Spotlight Mode</MenuItem>
@@ -68,7 +66,7 @@ const MultiGroupsTemplate: StoryFn< typeof MenuGroup > = ( args ) => {
 					onHover={ () => {} }
 				/>
 			</MenuGroup>
-		</>
+		</NavigableMenu>
 	);
 };
 

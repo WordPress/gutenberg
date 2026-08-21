@@ -1,22 +1,20 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import {
 	__experimentalConfirmDialog as ConfirmDialog,
-	__experimentalVStack as VStack,
 	TextControl,
 	Notice,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
+import { Stack } from '@wordpress/ui';
 import { isValidVideoEmbedUrl } from '../embed-video-utils';
 
-export default function EmbedVideoUrlInput( { onSubmit, onClose } ) {
-	const [ url, setUrl ] = useState( '' );
+export default function EmbedVideoUrlInput( {
+	onSubmit,
+	onClose,
+	initialUrl = '',
+	allowedVideoProviders,
+} ) {
+	const [ url, setUrl ] = useState( initialUrl );
 	const [ error, setError ] = useState( '' );
 
 	const handleConfirm = () => {
@@ -25,7 +23,7 @@ export default function EmbedVideoUrlInput( { onSubmit, onClose } ) {
 			return;
 		}
 
-		if ( ! isValidVideoEmbedUrl( url ) ) {
+		if ( ! isValidVideoEmbedUrl( url, allowedVideoProviders ) ) {
 			setError(
 				__(
 					'This URL is not supported. Please enter a valid video link from a supported provider.'
@@ -46,14 +44,14 @@ export default function EmbedVideoUrlInput( { onSubmit, onClose } ) {
 			confirmButtonText={ __( 'Add video' ) }
 			size="medium"
 		>
-			<VStack spacing={ 4 }>
+			<Stack direction="column" gap="lg">
 				{ error && (
 					<Notice status="error" isDismissible={ false }>
 						{ error }
 					</Notice>
 				) }
 				<TextControl
-					__next40pxDefaultSize
+					type="url"
 					label={ __( 'Video URL' ) }
 					value={ url }
 					onChange={ ( value ) => {
@@ -67,7 +65,7 @@ export default function EmbedVideoUrlInput( { onSubmit, onClose } ) {
 						'Add a background video to the cover block that will autoplay in a loop.'
 					) }
 				/>
-			</VStack>
+			</Stack>
 		</ConfirmDialog>
 	);
 }

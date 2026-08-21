@@ -1,17 +1,12 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	Button,
 	ExternalLink,
 	__experimentalTruncate as Truncate,
+	__experimentalHStack as HStack,
 	Flex,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
@@ -27,27 +22,10 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
+import { unlock } from '../../lock-unlock';
 import { ViewerSlot } from './viewer-slot';
-
+const { Badge: WCBadge } = unlock( componentsPrivateApis );
 import useRichUrlData from './use-rich-url-data';
-
-/**
- * Filters the title for display. Removes the protocol and www prefix.
- *
- * @param {string} title The title to be filtered.
- *
- * @return {string} The filtered title.
- */
-function filterTitleForDisplay( title ) {
-	// Derived from `filterURLForDisplay` in `@wordpress/url`.
-	return title
-		.replace( /^[a-z\-.\+]+[0-9]*:(\/\/)?/i, '' )
-		.replace( /^www\./i, '' );
-}
 
 export default function LinkPreview( {
 	value,
@@ -79,10 +57,9 @@ export default function LinkPreview( {
 
 	const displayTitle =
 		! isEmptyURL &&
-		stripHTML( richData?.title || value?.title || displayURL );
-
-	const isUrlRedundant =
-		! value?.url || filterTitleForDisplay( displayTitle ) === displayURL;
+		stripHTML(
+			value?.entityTitle || richData?.title || value?.title || displayURL
+		);
 
 	let icon;
 
@@ -115,7 +92,7 @@ export default function LinkPreview( {
 				'is-url-title': displayTitle === displayURL,
 			} ) }
 		>
-			<Flex gap={ 0 }>
+			<Flex gap={ 0 } align="flex-start">
 				<Flex
 					className="block-editor-link-control__link-information"
 					role="figure"
@@ -124,22 +101,32 @@ export default function LinkPreview( {
 						__( 'Link information' )
 					}
 					justify="start"
+					align="flex-start"
 				>
-					<Flex
-						className={ clsx(
-							'block-editor-link-control__preview-icon',
-							{
-								'is-image': richData?.icon,
-							}
-						) }
-						justify="center"
-					>
-						{ icon }
-					</Flex>
+					{ value?.image ? (
+						<Flex
+							className="block-editor-link-control__preview-image"
+							justify="center"
+						>
+							<img src={ value?.image } alt="" />
+						</Flex>
+					) : (
+						<Flex
+							className={ clsx(
+								'block-editor-link-control__preview-icon',
+								{
+									'is-image': richData?.icon,
+								}
+							) }
+							justify="center"
+						>
+							{ icon }
+						</Flex>
+					) }
 					<Flex
 						className="block-editor-link-control__preview-details"
 						direction="column"
-						gap={ 1 }
+						gap={ 2 }
 					>
 						{ ! isEmptyURL ? (
 							<>
@@ -151,12 +138,28 @@ export default function LinkPreview( {
 										{ displayTitle }
 									</Truncate>
 								</ExternalLink>
-								{ ! isUrlRedundant && (
-									<span className="block-editor-link-control__preview-info">
-										<Truncate numberOfLines={ 1 }>
-											{ displayURL }
-										</Truncate>
-									</span>
+								<span className="block-editor-link-control__preview-info">
+									<Truncate numberOfLines={ 1 }>
+										{ displayURL }
+									</Truncate>
+								</span>
+								{ value?.badges?.length > 0 && (
+									<HStack
+										className="block-editor-link-control__preview-badges"
+										alignment="left"
+										gap={ 1 }
+									>
+										{ value.badges.map(
+											( badge, index ) => (
+												<WCBadge
+													key={ `${ badge.label }|${ badge.intent }|${ index }` }
+													intent={ badge.intent }
+												>
+													{ badge.label }
+												</WCBadge>
+											)
+										) }
+									</HStack>
 								) }
 							</>
 						) : (

@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import BoxControl from '..';
 import type { BoxControlProps, BoxControlValue } from '../types';
 
@@ -29,7 +18,6 @@ const ControlledBoxControl = (
 
 	return (
 		<BoxControl
-			__next40pxDefaultSize
 			values={ state }
 			onChange={ ( next ) => setState( next ) }
 			{ ...extraProps }
@@ -42,7 +30,7 @@ const UncontrolledBoxControl = ( {
 	...props
 }: DistributiveOmit< BoxControlProps, 'onChange' > & {
 	onChange?: BoxControlProps[ 'onChange' ];
-} ) => <BoxControl __next40pxDefaultSize onChange={ onChange } { ...props } />;
+} ) => <BoxControl onChange={ onChange } { ...props } />;
 
 describe( 'BoxControl', () => {
 	describe( 'Basic rendering', () => {
@@ -236,6 +224,33 @@ describe( 'BoxControl', () => {
 				screen.getByRole( 'textbox', { name: 'Left side' } )
 			).not.toHaveValue();
 		} );
+
+		it.each( [
+			[ 'Top side', 'Bottom side' ],
+			[ 'Bottom side', 'Top side' ],
+			[ 'Left side', 'Right side' ],
+			[ 'Right side', 'Left side' ],
+		] )(
+			'should update %s together with %s when ALT is held',
+			async ( side, pairedSide ) => {
+				const user = userEvent.setup();
+
+				render( <ControlledBoxControl /> );
+
+				await user.click(
+					screen.getByRole( 'button', { name: 'Unlink sides' } )
+				);
+
+				const input = screen.getByRole( 'textbox', { name: side } );
+				await user.type( input, '10' );
+				await user.keyboard( '{Alt>}{ArrowUp}{/Alt}' );
+
+				expect( input ).toHaveValue( '11' );
+				expect(
+					screen.getByRole( 'textbox', { name: pairedSide } )
+				).toHaveValue( '11' );
+			}
+		);
 
 		it( 'should update a single side value when using slider unlinked', async () => {
 			const user = userEvent.setup();
@@ -472,6 +487,20 @@ describe( 'BoxControl', () => {
 				bottom: undefined,
 				left: undefined,
 			} );
+		} );
+	} );
+
+	describe( 'Placeholder', () => {
+		it( 'applies a consumer-supplied placeholder passed via inputProps', () => {
+			render(
+				<UncontrolledBoxControl
+					inputProps={ { placeholder: 'Inherited' } }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'textbox', { name: 'All sides' } )
+			).toHaveAttribute( 'placeholder', 'Inherited' );
 		} );
 	} );
 } );

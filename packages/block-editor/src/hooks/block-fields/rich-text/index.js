@@ -1,26 +1,15 @@
-/**
- * WordPress dependencies
- */
 import { BaseControl, useBaseControlProps } from '@wordpress/components';
 import { useMergeRefs } from '@wordpress/compose';
 import { useRegistry } from '@wordpress/data';
-import { useRef, useState } from '@wordpress/element';
-import {
-	__unstableUseRichText as useRichText,
-	removeFormat,
-} from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
-import { useFormatTypes } from '../../../components/rich-text/use-format-types';
+import { useMemo, useRef, useState } from '@wordpress/element';
+import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { getAllowedFormats } from '../../../components/rich-text/utils';
 import { useEventListeners } from '../../../components/rich-text/event-listeners';
 import FormatEdit from '../../../components/rich-text/format-edit';
-import {
-	keyboardShortcutContext,
-	inputEventContext,
-} from '../../../components/rich-text';
+import { unlock } from '../../../lock-unlock';
+
+const { useRichText, KeyboardShortcutContext, InputEventContext } =
+	unlock( richTextPrivateApis );
 
 export default function RichTextControl( {
 	data,
@@ -47,50 +36,6 @@ export default function RichTextControl( {
 		disableFormats: fieldConfig?.disableFormats,
 	} );
 
-	const {
-		formatTypes,
-		prepareHandlers,
-		valueHandlers,
-		changeHandlers,
-		dependencies,
-	} = useFormatTypes( {
-		clientId,
-		identifier: field.id,
-		allowedFormats: adjustedAllowedFormats,
-		withoutInteractiveFormatting: fieldConfig?.withoutInteractiveFormatting,
-		disableNoneEssentialFormatting: true,
-	} );
-
-	function addEditorOnlyFormats( value ) {
-		return valueHandlers.reduce(
-			( accumulator, fn ) => fn( accumulator, value.text ),
-			value.formats
-		);
-	}
-
-	function removeEditorOnlyFormats( value ) {
-		formatTypes.forEach( ( formatType ) => {
-			// Remove formats created by prepareEditableTree, because they are editor only.
-			if ( formatType.__experimentalCreatePrepareEditableTree ) {
-				value = removeFormat(
-					value,
-					formatType.name,
-					0,
-					value.text.length
-				);
-			}
-		} );
-
-		return value.formats;
-	}
-
-	function addInvisibleFormats( value ) {
-		return prepareHandlers.reduce(
-			( accumulator, fn ) => fn( accumulator, value.text ),
-			value.formats
-		);
-	}
-
 	function onFocus() {
 		anchorRef.current?.focus();
 	}
@@ -100,13 +45,11 @@ export default function RichTextControl( {
 		getValue,
 		onChange: onRichTextChange,
 		ref: richTextRef,
+		formatTypes,
 	} = useRichText( {
 		value: attrValue,
-		onChange( html, { __unstableFormats, __unstableText } ) {
+		onChange( html ) {
 			onChange( field.setValue( { item: data, value: html } ) );
-			Object.values( changeHandlers ).forEach( ( changeHandler ) => {
-				changeHandler( __unstableFormats, __unstableText );
-			} );
 		},
 		selectionStart: selection.start,
 		selectionEnd: selection.end,
@@ -115,10 +58,12 @@ export default function RichTextControl( {
 		preserveWhiteSpace: !! fieldConfig?.preserveWhiteSpace,
 		placeholder: fieldConfig?.placeholder,
 		__unstableDisableFormats: fieldConfig?.disableFormats,
-		__unstableDependencies: dependencies,
-		__unstableAfterParse: addEditorOnlyFormats,
-		__unstableBeforeSerialize: removeEditorOnlyFormats,
-		__unstableAddInvisibleFormats: addInvisibleFormats,
+		allowedFormats: adjustedAllowedFormats,
+		withoutInteractiveFormatting: fieldConfig?.withoutInteractiveFormatting,
+		__unstableFormatTypeHandlerContext: useMemo(
+			() => ( { richTextIdentifier: field.id, blockClientId: clientId } ),
+			[ field.id, clientId ]
+		),
 	} );
 
 	const { baseControlProps, controlProps } = useBaseControlProps( {
@@ -129,8 +74,8 @@ export default function RichTextControl( {
 	return (
 		<>
 			{ isSelected && (
-				<keyboardShortcutContext.Provider value={ keyboardShortcuts }>
-					<inputEventContext.Provider value={ inputEvents }>
+				<KeyboardShortcutContext.Provider value={ keyboardShortcuts }>
+					<InputEventContext.Provider value={ inputEvents }>
 						<div>
 							<FormatEdit
 								value={ value }
@@ -141,8 +86,8 @@ export default function RichTextControl( {
 								isVisible={ false }
 							/>
 						</div>
-					</inputEventContext.Provider>
-				</keyboardShortcutContext.Provider>
+					</InputEventContext.Provider>
+				</KeyboardShortcutContext.Provider>
 			) }
 			<BaseControl { ...baseControlProps }>
 				<div
@@ -161,7 +106,6 @@ export default function RichTextControl( {
 							disableFormats: fieldConfig?.disableFormats,
 							value,
 							tagName: 'div',
-							removeEditorOnlyFormats,
 							disableLineBreaks: fieldConfig?.disableLineBreaks,
 							keyboardShortcuts,
 							inputEvents,

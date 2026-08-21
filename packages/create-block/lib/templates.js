@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const { existsSync } = require( 'fs' );
 const { mkdtemp, readFile } = require( 'fs' ).promises;
 const { tmpdir } = require( 'os' );
@@ -10,10 +7,6 @@ const { command } = require( 'execa' );
 const glob = require( 'fast-glob' );
 const npmPackageArg = require( 'npm-package-arg' );
 const rimraf = require( 'rimraf' ).sync;
-
-/**
- * Internal dependencies
- */
 const CLIError = require( './cli-error' );
 const { info } = require( './log' );
 const prompts = require( './prompts' );
@@ -118,7 +111,7 @@ const getOutputAssets = async ( outputAssetsPath ) => {
 const externalTemplateExists = async ( templateName ) => {
 	try {
 		await command( `npm view ${ templateName }` );
-	} catch ( error ) {
+	} catch {
 		return false;
 	}
 	return true;
@@ -285,9 +278,9 @@ const getDefaultValues = ( projectTemplate, variant ) => {
 		license: 'GPL-2.0-or-later',
 		licenseURI: 'https://www.gnu.org/licenses/gpl-2.0.html',
 		version: '0.1.0',
-		requiresAtLeast: '6.7',
+		requiresAtLeast: '6.8',
 		requiresPHP: '7.4',
-		testedUpTo: '6.7',
+		testedUpTo: '6.8',
 		wpScripts: true,
 		customScripts: {},
 		wpEnv: false,

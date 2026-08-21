@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	createSlotFill,
 	MenuGroup,
@@ -8,10 +5,6 @@ import {
 } from '@wordpress/components';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import {
 	useConvertToGroupButtonProps,
 	ConvertToGroupButton,
@@ -19,10 +12,8 @@ import {
 import { BlockLockMenuItem, useBlockLock } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
 import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
-import { ModifyContentOnlySectionMenuItem } from '../content-lock';
 import { BlockRenameControl, useBlockRename } from '../block-rename';
-import { BlockVisibilityMenuItem } from '../block-visibility';
-import { EditSectionMenuItem } from './edit-section-menu-item';
+import { BlockVisibilityViewportMenuItem } from '../block-visibility';
 
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 
@@ -32,6 +23,7 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 		selectedClientIds,
 		isContentOnly,
 		canToggleSelectedBlocksVisibility,
+		canEdit,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -39,6 +31,7 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 				getBlockNamesByClientId,
 				getSelectedBlockClientIds,
 				getBlockEditingMode,
+				canEditBlock,
 			} = select( blockEditorStore );
 			const ids =
 				clientIds !== null ? clientIds : getSelectedBlockClientIds();
@@ -52,6 +45,7 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 				).every( ( block ) =>
 					hasBlockSupport( block.name, 'visibility', true )
 				),
+				canEdit: canEditBlock( ids[ 0 ] ),
 			};
 		},
 		[ clientIds ]
@@ -78,6 +72,7 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 		<Slot
 			fillProps={ {
 				...fillProps,
+				canEdit,
 				selectedBlocks,
 				selectedClientIds,
 			} }
@@ -99,40 +94,30 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 								onClose={ fillProps?.onClose }
 							/>
 						) }
-						{ selectedClientIds.length === 1 && (
-							<EditSectionMenuItem
-								clientId={ selectedClientIds[ 0 ] }
-								onClose={ fillProps?.onClose }
-							/>
-						) }
-						{ showLockButton && (
+						{ canEdit && showLockButton && (
 							<BlockLockMenuItem
 								clientId={ selectedClientIds[ 0 ] }
 							/>
 						) }
-						{ showRenameButton && (
+						{ canEdit && showRenameButton && (
 							<BlockRenameControl
 								clientId={ selectedClientIds[ 0 ] }
 							/>
 						) }
-						{ showVisibilityButton && (
-							<BlockVisibilityMenuItem
+						{ canEdit && showVisibilityButton && (
+							<BlockVisibilityViewportMenuItem
 								clientIds={ selectedClientIds }
 							/>
 						) }
 						{ fills }
-						{ selectedClientIds.length === 1 && (
-							<ModifyContentOnlySectionMenuItem
-								clientId={ selectedClientIds[ 0 ] }
-								onClose={ fillProps?.onClose }
-							/>
-						) }
-						{ fillProps?.count === 1 && ! isContentOnly && (
-							<BlockModeToggle
-								clientId={ fillProps?.firstBlockClientId }
-								onToggle={ fillProps?.onClose }
-							/>
-						) }
+						{ canEdit &&
+							fillProps?.count === 1 &&
+							! isContentOnly && (
+								<BlockModeToggle
+									clientId={ fillProps?.firstBlockClientId }
+									onToggle={ fillProps?.onClose }
+								/>
+							) }
 					</MenuGroup>
 				);
 			} }

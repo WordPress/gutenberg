@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	FormTokenField,
 	__experimentalVStack as VStack,
@@ -11,10 +8,6 @@ import { useState, useEffect, Fragment } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
 import { sprintf, __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useTaxonomies } from '../../utils';
 
 const EMPTY_ARRAY = [];
@@ -129,7 +122,7 @@ export function TaxonomyControls( { onChange, query } ) {
  * @param {number[]} props.oppositeTermIds An array with the opposite control's term ids (to exclude from suggestions).
  * @param {Function} props.onChange        Callback `onChange` function.
  * @param {string}   props.label           Label of the control.
- * @return {JSX.Element} The rendered component.
+ * @return {React.JSX.Element} The rendered component.
  */
 function TaxonomyItem( {
 	taxonomy,
@@ -242,8 +235,7 @@ function TaxonomyItem( {
 				suggestions={ suggestions }
 				displayTransform={ decodeEntities }
 				onChange={ onTermsChange }
-				__experimentalShowHowTo={ false }
-				__next40pxDefaultSize
+				help=""
 			/>
 		</div>
 	);

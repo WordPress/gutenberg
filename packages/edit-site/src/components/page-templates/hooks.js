@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import {
@@ -9,10 +6,6 @@ import {
 	plugins as pluginIcon,
 	globe as globeIcon,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { TEMPLATE_ORIGINS } from '../../utils/constants';
 
 /** @typedef {'wp_template'|'wp_template_part'} TemplateType */
@@ -22,14 +15,14 @@ import { TEMPLATE_ORIGINS } from '../../utils/constants';
  *
  * @typedef AddedByData
  * @type {Object}
- * @property {AddedByType}  type         The type of the data.
- * @property {JSX.Element}  icon         The icon to display.
- * @property {string}       [imageUrl]   The optional image URL to display.
- * @property {string}       [text]       The text to display.
- * @property {boolean}      isCustomized Whether the template has been customized.
+ * @property {AddedByType}       type         The type of the data.
+ * @property {React.JSX.Element} icon         The icon to display.
+ * @property {string}            [imageUrl]   The optional image URL to display.
+ * @property {string}            [text]       The text to display.
+ * @property {boolean}           isCustomized Whether the template has been customized.
  *
- * @param    {TemplateType} postType     The template post type.
- * @param    {number}       postId       The template post id.
+ * @param    {TemplateType}      postType     The template post type.
+ * @param    {number}            postId       The template post id.
  * @return {AddedByData} The added by object or null.
  */
 export function useAddedBy( postType, postId ) {

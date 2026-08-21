@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
-	AlignmentToolbar,
 	InspectorControls,
-	BlockControls,
 	useBlockProps,
 	useBlockDisplayInformation,
 	RichText,
-	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { Spinner, TextControl } from '@wordpress/components';
@@ -21,10 +10,6 @@ import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import usePostTerms from './use-post-terms';
 
 // Allowed formats for the prefix and suffix fields.
@@ -45,10 +30,8 @@ export default function PostTermsEdit( {
 	setAttributes,
 	insertBlocksAfter,
 } ) {
-	const { term, textAlign, separator, prefix, suffix } = attributes;
+	const { term, separator, prefix, suffix } = attributes;
 	const { postId, postType } = context;
-	const blockEditingMode = useBlockEditingMode();
-	const showControls = blockEditingMode === 'default';
 
 	const selectedTerm = useSelect(
 		( select ) => {
@@ -68,27 +51,13 @@ export default function PostTermsEdit( {
 	const hasPost = postId && postType;
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const blockProps = useBlockProps( {
-		className: clsx( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-			[ `taxonomy-${ term }` ]: term,
-		} ),
+		className: term && `taxonomy-${ term }`,
 	} );
 
 	return (
 		<>
-			{ showControls && (
-				<BlockControls>
-					<AlignmentToolbar
-						value={ textAlign }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { textAlign: nextAlign } );
-						} }
-					/>
-				</BlockControls>
-			) }
 			<InspectorControls group="advanced">
 				<TextControl
-					__next40pxDefaultSize
 					autoComplete="off"
 					label={ __( 'Separator' ) }
 					value={ separator || '' }
@@ -157,10 +126,13 @@ export default function PostTermsEdit( {
 							setAttributes( { suffix: value } )
 						}
 						tagName="span"
-						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter(
-								createBlock( getDefaultBlockName() )
-							)
+						__unstableOnSplitAtEnd={
+							insertBlocksAfter
+								? () =>
+										insertBlocksAfter(
+											createBlock( getDefaultBlockName() )
+										)
+								: undefined
 						}
 					/>
 				) }

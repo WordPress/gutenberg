@@ -1,13 +1,4 @@
-/**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
-	AlignmentControl,
 	BlockControls,
 	useBlockProps,
 	InspectorControls,
@@ -25,32 +16,24 @@ import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
-export default function Edit( {
-	attributes: {
-		textAlign,
+export default function Edit( props ) {
+	useDeprecatedTextAlign( props );
+	const { attributes, setAttributes, context } = props;
+	const {
 		showPostTitle,
 		showCommentsCount,
-		level,
+		level = 2,
 		levelOptions,
-	},
-	setAttributes,
-	context: { postType, postId },
-} ) {
+	} = attributes;
+	const { postId, postType } = context;
 	const TagName = 'h' + level;
 	const [ commentsCount, setCommentsCount ] = useState();
 	const [ rawTitle ] = useEntityProp( 'postType', postType, 'title', postId );
 	const isSiteEditor = typeof postId === 'undefined';
-	const blockProps = useBlockProps( {
-		className: clsx( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
+	const blockProps = useBlockProps();
 
 	const {
 		threadCommentsDepth,
@@ -104,12 +87,6 @@ export default function Edit( {
 
 	const blockControls = (
 		<BlockControls group="block">
-			<AlignmentControl
-				value={ textAlign }
-				onChange={ ( newAlign ) =>
-					setAttributes( { textAlign: newAlign } )
-				}
-			/>
 			<HeadingLevelDropdown
 				value={ level }
 				options={ levelOptions }

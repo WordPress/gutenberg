@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useParams,
 	useNavigate,
@@ -12,31 +9,26 @@ import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { Page } from '@wordpress/admin-ui';
 import type { View, Action } from '@wordpress/dataviews';
 import { store as coreStore } from '@wordpress/core-data';
-import {
-	Button,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useMemo, useCallback } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { layout } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../lock-unlock';
-import { getDefaultViewLegacy, DEFAULT_LAYOUTS } from './view-utils';
+import { unlock } from '@wordpress/routes-lock-unlock';
+import {
+	DEFAULT_VIEW_LEGACY,
+	getActiveViewOverridesForTabLegacy,
+	DEFAULT_LAYOUTS,
+} from './view-utils';
 import { previewField } from './fields/preview';
 import { authorField } from './fields/author';
 import { descriptionField } from './fields/description';
 import { useTemplatesLegacy } from './use-templates-legacy';
 import AddNewTemplate from './add-new-template';
-
 // Unlock WordPress private APIs
 const { usePostActions, templateTitleField } = unlock( editorPrivateApis );
 const { Tabs } = unlock( componentsPrivateApis );
-
 /**
  * Style dependencies
  */
@@ -59,9 +51,11 @@ function TemplateListLegacy() {
 		( select ) => select( coreStore ).getPostType( 'wp_template' ),
 		[]
 	);
-	const defaultView: View = useMemo( () => {
-		return getDefaultViewLegacy( activeView );
-	}, [ activeView ] );
+	const defaultView = DEFAULT_VIEW_LEGACY;
+	const activeViewOverrides = useMemo(
+		() => getActiveViewOverridesForTabLegacy( activeView ),
+		[ activeView ]
+	);
 
 	// Callback to handle URL query parameter changes
 	const handleQueryParamsChange = useCallback(
@@ -80,8 +74,9 @@ function TemplateListLegacy() {
 	const { view, isModified, updateView, resetToDefault } = useView( {
 		kind: 'postType',
 		name: 'wp_template',
-		slug: activeView,
+		slug: 'default-new',
 		defaultView,
+		activeViewOverrides,
 		queryParams: searchParams,
 		onChangeQueryParams: handleQueryParamsChange,
 	} );
@@ -269,20 +264,7 @@ function TemplateListLegacy() {
 		<Page
 			title={ __( 'Templates' ) }
 			className="template-page"
-			actions={
-				<>
-					{ isModified && (
-						<Button
-							variant="tertiary"
-							size="compact"
-							onClick={ onReset }
-						>
-							{ __( 'Reset view' ) }
-						</Button>
-					) }
-					<AddNewTemplate />
-				</>
-			}
+			actions={ <AddNewTemplate /> }
 			hasPadding={ false }
 		>
 			{ tabs.length > 1 && (
@@ -312,6 +294,7 @@ function TemplateListLegacy() {
 				defaultLayouts={ DEFAULT_LAYOUTS }
 				getItemId={ getItemId }
 				selection={ selection }
+				onReset={ isModified ? onReset : false }
 				onChangeSelection={ ( items: string[] ) => {
 					navigate( {
 						search: {

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { MenuItem } from '../../store/types';
 
 /**

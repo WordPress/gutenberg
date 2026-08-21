@@ -1,35 +1,26 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { NavigableRegion } from '@wordpress/admin-ui';
 import { Button, Modal } from '@wordpress/components';
-import {
-	EntitiesSavedStates,
-	useEntitiesSavedStatesIsDirty,
-	privateApis,
-} from '@wordpress/editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	privateApis as coreDataPrivateApis,
+} from '@wordpress/core-data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useActivateTheme } from '../../utils/use-activate-theme';
 import { useActualCurrentTheme } from '../../utils/use-actual-current-theme';
 import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 
-const { EntitiesSavedStatesExtensible } = unlock( privateApis );
 const { useLocation } = unlock( routerPrivateApis );
+const {
+	EntitiesSavedStatesExtensible,
+	EntitiesSavedStates,
+	useEntitiesSavedStatesIsDirty,
+} = unlock( coreDataPrivateApis );
 
 const EntitiesSavedStatesForPreview = ( {
 	onClose,
@@ -37,11 +28,13 @@ const EntitiesSavedStatesForPreview = ( {
 	variant,
 } ) => {
 	const isDirtyProps = useEntitiesSavedStatesIsDirty();
-	let activateSaveLabel;
+	let activateSaveLabel, successNoticeContent;
 	if ( isDirtyProps.isDirty ) {
 		activateSaveLabel = __( 'Activate & Save' );
+		successNoticeContent = __( 'Theme activated and site updated.' );
 	} else {
 		activateSaveLabel = __( 'Activate' );
+		successNoticeContent = __( 'Theme activated.' );
 	}
 
 	const currentTheme = useActualCurrentTheme();
@@ -65,9 +58,8 @@ const EntitiesSavedStatesForPreview = ( {
 	);
 
 	const activateTheme = useActivateTheme();
-	const onSave = async ( values ) => {
+	const onSave = async () => {
 		await activateTheme();
-		return values;
 	};
 
 	return (
@@ -81,6 +73,7 @@ const EntitiesSavedStatesForPreview = ( {
 				saveLabel: activateSaveLabel,
 				renderDialog,
 				variant,
+				successNoticeContent,
 			} }
 		/>
 	);

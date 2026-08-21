@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
@@ -13,7 +10,7 @@ import { __ } from '@wordpress/i18n';
  * @param {Object}   props               Component props.
  * @param {string}   props.overlayMenu   Overlay menu setting ('never', 'mobile', 'always').
  * @param {Function} props.setAttributes Function to update block attributes.
- * @return {JSX.Element}                 The overlay visibility control.
+ * @return {React.JSX.Element}                 The overlay visibility control.
  */
 export default function OverlayVisibilityControl( {
 	overlayMenu,
@@ -21,7 +18,6 @@ export default function OverlayVisibilityControl( {
 } ) {
 	return (
 		<ToggleGroupControl
-			__next40pxDefaultSize
 			label={ __( 'Overlay Visibility' ) }
 			aria-label={ __( 'Configure overlay visibility' ) }
 			value={ overlayMenu }

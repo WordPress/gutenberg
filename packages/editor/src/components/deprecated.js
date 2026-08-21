@@ -1,7 +1,4 @@
 // Block Creation Components.
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
 import { forwardRef } from '@wordpress/element';
 import {

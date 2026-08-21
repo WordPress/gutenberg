@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 
 const COLOR_RED = 'rgb(255, 0, 0)';
@@ -173,7 +170,45 @@ test.describe( 'Router styles', () => {
 		const csn = page.getByTestId( 'client-side navigation' );
 		const background = page.getByTestId( 'background-from-link' );
 
-		await expect( background ).toHaveScreenshot();
+		const expectBackgroundImage = async (
+			color: 'red' | 'green' | 'blue'
+		) => {
+			const assetPathPattern = `/router-styles-${ color }/assets/10x10_e2e_test_image_${ color }\\.png`;
+
+			// Match the path because the test origin varies between environments.
+			// Decoding the resolved URL also preserves the previous screenshots'
+			// guarantee that the referenced asset loads successfully.
+			await expect( background ).toHaveCSS(
+				'background-image',
+				new RegExp( assetPathPattern )
+			);
+			const imageLoaded = await background.evaluate(
+				async ( element ) => {
+					const match = getComputedStyle(
+						element
+					).backgroundImage.match( /^url\(["']?(.*?)["']?\)$/ );
+
+					if ( ! match ) {
+						return false;
+					}
+
+					const image = new Image();
+					image.src = match[ 1 ];
+
+					try {
+						await image.decode();
+					} catch {
+						return false;
+					}
+
+					return true;
+				}
+			);
+
+			expect( imageLoaded ).toBe( true );
+		};
+
+		await expect( background ).toHaveCSS( 'background-image', 'none' );
 
 		await page.getByTestId( 'link red' ).click();
 
@@ -181,25 +216,25 @@ test.describe( 'Router styles', () => {
 		// It should be visible again after a successful navigation.
 		await expect( csn ).toBeHidden();
 		await expect( csn ).toBeVisible();
-		await expect( background ).toHaveScreenshot();
+		await expectBackgroundImage( 'red' );
 
 		await page.getByTestId( 'link green' ).click();
 
 		await expect( csn ).toBeHidden();
 		await expect( csn ).toBeVisible();
-		await expect( background ).toHaveScreenshot();
+		await expectBackgroundImage( 'green' );
 
 		await page.getByTestId( 'link blue' ).click();
 
 		await expect( csn ).toBeHidden();
 		await expect( csn ).toBeVisible();
-		await expect( background ).toHaveScreenshot();
+		await expectBackgroundImage( 'blue' );
 
 		await page.getByTestId( 'link all' ).click();
 
 		await expect( csn ).toBeHidden();
 		await expect( csn ).toBeVisible();
-		await expect( background ).toHaveScreenshot();
+		await expectBackgroundImage( 'blue' );
 	} );
 
 	test( 'should update style tags with modified content', async ( {
@@ -444,6 +479,54 @@ test.describe( 'Router styles', () => {
 
 		// The "hide-on-print" element should remain visible.
 		await expect( hideOnPrint ).toBeVisible();
+	} );
+
+	test( 'should update styles when navigating to a cached page with force', async ( {
+		page,
+		request,
+		interactivityUtils: utils,
+	} ) => {
+		const csn = page.getByTestId( 'client-side navigation' );
+		const red = page.getByTestId( 'red' );
+		const green = page.getByTestId( 'green' );
+
+		// Navigate to "red" to cache the page and populate the
+		// internal style cache for the red page URL.
+		await page.getByTestId( 'link red' ).click();
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+		await expect( red ).toHaveCSS( 'color', COLOR_RED );
+		await expect( green ).toHaveCSS( 'color', COLOR_WRAPPER );
+
+		// Navigate to "green" so red styles are removed.
+		await page.getByTestId( 'link green' ).click();
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+
+		// Intercept the next fetch to the red page URL and respond
+		// with the "all" page HTML instead.
+		const redLink = utils.getLink( 'red' );
+		const allLink = utils.getLink( 'all' );
+		await page.route( redLink, async ( route ) => {
+			// Fetch the "all" page HTML to simulate server-side content
+			// changes (e.g., new blocks appearing on the page).
+			const allPage = await request.fetch( allLink );
+			const body = await allPage.body();
+			return route.fulfill( { body, contentType: 'text/html' } );
+		} );
+
+		// Force-navigate to "red". The response now contains all
+		// three color blocks with their styles.
+		await page.getByTestId( 'force link red' ).click();
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+
+		// Red and green styles should be present.
+		await expect( red ).toHaveCSS( 'color', COLOR_RED );
+		await expect( green ).toHaveCSS( 'color', COLOR_GREEN );
+
+		// Unroute previous route handler for "red".
+		await page.unroute( redLink );
 	} );
 
 	test( 'should ignore styles inside noscript elements during navigation', async ( {

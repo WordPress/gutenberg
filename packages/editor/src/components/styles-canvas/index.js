@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Button } from '@wordpress/components';
 import { ESCAPE } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
@@ -8,9 +5,6 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
 import { useFocusOnMount, useFocusReturn } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import StylesCanvasStyleBook from './style-book';
 import StylesCanvasRevisions from './revisions';
@@ -38,7 +32,7 @@ export function getStylesCanvasTitle( path, showStylebook ) {
  * Styles canvas component - orchestrates rendering of style book and revisions.
  * Determines what content to show based on global styles navigation state.
  *
- * @return {JSX.Element|null} The styles canvas or null if nothing to render.
+ * @return {React.JSX.Element} The styles canvas or null if nothing to render.
  */
 export default function StylesCanvas() {
 	const { stylesPath, showStylebook, showListViewByDefault } = useSelect(

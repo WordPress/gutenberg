@@ -1,18 +1,12 @@
-/**
- * WordPress dependencies
- */
 import { ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { copy, symbol } from '@wordpress/icons';
 import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import BlockSwitcher from '../block-switcher';
 import BlockIcon from '../block-icon';
+import BlockStylesDropdown from './block-styles-dropdown';
 import PatternOverridesDropdown from './pattern-overrides-dropdown';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import { store as blockEditorStore } from '../../store';
@@ -27,6 +21,8 @@ function getBlockIconVariant( { select, clientIds } ) {
 		canRemoveBlocks,
 		getTemplateLock,
 		getBlockEditingMode,
+		canEditBlock,
+		isSectionBlock,
 	} = unlock( select( blockEditorStore ) );
 	const { getBlockStyles } = select( blocksStore );
 
@@ -40,7 +36,9 @@ function getBlockIconVariant( { select, clientIds } ) {
 	const hasBlockStyles =
 		isSingleBlock && !! getBlockStyles( blockName )?.length;
 	const hasPatternNameInSelection = clientIds.some(
-		( id ) => !! getBlockAttributes( id )?.metadata?.patternName
+		( id ) =>
+			!! getBlockAttributes( id )?.metadata?.patternName &&
+			isSectionBlock( id )
 	);
 	const hasPatternOverrides = clientIds.every( ( clientId ) =>
 		hasPatternOverridesDefaultBinding(
@@ -53,22 +51,29 @@ function getBlockIconVariant( { select, clientIds } ) {
 			0
 	);
 	const canRemove = canRemoveBlocks( clientIds );
-
-	const isDefaultEditingMode =
-		getBlockEditingMode( clientIds[ 0 ] ) === 'default';
-	const _hideTransformsForSections =
-		window?.__experimentalContentOnlyPatternInsertion &&
-		hasPatternNameInSelection;
+	const canEdit = clientIds.every( ( clientId ) => canEditBlock( clientId ) );
+	const editingMode = getBlockEditingMode( clientIds[ 0 ] );
+	const isDefaultEditingMode = editingMode === 'default';
+	const isContentOnlyMode = editingMode === 'contentOnly';
+	const _hideTransformsForSections = hasPatternNameInSelection;
 	const _showBlockSwitcher =
 		! _hideTransformsForSections &&
 		isDefaultEditingMode &&
 		( hasBlockStyles || canRemove ) &&
-		! hasTemplateLock;
+		! hasTemplateLock &&
+		canEdit;
 
 	const _showPatternOverrides = hasPatternOverrides && hasParentPattern;
 
 	if ( _showBlockSwitcher ) {
 		return 'switcher';
+	} else if (
+		isContentOnlyMode &&
+		hasBlockStyles &&
+		! hasPatternOverrides &&
+		canEdit
+	) {
+		return 'styles-only';
 	} else if ( _showPatternOverrides ) {
 		return 'pattern-overrides';
 	}
@@ -77,27 +82,31 @@ function getBlockIconVariant( { select, clientIds } ) {
 }
 
 function getBlockIcon( { select, clientIds } ) {
-	const { getBlockName, getBlockAttributes } = unlock(
-		select( blockEditorStore )
-	);
+	const { getBlockName, getBlockAttributes, getBlock, isSectionBlock } =
+		unlock( select( blockEditorStore ) );
 
 	const _isSingleBlock = clientIds.length === 1;
 	const firstClientId = clientIds[ 0 ];
+
 	const blockAttributes = getBlockAttributes( firstClientId );
 	if (
 		_isSingleBlock &&
 		blockAttributes?.metadata?.patternName &&
-		window?.__experimentalContentOnlyPatternInsertion
+		isSectionBlock( firstClientId )
 	) {
 		return symbol;
 	}
 
 	const blockName = getBlockName( firstClientId );
 	const blockType = getBlockType( blockName );
-
 	if ( _isSingleBlock ) {
 		const { getActiveBlockVariation } = select( blocksStore );
-		const match = getActiveBlockVariation( blockName, blockAttributes );
+		const match = getActiveBlockVariation(
+			blockName,
+			blockAttributes,
+			undefined,
+			getBlock?.( firstClientId )?.innerContent
+		);
 		return match?.icon || blockType?.icon;
 	}
 
@@ -151,6 +160,18 @@ export default function BlockToolbarIcon( { clientIds, isSynced } ) {
 			>
 				{ BlockIconElement }
 			</BlockSwitcher>
+		);
+	}
+
+	if ( variant === 'styles-only' ) {
+		return (
+			<BlockStylesDropdown
+				clientIds={ clientIds }
+				label={ label }
+				text={ text }
+			>
+				{ BlockIconElement }
+			</BlockStylesDropdown>
 		);
 	}
 

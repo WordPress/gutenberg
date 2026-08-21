@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { DragEvent, ReactNode } from 'react';
 
 export type DraggableProps = {
@@ -16,10 +13,14 @@ export type DraggableProps = {
 		 * `onDragEnd` handler.
 		 */
 		onDraggableEnd: ( event: DragEvent ) => void;
-	} ) => JSX.Element | null;
+	} ) => React.JSX.Element | null;
 	/**
 	 * Whether to append the cloned element to the `ownerDocument` body.
 	 * By default, elements sourced by id are appended to the element's wrapper.
+	 *
+	 * Has no effect when the `@wordpress/ui` compat overlay slot is in use in
+	 * the same document — the clone goes into the slot instead. Cross-document
+	 * drags fall back to this prop's regular semantics.
 	 *
 	 * @default false
 	 */

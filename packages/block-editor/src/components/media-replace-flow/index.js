@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __, _x } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import {
@@ -27,10 +20,6 @@ import { compose } from '@wordpress/compose';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { store as noticesStore } from '@wordpress/notices';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import MediaUpload from '../media-upload';
 import MediaUploadCheck from '../media-upload/check';
 import LinkControl from '../link-control';
@@ -239,6 +228,9 @@ const MediaReplaceFlow = ( {
 								{ __( 'Use featured image' ) }
 							</MenuItem>
 						) }
+						{ typeof children === 'function'
+							? children( { onClose } )
+							: children }
 						{ mediaURL && onReset && (
 							<MenuItem
 								onClick={ () => {
@@ -249,9 +241,6 @@ const MediaReplaceFlow = ( {
 								{ __( 'Reset' ) }
 							</MenuItem>
 						) }
-						{ typeof children === 'function'
-							? children( { onClose } )
-							: children }
 					</NavigableMenu>
 					{ onSelectURL && (
 						<form className="block-editor-media-flow__url-input">

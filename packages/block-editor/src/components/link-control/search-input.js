@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { URLInput } from '../';
 import LinkControlSearchResults from './search-results';
 import { CREATE_TYPE } from './constants';
@@ -45,6 +38,7 @@ const LinkControlSearchInput = forwardRef(
 			hideLabelFromVision = false,
 			suffix,
 			isEntity = false,
+			customValidity: customValidityProp,
 		},
 		ref
 	) => {
@@ -98,7 +92,7 @@ const LinkControlSearchInput = forwardRef(
 					if ( suggestion?.url ) {
 						onSelect( suggestion );
 					}
-				} catch ( e ) {}
+				} catch {}
 				return;
 			}
 
@@ -146,6 +140,11 @@ const LinkControlSearchInput = forwardRef(
 					__experimentalShowInitialSuggestions={
 						showInitialSuggestions
 					}
+					customValidity={ customValidityProp }
+					// Validation is handled manually via onSubmit and handleSubmit. We may be able to rely
+					// on browser validation when enhancements land to base level components:
+					// https://github.com/WordPress/gutenberg/pull/75188#issuecomment-3861757260
+					required={ false }
 					onSubmit={ ( suggestion, event ) => {
 						const hasSuggestion = suggestion || focusedSuggestion;
 

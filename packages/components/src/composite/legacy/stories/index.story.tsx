@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import {
 	Composite,
 	CompositeGroup,
@@ -15,7 +8,7 @@ import {
 import { UseCompositeStatePlaceholder, transform } from './utils';
 
 const meta: Meta< typeof UseCompositeStatePlaceholder > = {
-	title: 'Components (Deprecated)/Composite (Unstable)',
+	title: 'Components/Deprecated/Composite (Unstable)',
 	id: 'components-composite-unstable',
 	component: UseCompositeStatePlaceholder,
 	subcomponents: {
@@ -154,19 +147,19 @@ export const OneDimensionWithStateProp: StoryFn<
 			state={ state }
 			aria-label="Legacy Composite with state prop (one dimension)"
 		>
-			<CompositeItem state={ state } role="listitem">
+			<CompositeItem state={ state } role="listitem" render={ <div /> }>
 				Item 1
 			</CompositeItem>
-			<CompositeItem state={ state } role="listitem">
+			<CompositeItem state={ state } role="listitem" render={ <div /> }>
 				Item 2
 			</CompositeItem>
-			<CompositeItem state={ state } role="listitem">
+			<CompositeItem state={ state } role="listitem" render={ <div /> }>
 				Item 3
 			</CompositeItem>
-			<CompositeItem state={ state } role="listitem">
+			<CompositeItem state={ state } role="listitem" render={ <div /> }>
 				Item 4
 			</CompositeItem>
-			<CompositeItem state={ state } role="listitem">
+			<CompositeItem state={ state } role="listitem" render={ <div /> }>
 				Item 5
 			</CompositeItem>
 		</Composite>
@@ -185,19 +178,19 @@ export const OneDimensionWithSpreadProps: StoryFn<
 			{ ...state }
 			aria-label="Legacy Composite with spread props (one dimension)"
 		>
-			<CompositeItem { ...state } role="listitem">
+			<CompositeItem { ...state } role="listitem" render={ <div /> }>
 				Item 1
 			</CompositeItem>
-			<CompositeItem { ...state } role="listitem">
+			<CompositeItem { ...state } role="listitem" render={ <div /> }>
 				Item 2
 			</CompositeItem>
-			<CompositeItem { ...state } role="listitem">
+			<CompositeItem { ...state } role="listitem" render={ <div /> }>
 				Item 3
 			</CompositeItem>
-			<CompositeItem { ...state } role="listitem">
+			<CompositeItem { ...state } role="listitem" render={ <div /> }>
 				Item 4
 			</CompositeItem>
-			<CompositeItem { ...state } role="listitem">
+			<CompositeItem { ...state } role="listitem" render={ <div /> }>
 				Item 5
 			</CompositeItem>
 		</Composite>

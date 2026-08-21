@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useNavigate, useSearch } from '@wordpress/route';
 import type { View, Action } from '@wordpress/dataviews';
 import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
@@ -12,18 +9,10 @@ import { useView } from '@wordpress/views';
 import { DataViews } from '@wordpress/dataviews';
 import { Button } from '@wordpress/components';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../lock-unlock';
+import { unlock } from '@wordpress/routes-lock-unlock';
 import { getDefaultView } from './view-utils';
 import { useEditNavigationAction } from './actions/edit-navigation';
 import { AddNavigationModal } from './add-navigation';
-
-/**
- * Style dependencies
- */
 import './style.scss';
 
 // Unlock WordPress private APIs
@@ -66,7 +55,7 @@ function NavigationList() {
 	const { view, updateView, isModified, resetToDefault } = useView( {
 		kind: 'postType',
 		name: NAVIGATION_POST_TYPE,
-		slug: 'all',
+		slug: 'default-new',
 		defaultView,
 		queryParams: searchParams,
 		onChangeQueryParams: handleQueryParamsChange,
@@ -131,27 +120,17 @@ function NavigationList() {
 		<>
 			<Page
 				title={ __( 'Navigation' ) }
+				headingLevel={ 2 }
 				className="navigation-page"
 				hasPadding={ false }
 				actions={
-					<>
-						{ isModified && (
-							<Button
-								variant="tertiary"
-								size="compact"
-								onClick={ resetToDefault }
-							>
-								{ __( 'Reset view' ) }
-							</Button>
-						) }
-						<Button
-							variant="primary"
-							size="compact"
-							onClick={ () => setShowAddModal( true ) }
-						>
-							{ __( 'Add New' ) }
-						</Button>
-					</>
+					<Button
+						variant="primary"
+						size="compact"
+						onClick={ () => setShowAddModal( true ) }
+					>
+						{ __( 'Add New' ) }
+					</Button>
 				}
 			>
 				<DataViews
@@ -166,10 +145,11 @@ function NavigationList() {
 						totalPages,
 					} }
 					defaultLayouts={ {
-						list: {},
+						list: true,
 					} }
 					getItemId={ getItemId }
 					selection={ selection }
+					onReset={ isModified ? resetToDefault : false }
 					onChangeSelection={ ( items: string[] ) => {
 						navigate( {
 							search: {

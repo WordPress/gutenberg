@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState, useRef, useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import { Popover } from '..';
-import { PopoverInsideIframeRenderedInExternalSlot } from '../test/utils';
+import { PopoverInsideIframeRenderedInExternalSlot } from './utils';
 import type { PopoverProps } from '../types';
 
 const AVAILABLE_PLACEMENTS: PopoverProps[ 'placement' ][] = [
@@ -33,6 +22,7 @@ const AVAILABLE_PLACEMENTS: PopoverProps[ 'placement' ][] = [
 ];
 
 const meta: Meta< typeof Popover > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Overlays/Popover',
 	id: 'components-popover',
 	component: Popover,
@@ -55,6 +45,10 @@ const meta: Meta< typeof Popover > = {
 	},
 	parameters: {
 		controls: { expanded: true },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 
@@ -89,7 +83,7 @@ export const Default: StoryObj< typeof Popover > = {
 	decorators: [
 		( Story ) => {
 			const [ isVisible, setIsVisible ] = useState( false );
-			const buttonRef = useRef< HTMLButtonElement | undefined >();
+			const buttonRef = useRef< HTMLButtonElement >( undefined );
 			const toggleVisible = ( event: React.MouseEvent ) => {
 				if ( buttonRef.current && event.target !== buttonRef.current ) {
 					return;

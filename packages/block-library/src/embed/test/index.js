@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import {
 	registerBlockType,
 	unregisterBlockType,
 	registerBlockVariation,
 	unregisterBlockVariation,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import {
 	findMoreSuitableBlock,
 	getClassNames,
@@ -31,6 +24,7 @@ jest.mock( '@wordpress/data/src/components/use-select', () => () => ( {} ) );
 describe( 'utils', () => {
 	beforeAll( () => {
 		registerBlockType( DEFAULT_EMBED_BLOCK, {
+			apiVersion: 3,
 			title: 'Embed',
 			category: 'embed',
 			attributes,
@@ -195,6 +189,7 @@ describe( 'utils', () => {
 				).toBeUndefined();
 
 				registerBlockType( DEFAULT_EMBED_BLOCK, {
+					apiVersion: 3,
 					title: 'Embed',
 					category: 'embed',
 					attributes,

@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../../context';
 import type { ToggleGroupControlOptionIconProps } from '../types';
 import { ToggleGroupControlOptionBase } from '../toggle-group-control-option-base';
@@ -52,7 +41,7 @@ function UnforwardedToggleGroupControlOptionIcon(
  *
  * function Example() {
  *  return (
- *    <ToggleGroupControl __next40pxDefaultSize>
+ *    <ToggleGroupControl>
  *      <ToggleGroupControlOptionIcon
  *        value="uppercase"
  *        label="Uppercase"
@@ -71,5 +60,6 @@ function UnforwardedToggleGroupControlOptionIcon(
 export const ToggleGroupControlOptionIcon = forwardRef(
 	UnforwardedToggleGroupControlOptionIcon
 );
+ToggleGroupControlOptionIcon.displayName = 'ToggleGroupControlOptionIcon';
 
 export default ToggleGroupControlOptionIcon;

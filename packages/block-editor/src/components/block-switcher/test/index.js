@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import { render, screen, within, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { copy } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { BlockSwitcher } from '../';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
@@ -33,6 +22,7 @@ describe( 'BlockSwitcher', () => {
 		clientId: 'a1303fd6-3e60-4fff-a770-0e0ea656c5b9',
 	};
 	const headingBlockType = {
+		apiVersion: 3,
 		category: 'text',
 		title: 'Heading',
 		edit: () => {},
@@ -54,6 +44,7 @@ describe( 'BlockSwitcher', () => {
 		},
 	};
 	const paragraphBlockType = {
+		apiVersion: 3,
 		category: 'text',
 		title: 'Paragraph',
 		edit: () => {},

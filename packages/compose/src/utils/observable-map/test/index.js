@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { observableMap } from '..';
 
 describe( 'ObservableMap', () => {

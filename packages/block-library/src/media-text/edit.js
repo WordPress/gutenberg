@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useState, useRef } from '@wordpress/element';
@@ -22,7 +15,7 @@ import {
 } from '@wordpress/block-editor';
 import {
 	RangeControl,
-	TextareaControl,
+	TextareaControl as WCTextareaControl,
 	ToggleControl,
 	ToolbarButton,
 	ExternalLink,
@@ -33,17 +26,13 @@ import {
 import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
 import { pullLeft, pullRight } from '@wordpress/icons';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import MediaContainer from './media-container';
 import {
 	DEFAULT_MEDIA_SIZE_SLUG,
 	WIDTH_CONSTRAINT_PERCENTAGE,
+	LINK_DESTINATION_NONE,
 	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_ATTACHMENT,
-	TEMPLATE,
 } from './constants';
 import { unlock } from '../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
@@ -107,16 +96,43 @@ function attributesFromMedia( {
 				media.media_details?.sizes?.large?.source_url;
 		}
 
+		let newLinkDestination = linkDestination;
 		let newHref = href;
-		if ( linkDestination === LINK_DESTINATION_MEDIA ) {
-			// Update the media link.
-			newHref = media.url;
-		}
 
-		// Check if the image is linked to the attachment page.
-		if ( linkDestination === LINK_DESTINATION_ATTACHMENT ) {
-			// Update the media link.
-			newHref = media.link;
+		// Only apply default link behavior for images (not videos).
+		if ( mediaType === 'image' ) {
+			// Check if default link setting should be used.
+			if ( ! newLinkDestination ) {
+				// Use the WordPress option to determine the proper default.
+				// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
+				switch (
+					window?.wp?.media?.view?.settings?.defaultProps?.link ||
+					LINK_DESTINATION_NONE
+				) {
+					case 'file':
+					case LINK_DESTINATION_MEDIA:
+						newLinkDestination = LINK_DESTINATION_MEDIA;
+						break;
+					case 'post':
+					case LINK_DESTINATION_ATTACHMENT:
+						newLinkDestination = LINK_DESTINATION_ATTACHMENT;
+						break;
+					case LINK_DESTINATION_NONE:
+					default:
+						newLinkDestination = LINK_DESTINATION_NONE;
+						break;
+				}
+			}
+
+			// Set href based on linkDestination.
+			switch ( newLinkDestination ) {
+				case LINK_DESTINATION_MEDIA:
+					newHref = media.url;
+					break;
+				case LINK_DESTINATION_ATTACHMENT:
+					newHref = media.link;
+					break;
+			}
 		}
 
 		setAttributes( {
@@ -126,6 +142,7 @@ function attributesFromMedia( {
 			mediaUrl: src || media.url,
 			mediaLink: media.link || undefined,
 			href: newHref,
+			linkDestination: newLinkDestination,
 			focalPoint: undefined,
 			useFeaturedImage: false,
 		} );
@@ -337,7 +354,6 @@ function MediaTextEdit( {
 				onDeselect={ () => setAttributes( { mediaWidth: 50 } ) }
 			>
 				<RangeControl
-					__next40pxDefaultSize
 					label={ __( 'Media width' ) }
 					value={ temporaryMediaWidth || mediaWidth }
 					onChange={ commitWidthChange }
@@ -415,7 +431,7 @@ function MediaTextEdit( {
 					hasValue={ () => !! mediaAlt }
 					onDeselect={ () => setAttributes( { mediaAlt: '' } ) }
 				>
-					<TextareaControl
+					<WCTextareaControl
 						label={ __( 'Alternative text' ) }
 						value={ mediaAlt }
 						onChange={ onMediaAltChange }
@@ -457,7 +473,7 @@ function MediaTextEdit( {
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{ className: 'wp-block-media-text__content' },
-		{ template: TEMPLATE, allowedBlocks }
+		{ allowedBlocks }
 	);
 
 	const blockEditingMode = useBlockEditingMode();
@@ -471,6 +487,7 @@ function MediaTextEdit( {
 						<BlockVerticalAlignmentControl
 							onChange={ onVerticalAlignmentChange }
 							value={ verticalAlignment }
+							label={ __( 'Align media and text vertically' ) }
 						/>
 						<ToolbarButton
 							icon={ pullLeft }

@@ -1,0 +1,17 @@
+{
+	"name": "@wordpress/site-health-widget",
+	"version": "1.0.0",
+	"private": true,
+	"dependencies": {
+		"@wordpress/api-fetch": "file:../../packages/api-fetch",
+		"@wordpress/components": "file:../../packages/components",
+		"@wordpress/element": "file:../../packages/element",
+		"@wordpress/i18n": "file:../../packages/i18n",
+		"@wordpress/icons": "file:../../packages/icons",
+		"@wordpress/primitives": "file:../../packages/primitives",
+		"@wordpress/ui": "file:../../packages/ui"
+	},
+	"devDependencies": {
+		"@types/react": "^18.3.27"
+	}
+}

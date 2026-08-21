@@ -1,11 +1,3 @@
-/**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
@@ -17,35 +9,18 @@ import {
 import {
 	InspectorControls,
 	RichText,
-	BlockControls,
-	AlignmentToolbar,
 	useBlockProps,
-	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function PostNavigationLinkEdit( {
 	context: { postType },
-	attributes: {
-		type,
-		label,
-		showTitle,
-		textAlign,
-		linkLabel,
-		arrow,
-		taxonomy,
-	},
+	attributes: { type, label, showTitle, linkLabel, arrow, taxonomy },
 	setAttributes,
 } ) {
-	const blockEditingMode = useBlockEditingMode();
-	const showControls = blockEditingMode === 'default';
 	const isNext = type === 'next';
 	let placeholder = isNext ? __( 'Next' ) : __( 'Previous' );
 
@@ -66,12 +41,7 @@ export default function PostNavigationLinkEdit( {
 	}
 
 	const ariaLabel = isNext ? __( 'Next post' ) : __( 'Previous post' );
-	const blockProps = useBlockProps( {
-		className: clsx( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
-
+	const blockProps = useBlockProps();
 	const taxonomies = useSelect(
 		( select ) => {
 			const { getTaxonomies } = select( coreStore );
@@ -168,7 +138,6 @@ export default function PostNavigationLinkEdit( {
 						onDeselect={ () => setAttributes( { arrow: 'none' } ) }
 					>
 						<ToggleGroupControl
-							__next40pxDefaultSize
 							label={ __( 'Arrow' ) }
 							value={ arrow }
 							onChange={ ( value ) => {
@@ -206,7 +175,6 @@ export default function PostNavigationLinkEdit( {
 			</InspectorControls>
 			<InspectorControls group="advanced">
 				<SelectControl
-					__next40pxDefaultSize
 					label={ __( 'Filter by taxonomy' ) }
 					value={ taxonomy }
 					options={ getTaxonomyOptions() }
@@ -220,16 +188,6 @@ export default function PostNavigationLinkEdit( {
 					) }
 				/>
 			</InspectorControls>
-			{ showControls && (
-				<BlockControls>
-					<AlignmentToolbar
-						value={ textAlign }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { textAlign: nextAlign } );
-						} }
-					/>
-				</BlockControls>
-			) }
 			<div { ...blockProps }>
 				{ ! isNext && displayArrow && (
 					<span

@@ -8,6 +8,8 @@
 /**
  * Redirect the Appearance > Design menu to the extensible site editor
  * when the experiment is enabled.
+ *
+ * @global array $submenu WordPress admin submenu array.
  */
 function gutenberg_redirect_to_extensible_site_editor() {
 	// Only proceed if the experiment is enabled.

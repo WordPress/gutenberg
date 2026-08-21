@@ -1,14 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-/**
- * WordPress dependencies
- */
 import { createContext, useContext, useState } from '@wordpress/element';
-/**
- * Internal dependencies
- */
 import CircularOptionPicker from '..';
 
 const CircularOptionPickerStoryContext = createContext< {
@@ -37,6 +28,11 @@ const meta: Meta< typeof CircularOptionPicker > = {
 		docs: {
 			canvas: { sourceState: 'shown' },
 			source: { excludeDecorators: true },
+		},
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Mostly intended for internal use.',
 		},
 	},
 	decorators: [

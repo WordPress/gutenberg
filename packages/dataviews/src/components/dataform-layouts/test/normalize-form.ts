@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import normalizeForm from '../normalize-form';
 import type { Form } from '../../../types';
 
@@ -137,8 +134,9 @@ describe( 'normalizeFormFields', () => {
 				layout: {
 					labelPosition: 'side',
 					type: 'panel',
-					openAs: 'dropdown',
+					openAs: { type: 'dropdown' },
 					summary: [],
+					editVisibility: 'on-hover',
 				},
 				fields: [
 					{
@@ -146,8 +144,9 @@ describe( 'normalizeFormFields', () => {
 						layout: {
 							type: 'panel',
 							labelPosition: 'side',
-							openAs: 'dropdown',
+							openAs: { type: 'dropdown' },
 							summary: [],
+							editVisibility: 'on-hover',
 						},
 					},
 				],
@@ -164,8 +163,9 @@ describe( 'normalizeFormFields', () => {
 				layout: {
 					labelPosition: 'top',
 					type: 'panel',
-					openAs: 'dropdown',
+					openAs: { type: 'dropdown' },
 					summary: [],
+					editVisibility: 'on-hover',
 				},
 				fields: [
 					{
@@ -173,11 +173,105 @@ describe( 'normalizeFormFields', () => {
 						layout: {
 							type: 'panel',
 							labelPosition: 'top',
-							openAs: 'dropdown',
+							openAs: { type: 'dropdown' },
 							summary: [],
+							editVisibility: 'on-hover',
 						},
 					},
 				],
+			} );
+		} );
+
+		it( 'panel: openAs string "modal" normalizes to object with defaults', () => {
+			const form: Form = {
+				layout: { type: 'panel', openAs: 'modal' },
+				fields: [ 'field1' ],
+			};
+			const result = normalizeForm( form );
+			expect( result.layout ).toEqual( {
+				type: 'panel',
+				labelPosition: 'side',
+				openAs: {
+					type: 'modal',
+					applyLabel: 'Apply',
+					cancelLabel: 'Cancel',
+				},
+				summary: [],
+				editVisibility: 'on-hover',
+			} );
+		} );
+
+		it( 'panel: openAs object preserves labels', () => {
+			const form: Form = {
+				layout: {
+					type: 'panel',
+					openAs: {
+						type: 'modal',
+						applyLabel: 'Save',
+						cancelLabel: 'Dismiss',
+					},
+				},
+				fields: [ 'field1' ],
+			};
+			const result = normalizeForm( form );
+			expect( result.layout ).toEqual( {
+				type: 'panel',
+				labelPosition: 'side',
+				openAs: {
+					type: 'modal',
+					applyLabel: 'Save',
+					cancelLabel: 'Dismiss',
+				},
+				summary: [],
+				editVisibility: 'on-hover',
+			} );
+		} );
+
+		it( 'panel: openAs object without labels gets defaults', () => {
+			const form: Form = {
+				layout: {
+					type: 'panel',
+					openAs: { type: 'modal' },
+				},
+				fields: [ 'field1' ],
+			};
+			const result = normalizeForm( form );
+			expect( result.layout ).toEqual( {
+				type: 'panel',
+				labelPosition: 'side',
+				openAs: {
+					type: 'modal',
+					applyLabel: 'Apply',
+					cancelLabel: 'Cancel',
+				},
+				summary: [],
+				editVisibility: 'on-hover',
+			} );
+		} );
+
+		it( 'panel: openAs object trims whitespace and falls back to defaults', () => {
+			const form: Form = {
+				layout: {
+					type: 'panel',
+					openAs: {
+						type: 'modal',
+						applyLabel: '  ',
+						cancelLabel: '',
+					},
+				},
+				fields: [ 'field1' ],
+			};
+			const result = normalizeForm( form );
+			expect( result.layout ).toEqual( {
+				type: 'panel',
+				labelPosition: 'side',
+				openAs: {
+					type: 'modal',
+					applyLabel: 'Apply',
+					cancelLabel: 'Cancel',
+				},
+				summary: [],
+				editVisibility: 'on-hover',
 			} );
 		} );
 
@@ -212,11 +306,10 @@ describe( 'normalizeFormFields', () => {
 
 		it( 'card: enforces isOpened=true and summary=[] when withHeader=false', () => {
 			const form: Form = {
-				// @ts-ignore - Test intentionally uses invalid type to verify runtime behavior.
 				layout: {
 					type: 'card',
 					withHeader: false,
-					// @ts-ignore - Test intentionally uses invalid type to verify runtime behavior.
+					// @ts-expect-error With `withHeader: false`, `isOpened` must be `true`; normalization of `false` is tested.
 					isOpened: false,
 					summary: [ { id: 'field1', visibility: 'always' } ],
 				},
@@ -356,8 +449,9 @@ describe( 'normalizeFormFields', () => {
 						layout: {
 							type: 'panel',
 							labelPosition: 'side',
-							openAs: 'dropdown',
+							openAs: { type: 'dropdown' },
 							summary: [],
+							editVisibility: 'on-hover',
 						},
 					},
 				],

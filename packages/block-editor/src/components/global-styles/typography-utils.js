@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
 
 /**

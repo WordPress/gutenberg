@@ -1,28 +1,10 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
-import {
-	Spinner,
-	Flex,
-	FlexItem,
-	privateApis as componentsPrivateApis,
-	Composite,
-} from '@wordpress/components';
+import { Spinner, Flex, FlexItem, Composite } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
-import { useContext } from '@wordpress/element';
-import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../../lock-unlock';
+import { useContext, useRef } from '@wordpress/element';
+import { Badge, Stack } from '@wordpress/ui';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
 import DataViewsContext from '../../dataviews-context';
 import { useIsMultiselectPicker } from '../../dataviews-picker-footer';
@@ -33,14 +15,20 @@ import type {
 } from '../../../types';
 import type { SetSelection } from '../../../types/private';
 import { GridItems } from '../utils/grid-items';
-const { Badge } = unlock( componentsPrivateApis );
 import getDataByGroup from '../utils/get-data-by-group';
+import useSelectionProps from '../utils/use-selection-props';
+import type { SelectionProps } from '../utils/use-selection-props';
+import { useGridColumns } from '../grid/preview-size-picker';
+import {
+	useIntersectionObserver,
+	usePlaceholdersNeeded,
+} from '../utils/use-infinite-scroll';
 
 interface GridItemProps< Item > {
 	view: ViewPickerGridType;
-	multiselect?: boolean;
 	selection: string[];
 	onChangeSelection: SetSelection;
+	selectionProps: SelectionProps;
 	getItemId: ( item: Item ) => string;
 	item: Item;
 	titleField?: NormalizedField< Item >;
@@ -57,9 +45,9 @@ interface GridItemProps< Item > {
 
 function GridItem< Item >( {
 	view,
-	multiselect,
 	selection,
 	onChangeSelection,
+	selectionProps,
 	getItemId,
 	item,
 	mediaField,
@@ -73,7 +61,12 @@ function GridItem< Item >( {
 }: GridItemProps< Item > ) {
 	const { showTitle = true, showMedia = true, showDescription = true } = view;
 	const id = getItemId( item );
+	const elementRef = useRef< HTMLButtonElement >( null );
+
 	const isSelected = selection.includes( id );
+
+	useIntersectionObserver( elementRef, posinset );
+
 	const renderedMediaField = mediaField?.render ? (
 		<mediaField.render
 			item={ item }
@@ -88,6 +81,7 @@ function GridItem< Item >( {
 
 	return (
 		<Composite.Item
+			ref={ elementRef }
 			aria-label={
 				titleField
 					? titleField.getValue( { item } ) || __( '(no title)' )
@@ -104,18 +98,7 @@ function GridItem< Item >( {
 				'is-selected': isSelected,
 			} ) }
 			aria-selected={ isSelected }
-			onClick={ () => {
-				if ( isSelected ) {
-					onChangeSelection(
-						selection.filter( ( itemId ) => id !== itemId )
-					);
-				} else {
-					const newSelection = multiselect
-						? [ ...selection, id ]
-						: [ id ];
-					onChangeSelection( newSelection );
-				}
-			} }
+			{ ...selectionProps }
 		>
 			{ showMedia && renderedMediaField && (
 				<div className="dataviews-view-picker-grid__media">
@@ -145,7 +128,7 @@ function GridItem< Item >( {
 					</div>
 				</Stack>
 			) }
-			<Stack direction="column" gap="2xs">
+			<Stack direction="column" gap="xs">
 				{ showDescription && descriptionField?.render && (
 					<descriptionField.render
 						item={ item }
@@ -156,13 +139,14 @@ function GridItem< Item >( {
 					<Stack
 						direction="row"
 						className="dataviews-view-picker-grid__badge-fields"
-						gap="xs"
+						gap="sm"
 						wrap="wrap"
 						align="top"
 						justify="flex-start"
 					>
 						{ badgeFields.map( ( field ) => {
 							return (
+								/* @ts-expect-error `Badge` is text-only, but a badge field renders whatever its `render` returns. */
 								<Badge
 									key={ field.id }
 									className="dataviews-view-picker-grid__field-value"
@@ -180,7 +164,7 @@ function GridItem< Item >( {
 					<Stack
 						direction="column"
 						className="dataviews-view-picker-grid__fields"
-						gap="2xs"
+						gap="xs"
 					>
 						{ regularFields.map( ( field ) => {
 							return (
@@ -236,7 +220,7 @@ function GridGroup< Item >( {
 		<Stack
 			direction="column"
 			key={ groupName }
-			gap="xs"
+			gap="sm"
 			role="group"
 			aria-labelledby={ headerId }
 		>
@@ -318,11 +302,33 @@ function ViewPickerGrid< Item >( {
 		: null;
 	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 
-	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
+	const isInfiniteScroll =
+		( view.infiniteScrollEnabled && ! dataByGroup ) ?? false;
+
+	const orderedData = dataByGroup
+		? Array.from( dataByGroup.values() ).flat()
+		: data;
+	const { getSelectionProps } = useSelectionProps( {
+		data: orderedData,
+		getItemId,
+		isItemSelectable: () => true,
+		selection,
+		onChangeSelection,
+		selectionMode: isMultiselect ? 'multi' : 'single-clearable',
+		shouldSelectOnClick: true,
+	} );
 
 	const currentPage = view?.page ?? 1;
 	const perPage = view?.perPage ?? 0;
 	const setSize = isInfiniteScroll ? paginationInfo?.totalItems : undefined;
+
+	// Calculate placeholders needed for infinite scroll
+	const gridColumns = useGridColumns();
+	const placeholdersNeeded = usePlaceholdersNeeded(
+		data,
+		isInfiniteScroll,
+		gridColumns
+	);
 
 	return (
 		<>
@@ -336,13 +342,20 @@ function ViewPickerGrid< Item >( {
 						aria-multiselectable={ isMultiselect }
 						className={ clsx(
 							'dataviews-view-picker-grid',
-							className
+							className,
+							{
+								[ `has-${ view.layout?.density }-density` ]:
+									view.layout?.density &&
+									[ 'compact', 'comfortable' ].includes(
+										view.layout.density
+									),
+							}
 						) }
 						aria-label={ itemListLabel }
 						render={ ( { children, ...props } ) => (
 							<Stack
 								direction="column"
-								gap="md"
+								gap="lg"
 								children={ children }
 								{ ...props }
 							/>
@@ -371,21 +384,23 @@ function ViewPickerGrid< Item >( {
 										}
 									>
 										{ groupItems.map( ( item ) => {
+											// Use position from item if available (infinite scroll), otherwise calculate.
 											const posInSet =
+												( item as any ).position ??
 												( currentPage - 1 ) * perPage +
-												data.indexOf( item ) +
-												1;
+													data.indexOf( item ) +
+													1;
 											return (
 												<GridItem
 													key={ getItemId( item ) }
 													view={ view }
-													multiselect={
-														isMultiselect
-													}
 													selection={ selection }
 													onChangeSelection={
 														onChangeSelection
 													}
+													selectionProps={ getSelectionProps(
+														getItemId( item )
+													) }
 													getItemId={ getItemId }
 													item={ item }
 													mediaField={ mediaField }
@@ -421,7 +436,15 @@ function ViewPickerGrid< Item >( {
 							<GridItems
 								className={ clsx(
 									'dataviews-view-picker-grid',
-									className
+									className,
+									{
+										[ `has-${ view.layout?.density }-density` ]:
+											view.layout?.density &&
+											[
+												'compact',
+												'comfortable',
+											].includes( view.layout.density ),
+									}
 								) }
 								previewSize={ usedPreviewSize }
 								aria-busy={ isLoading }
@@ -436,25 +459,38 @@ function ViewPickerGrid< Item >( {
 						aria-multiselectable={ isMultiselect }
 						aria-label={ itemListLabel }
 					>
-						{ data.map( ( item, index ) => {
-							let posinset = isInfiniteScroll
-								? index + 1
-								: undefined;
-
-							if ( ! isInfiniteScroll ) {
-								// When infinite scroll isn't active, take pagination into account
-								// when calculating the posinset.
-								posinset =
-									( currentPage - 1 ) * perPage + index + 1;
-							}
+						{ /* Render placeholders for unloaded items in first row */ }
+						{ Array.from( { length: placeholdersNeeded } ).map(
+							( _, index ) => (
+								<Composite.Item
+									key={ `placeholder-${ index }` }
+									render={ ( { children, ...props } ) => (
+										<Stack
+											direction="column"
+											children={ children }
+											{ ...props }
+										/>
+									) }
+									role="option"
+									aria-hidden
+									tabIndex={ -1 }
+									className="dataviews-view-picker-grid__card dataviews-view-picker-grid__placeholder"
+								/>
+							)
+						) }
+						{ data.map( ( item ) => {
+							// Use position from item for accessibility in infinite scroll mode.
+							const posinset = ( item as any ).position;
 
 							return (
 								<GridItem
 									key={ getItemId( item ) }
 									view={ view }
-									multiselect={ isMultiselect }
 									selection={ selection }
 									onChangeSelection={ onChangeSelection }
+									selectionProps={ getSelectionProps(
+										getItemId( item )
+									) }
 									getItemId={ getItemId }
 									item={ item }
 									mediaField={ mediaField }

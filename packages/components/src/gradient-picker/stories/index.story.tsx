@@ -1,35 +1,32 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react-vite';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import GradientPicker from '..';
 
 const meta: Meta< typeof GradientPicker > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Selection & Input/Color/GradientPicker',
 	id: 'components-gradientpicker',
 	component: GradientPicker,
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 	args: {
 		onChange: fn(),
 	},
 	argTypes: {
+		selectedSlug: { control: false },
 		value: { control: false },
 	},
 };
 export default meta;
+
+type GradientPickerStory = StoryObj< typeof GradientPicker >;
 
 const GRADIENTS = [
 	{
@@ -82,46 +79,85 @@ const GRADIENTS = [
 	},
 ];
 
-const Template: StoryFn< typeof GradientPicker > = ( {
+const Template = ( {
 	onChange,
+	value,
+	selectedSlug,
 	...props
-} ) => {
-	const [ gradient, setGradient ] =
-		useState< ( typeof props )[ 'value' ] >( null );
+}: React.ComponentProps< typeof GradientPicker > ) => {
+	const [ gradient, setGradient ] = useState<
+		React.ComponentProps< typeof GradientPicker >[ 'value' ]
+	>( value ?? null );
+	const [ slug, setSlug ] = useState< string | undefined >( selectedSlug );
 	return (
 		<GradientPicker
 			{ ...props }
 			value={ gradient }
-			onChange={ ( ...changeArgs ) => {
-				setGradient( ...changeArgs );
-				onChange?.( ...changeArgs );
+			selectedSlug={ slug }
+			onChange={ ( currentGradient, index, newSlug ) => {
+				setGradient( currentGradient );
+				setSlug( newSlug );
+				onChange?.( currentGradient, index, newSlug );
 			} }
 		/>
 	);
 };
 
-export const Default = Template.bind( {} );
-Default.args = {
-	gradients: GRADIENTS,
+export const Default: GradientPickerStory = {
+	render: Template,
+	args: {
+		gradients: GRADIENTS,
+	},
 };
 
-export const WithNoExistingGradients = Template.bind( {} );
-WithNoExistingGradients.args = {
-	...Default.args,
-	gradients: [],
+export const WithNoExistingGradients: GradientPickerStory = {
+	render: Template,
+	args: {
+		gradients: [],
+	},
 };
 
-export const MultipleOrigins = Template.bind( {} );
-MultipleOrigins.args = {
-	...Default.args,
-	gradients: [
-		{ name: 'Origin 1', gradients: GRADIENTS },
-		{ name: 'Origin 2', gradients: GRADIENTS },
-	],
+export const DuplicateGradients: GradientPickerStory = {
+	render: Template,
+	args: {
+		gradients: [
+			{
+				name: 'Dark Background',
+				slug: 'dark-background',
+				gradient:
+					'linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)',
+			},
+			{
+				name: 'Dark Text',
+				slug: 'dark-text',
+				gradient:
+					'linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)',
+			},
+			{
+				name: 'Brand',
+				slug: 'brand',
+				gradient:
+					'linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%)',
+			},
+		],
+		value: 'linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)',
+		selectedSlug: 'dark-text',
+		disableCustomGradients: true,
+	},
 };
 
-export const CSSVariables: StoryFn< typeof GradientPicker > = ( args ) => {
-	return (
+export const MultipleOrigins: GradientPickerStory = {
+	render: Template,
+	args: {
+		gradients: [
+			{ name: 'Origin 1', gradients: GRADIENTS },
+			{ name: 'Origin 2', gradients: GRADIENTS },
+		],
+	},
+};
+
+export const CSSVariables: GradientPickerStory = {
+	render: ( args ) => (
 		<div
 			style={ {
 				'--red': '#f00',
@@ -131,27 +167,27 @@ export const CSSVariables: StoryFn< typeof GradientPicker > = ( args ) => {
 		>
 			<Template { ...args } />
 		</div>
-	);
-};
-CSSVariables.args = {
-	...Default.args,
-	gradients: [
-		{
-			name: 'Red to Yellow',
-			gradient:
-				'linear-gradient(135deg,var(--red) 0%,var(--yellow) 100%)',
-			slug: 'red-to-yellow',
-		},
-		{
-			name: 'Yellow to Blue',
-			gradient:
-				'linear-gradient(135deg,var(--yellow) 0%,var(--blue) 100%)',
-			slug: 'yellow-to-blue',
-		},
-		{
-			name: 'Blue to Red',
-			gradient: 'linear-gradient(135deg,var(--blue) 0%,var(--red) 100%)',
-			slug: 'blue-to-red',
-		},
-	],
+	),
+	args: {
+		gradients: [
+			{
+				name: 'Red to Yellow',
+				gradient:
+					'linear-gradient(135deg,var(--red) 0%,var(--yellow) 100%)',
+				slug: 'red-to-yellow',
+			},
+			{
+				name: 'Yellow to Blue',
+				gradient:
+					'linear-gradient(135deg,var(--yellow) 0%,var(--blue) 100%)',
+				slug: 'yellow-to-blue',
+			},
+			{
+				name: 'Blue to Red',
+				gradient:
+					'linear-gradient(135deg,var(--blue) 0%,var(--red) 100%)',
+				slug: 'blue-to-red',
+			},
+		],
+	},
 };
