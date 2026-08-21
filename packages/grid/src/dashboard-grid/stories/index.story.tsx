@@ -643,35 +643,36 @@ export const EditMode: Story = {
 };
 
 /**
- * Per-item minimum sizes via `itemMinSizes`, in pixels. The grid
- * quantizes each minimum up to whole tracks of its current geometry and
- * pins both the tile and the snap preview at that floor while the
- * pointer overshoots; release commits the floored spans, so the layout
- * never records a size below the minimum. Tiles without an entry still
- * shrink to a single track.
+ * Per-item size limits via `itemLimits`, in pixels. The grid quantizes
+ * each limit to whole tracks of its current geometry (minimums round
+ * up, maximums round down) and pins both the tile and the snap preview
+ * at the bound while the pointer overshoots in either direction;
+ * release commits spans inside the limits, so the layout never records
+ * a size outside them. Tiles without an entry keep the full range.
  *
- * Resize the constrained tiles below their declared minimum to feel the
- * gesture being absorbed; the state panel confirms the committed layout
- * never dips under the floor.
+ * Resize each constrained tile past its bound to feel the gesture being
+ * absorbed; the state panel confirms the committed layout stays inside
+ * the limits.
  */
-export const MinimumSizes: Story = {
-	name: 'Per-Item Minimum Sizes',
+export const SizeLimits: Story = {
+	name: 'Per-Item Size Limits',
 	args: {
 		columns: 6,
 		rowHeight: 80,
 		editMode: true,
-		itemMinSizes: {
-			chart: { width: 320, height: 160 },
-			preview: { width: 480, height: 240 },
+		itemLimits: {
+			floor: { minWidth: 320, minHeight: 160 },
+			ceiling: { maxWidth: 360, maxHeight: 200 },
+			ranged: { minWidth: 200, maxWidth: 480 },
 		},
 		layout: [
-			{ key: 'chart', width: 4, height: 2, order: 1 },
-			{ key: 'free-a', width: 2, height: 2, order: 2 },
-			{ key: 'preview', width: 5, height: 4, order: 3 },
-			{ key: 'free-b', width: 2, height: 1, order: 4 },
+			{ key: 'floor', width: 4, height: 2, order: 1 },
+			{ key: 'ceiling', width: 2, height: 2, order: 2 },
+			{ key: 'ranged', width: 3, height: 1, order: 3 },
+			{ key: 'free', width: 3, height: 1, order: 4 },
 		],
 	},
-	render: function MinimumSizesRender( args ) {
+	render: function SizeLimitsRender( args ) {
 		const [ layout, setLayout ] = useState< DashboardGridLayoutItem[] >(
 			args.layout
 		);
@@ -681,17 +682,17 @@ export const MinimumSizes: Story = {
 
 		const tiles = useMemo(
 			() => [
-				<Tile key="chart" tone="info">
+				<Tile key="floor" tone="info">
 					min 320 × 160 px
 				</Tile>,
-				<Tile key="free-a" tone="neutral">
-					no minimum
+				<Tile key="ceiling" tone="warning">
+					max 360 × 200 px
 				</Tile>,
-				<Tile key="preview" tone="brand">
-					min 480 × 240 px
+				<Tile key="ranged" tone="brand">
+					min 200, max 480 wide
 				</Tile>,
-				<Tile key="free-b" tone="neutral">
-					no minimum
+				<Tile key="free" tone="neutral">
+					no limits
 				</Tile>,
 			],
 			[]

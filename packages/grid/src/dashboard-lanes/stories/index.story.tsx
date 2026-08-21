@@ -360,6 +360,96 @@ export const EditMode: Story = {
 };
 
 /**
+ * Per-item width limits via `itemLimits`, in pixels. Lanes quantize
+ * each limit to whole lanes (minimums round up, maximums round down)
+ * and bound spans and the horizontal resize gesture at the result;
+ * height limits do not apply because lane heights are content-driven.
+ *
+ * Resize the constrained tiles: the wide one refuses to shrink below
+ * its minimum, the capped one refuses to grow past its maximum, and
+ * the free tiles keep the full range.
+ */
+export const SizeLimits: Story = {
+	name: 'Per-Item Size Limits',
+	args: {
+		columns: 4,
+		editMode: true,
+		itemLimits: {
+			min: { minWidth: 360 },
+			max: { maxWidth: 260 },
+		},
+	},
+	render: function SizeLimitsStory( args ) {
+		const initial: ( DashboardLanesLayoutItem & {
+			tone: Tone;
+			height: number;
+			label: string;
+		} )[] = [
+			{
+				key: 'min',
+				width: 2,
+				tone: 'info',
+				height: 140,
+				label: 'min 360px wide',
+			},
+			{
+				key: 'max',
+				tone: 'warning',
+				height: 120,
+				label: 'max 260px wide',
+			},
+			{ key: 'free-a', tone: 'neutral', height: 180, label: 'no limits' },
+			{ key: 'free-b', tone: 'neutral', height: 100, label: 'no limits' },
+			{ key: 'free-c', tone: 'neutral', height: 160, label: 'no limits' },
+		];
+
+		const [ tiles, setTiles ] = useState( initial );
+
+		const layout: DashboardLanesLayoutItem[] = tiles.map(
+			( { tone: _tone, height: _height, label: _label, ...item } ) => item
+		);
+
+		const onChangeLayout = ( next: DashboardLanesLayoutItem[] ) => {
+			setTiles(
+				next.map( ( item ) => {
+					const existing = tiles.find( ( t ) => t.key === item.key );
+					return {
+						...item,
+						tone: existing?.tone ?? 'neutral',
+						height: existing?.height ?? 100,
+						label: existing?.label ?? item.key,
+					};
+				} )
+			);
+		};
+
+		const tileElements = useMemo(
+			() =>
+				tiles.map( ( tile ) => (
+					<Tile
+						key={ tile.key }
+						tone={ tile.tone }
+						height={ tile.height }
+					>
+						{ tile.label }
+					</Tile>
+				) ),
+			[ tiles ]
+		);
+
+		return (
+			<DashboardLanes
+				{ ...args }
+				layout={ layout }
+				onChangeLayout={ onChangeLayout }
+			>
+				{ tileElements }
+			</DashboardLanes>
+		);
+	},
+};
+
+/**
  * Example custom overlay supplied to `<DashboardLanes />` through the
  * `renderGridOverlay` prop. Receives `{ columns, isActive }` from the
  * surface (no `rowHeight` because lane heights are content-driven).
