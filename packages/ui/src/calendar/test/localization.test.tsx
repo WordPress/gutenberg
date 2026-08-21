@@ -179,7 +179,7 @@ describe( 'Calendar locale inputs', () => {
 		}
 	} );
 
-	it( 'keeps the date-fns locale as the default source for the week start', () => {
+	it( 'uses Intl week information for a date-fns locale object with a supported code', () => {
 		const locale = {
 			...faIR,
 			options: { ...faIR.options, weekStartsOn: 0 as const },
@@ -189,7 +189,22 @@ describe( 'Calendar locale inputs', () => {
 		expect(
 			screen.getAllByRole( 'columnheader', { hidden: true } )[ 0 ]
 		).toHaveAccessibleName(
-			weekdayFormatter( 'fa-IR' ).format( new Date( 2026, 0, 11 ) )
+			weekdayFormatter( 'fa-IR' ).format( new Date( 2026, 0, 10 ) )
+		);
+	} );
+
+	it( 'keeps the date-fns week start when its locale code is unsupported', () => {
+		const locale = {
+			...faIR,
+			code: 'x-private',
+			options: { ...faIR.options, weekStartsOn: 0 as const },
+		};
+		render( <Calendar defaultMonth={ TEST_DATE } locale={ locale } /> );
+
+		expect(
+			screen.getAllByRole( 'columnheader', { hidden: true } )[ 0 ]
+		).toHaveAccessibleName(
+			weekdayFormatter( 'en-US' ).format( new Date( 2026, 0, 11 ) )
 		);
 	} );
 

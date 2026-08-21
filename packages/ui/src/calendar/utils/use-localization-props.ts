@@ -81,17 +81,18 @@ export const useLocalizationProps = ( {
 	return useMemo( () => {
 		const isLocaleString = typeof locale === 'string';
 		const dateFnsLocale = isLocaleString ? enUS : locale;
-		const localeCode =
-			getSupportedLocaleCode( isLocaleString ? locale : locale.code ) ??
-			'en-US';
+		const supportedLocaleCode = getSupportedLocaleCode(
+			isLocaleString ? locale : locale.code
+		);
+		const localeCode = supportedLocaleCode ?? 'en-US';
 		const intlLocale = new Intl.Locale(
 			localeCode
 		) as IntlLocaleWithWeekInfo;
-		// Date-fns locale objects already define their own week start. Preserve
-		// that value for backward compatibility.
-		const weekStartsOn = isLocaleString
-			? getWeekStartsOn( intlLocale )
-			: undefined;
+		// Unsupported custom date-fns locales keep their own week-start option.
+		const weekStartsOn =
+			isLocaleString || supportedLocaleCode !== undefined
+				? getWeekStartsOn( intlLocale )
+				: undefined;
 
 		// ie. April 2025
 		const monthNameFormatter = new Intl.DateTimeFormat( localeCode, {

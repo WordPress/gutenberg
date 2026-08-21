@@ -269,11 +269,13 @@ export interface BaseProps
 	 * A BCP 47 locale code or date-fns locale object used to localize date text,
 	 * numerals, the default text direction, and the first day of the week.
 	 *
-	 * A locale code derives the first day of the week when the browser provides
-	 * that information. Otherwise, the component uses its default. A date-fns
-	 * locale object preserves the existing date-fns locale behavior.
+	 * The locale code derives the first day of the week when the browser provides
+	 * that information, whether passed directly or through a date-fns locale
+	 * object. Use `weekStartsOn` to override this default.
 	 *
-	 * Invalid or unsupported locale codes fall back to `en-US`.
+	 * Invalid or unsupported locale codes fall back to `en-US` for date text.
+	 * A date-fns locale object with an unsupported code retains its own first-day
+	 * setting.
 	 *
 	 * For a correct localized experience, consumers should make sure the locale
 	 * used for translated labels and date text is consistent.

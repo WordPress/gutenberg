@@ -13,6 +13,7 @@
 ### Breaking Changes
 
 -   `SearchableChipSelect`: Remove the `creatableItem` prop. Mark a creatable action with `creatable: true` on an item in `items` instead. The item renders in the list footer and is excluded from the main list automatically. Handle selection in `onValueChange`. See the `Creatable` and `GroupedCreatable` stories for examples ([#80989](https://github.com/WordPress/gutenberg/pull/80989)).
+-   `Calendar`, `RangeCalendar`: Derive the default first day of the week from the locale code for both strings and date-fns locale objects. Pass `weekStartsOn` to preserve a custom date-fns value. ([#81814](https://github.com/WordPress/gutenberg/pull/81814))
 -   `Select.Item`: Remove `'compact'` from the `size` prop. Use `'default'` instead ([#81354](https://github.com/WordPress/gutenberg/pull/81354)).
 -   `Combobox.Item`, `SelectControl.Item`: The `size` prop is removed ([#81354](https://github.com/WordPress/gutenberg/pull/81354)).
 
