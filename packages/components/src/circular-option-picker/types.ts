@@ -80,9 +80,7 @@ type WithBaseId = {
 };
 
 export type ListboxCircularOptionPickerProps = WithBaseId &
-	Omit< CircularOptionPickerProps, 'asButtons' | 'presentation' > & {
-		presentation?: 'listbox';
-	};
+	Omit< CircularOptionPickerProps, 'asButtons' | 'presentation' >;
 
 export type ButtonsCircularOptionPickerProps = WithBaseId &
 	Omit< CircularOptionPickerProps, 'asButtons' | 'presentation' | 'loop' > & {

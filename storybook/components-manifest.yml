@@ -335,7 +335,6 @@
       - aria-label
       - aria-labelledby
       - as
-      - asButtons
       - clearable
       - colors
       - disableCustomColors
@@ -343,6 +342,7 @@
       - headingLevel
       - loop
       - onChange
+      - presentation
       - selectedSlug
       - value
 - name: ColorPicker
@@ -692,7 +692,6 @@
       - __nextHasNoMargin
       - aria-label
       - aria-labelledby
-      - asButtons
       - className
       - clearable
       - disableCustomGradients
@@ -701,6 +700,7 @@
       - headingLevel
       - loop
       - onChange
+      - presentation
       - selectedSlug
       - value
 - name: Icon

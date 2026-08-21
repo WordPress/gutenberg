@@ -62,6 +62,7 @@ Whether this is rendered in the sidebar.
 
 Whether the control should present as a set of buttons,
 each with its own tab stop.
+@deprecated Use `presentation="toggle-buttons"` instead.
 
 ### `aria-label`
 
@@ -137,7 +138,7 @@ contains two or more items).
  - Default: `true`
 
 Prevents keyboard interaction from wrapping around.
-Only used when `asButtons` is not true.
+Only used when `presentation` is `listbox` (or `asButtons` is not true).
 
 ### `onChange`
 
@@ -148,6 +149,18 @@ The function called when a new gradient has been defined. It is passed
 the `currentGradient` as an argument. When a predefined gradient is
 selected, the second argument is its index (or, for multiple-origin
 gradients, the origin index) and the third argument is its slug.
+
+### `presentation`
+
+ - Type: `"listbox" | "toggle-buttons" | "command-buttons"`
+ - Required: No
+ - Default: `'listbox'`
+
+How options are presented to assistive technology.
+
+- `listbox`: a composite listbox with selected state.
+- `toggle-buttons`: individual buttons with a pressed state.
+- `command-buttons`: individual buttons without a pressed state.
 
 ### `selectedSlug`
 

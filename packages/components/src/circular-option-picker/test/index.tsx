@@ -56,6 +56,7 @@ describe( 'CircularOptionPicker', () => {
 				'aria-pressed',
 				'false'
 			);
+			expect( console ).toHaveWarned();
 		} );
 	} );
 

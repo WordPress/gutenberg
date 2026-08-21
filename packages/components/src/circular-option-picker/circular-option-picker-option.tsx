@@ -23,7 +23,7 @@ function UnforwardedOptionAsButton(
 		<Button
 			__next40pxDefaultSize
 			{ ...additionalProps }
-			aria-pressed={ isToggle ? isPressed : undefined }
+			aria-pressed={ isToggle ? !! isPressed : undefined }
 			ref={ forwardedRef }
 			label={ label }
 		/>

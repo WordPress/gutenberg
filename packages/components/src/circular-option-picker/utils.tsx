@@ -32,16 +32,15 @@ export function getComputeCircularOptionPickerCommonProps(
 		asButtons
 	);
 
+	// Prefer `presentation` so wrappers do not keep passing deprecated `asButtons`.
 	const metaProps =
 		resolvedPresentation === 'listbox'
 			? {
 					presentation: 'listbox' as const,
-					asButtons: false,
 					loop,
 			  }
 			: {
 					presentation: resolvedPresentation,
-					asButtons: true,
 			  };
 
 	const labelProps = {

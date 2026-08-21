@@ -154,7 +154,7 @@ function CircularOptionPicker( props: CircularOptionPickerProps ) {
 		...additionalProps
 	} = props;
 
-	if ( asButtons !== undefined && presentation === undefined ) {
+	if ( asButtons && presentation === undefined ) {
 		deprecated( '`asButtons` prop in wp.components.CircularOptionPicker', {
 			since: '7.2',
 			alternative: 'presentation',
@@ -199,7 +199,6 @@ function CircularOptionPicker( props: CircularOptionPickerProps ) {
 				{ ...additionalProps }
 				{ ...sharedProps }
 				loop={ loop }
-				presentation="listbox"
 			/>
 		);
 	}
