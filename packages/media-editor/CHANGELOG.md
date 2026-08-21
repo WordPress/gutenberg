@@ -10,7 +10,6 @@
 -   `MediaEditor`: move rotate, flip, zoom and aspect ratio out of the sidebar to a toolbar under the canvas, at every viewport. Frees the sidebar for Details alone.
 -   `MediaEditor`: replace `ComplementaryArea` and `InterfaceSkeleton` with a layout the media editor owns. Both were built for the post and site editors and imposed breakpoints the media editor could not control.
 -   `MediaEditor`: widen the docked details panel to 400px and dock it above the `large` breakpoint; below that it takes the whole body.
--   `MediaForm`: put alternative text above title in the details form.
 -   Expose the header, history (reset/undo/redo), save (cancel/save) and image control clusters as `MediaEditor` sub-components, so each frame imports and arranges them to suit its own chrome. `renderFrame` now passes data only: `footerActions` is gone, `footerLayout` is now `layout`, and `isImage` is new. `showCloseButton` moves from `MediaEditor` to `MediaEditor.HeaderActions` ([#81563](https://github.com/WordPress/gutenberg/pull/81563)).
 
 ### Breaking Changes
