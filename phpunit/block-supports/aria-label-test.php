@@ -48,8 +48,8 @@ class WP_Block_Supports_Aria_Label_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_aria_label_block_support
 	 *
-	 * @param boolean|array $support Aria label block support configuration.
-	 * @param string        $value   Aria label value for attribute object.
+	 * @param boolean|array $support  Aria label block support configuration.
+	 * @param string        $value    Aria label value for attribute object.
 	 * @param array         $expected Expected aria-label attributes.
 	 */
 	public function test_gutenberg_apply_aria_label_support( $support, $value, $expected ) {
