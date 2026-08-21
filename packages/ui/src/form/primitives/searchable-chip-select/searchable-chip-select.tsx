@@ -17,8 +17,10 @@ import {
 } from './types';
 
 /**
- * A searchable multi-selection component with chips, with support for
- * a footer item to create new items.
+ * A low-level primitive for a searchable multi-selection field with chips, with
+ * support for a footer item to create new items.
+ *
+ * Prefer `SearchableChipSelectControl` when using with a standard label and description.
  */
 export const SearchableChipSelect = forwardRef<
 	HTMLDivElement,
