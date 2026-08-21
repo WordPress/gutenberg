@@ -88,6 +88,35 @@ describe( 'Widget Dashboard menus', () => {
 		expect( action ).toHaveAttribute( 'target', '_blank' );
 	} );
 
+	it( 'closes the widget action menu when a link is activated', async () => {
+		const user = userEvent.setup();
+		render(
+			<WidgetActions
+				actions={ [
+					{
+						id: 'view-report',
+						label: 'View report',
+						href: '#report',
+					},
+				] }
+			/>
+		);
+
+		const trigger = screen.getByRole( 'button', { name: 'More' } );
+		await user.click( trigger );
+		const action = await screen.findByRole( 'menuitem', {
+			name: 'View report',
+		} );
+		action.addEventListener( 'click', ( event ) => event.preventDefault() );
+
+		await user.click( action );
+
+		await waitFor( () =>
+			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument()
+		);
+		expect( trigger ).toHaveFocus();
+	} );
+
 	it( 'updates a widget width from its options menu and returns focus', async () => {
 		const user = userEvent.setup();
 		const widget: DashboardWidget = {

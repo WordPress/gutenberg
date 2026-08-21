@@ -74,6 +74,7 @@ export function WidgetActions( {
 							return (
 								<Menu.LinkItem
 									key={ action.id }
+									closeOnClick
 									{ ...linkProps }
 									prefix={
 										action.icon ? (
