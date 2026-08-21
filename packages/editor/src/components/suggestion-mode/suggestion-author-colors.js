@@ -3,6 +3,11 @@ import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useStyleOverride } from '@wordpress/block-editor';
+import {
+	SUGGESTION_TYPE_ADDITION,
+	SUGGESTION_TYPE_DELETION,
+	SUGGESTION_TYPE_FORMAT,
+} from '../inline-suggestions';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import { useNoteThreads } from '../collab-sidebar/hooks';
 import { parseSuggestionPayload } from './provider';
@@ -79,20 +84,25 @@ function escapeCssString( value ) {
  * @return {string} Serialized CSS targeting `.wp-suggestion-a11y` pseudo-elements.
  */
 export function buildSuggestionAuthorAnnouncementCss( threads ) {
+	/*
+	 * Keyed by the same constants the marker format writes into
+	 * `data-suggestion-type`, so the selectors cannot drift from the
+	 * attribute they have to match.
+	 */
 	const announcements = {
-		add: [
+		[ SUGGESTION_TYPE_ADDITION ]: [
 			/* translators: %s: Name of the person who made the suggestion. */
 			__( 'Start of suggested addition by %s.' ),
 			/* translators: %s: Name of the person who made the suggestion. */
 			__( 'End of suggested addition by %s.' ),
 		],
-		del: [
+		[ SUGGESTION_TYPE_DELETION ]: [
 			/* translators: %s: Name of the person who made the suggestion. */
 			__( 'Start of suggested deletion by %s.' ),
 			/* translators: %s: Name of the person who made the suggestion. */
 			__( 'End of suggested deletion by %s.' ),
 		],
-		format: [
+		[ SUGGESTION_TYPE_FORMAT ]: [
 			/* translators: %s: Name of the person who made the suggestion. */
 			__( 'Start of suggested formatting change by %s.' ),
 			/* translators: %s: Name of the person who made the suggestion. */
