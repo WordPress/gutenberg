@@ -124,15 +124,6 @@ const swatchGap = 12;
 
 export const borderControlPopoverControls = css`
 	width: ${ swatchSize * 6 + swatchGap * 5 }px;
-
-	> div:first-of-type > .components-base-control__label {
-		margin-bottom: 0;
-	}
-
-	&& .components-base-control__label + button:not( .has-text ) {
-		min-width: 24px;
-		padding: 0;
-	}
 `;
 
 export const borderControlPopoverContent = css``;
