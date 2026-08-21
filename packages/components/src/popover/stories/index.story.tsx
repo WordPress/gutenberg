@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState, useRef, useEffect } from '@wordpress/element';
 import Button from '../../button';
 import { Popover } from '..';
-import { PopoverInsideIframeRenderedInExternalSlot } from '../test/utils';
+import { PopoverInsideIframeRenderedInExternalSlot } from './utils';
 import type { PopoverProps } from '../types';
 
 const AVAILABLE_PLACEMENTS: PopoverProps[ 'placement' ][] = [

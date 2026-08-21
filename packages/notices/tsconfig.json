@@ -8,7 +8,7 @@
 	"references": [
 		{ "path": "./tsconfig.build.json" },
 		{ "path": "../a11y/tsconfig.build.json" },
-		{ "path": "../components" },
+		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../data" }
 	],
 	// Listed files have pre-existing type errors; include them once fixed.
