@@ -10,6 +10,7 @@ jest.mock( '@wordpress/a11y', () => ( {
 } ) );
 import { store as editorStore } from '..';
 import * as actions from '../actions';
+import { EDITOR_INTENT_SUGGEST } from '../constants';
 import { unlock } from '../../lock-unlock';
 
 const postId = 44;
@@ -194,6 +195,8 @@ describe( 'Post actions', () => {
 			excerpt: 'crackers',
 			status: 'draft',
 		};
+		const REFUSED_STATUS_MESSAGE =
+			"The post status can't be changed while suggesting. Switch to Editing to change it.";
 
 		function setupPost() {
 			const registry = createRegistryWithStores();
@@ -207,7 +210,7 @@ describe( 'Post actions', () => {
 		it( 'refuses a post status edit while suggesting', () => {
 			const registry = setupPost();
 			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
-				'suggest'
+				EDITOR_INTENT_SUGGEST
 			);
 			speak.mockClear();
 
@@ -222,15 +225,52 @@ describe( 'Post actions', () => {
 				false
 			);
 			expect( speak ).toHaveBeenCalledWith(
-				'The post status cannot be changed while suggesting.',
+				REFUSED_STATUS_MESSAGE,
 				'assertive'
 			);
+		} );
+
+		it( 'shows the refusal in a snackbar, not only to screen readers', () => {
+			const registry = setupPost();
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				EDITOR_INTENT_SUGGEST
+			);
+
+			registry.dispatch( editorStore ).editPost( { status: 'pending' } );
+
+			const refusals = registry
+				.select( noticesStore )
+				.getNotices()
+				.filter(
+					( { id } ) => id === 'editor-suggest-locked-post-status'
+				);
+			expect( refusals ).toEqual( [
+				expect.objectContaining( {
+					content: REFUSED_STATUS_MESSAGE,
+					type: 'snackbar',
+					// `speak` already announced it; a spoken snackbar would
+					// repeat the same sentence.
+					spokenMessage: null,
+				} ),
+			] );
+
+			// A second refusal replaces the first rather than stacking.
+			registry.dispatch( editorStore ).editPost( { status: 'publish' } );
+
+			expect(
+				registry
+					.select( noticesStore )
+					.getNotices()
+					.filter(
+						( { id } ) => id === 'editor-suggest-locked-post-status'
+					)
+			).toHaveLength( 1 );
 		} );
 
 		it( 'keeps the other edits in the same call while suggesting', () => {
 			const registry = setupPost();
 			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
-				'suggest'
+				EDITOR_INTENT_SUGGEST
 			);
 
 			registry

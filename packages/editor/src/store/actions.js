@@ -206,10 +206,27 @@ export const editPost =
 			SUGGEST_LOCKED_POST_FIELDS.forEach( ( key ) => {
 				delete nextEdits[ key ];
 			} );
-			speak(
-				__( 'The post status cannot be changed while suggesting.' ),
-				'assertive'
+			/*
+			 * Say it twice over, in two channels: a refusal only screen reader
+			 * users perceive is indistinguishable from a control that quietly
+			 * does nothing. `speak` carries the announcement because it fires
+			 * on every refusal and can be assertive; the snackbar carries the
+			 * visible half with `speak: false`, since a spoken snackbar would
+			 * announce the same sentence a second time.
+			 */
+			const message = __(
+				"The post status can't be changed while suggesting. Switch to Editing to change it."
 			);
+			speak( message, 'assertive' );
+			registry.dispatch( noticesStore ).createNotice( 'info', message, {
+				// Reuse one notice id so a control that dispatches repeatedly
+				// replaces its own snackbar instead of stacking them.
+				id: 'editor-suggest-locked-post-status',
+				type: 'snackbar',
+				isDismissible: true,
+				speak: false,
+			} );
+
 			if ( ! Object.keys( nextEdits ).length ) {
 				return;
 			}

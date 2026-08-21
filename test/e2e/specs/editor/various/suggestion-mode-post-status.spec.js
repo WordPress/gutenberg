@@ -13,6 +13,9 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 const DISABLED_STATUS_LABEL =
 	'The post status cannot be suggested. Switch to Editing to change it.';
 
+const REFUSED_STATUS_MESSAGE =
+	"The post status can't be changed while suggesting. Switch to Editing to change it.";
+
 async function switchIntent( page, intentLabel ) {
 	await page
 		.getByRole( 'region', { name: 'Editor top bar' } )
@@ -114,6 +117,69 @@ test.describe( 'Suggestion mode post status', () => {
 				.getEditedPostAttribute( 'excerpt' )
 		);
 		expect( excerpt ).toBe( 'A suggested excerpt' );
+	} );
+
+	test( 'the publish button refuses to publish while suggesting', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		const publishButton = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Publish', exact: true } );
+
+		await expect( publishButton ).toHaveAttribute(
+			'aria-disabled',
+			'false'
+		);
+
+		await switchIntent( page, 'Suggesting' );
+
+		/*
+		 * `editPost` drops the status, but the button doesn't stop there: it
+		 * calls `savePost()` next, which would write the post to the server as
+		 * a draft while the pre-publish flow waits for a state change that
+		 * never comes.
+		 */
+		await expect( publishButton ).toHaveAttribute(
+			'aria-disabled',
+			'true'
+		);
+
+		// Playwright treats `aria-disabled` as not enabled and would refuse a
+		// normal click, but the point of the test is that a click reaching the
+		// button still does nothing.
+		await publishButton.dispatchEvent( 'click' );
+
+		await expect(
+			page.getByRole( 'region', { name: 'Editor publish' } )
+		).toBeHidden();
+		expect( await getEditedStatus( page ) ).toBe( 'draft' );
+
+		const post = await requestUtils.rest( {
+			path: `/wp/v2/posts/${ postId }`,
+		} );
+		expect( post.status ).toBe( 'draft' );
+	} );
+
+	test( 'the refusal is visible, not only announced', async ( { page } ) => {
+		await switchIntent( page, 'Suggesting' );
+
+		await page.evaluate( () =>
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.editPost( { status: 'pending' } )
+		);
+
+		// A refusal only screen reader users perceive is indistinguishable
+		// from a control that quietly does nothing, so check both channels.
+		await expect(
+			page
+				.getByTestId( 'snackbar' )
+				.filter( { hasText: REFUSED_STATUS_MESSAGE } )
+		).toBeVisible();
+		await expect( page.locator( '#a11y-speak-assertive' ) ).toContainText(
+			REFUSED_STATUS_MESSAGE
+		);
 	} );
 
 	test( 'a status edit still applies in the Editing intent', async ( {
