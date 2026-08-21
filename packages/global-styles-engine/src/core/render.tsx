@@ -296,7 +296,8 @@ function getPresetsSvgFilters(
 			metadata.path,
 			{}
 		) as PresetsByOrigin;
-		return [ 'default', 'theme' ]
+		// Includes `custom`, since the front end renders every origin.
+		return [ 'default', 'theme', 'custom' ]
 			.filter( ( origin ) => presetByOrigin[ origin ] )
 			.flatMap( ( origin ) =>
 				presetByOrigin[ origin ].map( ( preset: any ) =>
