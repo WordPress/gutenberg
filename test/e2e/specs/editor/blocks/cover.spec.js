@@ -195,7 +195,7 @@ test.describe( 'Cover', () => {
 		// Activate the paragraph block inside the Cover block.
 		// The name of the block differs depending on whether text has been entered or not.
 		const coverBlockParagraph = coverBlock.getByRole( 'document', {
-			name: /Block: Paragraph|Empty block; start writing or type forward slash to choose a block/,
+			name: /Block: Paragraph|Add default block/,
 		} );
 		await expect( coverBlockParagraph ).toBeEditable();
 
@@ -329,15 +329,15 @@ test.describe( 'Cover', () => {
 			} )
 			.click();
 
-		// Insert a Navigation block inside the Cover block
-		await editor.selectBlocks( coverBlock );
-		await coverBlock.getByRole( 'button', { name: 'Add block' } ).click();
-		await page.keyboard.type( 'Navigation' );
-		const blockResults = page.getByRole( 'listbox', {
-			name: 'Blocks',
-		} );
-		const blockResultOptions = blockResults.getByRole( 'option' );
-		await blockResultOptions.nth( 0 ).click();
+		// Insert a Navigation block inside the Cover block by typing a slash
+		// command into its default block ghost.
+		await coverBlock
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( '/navigation' );
+		await page
+			.getByRole( 'option', { name: 'Navigation', exact: true } )
+			.click();
 
 		// Insert a second Cover block.
 		await editor.insertBlock( { name: 'core/cover' } );

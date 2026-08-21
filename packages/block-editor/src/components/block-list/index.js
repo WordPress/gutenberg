@@ -26,6 +26,7 @@ import {
 } from '../block-edit/context';
 import { ZoomOutSeparator } from './zoom-out-separator';
 import { unlock } from '../../lock-unlock';
+import { omitUnsupportedBlockAttributes } from '../../utils/unsupported-block-attributes';
 
 export const IntersectionObserver = createContext();
 IntersectionObserver.displayName = 'IntersectionObserverContext';
@@ -200,6 +201,7 @@ function Items( {
 				isContainerInsertableToInContentOnlyMode,
 				getBlockName,
 				getBlockListSettings,
+				getBlockSettings,
 				isZoomOut: _isZoomOut,
 				canInsertBlockType,
 			} = unlock( select( blockEditorStore ) );
@@ -229,7 +231,10 @@ function Items( {
 					canInsertBlockType( defaultBlock.name, rootClientId )
 				) {
 					_ghostBlockName = defaultBlock.name;
-					_ghostBlockAttributes = defaultBlock.attributes;
+					_ghostBlockAttributes = omitUnsupportedBlockAttributes(
+						defaultBlock.attributes,
+						( path ) => getBlockSettings( rootClientId, path )[ 0 ]
+					);
 				}
 			}
 

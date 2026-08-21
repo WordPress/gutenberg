@@ -144,9 +144,7 @@ describe( 'Cover block', () => {
 				} )
 			);
 
-			const title = screen.getByLabelText( 'Empty block;', {
-				exact: false,
-			} );
+			const title = screen.getByLabelText( 'Add default block' );
 			await userEvent.click( title );
 			await userEvent.keyboard( 'abc' );
 			expect( title ).toHaveTextContent( 'abc' );
@@ -471,7 +469,11 @@ describe( 'Cover block', () => {
 				name: 'White',
 			} );
 			await userEvent.click( popupColorPicker );
-			expect( coverBlock ).not.toHaveClass( 'is-light' );
+			// Removing the color returns the empty cover to its placeholder,
+			// which remounts the block wrapper, so query it again.
+			expect( screen.getByLabelText( 'Block: Cover' ) ).not.toHaveClass(
+				'is-light'
+			);
 		} );
 	} );
 } );
