@@ -73,6 +73,38 @@ function claimResponseOrder( registry, orderKey ) {
 }
 
 /**
+ * Appends a cache-busting argument to a request path when a response for the
+ * same resolution has already been received during this session.
+ *
+ * A resolver re-runs for a resolution it has already resolved only after an
+ * invalidation, which means the data is believed to have changed on the
+ * server. Some hosts cache REST responses keyed on the full request URL, even
+ * for authenticated requests that WordPress marks `no-cache`, and would serve
+ * such a refetch the very response the invalidation is trying to replace - a
+ * client-side media upload, for example, refetches the attachment with the
+ * same URL that was requested before its sub-sizes were generated. A request
+ * argument no cache has seen before lets the refetch reach the server. First
+ * requests are left untouched, so regular traffic stays cacheable.
+ * See https://github.com/WordPress/gutenberg/issues/81844.
+ *
+ * @param {Object} registry A `@wordpress/data` registry.
+ * @param {string} orderKey Identifies the resolution the request belongs to.
+ * @param {string} path     The request path.
+ *
+ * @return {string} The request path, with a cache-busting argument added when
+ *                  the request is a refetch.
+ */
+function maybeBustRefetchCache( registry, orderKey, path ) {
+	if ( ! lastReceivedResponse.get( registry )?.has( orderKey ) ) {
+		return path;
+	}
+
+	return addQueryArgs( path, {
+		_cacheBust: `${ Date.now() }-${ responseSequence }`,
+	} );
+}
+
+/**
  * Requests authors from the REST API.
  *
  * @param {Object|undefined} query Optional object of query parameters to
@@ -176,11 +208,17 @@ export const getEntityRecord =
 				...entityConfig.baseURLParams,
 				...query,
 			} );
-			const isFreshestResponse = claimResponseOrder(
-				registry,
-				JSON.stringify( [ kind, name, key, query ?? null ] )
-			);
-			const response = await apiFetch( { path, parse: false } );
+			const orderKey = JSON.stringify( [
+				kind,
+				name,
+				key,
+				query ?? null,
+			] );
+			const isFreshestResponse = claimResponseOrder( registry, orderKey );
+			const response = await apiFetch( {
+				path: maybeBustRefetchCache( registry, orderKey, path ),
+				parse: false,
+			} );
 			const record = await response.json();
 
 			// A response to the same request has already been received since
@@ -451,10 +489,8 @@ export const getEntityRecords =
 		const rawQuery = { ...query };
 		const key = entityConfig.key || DEFAULT_ENTITY_KEY;
 
-		const isFreshestResponse = claimResponseOrder(
-			registry,
-			JSON.stringify( [ kind, name, rawQuery ] )
-		);
+		const orderKey = JSON.stringify( [ kind, name, rawQuery ] );
+		const isFreshestResponse = claimResponseOrder( registry, orderKey );
 
 		function getResolutionsArgs( records, recordsQuery ) {
 			const normalizedQuery = normalizeQueryForResolution( recordsQuery );
@@ -508,11 +544,19 @@ export const getEntityRecords =
 				...entityConfig.baseURLParams,
 				...query,
 			} );
+			const requestPath = maybeBustRefetchCache(
+				registry,
+				orderKey,
+				path
+			);
 
 			let records = [],
 				meta;
 			if ( entityConfig.supportsPagination && query.per_page !== -1 ) {
-				const response = await apiFetch( { path, parse: false } );
+				const response = await apiFetch( {
+					path: requestPath,
+					parse: false,
+				} );
 				records = Object.values( await response.json() );
 				meta = {
 					totalItems: parseInt(
@@ -531,7 +575,10 @@ export const getEntityRecords =
 
 				do {
 					const response = await apiFetch( {
-						path: addQueryArgs( path, { page, per_page: 100 } ),
+						path: addQueryArgs( requestPath, {
+							page,
+							per_page: 100,
+						} ),
 						parse: false,
 					} );
 					const pageRecords = Object.values( await response.json() );
@@ -577,7 +624,9 @@ export const getEntityRecords =
 					page++;
 				} while ( page <= totalPages );
 			} else {
-				records = Object.values( await apiFetch( { path } ) );
+				records = Object.values(
+					await apiFetch( { path: requestPath } )
+				);
 				meta = {
 					totalItems: records.length,
 					totalPages: 1,

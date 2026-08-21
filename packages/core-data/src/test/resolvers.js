@@ -26,13 +26,18 @@ describe( 'getEntityRecord', () => {
 			baseURLParams: { context: 'edit' },
 		},
 	];
-	const registry = { batch: ( callback ) => callback() };
 	const resolveSelect = { getEntitiesConfig: jest.fn( () => ENTITIES ) };
 
+	let registry;
 	let dispatch;
 	let syncManager;
 
 	beforeEach( async () => {
+		/*
+		 * The refetch cache-busting state is keyed per registry, so each test
+		 * gets a fresh registry to keep request paths independent.
+		 */
+		registry = { batch: ( callback ) => callback() };
 		dispatch = Object.assign( jest.fn(), {
 			receiveEntityRecords: jest.fn(),
 			__unstableAcquireStoreLock: jest.fn(),
@@ -220,6 +225,66 @@ describe( 'getEntityRecord', () => {
 			POST,
 			undefined
 		);
+	} );
+
+	it( 'adds a cache-busting argument when refetching a received record', async () => {
+		triggerFetch.mockImplementation( () => POST_TYPE_RESPONSE );
+
+		// The first request is left untouched so it stays cacheable.
+		await getEntityRecord(
+			'root',
+			'postType',
+			'post'
+		)( { dispatch, registry, resolveSelect } );
+		expect( triggerFetch ).toHaveBeenLastCalledWith( {
+			path: '/wp/v2/types/post?context=edit',
+			parse: false,
+		} );
+
+		// The resolver only re-runs for the same record after an
+		// invalidation, and a URL-keyed cache would serve that refetch the
+		// very response the invalidation is trying to replace. A never
+		// before seen argument lets it reach the server.
+		await getEntityRecord(
+			'root',
+			'postType',
+			'post'
+		)( { dispatch, registry, resolveSelect } );
+		expect( triggerFetch ).toHaveBeenLastCalledWith( {
+			path: expect.stringMatching(
+				/^\/wp\/v2\/types\/post\?context=edit&_cacheBust=\d+-\d+$/
+			),
+			parse: false,
+		} );
+
+		// The busted request is still received under the original query.
+		expect( dispatch.receiveEntityRecords ).toHaveBeenLastCalledWith(
+			'root',
+			'postType',
+			POST_TYPE,
+			undefined
+		);
+	} );
+
+	it( 'does not add a cache-busting argument because a different record was received', async () => {
+		triggerFetch.mockImplementation( () => POST_TYPE_RESPONSE );
+
+		await getEntityRecord(
+			'root',
+			'postType',
+			'post'
+		)( { dispatch, registry, resolveSelect } );
+
+		// A first request for another record is not a refetch.
+		await getEntityRecord(
+			'root',
+			'postType',
+			'page'
+		)( { dispatch, registry, resolveSelect } );
+		expect( triggerFetch ).toHaveBeenLastCalledWith( {
+			path: '/wp/v2/types/page?context=edit',
+			parse: false,
+		} );
 	} );
 
 	it( 'loads entity with sync manager', async () => {
@@ -721,10 +786,16 @@ describe( 'getEntityRecords', () => {
 			supportsPagination: true,
 		},
 	];
-	const registry = { batch: ( callback ) => callback() };
 	const resolveSelect = { getEntitiesConfig: jest.fn( () => ENTITIES ) };
 
+	let registry;
+
 	beforeEach( async () => {
+		/*
+		 * The refetch cache-busting state is keyed per registry, so each test
+		 * gets a fresh registry to keep request paths independent.
+		 */
+		registry = { batch: ( callback ) => callback() };
 		triggerFetch.mockReset();
 	} );
 
@@ -1205,13 +1276,63 @@ describe( 'getEntityRecords', () => {
 			2
 		);
 	} );
+
+	it( 'adds a cache-busting argument when refetching a received list', async () => {
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+			receiveUserPermissions: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn(),
+			__unstableReleaseStoreLock: jest.fn(),
+			finishResolutions: jest.fn(),
+		} );
+		triggerFetch.mockImplementation( () => POST_TYPES );
+
+		// The first request is left untouched so it stays cacheable.
+		await getEntityRecords(
+			'root',
+			'postType'
+		)( { dispatch, registry, resolveSelect } );
+		expect( triggerFetch ).toHaveBeenLastCalledWith( {
+			path: '/wp/v2/types?context=edit',
+		} );
+
+		// The resolver only re-runs for the same query after an
+		// invalidation, and a URL-keyed cache would serve that refetch the
+		// very response the invalidation is trying to replace. A never
+		// before seen argument lets it reach the server.
+		await getEntityRecords(
+			'root',
+			'postType'
+		)( { dispatch, registry, resolveSelect } );
+		expect( triggerFetch ).toHaveBeenLastCalledWith( {
+			path: expect.stringMatching(
+				/^\/wp\/v2\/types\?context=edit&_cacheBust=\d+-\d+$/
+			),
+		} );
+
+		// The busted request is still received under the original query.
+		expect( dispatch.receiveEntityRecords ).toHaveBeenLastCalledWith(
+			'root',
+			'postType',
+			Object.values( POST_TYPES ),
+			{},
+			false,
+			undefined,
+			{ totalItems: 2, totalPages: 1 }
+		);
+	} );
 } );
 
 describe( 'taxonomy pagination', () => {
-	const registry = { batch: ( callback ) => callback() };
+	let registry;
 	let dispatch, loadedTaxonomyEntities;
 
 	beforeEach( async () => {
+		/*
+		 * The refetch cache-busting state is keyed per registry, so each test
+		 * gets a fresh registry to keep request paths independent.
+		 */
+		registry = { batch: ( callback ) => callback() };
 		dispatch = Object.assign( jest.fn(), {
 			receiveEntityRecords: jest.fn(),
 			__unstableAcquireStoreLock: jest.fn().mockResolvedValue( 'lock' ),

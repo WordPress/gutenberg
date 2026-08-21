@@ -1053,4 +1053,102 @@ test.describe( 'Client-side media processing', () => {
 
 		await page.unroute( /\/wp\/v2\/media\/\d+\?/ );
 	} );
+
+	test( 'shows the Resolution control when a URL-keyed cache serves the attachment refetch', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+	} ) => {
+		/*
+		 * Regression test for https://github.com/WordPress/gutenberg/issues/81844.
+		 *
+		 * Some hosts cache REST responses keyed on the full request URL, even
+		 * for authenticated requests that WordPress marks `no-cache`. During a
+		 * client-side upload, the attachment GET issued before `finalize` has
+		 * written the sub-sizes then poisons the cache with a record whose
+		 * `media_details.sizes` is empty, and the post-upload refetch - made to
+		 * the very same URL - is served the stale copy, hiding the Image
+		 * block's Resolution control.
+		 *
+		 * Simulate such a cache: every attachment GET is served from a
+		 * full-URL-keyed cache once a response for that exact URL has been
+		 * seen. The post-upload refetch must bypass it, which it can only do
+		 * by requesting a URL the cache has not seen.
+		 */
+		const urlCache = new Map();
+
+		await page.route( /\/wp\/v2\/media\/\d+\?/, async ( route ) => {
+			if ( route.request().method() !== 'GET' ) {
+				await route.continue();
+				return;
+			}
+			const url = route.request().url();
+			if ( urlCache.has( url ) ) {
+				await route.fulfill( urlCache.get( url ) );
+				return;
+			}
+			const response = await route.fetch();
+			const body = await response.body();
+			urlCache.set( url, {
+				status: response.status(),
+				headers: response.headers(),
+				body,
+			} );
+			await route.fulfill( { response, body } );
+		} );
+
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await mediaProcessingUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			'1024x768_e2e_test_image_size.jpeg'
+		);
+
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
+		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
+			timeout: 30_000,
+		} );
+
+		await mediaProcessingUtils.waitForUploadQueueEmpty();
+
+		const imageId = await mediaProcessingUtils.getSelectedBlockImageId();
+		expect( imageId ).toBeDefined();
+
+		// The refetch triggered by the upload completing must get through to
+		// the server despite the cache and deliver the generated sub-sizes.
+		await page.waitForFunction(
+			( id ) => {
+				const record = window.wp.data
+					.select( 'core' )
+					.getEntityRecord( 'postType', 'attachment', id, {
+						context: 'view',
+					} );
+				return (
+					!! record &&
+					Object.keys( record.media_details?.sizes || {} ).length > 0
+				);
+			},
+			imageId,
+			{ timeout: 30_000 }
+		);
+
+		// The Resolution control offers the generated sizes.
+		await editor.openDocumentSettingsSidebar();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'tab', { name: 'Settings' } )
+			.click();
+		await expect(
+			page.getByRole( 'combobox', { name: 'Resolution' } )
+		).toBeVisible();
+
+		await page.unroute( /\/wp\/v2\/media\/\d+\?/ );
+	} );
 } );
