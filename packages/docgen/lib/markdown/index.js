@@ -1,10 +1,8 @@
 const fs = require( 'fs' );
-const remark = require( 'remark' );
-const unified = require( 'unified' );
-const remarkParser = require( 'remark-parse' );
 const inject = require( 'mdast-util-inject' );
 const formatter = require( './formatter' );
 const embed = require( './embed' );
+const createProcessor = require( './processor' );
 
 const appendOrEmbedContents = ( { options, newContents } ) => {
 	return function transform( targetAst, file, next ) {
@@ -32,11 +30,10 @@ const appendOrEmbedContents = ( { options, newContents } ) => {
 module.exports = ( options, processDir, doc, filteredIR, headingTitle ) => {
 	if ( options.toSection || options.toToken ) {
 		const currentReadmeFile = fs.readFileSync( options.output, 'utf8' );
-		const newContents = unified()
-			.use( remarkParser )
-			.parse( formatter( processDir, doc, filteredIR, null ) );
-		remark()
-			.use( { settings: { commonmark: true } } )
+		const newContents = createProcessor().parse(
+			formatter( processDir, doc, filteredIR, null )
+		);
+		createProcessor()
 			.use( appendOrEmbedContents, { options, newContents } )
 			.process( currentReadmeFile, ( err, file ) => {
 				if ( err ) {

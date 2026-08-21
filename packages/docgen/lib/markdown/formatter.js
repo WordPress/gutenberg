@@ -1,5 +1,5 @@
-const remark = require( 'remark' );
 const getSymbolTagsByName = require( '../get-symbol-tags-by-name' );
+const createProcessor = require( './processor' );
 
 const cleanSpaces = ( paragraph ) =>
 	paragraph
@@ -66,7 +66,7 @@ const formatDeprecated = ( tags, docs ) => {
 };
 
 const formatDescription = ( description, docs ) => {
-	const processor = remark().use( () => {
+	const processor = createProcessor().use( () => {
 		return function transformer( tree ) {
 			tree.children.forEach( function ( node ) {
 				if ( node.children ) {
