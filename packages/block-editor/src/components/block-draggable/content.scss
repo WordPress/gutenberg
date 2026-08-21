@@ -9,8 +9,9 @@
 		pointer-events: none;
 	}
 
-	// Hide the multi selection indicator when dragging.
-	&::selection {
+	// Hide the multi selection indicator when dragging. A block dragged by
+	// its fully selected text keeps its selection visible.
+	&:not([data-entirely-selected])::selection {
 		background: transparent !important;
 	}
 

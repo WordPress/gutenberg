@@ -479,6 +479,17 @@ function RichTextWrapper(
 				// when the contentEditable and draggable elements are the same
 				// element.
 				draggable={ undefined }
+				// While the field's content is entirely selected, pressing
+				// it drags the block. The attribute drives that behavior
+				// and the grab cursor.
+				data-entirely-selected={
+					isSelected &&
+					value.text.length > 0 &&
+					value.start === 0 &&
+					value.end === value.text.length
+						? 'true'
+						: undefined
+				}
 				aria-label={
 					bindingsLabel || props[ 'aria-label' ] || placeholder
 				}

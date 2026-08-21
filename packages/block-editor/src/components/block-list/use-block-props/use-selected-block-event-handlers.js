@@ -1,5 +1,5 @@
 import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
-import { isTextField } from '@wordpress/dom';
+import { isEntirelySelected, isTextField } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
@@ -77,8 +77,114 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			}
 
 			/**
-			 * Prevents default dragging behavior within a block. To do: we must
-			 * handle this in the future and clean up the drag target.
+			 * A press on the block's fully selected content drags the
+			 * block, but the browser only starts a drag of a text selection
+			 * when the press begins at rest on the selected glyphs; a press
+			 * that is already moving falls back to starting a new
+			 * selection. For the length of the press, make the block a non
+			 * editable, draggable element instead: exactly the shape a
+			 * directly draggable block has, from which a native drag starts
+			 * on any press, however fast the gesture begins.
+			 *
+			 * @param {MouseEvent} event Mouse down event.
+			 */
+			function onMouseDown( event ) {
+				if ( event.button !== 0 ) {
+					return;
+				}
+
+				// Shift and other modifiers adjust the selection; those
+				// presses keep their native behavior.
+				if (
+					event.shiftKey ||
+					event.metaKey ||
+					event.ctrlKey ||
+					event.altKey
+				) {
+					return;
+				}
+
+				const { ownerDocument } = node;
+				const selection = ownerDocument.defaultView.getSelection();
+
+				if (
+					! node.isContentEditable ||
+					selection.isCollapsed ||
+					! isEntirelySelected( node ) ||
+					hasMultiSelection()
+				) {
+					return;
+				}
+
+				const hadTabIndex = node.hasAttribute( 'tabindex' );
+
+				node.setAttribute( 'draggable', 'true' );
+				node.setAttribute( 'contenteditable', 'false' );
+
+				// A non editable block is only a drag target while it is
+				// focused, and losing editability also loses the focus
+				// unless the block is focusable in its own right.
+				if ( ! hadTabIndex ) {
+					node.setAttribute( 'tabindex', '-1' );
+				}
+				node.focus();
+
+				function restore() {
+					node.removeAttribute( 'draggable' );
+					node.setAttribute( 'contenteditable', 'true' );
+					if ( ! hadTabIndex ) {
+						node.removeAttribute( 'tabindex' );
+					}
+					ownerDocument.removeEventListener( 'mouseup', onPressEnd );
+					node.removeEventListener( 'dragstart', onPressDragStart );
+				}
+
+				function onPressDragStart() {
+					// The drag session is committed; the block can become
+					// editable again while it is dragged.
+					restore();
+				}
+
+				function onPressEnd( e ) {
+					restore();
+					// The block was not editable during the press, so the
+					// browser did not place a caret for the click. Place it
+					// where the press landed, so clicking into the selected
+					// text keeps putting the caret at the click position.
+					node.focus();
+					const position = ownerDocument.caretPositionFromPoint?.(
+						e.clientX,
+						e.clientY
+					);
+
+					if ( position ) {
+						selection.setPosition(
+							position.offsetNode,
+							position.offset
+						);
+					} else {
+						const range = ownerDocument.caretRangeFromPoint?.(
+							e.clientX,
+							e.clientY
+						);
+
+						if ( range ) {
+							selection.removeAllRanges();
+							selection.addRange( range );
+						}
+					}
+				}
+
+				node.addEventListener( 'dragstart', onPressDragStart );
+				ownerDocument.addEventListener( 'mouseup', onPressEnd );
+			}
+
+			/**
+			 * Starts a drag of the block when it is the direct, non
+			 * editable, focused drag target. The press above puts a fully
+			 * selected block in exactly that shape. Any other drag within
+			 * the block stays fully native: the browser moves the dragged
+			 * text selection to the drop point, like cut and paste.
 			 *
 			 * @param {DragEvent} event Drag event.
 			 */
@@ -89,9 +195,9 @@ export function useEventHandlers( { clientId, isSelected } ) {
 					node.ownerDocument.activeElement !== node ||
 					hasMultiSelection()
 				) {
-					event.preventDefault();
 					return;
 				}
+
 				const data = JSON.stringify( {
 					type: 'block',
 					srcClientIds: [ clientId ],
@@ -103,7 +209,17 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				const { ownerDocument } = node;
 				const { defaultView } = ownerDocument;
 				const selection = defaultView.getSelection();
-				selection.removeAllRanges();
+				// A block dragged by its fully selected content keeps the
+				// selection, so the highlight rides along with the block
+				// and survives the drop. Other drags clear the selection.
+				const editableElement =
+					! selection.isCollapsed && isEntirelySelected( node )
+						? node
+						: null;
+
+				if ( ! editableElement ) {
+					selection.removeAllRanges();
+				}
 
 				// Setting the drag chip as the drag image actually works, but
 				// the behaviour is slightly different in every browser. In
@@ -261,6 +377,16 @@ export function useEventHandlers( { clientId, isSelected } ) {
 					clone.remove();
 					node.id = id;
 					dragElement.remove();
+					// Moving the block in the document tears the selection
+					// out of it; select the field in full again, so the
+					// block reads as still selected after the drop.
+					if ( editableElement ) {
+						editableElement.focus();
+						const range = ownerDocument.createRange();
+						range.selectNodeContents( editableElement );
+						selection.removeAllRanges();
+						selection.addRange( range );
+					}
 					stopDraggingBlocks();
 					document.body.classList.remove(
 						'is-dragging-components-draggable'
@@ -284,6 +410,7 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			}
 
 			node.addEventListener( 'keydown', onKeyDown );
+			node.addEventListener( 'mousedown', onMouseDown );
 			node.addEventListener( 'dragstart', onDragStart );
 
 			/**
@@ -315,6 +442,7 @@ export function useEventHandlers( { clientId, isSelected } ) {
 
 			return () => {
 				node.removeEventListener( 'keydown', onKeyDown );
+				node.removeEventListener( 'mousedown', onMouseDown );
 				node.removeEventListener( 'dragstart', onDragStart );
 				node.removeEventListener( 'dblclick', onDoubleClick );
 			};
