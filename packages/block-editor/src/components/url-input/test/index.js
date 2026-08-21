@@ -6,7 +6,7 @@ import { dispatch } from '@wordpress/data';
 import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
 import URLInput from '../';
 import { store as blockEditorStore } from '../../../store';
-import { expectValidatedInputControlDeprecationIfCalled } from './expect-validated-input-control-deprecation';
+import { expectValidatedInputControlDeprecationIfCalled } from './fixtures/validated-input-control-deprecation';
 
 jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
 
