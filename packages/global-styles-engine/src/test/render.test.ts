@@ -1787,6 +1787,23 @@ describe( 'global styles renderer', () => {
 									colors: [ '#263135', '#69a8a7' ],
 								},
 							],
+							default: [
+								{
+									slug: 'grayscale',
+									name: 'Grayscale',
+									colors: [ '#000000', '#ffffff' ],
+								},
+							],
+							// User-created duotones need a filter in the
+							// editor too, or they render on the front end but
+							// not on the canvas.
+							custom: [
+								{
+									slug: 'custom-duotone-1',
+									name: 'Duotone 1',
+									colors: [ '#0000ff', '#1a4548' ],
+								},
+							],
 						},
 					},
 				},
@@ -1811,9 +1828,11 @@ describe( 'global styles renderer', () => {
 
 			expect( svgStyle ).toBeDefined();
 			expect( svgStyle.__unstableType ).toBe( 'svgs' );
-			expect( svgStyle.assets.join( '' ) ).toContain(
-				'wp-duotone-midnight'
-			);
+
+			const assets = svgStyle.assets.join( '' );
+			expect( assets ).toContain( 'wp-duotone-midnight' );
+			expect( assets ).toContain( 'wp-duotone-grayscale' );
+			expect( assets ).toContain( 'wp-duotone-custom-duotone-1' );
 		} );
 	} );
 
