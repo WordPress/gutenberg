@@ -20,10 +20,14 @@ export default defineConfig( {
 		// The plugin excludes MDX relative to the working directory, which is
 		// this workspace rather than the root. Exclude it everywhere.
 		exclude: [ ...configDefaults.exclude, '**/*.mdx' ],
+		// Runs a garbage collection before each file; see the setup file.
+		setupFiles: [ path.resolve( configDir, 'vitest.setup.ts' ) ],
 		browser: {
 			enabled: true,
 			headless: true,
-			provider: playwright(),
+			provider: playwright( {
+				launchOptions: { args: [ '--js-flags=--expose-gc' ] },
+			} ),
 			instances: [ { browser: 'chromium' } ],
 		},
 	},
