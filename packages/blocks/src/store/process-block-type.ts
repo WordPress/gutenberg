@@ -1,3 +1,4 @@
+// @ts-expect-error -- Its declaration file is not exposed through the `exports` map.
 import { isPlainObject } from 'is-plain-object';
 import { isValidElementType } from 'react-is';
 import deprecated from '@wordpress/deprecated';
