@@ -2,9 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import { seen, unseen } from '@wordpress/icons';
 import { ValidatedInputControl } from '../index';
-import { Button } from '../../../../button';
 import { IconButton } from '../../../../icon-button';
 import { InputLayout } from '../../../primitives/input-layout';
+import { formDecorator } from '../../../stories/shared';
 
 const meta: Meta< typeof ValidatedInputControl > = {
 	tags: [ 'manifest' ],
@@ -19,28 +19,12 @@ const meta: Meta< typeof ValidatedInputControl > = {
 		type: { control: 'text' },
 		value: { control: false },
 	},
-	decorators: [
-		( Story ) => (
-			<form
-				style={ {
-					display: 'flex',
-					flexDirection: 'column',
-					gap: 16,
-					alignItems: 'flex-start',
-					width: 300,
-				} }
-				onSubmit={ ( event ) => event.preventDefault() }
-			>
-				<Story />
-				<Button type="submit">Submit</Button>
-			</form>
-		),
-	],
+	decorators: [ formDecorator ],
 	parameters: {
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components`. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
+			notes: 'APIs and behavior are still prone to change.',
 		},
 	},
 };
