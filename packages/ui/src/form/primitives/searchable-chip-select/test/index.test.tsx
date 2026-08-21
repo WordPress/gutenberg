@@ -4,7 +4,7 @@ import { createRef } from '@wordpress/element';
 import warning from '@wordpress/warning';
 import { SearchableChipSelect } from '../index';
 import type { Item, ItemGroup } from '../types';
-import { GROUPED_ITEMS, ITEMS } from './fixtures';
+import { GROUPED_ITEMS, ITEMS } from './__fixtures__';
 
 jest.mock( '@wordpress/warning', () => jest.fn() );
 

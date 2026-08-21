@@ -1,4 +1,4 @@
-import type { Item, ItemGroup } from '../types';
+import type { Item, ItemGroup } from '../../types';
 
 export const ITEMS: Item[] = [
 	{ value: 'apple', label: 'Apple' },
