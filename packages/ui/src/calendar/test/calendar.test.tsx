@@ -645,6 +645,26 @@ describe( 'Calendar', () => {
 			).toHaveFocus();
 		} );
 
+		it( 'should keep focus inside when the controlled month changes and the calendar becomes fully disabled', () => {
+			const { rerender } = render(
+				<Calendar month={ currentMonth } value={ today } />
+			);
+
+			act( () => getDateButton( today ).focus() );
+			rerender(
+				<Calendar
+					month={ nextMonth }
+					value={ addMonths( today, 1 ) }
+					disabled
+					disableNavigation
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'button', { name: /previous month/i } )
+			).toHaveFocus();
+		} );
+
 		it( 'should auto-focus the selected day when the `autoFocus` prop is set to `true`', async () => {
 			// eslint-disable-next-line jsx-a11y/no-autofocus
 			render( <Calendar autoFocus defaultValue={ tomorrow } /> );

@@ -56,8 +56,11 @@ export function usePreserveDayFocus(
 		const enabledControl = root.querySelector< HTMLButtonElement >(
 			'button:not(:disabled):not([aria-disabled="true"])'
 		);
+		const focusableControl = root.querySelector< HTMLButtonElement >(
+			'button:not(:disabled)'
+		);
 
-		( focusTarget ?? enabledControl )?.focus();
+		( focusTarget ?? enabledControl ?? focusableControl )?.focus();
 	}, [ monthIndex ] );
 
 	return { ref: mergedRef, onDayFocus, onDayBlur };
