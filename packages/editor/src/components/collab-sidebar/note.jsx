@@ -14,8 +14,8 @@ import { NoteForm } from './note-form';
 function NoteActionsMenu( { items, buttonRef } ) {
 	return (
 		<Menu.Root
-			// Keep the menu non-modal so its portaled focus stays compatible
-			// with the note thread's focus-out handling.
+			// Let outside interactions reach the note thread's focus-out
+			// handling so it can clear the selection.
 			modal={ false }
 			disabled={ ! items.length }
 		>
