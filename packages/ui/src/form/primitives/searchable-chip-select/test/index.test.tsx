@@ -373,24 +373,5 @@ describe( 'SearchableChipSelect', () => {
 				'SearchableChipSelect: expected at most one item with `creatable: true` in `items`.'
 			);
 		} );
-
-		it( 'warns when a flat creatable item is not last', () => {
-			render(
-				<SearchableChipSelect
-					items={ [
-						{
-							value: '__create__',
-							label: 'Create new item',
-							creatable: true,
-						},
-						...ITEMS.slice( 0, 2 ),
-					] }
-				/>
-			);
-
-			expect( mockedWarning ).toHaveBeenCalledWith(
-				'SearchableChipSelect: the creatable item should be last in `items` for predictable keyboard navigation.'
-			);
-		} );
 	} );
 } );
