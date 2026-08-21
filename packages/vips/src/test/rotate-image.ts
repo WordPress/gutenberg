@@ -11,11 +11,13 @@ let calls: string[];
 let removed: string[];
 
 /*
- * Controls the `palette` metadata field reported by the mocked source image,
- * which libvips sets for indexed sources. `undefined` means the field is
- * absent, matching a truecolour source.
+ * Controls whether the mocked source image reports the `palette` metadata
+ * field, which libvips attaches only for indexed sources.
  */
-let mockPalette: number | undefined;
+let mockHasPalette = false;
+
+// GType of `gint`. Only whether `getTypeof` returns non-zero matters here.
+const G_TYPE_INT = 24;
 
 const mockWriteToBuffer = jest.fn( () => ( {
 	buffer: new ArrayBuffer( 0 ),
@@ -54,15 +56,12 @@ class MockImage {
 	} );
 	writeToBuffer = mockWriteToBuffer;
 	/*
-	 * Mirrors libvips: reading a field the image does not carry throws rather
-	 * than returning a falsy default.
+	 * libvips only attaches `palette` when the source was indexed, so presence
+	 * is the signal. Absent fields report GType 0.
 	 */
-	getInt = jest.fn( ( name: string ) => {
-		if ( 'palette' === name && undefined !== mockPalette ) {
-			return mockPalette;
-		}
-		throw new Error( `${ name }: no such field` );
-	} );
+	getTypeof = jest.fn( ( name: string ) =>
+		'palette' === name && mockHasPalette ? G_TYPE_INT : 0
+	);
 }
 
 class MockVipsImage {
@@ -82,7 +81,7 @@ describe( 'rotateImage', () => {
 	beforeEach( () => {
 		calls = [];
 		removed = [];
-		mockPalette = undefined;
+		mockHasPalette = false;
 	} );
 
 	afterEach( () => {
@@ -143,7 +142,7 @@ describe( 'rotateImage', () => {
 		}
 
 		it( 'quantises a rotated indexed PNG back to a palette', async () => {
-			mockPalette = 1;
+			mockHasPalette = true;
 
 			await rotatePng( 6 );
 
@@ -154,18 +153,9 @@ describe( 'rotateImage', () => {
 		} );
 
 		it( 'leaves a rotated truecolour PNG unquantised', async () => {
-			mockPalette = 0;
-
-			await rotatePng( 6 );
-
-			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
-				'.png',
-				expect.not.objectContaining( { palette: expect.anything() } )
-			);
-		} );
-
-		it( 'leaves a rotated PNG carrying no palette metadata unquantised', async () => {
-			mockPalette = undefined;
+			// libvips attaches `palette` only for an indexed source, so a
+			// truecolour PNG carries no such field.
+			mockHasPalette = false;
 
 			await rotatePng( 6 );
 
@@ -177,7 +167,7 @@ describe( 'rotateImage', () => {
 
 		it( 'does not quantise a rotated non-PNG', async () => {
 			// A GIF is indexed too, but only pngsave takes `palette`.
-			mockPalette = 1;
+			mockHasPalette = true;
 			const file = new File( [ '<BLOB>' ], 'example.gif', {
 				type: 'image/gif',
 			} );

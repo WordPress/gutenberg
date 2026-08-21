@@ -15,7 +15,10 @@ const mockWriteToBuffer = jest.fn( () => ( {
  * carries neither `heif-bitdepth` nor `palette`.
  */
 let mockBitdepth: number | undefined;
-let mockPalette: number | undefined;
+let mockHasPalette = false;
+
+// GType of `gint`. Only whether `getTypeof` returns non-zero matters here.
+const G_TYPE_INT = 24;
 
 class MockImage {
 	width = 100;
@@ -33,11 +36,15 @@ class MockImage {
 		if ( 'heif-bitdepth' === name && undefined !== mockBitdepth ) {
 			return mockBitdepth;
 		}
-		if ( 'palette' === name && undefined !== mockPalette ) {
-			return mockPalette;
-		}
 		throw new Error( `${ name }: no such field` );
 	} );
+	/*
+	 * libvips only attaches `palette` when the source was indexed, so presence
+	 * is the signal. Absent fields report GType 0 rather than throwing.
+	 */
+	getTypeof = jest.fn( ( name: string ) =>
+		'palette' === name && mockHasPalette ? G_TYPE_INT : 0
+	);
 }
 
 class MockVipsImage {
@@ -58,7 +65,7 @@ describe( 'resizeImage', () => {
 	afterEach( () => {
 		jest.clearAllMocks();
 		mockBitdepth = undefined;
-		mockPalette = undefined;
+		mockHasPalette = false;
 	} );
 
 	it( 'resizes without crop', async () => {
@@ -518,7 +525,7 @@ describe( 'resizeImage', () => {
 		 * as truecolour and can be larger than the indexed original.
 		 */
 		it( 'quantises sub-sizes of an indexed PNG back to a palette', async () => {
-			mockPalette = 1;
+			mockHasPalette = true;
 			const pngFile = new File( [ '<BLOB>' ], 'example.png', {
 				type: 'image/png',
 			} );
@@ -542,27 +549,9 @@ describe( 'resizeImage', () => {
 		} );
 
 		it( 'leaves a truecolour PNG unquantised', async () => {
-			mockPalette = 0;
-			const pngFile = new File( [ '<BLOB>' ], 'example.png', {
-				type: 'image/png',
-			} );
-			const buffer = await pngFile.arrayBuffer();
-
-			await resizeImage( 'itemId', buffer, 'image/png', {
-				width: 50,
-				height: 50,
-			} );
-
-			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
-				'.png',
-				expect.not.objectContaining( { palette: expect.anything() } )
-			);
-		} );
-
-		it( 'leaves a PNG carrying no palette metadata unquantised', async () => {
-			// libvips throws when the field is absent, which is what a
-			// truecolour source looks like to `isPaletteImage`.
-			mockPalette = undefined;
+			// libvips attaches `palette` only for an indexed source, so a
+			// truecolour PNG carries no such field.
+			mockHasPalette = false;
 			const pngFile = new File( [ '<BLOB>' ], 'example.png', {
 				type: 'image/png',
 			} );
@@ -581,7 +570,7 @@ describe( 'resizeImage', () => {
 
 		it( 'does not quantise non-PNG output from an indexed source', async () => {
 			// A GIF is always indexed, but only pngsave takes `palette`.
-			mockPalette = 1;
+			mockHasPalette = true;
 			const gifFile = new File( [ '<BLOB>' ], 'example.gif', {
 				type: 'image/gif',
 			} );

@@ -6,11 +6,13 @@ const mockWriteToBuffer = jest.fn( () => ( {
 } ) );
 
 /*
- * Controls the `palette` metadata field reported by the mocked source image,
- * which libvips sets for indexed sources. `undefined` means the field is
- * absent, which is the common case: a JPEG does not carry it.
+ * Controls whether the mocked source image reports the `palette` metadata
+ * field, which libvips attaches only for indexed sources.
  */
-let mockPalette: number | undefined;
+let mockHasPalette = false;
+
+// GType of `gint`. Only whether `getTypeof` returns non-zero matters here.
+const G_TYPE_INT = 24;
 
 class MockImage {
 	width = 100;
@@ -23,11 +25,15 @@ class MockImage {
 	 * the mock has to throw too or their fallbacks would never be exercised.
 	 */
 	getInt = jest.fn( ( name: string ) => {
-		if ( 'palette' === name && undefined !== mockPalette ) {
-			return mockPalette;
-		}
 		throw new Error( `${ name }: no such field` );
 	} );
+	/*
+	 * libvips only attaches `palette` when the source was indexed, so presence
+	 * is the signal. Absent fields report GType 0 rather than throwing.
+	 */
+	getTypeof = jest.fn( ( name: string ) =>
+		'palette' === name && mockHasPalette ? G_TYPE_INT : 0
+	);
 }
 
 class MockVipsImage {
@@ -46,7 +52,7 @@ jest.mock( 'wasm-vips', () =>
 describe( 'convertImageFormat', () => {
 	afterEach( () => {
 		jest.clearAllMocks();
-		mockPalette = undefined;
+		mockHasPalette = false;
 	} );
 
 	it( 'loads only the first frame when converting a GIF to JPEG', async () => {
@@ -121,7 +127,7 @@ describe( 'convertImageFormat', () => {
 		 * to PNG rewrites the image as truecolour and inflates it.
 		 */
 		it( 'quantises a compressed indexed PNG back to a palette', async () => {
-			mockPalette = 1;
+			mockHasPalette = true;
 			const pngFile = new File( [ '<BLOB>' ], 'example.png', {
 				type: 'image/png',
 			} );
@@ -142,24 +148,9 @@ describe( 'convertImageFormat', () => {
 		} );
 
 		it( 'leaves a truecolour PNG unquantised', async () => {
-			mockPalette = 0;
-			const pngFile = new File( [ '<BLOB>' ], 'example.png', {
-				type: 'image/png',
-			} );
-			const buffer = await pngFile.arrayBuffer();
-
-			await compressImage( 'itemId', buffer, 'image/png' );
-
-			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
-				'.png',
-				expect.not.objectContaining( { palette: expect.anything() } )
-			);
-		} );
-
-		it( 'leaves a PNG carrying no palette metadata unquantised', async () => {
-			// libvips throws when the field is absent, which is what a
-			// truecolour source looks like to `isPaletteImage`.
-			mockPalette = undefined;
+			// libvips attaches `palette` only for an indexed source, so a
+			// truecolour PNG carries no such field.
+			mockHasPalette = false;
 			const pngFile = new File( [ '<BLOB>' ], 'example.png', {
 				type: 'image/png',
 			} );
@@ -174,7 +165,7 @@ describe( 'convertImageFormat', () => {
 		} );
 
 		it( 'does not quantise when converting an indexed source away from PNG', async () => {
-			mockPalette = 1;
+			mockHasPalette = true;
 			const pngFile = new File( [ '<BLOB>' ], 'example.png', {
 				type: 'image/png',
 			} );

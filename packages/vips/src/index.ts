@@ -415,18 +415,14 @@ function applyResizeAndCrop<
  * palette-based artwork is typically several times larger than the indexed
  * original. See https://core.trac.wordpress.org/ticket/65922.
  *
+ * libvips only attaches the field when the source was indexed, so its presence
+ * is the signal. `getTypeof` reports the GType of a field, or 0 when absent.
+ *
  * @param image Decoded vips image.
  * @return Whether the source image used a palette.
  */
-function isPaletteImage< T extends { getInt: ( name: string ) => number } >(
-	image: T
-): boolean {
-	try {
-		return image.getInt( 'palette' ) === 1;
-	} catch {
-		// Field absent: the source was not indexed.
-		return false;
-	}
+function isPaletteImage( image: Vips.Image ): boolean {
+	return image.getTypeof( 'palette' ) !== 0;
 }
 
 /**
@@ -440,9 +436,7 @@ function isPaletteImage< T extends { getInt: ( name: string ) => number } >(
  * @param image Decoded vips image.
  * @return Source bit depth (typically 8, 10, or 12).
  */
-function getSourceBitdepth< T extends { getInt: ( name: string ) => number } >(
-	image: T
-): number {
+function getSourceBitdepth( image: Vips.Image ): number {
 	try {
 		const bitdepth = image.getInt( 'heif-bitdepth' );
 		if ( bitdepth > 8 ) {
