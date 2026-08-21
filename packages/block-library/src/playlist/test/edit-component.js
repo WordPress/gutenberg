@@ -2,8 +2,28 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { useDispatch, useSelect } from '@wordpress/data';
 import PlaylistEdit from '../edit';
 
-let mediaPlaceholderProps;
-let mediaReplaceFlowProps;
+let mockMediaPlaceholderProps;
+let mockMediaReplaceFlowProps;
+let mockCreatedBlockCount;
+
+const mockPlaceholderTracks = [
+	{
+		id: 2,
+		url: 'https://example.com/second-track.mp3',
+		title: 'Second track',
+	},
+	{
+		id: 3,
+		url: 'https://example.com/third-track.mp3',
+		title: 'Third track',
+	},
+];
+
+const mockAdditionalTrack = {
+	id: 4,
+	url: 'https://example.com/fourth-track.mp3',
+	title: 'Fourth track',
+};
 
 jest.mock( '@wordpress/block-editor', () => ( {
 	store: {},
@@ -11,21 +31,17 @@ jest.mock( '@wordpress/block-editor', () => ( {
 	BlockIcon: () => <span />,
 	InspectorControls: ( { children } ) => <div>{ children }</div>,
 	MediaPlaceholder: ( props ) => {
-		mediaPlaceholderProps = props;
-		return <div />;
+		mockMediaPlaceholderProps = props;
+		return (
+			<button onClick={ () => props.onSelect( mockPlaceholderTracks ) }>
+				Media Library
+			</button>
+		);
 	},
 	MediaReplaceFlow: ( props ) => {
-		mediaReplaceFlowProps = props;
+		mockMediaReplaceFlowProps = props;
 		return (
-			<button
-				onClick={ () =>
-					props.onSelect( {
-						id: 2,
-						url: 'https://example.com/second-track.mp3',
-						title: 'Second track',
-					} )
-				}
-			>
+			<button onClick={ () => props.onSelect( mockAdditionalTrack ) }>
 				{ props.name }
 			</button>
 		);
@@ -48,12 +64,8 @@ jest.mock( '@wordpress/blocks', () => ( {
 	createBlock: jest.fn( ( name, attributes ) => ( {
 		name,
 		attributes,
-		clientId: 'new-track',
+		clientId: `new-track-${ ++mockCreatedBlockCount }`,
 	} ) ),
-} ) );
-
-jest.mock( '@wordpress/blob', () => ( {
-	createBlobURL: jest.fn( () => 'blob:track' ),
 } ) );
 
 jest.mock( '@wordpress/components', () => ( {
@@ -67,15 +79,6 @@ jest.mock( '@wordpress/components', () => ( {
 jest.mock( '@wordpress/data', () => ( {
 	useDispatch: jest.fn(),
 	useSelect: jest.fn(),
-} ) );
-
-jest.mock( '@wordpress/i18n', () => ( {
-	__: ( text ) => text,
-	_x: ( text ) => text,
-} ) );
-
-jest.mock( '@wordpress/icons', () => ( {
-	playlist: 'playlist',
 } ) );
 
 jest.mock( '@wordpress/notices', () => ( {
@@ -104,79 +107,99 @@ const defaultAttributes = {
 	showTrackLength: true,
 };
 
+function renderEdit( props = {} ) {
+	return render(
+		<PlaylistEdit
+			attributes={ {
+				...defaultAttributes,
+				...props.attributes,
+			} }
+			clientId="playlist-1"
+			insertBlocksAfter={ jest.fn() }
+			isSelected={ false }
+			setAttributes={ jest.fn() }
+		/>
+	);
+}
+
 describe( 'PlaylistEdit', () => {
 	let replaceInnerBlocks;
 	let selectBlock;
+	let innerBlockTracks;
 
 	beforeEach( () => {
-		mediaPlaceholderProps = undefined;
-		mediaReplaceFlowProps = undefined;
+		mockMediaPlaceholderProps = undefined;
+		mockMediaReplaceFlowProps = undefined;
+		mockCreatedBlockCount = 0;
 		replaceInnerBlocks = jest.fn();
 		selectBlock = jest.fn();
+		innerBlockTracks = [
+			{
+				clientId: 'track-1',
+				attributes: {
+					id: 1,
+					src: 'https://example.com/audio.mp3',
+					title: 'Sample track',
+				},
+			},
+		];
 		useDispatch.mockReturnValue( {
 			createErrorNotice: jest.fn(),
 			replaceInnerBlocks,
 			selectBlock,
 		} );
-		useSelect.mockReturnValue( {
-			innerBlockTracks: [
-				{
-					clientId: 'track-1',
-					attributes: {
-						id: 1,
-						src: 'https://example.com/audio.mp3',
-						title: 'Sample track',
-					},
-				},
-			],
-		} );
+		useSelect.mockImplementation( () => ( {
+			innerBlockTracks,
+		} ) );
 	} );
 
 	it( 'lets users select audio tracks individually from the Media Library', () => {
-		useSelect.mockReturnValue( {
-			innerBlockTracks: [],
-		} );
+		innerBlockTracks = [];
 
-		render(
-			<PlaylistEdit
-				attributes={ defaultAttributes }
-				clientId="playlist-1"
-				insertBlocksAfter={ jest.fn() }
-				isSelected={ false }
-				setAttributes={ jest.fn() }
-			/>
+		renderEdit();
+
+		expect( mockMediaPlaceholderProps.multiple ).toBe( 'add' );
+
+		fireEvent.click(
+			screen.getByRole( 'button', {
+				name: 'Media Library',
+			} )
 		);
 
-		expect( mediaPlaceholderProps.multiple ).toBe( 'add' );
+		expect( replaceInnerBlocks ).toHaveBeenCalledWith( 'playlist-1', [
+			expect.objectContaining( {
+				clientId: 'new-track-1',
+				name: 'core/playlist-track',
+				attributes: expect.objectContaining( {
+					id: 2,
+					src: 'https://example.com/second-track.mp3',
+					title: 'Second track',
+				} ),
+			} ),
+			expect.objectContaining( {
+				clientId: 'new-track-2',
+				name: 'core/playlist-track',
+				attributes: expect.objectContaining( {
+					id: 3,
+					src: 'https://example.com/third-track.mp3',
+					title: 'Third track',
+				} ),
+			} ),
+		] );
 	} );
 
 	it( 'lets users select additional audio tracks individually from the Media Library', () => {
-		render(
-			<PlaylistEdit
-				attributes={ defaultAttributes }
-				clientId="playlist-1"
-				insertBlocksAfter={ jest.fn() }
-				isSelected={ false }
-				setAttributes={ jest.fn() }
-			/>
-		);
+		renderEdit();
 
-		expect( mediaReplaceFlowProps.multiple ).toBe( 'add' );
+		expect( mockMediaReplaceFlowProps.multiple ).toBe( 'add' );
 	} );
 
 	it( 'keeps track blocks mounted when the tracklist is hidden', () => {
-		render(
-			<PlaylistEdit
-				attributes={ {
-					...defaultAttributes,
-					showTracklist: false,
-				} }
-				clientId="playlist-1"
-				insertBlocksAfter={ jest.fn() }
-				isSelected={ false }
-				setAttributes={ jest.fn() }
-			/>
-		);
+		renderEdit( {
+			attributes: {
+				showTracklist: false,
+			},
+		} );
 
 		const tracklist = screen.getByRole( 'list' );
 
@@ -187,15 +210,7 @@ describe( 'PlaylistEdit', () => {
 	} );
 
 	it( 'adds tracks from the add track control', () => {
-		render(
-			<PlaylistEdit
-				attributes={ defaultAttributes }
-				clientId="playlist-1"
-				insertBlocksAfter={ jest.fn() }
-				isSelected={ false }
-				setAttributes={ jest.fn() }
-			/>
-		);
+		renderEdit();
 
 		fireEvent.click(
 			screen.getByRole( 'button', {
@@ -206,15 +221,15 @@ describe( 'PlaylistEdit', () => {
 		expect( replaceInnerBlocks ).toHaveBeenCalledWith( 'playlist-1', [
 			expect.objectContaining( { clientId: 'track-1' } ),
 			expect.objectContaining( {
-				clientId: 'new-track',
+				clientId: 'new-track-1',
 				name: 'core/playlist-track',
 				attributes: expect.objectContaining( {
-					id: 2,
-					src: 'https://example.com/second-track.mp3',
-					title: 'Second track',
+					id: 4,
+					src: 'https://example.com/fourth-track.mp3',
+					title: 'Fourth track',
 				} ),
 			} ),
 		] );
-		expect( selectBlock ).toHaveBeenCalledWith( 'new-track' );
+		expect( selectBlock ).toHaveBeenCalledWith( 'new-track-1' );
 	} );
 } );

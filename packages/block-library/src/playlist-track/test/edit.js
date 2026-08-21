@@ -1,56 +1,15 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
-import { useDispatch } from '@wordpress/data';
-import PlaylistTrackEdit from '../edit';
-import { PlaylistContext } from '../../playlist/context';
-import { useUploadMediaFromBlobURL } from '../../utils/hooks';
+import { screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { createBlobURL } from '@wordpress/blob';
+import { createBlock } from '@wordpress/blocks';
+import { addFilter, removeFilter } from '@wordpress/hooks';
+import {
+	initializeEditor,
+	selectBlock,
+} from '@wordpress/integration-tests/helpers/integration-test-editor';
+import { registerCoreBlocks } from '@wordpress/block-library';
 
-let mockMediaReplaceFlowProps;
-
-jest.mock( '@wordpress/block-editor', () => {
-	const PlainText = jest.requireActual(
-		'../../../../block-editor/src/components/plain-text'
-	).default;
-
-	return {
-		BlockControls: ( { children } ) => <div>{ children }</div>,
-		BlockIcon: () => <span />,
-		InspectorControls: ( { children } ) => <div>{ children }</div>,
-		MediaPlaceholder: () => <div />,
-		MediaReplaceFlow: ( props ) => {
-			mockMediaReplaceFlowProps = props;
-			const { name, onSelect } = props;
-			return <button onClick={ () => onSelect( {} ) }>{ name }</button>;
-		},
-		MediaUpload: ( { render: renderMediaUpload } ) =>
-			renderMediaUpload( { open: jest.fn() } ),
-		MediaUploadCheck: ( { children } ) => <div>{ children }</div>,
-		PlainText,
-		useBlockProps: jest.fn( () => ( {} ) ),
-	};
-} );
-
-jest.mock( '@wordpress/data', () => {
-	const data = jest.requireActual( '@wordpress/data' );
-	const mockUseDispatch = jest.fn();
-
-	return new Proxy( data, {
-		get( target, property ) {
-			if ( property === 'useDispatch' ) {
-				return mockUseDispatch;
-			}
-
-			return target[ property ];
-		},
-	} );
-} );
-
-jest.mock( '@wordpress/notices', () => ( {
-	store: 'core/notices',
-} ) );
-
-jest.mock( '../../utils/hooks', () => ( {
-	useUploadMediaFromBlobURL: jest.fn(),
-} ) );
+const MEDIA_UPLOAD_FILTER = 'core/playlist-track/test/media-upload';
 
 const defaultAttributes = {
 	id: 1,
@@ -63,48 +22,77 @@ const defaultAttributes = {
 	title: 'Song One',
 };
 
-function renderEdit( props = {} ) {
-	const setAttributes = jest.fn();
-	const setCurrentTrackClientId = props.setCurrentTrackClientId || jest.fn();
+let mediaUploadSelection;
 
-	render(
-		<PlaylistContext.Provider
-			value={ {
-				currentTrackClientId: props.currentTrackClientId ?? null,
-				setCurrentTrackClientId,
-			} }
-		>
-			<PlaylistTrackEdit
-				attributes={ {
-					...defaultAttributes,
-					...props.attributes,
-				} }
-				setAttributes={ setAttributes }
-				context={ {
-					showArtists: true,
-					showImages: true,
-					...props.context,
-				} }
-				clientId={ props.clientId || 'playlist-track-client-id' }
-				isSelected={ props.isSelected ?? false }
-			/>
-		</PlaylistContext.Provider>
+function addMediaUpload() {
+	addFilter( 'editor.MediaUpload', MEDIA_UPLOAD_FILTER, () => {
+		return ( { onSelect, render } ) =>
+			render( {
+				open: () => onSelect( mediaUploadSelection ),
+			} );
+	} );
+}
+
+async function setup( tracks, settings = { mediaUpload: () => {} } ) {
+	return initializeEditor(
+		createBlock(
+			'core/playlist',
+			{},
+			tracks.map( ( attributes ) =>
+				createBlock( 'core/playlist-track', attributes )
+			)
+		),
+		false,
+		settings
 	);
-
-	return { setAttributes, setCurrentTrackClientId };
 }
 
 describe( 'PlaylistTrackEdit', () => {
-	beforeEach( () => {
-		mockMediaReplaceFlowProps = undefined;
-		useDispatch.mockReturnValue( {
-			createErrorNotice: jest.fn(),
-		} );
-		useUploadMediaFromBlobURL.mockClear();
+	let jsdomStubs;
+
+	beforeAll( () => {
+		// The real playlist editor renders WaveformPlayer, which uses canvas
+		// and media element APIs that JSDOM does not implement.
+		jsdomStubs = [
+			jest
+				.spyOn( window.HTMLCanvasElement.prototype, 'getContext' )
+				.mockReturnValue( null ),
+			jest
+				.spyOn( window.HTMLMediaElement.prototype, 'pause' )
+				.mockImplementation( () => {} ),
+			jest
+				.spyOn( window.HTMLMediaElement.prototype, 'load' )
+				.mockImplementation( () => {} ),
+		];
+
+		if ( ! window.URL.createObjectURL ) {
+			window.URL.createObjectURL = jest.fn(
+				() => 'blob:https://example.com/temporary-track'
+			);
+		}
+		if ( ! window.URL.revokeObjectURL ) {
+			window.URL.revokeObjectURL = jest.fn();
+		}
 	} );
 
-	it( 'allows the track image alternative text to be edited', () => {
-		const { setAttributes } = renderEdit();
+	afterAll( () => {
+		jsdomStubs.forEach( ( stub ) => stub.mockRestore() );
+	} );
+
+	beforeEach( () => {
+		mediaUploadSelection = undefined;
+		registerCoreBlocks();
+		addMediaUpload();
+	} );
+
+	afterEach( () => {
+		removeFilter( 'editor.MediaUpload', MEDIA_UPLOAD_FILTER );
+	} );
+
+	it( 'allows the track image alternative text to be edited', async () => {
+		await setup( [ defaultAttributes ] );
+
+		await selectBlock( 'Block: Playlist track' );
 
 		expect(
 			screen.getByRole( 'link', {
@@ -118,64 +106,117 @@ describe( 'PlaylistTrackEdit', () => {
 			screen.queryByText( 'Leave empty if decorative.' )
 		).not.toBeInTheDocument();
 
-		fireEvent.change( screen.getByLabelText( 'Alternative text' ), {
-			target: { value: 'A silver microphone on a red background' },
-		} );
+		await userEvent.clear( screen.getByLabelText( 'Alternative text' ) );
+		await userEvent.type(
+			screen.getByLabelText( 'Alternative text' ),
+			'A silver microphone on a red background'
+		);
 
-		expect( setAttributes ).toHaveBeenCalledWith( {
-			imageAlt: 'A silver microphone on a red background',
-		} );
+		expect( screen.getByLabelText( 'Alternative text' ) ).toHaveValue(
+			'A silver microphone on a red background'
+		);
 	} );
 
-	it( 'does not show the alternative text control without a track image', () => {
-		renderEdit( {
-			attributes: {
+	it( 'does not show the alternative text control without a track image', async () => {
+		await setup( [
+			{
+				...defaultAttributes,
 				image: undefined,
 				imageAlt: undefined,
 			},
-		} );
+		] );
+
+		await selectBlock( 'Block: Playlist track' );
 
 		expect(
 			screen.queryByLabelText( 'Alternative text' )
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'sets the selected track as the current track', () => {
-		const { setCurrentTrackClientId } = renderEdit( {
-			currentTrackClientId: 'another-track-client-id',
-			isSelected: true,
-		} );
+	it( 'sets the selected track as the current track', async () => {
+		await setup( [
+			{
+				...defaultAttributes,
+				id: 1,
+				title: 'Song One',
+			},
+			{
+				...defaultAttributes,
+				id: 2,
+				src: 'https://example.com/song-two.mp3',
+				title: 'Song Two',
+			},
+		] );
 
-		expect( setCurrentTrackClientId ).toHaveBeenCalledWith(
-			'playlist-track-client-id'
+		await userEvent.click( screen.getByLabelText( 'Block: Playlist' ) );
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'button', { name: /Song One/ } )
+			).toHaveAttribute( 'aria-current', 'true' )
+		);
+
+		await userEvent.click(
+			screen.getAllByLabelText( 'Block: Playlist track' )[ 1 ]
+		);
+
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'button', { name: /Song Two/ } )
+			).toHaveAttribute( 'aria-current', 'true' )
 		);
 	} );
 
-	it( 'does not set a selected placeholder track as the current track', () => {
-		const { setCurrentTrackClientId } = renderEdit( {
-			attributes: {
-				blob: undefined,
-				src: undefined,
+	it( 'does not set a selected placeholder track as the current track', async () => {
+		await setup( [
+			defaultAttributes,
+			{
+				title: 'Placeholder track',
 			},
-			currentTrackClientId: 'another-track-client-id',
-			isSelected: true,
-		} );
+		] );
 
-		expect( setCurrentTrackClientId ).not.toHaveBeenCalled();
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'button', { name: /Song One/ } )
+			).toHaveAttribute( 'aria-current', 'true' )
+		);
+
+		await userEvent.click(
+			screen.getAllByLabelText( 'Block: Playlist track' )[ 1 ]
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: /Song One/ } )
+		).toHaveAttribute( 'aria-current', 'true' );
 	} );
 
-	it( 'uploads temporary blob tracks', () => {
-		renderEdit( {
-			attributes: {
-				blob: 'blob:https://example.com/temporary-track',
-				length: undefined,
-				src: undefined,
-			},
+	it( 'uploads temporary blob tracks', async () => {
+		let upload;
+		const file = new File( [ 'audio' ], 'temporary-track.mp3', {
+			type: 'audio/mpeg',
 		} );
+		const blob = createBlobURL( file );
 
-		expect( useUploadMediaFromBlobURL ).toHaveBeenCalledWith(
+		await setup(
+			[
+				{
+					...defaultAttributes,
+					blob,
+					length: undefined,
+					src: undefined,
+				},
+			],
+			{
+				mediaUpload: ( args ) => {
+					upload = args;
+				},
+			}
+		);
+
+		await waitFor( () => expect( upload ).toBeDefined() );
+		expect( upload ).toEqual(
 			expect.objectContaining( {
-				url: 'blob:https://example.com/temporary-track',
+				filesList: [ file ],
+				allowedTypes: [ 'audio' ],
 			} )
 		);
 		const trackButton = screen.getByRole( 'button', {
@@ -187,33 +228,73 @@ describe( 'PlaylistTrackEdit', () => {
 		).toBeInTheDocument();
 	} );
 
-	it( 'preserves the current track source when a replacement upload fails', () => {
-		const { setAttributes } = renderEdit();
+	it( 'preserves the current track source when a replacement upload fails', async () => {
+		mediaUploadSelection = {};
+		const { container } = await setup( [ defaultAttributes ] );
 
-		mockMediaReplaceFlowProps.onSelect();
-
-		expect( setAttributes ).toHaveBeenCalledTimes( 1 );
-		expect( setAttributes.mock.calls[ 0 ][ 0 ] ).not.toHaveProperty(
-			'src'
+		await selectBlock( 'Block: Playlist track' );
+		await userEvent.click(
+			screen.getByRole( 'button', {
+				expanded: false,
+				name: 'Replace',
+			} )
 		);
+		await userEvent.click(
+			screen.getByRole( 'menuitem', {
+				name: 'Open Media Library',
+			} )
+		);
+		await userEvent.click(
+			screen.getByRole( 'button', {
+				expanded: false,
+				name: 'Replace',
+			} )
+		);
+
+		/* eslint-disable testing-library/no-node-access */
+		await waitFor( () => {
+			expect(
+				container.querySelector(
+					'[data-url="https://example.com/song.mp3"]'
+				)
+			).toBeInTheDocument();
+		} );
+		/* eslint-enable testing-library/no-node-access */
 	} );
 
-	it( 'accepts raw uploaded attachment data when replacing a track', () => {
-		const { setAttributes } = renderEdit();
-
-		mockMediaReplaceFlowProps.onSelect( {
+	it( 'accepts raw uploaded attachment data when replacing a track', async () => {
+		mediaUploadSelection = {
 			id: 2,
 			source_url: 'https://example.com/replacement.mp3',
 			title: { raw: 'Replacement &amp; Track' },
-		} );
+		};
+		await setup( [ defaultAttributes ] );
 
-		expect( setAttributes ).toHaveBeenCalledWith(
-			expect.objectContaining( {
-				blob: undefined,
-				id: 2,
-				src: 'https://example.com/replacement.mp3',
-				title: 'Replacement & Track',
+		await selectBlock( 'Block: Playlist track' );
+		await userEvent.click(
+			screen.getByRole( 'button', {
+				expanded: false,
+				name: 'Replace',
 			} )
 		);
+		await userEvent.click(
+			screen.getByRole( 'menuitem', {
+				name: 'Open Media Library',
+			} )
+		);
+
+		expect(
+			await screen.findByRole( 'button', {
+				name: /Replacement & Track/,
+			} )
+		).toBeInTheDocument();
+		expect( screen.getByLabelText( 'Title' ) ).toHaveValue(
+			'Replacement & Track'
+		);
+		expect(
+			screen.queryByRole( 'button', {
+				name: /Song One/,
+			} )
+		).not.toBeInTheDocument();
 	} );
 } );
