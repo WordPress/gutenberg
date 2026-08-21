@@ -680,9 +680,9 @@ As a result of the above guidelines, all new components (except for shared utili
 ```text
 component-name/
 ├── stories
-│   └── index.js
+│   └── index.ts
 ├── test
-│   └── index.js
+│   └── index.ts
 ├── component.tsx
 ├── context.ts
 ├── hook.ts
@@ -709,9 +709,9 @@ component-family-name/
 │   ├── README.md
 │   └── style.module.scss
 ├── stories
-│   └── index.js
+│   └── index.ts
 ├── test
-│   └── index.js
+│   └── index.ts
 ├── context.ts
 ├── index.ts
 ├── types.ts
