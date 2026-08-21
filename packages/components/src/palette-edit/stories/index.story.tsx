@@ -2,7 +2,7 @@ import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 import { useState } from '@wordpress/element';
 import PaletteEdit from '..';
-import type { Color, Gradient } from '../types';
+import type { Color, Duotone, Gradient, PaletteElement } from '../types';
 
 const meta: Meta< typeof PaletteEdit > = {
 	title: 'Components/PaletteEdit',
@@ -22,27 +22,44 @@ const meta: Meta< typeof PaletteEdit > = {
 export default meta;
 
 const Template: StoryFn< typeof PaletteEdit > = ( args ) => {
-	const { colors, gradients, onChange, ...props } = args;
-	const [ value, setValue ] = useState( gradients || colors );
+	const { colors, gradients, duotones, colorPalette, onChange, ...props } =
+		args;
+	const [ value, setValue ] = useState< PaletteElement[] | undefined >(
+		gradients ?? duotones ?? colors
+	);
+	// The story's `onChange` is a mock shared by all three variants, so it is
+	// called through a single loosely typed reference.
+	const handleChange = ( newValue?: PaletteElement[] ) => {
+		setValue( newValue );
+		( onChange as ( values?: PaletteElement[] ) => void )( newValue );
+	};
+
+	if ( gradients ) {
+		return (
+			<PaletteEdit
+				{ ...props }
+				gradients={ ( value ?? [] ) as Gradient[] }
+				onChange={ handleChange }
+			/>
+		);
+	}
+
+	if ( duotones ) {
+		return (
+			<PaletteEdit
+				{ ...props }
+				duotones={ ( value ?? [] ) as Duotone[] }
+				colorPalette={ colorPalette }
+				onChange={ handleChange }
+			/>
+		);
+	}
 
 	return (
 		<PaletteEdit
-			{ ...( gradients
-				? {
-						gradients: value as Gradient[],
-						onChange: ( newValue?: Gradient[] ) => {
-							setValue( newValue );
-							onChange( newValue );
-						},
-				  }
-				: {
-						colors: value as Color[],
-						onChange: ( newValue?: Color[] ) => {
-							setValue( newValue );
-							onChange( newValue );
-						},
-				  } ) }
 			{ ...props }
+			colors={ ( value ?? [] ) as Color[] }
+			onChange={ handleChange }
 		/>
 	);
 };
@@ -80,4 +97,28 @@ Gradients.args = {
 	],
 	paletteLabel: 'Gradients',
 	emptyMessage: 'Gradients are empty',
+};
+
+export const Duotones = Template.bind( {} );
+Duotones.args = {
+	duotones: [
+		{
+			colors: [ '#8c00b7', '#fcff41' ],
+			name: 'Purple and yellow',
+			slug: 'purple-yellow',
+		},
+		{
+			colors: [ '#000097', '#ff4747' ],
+			name: 'Blue and red',
+			slug: 'blue-red',
+		},
+	],
+	colorPalette: [
+		{ color: '#ff4747', name: 'Red', slug: 'red' },
+		{ color: '#fcff41', name: 'Yellow', slug: 'yellow' },
+		{ color: '#000097', name: 'Blue', slug: 'blue' },
+		{ color: '#8c00b7', name: 'Purple', slug: 'purple' },
+	],
+	paletteLabel: 'Duotones',
+	emptyMessage: 'Duotones are empty',
 };

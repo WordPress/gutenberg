@@ -240,7 +240,15 @@ function RevisionsButtons( {
 									size="compact"
 									variant="primary"
 									className="global-styles-ui-screen-revisions__apply-button"
-									onClick={ onApplyRevision }
+									onClick={ ( event: React.MouseEvent ) => {
+										// This button sits inside the option,
+										// whose own click handler selects the
+										// revision. Without this the selection
+										// would re-run and navigate back to
+										// the revision just applied.
+										event.stopPropagation();
+										onApplyRevision?.();
+									} }
 									aria-label={ __(
 										'Apply the selected revision to your site.'
 									) }

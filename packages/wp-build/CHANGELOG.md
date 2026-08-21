@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Identify generated wp-admin page mount elements by their page-specific ID instead of a Boot class ([#81756](https://github.com/WordPress/gutenberg/pull/81756)).
+
 ### Bug Fixes
 
 -   Register the content module for routes that only export a `canvas`, so a route without a stage or inspector can render a custom canvas ([#81578](https://github.com/WordPress/gutenberg/pull/81578)).
