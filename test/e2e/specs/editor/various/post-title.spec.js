@@ -58,6 +58,91 @@ test.describe( 'Post title', () => {
 		} );
 	} );
 
+	test.describe( 'Forward delete', () => {
+		test( 'should delete the first block from the end of the title', async ( {
+			editor,
+			page,
+			admin,
+		} ) => {
+			await admin.createNewPost();
+
+			const titleField = editor.canvas.getByRole( 'textbox', {
+				name: 'Add title',
+			} );
+
+			await expect( titleField ).toBeFocused();
+			await page.keyboard.type( 'Hello' );
+
+			// Insert without updating the selection so that the caret stays
+			// at the end of the title.
+			await page.evaluate( () => {
+				const { createBlock } = window.wp.blocks;
+				window.wp.data.dispatch( 'core/block-editor' ).insertBlocks(
+					[
+						createBlock( 'core/paragraph' ),
+						createBlock( 'core/paragraph', {
+							content: 'world',
+						} ),
+					],
+					0,
+					undefined,
+					false
+				);
+			} );
+
+			// The first press removes the empty paragraph.
+			await page.keyboard.press( 'Delete' );
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'world' },
+				},
+			] );
+			await expect( titleField ).toHaveText( 'Hello' );
+
+			// The second press merges the paragraph into the title.
+			await page.keyboard.press( 'Delete' );
+			await expect.poll( editor.getBlocks ).toEqual( [] );
+
+			// Typing proves the caret stayed at the merge point.
+			await page.keyboard.type( ', ' );
+			await expect( titleField ).toHaveText( 'Hello, world' );
+		} );
+
+		test( 'should merge blocks that transform to the default block', async ( {
+			editor,
+			page,
+			admin,
+		} ) => {
+			await admin.createNewPost();
+
+			const titleField = editor.canvas.getByRole( 'textbox', {
+				name: 'Add title',
+			} );
+
+			await expect( titleField ).toBeFocused();
+			await page.keyboard.type( 'Hello' );
+
+			await page.evaluate( () => {
+				const { createBlock } = window.wp.blocks;
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.insertBlocks(
+						[ createBlock( 'core/heading', { content: 'World' } ) ],
+						0,
+						undefined,
+						false
+					);
+			} );
+
+			// The heading transforms to a paragraph and merges, the same
+			// as forward delete between a paragraph and a heading.
+			await page.keyboard.press( 'Delete' );
+			await expect.poll( editor.getBlocks ).toEqual( [] );
+			await expect( titleField ).toHaveText( 'HelloWorld' );
+		} );
+	} );
+
 	test.describe( 'HTML handling', () => {
 		test( `should (visually) render any HTML in Post Editor's post title field when in Visual editing mode`, async ( {
 			editor,
