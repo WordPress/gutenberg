@@ -1,8 +1,28 @@
 let compatibilityStyles = null;
 
 /**
+ * WP core handles that don't start with 'wp-' but must still be excluded.
+ * Stored as normalised handles (DOM id suffix '-css'/'-inline-css' stripped).
+ */
+const CORE_STYLE_HANDLES = new Set( [
+	'global-styles',
+	'global-styles-css-custom-properties',
+	'block-style-variation-styles',
+] );
+
+/**
+ * Normalizes a handle by removing the '-css' or '-inline-css' suffix.
+ *
+ * @param {string} id The handle to normalize.
+ * @return {string} The normalized handle.
+ */
+function normalizeHandle( id ) {
+	return id.replace( /-inline-css$/, '' ).replace( /-css$/, '' );
+}
+
+/**
  * Returns a list of stylesheets that target the editor canvas. A stylesheet is
- * considered targeting the editor a canvas if it contains the
+ * considered targeting the editor canvas if it contains the
  * `editor-styles-wrapper`, `wp-block`, or `wp-block-*` class selectors.
  *
  * Ideally, this hook should be removed in the future and styles should be added
@@ -37,6 +57,11 @@ export function getCompatibilityStyles() {
 				return accumulator;
 			}
 
+			// Don't try to add styles without ID. Styles enqueued via the WP dependency system will always have IDs.
+			if ( ! ownerNode.id ) {
+				return accumulator;
+			}
+
 			// Don't try to add core WP styles. We are responsible for adding
 			// them. This compatibility layer is only meant to add styles added
 			// by plugins or themes.
@@ -44,8 +69,8 @@ export function getCompatibilityStyles() {
 				return accumulator;
 			}
 
-			// Don't try to add styles without ID. Styles enqueued via the WP dependency system will always have IDs.
-			if ( ! ownerNode.id ) {
+			// Don't try to add styles that are dependencies of core WP styles. These are not meant to be added directly.
+			if ( CORE_STYLE_HANDLES.has( normalizeHandle( ownerNode.id ) ) ) {
 				return accumulator;
 			}
 
@@ -67,7 +92,8 @@ export function getCompatibilityStyles() {
 							( selectorText.includes(
 								'.editor-styles-wrapper'
 							) ||
-								selectorText.includes( '.wp-block' ) )
+								// Excludes .wp-blocks and .wp-block-editor-* (admin shell).
+								/\.wp-block(?!s|-editor)/.test( selectorText ) )
 						);
 					}
 				);
