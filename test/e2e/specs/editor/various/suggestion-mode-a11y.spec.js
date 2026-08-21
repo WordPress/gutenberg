@@ -84,6 +84,10 @@ test.describe( 'Suggestion mode marker accessibility', () => {
 		// ARIA maps `insertion` to `<ins>`, so the run is at least exposed as
 		// changed rather than as plain text.
 		const decoration = marker.locator( 'span.wp-suggestion-a11y' );
+		// Exactly one: a marker run is decorated with a single reused format
+		// object so it stays one element. More would mean the run split, and
+		// every assertion below would be reading an arbitrary half of it.
+		await expect( decoration ).toHaveCount( 1 );
 		await expect( decoration ).toHaveAttribute( 'role', 'insertion' );
 
 		// The bracketing text is what actually says "this is proposed": most
@@ -132,6 +136,7 @@ test.describe( 'Suggestion mode marker accessibility', () => {
 		const decoration = paragraph.locator(
 			'mark.wp-suggestion[data-suggestion-type="del"] span.wp-suggestion-a11y'
 		);
+		await expect( decoration ).toHaveCount( 1 );
 		await expect( decoration ).toHaveAttribute( 'role', 'deletion' );
 		await expect
 			.poll( async () => ( await announcementsOf( decoration ) ).before )
