@@ -479,7 +479,7 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
  * @since 6.6.0 Deprecated bool argument $should_use_fluid_typography.
  * @since 6.7.0 Font size presets can enable fluid typography individually, even if it’s disabled globally.
  *
- * @param array $preset       {
+ * @param array      $preset   {
  *     Required. fontSizes preset value as seen in theme.json.
  *
  *     @type string           $name Name of the font size preset.

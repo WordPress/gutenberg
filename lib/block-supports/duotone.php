@@ -100,8 +100,8 @@ function gutenberg_tinycolor_bound01( $n, $max ) {
  *
  * @deprecated 6.3.0
  *
- * @param  mixed $n   Number of unknown type.
- * @return float      Value in the range [0,1].
+ * @param mixed $n Number of unknown type.
+ * @return float Value in the range [0,1].
  */
 function gutenberg_tinycolor_bound_alpha( $n ) {
 	_deprecated_function( __FUNCTION__, '6.3.0' );
@@ -122,8 +122,8 @@ function gutenberg_tinycolor_bound_alpha( $n ) {
  *
  * @deprecated 6.3.0
  *
- * @param  array $rgb_color RGB object.
- * @return array            Rounded and converted RGB object.
+ * @param array $rgb_color RGB object.
+ * @return array Rounded and converted RGB object.
  */
 function gutenberg_tinycolor_rgb_to_rgb( $rgb_color ) {
 	_deprecated_function( __FUNCTION__, '6.3.0' );
@@ -175,8 +175,8 @@ function gutenberg_tinycolor_hue_to_rgb( $p, $q, $t ) {
  *
  * @deprecated 6.3.0
  *
- * @param  array $hsl_color HSL object.
- * @return array            Rounded and converted RGB object.
+ * @param array $hsl_color HSL object.
+ * @return array Rounded and converted RGB object.
  */
 function gutenberg_tinycolor_hsl_to_rgb( $hsl_color ) {
 	_deprecated_function( __FUNCTION__, '6.3.0' );
@@ -214,8 +214,8 @@ function gutenberg_tinycolor_hsl_to_rgb( $hsl_color ) {
  *
  * @deprecated 6.3.0
  *
- * @param  string $color_str CSS color string.
- * @return array             RGB object.
+ * @param string $color_str CSS color string.
+ * @return array RGB object.
  */
 function gutenberg_tinycolor_string_to_rgb( $color_str ) {
 	_deprecated_function( __FUNCTION__, '6.3.0' );
@@ -371,8 +371,8 @@ function gutenberg_tinycolor_string_to_rgb( $color_str ) {
  *
  * @deprecated 6.3.0
  *
- * @param  array $preset Duotone preset value as seen in theme.json.
- * @return string        Duotone filter CSS id.
+ * @param array $preset Duotone preset value as seen in theme.json.
+ * @return string Duotone filter CSS id.
  */
 function gutenberg_get_duotone_filter_id( $preset ) {
 	_deprecated_function( __FUNCTION__, '6.3.0' );
@@ -384,8 +384,8 @@ function gutenberg_get_duotone_filter_id( $preset ) {
  *
  * @deprecated 6.3.0
  *
- * @param  array $preset Duotone preset value as seen in theme.json.
- * @return string        Duotone CSS filter property url value.
+ * @param array $preset Duotone preset value as seen in theme.json.
+ * @return string Duotone CSS filter property url value.
  */
 function gutenberg_get_duotone_filter_property( $preset ) {
 	_deprecated_function( __FUNCTION__, '6.3.0' );
@@ -397,8 +397,8 @@ function gutenberg_get_duotone_filter_property( $preset ) {
  *
  * @deprecated 6.3.0
  *
- * @param  array $preset Duotone preset value as seen in theme.json.
- * @return string        Duotone SVG filter.
+ * @param array $preset Duotone preset value as seen in theme.json.
+ * @return string Duotone SVG filter.
  */
 function gutenberg_get_duotone_filter_svg( $preset ) {
 	_deprecated_function( __FUNCTION__, '6.3.0' );

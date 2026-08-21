@@ -232,8 +232,8 @@ function gutenberg_get_registered_block_templates( $query ) {
 	 *
 	 * @since 5.9.0
 	 *
-	 * @param WP_Block_Template[] $query_result Array of found block templates.
-	 * @param array               $query {
+	 * @param WP_Block_Template[] $query_result  Array of found block templates.
+	 * @param array               $query         {
 	 *     Arguments to retrieve templates. All arguments are optional.
 	 *
 	 *     @type string[] $slug__in  List of slugs to include.
@@ -827,8 +827,8 @@ function gutenberg_get_block_templates( $output, $query = array(), $template_typ
 	 *
 	 * @since 5.9.0
 	 *
-	 * @param WP_Block_Template[] $query_result Array of found block templates.
-	 * @param array               $query {
+	 * @param WP_Block_Template[] $query_result  Array of found block templates.
+	 * @param array               $query         {
 	 *     Arguments to retrieve templates. All arguments are optional.
 	 *
 	 *     @type string[] $slug__in  List of slugs to include.

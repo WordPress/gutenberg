@@ -10,8 +10,8 @@
  *
  * @deprecated 6.6.0 Use `gutenberg_render_elements_class_name` instead.
  *
- * @param  string $block_content Rendered block content.
- * @return string                Filtered block content.
+ * @param string $block_content Rendered block content.
+ * @return string Filtered block content.
  */
 function gutenberg_render_elements_support( $block_content ) {
 	_deprecated_function( __FUNCTION__, '6.6.0', 'gutenberg_render_elements_class_name' );

@@ -652,7 +652,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 7.1.0
 	 *
 	 * @param mixed $viewport_settings Viewport settings from theme.json.
-	 * @param array      $options           {
+	 * @param array $options           {
 	 *     Optional. Options for generating media queries.
 	 *
 	 *     @type bool $include_desktop Whether to include the desktop media query. Default false.
@@ -917,11 +917,11 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Processes pseudo-selectors for any node (block or variation).
 	 *
-	 * @param array  $node The node data (block or variation).
-	 * @param string $base_selector The base selector.
-	 * @param array  $settings The theme settings.
-	 * @param string $block_name The block name.
-	 * @param array|null $block_metadata Metadata about the block to get styles for.
+	 * @param array      $node            The node data (block or variation).
+	 * @param string     $base_selector   The base selector.
+	 * @param array      $settings        The theme settings.
+	 * @param string     $block_name      The block name.
+	 * @param array|null $block_metadata  Metadata about the block to get styles for.
 	 * @param array|null $style_variation Style variation metadata.
 	 * @return array Array of pseudo-selector declarations.
 	 */
@@ -2111,7 +2111,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * Returns the global styles custom CSS for a single block.
 	 * This function is deprecated; please do not sync to core.
 	 *
-	 * @param array  $css The block css node.
+	 * @param array  $css      The block css node.
 	 * @param string $selector The block selector.
 	 *
 	 * @return string The global styles custom CSS for the block.
@@ -3005,13 +3005,13 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.6.0 Passing current theme JSON settings to wp_get_typography_font_size_value(). Using style engine to correctly fetch background CSS values.
 	 * @since 6.7.0 Allow ref resolution of background properties.
 	 *
-	 * @param array   $styles Styles to process.
-	 * @param array   $settings Theme settings.
-	 * @param array   $properties Properties metadata.
-	 * @param array   $theme_json Theme JSON array.
-	 * @param string  $selector The style block selector.
+	 * @param array   $styles           Styles to process.
+	 * @param array   $settings         Theme settings.
+	 * @param array   $properties       Properties metadata.
+	 * @param array   $theme_json       Theme JSON array.
+	 * @param string  $selector         The style block selector.
 	 * @param boolean $use_root_padding Whether to add custom properties at root level.
-	 * @return array  Returns the modified $declarations.
+	 * @return array Returns the modified $declarations.
 	 */
 	protected static function compute_style_properties( $styles, $settings = array(), $properties = null, $theme_json = null, $selector = null, $use_root_padding = null ) {
 		if ( empty( $styles ) ) {
@@ -3137,8 +3137,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.1.0 Added the `$theme_json` parameter.
 	 * @since 6.7.0 Added support for background image refs
 	 *
-	 * @param array $styles Styles subtree.
-	 * @param array $path   Which property to process.
+	 * @param array $styles     Styles subtree.
+	 * @param array $path       Which property to process.
 	 * @param array $theme_json Theme JSON array.
 	 * @return string|array Style property value.
 	 */
@@ -3512,7 +3512,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @param array $theme_json The theme.json converted to an array.
 	 * @param array $selectors  Optional list of selectors per block.
-	 * @param array $options {
+	 * @param array $options    {
 	 *     Optional. An array of options for now used for internal purposes only (may change without notice).
 	 *
 	 *     @type bool $include_block_style_variations Includes nodes for block style variations. Default false.
@@ -4601,7 +4601,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 5.9.0
 	 *
-	 * @param string $slug The slug we want to find a match from default presets.
+	 * @param string $slug      The slug we want to find a match from default presets.
 	 * @param array  $base_path The path to inspect. It's 'settings' by default.
 	 * @return string|null
 	 */
@@ -4651,8 +4651,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.6.0 Added support for block style variation element styles and $origin parameter.
 	 *
 	 * @param array  $theme_json Structure to sanitize.
-	 * @param string $origin    Optional. What source of data this object represents.
-	 *                          One of 'blocks', 'default', 'theme', or 'custom'. Default 'theme'.
+	 * @param string $origin     Optional. What source of data this object represents.
+	 *                           One of 'blocks', 'default', 'theme', or 'custom'. Default 'theme'.
 	 * @return array Sanitized structure.
 	 */
 	public static function remove_insecure_properties( $theme_json, $origin = 'theme' ) {
@@ -5741,7 +5741,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * It is recursive and modifies the input in-place.
 	 *
 	 * @since 6.3.0
-	 * @param array $tree   Input to process.
+	 * @param array $tree Input to process.
 	 * @return array The modified $tree.
 	 */
 	private static function resolve_custom_css_format( $tree ) {
@@ -5891,7 +5891,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * declarations instead of deriving it by subtracting the root selector from
 	 * the feature selector.
 	 *
-	 * @param array  $style_variation Style variation metadata.
+	 * @param array  $style_variation  Style variation metadata.
 	 * @param string $feature_selector CSS selector for the feature.
 	 * @return string Feature selector with block style variation selector added.
 	 */
