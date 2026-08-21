@@ -43,7 +43,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@base-ui/react": "^1.6.0",
+		"@base-ui/react": "^1.7.0",
 		"@daypicker/react": "^10.0.1",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/compose": "file:../compose",
@@ -55,13 +55,14 @@
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/style-runtime": "file:../style-runtime",
 		"@wordpress/theme": "file:../theme",
+		"@wordpress/warning": "file:../warning",
 		"clsx": "^2.1.1",
 		"date-fns": "^4.4.0",
 		"tabbable": "^6.4.0"
 	},
 	"devDependencies": {
-		"@storybook/addon-docs": "^10.4.3",
-		"@storybook/react-vite": "^10.4.3",
+		"@storybook/addon-docs": "^10.5.3",
+		"@storybook/react-vite": "^10.5.3",
 		"@testing-library/dom": "^10.4.1",
 		"@testing-library/jest-dom": "^6.9.1",
 		"@testing-library/react": "^16.3.2",
@@ -70,7 +71,7 @@
 		"@types/node": "^20.19.39",
 		"@wordpress/base-styles": "file:../base-styles",
 		"fast-glob": "^3.2.7",
-		"storybook": "^10.4.3"
+		"storybook": "^10.5.3"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

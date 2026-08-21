@@ -16,6 +16,7 @@
 
 ### Internal
 
+-   Update `@ariakit/react` to 0.4.37 ([#81080](https://github.com/WordPress/gutenberg/pull/81080)).
 -   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509), [#81514](https://github.com/WordPress/gutenberg/pull/81514), [#81516](https://github.com/WordPress/gutenberg/pull/81516))
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81515](https://github.com/WordPress/gutenberg/pull/81515))
 -   DataForm: Narrow the combobox control's `onChange` handler parameter back to `string | null`, following the upstream `ComboboxControl` type fix that removed the accidental `undefined` from the callback type. [#81568](https://github.com/WordPress/gutenberg/pull/81568)
@@ -25,6 +26,8 @@
 -   DataForm: Internalize `ValidatedToggleGroupControl` instead of unlocking it from the `@wordpress/components` private APIs. [#81450](https://github.com/WordPress/gutenberg/pull/81450)
 -   `ValidatedToggleGroupControl`: Use `--focus-color` for the error focus ring so ancestor overrides apply correctly ([#81242](https://github.com/WordPress/gutenberg/pull/81242)).
 -   DataForms: Simplify the `panel` layout field trigger. The row is now a plain layout container and the edit button owns the click handling, with its hit area stretched over the row for pointer users. Removes the row-level click/keydown handlers and the text-selection guard they needed. [#80689](https://github.com/WordPress/gutenberg/pull/80689)
+-   DataForm: Remove the vendored `ControlWithError` copy in favor of the `ControlWithError` component from `@wordpress/ui`. ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574))
+-   DataForm: Render the `date` control's validity message with `ValidityIndicator` from `@wordpress/ui` instead of hand-rolled markup styled by `@wordpress/components` global class names. ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574))
 
 ## 18.0.0 (2026-08-12)
 

@@ -4,7 +4,7 @@ import {
 	FocalPointPicker,
 	ResizableBox,
 	Spinner,
-	TextareaControl,
+	TextareaControl as WCTextareaControl,
 	TextControl,
 	CheckboxControl,
 	ToolbarButton,
@@ -185,7 +185,7 @@ function ContentOnlyControls( {
 					variant="toolbar"
 				>
 					<div className="wp-block-image__toolbar_content_textarea__container">
-						<TextareaControl
+						<WCTextareaControl
 							className="wp-block-image__toolbar_content_textarea"
 							label={ __( 'Alternative text' ) }
 							value={ attributes.alt || '' }
@@ -1006,7 +1006,7 @@ export default function Image( {
 									setAttributes( { alt: undefined } )
 								}
 							>
-								<TextareaControl
+								<WCTextareaControl
 									label={ __( 'Alternative text' ) }
 									value={ alt || '' }
 									onChange={ updateAlt }

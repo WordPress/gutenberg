@@ -8,8 +8,10 @@ The rule checks named imports and direct destructuring from `unlock( privateApis
 
 - `__experimentalInputControl` — [`InputControl` migration guide][inputcontrol-migration-guide]
 - `TextControl` — [`InputControl` migration guide][inputcontrol-migration-guide]
+- `TextareaControl` — [`TextareaControl` migration guide][textareacontrol-migration-guide]
 
 [inputcontrol-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-inputcontrol--migration-guide
+[textareacontrol-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-textareacontrol--migration-guide
 
 ## Rule details
 
