@@ -1,4 +1,5 @@
-.wp-block-query-no-results {
+// Lowest specificity so parent layout can still enforce width.
+:where(.wp-block-query-no-results) {
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
 }

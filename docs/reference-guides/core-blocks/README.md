@@ -824,7 +824,7 @@ Contains the block elements used to render content when no query results are fou
 -	**Name:** [core/query-no-results](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query-no-results/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
 -	**Ancestor:** core/query
--	**Supports:** align, anchor, color (background, gradients, link, text), interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** align, anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 
 ## Pagination
 
