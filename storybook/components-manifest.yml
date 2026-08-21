@@ -1,6 +1,152 @@
 # Auto-generated snapshot of the Storybook components manifest.
 # Do not edit by hand. Regenerate with `npm run storybook:manifest-snapshot`
 # and commit the result. See `storybook/README.md` for details.
+- name: Autocomplete.Root
+  props:
+      - actionsRef
+      - autoHighlight
+      - children
+      - defaultOpen
+      - defaultValue
+      - disabled
+      - filter
+      - filteredItems
+      - form
+      - grid
+      - highlightItemOnHover
+      - id
+      - inline
+      - inputRef
+      - items
+      - itemToStringValue
+      - keepHighlight
+      - limit
+      - locale
+      - loopFocus
+      - modal
+      - mode
+      - name
+      - onItemHighlighted
+      - onOpenChange
+      - onOpenChangeComplete
+      - onValueChange
+      - open
+      - openOnInputClick
+      - readOnly
+      - required
+      - submitOnItemClick
+      - value
+      - virtualized
+  subcomponents:
+      - name: Autocomplete.Clear
+        props:
+            - children
+            - className
+            - disabled
+            - keepMounted
+            - nativeButton
+            - render
+            - style
+      - name: Autocomplete.Collection
+        props:
+            - children
+      - name: Autocomplete.Empty
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Autocomplete.Group
+        props:
+            - children
+            - className
+            - items
+            - render
+            - style
+      - name: Autocomplete.GroupLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Autocomplete.Input
+        props:
+            - className
+            - disabled
+            - render
+            - style
+      - name: Autocomplete.InputGroup
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Autocomplete.Item
+        props:
+            - children
+            - className
+            - disabled
+            - index
+            - nativeButton
+            - onClick
+            - render
+            - style
+            - value
+      - name: Autocomplete.List
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Autocomplete.ListBody
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Autocomplete.Popup
+        props:
+            - children
+            - className
+            - finalFocus
+            - initialFocus
+            - portal
+            - positioner
+            - render
+            - style
+      - name: Autocomplete.Portal
+        props:
+            - className
+            - container
+            - keepMounted
+            - render
+            - style
+      - name: Autocomplete.Positioner
+        props:
+            - align
+            - alignOffset
+            - anchor
+            - arrowPadding
+            - className
+            - collisionAvoidance
+            - collisionBoundary
+            - collisionPadding
+            - disableAnchorTracking
+            - positionMethod
+            - render
+            - side
+            - sideOffset
+            - sticky
+            - style
+      - name: Autocomplete.Row
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Autocomplete.Value
+        props:
+            - children
 - name: Badge
   props:
       - children
@@ -53,6 +199,30 @@
       - text
       - tooltipPosition
       - variant
+- name: Calendar
+  props:
+      - autoFocus
+      - className
+      - defaultMonth
+      - defaultValue
+      - disabled
+      - disableNavigation
+      - endMonth
+      - fixedWeeks
+      - labels
+      - locale
+      - month
+      - numberOfMonths
+      - onMonthChange
+      - onValueChange
+      - render
+      - required
+      - showOutsideDays
+      - startMonth
+      - style
+      - timeZone
+      - value
+      - weekStartsOn
 - name: Card.Root
   props:
       - children
@@ -399,6 +569,78 @@
             - className
             - render
             - style
+- name: Field.Root
+  props:
+      - actionsRef
+      - children
+      - className
+      - disabled
+      - name
+      - render
+      - style
+  subcomponents:
+      - name: Field.Control
+        props:
+            - children
+            - className
+            - defaultValue
+            - onValueChange
+            - render
+            - style
+      - name: Field.Description
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Field.Details
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Field.Item
+        props:
+            - children
+            - className
+            - disabled
+            - render
+            - style
+      - name: Field.Label
+        props:
+            - children
+            - className
+            - hideFromVision
+            - nativeLabel
+            - render
+            - style
+            - variant
+- name: Fieldset.Root
+  props:
+      - children
+      - className
+      - render
+      - style
+  subcomponents:
+      - name: Fieldset.Description
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Fieldset.Details
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: Fieldset.Legend
+        props:
+            - children
+            - className
+            - hideFromVision
+            - render
+            - style
 - name: FormFileUpload
   props:
       - __next40pxDefaultSize
@@ -465,44 +707,47 @@
   props:
       - icon
       - size
-- name: InputControl
+- name: Input
   props:
-      - __next36pxDefaultSize
-      - __next40pxDefaultSize
-      - __unstableInputWidth
-      - __unstableStateReducer
+      - className
+      - defaultValue
       - disabled
-      - dragDirection
-      - dragThreshold
-      - help
-      - hideLabelFromVision
-      - isDragEnabled
-      - isPressEnterToChange
-      - label
-      - labelPosition
-      - onChange
-      - onDrag
-      - onDragEnd
-      - onDragStart
-      - onValidate
+      - onValueChange
       - prefix
+      - render
       - size
+      - style
       - suffix
       - type
       - value
+- name: InputControl
+  props:
+      - className
+      - defaultValue
+      - description
+      - details
+      - disabled
+      - hideLabelFromVision
+      - label
+      - onValueChange
+      - prefix
+      - render
+      - size
+      - style
+      - suffix
+      - type
+      - value
+- name: InputLayout
+  props:
+      - isBorderless
+      - prefix
+      - size
+      - suffix
+      - visuallyDisabled
   subcomponents:
-      - name: InputControlPrefixWrapper
+      - name: InputLayout.Slot
         props:
-            - as
-            - children
-            - size
-            - variant
-      - name: InputControlSuffixWrapper
-        props:
-            - as
-            - children
-            - size
-            - variant
+            - padding
 - name: ItemGroup
   props:
       - as
@@ -654,40 +899,6 @@
             - children
             - notices
             - onRemove
-- name: NumberControl
-  props:
-      - __next36pxDefaultSize
-      - __next40pxDefaultSize
-      - __unstableInputWidth
-      - __unstableStateReducer
-      - disabled
-      - dragDirection
-      - dragThreshold
-      - help
-      - hideHTMLArrows
-      - hideLabelFromVision
-      - isDragEnabled
-      - isPressEnterToChange
-      - isShiftStepEnabled
-      - label
-      - labelPosition
-      - max
-      - min
-      - onChange
-      - onDrag
-      - onDragEnd
-      - onDragStart
-      - onValidate
-      - prefix
-      - required
-      - shiftStep
-      - size
-      - spinControls
-      - spinFactor
-      - step
-      - suffix
-      - type
-      - value
 - name: Popover
   props:
       - __unstableForcePosition
@@ -717,7 +928,10 @@
       - variant
   subcomponents:
       - name: Popover.Slot
-        props: []
+        props:
+            - key
+            - name
+            - ref
 - name: ProgressBar
   props:
       - className
@@ -731,6 +945,33 @@
       - onChange
       - options
       - selected
+- name: RangeCalendar
+  props:
+      - autoFocus
+      - className
+      - defaultMonth
+      - defaultValue
+      - disabled
+      - disableNavigation
+      - endMonth
+      - excludeDisabled
+      - fixedWeeks
+      - labels
+      - locale
+      - max
+      - min
+      - month
+      - numberOfMonths
+      - onMonthChange
+      - onValueChange
+      - render
+      - required
+      - showOutsideDays
+      - startMonth
+      - style
+      - timeZone
+      - value
+      - weekStartsOn
 - name: RangeControl
   props:
       - __next40pxDefaultSize
@@ -947,25 +1188,29 @@
       - render
       - style
       - variant
+- name: Textarea
+  props:
+      - className
+      - defaultValue
+      - disabled
+      - onValueChange
+      - render
+      - rows
+      - style
+      - value
 - name: TextareaControl
   props:
-      - __nextHasNoMarginBottom
-      - help
-      - hideLabelFromVision
-      - label
-      - onChange
-      - rows
-      - value
-- name: TextControl
-  props:
-      - __next40pxDefaultSize
-      - __nextHasNoMarginBottom
       - className
-      - help
+      - defaultValue
+      - description
+      - details
+      - disabled
       - hideLabelFromVision
       - label
-      - onChange
-      - type
+      - onValueChange
+      - render
+      - rows
+      - style
       - value
 - name: TextHighlight
   props:
@@ -1141,6 +1386,11 @@
       - unit
       - units
       - value
+- name: ValidityIndicator
+  props:
+      - id
+      - message
+      - type
 - name: VisuallyHidden
   props:
       - children

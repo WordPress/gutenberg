@@ -141,7 +141,7 @@ test.describe( 'Collaboration - Undo with a navigation block', () => {
 		// exists in an empty document, so the navigation block cannot
 		// be followed by a click on it.
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( USER_A_FIRST_PARAGRAPH );
 		await page.keyboard.press( 'Enter' );

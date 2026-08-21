@@ -14,8 +14,8 @@ A _host_ is any context that renders widgets: a dashboard, a sidebar, a plugin p
 
 The shapes a host reads to discover and render a widget:
 
-- `WidgetType`, `WidgetName`, `WidgetIcon`
-- `WidgetRenderProps`, `ResolveWidgetModule`, `WidgetModuleRecord`
+-   `WidgetType`, `WidgetName`, `WidgetIcon`
+-   `WidgetRenderProps`, `ResolveWidgetModule`, `WidgetModuleRecord`
 
 Defined here and re-exported nowhere else.
 
@@ -23,7 +23,7 @@ Defined here and re-exported nowhere else.
 
 `WidgetAttributeField< Item >` is for widget authors, not hosts. It narrows a DataViews `Field.id` to the keys of the widget's attribute object, so a typo'd field `id` is caught while authoring.
 
-It also accepts an optional `relevance` hint (`'high' | 'low'`). The widget declares importance, not a surface. See **Anatomy** for how hosts may use it.
+It also accepts an optional `relevance` hint (`'high' | 'medium' | 'low'`). The widget declares importance, not a surface. See **Anatomy** for how hosts may use it.
 
 How a widget is authored (its folder, `widget.json`, `widget.ts`, `render.tsx`) is covered in **System Architecture**.
 
@@ -31,8 +31,8 @@ How a widget is authored (its folder, `widget.json`, `widget.ts`, `render.tsx`) 
 
 `useWidgetTypes( records )` takes host-supplied widget-module records, imports each record's metadata module, and returns:
 
-- `WidgetType[]`
-- `isResolvingWidgetTypes`, which stays `true` before records are supplied (`null` or `undefined`) and while their metadata modules are still importing
+-   `WidgetType[]`
+-   `isResolvingWidgetTypes`, which stays `true` before records are supplied (`null` or `undefined`) and while their metadata modules are still importing
 
 The hook reaches for no store or endpoint. The host fetches the records however it wants and passes them in.
 

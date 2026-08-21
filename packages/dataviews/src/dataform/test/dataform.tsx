@@ -609,6 +609,76 @@ describe( 'DataForm component', () => {
 			);
 			expect( titleEditField ).toBeInTheDocument();
 		} );
+
+		it( 'should describe an invalid field trigger with its error message', async () => {
+			const user = userEvent.setup();
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fields }
+					form={ formPanelMode }
+					data={ { ...data, title: '' } }
+					validity={ {
+						title: {
+							required: {
+								type: 'invalid' as const,
+								message: 'Title is required.',
+							},
+						},
+					} }
+				/>
+			);
+
+			// The row only reveals the error after its flyout has been
+			// open once.
+			await user.click( fieldsSelector.title.view() );
+			await user.keyboard( '{Escape}' );
+			const titleButton = await screen.findByRole( 'button', {
+				name: 'Edit Title (has errors)',
+			} );
+			expect( titleButton ).toHaveAccessibleDescription(
+				/Title is required\./
+			);
+		} );
+
+		it( 'should describe an invalid field trigger when labels are hidden', async () => {
+			const user = userEvent.setup();
+			const formPanelNoLabel = {
+				...form,
+				layout: {
+					type: 'panel',
+					labelPosition: 'none',
+				} as const,
+			};
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fields }
+					form={ formPanelNoLabel }
+					data={ { ...data, title: '' } }
+					validity={ {
+						title: {
+							required: {
+								type: 'invalid' as const,
+								message: 'Title is required.',
+							},
+						},
+					} }
+				/>
+			);
+
+			// The row only reveals the error after its flyout has been
+			// open once.
+			await user.click( fieldsSelector.title.view() );
+			await user.keyboard( '{Escape}' );
+
+			const titleButton = await screen.findByRole( 'button', {
+				name: 'Edit Title (has errors)',
+			} );
+			expect( titleButton ).toHaveAccessibleDescription(
+				/Title is required\./
+			);
+		} );
 	} );
 
 	describe( 'in card mode', () => {
@@ -998,6 +1068,125 @@ describe( 'DataForm component', () => {
 			);
 
 			expect( speak ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'datetime fields', () => {
+		const datetimeFields = [
+			{
+				id: 'date',
+				label: 'Date',
+				type: 'datetime' as const,
+				isValid: { required: true },
+			},
+		];
+
+		const datetimeForm = {
+			fields: [ 'date' ],
+		};
+
+		const dayButton = ( date: Date ) =>
+			screen.getByRole( 'button', {
+				name: new RegExp(
+					new Intl.DateTimeFormat( 'en-US', {
+						weekday: 'long',
+						year: 'numeric',
+						month: 'long',
+						day: 'numeric',
+					} ).format( date )
+				),
+			} );
+
+		// Waits out any timeouts scheduled by the control, so that a
+		// duplicate update scheduled for a later tick is not missed.
+		const flushTimeouts = () =>
+			act(
+				() => new Promise( ( resolve ) => setTimeout( resolve, 10 ) )
+			);
+
+		function ControlledForm( {
+			onChange: onChangeProp = noop,
+		}: {
+			onChange?: ( edits: { date?: string } ) => void;
+		} ) {
+			const [ item, setItem ] = useState< {
+				date: string | undefined;
+			} >( { date: '2026-01-10T10:00:00.000Z' } );
+			return (
+				<Dataform
+					onChange={ ( edits ) => {
+						onChangeProp( edits );
+						setItem( ( prev ) => ( { ...prev, ...edits } ) );
+					} }
+					fields={ datetimeFields }
+					form={ datetimeForm }
+					data={ item }
+				/>
+			);
+		}
+
+		it( 'should call onChange once when a date is selected in the calendar', async () => {
+			const onChange = jest.fn();
+			const user = userEvent.setup();
+			render(
+				<Dataform
+					onChange={ onChange }
+					fields={ datetimeFields }
+					form={ datetimeForm }
+					data={ { date: '2026-01-10T10:00:00.000Z' } }
+				/>
+			);
+
+			await user.click( dayButton( new Date( 2026, 0, 15 ) ) );
+			await flushTimeouts();
+
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
+			// The time is preserved from the previous value.
+			expect( onChange ).toHaveBeenCalledWith( {
+				date: '2026-01-15T10:00:00.000Z',
+			} );
+			expect( speak ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should call onChange once and show the required error when the date is cleared, keeping focus on the day button', async () => {
+			const onChange = jest.fn();
+			const user = userEvent.setup();
+
+			render( <ControlledForm onChange={ onChange } /> );
+
+			// Clicking the selected day deselects it.
+			await user.click( dayButton( new Date( 2026, 0, 10 ) ) );
+			await flushTimeouts();
+
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
+			expect( onChange ).toHaveBeenCalledWith( { date: undefined } );
+			expect(
+				await screen.findByText( 'Constraints not satisfied' )
+			).toBeVisible();
+			// Focus does not move, so the error is announced instead.
+			expect( speak ).toHaveBeenCalledWith( 'Constraints not satisfied' );
+			expect( dayButton( new Date( 2026, 0, 10 ) ) ).toHaveFocus();
+		} );
+
+		it( 'should clear the revealed error when a valid date is selected in the calendar', async () => {
+			const user = userEvent.setup();
+
+			render( <ControlledForm /> );
+
+			// Clicking the selected day deselects it, making the field invalid.
+			await user.click( dayButton( new Date( 2026, 0, 10 ) ) );
+			await flushTimeouts();
+
+			expect(
+				await screen.findByText( 'Constraints not satisfied' )
+			).toBeVisible();
+
+			await user.click( dayButton( new Date( 2026, 0, 15 ) ) );
+			await flushTimeouts();
+
+			expect(
+				screen.queryByText( 'Constraints not satisfied' )
+			).not.toBeInTheDocument();
 		} );
 	} );
 } );

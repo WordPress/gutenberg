@@ -101,12 +101,18 @@ function BlockPopoverInbetween( {
 				} else if ( isVertical ) {
 					// vertical
 					top = previousRect ? previousRect.bottom : nextRect.top;
-					width = previousRect ? previousRect.width : nextRect.width;
+					width =
+						nextRect && previousRect
+							? ( previousRect.width + nextRect.width ) / 2
+							: ( previousRect || nextRect ).width;
 					height =
 						nextRect && previousRect
 							? nextRect.top - previousRect.bottom
 							: 0;
-					left = previousRect ? previousRect.left : nextRect.left;
+					left =
+						nextRect && previousRect
+							? ( previousRect.left + nextRect.left ) / 2
+							: ( previousRect || nextRect ).left;
 				} else {
 					top = previousRect ? previousRect.top : nextRect.top;
 					height = previousRect

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.53.0 (2026-08-12)
+
 ### Bug Fixes
 
 -   `Metrics.startTracing()`: Run a trivial script in every frame once tracing is on, to absorb the isolate interrupt that enabling the V8 sampling profiler queues. Its cost otherwise lands in the first thing the test does, usually the interaction being measured, and grows through a spec's iterations: a stable 220ms interaction reported anywhere from 200ms to 650ms ([#81264](https://github.com/WordPress/gutenberg/pull/81264)).

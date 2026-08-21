@@ -55,7 +55,7 @@ function calculateRamp( {
 	};
 } ) {
 	const rampResults = {} as Record< keyof Ramp, string >;
-	let warnings: string[] | undefined;
+	let warnings: ( keyof Ramp )[] | undefined;
 	let maxDeficit = -Infinity;
 	let maxDeficitDirection: RampDirection = 'lighter';
 	let maxDeficitStep;
@@ -255,6 +255,7 @@ export function buildRamp(
 	} );
 
 	let bestRamp = rampResults;
+	let bestWarnings = warnings;
 
 	if ( maxDeficit > CONTRAST_EPSILON && rescaleToFitContrastTargets ) {
 		const iterSteps = stepsForStep( maxDeficitStep!, config );
@@ -299,14 +300,16 @@ export function buildRamp(
 		);
 
 		// Calculate the final ramp with adjusted seed.
-		bestRamp = calculateRamp( {
+		const finalResult = calculateRamp( {
 			seed: bestSeed,
 			sortedSteps,
 			config,
 			mainDir,
 			oppDir,
 			pinLightness,
-		} ).rampResults;
+		} );
+		bestRamp = finalResult.rampResults;
+		bestWarnings = finalResult.warnings;
 	}
 
 	// Swap surface1 and surface3 for darker ramps to maintain visual elevation hierarchy.
@@ -320,7 +323,7 @@ export function buildRamp(
 
 	return {
 		ramp: bestRamp,
-		warnings,
+		warnings: bestWarnings,
 		direction: mainDir,
 	};
 }

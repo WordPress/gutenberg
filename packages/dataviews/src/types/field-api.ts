@@ -166,41 +166,6 @@ export type EditConfigDatetime = {
 };
 
 /**
- * Edit configuration for the rich text control.
- */
-export type EditConfigRichText = {
-	control: 'richtext';
-	/**
-	 * Additional class name applied to the control.
-	 */
-	className?: string;
-	/**
-	 * Block client ID, when the control is rendered for a specific block.
-	 */
-	clientId?: string;
-	/**
-	 * Format types the control allows. Defaults to all registered formats.
-	 */
-	allowedFormats?: string[];
-	/**
-	 * Disable all formatting, rendering plain text only.
-	 */
-	disableFormats?: boolean;
-	/**
-	 * Disable interactive formats such as links.
-	 */
-	withoutInteractiveFormatting?: boolean;
-	/**
-	 * Preserve white space in the value.
-	 */
-	preserveWhiteSpace?: boolean;
-	/**
-	 * Disable line breaks (Enter key).
-	 */
-	disableLineBreaks?: boolean;
-};
-
-/**
  * Edit configuration for other control types (excluding 'text', 'textarea', and 'datetime').
  */
 export type EditConfigGeneric = {
@@ -215,7 +180,6 @@ export type EditConfig =
 	| EditConfigTextarea
 	| EditConfigText
 	| EditConfigDatetime
-	| EditConfigRichText
 	| EditConfigGeneric;
 
 export type Field< Item > = {
