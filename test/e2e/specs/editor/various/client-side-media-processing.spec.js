@@ -404,18 +404,31 @@ test.describe( 'Client-side media processing', () => {
 		const fullSize = await probePngUrl( media.source_url );
 		expect( fullSize.colorType ).toBe( PNG_COLOR_TYPE_INDEXED );
 
-		const large = media.media_details.sizes.large;
-		expect( large ).toBeDefined();
+		// `full` is the uploaded original, already checked above.
+		const subSizes = Object.entries( media.media_details.sizes ).filter(
+			( [ sizeName ] ) => 'full' !== sizeName
+		);
+		expect( subSizes.map( ( [ sizeName ] ) => sizeName ) ).toContain(
+			'large'
+		);
 
-		const subSize = await probePngUrl( large.source_url );
+		for ( const [ sizeName, size ] of subSizes ) {
+			const subSize = await probePngUrl( size.source_url );
 
-		// The sub-size must stay indexed rather than being re-encoded as
-		// truecolour RGB/RGBA.
-		expect( subSize.colorType ).toBe( PNG_COLOR_TYPE_INDEXED );
+			// Every sub-size must stay indexed rather than being re-encoded
+			// as truecolour RGB/RGBA.
+			expect(
+				subSize.colorType,
+				`sub-size "${ sizeName }" must stay indexed`
+			).toBe( PNG_COLOR_TYPE_INDEXED );
 
-		// And the user-visible symptom: a downscaled sub-size must not be
-		// bigger than the full-size image it was generated from.
-		expect( subSize.byteLength ).toBeLessThan( fullSize.byteLength );
+			// And the user-visible symptom: a downscaled sub-size must not be
+			// bigger than the full-size image it was generated from.
+			expect(
+				subSize.byteLength,
+				`sub-size "${ sizeName }" must be smaller than the original`
+			).toBeLessThan( fullSize.byteLength );
+		}
 	} );
 
 	test( 'scales oversized images and generates the standard sub-sizes', async ( {
