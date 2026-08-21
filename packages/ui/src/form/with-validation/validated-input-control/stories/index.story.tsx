@@ -2,13 +2,13 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import { seen, unseen } from '@wordpress/icons';
 import { ValidatedInputControl } from '../index';
-import { Button } from '../../../button';
-import { IconButton } from '../../../icon-button';
-import { InputLayout } from '../../primitives/input-layout';
+import { Button } from '../../../../button';
+import { IconButton } from '../../../../icon-button';
+import { InputLayout } from '../../../primitives/input-layout';
 
 const meta: Meta< typeof ValidatedInputControl > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Form/ValidatedInputControl',
+	title: 'Design System/Components/Form/With Validation/ValidatedInputControl',
 	component: ValidatedInputControl,
 	argTypes: {
 		customValidity: { control: false },
