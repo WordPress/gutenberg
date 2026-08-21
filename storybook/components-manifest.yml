@@ -122,7 +122,22 @@
             - render
             - style
       - name: Autocomplete.Positioner
-        props: []
+        props:
+            - align
+            - alignOffset
+            - anchor
+            - arrowPadding
+            - className
+            - collisionAvoidance
+            - collisionBoundary
+            - collisionPadding
+            - disableAnchorTracking
+            - positionMethod
+            - render
+            - side
+            - sideOffset
+            - sticky
+            - style
       - name: Autocomplete.Row
         props:
             - children
@@ -130,7 +145,8 @@
             - render
             - style
       - name: Autocomplete.Value
-        props: []
+        props:
+            - children
 - name: Badge
   props:
       - children
@@ -584,7 +600,12 @@
             - render
             - style
       - name: Field.Item
-        props: []
+        props:
+            - children
+            - className
+            - disabled
+            - render
+            - style
       - name: Field.Label
         props:
             - children
@@ -907,7 +928,10 @@
       - variant
   subcomponents:
       - name: Popover.Slot
-        props: []
+        props:
+            - key
+            - name
+            - ref
 - name: ProgressBar
   props:
       - className

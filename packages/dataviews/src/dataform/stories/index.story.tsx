@@ -7,6 +7,7 @@ import LayoutRowComponent from './layout-row';
 import LayoutPanelComponent from './layout-panel';
 import DataAdapterComponent from './data-adapter';
 import ValidationComponent from './validation';
+import ValidationPanelComponent from './validation-panel';
 import VisibilityComponent from './visibility';
 
 const meta = {
@@ -169,6 +170,10 @@ export const Validation = {
 		pattern: false,
 		minMax: false,
 	},
+};
+
+export const ValidationPanelErrorIndicator = {
+	render: ValidationPanelComponent,
 };
 
 export const Visibility = {
