@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { useDispatch } from '@wordpress/data';
 import PlaylistTrackEdit from '../edit';
 import { PlaylistContext } from '../../playlist/context';
@@ -52,6 +52,10 @@ jest.mock( '../../utils/hooks', () => ( {
 	useUploadMediaFromBlobURL: jest.fn(),
 } ) );
 
+// The handler only forwards the message to a notice, so its text is
+// irrelevant to what these tests check.
+const UPLOAD_ERROR = 'Upload failed.';
+
 const defaultAttributes = {
 	id: 1,
 	src: 'https://example.com/song.mp3',
@@ -66,12 +70,14 @@ const defaultAttributes = {
 function renderEdit( props = {} ) {
 	const setAttributes = jest.fn();
 	const setCurrentTrackClientId = props.setCurrentTrackClientId || jest.fn();
+	const removeTrack = props.removeTrack || jest.fn();
 
 	render(
 		<PlaylistContext.Provider
 			value={ {
 				currentTrackClientId: props.currentTrackClientId ?? null,
 				setCurrentTrackClientId,
+				removeTrack,
 			} }
 		>
 			<PlaylistTrackEdit
@@ -91,7 +97,7 @@ function renderEdit( props = {} ) {
 		</PlaylistContext.Provider>
 	);
 
-	return { setAttributes, setCurrentTrackClientId };
+	return { setAttributes, setCurrentTrackClientId, removeTrack };
 }
 
 describe( 'PlaylistTrackEdit', () => {
@@ -101,6 +107,43 @@ describe( 'PlaylistTrackEdit', () => {
 			createErrorNotice: jest.fn(),
 		} );
 		useUploadMediaFromBlobURL.mockClear();
+	} );
+
+	it( 'shows the title control for a single selected playlist track', () => {
+		renderEdit( { isSelected: true } );
+
+		expect(
+			screen.getByRole( 'textbox', { name: 'Title' } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'shows the replace track control for a single selected playlist track', () => {
+		renderEdit( { isSelected: true } );
+
+		expect( mockMediaReplaceFlowProps ).toBeDefined();
+	} );
+
+	it( 'does not show the replace track control when multiple playlist tracks are selected', () => {
+		renderEdit( { isSelected: false } );
+
+		expect( mockMediaReplaceFlowProps ).toBeUndefined();
+	} );
+
+	it( 'does not show the title control when multiple playlist tracks are selected', () => {
+		// The track inspector only renders for the selected block, or for the
+		// first block of a same-type multi-selection, where `isSelected` is
+		// false.
+		renderEdit( { isSelected: false } );
+
+		expect(
+			screen.queryByRole( 'textbox', { name: 'Title' } )
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByRole( 'textbox', { name: 'Artist' } )
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'textbox', { name: 'Album' } )
+		).toBeInTheDocument();
 	} );
 
 	it( 'allows the track image alternative text to be edited', () => {
@@ -187,8 +230,62 @@ describe( 'PlaylistTrackEdit', () => {
 		).toBeInTheDocument();
 	} );
 
+	it( 'removes the track when its initial upload fails', () => {
+		const createErrorNotice = jest.fn();
+		const removeBlock = jest.fn();
+		useDispatch.mockReturnValue( { createErrorNotice, removeBlock } );
+
+		const { removeTrack } = renderEdit( {
+			attributes: {
+				blob: 'blob:https://example.com/temporary-track',
+				id: undefined,
+				length: undefined,
+				src: undefined,
+			},
+			clientId: 'temporary-track',
+		} );
+
+		const { onError } = useUploadMediaFromBlobURL.mock.calls[ 0 ][ 0 ];
+		act( () => {
+			onError( UPLOAD_ERROR );
+		} );
+
+		expect( createErrorNotice ).toHaveBeenCalled();
+		// The playlist owns its inner blocks: removing the track directly
+		// would take an unmodified playlist with it.
+		expect( removeTrack ).toHaveBeenCalledWith( 'temporary-track' );
+		expect( removeBlock ).not.toHaveBeenCalled();
+	} );
+
+	// `onUploadError` also fires when replacing an existing track's media, so
+	// removing the block unconditionally would discard the original track.
+	it( 'keeps a track that already has a source when an upload fails', () => {
+		const createErrorNotice = jest.fn();
+		const removeBlock = jest.fn();
+		useDispatch.mockReturnValue( { createErrorNotice, removeBlock } );
+
+		const { setAttributes } = renderEdit( {
+			clientId: 'existing-track',
+			isSelected: true,
+		} );
+
+		// A failed replacement is reported by MediaReplaceFlow, not the
+		// blob uploader, which never runs for a track that has a source.
+		act( () => {
+			mockMediaReplaceFlowProps.onError( UPLOAD_ERROR );
+		} );
+
+		expect( createErrorNotice ).toHaveBeenCalled();
+		expect( removeBlock ).not.toHaveBeenCalled();
+		// The original track is left untouched, so its source still plays.
+		expect( setAttributes ).not.toHaveBeenCalled();
+		expect(
+			screen.getByRole( 'button', { name: /Song One/ } )
+		).toBeInTheDocument();
+	} );
+
 	it( 'preserves the current track source when a replacement upload fails', () => {
-		const { setAttributes } = renderEdit();
+		const { setAttributes } = renderEdit( { isSelected: true } );
 
 		mockMediaReplaceFlowProps.onSelect();
 
@@ -199,7 +296,7 @@ describe( 'PlaylistTrackEdit', () => {
 	} );
 
 	it( 'accepts raw uploaded attachment data when replacing a track', () => {
-		const { setAttributes } = renderEdit();
+		const { setAttributes } = renderEdit( { isSelected: true } );
 
 		mockMediaReplaceFlowProps.onSelect( {
 			id: 2,

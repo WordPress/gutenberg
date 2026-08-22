@@ -174,6 +174,9 @@ export const AllPlacements: StoryObj< typeof Popover > = {
 	// Excluding placement and position since they all possible values
 	// are passed directly in code.
 	parameters: {
+		// FIXME: All Placements: scrollable demo region is not keyboard-accessible (scrollable-region-focusable).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
 		controls: {
 			exclude: [ 'placement', 'position' ],
 		},

@@ -327,6 +327,9 @@ const meta: Meta< typeof WidgetDashboard > = {
 	component: WidgetDashboard,
 	tags: [ 'status-experimental' ],
 	parameters: {
+		// FIXME: Sortable widget chrome nests interactive controls (nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',

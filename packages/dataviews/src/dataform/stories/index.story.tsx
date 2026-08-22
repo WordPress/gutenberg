@@ -85,6 +85,11 @@ export const LayoutPanel = {
 };
 
 export const LayoutRegular = {
+	parameters: {
+		// FIXME: Story renders unlabeled form controls (label).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: LayoutRegularComponent,
 	argTypes: {
 		labelPosition: {
@@ -103,6 +108,11 @@ export const LayoutRegular = {
 };
 
 export const LayoutRow = {
+	parameters: {
+		// FIXME: Story renders unlabeled form controls (label).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: LayoutRowComponent,
 	argTypes: {
 		alignment: {
@@ -121,6 +131,11 @@ export const LayoutMixed = {
 };
 
 export const Validation = {
+	parameters: {
+		// FIXME: Error-delegate inputs are unlabeled (label).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: ValidationComponent,
 	argTypes: {
 		layout: {

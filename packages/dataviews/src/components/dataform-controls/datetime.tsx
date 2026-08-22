@@ -41,34 +41,28 @@ function CalendarDateTimeControl< Item >( {
 	const disabled = field.isDisabled( { item: data, field } );
 	const fieldValue = getValue( { item: data } );
 	const value = typeof fieldValue === 'string' ? fieldValue : undefined;
-	const {
-		timezone: { string: timezoneString },
-	} = getSettings();
+	const { timezone } = getSettings();
+	const timeZone = timezone.string || dateI18n( 'P' );
 
 	const [ calendarMonth, setCalendarMonth ] = useState< Date >( () => {
 		const parsedDate = parseDateTime( value );
-		// Default to current month
-		return toCalendarDate( parsedDate || new Date(), timezoneString );
+		return toCalendarDate( parsedDate || new Date(), timeZone );
 	} );
-	// Follow the value when it changes, so that a change from outside the
-	// control, e.g. an undo, a reset, or switching the edited item, brings
-	// the selection into view. Months are compared in the calendar's time
-	// zone: near a month boundary, a date can belong to a different month
-	// there than in the browser's time zone.
+	// Follow external value changes in the same timezone frame as the calendar.
 	useEffect( () => {
 		const parsedDate = parseDateTime( value );
 		if ( parsedDate ) {
-			const targetMonth = toCalendarDate( parsedDate, timezoneString );
+			const targetMonth = toCalendarDate( parsedDate, timeZone );
 			setCalendarMonth( ( currentMonth ) =>
 				isSameMonth(
 					targetMonth,
-					toCalendarDate( currentMonth, timezoneString )
+					toCalendarDate( currentMonth, timeZone )
 				)
 					? currentMonth
 					: targetMonth
 			);
 		}
-	}, [ value, timezoneString ] );
+	}, [ timeZone, value ] );
 
 	const inputControlRef = useRef< HTMLInputElement >( null );
 	const validationTimeoutRef =
@@ -91,16 +85,14 @@ function CalendarDateTimeControl< Item >( {
 	const onSelectDate = useCallback(
 		( newDate: Date | null ) => {
 			if ( newDate ) {
-				// Extract the date part in WP timezone from the calendar selection
+				// Extract the date part in the WordPress timezone.
 				const wpDate = dateI18n( 'Y-m-d', newDate );
 
-				// Preserve time if it exists in current value, otherwise use current time
-				let wpTime: string;
-				if ( value ) {
-					wpTime = dateI18n( 'H:i', getDate( value ) );
-				} else {
-					wpTime = dateI18n( 'H:i', newDate );
-				}
+				// Preserve time if it exists. A new value starts at midnight in
+				// the site timezone.
+				const wpTime = value
+					? dateI18n( 'H:i', getDate( value ) )
+					: '00:00';
 
 				// Combine date and time in WP timezone and convert to ISO
 				const finalDateTime = getDate( `${ wpDate }T${ wpTime }` );
@@ -147,15 +139,13 @@ function CalendarDateTimeControl< Item >( {
 				// Update calendar month to match
 				const parsedDate = parseDateTime( dateTime.toISOString() );
 				if ( parsedDate ) {
-					setCalendarMonth(
-						toCalendarDate( parsedDate, timezoneString )
-					);
+					setCalendarMonth( toCalendarDate( parsedDate, timeZone ) );
 				}
 			} else {
 				onChangeCallback( undefined );
 			}
 		},
-		[ onChangeCallback, timezoneString ]
+		[ onChangeCallback, timeZone ]
 	);
 
 	const { format: fieldFormat } = field;
@@ -212,7 +202,7 @@ function CalendarDateTimeControl< Item >( {
 						onValueChange={ onSelectDate }
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
-						timeZone={ timezoneString || undefined }
+						timeZone={ timeZone }
 						weekStartsOn={ weekStartsOn }
 						disabled={ disabled || disabledMatchers }
 					/>
