@@ -27,18 +27,29 @@ const transforms = {
 			type: 'block',
 			blocks: [ 'core/audio' ],
 			isMatch: ( {}, block ) =>
-				block.innerBlocks.length === 1 &&
-				block.innerBlocks[ 0 ].name === 'core/playlist-track',
-			transform: ( { style, ...attributes }, [ track ] ) =>
-				createBlock( 'core/audio', {
-					...attributes,
-					...( style?.spacing && {
-						style: { spacing: style.spacing },
-					} ),
-					blob: track.attributes.blob,
-					id: track.attributes.id,
-					src: track.attributes.src,
-				} ),
+				block.innerBlocks.length > 0 &&
+				block.innerBlocks.every(
+					( { name } ) => name === 'core/playlist-track'
+				),
+			transform: ( { style, ...attributes }, tracks ) => {
+				const { anchor, caption, ...attributesWithoutContent } =
+					attributes;
+				const hasMultipleTracks = tracks.length > 1;
+
+				return tracks.map( ( track ) =>
+					createBlock( 'core/audio', {
+						...( hasMultipleTracks
+							? attributesWithoutContent
+							: attributes ),
+						...( style?.spacing && {
+							style: { spacing: style.spacing },
+						} ),
+						blob: track.attributes.blob,
+						id: track.attributes.id,
+						src: track.attributes.src,
+					} )
+				);
+			},
 		},
 	],
 };

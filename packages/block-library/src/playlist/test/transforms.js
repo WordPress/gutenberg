@@ -170,15 +170,62 @@ describe( 'Playlist transforms', () => {
 		);
 	} );
 
-	it( 'does not offer Playlist to Audio for multiple tracks', () => {
-		const playlist = createBlock( 'core/playlist', {}, [
-			createBlock( 'core/playlist-track', {
+	it( 'converts a multi-track Playlist into multiple Audio blocks', () => {
+		const playlist = createBlock(
+			'core/playlist',
+			{
+				align: 'wide',
+				anchor: 'my-playlist',
+				caption: 'A playlist caption',
+				style: { spacing: { margin: { top: '1rem' } } },
+			},
+			[
+				createBlock( 'core/playlist-track', {
+					blob: 'blob:https://example.com/first-track',
+					id: 123,
+					src: 'https://example.com/first-track.mp3',
+				} ),
+				createBlock( 'core/playlist-track', {
+					id: 456,
+					src: 'https://example.com/second-track.mp3',
+				} ),
+			]
+		);
+
+		expect( getPossibleBlockTransformations( [ playlist ] ) ).toEqual(
+			expect.arrayContaining( [
+				expect.objectContaining( { name: 'core/audio' } ),
+			] )
+		);
+
+		const audioBlocks = switchToBlockType( playlist, 'core/audio' );
+
+		expect( audioBlocks ).toHaveLength( 2 );
+		expect( audioBlocks[ 0 ] ).toMatchObject( {
+			name: 'core/audio',
+			attributes: {
+				align: 'wide',
+				blob: 'blob:https://example.com/first-track',
+				id: 123,
 				src: 'https://example.com/first-track.mp3',
-			} ),
-			createBlock( 'core/playlist-track', {
+				style: { spacing: { margin: { top: '1rem' } } },
+			},
+		} );
+		expect( audioBlocks[ 0 ].attributes ).not.toHaveProperty( 'anchor' );
+		expect( audioBlocks[ 0 ].attributes.caption.toString() ).toBe( '' );
+		expect( audioBlocks[ 1 ] ).toMatchObject( {
+			name: 'core/audio',
+			attributes: {
+				align: 'wide',
+				id: 456,
 				src: 'https://example.com/second-track.mp3',
-			} ),
-		] );
+				style: { spacing: { margin: { top: '1rem' } } },
+			},
+		} );
+	} );
+
+	it( 'does not offer Playlist to Audio without tracks', () => {
+		const playlist = createBlock( 'core/playlist' );
 
 		expect( getPossibleBlockTransformations( [ playlist ] ) ).not.toEqual(
 			expect.arrayContaining( [
