@@ -86,7 +86,13 @@ const PlaylistEdit = ( {
 
 	const blockProps = useBlockProps();
 	const waveformPanelId = `${ clientId }-waveform`;
-	const { replaceInnerBlocks, selectBlock } = useDispatch( blockEditorStore );
+	const {
+		replaceInnerBlocks,
+		replaceBlocks,
+		insertBlocks,
+		selectBlock,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
@@ -163,6 +169,23 @@ const PlaylistEdit = ( {
 			setCurrentTrackClientId( validTracks[ 0 ].clientId );
 		}
 	}, [ currentTrackClientId, setCurrentTrackClientId, validTracks ] );
+
+	// Clean up placeholder tracks when reverting back to playlist placeholder state
+	useEffect( () => {
+		if ( validTracks.length > 0 || innerBlockTracks.length === 0 ) {
+			return;
+		}
+
+		// Remove any lingering placeholder track blocks
+		__unstableMarkNextChangeAsNotPersistent();
+		replaceInnerBlocks( clientId, [] );
+	}, [
+		clientId,
+		innerBlockTracks,
+		replaceInnerBlocks,
+		validTracks,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
 
 	const createTrackBlocks = useCallback(
 		( media ) => {
@@ -248,27 +271,36 @@ const PlaylistEdit = ( {
 				return;
 			}
 
-			const nextBlocks = [ ...validTracks, ...newBlocks ];
 			setCurrentTrackClientId( newBlocks[ 0 ].clientId );
-			replaceInnerBlocks( clientId, nextBlocks );
+			insertBlocks( newBlocks, undefined, clientId, false );
 			selectBlock( newBlocks[ 0 ].clientId );
 		},
 		[
 			clientId,
 			createTrackBlocks,
-			replaceInnerBlocks,
+			insertBlocks,
 			selectBlock,
 			setCurrentTrackClientId,
 			validTracks,
 		]
 	);
 
+	const removeTrack = useCallback(
+		( trackClientId ) => {
+			// Not `removeBlock`: it removes the container along with its
+			// last inner block, so this would take the playlist with it.
+			replaceBlocks( trackClientId, [] );
+		},
+		[ replaceBlocks ]
+	);
+
 	const playlistContext = useMemo(
 		() => ( {
 			currentTrackClientId,
 			setCurrentTrackClientId,
+			removeTrack,
 		} ),
-		[ currentTrackClientId, setCurrentTrackClientId ]
+		[ currentTrackClientId, setCurrentTrackClientId, removeTrack ]
 	);
 
 	// Get current track data by finding the track with matching client ID.

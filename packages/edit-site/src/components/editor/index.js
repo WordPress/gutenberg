@@ -25,7 +25,7 @@ import SaveButton from '../save-button';
 import SavePanel from '../save-panel';
 import SiteEditorMoreMenu from '../more-menu';
 import useEditorIframeProps from '../block-editor/use-editor-iframe-props';
-import { ViewportSync } from '../block-editor/use-viewport-sync';
+import { getDeviceType } from '../block-editor/viewport';
 import useEditorTitle from './use-editor-title';
 import useRevisionsURLSync from './use-revisions-url-sync';
 import { useIsSiteEditorLoading } from '../layout/hooks';
@@ -189,13 +189,17 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 					customSavePanel={ _isPreviewingTheme && <SavePanel /> }
 					iframeProps={ iframeProps }
 					onActionPerformed={ onActionPerformed }
+					initialViewport={
+						isEditMode
+							? getDeviceType( location.query.viewport )
+							: undefined
+					}
 					extraSidebarPanels={
 						! postWithTemplate && (
 							<PluginTemplateSettingPanel.Slot />
 						)
 					}
 				>
-					{ isEditMode && <ViewportSync /> }
 					{ isEditMode && (
 						<BackButton>
 							{ ( { length } ) =>

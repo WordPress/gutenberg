@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Commands: Add a command palette entry that opens the current post on the front end once it is published, labelled with the post type's `view_item` label ([#66720](https://github.com/WordPress/gutenberg/pull/66720)).
+-   Pre-publish panel: Remove the "Visibility" and "Publish" headings that repeated the title of the panel containing them. The publish date's reset action, which lived in the removed header, becomes a "Reset" button below the date picker, disabled but still focusable while the post is set to publish immediately ([#81806](https://github.com/WordPress/gutenberg/pull/81806)).
 
 ### Bug Fixes
 
@@ -18,6 +19,10 @@
 
 -   Check the `window.__experimentalEnableRealTimeCollaboration` flag set by the Real-Time Collaboration experiment, instead of `window._wpCollaborationEnabled`, when determining whether collaboration is enabled for the current post ([#80658](https://github.com/WordPress/gutenberg/pull/80658)).
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81515](https://github.com/WordPress/gutenberg/pull/81515))
+
+### Enhancements
+
+-   Add an `initialViewport` prop to the editor provider, setting the width each entity opens at from the breakpoints the theme defines, so a host no longer has to dispatch `setDeviceType` from outside the provider and race the settings it reads ([#81750](https://github.com/WordPress/gutenberg/pull/81750)).
 
 ## 14.53.0 (2026-08-12)
 
