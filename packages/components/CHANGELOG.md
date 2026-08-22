@@ -8,6 +8,7 @@
     -   `DropdownContentWrapper` ([#81522](https://github.com/WordPress/gutenberg/pull/81522))
     -   `ResizableBox` ([#81792](https://github.com/WordPress/gutenberg/pull/81792))
     -   `ComboboxControl`: ([#80471](https://github.com/WordPress/gutenberg/pull/80471))
+    -   `BoxControl` ([#80715](https://github.com/WordPress/gutenberg/pull/80715))
 
 ### Enhancements
 
