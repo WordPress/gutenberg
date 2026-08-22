@@ -503,7 +503,7 @@ Show login & logout links.
 -	**Name:** [core/loginout](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-loginout/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
 -	**Supports:** anchor, className, color (background, gradients, link, ~~text~~), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight)
--	**Attributes:** displayLoginAsForm, redirectToCurrent
+-	**Attributes:** displayLoginAsForm, loginUrl, redirectToCurrent
 
 ## Math
 

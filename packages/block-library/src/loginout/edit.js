@@ -1,5 +1,6 @@
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
+	TextControl,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -8,7 +9,7 @@ import { __ } from '@wordpress/i18n';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function LoginOutEdit( { attributes, setAttributes } ) {
-	const { displayLoginAsForm, redirectToCurrent } = attributes;
+	const { displayLoginAsForm, redirectToCurrent, loginUrl } = attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	return (
@@ -20,6 +21,7 @@ export default function LoginOutEdit( { attributes, setAttributes } ) {
 						setAttributes( {
 							displayLoginAsForm: false,
 							redirectToCurrent: true,
+							loginUrl: '',
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -60,6 +62,28 @@ export default function LoginOutEdit( { attributes, setAttributes } ) {
 							}
 						/>
 					</ToolsPanelItem>
+					{ ! displayLoginAsForm && (
+						<ToolsPanelItem
+							label={ __( 'Custom login URL' ) }
+							hasValue={ () => !! loginUrl }
+							onDeselect={ () =>
+								setAttributes( { loginUrl: '' } )
+							}
+						>
+							<TextControl
+								label={ __( 'Custom login URL' ) }
+								type="url"
+								autoComplete="off"
+								value={ loginUrl }
+								onChange={ ( value ) =>
+									setAttributes( { loginUrl: value } )
+								}
+								help={ __(
+									'Send visitors to a custom login page instead of the default WordPress login page.'
+								) }
+							/>
+						</ToolsPanelItem>
+					) }
 				</ToolsPanel>
 			</InspectorControls>
 			<div
