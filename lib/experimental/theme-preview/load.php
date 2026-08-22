@@ -11,13 +11,13 @@
 /**
  * Builds the theme preview page URL for a theme.
  *
- * The page renders the site's frontend with the theme named by the
- * `wp_theme_preview` query parameter. Core's `wp-includes/theme-previews.php`
- * reads that parameter on every request: it filters `stylesheet`/`template`
- * (for users with `switch_themes`), attaches an apiFetch middleware that
- * forwards the parameter on every REST request, and prints the activation
- * nonce on `admin_head` — so the page needs no further wiring beyond carrying
- * the parameter in its URL.
+ * The page previews the theme named by the `wp_theme_preview` query
+ * parameter. Core's `wp-includes/theme-previews.php` reads that parameter on
+ * every request: it filters `stylesheet`/`template` (for users with
+ * `switch_themes`), attaches an apiFetch middleware that forwards the
+ * parameter on every REST request, and prints the activation nonce on
+ * `admin_head` — so the page needs no further wiring beyond carrying the
+ * parameter in its URL.
  *
  * @param string $stylesheet Stylesheet (directory name) of the theme to preview.
  * @return string Theme preview page URL, not escaped for output.
@@ -25,7 +25,8 @@
 function gutenberg_get_theme_preview_url( $stylesheet ) {
 	static $base = null;
 	if ( null === $base ) {
-		$base = admin_url( 'admin.php?page=theme-preview-wp-admin' );
+		// The page renders the styles route, registered at `/styles`.
+		$base = admin_url( 'admin.php?page=theme-preview-wp-admin&p=%2Fstyles' );
 	}
 
 	return add_query_arg(
@@ -137,9 +138,8 @@ function gutenberg_redirect_theme_preview_to_theme_preview_page() {
 		return;
 	}
 
-	// Core only applies the preview filters for users with `switch_themes`;
-	// for anyone else the site editor keeps showing the active theme, so
-	// leave them there.
+	// Core ignores the preview for users without `switch_themes`; leave them
+	// on the site editor, which keeps showing the active theme.
 	if ( ! current_user_can( 'switch_themes' ) ) {
 		return;
 	}

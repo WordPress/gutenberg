@@ -1,15 +1,13 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { getQueryArg } from '@wordpress/url';
 
+const THEME_PREVIEW_ADMIN_PAGE = 'theme-preview-wp-admin';
+
 /*
- * The previewed theme's stylesheet, from the `wp_theme_preview` query
- * parameter ('' when absent), read once per page load.
- *
- * Deliberately read from `window.location` rather than the router: the
- * router parses only the client path inside the `p` parameter, while Core
- * reads `$_GET['wp_theme_preview']` from the real request URL — so the
- * parameter must live outside `p`. The router preserves it across client
- * navigations, so it cannot change without a full page load.
+ * Read from `window.location` rather than the router: the router only parses
+ * the client path inside `p`, while Core reads the parameter from the real
+ * request URL. The router preserves it across client navigations, so it
+ * cannot change without a full page load.
  */
 const previewedStylesheet = ( () => {
 	const value = getQueryArg( window.location.href, 'wp_theme_preview' );
@@ -18,6 +16,17 @@ const previewedStylesheet = ( () => {
 
 export function getPreviewedStylesheet() {
 	return previewedStylesheet;
+}
+
+/**
+ * Whether this route is rendered on the standalone theme preview admin page,
+ * rather than inside the site editor.
+ */
+export function isThemePreviewAdminPage() {
+	return (
+		new URLSearchParams( window.location.search ).get( 'page' ) ===
+		THEME_PREVIEW_ADMIN_PAGE
+	);
 }
 
 /**
