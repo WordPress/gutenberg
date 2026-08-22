@@ -85,6 +85,24 @@ describe( 'matchDashboardHref', () => {
 		).toBeNull();
 	} );
 
+	it( 'rejects a duplicate page parameter', () => {
+		expect(
+			matchDashboardHref(
+				'admin.php?page=dashboard&page=stats&p=/reports',
+				BASE
+			)
+		).toBeNull();
+	} );
+
+	it( 'rejects a duplicate p parameter', () => {
+		expect(
+			matchDashboardHref(
+				'admin.php?page=dashboard&p=/reports&p=/settings',
+				BASE
+			)
+		).toBeNull();
+	} );
+
 	it( 'rejects an unparsable base', () => {
 		expect( matchDashboardHref( 'admin.php', 'not a url' ) ).toBeNull();
 	} );
