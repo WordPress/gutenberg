@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import BoxControl from '..';
 import type { BoxControlProps, BoxControlValue } from '../types';
+import styles from '../style.module.scss';
 
 // Since `BoxControlProps` is a the result of type unions, we need to use
 // a distributive version of the standard `Omit` utility.
@@ -162,6 +163,39 @@ describe( 'BoxControl', () => {
 			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
 
 			expect( input ).toHaveValue( '' );
+		} );
+
+		it( 'should expose the reset button as aria-disabled when there are no changes', async () => {
+			render( <UncontrolledBoxControl /> );
+
+			const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
+
+			expect( resetButton ).toHaveAttribute( 'aria-disabled', 'true' );
+			expect( resetButton ).not.toHaveAttribute( 'disabled' );
+
+			resetButton.focus();
+			expect( resetButton ).toHaveFocus();
+		} );
+
+		it( 'should keep focus on the reset button after it disables itself', async () => {
+			const user = userEvent.setup();
+
+			render( <UncontrolledBoxControl /> );
+
+			await user.type(
+				screen.getByRole( 'textbox', { name: 'All sides' } ),
+				'100'
+			);
+			await user.keyboard( '{Enter}' );
+
+			const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
+
+			expect( resetButton ).not.toHaveAttribute( 'aria-disabled' );
+
+			await user.click( resetButton );
+
+			expect( resetButton ).toHaveAttribute( 'aria-disabled', 'true' );
+			expect( resetButton ).toHaveFocus();
 		} );
 
 		it( 'should persist cleared value when focus changes', async () => {
@@ -501,6 +535,60 @@ describe( 'BoxControl', () => {
 			expect(
 				screen.getByRole( 'textbox', { name: 'All sides' } )
 			).toHaveAttribute( 'placeholder', 'Inherited' );
+		} );
+	} );
+
+	describe( 'Styles', () => {
+		const presets = [
+			{ name: 'Small', slug: 'small', value: '4px' },
+			{ name: 'Medium', slug: 'medium', value: '8px' },
+		];
+
+		it( 'should apply module classes and retained public class names in custom mode', () => {
+			render( <UncontrolledBoxControl /> );
+
+			// Disable reason: class names are on wrappers around the labeled controls.
+			// eslint-disable-next-line testing-library/no-node-access
+			const unitControl = screen
+				.getByRole( 'textbox', { name: 'All sides' } )
+				.closest( '.component-box-control__unit-control' );
+			// Disable reason: the range wrapper holds the module class.
+			// eslint-disable-next-line testing-library/no-node-access
+			const rangeControl = screen
+				.getByRole( 'slider', { name: 'All sides' } )
+				.closest( '.components-range-control' );
+
+			expect( unitControl ).toHaveClass(
+				styles[ 'unit-control' ],
+				'component-box-control__unit-control'
+			);
+			expect(
+				screen.getByRole( 'button', { name: 'Reset' } )
+			).toHaveClass(
+				styles[ 'reset-button' ],
+				'component-box-control__reset-button'
+			);
+			expect( rangeControl ).toHaveClass( styles[ 'range-control' ] );
+		} );
+
+		it( 'should compose the module range class with the public preset class', () => {
+			render(
+				<UncontrolledBoxControl
+					presets={ presets }
+					presetKey="padding"
+				/>
+			);
+
+			// Disable reason: the range wrapper holds the composed classes.
+			// eslint-disable-next-line testing-library/no-node-access
+			const rangeControl = screen
+				.getByRole( 'slider', { name: 'All sides' } )
+				.closest( '.components-range-control' );
+
+			expect( rangeControl ).toHaveClass(
+				styles[ 'range-control' ],
+				'spacing-sizes-control__range-control'
+			);
 		} );
 	} );
 } );

@@ -1,7 +1,8 @@
 import type { Meta, StoryFn } from '@storybook/react-vite';
-import { fn } from 'storybook/test';
+import { expect, fn, userEvent, within } from 'storybook/test';
 import { useState } from '@wordpress/element';
 import BoxControl from '../';
+import styles from '../style.module.scss';
 
 const meta: Meta< typeof BoxControl > = {
 	title: 'Components/BoxControl',
@@ -46,6 +47,54 @@ const TemplateControlled: StoryFn< typeof BoxControl > = ( props ) => {
 export const Default = TemplateUncontrolled.bind( {} );
 Default.args = {
 	label: 'Label',
+};
+Default.play = async ( { canvasElement } ) => {
+	const canvas = within( canvasElement );
+	const allSidesInput = canvas.getByRole( 'textbox', {
+		name: 'All sides',
+	} );
+	const inputWrapper = allSidesInput.closest(
+		`.${ styles[ 'input-wrapper' ] }`
+	);
+	const resetButton = canvas.getByRole( 'button', { name: 'Reset' } );
+	const linkedButtonWrapper = canvas
+		.getByRole( 'button', { name: 'Unlink sides' } )
+		.closest( `.${ styles[ 'linked-button-wrapper' ] }` );
+
+	await expect( inputWrapper ).toBeInTheDocument();
+	await expect( linkedButtonWrapper ).toBeInTheDocument();
+	await expect( getComputedStyle( inputWrapper! ).gridColumnStart ).toBe(
+		'1'
+	);
+	await expect( getComputedStyle( inputWrapper! ).gridColumnEnd ).toBe(
+		'span 3'
+	);
+	await expect( getComputedStyle( resetButton ).gridRowStart ).toBe( '1' );
+	await expect( getComputedStyle( resetButton ).gridColumnStart ).toBe(
+		'2'
+	);
+	await expect( getComputedStyle( linkedButtonWrapper! ).gridRowStart ).toBe(
+		'1'
+	);
+	await expect(
+		getComputedStyle( linkedButtonWrapper! ).gridColumnStart
+	).toBe( '3' );
+
+	await userEvent.click(
+		canvas.getByRole( 'button', { name: 'Unlink sides' } )
+	);
+
+	const topInputWrapper = canvas
+		.getByRole( 'textbox', { name: 'Top side' } )
+		.closest( `.${ styles[ 'input-wrapper' ] }` );
+
+	await expect( topInputWrapper ).toBeInTheDocument();
+	await expect( getComputedStyle( topInputWrapper! ).gridColumnStart ).toBe(
+		'1'
+	);
+	await expect( getComputedStyle( topInputWrapper! ).gridColumnEnd ).toBe(
+		'span 3'
+	);
 };
 
 export const Controlled = TemplateControlled.bind( {} );
