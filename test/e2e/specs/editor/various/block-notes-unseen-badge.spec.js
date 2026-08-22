@@ -145,6 +145,91 @@ test.describe( 'Notes: unseen badge', () => {
 		).toHaveAccessibleName( 'All notes, 12 unseen' );
 	} );
 
+	test( 'clears when a thread is selected without opening the sidebar', async ( {
+		admin,
+		page,
+		notesUtils,
+	} ) => {
+		const { postId } = await notesUtils.createPostWithNotes( [
+			{ author: collaboratorId, content: 'Worth a second look' },
+		] );
+
+		/*
+		 * The floating panel collapses itself on a narrow canvas, and the
+		 * default 1280px window minus the admin menu and the settings sidebar
+		 * lands under that threshold. Widen so the panel this test is about
+		 * actually renders.
+		 */
+		await page.setViewportSize( { width: 1500, height: 900 } );
+		await admin.editPost( postId );
+
+		const badge = page.locator( '.interface-complementary-area__badge' );
+		await expect( badge ).toHaveText( '1' );
+
+		const toggle = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'All notes' } );
+		await expect( toggle ).toHaveAttribute( 'aria-expanded', 'false' );
+
+		/*
+		 * Closing the settings sidebar leaves no complementary area active,
+		 * which is what lets the floating notes panel put itself up. Read the
+		 * note there and never touch "All notes": selecting the thread is what
+		 * proves the note was read.
+		 */
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Close Settings' } )
+			.click();
+
+		const thread = page
+			.getByRole( 'treeitem', { name: /Worth a second look/ } )
+			.first();
+		await expect( thread ).toBeVisible();
+
+		// The panel showing up is not the user doing anything, so the note is
+		// readable on screen and still counted.
+		await expect( badge ).toHaveText( '1' );
+
+		// Selecting the thread is the act that counts.
+		await thread.click();
+		await expect( badge ).toBeHidden();
+
+		// The sidebar was never opened, and the clear survives a reload.
+		await admin.editPost( postId );
+		await expect( toggle ).toBeVisible();
+		await expect( badge ).toBeHidden();
+	} );
+
+	test( 'starting a new note of your own does not clear the badge', async ( {
+		admin,
+		page,
+		editor,
+		notesUtils,
+	} ) => {
+		const { postId } = await notesUtils.createPostWithNotes( [
+			{ author: collaboratorId, content: 'Still needs reading' },
+		] );
+
+		await admin.editPost( postId );
+
+		const badge = page.locator( '.interface-complementary-area__badge' );
+		await expect( badge ).toHaveText( '1' );
+
+		// Authoring a note selects the 'new' form, which is not reading
+		// anybody else's note.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first()
+			.click();
+		await editor.clickBlockOptionsMenuItem( 'Add note' );
+		await expect(
+			page.getByRole( 'textbox', { name: 'New note', exact: true } )
+		).toBeFocused();
+
+		await expect( badge ).toHaveText( '1' );
+	} );
+
 	test( 'does not count resolved threads', async ( {
 		admin,
 		page,

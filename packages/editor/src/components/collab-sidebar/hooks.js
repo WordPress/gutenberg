@@ -183,9 +183,22 @@ export function useNoteThreads( postId ) {
  * Counts the note threads carrying activity the current user has not seen, and
  * marks the post's notes as seen while the "All notes" sidebar is open.
  *
- * The floating notes panel opens itself whenever a post has unresolved notes,
- * so it cannot stand in for "the user looked at the notes"; only the pinned
- * "All notes" sidebar - the one the badge sits on - clears the count.
+ * Two things count as having looked. Opening the pinned "All notes" sidebar -
+ * the one the badge sits on - is the obvious one. Selecting a thread is the
+ * other, and it matters because of the floating notes panel: once no
+ * complementary area is active - the user closed the settings sidebar - it puts
+ * itself up and shows every unresolved thread. Someone can read all of them
+ * there without ever touching "All notes", and their badge would otherwise
+ * never clear. The panel being open cannot itself count, since nobody asked for
+ * it.
+ *
+ * Selecting a thread expands it - replies unfold, a clamped note can be opened
+ * with "Show more" - so it is the point where reading is demonstrated rather
+ * than assumed. Those finer expansions are deliberately not wired up as
+ * separate signals: they all imply a selection, and a post whose notes are
+ * short and reply-free offers nothing to expand at all, which would leave its
+ * badge stuck forever. A badge that never clears is worse than one that clears
+ * eagerly.
  *
  * The recorded timestamp is the newest `date_gmt` the user has actually been
  * shown rather than the current time, which keeps the comparison immune to
@@ -199,20 +212,29 @@ export function useNoteThreads( postId ) {
 export function useUnseenNotes( { postId, notes } ) {
 	const { set: setPreference } = useDispatch( preferencesStore );
 
-	const { lastSeenByPost, currentUserId, isAllNotesOpen } = useSelect(
-		( select ) => ( {
-			lastSeenByPost: select( preferencesStore ).get(
-				NOTES_LAST_SEEN_SCOPE,
-				NOTES_LAST_SEEN_PREFERENCE
-			),
-			currentUserId: select( coreStore ).getCurrentUser()?.id,
-			isAllNotesOpen:
-				select( interfaceStore ).getActiveComplementaryArea(
-					'core'
-				) === ALL_NOTES_SIDEBAR,
-		} ),
-		[]
-	);
+	const { lastSeenByPost, currentUserId, isAllNotesOpen, hasSelectedNote } =
+		useSelect(
+			( select ) => ( {
+				lastSeenByPost: select( preferencesStore ).get(
+					NOTES_LAST_SEEN_SCOPE,
+					NOTES_LAST_SEEN_PREFERENCE
+				),
+				currentUserId: select( coreStore ).getCurrentUser()?.id,
+				isAllNotesOpen:
+					select( interfaceStore ).getActiveComplementaryArea(
+						'core'
+					) === ALL_NOTES_SIDEBAR,
+				/*
+				 * `getSelectedNote` also returns 'new' for the add-note form.
+				 * Authoring a note is not reading anyone else's, so only a real
+				 * thread id counts.
+				 */
+				hasSelectedNote:
+					typeof unlock( select( editorStore ) ).getSelectedNote() ===
+					'number',
+			} ),
+			[]
+		);
 
 	const lastSeen = postId ? lastSeenByPost?.[ postId ] : undefined;
 	const latestActivity = useMemo(
@@ -230,8 +252,10 @@ export function useUnseenNotes( { postId, notes } ) {
 		[ notes ]
 	);
 
+	const hasLooked = isAllNotesOpen || hasSelectedNote;
+
 	useEffect( () => {
-		if ( ! isAllNotesOpen || ! postId || ! latestActivity ) {
+		if ( ! hasLooked || ! postId || ! latestActivity ) {
 			return;
 		}
 		// Already recorded, including for activity arriving while the sidebar
@@ -250,7 +274,7 @@ export function useUnseenNotes( { postId, notes } ) {
 			)
 		);
 	}, [
-		isAllNotesOpen,
+		hasLooked,
 		postId,
 		latestActivity,
 		lastSeen,
