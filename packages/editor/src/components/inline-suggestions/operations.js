@@ -7,6 +7,7 @@ import {
 	applyFormat,
 } from '@wordpress/rich-text';
 import {
+	SUGGESTION_CLASS,
 	SUGGESTION_FORMAT_NAME,
 	SUGGESTION_ID_ATTRIBUTE,
 	SUGGESTION_TYPE_ATTRIBUTE,
@@ -88,7 +89,7 @@ export function valueRangeHasSuggestion( value, start, end ) {
 	} else if ( typeof value === 'string' ) {
 		html = value;
 	}
-	if ( html === null || false === html.includes( 'wp-suggestion' ) ) {
+	if ( html === null || false === html.includes( SUGGESTION_CLASS ) ) {
 		// Quick reject: no marker markup, nothing to overlap.
 		return false;
 	}

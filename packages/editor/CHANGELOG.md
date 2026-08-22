@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Suggest mode: keep the code editor closed while the Suggest intent is active and while the post still carries unresolved inline suggestion markers, and identify a marker by its element rather than by a substring of the document ([#81662](https://github.com/WordPress/gutenberg/pull/81662)).
+-   Suggest mode: Announce inline suggestion markers to screen readers. A marker's state was carried entirely by color and text decoration, so a run proposed for deletion was read aloud as ordinary prose. Each marker is now bracketed by an announcement naming the kind of change and the person who proposed it, and add and delete markers carry `role="insertion"` and `role="deletion"`; a formatting suggestion no longer claims to be a deletion. Suggestions over overlapping runs nest, and each is announced and attributed to the person who made it ([#81663](https://github.com/WordPress/gutenberg/pull/81663)).
+
 ## 14.53.0 (2026-08-12)
 
 ### Internal

@@ -9,6 +9,12 @@
  * the suggestion's operations. The block-editor store stays at the baseline
  * until Accept/Reject, so the document is never mutated in place.
  *
+ * The overlay and inline markers are mutually exclusive per attribute: an
+ * overlay snapshot is marker-free by construction, so it renders in place of —
+ * and hides — any marker living in that attribute. An edit that would do that
+ * is declined at this seam rather than captured (`notifyEditRefused`), which is
+ * what keeps a block from carrying both representations at once.
+ *
  * Text and formatting edits never reach the overlay: typing, deletion, cut,
  * and single-line paste are caught on `beforeinput`/`cut`/`paste` by the
  * suggestion keyboards, and the remaining seams (committed IME composition,
@@ -35,9 +41,11 @@ import useMoveGhosts from './use-move-ghosts';
 import {
 	planFormatMarkers,
 	planEditMarkers,
+	hasSuggestionMarkers,
 	stripSuggestionMarkersFromAttributes,
 } from '../inline-suggestions';
 import { isPartOfPendingInsertion } from './store-interceptor';
+import { notifyEditRefused } from './refuse-edit';
 
 /**
  * True for plain strings and for objects that stringify to a meaningful HTML
@@ -67,6 +75,35 @@ function isStringLike( value ) {
  * semantics for primitive and array values).
  */
 const DEEP_MERGE_KEYS = new Set( [ 'style', 'metadata' ] );
+
+/**
+ * Would routing this edit into the overlay hide a marker that is currently
+ * rendering?
+ *
+ * The overlay stores marker-free snapshots (see
+ * `stripSuggestionMarkersFromAttributes`) and renders them in place of the
+ * block's live values, so an overlay entry for an attribute whose live value
+ * carries `<mark class="wp-suggestion">` suppresses every marker in it — the
+ * earlier suggestion's note survives in the sidebar describing text the
+ * reviewer can no longer see, and the block ends up carrying both
+ * representations of a pending change at once (#73411, finding F-09).
+ *
+ * Compared per attribute rather than per block: an attribute-only suggestion
+ * (heading level, alignment) on a block whose `content` holds a marker touches
+ * neither the marked value nor its rendering, and still goes to the overlay.
+ *
+ * @param {Object} nextAttributes Attributes the block is trying to set.
+ * @param {Object} prevAttributes The block's current attributes.
+ * @return {boolean} True when the overlay would strip a live marker.
+ */
+function overlayWouldHideMarkers( nextAttributes, prevAttributes ) {
+	for ( const key of Object.keys( nextAttributes ?? {} ) ) {
+		if ( hasSuggestionMarkers( prevAttributes?.[ key ] ) ) {
+			return true;
+		}
+	}
+	return false;
+}
 
 /**
  * Apply an overlay attribute set on top of the block's real attributes for
@@ -308,6 +345,21 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 			if (
 				maybeHandleContentEdit( nextAttributes, attributesRef.current )
 			) {
+				return;
+			}
+			/*
+			 * Last stop before the overlay: an edit that would bury a live
+			 * marker under a clean whole-attribute snapshot is declined
+			 * instead. The keyboards decline the gestures they own before the
+			 * browser applies them; this covers every other way an edit can
+			 * reach a marked attribute (a format toggle over a marked run, a
+			 * paste or IME commit the marker plan can't resolve), so the
+			 * invariant holds however the edit arrived.
+			 */
+			if (
+				overlayWouldHideMarkers( nextAttributes, attributesRef.current )
+			) {
+				notifyEditRefused( registry );
 				return;
 			}
 			/*
