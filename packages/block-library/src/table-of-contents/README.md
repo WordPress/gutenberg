@@ -8,7 +8,7 @@ Summarize your post with a list of headings. Add HTML anchors to Heading blocks 
 - **Name:** `core/table-of-contents`
 - **Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 - **API Version:** [3](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/)
-- **Block Type:** [Hybrid](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/) (static save + server enhancements)
+- **Block Type:** [Dynamic](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/) (server-rendered)
 - **Keywords:** `document outline`, `summary`
 
 ## Attributes
@@ -17,7 +17,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 
 | Attribute | [Type](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
-| `headings` | `array` | `[]` | — |
+| `headings` | `array` | `[]` | [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `local` |
 | `onlyIncludeCurrentPage` | `boolean` | `false` | — |
 | `maxLevel` | `number` | — | — |
 | `ordered` | `boolean` | `true` | — |
@@ -45,12 +45,12 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 
 ## Block Markup
 
-This is a [**hybrid block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It saves static markup that the server may enhance during rendering.
+This is a [**dynamic block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It is rendered on the server and does not save HTML in post content.
+
+In post content, it is stored as a block comment:
 
 ```html
-<!-- wp:table-of-contents {"headings":[{"content":"Heading text","level":2,"link":"#heading-id-1"},{"content":"A sub-heading","level":3,"link":"#heading-id-2"}]} -->
-<nav class="wp-block-table-of-contents"><ol><li><a class="wp-block-table-of-contents__entry" href="#heading-id-1">Heading text</a><ol><li><a class="wp-block-table-of-contents__entry" href="#heading-id-2">A sub-heading</a></li></ol></li></ol></nav>
-<!-- /wp:table-of-contents -->
+<!-- wp:table-of-contents {"maxLevel":3,"ordered":false} /-->
 ```
 
 ## Source

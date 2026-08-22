@@ -348,6 +348,7 @@ export default function DimensionsPanel( {
 	// Special case because the layout controls are not part of the dimensions panel
 	// in global styles but not in block inspector.
 	includeLayoutControls = false,
+	allowAxialBlockGap = true,
 	styleState = DEFAULT_BLOCK_STYLE_STATE,
 	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
 } ) {
@@ -563,9 +564,19 @@ export default function DimensionsPanel( {
 		? settings?.spacing?.blockGap
 		: settings?.spacing?.blockGap?.sides;
 	const isAxialGap =
-		gapSides && gapSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
+		allowAxialBlockGap &&
+		gapSides &&
+		gapSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
 	const localGapRaw = decodeValue( value?.spacing?.blockGap );
 	const inheritedGapRaw = decodeValue( inheritedValue?.spacing?.blockGap );
+	const localGapForSingleInput =
+		! isAxialGap && typeof localGapRaw === 'object'
+			? localGapRaw?.top
+			: localGapRaw;
+	const inheritedGapForSingleInput =
+		! isAxialGap && typeof inheritedGapRaw === 'object'
+			? inheritedGapRaw?.top
+			: inheritedGapRaw;
 	// Merge local-then-inherited so SpacingSizesControl's chip slider and
 	// the axial-gap BoxControl reflect the local value when set and fall
 	// back to the inherited value at rest.
@@ -579,8 +590,8 @@ export default function DimensionsPanel( {
 	// at-rest cue for those.
 	const isGapPlaceholder =
 		! hasValue( value?.spacing?.blockGap ) &&
-		typeof inheritedGapRaw === 'string' &&
-		inheritedGapRaw !== '';
+		typeof inheritedGapForSingleInput === 'string' &&
+		inheritedGapForSingleInput !== '';
 	const setGapValue = ( newGapValue ) => {
 		onChange(
 			setImmutably( value, [ 'spacing', 'blockGap' ], newGapValue )
@@ -1004,16 +1015,17 @@ export default function DimensionsPanel( {
 								min={ 0 }
 								onChange={ setGapValue }
 								units={ units }
-								value={ localGapRaw ?? undefined }
+								value={ localGapForSingleInput ?? undefined }
 								placeholder={
 									isGapPlaceholder
-										? inheritedGapRaw
+										? inheritedGapForSingleInput
 										: undefined
 								}
 							/>
 						) ) }
 					{ showSpacingPresetsControl && (
 						<SpacingSizesControl
+							key={ isAxialGap ? 'axial-gap' : 'single-gap' }
 							label={ __( 'Block spacing' ) }
 							min={ 0 }
 							onChange={ setGapValues }
