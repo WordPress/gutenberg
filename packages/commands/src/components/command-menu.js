@@ -33,11 +33,11 @@ const ITEM_ID_PREFIX = 'command-palette-item-';
 const inputLabel = __( 'Search commands and settings' );
 
 /**
- * Icons enforced per command category.
- * Categories listed here will always use the specified icon,
- * ignoring whatever icon the command itself provides.
+ * Fallback icons per command category, used when a command provides no icon of
+ * its own. Navigating somewhere reads the same way across the palette, so `view`
+ * commands are expected to rely on this rather than pass an icon.
  */
-const CATEGORY_ICONS = {
+const CATEGORY_FALLBACK_ICONS = {
 	view: arrowRight,
 };
 
@@ -75,6 +75,7 @@ export function isValidIcon( icon ) {
 function CommandItem( { command, search, category, valuePrefix } ) {
 	const { close } = useDispatch( commandsStore );
 	const commandCategory = category ?? command.category;
+	const icon = command.icon ?? CATEGORY_FALLBACK_ICONS[ commandCategory ];
 	const label = command.searchLabel ?? command.label;
 	const value = valuePrefix ? `${ valuePrefix }${ command.name }` : label;
 	return (
@@ -95,17 +96,10 @@ function CommandItem( { command, search, category, valuePrefix } ) {
 			<HStack
 				alignment="left"
 				className={ clsx( 'commands-command-menu__item', {
-					'has-icon':
-						CATEGORY_ICONS[ commandCategory ] || command.icon,
+					'has-icon': !! icon,
 				} ) }
 			>
-				{ CATEGORY_ICONS[ commandCategory ] ? (
-					<Icon icon={ CATEGORY_ICONS[ commandCategory ] } />
-				) : (
-					isValidIcon( command.icon ) && (
-						<Icon icon={ command.icon } />
-					)
-				) }
+				{ isValidIcon( icon ) && <Icon icon={ icon } /> }
 				<span className="commands-command-menu__item-label">
 					<TextHighlight
 						text={ command.label }
