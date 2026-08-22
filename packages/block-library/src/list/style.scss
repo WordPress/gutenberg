@@ -8,3 +8,14 @@ ul {
 :root :where(.wp-block-list.has-background) {
 	padding: $block-bg-padding--v $block-bg-padding--h;
 }
+
+// Apply block spacing to this list's items only. Nested lists keep theme
+// margins unless they set their own block spacing.
+:root :where(.wp-block-list.has-block-spacing) > .wp-block-list-item {
+	margin-block-start: 0;
+	margin-block-end: 0;
+}
+
+:root :where(.wp-block-list.has-block-spacing) > .wp-block-list-item + .wp-block-list-item {
+	margin-block-start: var(--wp--style--block-gap);
+}

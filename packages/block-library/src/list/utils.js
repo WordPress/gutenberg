@@ -1,4 +1,36 @@
+import { __experimentalGetGapCSSValue as getGapCSSValue } from '@wordpress/block-editor';
 import { createBlock, rawHandler } from '@wordpress/blocks';
+
+/**
+ * Returns class and style props that apply the list's block gap without layout support.
+ *
+ * @param {Object} [style] Block style attribute.
+ * @return {Object} Props to merge into `useBlockProps`.
+ */
+export function getListBlockGapProps( style ) {
+	const blockGap = style?.spacing?.blockGap;
+	if ( blockGap == null || blockGap === '' ) {
+		return {};
+	}
+
+	const rawValue =
+		typeof blockGap === 'object' ? blockGap.top ?? blockGap.left : blockGap;
+	const gapValue =
+		rawValue === 0 || rawValue === '0'
+			? '0px'
+			: getGapCSSValue( rawValue );
+
+	if ( gapValue == null || gapValue === '' ) {
+		return {};
+	}
+
+	return {
+		className: 'has-block-spacing',
+		style: {
+			'--wp--style--block-gap': gapValue === '0' ? '0px' : gapValue,
+		},
+	};
+}
 
 const LIST_STYLES = {
 	A: 'upper-alpha',
