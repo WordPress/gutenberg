@@ -1,14 +1,8 @@
 import { Menu as _Menu } from '@base-ui/react/menu';
-import {
-	useCallback,
-	useImperativeHandle,
-	useRef,
-	useState,
-} from '@wordpress/element';
 import { DirectionProvider } from '../utils/direction-provider';
 import { MenuContext } from './context';
 import type { RootProps } from './types';
-import { useCloseOnIframePointerDown } from './use-close-on-iframe-pointer-down';
+import { useIframeDismissalBridge } from './use-iframe-dismissal-bridge';
 
 /**
  * Groups all parts of a menu.
@@ -30,39 +24,7 @@ import { useCloseOnIframePointerDown } from './use-close-on-iframe-pointer-down'
  * ```
  */
 function Root( props: RootProps ) {
-	const {
-		actionsRef,
-		defaultOpen,
-		modal,
-		onOpenChange,
-		open: openProp,
-		...rootProps
-	} = props;
-	const internalActionsRef = useRef< _Menu.Root.Actions | null >( null );
-	const [ uncontrolledOpen, setUncontrolledOpen ] = useState(
-		defaultOpen ?? false
-	);
-	const [ ownerDocument, setOwnerDocument ] = useState< Document | null >(
-		() => ( typeof document === 'undefined' ? null : document )
-	);
-	const open = openProp ?? uncontrolledOpen;
-	const close = useCallback( () => {
-		internalActionsRef.current?.close();
-	}, [] );
-
-	useImperativeHandle(
-		actionsRef,
-		() => ( {
-			close,
-			unmount: () => internalActionsRef.current?.unmount(),
-		} ),
-		[ close ]
-	);
-	useCloseOnIframePointerDown( {
-		enabled: open && modal === false,
-		onPointerDown: close,
-		ownerDocument,
-	} );
+	const { onOpenChange } = props;
 
 	const handleOpenChange: NonNullable< RootProps[ 'onOpenChange' ] > = (
 		nextOpen,
@@ -80,13 +42,6 @@ function Root( props: RootProps ) {
 				: null;
 
 		onOpenChange?.( nextOpen, eventDetails );
-
-		if ( ! eventDetails.isCanceled ) {
-			setUncontrolledOpen( nextOpen );
-			if ( nextOpen && trigger ) {
-				setOwnerDocument( trigger.ownerDocument );
-			}
-		}
 
 		if (
 			! nextOpen &&
@@ -107,18 +62,19 @@ function Root( props: RootProps ) {
 			trigger.focus();
 		}
 	};
+	const iframeDismissalProps = useIframeDismissalBridge( {
+		actionsRef: props.actionsRef,
+		defaultOpen: props.defaultOpen,
+		disabled: props.disabled,
+		modal: props.modal,
+		onOpenChange: handleOpenChange,
+		open: props.open,
+	} );
 
 	return (
 		<DirectionProvider>
 			<MenuContext.Provider value={ { isSubmenu: false } }>
-				<_Menu.Root
-					{ ...rootProps }
-					actionsRef={ internalActionsRef }
-					defaultOpen={ defaultOpen }
-					modal={ modal }
-					onOpenChange={ handleOpenChange }
-					open={ openProp }
-				/>
+				<_Menu.Root { ...props } { ...iframeDismissalProps } />
 			</MenuContext.Provider>
 		</DirectionProvider>
 	);
