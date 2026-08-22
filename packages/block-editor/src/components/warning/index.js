@@ -2,15 +2,19 @@ import clsx from 'clsx';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
+import { Text } from '@wordpress/ui';
 
 function Warning( { className, actions, children, secondaryActions } ) {
 	return (
 		<div style={ { display: 'contents', all: 'initial' } }>
 			<div className={ clsx( className, 'block-editor-warning' ) }>
 				<div className="block-editor-warning__contents">
-					<p className="block-editor-warning__message">
+					<Text
+						className="block-editor-warning__message"
+						render={ <p /> }
+					>
 						{ children }
-					</p>
+					</Text>
 
 					{ ( actions?.length > 0 || secondaryActions ) && (
 						<div className="block-editor-warning__actions">
