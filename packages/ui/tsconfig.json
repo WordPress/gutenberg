@@ -1,26 +1,35 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
+	"extends": "../../tsconfig.dev.base.json",
 	"compilerOptions": {
 		"types": [
-			"node",
 			"jest",
+			"gutenberg-env",
 			"style-imports",
 			"react-css-custom-properties"
 		]
 	},
+	"files": [ "global.d.ts" ],
+	"include": [
+		"src/**/test/**/*.ts",
+		"src/**/test/**/*.tsx",
+		"src/**/tests/**/*.ts",
+		"src/**/tests/**/*.tsx",
+		"src/**/__tests__/**/*.ts",
+		"src/**/__tests__/**/*.tsx"
+	],
 	"references": [
-		{ "path": "../a11y" },
-		{ "path": "../compose" },
-		{ "path": "../element" },
-		{ "path": "../i18n" },
-		{ "path": "../icons" },
-		{ "path": "../keycodes" },
+		{ "path": "./tsconfig.build.json" },
+		{ "path": "../a11y/tsconfig.build.json" },
+		{ "path": "../compose/tsconfig.build.json" },
+		{ "path": "../element/tsconfig.build.json" },
+		{ "path": "../i18n/tsconfig.build.json" },
+		{ "path": "../icons/tsconfig.build.json" },
+		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
-		{ "path": "../style-runtime" },
-		{ "path": "../theme/tsconfig.build.json" }
-	],
-	"files": [ "global.d.ts" ],
-	"exclude": []
+		{ "path": "../style-runtime/tsconfig.build.json" },
+		{ "path": "../theme/tsconfig.build.json" },
+		{ "path": "../warning" }
+	]
 }

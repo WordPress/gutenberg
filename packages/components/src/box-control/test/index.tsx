@@ -225,6 +225,33 @@ describe( 'BoxControl', () => {
 			).not.toHaveValue();
 		} );
 
+		it.each( [
+			[ 'Top side', 'Bottom side' ],
+			[ 'Bottom side', 'Top side' ],
+			[ 'Left side', 'Right side' ],
+			[ 'Right side', 'Left side' ],
+		] )(
+			'should update %s together with %s when ALT is held',
+			async ( side, pairedSide ) => {
+				const user = userEvent.setup();
+
+				render( <ControlledBoxControl /> );
+
+				await user.click(
+					screen.getByRole( 'button', { name: 'Unlink sides' } )
+				);
+
+				const input = screen.getByRole( 'textbox', { name: side } );
+				await user.type( input, '10' );
+				await user.keyboard( '{Alt>}{ArrowUp}{/Alt}' );
+
+				expect( input ).toHaveValue( '11' );
+				expect(
+					screen.getByRole( 'textbox', { name: pairedSide } )
+				).toHaveValue( '11' );
+			}
+		);
+
 		it( 'should update a single side value when using slider unlinked', async () => {
 			const user = userEvent.setup();
 

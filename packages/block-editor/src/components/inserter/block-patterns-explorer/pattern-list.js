@@ -1,12 +1,11 @@
 import { useMemo, useEffect, useRef, useState } from '@wordpress/element';
-import { _n, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { useDebounce } from '@wordpress/compose';
-import { __experimentalHeading as Heading } from '@wordpress/components';
+import { Text } from '@wordpress/ui';
 import { speak } from '@wordpress/a11y';
 import BlockPatternsList from '../../block-patterns-list';
 import useInsertionPoint from '../hooks/use-insertion-point';
 import usePatternsState from '../hooks/use-patterns-state';
-import InserterListbox from '../../inserter-listbox';
 import { searchItems } from '../search-items';
 import BlockPatternsPaging from '../../block-patterns-paging';
 import usePatternsPaging from '../hooks/use-patterns-paging';
@@ -16,30 +15,6 @@ import {
 	myPatternsCategory,
 	starterPatternsCategory,
 } from '../block-patterns-tab/utils';
-
-function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
-	if ( ! filterValue ) {
-		return null;
-	}
-
-	return (
-		<Heading
-			level={ 2 }
-			lineHeight="48px"
-			className="block-editor-block-patterns-explorer__search-results-count"
-		>
-			{ sprintf(
-				/* translators: %d: number of patterns. */
-				_n(
-					'%d pattern found',
-					'%d patterns found',
-					filteredBlockPatternsLength
-				),
-				filteredBlockPatternsLength
-			) }
-		</Heading>
-	);
-}
 
 function PatternList( {
 	searchValue,
@@ -143,26 +118,26 @@ function PatternList( {
 			className="block-editor-block-patterns-explorer__list"
 			ref={ container }
 		>
-			<PatternsListHeader
-				filterValue={ searchValue }
-				filteredBlockPatternsLength={ filteredBlockPatterns.length }
-			/>
-
-			<InserterListbox>
-				{ hasItems && (
-					<>
-						<BlockPatternsList
-							blockPatterns={ pagingProps.categoryPatterns }
-							onClickPattern={ ( pattern, blocks ) => {
-								onClickPattern( pattern, blocks );
-								onModalClose();
-							} }
-							isDraggable={ false }
-						/>
-						<BlockPatternsPaging { ...pagingProps } />
-					</>
-				) }
-			</InserterListbox>
+			{ hasItems ? (
+				<>
+					<BlockPatternsList
+						blockPatterns={ pagingProps.categoryPatterns }
+						onClickPattern={ ( pattern, blocks ) => {
+							onClickPattern( pattern, blocks );
+							onModalClose();
+						} }
+						isDraggable={ false }
+					/>
+					<BlockPatternsPaging { ...pagingProps } />
+				</>
+			) : (
+				<Text
+					render={ <p /> }
+					className="block-editor-block-patterns-explorer__no-results"
+				>
+					{ __( 'No results found.' ) }
+				</Text>
+			) }
 		</div>
 	);
 }

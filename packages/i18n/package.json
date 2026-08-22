@@ -51,6 +51,7 @@
 		"tannin": "^1.2.0"
 	},
 	"devDependencies": {
+		"@types/jest": "^30.0.0",
 		"benchmark": "^2.1.4"
 	},
 	"publishConfig": {
