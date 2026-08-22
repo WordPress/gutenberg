@@ -84,11 +84,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/block-switcher/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/block-toolbar/pattern-overrides-dropdown.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
