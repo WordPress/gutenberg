@@ -431,6 +431,56 @@ describe( 'SuggestionAutoSave', () => {
 
 		expect( createSuggestion ).not.toHaveBeenCalled();
 	} );
+
+	it( 'drops a pending save when the user leaves Suggest intent, and resumes it on return', async () => {
+		createSuggestion.mockResolvedValue( { id: 42 } );
+
+		const { registry } = renderInSuggestMode(
+			<>
+				<CaptureOverlay />
+				<SuggestionAutoSave />
+			</>
+		);
+
+		act( () => {
+			overlayHandle.captureBaseline( 'a', 'core/paragraph', {
+				content: 'Hi',
+			} );
+			overlayHandle.setOverlayAttributes( 'a', { content: 'Hello' } );
+		} );
+
+		// Leave Suggest mode mid-debounce.
+		await act( async () => {
+			jest.advanceTimersByTime( 500 );
+		} );
+		act( () => {
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'edit'
+			);
+		} );
+
+		await act( async () => {
+			jest.advanceTimersByTime( 5000 );
+		} );
+		await flushPromises();
+
+		expect( createSuggestion ).not.toHaveBeenCalled();
+
+		// Returning to Suggest reschedules the still-unsynced entry.
+		act( () => {
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+		} );
+
+		await act( async () => {
+			jest.advanceTimersByTime( 1500 );
+		} );
+		await flushPromises();
+		await flushPromises();
+
+		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
+	} );
 } );
 
 describe( 'operationsForEntry', () => {
