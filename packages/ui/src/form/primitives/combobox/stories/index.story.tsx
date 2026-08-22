@@ -115,6 +115,17 @@ export const Compact: Story = {
  * To do this, omit the `Popup` and enable the `inline` prop on the `Root`.
  */
 export const DetachedInline: Story = {
+	parameters: {
+		// The list scrolls, but the combobox input keeps focus and arrow keys
+		// move through the options, so the content is reachable by keyboard.
+		a11y: {
+			config: {
+				rules: [
+					{ id: 'scrollable-region-focusable', enabled: false },
+				],
+			},
+		},
+	},
 	args: {
 		items: ITEMS,
 		multiple: true,
@@ -131,7 +142,7 @@ export const DetachedInline: Story = {
 				key="div"
 			>
 				<Combobox.Empty>No results found.</Combobox.Empty>
-				<Combobox.List aria-label="Items">
+				<Combobox.List>
 					<Combobox.Collection>
 						{ ( item: FixtureItem ) => (
 							<Combobox.Item key={ item.value } value={ item }>

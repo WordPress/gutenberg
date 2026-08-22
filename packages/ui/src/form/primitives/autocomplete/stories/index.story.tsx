@@ -181,6 +181,17 @@ export const AsyncItems: Story = {
  * The suggestion list can be rendered inline by enabling `inline` and `open`.
  */
 export const Inline: Story = {
+	parameters: {
+		// The list scrolls, but the combobox input keeps focus and arrow keys
+		// move through the options, so the content is reachable by keyboard.
+		a11y: {
+			config: {
+				rules: [
+					{ id: 'scrollable-region-focusable', enabled: false },
+				],
+			},
+		},
+	},
 	args: {
 		items: COMMANDS,
 		inline: true,
