@@ -87,7 +87,7 @@
 		"memize": "^2.1.1"
 	},
 	"devDependencies": {
-		"@storybook/react-vite": "^10.4.3",
+		"@storybook/react-vite": "^10.5.3",
 		"@terrazzo/parser": "^2.5.0",
 		"@terrazzo/plugin-css": "^2.5.0",
 		"@terrazzo/token-tools": "^2.5.0",
@@ -101,7 +101,7 @@
 		"esbuild": "^0.27.2",
 		"esbuild-esm-loader": "^0.3.3",
 		"prettier": "npm:wp-prettier@^3.0.3",
-		"storybook": "^10.4.3",
+		"storybook": "^10.5.3",
 		"stylelint": "^16.26.1"
 	},
 	"peerDependencies": {

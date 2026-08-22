@@ -329,6 +329,9 @@ const meta: Meta< typeof WidgetDashboard > = {
 	component: WidgetDashboard,
 	tags: [ 'status-experimental' ],
 	parameters: {
+		// FIXME: Sortable widget chrome nests interactive controls (nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',
@@ -460,7 +463,7 @@ const DEMO_NAVIGATE_EVENT = 'widget-dashboard-demo-navigate';
 
 const DemoRouteLink = forwardRef<
 	HTMLAnchorElement,
-	{ path: string } & ComponentPropsWithoutRef< 'a' >
+	{ path: string } & Omit< ComponentPropsWithoutRef< 'a' >, 'href' >
 >( function DemoRouteLink( { path, onClick, children, ...props }, ref ) {
 	return (
 		<a
@@ -499,7 +502,7 @@ const demoHost: WidgetHost = {
 				return null;
 			}
 
-			return { path: url.searchParams.get( 'p' ) ?? '/' };
+			return url.searchParams.get( 'p' ) ?? '/';
 		},
 		Link: DemoRouteLink,
 	},

@@ -45,7 +45,7 @@
   <!-- The links capability -->
   <rect x="600" y="140" width="212" height="110" rx="9" fill="#ffffff" stroke="#1d6b5a" stroke-width="1.4"/>
   <text x="616" y="164" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12" font-weight="700" fill="#1d6b5a">links</text>
-  <text x="616" y="186" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#475569">match( href ): { to } | null</text>
+  <text x="616" y="186" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#475569">match( href ): '/reports' | null</text>
   <text x="616" y="204" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#475569">Link: the router's primitive</text>
   <text x="616" y="232" font-family="-apple-system, system-ui, sans-serif" font-size="9" font-style="italic" fill="#94a3b8">only the application knows</text>
   <text x="706" y="268" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="8.5" font-weight="700" fill="#64748b">provided through WidgetHostProvider</text>

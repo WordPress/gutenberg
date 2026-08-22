@@ -70,7 +70,7 @@
 		"colord": "^2.9.3",
 		"fast-deep-equal": "^3.1.3",
 		"hpq": "^1.4.0",
-		"is-plain-object": "^5.0.0",
+		"is-plain-object": "^5.1.0",
 		"marked": "^18.0.3",
 		"memize": "^2.1.1",
 		"react-is": "^18.3.0",

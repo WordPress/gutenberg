@@ -3276,6 +3276,12 @@
 		"parent": "contributors"
 	},
 	{
+		"title": "Working with WordPress Design System packages",
+		"slug": "design-system-packages",
+		"markdown_source": "../docs/contributors/design/design-system-packages.md",
+		"parent": "design"
+	},
+	{
 		"title": "Blocks are the Interface",
 		"slug": "the-block",
 		"markdown_source": "../docs/contributors/design/the-block.md",

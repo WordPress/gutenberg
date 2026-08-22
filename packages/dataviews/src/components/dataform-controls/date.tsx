@@ -1,5 +1,8 @@
 import {
+	areIntervalsOverlapping,
+	endOfMonth,
 	format,
+	isSameMonth,
 	isValid as isValidDate,
 	subMonths,
 	subDays,
@@ -10,7 +13,7 @@ import {
 import {
 	BaseControl,
 	Button,
-	__experimentalInputControl as InputControl,
+	__experimentalInputControl as WCInputControl,
 } from '@wordpress/components';
 import { speak } from '@wordpress/a11y';
 import {
@@ -29,6 +32,7 @@ import {
 	ValidityIndicator,
 } from '@wordpress/ui';
 import RelativeDateControl from './utils/relative-date-control';
+import toCalendarDate from './utils/to-calendar-date';
 import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
 import {
 	OPERATOR_IN_THE_PAST,
@@ -289,13 +293,36 @@ function CalendarDateControl< Item >( {
 	const weekStartsOn =
 		( fieldFormat as FormatDate ).weekStartsOn ??
 		getSettings().l10n.startOfWeek;
+	const {
+		timezone: { string: timezoneString },
+	} = getSettings();
 
 	const fieldValue = getValue( { item: data } );
 	const value = typeof fieldValue === 'string' ? fieldValue : undefined;
 	const [ calendarMonth, setCalendarMonth ] = useState< Date >( () => {
 		const parsedDate = parseDate( value );
-		return parsedDate || new Date(); // Default to current month
+		// Default to current month
+		return toCalendarDate( parsedDate || new Date(), timezoneString );
 	} );
+	// Follow the value when it changes, so that a change from outside the
+	// control, e.g. an undo, a reset, or switching the edited item, brings
+	// the selection into view. Months are compared in the calendar's time
+	// zone: near a month boundary, a date can belong to a different month
+	// there than in the browser's time zone.
+	useEffect( () => {
+		const parsedDate = parseDate( value );
+		if ( parsedDate ) {
+			const targetMonth = toCalendarDate( parsedDate, timezoneString );
+			setCalendarMonth( ( currentMonth ) =>
+				isSameMonth(
+					targetMonth,
+					toCalendarDate( currentMonth, timezoneString )
+				)
+					? currentMonth
+					: targetMonth
+			);
+		}
+	}, [ value, timezoneString ] );
 
 	const [ isTouched, setIsTouched ] = useState( false );
 	const validityTargetRef = useRef< HTMLInputElement >( null );
@@ -326,12 +353,12 @@ function CalendarDateControl< Item >( {
 			const presetDate = preset.getValue();
 			const dateValue = formatDate( presetDate );
 
-			setCalendarMonth( presetDate );
+			setCalendarMonth( toCalendarDate( presetDate, timezoneString ) );
 			onChangeCallback( dateValue );
 			setSelectedPresetId( preset.id );
 			setIsTouched( true );
 		},
-		[ onChangeCallback ]
+		[ onChangeCallback, timezoneString ]
 	);
 
 	const handleManualDateChange = useCallback(
@@ -340,18 +367,16 @@ function CalendarDateControl< Item >( {
 			if ( newValue ) {
 				const parsedDate = parseDate( newValue );
 				if ( parsedDate ) {
-					setCalendarMonth( parsedDate );
+					setCalendarMonth(
+						toCalendarDate( parsedDate, timezoneString )
+					);
 				}
 			}
 			setSelectedPresetId( null );
 			setIsTouched( true );
 		},
-		[ onChangeCallback ]
+		[ onChangeCallback, timezoneString ]
 	);
-
-	const {
-		timezone: { string: timezoneString },
-	} = getSettings();
 
 	let displayLabel = label;
 	if ( isValid?.required && ! markWhenOptional ) {
@@ -415,7 +440,7 @@ function CalendarDateControl< Item >( {
 					</Stack>
 
 					{ /* Manual date input */ }
-					<InputControl
+					<WCInputControl
 						ref={ validityTargetRef }
 						type="date"
 						label={ __( 'Date' ) }
@@ -477,6 +502,9 @@ function CalendarDateRangeControl< Item >( {
 	const weekStartsOn =
 		( fieldFormat as FormatDate ).weekStartsOn ??
 		getSettings().l10n.startOfWeek;
+	const {
+		timezone: { string: timezoneString },
+	} = getSettings();
 
 	const { minConstraint, maxConstraint, disabledMatchers } =
 		useDisabledDateMatchers( isValid, parseDate );
@@ -510,8 +538,50 @@ function CalendarDateRangeControl< Item >( {
 	}, [ value ] );
 
 	const [ calendarMonth, setCalendarMonth ] = useState< Date >( () => {
-		return selectedRange?.from || new Date();
+		return toCalendarDate(
+			selectedRange?.from || new Date(),
+			timezoneString
+		);
 	} );
+	// Follow the value when it changes, so that a change from outside the
+	// control, e.g. an undo, a reset, or switching the edited item, brings
+	// the range into view. Keep the current view when part of the new range
+	// is already visible, so that selecting the end of a cross-month range
+	// doesn't move the view away. Months are compared in the calendar's
+	// time zone: near a month boundary, a date can belong to a different
+	// month there than in the browser's time zone.
+	const [ fromValue, toValue ] = value ?? [];
+	useEffect( () => {
+		setCalendarMonth( ( currentMonth ) => {
+			const from = parseDate( fromValue );
+			const to = parseDate( toValue );
+			const targetMonth = from ?? to;
+			const currentCalendarMonth = toCalendarDate(
+				currentMonth,
+				timezoneString
+			);
+			const calendarFrom = from && toCalendarDate( from, timezoneString );
+			const calendarTo = to && toCalendarDate( to, timezoneString );
+			const isRangeVisible =
+				calendarFrom && calendarTo
+					? areIntervalsOverlapping(
+							{ start: calendarFrom, end: calendarTo },
+							{
+								start: startOfMonth( currentCalendarMonth ),
+								end: endOfMonth( currentCalendarMonth ),
+							},
+							{ inclusive: true }
+					  )
+					: [ calendarFrom, calendarTo ].some(
+							( date ) =>
+								date &&
+								isSameMonth( date, currentCalendarMonth )
+					  );
+			return targetMonth && ! isRangeVisible
+				? toCalendarDate( targetMonth, timezoneString )
+				: currentMonth;
+		} );
+	}, [ fromValue, toValue, timezoneString ] );
 
 	const [ isTouched, setIsTouched ] = useState( false );
 	const fromInputRef = useRef< HTMLInputElement >( null );
@@ -549,12 +619,12 @@ function CalendarDateRangeControl< Item >( {
 	const handlePresetClick = useCallback(
 		( preset: ( typeof DATE_RANGE_PRESETS )[ 0 ] ) => {
 			const [ startDate, endDate ] = preset.getValue();
-			setCalendarMonth( startDate );
+			setCalendarMonth( toCalendarDate( startDate, timezoneString ) );
 			updateDateRange( startDate, endDate );
 			setSelectedPresetId( preset.id );
 			setIsTouched( true );
 		},
-		[ updateDateRange ]
+		[ updateDateRange, timezoneString ]
 	);
 
 	const handleManualDateChange = useCallback(
@@ -571,17 +641,17 @@ function CalendarDateRangeControl< Item >( {
 			if ( newValue ) {
 				const parsedDate = parseDate( newValue );
 				if ( parsedDate ) {
-					setCalendarMonth( parsedDate );
+					setCalendarMonth(
+						toCalendarDate( parsedDate, timezoneString )
+					);
 				}
 			}
 
 			setSelectedPresetId( null );
 			setIsTouched( true );
 		},
-		[ value, updateDateRange ]
+		[ value, updateDateRange, timezoneString ]
 	);
-
-	const { timezone } = getSettings();
 
 	let displayLabel = label;
 	if ( field.isValid?.required && ! markWhenOptional ) {
@@ -651,7 +721,7 @@ function CalendarDateRangeControl< Item >( {
 						justify="space-between"
 						className="dataviews-controls__date-range-inputs"
 					>
-						<InputControl
+						<WCInputControl
 							ref={ fromInputRef }
 							type="date"
 							label={ __( 'From' ) }
@@ -665,7 +735,7 @@ function CalendarDateRangeControl< Item >( {
 							min={ minConstraint }
 							max={ maxConstraint }
 						/>
-						<InputControl
+						<WCInputControl
 							ref={ toInputRef }
 							type="date"
 							label={ __( 'To' ) }
@@ -687,7 +757,7 @@ function CalendarDateRangeControl< Item >( {
 						onValueChange={ onSelectCalendarRange }
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
-						timeZone={ timezone.string || undefined }
+						timeZone={ timezoneString || undefined }
 						weekStartsOn={ weekStartsOn }
 						disabled={ disabled || disabledMatchers }
 					/>
