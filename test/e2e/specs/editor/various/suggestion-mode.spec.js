@@ -523,16 +523,16 @@ test.describe( 'Suggestion mode', () => {
 		await expect( summaries ).toContainText( 'abc' );
 	} );
 
-	test( 'collapsed delete: a caret moved inside a del marker refuses the keystroke', async ( {
+	test( 'collapsed delete: a caret moved back to a del marker refuses the keystroke', async ( {
 		editor,
 		page,
 	} ) => {
-		// A marker outlives the run that opened it. An arrow key breaks the
-		// run's contiguity without clearing the marker, so the next Delete
-		// aims at a grapheme that is already proposed for deletion. The
+		// A marker outlives the run that opened it. Moving the caret ends the
+		// run without clearing the marker, so the next Backspace aims at a
+		// grapheme that is already proposed for deletion. This is the
 		// collapsed-caret half of the refusal #81655 added for a straddling
 		// selection: falling through would have the browser remove text that
-		// only exists as a proposal and destroy the marker with it.
+		// only exists as a proposal and destroy the marker holding it.
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'abcdef' },
@@ -544,21 +544,22 @@ test.describe( 'Suggestion mode', () => {
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.first();
 		await paragraph.click();
-		await page.keyboard.press( 'Home' );
-		await page.keyboard.press( 'Delete' );
+		await page.keyboard.press( 'End' );
+		await page.keyboard.press( 'Backspace' );
 
 		const markers = paragraph.locator(
 			'mark.wp-suggestion[data-suggestion-type="del"]'
 		);
-		// Wait for the note to mint before growing the run.
-		await expect( markers ).toHaveText( 'a' );
-		await page.keyboard.press( 'Delete' );
-		await expect( markers ).toHaveText( 'ab' );
+		// Wait for the first press to mint its note before repeating.
+		await expect( markers ).toHaveText( 'f' );
+		await page.keyboard.press( 'Backspace' );
+		await expect( markers ).toHaveText( 'ef' );
 
-		// The forward run parks the caret at the marker's start; one step
-		// right puts it inside the marker, with no run in progress.
-		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.press( 'Delete' );
+		// The run parks the caret at the marker's start. End puts it back at
+		// the marker's trailing edge, which ends the run - offset 6 against a
+		// run that left the caret at 4 - without touching the marker.
+		await page.keyboard.press( 'End' );
+		await page.keyboard.press( 'Backspace' );
 
 		// The user is told why the edit did not take.
 		await expect(
@@ -569,7 +570,7 @@ test.describe( 'Suggestion mode', () => {
 
 		// The marker is intact and no text was removed from the paragraph.
 		await expect( markers ).toHaveCount( 1 );
-		await expect( markers ).toHaveText( 'ab' );
+		await expect( markers ).toHaveText( 'ef' );
 		await expect( paragraph ).toHaveText( 'abcdef' );
 	} );
 
