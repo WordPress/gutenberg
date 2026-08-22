@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Input } from '../index';
 import { InputLayout } from '../../input-layout';
 import { WithSuffixControl } from '../../input-layout/stories/index.story';
-import * as Field from '../../field';
 
 const meta: Meta< typeof Input > = {
 	tags: [ 'manifest' ],
@@ -51,14 +50,6 @@ WithSuffixControl.args = {
 	...WithSuffixControl.args,
 	children: undefined,
 };
-// Input has no built-in label; paired with Field.Label here so the
-// example is copy-paste safe.
-WithSuffixControl.render = ( args ) => (
-	<Field.Root>
-		<Field.Label>Coupon code</Field.Label>
-		<Field.Control render={ <Input suffix={ args.suffix } /> } />
-	</Field.Root>
-);
 export { WithSuffixControl };
 
 export const Disabled: Story = {
