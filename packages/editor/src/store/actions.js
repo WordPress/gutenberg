@@ -1150,7 +1150,39 @@ export const toggleTopToolbar =
  */
 export const switchEditorMode =
 	( mode ) =>
-	( { dispatch, registry } ) => {
+	( { dispatch, registry, select } ) => {
+		/*
+		 * The code editor edits raw `post_content`, which has nowhere to put
+		 * an inline marker and is re-parsed wholesale on the way back, so a
+		 * raw edit bypasses suggestion capture and takes the existing markers
+		 * down with it. `getCodeEditorUnavailableReason` owns both cases -
+		 * the `suggest` intent, and any intent while markers are still
+		 * pending - so this refusal, the disabled menu item, and the filtered
+		 * command all agree.
+		 *
+		 * Refusing here is what actually closes the hole: the menu item is
+		 * disabled and the command is filtered out, but the keyboard shortcut
+		 * reaches this action directly. Announce it and raise a snackbar too,
+		 * because a shortcut that silently does nothing reads as a broken
+		 * editor to a sighted keyboard user.
+		 */
+		if ( mode === 'text' ) {
+			const unavailableReason = select.getCodeEditorUnavailableReason( {
+				checkPendingSuggestions: true,
+			} );
+			if ( unavailableReason ) {
+				speak( unavailableReason, 'assertive' );
+				registry
+					.dispatch( noticesStore )
+					.createNotice( 'info', unavailableReason, {
+						id: 'editor-code-editor-unavailable',
+						type: 'snackbar',
+						isDismissible: true,
+					} );
+				return;
+			}
+		}
+
 		registry.dispatch( preferencesStore ).set( 'core', 'editorMode', mode );
 
 		if ( mode !== 'visual' ) {

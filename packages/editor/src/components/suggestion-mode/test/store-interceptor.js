@@ -594,6 +594,115 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		} );
 	} );
 
+	it( 'adopts a resetBlocks as the new baseline instead of capturing it', async () => {
+		// A `resetBlocks` is content handed down by the controlling entity —
+		// the sync manager applying another session's changes, a revision
+		// restore, a refetch. Every block in it carries a fresh clientId, so
+		// without the external-reset check the interceptor read the arriving
+		// document as a page of insertions and the outgoing one as a page of
+		// removals, doubling the post in the canvas and opening a note per
+		// block (issue #73411, finding F-21).
+		const { registry, getOverlay } = setup();
+
+		const incoming = [
+			createBlock( TEST_BLOCK_NAME, { content: 'Hello' } ),
+			createBlock( TEST_BLOCK_NAME, { content: 'From the server' } ),
+		];
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).resetBlocks( incoming );
+		} );
+		await flushSubscribers();
+
+		const liveBlocks = registry.select( blockEditorStore ).getBlocks();
+		expect( liveBlocks.map( ( block ) => block.clientId ) ).toEqual(
+			incoming.map( ( block ) => block.clientId )
+		);
+		expect(
+			liveBlocks.map(
+				( block ) => block.attributes?.metadata?.suggestion
+			)
+		).toEqual( [ undefined, undefined ] );
+		expect( Object.keys( getOverlay().entries ) ).toEqual( [] );
+	} );
+
+	it( 'still captures an edit made after a resetBlocks', async () => {
+		// The adoption above must re-seed the baseline, not switch capture
+		// off: the next real edit — on a block that only exists because of
+		// the reset — is still a suggestion.
+		const { registry, getOverlay } = setup();
+
+		const incoming = [
+			createBlock( TEST_BLOCK_NAME, { content: 'From the server' } ),
+		];
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).resetBlocks( incoming );
+		} );
+		await flushSubscribers();
+
+		const incomingClientId = incoming[ 0 ].clientId;
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( incomingClientId, {
+					content: 'Edited',
+				} );
+		} );
+		await flushSubscribers();
+
+		// Reverted on the live block, captured in the overlay — the ordinary
+		// attribute-suggestion path.
+		expect(
+			registry
+				.select( blockEditorStore )
+				.getBlockAttributes( incomingClientId )?.content
+		).toBe( 'From the server' );
+		expect(
+			getOverlay().entries[ incomingClientId ]?.overlayAttributes?.content
+		).toBe( 'Edited' );
+	} );
+
+	it( 'does not leave an undo adoption token armed after a resetBlocks', async () => {
+		// An undo/redo IS a `resetBlocks` in the post editor: the guard arms
+		// an adoption token, core-data reverts the `blocks` edit, and
+		// `useBlockSync` hands the result down. The external-reset branch
+		// adopts that landing, so it must also spend the token — a token left
+		// armed stays live for a second, and the user's very next keystroke
+		// would spend it and be adopted as baseline rather than captured.
+		const { registry, getOverlay } = setup();
+
+		await act( async () => {
+			getOverlay().armUndoRedoAdoption();
+		} );
+
+		const incoming = [
+			createBlock( TEST_BLOCK_NAME, { content: 'Undone' } ),
+		];
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).resetBlocks( incoming );
+		} );
+		await flushSubscribers();
+
+		// The keystroke that follows the undo is an ordinary suggestion.
+		const incomingClientId = incoming[ 0 ].clientId;
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( incomingClientId, {
+					content: 'Undone and typed',
+				} );
+		} );
+		await flushSubscribers();
+
+		expect(
+			registry
+				.select( blockEditorStore )
+				.getBlockAttributes( incomingClientId )?.content
+		).toBe( 'Undone' );
+		expect(
+			getOverlay().entries[ incomingClientId ]?.overlayAttributes?.content
+		).toBe( 'Undone and typed' );
+	} );
+
 	it( 'defers an empty default block, then registers a single insertion once it gains content', async () => {
 		// Regression: typing into a freshly-appended empty paragraph must
 		// produce ONE suggestion (the block insertion, content included) —
