@@ -147,6 +147,14 @@ export function getSuggestionA11yDescriptor( type ) {
  * element), so a marker gains exactly one nested role element. Where markers
  * nest, each run keeps its own decoration describing the marker that wraps it.
  *
+ * It is spliced in directly after the marker rather than pushed onto the end of
+ * the stack. `toTree` decides whether to reuse an element by comparing format
+ * stacks *by index*, so a bold run or link covering only part of a marker would
+ * shift a trailing decoration's index and split it into two elements - and two
+ * elements means the closing announcement is read out mid-suggestion and the
+ * opening one repeated. Sitting immediately inside the marker keeps its index
+ * fixed for the marker's whole run.
+ *
  * @param {Array} formats Per-character format stacks.
  * @return {Array} Format stacks with role decorations added.
  */
@@ -161,19 +169,20 @@ export function addSuggestionRoleFormats( formats ) {
 		const stack = formats[ i ];
 		/*
 		 * The innermost marker, not the first: overlapping runs from two
-		 * people serialize as nested markers, and the decoration is appended
-		 * last so it renders inside all of them. Describing an enclosing
-		 * marker would announce the wrong change - a deletion nested inside
-		 * someone else's addition read aloud as an addition.
+		 * people serialize as nested markers, and the decoration goes just
+		 * inside the deepest of them. Describing an enclosing marker would
+		 * announce the wrong change - a deletion nested inside someone else's
+		 * addition read aloud as an addition.
 		 */
-		const suggestion = Array.isArray( stack )
-			? stack.findLast( ( f ) => f.type === SUGGESTION_FORMAT_NAME )
-			: undefined;
-		if ( ! suggestion ) {
+		const markerIndex = Array.isArray( stack )
+			? stack.findLastIndex( ( f ) => f.type === SUGGESTION_FORMAT_NAME )
+			: -1;
+		if ( markerIndex === -1 ) {
 			lastSuggestion = null;
 			lastDecoration = null;
 			continue;
 		}
+		const suggestion = stack[ markerIndex ];
 		if ( ! out ) {
 			out = formats.slice();
 		}
@@ -205,7 +214,11 @@ export function addSuggestionRoleFormats( formats ) {
 				},
 			};
 		}
-		out[ i ] = [ ...stack, lastDecoration ];
+		out[ i ] = [
+			...stack.slice( 0, markerIndex + 1 ),
+			lastDecoration,
+			...stack.slice( markerIndex + 1 ),
+		];
 	}
 	return out ?? formats;
 }
