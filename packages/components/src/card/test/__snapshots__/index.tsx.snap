@@ -9,7 +9,7 @@ Snapshot Diff:
   <div>
     <div
 -     class="css-1klm29z-Body css-3bn5lk-borderRadius css-15c2zrr-medium components-card__body components-card-body"
-+     class="css-drdujb-Scrollable css-1kynhwg-scrollableScrollbar css-flie1-scrollY components-scrollable css-1klm29z-Body css-3bn5lk-borderRadius css-15c2zrr-medium components-card__body components-card-body"
++     class="style-scrollable style-scroll-y components-scrollable css-1klm29z-Body css-3bn5lk-borderRadius css-15c2zrr-medium components-card__body components-card-body"
       data-wp-c16t="true"
       data-wp-component="CardBody"
     >
