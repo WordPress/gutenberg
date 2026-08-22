@@ -214,38 +214,36 @@ function VideoEdit( {
 					</BlockControls>
 				</>
 			) }
-			{ ! isGif && (
-				<InspectorControls>
-					<ToolsPanel
-						label={ __( 'Settings' ) }
-						resetAll={ () => {
+			<InspectorControls>
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => {
+						setAttributes( {
+							autoplay: false,
+							controls: true,
+							loop: false,
+							muted: false,
+							playsInline: false,
+							preload: 'metadata',
+							poster: undefined,
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<VideoCommonSettings
+						setAttributes={ setAttributes }
+						attributes={ attributes }
+					/>
+					<PosterImage
+						poster={ poster }
+						onChange={ ( posterImage ) =>
 							setAttributes( {
-								autoplay: false,
-								controls: true,
-								loop: false,
-								muted: false,
-								playsInline: false,
-								preload: 'metadata',
-								poster: undefined,
-							} );
-						} }
-						dropdownMenuProps={ dropdownMenuProps }
-					>
-						<VideoCommonSettings
-							setAttributes={ setAttributes }
-							attributes={ attributes }
-						/>
-						<PosterImage
-							poster={ poster }
-							onChange={ ( posterImage ) =>
-								setAttributes( {
-									poster: posterImage?.url,
-								} )
-							}
-						/>
-					</ToolsPanel>
-				</InspectorControls>
-			) }
+								poster: posterImage?.url,
+							} )
+						}
+					/>
+				</ToolsPanel>
+			</InspectorControls>
 			<figure { ...blockProps }>
 				<video
 					controls={ controls }
