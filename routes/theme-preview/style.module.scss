@@ -1,0 +1,19 @@
+/* Same adjustments the styles route applies to the global styles UI chrome. */
+.page {
+	:global(.global-styles-ui-screen-root) {
+		box-shadow: none;
+
+		> div > hr {
+			display: none;
+		}
+	}
+
+	:global(.global-styles-ui-sidebar__navigator-provider) {
+		overflow-y: auto;
+		padding-inline: 0;
+
+		:global(.components-tools-panel) {
+			border-top: none;
+		}
+	}
+}

@@ -64,6 +64,10 @@
 					"@wordpress/edit-site-init"
 				],
 				"experimental": true
+			},
+			{
+				"id": "theme-preview",
+				"experimental": true
 			}
 		]
 	},
