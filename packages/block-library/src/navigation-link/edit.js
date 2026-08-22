@@ -100,6 +100,9 @@ export default function NavigationLinkEdit( {
 	// Track whether we should focus the submenu appender when closing the link UI
 	const shouldSelectSubmenuAppenderOnClose = useRef( false );
 
+	const blockEditingMode = useBlockEditingMode();
+	const isContentOnlyMode = blockEditingMode === 'contentOnly';
+
 	const {
 		isAtMaxNesting,
 		isTopLevelLink,
@@ -368,7 +371,7 @@ export default function NavigationLinkEdit( {
 							setIsLinkOpen( true );
 						} }
 					/>
-					{ ! isAtMaxNesting && (
+					{ ! isAtMaxNesting && ! isContentOnlyMode && (
 						<ToolbarButton
 							name="submenu"
 							icon={ addSubmenu }
