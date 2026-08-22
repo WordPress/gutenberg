@@ -10,8 +10,10 @@
  *      AND an overlay `<del>/<ins class="has-suggestion-*">` diff. This holds
  *      now that Phase 2 moved formatting to markers, including when a formatting
  *      change and a text addition coexist on one block (non-overlapping runs).
- *      A formatting change whose run overlaps an existing marker still declines
- *      to the overlay; that narrower case is not yet exercised here.
+ *      An edit that can be expressed as neither — a delete straddling a marker,
+ *      a type-over of a marked run, a second format toggle over one — is
+ *      declined outright rather than falling through to the overlay, which
+ *      would hide the marker it landed on top of.
  *
  *   2. SEAMS - edits that used to fall through to the overlay diff path instead
  *      of producing a marker, because marker creation keys off a narrow set of
@@ -466,7 +468,7 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 		expect( serialized ).toContain( 'data-suggestion-type="add"' );
 	} );
 
-	test( 'seam: a delete straddling an existing marker never corrupts it', async ( {
+	test( 'invariant: a delete straddling an existing marker is declined, not swallowed by an overlay', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -491,30 +493,140 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 
 		/*
 		 * Select "ld NEW" — a range straddling the add marker's boundary —
-		 * and delete it. The deletion keyboard declines ranges overlapping an
-		 * existing suggestion (no nested marks), and the reconciler's diff
-		 * declares the straddling edit unresolvable, so the store interceptor
-		 * captures it as a whole-attribute suggestion. The one behavior this
-		 * seam pins: the existing suggestion is never corrupted.
+		 * and delete it. Neither representation fits: a `del` marker over the
+		 * range would re-attribute half of the existing marker to a new note,
+		 * and the whole-content overlay this used to fall through to renders a
+		 * marker-free snapshot, which hid every marker in the block while the
+		 * earlier note kept describing them (#73411, F-09). The gesture is
+		 * declined instead.
 		 */
-		const saved = waitForSuggestionSaved( page );
 		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 6 } );
 		await page.keyboard.press( 'Backspace' );
-		await saved;
+
+		// The user is told why the edit did not take.
+		await expect(
+			page
+				.locator( '.components-snackbar-list' )
+				.getByText( 'overlaps a pending suggestion' )
+		).toBeVisible();
+
 		await deselect( page );
 
 		// Never nested: a marker inside a marker would corrupt both.
 		await expect(
 			paragraph.locator( `${ SUGGESTION_MARK } ${ SUGGESTION_MARK }` )
 		).toHaveCount( 0 );
-		// The straddling edit fell back to an attribute suggestion…
-		await expect( paragraph ).toHaveClass( /is-suggestion-pending/ );
-		// …and the baseline — including the earlier add suggestion, intact —
-		// is what serializes.
+		// The invariant: no overlay landed on this block, so the marker is
+		// still the block's rendered state and still the only suggestion on it.
+		await expect( paragraph ).not.toHaveClass( /is-suggestion-pending/ );
+		await expect( paragraph.locator( OVERLAY_ADD ) ).toHaveCount( 0 );
+		await expect( paragraph.locator( OVERLAY_DEL ) ).toHaveCount( 0 );
+		await expect( addMarker ).toBeVisible();
+		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 1 );
+		// Nothing was removed, and the earlier suggestion survives verbatim.
+		await expect
+			.poll( () => paragraph.textContent() )
+			.toBe( 'Hello world NEW' );
 		const serialized = await editor.getEditedPostContent();
 		expect( serialized ).toContain( 'Hello world' );
 		expect( serialized ).toContain( 'data-suggestion-type="add"' );
 		expect( serialized ).toContain( 'NEW' );
+	} );
+
+	test( 'invariant: a format toggle over a marked run is declined, not swallowed by an overlay', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+
+		// Bold "world" — the golden path, one `format` marker.
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await pageUtils.pressKeys( 'primary+b' );
+		const formatMark = paragraph.locator(
+			`${ SUGGESTION_MARK }[data-suggestion-type="format"]`
+		);
+		await expect( formatMark ).toContainText( 'world' );
+
+		/*
+		 * Italicise the same run. `planFormatMarkers` declines a run that
+		 * overlaps an existing marker, and the overlay it used to fall through
+		 * to recorded a suggestion carrying no change at all while hiding the
+		 * bold marker (#73411, F-12). Declined at the seam instead.
+		 */
+		await pageUtils.pressKeys( 'primary+i' );
+
+		await expect(
+			page
+				.locator( '.components-snackbar-list' )
+				.getByText( 'overlaps a pending suggestion' )
+		).toBeVisible();
+
+		await deselect( page );
+
+		// The bold marker still renders, alone, with no overlay over it.
+		await expect( paragraph ).not.toHaveClass( /is-suggestion-pending/ );
+		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 1 );
+		await expect( formatMark ).toHaveText( 'world' );
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).toContain( 'data-suggestion-type="format"' );
+	} );
+
+	test( 'invariant: typing over a marked run is declined, not swallowed by an overlay', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' NEW' );
+		const addMarker = paragraph.locator(
+			`${ SUGGESTION_MARK }[data-suggestion-type="add"]`
+		);
+		await expect( addMarker ).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
+		/*
+		 * Select the pending addition and type over it. The type-over would
+		 * wrap the selection in a `del` marker, re-attributing the existing
+		 * marker's text to a second note; the fallback hid the marker instead.
+		 */
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 3 } );
+		await page.keyboard.type( 'X' );
+
+		await expect(
+			page
+				.locator( '.components-snackbar-list' )
+				.getByText( 'overlaps a pending suggestion' )
+		).toBeVisible();
+
+		await deselect( page );
+
+		await expect( paragraph ).not.toHaveClass( /is-suggestion-pending/ );
+		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 1 );
+		await expect
+			.poll( () => paragraph.textContent() )
+			.toBe( 'Hello world NEW' );
 	} );
 
 	/*

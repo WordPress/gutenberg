@@ -529,9 +529,10 @@ test.describe( 'Suggestion mode', () => {
 	} ) => {
 		// A marker outlives the run that opened it. An arrow key breaks the
 		// run's contiguity without clearing the marker, so the next Delete
-		// aims at a grapheme that is already proposed for deletion. Falling
-		// through to the browser there would remove text that only exists as
-		// a proposal and destroy the marker with it.
+		// aims at a grapheme that is already proposed for deletion. The
+		// collapsed-caret half of the refusal #81655 added for a straddling
+		// selection: falling through would have the browser remove text that
+		// only exists as a proposal and destroy the marker with it.
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'abcdef' },
@@ -559,8 +560,14 @@ test.describe( 'Suggestion mode', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Delete' );
 
-		// The keystroke is swallowed: the marker is intact and no text was
-		// removed from the paragraph.
+		// The user is told why the edit did not take.
+		await expect(
+			page
+				.locator( '.components-snackbar-list' )
+				.getByText( 'overlaps a pending suggestion' )
+		).toBeVisible();
+
+		// The marker is intact and no text was removed from the paragraph.
 		await expect( markers ).toHaveCount( 1 );
 		await expect( markers ).toHaveText( 'ab' );
 		await expect( paragraph ).toHaveText( 'abcdef' );

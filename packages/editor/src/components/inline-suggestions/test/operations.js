@@ -16,16 +16,9 @@ import {
 	growInlineAddition,
 	buildSuggestionMarkerAttributes,
 	formatsRangeHasSuggestion,
-	formatsRangeHasSuggestionType,
 	valueRangeHasSuggestion,
 } from '../operations';
-import {
-	registerSuggestionFormat,
-	SUGGESTION_FORMAT_NAME,
-	SUGGESTION_TYPE_ATTRIBUTE,
-	SUGGESTION_TYPE_ADDITION,
-	SUGGESTION_TYPE_DELETION,
-} from '../format';
+import { registerSuggestionFormat, SUGGESTION_FORMAT_NAME } from '../format';
 
 const getFormatType = ( name ) => select( richTextStore ).getFormatType( name );
 
@@ -594,77 +587,6 @@ describe( 'suggestion range overlap detection', () => {
 			expect( valueRangeHasSuggestion( 42, 0, 1 ) ).toBe( false );
 			const value = RichTextData.fromHTMLString( del( 1, 'abc' ) );
 			expect( valueRangeHasSuggestion( value, 2, 2 ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'formatsRangeHasSuggestionType', () => {
-		const stack = ( type ) => [
-			{
-				type: SUGGESTION_FORMAT_NAME,
-				attributes: { [ SUGGESTION_TYPE_ATTRIBUTE ]: type },
-			},
-		];
-		const formats = [
-			stack( SUGGESTION_TYPE_DELETION ),
-			undefined,
-			stack( SUGGESTION_TYPE_ADDITION ),
-		];
-
-		it( 'matches only the kind asked for', () => {
-			expect(
-				formatsRangeHasSuggestionType(
-					formats,
-					0,
-					1,
-					SUGGESTION_TYPE_DELETION
-				)
-			).toBe( true );
-			expect(
-				formatsRangeHasSuggestionType(
-					formats,
-					0,
-					1,
-					SUGGESTION_TYPE_ADDITION
-				)
-			).toBe( false );
-			expect(
-				formatsRangeHasSuggestionType(
-					formats,
-					2,
-					3,
-					SUGGESTION_TYPE_ADDITION
-				)
-			).toBe( true );
-		} );
-
-		it( 'ignores unmarked characters in range', () => {
-			expect(
-				formatsRangeHasSuggestionType(
-					formats,
-					1,
-					2,
-					SUGGESTION_TYPE_DELETION
-				)
-			).toBe( false );
-		} );
-
-		it( 'clamps out-of-bounds ranges and tolerates a missing array', () => {
-			expect(
-				formatsRangeHasSuggestionType(
-					formats,
-					-5,
-					99,
-					SUGGESTION_TYPE_DELETION
-				)
-			).toBe( true );
-			expect(
-				formatsRangeHasSuggestionType(
-					undefined,
-					0,
-					1,
-					SUGGESTION_TYPE_DELETION
-				)
-			).toBe( false );
 		} );
 	} );
 
