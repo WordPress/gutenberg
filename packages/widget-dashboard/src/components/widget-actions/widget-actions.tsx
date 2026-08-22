@@ -64,7 +64,7 @@ export function WidgetActions( {
 				<Menu.Popover>
 					<Menu.Group className={ styles[ 'widget-action-items' ] }>
 						{ actions.map( ( action ) => {
-							const route = getActionRoute( links, action );
+							const path = getActionRoute( links, action );
 							const HostLink = links?.Link;
 
 							return (
@@ -76,7 +76,7 @@ export function WidgetActions( {
 										) : undefined
 									}
 									render={
-										route && HostLink ? (
+										path !== null && HostLink ? (
 											<Link
 												className={
 													styles[
@@ -84,9 +84,7 @@ export function WidgetActions( {
 													]
 												}
 												render={
-													<HostLink
-														path={ route.path }
-													/>
+													<HostLink path={ path } />
 												}
 											/>
 										) : (

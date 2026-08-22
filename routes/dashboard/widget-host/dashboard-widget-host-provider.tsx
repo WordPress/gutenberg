@@ -12,7 +12,7 @@ import { matchDashboardHref } from './match-dashboard-href';
  */
 const DashboardRouteLink = forwardRef<
 	HTMLAnchorElement,
-	{ path: string } & ComponentPropsWithoutRef< 'a' >
+	{ path: string } & Omit< ComponentPropsWithoutRef< 'a' >, 'href' >
 >( function DashboardRouteLink( { path, ...props }, ref ) {
 	return <Link ref={ ref } to={ path } { ...props } />;
 } );

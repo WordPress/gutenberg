@@ -125,7 +125,7 @@ export function WidgetFooter( {
 			{ highActions.length > 0 && (
 				<Stack direction="row" align="center" gap="lg" wrap="wrap">
 					{ highActions.map( ( action ) => {
-						const route = getActionRoute( links, action );
+						const path = getActionRoute( links, action );
 						const className = action.icon
 							? styles[ 'prefixed-action' ]
 							: undefined;
@@ -136,11 +136,11 @@ export function WidgetFooter( {
 							</>
 						);
 
-						return route && HostLink ? (
+						return path !== null && HostLink ? (
 							<Link
 								key={ action.id }
 								className={ className }
-								render={ <HostLink path={ route.path } /> }
+								render={ <HostLink path={ path } /> }
 							>
 								{ children }
 							</Link>
@@ -168,10 +168,10 @@ export function WidgetFooter( {
 				>
 					<Tooltip.Provider>
 						{ mediumActions.map( ( action ) => {
-							const route = getActionRoute( links, action );
+							const path = getActionRoute( links, action );
 							const routeRender =
-								route && HostLink ? (
-									<HostLink path={ route.path } />
+								path !== null && HostLink ? (
+									<HostLink path={ path } />
 								) : undefined;
 
 							if ( action.icon ) {

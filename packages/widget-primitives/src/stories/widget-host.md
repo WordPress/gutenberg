@@ -20,17 +20,17 @@ The provider belongs to the application layer, wrapping the dashboard or whateve
 
 ```ts
 links: {
-	match: ( href: string ) => WidgetHostRouteMatch | null;
+	match: ( href: string ) => string | null;
 	// The router's link primitive. Must render a real anchor and
-	// forward `ref` to it.
+	// forward `ref` to it. `path` replaces `href`.
 	Link: ComponentType<
-		{ path: string } & ComponentPropsWithoutRef< 'a' > &
+		{ path: string } & Omit< ComponentPropsWithoutRef< 'a' >, 'href' > &
 			RefAttributes< HTMLAnchorElement >
 	>;
 }
 ```
 
-`match` answers one question: does this href target one of the application's own routes? On a hit it returns the in-app route, `{ path: '/reports' }`, and the consumer mounts `Link` with it, so the navigation is client-side. On `null` the consumer falls back to a plain anchor.
+`match` answers one question: does this href target one of the application's own routes? On a hit it returns the in-app route path, `'/reports'`, and the consumer mounts `Link` with it, so the navigation is client-side. On `null` the consumer falls back to a plain anchor.
 
 The action declaration does not change either way. A widget declares the portable URL of its target, `admin.php?page=analytics&p=/reports`; in the owning application that materializes as a router link, everywhere else as a plain anchor that full-loads to the same place. Recognition is the application's: reachability depends on the routes it registered, which change per application and over time.
 

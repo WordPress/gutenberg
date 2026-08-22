@@ -9,19 +9,19 @@ describe( 'matchDashboardHref', () => {
 				'https://example.com/wp-admin/admin.php?page=dashboard&p=/site-health',
 				BASE
 			)
-		).toEqual( { path: '/site-health' } );
+		).toBe( '/site-health' );
 	} );
 
 	it( 'matches a relative href that carries the same page', () => {
 		expect(
 			matchDashboardHref( 'admin.php?page=dashboard&p=/reports', BASE )
-		).toEqual( { path: '/reports' } );
+		).toBe( '/reports' );
 	} );
 
 	it( 'defaults to the root route when p is absent', () => {
-		expect(
-			matchDashboardHref( 'admin.php?page=dashboard', BASE )
-		).toEqual( { path: '/' } );
+		expect( matchDashboardHref( 'admin.php?page=dashboard', BASE ) ).toBe(
+			'/'
+		);
 	} );
 
 	it( 'rejects another admin page', () => {

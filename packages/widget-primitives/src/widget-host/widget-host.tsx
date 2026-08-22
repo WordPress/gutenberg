@@ -7,34 +7,26 @@ import type {
 } from 'react';
 
 /**
- * The in-app route a href resolves to.
- */
-export interface WidgetHostRouteMatch {
-	/**
-	 * Route path inside the host's router.
-	 */
-	path: string;
-}
-
-/**
  * Host link capability: recognition of the host's own routes plus the
  * router's link primitive. The two travel together; a match is only
  * actionable with the primitive that consumes it.
  */
 export interface WidgetHostLinks {
 	/**
-	 * Returns the in-app route for a href, or `null` when the href points
-	 * outside the host's registered routes.
+	 * Returns the in-app route path for a href, or `null` when the href
+	 * points outside the host's registered routes. Consumers hand the
+	 * path back to `Link` without interpreting it.
 	 */
-	match: ( href: string ) => WidgetHostRouteMatch | null;
+	match: ( href: string ) => string | null;
 
 	/**
 	 * The host router's link primitive. Must render a real anchor and
 	 * forward `ref` to it: consumers compose the link into render props,
 	 * where menus and tooltips reach their anchor through the ref.
+	 * `path` replaces `href`; the two never coexist.
 	 */
 	Link: ComponentType<
-		{ path: string } & ComponentPropsWithoutRef< 'a' > &
+		{ path: string } & Omit< ComponentPropsWithoutRef< 'a' >, 'href' > &
 			RefAttributes< HTMLAnchorElement >
 	>;
 }

@@ -1,7 +1,5 @@
-import type { WidgetHostRouteMatch } from '@wordpress/widget-primitives';
-
 /**
- * Resolves an action href to a route inside this SPA.
+ * Resolves an action href to a route path inside this SPA.
  *
  * A href belongs here when it targets the same document (origin and
  * pathname) and the same admin `page`; the route is then whatever `p`
@@ -12,12 +10,12 @@ import type { WidgetHostRouteMatch } from '@wordpress/widget-primitives';
  * @param {string} href Action href, absolute or relative.
  * @param {string} base Document URL the href is judged against; defaults
  *                      to the current location.
- * @return {WidgetHostRouteMatch | null} The in-app route, or `null`.
+ * @return {string | null} The in-app route path, or `null`.
  */
 export function matchDashboardHref(
 	href: string,
 	base: string = window.location.href
-): WidgetHostRouteMatch | null {
+): string | null {
 	let url: URL;
 	let baseUrl: URL;
 	try {
@@ -53,5 +51,5 @@ export function matchDashboardHref(
 		return null;
 	}
 
-	return { path };
+	return path;
 }
