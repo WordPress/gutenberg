@@ -1319,6 +1319,27 @@ describe( 'Editor actions', () => {
 			);
 		} );
 
+		it( 'announces a change of intent, but not a repeat of the current one', () => {
+			const getNotices = () =>
+				registry.select( noticesStore ).getNotices();
+
+			// The store boots at `edit`, so re-selecting it stays silent.
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'edit'
+			);
+			expect( getNotices() ).toHaveLength( 0 );
+
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+			expect( getNotices() ).toHaveLength( 1 );
+
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+			expect( getNotices() ).toHaveLength( 1 );
+		} );
+
 		it( 'does not write to the preferences store (session-scoped only)', () => {
 			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
 				'view'
