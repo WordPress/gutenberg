@@ -566,7 +566,7 @@ HTML;
 			'The original list item content should be replaced by the source value.'
 		);
 		$this->assertMatchesRegularExpression(
-			'#<li>Bound list item\s*<ul class="wp-block-list is-layout-flow(?: wp-container-core-list-is-layout-[^"\\s]+)? wp-block-list-is-layout-flow"><li>Nested child</li></ul></li>#',
+			'#<li>Bound list item\s*<ul class="wp-block-list"><li>Nested child</li></ul></li>#',
 			$normalized,
 			'The list item should render the source text and preserve nested list inner blocks.'
 		);
@@ -598,7 +598,7 @@ HTML;
 			'Raw list markup before the nested block should be replaced by the source value.'
 		);
 		$this->assertMatchesRegularExpression(
-			'#<li>Bound list item\s*<ul class="wp-block-list is-layout-flow(?: wp-container-core-list-is-layout-[^"\\s]+)? wp-block-list-is-layout-flow"><li>Nested child should remain</li></ul></li>#',
+			'#<li>Bound list item\s*<ul class="wp-block-list"><li>Nested child should remain</li></ul></li>#',
 			$normalized,
 			'The list item should preserve only the delimiter-backed nested list inner block.'
 		);
@@ -630,7 +630,7 @@ HTML;
 			'An empty source value should clear the original list item content.'
 		);
 		$this->assertMatchesRegularExpression(
-			'#<li>\s*<ul class="wp-block-list is-layout-flow(?: wp-container-core-list-is-layout-[^"\\s]+)? wp-block-list-is-layout-flow"><li>Nested child</li></ul></li>#',
+			'#<li>\s*<ul class="wp-block-list"><li>Nested child</li></ul></li>#',
 			$normalized,
 			'An empty source value should still preserve nested list inner blocks.'
 		);
@@ -662,7 +662,7 @@ HTML;
 			'The original list item content should be replaced by the source value.'
 		);
 		$this->assertMatchesRegularExpression(
-			'#<li>Bound list item\s*<ol class="wp-block-list is-layout-flow(?: wp-container-core-list-is-layout-[^"\\s]+)? wp-block-list-is-layout-flow"><li>Nested ordered child</li></ol></li>#',
+			'#<li>Bound list item\s*<ol class="wp-block-list"><li>Nested ordered child</li></ol></li>#',
 			$normalized,
 			'The list item should render the source text and preserve the nested ordered list.'
 		);
@@ -796,7 +796,7 @@ HTML;
 			'Nested list inner blocks should remain in the rendered output.'
 		);
 		$this->assertMatchesRegularExpression(
-			'#<li>Pattern <em>override</em><ul class="wp-block-list is-layout-flow(?: wp-container-core-list-is-layout-[^"\\s]+)? wp-block-list-is-layout-flow"><li>Nested child</li></ul></li>#',
+			'#<li>Pattern <em>override</em><ul class="wp-block-list"><li>Nested child</li></ul></li>#',
 			$normalized,
 			'The list item should render the pattern override before its nested list.'
 		);
