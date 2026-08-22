@@ -6,7 +6,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import {
 	Button,
 	Dropdown,
-	__experimentalInputControl as InputControl,
+	__experimentalInputControl as WCInputControl,
 } from '@wordpress/components';
 import { useState, useMemo } from '@wordpress/element';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
@@ -103,7 +103,7 @@ export default function BlogTitle() {
 							title={ __( 'Blog title' ) }
 							onClose={ onClose }
 						/>
-						<InputControl
+						<WCInputControl
 							placeholder={ __( 'No title' ) }
 							value={ postsPageTitle }
 							onChange={ debounce( setPostsPageTitle, 300 ) }
