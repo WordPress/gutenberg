@@ -82,11 +82,12 @@ function gutenberg_get_composition_demo_content() {
 /**
  * Returns the composition for the Site Health Overview definition.
  *
- * A paragraph plus the `widget-def/site-health-counts` dynamic block, every
- * piece resolved through the SSR fallback. The counts block reads the cached
- * Site Health results on the server at render time, so the composition
- * carries backend data while staying declarative; the full results belong to
- * the Site Health page its `Details` action targets.
+ * A paragraph, the `widget-def/site-health-counts` dynamic block, and a
+ * `core-admin/link` to the Site Health page. Paragraph and counts resolve
+ * through the SSR fallback; the counts block reads the cached Site Health
+ * results on the server at render time, so the composition carries backend
+ * data while staying declarative. The link renders client-side, where the
+ * host's `links` capability upgrades it to a router link.
  *
  * Spacing is inline because the dashboard does not enqueue
  * `wp-block-library`, so the block classes resolve to nothing.
@@ -94,11 +95,19 @@ function gutenberg_get_composition_demo_content() {
  * @return string Block markup.
  */
 function gutenberg_get_site_health_overview_content() {
+	$review_link = wp_json_encode(
+		array(
+			'href'  => 'admin.php?page=dashboard-wp-admin&p=/site-health',
+			'label' => __( 'Review all results', 'gutenberg' ),
+		)
+	);
+
 	return '<!-- wp:paragraph -->' .
 		'<p style="margin:0 0 12px;">' .
 		esc_html__( 'WordPress runs periodic health checks covering performance and security.', 'gutenberg' ) .
 		'</p><!-- /wp:paragraph -->' .
-		'<!-- wp:widget-def/site-health-counts /-->';
+		'<!-- wp:widget-def/site-health-counts /-->' .
+		'<!-- wp:core-admin/link ' . $review_link . ' /-->';
 }
 
 /**
