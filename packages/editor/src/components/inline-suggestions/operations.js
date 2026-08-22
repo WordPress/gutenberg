@@ -233,6 +233,19 @@ export function acceptInlineFormat( value, suggestionId ) {
 }
 
 /**
+ * Extract the HTML of a block attribute value, tolerating plain strings.
+ *
+ * @param {*} value Block attribute value.
+ * @return {?string} HTML, or null when the value carries none.
+ */
+function toHTML( value ) {
+	if ( value instanceof RichTextData ) {
+		return value.toHTMLString();
+	}
+	return typeof value === 'string' ? value : null;
+}
+
+/**
  * Reject a suggested formatting change: replace the marked run with the original
  * run captured when the suggestion was made, so the proposed formatting (and the
  * marker) are both discarded and the run returns to how it was styled before.
@@ -240,20 +253,25 @@ export function acceptInlineFormat( value, suggestionId ) {
  * `plan.beforeHTML`) because the marked run in content holds the *proposed*
  * formatting, not the original.
  *
- * @param {*}             value        Block attribute value (RichTextData or other).
+ * Accepts a plain-string value as well as `RichTextData`: the format keyboard's
+ * retract path passes the raw `content` attribute, which a block may hold as a
+ * string.
+ *
+ * @param {*}             value        Block attribute value (RichTextData, string, or other).
  * @param {number|string} suggestionId Suggestion (marker) id to reject.
  * @param {string}        beforeHTML   HTML of the original run to restore.
  * @return {*} New RichTextData with the original run restored, or the original value.
  */
 export function rejectInlineFormat( value, suggestionId, beforeHTML ) {
-	if ( ! ( value instanceof RichTextData ) ) {
+	const html = toHTML( value );
+	if ( html === null ) {
 		return value;
 	}
 	const range = findSuggestionRange( value, suggestionId );
 	if ( ! range ) {
 		return value;
 	}
-	const record = create( { html: value.toHTMLString() } );
+	const record = create( { html } );
 	const original = create( { html: beforeHTML ?? '' } );
 	// `insert` replaces the [start, end) range with the original run, which
 	// carries neither the proposed formatting nor the marker.
