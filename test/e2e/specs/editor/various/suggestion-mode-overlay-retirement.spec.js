@@ -10,9 +10,10 @@
  *      AND an overlay `<del>/<ins class="has-suggestion-*">` diff. This holds
  *      now that Phase 2 moved formatting to markers, including when a formatting
  *      change and a text addition coexist on one block (non-overlapping runs).
- *      An edit that can be expressed as neither — a delete straddling a marker,
- *      a type-over of a marked run, a second format toggle over one — is
- *      declined outright rather than falling through to the overlay, which
+ *      A second format toggle over a marked run extends that marker rather
+ *      than opening an overlay on top of it. An edit that can be expressed as
+ *      neither — a delete straddling a marker, a type-over of a marked run —
+ *      is declined outright rather than falling through to the overlay, which
  *      would hide the marker it landed on top of.
  *
  *   2. SEAMS - edits that used to fall through to the overlay diff path instead
@@ -533,7 +534,7 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 		expect( serialized ).toContain( 'NEW' );
 	} );
 
-	test( 'invariant: a format toggle over a marked run is declined, not swallowed by an overlay', async ( {
+	test( 'invariant: a second format toggle over a marked run extends the marker, never an overlay', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -550,7 +551,7 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 			.first();
 		await paragraph.click();
 
-		// Bold "world" — the golden path, one `format` marker.
+		// Bold "world" - the golden path, one `format` marker.
 		await page.keyboard.press( 'End' );
 		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
 		await pageUtils.pressKeys( 'primary+b' );
@@ -560,27 +561,40 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 		await expect( formatMark ).toContainText( 'world' );
 
 		/*
-		 * Italicise the same run. `planFormatMarkers` declines a run that
-		 * overlaps an existing marker, and the overlay it used to fall through
-		 * to recorded a suggestion carrying no change at all while hiding the
-		 * bold marker (#73411, F-12). Declined at the seam instead.
+		 * Italicise the same run. The overlay this used to fall through to
+		 * recorded a suggestion carrying no change at all while hiding the bold
+		 * marker (#73411, F-12); the second toggle now extends the marker that
+		 * is already there. `ArrowRight` collapses the selection first: on macOS
+		 * Chromium `End` is a no-op while a selection is live.
 		 */
+		await page.keyboard.press( 'ArrowRight' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
 		await pageUtils.pressKeys( 'primary+i' );
 
-		await expect(
-			page
-				.locator( '.components-snackbar-list' )
-				.getByText( 'overlaps a pending suggestion' )
-		).toBeVisible();
+		/*
+		 * Polled: the italic reaches the block's content only after the note
+		 * round trip, while the browser applies it to the live DOM immediately.
+		 */
+		await expect
+			.poll( async () => await editor.getEditedPostContent() )
+			.toContain( '<em>' );
 
 		await deselect( page );
 
-		// The bold marker still renders, alone, with no overlay over it.
+		/*
+		 * The invariant: one marker carrying both formats, and no overlay over
+		 * the block it sits in. `suggestion-mode.spec.js` owns the rest of the
+		 * extension behaviour - one note, a summary naming both formats.
+		 */
 		await expect( paragraph ).not.toHaveClass( /is-suggestion-pending/ );
 		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 1 );
+		await expect( paragraph.locator( OVERLAY_ADD ) ).toHaveCount( 0 );
+		await expect( paragraph.locator( OVERLAY_DEL ) ).toHaveCount( 0 );
 		await expect( formatMark ).toHaveText( 'world' );
 		const serialized = await editor.getEditedPostContent();
 		expect( serialized ).toContain( 'data-suggestion-type="format"' );
+		expect( serialized ).toContain( '<strong>' );
+		expect( serialized ).toContain( '<em>' );
 	} );
 
 	test( 'invariant: typing over a marked run is declined, not swallowed by an overlay', async ( {
