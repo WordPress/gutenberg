@@ -34,7 +34,7 @@
 		"@wordpress/format-library": "file:../../packages/format-library",
 		"@wordpress/prettier-config": "file:../../packages/prettier-config",
 		"@wordpress/rich-text": "file:../../packages/rich-text",
-		"ajv": "^8.17.1",
+		"ajv": "^8.20.0",
 		"fast-glob": "^3.2.7",
 		"react": "^18.3.1",
 		"rimraf": "^5.0.10"

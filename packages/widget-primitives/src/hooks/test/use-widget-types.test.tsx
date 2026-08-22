@@ -75,6 +75,29 @@ const iconReferenceRecords: WidgetModuleRecord[] = [
 	{ ...records[ 0 ], icon: 'core/calendar' },
 ];
 
+const emptyRecords: WidgetModuleRecord[] = [
+	{ name: 'test/empty', widget_module: null },
+];
+
+const moduleLessRecords: WidgetModuleRecord[] = [
+	{
+		name: 'test/manifest-only',
+		widget_module: null,
+		render_module: 'test-widget/render-module',
+		title: 'Manifest only',
+		description: 'Declared entirely by widget.json.',
+		icon: 'core/calendar',
+		actions: [
+			{
+				id: 'details',
+				label: 'Details',
+				href: 'admin.php?page=test&p=/details',
+				relevance: 'high',
+			},
+		],
+	},
+];
+
 const stringIconRecords: WidgetModuleRecord[] = [
 	{
 		name: 'test/string-icon',
@@ -132,6 +155,48 @@ describe( 'useWidgetTypes', () => {
 		} );
 		// …while plain DataViews fields pass through unchanged.
 		expect( label ).toMatchObject( { id: 'label', type: 'text' } );
+	} );
+
+	it( 'defaults apiVersion when the module omits it', async () => {
+		const { result } = renderHook( () =>
+			useWidgetTypes( stringIconRecords )
+		);
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+		expect( result.current[ 0 ][ 0 ].apiVersion ).toBe( 1 );
+	} );
+
+	it( 'resolves a record without a metadata module from its fields', async () => {
+		const resolvedIcon = createElement( 'svg', {
+			viewBox: '0 0 20 20',
+		} ) as WidgetIcon;
+		registerIconResolver( async () => resolvedIcon );
+
+		const { result } = renderHook( () =>
+			useWidgetTypes( moduleLessRecords )
+		);
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+
+		expect( result.current[ 0 ][ 0 ] ).toMatchObject( {
+			name: 'test/manifest-only',
+			apiVersion: 1,
+			renderModule: 'test-widget/render-module',
+			title: 'Manifest only',
+			description: 'Declared entirely by widget.json.',
+		} );
+		expect( result.current[ 0 ][ 0 ].actions ).toHaveLength( 1 );
+
+		await waitFor( () =>
+			expect( result.current[ 0 ][ 0 ].icon ).toBe( resolvedIcon )
+		);
+	} );
+
+	it( 'drops a record with neither metadata nor render module', async () => {
+		const { result } = renderHook( () => useWidgetTypes( emptyRecords ) );
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+		expect( result.current[ 0 ] ).toHaveLength( 0 );
 	} );
 
 	it( 'prefers the resolved record icon over the module element', async () => {

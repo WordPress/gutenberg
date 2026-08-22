@@ -1,4 +1,5 @@
 import { type ReactNode } from 'react';
+import type { ThemeProviderColorWarning } from './theme-provider-color-warnings';
 
 export type CornerRadiusPreset = 'none' | 'subtle' | 'moderate' | 'pronounced';
 
@@ -72,6 +73,15 @@ export interface ThemeProviderProps extends ThemeProviderSettings {
 	 * The children to render.
 	 */
 	children?: ReactNode;
+
+	/**
+	 * Called after the provider calculates its colors. Receives an empty array
+	 * when all contrast targets are met.
+	 * The callback may run more than once in development under React Strict Mode.
+	 */
+	onColorWarnings?: (
+		warnings: readonly ThemeProviderColorWarning[]
+	) => void;
 
 	/**
 	 * When a ThemeProvider is the root provider, it will apply its theming

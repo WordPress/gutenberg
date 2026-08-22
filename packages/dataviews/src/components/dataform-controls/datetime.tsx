@@ -1,3 +1,4 @@
+import { isSameMonth } from 'date-fns';
 import {
 	BaseControl,
 	privateApis as componentsPrivateApis,
@@ -10,6 +11,7 @@ import { Calendar, Stack } from '@wordpress/ui';
 import type { DataFormControlProps, FormatDatetime } from '../../types';
 import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../../constants';
 import RelativeDateControl from './utils/relative-date-control';
+import toCalendarDate from './utils/to-calendar-date';
 import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
 import getCustomValidity from './utils/get-custom-validity';
 import parseDateTime from '../../field-types/utils/parse-date-time';
@@ -39,11 +41,34 @@ function CalendarDateTimeControl< Item >( {
 	const disabled = field.isDisabled( { item: data, field } );
 	const fieldValue = getValue( { item: data } );
 	const value = typeof fieldValue === 'string' ? fieldValue : undefined;
+	const {
+		timezone: { string: timezoneString },
+	} = getSettings();
 
 	const [ calendarMonth, setCalendarMonth ] = useState< Date >( () => {
 		const parsedDate = parseDateTime( value );
-		return parsedDate || new Date(); // Default to current month
+		// Default to current month
+		return toCalendarDate( parsedDate || new Date(), timezoneString );
 	} );
+	// Follow the value when it changes, so that a change from outside the
+	// control, e.g. an undo, a reset, or switching the edited item, brings
+	// the selection into view. Months are compared in the calendar's time
+	// zone: near a month boundary, a date can belong to a different month
+	// there than in the browser's time zone.
+	useEffect( () => {
+		const parsedDate = parseDateTime( value );
+		if ( parsedDate ) {
+			const targetMonth = toCalendarDate( parsedDate, timezoneString );
+			setCalendarMonth( ( currentMonth ) =>
+				isSameMonth(
+					targetMonth,
+					toCalendarDate( currentMonth, timezoneString )
+				)
+					? currentMonth
+					: targetMonth
+			);
+		}
+	}, [ value, timezoneString ] );
 
 	const inputControlRef = useRef< HTMLInputElement >( null );
 	const validationTimeoutRef =
@@ -122,22 +147,21 @@ function CalendarDateTimeControl< Item >( {
 				// Update calendar month to match
 				const parsedDate = parseDateTime( dateTime.toISOString() );
 				if ( parsedDate ) {
-					setCalendarMonth( parsedDate );
+					setCalendarMonth(
+						toCalendarDate( parsedDate, timezoneString )
+					);
 				}
 			} else {
 				onChangeCallback( undefined );
 			}
 		},
-		[ onChangeCallback ]
+		[ onChangeCallback, timezoneString ]
 	);
 
 	const { format: fieldFormat } = field;
 	const weekStartsOn =
 		( fieldFormat as FormatDatetime ).weekStartsOn ??
 		getSettings().l10n.startOfWeek;
-	const {
-		timezone: { string: timezoneString },
-	} = getSettings();
 
 	let displayLabel = label;
 	if ( isValid?.required && ! markWhenOptional && ! hideLabelFromVision ) {

@@ -2,7 +2,7 @@ import { __, _x } from '@wordpress/i18n';
 import {
 	Button,
 	Placeholder,
-	__experimentalInputControl as InputControl,
+	__experimentalInputControl as WCInputControl,
 } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/block-editor';
 import { Link, Stack } from '@wordpress/ui';
@@ -27,7 +27,7 @@ export default function EmbedPlaceholder( {
 			) }
 		>
 			<form onSubmit={ onSubmit }>
-				<InputControl
+				<WCInputControl
 					type="url"
 					value={ value || '' }
 					className="wp-block-embed__placeholder-input"
