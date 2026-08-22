@@ -142,7 +142,7 @@ export const useLocalizationProps = ( {
 				 * The label for the month grid.
 				 * @param date
 				 */
-				labelGrid: ( date: Date ) => monthNameFormatter.format( date ),
+				labelGrid: monthNameFormatter.format,
 				/**
 				 * The label for the gridcell, when the calendar is not interactive.
 				 * @param date
@@ -207,8 +207,7 @@ export const useLocalizationProps = ( {
 				 * The label for the weekday.
 				 * @param date
 				 */
-				labelWeekday: ( date: Date ) =>
-					weekdayLongFormatter.format( date ),
+				labelWeekday: weekdayLongFormatter.format,
 			},
 			locale: dateFnsLocale,
 			lang: localeCode,
@@ -216,12 +215,8 @@ export const useLocalizationProps = ( {
 			...( weekStartsOn === undefined ? {} : { weekStartsOn } ),
 			formatters: {
 				formatDay: dayNumberFormatter.format,
-				formatWeekdayName: ( date: Date ) => {
-					return weekdayNarrowFormatter.format( date );
-				},
-				formatCaption: ( date: Date ) => {
-					return monthNameFormatter.format( date );
-				},
+				formatWeekdayName: weekdayNarrowFormatter.format,
+				formatCaption: monthNameFormatter.format,
 			},
 			timeZone,
 		} as const;
