@@ -31,6 +31,7 @@
 -   `Card`: Use the normal neutral surface stroke for the default border. ([#81746](https://github.com/WordPress/gutenberg/pull/81746))
 -   `Calendar`, `RangeCalendar`: Preserve day focus when a controlled month change removes the focused day. ([#81635](https://github.com/WordPress/gutenberg/pull/81635))
 -   `Select`, `Combobox`, `SelectControl`: Fix the trigger placeholder failing the 4.5:1 text contrast minimum. A placeholder is live text rather than disabled text, so it no longer uses the disabled foreground token. ([#81853](https://github.com/WordPress/gutenberg/pull/81853))
+-   `Autocomplete.List`: Stop rendering `aria-orientation` in grid mode, where `role="grid"` disallows it. Temporary workaround for [mui/base-ui#5548](https://github.com/mui/base-ui/issues/5548). ([#81853](https://github.com/WordPress/gutenberg/pull/81853))
 
 ### Documentation
 
