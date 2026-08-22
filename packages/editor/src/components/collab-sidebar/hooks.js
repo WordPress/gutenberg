@@ -35,13 +35,26 @@ import {
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
-export function useNoteThreads( postId ) {
-	const queryArgs = {
+/**
+ * Query that loads every note thread on a post, replies included. Exported so
+ * code outside the sidebar can read the same cached list synchronously with
+ * `select( coreStore ).getEntityRecords()` — a queried list is only found under
+ * the exact query it was fetched with.
+ *
+ * @param {number} postId Post id.
+ * @return {Object} Query arguments for the `root`/`comment` entity.
+ */
+export function getNoteThreadsQuery( postId ) {
+	return {
 		post: postId,
 		type: 'note',
 		status: 'all',
 		per_page: -1,
 	};
+}
+
+export function useNoteThreads( postId ) {
+	const queryArgs = getNoteThreadsQuery( postId );
 
 	const { records: threads } = useEntityRecords(
 		'root',

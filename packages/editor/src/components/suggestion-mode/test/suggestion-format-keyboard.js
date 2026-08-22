@@ -27,6 +27,7 @@ import { unlock } from '../../../lock-unlock';
 
 // jest.mock factories may only reference variables prefixed with `mock`.
 const mockCreateSuggestion = jest.fn();
+const mockUpdateSuggestion = jest.fn();
 const mockDeleteSuggestion = jest.fn();
 
 jest.mock( '../provider', () => {
@@ -35,13 +36,18 @@ jest.mock( '../provider', () => {
 		...actual,
 		useSuggestionsProvider: () => ( {
 			createSuggestion: mockCreateSuggestion,
+			updateSuggestion: mockUpdateSuggestion,
 			deleteSuggestion: mockDeleteSuggestion,
 		} ),
 	};
 } );
 
 const createSuggestion = mockCreateSuggestion;
+const updateSuggestion = mockUpdateSuggestion;
 const deleteSuggestion = mockDeleteSuggestion;
+
+const AUTHOR_ID = 7;
+const POST_ID = 5;
 
 const TEST_BLOCK_NAME = 'core/test-format-keyboard';
 
@@ -80,6 +86,8 @@ afterAll( () => {
 
 beforeEach( () => {
 	createSuggestion.mockReset();
+	updateSuggestion.mockReset();
+	updateSuggestion.mockResolvedValue( { id: 9 } );
 	deleteSuggestion.mockReset();
 	deleteSuggestion.mockResolvedValue( undefined );
 } );
@@ -103,6 +111,9 @@ function setup( { content = 'Hello world' } = {} ) {
 	registry.register( blockEditorStore );
 	registry.register( editorStore );
 	unlock( registry.dispatch( editorStore ) ).setEditorIntent( 'suggest' );
+
+	registry.dispatch( coreStore ).receiveCurrentUser( { id: AUTHOR_ID } );
+	registry.dispatch( editorStore ).setEditedPost( 'post', POST_ID );
 
 	const block = createBlock( TEST_BLOCK_NAME, {} );
 	registry.dispatch( blockEditorStore ).resetBlocks( [ block ] );
@@ -133,8 +144,57 @@ function setup( { content = 'Hello world' } = {} ) {
 				.getBlockAttributes( block.clientId )?.content ?? ''
 		);
 	const getNotices = () => registry.select( noticesStore ).getNotices();
+	const getMetadata = () =>
+		registry.select( blockEditorStore ).getBlockAttributes( block.clientId )
+			?.metadata;
 
-	return { registry, clientId: block.clientId, getContent, getNotices };
+	return {
+		registry,
+		clientId: block.clientId,
+		getContent,
+		getNotices,
+		getMetadata,
+	};
+}
+
+// The note record behind a pending `format` suggestion, as the sidebar's
+// thread query leaves it in the entity store.
+function formatNote( { id = 9, beforeHTML = 'world' } = {} ) {
+	return {
+		id,
+		parent: 0,
+		status: 'hold',
+		meta: {
+			_wp_suggestion: JSON.stringify( {
+				schemaVersion: 2,
+				operations: [
+					{
+						type: 'inline-suggestion',
+						attribute: 'content',
+						suggestionType: 'format',
+						beforeHTML,
+						afterHTML: `<strong>${ beforeHTML }</strong>`,
+					},
+				],
+			} ),
+		},
+	};
+}
+
+/*
+ * Seed the note (and any replies) exactly as loading the post does: the record
+ * arrives with the thread list, so `getEntityRecord` finds it in the store
+ * while its own resolution was never run.
+ */
+function seedThreads( registry, records ) {
+	registry
+		.dispatch( coreStore )
+		.receiveEntityRecords( 'root', 'comment', records, {
+			post: POST_ID,
+			type: 'note',
+			status: 'all',
+			per_page: -1,
+		} );
 }
 
 function deferred() {
@@ -305,6 +365,178 @@ describe( 'SuggestionFormatKeyboard', () => {
 			)
 		).toBe( true );
 		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	/*
+	 * Drive the create path once so the block carries a real `format` marker
+	 * stamped with this author — the state every second toggle starts from.
+	 */
+	async function makeFirstSuggestion( { registry, clientId, getContent } ) {
+		createSuggestion.mockResolvedValue( { id: 9 } );
+		const { prevContent, nextContent, plan } = boldPlan();
+		act( () => {
+			overlayRef.current.requestFormatSuggestion( {
+				clientId,
+				blockName: TEST_BLOCK_NAME,
+				prevContent,
+				nextContent,
+				plan,
+			} );
+		} );
+		await flushPromises();
+		// The real provider writes this linkage; the mocked one does not.
+		act( () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( clientId, {
+					metadata: { noteId: [ 9 ] },
+				} );
+		} );
+		return getContent();
+	}
+
+	// A second toggle over the marked run, as the HOC hands it to the handler.
+	function secondToggle( markedHTML, nextHTML ) {
+		const prevContent = RichTextData.fromHTMLString( markedHTML );
+		const nextContent = RichTextData.fromHTMLString( nextHTML );
+		return {
+			prevContent,
+			nextContent,
+			plan: planFormatMarkers( prevContent, nextContent, {
+				authorId: AUTHOR_ID,
+			} ),
+		};
+	}
+
+	const unbolded = ( markedHTML ) => markedHTML.replace( /<\/?strong>/g, '' );
+	const italicized = ( markedHTML ) =>
+		markedHTML
+			.replace( '<strong>', '<strong><em>' )
+			.replace( '</strong>', '</em></strong>' );
+
+	function request( clientId, { prevContent, nextContent, plan } ) {
+		act( () => {
+			overlayRef.current.requestFormatSuggestion( {
+				clientId,
+				blockName: TEST_BLOCK_NAME,
+				prevContent,
+				nextContent,
+				plan,
+			} );
+		} );
+		return flushPromises();
+	}
+
+	it( 'revises the existing note from the record the post already loaded', async () => {
+		const harness = setup();
+		const { registry, clientId, getNotices } = harness;
+		const marked = await makeFirstSuggestion( harness );
+		// Seeded by the thread query only: the note's own resolution never ran,
+		// so revising must not depend on resolving (or refetching) it.
+		seedThreads( registry, [ formatNote() ] );
+
+		await request( clientId, secondToggle( marked, italicized( marked ) ) );
+
+		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
+		expect( updateSuggestion ).toHaveBeenCalledTimes( 1 );
+		expect( updateSuggestion.mock.calls[ 0 ][ 0 ] ).toMatchObject( {
+			commentId: '9',
+			operations: [
+				expect.objectContaining( {
+					beforeHTML: 'world',
+					afterHTML: '<strong><em>world</em></strong>',
+				} ),
+			],
+		} );
+		expect(
+			getNotices().some( ( notice ) =>
+				notice.content.includes( 'could not be captured' )
+			)
+		).toBe( false );
+	} );
+
+	it( 'retracts the suggestion when the toggle restores the original run', async () => {
+		const harness = setup();
+		const { registry, clientId, getContent, getMetadata } = harness;
+		const marked = await makeFirstSuggestion( harness );
+		seedThreads( registry, [ formatNote() ] );
+
+		await request( clientId, secondToggle( marked, unbolded( marked ) ) );
+
+		expect( deleteSuggestion ).toHaveBeenCalledWith( { commentId: '9' } );
+		expect( getContent() ).toBe( 'Hello world' );
+		// The linkage goes with the note, leaving no empty `metadata` object
+		// behind to serialize.
+		expect( getMetadata() ).toBeUndefined();
+		// ...and it is bookkeeping, so it takes no undo level of its own: the
+		// first Ctrl+Z has to undo the formatting, not restore a noteId
+		// pointing at the note just trashed.
+		expect(
+			registry.select( blockEditorStore ).isLastBlockChangePersistent()
+		).toBe( false );
+	} );
+
+	it( 'keeps a note that has replies instead of trashing the discussion', async () => {
+		const harness = setup();
+		const { registry, clientId, getContent, getNotices } = harness;
+		const marked = await makeFirstSuggestion( harness );
+		seedThreads( registry, [
+			formatNote(),
+			{ id: 10, parent: 9, status: 'hold' },
+		] );
+
+		await request( clientId, secondToggle( marked, unbolded( marked ) ) );
+
+		expect( deleteSuggestion ).not.toHaveBeenCalled();
+		// The marker stays, so the reply keeps its anchor...
+		expect( getContent() ).toContain( 'data-suggestion-id="9"' );
+		// ...the suggestion is revised to propose nothing...
+		expect( updateSuggestion.mock.calls[ 0 ][ 0 ] ).toMatchObject( {
+			operations: [
+				expect.objectContaining( {
+					beforeHTML: 'world',
+					afterHTML: 'world',
+				} ),
+			],
+		} );
+		// ...and the user is told why the note is still there.
+		expect(
+			getNotices().some( ( notice ) =>
+				notice.content.includes( 'has replies' )
+			)
+		).toBe( true );
+	} );
+
+	it( 'retracts a block whose content is a plain string', async () => {
+		const harness = setup();
+		const { registry, clientId, getContent, getNotices } = harness;
+		const marked = String( await makeFirstSuggestion( harness ) );
+		seedThreads( registry, [ formatNote() ] );
+
+		// Some blocks hand `setAttributes` a plain string rather than a
+		// RichTextData; the restore has to work the same way.
+		act( () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( clientId, { content: marked } );
+		} );
+		const prevContent = marked;
+		const nextContent = unbolded( marked );
+		await request( clientId, {
+			prevContent,
+			nextContent,
+			plan: planFormatMarkers( prevContent, nextContent, {
+				authorId: AUTHOR_ID,
+			} ),
+		} );
+
+		expect( deleteSuggestion ).toHaveBeenCalledWith( { commentId: '9' } );
+		expect( getContent() ).toBe( 'Hello world' );
+		expect(
+			getNotices().some( ( notice ) =>
+				notice.content.includes( 'could not be captured' )
+			)
+		).toBe( false );
 	} );
 
 	it( 'notifies without writing when the note comes back without an id', async () => {

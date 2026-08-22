@@ -819,6 +819,9 @@ test.describe( 'Suggestion mode', () => {
 		await expect( paragraph.locator( 'strong' ) ).toHaveCount( 0 );
 		const serialized = await editor.getEditedPostContent();
 		expect( serialized ).not.toContain( 'noteId' );
+		// The linkage was the block's only metadata, so none is left to
+		// serialize as an empty object.
+		expect( serialized ).not.toContain( 'metadata' );
 	} );
 
 	test( 'captures a heading-level change made via the block-switcher variation picker', async ( {

@@ -1,6 +1,9 @@
 import { useCallback, useEffect } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
@@ -19,6 +22,11 @@ import {
 import { contentKey } from './suggestion-content-reconciler';
 import { readLiveInlineSelection } from './keyboard-target';
 import { removeNoteIdFromMetadata } from '../collab-sidebar/utils';
+import { getNoteThreadsQuery } from '../collab-sidebar/hooks';
+import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 /**
  * Owns the write side of formatting suggestions in Suggest mode.
@@ -53,10 +61,17 @@ export default function SuggestionFormatKeyboard() {
 		( select ) => select( coreStore ).getCurrentUser()?.id ?? null,
 		[]
 	);
+	const postId = useSelect(
+		( select ) => select( editorStore ).getCurrentPostId(),
+		[]
+	);
 	const { createSuggestion, updateSuggestion, deleteSuggestion } =
 		useSuggestionsProvider();
-	const { updateBlockAttributes, selectionChange } =
-		useDispatch( blockEditorStore );
+	const {
+		updateBlockAttributes,
+		selectionChange,
+		__unstableMarkNextChangeAsNotPersistent: markNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
 	const { getBlockAttributes } = useSelect( blockEditorStore );
 	const { createNotice } = useDispatch( noticesStore );
 	const registry = useRegistry();
@@ -74,11 +89,20 @@ export default function SuggestionFormatKeyboard() {
 			if ( ! id ) {
 				return;
 			}
-			const metadata = removeNoteIdFromMetadata(
-				getBlockAttributes( clientId )?.metadata,
-				id
+			const metadata = cleanEmptyObject(
+				removeNoteIdFromMetadata(
+					getBlockAttributes( clientId )?.metadata,
+					id
+				)
 			);
 			requestInterceptorBypass( clientId );
+			/*
+			 * The linkage is bookkeeping, not a user edit, and must never take
+			 * an undo level of its own: on the retraction path that level would
+			 * pop first, restoring a `noteId` that points at a note this call is
+			 * about to trash, instead of undoing the formatting.
+			 */
+			markNextChangeAsNotPersistent?.( { history: 'ignore' } );
 			updateBlockAttributes( clientId, { metadata } );
 			try {
 				await deleteSuggestion( { commentId: id } );
@@ -89,6 +113,7 @@ export default function SuggestionFormatKeyboard() {
 		[
 			getBlockAttributes,
 			updateBlockAttributes,
+			markNextChangeAsNotPersistent,
 			requestInterceptorBypass,
 			deleteSuggestion,
 		]
@@ -103,6 +128,39 @@ export default function SuggestionFormatKeyboard() {
 			{ type: 'snackbar', isDismissible: true }
 		);
 	}, [ createNotice ] );
+
+	const notifyKept = useCallback( () => {
+		createNotice(
+			'info',
+			__(
+				'Formatting restored. The note is kept because it has replies.'
+			),
+			{ type: 'snackbar', isDismissible: true }
+		);
+	}, [ createNotice ] );
+
+	/*
+	 * Whether a note carries replies. Retracting trashes the note, taking every
+	 * reply on it with it, so a note someone has answered is revised instead of
+	 * withdrawn. Read from the cached thread list the sidebar and the note
+	 * collector already load; an unresolved list means no reply is on screen to
+	 * lose.
+	 */
+	const hasReplies = useCallback(
+		( commentId ) => {
+			const threads = registry
+				.select( coreStore )
+				.getEntityRecords(
+					'root',
+					'comment',
+					getNoteThreadsQuery( postId )
+				);
+			return !! threads?.some(
+				( thread ) => String( thread.parent ) === String( commentId )
+			);
+		},
+		[ registry, postId ]
+	);
 
 	/*
 	 * Write a marked value to the live block, bypassing the suggest-mode
@@ -144,7 +202,8 @@ export default function SuggestionFormatKeyboard() {
 	 * recorded at suggest time — that is what a reject has to restore — and only
 	 * its proposed side is updated. When the toggle puts the run back exactly as
 	 * that original, the suggestion no longer proposes anything and is retracted
-	 * instead of being stored as a note whose before and after are identical.
+	 * instead of being stored as a note whose before and after are identical —
+	 * unless replies have accumulated on it, which no toggle may throw away.
 	 */
 	const runFormatExtend = useCallback(
 		async ( { clientId, blockName, prevContent, nextContent, plan } ) => {
@@ -157,14 +216,17 @@ export default function SuggestionFormatKeyboard() {
 				notifyDropped();
 				return;
 			}
-			let comment = null;
-			try {
-				comment = await registry
-					.resolveSelect( coreStore )
-					.getEntityRecord( 'root', 'comment', commentId );
-			} catch {
-				comment = null;
-			}
+			/*
+			 * Read the note from the store rather than resolving it: the thread
+			 * list is already loaded for every note in the post, and the marker
+			 * this plan extends was written from it. Resolving would refetch the
+			 * record on every second toggle — the resolution is cached under the
+			 * list's argument shape, not this one — and would turn an offline
+			 * blip into a dropped edit.
+			 */
+			const comment = registry
+				.select( coreStore )
+				.getEntityRecord( 'root', 'comment', Number( commentId ) );
 			const existing = findInlineOp(
 				parseSuggestionPayload( comment?.meta?._wp_suggestion )
 					?.operations
@@ -183,8 +245,16 @@ export default function SuggestionFormatKeyboard() {
 				return;
 			}
 			const beforeHTML = existing.beforeHTML ?? '';
+			/*
+			 * The toggle put the run back exactly as the note recorded it, so the
+			 * suggestion proposes nothing. Withdraw it — unless replies have
+			 * turned the note into a discussion, in which case the note (and its
+			 * marker, which anchors it) is kept and revised to propose nothing.
+			 */
+			const retracting = plan.afterHTML === beforeHTML;
+			const keepForReplies = retracting && hasReplies( commentId );
 			try {
-				if ( plan.afterHTML === beforeHTML ) {
+				if ( retracting && ! keepForReplies ) {
 					const restored = rejectInlineFormat(
 						nextContent,
 						commentId,
@@ -218,6 +288,9 @@ export default function SuggestionFormatKeyboard() {
 					return;
 				}
 				writeContent( clientId, applyFormatPlan( nextContent, plan ) );
+				if ( keepForReplies ) {
+					notifyKept();
+				}
 			} catch {
 				// `updateSuggestion` / `deleteSuggestion` surface their own
 				// error notices. The note is left as it was.
@@ -227,10 +300,12 @@ export default function SuggestionFormatKeyboard() {
 		[
 			registry,
 			getBlockAttributes,
+			hasReplies,
 			updateSuggestion,
 			cleanupAbandonedNote,
 			writeContent,
 			notifyDropped,
+			notifyKept,
 		]
 	);
 
