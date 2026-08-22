@@ -1,6 +1,7 @@
 import {
 	RichTextData,
 	create,
+	toHTMLString,
 	registerFormatType,
 	unregisterFormatType,
 	store as richTextStore,
@@ -369,5 +370,53 @@ describe( 'nested suggestion markers', () => {
 		expect( html ).not.toContain( 'wp-suggestion-a11y' );
 		expect( html ).toContain( 'data-author="4"' );
 		expect( html ).toContain( 'data-author="7"' );
+	} );
+} );
+
+describe( 'announcement element boundaries', () => {
+	beforeAll( () => {
+		registerSuggestionFormat();
+	} );
+
+	afterAll( () => {
+		for ( const name of [
+			SUGGESTION_FORMAT_NAME,
+			SUGGESTION_A11Y_FORMAT_NAME,
+		] ) {
+			if ( select( richTextStore ).getFormatType( name ) ) {
+				unregisterFormatType( name );
+			}
+		}
+	} );
+
+	/**
+	 * Serialize a marker through the editable-tree preparation pass and count
+	 * the announcement elements it produced.
+	 *
+	 * @param {string} html Marker HTML.
+	 * @return {number} Number of `.wp-suggestion-a11y` elements rendered.
+	 */
+	function countAnnouncements( html ) {
+		const value = create( { html } );
+		const rendered = toHTMLString( {
+			value: {
+				...value,
+				formats: addSuggestionRoleFormats( value.formats ),
+			},
+		} );
+		return ( rendered.match( /wp-suggestion-a11y/g ) ?? [] ).length;
+	}
+
+	it.each( [
+		[ 'a bold run', '<strong>bold</strong> tail' ],
+		[ 'a link', '<a href="https://w.org">link</a> tail' ],
+		[ 'a trailing format', 'head <em>italic</em>' ],
+		[ 'an interior format', 'head <em>mid</em> tail' ],
+	] )( 'brackets a marker containing %s exactly once', ( _label, inner ) => {
+		expect(
+			countAnnouncements(
+				`<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="del" data-author="2">${ inner }</mark>`
+			)
+		).toBe( 1 );
 	} );
 } );
