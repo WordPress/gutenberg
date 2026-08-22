@@ -13,7 +13,6 @@ import {
 	Spinner,
 	ToggleControl,
 	ToolbarButton,
-	Placeholder,
 	Button,
 	DropZone,
 	__experimentalToolsPanel as ToolsPanel,
@@ -36,6 +35,7 @@ import { crop, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { MIN_SIZE } from '../image/constants';
 import { MediaControl, MediaControlPreview } from '../utils/media-control';
+import BlockMediaPlaceholder from '../utils/media-placeholder';
 import { unlock } from '../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
@@ -574,13 +574,10 @@ export default function LogoEdit( {
 		);
 	}
 	const placeholder = ( content ) => {
-		const placeholderClassName = clsx(
-			'block-editor-media-placeholder',
-			className
-		);
+		const placeholderClassName = clsx( className );
 
 		return (
-			<Placeholder
+			<BlockMediaPlaceholder
 				className={ placeholderClassName }
 				preview={ logoImage }
 				withIllustration
@@ -589,7 +586,7 @@ export default function LogoEdit( {
 				} }
 			>
 				{ content }
-			</Placeholder>
+			</BlockMediaPlaceholder>
 		);
 	};
 
@@ -658,13 +655,16 @@ export default function LogoEdit( {
 			{ ( !! logoUrl || !! temporaryURL ) && logoImage }
 			{ ( isLoading ||
 				( ! temporaryURL && ! logoUrl && ! canUserEdit ) ) && (
-				<Placeholder className="site-logo_placeholder" withIllustration>
+				<BlockMediaPlaceholder
+					className="site-logo_placeholder"
+					withIllustration
+				>
 					{ isLoading && (
 						<span className="components-placeholder__preview">
 							<Spinner />
 						</span>
 					) }
-				</Placeholder>
+				</BlockMediaPlaceholder>
 			) }
 			{ ! isLoading && ! temporaryURL && ! logoUrl && canUserEdit && (
 				<MediaPlaceholder

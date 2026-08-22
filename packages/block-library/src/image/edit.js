@@ -1,7 +1,6 @@
 import clsx from 'clsx';
 import { isBlobURL, createBlobURL } from '@wordpress/blob';
 import { createBlock, getBlockBindingsSource } from '@wordpress/blocks';
-import { Placeholder } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	BlockIcon,
@@ -20,6 +19,7 @@ import { useResizeObserver } from '@wordpress/compose';
 import { getProtocol, prependHTTPS } from '@wordpress/url';
 import { store as uploadStore } from '@wordpress/upload-media';
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
+import BlockMediaPlaceholder from '../utils/media-placeholder';
 import Image from './image';
 import { isValidFileType } from './utils';
 import { useMaxWidthObserver } from './use-max-width-observer';
@@ -418,8 +418,8 @@ export function ImageEdit( {
 	const pinnedHeight = height === 'auto' ? undefined : height;
 	const placeholder = ( content ) => {
 		return (
-			<Placeholder
-				className={ clsx( 'block-editor-media-placeholder', {
+			<BlockMediaPlaceholder
+				className={ clsx( {
 					[ borderProps.className ]:
 						!! borderProps.className && ! isSingleSelected,
 				} ) }
@@ -454,7 +454,7 @@ export function ImageEdit( {
 
 				{ ! lockUrlControls && ! isSmallContainer && content }
 				{ placeholderResizeListener }
-			</Placeholder>
+			</BlockMediaPlaceholder>
 		);
 	};
 
