@@ -32,7 +32,8 @@ const meta: Meta< typeof Combobox.Root > = {
 		'Combobox.Clear': Combobox.Clear,
 	},
 	parameters: {
-		// FIXME: Placeholder-like trigger text fails color-contrast (WCAG 1.4.3 applies to placeholder text). The trigger has no visible label and relies on aria-label (button-name). Detached Inline also lacks accessible names/required ARIA and uses a non-keyboard-accessible scroll region (aria-input-field-name, aria-required-attr, scrollable-region-focusable).
+		// FIXME: The trigger has no visible label and relies on aria-label
+		// (button-name).
 		// See: https://github.com/WordPress/gutenberg/issues/81596
 		a11y: { test: 'todo' },
 		componentStatus: {
@@ -119,8 +120,8 @@ export const Compact: Story = {
  */
 export const DetachedInline: Story = {
 	parameters: {
-		// The list scrolls, but the combobox input keeps focus and arrow keys
-		// move through the options, so the content is reachable by keyboard.
+		// The input keeps focus and arrow keys move through the options, so
+		// the scrollable list is reachable by keyboard.
 		a11y: {
 			config: {
 				rules: [
@@ -133,6 +134,9 @@ export const DetachedInline: Story = {
 		items: ITEMS,
 		multiple: true,
 		inline: true,
+		// `inline` requires `open` so the list counts as visible and takes
+		// its accessible name from the input.
+		open: true,
 		children: [
 			<Combobox.Input placeholder="Search" key="input" />,
 			<div
