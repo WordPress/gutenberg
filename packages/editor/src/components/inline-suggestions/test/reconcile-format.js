@@ -190,6 +190,44 @@ describe( 'planFormatMarkers', () => {
 		} );
 	} );
 
+	it( 'declines to extend over a marker nested inside the run', () => {
+		/*
+		 * Typing inside a formatted suggestion nests an `add` marker beneath
+		 * the `format` one. Extending applies `core/suggestion` across the
+		 * whole run, and `applyFormat` drops same-type formats it finds inside
+		 * a non-collapsed range - so extending here would strip the nested
+		 * marker and orphan its note. The outermost-only lookup used to miss it.
+		 */
+		const nested =
+			'<mark class="wp-suggestion" data-suggestion-id="2" data-suggestion-type="add" data-author="7">XX</mark>';
+		const prev = rtd(
+			`Hello ${ formatMark( 1, `<strong>wor${ nested }ld</strong>` ) }`
+		);
+		const next = rtd(
+			`Hello ${ formatMark(
+				1,
+				`<strong><em>wor${ nested }ld</em></strong>`
+			) }`
+		);
+		expect( planFormatMarkers( prev, next, { authorId: 7 } ) ).toEqual( {
+			kind: 'none',
+		} );
+	} );
+
+	it( 'reports the run text so the caller can check it against the note', () => {
+		// A reject restores the note's recorded original over the marker's whole
+		// span, so the caller has to be able to tell the two still cover the
+		// same characters.
+		const prev = rtd(
+			`Hello ${ formatMark( 1, '<strong>world</strong>' ) }`
+		);
+		const next = rtd(
+			`Hello ${ formatMark( 1, '<strong><em>world</em></strong>' ) }`
+		);
+		const plan = planFormatMarkers( prev, next, { authorId: 7 } );
+		expect( plan.runText ).toBe( 'world' );
+	} );
+
 	it( 'declines to extend a marker that is not a format suggestion', () => {
 		const prev = rtd(
 			'Hello <mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add" data-author="7">world</mark>'

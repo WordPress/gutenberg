@@ -209,6 +209,34 @@ function suggestionIdAt( record, index ) {
 }
 
 /**
+ * Every suggestion id a character carries, outermost first.
+ *
+ * A character can sit under more than one marker — typing inside a formatted
+ * suggestion nests an `add` marker beneath it — and `suggestionAt` reports only
+ * the outermost. Extending applies `core/suggestion` across the whole run, and
+ * `applyFormat` drops same-type formats it finds inside a non-collapsed range,
+ * so the extend path has to see the whole stack or it will silently strip a
+ * nested marker and orphan its note.
+ *
+ * @param {Object} record Rich-text record.
+ * @param {number} index  Character index.
+ * @return {string[]} Marker ids at that character.
+ */
+function suggestionIdsAt( record, index ) {
+	const ids = [];
+	for ( const format of record.formats?.[ index ] ?? [] ) {
+		if ( format.type !== SUGGESTION_FORMAT_NAME ) {
+			continue;
+		}
+		const id = format.attributes?.[ SUGGESTION_ID_ATTRIBUTE ];
+		if ( id !== undefined ) {
+			ids.push( String( id ) );
+		}
+	}
+	return ids;
+}
+
+/**
  * The contiguous run of characters carrying the marker with the given id,
  * around `index`. Returns null when the same id also appears outside that run —
  * a fragmented marker can't be re-planned as one range.
@@ -280,11 +308,18 @@ function findExtendableFormatMarker( prev, next, range, authorId ) {
 		return null;
 	}
 	const key = String( id );
+	/*
+	 * Every character in the toggled range must carry this marker and no other,
+	 * on both sides of the edit. A second marker nested under this one would be
+	 * stripped by the `applyFormat` the extend plan leads to, leaving its note
+	 * anchored to nothing; refuse rather than extend over it.
+	 */
+	const carriesOnly = ( record, i ) => {
+		const ids = suggestionIdsAt( record, i );
+		return ids.length === 1 && ids[ 0 ] === key;
+	};
 	for ( let i = range.start; i < range.end; i++ ) {
-		if (
-			suggestionIdAt( prev, i ) !== key ||
-			suggestionIdAt( next, i ) !== key
-		) {
+		if ( ! carriesOnly( prev, i ) || ! carriesOnly( next, i ) ) {
 			return null;
 		}
 	}
@@ -297,6 +332,16 @@ function findExtendableFormatMarker( prev, next, range, authorId ) {
 		prevRun.end !== nextRun.end
 	) {
 		return null;
+	}
+	/*
+	 * The plan re-applies the marker across the whole run, not only the range
+	 * the user toggled, so the exclusivity the loop above established has to
+	 * hold over the run's full span.
+	 */
+	for ( let i = nextRun.start; i < nextRun.end; i++ ) {
+		if ( ! carriesOnly( prev, i ) || ! carriesOnly( next, i ) ) {
+			return null;
+		}
 	}
 	return { id: key, attributes, range: nextRun };
 }
@@ -362,6 +407,17 @@ export function planFormatMarkers( prevValue, nextValue, { authorId } = {} ) {
 			range: extendable.range,
 			afterHTML: sliceToUnmarkedHTML(
 				next,
+				extendable.range.start,
+				extendable.range.end
+			),
+			/*
+			 * The run's plain text, for the caller to check against the text of
+			 * the original the note recorded. A reject restores that original
+			 * over the marker's whole span, so if the run has grown since the
+			 * note was written the two no longer describe the same characters
+			 * and rejecting would delete the difference.
+			 */
+			runText: next.text.slice(
 				extendable.range.start,
 				extendable.range.end
 			),

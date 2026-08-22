@@ -6,6 +6,7 @@ import {
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
+import { create } from '@wordpress/rich-text';
 import { __ } from '@wordpress/i18n';
 import { useSuggestionOverlay } from './overlay-context';
 import {
@@ -140,13 +141,18 @@ export default function SuggestionFormatKeyboard() {
 	}, [ createNotice ] );
 
 	/*
-	 * Whether a note carries replies. Retracting trashes the note, taking every
-	 * reply on it with it, so a note someone has answered is revised instead of
-	 * withdrawn. Read from the cached thread list the sidebar and the note
-	 * collector already load; an unresolved list means no reply is on screen to
-	 * lose.
+	 * Whether a note may carry replies. Retracting trashes the note, taking
+	 * every reply on it with it, so a note someone has answered is revised
+	 * instead of withdrawn. Read from the cached thread list the sidebar and the
+	 * note collector already load.
+	 *
+	 * An unresolved list answers "unknown", not "none": the fetch is async, so a
+	 * toggle before it lands - or after it failed - would otherwise report no
+	 * replies and trash a discussion. The two failure modes are not symmetric.
+	 * Keeping a note that proposes nothing is a tidiness problem the user can
+	 * resolve; deleting someone's reply cannot be undone. Fail closed.
 	 */
-	const hasReplies = useCallback(
+	const mayHaveReplies = useCallback(
 		( commentId ) => {
 			const threads = registry
 				.select( coreStore )
@@ -155,7 +161,10 @@ export default function SuggestionFormatKeyboard() {
 					'comment',
 					getNoteThreadsQuery( postId )
 				);
-			return !! threads?.some(
+			if ( ! threads ) {
+				return true;
+			}
+			return threads.some(
 				( thread ) => String( thread.parent ) === String( commentId )
 			);
 		},
@@ -224,9 +233,26 @@ export default function SuggestionFormatKeyboard() {
 			 * list's argument shape, not this one — and would turn an offline
 			 * blip into a dropped edit.
 			 */
-			const comment = registry
+			let comment = registry
 				.select( coreStore )
 				.getEntityRecord( 'root', 'comment', Number( commentId ) );
+			/*
+			 * Absent is not the same as resolved-and-gone. The thread list is
+			 * fetched asynchronously, so a toggle over a marker on a
+			 * freshly-loaded post can arrive before the record exists in the
+			 * store - and treating that as "no longer pending" would swallow the
+			 * edit. Resolve once, only on that path, which leaves the common
+			 * case reading from the cache as before.
+			 */
+			if ( comment === undefined ) {
+				comment = await registry
+					.resolveSelect( coreStore )
+					.getEntityRecord( 'root', 'comment', Number( commentId ) );
+				if ( stale() ) {
+					notifyDropped();
+					return;
+				}
+			}
 			const existing = findInlineOp(
 				parseSuggestionPayload( comment?.meta?._wp_suggestion )
 					?.operations
@@ -246,13 +272,28 @@ export default function SuggestionFormatKeyboard() {
 			}
 			const beforeHTML = existing.beforeHTML ?? '';
 			/*
+			 * The note's recorded original and the marker's current run have to
+			 * still describe the same characters. A reject replaces the marker's
+			 * whole span with that original, so if the run has grown since the
+			 * note was written, rejecting would delete the difference along with
+			 * the formatting. Compare the text alone - the formatting is exactly
+			 * what this suggestion proposes to change.
+			 */
+			if (
+				plan.runText !== undefined &&
+				plan.runText !== create( { html: beforeHTML } ).text
+			) {
+				notifyDropped();
+				return;
+			}
+			/*
 			 * The toggle put the run back exactly as the note recorded it, so the
 			 * suggestion proposes nothing. Withdraw it — unless replies have
 			 * turned the note into a discussion, in which case the note (and its
 			 * marker, which anchors it) is kept and revised to propose nothing.
 			 */
 			const retracting = plan.afterHTML === beforeHTML;
-			const keepForReplies = retracting && hasReplies( commentId );
+			const keepForReplies = retracting && mayHaveReplies( commentId );
 			try {
 				if ( retracting && ! keepForReplies ) {
 					const restored = rejectInlineFormat(
@@ -300,7 +341,7 @@ export default function SuggestionFormatKeyboard() {
 		[
 			registry,
 			getBlockAttributes,
-			hasReplies,
+			mayHaveReplies,
 			updateSuggestion,
 			cleanupAbandonedNote,
 			writeContent,

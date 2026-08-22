@@ -507,6 +507,46 @@ describe( 'SuggestionFormatKeyboard', () => {
 		).toBe( true );
 	} );
 
+	it( 'keeps the note when the thread list has not resolved yet', async () => {
+		const harness = setup();
+		const { registry, clientId, getContent } = harness;
+		const marked = await makeFirstSuggestion( harness );
+		/*
+		 * The note itself is in the store, but the THREAD LIST that carries its
+		 * replies has not resolved - the state right after a load, or after that
+		 * fetch failed. Reading an unresolved list as "no replies" would trash a
+		 * discussion nobody has seen yet, which cannot be undone, so an unknown
+		 * list has to fail closed.
+		 */
+		registry
+			.dispatch( coreStore )
+			.receiveEntityRecords( 'root', 'comment', [ formatNote() ] );
+
+		await request( clientId, secondToggle( marked, unbolded( marked ) ) );
+
+		expect( deleteSuggestion ).not.toHaveBeenCalled();
+		expect( getContent() ).toContain( 'data-suggestion-id="9"' );
+	} );
+
+	it( 'declines to revise when the run no longer matches the recorded original', async () => {
+		const harness = setup();
+		const { registry, clientId, getNotices } = harness;
+		const marked = await makeFirstSuggestion( harness );
+		// The note recorded a shorter run than the marker now spans. A reject
+		// replaces the whole span with that original, so revising would set up
+		// a reject that deletes the difference.
+		seedThreads( registry, [ formatNote( { beforeHTML: 'wor' } ) ] );
+
+		await request( clientId, secondToggle( marked, italicized( marked ) ) );
+
+		expect( updateSuggestion ).not.toHaveBeenCalled();
+		expect(
+			getNotices().some( ( notice ) =>
+				notice.content.includes( 'could not be captured' )
+			)
+		).toBe( true );
+	} );
+
 	it( 'retracts a block whose content is a plain string', async () => {
 		const harness = setup();
 		const { registry, clientId, getContent, getNotices } = harness;
