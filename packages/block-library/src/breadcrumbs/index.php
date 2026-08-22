@@ -104,12 +104,11 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		}
 
 		// Determine breadcrumb type.
-		// Some non-hierarchical post types (e.g., attachments) can have parents.
-		// Use hierarchical breadcrumbs if a parent exists, otherwise use taxonomy breadcrumbs.
-		$show_terms = false;
-		if ( ! is_post_type_hierarchical( $post_type ) && ! $post_parent ) {
-			$show_terms = true;
-		} elseif ( empty( get_object_taxonomies( $post_type, 'objects' ) ) ) {
+		// Post types with no registered taxonomies can only use a hierarchical ancestor
+		// trail (or none, for non-hierarchical types). For all other cases, whether to
+		// include taxonomy terms is controlled by the 'prefersTaxonomy' attribute, which
+		// defaults to false so terms are hidden by default on singular post templates.
+		if ( empty( get_object_taxonomies( $post_type, 'objects' ) ) ) {
 			$show_terms = false;
 		} else {
 			$show_terms = $attributes['prefersTaxonomy'];
