@@ -31,6 +31,7 @@
 ### Internal
 
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81516](https://github.com/WordPress/gutenberg/pull/81516))
+-   Expose `isElementVisible` via private APIs so `@wordpress/editor`'s collaboration overlay can detect content hidden by a collapsed container (e.g. a closed `core/details` panel) without duplicating the visibility check ([#81322](https://github.com/WordPress/gutenberg/pull/81322)).
 
 ## 16.2.0 (2026-08-12)
 
@@ -58,7 +59,6 @@
 ### Internal
 
 -   `ListView`: Reimplement the Firefox description-recomputation workaround in `AriaReferencedText` by keying the element on its text, so React replaces it instead of updating the existing text node in place ([#80929](https://github.com/WordPress/gutenberg/pull/80929).
--   Expose `isElementVisible` via private APIs so `@wordpress/editor`'s collaboration overlay can detect content hidden by a collapsed container (e.g. a closed `core/details` panel) without duplicating the visibility check ([#79641](https://github.com/WordPress/gutenberg/issues/79641)).
 
 ### Bug Fixes
 
