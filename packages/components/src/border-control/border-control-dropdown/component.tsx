@@ -150,7 +150,10 @@ const BorderControlDropdown = (
 		...otherProps
 	} = useBorderControlDropdown( props );
 
-	const { color, style } = border || {};
+	const { color, style, width } = border || {};
+	const indicatorColor =
+		color ?? ( width ? 'var(--wp--preset--color--contrast)' : undefined );
+
 	const colorObject = getColorObject( color, colors );
 
 	const toggleAriaLabel = getToggleAriaLabel(
@@ -180,7 +183,7 @@ const BorderControlDropdown = (
 			<span className={ indicatorWrapperClassName }>
 				<ColorIndicator
 					className={ indicatorClassName }
-					colorValue={ color }
+					colorValue={ indicatorColor }
 				/>
 			</span>
 		</Button>
