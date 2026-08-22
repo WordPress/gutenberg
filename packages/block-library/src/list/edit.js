@@ -19,7 +19,7 @@ import { createBlock } from '@wordpress/blocks';
 import { useCallback, useEffect } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 import OrderedListSettings from './ordered-list-settings';
-import { getListBlockGapProps, migrateToListV2 } from './utils';
+import { migrateToListV2 } from './utils';
 import TagName from './tag-name';
 
 const DEFAULT_BLOCK = {
@@ -120,13 +120,10 @@ function IndentUI( { clientId } ) {
 }
 
 export default function Edit( { attributes, setAttributes, clientId } ) {
-	const { ordered, type, reversed, start, style } = attributes;
-	const gapProps = getListBlockGapProps( style );
+	const { ordered, type, reversed, start } = attributes;
 	const blockProps = useBlockProps( {
-		className: gapProps.className,
 		style: {
 			listStyleType: ordered && type !== 'decimal' ? type : undefined,
-			...gapProps.style,
 		},
 	} );
 

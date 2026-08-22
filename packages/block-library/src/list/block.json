@@ -69,7 +69,6 @@
 		"spacing": {
 			"margin": true,
 			"padding": true,
-			"blockGap": true,
 			"__experimentalDefaultControls": {
 				"margin": false,
 				"padding": false
