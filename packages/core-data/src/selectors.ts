@@ -57,6 +57,12 @@ export interface State {
 
 type EntityRecordKey = string | number;
 
+interface PostRecordFields {
+	title?: string;
+	content?: string;
+	excerpt?: string;
+}
+
 interface EntitiesState {
 	config: EntityConfig[];
 	records: Record< string, Record< string, EntityState< ET.EntityRecord > > >;
@@ -896,12 +902,36 @@ export const getEntityRecordNonTransientEdits = createSelector(
 		if ( ! transientEdits ) {
 			return edits;
 		}
-		return Object.keys( edits ).reduce( ( acc, key ) => {
+
+		const nonTransientEdits = Object.keys( edits ).reduce( ( acc, key ) => {
 			if ( ! transientEdits[ key ] ) {
 				acc[ key ] = edits[ key ];
 			}
 			return acc;
 		}, {} );
+
+		// Ignore template only edits on empty posts,
+		// to avoid false dirty state.
+		if (
+			kind === 'postType' &&
+			name === 'post' &&
+			recordId &&
+			Object.keys( nonTransientEdits ).length === 1 &&
+			'template' in nonTransientEdits
+		) {
+			const record = getRawEntityRecord(
+				state,
+				kind,
+				name,
+				recordId
+			) as PostRecordFields;
+
+			if ( ! record?.title && ! record?.content && ! record?.excerpt ) {
+				return {};
+			}
+		}
+
+		return nonTransientEdits;
 	},
 	(
 		state: State,

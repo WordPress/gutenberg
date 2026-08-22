@@ -940,6 +940,45 @@ describe( 'getEntityRecordNonTransientEdits', () => {
 			)
 		).toEqual( {} );
 	} );
+
+	it( 'should ignore template change as non-transient edit if post is empty', () => {
+		const state = deepFreeze( {
+			entities: {
+				config: [
+					{
+						kind: 'postType',
+						name: 'post',
+						transientEdits: { blocks: true, selection: true },
+					},
+				],
+				records: {
+					postType: {
+						post: {
+							records: {
+								someId: {
+									id: 'someId',
+									title: '',
+									content: '',
+									excerpt: '',
+								},
+							},
+							edits: {
+								someId: { template: 'new-template' },
+							},
+						},
+					},
+				},
+			},
+		} );
+		expect(
+			getEntityRecordNonTransientEdits(
+				state,
+				'postType',
+				'post',
+				'someId'
+			)
+		).toEqual( {} );
+	} );
 } );
 
 describe( 'getEmbedPreview()', () => {
