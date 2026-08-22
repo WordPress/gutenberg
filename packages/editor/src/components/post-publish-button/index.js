@@ -69,6 +69,18 @@ export function PostPublishButton( {
 	const createOnClick =
 		( callback ) =>
 		( ...args ) => {
+			/*
+			 * Both controls are disabled while suggesting, but they carry
+			 * `aria-disabled` rather than `disabled`, so the click still
+			 * arrives here - ahead of the callbacks that check for it. Stop at
+			 * the seam: otherwise a dirty non-post entity sends a control
+			 * reporting `aria-disabled="true"` on to open the "Are you ready to
+			 * save?" dialog. See issue #73411 (F-15).
+			 */
+			if ( isSuggesting ) {
+				return noop;
+			}
+
 			// If a post with non-post entities is published, but the user
 			// elects to not save changes to the non-post entities, those
 			// entities will still be dirty when the Publish button is clicked.

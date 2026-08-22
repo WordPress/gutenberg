@@ -175,6 +175,35 @@ describe( 'PostPublishButton', () => {
 			expect( dispatch( editorStore ).savePost ).not.toHaveBeenCalled();
 		} );
 
+		it( 'should not open the entities save panel when clicked', async () => {
+			const user = userEvent.setup();
+			const setEntitiesSavedStatesCallback = jest.fn();
+			mockHasPublishAction( true );
+			mockSelector( 'isEditedPostPublishable', true );
+			mockSelector( 'isEditedPostSaveable', true );
+			mockSelector( 'hasNonPostEntityChanges', true );
+			setEditorIntent( EDITOR_INTENT_SUGGEST );
+
+			render(
+				<PostPublishButton
+					setEntitiesSavedStatesCallback={
+						setEntitiesSavedStatesCallback
+					}
+				/>
+			);
+
+			await user.click( screen.getByRole( 'button' ) );
+
+			/*
+			 * The button is `aria-disabled`, not `disabled`, so the click still
+			 * reaches its handler. A dirty non-post entity used to send it past
+			 * the disabled check and straight into the "Are you ready to save?"
+			 * dialog.
+			 */
+			expect( setEntitiesSavedStatesCallback ).not.toHaveBeenCalled();
+			expect( dispatch( editorStore ).savePost ).not.toHaveBeenCalled();
+		} );
+
 		it( 'should keep its visible label as its accessible name', () => {
 			mockHasPublishAction( true );
 			mockSelector( 'isEditedPostPublishable', true );

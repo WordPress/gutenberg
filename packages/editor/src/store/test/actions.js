@@ -194,6 +194,7 @@ describe( 'Post actions', () => {
 			content: 'bar',
 			excerpt: 'crackers',
 			status: 'draft',
+			password: 'hunter2',
 		};
 		const REFUSED_STATUS_MESSAGE =
 			"The post status can't be changed while suggesting. Switch to Editing to change it.";
@@ -267,15 +268,20 @@ describe( 'Post actions', () => {
 			).toHaveLength( 1 );
 		} );
 
-		it( 'keeps the other edits in the same call while suggesting', () => {
+		it( 'refuses the whole call, so a companion edit cannot land without its status', () => {
 			const registry = setupPost();
 			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
 				EDITOR_INTENT_SUGGEST
 			);
 
+			/*
+			 * The shape `PostVisibility` sends for "Private". Dropping only the
+			 * status would strip the password while leaving the post published
+			 * - a state nobody asked for.
+			 */
 			registry
 				.dispatch( editorStore )
-				.editPost( { status: 'pending', excerpt: 'new crackers' } );
+				.editPost( { status: 'private', password: '' } );
 
 			expect(
 				registry
@@ -285,8 +291,72 @@ describe( 'Post actions', () => {
 			expect(
 				registry
 					.select( editorStore )
+					.getEditedPostAttribute( 'password' )
+			).toBe( draftPost.password );
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
+		} );
+
+		it( 'lets a call through when it only repeats the status it already has', () => {
+			const registry = setupPost();
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				EDITOR_INTENT_SUGGEST
+			);
+			speak.mockClear();
+
+			/*
+			 * `PostVisibility` sends the current status alongside every
+			 * visibility choice. Nothing is being changed, so there is nothing
+			 * to refuse and nothing to announce.
+			 */
+			registry
+				.dispatch( editorStore )
+				.editPost( { status: 'draft', excerpt: 'new crackers' } );
+
+			expect(
+				registry
+					.select( editorStore )
 					.getEditedPostAttribute( 'excerpt' )
 			).toBe( 'new crackers' );
+			expect( speak ).not.toHaveBeenCalled();
+			// The no-op status was dropped rather than written back as an edit.
+			expect(
+				registry
+					.select( coreStore )
+					.getEntityRecordEdits( 'postType', 'post', draftPost.id )
+			).not.toHaveProperty( 'status' );
+		} );
+
+		it( 'discards a status staged while editing when the suggest intent is entered', () => {
+			const registry = setupPost();
+
+			registry.dispatch( editorStore ).editPost( { status: 'pending' } );
+			expect(
+				registry
+					.select( editorStore )
+					.getEditedPostAttribute( 'status' )
+			).toBe( 'pending' );
+
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				EDITOR_INTENT_SUGGEST
+			);
+
+			/*
+			 * `savePost` is not guarded, so a status left staged from Editing
+			 * would be written on the next save - the workflow change this
+			 * intent withholds, applied without anyone choosing it here.
+			 */
+			expect(
+				registry
+					.select( editorStore )
+					.getEditedPostAttribute( 'status' )
+			).toBe( 'draft' );
+			expect(
+				registry
+					.select( coreStore )
+					.getEntityRecordEdits( 'postType', 'post', draftPost.id )
+			).not.toHaveProperty( 'status' );
 		} );
 
 		it( 'applies a post status edit while editing', () => {

@@ -6,6 +6,7 @@ import {
 	TextControl,
 	RadioControl,
 } from '@wordpress/components';
+import { Tooltip } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
@@ -124,22 +125,39 @@ export default function PostStatus() {
 	 * this control. See issue #73411 (F-15).
 	 */
 	if ( isSuggesting ) {
+		const suggestingHint = __(
+			'The post status cannot be suggested. Switch to Editing to change it.'
+		);
 		return (
 			<PostPanelRow label={ __( 'Status' ) }>
-				<Button
-					className="editor-post-status__toggle"
-					variant="tertiary"
-					size="compact"
-					icon={ postStatusesInfo[ status ]?.icon }
-					disabled
-					accessibleWhenDisabled
-					showTooltip
-					label={ __(
-						'The post status cannot be suggested. Switch to Editing to change it.'
-					) }
-				>
-					{ postStatusesInfo[ status ]?.label }
-				</Button>
+				<Tooltip.Root>
+					<Tooltip.Trigger
+						render={
+							<Button
+								className="editor-post-status__toggle"
+								variant="tertiary"
+								size="compact"
+								icon={ postStatusesInfo[ status ]?.icon }
+								disabled
+								accessibleWhenDisabled
+								/*
+								 * `description` rather than `label`, which
+								 * doubles as the button's `aria-label` and
+								 * would replace the status with the reason as
+								 * its accessible name - leaving a screen
+								 * reader user told why the control is disabled
+								 * but never told what the status is. The
+								 * tooltip carries the reason to everyone else,
+								 * since tooltip popups are visual-only.
+								 */
+								description={ suggestingHint }
+							>
+								{ postStatusesInfo[ status ]?.label }
+							</Button>
+						}
+					/>
+					<Tooltip.Popup>{ suggestingHint }</Tooltip.Popup>
+				</Tooltip.Root>
 			</PostPanelRow>
 		);
 	}

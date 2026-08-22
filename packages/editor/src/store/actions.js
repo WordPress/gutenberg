@@ -26,7 +26,7 @@ import {
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
-import { EDITOR_INTENT_SUGGEST } from './constants';
+import { EDITOR_INTENT_SUGGEST, SUGGEST_LOCKED_POST_FIELDS } from './constants';
 import { unlock } from '../lock-unlock';
 import { setCanvasWidth } from './private-actions';
 import { getCanvasWidthByDeviceType } from '../utils/device-type';
@@ -37,14 +37,6 @@ const { getEntitySnapshot } = unlock( coreDataPrivateApis );
 // the server. Their messages restate what the notice already says, so there are
 // no details worth disclosing.
 const CLIENT_GENERATED_ERROR_CODES = [ 'offline_error', 'fetch_error' ];
-
-// Post-level fields the Suggest intent refuses to edit because there is no way
-// to hold them as a pending proposal: they are not part of the block tree, so
-// nothing can carry a marker for them and nothing can review them later. Only
-// `status` is listed for now — it is the field that carries editorial
-// authority. The rest of the post-level fields (title, excerpt, featured image)
-// still need a per-field capture-or-disable decision. See issue #73411 (F-15).
-const SUGGEST_LOCKED_POST_FIELDS = [ 'status' ];
 
 /**
  * Returns an action generator used in signalling that editor has initialized with
@@ -198,36 +190,61 @@ export const editPost =
 		 * button, "Switch to draft", the command palette and third-party code
 		 * all reach the post through this action. See issue #73411 (F-15).
 		 */
-		if (
-			select.getEditorIntent() === EDITOR_INTENT_SUGGEST &&
-			SUGGEST_LOCKED_POST_FIELDS.some( ( key ) => key in nextEdits )
-		) {
-			nextEdits = { ...nextEdits };
-			SUGGEST_LOCKED_POST_FIELDS.forEach( ( key ) => {
-				delete nextEdits[ key ];
-			} );
-			/*
-			 * Say it twice over, in two channels: a refusal only screen reader
-			 * users perceive is indistinguishable from a control that quietly
-			 * does nothing. `speak` carries the announcement because it fires
-			 * on every refusal and can be assertive; the snackbar carries the
-			 * visible half with `speak: false`, since a spoken snackbar would
-			 * announce the same sentence a second time.
-			 */
-			const message = __(
-				"The post status can't be changed while suggesting. Switch to Editing to change it."
+		if ( select.getEditorIntent() === EDITOR_INTENT_SUGGEST ) {
+			const locked = SUGGEST_LOCKED_POST_FIELDS.filter(
+				( key ) => key in nextEdits
 			);
-			speak( message, 'assertive' );
-			registry.dispatch( noticesStore ).createNotice( 'info', message, {
-				// Reuse one notice id so a control that dispatches repeatedly
-				// replaces its own snackbar instead of stacking them.
-				id: 'editor-suggest-locked-post-status',
-				type: 'snackbar',
-				isDismissible: true,
-				speak: false,
-			} );
+			/*
+			 * A locked field repeated at the value it already holds is not a
+			 * change to refuse. `PostVisibility` sends the current status
+			 * alongside every visibility choice, so refusing on the mere
+			 * presence of the key would announce a refusal for an edit that
+			 * proposed nothing. Drop those keys silently - writing them back
+			 * would dirty the post for no reason - and let the rest apply.
+			 */
+			const changed = locked.filter(
+				( key ) =>
+					nextEdits[ key ] !== select.getEditedPostAttribute( key )
+			);
+			if ( locked.length && ! changed.length ) {
+				nextEdits = { ...nextEdits };
+				locked.forEach( ( key ) => {
+					delete nextEdits[ key ];
+				} );
+			}
+			if ( changed.length ) {
+				/*
+				 * Say it twice over, in two channels: a refusal only screen reader
+				 * users perceive is indistinguishable from a control that quietly
+				 * does nothing. `speak` carries the announcement because it fires
+				 * on every refusal and can be assertive; the snackbar carries the
+				 * visible half with `speak: false`, since a spoken snackbar would
+				 * announce the same sentence a second time.
+				 */
+				const message = __(
+					"The post status can't be changed while suggesting. Switch to Editing to change it."
+				);
+				speak( message, 'assertive' );
+				registry
+					.dispatch( noticesStore )
+					.createNotice( 'info', message, {
+						// Reuse one notice id so a control that dispatches repeatedly
+						// replaces its own snackbar instead of stacking them.
+						id: 'editor-suggest-locked-post-status',
+						type: 'snackbar',
+						isDismissible: true,
+						speak: false,
+					} );
 
-			if ( ! Object.keys( nextEdits ).length ) {
+				/*
+				 * Refuse the whole call, not just the locked key. A status
+				 * edit rarely travels alone - `PostVisibility` pairs it with
+				 * `password`, scheduling pairs it with `date` - and applying
+				 * the companion while dropping the status leaves the post in
+				 * a state nobody asked for: switching a published post to
+				 * Private while suggesting would strip its password and keep
+				 * it published.
+				 */
 				return;
 			}
 		}

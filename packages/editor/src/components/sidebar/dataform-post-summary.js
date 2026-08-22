@@ -13,7 +13,10 @@ import PostTrash from '../post-trash';
 import usePostFields from '../post-fields';
 import { usePostTemplatePanelMode } from '../post-template/hooks';
 import revisionsField from '../../dataviews/fields/revisions';
-import { EDITOR_INTENT_SUGGEST } from '../../store/constants';
+import {
+	EDITOR_INTENT_SUGGEST,
+	SUGGEST_LOCKED_POST_FIELDS,
+} from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 
 const EMPTY_FORM = { layout: { type: 'panel' }, fields: [] };
@@ -368,6 +371,25 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 		}
 
 		if ( ! Object.keys( baseEdits ).length ) {
+			return;
+		}
+
+		/*
+		 * `editPost` owns the Suggest-mode refusal, but this panel writes to
+		 * the entity directly and so never reaches it. `readOnly` on the status
+		 * field keeps the control from offering the change; this keeps a form
+		 * that doesn't go through that control - a different layout, a
+		 * plugin-supplied field config - from writing the status anyway. The
+		 * whole call is dropped rather than the one key, because the co-dependent
+		 * `date` and `password` edits below are derived from the status.
+		 */
+		if (
+			isSuggesting &&
+			SUGGEST_LOCKED_POST_FIELDS.some(
+				( key ) =>
+					key in baseEdits && baseEdits[ key ] !== record?.[ key ]
+			)
+		) {
 			return;
 		}
 
