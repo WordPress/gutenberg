@@ -70,9 +70,7 @@ Default.play = async ( { canvasElement } ) => {
 		'span 3'
 	);
 	await expect( getComputedStyle( resetButton ).gridRowStart ).toBe( '1' );
-	await expect( getComputedStyle( resetButton ).gridColumnStart ).toBe(
-		'2'
-	);
+	await expect( getComputedStyle( resetButton ).gridColumnStart ).toBe( '2' );
 	await expect( getComputedStyle( linkedButtonWrapper! ).gridRowStart ).toBe(
 		'1'
 	);

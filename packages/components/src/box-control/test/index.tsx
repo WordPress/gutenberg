@@ -171,6 +171,8 @@ describe( 'BoxControl', () => {
 			const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
 
 			expect( resetButton ).toHaveAttribute( 'aria-disabled', 'true' );
+			// Native `disabled` would drop focus; `toBeEnabled()` fails on `aria-disabled`.
+			// eslint-disable-next-line jest-dom/prefer-enabled-disabled
 			expect( resetButton ).not.toHaveAttribute( 'disabled' );
 
 			resetButton.focus();
@@ -547,15 +549,15 @@ describe( 'BoxControl', () => {
 		it( 'should apply module classes and retained public class names in custom mode', () => {
 			render( <UncontrolledBoxControl /> );
 
-			// Disable reason: class names are on wrappers around the labeled controls.
-			// eslint-disable-next-line testing-library/no-node-access
 			const unitControl = screen
 				.getByRole( 'textbox', { name: 'All sides' } )
+				// Disable reason: class names are on wrappers around the labeled controls.
+				// eslint-disable-next-line testing-library/no-node-access
 				.closest( '.component-box-control__unit-control' );
-			// Disable reason: the range wrapper holds the module class.
-			// eslint-disable-next-line testing-library/no-node-access
 			const rangeControl = screen
 				.getByRole( 'slider', { name: 'All sides' } )
+				// Disable reason: the range wrapper holds the module class.
+				// eslint-disable-next-line testing-library/no-node-access
 				.closest( '.components-range-control' );
 
 			expect( unitControl ).toHaveClass(
@@ -579,10 +581,10 @@ describe( 'BoxControl', () => {
 				/>
 			);
 
-			// Disable reason: the range wrapper holds the composed classes.
-			// eslint-disable-next-line testing-library/no-node-access
 			const rangeControl = screen
 				.getByRole( 'slider', { name: 'All sides' } )
+				// Disable reason: the range wrapper holds the composed classes.
+				// eslint-disable-next-line testing-library/no-node-access
 				.closest( '.components-range-control' );
 
 			expect( rangeControl ).toHaveClass(
