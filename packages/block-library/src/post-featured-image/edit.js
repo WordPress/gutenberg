@@ -448,7 +448,8 @@ export default function PostFeaturedImageEdit( {
 							label={ label }
 							showTooltip
 							tooltipPosition="top center"
-							onClick={ () => {
+							onClick={ ( event ) => {
+								event.preventDefault();
 								open();
 							} }
 						/>
@@ -505,8 +506,8 @@ export default function PostFeaturedImageEdit( {
 				</BlockControls>
 			) }
 			<figure { ...blockProps }>
-				{ /* If the featured image is linked, wrap in an <a /> tag to trigger any inherited link element styles */ }
-				{ !! isLink ? (
+				{ /* Only wrap an actual image. The placeholder has buttons and must not sit inside an <a>. */ }
+				{ !! isLink && ( featuredImage || temporaryURL ) ? (
 					<a href={ postPermalink } target={ linkTarget }>
 						{ image }
 					</a>

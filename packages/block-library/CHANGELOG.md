@@ -22,6 +22,7 @@
 -   Term Description: Apply the term description display filters when rendering with term context inside a Terms Query loop, so multi-paragraph descriptions keep their paragraphs and match the taxonomy archive rendering ([#81290](https://github.com/WordPress/gutenberg/pull/81290)).
 -   Accordion: Resolve the URL fragment with the `:target` pseudo-class instead of decoding `window.location.hash`, so a hash containing malformed percent-encoding no longer throws a `URIError` when a panel is opened ([#81780](https://github.com/WordPress/gutenberg/pull/81780)).
 -   Post Template: Pass an explicit default layout to the inner blocks of the Post Template and Term Template blocks, so the movers, inserters, and child controls of the template's blocks no longer follow the grid used to arrange the post/term items ([#81120](https://github.com/WordPress/gutenberg/pull/81120)).
+-   Post Featured Image: Do not wrap the media placeholder in a post link when `isLink` comes from the template, so adding a featured image no longer crashes the editor ([#81584](https://github.com/WordPress/gutenberg/pull/81584)).
 
 ## 10.4.0 (2026-08-12)
 
