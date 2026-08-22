@@ -185,3 +185,87 @@ describe( 'FiltersPanel — visual treatment and display-without-commit', () => 
 		expect( onChange ).not.toHaveBeenCalled();
 	} );
 } );
+
+// Adding two custom duotones in Global Styles seeds both from the palette's
+// darkest and lightest colors, so duplicates are the ordinary case. Only the
+// slug tells them apart.
+const duplicateSettings = {
+	color: {
+		customDuotone: true,
+		defaultDuotone: true,
+		duotone: {
+			custom: [
+				{
+					name: 'Duotone 1',
+					slug: 'custom-duotone-1',
+					colors: [ '#000000', '#ffffff' ],
+				},
+				{
+					name: 'Duotone 2',
+					slug: 'custom-duotone-2',
+					colors: [ '#000000', '#ffffff' ],
+				},
+			],
+		},
+		palette: {
+			default: [
+				{ name: 'Black', slug: 'black', color: '#000000' },
+				{ name: 'White', slug: 'white', color: '#ffffff' },
+			],
+		},
+	},
+};
+
+async function openDuotone( user ) {
+	await user.click( screen.getByRole( 'button', { name: /duotone/i } ) );
+}
+
+describe( 'FiltersPanel — duplicate duotone presets', () => {
+	it( 'marks only the stored preset as selected', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<FiltersPanel
+				value={ {
+					filter: { duotone: 'var:preset|duotone|custom-duotone-2' },
+				} }
+				inheritedValue={ {} }
+				settings={ duplicateSettings }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+		await openDuotone( user );
+
+		expect(
+			screen.getByRole( 'option', { name: 'Duotone: Duotone 1' } )
+		).toHaveAttribute( 'aria-selected', 'false' );
+		expect(
+			screen.getByRole( 'option', { name: 'Duotone: Duotone 2' } )
+		).toHaveAttribute( 'aria-selected', 'true' );
+	} );
+
+	it( 'saves the slug of the preset that was picked', async () => {
+		const user = userEvent.setup();
+		const onChange = jest.fn();
+
+		render(
+			<FiltersPanel
+				value={ {} }
+				inheritedValue={ {} }
+				settings={ duplicateSettings }
+				onChange={ onChange }
+				panelId="test-panel"
+			/>
+		);
+		await openDuotone( user );
+
+		await user.click(
+			screen.getByRole( 'option', { name: 'Duotone: Duotone 2' } )
+		);
+
+		expect( onChange ).toHaveBeenCalledWith( {
+			filter: { duotone: 'var:preset|duotone|custom-duotone-2' },
+		} );
+	} );
+} );

@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
 	startOfDay,
@@ -568,6 +568,133 @@ describe( 'Calendar', () => {
 	} );
 
 	describe( 'Keyboard focus and navigation', () => {
+		it( 'should keep day focus when the controlled month changes', () => {
+			const selectedNextMonth = addMonths( today, 1 );
+			const { rerender } = render(
+				<Calendar month={ currentMonth } value={ today } />
+			);
+
+			act( () => getDateButton( today ).focus() );
+
+			rerender(
+				<Calendar month={ nextMonth } value={ selectedNextMonth } />
+			);
+
+			expect( getDateButton( selectedNextMonth ) ).toHaveFocus();
+		} );
+
+		it( 'should keep tracking focus when the controlled date changes within the displayed month', () => {
+			const selectedNextMonth = addMonths( today, 1 );
+			const { rerender } = render(
+				<Calendar month={ today } value={ today } />
+			);
+
+			act( () => getDateButton( today ).focus() );
+			rerender( <Calendar month={ tomorrow } value={ tomorrow } /> );
+			rerender(
+				<Calendar
+					month={ selectedNextMonth }
+					value={ selectedNextMonth }
+				/>
+			);
+
+			expect( getDateButton( selectedNextMonth ) ).toHaveFocus();
+		} );
+
+		it( 'should keep tracking focus when the focused day remains in a later displayed month', () => {
+			const selectedNextMonth = addMonths( today, 1 );
+			const { rerender } = render(
+				<Calendar
+					month={ currentMonth }
+					numberOfMonths={ 2 }
+					value={ today }
+				/>
+			);
+
+			act( () => getDateButton( today ).focus() );
+			rerender(
+				<Calendar
+					month={ prevMonth }
+					numberOfMonths={ 2 }
+					value={ today }
+				/>
+			);
+			expect( getDateButton( today ) ).toHaveFocus();
+			rerender(
+				<Calendar
+					month={ nextMonth }
+					numberOfMonths={ 2 }
+					value={ selectedNextMonth }
+				/>
+			);
+
+			expect( getDateButton( selectedNextMonth ) ).toHaveFocus();
+		} );
+
+		it( 'should not move outside focus when the controlled month changes', () => {
+			const { rerender } = render(
+				<>
+					<button>Outside control</button>
+					<Calendar month={ currentMonth } value={ today } />
+				</>
+			);
+			const outsideControl = screen.getByRole( 'button', {
+				name: 'Outside control',
+			} );
+
+			act( () => outsideControl.focus() );
+			rerender(
+				<>
+					<button>Outside control</button>
+					<Calendar
+						month={ nextMonth }
+						value={ addMonths( today, 1 ) }
+					/>
+				</>
+			);
+
+			expect( outsideControl ).toHaveFocus();
+		} );
+
+		it( 'should keep focus inside the component when the new month has no enabled day', () => {
+			const { rerender } = render(
+				<Calendar month={ currentMonth } value={ today } />
+			);
+
+			act( () => getDateButton( today ).focus() );
+			rerender(
+				<Calendar
+					month={ nextMonth }
+					value={ addMonths( today, 1 ) }
+					disabled
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'button', { name: /previous month/i } )
+			).toHaveFocus();
+		} );
+
+		it( 'should keep focus inside when the controlled month changes and the calendar becomes fully disabled', () => {
+			const { rerender } = render(
+				<Calendar month={ currentMonth } value={ today } />
+			);
+
+			act( () => getDateButton( today ).focus() );
+			rerender(
+				<Calendar
+					month={ nextMonth }
+					value={ addMonths( today, 1 ) }
+					disabled
+					disableNavigation
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'button', { name: /previous month/i } )
+			).toHaveFocus();
+		} );
+
 		it( 'should auto-focus the selected day when the `autoFocus` prop is set to `true`', async () => {
 			// eslint-disable-next-line jsx-a11y/no-autofocus
 			render( <Calendar autoFocus defaultValue={ tomorrow } /> );

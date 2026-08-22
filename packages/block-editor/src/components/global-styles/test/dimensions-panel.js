@@ -90,6 +90,14 @@ const baseSettings = {
 	},
 };
 
+const settingsWithAxialGap = {
+	...baseSettings,
+	spacing: {
+		...baseSettings.spacing,
+		blockGap: [ 'horizontal', 'vertical' ],
+	},
+};
+
 const settingsWithDimensions = {
 	...baseSettings,
 	dimensions: {
@@ -280,12 +288,7 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			expect( gapInput ).toHaveAttribute( 'placeholder', '1.5rem' );
 		} );
 
-		it( 'renders no placeholder for blockGap when the inherited value is the compound axial shape (single-input path can only display strings)', () => {
-			// When blockGap is an object (axial split), the panel still
-			// renders the single-input UnitControl path because the
-			// settings here do not enable axial gap sides. The placeholder
-			// must NOT surface a non-string value into a control that
-			// cannot display it.
+		it( 'renders the vertical blockGap as a placeholder when the inherited value has an axial shape', () => {
 			renderPanel( {
 				value: {},
 				inheritedValue: {
@@ -295,7 +298,95 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			} );
 
 			const gapInput = screen.getByLabelText( /block spacing/i );
-			expect( gapInput ).not.toHaveAttribute( 'placeholder' );
+			expect( gapInput ).toHaveAttribute( 'placeholder', '1rem' );
+		} );
+
+		it( 'renders the vertical blockGap when a local axial value is shown in a single input', () => {
+			renderPanel( {
+				value: {
+					spacing: { blockGap: { top: '1rem', left: '0.5rem' } },
+				},
+				settings: baseSettings,
+			} );
+
+			const gapInput = screen.getByLabelText( /block spacing/i );
+			expect( gapInput ).toHaveValue( 1 );
+		} );
+	} );
+
+	describe( 'block spacing (axial gap path)', () => {
+		it( 'renders separate horizontal and vertical controls when axial block gap is allowed', async () => {
+			const user = userEvent.setup();
+			renderPanel( {
+				value: {},
+				settings: settingsWithAxialGap,
+			} );
+
+			const blockSpacingControl = screen.getByRole( 'group', {
+				name: 'Block spacing',
+			} );
+			await user.click(
+				within( blockSpacingControl ).getByRole( 'button', {
+					name: 'Unlink sides',
+				} )
+			);
+
+			expect(
+				within( blockSpacingControl ).getByRole( 'textbox', {
+					name: 'Top and bottom sides',
+				} )
+			).toBeInTheDocument();
+			expect(
+				within( blockSpacingControl ).getByRole( 'textbox', {
+					name: 'Left and right sides',
+				} )
+			).toBeInTheDocument();
+		} );
+
+		it( 'renders a single control when axial block gap is not allowed', () => {
+			renderPanel( {
+				value: {},
+				settings: settingsWithAxialGap,
+				allowAxialBlockGap: false,
+			} );
+
+			expect(
+				screen.getByLabelText( /block spacing/i )
+			).toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'group', { name: 'Block spacing' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'keeps the block spacing control visible when axial support changes', () => {
+			const settings = {
+				...settingsWithSpacingPresets,
+				spacing: {
+					...settingsWithSpacingPresets.spacing,
+					blockGap: [ 'horizontal', 'vertical' ],
+				},
+			};
+			const props = {
+				value: {},
+				settings,
+				onChange: () => {},
+				panelId: 'test-panel',
+			};
+			const { rerender } = render(
+				<DimensionsPanel { ...props } allowAxialBlockGap />
+			);
+
+			expect(
+				screen.getAllByRole( 'slider', { name: /block spacing/i } )
+			).toHaveLength( 2 );
+
+			rerender(
+				<DimensionsPanel { ...props } allowAxialBlockGap={ false } />
+			);
+
+			expect(
+				screen.getAllByRole( 'slider', { name: /block spacing/i } )
+			).toHaveLength( 1 );
 		} );
 	} );
 
