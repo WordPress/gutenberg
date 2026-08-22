@@ -100,7 +100,8 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => trim( $classnames ) ) );
 
-	$content = '';
+	$content     = '';
+	$query_index = 0;
 	while ( $query->have_posts() ) {
 		$query->the_post();
 
@@ -113,9 +114,10 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 
 		$post_id              = get_the_ID();
 		$post_type            = get_post_type();
-		$filter_block_context = static function ( $context ) use ( $post_id, $post_type ) {
-			$context['postType'] = $post_type;
-			$context['postId']   = $post_id;
+		$filter_block_context = static function ( $context ) use ( $post_id, $post_type, $query_index ) {
+			$context['postType']   = $post_type;
+			$context['postId']     = $post_id;
+			$context['queryIndex'] = $query_index;
 			return $context;
 		};
 
@@ -132,6 +134,8 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 		$inner_block_directives = $enhanced_pagination ? ' data-wp-key="post-template-item-' . $post_id . '"' : '';
 
 		$content .= '<li' . $inner_block_directives . ' class="' . esc_attr( $post_classes ) . '">' . $block_content . '</li>';
+
+		++$query_index;
 	}
 
 	/*
