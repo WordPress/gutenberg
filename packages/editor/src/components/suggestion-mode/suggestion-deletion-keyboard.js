@@ -14,6 +14,7 @@ import {
 	buildSuggestionMarkerAttributes,
 	computeDeleteRange,
 	formatsRangeHasSuggestion,
+	formatsRangeHasSuggestionType,
 	valueRangeHasSuggestion,
 } from '../inline-suggestions';
 import {
@@ -143,6 +144,71 @@ export function collapsedDeleteTarget( text, pos, isBackward, run ) {
 		return null;
 	}
 	return { start: from, end: nextGraphemeBoundary( text, from ) };
+}
+
+/**
+ * Decide what a collapsed single-grapheme delete should do.
+ *
+ * Three outcomes:
+ *
+ * - `mark` — wrap the target grapheme in a deletion marker.
+ * - `cancel` — swallow the keystroke. The grapheme is already proposed for
+ *   deletion, so the default path would have the browser remove text that only
+ *   exists as a proposal and destroy the marker holding it. A caret lands there
+ *   mid-run (a forward run parks it inside its own marker) but also from a
+ *   plain arrow key next to a marker an earlier run left behind.
+ * - `default` — let the browser handle it. A caret at a block edge still merges
+ *   blocks, and removing your own pending *addition* is a real edit the
+ *   reconciler turns into dropping that marker.
+ *
+ * Only `mark` continues a run: on either refusal the caller drops the run in
+ * progress, since a run that cannot grow would otherwise keep testing as
+ * contiguous at an unmoved caret and swallow every later keystroke.
+ *
+ * @param {Object}  options
+ * @param {string}  options.text       Plain text of the attribute value.
+ * @param {Array}   options.formats    Per-character format stacks.
+ * @param {number}  options.pos        Collapsed caret offset.
+ * @param {boolean} options.isBackward True for Backspace, false for Delete.
+ * @param {?Object} options.run        The contiguous run in progress, if any.
+ * @return {'mark'|'cancel'|'default'} What this keystroke should do.
+ */
+export function collapsedDeleteDisposition( {
+	text,
+	formats,
+	pos,
+	isBackward,
+	run,
+} ) {
+	const target = collapsedDeleteTarget( text, pos, isBackward, run );
+	if ( ! target ) {
+		/*
+		 * Nothing left to mark. Mid-run a forward delete's caret is parked at
+		 * the start of its own marker, so the browser would eat marked text.
+		 * Every other case is a real block edge: Backspace at offset 0 merges
+		 * with the previous block, as before.
+		 */
+		return run && ! isBackward ? 'cancel' : 'default';
+	}
+	if (
+		formatsRangeHasSuggestionType(
+			formats,
+			target.start,
+			target.end,
+			SUGGESTION_TYPE_DELETION
+		)
+	) {
+		return 'cancel';
+	}
+	/*
+	 * Some other marker covers the grapheme — a pending addition. Leave it to
+	 * the default path rather than nesting marks: `applyFormat` over the range
+	 * would re-attribute part of that marker to a new id.
+	 */
+	if ( formatsRangeHasSuggestion( formats, target.start, target.end ) ) {
+		return 'default';
+	}
+	return 'mark';
 }
 
 /**
@@ -486,10 +552,9 @@ export default function SuggestionDeletionKeyboard() {
 
 			// Collapsed-cursor delete.
 			const pos = start;
-			const { text, formats } =
-				readValueMetrics(
-					getBlockAttributes( clientId )?.[ attributeKey ]
-				) ?? {};
+			const { text, formats } = readValueMetrics(
+				getBlockAttributes( clientId )?.[ attributeKey ]
+			);
 
 			const isBackward = event.inputType === 'deleteContentBackward';
 			const isForward = event.inputType === 'deleteContentForward';
@@ -514,37 +579,21 @@ export default function SuggestionDeletionKeyboard() {
 					: null;
 				/*
 				 * The target is the whole grapheme past the leading edge, not
-				 * a single code unit. Nothing to mark at the value's edge, and
-				 * nothing to mark inside an existing suggestion marker either
-				 * — those edits stay on the default path rather than nesting
-				 * marks.
+				 * a single code unit, and whether it can be marked at all
+				 * depends on what already covers it.
 				 */
-				const target = collapsedDeleteTarget(
+				const disposition = collapsedDeleteDisposition( {
 					text,
+					formats,
 					pos,
 					isBackward,
-					run
-				);
-				if (
-					! target ||
-					formatsRangeHasSuggestion(
-						formats,
-						target.start,
-						target.end
-					)
-				) {
-					/*
-					 * Mid-run, a forward delete's caret is parked at the start
-					 * of its own marker, so falling through would have the
-					 * browser remove text that is already marked for deletion.
-					 * Cancel the keystroke instead. Every other case keeps the
-					 * default-path fall-through (a caret at a block edge still
-					 * merges blocks natively).
-					 */
-					if ( run && isForward ) {
+					run,
+				} );
+				if ( disposition !== 'mark' ) {
+					if ( disposition === 'cancel' ) {
 						event.preventDefault();
-						return;
 					}
+					// Neither refusal can grow the run, so it ends here.
 					resetRun();
 					return;
 				}

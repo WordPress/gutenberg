@@ -43,6 +43,7 @@ export {
 	growInlineAddition,
 	buildSuggestionMarkerAttributes,
 	formatsRangeHasSuggestion,
+	formatsRangeHasSuggestionType,
 	valueRangeHasSuggestion,
 } from './operations';
 export { computeDeleteRange } from './delete-range';

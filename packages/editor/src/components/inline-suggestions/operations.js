@@ -54,6 +54,41 @@ export function buildSuggestionMarkerAttributes( { id, type, authorId } ) {
  * @return {boolean} True when a suggestion format covers any character in range.
  */
 export function formatsRangeHasSuggestion( formats, start, end ) {
+	return someSuggestionInRange( formats, start, end, () => true );
+}
+
+/**
+ * Whether any character in `[start, end)` carries a `core/suggestion` marker of
+ * one kind (`del`, `add`, `format`).
+ *
+ * Deletion interception needs the distinction `formatsRangeHasSuggestion`
+ * flattens. Text already proposed for deletion must not be removed on the
+ * default path — the browser would take the marked text with it and leave the
+ * marker pointing at nothing. Text inside a pending *addition* still deletes
+ * there, where the reconciler reads the removal as the author dropping their
+ * own unaccepted insertion.
+ *
+ * @param {Array}  formats Per-character format stacks (from `create()`).
+ * @param {number} start   Range start (inclusive).
+ * @param {number} end     Range end (exclusive).
+ * @param {string} type    Marker kind to match.
+ * @return {boolean} True when a marker of that kind covers any character in range.
+ */
+export function formatsRangeHasSuggestionType( formats, start, end, type ) {
+	return someSuggestionInRange(
+		formats,
+		start,
+		end,
+		( format ) => format.attributes?.[ SUGGESTION_TYPE_ATTRIBUTE ] === type
+	);
+}
+
+/*
+ * Shared scan behind the two range checks above: true when some character in
+ * `[start, end)` carries a `core/suggestion` marker `predicate` accepts. Ranges
+ * are clamped and a missing formats array reads as "no markers".
+ */
+function someSuggestionInRange( formats, start, end, predicate ) {
 	if ( ! Array.isArray( formats ) ) {
 		return false;
 	}
@@ -63,7 +98,11 @@ export function formatsRangeHasSuggestion( formats, start, end ) {
 		const stack = formats[ i ];
 		if (
 			Array.isArray( stack ) &&
-			stack.some( ( f ) => f.type === SUGGESTION_FORMAT_NAME )
+			stack.some(
+				( format ) =>
+					format.type === SUGGESTION_FORMAT_NAME &&
+					predicate( format )
+			)
 		) {
 			return true;
 		}

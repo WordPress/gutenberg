@@ -523,6 +523,49 @@ test.describe( 'Suggestion mode', () => {
 		await expect( summaries ).toContainText( 'abc' );
 	} );
 
+	test( 'collapsed delete: a caret moved inside a del marker refuses the keystroke', async ( {
+		editor,
+		page,
+	} ) => {
+		// A marker outlives the run that opened it. An arrow key breaks the
+		// run's contiguity without clearing the marker, so the next Delete
+		// aims at a grapheme that is already proposed for deletion. Falling
+		// through to the browser there would remove text that only exists as
+		// a proposal and destroy the marker with it.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'abcdef' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.press( 'Delete' );
+
+		const markers = paragraph.locator(
+			'mark.wp-suggestion[data-suggestion-type="del"]'
+		);
+		// Wait for the note to mint before growing the run.
+		await expect( markers ).toHaveText( 'a' );
+		await page.keyboard.press( 'Delete' );
+		await expect( markers ).toHaveText( 'ab' );
+
+		// The forward run parks the caret at the marker's start; one step
+		// right puts it inside the marker, with no run in progress.
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'Delete' );
+
+		// The keystroke is swallowed: the marker is intact and no text was
+		// removed from the paragraph.
+		await expect( markers ).toHaveCount( 1 );
+		await expect( markers ).toHaveText( 'ab' );
+		await expect( paragraph ).toHaveText( 'abcdef' );
+	} );
+
 	test( 'collapsed delete: Backspace over an emoji ZWJ sequence marks the whole grapheme', async ( {
 		editor,
 		page,

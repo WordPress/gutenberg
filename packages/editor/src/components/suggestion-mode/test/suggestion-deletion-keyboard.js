@@ -1,5 +1,12 @@
 import { RichTextData } from '@wordpress/rich-text';
 import {
+	SUGGESTION_FORMAT_NAME,
+	SUGGESTION_TYPE_ATTRIBUTE,
+	SUGGESTION_TYPE_ADDITION,
+	SUGGESTION_TYPE_DELETION,
+} from '../../inline-suggestions';
+import {
+	collapsedDeleteDisposition,
 	collapsedDeleteTarget,
 	isContiguousDeleteRun,
 	sliceValueToHTML,
@@ -157,5 +164,113 @@ describe( 'collapsedDeleteTarget', () => {
 			caret: 0,
 		} );
 		expect( text.slice( grown.start, grown.end ) ).toBe( family );
+	} );
+} );
+
+describe( 'collapsedDeleteDisposition', () => {
+	const stack = ( type ) => [
+		{
+			type: SUGGESTION_FORMAT_NAME,
+			attributes: { [ SUGGESTION_TYPE_ATTRIBUTE ]: type },
+		},
+	];
+	// "abcdef" whose leading "ab" carries a marker of the given type.
+	const marked = ( type ) => [
+		stack( type ),
+		stack( type ),
+		undefined,
+		undefined,
+		undefined,
+		undefined,
+	];
+	const unmarked = new Array( 6 ).fill( undefined );
+	const forwardRun = ( end ) => ( {
+		clientId: 'a',
+		attributeKey: 'content',
+		id: 7,
+		start: 0,
+		end,
+		caret: 0,
+		dir: 'forward',
+	} );
+	const decide = ( overrides ) =>
+		collapsedDeleteDisposition( {
+			text: 'abcdef',
+			formats: unmarked,
+			pos: 3,
+			isBackward: false,
+			run: null,
+			...overrides,
+		} );
+
+	it( 'marks a grapheme that carries no marker', () => {
+		expect( decide() ).toBe( 'mark' );
+		expect( decide( { isBackward: true } ) ).toBe( 'mark' );
+	} );
+
+	it( 'grows a run past its own marker rather than refusing it', () => {
+		// The caret is parked inside the marker the run opened; the target
+		// comes from the run's far edge, which is still free text.
+		expect(
+			decide( {
+				formats: marked( SUGGESTION_TYPE_DELETION ),
+				pos: 0,
+				run: forwardRun( 2 ),
+			} )
+		).toBe( 'mark' );
+	} );
+
+	it( 'cancels a keystroke aimed into an existing deletion marker', () => {
+		// No run in progress: an arrow key is all it takes to park the caret
+		// inside a marker an earlier run left behind. Falling through would
+		// have the browser remove text that is only proposed for removal.
+		const formats = marked( SUGGESTION_TYPE_DELETION );
+		expect( decide( { formats, pos: 1 } ) ).toBe( 'cancel' );
+		expect( decide( { formats, pos: 2, isBackward: true } ) ).toBe(
+			'cancel'
+		);
+	} );
+
+	it( 'leaves a grapheme inside a pending addition to the default path', () => {
+		// Removing your own unaccepted insertion is a real edit: the
+		// reconciler turns the native removal into dropping that marker.
+		const formats = marked( SUGGESTION_TYPE_ADDITION );
+		expect( decide( { formats, pos: 1 } ) ).toBe( 'default' );
+		expect( decide( { formats, pos: 2, isBackward: true } ) ).toBe(
+			'default'
+		);
+	} );
+
+	it( 'cancels a forward run that has reached the end of the value', () => {
+		expect(
+			decide( {
+				text: 'ab',
+				formats: marked( SUGGESTION_TYPE_DELETION ),
+				pos: 0,
+				run: forwardRun( 2 ),
+			} )
+		).toBe( 'cancel' );
+	} );
+
+	it( 'leaves a block edge with no run to the default path', () => {
+		// Native block merges still have to happen.
+		expect( decide( { pos: 6 } ) ).toBe( 'default' );
+		expect( decide( { pos: 0, isBackward: true } ) ).toBe( 'default' );
+	} );
+
+	it( 'leaves a backward run at offset 0 to the default path', () => {
+		// Backspace there merges with the previous block; it does not reach
+		// into the marker.
+		expect(
+			decide( {
+				formats: marked( SUGGESTION_TYPE_DELETION ),
+				pos: 0,
+				isBackward: true,
+				run: {
+					...forwardRun( 2 ),
+					dir: 'backward',
+				},
+			} )
+		).toBe( 'default' );
 	} );
 } );
