@@ -242,11 +242,24 @@ export default function SuggestionAutoSave() {
 	);
 
 	useEffect( () => {
+		const timers = timersRef.current;
+
+		/*
+		 * Leaving Suggest mode cancels every pending debounce. The component
+		 * stays mounted across intent changes (it is gated on the experiment
+		 * flag, not the intent), so without this a timer scheduled moments
+		 * before the switch still fires and POSTs a note for an edit the
+		 * user walked away from. Cancelling is not lossy: the overlay entry
+		 * keeps its unsynced fingerprint, so re-entering Suggest re-runs this
+		 * effect and reschedules the save.
+		 */
 		if ( ! isSuggestMode ) {
+			for ( const timer of timers.values() ) {
+				clearTimeout( timer );
+			}
+			timers.clear();
 			return undefined;
 		}
-
-		const timers = timersRef.current;
 
 		for ( const [ clientId, entry ] of Object.entries( entries ) ) {
 			const operations = operationsForEntry( entry );
