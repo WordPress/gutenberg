@@ -799,10 +799,11 @@ export const setEditorIntent =
 
 		dispatch( { type: 'SET_EDITOR_INTENT', intent } );
 
-		// Skip the snackbar/announcement on the initial set (when there is no
-		// previous intent, e.g. during editor boot) so the user isn't greeted
-		// with a mode notice they didn't trigger.
-		if ( previousIntent === intent || previousIntent === undefined ) {
+		// Only announce an actual change of intent. Re-selecting the current
+		// intent is a no-op, and because the store starts at `edit` this also
+		// keeps editor boot silent: a boot-time `setEditorIntent( 'edit' )`
+		// matches the default and never reaches the announcement.
+		if ( previousIntent === intent ) {
 			return;
 		}
 
