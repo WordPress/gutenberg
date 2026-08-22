@@ -46,6 +46,7 @@
 -   Playlist: Improve handling of declarative waveform player configuration ([#81342](https://github.com/WordPress/gutenberg/pull/81342)).
 -   Playlist: Update `@arraypress/waveform-player` to `^1.26.0`, disable automatic initialization, and prevent custom SVG icons from being configured through HTML data attributes.
 -   Cover: Pass `'full'` instead of `null` as the featured image size for parallax and repeated backgrounds, so a null array offset is no longer reached on PHP 8.5 ([#81444](https://github.com/WordPress/gutenberg/pull/81444)).
+-   Style states: Persist `aspect-ratio: auto` when resetting aspect ratio in a viewport or pseudo state so the default-state ratio no longer wins([#81393](https://github.com/WordPress/gutenberg/pull/81393)).
 
 ### Internal
 

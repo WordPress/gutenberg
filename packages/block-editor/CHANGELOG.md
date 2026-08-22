@@ -72,6 +72,7 @@
 -   `LinkControl`: Restore the preview title underline by slightly increasing the title's line height, which was too tight for the underline to be visible ([#81083](https://github.com/WordPress/gutenberg/pull/81083)).
 -   `URLInput`: Skip link search requests while an IME composition is in progress; the search now fires once with the confirmed value on `compositionend` ([#80602](https://github.com/WordPress/gutenberg/pull/80602)).
 -   `SpacingSizesControl`: Give the control's visible label its own translation context instead of sharing an entry with the side input's aria label, which feeds the same placeholders in the opposite order — a single shared translation could not be correct for both ([#81240](https://github.com/WordPress/gutenberg/pull/81240)).
+-   Style states: Persist `aspect-ratio: auto` when resetting aspect ratio in a viewport or pseudo state so the default-state ratio no longer wins. ([#81393](https://github.com/WordPress/gutenberg/pull/81393)).
 
 ## 16.1.0 (2026-07-29)
 

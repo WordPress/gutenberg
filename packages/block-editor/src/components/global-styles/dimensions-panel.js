@@ -21,6 +21,7 @@ import {
 	DEFAULT_BLOCK_STYLE_STATE,
 	hasPseudoBlockStyleState,
 	hasViewportBlockStyleState,
+	isDefaultBlockStyleState,
 } from '../../hooks/block-style-state';
 import {
 	getInheritanceProps,
@@ -352,6 +353,7 @@ export default function DimensionsPanel( {
 	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
 } ) {
 	const { dimensions, spacing } = settings;
+	const isStyleStateSelected = ! isDefaultBlockStyleState( styleState );
 
 	const decodeValue = ( rawValue ) => {
 		if ( rawValue && typeof rawValue === 'object' ) {
@@ -394,36 +396,41 @@ export default function DimensionsPanel( {
 	const minimumMargin = -Infinity;
 	const [ minMarginValue, setMinMarginValue ] = useState( minimumMargin );
 
-	const resetAllFilter = useCallback( ( previousValue ) => {
-		return {
-			...previousValue,
-			layout: cleanEmptyObject( {
-				...previousValue?.layout,
-				contentSize: undefined,
-				wideSize: undefined,
-				selfStretch: undefined,
-				flexSize: undefined,
-				columnStart: undefined,
-				rowStart: undefined,
-				columnSpan: undefined,
-				rowSpan: undefined,
-			} ),
-			spacing: {
-				...previousValue?.spacing,
-				padding: undefined,
-				margin: undefined,
-				blockGap: undefined,
-			},
-			dimensions: {
-				...previousValue?.dimensions,
-				height: undefined,
-				minHeight: undefined,
-				minWidth: undefined,
-				aspectRatio: undefined,
-				width: undefined,
-			},
-		};
-	}, [] );
+	const resetAllFilter = useCallback(
+		( previousValue ) => {
+			return {
+				...previousValue,
+				layout: cleanEmptyObject( {
+					...previousValue?.layout,
+					contentSize: undefined,
+					wideSize: undefined,
+					selfStretch: undefined,
+					flexSize: undefined,
+					columnStart: undefined,
+					rowStart: undefined,
+					columnSpan: undefined,
+					rowSpan: undefined,
+				} ),
+				spacing: {
+					...previousValue?.spacing,
+					padding: undefined,
+					margin: undefined,
+					blockGap: undefined,
+				},
+				dimensions: {
+					...previousValue?.dimensions,
+					height: undefined,
+					minHeight: undefined,
+					minWidth: undefined,
+					// Persist the CSS default under a style state so reset does
+					// not fall back to the default-state aspect ratio.
+					aspectRatio: isStyleStateSelected ? 'auto' : undefined,
+					width: undefined,
+				},
+			};
+		},
+		[ isStyleStateSelected ]
+	);
 
 	// Content Width
 	const showContentSizeControl =
@@ -712,10 +719,14 @@ export default function DimensionsPanel( {
 		! hasValue( value?.dimensions?.aspectRatio ) &&
 		hasValue( inheritedAspectRatioValue );
 	const setAspectRatioValue = ( newValue ) => {
+		const nextAspectRatio =
+			isStyleStateSelected && EMPTY_VALUES.includes( newValue )
+				? 'auto'
+				: newValue;
 		const tempValue = setImmutably(
 			value,
 			[ 'dimensions', 'aspectRatio' ],
-			newValue
+			nextAspectRatio
 		);
 		// Apply aspect-ratio, while removing any applied min-height.
 		onChange(
