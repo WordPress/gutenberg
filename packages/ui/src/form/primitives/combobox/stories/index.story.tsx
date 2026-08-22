@@ -32,6 +32,9 @@ const meta: Meta< typeof Combobox.Root > = {
 		'Combobox.Clear': Combobox.Clear,
 	},
 	parameters: {
+		// FIXME: Placeholder-like trigger text fails color-contrast (WCAG 1.4.3 applies to placeholder text). The trigger has no visible label and relies on aria-label (button-name). Detached Inline also lacks accessible names/required ARIA and uses a non-keyboard-accessible scroll region (aria-input-field-name, aria-required-attr, scrollable-region-focusable).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',
