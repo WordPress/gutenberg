@@ -238,6 +238,32 @@ function TableEdit( {
 	 */
 	function onInsertRow( delta ) {
 		if ( ! selectedCell ) {
+			const {
+				head: headRows,
+				body: bodyRows,
+				foot: footRows,
+			} = attributes;
+			const hasHeader = headRows && headRows.length > 0;
+			const hasFooter = footRows && footRows.length > 0;
+			const hasEmptyBody = ! bodyRows || bodyRows.length === 0;
+
+			if ( ( hasHeader || hasFooter ) && hasEmptyBody ) {
+				setAttributes(
+					insertRow( attributes, {
+						sectionName: 'body',
+						rowIndex: 0,
+					} )
+				);
+				// Select the first cell of the new row
+				setSelectedCell( {
+					sectionName: 'body',
+					rowIndex: 0,
+					columnIndex: 0,
+					type: 'cell',
+				} );
+				return;
+			}
+
 			return;
 		}
 
@@ -366,13 +392,25 @@ function TableEdit( {
 		{
 			icon: tableRowBefore,
 			title: __( 'Insert row before' ),
-			isDisabled: ! selectedCell,
+			isDisabled:
+				! selectedCell &&
+				! (
+					( ( head && head.length > 0 ) ||
+						( foot && foot.length > 0 ) ) &&
+					( ! attributes.body || attributes.body.length === 0 )
+				),
 			onClick: onInsertRowBefore,
 		},
 		{
 			icon: tableRowAfter,
 			title: __( 'Insert row after' ),
-			isDisabled: ! selectedCell,
+			isDisabled:
+				! selectedCell &&
+				! (
+					( ( head && head.length > 0 ) ||
+						( foot && foot.length > 0 ) ) &&
+					( ! attributes.body || attributes.body.length === 0 )
+				),
 			onClick: onInsertRowAfter,
 		},
 		{
