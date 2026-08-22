@@ -25,7 +25,10 @@ round's re-homing absorbed them; one remains open:
     `components.link`-style prop cannot reach widget bodies without
     widening the render contract), so 17 shrinks to extending the bag with
     `navigate` / `notify` for the operations of step 16 and aligning
-    `renderBlocks` (step 10) with the context mechanism.
+    `renderBlocks` (step 10) with the context mechanism. The demo branch
+    carries the first admin block ahead of steps 12/17: `core-admin/link`,
+    a composed-def body link the seam upgrades; it depends on the seam, so
+    it can only live where both meet until the seam lands. Absorb it then.
 -   **WordPress/gutenberg#81738, module-less widget resolution. Merged**,
     absorbed by this round's re-homing of step 07 (below).
 -   **WordPress/gutenberg#81729, the Site Health page. Merged**, no collision
