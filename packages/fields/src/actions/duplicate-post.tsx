@@ -7,7 +7,7 @@ import {
 	Button,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	__experimentalInputControl as InputControl,
+	__experimentalInputControl as WCInputControl,
 } from '@wordpress/components';
 import type { BasePost, CoreDataError } from '../types';
 import { getItemTitle } from './utils';
@@ -145,7 +145,7 @@ const duplicatePost: Action< BasePost > = {
 							) }
 						</div>
 					) }
-					<InputControl
+					<WCInputControl
 						label={ __( 'Title' ) }
 						placeholder={ __( 'No title' ) }
 						value={ getItemTitle( item ) }

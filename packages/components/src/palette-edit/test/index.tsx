@@ -91,6 +91,47 @@ describe( 'getNameAndSlugForPosition', () => {
 			slug: 'test-color-151',
 		} );
 	} );
+
+	test( 'should return a duotone name and slug for the duotone variant', () => {
+		const slugPrefix = 'custom-';
+		const elements: PaletteElement[] = [];
+
+		expect(
+			getNameAndSlugForPosition( elements, slugPrefix, 'duotone' )
+		).toEqual( {
+			name: 'Duotone 1',
+			slug: 'custom-duotone-1',
+		} );
+	} );
+
+	test( 'should increment the duotone slug id independently of colors', () => {
+		const slugPrefix = 'custom-';
+		const elements = [
+			{
+				slug: 'custom-duotone-1',
+				colors: [ '#000000', '#ffffff' ],
+				name: 'Duotone 1',
+			},
+			{
+				slug: 'custom-duotone-4',
+				colors: [ '#8c00b7', '#fcff41' ],
+				name: 'Duotone 4',
+			},
+			// A color preset sharing the prefix must not affect the count.
+			{
+				slug: 'custom-color-99',
+				color: '#ffffff',
+				name: 'Color 99',
+			},
+		];
+
+		expect(
+			getNameAndSlugForPosition( elements, slugPrefix, 'duotone' )
+		).toEqual( {
+			name: 'Duotone 5',
+			slug: 'custom-duotone-5',
+		} );
+	} );
 } );
 
 describe( 'deduplicateElementSlugs', () => {
@@ -162,6 +203,18 @@ describe( 'PaletteEdit', () => {
 				'linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%)',
 			name: 'Midnight',
 			slug: 'midnight',
+		},
+	];
+	const duotones = [
+		{
+			colors: [ '#8c00b7', '#fcff41' ],
+			name: 'Purple and yellow',
+			slug: 'purple-yellow',
+		},
+		{
+			colors: [ '#000097', '#ff4747' ],
+			name: 'Blue and red',
+			slug: 'blue-red',
 		},
 	];
 
@@ -315,6 +368,143 @@ describe( 'PaletteEdit', () => {
 		} );
 	} );
 
+	it( 'calls the `onChange` with the new duotone appended, seeded from the color palette', async () => {
+		const onChange = jest.fn();
+
+		render(
+			<PaletteEdit
+				{ ...defaultProps }
+				duotones={ duotones }
+				colorPalette={ colors }
+				onChange={ onChange }
+			/>
+		);
+
+		await click(
+			screen.getByRole( 'button', {
+				name: 'Add duotone',
+			} )
+		);
+
+		await waitFor( () => {
+			expect( onChange ).toHaveBeenCalledWith( [
+				...duotones,
+				{
+					// The darkest and lightest colors of `colors`.
+					colors: [ '#0000ff', '#1a4548' ],
+					name: 'Duotone 1',
+					slug: 'duotone-1',
+				},
+			] );
+		} );
+	} );
+
+	it( 'ignores palette colors a duotone cannot be built from when adding one', async () => {
+		const onChange = jest.fn();
+
+		render(
+			<PaletteEdit
+				{ ...defaultProps }
+				duotones={ duotones }
+				colorPalette={ [
+					...colors,
+					// Twenty Twenty-Five ships a color like this. `colord`
+					// cannot parse it and treats it as black, which would
+					// otherwise win as the duotone's shadow color and produce a
+					// duotone that cannot be rendered.
+					{
+						color: 'color-mix(in srgb, currentColor 20%, transparent)',
+						name: 'Contrast overlay',
+						slug: 'contrast-overlay',
+					},
+				] }
+				onChange={ onChange }
+			/>
+		);
+
+		await click(
+			screen.getByRole( 'button', {
+				name: 'Add duotone',
+			} )
+		);
+
+		await waitFor( () => {
+			expect( onChange ).toHaveBeenCalledWith( [
+				...duotones,
+				{
+					colors: [ '#0000ff', '#1a4548' ],
+					name: 'Duotone 1',
+					slug: 'duotone-1',
+				},
+			] );
+		} );
+	} );
+
+	// The front end parses duotone colors with a PHP port of colord that only
+	// accepts hex, `rgb()` and `hsl()`, so a named color saved as-is would
+	// render in the editor and be dropped on the front end.
+	it( 'normalizes palette colors to hex when adding a duotone', async () => {
+		const onChange = jest.fn();
+
+		render(
+			<PaletteEdit
+				{ ...defaultProps }
+				duotones={ duotones }
+				colorPalette={ [
+					{ color: 'black', name: 'Black', slug: 'black' },
+					{ color: 'white', name: 'White', slug: 'white' },
+				] }
+				onChange={ onChange }
+			/>
+		);
+
+		await click(
+			screen.getByRole( 'button', {
+				name: 'Add duotone',
+			} )
+		);
+
+		await waitFor( () => {
+			expect( onChange ).toHaveBeenCalledWith( [
+				...duotones,
+				{
+					colors: [ '#000000', '#ffffff' ],
+					name: 'Duotone 1',
+					slug: 'duotone-1',
+				},
+			] );
+		} );
+	} );
+
+	it( 'falls back to black and white when adding a duotone without a color palette', async () => {
+		const onChange = jest.fn();
+
+		render(
+			<PaletteEdit
+				{ ...defaultProps }
+				duotones={ duotones }
+				onChange={ onChange }
+			/>
+		);
+
+		await click(
+			screen.getByRole( 'button', {
+				name: 'Add duotone',
+			} )
+		);
+
+		await waitFor( () => {
+			expect( onChange ).toHaveBeenCalledWith( [
+				...duotones,
+				{
+					colors: [ '#000', '#fff' ],
+					name: 'Duotone 1',
+					slug: 'duotone-1',
+				},
+			] );
+		} );
+	} );
+
 	it( 'can not add new colors when `canOnlyChangeValues` is enabled', () => {
 		render( <PaletteEdit { ...defaultProps } canOnlyChangeValues /> );
 
@@ -458,6 +648,116 @@ describe( 'PaletteEdit', () => {
 						'radial-gradient(rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%)',
 				},
 				gradients[ 1 ],
+			] );
+		} );
+	} );
+
+	it( 'can update duotone palette value', async () => {
+		const onChange = jest.fn();
+
+		render(
+			<PaletteEdit
+				{ ...defaultProps }
+				duotones={ duotones }
+				colorPalette={ colors }
+				onChange={ onChange }
+			/>
+		);
+
+		await click( screen.getByLabelText( 'Duotone: Blue and red' ) );
+		await click( screen.getByRole( 'button', { name: /Shadows/ } ) );
+		await click( screen.getByRole( 'option', { name: 'Primary' } ) );
+
+		await waitFor( () => {
+			expect( onChange ).toHaveBeenCalledWith( [
+				duotones[ 0 ],
+				{
+					...duotones[ 1 ],
+					colors: [ '#1a4548', duotones[ 1 ].colors[ 1 ] ],
+				},
+			] );
+		} );
+	} );
+
+	// The same filtering and normalization that applies when adding a duotone
+	// has to apply when editing one, or the shadows and highlights picker can
+	// offer a color the saved duotone cannot be built from.
+	it( 'hides unusable colors and saves named ones as hex when editing a duotone', async () => {
+		const onChange = jest.fn();
+
+		render(
+			<PaletteEdit
+				{ ...defaultProps }
+				duotones={ duotones }
+				colorPalette={ [
+					{
+						color: 'black',
+						name: 'Named black',
+						slug: 'named-black',
+					},
+					{
+						color: 'color-mix(in srgb, currentColor 20%, transparent)',
+						name: 'Contrast overlay',
+						slug: 'contrast-overlay',
+					},
+				] }
+				onChange={ onChange }
+			/>
+		);
+
+		await click( screen.getByLabelText( 'Duotone: Blue and red' ) );
+		await click( screen.getByRole( 'button', { name: /Shadows/ } ) );
+
+		// The unusable color must not be offered at all.
+		expect(
+			screen.queryByRole( 'option', { name: 'Contrast overlay' } )
+		).not.toBeInTheDocument();
+
+		await click( screen.getByRole( 'option', { name: 'Named black' } ) );
+
+		await waitFor( () => {
+			expect( onChange ).toHaveBeenCalledWith( [
+				duotones[ 0 ],
+				{
+					...duotones[ 1 ],
+					colors: [ '#000000', duotones[ 1 ].colors[ 1 ] ],
+				},
+			] );
+		} );
+	} );
+
+	// Adding two duotones with the `+` button seeds both from the palette's
+	// darkest and lightest colors, so duplicate values are the normal case
+	// rather than an edge one. The duotone that was clicked has to be the one
+	// that gets edited.
+	it( 'updates the clicked duotone when two share the same colors', async () => {
+		const onChange = jest.fn();
+		const twins = [
+			{ colors: [ '#000000', '#ffffff' ], name: 'First', slug: 'first' },
+			{
+				colors: [ '#000000', '#ffffff' ],
+				name: 'Second',
+				slug: 'second',
+			},
+		];
+
+		render(
+			<PaletteEdit
+				{ ...defaultProps }
+				duotones={ twins }
+				colorPalette={ colors }
+				onChange={ onChange }
+			/>
+		);
+
+		await click( screen.getByLabelText( 'Duotone: Second' ) );
+		await click( screen.getByRole( 'button', { name: /Shadows/ } ) );
+		await click( screen.getByRole( 'option', { name: 'Primary' } ) );
+
+		await waitFor( () => {
+			expect( onChange ).toHaveBeenCalledWith( [
+				twins[ 0 ],
+				{ ...twins[ 1 ], colors: [ '#1a4548', '#ffffff' ] },
 			] );
 		} );
 	} );

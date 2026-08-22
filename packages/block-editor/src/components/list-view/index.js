@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import {
 	useInstanceId,
 	useMergeRefs,
+	useRefEffect,
 	__experimentalUseFixedWindowList as useFixedWindowList,
 } from '@wordpress/compose';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
@@ -80,6 +81,7 @@ const expansion = ( state, action ) => {
  * @param {?boolean}       props.showBlockMovers        Flag to enable block movers. Defaults to `false`.
  * @param {?boolean}       props.isExpanded             Flag to determine whether nested levels are expanded by default. Defaults to `false`.
  * @param {?boolean}       props.showAppender           Flag to show or hide the block appender. Defaults to `false`.
+ * @param {?boolean}       props.focusOnMount           Flag to move focus into the list when it mounts. Defaults to `false`.
  * @param {?ComponentType} props.blockSettingsMenu      Optional more menu substitution. Defaults to the standard `BlockSettingsDropdown` component.
  * @param {string}         props.rootClientId           The client id of the root block from which we determine the blocks to show in the list.
  * @param {string}         props.description            Optional accessible description for the tree grid component.
@@ -95,6 +97,7 @@ function ListViewComponent(
 		showBlockMovers = false,
 		isExpanded = false,
 		showAppender = false,
+		focusOnMount = false,
 		blockSettingsMenu: BlockSettingsMenu = BlockSettingsDropdown,
 		rootClientId,
 		description,
@@ -174,21 +177,61 @@ function ListViewComponent(
 		selectBlock: selectEditorBlock,
 	} );
 
-	const focusSelectedBlock = useCallback(
+	const focusOnMountRef = useRefEffect(
 		( node ) => {
-			const [ firstSelectedClientId ] = getSelectedBlockClientIds();
-			// If a blocks are already selected when the list view is initially
-			// mounted, shift focus to the first selected block.
-			if ( firstSelectedClientId && node ) {
-				focusListItem( firstSelectedClientId, node );
+			// A list that mounts as a side effect of selecting a block, the
+			// block inspector's for one, would pull focus out of whatever the
+			// user is editing, so taking focus is opt-in.
+			if ( ! focusOnMount ) {
+				return;
 			}
+
+			const controller = new window.AbortController();
+			const focusRow = ( clientId ) =>
+				focusListItem( clientId, node, controller.signal ).then( () =>
+					controller.abort()
+				);
+
+			// Anything that takes focus first has a better claim to it. The row
+			// is not always there yet either, because a nested block waits on
+			// its ancestors expanding.
+			node.ownerDocument.addEventListener(
+				'focusin',
+				() => controller.abort(),
+				{ once: true, signal: controller.signal }
+			);
+
+			const [ firstSelectedClientId ] = getSelectedBlockClientIds();
+
+			if ( firstSelectedClientId ) {
+				focusRow( firstSelectedClientId );
+				return () => controller.abort();
+			}
+
+			// With nothing selected the top of the list gets focus, but only
+			// once the click that opened the list is over. Focusing a row costs
+			// a style and layout pass, and inside that commit it lands on a
+			// document that is still dirty.
+			const timerId = setTimeout( () => {
+				const firstClientId = node.querySelector(
+					'[role=row][data-block]'
+				)?.dataset.block;
+				if ( firstClientId ) {
+					focusRow( firstClientId );
+				}
+			}, 0 );
+
+			return () => {
+				clearTimeout( timerId );
+				controller.abort();
+			};
 		},
-		[ getSelectedBlockClientIds ]
+		[ focusOnMount, getSelectedBlockClientIds ]
 	);
 
 	const treeGridRef = useMergeRefs( [
 		clipBoardRef,
-		focusSelectedBlock,
+		focusOnMountRef,
 		elementRef,
 		dropZoneRef,
 		ref,
