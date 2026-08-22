@@ -92,7 +92,7 @@ Reuse this design across your site.
 
 -	**Name:** [core/block](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-reusable/core-block-block/)
 -	**Category:** [reusable](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-reusable/)
--	**Supports:** interactivity (clientNavigation), ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~inserter~~, ~~renaming~~
+-	**Supports:** interactivity (clientNavigation), ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~inserter~~, ~~renaming~~, ~~visibility~~
 -	**Attributes:** content, ref
 
 ## Breadcrumbs

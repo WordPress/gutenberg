@@ -314,7 +314,6 @@ If you are publishing new versions of packages, note that there are versioning r
 ## TypeScript
 
 The [TypeScript](https://www.typescriptlang.org/) language is a typed superset of JavaScript that compiles to plain JavaScript.
-Gutenberg does not use the TypeScript language, however TypeScript has powerful tooling that can be applied to JavaScript projects.
 
 Gutenberg uses TypeScript for several reasons, including:
 
@@ -329,7 +328,7 @@ These packages benefit from type checking and produced type declarations in the 
 
 A package opts in to TypeScript tooling with a build project registered in the root `tsconfig.build.json` references: `tsconfig.json` for a package without TypeScript dev files, `tsconfig.build.json` for one that splits. Packages that emit declarations through this standard layout and have TypeScript test or story files split into two projects:
 
--   `tsconfig.build.json` is the build project: it covers `src`, emits declarations to `build-types`, and is what other packages and `npm run build` consume.
+-   `tsconfig.build.json` is the build project: it covers `src`, emits declarations to `build-types`, and is what other packages and `npm run build` consume. `npm run build` emits those declarations with `--noCheck`, so it only reports parse and declaration emit errors; `npm run typecheck` is where type errors surface.
 -   `tsconfig.json` is the dev project: it covers test and story files with `noEmit`, so `npm run typecheck` and the IDE can check them without their declarations ending up in the published package.
 
 Both extend shared base configurations (comments are not necessary):
@@ -362,7 +361,7 @@ Both extend shared base configurations (comments are not necessary):
 }
 ```
 
-Register both projects at the root: `packages/<name>/tsconfig.build.json` in the root `tsconfig.build.json` references, and `packages/<name>` in the root `tsconfig.json` references.
+Register both projects at the root: `packages/<name>/tsconfig.build.json` in the root `tsconfig.build.json` references, and `packages/<name>` in the root `tsconfig.json` references. Route entry points under `routes/` with a `tsconfig.json` register it in the root `tsconfig.json` references only: their projects emit nothing and nothing else references them, so that registration is what puts them under `npm run typecheck`. A route with TypeScript test files pairs it with a `tsconfig.test.json` covering them, registered the same way.
 
 Packages whose components feed the Storybook components manifest (`components`, `dataviews`, `ui`) carry a third project, `tsconfig.stories.json`, registered in the root `tsconfig.json` only. It type checks the stories against component sources without jest types. Storybook's component meta extractor reads props through the closest `tsconfig.json` that lists a story, or through its own inferred project when none does; the inferred project produces the complete manifest and the dev project does not, so stories stay out of `tsconfig.json`. The dev project cannot reference this one either, because a referenced project may not disable emit (TS6310), which is why it is registered at the root only.
 

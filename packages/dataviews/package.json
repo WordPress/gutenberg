@@ -51,7 +51,8 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@ariakit/react": "^0.4.35",
+		"@ariakit/react": "^0.4.37",
+		"@date-fns/tz": "^1.5.0",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/components": "file:../components",
@@ -76,8 +77,8 @@
 		"remove-accents": "^0.5.0"
 	},
 	"devDependencies": {
-		"@storybook/addon-docs": "^10.4.3",
-		"@storybook/react-vite": "^10.4.3",
+		"@storybook/addon-docs": "^10.5.3",
+		"@storybook/react-vite": "^10.5.3",
 		"@testing-library/dom": "^10.4.1",
 		"@testing-library/jest-dom": "^6.9.1",
 		"@testing-library/react": "^16.3.2",
@@ -85,7 +86,7 @@
 		"@types/jest": "^30.0.0",
 		"@types/node": "^20.19.39",
 		"esbuild": "^0.27.2",
-		"storybook": "^10.4.3"
+		"storybook": "^10.5.3"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

@@ -11,6 +11,10 @@
 -   Check normal and active fill color contrast, and return warnings for the final generated ramp ([#81185](https://github.com/WordPress/gutenberg/pull/81185)).
 -   `ThemeProvider`: Avoid root-level relational selectors when forwarding `cornerRadius` presets to reduce style recalculation work. ([#81457](https://github.com/WordPress/gutenberg/pull/81457))
 
+### Documentation
+
+-   Route contributors and coding agents to the canonical Design System package guidance ([#80597](https://github.com/WordPress/gutenberg/pull/80597)).
+
 ### Internal
 
 -   Point tsconfig references at split dependencies' build projects. ([#81514](https://github.com/WordPress/gutenberg/pull/81514), [#81518](https://github.com/WordPress/gutenberg/pull/81518))
