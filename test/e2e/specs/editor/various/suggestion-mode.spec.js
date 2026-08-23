@@ -810,7 +810,8 @@ test.describe( 'Suggestion mode', () => {
 		expect( serialized ).toContain( 'data-suggestion-type="format"' );
 		expect( serialized ).toContain( '<strong>' );
 
-		// The sidebar reads the change as "Formatting: bold", not a text edit.
+		// The sidebar reads the change as "Add formatting: bold", not a text
+		// edit — and the verb says which way the format is going.
 		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
 		const allNotesToggle = topBar.getByRole( 'button', {
 			name: 'All notes',
@@ -825,8 +826,61 @@ test.describe( 'Suggestion mode', () => {
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.locator( '.editor-collab-sidebar-panel__suggestion-summary' );
 		await expect( summary ).toBeVisible();
-		await expect( summary ).toContainText( 'Formatting:' );
+		await expect( summary ).toContainText( 'Add formatting:' );
 		await expect( summary ).toContainText( 'bold' );
+	} );
+
+	test( 'style — un-bolding a run reads as a removal in the sidebar', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Adding a format and taking one away are opposite proposals. Both
+		// used to summarize as "Formatting: bold", so a reviewer working from
+		// the sidebar could not tell which was on offer without opening the
+		// canvas (F-11).
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello <strong>world</strong>' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await pageUtils.pressKeys( 'primary+b' );
+
+		// The marker proves the un-bold was captured as a format suggestion.
+		const marker = paragraph.locator(
+			'mark.wp-suggestion[data-suggestion-type="format"]'
+		);
+		await expect( marker ).toContainText( 'world' );
+		await expect( paragraph ).toHaveText( 'Hello world' );
+
+		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
+		const allNotesToggle = topBar.getByRole( 'button', {
+			name: 'All notes',
+			exact: true,
+		} );
+		if (
+			( await allNotesToggle.getAttribute( 'aria-expanded' ) ) === 'false'
+		) {
+			await allNotesToggle.click();
+		}
+		const summary = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.locator( '.editor-collab-sidebar-panel__suggestion-summary' );
+		await expect( summary ).toBeVisible();
+		// Anchor on the line that should be there before asserting the
+		// opposite one is not — an absence assertion that runs first can pass
+		// simply by arriving before the summary has rendered.
+		await expect( summary ).toContainText( 'Remove formatting:' );
+		await expect( summary ).toContainText( 'bold' );
+		await expect( summary ).not.toContainText( 'Add formatting:' );
 	} );
 
 	test( 'style — italicizing a word wraps the run in one format marker', async ( {
