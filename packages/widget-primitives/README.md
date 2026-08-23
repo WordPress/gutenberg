@@ -60,11 +60,11 @@ It takes host-supplied records (`WidgetModuleRecord[]`, or `null` while loading)
 ### `WidgetAttributeField< Item >`
 
 It's an authoring helper: a DataViews `Field` whose `id` is narrowed to the widget's attribute keys.
-Its optional `relevance` hint (`'high' | 'low'`) marks attributes a host may promote to a prominent surface.
+Its optional `relevance` hint (`'high' | 'medium' | 'low'`) marks attributes a host may promote to a prominent surface.
 
 ### `WidgetAction`
 
-It's a declarative verb a widget type exposes: an envelope (`id`, `label`) plus exactly one fulfillment, named by the key carrying it.
+It's a declarative verb a widget type exposes: an envelope (`id`, `label`, optional `icon` and `relevance`) plus exactly one fulfillment, named by the key carrying it.
 Today the only key is `href`, a link target, with optional `download` / `openInNewTab`.
 `data:` and `javascript:` hrefs are rejected at registration. Prefer a file next to the widget, an absolute URL, or `downloadBlob` for generated content.
 

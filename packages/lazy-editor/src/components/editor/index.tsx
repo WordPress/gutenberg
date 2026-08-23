@@ -9,23 +9,31 @@ import { useEditorSettings } from '../../hooks/use-editor-settings';
 import { useEditorAssets } from '../../hooks/use-editor-assets';
 import { unlock } from '../../lock-unlock';
 
-const { Editor: PrivateEditor, BackButton } = unlock( editorPrivateApis );
+const {
+	Editor: PrivateEditor,
+	BackButton,
+	PreferencesModal,
+} = unlock( editorPrivateApis );
 
 interface EditorProps {
 	postType?: string;
 	postId?: string;
 	settings?: Record< string, any >;
 	backButton?: ReactNode;
+	onActionPerformed?: ( actionId: string, items: any[] ) => void;
+	initialViewport?: string;
 }
 
 /**
  * Lazy-loading editor component that handles asset loading and settings initialization.
  *
- * @param {Object}    props            Component props
- * @param {string}    props.postType   Optional post type to edit. If not provided, resolves to homepage.
- * @param {string}    props.postId     Optional post ID to edit. If not provided, resolves to homepage.
- * @param {Object}    props.settings   Optional extra settings to merge with editor settings
- * @param {ReactNode} props.backButton Optional back button to render in editor header
+ * @param {Object}    props                   Component props
+ * @param {string}    props.postType          Optional post type to edit. If not provided, resolves to homepage.
+ * @param {string}    props.postId            Optional post ID to edit. If not provided, resolves to homepage.
+ * @param {Object}    props.settings          Optional extra settings to merge with editor settings
+ * @param {ReactNode} props.backButton        Optional back button to render in editor header
+ * @param {Function}  props.onActionPerformed Optional callback run after a post action
+ * @param {string}    props.initialViewport   Optional device type the entity opens at
  * @return The editor component with loading states
  */
 export function Editor( {
@@ -33,6 +41,8 @@ export function Editor( {
 	postId,
 	settings,
 	backButton,
+	onActionPerformed,
+	initialViewport,
 }: EditorProps ) {
 	// Resolve homepage when no postType/postId provided
 	const homePage = useSelect(
@@ -81,6 +91,16 @@ export function Editor( {
 		() => ( {
 			...editorSettings,
 			...settings,
+			/*
+			 * The theme's styles and the user's global styles, then whatever the
+			 * host adds for the surface it is rendering into. Spelled out after
+			 * the spread because `styles` is a list each source adds to: a host
+			 * contributing its own must not drop everyone else's.
+			 */
+			styles: [
+				...( editorSettings.styles ?? [] ),
+				...( settings?.styles ?? [] ),
+			],
 		} ),
 		[ editorSettings, settings ]
 	);
@@ -109,8 +129,16 @@ export function Editor( {
 			templateId={ templateId }
 			settings={ finalSettings }
 			styles={ finalSettings.styles }
+			onActionPerformed={ onActionPerformed }
+			initialViewport={ initialViewport }
 		>
 			{ backButton && <BackButton>{ backButton }</BackButton> }
+			{ /*
+			   Opened from the editor's own menu and from the command the editor
+			   registers, both of which exist only while it is mounted. Renders
+			   nothing until one of them opens it.
+			 */ }
+			<PreferencesModal />
 		</PrivateEditor>
 	);
 }
