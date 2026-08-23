@@ -1,4 +1,5 @@
 import { Modal } from '@wordpress/components';
+import { Tabs } from '@wordpress/ui';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import PatternExplorerSidebar from './pattern-explorer-sidebar';
@@ -14,22 +15,34 @@ function PatternsExplorer( { initialCategory, rootClientId, onModalClose } ) {
 	const patternCategories = usePatternCategories( rootClientId );
 
 	return (
-		<div className="block-editor-block-patterns-explorer">
+		<Tabs.Root
+			className="block-editor-block-patterns-explorer"
+			orientation="vertical"
+			value={ selectedCategory }
+			onValueChange={ setSelectedCategory }
+		>
 			<PatternExplorerSidebar
-				selectedCategory={ selectedCategory }
 				patternCategories={ patternCategories }
-				onClickCategory={ setSelectedCategory }
 				searchValue={ searchValue }
 				setSearchValue={ setSearchValue }
 			/>
-			<PatternList
-				searchValue={ searchValue }
-				selectedCategory={ selectedCategory }
-				patternCategories={ patternCategories }
-				rootClientId={ rootClientId }
-				onModalClose={ onModalClose }
-			/>
-		</div>
+			{ patternCategories.map( ( { name } ) => (
+				<Tabs.Panel
+					key={ name }
+					value={ name }
+					tabIndex={ -1 }
+					className="block-editor-block-patterns-explorer__panel"
+				>
+					<PatternList
+						searchValue={ searchValue }
+						selectedCategory={ name }
+						patternCategories={ patternCategories }
+						rootClientId={ rootClientId }
+						onModalClose={ onModalClose }
+					/>
+				</Tabs.Panel>
+			) ) }
+		</Tabs.Root>
 	);
 }
 

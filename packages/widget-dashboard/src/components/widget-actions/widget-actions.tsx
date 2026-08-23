@@ -3,7 +3,7 @@ import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Icon, IconButton, Link } from '@wordpress/ui';
-import type { WidgetType } from '@wordpress/widget-primitives';
+import type { WidgetAction } from '@wordpress/widget-primitives';
 import { useReserveHeaderSpace } from '../widget-header/widget-header-fit';
 import styles from './widget-actions.module.css';
 import { unlock } from '../../lock-unlock';
@@ -12,16 +12,18 @@ const { Menu } = unlock( componentsPrivateApis );
 
 type WidgetActionsProps = {
 	/**
-	 * The widget type whose declared actions render here.
+	 * The actions this menu materializes. The host routes by relevance:
+	 * the footer takes `'high'` and `'medium'`, this menu the rest, and
+	 * every action for full-bleed widgets, which have no footer.
 	 */
-	widgetType: WidgetType;
+	actions: WidgetAction[];
 };
 
 /**
- * Materializes a widget type's declared `actions` as a "more" menu in the
- * chrome: a three-dots trigger surfacing each action. This host mounts a real
- * anchor for the link fulfillment, so middle-click and copy address survive;
- * the menu exposes it as a menu item rather than as a link.
+ * Materializes widget actions as a "more" menu in the chrome: a three-dots
+ * trigger surfacing each given action. This host mounts a real anchor for the
+ * link fulfillment, so middle-click and copy address survive; the menu exposes
+ * it as a menu item rather than as a link.
  *
  * As a trailing header section it reserves its own footprint, so the
  * collapsible controls beside it never plan for space it occupies.
@@ -29,9 +31,8 @@ type WidgetActionsProps = {
  * @param {WidgetActionsProps} props Component props.
  */
 export function WidgetActions( {
-	widgetType,
+	actions,
 }: WidgetActionsProps ): React.ReactNode {
-	const actions = widgetType.actions ?? [];
 	const reserveRef = useReserveHeaderSpace< HTMLSpanElement >( 'actions' );
 
 	if ( actions.length === 0 ) {

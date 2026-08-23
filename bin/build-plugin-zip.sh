@@ -78,7 +78,7 @@ status "Installing dependencies... 📦"
 npm cache verify
 npm ci
 status "Generating build... 👷‍♀️"
-npm run build -- --skip-types
+npm run build
 
 # Only including public icons when building for WordPress Core.
 #
