@@ -431,14 +431,24 @@ function ListViewBlock( {
 	const selectEditorBlock = useCallback(
 		( event ) => {
 			// For keyboard activation (Enter/Space on a link), transfer focus
-			// to the canvas with the caret at the end of the block.
-			// For mouse clicks, keep focus in the list view so that subsequent
-			// keyboard operations (arrow navigation, copy/paste) still work.
+			// to the canvas. For mouse clicks, keep focus in the list view so
+			// that subsequent keyboard operations (arrow navigation, copy/paste)
+			// still work.
 			const isKeyboardActivation = event?.detail === 0;
-			selectBlock( event, clientId, isKeyboardActivation ? -1 : null );
+			let initialPosition = null;
+			if ( isKeyboardActivation ) {
+				// Caret-at-end (-1) is only valid for Paragraph: it is a
+				// single text field, and that is the block type covered by
+				// the original List View behavior. For every other block,
+				// -1 would land on the last text field (e.g. the last Table
+				// cell). Use 0 so focus enters the first editable instead.
+				initialPosition =
+					blockName === 'core/paragraph' ? -1 : 0;
+			}
+			selectBlock( event, clientId, initialPosition );
 			event.preventDefault();
 		},
-		[ clientId, selectBlock ]
+		[ blockName, clientId, selectBlock ]
 	);
 
 	const updateFocusAndSelection = useCallback(
