@@ -314,7 +314,6 @@ If you are publishing new versions of packages, note that there are versioning r
 ## TypeScript
 
 The [TypeScript](https://www.typescriptlang.org/) language is a typed superset of JavaScript that compiles to plain JavaScript.
-Gutenberg does not use the TypeScript language, however TypeScript has powerful tooling that can be applied to JavaScript projects.
 
 Gutenberg uses TypeScript for several reasons, including:
 
@@ -327,11 +326,9 @@ Gutenberg uses TypeScript for several reasons, including:
 Gutenberg uses TypeScript by running the TypeScript compiler (`tsc`) on select packages.
 These packages benefit from type checking and produced type declarations in the published packages.
 
-A package opts in to TypeScript tooling with a `tsconfig.json` in its root, registered in the root `tsconfig.build.json` references.
+A package opts in to TypeScript tooling with a build project registered in the root `tsconfig.build.json` references: `tsconfig.json` for a package without TypeScript dev files, `tsconfig.build.json` for one that splits. Packages that emit declarations through this standard layout and have TypeScript test or story files split into two projects:
 
-Packages are being migrated to a two project layout, one package at a time:
-
--   `tsconfig.build.json` is the build project: it covers `src`, emits declarations to `build-types`, and is what other packages and `npm run build` consume.
+-   `tsconfig.build.json` is the build project: it covers `src`, emits declarations to `build-types`, and is what other packages and `npm run build` consume. `npm run build` emits those declarations with `--noCheck`, so it only reports parse and declaration emit errors; `npm run typecheck` is where type errors surface.
 -   `tsconfig.json` is the dev project: it covers test and story files with `noEmit`, so `npm run typecheck` and the IDE can check them without their declarations ending up in the published package.
 
 Both extend shared base configurations (comments are not necessary):
@@ -343,8 +340,8 @@ Both extend shared base configurations (comments are not necessary):
 	"extends": "../../tsconfig.base.json",
 
 	// Dependencies that have opted in to TypeScript are referenced here: a
-	// migrated one by its build project, one still on a single config by
-	// its directory.
+	// split one by its build project, one on a single config by its
+	// directory.
 	"references": [
 		{ "path": "../dom-ready/tsconfig.build.json" },
 		{ "path": "../hooks" }
@@ -364,9 +361,18 @@ Both extend shared base configurations (comments are not necessary):
 }
 ```
 
-A migrated package registers both projects at the root: `packages/<name>/tsconfig.build.json` in the root `tsconfig.build.json` references, and `packages/<name>` in the root `tsconfig.json` references.
+Register both projects at the root: `packages/<name>/tsconfig.build.json` in the root `tsconfig.build.json` references, and `packages/<name>` in the root `tsconfig.json` references. Route entry points under `routes/` with a `tsconfig.json` register it in the root `tsconfig.json` references only: their projects emit nothing and nothing else references them, so that registration is what puts them under `npm run typecheck`. A route with TypeScript test files pairs it with a `tsconfig.test.json` covering them, registered the same way.
 
-Ambient types used only by dev files (`@types/jest`, `@types/node`, `@testing-library/jest-dom`) belong in the package's own `devDependencies`, listed via `types` in the dev project, so jest globals do not apply to `src`.
+Packages whose components feed the Storybook components manifest (`components`, `dataviews`, `ui`) carry a third project, `tsconfig.stories.json`, registered in the root `tsconfig.json` only. It type checks the stories against component sources without jest types. Storybook's component meta extractor reads props through the closest `tsconfig.json` that lists a story, or through its own inferred project when none does; the inferred project produces the complete manifest and the dev project does not, so stories stay out of `tsconfig.json`. The dev project cannot reference this one either, because a referenced project may not disable emit (TS6310), which is why it is registered at the root only.
+
+Two rules keep the projects consistent, and `npm run lint:tsconfig` enforces both:
+
+-   The build project excludes every dev file (`**/test/**`, `**/tests/**`, `**/__tests__/**`, `**/stories/**`, `**/*.story.*`) and never lists a test type such as `jest` or `gutenberg-test-env` in `types`, so `src` cannot use test globals and no dev declaration is published. A package `exclude` replaces the inherited one, so list all of them.
+-   The dev project's `types` starts from the build project's list and adds `jest`, so tests see every ambient type the sources see. Ambient types only dev files need (`@types/jest`, `@types/node`, `@testing-library/jest-dom`) belong in the package's own `devDependencies`.
+
+A few packages emit declarations through a different layout and keep only the parts of the split that apply. `jest-console` compiles nothing: a dev project checks its TypeScript sources and tests, and the package ships a handwritten `declarations.d.ts` instead of `build-types`. `interactivity-router` pairs its dev project with two specialized build projects (`tsconfig.main.json` and `tsconfig.full-page.json`), which take the standard build project's place in the root `tsconfig.build.json` references. The rules above still apply to whichever projects such a package has.
+
+The build project inherits `rootDir`, `declarationDir`, and `include` from the base configuration, so a package only sets what differs. Test files that do not type check yet are listed in the dev project's `exclude` with a comment, so the debt stays visible per file.
 
 Type declarations will be produced in the `build-types` which should be included in the published package.
 For consumers to use the published type declarations, we'll set the `types` field in `package.json`:

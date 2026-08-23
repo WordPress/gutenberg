@@ -2,13 +2,15 @@ import { screen } from '@testing-library/react';
 
 export const monthNameFormatter = ( localeCode: string, timeZone?: string ) =>
 	new Intl.DateTimeFormat( localeCode, {
+		calendar: 'gregory',
 		year: 'numeric',
 		month: 'long',
 		timeZone,
 	} );
 
-const fullDateFormatter = ( localeCode: string, timeZone?: string ) =>
+export const fullDateFormatter = ( localeCode: string, timeZone?: string ) =>
 	new Intl.DateTimeFormat( localeCode, {
+		calendar: 'gregory',
 		weekday: 'long',
 		year: 'numeric',
 		month: 'long',
@@ -18,7 +20,15 @@ const fullDateFormatter = ( localeCode: string, timeZone?: string ) =>
 
 export const dateNumberFormatter = ( localeCode: string, timeZone?: string ) =>
 	new Intl.DateTimeFormat( localeCode, {
+		calendar: 'gregory',
 		day: 'numeric',
+		timeZone,
+	} );
+
+export const weekdayFormatter = ( localeCode: string, timeZone?: string ) =>
+	new Intl.DateTimeFormat( localeCode, {
+		calendar: 'gregory',
+		weekday: 'long',
 		timeZone,
 	} );
 

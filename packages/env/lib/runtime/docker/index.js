@@ -162,7 +162,17 @@ class DockerRuntime {
 				// stop wp-env from working correctly.
 			}
 
-			await dockerCompose.pullAll( dockerComposeConfig );
+			try {
+				await dockerCompose.pullAll( dockerComposeConfig );
+			} catch {
+				// Note: pulling the images requires connecting to the Docker
+				// registry, which may be unavailable (e.g., offline or an
+				// outage). Locally cached images will be used instead, so this
+				// error should not stop wp-env from working correctly.
+				spinner.info(
+					'Could not pull docker images; using cached images instead.'
+				);
+			}
 			spinner.text = 'Downloading sources.';
 		}
 

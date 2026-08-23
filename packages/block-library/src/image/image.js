@@ -4,7 +4,7 @@ import {
 	FocalPointPicker,
 	ResizableBox,
 	Spinner,
-	TextareaControl,
+	TextareaControl as WCTextareaControl,
 	TextControl,
 	CheckboxControl,
 	ToolbarButton,
@@ -202,7 +202,7 @@ function ContentOnlyControls( {
 					variant="toolbar"
 				>
 					<div className="wp-block-image__toolbar_content_textarea__container">
-						<TextareaControl
+						<WCTextareaControl
 							className="wp-block-image__toolbar_content_textarea"
 							label={ __( 'Alternative text' ) }
 							value={ attributes.alt || '' }
@@ -1019,7 +1019,7 @@ export default function Image( {
 							onClick={ openImageMediaEditorModal }
 							aria-haspopup="dialog"
 							icon={ crop }
-							label={ __( 'Crop' ) }
+							label={ __( 'Edit image' ) }
 							// Disable rather than hide while the edited image
 							// loads, so the button keeps focus when the modal
 							// closes instead of dropping it to the canvas.
@@ -1107,7 +1107,7 @@ export default function Image( {
 									setAttributes( { alt: undefined } )
 								}
 							>
-								<TextareaControl
+								<WCTextareaControl
 									label={ __( 'Alternative text' ) }
 									value={ alt || '' }
 									onChange={ updateAlt }

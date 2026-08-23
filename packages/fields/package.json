@@ -38,7 +38,8 @@
 			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
-		"./package.json": "./package.json"
+		"./package.json": "./package.json",
+		"./build-style/*": "./build-style/*"
 	},
 	"types": "build-types",
 	"sideEffects": [
@@ -77,6 +78,9 @@
 		"client-zip": "^2.4.5",
 		"clsx": "^2.1.1",
 		"remove-accents": "^0.5.0"
+	},
+	"devDependencies": {
+		"@types/jest": "^30.0.0"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

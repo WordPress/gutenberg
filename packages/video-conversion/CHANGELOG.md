@@ -10,8 +10,11 @@
 
 -   `SIZE_LIMIT_ERROR_PREFIX` no longer names the GIF format, so the same prefix covers every over-budget source. The dimensions and frame count that used to follow it are now labelled by source instead: `Unsupported: exceeds maximum conversion size (GIF is 500x500 …)` ([#79642](https://github.com/WordPress/gutenberg/issues/79642)).
 
-## 0.4.0 (2026-08-12)
+### Internal
 
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 0.4.0 (2026-08-12)
 
 ## 0.3.0 (2026-07-29)
 
