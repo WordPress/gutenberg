@@ -28,6 +28,10 @@ export {
 	buildSuggestionAuthorColorCss,
 } from './suggestion-author-colors';
 export {
+	default as RevealSelectedSuggestion,
+	buildSelectedSuggestionCss,
+} from './reveal-selected-suggestion';
+export {
 	useSuggestionsProvider,
 	operationsFromOverlay,
 	applyOperations,

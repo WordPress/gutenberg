@@ -50,6 +50,7 @@ import {
 	SuggestionNoteGC,
 	SuggestionAnnotations,
 	SuggestionAuthorColors,
+	RevealSelectedSuggestion,
 	SuggestionDeletionKeyboard,
 	SuggestionAdditionKeyboard,
 	SuggestionFormatKeyboard,
@@ -530,6 +531,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 													<SuggestionAutoSave />
 													<SuggestionAnnotations />
 													<SuggestionAuthorColors />
+													<RevealSelectedSuggestion />
 													<SuggestionDeletionKeyboard />
 													<SuggestionAdditionKeyboard />
 													<SuggestionFormatKeyboard />
