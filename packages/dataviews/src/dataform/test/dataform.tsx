@@ -2,6 +2,7 @@ import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
+import { getSettings, setSettings } from '@wordpress/date';
 import Dataform from '../index';
 import useFormValidity from '../../hooks/use-form-validity';
 
@@ -609,6 +610,76 @@ describe( 'DataForm component', () => {
 			);
 			expect( titleEditField ).toBeInTheDocument();
 		} );
+
+		it( 'should describe an invalid field trigger with its error message', async () => {
+			const user = userEvent.setup();
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fields }
+					form={ formPanelMode }
+					data={ { ...data, title: '' } }
+					validity={ {
+						title: {
+							required: {
+								type: 'invalid' as const,
+								message: 'Title is required.',
+							},
+						},
+					} }
+				/>
+			);
+
+			// The row only reveals the error after its flyout has been
+			// open once.
+			await user.click( fieldsSelector.title.view() );
+			await user.keyboard( '{Escape}' );
+			const titleButton = await screen.findByRole( 'button', {
+				name: 'Edit Title (has errors)',
+			} );
+			expect( titleButton ).toHaveAccessibleDescription(
+				/Title is required\./
+			);
+		} );
+
+		it( 'should describe an invalid field trigger when labels are hidden', async () => {
+			const user = userEvent.setup();
+			const formPanelNoLabel = {
+				...form,
+				layout: {
+					type: 'panel',
+					labelPosition: 'none',
+				} as const,
+			};
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fields }
+					form={ formPanelNoLabel }
+					data={ { ...data, title: '' } }
+					validity={ {
+						title: {
+							required: {
+								type: 'invalid' as const,
+								message: 'Title is required.',
+							},
+						},
+					} }
+				/>
+			);
+
+			// The row only reveals the error after its flyout has been
+			// open once.
+			await user.click( fieldsSelector.title.view() );
+			await user.keyboard( '{Escape}' );
+
+			const titleButton = await screen.findByRole( 'button', {
+				name: 'Edit Title (has errors)',
+			} );
+			expect( titleButton ).toHaveAccessibleDescription(
+				/Title is required\./
+			);
+		} );
 	} );
 
 	describe( 'in card mode', () => {
@@ -1002,6 +1073,22 @@ describe( 'DataForm component', () => {
 	} );
 
 	describe( 'datetime fields', () => {
+		const originalSettings = getSettings();
+
+		beforeEach( () => {
+			setSettings( {
+				...originalSettings,
+				timezone: {
+					...originalSettings.timezone,
+					string: 'UTC',
+				},
+			} );
+		} );
+
+		afterEach( () => {
+			setSettings( originalSettings );
+		} );
+
 		const datetimeFields = [
 			{
 				id: 'date',
