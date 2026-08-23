@@ -399,7 +399,13 @@ export default function SuggestionNoteGC() {
 				{
 					id: note.id,
 					status: 'hold',
-					meta: { _wp_suggestion_status: '' },
+					/*
+					 * `pending` rather than clearing the meta: the registered
+					 * enum (`pending` / `applied` / `rejected`) rejects the
+					 * empty string, and readers treat `pending` and absent
+					 * meta the same - awaiting a decision.
+					 */
+					meta: { _wp_suggestion_status: 'pending' },
 				},
 				{ throwOnError: true }
 			).catch( () => {
