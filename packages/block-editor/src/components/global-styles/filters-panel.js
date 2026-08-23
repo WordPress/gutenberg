@@ -17,7 +17,10 @@ import { __, _x } from '@wordpress/i18n';
 import { useCallback, useMemo, useRef } from '@wordpress/element';
 import { reset as resetIcon } from '@wordpress/icons';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
-import { useToolsPanelDropdownMenuProps } from './utils';
+import {
+	useToolsPanelDropdownMenuProps,
+	getDuotoneSlugFromPreset,
+} from './utils';
 import { setImmutably } from '../../utils/object';
 import {
 	getInheritanceProps,
@@ -202,14 +205,24 @@ export default function FiltersPanel( {
 	const localDuotone = decodeValue( value?.filter?.duotone );
 	const inheritedDuotone = decodeValue( inheritedValue?.filter?.duotone );
 	const duotone = localDuotone ?? inheritedDuotone;
+	// Read from the raw value, since decoding resolves a preset reference to
+	// its colors and two presets can hold the same pair.
+	const localDuotoneSlug = getDuotoneSlugFromPreset( value?.filter?.duotone );
+	const inheritedDuotoneSlug = getDuotoneSlugFromPreset(
+		inheritedValue?.filter?.duotone
+	);
+	const duotoneSlug =
+		localDuotone !== undefined ? localDuotoneSlug : inheritedDuotoneSlug;
 	const isDuotonePlaceholder =
 		localDuotone === undefined && inheritedDuotone !== undefined;
-	const setDuotone = ( newValue ) => {
-		const duotonePreset = duotonePalette.find( ( { colors } ) => {
-			return colors === newValue;
-		} );
-		const duotoneValue = duotonePreset
-			? `var:preset|duotone|${ duotonePreset.slug }`
+	const setDuotone = ( newValue, slug ) => {
+		// A slug identifies the picked preset exactly. Falling back to a value
+		// match cannot tell two presets holding the same colors apart.
+		const presetSlug =
+			slug ??
+			duotonePalette.find( ( { colors } ) => colors === newValue )?.slug;
+		const duotoneValue = presetSlug
+			? `var:preset|duotone|${ presetSlug }`
 			: newValue;
 		onChange(
 			setImmutably( value, [ 'filter', 'duotone' ], duotoneValue )
@@ -217,16 +230,16 @@ export default function FiltersPanel( {
 	};
 	// Commit the inherited value when the user clicks the active preset
 	// while the picker is showing inherited duotone at rest.
-	const setDuotoneWithInheritedCommit = ( newValue ) => {
+	const setDuotoneWithInheritedCommit = ( newValue, index, slug ) => {
 		if (
 			newValue === undefined &&
 			isDuotonePlaceholder &&
 			inheritedDuotone !== undefined
 		) {
-			setDuotone( inheritedDuotone );
+			setDuotone( inheritedDuotone, inheritedDuotoneSlug );
 			return;
 		}
-		setDuotone( newValue );
+		setDuotone( newValue, slug );
 	};
 	const hasDuotone = () => !! value?.filter?.duotone;
 	const resetDuotone = () => setDuotone( undefined );
@@ -292,6 +305,7 @@ export default function FiltersPanel( {
 										disableCustomColors
 										disableCustomDuotone
 										value={ duotone }
+										selectedSlug={ duotoneSlug }
 										onChange={
 											setDuotoneWithInheritedCommit
 										}

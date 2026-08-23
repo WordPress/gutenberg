@@ -22,6 +22,7 @@ import { createBlock } from '@wordpress/blocks';
 import withRegistryProvider from './with-registry-provider';
 import { store as editorStore } from '../../store';
 import useAutosaveNotice from './use-autosave-notice';
+import useSuggestionReviewNotice from './use-suggestion-review-notice';
 import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
 import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
@@ -36,10 +37,12 @@ import StartPageOptions from '../start-page-options';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import StartTemplateOptions from '../start-template-options';
 import EditorKeyboardShortcuts from '../global-keyboard-shortcuts';
+import EditorKeyboardShortcutsRegister from '../global-keyboard-shortcuts/register-shortcuts';
 import PatternRenameModal from '../pattern-rename-modal';
 import PatternDuplicateModal from '../pattern-duplicate-modal';
 import TemplatePartMenuItems from '../template-part-menu-items';
 import MediaEditorModalMount from '../media/media-editor-modal';
+import { getCanvasWidthByDeviceType } from '../../utils/device-type';
 import {
 	SuggestionOverlayProvider,
 	SuggestionAutoSave,
@@ -48,11 +51,14 @@ import {
 	SuggestionNoteGC,
 	SuggestionAnnotations,
 	SuggestionAuthorColors,
+	RevealSelectedSuggestion,
 	SuggestionDeletionKeyboard,
 	SuggestionAdditionKeyboard,
 	SuggestionFormatKeyboard,
+	SuggestionMultiBlockFormatNotice,
 	SuggestionContentReconciler,
 	registerSuggestionOverlayFilter,
+	registerClipboardSuggestionStrip,
 	isSuggestionModeEnabled,
 	MoveGhostsProvider,
 } from '../suggestion-mode';
@@ -75,6 +81,12 @@ if ( isSuggestionModeEnabled() ) {
 // editing in Suggest mode, not from a control. Idempotent, so it's safe
 // globally.
 registerSuggestionFormat();
+
+// Keep suggestion markers, `metadata.suggestion` and `metadata.noteId` off the
+// clipboard. Registered unconditionally for the same reason as the format:
+// content that already carries markers outlives the experiment flag, and a
+// paste into another post has no way to resolve ids from this one.
+registerClipboardSuggestionStrip();
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
@@ -197,6 +209,7 @@ function useBlockEditorProps( post, template, mode ) {
  * @param {Object}  props.settings                       The editor settings.
  * @param {boolean} props.recovery                       Indicates if the editor is in recovery mode.
  * @param {Array}   props.initialEdits                   The initial edits for the editor.
+ * @param {string}  [props.initialViewport]              The device type an entity opens at, one of those `setDeviceType` accepts. Each entity opens at the width it names, so a width set from the device preview is view state that does not follow the user into the next one. The current width is left alone when omitted.
  * @param {Object}  props.children                       The child components.
  * @param {Object}  [props.BlockEditorProviderComponent] The block editor provider component to use. Defaults to ExperimentalBlockEditorProvider.
  * @param {Object}  [props.__unstableTemplate]           The template object.
@@ -221,6 +234,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		settings,
 		recovery,
 		initialEdits,
+		initialViewport,
 		children,
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
 		__unstableTemplate: template,
@@ -350,6 +364,16 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			mode
 		);
 
+		/*
+		 * Resolved here rather than by dispatching `setDeviceType`, which reads
+		 * the theme's breakpoints from the block editor store — the store this
+		 * provider is the one to fill, and has not yet when it mounts.
+		 */
+		const initialCanvasWidth = getCanvasWidthByDeviceType(
+			initialViewport,
+			blockEditorSettings.__experimentalFeatures?.viewport
+		);
+
 		const {
 			updatePostLock,
 			setupEditor,
@@ -357,6 +381,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			setCurrentTemplateId,
 			setEditedPost,
 			setRenderingMode,
+			setCanvasWidth,
 		} = unlock( useDispatch( editorStore ) );
 		const { editEntityRecord } = useDispatch( coreStore );
 		const registry = useRegistry();
@@ -401,6 +426,11 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		// has populated the current post.
 		useAutosaveNotice( { post, recovery, settings } );
 
+		// Explains suggestion markers to a user who does not have Suggest
+		// mode. Same ordering requirement as the autosave notice: it reads
+		// the current post, which `setupEditor` populates above.
+		useSuggestionReviewNotice();
+
 		// Synchronizes the active post with the state
 		useEffect( () => {
 			setEditedPost( post.type, post.id );
@@ -414,6 +444,21 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 
 			return () => setEditedPost( null, null );
 		}, [ post.type, post.id, setEditedPost, removeNotice ] );
+
+		// Opens the entity at the width it asks for. Keyed on the entity as well
+		// as the width, so that moving to another one leaves a width set from
+		// the device preview behind.
+		useEffect( () => {
+			if ( initialViewport ) {
+				setCanvasWidth( initialCanvasWidth );
+			}
+		}, [
+			post.type,
+			post.id,
+			initialViewport,
+			initialCanvasWidth,
+			setCanvasWidth,
+		] );
 
 		// Synchronize the editor settings as they change.
 		// Do it as a layout effect so that rendered UI with outdated settings is not painted.
@@ -483,6 +528,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 											{ type === 'wp_navigation' && (
 												<NavigationBlockEditingMode />
 											) }
+											<EditorKeyboardShortcutsRegister />
 											<EditorKeyboardShortcuts />
 											<KeyboardShortcutHelpModal />
 											<BlockRemovalWarnings />
@@ -498,9 +544,11 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 													<SuggestionAutoSave />
 													<SuggestionAnnotations />
 													<SuggestionAuthorColors />
+													<RevealSelectedSuggestion />
 													<SuggestionDeletionKeyboard />
 													<SuggestionAdditionKeyboard />
 													<SuggestionFormatKeyboard />
+													<SuggestionMultiBlockFormatNotice />
 													<SuggestionContentReconciler />
 												</>
 											) }

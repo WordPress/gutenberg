@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Block variations and `block` type block transforms accept a `shortcut` property, declaring a keyboard shortcut that applies the variation or transform to the selected block. See the [block variations](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-variations/) and [block transforms](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-transforms/) documentation ([#81588](https://github.com/WordPress/gutenberg/pull/81588)).
+
 ## 15.26.0 (2026-08-12)
 
 ### Internal

@@ -1,4 +1,4 @@
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
@@ -26,6 +26,7 @@ import {
 	nextGraphemeBoundary,
 } from './grapheme-boundaries';
 import { isPartOfPendingInsertion } from './store-interceptor';
+import { notifyEditRefused } from './refuse-edit';
 
 /**
  * Read a rich-text value's plain text and its per-character format stacks,
@@ -75,6 +76,122 @@ export function sliceValueToHTML( value, start, end ) {
 	}
 	const record = create( { html } );
 	return new RichTextData( slice( record, start, end ) ).toHTMLString();
+}
+
+/**
+ * Whether an in-progress collapsed-delete run continues at this caret.
+ *
+ * A run only continues in the direction it started, in the same block and
+ * attribute, once its note id has resolved, and with the caret still parked
+ * where the run left it.
+ *
+ * @param {?Object} run                  The run in progress, or null.
+ * @param {Object}  context              The current keystroke's context.
+ * @param {string}  context.clientId     Block client id.
+ * @param {string}  context.attributeKey Rich-text attribute name.
+ * @param {boolean} context.isBackward   True for Backspace, false for Delete.
+ * @param {number}  context.pos          Collapsed caret offset.
+ * @return {boolean} True when this keystroke grows `run`.
+ */
+export function isContiguousDeleteRun(
+	run,
+	{ clientId, attributeKey, isBackward, pos }
+) {
+	return Boolean(
+		run &&
+			run.id !== null &&
+			run.clientId === clientId &&
+			run.attributeKey === attributeKey &&
+			run.dir === ( isBackward ? 'backward' : 'forward' ) &&
+			run.caret === pos
+	);
+}
+
+/**
+ * Resolve the grapheme range a collapsed delete should mark next.
+ *
+ * Backspace walks the caret leftward as it marks, so on a repeat the caret is
+ * already sitting on fresh text and locates the target by itself. Delete does
+ * not move the caret at all — it leaves it parked at the start of what it has
+ * marked — so on a repeat the grapheme *at* the caret is the one the previous
+ * press already marked. Reading the target from the run's far edge instead is
+ * what lets a Delete run grow the same marker the way a Backspace run does;
+ * without it every repeat looks like an edit inside an existing marker and
+ * gets refused.
+ *
+ * Returns null at the value's edge, where there is nothing left to mark.
+ *
+ * @param {string}  text       Plain text of the attribute value.
+ * @param {number}  pos        Collapsed caret offset.
+ * @param {boolean} isBackward True for Backspace, false for Delete.
+ * @param {?Object} run        The contiguous run in progress, if any.
+ * @return {?{start: number, end: number}} Range to mark, or null at the edge.
+ */
+export function collapsedDeleteTarget( text, pos, isBackward, run ) {
+	// The leading edge: the caret for a fresh run, the run's growing side for a
+	// repeat.
+	let from = pos;
+	if ( run ) {
+		from = isBackward ? run.start : run.end;
+	}
+	if ( isBackward ) {
+		if ( from <= 0 ) {
+			return null;
+		}
+		return { start: previousGraphemeBoundary( text, from ), end: from };
+	}
+	if ( from >= text.length ) {
+		return null;
+	}
+	return { start: from, end: nextGraphemeBoundary( text, from ) };
+}
+
+/**
+ * Decide what a collapsed single-grapheme delete should do.
+ *
+ * Three outcomes:
+ *
+ * - `mark` — wrap the target grapheme in a deletion marker.
+ * - `refuse` — decline the keystroke and tell the user why (`refuseDeletion`).
+ *   The grapheme already carries a marker, so the edit fits neither
+ *   representation. A caret lands there mid-run (a forward run parks it inside
+ *   its own marker) but also from a plain arrow key next to a marker an earlier
+ *   run left behind.
+ * - `default` — let the browser handle it: a caret at a block edge still merges
+ *   blocks natively.
+ *
+ * Only `mark` continues a run. Neither refusal can grow one, so the caller ends
+ * the run either way — left in place it would keep testing as contiguous at a
+ * caret `preventDefault` never moved, against a range that may no longer exist.
+ *
+ * @param {Object}  options
+ * @param {string}  options.text       Plain text of the attribute value.
+ * @param {Array}   options.formats    Per-character format stacks.
+ * @param {number}  options.pos        Collapsed caret offset.
+ * @param {boolean} options.isBackward True for Backspace, false for Delete.
+ * @param {?Object} options.run        The contiguous run in progress, if any.
+ * @return {'mark'|'refuse'|'default'} What this keystroke should do.
+ */
+export function collapsedDeleteDisposition( {
+	text,
+	formats,
+	pos,
+	isBackward,
+	run,
+} ) {
+	const target = collapsedDeleteTarget( text, pos, isBackward, run );
+	if ( ! target ) {
+		/*
+		 * Nothing left to mark. Mid-run a forward delete's caret is parked at
+		 * the start of its own marker, so the browser would eat marked text.
+		 * Every other case is a real block edge: Backspace at offset 0 still
+		 * merges with the previous block.
+		 */
+		return run && ! isBackward ? 'refuse' : 'default';
+	}
+	return formatsRangeHasSuggestion( formats, target.start, target.end )
+		? 'refuse'
+		: 'mark';
 }
 
 /**
@@ -139,6 +256,24 @@ export default function SuggestionDeletionKeyboard() {
 	const { createSuggestion } = useSuggestionsProvider();
 	const { requestInterceptorBypass, isDeferredInsertion } =
 		useSuggestionOverlay();
+	const registry = useRegistry();
+
+	/*
+	 * A deletion whose range overlaps an existing marker can be expressed
+	 * neither as a marker (`applyFormat` over the range would re-attribute
+	 * part of the existing marker to the new id, so its accept/reject would
+	 * act on a partial range) nor as an overlay (a whole-attribute snapshot
+	 * is marker-free, so it would hide the existing marker — #73411, F-09).
+	 * Cancel the native edit and say so, rather than letting the browser
+	 * apply it and the overlay swallow the result.
+	 */
+	const refuseDeletion = useCallback(
+		( event ) => {
+			event.preventDefault();
+			notifyEditRefused( registry );
+		},
+		[ registry ]
+	);
 
 	// The in-progress collapsed-cursor deletion run. `id` is null while the note
 	// is being created; repeats in that window accumulate in `steps`. `start`/
@@ -224,30 +359,32 @@ export default function SuggestionDeletionKeyboard() {
 	// split them and serialize a lone surrogate (rendered as U+FFFD).
 	const deleteCharacter = useCallback(
 		async ( clientId, attributeKey, pos, isBackward, text ) => {
-			const textLength = text.length;
 			const run = runRef.current;
-			const isContiguous =
-				run &&
-				run.id !== null &&
-				run.clientId === clientId &&
-				run.attributeKey === attributeKey &&
-				run.dir === ( isBackward ? 'backward' : 'forward' ) &&
-				// Backspace grows leftward from the marker start (caret sits
-				// there); Delete grows rightward with the caret held at start.
-				run.caret === pos;
 
-			if ( isContiguous ) {
+			// Backspace grows leftward from the marker start (the caret sits
+			// there); Delete grows rightward with the caret held at start.
+			if (
+				isContiguousDeleteRun( run, {
+					clientId,
+					attributeKey,
+					isBackward,
+					pos,
+				} )
+			) {
+				const target = collapsedDeleteTarget(
+					text,
+					pos,
+					isBackward,
+					run
+				);
+				if ( ! target ) {
+					return;
+				}
 				if ( isBackward ) {
-					if ( run.start <= 0 ) {
-						return;
-					}
-					run.start = previousGraphemeBoundary( text, run.start );
+					run.start = target.start;
 					run.caret = run.start;
 				} else {
-					if ( run.end >= textLength ) {
-						return;
-					}
-					run.end = nextGraphemeBoundary( text, run.end );
+					run.end = target.end;
 				}
 				writeDeletion(
 					clientId,
@@ -267,10 +404,11 @@ export default function SuggestionDeletionKeyboard() {
 			}
 
 			// New run. Anchor the initial single-grapheme range.
-			const start = isBackward
-				? previousGraphemeBoundary( text, pos )
-				: pos;
-			const end = isBackward ? pos : nextGraphemeBoundary( text, pos );
+			const anchored = collapsedDeleteTarget( text, pos, isBackward );
+			if ( ! anchored ) {
+				return;
+			}
+			const { start, end } = anchored;
 			const newRun = {
 				clientId,
 				attributeKey,
@@ -392,12 +530,8 @@ export default function SuggestionDeletionKeyboard() {
 
 			// Selection delete (any delete input type over a range).
 			if ( start !== end ) {
-				/*
-				 * Leave a selection that overlaps an existing suggestion
-				 * marker to the default path: `applyFormat` over the range
-				 * would re-attribute part of that marker to the new id and
-				 * its accept/reject would then act on a partial range.
-				 */
+				// A selection overlapping an existing marker is declined; see
+				// `refuseDeletion`.
 				if (
 					valueRangeHasSuggestion(
 						getBlockAttributes( clientId )?.[ attributeKey ],
@@ -406,6 +540,7 @@ export default function SuggestionDeletionKeyboard() {
 					)
 				) {
 					resetRun();
+					refuseDeletion( event );
 					return;
 				}
 				event.preventDefault();
@@ -415,39 +550,44 @@ export default function SuggestionDeletionKeyboard() {
 
 			// Collapsed-cursor delete.
 			const pos = start;
-			const { text, length, formats } =
-				readValueMetrics(
-					getBlockAttributes( clientId )?.[ attributeKey ]
-				) ?? {};
+			const { text, formats } = readValueMetrics(
+				getBlockAttributes( clientId )?.[ attributeKey ]
+			);
 
 			const isBackward = event.inputType === 'deleteContentBackward';
 			const isForward = event.inputType === 'deleteContentForward';
 
 			// Single-character delete: mark one character and grow on repeats.
 			if ( isBackward || isForward ) {
-				// Nothing to delete at the document edge.
-				if (
-					( isBackward && pos <= 0 ) ||
-					( isForward && pos >= length )
-				) {
-					resetRun();
-					return;
-				}
 				/*
-				 * Leave edits inside an existing suggestion marker to the
-				 * default path rather than nesting marks. The target is the
-				 * whole grapheme next to the caret, not a single code unit.
+				 * A repeat of the run in progress grows the marker it already
+				 * opened, so its target comes from the run's far edge rather
+				 * than from the caret. This matters for Delete, which parks
+				 * the caret at the marker start: without it every repeat would
+				 * aim at a character the previous press had already marked,
+				 * read as an edit inside an existing marker, and get refused.
 				 */
-				const targetStart = isBackward
-					? previousGraphemeBoundary( text, pos )
-					: pos;
-				const targetEnd = isBackward
-					? pos
-					: nextGraphemeBoundary( text, pos );
-				if (
-					formatsRangeHasSuggestion( formats, targetStart, targetEnd )
-				) {
+				const run = isContiguousDeleteRun( runRef.current, {
+					clientId,
+					attributeKey,
+					isBackward,
+					pos,
+				} )
+					? runRef.current
+					: null;
+				const disposition = collapsedDeleteDisposition( {
+					text,
+					formats,
+					pos,
+					isBackward,
+					run,
+				} );
+				if ( disposition !== 'mark' ) {
+					// Neither outcome can grow the run, so it ends here.
 					resetRun();
+					if ( disposition === 'refuse' ) {
+						refuseDeletion( event );
+					}
 					return;
 				}
 				event.preventDefault();
@@ -469,12 +609,13 @@ export default function SuggestionDeletionKeyboard() {
 				resetRun();
 				return;
 			}
-			// Leave a range overlapping an existing suggestion marker to the
-			// default path rather than nesting marks.
+			// A word/line range overlapping an existing marker is declined
+			// rather than nesting marks; see `refuseDeletion`.
 			if (
 				formatsRangeHasSuggestion( formats, range.start, range.end )
 			) {
 				resetRun();
+				refuseDeletion( event );
 				return;
 			}
 			event.preventDefault();
@@ -493,6 +634,7 @@ export default function SuggestionDeletionKeyboard() {
 			isDeferredInsertion,
 			deleteSelection,
 			deleteCharacter,
+			refuseDeletion,
 			resetRun,
 		]
 	);
@@ -542,17 +684,13 @@ export default function SuggestionDeletionKeyboard() {
 			}
 			const value = getBlockAttributes( clientId )?.[ attributeKey ];
 			const { formats, text } = readValueMetrics( value );
-			// Leave a selection overlapping an existing suggestion marker to the
-			// default path rather than nesting marks.
-			if ( formatsRangeHasSuggestion( formats, start, end ) ) {
-				resetRun();
-				return;
-			}
 			/*
 			 * Preserve the copy half of cut: put the selected run on the
 			 * clipboard as plain text AND as HTML (so pasting elsewhere keeps
 			 * bold/links/other inline formatting), then cancel the browser's
 			 * delete so the text is marked for deletion instead of removed.
+			 * The copy half runs even when the delete half is declined below,
+			 * so a cut over a marker still behaves as a copy.
 			 */
 			event.clipboardData?.setData?.(
 				'text/plain',
@@ -564,6 +702,14 @@ export default function SuggestionDeletionKeyboard() {
 			}
 			event.preventDefault();
 			event.stopImmediatePropagation();
+			// A selection overlapping an existing marker is declined rather
+			// than nesting marks; see `refuseDeletion`. The `preventDefault`
+			// above already cancelled the removal.
+			if ( formatsRangeHasSuggestion( formats, start, end ) ) {
+				resetRun();
+				notifyEditRefused( registry );
+				return;
+			}
 			deleteSelection( { clientId, attributeKey, start, end } );
 		},
 		[
@@ -571,6 +717,7 @@ export default function SuggestionDeletionKeyboard() {
 			getSelectionEnd,
 			getBlockAttributes,
 			deleteSelection,
+			registry,
 			resetRun,
 		]
 	);

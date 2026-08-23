@@ -1,4 +1,9 @@
-import { RichTextData, create } from '@wordpress/rich-text';
+import {
+	RichTextData,
+	create,
+	slice,
+	toHTMLString,
+} from '@wordpress/rich-text';
 import { wrapInlineMarker } from '../inline-markers';
 import {
 	SUGGESTION_FORMAT_NAME,
@@ -10,6 +15,7 @@ import {
 } from './format';
 import {
 	buildSuggestionMarkerAttributes,
+	formatsAdditionRunToExtend,
 	insertInlineAddition,
 	growInlineAddition,
 	rejectInlineAddition,
@@ -219,10 +225,48 @@ function markerType( format ) {
 }
 
 /**
+ * HTML of the inserted run when it carries inline formatting of its own, so the
+ * proposed addition can be marked up rather than flattened to plain text — a
+ * pasted `<strong>`/`<a href>` reaches the block as a new `content` value, and
+ * diffing only `record.text` would drop it.
+ *
+ * Returns null when the run is unformatted (the plain-text path stays exactly as
+ * it was) and when it already carries a suggestion marker: re-marking a marked
+ * run would nest one marker inside another.
+ *
+ * @param {?Object} nextRecord Rich-text record of the value after the edit.
+ * @param {Object}  edit       Normalized edit from `analyzeTextEdit`.
+ * @return {?string} HTML of the inserted run, or null.
+ */
+function insertedRunHTML( nextRecord, edit ) {
+	if ( ! nextRecord || ! edit.insertedText ) {
+		return null;
+	}
+	const from = edit.start;
+	const to = from + edit.insertedText.length;
+	let hasFormats = false;
+	for ( let index = from; index < to; index++ ) {
+		const stack = nextRecord.formats?.[ index ];
+		if ( ! Array.isArray( stack ) || stack.length === 0 ) {
+			continue;
+		}
+		if ( stack.some( ( f ) => f.type === SUGGESTION_FORMAT_NAME ) ) {
+			return null;
+		}
+		hasFormats = true;
+	}
+	if ( ! hasFormats ) {
+		return null;
+	}
+	return toHTMLString( { value: slice( nextRecord, from, to ) } );
+}
+
+/**
  * @typedef {Object} MarkerAction
  * @property {'insert-add'|'grow-add'|'wrap-del'|'remove-add'} type      Action kind.
  * @property {string}                                          [text]    Text to insert/append (insert-add, grow-add).
- * @property {number}                                          [at]      Insertion offset (insert-add).
+ * @property {string}                                          [html]    HTML of the inserted run when it carries inline formatting (insert-add).
+ * @property {number}                                          [at]      Insertion offset (insert-add, grow-add).
  * @property {number}                                          [start]   Range start (wrap-del).
  * @property {number}                                          [end]     Range end (wrap-del).
  * @property {string}                                          [id]      Existing marker id to reuse (grow-add, remove-add).
@@ -237,8 +281,8 @@ function markerType( format ) {
  *
  * Handled cleanly:
  *   - insert into unmarked text                       -> new `add` marker
- *   - insert at the trailing edge of the author's own
- *     open `add` marker                               -> grow that marker
+ *   - insert inside, or at the trailing edge of, the
+ *     author's own `add` marker                       -> grow that marker
  *   - delete unmarked text                            -> new `del` marker (kept, struck through)
  *   - delete text already inside a `del` marker       -> no-op (already proposed for deletion)
  *   - delete the author's own `add` text              -> remove that marker (un-add)
@@ -307,38 +351,45 @@ export function planEditMarkers( prevValue, nextValue, { authorId } = {} ) {
 	};
 
 	if ( edit.kind === 'insert' ) {
-		const left =
-			edit.start > 0 ? suggestionAt( record, edit.start - 1 ) : null;
-		const right = suggestionAt( record, edit.start );
-		const sameMarker =
-			left && right && markerId( left ) === markerId( right );
-
-		// Grow the author's own open addition when typing at its trailing edge
-		// (left edge is that marker, the insertion point is past its end).
-		const atAddTrailingEdge =
-			left &&
-			markerType( left ) === SUGGESTION_TYPE_ADDITION &&
-			! sameMarker;
-		if (
-			atAddTrailingEdge &&
-			( authorToken === null ||
-				left.attributes?.[ 'data-author' ] === authorToken )
-		) {
+		/*
+		 * Grow the author's own pending addition when the insertion point sits
+		 * inside it or at its trailing edge, rather than opening a second
+		 * suggestion over the same words. Nesting a new marker inside an
+		 * existing one splits it into two disjoint `<mark>` elements sharing an
+		 * id and leaves two notes claiming the same characters (#73411, finding
+		 * F-06).
+		 */
+		const extendable = formatsAdditionRunToExtend(
+			record.formats,
+			edit.start,
+			authorToken
+		);
+		if ( extendable ) {
 			return {
 				kind: 'insert',
 				actions: [
 					{
 						type: 'grow-add',
-						id: markerId( left ),
+						id: extendable.id,
 						text: edit.insertedText,
+						at: edit.start,
 					},
 				],
 			};
 		}
-		// Typing in the middle of an existing marker: leave to a later phase.
-		if ( sameMarker ) {
+		/*
+		 * Inside a marker this edit may not extend — a run proposed for
+		 * deletion, or someone else's addition. Splitting it would fragment a
+		 * marker whose accept/reject then acts on a partial range, so plan
+		 * nothing and leave the call to the caller.
+		 */
+		const left =
+			edit.start > 0 ? suggestionAt( record, edit.start - 1 ) : null;
+		const right = suggestionAt( record, edit.start );
+		if ( left && right && markerId( left ) === markerId( right ) ) {
 			return { kind: 'insert', actions: [] };
 		}
+		const html = insertedRunHTML( nextRecord, edit );
 		return {
 			kind: 'insert',
 			actions: [
@@ -346,6 +397,7 @@ export function planEditMarkers( prevValue, nextValue, { authorId } = {} ) {
 					type: 'insert-add',
 					at: edit.start,
 					text: edit.insertedText,
+					...( html ? { html } : {} ),
 					newNote: true,
 				},
 			],
@@ -400,6 +452,9 @@ export function planEditMarkers( prevValue, nextValue, { authorId } = {} ) {
 		isUnmarked
 	);
 	if ( isUnmarked( replaceEdit.start, replaceEdit.end ) ) {
+		// Widening moves both ends together, so the widened range still spans
+		// exactly the inserted run in `nextRecord`.
+		const html = insertedRunHTML( nextRecord, replaceEdit );
 		return {
 			kind: 'replace',
 			actions: [
@@ -413,6 +468,7 @@ export function planEditMarkers( prevValue, nextValue, { authorId } = {} ) {
 					type: 'insert-add',
 					at: replaceEdit.end,
 					text: replaceEdit.insertedText,
+					...( html ? { html } : {} ),
 					newNote: true,
 				},
 			],
@@ -446,6 +502,7 @@ export function applyEditPlan( value, actions, { authorId, ids = [] } = {} ) {
 				const id = ids[ idIndex++ ];
 				result = insertInlineAddition( result, {
 					text: action.text,
+					html: action.html,
 					attributes: buildSuggestionMarkerAttributes( {
 						id,
 						type: SUGGESTION_TYPE_ADDITION,
@@ -470,6 +527,7 @@ export function applyEditPlan( value, actions, { authorId, ids = [] } = {} ) {
 					} ),
 					markerStart: range.start,
 					markerEnd: range.end,
+					at: action.at,
 				} );
 				break;
 			}

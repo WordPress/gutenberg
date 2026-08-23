@@ -17,8 +17,14 @@ import {
 	buildSuggestionMarkerAttributes,
 	formatsRangeHasSuggestion,
 	valueRangeHasSuggestion,
+	formatsAdditionRunToExtend,
+	valueAdditionRunToExtend,
 } from '../operations';
-import { registerSuggestionFormat, SUGGESTION_FORMAT_NAME } from '../format';
+import {
+	registerSuggestionFormat,
+	findSuggestionText,
+	SUGGESTION_FORMAT_NAME,
+} from '../format';
 
 const getFormatType = ( name ) => select( richTextStore ).getFormatType( name );
 
@@ -335,6 +341,74 @@ describe( 'inline addition operations', () => {
 				} ).toHTMLString()
 			).toBe( 'unchanged' );
 		} );
+
+		it( 'keeps the inline formatting of a rich run (bold and a link)', () => {
+			const value = RichTextData.fromHTMLString( 'before  after' );
+			const result = insertInlineAddition( value, {
+				html: 'rich <strong>bold</strong> and <a href="https://example.com">a link</a>',
+				attributes: buildSuggestionMarkerAttributes( {
+					id: 7,
+					type: 'add',
+				} ),
+				start: 7,
+				end: 7,
+			} );
+			const html = result.toHTMLString();
+			expect( stripTags( html ) ).toBe(
+				'before rich bold and a link after'
+			);
+			expect( html ).toContain( '<strong>bold</strong>' );
+			expect( html ).toContain( '<a href="https://example.com">' );
+			expect( html ).toContain( 'data-suggestion-id="7"' );
+		} );
+
+		it( 'wraps a rich run in exactly one marker', () => {
+			const value = RichTextData.fromHTMLString( '' );
+			const result = insertInlineAddition( value, {
+				html: '<strong>all</strong> <em>formatted</em>',
+				attributes: buildSuggestionMarkerAttributes( {
+					id: 8,
+					type: 'add',
+				} ),
+			} );
+			const html = result.toHTMLString();
+			expect( html.match( /<mark/g ) ).toHaveLength( 1 );
+			// The marker is the outermost tag, so accept/reject resolve the
+			// whole run rather than one fragment of it.
+			expect( html.startsWith( '<mark' ) ).toBe( true );
+		} );
+
+		it( 'is reversible for a rich run: reject removes it entirely', () => {
+			const value = RichTextData.fromHTMLString( 'before after' );
+			const inserted = insertInlineAddition( value, {
+				html: '<strong>NEW</strong> ',
+				attributes: buildSuggestionMarkerAttributes( {
+					id: 4,
+					type: 'add',
+				} ),
+				start: 7,
+				end: 7,
+			} );
+			expect( rejectInlineAddition( inserted, 4 ).toHTMLString() ).toBe(
+				'before after'
+			);
+		} );
+
+		it( 'leaves the rich run behind when the addition is accepted', () => {
+			const value = RichTextData.fromHTMLString( 'before after' );
+			const inserted = insertInlineAddition( value, {
+				html: '<a href="https://example.com">link</a> ',
+				attributes: buildSuggestionMarkerAttributes( {
+					id: 6,
+					type: 'add',
+				} ),
+				start: 7,
+				end: 7,
+			} );
+			expect( acceptInlineAddition( inserted, 6 ).toHTMLString() ).toBe(
+				'before <a href="https://example.com">link</a> after'
+			);
+		} );
 	} );
 
 	describe( 'growInlineAddition', () => {
@@ -404,6 +478,175 @@ describe( 'inline addition operations', () => {
 				} ).toHTMLString()
 			).toBe( 'unchanged' );
 		} );
+
+		it( "keeps a pasted run's formatting inside the grown marker", () => {
+			// A rich-text paste landing strictly inside the author's own
+			// pending addition grows that marker rather than nesting a second
+			// one in it, and the pasted formatting survives the grow.
+			const value = growInlineAddition(
+				RichTextData.fromHTMLString( `Hello ${ add( 9, 'ADDED' ) }` ),
+				{
+					text: 'bold',
+					html: '<strong>bold</strong>',
+					attributes: attrs,
+					markerStart: 6,
+					markerEnd: 11,
+					at: 9,
+				}
+			);
+			const html = value.toHTMLString();
+			expect( stripTags( html ) ).toBe( 'Hello ADDboldED' );
+			// One marker wrapping the whole proposal, with the pasted format
+			// nested inside it rather than the other way round.
+			expect( html.match( /<mark/g ) ).toHaveLength( 1 );
+			expect( html ).toContain( '<strong>bold</strong>' );
+			expect( findSuggestionText( value, 9 ) ).toBe( 'ADDboldED' );
+			expect( rejectInlineAddition( value, 9 ).toHTMLString() ).toBe(
+				'Hello '
+			);
+		} );
+
+		it( 'inserts at `at` inside the marker, still as one run', () => {
+			const value = growInlineAddition(
+				RichTextData.fromHTMLString( `Hello ${ add( 9, 'ADDED' ) }` ),
+				{
+					text: 'XX',
+					attributes: attrs,
+					markerStart: 6,
+					markerEnd: 11,
+					at: 9,
+				}
+			);
+			const html = value.toHTMLString();
+			expect( stripTags( html ) ).toBe( 'Hello ADDXXED' );
+			expect( html.match( /<mark/g ) ).toHaveLength( 1 );
+			expect( findSuggestionText( value, 9 ) ).toBe( 'ADDXXED' );
+			// Rejecting still restores the original text exactly.
+			expect( rejectInlineAddition( value, 9 ).toHTMLString() ).toBe(
+				'Hello '
+			);
+		} );
+
+		it( 'clamps an `at` outside the marker into it', () => {
+			const value = growInlineAddition(
+				RichTextData.fromHTMLString( `Hello ${ add( 9, 'ADDED' ) }` ),
+				{
+					text: 'X',
+					attributes: attrs,
+					markerStart: 6,
+					markerEnd: 11,
+					at: 0,
+				}
+			);
+			expect( stripTags( value.toHTMLString() ) ).toBe( 'Hello XADDED' );
+			expect( findSuggestionText( value, 9 ) ).toBe( 'XADDED' );
+		} );
+	} );
+} );
+
+describe( 'formatsAdditionRunToExtend / valueAdditionRunToExtend', () => {
+	beforeAll( () => {
+		registerSuggestionFormat();
+	} );
+
+	afterAll( () => {
+		if ( getFormatType( SUGGESTION_FORMAT_NAME ) ) {
+			unregisterFormatType( SUGGESTION_FORMAT_NAME );
+		}
+	} );
+
+	// A pending `add` marker authored by user 2.
+	const mine = ( id, text ) =>
+		`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="add" data-author="2">${ text }</mark>`;
+
+	it( 'matches a caret inside the author own addition', () => {
+		const value = RichTextData.fromHTMLString(
+			`Hello ${ mine( 41, 'ADDED' ) }`
+		);
+		expect( valueAdditionRunToExtend( value, 9, '2' ) ).toEqual( {
+			id: '41',
+			start: 6,
+			end: 11,
+		} );
+	} );
+
+	it( 'matches a caret at the trailing edge', () => {
+		const value = RichTextData.fromHTMLString(
+			`Hello ${ mine( 41, 'ADDED' ) } tail`
+		);
+		expect( valueAdditionRunToExtend( value, 11, '2' ) ).toEqual( {
+			id: '41',
+			start: 6,
+			end: 11,
+		} );
+	} );
+
+	it( 'does not match a caret at the leading edge', () => {
+		const value = RichTextData.fromHTMLString(
+			`Hello ${ mine( 41, 'ADDED' ) }`
+		);
+		expect( valueAdditionRunToExtend( value, 6, '2' ) ).toBeNull();
+	} );
+
+	it( 'does not match another author addition', () => {
+		const value = RichTextData.fromHTMLString(
+			`Hello ${ mine( 41, 'ADDED' ) }`
+		);
+		expect( valueAdditionRunToExtend( value, 9, '7' ) ).toBeNull();
+	} );
+
+	it( 'does not match a deletion or a format marker', () => {
+		expect(
+			valueAdditionRunToExtend(
+				RichTextData.fromHTMLString( del( 41, 'gone' ) ),
+				2,
+				null
+			)
+		).toBeNull();
+		expect(
+			valueAdditionRunToExtend(
+				RichTextData.fromHTMLString(
+					fmt( 41, '<strong>bold</strong>' )
+				),
+				2,
+				null
+			)
+		).toBeNull();
+	} );
+
+	it( 'does not match a marker already fragmented across the value', () => {
+		// The shape F-06 used to produce: one id, two disjoint <mark>s.
+		const value = RichTextData.fromHTMLString(
+			`${ mine( 41, 'ADD' ) }${ add( 42, 'XX' ) }${ mine( 41, 'ED' ) }`
+		);
+		expect( valueAdditionRunToExtend( value, 2, '2' ) ).toBeNull();
+	} );
+
+	it( 'returns null for unmarked text and non-rich values', () => {
+		expect(
+			valueAdditionRunToExtend(
+				RichTextData.fromHTMLString( 'plain text' ),
+				4,
+				'2'
+			)
+		).toBeNull();
+		expect( valueAdditionRunToExtend( undefined, 4, '2' ) ).toBeNull();
+		expect( formatsAdditionRunToExtend( undefined, 4, '2' ) ).toBeNull();
+	} );
+
+	it( 'matches an unauthored marker when the editor author is unknown', () => {
+		const value = RichTextData.fromHTMLString( add( 41, 'ADDED' ) );
+		expect( valueAdditionRunToExtend( value, 3, null ) ).toEqual( {
+			id: '41',
+			start: 0,
+			end: 5,
+		} );
+	} );
+
+	it( 'does not match an authored marker when the editor author is unknown', () => {
+		const value = RichTextData.fromHTMLString( mine( 41, 'ADDED' ) );
+		expect( valueAdditionRunToExtend( value, 3, null ) ).toBeNull();
+		expect( valueAdditionRunToExtend( value, 3, undefined ) ).toBeNull();
 	} );
 } );
 

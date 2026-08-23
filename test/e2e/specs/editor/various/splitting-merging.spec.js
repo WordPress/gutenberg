@@ -239,6 +239,57 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 		);
 	} );
 
+	test( 'should forward delete an empty heading without transforming the next block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/heading' } );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'My paragraph' );
+		await page.keyboard.press( 'ArrowUp' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/heading', attributes: { content: '' } },
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'My paragraph' },
+			},
+		] );
+
+		await page.keyboard.press( 'Delete' );
+		// The caret lands at the start of the surviving paragraph.
+		await page.keyboard.type( '‸' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '‸My paragraph' },
+			},
+		] );
+	} );
+
+	test( 'should forward delete an empty heading before an empty paragraph', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/heading' } );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Heading' } )
+			.click();
+
+		await page.keyboard.press( 'Delete' );
+		// Typing proves the surviving block: the empty heading is removed
+		// and the caret sits in the empty default paragraph.
+		await page.keyboard.type( '2' );
+
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/paragraph', attributes: { content: '2' } },
+			] );
+	} );
+
 	test( 'should place the caret in the next block on forward delete from an empty paragraph', async ( {
 		editor,
 		page,

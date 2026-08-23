@@ -1,4 +1,43 @@
-import { getCommonDepthClientIds, getDragDisplacementValues } from '../utils';
+import {
+	getBlockSuggestionTreatment,
+	getCommonDepthClientIds,
+	getDragDisplacementValues,
+} from '../utils';
+
+describe( 'getBlockSuggestionTreatment', () => {
+	it( 'returns nothing for a block with no structural suggestion', () => {
+		expect( getBlockSuggestionTreatment( undefined ) ).toBe( undefined );
+		expect( getBlockSuggestionTreatment( null ) ).toBe( undefined );
+		expect( getBlockSuggestionTreatment( {} ) ).toBe( undefined );
+	} );
+
+	it( 'ignores a marker type it does not recognize rather than inventing a class', () => {
+		expect( getBlockSuggestionTreatment( { type: 'pending-shrug' } ) ).toBe(
+			undefined
+		);
+	} );
+
+	it( 'describes each structural marker with a class and a spoken label', () => {
+		expect(
+			getBlockSuggestionTreatment( { type: 'pending-insert' } )
+		).toEqual( {
+			className: 'is-suggestion-pending-insert',
+			label: 'Suggested insertion.',
+		} );
+		expect(
+			getBlockSuggestionTreatment( { type: 'pending-remove' } )
+		).toEqual( {
+			className: 'is-suggestion-pending-remove',
+			label: 'Suggested removal.',
+		} );
+		expect(
+			getBlockSuggestionTreatment( { type: 'pending-move' } )
+		).toEqual( {
+			className: 'is-suggestion-pending-move',
+			label: 'Suggested move destination.',
+		} );
+	} );
+} );
 
 describe( 'getCommonDepthClientIds', () => {
 	it( 'should return start and end when no depth is provided', () => {

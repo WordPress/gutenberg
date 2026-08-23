@@ -72,17 +72,6 @@ export const Root = styled( Flex )`
 	position: relative;
 	border-radius: ${ CONFIG.radiusSmall };
 	padding-top: 0;
-
-	// Focus within, excluding cases where auxiliary controls in prefix or suffix have focus.
-	&:focus-within:not( :has( :is( ${ Prefix }, ${ Suffix } ):focus-within ) ) {
-		${ BackdropUI } {
-			border-color: ${ COLORS.ui.borderFocus };
-			box-shadow: ${ CONFIG.controlBoxShadowFocus };
-			// Windows High Contrast mode will show this outline, but not the box-shadow.
-			outline: 2px solid transparent;
-			outline-offset: -2px;
-		}
-	}
 `;
 
 const containerDisabledStyles = ( { disabled }: ContainerProps ) => {
