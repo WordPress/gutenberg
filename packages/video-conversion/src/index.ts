@@ -11,6 +11,7 @@ import {
 	QUALITY_HIGH,
 	canEncodeVideo,
 	ALL_FORMATS,
+	type Quality,
 	type VideoCodec,
 	type ConversionVideoOptions,
 } from 'mediabunny';
@@ -60,6 +61,59 @@ export const SIZE_LIMIT_ERROR_PREFIX = `${ UNSUPPORTED_ERROR_PREFIX }: GIF excee
  * cheaper to not start. Pass `0` to disable the check.
  */
 export const DEFAULT_MAX_TOTAL_PIXELS = 300_000_000;
+
+/**
+ * Hardware acceleration hints to try, in order of preference.
+ *
+ * A hardware encoder is much faster where one exists, but `'prefer-hardware'`
+ * is a hard requirement to WebCodecs, not a hint: the browser rejects the
+ * configuration outright when no hardware encoder is available, which is the
+ * norm on headless browsers, VMs and CI runners. Falling back to
+ * `'no-preference'` lets the browser reach its software encoder instead.
+ */
+const HARDWARE_ACCELERATION_PREFERENCES = [
+	'prefer-hardware',
+	'no-preference',
+] as const;
+
+type HardwareAccelerationPreference =
+	( typeof HARDWARE_ACCELERATION_PREFERENCES )[ number ];
+
+/**
+ * Picks the first hardware acceleration hint the browser will actually encode
+ * with, for the given codec and output parameters.
+ *
+ * Support is parameter-specific, so the probe has to use the real output
+ * dimensions and bitrate: a configuration the browser accepts at 1280x720 can
+ * be rejected at 160x120.
+ *
+ * @param codec   Video codec.
+ * @param bitrate Output bitrate, or a subjective quality.
+ * @param width   Output width in pixels, if known.
+ * @param height  Output height in pixels, if known.
+ * @return The first supported hint, or `null` when none of them are supported.
+ */
+async function selectHardwareAcceleration(
+	codec: VideoCodec,
+	bitrate: number | Quality,
+	width?: number,
+	height?: number
+): Promise< HardwareAccelerationPreference | null > {
+	for ( const hardwareAcceleration of HARDWARE_ACCELERATION_PREFERENCES ) {
+		// Sequential on purpose: the first supported hint wins, so probing the
+		// rest would be wasted work.
+		const supported = await canEncodeVideo( codec, {
+			width,
+			height,
+			bitrate,
+			hardwareAcceleration,
+		} );
+		if ( supported ) {
+			return hardwareAcceleration;
+		}
+	}
+	return null;
+}
 
 /**
  * Serializes encoder access. The upload-media concurrency limit already caps
@@ -416,55 +470,83 @@ export async function transcodeVideo(
 		const isWebm = outputMimeType === 'video/webm';
 		const codec: VideoCodec = isWebm ? 'vp9' : 'avc';
 
-		if ( ! ( await canEncodeVideo( codec ) ) ) {
-			throw new Error(
-				`${ UNSUPPORTED_ERROR_PREFIX }: encoder codec not supported`
-			);
+		const blob = source instanceof Blob ? source : new Blob( [ source ] );
+		const input = new Input( {
+			formats: ALL_FORMATS,
+			source: new BlobSource( blob ),
+		} );
+
+		const bitrate = options.bitrate ?? QUALITY_HIGH;
+		const videoOptions: ConversionVideoOptions = { codec, bitrate };
+		if ( options.frameRate ) {
+			videoOptions.frameRate = options.frameRate;
+		}
+
+		/*
+		 * Read the source dimensions up front: they are needed both to cap the
+		 * output size and to probe encoder support at the real output size.
+		 */
+		const track = await input.getPrimaryVideoTrack();
+		let outputWidth: number | undefined;
+		let outputHeight: number | undefined;
+		if ( track ) {
+			const [ srcW, srcH ] = await Promise.all( [
+				track.getDisplayWidth(),
+				track.getDisplayHeight(),
+			] );
+			outputWidth = srcW;
+			outputHeight = srcH;
+
+			/*
+			 * Cap the longest edge while preserving aspect ratio: set only the
+			 * dominant dimension and let mediabunny deduce the other.
+			 */
+			const max = options.maxDimensions;
+			if ( max && srcW >= srcH && srcW > max ) {
+				videoOptions.width = max;
+				outputWidth = max;
+				outputHeight = Math.round( ( srcH * max ) / srcW );
+			} else if ( max && srcH > srcW && srcH > max ) {
+				videoOptions.height = max;
+				outputHeight = max;
+				outputWidth = Math.round( ( srcW * max ) / srcH );
+			}
 		}
 
 		if ( ! inProgressOperations.has( id ) ) {
 			throw new Error( 'Operation cancelled' );
 		}
 
-		const blob = source instanceof Blob ? source : new Blob( [ source ] );
-		const input = new Input( {
-			formats: ALL_FORMATS,
-			source: new BlobSource( blob ),
-		} );
+		/*
+		 * Probe before encoding rather than letting Conversion throw: a
+		 * hardware encoder is not always available (headless browsers, VMs, CI
+		 * runners), and `'prefer-hardware'` is rejected outright when it is
+		 * missing. Fall back to the browser's own choice, and only give up
+		 * once no hint works.
+		 */
+		const hardwareAcceleration = await selectHardwareAcceleration(
+			codec,
+			bitrate,
+			outputWidth,
+			outputHeight
+		);
+		if ( ! hardwareAcceleration ) {
+			throw new Error(
+				`${ UNSUPPORTED_ERROR_PREFIX }: encoder codec not supported`
+			);
+		}
+		videoOptions.hardwareAcceleration = hardwareAcceleration;
+
+		if ( ! inProgressOperations.has( id ) ) {
+			throw new Error( 'Operation cancelled' );
+		}
+
 		const output = new Output( {
 			format: isWebm
 				? new WebMOutputFormat()
 				: new Mp4OutputFormat( { fastStart: 'in-memory' } ),
 			target: new BufferTarget(),
 		} );
-
-		const videoOptions: ConversionVideoOptions = {
-			codec,
-			bitrate: options.bitrate ?? QUALITY_HIGH,
-			hardwareAcceleration: 'prefer-hardware',
-		};
-		if ( options.frameRate ) {
-			videoOptions.frameRate = options.frameRate;
-		}
-
-		/*
-		 * Cap the longest edge while preserving aspect ratio: set only the
-		 * dominant dimension and let mediabunny deduce the other.
-		 */
-		if ( options.maxDimensions ) {
-			const track = await input.getPrimaryVideoTrack();
-			if ( track ) {
-				const [ srcW, srcH ] = await Promise.all( [
-					track.getDisplayWidth(),
-					track.getDisplayHeight(),
-				] );
-				if ( srcW >= srcH && srcW > options.maxDimensions ) {
-					videoOptions.width = options.maxDimensions;
-				} else if ( srcH > srcW && srcH > options.maxDimensions ) {
-					videoOptions.height = options.maxDimensions;
-				}
-			}
-		}
 
 		const conversion = await Conversion.init( {
 			input,

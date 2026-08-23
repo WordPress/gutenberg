@@ -32,19 +32,22 @@ jest.mock( 'mediabunny', () => ( {
 	// `mock`-prefixed out-of-scope variables. Reads the shared mockTrack.
 	Input: class {
 		async getPrimaryVideoTrack() {
-			if ( ! mockTrack ) {
+			// Read into a local so the accessors below close over a
+			// non-nullable value rather than the mutable module variable.
+			const track = mockTrack;
+			if ( ! track ) {
 				return null;
 			}
 			return {
-				getCodec: async () => mockTrack.codec,
-				getDisplayWidth: async () => mockTrack.width,
-				getDisplayHeight: async () => mockTrack.height,
+				getCodec: async () => track.codec,
+				getDisplayWidth: async () => track.width,
+				getDisplayHeight: async () => track.height,
 				computePacketStats: async () => ( {
-					averageBitrate: mockTrack.bitrate,
+					averageBitrate: track.bitrate,
 					averagePacketRate: 30,
 					packetCount: 360,
 				} ),
-				computeDuration: async () => mockTrack.duration,
+				computeDuration: async () => track.duration,
 			};
 		}
 	},
@@ -148,6 +151,45 @@ describe( 'transcodeVideo', () => {
 			transcodeVideo( 'item-y', VIDEO_BUFFER, 'video/mp4' )
 		).rejects.toThrow( new RegExp( `^${ UNSUPPORTED_ERROR_PREFIX }` ) );
 		expect( mockExecute ).not.toHaveBeenCalled();
+	} );
+
+	it( 'falls back to no-preference when hardware encoding is unsupported', async () => {
+		// Headless browsers, VMs and CI runners have no hardware encoder, so
+		// 'prefer-hardware' is rejected while the software path is available.
+		mockCanEncodeVideo.mockImplementation(
+			async (
+				_codec: string,
+				probeOptions: { hardwareAcceleration?: string } = {}
+			) => probeOptions.hardwareAcceleration !== 'prefer-hardware'
+		);
+
+		await transcodeVideo( 'item-sw', VIDEO_BUFFER, 'video/mp4' );
+
+		expect( mockConversionVideoOptions?.hardwareAcceleration ).toBe(
+			'no-preference'
+		);
+		expect( mockExecute ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'probes encoder support at the real output dimensions', async () => {
+		mockTrack = {
+			codec: 'avc',
+			width: 3840,
+			height: 2160,
+			bitrate: 4_000_000,
+			duration: 12,
+		};
+
+		await transcodeVideo( 'item-probe', VIDEO_BUFFER, 'video/mp4', {
+			maxDimensions: 1920,
+		} );
+
+		// The probe must reflect the downscaled output, not the source, since
+		// encoder support is parameter-specific.
+		expect( mockCanEncodeVideo ).toHaveBeenCalledWith(
+			'avc',
+			expect.objectContaining( { width: 1920, height: 1080 } )
+		);
 	} );
 } );
 
