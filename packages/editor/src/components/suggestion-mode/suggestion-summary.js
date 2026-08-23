@@ -15,11 +15,14 @@
  *                        halves are one change, so they are reported on one
  *                        line ("old" → "new") rather than as an unrelated
  *                        delete plus add.
- *   - **Format: …**    — non-text attribute changes. Uses
- *                        `FORMAT_ATTRIBUTE_LABELS` to surface friendly names
- *                        (e.g. `level` → "heading level") with a fallback to
- *                        the raw attribute name so a brand-new attribute
- *                        isn't silently swallowed.
+ *   - **Change: …**    — non-text attribute changes. Uses
+ *                        `ATTRIBUTE_LABELS` to surface friendly names
+ *                        (e.g. `level` → "heading level") and humanizes any
+ *                        attribute not in that map so a brand-new attribute
+ *                        isn't silently swallowed or shown as `camelCase`.
+ *   - **Rename block:** — the one attribute change worth its own line: a
+ *                        block renamed through `metadata.name`, reported
+ *                        with the name being proposed.
  *   - **Add formatting: / Remove formatting:**
  *                      — pure inline-format changes (bold, italic, links).
  *                        Detected by tag-level diff of the serialized HTML
@@ -35,6 +38,10 @@
  * ambiguous quote is a review failure: whitespace-only edits are described by
  * kind and count ("3 spaces") rather than quoted into invisibility, and
  * structural lines name the parent block when there is one.
+ *
+ * "Change:" and the two "… formatting:" labels name different families of
+ * suggestion, so they have to be readable as different things in a mixed list.
+ * The attribute family was once "Format:", one word from "Formatting:".
  *
  * Quoted lines report what a reviewer would read on screen: the diff behind
  * them runs on visible text, never on the raw content attribute, so no markup
@@ -63,11 +70,14 @@ const SUMMARY_MAX_CHARS = 120;
 const REPLACE_SIDE_MAX_CHARS = 60;
 
 /**
- * Friendlier labels for common block attributes so `Format:` lines read like
- * human categories rather than internal names. Anything not in this map
- * falls through to the raw attribute name.
+ * Friendlier labels for common block attributes so `Change:` lines read like
+ * human categories rather than internal names. Anything not in this map is
+ * humanized by `humanizeAttributeName`.
+ *
+ * The names here match what the editor's own controls call these settings, so
+ * a reviewer reading "additional CSS class" can go and find the field.
  */
-const FORMAT_ATTRIBUTE_LABELS = {
+const ATTRIBUTE_LABELS = {
 	level: __( 'heading level' ),
 	align: __( 'alignment' ),
 	textAlign: __( 'text alignment' ),
@@ -77,7 +87,45 @@ const FORMAT_ATTRIBUTE_LABELS = {
 	href: __( 'link' ),
 	backgroundColor: __( 'background color' ),
 	textColor: __( 'text color' ),
+	className: __( 'additional CSS class' ),
+	anchor: __( 'HTML anchor' ),
+	content: __( 'text' ),
+	metadata: __( 'block settings' ),
 };
+
+/**
+ * Turn an attribute key the summary has no friendly label for into something
+ * readable: `fontFamily` becomes "font family", `layout_type` becomes "layout
+ * type". Better than surfacing the raw key, which used to be lowercased whole
+ * and rendered `className` as the non-word "classname".
+ *
+ * @param {string} key Attribute key.
+ * @return {string} Humanized name.
+ */
+function humanizeAttributeName( key ) {
+	if ( typeof key !== 'string' || key === '' ) {
+		return __( 'setting' );
+	}
+	return key
+		.replace( /([a-z0-9])([A-Z])/g, '$1 $2' )
+		.replace( /[_-]+/g, ' ' )
+		.replace( /\s+/g, ' ' )
+		.trim()
+		.toLowerCase();
+}
+
+/**
+ * Read the custom block name out of a `metadata` attribute value, which is
+ * where the "Rename" command stores it. Returns null for anything that isn't
+ * a usable name so the caller can fall back to the generic label.
+ *
+ * @param {*} metadata Attribute value.
+ * @return {?string} The block name, or null.
+ */
+function readBlockName( metadata ) {
+	const name = metadata?.name;
+	return typeof name === 'string' && name.trim() !== '' ? name.trim() : null;
+}
 
 /**
  * Convert a block name like `core/paragraph` to a friendlier label used in
@@ -343,6 +391,19 @@ function joinLabels( labels ) {
 	return unique.join( ', ' );
 }
 
+/**
+ * Join attribute labels without touching their case. Unlike `joinLabels`,
+ * which lowercases the inline-format names it is given, these labels already
+ * read as the editor writes them and carry acronyms - "HTML anchor",
+ * "additional CSS class" - that lowercasing would turn into noise.
+ *
+ * @param {string[]} labels Attribute labels.
+ * @return {string} Comma-joined list.
+ */
+function joinAttributeLabels( labels ) {
+	return Array.from( new Set( labels.filter( Boolean ) ) ).join( ', ' );
+}
+
 function ellipsize( text, max = SUMMARY_MAX_CHARS ) {
 	const trimmed = text.replace( /\s+/g, ' ' ).trim();
 	if ( trimmed.length <= max ) {
@@ -473,8 +534,8 @@ function isTextLike( value ) {
 /**
  * Build a list of `{ label, value }` lines summarizing a suggestion. The
  * content attribute is reported with `Add:` / `Delete:` quotes; other
- * attribute changes are collapsed into a single `Format:` line listing the
- * touched attributes.
+ * attribute changes are collapsed into a single `Change:` line listing the
+ * touched settings.
  *
  * @param {import('./provider').SuggestionOperation[]} operations Operations.
  * @return {Array<{label: string, value: string}>} Rendered lines.
@@ -564,11 +625,41 @@ export function summarizeOperations( operations ) {
 			continue;
 		}
 
+		/*
+		 * A rename is stored as a `metadata` attribute change, so it would
+		 * otherwise arrive in the sidebar as the word "metadata" - a reviewer
+		 * can't tell whether a block was renamed, bound to a field, or turned
+		 * into a pattern override. Report the proposed name instead, and only
+		 * when the name is what actually changed.
+		 */
+		if ( op.attribute === 'metadata' ) {
+			const beforeName = readBlockName( op.before );
+			const afterName = readBlockName( op.after );
+			if ( afterName && afterName !== beforeName ) {
+				lines.push( {
+					label: __( 'Rename block:' ),
+					value: `“${ ellipsize( afterName ) }”`,
+				} );
+				continue;
+			}
+			if ( beforeName && ! afterName ) {
+				lines.push( {
+					label: __( 'Rename block:' ),
+					value: sprintf(
+						/* translators: %s: the block's current custom name. */
+						__( 'reset “%s” to the default name' ),
+						ellipsize( beforeName )
+					),
+				} );
+				continue;
+			}
+		}
+
 		const isContent = op.attribute === 'content';
 		/*
 		 * The word diff below is O(m*n); cap the input length so a payload
 		 * approaching the 64KB limit can't freeze the sidebar. Oversized
-		 * content changes fall back to the attribute-level "Format: content"
+		 * content changes fall back to the attribute-level "Change: text"
 		 * line. This character cap composes with `wordDiff`'s own
 		 * MAX_DIFF_TOKENS guard, which bounds the LCS table itself for any
 		 * input that passes here but tokenizes pathologically.
@@ -670,10 +761,18 @@ export function summarizeOperations( operations ) {
 	}
 
 	if ( attributeLabels.length > 0 ) {
+		/*
+		 * Attribute changes and inline formatting are different families of
+		 * suggestion, so their labels have to be tellable apart at a glance in
+		 * a mixed list. "Format:" next to "Formatting:" was not.
+		 */
 		const labels = attributeLabels.map(
-			( key ) => FORMAT_ATTRIBUTE_LABELS[ key ] ?? key
+			( key ) => ATTRIBUTE_LABELS[ key ] ?? humanizeAttributeName( key )
 		);
-		lines.push( { label: __( 'Format:' ), value: joinLabels( labels ) } );
+		lines.push( {
+			label: __( 'Change:' ),
+			value: joinAttributeLabels( labels ),
+		} );
 	}
 
 	return lines;
@@ -681,7 +780,7 @@ export function summarizeOperations( operations ) {
 
 /**
  * Compact sidebar summary of a suggestion — "Add: …", "Delete: …",
- * "Format: …". Designed to mirror a Google Docs-style review note.
+ * "Change: …". Designed to mirror a Google Docs-style review note.
  *
  * @param {Object}                                     props
  * @param {import('./provider').SuggestionOperation[]} props.operations

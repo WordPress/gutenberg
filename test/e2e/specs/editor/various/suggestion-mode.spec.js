@@ -207,7 +207,7 @@ test.describe( 'Suggestion mode', () => {
 		await expect( paragraph ).toHaveText( 'Hello!' );
 	} );
 
-	test( 'add — the note summarizes the addition as "Add: …", not "Format: content"', async ( {
+	test( 'add — the note summarizes the addition as "Add: …", not the generic attribute line', async ( {
 		editor,
 		page,
 	} ) => {
@@ -215,7 +215,7 @@ test.describe( 'Suggestion mode', () => {
 		// `inline-suggestion` operation that carries no before/after text (the
 		// proposed words live in the in-content marker, not the payload). The
 		// sidebar summary used to fall through to the generic attribute branch
-		// and label the note "Format: content"; it should read like a Google
+		// and label the note with the attribute name; it should read like a Google
 		// Docs review note — Add: "new text".
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -260,10 +260,10 @@ test.describe( 'Suggestion mode', () => {
 		await expect( summary ).toBeVisible();
 		await expect( summary ).toContainText( 'Add:' );
 		await expect( summary ).toContainText( 'new text' );
-		await expect( summary ).not.toContainText( 'Format:' );
+		await expect( summary ).not.toContainText( 'Change:' );
 	} );
 
-	test( 'add — a whitespace-only addition summarizes as "Add: …", not "Format: content"', async ( {
+	test( 'add — a whitespace-only addition summarizes as "Add: …", not the generic attribute line', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -271,7 +271,7 @@ test.describe( 'Suggestion mode', () => {
 		// Regression: inserting only whitespace in Suggest mode resolves to a
 		// marker whose text is all spaces. The summary required the resolved
 		// text to survive a `trim()` (and then collapsed its whitespace), so a
-		// pure-whitespace edit fell back to "Format: content" instead of
+		// pure-whitespace edit fell back to the generic attribute line instead of
 		// quoting the added spaces.
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -315,7 +315,7 @@ test.describe( 'Suggestion mode', () => {
 			.locator( '.editor-collab-sidebar-panel__suggestion-summary' );
 		await expect( summary ).toBeVisible();
 		await expect( summary ).toContainText( 'Add:' );
-		await expect( summary ).not.toContainText( 'Format:' );
+		await expect( summary ).not.toContainText( 'Change:' );
 	} );
 
 	/*

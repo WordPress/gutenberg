@@ -69,7 +69,7 @@ describe( 'summarizeOperations', () => {
 		} );
 	} );
 
-	it( 'collapses non-content attribute changes into a Format: line', () => {
+	it( 'collapses non-content attribute changes into a Change: line', () => {
 		const lines = summarizeOperations( [
 			{
 				type: 'attribute-set',
@@ -86,7 +86,7 @@ describe( 'summarizeOperations', () => {
 		] );
 		expect( lines ).toEqual( [
 			{
-				label: 'Format:',
+				label: 'Change:',
 				value: expect.stringMatching( /heading level.*alignment/i ),
 			},
 		] );
@@ -111,7 +111,7 @@ describe( 'summarizeOperations', () => {
 			expect.arrayContaining( [
 				{ label: 'Add:', value: expect.stringContaining( 'there' ) },
 				{
-					label: 'Format:',
+					label: 'Change:',
 					value: expect.stringContaining( 'heading level' ),
 				},
 			] )
@@ -308,7 +308,7 @@ describe( 'summarizeOperations', () => {
 				after: { also: 'object' },
 			},
 		] );
-		expect( lines ).toEqual( [ { label: 'Format:', value: 'content' } ] );
+		expect( lines ).toEqual( [ { label: 'Change:', value: 'text' } ] );
 	} );
 
 	it( 'decodes HTML entities when comparing visible text', () => {
@@ -402,15 +402,15 @@ describe( 'summarizeOperations', () => {
 				suggestionType: 'format',
 			},
 		] );
-		expect( lines ).toEqual( [ { label: 'Format:', value: 'content' } ] );
+		expect( lines ).toEqual( [ { label: 'Change:', value: 'text' } ] );
 	} );
 
 	it( 'still surfaces a whitespace-only inline-suggestion add', () => {
 		// Regression: typing only whitespace in Suggest mode resolves to a
 		// marker whose text is all spaces. The summary used to require
 		// `text.trim()` to be truthy and then collapse whitespace, so the line
-		// fell back to "Format: content" instead of reporting the added
-		// spaces. It is now described rather than quoted — see the
+		// fell back to the generic attribute line instead of reporting the
+		// added spaces. It is now described rather than quoted — see the
 		// whitespace-by-count test below.
 		const lines = summarizeOperations( [
 			{
@@ -435,7 +435,113 @@ describe( 'summarizeOperations', () => {
 				suggestionType: 'add',
 			},
 		] );
-		expect( lines ).toEqual( [ { label: 'Format:', value: 'content' } ] );
+		expect( lines ).toEqual( [ { label: 'Change:', value: 'text' } ] );
+	} );
+
+	it( 'keeps attribute changes and inline formatting a word apart', () => {
+		// "Format: heading level" and "Formatting: bold" describe two
+		// different families of suggestion and used to read as near-identical
+		// labels in a mixed list (F-16).
+		const lines = summarizeOperations( [
+			{
+				type: 'attribute-set',
+				attribute: 'content',
+				before: 'Hello world',
+				after: '<strong>Hello world</strong>',
+			},
+			{
+				type: 'attribute-set',
+				attribute: 'level',
+				before: 2,
+				after: 3,
+			},
+		] );
+		expect( lines.map( ( line ) => line.label ) ).toEqual( [
+			'Formatting:',
+			'Change:',
+		] );
+		expect( lines ).not.toContainEqual(
+			expect.objectContaining( { label: 'Format:' } )
+		);
+	} );
+
+	it( 'names the additional CSS class setting rather than "classname"', () => {
+		const lines = summarizeOperations( [
+			{
+				type: 'attribute-set',
+				attribute: 'className',
+				before: null,
+				after: 'is-highlighted',
+			},
+		] );
+		expect( lines ).toEqual( [
+			{ label: 'Change:', value: 'additional CSS class' },
+		] );
+	} );
+
+	it( 'humanizes an attribute it has no friendly label for', () => {
+		// The raw key used to be lowercased whole, so `fontFamily` reached the
+		// sidebar as the non-word "fontfamily".
+		const lines = summarizeOperations( [
+			{
+				type: 'attribute-set',
+				attribute: 'fontFamily',
+				before: null,
+				after: 'serif',
+			},
+		] );
+		expect( lines ).toEqual( [
+			{ label: 'Change:', value: 'font family' },
+		] );
+	} );
+
+	it( 'reports a block rename with the name being proposed', () => {
+		// A rename is a `metadata` write, which the generic path reported as
+		// the bare word "metadata" — true but useless to a reviewer (F-16).
+		const lines = summarizeOperations( [
+			{
+				type: 'attribute-set',
+				attribute: 'metadata',
+				before: {},
+				after: { name: 'Intro paragraph' },
+			},
+		] );
+		expect( lines ).toEqual( [
+			{ label: 'Rename block:', value: '“Intro paragraph”' },
+		] );
+	} );
+
+	it( 'reports clearing a custom block name as a reset', () => {
+		const lines = summarizeOperations( [
+			{
+				type: 'attribute-set',
+				attribute: 'metadata',
+				before: { name: 'Intro paragraph' },
+				after: {},
+			},
+		] );
+		expect( lines ).toEqual( [
+			{
+				label: 'Rename block:',
+				value: 'reset “Intro paragraph” to the default name',
+			},
+		] );
+	} );
+
+	it( 'falls back to a settings label for a metadata write that is not a rename', () => {
+		// Bindings and pattern overrides also live in `metadata`; only a name
+		// change should claim the rename line.
+		const lines = summarizeOperations( [
+			{
+				type: 'attribute-set',
+				attribute: 'metadata',
+				before: { bindings: {} },
+				after: { bindings: { content: { source: 'core/post-meta' } } },
+			},
+		] );
+		expect( lines ).toEqual( [
+			{ label: 'Change:', value: 'block settings' },
+		] );
 	} );
 
 	it( 'summarizes a block-remove op as "Remove block: <name>"', () => {

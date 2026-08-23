@@ -415,6 +415,73 @@ test.describe( 'Suggestion mode review flows', () => {
 		).toBeVisible();
 	} );
 
+	test( 'summary — an attribute change and an inline format change read as two different kinds', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		/*
+		 * The sidebar is a mixed list, and a block-attribute change used to
+		 * arrive there as "Format: heading level" right next to an inline
+		 * formatting change reading "Formatting: bold" — two families of
+		 * suggestion one word apart (F-16). The labels have to be tellable
+		 * apart at a glance.
+		 */
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { content: 'My Heading', level: 2 },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		// An inline format suggestion: bold the trailing word.
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		const formatSaved = suggestionSavedPromise( page );
+		await pageUtils.pressKeys( 'primary+b' );
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="format"]'
+			)
+		).toContainText( 'world' );
+		await formatSaved;
+
+		// A block attribute suggestion: demote the heading.
+		const heading = editor.canvas
+			.getByRole( 'document', { name: 'Block: Heading' } )
+			.first();
+		await heading.click();
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: /^Heading 2$/ } )
+			.click();
+		const attributeSaved = suggestionSavedPromise( page );
+		await page.getByRole( 'menuitem', { name: /^Heading 3/ } ).click();
+		await attributeSaved;
+
+		const sidebar = await openNotesSidebar( page );
+		const summaries = sidebar.locator(
+			'.editor-collab-sidebar-panel__suggestion-summary'
+		);
+		await expect( summaries ).toHaveCount( 2 );
+
+		const summaryText = async () =>
+			( await summaries.allInnerTexts() ).join( '\n' );
+		// Positive signals first: both suggestions are described.
+		await expect.poll( summaryText ).toContain( 'Formatting: bold' );
+		await expect.poll( summaryText ).toContain( 'Change: heading level' );
+		// And the old near-collision is gone.
+		expect( await summaryText() ).not.toMatch( /(^|\W)Format:/ );
+	} );
+
 	test( 'accept — an accepted text-alignment change lands in the post content', async ( {
 		editor,
 		page,
