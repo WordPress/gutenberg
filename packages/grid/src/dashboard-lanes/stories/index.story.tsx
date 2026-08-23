@@ -382,7 +382,9 @@ export const EditMode: Story = {
 /**
  * Per-item width limits via `itemLimits`, in pixels. The wide tile
  * stops shrinking at its minimum, the capped tile stops growing at its
- * maximum, and the free tiles keep the full range.
+ * maximum, the ranged tile stays between both, and the free tiles keep
+ * the full range. Lanes take no height limits; lane heights are
+ * content-driven.
  */
 export const SizeLimits: Story = {
 	name: 'Per-Item Size Limits',
@@ -392,6 +394,7 @@ export const SizeLimits: Story = {
 		itemLimits: {
 			min: { minWidth: 360 },
 			max: { maxWidth: 500 },
+			ranged: { minWidth: 300, maxWidth: 500 },
 		},
 	},
 	render: function SizeLimitsStory( args ) {
@@ -413,6 +416,13 @@ export const SizeLimits: Story = {
 				tone: 'warning',
 				height: 120,
 				label: 'max 500px wide',
+			},
+			{
+				key: 'ranged',
+				width: 2,
+				tone: 'brand',
+				height: 150,
+				label: 'min 300, max 500px wide',
 			},
 			{
 				key: 'free-a',

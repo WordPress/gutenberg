@@ -653,11 +653,13 @@ const LIMIT_LABELS: Record< string, string > = {
 	floor: 'min 320 × 200 px',
 	ceiling: 'max 500 × 400 px',
 	ranged: 'min 200, max 600 wide',
+	bounded: 'min 300 × 160, max 600 × 320 px',
 };
 
 /**
- * Per-item size limits via `itemLimits`, in pixels. Constrained tiles
- * pin at their bounds while the pointer overshoots, and release commits
+ * Per-item size limits via `itemLimits`, in pixels: a floor, a ceiling,
+ * a width range, and a tile bounded on both axes. Constrained tiles pin
+ * at their bounds while the pointer overshoots, and release commits
  * spans inside the limits. `'full'` and `'fill'` stop at the tile's
  * maximum span; the per-tile toggles exercise both.
  */
@@ -671,6 +673,12 @@ export const SizeLimits: Story = {
 			floor: { minWidth: 320, minHeight: 200 },
 			ceiling: { maxWidth: 500, maxHeight: 400 },
 			ranged: { minWidth: 200, maxWidth: 600 },
+			bounded: {
+				minWidth: 300,
+				minHeight: 160,
+				maxWidth: 600,
+				maxHeight: 320,
+			},
 		},
 	},
 	render: function SizeLimitsRender( args ) {
@@ -680,7 +688,8 @@ export const SizeLimits: Story = {
 			{ key: 'floor', width: 4, height: 2, order: 1, tone: 'info' },
 			{ key: 'ceiling', width: 2, height: 2, order: 2, tone: 'warning' },
 			{ key: 'ranged', width: 3, height: 1, order: 3, tone: 'brand' },
-			{ key: 'free', width: 3, height: 1, order: 4, tone: 'neutral' },
+			{ key: 'bounded', width: 2, height: 1, order: 4, tone: 'success' },
+			{ key: 'free', width: 3, height: 1, order: 5, tone: 'neutral' },
 		];
 
 		const [ tiles, setTiles ] = useState( initialLayout );
