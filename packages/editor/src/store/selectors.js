@@ -20,8 +20,10 @@ import {
 	PERMALINK_POSTNAME_REGEX,
 	ONE_MINUTE_IN_MS,
 	AUTOSAVE_PROPERTIES,
+	EDITOR_INTENT_SUGGEST,
 } from './constants';
 import { getPostRawValue } from './reducer';
+import { hasPendingSuggestionMarkers } from './utils/pending-suggestion-markers';
 import { unlock } from '../lock-unlock';
 import { getDeviceTypeByCanvasWidth } from '../utils/device-type';
 
@@ -1387,8 +1389,54 @@ export function isInserterOpened( state ) {
  * @return {string} Editing mode.
  */
 export const getEditorMode = createRegistrySelector(
-	( select ) => () =>
-		select( preferencesStore ).get( 'core', 'editorMode' ) ?? 'visual'
+	( select ) => ( state ) => {
+		/*
+		 * The `suggest` intent reports `visual` whatever the stored preference
+		 * says. The code editor is a raw `post_content` textarea: it has
+		 * nowhere to render an inline marker, and the document it hands back
+		 * is re-parsed from scratch, so an edit made there is not capturable
+		 * as a suggestion and destroys the markers already in the post.
+		 * Answering here keeps every consumer of this selector - the
+		 * interface, the header, the document tools, the mode switcher -
+		 * agreed on one mode, and leaves the preference untouched so
+		 * returning to the `edit` intent returns the user to the code editor.
+		 *
+		 * The intent is read off state rather than through the private
+		 * `getEditorIntent` selector because private-selectors.js imports
+		 * from this module, so importing it back would close a cycle. The
+		 * reducer always holds a value, so there is nothing to fall back to.
+		 */
+		if ( state.editorIntent === EDITOR_INTENT_SUGGEST ) {
+			return 'visual';
+		}
+
+		const mode =
+			select( preferencesStore ).get( 'core', 'editorMode' ) ?? 'visual';
+
+		/*
+		 * The same refusal, for the same reason, one intent later. Markers
+		 * left unresolved when the user goes back to Editing - or already in
+		 * the post when it loads - are just as destructible, and neither
+		 * route dispatches `switchEditorMode`, so its guard never runs: the
+		 * mask simply lifts and the stored `text` preference puts the raw
+		 * `post_content` textarea back on screen with the markers in it.
+		 * Answering here covers both, and leaves the preference alone so the
+		 * code editor returns once the suggestions are resolved.
+		 *
+		 * Probing costs a serialization of the document, so it is gated on
+		 * the preference actually being `text`: a visual-editor session -
+		 * every session by default - never pays for it, and a code-editor
+		 * session is not re-serializing per keystroke the way the canvas is.
+		 */
+		if (
+			mode === 'text' &&
+			hasPendingSuggestionMarkers( getEditedPostContent( state ) )
+		) {
+			return 'visual';
+		}
+
+		return mode;
+	}
 );
 
 /*

@@ -466,6 +466,114 @@ test.describe( 'Suggestion mode', () => {
 		await expect( summaries ).toContainText( 'def' );
 	} );
 
+	test( 'collapsed delete: repeated Delete grows a single del marker', async ( {
+		editor,
+		page,
+	} ) => {
+		// The forward direction has to merge the way Backspace does. A
+		// forward-delete run parks the caret at the marker's start, so every
+		// repeat aims at a character the previous press already marked —
+		// without an explicit merge the second press is refused and the run
+		// stalls at one character.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'abcdef' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.press( 'Delete' );
+
+		const markers = paragraph.locator(
+			'mark.wp-suggestion[data-suggestion-type="del"]'
+		);
+		// Wait for the first press to mint its note before repeating, so the
+		// growth path (not the buffered-repeat path) is what is exercised.
+		await expect( markers ).toHaveText( 'a' );
+
+		await page.keyboard.press( 'Delete' );
+		await page.keyboard.press( 'Delete' );
+
+		await expect( markers ).toHaveCount( 1 );
+		await expect( markers ).toHaveText( 'abc' );
+		// The text is kept until the suggestion is accepted.
+		await expect( paragraph ).toContainText( 'abcdef' );
+
+		// One note for the whole run, not one per keystroke.
+		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
+		const allNotesToggle = topBar.getByRole( 'button', {
+			name: 'All notes',
+			exact: true,
+		} );
+		if (
+			( await allNotesToggle.getAttribute( 'aria-expanded' ) ) === 'false'
+		) {
+			await allNotesToggle.click();
+		}
+		const summaries = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.locator( '.editor-collab-sidebar-panel__suggestion-summary' );
+		await expect( summaries ).toHaveCount( 1 );
+		await expect( summaries ).toContainText( 'Delete:' );
+		await expect( summaries ).toContainText( 'abc' );
+	} );
+
+	test( 'collapsed delete: a caret moved back to a del marker refuses the keystroke', async ( {
+		editor,
+		page,
+	} ) => {
+		// A marker outlives the run that opened it. Moving the caret ends the
+		// run without clearing the marker, so the next Backspace aims at a
+		// grapheme that is already proposed for deletion. This is the
+		// collapsed-caret half of the refusal #81655 added for a straddling
+		// selection: falling through would have the browser remove text that
+		// only exists as a proposal and destroy the marker holding it.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'abcdef' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.press( 'Backspace' );
+
+		const markers = paragraph.locator(
+			'mark.wp-suggestion[data-suggestion-type="del"]'
+		);
+		// Wait for the first press to mint its note before repeating.
+		await expect( markers ).toHaveText( 'f' );
+		await page.keyboard.press( 'Backspace' );
+		await expect( markers ).toHaveText( 'ef' );
+
+		// The run parks the caret at the marker's start. End puts it back at
+		// the marker's trailing edge, which ends the run - offset 6 against a
+		// run that left the caret at 4 - without touching the marker.
+		await page.keyboard.press( 'End' );
+		await page.keyboard.press( 'Backspace' );
+
+		// The user is told why the edit did not take.
+		await expect(
+			page
+				.locator( '.components-snackbar-list' )
+				.getByText( 'overlaps a pending suggestion' )
+		).toBeVisible();
+
+		// The marker is intact and no text was removed from the paragraph.
+		await expect( markers ).toHaveCount( 1 );
+		await expect( markers ).toHaveText( 'ef' );
+		await expect( paragraph ).toHaveText( 'abcdef' );
+	} );
+
 	test( 'collapsed delete: Backspace over an emoji ZWJ sequence marks the whole grapheme', async ( {
 		editor,
 		page,

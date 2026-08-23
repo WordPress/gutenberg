@@ -34,6 +34,8 @@ import {
 	findInlineOp,
 	clearSuggestionMarkerAttributes,
 	useSuggestionsProvider,
+	getSuggestionsResolvedThisSession,
+	forgetResolvedSuggestion,
 } from '../provider';
 
 describe( 'operationsFromOverlay', () => {
@@ -860,6 +862,159 @@ describe( 'rejectSuggestion (inline marker)', () => {
 	} );
 } );
 
+describe( 'decision failures leave the block tree untouched', () => {
+	const PARAGRAPH = 'core/test-failure-paragraph';
+
+	beforeAll( () => {
+		registerBlockType( PARAGRAPH, {
+			apiVersion: 3,
+			attributes: {
+				content: { type: 'string', default: '' },
+				metadata: { type: 'object' },
+			},
+			save: () => null,
+			category: 'text',
+			title: 'Test Failure Paragraph',
+		} );
+	} );
+
+	afterAll( () => {
+		getBlockTypes().forEach( ( block ) =>
+			unregisterBlockType( block.name )
+		);
+	} );
+
+	// Same stub as the block-move suite, except the lifecycle write rejects
+	// the way a dropped connection or a concurrently trashed note would.
+	function createFailingCoreStore() {
+		return createReduxStore( 'core', {
+			reducer: ( state = {} ) => state,
+			actions: {
+				saveEntityRecord: () => () => {
+					throw new Error( 'Network error' );
+				},
+			},
+			selectors: {
+				getEditedEntityRecord: () => null,
+				getEntityRecord: () => null,
+				getCurrentUser: () => null,
+			},
+		} );
+	}
+
+	function setup( initialBlocks ) {
+		const registry = createRegistry();
+		registry.register( noticesStore );
+		registry.register( blockEditorStore );
+		registry.register( createFailingCoreStore() );
+		registry.register( createStubInterfaceStore() );
+		registry.dispatch( blockEditorStore ).resetBlocks( initialBlocks );
+
+		let providerHandle;
+		function CaptureProvider() {
+			providerHandle = useSuggestionsProvider();
+			return null;
+		}
+
+		render(
+			<RegistryProvider value={ registry }>
+				<CaptureProvider />
+			</RegistryProvider>
+		);
+
+		return { registry, getProvider: () => providerHandle };
+	}
+
+	it( 'keeps the block when applying a block-remove suggestion fails', async () => {
+		const target = createBlock( PARAGRAPH, {
+			content: 'Doomed',
+			metadata: {
+				noteId: [ 7 ],
+				suggestion: { type: 'pending-remove' },
+			},
+		} );
+		const { registry, getProvider } = setup( [ target ] );
+
+		await act( async () => {
+			await getProvider().applySuggestion( {
+				commentId: 7,
+				clientId: target.clientId,
+				payload: {
+					schemaVersion: 2,
+					blockName: PARAGRAPH,
+					baseRevision: null,
+					operations: [
+						{
+							type: 'block-remove',
+							clientId: target.clientId,
+							blockName: PARAGRAPH,
+						},
+					],
+				},
+			} );
+		} );
+
+		const blockEditor = registry.select( blockEditorStore );
+		// The block survives, marker intact, so the still-pending note can
+		// be applied or rejected again once the server is reachable.
+		expect( blockEditor.getBlock( target.clientId ) ).not.toBeNull();
+		expect(
+			blockEditor.getBlockAttributes( target.clientId )?.metadata
+				?.suggestion?.type
+		).toBe( 'pending-remove' );
+		expect(
+			registry
+				.select( noticesStore )
+				.getNotices()
+				.some( ( notice ) => notice.status === 'error' )
+		).toBe( true );
+	} );
+
+	it( 'leaves a moved block in place when rejecting fails', async () => {
+		const a = createBlock( PARAGRAPH, { content: 'A' } );
+		const moved = createBlock( PARAGRAPH, {
+			content: 'Moved',
+			metadata: {
+				noteId: [ 8 ],
+				suggestion: { type: 'pending-move' },
+			},
+		} );
+		// Current order is [ A, Moved ]; the suggestion moved it from index 0.
+		const { registry, getProvider } = setup( [ a, moved ] );
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 8,
+				clientId: moved.clientId,
+				payload: {
+					schemaVersion: 2,
+					blockName: PARAGRAPH,
+					baseRevision: null,
+					operations: [
+						{
+							type: 'block-move',
+							clientId: moved.clientId,
+							blockName: PARAGRAPH,
+							fromParentClientId: null,
+							fromIndex: 0,
+							toParentClientId: null,
+						},
+					],
+				},
+			} );
+		} );
+
+		const blockEditor = registry.select( blockEditorStore );
+		// No half-rejected state: the block stays at its suggested position
+		// with the marker still on it.
+		expect( blockEditor.getBlockIndex( moved.clientId ) ).toBe( 1 );
+		expect(
+			blockEditor.getBlockAttributes( moved.clientId )?.metadata
+				?.suggestion?.type
+		).toBe( 'pending-move' );
+	} );
+} );
+
 describe( 'createSuggestion (notes sidebar switch)', () => {
 	const PARAGRAPH = 'core/test-sidebar-paragraph';
 	const ALL_NOTES_SIDEBAR = 'edit-post/collab-history-sidebar';
@@ -1098,13 +1253,8 @@ describe( 'review decisions and undo history', () => {
 		],
 	};
 
-	it( 'keeps an applied suggestion out of undo history', async () => {
+	it( 'commits an applied suggestion as a persistent change', async () => {
 		const { registry, block, getProvider } = setup();
-		expect(
-			registry
-				.select( blockEditorStore )
-				.__unstableGetLastBlockChangeHistoryMode()
-		).toBe( 'persistent' );
 
 		await act( async () => {
 			await getProvider().applySuggestion( {
@@ -1121,17 +1271,22 @@ describe( 'review decisions and undo history', () => {
 				.getBlockAttributes( block.clientId )
 				?.content.toHTMLString()
 		).toBe( 'Hello world' );
-		// ...and the write is invisible to undo. Left as an undo level, the
-		// first Ctrl+Z after accepting puts the `<mark>` back while the note
-		// stays resolved — a marker with no Accept/Reject and no way out.
+		/*
+		 * ...as a PERSISTENT change. Hiding the decision from undo also hides
+		 * it from the entity: a non-persistent block change reaches the parent
+		 * through `onInput`, which never writes `content`, so the post would
+		 * never go dirty and the applied text would be gone on reload. The
+		 * undo half of F-18 is handled by reopening the note instead, in
+		 * `SuggestionNoteGC`.
+		 */
 		expect(
 			registry
 				.select( blockEditorStore )
 				.__unstableGetLastBlockChangeHistoryMode()
-		).toBe( 'ignore' );
+		).toBe( 'persistent' );
 	} );
 
-	it( 'keeps a rejected suggestion out of undo history', async () => {
+	it( 'commits a rejected suggestion as a persistent change', async () => {
 		const { registry, block, getProvider } = setup();
 
 		await act( async () => {
@@ -1152,6 +1307,22 @@ describe( 'review decisions and undo history', () => {
 			registry
 				.select( blockEditorStore )
 				.__unstableGetLastBlockChangeHistoryMode()
-		).toBe( 'ignore' );
+		).toBe( 'persistent' );
+	} );
+
+	it( 'records a decided suggestion so its note can be reopened', async () => {
+		const { block, getProvider } = setup();
+
+		await act( async () => {
+			await getProvider().applySuggestion( {
+				commentId: 9,
+				clientId: block.clientId,
+				payload: inlinePayload,
+			} );
+		} );
+
+		// The note collector reads this to spot a marker an undo put back.
+		expect( getSuggestionsResolvedThisSession().has( '9' ) ).toBe( true );
+		forgetResolvedSuggestion( 9 );
 	} );
 } );

@@ -549,7 +549,7 @@ test.describe( 'Suggestion mode undo', () => {
 	 * Accept/Reject and leaves the run stuck. These tests pin the invariant
 	 * that keeps the halves together: undo never resurrects a decided marker.
 	 */
-	test( 'undo after accepting an addition does not restore its marker', async ( {
+	test( 'undo after accepting an addition reopens its note with the marker', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -582,22 +582,29 @@ test.describe( 'Suggestion mode undo', () => {
 		// The proposal is committed: text kept, marker unwrapped.
 		await expect( paragraph ).toHaveText( 'Hello world' );
 		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 0 );
-
-		await pageUtils.pressKeys( 'primary+z' );
-
-		// Undo may step back through the reviewer's own earlier edits, but it
-		// must not bring the marker back: the note is resolved and could no
-		// longer be accepted or rejected.
-		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 0 );
-		expect( await editor.getEditedPostContent() ).not.toContain(
-			'data-suggestion'
-		);
 		await expect(
 			sidebar.getByText( 'Applied', { exact: true } )
 		).toBeVisible();
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		/*
+		 * Undo walks the block half of the decision back, so the marker
+		 * returns. The note has to come with it: a marker whose note stayed
+		 * resolved carries no Accept/Reject and cannot be cleared through the
+		 * UI (#73411, F-18). Asserting the marker is BACK also means this can
+		 * only pass once the undo has actually been processed.
+		 */
+		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 1 );
+		await expect(
+			sidebar.getByRole( 'button', { name: 'Accept suggestion' } )
+		).toBeVisible();
+		await expect(
+			sidebar.getByText( 'Applied', { exact: true } )
+		).toBeHidden();
 	} );
 
-	test( 'undo after rejecting an addition does not restore its marker', async ( {
+	test( 'undo after rejecting an addition reopens its note with the marker', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -629,15 +636,17 @@ test.describe( 'Suggestion mode undo', () => {
 		// The proposal is withdrawn: the text goes with its marker.
 		await expect( paragraph ).toHaveText( 'Hello' );
 		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 0 );
+		await expect(
+			sidebar.getByText( 'Rejected', { exact: true } )
+		).toBeVisible();
 
 		await pageUtils.pressKeys( 'primary+z' );
 
-		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 0 );
-		expect( await editor.getEditedPostContent() ).not.toContain(
-			'data-suggestion'
-		);
+		// See above: the marker and its note are undone together.
+		await expect( paragraph ).toHaveText( 'Hello world' );
+		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 1 );
 		await expect(
-			sidebar.getByText( 'Rejected', { exact: true } )
+			sidebar.getByRole( 'button', { name: 'Reject suggestion' } )
 		).toBeVisible();
 	} );
 } );

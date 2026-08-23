@@ -56,17 +56,40 @@ const INTENTS = [
  */
 function IntentSwitcher() {
 	// The intent API is private while Suggest mode is experimental.
-	const intent = useSelect(
-		( select ) => unlock( select( editorStore ) ).getEditorIntent(),
+	const { intent, isRichEditingEnabled } = useSelect(
+		( select ) => ( {
+			intent: unlock( select( editorStore ) ).getEditorIntent(),
+			isRichEditingEnabled:
+				select( editorStore ).getEditorSettings().richEditingEnabled,
+		} ),
 		[]
 	);
 	const { setEditorIntent } = unlock( useDispatch( editorStore ) );
+
+	/*
+	 * Suggesting is visual-only - a suggestion is an inline marker in block
+	 * content, which the code editor cannot render - so it is unavailable to
+	 * a user who turned the visual editor off. `setEditorIntent` refuses it
+	 * either way; offering it disabled, with the setting to change, beats a
+	 * choice that looks live and then declines.
+	 */
+	const choices = INTENTS.map( ( choice ) =>
+		choice.value === EDITOR_INTENT_SUGGEST && ! isRichEditingEnabled
+			? {
+					...choice,
+					disabled: true,
+					info: __(
+						'You can enable the visual editor in your profile settings.'
+					),
+			  }
+			: choice
+	);
 
 	return (
 		<PostTypeSupportCheck supportKeys="editor.notes">
 			<MenuGroup label={ __( 'Mode' ) }>
 				<MenuItemsChoice
-					choices={ INTENTS }
+					choices={ choices }
 					value={ intent }
 					onSelect={ setEditorIntent }
 				/>

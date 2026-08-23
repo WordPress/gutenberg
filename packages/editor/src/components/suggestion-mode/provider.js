@@ -426,8 +426,54 @@ function withDecisionInFlight( decide ) {
 			return await decide( args );
 		} finally {
 			decisionsInFlight.delete( key );
+			resolvedThisSession.add( key );
 		}
 	};
+}
+
+/*
+ * Suggestions this session has applied or rejected.
+ *
+ * A decision has two halves: the block change, which the undo stack holds, and
+ * the comment's lifecycle status, which lives on the server and no keystroke
+ * here can walk back. Undo therefore puts a marker back while its note stays
+ * resolved, leaving a marked-up run with no Accept/Reject on it and no way to
+ * clear it through the UI (issue #73411, F-18). The note collector watches this
+ * set and reopens a note whose marker reappears, so the two halves travel
+ * together again.
+ *
+ * Deliberately scoped to decisions made HERE rather than to every resolved note
+ * that has a live marker: a peer's decision arriving through sync before this
+ * session's content catches up looks identical from the outside, and reopening
+ * that would undo their review.
+ */
+const resolvedThisSession = new Set();
+
+/**
+ * Comment ids this session applied or rejected and has not yet reopened.
+ *
+ * @return {Set<string>} Comment id keys.
+ */
+export function getSuggestionsResolvedThisSession() {
+	return resolvedThisSession;
+}
+
+/**
+ * Forget a decision, once its note has been reopened or is past reopening.
+ *
+ * @param {number|string} commentId Comment id.
+ */
+export function forgetResolvedSuggestion( commentId ) {
+	resolvedThisSession.delete( String( commentId ) );
+}
+
+/**
+ * Record a decision again, so a failed reopen is retried on a later pass.
+ *
+ * @param {number|string} commentId Comment id.
+ */
+export function rememberResolvedSuggestion( commentId ) {
+	resolvedThisSession.add( String( commentId ) );
 }
 
 /**
@@ -480,29 +526,6 @@ export function useSuggestionsProvider() {
 	} = useSelect( blockEditorStore );
 	const { requestInterceptorBypass, clearOverlay } = useSuggestionOverlay();
 	const registry = useRegistry();
-
-	/*
-	 * Keep the next block-editor write out of undo history.
-	 *
-	 * Applying or rejecting a suggestion is a review decision, not one of the
-	 * reviewer's content edits. It has two halves — the live block change and
-	 * the comment's lifecycle status — and only the first is something the
-	 * undo stack can hold: the status lives on the server, is shared with
-	 * every other session, and cannot be walked back by a keystroke here.
-	 * Recording the block half as an undo level therefore lets Ctrl+Z split
-	 * the two apart. Undo after accepting puts the `<mark>` back while the
-	 * note stays resolved, leaving a marked-up run with no Accept/Reject on
-	 * it and no way to clear it through the UI.
-	 *
-	 * `history: 'ignore'` keeps the applied content (it still reaches the
-	 * entity and saves) while making the write invisible to undo, so the two
-	 * halves can no longer come apart. This is the same treatment
-	 * `createSuggestion` gives the note-id linkage above, and the notes
-	 * delete-cleanup gives its own bookkeeping writes.
-	 */
-	const ignoreNextChangeInUndo = useCallback( () => {
-		markNextChangeAsNotPersistent?.( { history: 'ignore' } );
-	}, [ markNextChangeAsNotPersistent ] );
 
 	const createSuggestion = useCallback(
 		async ( { clientId, blockName, operations } ) => {
@@ -796,7 +819,6 @@ export function useSuggestionsProvider() {
 				try {
 					requestInterceptorBypass( targetClientId );
 					clearOverlay( targetClientId );
-					ignoreNextChangeInUndo();
 					updateBlockAttributes( targetClientId, {
 						[ attributeKey ]: nextValue,
 					} );
@@ -820,7 +842,6 @@ export function useSuggestionsProvider() {
 					// Roll the attribute back so the block isn't left
 					// half-applied if the server rejected the status update.
 					requestInterceptorBypass( targetClientId );
-					ignoreNextChangeInUndo();
 					updateBlockAttributes( targetClientId, {
 						[ attributeKey ]: originalValue,
 					} );
@@ -843,6 +864,28 @@ export function useSuggestionsProvider() {
 			const structuralOp = findStructuralOp( payload.operations );
 			if ( structuralOp ) {
 				try {
+					/*
+					 * Persist the decision BEFORE touching the tree. The
+					 * attribute-set path below can mutate first and roll
+					 * back on failure because restoring attributes is
+					 * exact; a structural rollback is not — re-inserting a
+					 * removed block would have to restore its position,
+					 * nested children, selection, and overlay entry. Saving
+					 * first costs one round-trip of latency and gives the
+					 * same invariant for free: a failed save leaves the
+					 * editor exactly as it was.
+					 */
+					await saveEntityRecord(
+						'root',
+						'comment',
+						{
+							id: commentId,
+							status: 'approved',
+							meta: { _wp_suggestion_status: 'applied' },
+						},
+						{ throwOnError: true }
+					);
+
 					if ( structuralOp.type === 'block-remove' ) {
 						// Bypass twice: the marker-clear dispatch lands
 						// first (so the live block ends without the
@@ -853,12 +896,10 @@ export function useSuggestionsProvider() {
 						);
 						if ( clearAttrs ) {
 							requestInterceptorBypass( targetClientId );
-							ignoreNextChangeInUndo();
 							updateBlockAttributes( targetClientId, clearAttrs );
 						}
 						requestInterceptorBypass( targetClientId );
 						clearOverlay( targetClientId );
-						ignoreNextChangeInUndo();
 						removeBlock( targetClientId );
 					} else if (
 						structuralOp.type === 'block-insert-after' ||
@@ -893,24 +934,12 @@ export function useSuggestionsProvider() {
 							? { ...withOpsApplied, ...markerCleared }
 							: withOpsApplied;
 						requestInterceptorBypass( targetClientId );
-						ignoreNextChangeInUndo();
 						updateBlockAttributes(
 							targetClientId,
 							finalAttributes
 						);
 						clearOverlay( targetClientId );
 					}
-
-					await saveEntityRecord(
-						'root',
-						'comment',
-						{
-							id: commentId,
-							status: 'approved',
-							meta: { _wp_suggestion_status: 'applied' },
-						},
-						{ throwOnError: true }
-					);
 
 					createNotice( 'snackbar', __( 'Suggestion applied.' ), {
 						type: 'snackbar',
@@ -965,7 +994,6 @@ export function useSuggestionsProvider() {
 				// interceptor isn't running and these calls are no-ops.
 				requestInterceptorBypass( targetClientId );
 				clearOverlay( targetClientId );
-				ignoreNextChangeInUndo();
 				updateBlockAttributes( targetClientId, newAttributes );
 
 				await saveEntityRecord(
@@ -987,7 +1015,6 @@ export function useSuggestionsProvider() {
 				// Roll back the block change so the UI isn't left in a
 				// half-applied state if the server rejected the update.
 				requestInterceptorBypass( targetClientId );
-				ignoreNextChangeInUndo();
 				updateBlockAttributes( targetClientId, rollbackPayload );
 				createNotice(
 					'error',
@@ -1005,7 +1032,6 @@ export function useSuggestionsProvider() {
 			createNotice,
 			requestInterceptorBypass,
 			clearOverlay,
-			ignoreNextChangeInUndo,
 		]
 	);
 
@@ -1031,76 +1057,6 @@ export function useSuggestionsProvider() {
 	 */
 	const rejectSuggestion = useCallback(
 		async ( { commentId, clientId, payload } ) => {
-			// Reject behavior depends on the structural op type:
-			//   - block-remove: drop the marker (block stays).
-			//   - block-insert-after: dispatch removeBlock to undo the
-			//     suggested insertion. The marker on the live block goes
-			//     away with the block itself.
-			//   - block-move: clear the marker, then dispatch
-			//     moveBlockToPosition to put the block back at its
-			//     pre-move parent + index.
-			//   - attribute-set (no structural op): no live-block change.
-			const structuralOp = findStructuralOp( payload?.operations );
-			if ( structuralOp && clientId ) {
-				if ( structuralOp.type === 'block-insert-after' ) {
-					requestInterceptorBypass( clientId );
-					clearOverlay( clientId );
-					ignoreNextChangeInUndo();
-					removeBlock( clientId );
-				} else if ( structuralOp.type === 'block-move' ) {
-					const clearAttrs = clearSuggestionMarkerAttributes(
-						selectBlockAttributes( clientId )
-					);
-					requestInterceptorBypass( clientId );
-					clearOverlay( clientId );
-					/*
-					 * Batch the marker-clear and the restoring move into ONE
-					 * store update. The interceptor recognizes a reject
-					 * landing by their combination — a block that moved in
-					 * the same tick its pending-move marker disappeared —
-					 * and adopts it instead of re-capturing the restore as
-					 * a fresh move suggestion (which is what happens when
-					 * the two dispatches fire the subscriber separately and
-					 * the reviewer is in Suggesting intent). This is also
-					 * the shape a remote reject arrives in through sync.
-					 */
-					registry.batch( () => {
-						if ( clearAttrs ) {
-							ignoreNextChangeInUndo();
-							updateBlockAttributes( clientId, clearAttrs );
-						}
-						// Marked per dispatch: the flag covers the next
-						// change only, and a batch is still two of them.
-						ignoreNextChangeInUndo();
-						moveBlockToPosition(
-							clientId,
-							/*
-							 * `fromRootClientId` must be the block's CURRENT
-							 * parent: after a cross-parent move the block lives
-							 * in the destination parent, and the reducer looks
-							 * the block up there. Passing the original parent
-							 * for both roots made cross-parent rejects silently
-							 * no-op. `moveBlockToPosition` expects '' (not null)
-							 * for the root.
-							 */
-							selectBlockRootClientId( clientId ) ?? '',
-							structuralOp.fromParentClientId ?? '',
-							structuralOp.fromIndex ?? 0
-						);
-					} );
-				} else {
-					const clearAttrs = clearSuggestionMarkerAttributes(
-						selectBlockAttributes( clientId )
-					);
-					if ( clearAttrs ) {
-						requestInterceptorBypass( clientId );
-						ignoreNextChangeInUndo();
-						updateBlockAttributes( clientId, clearAttrs );
-					}
-					clearOverlay( clientId );
-				}
-			}
-
 			// Inline suggestions: reject restores the block's pre-suggestion
 			// content for the marked attribute — a deletion keeps the text and
 			// drops the marker, an addition removes the proposed text with its
@@ -1158,7 +1114,6 @@ export function useSuggestionsProvider() {
 					try {
 						requestInterceptorBypass( targetClientId );
 						clearOverlay( targetClientId );
-						ignoreNextChangeInUndo();
 						updateBlockAttributes( targetClientId, {
 							[ attributeKey ]: nextValue,
 						} );
@@ -1185,7 +1140,6 @@ export function useSuggestionsProvider() {
 						// server rejected the status update. Mirrors the
 						// apply-path rollback.
 						requestInterceptorBypass( targetClientId );
-						ignoreNextChangeInUndo();
 						updateBlockAttributes( targetClientId, {
 							[ attributeKey ]: originalValue,
 						} );
@@ -1200,6 +1154,17 @@ export function useSuggestionsProvider() {
 				}
 			}
 
+			// Reject behavior depends on the structural op type:
+			//   - block-remove: drop the marker (block stays).
+			//   - block-insert-after: dispatch removeBlock to undo the
+			//     suggested insertion. The marker on the live block goes
+			//     away with the block itself.
+			//   - block-move: clear the marker, then dispatch
+			//     moveBlockToPosition to put the block back at its
+			//     pre-move parent + index.
+			//   - attribute-set (no structural op): no live-block change.
+			const structuralOp = findStructuralOp( payload?.operations );
+
 			try {
 				await saveEntityRecord(
 					'root',
@@ -1211,6 +1176,68 @@ export function useSuggestionsProvider() {
 					},
 					{ throwOnError: true }
 				);
+
+				/*
+				 * Undo the live-block change only once the decision is
+				 * persisted. A structural change can't be rolled back
+				 * faithfully (position, children, selection, and the
+				 * overlay entry would all have to be restored), so the
+				 * tree is left untouched until the save succeeds — a
+				 * failed reject then leaves the editor exactly as it was.
+				 */
+				if ( structuralOp && clientId ) {
+					if ( structuralOp.type === 'block-insert-after' ) {
+						requestInterceptorBypass( clientId );
+						clearOverlay( clientId );
+						removeBlock( clientId );
+					} else if ( structuralOp.type === 'block-move' ) {
+						const clearAttrs = clearSuggestionMarkerAttributes(
+							selectBlockAttributes( clientId )
+						);
+						requestInterceptorBypass( clientId );
+						clearOverlay( clientId );
+						/*
+						 * Batch the marker-clear and the restoring move into ONE
+						 * store update. The interceptor recognizes a reject
+						 * landing by their combination — a block that moved in
+						 * the same tick its pending-move marker disappeared —
+						 * and adopts it instead of re-capturing the restore as
+						 * a fresh move suggestion (which is what happens when
+						 * the two dispatches fire the subscriber separately and
+						 * the reviewer is in Suggesting intent). This is also
+						 * the shape a remote reject arrives in through sync.
+						 */
+						registry.batch( () => {
+							if ( clearAttrs ) {
+								updateBlockAttributes( clientId, clearAttrs );
+							}
+							moveBlockToPosition(
+								clientId,
+								/*
+								 * `fromRootClientId` must be the block's CURRENT
+								 * parent: after a cross-parent move the block lives
+								 * in the destination parent, and the reducer looks
+								 * the block up there. Passing the original parent
+								 * for both roots made cross-parent rejects silently
+								 * no-op. `moveBlockToPosition` expects '' (not null)
+								 * for the root.
+								 */
+								selectBlockRootClientId( clientId ) ?? '',
+								structuralOp.fromParentClientId ?? '',
+								structuralOp.fromIndex ?? 0
+							);
+						} );
+					} else {
+						const clearAttrs = clearSuggestionMarkerAttributes(
+							selectBlockAttributes( clientId )
+						);
+						if ( clearAttrs ) {
+							requestInterceptorBypass( clientId );
+							updateBlockAttributes( clientId, clearAttrs );
+						}
+						clearOverlay( clientId );
+					}
+				}
 
 				createNotice( 'snackbar', __( 'Suggestion rejected.' ), {
 					type: 'snackbar',
@@ -1235,7 +1262,6 @@ export function useSuggestionsProvider() {
 			moveBlockToPosition,
 			requestInterceptorBypass,
 			clearOverlay,
-			ignoreNextChangeInUndo,
 			registry,
 		]
 	);
