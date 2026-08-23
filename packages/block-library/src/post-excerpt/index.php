@@ -38,7 +38,7 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 		);
 		$more_text = '<a class="wp-block-post-excerpt__more-link" href="' . esc_url( get_the_permalink( $post_id ) ) . '">'
 			. wp_kses_post( $attributes['moreText'] )
-			. '<span class="screen-reader-text">' . $screen_reader_text . '</span>'
+			. '<span class="screen-reader-text">' . esc_html( $screen_reader_text ) . '</span>'
 			. '</a>';
 	}
 	$filter_excerpt_more = static function ( $more ) use ( $more_text ) {
