@@ -47,6 +47,11 @@
  *     whose index just shifted as a side-effect by preferring the current
  *     selection (the block a user moves stays selected), with an LCS-based
  *     heuristic as the fallback.
+ *   - A block-switcher transform (or any other `replaceBlocks`) reaches the
+ *     loop as a removal AND an insertion in the same fire. Both halves are
+ *     stamped with a shared `groupId` so the review layer can resolve them
+ *     together — accepting the insertion without the removal would leave a
+ *     duplicate block, and rejecting it without the removal a hole.
  *
  * In every case the live block carries the marker and a corresponding
  * structural op is written to the overlay so auto-save persists it.
@@ -364,6 +369,11 @@ function isAcceptedSuggestionChange( coreSelect, currentAttributes, delta ) {
  * @typedef {Object} SuggestionMarker
  * @property {'pending-remove'|'pending-insert'|'pending-move'} type             Op type
  *                                                                               the marker represents.
+ * @property {string}                                           [groupId]        Shared id linking the halves of a single
+ *                                                                               replacement (a block-switcher transform is
+ *                                                                               a removal plus an insertion). Present on
+ *                                                                               every member; the review layer resolves the
+ *                                                                               whole group with one decision.
  * @property {number}                                           [commentId]      Filled in by auto-save once a note comment
  *                                                                               exists for this marker.
  * @property {number|null}                                      [authorId]       ID of the user who proposed this
@@ -460,6 +470,86 @@ function isPartOfPendingInsertion( blockEditor, clientId ) {
 	}
 	const parents = blockEditor.getBlockParents?.( clientId ) ?? [];
 	return parents.some( ( id ) => markerType( id ) === 'pending-insert' );
+}
+
+/**
+ * Monotonic counter behind `nextSuggestionGroupId`. Module scope so two
+ * interceptor sessions in the same page never mint the same id.
+ */
+let suggestionGroupCounter = 0;
+
+/**
+ * Mint an id shared by the halves of one replacement. It only has to be
+ * unique among the suggestions pending on a post, and it is written into
+ * post content (`metadata.suggestion.groupId`) and into the note payload,
+ * so it is kept short and free of characters that need escaping.
+ *
+ * @return {string} Group id.
+ */
+function nextSuggestionGroupId() {
+	suggestionGroupCounter += 1;
+	return `sg-${ Date.now().toString( 36 ) }-${ suggestionGroupCounter }`;
+}
+
+/**
+ * Pair the insertions and removals captured in a single subscribe fire.
+ *
+ * `replaceBlocks` — what the block switcher, "Group", and paste-over-selection
+ * all dispatch — lands as one store update in which a block disappears and
+ * another appears in its place. Diffed independently those are two unrelated
+ * suggestions, and resolving one without the other leaves either a duplicate
+ * block or a hole. Insertions and removals that landed in the SAME parent
+ * during the same fire are the two halves of one replacement, so they get a
+ * shared group id.
+ *
+ * Pairing is deliberately per-parent: a transform of three paragraphs into one
+ * quote (3 removals, 1 insertion) is one group, while an unrelated removal in
+ * a different container stays its own suggestion.
+ *
+ * @param {Array<{clientId: string, parentClientId: string|null}>} insertions       New top-level blocks
+ *                                                                                  captured this fire.
+ * @param {string[]}                                               removedTopIds    Top-level removed
+ *                                                                                  clientIds.
+ * @param {Map<string, string|null>}                               parentByClientId Previous-tick parents.
+ * @return {Map<string, string>} Group id per participating clientId. Empty when
+ * the fire held only insertions or only removals.
+ */
+function pairReplacedBlocks( insertions, removedTopIds, parentByClientId ) {
+	const groupIds = new Map();
+	if ( insertions.length === 0 || removedTopIds.length === 0 ) {
+		return groupIds;
+	}
+
+	const insertedByParent = new Map();
+	for ( const insertion of insertions ) {
+		const parent = insertion.parentClientId ?? null;
+		if ( ! insertedByParent.has( parent ) ) {
+			insertedByParent.set( parent, [] );
+		}
+		insertedByParent.get( parent ).push( insertion.clientId );
+	}
+
+	const removedByParent = new Map();
+	for ( const clientId of removedTopIds ) {
+		const parent = parentByClientId.get( clientId ) ?? null;
+		if ( ! removedByParent.has( parent ) ) {
+			removedByParent.set( parent, [] );
+		}
+		removedByParent.get( parent ).push( clientId );
+	}
+
+	for ( const [ parent, insertedIds ] of insertedByParent ) {
+		const removedIds = removedByParent.get( parent );
+		if ( ! removedIds ) {
+			continue;
+		}
+		const groupId = nextSuggestionGroupId();
+		for ( const clientId of [ ...insertedIds, ...removedIds ] ) {
+			groupIds.set( clientId, groupId );
+		}
+	}
+
+	return groupIds;
 }
 
 /**
@@ -1000,6 +1090,15 @@ export default function SuggestionStoreInterceptor() {
 				blockEditor.getClientIdsWithDescendants?.() ?? [];
 			const live = new Set( liveClientIds );
 
+			/*
+			 * Insertions captured during this fire. A `replaceBlocks` shows up
+			 * as an insertion here and as a removal further down, and the
+			 * removal is only known once this loop has finished — so the
+			 * insertions are recorded as they are captured and re-stamped with
+			 * a group id below if a removal turns up to pair them with.
+			 */
+			const insertionsThisFire = [];
+
 			for ( const clientId of liveClientIds ) {
 				let previous = snapshot.get( clientId );
 				const current = blockEditor.getBlockAttributes( clientId );
@@ -1101,13 +1200,24 @@ export default function SuggestionStoreInterceptor() {
 						isDispatchingOwnWrite = false;
 					}
 
-					setStructuralOpRef.current?.( clientId, block.name, {
+					const insertOp = {
 						type: 'block-insert-after',
 						clientId,
 						blockName: block.name,
 						anchorClientId,
 						parentClientId,
 						block,
+					};
+					setStructuralOpRef.current?.(
+						clientId,
+						block.name,
+						insertOp
+					);
+					insertionsThisFire.push( {
+						clientId,
+						blockName: block.name,
+						parentClientId,
+						op: insertOp,
 					} );
 					continue;
 				}
@@ -1423,6 +1533,19 @@ export default function SuggestionStoreInterceptor() {
 					tree.parentByClientId
 				);
 
+				/*
+				 * A removal and an insertion that landed in the same parent
+				 * during the same fire are the two halves of one
+				 * `replaceBlocks` — a block-switcher transform, "Group", or a
+				 * paste over a selection. Stamp both with a shared id so the
+				 * review layer can resolve them with one decision.
+				 */
+				const groupIds = pairReplacedBlocks(
+					insertionsThisFire,
+					tops,
+					tree.parentByClientId
+				);
+
 				// Phase 1: re-insert each top-level removed subtree at its
 				// previous position. Done synchronously inside `isReverting`
 				// so the resulting subscribe fires don't loop. The inserted
@@ -1467,6 +1590,7 @@ export default function SuggestionStoreInterceptor() {
 						continue;
 					}
 					const block = tree.blocksByClientId.get( clientId );
+					const groupId = groupIds.get( clientId );
 					isDispatchingOwnWrite = true;
 					try {
 						// Programmatic marker write — keep it off the undo
@@ -1478,6 +1602,7 @@ export default function SuggestionStoreInterceptor() {
 								{
 									type: 'pending-remove',
 									authorId: currentUserId,
+									...( groupId ? { groupId } : {} ),
 								}
 							),
 						} );
@@ -1488,8 +1613,54 @@ export default function SuggestionStoreInterceptor() {
 						type: 'block-remove',
 						clientId,
 						blockName: block?.name ?? '',
+						...( groupId ? { groupId } : {} ),
 						block,
 					} );
+				}
+
+				/*
+				 * Re-stamp the insertion halves. Their markers and ops were
+				 * written earlier in this fire, before the removal that pairs
+				 * with them was known, so the group id has to be added after
+				 * the fact. `setStructuralOp` replaces the entry's op, and the
+				 * marker rewrite is system metadata the next diff folds in.
+				 */
+				for ( const insertion of insertionsThisFire ) {
+					const groupId = groupIds.get( insertion.clientId );
+					if ( ! groupId ) {
+						continue;
+					}
+					const insertAttrs = blockEditor.getBlockAttributes?.(
+						insertion.clientId
+					);
+					if ( ! insertAttrs ) {
+						continue;
+					}
+					isDispatchingOwnWrite = true;
+					try {
+						blockEditorDispatch.__unstableMarkNextChangeAsNotPersistent();
+						blockEditorDispatch.updateBlockAttributes(
+							insertion.clientId,
+							{
+								metadata: withSuggestionMarker(
+									insertAttrs.metadata,
+									{
+										...insertAttrs.metadata?.suggestion,
+										type: 'pending-insert',
+										authorId: currentUserId,
+										groupId,
+									}
+								),
+							}
+						);
+					} finally {
+						isDispatchingOwnWrite = false;
+					}
+					setStructuralOpRef.current?.(
+						insertion.clientId,
+						insertion.blockName,
+						{ ...insertion.op, groupId }
+					);
 				}
 
 				// Re-seed the snapshot for every block that came back via
@@ -1550,6 +1721,7 @@ export {
 	isPartOfPendingInsertion,
 	captureTreeSnapshot,
 	topLevelRemoved,
+	pairReplacedBlocks,
 	withSuggestionMarker,
 	lcsClientIds,
 	stableSiblingSet,

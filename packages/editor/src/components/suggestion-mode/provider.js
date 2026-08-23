@@ -741,10 +741,14 @@ export function useSuggestionsProvider() {
 	 *                                           live tree by `metadata.noteId`.
 	 * @param {SuggestionPayload} args.payload   Parsed payload (from
 	 *                                           `parseSuggestionPayload`).
+	 * @param {boolean}           [args.silent]  Suppress the success snackbar.
+	 *                                           Set when resolving the other
+	 *                                           half of a grouped suggestion so
+	 *                                           one gesture reports once.
 	 * @return {Promise<void>}
 	 */
-	const applySuggestion = useCallback(
-		async ( { commentId, clientId, payload } ) => {
+	const applyOneSuggestion = useCallback(
+		async ( { commentId, clientId, payload, silent } ) => {
 			if ( ! payload || ! Array.isArray( payload.operations ) ) {
 				createNotice( 'error', __( 'Invalid suggestion payload.' ), {
 					type: 'snackbar',
@@ -843,10 +847,12 @@ export function useSuggestionsProvider() {
 						{ throwOnError: true }
 					);
 
-					createNotice( 'snackbar', __( 'Suggestion applied.' ), {
-						type: 'snackbar',
-						isDismissible: true,
-					} );
+					if ( ! silent ) {
+						createNotice( 'snackbar', __( 'Suggestion applied.' ), {
+							type: 'snackbar',
+							isDismissible: true,
+						} );
+					}
 				} catch ( error ) {
 					// Roll the attribute back so the block isn't left
 					// half-applied if the server rejected the status update.
@@ -950,10 +956,12 @@ export function useSuggestionsProvider() {
 						clearOverlay( targetClientId );
 					}
 
-					createNotice( 'snackbar', __( 'Suggestion applied.' ), {
-						type: 'snackbar',
-						isDismissible: true,
-					} );
+					if ( ! silent ) {
+						createNotice( 'snackbar', __( 'Suggestion applied.' ), {
+							type: 'snackbar',
+							isDismissible: true,
+						} );
+					}
 				} catch ( error ) {
 					createNotice(
 						'error',
@@ -1016,10 +1024,12 @@ export function useSuggestionsProvider() {
 					{ throwOnError: true }
 				);
 
-				createNotice( 'snackbar', __( 'Suggestion applied.' ), {
-					type: 'snackbar',
-					isDismissible: true,
-				} );
+				if ( ! silent ) {
+					createNotice( 'snackbar', __( 'Suggestion applied.' ), {
+						type: 'snackbar',
+						isDismissible: true,
+					} );
+				}
 			} catch ( error ) {
 				// Roll back the block change so the UI isn't left in a
 				// half-applied state if the server rejected the update.
@@ -1063,10 +1073,13 @@ export function useSuggestionsProvider() {
 	 *                                            structural op so the marker
 	 *                                            can be cleared on the live
 	 *                                            block.
+	 * @param {boolean}           [args.silent]   Suppress the success snackbar.
+	 *                                            Set when resolving the other
+	 *                                            half of a grouped suggestion.
 	 * @return {Promise<void>}
 	 */
-	const rejectSuggestion = useCallback(
-		async ( { commentId, clientId, payload } ) => {
+	const rejectOneSuggestion = useCallback(
+		async ( { commentId, clientId, payload, silent } ) => {
 			// Inline suggestions: reject restores the block's pre-suggestion
 			// content for the marked attribute — a deletion keeps the text and
 			// drops the marker, an addition removes the proposed text with its
@@ -1142,11 +1155,13 @@ export function useSuggestionsProvider() {
 							{ throwOnError: true }
 						);
 
-						createNotice(
-							'snackbar',
-							__( 'Suggestion rejected.' ),
-							{ type: 'snackbar', isDismissible: true }
-						);
+						if ( ! silent ) {
+							createNotice(
+								'snackbar',
+								__( 'Suggestion rejected.' ),
+								{ type: 'snackbar', isDismissible: true }
+							);
+						}
 					} catch ( error ) {
 						// Roll the attribute back so the content isn't left
 						// inconsistent with a still-pending comment if the
@@ -1252,10 +1267,12 @@ export function useSuggestionsProvider() {
 					}
 				}
 
-				createNotice( 'snackbar', __( 'Suggestion rejected.' ), {
-					type: 'snackbar',
-					isDismissible: true,
-				} );
+				if ( ! silent ) {
+					createNotice( 'snackbar', __( 'Suggestion rejected.' ), {
+						type: 'snackbar',
+						isDismissible: true,
+					} );
+				}
 			} catch ( error ) {
 				createNotice(
 					'error',
@@ -1278,6 +1295,101 @@ export function useSuggestionsProvider() {
 			clearOverlayForComment,
 			registry,
 		]
+	);
+
+	/**
+	 * Collect the OTHER pending suggestions that belong to the same
+	 * replacement group as the one being resolved.
+	 *
+	 * A `replaceBlocks` — the block switcher's transform, "Group", a paste
+	 * over a selection — is captured as a removal plus an insertion, and the
+	 * interceptor stamps both halves with a shared `metadata.suggestion
+	 * .groupId`. They are one logical change: accepting the insertion alone
+	 * leaves the original block behind as a duplicate, and rejecting it alone
+	 * leaves a hole where the original used to be. The group is resolved from
+	 * the live tree rather than from the payload so it survives a reload,
+	 * where every clientId in a stored payload is stale but the marker on each
+	 * block still carries the group id and its own `metadata.noteId`.
+	 *
+	 * @param {Object}            args           Arguments.
+	 * @param {number|string}     args.commentId Comment being resolved.
+	 * @param {SuggestionPayload} [args.payload] Its parsed payload.
+	 * @return {Array<{commentId: number|string, clientId: string, payload: SuggestionPayload}>}
+	 * Partner suggestions, or an empty array when this one is not grouped.
+	 */
+	const findGroupPartners = useCallback(
+		( { commentId, payload } ) => {
+			const groupId = findStructuralOp( payload?.operations )?.groupId;
+			if ( ! groupId ) {
+				return [];
+			}
+			const partners = [];
+			const seen = new Set( [ String( commentId ) ] );
+			const liveIds = selectClientIdsWithDescendants?.() ?? [];
+			for ( const id of liveIds ) {
+				const metadata = selectBlockAttributes( id )?.metadata;
+				if ( metadata?.suggestion?.groupId !== groupId ) {
+					continue;
+				}
+				for ( const noteId of getNoteIdsFromMetadata( metadata ) ) {
+					if ( seen.has( String( noteId ) ) ) {
+						continue;
+					}
+					seen.add( String( noteId ) );
+					const comment = registry
+						.select( coreStore )
+						.getEntityRecord( 'root', 'comment', noteId );
+					const status = comment?.meta?._wp_suggestion_status;
+					if ( status === 'applied' || status === 'rejected' ) {
+						continue;
+					}
+					const partnerPayload = parseSuggestionPayload(
+						comment?.meta?._wp_suggestion
+					);
+					if (
+						findStructuralOp( partnerPayload?.operations )
+							?.groupId !== groupId
+					) {
+						continue;
+					}
+					partners.push( {
+						commentId: noteId,
+						clientId: id,
+						payload: partnerPayload,
+					} );
+				}
+			}
+			return partners;
+		},
+		[ selectClientIdsWithDescendants, selectBlockAttributes, registry ]
+	);
+
+	/*
+	 * Public apply / reject. Partners are resolved BEFORE the decision runs:
+	 * applying a removal takes its block out of the tree, and the scan reads
+	 * the group off the live blocks. Only the first decision reports through a
+	 * snackbar — the group is one change and one gesture.
+	 */
+	const applySuggestion = useCallback(
+		async ( args ) => {
+			const partners = findGroupPartners( args );
+			await applyOneSuggestion( args );
+			for ( const partner of partners ) {
+				await applyOneSuggestion( { ...partner, silent: true } );
+			}
+		},
+		[ applyOneSuggestion, findGroupPartners ]
+	);
+
+	const rejectSuggestion = useCallback(
+		async ( args ) => {
+			const partners = findGroupPartners( args );
+			await rejectOneSuggestion( args );
+			for ( const partner of partners ) {
+				await rejectOneSuggestion( { ...partner, silent: true } );
+			}
+		},
+		[ rejectOneSuggestion, findGroupPartners ]
 	);
 
 	// Decisions are wrapped so the note garbage collector can distinguish a

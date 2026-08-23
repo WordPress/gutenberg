@@ -1148,4 +1148,181 @@ test.describe( 'Suggestion mode review flows', () => {
 		} );
 		expect( attributeNoteStatuses ).toEqual( [ 'hold' ] );
 	} );
+
+	// --- Review: block replacement (transform) -------------------------------
+
+	/**
+	 * Transform the first paragraph into a Quote through the block switcher.
+	 *
+	 * @param {import('@playwright/test').Page} page   Playwright page.
+	 * @param {Object}                          editor Editor utils.
+	 */
+	async function transformParagraphToQuote( page, editor ) {
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first()
+			.click();
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Paragraph' } )
+			.click();
+		await page
+			.getByRole( 'menuitem', { name: 'Quote', exact: true } )
+			.click();
+	}
+
+	/**
+	 * Read every suggestion note's lifecycle status straight from the REST
+	 * API. The sidebar drops a card whose block has left the tree, so an
+	 * accepted removal can't be confirmed from the DOM.
+	 *
+	 * @param {import('@playwright/test').Page} page Playwright page.
+	 * @return {Promise<string[]>} Statuses, oldest note first.
+	 */
+	async function suggestionStatuses( page ) {
+		return page.evaluate( async () => {
+			// Scoped to this post: earlier tests in the same worker leave
+			// their own pending notes behind until the suite's afterAll.
+			const postId = window.wp.data
+				.select( 'core/editor' )
+				.getCurrentPostId();
+			const notes = await window.wp.apiFetch( {
+				path: `/wp/v2/comments?type=note&status=any&per_page=50&order=asc&post=${ postId }`,
+			} );
+			return notes
+				.filter( ( note ) => !! note.meta?._wp_suggestion )
+				.map(
+					( note ) => note.meta?._wp_suggestion_status || 'pending'
+				);
+		} );
+	}
+
+	test( 'transform — a block-switcher transform links both halves with one group id', async ( {
+		editor,
+		page,
+	} ) => {
+		// `replaceBlocks` is captured as a removal plus an insertion. They
+		// are one logical change, so both halves must carry the same
+		// `metadata.suggestion.groupId` — without it a reviewer can accept
+		// one and reject the other and end up with a duplicate or a hole.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Transform me' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const suggestionSaved = suggestionSavedPromise( page );
+		await transformParagraphToQuote( page, editor );
+		await suggestionSaved;
+
+		const blocks = await editor.getBlocks();
+		const removed = blocks.find(
+			( block ) =>
+				block.attributes?.metadata?.suggestion?.type ===
+				'pending-remove'
+		);
+		const inserted = blocks.find(
+			( block ) =>
+				block.attributes?.metadata?.suggestion?.type ===
+				'pending-insert'
+		);
+		expect( removed?.name ).toBe( 'core/paragraph' );
+		expect( inserted?.name ).toBe( 'core/quote' );
+		expect( inserted.attributes.metadata.suggestion.groupId ).toBeTruthy();
+		expect( removed.attributes.metadata.suggestion.groupId ).toBe(
+			inserted.attributes.metadata.suggestion.groupId
+		);
+	} );
+
+	test( 'accept — accepting one half of a transform resolves both halves', async ( {
+		editor,
+		page,
+	} ) => {
+		// Accepting only the insertion used to leave the original paragraph
+		// behind, still flagged for removal: one transform, two blocks, one
+		// still-pending note.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Transform me' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const suggestionSaved = suggestionSavedPromise( page );
+		await transformParagraphToQuote( page, editor );
+		await suggestionSaved;
+
+		await switchIntent( page, 'Editing' );
+		const sidebar = await openNotesSidebar( page );
+		await sidebar
+			.getByRole( 'button', { name: 'Accept suggestion' } )
+			.first()
+			.click();
+		await expect(
+			page
+				.locator( '.components-snackbar-list' )
+				.getByText( 'Suggestion applied.' )
+		).toBeVisible();
+
+		// The quote is the only block left, with no pending treatment and
+		// no leftover paragraph beside it.
+		await expect
+			.poll( async () =>
+				( await editor.getBlocks() ).map( ( block ) => block.name )
+			)
+			.toEqual( [ 'core/quote' ] );
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).toContain( '<!-- wp:quote' );
+		expect( serialized ).not.toContain( 'pending-remove' );
+		expect( serialized ).not.toContain( 'pending-insert' );
+
+		// Both notes are resolved by the single decision.
+		await expect
+			.poll( () => suggestionStatuses( page ) )
+			.toEqual( [ 'applied', 'applied' ] );
+	} );
+
+	test( 'reject — rejecting one half of a transform withdraws the whole change', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Transform me' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const suggestionSaved = suggestionSavedPromise( page );
+		await transformParagraphToQuote( page, editor );
+		await suggestionSaved;
+
+		await switchIntent( page, 'Editing' );
+		const sidebar = await openNotesSidebar( page );
+		await sidebar
+			.getByRole( 'button', { name: 'Reject suggestion' } )
+			.first()
+			.click();
+		await expect(
+			page
+				.locator( '.components-snackbar-list' )
+				.getByText( 'Suggestion rejected.' )
+		).toBeVisible();
+
+		// The document is back to the paragraph it started as.
+		await expect
+			.poll( async () =>
+				( await editor.getBlocks() ).map( ( block ) => block.name )
+			)
+			.toEqual( [ 'core/paragraph' ] );
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).toContain( 'Transform me' );
+		expect( serialized ).not.toContain( '<!-- wp:quote' );
+		expect( serialized ).not.toContain( 'suggestion' );
+
+		await expect
+			.poll( () => suggestionStatuses( page ) )
+			.toEqual( [ 'rejected', 'rejected' ] );
+	} );
 } );

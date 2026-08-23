@@ -25,6 +25,7 @@ import SuggestionStoreInterceptor, {
 	withSuggestionMarker,
 	lcsClientIds,
 	stableSiblingSet,
+	pairReplacedBlocks,
 } from '../store-interceptor';
 import {
 	SuggestionOverlayProvider,
@@ -612,6 +613,73 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 			anchorClientId: clientId,
 			parentClientId: null,
 		} );
+	} );
+
+	it( 'links the two halves of a block-switcher transform with a shared group id', async () => {
+		// A transform dispatches `replaceBlocks`: the old block disappears
+		// and a new one appears in the same store update. Diffed
+		// independently that is a removal suggestion plus an insertion
+		// suggestion, and resolving one without the other leaves either a
+		// duplicate block or a hole. Both halves must carry one group id.
+		const original = createBlock( TEST_BLOCK_NAME, { content: 'Before' } );
+		const { registry, getOverlay } = setup( {
+			initialBlocks: [ original ],
+		} );
+
+		const replacement = createBlock( TEST_BLOCK_NAME, {
+			content: 'After',
+		} );
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.replaceBlocks( original.clientId, replacement );
+		} );
+		await flushSubscribers();
+
+		const select = registry.select( blockEditorStore );
+		const removedMarker = select.getBlockAttributes( original.clientId )
+			?.metadata?.suggestion;
+		const insertedMarker = select.getBlockAttributes( replacement.clientId )
+			?.metadata?.suggestion;
+
+		expect( removedMarker?.type ).toBe( 'pending-remove' );
+		expect( insertedMarker?.type ).toBe( 'pending-insert' );
+		expect( insertedMarker?.groupId ).toEqual( expect.any( String ) );
+		expect( removedMarker?.groupId ).toBe( insertedMarker?.groupId );
+
+		// The persisted ops carry the same id, so the linkage survives a
+		// reload where every captured clientId is stale.
+		const entries = getOverlay().entries;
+		expect( entries[ original.clientId ]?.structuralOp ).toMatchObject( {
+			type: 'block-remove',
+			groupId: removedMarker.groupId,
+		} );
+		expect( entries[ replacement.clientId ]?.structuralOp ).toMatchObject( {
+			type: 'block-insert-after',
+			groupId: removedMarker.groupId,
+		} );
+	} );
+
+	it( 'leaves a plain insertion ungrouped', async () => {
+		// Only a fire that holds BOTH halves is a replacement. Inserting a
+		// block on its own must stay a standalone suggestion, or an
+		// unrelated note would be dragged into its decision.
+		const { registry } = setup();
+
+		const inserted = createBlock( TEST_BLOCK_NAME, { content: 'New' } );
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.insertBlock( inserted, 1, undefined, false );
+		} );
+		await flushSubscribers();
+
+		expect(
+			registry
+				.select( blockEditorStore )
+				.getBlockAttributes( inserted.clientId )?.metadata?.suggestion
+				?.groupId
+		).toBeUndefined();
 	} );
 
 	it( 'adopts a resetBlocks as the new baseline instead of capturing it', async () => {
@@ -1690,5 +1758,79 @@ describe( 'isPartOfPendingInsertion', () => {
 
 	it( 'returns false when selectors are unavailable', () => {
 		expect( isPartOfPendingInsertion( undefined, 'a' ) ).toBe( false );
+	} );
+} );
+
+describe( 'pairReplacedBlocks', () => {
+	it( 'returns no groups when the fire held only insertions', () => {
+		expect(
+			pairReplacedBlocks(
+				[ { clientId: 'new', parentClientId: null } ],
+				[],
+				new Map()
+			).size
+		).toBe( 0 );
+	} );
+
+	it( 'returns no groups when the fire held only removals', () => {
+		expect(
+			pairReplacedBlocks(
+				[],
+				[ 'gone' ],
+				new Map( [ [ 'gone', null ] ] )
+			).size
+		).toBe( 0 );
+	} );
+
+	it( 'gives both halves of a same-parent replacement one shared id', () => {
+		const groups = pairReplacedBlocks(
+			[ { clientId: 'quote', parentClientId: null } ],
+			[ 'paragraph' ],
+			new Map( [ [ 'paragraph', null ] ] )
+		);
+		expect( groups.get( 'quote' ) ).toEqual( expect.any( String ) );
+		expect( groups.get( 'paragraph' ) ).toBe( groups.get( 'quote' ) );
+	} );
+
+	it( 'groups a many-to-one transform under a single id', () => {
+		const groups = pairReplacedBlocks(
+			[ { clientId: 'quote', parentClientId: null } ],
+			[ 'p1', 'p2', 'p3' ],
+			new Map( [
+				[ 'p1', null ],
+				[ 'p2', null ],
+				[ 'p3', null ],
+			] )
+		);
+		const groupId = groups.get( 'quote' );
+		expect( groups.get( 'p1' ) ).toBe( groupId );
+		expect( groups.get( 'p2' ) ).toBe( groupId );
+		expect( groups.get( 'p3' ) ).toBe( groupId );
+	} );
+
+	it( 'does not pair an insertion with a removal in a different parent', () => {
+		const groups = pairReplacedBlocks(
+			[ { clientId: 'inGroup', parentClientId: 'group' } ],
+			[ 'atRoot' ],
+			new Map( [ [ 'atRoot', null ] ] )
+		);
+		expect( groups.size ).toBe( 0 );
+	} );
+
+	it( 'mints a distinct id per parent', () => {
+		const groups = pairReplacedBlocks(
+			[
+				{ clientId: 'newRoot', parentClientId: null },
+				{ clientId: 'newInner', parentClientId: 'group' },
+			],
+			[ 'oldRoot', 'oldInner' ],
+			new Map( [
+				[ 'oldRoot', null ],
+				[ 'oldInner', 'group' ],
+			] )
+		);
+		expect( groups.get( 'newRoot' ) ).toBe( groups.get( 'oldRoot' ) );
+		expect( groups.get( 'newInner' ) ).toBe( groups.get( 'oldInner' ) );
+		expect( groups.get( 'newRoot' ) ).not.toBe( groups.get( 'newInner' ) );
 	} );
 } );
