@@ -15,12 +15,16 @@
  * The session `Set` guard is what distinguishes a genuine removal (seen, now
  * gone) from content that simply has not loaded its marker yet.
  *
- * @param {boolean|null|undefined} markerPresent Whether the marker was found in content; null/undefined when undeterminable.
- * @param {*}                      id            Stable marker id, used as the key in `anchored`.
- * @param {Set}                    anchored      Ids whose marker has been observed present this session.
- * @return {'anchor'|'delete'|'skip'} The action to take.
+ * @param markerPresent Whether the marker was found in content; null/undefined when undeterminable.
+ * @param id            Stable marker id, used as the key in `anchored`.
+ * @param anchored      Ids whose marker has been observed present this session.
+ * @return The action to take.
  */
-export function reconcileMarkerRemoval( markerPresent, id, anchored ) {
+export function reconcileMarkerRemoval(
+	markerPresent: boolean | null | undefined,
+	id: any,
+	anchored: Set< any >
+): 'anchor' | 'delete' | 'skip' {
 	if ( markerPresent === null || markerPresent === undefined ) {
 		return 'skip';
 	}

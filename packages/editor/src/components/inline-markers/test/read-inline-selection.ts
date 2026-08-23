@@ -3,11 +3,11 @@ import { readInlineSelection } from '../read-inline-selection';
 /**
  * Build the two block-editor selection selectors from a single pair of points.
  *
- * @param {Object} start Selection start point.
- * @param {Object} end   Selection end point.
- * @return {[Function, Function]} `[getSelectionStart, getSelectionEnd]`.
+ * @param start Selection start point.
+ * @param end   Selection end point.
+ * @return `[getSelectionStart, getSelectionEnd]`.
  */
-function selectors( start, end ) {
+function selectors( start: any, end: any ) {
 	return [ () => start, () => end ];
 }
 

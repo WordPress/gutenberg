@@ -11,7 +11,7 @@ import { findMarkerRange } from '../find-marker-range';
 const FORMAT_NAME = 'test/marker';
 
 const isRegistered = () =>
-	!! select( richTextStore ).getFormatType( FORMAT_NAME );
+	!! ( select( richTextStore as any ) as any ).getFormatType( FORMAT_NAME );
 
 describe( 'wrapInlineMarker', () => {
 	beforeAll( () => {
@@ -22,7 +22,7 @@ describe( 'wrapInlineMarker', () => {
 				className: 'wp-marker',
 				attributes: { 'data-id': 'data-id' },
 				edit: () => null,
-			} );
+			} as any );
 		}
 	} );
 
@@ -60,7 +60,7 @@ describe( 'wrapInlineMarker', () => {
 			end: 11,
 		} );
 		expect( wrapped ).toBeInstanceOf( RichTextData );
-		const html = wrapped.toHTMLString();
+		const html = wrapped!.toHTMLString();
 		expect( html ).toContain( 'data-id="7"' );
 		expect( html ).toContain( 'world' );
 	} );

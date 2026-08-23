@@ -6,11 +6,14 @@
  * when nothing is selected. Returns null for block-level or cross-attribute
  * selections.
  *
- * @param {Function} getSelectionStart Block-editor selector.
- * @param {Function} getSelectionEnd   Block-editor selector.
- * @return {?Object} { clientId, attributeKey, start, end } or null.
+ * @param getSelectionStart Block-editor selector.
+ * @param getSelectionEnd   Block-editor selector.
+ * @return `{ clientId, attributeKey, start, end }` or null.
  */
-export function readInlineCaret( getSelectionStart, getSelectionEnd ) {
+export function readInlineCaret(
+	getSelectionStart: () => any,
+	getSelectionEnd: () => any
+) {
 	const start = getSelectionStart();
 	const end = getSelectionEnd();
 	if (

@@ -10,7 +10,7 @@ import { findMarkerRange, findMarkerText } from '../find-marker-range';
 const FORMAT_NAME = 'test/marker';
 
 const isRegistered = () =>
-	!! select( richTextStore ).getFormatType( FORMAT_NAME );
+	!! ( select( richTextStore as any ) as any ).getFormatType( FORMAT_NAME );
 
 const options = {
 	formatType: FORMAT_NAME,
@@ -30,7 +30,7 @@ describe( 'findMarkerRange', () => {
 					'data-suggestion-id': 'data-suggestion-id',
 				},
 				edit: () => null,
-			} );
+			} as any );
 		}
 	} );
 
@@ -207,7 +207,7 @@ describe( 'findMarkerText', () => {
 					'data-suggestion-id': 'data-suggestion-id',
 				},
 				edit: () => null,
-			} );
+			} as any );
 		}
 	} );
 

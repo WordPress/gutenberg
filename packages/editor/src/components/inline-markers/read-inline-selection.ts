@@ -3,11 +3,14 @@
  * normalized anchor data when a non-collapsed selection sits inside a single
  * rich-text attribute. Returns null for block-level or collapsed selections.
  *
- * @param {Function} getSelectionStart Block-editor selector.
- * @param {Function} getSelectionEnd   Block-editor selector.
- * @return {?Object} { clientId, attributeKey, start, end } or null.
+ * @param getSelectionStart Block-editor selector.
+ * @param getSelectionEnd   Block-editor selector.
+ * @return `{ clientId, attributeKey, start, end }` or null.
  */
-export function readInlineSelection( getSelectionStart, getSelectionEnd ) {
+export function readInlineSelection(
+	getSelectionStart: () => any,
+	getSelectionEnd: () => any
+) {
 	const start = getSelectionStart();
 	const end = getSelectionEnd();
 	if (
