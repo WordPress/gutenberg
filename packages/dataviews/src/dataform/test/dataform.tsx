@@ -2,6 +2,7 @@ import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
+import { getSettings, setSettings } from '@wordpress/date';
 import Dataform from '../index';
 import useFormValidity from '../../hooks/use-form-validity';
 
@@ -1072,6 +1073,22 @@ describe( 'DataForm component', () => {
 	} );
 
 	describe( 'datetime fields', () => {
+		const originalSettings = getSettings();
+
+		beforeEach( () => {
+			setSettings( {
+				...originalSettings,
+				timezone: {
+					...originalSettings.timezone,
+					string: 'UTC',
+				},
+			} );
+		} );
+
+		afterEach( () => {
+			setSettings( originalSettings );
+		} );
+
 		const datetimeFields = [
 			{
 				id: 'date',
