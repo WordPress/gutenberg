@@ -19,14 +19,17 @@
  *   - **Rename block:** — the one attribute change worth its own line: a
  *                        block renamed through `metadata.name`, reported
  *                        with the name being proposed.
- *   - **Formatting:**  — pure inline-format changes (bold, italic, links).
+ *   - **Add formatting: / Remove formatting:**
+ *                      — pure inline-format changes (bold, italic, links).
  *                        Detected by tag-level diff of the serialized HTML
  *                        and de-duplicated by `joinLabels` so multiple span
- *                        edits don't list the same format twice.
+ *                        edits don't list the same format twice. The two
+ *                        directions are opposite proposals, so they get
+ *                        opposite labels.
  *
- * "Change:" and "Formatting:" name two different families of suggestion, so
- * they have to be readable as two different things in a mixed list. They were
- * once "Format:" and "Formatting:", one word apart.
+ * "Change:" and the two "… formatting:" labels name different families of
+ * suggestion, so they have to be readable as different things in a mixed list.
+ * The attribute family was once "Format:", one word from "Formatting:".
  *
  * Quoted lines report what a reviewer would read on screen: the diff behind
  * them runs on visible text, never on the raw content attribute, so no markup
@@ -128,9 +131,9 @@ function friendlyBlockName( blockName ) {
 /**
  * Mapping of inline HTML tags — as emitted by RichText serialization — to
  * human-readable format names. The key is the lower-cased tag name; the
- * value is what appears in a "Formatting:" line. Tags not in this map are
- * reported by their raw name (``<mark>`` → "mark") so a future rich-text
- * format isn't silently swallowed.
+ * value is what appears in an "Add formatting:" or "Remove formatting:" line.
+ * Tags not in this map are reported by their raw name (``<mark>`` → "mark")
+ * so a future rich-text format isn't silently swallowed.
  */
 const INLINE_FORMAT_TAG_LABELS = {
 	strong: __( 'bold' ),
@@ -202,29 +205,52 @@ function countTags( html ) {
 }
 
 /**
- * Diff the tag usage between two HTML strings. Returns a set of format
- * names (mapped via `INLINE_FORMAT_TAG_LABELS`) whose count differs, which
- * indicates an inline format was added or removed regardless of direction.
+ * Roll the tag counts of an HTML string up to display labels. Several tags
+ * render as the same format — `<b>` and `<strong>` are both "bold" — so a
+ * tag-level count would read a `<b>` rewritten as `<strong>` as bold being
+ * both added and removed. Counting by label instead makes that swap net out.
+ *
+ * @param {string} html Possibly-HTML content.
+ * @return {Map<string, number>} Format label → count.
+ */
+function countFormatLabels( html ) {
+	const byLabel = new Map();
+	for ( const [ tag, count ] of countTags( html ) ) {
+		const label = INLINE_FORMAT_TAG_LABELS[ tag ] ?? tag;
+		byLabel.set( label, ( byLabel.get( label ) ?? 0 ) + count );
+	}
+	return byLabel;
+}
+
+/**
+ * Diff the format usage between two HTML strings, keeping the direction of
+ * each change. Bolding a run and un-bolding one are opposite proposals, and a
+ * reviewer reading the sidebar has to be able to tell which one is on offer.
+ *
+ * A format whose count is unchanged is not reported at all — that covers both
+ * a tag rewritten to a synonym and a format added in one place while being
+ * removed in another, neither of which has a direction worth stating.
  *
  * @param {string} before HTML before the edit.
  * @param {string} after  HTML after the edit.
- * @return {string[]} Ordered, deduplicated list of changed format labels.
+ * @return {{added: string[], removed: string[]}} Deduplicated format labels
+ * the edit introduces and takes away, in document order.
  */
 function diffInlineFormats( before, after ) {
-	const beforeCounts = countTags( before );
-	const afterCounts = countTags( after );
-	const changed = new Set();
-	const tags = new Set( [ ...beforeCounts.keys(), ...afterCounts.keys() ] );
-	for ( const tag of tags ) {
-		if (
-			( beforeCounts.get( tag ) ?? 0 ) === ( afterCounts.get( tag ) ?? 0 )
-		) {
+	const beforeCounts = countFormatLabels( before );
+	const afterCounts = countFormatLabels( after );
+	const added = new Set();
+	const removed = new Set();
+	const labels = new Set( [ ...beforeCounts.keys(), ...afterCounts.keys() ] );
+	for ( const label of labels ) {
+		const beforeCount = beforeCounts.get( label ) ?? 0;
+		const afterCount = afterCounts.get( label ) ?? 0;
+		if ( beforeCount === afterCount ) {
 			continue;
 		}
-		const label = INLINE_FORMAT_TAG_LABELS[ tag ] ?? tag;
-		changed.add( label );
+		( afterCount > beforeCount ? added : removed ).add( label );
 	}
-	return Array.from( changed );
+	return { added: Array.from( added ), removed: Array.from( removed ) };
 }
 
 /**
@@ -385,7 +411,8 @@ export function summarizeOperations( operations ) {
 
 	const lines = [];
 	const attributeLabels = [];
-	const formattingLabels = [];
+	const addedFormats = [];
+	const removedFormats = [];
 
 	for ( const op of operations ) {
 		if ( op.type === 'block-remove' ) {
@@ -416,15 +443,17 @@ export function summarizeOperations( operations ) {
 		// through to the generic attribute label rather than an empty quote.
 		if ( op.type === 'inline-suggestion' ) {
 			// A format suggestion changes only the run's markup, so surface
-			// which formats changed ("Formatting: bold") from the captured
-			// before/after HTML rather than quoting the (unchanged) text.
+			// which formats changed, and in which direction ("Add
+			// formatting: bold"), from the captured before/after HTML rather
+			// than quoting the (unchanged) text.
 			if ( op.suggestionType === 'format' ) {
-				const changedFormats = diffInlineFormats(
+				const { added, removed } = diffInlineFormats(
 					op.beforeHTML ?? '',
 					op.afterHTML ?? ''
 				);
-				if ( changedFormats.length > 0 ) {
-					formattingLabels.push( ...changedFormats );
+				if ( added.length > 0 || removed.length > 0 ) {
+					addedFormats.push( ...added );
+					removedFormats.push( ...removed );
 				} else {
 					attributeLabels.push( op.attribute );
 				}
@@ -517,12 +546,13 @@ export function summarizeOperations( operations ) {
 		const afterText = stripTags( after );
 
 		// A pure inline-format change produces identical visible text with
-		// different markup — surface it as "Formatting: bold" rather than
+		// different markup — surface it as "Add formatting: bold" rather than
 		// leaking raw `<strong>…</strong>` into an Add/Delete quote.
 		if ( beforeText === afterText && before !== after ) {
-			const changedFormats = diffInlineFormats( before, after );
-			if ( changedFormats.length > 0 ) {
-				formattingLabels.push( ...changedFormats );
+			const { added, removed } = diffInlineFormats( before, after );
+			if ( added.length > 0 || removed.length > 0 ) {
+				addedFormats.push( ...added );
+				removedFormats.push( ...removed );
 			} else {
 				attributeLabels.push( op.attribute );
 			}
@@ -544,10 +574,22 @@ export function summarizeOperations( operations ) {
 		}
 	}
 
-	if ( formattingLabels.length > 0 ) {
+	/*
+	 * Two lines, not one: bolding a run and un-bolding one are opposite
+	 * proposals, and a single "Formatting: bold" label read the same either
+	 * way — a reviewer had to open the canvas to find out which was meant.
+	 */
+	if ( addedFormats.length > 0 ) {
 		lines.push( {
-			label: __( 'Formatting:' ),
-			value: joinLabels( formattingLabels ),
+			label: __( 'Add formatting:' ),
+			value: joinLabels( addedFormats ),
+		} );
+	}
+
+	if ( removedFormats.length > 0 ) {
+		lines.push( {
+			label: __( 'Remove formatting:' ),
+			value: joinLabels( removedFormats ),
 		} );
 	}
 
