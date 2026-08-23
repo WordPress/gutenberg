@@ -36,9 +36,33 @@ export type DuotonePickerProps = {
 	 */
 	value?: string[] | 'unset';
 	/**
-	 * Callback which is called when the duotone colors change.
+	 * The slug of the selected duotone preset. When a non-empty `selectedSlug`
+	 * is provided, selection is decided strictly by slug, which keeps two
+	 * presets holding the same pair of colors apart. Presets whose slug does
+	 * not match will not appear selected in this mode, even if their colors
+	 * match `value`.
+	 *
+	 * An empty string is treated the same as `undefined`: selection falls back
+	 * to matching by color value.
 	 */
-	onChange: ( value: DuotonePickerProps[ 'value' ] | undefined ) => void;
+	selectedSlug?: string;
+	/**
+	 * Callback which is called when the duotone colors change.
+	 *
+	 * When the change comes from picking a preset out of `duotonePalette`, the
+	 * preset's index and slug are passed too. Two presets can hold the same
+	 * pair of colors, so the value alone does not identify which one was
+	 * picked.
+	 *
+	 * Both are omitted whenever no preset is being picked: the custom, unset
+	 * and clear controls, and deselecting the currently selected preset, which
+	 * reports `undefined` alone.
+	 */
+	onChange: (
+		value: DuotonePickerProps[ 'value' ] | undefined,
+		index?: number,
+		slug?: string
+	) => void;
 	/**
 	 * Whether the control should present as a set of buttons,
 	 * each with its own tab stop.

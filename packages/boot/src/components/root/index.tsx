@@ -11,17 +11,19 @@ import {
 import { menu } from '@wordpress/icons';
 import { useState, useEffect, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { UnsavedChangesWarning } from '@wordpress/editor';
 import { Page, getAdminThemeColors } from '@wordpress/admin-ui';
 import { Tooltip } from '@wordpress/ui';
 import { ThemeProvider } from '@wordpress/theme';
 import Sidebar from '../sidebar';
 import SavePanel from '../save-panel';
 import CanvasRenderer from '../canvas-renderer';
+import ErrorBoundary from '../error-boundary';
 import useRouteTitle from '../app/use-route-title';
 import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
 import useSyncBodyBackground from './use-sync-body-background';
-import './style.scss';
+import styles from './style.module.scss';
 
 const { useLocation, useMatches, Outlet } = unlock( routePrivateApis );
 
@@ -62,13 +64,17 @@ export default function Root() {
 					<ThemeProvider color={ themeColors }>
 						<div
 							ref={ layoutRef }
-							className={ clsx( 'boot-layout', {
-								'has-canvas': !! canvas || canvas === null,
-								'has-full-canvas': isFullScreen,
+							className={ clsx( styles.layout, {
+								[ styles[ 'has-canvas' ] ]:
+									!! canvas || canvas === null,
+								[ styles[ 'has-full-canvas' ] ]: isFullScreen,
 							} ) }
 						>
+							<UnsavedChangesWarning />
 							<SavePanel />
-							<SnackbarNotices className="boot-notices__snackbar" />
+							<SnackbarNotices
+								className={ styles[ 'notices-snackbar' ] }
+							/>
 							{ isMobileViewport && (
 								<Page.SidebarToggleFill>
 									<Button
@@ -97,7 +103,9 @@ export default function Root() {
 													: 0.2,
 												ease: 'easeOut',
 											} }
-											className="boot-layout__sidebar-backdrop"
+											className={
+												styles[ 'sidebar-backdrop' ]
+											}
 											onClick={ () =>
 												setIsMobileSidebarOpen( false )
 											}
@@ -132,7 +140,10 @@ export default function Root() {
 													: 0.2,
 												ease: 'easeOut',
 											} }
-											className="boot-layout__sidebar is-mobile"
+											className={ clsx(
+												styles.sidebar,
+												styles[ 'is-mobile' ]
+											) }
 										>
 											<Sidebar />
 										</motion.div>
@@ -140,11 +151,11 @@ export default function Root() {
 							</AnimatePresence>
 							{ /* Desktop Sidebar */ }
 							{ ! isMobileViewport && ! isFullScreen && (
-								<div className="boot-layout__sidebar">
+								<div className={ styles.sidebar }>
 									<Sidebar />
 								</div>
 							) }
-							<div className="boot-layout__surfaces">
+							<div className={ styles.surfaces }>
 								<ThemeProvider
 									color={ {
 										...themeColors,
@@ -155,18 +166,23 @@ export default function Root() {
 									{ /* Render Canvas in Root to prevent remounting on route changes */ }
 									{ ( canvas || canvas === null ) && (
 										<div
-											className={ clsx(
-												'boot-layout__canvas',
-												{
-													'has-mobile-drawer':
-														canvas?.isPreview &&
-														isMobileViewport,
-												}
-											) }
+											className={ clsx( styles.canvas, {
+												[ styles[
+													'has-mobile-drawer'
+												] ]:
+													canvas?.isPreview &&
+													isMobileViewport,
+											} ) }
 										>
 											{ canvas?.isPreview &&
 												isMobileViewport && (
-													<div className="boot-layout__mobile-sidebar-drawer">
+													<div
+														className={
+															styles[
+																'mobile-sidebar-drawer'
+															]
+														}
+													>
 														<Button
 															icon={ menu }
 															onClick={ () =>
@@ -181,12 +197,14 @@ export default function Root() {
 														/>
 													</div>
 												) }
-											<CanvasRenderer
-												canvas={ canvas }
-												routeContentModule={
-													routeContentModule
-												}
-											/>
+											<ErrorBoundary>
+												<CanvasRenderer
+													canvas={ canvas }
+													routeContentModule={
+														routeContentModule
+													}
+												/>
+											</ErrorBoundary>
 										</div>
 									) }
 								</ThemeProvider>

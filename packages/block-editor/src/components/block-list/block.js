@@ -771,6 +771,11 @@ function BlockListBlockProvider( props ) {
 				blockVisibility,
 				deviceType,
 				viewportSettings,
+				supportsSplitting: hasBlockSupport(
+					blockName,
+					'splitting',
+					false
+				),
 			};
 		},
 		[ clientId, rootClientId, ghostBlock, ghostBlockWithoutAttributes ]
@@ -854,6 +859,7 @@ function BlockListBlockProvider( props ) {
 		blockVisibility,
 		deviceType,
 		viewportSettings,
+		supportsSplitting,
 	} = selectedProps;
 
 	const privateContext = {
@@ -896,6 +902,7 @@ function BlockListBlockProvider( props ) {
 		blockVisibility,
 		deviceType,
 		viewportSettings,
+		supportsSplitting,
 	};
 
 	if (
