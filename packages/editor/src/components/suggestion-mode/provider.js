@@ -426,8 +426,54 @@ function withDecisionInFlight( decide ) {
 			return await decide( args );
 		} finally {
 			decisionsInFlight.delete( key );
+			resolvedThisSession.add( key );
 		}
 	};
+}
+
+/*
+ * Suggestions this session has applied or rejected.
+ *
+ * A decision has two halves: the block change, which the undo stack holds, and
+ * the comment's lifecycle status, which lives on the server and no keystroke
+ * here can walk back. Undo therefore puts a marker back while its note stays
+ * resolved, leaving a marked-up run with no Accept/Reject on it and no way to
+ * clear it through the UI (issue #73411, F-18). The note collector watches this
+ * set and reopens a note whose marker reappears, so the two halves travel
+ * together again.
+ *
+ * Deliberately scoped to decisions made HERE rather than to every resolved note
+ * that has a live marker: a peer's decision arriving through sync before this
+ * session's content catches up looks identical from the outside, and reopening
+ * that would undo their review.
+ */
+const resolvedThisSession = new Set();
+
+/**
+ * Comment ids this session applied or rejected and has not yet reopened.
+ *
+ * @return {Set<string>} Comment id keys.
+ */
+export function getSuggestionsResolvedThisSession() {
+	return resolvedThisSession;
+}
+
+/**
+ * Forget a decision, once its note has been reopened or is past reopening.
+ *
+ * @param {number|string} commentId Comment id.
+ */
+export function forgetResolvedSuggestion( commentId ) {
+	resolvedThisSession.delete( String( commentId ) );
+}
+
+/**
+ * Record a decision again, so a failed reopen is retried on a later pass.
+ *
+ * @param {number|string} commentId Comment id.
+ */
+export function rememberResolvedSuggestion( commentId ) {
+	resolvedThisSession.add( String( commentId ) );
 }
 
 /**

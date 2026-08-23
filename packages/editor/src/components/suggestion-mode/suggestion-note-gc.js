@@ -36,8 +36,11 @@ import { useSuggestionOverlay } from './overlay-context';
 import {
 	findInlineOp,
 	findStructuralOp,
+	forgetResolvedSuggestion,
+	getSuggestionsResolvedThisSession,
 	isSuggestionDecisionInFlight,
 	parseSuggestionPayload,
+	rememberResolvedSuggestion,
 } from './provider';
 import { findSuggestionRange } from '../inline-suggestions';
 import { getNoteIdsFromMetadata } from '../collab-sidebar/utils';
@@ -156,13 +159,25 @@ export default function SuggestionNoteGC() {
 	// Pending suggestion root notes only; replies and resolved notes have no
 	// anchor contract.
 	const suggestionNotes = [];
+	/*
+	 * Notes this session applied or rejected. Their marker should be gone; if
+	 * it is back, an undo walked the block half of the decision back while the
+	 * note stayed resolved, and the note has to follow (#73411, F-18).
+	 */
+	const resolvedNotes = [];
+	const resolvedIds = getSuggestionsResolvedThisSession();
 	for ( const note of notes ?? [] ) {
-		if ( note.parent !== 0 || note.status !== 'hold' ) {
+		if ( note.parent !== 0 ) {
 			continue;
 		}
 		const anchor = describeAnchor( note );
-		if ( anchor ) {
+		if ( ! anchor ) {
+			continue;
+		}
+		if ( note.status === 'hold' ) {
 			suggestionNotes.push( { note, anchor } );
+		} else if ( resolvedIds.has( String( note.id ) ) ) {
+			resolvedNotes.push( { note, anchor } );
 		}
 	}
 
@@ -174,6 +189,8 @@ export default function SuggestionNoteGC() {
 
 	const entriesRef = useRef( entries );
 	entriesRef.current = entries;
+	const resolvedNotesRef = useRef( resolvedNotes );
+	resolvedNotesRef.current = resolvedNotes;
 	const clearOverlayRef = useRef( clearOverlay );
 	clearOverlayRef.current = clearOverlay;
 
@@ -205,6 +222,15 @@ export default function SuggestionNoteGC() {
 							blockEditor,
 							entries
 						)
+							? 1
+							: 0
+					}`
+				);
+			}
+			for ( const { note, anchor } of resolvedNotes ) {
+				parts.push(
+					`r${ note.id }:${
+						isAnchorPresent( note, anchor, blockEditor, entries )
 							? 1
 							: 0
 					}`
@@ -338,6 +364,42 @@ export default function SuggestionNoteGC() {
 				trashedRef.current.set( idKey, info );
 			} );
 		}
+		/*
+		 * Undo: a decision this session made has had its marker put back. The
+		 * comment's status is the half undo cannot reach, so reopen it here -
+		 * otherwise the run stays marked with no Accept/Reject on it and no way
+		 * to clear it through the UI (#73411, F-18). The in-flight guard keeps
+		 * this off the decision's own window, where the status can land before
+		 * the tree has been mutated.
+		 */
+		for ( const { note, anchor } of resolvedNotesRef.current ) {
+			if (
+				isSuggestionDecisionInFlight( note.id ) ||
+				! isAnchorPresent(
+					note,
+					anchor,
+					blockEditor,
+					entriesRef.current
+				)
+			) {
+				continue;
+			}
+			forgetResolvedSuggestion( note.id );
+			saveEntityRecord(
+				'root',
+				'comment',
+				{
+					id: note.id,
+					status: 'hold',
+					meta: { _wp_suggestion_status: '' },
+				},
+				{ throwOnError: true }
+			).catch( () => {
+				// Reopen failed; leave it recorded so a later pass retries.
+				rememberResolvedSuggestion( note.id );
+			} );
+		}
+
 		// `presenceSignature` fully determines the work; the other values are
 		// read through refs or stable.
 		// eslint-disable-next-line react-hooks/exhaustive-deps

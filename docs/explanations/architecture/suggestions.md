@@ -273,7 +273,7 @@ The current implementation (`provider.js`) uses comment meta. A future Yjs-backe
 
 In the notes sidebar, a suggestion thread renders:
 
-- **`SuggestionSummary`** — a Docs-style "Add: …", "Delete: …", "Format: …" summary derived from the operations. It is the sidebar's sole suggestion renderer; its `wordDiff` engine lives in `word-diff.js`, capped by `MAX_DIFF_LENGTH`/`MAX_DIFF_TOKENS` so a large payload can't freeze the sidebar.
+- **`SuggestionSummary`** — a Docs-style "Add: …", "Delete: …", "Change: …" summary derived from the operations. Inline formatting reads "Formatting: bold" and block attributes read "Change: heading level", so the two families of suggestion stay tellable apart in a mixed list. It is the sidebar's sole suggestion renderer; its `wordDiff` engine lives in `word-diff.js`, capped by `MAX_DIFF_LENGTH`/`MAX_DIFF_TOKENS` so a large payload can't freeze the sidebar.
 - **Accept / Reject icon buttons** — checkmark and close icons that trigger the provider's apply/reject flows.
 
 ## Yjs v2 Migration Path

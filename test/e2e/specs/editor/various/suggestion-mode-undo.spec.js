@@ -82,6 +82,33 @@ async function openSuggestionSummaries( page ) {
 		.locator( '.editor-collab-sidebar-panel__suggestion-summary' );
 }
 
+/**
+ * Clicks the note-header decision button and waits for the confirmation
+ * snackbar, which fires only after the comment status PATCH succeeds — so the
+ * decision is fully landed before a test presses undo.
+ *
+ * @param {import('@playwright/test').Page} page   Playwright page.
+ * @param {'Accept'|'Reject'}               action Which decision to take.
+ * @return {Promise<import('@playwright/test').Locator>} Sidebar region.
+ */
+async function decideSuggestion( page, action ) {
+	await openSuggestionSummaries( page );
+	const sidebar = page.getByRole( 'region', { name: 'Editor settings' } );
+	await sidebar
+		.getByRole( 'button', { name: `${ action } suggestion` } )
+		.click();
+	await expect(
+		page
+			.locator( '.components-snackbar-list' )
+			.getByText(
+				action === 'Accept'
+					? 'Suggestion applied.'
+					: 'Suggestion rejected.'
+			)
+	).toBeVisible();
+	return sidebar;
+}
+
 test.describe( 'Suggestion mode undo', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.setGutenbergExperiments( [
@@ -576,5 +603,117 @@ test.describe( 'Suggestion mode undo', () => {
 		expect( serialized ).toContain( 'Beta' );
 		expect( serialized ).not.toContain( 'Gamma' );
 		expect( serialized ).not.toContain( '"suggestion"' );
+	} );
+
+	// --- Undo after a review decision ---------------------------------------
+
+	/*
+	 * A decision is half editor state and half server state: the block change
+	 * lands locally, the note's resolved status lives on the comment and is
+	 * shared with every other session. Undo can only reach the first half, so
+	 * a decision that sits on the undo stack can be torn apart — the marker
+	 * comes back with a note that is already resolved, which renders no
+	 * Accept/Reject and leaves the run stuck. These tests pin the invariant
+	 * that keeps the halves together: undo never resurrects a decided marker.
+	 */
+	test( 'undo after accepting an addition reopens its note with the marker', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		const suggestionSaved = suggestionSavedPromise( page );
+		await page.keyboard.type( ' world' );
+		await expect(
+			paragraph.locator(
+				`${ SUGGESTION_MARK }[data-suggestion-type="add"]`
+			)
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		await suggestionSaved;
+
+		// Review as the post author, outside Suggest mode.
+		await switchIntent( page, 'Editing' );
+		const sidebar = await decideSuggestion( page, 'Accept' );
+
+		// The proposal is committed: text kept, marker unwrapped.
+		await expect( paragraph ).toHaveText( 'Hello world' );
+		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 0 );
+		await expect(
+			sidebar.getByText( 'Applied', { exact: true } )
+		).toBeVisible();
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		/*
+		 * Undo walks the block half of the decision back, so the marker
+		 * returns. The note has to come with it: a marker whose note stayed
+		 * resolved carries no Accept/Reject and cannot be cleared through the
+		 * UI (#73411, F-18). Asserting the marker is BACK also means this can
+		 * only pass once the undo has actually been processed.
+		 */
+		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 1 );
+		await expect(
+			sidebar.getByRole( 'button', { name: 'Accept suggestion' } )
+		).toBeVisible();
+		await expect(
+			sidebar.getByText( 'Applied', { exact: true } )
+		).toBeHidden();
+	} );
+
+	test( 'undo after rejecting an addition reopens its note with the marker', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		const suggestionSaved = suggestionSavedPromise( page );
+		await page.keyboard.type( ' world' );
+		await expect(
+			paragraph.locator(
+				`${ SUGGESTION_MARK }[data-suggestion-type="add"]`
+			)
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		await suggestionSaved;
+
+		await switchIntent( page, 'Editing' );
+		const sidebar = await decideSuggestion( page, 'Reject' );
+
+		// The proposal is withdrawn: the text goes with its marker.
+		await expect( paragraph ).toHaveText( 'Hello' );
+		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 0 );
+		await expect(
+			sidebar.getByText( 'Rejected', { exact: true } )
+		).toBeVisible();
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		// See above: the marker and its note are undone together.
+		await expect( paragraph ).toHaveText( 'Hello world' );
+		await expect( paragraph.locator( SUGGESTION_MARK ) ).toHaveCount( 1 );
+		await expect(
+			sidebar.getByRole( 'button', { name: 'Reject suggestion' } )
+		).toBeVisible();
 	} );
 } );
