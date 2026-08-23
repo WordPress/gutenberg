@@ -442,8 +442,7 @@ function ListViewBlock( {
 				// the original List View behavior. For every other block,
 				// -1 would land on the last text field (e.g. the last Table
 				// cell). Use 0 so focus enters the first editable instead.
-				initialPosition =
-					blockName === 'core/paragraph' ? -1 : 0;
+				initialPosition = blockName === 'core/paragraph' ? -1 : 0;
 			}
 			selectBlock( event, clientId, initialPosition );
 			event.preventDefault();
