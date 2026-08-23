@@ -1,8 +1,30 @@
 import { createBlobURL, isBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
 
+/**
+ * Video file extensions that indicate a URL points directly to a video.
+ *
+ * 'mp4', 'm4v', 'webm', 'ogv', 'avi', 'mov', 'wmv', 'mpg', 'mpeg', 'ogg'
+ */
+const VIDEO_EXTENSIONS =
+	/\.(?:mp4|m4v|webm|ogv|avi|mov|wmv|mpg|mpeg|ogg)(?:\?.*)?$/i;
+
 const transforms = {
 	from: [
+		{
+			type: 'raw',
+			priority: 9,
+			isMatch: ( node ) =>
+				node.nodeName === 'P' &&
+				/^\s*(https?:\/\/\S+)\s*$/i.test( node.textContent ) &&
+				node.textContent?.match( /https/gi )?.length === 1 &&
+				VIDEO_EXTENSIONS.test( node.textContent.trim() ),
+			transform: ( node ) => {
+				return createBlock( 'core/video', {
+					src: node.textContent.trim(),
+				} );
+			},
+		},
 		{
 			type: 'files',
 			isMatch( files ) {
