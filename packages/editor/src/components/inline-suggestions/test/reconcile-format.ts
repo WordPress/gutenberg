@@ -16,9 +16,10 @@ import {
 	SUGGESTION_FORMAT_NAME,
 } from '../format';
 
-const getFormatType = ( name ) => select( richTextStore ).getFormatType( name );
+const getFormatType = ( name: string ) =>
+	( select( richTextStore as any ) as any ).getFormatType( name );
 
-const rtd = ( html ) => RichTextData.fromHTMLString( html );
+const rtd = ( html: string ) => RichTextData.fromHTMLString( html );
 
 beforeAll( () => {
 	if ( ! getFormatType( SUGGESTION_FORMAT_NAME ) ) {
@@ -30,7 +31,7 @@ beforeAll( () => {
 			tagName: 'strong',
 			className: null,
 			edit: () => null,
-		} );
+		} as any );
 	}
 	if ( ! getFormatType( 'test/link' ) ) {
 		registerFormatType( 'test/link', {
@@ -39,7 +40,7 @@ beforeAll( () => {
 			className: null,
 			attributes: { href: 'href' },
 			edit: () => null,
-		} );
+		} as any );
 	}
 } );
 

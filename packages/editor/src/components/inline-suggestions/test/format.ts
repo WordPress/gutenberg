@@ -19,19 +19,21 @@ import {
 } from '../format';
 
 const isRegistered = () =>
-	!! select( richTextStore ).getFormatType( SUGGESTION_FORMAT_NAME );
+	!! ( select( richTextStore as any ) as any ).getFormatType(
+		SUGGESTION_FORMAT_NAME
+	);
 
 /**
  * Read the suggestion-type attribute off whichever marker covers `offset`.
  *
- * @param {string} html   Serialized rich-text HTML.
- * @param {number} offset Character offset to inspect.
- * @return {?string} The marker's type attribute, or null.
+ * @param html   Serialized rich-text HTML.
+ * @param offset Character offset to inspect.
+ * @return The marker's type attribute, or null.
  */
-function typeAt( html, offset ) {
+function typeAt( html: string, offset: number ): string | null {
 	const { formats } = create( { html } );
-	const hit = formats[ offset ]?.find(
-		( f ) => f.type === SUGGESTION_FORMAT_NAME
+	const hit = ( formats[ offset ] as any )?.find(
+		( f: any ) => f.type === SUGGESTION_FORMAT_NAME
 	);
 	return hit?.attributes?.[ SUGGESTION_TYPE_ATTRIBUTE ] ?? null;
 }
@@ -39,7 +41,10 @@ function typeAt( html, offset ) {
 describe( 'suggestion format', () => {
 	beforeAll( () => {
 		if ( ! isRegistered() ) {
-			registerFormatType( SUGGESTION_FORMAT_NAME, suggestionFormat );
+			registerFormatType(
+				SUGGESTION_FORMAT_NAME,
+				suggestionFormat as any
+			);
 		}
 	} );
 
@@ -113,17 +118,19 @@ describe( 'suggestion a11y role decoration', () => {
 			SUGGESTION_FORMAT_NAME,
 			SUGGESTION_A11Y_FORMAT_NAME,
 		] ) {
-			if ( select( richTextStore ).getFormatType( name ) ) {
+			if (
+				( select( richTextStore as any ) as any ).getFormatType( name )
+			) {
 				unregisterFormatType( name );
 			}
 		}
 	} );
 
-	const marker = ( id, type, text ) =>
+	const marker = ( id: number | string, type: string, text: string ) =>
 		`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="${ type }">${ text }</mark>`;
 
 	it( 'registers the editor-only decoration format', () => {
-		const format = select( richTextStore ).getFormatType(
+		const format = ( select( richTextStore as any ) as any ).getFormatType(
 			SUGGESTION_A11Y_FORMAT_NAME
 		);
 		expect( format ).toBeTruthy();
@@ -144,7 +151,7 @@ describe( 'suggestion a11y role decoration', () => {
 			const decorated = addSuggestionRoleFormats( formats );
 			for ( const i of [ 2, 3 ] ) {
 				const role = decorated[ i ].find(
-					( f ) => f.type === SUGGESTION_A11Y_FORMAT_NAME
+					( f: any ) => f.type === SUGGESTION_A11Y_FORMAT_NAME
 				);
 				expect( role?.attributes.role ).toBe( 'deletion' );
 			}
@@ -159,7 +166,7 @@ describe( 'suggestion a11y role decoration', () => {
 			} );
 			const decorated = addSuggestionRoleFormats( formats );
 			const role = decorated[ 0 ].find(
-				( f ) => f.type === SUGGESTION_A11Y_FORMAT_NAME
+				( f: any ) => f.type === SUGGESTION_A11Y_FORMAT_NAME
 			);
 			expect( role?.attributes.role ).toBe( 'insertion' );
 		} );
@@ -170,12 +177,12 @@ describe( 'suggestion a11y role decoration', () => {
 			} );
 			const decorated = addSuggestionRoleFormats( formats );
 			const first = decorated[ 0 ].find(
-				( f ) => f.type === SUGGESTION_A11Y_FORMAT_NAME
+				( f: any ) => f.type === SUGGESTION_A11Y_FORMAT_NAME
 			);
 			for ( const i of [ 1, 2 ] ) {
 				expect(
 					decorated[ i ].find(
-						( f ) => f.type === SUGGESTION_A11Y_FORMAT_NAME
+						( f: any ) => f.type === SUGGESTION_A11Y_FORMAT_NAME
 					)
 				).toBe( first );
 			}
@@ -191,10 +198,10 @@ describe( 'suggestion a11y role decoration', () => {
 			} );
 			const decorated = addSuggestionRoleFormats( formats );
 			const delRole = decorated[ 1 ].find(
-				( f ) => f.type === SUGGESTION_A11Y_FORMAT_NAME
+				( f: any ) => f.type === SUGGESTION_A11Y_FORMAT_NAME
 			);
 			const addRole = decorated[ 2 ].find(
-				( f ) => f.type === SUGGESTION_A11Y_FORMAT_NAME
+				( f: any ) => f.type === SUGGESTION_A11Y_FORMAT_NAME
 			);
 			expect( delRole.attributes.role ).toBe( 'deletion' );
 			expect( addRole.attributes.role ).toBe( 'insertion' );

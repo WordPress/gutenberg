@@ -13,8 +13,8 @@
 
 // Rich text uses a non-breaking space (\u00A0) for a trailing/collapsing
 // space, so treat it as whitespace for word-boundary detection.
-const isSpace = ( ch ) => ch === ' ' || ch === '\t' || ch === '\u00A0';
-const isNewline = ( ch ) => ch === '\n';
+const isSpace = ( ch: string ) => ch === ' ' || ch === '\t' || ch === '\u00A0';
+const isNewline = ( ch: string ) => ch === '\n';
 
 /**
  * The collapsed-caret delete input types this resolves a range for, and whether
@@ -36,12 +36,16 @@ const FORWARD = new Set( [
 /**
  * Resolve the character range a collapsed-caret delete would remove.
  *
- * @param {string} text      Plain text of the value.
- * @param {number} caret     Caret offset.
- * @param {string} inputType `beforeinput` inputType (a `delete*` variant).
- * @return {?{start: number, end: number}} The range, or null when nothing would be removed.
+ * @param text      Plain text of the value.
+ * @param caret     Caret offset.
+ * @param inputType `beforeinput` inputType (a `delete*` variant).
+ * @return The range, or null when nothing would be removed.
  */
-export function computeDeleteRange( text, caret, inputType ) {
+export function computeDeleteRange(
+	text: any,
+	caret: number,
+	inputType: string
+): { start: number; end: number } | null {
 	if ( typeof text !== 'string' ) {
 		return null;
 	}

@@ -16,19 +16,20 @@ import {
 	SUGGESTION_FORMAT_NAME,
 } from '../format';
 
-const getFormatType = ( name ) => select( richTextStore ).getFormatType( name );
+const getFormatType = ( name: string ) =>
+	( select( richTextStore as any ) as any ).getFormatType( name );
 
-const add = ( id, text, author ) =>
+const add = ( id: number | string, text: string, author?: number | string ) =>
 	`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="add"${
 		author !== undefined ? ` data-author="${ author }"` : ''
 	}>${ text }</mark>`;
 
-const del = ( id, text, author ) =>
+const del = ( id: number | string, text: string, author?: number | string ) =>
 	`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="del"${
 		author !== undefined ? ` data-author="${ author }"` : ''
 	}>${ text }</mark>`;
 
-const rtd = ( html ) => RichTextData.fromHTMLString( html );
+const rtd = ( html: string ) => RichTextData.fromHTMLString( html );
 
 describe( 'analyzeTextEdit', () => {
 	it( 'reports no change for identical text', () => {

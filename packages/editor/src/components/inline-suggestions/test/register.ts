@@ -12,7 +12,8 @@ import {
 	SUGGESTION_AUTHOR_ATTRIBUTE,
 } from '../';
 
-const getFormatType = ( name ) => select( richTextStore ).getFormatType( name );
+const getFormatType = ( name: string ) =>
+	( select( richTextStore as any ) as any ).getFormatType( name );
 
 describe( 'registerSuggestionFormat', () => {
 	afterEach( () => {

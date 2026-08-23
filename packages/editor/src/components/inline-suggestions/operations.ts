@@ -21,13 +21,21 @@ import {
  * attribution survives reload and reviewer view. The author attribute is
  * omitted when no author id is known.
  *
- * @param {Object}               options
- * @param {number|string}        options.id         Suggestion (comment) id.
- * @param {'del'|'add'|'format'} options.type       Marker kind.
- * @param {number|string}        [options.authorId] Author user id.
- * @return {Object} Marker attributes for `wrapInlineMarker`.
+ * @param options
+ * @param options.id       Suggestion (comment) id.
+ * @param options.type     Marker kind.
+ * @param options.authorId Author user id.
+ * @return Marker attributes for `wrapInlineMarker`.
  */
-export function buildSuggestionMarkerAttributes( { id, type, authorId } ) {
+export function buildSuggestionMarkerAttributes( {
+	id,
+	type,
+	authorId,
+}: {
+	id: number | string;
+	type: 'del' | 'add' | 'format';
+	authorId?: number | string | null;
+} ): Record< string, string > {
 	return {
 		[ SUGGESTION_ID_ATTRIBUTE ]: String( id ),
 		[ SUGGESTION_TYPE_ATTRIBUTE ]: type,
@@ -48,12 +56,16 @@ export function buildSuggestionMarkerAttributes( { id, type, authorId } ) {
  * new id — and the damaged marker's accept/reject would then act on a partial
  * range.
  *
- * @param {Array}  formats Per-character format stacks (from `create()`).
- * @param {number} start   Range start (inclusive).
- * @param {number} end     Range end (exclusive).
- * @return {boolean} True when a suggestion format covers any character in range.
+ * @param formats Per-character format stacks (from `create()`).
+ * @param start   Range start (inclusive).
+ * @param end     Range end (exclusive).
+ * @return True when a suggestion format covers any character in range.
  */
-export function formatsRangeHasSuggestion( formats, start, end ) {
+export function formatsRangeHasSuggestion(
+	formats: any,
+	start: number,
+	end: number
+): boolean {
 	if ( ! Array.isArray( formats ) ) {
 		return false;
 	}
@@ -76,13 +88,17 @@ export function formatsRangeHasSuggestion( formats, start, end ) {
  * carries a `core/suggestion` marker. Value-level convenience wrapper around
  * `formatsRangeHasSuggestion` tolerating plain strings and non-rich values.
  *
- * @param {*}      value Block attribute value (RichTextData, string, or other).
- * @param {number} start Range start (inclusive).
- * @param {number} end   Range end (exclusive).
- * @return {boolean} True when a suggestion format covers any character in range.
+ * @param value Block attribute value (RichTextData, string, or other).
+ * @param start Range start (inclusive).
+ * @param end   Range end (exclusive).
+ * @return True when a suggestion format covers any character in range.
  */
-export function valueRangeHasSuggestion( value, start, end ) {
-	let html = null;
+export function valueRangeHasSuggestion(
+	value: any,
+	start: number,
+	end: number
+): boolean {
+	let html: string | null = null;
 	if ( value && typeof value.toHTMLString === 'function' ) {
 		html = value.toHTMLString();
 	} else if ( typeof value === 'string' ) {
@@ -104,11 +120,11 @@ export function valueRangeHasSuggestion( value, start, end ) {
  * marker on read (never a stored offset), so it stays correct after unrelated
  * edits elsewhere in the value.
  *
- * @param {*}             value        Block attribute value (RichTextData or other).
- * @param {number|string} suggestionId Suggestion (marker) id.
- * @return {*} New RichTextData with the marked run removed, or the original value.
+ * @param value        Block attribute value (RichTextData or other).
+ * @param suggestionId Suggestion (marker) id.
+ * @return New RichTextData with the marked run removed, or the original value.
  */
-function removeMarkedRange( value, suggestionId ) {
+function removeMarkedRange( value: any, suggestionId: number | string ) {
 	if ( ! ( value instanceof RichTextData ) ) {
 		return value;
 	}
@@ -126,9 +142,9 @@ function removeMarkedRange( value, suggestionId ) {
 	 * THIS id — back-to-front, so earlier offsets stay valid as text shrinks.
 	 */
 	const target = String( suggestionId );
-	const carriesId = ( index ) =>
+	const carriesId = ( index: number ) =>
 		record.formats[ index ]?.some(
-			( f ) =>
+			( f: any ) =>
 				f.type === SUGGESTION_FORMAT_NAME &&
 				f.attributes?.[ SUGGESTION_ID_ATTRIBUTE ] === target
 		);
@@ -143,7 +159,7 @@ function removeMarkedRange( value, suggestionId ) {
 			runEnd = null;
 		}
 	}
-	return new RichTextData( result );
+	return new RichTextData( result as any );
 }
 
 /**
@@ -152,11 +168,11 @@ function removeMarkedRange( value, suggestionId ) {
  * permanent (accepting an addition) — the two ends of a suggestion that resolve
  * to "the marked run stays, the marker goes".
  *
- * @param {*}             value        Block attribute value (RichTextData or other).
- * @param {number|string} suggestionId Suggestion (marker) id.
- * @return {*} New RichTextData with the marker unwrapped, or the original value.
+ * @param value        Block attribute value (RichTextData or other).
+ * @param suggestionId Suggestion (marker) id.
+ * @return New RichTextData with the marker unwrapped, or the original value.
  */
-function unwrapMarker( value, suggestionId ) {
+function unwrapMarker( value: any, suggestionId: number | string ) {
 	if ( ! ( value instanceof RichTextData ) ) {
 		return value;
 	}
@@ -166,7 +182,12 @@ function unwrapMarker( value, suggestionId ) {
 	}
 	const record = create( { html: value.toHTMLString() } );
 	return new RichTextData(
-		removeFormat( record, SUGGESTION_FORMAT_NAME, range.start, range.end )
+		removeFormat(
+			record,
+			SUGGESTION_FORMAT_NAME,
+			range.start,
+			range.end
+		) as any
 	);
 }
 
@@ -174,11 +195,14 @@ function unwrapMarker( value, suggestionId ) {
  * Accept a suggested deletion: drop both the marked text and its marker so the
  * proposed removal becomes permanent.
  *
- * @param {*}             value        Block attribute value (RichTextData or other).
- * @param {number|string} suggestionId Suggestion (marker) id to accept.
- * @return {*} New RichTextData with the marked text removed, or the original value.
+ * @param value        Block attribute value (RichTextData or other).
+ * @param suggestionId Suggestion (marker) id to accept.
+ * @return New RichTextData with the marked text removed, or the original value.
  */
-export function acceptInlineDeletion( value, suggestionId ) {
+export function acceptInlineDeletion(
+	value: any,
+	suggestionId: number | string
+) {
 	return removeMarkedRange( value, suggestionId );
 }
 
@@ -186,11 +210,14 @@ export function acceptInlineDeletion( value, suggestionId ) {
  * Reject a suggested deletion: keep the text and drop only the marker, so the
  * existing content is preserved and the suggestion goes away.
  *
- * @param {*}             value        Block attribute value (RichTextData or other).
- * @param {number|string} suggestionId Suggestion (marker) id to reject.
- * @return {*} New RichTextData with the marker unwrapped, or the original value.
+ * @param value        Block attribute value (RichTextData or other).
+ * @param suggestionId Suggestion (marker) id to reject.
+ * @return New RichTextData with the marker unwrapped, or the original value.
  */
-export function rejectInlineDeletion( value, suggestionId ) {
+export function rejectInlineDeletion(
+	value: any,
+	suggestionId: number | string
+) {
 	return unwrapMarker( value, suggestionId );
 }
 
@@ -198,11 +225,14 @@ export function rejectInlineDeletion( value, suggestionId ) {
  * Accept a suggested addition: keep the proposed text and drop only the marker,
  * so the new content becomes permanent. (Mirror of rejecting a deletion.)
  *
- * @param {*}             value        Block attribute value (RichTextData or other).
- * @param {number|string} suggestionId Suggestion (marker) id to accept.
- * @return {*} New RichTextData with the marker unwrapped, or the original value.
+ * @param value        Block attribute value (RichTextData or other).
+ * @param suggestionId Suggestion (marker) id to accept.
+ * @return New RichTextData with the marker unwrapped, or the original value.
  */
-export function acceptInlineAddition( value, suggestionId ) {
+export function acceptInlineAddition(
+	value: any,
+	suggestionId: number | string
+) {
 	return unwrapMarker( value, suggestionId );
 }
 
@@ -211,11 +241,14 @@ export function acceptInlineAddition( value, suggestionId ) {
  * the content returns to its pre-suggestion state. (Mirror of accepting a
  * deletion.)
  *
- * @param {*}             value        Block attribute value (RichTextData or other).
- * @param {number|string} suggestionId Suggestion (marker) id to reject.
- * @return {*} New RichTextData with the marked text removed, or the original value.
+ * @param value        Block attribute value (RichTextData or other).
+ * @param suggestionId Suggestion (marker) id to reject.
+ * @return New RichTextData with the marked text removed, or the original value.
  */
-export function rejectInlineAddition( value, suggestionId ) {
+export function rejectInlineAddition(
+	value: any,
+	suggestionId: number | string
+) {
 	return removeMarkedRange( value, suggestionId );
 }
 
@@ -224,11 +257,14 @@ export function rejectInlineAddition( value, suggestionId ) {
  * formatting (already carried on the marked run) becomes permanent. (Same shape
  * as accepting an addition — the marked run stays, the marker goes.)
  *
- * @param {*}             value        Block attribute value (RichTextData or other).
- * @param {number|string} suggestionId Suggestion (marker) id to accept.
- * @return {*} New RichTextData with the marker unwrapped, or the original value.
+ * @param value        Block attribute value (RichTextData or other).
+ * @param suggestionId Suggestion (marker) id to accept.
+ * @return New RichTextData with the marker unwrapped, or the original value.
  */
-export function acceptInlineFormat( value, suggestionId ) {
+export function acceptInlineFormat(
+	value: any,
+	suggestionId: number | string
+) {
 	return unwrapMarker( value, suggestionId );
 }
 
@@ -240,12 +276,16 @@ export function acceptInlineFormat( value, suggestionId ) {
  * `plan.beforeHTML`) because the marked run in content holds the *proposed*
  * formatting, not the original.
  *
- * @param {*}             value        Block attribute value (RichTextData or other).
- * @param {number|string} suggestionId Suggestion (marker) id to reject.
- * @param {string}        beforeHTML   HTML of the original run to restore.
- * @return {*} New RichTextData with the original run restored, or the original value.
+ * @param value        Block attribute value (RichTextData or other).
+ * @param suggestionId Suggestion (marker) id to reject.
+ * @param beforeHTML   HTML of the original run to restore.
+ * @return New RichTextData with the original run restored, or the original value.
  */
-export function rejectInlineFormat( value, suggestionId, beforeHTML ) {
+export function rejectInlineFormat(
+	value: any,
+	suggestionId: number | string,
+	beforeHTML: string
+) {
 	if ( ! ( value instanceof RichTextData ) ) {
 		return value;
 	}
@@ -258,7 +298,7 @@ export function rejectInlineFormat( value, suggestionId, beforeHTML ) {
 	// `insert` replaces the [start, end) range with the original run, which
 	// carries neither the proposed formatting nor the marker.
 	return new RichTextData(
-		insert( record, original, range.start, range.end )
+		insert( record, original, range.start, range.end ) as any
 	);
 }
 
@@ -273,17 +313,27 @@ export function rejectInlineFormat( value, suggestionId, beforeHTML ) {
  * comment id once the suggestion is persisted), so this can be unit-tested and
  * reused by whatever drives addition creation.
  *
- * @param {*}      value              Block attribute value (RichTextData or other).
- * @param {Object} options
- * @param {string} options.text       Proposed text to insert.
- * @param {Object} options.attributes Marker attributes (see `buildSuggestionMarkerAttributes`).
- * @param {number} [options.start]    Range start; defaults to end of value.
- * @param {number} [options.end]      Range end; defaults to `start` (collapsed).
- * @return {*} New RichTextData with the marked addition inserted, or the original value.
+ * @param value              Block attribute value (RichTextData or other).
+ * @param options
+ * @param options.text       Proposed text to insert.
+ * @param options.attributes Marker attributes (see `buildSuggestionMarkerAttributes`).
+ * @param options.start      Range start; defaults to end of value.
+ * @param options.end        Range end; defaults to `start` (collapsed).
+ * @return New RichTextData with the marked addition inserted, or the original value.
  */
 export function insertInlineAddition(
-	value,
-	{ text, attributes, start, end }
+	value: any,
+	{
+		text,
+		attributes,
+		start,
+		end,
+	}: {
+		text: string;
+		attributes: Record< string, any >;
+		start?: number;
+		end?: number;
+	}
 ) {
 	if ( ! ( value instanceof RichTextData ) ) {
 		return value;
@@ -297,11 +347,11 @@ export function insertInlineAddition(
 	const inserted = insert( record, text, startIndex, endIndex );
 	const formatted = applyFormat(
 		inserted,
-		{ type: SUGGESTION_FORMAT_NAME, attributes },
+		{ type: SUGGESTION_FORMAT_NAME, attributes } as any,
 		startIndex,
 		startIndex + text.length
 	);
-	return new RichTextData( formatted );
+	return new RichTextData( formatted as any );
 }
 
 /**
@@ -315,17 +365,27 @@ export function insertInlineAddition(
  * round-trip per character: the caret-driven insertion point is `markerEnd`,
  * the new span becomes `[markerStart, markerEnd + text.length]`.
  *
- * @param {*}      value               Block attribute value (RichTextData or other).
- * @param {Object} options
- * @param {string} options.text        Proposed text to append to the marker.
- * @param {Object} options.attributes  Marker attributes (see `buildSuggestionMarkerAttributes`).
- * @param {number} options.markerStart Current marker start offset.
- * @param {number} options.markerEnd   Current marker end offset (insertion point).
- * @return {*} New RichTextData with the marker grown, or the original value.
+ * @param value               Block attribute value (RichTextData or other).
+ * @param options
+ * @param options.text        Proposed text to append to the marker.
+ * @param options.attributes  Marker attributes (see `buildSuggestionMarkerAttributes`).
+ * @param options.markerStart Current marker start offset.
+ * @param options.markerEnd   Current marker end offset (insertion point).
+ * @return New RichTextData with the marker grown, or the original value.
  */
 export function growInlineAddition(
-	value,
-	{ text, attributes, markerStart, markerEnd }
+	value: any,
+	{
+		text,
+		attributes,
+		markerStart,
+		markerEnd,
+	}: {
+		text: string;
+		attributes: Record< string, any >;
+		markerStart: number;
+		markerEnd: number;
+	}
 ) {
 	if ( ! ( value instanceof RichTextData ) ) {
 		return value;
@@ -337,9 +397,9 @@ export function growInlineAddition(
 	const inserted = insert( record, text, markerEnd, markerEnd );
 	const formatted = applyFormat(
 		inserted,
-		{ type: SUGGESTION_FORMAT_NAME, attributes },
+		{ type: SUGGESTION_FORMAT_NAME, attributes } as any,
 		markerStart,
 		markerEnd + text.length
 	);
-	return new RichTextData( formatted );
+	return new RichTextData( formatted as any );
 }

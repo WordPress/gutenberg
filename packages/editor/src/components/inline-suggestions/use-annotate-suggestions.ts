@@ -9,8 +9,8 @@ import { SUGGESTION_ANNOTATION_SOURCE } from './format';
  * Callers resolve the ranges (via `findSuggestionRange`) and memoize them; this
  * hook only registers/clears the annotations.
  *
- * @param {Array} ranges Ranges to decorate: `{ id, clientId, attributeKey, start, end }`.
+ * @param ranges Ranges to decorate: `{ id, clientId, attributeKey, start, end }`.
  */
-export function useAnnotateSuggestions( ranges ) {
+export function useAnnotateSuggestions( ranges: any[] ) {
 	useAnnotateRanges( SUGGESTION_ANNOTATION_SOURCE, ranges );
 }

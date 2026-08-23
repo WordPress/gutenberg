@@ -23,23 +23,25 @@ import { buildSuggestionMarkerAttributes } from './operations';
  * Serialize a rich-text record range to an HTML string, for capturing the
  * original run so a reject can restore it.
  *
- * @param {Object} record Rich-text record.
- * @param {number} start  Range start.
- * @param {number} end    Range end.
- * @return {string} HTML of the sliced run.
+ * @param record Rich-text record.
+ * @param start  Range start.
+ * @param end    Range end.
+ * @return HTML of the sliced run.
  */
-function sliceToHTML( record, start, end ) {
-	return new RichTextData( slice( record, start, end ) ).toHTMLString();
+function sliceToHTML( record: any, start: number, end: number ): string {
+	return new RichTextData(
+		slice( record, start, end ) as any
+	).toHTMLString();
 }
 
 /**
  * Parse a block attribute value into a rich-text record, tolerating plain
  * strings and other non-rich values.
  *
- * @param {*} value Block attribute value.
- * @return {?Object} Rich-text record, or null when the value isn't rich text.
+ * @param value Block attribute value.
+ * @return Rich-text record, or null when the value isn't rich text.
  */
-function toRecord( value ) {
+function toRecord( value: any ) {
 	if ( value instanceof RichTextData ) {
 		return create( { html: value.toHTMLString() } );
 	}
@@ -55,10 +57,10 @@ function toRecord( value ) {
  * text-color and its value). Attribute keys are sorted so key order doesn't
  * affect equality.
  *
- * @param {Object} format Rich-text format ({ type, attributes? }).
- * @return {string} Comparison key.
+ * @param format Rich-text format ({ type, attributes? }).
+ * @return Comparison key.
  */
-function formatKey( format ) {
+function formatKey( format: any ): string {
 	const attributes = format.attributes ?? {};
 	const parts = Object.keys( attributes )
 		.sort()
@@ -72,7 +74,7 @@ function formatKey( format ) {
  * by reference collapses the per-character key computation to once per run.
  * A WeakMap so retired records don't pin their stacks in memory.
  */
-const stackKeyCache = new WeakMap();
+const stackKeyCache = new WeakMap< any[], string >();
 
 /**
  * Comparison key for a character's whole format stack, excluding the suggestion
@@ -80,10 +82,10 @@ const stackKeyCache = new WeakMap();
  * "different" only because of them, and re-running is stable). Sorted so stack
  * order doesn't matter. Memoized per stack-array reference.
  *
- * @param {Array} stack Per-character format stack (may be undefined).
- * @return {string} Comparison key for the stack.
+ * @param stack Per-character format stack (may be undefined).
+ * @return Comparison key for the stack.
  */
-function stackKey( stack ) {
+function stackKey( stack: any ): string {
 	if ( ! Array.isArray( stack ) ) {
 		return '';
 	}
@@ -110,11 +112,14 @@ function stackKey( stack ) {
  * middle, which marks a slightly wider run but never corrupts content. The
  * common case — toggling one selection — is exact.
  *
- * @param {*} prevValue Value before the edit.
- * @param {*} nextValue Value after the edit.
- * @return {?{start: number, end: number}} Changed range, or null.
+ * @param prevValue Value before the edit.
+ * @param nextValue Value after the edit.
+ * @return Changed range, or null.
  */
-export function analyzeFormatEdit( prevValue, nextValue ) {
+export function analyzeFormatEdit(
+	prevValue: any,
+	nextValue: any
+): { start: number; end: number } | null {
 	const prev = toRecord( prevValue );
 	const next = toRecord( nextValue );
 	if ( ! prev || ! next ) {
@@ -148,19 +153,24 @@ export function analyzeFormatEdit( prevValue, nextValue ) {
  * either value. A format change overlapping an open suggestion is left alone
  * rather than nesting a marker inside another suggestion.
  *
- * @param {Object} prev  Previous record.
- * @param {Object} next  Next record.
- * @param {number} start Range start.
- * @param {number} end   Range end.
- * @return {boolean} True when the range touches an existing marker.
+ * @param prev  Previous record.
+ * @param next  Next record.
+ * @param start Range start.
+ * @param end   Range end.
+ * @return True when the range touches an existing marker.
  */
-function overlapsExistingMarker( prev, next, start, end ) {
+function overlapsExistingMarker(
+	prev: any,
+	next: any,
+	start: number,
+	end: number
+): boolean {
 	for ( let i = start; i < end; i++ ) {
 		const inPrev = prev.formats?.[ i ]?.some(
-			( f ) => f.type === SUGGESTION_FORMAT_NAME
+			( f: any ) => f.type === SUGGESTION_FORMAT_NAME
 		);
 		const inNext = next.formats?.[ i ]?.some(
-			( f ) => f.type === SUGGESTION_FORMAT_NAME
+			( f: any ) => f.type === SUGGESTION_FORMAT_NAME
 		);
 		if ( inPrev || inNext ) {
 			return true;
@@ -169,17 +179,29 @@ function overlapsExistingMarker( prev, next, start, end ) {
 	return false;
 }
 
+export interface FormatPlan {
+	kind: 'format' | 'none';
+	/** The changed character range. */
+	range?: { start: number; end: number };
+	/** HTML of the original run (for reject). */
+	beforeHTML?: string;
+	/** HTML of the reformatted run. */
+	afterHTML?: string;
+}
+
 /**
  * Plan the marker for a format-only edit. One `format` marker wraps the run; the
  * plan also carries the original and proposed run HTML so the caller can persist
  * the original on the note (for reject) and summarize the change.
  *
- * @param {*} prevValue Value before the edit.
- * @param {*} nextValue Value after the edit.
- * @return {{ kind: 'format'|'none', range?: {start:number, end:number},
- *           beforeHTML?: string, afterHTML?: string }} Plan.
+ * @param prevValue Value before the edit.
+ * @param nextValue Value after the edit.
+ * @return Plan.
  */
-export function planFormatMarkers( prevValue, nextValue ) {
+export function planFormatMarkers(
+	prevValue: any,
+	nextValue: any
+): FormatPlan {
 	const prev = toRecord( prevValue );
 	const next = toRecord( nextValue );
 	if ( ! prev || ! next ) {
@@ -206,14 +228,18 @@ export function planFormatMarkers( prevValue, nextValue ) {
  * marker. The marker id is the caller's created note id. The text is unchanged,
  * so no duplication — the run is shown once with the proposed formatting.
  *
- * @param {*}             nextValue          Value after the edit (source of the reformatted run).
- * @param {Object}        plan               Plan from `planFormatMarkers`.
- * @param {Object}        options
- * @param {number|string} options.id         Marker (note) id.
- * @param {number}        [options.authorId] Author id stamped on the marker.
- * @return {*} New RichTextData with the format marker, or `nextValue` unchanged.
+ * @param nextValue        Value after the edit (source of the reformatted run).
+ * @param plan             Plan from `planFormatMarkers`.
+ * @param options
+ * @param options.id       Marker (note) id.
+ * @param options.authorId Author id stamped on the marker.
+ * @return New RichTextData with the format marker, or `nextValue` unchanged.
  */
-export function applyFormatPlan( nextValue, plan, { id, authorId } = {} ) {
+export function applyFormatPlan(
+	nextValue: any,
+	plan: FormatPlan | null | undefined,
+	{ id, authorId }: { id?: number | string | null; authorId?: number } = {}
+): any {
 	if ( ! plan || plan.kind !== 'format' || id === undefined || id === null ) {
 		return nextValue;
 	}
@@ -221,7 +247,7 @@ export function applyFormatPlan( nextValue, plan, { id, authorId } = {} ) {
 	if ( ! next ) {
 		return nextValue;
 	}
-	const { start, end } = plan.range;
+	const { start, end } = plan.range!;
 
 	const marked = applyFormat(
 		next,
@@ -232,9 +258,9 @@ export function applyFormatPlan( nextValue, plan, { id, authorId } = {} ) {
 				type: SUGGESTION_TYPE_FORMAT,
 				authorId,
 			} ),
-		},
+		} as any,
 		start,
 		end
 	);
-	return new RichTextData( marked );
+	return new RichTextData( marked as any );
 }

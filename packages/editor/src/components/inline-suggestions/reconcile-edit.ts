@@ -36,14 +36,18 @@ import {
  *     executes the plan.
  */
 
-/**
- * @typedef {Object} TextEdit
- * @property {'insert'|'delete'|'replace'|'none'} kind         What the edit did.
- * @property {number}                             start        Prev-value offset where the change starts.
- * @property {number}                             end          Prev-value offset where the changed (removed) region ends; equals `start` for a pure insert.
- * @property {string}                             insertedText Text present in next but not prev at the change.
- * @property {string}                             removedText  Text present in prev but not next at the change.
- */
+export interface TextEdit {
+	/** What the edit did. */
+	kind: 'insert' | 'delete' | 'replace' | 'none';
+	/** Prev-value offset where the change starts. */
+	start: number;
+	/** Prev-value offset where the changed (removed) region ends; equals `start` for a pure insert. */
+	end: number;
+	/** Text present in next but not prev at the change. */
+	insertedText: string;
+	/** Text present in prev but not next at the change. */
+	removedText: string;
+}
 
 /**
  * Reduce a previous/next plain-text pair to a single contiguous edit by trimming
@@ -51,11 +55,14 @@ import {
  * autocorrect, IME commit) changes one contiguous region, so prefix/suffix
  * trimming recovers it exactly without an O(n*m) diff.
  *
- * @param {string} prevText Text before the edit.
- * @param {string} nextText Text after the edit.
- * @return {TextEdit} The normalized edit.
+ * @param prevText Text before the edit.
+ * @param nextText Text after the edit.
+ * @return The normalized edit.
  */
-export function analyzeTextEdit( prevText, nextText ) {
+export function analyzeTextEdit(
+	prevText: string | undefined,
+	nextText: string | undefined
+): TextEdit {
 	const prev = typeof prevText === 'string' ? prevText : '';
 	const next = typeof nextText === 'string' ? nextText : '';
 
@@ -87,7 +94,7 @@ export function analyzeTextEdit( prevText, nextText ) {
 	const removedText = prev.slice( prefix, prev.length - suffix );
 	const insertedText = next.slice( prefix, next.length - suffix );
 
-	let kind;
+	let kind: TextEdit[ 'kind' ];
 	if ( removedText && insertedText ) {
 		kind = 'replace';
 	} else if ( insertedText ) {
@@ -109,10 +116,10 @@ export function analyzeTextEdit( prevText, nextText ) {
  * Parse a block attribute value into a rich-text record, tolerating plain
  * strings and other non-rich values.
  *
- * @param {*} value Block attribute value.
- * @return {?Object} Rich-text record, or null when the value isn't rich text.
+ * @param value Block attribute value.
+ * @return Rich-text record, or null when the value isn't rich text.
  */
-function toRecord( value ) {
+function toRecord( value: any ) {
 	if ( value instanceof RichTextData ) {
 		return create( { html: value.toHTMLString() } );
 	}
@@ -125,11 +132,11 @@ function toRecord( value ) {
 /**
  * The `core/suggestion` format active at a character, or null.
  *
- * @param {Object} record Rich-text record.
- * @param {number} index  Character index.
- * @return {?Object} The suggestion format object (with `attributes`), or null.
+ * @param record Rich-text record.
+ * @param index  Character index.
+ * @return The suggestion format object (with `attributes`), or null.
  */
-function suggestionAt( record, index ) {
+function suggestionAt( record: any, index: number ) {
 	const stack = record.formats?.[ index ];
 	if ( ! Array.isArray( stack ) ) {
 		return null;
@@ -137,24 +144,30 @@ function suggestionAt( record, index ) {
 	return stack.find( ( f ) => f.type === SUGGESTION_FORMAT_NAME ) ?? null;
 }
 
-function markerId( format ) {
+function markerId( format: any ) {
 	return format?.attributes?.[ SUGGESTION_ID_ATTRIBUTE ] ?? null;
 }
 
-function markerType( format ) {
+function markerType( format: any ) {
 	return format?.attributes?.[ SUGGESTION_TYPE_ATTRIBUTE ] ?? null;
 }
 
-/**
- * @typedef {Object} MarkerAction
- * @property {'insert-add'|'grow-add'|'wrap-del'|'remove-add'} type      Action kind.
- * @property {string}                                          [text]    Text to insert/append (insert-add, grow-add).
- * @property {number}                                          [at]      Insertion offset (insert-add).
- * @property {number}                                          [start]   Range start (wrap-del).
- * @property {number}                                          [end]     Range end (wrap-del).
- * @property {string}                                          [id]      Existing marker id to reuse (grow-add, remove-add).
- * @property {boolean}                                         [newNote] True when the action needs a freshly created note/id.
- */
+export interface MarkerAction {
+	/** Action kind. */
+	type: 'insert-add' | 'grow-add' | 'wrap-del' | 'remove-add';
+	/** Text to insert/append (insert-add, grow-add). */
+	text?: string;
+	/** Insertion offset (insert-add). */
+	at?: number;
+	/** Range start (wrap-del). */
+	start?: number;
+	/** Range end (wrap-del). */
+	end?: number;
+	/** Existing marker id to reuse (grow-add, remove-add). */
+	id?: string;
+	/** True when the action needs a freshly created note/id. */
+	newNote?: boolean;
+}
 
 /**
  * Decide how a text edit maps to inline-suggestion marker actions, against the
@@ -176,13 +189,17 @@ function markerType( format ) {
  * actions; the caller leaves the value as the user typed it rather than guess.
  * Those are tightened in later phases with the safety-net e2e as the oracle.
  *
- * @param {*}             prevValue          Block attribute value before the edit.
- * @param {*}             nextValue          Block attribute value after the edit.
- * @param {Object}        [options]
- * @param {number|string} [options.authorId] Current author id; gates growing/removing the author's own markers.
- * @return {{ kind: string, actions: MarkerAction[] }} The marker plan.
+ * @param prevValue        Block attribute value before the edit.
+ * @param nextValue        Block attribute value after the edit.
+ * @param options
+ * @param options.authorId Current author id; gates growing/removing the author's own markers.
+ * @return The marker plan.
  */
-export function planEditMarkers( prevValue, nextValue, { authorId } = {} ) {
+export function planEditMarkers(
+	prevValue: any,
+	nextValue: any,
+	{ authorId }: { authorId?: number | string } = {}
+): { kind: string; actions: MarkerAction[] } {
 	const record = toRecord( prevValue );
 	if ( ! record ) {
 		return { kind: 'none', actions: [] };
@@ -203,11 +220,11 @@ export function planEditMarkers( prevValue, nextValue, { authorId } = {} ) {
 
 	// Whether every character in [start, end) carries a suggestion marker of the
 	// given type sharing one id; returns that id, or null otherwise.
-	const uniformMarker = ( start, end, type ) => {
+	const uniformMarker = ( start: number, end: number, type: string ) => {
 		if ( start >= end ) {
 			return null;
 		}
-		let id = null;
+		let id: string | null = null;
 		for ( let i = start; i < end; i++ ) {
 			const f = suggestionAt( record, i );
 			if ( ! f || markerType( f ) !== type ) {
@@ -224,7 +241,7 @@ export function planEditMarkers( prevValue, nextValue, { authorId } = {} ) {
 	};
 
 	// Whether [start, end) is entirely free of suggestion markers.
-	const isUnmarked = ( start, end ) => {
+	const isUnmarked = ( start: number, end: number ) => {
 		for ( let i = start; i < end; i++ ) {
 			if ( suggestionAt( record, i ) ) {
 				return false;
@@ -350,14 +367,21 @@ export function planEditMarkers( prevValue, nextValue, { authorId } = {} ) {
  * `wrap-del` before `insert-add` in a replace is order-safe: wrapping existing
  * text doesn't change the value length, so a later action's offset stays valid.
  *
- * @param {*}                    value              Block attribute value to mark (RichTextData or other).
- * @param {MarkerAction[]}       actions            Plan from `planEditMarkers`.
- * @param {Object}               [options]
- * @param {number|string}        [options.authorId] Author id stamped on new markers.
- * @param {Array<number|string>} [options.ids]      Note ids for the `newNote` actions, in order.
- * @return {*} The value with markers applied (unchanged when nothing applies).
+ * @param value            Block attribute value to mark (RichTextData or other).
+ * @param actions          Plan from `planEditMarkers`.
+ * @param options
+ * @param options.authorId Author id stamped on new markers.
+ * @param options.ids      Note ids for the `newNote` actions, in order.
+ * @return The value with markers applied (unchanged when nothing applies).
  */
-export function applyEditPlan( value, actions, { authorId, ids = [] } = {} ) {
+export function applyEditPlan(
+	value: any,
+	actions: MarkerAction[],
+	{
+		authorId,
+		ids = [],
+	}: { authorId?: number | string; ids?: Array< number | string > } = {}
+): any {
 	let result = value;
 	let idIndex = 0;
 
@@ -366,7 +390,7 @@ export function applyEditPlan( value, actions, { authorId, ids = [] } = {} ) {
 			case 'insert-add': {
 				const id = ids[ idIndex++ ];
 				result = insertInlineAddition( result, {
-					text: action.text,
+					text: action.text!,
 					attributes: buildSuggestionMarkerAttributes( {
 						id,
 						type: SUGGESTION_TYPE_ADDITION,
@@ -378,14 +402,14 @@ export function applyEditPlan( value, actions, { authorId, ids = [] } = {} ) {
 				break;
 			}
 			case 'grow-add': {
-				const range = findSuggestionRange( result, action.id );
+				const range = findSuggestionRange( result, action.id! );
 				if ( ! range ) {
 					break;
 				}
 				result = growInlineAddition( result, {
-					text: action.text,
+					text: action.text!,
 					attributes: buildSuggestionMarkerAttributes( {
-						id: action.id,
+						id: action.id!,
 						type: SUGGESTION_TYPE_ADDITION,
 						authorId,
 					} ),
@@ -403,8 +427,8 @@ export function applyEditPlan( value, actions, { authorId, ids = [] } = {} ) {
 						type: SUGGESTION_TYPE_DELETION,
 						authorId,
 					} ),
-					start: action.start,
-					end: action.end,
+					start: action.start!,
+					end: action.end!,
 				} );
 				if ( wrapped ) {
 					result = wrapped;
@@ -412,7 +436,7 @@ export function applyEditPlan( value, actions, { authorId, ids = [] } = {} ) {
 				break;
 			}
 			case 'remove-add': {
-				result = rejectInlineAddition( result, action.id );
+				result = rejectInlineAddition( result, action.id! );
 				break;
 			}
 		}

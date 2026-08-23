@@ -10,12 +10,13 @@ import {
 } from '../strip-markers';
 import { registerSuggestionFormat, SUGGESTION_FORMAT_NAME } from '../format';
 
-const getFormatType = ( name ) => select( richTextStore ).getFormatType( name );
+const getFormatType = ( name: string ) =>
+	( select( richTextStore as any ) as any ).getFormatType( name );
 
-const del = ( id, text ) =>
+const del = ( id: number | string, text: string ) =>
 	`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="del">${ text }</mark>`;
 
-const add = ( id, text ) =>
+const add = ( id: number | string, text: string ) =>
 	`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="add">${ text }</mark>`;
 
 beforeAll( () => {

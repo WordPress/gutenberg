@@ -91,20 +91,20 @@ export const SUGGESTION_A11Y_FORMAT_NAME = 'core/suggestion-a11y';
  * (rich-text merges adjacent identical format references into a single
  * element), so a marker gains exactly one nested role element.
  *
- * @param {Array} formats Per-character format stacks.
- * @return {Array} Format stacks with role decorations added.
+ * @param formats Per-character format stacks.
+ * @return Format stacks with role decorations added.
  */
-export function addSuggestionRoleFormats( formats ) {
+export function addSuggestionRoleFormats( formats: any[] | undefined ): any {
 	if ( ! formats || formats.length === 0 ) {
 		return formats;
 	}
-	let out = null;
-	let lastSuggestion = null;
-	let lastDecoration = null;
+	let out: any[] | null = null;
+	let lastSuggestion: any = null;
+	let lastDecoration: any = null;
 	for ( let i = 0; i < formats.length; i++ ) {
 		const stack = formats[ i ];
 		const suggestion = Array.isArray( stack )
-			? stack.find( ( f ) => f.type === SUGGESTION_FORMAT_NAME )
+			? stack.find( ( f: any ) => f.type === SUGGESTION_FORMAT_NAME )
 			: undefined;
 		if ( ! suggestion ) {
 			lastSuggestion = null;
@@ -162,20 +162,29 @@ export const suggestionA11yFormat = {
  * suggesting UI — i.e. suggest mode — passes its own `edit` so the
  * marker-creating toolbar control lives with the feature, not the primitive.
  *
- * @param {Function} [edit] Optional rich-text format `edit` component.
+ * @param [edit] Optional rich-text format `edit` component.
  */
-export function registerSuggestionFormat( edit ) {
+export function registerSuggestionFormat( edit?: any ) {
 	if (
-		! select( richTextStore ).getFormatType( SUGGESTION_A11Y_FORMAT_NAME )
+		! ( select( richTextStore as any ) as any ).getFormatType(
+			SUGGESTION_A11Y_FORMAT_NAME
+		)
 	) {
-		registerFormatType( SUGGESTION_A11Y_FORMAT_NAME, suggestionA11yFormat );
+		registerFormatType(
+			SUGGESTION_A11Y_FORMAT_NAME,
+			suggestionA11yFormat as any
+		);
 	}
-	if ( select( richTextStore ).getFormatType( SUGGESTION_FORMAT_NAME ) ) {
+	if (
+		( select( richTextStore as any ) as any ).getFormatType(
+			SUGGESTION_FORMAT_NAME
+		)
+	) {
 		return;
 	}
 	registerFormatType(
 		SUGGESTION_FORMAT_NAME,
-		edit ? { ...suggestionFormat, edit } : suggestionFormat
+		( edit ? { ...suggestionFormat, edit } : suggestionFormat ) as any
 	);
 }
 
@@ -183,11 +192,14 @@ export function registerSuggestionFormat( edit ) {
  * Resolve a suggestion marker's live character range in a rich-text value by
  * id, deriving the position from the in-content marker on every read.
  *
- * @param {*}             value Block attribute value (RichTextData, string, or other).
- * @param {number|string} id    Suggestion id to search for.
- * @return {?{start: number, end: number}} Range or null when no marker is found.
+ * @param value Block attribute value (RichTextData, string, or other).
+ * @param id    Suggestion id to search for.
+ * @return Range or null when no marker is found.
  */
-export function findSuggestionRange( value, id ) {
+export function findSuggestionRange(
+	value: any,
+	id: number | string
+): { start: number; end: number } | null {
 	return findMarkerRange( value, {
 		formatType: SUGGESTION_FORMAT_NAME,
 		idAttribute: SUGGESTION_ID_ATTRIBUTE,
@@ -202,11 +214,11 @@ export function findSuggestionRange( value, id ) {
  * suggestion proposes to add or remove (e.g. `Add: "new text"` in the sidebar)
  * without storing the text in the suggestion payload.
  *
- * @param {*}             value Block attribute value (RichTextData, string, or other).
- * @param {number|string} id    Suggestion id to search for.
- * @return {string} The marked text, or '' when no marker is found.
+ * @param value Block attribute value (RichTextData, string, or other).
+ * @param id    Suggestion id to search for.
+ * @return The marked text, or '' when no marker is found.
  */
-export function findSuggestionText( value, id ) {
+export function findSuggestionText( value: any, id: number | string ): string {
 	return findMarkerText( value, {
 		formatType: SUGGESTION_FORMAT_NAME,
 		idAttribute: SUGGESTION_ID_ATTRIBUTE,

@@ -23,11 +23,11 @@ const SUGGESTION_MARKER_CLASS = 'wp-suggestion';
  * Pure and cheap on the common path: values that don't contain the marker
  * class are returned by reference without parsing.
  *
- * @param {*} value Attribute value (string, RichTextData, or anything else).
- * @return {*} The value with suggestion markers unwrapped; non-string-like
+ * @param value Attribute value (string, RichTextData, or anything else).
+ * @return The value with suggestion markers unwrapped; non-string-like
  * values (and marker-free values) are returned unchanged by reference.
  */
-export function stripSuggestionMarkers( value ) {
+export function stripSuggestionMarkers( value: any ): any {
 	const isRich = value instanceof RichTextData;
 	if ( ! isRich && typeof value !== 'string' ) {
 		return value;
@@ -43,7 +43,7 @@ export function stripSuggestionMarkers( value ) {
 		0,
 		record.text.length
 	);
-	const result = new RichTextData( stripped );
+	const result = new RichTextData( stripped as any );
 	return isRich ? result : result.toHTMLString();
 }
 
@@ -52,15 +52,17 @@ export function stripSuggestionMarkers( value ) {
  * attributes object. Returns the input by reference when nothing changed so
  * callers (and React) can rely on identity.
  *
- * @param {Object|null|undefined} attributes Attribute map.
- * @return {Object|null|undefined} Attributes with markers stripped.
+ * @param attributes Attribute map.
+ * @return Attributes with markers stripped.
  */
-export function stripSuggestionMarkersFromAttributes( attributes ) {
+export function stripSuggestionMarkersFromAttributes(
+	attributes: Record< string, any > | null | undefined
+): any {
 	if ( ! attributes || typeof attributes !== 'object' ) {
 		return attributes;
 	}
 	let changed = false;
-	const next = {};
+	const next: Record< string, any > = {};
 	for ( const [ key, value ] of Object.entries( attributes ) ) {
 		const stripped = stripSuggestionMarkers( value );
 		next[ key ] = stripped;

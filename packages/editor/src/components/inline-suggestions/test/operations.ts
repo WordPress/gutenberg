@@ -20,15 +20,16 @@ import {
 } from '../operations';
 import { registerSuggestionFormat, SUGGESTION_FORMAT_NAME } from '../format';
 
-const getFormatType = ( name ) => select( richTextStore ).getFormatType( name );
+const getFormatType = ( name: string ) =>
+	( select( richTextStore as any ) as any ).getFormatType( name );
 
-const del = ( id, text ) =>
+const del = ( id: number | string, text: string ) =>
 	`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="del">${ text }</mark>`;
 
-const add = ( id, text ) =>
+const add = ( id: number | string, text: string ) =>
 	`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="add">${ text }</mark>`;
 
-const fmt = ( id, inner ) =>
+const fmt = ( id: number | string, inner: string ) =>
 	`<mark class="wp-suggestion" data-suggestion-id="${ id }" data-suggestion-type="format">${ inner }</mark>`;
 
 describe( 'inline deletion operations', () => {
@@ -251,7 +252,7 @@ describe( 'inline addition operations', () => {
 		// `applyFormat` emits marker attributes in a different order than the
 		// `add()` helper string (data-* before class), so these assert on the
 		// stripped text plus attribute presence rather than an exact HTML match.
-		const stripTags = ( html ) => html.replace( /<[^>]+>/g, '' );
+		const stripTags = ( html: string ) => html.replace( /<[^>]+>/g, '' );
 
 		it( 'inserts the text wrapped in an add marker at a caret', () => {
 			const value = RichTextData.fromHTMLString( 'before after' );
@@ -338,7 +339,7 @@ describe( 'inline addition operations', () => {
 	} );
 
 	describe( 'growInlineAddition', () => {
-		const stripTags = ( html ) => html.replace( /<[^>]+>/g, '' );
+		const stripTags = ( html: string ) => html.replace( /<[^>]+>/g, '' );
 		const attrs = buildSuggestionMarkerAttributes( { id: 9, type: 'add' } );
 
 		it( 'appends to the marker and keeps it a single run', () => {
@@ -448,7 +449,7 @@ describe( 'inline format operations', () => {
 				tagName: 'strong',
 				className: null,
 				edit: () => null,
-			} );
+			} as any );
 		}
 	} );
 
