@@ -31,6 +31,8 @@ const smileyIcon = (
 interface ReactionSummaryEntry {
 	count: number;
 	reacted?: boolean;
+	// The current user's reaction comment ID, used to delete it again.
+	my_reaction_id?: number;
 }
 
 /**

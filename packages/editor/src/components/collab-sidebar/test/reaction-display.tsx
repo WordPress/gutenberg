@@ -5,6 +5,8 @@ import ReactionDisplay, { AddReactionButton } from '../reaction-display';
 
 jest.mock( '@wordpress/api-fetch', () => jest.fn() );
 
+const mockApiFetch = jest.mocked( apiFetch );
+
 /*
  * The tooltip name cache in reaction-display.js is module-level and keyed
  * by `noteId:slug`, so each test uses a distinct noteId to stay isolated.
@@ -14,10 +16,10 @@ let uniqueNoteId = 1;
 describe( 'ReactionDisplay', () => {
 	beforeEach( () => {
 		uniqueNoteId += 1;
-		apiFetch.mockReset();
+		mockApiFetch.mockReset();
 		// Reject by default so tests that never await a tooltip fetch
 		// fall back to the count-based label instead of hanging.
-		apiFetch.mockRejectedValue( new Error( 'not mocked' ) );
+		mockApiFetch.mockRejectedValue( new Error( 'not mocked' ) );
 	} );
 
 	it( 'renders nothing when there are no reactions', () => {
@@ -139,7 +141,7 @@ describe( 'ReactionDisplay', () => {
 
 	it( 'lazy-loads reacting user names into the label on hover', async () => {
 		const user = userEvent.setup();
-		apiFetch.mockResolvedValue( [
+		mockApiFetch.mockResolvedValue( [
 			{ author_name: 'Alice', content: { raw: 'heart' } },
 			// A different emoji on the same note must be filtered out.
 			{ author_name: 'Mallory', content: { raw: 'rocket' } },
@@ -170,7 +172,7 @@ describe( 'ReactionDisplay', () => {
 
 	it( 'formats two and three-plus reactor names GitHub-style', async () => {
 		const user = userEvent.setup();
-		apiFetch.mockResolvedValue( [
+		mockApiFetch.mockResolvedValue( [
 			{ author_name: 'Alice', content: { raw: 'heart' } },
 			{ author_name: 'Bob', content: { raw: 'heart' } },
 			{ author_name: 'Carol', content: { raw: 'heart' } },
@@ -200,7 +202,7 @@ describe( 'ReactionDisplay', () => {
 
 	it( 'keeps the count-based label when the names fetch fails', async () => {
 		const user = userEvent.setup();
-		apiFetch.mockRejectedValue( new Error( 'network down' ) );
+		mockApiFetch.mockRejectedValue( new Error( 'network down' ) );
 		render(
 			<ReactionDisplay
 				noteId={ uniqueNoteId }
@@ -225,8 +227,8 @@ describe( 'ReactionDisplay', () => {
 describe( 'AddReactionButton', () => {
 	beforeEach( () => {
 		uniqueNoteId += 1;
-		apiFetch.mockReset();
-		apiFetch.mockRejectedValue( new Error( 'not mocked' ) );
+		mockApiFetch.mockReset();
+		mockApiFetch.mockRejectedValue( new Error( 'not mocked' ) );
 	} );
 
 	it( 'opens the curated picker and toggles the chosen reaction', async () => {
