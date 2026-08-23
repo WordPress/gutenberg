@@ -60,4 +60,6 @@ Where no link primitive fits, as in a command palette, the host mounts what the 
 
 The widget lists its actions; it never specifies where they go. The host maps them to its surfaces: a dashboard might gather them in a "More" menu, a footer, or a command palette.
 
-`relevance` carries the widget's side of that decision: `'high'` marks an action worth a prominent surface, `'low'` (the default) the rest. Attributes already use the same vocabulary: the widget declares intent, and the host owns the surface.
+`relevance` carries the widget's side of that decision: `'high'` marks an action worth the most prominent surface, `'medium'` one worth persistent but compact visibility, and `'low'` (the default) the rest. Attributes use the same vocabulary: the widget declares intent, and the host owns the surface.
+
+The dashboard maps it as: `'high'` as text links in a persistent footer, `'medium'` beside them as compact icon affordances, the rest in the "More" menu. Full-bleed widgets keep every action in the menu.

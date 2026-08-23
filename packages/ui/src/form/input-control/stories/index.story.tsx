@@ -15,6 +15,7 @@ import {
 } from '../../stories/shared';
 
 const meta: Meta< typeof InputControl > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/InputControl',
 	component: InputControl,
 	argTypes: {
@@ -25,9 +26,8 @@ const meta: Meta< typeof InputControl > = {
 	},
 	parameters: {
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components`. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
@@ -65,11 +65,21 @@ WithPrefix.args = {
 	...WithPrefix.args,
 	...Default.args,
 };
-WithSuffixControl.args = {
-	...WithSuffixControl.args,
-	...Default.args,
+// Copied rather than mutated: the story object is shared with the Input story,
+// which opts out of the accessibility test because it shows the control
+// without a label. This story does label the control, so it opts back in.
+const InputControlWithSuffixControl: typeof WithSuffixControl = {
+	...WithSuffixControl,
+	args: {
+		...WithSuffixControl.args,
+		...Default.args,
+	},
+	parameters: {
+		...WithSuffixControl.parameters,
+		a11y: { test: 'error' },
+	},
 };
-export { WithPrefix, WithSuffixControl };
+export { WithPrefix, InputControlWithSuffixControl as WithSuffixControl };
 
 export const Password: Story = {
 	render: function Template( args ) {
