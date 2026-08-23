@@ -762,8 +762,20 @@ describe( 'inline format operations', () => {
 			);
 		} );
 
-		it( 'returns a non-rich-text value unchanged', () => {
+		it( 'restores the original run in a plain-string value', () => {
+			const html = `keep ${ fmt( 5, '<strong>word</strong>' ) } tail`;
+			expect( rejectInlineFormat( html, 5, 'word' ).toHTMLString() ).toBe(
+				'keep word tail'
+			);
+		} );
+
+		it( 'returns a string carrying no marker unchanged', () => {
 			expect( rejectInlineFormat( 'plain', 5, 'x' ) ).toBe( 'plain' );
+		} );
+
+		it( 'returns a value that is neither rich text nor a string unchanged', () => {
+			const value = { nope: true };
+			expect( rejectInlineFormat( value, 5, 'x' ) ).toBe( value );
 		} );
 	} );
 } );

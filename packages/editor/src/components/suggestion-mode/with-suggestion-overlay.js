@@ -230,7 +230,12 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 			) {
 				return false;
 			}
-			const plan = planFormatMarkers( prevContent, nextContent );
+			// `authorId` lets the planner recognise the suggester's own
+			// pending `format` marker on the run and extend it instead of
+			// opening a second suggestion over the same words.
+			const plan = planFormatMarkers( prevContent, nextContent, {
+				authorId,
+			} );
 			if ( plan.kind !== 'format' ) {
 				return false;
 			}
@@ -245,7 +250,7 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 				plan,
 			} );
 		},
-		[ clientId, name, requestFormatSuggestion ]
+		[ clientId, name, authorId, requestFormatSuggestion ]
 	);
 
 	// Detect a text edit that reaches the block as a whole new `content` value

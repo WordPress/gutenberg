@@ -1,5 +1,9 @@
 import { render, act } from '@testing-library/react';
-import { createRegistry, RegistryProvider } from '@wordpress/data';
+import {
+	RegistryProvider,
+	createReduxStore,
+	createRegistry,
+} from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -146,6 +150,21 @@ describe( 'adoptSystemMetadata', () => {
 	} );
 } );
 
+/*
+ * `setEditorIntent( 'suggest' )` reads the current post so it can discard a
+ * staged status edit, and both reads go through `core`. These registries are
+ * minimal, so answer the two selectors with nothing.
+ */
+function createStubCoreStore() {
+	return createReduxStore( 'core', {
+		reducer: ( state = {} ) => state,
+		selectors: {
+			getRawEntityRecord: () => undefined,
+			getEntityRecordEdits: () => undefined,
+		},
+	} );
+}
+
 describe( 'SuggestionStoreInterceptor (integration)', () => {
 	const TEST_BLOCK_NAME = 'core/test-suggestion-block';
 
@@ -184,6 +203,7 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		registry.register( preferencesStore );
 		registry.register( blockEditorStore );
 		registry.register( editorStore );
+		registry.register( createStubCoreStore() );
 		unlock( registry.dispatch( editorStore ) ).setEditorIntent( 'suggest' );
 
 		const block =
