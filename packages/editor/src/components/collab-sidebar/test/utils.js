@@ -365,6 +365,45 @@ describe( 'calculateNotePositions', () => {
 		expect( positions ).toEqual( { 1: 84, 2: 284, 3: 484 } );
 	} );
 
+	it( 'anchors on a measured thread when the selected one has no rect', () => {
+		// A selected thread whose anchor has not been measured yet used to
+		// abandon the whole sweep, leaving every card without a position —
+		// and an unpositioned floating card falls back to the panel's origin,
+		// where the cards pile up on each other.
+		const threads = [ { id: 1 }, { id: 2 }, { id: 3 } ];
+		// Thread 2 is selected but its anchor has not been measured.
+		const blockRects = { 1: makeRect( 100 ), 3: makeRect( 300 ) };
+		const heights = { 1: 50, 2: 50, 3: 50 };
+
+		const { positions } = calculateNotePositions( {
+			threads,
+			selectedNoteId: 2,
+			blockRects,
+			heights,
+			scrollTop: 0,
+		} );
+
+		expect( positions ).toEqual( { 1: 84, 3: 284 } );
+	} );
+
+	it( 'holds every position back until the cards have been measured', () => {
+		// Sweeping with an unmeasured card treats it as zero-height, so the
+		// card after it lands on its anchor — on top of the card it was
+		// supposed to clear.
+		const threads = [ { id: 1 }, { id: 2 } ];
+		const blockRects = { 1: makeRect( 100 ), 2: makeRect( 140 ) };
+
+		const { positions } = calculateNotePositions( {
+			threads,
+			selectedNoteId: 1,
+			blockRects,
+			heights: { 1: 90 },
+			scrollTop: 0,
+		} );
+
+		expect( positions ).toEqual( {} );
+	} );
+
 	it( 'pushes an overlapping thread above the anchor upward', () => {
 		const threads = [ { id: 1 }, { id: 2 } ];
 		const blockRects = {

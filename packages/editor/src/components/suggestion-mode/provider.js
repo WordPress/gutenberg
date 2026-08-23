@@ -524,7 +524,8 @@ export function useSuggestionsProvider() {
 		getBlockRootClientId: selectBlockRootClientId,
 		getClientIdsWithDescendants: selectClientIdsWithDescendants,
 	} = useSelect( blockEditorStore );
-	const { requestInterceptorBypass, clearOverlay } = useSuggestionOverlay();
+	const { requestInterceptorBypass, clearOverlay, clearOverlayForComment } =
+		useSuggestionOverlay();
 	const registry = useRegistry();
 
 	const createSuggestion = useCallback(
@@ -818,7 +819,15 @@ export function useSuggestionsProvider() {
 				}
 				try {
 					requestInterceptorBypass( targetClientId );
-					clearOverlay( targetClientId );
+					/*
+					 * An inline suggestion never lives in the overlay, but the
+					 * same block can hold a pending attribute suggestion that
+					 * does. Clear only an entry this comment owns: the entry is
+					 * the attribute note's sole anchor, so an unconditional
+					 * clear here hands that note to the orphan collector and
+					 * wipes the proposed value off the canvas (F-14).
+					 */
+					clearOverlayForComment( targetClientId, commentId );
 					updateBlockAttributes( targetClientId, {
 						[ attributeKey ]: nextValue,
 					} );
@@ -1032,6 +1041,7 @@ export function useSuggestionsProvider() {
 			createNotice,
 			requestInterceptorBypass,
 			clearOverlay,
+			clearOverlayForComment,
 		]
 	);
 
@@ -1113,7 +1123,10 @@ export function useSuggestionsProvider() {
 					}
 					try {
 						requestInterceptorBypass( targetClientId );
-						clearOverlay( targetClientId );
+						// Guarded for the same reason as the apply path above:
+						// a co-resident attribute suggestion owns this block's
+						// overlay entry and must survive an inline decision.
+						clearOverlayForComment( targetClientId, commentId );
 						updateBlockAttributes( targetClientId, {
 							[ attributeKey ]: nextValue,
 						} );
@@ -1262,6 +1275,7 @@ export function useSuggestionsProvider() {
 			moveBlockToPosition,
 			requestInterceptorBypass,
 			clearOverlay,
+			clearOverlayForComment,
 			registry,
 		]
 	);

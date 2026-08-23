@@ -538,6 +538,73 @@ test.describe( 'Suggestion mode undo', () => {
 		expect( serialized ).not.toContain( '"suggestion"' );
 	} );
 
+	test( 'undo unwinds a block insertion and a block removal in the order they were made', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Alpha' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Beta' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		// Suggestion 1: a brand new block after the first paragraph.
+		const alpha = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Alpha' } );
+		await editor.selectBlocks( alpha );
+		await alpha.click();
+		await page.keyboard.press( 'End' );
+		const insertSaved = suggestionSavedPromise( page );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Gamma' );
+		const inserted = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Gamma' } );
+		await expect( inserted ).toHaveClass( /is-suggestion-pending-insert/ );
+		await insertSaved;
+
+		// Suggestion 2: remove the last paragraph.
+		const beta = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Beta' } );
+		await beta.click();
+		const removeSaved = suggestionSavedPromise( page );
+		await editor.clickBlockOptionsMenuItem( 'Delete' );
+		await expect( beta ).toHaveClass( /is-suggestion-pending-remove/ );
+		await removeSaved;
+
+		const summaries = await openSuggestionSummaries( page );
+		await expect( summaries ).toHaveCount( 2 );
+
+		/*
+		 * The removal was the newer action, so it has to come off first - even
+		 * though the guard could withdraw the insertion itself while the real
+		 * undo stack owns the removal. Unwinding out of order is how a pair of
+		 * interacting steps lands the document in a state that never existed.
+		 */
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( beta ).not.toHaveClass( /is-suggestion-pending-remove/ );
+		await expect( inserted ).toHaveClass( /is-suggestion-pending-insert/ );
+		await expect( summaries ).toHaveCount( 1 );
+
+		// The insertion goes on the next undo.
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( inserted ).toHaveCount( 0 );
+		await expect( summaries ).toHaveCount( 0 );
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).toContain( 'Alpha' );
+		expect( serialized ).toContain( 'Beta' );
+		expect( serialized ).not.toContain( 'Gamma' );
+		expect( serialized ).not.toContain( '"suggestion"' );
+	} );
+
 	// --- Undo after a review decision ---------------------------------------
 
 	/*

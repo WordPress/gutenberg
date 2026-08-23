@@ -4,7 +4,11 @@ import {
 	registerFormatType,
 	store as richTextStore,
 } from '@wordpress/rich-text';
-import { findMarkerRange, findMarkerText } from '../inline-markers';
+import {
+	findMarkerRange,
+	findMarkerText,
+	getMarkerSelector,
+} from '../inline-markers';
 
 export const SUGGESTION_FORMAT_NAME = 'core/suggestion';
 
@@ -273,6 +277,19 @@ export function registerSuggestionFormat( edit ) {
 		SUGGESTION_FORMAT_NAME,
 		edit ? { ...suggestionFormat, edit } : suggestionFormat
 	);
+}
+
+/**
+ * Build the CSS selector matching a suggestion's in-content marker in the
+ * editor canvas. The format serializes as `<mark class="wp-suggestion">` with
+ * the suggestion id in `data-suggestion-id`, so the marker element can be
+ * targeted directly — no separate annotation layer needed.
+ *
+ * @param {number|string} id Suggestion id the marker carries.
+ * @return {string} Selector for the suggestion's marker element(s).
+ */
+export function getSuggestionMarkerSelector( id ) {
+	return getMarkerSelector( SUGGESTION_CLASS, SUGGESTION_ID_ATTRIBUTE, id );
 }
 
 /**

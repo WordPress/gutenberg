@@ -16,6 +16,7 @@ import {
 	EDITOR_INTENT_EDIT,
 	EDITOR_INTENT_SUGGEST,
 	EDITOR_INTENT_VIEW,
+	SUGGEST_LOCKED_POST_FIELDS,
 } from './constants';
 import {
 	getDeviceTypeByCanvasWidth,
@@ -843,6 +844,38 @@ export const setEditorIntent =
 		// can't do anything, so close it on the way in.
 		if ( intent === EDITOR_INTENT_VIEW && select.isInserterOpened() ) {
 			dispatch.setIsInserterOpened( false );
+		}
+
+		/*
+		 * `editPost` refuses new status edits while suggesting, but a status
+		 * picked in Editing and left unsaved is already staged when the intent
+		 * changes, and `savePost` would write it on the next save - the
+		 * workflow change this intent exists to withhold, applied without
+		 * anyone choosing it here. Discard it on the way in. `undefined`
+		 * removes the key from the entity's edits, restoring the saved status;
+		 * the write goes straight to `core` because `editPost` would refuse it.
+		 */
+		if ( intent === EDITOR_INTENT_SUGGEST ) {
+			const { id, type } = select.getCurrentPost();
+			const staged = registry
+				.select( coreStore )
+				.getEntityRecordEdits( 'postType', type, id );
+			const discarded = SUGGEST_LOCKED_POST_FIELDS.filter(
+				( key ) => staged && key in staged
+			);
+			if ( discarded.length ) {
+				registry
+					.dispatch( coreStore )
+					.editEntityRecord(
+						'postType',
+						type,
+						id,
+						Object.fromEntries(
+							discarded.map( ( key ) => [ key, undefined ] )
+						),
+						{ undoIgnore: true }
+					);
+			}
 		}
 
 		// Only announce an actual change of intent. Re-selecting the current

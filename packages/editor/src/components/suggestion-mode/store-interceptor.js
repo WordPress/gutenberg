@@ -59,6 +59,7 @@ import { useSuggestionOverlay } from './overlay-context';
 import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
 import { parseSuggestionPayload } from './provider';
 import { createRevertGuard } from '../attribute-suggestions/revert-guard';
+import { planStoreContentEdit } from './plan-store-content-edit';
 import { unlock } from '../../lock-unlock';
 
 const BLOCK_EDITOR_STORE_NAME = 'core/block-editor';
@@ -742,6 +743,7 @@ export default function SuggestionStoreInterceptor() {
 		isDeferredInsertion,
 		clearDeferredInsertions,
 		consumeUndoRedoAdoption,
+		requestContentSuggestion,
 	} = useSuggestionOverlay();
 	const registry = useRegistry();
 
@@ -772,6 +774,9 @@ export default function SuggestionStoreInterceptor() {
 
 	const consumeUndoRedoAdoptionRef = useRef( consumeUndoRedoAdoption );
 	consumeUndoRedoAdoptionRef.current = consumeUndoRedoAdoption;
+
+	const requestContentSuggestionRef = useRef( requestContentSuggestion );
+	requestContentSuggestionRef.current = requestContentSuggestion;
 
 	// The deferred-insertion callbacks are identity-stable (`useCallback`
 	// with no dependencies in the overlay provider), so unlike the values
@@ -1158,27 +1163,56 @@ export default function SuggestionStoreInterceptor() {
 					continue;
 				}
 
-				// Capture a baseline if one isn't already set. The HOC's
-				// own captureBaseline only fires for `setAttributes` calls;
-				// for store-level mutations we have to seed one here.
-				const overlayEntries = entriesRef.current;
-				if ( ! overlayEntries[ clientId ] ) {
-					const block = blockEditor.getBlock?.( clientId );
-					captureBaselineRef.current(
-						clientId,
-						block?.name ?? '',
-						previous
-					);
-				}
-
-				// Route the changes into the overlay so the user still sees
-				// their edit, then revert the underlying store back to the
-				// snapshot so the post itself isn't actually modified. System
-				// metadata is filtered out of the overlay payload — it isn't
-				// a user edit, and `delta.restore` already preserves it.
+				// System metadata is filtered out before the change is
+				// classified — it isn't a user edit, and `delta.restore`
+				// already preserves it.
 				const overlayChanged = stripSystemMetadata( delta.changed );
-				if ( Object.keys( overlayChanged ).length > 0 ) {
-					setOverlayAttributesRef.current( clientId, overlayChanged );
+
+				/*
+				 * A `content` change that is a plain removal goes to the
+				 * content reconciler as an inline deletion marker rather than
+				 * to the overlay. The splitting Enter is why (#73411, F-07):
+				 * it dispatches `replaceBlocks` with a truncated head, so the
+				 * removed tail reached the overlay, which draws its clean
+				 * snapshot in place of the block's value — the removal rendered
+				 * as already done instead of struck through where it still is.
+				 * The reconciler runs asynchronously and re-reads the block, so
+				 * the revert below has to land first; the overlay fallback is
+				 * unaffected by the reordering because it works off `delta`.
+				 */
+				const markerPlan = planStoreContentEdit(
+					previous,
+					current,
+					overlayChanged,
+					currentUserId
+				);
+				const block = blockEditor.getBlock?.( clientId );
+
+				// Capture a baseline if one isn't already set (the HOC's own
+				// captureBaseline only fires for `setAttributes` calls; for
+				// store-level mutations we have to seed one here), then route
+				// the changes into the overlay so the user still sees their
+				// edit. The revert below restores the store so the post itself
+				// isn't actually modified.
+				const routeToOverlay = () => {
+					const overlayEntries = entriesRef.current;
+					if ( ! overlayEntries[ clientId ] ) {
+						captureBaselineRef.current(
+							clientId,
+							block?.name ?? '',
+							previous
+						);
+					}
+					if ( Object.keys( overlayChanged ).length > 0 ) {
+						setOverlayAttributesRef.current(
+							clientId,
+							overlayChanged
+						);
+					}
+				};
+
+				if ( ! markerPlan ) {
+					routeToOverlay();
 				}
 
 				// Record what this revert will make true, so its echo can be
@@ -1213,6 +1247,26 @@ export default function SuggestionStoreInterceptor() {
 					clientId,
 					blockEditor.getBlockAttributes( clientId )
 				);
+
+				/*
+				 * Hand the marker plan over now that the block is back at the
+				 * value the plan was diffed from. The reconciler opens the
+				 * note(s) and writes the marked content through an interceptor
+				 * bypass. It returns a synchronous verdict, so a refusal (no
+				 * handler mounted, as in isolated unit tests) still lands in
+				 * the overlay exactly as it did before this branch existed.
+				 */
+				if ( markerPlan ) {
+					const handed = requestContentSuggestionRef.current?.( {
+						clientId,
+						blockName: block?.name ?? '',
+						prevContent: previous?.content,
+						plan: markerPlan,
+					} );
+					if ( ! handed ) {
+						routeToOverlay();
+					}
+				}
 
 				// The snapshot reflects the (now-restored) baseline for this
 				// block; do NOT update it to `current` here.

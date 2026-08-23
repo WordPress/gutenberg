@@ -262,6 +262,10 @@ test.describe( 'Suggestion mode persistence', () => {
 		).toHaveClass( /is-suggestion-pending-insert/ );
 		await suggestionSaved;
 
+		// Publishing is an editorial decision, refused while Suggesting (see
+		// the post-status guard). These tests only need the post published so
+		// the front end can be inspected, so take the editor's own route back.
+		await switchIntent( page, 'Editing' );
 		const postId = await editor.publishPost();
 
 		await page.goto( `/?p=${ postId }` );
@@ -317,6 +321,8 @@ test.describe( 'Suggestion mode persistence', () => {
 			serialized.indexOf( 'Alpha the first' )
 		);
 
+		// See above: leave Suggesting before publishing.
+		await switchIntent( page, 'Editing' );
 		const postId = await editor.publishPost();
 		await page.goto( `/?p=${ postId }` );
 
@@ -376,6 +382,8 @@ test.describe( 'Suggestion mode persistence', () => {
 		await expect( alpha ).toHaveClass( /is-suggestion-pending-move/ );
 		await saved;
 
+		// See above: leave Suggesting before publishing.
+		await switchIntent( page, 'Editing' );
 		const postId = await editor.publishPost();
 		await page.goto( `/?p=${ postId }` );
 
@@ -483,6 +491,8 @@ test.describe( 'Suggestion mode persistence', () => {
 			serialized.indexOf( 'Group B first' )
 		);
 
+		// See above: leave Suggesting before publishing.
+		await switchIntent( page, 'Editing' );
 		const postId = await editor.publishPost();
 		await page.goto( `/?p=${ postId }` );
 
@@ -560,6 +570,8 @@ test.describe( 'Suggestion mode persistence', () => {
 			third.locator( 'mark.wp-suggestion[data-suggestion-type="format"]' )
 		).toHaveAttribute( 'data-suggestion-id', /\d/ );
 
+		// See above: leave Suggesting before publishing.
+		await switchIntent( page, 'Editing' );
 		const postId = await editor.publishPost();
 		await page.goto( `/?p=${ postId }` );
 
