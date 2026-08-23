@@ -14,6 +14,7 @@
  * overlay context: move suggestions live on the real block and must keep
  * rendering once the overlay is retired. See #73411.
  */
+import type { ReactNode } from 'react';
 import { useRegistry, useSelect } from '@wordpress/data';
 import { createContext, useContext, useMemo } from '@wordpress/element';
 import { buildMoveGhostIndex } from './move-ghost-index';
@@ -39,8 +40,8 @@ const MoveGhostContext = createContext( EMPTY_GHOSTS );
  * provider — per-block consumers must go through `useMoveGhosts` so the
  * document scan runs once, not once per block.
  *
- * @return {{after:Map, before:Map, insideParent:Map}} Anchor → ghost index.
- * Empty when there are no pending moves (or no block-editor store).
+ * @return Anchor → ghost index. Empty when there are no pending moves (or no
+ * block-editor store).
  */
 function useMoveGhostIndex() {
 	const registry = useRegistry();
@@ -55,7 +56,7 @@ function useMoveGhostIndex() {
 	// exists, and the old parent's current first non-self sibling). The index
 	// itself is rebuilt only when that signature changes.
 	const moveSignature = useSelect( ( select ) => {
-		const blockEditor = select( BLOCK_EDITOR_STORE_NAME );
+		const blockEditor: any = select( BLOCK_EDITOR_STORE_NAME );
 		const ids = blockEditor?.getClientIdsWithDescendants?.() ?? [];
 		// Collect the pending-move set first so anchor/sibling resolution in
 		// the fingerprint matches `buildMoveGhostIndex`: a block that is itself
@@ -92,7 +93,8 @@ function useMoveGhostIndex() {
 				blockEditor
 					.getBlockOrder( fromParent )
 					.find(
-						( id ) => id !== clientId && ! movedIds.has( id )
+						( id: string ) =>
+							id !== clientId && ! movedIds.has( id )
 					) ?? '';
 			// Whether the old parent can host an inside-parent fallback ghost
 			// (block existed, not root, not itself moved) — keeps the memo in
@@ -114,7 +116,7 @@ function useMoveGhostIndex() {
 		if ( ! moveSignature ) {
 			return EMPTY_GHOSTS;
 		}
-		const blockEditor = registry.select( BLOCK_EDITOR_STORE_NAME );
+		const blockEditor: any = registry.select( BLOCK_EDITOR_STORE_NAME );
 		if ( ! blockEditor?.getClientIdsWithDescendants ) {
 			return EMPTY_GHOSTS;
 		}
@@ -138,8 +140,9 @@ function useMoveGhostIndex() {
 			return EMPTY_GHOSTS;
 		}
 		return buildMoveGhostIndex( moved, {
-			blockExists: ( id ) => !! blockEditor.getBlockName( id ),
-			getSiblings: ( parentId ) => blockEditor.getBlockOrder( parentId ),
+			blockExists: ( id: string ) => !! blockEditor.getBlockName( id ),
+			getSiblings: ( parentId: string ) =>
+				blockEditor.getBlockOrder( parentId ),
 		} );
 	}, [ moveSignature, registry ] );
 }
@@ -150,9 +153,10 @@ function useMoveGhostIndex() {
  * experiment gate; move ghosts render in every intent (a reviewer in Edit
  * intent needs to see a pending move), so the provider is not intent-gated.
  *
- * @param {{ children: React.ReactNode }} props
+ * @param props          Props.
+ * @param props.children Child elements.
  */
-export function MoveGhostsProvider( { children } ) {
+export function MoveGhostsProvider( { children }: { children: ReactNode } ) {
 	const ghosts = useMoveGhostIndex();
 	return (
 		<MoveGhostContext.Provider value={ ghosts }>
@@ -165,7 +169,7 @@ export function MoveGhostsProvider( { children } ) {
  * Read the shared move-ghost index. Cheap per block: a context read, no
  * store subscription and no tree scan.
  *
- * @return {{after:Map, before:Map, insideParent:Map}} Anchor → ghost index.
+ * @return Anchor → ghost index.
  */
 export default function useMoveGhosts() {
 	return useContext( MoveGhostContext );

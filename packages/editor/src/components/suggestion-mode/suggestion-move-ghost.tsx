@@ -1,18 +1,20 @@
 import { useSelect } from '@wordpress/data';
+// @ts-expect-error No exported types
 import { BlockIcon, store as blockEditorStore } from '@wordpress/block-editor';
 import { getBlockType } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import { VisuallyHidden } from '@wordpress/ui';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
+import type { MovedBlockDescriptor } from './move-ghost-index';
 
 /**
  * Extract a short plain-text excerpt from a block's primary text attribute.
  * `content` may be a string or a RichText value; both expose a string form.
  *
- * @param {*} content Raw `content` attribute.
- * @return {string} Tag-stripped, trimmed, length-capped excerpt.
+ * @param content Raw `content` attribute.
+ * @return Tag-stripped, trimmed, length-capped excerpt.
  */
-function toExcerpt( content ) {
+function toExcerpt( content: any ): string {
 	let raw = '';
 	if ( typeof content === 'string' ) {
 		raw = content;
@@ -39,13 +41,15 @@ function toExcerpt( content ) {
  * original-position cue so screen-reader users get it once, without the
  * struck-through old content reading as live text.
  *
- * @param {Object}                                            props       Props.
- * @param {import('./move-ghost-index').MovedBlockDescriptor} props.moved The
- *                                                                        moved-block
- *                                                                        descriptor.
- * @return {JSX.Element} The ghost element.
+ * @param props       Props.
+ * @param props.moved The moved-block descriptor.
+ * @return The ghost element.
  */
-export default function SuggestionMoveGhost( { moved } ) {
+export default function SuggestionMoveGhost( {
+	moved,
+}: {
+	moved: MovedBlockDescriptor;
+} ) {
 	const blockType = getBlockType( moved.name );
 	const title = blockType?.title ?? moved.name;
 

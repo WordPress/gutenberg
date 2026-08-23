@@ -5,7 +5,7 @@ import SuggestionMoveGhost from '../suggestion-move-ghost';
 // registry, and the icon so the test doesn't pull the real data/blocks
 // module graph.
 jest.mock( '@wordpress/data', () => ( {
-	useSelect: ( fn ) =>
+	useSelect: ( fn: any ) =>
 		fn( () => ( {
 			getBlockAttributes: () => ( {
 				content: '<strong>Hello</strong> world',
@@ -19,14 +19,14 @@ jest.mock( '@wordpress/block-editor', () => ( {
 } ) );
 
 jest.mock( '@wordpress/blocks', () => ( {
-	getBlockType: ( name ) =>
+	getBlockType: ( name: string ) =>
 		name === 'core/paragraph'
 			? { title: 'Paragraph', icon: undefined }
 			: undefined,
 } ) );
 
 jest.mock( '../../collab-sidebar/utils', () => ( {
-	getAvatarBorderColor: ( id ) => `#color${ id }`,
+	getAvatarBorderColor: ( id: any ) => `#color${ id }`,
 } ) );
 
 describe( 'SuggestionMoveGhost', () => {

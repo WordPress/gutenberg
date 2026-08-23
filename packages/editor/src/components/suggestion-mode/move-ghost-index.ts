@@ -1,14 +1,22 @@
-/**
- * @typedef {Object} MovedBlockDescriptor
- * @property {string}      clientId           Live clientId of the moved block.
- * @property {string}      name               Block name.
- * @property {number|null} authorId           Suggesting user id, or null.
- * @property {string|null} fromAnchorClientId Previous-sibling clientId at the
- *                                            old position, or null when the
- *                                            block was the first child.
- * @property {string}      fromParentClientId Old parent clientId ('' = root).
- * @property {number}      fromIndex          Old index within the old parent.
- */
+export interface MovedBlockDescriptor {
+	/** Live clientId of the moved block. */
+	clientId: string;
+	/** Block name. */
+	name: string;
+	/** Suggesting user id, or null. */
+	authorId: number | null;
+	/**
+	 * Previous-sibling clientId at the old position, or null when the block
+	 * was the first child.
+	 */
+	fromAnchorClientId: string | null;
+	/** Old parent clientId ('' = root). */
+	fromParentClientId: string;
+	/** Old index within the old parent. */
+	fromIndex: number;
+}
+
+export type MoveGhostIndex = Map< string, MovedBlockDescriptor[] >;
 
 /**
  * Build the anchor → ghost index from a flat list of moved-block
@@ -33,20 +41,25 @@
  * gone or pending-moved, produces no ghost (graceful) — there is no stable
  * place to anchor it.
  *
- * @param {MovedBlockDescriptor[]}      moved                 Moved-block descriptors.
- * @param {Object}                      resolvers             Injected store accessors.
- * @param {(id:string)=>boolean}        resolvers.blockExists Does a clientId still
- *                                                            exist in the tree?
- * @param {(parentId:string)=>string[]} resolvers.getSiblings Current child order
- *                                                            of a parent.
- * @return {{ after: Map<string, MovedBlockDescriptor[]>,
- *            before: Map<string, MovedBlockDescriptor[]>,
- *            insideParent: Map<string, MovedBlockDescriptor[]> }} The ghost index.
+ * @param moved                 Moved-block descriptors.
+ * @param resolvers             Injected store accessors.
+ * @param resolvers.blockExists Does a clientId still exist in the tree?
+ * @param resolvers.getSiblings Current child order of a parent.
+ * @return The ghost index.
  */
-export function buildMoveGhostIndex( moved, { blockExists, getSiblings } ) {
-	const after = new Map();
-	const before = new Map();
-	const insideParent = new Map();
+export function buildMoveGhostIndex(
+	moved: MovedBlockDescriptor[],
+	{
+		blockExists,
+		getSiblings,
+	}: {
+		blockExists: ( id: string ) => boolean;
+		getSiblings: ( parentId: string ) => string[];
+	}
+) {
+	const after: MoveGhostIndex = new Map();
+	const before: MoveGhostIndex = new Map();
+	const insideParent: MoveGhostIndex = new Map();
 	const sorted = [ ...moved ].sort( ( a, b ) => a.fromIndex - b.fromIndex );
 
 	// A pending-moved block is itself displaced to its new position, so it
@@ -57,26 +70,30 @@ export function buildMoveGhostIndex( moved, { blockExists, getSiblings } ) {
 	const movedIds = new Set(
 		moved.map( ( descriptor ) => descriptor.clientId )
 	);
-	const isUsableAnchor = ( id ) =>
+	const isUsableAnchor = ( id: string | null | undefined ) =>
 		!! id && blockExists( id ) && ! movedIds.has( id );
 
-	const push = ( map, key, value ) => {
+	const push = (
+		map: MoveGhostIndex,
+		key: string,
+		value: MovedBlockDescriptor
+	) => {
 		if ( ! map.has( key ) ) {
 			map.set( key, [] );
 		}
-		map.get( key ).push( value );
+		map.get( key )!.push( value );
 	};
 
 	for ( const descriptor of sorted ) {
 		const anchor = descriptor.fromAnchorClientId;
 		if ( isUsableAnchor( anchor ) ) {
-			push( after, anchor, descriptor );
+			push( after, anchor!, descriptor );
 			continue;
 		}
 		const parentId = descriptor.fromParentClientId ?? '';
 		const siblings = getSiblings( parentId ) ?? [];
 		const firstSibling = siblings.find(
-			( id ) => id !== descriptor.clientId && ! movedIds.has( id )
+			( id: string ) => id !== descriptor.clientId && ! movedIds.has( id )
 		);
 		if ( firstSibling ) {
 			push( before, firstSibling, descriptor );

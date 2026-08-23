@@ -15,6 +15,7 @@
 import clsx from 'clsx';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useRegistry, useSelect } from '@wordpress/data';
+// @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useCallback, useEffect, useMemo, useRef } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
@@ -44,12 +45,15 @@ const DEEP_MERGE_KEYS = new Set( [ 'style', 'metadata' ] );
  * untouched fields. Every other key is replaced wholesale, matching
  * `setAttributes` semantics for primitive and array values.
  *
- * @param {Object}      base    Block's real attributes from the block-editor store.
- * @param {Object|null} overlay Pending overlay attributes; `null` is a no-op.
- * @return {Object} Merged attributes for rendering. Returns `base` by reference
+ * @param base    Block's real attributes from the block-editor store.
+ * @param overlay Pending overlay attributes; `null` is a no-op.
+ * @return Merged attributes for rendering. Returns `base` by reference
  * when there is no overlay to apply, so React's prop-identity bail-out fires.
  */
-function mergeOverlayAttributes( base, overlay ) {
+function mergeOverlayAttributes(
+	base: Record< string, any >,
+	overlay: Record< string, any > | null | undefined
+): Record< string, any > {
 	if ( ! overlay ) {
 		return base;
 	}
@@ -81,11 +85,17 @@ function mergeOverlayAttributes( base, overlay ) {
  * executes a single `useSelect` and renders the original `BlockEdit`
  * untouched.
  *
- * @param {Object}                        args           Arguments.
- * @param {import('react').ComponentType} args.BlockEdit Wrapped edit component.
- * @param {Object}                        args.props     Props to forward to `BlockEdit`.
+ * @param args           Arguments.
+ * @param args.BlockEdit Wrapped edit component.
+ * @param args.props     Props to forward to `BlockEdit`.
  */
-function SuggestingBlockEdit( { BlockEdit, props } ) {
+function SuggestingBlockEdit( {
+	BlockEdit,
+	props,
+}: {
+	BlockEdit: any;
+	props: any;
+} ) {
 	const { clientId, name, attributes, setAttributes } = props;
 	const {
 		entries,
@@ -122,7 +132,7 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 	const entryExists = !! overlayEntry;
 
 	const wrappedSetAttributes = useCallback(
-		( nextAttributes ) => {
+		( nextAttributes: Record< string, any > ) => {
 			/*
 			 * Edits inside a block that IS the suggestion write through to
 			 * the real attributes instead of the overlay:
@@ -239,11 +249,11 @@ const withSuggestionOverlay = createHigherOrderComponent(
  * in one place so the rendering layer stays a thin shell over the data
  * model.
  *
- * @param {string|undefined} type Marker type.
- * @return {string|null} Class name for the marker, or null when the type
+ * @param type Marker type.
+ * @return Class name for the marker, or null when the type
  * is not a recognized structural marker.
  */
-function structuralMarkerClass( type ) {
+function structuralMarkerClass( type: string | undefined ): string | null {
 	switch ( type ) {
 		case 'pending-remove':
 			return 'is-suggestion-pending-remove';
@@ -310,8 +320,11 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 				return <BlockListBlock { ...props } />;
 			}
 
-			const renderGhosts = ( list, keyPrefix ) =>
-				list?.map( ( moved ) => (
+			const renderGhosts = (
+				list: any[] | undefined,
+				keyPrefix: string
+			) =>
+				list?.map( ( moved: any ) => (
 					<SuggestionMoveGhost
 						key={ `${ keyPrefix }-${ moved.clientId }` }
 						moved={ moved }

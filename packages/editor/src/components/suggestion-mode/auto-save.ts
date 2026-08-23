@@ -38,6 +38,7 @@ import { useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { useSuggestionOverlay } from './overlay-context';
+import type { OverlayEntry, SuggestionOperation } from './overlay-context';
 import { operationsFromOverlay, useSuggestionsProvider } from './provider';
 import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
 import { unlock } from '../../lock-unlock';
@@ -49,10 +50,12 @@ const AUTOSAVE_DEBOUNCE_MS = 1500;
  * the overlay has changed relative to what we last synced without comparing
  * deep object trees on every render.
  *
- * @param {Array} operations Operations to fingerprint.
- * @return {string} Stable serialization.
+ * @param operations Operations to fingerprint.
+ * @return Stable serialization.
  */
-export function fingerprintOperations( operations ) {
+export function fingerprintOperations(
+	operations: SuggestionOperation[]
+): string {
 	try {
 		return JSON.stringify( operations );
 	} catch {
@@ -71,11 +74,13 @@ export function fingerprintOperations( operations ) {
  * removal — in which case the structural op leads and any attribute ops
  * follow.
  *
- * @param {Object} entry Overlay entry.
- * @return {Array} Ops describing the entry's pending suggestion.
+ * @param entry Overlay entry.
+ * @return Ops describing the entry's pending suggestion.
  */
-export function operationsForEntry( entry ) {
-	const ops = [];
+export function operationsForEntry(
+	entry: OverlayEntry
+): SuggestionOperation[] {
+	const ops: SuggestionOperation[] = [];
 	if ( entry.structuralOp ) {
 		ops.push( entry.structuralOp );
 	}
@@ -96,7 +101,7 @@ export function operationsForEntry( entry ) {
  * idle window, and subsequent edits update the same note rather than
  * spawning a new one.
  *
- * @return {null} Renders nothing.
+ * @return Renders nothing.
  */
 export default function SuggestionAutoSave() {
 	const { entries, setCommentId, setSyncedOpsKey } = useSuggestionOverlay();
@@ -134,12 +139,14 @@ export default function SuggestionAutoSave() {
 	setSyncedOpsKeyRef.current = setSyncedOpsKey;
 
 	// Per-clientId debounce timer.
-	const timersRef = useRef( new Map() );
+	const timersRef = useRef(
+		new Map< string, ReturnType< typeof setTimeout > >()
+	);
 	// Per-clientId promise chain. New saves are enqueued onto the existing
 	// chain so saves on the same block always run sequentially — no races,
 	// no duplicate POSTs, and no dropped work when the user keeps typing
 	// during a slow network call.
-	const queuesRef = useRef( new Map() );
+	const queuesRef = useRef( new Map< string, Promise< void > >() );
 	// Synchronous mirror of each block's last-known comment id. `setCommentId`
 	// updates React state, which only reaches `entriesRef` on the next render
 	// commit; a save queued immediately after a `create` resolves would run
@@ -148,14 +155,17 @@ export default function SuggestionAutoSave() {
 	// every rotation/clear), so the queued save sees the fresh id without waiting
 	// for React. A `null` value is a deliberate "known to have no note" marker,
 	// distinct from "no entry yet" (fall back to `entry.commentId`).
-	const commentIdsRef = useRef( new Map() );
-	const writeCommentId = useCallback( ( clientId, id ) => {
-		commentIdsRef.current.set( clientId, id );
-		setCommentIdRef.current( clientId, id );
-	}, [] );
+	const commentIdsRef = useRef( new Map< string, number | null >() );
+	const writeCommentId = useCallback(
+		( clientId: string, id: number | null ) => {
+			commentIdsRef.current.set( clientId, id );
+			setCommentIdRef.current( clientId, id );
+		},
+		[]
+	);
 
 	const syncOnce = useCallback(
-		async ( clientId ) => {
+		async ( clientId: string ) => {
 			const entry = entriesRef.current[ clientId ];
 			if ( ! entry ) {
 				return;
@@ -183,7 +193,7 @@ export default function SuggestionAutoSave() {
 				? commentIdsRef.current.get( clientId )
 				: entry.commentId;
 			if ( commentId ) {
-				const linkedComment = registry
+				const linkedComment: any = registry
 					.select( coreStore )
 					.getEntityRecord( 'root', 'comment', commentId );
 				if ( linkedComment && linkedComment.status !== 'hold' ) {
@@ -225,7 +235,7 @@ export default function SuggestionAutoSave() {
 	);
 
 	const enqueueSync = useCallback(
-		( clientId ) => {
+		( clientId: string ) => {
 			const queues = queuesRef.current;
 			const previous = queues.get( clientId ) ?? Promise.resolve();
 			const next = previous

@@ -65,10 +65,12 @@ const BLOCK_EDITOR_STORE_NAME = 'core/block-editor';
  * here so this module doesn't depend on a helper that lands in a later
  * stack PR — it accepts either shape and returns a normalized array.
  *
- * @param {Object|undefined} metadata Block metadata.
- * @return {Array<number|string>} Normalized note ids (empty when none).
+ * @param metadata Block metadata.
+ * @return Normalized note ids (empty when none).
  */
-function readNoteIds( metadata ) {
+function readNoteIds(
+	metadata: Record< string, any > | undefined
+): Array< number | string > {
 	const value = metadata?.noteId;
 	if ( Array.isArray( value ) ) {
 		return value.filter(
@@ -97,11 +99,11 @@ const SYSTEM_METADATA_KEYS = new Set( [ 'noteId', 'suggestion' ] );
  * provider.js — kept as a private helper here so this module doesn't pull
  * in the provider's hooks just for the comparison.
  *
- * @param {*} a First value.
- * @param {*} b Second value.
- * @return {boolean} True when the two values are structurally equal.
+ * @param a First value.
+ * @param b Second value.
+ * @return True when the two values are structurally equal.
  */
-function shallowAttributeEquals( a, b ) {
+function shallowAttributeEquals( a: any, b: any ): boolean {
 	if ( a === b ) {
 		return true;
 	}
@@ -165,14 +167,17 @@ function shallowAttributeEquals( a, b ) {
  * keys whose value has changed and `{ key: previousValue }` for the keys that
  * need to be restored on the block.
  *
- * @param {Object} previous Attributes before the mutation.
- * @param {Object} current  Attributes after the mutation.
- * @return {{ changed: Object, restore: Object }|null} Per-key delta, or null
+ * @param previous Attributes before the mutation.
+ * @param current  Attributes after the mutation.
+ * @return Per-key delta, or null
  * when no keys changed.
  */
-function diffAttributes( previous, current ) {
-	const changed = {};
-	const restore = {};
+function diffAttributes(
+	previous: Record< string, any > | null | undefined,
+	current: Record< string, any >
+): { changed: Record< string, any >; restore: Record< string, any > } | null {
+	const changed: Record< string, any > = {};
+	const restore: Record< string, any > = {};
 	let hasChange = false;
 	const seen = new Set();
 
@@ -193,7 +198,7 @@ function diffAttributes( previous, current ) {
 		}
 		// Key was removed by the mutation.
 		changed[ key ] = undefined;
-		restore[ key ] = previous[ key ];
+		restore[ key ] = previous![ key ];
 		hasChange = true;
 	}
 
@@ -208,11 +213,14 @@ function diffAttributes( previous, current ) {
  *
  * Returns `previous` unchanged when no system key has drifted.
  *
- * @param {Object} previous Snapshot attributes.
- * @param {Object} current  Live attributes.
- * @return {Object} Snapshot attributes with system metadata adopted.
+ * @param previous Snapshot attributes.
+ * @param current  Live attributes.
+ * @return Snapshot attributes with system metadata adopted.
  */
-function adoptSystemMetadata( previous, current ) {
+function adoptSystemMetadata(
+	previous: Record< string, any >,
+	current: Record< string, any >
+): Record< string, any > {
 	const previousMeta = previous?.metadata ?? {};
 	const currentMeta = current?.metadata ?? {};
 	let nextMeta = previousMeta;
@@ -251,10 +259,12 @@ function adoptSystemMetadata( previous, current ) {
  *
  * Drops the `metadata` key entirely when no non-system fields remain.
  *
- * @param {Object} changed `delta.changed` from `diffAttributes`.
- * @return {Object} Filtered payload safe for the overlay.
+ * @param changed `delta.changed` from `diffAttributes`.
+ * @return Filtered payload safe for the overlay.
  */
-function stripSystemMetadata( changed ) {
+function stripSystemMetadata(
+	changed: Record< string, any >
+): Record< string, any > {
 	const meta = changed?.metadata;
 	if ( ! meta || typeof meta !== 'object' ) {
 		return changed;
@@ -295,14 +305,18 @@ function stripSystemMetadata( changed ) {
  * through the sync layer, which undoes the apply on the accepter's screen
  * a moment after they clicked.
  *
- * @param {Object|null} coreSelect        Selectors for the core-data store,
- *                                        or `null` when the store isn't
- *                                        registered (e.g. unit tests).
- * @param {Object}      currentAttributes Block attributes after the mutation.
- * @param {Object}      delta             Output of `diffAttributes`.
- * @return {boolean} True when every changed key matches a suggestion's `after`.
+ * @param coreSelect        Selectors for the core-data store, or `null`
+ *                          when the store isn't registered (e.g. unit tests).
+ * @param currentAttributes Block attributes after the mutation.
+ * @param delta             Output of `diffAttributes`.
+ * @param delta.changed     Changed attribute values keyed by attribute.
+ * @return True when every changed key matches a suggestion's `after`.
  */
-function isAcceptedSuggestionChange( coreSelect, currentAttributes, delta ) {
+function isAcceptedSuggestionChange(
+	coreSelect: any,
+	currentAttributes: Record< string, any > | null | undefined,
+	delta: { changed: Record< string, any > }
+): boolean {
 	if ( ! coreSelect?.getEntityRecord ) {
 		return false;
 	}
@@ -315,7 +329,7 @@ function isAcceptedSuggestionChange( coreSelect, currentAttributes, delta ) {
 		return false;
 	}
 
-	const matched = new Set();
+	const matched = new Set< string >();
 	for ( const noteId of noteIds ) {
 		const comment = coreSelect.getEntityRecord( 'root', 'comment', noteId );
 		const payload = parseSuggestionPayload( comment?.meta?._wp_suggestion );
@@ -356,38 +370,34 @@ function isAcceptedSuggestionChange( coreSelect, currentAttributes, delta ) {
  * reject. See `docs/explanations/architecture/suggestions.md` for the
  * "apply-and-tag" rationale.
  *
- * @typedef {Object} SuggestionMarker
- * @property {'pending-remove'|'pending-insert'|'pending-move'} type        Op type
- *                                                                          the marker represents.
- * @property {number}                                           [commentId] Filled in by auto-save once a note comment
- *                                                                          exists for this marker.
- * @property {number|null}                                      [authorId]  ID of the user who proposed this
- *                                                                          suggestion. Captured at marker-write
- *                                                                          time so the rendering layer can tint
- *                                                                          the preview with the author's avatar
- *                                                                          color. `null` when the current user
- *                                                                          can't be resolved (e.g., unit tests).
+ * The marker's `type` is the op type it represents; `commentId` is filled
+ * in by auto-save once a note comment exists for the marker; `authorId` is
+ * the ID of the user who proposed the suggestion, captured at marker-write
+ * time so the rendering layer can tint the preview with the author's avatar
+ * color (`null` when the current user can't be resolved, e.g. unit tests).
  */
+export interface SuggestionMarker {
+	type: 'pending-remove' | 'pending-insert' | 'pending-move';
+	commentId?: number;
+	authorId?: number | null;
+	[ key: string ]: any;
+}
 
 /**
  * Walk the live block-editor tree and capture the parent + index of every
  * block. Used by the removal-detection branch to re-insert a block at its
  * previous position when the live tree drops it.
  *
- * @param {Object} blockEditor Block-editor selectors (`registry.select(
- *                             'core/block-editor' )`).
- * @return {{
- *   blocksByClientId: Map<string, Object>,
- *   parentByClientId: Map<string, string|null>,
- *   indexByClientId:  Map<string, number>,
- * }} Tree snapshot.
+ * @param blockEditor Block-editor selectors (`registry.select(
+ *                    'core/block-editor' )`).
+ * @return Tree snapshot.
  */
-function captureTreeSnapshot( blockEditor ) {
-	const blocksByClientId = new Map();
-	const parentByClientId = new Map();
-	const indexByClientId = new Map();
+function captureTreeSnapshot( blockEditor: any ) {
+	const blocksByClientId = new Map< string, any >();
+	const parentByClientId = new Map< string, string | null >();
+	const indexByClientId = new Map< string, number >();
 
-	const walk = ( clientIds, parentClientId ) => {
+	const walk = ( clientIds: string[], parentClientId: string | null ) => {
 		for ( let index = 0; index < clientIds.length; index++ ) {
 			const clientId = clientIds[ index ];
 			const block = blockEditor.getBlock?.( clientId );
@@ -413,11 +423,14 @@ function captureTreeSnapshot( blockEditor ) {
  * leaving every other field untouched. Returns a new object — the caller
  * passes it to `updateBlockAttributes`, which performs its own merge.
  *
- * @param {Object}           currentMetadata Current block metadata.
- * @param {SuggestionMarker} marker          Marker to write.
- * @return {Object} New metadata with the marker applied.
+ * @param currentMetadata Current block metadata.
+ * @param marker          Marker to write.
+ * @return New metadata with the marker applied.
  */
-function withSuggestionMarker( currentMetadata, marker ) {
+function withSuggestionMarker(
+	currentMetadata: Record< string, any > | null | undefined,
+	marker: SuggestionMarker
+): Record< string, any > {
 	return {
 		...( currentMetadata || {} ),
 		suggestion: marker,
@@ -434,22 +447,27 @@ function withSuggestionMarker( currentMetadata, marker ) {
  * "before" state to preserve — so callers let them write through to the real
  * attributes instead of opening a separate suggestion.
  *
- * @param {Object} blockEditor Block-editor selectors (anything exposing
- *                             `getBlockAttributes` and `getBlockParents`).
- * @param {string} clientId    Block client ID.
- * @return {boolean} True when the block or an ancestor is a pending insert.
+ * @param blockEditor Block-editor selectors (anything exposing
+ *                    `getBlockAttributes` and `getBlockParents`).
+ * @param clientId    Block client ID.
+ * @return True when the block or an ancestor is a pending insert.
  */
-function isPartOfPendingInsertion( blockEditor, clientId ) {
+function isPartOfPendingInsertion(
+	blockEditor: any,
+	clientId: string
+): boolean {
 	if ( ! blockEditor ) {
 		return false;
 	}
-	const markerType = ( id ) =>
+	const markerType = ( id: string ) =>
 		blockEditor.getBlockAttributes?.( id )?.metadata?.suggestion?.type;
 	if ( markerType( clientId ) === 'pending-insert' ) {
 		return true;
 	}
 	const parents = blockEditor.getBlockParents?.( clientId ) ?? [];
-	return parents.some( ( id ) => markerType( id ) === 'pending-insert' );
+	return parents.some(
+		( id: string ) => markerType( id ) === 'pending-insert'
+	);
 }
 
 /**
@@ -458,16 +476,18 @@ function isPartOfPendingInsertion( blockEditor, clientId ) {
  * block restores its descendants automatically; re-inserting both a parent
  * and its child would duplicate the child.
  *
- * @param {string[]}                 removedIds       All clientIds missing
- *                                                    from the live tree.
- * @param {Map<string, string|null>} parentByClientId Snapshot parents.
- * @return {string[]} Top-level removed clientIds.
+ * @param removedIds       All clientIds missing from the live tree.
+ * @param parentByClientId Snapshot parents.
+ * @return Top-level removed clientIds.
  */
-function topLevelRemoved( removedIds, parentByClientId ) {
+function topLevelRemoved(
+	removedIds: string[],
+	parentByClientId: Map< string, string | null >
+): string[] {
 	const removedSet = new Set( removedIds );
 	return removedIds.filter( ( id ) => {
 		const parent = parentByClientId.get( id );
-		return parent === null || ! removedSet.has( parent );
+		return parent === null || ! removedSet.has( parent as string );
 	} );
 }
 
@@ -478,11 +498,11 @@ function topLevelRemoved( removedIds, parentByClientId ) {
  * parent's old vs new sibling order are the ones that actually moved;
  * blocks in the LCS just had their index shift as a side-effect.
  *
- * @param {string[]} a First array.
- * @param {string[]} b Second array.
- * @return {Set<string>} The LCS as a set for O(1) membership checks.
+ * @param a First array.
+ * @param b Second array.
+ * @return The LCS as a set for O(1) membership checks.
  */
-function lcsClientIds( a, b ) {
+function lcsClientIds( a: string[], b: string[] ): Set< string > {
 	const m = a.length;
 	const n = b.length;
 	if ( m === 0 || n === 0 ) {
@@ -499,7 +519,7 @@ function lcsClientIds( a, b ) {
 					: Math.max( dp[ i - 1 ][ j ], dp[ i ][ j - 1 ] );
 		}
 	}
-	const result = new Set();
+	const result = new Set< string >();
 	let i = m;
 	let j = n;
 	while ( i > 0 && j > 0 ) {
@@ -531,14 +551,18 @@ function lcsClientIds( a, b ) {
  * not explain the reorder (programmatic reorders, no selection), fall back
  * to the LCS heuristic.
  *
- * @param {string[]}    oldSiblings Candidate ids in previous-tick order.
- * @param {string[]}    newSiblings Candidate ids in live order.
- * @param {Set<string>} selectedIds Currently selected block client ids.
- * @return {Set<string>} Ids of siblings that did NOT move.
+ * @param oldSiblings Candidate ids in previous-tick order.
+ * @param newSiblings Candidate ids in live order.
+ * @param selectedIds Currently selected block client ids.
+ * @return Ids of siblings that did NOT move.
  */
-function stableSiblingSet( oldSiblings, newSiblings, selectedIds ) {
+function stableSiblingSet(
+	oldSiblings: string[],
+	newSiblings: string[],
+	selectedIds: Set< string >
+): Set< string > {
 	if ( selectedIds?.size > 0 ) {
-		const isSelected = ( id ) => selectedIds.has( id );
+		const isSelected = ( id: string ) => selectedIds.has( id );
 		if ( oldSiblings.some( isSelected ) ) {
 			const oldRest = oldSiblings.filter( ( id ) => ! isSelected( id ) );
 			const newRest = newSiblings.filter( ( id ) => ! isSelected( id ) );
@@ -572,21 +596,29 @@ function stableSiblingSet( oldSiblings, newSiblings, selectedIds ) {
  * previous-tick tree but not live) are handled by the insertion / removal
  * branches; this function ignores both.
  *
- * @param {string[]} liveClientIds Live tree client ids.
- * @param {Object}   tree          Previous-tick tree snapshot from
- *                                 `captureTreeSnapshot`.
- * @param {Object}   blockEditor   Block-editor selectors.
- * @return {Array<Object>} One entry per moved block, with from/to anchors.
+ * @param liveClientIds Live tree client ids.
+ * @param tree          Previous-tick tree snapshot from
+ *                      `captureTreeSnapshot`.
+ * @param blockEditor   Block-editor selectors.
+ * @return One entry per moved block, with from/to anchors.
  */
-function detectMovedBlocks( liveClientIds, tree, blockEditor ) {
-	const movedRaw = [];
+function detectMovedBlocks(
+	liveClientIds: string[],
+	tree: ReturnType< typeof captureTreeSnapshot >,
+	blockEditor: any
+) {
+	const movedRaw: Array< {
+		clientId: string;
+		oldParent: string | null;
+		newParent: string | null;
+	} > = [];
 
-	const candidatesByNewParent = new Map();
+	const candidatesByNewParent = new Map< string | null, string[] >();
 	for ( const clientId of liveClientIds ) {
 		if ( ! tree.parentByClientId.has( clientId ) ) {
 			continue; // new block — handled elsewhere
 		}
-		const oldParent = tree.parentByClientId.get( clientId );
+		const oldParent = tree.parentByClientId.get( clientId )!;
 		const newParent =
 			blockEditor.getBlockRootClientId?.( clientId ) || null;
 		if ( oldParent !== newParent ) {
@@ -596,10 +628,10 @@ function detectMovedBlocks( liveClientIds, tree, blockEditor ) {
 		if ( ! candidatesByNewParent.has( newParent ) ) {
 			candidatesByNewParent.set( newParent, [] );
 		}
-		candidatesByNewParent.get( newParent ).push( clientId );
+		candidatesByNewParent.get( newParent )!.push( clientId );
 	}
 
-	const selectedIds = new Set(
+	const selectedIds = new Set< string >(
 		blockEditor.getSelectedBlockClientIds?.() ?? []
 	);
 
@@ -616,7 +648,7 @@ function detectMovedBlocks( liveClientIds, tree, blockEditor ) {
 		const newSiblings = candidates
 			.slice()
 			.sort(
-				( a, b ) =>
+				( a: string, b: string ) =>
 					newSiblingOrder.indexOf( a ) - newSiblingOrder.indexOf( b )
 			);
 		const samePosition =
@@ -648,12 +680,12 @@ function detectMovedBlocks( liveClientIds, tree, blockEditor ) {
 	// Reconstruct the previous-tick sibling order per parent so we can
 	// compute fromAnchorClientId. Building this lazily keeps the no-move
 	// path zero-cost.
-	const oldOrderByParent = new Map();
-	const oldOrderFor = ( oldParent ) => {
+	const oldOrderByParent = new Map< string | null, string[] >();
+	const oldOrderFor = ( oldParent: string | null ) => {
 		if ( oldOrderByParent.has( oldParent ) ) {
-			return oldOrderByParent.get( oldParent );
+			return oldOrderByParent.get( oldParent )!;
 		}
-		const ids = [];
+		const ids: string[] = [];
 		for ( const [ id, parent ] of tree.parentByClientId ) {
 			if ( parent === oldParent ) {
 				ids.push( id );
