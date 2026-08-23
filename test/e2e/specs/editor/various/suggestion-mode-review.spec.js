@@ -1403,7 +1403,7 @@ test.describe( 'Suggestion mode review flows', () => {
 		const summary = sidebar.locator(
 			'.editor-collab-sidebar-panel__suggestion-summary'
 		);
-		await expect( summary ).toContainText( 'Formatting:' );
+		await expect( summary ).toContainText( 'Add formatting:' );
 		await expect( summary ).toContainText( 'https://example.com/handbook' );
 	} );
 

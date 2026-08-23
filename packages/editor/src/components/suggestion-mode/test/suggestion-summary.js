@@ -242,12 +242,14 @@ describe( 'summarizeOperations', () => {
 				after: 'alpha one two three four',
 			},
 		] );
-		expect( lines ).toEqual(
-			expect.arrayContaining( [
-				{ label: 'Add:', value: '“one two three four”' },
-				{ label: 'Delete:', value: '“beta gamma delta epsilon”' },
-			] )
-		);
+		// Both halves of the edit are one change, so they share a `Replace:`
+		// line - the point here is that neither half is glued together.
+		expect( lines ).toEqual( [
+			{
+				label: 'Replace:',
+				value: '“beta gamma delta epsilon” → “one two three four”',
+			},
+		] );
 	} );
 
 	it( 'does not leak markup into a quoted Add: line', () => {
@@ -668,7 +670,7 @@ describe( 'summarizeOperations', () => {
 			},
 		] );
 		expect( lines ).toEqual( [
-			{ label: 'Formatting:', value: 'link' },
+			{ label: 'Add formatting:', value: 'link' },
 			{ label: 'Link:', value: 'https://example.com/docs' },
 		] );
 	} );
@@ -683,7 +685,7 @@ describe( 'summarizeOperations', () => {
 			},
 		] );
 		expect( lines ).toEqual( [
-			{ label: 'Formatting:', value: 'link' },
+			{ label: 'Remove formatting:', value: 'link' },
 			{ label: 'Link:', value: 'https://example.com/?a=1&b=2' },
 		] );
 	} );
