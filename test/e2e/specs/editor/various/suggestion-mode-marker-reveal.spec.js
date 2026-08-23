@@ -46,6 +46,23 @@ async function suggestAdditionIn( page, editor, index ) {
 	return marker;
 }
 
+/**
+ * Open the docked notes sidebar. Notes no longer open it on their own, so a
+ * test that needs the panel has to ask for it.
+ *
+ * @param {import('@playwright/test').Page} page Playwright page.
+ */
+async function openNotesSidebar( page ) {
+	const allNotesToggle = page
+		.getByRole( 'region', { name: 'Editor top bar' } )
+		.getByRole( 'button', { name: 'All notes', exact: true } );
+	if (
+		( await allNotesToggle.getAttribute( 'aria-expanded' ) ) === 'false'
+	) {
+		await allNotesToggle.click();
+	}
+}
+
 test.describe( 'Suggestion marker reveal', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.setGutenbergExperiments( [
@@ -82,14 +99,7 @@ test.describe( 'Suggestion marker reveal', () => {
 		const marker = await suggestAdditionIn( page, editor, 0 );
 
 		// Open "All notes" and scroll the marker out of sight.
-		const allNotesToggle = page
-			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'All notes', exact: true } );
-		if (
-			( await allNotesToggle.getAttribute( 'aria-expanded' ) ) === 'false'
-		) {
-			await allNotesToggle.click();
-		}
+		await openNotesSidebar( page );
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.last()
@@ -175,6 +185,7 @@ test.describe( 'Suggestion marker reveal', () => {
 
 		// Closing the docked sidebar hands the notes over to the floating
 		// board, which mounts all three cards at once.
+		await openNotesSidebar( page );
 		await page.getByRole( 'button', { name: 'Close Notes' } ).click();
 		const cards = page.locator(
 			'.editor-collab-sidebar-panel__thread.is-floating'

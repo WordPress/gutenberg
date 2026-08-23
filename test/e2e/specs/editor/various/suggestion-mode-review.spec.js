@@ -476,7 +476,7 @@ test.describe( 'Suggestion mode review flows', () => {
 		const summaryText = async () =>
 			( await summaries.allInnerTexts() ).join( '\n' );
 		// Positive signals first: both suggestions are described.
-		await expect.poll( summaryText ).toContain( 'Formatting: bold' );
+		await expect.poll( summaryText ).toContain( 'Add formatting: bold' );
 		await expect.poll( summaryText ).toContain( 'Change: heading level' );
 		// And the old near-collision is gone.
 		expect( await summaryText() ).not.toMatch( /(^|\W)Format:/ );

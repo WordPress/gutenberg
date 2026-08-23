@@ -86,9 +86,14 @@ test.describe( 'Suggestion mode post status', () => {
 		await expect(
 			settings.getByRole( 'button', { name: /^Change status:/ } )
 		).toBeHidden();
-		await expect(
-			settings.getByRole( 'button', { name: DISABLED_STATUS_LABEL } )
-		).toBeDisabled();
+		const statusToggle = settings.locator( '.editor-post-status__toggle' );
+		await expect( statusToggle ).toBeDisabled();
+		// The status stays the accessible name so it is still announced; the
+		// reason rides along as the description.
+		await expect( statusToggle ).toHaveAccessibleName( 'Draft' );
+		await expect( statusToggle ).toHaveAccessibleDescription(
+			DISABLED_STATUS_LABEL
+		);
 	} );
 
 	test( 'a status edit dispatched while suggesting is refused', async ( {
@@ -109,14 +114,18 @@ test.describe( 'Suggestion mode post status', () => {
 
 		expect( await getEditedStatus( page ) ).toBe( 'draft' );
 
-		// The rest of the same call still lands: only the locked field is
-		// dropped.
+		/*
+		 * The whole call is dropped, not just the locked key: a status edit
+		 * travels with companions derived from it - `PostVisibility` pairs it
+		 * with `password`, scheduling with `date` - and applying those while
+		 * withholding the status leaves a state nobody asked for.
+		 */
 		const excerpt = await page.evaluate( () =>
 			window.wp.data
 				.select( 'core/editor' )
 				.getEditedPostAttribute( 'excerpt' )
 		);
-		expect( excerpt ).toBe( 'A suggested excerpt' );
+		expect( excerpt ).toBe( '' );
 	} );
 
 	test( 'the publish button refuses to publish while suggesting', async ( {

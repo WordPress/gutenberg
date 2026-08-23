@@ -113,7 +113,7 @@ test.describe( 'Suggest mode: sidebar summaries', () => {
 		const sidebar = await openNotesSidebar( page );
 		const summary = sidebar
 			.locator( '.editor-collab-sidebar-panel__suggestion-summary' )
-			.filter( { hasText: 'Delete:' } )
+			.filter( { hasText: 'Replace:' } )
 			.first();
 
 		// Anchor on the summary existing before asserting what it says, so a
