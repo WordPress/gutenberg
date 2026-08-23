@@ -1087,13 +1087,27 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			return $post;
 		}
 
+		$image_size = $request['image_size'];
+
+		/*
+		 * Sideloads extend an existing attachment with a file derived from it,
+		 * which is an image or PDF sub-size in every case but one: the web-safe
+		 * transcode of a video is sideloaded as a companion of the video
+		 * attachment it was produced from, so a video parent is valid for that
+		 * size and no other.
+		 */
+		$is_optimized_video_companion =
+			self::IMAGE_SIZE_OPTIMIZED_VIDEO === $image_size &&
+			wp_attachment_is( 'video', $post );
+
 		if (
 			! wp_attachment_is_image( $post ) &&
-			! wp_attachment_is( 'pdf', $post )
+			! wp_attachment_is( 'pdf', $post ) &&
+			! $is_optimized_video_companion
 		) {
 			return new WP_Error(
 				'rest_post_invalid_id',
-				__( 'Invalid post ID. Only images and PDFs can be sideloaded.', 'gutenberg' ),
+				__( 'Invalid post ID. Only images, PDFs and videos can be sideloaded.', 'gutenberg' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -1187,8 +1201,6 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		$type = $file['type'];
 		$path = $file['file'];
 
-		$image_size = $request['image_size'];
-
 		// Read dimensions once up-front. Needed both for early-error handling
 		// (corrupted/unsupported files) and for populating the sub-size payload
 		// below. 'original' and 'scaled' both replace the main file, so their
@@ -1196,7 +1208,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		// validated against the stored attachment size (it must match it or be
 		// its transpose).
 		//
-		// 'animated_video' companions are video files (MP4/WebM); the image
+		// 'animated_video' and 'optimized-video' companions are video files
+		// (MP4/WebM); the image
 		// helpers can't read their dimensions and would falsely report the
 		// upload as "corrupted or unsupported". Source-format originals
 		// ('source_original', e.g. the HEIC kept next to its JPEG derivative)
