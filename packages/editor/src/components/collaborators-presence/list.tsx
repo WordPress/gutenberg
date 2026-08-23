@@ -7,6 +7,7 @@ import Avatar from './avatar';
 import { getAvatarUrl } from '../collaborators-overlay/get-avatar-url';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import { type CursorRegistry } from '../collaborators-overlay/cursor-registry';
+import { getCollaboratorDisplayName } from '../../utils/get-collaborator-display-name';
 
 interface CollaboratorsListProps {
 	activeCollaborators: PostEditorAwarenessState[];
@@ -72,6 +73,9 @@ export function CollaboratorsList( {
 				<div className="editor-collaborators-presence__list-items">
 					{ activeCollaborators.map( ( collaboratorState ) => {
 						const isCurrentUser = collaboratorState.isMe;
+						const displayName = getCollaboratorDisplayName(
+							collaboratorState.collaboratorInfo
+						);
 						return (
 							<button
 								key={ collaboratorState.clientId }
@@ -88,15 +92,14 @@ export function CollaboratorsList( {
 										collaboratorState.collaboratorInfo
 											.avatar_urls
 									) }
-									name={
-										collaboratorState.collaboratorInfo.name
-									}
+									name={ displayName }
 									borderColor={
 										isCurrentUser
 											? 'var(--wp-admin-theme-color)'
 											: getAvatarBorderColor(
 													collaboratorState
-														.collaboratorInfo.id
+														.collaboratorInfo.id ??
+														collaboratorState.clientId
 											  )
 									}
 									dimmed={ ! collaboratorState.isConnected }
@@ -105,8 +108,7 @@ export function CollaboratorsList( {
 									<div className="editor-collaborators-presence__list-item-name">
 										{ isCurrentUser
 											? __( 'You' )
-											: collaboratorState.collaboratorInfo
-													.name }
+											: displayName }
 									</div>
 								</div>
 							</button>

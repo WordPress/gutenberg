@@ -87,12 +87,14 @@ describe( 'isCollaborationEnabledForCurrentPost', () => {
 	let originalCollaborationEnabled;
 
 	beforeEach( () => {
-		originalCollaborationEnabled = window._wpCollaborationEnabled;
-		window._wpCollaborationEnabled = true;
+		originalCollaborationEnabled =
+			window.__experimentalEnableRealTimeCollaboration;
+		window.__experimentalEnableRealTimeCollaboration = true;
 	} );
 
 	afterEach( () => {
-		window._wpCollaborationEnabled = originalCollaborationEnabled;
+		window.__experimentalEnableRealTimeCollaboration =
+			originalCollaborationEnabled;
 	} );
 
 	function setupRegistry( {

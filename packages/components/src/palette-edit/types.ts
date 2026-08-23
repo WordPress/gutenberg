@@ -7,6 +7,7 @@ export type Color = {
 	name: string;
 	slug: string;
 	gradient?: never;
+	colors?: never;
 };
 
 export type Gradient = {
@@ -14,9 +15,23 @@ export type Gradient = {
 	name: string;
 	slug: string;
 	color?: never;
+	colors?: never;
 };
 
-export type PaletteElement = Color | Gradient;
+export type Duotone = {
+	colors: string[];
+	name: string;
+	slug: string;
+	color?: never;
+	gradient?: never;
+};
+
+export type PaletteElement = Color | Gradient | Duotone;
+
+/**
+ * The kind of preset a `PaletteEdit` instance is editing.
+ */
+export type PaletteVariant = 'color' | 'gradient' | 'duotone';
 
 export type BasePaletteEdit = {
 	/**
@@ -71,6 +86,8 @@ type PaletteEditColors = {
 	 */
 	onChange: ( values?: Color[] ) => void;
 	gradients?: never;
+	duotones?: never;
+	colorPalette?: never;
 };
 
 type PaletteEditGradients = {
@@ -83,17 +100,40 @@ type PaletteEditGradients = {
 	 */
 	onChange: ( values?: Gradient[] ) => void;
 	colors?: never;
+	duotones?: never;
+	colorPalette?: never;
+};
+
+type PaletteEditDuotones = {
+	/**
+	 * The duotones in the palette.
+	 */
+	duotones: Duotone[];
+	/**
+	 * Runs on changing the value.
+	 */
+	onChange: ( values?: Duotone[] ) => void;
+	/**
+	 * The colors offered when picking the shadows and highlights of a duotone,
+	 * and from which the value of a newly added duotone is derived.
+	 *
+	 * @default []
+	 */
+	colorPalette?: Color[];
+	colors?: never;
+	gradients?: never;
 };
 
 export type PaletteEditProps = BasePaletteEdit &
-	( PaletteEditColors | PaletteEditGradients );
+	( PaletteEditColors | PaletteEditGradients | PaletteEditDuotones );
 
 type EditingElement = number | null;
 
-export type ColorPickerPopoverProps< T extends Color | Gradient > = {
+export type ColorPickerPopoverProps< T extends PaletteElement > = {
 	element: T;
 	onChange: ( newElement: T ) => void;
-	isGradient?: T extends Gradient ? true : false;
+	variant: PaletteVariant;
+	colorPalette?: Color[];
 	onClose?: () => void;
 	popoverProps?: PaletteEditProps[ 'popoverProps' ];
 };
@@ -104,10 +144,11 @@ export type NameInputProps = {
 	value: PaletteElement[ 'name' ];
 };
 
-export type OptionProps< T extends Color | Gradient > = {
+export type OptionProps< T extends PaletteElement > = {
 	element: T;
 	onChange: ( newElement: T ) => void;
-	isGradient: T extends Gradient ? true : false;
+	variant: PaletteVariant;
+	colorPalette?: Color[];
 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
 	key: Key;
 	onRemove: MouseEventHandler< HTMLButtonElement >;
@@ -115,10 +156,11 @@ export type OptionProps< T extends Color | Gradient > = {
 	slugPrefix: string;
 };
 
-export type PaletteEditListViewProps< T extends Color | Gradient > = {
+export type PaletteEditListViewProps< T extends PaletteElement > = {
 	elements: T[];
 	onChange: ( newElements?: T[] ) => void;
-	isGradient: T extends Gradient ? true : false;
+	variant: PaletteVariant;
+	colorPalette?: Color[];
 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
 	addColorRef: React.RefObject< HTMLButtonElement | null >;
 	editingElement?: EditingElement;

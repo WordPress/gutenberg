@@ -50,6 +50,7 @@
 		"build-vendors": "node ./packages/build-vendors.mjs",
 		"generate-worker-placeholders": "node ./packages/generate-worker-placeholders.mjs",
 		"resolve-trace-source-maps": "node ./packages/resolve-trace-source-maps.cjs",
-		"check-type-declarations": "node ./packages/check-build-type-declaration-files.cjs"
+		"check-type-declarations": "node ./packages/check-build-type-declaration-files.cjs",
+		"typecheck": "node ./typecheck.mjs"
 	}
 }
