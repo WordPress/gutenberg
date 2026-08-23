@@ -53,7 +53,7 @@
 		"@wordpress/redux-routine": "file:../redux-routine",
 		"deepmerge": "^4.3.1",
 		"equivalent-key-map": "^0.2.2",
-		"is-plain-object": "^5.0.0",
+		"is-plain-object": "^5.1.0",
 		"is-promise": "^4.0.0",
 		"redux": "^5.0.1",
 		"rememo": "^4.0.2",

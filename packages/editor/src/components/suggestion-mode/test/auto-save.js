@@ -2,6 +2,7 @@ import { render, act } from '@testing-library/react';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as preferencesStore } from '@wordpress/preferences';
 import SuggestionAutoSave, { operationsForEntry } from '../auto-save';
 import {
 	SuggestionOverlayProvider,
@@ -46,6 +47,9 @@ function renderInSuggestMode( ui ) {
 	const registry = createRegistry();
 	registry.register( noticesStore );
 	registry.register( coreStore );
+	// `setEditorIntent` compares the editor mode across the change so it can
+	// announce a canvas swap, and `getEditorMode` reads the preferences store.
+	registry.register( preferencesStore );
 	registry.register( editorStore );
 	unlock( registry.dispatch( editorStore ) ).setEditorIntent( 'suggest' );
 
@@ -398,6 +402,7 @@ describe( 'SuggestionAutoSave', () => {
 	it( 'does nothing when the editor is not in Suggest intent', async () => {
 		const registry = createRegistry();
 		registry.register( noticesStore );
+		registry.register( preferencesStore );
 		registry.register( editorStore );
 		unlock( registry.dispatch( editorStore ) ).setEditorIntent( 'edit' );
 
@@ -430,6 +435,56 @@ describe( 'SuggestionAutoSave', () => {
 		await flushPromises();
 
 		expect( createSuggestion ).not.toHaveBeenCalled();
+	} );
+
+	it( 'drops a pending save when the user leaves Suggest intent, and resumes it on return', async () => {
+		createSuggestion.mockResolvedValue( { id: 42 } );
+
+		const { registry } = renderInSuggestMode(
+			<>
+				<CaptureOverlay />
+				<SuggestionAutoSave />
+			</>
+		);
+
+		act( () => {
+			overlayHandle.captureBaseline( 'a', 'core/paragraph', {
+				content: 'Hi',
+			} );
+			overlayHandle.setOverlayAttributes( 'a', { content: 'Hello' } );
+		} );
+
+		// Leave Suggest mode mid-debounce.
+		await act( async () => {
+			jest.advanceTimersByTime( 500 );
+		} );
+		act( () => {
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'edit'
+			);
+		} );
+
+		await act( async () => {
+			jest.advanceTimersByTime( 5000 );
+		} );
+		await flushPromises();
+
+		expect( createSuggestion ).not.toHaveBeenCalled();
+
+		// Returning to Suggest reschedules the still-unsynced entry.
+		act( () => {
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+		} );
+
+		await act( async () => {
+			jest.advanceTimersByTime( 1500 );
+		} );
+		await flushPromises();
+		await flushPromises();
+
+		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
 	} );
 } );
 

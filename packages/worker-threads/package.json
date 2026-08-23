@@ -51,6 +51,9 @@
 	"dependencies": {
 		"comctx": "^1.4.3"
 	},
+	"devDependencies": {
+		"@types/jest": "^30.0.0"
+	},
 	"publishConfig": {
 		"access": "public"
 	}
