@@ -38,6 +38,16 @@ const getDayButton = ( date: Date ) =>
 		name: new RegExp( fullDateFormatter.format( date ) ),
 	} );
 
+function DateHarness( { initialValue }: { initialValue: string } ) {
+	const [ data, setData ] = useState< TestItem >( {
+		published: initialValue,
+	} );
+	const onChange: DataFormControlProps< TestItem >[ 'onChange' ] = (
+		edits
+	) => setData( ( current ) => ( { ...current, ...edits } ) as TestItem );
+	return <DateControl data={ data } field={ field } onChange={ onChange } />;
+}
+
 function RangeHarness( {
 	initialValue,
 }: {
@@ -60,6 +70,12 @@ function RangeHarness( {
 }
 
 describe( 'DateControl', () => {
+	const originalSettings = getSettings();
+
+	afterEach( () => {
+		setSettings( originalSettings );
+	} );
+
 	it( 'should move the calendar to the month of a value changed from outside the control', () => {
 		const { rerender } = render(
 			<DateControl
@@ -186,10 +202,7 @@ describe( 'DateControl', () => {
 	} );
 
 	describe( 'with a site time zone ahead of the browser', () => {
-		let originalSettings: ReturnType< typeof getSettings >;
-
-		beforeAll( () => {
-			originalSettings = getSettings();
+		beforeEach( () => {
 			// UTC+14, ahead of every possible browser time zone.
 			setSettings( {
 				...originalSettings,
@@ -199,10 +212,6 @@ describe( 'DateControl', () => {
 					offset: 14,
 				},
 			} );
-		} );
-
-		afterAll( () => {
-			setSettings( originalSettings );
 		} );
 
 		it( 'should move the calendar to the month of a value changed across a month boundary', () => {
@@ -216,9 +225,6 @@ describe( 'DateControl', () => {
 
 			expect( getMonthGrid( 'February 2026' ) ).toBeInTheDocument();
 
-			// March 1 in the site time zone is still February in the
-			// browser's, so a comparison in the wrong time zone keeps the
-			// calendar on February and hides the selected day.
 			rerender(
 				<DateControl
 					data={ { published: '2026-03-01' } as TestItem }
@@ -264,5 +270,129 @@ describe( 'DateControl', () => {
 
 			expect( getMonthGrid( 'March 2026' ) ).toBeInTheDocument();
 		} );
+	} );
+
+	// The site setting should not affect a plain date, which stays in the
+	// browser calendar frame.
+	it.each( [ -8, -5, 5.5, 9 ] )(
+		'should show the stored day as selected on a site at UTC%s',
+		( offset ) => {
+			setSettings( {
+				...originalSettings,
+				timezone: {
+					offset,
+					offsetFormatted: String( offset ),
+					string: '',
+					abbr: '',
+				},
+			} );
+
+			render( <DateHarness initialValue="2026-08-20" /> );
+
+			expect(
+				screen.getByRole( 'button', {
+					name: /august 20, 2026, selected/i,
+				} )
+			).toBeInTheDocument();
+		}
+	);
+
+	it( 'should commit the day that was clicked', async () => {
+		setSettings( {
+			...originalSettings,
+			timezone: {
+				offset: -8,
+				offsetFormatted: '-8',
+				string: '',
+				abbr: '',
+			},
+		} );
+		const user = userEvent.setup();
+
+		render( <DateHarness initialValue="2026-08-20" /> );
+
+		await user.click(
+			screen.getByRole( 'button', { name: /august 25, 2026/i } )
+		);
+
+		expect(
+			screen.getByLabelText< HTMLInputElement >( 'Date' ).value
+		).toBe( '2026-08-25' );
+		expect(
+			screen.getByRole( 'button', {
+				name: /august 25, 2026, selected/i,
+			} )
+		).toBeInTheDocument();
+	} );
+
+	it( 'should show and commit a date range on a site with a different timezone', async () => {
+		setSettings( {
+			...originalSettings,
+			timezone: {
+				offset: -8,
+				offsetFormatted: '-8',
+				string: '',
+				abbr: '',
+			},
+		} );
+		const user = userEvent.setup();
+
+		render(
+			<RangeHarness initialValue={ [ '2026-08-20', '2026-08-22' ] } />
+		);
+
+		expect(
+			screen.getByLabelText< HTMLInputElement >( 'From' ).value
+		).toBe( '2026-08-20' );
+		expect( screen.getByLabelText< HTMLInputElement >( 'To' ).value ).toBe(
+			'2026-08-22'
+		);
+
+		const august25 = screen.getByRole( 'button', {
+			name: /august 25, 2026/i,
+		} );
+		await user.click( august25 );
+		// The first click extends the existing range. Clicking its new end again
+		// starts the replacement range from that day.
+		await user.click( august25 );
+		await user.click(
+			screen.getByRole( 'button', { name: /august 27, 2026/i } )
+		);
+
+		expect(
+			screen.getByLabelText< HTMLInputElement >( 'From' ).value
+		).toBe( '2026-08-25' );
+		expect( screen.getByLabelText< HTMLInputElement >( 'To' ).value ).toBe(
+			'2026-08-27'
+		);
+	} );
+
+	it( 'should show and commit the right day on a site with a named timezone', async () => {
+		setSettings( {
+			...originalSettings,
+			timezone: {
+				offset: 9,
+				offsetFormatted: '9',
+				string: 'Asia/Tokyo',
+				abbr: 'JST',
+			},
+		} );
+		const user = userEvent.setup();
+
+		render( <DateHarness initialValue="2026-08-20" /> );
+
+		expect(
+			screen.getByRole( 'button', {
+				name: /august 20, 2026, selected/i,
+			} )
+		).toBeInTheDocument();
+
+		await user.click(
+			screen.getByRole( 'button', { name: /august 25, 2026/i } )
+		);
+
+		expect(
+			screen.getByLabelText< HTMLInputElement >( 'Date' ).value
+		).toBe( '2026-08-25' );
 	} );
 } );
