@@ -11,7 +11,11 @@
  *    that keeps untouched fields alive.
  */
 import { render, screen, act, fireEvent } from '@testing-library/react';
-import { createRegistry, RegistryProvider } from '@wordpress/data';
+import {
+	RegistryProvider,
+	createReduxStore,
+	createRegistry,
+} from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -35,6 +39,21 @@ import {
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
+/*
+ * `setEditorIntent( 'suggest' )` reads the current post so it can discard a
+ * staged status edit, and both reads go through `core`. These registries are
+ * minimal, so answer the two selectors with nothing.
+ */
+function createStubCoreStore() {
+	return createReduxStore( 'core', {
+		reducer: ( state = {} ) => state,
+		selectors: {
+			getRawEntityRecord: () => undefined,
+			getEntityRecordEdits: () => undefined,
+		},
+	} );
+}
+
 function renderWithProviders( ui, { intent = 'edit', blocks = null } = {} ) {
 	const registry = createRegistry();
 	// `setEditorIntent` dispatches a snackbar via the notices store when
@@ -46,6 +65,7 @@ function renderWithProviders( ui, { intent = 'edit', blocks = null } = {} ) {
 	// store.
 	registry.register( preferencesStore );
 	registry.register( editorStore );
+	registry.register( createStubCoreStore() );
 	// `blockEditorStore` is only registered when the test passes `blocks`.
 	// Registering it unconditionally activates the overlay provider's
 	// orphan-prune effect — it short-circuits when
@@ -675,6 +695,7 @@ describe( 'withSuggestionBlockClassName', () => {
 		registry.register( preferencesStore );
 		registry.register( blockEditorStore );
 		registry.register( editorStore );
+		registry.register( createStubCoreStore() );
 		unlock( registry.dispatch( editorStore ) ).setEditorIntent( intent );
 
 		const block = createBlock( TEST_BLOCK_NAME, {
