@@ -51,6 +51,7 @@ import {
 	SuggestionDeletionKeyboard,
 	SuggestionAdditionKeyboard,
 	SuggestionFormatKeyboard,
+	SuggestionMultiBlockFormatNotice,
 	SuggestionContentReconciler,
 	registerSuggestionOverlayFilter,
 	isSuggestionModeEnabled,
@@ -501,6 +502,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 													<SuggestionDeletionKeyboard />
 													<SuggestionAdditionKeyboard />
 													<SuggestionFormatKeyboard />
+													<SuggestionMultiBlockFormatNotice />
 													<SuggestionContentReconciler />
 												</>
 											) }
