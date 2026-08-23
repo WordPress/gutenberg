@@ -187,12 +187,20 @@ export default function SuggestionNoteGC() {
 	const trashedRef = useRef( new Map() );
 	const [ trashedVersion, setTrashedVersion ] = useState( 0 );
 
+	/*
+	 * Latest render's values, read by the collector effect below rather than
+	 * listed in its deps - the effect must run on a presence change, not on
+	 * every note or block edit. Written in an effect of their own, declared
+	 * first so the collector sees this render's values.
+	 */
 	const entriesRef = useRef( entries );
-	entriesRef.current = entries;
 	const resolvedNotesRef = useRef( resolvedNotes );
-	resolvedNotesRef.current = resolvedNotes;
 	const clearOverlayRef = useRef( clearOverlay );
-	clearOverlayRef.current = clearOverlay;
+	useEffect( () => {
+		entriesRef.current = entries;
+		resolvedNotesRef.current = resolvedNotes;
+		clearOverlayRef.current = clearOverlay;
+	} );
 
 	/*
 	 * Reactive presence signature. Computed inside `useSelect` so it updates
