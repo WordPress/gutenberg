@@ -83,6 +83,16 @@ export const EDITOR_INTENTS = [
 export type EditorIntent = ( typeof EDITOR_INTENTS )[ number ];
 
 /**
+ * Post-level fields the Suggest intent refuses to edit because there is no way
+ * to hold them as a pending proposal: they are not part of the block tree, so
+ * nothing can carry a marker for them and nothing can review them later. Only
+ * `status` is listed for now — it is the field that carries editorial
+ * authority. The rest of the post-level fields (title, excerpt, featured image)
+ * still need a per-field capture-or-disable decision. See issue #73411 (F-15).
+ */
+export const SUGGEST_LOCKED_POST_FIELDS = [ 'status' ] as const;
+
+/**
  * Class token carried by an inline suggestion marker
  * (`<mark class="wp-suggestion">`) in serialized block content.
  *

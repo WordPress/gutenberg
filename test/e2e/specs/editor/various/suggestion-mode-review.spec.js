@@ -983,6 +983,105 @@ test.describe( 'Suggestion mode review flows', () => {
 		).toBeVisible();
 	} );
 
+	test( 'an inline decision leaves a co-resident attribute suggestion pending', async ( {
+		editor,
+		page,
+	} ) => {
+		// A heading can hold two independent suggestions at once: an
+		// attribute-set overlay for its level, and an inline marker in its
+		// text. They describe disjoint parts of the block, so deciding one
+		// must not disturb the other. The apply/reject paths for an inline
+		// marker used to clear the block's whole overlay entry, which is the
+		// attribute note's only anchor — the note was collected as an orphan
+		// and its proposed level vanished from the canvas. See F-14.
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { content: 'My Heading', level: 2 },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const heading = editor.canvas
+			.getByRole( 'document', { name: 'Block: Heading' } )
+			.first();
+		await heading.click();
+
+		// Suggestion one: heading level, captured into the overlay.
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: /^Heading 2$/ } )
+			.click();
+		const attributeSaved = suggestionSavedPromise( page );
+		await page.getByRole( 'menuitem', { name: /^Heading 3/ } ).click();
+		await attributeSaved;
+		await expect( heading ).toHaveJSProperty( 'tagName', 'H3' );
+
+		// Suggestion two: typed text in the same heading, captured as a marker.
+		await heading.click();
+		await page.keyboard.press( 'End' );
+		const inlineSaved = suggestionSavedPromise( page );
+		await page.keyboard.type( ' XYZ' );
+		await inlineSaved;
+		await expect(
+			heading.locator( 'mark.wp-suggestion[data-suggestion-type="add"]' )
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+
+		// Both suggestions are listed as their own threads.
+		const sidebar = await openNotesSidebar( page );
+		const threads = sidebar.locator(
+			'.editor-collab-sidebar-panel__thread'
+		);
+		await expect( threads ).toHaveCount( 2 );
+
+		// Accept the inline one, picked by the thread carrying its summary —
+		// thread order is not guaranteed, so index-based selection would
+		// silently decide the wrong suggestion.
+		await threads
+			.filter( { hasText: 'XYZ' } )
+			.getByRole( 'button', { name: 'Accept suggestion' } )
+			.click();
+		await expect(
+			page
+				.locator( '.components-snackbar-list' )
+				.getByText( 'Suggestion applied.' )
+		).toBeVisible();
+
+		// The addition landed: marker unwrapped, text kept.
+		await expect( heading.locator( 'mark.wp-suggestion' ) ).toHaveCount(
+			0
+		);
+		await expect( heading ).toHaveText( 'My Heading XYZ' );
+
+		/*
+		 * Let the state settle before judging the level suggestion. Both
+		 * failure modes are asynchronous — the orphan collector waits out its
+		 * 500ms grace period and then round-trips a status write — so an
+		 * assertion that retries until it passes would go green on the state
+		 * before the damage, not after it.
+		 */
+		// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
+		await page.waitForTimeout( 3000 );
+
+		// The level suggestion is untouched: still previewed on the canvas,
+		// still listed in the sidebar, still pending on the server.
+		await expect( heading ).toHaveJSProperty( 'tagName', 'H3' );
+		await expect( sidebar.getByText( /heading level/ ) ).toBeVisible();
+		const attributeNoteStatuses = await page.evaluate( async () => {
+			const postId = window.wp.data
+				.select( 'core/editor' )
+				.getCurrentPostId();
+			const comments = await window.wp.apiFetch( {
+				path: `/wp/v2/comments?type=note&status=any&per_page=50&context=edit&post=${ postId }`,
+			} );
+			return comments
+				.filter( ( comment ) =>
+					/attribute-set/.test( comment.meta?._wp_suggestion ?? '' )
+				)
+				.map( ( comment ) => comment.status );
+		} );
+		expect( attributeNoteStatuses ).toEqual( [ 'hold' ] );
+	} );
+
 	// --- Review: block replacement (transform) -------------------------------
 
 	/**

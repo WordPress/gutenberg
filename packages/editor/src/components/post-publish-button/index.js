@@ -1,7 +1,11 @@
 import { Button } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+import { Tooltip } from '@wordpress/ui';
 import PublishButtonLabel from './label';
 import { store as editorStore } from '../../store';
+import { EDITOR_INTENT_SUGGEST } from '../../store/constants';
+import { unlock } from '../../lock-unlock';
 
 const noop = () => {};
 
@@ -29,6 +33,7 @@ export function PostPublishButton( {
 		postStatusHasChanged,
 		postType,
 		postId,
+		isSuggesting,
 	} = useSelect( ( select ) => {
 		const store = select( editorStore );
 		return {
@@ -48,6 +53,9 @@ export function PostPublishButton( {
 			postStatusHasChanged: store.getPostEdits()?.status,
 			hasNonPostEntityChanges: store.hasNonPostEntityChanges(),
 			isSavingNonPostEntityChanges: store.isSavingNonPostEntityChanges(),
+			// `getEditorIntent` is private while Suggest mode is experimental.
+			isSuggesting:
+				unlock( store ).getEditorIntent() === EDITOR_INTENT_SUGGEST,
 		};
 	}, [] );
 
@@ -61,6 +69,18 @@ export function PostPublishButton( {
 	const createOnClick =
 		( callback ) =>
 		( ...args ) => {
+			/*
+			 * Both controls are disabled while suggesting, but they carry
+			 * `aria-disabled` rather than `disabled`, so the click still
+			 * arrives here - ahead of the callbacks that check for it. Stop at
+			 * the seam: otherwise a dirty non-post entity sends a control
+			 * reporting `aria-disabled="true"` on to open the "Are you ready to
+			 * save?" dialog. See issue #73411 (F-15).
+			 */
+			if ( isSuggesting ) {
+				return noop;
+			}
+
 			// If a post with non-post entities is published, but the user
 			// elects to not save changes to the non-post entities, those
 			// entities will still be dirty when the Publish button is clicked.
@@ -94,7 +114,16 @@ export function PostPublishButton( {
 			return callback( ...args );
 		};
 
+	/*
+	 * Publishing is the editorial decision Suggest mode exists to withhold.
+	 * `editPost` drops the status field there, but the button doesn't stop at
+	 * the status edit: it calls `savePost()` right after, which would write
+	 * the post to the server while the pre-publish flow waits on a state
+	 * change that never comes. Disable the control rather than let it run half
+	 * of itself. See issue #73411 (F-15).
+	 */
 	const isButtonDisabled =
+		isSuggesting ||
 		isPostSavingLocked ||
 		// Disable while a non-post entity (e.g. a newly created term) is mid-save.
 		isSavingNonPostEntityChanges ||
@@ -104,6 +133,7 @@ export function PostPublishButton( {
 			! hasNonPostEntityChanges );
 
 	const isToggleDisabled =
+		isSuggesting ||
 		isPostSavingLocked ||
 		isSavingNonPostEntityChanges ||
 		( ( isPublished ||
@@ -163,14 +193,39 @@ export function PostPublishButton( {
 		'aria-haspopup': hasNonPostEntityChanges ? 'dialog' : undefined,
 	};
 	const componentProps = isToggle ? toggleProps : buttonProps;
-	return (
+	const suggestingHint = __(
+		'Switch to Editing to publish or update this post.'
+	);
+	const button = (
 		<Button
 			{ ...componentProps }
 			className={ `${ componentProps.className } editor-post-publish-button__button` }
 			size="compact"
+			/*
+			 * `description` rather than `label`, which doubles as the button's
+			 * `aria-label` and would replace the visible "Publish" / "Update"
+			 * text as its accessible name.
+			 */
+			description={ isSuggesting ? suggestingHint : undefined }
 		>
 			<PublishButtonLabel />
 		</Button>
+	);
+
+	if ( ! isSuggesting ) {
+		return button;
+	}
+
+	/*
+	 * `description` carries the reason to assistive technology; the tooltip
+	 * carries it to everyone else. Tooltip popups are visual-only by design,
+	 * so neither channel covers for the other.
+	 */
+	return (
+		<Tooltip.Root>
+			<Tooltip.Trigger render={ button } />
+			<Tooltip.Popup>{ suggestingHint }</Tooltip.Popup>
+		</Tooltip.Root>
 	);
 }
 

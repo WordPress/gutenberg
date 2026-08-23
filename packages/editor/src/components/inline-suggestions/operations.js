@@ -407,9 +407,14 @@ export function rejectInlineFormat( value, suggestionId, beforeHTML ) {
  * comment id once the suggestion is persisted), so this can be unit-tested and
  * reused by whatever drives addition creation.
  *
+ * Pass `html` instead of `text` when the proposed run carries its own inline
+ * formatting (a pasted `<strong>`/`<a href>`): the run keeps those formats and
+ * the marker wraps them.
+ *
  * @param {*}      value              Block attribute value (RichTextData or other).
  * @param {Object} options
- * @param {string} options.text       Proposed text to insert.
+ * @param {string} [options.text]     Proposed plain text to insert.
+ * @param {string} [options.html]     Proposed rich HTML to insert; takes precedence over `text`.
  * @param {Object} options.attributes Marker attributes (see `buildSuggestionMarkerAttributes`).
  * @param {number} [options.start]    Range start; defaults to end of value.
  * @param {number} [options.end]      Range end; defaults to `start` (collapsed).
@@ -417,25 +422,37 @@ export function rejectInlineFormat( value, suggestionId, beforeHTML ) {
  */
 export function insertInlineAddition(
 	value,
-	{ text, attributes, start, end }
+	{ text, html, attributes, start, end }
 ) {
 	if ( ! ( value instanceof RichTextData ) ) {
 		return value;
 	}
-	if ( ! text ) {
+	const run = html ? create( { html } ) : create( { text: text ?? '' } );
+	if ( ! run.text ) {
 		return value;
 	}
 	const record = create( { html: value.toHTMLString() } );
 	const startIndex = start ?? record.text.length;
 	const endIndex = end ?? startIndex;
-	const inserted = insert( record, text, startIndex, endIndex );
-	const formatted = applyFormat(
-		inserted,
-		{ type: SUGGESTION_FORMAT_NAME, attributes },
-		startIndex,
-		startIndex + text.length
+	/*
+	 * Stamp the marker onto the run before inserting it, as the outermost
+	 * format on every character. `applyFormat` places a format at the
+	 * shallowest depth the whole range shares, which nests the marker INSIDE
+	 * the run's own formats when every character carries one — a fully bold
+	 * paste would serialize as `<strong><mark>…</mark></strong>`, and a
+	 * partially formatted one can fragment into several `<mark>` tags. The
+	 * marker has to stay one span wrapping the run so accept/reject resolve
+	 * it as a unit.
+	 */
+	const marker = { type: SUGGESTION_FORMAT_NAME, attributes };
+	const formats = new Array( run.text.length );
+	for ( let index = 0; index < formats.length; index++ ) {
+		const stack = run.formats[ index ];
+		formats[ index ] = stack ? [ marker, ...stack ] : [ marker ];
+	}
+	return new RichTextData(
+		insert( record, { ...run, formats }, startIndex, endIndex )
 	);
-	return new RichTextData( formatted );
 }
 
 /**
@@ -452,9 +469,15 @@ export function insertInlineAddition(
  * `at` moves that insertion point anywhere within the marker, so resuming inside
  * a pending addition grows the one marker instead of nesting a second one in it.
  *
+ * `html` carries the run's own inline formats, for a rich-text paste that lands
+ * inside the marker. As in `insertInlineAddition`, the marker is stamped as the
+ * outermost format on the pasted characters so the grown proposal stays one
+ * `<mark>` rather than fragmenting around the nested formats.
+ *
  * @param {*}      value               Block attribute value (RichTextData or other).
  * @param {Object} options
  * @param {string} options.text        Proposed text to append to the marker.
+ * @param {string} [options.html]      HTML of the proposed run when it carries inline formatting.
  * @param {Object} options.attributes  Marker attributes (see `buildSuggestionMarkerAttributes`).
  * @param {number} options.markerStart Current marker start offset.
  * @param {number} options.markerEnd   Current marker end offset.
@@ -463,12 +486,13 @@ export function insertInlineAddition(
  */
 export function growInlineAddition(
 	value,
-	{ text, attributes, markerStart, markerEnd, at }
+	{ text, html, attributes, markerStart, markerEnd, at }
 ) {
 	if ( ! ( value instanceof RichTextData ) ) {
 		return value;
 	}
-	if ( ! text ) {
+	const run = html ? create( { html } ) : create( { text: text ?? '' } );
+	if ( ! run.text ) {
 		return value;
 	}
 	const record = create( { html: value.toHTMLString() } );
@@ -479,12 +503,18 @@ export function growInlineAddition(
 		Math.max( at ?? markerEnd, markerStart ),
 		markerEnd
 	);
-	const inserted = insert( record, text, insertAt, insertAt );
+	const marker = { type: SUGGESTION_FORMAT_NAME, attributes };
+	const formats = new Array( run.text.length );
+	for ( let index = 0; index < formats.length; index++ ) {
+		const stack = run.formats[ index ];
+		formats[ index ] = stack ? [ marker, ...stack ] : [ marker ];
+	}
+	const inserted = insert( record, { ...run, formats }, insertAt, insertAt );
 	const formatted = applyFormat(
 		inserted,
-		{ type: SUGGESTION_FORMAT_NAME, attributes },
+		marker,
 		markerStart,
-		markerEnd + text.length
+		markerEnd + run.text.length
 	);
 	return new RichTextData( formatted );
 }
