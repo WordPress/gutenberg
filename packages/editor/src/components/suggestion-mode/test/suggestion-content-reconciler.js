@@ -169,6 +169,33 @@ describe( 'SuggestionContentReconciler', () => {
 		expect( getContent() ).toContain( ' world' );
 	} );
 
+	it( 'grows an existing marker without opening a note', async () => {
+		const marked =
+			'Hi <mark class="wp-suggestion" data-suggestion-id="9" data-suggestion-type="add">new</mark>';
+		const { clientId, getContent } = setup( { content: marked } );
+
+		let accepted;
+		act( () => {
+			accepted = overlayRef.current.requestContentSuggestion( {
+				clientId,
+				blockName: TEST_BLOCK_NAME,
+				prevContent: RichTextData.fromHTMLString( marked ),
+				plan: {
+					kind: 'edit',
+					// A revision of a proposal that already has a note.
+					actions: [
+						{ type: 'grow-add', text: 'er', id: '9', at: 6 },
+					],
+				},
+			} );
+		} );
+		expect( accepted ).toBe( true );
+		await flushPromises();
+
+		expect( createSuggestion ).not.toHaveBeenCalled();
+		expect( getContent() ).toContain( '>newer</mark>' );
+	} );
+
 	it( 'declines synchronously when the plan is not executable', () => {
 		const { clientId } = setup();
 
@@ -180,8 +207,8 @@ describe( 'SuggestionContentReconciler', () => {
 				prevContent: RichTextData.fromHTMLString( 'Hello' ),
 				plan: {
 					kind: 'edit',
-					// `grow-add` reuses an existing note: not this handler's job.
-					actions: [ { type: 'grow-add', text: 'x', id: '9' } ],
+					// `remove-add` retires a note: not this handler's job.
+					actions: [ { type: 'remove-add', id: '9' } ],
 				},
 			} );
 		} );
