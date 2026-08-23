@@ -1,5 +1,9 @@
 import { render } from '@testing-library/react';
-import { createRegistry, RegistryProvider } from '@wordpress/data';
+import {
+	RegistryProvider,
+	createReduxStore,
+	createRegistry,
+} from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -41,12 +45,28 @@ function pressBold( target ) {
 	);
 }
 
+/*
+ * `setEditorIntent( 'suggest' )` reads the current post so it can discard a
+ * staged status edit, and both reads go through `core`. These registries are
+ * minimal, so answer the two selectors with nothing.
+ */
+function createStubCoreStore() {
+	return createReduxStore( 'core', {
+		reducer: ( state = {} ) => state,
+		selectors: {
+			getRawEntityRecord: () => undefined,
+			getEntityRecordEdits: () => undefined,
+		},
+	} );
+}
+
 function setup( { intent = 'suggest', multiSelect = true } = {} ) {
 	const registry = createRegistry();
 	registry.register( noticesStore );
 	registry.register( preferencesStore );
 	registry.register( blockEditorStore );
 	registry.register( editorStore );
+	registry.register( createStubCoreStore() );
 	unlock( registry.dispatch( editorStore ) ).setEditorIntent( intent );
 
 	const first = createBlock( TEST_BLOCK_NAME, { content: 'Alpha' } );

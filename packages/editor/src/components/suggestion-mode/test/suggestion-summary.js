@@ -133,7 +133,7 @@ describe( 'summarizeOperations', () => {
 		expect( lines[ 0 ].value.endsWith( '…”' ) ).toBe( true );
 	} );
 
-	it( 'reports bold toggled on as Formatting: bold', () => {
+	it( 'reports bold toggled on as "Add formatting: bold"', () => {
 		const lines = summarizeOperations( [
 			{
 				type: 'attribute-set',
@@ -142,10 +142,15 @@ describe( 'summarizeOperations', () => {
 				after: 's magna elementum platea <strong>neque</strong>.',
 			},
 		] );
-		expect( lines ).toEqual( [ { label: 'Formatting:', value: 'bold' } ] );
+		expect( lines ).toEqual( [
+			{ label: 'Add formatting:', value: 'bold' },
+		] );
 	} );
 
-	it( 'reports bold toggled off as Formatting: bold', () => {
+	it( 'reports bold toggled off as "Remove formatting: bold"', () => {
+		// Adding and removing a format are opposite proposals and both used
+		// to read "Formatting: bold", so the sidebar could not tell a
+		// reviewer which one was on offer (F-11).
 		const lines = summarizeOperations( [
 			{
 				type: 'attribute-set',
@@ -154,10 +159,43 @@ describe( 'summarizeOperations', () => {
 				after: 'Hello brave world',
 			},
 		] );
-		expect( lines ).toEqual( [ { label: 'Formatting:', value: 'bold' } ] );
+		expect( lines ).toEqual( [
+			{ label: 'Remove formatting:', value: 'bold' },
+		] );
 	} );
 
-	it( 'collapses multiple inline format changes into one Formatting: line', () => {
+	it( 'separates the formats an edit adds from the ones it removes', () => {
+		// Swapping italic for bold on the same run is one edit with two
+		// directions; both belong in the summary, told apart.
+		const lines = summarizeOperations( [
+			{
+				type: 'attribute-set',
+				attribute: 'content',
+				before: 'Hello <em>brave</em> world',
+				after: 'Hello <strong>brave</strong> world',
+			},
+		] );
+		expect( lines ).toEqual( [
+			{ label: 'Add formatting:', value: 'bold' },
+			{ label: 'Remove formatting:', value: 'italic' },
+		] );
+	} );
+
+	it( 'does not report a direction for a tag rewritten to a synonym', () => {
+		// `<b>` and `<strong>` are both "bold", so this is not bold being
+		// added and removed at once — it is no format change at all.
+		const lines = summarizeOperations( [
+			{
+				type: 'attribute-set',
+				attribute: 'content',
+				before: 'Hello <b>brave</b> world',
+				after: 'Hello <strong>brave</strong> world',
+			},
+		] );
+		expect( lines ).toEqual( [ { label: 'Format:', value: 'content' } ] );
+	} );
+
+	it( 'collapses formats changed in the same direction into one line', () => {
 		const lines = summarizeOperations( [
 			{
 				type: 'attribute-set',
@@ -167,7 +205,7 @@ describe( 'summarizeOperations', () => {
 			},
 		] );
 		expect( lines ).toHaveLength( 1 );
-		expect( lines[ 0 ].label ).toBe( 'Formatting:' );
+		expect( lines[ 0 ].label ).toBe( 'Add formatting:' );
 		expect( lines[ 0 ].value ).toMatch( /bold/ );
 		expect( lines[ 0 ].value ).toMatch( /italic/ );
 	} );
@@ -285,7 +323,9 @@ describe( 'summarizeOperations', () => {
 				after: '<strong>Tom &amp; Jerry</strong>',
 			},
 		] );
-		expect( lines ).toEqual( [ { label: 'Formatting:', value: 'bold' } ] );
+		expect( lines ).toEqual( [
+			{ label: 'Add formatting:', value: 'bold' },
+		] );
 	} );
 
 	it( 'summarizes an inline-suggestion add op as "Add: <text>"', () => {
@@ -317,7 +357,7 @@ describe( 'summarizeOperations', () => {
 		] );
 	} );
 
-	it( 'summarizes an inline-suggestion format op as "Formatting: <format>"', () => {
+	it( 'summarizes an inline-suggestion format op with its direction', () => {
 		// A format suggestion changes only markup, so it surfaces which
 		// formats changed (from the captured before/after run HTML) rather
 		// than quoting the unchanged text.
@@ -330,7 +370,26 @@ describe( 'summarizeOperations', () => {
 				afterHTML: '<strong>world</strong>',
 			},
 		] );
-		expect( lines ).toEqual( [ { label: 'Formatting:', value: 'bold' } ] );
+		expect( lines ).toEqual( [
+			{ label: 'Add formatting:', value: 'bold' },
+		] );
+	} );
+
+	it( 'summarizes an inline-suggestion un-format op as a removal', () => {
+		// The same operation shape with the markup on the other side is the
+		// opposite proposal, and has to read as one (F-11).
+		const lines = summarizeOperations( [
+			{
+				type: 'inline-suggestion',
+				attribute: 'content',
+				suggestionType: 'format',
+				beforeHTML: '<strong>world</strong>',
+				afterHTML: 'world',
+			},
+		] );
+		expect( lines ).toEqual( [
+			{ label: 'Remove formatting:', value: 'bold' },
+		] );
 	} );
 
 	it( 'falls back to the attribute label for a format op with no HTML delta', () => {
