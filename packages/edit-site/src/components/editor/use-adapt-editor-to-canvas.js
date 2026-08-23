@@ -3,7 +3,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as editorStore } from '@wordpress/editor';
 import { useLayoutEffect } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { DEFAULT_DEVICE_TYPE } from '../block-editor/use-viewport-sync';
+import { DEFAULT_DEVICE_TYPE } from '../block-editor/viewport';
 
 export function useAdaptEditorToCanvas( canvas ) {
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
