@@ -5,6 +5,7 @@
 ### New Features
 
 -   Add `Spinner` component ([#81358](https://github.com/WordPress/gutenberg/pull/81358)).
+-   `Calendar`, `RangeCalendar`: Accept BCP 47 locale codes in the `locale` prop and keep localized date text aligned with the Gregorian date grid. ([#81814](https://github.com/WordPress/gutenberg/pull/81814))
 -   Add a `Menu` component. ([#79560](https://github.com/WordPress/gutenberg/pull/79560))
 -   Add `ControlWithError` component, ported from `@wordpress/components` and `@wordpress/dataviews` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574)).
 -   Export `ValidityIndicator`, so custom validated controls can render the same validity message as `ControlWithError` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574)).
@@ -27,6 +28,7 @@
 
 ### Bug Fixes
 
+-   `Calendar`, `RangeCalendar`: Make the navigation label translatable and use the same locale-derived default first day of the week for locale strings and date-fns locale objects. Existing object-based calendars may use a different default; pass `weekStartsOn` to preserve it. ([#81814](https://github.com/WordPress/gutenberg/pull/81814))
 -   `Autocomplete.Input`, `Combobox.Input`: Omit the `type` prop, since the combobox role is only valid on `input type="text"` ([#80636](https://github.com/WordPress/gutenberg/pull/80636)).
 -   `Card`: Use the normal neutral surface stroke for the default border. ([#81746](https://github.com/WordPress/gutenberg/pull/81746))
 -   `Calendar`, `RangeCalendar`: Preserve day focus when a controlled month change removes the focused day. ([#81635](https://github.com/WordPress/gutenberg/pull/81635))
