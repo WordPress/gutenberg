@@ -116,6 +116,11 @@ $footer-height: 90px;
 	margin-bottom: 0;
 }
 
+.font-library__font-demo {
+	// Anchors the image while it's out of flow during loading.
+	position: relative;
+}
+
 .font-library__font-card {
 	box-sizing: border-box;
 	border: variables.$border-width solid colors.$gray-300;
@@ -148,6 +153,26 @@ $footer-height: 90px;
 		display: block;
 		height: variables.$grid-unit-30;
 		width: auto;
+
+		@media not (prefers-reduced-motion) {
+			transition:
+				opacity var(--wpds-motion-duration-lg)
+				var(--wpds-motion-easing-subtle);
+		}
+
+		// Hidden while loading, but still rendered, since `display: none`
+		// would stop the lazy image from loading.
+		&.is-loading {
+			position: absolute;
+			top: 0;
+			left: 0;
+			opacity: 0;
+		}
+	}
+
+	.font-library__font-variant-demo-skeleton {
+		height: variables.$grid-unit-30;
+		border-radius: var(--wpds-border-radius-sm);
 	}
 
 	.font-library__font-variant_demo-text {
