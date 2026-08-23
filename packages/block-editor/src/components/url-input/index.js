@@ -6,7 +6,7 @@ import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
 import {
 	BaseControl,
 	Button,
-	__experimentalInputControl as InputControl,
+	__experimentalInputControl as WCInputControl,
 	Spinner,
 	Popover,
 	privateApis as componentsPrivateApis,
@@ -436,7 +436,7 @@ function Control( {
 
 	const MaybeValidatedInputControl = isValidated
 		? ValidatedInputControl
-		: InputControl;
+		: WCInputControl;
 
 	return (
 		<BaseControl { ...controlProps }>
