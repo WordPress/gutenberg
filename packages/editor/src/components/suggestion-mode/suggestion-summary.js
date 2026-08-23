@@ -20,6 +20,12 @@
  *                        Detected by tag-level diff of the serialized HTML
  *                        and de-duplicated by `joinLabels` so multiple span
  *                        edits don't list the same format twice.
+ *
+ * Quoted lines report what a reviewer would read on screen: the diff behind
+ * them runs on visible text, never on the raw content attribute, so no markup
+ * reaches the sidebar. Changed words keep the spaces that separated them, and
+ * runs that were not adjacent in the text are joined with an ellipsis rather
+ * than run together into a phrase nobody typed.
  */
 import { __ } from '@wordpress/i18n';
 import { __experimentalText as WCText } from '@wordpress/components';
@@ -97,10 +103,13 @@ const INLINE_FORMAT_TAG_LABELS = {
 
 const TAG_REGEX = /<\s*([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>/g;
 
+const LINE_BREAK_REGEX = /<\s*br\b[^>]*>/gi;
+
 /**
  * Strip HTML tags AND decode entities, leaving only the visible text. Used
  * to decide whether a content change is purely a formatting change (same
- * visible text wrapped in different markup) or a real text edit.
+ * visible text wrapped in different markup) or a real text edit, and to give
+ * the word diff plain text to work on.
  *
  * Wraps `__unstableStripHTML` so HTML entities such as `&amp;` and `&nbsp;`
  * are decoded by the DOM parser rather than via a hand-rolled regex — a
@@ -114,7 +123,15 @@ function stripTags( html ) {
 	if ( typeof html !== 'string' || html === '' ) {
 		return '';
 	}
-	return wpStripHTML( html ).replace( /\s+/g, ' ' ).trim();
+	/*
+	 * `textContent` drops a `<br>` without leaving anything in its place, so
+	 * the words on either side of a soft line break would run together in the
+	 * quoted summary. A line break separates words on screen, so give it a
+	 * separator here too before the tags come off.
+	 */
+	return wpStripHTML( html.replace( LINE_BREAK_REGEX, '\n' ) )
+		.replace( /\s+/g, ' ' )
+		.trim();
 }
 
 /**
@@ -201,27 +218,86 @@ function clampText( text ) {
 }
 
 /**
- * Derive the inserted and deleted text spans from a pair of before/after
- * strings by running the shared word-level diff and concatenating matching
- * segments. Whitespace-only runs are excluded from the counts so a pure
- * format change doesn't surface as "Add: ' '".
+ * Marker placed between two changed runs that are not next to each other in
+ * the text. Without it, "brave new" inserted in one place and "much longer"
+ * inserted three words later are concatenated into the phrase "brave new much
+ * longer", which is not a phrase anyone typed.
+ */
+const RUN_GAP = ' … ';
+
+/**
+ * Collect the changed runs of one side of a word diff, preserving the spaces
+ * that separated the changed words.
  *
- * @param {string} before Original text.
- * @param {string} after  Proposed text.
+ * `wordDiff` tokenizes on `\S+|\s+`, so the space between two changed words is
+ * its own token — and it matches a space on the other side of the diff, which
+ * makes it an `equal` segment sitting between two `delete` (or two `insert`)
+ * segments. Concatenating only the changed segments therefore glues the words
+ * together: "fox jumps over" comes out "foxjumpsover". Whitespace-only `equal`
+ * segments bridge a run instead of breaking it, so the quote reads the way the
+ * text does. An `equal` segment with visible characters is a genuine gap and
+ * does break the run.
+ *
+ * The opposite side of the diff neither bridges nor breaks: the two halves of
+ * a replacement are one edit that happens to interleave.
+ *
+ * @param {Array<{type: string, value: string}>} segments Word-diff segments.
+ * @param {string}                               type     `insert` or `delete`.
+ * @return {string[]} The changed runs, in document order.
+ */
+function changedRuns( segments, type ) {
+	const runs = [];
+	let current = '';
+	let gap = '';
+	for ( const seg of segments ) {
+		if ( seg.type === type ) {
+			if ( current !== '' ) {
+				current += gap;
+			}
+			gap = '';
+			current += seg.value;
+			continue;
+		}
+		if ( seg.type !== 'equal' ) {
+			continue;
+		}
+		if ( ! /\S/.test( seg.value ) ) {
+			gap += seg.value;
+			continue;
+		}
+		if ( current !== '' ) {
+			runs.push( current );
+			current = '';
+		}
+		gap = '';
+	}
+	if ( current !== '' ) {
+		runs.push( current );
+	}
+	return runs;
+}
+
+/**
+ * Derive the inserted and deleted text spans from a pair of before/after
+ * strings by running the shared word-level diff and joining the changed runs.
+ * Whitespace-only runs are excluded from the counts so a pure format change
+ * doesn't surface as "Add: ' '".
+ *
+ * Callers must pass *visible text*, not the raw content attribute: a tag is a
+ * token like any other to a whitespace tokenizer, so diffing markup puts
+ * `<strong>` and `</strong>` into the quoted summary as literal text. A
+ * reviewer wants to read the words being proposed, not the markup they arrive
+ * in — which formats changed is reported separately on the "Formatting:" line.
+ *
+ * @param {string} before Original visible text.
+ * @param {string} after  Proposed visible text.
  * @return {{inserted: string, deleted: string}} Aggregated insertions and
  * deletions, already trimmed and ellipsized.
  */
 function textDelta( before, after ) {
 	const segments = wordDiff( before, after );
-	let inserted = '';
-	let deleted = '';
-	for ( const seg of segments ) {
-		if ( seg.type === 'insert' ) {
-			inserted += seg.value;
-		} else if ( seg.type === 'delete' ) {
-			deleted += seg.value;
-		}
-	}
+	const inserted = changedRuns( segments, 'insert' ).join( RUN_GAP );
+	const deleted = changedRuns( segments, 'delete' ).join( RUN_GAP );
 	return {
 		inserted: inserted.trim() ? ellipsize( inserted ) : '',
 		deleted: deleted.trim() ? ellipsize( deleted ) : '',
@@ -340,11 +416,19 @@ export function summarizeOperations( operations ) {
 
 		const before = op.before ?? '';
 		const after = op.after ?? '';
+		/*
+		 * The quoted lines below report what a reviewer would read on screen,
+		 * so both the format check and the word diff work on visible text.
+		 * Strip once and share it — `stripTags` parses through the DOM, and a
+		 * sidebar can hold a lot of these cards.
+		 */
+		const beforeText = stripTags( before );
+		const afterText = stripTags( after );
 
 		// A pure inline-format change produces identical visible text with
 		// different markup — surface it as "Formatting: bold" rather than
 		// leaking raw `<strong>…</strong>` into an Add/Delete quote.
-		if ( stripTags( before ) === stripTags( after ) && before !== after ) {
+		if ( beforeText === afterText && before !== after ) {
 			const changedFormats = diffInlineFormats( before, after );
 			if ( changedFormats.length > 0 ) {
 				formattingLabels.push( ...changedFormats );
@@ -354,7 +438,7 @@ export function summarizeOperations( operations ) {
 			continue;
 		}
 
-		const { inserted, deleted } = textDelta( before, after );
+		const { inserted, deleted } = textDelta( beforeText, afterText );
 		if ( inserted ) {
 			lines.push( { label: __( 'Add:' ), value: `“${ inserted }”` } );
 		}

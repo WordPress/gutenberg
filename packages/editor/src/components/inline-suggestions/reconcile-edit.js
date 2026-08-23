@@ -1,4 +1,9 @@
-import { RichTextData, create } from '@wordpress/rich-text';
+import {
+	RichTextData,
+	create,
+	slice,
+	toHTMLString,
+} from '@wordpress/rich-text';
 import { wrapInlineMarker } from '../inline-markers';
 import {
 	SUGGESTION_FORMAT_NAME,
@@ -147,9 +152,47 @@ function markerType( format ) {
 }
 
 /**
+ * HTML of the inserted run when it carries inline formatting of its own, so the
+ * proposed addition can be marked up rather than flattened to plain text — a
+ * pasted `<strong>`/`<a href>` reaches the block as a new `content` value, and
+ * diffing only `record.text` would drop it.
+ *
+ * Returns null when the run is unformatted (the plain-text path stays exactly as
+ * it was) and when it already carries a suggestion marker: re-marking a marked
+ * run would nest one marker inside another.
+ *
+ * @param {?Object} nextRecord Rich-text record of the value after the edit.
+ * @param {Object}  edit       Normalized edit from `analyzeTextEdit`.
+ * @return {?string} HTML of the inserted run, or null.
+ */
+function insertedRunHTML( nextRecord, edit ) {
+	if ( ! nextRecord || ! edit.insertedText ) {
+		return null;
+	}
+	const from = edit.start;
+	const to = from + edit.insertedText.length;
+	let hasFormats = false;
+	for ( let index = from; index < to; index++ ) {
+		const stack = nextRecord.formats?.[ index ];
+		if ( ! Array.isArray( stack ) || stack.length === 0 ) {
+			continue;
+		}
+		if ( stack.some( ( f ) => f.type === SUGGESTION_FORMAT_NAME ) ) {
+			return null;
+		}
+		hasFormats = true;
+	}
+	if ( ! hasFormats ) {
+		return null;
+	}
+	return toHTMLString( { value: slice( nextRecord, from, to ) } );
+}
+
+/**
  * @typedef {Object} MarkerAction
  * @property {'insert-add'|'grow-add'|'wrap-del'|'remove-add'} type      Action kind.
  * @property {string}                                          [text]    Text to insert/append (insert-add, grow-add).
+ * @property {string}                                          [html]    HTML of the inserted run when it carries inline formatting (insert-add).
  * @property {number}                                          [at]      Insertion offset (insert-add, grow-add).
  * @property {number}                                          [start]   Range start (wrap-del).
  * @property {number}                                          [end]     Range end (wrap-del).
@@ -273,6 +316,7 @@ export function planEditMarkers( prevValue, nextValue, { authorId } = {} ) {
 		if ( left && right && markerId( left ) === markerId( right ) ) {
 			return { kind: 'insert', actions: [] };
 		}
+		const html = insertedRunHTML( nextRecord, edit );
 		return {
 			kind: 'insert',
 			actions: [
@@ -280,6 +324,7 @@ export function planEditMarkers( prevValue, nextValue, { authorId } = {} ) {
 					type: 'insert-add',
 					at: edit.start,
 					text: edit.insertedText,
+					...( html ? { html } : {} ),
 					newNote: true,
 				},
 			],
@@ -328,6 +373,7 @@ export function planEditMarkers( prevValue, nextValue, { authorId } = {} ) {
 
 	// replace (type-over): only the clean unmarked case for now.
 	if ( isUnmarked( edit.start, edit.end ) ) {
+		const html = insertedRunHTML( nextRecord, edit );
 		return {
 			kind: 'replace',
 			actions: [
@@ -341,6 +387,7 @@ export function planEditMarkers( prevValue, nextValue, { authorId } = {} ) {
 					type: 'insert-add',
 					at: edit.end,
 					text: edit.insertedText,
+					...( html ? { html } : {} ),
 					newNote: true,
 				},
 			],
@@ -374,6 +421,7 @@ export function applyEditPlan( value, actions, { authorId, ids = [] } = {} ) {
 				const id = ids[ idIndex++ ];
 				result = insertInlineAddition( result, {
 					text: action.text,
+					html: action.html,
 					attributes: buildSuggestionMarkerAttributes( {
 						id,
 						type: SUGGESTION_TYPE_ADDITION,

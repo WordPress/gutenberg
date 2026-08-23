@@ -644,6 +644,64 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 	} );
 
 	/*
+	 * A splitting Enter reaches the store as `replaceBlocks` — a truncated head
+	 * plus a new tail block — so it never passes through the overlay HOC's
+	 * `setAttributes` seam and the head's truncation used to be captured as a
+	 * whole-attribute overlay. The overlay renders its clean snapshot in place
+	 * of the block's value, which drew the proposed removal as already done: a
+	 * short first paragraph followed by a pending-insert block, indistinguishable
+	 * from a split that had actually been applied (#73411, F-07).
+	 */
+	test( 'seam: a split strikes the removed tail through in place', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'The quick brown fox jumps over the lazy dog.',
+			},
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		// Caret between "fox " and "jumps": the tail is the last 24 characters.
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 24 } );
+		await page.keyboard.press( 'Enter' );
+
+		// Positive signal first: the deletion marker lands on the head block,
+		// with the removed run still readable inside it.
+		const delMarker = paragraph.locator(
+			`${ SUGGESTION_MARK }[data-suggestion-type="del"]`
+		);
+		await expect( delMarker ).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		await expect( delMarker ).toHaveText( 'jumps over the lazy dog.' );
+		await deselect( page );
+
+		// The head block keeps its whole sentence rather than being repainted
+		// as the post-split "The quick brown fox ".
+		await expect( paragraph ).toHaveText(
+			'The quick brown fox jumps over the lazy dog.'
+		);
+		// And it carries no overlay, so the marker is the only representation
+		// of the pending change on that block.
+		await expect( paragraph ).not.toHaveClass( /is-suggestion-pending\b/ );
+
+		// The other half of the split is still proposed as an inserted block.
+		const tail = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.nth( 1 );
+		await expect( tail ).toHaveClass( /is-suggestion-pending-insert/ );
+		await expect( tail ).toHaveText( 'jumps over the lazy dog.' );
+	} );
+
+	/*
 	 * Remaining seam that needs lower-level input injection than Playwright's
 	 * event APIs expose end-to-end: drag-and-drop text. The `onChange`
 	 * diff->marker converter (`SuggestionContentReconciler`) is
