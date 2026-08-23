@@ -10,6 +10,7 @@ jest.mock( '@wordpress/a11y', () => ( {
 } ) );
 import { store as editorStore } from '..';
 import * as actions from '../actions';
+import { EDITOR_INTENT_SUGGEST } from '../constants';
 import { unlock } from '../../lock-unlock';
 
 const postId = 44;
@@ -182,6 +183,192 @@ describe( 'Post actions', () => {
 			expect( registry.select( editorStore ).getDeviceType() ).toBe(
 				'Desktop'
 			);
+		} );
+	} );
+
+	describe( 'editPost()', () => {
+		const draftPost = {
+			id: postId,
+			type: 'post',
+			title: 'bar',
+			content: 'bar',
+			excerpt: 'crackers',
+			status: 'draft',
+			password: 'hunter2',
+		};
+		const REFUSED_STATUS_MESSAGE =
+			"The post status can't be changed while suggesting. Switch to Editing to change it.";
+
+		function setupPost() {
+			const registry = createRegistryWithStores();
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', draftPost );
+			registry.dispatch( editorStore ).setupEditor( draftPost );
+			return registry;
+		}
+
+		it( 'refuses a post status edit while suggesting', () => {
+			const registry = setupPost();
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				EDITOR_INTENT_SUGGEST
+			);
+			speak.mockClear();
+
+			registry.dispatch( editorStore ).editPost( { status: 'pending' } );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getEditedPostAttribute( 'status' )
+			).toBe( 'draft' );
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
+			expect( speak ).toHaveBeenCalledWith(
+				REFUSED_STATUS_MESSAGE,
+				'assertive'
+			);
+		} );
+
+		it( 'shows the refusal in a snackbar, not only to screen readers', () => {
+			const registry = setupPost();
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				EDITOR_INTENT_SUGGEST
+			);
+
+			registry.dispatch( editorStore ).editPost( { status: 'pending' } );
+
+			const refusals = registry
+				.select( noticesStore )
+				.getNotices()
+				.filter(
+					( { id } ) => id === 'editor-suggest-locked-post-status'
+				);
+			expect( refusals ).toEqual( [
+				expect.objectContaining( {
+					content: REFUSED_STATUS_MESSAGE,
+					type: 'snackbar',
+					// `speak` already announced it; a spoken snackbar would
+					// repeat the same sentence.
+					spokenMessage: null,
+				} ),
+			] );
+
+			// A second refusal replaces the first rather than stacking.
+			registry.dispatch( editorStore ).editPost( { status: 'publish' } );
+
+			expect(
+				registry
+					.select( noticesStore )
+					.getNotices()
+					.filter(
+						( { id } ) => id === 'editor-suggest-locked-post-status'
+					)
+			).toHaveLength( 1 );
+		} );
+
+		it( 'refuses the whole call, so a companion edit cannot land without its status', () => {
+			const registry = setupPost();
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				EDITOR_INTENT_SUGGEST
+			);
+
+			/*
+			 * The shape `PostVisibility` sends for "Private". Dropping only the
+			 * status would strip the password while leaving the post published
+			 * - a state nobody asked for.
+			 */
+			registry
+				.dispatch( editorStore )
+				.editPost( { status: 'private', password: '' } );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getEditedPostAttribute( 'status' )
+			).toBe( 'draft' );
+			expect(
+				registry
+					.select( editorStore )
+					.getEditedPostAttribute( 'password' )
+			).toBe( draftPost.password );
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
+		} );
+
+		it( 'lets a call through when it only repeats the status it already has', () => {
+			const registry = setupPost();
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				EDITOR_INTENT_SUGGEST
+			);
+			speak.mockClear();
+
+			/*
+			 * `PostVisibility` sends the current status alongside every
+			 * visibility choice. Nothing is being changed, so there is nothing
+			 * to refuse and nothing to announce.
+			 */
+			registry
+				.dispatch( editorStore )
+				.editPost( { status: 'draft', excerpt: 'new crackers' } );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getEditedPostAttribute( 'excerpt' )
+			).toBe( 'new crackers' );
+			expect( speak ).not.toHaveBeenCalled();
+			// The no-op status was dropped rather than written back as an edit.
+			expect(
+				registry
+					.select( coreStore )
+					.getEntityRecordEdits( 'postType', 'post', draftPost.id )
+			).not.toHaveProperty( 'status' );
+		} );
+
+		it( 'discards a status staged while editing when the suggest intent is entered', () => {
+			const registry = setupPost();
+
+			registry.dispatch( editorStore ).editPost( { status: 'pending' } );
+			expect(
+				registry
+					.select( editorStore )
+					.getEditedPostAttribute( 'status' )
+			).toBe( 'pending' );
+
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				EDITOR_INTENT_SUGGEST
+			);
+
+			/*
+			 * `savePost` is not guarded, so a status left staged from Editing
+			 * would be written on the next save - the workflow change this
+			 * intent withholds, applied without anyone choosing it here.
+			 */
+			expect(
+				registry
+					.select( editorStore )
+					.getEditedPostAttribute( 'status' )
+			).toBe( 'draft' );
+			expect(
+				registry
+					.select( coreStore )
+					.getEntityRecordEdits( 'postType', 'post', draftPost.id )
+			).not.toHaveProperty( 'status' );
+		} );
+
+		it( 'applies a post status edit while editing', () => {
+			const registry = setupPost();
+
+			registry.dispatch( editorStore ).editPost( { status: 'pending' } );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getEditedPostAttribute( 'status' )
+			).toBe( 'pending' );
 		} );
 	} );
 
