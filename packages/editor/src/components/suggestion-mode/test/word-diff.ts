@@ -71,7 +71,7 @@ describe( 'wordDiff', () => {
 	describe( 'token cap', () => {
 		// A text of `n` distinct words tokenizes to n word tokens plus the
 		// separating spaces (2n - 1 tokens total).
-		const words = ( n, prefix = 'w' ) =>
+		const words = ( n: number, prefix = 'w' ) =>
 			Array.from( { length: n }, ( _, i ) => `${ prefix }${ i }` ).join(
 				' '
 			);

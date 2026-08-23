@@ -7,6 +7,7 @@ import {
 } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
+// @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { check, closeSmall } from '@wordpress/icons';
 import {
@@ -29,10 +30,10 @@ const REJECTED = 'rejected';
  * Both the header icon buttons and the body (for resolution state and the
  * staleness dialog) consume the same hook so their behavior never diverges.
  *
- * @param {Object} thread The note thread.
- * @return {Object|null} Controls, or null if the thread has no payload.
+ * @param thread The note thread.
+ * @return Controls, or null if the thread has no payload.
  */
-function useSuggestionDecision( thread ) {
+function useSuggestionDecision( thread: any ) {
 	const payload = useMemo(
 		() => parseSuggestionPayload( thread?.meta?._wp_suggestion ),
 		[ thread?.meta?._wp_suggestion ]
@@ -147,9 +148,10 @@ function useSuggestionDecision( thread ) {
  * suggestion. Rendered inline with the note's author info so the decision
  * affordance is always in view, even when the thread is long.
  *
- * @param {{ thread: Object }} props
+ * @param props        Props.
+ * @param props.thread The note thread.
  */
-export function SuggestionActionButtons( { thread } ) {
+export function SuggestionActionButtons( { thread }: { thread: any } ) {
 	const decision = useSuggestionDecision( thread );
 	if ( ! decision || decision.isResolved ) {
 		return null;
@@ -161,7 +163,7 @@ export function SuggestionActionButtons( { thread } ) {
 		<Stack
 			direction="row"
 			justify="flex-end"
-			gap="0"
+			gap={ '0' as any }
 			className="editor-collab-sidebar-panel__suggestion-header-actions"
 			onClick={ ( event ) => {
 				// Keep the click from bubbling into the thread's expand/
@@ -226,9 +228,17 @@ export function SuggestionActionButtons( { thread } ) {
  * operations feed the pure `summarizeOperations`. Threads with no inline op
  * (structural or whole-attribute suggestions) pass through untouched.
  *
- * @param {{ thread: Object, operations: Array }} props
+ * @param props            Props.
+ * @param props.thread     The note thread.
+ * @param props.operations Suggestion operations.
  */
-function ResolvedSuggestionSummary( { thread, operations } ) {
+function ResolvedSuggestionSummary( {
+	thread,
+	operations,
+}: {
+	thread: any;
+	operations: any[];
+} ) {
 	const resolvedOperations = useSelect(
 		( select ) => {
 			if ( ! thread?.blockClientId ) {
@@ -240,7 +250,7 @@ function ResolvedSuggestionSummary( { thread, operations } ) {
 			if ( ! attributes ) {
 				return operations;
 			}
-			return operations.map( ( op ) => {
+			return operations.map( ( op: any ) => {
 				if (
 					op.type !== 'inline-suggestion' ||
 					! op.attribute ||
@@ -267,9 +277,10 @@ function ResolvedSuggestionSummary( { thread, operations } ) {
  * Accept/Reject and the staleness dialog live in the header slot via
  * `SuggestionActionButtons` so the click and the dialog share state.
  *
- * @param {{ thread: Object }} props
+ * @param props        Props.
+ * @param props.thread The note thread.
  */
-export default function SuggestionActions( { thread } ) {
+export default function SuggestionActions( { thread }: { thread: any } ) {
 	const decision = useSuggestionDecision( thread );
 	if ( ! decision ) {
 		return null;

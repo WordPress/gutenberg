@@ -1246,7 +1246,7 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/collab-sidebar/suggestion-actions.js": {
+	"packages/editor/src/components/collab-sidebar/suggestion-actions.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
@@ -1434,7 +1434,7 @@
 			"count": 6
 		}
 	},
-	"packages/editor/src/components/suggestion-mode/suggestion-summary.js": {
+	"packages/editor/src/components/suggestion-mode/suggestion-summary.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		}

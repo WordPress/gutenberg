@@ -22,6 +22,11 @@ export const MAX_DIFF_LENGTH = 2000;
  */
 export const MAX_DIFF_TOKENS = 1500;
 
+export interface WordDiffSegment {
+	type: 'equal' | 'insert' | 'delete';
+	value: string;
+}
+
 /**
  * Compute a word-level diff between two strings, returning an array of
  * segments tagged as `equal`, `insert`, or `delete`.
@@ -35,16 +40,16 @@ export const MAX_DIFF_TOKENS = 1500;
  * effectively degrades to the same whole-run replace rather than a
  * word-level diff.
  *
- * @param {string} before Original text.
- * @param {string} after  Proposed text.
- * @return {Array<{type: string, value: string}>} Diff segments.
+ * @param before Original text.
+ * @param after  Proposed text.
+ * @return Diff segments.
  */
-export function wordDiff( before, after ) {
+export function wordDiff( before: any, after: any ): WordDiffSegment[] {
 	const a = tokenize( before );
 	const b = tokenize( after );
 
 	if ( a.length > MAX_DIFF_TOKENS || b.length > MAX_DIFF_TOKENS ) {
-		const coarse = [];
+		const coarse: WordDiffSegment[] = [];
 		if ( a.length > 0 ) {
 			coarse.push( { type: 'delete', value: a.join( '' ) } );
 		}
@@ -56,7 +61,7 @@ export function wordDiff( before, after ) {
 
 	const lcs = longestCommonSubsequence( a, b );
 
-	const result = [];
+	const result: WordDiffSegment[] = [];
 	let ai = 0;
 	let bi = 0;
 
@@ -86,14 +91,14 @@ export function wordDiff( before, after ) {
 	return result;
 }
 
-function tokenize( str ) {
+function tokenize( str: any ): string[] {
 	if ( typeof str !== 'string' ) {
 		return [];
 	}
 	return str.match( /\S+|\s+/g ) || [];
 }
 
-function longestCommonSubsequence( a, b ) {
+function longestCommonSubsequence( a: string[], b: string[] ): string[] {
 	const m = a.length;
 	const n = b.length;
 	const dp = Array.from( { length: m + 1 }, () =>

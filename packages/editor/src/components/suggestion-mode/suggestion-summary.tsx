@@ -27,6 +27,7 @@ import { Stack } from '@wordpress/ui';
 import { useMemo } from '@wordpress/element';
 import { __unstableStripHTML as wpStripHTML } from '@wordpress/dom';
 import { wordDiff, MAX_DIFF_LENGTH } from './word-diff';
+import type { SuggestionOperation } from './provider';
 
 /**
  * Cap on how much text we'll render inline in a summary. Longer insertions
@@ -57,10 +58,10 @@ const FORMAT_ATTRIBUTE_LABELS = {
  * namespace prefix and falls back to the raw name when the block name is
  * empty or non-namespaced.
  *
- * @param {string|undefined} blockName Block name from the suggestion op.
- * @return {string} Display label.
+ * @param blockName Block name from the suggestion op.
+ * @return Display label.
  */
-function friendlyBlockName( blockName ) {
+function friendlyBlockName( blockName: any ): string {
 	if ( ! blockName || typeof blockName !== 'string' ) {
 		return __( 'block' );
 	}
@@ -107,10 +108,10 @@ const TAG_REGEX = /<\s*([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>/g;
  * regex-only strip would mis-classify text edits where one side encoded an
  * ampersand and the other didn't.
  *
- * @param {string} html Possibly-HTML content.
- * @return {string} The visible text, with whitespace collapsed.
+ * @param html Possibly-HTML content.
+ * @return The visible text, with whitespace collapsed.
  */
-function stripTags( html ) {
+function stripTags( html: any ): string {
 	if ( typeof html !== 'string' || html === '' ) {
 		return '';
 	}
@@ -122,11 +123,11 @@ function stripTags( html ) {
  * and void tags (e.g. `<br>`) are counted the same way as paired tags
  * since we only care about presence, not balance.
  *
- * @param {string} html Possibly-HTML content.
- * @return {Map<string, number>} Tag name → count.
+ * @param html Possibly-HTML content.
+ * @return Tag name → count.
  */
-function countTags( html ) {
-	const counts = new Map();
+function countTags( html: string ): Map< string, number > {
+	const counts = new Map< string, number >();
 	let match;
 	TAG_REGEX.lastIndex = 0;
 	while ( ( match = TAG_REGEX.exec( html ) ) !== null ) {
@@ -141,14 +142,14 @@ function countTags( html ) {
  * names (mapped via `INLINE_FORMAT_TAG_LABELS`) whose count differs, which
  * indicates an inline format was added or removed regardless of direction.
  *
- * @param {string} before HTML before the edit.
- * @param {string} after  HTML after the edit.
- * @return {string[]} Ordered, deduplicated list of changed format labels.
+ * @param before HTML before the edit.
+ * @param after  HTML after the edit.
+ * @return Ordered, deduplicated list of changed format labels.
  */
-function diffInlineFormats( before, after ) {
+function diffInlineFormats( before: string, after: string ): string[] {
 	const beforeCounts = countTags( before );
 	const afterCounts = countTags( after );
-	const changed = new Set();
+	const changed = new Set< string >();
 	const tags = new Set( [ ...beforeCounts.keys(), ...afterCounts.keys() ] );
 	for ( const tag of tags ) {
 		if (
@@ -156,7 +157,9 @@ function diffInlineFormats( before, after ) {
 		) {
 			continue;
 		}
-		const label = INLINE_FORMAT_TAG_LABELS[ tag ] ?? tag;
+		const label =
+			( INLINE_FORMAT_TAG_LABELS as Record< string, string > )[ tag ] ??
+			tag;
 		changed.add( label );
 	}
 	return Array.from( changed );
@@ -166,17 +169,19 @@ function diffInlineFormats( before, after ) {
  * Join an array of label strings with a comma, using `__()`-friendly
  * punctuation. Deduplicated and lowercased for display.
  *
- * @param {string[]} labels Raw labels.
- * @return {string} Comma-joined list.
+ * @param labels Raw labels.
+ * @return Comma-joined list.
  */
-function joinLabels( labels ) {
+function joinLabels( labels: string[] ): string {
 	const unique = Array.from(
-		new Set( labels.filter( Boolean ).map( ( l ) => l.toLowerCase() ) )
+		new Set(
+			labels.filter( Boolean ).map( ( l: string ) => l.toLowerCase() )
+		)
 	);
 	return unique.join( ', ' );
 }
 
-function ellipsize( text ) {
+function ellipsize( text: string ): string {
 	const trimmed = text.replace( /\s+/g, ' ' ).trim();
 	if ( trimmed.length <= SUMMARY_MAX_CHARS ) {
 		return trimmed;
@@ -190,10 +195,10 @@ function ellipsize( text ) {
  * inline suggestion that adds or removes literal spaces (e.g. a single typed
  * space) is shown as-is rather than reduced to an empty quote.
  *
- * @param {string} text Literal marker text.
- * @return {string} The text, truncated with an ellipsis when too long.
+ * @param text Literal marker text.
+ * @return The text, truncated with an ellipsis when too long.
  */
-function clampText( text ) {
+function clampText( text: string ): string {
 	if ( text.length <= SUMMARY_MAX_CHARS ) {
 		return text;
 	}
@@ -206,12 +211,15 @@ function clampText( text ) {
  * segments. Whitespace-only runs are excluded from the counts so a pure
  * format change doesn't surface as "Add: ' '".
  *
- * @param {string} before Original text.
- * @param {string} after  Proposed text.
- * @return {{inserted: string, deleted: string}} Aggregated insertions and
+ * @param before Original text.
+ * @param after  Proposed text.
+ * @return Aggregated insertions and
  * deletions, already trimmed and ellipsized.
  */
-function textDelta( before, after ) {
+function textDelta(
+	before: string,
+	after: string
+): { inserted: string; deleted: string } {
 	const segments = wordDiff( before, after );
 	let inserted = '';
 	let deleted = '';
@@ -228,7 +236,7 @@ function textDelta( before, after ) {
 	};
 }
 
-function isTextLike( value ) {
+function isTextLike( value: any ): boolean {
 	return typeof value === 'string';
 }
 
@@ -238,17 +246,19 @@ function isTextLike( value ) {
  * attribute changes are collapsed into a single `Format:` line listing the
  * touched attributes.
  *
- * @param {import('./provider').SuggestionOperation[]} operations Operations.
- * @return {Array<{label: string, value: string}>} Rendered lines.
+ * @param operations Operations.
+ * @return Rendered lines.
  */
-export function summarizeOperations( operations ) {
+export function summarizeOperations(
+	operations: SuggestionOperation[] | null | undefined
+): Array< { label: string; value: string } > {
 	if ( ! Array.isArray( operations ) || operations.length === 0 ) {
 		return [];
 	}
 
-	const lines = [];
-	const attributeLabels = [];
-	const formattingLabels = [];
+	const lines: Array< { label: string; value: string } > = [];
+	const attributeLabels: string[] = [];
+	const formattingLabels: string[] = [];
 
 	for ( const op of operations ) {
 		if ( op.type === 'block-remove' ) {
@@ -378,7 +388,10 @@ export function summarizeOperations( operations ) {
 
 	if ( attributeLabels.length > 0 ) {
 		const labels = attributeLabels.map(
-			( key ) => FORMAT_ATTRIBUTE_LABELS[ key ] ?? key
+			( key ) =>
+				( FORMAT_ATTRIBUTE_LABELS as Record< string, string > )[
+					key
+				] ?? key
 		);
 		lines.push( { label: __( 'Format:' ), value: joinLabels( labels ) } );
 	}
@@ -390,10 +403,14 @@ export function summarizeOperations( operations ) {
  * Compact sidebar summary of a suggestion — "Add: …", "Delete: …",
  * "Format: …". Designed to mirror a Google Docs-style review note.
  *
- * @param {Object}                                     props
- * @param {import('./provider').SuggestionOperation[]} props.operations
+ * @param props            Props.
+ * @param props.operations Operations to summarize.
  */
-export default function SuggestionSummary( { operations } ) {
+export default function SuggestionSummary( {
+	operations,
+}: {
+	operations: SuggestionOperation[];
+} ) {
 	const lines = useMemo(
 		() => summarizeOperations( operations ),
 		[ operations ]
