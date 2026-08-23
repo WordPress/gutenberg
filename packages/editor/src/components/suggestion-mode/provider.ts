@@ -1,12 +1,15 @@
 import { useCallback, useMemo } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+// @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
+// @ts-expect-error No exported types
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { EDITOR_STORE_NAME } from './constants';
 import { useSuggestionOverlay } from './overlay-context';
+import type { SuggestionOperation } from './overlay-context';
 import {
 	addNoteIdToMetadata,
 	getNoteIdsFromMetadata,
@@ -14,33 +17,38 @@ import {
 import { ALL_NOTES_SIDEBAR, SIDEBARS } from '../collab-sidebar/constants';
 
 /**
- * @typedef {Object} SuggestionOperation
- * @property {'attribute-set'|'inline-suggestion'|'block-insert-after'|'block-remove'|'block-move'} type
- *                                                                                                                   Operation type. `attribute-set` and `inline-suggestion` ship in
- *                                                                                                                   Phase 2; the structural variants ship in Phase 6 (issue #77434).
- * @property {string}                                                                               [attribute]      The attribute being changed (`attribute-set`) or
- *                                                                                                                   carrying the marker (`inline-suggestion`).
- * @property {'del'|'add'|'format'}                                                                 [suggestionType] Inline marker kind (`inline-suggestion` only): `del`
- *                                                                                                                   wraps existing text proposed for removal, `add` wraps proposed
- *                                                                                                                   new text, `format` wraps a run whose formatting changed (text
- *                                                                                                                   unchanged).
- * @property {string}                                                                               [beforeHTML]     Original run HTML captured for a `format` suggestion, so a
- *                                                                                                                   reject can restore the pre-suggestion formatting.
- * @property {string}                                                                               [afterHTML]      Proposed run HTML for a `format` suggestion, used to
- *                                                                                                                   summarize which formats changed.
- * @property {*}                                                                                    [before]         The baseline value (`attribute-set`).
- * @property {*}                                                                                    [after]          The proposed value (`attribute-set`).
+ * A single suggestion operation.
+ *
+ * `type` is one of `attribute-set` / `inline-suggestion` (Phase 2) or the
+ * structural variants `block-insert-after` / `block-remove` / `block-move`
+ * (Phase 6, issue #77434). Other fields vary by type:
+ *   - `attribute`      The attribute being changed (`attribute-set`) or
+ *                      carrying the marker (`inline-suggestion`).
+ *   - `suggestionType` Inline marker kind (`inline-suggestion` only): `del`
+ *                      wraps existing text proposed for removal, `add` wraps
+ *                      proposed new text, `format` wraps a run whose
+ *                      formatting changed (text unchanged).
+ *   - `beforeHTML`     Original run HTML captured for a `format` suggestion,
+ *                      so a reject can restore the pre-suggestion formatting.
+ *   - `afterHTML`      Proposed run HTML for a `format` suggestion, used to
+ *                      summarize which formats changed.
+ *   - `before`/`after` The baseline and proposed values (`attribute-set`).
  */
+export type { SuggestionOperation };
 
-/**
- * @typedef {Object} SuggestionPayload
- * @property {number}                schemaVersion Payload schema version.
- * @property {string}                blockName     Block name at capture time.
- * @property {string|null}           baseRevision  Post `modified_gmt` at
- *                                                 capture, used by Phase 3 to
- *                                                 detect stale suggestions.
- * @property {SuggestionOperation[]} operations    Ordered operations.
- */
+export interface SuggestionPayload {
+	/** Payload schema version. */
+	schemaVersion: number;
+	/** Block name at capture time. */
+	blockName: string;
+	/**
+	 * Post `modified_gmt` at capture, used by Phase 3 to detect stale
+	 * suggestions.
+	 */
+	baseRevision: string | null;
+	/** Ordered operations. */
+	operations: SuggestionOperation[];
+}
 
 /**
  * Suggestion payload schema version. v1 emitted only `attribute-set`
@@ -70,10 +78,10 @@ const PAYLOAD_MAX_BYTES = 65536;
  * Byte length of a serialized payload, measured the way PHP `strlen()`
  * counts (UTF-8 bytes, not chars).
  *
- * @param {SuggestionPayload} payload
- * @return {number} UTF-8 byte length of the serialized JSON.
+ * @param payload Payload to measure.
+ * @return UTF-8 byte length of the serialized JSON.
  */
-function payloadByteLength( payload ) {
+function payloadByteLength( payload: SuggestionPayload ): number {
 	const serialized = JSON.stringify( payload );
 	if ( typeof TextEncoder !== 'undefined' ) {
 		return new TextEncoder().encode( serialized ).length;
@@ -89,12 +97,15 @@ function payloadByteLength( payload ) {
  * captured baseline. Attributes whose value differs are emitted; unchanged
  * or absent keys are skipped.
  *
- * @param {Object} baselineAttributes Attributes captured on first edit.
- * @param {Object} overlayAttributes  Pending attribute changes.
- * @return {SuggestionOperation[]} Operations describing the suggestion.
+ * @param baselineAttributes Attributes captured on first edit.
+ * @param overlayAttributes  Pending attribute changes.
+ * @return Operations describing the suggestion.
  */
-export function operationsFromOverlay( baselineAttributes, overlayAttributes ) {
-	const operations = [];
+export function operationsFromOverlay(
+	baselineAttributes: Record< string, any > | null | undefined,
+	overlayAttributes: Record< string, any > | null | undefined
+): SuggestionOperation[] {
+	const operations: SuggestionOperation[] = [];
 	for ( const [ attribute, after ] of Object.entries(
 		overlayAttributes || {}
 	) ) {
@@ -119,11 +130,11 @@ export function operationsFromOverlay( baselineAttributes, overlayAttributes ) {
  * based compare produces spurious "changed" detections when block code re-
  * emits a `style` object with reordered keys. The recursive walk avoids that.
  *
- * @param {*} a First value.
- * @param {*} b Second value.
- * @return {boolean} True when the values are structurally equal.
+ * @param a First value.
+ * @param b Second value.
+ * @return True when the values are structurally equal.
  */
-function isAttributeEqual( a, b ) {
+function isAttributeEqual( a: any, b: any ): boolean {
 	if ( a === b ) {
 		return true;
 	}
@@ -203,10 +214,12 @@ const STRUCTURAL_OP_TYPES = new Set( [
  * structural mutation as its own note); attribute-set ops can ride along
  * inside the same payload but the structural op leads.
  *
- * @param {SuggestionOperation[]} operations Payload operations.
- * @return {SuggestionOperation|null} Structural op, or null when none.
+ * @param operations Payload operations.
+ * @return Structural op, or null when none.
  */
-export function findStructuralOp( operations ) {
+export function findStructuralOp(
+	operations: SuggestionOperation[] | null | undefined
+): SuggestionOperation | null {
 	if ( ! Array.isArray( operations ) ) {
 		return null;
 	}
@@ -223,10 +236,12 @@ export function findStructuralOp( operations ) {
  * while preserving every other metadata field. Used by Apply (after the
  * mutation lands) and by Reject (to drop the pending state).
  *
- * @param {Object} currentAttributes Block's current attributes.
- * @return {Object} Partial attributes payload safe for `updateBlockAttributes`.
+ * @param currentAttributes Block's current attributes.
+ * @return Partial attributes payload safe for `updateBlockAttributes`.
  */
-export function clearSuggestionMarkerAttributes( currentAttributes ) {
+export function clearSuggestionMarkerAttributes(
+	currentAttributes: Record< string, any > | null | undefined
+): { metadata: Record< string, any > } | null {
 	const meta = currentAttributes?.metadata;
 	if ( ! meta || meta.suggestion === undefined ) {
 		return null;
@@ -239,12 +254,15 @@ export function clearSuggestionMarkerAttributes( currentAttributes ) {
  * Apply a suggestion payload's operations to a block's current attributes
  * to produce the new attributes. Pure function — no side effects.
  *
- * @param {Object}                currentAttributes Block's current attributes.
- * @param {SuggestionOperation[]} operations        Operations from the payload.
- * @return {Object} Merged attributes with suggestions applied.
+ * @param currentAttributes Block's current attributes.
+ * @param operations        Operations from the payload.
+ * @return Merged attributes with suggestions applied.
  */
-export function applyOperations( currentAttributes, operations ) {
-	const result = { ...currentAttributes };
+export function applyOperations(
+	currentAttributes: Record< string, any > | null | undefined,
+	operations: SuggestionOperation[]
+): Record< string, any > {
+	const result: Record< string, any > = { ...currentAttributes };
 	for ( const op of operations ) {
 		if ( op.type === 'attribute-set' ) {
 			result[ op.attribute ] = op.after;
@@ -260,11 +278,14 @@ export function applyOperations( currentAttributes, operations ) {
  * captured at suggest-time differs from the attribute's current value —
  * simply reopening the post after any auto-save doesn't qualify.
  *
- * @param {Object}                currentAttributes Block's current attributes.
- * @param {SuggestionOperation[]} operations        Operations from the payload.
- * @return {boolean} True if at least one targeted attribute has diverged.
+ * @param currentAttributes Block's current attributes.
+ * @param operations        Operations from the payload.
+ * @return True if at least one targeted attribute has diverged.
  */
-export function hasAttributeConflict( currentAttributes, operations ) {
+export function hasAttributeConflict(
+	currentAttributes: Record< string, any > | null | undefined,
+	operations: SuggestionOperation[] | null | undefined
+): boolean {
 	if ( ! Array.isArray( operations ) ) {
 		return false;
 	}
@@ -303,10 +324,12 @@ export function hasAttributeConflict( currentAttributes, operations ) {
  * Add a new `case` per future bump; never remove old cases, since the
  * comment-meta store may contain payloads written by every prior version.
  *
- * @param {Object} parsed Parsed JSON payload of a known older version.
- * @return {Object} Payload upgraded to the current schema.
+ * @param parsed Parsed JSON payload of a known older version.
+ * @return Payload upgraded to the current schema.
  */
-function migrateSuggestionPayload( parsed ) {
+function migrateSuggestionPayload(
+	parsed: SuggestionPayload
+): SuggestionPayload {
 	let next = parsed;
 	if ( next.schemaVersion === 1 ) {
 		next = { ...next, schemaVersion: 2 };
@@ -320,15 +343,17 @@ function migrateSuggestionPayload( parsed ) {
  * apply can't drop op types this consumer doesn't understand. Migrates
  * older payloads forward to the current shape.
  *
- * @param {string|undefined} raw The raw JSON string from comment meta.
- * @return {SuggestionPayload|null} Parsed payload, or null when the input is
+ * @param raw The raw JSON string from comment meta.
+ * @return Parsed payload, or null when the input is
  * malformed or the payload was written by a newer editor.
  */
-export function parseSuggestionPayload( raw ) {
+export function parseSuggestionPayload(
+	raw: string | null | undefined
+): SuggestionPayload | null {
 	if ( ! raw ) {
 		return null;
 	}
-	let parsed;
+	let parsed: any;
 	try {
 		parsed = JSON.parse( raw );
 	} catch {
@@ -366,15 +391,17 @@ export function parseSuggestionPayload( raw ) {
  * `useSuggestionsProvider` is instantiated once per consumer and the guard
  * must be shared across all of them.
  */
-const decisionsInFlight = new Set();
+const decisionsInFlight = new Set< string >();
 
 /**
  * Whether an apply/reject decision for the given comment is in flight.
  *
- * @param {number|string} commentId Comment id to check.
- * @return {boolean} True while a decision is being processed.
+ * @param commentId Comment id to check.
+ * @return True while a decision is being processed.
  */
-export function isSuggestionDecisionInFlight( commentId ) {
+export function isSuggestionDecisionInFlight(
+	commentId: number | string
+): boolean {
 	return decisionsInFlight.has( String( commentId ) );
 }
 
@@ -382,11 +409,13 @@ export function isSuggestionDecisionInFlight( commentId ) {
  * Wrap a decision callback (apply/reject) so its comment id is registered as
  * in flight for the duration of the call.
  *
- * @param {Function} decide Decision callback taking `{ commentId, ... }`.
- * @return {Function} Wrapped callback.
+ * @param decide Decision callback taking `{ commentId, ... }`.
+ * @return Wrapped callback.
  */
-function withDecisionInFlight( decide ) {
-	return async ( args ) => {
+function withDecisionInFlight< Args extends { commentId?: number | string } >(
+	decide: ( args: Args ) => Promise< unknown >
+) {
+	return async ( args: Args ) => {
 		const key = String( args?.commentId );
 		decisionsInFlight.add( key );
 		try {
@@ -405,15 +434,11 @@ function withDecisionInFlight( decide ) {
  * the `_wp_suggestion` comment meta. Linkage to a block reuses the existing
  * `metadata.noteId` block attribute.
  *
- * @return {{
- *   createSuggestion: Function,
- *   applySuggestion:  Function,
- *   rejectSuggestion: Function,
- * }} Suggestions API.
+ * @return Suggestions API.
  */
 export function useSuggestionsProvider() {
 	const { postId, postModified } = useSelect( ( select ) => {
-		const editor = select( EDITOR_STORE_NAME );
+		const editor: any = select( EDITOR_STORE_NAME );
 		const id = editor?.getCurrentPostId?.() ?? null;
 		const postType = editor?.getCurrentPostType?.() ?? null;
 		const record =
@@ -426,7 +451,7 @@ export function useSuggestionsProvider() {
 				: null;
 		return {
 			postId: id,
-			postModified: record?.modified_gmt ?? null,
+			postModified: ( record as any )?.modified_gmt ?? null,
 		};
 	}, [] );
 
@@ -449,7 +474,15 @@ export function useSuggestionsProvider() {
 	const registry = useRegistry();
 
 	const createSuggestion = useCallback(
-		async ( { clientId, blockName, operations } ) => {
+		async ( {
+			clientId,
+			blockName,
+			operations,
+		}: {
+			clientId: string;
+			blockName: string;
+			operations: SuggestionOperation[];
+		} ) => {
 			if ( ! postId ) {
 				throw new Error( 'No post id available for suggestion.' );
 			}
@@ -457,12 +490,12 @@ export function useSuggestionsProvider() {
 				return null;
 			}
 
-			const payload = /** @type {SuggestionPayload} */ ( {
+			const payload: SuggestionPayload = {
 				schemaVersion: SCHEMA_VERSION,
 				blockName,
 				baseRevision: postModified,
 				operations,
-			} );
+			};
 
 			if ( payloadByteLength( payload ) > PAYLOAD_MAX_BYTES ) {
 				const error = new Error(
@@ -476,7 +509,7 @@ export function useSuggestionsProvider() {
 			}
 
 			try {
-				const savedRecord = await saveEntityRecord(
+				const savedRecord: any = await saveEntityRecord(
 					'root',
 					'comment',
 					{
@@ -526,7 +559,7 @@ export function useSuggestionsProvider() {
 				}
 
 				return savedRecord;
-			} catch ( error ) {
+			} catch ( error: any ) {
 				createNotice(
 					'error',
 					error?.message || __( 'Unable to submit suggestion.' ),
@@ -554,26 +587,32 @@ export function useSuggestionsProvider() {
 	 * status, or thread identity, so the user sees a single note
 	 * accumulating edits rather than a new note per save burst.
 	 *
-	 * @param {Object}                args            Update arguments.
-	 * @param {number|string}         args.commentId  Comment id of the
-	 *                                                existing suggestion.
-	 * @param {string}                args.blockName  Block name (recorded
-	 *                                                on the payload).
-	 * @param {SuggestionOperation[]} args.operations Latest operations.
-	 * @return {Promise<Object>} The saved comment record.
+	 * @param args            Update arguments.
+	 * @param args.commentId  Comment id of the existing suggestion.
+	 * @param args.blockName  Block name (recorded on the payload).
+	 * @param args.operations Latest operations.
+	 * @return The saved comment record.
 	 */
 	const updateSuggestion = useCallback(
-		async ( { commentId, blockName, operations } ) => {
+		async ( {
+			commentId,
+			blockName,
+			operations,
+		}: {
+			commentId: number | string;
+			blockName: string;
+			operations: SuggestionOperation[];
+		} ) => {
 			if ( ! commentId ) {
 				throw new Error( 'No comment id for suggestion update.' );
 			}
 
-			const payload = /** @type {SuggestionPayload} */ ( {
+			const payload: SuggestionPayload = {
 				schemaVersion: SCHEMA_VERSION,
 				blockName,
 				baseRevision: postModified,
 				operations,
-			} );
+			};
 
 			if ( payloadByteLength( payload ) > PAYLOAD_MAX_BYTES ) {
 				const error = new Error(
@@ -598,7 +637,7 @@ export function useSuggestionsProvider() {
 					},
 					{ throwOnError: true }
 				);
-			} catch ( error ) {
+			} catch ( error: any ) {
 				createNotice(
 					'error',
 					error?.message || __( 'Unable to update suggestion.' ),
@@ -615,12 +654,11 @@ export function useSuggestionsProvider() {
 	 * fully reverted to baseline — the user retracted their edit, so the
 	 * note no longer carries a meaningful suggestion.
 	 *
-	 * @param {Object}        args           Delete arguments.
-	 * @param {number|string} args.commentId Comment id to trash.
-	 * @return {Promise<void>}
+	 * @param args           Delete arguments.
+	 * @param args.commentId Comment id to trash.
 	 */
 	const deleteSuggestion = useCallback(
-		async ( { commentId } ) => {
+		async ( { commentId }: { commentId: number | string | null } ) => {
 			if ( ! commentId ) {
 				return;
 			}
@@ -631,7 +669,7 @@ export function useSuggestionsProvider() {
 					{ id: commentId, status: 'trash' },
 					{ throwOnError: true }
 				);
-			} catch ( error ) {
+			} catch ( error: any ) {
 				createNotice(
 					'error',
 					error?.message || __( 'Unable to remove suggestion.' ),
@@ -648,23 +686,26 @@ export function useSuggestionsProvider() {
 	 * status to the comment meta. On a server failure the block is rolled
 	 * back so the UI is never left in a half-applied state.
 	 *
-	 * @param {Object}            args           Apply arguments.
-	 * @param {number|string}     args.commentId Comment id holding the
-	 *                                           suggestion (`_wp_suggestion`
-	 *                                           meta).
-	 * @param {string}            args.clientId  Block client id of the apply
-	 *                                           target. May be undefined if
-	 *                                           the acting user opened the
-	 *                                           post fresh and the metadata
-	 *                                           linkage was never persisted —
-	 *                                           the apply path then scans the
-	 *                                           live tree by `metadata.noteId`.
-	 * @param {SuggestionPayload} args.payload   Parsed payload (from
-	 *                                           `parseSuggestionPayload`).
-	 * @return {Promise<void>}
+	 * @param args           Apply arguments.
+	 * @param args.commentId Comment id holding the suggestion
+	 *                       (`_wp_suggestion` meta).
+	 * @param args.clientId  Block client id of the apply target. May be
+	 *                       undefined if the acting user opened the post
+	 *                       fresh and the metadata linkage was never
+	 *                       persisted — the apply path then scans the live
+	 *                       tree by `metadata.noteId`.
+	 * @param args.payload   Parsed payload (from `parseSuggestionPayload`).
 	 */
 	const applySuggestion = useCallback(
-		async ( { commentId, clientId, payload } ) => {
+		async ( {
+			commentId,
+			clientId,
+			payload,
+		}: {
+			commentId: number | string;
+			clientId?: string;
+			payload: SuggestionPayload | null;
+		} ) => {
 			if ( ! payload || ! Array.isArray( payload.operations ) ) {
 				createNotice( 'error', __( 'Invalid suggestion payload.' ), {
 					type: 'snackbar',
@@ -690,7 +731,12 @@ export function useSuggestionsProvider() {
 					const ids = getNoteIdsFromMetadata(
 						selectBlockAttributes( id )?.metadata
 					);
-					if ( ids.some( ( n ) => String( n ) === commentIdKey ) ) {
+					if (
+						ids.some(
+							( n: number | string ) =>
+								String( n ) === commentIdKey
+						)
+					) {
 						targetClientId = id;
 						break;
 					}
@@ -794,11 +840,15 @@ export function useSuggestionsProvider() {
 						clearOverlay( targetClientId );
 					}
 
-					createNotice( 'snackbar', __( 'Suggestion applied.' ), {
-						type: 'snackbar',
-						isDismissible: true,
-					} );
-				} catch ( error ) {
+					createNotice(
+						'snackbar' as any,
+						__( 'Suggestion applied.' ),
+						{
+							type: 'snackbar',
+							isDismissible: true,
+						}
+					);
+				} catch ( error: any ) {
 					createNotice(
 						'error',
 						error?.message ||
@@ -823,7 +873,7 @@ export function useSuggestionsProvider() {
 			// to override them. Listing each touched key with its original
 			// value (or `undefined` when the key was added by this apply)
 			// restores the block cleanly.
-			const rollbackPayload = {};
+			const rollbackPayload: Record< string, any > = {};
 			for ( const op of payload.operations ) {
 				if ( op.type !== 'attribute-set' ) {
 					continue;
@@ -833,7 +883,7 @@ export function useSuggestionsProvider() {
 						currentAttributes ?? {},
 						op.attribute
 					)
-						? currentAttributes[ op.attribute ]
+						? currentAttributes?.[ op.attribute ]
 						: undefined;
 			}
 
@@ -860,11 +910,11 @@ export function useSuggestionsProvider() {
 					{ throwOnError: true }
 				);
 
-				createNotice( 'snackbar', __( 'Suggestion applied.' ), {
+				createNotice( 'snackbar' as any, __( 'Suggestion applied.' ), {
 					type: 'snackbar',
 					isDismissible: true,
 				} );
-			} catch ( error ) {
+			} catch ( error: any ) {
 				// Roll back the block change so the UI isn't left in a
 				// half-applied state if the server rejected the update.
 				requestInterceptorBypass( targetClientId );
@@ -896,20 +946,23 @@ export function useSuggestionsProvider() {
 	 * `metadata.suggestion` marker on the live block so the dimmed/struck
 	 * visual treatment goes away.
 	 *
-	 * @param {Object}            args            Reject arguments.
-	 * @param {number|string}     args.commentId  Comment id of the rejected
-	 *                                            suggestion.
-	 * @param {string}            [args.clientId] Target block clientId, if
-	 *                                            known.
-	 * @param {SuggestionPayload} [args.payload]  Parsed suggestion payload —
-	 *                                            inspected to detect a
-	 *                                            structural op so the marker
-	 *                                            can be cleared on the live
-	 *                                            block.
-	 * @return {Promise<void>}
+	 * @param args           Reject arguments.
+	 * @param args.commentId Comment id of the rejected suggestion.
+	 * @param args.clientId  Target block clientId, if known.
+	 * @param args.payload   Parsed suggestion payload — inspected to detect
+	 *                       a structural op so the marker can be cleared on
+	 *                       the live block.
 	 */
 	const rejectSuggestion = useCallback(
-		async ( { commentId, clientId, payload } ) => {
+		async ( {
+			commentId,
+			clientId,
+			payload,
+		}: {
+			commentId: number | string;
+			clientId?: string;
+			payload?: SuggestionPayload | null;
+		} ) => {
 			// Reject behavior depends on the structural op type:
 			//   - block-remove: drop the marker (block stays).
 			//   - block-insert-after: dispatch removeBlock to undo the
@@ -995,11 +1048,11 @@ export function useSuggestionsProvider() {
 					}
 				}
 
-				createNotice( 'snackbar', __( 'Suggestion rejected.' ), {
+				createNotice( 'snackbar' as any, __( 'Suggestion rejected.' ), {
 					type: 'snackbar',
 					isDismissible: true,
 				} );
-			} catch ( error ) {
+			} catch ( error: any ) {
 				createNotice(
 					'error',
 					error?.message || __( 'Failed to reject suggestion.' ),

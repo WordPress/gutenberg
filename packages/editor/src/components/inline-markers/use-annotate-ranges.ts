@@ -14,10 +14,10 @@ import { store as annotationsStore } from '@wordpress/annotations';
  * Callers are responsible for memoizing `ranges` so the effect only re-runs
  * when the resolved ranges actually change.
  *
- * @param {string} source Annotation source identifier.
- * @param {Array}  ranges Ranges to decorate: `{ id, clientId, attributeKey, start, end }`.
+ * @param source Annotation source identifier.
+ * @param ranges Ranges to decorate: `{ id, clientId, attributeKey, start, end }`.
  */
-export function useAnnotateRanges( source, ranges ) {
+export function useAnnotateRanges( source: string, ranges: any[] ) {
 	const {
 		__experimentalAddAnnotation: addAnnotation,
 		__experimentalRemoveAnnotationsBySource: removeAnnotationsBySource,

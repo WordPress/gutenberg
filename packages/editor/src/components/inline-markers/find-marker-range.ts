@@ -6,13 +6,19 @@ import { create, RichTextData } from '@wordpress/rich-text';
  * by `findMarkerRange` and `findMarkerText` so both resolve offsets the same
  * way from a single code path.
  *
- * @param {*}             value                 Block attribute value (RichTextData, string, or other).
- * @param {Object}        options
- * @param {number|string} options.id            Marker id (only its presence is checked here).
- * @param {string}        [options.quickReject] Optional substring used to skip parsing when absent.
- * @return {?Object} Rich-text record, or null when there is nothing to search.
+ * @param value               Block attribute value (RichTextData, string, or other).
+ * @param options             Options.
+ * @param options.id          Marker id (only its presence is checked here).
+ * @param options.quickReject Optional substring used to skip parsing when absent.
+ * @return Rich-text record, or null when there is nothing to search.
  */
-function parseMarkerValue( value, { id, quickReject } ) {
+function parseMarkerValue(
+	value: any,
+	{
+		id,
+		quickReject,
+	}: { id: number | string | null | undefined; quickReject?: string }
+) {
 	if ( id === undefined || id === null ) {
 		return null;
 	}
@@ -43,13 +49,18 @@ function parseMarkerValue( value, { id, quickReject } ) {
  * — truncated accept/reject to a fragment of the marker. Any short gap between
  * fragments is the suggester's own run and belongs to the suggestion.
  *
- * @param {Object}        record      Rich-text record.
- * @param {string}        formatType  Rich-text format type to match.
- * @param {string}        idAttribute Marker attribute holding the id.
- * @param {number|string} id          Marker id to search for.
- * @return {?{start: number, end: number}} Range or null when no marker is found.
+ * @param record      Rich-text record.
+ * @param formatType  Rich-text format type to match.
+ * @param idAttribute Marker attribute holding the id.
+ * @param id          Marker id to search for.
+ * @return Range or null when no marker is found.
  */
-function rangeInRecord( record, formatType, idAttribute, id ) {
+function rangeInRecord(
+	record: any,
+	formatType: string,
+	idAttribute: string,
+	id: number | string
+): { start: number; end: number } | null {
 	const target = String( id );
 	const formats = record.formats;
 	let start = -1;
@@ -57,7 +68,7 @@ function rangeInRecord( record, formatType, idAttribute, id ) {
 	for ( let i = 0; i < formats.length; i++ ) {
 		const stack = formats[ i ];
 		const hit = stack?.find(
-			( f ) =>
+			( f: any ) =>
 				f.type === formatType &&
 				f.attributes &&
 				f.attributes[ idAttribute ] === target
@@ -84,24 +95,34 @@ function rangeInRecord( record, formatType, idAttribute, id ) {
  * marker survives unrelated edits elsewhere in the same attribute. It is the
  * intended swap point for a future CRDT-backed resolver.
  *
- * @param {*}             value                           Block attribute value (RichTextData, string, or other).
- * @param {Object}        options
- * @param {string}        options.formatType              Rich-text format type to match (e.g. `core/note`).
- * @param {string}        [options.idAttribute='data-id'] Marker attribute holding the id.
- * @param {number|string} options.id                      Marker id to search for.
- * @param {string}        [options.quickReject]           Optional substring (e.g. the marker class) used to
- *                                                        skip parsing when it is absent from the HTML.
- * @return {?{start: number, end: number}} Range or null when no marker is found.
+ * @param value               Block attribute value (RichTextData, string, or other).
+ * @param options             Options.
+ * @param options.formatType  Rich-text format type to match (e.g. `core/note`).
+ * @param options.idAttribute Marker attribute holding the id.
+ * @param options.id          Marker id to search for.
+ * @param options.quickReject Optional substring (e.g. the marker class) used to
+ *                            skip parsing when it is absent from the HTML.
+ * @return Range or null when no marker is found.
  */
 export function findMarkerRange(
-	value,
-	{ formatType, idAttribute = 'data-id', id, quickReject }
+	value: any,
+	{
+		formatType,
+		idAttribute = 'data-id',
+		id,
+		quickReject,
+	}: {
+		formatType: string;
+		idAttribute?: string;
+		id: number | string | null | undefined;
+		quickReject?: string;
+	}
 ) {
 	const record = parseMarkerValue( value, { id, quickReject } );
 	if ( ! record ) {
 		return null;
 	}
-	return rangeInRecord( record, formatType, idAttribute, id );
+	return rangeInRecord( record, formatType, idAttribute, id! );
 }
 
 /**
@@ -110,23 +131,33 @@ export function findMarkerRange(
  * itself (e.g. for a sidebar summary of what a suggestion adds or removes).
  * Returns an empty string when the marker can no longer be found.
  *
- * @param {*}             value                           Block attribute value (RichTextData, string, or other).
- * @param {Object}        options
- * @param {string}        options.formatType              Rich-text format type to match.
- * @param {string}        [options.idAttribute='data-id'] Marker attribute holding the id.
- * @param {number|string} options.id                      Marker id to search for.
- * @param {string}        [options.quickReject]           Optional substring used to skip parsing when absent.
- * @return {string} The marked text, or '' when no marker is found.
+ * @param value               Block attribute value (RichTextData, string, or other).
+ * @param options             Options.
+ * @param options.formatType  Rich-text format type to match.
+ * @param options.idAttribute Marker attribute holding the id.
+ * @param options.id          Marker id to search for.
+ * @param options.quickReject Optional substring used to skip parsing when absent.
+ * @return The marked text, or '' when no marker is found.
  */
 export function findMarkerText(
-	value,
-	{ formatType, idAttribute = 'data-id', id, quickReject }
-) {
+	value: any,
+	{
+		formatType,
+		idAttribute = 'data-id',
+		id,
+		quickReject,
+	}: {
+		formatType: string;
+		idAttribute?: string;
+		id: number | string | null | undefined;
+		quickReject?: string;
+	}
+): string {
 	const record = parseMarkerValue( value, { id, quickReject } );
 	if ( ! record ) {
 		return '';
 	}
-	const range = rangeInRecord( record, formatType, idAttribute, id );
+	const range = rangeInRecord( record, formatType, idAttribute, id! );
 	if ( ! range ) {
 		return '';
 	}

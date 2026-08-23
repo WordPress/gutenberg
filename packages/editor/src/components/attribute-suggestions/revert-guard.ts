@@ -43,16 +43,21 @@
  */
 export const MAX_PENDING_TOKENS = 20;
 
+export interface RevertToken {
+	clientId: string;
+	values: Record< string, any >;
+}
+
 /**
  * Strict-equality fallback used when the caller doesn't supply a comparison.
  * Real callers pass a structural comparator (e.g. the interceptor's
  * `shallowAttributeEquals`) so object-valued attributes compare by value.
  *
- * @param {*} a First value.
- * @param {*} b Second value.
- * @return {boolean} True when strictly equal.
+ * @param a First value.
+ * @param b Second value.
+ * @return True when strictly equal.
  */
-function strictEquals( a, b ) {
+function strictEquals( a: any, b: any ): boolean {
 	return a === b;
 }
 
@@ -62,11 +67,14 @@ function strictEquals( a, b ) {
  * passed to `updateBlockAttributes`; a value of `undefined` means the key is
  * expected to be absent after the revert.
  *
- * @param {string} clientId Block client id being reverted.
- * @param {Object} restore  Attribute values the revert sets.
- * @return {{ clientId: string, values: Object }} The token.
+ * @param clientId Block client id being reverted.
+ * @param restore  Attribute values the revert sets.
+ * @return The token.
  */
-export function createRevertToken( clientId, restore ) {
+export function createRevertToken(
+	clientId: string,
+	restore: Record< string, any >
+): RevertToken {
 	return { clientId, values: { ...restore } };
 }
 
@@ -78,18 +86,18 @@ export function createRevertToken( clientId, restore ) {
  * Only the keys the revert touched are checked; other attributes may legitimately
  * differ (a concurrent edit to an unrelated key) without breaking the match.
  *
- * @param {{ clientId: string, values: Object }} token             Token from `createRevertToken`.
- * @param {string}                               clientId          The block that changed.
- * @param {Object}                               currentAttributes The block's live attributes.
- * @param {Function}                             [equals]          Value comparison; defaults to strict.
- * @return {boolean} True when the change matches the token.
+ * @param token             Token from `createRevertToken`.
+ * @param clientId          The block that changed.
+ * @param currentAttributes The block's live attributes.
+ * @param equals            Value comparison; defaults to strict.
+ * @return True when the change matches the token.
  */
 export function matchesRevertToken(
-	token,
-	clientId,
-	currentAttributes,
-	equals = strictEquals
-) {
+	token: RevertToken | null | undefined,
+	clientId: string,
+	currentAttributes: Record< string, any > | null | undefined,
+	equals: ( a: any, b: any ) => boolean = strictEquals
+): boolean {
 	if ( ! token || token.clientId !== clientId ) {
 		return false;
 	}
@@ -113,22 +121,18 @@ export function matchesRevertToken(
  *   // inside subscribe, for each changed block:
  *   if ( guard.isEcho( clientId, currentAttributes ) ) continue;
  *
- * @param {Function} [equals] Value comparison for matching; defaults to strict.
- * @return {{
- *   expect:  ( clientId: string, restore: Object ) => void,
- *   isEcho:  ( clientId: string, currentAttributes: Object ) => boolean,
- *   pending: ( clientId: string ) => number,
- *   size:    () => number,
- *   clear:   () => void,
- * }} Guard API.
+ * @param equals Value comparison for matching; defaults to strict.
+ * @return Guard API.
  */
-export function createRevertGuard( equals = strictEquals ) {
+export function createRevertGuard(
+	equals: ( a: any, b: any ) => boolean = strictEquals
+) {
 	// clientId -> array of pending tokens (FIFO). Multiple reverts can be
 	// queued for the same block before their echoes arrive; each echo consumes
 	// the oldest matching token.
-	const pending = new Map();
+	const pending = new Map< string, RevertToken[] >();
 
-	function expect( clientId, restore ) {
+	function expect( clientId: string, restore: Record< string, any > ) {
 		const token = createRevertToken( clientId, restore );
 		const list = pending.get( clientId );
 		if ( list ) {
@@ -144,7 +148,10 @@ export function createRevertGuard( equals = strictEquals ) {
 		}
 	}
 
-	function isEcho( clientId, currentAttributes ) {
+	function isEcho(
+		clientId: string,
+		currentAttributes: Record< string, any > | null | undefined
+	) {
 		const list = pending.get( clientId );
 		if ( ! list || list.length === 0 ) {
 			return false;
@@ -174,7 +181,7 @@ export function createRevertGuard( equals = strictEquals ) {
 	return {
 		expect,
 		isEcho,
-		pending: ( clientId ) => pending.get( clientId )?.length ?? 0,
+		pending: ( clientId: string ) => pending.get( clientId )?.length ?? 0,
 		size: () => {
 			let total = 0;
 			for ( const list of pending.values() ) {

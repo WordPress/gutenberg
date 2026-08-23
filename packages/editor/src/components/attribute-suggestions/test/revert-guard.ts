@@ -10,11 +10,11 @@ import {
  * enough for the guard's needs: strict equality with an array/plain-object
  * value compare, so object-valued attributes match by value.
  *
- * @param {*} a First value.
- * @param {*} b Second value.
- * @return {boolean} True when equal.
+ * @param a First value.
+ * @param b Second value.
+ * @return True when equal.
  */
-function valueEquals( a, b ) {
+function valueEquals( a: any, b: any ): boolean {
 	if ( a === b ) {
 		return true;
 	}

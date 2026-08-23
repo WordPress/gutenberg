@@ -1,5 +1,6 @@
 import { render, act } from '@testing-library/react';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
+// @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -164,7 +165,7 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 	afterEach( () => {
 		// The deferral tests below set a default block name; reset it so the
 		// removal tests keep their no-auto-inserted-default-block setup.
-		setDefaultBlockName( null );
+		setDefaultBlockName( null as any );
 	} );
 
 	afterAll( () => {
@@ -173,7 +174,7 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		);
 	} );
 
-	function setup( { initialBlocks } = {} ) {
+	function setup( { initialBlocks }: { initialBlocks?: any[] } = {} ) {
 		const registry = createRegistry();
 		registry.register( noticesStore );
 		// `preferencesStore` is required by `setEditorIntent` on branches
@@ -191,13 +192,13 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		const blocks = initialBlocks ?? [ block ];
 		registry.dispatch( blockEditorStore ).resetBlocks( blocks );
 
-		let overlayHandle;
+		let overlayHandle: ReturnType< typeof useSuggestionOverlay >;
 		function CaptureOverlay() {
 			overlayHandle = useSuggestionOverlay();
 			return null;
 		}
 
-		const wrapper = ( { children } ) => (
+		const wrapper = ( { children }: { children?: React.ReactNode } ) => (
 			<RegistryProvider value={ registry }>
 				<SuggestionOverlayProvider>
 					{ children }
@@ -728,7 +729,9 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		const liveBlocks = registry.select( blockEditorStore ).getBlocks();
 		expect( liveBlocks ).toHaveLength( 1 );
 		expect(
-			liveBlocks.some( ( block ) => block.clientId === inserted.clientId )
+			liveBlocks.some(
+				( block: any ) => block.clientId === inserted.clientId
+			)
 		).toBe( false );
 		expect( getOverlay().entries[ inserted.clientId ] ).toBeUndefined();
 		expect( getOverlay().isDeferredInsertion( inserted.clientId ) ).toBe(
@@ -837,20 +840,17 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		await flushSubscribers();
 
 		const liveBlocks = registry.select( blockEditorStore ).getBlocks();
-		expect( liveBlocks.map( ( bl ) => bl.attributes?.content ) ).toEqual( [
-			'A',
-			'C',
-			'D',
-			'B',
-		] );
 		expect(
-			liveBlocks.find( ( bl ) => bl.clientId === b.clientId )?.attributes
-				?.metadata?.suggestion?.type
+			liveBlocks.map( ( bl: any ) => bl.attributes?.content )
+		).toEqual( [ 'A', 'C', 'D', 'B' ] );
+		expect(
+			liveBlocks.find( ( bl: any ) => bl.clientId === b.clientId )
+				?.attributes?.metadata?.suggestion?.type
 		).toBe( 'pending-move' );
 
 		// Side-effect siblings: NOT tagged.
 		const sideEffectBlocks = liveBlocks.filter(
-			( bl ) => bl.clientId !== b.clientId
+			( bl: any ) => bl.clientId !== b.clientId
 		);
 		for ( const bl of sideEffectBlocks ) {
 			expect( bl.attributes?.metadata?.suggestion ).toBeUndefined();
@@ -940,16 +940,14 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		await flushSubscribers();
 
 		const liveBlocks = registry.select( blockEditorStore ).getBlocks();
-		expect( liveBlocks.map( ( bl ) => bl.attributes?.content ) ).toEqual( [
-			'B',
-			'A',
-			'C',
-		] );
+		expect(
+			liveBlocks.map( ( bl: any ) => bl.attributes?.content )
+		).toEqual( [ 'B', 'A', 'C' ] );
 
 		// The marker sits on the moved block, recording its true origin.
 		expect(
-			liveBlocks.find( ( bl ) => bl.clientId === b.clientId )?.attributes
-				?.metadata?.suggestion
+			liveBlocks.find( ( bl: any ) => bl.clientId === b.clientId )
+				?.attributes?.metadata?.suggestion
 		).toMatchObject( {
 			type: 'pending-move',
 			fromIndex: 1,
@@ -957,8 +955,8 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		} );
 		// The block it swapped past is NOT tagged.
 		expect(
-			liveBlocks.find( ( bl ) => bl.clientId === a.clientId )?.attributes
-				?.metadata?.suggestion
+			liveBlocks.find( ( bl: any ) => bl.clientId === a.clientId )
+				?.attributes?.metadata?.suggestion
 		).toBeUndefined();
 
 		expect( getOverlay().entries[ a.clientId ] ).toBeUndefined();
@@ -998,17 +996,14 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		await flushSubscribers();
 
 		const liveBlocks = registry.select( blockEditorStore ).getBlocks();
-		expect( liveBlocks.map( ( bl ) => bl.attributes?.content ) ).toEqual( [
-			'C',
-			'A',
-			'B',
-			'D',
-		] );
+		expect(
+			liveBlocks.map( ( bl: any ) => bl.attributes?.content )
+		).toEqual( [ 'C', 'A', 'B', 'D' ] );
 
 		// Exactly one block is tagged — the one the user moved — and its
 		// marker still points at the true origin (index 2).
 		const tagged = liveBlocks.filter(
-			( bl ) =>
+			( bl: any ) =>
 				bl.attributes?.metadata?.suggestion?.type === 'pending-move'
 		);
 		expect( tagged ).toHaveLength( 1 );
@@ -1070,11 +1065,9 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 
 		// Order is restored and NOTHING is re-tagged.
 		const liveBlocks = registry.select( blockEditorStore ).getBlocks();
-		expect( liveBlocks.map( ( bl ) => bl.attributes?.content ) ).toEqual( [
-			'A',
-			'B',
-			'C',
-		] );
+		expect(
+			liveBlocks.map( ( bl: any ) => bl.attributes?.content )
+		).toEqual( [ 'A', 'B', 'C' ] );
 		for ( const bl of liveBlocks ) {
 			expect( bl.attributes?.metadata?.suggestion ).toBeUndefined();
 		}
@@ -1183,14 +1176,14 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 } );
 
 describe( 'isAcceptedSuggestionChange', () => {
-	function makeCoreSelect( comments ) {
+	function makeCoreSelect( comments: Record< string, any > ) {
 		return {
-			getEntityRecord: ( _kind, _name, id ) =>
+			getEntityRecord: ( _kind: any, _name: any, id: any ) =>
 				comments[ String( id ) ] ?? null,
 		};
 	}
 
-	function makePayload( operations ) {
+	function makePayload( operations: any ) {
 		return {
 			meta: {
 				_wp_suggestion: JSON.stringify( {
@@ -1310,14 +1303,17 @@ describe( 'isAcceptedSuggestionChange', () => {
 		// Mimic a RichTextData wrapper: an object with no enumerable keys
 		// whose `String()` projection equals the JSON-decoded `after` value.
 		class FakeRichTextData {
-			constructor( text ) {
+			constructor( text: string ) {
+				// A real class field would be enumerable and break the
+				// no-enumerable-keys premise, so the property is defined
+				// imperatively and read back through a cast.
 				Object.defineProperty( this, '_text', {
 					value: text,
 					enumerable: false,
 				} );
 			}
 			toString() {
-				return this._text;
+				return ( this as any )._text;
 			}
 		}
 		const coreSelect = makeCoreSelect( {
@@ -1524,12 +1520,18 @@ describe( 'stableSiblingSet', () => {
 } );
 
 describe( 'isPartOfPendingInsertion', () => {
-	const buildSelectors = ( { markers = {}, parents = {} } = {} ) => ( {
-		getBlockAttributes: ( id ) =>
+	const buildSelectors = ( {
+		markers = {},
+		parents = {},
+	}: {
+		markers?: Record< string, string >;
+		parents?: Record< string, string[] >;
+	} = {} ) => ( {
+		getBlockAttributes: ( id: string ) =>
 			markers[ id ]
 				? { metadata: { suggestion: { type: markers[ id ] } } }
 				: {},
-		getBlockParents: ( id ) => parents[ id ] ?? [],
+		getBlockParents: ( id: string ) => parents[ id ] ?? [],
 	} );
 
 	it( 'returns true when the block itself is pending-insert', () => {

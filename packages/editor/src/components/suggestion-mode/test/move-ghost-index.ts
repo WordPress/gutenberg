@@ -1,8 +1,11 @@
 import { buildMoveGhostIndex } from '../move-ghost-index';
 
-const resolvers = ( existingIds, siblingsByParent ) => ( {
-	blockExists: ( id ) => existingIds.includes( id ),
-	getSiblings: ( parentId ) => siblingsByParent[ parentId ] ?? [],
+const resolvers = (
+	existingIds: string[],
+	siblingsByParent: Record< string, string[] >
+) => ( {
+	blockExists: ( id: string ) => existingIds.includes( id ),
+	getSiblings: ( parentId: string ) => siblingsByParent[ parentId ] ?? [],
 } );
 
 describe( 'buildMoveGhostIndex', () => {
