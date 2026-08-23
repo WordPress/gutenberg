@@ -26,16 +26,9 @@
 			"path": "plugins/**"
 		},
 		{
-			"comment": "@wordpress/scripts intentionally deep-imports puppeteer-core/install (its install entrypoint), which puppeteer-core does not expose via exports.",
-			"specifier": "puppeteer-core/install",
-			"surface": "runtime",
-			"kind": "unresolved"
-		},
-		{
-			"comment": "@wordpress/scripts references puppeteer-firefox conditionally in its puppeteer jest environment; it is an optional, environment-gated import rather than a hard dependency.",
-			"specifier": "puppeteer-firefox",
-			"surface": "runtime",
-			"kind": "undeclared"
+			"comment": "@wordpress/dataviews `./wp` bundle (build-wp/, built by packages/dataviews/build.cjs) inlines other @wordpress/* packages but keeps their third-party imports external, so they are undeclared. Not fixing: the bundle is about to be removed along with the private APIs, see https://github.com/WordPress/gutenberg/pull/81843#issuecomment-5354950365",
+			"target": "@wordpress/dataviews",
+			"path": "build-wp/**"
 		}
 	]
 }

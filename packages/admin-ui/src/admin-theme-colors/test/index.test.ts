@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getAdminThemeColors } from '../index';
 
 describe( 'getAdminThemeColors', () => {

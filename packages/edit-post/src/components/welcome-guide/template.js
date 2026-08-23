@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch } from '@wordpress/data';
 import { Guide } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import WelcomeGuideImage from './image';
 import { store as editPostStore } from '../../store';
 

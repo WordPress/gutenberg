@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import {
 	PanelBody,
 	__experimentalUseSlotFills as useSlotFills,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import {
 	default as InspectorControls,
 	InspectorAdvancedControls,

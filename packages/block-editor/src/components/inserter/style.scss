@@ -163,7 +163,7 @@ $block-inserter-tabs-height: 44px;
 	color: $gray-700;
 	text-transform: uppercase;
 	font-size: 11px;
-	font-weight: $font-weight-medium;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 }
 
 .block-editor-inserter__panel-dropdown select.components-select-control__input.components-select-control__input.components-select-control__input {
@@ -369,94 +369,76 @@ $block-inserter-tabs-height: 44px;
 	padding: 0;
 }
 
-.block-editor-inserter__quick-inserter-expand.components-button {
-	display: block;
-	background: $gray-900;
-	color: $white;
-	width: 100%;
-	border-radius: 0;
-
-	&:hover {
-		color: $white;
-	}
-
-	&:active {
-		color: $gray-400;
-	}
-
-	// Specificity is needed for the border color.
-	&.components-button:focus:not(:disabled) {
-		box-shadow: none;
-		background: var(--wp-admin-theme-color);
-		border-color: var(--wp-admin-theme-color);
-	}
+.block-editor-inserter__quick-inserter-expand {
+	padding: 0 $grid-unit-20 $grid-unit-20;
 }
 
-.block-editor-block-patterns-explorer {
-	&__sidebar {
+.block-editor-inserter__quick-inserter-expand-toggle {
+	width: 100%;
+	justify-content: center;
+}
+
+.block-editor-block-patterns-explorer__sidebar {
+	padding-bottom: $grid-unit-30;
+
+	@include break-medium() {
 		position: absolute;
 		top: $header-height + $grid-unit-10;
 		left: 0;
 		bottom: 0;
 		width: $sidebar-width;
-		padding: $grid-unit-30 $grid-unit-30 $grid-unit-30;
+		padding: $grid-unit-30;
 		overflow-x: visible;
 		overflow-y: auto;
+	}
+}
 
-		&__categories-list__item {
-			display: block;
-			width: 100%;
-			height: 48px;
-			text-align: left;
-		}
+.block-editor-block-patterns-explorer__panel {
+	@include break-medium() {
+		margin-inline-start: $sidebar-width;
+	}
+}
+
+.block-editor-block-patterns-explorer__no-results {
+	padding: $grid-unit-40;
+	text-align: center;
+}
+
+.block-editor-block-patterns-explorer__list {
+	padding: $grid-unit-30 0 $grid-unit-40;
+
+	.block-editor-patterns__sync-status-filter .components-input-control__container {
+		width: 380px;
+	}
+}
+
+.block-editor-block-patterns-explorer .block-editor-block-patterns-list {
+	display: grid;
+	grid-gap: $grid-unit-40;
+	grid-template-columns: repeat(1, 1fr);
+	margin-bottom: $grid-unit-20;
+
+	@include break-xlarge() {
+		grid-template-columns: repeat(2, 1fr);
 	}
 
-	&__search {
-		margin-bottom: $grid-unit-40;
+	@include break-huge() {
+		grid-template-columns: repeat(3, 1fr);
 	}
 
-	&__search-results-count {
-		padding-bottom: $grid-unit-40;
+	.block-editor-block-patterns-list__list-item {
+		min-height: 240px;
 	}
 
-	&__list {
-		margin-left: $sidebar-width;
-		padding: $grid-unit-30 0 $grid-unit-40;
-		.block-editor-patterns__sync-status-filter {
-			.components-input-control__container {
-				width: 380px;
-			}
-		}
-	}
-
-	.block-editor-block-patterns-list {
-		display: grid;
-		grid-gap: $grid-unit-40;
-		grid-template-columns: repeat(1, 1fr);
-		margin-bottom: $grid-unit-20;
-
-		@include break-xlarge() {
-			grid-template-columns: repeat(2, 1fr);
-		}
-
-		@include break-huge() {
-			grid-template-columns: repeat(3, 1fr);
-		}
-
-		.block-editor-block-patterns-list__list-item {
-			min-height: 240px;
-		}
-
-		.block-editor-inserter__media-list__list-item {
-			height: inherit;
-			min-height: 100px;
-			max-height: 800px;
-		}
+	.block-editor-inserter__media-list__list-item {
+		height: inherit;
+		min-height: 100px;
+		max-height: 800px;
 	}
 }
 
 .components-heading.block-editor-inserter__patterns-category-panel-title {
-	font-weight: $font-weight-medium;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 }
 
 .block-editor-inserter__patterns-explore-button,
@@ -518,22 +500,25 @@ $block-inserter-tabs-height: 44px;
 		flex-grow: 1;
 	}
 
+	.block-editor-inserter__media-panel-footer {
+		// Keeps the footer at its natural height rather than collapsing to make
+		// room for the scrolling grid above.
+		flex-shrink: 0;
+		padding-top: $grid-unit-20;
+		padding-bottom: $grid-unit-20;
+		@include break-medium() {
+			// Align with the search field and grid gutters.
+			padding-left: $grid-unit-30;
+			padding-right: $grid-unit-30;
+		}
+	}
+
 	.block-editor-inserter__media-panel-attach {
 		// Match the padding (and so the height) of the "Open Media Library"
 		// footer button in the adjacent column, so the two line up.
 		&.components-button {
 			justify-content: center;
 			padding: $grid-unit-20;
-		}
-		// Balanced breathing room above and below the footer button.
-		// `flex-shrink: 0` keeps it full height as a flex child rather than
-		// collapsing to its content.
-		flex-shrink: 0;
-		margin-top: $grid-unit-20;
-		margin-bottom: $grid-unit-20;
-		@include break-medium() {
-			margin-left: $grid-unit-30;
-			margin-right: $grid-unit-30;
 		}
 	}
 
@@ -561,10 +546,10 @@ $block-inserter-tabs-height: 44px;
 		}
 	}
 
-	// When the attach footer is present it supplies the breathing room beneath
-	// the grid, so drop the list's own bottom padding — otherwise scrolling to
-	// the end leaves a doubled gap before the footer.
-	&.has-attach-footer .block-editor-inserter__media-list {
+	// When the footer is present it supplies the breathing room beneath the grid,
+	// so drop the list's own bottom padding — otherwise scrolling to the end
+	// leaves a doubled gap before the footer.
+	&.has-footer .block-editor-inserter__media-list {
 		padding-bottom: 0;
 	}
 }

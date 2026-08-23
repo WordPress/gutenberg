@@ -46,8 +46,8 @@
 		// Panel mode: the footer holds only History (left) and
 		// Cancel/Save (right). `margin-left: auto` pins the actions to the
 		// right edge whether or not History renders (e.g. non-image
-		// attachments show only `FooterActions`).
-		.media-editor__footer-actions {
+		// attachments show only `SaveActions`).
+		.media-editor__save-actions {
 			margin-left: auto;
 		}
 	}
@@ -76,7 +76,7 @@
 	gap: $grid-unit-20;
 
 	.media-editor-image-controls,
-	.media-editor__footer-actions {
+	.media-editor__save-actions {
 		margin-left: auto;
 	}
 }
@@ -85,9 +85,13 @@
 // they read as live alongside the Reset/Cancel/Save actions. Disabled
 // buttons (rendered with `aria-disabled` via `accessibleWhenDisabled`)
 // keep the default muted icon colour.
+// Scoped to the modal: the package ships one stylesheet, so an unscoped
+// selector would also colour the history cluster in frames that place it in
+// their own chrome (the wp-admin route puts it in the page header, where the
+// neutral icon colour matches the header's other buttons).
 // NOTE: overrides @wordpress/components Button internals (`.components-button`,
 // `.has-icon`), scoped to our history-actions wrapper. Update if renamed.
-.media-editor__history-actions .components-button.has-icon:not([aria-disabled="true"]) {
+.media-editor-modal .media-editor__history-actions .components-button.has-icon:not([aria-disabled="true"]) {
 	color: var(--wp-admin-theme-color);
 }
 

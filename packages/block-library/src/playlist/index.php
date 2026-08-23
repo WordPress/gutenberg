@@ -8,7 +8,7 @@
 /**
  * Renders the `core/playlist` block on server.
  *
- * @since 6.9.0
+ * @since 7.1.0
  *
  * @param array    $attributes The block attributes.
  * @param string   $content    The block content.
@@ -17,10 +17,10 @@
  * @return string Returns the Playlist.
  */
 function render_block_core_playlist( $attributes, $content, $block ) {
-	$playlist_id     = wp_unique_id( 'playlist-' );
-	$playlist_tracks = array();
-	$tracks_data     = array();
-	$show_images     = $attributes['showImages'] ?? true;
+	$playlist_id              = wp_unique_id( 'playlist-' );
+	$playlist_tracks          = array();
+	$tracks_data              = array();
+	$show_play_button_artwork = ! empty( $attributes['showPlayButtonArtwork'] );
 
 	// Parse inner blocks to extract track data.
 	// This approach avoids duplicating track data in the HTML output.
@@ -37,13 +37,18 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 				$playlist_tracks[] = $track_id;
 
 				// Extract track metadata from block attributes.
-				$title      = isset( $track_attributes['title'] ) && ! empty( $track_attributes['title'] ) ? $track_attributes['title'] : __( 'Unknown title' );
-				$artist     = $track_attributes['artist'] ?? '';
-				$album      = $track_attributes['album'] ?? '';
-				$image      = $track_attributes['image'] ?? '';
-				$image_alt  = $track_attributes['imageAlt'] ?? '';
-				$url        = $track_attributes['src'] ?? '';
-				$aria_label = $title;
+				$track_title_attr = $track_attributes['title'] ?? null;
+				$track_artist     = $track_attributes['artist'] ?? null;
+				$track_album      = $track_attributes['album'] ?? null;
+				$track_image      = $track_attributes['image'] ?? null;
+				$track_src        = $track_attributes['src'] ?? null;
+				$title            = ! empty( $track_title_attr ) && is_string( $track_title_attr ) ? $track_title_attr : __( 'Unknown title' );
+				$artist           = is_string( $track_artist ) ? $track_artist : '';
+				$album            = is_string( $track_album ) ? $track_album : '';
+				$image            = is_string( $track_image ) ? $track_image : '';
+				$image_alt        = $track_attributes['imageAlt'] ?? '';
+				$url              = is_string( $track_src ) ? $track_src : '';
+				$aria_label       = $title;
 
 				if ( $title && $artist && $album ) {
 					$aria_label = sprintf(
@@ -63,8 +68,8 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 					'title'     => wp_strip_all_tags( $title ),
 					'artist'    => wp_strip_all_tags( $artist ),
 					'album'     => wp_strip_all_tags( $album ),
-					'image'     => $show_images ? esc_url( $image ) : '',
-					'imageAlt'  => $show_images ? wp_strip_all_tags( $image_alt ) : '',
+					'image'     => esc_url( $image ),
+					'imageAlt'  => wp_strip_all_tags( $image_alt ),
 					'ariaLabel' => wp_strip_all_tags( $aria_label ),
 				);
 			}
@@ -95,11 +100,43 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 	$label_pause = esc_attr__( 'Pause' );
 	$label_seek  = esc_attr__( 'Seek' );
 	/* translators: %1$s: current audio time, %2$s: total audio duration. */
-	$label_seek_value = esc_attr_x(
+	$label_seek_value                       = esc_attr_x(
 		'%1$s of %2$s',
 		'audio current time of total duration'
 	);
-	$html             = '<div class="wp-block-playlist__waveform-player"
+	$waveform_color_attribute               = '';
+	$waveform_gradient_attribute            = '';
+	$waveform_background_color_attribute    = '';
+	$waveform_background_gradient_attribute = '';
+	if ( ! empty( $attributes['waveformColor'] ) ) {
+		$waveform_color_attribute = sprintf(
+			' data-waveform-player-color="%s"',
+			esc_attr( $attributes['waveformColor'] )
+		);
+	}
+	if ( ! empty( $attributes['waveformGradient'] ) ) {
+		$waveform_gradient_attribute = sprintf(
+			' data-waveform-player-gradient="%s"',
+			esc_attr( $attributes['waveformGradient'] )
+		);
+	}
+	if ( ! empty( $attributes['waveformBackgroundColor'] ) ) {
+		$waveform_background_color_attribute = sprintf(
+			' data-waveform-player-background-color="%s"',
+			esc_attr( $attributes['waveformBackgroundColor'] )
+		);
+	}
+	if ( ! empty( $attributes['waveformBackgroundGradient'] ) ) {
+		$waveform_background_gradient_attribute = sprintf(
+			' data-waveform-player-background-gradient="%s"',
+			esc_attr( $attributes['waveformBackgroundGradient'] )
+		);
+	}
+	$html = '<div class="wp-block-playlist__waveform-player"' .
+		$waveform_color_attribute .
+		$waveform_gradient_attribute .
+		$waveform_background_color_attribute .
+		$waveform_background_gradient_attribute . '
 		data-wp-watch="callbacks.initWaveformPlayer"
 		data-label-play="' . $label_play . '"
 		data-label-pause="' . $label_pause . '"
@@ -124,13 +161,14 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 		'data-wp-context',
 		wp_json_encode(
 			array(
-				'playlistId'       => $playlist_id,
-				'currentId'        => $playlist_tracks[0],
-				'isPlaying'        => false,
-				'tracks'           => $playlist_tracks,
-				'waveformStyle'    => $waveform_style,
-				'labelPauseTrack'  => __( 'Pause' ),
-				'labelSelectTrack' => __( 'Play' ),
+				'playlistId'            => $playlist_id,
+				'currentId'             => $playlist_tracks[0],
+				'isPlaying'             => false,
+				'tracks'                => $playlist_tracks,
+				'waveformStyle'         => $waveform_style,
+				'showPlayButtonArtwork' => $show_play_button_artwork,
+				'labelPauseTrack'       => __( 'Pause' ),
+				'labelSelectTrack'      => __( 'Play' ),
 			)
 		)
 	);
@@ -164,7 +202,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 /**
  * Registers the `core/playlist` block on server.
  *
- * @since 6.9.0
+ * @since 7.1.0
  */
 function register_block_core_playlist() {
 	register_block_type_from_metadata(

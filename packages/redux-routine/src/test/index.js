@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { createStore, applyMiddleware } from 'redux';
-
-/**
- * Internal dependencies
- */
 import createMiddleware from '../';
 
 describe( 'createMiddleware', () => {

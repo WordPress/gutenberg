@@ -34,7 +34,7 @@ export type AutocompleteGroupLabelProps = ComponentProps<
 
 export type AutocompleteInputProps = Omit<
 	ComponentProps< typeof _Autocomplete.Input >,
-	'size'
+	'size' | 'type' // The combobox role is only valid on input type="text".
 >;
 
 export type AutocompleteInputGroupProps = ComponentProps<
@@ -82,5 +82,11 @@ export type AutocompletePopupProps = ComponentProps<
 
 export type AutocompleteRootProps< Value = unknown > =
 	_Autocomplete.Root.Props< Value >;
+
+export type AutocompleteRowProps = ComponentProps<
+	typeof _Autocomplete.Row
+> & {
+	children?: React.ReactNode;
+};
 
 export type AutocompleteValueProps = _Autocomplete.Value.Props;

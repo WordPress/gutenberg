@@ -226,6 +226,11 @@
 					"type": "boolean",
 					"default": false
 				},
+				"autoRegister": {
+					"description": "Allows PHP-only blocks with a `render_callback` to appear in the block editor without JavaScript registration. The editor renders them with `ServerSideRender`. If a block uses an API version older than 3, or does not specify one, the editor uses version 3.",
+					"type": "boolean",
+					"default": false
+				},
 				"align": {
 					"description": "This property adds block controls which allow to change block’s alignment.",
 					"oneOf": [

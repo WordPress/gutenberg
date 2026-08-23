@@ -58,8 +58,9 @@ function render_block_core_latest_posts( $attributes ) {
 	$block_core_latest_posts_excerpt_length = $attributes['excerptLength'];
 	add_filter( 'excerpt_length', 'block_core_latest_posts_get_excerpt_length', 20 );
 
-	if ( ! empty( $attributes['categories'] ) ) {
-		$args['category__in'] = array_column( $attributes['categories'], 'id' );
+	$categories = $attributes['categories'] ?? null;
+	if ( ! empty( $categories ) && is_array( $categories ) ) {
+		$args['category__in'] = array_column( $categories, 'id' );
 	}
 	if ( isset( $attributes['selectedAuthor'] ) ) {
 		$args['author'] = $attributes['selectedAuthor'];
@@ -202,7 +203,7 @@ function render_block_core_latest_posts( $attributes ) {
 
 					try {
 						// Run through the actions that are typically taken on the_content.
-						$post_content = _gutenberg_apply_content_filters( $post_content, 'latest-posts' );
+						$post_content = _wp_apply_block_content_filters( $post_content, 'latest-posts' );
 					} finally {
 						array_pop( $rendering_stack );
 					}

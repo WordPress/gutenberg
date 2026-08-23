@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalText as WCText } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { count as wordCount } from '@wordpress/wordcount';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import {
 	TEMPLATE_POST_TYPE,

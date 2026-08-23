@@ -154,7 +154,7 @@ The id of the currently selected node.
 
 ### `size`
 
- - Type: `"default" | "small" | "compact" | "__unstable-large"`
+ - Type: `"default" | "small" | "compact"`
  - Required: No
  - Default: `'default'`
 

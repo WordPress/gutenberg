@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import type { Meta } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import { Modal, Button } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import DataViewsPicker from '../index';
 import { LAYOUT_PICKER_GRID } from '../../constants';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
@@ -219,6 +208,11 @@ export const Default = ( {
 
 Default.args = storyArgs;
 Default.argTypes = storyArgTypes;
+Default.parameters = {
+	// FIXME: Picker UI nests interactive controls (nested-interactive).
+	// See: https://github.com/WordPress/gutenberg/issues/81596
+	a11y: { test: 'todo' },
+};
 
 export const WithModal = ( {
 	perPageSizes = [ 10, 25, 50, 100 ],

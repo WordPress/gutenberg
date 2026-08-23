@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	RangeControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,

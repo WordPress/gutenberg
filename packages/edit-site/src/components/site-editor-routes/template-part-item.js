@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import Editor from '../editor';
 import SidebarNavigationScreenPatterns from '../sidebar-navigation-screen-patterns';
 

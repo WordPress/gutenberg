@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, _x } from '@wordpress/i18n';
 import { MenuItem } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';

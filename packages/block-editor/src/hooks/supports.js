@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 
 const ALIGN_SUPPORT_KEY = 'align';

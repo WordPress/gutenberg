@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { h } from 'preact';
 import type { VNode } from 'preact';
-
-/**
- * Internal dependencies
- */
 import { toVdom, hydratedIslands } from '../vdom';
 
 function createElementFromHTML( html: string ): HTMLElement {
@@ -31,7 +24,7 @@ expect.extend( {
 
 describe( 'toVdom', () => {
 	beforeEach( () => {
-		// @ts-ignore - Accessing private property for testing.
+		// @ts-expect-error `_values` is an internal property, accessed here for testing.
 		hydratedIslands._values = new WeakMap();
 	} );
 

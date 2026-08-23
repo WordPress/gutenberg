@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { RichText, useBlockProps } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { escape } from './utils';
 
 export default function save( { attributes } ) {

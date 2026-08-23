@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { createEvent, fireEvent, render, screen } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import KeyboardShortcuts from '..';
 
 describe( 'KeyboardShortcuts', () => {

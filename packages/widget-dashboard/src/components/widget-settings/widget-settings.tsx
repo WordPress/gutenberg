@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { DataForm } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
@@ -8,16 +5,11 @@ import { __ } from '@wordpress/i18n';
 // Dashboard is still experimental.
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Button, Drawer } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
 import { getWidgetSettingsTitle } from './utils';
 import styles from './widget-settings.module.css';
-
-type WidgetAttributes = Record< string, unknown >;
+import type { WidgetAttributeValues } from '../../types';
 
 /**
  * Side drawer that edits one instance's attributes, mounted once at the
@@ -66,8 +58,10 @@ export function WidgetSettings(): React.ReactNode {
 		? widgetTypes.find( ( type ) => type.name === widget.type )
 		: undefined;
 
-	const fields = useMemo< Field< WidgetAttributes >[] >(
-		() => ( widgetType?.attributes ?? [] ) as Field< WidgetAttributes >[],
+	const fields = useMemo< Field< WidgetAttributeValues >[] >(
+		() =>
+			( widgetType?.attributes ??
+				[] ) as Field< WidgetAttributeValues >[],
 		[ widgetType?.attributes ]
 	);
 
@@ -132,7 +126,7 @@ export function WidgetSettings(): React.ReactNode {
 	const title = getWidgetSettingsTitle( widgetType );
 	const data = ( widget?.attributes ??
 		widgetType?.example?.attributes ??
-		{} ) as WidgetAttributes;
+		{} ) as WidgetAttributeValues;
 
 	return (
 		<Drawer.Root
@@ -149,7 +143,7 @@ export function WidgetSettings(): React.ReactNode {
 				</Drawer.Header>
 
 				<Drawer.Content>
-					<DataForm< WidgetAttributes >
+					<DataForm< WidgetAttributeValues >
 						data={ data }
 						fields={ fields }
 						form={ form }

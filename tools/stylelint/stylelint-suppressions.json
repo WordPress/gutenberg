@@ -34,11 +34,6 @@
 			"count": 5
 		}
 	},
-	"widgets/events/components/location-picker/location-picker.module.css": {
-		"selector-class-pattern": {
-			"count": 1
-		}
-	},
 	"widgets/quick-draft/components/drafts-list/drafts-list.module.css": {
 		"selector-class-pattern": {
 			"count": 5

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { FontSizePicker as BaseFontSizePicker } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import { useSettings } from '../use-settings';
 
 function FontSizePicker( props ) {

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	DropdownMenu,
@@ -33,10 +26,6 @@ import { useState } from '@wordpress/element';
 import { SVG, Rect, Path } from '@wordpress/primitives';
 import { useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
 import { CustomInserterModal } from './components';
@@ -70,7 +59,15 @@ export function Edit( { attributes, setAttributes } ) {
 	const isContentOnlyMode = useBlockEditingMode() === 'contentOnly';
 
 	const colorProps = useColorProps( attributes );
-	const spacingProps = useSpacingProps( attributes );
+	// Only padding is applied to the inner SVG element, matching the front
+	// end. The margin support is serialized to the block wrapper instead.
+	const spacingProps = useSpacingProps( {
+		style: {
+			spacing: {
+				padding: attributes.style?.spacing?.padding,
+			},
+		},
+	} );
 	const borderProps = useBorderProps( attributes );
 	const dimensionsProps = useDimensionsProps( attributes );
 
@@ -210,7 +207,7 @@ export function Edit( { attributes, setAttributes } ) {
 			{ blockControls }
 			{ inspectorControls }
 			<div { ...useBlockProps() }>
-				{ icon ? (
+				{ iconToDisplay ? (
 					<HtmlRenderer
 						html={ iconToDisplay }
 						wrapperProps={ {

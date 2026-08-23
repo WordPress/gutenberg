@@ -2,9 +2,67 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add an `onColorWarnings` callback for `ThemeProvider` consumers to receive structured color ramp and semantic contrast warnings ([#81185](https://github.com/WordPress/gutenberg/pull/81185)).
+
+### Bug Fixes
+
+-   Check normal and active fill color contrast, and return warnings for the final generated ramp ([#81185](https://github.com/WordPress/gutenberg/pull/81185)).
+-   `ThemeProvider`: Avoid root-level relational selectors when forwarding `cornerRadius` presets to reduce style recalculation work. ([#81457](https://github.com/WordPress/gutenberg/pull/81457))
+
+### Documentation
+
+-   Route contributors and coding agents to the canonical Design System package guidance ([#80597](https://github.com/WordPress/gutenberg/pull/80597)).
+
+### Internal
+
+-   Point tsconfig references at split dependencies' build projects. ([#81514](https://github.com/WordPress/gutenberg/pull/81514), [#81518](https://github.com/WordPress/gutenberg/pull/81518))
+-   Collapse the `tsconfig.src.json`/`tsconfig.bin.json`/`tsconfig.test.json` projects into the repository-standard split of `tsconfig.build.json` and a default dev `tsconfig.json`. ([#81509](https://github.com/WordPress/gutenberg/pull/81509))
+-   Update Terrazzo packages to 2.5.0, use its resolver for mode overrides, and restore token linting with semantic WCAG AA contrast checks ([#81082](https://github.com/WordPress/gutenberg/pull/81082)).
+
+## 1.2.0 (2026-08-12)
+
+### Bug Fixes
+
+-   Avoid `ThemeProvider` assigning CSS color properties when a seed value is not provided and there is no ancestor to inherit from. This is consistent with how `cursor` and `cornerRadius` behave, and resolves an issue where `ThemeProvider` may forcibly override colors to the default color scheme in situations where the admin color scheme properties may be provided elsewhere ([#80600](https://github.com/WordPress/gutenberg/pull/80600)).
+
+### Internal
+
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
+
+## 1.1.0 (2026-07-29)
+
+### Enhancements
+
+-   Widen optional peer dependency ranges so projects on newer tooling can install without peer resolution conflicts: Vite `^7 || ^8`, Stylelint `^16 || ^17`, and esbuild `>=0.27.2 <1.0.0` ([#80267](https://github.com/WordPress/gutenberg/pull/80267)).
+
+### Documentation
+
+-   Add a Storybook typography showcase that renders the published CSS design tokens directly ([#80212](https://github.com/WordPress/gutenberg/pull/80212)).
+
+### Internal
+
+-   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).
+
+### Code Quality
+
+-   Update `colorjs.io` to 0.7.1 ([#80762](https://github.com/WordPress/gutenberg/pull/80762)).
+-   Update Jest type definitions to v30 ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
+-   Stop publishing `@wordpress/theme` source paths by moving publish-ready assets outside `src` and enforcing the package boundary ([#80213](https://github.com/WordPress/gutenberg/pull/80213)).
+-   Update `colorjs.io` dependency to remove need for colorspace registration workaround ([#80272](https://github.com/WordPress/gutenberg/pull/80272)).
+-   Regenerate design token styles using the shared CSS/SCSS Prettier configuration ([#80422](https://github.com/WordPress/gutenberg/pull/80422)).
+
+## 1.0.0 (2026-07-14)
+
+### Stable Release
+
+This package is now considered stable and production-ready. The API will follow semantic versioning from this point forward.
+
 ### Breaking Changes
 
 -   Remove the `--wpds-elevation-*` design tokens while the complete elevation model is still being defined ([#80099](https://github.com/WordPress/gutenberg/pull/80099)).
+-   Rename the font-weight tokens by intent: `--wpds-typography-font-weight-default` for baseline text and `--wpds-typography-font-weight-emphasis` for labels, controls, and headings ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
 -   Make the package ESM-only by removing the published CommonJS entrypoints and requiring Node.js `^20.19.0` or `>=22.13.0`. ([#80063](https://github.com/WordPress/gutenberg/pull/80063))
 -   Rename `--wpds-color-background-thumb-neutral-disabled` to `--wpds-color-background-thumb-neutral-weak-disabled` so the disabled token belongs to the existing neutral weak thumb family ([#79770](https://github.com/WordPress/gutenberg/pull/79770)).
 -   `ThemeProvider`: reject partially transparent and `transparent` seed colors. `color.primary` and `color.background` now only accept fully opaque seed colors ([#79773](https://github.com/WordPress/gutenberg/pull/79773)).
@@ -20,6 +78,8 @@
 
 ### Documentation
 
+-   Correct the documented default `ThemeProvider` background seed to `#fcfcfc` ([#80237](https://github.com/WordPress/gutenberg/pull/80237)).
+-   Remove the experimental messaging from the package README and update the package keywords to reflect its stable design system purpose ([#80049](https://github.com/WordPress/gutenberg/pull/80049)).
 -   Clarify what `@wordpress/theme` provides, when consumers need to load `design-tokens.css`, the `ThemeProvider` contract including root provider usage, and the legacy compatibility boundary ([#79961](https://github.com/WordPress/gutenberg/pull/79961)).
 -   Document build plugin behavior and add parity coverage for PostCSS, esbuild, and Vite ([#80088](https://github.com/WordPress/gutenberg/pull/80088)).
 -   Document design token accessibility responsibilities ([#79943](https://github.com/WordPress/gutenberg/pull/79943)).
@@ -37,6 +97,10 @@
 ### Internal
 
 -   Add regression test coverage for the `ThemeProvider` wrapper's `display: contents` focus behavior ([#80056](https://github.com/WordPress/gutenberg/pull/80056)).
+
+### Code Quality
+
+-   Clean the npm package publish surface, correct ESM declaration export paths, and validate packed test/story artifacts and local export targets ([#79552](https://github.com/WordPress/gutenberg/pull/79552)).
 
 ## 0.17.0 (2026-06-30)
 

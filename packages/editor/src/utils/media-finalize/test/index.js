@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import mediaFinalize from '..';
 
 jest.mock( '@wordpress/api-fetch', () => jest.fn() );

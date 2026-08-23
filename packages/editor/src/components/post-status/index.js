@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	CheckboxControl,
@@ -22,10 +19,6 @@ import {
 	pending,
 	notAllowed,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { DESIGN_POST_TYPES } from '../../store/constants';
 import PostPanelRow from '../post-panel-row';
 import PostSticky from '../post-sticky';

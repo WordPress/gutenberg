@@ -8,12 +8,10 @@
 			overflow-inline: auto;
 			overscroll-behavior-inline: none;
 
-			--direction-factor: 1;
 			--direction-start: left;
 			--direction-end: right;
 
 			&:dir(rtl) {
-				--direction-factor: -1;
 				--direction-start: right;
 				--direction-end: left;
 			}

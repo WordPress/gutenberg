@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { BACKSPACE, ESCAPE } from '@wordpress/keycodes';
-import { privateApis as composePrivateApis } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
+import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
-const { subscribeDelegatedListener } = unlock( composePrivateApis );
+const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
 export default ( props ) => ( element ) => {
 	function onKeyDown( event ) {
@@ -42,5 +35,5 @@ export default ( props ) => ( element ) => {
 		__experimentalUndo();
 	}
 
-	return subscribeDelegatedListener( element, 'keydown', onKeyDown );
+	return subscribeOwnedListener( element, 'keydown', onKeyDown );
 };

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { HeadingSize } from '../heading/types';
 import type { DropdownMenu } from '../dropdown-menu';
 

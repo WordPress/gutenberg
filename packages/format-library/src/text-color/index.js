@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { RichTextToolbarButton, useSettings } from '@wordpress/block-editor';
@@ -10,10 +7,6 @@ import {
 	textColor as textColorIcon,
 } from '@wordpress/icons';
 import { removeFormat } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import { default as InlineColorUI, getActiveColors } from './inline';
 
 export const transparentValue = 'rgba(0, 0, 0, 0)';

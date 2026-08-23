@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, createSelector } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import { privateApis as patternPrivateApis } from '@wordpress/patterns';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { unlock } from '@wordpress/routes-lock-unlock';
-
-/**
- * Internal dependencies
- */
 import { filterOutDuplicatesByName } from './utils';
 
 const {

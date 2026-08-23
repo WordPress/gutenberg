@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	Icon as WCIcon,
@@ -19,10 +16,6 @@ import { useEffect, useMemo, useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { blockDefault } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import BlockGuidelineModal from './block-guideline-modal';
 import { blockSlug, deleteGuidelineRow } from '../data';
 import type { ContentBlock, GuidelineRow, GuidelineQuery } from '../types';

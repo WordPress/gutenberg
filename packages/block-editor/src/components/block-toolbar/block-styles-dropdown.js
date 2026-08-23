@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { DropdownMenu, ToolbarGroup, ToolbarItem } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import BlockStylesMenu from '../block-switcher/block-styles-menu';
 
 export default function BlockStylesDropdown( {

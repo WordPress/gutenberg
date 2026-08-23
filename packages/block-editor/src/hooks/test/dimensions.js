@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import {
 	getBlockType,
 	registerBlockType,
 	unregisterBlockType,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import dimensions from '../dimensions';
 import { getDimensionsClassesAndStyles } from '../use-dimensions-props';
 

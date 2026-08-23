@@ -54,6 +54,7 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 - `previewPostType`
 - `enhancedPagination`
 - `postType`
+- `postId`
 
 ## Block Markup
 

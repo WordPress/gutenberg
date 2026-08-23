@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { isBlobURL } from '@wordpress/blob';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -40,10 +33,6 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import DimensionControls from './dimension-controls';
 import OverlayControls from './overlay-controls';
 import Overlay from './overlay';
@@ -182,6 +171,7 @@ export default function PostFeaturedImageEdit( {
 	const borderProps = useBorderProps( attributes );
 	const shadowProps = getShadowClassesAndStyles( attributes );
 	const blockEditingMode = useBlockEditingMode();
+	const aspectRatioStyle = aspectRatio === 'auto' ? undefined : aspectRatio;
 
 	const placeholder = ( content ) => {
 		return (
@@ -192,7 +182,7 @@ export default function PostFeaturedImageEdit( {
 				) }
 				withIllustration
 				style={ {
-					aspectRatio,
+					aspectRatio: aspectRatioStyle,
 					height: hasDimensionValue( height )
 						? height
 						: hasDimensionValue( width ) && 'auto',
@@ -426,7 +416,7 @@ export default function PostFeaturedImageEdit( {
 	const imageStyles = {
 		...borderProps.style,
 		...shadowProps.style,
-		aspectRatio,
+		aspectRatio: aspectRatioStyle,
 		height: hasDimensionValue( height )
 			? height
 			: hasDimensionValue( width ) && 'auto',

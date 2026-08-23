@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { Settings } from '@wordpress/core-data';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import type { CommonPost } from '../../types';
 import { BaseTitleView } from '../title/view';
 import { unlock } from '../../lock-unlock';

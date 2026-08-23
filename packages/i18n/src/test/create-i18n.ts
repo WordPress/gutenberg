@@ -1,13 +1,5 @@
 /* eslint-disable @wordpress/i18n-text-domain, @wordpress/i18n-translator-comments */
-
-/**
- * WordPress dependencies
- */
 import { createHooks } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
 import { createI18n } from '..';
 import type { I18nDomainMetadata, LocaleData } from '../types';
 
