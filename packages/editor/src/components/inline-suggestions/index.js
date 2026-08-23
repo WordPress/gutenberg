@@ -44,6 +44,8 @@ export {
 	buildSuggestionMarkerAttributes,
 	formatsRangeHasSuggestion,
 	valueRangeHasSuggestion,
+	formatsAdditionRunToExtend,
+	valueAdditionRunToExtend,
 } from './operations';
 export { computeDeleteRange } from './delete-range';
 export {
@@ -57,6 +59,7 @@ export {
 	applyFormatPlan,
 } from './reconcile-format';
 export {
+	hasSuggestionMarkers,
 	stripSuggestionMarkers,
 	stripSuggestionMarkersFromAttributes,
 } from './strip-markers';

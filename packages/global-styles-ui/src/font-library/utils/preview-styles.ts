@@ -12,25 +12,43 @@ function findNearest( input: number, numbers: number[] ) {
 	return numbers[ 0 ];
 }
 
-function extractFontWeights( fontFaces: FontFace[] ): number[] {
-	const result: number[] = [];
+const FONT_WEIGHT_KEYWORDS: Record< string, number | undefined > = {
+	normal: 400,
+	bold: 700,
+};
 
-	fontFaces.forEach( ( face ) => {
-		const weights = String( face.fontWeight ).split( ' ' );
+function isValidWeight( weight: number | undefined ): weight is number {
+	return (
+		weight !== undefined &&
+		Number.isFinite( weight ) &&
+		weight >= 1 &&
+		weight <= 1000
+	);
+}
 
-		if ( weights.length === 2 ) {
-			const start = parseInt( weights[ 0 ] );
-			const end = parseInt( weights[ 1 ] );
+/*
+ * Resolve a font-weight range (e.g. "200 900") to a single value.
+ * Ranges that cover 400 resolve to 400; otherwise to the closest end.
+ */
+function resolveFontWeight( fontWeight: FontFace[ 'fontWeight' ] ): string {
+	const weights = String( fontWeight ?? '' )
+		.trim()
+		.toLowerCase()
+		.split( /\s+/ )
+		.filter( Boolean )
+		.map( ( value ) => FONT_WEIGHT_KEYWORDS[ value ] ?? Number( value ) );
 
-			for ( let i = start; i <= end; i += 100 ) {
-				result.push( i );
-			}
-		} else if ( weights.length === 1 ) {
-			result.push( parseInt( weights[ 0 ] ) );
-		}
-	} );
+	const [ start, end ] = weights;
 
-	return result;
+	if ( ! isValidWeight( start ) ) {
+		return '400';
+	}
+
+	if ( weights.length !== 2 || ! isValidWeight( end ) ) {
+		return String( start );
+	}
+
+	return String( Math.min( Math.max( 400, start ), end ) );
 }
 
 /*
@@ -134,16 +152,19 @@ export function getFamilyPreviewStyle(
 		);
 		if ( normalFaces.length > 0 ) {
 			style.fontStyle = 'normal';
-			const normalWeights = extractFontWeights( normalFaces );
-			const nearestWeight = findNearest( 400, normalWeights );
-			style.fontWeight = String( nearestWeight ) || '400';
+			const normalWeights = normalFaces.map( ( face ) =>
+				Number( resolveFontWeight( face.fontWeight ) )
+			);
+			style.fontWeight = String(
+				findNearest( 400, normalWeights ) ?? 400
+			);
 		} else {
 			style.fontStyle =
 				( family.fontFace.length && family.fontFace[ 0 ].fontStyle ) ||
 				'normal';
 			style.fontWeight =
 				( family.fontFace.length &&
-					String( family.fontFace[ 0 ].fontWeight ) ) ||
+					resolveFontWeight( family.fontFace[ 0 ].fontWeight ) ) ||
 				'400';
 		}
 	}
@@ -155,6 +176,6 @@ export function getFacePreviewStyle( face: FontFace ): CSSProperties {
 	return {
 		fontFamily: formatFontFamily( face.fontFamily ),
 		fontStyle: face.fontStyle || 'normal',
-		fontWeight: face.fontWeight || '400',
+		fontWeight: resolveFontWeight( face.fontWeight ),
 	};
 }

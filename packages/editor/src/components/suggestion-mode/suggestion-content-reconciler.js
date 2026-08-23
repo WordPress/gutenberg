@@ -48,10 +48,11 @@ export function contentKey( value ) {
  * `useSuggestionsProvider` in one component rather than every block's render is
  * why this is a singleton, mirroring `SuggestionFormatKeyboard`.
  *
- * Only plans whose actions all open a fresh note (`insert-add`, `wrap-del`) are
- * routed here by the HOC; plans that edit an existing marker or that the diff
- * can't resolve are left to the overlay path, so this handler always has a note
- * to create for every id the plan consumes.
+ * Only plans this handler can execute end to end are routed here by the HOC:
+ * every action either opens a fresh note (`insert-add`, `wrap-del`) or grows a
+ * marker that already has one (`grow-add`, which needs no note work at all).
+ * Plans that would retire a note, or that the diff can't resolve, are left to
+ * the overlay path.
  *
  * Writes are serialized per block through the overlay context's shared write
  * queue (shared with `SuggestionFormatKeyboard`), and every write re-validates
@@ -221,7 +222,9 @@ export default function SuggestionContentReconciler() {
 			if (
 				! request?.clientId ||
 				actions.length === 0 ||
-				! actions.every( ( action ) => action.newNote ) ||
+				! actions.every(
+					( action ) => action.newNote || action.type === 'grow-add'
+				) ||
 				contentKey( request.prevContent ) === null
 			) {
 				return false;

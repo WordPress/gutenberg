@@ -1,4 +1,4 @@
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
@@ -16,6 +16,7 @@ import {
 	buildSuggestionMarkerAttributes,
 	insertInlineAddition,
 	growInlineAddition,
+	valueAdditionRunToExtend,
 	valueRangeHasSuggestion,
 } from '../inline-suggestions';
 import {
@@ -24,6 +25,7 @@ import {
 	readEventRange,
 } from './keyboard-target';
 import { isPartOfPendingInsertion } from './store-interceptor';
+import { notifyEditRefused } from './refuse-edit';
 
 /**
  * @typedef {Object} RunSegment
@@ -119,7 +121,10 @@ function readInlinePasteHTML( clipboardData, plainText ) {
  *   via `selectionChange`. A contiguous run grows one marker: the first
  *   character opens the note (async; characters typed meanwhile buffer and
  *   flush once the id resolves), and each subsequent character re-stamps the
- *   whole marker span so it stays one `<mark>` (`growInlineAddition`).
+ *   whole marker span so it stays one `<mark>` (`growInlineAddition`). Typing
+ *   back inside a pending addition of the author's own grows that marker the
+ *   same way, wherever the caret sits in it, so one proposal stays one marker
+ *   and one note.
  * - Type-over (entering text with a non-collapsed selection) proposes deleting
  *   the selected text (a `del` marker) and adds the replacement (an `add` run
  *   at the selection end), as two independent notes.
@@ -164,11 +169,13 @@ export default function SuggestionAdditionKeyboard() {
 	const { getBlockName } = useSelect( blockEditorStore );
 	const { requestInterceptorBypass, isDeferredInsertion } =
 		useSuggestionOverlay();
+	const registry = useRegistry();
 
 	// The in-progress addition run. `id` is null while the suggestion note is
 	// being created; characters entered in that window queue in `pending` and
 	// are flushed when the id resolves. `start`/`end` track the marker's live
-	// span; the caret sits at `end`.
+	// span and `caret` the insertion point within it — the two only differ when
+	// the author resumed typing inside the marker rather than at its end.
 	const runRef = useRef( null );
 
 	const resetRun = useCallback( () => {
@@ -222,6 +229,7 @@ export default function SuggestionAdditionKeyboard() {
 				id: null,
 				start: markerStart,
 				end: markerStart,
+				caret: markerStart,
 				pending: [ segment ],
 			};
 			runRef.current = run;
@@ -317,7 +325,8 @@ export default function SuggestionAdditionKeyboard() {
 					end: run.start,
 				} );
 				run.end = run.start + buffered.text.length;
-				commit( clientId, attributeKey, inserted, run.end );
+				run.caret = run.end;
+				commit( clientId, attributeKey, inserted, run.caret );
 			} catch {
 				// `createSuggestion` already surfaces a notice on failure; drop
 				// the run so the next edit starts clean.
@@ -348,7 +357,9 @@ export default function SuggestionAdditionKeyboard() {
 	 * Returns whether the input was consumed. Callers must only cancel the
 	 * native edit when this returns true — when no valid single-attribute
 	 * anchor exists the input has to fall through to the native/overlay path
-	 * rather than being swallowed.
+	 * rather than being swallowed. A gesture this component owns but declines
+	 * (a type-over of a marked run) also counts as consumed: cancelling is the
+	 * refusal.
 	 *
 	 * `domRange` carries the DOM-derived offsets for the edit
 	 * (`readEventRange`); the store caret is only trusted for block/attribute
@@ -427,11 +438,15 @@ export default function SuggestionAdditionKeyboard() {
 				 * Type-over of a selection that overlaps an existing
 				 * suggestion marker: wrapping it in the `del` marker would
 				 * re-attribute part of that marker to the new id (see
-				 * `formatsRangeHasSuggestion`). Fall through to the
-				 * native/overlay path instead of intercepting.
+				 * `formatsRangeHasSuggestion`), and the overlay it used to
+				 * fall through to would hide that marker (#73411, F-09).
+				 * Neither representation fits, so the gesture is consumed and
+				 * declined — the caller cancels the native edit, leaving the
+				 * existing suggestion exactly as it was.
 				 */
 				resetRun();
-				return false;
+				notifyEditRefused( registry );
+				return true;
 			}
 			const run = runRef.current;
 			const isContiguous =
@@ -441,7 +456,7 @@ export default function SuggestionAdditionKeyboard() {
 				run.id !== null &&
 				run.clientId === clientId &&
 				run.attributeKey === attributeKey &&
-				run.end === start;
+				run.caret === start;
 
 			if ( isContiguous ) {
 				const value = getBlockAttributes( clientId )?.[ attributeKey ];
@@ -454,10 +469,67 @@ export default function SuggestionAdditionKeyboard() {
 					} ),
 					markerStart: run.start,
 					markerEnd: run.end,
+					at: run.caret,
 				} );
 				run.end += text.length;
-				commit( clientId, attributeKey, grown, run.end );
+				run.caret += text.length;
+				commit( clientId, attributeKey, grown, run.caret );
 				return true;
+			}
+
+			/*
+			 * Resuming inside the author's own pending addition — clicking back
+			 * into text they already proposed and typing more. Grow that marker
+			 * in place: a fresh marker at that offset would split the enclosing
+			 * one into two `<mark>` elements sharing an id and leave a second
+			 * note claiming characters the first note also reports (#73411,
+			 * finding F-06). The marker is resolved from the block's live value
+			 * rather than from `runRef`, so it works after a click, a
+			 * reload or a caret move away and back.
+			 *
+			 * Paste merges only when the caret is strictly inside the marker,
+			 * where the alternative is that split. At the trailing edge a pasted
+			 * run stays its own marker, as `allowGrow` intends.
+			 */
+			if ( start === end ) {
+				const value = getBlockAttributes( clientId )?.[ attributeKey ];
+				const extendable = valueAdditionRunToExtend(
+					value,
+					start,
+					authorId === null || authorId === undefined
+						? null
+						: String( authorId )
+				);
+				if ( extendable && ( allowGrow || start < extendable.end ) ) {
+					const grown = growInlineAddition( value, {
+						text,
+						html: segment.html,
+						attributes: buildSuggestionMarkerAttributes( {
+							id: extendable.id,
+							type: SUGGESTION_TYPE_ADDITION,
+							authorId,
+						} ),
+						markerStart: extendable.start,
+						markerEnd: extendable.end,
+						at: start,
+					} );
+					runRef.current = {
+						clientId,
+						attributeKey,
+						id: extendable.id,
+						start: extendable.start,
+						end: extendable.end + text.length,
+						caret: start + text.length,
+						pending: [],
+					};
+					commit(
+						clientId,
+						attributeKey,
+						grown,
+						runRef.current.caret
+					);
+					return true;
+				}
 			}
 
 			beginInsertion( clientId, attributeKey, start, end, segment );
@@ -471,6 +543,7 @@ export default function SuggestionAdditionKeyboard() {
 			isDeferredInsertion,
 			beginInsertion,
 			commit,
+			registry,
 			resetRun,
 			authorId,
 		]

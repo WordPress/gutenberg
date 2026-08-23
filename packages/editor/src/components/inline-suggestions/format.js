@@ -12,6 +12,10 @@ export const SUGGESTION_FORMAT_NAME = 'core/suggestion';
  * Exact class token on a suggestion `<mark>`. Kept distinct from `wp-note` (and
  * from any user/`core/text-color` `<mark>`) so the PHP strip and CSS only ever
  * touch suggestion markers.
+ *
+ * Mirrored as `SUGGESTION_MARKER_CLASS` in `store/constants.ts`, which the
+ * store reads saved content back with and cannot import from here. Those two
+ * are the only copies; keep them in step.
  */
 export const SUGGESTION_CLASS = 'wp-suggestion';
 
@@ -72,13 +76,64 @@ export const suggestionFormat = {
 
 export const SUGGESTION_A11Y_FORMAT_NAME = 'core/suggestion-a11y';
 
+export const SUGGESTION_A11Y_START_ATTRIBUTE = 'data-suggestion-a11y-start';
+export const SUGGESTION_A11Y_END_ATTRIBUTE = 'data-suggestion-a11y-end';
+
+/**
+ * Screen-reader announcements that bracket a marker of a given type, plus the
+ * ARIA role that matches it. `insertion` and `deletion` are the only two roles
+ * that fit: a formatting suggestion changes neither the presence nor the
+ * absence of the run, so announcing it as a deletion would tell a
+ * screen-reader user the words are slated for removal when they are not.
+ *
+ * The bracketing text is what carries the meaning. `role="insertion"` /
+ * `role="deletion"` map to `<ins>`/`<del>`, which most screen readers do not
+ * announce by default, and both roles prohibit an accessible name — so the
+ * "who and what" has to be rendered, not labelled. It is painted as CSS
+ * generated content off these attributes (see `content-suggestion.scss`), which
+ * keeps it out of the DOM: inside a `contenteditable` any real text node would
+ * be reachable by the caret and picked up by copy.
+ *
+ * @param {?string} type Marker `data-suggestion-type` value.
+ * @return {{start: string, end: string, role: ?string}} Announcement pair and role.
+ */
+export function getSuggestionA11yDescriptor( type ) {
+	switch ( type ) {
+		case SUGGESTION_TYPE_ADDITION:
+			return {
+				start: __( 'Start of suggested addition.' ),
+				end: __( 'End of suggested addition.' ),
+				role: 'insertion',
+			};
+		case SUGGESTION_TYPE_DELETION:
+			return {
+				start: __( 'Start of suggested deletion.' ),
+				end: __( 'End of suggested deletion.' ),
+				role: 'deletion',
+			};
+		case SUGGESTION_TYPE_FORMAT:
+			return {
+				start: __( 'Start of suggested formatting change.' ),
+				end: __( 'End of suggested formatting change.' ),
+				role: null,
+			};
+		default:
+			return {
+				start: __( 'Start of suggested change.' ),
+				end: __( 'End of suggested change.' ),
+				role: null,
+			};
+	}
+}
+
 /**
  * Editor-only decoration pass that gives suggestion markers screen-reader
  * semantics. A bare `<mark class="wp-suggestion">` is invisible to assistive
  * technology — a suggested deletion reads as normal text. For each rich-text
  * run covered by a `core/suggestion` format, nest a `core/suggestion-a11y`
- * format carrying `role="insertion"` (add markers) or `role="deletion"` (del
- * markers), which ARIA maps to `<ins>`/`<del>` semantics.
+ * format carrying the bracketing announcements for its type and, where one
+ * applies, `role="insertion"` (add markers) or `role="deletion"` (del markers),
+ * which ARIA maps to `<ins>`/`<del>` semantics.
  *
  * The role must never serialize into post content, so it cannot live on the
  * marker format itself (reading the editable DOM back would absorb it). It is
@@ -89,7 +144,16 @@ export const SUGGESTION_A11Y_FORMAT_NAME = 'core/suggestion-a11y';
  *
  * One decoration object is reused across each contiguous marker run
  * (rich-text merges adjacent identical format references into a single
- * element), so a marker gains exactly one nested role element.
+ * element), so a marker gains exactly one nested role element. Where markers
+ * nest, each run keeps its own decoration describing the marker that wraps it.
+ *
+ * It is spliced in directly after the marker rather than pushed onto the end of
+ * the stack. `toTree` decides whether to reuse an element by comparing format
+ * stacks *by index*, so a bold run or link covering only part of a marker would
+ * shift a trailing decoration's index and split it into two elements - and two
+ * elements means the closing announcement is read out mid-suggestion and the
+ * opening one repeated. Sitting immediately inside the marker keeps its index
+ * fixed for the marker's whole run.
  *
  * @param {Array} formats Per-character format stacks.
  * @return {Array} Format stacks with role decorations added.
@@ -103,40 +167,68 @@ export function addSuggestionRoleFormats( formats ) {
 	let lastDecoration = null;
 	for ( let i = 0; i < formats.length; i++ ) {
 		const stack = formats[ i ];
-		const suggestion = Array.isArray( stack )
-			? stack.find( ( f ) => f.type === SUGGESTION_FORMAT_NAME )
-			: undefined;
-		if ( ! suggestion ) {
+		/*
+		 * The innermost marker, not the first: overlapping runs from two
+		 * people serialize as nested markers, and the decoration goes just
+		 * inside the deepest of them. Describing an enclosing marker would
+		 * announce the wrong change - a deletion nested inside someone else's
+		 * addition read aloud as an addition.
+		 */
+		const markerIndex = Array.isArray( stack )
+			? stack.findLastIndex( ( f ) => f.type === SUGGESTION_FORMAT_NAME )
+			: -1;
+		if ( markerIndex === -1 ) {
 			lastSuggestion = null;
 			lastDecoration = null;
 			continue;
 		}
+		const suggestion = stack[ markerIndex ];
 		if ( ! out ) {
 			out = formats.slice();
 		}
 		if ( suggestion !== lastSuggestion ) {
 			lastSuggestion = suggestion;
+			const type = suggestion.attributes?.[ SUGGESTION_TYPE_ATTRIBUTE ];
+			const author =
+				suggestion.attributes?.[ SUGGESTION_AUTHOR_ATTRIBUTE ];
+			const { start, end, role } = getSuggestionA11yDescriptor( type );
+			/*
+			 * Absent values are omitted rather than set to a falsy one:
+			 * rich-text renders every key in this object, so an undefined
+			 * entry would serialize as `role="undefined"`.
+			 *
+			 * Type and author are repeated onto the decoration so the
+			 * per-author announcement stylesheet can select it directly. An
+			 * ancestor selector would also match a decoration nested deeper
+			 * inside an enclosing marker, letting that marker's author claim
+			 * a run they did not suggest.
+			 */
 			lastDecoration = {
 				type: SUGGESTION_A11Y_FORMAT_NAME,
 				attributes: {
-					role:
-						suggestion.attributes?.[ SUGGESTION_TYPE_ATTRIBUTE ] ===
-						SUGGESTION_TYPE_ADDITION
-							? 'insertion'
-							: 'deletion',
+					start,
+					end,
+					...( role && { role } ),
+					...( type !== undefined && { suggestionType: type } ),
+					...( author !== undefined && { author } ),
 				},
 			};
 		}
-		out[ i ] = [ ...stack, lastDecoration ];
+		out[ i ] = [
+			...stack.slice( 0, markerIndex + 1 ),
+			lastDecoration,
+			...stack.slice( markerIndex + 1 ),
+		];
 	}
 	return out ?? formats;
 }
 
 /**
- * Editor-only rich-text format that renders the screen-reader role element
- * inside a suggestion marker. Never parsed back into values (it declares
+ * Editor-only rich-text format that renders the screen-reader element inside a
+ * suggestion marker. Never parsed back into values (it declares
  * `__experimentalCreatePrepareEditableTree` without a change handler, which
- * `toFormat` treats as editor-only), so the role never reaches post content.
+ * `toFormat` treats as editor-only), so neither the role nor the announcement
+ * text ever reaches post content.
  */
 export const suggestionA11yFormat = {
 	title: __( 'Suggestion accessibility decoration' ),
@@ -144,6 +236,10 @@ export const suggestionA11yFormat = {
 	className: 'wp-suggestion-a11y',
 	attributes: {
 		role: 'role',
+		start: SUGGESTION_A11Y_START_ATTRIBUTE,
+		end: SUGGESTION_A11Y_END_ATTRIBUTE,
+		suggestionType: SUGGESTION_TYPE_ATTRIBUTE,
+		author: SUGGESTION_AUTHOR_ATTRIBUTE,
 	},
 	interactive: false,
 	edit: () => null,

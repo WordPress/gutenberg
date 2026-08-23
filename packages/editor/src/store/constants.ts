@@ -42,8 +42,17 @@ export const DESIGN_POST_TYPES = [
  * Editor intent values. The intent represents the user's current editing
  * purpose (edit the post directly, suggest changes, or view in read-only).
  *
- * Orthogonal to the `editorMode` preference (visual vs. code): a user can
- * be in `suggest` intent in either visual or code mode.
+ * Mostly orthogonal to the `editorMode` preference (visual vs. code). The
+ * exception is `suggest`, which always reports `visual`: the code editor
+ * hands back raw `post_content` with nowhere to carry an inline marker, so
+ * `getEditorMode` masks the preference rather than changing it, and the
+ * user's stored mode returns with the `edit` intent.
+ *
+ * Because `suggest` is visual-only it also depends on the visual editor
+ * being available at all: `setEditorIntent` refuses it when the
+ * `richEditingEnabled` setting is off (the "Disable the visual editor when
+ * writing" profile option), and the intent menu offers it disabled with a
+ * pointer to that setting.
  *
  * Storage and defaults:
  *   - Session-scoped: held in the editor store's reducer, not the
@@ -59,7 +68,7 @@ export const DESIGN_POST_TYPES = [
  * `suggest` intent to capture edits as in-memory overlays, render them as
  * suggestions, and let other users apply or reject them. Adding a new
  * intent here also requires updates to:
- *   - packages/editor/src/components/intent-switcher/index.js (UI choices)
+ *   - packages/editor/src/components/intent-switcher/index.tsx (UI choices)
  *   - packages/editor/src/components/global-keyboard-shortcuts/* (shortcut
  *     registration and dispatch)
  */
@@ -72,3 +81,19 @@ export const EDITOR_INTENTS = [
 	EDITOR_INTENT_VIEW,
 ] as const;
 export type EditorIntent = ( typeof EDITOR_INTENTS )[ number ];
+
+/**
+ * Class token carried by an inline suggestion marker
+ * (`<mark class="wp-suggestion">`) in serialized block content.
+ *
+ * Mirrors `SUGGESTION_CLASS` in `components/inline-suggestions/format.js`,
+ * duplicated here for the same reason `components/suggestion-mode/constants.js`
+ * mirrors the intent value: the store must not import from the component tree.
+ * A serialization contract: `utils/pending-suggestion-markers.js` reads it back
+ * out of saved content, so the two copies must not drift.
+ *
+ * On its own the token is only a cheap pre-filter, never the answer - it also
+ * appears in block class names and in prose about the feature. See
+ * `hasPendingSuggestionMarkers` for what actually identifies a marker.
+ */
+export const SUGGESTION_MARKER_CLASS = 'wp-suggestion';
