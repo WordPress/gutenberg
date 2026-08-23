@@ -1,6 +1,7 @@
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+import type { Page } from '@playwright/test';
+import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
-async function openIntentSwitcher( page ) {
+async function openIntentSwitcher( page: Page ) {
 	await page.click(
 		'role=region[name="Editor top bar"i] >> role=button[name="Options"i]'
 	);

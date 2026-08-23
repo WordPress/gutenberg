@@ -20,12 +20,18 @@ import { store as coreStore } from '@wordpress/core-data';
 import { EDITOR_STORE_NAME } from './constants';
 import { checkSupport } from '../post-type-support-check';
 
+declare global {
+	interface Window {
+		__experimentalSuggestionMode?: boolean;
+	}
+}
+
 /**
  * Whether the Suggestion Mode experiment is enabled.
  *
- * @return {boolean} True when the experiment flag is set.
+ * @return True when the experiment flag is set.
  */
-export function isSuggestionModeEnabled() {
+export function isSuggestionModeEnabled(): boolean {
 	return !! window?.__experimentalSuggestionMode;
 }
 
@@ -35,10 +41,12 @@ export function isSuggestionModeEnabled() {
  * intent menu with `supportKeys="editor.notes"`), so the shortcut and menu
  * gates can't diverge.
  *
- * @param {Function} select Registry select function.
- * @return {boolean} True when notes are supported.
+ * @param select Registry select function.
+ * @return True when notes are supported.
  */
-function hasNotesSupport( select ) {
+function hasNotesSupport(
+	select: ( store: string | typeof coreStore ) => any
+): boolean {
 	const editor = select( EDITOR_STORE_NAME );
 	const postTypeSlug = editor?.getEditedPostAttribute?.( 'type' );
 	const postType = postTypeSlug
@@ -55,9 +63,9 @@ function hasNotesSupport( select ) {
  * intent: the experiment must be enabled AND the current post type must
  * support notes.
  *
- * @return {boolean} True when the current editor can host suggestions.
+ * @return True when the current editor can host suggestions.
  */
-export function useCanSuggest() {
+export function useCanSuggest(): boolean {
 	return useSelect(
 		( select ) => isSuggestionModeEnabled() && hasNotesSupport( select ),
 		[]

@@ -11,7 +11,11 @@ import { isSuggestionModeEnabled, useCanSuggest } from '../gate';
  * stubs (instead of the real editor / core-data stores) keeps the test
  * free of entity bootstrapping.
  */
-function createStubRegistry( { postTypeSupports } ) {
+function createStubRegistry( {
+	postTypeSupports,
+}: {
+	postTypeSupports?: Record< string, unknown >;
+} ) {
 	const registry = createRegistry();
 	registry.register(
 		createReduxStore( 'core/editor', {
@@ -35,8 +39,8 @@ function createStubRegistry( { postTypeSupports } ) {
 	return registry;
 }
 
-function renderCanSuggest( registry ) {
-	let result;
+function renderCanSuggest( registry: ReturnType< typeof createRegistry > ) {
+	let result: boolean | undefined;
 	function Capture() {
 		result = useCanSuggest();
 		return null;

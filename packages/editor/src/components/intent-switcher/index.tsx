@@ -25,10 +25,13 @@ import PostTypeSupportCheck from '../post-type-support-check';
  * The `value` field must be one of the `EDITOR_INTENT_*` constants — the
  * `setEditorIntent` action validates against `EDITOR_INTENTS` and silently
  * ignores unknown values.
- *
- * @type {Array<{value: string, label: string, info: string, shortcut: string}>}
  */
-const INTENTS = [
+const INTENTS: Array< {
+	value: string;
+	label: string;
+	info: string;
+	shortcut: string;
+} > = [
 	{
 		value: EDITOR_INTENT_EDIT,
 		label: __( 'Editing' ),
