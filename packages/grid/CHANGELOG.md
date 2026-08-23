@@ -4,12 +4,7 @@
 
 ### New Features
 
--   `DashboardGrid` and `DashboardLanes` accept `itemLimits`: per-item
-    minimum and maximum tile sizes in pixels, quantized to whole tracks
-    of the current geometry (minimums round up, maximums round down) and
-    enforced on rendered spans and resize gestures, without ever being
-    written into the layout
-    ([#81899](https://github.com/WordPress/gutenberg/pull/81899)).
+-   `DashboardGrid` and `DashboardLanes` accept `itemLimits`: per-item minimum and maximum tile sizes in pixels, enforced on rendered spans and resize gestures without being written into the layout ([#81899](https://github.com/WordPress/gutenberg/pull/81899)).
 
 ### Internal
 

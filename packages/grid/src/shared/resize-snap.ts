@@ -86,12 +86,10 @@ export type SpanBounds = {
 };
 
 /**
- * Converts per-item pixel limits to span bounds, using the same track
- * math as `gridSpanToPixelSize`: minimums round up so the derived span
- * always covers the requested pixels, maximums round down so it always
- * fits inside them, and every bound stays at one track or more. A
- * minimum that exceeds a maximum after quantization wins over it.
- * Width bounds saturate at the surface's column count; height bounds
+ * Converts per-item pixel limits to span bounds with the track math of
+ * `gridSpanToPixelSize`. Minimums round up, maximums round down, every
+ * bound stays at one track or more, and a minimum wins over a smaller
+ * maximum. Width bounds saturate at the column count; height bounds
  * resolve to `1`/`Infinity` when rows are content-sized.
  *
  * @param limits      Size limits in pixels.

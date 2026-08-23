@@ -380,14 +380,9 @@ export const EditMode: Story = {
 };
 
 /**
- * Per-item width limits via `itemLimits`, in pixels. Lanes quantize
- * each limit to whole lanes (minimums round up, maximums round down)
- * and bound spans and the horizontal resize gesture at the result;
- * height limits do not apply because lane heights are content-driven.
- *
- * Resize the constrained tiles: the wide one refuses to shrink below
- * its minimum, the capped one refuses to grow past its maximum, and
- * the free tiles keep the full range.
+ * Per-item width limits via `itemLimits`, in pixels. The wide tile
+ * stops shrinking at its minimum, the capped tile stops growing at its
+ * maximum, and the free tiles keep the full range.
  */
 export const SizeLimits: Story = {
 	name: 'Per-Item Size Limits',

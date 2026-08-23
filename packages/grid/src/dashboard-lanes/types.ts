@@ -173,10 +173,8 @@ export interface DashboardLanesProps
 	minColumnWidth?: number;
 
 	/**
-	 * Per-item width limits in pixels, keyed by layout item key. Lanes
-	 * quantize each limit to whole lanes (minimums round up, maximums
-	 * round down) and bound spans and resize gestures at the result;
-	 * height limits are ignored because lane heights are content-driven.
+	 * Per-item width limits in pixels, keyed by layout item key. Height
+	 * limits are ignored; lane heights are content-driven.
 	 */
 	itemLimits?: Record< string, GridItemLimits >;
 }

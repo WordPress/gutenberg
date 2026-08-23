@@ -161,12 +161,10 @@ export interface ResizeHandleProps {
 }
 
 /**
- * Per-item size limits, in pixels. The surface quantizes each limit to
- * whole tracks of its current geometry (minimums round up so the span
- * covers the pixels, maximums round down so it fits inside them) and
- * bounds rendered spans and resize gestures at the result; the limits
- * themselves are never written into the layout. When a quantized
- * minimum exceeds a quantized maximum, the minimum wins.
+ * Per-item size limits, in pixels. Surfaces quantize each limit to
+ * whole tracks (minimums round up, maximums round down), bound rendered
+ * spans and resize gestures at the result, and never write it into the
+ * layout. A quantized minimum wins over a smaller quantized maximum.
  */
 export type GridItemLimits = {
 	/**

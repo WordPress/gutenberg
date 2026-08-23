@@ -280,10 +280,7 @@ export interface DashboardGridProps
 	minColumnWidth?: number;
 
 	/**
-	 * Per-item size limits in pixels, keyed by layout item key. The grid
-	 * quantizes each limit to whole tracks (minimums round up, maximums
-	 * round down), bounds the item's rendered spans and resize gestures
-	 * at the result, and never writes the limits into the layout. Width
+	 * Per-item size limits in pixels, keyed by layout item key. Width
 	 * bounds saturate at the column count; `'full'` and `'fill'` widths
 	 * respect a maximum.
 	 */

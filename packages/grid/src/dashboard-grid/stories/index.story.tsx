@@ -656,18 +656,10 @@ const LIMIT_LABELS: Record< string, string > = {
 };
 
 /**
- * Per-item size limits via `itemLimits`, in pixels. The grid quantizes
- * each limit to whole tracks of its current geometry (minimums round
- * up, maximums round down) and pins both the tile and the snap preview
- * at the bound while the pointer overshoots in either direction;
- * release commits spans inside the limits, so the layout never records
- * a size outside them. Tiles without an entry keep the full range.
- *
- * The `'full'` and `'fill'` width modes respect the limits too: use the
- * per-tile toggles to make the capped tile full- or fill-width and
- * watch it stop at its maximum span instead of taking the whole row.
- * The state panel confirms the committed layout stays inside the
- * limits.
+ * Per-item size limits via `itemLimits`, in pixels. Constrained tiles
+ * pin at their bounds while the pointer overshoots, and release commits
+ * spans inside the limits. `'full'` and `'fill'` stop at the tile's
+ * maximum span; the per-tile toggles exercise both.
  */
 export const SizeLimits: Story = {
 	name: 'Per-Item Size Limits',
