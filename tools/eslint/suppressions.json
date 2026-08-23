@@ -1419,12 +1419,12 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/suggestion-mode/auto-save.js": {
+	"packages/editor/src/components/suggestion-mode/auto-save.ts": {
 		"react-hooks/refs": {
 			"count": 6
 		}
 	},
-	"packages/editor/src/components/suggestion-mode/test/auto-save.js": {
+	"packages/editor/src/components/suggestion-mode/test/auto-save.tsx": {
 		"react-hooks/globals": {
 			"count": 1
 		}

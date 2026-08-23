@@ -2,8 +2,8 @@ import { createSuggestionWriteQueue } from '../suggestion-write-queue';
 
 /** Create a promise whose resolution the test controls. */
 function deferred() {
-	let resolve;
-	let reject;
+	let resolve!: ( value?: unknown ) => void;
+	let reject!: ( reason?: unknown ) => void;
 	const promise = new Promise( ( res, rej ) => {
 		resolve = res;
 		reject = rej;
@@ -22,7 +22,7 @@ describe( 'createSuggestionWriteQueue', () => {
 	it( 'runs tasks for the same block strictly one after another', async () => {
 		const queue = createSuggestionWriteQueue();
 		const first = deferred();
-		const order = [];
+		const order: string[] = [];
 
 		queue.enqueue( 'a', async () => {
 			order.push( 'first:start' );
@@ -49,7 +49,7 @@ describe( 'createSuggestionWriteQueue', () => {
 	it( 'lets tasks for different blocks run independently', async () => {
 		const queue = createSuggestionWriteQueue();
 		const blockedForever = deferred();
-		const order = [];
+		const order: string[] = [];
 
 		queue.enqueue( 'a', async () => {
 			await blockedForever.promise;
@@ -64,7 +64,7 @@ describe( 'createSuggestionWriteQueue', () => {
 
 	it( 'does not let a rejected task poison later tasks on the block', async () => {
 		const queue = createSuggestionWriteQueue();
-		const order = [];
+		const order: string[] = [];
 
 		const failing = queue.enqueue( 'a', async () => {
 			throw new Error( 'boom' );

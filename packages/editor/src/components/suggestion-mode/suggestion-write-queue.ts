@@ -13,13 +13,18 @@
  * while tasks for different blocks stay independent.
  */
 
+export interface SuggestionWriteQueue {
+	enqueue: ( clientId: string, task: () => unknown ) => Promise< unknown >;
+	hasPending: ( clientId: string ) => boolean;
+}
+
 /**
  * Create a write queue keyed by block client id.
  *
- * @return {{enqueue: Function, hasPending: Function}} Queue API.
+ * @return Queue API.
  */
-export function createSuggestionWriteQueue() {
-	const chains = new Map();
+export function createSuggestionWriteQueue(): SuggestionWriteQueue {
+	const chains = new Map< string, Promise< void > >();
 
 	return {
 		/**
@@ -27,12 +32,12 @@ export function createSuggestionWriteQueue() {
 		 * block has settled. A rejected task never poisons later tasks —
 		 * the stored chain always resolves.
 		 *
-		 * @param {string}   clientId Block client id the write targets.
-		 * @param {Function} task     Async task to run.
-		 * @return {Promise<*>} The task's own settlement (observable by the
+		 * @param clientId Block client id the write targets.
+		 * @param task     Async task to run.
+		 * @return The task's own settlement (observable by the
 		 * caller, including rejection).
 		 */
-		enqueue( clientId, task ) {
+		enqueue( clientId: string, task: () => unknown ) {
 			const previous = chains.get( clientId ) ?? Promise.resolve();
 			const run = previous.then( () => task() );
 			const settled = run.then(
@@ -53,10 +58,10 @@ export function createSuggestionWriteQueue() {
 		/**
 		 * Whether a task is queued or in flight for the block.
 		 *
-		 * @param {string} clientId Block client id.
-		 * @return {boolean} True when the block has pending writes.
+		 * @param clientId Block client id.
+		 * @return True when the block has pending writes.
 		 */
-		hasPending( clientId ) {
+		hasPending( clientId: string ) {
 			return chains.has( clientId );
 		},
 	};

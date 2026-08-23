@@ -42,14 +42,14 @@ afterEach( () => {
 	jest.useRealTimers();
 } );
 
-function renderInSuggestMode( ui ) {
+function renderInSuggestMode( ui: React.ReactElement ) {
 	const registry = createRegistry();
 	registry.register( noticesStore );
 	registry.register( coreStore );
 	registry.register( editorStore );
 	unlock( registry.dispatch( editorStore ) ).setEditorIntent( 'suggest' );
 
-	const wrapper = ( { children } ) => (
+	const wrapper = ( { children }: { children?: React.ReactNode } ) => (
 		<RegistryProvider value={ registry }>
 			<SuggestionOverlayProvider>{ children }</SuggestionOverlayProvider>
 		</RegistryProvider>
@@ -61,7 +61,7 @@ function renderInSuggestMode( ui ) {
 // Seed a comment record so `getEntityRecord( 'root', 'comment', id )` resolves
 // without an HTTP fetch — mirrors what `useNoteThreads`'s entity query would
 // have populated by the time a suggestion is in flight.
-function seedComment( registry, comment ) {
+function seedComment( registry: any, comment: any ) {
 	registry
 		.dispatch( coreStore )
 		.receiveEntityRecords( 'root', 'comment', [ comment ] );
@@ -69,7 +69,7 @@ function seedComment( registry, comment ) {
 
 // Test harness exposes the overlay API via a render-prop ref so tests can
 // drive the reducer directly.
-let overlayHandle;
+let overlayHandle: ReturnType< typeof useSuggestionOverlay >;
 function CaptureOverlay() {
 	overlayHandle = useSuggestionOverlay();
 	return null;
@@ -215,7 +215,7 @@ describe( 'SuggestionAutoSave', () => {
 
 	it( 'does not duplicate work when the user keeps typing during an in-flight save', async () => {
 		// `createSuggestion` resolves only when we explicitly let it.
-		let resolveCreate;
+		let resolveCreate!: ( value?: unknown ) => void;
 		createSuggestion.mockImplementation(
 			() =>
 				new Promise( ( resolve ) => {
@@ -401,7 +401,7 @@ describe( 'SuggestionAutoSave', () => {
 		registry.register( editorStore );
 		unlock( registry.dispatch( editorStore ) ).setEditorIntent( 'edit' );
 
-		const wrapper = ( { children } ) => (
+		const wrapper = ( { children }: { children?: React.ReactNode } ) => (
 			<RegistryProvider value={ registry }>
 				<SuggestionOverlayProvider>
 					{ children }
@@ -490,6 +490,8 @@ describe( 'operationsForEntry', () => {
 				blockName: 'core/paragraph',
 				baselineAttributes: { content: 'a' },
 				overlayAttributes: { content: 'b' },
+				commentId: null,
+				syncedOpsKey: null,
 			} )
 		).toEqual( [
 			{
@@ -513,6 +515,8 @@ describe( 'operationsForEntry', () => {
 				baselineAttributes: {},
 				overlayAttributes: {},
 				structuralOp: op,
+				commentId: null,
+				syncedOpsKey: null,
 			} )
 		).toEqual( [ op ] );
 	} );
@@ -525,6 +529,8 @@ describe( 'operationsForEntry', () => {
 				baselineAttributes: { content: 'a' },
 				overlayAttributes: { content: 'b' },
 				structuralOp: op,
+				commentId: null,
+				syncedOpsKey: null,
 			} )
 		).toEqual( [
 			op,

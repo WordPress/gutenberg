@@ -4,6 +4,7 @@ import {
 	createReduxStore,
 	RegistryProvider,
 } from '@wordpress/data';
+// @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import {
@@ -196,12 +197,12 @@ describe( 'applyOperations', () => {
 describe( 'payloadByteLength', () => {
 	it( 'measures ASCII payload byte length', () => {
 		// {"a":"hello"} is 13 bytes.
-		expect( payloadByteLength( { a: 'hello' } ) ).toBe( 13 );
+		expect( payloadByteLength( { a: 'hello' } as any ) ).toBe( 13 );
 	} );
 
 	it( 'counts multi-byte characters by UTF-8 byte length', () => {
 		// {"a":"€"} = 8 ASCII bytes + 3 bytes for the euro sign = 11.
-		expect( payloadByteLength( { a: '€' } ) ).toBe( 11 );
+		expect( payloadByteLength( { a: '€' } as any ) ).toBe( 11 );
 	} );
 
 	it( 'exposes a numeric size cap', () => {
@@ -355,7 +356,7 @@ describe( 'parseSuggestionPayload', () => {
 				},
 			],
 		} );
-		const result = parseSuggestionPayload( raw );
+		const result = parseSuggestionPayload( raw )!;
 		expect( result ).not.toBeNull();
 		expect( result.schemaVersion ).toBe( 2 );
 		expect( result.operations ).toHaveLength( 1 );
@@ -376,7 +377,7 @@ describe( 'parseSuggestionPayload', () => {
 				},
 			],
 		} );
-		const result = parseSuggestionPayload( raw );
+		const result = parseSuggestionPayload( raw )!;
 		expect( result ).not.toBeNull();
 		expect( result.schemaVersion ).toBe( 2 );
 		expect( result.operations ).toHaveLength( 1 );
@@ -395,7 +396,7 @@ describe( 'parseSuggestionPayload', () => {
 				},
 			],
 		} );
-		const result = parseSuggestionPayload( raw );
+		const result = parseSuggestionPayload( raw )!;
 		expect( result ).not.toBeNull();
 		expect( result.schemaVersion ).toBe( 2 );
 	} );
@@ -490,16 +491,16 @@ describe( 'clearSuggestionMarkerAttributes', () => {
  */
 function createStubInterfaceStore() {
 	return createReduxStore( 'core/interface', {
-		reducer: ( state = { activeArea: null }, action ) =>
+		reducer: ( state: any = { activeArea: null }, action: any ) =>
 			action.type === 'ENABLE_AREA' ? { activeArea: action.area } : state,
 		actions: {
-			enableComplementaryArea: ( scope, area ) => ( {
+			enableComplementaryArea: ( scope: string, area: string ) => ( {
 				type: 'ENABLE_AREA',
 				area,
 			} ),
 		},
 		selectors: {
-			getActiveComplementaryArea: ( state ) => state.activeArea,
+			getActiveComplementaryArea: ( state: any ) => state.activeArea,
 		},
 	} );
 }
@@ -556,7 +557,7 @@ describe( 'rejectSuggestion (block-move)', () => {
 		} );
 	}
 
-	function setup( initialBlocks ) {
+	function setup( initialBlocks: any[] ) {
 		const registry = createRegistry();
 		registry.register( noticesStore );
 		registry.register( blockEditorStore );
@@ -564,7 +565,7 @@ describe( 'rejectSuggestion (block-move)', () => {
 		registry.register( createStubInterfaceStore() );
 		registry.dispatch( blockEditorStore ).resetBlocks( initialBlocks );
 
-		let providerHandle;
+		let providerHandle: ReturnType< typeof useSuggestionsProvider >;
 		function CaptureProvider() {
 			providerHandle = useSuggestionsProvider();
 			return null;
@@ -579,7 +580,7 @@ describe( 'rejectSuggestion (block-move)', () => {
 		return { registry, getProvider: () => providerHandle };
 	}
 
-	function movePayload( structuralOp ) {
+	function movePayload( structuralOp: any ) {
 		return {
 			schemaVersion: 2,
 			blockName: PARAGRAPH,
@@ -709,7 +710,7 @@ describe( 'decision failures leave the block tree untouched', () => {
 		} );
 	}
 
-	function setup( initialBlocks ) {
+	function setup( initialBlocks: any[] ) {
 		const registry = createRegistry();
 		registry.register( noticesStore );
 		registry.register( blockEditorStore );
@@ -717,7 +718,7 @@ describe( 'decision failures leave the block tree untouched', () => {
 		registry.register( createStubInterfaceStore() );
 		registry.dispatch( blockEditorStore ).resetBlocks( initialBlocks );
 
-		let providerHandle;
+		let providerHandle: ReturnType< typeof useSuggestionsProvider >;
 		function CaptureProvider() {
 			providerHandle = useSuggestionsProvider();
 			return null;
@@ -876,7 +877,7 @@ describe( 'createSuggestion (notes sidebar switch)', () => {
 		} );
 	}
 
-	function setup( { activeArea } ) {
+	function setup( { activeArea }: { activeArea?: string | null } ) {
 		const registry = createRegistry();
 		registry.register( noticesStore );
 		registry.register( blockEditorStore );
@@ -893,7 +894,7 @@ describe( 'createSuggestion (notes sidebar switch)', () => {
 		const block = createBlock( PARAGRAPH, { content: 'Hello' } );
 		registry.dispatch( blockEditorStore ).resetBlocks( [ block ] );
 
-		let providerHandle;
+		let providerHandle: ReturnType< typeof useSuggestionsProvider >;
 		function CaptureProvider() {
 			providerHandle = useSuggestionsProvider();
 			return null;
@@ -908,7 +909,7 @@ describe( 'createSuggestion (notes sidebar switch)', () => {
 		return { registry, block, getProvider: () => providerHandle };
 	}
 
-	async function createAttributeSuggestion( getProvider, block ) {
+	async function createAttributeSuggestion( getProvider: any, block: any ) {
 		await act( async () => {
 			await getProvider().createSuggestion( {
 				clientId: block.clientId,

@@ -84,7 +84,7 @@ describe( 'overlayReducer', () => {
 	} );
 
 	it( 'returns the same reference for unknown actions', () => {
-		const next = overlayReducer( INITIAL, { type: 'UNKNOWN' } );
+		const next = overlayReducer( INITIAL, { type: 'UNKNOWN' } as any );
 		expect( next ).toBe( INITIAL );
 	} );
 
@@ -152,11 +152,15 @@ describe( 'overlayReducer', () => {
 				blockName: 'core/paragraph',
 				baselineAttributes: {},
 				overlayAttributes: { content: 'hi' },
+				commentId: null,
+				syncedOpsKey: null,
 			},
 			'orphan-1': {
 				blockName: 'core/paragraph',
 				baselineAttributes: {},
 				overlayAttributes: { content: 'gone' },
+				commentId: null,
+				syncedOpsKey: null,
 			},
 		};
 		const next = overlayReducer( state, {
@@ -218,6 +222,8 @@ describe( 'overlayReducer', () => {
 				blockName: 'core/paragraph',
 				baselineAttributes: {},
 				overlayAttributes: {},
+				commentId: null,
+				syncedOpsKey: null,
 			},
 		};
 		const next = overlayReducer( state, {

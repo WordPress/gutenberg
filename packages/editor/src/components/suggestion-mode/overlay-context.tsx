@@ -28,6 +28,7 @@
  * The orphan prune runs whenever the live block tree shrinks; it skips when
  * the block-editor store isn't registered (tests, standalone consumers).
  */
+import type { ReactNode } from 'react';
 import {
 	createContext,
 	useCallback,
@@ -39,6 +40,7 @@ import {
 } from '@wordpress/element';
 import { useRegistry, useSelect } from '@wordpress/data';
 import { createSuggestionWriteQueue } from './suggestion-write-queue';
+import type { SuggestionWriteQueue } from './suggestion-write-queue';
 
 // Referenced by name to keep the provider runnable in tests and standalone
 // contexts where the block-editor store isn't registered. Orphan cleanup is
@@ -65,31 +67,125 @@ const nextCaptureSeq = () => ++captureSequence;
 const UNDO_ADOPTION_TTL_MS = 1000;
 
 /**
- * @typedef {Object} OverlayEntry
- * @property {string} blockName          The block name at the time the
- *                                       overlay was opened.
- * @property {Object} baselineAttributes The attributes captured when
- *                                       Suggest mode first began editing
- *                                       this block.
- * @property {Object} overlayAttributes  Pending attribute changes that
- *                                       have not yet been committed.
+ * A persisted suggestion operation. Attribute ops are derived from the
+ * baseline-vs-overlay diff; structural ops (block-remove, block-insert-after,
+ * block-move) are pre-built by the store interceptor. The concrete shape
+ * varies per op type, so the contract stays open beyond `type`.
  */
+export interface SuggestionOperation {
+	type: string;
+	[ key: string ]: any;
+}
+
+export interface OverlayEntry {
+	/** The block name at the time the overlay was opened. */
+	blockName: string;
+	/**
+	 * The attributes captured when Suggest mode first began editing this
+	 * block.
+	 */
+	baselineAttributes: Record< string, any >;
+	/** Pending attribute changes that have not yet been committed. */
+	overlayAttributes: Record< string, any >;
+	/** Note comment id the entry is synced to, when one exists. */
+	commentId: number | null;
+	/** Fingerprint of the operations last persisted for this entry. */
+	syncedOpsKey: string | null;
+	/** Capture-order stamp of the most recent attribute edit. */
+	lastEditSeq?: number;
+	/** Pending structural operation, when one was captured. */
+	structuralOp?: SuggestionOperation;
+	/** Capture-order stamp of the structural operation. */
+	structuralOpSeq?: number;
+}
+
+export type OverlayEntries = Record< string, OverlayEntry >;
 
 /**
- * @typedef {Object} OverlayContextValue
- * @property {Object.<string,OverlayEntry>} entries              Per-clientId entries.
- * @property {Function}                     captureBaseline      Store a baseline for a
- *                                                               block if one isn't set.
- * @property {Function}                     setOverlayAttributes Merge overlay attributes
- *                                                               onto an entry.
- * @property {Function}                     clearOverlay         Remove the entry.
- * @property {Function}                     hasOverlay           Check if an entry has any
- *                                                               overlay attributes.
+ * Handler invoked with a format/content suggestion request. Returning
+ * `false` means the handler cannot process the request and the edit must
+ * fall through to the overlay path; anything else counts as accepted.
  */
+type SuggestionRequestHandler = ( request: any ) => unknown;
 
-const EMPTY_ENTRIES = Object.freeze( {} );
+export interface OverlayContextValue {
+	entries: OverlayEntries;
+	captureBaseline: (
+		clientId: string,
+		blockName: string,
+		attributes: Record< string, any >
+	) => void;
+	setOverlayAttributes: (
+		clientId: string,
+		attributes: Record< string, any >
+	) => void;
+	clearOverlay: ( clientId: string ) => void;
+	setCommentId: ( clientId: string, commentId: number | null ) => void;
+	setSyncedOpsKey: ( clientId: string, syncedOpsKey: string | null ) => void;
+	setStructuralOp: (
+		clientId: string,
+		blockName: string,
+		op: SuggestionOperation
+	) => void;
+	hasOverlay: ( clientId: string ) => boolean;
+	requestInterceptorBypass: ( clientId: string ) => void;
+	consumeInterceptorBypass: ( clientId: string ) => boolean;
+	registerFormatHandler: ( handler: SuggestionRequestHandler ) => () => void;
+	requestFormatSuggestion: ( request: any ) => boolean;
+	registerContentHandler: ( handler: SuggestionRequestHandler ) => () => void;
+	requestContentSuggestion: ( request: any ) => boolean;
+	enqueueSuggestionWrite: (
+		clientId: string,
+		task: () => unknown
+	) => Promise< unknown >;
+	markDeferredInsertion: ( clientId: string ) => void;
+	unmarkDeferredInsertion: ( clientId: string ) => void;
+	isDeferredInsertion: ( clientId: string ) => boolean;
+	clearDeferredInsertions: () => void;
+	getLastContentCaptureSeq: () => number;
+	armUndoRedoAdoption: () => void;
+	consumeUndoRedoAdoption: () => boolean;
+}
 
-const OverlayContext = createContext( {
+type OverlayAction =
+	| {
+			type: 'CAPTURE_BASELINE';
+			clientId: string;
+			blockName: string;
+			attributes: Record< string, any >;
+	  }
+	| {
+			type: 'SET_OVERLAY_ATTRIBUTES';
+			clientId: string;
+			attributes: Record< string, any >;
+			seq?: number;
+	  }
+	| { type: 'CLEAR_OVERLAY'; clientId: string }
+	| {
+			type: 'SET_COMMENT_ID';
+			clientId: string;
+			commentId: number | null;
+	  }
+	| {
+			type: 'SET_SYNCED_OPS_KEY';
+			clientId: string;
+			syncedOpsKey: string | null;
+	  }
+	| {
+			type: 'SET_STRUCTURAL_OP';
+			clientId: string;
+			blockName: string;
+			op: SuggestionOperation;
+			seq?: number;
+	  }
+	| {
+			type: 'PRUNE_ORPHANS';
+			liveClientIds: string[] | Set< string >;
+	  };
+
+const EMPTY_ENTRIES: OverlayEntries = Object.freeze( {} );
+
+const OverlayContext = createContext< OverlayContextValue >( {
 	entries: EMPTY_ENTRIES,
 	captureBaseline: () => {},
 	setOverlayAttributes: () => {},
@@ -105,7 +201,7 @@ const OverlayContext = createContext( {
 	registerContentHandler: () => () => {},
 	requestContentSuggestion: () => false,
 	// Standalone default (no provider mounted): run the task immediately.
-	enqueueSuggestionWrite: ( clientId, task ) => task(),
+	enqueueSuggestionWrite: ( _clientId, task ) => Promise.resolve( task() ),
 	markDeferredInsertion: () => {},
 	unmarkDeferredInsertion: () => {},
 	isDeferredInsertion: () => false,
@@ -118,11 +214,14 @@ const OverlayContext = createContext( {
 /**
  * Reducer managing the map of pending block overlays.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Action.
- * @return {Object} Next state.
+ * @param state  Current state.
+ * @param action Action.
+ * @return Next state.
  */
-export function overlayReducer( state, action ) {
+export function overlayReducer(
+	state: OverlayEntries,
+	action: OverlayAction
+): OverlayEntries {
 	switch ( action.type ) {
 		case 'CAPTURE_BASELINE': {
 			if ( state[ action.clientId ] ) {
@@ -225,7 +324,7 @@ export function overlayReducer( state, action ) {
 				: action.liveClientIds;
 			const keys = Object.keys( state );
 			let changed = false;
-			const next = {};
+			const next: OverlayEntries = {};
 			for ( const key of keys ) {
 				if ( liveIds.has( key ) ) {
 					next[ key ] = state[ key ];
@@ -247,14 +346,21 @@ export function overlayReducer( state, action ) {
  * changes per `clientId` so a block can render the user's in-progress
  * suggestion without mutating the real block-editor state.
  *
- * @param {{ children: React.ReactNode }} props
  */
-export function SuggestionOverlayProvider( { children } ) {
+export function SuggestionOverlayProvider( {
+	children,
+}: {
+	children: ReactNode;
+} ) {
 	const [ entries, dispatch ] = useReducer( overlayReducer, EMPTY_ENTRIES );
 	const registry = useRegistry();
 
 	const captureBaseline = useCallback(
-		( clientId, blockName, attributes ) =>
+		(
+			clientId: string,
+			blockName: string,
+			attributes: Record< string, any >
+		) =>
 			dispatch( {
 				type: 'CAPTURE_BASELINE',
 				clientId,
@@ -265,7 +371,7 @@ export function SuggestionOverlayProvider( { children } ) {
 	);
 
 	const setOverlayAttributes = useCallback(
-		( clientId, attributes ) =>
+		( clientId: string, attributes: Record< string, any > ) =>
 			dispatch( {
 				type: 'SET_OVERLAY_ATTRIBUTES',
 				clientId,
@@ -276,18 +382,18 @@ export function SuggestionOverlayProvider( { children } ) {
 	);
 
 	const clearOverlay = useCallback(
-		( clientId ) => dispatch( { type: 'CLEAR_OVERLAY', clientId } ),
+		( clientId: string ) => dispatch( { type: 'CLEAR_OVERLAY', clientId } ),
 		[]
 	);
 
 	const setCommentId = useCallback(
-		( clientId, commentId ) =>
+		( clientId: string, commentId: number | null ) =>
 			dispatch( { type: 'SET_COMMENT_ID', clientId, commentId } ),
 		[]
 	);
 
 	const setSyncedOpsKey = useCallback(
-		( clientId, syncedOpsKey ) =>
+		( clientId: string, syncedOpsKey: string | null ) =>
 			dispatch( { type: 'SET_SYNCED_OPS_KEY', clientId, syncedOpsKey } ),
 		[]
 	);
@@ -307,20 +413,23 @@ export function SuggestionOverlayProvider( { children } ) {
 		[]
 	);
 
-	const setStructuralOp = useCallback( ( clientId, blockName, op ) => {
-		dispatch( {
-			type: 'SET_STRUCTURAL_OP',
-			clientId,
-			blockName,
-			op,
-			seq: nextCaptureSeq(),
-		} );
-	}, [] );
+	const setStructuralOp = useCallback(
+		( clientId: string, blockName: string, op: SuggestionOperation ) => {
+			dispatch( {
+				type: 'SET_STRUCTURAL_OP',
+				clientId,
+				blockName,
+				op,
+				seq: nextCaptureSeq(),
+			} );
+		},
+		[]
+	);
 
 	const hasEntries = Object.keys( entries ).length > 0;
 
 	const hasOverlay = useCallback(
-		( clientId ) => {
+		( clientId: string ) => {
 			const entry = entries[ clientId ];
 			return (
 				!! entry && Object.keys( entry.overlayAttributes ).length > 0
@@ -336,9 +445,9 @@ export function SuggestionOverlayProvider( { children } ) {
 	// A ref-set rather than reducer state because the value is consumed
 	// inside `registry.subscribe` (which doesn't react to React state) and
 	// must clear synchronously when the dispatch is processed.
-	const bypassClientIdsRef = useRef( new Set() );
+	const bypassClientIdsRef = useRef( new Set< string >() );
 
-	const requestInterceptorBypass = useCallback( ( clientId ) => {
+	const requestInterceptorBypass = useCallback( ( clientId: string ) => {
 		if ( clientId ) {
 			bypassClientIdsRef.current.add( clientId );
 			/*
@@ -353,7 +462,7 @@ export function SuggestionOverlayProvider( { children } ) {
 		}
 	}, [] );
 
-	const consumeInterceptorBypass = useCallback( ( clientId ) => {
+	const consumeInterceptorBypass = useCallback( ( clientId: string ) => {
 		const set = bypassClientIdsRef.current;
 		if ( ! set.has( clientId ) ) {
 			return false;
@@ -369,18 +478,21 @@ export function SuggestionOverlayProvider( { children } ) {
 	// heavy `useSuggestionsProvider` out of every block's render is why this is
 	// a singleton rather than a per-block hook. A ref (not state) so
 	// registering doesn't re-render every subscribed block.
-	const formatHandlerRef = useRef( null );
+	const formatHandlerRef = useRef< SuggestionRequestHandler | null >( null );
 
-	const registerFormatHandler = useCallback( ( handler ) => {
-		formatHandlerRef.current = handler;
-		return () => {
-			if ( formatHandlerRef.current === handler ) {
-				formatHandlerRef.current = null;
-			}
-		};
-	}, [] );
+	const registerFormatHandler = useCallback(
+		( handler: SuggestionRequestHandler ) => {
+			formatHandlerRef.current = handler;
+			return () => {
+				if ( formatHandlerRef.current === handler ) {
+					formatHandlerRef.current = null;
+				}
+			};
+		},
+		[]
+	);
 
-	const requestFormatSuggestion = useCallback( ( request ) => {
+	const requestFormatSuggestion = useCallback( ( request: any ) => {
 		const handler = formatHandlerRef.current;
 		if ( ! handler ) {
 			return false;
@@ -400,18 +512,21 @@ export function SuggestionOverlayProvider( { children } ) {
 	// composition, autocorrect, a drag-drop, a multi-line paste). The per-block
 	// HOC runs the cheap diff and hands a ready marker plan here; this single
 	// mounted component owns note creation and the marker write.
-	const contentHandlerRef = useRef( null );
+	const contentHandlerRef = useRef< SuggestionRequestHandler | null >( null );
 
-	const registerContentHandler = useCallback( ( handler ) => {
-		contentHandlerRef.current = handler;
-		return () => {
-			if ( contentHandlerRef.current === handler ) {
-				contentHandlerRef.current = null;
-			}
-		};
-	}, [] );
+	const registerContentHandler = useCallback(
+		( handler: SuggestionRequestHandler ) => {
+			contentHandlerRef.current = handler;
+			return () => {
+				if ( contentHandlerRef.current === handler ) {
+					contentHandlerRef.current = null;
+				}
+			};
+		},
+		[]
+	);
 
-	const requestContentSuggestion = useCallback( ( request ) => {
+	const requestContentSuggestion = useCallback( ( request: any ) => {
 		const handler = contentHandlerRef.current;
 		if ( ! handler ) {
 			return false;
@@ -427,12 +542,13 @@ export function SuggestionOverlayProvider( { children } ) {
 	 * previously let one of each race on the same block). A ref because the
 	 * queue is imperative state consumed outside React's render cycle.
 	 */
-	const writeQueueRef = useRef( null );
+	const writeQueueRef = useRef< SuggestionWriteQueue | null >( null );
 	if ( writeQueueRef.current === null ) {
 		writeQueueRef.current = createSuggestionWriteQueue();
 	}
 	const enqueueSuggestionWrite = useCallback(
-		( clientId, task ) => writeQueueRef.current.enqueue( clientId, task ),
+		( clientId: string, task: () => unknown ) =>
+			writeQueueRef.current!.enqueue( clientId, task ),
 		[]
 	);
 
@@ -447,20 +563,20 @@ export function SuggestionOverlayProvider( { children } ) {
 	// A ref-set for the same reason as the bypass set above: it is written
 	// from inside `registry.subscribe` and read synchronously during event
 	// handling, neither of which can wait on React state.
-	const deferredInsertionsRef = useRef( new Set() );
+	const deferredInsertionsRef = useRef( new Set< string >() );
 
-	const markDeferredInsertion = useCallback( ( clientId ) => {
+	const markDeferredInsertion = useCallback( ( clientId: string ) => {
 		if ( clientId ) {
 			deferredInsertionsRef.current.add( clientId );
 		}
 	}, [] );
 
-	const unmarkDeferredInsertion = useCallback( ( clientId ) => {
+	const unmarkDeferredInsertion = useCallback( ( clientId: string ) => {
 		deferredInsertionsRef.current.delete( clientId );
 	}, [] );
 
 	const isDeferredInsertion = useCallback(
-		( clientId ) => deferredInsertionsRef.current.has( clientId ),
+		( clientId: string ) => deferredInsertionsRef.current.has( clientId ),
 		[]
 	);
 
@@ -482,7 +598,7 @@ export function SuggestionOverlayProvider( { children } ) {
 	 * block-related. A counter-of-expiries rather than a boolean so two quick
 	 * undo presses arm two adoptions.
 	 */
-	const undoAdoptionExpiriesRef = useRef( [] );
+	const undoAdoptionExpiriesRef = useRef< number[] >( [] );
 
 	const armUndoRedoAdoption = useCallback( () => {
 		undoAdoptionExpiriesRef.current.push(
@@ -513,7 +629,7 @@ export function SuggestionOverlayProvider( { children } ) {
 			if ( ! hasEntries ) {
 				return 0;
 			}
-			const blockEditor = select( BLOCK_EDITOR_STORE_NAME );
+			const blockEditor: any = select( BLOCK_EDITOR_STORE_NAME );
 			return blockEditor?.getClientIdsWithDescendants?.().length ?? 0;
 		},
 		[ hasEntries ]
@@ -522,9 +638,8 @@ export function SuggestionOverlayProvider( { children } ) {
 		if ( ! hasEntries ) {
 			return;
 		}
-		const getLive = registry.select(
-			BLOCK_EDITOR_STORE_NAME
-		)?.getClientIdsWithDescendants;
+		const getLive = registry.select( BLOCK_EDITOR_STORE_NAME )
+			?.getClientIdsWithDescendants;
 		if ( ! getLive ) {
 			return;
 		}
@@ -599,8 +714,8 @@ export function SuggestionOverlayProvider( { children } ) {
 /**
  * Hook returning the suggestion overlay API.
  *
- * @return {OverlayContextValue} Overlay API.
+ * @return Overlay API.
  */
-export function useSuggestionOverlay() {
+export function useSuggestionOverlay(): OverlayContextValue {
 	return useContext( OverlayContext );
 }
