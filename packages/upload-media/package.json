@@ -61,6 +61,10 @@
 		"@wordpress/vips": "file:../vips",
 		"uuid": "^14.0.0"
 	},
+	"devDependencies": {
+		"@types/jest": "^30.0.0",
+		"@types/node": "^20.19.39"
+	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",
 		"react": "^18 || ^19",

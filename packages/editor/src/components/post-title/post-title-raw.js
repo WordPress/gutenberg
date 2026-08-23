@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { TextareaControl } from '@wordpress/components';
+import { TextareaControl as WCTextareaControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useSelect } from '@wordpress/data';
@@ -55,7 +55,7 @@ function PostTitleRaw( _, forwardedRef ) {
 		decodeEntities( placeholder ) || __( 'Add title' );
 
 	return (
-		<TextareaControl
+		<WCTextareaControl
 			ref={ focusRef }
 			value={ title }
 			onChange={ onChange }

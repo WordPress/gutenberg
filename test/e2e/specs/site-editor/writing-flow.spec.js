@@ -67,4 +67,88 @@ test.describe( 'Site editor writing flow', () => {
 		);
 		await expect( inspectorBlockTab ).toBeFocused();
 	} );
+
+	test( 'enter selects the next block', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const { id } = await requestUtils.createPage( {
+			status: 'draft',
+			title: 'test',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: id,
+			postType: 'page',
+			canvas: 'edit',
+		} );
+
+		// Render the page within its template so the template blocks
+		// surround the post blocks.
+		await expect(
+			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
+		).toBeVisible();
+		await page.evaluate( () => {
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.setRenderingMode( 'template-locked' );
+		} );
+
+		// select the first block
+		const firstBlock = editor.canvas.locator(
+			'role=document[name="Block: Title"i]'
+		);
+		await editor.selectBlocks( firstBlock );
+
+		await expect( firstBlock ).toBeFocused();
+
+		await page.keyboard.press( 'Enter' );
+		const secondBlock = editor.canvas.locator(
+			'role=document[name="Block: Content"i]'
+		);
+		await expect( secondBlock ).toBeFocused();
+
+		await page.keyboard.press( 'Enter' );
+		const thirdBlock = editor.canvas.getByRole( 'document', {
+			name: 'Empty block',
+		} );
+		await expect( thirdBlock ).toBeFocused();
+
+		// Typing proves the ghost materialised into a real stored block.
+		await page.keyboard.type( 'a' );
+		await expect(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		).toHaveText( 'a' );
+	} );
+
+	test( 'enter in a nested editable inserts a block after', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//header',
+			postType: 'wp_template_part',
+			canvas: 'edit',
+		} );
+
+		// The Site Title's editable element is nested within the block
+		// wrapper, unlike e.g. a paragraph, where they are the same
+		// element.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Site title text' } )
+			.click();
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'a' );
+
+		await expect
+			.poll( () => editor.getBlocks() )
+			.toMatchObject( [
+				{ name: 'core/site-title' },
+				{ name: 'core/paragraph', attributes: { content: 'a' } },
+				{ name: 'core/site-tagline' },
+			] );
+	} );
 } );

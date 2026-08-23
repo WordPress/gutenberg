@@ -1,5 +1,8 @@
 import { __ } from '@wordpress/i18n';
-import { ExternalLink, TextareaControl } from '@wordpress/components';
+import {
+	ExternalLink,
+	TextareaControl as WCTextareaControl,
+} from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -58,7 +61,7 @@ export default function PostExcerpt( {
 
 	return (
 		<div className="editor-post-excerpt">
-			<TextareaControl
+			<WCTextareaControl
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
 				className="editor-post-excerpt__textarea"
