@@ -18,12 +18,14 @@ import type { DashboardGridLayoutItem } from './types';
  * Fill items honor per-item span bounds: the row plan reserves at least
  * the fill's minimum span (wrapping it to the next free run when the
  * current one is too narrow), and the resolved span never exceeds its
- * maximum. Fixed-width items arrive already bounded by the caller.
+ * maximum. A `'full'` item capped below the column count places like a
+ * fixed item of its capped width. Fixed-width items arrive already
+ * bounded by the caller.
  *
  * @param sortedKeys - Item keys in display order.
  * @param layoutMap  - Map of key to DashboardGridLayoutItem.
  * @param maxColumns - Total columns in the grid.
- * @param itemBounds - Optional per-key span bounds for fill items.
+ * @param itemBounds - Optional per-key span bounds for fill and full items.
  * @return Map of fill item keys to their resolved column spans.
  */
 export function resolveFillWidths(
@@ -37,6 +39,7 @@ export function resolveFillWidths(
 
 	// Pre-extract items, clamp widths and heights, detect which path to take.
 	const items = new Array< DashboardGridLayoutItem | undefined >( n );
+	const kinds = new Array< 'fixed' | 'fill' | 'full' | undefined >( n );
 	const widths = new Array< number >( n );
 	const heights = new Array< number >( n );
 	let hasFill = false;
@@ -46,17 +49,31 @@ export function resolveFillWidths(
 	for ( let i = 0; i < n; i++ ) {
 		const item = layoutMap.get( sortedKeys[ i ] );
 		items[ i ] = item;
-		widths[ i ] =
-			item && typeof item.width === 'number'
-				? Math.min( item.width, maxColumns )
-				: 1;
+		if ( ! item ) {
+			continue;
+		}
+		if ( item.width === 'fill' ) {
+			kinds[ i ] = 'fill';
+			widths[ i ] = 1;
+			hasFill = true;
+		} else if ( item.width === 'full' ) {
+			const cap = Math.min(
+				itemBounds?.get( item.key )?.maxWidth ?? maxColumns,
+				maxColumns
+			);
+			kinds[ i ] = cap < maxColumns ? 'fixed' : 'full';
+			widths[ i ] = cap;
+		} else {
+			kinds[ i ] = 'fixed';
+			widths[ i ] =
+				typeof item.width === 'number'
+					? Math.min( item.width, maxColumns )
+					: 1;
+		}
 		// Clamp to a positive integer so `0`, fractional, or negative
 		// values match the `|| 1` defaulting used in GridItem styles.
-		const h = Math.max( 1, Math.floor( item?.height ?? 1 ) );
+		const h = Math.max( 1, Math.floor( item.height ?? 1 ) );
 		heights[ i ] = h;
-		if ( item?.width === 'fill' ) {
-			hasFill = true;
-		}
 		if ( h > 1 ) {
 			hasMultiRow = true;
 		}
@@ -76,12 +93,12 @@ export function resolveFillWidths(
 				continue;
 			}
 
-			if ( item.width === 'full' ) {
+			if ( kinds[ i ] === 'full' ) {
 				currentCol = 0;
 				continue;
 			}
 
-			if ( item.width === 'fill' ) {
+			if ( kinds[ i ] === 'fill' ) {
 				const bounds = itemBounds?.get( item.key );
 				const minW = Math.min( bounds?.minWidth ?? 1, maxColumns );
 				const maxW = bounds?.maxWidth ?? maxColumns;
@@ -91,12 +108,7 @@ export function resolveFillWidths(
 				}
 				let reserved = 0;
 				for ( let j = i + 1; j < n; j++ ) {
-					const next = items[ j ];
-					if (
-						! next ||
-						next.width === 'full' ||
-						next.width === 'fill'
-					) {
+					if ( kinds[ j ] !== 'fixed' ) {
 						break;
 					}
 					const nextW = widths[ j ];
@@ -135,6 +147,30 @@ export function resolveFillWidths(
 	let cursorRow = 0;
 	let cursorCol = 0;
 
+	// First row and column, in row-major order from the cursor, where
+	// `w` consecutive columns are free.
+	const findFreeRun = ( w: number ): [ number, number ] => {
+		let r = cursorRow;
+		let c = cursorCol;
+		place: for ( ; r <= totalRows; r++ ) {
+			c = r === cursorRow ? cursorCol : 0;
+			while ( c + w <= maxColumns ) {
+				let blocked = -1;
+				for ( let k = 0; k < w; k++ ) {
+					if ( rowOccupancy[ c + k ] > r ) {
+						blocked = c + k;
+						break;
+					}
+				}
+				if ( blocked === -1 ) {
+					break place;
+				}
+				c = blocked + 1;
+			}
+		}
+		return [ r, c ];
+	};
+
 	for ( let i = 0; i < n; i++ ) {
 		const item = items[ i ];
 		if ( ! item ) {
@@ -143,7 +179,7 @@ export function resolveFillWidths(
 
 		const h = heights[ i ];
 
-		if ( item.width === 'full' ) {
+		if ( kinds[ i ] === 'full' ) {
 			let r = cursorRow;
 			for ( let c = 0; c < maxColumns; c++ ) {
 				if ( rowOccupancy[ c ] > r ) {
@@ -158,32 +194,11 @@ export function resolveFillWidths(
 			continue;
 		}
 
-		if ( item.width === 'fill' ) {
+		if ( kinds[ i ] === 'fill' ) {
 			const bounds = itemBounds?.get( item.key );
 			const minW = Math.min( bounds?.minWidth ?? 1, maxColumns );
 			const maxW = bounds?.maxWidth ?? maxColumns;
-			// Scan for the first free run wide enough for the fill's
-			// floor, like a fixed item of width `minW`.
-			let r = cursorRow;
-			let c = cursorCol;
-			place: for ( ; r <= totalRows; r++ ) {
-				c = r === cursorRow ? cursorCol : 0;
-				while ( c + minW <= maxColumns ) {
-					let blocked = -1;
-					for ( let k = 0; k < minW; k++ ) {
-						if ( rowOccupancy[ c + k ] > r ) {
-							blocked = c + k;
-							break;
-						}
-					}
-					if ( blocked === -1 ) {
-						break place;
-					}
-					c = blocked + 1;
-				}
-			}
-			const fillStartRow = r;
-			const fillStartCol = c;
+			const [ fillStartRow, fillStartCol ] = findFreeRun( minW );
 			let runLength = minW;
 			while (
 				fillStartCol + runLength < maxColumns &&
@@ -193,12 +208,7 @@ export function resolveFillWidths(
 			}
 			let reserved = 0;
 			for ( let j = i + 1; j < n; j++ ) {
-				const next = items[ j ];
-				if (
-					! next ||
-					next.width === 'full' ||
-					next.width === 'fill'
-				) {
+				if ( kinds[ j ] !== 'fixed' ) {
 					break;
 				}
 				const nextW = widths[ j ];
@@ -222,24 +232,7 @@ export function resolveFillWidths(
 		}
 
 		const w = widths[ i ];
-		let r = cursorRow;
-		let c = cursorCol;
-		place: for ( ; r <= totalRows; r++ ) {
-			c = r === cursorRow ? cursorCol : 0;
-			while ( c + w <= maxColumns ) {
-				let blocked = -1;
-				for ( let k = 0; k < w; k++ ) {
-					if ( rowOccupancy[ c + k ] > r ) {
-						blocked = c + k;
-						break;
-					}
-				}
-				if ( blocked === -1 ) {
-					break place;
-				}
-				c = blocked + 1;
-			}
-		}
+		const [ r, c ] = findFreeRun( w );
 		for ( let k = 0; k < w; k++ ) {
 			rowOccupancy[ c + k ] = r + h;
 		}
