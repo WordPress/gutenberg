@@ -6,6 +6,7 @@ import { COMMON_PROPS, MODIFIER_CLASSNAMES } from './utils/constants';
 import { clampNumberOfMonths } from './utils/misc';
 import { useControlledValue } from './utils/use-controlled-value';
 import { useLocalizationProps } from './utils/use-localization-props';
+import { usePreserveDayFocus } from './utils/use-preserve-day-focus';
 import { RootContext } from './utils/root-context';
 import type {
 	RangeCalendarProps,
@@ -141,6 +142,7 @@ export const RangeCalendar = forwardRef< HTMLDivElement, RangeCalendarProps >(
 			disabled,
 			locale = enUS,
 			timeZone,
+			month,
 			render,
 			labels: customLabels,
 			...props
@@ -181,6 +183,7 @@ export const RangeCalendar = forwardRef< HTMLDivElement, RangeCalendarProps >(
 			value: valueProp,
 			onChange,
 		} );
+		const dayFocusProps = usePreserveDayFocus( ref, month );
 
 		const [ hoveredDate, setHoveredDate ] = useState< Date | undefined >(
 			undefined
@@ -205,8 +208,8 @@ export const RangeCalendar = forwardRef< HTMLDivElement, RangeCalendarProps >(
 		}, [ previewRange ] );
 
 		const rootContextValue = useMemo(
-			() => ( { render, ref } ),
-			[ render, ref ]
+			() => ( { render, ref: dayFocusProps.ref } ),
+			[ render, dayFocusProps.ref ]
 		);
 
 		return (
@@ -217,6 +220,7 @@ export const RangeCalendar = forwardRef< HTMLDivElement, RangeCalendarProps >(
 					{ ...props }
 					role="application"
 					mode="range"
+					month={ month }
 					numberOfMonths={ clampNumberOfMonths( numberOfMonths ) }
 					disabled={ disabled }
 					excludeDisabled={ excludeDisabled }
@@ -225,6 +229,8 @@ export const RangeCalendar = forwardRef< HTMLDivElement, RangeCalendarProps >(
 					labels={ labels }
 					selected={ selected ?? undefined }
 					onSelect={ setSelected }
+					onDayFocus={ dayFocusProps.onDayFocus }
+					onDayBlur={ dayFocusProps.onDayBlur }
 					onDayMouseEnter={ ( date ) => setHoveredDate( date ) }
 					onDayMouseLeave={ () => setHoveredDate( undefined ) }
 					modifiers={ modifiers }

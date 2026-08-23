@@ -7,7 +7,6 @@ import {
 } from '@wordpress/editor';
 import { __, isRTL, sprintf } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
-import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 import { useCallback } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -15,6 +14,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { addQueryArgs } from '@wordpress/url';
+import { store as preferencesStore } from '@wordpress/preferences';
 import WelcomeGuide from '../welcome-guide';
 import CanvasLoader from '../canvas-loader';
 import { unlock } from '../../lock-unlock';
@@ -25,7 +25,7 @@ import SaveButton from '../save-button';
 import SavePanel from '../save-panel';
 import SiteEditorMoreMenu from '../more-menu';
 import useEditorIframeProps from '../block-editor/use-editor-iframe-props';
-import { ViewportSync } from '../block-editor/use-viewport-sync';
+import { getDeviceType } from '../block-editor/viewport';
 import useEditorTitle from './use-editor-title';
 import useRevisionsURLSync from './use-revisions-url-sync';
 import { useIsSiteEditorLoading } from '../layout/hooks';
@@ -38,7 +38,6 @@ import SitePreview from './site-preview';
 
 const { Editor, BackButton } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
-const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
 function getListPathForPostType( postType ) {
 	switch ( postType ) {
@@ -87,6 +86,11 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 	const { postType, postId, context } = entity;
 	const isBlockBasedTheme = useSelect(
 		( select ) => select( coreDataStore ).getCurrentTheme()?.is_block_theme,
+		[]
+	);
+	const showIconLabels = useSelect(
+		( select ) =>
+			select( preferencesStore ).get( 'core', 'showIconLabels' ),
 		[]
 	);
 	const postWithTemplate = !! context?.postId;
@@ -166,7 +170,6 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 		<SitePreview />
 	) : (
 		<>
-			{ isEditMode && <BlockKeyboardShortcuts /> }
 			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
 			{ isEditMode && isReady && (
 				<WelcomeGuide
@@ -186,13 +189,17 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 					customSavePanel={ _isPreviewingTheme && <SavePanel /> }
 					iframeProps={ iframeProps }
 					onActionPerformed={ onActionPerformed }
+					initialViewport={
+						isEditMode
+							? getDeviceType( location.query.viewport )
+							: undefined
+					}
 					extraSidebarPanels={
 						! postWithTemplate && (
 							<PluginTemplateSettingPanel.Slot />
 						)
 					}
 				>
-					{ isEditMode && <ViewportSync /> }
 					{ isEditMode && (
 						<BackButton>
 							{ ( { length } ) =>
@@ -200,7 +207,7 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 									<Button
 										size="compact"
 										label={ __( 'Open Navigation' ) }
-										showTooltip
+										showTooltip={ ! showIconLabels }
 										tooltipPosition="middle right"
 										onClick={ () => {
 											resetZoomLevel();
