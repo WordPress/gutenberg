@@ -37,6 +37,9 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/private-apis": "file:../private-apis"
 	},
+	"devDependencies": {
+		"@types/jest": "^30.0.0"
+	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",
 		"react": "^18 || ^19"
