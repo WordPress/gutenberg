@@ -1074,6 +1074,47 @@ test.describe( 'Suggestion mode', () => {
 		expect( serialized ).toContain( 'data-suggestion-type="add"' );
 	} );
 
+	test( 'paste — a pasted run keeps its bold and its link inside the add marker', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+
+		pageUtils.setClipboardData( {
+			plainText: ' rich bold and a link',
+			html: ' rich <strong>bold</strong> and <a href="https://example.com">a link</a>',
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		// The whole pasted run is one add marker…
+		const marker = paragraph.locator(
+			'mark.wp-suggestion[data-suggestion-type="add"]'
+		);
+		await expect( marker ).toHaveCount( 1 );
+		await expect( marker ).toContainText( 'rich bold and a link' );
+		// …and the formatting the author pasted is inside it, not flattened.
+		await expect( marker.locator( 'strong' ) ).toHaveText( 'bold' );
+		await expect(
+			marker.locator( 'a[href="https://example.com"]' )
+		).toHaveText( 'a link' );
+
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).toContain( '<strong>bold</strong>' );
+		expect( serialized ).toContain( 'href="https://example.com"' );
+	} );
+
 	test( 'an open settings sidebar switches to All notes when a suggestion is created', async ( {
 		editor,
 		page,

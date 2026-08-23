@@ -245,6 +245,31 @@ describe( 'planEditMarkers', () => {
 			],
 		} );
 	} );
+
+	it( 'carries the HTML of an inserted run that has its own formatting', () => {
+		const plan = planEditMarkers(
+			rtd( 'Hello' ),
+			rtd( 'Hello <strong>bold</strong>!' )
+		);
+		expect( plan.actions ).toHaveLength( 1 );
+		expect( plan.actions[ 0 ].text ).toBe( ' bold!' );
+		expect( plan.actions[ 0 ].html ).toBe( ' <strong>bold</strong>!' );
+	} );
+
+	it( 'omits the HTML when the inserted run is plain text', () => {
+		const plan = planEditMarkers( rtd( 'Hello' ), rtd( 'Hello world' ) );
+		expect( plan.actions[ 0 ] ).not.toHaveProperty( 'html' );
+	} );
+
+	it( 'omits the HTML when the inserted run already carries a marker', () => {
+		// Pasting content that already holds a marker must not nest one
+		// marker inside another.
+		const plan = planEditMarkers(
+			rtd( 'Hello' ),
+			rtd( 'Hello ' + add( 3, 'pasted', 2 ) )
+		);
+		expect( plan.actions[ 0 ] ).not.toHaveProperty( 'html' );
+	} );
 } );
 
 describe( 'applyEditPlan', () => {
@@ -340,5 +365,36 @@ describe( 'applyEditPlan', () => {
 		} );
 		expect( findSuggestionText( result, 30 ) ).toBe( 'world' );
 		expect( findSuggestionText( result, 31 ) ).toBe( 'there' );
+	} );
+
+	it( 'keeps the formatting of a rich inserted run', () => {
+		const prev = rtd( 'Hello' );
+		const next = rtd(
+			'Hello <strong>bold</strong> and <a href="https://example.com">a link</a>'
+		);
+		const { actions } = planEditMarkers( prev, next );
+		const result = applyEditPlan( prev, actions, {
+			authorId: 2,
+			ids: [ 40 ],
+		} );
+		const html = result.toHTMLString();
+		expect( findSuggestionText( result, 40 ) ).toBe( ' bold and a link' );
+		expect( html ).toContain( '<strong>bold</strong>' );
+		expect( html ).toContain( '<a href="https://example.com">' );
+	} );
+
+	it( 'keeps the formatting of a rich run pasted over a selection', () => {
+		const prev = rtd( 'Hello world' );
+		const next = rtd( 'Hello <a href="https://example.com">there</a>' );
+		const { actions } = planEditMarkers( prev, next );
+		const result = applyEditPlan( prev, actions, {
+			authorId: 2,
+			ids: [ 50, 51 ],
+		} );
+		expect( findSuggestionText( result, 50 ) ).toBe( 'world' );
+		expect( findSuggestionText( result, 51 ) ).toBe( 'there' );
+		expect( result.toHTMLString() ).toContain(
+			'<a href="https://example.com">'
+		);
 	} );
 } );
