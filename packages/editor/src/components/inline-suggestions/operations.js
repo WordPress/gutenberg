@@ -110,13 +110,15 @@ function suggestionFormatAt( formats, index ) {
  * Conservative elsewhere too. The marker has to be an `add` marker (typing
  * inside someone's proposed deletion is a different, unsettled gesture),
  * authored by the person making this edit, and unfragmented — a marker whose id
- * also appears elsewhere in the value cannot be re-stamped as one range.
+ * also appears elsewhere in the value cannot be re-stamped as one range. An
+ * editor whose own id is unknown counts as unauthored, matching only a marker
+ * that carries no author either.
  *
  * @param {Array}   formats       Per-character format stacks (from `create()`).
  * @param {number}  offset        Caret offset.
  * @param {?string} [authorToken] Id of the author making the edit, as a
- *                                string; `null`/omitted skips the author
- *                                check.
+ *                                string; `null`/omitted matches only a marker
+ *                                with no author.
  * @return {?{id: string, start: number, end: number}} The marker's range, or null.
  */
 export function formatsAdditionRunToExtend( formats, offset, authorToken ) {
@@ -137,13 +139,16 @@ export function formatsAdditionRunToExtend( formats, offset, authorToken ) {
 	if ( rawId === undefined || rawId === null || rawId === '' ) {
 		return null;
 	}
-	// Extending re-attributes nothing: the marker and its note stay the
-	// original author's, so only that author may grow it.
+	/*
+	 * Extending re-attributes nothing: the marker and its note stay the
+	 * original author's, so only that author may grow it. An unknown editor
+	 * therefore matches an unauthored marker only — growing someone else's
+	 * would re-stamp their span with no `data-author` and fold this text into
+	 * their note.
+	 */
 	if (
-		authorToken !== null &&
-		authorToken !== undefined &&
 		String( attributes[ SUGGESTION_AUTHOR_ATTRIBUTE ] ?? '' ) !==
-			authorToken
+		( authorToken ?? '' )
 	) {
 		return null;
 	}

@@ -539,13 +539,19 @@ describe( 'formatsAdditionRunToExtend / valueAdditionRunToExtend', () => {
 		expect( formatsAdditionRunToExtend( undefined, 4, '2' ) ).toBeNull();
 	} );
 
-	it( 'skips the author check when no author is supplied', () => {
+	it( 'matches an unauthored marker when the editor author is unknown', () => {
 		const value = RichTextData.fromHTMLString( add( 41, 'ADDED' ) );
 		expect( valueAdditionRunToExtend( value, 3, null ) ).toEqual( {
 			id: '41',
 			start: 0,
 			end: 5,
 		} );
+	} );
+
+	it( 'does not match an authored marker when the editor author is unknown', () => {
+		const value = RichTextData.fromHTMLString( mine( 41, 'ADDED' ) );
+		expect( valueAdditionRunToExtend( value, 3, null ) ).toBeNull();
+		expect( valueAdditionRunToExtend( value, 3, undefined ) ).toBeNull();
 	} );
 } );
 
