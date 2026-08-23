@@ -1325,4 +1325,126 @@ test.describe( 'Suggestion mode review flows', () => {
 			.poll( () => suggestionStatuses( page ) )
 			.toEqual( [ 'rejected', 'rejected' ] );
 	} );
+
+	// --- Sidebar summaries carry enough context to review (F-27) ------------
+
+	test( 'summary — a whitespace-only addition is described, not quoted into invisibility', async ( {
+		editor,
+		page,
+	} ) => {
+		// HTML collapses a quoted run of spaces, so one typed space and three
+		// typed spaces both rendered as `Add: " "` and a reviewer could not
+		// tell them apart without opening the canvas.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Spacing test' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		const suggestionSaved = suggestionSavedPromise( page );
+		await page.keyboard.type( '   ' );
+
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="add"]'
+			)
+		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		await suggestionSaved;
+
+		const sidebar = await openNotesSidebar( page );
+		const summary = sidebar.locator(
+			'.editor-collab-sidebar-panel__suggestion-summary'
+		);
+		await expect( summary ).toContainText( 'Add:' );
+		await expect( summary ).toContainText( '3 spaces' );
+	} );
+
+	test( 'summary — a link suggestion records the URL it proposes', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// "Formatting: link" says a link changed but not which one, and the
+		// URL is the entire substance of a link suggestion.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		const suggestionSaved = suggestionSavedPromise( page );
+		await pageUtils.pressKeys( 'primary+k' );
+		await page
+			.getByRole( 'combobox', { name: 'Search or type URL' } )
+			.fill( 'https://example.com/handbook' );
+		await page.keyboard.press( 'Enter' );
+
+		await expect(
+			paragraph.locator(
+				'mark.wp-suggestion[data-suggestion-type="format"]'
+			)
+		).toContainText( 'world' );
+		await suggestionSaved;
+
+		const sidebar = await openNotesSidebar( page );
+		const summary = sidebar.locator(
+			'.editor-collab-sidebar-panel__suggestion-summary'
+		);
+		await expect( summary ).toContainText( 'Add formatting:' );
+		await expect( summary ).toContainText( 'https://example.com/handbook' );
+	} );
+
+	test( 'summary — a structural change inside a container names the container', async ( {
+		editor,
+		page,
+	} ) => {
+		// "Remove block: paragraph" reads identically whether the paragraph
+		// sat at the top level or inside a Group, so nesting was invisible
+		// from the sidebar.
+		await editor.insertBlock( {
+			name: 'core/group',
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Inner keeper' },
+				},
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Inner goner' },
+				},
+			],
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const doomed = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Inner goner' } );
+		await editor.selectBlocks( doomed );
+		const suggestionSaved = suggestionSavedPromise( page );
+		await editor.clickBlockOptionsMenuItem( 'Delete' );
+
+		await expect( doomed ).toHaveClass( /is-suggestion-pending-remove/ );
+		await suggestionSaved;
+
+		const sidebar = await openNotesSidebar( page );
+		const summary = sidebar.locator(
+			'.editor-collab-sidebar-panel__suggestion-summary'
+		);
+		await expect( summary ).toContainText( 'Remove block:' );
+		await expect( summary ).toContainText( 'paragraph in group' );
+	} );
 } );

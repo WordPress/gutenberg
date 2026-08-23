@@ -32,7 +32,9 @@ describe( 'summarizeOperations', () => {
 		] );
 	} );
 
-	it( 'reports both Add: and Delete: lines for a mixed content edit', () => {
+	it( 'reports a mixed content edit as one Replace: line', () => {
+		// The removed and inserted halves of one edit are one change. Two
+		// lines read as an unrelated delete plus add (F-27).
 		const lines = summarizeOperations( [
 			{
 				type: 'attribute-set',
@@ -41,12 +43,30 @@ describe( 'summarizeOperations', () => {
 				after: 'The slow fox leaps',
 			},
 		] );
-		expect( lines ).toEqual(
-			expect.arrayContaining( [
-				{ label: 'Add:', value: expect.stringContaining( 'slow' ) },
-				{ label: 'Delete:', value: expect.stringContaining( 'quick' ) },
-			] )
-		);
+		expect( lines ).toHaveLength( 1 );
+		expect( lines[ 0 ].label ).toBe( 'Replace:' );
+		expect( lines[ 0 ].value ).toMatch( /quick.*→.*slow/ );
+	} );
+
+	it( 'describes a block merge as a replacement rather than a re-add', () => {
+		// Backspace at the start of a paragraph merges it into the heading
+		// above, which the whole-content diff sees as the word "heading"
+		// growing. Reported as two lines it read as "Delete: heading" plus
+		// "Add: headingSphinx of black quartz…" — an append described as a
+		// rewrite (F-27, flow ID-10).
+		const lines = summarizeOperations( [
+			{
+				type: 'attribute-set',
+				attribute: 'content',
+				before: 'heading',
+				after: 'headingSphinx of black quartz',
+			},
+		] );
+		expect( lines ).toHaveLength( 1 );
+		expect( lines[ 0 ] ).toEqual( {
+			label: 'Replace:',
+			value: '“heading” → “headingSphinx of black quartz”',
+		} );
 	} );
 
 	it( 'collapses non-content attribute changes into a Change: line', () => {
@@ -222,12 +242,14 @@ describe( 'summarizeOperations', () => {
 				after: 'alpha one two three four',
 			},
 		] );
-		expect( lines ).toEqual(
-			expect.arrayContaining( [
-				{ label: 'Add:', value: '“one two three four”' },
-				{ label: 'Delete:', value: '“beta gamma delta epsilon”' },
-			] )
-		);
+		// Both halves of the edit are one change, so they share a `Replace:`
+		// line - the point here is that neither half is glued together.
+		expect( lines ).toEqual( [
+			{
+				label: 'Replace:',
+				value: '“beta gamma delta epsilon” → “one two three four”',
+			},
+		] );
 	} );
 
 	it( 'does not leak markup into a quoted Add: line', () => {
@@ -385,12 +407,13 @@ describe( 'summarizeOperations', () => {
 		expect( lines ).toEqual( [ { label: 'Change:', value: 'text' } ] );
 	} );
 
-	it( 'quotes a whitespace-only inline-suggestion add verbatim', () => {
+	it( 'still surfaces a whitespace-only inline-suggestion add', () => {
 		// Regression: typing only whitespace in Suggest mode resolves to a
 		// marker whose text is all spaces. The summary used to require
 		// `text.trim()` to be truthy and then collapse whitespace, so the line
-		// fell back to the generic attribute line instead of showing the
-		// added spaces.
+		// fell back to the generic attribute line instead of reporting the
+		// added spaces. It is now described rather than quoted — see the
+		// whitespace-by-count test below.
 		const lines = summarizeOperations( [
 			{
 				type: 'inline-suggestion',
@@ -399,7 +422,8 @@ describe( 'summarizeOperations', () => {
 				text: '   ',
 			},
 		] );
-		expect( lines ).toEqual( [ { label: 'Add:', value: '“   ”' } ] );
+		expect( lines[ 0 ].label ).toBe( 'Add:' );
+		expect( lines[ 0 ].value ).not.toBe( '' );
 	} );
 
 	it( 'falls back to a format line for an inline-suggestion with no resolved text', () => {
@@ -569,6 +593,134 @@ describe( 'summarizeOperations', () => {
 		] );
 		expect( lines ).toEqual( [
 			{ label: 'Insert block:', value: 'paragraph' },
+		] );
+	} );
+
+	it( 'describes a whitespace-only addition by kind and count', () => {
+		// HTML collapses a quoted run of spaces, so one typed space and three
+		// rendered as the identical `Add: " "` (F-27, flow IA-09).
+		expect(
+			summarizeOperations( [
+				{
+					type: 'inline-suggestion',
+					attribute: 'content',
+					suggestionType: 'add',
+					text: '   ',
+				},
+			] )
+		).toEqual( [ { label: 'Add:', value: '3 spaces' } ] );
+		expect(
+			summarizeOperations( [
+				{
+					type: 'inline-suggestion',
+					attribute: 'content',
+					suggestionType: 'add',
+					text: ' ',
+				},
+			] )
+		).toEqual( [ { label: 'Add:', value: '1 space' } ] );
+	} );
+
+	it( 'describes a whitespace-only deletion by kind and count', () => {
+		expect(
+			summarizeOperations( [
+				{
+					type: 'inline-suggestion',
+					attribute: 'content',
+					suggestionType: 'del',
+					text: '\n\n',
+				},
+			] )
+		).toEqual( [ { label: 'Delete:', value: '2 line breaks' } ] );
+		expect(
+			summarizeOperations( [
+				{
+					type: 'inline-suggestion',
+					attribute: 'content',
+					suggestionType: 'del',
+					text: '\t',
+				},
+			] )
+		).toEqual( [ { label: 'Delete:', value: '1 tab' } ] );
+	} );
+
+	it( 'still quotes text that merely contains whitespace', () => {
+		expect(
+			summarizeOperations( [
+				{
+					type: 'inline-suggestion',
+					attribute: 'content',
+					suggestionType: 'add',
+					text: ' two words ',
+				},
+			] )
+		).toEqual( [ { label: 'Add:', value: '“ two words ”' } ] );
+	} );
+
+	it( 'reports the URL a proposed link points at', () => {
+		// "Formatting: link" alone says a link changed but not which one —
+		// the URL is the whole substance of a link suggestion (F-27, FS-03).
+		const lines = summarizeOperations( [
+			{
+				type: 'inline-suggestion',
+				attribute: 'content',
+				suggestionType: 'format',
+				beforeHTML: 'example',
+				afterHTML: '<a href="https://example.com/docs">example</a>',
+			},
+		] );
+		expect( lines ).toEqual( [
+			{ label: 'Add formatting:', value: 'link' },
+			{ label: 'Link:', value: 'https://example.com/docs' },
+		] );
+	} );
+
+	it( 'decodes entities in a link URL and reports a removed link too', () => {
+		const lines = summarizeOperations( [
+			{
+				type: 'attribute-set',
+				attribute: 'content',
+				before: '<a href="https://example.com/?a=1&amp;b=2">x</a>',
+				after: 'x',
+			},
+		] );
+		expect( lines ).toEqual( [
+			{ label: 'Remove formatting:', value: 'link' },
+			{ label: 'Link:', value: 'https://example.com/?a=1&b=2' },
+		] );
+	} );
+
+	it( 'names the containing block on an insertion inside a container', () => {
+		// A paragraph inserted inside a Group was summarized identically to
+		// one inserted at the top level (F-27, flow ST-14).
+		expect(
+			summarizeOperations( [
+				{
+					type: 'block-insert-after',
+					clientId: 'abc',
+					blockName: 'core/paragraph',
+					anchorClientId: null,
+					parentClientId: 'group-1',
+					parentBlockName: 'core/group',
+				},
+			] )
+		).toEqual( [
+			{ label: 'Insert block:', value: 'paragraph in group' },
+		] );
+	} );
+
+	it( 'names the containing block on a removal inside a container', () => {
+		expect(
+			summarizeOperations( [
+				{
+					type: 'block-remove',
+					clientId: 'abc',
+					blockName: 'core/paragraph',
+					parentBlockName: 'core/columns',
+				},
+			] )
+		).toEqual( [
+			{ label: 'Remove block:', value: 'paragraph in columns' },
 		] );
 	} );
 

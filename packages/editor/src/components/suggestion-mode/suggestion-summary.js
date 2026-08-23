@@ -11,6 +11,10 @@
  *                        `SUMMARY_MAX_CHARS` with an ellipsis.
  *   - **Delete: …**    — text removed by the suggestion, again derived from
  *                        the word diff.
+ *   - **Replace: …**   — a text edit that both removes and inserts. The two
+ *                        halves are one change, so they are reported on one
+ *                        line ("old" → "new") rather than as an unrelated
+ *                        delete plus add.
  *   - **Change: …**    — non-text attribute changes. Uses
  *                        `ATTRIBUTE_LABELS` to surface friendly names
  *                        (e.g. `level` → "heading level") and humanizes any
@@ -26,6 +30,14 @@
  *                        edits don't list the same format twice. The two
  *                        directions are opposite proposals, so they get
  *                        opposite labels.
+ *   - **Link: …**      — the URL a link format points at, so a formatting
+ *                        line about a link says *which* link is proposed.
+ *
+ * The sidebar is the only surface a reviewer has for a suggestion they don't
+ * want to hunt for in the canvas, so a line that renders as an empty or
+ * ambiguous quote is a review failure: whitespace-only edits are described by
+ * kind and count ("3 spaces") rather than quoted into invisibility, and
+ * structural lines name the parent block when there is one.
  *
  * "Change:" and the two "… formatting:" labels name different families of
  * suggestion, so they have to be readable as different things in a mixed list.
@@ -37,11 +49,12 @@
  * runs that were not adjacent in the text are joined with an ellipsis rather
  * than run together into a phrase nobody typed.
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { __experimentalText as WCText } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { useMemo } from '@wordpress/element';
 import { __unstableStripHTML as wpStripHTML } from '@wordpress/dom';
+import { decodeEntities } from '@wordpress/html-entities';
 import { wordDiff, MAX_DIFF_LENGTH } from './word-diff';
 
 /**
@@ -49,6 +62,12 @@ import { wordDiff, MAX_DIFF_LENGTH } from './word-diff';
  * or deletions are ellipsized so the comment thread stays readable.
  */
 const SUMMARY_MAX_CHARS = 120;
+
+/**
+ * Cap per side of a `Replace:` line, which carries both halves of the edit on
+ * one line and would otherwise be twice as long as any other summary line.
+ */
+const REPLACE_SIDE_MAX_CHARS = 60;
 
 /**
  * Friendlier labels for common block attributes so `Change:` lines read like
@@ -126,6 +145,65 @@ function friendlyBlockName( blockName ) {
 		return blockName;
 	}
 	return blockName.slice( slashIdx + 1 ) || blockName;
+}
+
+/**
+ * Label for a structural operation's block, qualified by its container when
+ * the block sits inside another one. "Insert block: paragraph" is the same
+ * sentence whether the paragraph landed at the top level or three levels deep
+ * inside a Group, which is exactly the context a reviewer needs and cannot get
+ * from the sidebar.
+ *
+ * @param {string|undefined} blockName       Block name from the suggestion op.
+ * @param {string|undefined} parentBlockName Containing block's name, if any.
+ * @return {string} Display label.
+ */
+function structuralBlockLabel( blockName, parentBlockName ) {
+	const name = friendlyBlockName( blockName );
+	if ( ! parentBlockName || typeof parentBlockName !== 'string' ) {
+		return name;
+	}
+	return sprintf(
+		/* translators: 1: block name, e.g. "paragraph". 2: containing block name, e.g. "group". */
+		__( '%1$s in %2$s' ),
+		name,
+		friendlyBlockName( parentBlockName )
+	);
+}
+
+/**
+ * Describe a run of whitespace in words instead of quoting it.
+ *
+ * A quoted whitespace run is invisible in the sidebar - HTML collapses it, so
+ * one typed space and three typed spaces render as the identical `Add: " "`.
+ * Returns null for anything that has visible characters, so the caller falls
+ * back to quoting the text.
+ *
+ * @param {string} text Candidate text.
+ * @return {?string} Human description, or null when the text isn't whitespace.
+ */
+function describeWhitespace( text ) {
+	if ( typeof text !== 'string' || text === '' || /\S/.test( text ) ) {
+		return null;
+	}
+	const count = Array.from( text ).length;
+	if ( /^[\n\r]+$/.test( text ) ) {
+		/* translators: %d: number of line breaks. */
+		return sprintf( _n( '%d line break', '%d line breaks', count ), count );
+	}
+	if ( /^\t+$/.test( text ) ) {
+		/* translators: %d: number of tab characters. */
+		return sprintf( _n( '%d tab', '%d tabs', count ), count );
+	}
+	if ( /^[ \u00a0]+$/.test( text ) ) {
+		/* translators: %d: number of space characters. */
+		return sprintf( _n( '%d space', '%d spaces', count ), count );
+	}
+	return sprintf(
+		/* translators: %d: number of whitespace characters. */
+		_n( '%d whitespace character', '%d whitespace characters', count ),
+		count
+	);
 }
 
 /**
@@ -253,6 +331,52 @@ function diffInlineFormats( before, after ) {
 	return { added: Array.from( added ), removed: Array.from( removed ) };
 }
 
+const ANCHOR_HREF_REGEX =
+	/<\s*a\b[^>]*?\shref\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/gi;
+
+/**
+ * Collect the `href` targets of the anchors in an HTML string, entity-decoded
+ * so a URL with a query string reads as the author typed it rather than as
+ * `?a=1&amp;b=2`.
+ *
+ * A "Formatting: link" line says a link changed but not which one, which is
+ * the whole substance of a link suggestion. The URL only exists on one side of
+ * the edit, so callers pass the side that has it.
+ *
+ * @param {string} html Possibly-HTML content.
+ * @return {string[]} Ordered, deduplicated link targets.
+ */
+function linkTargets( html ) {
+	if ( typeof html !== 'string' || html === '' ) {
+		return [];
+	}
+	const urls = new Set();
+	let match;
+	ANCHOR_HREF_REGEX.lastIndex = 0;
+	while ( ( match = ANCHOR_HREF_REGEX.exec( html ) ) !== null ) {
+		const raw = match[ 1 ] ?? match[ 2 ] ?? match[ 3 ] ?? '';
+		const url = decodeEntities( raw ).trim();
+		if ( url ) {
+			urls.add( url );
+		}
+	}
+	return Array.from( urls );
+}
+
+/**
+ * Push the link targets of a format change onto an accumulator. The URL lives
+ * on whichever side of the edit has the anchor, so an added link reports the
+ * URL being proposed and a removed one reports the URL being dropped.
+ *
+ * @param {string[]} accumulator Collected URLs, mutated in place.
+ * @param {string}   before      HTML before the edit.
+ * @param {string}   after       HTML after the edit.
+ */
+function collectLinkTargets( accumulator, before, after ) {
+	const urls = linkTargets( after );
+	accumulator.push( ...( urls.length > 0 ? urls : linkTargets( before ) ) );
+}
+
 /**
  * Join an array of label strings with a comma, using `__()`-friendly
  * punctuation. Deduplicated and lowercased for display.
@@ -280,12 +404,12 @@ function joinAttributeLabels( labels ) {
 	return Array.from( new Set( labels.filter( Boolean ) ) ).join( ', ' );
 }
 
-function ellipsize( text ) {
+function ellipsize( text, max = SUMMARY_MAX_CHARS ) {
 	const trimmed = text.replace( /\s+/g, ' ' ).trim();
-	if ( trimmed.length <= SUMMARY_MAX_CHARS ) {
+	if ( trimmed.length <= max ) {
 		return trimmed;
 	}
-	return `${ trimmed.slice( 0, SUMMARY_MAX_CHARS - 1 ).trimEnd() }…`;
+	return `${ trimmed.slice( 0, max - 1 ).trimEnd() }…`;
 }
 
 /**
@@ -391,6 +515,18 @@ function textDelta( before, after ) {
 	};
 }
 
+/**
+ * Render a piece of proposed text as a summary value: a curly-quoted run for
+ * anything with visible characters, a spelled-out description for a run that
+ * is nothing but whitespace.
+ *
+ * @param {string} text Text to present.
+ * @return {string} Summary value.
+ */
+function presentText( text ) {
+	return describeWhitespace( text ) ?? `“${ text }”`;
+}
+
 function isTextLike( value ) {
 	return typeof value === 'string';
 }
@@ -413,26 +549,27 @@ export function summarizeOperations( operations ) {
 	const attributeLabels = [];
 	const addedFormats = [];
 	const removedFormats = [];
+	const linkUrls = [];
 
 	for ( const op of operations ) {
 		if ( op.type === 'block-remove' ) {
 			lines.push( {
 				label: __( 'Remove block:' ),
-				value: friendlyBlockName( op.blockName ),
+				value: structuralBlockLabel( op.blockName, op.parentBlockName ),
 			} );
 			continue;
 		}
 		if ( op.type === 'block-insert-after' ) {
 			lines.push( {
 				label: __( 'Insert block:' ),
-				value: friendlyBlockName( op.blockName ),
+				value: structuralBlockLabel( op.blockName, op.parentBlockName ),
 			} );
 			continue;
 		}
 		if ( op.type === 'block-move' ) {
 			lines.push( {
 				label: __( 'Move block:' ),
-				value: friendlyBlockName( op.blockName ),
+				value: structuralBlockLabel( op.blockName, op.parentBlockName ),
 			} );
 			continue;
 		}
@@ -454,6 +591,11 @@ export function summarizeOperations( operations ) {
 				if ( added.length > 0 || removed.length > 0 ) {
 					addedFormats.push( ...added );
 					removedFormats.push( ...removed );
+					collectLinkTargets(
+						linkUrls,
+						op.beforeHTML ?? '',
+						op.afterHTML ?? ''
+					);
 				} else {
 					attributeLabels.push( op.attribute );
 				}
@@ -474,7 +616,7 @@ export function summarizeOperations( operations ) {
 					op.suggestionType === 'del'
 						? __( 'Delete:' )
 						: __( 'Add:' ),
-				value: `“${ text }”`,
+				value: presentText( text ),
 			} );
 			continue;
 		}
@@ -553,6 +695,7 @@ export function summarizeOperations( operations ) {
 			if ( added.length > 0 || removed.length > 0 ) {
 				addedFormats.push( ...added );
 				removedFormats.push( ...removed );
+				collectLinkTargets( linkUrls, before, after );
 			} else {
 				attributeLabels.push( op.attribute );
 			}
@@ -560,16 +703,33 @@ export function summarizeOperations( operations ) {
 		}
 
 		const { inserted, deleted } = textDelta( beforeText, afterText );
-		if ( inserted ) {
-			lines.push( { label: __( 'Add:' ), value: `“${ inserted }”` } );
-		}
-		if ( deleted ) {
+		/*
+		 * An edit that both removes and inserts is one change, not two. Two
+		 * lines read as an unrelated delete plus re-add — a paragraph merged
+		 * into a heading reported "Delete: heading" next to "Add: headingSphinx
+		 * of black quartz…", which describes an append as a rewrite.
+		 */
+		if ( inserted && deleted ) {
+			lines.push( {
+				label: __( 'Replace:' ),
+				value: sprintf(
+					/* translators: 1: text being replaced. 2: proposed replacement text. */
+					__( '%1$s → %2$s' ),
+					presentText( ellipsize( deleted, REPLACE_SIDE_MAX_CHARS ) ),
+					presentText( ellipsize( inserted, REPLACE_SIDE_MAX_CHARS ) )
+				),
+			} );
+		} else if ( inserted ) {
+			lines.push( {
+				label: __( 'Add:' ),
+				value: presentText( inserted ),
+			} );
+		} else if ( deleted ) {
 			lines.push( {
 				label: __( 'Delete:' ),
-				value: `“${ deleted }”`,
+				value: presentText( deleted ),
 			} );
-		}
-		if ( ! inserted && ! deleted ) {
+		} else {
 			attributeLabels.push( op.attribute );
 		}
 	}
@@ -590,6 +750,13 @@ export function summarizeOperations( operations ) {
 		lines.push( {
 			label: __( 'Remove formatting:' ),
 			value: joinLabels( removedFormats ),
+		} );
+	}
+
+	if ( linkUrls.length > 0 ) {
+		lines.push( {
+			label: __( 'Link:' ),
+			value: Array.from( new Set( linkUrls ) ).join( ', ' ),
 		} );
 	}
 

@@ -1206,6 +1206,17 @@ export default function SuggestionStoreInterceptor() {
 						blockName: block.name,
 						anchorClientId,
 						parentClientId,
+						/*
+						 * The sidebar summary is the only surface some
+						 * reviewers use, and "Insert block: paragraph" reads
+						 * identically whether the paragraph landed at the top
+						 * level or inside a Group. Record the container's name
+						 * so the summary can say where.
+						 */
+						parentBlockName: parentClientId
+							? blockEditor.getBlockName?.( parentClientId ) ??
+							  null
+							: null,
 						block,
 					};
 					setStructuralOpRef.current?.(
@@ -1609,10 +1620,18 @@ export default function SuggestionStoreInterceptor() {
 					} finally {
 						isDispatchingOwnWrite = false;
 					}
+					// Same reason as the insertion branch: name the container
+					// so "Remove block: paragraph" says which paragraph.
+					const removedParentClientId =
+						tree.parentByClientId.get( clientId ) ?? null;
 					setStructuralOpRef.current?.( clientId, block?.name ?? '', {
 						type: 'block-remove',
 						clientId,
 						blockName: block?.name ?? '',
+						parentBlockName: removedParentClientId
+							? tree.blocksByClientId.get( removedParentClientId )
+									?.name ?? null
+							: null,
 						...( groupId ? { groupId } : {} ),
 						block,
 					} );

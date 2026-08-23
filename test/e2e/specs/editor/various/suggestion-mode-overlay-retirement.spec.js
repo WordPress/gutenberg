@@ -405,16 +405,22 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 		// The replacement is expressed as markers on the ORIGINAL text: the
 		// replaced run is kept and struck through (del), the replacement is
 		// inserted alongside it (add). The raw content was not overwritten.
-		await expect(
-			paragraph.locator(
-				`${ SUGGESTION_MARK }[data-suggestion-type="del"]`
-			)
-		).toBeVisible();
-		await expect(
-			paragraph.locator(
-				`${ SUGGESTION_MARK }[data-suggestion-type="add"]`
-			)
-		).toBeVisible();
+		const delMarker = paragraph.locator(
+			`${ SUGGESTION_MARK }[data-suggestion-type="del"]`
+		);
+		const addMarker = paragraph.locator(
+			`${ SUGGESTION_MARK }[data-suggestion-type="add"]`
+		);
+		await expect( delMarker ).toBeVisible();
+		await expect( addMarker ).toBeVisible();
+		/*
+		 * Both markers cover whole words. Trimming the shared prefix and
+		 * suffix locates the edit but describes it as delete "eh" plus add
+		 * "he", which renders as "tehhe" in the canvas and quotes word
+		 * fragments in the sidebar (F-27).
+		 */
+		await expect( delMarker ).toHaveText( 'teh' );
+		await expect( addMarker ).toHaveText( 'the' );
 		// Nothing was lost: the original run is still present in the block.
 		await expect( paragraph ).toContainText( 'Start' );
 

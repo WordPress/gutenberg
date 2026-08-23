@@ -8,6 +8,7 @@ import {
 	analyzeTextEdit,
 	planEditMarkers,
 	applyEditPlan,
+	widenReplaceToWords,
 } from '../reconcile-edit';
 import {
 	registerSuggestionFormat,
@@ -270,6 +271,79 @@ describe( 'planEditMarkers', () => {
 		);
 		expect( plan.actions[ 0 ] ).not.toHaveProperty( 'html' );
 	} );
+
+	it( 'widens a mid-word correction to the whole word', () => {
+		// "teh" -> "the" shares a leading "t" and a trailing "e", so the raw
+		// prefix/suffix trim proposes delete "eh" plus add "he" — which renders
+		// as "tehhe" and quotes word fragments in the sidebar (F-27, IR-08).
+		expect(
+			planEditMarkers(
+				rtd( 'a teh common typo' ),
+				rtd( 'a the common typo' )
+			)
+		).toEqual( {
+			kind: 'replace',
+			actions: [
+				{ type: 'wrap-del', start: 2, end: 5, newNote: true },
+				{ type: 'insert-add', at: 5, text: 'the', newNote: true },
+			],
+		} );
+	} );
+
+	it( 'does not widen a replacement into an existing marker', () => {
+		// Widening past a marker boundary would wrap someone's pending run in
+		// a second marker, so the narrow edit is used instead.
+		const prev = rtd( `x${ add( 9, 'ab', 2 ) }cd` );
+		const plan = planEditMarkers( prev, rtd( 'xabcZ' ), { authorId: 2 } );
+		expect( plan.kind ).toBe( 'replace' );
+		expect( plan.actions ).toEqual( [
+			{ type: 'wrap-del', start: 4, end: 5, newNote: true },
+			{ type: 'insert-add', at: 5, text: 'Z', newNote: true },
+		] );
+	} );
+} );
+
+describe( 'widenReplaceToWords', () => {
+	it( 'leaves a non-replace edit alone', () => {
+		const edit = analyzeTextEdit( 'ab', 'abc' );
+		expect( widenReplaceToWords( 'ab', 'abc', edit ) ).toBe( edit );
+	} );
+
+	it( 'extends both ends to the surrounding word boundaries', () => {
+		const prev = 'one tea three';
+		const next = 'one sea three';
+		const edit = analyzeTextEdit( prev, next );
+		// The raw edit is the single character "t" -> "s".
+		expect( edit ).toEqual(
+			expect.objectContaining( { removedText: 't', insertedText: 's' } )
+		);
+		expect( widenReplaceToWords( prev, next, edit ) ).toEqual(
+			expect.objectContaining( {
+				kind: 'replace',
+				start: 4,
+				end: 7,
+				removedText: 'tea',
+				insertedText: 'sea',
+			} )
+		);
+	} );
+
+	it( 'stops widening at a whitespace boundary', () => {
+		const prev = 'alpha beta gamma';
+		const next = 'alpha BETA gamma';
+		const edit = analyzeTextEdit( prev, next );
+		const widened = widenReplaceToWords( prev, next, edit );
+		expect( widened.removedText ).toBe( 'beta' );
+		expect( widened.insertedText ).toBe( 'BETA' );
+	} );
+
+	it( 'caps widening so separator-free text is not swallowed whole', () => {
+		const prev = 'x'.repeat( 200 ) + 'a' + 'y'.repeat( 200 );
+		const next = 'x'.repeat( 200 ) + 'bc' + 'y'.repeat( 200 );
+		const edit = analyzeTextEdit( prev, next );
+		const widened = widenReplaceToWords( prev, next, edit );
+		expect( widened.removedText.length ).toBeLessThanOrEqual( 81 );
+	} );
 } );
 
 describe( 'applyEditPlan', () => {
@@ -354,6 +428,17 @@ describe( 'applyEditPlan', () => {
 		const result = applyEditPlan( prev, actions, { authorId: 2 } );
 		expect( findSuggestionRange( result, 8 ) ).toBeNull();
 		expect( result.toHTMLString() ).not.toContain( 'gone' );
+	} );
+
+	it( 'applies a widened correction as a whole-word del + add pair', () => {
+		const prev = rtd( 'a teh common typo' );
+		const { actions } = planEditMarkers( prev, rtd( 'a the common typo' ) );
+		const result = applyEditPlan( prev, actions, {
+			authorId: 2,
+			ids: [ 40, 41 ],
+		} );
+		expect( findSuggestionText( result, 40 ) ).toBe( 'teh' );
+		expect( findSuggestionText( result, 41 ) ).toBe( 'the' );
 	} );
 
 	it( 'applies a type-over as a del + add pair', () => {

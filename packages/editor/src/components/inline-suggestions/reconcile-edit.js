@@ -112,6 +112,79 @@ export function analyzeTextEdit( prevText, nextText ) {
 }
 
 /**
+ * Cap on how far a replacement is widened toward its word boundaries. Text
+ * without whitespace separators — CJK prose, a long URL — would otherwise
+ * widen a one-character correction across the whole run.
+ */
+const MAX_WORD_WIDEN_CHARS = 40;
+
+/**
+ * Widen a replacement to the whole words it lands inside.
+ *
+ * `analyzeTextEdit` trims the common prefix and suffix, which is exactly right
+ * for locating the edit but wrong for describing it: correcting "teh" to "the"
+ * shares a leading "t" and a trailing "e", so the raw edit is delete "eh",
+ * insert "he". That renders in the canvas as "tehhe" and in the sidebar as two
+ * notes quoting fragments of words, neither of which a reviewer can act on.
+ * Snapping both ends out to the surrounding word boundaries proposes the
+ * correction the way a person would describe it: replace "teh" with "the".
+ *
+ * The prefix and suffix are shared by construction, so extending the range in
+ * the previous text extends it by the identical characters in the next text.
+ *
+ * @param {string}   prevText   Text before the edit.
+ * @param {string}   nextText   Text after the edit.
+ * @param {TextEdit} edit       The trimmed edit from `analyzeTextEdit`.
+ * @param {Function} isUnmarked Predicate reporting whether a prev-text range
+ *                              is free of suggestion markers; widening into a
+ *                              marker is declined so the narrow edit is used.
+ * @return {TextEdit} The widened edit, or the original when it can't widen.
+ */
+export function widenReplaceToWords( prevText, nextText, edit, isUnmarked ) {
+	if ( edit.kind !== 'replace' ) {
+		return edit;
+	}
+	const isWordChar = ( char ) =>
+		typeof char === 'string' && ! /\s/.test( char );
+
+	let start = edit.start;
+	while (
+		start > 0 &&
+		edit.start - start < MAX_WORD_WIDEN_CHARS &&
+		isWordChar( prevText[ start - 1 ] )
+	) {
+		start--;
+	}
+
+	let end = edit.end;
+	while (
+		end < prevText.length &&
+		end - edit.end < MAX_WORD_WIDEN_CHARS &&
+		isWordChar( prevText[ end ] )
+	) {
+		end++;
+	}
+
+	if ( start === edit.start && end === edit.end ) {
+		return edit;
+	}
+	if ( typeof isUnmarked === 'function' && ! isUnmarked( start, end ) ) {
+		return edit;
+	}
+
+	return {
+		...edit,
+		start,
+		end,
+		removedText: prevText.slice( start, end ),
+		insertedText: nextText.slice(
+			start,
+			nextText.length - ( prevText.length - end )
+		),
+	};
+}
+
+/**
  * Parse a block attribute value into a rich-text record, tolerating plain
  * strings and other non-rich values.
  *
@@ -372,21 +445,29 @@ export function planEditMarkers( prevValue, nextValue, { authorId } = {} ) {
 	}
 
 	// replace (type-over): only the clean unmarked case for now.
-	if ( isUnmarked( edit.start, edit.end ) ) {
-		const html = insertedRunHTML( nextRecord, edit );
+	const replaceEdit = widenReplaceToWords(
+		record.text,
+		nextRecord ? nextRecord.text : '',
+		edit,
+		isUnmarked
+	);
+	if ( isUnmarked( replaceEdit.start, replaceEdit.end ) ) {
+		// Widening moves both ends together, so the widened range still spans
+		// exactly the inserted run in `nextRecord`.
+		const html = insertedRunHTML( nextRecord, replaceEdit );
 		return {
 			kind: 'replace',
 			actions: [
 				{
 					type: 'wrap-del',
-					start: edit.start,
-					end: edit.end,
+					start: replaceEdit.start,
+					end: replaceEdit.end,
 					newNote: true,
 				},
 				{
 					type: 'insert-add',
-					at: edit.end,
-					text: edit.insertedText,
+					at: replaceEdit.end,
+					text: replaceEdit.insertedText,
 					...( html ? { html } : {} ),
 					newNote: true,
 				},
