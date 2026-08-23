@@ -15,7 +15,7 @@ import {
 } from '@wordpress/block-editor';
 import {
 	RangeControl,
-	TextareaControl,
+	TextareaControl as WCTextareaControl,
 	ToggleControl,
 	ToolbarButton,
 	ExternalLink,
@@ -431,7 +431,7 @@ function MediaTextEdit( {
 					hasValue={ () => !! mediaAlt }
 					onDeselect={ () => setAttributes( { mediaAlt: '' } ) }
 				>
-					<TextareaControl
+					<WCTextareaControl
 						label={ __( 'Alternative text' ) }
 						value={ mediaAlt }
 						onChange={ onMediaAltChange }
