@@ -21,7 +21,7 @@
 		"html": false,
 		"color": {
 			"link": true,
-			"__experimentalSkipSerialization": [ "text" ],
+			"__experimentalSkipSerialization": [ "text", "background" ],
 			"__experimentalDefaultControls": {
 				"background": true,
 				"text": true
@@ -59,9 +59,7 @@
 	},
 	"style": "wp-block-calendar",
 	"selectors": {
-		"border": ".wp-block-calendar th, .wp-block-calendar td",
-		"color": {
-			"text": ".wp-block-calendar table"
-		}
+		"border": ".wp-block-calendar th, .wp-block-calendar td:not(.pad)",
+		"color": ".wp-block-calendar table"
 	}
 }

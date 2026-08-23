@@ -43,13 +43,18 @@ function render_block_core_calendar( $attributes ) {
 		}
 	}
 
-	// Text color is applied to the table. Background is serialized onto the
-	// wrapper via block supports so padding sits inside the colored area.
+	// Text and background are applied to the table, not the wrapper.
+	// Skipping wrapper serialization matches #42029: a fill on the outer
+	// container also paints the caption and nav, which most users do not want.
 	$color_block_styles = array();
 
 	$preset_text_color          = array_key_exists( 'textColor', $attributes ) ? "var:preset|color|{$attributes['textColor']}" : null;
 	$custom_text_color          = $attributes['style']['color']['text'] ?? null;
 	$color_block_styles['text'] = $preset_text_color ? $preset_text_color : $custom_text_color;
+
+	$preset_background_color          = array_key_exists( 'backgroundColor', $attributes ) ? "var:preset|color|{$attributes['backgroundColor']}" : null;
+	$custom_background_color          = $attributes['style']['color']['background'] ?? null;
+	$color_block_styles['background'] = $preset_background_color ? $preset_background_color : $custom_background_color;
 
 	$styles        = wp_style_engine_get_styles( array( 'color' => $color_block_styles ), array( 'convert_vars_to_classnames' => true ) );
 	$inline_styles = $styles['css'] ?? '';
@@ -72,7 +77,7 @@ function render_block_core_calendar( $attributes ) {
 
 	// Fallback to ensure the calendar renders if get_calendar returns false or empty.
 	if ( empty( $calendar ) ) {
-		$calendar = '<table class="wp-calendar-table"><caption>&nbsp;</caption></table>';
+		$calendar = '   ';
 	}
 
 	$processor = new WP_HTML_Tag_Processor( $calendar );
@@ -80,7 +85,7 @@ function render_block_core_calendar( $attributes ) {
 	while ( $processor->next_tag() ) {
 		$tag_name = $processor->get_tag();
 
-		// Apply text color classes and styles to the main table.
+		// Apply text and background color classes and styles to the main table.
 		if ( 'TABLE' === $tag_name ) {
 			if ( ! empty( $inline_styles ) ) {
 				$processor->set_attribute( 'style', $inline_styles );
