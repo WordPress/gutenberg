@@ -11,9 +11,11 @@
  *    that keeps untouched fields alive.
  */
 import { render, screen, act, fireEvent } from '@testing-library/react';
+import type { ReactElement, ReactNode } from 'react';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
+// @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createBlock, registerBlockType } from '@wordpress/blocks';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -30,7 +32,13 @@ import {
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
-function renderWithProviders( ui, { intent = 'edit', blocks = null } = {} ) {
+function renderWithProviders(
+	ui: ReactElement,
+	{
+		intent = 'edit',
+		blocks = null,
+	}: { intent?: string; blocks?: any[] | null } = {}
+) {
 	const registry = createRegistry();
 	// `setEditorIntent` dispatches a snackbar via the notices store when
 	// the intent actually changes, so the store needs to be registered even
@@ -52,7 +60,7 @@ function renderWithProviders( ui, { intent = 'edit', blocks = null } = {} ) {
 	}
 	unlock( registry.dispatch( editorStore ) ).setEditorIntent( intent );
 
-	const wrapper = ( { children } ) => (
+	const wrapper = ( { children }: { children?: ReactNode } ) => (
 		<RegistryProvider value={ registry }>
 			<SuggestionOverlayProvider>{ children }</SuggestionOverlayProvider>
 		</RegistryProvider>
@@ -66,7 +74,7 @@ function renderWithProviders( ui, { intent = 'edit', blocks = null } = {} ) {
 
 // Minimal block component that exposes its received attributes and
 // calls setAttributes when its button is clicked.
-function FakeBlock( { attributes, setAttributes } ) {
+function FakeBlock( { attributes, setAttributes }: any ) {
 	return (
 		<>
 			<div data-testid="content">{ attributes?.content ?? '' }</div>
@@ -219,7 +227,7 @@ describe( 'withSuggestionOverlay', () => {
 		// and publishes the deferral). Its first edit must land on the real
 		// attributes so the interceptor can register the WHOLE block as one
 		// insertion — not divert into the overlay as a content suggestion.
-		let overlayHandle;
+		let overlayHandle!: ReturnType< typeof useSuggestionOverlay >;
 		function CaptureOverlay() {
 			const overlay = useSuggestionOverlay();
 			// Assigned in an effect (not during render) to keep the harness
@@ -326,7 +334,9 @@ describe( 'withSuggestionOverlay', () => {
 		// Regression: after Submit/Discard clears the overlay entry, a
 		// later edit must create a new baseline + overlay rather than
 		// silently no-oping.
-		let clearOverlayHandle;
+		let clearOverlayHandle!: ReturnType<
+			typeof useSuggestionOverlay
+		>[ 'clearOverlay' ];
 		function Harness() {
 			const { clearOverlay } = useSuggestionOverlay();
 			useEffect( () => {
@@ -476,7 +486,7 @@ describe( 'withSuggestionBlockClassName', () => {
 		} );
 	} );
 
-	function FakeBlockListBlock( { className, wrapperProps } ) {
+	function FakeBlockListBlock( { className, wrapperProps }: any ) {
 		return (
 			<div
 				data-testid="block-list-block"
@@ -489,7 +499,10 @@ describe( 'withSuggestionBlockClassName', () => {
 	const WrappedBlockListBlock =
 		withSuggestionBlockClassName( FakeBlockListBlock );
 
-	function setup( { intent = 'edit', metadata } = {} ) {
+	function setup( {
+		intent = 'edit',
+		metadata,
+	}: { intent?: string; metadata?: Record< string, any > } = {} ) {
 		const registry = createRegistry();
 		registry.register( noticesStore );
 		registry.register( preferencesStore );
@@ -503,7 +516,7 @@ describe( 'withSuggestionBlockClassName', () => {
 		} );
 		registry.dispatch( blockEditorStore ).resetBlocks( [ block ] );
 
-		const wrapper = ( { children } ) => (
+		const wrapper = ( { children }: { children?: ReactNode } ) => (
 			<RegistryProvider value={ registry }>
 				<SuggestionOverlayProvider>
 					{ children }
@@ -615,7 +628,7 @@ describe( 'withSuggestionBlockClassName', () => {
 		} );
 		registry.dispatch( blockEditorStore ).resetBlocks( [ anchor, moved ] );
 
-		const wrapper = ( { children } ) => (
+		const wrapper = ( { children }: { children?: ReactNode } ) => (
 			<RegistryProvider value={ registry }>
 				<SuggestionOverlayProvider>
 					<MoveGhostsProvider>{ children }</MoveGhostsProvider>
@@ -669,7 +682,7 @@ describe( 'withSuggestionBlockClassName', () => {
 		} );
 		registry.dispatch( blockEditorStore ).resetBlocks( [ parent, moved ] );
 
-		const wrapper = ( { children } ) => (
+		const wrapper = ( { children }: { children?: ReactNode } ) => (
 			<RegistryProvider value={ registry }>
 				<SuggestionOverlayProvider>
 					<MoveGhostsProvider>{ children }</MoveGhostsProvider>

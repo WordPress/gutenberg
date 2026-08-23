@@ -1424,12 +1424,12 @@
 			"count": 6
 		}
 	},
-	"packages/editor/src/components/suggestion-mode/store-interceptor.js": {
+	"packages/editor/src/components/suggestion-mode/store-interceptor.ts": {
 		"react-hooks/refs": {
 			"count": 6
 		}
 	},
-	"packages/editor/src/components/suggestion-mode/suggestion-undo-guard.js": {
+	"packages/editor/src/components/suggestion-mode/suggestion-undo-guard.ts": {
 		"react-hooks/refs": {
 			"count": 4
 		}

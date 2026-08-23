@@ -54,8 +54,10 @@
 import { useRegistry, useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
+// @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSuggestionOverlay } from './overlay-context';
+import type { OverlayEntry } from './overlay-context';
 import { operationsFromOverlay } from './provider';
 import { removeNoteIdFromMetadata } from '../collab-sidebar/utils';
 import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
@@ -71,7 +73,7 @@ import { unlock } from '../../lock-unlock';
  * history-ignored linkage write resurrects the marker — those are withdrawn
  * here instead.
  */
-const PENDING_MARKER_BY_OP = {
+const PENDING_MARKER_BY_OP: Record< string, string > = {
 	'block-insert-after': 'pending-insert',
 	'block-move': 'pending-move',
 };
@@ -83,15 +85,26 @@ const PENDING_MARKER_BY_OP = {
  * candidates need their pending marker still live on the block (an already
  * resolved or withdrawn op is stale overlay state, not a candidate).
  *
- * @param {Object}      entries     Overlay entries keyed by clientId.
- * @param {Object|null} blockEditor Block-editor selectors; without them (unit
- *                                  tests, standalone) structural candidates
- *                                  are skipped.
- * @return {{kind: 'attribute'|'structural', clientId: string, entry: Object,
- * seq: number}|null} Newest withdrawable suggestion.
+ * @param entries     Overlay entries keyed by clientId.
+ * @param blockEditor Block-editor selectors; without them (unit tests,
+ *                    standalone) structural candidates are skipped.
+ * @return Newest withdrawable suggestion, or null.
  */
-export function findNewestWithdrawableSuggestion( entries, blockEditor ) {
-	let newest = null;
+export function findNewestWithdrawableSuggestion(
+	entries: Record< string, any > | null | undefined,
+	blockEditor: any
+): {
+	kind: 'attribute' | 'structural';
+	clientId: string;
+	entry: any;
+	seq: number;
+} | null {
+	let newest: {
+		kind: 'attribute' | 'structural';
+		clientId: string;
+		entry: any;
+		seq: number;
+	} | null = null;
 	for ( const [ clientId, entry ] of Object.entries( entries ?? {} ) ) {
 		if (
 			entry.lastEditSeq &&
@@ -139,19 +152,22 @@ export function findNewestWithdrawableSuggestion( entries, blockEditor ) {
  * bookkeeping from a block: the `metadata.suggestion` marker and, when the
  * note already exists, its `metadata.noteId` linkage.
  *
- * @param {Object}             currentAttributes Block's current attributes.
- * @param {number|string|null} commentId         Linked note id, if any.
- * @return {Object|null} Update payload for `updateBlockAttributes`, or null
- * when there is nothing to strip.
+ * @param currentAttributes Block's current attributes.
+ * @param commentId         Linked note id, if any.
+ * @return Update payload for `updateBlockAttributes`, or null when there is
+ * nothing to strip.
  */
-function withdrawnMarkerAttributes( currentAttributes, commentId ) {
+function withdrawnMarkerAttributes(
+	currentAttributes: any,
+	commentId: number | string | null
+) {
 	const meta = currentAttributes?.metadata;
 	if ( ! meta || meta.suggestion === undefined ) {
 		return null;
 	}
 	const { suggestion: _drop, ...rest } = meta;
 	const metadata = commentId
-		? removeNoteIdFromMetadata( rest, commentId )
+		? removeNoteIdFromMetadata( rest, commentId as any )
 		: rest;
 	return { metadata };
 }
@@ -210,8 +226,11 @@ export default function SuggestionUndoGuard() {
 		 * the entry and trashes the linked note, correctly serialized behind
 		 * any in-flight create for the same block.
 		 */
-		const cancelAttributeSuggestion = ( clientId, entry ) => {
-			const revert = {};
+		const cancelAttributeSuggestion = (
+			clientId: string,
+			entry: OverlayEntry
+		) => {
+			const revert: Record< string, any > = {};
 			for ( const key of Object.keys( entry.overlayAttributes ) ) {
 				revert[ key ] = entry.baselineAttributes?.[ key ];
 			}
@@ -226,7 +245,10 @@ export default function SuggestionUndoGuard() {
 		 * are exactly the reject-landing shapes the store interceptor already
 		 * recognizes, so nothing is re-captured.
 		 */
-		const withdrawStructuralSuggestion = ( clientId, entry ) => {
+		const withdrawStructuralSuggestion = (
+			clientId: string,
+			entry: OverlayEntry
+		) => {
 			const blockEditor = registry.select( blockEditorStore );
 			const {
 				removeBlock,
@@ -234,7 +256,9 @@ export default function SuggestionUndoGuard() {
 				updateBlockAttributes,
 				__unstableMarkNextChangeAsNotPersistent: markIgnored,
 			} = registry.dispatch( blockEditorStore );
-			const op = entry.structuralOp;
+			// Only ever called for a structural candidate, which requires a
+			// captured structural op.
+			const op = entry.structuralOp!;
 			const clearAttrs = withdrawnMarkerAttributes(
 				blockEditor.getBlockAttributes( clientId ),
 				entry.commentId
