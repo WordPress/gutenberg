@@ -63,6 +63,7 @@ function IntentSwitcher() {
 		( select ) => ( {
 			intent: unlock( select( editorStore ) ).getEditorIntent(),
 			isRichEditingEnabled:
+				// @ts-expect-error Editor settings are typed as a bare `Object`.
 				select( editorStore ).getEditorSettings().richEditingEnabled,
 		} ),
 		[]

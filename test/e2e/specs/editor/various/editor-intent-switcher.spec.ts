@@ -14,7 +14,7 @@ async function openIntentSwitcher( page: Page ) {
  * instead, and the assertion that follows finds no menu item at all. Close it
  * through the same toggle and wait for it to actually go.
  */
-async function closeIntentSwitcher( page ) {
+async function closeIntentSwitcher( page: Page ) {
 	await page
 		.getByRole( 'region', { name: 'Editor top bar' } )
 		.getByRole( 'button', { name: 'Options' } )
