@@ -192,7 +192,7 @@ describe( 'summarizeOperations', () => {
 				after: 'Hello <strong>brave</strong> world',
 			},
 		] );
-		expect( lines ).toEqual( [ { label: 'Format:', value: 'content' } ] );
+		expect( lines ).toEqual( [ { label: 'Change:', value: 'text' } ] );
 	} );
 
 	it( 'collapses formats changed in the same direction into one line', () => {
@@ -439,7 +439,7 @@ describe( 'summarizeOperations', () => {
 	} );
 
 	it( 'keeps attribute changes and inline formatting a word apart', () => {
-		// "Format: heading level" and "Formatting: bold" describe two
+		// "Format: heading level" and "Formatting: bold" described two
 		// different families of suggestion and used to read as near-identical
 		// labels in a mixed list (F-16).
 		const lines = summarizeOperations( [
@@ -457,7 +457,7 @@ describe( 'summarizeOperations', () => {
 			},
 		] );
 		expect( lines.map( ( line ) => line.label ) ).toEqual( [
-			'Formatting:',
+			'Add formatting:',
 			'Change:',
 		] );
 		expect( lines ).not.toContainEqual(
