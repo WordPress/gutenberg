@@ -1146,6 +1146,15 @@ test.describe( 'Suggestion mode', () => {
 				'mark.wp-suggestion[data-suggestion-type="add"]'
 			)
 		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		// The saved note still has to travel back through the notes query
+		// before the floating board would claim the vacated slot, and the
+		// "All notes" toggle only renders once it has. Waiting for it stops
+		// `toBeHidden` passing on a poll that lands before the board's turn.
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'All notes', exact: true } )
+		).toBeVisible();
 		await expect( sidebar ).toBeHidden();
 	} );
 

@@ -518,9 +518,24 @@ export function useEnableFloatingSidebar( enabled = false ) {
 		const { disableComplementaryArea, enableComplementaryArea } =
 			registry.dispatch( interfaceStore );
 
+		/*
+		 * The floating board fills a slot the user vacates while notes are
+		 * on screen, but it must not claim one that was already empty when
+		 * the first note arrived: the user closed the sidebar before there
+		 * was anything to float, and opening it under them narrows the
+		 * canvas and reflows the block they are writing in. Wait until they
+		 * open a complementary area themselves before taking the slot back.
+		 */
+		let mayClaimEmptySlot = getActiveComplementaryArea( 'core' ) !== null;
+
 		const unsubscribe = registry.subscribe( () => {
-			// Return `null` to indicate the user hid the complementary area.
-			if ( getActiveComplementaryArea( 'core' ) === null ) {
+			// Returns `null` to indicate the user hid the complementary area.
+			if ( getActiveComplementaryArea( 'core' ) !== null ) {
+				mayClaimEmptySlot = true;
+				return;
+			}
+
+			if ( mayClaimEmptySlot ) {
 				enableComplementaryArea( 'core', FLOATING_NOTES_SIDEBAR );
 			}
 		} );
