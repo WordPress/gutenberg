@@ -318,6 +318,110 @@ test.describe( 'Suggestion mode', () => {
 		await expect( summary ).not.toContainText( 'Change:' );
 	} );
 
+	/*
+	 * #73411 finding F-06. Typing back inside a pending addition used to insert
+	 * a marker with a FRESH id at the caret, splitting the enclosing marker into
+	 * two disjoint `<mark>` elements sharing one id — `add:41:"ADD"`,
+	 * `add:42:"XX"`, `add:41:"ED"` — backed by two notes that both claimed the
+	 * typed characters (note 41 summarised `Add: "ADDXXED"` because it reads
+	 * across its fragments, note 42 `Add: "XX"`). Accepting one while rejecting
+	 * the other kept the new text and dropped the text it was typed into. The
+	 * addition now grows the marker already under the caret.
+	 */
+	test( 'add — typing inside your own pending addition extends that marker, not a second one', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello ' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( 'ADDED' );
+
+		const markers = paragraph.locator(
+			'mark.wp-suggestion[data-suggestion-type="add"]'
+		);
+		await expect( markers ).toHaveText( [ 'ADDED' ] );
+		const firstId = await markers.getAttribute( 'data-suggestion-id' );
+		expect( firstId ).toMatch( /\d/ );
+
+		/*
+		 * Put the caret between "ADD" and "ED", inside the author's own
+		 * pending addition. Placed as a DOM range rather than with ArrowLeft:
+		 * rich-text absorbs the first presses at a format boundary, so the
+		 * number of keystrokes needed to reach a given character is not fixed.
+		 */
+		await markers.first().evaluate( ( mark ) => {
+			const doc = mark.ownerDocument;
+			// The marker wraps its text in the editor-only a11y role element,
+			// so walk to the text node itself.
+			const text = doc
+				.createTreeWalker( mark, NodeFilter.SHOW_TEXT )
+				.nextNode();
+			const range = doc.createRange();
+			range.setStart( text, 3 );
+			range.collapse( true );
+			const selection = doc.getSelection();
+			selection.removeAllRanges();
+			selection.addRange( range );
+		} );
+		// Wait for the store to agree with the DOM caret: while it lags, a
+		// re-render would re-apply the stale selection and snap the caret back
+		// to the end of the marker.
+		await expect
+			.poll( () =>
+				page.evaluate(
+					() =>
+						window.wp.data
+							.select( 'core/block-editor' )
+							.getSelectionStart().offset
+				)
+			)
+			.toBe( 9 );
+
+		await page.keyboard.type( 'XX' );
+
+		// One marker, still the original note's id, holding the whole run.
+		await expect( markers ).toHaveText( [ 'ADDXXED' ] );
+		await expect( markers ).toHaveAttribute(
+			'data-suggestion-id',
+			firstId
+		);
+		await expect( paragraph ).toHaveText( 'Hello ADDXXED' );
+
+		// The serialized post carries one marker and one id, so no second note
+		// claims the typed characters.
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized.match( /data-suggestion-id="\d+"/g ) ).toEqual( [
+			`data-suggestion-id="${ firstId }"`,
+		] );
+
+		// And the sidebar lists exactly one suggestion for the run.
+		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
+		const allNotesToggle = topBar.getByRole( 'button', {
+			name: 'All notes',
+			exact: true,
+		} );
+		if (
+			( await allNotesToggle.getAttribute( 'aria-expanded' ) ) === 'false'
+		) {
+			await allNotesToggle.click();
+		}
+		const summaries = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.locator( '.editor-collab-sidebar-panel__suggestion-summary' );
+		await expect( summaries ).toHaveCount( 1 );
+		await expect( summaries.first() ).toContainText( 'ADDXXED' );
+	} );
+
 	test( 'delete — golden path: deleting a selection becomes an in-content del marker', async ( {
 		editor,
 		page,
@@ -464,6 +568,114 @@ test.describe( 'Suggestion mode', () => {
 		await expect( summaries ).toHaveCount( 1 );
 		await expect( summaries ).toContainText( 'Delete:' );
 		await expect( summaries ).toContainText( 'def' );
+	} );
+
+	test( 'collapsed delete: repeated Delete grows a single del marker', async ( {
+		editor,
+		page,
+	} ) => {
+		// The forward direction has to merge the way Backspace does. A
+		// forward-delete run parks the caret at the marker's start, so every
+		// repeat aims at a character the previous press already marked —
+		// without an explicit merge the second press is refused and the run
+		// stalls at one character.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'abcdef' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.press( 'Delete' );
+
+		const markers = paragraph.locator(
+			'mark.wp-suggestion[data-suggestion-type="del"]'
+		);
+		// Wait for the first press to mint its note before repeating, so the
+		// growth path (not the buffered-repeat path) is what is exercised.
+		await expect( markers ).toHaveText( 'a' );
+
+		await page.keyboard.press( 'Delete' );
+		await page.keyboard.press( 'Delete' );
+
+		await expect( markers ).toHaveCount( 1 );
+		await expect( markers ).toHaveText( 'abc' );
+		// The text is kept until the suggestion is accepted.
+		await expect( paragraph ).toContainText( 'abcdef' );
+
+		// One note for the whole run, not one per keystroke.
+		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
+		const allNotesToggle = topBar.getByRole( 'button', {
+			name: 'All notes',
+			exact: true,
+		} );
+		if (
+			( await allNotesToggle.getAttribute( 'aria-expanded' ) ) === 'false'
+		) {
+			await allNotesToggle.click();
+		}
+		const summaries = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.locator( '.editor-collab-sidebar-panel__suggestion-summary' );
+		await expect( summaries ).toHaveCount( 1 );
+		await expect( summaries ).toContainText( 'Delete:' );
+		await expect( summaries ).toContainText( 'abc' );
+	} );
+
+	test( 'collapsed delete: a caret moved back to a del marker refuses the keystroke', async ( {
+		editor,
+		page,
+	} ) => {
+		// A marker outlives the run that opened it. Moving the caret ends the
+		// run without clearing the marker, so the next Backspace aims at a
+		// grapheme that is already proposed for deletion. This is the
+		// collapsed-caret half of the refusal #81655 added for a straddling
+		// selection: falling through would have the browser remove text that
+		// only exists as a proposal and destroy the marker holding it.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'abcdef' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.press( 'Backspace' );
+
+		const markers = paragraph.locator(
+			'mark.wp-suggestion[data-suggestion-type="del"]'
+		);
+		// Wait for the first press to mint its note before repeating.
+		await expect( markers ).toHaveText( 'f' );
+		await page.keyboard.press( 'Backspace' );
+		await expect( markers ).toHaveText( 'ef' );
+
+		// The run parks the caret at the marker's start. End puts it back at
+		// the marker's trailing edge, which ends the run - offset 6 against a
+		// run that left the caret at 4 - without touching the marker.
+		await page.keyboard.press( 'End' );
+		await page.keyboard.press( 'Backspace' );
+
+		// The user is told why the edit did not take.
+		await expect(
+			page
+				.locator( '.components-snackbar-list' )
+				.getByText( 'overlaps a pending suggestion' )
+		).toBeVisible();
+
+		// The marker is intact and no text was removed from the paragraph.
+		await expect( markers ).toHaveCount( 1 );
+		await expect( markers ).toHaveText( 'ef' );
+		await expect( paragraph ).toHaveText( 'abcdef' );
 	} );
 
 	test( 'collapsed delete: Backspace over an emoji ZWJ sequence marks the whole grapheme', async ( {
@@ -862,6 +1074,47 @@ test.describe( 'Suggestion mode', () => {
 		expect( serialized ).toContain( 'data-suggestion-type="add"' );
 	} );
 
+	test( 'paste — a pasted run keeps its bold and its link inside the add marker', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+
+		pageUtils.setClipboardData( {
+			plainText: ' rich bold and a link',
+			html: ' rich <strong>bold</strong> and <a href="https://example.com">a link</a>',
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		// The whole pasted run is one add marker…
+		const marker = paragraph.locator(
+			'mark.wp-suggestion[data-suggestion-type="add"]'
+		);
+		await expect( marker ).toHaveCount( 1 );
+		await expect( marker ).toContainText( 'rich bold and a link' );
+		// …and the formatting the author pasted is inside it, not flattened.
+		await expect( marker.locator( 'strong' ) ).toHaveText( 'bold' );
+		await expect(
+			marker.locator( 'a[href="https://example.com"]' )
+		).toHaveText( 'a link' );
+
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).toContain( '<strong>bold</strong>' );
+		expect( serialized ).toContain( 'href="https://example.com"' );
+	} );
+
 	test( 'an open settings sidebar switches to All notes when a suggestion is created', async ( {
 		editor,
 		page,
@@ -934,6 +1187,15 @@ test.describe( 'Suggestion mode', () => {
 				'mark.wp-suggestion[data-suggestion-type="add"]'
 			)
 		).toHaveAttribute( 'data-suggestion-id', /\d/ );
+		// The saved note still has to travel back through the notes query
+		// before the floating board would claim the vacated slot, and the
+		// "All notes" toggle only renders once it has. Waiting for it stops
+		// `toBeHidden` passing on a poll that lands before the board's turn.
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'All notes', exact: true } )
+		).toBeVisible();
 		await expect( sidebar ).toBeHidden();
 	} );
 

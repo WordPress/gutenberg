@@ -1,4 +1,5 @@
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { __ } from '@wordpress/i18n';
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import {
 	layout,
@@ -19,13 +20,15 @@ import {
 	getCurrentPostId,
 	getEditorSettings,
 	getCurrentPostRevisionsCount,
+	getEditedPostContent,
 } from './selectors';
 import {
 	getEntityActions as _getEntityActions,
 	getEntityFields as _getEntityFields,
 	isEntityReady as _isEntityReady,
 } from '../dataviews/store/private-selectors';
-import { EDITOR_INTENT_EDIT } from './constants';
+import { EDITOR_INTENT_EDIT, EDITOR_INTENT_SUGGEST } from './constants';
+import { hasPendingSuggestionMarkers } from './utils/pending-suggestion-markers';
 import { unlock } from '../lock-unlock';
 
 const EMPTY_INSERTION_POINT = {
@@ -595,7 +598,7 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 		return Boolean(
 			syncConfig &&
 				syncConfig.supportsPersistence &&
-				window._wpCollaborationEnabled &&
+				window.__experimentalEnableRealTimeCollaboration &&
 				false !==
 					syncConfig.shouldSync?.(
 						`postType/${ currentPostType }`,
@@ -611,7 +614,9 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
  * that the author can apply or reject (`suggest`), or viewing the post in
  * a read-only mode (`view`).
  *
- * The intent is orthogonal to the `editorMode` preference (visual vs. code).
+ * Mostly orthogonal to the `editorMode` preference (visual vs. code); the
+ * exception is `suggest`, which forces `getEditorMode` to report `visual`
+ * because the code editor cannot render an inline suggestion marker.
  *
  * Storage: the intent is session-scoped — it lives in the editor store's
  * reducer, not the preferences store, so reloading the editor always
@@ -625,4 +630,62 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
  */
 export function getEditorIntent( state ) {
 	return state.editorIntent ?? EDITOR_INTENT_EDIT;
+}
+
+/**
+ * Why the code editor cannot be opened right now, or `null` when it can.
+ *
+ * The code editor edits raw `post_content`: there is nowhere in that textarea
+ * to render an inline suggestion marker, and the document it hands back is
+ * re-parsed from scratch, so an edit made there both escapes suggestion
+ * capture and takes down the markers already in the post.
+ *
+ * Two situations are refused:
+ *
+ *   - The `suggest` intent, where every edit is meant to be captured as a
+ *     suggestion. This is the cheap check, and the only one the UI runs.
+ *   - Any intent while the document still carries pending markers - what the
+ *     author meets after leaving Suggesting with suggestions left to resolve.
+ *     Re-parsing an edited document corrupts markers whatever the intent was
+ *     when the edit was made, so the intent alone is not a sufficient guard.
+ *
+ * The marker probe serializes the whole document, so it is opt-in:
+ * `switchEditorMode` asks for it once on an explicit user action, while the
+ * menu item and the command palette gate on the intent only and let the action
+ * refuse the rarer case with a notice. `getEditorMode` runs the same probe on
+ * the render path for the routes that never dispatch an action at all - a
+ * reload, or the mask lifting as the user leaves Suggesting - but only once
+ * the stored preference is `text`, so a visual session never pays for it.
+ *
+ * Returns the user-facing reason rather than a boolean so the disabled menu
+ * item, the refused shortcut, and the announcement cannot drift apart.
+ *
+ * @param {Object}  state                             Global application state.
+ * @param {Object}  [options]                         Options.
+ * @param {boolean} [options.checkPendingSuggestions] Also probe the document
+ *                                                    for pending markers.
+ *
+ * @return {string|null} Reason the code editor is unavailable, or `null` when
+ *                       it is available.
+ */
+export function getCodeEditorUnavailableReason(
+	state,
+	{ checkPendingSuggestions = false } = {}
+) {
+	if ( getEditorIntent( state ) === EDITOR_INTENT_SUGGEST ) {
+		return __(
+			'Raw HTML edits cannot be captured as suggestions. Switch to Editing to use the code editor.'
+		);
+	}
+
+	if (
+		checkPendingSuggestions &&
+		hasPendingSuggestionMarkers( getEditedPostContent( state ) )
+	) {
+		return __(
+			'The code editor is unavailable while this post has suggestions to resolve. Accept or reject them first.'
+		);
+	}
+
+	return null;
 }

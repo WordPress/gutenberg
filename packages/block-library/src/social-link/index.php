@@ -10,10 +10,9 @@
  *
  * @since 5.4.0
  *
- * @param Array    $attributes The block attributes.
- * @param String   $content    InnerBlocks content of the Block.
+ * @param array    $attributes The block attributes.
+ * @param string   $content    InnerBlocks content of the Block.
  * @param WP_Block $block      Block object.
- *
  * @return string Rendered HTML of the referenced block.
  */
 function render_block_core_social_link( $attributes, $content, $block ) {
@@ -39,7 +38,7 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 		return '';
 	}
 
-	/**
+	/*
 	 * Prepend emails with `mailto:` if not set.
 	 * The `is_email` returns false for emails with schema.
 	 */
@@ -47,7 +46,7 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 		$url = 'mailto:' . antispambot( $url );
 	}
 
-	/**
+	/*
 	 * Prepend URL with https:// if it doesn't appear to contain a scheme
 	 * and it's not a relative link or a fragment.
 	 */
@@ -95,14 +94,12 @@ function register_block_core_social_link() {
 }
 add_action( 'init', 'register_block_core_social_link' );
 
-
 /**
  * Returns the SVG for social link.
  *
  * @since 5.4.0
  *
  * @param string $service The service icon.
- *
  * @return string SVG Element for service icon.
  */
 function block_core_social_link_get_icon( $service ) {
@@ -120,7 +117,6 @@ function block_core_social_link_get_icon( $service ) {
  * @since 5.4.0
  *
  * @param string $service The service icon.
- *
  * @return string Brand label.
  */
 function block_core_social_link_get_name( $service ) {
@@ -138,8 +134,7 @@ function block_core_social_link_get_name( $service ) {
  * @since 5.4.0
  *
  * @param string $service The service slug to extract data from.
- * @param string $field The field ('name', 'icon', etc) to extract for a service.
- *
+ * @param string $field   The field ('name', 'icon', etc) to extract for a service.
  * @return array|string
  */
 function block_core_social_link_services( $service = '', $field = '' ) {
@@ -346,7 +341,7 @@ function block_core_social_link_services( $service = '', $field = '' ) {
 	);
 
 	/**
-	 * Filter the list of available social service.
+	 * Filters the list of available social service.
 	 *
 	 * This can be used to change icons or add custom icons (additionally to variations in the editor).
 	 * Icons should be directly renderable - therefore SVGs work best.
@@ -377,7 +372,6 @@ function block_core_social_link_services( $service = '', $field = '' ) {
  * @since 5.7.0
  *
  * @param array $context Block context passed to Social Link.
- *
  * @return string Inline CSS styles for link's icon and background colors.
  */
 function block_core_social_link_get_color_styles( $context ) {
@@ -400,7 +394,6 @@ function block_core_social_link_get_color_styles( $context ) {
  * @since 6.3.0
  *
  * @param array $context Block context passed to Social Sharing Link.
- *
  * @return string CSS classes for link's icon and background colors.
  */
 function block_core_social_link_get_color_classes( $context ) {

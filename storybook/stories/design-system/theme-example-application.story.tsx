@@ -103,7 +103,7 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 						Background
 						<input
 							type="color"
-							value={ background ?? '#ffffff' }
+							value={ background ?? '#fcfcfc' }
 							onChange={ ( e ) =>
 								setBackground( e.target.value )
 							}

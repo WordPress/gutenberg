@@ -153,7 +153,7 @@ describe( 'planEditMarkers', () => {
 		const next = rtd( add( 7, 'new', 2 ) + 's' );
 		expect( planEditMarkers( prev, next, { authorId: 2 } ) ).toEqual( {
 			kind: 'insert',
-			actions: [ { type: 'grow-add', id: '7', text: 's' } ],
+			actions: [ { type: 'grow-add', id: '7', text: 's', at: 3 } ],
 		} );
 	} );
 
@@ -168,10 +168,34 @@ describe( 'planEditMarkers', () => {
 		} );
 	} );
 
-	it( 'does not act when typing inside an existing marker', () => {
+	/*
+	 * #73411 finding F-06. Typing inside the author's own pending addition used
+	 * to plan nothing, so the edit fell through to the whole-content overlay (or,
+	 * on the typing seam, nested a second marker inside the first). It extends
+	 * the one marker now.
+	 */
+	it( 'grows the author own addition when typing inside it', () => {
 		// Insert between the two characters of an existing add marker.
 		const prev = rtd( add( 7, 'ab', 2 ) );
 		const next = rtd( add( 7, 'aXb', 2 ) );
+		expect( planEditMarkers( prev, next, { authorId: 2 } ) ).toEqual( {
+			kind: 'insert',
+			actions: [ { type: 'grow-add', id: '7', text: 'X', at: 1 } ],
+		} );
+	} );
+
+	it( 'does not act when typing inside another author addition', () => {
+		const prev = rtd( add( 7, 'ab', 2 ) );
+		const next = rtd( add( 7, 'aXb', 2 ) );
+		expect( planEditMarkers( prev, next, { authorId: 9 } ) ).toEqual( {
+			kind: 'insert',
+			actions: [],
+		} );
+	} );
+
+	it( 'does not act when typing inside a pending deletion', () => {
+		const prev = rtd( del( 7, 'ab', 2 ) );
+		const next = rtd( del( 7, 'aXb', 2 ) );
 		expect( planEditMarkers( prev, next, { authorId: 2 } ) ).toEqual( {
 			kind: 'insert',
 			actions: [],
@@ -221,6 +245,31 @@ describe( 'planEditMarkers', () => {
 			],
 		} );
 	} );
+
+	it( 'carries the HTML of an inserted run that has its own formatting', () => {
+		const plan = planEditMarkers(
+			rtd( 'Hello' ),
+			rtd( 'Hello <strong>bold</strong>!' )
+		);
+		expect( plan.actions ).toHaveLength( 1 );
+		expect( plan.actions[ 0 ].text ).toBe( ' bold!' );
+		expect( plan.actions[ 0 ].html ).toBe( ' <strong>bold</strong>!' );
+	} );
+
+	it( 'omits the HTML when the inserted run is plain text', () => {
+		const plan = planEditMarkers( rtd( 'Hello' ), rtd( 'Hello world' ) );
+		expect( plan.actions[ 0 ] ).not.toHaveProperty( 'html' );
+	} );
+
+	it( 'omits the HTML when the inserted run already carries a marker', () => {
+		// Pasting content that already holds a marker must not nest one
+		// marker inside another.
+		const plan = planEditMarkers(
+			rtd( 'Hello' ),
+			rtd( 'Hello ' + add( 3, 'pasted', 2 ) )
+		);
+		expect( plan.actions[ 0 ] ).not.toHaveProperty( 'html' );
+	} );
 } );
 
 describe( 'applyEditPlan', () => {
@@ -263,6 +312,24 @@ describe( 'applyEditPlan', () => {
 		expect( findSuggestionText( result, 7 ) ).toBe( 'news' );
 	} );
 
+	it( 'grows an existing add marker from inside, as one marker', () => {
+		const prev = rtd( 'Hello ' + add( 41, 'ADDED', 2 ) );
+		const { actions } = planEditMarkers(
+			prev,
+			rtd( 'Hello ' + add( 41, 'ADDXXED', 2 ) ),
+			{ authorId: 2 }
+		);
+		const result = applyEditPlan( prev, actions, {
+			authorId: 2,
+			ids: [],
+		} );
+		const html = result.toHTMLString();
+		// One marker, one id, the typed text inside it.
+		expect( html.match( /<mark/g ) ).toHaveLength( 1 );
+		expect( findSuggestionText( result, 41 ) ).toBe( 'ADDXXED' );
+		expect( html ).toContain( 'data-author="2"' );
+	} );
+
 	it( 'wraps a deletion, keeping the text struck through', () => {
 		const prev = rtd( 'Hello world' );
 		const { actions } = planEditMarkers( prev, rtd( 'Hello' ) );
@@ -298,5 +365,36 @@ describe( 'applyEditPlan', () => {
 		} );
 		expect( findSuggestionText( result, 30 ) ).toBe( 'world' );
 		expect( findSuggestionText( result, 31 ) ).toBe( 'there' );
+	} );
+
+	it( 'keeps the formatting of a rich inserted run', () => {
+		const prev = rtd( 'Hello' );
+		const next = rtd(
+			'Hello <strong>bold</strong> and <a href="https://example.com">a link</a>'
+		);
+		const { actions } = planEditMarkers( prev, next );
+		const result = applyEditPlan( prev, actions, {
+			authorId: 2,
+			ids: [ 40 ],
+		} );
+		const html = result.toHTMLString();
+		expect( findSuggestionText( result, 40 ) ).toBe( ' bold and a link' );
+		expect( html ).toContain( '<strong>bold</strong>' );
+		expect( html ).toContain( '<a href="https://example.com">' );
+	} );
+
+	it( 'keeps the formatting of a rich run pasted over a selection', () => {
+		const prev = rtd( 'Hello world' );
+		const next = rtd( 'Hello <a href="https://example.com">there</a>' );
+		const { actions } = planEditMarkers( prev, next );
+		const result = applyEditPlan( prev, actions, {
+			authorId: 2,
+			ids: [ 50, 51 ],
+		} );
+		expect( findSuggestionText( result, 50 ) ).toBe( 'world' );
+		expect( findSuggestionText( result, 51 ) ).toBe( 'there' );
+		expect( result.toHTMLString() ).toContain(
+			'<a href="https://example.com">'
+		);
 	} );
 } );

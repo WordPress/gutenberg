@@ -30,6 +30,7 @@ export {
 	registerSuggestionFormat,
 	findSuggestionRange,
 	findSuggestionText,
+	getSuggestionMarkerSelector,
 } from './format';
 export { useAnnotateSuggestions } from './use-annotate-suggestions';
 export {
@@ -44,6 +45,8 @@ export {
 	buildSuggestionMarkerAttributes,
 	formatsRangeHasSuggestion,
 	valueRangeHasSuggestion,
+	formatsAdditionRunToExtend,
+	valueAdditionRunToExtend,
 } from './operations';
 export { computeDeleteRange } from './delete-range';
 export {
@@ -57,6 +60,7 @@ export {
 	applyFormatPlan,
 } from './reconcile-format';
 export {
+	hasSuggestionMarkers,
 	stripSuggestionMarkers,
 	stripSuggestionMarkersFromAttributes,
 } from './strip-markers';

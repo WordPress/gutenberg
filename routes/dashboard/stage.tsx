@@ -1,4 +1,4 @@
-import { Page } from '@wordpress/admin-ui';
+import { Breadcrumbs, Page } from '@wordpress/admin-ui';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
@@ -69,7 +69,11 @@ function Dashboard() {
 			onEditChange={ setEditMode }
 		>
 			<Page
-				title={ editMode && isMobileViewport ? undefined : pageTitle }
+				breadcrumbs={
+					editMode && isMobileViewport ? undefined : (
+						<Breadcrumbs items={ [ { label: pageTitle } ] } />
+					)
+				}
 				ariaLabel={ pageTitle }
 				actions={ <WidgetDashboard.Actions /> }
 				hasPadding

@@ -1,4 +1,8 @@
-import { areCollaboratorInfosEqual, generateCollaboratorInfo } from '../utils';
+import {
+	areCollaboratorInfosEqual,
+	generateCollaboratorInfo,
+	isCollaboratorInfo,
+} from '../utils';
 import type { CollaboratorInfo } from '../types';
 import type { User } from '../../entity-types';
 
@@ -180,7 +184,7 @@ describe( 'Awareness Utils', () => {
 
 		test( 'should generate collaboratorInfo with user properties', () => {
 			const user = createMockUser( { id: 42, name: 'Jane Doe' } );
-			const collaboratorInfo = generateCollaboratorInfo( user );
+			const collaboratorInfo = generateCollaboratorInfo( user, 9 );
 
 			expect( collaboratorInfo.id ).toBe( 42 );
 			expect( collaboratorInfo.name ).toBe( 'Jane Doe' );
@@ -189,7 +193,7 @@ describe( 'Awareness Utils', () => {
 
 		test( 'should include browser type', () => {
 			const user = createMockUser();
-			const collaboratorInfo = generateCollaboratorInfo( user );
+			const collaboratorInfo = generateCollaboratorInfo( user, 9 );
 
 			expect( collaboratorInfo.browserType ).toBe( 'Chrome' );
 		} );
@@ -199,7 +203,7 @@ describe( 'Awareness Utils', () => {
 				'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0'
 			);
 			const user = createMockUser();
-			const collaboratorInfo = generateCollaboratorInfo( user );
+			const collaboratorInfo = generateCollaboratorInfo( user, 9 );
 
 			expect( collaboratorInfo.browserType ).toBe( 'Firefox' );
 		} );
@@ -209,7 +213,7 @@ describe( 'Awareness Utils', () => {
 				'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.59'
 			);
 			const user = createMockUser();
-			const collaboratorInfo = generateCollaboratorInfo( user );
+			const collaboratorInfo = generateCollaboratorInfo( user, 9 );
 
 			expect( collaboratorInfo.browserType ).toBe( 'Microsoft Edge' );
 		} );
@@ -219,7 +223,7 @@ describe( 'Awareness Utils', () => {
 				'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15'
 			);
 			const user = createMockUser();
-			const collaboratorInfo = generateCollaboratorInfo( user );
+			const collaboratorInfo = generateCollaboratorInfo( user, 9 );
 
 			expect( collaboratorInfo.browserType ).toBe( 'Safari' );
 		} );
@@ -229,7 +233,7 @@ describe( 'Awareness Utils', () => {
 				'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; SLCC2; .NET CLR 2.0.50727; MSIE 10.0; rv:11.0) like Gecko'
 			);
 			const user = createMockUser();
-			const collaboratorInfo = generateCollaboratorInfo( user );
+			const collaboratorInfo = generateCollaboratorInfo( user, 9 );
 
 			expect( collaboratorInfo.browserType ).toBe( 'Internet Explorer' );
 		} );
@@ -239,7 +243,7 @@ describe( 'Awareness Utils', () => {
 				'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko'
 			);
 			const user = createMockUser();
-			const collaboratorInfo = generateCollaboratorInfo( user );
+			const collaboratorInfo = generateCollaboratorInfo( user, 9 );
 
 			expect( collaboratorInfo.browserType ).toBe( 'Internet Explorer' );
 		} );
@@ -249,7 +253,7 @@ describe( 'Awareness Utils', () => {
 				'Opera/9.80 (Windows NT 6.1; WOW64) Presto/2.12.388 Version/12.18'
 			);
 			const user = createMockUser();
-			const collaboratorInfo = generateCollaboratorInfo( user );
+			const collaboratorInfo = generateCollaboratorInfo( user, 9 );
 
 			expect( collaboratorInfo.browserType ).toBe( 'Opera' );
 		} );
@@ -262,7 +266,7 @@ describe( 'Awareness Utils', () => {
 				'Mozilla/5.0 (Windows NT 10.0; Win64; x64) OPR/77.0.4054.203'
 			);
 			const user = createMockUser();
-			const collaboratorInfo = generateCollaboratorInfo( user );
+			const collaboratorInfo = generateCollaboratorInfo( user, 9 );
 
 			expect( collaboratorInfo.browserType ).toBe( 'Opera' );
 		} );
@@ -270,14 +274,14 @@ describe( 'Awareness Utils', () => {
 		test( 'should return Unknown for unrecognized browser', () => {
 			mockUserAgent( 'Some Unknown Browser/1.0' );
 			const user = createMockUser();
-			const collaboratorInfo = generateCollaboratorInfo( user );
+			const collaboratorInfo = generateCollaboratorInfo( user, 9 );
 
 			expect( collaboratorInfo.browserType ).toBe( 'Unknown' );
 		} );
 
 		test( 'should include enteredAt timestamp', () => {
 			const user = createMockUser();
-			const collaboratorInfo = generateCollaboratorInfo( user );
+			const collaboratorInfo = generateCollaboratorInfo( user, 9 );
 
 			expect( collaboratorInfo.enteredAt ).toBe( 1704067200000 );
 		} );
@@ -290,12 +294,99 @@ describe( 'Awareness Utils', () => {
 					'96': 'https://example.com/large.png',
 				},
 			} );
-			const collaboratorInfo = generateCollaboratorInfo( user );
+			const collaboratorInfo = generateCollaboratorInfo( user, 9 );
 
 			expect( collaboratorInfo.avatar_urls ).toEqual( {
 				'24': 'https://example.com/small.png',
 				'48': 'https://example.com/medium.png',
 				'96': 'https://example.com/large.png',
+			} );
+		} );
+
+		test( 'omits invalid avatar data', () => {
+			const user = createMockUser( {
+				avatar_urls: 'invalid',
+			} as unknown as Partial< User< 'view' > > );
+			const collaboratorInfo = generateCollaboratorInfo( user, 9 );
+
+			expect( collaboratorInfo ).toMatchObject( { id: 1 } );
+			expect( collaboratorInfo ).not.toHaveProperty( 'avatar_urls' );
+		} );
+	} );
+
+	describe( 'isCollaboratorInfo', () => {
+		test( 'accepts complete named and fallback collaborator information', () => {
+			expect(
+				isCollaboratorInfo( {
+					avatar_urls: {
+						'48': 'https://example.com/medium.png',
+					},
+					browserType: 'Chrome',
+					enteredAt: 1704067200000,
+					id: 42,
+					name: 'Test User',
+					slug: 'test-user',
+				} )
+			).toBe( true );
+			expect(
+				isCollaboratorInfo( {
+					browserType: 'Chrome',
+					enteredAt: 1704067200000,
+					id: null,
+					name: 'Anonymous User',
+					slug: 'anonymous-9',
+				} )
+			).toBe( true );
+		} );
+
+		test( 'rejects incomplete or malformed collaborator information', () => {
+			expect( isCollaboratorInfo( { id: 42 } ) ).toBe( false );
+			expect(
+				isCollaboratorInfo( {
+					avatar_urls: { '48': 42 },
+					browserType: 'Chrome',
+					enteredAt: 1704067200000,
+					id: 42,
+					name: 'Test User',
+					slug: 'test-user',
+				} )
+			).toBe( false );
+			expect(
+				isCollaboratorInfo( {
+					avatar_urls: {},
+					browserType: 'Chrome',
+					enteredAt: 1704067200000,
+					id: 0,
+					name: 'Test User',
+					slug: 'test-user',
+				} )
+			).toBe( false );
+		} );
+	} );
+
+	describe( 'fallback collaborator', () => {
+		beforeEach( () => {
+			mockUserAgent( 'Some Browser/1.0' );
+			jest.spyOn( Date, 'now' ).mockReturnValue( 1704067200000 );
+		} );
+
+		test( 'stores a canonical fallback name when the user is unavailable', () => {
+			const collaboratorInfo = generateCollaboratorInfo( undefined, 9 );
+
+			expect( collaboratorInfo ).toEqual( {
+				browserType: 'Unknown',
+				enteredAt: 1704067200000,
+				id: null,
+				name: 'Anonymous User',
+				slug: 'anonymous-9',
+			} );
+		} );
+
+		test( 'creates fallback information for an unusable user response', () => {
+			expect( generateCollaboratorInfo( { id: 1 }, 9 ) ).toMatchObject( {
+				id: null,
+				name: 'Anonymous User',
+				slug: 'anonymous-9',
 			} );
 		} );
 	} );
