@@ -114,7 +114,16 @@ export async function loadFontFaceInBrowser(
 		}
 	);
 
-	const loadedFace = await newFont.load();
+	let loadedFace;
+	try {
+		loadedFace = await newFont.load();
+	} catch {
+		// Some fonts may fail to load in the browser due to
+		// strict validation (e.g., Chrome's OpenType Sanitizer
+		// rejecting non-standard tables). This is acceptable
+		// since the font can still be installed server-side.
+		return;
+	}
 
 	if ( addTo === 'document' || addTo === 'all' ) {
 		document.fonts.add( loadedFace );

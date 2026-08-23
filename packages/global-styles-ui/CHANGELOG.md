@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Font Library: Handle font loading errors gracefully so fonts that fail browser validation (e.g., Chrome's OpenType Sanitizer) can still be installed server-side ([#72265](https://github.com/WordPress/gutenberg/issues/72265)).
 -   Revisions: close the screen on the first click of the back arrow after a revision has been selected, instead of requiring a second click ([#81897](https://github.com/WordPress/gutenberg/pull/81897)).
 -   Revisions: close the screen after applying a revision, which stopped happening when the screen moved into this package ([#81897](https://github.com/WordPress/gutenberg/pull/81897)).
 -   Color palette panel: do not render the theme colors wrapper when the theme provides no colors, which left an empty gap above the Custom section ([#81894](https://github.com/WordPress/gutenberg/pull/81894)).
