@@ -5,6 +5,7 @@ import { COMMON_PROPS } from './utils/constants';
 import { clampNumberOfMonths } from './utils/misc';
 import { useControlledValue } from './utils/use-controlled-value';
 import { useLocalizationProps } from './utils/use-localization-props';
+import { usePreserveDayFocus } from './utils/use-preserve-day-focus';
 import { RootContext } from './utils/root-context';
 import type { CalendarProps, OnValueChangeHandler } from './types';
 
@@ -25,6 +26,7 @@ export const Calendar = forwardRef< HTMLDivElement, CalendarProps >(
 			numberOfMonths = 1,
 			locale = enUS,
 			timeZone,
+			month,
 			render,
 			labels: customLabels,
 			...props
@@ -65,10 +67,11 @@ export const Calendar = forwardRef< HTMLDivElement, CalendarProps >(
 			value: valueProp,
 			onChange,
 		} );
+		const dayFocusProps = usePreserveDayFocus( ref, month );
 
 		const rootContextValue = useMemo(
-			() => ( { render, ref } ),
-			[ render, ref ]
+			() => ( { render, ref: dayFocusProps.ref } ),
+			[ render, dayFocusProps.ref ]
 		);
 
 		return (
@@ -79,10 +82,13 @@ export const Calendar = forwardRef< HTMLDivElement, CalendarProps >(
 					{ ...props }
 					role="application"
 					mode="single"
+					month={ month }
 					numberOfMonths={ clampNumberOfMonths( numberOfMonths ) }
 					labels={ labels }
 					selected={ selected ?? undefined }
 					onSelect={ setSelected }
+					onDayFocus={ dayFocusProps.onDayFocus }
+					onDayBlur={ dayFocusProps.onDayBlur }
 				/>
 			</RootContext.Provider>
 		);

@@ -1,0 +1,19 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.dev.base.json",
+	/* Route tests live beside the route sources, not under src. */
+	"compilerOptions": {
+		"jsx": "react-jsx",
+		"rootDir": ".",
+		"composite": false,
+		"types": [ "jest" ]
+	},
+	"include": [ "**/test/**/*.ts", "**/test/**/*.tsx" ],
+	"exclude": [ "build", "node_modules" ],
+	"references": [
+		{ "path": "../../packages/api-fetch/tsconfig.build.json" },
+		{ "path": "../../packages/data" },
+		{ "path": "../../packages/preferences/tsconfig.build.json" },
+		{ "path": "../../packages/widget-dashboard/tsconfig.build.json" }
+	]
+}

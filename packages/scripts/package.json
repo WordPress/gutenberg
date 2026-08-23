@@ -47,7 +47,7 @@
 		"@wordpress/postcss-plugins-preset": "file:../postcss-plugins-preset",
 		"@wordpress/prettier-config": "file:../prettier-config",
 		"@wordpress/stylelint-config": "file:../stylelint-config",
-		"adm-zip": "^0.5.9",
+		"adm-zip": "^0.6.0",
 		"babel-jest": "^30.4.1",
 		"babel-loader": "^9.2.1",
 		"browserslist": "^4.28.4",

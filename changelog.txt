@@ -1,7 +1,6 @@
 == Changelog ==
 
-= 23.8.0-rc.1 =
-
+= 23.8.0 =
 
 ## Changelog
 
@@ -161,6 +160,8 @@
 #### Collaboration
 - Notes: Fix the mention notification email composition. ([81187](https://github.com/WordPress/gutenberg/pull/81187))
 - RTC: Disable custom autosave controller when RTC is disabled. ([80769](https://github.com/WordPress/gutenberg/pull/80769))
+- RTC: Couple RTC and polling provider as an opt-in experiment. ([80658](https://github.com/WordPress/gutenberg/pull/80658))
+
 
 
 ### Accessibility
@@ -352,7 +353,7 @@ The following PRs were merged by first-time contributors:
 
 The following contributors merged PRs in this release:
 
-@adamsilverstein @adimoldovan @adithya-naik @aduth @ajlende @alecgeatches @amitraj2203 @andrewserong @aslushnikov @chihsuan @ciampo @desrosj @dhasilva @dhruvikpatel18 @dognose24 @dpmehta @drewmt @ellatrix @getdave @giteshsarvaiya @hbhalodia @im3dabasia @ingeniumed @itzmekhokan @jasmussen @jorgefilipecosta @juanfra @makdia @Mamaduka @manzoorwanijk @mcsf @mirka @nerrad @ntsekouras @oandregal @Pranjal1423 @priethor @R1shabh-Gupta @ramonjd @retrofox @scruffian @shail-mehta @simison @SirLouen @SteveJonesDev @t-hamano @talldan @tellthemachines @vianasw @westonruter @yogeshbhutkar @youknowriad @YvetteNikolov
+@adamsilverstein @adimoldovan @adithya-naik @aduth @ajlende @alecgeatches @amitraj2203 @andrewserong @aslushnikov @chihsuan @ciampo @desrosj @dhasilva @dhruvikpatel18 @dognose24 @dpmehta @drewmt @ellatrix @getdave @giteshsarvaiya @hbhalodia @im3dabasia @ingeniumed @itzmekhokan @jasmussen @jorgefilipecosta @juanfra @makdia @Mamaduka @manzoorwanijk @mcsf @mirka @nerrad @ntsekouras @oandregal @Pranjal1423 @priethor @R1shabh-Gupta @ramonjd @retrofox @scruffian @shail-mehta @simison @SirLouen @SteveJonesDev @t-hamano @talldan @tellthemachines @vianasw @westonruter @yogeshbhutkar @youknowriad @YvetteNikolov @chriszarate
 
 
 = 23.7.2 =

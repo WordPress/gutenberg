@@ -62,8 +62,8 @@
 
 	.dataviews-filters__summary-operators-filter-select {
 		width: 100%;
+		min-width: 0;
 		white-space: nowrap;
-		overflow: hidden;
 	}
 }
 
@@ -350,9 +350,6 @@
 
 		&:focus {
 			background: var(--wpds-color-background-surface-neutral-strong);
-			box-shadow:
-				inset 0 0 0 var(--wpds-border-width-focus)
-				var(--wpds-color-stroke-focus);
 		}
 
 		&::placeholder {

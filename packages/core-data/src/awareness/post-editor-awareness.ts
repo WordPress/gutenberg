@@ -3,6 +3,7 @@ import { Y } from '@wordpress/sync';
 // @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { BaseAwarenessState, baseEqualityFieldChecks } from './base-awareness';
+import { isCollaboratorInfo } from './utils';
 import {
 	getBlockPathInYdoc,
 	getContainingBlockYMap,
@@ -353,15 +354,17 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 
 		// Build collaboratorMap from awareness store (all collaborators seen this session)
 		const collaboratorMapData = new Map< string, DebugCollaboratorData >(
-			Array.from( this.getSeenStates().entries() ).map(
-				( [ clientId, collaboratorState ] ) => [
+			Array.from( this.getSeenStates().entries() )
+				.filter( ( [ , collaboratorState ] ) =>
+					isCollaboratorInfo( collaboratorState.collaboratorInfo )
+				)
+				.map( ( [ clientId, collaboratorState ] ) => [
 					String( clientId ),
 					{
 						name: collaboratorState.collaboratorInfo.name,
 						wpUserId: collaboratorState.collaboratorInfo.id,
 					},
-				]
-			)
+				] )
 		);
 
 		// Serialize Yjs client items to avoid deep nesting
