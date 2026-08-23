@@ -810,7 +810,8 @@ test.describe( 'Suggestion mode', () => {
 		expect( serialized ).toContain( 'data-suggestion-type="format"' );
 		expect( serialized ).toContain( '<strong>' );
 
-		// The sidebar reads the change as "Formatting: bold", not a text edit.
+		// The sidebar reads the change as "Add formatting: bold", not a text
+		// edit — and the verb says which way the format is going.
 		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
 		const allNotesToggle = topBar.getByRole( 'button', {
 			name: 'All notes',
@@ -825,8 +826,61 @@ test.describe( 'Suggestion mode', () => {
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.locator( '.editor-collab-sidebar-panel__suggestion-summary' );
 		await expect( summary ).toBeVisible();
-		await expect( summary ).toContainText( 'Formatting:' );
+		await expect( summary ).toContainText( 'Add formatting:' );
 		await expect( summary ).toContainText( 'bold' );
+	} );
+
+	test( 'style — un-bolding a run reads as a removal in the sidebar', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Adding a format and taking one away are opposite proposals. Both
+		// used to summarize as "Formatting: bold", so a reviewer working from
+		// the sidebar could not tell which was on offer without opening the
+		// canvas (F-11).
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello <strong>world</strong>' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await pageUtils.pressKeys( 'primary+b' );
+
+		// The marker proves the un-bold was captured as a format suggestion.
+		const marker = paragraph.locator(
+			'mark.wp-suggestion[data-suggestion-type="format"]'
+		);
+		await expect( marker ).toContainText( 'world' );
+		await expect( paragraph ).toHaveText( 'Hello world' );
+
+		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
+		const allNotesToggle = topBar.getByRole( 'button', {
+			name: 'All notes',
+			exact: true,
+		} );
+		if (
+			( await allNotesToggle.getAttribute( 'aria-expanded' ) ) === 'false'
+		) {
+			await allNotesToggle.click();
+		}
+		const summary = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.locator( '.editor-collab-sidebar-panel__suggestion-summary' );
+		await expect( summary ).toBeVisible();
+		// Anchor on the line that should be there before asserting the
+		// opposite one is not — an absence assertion that runs first can pass
+		// simply by arriving before the summary has rendered.
+		await expect( summary ).toContainText( 'Remove formatting:' );
+		await expect( summary ).toContainText( 'bold' );
+		await expect( summary ).not.toContainText( 'Add formatting:' );
 	} );
 
 	test( 'style — italicizing a word wraps the run in one format marker', async ( {
@@ -891,6 +945,149 @@ test.describe( 'Suggestion mode', () => {
 			paragraph.locator( 'a[href="https://example.com/"]' )
 		).toContainText( 'world' );
 		await expect( paragraph ).toHaveText( 'Hello world' );
+	} );
+
+	/*
+	 * #73411 finding F-12. A second format toggle over a run that already
+	 * carries a `format` marker used to be declined by `planFormatMarkers`
+	 * (the range overlaps a marker) and fall through to the whole-content
+	 * overlay: a second note appeared, the proposed italic never reached the
+	 * block's content, and the overlay's marker-free snapshot rendered in
+	 * place of the live value so every marker in the block stopped rendering.
+	 * The toggle now extends the existing suggestion instead.
+	 */
+	test( 'style — a second format toggle extends the first suggestion instead of opening a second note', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await pageUtils.pressKeys( 'primary+b' );
+
+		const marker = paragraph.locator(
+			'mark.wp-suggestion[data-suggestion-type="format"]'
+		);
+		await expect( marker ).toContainText( 'world' );
+		await expect( paragraph.locator( 'strong' ) ).toContainText( 'world' );
+
+		/*
+		 * Re-select the same run and toggle italic. `ArrowRight` collapses the
+		 * selection first: on macOS Chromium `End` is a no-op while a
+		 * selection is live.
+		 */
+		await page.keyboard.press( 'ArrowRight' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await pageUtils.pressKeys( 'primary+i' );
+
+		/*
+		 * Both proposed formats round-trip into the block's saved content,
+		 * still carried by the one marker. Polled: the italic reaches content
+		 * only after the note round trip, and the browser applies it to the
+		 * live DOM immediately, so a DOM assertion would pass before the
+		 * suggestion layer has done anything.
+		 */
+		await expect
+			.poll( async () => await editor.getEditedPostContent() )
+			.toContain( '<em>' );
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).toContain( 'data-suggestion-type="format"' );
+		expect( serialized ).toContain( '<strong>' );
+
+		// One suggestion, not two: the block links exactly one note id.
+		const noteIds = serialized.match( /"noteId":\[([^\]]*)\]/ );
+		expect( noteIds?.[ 1 ].split( ',' ) ).toHaveLength( 1 );
+
+		// The one marker survives on the canvas, over the same run.
+		await expect( marker ).toContainText( 'world' );
+		await expect( paragraph.locator( 'em' ) ).toContainText( 'world' );
+		await expect( paragraph.locator( 'mark.wp-suggestion' ) ).toHaveCount(
+			1
+		);
+		await expect( paragraph ).toHaveText( 'Hello world' );
+
+		// The single note describes both proposed formats.
+		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
+		const allNotesToggle = topBar.getByRole( 'button', {
+			name: 'All notes',
+			exact: true,
+		} );
+		if (
+			( await allNotesToggle.getAttribute( 'aria-expanded' ) ) === 'false'
+		) {
+			await allNotesToggle.click();
+		}
+		const summary = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.locator( '.editor-collab-sidebar-panel__suggestion-summary' );
+		await expect( summary ).toHaveCount( 1 );
+		await expect( summary ).toContainText( 'bold' );
+		await expect( summary ).toContainText( 'italic' );
+	} );
+
+	/*
+	 * #73411 finding F-12, the degenerate case: toggling the same format back
+	 * off leaves the run exactly as it started, so there is nothing left to
+	 * review. The suggestion is retracted rather than stored as a note whose
+	 * before and after are identical.
+	 */
+	test( 'style — toggling a format back off retracts the suggestion', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await pageUtils.pressKeys( 'primary+b' );
+
+		const marker = paragraph.locator(
+			'mark.wp-suggestion[data-suggestion-type="format"]'
+		);
+		await expect( marker ).toContainText( 'world' );
+
+		await page.keyboard.press( 'ArrowRight' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await pageUtils.pressKeys( 'primary+b' );
+
+		/*
+		 * Marker and note are both gone; the paragraph is back to plain text.
+		 * Polled for the same reason as the stacked-toggle test: the retraction
+		 * only lands after the note round trip.
+		 */
+		await expect
+			.poll( async () => await editor.getEditedPostContent() )
+			.not.toContain( 'wp-suggestion' );
+		await expect( paragraph.locator( 'mark.wp-suggestion' ) ).toHaveCount(
+			0
+		);
+		await expect( paragraph.locator( 'strong' ) ).toHaveCount( 0 );
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).not.toContain( 'noteId' );
+		// The linkage was the block's only metadata, so none is left to
+		// serialize as an empty object.
+		expect( serialized ).not.toContain( 'metadata' );
 	} );
 
 	test( 'captures a heading-level change made via the block-switcher variation picker', async ( {
