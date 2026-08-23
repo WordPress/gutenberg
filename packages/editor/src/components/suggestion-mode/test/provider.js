@@ -1161,6 +1161,244 @@ describe( 'createSuggestion (notes sidebar switch)', () => {
 	} );
 } );
 
+describe( 'grouped structural decisions (block replacement)', () => {
+	const PARAGRAPH = 'core/test-group-paragraph';
+	const QUOTE = 'core/test-group-quote';
+	const GROUP_ID = 'sg-test-1';
+
+	beforeAll( () => {
+		for ( const [ name, title ] of [
+			[ PARAGRAPH, 'Test Group Paragraph' ],
+			[ QUOTE, 'Test Group Quote' ],
+		] ) {
+			registerBlockType( name, {
+				apiVersion: 3,
+				attributes: {
+					content: { type: 'string', default: '' },
+					metadata: { type: 'object' },
+				},
+				save: () => null,
+				category: 'text',
+				title,
+			} );
+		}
+	} );
+
+	afterAll( () => {
+		getBlockTypes().forEach( ( block ) =>
+			unregisterBlockType( block.name )
+		);
+	} );
+
+	function payloadFor( op ) {
+		return {
+			schemaVersion: 2,
+			blockName: op.blockName,
+			baseRevision: null,
+			operations: [ op ],
+		};
+	}
+
+	/**
+	 * Stub core store whose `getEntityRecord` serves the two suggestion
+	 * comments the group is made of, and which records every
+	 * `saveEntityRecord` so the test can assert that BOTH notes were
+	 * resolved by one decision.
+	 *
+	 * @param {Object} comments Comment records keyed by id.
+	 * @param {Array}  saves    Collector for saved records.
+	 * @return {Object} Store descriptor.
+	 */
+	function createStubCoreStore( comments, saves ) {
+		return createReduxStore( 'core', {
+			reducer: ( state = {} ) => state,
+			actions: {
+				saveEntityRecord:
+					( kind, name, record ) =>
+					( { dispatch } ) => {
+						saves.push( record );
+						dispatch( { type: 'SAVE_ENTITY_RECORD' } );
+						return record;
+					},
+			},
+			selectors: {
+				getEditedEntityRecord: () => null,
+				getEntityRecord: ( state, kind, name, id ) =>
+					comments[ id ] ?? null,
+				getCurrentUser: () => null,
+			},
+		} );
+	}
+
+	function setup() {
+		const removed = createBlock( PARAGRAPH, {
+			content: 'Original',
+			metadata: {
+				suggestion: { type: 'pending-remove', groupId: GROUP_ID },
+				noteId: [ 11 ],
+			},
+		} );
+		const inserted = createBlock( QUOTE, {
+			content: 'Original',
+			metadata: {
+				suggestion: { type: 'pending-insert', groupId: GROUP_ID },
+				noteId: [ 12 ],
+			},
+		} );
+
+		const removeOp = {
+			type: 'block-remove',
+			clientId: removed.clientId,
+			blockName: PARAGRAPH,
+			groupId: GROUP_ID,
+		};
+		const insertOp = {
+			type: 'block-insert-after',
+			clientId: inserted.clientId,
+			blockName: QUOTE,
+			anchorClientId: removed.clientId,
+			parentClientId: null,
+			groupId: GROUP_ID,
+		};
+
+		const comments = {
+			11: {
+				id: 11,
+				meta: {
+					_wp_suggestion: JSON.stringify( payloadFor( removeOp ) ),
+				},
+			},
+			12: {
+				id: 12,
+				meta: {
+					_wp_suggestion: JSON.stringify( payloadFor( insertOp ) ),
+				},
+			},
+		};
+		const saves = [];
+
+		const registry = createRegistry();
+		registry.register( noticesStore );
+		registry.register( blockEditorStore );
+		registry.register( createStubCoreStore( comments, saves ) );
+		registry.register( createStubInterfaceStore() );
+		registry
+			.dispatch( blockEditorStore )
+			.resetBlocks( [ removed, inserted ] );
+
+		let providerHandle;
+		function CaptureProvider() {
+			providerHandle = useSuggestionsProvider();
+			return null;
+		}
+		render(
+			<RegistryProvider value={ registry }>
+				<CaptureProvider />
+			</RegistryProvider>
+		);
+
+		return {
+			registry,
+			saves,
+			removed,
+			inserted,
+			removeOp,
+			insertOp,
+			payloadFor,
+			getProvider: () => providerHandle,
+		};
+	}
+
+	it( 'accepting the insertion half also accepts the removal half', async () => {
+		const { registry, saves, removed, inserted, insertOp, getProvider } =
+			setup();
+
+		await act( async () => {
+			await getProvider().applySuggestion( {
+				commentId: 12,
+				clientId: inserted.clientId,
+				payload: payloadFor( insertOp ),
+			} );
+		} );
+
+		const blockEditor = registry.select( blockEditorStore );
+		// The replacement stays and loses its pending treatment...
+		expect( blockEditor.getBlock( inserted.clientId ) ).toBeTruthy();
+		expect(
+			blockEditor.getBlockAttributes( inserted.clientId )?.metadata
+				?.suggestion
+		).toBeUndefined();
+		// ...and the block it replaced is gone, rather than left behind as a
+		// duplicate with a still-pending removal note.
+		expect( blockEditor.getBlock( removed.clientId ) ).toBeFalsy();
+
+		expect( saves.map( ( record ) => record.id ).sort() ).toEqual( [
+			11, 12,
+		] );
+		expect(
+			saves.every(
+				( record ) => record.meta?._wp_suggestion_status === 'applied'
+			)
+		).toBe( true );
+	} );
+
+	it( 'rejecting the removal half also rejects the insertion half', async () => {
+		const { registry, saves, removed, inserted, removeOp, getProvider } =
+			setup();
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 11,
+				clientId: removed.clientId,
+				payload: payloadFor( removeOp ),
+			} );
+		} );
+
+		const blockEditor = registry.select( blockEditorStore );
+		// The original block stays and loses its pending treatment...
+		expect( blockEditor.getBlock( removed.clientId ) ).toBeTruthy();
+		expect(
+			blockEditor.getBlockAttributes( removed.clientId )?.metadata
+				?.suggestion
+		).toBeUndefined();
+		// ...and the replacement is withdrawn, rather than left in place as a
+		// duplicate.
+		expect( blockEditor.getBlock( inserted.clientId ) ).toBeFalsy();
+
+		expect( saves.map( ( record ) => record.id ).sort() ).toEqual( [
+			11, 12,
+		] );
+		expect(
+			saves.every(
+				( record ) => record.meta?._wp_suggestion_status === 'rejected'
+			)
+		).toBe( true );
+	} );
+
+	it( 'leaves an ungrouped structural suggestion alone', async () => {
+		const { registry, saves, removed, inserted, getProvider } = setup();
+
+		// Same tree, but the decision is made against a payload with no
+		// group id — the partner must not be dragged in.
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 11,
+				clientId: removed.clientId,
+				payload: payloadFor( {
+					type: 'block-remove',
+					clientId: removed.clientId,
+					blockName: PARAGRAPH,
+				} ),
+			} );
+		} );
+
+		expect(
+			registry.select( blockEditorStore ).getBlock( inserted.clientId )
+		).toBeTruthy();
+		expect( saves.map( ( record ) => record.id ) ).toEqual( [ 11 ] );
+	} );
+} );
+
 describe( 'review decisions and undo history', () => {
 	const PARAGRAPH = 'core/test-decision-paragraph';
 
