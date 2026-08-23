@@ -22,7 +22,6 @@ function flush() {
 function setup() {
 	( globalThis as any ).indexedDB = buildIndexedDBMock();
 	const registry = createRegistry();
-	// @ts-expect-error -- uploadStore type not assignable to createRegistry's store param
 	registry.register( uploadStore );
 	// Pause so loaded items do not auto-process before we assert.
 	unlock( registry.dispatch( uploadStore ) ).pauseQueue();

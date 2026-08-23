@@ -22,7 +22,6 @@ describe( 'persistence wiring', () => {
 	beforeEach( () => {
 		( globalThis as any ).indexedDB = buildIndexedDBMock();
 		registry = createRegistry();
-		// @ts-expect-error -- uploadStore type not assignable to createRegistry's store param
 		registry.register( uploadStore );
 		unlock( registry.dispatch( uploadStore ) ).pauseQueue();
 	} );
