@@ -23,7 +23,28 @@ import {
 	getInlineMarkerStart,
 	getNoteMarkerSelector,
 } from '../utils';
+import type { BlockAttributes, Thread } from '../utils';
 import { noteFormat } from '../format';
+
+/*
+ * `@wordpress/rich-text` is plain JavaScript with JSDoc types: its store
+ * descriptor is declared as a bare `Object`, its `WPFormat` typedef omits the
+ * optional `attributes` map the note format relies on, and the `RichTextData`
+ * constructor is typed from its default argument. Wrap those three here so
+ * this file type checks without loosening the utilities under test.
+ */
+const getFormatType = ( name: string ): unknown =>
+	( select as ( store: unknown ) => any )( richTextStore ).getFormatType(
+		name
+	);
+
+const registerFormat = registerFormatType as (
+	name: string,
+	settings: Record< string, unknown >
+) => void;
+
+const recordToHTMLString = ( record: unknown ): string =>
+	new ( RichTextData as any )( record ).toHTMLString();
 
 function makeRect( top: number ) {
 	return { top };
@@ -238,7 +259,7 @@ describe( 'note id order preservation', () => {
 	// See https://github.com/WordPress/gutenberg/issues/75145#issuecomment-4361104794
 
 	it( 'preserves insertion order across multiple sequential adds', () => {
-		let metadata = {};
+		let metadata: BlockAttributes = {};
 		metadata = addNoteIdToMetadata( metadata, 5 );
 		metadata = addNoteIdToMetadata( metadata, 3 );
 		metadata = addNoteIdToMetadata( metadata, 7 );
@@ -286,7 +307,7 @@ describe( 'note id order preservation', () => {
 	} );
 
 	it( 'preserves order across an interleaved sequence of adds and removes', () => {
-		let metadata = {};
+		let metadata: BlockAttributes = {};
 		metadata = addNoteIdToMetadata( metadata, 10 );
 		metadata = addNoteIdToMetadata( metadata, 20 );
 		metadata = addNoteIdToMetadata( metadata, 30 );
@@ -551,7 +572,7 @@ describe( 'calculateNotePositions', () => {
 		 * keeps the sweep's assumption true; without it note 1 is pushed to
 		 * 164 - 136px above the marker it points at.
 		 */
-		const threads = [ { id: 1 }, { id: 'new' } ];
+		const threads: Thread[] = [ { id: 1 }, { id: 'new' } ];
 		const blockRects = {
 			1: makeRect( 300 ),
 			new: makeRect( 250 ),
@@ -576,12 +597,11 @@ describe( 'calculateNotePositions', () => {
 describe( 'findNoteRange', () => {
 	const FORMAT_NAME = 'core/note';
 
-	const isRegistered = () =>
-		!! select( richTextStore ).getFormatType( FORMAT_NAME );
+	const isRegistered = () => !! getFormatType( FORMAT_NAME );
 
 	beforeAll( () => {
 		if ( ! isRegistered() ) {
-			registerFormatType( FORMAT_NAME, {
+			registerFormat( FORMAT_NAME, {
 				title: 'Note',
 				tagName: 'span',
 				className: 'wp-note',
@@ -649,12 +669,11 @@ describe( 'findNoteRange', () => {
 describe( 'findNoteInBlock', () => {
 	const FORMAT_NAME = 'core/note';
 
-	const isRegistered = () =>
-		!! select( richTextStore ).getFormatType( FORMAT_NAME );
+	const isRegistered = () => !! getFormatType( FORMAT_NAME );
 
 	beforeAll( () => {
 		if ( ! isRegistered() ) {
-			registerFormatType( FORMAT_NAME, {
+			registerFormat( FORMAT_NAME, {
 				title: 'Note',
 				tagName: 'span',
 				className: 'wp-note',
@@ -742,12 +761,11 @@ describe( 'findNoteInBlock', () => {
 describe( 'applyNoteFormat', () => {
 	const FORMAT_NAME = 'core/note';
 
-	const isRegistered = () =>
-		!! select( richTextStore ).getFormatType( FORMAT_NAME );
+	const isRegistered = () => !! getFormatType( FORMAT_NAME );
 
 	beforeAll( () => {
 		if ( ! isRegistered() ) {
-			registerFormatType( FORMAT_NAME, {
+			registerFormat( FORMAT_NAME, {
 				title: 'Note',
 				tagName: 'mark',
 				className: 'wp-note',
@@ -755,8 +773,8 @@ describe( 'applyNoteFormat', () => {
 				edit: () => null,
 			} );
 		}
-		if ( ! select( richTextStore ).getFormatType( 'core/bold' ) ) {
-			registerFormatType( 'core/bold', {
+		if ( ! getFormatType( 'core/bold' ) ) {
+			registerFormat( 'core/bold', {
 				title: 'Bold',
 				tagName: 'strong',
 				className: null,
@@ -769,7 +787,7 @@ describe( 'applyNoteFormat', () => {
 		if ( isRegistered() ) {
 			unregisterFormatType( FORMAT_NAME );
 		}
-		if ( select( richTextStore ).getFormatType( 'core/bold' ) ) {
+		if ( getFormatType( 'core/bold' ) ) {
 			unregisterFormatType( 'core/bold' );
 		}
 	} );
@@ -789,9 +807,7 @@ describe( 'applyNoteFormat', () => {
 		for ( const [ id, start, end ] of ops ) {
 			record = applyNoteFormat( record, note( id ), start, end );
 		}
-		return RichTextData.fromHTMLString(
-			new RichTextData( record ).toHTMLString()
-		);
+		return RichTextData.fromHTMLString( recordToHTMLString( record ) );
 	};
 
 	it( 'adds a single marker over plain text', () => {
@@ -854,7 +870,7 @@ describe( 'applyNoteFormat', () => {
 		record = applyFormat( record, { type: 'core/bold' }, 4, 9 );
 		record = applyNoteFormat( record, note( 1 ), 0, 18 );
 		const value = RichTextData.fromHTMLString(
-			new RichTextData( record ).toHTMLString()
+			recordToHTMLString( record )
 		);
 		expect( findNoteRange( value, 1 ) ).toEqual( { start: 0, end: 18 } );
 	} );
@@ -866,12 +882,11 @@ describe( 'getInlineMarkerStart', () => {
 	// elements the tests construct below.
 	const FORMAT_NAME = 'core/note';
 
-	const isRegistered = () =>
-		!! select( richTextStore ).getFormatType( FORMAT_NAME );
+	const isRegistered = () => !! getFormatType( FORMAT_NAME );
 
 	beforeAll( () => {
 		if ( ! isRegistered() ) {
-			registerFormatType( FORMAT_NAME, {
+			registerFormat( FORMAT_NAME, {
 				title: 'Note',
 				tagName: 'mark',
 				className: 'wp-note',
@@ -959,12 +974,11 @@ describe( 'removeNoteFormat', () => {
 	// `core/note` format, so register it for the fixtures below.
 	const FORMAT_NAME = 'core/note';
 
-	const isRegistered = () =>
-		!! select( richTextStore ).getFormatType( FORMAT_NAME );
+	const isRegistered = () => !! getFormatType( FORMAT_NAME );
 
 	beforeAll( () => {
 		if ( ! isRegistered() ) {
-			registerFormatType( FORMAT_NAME, {
+			registerFormat( FORMAT_NAME, {
 				title: 'Note',
 				tagName: 'mark',
 				className: 'wp-note',
