@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### New Features
+
+-   Added `transcodeVideo`, which re-encodes a video to a web-safe format (MP4/H.264 or WebM/VP9) with optional downscaling, frame rate and bitrate caps, and `getVideoMetadata`, which reads the primary video track's codec, dimensions, bitrate and duration from the container headers so callers can decide whether a transcode is needed. ([#79375](https://github.com/WordPress/gutenberg/pull/79375))
+-   `transcodeVideo` now probes encoder support before encoding and falls back from `'prefer-hardware'` to `'no-preference'` when the browser has no hardware encoder for the requested codec and output size. Previously the transcode failed outright on machines without a hardware encoder, such as headless browsers, virtual machines and CI runners. ([#79375](https://github.com/WordPress/gutenberg/pull/79375))
+
 ### Internal
 
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
