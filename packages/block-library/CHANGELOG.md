@@ -8,8 +8,8 @@
 
 ### Enhancements
 
--   Calendar: Add cell border support and spacing support. Borders apply to header and date cells (not empty pad cells); text and background color remain on the table ([#64345](https://github.com/WordPress/gutenberg/pull/64345)).
 -   Columns: Add transforms between Columns and the Row variation that preserve column widths through flex child sizing controls.
+-   Calendar: Add cell border support and spacing support. Borders apply to header and date cells (not empty pad cells); text and background color remain on the table ([#64345](https://github.com/WordPress/gutenberg/pull/64345)).
 
 ### Bug Fixes
 
