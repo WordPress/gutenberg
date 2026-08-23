@@ -187,6 +187,11 @@ export const Default: Story = {
  * frame to see the lane count adapt.
  */
 export const Responsive: Story = {
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	args: {
 		minColumnWidth: 200,
 		layout: [
@@ -216,6 +221,11 @@ export const Responsive: Story = {
  * tiles below `minColumnWidth`.
  */
 export const Layered: Story = {
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	args: {
 		columns: 4,
 		minColumnWidth: 200,
@@ -244,6 +254,11 @@ export const Layered: Story = {
  * lanes.
  */
 export const Spanning: Story = {
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	args: {
 		columns: 4,
 		layout: [
@@ -287,6 +302,11 @@ export const Spanning: Story = {
  * story below for a full override example.
  */
 export const EditMode: Story = {
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	args: {
 		columns: 4,
 		editMode: true,
@@ -433,6 +453,11 @@ function NumberedLanesOverlay( { columns, isActive }: GridOverlayRenderProps ) {
  * entirely while keeping `editMode` interactions on.
  */
 export const CustomGridOverlayStory: Story = {
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	name: 'Custom Grid Overlay',
 	args: {
 		columns: 4,

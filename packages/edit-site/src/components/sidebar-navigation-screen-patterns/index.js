@@ -121,7 +121,7 @@ export default function SidebarNavigationScreenPatterns( { backPath } ) {
 		<SidebarNavigationScreen
 			title={ __( 'Patterns' ) }
 			description={ __(
-				'Manage what patterns are available when editing the site.'
+				'Manage what patterns are available when editing your site.'
 			) }
 			isRoot={ ! backPath }
 			backPath={ backPath }

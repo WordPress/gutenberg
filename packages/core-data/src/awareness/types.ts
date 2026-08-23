@@ -2,10 +2,14 @@ import type { Y } from '@wordpress/sync';
 import type { SelectionState } from '../types';
 import type { User } from '../entity-types';
 
-export type CollaboratorInfo = Pick<
-	User< 'view' >,
-	'id' | 'name' | 'slug' | 'avatar_urls'
-> & {
+export type CollaboratorInfo = {
+	// This exclusively represents a WordPress user ID. Fallback collaborators
+	// have no WordPress identity, so their ID is null.
+	id: User< 'view' >[ 'id' ] | null;
+	name: User< 'view' >[ 'name' ];
+	slug: User< 'view' >[ 'slug' ];
+	// Fallback collaborators omit avatar URLs so avatar components render initials.
+	avatar_urls?: Partial< User< 'view' >[ 'avatar_urls' ] >;
 	browserType: string;
 	enteredAt: number;
 };
@@ -49,7 +53,7 @@ export type EnhancedState< State > = State & {
  */
 export type PostEditorAwarenessState = EnhancedState< PostEditorState >;
 
-// WordPress collaborator info for debug export (subset of CollaboratorInfo)
+// Keep the established debug export shape while allowing fallback collaborators.
 export type DebugCollaboratorData = Pick< CollaboratorInfo, 'name' > & {
 	wpUserId: CollaboratorInfo[ 'id' ];
 };

@@ -75,14 +75,23 @@ export function getQueryArgs( url: string ): QueryArgs {
 			.replace( /\+/g, '%20' )
 			.split( '&' )
 			.reduce( ( accumulator, keyValue ) => {
-				const [ key, value = '' ] = keyValue
-					.split( '=' )
-					// Filtering avoids decoding as `undefined` for value, where
-					// default is restored in destructuring assignment.
-					.filter( Boolean )
-					.map( safeDecodeURIComponent );
+				// Only the first `=` separates the key from the value. Any
+				// further occurrences are part of the value itself, as in
+				// base64 padding or a nested URL.
+				const separatorIndex = keyValue.indexOf( '=' );
+				const hasValue = separatorIndex !== -1;
+				const key = safeDecodeURIComponent(
+					hasValue ? keyValue.slice( 0, separatorIndex ) : keyValue
+				);
 
+				// A pair without a key, such as `=value`, is malformed and has
+				// nothing to assign to.
 				if ( key ) {
+					const value = hasValue
+						? safeDecodeURIComponent(
+								keyValue.slice( separatorIndex + 1 )
+						  )
+						: '';
 					const segments = key.replace( /\]/g, '' ).split( '[' );
 					setPath( accumulator, segments, value );
 				}
