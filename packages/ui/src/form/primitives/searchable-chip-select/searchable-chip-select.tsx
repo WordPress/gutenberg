@@ -7,7 +7,14 @@ import focusStyles from '../../../utils/css/focus.module.scss';
 import * as Combobox from '../combobox';
 import { InputLayout } from '../input-layout';
 import styles from './style.module.css';
-import type { Item, SearchableChipSelectProps } from './types';
+import { warnSearchableChipSelectProps } from './dev-warnings';
+import type { Item, ItemGroup, SearchableChipSelectProps } from './types';
+import {
+	findCreatableItem,
+	isItem,
+	normalizeRootItems,
+	shouldSkipCollectionEntry,
+} from './types';
 
 /**
  * A searchable multi-selection component with chips, with support for
@@ -19,7 +26,6 @@ export const SearchableChipSelect = forwardRef<
 >( function SearchableChipSelect(
 	{
 		children,
-		creatableItem,
 		disabled,
 		emptyContent = __( 'No results found.' ),
 		items,
@@ -34,11 +40,14 @@ export const SearchableChipSelect = forwardRef<
 	},
 	ref
 ) {
+	warnSearchableChipSelectProps( items, children );
+
+	const creatableItem = findCreatableItem( items );
+	const comboboxItems = normalizeRootItems( items );
+
 	return (
 		<Combobox.Root
-			items={
-				! creatableItem ? items : [ ...( items ?? [] ), creatableItem ]
-			}
+			items={ comboboxItems }
 			multiple
 			disabled={ disabled }
 			{ ...restProps }
@@ -114,20 +123,31 @@ export const SearchableChipSelect = forwardRef<
 				<Combobox.List>
 					<Combobox.ListBody>
 						<Combobox.Collection>
-							{ ( item: Item, ...args ) => {
-								if ( item.value === creatableItem?.value ) {
+							{ ( entry: Item | ItemGroup, ...args ) => {
+								if (
+									shouldSkipCollectionEntry(
+										entry,
+										creatableItem
+									)
+								) {
 									return null;
 								}
+
 								if ( children ) {
-									return children( item, ...args );
+									return children( entry, ...args );
 								}
+
+								if ( ! isItem( entry ) ) {
+									return null;
+								}
+
 								return (
 									<Combobox.Item
-										key={ item.value }
-										value={ item }
-										disabled={ item.disabled }
+										key={ entry.value }
+										value={ entry }
+										disabled={ entry.disabled }
 									>
-										{ item.label }
+										{ entry.label }
 									</Combobox.Item>
 								);
 							} }

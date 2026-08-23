@@ -9,7 +9,7 @@ import {
 	Button,
 	CheckboxControl,
 	TextControl,
-	TextareaControl,
+	TextareaControl as WCTextareaControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -165,7 +165,7 @@ export default function HomeEdit( { attributes, setAttributes, context } ) {
 						}
 						isShownByDefault
 					>
-						<TextareaControl
+						<WCTextareaControl
 							label={ __( 'Description' ) }
 							value={ description || '' }
 							onChange={ ( descriptionValue ) => {

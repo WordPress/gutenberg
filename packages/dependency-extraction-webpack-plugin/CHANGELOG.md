@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.53.0 (2026-08-12)
+
 ### Enhancements
 
 -   Add `@wordpress/kebab-case` as a bundled package, so consumer builds bundle it instead of externalizing it to a nonexistent `wp-kebab-case` script ([#81294](https://github.com/WordPress/gutenberg/pull/81294)).

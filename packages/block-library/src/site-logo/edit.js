@@ -344,7 +344,7 @@ const SiteLogo = ( {
 							}
 							aria-haspopup="dialog"
 							icon={ crop }
-							label={ __( 'Crop' ) }
+							label={ __( 'Edit image' ) }
 						/>
 					</BlockControls>
 				) }

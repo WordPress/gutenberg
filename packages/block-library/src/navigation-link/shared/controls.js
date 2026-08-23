@@ -4,7 +4,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	CheckboxControl,
 	TextControl,
-	TextareaControl,
+	TextareaControl as WCTextareaControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
@@ -265,7 +265,7 @@ export function Controls( {
 				onDeselect={ () => setAttributes( { description: '' } ) }
 				isShownByDefault={ ! isContentOnly }
 			>
-				<TextareaControl
+				<WCTextareaControl
 					label={ __( 'Description' ) }
 					value={ description || '' }
 					onChange={ ( descriptionValue ) => {
