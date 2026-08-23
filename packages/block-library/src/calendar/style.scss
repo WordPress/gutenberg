@@ -16,8 +16,9 @@
 		}
 	}
 
-	th,
-	td:not(.pad) {
+	// :where() keeps specificity at (0, 1, 0) so Global Styles can override
+	// the default cell border (same approach as #70184 for text color).
+	:where(th, td:not(.pad)) {
 		padding: 0.25em;
 		border: 1px solid $gray-300;
 	}
