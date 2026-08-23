@@ -285,7 +285,19 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 			if ( actions.length === 0 ) {
 				return false;
 			}
-			if ( ! actions.every( ( action ) => action.newNote ) ) {
+			/*
+			 * Only plans this seam can carry out end to end. Every action
+			 * either opens its own note (`newNote`) or grows a marker that
+			 * already has one (`grow-add`) — a `grow-add` is a revision of an
+			 * existing proposal, so it needs no note work at all. An action
+			 * that would retire a note (`remove-add`) is left to the paths that
+			 * own that cleanup.
+			 */
+			if (
+				! actions.every(
+					( action ) => action.newNote || action.type === 'grow-add'
+				)
+			) {
 				return false;
 			}
 			return requestContentSuggestion( {
