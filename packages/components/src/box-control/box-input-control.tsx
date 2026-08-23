@@ -57,10 +57,10 @@ function getSidesToModify(
 				modifiedSides.push( 'top' );
 				break;
 			case 'left':
-				modifiedSides.push( 'left' );
+				modifiedSides.push( 'right' );
 				break;
 			case 'right':
-				modifiedSides.push( 'right' );
+				modifiedSides.push( 'left' );
 				break;
 		}
 	}

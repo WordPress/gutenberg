@@ -35,6 +35,32 @@ describe( 'getLayoutStyle', () => {
 		expect( result ).toBe( expected );
 	} );
 
+	it( 'uses the vertical block gap when a constrained layout receives an axial gap', () => {
+		const result = constrained.getLayoutStyle( {
+			selector: '.my-container',
+			layout: {},
+			style: {
+				spacing: { blockGap: { top: '2rem', left: '3rem' } },
+			},
+			blockName: 'test-block',
+			hasBlockGapSupport: true,
+			layoutDefinitions: {
+				constrained: {
+					spacingStyles: [
+						{
+							selector: ' > * + *',
+							rules: { 'margin-block-start': null },
+						},
+					],
+				},
+			},
+		} );
+
+		expect( result ).toBe(
+			'.my-container > * + * { margin-block-start: 2rem; }'
+		);
+	} );
+
 	it( 'should reset constrained sizes when content width is unset in a viewport', () => {
 		const result = constrained.getLayoutStyle( {
 			selector: '.my-container',

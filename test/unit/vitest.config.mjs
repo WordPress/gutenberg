@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { playwright } from '@vitest/browser-playwright';
@@ -76,7 +77,13 @@ export default defineConfig( {
 						'default',
 						'github-actions',
 						[
-							'@flakiness/vitest',
+							/*
+							 * Resolve to an absolute path so Vitest can load
+							 * the reporter regardless of hoisting layout.
+							 */
+							createRequire( import.meta.url ).resolve(
+								'@flakiness/vitest'
+							),
 							{
 								duplicates: 'rename',
 								flakinessProject: 'WordPress/gutenberg',

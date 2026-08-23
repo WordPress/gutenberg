@@ -258,6 +258,30 @@ describe( 'ColorPanel — duplicate-hex preset slug identity', () => {
 	} );
 } );
 
+describe( 'ColorPanel — additional elements', () => {
+	it( 'renders additional element color controls', () => {
+		render(
+			<ColorPanel
+				value={ {} }
+				settings={ settingsWithColors( {
+					text: true,
+					background: true,
+				} ) }
+				onChange={ () => {} }
+				panelId="test-panel"
+				additionalElements={ [
+					{ name: 'textInput', label: 'Inputs' },
+				] }
+				defaultControls={ { textInput: true } }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: /^Inputs/ } )
+		).toBeVisible();
+	} );
+} );
+
 describe( 'ColorPanel — inherited Global Styles label treatment', () => {
 	describe( 'Link color', () => {
 		it( 'exposes an accessible reset when local link.text overrides the inherited value', () => {
