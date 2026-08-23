@@ -21,15 +21,15 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | Attribute | [Type](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
 | `blob` | `string` | — | [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `local` |
-| `id` | `number` | — | — |
-| `src` | `string` | — | — |
+| `id` | `number` | — | [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `src` | `string` | — | [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `type` | `string` | `"audio"` | — |
-| `album` | `string` | — | — |
-| `artist` | `string` | — | — |
-| `image` | `string` | — | — |
-| `imageAlt` | `string` | — | — |
-| `length` | `string` | — | — |
-| `title` | `string` | — | — |
+| `album` | `string` | — | [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `artist` | `string` | — | [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `image` | `string` | — | [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `imageAlt` | `string` | — | [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `length` | `string` | — | [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `title` | `string` | — | [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 
 ## Supports
 

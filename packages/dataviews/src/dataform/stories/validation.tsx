@@ -12,7 +12,7 @@ import type {
 import DateControl from '../../components/dataform-controls/date';
 import { unlock } from '../../lock-unlock';
 
-const { ValidatedTextControl } = unlock( privateApis );
+const { ValidatedInputControl } = unlock( privateApis );
 
 function getCustomValidity< Item >(
 	isValid: NormalizedRules< Item >,
@@ -52,7 +52,7 @@ function CustomEditControl< Item >( {
 	);
 
 	return (
-		<ValidatedTextControl
+		<ValidatedInputControl
 			required={ !! isValid?.required }
 			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
@@ -109,6 +109,8 @@ const ValidationComponent = ( {
 		dateRange?: string;
 		datetime?: string;
 		time?: string;
+		showConditionalText?: boolean;
+		conditionalText?: string;
 	};
 
 	const [ post, setPost ] = useState< ValidatedItem >( {
@@ -134,6 +136,8 @@ const ValidationComponent = ( {
 		dateRange: undefined,
 		datetime: undefined,
 		time: undefined,
+		showConditionalText: undefined,
+		conditionalText: undefined,
 	} );
 
 	// Cache for getElements functions - ensures promises are only created once
@@ -911,6 +915,22 @@ const ValidationComponent = ( {
 					max: minMax ? '17:00' : undefined,
 				},
 			},
+			{
+				id: 'showConditionalText',
+				type: 'boolean',
+				label: 'Show conditional text',
+			},
+			{
+				id: 'conditionalText',
+				type: 'text',
+				label: 'Conditional text',
+				description:
+					'Always required, but only validated while visible.',
+				isVisible: ( item ) => item.showConditionalText === true,
+				isValid: {
+					required: true,
+				},
+			},
 		];
 	}, [ elements, custom, pattern, minMax, getElements, required ] );
 
@@ -975,6 +995,8 @@ const ValidationComponent = ( {
 					'dateRange',
 					'datetime',
 					'time',
+					'showConditionalText',
+					'conditionalText',
 				],
 			};
 		}
@@ -1012,6 +1034,11 @@ const ValidationComponent = ( {
 				id: 'dateFields',
 				label: 'Date fields',
 				children: [ 'date', 'dateRange', 'datetime', 'time' ],
+			},
+			{
+				id: 'conditionalFields',
+				label: 'Conditionally visible fields',
+				children: [ 'showConditionalText', 'conditionalText' ],
 			},
 		];
 

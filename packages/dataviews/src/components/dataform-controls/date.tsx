@@ -1,19 +1,20 @@
-import clsx from 'clsx';
 import {
+	areIntervalsOverlapping,
+	endOfMonth,
 	format,
+	isSameMonth,
 	isValid as isValidDate,
-	subMonths,
-	subDays,
-	subYears,
+	parseISO,
 	startOfMonth,
 	startOfYear,
+	subDays,
+	subMonths,
+	subYears,
 } from 'date-fns';
 import {
 	BaseControl,
 	Button,
-	Icon as WCIcon,
-	privateApis as componentsPrivateApis,
-	__experimentalInputControl as InputControl,
+	__experimentalInputControl as WCInputControl,
 } from '@wordpress/components';
 import { speak } from '@wordpress/a11y';
 import {
@@ -25,8 +26,12 @@ import {
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getDate, getSettings } from '@wordpress/date';
-import { error as errorIcon } from '@wordpress/icons';
-import { Stack } from '@wordpress/ui';
+import {
+	Calendar,
+	RangeCalendar,
+	Stack,
+	ValidityIndicator,
+} from '@wordpress/ui';
 import RelativeDateControl from './utils/relative-date-control';
 import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
 import {
@@ -34,7 +39,6 @@ import {
 	OPERATOR_OVER,
 	OPERATOR_BETWEEN,
 } from '../../constants';
-import { unlock } from '../../lock-unlock';
 import type {
 	DataFormControlProps,
 	FieldValidity,
@@ -42,8 +46,6 @@ import type {
 	NormalizedField,
 } from '../../types';
 import getCustomValidity from './utils/get-custom-validity';
-
-const { DateCalendar, DateRangeCalendar } = unlock( componentsPrivateApis );
 
 type DateRange = [ string, string ] | undefined;
 
@@ -126,12 +128,19 @@ const DATE_RANGE_PRESETS = [
 	},
 ];
 
+// A `date` value is a plain calendar day with no timezone attached, and the
+// calendar reads and reports the `Date`s it is given in the browser timezone.
+// Anchoring the day there keeps the visible day aligned with the field value.
+// A native Date cannot represent a civil day skipped by the browser timezone
+// (for example, 2011-12-30 in Pacific/Apia). That rare historical edge remains
+// outside this browser-frame approach; using a neutral frame would also make
+// Calendar's built-in today marker follow that frame instead of the browser.
 const parseDate = ( dateString?: string ): Date | null => {
 	if ( ! dateString ) {
 		return null;
 	}
-	const parsed = getDate( dateString );
-	return parsed && isValidDate( parsed ) ? parsed : null;
+	const parsed = parseISO( dateString );
+	return isValidDate( parsed ) ? parsed : null;
 };
 
 const formatDate = ( date?: Date | string ): string => {
@@ -257,22 +266,10 @@ function ValidatedDateControl< Item >( {
 		<div onBlur={ onBlur }>
 			{ children }
 			{ customValidity && (
-				<p
-					className={ clsx(
-						'components-validated-control__indicator',
-						customValidity.type === 'invalid'
-							? 'is-invalid'
-							: undefined
-					) }
-				>
-					<WCIcon
-						className="components-validated-control__indicator-icon"
-						icon={ errorIcon }
-						size={ 16 }
-						fill="currentColor"
-					/>
-					{ customValidity.message }
-				</p>
+				<ValidityIndicator
+					type={ customValidity.type }
+					message={ customValidity.message }
+				/>
 			) }
 		</div>
 	);
@@ -310,6 +307,18 @@ function CalendarDateControl< Item >( {
 		const parsedDate = parseDate( value );
 		return parsedDate || new Date(); // Default to current month
 	} );
+	// Follow external value changes, such as undo, reset, or switching the
+	// edited item. Both dates are already in the browser calendar frame.
+	useEffect( () => {
+		const parsedDate = parseDate( value );
+		if ( parsedDate ) {
+			setCalendarMonth( ( currentMonth ) =>
+				isSameMonth( parsedDate, currentMonth )
+					? currentMonth
+					: parsedDate
+			);
+		}
+	}, [ value ] );
 
 	const [ isTouched, setIsTouched ] = useState( false );
 	const validityTargetRef = useRef< HTMLInputElement >( null );
@@ -324,10 +333,8 @@ function CalendarDateControl< Item >( {
 	);
 
 	const onSelectDate = useCallback(
-		( newDate: Date | undefined | null ) => {
-			const dateValue = newDate
-				? format( newDate, 'yyyy-MM-dd' )
-				: undefined;
+		( newDate: Date | null ) => {
+			const dateValue = newDate ? formatDate( newDate ) : undefined;
 			onChangeCallback( dateValue );
 			setSelectedPresetId( null );
 			setIsTouched( true );
@@ -362,10 +369,6 @@ function CalendarDateControl< Item >( {
 		},
 		[ onChangeCallback ]
 	);
-
-	const {
-		timezone: { string: timezoneString },
-	} = getSettings();
 
 	let displayLabel = label;
 	if ( isValid?.required && ! markWhenOptional ) {
@@ -429,7 +432,7 @@ function CalendarDateControl< Item >( {
 					</Stack>
 
 					{ /* Manual date input */ }
-					<InputControl
+					<WCInputControl
 						ref={ validityTargetRef }
 						type="date"
 						label={ __( 'Date' ) }
@@ -443,15 +446,12 @@ function CalendarDateControl< Item >( {
 					/>
 
 					{ /* Calendar widget */ }
-					<DateCalendar
+					<Calendar
 						style={ { width: '100%' } }
-						selected={
-							value ? parseDate( value ) || undefined : undefined
-						}
-						onSelect={ onSelectDate }
+						value={ value ? parseDate( value ) : null }
+						onValueChange={ onSelectDate }
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
-						timeZone={ timezoneString || undefined }
 						weekStartsOn={ weekStartsOn }
 						disabled={ disabled || disabledMatchers }
 						disableNavigation={ disabled }
@@ -515,7 +515,7 @@ function CalendarDateRangeControl< Item >( {
 
 	const selectedRange = useMemo( () => {
 		if ( ! value ) {
-			return { from: undefined, to: undefined };
+			return null;
 		}
 
 		const [ from, to ] = value;
@@ -526,8 +526,33 @@ function CalendarDateRangeControl< Item >( {
 	}, [ value ] );
 
 	const [ calendarMonth, setCalendarMonth ] = useState< Date >( () => {
-		return selectedRange.from || new Date();
+		return selectedRange?.from || new Date();
 	} );
+	// Follow external range changes while keeping the current view when it
+	// already contains an endpoint or falls between the range endpoints.
+	const [ fromValue, toValue ] = value ?? [];
+	useEffect( () => {
+		setCalendarMonth( ( currentMonth ) => {
+			const from = parseDate( fromValue );
+			const to = parseDate( toValue );
+			const targetMonth = from ?? to;
+			const isRangeVisible =
+				from && to
+					? areIntervalsOverlapping(
+							{ start: from, end: to },
+							{
+								start: startOfMonth( currentMonth ),
+								end: endOfMonth( currentMonth ),
+							},
+							{ inclusive: true }
+					  )
+					: [ from, to ].some(
+							( date ) =>
+								date && isSameMonth( date, currentMonth )
+					  );
+			return targetMonth && ! isRangeVisible ? targetMonth : currentMonth;
+		} );
+	}, [ fromValue, toValue ] );
 
 	const [ isTouched, setIsTouched ] = useState( false );
 	const fromInputRef = useRef< HTMLInputElement >( null );
@@ -553,9 +578,7 @@ function CalendarDateRangeControl< Item >( {
 
 	const onSelectCalendarRange = useCallback(
 		(
-			newRange:
-				| { from: Date | undefined; to?: Date | undefined }
-				| undefined
+			newRange: { from: Date | undefined; to?: Date | undefined } | null
 		) => {
 			updateDateRange( newRange?.from, newRange?.to );
 			setSelectedPresetId( null );
@@ -598,8 +621,6 @@ function CalendarDateRangeControl< Item >( {
 		},
 		[ value, updateDateRange ]
 	);
-
-	const { timezone } = getSettings();
 
 	let displayLabel = label;
 	if ( field.isValid?.required && ! markWhenOptional ) {
@@ -669,7 +690,7 @@ function CalendarDateRangeControl< Item >( {
 						justify="space-between"
 						className="dataviews-controls__date-range-inputs"
 					>
-						<InputControl
+						<WCInputControl
 							ref={ fromInputRef }
 							type="date"
 							label={ __( 'From' ) }
@@ -683,7 +704,7 @@ function CalendarDateRangeControl< Item >( {
 							min={ minConstraint }
 							max={ maxConstraint }
 						/>
-						<InputControl
+						<WCInputControl
 							ref={ toInputRef }
 							type="date"
 							label={ __( 'To' ) }
@@ -699,13 +720,12 @@ function CalendarDateRangeControl< Item >( {
 						/>
 					</Stack>
 
-					<DateRangeCalendar
+					<RangeCalendar
 						style={ { width: '100%' } }
-						selected={ selectedRange }
-						onSelect={ onSelectCalendarRange }
+						value={ selectedRange }
+						onValueChange={ onSelectCalendarRange }
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
-						timeZone={ timezone.string || undefined }
 						weekStartsOn={ weekStartsOn }
 						disabled={ disabled || disabledMatchers }
 					/>
