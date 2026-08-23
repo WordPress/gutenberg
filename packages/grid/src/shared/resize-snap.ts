@@ -157,3 +157,65 @@ export function pixelLimitsToSpanBounds(
 		maxHeight: Math.max( maxHeight, minHeight ),
 	};
 }
+
+/**
+ * Clamps a span to the inclusive `[ min, max ]` range.
+ *
+ * @param span Span in tracks.
+ * @param min  Lowest allowed span.
+ * @param max  Highest allowed span.
+ */
+export function clampSpan( span: number, min: number, max: number ): number {
+	return Math.min( Math.max( span, min ), max );
+}
+
+/**
+ * Pixel limits for the resize gesture, derived from span bounds.
+ * Heights are `null` when rows are content-sized or the height
+ * bound is open.
+ */
+export type ResizePixelLimits = {
+	minWidthPx: number;
+	minHeightPx: number | null;
+	maxWidthPx: number;
+	maxHeightPx: number | null;
+};
+
+/**
+ * Converts span bounds back to pixel limits for the resize gesture,
+ * using the same track math as `gridSpanToPixelSize`.
+ *
+ * @param bounds      Span bounds in whole tracks.
+ * @param columnWidth Width of one column track in pixels.
+ * @param gapPx       Gap between tracks in pixels.
+ * @param rowHeightPx Row track height in pixels, or `null` when rows
+ *                    are content-sized.
+ */
+export function spanBoundsToPixelLimits(
+	bounds: SpanBounds,
+	columnWidth: number,
+	gapPx: number,
+	rowHeightPx: number | null
+): ResizePixelLimits {
+	const min = gridSpanToPixelSize(
+		bounds.minWidth,
+		bounds.minHeight,
+		columnWidth,
+		gapPx,
+		rowHeightPx
+	);
+	const hasMaxHeight = Number.isFinite( bounds.maxHeight );
+	const max = gridSpanToPixelSize(
+		bounds.maxWidth,
+		hasMaxHeight ? bounds.maxHeight : 1,
+		columnWidth,
+		gapPx,
+		hasMaxHeight ? rowHeightPx : null
+	);
+	return {
+		minWidthPx: min.widthPx,
+		minHeightPx: min.heightPx,
+		maxWidthPx: max.widthPx,
+		maxHeightPx: max.heightPx,
+	};
+}

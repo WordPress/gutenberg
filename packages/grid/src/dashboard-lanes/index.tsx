@@ -27,10 +27,8 @@ import {
 import { LanesItem } from './lanes-item';
 import { useLanePlacement } from './use-lane-placement';
 import { GridOverlay } from '../shared/grid-overlay';
-import {
-	gridSpanToPixelSize,
-	pixelLimitsToSpanBounds,
-} from '../shared/resize-snap';
+import { clampSpan, gridSpanToPixelSize } from '../shared/resize-snap';
+import { useResizePixelLimits, useSpanBounds } from '../shared/use-span-bounds';
 import layoutAnimationStyles from '../shared/layout-shift-animation.module.css';
 import { ItemExitOverlay } from '../shared/item-exit-overlay';
 import {
@@ -201,29 +199,20 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			null
 		).widthPx;
 
-		// Per-item width bounds: each declared limit quantized to whole
-		// lanes. Height limits do not apply; lane heights are
-		// content-driven.
-		const widthBoundsByKey = useMemo( () => {
-			const map = new Map<
-				string,
-				{ minWidth: number; maxWidth: number }
-			>();
-			if ( ! itemLimits ) {
-				return map;
-			}
-			for ( const [ key, limits ] of Object.entries( itemLimits ) ) {
-				const { minWidth, maxWidth } = pixelLimitsToSpanBounds(
-					limits,
-					columnWidth,
-					gapPx,
-					null,
-					effectiveColumns
-				);
-				map.set( key, { minWidth, maxWidth } );
-			}
-			return map;
-		}, [ itemLimits, columnWidth, gapPx, effectiveColumns ] );
+		// Height limits do not apply: lane heights are content-driven.
+		const widthBoundsByKey = useSpanBounds(
+			itemLimits,
+			columnWidth,
+			gapPx,
+			null,
+			effectiveColumns
+		);
+		const resizeLimitsByKey = useResizePixelLimits(
+			widthBoundsByKey,
+			columnWidth,
+			gapPx,
+			null
+		);
 
 		const layoutMap = useMemo( () => {
 			const map = new Map< string, DashboardLanesLayoutItem >();
@@ -269,10 +258,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 				return {
 					key,
 					span: bounds
-						? Math.min(
-								Math.max( span, bounds.minWidth ),
-								bounds.maxWidth
-						  )
+						? clampSpan( span, bounds.minWidth, bounds.maxWidth )
 						: span,
 					lane: item?.lane,
 				};
@@ -461,10 +447,10 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			}
 			const baseline = resizeBaselineRef.current;
 			const bounds = widthBoundsByKey.get( id );
-			const newWidth = Math.min(
-				Math.max( baseline + relativeDelta, bounds?.minWidth ?? 1 ),
-				bounds?.maxWidth ?? effectiveColumns,
-				effectiveColumns
+			const newWidth = clampSpan(
+				baseline + relativeDelta,
+				bounds?.minWidth ?? 1,
+				bounds?.maxWidth ?? effectiveColumns
 			);
 
 			setResizeSnapPreview( {
@@ -609,7 +595,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 							if ( ! child ) {
 								return null;
 							}
-							const bounds = widthBoundsByKey.get( id );
+							const limitsPx = resizeLimitsByKey.get( id );
 							return (
 								<LanesItem
 									key={ id }
@@ -628,27 +614,9 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 											: null
 									}
 									minResizeWidthPx={
-										bounds
-											? gridSpanToPixelSize(
-													bounds.minWidth,
-													1,
-													columnWidth,
-													gapPx,
-													null
-											  ).widthPx
-											: minResizeWidthPx
+										limitsPx?.minWidthPx ?? minResizeWidthPx
 									}
-									maxResizeWidthPx={
-										bounds
-											? gridSpanToPixelSize(
-													bounds.maxWidth,
-													1,
-													columnWidth,
-													gapPx,
-													null
-											  ).widthPx
-											: undefined
-									}
+									maxResizeWidthPx={ limitsPx?.maxWidthPx }
 									actionableArea={ actionableAreaMap.get(
 										id
 									) }

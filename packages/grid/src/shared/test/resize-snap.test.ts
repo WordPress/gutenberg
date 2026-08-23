@@ -1,5 +1,6 @@
 import {
 	clampResizeDelta,
+	clampSpan,
 	gridSpanToPixelSize,
 	pixelLimitsToSpanBounds,
 } from '../resize-snap';
@@ -186,5 +187,17 @@ describe( 'clampResizeDelta', () => {
 		expect(
 			clampResizeDelta( { width: 0, height: 120 }, initial, min, max )
 		).toEqual( { width: 0, height: 56 } );
+	} );
+} );
+
+describe( 'clampSpan', () => {
+	it( 'keeps a span inside the inclusive range', () => {
+		expect( clampSpan( 0, 1, 4 ) ).toBe( 1 );
+		expect( clampSpan( 3, 1, 4 ) ).toBe( 3 );
+		expect( clampSpan( 9, 1, 4 ) ).toBe( 4 );
+	} );
+
+	it( 'treats an infinite maximum as open', () => {
+		expect( clampSpan( 40, 1, Infinity ) ).toBe( 40 );
 	} );
 } );

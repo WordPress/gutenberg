@@ -30,7 +30,7 @@ export function resolveFillWidths(
 	sortedKeys: string[],
 	layoutMap: Map< string, DashboardGridLayoutItem >,
 	maxColumns: number,
-	itemBounds?: Map< string, { minWidth: number; maxWidth: number } >
+	itemBounds?: ReadonlyMap< string, { minWidth: number; maxWidth: number } >
 ): Map< string, number > {
 	const resolved = new Map< string, number >();
 	const n = sortedKeys.length;
