@@ -126,6 +126,18 @@ if ( typeof window !== 'undefined' ) {
 		global.HTMLElement.prototype.getAnimations = () => [];
 	}
 
+	// jsdom lacks PointerEvent (needed by Base UI keyboard activation ≥1.7).
+	if ( ! global.PointerEvent ) {
+		global.PointerEvent = class PointerEvent extends global.MouseEvent {
+			constructor( type, init = {} ) {
+				super( type, init );
+				this.pointerId = init.pointerId ?? 0;
+				this.pointerType = init.pointerType ?? '';
+				this.isPrimary = init.isPrimary ?? false;
+			}
+		};
+	}
+
 	// jsdom lacks CSS.supports (needed by Ariakit's modal scroll locking).
 	if ( ! global.CSS ) {
 		global.CSS = {};
