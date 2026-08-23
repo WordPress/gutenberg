@@ -1437,9 +1437,6 @@
 	"packages/editor/src/components/suggestion-mode/suggestion-note-gc.js": {
 		"@wordpress/react-no-unsafe-timeout": {
 			"count": 1
-		},
-		"react-hooks/refs": {
-			"count": 2
 		}
 	},
 	"packages/editor/src/components/suggestion-mode/suggestion-summary.js": {
