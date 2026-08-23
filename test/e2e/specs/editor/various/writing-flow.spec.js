@@ -1391,6 +1391,54 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		);
 		await expect( focusedElement.locator( 'a[href="#"]' ) ).toBeVisible();
 	} );
+
+	test( 'inserts the container default block on Enter on a selected block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			innerBlocks: [
+				{
+					name: 'core/image',
+					attributes: {
+						url: 'data:image/gif;base64,R0lGODlhAQABAAAAACw=',
+					},
+				},
+				{
+					name: 'core/image',
+					attributes: {
+						url: 'data:image/gif;base64,R0lGODlhAQABAAAAACw=',
+					},
+				},
+			],
+		} );
+
+		const firstImage = editor.canvas
+			.getByRole( 'document', { name: 'Block: Image' } )
+			.first();
+		await editor.selectBlocks( firstImage );
+		await expect( firstImage ).toBeFocused();
+
+		// A gallery defines the image as its default block, so Enter
+		// inserts a new empty image after the selected one.
+		await page.keyboard.press( 'Enter' );
+
+		await expect
+			.poll( () =>
+				editor.getBlocks().then( ( [ gallery ] ) =>
+					gallery.innerBlocks.map( ( { name, attributes } ) => ( {
+						name,
+						hasUrl: !! attributes.url,
+					} ) )
+				)
+			)
+			.toEqual( [
+				{ name: 'core/image', hasUrl: true },
+				{ name: 'core/image', hasUrl: false },
+				{ name: 'core/image', hasUrl: true },
+			] );
+	} );
 } );
 
 class WritingFlowUtils {

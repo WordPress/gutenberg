@@ -246,8 +246,17 @@ export function GlobalStylesUI( {
 					<GlobalStylesNavigationScreen path="/typography/caption">
 						<ScreenTypographyElement element="caption" />
 					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/cite">
+						<ScreenTypographyElement element="cite" />
+					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/typography/button">
 						<ScreenTypographyElement element="button" />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/textInput">
+						<ScreenTypographyElement element="textInput" />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/select">
+						<ScreenTypographyElement element="select" />
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/blocks">
 						<ScreenBlockList />
