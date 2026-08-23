@@ -86,8 +86,10 @@ test.describe( 'Parent selector inserter', () => {
 		await expect(
 			toolbar.locator( 'role=button[name="Select parent block: List"]' )
 		).toBeVisible();
+		// The inserter's label varies with the block it would add, so match
+		// the inserter itself rather than any toolbar button named "Add …".
 		await expect(
-			toolbar.locator( 'role=button[name^="Add "]' )
+			toolbar.locator( '.block-editor-block-parent-selector__inserter' )
 		).toBeHidden();
 	} );
 } );
