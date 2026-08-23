@@ -829,7 +829,6 @@ const Example = ( {
 	const settings = useMemo(
 		() => ( {
 			...originalSettings,
-			focusMode: false, // Disable "Spotlight mode".
 			isPreviewMode: true,
 		} ),
 		[ originalSettings ]

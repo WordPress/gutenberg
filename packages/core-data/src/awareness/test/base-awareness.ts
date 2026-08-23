@@ -81,15 +81,21 @@ describe( 'BaseAwareness', () => {
 
 			awareness.setUp();
 			awareness.setUp();
-
 			// Should not throw and should only call getCurrentUser once
 			expect( resolveSelect ).toHaveBeenCalledTimes( 1 );
 		} );
 
-		test( 'should fetch current user and set userInfo', async () => {
+		test( 'publishes the resolved WordPress identity once', async () => {
 			const awareness = new BaseAwareness( doc );
+			const setLocalStateField = jest.spyOn(
+				awareness,
+				'setLocalStateField'
+			);
 
 			awareness.setUp();
+			expect(
+				awareness.getLocalStateField( 'collaboratorInfo' )
+			).toBeNull();
 
 			// Wait for async operations
 			await Promise.resolve();
@@ -100,6 +106,43 @@ describe( 'BaseAwareness', () => {
 			expect( collaboratorInfo?.id ).toBe( 1 );
 			expect( collaboratorInfo?.name ).toBe( 'Test User' );
 			expect( collaboratorInfo?.browserType ).toBe( 'Chrome' );
+			expect( collaboratorInfo?.enteredAt ).toBe( 1704067200000 );
+			expect( setLocalStateField ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		test( 'keeps the fallback identity when user resolution fails', async () => {
+			( resolveSelect as jest.Mock ).mockReturnValue( {
+				getCurrentUser: jest.fn().mockRejectedValue( new Error() ),
+			} );
+			const awareness = new BaseAwareness( doc );
+
+			awareness.setUp();
+			await Promise.resolve();
+
+			const collaboratorInfo =
+				awareness.getLocalStateField( 'collaboratorInfo' );
+			expect( collaboratorInfo ).toMatchObject( {
+				id: null,
+				name: 'Anonymous User',
+				slug: `anonymous-${ doc.clientID }`,
+			} );
+		} );
+
+		test( 'keeps the fallback identity for an invalid user response', async () => {
+			( resolveSelect as jest.Mock ).mockReturnValue( {
+				getCurrentUser: jest.fn().mockResolvedValue( { id: 1 } ),
+			} );
+			const awareness = new BaseAwareness( doc );
+
+			awareness.setUp();
+			await Promise.resolve();
+
+			expect(
+				awareness.getLocalStateField( 'collaboratorInfo' )
+			).toMatchObject( {
+				id: null,
+				name: 'Anonymous User',
+			} );
 		} );
 	} );
 

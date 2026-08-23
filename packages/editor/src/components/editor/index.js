@@ -20,6 +20,7 @@ function Editor( {
 	settings,
 	children,
 	initialEdits,
+	initialViewport,
 
 	// This could be part of the settings.
 	onActionPerformed,
@@ -109,6 +110,7 @@ function Editor( {
 					__unstableTemplate={ template }
 					settings={ settings }
 					initialEdits={ initialEdits }
+					initialViewport={ initialViewport }
 					useSubRegistry={ false }
 				>
 					{ /*
