@@ -16,13 +16,6 @@
 		}
 	}
 
-	// :where() keeps specificity at (0, 1, 0) so Global Styles can override
-	// the default cell border (same approach as #70184 for text color).
-	:where(th, td:not(.pad)) {
-		padding: 0.25em;
-		border: 1px solid $gray-300;
-	}
-
 	th {
 		font-weight: 400;
 	}
@@ -38,6 +31,15 @@
 	:where(table:not(.has-text-color)) {
 		color: #40464d;
 	}
+}
+
+// Zero specificity so Global Styles (`:root :where(...)`) always wins, even
+// when block-library CSS loads after the global stylesheet (editor + Playground).
+:where(.wp-block-calendar th, .wp-block-calendar td:not(.pad)) {
+	padding: 0.25em;
+	border-color: $gray-300;
+	border-style: solid;
+	border-width: 1px;
 }
 
 // Keep the hard-coded header background color for backward compatibility.
