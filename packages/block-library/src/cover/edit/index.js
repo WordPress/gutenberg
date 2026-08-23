@@ -34,6 +34,7 @@ import {
 	isContentPositionCenter,
 	getPositionClassName,
 	mediaPosition,
+	getMediaTypeFromURL,
 } from '../shared';
 import CoverInspectorControls from './inspector-controls';
 import CoverBlockControls from './block-controls';
@@ -424,6 +425,68 @@ function CoverEdit( {
 		} );
 	};
 
+	const onSelectURL = async ( newURL ) => {
+		if ( newURL === url ) {
+			return;
+		}
+
+		// Detect media type from URL (async - may make a HEAD request)
+		const { type: detectedMediaType, error } =
+			await getMediaTypeFromURL( newURL );
+
+		// If we couldn't detect the media type, show an error and don't proceed
+		if ( ! detectedMediaType ) {
+			createErrorNotice(
+				error ||
+					__(
+						'Could not determine if the URL is an image or video.'
+					),
+				{ type: 'snackbar' }
+			);
+			return;
+		}
+
+		const isImage = detectedMediaType === IMAGE_BACKGROUND_TYPE;
+
+		// Only set a new dimRatio if there was no previous media selected
+		// to avoid resetting to 50 if it has been explicitly set to 100.
+		const newDimRatio =
+			originalUrl === undefined && dimRatio === 100 ? 50 : dimRatio;
+
+		// Get average background color for images
+		const averageBackgroundColor = await getMediaColor(
+			isImage ? newURL : undefined
+		);
+
+		let newOverlayColor = overlayColor.color;
+		if ( ! isUserOverlayColor ) {
+			newOverlayColor = averageBackgroundColor;
+			setOverlayColor( newOverlayColor );
+
+			// Make undo revert the next setAttributes and the previous setOverlayColor.
+			__unstableMarkNextChangeAsNotPersistent();
+		}
+
+		const newIsDark = compositeIsDark(
+			newDimRatio,
+			newOverlayColor,
+			averageBackgroundColor
+		);
+
+		setAttributes( {
+			url: newURL,
+			id: undefined,
+			backgroundType: detectedMediaType,
+			focalPoint: undefined,
+			useFeaturedImage: undefined,
+			dimRatio: newDimRatio,
+			isDark: newIsDark,
+			isUserOverlayColor: isUserOverlayColor || false,
+			// Reset parallax for videos
+			...( ! isImage ? { hasParallax: undefined } : {} ),
+		} );
+	};
+
 	// Fetch embed preview for embed videos
 	const { embedPreview, isFetchingEmbed } = useSelect(
 		( select ) => {
@@ -751,6 +814,7 @@ function CoverEdit( {
 					{ resizeListener }
 					<CoverPlaceholder
 						onSelectMedia={ onSelectMedia }
+						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
 						toggleUseFeaturedImage={ toggleUseFeaturedImage }
 					>
@@ -888,6 +952,7 @@ function CoverEdit( {
 				<CoverPlaceholder
 					disableMediaButtons
 					onSelectMedia={ onSelectMedia }
+					onSelectURL={ onSelectURL }
 					onError={ onUploadError }
 					toggleUseFeaturedImage={ toggleUseFeaturedImage }
 				/>

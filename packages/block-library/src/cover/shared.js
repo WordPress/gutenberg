@@ -1,4 +1,5 @@
 import { getBlobTypeByURL, isBlobURL } from '@wordpress/blob';
+import { __, sprintf } from '@wordpress/i18n';
 
 const POSITION_CLASSNAMES = {
 	'top left': 'is-position-top-left',
@@ -106,4 +107,169 @@ export function getPositionClassName( contentPosition ) {
 	}
 
 	return POSITION_CLASSNAMES[ contentPosition ];
+}
+
+/**
+ * Detects the media type from a URL by first checking the file extension,
+ * then falling back to a HEAD request to check the Content-Type header.
+ *
+ * @param {string} url The URL to analyze.
+ * @return {Promise<{type: string|null, error: string|null}>} Object containing the detected media type ('image' or 'video') or an error message.
+ */
+export async function getMediaTypeFromURL( url ) {
+	if ( ! url ) {
+		return { type: null, error: __( 'No URL provided.' ) };
+	}
+
+	// First, try to detect from file extension (fast path)
+	const extensionType = getMediaTypeFromExtension( url );
+	if ( extensionType ) {
+		return { type: extensionType, error: null };
+	}
+
+	// Fall back to HEAD request to check Content-Type
+	try {
+		const response = await fetch( url, { method: 'HEAD' } );
+
+		if ( ! response.ok ) {
+			return {
+				type: null,
+				error: sprintf(
+					/* translators: %d: HTTP status code */
+					__( 'Unable to access the URL (HTTP %d).' ),
+					response.status
+				),
+			};
+		}
+
+		const contentType = response.headers.get( 'Content-Type' ) || '';
+
+		if ( contentType.startsWith( 'image/' ) ) {
+			return { type: IMAGE_BACKGROUND_TYPE, error: null };
+		}
+
+		if ( contentType.startsWith( 'video/' ) ) {
+			return { type: VIDEO_BACKGROUND_TYPE, error: null };
+		}
+
+		// Content-Type doesn't match image or video
+		return {
+			type: null,
+			error: sprintf(
+				/* translators: %s: Content-Type header value */
+				__(
+					'The URL does not point to a valid image or video file (Content-Type: %s).'
+				),
+				contentType || __( 'unknown' )
+			),
+		};
+	} catch {
+		// If HEAD request fails, try a regular GET request with a range
+		// Some servers don't support HEAD requests
+		try {
+			const response = await fetch( url, {
+				method: 'GET',
+				headers: { Range: 'bytes=0-0' },
+			} );
+
+			if ( ! response.ok && response.status !== 206 ) {
+				return {
+					type: null,
+					error: sprintf(
+						/* translators: %d: HTTP status code */
+						__( 'Unable to access the URL (HTTP %d).' ),
+						response.status
+					),
+				};
+			}
+
+			const contentType = response.headers.get( 'Content-Type' ) || '';
+
+			if ( contentType.startsWith( 'image/' ) ) {
+				return { type: IMAGE_BACKGROUND_TYPE, error: null };
+			}
+
+			if ( contentType.startsWith( 'video/' ) ) {
+				return { type: VIDEO_BACKGROUND_TYPE, error: null };
+			}
+
+			// Content-Type doesn't match image or video
+			return {
+				type: null,
+				error: sprintf(
+					/* translators: %s: Content-Type header value */
+					__(
+						'The URL does not point to a valid image or video file (Content-Type: %s).'
+					),
+					contentType || __( 'unknown' )
+				),
+			};
+		} catch {
+			// Both HEAD and GET requests failed - likely CORS or network error
+			return {
+				type: null,
+				error: __(
+					'Unable to verify the URL. This may be due to CORS restrictions or the resource is not accessible.'
+				),
+			};
+		}
+	}
+}
+
+/**
+ * Detects the media type from a URL based on the file extension.
+ * This is a fast path before making network requests.
+ *
+ * @param {string} url The URL to analyze.
+ * @return {string|null} The media type ('image' or 'video'), or null if unknown.
+ */
+function getMediaTypeFromExtension( url ) {
+	// Extract the pathname from the URL to get the file extension
+	let pathname;
+	try {
+		pathname = new URL( url, window.location.origin ).pathname;
+	} catch {
+		pathname = url;
+	}
+
+	// Remove query string and hash from pathname
+	pathname = pathname.split( '?' )[ 0 ].split( '#' )[ 0 ];
+
+	// Common image extensions
+	const imageExtensions = [
+		'jpg',
+		'jpeg',
+		'png',
+		'gif',
+		'webp',
+		'avif',
+		'svg',
+		'bmp',
+		'ico',
+	];
+	// Common video extensions
+	const videoExtensions = [
+		'mp4',
+		'webm',
+		'ogg',
+		'ogv',
+		'mov',
+		'avi',
+		'wmv',
+		'flv',
+		'm4v',
+	];
+
+	const extension = pathname.split( '.' ).pop()?.toLowerCase();
+
+	if ( extension && imageExtensions.includes( extension ) ) {
+		return IMAGE_BACKGROUND_TYPE;
+	}
+
+	if ( extension && videoExtensions.includes( extension ) ) {
+		return VIDEO_BACKGROUND_TYPE;
+	}
+
+	// Return null to indicate we couldn't determine from extension
+	return null;
 }

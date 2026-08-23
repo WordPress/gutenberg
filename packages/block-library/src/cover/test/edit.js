@@ -107,8 +107,9 @@ describe( 'Cover block', () => {
 			await setup();
 
 			expect(
-				within( screen.getByLabelText( 'Block: Cover' ) ).getByText(
-					'To edit this block, you need permission to upload media.'
+				within( screen.getByLabelText( 'Block: Cover' ) ).getByRole(
+					'button',
+					{ name: 'Insert from URL' }
 				)
 			).toBeInTheDocument();
 		} );
