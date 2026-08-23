@@ -134,7 +134,7 @@ describe( 'SuggestionNoteGC reopening an undone decision', () => {
 			{
 				id: NOTE_ID,
 				status: 'hold',
-				meta: { _wp_suggestion_status: '' },
+				meta: { _wp_suggestion_status: 'pending' },
 			},
 			expect.anything()
 		);
