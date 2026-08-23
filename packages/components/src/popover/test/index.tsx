@@ -15,7 +15,7 @@ import {
 } from '../utils';
 import Popover from '..';
 import type { PopoverProps } from '../types';
-import { PopoverInsideIframeRenderedInExternalSlot } from './utils';
+import { PopoverInsideIframeRenderedInExternalSlot } from './utils/index.js';
 
 type PositionToPlacementTuple = [
 	NonNullable< PopoverProps[ 'position' ] >,

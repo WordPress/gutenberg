@@ -88,7 +88,7 @@ export type SelectItemProps = Omit<
 	 *
 	 * @default 'default'
 	 */
-	size?: InputLayoutProps[ 'size' ];
+	size?: 'default' | 'small';
 	/**
 	 * The content of the item.
 	 */
