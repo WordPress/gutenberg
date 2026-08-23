@@ -58,6 +58,7 @@ import {
 	SuggestionMultiBlockFormatNotice,
 	SuggestionContentReconciler,
 	registerSuggestionOverlayFilter,
+	registerClipboardSuggestionStrip,
 	isSuggestionModeEnabled,
 	MoveGhostsProvider,
 } from '../suggestion-mode';
@@ -80,6 +81,12 @@ if ( isSuggestionModeEnabled() ) {
 // editing in Suggest mode, not from a control. Idempotent, so it's safe
 // globally.
 registerSuggestionFormat();
+
+// Keep suggestion markers, `metadata.suggestion` and `metadata.noteId` off the
+// clipboard. Registered unconditionally for the same reason as the format:
+// content that already carries markers outlives the experiment flag, and a
+// paste into another post has no way to resolve ids from this one.
+registerClipboardSuggestionStrip();
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
