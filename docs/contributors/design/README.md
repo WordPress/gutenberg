@@ -2,6 +2,9 @@
 
 A guide on how to get started contributing design to the Gutenberg project.
 
+For guidance on consuming or maintaining the WordPress Design System packages,
+see [Working with WordPress Design System packages](/docs/contributors/design/design-system-packages.md).
+
 ## Discussions
 
 The [Make WordPress Design blog](https://make.wordpress.org/design/) is the primary spot for the latest information around WordPress Design Team: including announcements, product goals, meeting notes, meeting agendas, and more.

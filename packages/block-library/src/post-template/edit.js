@@ -14,10 +14,19 @@ import { Spinner, ToolbarGroup } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { list, grid } from '@wordpress/icons';
 
+// The Post Template's layout attribute arranges the post items, not the
+// blocks of the template, which always stack vertically inside each post
+// item. Override the inherited layout so inner block UI (movers, inserters,
+// grid controls) doesn't follow the post items' grid.
+const INNER_BLOCKS_LAYOUT = { type: 'default' };
+
 function PostTemplateInnerBlocks( { classList } ) {
 	const innerBlocksProps = useInnerBlocksProps(
 		{ className: clsx( 'wp-block-post', classList ) },
-		{ __unstableDisableLayoutClassNames: true }
+		{
+			__unstableDisableLayoutClassNames: true,
+			layout: INNER_BLOCKS_LAYOUT,
+		}
 	);
 	return <li { ...innerBlocksProps } />;
 }
