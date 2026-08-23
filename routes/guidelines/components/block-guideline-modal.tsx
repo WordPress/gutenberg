@@ -4,7 +4,7 @@ import {
 	Modal,
 	Notice,
 	TextControl,
-	TextareaControl,
+	TextareaControl as WCTextareaControl,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -145,7 +145,7 @@ export default function BlockGuidelineModal( {
 						placeholder={ __( 'Search for a block…' ) }
 					/>
 				) }
-				<TextareaControl
+				<WCTextareaControl
 					label={ __( 'Guideline text' ) }
 					value={ guidelineText }
 					onChange={ setGuidelineText }

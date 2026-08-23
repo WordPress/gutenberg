@@ -10,6 +10,10 @@
 
 -   A HEIC photo whose extension says `.jpg` or `.png` is now recognized from its own file header and converted like any other HEIC file, instead of being uploaded as undecodable bytes that leave the upload stuck without ever completing or reporting an error ([#81707](https://github.com/WordPress/gutenberg/issues/81707)).
 
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
 ## 0.38.0 (2026-08-12)
 
 ### Enhancements
@@ -19,7 +23,6 @@
 ### Bug Fixes
 
 -   A failed `/finalize` request is no longer reported as a successful upload. Finalize is the server's commit point for the attachment metadata (responsive sub-sizes and the final `-scaled` file reference); when it fails, the item is now cancelled and the error surfaced instead of showing "upload complete" and keeping an attachment that is missing its registered sizes ([#80673](https://github.com/WordPress/gutenberg/issues/80673)).
-
 ## 0.37.0 (2026-07-29)
 
 ### Breaking Changes

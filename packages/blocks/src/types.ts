@@ -70,6 +70,12 @@ export interface BlockShortcutKeyCombination {
  *
  * Shortcuts are registered with the `core/keyboard-shortcuts` store while the
  * block editor is mounted, and apply to the selected block.
+ *
+ * The same shortcut may be declared in more than one place, so long as every
+ * declaration agrees on the key combination and description. A shortcut that
+ * both switches a block's type and picks a variation of it is declared twice:
+ * once on the variation, for a block that is already of that type, and once on
+ * the transform that produces it.
  */
 export interface BlockShortcut {
 	/**
@@ -90,6 +96,13 @@ export interface BlockShortcut {
 	 * Alternative key combinations that trigger the same shortcut.
 	 */
 	aliases?: BlockShortcutKeyCombination[];
+	/**
+	 * The variation of the produced block type this shortcut targets. Only
+	 * meaningful on a block transform, where it lets one transform carry a
+	 * shortcut per variation of the block it produces. Defaults to the
+	 * transform's own `variationName`.
+	 */
+	variationName?: string;
 }
 
 /**
@@ -155,10 +168,10 @@ export interface BlockVariation<
 	/**
 	 * A keyboard shortcut that applies this variation to the selected block.
 	 *
-	 * When the selected block is already of this block type, the variation's
-	 * attributes are applied to it, unless `isActive` reports the variation as
-	 * already active. Otherwise the selected block is transformed to this block
-	 * type first, which requires a matching block transform to exist.
+	 * It only applies to blocks that are already of this block type, and does
+	 * nothing when `isActive` reports the variation as already active. To reach
+	 * the variation from another block type, declare the same shortcut on a
+	 * block transform that produces this one.
 	 */
 	shortcut?: BlockShortcut;
 	/**
@@ -217,14 +230,17 @@ export interface BlockTransform<
 	 */
 	variationName?: string;
 	/**
-	 * A keyboard shortcut that applies this transform to the selected block.
-	 * Only supported on transforms of type `block`.
+	 * Keyboard shortcuts that apply this transform to the selected block. Only
+	 * supported on transforms of type `block`.
 	 *
-	 * On a `to` transform the shortcut applies to the block declaring it, and
-	 * produces the first entry of `blocks`. On a `from` transform it applies to
-	 * any block listed in `blocks`, and produces the block declaring it.
+	 * On a `to` transform they apply to the block declaring it, and produce the
+	 * first entry of `blocks`. On a `from` transform they apply to any block
+	 * listed in `blocks`, and produce the block declaring it. Each shortcut may
+	 * target a different variation of the produced block through its own
+	 * `variationName`, which is what lets one transform carry a shortcut per
+	 * variation without appearing more than once in the block switcher.
 	 */
-	shortcut?: BlockShortcut;
+	shortcuts?: BlockShortcut[];
 	priority?: number;
 	isMultiBlock?: boolean;
 	isMatch?: (

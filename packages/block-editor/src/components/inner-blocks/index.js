@@ -178,12 +178,17 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		__unstableDisableLayoutClassNames,
 		__unstableDisableDropZone,
 		dropZoneElement,
+		layout: layoutOverride,
 	} = options;
 	const {
 		clientId,
-		layout = null,
+		layout: contextLayout = null,
 		__unstableLayoutClassNames: layoutClassNames = '',
 	} = useBlockEditContext();
+	// An options layout takes precedence over the context layout, as it does
+	// for the inner blocks settings, so containers whose layout attribute
+	// doesn't apply to their inner blocks (e.g. Post Template) can opt out.
+	const layout = layoutOverride ?? contextLayout;
 	const selected = useSelect(
 		( select ) => {
 			const {

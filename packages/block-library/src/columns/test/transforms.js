@@ -87,7 +87,7 @@ describe( 'transforms', () => {
 		} );
 		expect( transformedBlocks[ 0 ].innerBlocks[ 1 ] ).toMatchObject( {
 			name: 'core/group',
-			attributes: { layout: { type: 'constrained' } },
+			attributes: { layout: { type: 'default' } },
 			innerBlocks: [
 				expect.objectContaining( {
 					name: 'core/paragraph',
@@ -99,6 +99,522 @@ describe( 'transforms', () => {
 				} ),
 			],
 		} );
+	} );
+
+	it( "preserves each Column block's styles when transforming Columns to Grid", () => {
+		const block = createBlock( 'core/columns', {}, [
+			createBlock(
+				'core/column',
+				{ style: { color: { background: '#123456' } } },
+				[ createBlock( 'core/paragraph', { content: 'One' } ) ]
+			),
+			createBlock(
+				'core/column',
+				{ style: { spacing: { padding: { top: '10px' } } } },
+				[
+					createBlock( 'core/paragraph', { content: 'Two' } ),
+					createBlock( 'core/paragraph', { content: 'Three' } ),
+				]
+			),
+		] );
+
+		const transformedBlocks = switchToBlockType(
+			block,
+			'core/group',
+			'group-grid'
+		);
+
+		expect(
+			transformedBlocks[ 0 ].innerBlocks.map( ( innerBlock ) => ( {
+				name: innerBlock.name,
+				style: innerBlock.attributes.style,
+			} ) )
+		).toEqual( [
+			{
+				name: 'core/group',
+				style: { color: { background: '#123456' } },
+			},
+			{
+				name: 'core/group',
+				style: { spacing: { padding: { top: '10px' } } },
+			},
+		] );
+	} );
+
+	it( 'transforms Columns to the Row variation of Group with one child for each column', () => {
+		const block = createBlock(
+			'core/columns',
+			{
+				align: 'wide',
+				isStackedOnMobile: true,
+				verticalAlignment: 'center',
+			},
+			[
+				createBlock( 'core/column', {}, [
+					createBlock( 'core/paragraph', { content: 'One' } ),
+				] ),
+				createBlock( 'core/column', {}, [
+					createBlock( 'core/paragraph', { content: 'Two' } ),
+					createBlock( 'core/paragraph', { content: 'Three' } ),
+				] ),
+				createBlock( 'core/column' ),
+			]
+		);
+
+		const transformedBlocks = switchToBlockType(
+			block,
+			'core/group',
+			'group-row'
+		);
+
+		expect( transformedBlocks[ 0 ] ).toMatchObject( {
+			name: 'core/group',
+			attributes: {
+				align: 'wide',
+				layout: {
+					type: 'flex',
+					flexWrap: 'nowrap',
+					verticalAlignment: 'center',
+				},
+			},
+		} );
+		expect( transformedBlocks[ 0 ].attributes ).not.toHaveProperty(
+			'isStackedOnMobile'
+		);
+		expect( transformedBlocks[ 0 ].attributes ).not.toHaveProperty(
+			'verticalAlignment'
+		);
+		expect( transformedBlocks[ 0 ].innerBlocks ).toHaveLength( 3 );
+		expect( transformedBlocks[ 0 ].innerBlocks[ 0 ] ).toMatchObject( {
+			name: 'core/paragraph',
+			attributes: { content: 'One' },
+		} );
+		expect( transformedBlocks[ 0 ].innerBlocks[ 1 ] ).toMatchObject( {
+			name: 'core/group',
+			attributes: { layout: { type: 'default' } },
+			innerBlocks: [
+				expect.objectContaining( {
+					name: 'core/paragraph',
+					attributes: { content: 'Two' },
+				} ),
+				expect.objectContaining( {
+					name: 'core/paragraph',
+					attributes: { content: 'Three' },
+				} ),
+			],
+		} );
+		expect( transformedBlocks[ 0 ].innerBlocks[ 2 ] ).toMatchObject( {
+			name: 'core/group',
+			attributes: { layout: { type: 'default' } },
+			innerBlocks: [],
+		} );
+	} );
+
+	it( "preserves each Column block's styles when transforming Columns to Row", () => {
+		const block = createBlock( 'core/columns', {}, [
+			createBlock(
+				'core/column',
+				{
+					width: '320px',
+					style: {
+						color: { background: '#123456' },
+						layout: { columnSpan: 2 },
+					},
+				},
+				[ createBlock( 'core/paragraph', { content: 'One' } ) ]
+			),
+			createBlock(
+				'core/column',
+				{
+					width: '50%',
+					style: { spacing: { padding: { top: '10px' } } },
+				},
+				[
+					createBlock( 'core/paragraph', { content: 'Two' } ),
+					createBlock( 'core/paragraph', { content: 'Three' } ),
+				]
+			),
+		] );
+
+		const transformedBlocks = switchToBlockType(
+			block,
+			'core/group',
+			'group-row'
+		);
+
+		expect(
+			transformedBlocks[ 0 ].innerBlocks.map( ( innerBlock ) => ( {
+				name: innerBlock.name,
+				style: innerBlock.attributes.style,
+			} ) )
+		).toEqual( [
+			{
+				name: 'core/group',
+				style: {
+					color: { background: '#123456' },
+					layout: {
+						columnSpan: 2,
+						selfStretch: 'fixed',
+						flexSize: '320px',
+					},
+				},
+			},
+			{
+				name: 'core/group',
+				style: {
+					spacing: { padding: { top: '10px' } },
+					layout: {
+						selfStretch: 'fixed',
+						flexSize: '50%',
+					},
+				},
+			},
+		] );
+	} );
+
+	it.each( [
+		[ 'Grid', 'group-grid' ],
+		[ 'Row', 'group-row' ],
+	] )(
+		"preserves each Column block's layout attributes when transforming Columns to %s",
+		( _variationTitle, variationName ) => {
+			const columnLayouts = [
+				{
+					type: 'constrained',
+					contentSize: '640px',
+					wideSize: '1200px',
+				},
+				{
+					type: 'flex',
+					orientation: 'vertical',
+					justifyContent: 'center',
+				},
+			];
+			const block = createBlock(
+				'core/columns',
+				{},
+				columnLayouts.map( ( layout ) =>
+					createBlock( 'core/column', { layout }, [
+						createBlock( 'core/paragraph' ),
+					] )
+				)
+			);
+
+			const transformedBlocks = switchToBlockType(
+				block,
+				'core/group',
+				variationName
+			);
+
+			expect(
+				transformedBlocks[ 0 ].innerBlocks.map( ( innerBlock ) => ( {
+					name: innerBlock.name,
+					layout: innerBlock.attributes.layout,
+				} ) )
+			).toEqual(
+				columnLayouts.map( ( layout ) => ( {
+					name: 'core/group',
+					layout,
+				} ) )
+			);
+		}
+	);
+
+	it.each( [
+		[ 'Grid', 'group-grid' ],
+		[ 'Row', 'group-row' ],
+	] )(
+		'transforms an implicitly flow-layout Column to a flow Group in %s',
+		( _variationTitle, variationName ) => {
+			const block = createBlock( 'core/columns', {}, [
+				createBlock( 'core/column', {}, [
+					createBlock( 'core/paragraph', { content: 'One' } ),
+					createBlock( 'core/paragraph', { content: 'Two' } ),
+				] ),
+			] );
+
+			const transformedBlocks = switchToBlockType(
+				block,
+				'core/group',
+				variationName
+			);
+
+			expect( transformedBlocks[ 0 ].innerBlocks[ 0 ] ).toMatchObject( {
+				name: 'core/group',
+				attributes: { layout: { type: 'default' } },
+			} );
+		}
+	);
+
+	it.each( [
+		[ 'Grid', 'group-grid' ],
+		[ 'Row', 'group-row' ],
+	] )(
+		'preserves root-level style attributes when transforming Columns to %s',
+		( _variationTitle, variationName ) => {
+			const rootStyleAttributes = {
+				backgroundColor: 'primary',
+				borderColor: 'accent',
+				className: 'is-style-example custom-class',
+				fontFamily: 'heading',
+				fontSize: 'large',
+				gradient: 'vivid-cyan-blue-to-vivid-purple',
+				textColor: 'contrast',
+			};
+			const block = createBlock( 'core/columns', {}, [
+				createBlock( 'core/column', rootStyleAttributes, [
+					createBlock( 'core/paragraph' ),
+				] ),
+			] );
+
+			const transformedBlocks = switchToBlockType(
+				block,
+				'core/group',
+				variationName
+			);
+
+			expect( transformedBlocks[ 0 ].innerBlocks[ 0 ] ).toMatchObject( {
+				name: 'core/group',
+				attributes: rootStyleAttributes,
+			} );
+		}
+	);
+
+	it.each( [
+		[ 'Grid', 'group-grid' ],
+		[ 'Row', 'group-row' ],
+	] )(
+		'preserves Group-supported Column attributes when transforming Columns to %s',
+		( _variationTitle, variationName ) => {
+			const block = createBlock( 'core/columns', {}, [
+				createBlock(
+					'core/column',
+					{
+						anchor: 'column-anchor',
+						lock: { move: true, remove: true },
+						templateLock: 'insert',
+						verticalAlignment: 'center',
+						width: '320px',
+					},
+					[ createBlock( 'core/paragraph' ) ]
+				),
+			] );
+
+			const transformedBlocks = switchToBlockType(
+				block,
+				'core/group',
+				variationName
+			);
+			const transformedColumn = transformedBlocks[ 0 ].innerBlocks[ 0 ];
+
+			expect( transformedColumn ).toMatchObject( {
+				name: 'core/group',
+				attributes: {
+					anchor: 'column-anchor',
+					lock: { move: true, remove: true },
+					templateLock: 'insert',
+				},
+			} );
+			expect( transformedColumn.attributes ).not.toHaveProperty(
+				'verticalAlignment'
+			);
+			expect( transformedColumn.attributes ).not.toHaveProperty(
+				'width'
+			);
+		}
+	);
+
+	it( 'migrates Column widths to Row child sizing controls', () => {
+		const block = createBlock( 'core/columns', {}, [
+			createBlock( 'core/column', { width: '320px' }, [
+				createBlock( 'core/paragraph', {
+					content: 'One',
+					style: {
+						color: { text: '#123456' },
+						layout: { columnSpan: 2 },
+					},
+				} ),
+			] ),
+			createBlock( 'core/column', { width: '50%' }, [
+				createBlock( 'core/paragraph', { content: 'Two' } ),
+			] ),
+			createBlock( 'core/column', {}, [
+				createBlock( 'core/paragraph', { content: 'Three' } ),
+			] ),
+		] );
+
+		const transformedBlocks = switchToBlockType(
+			block,
+			'core/group',
+			'group-row'
+		);
+
+		expect(
+			transformedBlocks[ 0 ].innerBlocks.map(
+				( innerBlock ) => innerBlock.attributes.style.layout
+			)
+		).toEqual( [
+			{
+				columnSpan: 2,
+				selfStretch: 'fixed',
+				flexSize: '320px',
+			},
+			{ selfStretch: 'fixed', flexSize: '50%' },
+			{ selfStretch: 'fill' },
+		] );
+		expect(
+			transformedBlocks[ 0 ].innerBlocks[ 0 ].attributes.style.color
+		).toEqual( { text: '#123456' } );
+	} );
+
+	it( 'sets equal fixed widths when no Column widths are set', () => {
+		const block = createBlock( 'core/columns', {}, [
+			createBlock( 'core/column', {}, [
+				createBlock( 'core/paragraph', { content: 'One' } ),
+			] ),
+			createBlock( 'core/column', {}, [
+				createBlock( 'core/paragraph', { content: 'Two' } ),
+			] ),
+			createBlock( 'core/column', {}, [
+				createBlock( 'core/paragraph', { content: 'Three' } ),
+			] ),
+		] );
+
+		const transformedBlocks = switchToBlockType(
+			block,
+			'core/group',
+			'group-row'
+		);
+
+		expect(
+			transformedBlocks[ 0 ].innerBlocks.map(
+				( innerBlock ) => innerBlock.attributes.style.layout
+			)
+		).toEqual( [
+			{ selfStretch: 'fixed', flexSize: '33.33%' },
+			{ selfStretch: 'fixed', flexSize: '33.33%' },
+			{ selfStretch: 'fixed', flexSize: '33.33%' },
+		] );
+	} );
+
+	it( 'transforms the Row variation of Group to Columns with one Column per Row child', () => {
+		const block = createBlock(
+			'core/group',
+			{
+				align: 'wide',
+				layout: {
+					type: 'flex',
+					flexWrap: 'nowrap',
+					verticalAlignment: 'center',
+				},
+			},
+			[
+				createBlock( 'core/paragraph', { content: 'One' } ),
+				createBlock(
+					'core/group',
+					{ layout: { type: 'constrained' } },
+					[
+						createBlock( 'core/paragraph', { content: 'Two' } ),
+						createBlock( 'core/paragraph', { content: 'Three' } ),
+					]
+				),
+			]
+		);
+
+		const transformedBlocks = switchToBlockType( block, 'core/columns' );
+
+		expect( transformedBlocks[ 0 ] ).toMatchObject( {
+			name: 'core/columns',
+			attributes: {
+				align: 'wide',
+				verticalAlignment: 'center',
+			},
+		} );
+		expect( transformedBlocks[ 0 ].attributes ).not.toHaveProperty(
+			'layout'
+		);
+		expect( transformedBlocks[ 0 ].innerBlocks ).toHaveLength( 2 );
+		expect( transformedBlocks[ 0 ].innerBlocks[ 0 ] ).toMatchObject( {
+			name: 'core/column',
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'One' },
+				},
+			],
+		} );
+		expect( transformedBlocks[ 0 ].innerBlocks[ 1 ] ).toMatchObject( {
+			name: 'core/column',
+			innerBlocks: [
+				{
+					name: 'core/group',
+					attributes: { layout: { type: 'constrained' } },
+					innerBlocks: [
+						{ attributes: { content: 'Two' } },
+						{ attributes: { content: 'Three' } },
+					],
+				},
+			],
+		} );
+	} );
+
+	it( 'migrates fixed Row child sizes to Column widths', () => {
+		const block = createBlock(
+			'core/group',
+			{ layout: { type: 'flex', flexWrap: 'nowrap' } },
+			[
+				createBlock( 'core/paragraph', {
+					content: 'One',
+					style: {
+						color: { text: '#123456' },
+						layout: {
+							columnSpan: 2,
+							selfStretch: 'fixed',
+							flexSize: '320px',
+						},
+					},
+				} ),
+				createBlock( 'core/paragraph', {
+					content: 'Two',
+					style: {
+						layout: {
+							selfStretch: 'fixedNoShrink',
+							flexSize: '50%',
+						},
+					},
+				} ),
+				createBlock( 'core/paragraph', {
+					content: 'Three',
+					style: {
+						layout: {
+							selfStretch: 'fill',
+							flexSize: '25%',
+						},
+					},
+				} ),
+			]
+		);
+
+		const transformedBlocks = switchToBlockType( block, 'core/columns' );
+
+		expect(
+			transformedBlocks[ 0 ].innerBlocks.map(
+				( column ) => column.attributes.width
+			)
+		).toEqual( [ '320px', '50%', undefined ] );
+		expect(
+			transformedBlocks[ 0 ].innerBlocks[ 0 ].innerBlocks[ 0 ].attributes
+				.style
+		).toEqual( {
+			color: { text: '#123456' },
+			layout: { columnSpan: 2 },
+		} );
+		expect(
+			transformedBlocks[ 0 ].innerBlocks[ 1 ].innerBlocks[ 0 ].attributes
+		).not.toHaveProperty( 'style' );
+		expect(
+			transformedBlocks[ 0 ].innerBlocks[ 2 ].innerBlocks[ 0 ].attributes
+		).not.toHaveProperty( 'style' );
 	} );
 
 	it( 'transforms Grid variation of Group to Columns using the explicit grid column count', () => {

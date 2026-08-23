@@ -1,6 +1,5 @@
 import { __experimentalListView as ListView } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
-import { useFocusOnMount, useMergeRefs } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -16,8 +15,6 @@ export default function ListViewSidebar() {
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the dropZoneElement updates.
 	const [ dropZoneElement, setDropZoneElement ] = useState( null );
-
-	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 
 	// When closing the list view, focus should return to the toggle button.
 	const closeListView = useCallback( () => {
@@ -52,9 +49,9 @@ export default function ListViewSidebar() {
 			</div>
 			<div
 				className="edit-widgets-editor__list-view-panel-content"
-				ref={ useMergeRefs( [ focusOnMountRef, setDropZoneElement ] ) }
+				ref={ setDropZoneElement }
 			>
-				<ListView dropZoneElement={ dropZoneElement } />
+				<ListView dropZoneElement={ dropZoneElement } focusOnMount />
 			</div>
 		</div>
 	);

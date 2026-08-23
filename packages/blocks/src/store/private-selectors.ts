@@ -12,28 +12,23 @@ import type {
 } from '../types';
 
 /**
- * A keyboard shortcut declared by a block variation or transform, normalized
- * into the block type it produces and the block types it applies to.
+ * A keyboard shortcut declared by a block variation or transform, together with
+ * the block change it performs.
  */
-export interface NormalizedBlockShortcut {
-	/**
-	 * The shortcut as declared by the block.
-	 */
-	shortcut: BlockShortcut;
+type ResolvedBlockShortcut = BlockShortcut & {
 	/**
 	 * The block type the shortcut produces.
 	 */
 	targetBlockName: string;
 	/**
-	 * The block types the shortcut applies to. When undefined, the shortcut
-	 * applies to any block that can be transformed to `targetBlockName`.
+	 * The block types the shortcut applies to.
 	 */
-	blockNames?: string[];
+	blockNames: string[];
 	/**
 	 * The variation of `targetBlockName` the shortcut produces, if any.
 	 */
 	variationName?: string;
-}
+};
 
 const ROOT_BLOCK_SUPPORTS: string[] = [
 	'background',
@@ -321,25 +316,25 @@ export const getBlockBindingsSourceFieldsList = createRegistrySelector(
  *
  * @param state Data state.
  *
- * @return The declared shortcuts, normalized for the block editor to apply.
+ * @return The declared shortcuts, each paired with the block change it makes.
  */
 export const getBlockKeyboardShortcuts = createSelector(
-	( state: BlockStoreState ): NormalizedBlockShortcut[] => {
-		const shortcuts: NormalizedBlockShortcut[] = [];
+	( state: BlockStoreState ): ResolvedBlockShortcut[] => {
+		const shortcuts: ResolvedBlockShortcut[] = [];
 
 		for ( const blockName of Object.keys( state.blockTypes ) ) {
-			// A variation shortcut produces the variation of the block type it
-			// is declared on. It is not restricted to a source block type: any
-			// block with a transform to this block type can be its subject,
-			// which is what makes `access+2` on a paragraph produce a heading.
+			// A variation shortcut only applies to blocks that are already of
+			// the block type declaring it. Reaching the variation from another
+			// block type is a transform, and is declared as one.
 			for ( const variation of state.blockVariations[ blockName ] ??
 				[] ) {
 				if ( ! variation.shortcut ) {
 					continue;
 				}
 				shortcuts.push( {
-					shortcut: variation.shortcut,
+					...variation.shortcut,
 					targetBlockName: blockName,
+					blockNames: [ blockName ],
 					variationName: variation.name,
 				} );
 			}
@@ -347,38 +342,39 @@ export const getBlockKeyboardShortcuts = createSelector(
 			const transforms = state.blockTypes[ blockName ]?.transforms;
 
 			for ( const transform of transforms?.to ?? [] ) {
-				// A `to` transform can list several targets, but a shortcut can
-				// only produce one. The first entry wins.
+				// A `to` transform can list several target blocks, but a shortcut
+				// can only produce one of them. The first is used.
 				const targetBlockName = transform.blocks?.[ 0 ];
-				if (
-					! transform.shortcut ||
-					transform.type !== 'block' ||
-					! targetBlockName
-				) {
+				if ( transform.type !== 'block' || ! targetBlockName ) {
 					continue;
 				}
-				shortcuts.push( {
-					shortcut: transform.shortcut,
-					targetBlockName,
-					blockNames: [ blockName ],
-					variationName: transform.variationName,
-				} );
+				for ( const shortcut of transform.shortcuts ?? [] ) {
+					shortcuts.push( {
+						...shortcut,
+						targetBlockName,
+						blockNames: [ blockName ],
+						variationName:
+							shortcut.variationName ?? transform.variationName,
+					} );
+				}
 			}
 
 			for ( const transform of transforms?.from ?? [] ) {
 				if (
-					! transform.shortcut ||
 					transform.type !== 'block' ||
 					! transform.blocks?.length
 				) {
 					continue;
 				}
-				shortcuts.push( {
-					shortcut: transform.shortcut,
-					targetBlockName: blockName,
-					blockNames: transform.blocks,
-					variationName: transform.variationName,
-				} );
+				for ( const shortcut of transform.shortcuts ?? [] ) {
+					shortcuts.push( {
+						...shortcut,
+						targetBlockName: blockName,
+						blockNames: transform.blocks,
+						variationName:
+							shortcut.variationName ?? transform.variationName,
+					} );
+				}
 			}
 		}
 
