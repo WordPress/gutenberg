@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Internal
+
+-   Identify generated wp-admin page mount elements by their page-specific ID instead of a Boot class ([#81756](https://github.com/WordPress/gutenberg/pull/81756)).
+
+### Bug Fixes
+
+-   Register the content module for routes that only export a `canvas`, so a route without a stage or inspector can render a custom canvas ([#81578](https://github.com/WordPress/gutenberg/pull/81578)).
+-   Pages: use the boot module that ships with Core when the plugin has no local one, so plugin pages are no longer empty ([#81761](https://github.com/WordPress/gutenberg/pull/81761)).
+
+### Documentation
+
+-   Widget attributes: the `relevance` hint documents the `'medium'` tier
+    ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
+
 ## 0.21.0 (2026-08-12)
 
 ### Enhancements

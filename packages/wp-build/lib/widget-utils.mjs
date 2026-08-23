@@ -34,13 +34,13 @@ export function getAllWidgets( rootDir ) {
 
 /**
  * @typedef {Object} WidgetActionMetadata
- * @property {string}         id             Stable identifier, local to the widget type.
- * @property {string}         label          Human-readable label. Translatable.
- * @property {string}         [icon]         Registered icon name (`collection/icon-name`).
- * @property {'high'|'low'}   [relevance]    How relevant the action is among the widget's actions.
- * @property {string}         href           Destination the action points at.
- * @property {string|boolean} [download]     Download the destination; a string sets the filename.
- * @property {boolean}        [openInNewTab] Open the destination in a new browser tab.
+ * @property {string}                id             Stable identifier, local to the widget type.
+ * @property {string}                label          Human-readable label. Translatable.
+ * @property {string}                [icon]         Registered icon name (`collection/icon-name`).
+ * @property {'high'|'medium'|'low'} [relevance]    How relevant the action is among the widget's actions.
+ * @property {string}                href           Destination the action points at.
+ * @property {string|boolean}        [download]     Download the destination; a string sets the filename.
+ * @property {boolean}               [openInNewTab] Open the destination in a new browser tab.
  */
 
 /**
