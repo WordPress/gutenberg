@@ -2,11 +2,30 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Commands: Add a command palette entry that opens the current post on the front end once it is published, labelled with the post type's `view_item` label ([#66720](https://github.com/WordPress/gutenberg/pull/66720)).
+-   Pre-publish panel: Remove the "Visibility" and "Publish" headings that repeated the title of the panel containing them. The publish date's reset action, which lived in the removed header, becomes a "Reset" button below the date picker, disabled but still focusable while the post is set to publish immediately ([#81806](https://github.com/WordPress/gutenberg/pull/81806)).
+
 ### Bug Fixes
 
 -   Suggest mode: keep the code editor closed while the Suggest intent is active and while the post still carries unresolved inline suggestion markers, and identify a marker by its element rather than by a substring of the document ([#81662](https://github.com/WordPress/gutenberg/pull/81662)).
 -   Suggest mode: Announce inline suggestion markers to screen readers. A marker's state was carried entirely by color and text decoration, so a run proposed for deletion was read aloud as ordinary prose. Each marker is now bracketed by an announcement naming the kind of change and the person who proposed it, and add and delete markers carry `role="insertion"` and `role="deletion"`; a formatting suggestion no longer claims to be a deletion. Suggestions over overlapping runs nest, and each is announced and attributed to the person who made it ([#81663](https://github.com/WordPress/gutenberg/pull/81663), [#81957](https://github.com/WordPress/gutenberg/pull/81957)).
 -   Suggest mode: refuse post status changes while suggesting. `editPost` drops the `status` field in the `suggest` intent, the status control and the summary panel show the status without offering to change it, and the publish button is disabled there rather than dropping the status edit and saving the post anyway. A status edit that travels with a companion field - the `password` that visibility changes carry, the `date` that scheduling carries - is refused whole rather than half-applied, a status repeated at the value it already holds is not announced as a refusal, and a status staged before the intent changed is discarded on the way in. The refusal is announced and shown in a snackbar ([#81664](https://github.com/WordPress/gutenberg/pull/81664)).
+-   Register the editor and block editor keyboard shortcuts from the editor provider, so shortcuts work for consumers that mount the editor without rendering `EditorKeyboardShortcutsRegister` themselves ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
+-   Header: Allow the Back button column to grow when "Show button text labels" is enabled so the label is not obscured by the following controls ([#81701](https://github.com/WordPress/gutenberg/pull/81701)).
+-   Notes: Stop forcing capitalization of the user name in a note byline, so the name is shown as the user set it ([#81788](https://github.com/WordPress/gutenberg/pull/81788)).
+-   Device Preview: Center the editor canvas with the canvas container's own flex alignment rather than the canvas's auto margins, which were conditional on the resize handles being active. Switching from the mobile or tablet preview back to desktop no longer expands the canvas from the left edge ([#81484](https://github.com/WordPress/gutenberg/pull/81484)).
+-   `PostSchedule`: Announce the new publish date to screen readers when the date is changed ([#81629](https://github.com/WordPress/gutenberg/pull/81629)).
+
+### Internal
+
+-   Check the `window.__experimentalEnableRealTimeCollaboration` flag set by the Real-Time Collaboration experiment, instead of `window._wpCollaborationEnabled`, when determining whether collaboration is enabled for the current post ([#80658](https://github.com/WordPress/gutenberg/pull/80658)).
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81515](https://github.com/WordPress/gutenberg/pull/81515))
+
+### Enhancements
+
+-   Add an `initialViewport` prop to the editor provider, setting the width each entity opens at from the breakpoints the theme defines, so a host no longer has to dispatch `setDeviceType` from outside the provider and race the settings it reads ([#81750](https://github.com/WordPress/gutenberg/pull/81750)).
 
 ## 14.53.0 (2026-08-12)
 

@@ -68,7 +68,7 @@ export const DESIGN_POST_TYPES = [
  * `suggest` intent to capture edits as in-memory overlays, render them as
  * suggestions, and let other users apply or reject them. Adding a new
  * intent here also requires updates to:
- *   - packages/editor/src/components/intent-switcher/index.js (UI choices)
+ *   - packages/editor/src/components/intent-switcher/index.tsx (UI choices)
  *   - packages/editor/src/components/global-keyboard-shortcuts/* (shortcut
  *     registration and dispatch)
  */

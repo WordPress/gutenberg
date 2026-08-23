@@ -197,6 +197,9 @@ class ToolbarRovingTabindexUtils {
 		await this.pageUtils.pressKeys( 'shift+Tab' );
 		await this.expectLabelToHaveFocus( 'Select parent block: Group' );
 		await this.page.keyboard.press( 'ArrowRight' );
+		// The parent selector segment also hosts the inserter.
+		await this.expectLabelToHaveFocus( 'Add block' );
+		await this.page.keyboard.press( 'ArrowRight' );
 		await this.expectLabelToHaveFocus( currentBlockTitle );
 	}
 }
