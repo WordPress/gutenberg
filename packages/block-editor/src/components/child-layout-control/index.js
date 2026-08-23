@@ -2,7 +2,7 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUnitControl as UnitControl,
-	__experimentalInputControl as InputControl,
+	__experimentalInputControl as WCInputControl,
 	__experimentalVStack as VStack,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUseCustomUnits as useCustomUnits,
@@ -298,7 +298,7 @@ function GridControls( {
 				panelId={ panelId }
 			>
 				<FlexItem style={ { width: '50%' } }>
-					<InputControl
+					<WCInputControl
 						label={ __( 'Column span' ) }
 						type="number"
 						onChange={ ( value ) => {
@@ -322,7 +322,7 @@ function GridControls( {
 					/>
 				</FlexItem>
 				<FlexItem style={ { width: '50%' } }>
-					<InputControl
+					<WCInputControl
 						label={ __( 'Row span' ) }
 						type="number"
 						onChange={ ( value ) => {
@@ -359,7 +359,7 @@ function GridControls( {
 					panelId={ panelId }
 				>
 					<FlexItem style={ { width: '50%' } }>
-						<InputControl
+						<WCInputControl
 							label={ __( 'Column' ) }
 							type="number"
 							onChange={ ( value ) => {
@@ -393,7 +393,7 @@ function GridControls( {
 						/>
 					</FlexItem>
 					<FlexItem style={ { width: '50%' } }>
-						<InputControl
+						<WCInputControl
 							label={ __( 'Row' ) }
 							type="number"
 							onChange={ ( value ) => {

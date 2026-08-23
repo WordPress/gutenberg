@@ -47,6 +47,7 @@
 		"requestidlecallback": "^0.3.0"
 	},
 	"devDependencies": {
+		"@types/jest": "^30.0.0",
 		"@types/requestidlecallback": "^0.3.4"
 	},
 	"publishConfig": {

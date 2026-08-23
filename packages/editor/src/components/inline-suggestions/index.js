@@ -44,6 +44,8 @@ export {
 	buildSuggestionMarkerAttributes,
 	formatsRangeHasSuggestion,
 	valueRangeHasSuggestion,
+	formatsAdditionRunToExtend,
+	valueAdditionRunToExtend,
 } from './operations';
 export { computeDeleteRange } from './delete-range';
 export {
