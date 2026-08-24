@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a session-scoped editor intent (`edit`, `suggest`, `view`), with a private `setEditorIntent` action and `getEditorIntent` selector - the intent API stays private while Suggest mode is experimental. It is surfaced as an Edit / Suggest / View menu in the editor options for post types that support notes, and announced on change with a snackbar. Keyboard shortcuts follow the Google Docs convention: Ctrl+Alt+Shift+Z (Edit), +X (Suggest), +C (View) on Windows, ⌘⌥⇧Z/X/C on macOS ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
+
 ### Enhancements
 
 -   Commands: Add a command palette entry that opens the current post on the front end once it is published, labelled with the post type's `view_item` label ([#66720](https://github.com/WordPress/gutenberg/pull/66720)).
@@ -9,6 +13,7 @@
 
 ### Bug Fixes
 
+-   `DocumentTools`: Disable the Block Inserter toggle while the canvas is a preview, and close an inserter left open when the editor enters the `view` intent, so the control that adds blocks does not open onto a library the editor will refuse ([#80427](https://github.com/WordPress/gutenberg/pull/80427), [#81661](https://github.com/WordPress/gutenberg/pull/81661)).
 -   Register the editor and block editor keyboard shortcuts from the editor provider, so shortcuts work for consumers that mount the editor without rendering `EditorKeyboardShortcutsRegister` themselves ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
 -   Header: Allow the Back button column to grow when "Show button text labels" is enabled so the label is not obscured by the following controls ([#81701](https://github.com/WordPress/gutenberg/pull/81701)).
 -   Notes: Stop forcing capitalization of the user name in a note byline, so the name is shown as the user set it ([#81788](https://github.com/WordPress/gutenberg/pull/81788)).
@@ -39,8 +44,6 @@
 ### New Features
 
 -   Add a `blockStatesEditingEnabled` editor setting, defaulting to `true`, which hides state controls for blocks in the block inspector and Global Styles when set to `false` ([#80956](https://github.com/WordPress/gutenberg/pull/80956), [#81058](https://github.com/WordPress/gutenberg/pull/81058)).
--   Added a session-scoped editor intent (`edit`, `suggest`, `view`) with a matching private `setEditorIntent` action and private `getEditorIntent` selector (the intent API is private while Suggest mode is experimental). Surfaced as an Edit / Suggest / View menu in the editor options for post types that support notes. The `view` intent puts the block editor into a read-only preview. Keyboard shortcuts follow the Google Docs convention: Ctrl+Alt+Shift+Z (Edit), +X (Suggest), +C (View) on Windows / ⌘⌥⇧Z/X/C on macOS.
--   `setEditorIntent` now surfaces mode transitions with a snackbar ('You're suggesting' / 'You're editing' / 'You're viewing') alongside the existing a11y announcement.
 
 ### Bug Fixes
 
