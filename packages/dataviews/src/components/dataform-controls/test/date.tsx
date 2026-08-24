@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getSettings, setSettings } from '@wordpress/date';
+import { resetLocaleData, setLocaleData } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import normalizeFields from '../../../field-types';
 import { OPERATOR_BETWEEN } from '../../../constants';
@@ -394,5 +395,68 @@ describe( 'DateControl', () => {
 		expect(
 			screen.getByLabelText< HTMLInputElement >( 'Date' ).value
 		).toBe( '2026-08-25' );
+	} );
+	describe( 'localization', () => {
+		const setLocale = ( locale: string, isRTL: boolean ) => {
+			const settings = getSettings();
+			setSettings( {
+				...settings,
+				l10n: { ...settings.l10n, locale },
+			} );
+			// Tannin keys a contextual string as `context\u0004singular`.
+			setLocaleData( {
+				'text direction\u0004ltr': [ isRTL ? 'rtl' : 'ltr' ],
+			} );
+		};
+
+		afterEach( () => {
+			resetLocaleData();
+		} );
+
+		it( 'should format the calendar with the site locale', () => {
+			setLocale( 'ur', true );
+			render(
+				<DateControl
+					data={ { published: '2026-01-15' } as TestItem }
+					field={ field }
+					onChange={ noop }
+				/>
+			);
+
+			// January 2026 in Urdu.
+			expect( getMonthGrid( 'جنوری 2026' ) ).toBeInTheDocument();
+		} );
+
+		it( 'should take the text direction from the site, not the locale', () => {
+			// `skr` is RTL, but `Intl` has no data for it, so the calendar
+			// resolves it to the `en-US` fallback.
+			setLocale( 'skr', true );
+			render(
+				<DateControl
+					data={ { published: '2026-01-15' } as TestItem }
+					field={ field }
+					onChange={ noop }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'application', { name: 'Date calendar' } )
+			).toHaveAttribute( 'dir', 'rtl' );
+		} );
+
+		it( 'should take the site text direction over a supported date locale', () => {
+			setLocale( 'en', true );
+			render(
+				<DateControl
+					data={ { published: '2026-01-15' } as TestItem }
+					field={ field }
+					onChange={ noop }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'application', { name: 'Date calendar' } )
+			).toHaveAttribute( 'dir', 'rtl' );
+		} );
 	} );
 } );
