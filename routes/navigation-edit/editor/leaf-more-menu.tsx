@@ -4,11 +4,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 // @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
-import {
-	hasBlockSupport,
-	store as blocksStore,
-	// @ts-expect-error - No type declarations available for @wordpress/blocks
-} from '@wordpress/blocks';
+import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -92,7 +88,6 @@ export default function LeafMoreMenu( {
 						<MenuItem
 							icon={ chevronUp }
 							disabled={ isFirst }
-							accessibleWhenDisabled
 							onClick={ () => {
 								moveBlocksUp( [ clientId ], rootClientId );
 								onClose();
@@ -103,7 +98,6 @@ export default function LeafMoreMenu( {
 						<MenuItem
 							icon={ chevronDown }
 							disabled={ isLast }
-							accessibleWhenDisabled
 							onClick={ () => {
 								moveBlocksDown( [ clientId ], rootClientId );
 								onClose();

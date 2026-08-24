@@ -15,7 +15,7 @@ import {
 	Button,
 	PanelBody,
 	TextControl,
-	TextareaControl,
+	TextareaControl as WCTextareaControl,
 	BaseControl,
 	Spinner,
 } from '@wordpress/components';
@@ -46,11 +46,27 @@ const PlaylistTrackEdit = ( {
 	const showImages = context?.showImages ?? true;
 	const imageButton = useRef();
 	const blockProps = useBlockProps();
-	const { currentTrackClientId, setCurrentTrackClientId } =
+	const { currentTrackClientId, setCurrentTrackClientId, removeTrack } =
 		useContext( PlaylistContext );
 	const { createErrorNotice } = useDispatch( noticesStore );
-	function onUploadError( message ) {
+
+	/**
+	 * Handle audio upload errors.
+	 *
+	 * @param {string}  message                      Error message to show.
+	 * @param {Object}  [options]
+	 * @param {boolean} [options.removeTrackOnError] Remove the track as well. Useful for drag/drop where a track is optimistically created before upload finishes.
+	 */
+	function onUploadError( message, { removeTrackOnError = false } = {} ) {
 		createErrorNotice( message, { type: 'snackbar' } );
+
+		if ( removeTrackOnError ) {
+			removeTrack( clientId );
+			return;
+		}
+
+		// Set temporaryURL back to default state
+		setTemporaryURL();
 	}
 	const hasTrackSource = !! src || !! temporaryURL;
 
@@ -70,11 +86,14 @@ const PlaylistTrackEdit = ( {
 		setCurrentTrackClientId,
 	] );
 
+	// Handles drag/drop uploads
 	useUploadMediaFromBlobURL( {
 		url: temporaryURL,
 		allowedTypes: ALLOWED_MEDIA_TYPES,
 		onChange: onSelectTrack,
-		onError: onUploadError,
+		onError: ( message ) => {
+			onUploadError( message, { removeTrackOnError: true } );
+		},
 	} );
 
 	function onSelectTrack( media ) {
@@ -144,20 +163,33 @@ const PlaylistTrackEdit = ( {
 
 	return (
 		<>
-			<BlockControls group="other">
-				<MediaReplaceFlow
-					name={ __( 'Replace' ) }
-					onSelect={ onSelectTrack }
-					accept="audio/*"
-					mediaId={ id }
-					mediaURL={ src }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					onError={ onUploadError }
-					variant="toolbar"
-				/>
-			</BlockControls>
+			{ /* Only show if this is a single selection (not multiselect) */ }
+			{ isSelected && (
+				<BlockControls group="other">
+					<MediaReplaceFlow
+						name={ __( 'Replace' ) }
+						onSelect={ onSelectTrack }
+						accept="audio/*"
+						mediaId={ id }
+						mediaURL={ src }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						onError={ onUploadError }
+						variant="toolbar"
+					/>
+				</BlockControls>
+			) }
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
+					{ /* Only show if this is a single selection (not multiselect) */ }
+					{ isSelected && (
+						<TextControl
+							label={ __( 'Title' ) }
+							value={ title ? stripHTML( title ) : '' }
+							onChange={ ( titleValue ) => {
+								setAttributes( { title: titleValue } );
+							} }
+						/>
+					) }
 					<TextControl
 						label={ __( 'Artist' ) }
 						value={ artist ? stripHTML( artist ) : '' }
@@ -170,13 +202,6 @@ const PlaylistTrackEdit = ( {
 						value={ album ? stripHTML( album ) : '' }
 						onChange={ ( albumValue ) => {
 							setAttributes( { album: albumValue } );
-						} }
-					/>
-					<TextControl
-						label={ __( 'Title' ) }
-						value={ title ? stripHTML( title ) : '' }
-						onChange={ ( titleValue ) => {
-							setAttributes( { title: titleValue } );
 						} }
 					/>
 					<MediaUploadCheck>
@@ -225,7 +250,7 @@ const PlaylistTrackEdit = ( {
 						</BaseControl>
 					</MediaUploadCheck>
 					{ !! image && (
-						<TextareaControl
+						<WCTextareaControl
 							label={ __( 'Alternative text' ) }
 							value={ imageAlt || '' }
 							onChange={ ( value ) =>
