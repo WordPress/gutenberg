@@ -28,7 +28,8 @@ const { PATTERN_TYPES } = unlock( patternsPrivateApis );
 // moves the post to trash.
 const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 	id: 'delete-post',
-	label: __( 'Delete' ),
+	label: __( 'Delete…' ),
+	modalHeader: __( 'Delete' ),
 	isPrimary: true,
 	icon: trash,
 	isEligible( post ) {
