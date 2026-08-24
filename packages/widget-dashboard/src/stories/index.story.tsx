@@ -454,9 +454,9 @@ Each type also carries a \`help\` note, opened from the info icon in the header,
 };
 
 /*
- * The policy demo: an application with sections, where the active section
- * decides what the inserter offers and a switch decides whether the user may
- * customize at all. The widget types never change; only the policy does.
+ * The policy demo: an application with user profiles and sections. The
+ * profile decides which operations the user may perform; the active section
+ * decides what the inserter offers. The widget types never change.
  */
 const POLICY_SECTIONS = [
 	{ label: 'All', href: '/analytics', type: null },
@@ -470,15 +470,36 @@ const POLICY_SECTIONS = [
 
 type PolicySectionHref = ( typeof POLICY_SECTIONS )[ number ][ 'href' ];
 
+const PROFILES = {
+	viewer: {
+		label: 'Viewer',
+		summary: 'reads the dashboard and edits nothing',
+		operations: [] as readonly string[],
+	},
+	arranger: {
+		label: 'Arranger',
+		summary:
+			'may customize, move, and resize; never adds, removes, or edits',
+		operations: [ 'customize', 'move', 'resize' ] as readonly string[],
+	},
+	owner: {
+		label: 'Owner',
+		summary: 'may do everything',
+		operations: 'all' as const,
+	},
+};
+
+type Profile = keyof typeof PROFILES;
+
 type PageLink = NonNullable<
 	NonNullable< ComponentProps< typeof Page >[ 'components' ] >[ 'link' ]
 >;
 
 interface PolicyStoryProps {
-	allowCustomize: boolean;
+	profile: Profile;
 }
 
-function PolicyStory( { allowCustomize }: PolicyStoryProps ) {
+function PolicyStory( { profile }: PolicyStoryProps ) {
 	const [ layout, setLayout ] =
 		useState< DashboardWidget[] >( INITIAL_LAYOUT );
 	const [ editMode, setEditMode ] = useState( false );
@@ -486,20 +507,23 @@ function PolicyStory( { allowCustomize }: PolicyStoryProps ) {
 		useState< PolicySectionHref >( '/analytics' );
 
 	const canPerform = useMemo< CanPerformDashboardOperation >( () => {
-		const allowed = POLICY_SECTIONS.find(
+		const { operations } = PROFILES[ profile ];
+		const sectionType = POLICY_SECTIONS.find(
 			( section ) => section.href === currentHref
 		)?.type;
 		return ( request ) => {
-			switch ( request.operation ) {
-				case 'customize':
-					return allowCustomize;
-				case 'insert':
-					return ! allowed || request.widgetType.name === allowed;
-				default:
-					return true;
+			if (
+				operations !== 'all' &&
+				! operations.includes( request.operation )
+			) {
+				return false;
 			}
+			if ( request.operation === 'insert' ) {
+				return ! sectionType || request.widgetType.name === sectionType;
+			}
+			return true;
 		};
-	}, [ currentHref, allowCustomize ] );
+	}, [ profile, currentHref ] );
 
 	// Section links drive local state instead of a router.
 	const link = useCallback< PageLink >(
@@ -519,6 +543,8 @@ function PolicyStory( { allowCustomize }: PolicyStoryProps ) {
 		[]
 	);
 
+	const { label, summary } = PROFILES[ profile ];
+
 	return (
 		<WidgetDashboard.Policy canPerform={ canPerform }>
 			<WidgetDashboard
@@ -535,13 +561,15 @@ function PolicyStory( { allowCustomize }: PolicyStoryProps ) {
 			>
 				<Page
 					title="Analytics"
-					subTitle="Switch the section, then open Add widget: the inserter offers only what the section allows, while placed widgets keep rendering."
+					subTitle={ `Signed in as ${ label }: ${ summary }. The section scopes what "Add widget" offers.` }
 					actions={ <WidgetDashboard.Actions /> }
 					navigation={ {
-						items: POLICY_SECTIONS.map( ( { label, href } ) => ( {
-							label,
-							href,
-						} ) ),
+						items: POLICY_SECTIONS.map(
+							( { label: text, href } ) => ( {
+								label: text,
+								href,
+							} )
+						),
 						currentHref,
 						ariaLabel: 'Sections',
 					} }
@@ -559,24 +587,27 @@ function PolicyStory( { allowCustomize }: PolicyStoryProps ) {
 export const Policy: StoryObj< PolicyStoryProps > = {
 	render: ( args ) => <PolicyStory { ...args } />,
 	args: {
-		allowCustomize: true,
+		profile: 'owner',
 	},
 	argTypes: {
-		allowCustomize: {
-			control: 'boolean',
+		profile: {
+			control: 'select',
+			options: Object.keys( PROFILES ),
 			description:
-				'What the application answers for the `customize` operation. Off removes the Customize button; Done and Cancel stay while already customizing.',
+				'The user profile the application maps to a policy. Viewer: nothing. Arranger: customize, move, resize. Owner: everything.',
 		},
 	},
 	parameters: {
 		docs: {
 			description: {
 				story: `
-The application governs the dashboard; the widget types stay untouched. This story mounts \`WidgetDashboard.Policy\` around the dashboard with a \`canPerform\` closing over the active section, and composes the dashboard inside an admin \`Page\`: the section links in its navigation, the dashboard actions in its actions slot.
+The application governs the dashboard; the widget types stay untouched. This story mounts \`WidgetDashboard.Policy\` around the dashboard with a \`canPerform\` closing over the signed-in profile and the active section, and composes the dashboard inside an admin \`Page\`: the section links in its navigation, the dashboard actions in its actions slot.
 
-Switching sections re-renders the provider value, so the "Add widget" listing follows the application state, even while open; the excluded types keep rendering where already placed because the \`widgetTypes\` registry never changes. Turning "allowCustomize" off removes the Customize button and the matching commands.
+Switch the \`profile\` control. A Viewer gets no Customize button, no attribute controls, and read-only widgets (no \`setAttributes\`). An Arranger enters customize mode and drags or resizes tiles, but has no Add widget trigger, no Remove control, and no attribute editing. An Owner does everything.
 
-Nested policies compose restrictively: mount one provider per dashboard for per-instance rules, or a single provider around a group to share one. Without a policy, every operation is allowed. See the **Policy** page for the contract.
+Switch the section, then open "Add widget": the listing follows the section, even while open; the excluded types keep rendering where already placed because the \`widgetTypes\` registry never changes.
+
+Nested policies compose restrictively; without a policy, every operation is allowed. See the **Policy** page for the contract.
 `,
 			},
 		},
