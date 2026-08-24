@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { moreVertical, trash } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { IconButton } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import type { DashboardWidget, GridTilePlacement } from '../../types';

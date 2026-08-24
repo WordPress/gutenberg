@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useLayoutEffect } from '@wordpress/element';
 import { useDispatch, useRegistry } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { getQueryArg } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import useEntityContainsSnapshot from './use-entity-contains-snapshot';

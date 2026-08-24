@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import markdownConverter from '../markdown-converter';
 
 describe( 'markdownConverter', () => {

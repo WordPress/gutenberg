@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { useLayout } from '../block-list/layout';
 import { store as blockEditorStore } from '../../store';
 import { getLayoutType } from '../../layouts';

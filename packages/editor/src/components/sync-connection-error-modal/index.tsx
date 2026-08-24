@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, select } from '@wordpress/data';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { serialize } from '@wordpress/blocks';
@@ -20,10 +17,6 @@ import {
 import { applyFilters } from '@wordpress/hooks';
 import { useState, useEffect } from '@wordpress/element';
 import { __, sprintf, _n } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import {
 	getSyncErrorMessages,
 	PROTOCOL_MISMATCH,

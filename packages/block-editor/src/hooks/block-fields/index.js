@@ -23,7 +23,6 @@ const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 import FieldsDropdownMenu from './fields-dropdown-menu';
 import { PrivateBlockContext } from '../../components/block-list/private-block-context';
 import InspectorControls from '../../components/inspector-controls/fill';
-
 // controls
 import RichText from './rich-text';
 import Media from './media';

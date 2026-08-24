@@ -1,7 +1,5 @@
-/**
- * Internal dependencies
- */
 import type { ComponentType, ReactElement } from 'react';
+import type { WPKeycodeModifier } from '@wordpress/keycodes';
 
 /**
  * An icon type definition. One of a Dashicon slug, an element,
@@ -51,6 +49,61 @@ export type BlockTypeIcon = BlockTypeIconDescriptor | BlockTypeIconRender;
  * Named block variation scopes.
  */
 export type BlockVariationScope = 'block' | 'inserter' | 'transform';
+
+/**
+ * A key combination that triggers a block shortcut.
+ */
+export interface BlockShortcutKeyCombination {
+	/**
+	 * The modifier the character is pressed with. When omitted, the character
+	 * is matched on its own.
+	 */
+	modifier?: WPKeycodeModifier;
+	/**
+	 * The character, e.g. `2`, or a special key such as `escape`.
+	 */
+	character: string;
+}
+
+/**
+ * A keyboard shortcut declared by a block variation or a block transform.
+ *
+ * Shortcuts are registered with the `core/keyboard-shortcuts` store while the
+ * block editor is mounted, and apply to the selected block.
+ *
+ * The same shortcut may be declared in more than one place, so long as every
+ * declaration agrees on the key combination and description. A shortcut that
+ * both switches a block's type and picks a variation of it is declared twice:
+ * once on the variation, for a block that is already of that type, and once on
+ * the transform that produces it.
+ */
+export interface BlockShortcut {
+	/**
+	 * The unique and machine-readable shortcut name, e.g.
+	 * `core/block-editor/transform-heading-to-paragraph`.
+	 */
+	name: string;
+	/**
+	 * A human-readable description, shown in the keyboard shortcuts help
+	 * modal.
+	 */
+	description: string;
+	/**
+	 * The key combination that triggers the shortcut.
+	 */
+	keyCombination: BlockShortcutKeyCombination;
+	/**
+	 * Alternative key combinations that trigger the same shortcut.
+	 */
+	aliases?: BlockShortcutKeyCombination[];
+	/**
+	 * The variation of the produced block type this shortcut targets. Only
+	 * meaningful on a block transform, where it lets one transform carry a
+	 * shortcut per variation of the block it produces. Defaults to the
+	 * transform's own `variationName`.
+	 */
+	variationName?: string;
+}
 
 /**
  * An object describing a variation defined for the block type.
@@ -113,6 +166,15 @@ export interface BlockVariation<
 	 */
 	scope?: BlockVariationScope[];
 	/**
+	 * A keyboard shortcut that applies this variation to the selected block.
+	 *
+	 * It only applies to blocks that are already of this block type, and does
+	 * nothing when `isActive` reports the variation as already active. To reach
+	 * the variation from another block type, declare the same shortcut on a
+	 * block transform that produces this one.
+	 */
+	shortcut?: BlockShortcut;
+	/**
 	 * An array of terms (which can be translated)
 	 * that help users discover the variation
 	 * while searching.
@@ -167,6 +229,18 @@ export interface BlockTransform<
 	 * variation of the transformed block type.
 	 */
 	variationName?: string;
+	/**
+	 * Keyboard shortcuts that apply this transform to the selected block. Only
+	 * supported on transforms of type `block`.
+	 *
+	 * On a `to` transform they apply to the block declaring it, and produce the
+	 * first entry of `blocks`. On a `from` transform they apply to any block
+	 * listed in `blocks`, and produce the block declaring it. Each shortcut may
+	 * target a different variation of the produced block through its own
+	 * `variationName`, which is what lets one transform carry a shortcut per
+	 * variation without appearing more than once in the block switcher.
+	 */
+	shortcuts?: BlockShortcut[];
 	priority?: number;
 	isMultiBlock?: boolean;
 	isMatch?: (
@@ -291,6 +365,19 @@ export interface BlockType<
 	 * Allowed child block types.
 	 */
 	allowedBlocks?: string[];
+	/**
+	 * Initial child blocks created when an empty block of this type
+	 * is inserted, as a list of `[ name, attributes, innerTemplate ]`
+	 * items.
+	 */
+	template?: Array<
+		[ string, Record< string, unknown >?, Array< unknown >? ]
+	>;
+	/**
+	 * Whether the selection should move into the first block created from
+	 * the template when it is inserted.
+	 */
+	templateInsertUpdatesSelection?: boolean;
 	/**
 	 * Context provided for available access by descendants of
 	 * blocks of this type, in the form of an object which maps

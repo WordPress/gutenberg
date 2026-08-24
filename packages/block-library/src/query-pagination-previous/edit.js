@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useBlockProps, PlainText } from '@wordpress/block-editor';
 

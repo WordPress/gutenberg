@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { isBlobURL } from '@wordpress/blob';
 import {
 	Spinner,
@@ -27,10 +20,6 @@ import { useDispatch } from '@wordpress/data';
 import { video as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { prependHTTPS } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { createUpgradedEmbedBlock } from '../embed/util';
 import {
 	useUploadMediaFromBlobURL,

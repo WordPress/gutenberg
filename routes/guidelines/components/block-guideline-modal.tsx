@@ -1,13 +1,10 @@
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	ComboboxControl,
 	Modal,
 	Notice,
 	TextControl,
-	TextareaControl,
+	TextareaControl as WCTextareaControl,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -16,10 +13,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import { blockSlug, saveGuidelineRow, deleteGuidelineRow } from '../data';
 import type { ContentBlock, GuidelineRow, GuidelineQuery } from '../types';
 import './block-guideline-modal.scss';
@@ -152,7 +145,7 @@ export default function BlockGuidelineModal( {
 						placeholder={ __( 'Search for a block…' ) }
 					/>
 				) }
-				<TextareaControl
+				<WCTextareaControl
 					label={ __( 'Guideline text' ) }
 					value={ guidelineText }
 					onChange={ setGuidelineText }

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import hiddenCaretRangeFromPoint from './hidden-caret-range-from-point';
 import { assertIsDefined } from '../utils/assert-is-defined';
 import isInputOrTextArea from './is-input-or-text-area';

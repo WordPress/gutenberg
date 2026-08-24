@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	createBlock,
 	hasBlockSupport,
@@ -16,10 +13,6 @@ import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { DEFAULT_BLOCK } from '../constants';
 
 const POPOVER_PROPS = {
@@ -36,7 +29,6 @@ function AddSubmenuItem( {
 	clientId,
 	onClose,
 	isDisabled,
-	expansionState,
 	updateExpansion,
 	setInsertedBlockClientId,
 } ) {
@@ -90,10 +82,7 @@ function AddSubmenuItem( {
 				// This is required for the Nav Block to determine whether or not to display
 				// the Link UI for this new block.
 				setInsertedBlockClientId( newLink.clientId );
-
-				if ( ! expansionState[ clientId ] ) {
-					updateExpansion( { type: 'expand', clientIds: clientId } );
-				}
+				updateExpansion( { type: 'expand', clientIds: [ clientId ] } );
 				onClose();
 			} }
 		>
@@ -102,9 +91,12 @@ function AddSubmenuItem( {
 	);
 }
 
-export default function LeafMoreMenu( props ) {
-	const { clientId } = props;
-
+export default function LeafMoreMenu( {
+	clientId,
+	updateExpansion,
+	setInsertedBlockClientId,
+	...props
+} ) {
 	const {
 		moveBlocksDown,
 		moveBlocksUp,
@@ -210,10 +202,9 @@ export default function LeafMoreMenu( props ) {
 							clientId={ clientId }
 							onClose={ onClose }
 							isDisabled={ isSubmenuDisabled }
-							expansionState={ props.expansionState }
-							updateExpansion={ props.updateExpansion }
+							updateExpansion={ updateExpansion }
 							setInsertedBlockClientId={
-								props.setInsertedBlockClientId
+								setInsertedBlockClientId
 							}
 						/>
 						{ canDuplicate && (

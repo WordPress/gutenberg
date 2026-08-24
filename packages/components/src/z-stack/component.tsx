@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { isValidElement } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { getValidChildren } from '../utils/get-valid-children';
 import { contextConnect, useContextSystem } from '../context';
 import { PolymorphicElement } from '../utils/polymorphic-element';

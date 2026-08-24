@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen, renderHook } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { AutocompleterUI } from '../autocompleter-ui';
 import { useLastDifferentValue } from '..';
 

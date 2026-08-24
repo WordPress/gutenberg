@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, _x } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
@@ -12,10 +9,6 @@ import {
 } from '@wordpress/preferences';
 import { store as interfaceStore, ActionItem } from '@wordpress/interface';
 import { VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import CopyContentMenuItem from './copy-content-menu-item';
 import ModeSwitcher from '../mode-switcher';
 import ToolsMoreMenuGroup from './tools-more-menu-group';

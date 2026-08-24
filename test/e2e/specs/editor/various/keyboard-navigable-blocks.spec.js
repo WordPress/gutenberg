@@ -1,8 +1,4 @@
 /* eslint-disable playwright/expect-expect */
-
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {

@@ -1,7 +1,6 @@
 import { FORMAT_ID } from '@terrazzo/plugin-css';
 import type { Plugin } from '@terrazzo/parser';
 import { ColorSpace, to, get, OKLCH, sRGB } from 'colorjs.io/fn';
-
 import colorTokens from '../../src/prebuilt/ts/color-tokens';
 import { DEFAULT_RAMPS } from '../../src/color-ramps/lib/default-ramps';
 import { DEFAULT_SEED_COLORS } from '../../src/color-ramps/lib/constants';

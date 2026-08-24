@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	getBlockType,
 	getBlockTypes,
@@ -17,10 +14,6 @@ import { symbol } from '@wordpress/icons';
 import { create, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 import { createSelector, createRegistrySelector } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import {
 	isFiltered,
 	checkAllowListRecursive,
@@ -34,7 +27,6 @@ import {
 import { orderBy } from '../utils/sorting';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
-
 import {
 	getContentLockingParent,
 	getEditedContentOnlySection,
@@ -1319,6 +1311,35 @@ export function isBlockSelected( state, clientId ) {
 }
 
 /**
+ * Returns the ancestors of the current selection, as a set. A block is not its
+ * own ancestor, so the selected blocks themselves are not in the set.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Set<string>} Client IDs of the ancestors of the selection.
+ */
+const getSelectedBlockAncestors = createSelector(
+	( state ) => {
+		const ancestors = new Set();
+
+		for ( const clientId of getSelectedBlockClientIds( state ) ) {
+			let current = clientId;
+			while ( ( current = state.blocks.parents.get( current ) ) ) {
+				// An earlier block already walked the rest of this chain.
+				if ( ancestors.has( current ) ) {
+					break;
+				}
+
+				ancestors.add( current );
+			}
+		}
+
+		return ancestors;
+	},
+	( state ) => getSelectedBlockClientIds.getDependants( state )
+);
+
+/**
  * Returns true if one of the block's inner blocks is selected.
  *
  * @param {Object}  state    Editor state.
@@ -1328,18 +1349,19 @@ export function isBlockSelected( state, clientId ) {
  * @return {boolean} Whether the block has an inner block selected
  */
 export function hasSelectedInnerBlock( state, clientId, deep = false ) {
-	const selectedBlockClientIds = getSelectedBlockClientIds( state );
+	if ( ! clientId ) {
+		return false;
+	}
 
+	const selectedBlockClientIds = getSelectedBlockClientIds( state );
 	if ( ! selectedBlockClientIds.length ) {
 		return false;
 	}
 
 	if ( deep ) {
-		return selectedBlockClientIds.some( ( id ) =>
-			// Pass true because we don't care about order and it's more
-			// performant.
-			getBlockParents( state, id, true ).includes( clientId )
-		);
+		// Callers ask once per rendered block, so the set is built once per
+		// selection rather than walking the selection on every call.
+		return getSelectedBlockAncestors( state ).has( clientId );
 	}
 
 	return selectedBlockClientIds.some(
@@ -2737,15 +2759,14 @@ export const __experimentalGetAllowedBlocks = createSelector(
 /**
  * Returns the block to be directly inserted by the block appender.
  *
- * @param    {Object}         state            Editor state.
- * @param    {?string}        rootClientId     Optional root client ID of block list.
+ * @param    {Object}  state        Editor state.
+ * @param    {?string} rootClientId Optional root client ID of block list.
  *
- * @return {WPDirectInsertBlock|undefined}              The block type to be directly inserted.
+ * @return {WPDirectInsertBlock|undefined} The block type to be directly inserted.
  *
  * @typedef {Object} WPDirectInsertBlock
- * @property {string}         name             The type of block.
- * @property {?Object}        attributes       Attributes to pass to the newly created block.
- * @property {?Array<string>} attributesToCopy Attributes to be copied from adjacent blocks when inserted.
+ * @property {string}  name         The type of block.
+ * @property {?Object} attributes   Attributes to pass to the newly created block.
  */
 export function getDirectInsertBlock( state, rootClientId = null ) {
 	if ( ! rootClientId ) {

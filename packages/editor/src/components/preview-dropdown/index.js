@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	DropdownMenu,
@@ -22,10 +15,6 @@ import { ActionItem, store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import { VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { PostPreviewMenuItem } from '../post-preview-button';
 import { sidebars } from '../sidebar/constants';
@@ -145,8 +134,8 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 
 	/**
 	 * The choices for the device type.
-	 * Duplicated in block-editor block-visibility constants and edit-site
-	 * use-viewport-sync. Update all three when adding new viewport types.
+	 * Duplicated in block-editor block-visibility constants, and in the edit-site
+	 * and boot `viewport` modules. Update all four when adding new viewport types.
 	 *
 	 * @type {Array}
 	 */

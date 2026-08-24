@@ -2,9 +2,13 @@
 
 ## Unreleased
 
+## 5.53.0 (2026-08-12)
+
 ### Enhancements
 
 -   Wrap the Customizer widgets editor in `ThemeProvider`, seeded with the active admin color scheme primary color ([#81174](https://github.com/WordPress/gutenberg/pull/81174)).
+
+## 5.52.0 (2026-07-29)
 
 ## 5.51.0 (2026-07-14)
 

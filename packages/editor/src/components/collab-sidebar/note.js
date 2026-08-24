@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useRef, useState, useLayoutEffect } from '@wordpress/element';
 import {
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -16,10 +9,6 @@ import {
 import { Button as UIButton } from '@wordpress/ui';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { moreVertical, published } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import { unlock } from '../../lock-unlock';

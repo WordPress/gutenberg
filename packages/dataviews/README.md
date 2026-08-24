@@ -1763,6 +1763,8 @@ Function that indicates if the field should be visible.
     -   `item`: the data to be processed
 -   Returns a `boolean` indicating if the field should be visible (`true`) or not (`false`).
 
+A field hidden through `isVisible` is not validated: its validation rules are skipped while it is hidden and re-applied when it becomes visible again.
+
 This can be useful to hide fields based on the state of other fields. For example, a `staticHomepage` field can be hidden depending on the value of the `homepageDisplay` field:
 
 ```js

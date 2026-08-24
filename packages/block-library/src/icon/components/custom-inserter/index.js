@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { Modal, SearchControl, Spinner } from '@wordpress/components';
 import { Stack, Tabs } from '@wordpress/ui';
@@ -8,10 +5,6 @@ import { useState, useMemo } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import IconGrid from './icon-grid';
 import { normalizeSearchInput } from '../../../utils/search-patterns';
 

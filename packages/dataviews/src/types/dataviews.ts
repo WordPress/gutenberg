@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { ReactElement, ReactNode, ComponentProps } from 'react';
-
-/**
- * WordPress dependencies
- */
 import type { useFocusOnMount } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import type {
 	NormalizedField,
 	Operator,

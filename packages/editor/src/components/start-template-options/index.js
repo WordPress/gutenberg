@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Modal, Flex, FlexItem, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, useMemo, useEffect } from '@wordpress/element';
@@ -8,10 +5,6 @@ import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress
 import { useSelect } from '@wordpress/data';
 import { parse } from '@wordpress/blocks';
 import { store as coreStore, useEntityBlockEditor } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { TEMPLATE_POST_TYPE } from '../../store/constants';
 

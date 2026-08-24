@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { act, renderHook } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import useAutosaveNotice from '../use-autosave-notice';
 import { SNAPSHOT_STATUS_SYNC_WAIT_MS } from '../use-entity-contains-snapshot';
 

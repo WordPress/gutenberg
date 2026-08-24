@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { ToolbarButton } from '@wordpress/components';

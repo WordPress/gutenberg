@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import {
 	PanelBody,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import OverlayTemplatePartSelector from './overlay-template-part-selector';
 import OverlayVisibilityControl from './overlay-visibility-control';
 import OverlayMenuPreviewButton from './overlay-menu-preview-button';

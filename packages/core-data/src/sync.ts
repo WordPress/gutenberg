@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import {
 	privateApis as syncPrivateApis,
 	type SyncManager,
 } from '@wordpress/sync';
-
-/**
- * Internal dependencies
- */
 import { unlock } from './lock-unlock';
 
 const {
@@ -47,6 +40,10 @@ let syncManager: SyncManager;
 export function getSyncManager(): SyncManager | undefined {
 	if ( syncManager ) {
 		return syncManager;
+	}
+
+	if ( ! globalThis.window?.__experimentalEnableRealTimeCollaboration ) {
+		return undefined;
 	}
 
 	syncManager = createSyncManager();

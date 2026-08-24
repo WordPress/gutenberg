@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	Icon as WCIcon,
@@ -8,10 +5,12 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	__experimentalConfirmDialog as ConfirmDialog,
+	type IconType,
 } from '@wordpress/components';
 import {
 	DataViews,
 	filterSortAndPaginate,
+	type Field,
 	type View,
 } from '@wordpress/dataviews';
 import { __, sprintf } from '@wordpress/i18n';
@@ -19,10 +18,6 @@ import { useEffect, useMemo, useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { blockDefault } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import BlockGuidelineModal from './block-guideline-modal';
 import { blockSlug, deleteGuidelineRow } from '../data';
 import type { ContentBlock, GuidelineRow, GuidelineQuery } from '../types';
@@ -47,9 +42,11 @@ const initialView: View = {
 interface DataRow {
 	id: string;
 	label: string;
+	guidelines: string;
+	icon?: IconType;
 }
 
-const fields = [
+const fields: Field< DataRow >[] = [
 	{
 		id: 'icon',
 		label: __( 'Icon' ),
@@ -104,7 +101,9 @@ export default function BlockGuidelines( {
 					label: block.title,
 					guidelines:
 						bySlug[ blockSlug( block.name ) ]?.content ?? '',
-					icon: block.icon?.src,
+					/* Block registry icons are renderable by `Icon`, but the
+					   registry types do not model them. */
+					icon: block.icon?.src as IconType | undefined,
 				} ) ),
 		[ contentBlocks, bySlug ]
 	);

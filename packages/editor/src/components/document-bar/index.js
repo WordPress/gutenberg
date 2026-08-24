@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __, isRTL } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -25,10 +18,6 @@ import { useRef, useEffect } from '@wordpress/element';
 import { useReducedMotion } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import { TEMPLATE_POST_TYPES } from '../../store/constants';
 import { store as editorStore } from '../../store';
 import usePageTypeBadge from '../../utils/pageTypeBadge';

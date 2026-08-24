@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { backup } from '@wordpress/icons';
 import { dispatch, select, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -17,10 +14,6 @@ import {
 import type { Action } from '@wordpress/dataviews';
 import { addQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import { getItemTitle, isTemplateOrTemplatePart } from './utils';
 import type { CoreDataError, Template, TemplatePart } from '../types';
 

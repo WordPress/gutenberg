@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 import type { Block } from '@wordpress/blocks';
 import { escapeAttribute, escapeEditableHTML } from '@wordpress/escape-html';

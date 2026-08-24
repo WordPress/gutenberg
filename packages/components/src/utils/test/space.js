@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { space } from '../space';
 
 describe( 'space', () => {

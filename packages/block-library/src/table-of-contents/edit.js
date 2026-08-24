@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	BlockControls,
 	BlockIcon,
@@ -31,10 +28,6 @@ import {
 	formatListNumbered,
 	formatListNumberedRTL,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import TableOfContentsList from './list';
 import { createListItemBlocks, linearToNestedHeadingList } from './utils';
 import { useObserveHeadings } from './hooks';

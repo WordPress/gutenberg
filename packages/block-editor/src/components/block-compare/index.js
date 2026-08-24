@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import { diffChars } from 'diff';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { getSaveContent } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import BlockView from './block-view';
 
 function BlockCompare( {

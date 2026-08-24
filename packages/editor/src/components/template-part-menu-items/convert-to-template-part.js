@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { MenuItem } from '@wordpress/components';
@@ -10,10 +7,6 @@ import { useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { symbolFilled } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { CreateTemplatePartModal } from '@wordpress/fields';
 
 export default function ConvertToTemplatePart( { clientIds, blocks } ) {

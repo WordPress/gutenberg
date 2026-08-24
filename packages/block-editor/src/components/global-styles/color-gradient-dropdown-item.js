@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalHStack as HStack,
 	__experimentalZStack as ZStack,
@@ -20,10 +13,6 @@ import {
 import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { reset as resetIcon, caution as cautionIcon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import ColorGradientControl from '../colors-gradients/control';
 import { unlock } from '../../lock-unlock';
 import {

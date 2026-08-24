@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as blocksStore } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import {
@@ -12,10 +9,6 @@ import {
 import { VisuallyHidden } from '@wordpress/ui';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';

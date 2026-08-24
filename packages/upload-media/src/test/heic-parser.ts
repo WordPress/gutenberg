@@ -1,14 +1,6 @@
 /* eslint-disable no-bitwise, jsdoc/require-param */
-
-/**
- * External dependencies
- */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-
-/**
- * Internal dependencies
- */
 import {
 	parseHeic,
 	reverseBits32,

@@ -4,7 +4,8 @@
 	"compilerOptions": {
 		"jsx": "react-jsx",
 		"rootDir": ".",
-		"noEmit": true
+		"noEmit": true,
+		"types": [ "jest" ]
 	},
 	"include": [ "**/*.tsx", "**/*.ts", "**/*.mjs" ],
 	"exclude": [ "scripts/inject-legacy-docgen.mjs" ]

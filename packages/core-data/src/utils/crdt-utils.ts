@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { Y } from '@wordpress/sync';
 import { create, insert, toHTMLString } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import type { YBlock, YBlocks } from './crdt-blocks';
 import type { YPostRecord } from './crdt';
 import { CRDT_RECORD_MAP_KEY } from '../sync';

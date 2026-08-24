@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { ToolbarButton } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
@@ -10,10 +7,6 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { getAvatarBorderColor } from './utils';
 

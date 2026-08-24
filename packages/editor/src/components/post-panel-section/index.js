@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __experimentalVStack as VStack } from '@wordpress/components';
 
 function PostPanelSection( { className, children } ) {

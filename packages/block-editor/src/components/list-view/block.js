@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import {
 	__experimentalTreeGridCell as TreeGridCell,
@@ -26,10 +19,6 @@ import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { speak } from '@wordpress/a11y';
-
-/**
- * Internal dependencies
- */
 import ListViewLeaf from './leaf';
 import useListViewScrollIntoView from './use-list-view-scroll-into-view';
 import {
@@ -177,7 +166,6 @@ function ListViewBlock( {
 	const {
 		BlockSettingsMenu,
 		listViewInstanceId,
-		expansionState,
 		updateExpansion,
 		setInsertedBlockClientId,
 		treeGridElementRef,
@@ -377,8 +365,7 @@ function ListViewBlock( {
 			const { firstBlockClientId } = getBlocksToUpdate();
 			const blockParents = getBlockParents( firstBlockClientId, false );
 			// Collapse all blocks and expand the block's parents.
-			updateExpansion( { type: 'clear' } );
-			updateExpansion( { type: 'expand', clientIds: blockParents } );
+			updateExpansion( { type: 'replace', clientIds: blockParents } );
 		} else if ( isMatch( 'core/block-editor/group', event ) ) {
 			const { blocksToUpdate } = getBlocksToUpdate();
 			if ( blocksToUpdate.length > 1 && isGroupable( blocksToUpdate ) ) {
@@ -475,7 +462,7 @@ function ListViewBlock( {
 			}
 			updateExpansion( {
 				type: isExpanded ? 'collapse' : 'expand',
-				clientIds: clientId,
+				clientIds: [ clientId ],
 			} );
 		},
 		[ clientId, updateExpansion, isExpanded ]
@@ -664,10 +651,6 @@ function ListViewBlock( {
 							onToggleExpanded={
 								isDisabled ? undefined : toggleExpanded
 							}
-							isSelected={ isSelected }
-							position={ position }
-							siblingBlockCount={ siblingBlockCount }
-							level={ level }
 							ref={ ref }
 							tabIndex={ getListViewBlockTabIndex( tabIndex ) }
 							onFocus={ onFocus }
@@ -745,7 +728,6 @@ function ListViewBlock( {
 								size: 'small',
 							} }
 							disableOpenOnArrowDown
-							expansionState={ expansionState }
 							updateExpansion={ updateExpansion }
 							setInsertedBlockClientId={
 								setInsertedBlockClientId

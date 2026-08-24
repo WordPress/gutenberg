@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import ThemeSupportCheck from '../';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );

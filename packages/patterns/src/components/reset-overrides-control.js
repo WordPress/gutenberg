@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	store as blockEditorStore,
 	__unstableBlockToolbarLastItem as BlockToolbarLastItem,

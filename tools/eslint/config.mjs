@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { createRequire } from 'module';
 import { join, resolve } from 'path';
 import globals from 'globals';
@@ -12,11 +9,12 @@ import testingLibraryPlugin from 'eslint-plugin-testing-library';
 import jestPlugin from 'eslint-plugin-jest';
 import tseslint from 'typescript-eslint';
 import wpBuildConfig from '../../packages/wp-build/eslint-overrides.cjs';
-
 const require = createRequire( import.meta.url );
 const rootDir = resolve( import.meta.dirname, '../..' );
+// React is loaded conditionally below, so these CommonJS imports cannot form
+// one contiguous block.
+// eslint-disable-next-line import/order
 const wpPlugin = require( '@wordpress/eslint-plugin' );
-
 // Prefer the installed React version for linting, but fall back to the detected version.
 let reactVersion = 'detect';
 try {
@@ -322,12 +320,28 @@ export default dedupePlugins( [
 						Autocomplete: 'WCAutocomplete',
 						Badge: 'WCBadge',
 						Icon: 'WCIcon',
+						__experimentalInputControl: 'WCInputControl',
+						TextareaControl: 'WCTextareaControl',
 						Tooltip: 'WCTooltip',
 					},
 				},
 			],
+			'@wordpress/dependency-group': [ 'error', 'never' ],
 			'import/default': 'error',
 			'import/named': 'error',
+			'import/order': [
+				'error',
+				{
+					groups: [
+						'builtin', // Node.js built-in modules
+						'external', // npm packages
+						'internal', // Aliased modules
+						[ 'parent', 'sibling', 'index' ], // Relative imports
+					],
+					'newlines-between': 'never',
+					warnOnUnassignedImports: true,
+				},
+			],
 			'no-restricted-imports': [
 				'error',
 				{
@@ -863,19 +877,6 @@ export default dedupePlugins( [
 		files: [ 'packages/interactivity*/src/**' ],
 		rules: {
 			'react/react-in-jsx-scope': 'error',
-		},
-	},
-
-	// Override: Packages which have eliminated dependency grouping comments
-	// and explicitly prevent new additions.
-	{
-		files: [
-			'packages/design-system-mcp/**',
-			'packages/ui/**',
-			'packages/theme/**',
-		],
-		rules: {
-			'@wordpress/dependency-group': [ 'error', 'never' ],
 		},
 	},
 

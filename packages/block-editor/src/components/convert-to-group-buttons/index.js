@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { MenuItem } from '@wordpress/components';
 import { _x } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { groupBlocks } from '../../utils/group-blocks';
 import useConvertToGroupButtonProps from './use-convert-to-group-button-props';

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { Icon as WCIcon } from '@wordpress/components';
 import { blockDefault } from '@wordpress/icons';
 import { memo } from '@wordpress/element';

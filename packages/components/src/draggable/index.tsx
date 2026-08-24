@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import type { DragEvent } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { throttle } from '@wordpress/compose';
 import { useEffect, useRef } from '@wordpress/element';
 import { getWpCompatOverlaySlot } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { DraggableProps } from './types';
 import styles from './style.module.scss';
 

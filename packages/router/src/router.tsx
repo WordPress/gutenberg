@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import RouteRecognizer from 'route-recognizer';
 import { createBrowserHistory } from 'history';
-
-/**
- * WordPress dependencies
- */
 import {
 	createContext,
 	useContext,
@@ -22,10 +15,6 @@ import {
 	buildQueryString,
 } from '@wordpress/url';
 import { useEvent, usePrevious } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import type { ReactNode } from 'react';
 
 const history = createBrowserHistory();

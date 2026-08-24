@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	BaseControl,
@@ -15,10 +8,6 @@ import {
 	Notice,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import { useSettings } from '../use-settings';
 import { unlock } from '../../lock-unlock';
 

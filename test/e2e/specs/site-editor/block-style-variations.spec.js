@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 const TEST_PAGE_TITLE = 'Test Page for Block Style Variations';
 

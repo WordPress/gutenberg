@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { Component } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import withGlobalEvents from '../';
 import Listener from '../listener';
 

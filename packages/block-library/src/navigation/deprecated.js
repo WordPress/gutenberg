@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { InnerBlocks } from '@wordpress/block-editor';
 import { compose } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import migrateFontFamily from '../utils/migrate-font-family';
 
 const TYPOGRAPHY_PRESET_DEPRECATION_MAP = {

@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 8.5.0 (2026-08-12)
+
+## 8.4.0 (2026-07-29)
+
 ### Bug Fixes
 
 -   `createInterpolateElement`: Warn and stop interpolating instead of throwing when an unmatched closing tag is present ([#60843](https://github.com/WordPress/gutenberg/issues/60843)).

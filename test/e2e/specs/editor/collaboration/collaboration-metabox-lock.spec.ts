@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Page } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 import { SECOND_USER } from './fixtures/collaboration-utils';
 

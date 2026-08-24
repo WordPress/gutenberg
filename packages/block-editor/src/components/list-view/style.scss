@@ -382,10 +382,18 @@
 		}
 	}
 
-	// Style lock and position icons in line with image previews.
-	.block-editor-list-view-block-select-button__label-wrapper svg {
-		left: $grid-unit-05 * 0.5; // 2px.
-		position: relative;
+	.block-editor-list-view-block-select-button__label-wrapper {
+		width: 100%;
+
+		> * {
+			min-width: 0;
+		}
+
+		// Style lock and position icons in line with image previews.
+		svg {
+			left: $grid-unit-05 * 0.5; // 2px.
+			position: relative;
+		}
 	}
 
 	.block-editor-list-view-block-select-button__title {
@@ -409,6 +417,17 @@
 		position: absolute;
 		right: 0;
 		transform: translateY(-50%);
+		box-sizing: border-box;
+		max-width: 100%;
+		padding: 2px $grid-unit-10;
+		border-radius: $radius-small;
+		background: $gray-100;
+		color: $gray-800;
+		font-size: $font-size-small;
+		line-height: $font-line-height-small;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	&.is-selected .block-editor-list-view-block-select-button__anchor {

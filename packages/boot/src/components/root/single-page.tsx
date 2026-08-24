@@ -1,27 +1,17 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { privateApis as routePrivateApis } from '@wordpress/route';
 import { SnackbarNotices } from '@wordpress/notices';
 import { SlotFillProvider } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { getAdminThemeColors } from '@wordpress/admin-ui';
 import { ThemeProvider } from '@wordpress/theme';
-
-/**
- * Internal dependencies
- */
+import { UnsavedChangesWarning } from '@wordpress/editor';
 import SavePanel from '../save-panel';
 import CanvasRenderer from '../canvas-renderer';
 import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
 import useSyncBodyBackground from './use-sync-body-background';
-import './style.scss';
+import styles from './style.module.scss';
 import useRouteTitle from '../app/use-route-title';
 
 const { useMatches, Outlet } = unlock( routePrivateApis );
@@ -57,16 +47,21 @@ export default function RootSinglePage() {
 					<div
 						ref={ layoutRef }
 						className={ clsx(
-							'boot-layout boot-layout--single-page',
+							styles.layout,
+							styles[ 'layout-single-page' ],
 							{
-								'has-canvas': !! canvas || canvas === null,
-								'has-full-canvas': isFullScreen,
+								[ styles[ 'has-canvas' ] ]:
+									!! canvas || canvas === null,
+								[ styles[ 'has-full-canvas' ] ]: isFullScreen,
 							}
 						) }
 					>
+						<UnsavedChangesWarning />
 						<SavePanel />
-						<SnackbarNotices className="boot-notices__snackbar" />
-						<div className="boot-layout__surfaces">
+						<SnackbarNotices
+							className={ styles[ 'notices-snackbar' ] }
+						/>
+						<div className={ styles.surfaces }>
 							<ThemeProvider
 								color={ {
 									...themeColors,
@@ -76,7 +71,7 @@ export default function RootSinglePage() {
 								<Outlet />
 								{ /* Render Canvas in Root to prevent remounting on route changes */ }
 								{ ( canvas || canvas === null ) && (
-									<div className="boot-layout__canvas">
+									<div className={ styles.canvas }>
 										<CanvasRenderer
 											canvas={ canvas }
 											routeContentModule={

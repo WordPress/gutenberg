@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	registerBlockType,
 	unregisterBlockType,
@@ -13,10 +10,6 @@ import {
 import { RawHTML } from '@wordpress/element';
 import { symbol } from '@wordpress/icons';
 import { select, dispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import * as selectors from '../selectors';
 import { store } from '../';
 import { lock } from '../../lock-unlock';
@@ -2059,6 +2052,138 @@ describe( 'selectors', () => {
 				},
 			};
 			expect( hasSelectedInnerBlock( state, '3' ) ).toBe( false );
+		} );
+
+		it( 'should return true for a deep check if the selected block is a descendant of the given ClientId', () => {
+			const state = {
+				selection: {
+					selectionStart: { clientId: '3' },
+					selectionEnd: { clientId: '3' },
+				},
+				blocks: {
+					order: new Map(
+						Object.entries( {
+							1: [ '2' ],
+							2: [ '3' ],
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							2: '1',
+							3: '2',
+						} )
+					),
+				},
+			};
+
+			expect( hasSelectedInnerBlock( state, '1', true ) ).toBe( true );
+			expect( hasSelectedInnerBlock( state, '2', true ) ).toBe( true );
+			// Without a deep check only the direct parent matches.
+			expect( hasSelectedInnerBlock( state, '1' ) ).toBe( false );
+			expect( hasSelectedInnerBlock( state, '2' ) ).toBe( true );
+		} );
+
+		it( 'should return false for a deep check if the given ClientId is the selected block itself', () => {
+			const state = {
+				selection: {
+					selectionStart: { clientId: '3' },
+					selectionEnd: { clientId: '3' },
+				},
+				blocks: {
+					order: new Map(
+						Object.entries( {
+							1: [ '2' ],
+							2: [ '3' ],
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							2: '1',
+							3: '2',
+						} )
+					),
+				},
+			};
+
+			expect( hasSelectedInnerBlock( state, '3', true ) ).toBe( false );
+		} );
+
+		it( 'should return true for a deep check if a multi selection contains a descendant of the block with the given ClientId', () => {
+			const state = {
+				selection: {
+					selectionStart: { clientId: '2' },
+					selectionEnd: { clientId: '3' },
+				},
+				blocks: {
+					order: new Map(
+						Object.entries( {
+							'': [ '1' ],
+							1: [ '2', '3' ],
+							3: [ '4' ],
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							1: '',
+							2: '1',
+							3: '1',
+							4: '3',
+						} )
+					),
+				},
+			};
+
+			expect( hasSelectedInnerBlock( state, '1', true ) ).toBe( true );
+			// '3' is selected, and it is not its own ancestor.
+			expect( hasSelectedInnerBlock( state, '3', true ) ).toBe( false );
+			expect( hasSelectedInnerBlock( state, '4', true ) ).toBe( false );
+		} );
+
+		it( 'should return an up to date deep check after the selection moves to another branch', () => {
+			// The same blocks throughout, so only the selection changes.
+			const blocks = {
+				order: new Map(
+					Object.entries( {
+						'': [ '1', '4' ],
+						1: [ '2' ],
+						4: [ '5' ],
+					} )
+				),
+				parents: new Map(
+					Object.entries( {
+						1: '',
+						2: '1',
+						4: '',
+						5: '4',
+					} )
+				),
+			};
+
+			const state = {
+				blocks,
+				selection: {
+					selectionStart: { clientId: '2' },
+					selectionEnd: { clientId: '2' },
+				},
+			};
+
+			expect( hasSelectedInnerBlock( state, '1', true ) ).toBe( true );
+			expect( hasSelectedInnerBlock( state, '4', true ) ).toBe( false );
+
+			const nextState = {
+				blocks,
+				selection: {
+					selectionStart: { clientId: '5' },
+					selectionEnd: { clientId: '5' },
+				},
+			};
+
+			expect( hasSelectedInnerBlock( nextState, '1', true ) ).toBe(
+				false
+			);
+			expect( hasSelectedInnerBlock( nextState, '4', true ) ).toBe(
+				true
+			);
 		} );
 	} );
 

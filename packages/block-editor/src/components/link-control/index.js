@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	Spinner,
@@ -25,10 +18,6 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { keyboardReturn, linkOff } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
 import { isURL, prependHTTPS } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { useNativeUndo } from '../../utils/native-undo';
 import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchInput from './search-input';

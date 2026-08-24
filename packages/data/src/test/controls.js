@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { createRegistry, controls } from '..';
 
 describe( 'controls', () => {

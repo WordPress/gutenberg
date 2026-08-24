@@ -1,21 +1,13 @@
-/**
- * WordPress dependencies
- */
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { useMemo, useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import InspectorControls from '../components/inspector-controls';
 import {
 	default as StylesTypographyPanel,
 	useHasTypographyPanel,
 } from '../components/global-styles/typography-panel';
 import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
-
 import { LINE_HEIGHT_SUPPORT_KEY } from './line-height';
 import { FONT_FAMILY_SUPPORT_KEY } from './font-family';
 import { FONT_SIZE_SUPPORT_KEY } from './font-size';

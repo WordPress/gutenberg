@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	Panel,
@@ -32,10 +25,6 @@ import {
 	usePrevious,
 } from '@wordpress/compose';
 import { usePluginContext } from '@wordpress/plugins';
-
-/**
- * Internal dependencies
- */
 import ComplementaryAreaHeader from '../complementary-area-header';
 import ComplementaryAreaMoreMenuItem from '../complementary-area-more-menu-item';
 import ComplementaryAreaToggle from '../complementary-area-toggle';
@@ -48,11 +37,14 @@ function ComplementaryAreaSlot( { scope, ...props } ) {
 	return <Slot name={ `ComplementaryArea/${ scope }` } { ...props } />;
 }
 
-const SIDEBAR_WIDTH = 280;
 const variants = {
-	open: { width: SIDEBAR_WIDTH },
-	closed: { width: 0 },
-	mobileOpen: { width: '100vw' },
+	// `auto` leaves the width to the area's own stylesheet, so it stays in one
+	// place. framer-motion measures the element to animate, then restores
+	// `auto`.
+	open: { width: 'auto' },
+	// Resolved with the `custom` value passed to `AnimatePresence`, which is
+	// the only way an already removed element can be given a fresh transition.
+	closed: ( transition ) => ( { width: 0, transition } ),
 };
 
 /**
@@ -88,24 +80,16 @@ function ComplementaryAreaFill( {
 } ) {
 	const disableMotion = useReducedMotion();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	// This is used to delay the exit animation to the next tick.
-	// The reason this is done is to allow us to apply the right transition properties
-	// When we switch from an open sidebar to another open sidebar.
-	// we don't want to animate in this case.
+	// Swapping one open area straight for another should not animate.
 	const previousActiveArea = usePrevious( activeArea );
-	const previousIsActive = usePrevious( isActive );
-	const [ , setState ] = useState( {} );
-	useEffect( () => {
-		setState( {} );
-	}, [ isActive ] );
+	const isSwitchingAreas =
+		!! previousActiveArea &&
+		!! activeArea &&
+		activeArea !== previousActiveArea;
 	const transition = {
 		type: 'tween',
 		duration:
-			disableMotion ||
-			isMobileViewport ||
-			( !! previousActiveArea &&
-				!! activeArea &&
-				activeArea !== previousActiveArea )
+			disableMotion || isMobileViewport || isSwitchingAreas
 				? 0
 				: ANIMATION_DURATION,
 		ease: [ 0.6, 0, 0.4, 1 ],
@@ -113,12 +97,12 @@ function ComplementaryAreaFill( {
 
 	return (
 		<Fill name={ `ComplementaryArea/${ scope }` }>
-			<AnimatePresence initial={ false }>
-				{ ( previousIsActive || isActive ) && (
+			<AnimatePresence initial={ false } custom={ transition }>
+				{ isActive && (
 					<motion.div
 						variants={ variants }
 						initial="closed"
-						animate={ isMobileViewport ? 'mobileOpen' : 'open' }
+						animate="open"
 						exit="closed"
 						transition={ transition }
 						className="interface-complementary-area__fill"
@@ -126,11 +110,6 @@ function ComplementaryAreaFill( {
 						{ renderContainer( render, {
 							id,
 							className,
-							style: {
-								width: isMobileViewport
-									? '100vw'
-									: SIDEBAR_WIDTH,
-							},
 							children,
 						} ) }
 					</motion.div>

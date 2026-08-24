@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { camelCase } from 'change-case';
-
-/**
- * WordPress dependencies
- */
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import { STORE_NAME } from './name';
 import { additionalEntityConfigLoaders, DEFAULT_ENTITY_KEY } from './entities';
 import { getSyncManager } from './sync';
@@ -29,7 +18,7 @@ import {
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
 import { restoreSelection, getSelectionHistory } from './utils/crdt-selection';
-import { parsedBlocksCache, getCacheKey } from './parsed-blocks-cache';
+import { setCachedBlocks } from './parsed-blocks-cache';
 
 /**
  * Requests authors from the REST API.
@@ -183,15 +172,20 @@ export const getEntityRecord =
 					} );
 
 				// Share the parsed blocks with `useEntityBlockEditor` so the
-				// editor doesn't re-parse the same `content` string.
+				// editor doesn't re-parse the same `content` string. The cache
+				// remembers which block types the parse ran against, so an
+				// entry computed before they register is discarded, not served.
 				if (
 					recordWithTransients.blocks &&
 					typeof recordWithTransients.content?.raw === 'string'
 				) {
-					parsedBlocksCache.set( getCacheKey( kind, name, key ), {
-						content: recordWithTransients.content.raw,
-						blocks: recordWithTransients.blocks,
-					} );
+					setCachedBlocks(
+						kind,
+						name,
+						key,
+						recordWithTransients.content.raw,
+						recordWithTransients.blocks
+					);
 				}
 
 				const syncManager =
@@ -200,6 +194,11 @@ export const getEntityRecord =
 						: getSyncManager();
 
 				// Load the entity record for syncing. Do not await promise.
+				// NOTE: when this resolver runs before block types register,
+				// `recordWithTransients.blocks` was parsed as empty. The cache
+				// above discards such an entry; the sync manager receives it
+				// as-is, and seeding a collaborative document from it is an
+				// open problem of the collaboration path.
 				void syncManager?.load(
 					entityConfig.syncConfig,
 					objectType,

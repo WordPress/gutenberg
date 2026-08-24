@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type {
 	WithInjectedProps,
 	WithoutInjectedProps,
