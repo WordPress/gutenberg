@@ -302,7 +302,7 @@ describe( 'CollapsibleCard', () => {
 			);
 		} );
 
-		it( 'preserves an existing trigger accessible description', () => {
+		it( 'applies an explicit accessible description only to the header trigger', () => {
 			const existingDescriptionId = 'existing-description';
 
 			render(
@@ -310,6 +310,7 @@ describe( 'CollapsibleCard', () => {
 					<p id={ existingDescriptionId }>Existing description</p>
 					<CollapsibleCard.Root>
 						<CollapsibleCard.Header
+							render={ <h2 /> }
 							aria-describedby={ existingDescriptionId }
 						>
 							<Card.Title>Settings</Card.Title>
@@ -329,6 +330,28 @@ describe( 'CollapsibleCard', () => {
 			expect( trigger ).toHaveAccessibleDescription(
 				'Existing description 3 errors Requires attention'
 			);
+			expect(
+				screen.getByRole( 'heading' )
+			).not.toHaveAccessibleDescription();
+		} );
+
+		it( 'deduplicates explicit and registered accessible-description IDs', () => {
+			const descriptionId = 'status';
+
+			render(
+				<CollapsibleCard.Root>
+					<CollapsibleCard.Header aria-describedby={ descriptionId }>
+						<Card.Title>Settings</Card.Title>
+						<CollapsibleCard.HeaderDescription id={ descriptionId }>
+							3 errors
+						</CollapsibleCard.HeaderDescription>
+					</CollapsibleCard.Header>
+				</CollapsibleCard.Root>
+			);
+
+			const trigger = screen.getByRole( 'button' );
+			expect( trigger ).toHaveAccessibleName( 'Settings' );
+			expect( trigger ).toHaveAccessibleDescription( '3 errors' );
 		} );
 
 		it( 'keeps descriptions in visual order when a conditional description remounts', () => {

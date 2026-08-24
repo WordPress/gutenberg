@@ -37,7 +37,13 @@ import type { HeaderProps } from './types';
  */
 export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 	function CollapsibleCardHeader(
-		{ children, className, render, ...restProps },
+		{
+			children,
+			className,
+			render,
+			'aria-describedby': ariaDescribedByProp,
+			...restProps
+		},
 		ref
 	) {
 		const [ descriptionIds, setDescriptionIds ] = useState< string[] >(
@@ -95,9 +101,14 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 		} );
 
 		const ariaDescribedBy =
-			[ restProps[ 'aria-describedby' ], ...orderedDescriptionIds ]
-				.filter( Boolean )
-				.join( ' ' ) || undefined;
+			Array.from(
+				new Set( [
+					...( ariaDescribedByProp
+						?.split( /\s+/ )
+						.filter( Boolean ) ?? [] ),
+					...orderedDescriptionIds,
+				] )
+			).join( ' ' ) || undefined;
 
 		return useRender( {
 			defaultTagName: 'div',
