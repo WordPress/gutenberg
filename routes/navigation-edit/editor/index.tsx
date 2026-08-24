@@ -1,7 +1,6 @@
 import { useMemo } from '@wordpress/element';
 // @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { BlockEditorProvider } from '@wordpress/block-editor';
-// @ts-expect-error - No type declarations available for @wordpress/blocks
 import { createBlock } from '@wordpress/blocks';
 import { Spinner } from '@wordpress/components';
 import { useEditorAssets } from '@wordpress/lazy-editor';

@@ -77,6 +77,9 @@ export const decorators = [
 ];
 
 export const parameters = {
+	a11y: {
+		test: 'error',
+	},
 	controls: {
 		sort: 'requiredFirst',
 	},
