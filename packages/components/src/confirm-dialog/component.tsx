@@ -22,6 +22,8 @@ const UnconnectedConfirmDialog = (
 		confirmButtonText,
 		cancelButtonText,
 		isBusy,
+		title,
+		__experimentalHideHeader = true,
 		...otherProps
 	} = useContextSystem( props, 'ConfirmDialog' );
 
@@ -81,7 +83,11 @@ const UnconnectedConfirmDialog = (
 					isDismissible
 					ref={ forwardedRef }
 					overlayClassName={ wrapperClassName }
-					__experimentalHideHeader
+					title={ title }
+					contentLabel={
+						__experimentalHideHeader ? title : undefined
+					}
+					__experimentalHideHeader={ __experimentalHideHeader }
 					{ ...otherProps }
 				>
 					<VStack spacing={ 8 }>

@@ -9,6 +9,9 @@
 			"@wordpress/block-editor": [
 				"./typings/untyped-packages/any-module.d.ts"
 			],
+			"@wordpress/block-library": [
+				"./typings/untyped-packages/any-module.d.ts"
+			],
 			"@wordpress/patterns": [
 				"./typings/untyped-packages/any-module.d.ts"
 			],
