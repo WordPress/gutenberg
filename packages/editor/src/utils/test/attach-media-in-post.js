@@ -20,20 +20,26 @@ const imageBlock = ( id ) => ( {
  * Builds a registry stub over a set of blocks and the records they resolve to.
  *
  * @param {Object}   options
- * @param {Object[]} [options.blocks] Blocks the post contains.
- * @param {Object[]} [options.media]  Records `getEntityRecords` resolves to.
+ * @param {Object[]} [options.blocks]   Blocks the post contains.
+ * @param {Object[]} [options.media]    Records `getEntityRecords` resolves to.
+ * @param {Object}   [options.postType] What `getPostType` resolves to.
  */
-function createRegistry( { blocks = [], media = [] } = {} ) {
+function createRegistry( {
+	blocks = [],
+	media = [],
+	postType = { viewable: true },
+} = {} ) {
 	const getEntityRecords = jest.fn().mockResolvedValue( media );
+	const getPostType = jest.fn().mockResolvedValue( postType );
 	const saveEntityRecord = jest.fn().mockResolvedValue( {} );
 
 	const registry = {
 		select: () => ( { getBlocks: () => blocks } ),
-		resolveSelect: () => ( { getEntityRecords } ),
+		resolveSelect: () => ( { getEntityRecords, getPostType } ),
 		dispatch: () => ( { saveEntityRecord } ),
 	};
 
-	return { registry, getEntityRecords, saveEntityRecord };
+	return { registry, getEntityRecords, getPostType, saveEntityRecord };
 }
 
 describe( 'attachMediaInPost', () => {
@@ -47,7 +53,7 @@ describe( 'attachMediaInPost', () => {
 			media: [ { id: 12, post: null } ],
 		} );
 
-		await attachMediaInPost( registry, 7 );
+		await attachMediaInPost( registry, 7, 'post' );
 
 		expect( saveEntityRecord ).toHaveBeenCalledWith(
 			'postType',
@@ -63,7 +69,7 @@ describe( 'attachMediaInPost', () => {
 			media: [ { id: 12, post: 99 } ],
 		} );
 
-		await attachMediaInPost( registry, 7 );
+		await attachMediaInPost( registry, 7, 'post' );
 
 		expect( saveEntityRecord ).not.toHaveBeenCalled();
 		expect( mockInvalidate ).not.toHaveBeenCalled();
@@ -80,7 +86,7 @@ describe( 'attachMediaInPost', () => {
 			],
 		} );
 
-		await attachMediaInPost( registry, 7 );
+		await attachMediaInPost( registry, 7, 'post' );
 
 		expect( getEntityRecords ).not.toHaveBeenCalled();
 	} );
@@ -97,7 +103,7 @@ describe( 'attachMediaInPost', () => {
 			],
 		} );
 
-		await attachMediaInPost( registry, 7 );
+		await attachMediaInPost( registry, 7, 'post' );
 
 		expect( getEntityRecords ).not.toHaveBeenCalled();
 	} );
@@ -117,7 +123,7 @@ describe( 'attachMediaInPost', () => {
 			],
 		} );
 
-		await attachMediaInPost( registry, 7 );
+		await attachMediaInPost( registry, 7, 'post' );
 
 		expect( saveEntityRecord ).toHaveBeenCalledTimes( 2 );
 	} );
@@ -129,8 +135,39 @@ describe( 'attachMediaInPost', () => {
 		} );
 		saveEntityRecord.mockRejectedValue( new Error( 'Forbidden' ) );
 
-		await attachMediaInPost( registry, 7 );
+		await attachMediaInPost( registry, 7, 'post' );
 
 		expect( mockInvalidate ).not.toHaveBeenCalled();
+	} );
+	/**
+	 * `savePost` handles templates as well as posts. A template has no front end
+	 * of its own and backs many posts, so "uploaded to" pointing at one says
+	 * nothing useful.
+	 */
+	it( 'attaches nothing for a post type with no front end', async () => {
+		const { registry, getEntityRecords, saveEntityRecord } = createRegistry(
+			{
+				blocks: [ imageBlock( 12 ) ],
+				media: [ { id: 12, post: null } ],
+				postType: { viewable: false },
+			}
+		);
+
+		await attachMediaInPost( registry, 7, 'wp_template' );
+
+		expect( getEntityRecords ).not.toHaveBeenCalled();
+		expect( saveEntityRecord ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does not look up the post type when the post has no media', async () => {
+		const { registry, getPostType } = createRegistry( {
+			blocks: [
+				{ name: 'core/paragraph', attributes: {}, innerBlocks: [] },
+			],
+		} );
+
+		await attachMediaInPost( registry, 7, 'post' );
+
+		expect( getPostType ).not.toHaveBeenCalled();
 	} );
 } );

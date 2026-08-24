@@ -10,8 +10,8 @@
  * `core/image` blocks, and only the pre-v7 format stored its own array of IDs.
  *
  * Widening this to Cover, Media & Text, Video, Audio and File is a one-line
- * change — the panel reads the post's blocks rather than tracking which blocks
- * proposed what, so a block needs no involvement to be covered.
+ * change — the post's blocks are read on save rather than each block reporting
+ * what it holds, so a block needs no involvement to be covered.
  */
 const MEDIA_ID_ATTRIBUTES = {
 	'core/image': [ 'id' ],

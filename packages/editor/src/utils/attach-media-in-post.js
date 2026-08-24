@@ -27,13 +27,28 @@ const { invalidateAttachmentResolutions } = unlock( mediaUtilsPrivateApis );
  *
  * @param {Object} registry A `@wordpress/data` registry.
  * @param {number} postId   ID of the post that was saved.
+ * @param {string} postType Type of the post that was saved.
  */
-export default async function attachMediaInPost( registry, postId ) {
+export default async function attachMediaInPost( registry, postId, postType ) {
 	const mediaIds = getMediaIdsInBlocks(
 		registry.select( blockEditorStore ).getBlocks()
 	);
 
 	if ( ! mediaIds.length ) {
+		return;
+	}
+
+	// A post type with no front end of its own is a poor owner for media. A
+	// template is the clearest case: it has no URL, and the same template backs
+	// many posts, so "uploaded to" pointing at it says nothing useful. `savePost`
+	// handles templates as well as posts, so this has to be checked rather than
+	// assumed. Ordered after the cheap block scan so a post with no media at all
+	// still costs nothing.
+	const postTypeObject = await registry
+		.resolveSelect( coreStore )
+		.getPostType( postType );
+
+	if ( ! postTypeObject?.viewable ) {
 		return;
 	}
 
