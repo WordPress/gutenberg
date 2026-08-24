@@ -25,9 +25,7 @@ export const SearchableChipSelectControl = forwardRef<
 			<Field.Label hideFromVision={ hideLabelFromVision }>
 				{ label }
 			</Field.Label>
-			<Field.Control
-				render={ <SearchableChipSelect ref={ ref } { ...restProps } /> }
-			/>
+			<SearchableChipSelect ref={ ref } { ...restProps } />
 			{ description && (
 				<Field.Description>{ description }</Field.Description>
 			) }
