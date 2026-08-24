@@ -253,6 +253,44 @@ export type EntityRecordOf<
 	keyof EntityRecordTypes< C >[ Kind ] ];
 
 /**
+ * The contexts a query's `context` property can hold.
+ *
+ * A literal, or a union of them, is the context the request will use. Anything
+ * wider -- `string`, `any`, an optional property -- could still be any of the
+ * three at runtime.
+ */
+type ContextsOf< Requested > = Context extends Requested
+	? Context
+	: Requested extends Context
+	? Requested
+	: Context;
+
+/**
+ * Resolves the context a query asks for.
+ *
+ * Only an inline object keeps `context` as a literal: assigning that same
+ * object to a variable widens the property to `string` at the declaration,
+ * before the call is made. A query with no `context` keeps the default.
+ */
+type ContextOfQuery< Query > = 'context' extends keyof Query
+	? ContextsOf< Query[ 'context' & keyof Query ] >
+	: 'edit';
+
+/**
+ * Resolves a `kind`/`name` pair to its record in each of the given contexts.
+ *
+ * `ContextualField` distributes over the contexts a field is available in, not
+ * over `C`, so a record instantiated at `'view' | 'edit'` would carry the
+ * edit-only fields. Distributing here returns a union of records instead, so
+ * only the fields every context serialises can be read.
+ */
+type EntityRecordInContexts<
+	Kind extends EntityKind,
+	Name extends EntityNameOf< Kind >,
+	C extends Context,
+> = C extends Context ? EntityRecordOf< Kind, Name, C > : never;
+
+/**
  * Resolves a `kind`/`name` pair against the query it was requested with.
  *
  * `context` selects which fields the REST API serialises, so a `'view'`
@@ -264,14 +302,8 @@ export type EntityRecordOf<
  * that reflected should say so locally -- with `Pick`, or their own interface
  * -- rather than have it imposed here.
  */
-type ContextOfQuery< Query > = Query extends {
-	context: infer Requested extends Context;
-}
-	? Requested
-	: 'edit';
-
 export type EntityRecordOfQuery<
 	Kind extends EntityKind,
 	Name extends EntityNameOf< Kind >,
 	Query,
-> = EntityRecordOf< Kind, Name, ContextOfQuery< Query > >;
+> = EntityRecordInContexts< Kind, Name, ContextOfQuery< Query > >;

@@ -32,6 +32,12 @@ type Expect< A, B > = [ A ] extends [ B ]
 		: never
 	: never;
 
+/**
+ * A post whose context is not known at compile time: one record per context,
+ * leaving only the fields all three serialise readable.
+ */
+type PostInAnyContext = Post< 'view' > | Post< 'edit' > | Post< 'embed' >;
+
 describe( 'EntityRecordOf', () => {
 	it( 'resolves root entities to their record type', () => {
 		const base: Expect<
@@ -145,6 +151,51 @@ describe( 'EntityRecordOf', () => {
 		> = true;
 
 		expect( [ view, embed, withFields ] ).toHaveLength( 3 );
+	} );
+
+	/*
+	 * A query only pins the context down when it holds a literal. The request
+	 * still goes out with the context the object named, so a widened property
+	 * cannot assume `edit` -- every context stays possible.
+	 */
+	it( 'resolves a widened context to every context', () => {
+		const widened: Expect<
+			EntityRecordOfQuery< 'postType', 'post', { context: string } >,
+			PostInAnyContext
+		> = true;
+		const optional: Expect<
+			EntityRecordOfQuery<
+				'postType',
+				'post',
+				{ context?: 'view' | 'edit' | 'embed' }
+			>,
+			PostInAnyContext
+		> = true;
+		// The declared type of the selectors' own `query` parameter.
+		const untyped: Expect<
+			EntityRecordOfQuery< 'postType', 'post', Record< string, any > >,
+			PostInAnyContext
+		> = true;
+
+		expect( [ widened, optional, untyped ] ).toHaveLength( 3 );
+	} );
+
+	/*
+	 * Each context has to reach the record separately: `ContextualField`
+	 * distributes over the contexts a field is available in, not over `C`, so
+	 * `Post< 'view' | 'embed' >` would carry the edit-only fields.
+	 */
+	it( 'distributes a union of contexts across records', () => {
+		const union: Expect<
+			EntityRecordOfQuery<
+				'postType',
+				'post',
+				{ context: 'view' | 'embed' }
+			>,
+			Post< 'view' > | Post< 'embed' >
+		> = true;
+
+		expect( union ).toBe( true );
 	} );
 
 	it( 'leaves a query without a context at the complete record', () => {
