@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Input } from '../index';
 import { InputLayout } from '../../input-layout';
-import { WithSuffixControl } from '../../input-layout/stories/index.story';
+import { WithSuffixControl as InputLayoutWithSuffixControl } from '../../input-layout/stories/index.story';
 
 const meta: Meta< typeof Input > = {
 	tags: [ 'manifest' ],
@@ -46,11 +46,16 @@ export const WithPrefix: Story = {
 	},
 };
 
-WithSuffixControl.args = {
-	...WithSuffixControl.args,
-	children: undefined,
+export const WithSuffixControl: Story = {
+	args: {
+		suffix: InputLayoutWithSuffixControl.args?.suffix,
+	},
+	parameters: {
+		// FIXME: Story shows Input without a visible label (label).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 };
-export { WithSuffixControl };
 
 export const Disabled: Story = {
 	args: {
