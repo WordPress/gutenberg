@@ -1,14 +1,10 @@
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Icon, IconButton, Link } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { Icon, IconButton, Menu } from '@wordpress/ui';
 import type { WidgetAction } from '@wordpress/widget-primitives';
 import { useReserveHeaderSpace } from '../widget-header/widget-header-fit';
 import styles from './widget-actions.module.css';
-import { unlock } from '../../lock-unlock';
-
-const { Menu } = unlock( componentsPrivateApis );
 
 type WidgetActionsProps = {
 	/**
@@ -41,8 +37,8 @@ export function WidgetActions( {
 
 	return (
 		<span ref={ reserveRef } className={ styles[ 'widget-actions' ] }>
-			<Menu>
-				<Menu.TriggerButton
+			<Menu.Root>
+				<Menu.Trigger
 					render={
 						<IconButton
 							icon={ moreVertical }
@@ -54,33 +50,29 @@ export function WidgetActions( {
 					}
 				/>
 
-				<Menu.Popover>
-					<Menu.Group className={ styles[ 'widget-action-items' ] }>
+				<Menu.Popup>
+					<Menu.Group>
 						{ actions.map( ( action ) => (
-							<Menu.Item
+							<Menu.LinkItem
 								key={ action.id }
+								closeOnClick
 								prefix={
 									action.icon ? (
 										<Icon icon={ action.icon } />
 									) : undefined
 								}
-								render={
-									<Link
-										href={ action.href }
-										download={ action.download }
-										openInNewTab={ action.openInNewTab }
-										className={
-											styles[ 'widget-action-link' ]
-										}
-									/>
-								}
+								href={ action.href }
+								download={ action.download }
+								openInNewTab={ action.openInNewTab }
 							>
-								{ action.label }
-							</Menu.Item>
+								<Menu.ItemLabel>
+									{ action.label }
+								</Menu.ItemLabel>
+							</Menu.LinkItem>
 						) ) }
 					</Menu.Group>
-				</Menu.Popover>
-			</Menu>
+				</Menu.Popup>
+			</Menu.Root>
 		</span>
 	);
 }

@@ -1,13 +1,9 @@
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { moreVertical, trash } from '@wordpress/icons';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { IconButton } from '@wordpress/ui';
-import { unlock } from '../../lock-unlock';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { IconButton, Menu } from '@wordpress/ui';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import type { DashboardWidget, GridTilePlacement } from '../../types';
-
-const { Menu } = unlock( componentsPrivateApis );
 
 type NamedGridWidth = Exclude<
 	NonNullable< GridTilePlacement[ 'width' ] >,
@@ -61,8 +57,8 @@ export function WidgetLayoutControls( {
 
 	return (
 		<>
-			<Menu>
-				<Menu.TriggerButton
+			<Menu.Root>
+				<Menu.Trigger
 					render={
 						<IconButton
 							icon={ moreVertical }
@@ -74,7 +70,7 @@ export function WidgetLayoutControls( {
 					}
 				/>
 
-				<Menu.Popover>
+				<Menu.Popup>
 					<Menu.Group>
 						<Menu.GroupLabel>{ __( 'Width' ) }</Menu.GroupLabel>
 						<Menu.Item
@@ -94,8 +90,8 @@ export function WidgetLayoutControls( {
 							</Menu.ItemLabel>
 						</Menu.Item>
 					</Menu.Group>
-				</Menu.Popover>
-			</Menu>
+				</Menu.Popup>
+			</Menu.Root>
 
 			<IconButton
 				icon={ trash }
