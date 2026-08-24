@@ -24,12 +24,30 @@ const MEDIA_ID_ATTRIBUTES = {
  * @param {Object[]} blocks Blocks to flatten.
  * @return {Object[]} Every block in the tree.
  */
+/**
+ * Blocks whose inner blocks are another entity's content.
+ *
+ * A synced pattern's blocks are *controlled* inner blocks: `core/block` passes
+ * the pattern's own content into `useInnerBlocksProps`, which syncs it into this
+ * editor's store under the pattern block's client ID. So they are in this post's
+ * block tree without being this post's content, and walking into them would let
+ * a post claim media it does not own.
+ *
+ * That matters more here than a missed image would. A pattern may be used on
+ * twenty posts, so whichever one saved first would take the file permanently -
+ * arbitrary, invisible, and not undone by saving any of the others.
+ */
+const ENTITY_BOUNDARY_BLOCKS = [ 'core/block', 'core/template-part' ];
+
 function flattenBlocks( blocks ) {
 	const result = [];
 
 	blocks.forEach( ( block ) => {
 		result.push( block );
-		result.push( ...flattenBlocks( block.innerBlocks ) );
+
+		if ( ! ENTITY_BOUNDARY_BLOCKS.includes( block.name ) ) {
+			result.push( ...flattenBlocks( block.innerBlocks ) );
+		}
 	} );
 
 	return result;

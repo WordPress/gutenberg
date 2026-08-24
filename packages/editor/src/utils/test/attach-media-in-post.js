@@ -170,4 +170,57 @@ describe( 'attachMediaInPost', () => {
 
 		expect( getPostType ).not.toHaveBeenCalled();
 	} );
+	/**
+	 * A synced pattern's blocks are controlled inner blocks, so they sit in this
+	 * post's tree without being this post's content. The pattern may be used on
+	 * many posts, and whichever saved first would claim the file permanently.
+	 */
+	it( 'does not claim media inside a synced pattern', async () => {
+		const { registry, getEntityRecords } = createRegistry( {
+			blocks: [
+				{
+					name: 'core/block',
+					attributes: { ref: 5 },
+					innerBlocks: [ imageBlock( 12 ) ],
+				},
+			],
+		} );
+
+		await attachMediaInPost( registry, 7, 'post' );
+
+		expect( getEntityRecords ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does not claim media inside a template part', async () => {
+		const { registry, getEntityRecords } = createRegistry( {
+			blocks: [
+				{
+					name: 'core/template-part',
+					attributes: { slug: 'header' },
+					innerBlocks: [ imageBlock( 12 ) ],
+				},
+			],
+		} );
+
+		await attachMediaInPost( registry, 7, 'post' );
+
+		expect( getEntityRecords ).not.toHaveBeenCalled();
+	} );
+
+	it( 'still walks into ordinary container blocks', async () => {
+		const { registry, saveEntityRecord } = createRegistry( {
+			blocks: [
+				{
+					name: 'core/group',
+					attributes: {},
+					innerBlocks: [ imageBlock( 12 ) ],
+				},
+			],
+			media: [ { id: 12, post: null } ],
+		} );
+
+		await attachMediaInPost( registry, 7, 'post' );
+
+		expect( saveEntityRecord ).toHaveBeenCalledTimes( 1 );
+	} );
 } );
