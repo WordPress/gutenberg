@@ -1882,10 +1882,11 @@ const canInsertBlockTypeUnmemoized = (
 	}
 
 	const blockAllowedParentBlocks = blockType.parent;
-	const hasBlockAllowedParent = checkAllowList(
-		blockAllowedParentBlocks,
-		parentName
-	);
+	const hasBlockAllowedParent =
+		Array.isArray( blockAllowedParentBlocks ) &&
+		blockAllowedParentBlocks.length === 0
+			? parentName === null
+			: checkAllowList( blockAllowedParentBlocks, parentName );
 
 	let hasBlockAllowedAncestor = true;
 	const blockAllowedAncestorBlocks = blockType.ancestor;

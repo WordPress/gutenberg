@@ -148,6 +148,16 @@ describe( 'selectors', () => {
 			parent: [ 'core/post-content' ],
 		} );
 
+		registerBlockType( 'core/root-only-child', {
+			apiVersion: 3,
+			save: () => null,
+			category: 'text',
+			title: 'Test Block Root Only Child',
+			icon: 'test',
+			keywords: [ 'testing' ],
+			parent: [],
+		} );
+
 		registerBlockType( 'core/test-block-ancestor', {
 			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
@@ -213,6 +223,7 @@ describe( 'selectors', () => {
 		unregisterBlockType( 'core/test-block-c' );
 		unregisterBlockType( 'core/freeform' );
 		unregisterBlockType( 'core/post-content-child' );
+		unregisterBlockType( 'core/root-only-child' );
 		unregisterBlockType( 'core/test-block-ancestor' );
 		unregisterBlockType( 'core/test-block-parent' );
 		unregisterBlockType( 'core/test-block-requires-ancestor' );
@@ -3184,6 +3195,48 @@ describe( 'selectors', () => {
 			expect(
 				canInsertBlockType( state, 'core/post-content-child' )
 			).toBe( true );
+		} );
+
+		it( 'should deny blocks that restrict parent to the root when not in editor root', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							block1: { name: 'core/test-block-a' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							block1: {},
+						} )
+					),
+					parents: new Map(),
+					order: new Map(),
+					blockEditingModes: new Map(),
+				},
+				blockListSettings: new Map(),
+				settings: {},
+			};
+			expect(
+				canInsertBlockType( state, 'core/root-only-child', 'block1' )
+			).toBe( false );
+		} );
+
+		it( 'should allow blocks that restrict parent to the root when in editor root', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(),
+					attributes: new Map(),
+					parents: new Map(),
+					order: new Map(),
+					blockEditingModes: new Map(),
+				},
+				blockListSettings: new Map(),
+				settings: {},
+			};
+			expect( canInsertBlockType( state, 'core/root-only-child' ) ).toBe(
+				true
+			);
 		} );
 
 		it( 'should allow blocks to be inserted in a descendant of a required ancestor', () => {

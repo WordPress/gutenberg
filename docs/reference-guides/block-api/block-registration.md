@@ -275,15 +275,21 @@ Transforms provide rules for what a block can be transformed from and what it ca
 
 #### parent (optional)
 
--   **Type:** `Array`
+-   **Type:** `Array` or `undefined`
+-   **Default:** `undefined`
 
 Blocks are able to be inserted into blocks that use [`InnerBlocks`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md) as nested content. Sometimes it is useful to restrict a block so that it is only available as a nested block. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
 
-Setting `parent` lets a block require that it is only available when nested within the specified blocks.
+Setting `parent` lets a block require that it is only available when nested within the specified blocks. When `parent` is `undefined`, the block is available at any level where insertion is otherwise allowed. When `parent` is an empty array (`[]`), the block is only available at the root level.
 
 ```js
 // Only allow this block when it is nested in a Columns block
 parent: [ 'core/columns' ],
+```
+
+```js
+// Only allow this block at the root level.
+parent: [],
 ```
 
 #### ancestor (optional)
