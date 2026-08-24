@@ -678,11 +678,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/base-control/styles/base-control-styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
 	"packages/components/src/border-box-control/styles.ts": {
 		"no-restricted-imports": {
 			"count": 1
@@ -714,11 +709,6 @@
 		}
 	},
 	"packages/components/src/card/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/components/src/color-palette/styles.ts": {
 		"no-restricted-imports": {
 			"count": 1
 		}
@@ -853,11 +843,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/progress-bar/styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
 	"packages/components/src/range-control/index.tsx": {
 		"react-hooks/immutability": {
 			"count": 3
@@ -902,11 +887,6 @@
 		}
 	},
 	"packages/components/src/text/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/components/src/textarea-control/styles/textarea-control-styles.ts": {
 		"no-restricted-imports": {
 			"count": 1
 		}
