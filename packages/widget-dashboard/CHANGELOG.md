@@ -13,9 +13,10 @@
     `setAttributes`). Nested policies compose restrictively. Exports the
     `DashboardOperationRequest`, `DashboardInstanceOperation`,
     `DashboardInstanceOperationRequest`, and `CanPerformDashboardOperation`
-    types.
+    types ([#81967](https://github.com/WordPress/gutenberg/pull/81967)).
 -   The Add widget button and command show only while the policy lets some
-    registered type be inserted.
+    registered type be inserted
+    ([#81967](https://github.com/WordPress/gutenberg/pull/81967)).
 
 -   Widget chrome footer: `relevance: 'high'` actions mount as leading text
     links (declared icon as prefix) in a persistent strip under the widget

@@ -5,7 +5,8 @@
 ### New Features
 
 -   Layout items accept `draggable` and `resizable` flags, so a surface in
-    edit mode can keep individual tiles fixed in place or at their size.
+    edit mode can keep individual tiles fixed in place or at their size
+    ([#81967](https://github.com/WordPress/gutenberg/pull/81967)).
 
 ### Internal
 
