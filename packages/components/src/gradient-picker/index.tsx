@@ -6,7 +6,8 @@ import CircularOptionPicker, {
 } from '../circular-option-picker';
 import CustomGradientPicker from '../custom-gradient-picker';
 import { VStack } from '../v-stack';
-import { ColorHeading } from '../color-palette/styles';
+import { Heading } from '../heading';
+import colorPaletteStyles from '../color-palette/style.module.scss';
 import type {
 	GradientPickerComponentProps,
 	PickerProps,
@@ -102,9 +103,13 @@ function MultipleOrigin( {
 				const id = `color-palette-${ instanceId }-${ index }`;
 				return (
 					<VStack spacing={ 2 } key={ index }>
-						<ColorHeading level={ headingLevel } id={ id }>
+						<Heading
+							className={ colorPaletteStyles[ 'color-heading' ] }
+							level={ headingLevel }
+							id={ id }
+						>
 							{ name }
-						</ColorHeading>
+						</Heading>
 						<SingleOrigin
 							clearGradient={ clearGradient }
 							gradients={ gradientSet }
