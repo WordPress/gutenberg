@@ -43,6 +43,14 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		const SYNC_UPDATE_META_KEY = 'wp_sync_update_data';
 
 		/**
+		 * Meta key for the room's engine lineage stamp.
+		 *
+		 * @since 7.2.0
+		 * @var string
+		 */
+		const ENGINE_META_KEY = 'wp_sync_engine';
+
+		/**
 		 * Cache of cursors by room.
 		 *
 		 * @since 7.0.0
@@ -209,6 +217,164 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		 */
 		public function get_cursor( string $room ): int {
 			return $this->room_cursors[ $room ] ?? 0;
+		}
+
+		/**
+		 * Gets the sync engine lineage of a room.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @global wpdb $wpdb WordPress database abstraction object.
+		 *
+		 * @param string $room Room identifier.
+		 * @return string|null Engine slug, or null for a room with no lineage.
+		 */
+		public function get_room_engine( string $room ): ?string {
+			global $wpdb;
+
+			$post_id = $this->get_storage_post_id( $room );
+			if ( null === $post_id ) {
+				return null;
+			}
+
+			// Use direct database operation to avoid priming the post meta
+			// cache (see the cache-hygiene notes on the other accessors).
+			$meta_value = $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT meta_value FROM $wpdb->postmeta WHERE post_id = %d AND meta_key = %s ORDER BY meta_id ASC LIMIT 1",
+					$post_id,
+					self::ENGINE_META_KEY
+				)
+			);
+
+			if ( ! is_string( $meta_value ) || '' === $meta_value ) {
+				return null;
+			}
+
+			return $meta_value;
+		}
+
+		/**
+		 * Stamps the sync engine lineage of a room.
+		 *
+		 * Never overwrites an existing stamp: get_room_engine() reads the
+		 * OLDEST row, so even a concurrent double-insert converges on the
+		 * first writer's engine.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @global wpdb $wpdb WordPress database abstraction object.
+		 *
+		 * @param string $room   Room identifier.
+		 * @param string $engine Engine slug.
+		 * @return bool True on success, false on failure.
+		 */
+		public function set_room_engine( string $room, string $engine ): bool {
+			global $wpdb;
+
+			if ( null !== $this->get_room_engine( $room ) ) {
+				return true;
+			}
+
+			$post_id = $this->get_storage_post_id( $room );
+			if ( null === $post_id ) {
+				return false;
+			}
+
+			// Use direct database operation to avoid cache invalidation
+			// performed by post meta functions.
+			return (bool) $wpdb->insert(
+				$wpdb->postmeta,
+				array(
+					'post_id'    => $post_id,
+					'meta_key'   => self::ENGINE_META_KEY,
+					'meta_value' => $engine,
+				),
+				array( '%d', '%s', '%s' )
+			);
+		}
+
+		/**
+		 * Reads a per-room metadata value (JSON-decoded). Engine-level
+		 * bookkeeping (compaction checkpoints, trim floors) rides here; the
+		 * key is namespaced to avoid update-row and lineage keys. Not part
+		 * of the WP_Sync_Storage interface yet — engines feature-detect via
+		 * method_exists and degrade gracefully.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @global wpdb $wpdb WordPress database abstraction object.
+		 *
+		 * @param string $room Room identifier.
+		 * @param string $key  Meta key (namespaced automatically).
+		 * @return mixed Decoded value, or null when absent.
+		 */
+		public function get_room_meta( string $room, string $key ) {
+			global $wpdb;
+
+			$post_id = $this->get_storage_post_id( $room );
+			if ( null === $post_id ) {
+				return null;
+			}
+
+			// Direct query for cache hygiene (see other accessors).
+			$meta_value = $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT meta_value FROM $wpdb->postmeta WHERE post_id = %d AND meta_key = %s ORDER BY meta_id DESC LIMIT 1",
+					$post_id,
+					'wp_sync_room_meta_' . $key
+				)
+			);
+
+			if ( ! is_string( $meta_value ) || '' === $meta_value ) {
+				return null;
+			}
+
+			return json_decode( $meta_value, true );
+		}
+
+		/**
+		 * Writes a per-room metadata value (JSON-encoded), replacing any
+		 * previous value for the key.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @global wpdb $wpdb WordPress database abstraction object.
+		 *
+		 * @param string $room  Room identifier.
+		 * @param string $key   Meta key (namespaced automatically).
+		 * @param mixed  $value JSON-serializable value.
+		 * @return bool True on success, false on failure.
+		 */
+		public function set_room_meta( string $room, string $key, $value ): bool {
+			global $wpdb;
+
+			$post_id = $this->get_storage_post_id( $room );
+			if ( null === $post_id ) {
+				return false;
+			}
+
+			$meta_key = 'wp_sync_room_meta_' . $key;
+
+			// Direct queries for cache hygiene (see other accessors).
+			$wpdb->delete(
+				$wpdb->postmeta,
+				array(
+					'post_id'  => $post_id,
+					'meta_key' => $meta_key,
+				),
+				array( '%d', '%s' )
+			);
+
+			return (bool) $wpdb->insert(
+				$wpdb->postmeta,
+				array(
+					'post_id'    => $post_id,
+					'meta_key'   => $meta_key,
+					'meta_value' => wp_json_encode( $value ),
+				),
+				array( '%d', '%s', '%s' )
+			);
 		}
 
 		/**

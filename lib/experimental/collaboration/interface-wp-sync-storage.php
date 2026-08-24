@@ -85,5 +85,28 @@ if ( ! interface_exists( 'WP_Sync_Storage' ) ) {
 		 * @return bool True on success, false on failure.
 		 */
 		public function set_awareness_state( string $room, array $awareness ): bool;
+
+		/**
+		 * Gets the sync engine lineage of a room: the slug of the engine that
+		 * first wrote to it, or null for a room with no lineage yet.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @param string $room Room identifier.
+		 * @return string|null Engine slug, or null.
+		 */
+		public function get_room_engine( string $room ): ?string;
+
+		/**
+		 * Stamps the sync engine lineage of a room. Called on a room's first
+		 * write; implementations must not overwrite an existing stamp.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @param string $room   Room identifier.
+		 * @param string $engine Engine slug.
+		 * @return bool True on success, false on failure.
+		 */
+		public function set_room_engine( string $room, string $engine ): bool;
 	}
 }

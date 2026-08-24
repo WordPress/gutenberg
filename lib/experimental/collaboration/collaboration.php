@@ -9,7 +9,15 @@ require_once __DIR__ . '/class-wp-sync-config.php';
 if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 	require_once __DIR__ . '/interface-wp-sync-storage.php';
 	require_once __DIR__ . '/class-wp-sync-post-meta-storage.php';
-	require_once __DIR__ . '/class-wp-http-polling-sync-server.php';
+	require_once __DIR__ . '/interface-wp-sync-engine.php';
+	require_once __DIR__ . '/class-wp-sync-engine-registry.php';
+	require_once __DIR__ . '/transports/interface-wp-sync-transport.php';
+	require_once __DIR__ . '/transports/class-wp-sync-transport-registry.php';
+	// Engine and transport IMPLEMENTATIONS ship in a plugin (e.g. Gutenberg
+	// Sync Engines) and register through the wp_sync_engines /
+	// wp_sync_transports filters. The framework loads only the contracts and
+	// registries; without an engine plugin the registries stay empty and
+	// real-time collaboration degrades to the classic post lock.
 }
 require_once __DIR__ . '/class-wp-sync-save-server.php';
 
@@ -57,15 +65,55 @@ if ( ! function_exists( 'gutenberg_register_sync_storage_post_type' ) ) {
 	add_action( 'init', 'gutenberg_register_sync_storage_post_type' );
 }
 
-if ( ! function_exists( 'gutenberg_register_collaboration_rest_routes' ) ) {
+if ( ! function_exists( 'wp_get_collaboration_transport' ) ) {
 	/**
-	 * Registers REST API routes for collaborative editing.
+	 * The single config value that selects the active collaboration
+	 * transport. One source of truth: the `WP_COLLABORATION_TRANSPORT`
+	 * constant, else the environment variable of the same name, else the
+	 * `wp_collaboration_transport` filter, defaulting to HTTP polling. The
+	 * value must be a registered transport slug; an unknown value falls back
+	 * to the default in the registry.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @return string Configured transport slug.
 	 */
-	function gutenberg_register_collaboration_rest_routes(): void {
-		if ( ! wp_is_collaboration_enabled() ) {
-			return;
+	function wp_get_collaboration_transport(): string {
+		// Conventional default; only takes effect if a plugin registered a
+		// transport by this slug.
+		$transport = 'http-polling';
+		if ( defined( 'WP_COLLABORATION_TRANSPORT' ) && is_string( WP_COLLABORATION_TRANSPORT ) && '' !== WP_COLLABORATION_TRANSPORT ) {
+			$transport = WP_COLLABORATION_TRANSPORT;
+		} else {
+			$from_env = getenv( 'WP_COLLABORATION_TRANSPORT' );
+			if ( is_string( $from_env ) && '' !== $from_env ) {
+				$transport = $from_env;
+			}
 		}
 
+		/**
+		 * Filters the active collaboration transport slug.
+		 *
+		 * @since 7.2.0
+		 *
+		 * @param string $transport Transport slug.
+		 */
+		return (string) apply_filters( 'wp_collaboration_transport', $transport );
+	}
+}
+
+if ( ! function_exists( 'wp_get_collaboration_transport_registry' ) ) {
+	/**
+	 * Builds a transport registry over the default storage and engine
+	 * registry. Built fresh per call: the storage keeps per-request in-memory
+	 * caches (room cursors, storage post ids) that must not outlive a
+	 * request, so this is never memoized.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @return WP_Sync_Transport_Registry Transport registry.
+	 */
+	function wp_get_collaboration_transport_registry(): WP_Sync_Transport_Registry {
 		/**
 		 * Filters the sync storage implementation for collaborative editing.
 		 *
@@ -75,22 +123,36 @@ if ( ! function_exists( 'gutenberg_register_collaboration_rest_routes' ) ) {
 		 * table for CRDT updates, eliminating cache side effects.
 		 *
 		 * This filter is unstable and may change as RTC explores fundamental changes
-		 * to how syncing works. The current interface assumes a pure naïve relay,
-		 * which could change.
+		 * to how syncing works.
 		 *
 		 * @since Gutenberg 21.x
 		 *
 		 * @param WP_Sync_Storage $sync_storage Storage implementation. Must implement
 		 *                                      the WP_Sync_Storage interface.
 		 */
-		$sync_storage = apply_filters( '__unstable_wp_sync_storage', new WP_Sync_Post_Meta_Storage() );
+		$storage = apply_filters( '__unstable_wp_sync_storage', new WP_Sync_Post_Meta_Storage() );
 
-		if ( ! $sync_storage instanceof WP_Sync_Storage ) {
-			$sync_storage = new WP_Sync_Post_Meta_Storage();
+		if ( ! $storage instanceof WP_Sync_Storage ) {
+			$storage = new WP_Sync_Post_Meta_Storage();
 		}
 
-		$sync_server = new WP_HTTP_Polling_Sync_Server( $sync_storage );
-		$sync_server->register_routes();
+		$engines = new WP_Sync_Engine_Registry( $storage );
+		return new WP_Sync_Transport_Registry( $storage, $engines );
+	}
+}
+
+if ( ! function_exists( 'gutenberg_register_collaboration_rest_routes' ) ) {
+	/**
+	 * Registers REST API routes for collaborative editing.
+	 */
+	function gutenberg_register_collaboration_rest_routes(): void {
+		if ( ! wp_is_collaboration_enabled() ) {
+			return;
+		}
+
+		// Every registered transport's routes are reachable; the client uses
+		// the one the server announces as active.
+		wp_get_collaboration_transport_registry()->register_all_routes();
 
 		$sync_save_server = new WP_Sync_Save_Server();
 		$sync_save_server->register_routes();
@@ -232,9 +294,49 @@ function gutenberg_inject_collaboration_disabled_post_types() {
 		)
 	);
 
+	/*
+	 * Engine/transport handshake. The client refuses to join sync rooms
+	 * whose engine (or protocol version) its adapter registry cannot
+	 * provide, or when no announced transport is supported — degrading to
+	 * the classic exclusive post lock instead of corrupting a session.
+	 * Per-room engine overrides (`wp_sync_engine_for_room`) are enforced
+	 * server-side by the 409 mismatch check; this announcement covers the
+	 * site default.
+	 */
+	$registry           = new WP_Sync_Engine_Registry( new WP_Sync_Post_Meta_Storage() );
+	$engine             = $registry->get_engine_for_room( '' );
+	$transport_registry = wp_get_collaboration_transport_registry();
+	$active_transport   = $transport_registry->get_transport( $transport_registry->get_active_slug() );
+	// With no engine plugin active, announce no engine and no transports;
+	// the client then has nothing to negotiate and falls back to the post
+	// lock (RTC disabled).
+	$sync               = array(
+		'engine'            => $engine ? $engine->get_slug() : '',
+		'engineProtocol'    => $engine ? $engine->get_protocol_version() : 0,
+		// Announced active FIRST; the client picks the first slug it can
+		// provide (see the single config value `wp_get_collaboration_transport`).
+		'transports'        => $transport_registry->get_announced_slugs(),
+		'transportProtocol' => $active_transport ? $active_transport->get_protocol_version() : 1,
+	);
+
 	wp_add_inline_script(
 		'wp-core-data',
-		'window._wpCollaborationDisabledPostTypes = ' . wp_json_encode( $disabled_post_types ) . ';',
+		'window._wpCollaborationDisabledPostTypes = ' . wp_json_encode( $disabled_post_types ) . ';' .
+		'window._wpCollaborationSync = ' . wp_json_encode( $sync ) . ';' .
+		// Informational half of the intent-log actor id; the server stamps
+		// the authoritative value from the authenticated request.
+		'window._wpCollaborationUserId = ' . wp_json_encode( get_current_user_id() ) . ';' .
+		/*
+		 * Transport-specific connection metadata (e.g. a WebSocket socket
+		 * URL) is supplied by the transport's plugin through this filter,
+		 * so the framework carries no transport-specific knowledge.
+		 */
+		'window._wpCollaborationTransportConfig = ' . wp_json_encode(
+			(object) apply_filters( 'wp_sync_transport_client_config', array(), $sync['transports'] )
+		) . ';' .
+		// UI hint only — restore/approval is enforced at ingest per the
+		// authoring user's capability regardless of what the client shows.
+		'window._wpCollaborationCanUnfilteredHtml = ' . wp_json_encode( current_user_can( 'unfiltered_html' ) ) . ';',
 		'after'
 	);
 }
