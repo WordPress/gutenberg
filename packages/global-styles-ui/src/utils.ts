@@ -17,6 +17,7 @@ const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 export interface StateDefinition {
 	value: string;
 	label: string;
+	info?: string;
 }
 
 /**
@@ -28,19 +29,55 @@ export const VALID_ELEMENT_STATES: Record< string, StateDefinition[] > = {
 		{ value: ':link', label: __( 'Link' ) },
 		{ value: ':any-link', label: __( 'Any Link' ) },
 		{ value: ':visited', label: __( 'Visited' ) },
-		{ value: ':hover', label: __( 'Hover' ) },
-		{ value: ':focus', label: __( 'Focus' ) },
-		{ value: ':focus-visible', label: __( 'Focus-visible' ) },
-		{ value: ':active', label: __( 'Active' ) },
+		{
+			value: ':hover',
+			label: __( 'Hover' ),
+			info: __( 'Applies when the pointer is over the element.' ),
+		},
+		{
+			value: ':focus',
+			label: __( 'Focus' ),
+			info: __( 'Applies when the element has focus.' ),
+		},
+		{
+			value: ':focus-visible',
+			label: __( 'Focus-visible' ),
+			info: __(
+				'Applies when the element has focus from keyboard navigation.'
+			),
+		},
+		{
+			value: ':active',
+			label: __( 'Active' ),
+			info: __( 'Applies while the element is pressed.' ),
+		},
 	],
 	button: [
 		{ value: ':link', label: __( 'Link' ) },
 		{ value: ':any-link', label: __( 'Any Link' ) },
 		{ value: ':visited', label: __( 'Visited' ) },
-		{ value: ':hover', label: __( 'Hover' ) },
-		{ value: ':focus', label: __( 'Focus' ) },
-		{ value: ':focus-visible', label: __( 'Focus-visible' ) },
-		{ value: ':active', label: __( 'Active' ) },
+		{
+			value: ':hover',
+			label: __( 'Hover' ),
+			info: __( 'Applies when the pointer is over the element.' ),
+		},
+		{
+			value: ':focus',
+			label: __( 'Focus' ),
+			info: __( 'Applies when the element has focus.' ),
+		},
+		{
+			value: ':focus-visible',
+			label: __( 'Focus-visible' ),
+			info: __(
+				'Applies when the element has focus from keyboard navigation.'
+			),
+		},
+		{
+			value: ':active',
+			label: __( 'Active' ),
+			info: __( 'Applies while the element is pressed.' ),
+		},
 	],
 };
 
@@ -50,10 +87,28 @@ export const VALID_ELEMENT_STATES: Record< string, StateDefinition[] > = {
  */
 export const VALID_BLOCK_STATES: Record< string, StateDefinition[] > = {
 	'core/button': [
-		{ value: ':hover', label: __( 'Hover' ) },
-		{ value: ':focus', label: __( 'Focus' ) },
-		{ value: ':focus-visible', label: __( 'Focus-visible' ) },
-		{ value: ':active', label: __( 'Active' ) },
+		{
+			value: ':hover',
+			label: __( 'Hover' ),
+			info: __( 'Applies when the pointer is over the element.' ),
+		},
+		{
+			value: ':focus',
+			label: __( 'Focus' ),
+			info: __( 'Applies when the element has focus.' ),
+		},
+		{
+			value: ':focus-visible',
+			label: __( 'Focus-visible' ),
+			info: __(
+				'Applies when the element has focus from keyboard navigation.'
+			),
+		},
+		{
+			value: ':active',
+			label: __( 'Active' ),
+			info: __( 'Applies while the element is pressed.' ),
+		},
 	],
 };
 
