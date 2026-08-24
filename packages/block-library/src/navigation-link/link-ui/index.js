@@ -1,9 +1,5 @@
 import { __unstableStripHTML as stripHTML, focus } from '@wordpress/dom';
-import {
-	Popover,
-	Button,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { Popover, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { LinkControl, useBlockEditingMode } from '@wordpress/block-editor';
 import {
@@ -16,7 +12,7 @@ import {
 import { useResourcePermissions } from '@wordpress/core-data';
 import { plus } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
-import { VisuallyHidden } from '@wordpress/ui';
+import { Stack, VisuallyHidden } from '@wordpress/ui';
 import { isURL } from '@wordpress/url';
 import { LinkUIPageCreator } from './page-creator';
 import LinkUIBlockInserter from './block-inserter';
@@ -82,6 +78,8 @@ function UnforwardedLinkUI( props, ref ) {
 	const [ addingBlock, setAddingBlock ] = useState( false );
 	const [ addingPage, setAddingPage ] = useState( false );
 	const [ shouldFocusPane, setShouldFocusPane ] = useState( null );
+	const [ pageCreatorInitialTitle, setPageCreatorInitialTitle ] =
+		useState( '' );
 	// Stable initial value for LinkControl's uncontrolled inputValue prop.
 	// We track the search with the searchInputValueRef, then update the
 	// initialSearchValue state with the observed searchInputValueRef
@@ -187,6 +185,7 @@ function UnforwardedLinkUI( props, ref ) {
 			onClose={ props.onClose }
 			anchor={ props.anchor }
 			shift
+			{ ...( props.popoverProps ?? {} ) }
 		>
 			{ ! addingBlock && ! addingPage && (
 				<div
@@ -238,6 +237,14 @@ function UnforwardedLinkUI( props, ref ) {
 										setAddingBlock( true );
 									} }
 									setAddingPage={ () => {
+										const searchInputValue =
+											searchInputValueRef.current;
+										setPageCreatorInitialTitle(
+											searchInputValue &&
+												! isURL( searchInputValue )
+												? searchInputValue
+												: ''
+										);
 										setAddingPage( true );
 									} }
 									canAddPage={
@@ -276,12 +283,7 @@ function UnforwardedLinkUI( props, ref ) {
 						updateSearchValue( searchInputValueRef.current );
 					} }
 					onPageCreated={ handlePageCreated }
-					initialTitle={
-						searchInputValueRef.current &&
-						! isURL( searchInputValueRef.current )
-							? searchInputValueRef.current
-							: ''
-					}
+					initialTitle={ pageCreatorInitialTitle }
 				/>
 			) }
 		</Popover>
@@ -306,7 +308,7 @@ const LinkUITools = ( {
 	}
 
 	return (
-		<VStack spacing={ 0 } className="link-ui-tools">
+		<Stack spacing={ 0 } className="link-ui-tools">
 			{ canAddPage && (
 				<Button
 					__next40pxDefaultSize
@@ -335,7 +337,7 @@ const LinkUITools = ( {
 					{ __( 'Add block' ) }
 				</Button>
 			) }
-		</VStack>
+		</Stack>
 	);
 };
 
