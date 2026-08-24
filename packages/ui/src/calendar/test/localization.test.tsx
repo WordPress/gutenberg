@@ -349,6 +349,20 @@ describe( 'Calendar text direction fallback', () => {
 	} );
 
 	it.each( [
+		[ 'Sindhi', 'sd', 'rtl' ],
+		[ 'Latin-script Uyghur', 'ug-Latn', 'ltr' ],
+	] as const )(
+		'uses legacy Intl.Locale text information for %s',
+		( _, locale, direction ) => {
+			render( <Calendar locale={ locale } /> );
+
+			expect(
+				screen.getByRole( 'application', { name: 'Date calendar' } )
+			).toHaveAttribute( 'dir', direction );
+		}
+	);
+
+	it.each( [
 		[ 'Central Kurdish', ckb ],
 		[ 'Uyghur', ug ],
 	] )(

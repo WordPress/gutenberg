@@ -3,13 +3,14 @@ import { useMemo } from '@wordpress/element';
 import { enUS } from 'date-fns/locale';
 import type { Modifiers, BaseProps } from '../types';
 
-type IntlLocaleWithWeekInfo = Intl.Locale & {
+type IntlLocaleWithInfo = Intl.Locale & {
 	getWeekInfo?: () => { firstDay?: number };
 	weekInfo?: { firstDay?: number };
+	textInfo?: { direction?: string };
 };
 
-function isLocaleRTL( locale: Intl.Locale ) {
-	const direction = locale.getTextInfo?.().direction;
+function isLocaleRTL( locale: IntlLocaleWithInfo ) {
+	const direction = ( locale.getTextInfo?.() ?? locale.textInfo )?.direction;
 	if ( direction ) {
 		return direction === 'rtl';
 	}
@@ -44,7 +45,7 @@ function getSupportedLocaleCode( localeCode: string | undefined ) {
 	return supportedLocaleCode;
 }
 
-function getWeekStartsOn( locale: IntlLocaleWithWeekInfo ) {
+function getWeekStartsOn( locale: IntlLocaleWithInfo ) {
 	const firstDay = ( locale.getWeekInfo?.() ?? locale.weekInfo )?.firstDay;
 	if ( firstDay === undefined || firstDay < 1 || firstDay > 7 ) {
 		return;
@@ -87,9 +88,7 @@ export const useLocalizationProps = ( {
 			isLocaleString ? locale : locale?.code
 		);
 		const localeCode = supportedLocaleCode ?? 'en-US';
-		const intlLocale = new Intl.Locale(
-			localeCode
-		) as IntlLocaleWithWeekInfo;
+		const intlLocale = new Intl.Locale( localeCode ) as IntlLocaleWithInfo;
 		const isRightToLeft =
 			supportedLocaleCode !== undefined
 				? isLocaleRTL( intlLocale )
