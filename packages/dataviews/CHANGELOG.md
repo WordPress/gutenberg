@@ -30,6 +30,7 @@
 -   DataForms: Simplify the `panel` layout field trigger. The row is now a plain layout container and the edit button owns the click handling, with its hit area stretched over the row for pointer users. Removes the row-level click/keydown handlers and the text-selection guard they needed. [#80689](https://github.com/WordPress/gutenberg/pull/80689)
 -   DataForm: Remove the vendored `ControlWithError` copy in favor of the `ControlWithError` component from `@wordpress/ui`. ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574))
 -   DataForm: Render the `date` control's validity message with `ValidityIndicator` from `@wordpress/ui` instead of hand-rolled markup styled by `@wordpress/components` global class names. ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574))
+-   DataForm: Use `ValidatedInputControl` from `@wordpress/ui` in the `text`, `email`, `telephone`, `url`, `password`, `color`, `datetime`, and `time` controls, instead of unlocking it from the `@wordpress/components` private APIs. Prefixes and suffixes now render in an `InputLayout.Slot` from `@wordpress/ui`. ([#81627](https://github.com/WordPress/gutenberg/pull/81627))
 
 ## 18.0.0 (2026-08-12)
 

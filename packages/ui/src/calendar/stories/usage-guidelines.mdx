@@ -99,7 +99,17 @@ const functionMatcher = ( day ) => day.getMonth() === 2;
 
 ## Localization
 
-Dates are formatted with the `locale` prop, which takes a locale object from [`date-fns`](https://github.com/date-fns/date-fns/tree/main/src/locale). Text direction is derived from that locale, so an RTL locale flips the layout and the navigation chevrons automatically.
+`Calendar` and `RangeCalendar` always render a Gregorian date grid. A locale changes the language, localized names, numerals, and default text direction. It does not replace the underlying calendar system.
+
+Pass a BCP 47 locale code to `locale` to localize date text. This does not require importing a matching date-fns locale:
+
+```jsx
+import { Calendar } from '@wordpress/ui';
+
+const MyFrenchCalendar = () => <Calendar locale="fr-FR" />;
+```
+
+The `locale` prop also accepts a locale object from [`date-fns`](https://github.com/date-fns/date-fns/tree/main/src/locale):
 
 ```jsx
 import { fr } from 'date-fns/locale';
@@ -108,9 +118,13 @@ import { Calendar } from '@wordpress/ui';
 const MyFrenchCalendar = () => <Calendar locale={ fr } />;
 ```
 
-The visible strings (button labels, the "today" announcement) come from `@wordpress/i18n`, which uses the site locale rather than the `locale` prop. For a coherent experience, make sure the two agree — or override the strings through the `labels` prop.
+For both input forms, a supported locale code derives the default text direction and first day of the week from the browser. This keeps the result consistent whether the code is passed directly or through a date-fns locale object.
 
-Use `weekStartsOn` to override the first day of the week that the locale would otherwise imply.
+An invalid or unsupported locale code falls back to `en-US` for date text. A date-fns locale object with an unsupported code retains its own first-day setting.
+
+The visible strings (button labels, the "today" announcement) come from `@wordpress/i18n`, which uses the site locale rather than these props. For a coherent experience, make sure they agree — or override the strings through the `labels` prop.
+
+Use `weekStartsOn` to override the first day of the week, including to preserve a custom value from a date-fns locale object. Explicit `dir` and `lang` props override the defaults derived from `locale`.
 
 ## Time Zones
 
