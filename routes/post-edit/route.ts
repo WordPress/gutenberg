@@ -58,11 +58,11 @@ export const route = {
 	},
 	title: async ( { params }: { params: PostEditParams } ) => {
 		const postId = getPostId( params );
-		const post = await resolveSelect( coreStore ).getEntityRecord(
+		const post = ( await resolveSelect( coreStore ).getEntityRecord(
 			'postType',
 			params.type,
 			postId
-		);
+		) ) as { title?: { rendered?: string } } | undefined;
 
 		if ( post?.title?.rendered ) {
 			return decodeEntities( post.title.rendered );
