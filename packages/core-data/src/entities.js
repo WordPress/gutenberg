@@ -1,6 +1,11 @@
 import { capitalCase, pascalCase } from 'change-case';
 import apiFetch from '@wordpress/api-fetch';
-import { __unstableSerializeAndClean, parse } from '@wordpress/blocks';
+import {
+	__unstableSerializeAndClean,
+	getBlockContent,
+	getBlockType,
+	parse,
+} from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { PostEditorAwareness } from './awareness/post-editor-awareness';
 import { getSyncManager } from './sync';
@@ -476,6 +481,72 @@ async function loadPostTypeEntities() {
 					Array.isArray( window._wpCollaborationDisabledPostTypes ) &&
 					window._wpCollaborationDisabledPostTypes.includes( name )
 				),
+
+			/**
+			 * Names a block type's rich-text attributes so engines with
+			 * rich-text-coordinate capture know which attributes become
+			 * text fields.
+			 *
+			 * @param {string} blockName Block type name.
+			 * @return {string[]} Rich-text attribute names.
+			 */
+			richTextFields: ( blockName ) => {
+				const blockType = getBlockType( blockName );
+				if ( ! blockType ) {
+					return [ 'content' ];
+				}
+				return Object.entries( blockType.attributes ?? {} )
+					.filter(
+						( [ , schema ] ) =>
+							'html' === schema?.source ||
+							'rich-text' === schema?.source
+					)
+					.map( ( [ key ] ) => key );
+			},
+
+			/**
+			 * Blocks whose markup lives in innerContent fragments rather
+			 * than any attribute. The block serializer special-cases
+			 * core/html the same way.
+			 *
+			 * @param {string} blockName Block type name.
+			 * @return {boolean} Whether the block is a raw-content block.
+			 */
+			isRawContentBlock: ( blockName ) =>
+				'core/html' === blockName || 'core/freeform' === blockName,
+
+			/**
+			 * The full inner HTML of a raw-content block: static fragments
+			 * plus serialized inner blocks. Falls back to the deprecated
+			 * `content` attribute for blocks created via
+			 * `createBlock( 'core/html', { content } )` that have not been
+			 * migrated yet.
+			 *
+			 * @param {Object} block The block.
+			 * @return {string} Inner HTML.
+			 */
+			serializeRawContent: ( block ) => {
+				if ( block.innerContent ) {
+					return getBlockContent( block );
+				}
+				return 'string' === typeof block.attributes?.content
+					? block.attributes.content
+					: '';
+			},
+
+			/**
+			 * Where a raw-content block's HTML re-enters the editor block:
+			 * core/html models content as innerContent fragments; classic
+			 * content (core/freeform) as a raw-sourced content attribute.
+			 *
+			 * @param {string} blockName Block type name.
+			 * @param {string} html      The block's inner HTML.
+			 * @return {Object} Partial block (attributes or innerContent).
+			 */
+			hydrateRawContent: ( blockName, html ) =>
+				'core/freeform' === blockName
+					? { attributes: { content: html } }
+					: { innerContent: '' === html ? [] : [ html ] },
 		};
 
 		return entity;

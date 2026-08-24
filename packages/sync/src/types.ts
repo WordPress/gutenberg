@@ -160,6 +160,42 @@ export interface SyncConfig {
 		objectId: ObjectID | null
 	) => boolean;
 	supportsPersistence?: boolean;
+	/**
+	 * Names a block type's rich-text attributes (backed by the block
+	 * registry). Engines with rich-text-coordinate capture (the intent log)
+	 * use it to decide which attributes become text fields; omitted, only
+	 * the conventional `content` attribute is captured.
+	 */
+	richTextFields?: ( blockName: string ) => string[];
+	/**
+	 * Whether a block type keeps its markup in innerContent fragments
+	 * rather than any attribute (core/html). Such blocks sync their full
+	 * inner HTML as the engine's content field.
+	 */
+	isRawContentBlock?: ( blockName: string ) => boolean;
+	/**
+	 * The full inner HTML of a raw-content block (static fragments plus
+	 * serialized inner blocks) — typically backed by the block
+	 * serializer's getBlockContent.
+	 */
+	serializeRawContent?: ( block: {
+		name: string;
+		attributes: Record< string, unknown >;
+		innerBlocks: unknown[];
+		innerContent?: Array< string | null >;
+	} ) => string;
+	/**
+	 * Where a raw-content block's HTML lives on the editor block:
+	 * innerContent fragments (core/html) or attributes (core/freeform's
+	 * raw-sourced content). Omitted, innerContent form is used.
+	 */
+	hydrateRawContent?: (
+		blockName: string,
+		html: string
+	) => {
+		attributes?: Record< string, unknown >;
+		innerContent?: Array< string | null >;
+	};
 }
 
 export interface SyncManager {
