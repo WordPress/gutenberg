@@ -1130,7 +1130,7 @@ describe( 'DataViews component', () => {
 
 			// Table, Grid, and List options must all appear.
 			expect(
-				screen.getByRole( 'menuitemradio', { name: 'Table' } )
+				await screen.findByRole( 'menuitemradio', { name: 'Table' } )
 			).toBeInTheDocument();
 			expect(
 				screen.getByRole( 'menuitemradio', { name: 'Grid' } )
