@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { createInterpolateElement, useState } from '@wordpress/element';
 import { Tip } from '@wordpress/components';
@@ -29,9 +26,7 @@ const globalTips = [
 ];
 
 function Tips() {
-	const [ randomIndex ] = useState(
-		// Disable Reason: I'm not generating an HTML id.
-		// eslint-disable-next-line no-restricted-syntax
+	const [ randomIndex ] = useState( () =>
 		Math.floor( Math.random() * globalTips.length )
 	);
 

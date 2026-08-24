@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 import {
 	RichText,
@@ -17,10 +10,6 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
@@ -1847,7 +1836,11 @@ const v3 = {
 			[
 				createBlock( 'core/paragraph', {
 					content: attributes.title,
-					align: attributes.contentAlign,
+					style: {
+						typography: {
+							textAlign: attributes.contentAlign,
+						},
+					},
 					fontSize: 'large',
 					placeholder: __( 'Write title…' ),
 				} ),
@@ -1933,7 +1926,11 @@ const v2 = {
 			[
 				createBlock( 'core/paragraph', {
 					content: attributes.title,
-					align: attributes.contentAlign,
+					style: {
+						typography: {
+							textAlign: attributes.contentAlign,
+						},
+					},
 					fontSize: 'large',
 					placeholder: __( 'Write title…' ),
 				} ),
@@ -1993,7 +1990,11 @@ const v1 = {
 			[
 				createBlock( 'core/paragraph', {
 					content: attributes.title,
-					align: attributes.contentAlign,
+					style: {
+						typography: {
+							textAlign: attributes.contentAlign,
+						},
+					},
 					fontSize: 'large',
 					placeholder: __( 'Write title…' ),
 				} ),

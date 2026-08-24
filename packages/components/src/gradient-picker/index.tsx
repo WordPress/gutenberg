@@ -1,17 +1,13 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { useCallback, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import CircularOptionPicker from '../circular-option-picker';
+import CircularOptionPicker, {
+	getComputeCircularOptionPickerCommonProps,
+} from '../circular-option-picker';
 import CustomGradientPicker from '../custom-gradient-picker';
 import { VStack } from '../v-stack';
-import { ColorHeading } from '../color-palette/styles';
+import { Heading } from '../heading';
+import colorPaletteStyles from '../color-palette/style.module.scss';
 import type {
 	GradientPickerComponentProps,
 	PickerProps,
@@ -39,35 +35,48 @@ function SingleOrigin( {
 	gradients,
 	onChange,
 	value,
+	selectedSlug,
 	...additionalProps
 }: PickerProps< GradientObject > ) {
 	const gradientOptions = useMemo( () => {
-		return gradients.map( ( { gradient, name, slug }, index ) => (
-			<CircularOptionPicker.Option
-				key={ slug }
-				value={ gradient }
-				isSelected={ value === gradient }
-				tooltipText={
-					name ||
-					// translators: %s: gradient code e.g: "linear-gradient(90deg, rgba(98,16,153,1) 0%, rgba(172,110,22,1) 100%);".
-					sprintf( __( 'Gradient code: %s' ), gradient )
-				}
-				style={ { color: 'rgba( 0,0,0,0 )', background: gradient } }
-				onClick={
-					value === gradient
-						? clearGradient
-						: () => onChange( gradient, index )
-				}
-				aria-label={
-					name
-						? // translators: %s: The name of the gradient e.g: "Angular red to blue".
-						  sprintf( __( 'Gradient: %s' ), name )
-						: // translators: %s: gradient code e.g: "linear-gradient(90deg, rgba(98,16,153,1) 0%, rgba(172,110,22,1) 100%);".
-						  sprintf( __( 'Gradient code: %s' ), gradient )
-				}
-			/>
-		) );
-	}, [ gradients, value, onChange, clearGradient ] );
+		return gradients.map( ( { gradient, name, slug }, index ) => {
+			// When a non-empty selectedSlug is provided, selection is decided
+			// strictly by slug, which keeps two entries with the same gradient
+			// value apart. Otherwise selection falls back to matching the
+			// gradient value.
+			const isSelected = selectedSlug
+				? slug === selectedSlug
+				: value === gradient;
+			return (
+				<CircularOptionPicker.Option
+					key={ slug }
+					value={ gradient }
+					isSelected={ isSelected }
+					tooltipText={
+						name ||
+						// translators: %s: gradient code e.g: "linear-gradient(90deg, rgba(98,16,153,1) 0%, rgba(172,110,22,1) 100%);".
+						sprintf( __( 'Gradient code: %s' ), gradient )
+					}
+					style={ {
+						color: 'rgba( 0,0,0,0 )',
+						background: gradient,
+					} }
+					onClick={
+						isSelected
+							? clearGradient
+							: () => onChange( gradient, index, slug )
+					}
+					aria-label={
+						name
+							? // translators: %s: The name of the gradient e.g: "Angular red to blue".
+							  sprintf( __( 'Gradient: %s' ), name )
+							: // translators: %s: gradient code e.g: "linear-gradient(90deg, rgba(98,16,153,1) 0%, rgba(172,110,22,1) 100%);".
+							  sprintf( __( 'Gradient code: %s' ), gradient )
+					}
+				/>
+			);
+		} );
+	}, [ gradients, value, onChange, clearGradient, selectedSlug ] );
 	return (
 		<CircularOptionPicker.OptionGroup
 			className={ className }
@@ -83,6 +92,7 @@ function MultipleOrigin( {
 	gradients,
 	onChange,
 	value,
+	selectedSlug,
 	headingLevel,
 }: PickerProps< OriginObject > ) {
 	const instanceId = useInstanceId( MultipleOrigin );
@@ -93,16 +103,21 @@ function MultipleOrigin( {
 				const id = `color-palette-${ instanceId }-${ index }`;
 				return (
 					<VStack spacing={ 2 } key={ index }>
-						<ColorHeading level={ headingLevel } id={ id }>
+						<Heading
+							className={ colorPaletteStyles[ 'color-heading' ] }
+							level={ headingLevel }
+							id={ id }
+						>
 							{ name }
-						</ColorHeading>
+						</Heading>
 						<SingleOrigin
 							clearGradient={ clearGradient }
 							gradients={ gradientSet }
-							onChange={ ( gradient ) =>
-								onChange( gradient, index )
+							onChange={ ( gradient, _index, slug ) =>
+								onChange( gradient, index, slug )
 							}
 							value={ value }
+							selectedSlug={ selectedSlug }
 							aria-labelledby={ id }
 						/>
 					</VStack>
@@ -128,37 +143,17 @@ function Component( props: PickerProps< any > ) {
 		<SingleOrigin { ...additionalProps } />
 	);
 
-	let metaProps:
-		| { asButtons: false; loop?: boolean; 'aria-label': string }
-		| { asButtons: false; loop?: boolean; 'aria-labelledby': string }
-		| { asButtons: true };
-
-	if ( asButtons ) {
-		metaProps = { asButtons: true };
-	} else {
-		const _metaProps: { asButtons: false; loop?: boolean } = {
-			asButtons: false,
-			loop,
-		};
-
-		if ( ariaLabel ) {
-			metaProps = { ..._metaProps, 'aria-label': ariaLabel };
-		} else if ( ariaLabelledby ) {
-			metaProps = {
-				..._metaProps,
-				'aria-labelledby': ariaLabelledby,
-			};
-		} else {
-			metaProps = {
-				..._metaProps,
-				'aria-label': __( 'Custom color picker.' ),
-			};
-		}
-	}
+	const { metaProps, labelProps } = getComputeCircularOptionPickerCommonProps(
+		asButtons,
+		loop,
+		ariaLabel,
+		ariaLabelledby
+	);
 
 	return (
 		<CircularOptionPicker
 			{ ...metaProps }
+			{ ...labelProps }
 			actions={ actions }
 			options={ options }
 		/>

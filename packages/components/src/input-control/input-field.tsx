@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { useDrag } from '@use-gesture/react';
 import type {
 	SyntheticEvent,
@@ -9,22 +6,14 @@ import type {
 	PointerEvent,
 	FocusEvent,
 	ForwardedRef,
-	MouseEvent,
 } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef, useRef } from '@wordpress/element';
-/**
- * Internal dependencies
- */
+import { withIgnoreIMEEvents } from '@wordpress/keycodes';
 import type { WordPressComponentProps } from '../context';
 import { useDragCursor } from './utils';
 import { Input } from './styles/input-control-styles';
 import { useInputControlStateReducer } from './reducer/reducer';
 import type { InputFieldProps } from './types';
-import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 
 const noop = () => {};
 
@@ -187,22 +176,6 @@ function InputField(
 	);
 
 	const dragProps = isDragEnabled ? dragGestureProps() : {};
-	/*
-	 * Works around the odd UA (e.g. Firefox) that does not focus inputs of
-	 * type=number when their spinner arrows are pressed.
-	 */
-	let handleOnMouseDown;
-	if ( type === 'number' ) {
-		handleOnMouseDown = ( event: MouseEvent< HTMLInputElement > ) => {
-			props.onMouseDown?.( event );
-			if (
-				event.currentTarget !==
-				event.currentTarget.ownerDocument.activeElement
-			) {
-				event.currentTarget.focus();
-			}
-		};
-	}
 
 	return (
 		<Input
@@ -216,7 +189,6 @@ function InputField(
 			onBlur={ handleOnBlur }
 			onChange={ handleOnChange }
 			onKeyDown={ withIgnoreIMEEvents( handleOnKeyDown ) }
-			onMouseDown={ handleOnMouseDown }
 			ref={ ref }
 			inputSize={ size }
 			// Fallback to `''` to avoid "uncontrolled to controlled" warning.

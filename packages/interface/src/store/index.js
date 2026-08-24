@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { createReduxStore, register } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import * as actions from './actions';
 import * as selectors from './selectors';
 import reducer from './reducer';
@@ -23,7 +16,4 @@ export const store = createReduxStore( STORE_NAME, {
 	actions,
 	selectors,
 } );
-
-// Once we build a more generic persistence plugin that works across types of stores
-// we'd be able to replace this with a register call.
 register( store );

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import figureContentReducer from '../figure-content-reducer';
 import { deepFilterHTML } from '../utils';
 

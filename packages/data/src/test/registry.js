@@ -1,8 +1,4 @@
 /* eslint jest/expect-expect: ["warn", { "assertFunctionNames": ["expect", "subscribeUntil"] }] */
-
-/**
- * Internal dependencies
- */
 import { createRegistry } from '../registry';
 import { createRegistrySelector } from '../factory';
 import createReduxStore from '../redux-store';

@@ -39,6 +39,7 @@ function buildSelector( sequential ) {
 		'iframe:not([tabindex^="-"])',
 		'object',
 		'embed',
+		'summary',
 		'area[href]',
 		'[contenteditable]:not([contenteditable=false])',
 	].join( ',' );
@@ -103,6 +104,11 @@ export function find( context, { sequential = false } = {} ) {
 
 	return Array.from( elements ).filter( ( element ) => {
 		if ( ! isVisible( element ) ) {
+			return false;
+		}
+
+		// Elements inside an inert subtree are not focusable.
+		if ( element.closest( '[inert]' ) ) {
 			return false;
 		}
 

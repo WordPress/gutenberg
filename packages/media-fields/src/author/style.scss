@@ -1,0 +1,58 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.media-author-field__avatar {
+	flex-shrink: 0;
+	overflow: hidden;
+	width: $grid-unit-30;
+	height: $grid-unit-30;
+	align-items: center;
+	justify-content: left;
+	display: flex;
+
+	img {
+		width: $grid-unit-20;
+		height: $grid-unit-20;
+		object-fit: cover;
+		opacity: 1;
+		border-radius: 100%;
+	}
+
+	&.is-loading,
+	&.is-loaded {
+		img {
+			@media not (prefers-reduced-motion) {
+				transition: opacity 0.1s linear;
+			}
+		}
+	}
+
+	&.is-loading {
+		img {
+			opacity: 0;
+		}
+	}
+
+	&.is-loaded {
+		img {
+			opacity: 1;
+		}
+	}
+}
+
+.media-author-field__icon {
+	display: flex;
+	flex-shrink: 0;
+	width: $grid-unit-30;
+	height: $grid-unit-30;
+
+	svg {
+		margin-left: -$grid-unit-05;
+		fill: currentColor;
+	}
+}
+
+.media-author-field__name {
+	text-overflow: ellipsis;
+	overflow: hidden;
+}

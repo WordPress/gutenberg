@@ -1,15 +1,9 @@
-/**
- * External dependencies
- */
 import deepFreeze from 'deep-freeze';
-
-/**
- * Internal dependencies
- */
 import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 	cloneBlock,
+	cloneSanitizedBlock,
 	__experimentalCloneSanitizedBlock,
 	getPossibleBlockTransformations,
 	switchToBlockType,
@@ -26,11 +20,13 @@ import {
 	unregisterBlockType,
 	setGroupingBlockName,
 } from '../registration';
+import { logged as warningLoggedSet } from '../../../../warning/src/utils';
 
 const noop = () => {};
 
 describe( 'block factory', () => {
 	const defaultBlockSettings = {
+		apiVersion: 3,
 		attributes: {
 			value: {
 				type: 'string',
@@ -46,6 +42,11 @@ describe( 'block factory', () => {
 		require( '../../store' );
 	} );
 
+	beforeEach( () => {
+		// Reset warning logging so deduped warnings fire within each test.
+		warningLoggedSet.clear();
+	} );
+
 	afterEach( () => {
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
@@ -55,6 +56,7 @@ describe( 'block factory', () => {
 	describe( 'createBlock()', () => {
 		it( 'should create a block given its blockType, attributes, inner blocks', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					align: {
 						type: 'string',
@@ -179,6 +181,28 @@ describe( 'block factory', () => {
 
 			expect( block.attributes ).toEqual( {} );
 		} );
+
+		it( 'should attach innerContent for the Custom HTML block', () => {
+			registerBlockType( 'core/html', defaultBlockSettings );
+
+			const block = createBlock( 'core/html', {}, [], [ '<div></div>' ] );
+
+			expect( block.innerContent ).toEqual( [ '<div></div>' ] );
+		} );
+
+		it( 'should ignore innerContent and warn for other blocks', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			const block = createBlock(
+				'core/test-block',
+				{},
+				[],
+				[ '<div></div>' ]
+			);
+
+			expect( block.innerContent ).toBeUndefined();
+			expect( console ).toHaveWarned();
+		} );
 	} );
 
 	describe( 'createBlocksFromInnerBlocksTemplate', () => {
@@ -206,6 +230,7 @@ describe( 'block factory', () => {
 					...defaultBlockSettings,
 				} );
 				registerBlockType( 'core/test-paragraph', {
+					apiVersion: 3,
 					...defaultBlockSettings,
 					attributes: {
 						content: {
@@ -286,6 +311,7 @@ describe( 'block factory', () => {
 	describe( 'cloneBlock()', () => {
 		it( 'should merge attributes into the existing block', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					align: {
 						type: 'string',
@@ -352,6 +378,7 @@ describe( 'block factory', () => {
 
 		it( 'should replace inner blocks of the existing block', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					align: {
 						type: 'string',
@@ -384,6 +411,7 @@ describe( 'block factory', () => {
 
 		it( 'should clone innerBlocks if innerBlocks are not passed', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					align: {
 						type: 'string',
@@ -428,8 +456,8 @@ describe( 'block factory', () => {
 		} );
 	} );
 
-	describe( '__experimentalCloneSanitizedBlock', () => {
-		it( 'should sanitize attributes not defined in the block type', () => {
+	describe( 'cloneSanitizedBlock', () => {
+		beforeEach( () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
 				attributes: {
@@ -438,7 +466,21 @@ describe( 'block factory', () => {
 					},
 				},
 			} );
+		} );
 
+		it( 'sanitizes attributes not defined in the block type', () => {
+			const block = createBlock( 'core/test-block', {
+				notDefined: 'not-defined',
+			} );
+
+			const clonedBlock = cloneSanitizedBlock( block, {
+				notDefined2: 'not-defined-2',
+			} );
+
+			expect( clonedBlock.attributes ).toEqual( {} );
+		} );
+
+		it( 'keeps the experimental function as a deprecated alias', () => {
 			const block = createBlock( 'core/test-block', {
 				notDefined: 'not-defined',
 			} );
@@ -448,12 +490,16 @@ describe( 'block factory', () => {
 			} );
 
 			expect( clonedBlock.attributes ).toEqual( {} );
+			expect( console ).toHaveWarnedWith(
+				'__experimentalCloneSanitizedBlock is deprecated since version 7.1. Please use cloneSanitizedBlock instead.'
+			);
 		} );
 	} );
 
 	describe( 'getPossibleBlockTransformations()', () => {
 		it( 'should show as available a simple "from" transformation"', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -490,6 +536,7 @@ describe( 'block factory', () => {
 
 		it( 'should show as available a simple "to" transformation"', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -522,8 +569,48 @@ describe( 'block factory', () => {
 			expect( availableBlocks[ 0 ].name ).toBe( 'core/text-block' );
 		} );
 
+		it( 'should preserve variation metadata for possible transformations', () => {
+			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/text-block' ],
+							variationName: 'grid',
+							transform: noop,
+						},
+					],
+				},
+				save: noop,
+				category: 'text',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const block = createBlock( 'core/updated-text-block', {
+				value: 'ribs',
+			} );
+
+			const availableBlocks = getPossibleBlockTransformations( [
+				block,
+			] );
+
+			expect( availableBlocks ).toHaveLength( 1 );
+			expect( availableBlocks[ 0 ] ).toMatchObject( {
+				name: 'core/text-block',
+				variationName: 'grid',
+			} );
+		} );
+
 		it( 'should not show a transformation if multiple blocks are passed and the transformation is not multi block (for a "from" transform)', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -562,6 +649,7 @@ describe( 'block factory', () => {
 
 		it( 'should not show a transformation if multiple blocks are passed and the transformation is not multi block (for a "to" transform)', () => {
 			registerBlockType( 'core/text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -603,6 +691,7 @@ describe( 'block factory', () => {
 
 		it( 'should show a transformation as available if multiple blocks are passed and the transformation accepts multiple blocks (for a "from" transform)', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -645,6 +734,7 @@ describe( 'block factory', () => {
 
 		it( 'should show a transformation as available if multiple blocks are passed and the transformation accepts multiple blocks (for a "to" transform)', () => {
 			registerBlockType( 'core/text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -690,6 +780,7 @@ describe( 'block factory', () => {
 
 		it( 'should show multiple possible transformations', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -738,6 +829,7 @@ describe( 'block factory', () => {
 
 		it( 'should show multiple possible transformations when multiple blocks have a matching `from` transform', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -758,6 +850,7 @@ describe( 'block factory', () => {
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/another-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -798,6 +891,7 @@ describe( 'block factory', () => {
 
 		it( 'should show multiple possible transformations for a single `to` transform object with multiple block names', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -842,6 +936,7 @@ describe( 'block factory', () => {
 
 		it( 'returns a single transformation for a "from" transform that has a `isMatch` function returning `true`', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -879,6 +974,7 @@ describe( 'block factory', () => {
 
 		it( 'returns no transformations for a "from" transform with a `isMatch` function returning `false`', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -913,6 +1009,7 @@ describe( 'block factory', () => {
 
 		it( 'returns a single transformation for a "to" transform that has a `isMatch` function returning `true`', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -948,6 +1045,7 @@ describe( 'block factory', () => {
 
 		it( 'returns no transformations for a "to" transform with a `isMatch` function returning `false`', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -984,6 +1082,7 @@ describe( 'block factory', () => {
 			const isMatch = jest.fn();
 
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1018,6 +1117,7 @@ describe( 'block factory', () => {
 			const isMatch = jest.fn();
 
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1059,6 +1159,7 @@ describe( 'block factory', () => {
 		describe( 'wildcard block transforms', () => {
 			beforeEach( () => {
 				registerBlockType( 'core/group', {
+					apiVersion: 3,
 					attributes: {
 						value: {
 							type: 'string',
@@ -1142,6 +1243,7 @@ describe( 'block factory', () => {
 	describe( 'switchToBlockType()', () => {
 		it( 'should switch the blockType of a block using the "transform form"', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1192,6 +1294,7 @@ describe( 'block factory', () => {
 				defaultBlockSettings
 			);
 			registerBlockType( 'core/text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1235,6 +1338,70 @@ describe( 'block factory', () => {
 			} );
 		} );
 
+		it( 'should switch the blockType of a block using a variation transform', () => {
+			registerBlockType( 'core/group-block', {
+				...defaultBlockSettings,
+				attributes: {
+					layout: {
+						type: 'object',
+					},
+				},
+			} );
+			registerBlockType( 'core/text-block', {
+				apiVersion: 3,
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/group-block' ],
+							transform: () =>
+								createBlock( 'core/group-block', {
+									layout: { type: 'constrained' },
+								} ),
+						},
+						{
+							type: 'block',
+							blocks: [ 'core/group-block' ],
+							variationName: 'grid',
+							transform: () =>
+								createBlock( 'core/group-block', {
+									layout: { type: 'grid' },
+								} ),
+						},
+					],
+				},
+				save: noop,
+				category: 'text',
+				title: 'text-block',
+			} );
+
+			const block = createBlock( 'core/text-block', {
+				value: 'ribs',
+			} );
+
+			const transformedBlocks = switchToBlockType(
+				block,
+				'core/group-block',
+				'grid'
+			);
+			const defaultTransformedBlocks = switchToBlockType(
+				block,
+				'core/group-block'
+			);
+
+			expect( transformedBlocks[ 0 ].attributes ).toEqual( {
+				layout: { type: 'grid' },
+			} );
+			expect( defaultTransformedBlocks[ 0 ].attributes ).toEqual( {
+				layout: { type: 'constrained' },
+			} );
+		} );
+
 		it( 'should return null if no transformation is found', () => {
 			registerBlockType(
 				'core/updated-text-block',
@@ -1256,6 +1423,7 @@ describe( 'block factory', () => {
 
 		it( 'should reject transformations that return null', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1293,6 +1461,7 @@ describe( 'block factory', () => {
 				defaultBlockSettings
 			);
 			registerBlockType( 'core/text-block', {
+				apiVersion: 3,
 				attributes: {
 					matches: {
 						type: 'boolean',
@@ -1339,6 +1508,7 @@ describe( 'block factory', () => {
 				defaultBlockSettings
 			);
 			registerBlockType( 'core/text-block', {
+				apiVersion: 3,
 				attributes: {
 					matches: {
 						type: 'boolean',
@@ -1381,6 +1551,7 @@ describe( 'block factory', () => {
 
 		it( 'should reject transformations that return an empty array', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1414,6 +1585,7 @@ describe( 'block factory', () => {
 
 		it( 'should reject single transformations that do not include block types', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1453,6 +1625,7 @@ describe( 'block factory', () => {
 
 		it( 'should reject array transformations that do not include block types', () => {
 			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1501,6 +1674,7 @@ describe( 'block factory', () => {
 				defaultBlockSettings
 			);
 			registerBlockType( 'core/text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1541,6 +1715,7 @@ describe( 'block factory', () => {
 				defaultBlockSettings
 			);
 			registerBlockType( 'core/text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1586,6 +1761,7 @@ describe( 'block factory', () => {
 				defaultBlockSettings
 			);
 			registerBlockType( 'core/text-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1645,6 +1821,7 @@ describe( 'block factory', () => {
 
 		it( 'should pass through inner blocks to transform', () => {
 			registerBlockType( 'core/updated-columns-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1694,6 +1871,7 @@ describe( 'block factory', () => {
 
 		it( 'should pass through inner blocks to transform (multi)', () => {
 			registerBlockType( 'core/updated-columns-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1762,6 +1940,7 @@ describe( 'block factory', () => {
 
 		it( 'should pass entire block object(s) to the "__experimentalConvert" method if defined', () => {
 			registerBlockType( 'core/test-group-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1840,6 +2019,7 @@ describe( 'block factory', () => {
 			const transformSpy = jest.fn();
 
 			registerBlockType( 'core/test-group-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1903,6 +2083,7 @@ describe( 'block factory', () => {
 			const transformSpy = jest.fn();
 
 			registerBlockType( 'core/test-group-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -1963,6 +2144,7 @@ describe( 'block factory', () => {
 			const transformSpy = jest.fn();
 
 			registerBlockType( 'core/test-group-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -2023,6 +2205,7 @@ describe( 'block factory', () => {
 			const transformSpy = jest.fn();
 
 			registerBlockType( 'core/test-group-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -2070,6 +2253,7 @@ describe( 'block factory', () => {
 		beforeEach( () => {
 			registerBlockType( 'core/text-block', defaultBlockSettings );
 			registerBlockType( 'core/transform-from-text-block-1', {
+				apiVersion: 3,
 				transforms: {
 					from: [
 						{
@@ -2082,6 +2266,7 @@ describe( 'block factory', () => {
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/transform-from-text-block-2', {
+				apiVersion: 3,
 				transforms: {
 					from: [
 						{
@@ -2245,6 +2430,7 @@ describe( 'block factory', () => {
 	describe( 'isContainerGroupBlock', () => {
 		beforeEach( () => {
 			registerBlockType( 'core/registered-grouping-block', {
+				apiVersion: 3,
 				attributes: {
 					value: {
 						type: 'string',
@@ -2281,12 +2467,15 @@ describe( 'block factory', () => {
 	describe( 'getBlockFromExample', () => {
 		it( 'should replace unregistered block with core/missing block', () => {
 			registerBlockType( 'core/missing', {
+				apiVersion: 3,
 				title: 'Unsupported',
 			} );
 			registerBlockType( 'core/paragraph', {
+				apiVersion: 3,
 				title: 'Paragraph',
 			} );
 			registerBlockType( 'core/group', {
+				apiVersion: 3,
 				title: 'A block that groups other blocks.',
 			} );
 			const example = {

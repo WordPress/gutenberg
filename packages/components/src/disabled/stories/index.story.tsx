@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Disabled from '../';
 import SelectControl from '../../select-control/';
 import TextControl from '../../text-control/';
@@ -18,6 +7,7 @@ import TextareaControl from '../../textarea-control/';
 import { VStack } from '../../v-stack/';
 
 const meta: Meta< typeof Disabled > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Utilities/Disabled',
 	id: 'components-disabled',
 	component: Disabled,
@@ -30,6 +20,10 @@ const meta: Meta< typeof Disabled > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 
@@ -41,21 +35,16 @@ const Form = () => {
 	return (
 		<VStack>
 			<TextControl
-				__nextHasNoMarginBottom
-				__next40pxDefaultSize
 				label="Text Control"
 				value={ textControlValue }
 				onChange={ setTextControlValue }
 			/>
 			<TextareaControl
-				__nextHasNoMarginBottom
 				label="TextArea Control"
 				value={ textAreaValue }
 				onChange={ setTextAreaValue }
 			/>
 			<SelectControl
-				__nextHasNoMarginBottom
-				__next40pxDefaultSize
 				label="Select Control"
 				onChange={ () => {} }
 				options={ [

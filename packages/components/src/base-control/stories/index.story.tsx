@@ -1,20 +1,13 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import BaseControl, { useBaseControlProps } from '..';
 import Button from '../../button';
 
 const meta: Meta< typeof BaseControl > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Selection & Input/Common/BaseControl',
 	id: 'components-basecontrol',
 	component: BaseControl,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'BaseControl.VisualLabel': BaseControl.VisualLabel,
 	},
 	argTypes: {
@@ -25,6 +18,11 @@ const meta: Meta< typeof BaseControl > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: '`BaseControl.VisualLabel` can continue to be used for now. To add labels and descriptions semantically, use [`Field`](?path=/docs/design-system-components-form-primitives-field--docs) in `@wordpress/ui`.',
+		},
 	},
 };
 export default meta;
@@ -42,7 +40,6 @@ const BaseControlWithTextarea: StoryFn< typeof BaseControl > = ( props ) => {
 export const Default: StoryFn< typeof BaseControl > =
 	BaseControlWithTextarea.bind( {} );
 Default.args = {
-	__nextHasNoMarginBottom: true,
 	label: 'Label text',
 };
 
@@ -66,7 +63,9 @@ export const WithVisualLabel: StoryFn< typeof BaseControl > = ( props ) => {
 		<BaseControl { ...props }>
 			<BaseControl.VisualLabel>Visual label</BaseControl.VisualLabel>
 			<div>
-				<Button variant="secondary">Select an author</Button>
+				<Button __next40pxDefaultSize variant="secondary">
+					Select an author
+				</Button>
 			</div>
 		</BaseControl>
 	);

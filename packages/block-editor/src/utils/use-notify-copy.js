@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useCallback } from '@wordpress/element';
 import { store as blocksStore } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../store';
 
 export function useNotifyCopy() {
@@ -29,13 +22,13 @@ export function useNotifyCopy() {
 
 				if ( eventType === 'copy' ) {
 					notice = sprintf(
-						// Translators: Name of the block being copied, e.g. "Paragraph".
+						// Translators: %s: Name of the block being copied, e.g. "Paragraph".
 						__( 'Copied "%s" to clipboard.' ),
 						title
 					);
 				} else {
 					notice = sprintf(
-						// Translators: Name of the block being cut, e.g. "Paragraph".
+						// Translators: %s: Name of the block being cut, e.g. "Paragraph".
 						__( 'Moved "%s" to clipboard.' ),
 						title
 					);

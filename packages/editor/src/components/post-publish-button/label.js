@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 
 /**
@@ -27,6 +20,7 @@ export default function PublishButtonLabel() {
 		hasNonPostEntityChanges,
 		postStatusHasChanged,
 		postStatus,
+		isPostSavingLocked,
 	} = useSelect( ( select ) => {
 		const {
 			isCurrentPostPublished,
@@ -34,7 +28,6 @@ export default function PublishButtonLabel() {
 			isSavingPost,
 			isPublishingPost,
 			getCurrentPost,
-			getCurrentPostType,
 			isAutosavingPost,
 			getPostEdits,
 			getEditedPostAttribute,
@@ -46,10 +39,10 @@ export default function PublishButtonLabel() {
 			isPublishing: isPublishingPost(),
 			hasPublishAction:
 				getCurrentPost()._links?.[ 'wp:action-publish' ] ?? false,
-			postType: getCurrentPostType(),
 			isAutosaving: isAutosavingPost(),
 			hasNonPostEntityChanges:
 				select( editorStore ).hasNonPostEntityChanges(),
+			isPostSavingLocked: select( editorStore ).isPostSavingLocked(),
 			postStatusHasChanged: !! getPostEdits()?.status,
 			postStatus: getEditedPostAttribute( 'status' ),
 		};
@@ -73,7 +66,7 @@ export default function PublishButtonLabel() {
 			: __( 'Submit for Review' );
 	}
 	if (
-		hasNonPostEntityChanges ||
+		( hasNonPostEntityChanges && ! isPostSavingLocked ) ||
 		isPublished ||
 		( postStatusHasChanged &&
 			! [ 'future', 'publish' ].includes( postStatus ) ) ||

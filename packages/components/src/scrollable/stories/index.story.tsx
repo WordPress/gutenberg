@@ -1,22 +1,11 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { View } from '../../view';
 import { Scrollable } from '..';
 
 const meta: Meta< typeof Scrollable > = {
 	component: Scrollable,
-	title: 'Components (Experimental)/Scrollable',
+	title: 'Components/Scrollable',
 	argTypes: {
 		as: {
 			control: { type: 'text' },
@@ -25,11 +14,17 @@ const meta: Meta< typeof Scrollable > = {
 			control: false,
 		},
 	},
+	tags: [ 'status-experimental' ],
 	parameters: {
 		controls: {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Planned for deprecation.',
+		},
 	},
 };
 export default meta;
@@ -69,6 +64,7 @@ const Template: StoryFn< typeof Scrollable > = ( { ...args } ) => {
 						right: 0,
 					} }
 					type="text"
+					aria-label="Element out of view"
 					value="Focus me"
 					readOnly
 				/>

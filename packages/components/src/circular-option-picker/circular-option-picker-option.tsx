@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { forwardRef, useContext, useEffect } from '@wordpress/element';
 import { Icon, check } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { CircularOptionPickerContext } from './circular-option-picker-context';
 import Button from '../button';
 import { Composite } from '../composite';
@@ -31,6 +20,7 @@ function UnforwardedOptionAsButton(
 	const { isPressed, label, ...additionalProps } = props;
 	return (
 		<Button
+			__next40pxDefaultSize
 			{ ...additionalProps }
 			aria-pressed={ isPressed }
 			ref={ forwardedRef }
@@ -67,6 +57,7 @@ function UnforwardedOptionAsOption(
 		<Composite.Item
 			render={
 				<Button
+					__next40pxDefaultSize
 					{ ...additionalProps }
 					role="option"
 					aria-selected={ !! isSelected }
@@ -97,7 +88,6 @@ export function Option( {
 	const commonProps = {
 		id,
 		className: 'components-circular-option-picker__option',
-		__next40pxDefaultSize: true,
 		...additionalProps,
 	};
 

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	AlignmentControl,
@@ -15,20 +8,12 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { BlockQuotation } from '@wordpress/components';
-import { useDispatch, useRegistry } from '@wordpress/data';
-import { Platform, useEffect } from '@wordpress/element';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 import { verse } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { migrateToQuoteV2 } from './deprecated';
 import { Caption } from '../utils/caption';
-
-const isWebPlatform = Platform.OS === 'web';
-
-const TEMPLATE = [ [ 'core/paragraph', {} ] ];
 
 /**
  * At the moment, deprecations don't handle create blocks from attributes
@@ -40,7 +25,7 @@ const TEMPLATE = [ [ 'core/paragraph', {} ] ];
  */
 const useMigrateOnLoad = ( attributes, clientId ) => {
 	const registry = useRegistry();
-	const { updateBlockAttributes, replaceInnerBlocks } =
+	const { updateBlockAttributes, replaceInnerBlocks, selectBlock } =
 		useDispatch( blockEditorStore );
 	useEffect( () => {
 		// As soon as the block is loaded, migrate it to the new version.
@@ -59,9 +44,19 @@ const useMigrateOnLoad = ( attributes, clientId ) => {
 			alternative: 'inner blocks',
 		} );
 
+		// The selection can be inside an inner block created from the block
+		// type template at insertion, which the migration replaces; restore
+		// the selection to the migrated block in that case.
+		const shouldReselectBlock = registry
+			.select( blockEditorStore )
+			.hasSelectedInnerBlock( clientId, true );
+
 		registry.batch( () => {
 			updateBlockAttributes( clientId, newAttributes );
 			replaceInnerBlocks( clientId, newInnerBlocks );
+			if ( shouldReselectBlock ) {
+				selectBlock( clientId );
+			}
 		} );
 	}, [ attributes.value ] );
 };
@@ -72,10 +67,19 @@ export default function QuoteEdit( {
 	insertBlocksAfter,
 	clientId,
 	className,
-	style,
 	isSelected,
 } ) {
-	const { textAlign } = attributes;
+	const { textAlign, allowedBlocks } = attributes;
+
+	const { hasInnerBlocks } = useSelect(
+		( select ) => {
+			const { getBlockCount } = select( blockEditorStore );
+			return {
+				hasInnerBlocks: getBlockCount( clientId ) > 0,
+			};
+		},
+		[ clientId ]
+	);
 
 	useMigrateOnLoad( attributes, clientId );
 
@@ -83,13 +87,11 @@ export default function QuoteEdit( {
 		className: clsx( className, {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
-		...( ! isWebPlatform && { style } ),
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: TEMPLATE,
-		templateInsertUpdatesSelection: true,
 		__experimentalCaptureToolbars: true,
-		renderAppender: false,
+		renderAppender: hasInnerBlocks ? false : undefined,
+		allowedBlocks,
 	} );
 
 	return (
@@ -106,12 +108,11 @@ export default function QuoteEdit( {
 				{ innerBlocksProps.children }
 				<Caption
 					attributeKey="citation"
-					tagName={ isWebPlatform ? 'cite' : 'p' }
-					style={ isWebPlatform && { display: 'block' } }
+					tagName="cite"
+					style={ { display: 'block' } }
 					isSelected={ isSelected }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
-					__unstableMobileNoFocusOnMount
 					icon={ verse }
 					label={ __( 'Quote citation' ) }
 					placeholder={
@@ -124,7 +125,6 @@ export default function QuoteEdit( {
 					excludeElementClassName
 					className="wp-block-quote__citation"
 					insertBlocksAfter={ insertBlocksAfter }
-					{ ...( ! isWebPlatform ? { textAlign } : {} ) }
 				/>
 			</BlockQuotation>
 		</>

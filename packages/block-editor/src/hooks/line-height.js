@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { hasBlockSupport } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import LineHeightControl from '../components/line-height-control';
 import { cleanEmptyObject } from './utils';
 import { useSettings } from '../components/use-settings';
@@ -41,7 +34,6 @@ export function LineHeightEdit( props ) {
 			__unstableInputWidth="100%"
 			value={ style?.typography?.lineHeight }
 			onChange={ onChange }
-			size="__unstable-large"
 		/>
 	);
 }

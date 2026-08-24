@@ -180,6 +180,10 @@ _Returns_
 
 -   `RichTextValue`: A rich text value.
 
+### EventListenersProps
+
+The callback-Set refs the private event-listener helpers dispatch from.
+
 ### getActiveFormat
 
 Gets the format object by type at the start of the selection. This can be used to get e.g. the URL of a link format at the current selection, but also to check if a format is active at the selection. Returns undefined if there is no format at the selection.
@@ -298,6 +302,10 @@ _Parameters_
 _Returns_
 
 -   `RichTextValue`: A new combined value.
+
+### privateApis
+
+Private @wordpress/rich-text APIs.
 
 ### registerFormatType
 
@@ -456,13 +464,13 @@ This hook, to be used in a format type's Edit component, returns the active elem
 
 _Parameters_
 
--   _$1_ `Object`: Named parameters.
--   _$1.editableContentElement_ `HTMLElement|null`: The element containing the editable content.
--   _$1.settings_ `WPFormat=`: The format type's settings.
+-   _obj_ `{ editableContentElement: HTMLElement | null; settings?: WPFormat; }`: Named parameters.
+-   _obj.editableContentElement_ `HTMLElement | null`: The element containing the editable content.
+-   _obj.settings_ `WPFormat`: The format type's settings.
 
 _Returns_
 
--   `Element|VirtualAnchorElement|undefined|null`: The active element or selection range.
+-   `Element | VirtualAnchorElement | undefined | null`: The active element or selection range.
 
 ### useAnchorRef
 

@@ -4,7 +4,7 @@ The WordPress block editor is a powerful tool that allows you to create and form
 
 This package can also be used to create custom block editors for virtually any other web application. This means that you can use the same blocks and block editing experience outside of WordPress.
 
-![alt text](https://developer.wordpress.org/files/2023/07/custom-block-editor.png 'The Standalone Editor instance populated with example Blocks within a custom WordPress admin page.')
+![WordPress block editor showing content blocks and editing options](https://developer.wordpress.org/files/2023/07/custom-block-editor.png 'The Standalone Editor instance populated with example Blocks within a custom WordPress admin page.')
 
 This flexibility and interoperability makes blocks a powerful tool for building and managing content across multiple applications. It also makes it simpler for developers to create content editors that work best for their users.
 
@@ -46,7 +46,7 @@ The custom editor is going to be built as a WordPress plugin. To keep things sim
 
 The plugin file structure will look like this:
 
-![alt text](https://wordpress.org/gutenberg/files/2020/03/repo-files.png 'Screenshot showing file structure of the Plugin at https://github.com/getdave/standalone-block-editor.')
+![Project directory listing with configuration and source files](https://wordpress.org/gutenberg/files/2020/03/repo-files.png 'Screenshot showing file structure of the Plugin at https://github.com/getdave/standalone-block-editor.')
 
 Here is a brief summary of what's going on:
 
@@ -76,7 +76,7 @@ Perfect, this is the main package you will use to create the custom block editor
 Let's begin by creating a custom page within WordPress admin that will house the custom block editor instance.
 
 <div class="callout callout-info">
-	If you're already comfortable with the process of creating custom admin pages in WordPress, you might want to <a href="#registering-and-rendering-our-custom-block-editor">skip ahead</a>.
+	If you're already comfortable with the process of creating custom admin pages in WordPress, you might want to <a href="#registering-and-rendering-the-custom-block-editor">skip ahead</a>.
 </div>
 
 ### Registering the page
@@ -199,15 +199,9 @@ Begin by opening the main `src/index.js` file. Then pull in the required JavaScr
 
 ```js
 // File: src/index.js
-
-// External dependencies.
 import { createRoot } from 'react-dom';
-
-// WordPress dependencies.
 import domReady from '@wordpress/dom-ready';
 import { registerCoreBlocks } from '@wordpress/block-library';
-
-// Internal dependencies.
 import Editor from './editor';
 import './styles.scss';
 ```
@@ -461,7 +455,7 @@ it display within the editor's sidebar. Exploring this component in more detail 
 You have come a long way on your journey to create a custom block editor. But there is one major area left to touch upon - block persistence. In other words, having your
 blocks saved and available _between_ page refreshes.
 
-![alt text](https://developer.wordpress.org/files/2023/07/custom-block-editor-persistance.gif 'Screencapture showing blocks being restored between page refreshes.')
+![WordPress custom block editor interface with various content blocks and editing options](https://developer.wordpress.org/files/2023/07/custom-block-editor-persistance.gif 'Screencapture showing blocks being restored between page refreshes.')
 
 As this is only an _experiment_, this guide has opted to utilize the browser's `localStorage` API to handle saving block data. In a real-world scenario, you would likely choose a more reliable and robust system (e.g. a database).
 

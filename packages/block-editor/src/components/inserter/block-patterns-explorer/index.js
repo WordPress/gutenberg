@@ -1,40 +1,48 @@
-/**
- * WordPress dependencies
- */
 import { Modal } from '@wordpress/components';
+import { Tabs } from '@wordpress/ui';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import PatternExplorerSidebar from './pattern-explorer-sidebar';
 import PatternList from './pattern-list';
 import { usePatternCategories } from '../block-patterns-tab/use-pattern-categories';
 
-function PatternsExplorer( { initialCategory, rootClientId } ) {
+function PatternsExplorer( { initialCategory, rootClientId, onModalClose } ) {
 	const [ searchValue, setSearchValue ] = useState( '' );
-	const [ selectedCategory, setSelectedCategory ] =
-		useState( initialCategory );
+	const [ selectedCategory, setSelectedCategory ] = useState(
+		initialCategory?.name
+	);
 
 	const patternCategories = usePatternCategories( rootClientId );
 
 	return (
-		<div className="block-editor-block-patterns-explorer">
+		<Tabs.Root
+			className="block-editor-block-patterns-explorer"
+			orientation="vertical"
+			value={ selectedCategory }
+			onValueChange={ setSelectedCategory }
+		>
 			<PatternExplorerSidebar
-				selectedCategory={ selectedCategory }
 				patternCategories={ patternCategories }
-				onClickCategory={ setSelectedCategory }
 				searchValue={ searchValue }
 				setSearchValue={ setSearchValue }
 			/>
-			<PatternList
-				searchValue={ searchValue }
-				selectedCategory={ selectedCategory }
-				patternCategories={ patternCategories }
-				rootClientId={ rootClientId }
-			/>
-		</div>
+			{ patternCategories.map( ( { name } ) => (
+				<Tabs.Panel
+					key={ name }
+					value={ name }
+					tabIndex={ -1 }
+					className="block-editor-block-patterns-explorer__panel"
+				>
+					<PatternList
+						searchValue={ searchValue }
+						selectedCategory={ name }
+						patternCategories={ patternCategories }
+						rootClientId={ rootClientId }
+						onModalClose={ onModalClose }
+					/>
+				</Tabs.Panel>
+			) ) }
+		</Tabs.Root>
 	);
 }
 
@@ -45,7 +53,7 @@ function PatternsExplorerModal( { onModalClose, ...restProps } ) {
 			onRequestClose={ onModalClose }
 			isFullScreen
 		>
-			<PatternsExplorer { ...restProps } />
+			<PatternsExplorer onModalClose={ onModalClose } { ...restProps } />
 		</Modal>
 	);
 }

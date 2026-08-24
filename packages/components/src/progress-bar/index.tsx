@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import * as ProgressBarStyled from './styles';
 import type { ProgressBarProps } from './types';
 import type { WordPressComponentProps } from '../context';
@@ -60,5 +49,6 @@ function UnforwardedProgressBar(
  * ```
  */
 export const ProgressBar = forwardRef( UnforwardedProgressBar );
+ProgressBar.displayName = 'ProgressBar';
 
 export default ProgressBar;

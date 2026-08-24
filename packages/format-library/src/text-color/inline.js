@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
@@ -16,19 +13,10 @@ import {
 	getColorObjectByAttributeValues,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	Popover,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { Popover } from '@wordpress/components';
+import { Tabs } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { textColor as settings, transparentValue } from './index';
-import { unlock } from '../lock-unlock';
-
-const { Tabs } = unlock( componentsPrivateApis );
 
 const TABS = [
 	{ name: 'color', title: __( 'Text' ) },
@@ -142,6 +130,9 @@ function ColorPicker( { name, property, value, onChange } ) {
 					setColors( value, name, colors, { [ property ]: color } )
 				);
 			} }
+			enableAlpha
+			// Prevent the text and color picker from overlapping.
+			__experimentalIsRenderedInSidebar
 		/>
 	);
 }
@@ -165,18 +156,18 @@ export default function InlineColorUI( {
 			className="format-library__inline-color-popover"
 			anchor={ popoverAnchor }
 		>
-			<Tabs>
-				<Tabs.TabList>
+			<Tabs.Root defaultValue={ TABS[ 0 ].name }>
+				<Tabs.List>
 					{ TABS.map( ( tab ) => (
-						<Tabs.Tab tabId={ tab.name } key={ tab.name }>
+						<Tabs.Tab value={ tab.name } key={ tab.name }>
 							{ tab.title }
 						</Tabs.Tab>
 					) ) }
-				</Tabs.TabList>
+				</Tabs.List>
 				{ TABS.map( ( tab ) => (
-					<Tabs.TabPanel
-						tabId={ tab.name }
-						focusable={ false }
+					<Tabs.Panel
+						value={ tab.name }
+						tabIndex={ -1 }
 						key={ tab.name }
 					>
 						<ColorPicker
@@ -185,9 +176,9 @@ export default function InlineColorUI( {
 							value={ value }
 							onChange={ onChange }
 						/>
-					</Tabs.TabPanel>
+					</Tabs.Panel>
 				) ) }
-			</Tabs>
+			</Tabs.Root>
 		</Popover>
 	);
 }

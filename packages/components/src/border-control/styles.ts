@@ -1,19 +1,10 @@
-/**
- * External dependencies
- */
 import { css } from '@emotion/react';
-
-/**
- * Internal dependencies
- */
 import { COLORS, CONFIG, boxSizingReset, rtl } from '../utils';
 import { space } from '../utils/space';
-import { StyledLabel } from '../base-control/styles/base-control-styles';
 import {
 	ValueInput as UnitControlWrapper,
 	UnitSelect,
 } from '../unit-control/styles/unit-control-styles';
-
 import type { Border } from './types';
 
 const focusBoxShadow = css`
@@ -49,11 +40,13 @@ export const wrapperWidth = css`
 	}
 `;
 
-export const wrapperHeight = ( size?: 'default' | '__unstable-large' ) => {
-	return css`
-		height: ${ size === '__unstable-large' ? '40px' : '30px' };
-	`;
-};
+export const wrapperHeight = css`
+	height: 40px;
+`;
+
+export function getInnerWrapperStyles( { hasWidth }: { hasWidth: boolean } ) {
+	return css( innerWrapper(), hasWidth && wrapperWidth, wrapperHeight );
+}
 
 export const borderControlDropdown = css`
 	background: #fff;
@@ -84,6 +77,7 @@ export const colorIndicatorBorder = ( border?: Border ) => {
 	const { color, style } = border || {};
 
 	const fallbackColor =
+		// TODO: should use the `stroke-interactive-neutral` WPDS token when refactored to SCSS modules
 		!! style && style !== 'none' ? COLORS.gray[ 300 ] : undefined;
 
 	return css`
@@ -92,19 +86,16 @@ export const colorIndicatorBorder = ( border?: Border ) => {
 	`;
 };
 
-export const colorIndicatorWrapper = (
-	border?: Border,
-	size?: 'default' | '__unstable-large'
-) => {
+export const colorIndicatorWrapper = ( border?: Border ) => {
 	const { style } = border || {};
 
 	return css`
 		border-radius: ${ CONFIG.radiusFull };
 		border: 2px solid transparent;
 		${ style ? colorIndicatorBorder( border ) : undefined }
-		width: ${ size === '__unstable-large' ? '24px' : '22px' };
-		height: ${ size === '__unstable-large' ? '24px' : '22px' };
-		padding: ${ size === '__unstable-large' ? '2px' : '1px' };
+		width: 24px;
+		height: 24px;
+		padding: 2px;
 
 		/*
 		 * ColorIndicator
@@ -133,30 +124,15 @@ const swatchGap = 12;
 
 export const borderControlPopoverControls = css`
 	width: ${ swatchSize * 6 + swatchGap * 5 }px;
-
-	> div:first-of-type > ${ StyledLabel } {
-		margin-bottom: 0;
-	}
-
-	&& ${ StyledLabel } + button:not( .has-text ) {
-		min-width: 24px;
-		padding: 0;
-	}
 `;
 
 export const borderControlPopoverContent = css``;
 export const borderColorIndicator = css``;
 
-export const resetButton = css`
-	justify-content: center;
-	width: 100%;
-
-	/* Override button component styling */
-	&& {
-		border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 400 ] };
-		border-top-left-radius: 0;
-		border-top-right-radius: 0;
-	}
+export const resetButtonWrapper = css`
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 12px;
 `;
 
 export const borderSlider = () => css`

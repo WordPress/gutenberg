@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import BlockModeToggle from '../block-mode-toggle';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
@@ -20,7 +9,7 @@ function setupUseSelectMock( mode, blockType, codeEditingEnabled = true ) {
 		return {
 			mode,
 			blockType,
-			isCodeEditingEnabled: codeEditingEnabled,
+			enabled: codeEditingEnabled,
 		};
 	} );
 }

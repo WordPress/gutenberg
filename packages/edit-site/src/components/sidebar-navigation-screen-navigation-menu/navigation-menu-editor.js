@@ -1,14 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { BlockEditorProvider } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
+import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import NavigationMenuContent from '../sidebar-navigation-screen-navigation-menus/navigation-menu-content';
@@ -24,6 +18,14 @@ export default function NavigationMenuEditor( { navigationMenuId } ) {
 		};
 	}, [] );
 
+	const settings = useMemo( () => {
+		return {
+			...storedSettings,
+			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
+				fetchLinkSuggestions( search, searchOptions, storedSettings ),
+		};
+	}, [ storedSettings ] );
+
 	const blocks = useMemo( () => {
 		if ( ! navigationMenuId ) {
 			return [];
@@ -38,7 +40,7 @@ export default function NavigationMenuEditor( { navigationMenuId } ) {
 
 	return (
 		<BlockEditorProvider
-			settings={ storedSettings }
+			settings={ settings }
 			value={ blocks }
 			onChange={ noop }
 			onInput={ noop }

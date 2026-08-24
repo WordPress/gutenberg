@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { createRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import useNavigationMenu from '../use-navigation-menu';
 
 const BASE_ENTITY = {
@@ -70,8 +63,14 @@ function resolveRecords( registry, menus ) {
 function resolveReadPermission( registry, allowed ) {
 	const dispatch = registry.dispatch( coreStore );
 	dispatch.receiveUserPermission( 'read/postType/wp_navigation', allowed );
-	dispatch.startResolution( 'canUser', [ 'read', BASE_ENTITY ] );
-	dispatch.finishResolution( 'canUser', [ 'read', BASE_ENTITY ] );
+	dispatch.startResolution( 'canUser', [
+		'read',
+		{ kind: 'postType', name: 'wp_navigation' },
+	] );
+	dispatch.finishResolution( 'canUser', [
+		'read',
+		{ kind: 'postType', name: 'wp_navigation' },
+	] );
 }
 
 function resolveReadRecordPermission( registry, ref, allowed ) {

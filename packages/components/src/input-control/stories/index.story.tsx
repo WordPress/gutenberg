@@ -1,25 +1,16 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 import { closeSmall, Icon, link, seen, unseen } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
-/**
- * Internal dependencies
- */
 import InputControl from '..';
 import { InputControlPrefixWrapper } from '../input-prefix-wrapper';
 import { InputControlSuffixWrapper } from '../input-suffix-wrapper';
 import Button from '../../button';
 
 const meta: Meta< typeof InputControl > = {
-	title: 'Components (Experimental)/Selection & Input/InputControl',
-	id: 'components-experimental-inputcontrol',
+	title: 'Components/Selection & Input/Common/InputControl',
+	id: 'components-inputcontrol',
 	component: InputControl,
-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { InputControlPrefixWrapper, InputControlSuffixWrapper },
 	argTypes: {
 		__unstableInputWidth: { control: { type: 'text' } },
@@ -30,10 +21,20 @@ const meta: Meta< typeof InputControl > = {
 		type: { control: { type: 'text' } },
 		value: { control: { disable: true } },
 	},
+	tags: [ 'status-experimental' ],
+	args: {
+		onChange: fn(),
+		onValidate: fn(),
+		onKeyDown: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Use [`InputControl`](?path=/docs/design-system-components-form-inputcontrol--docs) from `@wordpress/ui` instead. See the [migration guide](?path=/docs/components-inputcontrol--migration-guide).',
+		},
 	},
 };
 export default meta;
@@ -46,7 +47,6 @@ export const Default = Template.bind( {} );
 Default.args = {
 	label: 'Value',
 	placeholder: 'Placeholder',
-	__next40pxDefaultSize: true,
 };
 
 export const WithHelpText = Template.bind( {} );

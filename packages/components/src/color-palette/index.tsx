@@ -1,29 +1,21 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useMemo, useState, forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Dropdown from '../dropdown';
 import { ColorPicker } from '../color-picker';
-import CircularOptionPicker from '../circular-option-picker';
+import CircularOptionPicker, {
+	getComputeCircularOptionPickerCommonProps,
+} from '../circular-option-picker';
 import { VStack } from '../v-stack';
 import { Truncate } from '../truncate';
-import { ColorHeading } from './styles';
+import { Heading } from '../heading';
 import DropdownContentWrapper from '../dropdown/dropdown-content-wrapper';
+import styles from './style.module.scss';
 import type {
 	ColorObject,
 	ColorPaletteProps,
@@ -48,16 +40,25 @@ function SinglePalette( {
 	colors,
 	onChange,
 	value,
+	selectedSlug,
 	...additionalProps
 }: SinglePaletteProps ) {
 	const colorOptions = useMemo( () => {
-		return colors.map( ( { color, name }, index ) => {
+		return colors.map( ( { color, name, slug }, index ) => {
 			const colordColor = colord( color );
-			const isSelected = value === color;
+			// When a non-empty selectedSlug is provided, selection is decided
+			// strictly by slug — entries without a slug or with a different slug
+			// are not selected, even when their color value matches `value`.
+			// This correctly handles mixed palettes where some entries have slugs
+			// and others don't. Fall back to color value matching otherwise
+			// (including when selectedSlug is an empty string).
+			const isSelected = selectedSlug
+				? slug === selectedSlug
+				: value === color;
 
 			return (
 				<CircularOptionPicker.Option
-					key={ `${ color }-${ index }` }
+					key={ slug ?? `${ color }-${ index }` }
 					isSelected={ isSelected }
 					selectedIconProps={
 						isSelected
@@ -77,12 +78,14 @@ function SinglePalette( {
 					}
 					style={ { backgroundColor: color, color } }
 					onClick={
-						isSelected ? clearColor : () => onChange( color, index )
+						isSelected
+							? clearColor
+							: () => onChange( color, index, slug )
 					}
 				/>
 			);
 		} );
-	}, [ colors, value, onChange, clearColor ] );
+	}, [ colors, value, selectedSlug, onChange, clearColor ] );
 
 	return (
 		<CircularOptionPicker.OptionGroup
@@ -99,6 +102,7 @@ function MultiplePalettes( {
 	colors,
 	onChange,
 	value,
+	selectedSlug,
 	headingLevel,
 }: MultiplePalettesProps ) {
 	const instanceId = useInstanceId( MultiplePalettes, 'color-palette' );
@@ -113,16 +117,21 @@ function MultiplePalettes( {
 				const id = `${ instanceId }-${ index }`;
 				return (
 					<VStack spacing={ 2 } key={ index }>
-						<ColorHeading id={ id } level={ headingLevel }>
+						<Heading
+							className={ styles[ 'color-heading' ] }
+							id={ id }
+							level={ headingLevel }
+						>
 							{ name }
-						</ColorHeading>
+						</Heading>
 						<SinglePalette
 							clearColor={ clearColor }
 							colors={ colorPalette }
-							onChange={ ( newColor ) =>
-								onChange( newColor, index )
+							onChange={ ( newColor, _colorIndex, slug ) =>
+								onChange( newColor, index, slug )
 							}
 							value={ value }
+							selectedSlug={ selectedSlug }
 							aria-labelledby={ id }
 						/>
 					</VStack>
@@ -183,6 +192,7 @@ function UnforwardedColorPalette(
 		enableAlpha = false,
 		onChange,
 		value,
+		selectedSlug,
 		__experimentalIsRenderedInSidebar = false,
 		headingLevel = 2,
 		'aria-label': ariaLabel,
@@ -206,9 +216,10 @@ function UnforwardedColorPalette(
 			extractColorNameFromCurrentValue(
 				value,
 				colors,
-				hasMultipleColorOrigins
+				hasMultipleColorOrigins,
+				selectedSlug
 			),
-		[ value, colors, hasMultipleColorOrigins ]
+		[ value, colors, hasMultipleColorOrigins, selectedSlug ]
 	);
 
 	const renderCustomColorPicker = () => (
@@ -233,12 +244,13 @@ function UnforwardedColorPalette(
 				buttonLabelName,
 				displayValue
 		  )
-		: __( 'Custom color picker.' );
+		: __( 'Custom color picker' );
 
 	const paletteCommonProps = {
 		clearColor,
 		onChange,
 		value,
+		selectedSlug,
 	};
 
 	const actions = !! clearable && (
@@ -251,32 +263,16 @@ function UnforwardedColorPalette(
 		</CircularOptionPicker.ButtonAction>
 	);
 
-	let metaProps:
-		| { asButtons: false; loop?: boolean; 'aria-label': string }
-		| { asButtons: false; loop?: boolean; 'aria-labelledby': string }
-		| { asButtons: true };
+	const { metaProps, labelProps } = getComputeCircularOptionPickerCommonProps(
+		asButtons,
+		loop,
+		ariaLabel,
+		ariaLabelledby
+	);
 
-	if ( asButtons ) {
-		metaProps = { asButtons: true };
-	} else {
-		const _metaProps: { asButtons: false; loop?: boolean } = {
-			asButtons: false,
-			loop,
-		};
-
-		if ( ariaLabel ) {
-			metaProps = { ..._metaProps, 'aria-label': ariaLabel };
-		} else if ( ariaLabelledby ) {
-			metaProps = {
-				..._metaProps,
-				'aria-labelledby': ariaLabelledby,
-			};
-		} else {
-			metaProps = {
-				..._metaProps,
-				'aria-label': __( 'Custom color picker.' ),
-			};
-		}
+	// If disableCustomColors is true and colors.length is 0, return null to avoid rendering an empty palette wrapper.
+	if ( disableCustomColors && colors.length === 0 && ! actions ) {
+		return null;
 	}
 
 	return (
@@ -335,6 +331,7 @@ function UnforwardedColorPalette(
 			{ ( colors.length > 0 || actions ) && (
 				<CircularOptionPicker
 					{ ...metaProps }
+					{ ...labelProps }
 					actions={ actions }
 					options={
 						hasMultipleColorOrigins ? (
@@ -383,5 +380,6 @@ function UnforwardedColorPalette(
  * ```
  */
 export const ColorPalette = forwardRef( UnforwardedColorPalette );
+ColorPalette.displayName = 'ColorPalette';
 
 export default ColorPalette;

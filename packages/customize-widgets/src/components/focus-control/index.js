@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	createContext,
 	useState,
@@ -9,13 +6,10 @@ import {
 	useCallback,
 	useMemo,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { settingIdToWidgetId } from '../../utils';
 
 const FocusControlContext = createContext();
+FocusControlContext.displayName = 'FocusControlContext';
 
 export default function FocusControl( { api, sidebarControls, children } ) {
 	const [ focusedWidgetIdRef, setFocusedWidgetIdRef ] = useState( {

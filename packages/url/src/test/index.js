@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import {
 	addQueryArgs,
 	buildQueryString,
@@ -144,7 +141,7 @@ describe( 'getProtocol', () => {
 	it( 'returns undefined when the provided value does not contain a URL protocol', () => {
 		expect( getProtocol( '' ) ).toBeUndefined();
 		expect( getProtocol( 'https' ) ).toBeUndefined();
-		expect( getProtocol( 'test.com' ) ).toBeUndefined();
+		expect( getProtocol( 'example.com' ) ).toBeUndefined();
 		expect( getProtocol( ' https:// ' ) ).toBeUndefined();
 	} );
 } );
@@ -206,7 +203,7 @@ describe( 'getAuthority', () => {
 		expect( getAuthority( 'https:///' ) ).toBeUndefined();
 		expect( getAuthority( 'https://#' ) ).toBeUndefined();
 		expect( getAuthority( 'https://?' ) ).toBeUndefined();
-		expect( getAuthority( 'test.com' ) ).toBeUndefined();
+		expect( getAuthority( 'example.com' ) ).toBeUndefined();
 		expect( getAuthority( 'https://#?hello' ) ).toBeUndefined();
 	} );
 } );
@@ -274,7 +271,7 @@ describe( 'getPath', () => {
 		expect( getPath( 'https:///test' ) ).toBeUndefined();
 		expect( getPath( 'https://#' ) ).toBeUndefined();
 		expect( getPath( 'https://?' ) ).toBeUndefined();
-		expect( getPath( 'test.com' ) ).toBeUndefined();
+		expect( getPath( 'example.com' ) ).toBeUndefined();
 		expect( getPath( 'https://#?hello' ) ).toBeUndefined();
 		expect( getPath( 'https' ) ).toBeUndefined();
 	} );
@@ -365,11 +362,11 @@ describe( 'getQueryString', () => {
 				'https://andalouses.example/beach?foo[]=bar&foo[]=baz'
 			)
 		).toBe( 'foo[]=bar&foo[]=baz' );
-		expect( getQueryString( 'https://test.com?foo[]=bar&foo[]=baz' ) ).toBe(
-			'foo[]=bar&foo[]=baz'
-		);
 		expect(
-			getQueryString( 'https://test.com?foo=bar&foo=baz?test' )
+			getQueryString( 'https://example.com?foo[]=bar&foo[]=baz' )
+		).toBe( 'foo[]=bar&foo[]=baz' );
+		expect(
+			getQueryString( 'https://example.com?foo=bar&foo=baz?test' )
 		).toBe( 'foo=bar&foo=baz?test' );
 	} );
 
@@ -494,12 +491,12 @@ describe( 'getPathAndQueryString', () => {
 	beforeAll( jest.resetModules );
 	afterAll( jest.resetModules );
 	it( 'combines the results of `getPath` and `getQueryString`', () => {
-		jest.doMock( '../get-path.js', () => ( {
+		jest.doMock( '../get-path', () => ( {
 			getPath( { path } = {} ) {
 				return path;
 			},
 		} ) );
-		jest.doMock( '../get-query-string.js', () => ( {
+		jest.doMock( '../get-query-string', () => ( {
 			getQueryString( { queryString } = {} ) {
 				return queryString;
 			},
@@ -564,7 +561,7 @@ describe( 'getFragment', () => {
 		expect( getFragment( 'https://' ) ).toBeUndefined();
 		expect( getFragment( 'https:///test' ) ).toBeUndefined();
 		expect( getFragment( 'https://?' ) ).toBeUndefined();
-		expect( getFragment( 'test.com' ) ).toBeUndefined();
+		expect( getFragment( 'example.com' ) ).toBeUndefined();
 	} );
 } );
 
@@ -636,7 +633,7 @@ describe( 'addQueryArgs', () => {
 		);
 	} );
 
-	it( 'should encodes spaces by RFC 3986', () => {
+	it( 'should encode spaces by RFC 3986', () => {
 		const url = 'https://andalouses.example/beach';
 		const args = { activity: 'fun in the sun' };
 
@@ -652,6 +649,15 @@ describe( 'addQueryArgs', () => {
 		expect( addQueryArgs( url, args ) ).toBe( '?sun=true' );
 	} );
 
+	it( 'should add query args before the url fragment', () => {
+		const url = 'https://andalouses.example/beach/#fragment';
+		const args = { sun: 'true' };
+
+		expect( addQueryArgs( url, args ) ).toBe(
+			'https://andalouses.example/beach/?sun=true#fragment'
+		);
+	} );
+
 	it( 'should return URL argument unaffected if no query arguments to append', () => {
 		[ '', 'https://example.com', 'https://example.com?' ].forEach(
 			( url ) => {
@@ -659,6 +665,25 @@ describe( 'addQueryArgs', () => {
 					expect( addQueryArgs( url, args ) ).toBe( url );
 				} );
 			}
+		);
+	} );
+
+	it( 'should not truncate an existing value containing equals signs', () => {
+		const url =
+			'https://andalouses.example/beach?cursor=eyJvZmZzZXQiOjIwfQ==';
+		const args = { sun: 'true' };
+
+		expect( addQueryArgs( url, args ) ).toBe(
+			'https://andalouses.example/beach?cursor=eyJvZmZzZXQiOjIwfQ%3D%3D&sun=true'
+		);
+	} );
+
+	it( 'should not truncate a nested URL passed as an existing value', () => {
+		const url = 'https://andalouses.example/beach?redirect=/watch?v=abc';
+		const args = { sun: 'true' };
+
+		expect( addQueryArgs( url, args ) ).toBe(
+			'https://andalouses.example/beach?redirect=%2Fwatch%3Fv%3Dabc&sun=true'
 		);
 	} );
 } );
@@ -733,6 +758,40 @@ describe( 'getQueryArgs', () => {
 		} );
 	} );
 
+	it( 'should only split on the first equals sign', () => {
+		const url = 'https://andalouses.example/beach?a=1&b=x=y';
+
+		expect( getQueryArgs( url ) ).toEqual( {
+			a: '1',
+			b: 'x=y',
+		} );
+	} );
+
+	it( 'should preserve base64 padding in a value', () => {
+		const url =
+			'https://andalouses.example/beach?token=eyJhbGciOiJIUzI1NiJ9==';
+
+		expect( getQueryArgs( url ) ).toEqual( {
+			token: 'eyJhbGciOiJIUzI1NiJ9==',
+		} );
+	} );
+
+	it( 'should preserve an unencoded URL in a value', () => {
+		const url = 'https://andalouses.example/beach?redirect=/watch?v=abc';
+
+		expect( getQueryArgs( url ) ).toEqual( {
+			redirect: '/watch?v=abc',
+		} );
+	} );
+
+	it( 'should ignore a pair with no key', () => {
+		const url = 'https://andalouses.example/beach?=orphan&foo=bar';
+
+		expect( getQueryArgs( url ) ).toEqual( {
+			foo: 'bar',
+		} );
+	} );
+
 	describe( 'reverses buildQueryString', () => {
 		it( 'unbuilds simple strings', () => {
 			const data = {
@@ -796,6 +855,12 @@ describe( 'getQueryArg', () => {
 		expect( getQueryArg( url, 'baz' ) ).toBeUndefined();
 	} );
 
+	it( 'should not return what looks like a query arg after the url fragment', () => {
+		const url = 'https://andalouses.example/beach#fragment?foo=bar&bar=baz';
+
+		expect( getQueryArg( url, 'foo' ) ).toBeUndefined();
+	} );
+
 	it( 'should get the value of an array query arg', () => {
 		const url = 'https://andalouses.example/beach?foo[]=bar&foo[]=baz';
 
@@ -821,6 +886,12 @@ describe( 'hasQueryArg', () => {
 		const url = 'https://andalouses.example/beach?foo=bar&bar=baz';
 
 		expect( hasQueryArg( url, 'baz' ) ).toBeFalsy();
+	} );
+
+	it( 'should return false if the query arg is after url fragment', () => {
+		const url = 'https://andalouses.example/beach#fragment?foo=bar&bar=baz';
+
+		expect( hasQueryArg( url, 'foo' ) ).toBeFalsy();
 	} );
 
 	it( 'should return true for an array query arg', () => {
@@ -865,6 +936,23 @@ describe( 'removeQueryArgs', () => {
 
 		expect( removeQueryArgs( url, 'foo' ) ).toEqual(
 			'https://andalouses.example/beach?bar=foobar'
+		);
+	} );
+
+	it( 'should not remove the url fragment', () => {
+		const url =
+			'https://andalouses.example/beach?foo=bar&param=value#fragment';
+
+		expect( removeQueryArgs( url, 'foo' ) ).toEqual(
+			'https://andalouses.example/beach?param=value#fragment'
+		);
+	} );
+
+	it( 'should not remove what looks like a query arg after url fragment', () => {
+		const url = 'https://andalouses.example/beach#fragment?foo=bar';
+
+		expect( removeQueryArgs( url, 'foo' ) ).toEqual(
+			'https://andalouses.example/beach#fragment?foo=bar'
 		);
 	} );
 } );
@@ -1102,6 +1190,13 @@ describe( 'filterURLForDisplay', () => {
 		);
 		expect( url ).toBe( 'superlongti…ion.jpeg' );
 	} );
+	it( 'should not return more than the shortest truncation when maxLength is tiny', () => {
+		const url = filterURLForDisplay(
+			'https://example.com/averylongfilename.png',
+			5
+		);
+		expect( url ).toBe( '…ame.png' );
+	} );
 	it( 'should remove query arguments', () => {
 		const url = filterURLForDisplay(
 			'http://www.wordpress.org/wp-content/uploads/myimage.jpeg?query_args=a',
@@ -1164,6 +1259,24 @@ describe( 'cleanForSlug', () => {
 		expect( cleanForSlug( 'the long - cat' ) ).toBe( 'the-long-cat' );
 		expect( cleanForSlug( 'the----long---cat' ) ).toBe( 'the-long-cat' );
 	} );
+
+	it( 'Should remove ampersands', () => {
+		expect( cleanForSlug( 'the long cat & dog' ) ).toBe(
+			'the-long-cat-dog'
+		);
+		expect(
+			cleanForSlug( 'the long cat &amp; a dog &amp;&amp; fish' )
+		).toBe( 'the-long-cat-a-dog-fish' );
+		expect( cleanForSlug( 'the long cat &amp;amp; dog' ) ).toBe(
+			'the-long-cat-amp-dog'
+		);
+	} );
+
+	it( 'Should remove HTML entities', () => {
+		expect(
+			cleanForSlug( 'No &nbsp; Entities> &ndash; Here &mdash;&lt;' )
+		).toBe( 'no-entities-here' );
+	} );
 } );
 
 describe( 'normalizePath', () => {
@@ -1191,5 +1304,25 @@ describe( 'normalizePath', () => {
 	it( 'sorts urldecoded values and returns property urlencoded query string', () => {
 		const ab = normalizePath( '/foo/bar?a%2Ca=5,5&a,b=1,1' );
 		expect( ab ).toBe( '/foo/bar?a%2Ca=5%2C5&a%2Cb=1%2C1' );
+	} );
+
+	it( 'should not blow up on malformed params', () => {
+		const path = '/foo/bar?baz=%E0%A4%A';
+
+		expect( () => normalizePath( path ) ).not.toThrow();
+		expect( normalizePath( path ) ).toBe( '/foo/bar?baz=%25E0%25A4%25A' );
+	} );
+
+	it( 'returns a stable path when a param is malformed', () => {
+		const ab = normalizePath( '/foo/bar?a=5&b=50%off' );
+		const ba = normalizePath( '/foo/bar?b=50%off&a=5' );
+
+		expect( ab ).toBe( ba );
+	} );
+
+	it( 'keeps the query beyond a second question mark', () => {
+		expect( normalizePath( '/foo/bar?redirect=/watch?v=abc' ) ).toBe(
+			'/foo/bar?redirect=%2Fwatch%3Fv=abc'
+		);
 	} );
 } );

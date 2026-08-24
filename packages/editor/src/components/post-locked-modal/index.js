@@ -1,12 +1,10 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	Modal,
 	Button,
 	ExternalLink,
 	__experimentalHStack as HStack,
+	withFilters,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
@@ -14,23 +12,54 @@ import { useEffect, createInterpolateElement } from '@wordpress/element';
 import { addAction, removeAction } from '@wordpress/hooks';
 import { useInstanceId } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
+import { unlock } from '../../lock-unlock';
+import { DOCUMENT_SIZE_LIMIT_EXCEEDED } from '../../utils/sync-error-messages';
 import { store as editorStore } from '../../store';
 
-/**
- * A modal component that is displayed when a post is locked for editing by another user.
- * The modal provides information about the lock status and options to take over or exit the editor.
- *
- * @return {React.ReactNode} The rendered PostLockedModal component.
- */
-export default function PostLockedModal() {
+function CollaborationContext() {
+	const { isCollaborationSupported, syncConnectionStatus } = useSelect(
+		( select ) => {
+			const {
+				isCollaborationSupported: isSupported,
+				getSyncConnectionStatus,
+			} = unlock( select( coreStore ) );
+			return {
+				isCollaborationSupported: isSupported(),
+				syncConnectionStatus: getSyncConnectionStatus(),
+			};
+		},
+		[]
+	);
+
+	if ( isCollaborationSupported ) {
+		return null;
+	}
+
+	if ( DOCUMENT_SIZE_LIMIT_EXCEEDED === syncConnectionStatus?.error?.code ) {
+		return (
+			<p>
+				{ __(
+					'Because this post is too large for real-time collaboration, only one person can edit at a time.'
+				) }
+			</p>
+		);
+	}
+
+	return (
+		<p>
+			{ __(
+				'Because this post uses plugins that aren’t compatible with real-time collaboration, only one person can edit at a time.'
+			) }
+		</p>
+	);
+}
+
+function PostLockedModal() {
 	const instanceId = useInstanceId( PostLockedModal );
 	const hookName = 'core/editor/post-locked-modal-' + instanceId;
 	const { autosave, updatePostLock } = useDispatch( editorStore );
 	const {
+		isCollaborationEnabled,
 		isLocked,
 		isTakeover,
 		user,
@@ -49,9 +78,11 @@ export default function PostLockedModal() {
 			getEditedPostAttribute,
 			getEditedPostPreviewLink,
 			getEditorSettings,
-		} = select( editorStore );
+			isCollaborationEnabledForCurrentPost,
+		} = unlock( select( editorStore ) );
 		const { getPostType } = select( coreStore );
 		return {
+			isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),
 			isLocked: isPostLocked(),
 			isTakeover: isPostLockTakeover(),
 			user: getPostLockUser(),
@@ -147,9 +178,25 @@ export default function PostLockedModal() {
 			removeAction( 'heartbeat.tick', hookName );
 			window.removeEventListener( 'beforeunload', releasePostLock );
 		};
-	}, [] );
+		// Re-register with fresh values once the lock state is hydrated from
+		// the server, so a stale `isLocked` doesn't keep `sendPostLock`
+		// refreshing a lock this user doesn't hold.
+	}, [
+		hookName,
+		isLocked,
+		activePostLock,
+		postId,
+		postLockUtils,
+		autosave,
+		updatePostLock,
+	] );
 
 	if ( ! isLocked ) {
+		return null;
+	}
+
+	// Avoid sending the modal if sync is supported, but retain functionality around locks etc.
+	if ( isCollaborationEnabled ) {
 		return null;
 	}
 
@@ -194,29 +241,32 @@ export default function PostLockedModal() {
 				) }
 				<div>
 					{ !! isTakeover && (
-						<p>
-							{ createInterpolateElement(
-								userDisplayName
-									? sprintf(
-											/* translators: %s: user's display name */
-											__(
-												'<strong>%s</strong> now has editing control of this post (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
-											),
-											userDisplayName
-									  )
-									: __(
-											'Another user now has editing control of this post (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
-									  ),
-								{
-									strong: <strong />,
-									PreviewLink: (
-										<ExternalLink href={ previewLink }>
-											{ __( 'preview' ) }
-										</ExternalLink>
-									),
-								}
-							) }
-						</p>
+						<>
+							<p>
+								{ createInterpolateElement(
+									userDisplayName
+										? sprintf(
+												/* translators: %s: user's display name */
+												__(
+													'<strong>%s</strong> now has editing control of this post (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
+												),
+												userDisplayName
+										  )
+										: __(
+												'Another user now has editing control of this post (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
+										  ),
+									{
+										strong: <strong />,
+										PreviewLink: (
+											<ExternalLink href={ previewLink }>
+												{ __( 'preview' ) }
+											</ExternalLink>
+										),
+									}
+								) }
+							</p>
+							<CollaborationContext />
+						</>
 					) }
 					{ ! isTakeover && (
 						<>
@@ -243,6 +293,7 @@ export default function PostLockedModal() {
 									}
 								) }
 							</p>
+							<CollaborationContext />
 							<p>
 								{ __(
 									'If you take over, the other user will lose editing control to the post, but their changes will be saved.'
@@ -277,3 +328,13 @@ export default function PostLockedModal() {
 		</Modal>
 	);
 }
+
+/**
+ * A modal component that is displayed when a post is locked for editing by another user.
+ * The modal provides information about the lock status and options to take over or exit the editor.
+ *
+ * @return {React.ReactNode} The rendered PostLockedModal component.
+ */
+export default globalThis.IS_GUTENBERG_PLUGIN
+	? withFilters( 'editor.PostLockedModal' )( PostLockedModal )
+	: PostLockedModal;

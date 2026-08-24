@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { blockDefault } from '@wordpress/icons';
@@ -9,10 +6,6 @@ import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 import { safeHTML } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import { store as editWidgetsStore } from '../../store';
 
 export default function WidgetAreas( { selectedWidgetAreaId } ) {
@@ -33,6 +26,7 @@ export default function WidgetAreas( { selectedWidgetAreaId } ) {
 	let description;
 	if ( ! selectedWidgetArea ) {
 		description = __(
+			// eslint-disable-next-line no-restricted-syntax -- 'sidebar' is a common web design term for layouts
 			'Widget Areas are global parts in your site’s layout that can accept blocks. These vary by theme, but are typically parts like your Sidebar or Footer.'
 		);
 	} else if ( selectedWidgetAreaId === 'wp_inactive_widgets' ) {

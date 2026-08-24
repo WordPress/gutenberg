@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { MenuItem } from '@wordpress/components';
@@ -9,10 +6,7 @@ import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { symbolFilled } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
+import { store as coreStore } from '@wordpress/core-data';
 import { CreateTemplatePartModal } from '@wordpress/fields';
 
 export default function ConvertToTemplatePart( { clientIds, blocks } ) {
@@ -20,8 +14,10 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
-	const { canCreate } = useSelect( ( select ) => {
+	const { isBlockBasedTheme, canCreate } = useSelect( ( select ) => {
 		return {
+			isBlockBasedTheme:
+				select( coreStore ).getCurrentTheme()?.is_block_theme,
 			canCreate:
 				select( blockEditorStore ).canInsertBlockType(
 					'core/template-part'
@@ -29,7 +25,7 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 		};
 	}, [] );
 
-	if ( ! canCreate ) {
+	if ( ! isBlockBasedTheme || ! canCreate ) {
 		return null;
 	}
 

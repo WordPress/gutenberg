@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEntityProp } from '@wordpress/core-data';
 import {
 	dateI18n,
@@ -12,8 +9,13 @@ import {
 	useBlockProps,
 	__experimentalDateFormatPicker as DateFormatPicker,
 } from '@wordpress/block-editor';
-import { PanelBody, ToggleControl } from '@wordpress/components';
+import {
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+	ToggleControl,
+} from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 /**
  * Renders the `core/comment-date` block on the editor.
@@ -26,7 +28,7 @@ import { __, _x } from '@wordpress/i18n';
  * @param {Object} props.context           Inherited context.
  * @param {string} props.context.commentId The comment ID.
  *
- * @return {JSX.Element} React element.
+ * @return {React.JSX.Element} React element.
  */
 export default function Edit( {
 	attributes: { format, isLink },
@@ -34,6 +36,8 @@ export default function Edit( {
 	setAttributes,
 } ) {
 	const blockProps = useBlockProps();
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	let [ date ] = useEntityProp( 'root', 'comment', 'date', commentId );
 	const [ siteFormat = getDateSettings().formats.date ] = useEntityProp(
 		'root',
@@ -43,21 +47,44 @@ export default function Edit( {
 
 	const inspectorControls = (
 		<InspectorControls>
-			<PanelBody title={ __( 'Settings' ) }>
-				<DateFormatPicker
-					format={ format }
-					defaultFormat={ siteFormat }
-					onChange={ ( nextFormat ) =>
-						setAttributes( { format: nextFormat } )
-					}
-				/>
-				<ToggleControl
-					__nextHasNoMarginBottom
+			<ToolsPanel
+				label={ __( 'Settings' ) }
+				resetAll={ () => {
+					setAttributes( {
+						format: undefined,
+						isLink: true,
+					} );
+				} }
+				dropdownMenuProps={ dropdownMenuProps }
+			>
+				<ToolsPanelItem
+					label={ __( 'Date format' ) }
+					hasValue={ () => format !== undefined }
+					onDeselect={ () => setAttributes( { format: undefined } ) }
+					isShownByDefault
+				>
+					<DateFormatPicker
+						format={ format }
+						defaultFormat={ siteFormat }
+						onChange={ ( nextFormat ) =>
+							setAttributes( { format: nextFormat } )
+						}
+					/>
+				</ToolsPanelItem>
+
+				<ToolsPanelItem
 					label={ __( 'Link to comment' ) }
-					onChange={ () => setAttributes( { isLink: ! isLink } ) }
-					checked={ isLink }
-				/>
-			</PanelBody>
+					hasValue={ () => ! isLink }
+					onDeselect={ () => setAttributes( { isLink: true } ) }
+					isShownByDefault
+				>
+					<ToggleControl
+						label={ __( 'Link to comment' ) }
+						onChange={ () => setAttributes( { isLink: ! isLink } ) }
+						checked={ isLink }
+					/>
+				</ToolsPanelItem>
+			</ToolsPanel>
 		</InspectorControls>
 	);
 

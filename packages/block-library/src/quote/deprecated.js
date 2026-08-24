@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { createBlock, parseWithAttributeSchema } from '@wordpress/blocks';
 import { InnerBlocks, RichText, useBlockProps } from '@wordpress/block-editor';
 

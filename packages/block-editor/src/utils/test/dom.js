@@ -1,8 +1,51 @@
-/**
- * Internal dependencies
- */
-import { getElementBounds, WITH_OVERFLOW_ELEMENT_BLOCKS } from '../dom';
+import { render, screen } from '@testing-library/react';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Required for testing
+import { VisuallyHidden as WCVisuallyHidden } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
+import {
+	getElementBounds,
+	isElementVisible,
+	WITH_OVERFLOW_ELEMENT_BLOCKS,
+} from '../dom';
+
+function mockVisibleBoundingClientRect( element ) {
+	element.getBoundingClientRect = jest.fn().mockReturnValue( {
+		left: 0,
+		top: 0,
+		right: 100,
+		bottom: 20,
+		width: 100,
+		height: 20,
+		x: 0,
+		y: 0,
+	} );
+}
+
 describe( 'dom', () => {
+	describe( 'isElementVisible', () => {
+		it( 'returns false for @wordpress/components VisuallyHidden', () => {
+			render(
+				<WCVisuallyHidden data-testid="wc-visually-hidden">
+					Hidden
+				</WCVisuallyHidden>
+			);
+			const element = screen.getByTestId( 'wc-visually-hidden' );
+			mockVisibleBoundingClientRect( element );
+			expect( isElementVisible( element ) ).toBe( false );
+		} );
+
+		it( 'returns false for @wordpress/ui VisuallyHidden', () => {
+			render(
+				<VisuallyHidden data-testid="ui-visually-hidden">
+					Hidden
+				</VisuallyHidden>
+			);
+			const element = screen.getByTestId( 'ui-visually-hidden' );
+			mockVisibleBoundingClientRect( element );
+			expect( isElementVisible( element ) ).toBe( false );
+		} );
+	} );
+
 	describe( 'getElementBounds', () => {
 		it( 'should return a DOMRectReadOnly object if the viewport is not available', () => {
 			const element = {

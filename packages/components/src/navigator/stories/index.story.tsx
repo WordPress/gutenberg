@@ -1,24 +1,15 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryObj } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import Button from '../../button';
 import { VStack } from '../../v-stack';
 import { HStack } from '../../h-stack';
 import { Navigator, useNavigator } from '../';
 
 const meta: Meta< typeof Navigator > = {
+	tags: [ 'manifest' ],
 	component: Navigator,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Screen: Navigator.Screen,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Button: Navigator.Button,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		BackButton: Navigator.BackButton,
 	},
 	title: 'Components/Navigation/Navigator',
@@ -31,6 +22,10 @@ const meta: Meta< typeof Navigator > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 	decorators: [
 		( Story ) => {
@@ -144,6 +139,7 @@ const NavigatorButtonWithSkipFocus = ( {
 
 	return (
 		<Button
+			__next40pxDefaultSize
 			{ ...props }
 			style={ {
 				marginInline: '8px',

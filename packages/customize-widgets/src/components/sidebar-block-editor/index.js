@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useViewportMatch } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
@@ -14,11 +11,6 @@ import {
 } from '@wordpress/block-editor';
 import { uploadMedia } from '@wordpress/media-utils';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
-
-/**
- * Internal dependencies
- */
 import BlockInspectorButton from '../block-inspector-button';
 import Header from '../header';
 import useInserter from '../inserter/use-inserter';
@@ -31,8 +23,6 @@ import { unlock } from '../../lock-unlock';
 const { ExperimentalBlockCanvas: BlockCanvas } = unlock(
 	blockEditorPrivateApis
 );
-
-const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
 export default function SidebarBlockEditor( {
 	blockEditorSettings,
@@ -52,8 +42,8 @@ export default function SidebarBlockEditor( {
 		return {
 			hasUploadPermissions:
 				select( coreStore ).canUser( 'create', {
-					kind: 'root',
-					name: 'media',
+					kind: 'postType',
+					name: 'attachment',
 				} ) ?? true,
 			isFixedToolbarActive: !! get(
 				'core/customize-widgets',
@@ -106,7 +96,6 @@ export default function SidebarBlockEditor( {
 	return (
 		<>
 			<KeyboardShortcuts.Register />
-			<BlockKeyboardShortcuts />
 
 			<SidebarEditorProvider sidebar={ sidebar } settings={ settings }>
 				<KeyboardShortcuts

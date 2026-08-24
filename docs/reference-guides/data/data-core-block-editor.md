@@ -39,7 +39,7 @@ Determines if the given blocks are allowed to be inserted into the block list.
 _Parameters_
 
 -   _state_ `Object`: Editor state.
--   _clientIds_ `string`: The block client IDs to be inserted.
+-   _clientIds_ `string[]`: The block client IDs to be inserted.
 -   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
@@ -168,7 +168,16 @@ _Returns_
 
 Returns a block given its client ID. This is a parsed copy of the block, containing its `blockName`, `clientId`, and current `attributes` state. This is not the block's registration settings, which must be retrieved from the blocks module registration store.
 
-getBlock recurses through its inner blocks until all its children blocks have been retrieved. Note that getBlock will not return the child inner blocks of an inner block controller. This is because an inner block controller syncs itself with its own entity, and should therefore not be included with the blocks of a different entity. For example, say you call `getBlocks( TP )` to get the blocks of a template part. If another template part is a child of TP, then the nested template part's child blocks will not be returned. This way, the template block itself is considered part of the parent, but the children are not.
+getBlock recurses through its inner blocks until all its children blocks have been retrieved, with one exception: the children of an "inner block controller" are not part of its tree, so `innerBlocks` usually comes back empty even though the block clearly has children in the editor. Never rely on a controller's `innerBlocks`; ask for its children directly:
+
+```js
+getBlock( syncedPatternClientId ).innerBlocks; // Usually [].
+getBlocks( syncedPatternClientId ); // The pattern's blocks.
+```
+
+A block is an inner block controller when its children belong to, and are synced with, an entity other than the one being edited. Synced patterns (`core/block`) and template parts (`core/template-part`) are the usual examples: each owns its own blocks, and editing them saves to that pattern or template part, not to the post or template it sits in. Leaving their children out of the tree is what keeps the two entities separate, so walking a template's blocks stops at a template part placed inside it.
+
+`areInnerBlocksControlled( clientId )` tells whether a block is such a controller.
 
 _Parameters_
 
@@ -470,6 +479,7 @@ _Properties_
 
 -   _id_ `string`: Unique identifier for the item.
 -   _name_ `string`: The type of block to create.
+-   _variationName_ `?string`: The target block variation name.
 -   _title_ `string`: Title of the item, as it appears in the inserter.
 -   _icon_ `string`: Dashicon for the item, as it appears in the inserter.
 -   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
@@ -521,7 +531,6 @@ _Properties_
 
 -   _name_ `string`: The type of block.
 -   _attributes_ `?Object`: Attributes to pass to the newly created block.
--   _attributesToCopy_ `?Array<string>`: Attributes to be copied from adjacent blocks when inserted.
 
 ### getDraggedBlockClientIds
 
@@ -564,15 +573,9 @@ _Returns_
 
 ### getHoveredBlockClientId
 
+> **Deprecated**
+
 Returns the currently hovered block.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `Object`: Client Id of the hovered block.
 
 ### getInserterItems
 
@@ -1166,18 +1169,6 @@ _Returns_
 
 -   `boolean`: True if multi-selecting, false if not.
 
-### isNavigationMode
-
-Returns whether the navigation mode is enabled.
-
-_Parameters_
-
--   _state_ `Object`: Editor state.
-
-_Returns_
-
--   `boolean`: Is navigation mode enabled.
-
 ### isSelectionEnabled
 
 Selector that returns if multi-selection is enabled or not.
@@ -1204,7 +1195,7 @@ _Returns_
 
 ### isUngroupable
 
-Indicates if a block is ungroupable. A block is ungroupable if it is a single grouping block with inner blocks. If a block has an `ungroup` transform, it is also ungroupable, without the requirement of being the default grouping block. Additionally a block can only be ungrouped if it has inner blocks and can be removed.
+Indicates if a block is ungroupable. A block is ungroupable if it is a single grouping block with inner blocks. If a block has an `ungroup` transform, it is also ungroupable, without the requirement of being the default grouping block. Additionally a block can only be ungrouped if it has inner blocks and can be removed. Section blocks are not ungroupable.
 
 _Parameters_
 
@@ -1291,6 +1282,7 @@ Action that "flashes" the block with a given `clientId` by rhythmically highligh
 _Parameters_
 
 -   _clientId_ `string`: Target block client ID.
+-   _timeout_ `number`: Duration in milliseconds to keep the highlight. Defaults to 150ms.
 
 ### hideInsertionPoint
 
@@ -1298,15 +1290,9 @@ Action that hides the insertion point.
 
 ### hoverBlock
 
+> **Deprecated**
+
 Returns an action object used in signalling that the block with the specified client ID has been hovered.
-
-_Parameters_
-
--   _clientId_ `string`: Block client ID.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### insertAfterBlock
 
@@ -1336,6 +1322,7 @@ _Parameters_
 -   _index_ `?number`: Index at which block should be inserted.
 -   _rootClientId_ `?string`: Optional root client ID of block list on which to insert.
 -   _updateSelection_ `?boolean`: If true block selection will be updated. If false, block selection will not change. Defaults to true.
+-   _initialPosition_ `0|-1|null`: Initial focus position. Setting it to null prevent focusing the inserted block.
 -   _meta_ `?Object`: Optional Meta values to be passed to the action object.
 
 _Returns_
@@ -1447,6 +1434,7 @@ _Type Definition_
 _Properties_
 
 -   _per_page_ `number`: How many items to fetch per page.
+-   _page_ `[number]`: Which page of results to fetch. Defaults to the first page.
 -   _search_ `string`: The search term to use for filtering the results.
 
 _Type Definition_
@@ -1462,6 +1450,16 @@ _Properties_
 -   _sourceId_ `[number|string]`: The id of the media item from external source.
 -   _alt_ `[string]`: The alt text of the media item.
 -   _caption_ `[string]`: The caption of the media item.
+
+_Type Definition_
+
+-   _InserterMediaResponse_ `Object`: Interface for paginated inserter media responses. A media category's `fetch` may return this instead of a plain array to opt into pagination, in which case the media tab renders paging controls for the category.
+
+_Properties_
+
+-   _mediaItems_ `InserterMediaItem[]`: The media items for the requested page.
+-   _totalItems_ `number`: The total number of items across all pages.
+-   _totalPages_ `number`: The total number of pages available.
 
 _Usage_
 
@@ -1532,9 +1530,10 @@ _Properties_
 -   _labels.name_ `string`: General name of the media category. It's used in the inserter media items list.
 -   _labels.search_items_ `[string]`: Label for searching items. Default is ‘Search Posts’ / ‘Search Pages’.
 -   _mediaType_ `('image'|'audio'|'video')`: The media type of the media category.
--   _fetch_ `(InserterMediaRequest) => Promise<InserterMediaItem[]>`: The function to fetch media items for the category.
+-   _fetch_ `(InserterMediaRequest) => Promise<InserterMediaItem[]|InserterMediaResponse>`: The function to fetch media items for the category. Returning an `InserterMediaResponse` instead of a plain array opts the category into pagination.
 -   _getReportUrl_ `[(InserterMediaItem) => string]`: If the media category supports reporting media items, this function should return the report url for the media item. It accepts the `InserterMediaItem` as an argument.
--   _isExternalResource_ `[boolean]`: If the media category is an external resource, this should be set to true. This is used to avoid making a request to the external resource when the user
+-   _isExternalResource_ `[boolean]`: If the media category is an external resource, this should be set to true. This is used to avoid making a request to the external resource when checking whether the category has any media items to display in the media tab.
+-   _emptyMessage_ `[string]`: Optional message shown in place of the generic "No results found." when the source has no items and there is no active search. Providing it also keeps the source in the tab list while empty, so the message stays reachable.
 
 ### removeBlock
 
@@ -1631,7 +1630,7 @@ Returns an action object used in signalling that the block with the specified cl
 _Parameters_
 
 -   _clientId_ `string`: Block client ID.
--   _initialPosition_ `0|-1|null`: Optional initial position. Pass as -1 to reflect reverse selection.
+-   _initialPosition_ `0|-1|null`: Optional initial position. Pass -1 to reflect reverse selection or `null` to prevent focusing the block.
 
 _Returns_
 
@@ -1712,14 +1711,6 @@ _Parameters_
 
 -   _clientId_ `string`: The block's clientId.
 -   _hasControlledInnerBlocks_ `boolean`: True if the block's inner blocks are controlled.
-
-### setNavigationMode
-
-Action that enables or disables the navigation mode.
-
-_Parameters_
-
--   _isNavigationMode_ `boolean`: Enable/Disable navigation mode.
 
 ### setTemplateValidity
 
@@ -1881,8 +1872,9 @@ Action that updates attributes of multiple blocks with the specified client IDs.
 _Parameters_
 
 -   _clientIds_ `string|string[]`: Block client IDs.
--   _attributes_ `Object`: Block attributes to be merged. Should be keyed by clientIds if uniqueByBlock is true.
--   _uniqueByBlock_ `boolean`: true if each block in clientIds array has a unique set of attributes
+-   _attributes_ `Object`: Block attributes to be merged. Should be keyed by clientIds if `options.uniqueByBlock` is true.
+-   _options_ `Object`: Updating options.
+-   _options.uniqueByBlock_ `[boolean]`: Whether each block in clientIds array has a unique set of attributes.
 
 _Returns_
 

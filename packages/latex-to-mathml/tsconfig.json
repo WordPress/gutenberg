@@ -1,0 +1,9 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"types": [ "gutenberg-env" ]
+	},
+	"references": [],
+	"exclude": [ "src/loader.ts" ]
+}

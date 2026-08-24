@@ -1,11 +1,15 @@
-/**
- * Internal dependencies
- */
 import type { Context, Updatable } from './helpers';
 import type { Attachment } from './attachment';
 import type { Base, TemplatePartArea, TemplateType } from './base';
 import type { Comment } from './comment';
+import type {
+	FontCollection,
+	CollectionFontFamily,
+	CollectionFontFace,
+} from './font-collection';
+import type { FontFamily, FontFace, WpFontFamily } from './font-family';
 import type { GlobalStylesRevision } from './global-styles-revision';
+import type { Icon } from './icon';
 import type { MenuLocation } from './menu-location';
 import type { NavMenu } from './nav-menu';
 import type { NavMenuItem } from './nav-menu-item';
@@ -17,6 +21,7 @@ import type { PostRevision } from './post-revision';
 import type { Settings } from './settings';
 import type { Sidebar } from './sidebar';
 import type { Taxonomy } from './taxonomy';
+import type { Term } from './term';
 import type { Theme } from './theme';
 import type { User } from './user';
 import type { Type } from './type';
@@ -30,9 +35,15 @@ export type { BaseEntityRecords } from './base-entity-records';
 export type {
 	Attachment,
 	Base as UnstableBase,
+	CollectionFontFace,
+	CollectionFontFamily,
 	Comment,
 	Context,
+	FontCollection,
+	FontFace,
+	FontFamily,
 	GlobalStylesRevision,
+	Icon,
 	MenuLocation,
 	NavMenu,
 	NavMenuItem,
@@ -46,12 +57,14 @@ export type {
 	Taxonomy,
 	TemplatePartArea,
 	TemplateType,
+	Term,
 	Theme,
 	Type,
 	Updatable,
 	User,
 	Widget,
 	WidgetType,
+	WpFontFamily,
 	WpTemplate,
 	WpTemplatePart,
 };
@@ -93,7 +106,9 @@ export interface PerPackageEntityRecords< C extends Context > {
 		| Base< C >
 		| Attachment< C >
 		| Comment< C >
+		| FontCollection< C >
 		| GlobalStylesRevision< C >
+		| Icon< C >
 		| MenuLocation< C >
 		| NavMenu< C >
 		| NavMenuItem< C >
@@ -105,11 +120,13 @@ export interface PerPackageEntityRecords< C extends Context > {
 		| Settings< C >
 		| Sidebar< C >
 		| Taxonomy< C >
+		| Term< C >
 		| Theme< C >
 		| User< C >
 		| Type< C >
 		| Widget< C >
 		| WidgetType< C >
+		| WpFontFamily< C >
 		| WpTemplate< C >
 		| WpTemplatePart< C >;
 }

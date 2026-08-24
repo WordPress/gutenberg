@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { SelectControl } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { useAuthorsQuery } from './hook';
 
@@ -22,8 +15,6 @@ export default function PostAuthorSelect() {
 
 	return (
 		<SelectControl
-			__next40pxDefaultSize
-			__nextHasNoMarginBottom
 			className="post-author-selector"
 			label={ __( 'Author' ) }
 			options={ authorOptions }

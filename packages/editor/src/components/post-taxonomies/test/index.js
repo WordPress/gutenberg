@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { select } from '@wordpress/data';
-import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
+import { store as editorStore } from '@wordpress/editor';
 import PostTaxonomies from '../';
 
 describe( 'PostTaxonomies', () => {
@@ -26,7 +15,7 @@ describe( 'PostTaxonomies', () => {
 			show_ui: true,
 		},
 		labels: {
-			add_new_item: 'Add new genre',
+			add_new_item: 'Add Genre',
 		},
 	};
 
@@ -40,7 +29,7 @@ describe( 'PostTaxonomies', () => {
 			show_ui: true,
 		},
 		labels: {
-			add_new_item: 'Add new category',
+			add_new_item: 'Add Category',
 		},
 	};
 
@@ -135,10 +124,10 @@ describe( 'PostTaxonomies', () => {
 			screen.queryByRole( 'group', { name: 'Categories' } )
 		).not.toBeInTheDocument();
 		expect(
-			screen.getByRole( 'button', { name: 'Add new genre' } )
+			screen.getByRole( 'button', { name: 'Add Genre' } )
 		).toBeVisible();
 		expect(
-			screen.queryByRole( 'button', { name: 'Add new category' } )
+			screen.queryByRole( 'button', { name: 'Add Category' } )
 		).not.toBeInTheDocument();
 	} );
 
@@ -158,13 +147,13 @@ describe( 'PostTaxonomies', () => {
 
 		expect( screen.getByRole( 'group', { name: 'Genres' } ) ).toBeVisible();
 		expect(
-			screen.getByRole( 'button', { name: 'Add new genre' } )
+			screen.getByRole( 'button', { name: 'Add Genre' } )
 		).toBeVisible();
 		expect(
 			screen.queryByRole( 'group', { name: 'Categories' } )
 		).not.toBeInTheDocument();
 		expect(
-			screen.queryByRole( 'button', { name: 'Add new category' } )
+			screen.queryByRole( 'button', { name: 'Add Category' } )
 		).not.toBeInTheDocument();
 	} );
 } );

@@ -1,20 +1,13 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { PanelBody } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState, useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import HierarchicalTermSelector from '../post-taxonomies/hierarchical-term-selector';
 import { store as editorStore } from '../../store';
 
 function MaybeCategoryPanel() {
-	const hasNoCategory = useSelect( ( select ) => {
+	const { hasNoCategory, hasSiteCategories } = useSelect( ( select ) => {
 		const postType = select( editorStore ).getCurrentPostType();
 		const { canUser, getEntityRecord } = select( coreStore );
 		const categoriesTaxonomy = getEntityRecord(
@@ -39,19 +32,30 @@ function MaybeCategoryPanel() {
 			select( editorStore ).getEditedPostAttribute(
 				categoriesTaxonomy.rest_base
 			);
+		const siteCategories = postTypeSupportsCategories
+			? !! select( coreStore ).getEntityRecords( 'taxonomy', 'category', {
+					exclude: [ defaultCategoryId ],
+					per_page: 1,
+			  } )?.length
+			: false;
 
 		// This boolean should return true if everything is loaded
 		// ( categoriesTaxonomy, defaultCategory )
 		// and the post has not been assigned a category different than "uncategorized".
-		return (
+		const noCategory =
 			!! categoriesTaxonomy &&
 			!! defaultCategory &&
 			postTypeSupportsCategories &&
 			( categories?.length === 0 ||
 				( categories?.length === 1 &&
-					defaultCategory?.id === categories[ 0 ] ) )
-		);
+					defaultCategory?.id === categories[ 0 ] ) );
+
+		return {
+			hasNoCategory: noCategory,
+			hasSiteCategories: siteCategories,
+		};
 	}, [] );
+
 	const [ shouldShowPanel, setShouldShowPanel ] = useState( false );
 	useEffect( () => {
 		// We use state to avoid hiding the panel if the user edits the categories
@@ -61,7 +65,11 @@ function MaybeCategoryPanel() {
 		}
 	}, [ hasNoCategory ] );
 
-	if ( ! shouldShowPanel ) {
+	// We only want to show the category panel:
+	// if the post type supports categories,
+	// if the site has categories other than the default category,
+	// and if the post has no other categories than the default category.
+	if ( ! shouldShowPanel || ! hasSiteCategories ) {
 		return null;
 	}
 

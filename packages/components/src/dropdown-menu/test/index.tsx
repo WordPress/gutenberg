@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { arrowLeft, arrowRight, arrowUp, arrowDown } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import DropdownMenu from '..';
 import MenuItem from '../../menu-item';
 

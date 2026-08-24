@@ -1,21 +1,14 @@
-/**
- * WordPress dependencies
- */
 import { focus, isFormElement } from '@wordpress/dom';
 import { TAB } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect, useMergeRefs } from '@wordpress/compose';
 import { useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { isInSameBlock, isInsideRootBlock } from '../../utils/dom';
 import { unlock } from '../../lock-unlock';
 
 export default function useTabNav() {
-	const container = useRef();
+	const containerRef = /** @type {typeof useRef<HTMLElement>} */ ( useRef )();
 	const focusCaptureBeforeRef = useRef();
 	const focusCaptureAfterRef = useRef();
 
@@ -36,21 +29,21 @@ export default function useTabNav() {
 
 	function onFocusCapture( event ) {
 		const canvasElement =
-			container.current.ownerDocument === event.target.ownerDocument
-				? container.current
-				: container.current.ownerDocument.defaultView.frameElement;
+			containerRef.current.ownerDocument === event.target.ownerDocument
+				? containerRef.current
+				: containerRef.current.ownerDocument.defaultView.frameElement;
 
 		// Do not capture incoming focus if set by us in WritingFlow.
 		if ( noCaptureRef.current ) {
 			noCaptureRef.current = null;
 		} else if ( hasMultiSelection() ) {
-			container.current.focus();
+			containerRef.current.focus();
 		} else if ( getSelectedBlockClientId() ) {
 			if ( getLastFocus()?.current ) {
 				getLastFocus().current.focus();
 			} else {
 				// Handles when the last focus has not been set yet, or has been cleared by new blocks being added via the inserter.
-				container.current
+				containerRef.current
 					.querySelector(
 						`[data-block="${ getSelectedBlockClientId() }"]`
 					)
@@ -64,13 +57,13 @@ export default function useTabNav() {
 
 			// If we have section within the section root, focus the first one.
 			if ( sectionBlocks.length ) {
-				container.current
+				containerRef.current
 					.querySelector( `[data-block="${ sectionBlocks[ 0 ] }"]` )
 					.focus();
 			}
 			// If we don't have any section blocks, focus the section root.
 			else if ( sectionRootClientId ) {
-				container.current
+				containerRef.current
 					.querySelector( `[data-block="${ sectionRootClientId }"]` )
 					.focus();
 			} else {
@@ -82,8 +75,7 @@ export default function useTabNav() {
 				// eslint-disable-next-line no-bitwise
 				event.target.compareDocumentPosition( canvasElement ) &
 				event.target.DOCUMENT_POSITION_FOLLOWING;
-			const tabbables = focus.tabbable.find( container.current );
-
+			const tabbables = focus.tabbable.find( containerRef.current );
 			if ( tabbables.length ) {
 				const next = isBefore
 					? tabbables[ 0 ]
@@ -125,16 +117,26 @@ export default function useTabNav() {
 				return;
 			}
 
-			const isShift = event.shiftKey;
+			if (
+				// Bails in case the focus capture elements aren’t present. They
+				// may be omitted to avoid silent tab stops in preview mode.
+				// See: https://github.com/WordPress/gutenberg/pull/59317
+				! focusCaptureAfterRef.current ||
+				! focusCaptureBeforeRef.current
+			) {
+				return;
+			}
+
+			const { target, shiftKey: isShift } = event;
 			const direction = isShift ? 'findPrevious' : 'findNext';
-			const nextTabbable = focus.tabbable[ direction ]( event.target );
+			const nextTabbable = focus.tabbable[ direction ]( target );
 
 			// We want to constrain the tabbing to the block and its child blocks.
 			// If the preceding form element is within a different block,
 			// such as two sibling image blocks in the placeholder state,
 			// we want shift + tab from the first form element to move to the image
 			// block toolbar and not the previous image block's form element.
-			const currentBlock = event.target.closest( '[data-block]' );
+			const currentBlock = target.closest( '[data-block]' );
 			const isElementPartOfSelectedBlock =
 				currentBlock &&
 				nextTabbable &&
@@ -153,7 +155,6 @@ export default function useTabNav() {
 			) {
 				return;
 			}
-
 			const next = isShift ? focusCaptureBeforeRef : focusCaptureAfterRef;
 
 			// Disable focus capturing on the focus capture element, so it
@@ -168,7 +169,13 @@ export default function useTabNav() {
 		}
 
 		function onFocusOut( event ) {
-			setLastFocus( { ...getLastFocus(), current: event.target } );
+			// `focusout` also fires when focus moves between elements within the
+			// canvas, but only the element focus left the canvas from is of
+			// interest. `contains` is false for a null `relatedTarget`, which is
+			// what focus moving to another document reports.
+			if ( ! node.contains( event.relatedTarget ) ) {
+				setLastFocus( { current: event.target } );
+			}
 
 			const { ownerDocument } = node;
 
@@ -176,6 +183,7 @@ export default function useTabNav() {
 			// the writing flow wrapper.
 			if (
 				! event.relatedTarget &&
+				event.target.hasAttribute( 'data-block' ) &&
 				ownerDocument.activeElement === ownerDocument.body &&
 				getBlockCount() === 0
 			) {
@@ -200,7 +208,7 @@ export default function useTabNav() {
 				return;
 			}
 
-			if ( container.current === event.target ) {
+			if ( containerRef.current === event.target ) {
 				return;
 			}
 
@@ -229,7 +237,7 @@ export default function useTabNav() {
 		};
 	}, [] );
 
-	const mergedRefs = useMergeRefs( [ container, ref ] );
+	const mergedRefs = useMergeRefs( [ containerRef, ref ] );
 
 	return [ before, mergedRefs, after ];
 }

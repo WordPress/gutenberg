@@ -1,27 +1,16 @@
-/**
- * External dependencies
- */
+const { basename, dirname, relative, resolve, sep } = require( 'path' );
+const { realpathSync } = require( 'fs' );
+const { exec } = require( 'child_process' );
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
-const { CleanWebpackPlugin } = require( 'clean-webpack-plugin' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const webpack = require( 'webpack' );
 const browserslist = require( 'browserslist' );
 const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
-const { basename, dirname, relative, resolve, sep } = require( 'path' );
 const ReactRefreshWebpackPlugin = require( '@pmmmwh/react-refresh-webpack-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
-const { realpathSync } = require( 'fs' );
 const { sync: glob } = require( 'fast-glob' );
-
-/**
- * WordPress dependencies
- */
 const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
 const postcssPlugins = require( '@wordpress/postcss-plugins-preset' );
-
-/**
- * Internal dependencies
- */
 const PhpFilePathsPlugin = require( '../plugins/php-file-paths-plugin' );
 const RtlCssPlugin = require( '../plugins/rtlcss-webpack-plugin' );
 const {
@@ -36,6 +25,7 @@ const {
 	getBlockJsonModuleFields,
 	getBlockJsonScriptFields,
 	fromProjectRoot,
+	fromScriptsRoot,
 } = require( '../utils' );
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -45,6 +35,7 @@ if ( ! browserslist.findConfig( '.' ) ) {
 	target += ':' + fromConfigRoot( '.browserslistrc' );
 }
 const hasReactFastRefresh = hasArgInCLI( '--hot' ) && ! isProduction;
+const hasBlocksManifest = getAsBooleanFromENV( 'WP_BLOCKS_MANIFEST' );
 const hasExperimentalModulesFlag = getAsBooleanFromENV(
 	'WP_EXPERIMENTAL_MODULES'
 );
@@ -105,6 +96,14 @@ const baseConfig = {
 		filename: '[name].js',
 		chunkFilename: '[name].js?ver=[chunkhash]',
 		path: resolve( process.cwd(), 'build' ),
+		// Clean output directory before emit, except when modules flag is enabled
+		// to prevent the 2 compilations from cleaning each other's output
+		...( ! hasExperimentalModulesFlag && {
+			clean: {
+				// Keep fonts and images directories
+				keep: /^(fonts|images)\//,
+			},
+		} ),
 	},
 	resolve: {
 		alias: {
@@ -203,6 +202,9 @@ const baseConfig = {
 						loader: require.resolve( 'sass-loader' ),
 						options: {
 							sourceMap: ! isProduction,
+							sassOptions: {
+								charset: false,
+							},
 						},
 					},
 				],
@@ -210,7 +212,10 @@ const baseConfig = {
 			{
 				test: /\.svg$/,
 				issuer: /\.(j|t)sx?$/,
-				use: [ '@svgr/webpack', 'url-loader' ],
+				use: [
+					require.resolve( '@svgr/webpack' ),
+					require.resolve( 'url-loader' ),
+				],
 				type: 'javascript/auto',
 			},
 			{
@@ -260,6 +265,26 @@ if ( baseConfig.devtool ) {
 	} );
 }
 
+/**
+ * Build blocks manifest.
+ */
+class BlocksManifestPlugin {
+	/**
+	 * Apply the plugin.
+	 *
+	 * @param {webpack.Compiler} compiler The compiler instance.
+	 */
+	apply( compiler ) {
+		compiler.hooks.afterEmit.tap( 'BlocksManifest', () => {
+			exec(
+				`node "${ fromScriptsRoot(
+					'build-blocks-manifest'
+				) }" --input="${ compiler.options.output.path }"`
+			);
+		} );
+	}
+}
+
 /** @type {webpack.Configuration} */
 const scriptConfig = {
 	...baseConfig,
@@ -275,13 +300,15 @@ const scriptConfig = {
 				allowedHosts: 'auto',
 				host: 'localhost',
 				port: 8887,
-				proxy: {
-					'/build': {
+				proxy: [
+					{
+						context: [ '/build' ],
+						target: 'http://localhost:8887',
 						pathRewrite: {
 							'^/build': '',
 						},
 					},
-				},
+				],
 		  },
 
 	plugins: [
@@ -290,16 +317,6 @@ const scriptConfig = {
 			'globalThis.SCRIPT_DEBUG': JSON.stringify( ! isProduction ),
 			SCRIPT_DEBUG: JSON.stringify( ! isProduction ),
 		} ),
-
-		// If we run a modules build, the 2 compilations can "clean" each other's output
-		// Prevent the cleaning from happening
-		! hasExperimentalModulesFlag &&
-			new CleanWebpackPlugin( {
-				cleanAfterEveryBuildPatterns: [ '!fonts/**', '!images/**' ],
-				// Prevent it from deleting webpack assets during builds that have
-				// multiple configurations returned in the webpack config.
-				cleanStaleWebpackAssets: false,
-			} ),
 
 		new PhpFilePathsPlugin( {
 			context: getProjectSourcePath(),
@@ -397,6 +414,8 @@ const scriptConfig = {
 		} ),
 		// RtlCssPlugin to generate RTL CSS files.
 		new RtlCssPlugin(),
+		// Generate blocks manifest after changes.
+		hasBlocksManifest && new BlocksManifestPlugin(),
 		// React Fast Refresh.
 		hasReactFastRefresh && new ReactRefreshWebpackPlugin(),
 		// WP_NO_EXTERNALS global variable controls whether scripts' assets get

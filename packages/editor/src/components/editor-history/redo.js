@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { __, isRTL } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { displayShortcut, isAppleOS } from '@wordpress/keycodes';
 import { redo as redoIcon, undo as undoIcon } from '@wordpress/icons';
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 
 function EditorHistoryRedo( props, ref ) {
@@ -42,7 +35,7 @@ function EditorHistoryRedo( props, ref ) {
 	);
 }
 
-/** @typedef {import('react').Ref<HTMLElement>} Ref */
+/** @typedef {React.Ref<HTMLElement>} Ref */
 
 /**
  * Renders the redo button for the editor history.

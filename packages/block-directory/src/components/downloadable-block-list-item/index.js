@@ -1,26 +1,11 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __, _n, sprintf } from '@wordpress/i18n';
-import {
-	Tooltip,
-	Spinner,
-	VisuallyHidden,
-	Composite,
-} from '@wordpress/components';
+import { Spinner, Composite } from '@wordpress/components';
 import { createInterpolateElement } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { getBlockType } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
+import { VisuallyHidden, Tooltip } from '@wordpress/ui';
 import BlockRatings from '../block-ratings';
 import DownloadableBlockIcon from '../downloadable-block-icon';
 import DownloadableBlockNotice from '../downloadable-block-notice';
@@ -34,24 +19,36 @@ function getDownloadableBlockLabel(
 	const stars = Math.round( rating / 0.5 ) * 0.5;
 
 	if ( ! isInstalled && hasNotice ) {
-		/* translators: %s: block title */
-		return sprintf( 'Retry installing %s.', decodeEntities( title ) );
+		return sprintf(
+			/* translators: %s: block title */
+			__( 'Retry installing %s.' ),
+			decodeEntities( title )
+		);
 	}
 
 	if ( isInstalled ) {
-		/* translators: %s: block title */
-		return sprintf( 'Add %s.', decodeEntities( title ) );
+		return sprintf(
+			/* translators: %s: block title */
+			__( 'Add %s.' ),
+			decodeEntities( title )
+		);
 	}
 
 	if ( isInstalling ) {
-		/* translators: %s: block title */
-		return sprintf( 'Installing %s.', decodeEntities( title ) );
+		return sprintf(
+			/* translators: %s: block title */
+			__( 'Installing %s.' ),
+			decodeEntities( title )
+		);
 	}
 
 	// No ratings yet, just use the title.
 	if ( ratingCount < 1 ) {
-		/* translators: %s: block title */
-		return sprintf( 'Install %s.', decodeEntities( title ) );
+		return sprintf(
+			/* translators: %s: block title */
+			__( 'Install %s.' ),
+			decodeEntities( title )
+		);
 	}
 
 	return sprintf(
@@ -101,68 +98,76 @@ function DownloadableBlockListItem( { item, onClick } ) {
 	} );
 
 	return (
-		<Tooltip placement="top" text={ itemLabel }>
-			<Composite.Item
-				className={ clsx(
-					'block-directory-downloadable-block-list-item',
-					isInstalling && 'is-installing'
-				) }
-				accessibleWhenDisabled
-				disabled={ isInstalling || ! isInstallable }
-				onClick={ ( event ) => {
-					event.preventDefault();
-					onClick();
-				} }
-				aria-label={ itemLabel }
-				type="button"
-				role="option"
-			>
-				<div className="block-directory-downloadable-block-list-item__icon">
-					<DownloadableBlockIcon icon={ icon } title={ title } />
-					{ isInstalling ? (
-						<span className="block-directory-downloadable-block-list-item__spinner">
-							<Spinner />
-						</span>
-					) : (
-						<BlockRatings rating={ rating } />
-					) }
-				</div>
-				<span className="block-directory-downloadable-block-list-item__details">
-					<span className="block-directory-downloadable-block-list-item__title">
-						{ createInterpolateElement(
-							sprintf(
-								/* translators: 1: block title. 2: author name. */
-								__( '%1$s <span>by %2$s</span>' ),
-								decodeEntities( title ),
-								author
-							),
-							{
-								span: (
-									<span className="block-directory-downloadable-block-list-item__author" />
-								),
-							}
+		<Tooltip.Root>
+			<Tooltip.Trigger
+				render={
+					<Composite.Item
+						className={ clsx(
+							'block-directory-downloadable-block-list-item',
+							isInstalling && 'is-installing'
 						) }
-					</span>
-					{ hasNotice ? (
-						<DownloadableBlockNotice block={ item } />
-					) : (
-						<>
-							<span className="block-directory-downloadable-block-list-item__desc">
-								{ !! statusText
-									? statusText
-									: decodeEntities( description ) }
-							</span>
-							{ isInstallable &&
-								! ( isInstalled || isInstalling ) && (
-									<VisuallyHidden>
-										{ __( 'Install block' ) }
-									</VisuallyHidden>
+						accessibleWhenDisabled
+						disabled={ isInstalling || ! isInstallable }
+						onClick={ ( event ) => {
+							event.preventDefault();
+							onClick();
+						} }
+						aria-label={ itemLabel }
+						type="button"
+						role="option"
+					>
+						<div className="block-directory-downloadable-block-list-item__icon">
+							<DownloadableBlockIcon
+								icon={ icon }
+								title={ title }
+							/>
+							{ isInstalling ? (
+								<span className="block-directory-downloadable-block-list-item__spinner">
+									<Spinner />
+								</span>
+							) : (
+								<BlockRatings rating={ rating } />
+							) }
+						</div>
+						<span className="block-directory-downloadable-block-list-item__details">
+							<span className="block-directory-downloadable-block-list-item__title">
+								{ createInterpolateElement(
+									sprintf(
+										/* translators: 1: block title. 2: author name. */
+										__( '%1$s <span>by %2$s</span>' ),
+										decodeEntities( title ),
+										author
+									),
+									{
+										span: (
+											<span className="block-directory-downloadable-block-list-item__author" />
+										),
+									}
 								) }
-						</>
-					) }
-				</span>
-			</Composite.Item>
-		</Tooltip>
+							</span>
+							{ hasNotice ? (
+								<DownloadableBlockNotice block={ item } />
+							) : (
+								<>
+									<span className="block-directory-downloadable-block-list-item__desc">
+										{ !! statusText
+											? statusText
+											: decodeEntities( description ) }
+									</span>
+									{ isInstallable &&
+										! ( isInstalled || isInstalling ) && (
+											<VisuallyHidden>
+												{ __( 'Install block' ) }
+											</VisuallyHidden>
+										) }
+								</>
+							) }
+						</span>
+					</Composite.Item>
+				}
+			/>
+			<Tooltip.Popup>{ itemLabel }</Tooltip.Popup>
+		</Tooltip.Root>
 	);
 }
 

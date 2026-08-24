@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { check, aspectRatio as aspectRatioIcon } from '@wordpress/icons';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useSettings } from '../use-settings';
 import { POPOVER_PROPS } from './constants';
 import { useImageEditingContext } from './context';
@@ -93,7 +86,7 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 							{
 								slug: 'original',
 								name: __( 'Original' ),
-								aspect: defaultAspect,
+								ratio: defaultAspect,
 							},
 							...( showDefaultRatios
 								? defaultRatios
