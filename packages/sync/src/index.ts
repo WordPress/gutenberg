@@ -60,3 +60,23 @@ export { Awareness } from 'y-protocols/awareness';
 export { privateApis } from './private-apis';
 
 export type * from './types';
+
+// The engine/transport SEAM types, so engine and transport plugins can type
+// their adapters, session codecs, and providers against the framework.
+export type {
+	LocalAwarenessState,
+	AwarenessState,
+	EngineUpdate,
+	EngineDisposition,
+	EngineLocalUpdateListener,
+	EngineSessionCodec,
+} from './engines/session';
+
+// The engine SPI: an engine plugin implements `SyncEngine` (a factory of
+// per-entity/collection cores) and composes it with `createSyncManager`.
+export type {
+	SyncEngine,
+	EngineEntity,
+	EngineCollection,
+	EngineEntityObservers,
+} from './engines/engine';

@@ -1,10 +1,12 @@
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { describe, expect, it, jest } from '@jest/globals';
 import { Y } from '@wordpress/sync';
+
 /**
  * Mock block schemas and sync providers.
  */
 jest.mock( '@wordpress/blocks', () => {
 	const actual = jest.requireActual( '@wordpress/blocks' );
+
 	return {
 		...actual,
 		getBlockTypes: () => [
@@ -18,17 +20,10 @@ jest.mock( '@wordpress/blocks', () => {
 		],
 	};
 } );
-jest.mock( '../../../../sync/src/providers', () => ( {
-	getProviderCreators: jest.fn(),
-} ) );
-import { createSyncManager } from '../../../../sync/src/manager';
-import { getProviderCreators } from '../../../../sync/src/providers';
 import { CRDT_RECORD_MAP_KEY } from '../../sync';
 import { applyPostChangesToCRDTDoc } from '../crdt';
 import { deserializeBlockAttributes, mergeCrdtBlocks } from '../crdt-blocks';
 import { getRootMap } from '../crdt-utils';
-
-const mockGetProviderCreators = jest.mocked( getProviderCreators );
 
 const SYNCED_PROPERTIES = new Set( [ 'blocks' ] );
 const INITIAL_SECOND = '<em>b</em><em>i</em>';
@@ -139,21 +134,7 @@ function runSequenceWithApplyPostChangesToCRDTDoc( ydoc ) {
 	);
 }
 
-function waitForNextTick() {
-	return new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
-}
-
 describe( 'RTC rich-text cursor scope bug', () => {
-	beforeEach( () => {
-		jest.clearAllMocks();
-		mockGetProviderCreators.mockReturnValue( [
-			jest.fn( async () => ( {
-				destroy: jest.fn(),
-				on: jest.fn(),
-			} ) ),
-		] );
-	} );
-
 	it( 'keeps unrelated rich-text fields correct in mergeCrdtBlocks', () => {
 		const doc = new Y.Doc();
 		const yblocks = doc.getArray( 'blocks' );
@@ -191,63 +172,5 @@ describe( 'RTC rich-text cursor scope bug', () => {
 
 		expect( readSecondFromDoc( doc ) ).toBe( FINAL_SECOND );
 		expect( readVisibleSecondFromDoc( doc ) ).toBe( FINAL_SECOND );
-	} );
-
-	it( 'keeps unrelated rich-text fields correct in SyncManager.update', async () => {
-		let capturedDoc;
-		const manager = createSyncManager();
-		const handlers = {
-			addUndoMeta: jest.fn(),
-			editRecord: jest.fn(),
-			getEditedRecord: jest.fn( async () => ( {
-				id: 1,
-				blocks: [ makeBlock( '', INITIAL_SECOND ) ],
-			} ) ),
-			onStatusChange: jest.fn(),
-			persistCRDTDoc: jest.fn(),
-			refetchRecord: jest.fn( async () => {} ),
-			restoreUndoMeta: jest.fn(),
-		};
-		const syncConfig = {
-			applyChangesToCRDTDoc: ( ydoc, changes ) => {
-				capturedDoc = ydoc;
-				applyPostChangesToCRDTDoc( ydoc, changes, SYNCED_PROPERTIES );
-			},
-			createAwareness: jest.fn(),
-			getChangesFromCRDTDoc: jest.fn( () => ( {} ) ),
-			getPersistedCRDTDoc: jest.fn( () => null ),
-		};
-
-		await manager.load(
-			syncConfig,
-			'postType/post',
-			'1',
-			{ id: 1, blocks: [ makeBlock( '', INITIAL_SECOND ) ] },
-			handlers
-		);
-
-		for ( const [ first, second, offset ] of [
-			[ 'x', HIDDEN_SECOND, 1 ],
-			[ 'xy', STEP_TWO_SECOND, 2 ],
-			[ 'xyq', FINAL_SECOND, 3 ],
-		] ) {
-			manager.update(
-				'postType/post',
-				'1',
-				{
-					blocks: [ makeBlock( first, second ) ],
-					selection: getSelection( offset ),
-				},
-				'LOCAL_EDITOR_ORIGIN'
-			);
-			// Selection history writes are deferred. Wait one tick before
-			// inspecting the document.
-			await waitForNextTick();
-		}
-
-		expect( readSecondFromDoc( capturedDoc ) ).toBe( FINAL_SECOND );
-		expect( readVisibleSecondFromDoc( capturedDoc ) ).toBe( FINAL_SECOND );
-
-		manager.unload( 'postType/post', '1' );
 	} );
 } );

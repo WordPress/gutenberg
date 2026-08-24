@@ -1,26 +1,28 @@
 import type { UndoManager as WPUndoManager } from '@wordpress/undo-manager';
 import type * as Y from 'yjs';
 import type { Awareness } from 'y-protocols/awareness';
+import type { EngineSessionCodec } from './engines/session';
 import type { ConnectionError } from './errors';
 
 /* globalThis */
 declare global {
 	interface Window {
 		__experimentalEnableRealTimeCollaboration?: boolean;
+		_wpCollaborationUserId?: number;
+		_wpCollaborationWebSocketUrl?: string;
+		_wpCollaborationSync?: {
+			engine?: string;
+			engineProtocol?: number;
+			transports?: string[];
+			transportProtocol?: number;
+		};
 	}
 }
 
 export type CRDTDoc = Y.Doc;
-export type AwarenessID = string;
 export type EntityID = string;
 export type ObjectID = string;
 export type ObjectType = string;
-
-// An origin is a value passed by the transactor to identify the source of a
-// change. It can be any value, and is not used internally by Yjs. Origins are
-// preserved locally, while a remote change will have the provider instance as
-// its origin.
-export type Origin = any;
 
 // Object data represents any entity record. There are not any expectations that
 // can hold on its shape, beyond a record with string keys and unknown values.
@@ -47,6 +49,12 @@ export type ProviderOn = < K extends keyof ProviderEventMap >(
 export interface ProviderCreatorResult {
 	destroy: () => void;
 	on: ProviderOn;
+	/**
+	 * Best-effort: reconnect / poll immediately after a connection error.
+	 * Called by the manager's `retry()` (driven by the editor's connection-
+	 * error UI). Optional — transports without an explicit retry are skipped.
+	 */
+	retry?: () => void;
 }
 
 /**
@@ -89,13 +97,14 @@ export type OnStatusChangeCallback = (
 ) => void;
 
 /**
- * Options passed to a provider creator function when initializing a sync provider.
+ * Options passed to a provider creator function when initializing a sync
+ * provider. Providers receive an engine session codec — never the engine's
+ * internal state (e.g. a Y.Doc) — so transports stay engine-agnostic.
  */
 export interface ProviderCreatorOptions {
 	objectType: ObjectType;
 	objectId: ObjectID | null;
-	ydoc: Y.Doc;
-	awareness?: Awareness;
+	session: EngineSessionCodec;
 }
 
 export type ProviderCreator = (
@@ -187,6 +196,14 @@ export interface SyncManager {
 	undoManager: SyncUndoManager | undefined;
 	unload: ( objectType: ObjectType, objectId: ObjectID ) => void;
 	unloadAll: () => void;
+	/**
+	 * Retries the active connection(s) after a connection error — the
+	 * transport-agnostic replacement for reaching into a specific transport.
+	 * Best-effort: it asks every live provider to retry (see
+	 * `ProviderCreatorResult.retry`). Wired to the editor's connection-error
+	 * modal through `core-data`'s `retrySyncConnection`.
+	 */
+	retry?: () => void;
 	update: (
 		objectType: ObjectType,
 		objectId: ObjectID | null,

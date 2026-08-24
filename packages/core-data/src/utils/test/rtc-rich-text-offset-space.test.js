@@ -1,10 +1,12 @@
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { describe, expect, it, jest } from '@jest/globals';
 import { Y } from '@wordpress/sync';
+
 /**
  * Mock block schemas and sync providers.
  */
 jest.mock( '@wordpress/blocks', () => {
 	const actual = jest.requireActual( '@wordpress/blocks' );
+
 	return {
 		...actual,
 		getBlockTypes: () => [
@@ -17,17 +19,10 @@ jest.mock( '@wordpress/blocks', () => {
 		],
 	};
 } );
-jest.mock( '../../../../sync/src/providers', () => ( {
-	getProviderCreators: jest.fn(),
-} ) );
-import { createSyncManager } from '../../../../sync/src/manager';
-import { getProviderCreators } from '../../../../sync/src/providers';
 import { CRDT_RECORD_MAP_KEY, Delta } from '../../sync';
 import { applyPostChangesToCRDTDoc } from '../crdt';
 import { mergeCrdtBlocks } from '../crdt-blocks';
 import { getRootMap, richTextOffsetToHtmlIndex } from '../crdt-utils';
-
-const mockGetProviderCreators = jest.mocked( getProviderCreators );
 
 const SYNCED_PROPERTIES = new Set( [ 'blocks' ] );
 const OLD_HTML = '<em>italic</em><em>italic</em>';
@@ -85,10 +80,6 @@ function readFirstBlockContentFromDoc( ydoc ) {
 	const ymap = getRootMap( ydoc, CRDT_RECORD_MAP_KEY );
 	const yblocks = ymap.get( 'blocks' );
 	return readFirstBlockContentFromYBlocks( yblocks );
-}
-
-function waitForNextTick() {
-	return new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 }
 
 function createRandom( seed ) {
@@ -185,16 +176,6 @@ function assertEqualWithContext( actual, expected, context ) {
 }
 
 describe( 'RTC rich-text offset-space bug', () => {
-	beforeEach( () => {
-		jest.clearAllMocks();
-		mockGetProviderCreators.mockReturnValue( [
-			jest.fn( async () => ( {
-				destroy: jest.fn(),
-				on: jest.fn(),
-			} ) ),
-		] );
-	} );
-
 	it( 'preserves formatted paragraph content in mergeCrdtBlocks', () => {
 		const doc = new Y.Doc();
 		const yblocks = doc.getArray( 'blocks' );
@@ -402,54 +383,5 @@ describe( 'RTC rich-text offset-space bug', () => {
 		);
 
 		expect( readFirstBlockContentFromDoc( doc ) ).toBe( NEW_HTML );
-	} );
-
-	it( 'preserves formatted paragraph content in SyncManager.update', async () => {
-		let capturedDoc;
-		const manager = createSyncManager();
-		const handlers = {
-			addUndoMeta: jest.fn(),
-			editRecord: jest.fn(),
-			getEditedRecord: jest.fn( async () => ( {
-				id: 1,
-				blocks: [ makeParagraphBlock( OLD_HTML ) ],
-			} ) ),
-			onStatusChange: jest.fn(),
-			persistCRDTDoc: jest.fn(),
-			refetchRecord: jest.fn( async () => {} ),
-			restoreUndoMeta: jest.fn(),
-		};
-		const syncConfig = {
-			applyChangesToCRDTDoc: ( ydoc, changes ) => {
-				capturedDoc = ydoc;
-				applyPostChangesToCRDTDoc( ydoc, changes, SYNCED_PROPERTIES );
-			},
-			createAwareness: jest.fn(),
-			getChangesFromCRDTDoc: jest.fn( () => ( {} ) ),
-			getPersistedCRDTDoc: jest.fn( () => null ),
-		};
-
-		await manager.load(
-			syncConfig,
-			'postType/post',
-			'1',
-			{ id: 1, blocks: [ makeParagraphBlock( OLD_HTML ) ] },
-			handlers
-		);
-
-		manager.update(
-			'postType/post',
-			'1',
-			{
-				blocks: [ makeParagraphBlock( NEW_HTML ) ],
-				selection: getSelection(),
-			},
-			'LOCAL_EDITOR_ORIGIN'
-		);
-		await waitForNextTick();
-
-		expect( readFirstBlockContentFromDoc( capturedDoc ) ).toBe( NEW_HTML );
-
-		manager.unload( 'postType/post', '1' );
 	} );
 } );

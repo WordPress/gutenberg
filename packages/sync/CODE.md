@@ -1,6 +1,8 @@
 # Real-time collaboration
 
-The `sync` package provides the syncing layer for real-time collaboration. Each entity with sync enabled is represented by a CRDT ([Yjs](https://docs.yjs.dev/)) document. Local edits to an entity are applied to its CRDT document, which is synced with other peers via a provider. Those peers extract changes from the CRDT document and apply them to their local state.
+The `sync` package is the **engine-neutral substrate** for real-time collaboration: a generic sync-manager _shell_, two registries (engines and transports) with a client/server handshake, and the engine SPI that a collaboration engine implements. It ships **no engine and no transport** of its own — both live in a separate plugin (the Gutenberg Sync Engines plugin) and register through this package's unlockable private APIs (`registerSyncEngine` / `registerSyncTransport`) and the `sync.engines` / `sync.transports` / `sync.providers` filters. Without such a plugin, the registries are empty and collaboration degrades to the classic post lock.
+
+> **Note (post-split, 2026-08-10).** Much of the detail below — CRDT (`Y.Doc`) documents, HTTP polling, `Y.Doc` persistence, Yjs undo — describes the behavior of the built-in **yjs-relay** engine, which (with the transports) has moved into the plugin. The framework now only defines the seams they plug into. The generic manager (`createSyncManager( engine, { debug } )`) delegates all document meaning to an injected `SyncEngine` (see `src/engines/engine.ts`), including undo (`SyncEngine.createUndoManager`). This package no longer contains any engine or transport implementation — its only remaining Yjs references are the deliberate shared `Y` export and a couple of Yjs-typed contract types (`CRDTDoc`, `SyncUndoManager.addToScope`). For the full picture see `prototypes/sync/ARCHITECTURE.md`.
 
 Relevant docs and discussions:
 
@@ -11,8 +13,9 @@ Relevant docs and discussions:
 ## Key concepts
 
 -   **CRDT document**: A [Yjs `Y.Doc`](https://docs.yjs.dev/api/y.doc) that holds synced entity data. CRDTs (Conflict-free Replicated Data Types) allow concurrent edits from multiple peers to be merged automatically without conflicts.
--   **Sync manager**: Orchestrates the lifecycle of synced entities: creating CRDT documents, connecting providers, attaching observers, and coordinating updates.
--   **Provider**: A transport layer that syncs CRDT document updates between peers. The Real-Time Collaboration experiment uses HTTP polling by default; plugins can replace it via the `sync.providers` filter.
+-   **Sync manager**: The engine-neutral shell that orchestrates the lifecycle of synced entities — negotiating a transport, wiring the engine's session codec to it, coordinating the deferred-update policy, and connecting to `core-data`. It delegates all document meaning to the injected engine.
+-   **Engine**: Owns the _meaning_ of sync (how local edits become updates and received updates become entity changes). A plugin implements the `SyncEngine` SPI — `SyncEngine` → `EngineEntity` / `EngineCollection` → `EngineSessionCodec` (`src/engines/engine.ts`, `src/engines/session.ts`) — and composes it with `createSyncManager` in a `SyncEngineAdapter`.
+-   **Transport (provider)**: Moves engine updates between peers. The framework ships none; a plugin registers transports via `registerSyncTransport` / the `sync.transports` filter, and the active one is negotiated against the server announcement.
 -   **Awareness**: Ephemeral presence state (e.g., cursor positions, user identity) shared between peers. Unlike CRDT document state, awareness is not persisted.
 -   **Sync config**: An entity-level configuration object that defines how local changes are written to the CRDT document and how remote changes are extracted from it. See the `SyncConfig` type in `src/types.ts`.
 -   **Origin**: A value attached to each Yjs transaction to identify the source of a change (e.g., local editor, sync manager, undo manager, or remote peer). Origins are used to decide which changes should trigger store updates and which should be tracked by the undo manager.
@@ -56,51 +59,43 @@ The sync config (`SyncConfig` in `src/types.ts`) is an entity-level object that 
 
 The sync config "owns" the sync behavior of the entity; it has sole knowledge of the entity schema and edit flows. The sync config is defined and controlled by the `core-data` package.
 
-## Providers
+## Transports (providers)
 
-A provider is a transport layer that syncs Yjs document updates between peers. This package uses a pluggable provider system defined in `src/providers/`.
+A transport (provider) moves engine updates between peers. This package defines the transport **registry and negotiation** (`src/providers/index.ts`) but ships **no built-in transport** — they live in a plugin. The server announces the transports it supports (active-first); the client picks the first announced slug it has registered whose protocol matches, else it declines to connect (post lock).
 
-### Default HTTP polling provider
+### Registering a transport
 
-When the **Real-Time Collaboration** experiment is enabled, the default provider (`src/providers/http-polling/`) uses HTTP polling to exchange updates with a central sync server. Plugins can replace the polling provider through the `sync.providers` filter. A shared polling manager batches updates for all rooms (entities) into a single request per poll cycle. See [the HTTP polling README](./src/providers/http-polling/README.md) for full details including the REST API format, sync protocol, and compaction.
+A plugin registers a transport with `registerSyncTransport( { slug, protocolVersion, create } )` (via the unlocked private API) or by appending to the `sync.transports` filter. `create()` returns a `ProviderCreator`: an async function that receives `{ objectType, objectId, session }` — where `session` is the engine's `EngineSessionCodec`, so transports never see engine internals like a `Y.Doc` — and returns a `ProviderCreatorResult`:
 
--   Poll interval: 4 seconds when editing alone, 1 second when collaborators are detected.
--   The `sync.pollingManager.pollingInterval` and `sync.pollingManager.pollingIntervalWithCollaborators` filters can make active-tab polling faster, but slower values are clamped to the defaults.
--   On errors, the interval backs off according to the retry schedule before continuing at 30-second automatic retries.
--   Awareness state is sent and received alongside document updates in the same poll request.
-
-### Custom providers
-
-Plugins can replace or augment the default provider using the `sync.providers` WordPress filter hook. The filter receives an array of `ProviderCreator` functions and should return the same. Each `ProviderCreator` is an async function that receives `{ objectType, objectId, ydoc, awareness? }` and returns `{ destroy, on }`. The `on` method is used by the sync manager to listen for provider status events (e.g., connection state changes).
+-   **`on( event, callback )`**: the manager subscribes to `status` (connection state).
+-   **`destroy()`**: tear down the connection.
+-   **`retry?()`** _(optional)_: reconnect / poll immediately. The manager's transport-agnostic `retry()` calls this on every live provider (wired to the editor's connection-error UI via `core-data`'s `retrySyncConnection`).
 
 ```js
 import { addFilter } from '@wordpress/hooks';
-import { Y } from '@wordpress/sync';
 
-addFilter( 'sync.providers', 'my-plugin/websocket-provider', ( providers ) => {
-	// Replace the default HTTP polling provider with a WebSocket provider.
-	return [
-		async ( { objectType, objectId, ydoc, awareness } ) => {
-			const ws = new WebSocketProvider(
-				ydoc,
-				objectType,
-				objectId,
-				awareness
-			);
-
+addFilter( 'sync.transports', 'my-plugin/websocket', ( transports ) => [
+	...transports,
+	{
+		slug: 'websocket',
+		protocolVersion: 1,
+		create: () => async ( { objectType, objectId, session } ) => {
+			const ws = new MyWebSocketProvider( objectType, objectId, session );
 			return {
+				on: ( event, cb ) => ws.addEventListener( event, cb ),
 				destroy: () => ws.disconnect(),
-				on: ( event, callback ) =>
-					ws.addEventListener( event, callback ),
+				retry: () => ws.reconnect(),
 			};
 		},
-	];
-} );
+	},
+] );
 ```
+
+The built-in `http-polling` / `http-long-polling` / `websocket` transports now live in the Gutenberg Sync Engines plugin (`src/providers/`, one folder each); the polling manager, intervals (4 s alone / 1 s with collaborators), backoff, and REST format are documented there. Tests and the `sync.providers` filter (which replaces the negotiated provider list outright — used mainly for testing) remain in this package.
 
 ## Persistence
 
-CRDT documents can be persisted so that a user returning to an entity can restore its CRDT state (including the full edit history needed for proper merging). See `src/utils.ts` for serialization helpers.
+CRDT documents can be persisted so that a user returning to an entity can restore its CRDT state (including the full edit history needed for proper merging). This is the built-in Yjs engine's behavior; its serialization helpers now live in the plugin (`src/engines/yjs-relay/doc.ts`). The manager exposes it engine-neutrally through `EngineEntity.serialize()` / `hydrate()`.
 
 -   **Initialization problem**: Persisting CRDT documents establishes a shared starting point for all peers. This is critical to prevent data loss and ensure proper merging of concurrent edits.
 -   **Serialization**: The sync manager's `createPersistedCRDTDoc` method returns a serialized `Y.Doc`. The consumer is responsible for storing this string.
@@ -119,9 +114,9 @@ Awareness provides ephemeral presence information (cursor positions, user identi
 
 ## Undo / redo
 
-The `SyncUndoManager` (`src/undo-manager.ts`) replaces the default WordPress undo manager when synced entities are in use. It wraps Yjs's built-in undo functionality.
+Undo is **engine-provided**. The generic manager asks the injected engine for a session-scoped, sync-aware undo manager (`SyncEngine.createUndoManager()`), exposes it as `SyncManager.undoManager` — replacing the default WordPress undo manager while synced entities are loaded — and registers each entity with it (`EngineEntity.addToUndoScope`). An engine without collaborative undo leaves it undefined. This package keeps only the `SyncUndoManager` **type** (the WordPress-undo-manager contract core-data consumes).
 
--   **Lazy creation**: The undo manager is created when the first entity is loaded. If no entities are synced, the default WordPress undo manager is used.
--   **Automatic tracking**: Unlike the default undo manager, which explicitly records each edit, the `SyncUndoManager` relies on Yjs to track changes to observed `Y.Map` instances. Only changes with the local editor origin are tracked.
--   **Capture grouping**: Changes within 500ms of each other are grouped into a single undo step, preventing mid-word undo breaks.
--   **Limitation**: Once created, the `SyncUndoManager` only tracks synced entities. Edits to non-synced entities are not included in the undo stack.
+Collaborative undo is engine-specific by nature — it must undo only the local client's changes and rebase them over concurrent remote edits, which depends on the merge model — so each engine implements its own:
+
+-   **Yjs relay** (in the plugin): wraps Yjs's undo (`YMultiDocUndoManager`) — Yjs tracks changes to observed `Y.Map`s per entity, gives each peer its own stack, groups edits within 500ms, and tracks only local-origin changes.
+-   **Intent-log** (planned): inverse intents — invert the user's own local intents and re-author them, letting the server rebase like any intent (see `prototypes/sync/ARCHITECTURE.md` → _Open items / TODOs_). It currently leaves undo undefined.
