@@ -12,6 +12,7 @@
 
 ### Bug Fixes
 
+-   Post Excerpt: Trim the excerpt on the server with the REST API's `excerpt_length` parameter instead of filtering `excerpt_length` for every admin request, and keep the excerpt of each length apart so returning to a length already requested no longer shows the excerpt of another length ([#69090](https://github.com/WordPress/gutenberg/pull/69090)).
 -   Icon: Apply only padding to the inner SVG in the editor, so margin is no longer applied twice compared to the front end ([#81292](https://github.com/WordPress/gutenberg/pull/81292)).
 -   Playlist: Attach the inner block drop zone to the track list, so Playlist Track blocks show insertion markers while being reordered.
 -   Playlist Track: Mark track media fields as content so toolbar inserters add an empty track instead of duplicating the selected track.
