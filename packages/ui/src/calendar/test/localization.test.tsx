@@ -206,9 +206,10 @@ describe( 'Calendar locale inputs', () => {
 		render( <Calendar defaultMonth={ TEST_DATE } locale="fa-IR" /> );
 
 		expectGregorianDate( 'fa-IR' );
-		expect(
-			screen.getByRole( 'application', { name: 'Date calendar' } )
-		).toHaveAttribute( 'dir', 'rtl' );
+		expect( screen.getByRole( 'application' ) ).toHaveAttribute(
+			'dir',
+			'rtl'
+		);
 	} );
 
 	it.each( [ 'not_a_locale', 'xx-XX' ] )(
@@ -400,9 +401,10 @@ describe( 'Calendar text direction fallback', () => {
 		( _, locale ) => {
 			render( <Calendar locale={ locale } /> );
 
-			expect(
-				screen.getByRole( 'group', { name: 'Date calendar' } )
-			).toHaveAttribute( 'dir', 'rtl' );
+			expect( screen.getByRole( 'application' ) ).toHaveAttribute(
+				'dir',
+				'rtl'
+			);
 		}
 	);
 } );
