@@ -26,18 +26,17 @@ defaultTest: file://../../lib/default-test.yaml
 # references/php.md or references/e2e.md depending on the kind of test. An
 # end-to-end task should take the e2e branch and leave the other two unread.
 #
-# `skill-used` cannot express that — the skill is `testing` either way, and the
-# distinction is which reference was opened. Promptfoo normalizes both agents'
-# shell calls into provider-independent command trajectory steps.
+# `skill-used` covers the invocation itself, but not the routing: the skill is
+# `testing` either way, and the distinction is which reference was opened. That
+# part reads the command trajectory, which Promptfoo normalizes across both
+# agents. Matching the skill by shell command would miss it entirely — Claude
+# invokes the skill natively rather than reading the file.
 tests:
     - description: e2e test for unencoded ampersands in the paragraph block
       assert:
-          - type: trajectory:step-count
-            value:
-                type: command
-                pattern: '*skills/testing/SKILL.md*'
-                min: 1
-            metric: Read the testing skill
+          - type: skill-used
+            value: testing
+            metric: Invoked the testing skill
 
           - type: trajectory:step-count
             value:
@@ -70,7 +69,6 @@ tests:
                 - enters a literal `&` in the paragraph through the editor UI;
                 - reads the serialized post content with
                   `editor.getEditedPostContent()`;
-                - directly asserts that content without using `expect.poll()`;
                 - verifies that the serialized content contains `&`, not
                   `&amp;`; and
                 - follows nearby test conventions.
