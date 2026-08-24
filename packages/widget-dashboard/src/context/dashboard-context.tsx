@@ -208,22 +208,35 @@ export function WidgetDashboardProvider( {
 	const canPerform = useDashboardPolicy() ?? ALLOW_EVERY_OPERATION;
 
 	// Every mutation stages through here. Instances the policy locks against
-	// removal are re-asserted, so no composed trigger can drop them.
+	// removal are re-asserted right after the nearest preceding instance that
+	// survived, so no composed trigger can drop or displace them.
 	const stageLayout = useCallback(
 		( next: DashboardWidget[] ) => {
 			setStagingLayout( ( previous ) => {
-				const kept = previous.filter(
-					( widget ) =>
-						! next.some( ( { uuid } ) => uuid === widget.uuid ) &&
-						! canPerform( {
-							operation: 'remove',
-							widget,
-							widgetType: widgetTypes.find(
-								( type ) => type.name === widget.type
-							),
-						} )
-				);
-				return kept.length === 0 ? next : [ ...next, ...kept ];
+				const staged = [ ...next ];
+				let insertAt = 0;
+				previous.forEach( ( widget ) => {
+					const position = staged.findIndex(
+						( { uuid } ) => uuid === widget.uuid
+					);
+					if ( position !== -1 ) {
+						insertAt = position + 1;
+						return;
+					}
+					const removable = canPerform( {
+						operation: 'remove',
+						widget,
+						widgetType: widgetTypes.find(
+							( type ) => type.name === widget.type
+						),
+					} );
+					if ( removable ) {
+						return;
+					}
+					staged.splice( insertAt, 0, widget );
+					insertAt += 1;
+				} );
+				return staged.length === next.length ? next : staged;
 			} );
 		},
 		[ canPerform, widgetTypes ]

@@ -82,6 +82,22 @@ function ClearLayout() {
 	);
 }
 
+function RemoveInstance( { uuid }: { uuid: string } ) {
+	const { layout, onLayoutChange } = useDashboardInternalContext();
+	return (
+		<button
+			type="button"
+			onClick={ () =>
+				onLayoutChange(
+					layout.filter( ( widget ) => widget.uuid !== uuid )
+				)
+			}
+		>
+			Remove { uuid }
+		</button>
+	);
+}
+
 function OpenSettings() {
 	const { setSettingsWidgetUuid } = useDashboardUIContext();
 	return (
@@ -94,12 +110,17 @@ function OpenSettings() {
 interface HarnessProps {
 	canPerform?: CanPerformDashboardOperation;
 	editMode?: boolean;
+	layout?: DashboardWidget[];
 	children?: React.ReactNode;
 }
 
-function Harness( { canPerform, editMode = false, children }: HarnessProps ) {
-	const [ layout, setLayout ] =
-		useState< DashboardWidget[] >( initialLayout );
+function Harness( {
+	canPerform,
+	editMode = false,
+	layout: seed = initialLayout,
+	children,
+}: HarnessProps ) {
+	const [ layout, setLayout ] = useState< DashboardWidget[] >( seed );
 
 	const dashboard = (
 		<WidgetDashboard
@@ -248,6 +269,35 @@ describe( 'WidgetDashboard.Policy instance operations', () => {
 		await user.click( screen.getByRole( 'button', { name: 'Clear' } ) );
 
 		expect( screen.getByTestId( 'label' ) ).toHaveTextContent( 'Traffic' );
+	} );
+
+	it( 'keeps a re-asserted instance at its place', async () => {
+		const user = userEvent.setup();
+		const layout: DashboardWidget[] = [
+			initialLayout[ 0 ],
+			{
+				uuid: 'w2',
+				type: 'test/snapshot',
+				attributes: { metric: 'sales', label: 'Revenue' },
+				placement: { width: 1, height: 1 },
+			},
+		];
+		const lockFirst: CanPerformDashboardOperation = ( request ) =>
+			! (
+				request.operation === 'remove' && request.widget.uuid === 'w1'
+			);
+		render(
+			<Harness canPerform={ lockFirst } layout={ layout } editMode>
+				<RemoveInstance uuid="w1" />
+			</Harness>
+		);
+		await screen.findAllByTestId( 'label' );
+
+		await user.click( screen.getByRole( 'button', { name: 'Remove w1' } ) );
+
+		expect(
+			screen.getAllByTestId( 'label' ).map( ( node ) => node.textContent )
+		).toEqual( [ 'Traffic', 'Revenue' ] );
 	} );
 
 	it( 'lets staging drop an instance the policy allows to remove', async () => {
