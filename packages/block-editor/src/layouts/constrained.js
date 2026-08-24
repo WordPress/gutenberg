@@ -29,6 +29,14 @@ const GLOBAL_WIDE_SIZE = 'var(--wp--style--global--wide-size, none)';
 export default {
 	name: 'constrained',
 	label: __( 'Constrained' ),
+	hasInspectorControls( layoutBlockSupport = {} ) {
+		const {
+			allowJustification = true,
+			allowCustomContentAndWideSize = true,
+		} = layoutBlockSupport;
+
+		return allowJustification || allowCustomContentAndWideSize;
+	},
 	inspectorControls: function DefaultLayoutInspectorControls( {
 		layout,
 		onChange,
