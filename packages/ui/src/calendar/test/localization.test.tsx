@@ -1,7 +1,9 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { startOfDay } from 'date-fns';
 import { ckb, faIR, ug } from 'date-fns/locale';
 import { Calendar, RangeCalendar } from '..';
+import * as Tooltip from '../../tooltip';
 import {
 	dateNumberFormatter,
 	fullDateFormatter,
@@ -32,7 +34,7 @@ function expectGregorianDate( localeCode: string ) {
 jest.mock( '@wordpress/i18n', () => {
 	const actual = jest.requireActual( '@wordpress/i18n' );
 	const translations: Record< string, string > = {
-		'Go to the Previous Month': 'Translated previous month',
+		'Previous month': 'Translated previous month',
 		'Navigation bar': 'Translated navigation bar',
 		'Today, %s, selected': 'Today and selected: %s',
 	};
@@ -88,6 +90,34 @@ describe.each( [
 			} )
 		).toBeVisible();
 	} );
+
+	it.each( [
+		[ 'previous', 'Previous test month', 'labelPrevious' ],
+		[ 'next', 'Next test month', 'labelNext' ],
+		[ 'default previous', 'Translated previous month', undefined ],
+		[ 'default next', 'Next month', undefined ],
+	] as const )(
+		'shows the %s month button label in a tooltip',
+		async ( _direction, label, labelKey ) => {
+			const user = userEvent.setup();
+
+			render(
+				<Tooltip.Provider delay={ 0 }>
+					<Component
+						labels={
+							labelKey ? { [ labelKey ]: () => label } : undefined
+						}
+					/>
+				</Tooltip.Provider>
+			);
+
+			await user.hover( screen.getByRole( 'button', { name: label } ) );
+
+			await waitFor( () => {
+				expect( screen.getByText( label ) ).toBeVisible();
+			} );
+		}
+	);
 } );
 
 describe( 'Calendar locale inputs', () => {
