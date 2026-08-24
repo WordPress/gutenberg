@@ -1,5 +1,10 @@
-import { useInnerBlocksProps } from '@wordpress/block-editor';
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 
 export default function TableRowEdit() {
-	return <tr { ...useInnerBlocksProps() } />;
+	const innerBlocksProps = useInnerBlocksProps( useBlockProps(), {
+		renderAppender: false,
+		__unstableDisableDropZone: true,
+	} );
+
+	return <tr { ...innerBlocksProps } />;
 }

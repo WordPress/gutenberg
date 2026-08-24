@@ -309,11 +309,6 @@ export const multiSelect =
 		const startBlockRootClientId = select.getBlockRootClientId( start );
 		const endBlockRootClientId = select.getBlockRootClientId( end );
 
-		// Only allow block multi-selections at the same level.
-		if ( startBlockRootClientId !== endBlockRootClientId ) {
-			return;
-		}
-
 		const defaultMultiSelect = (
 			defaultStart = start,
 			defaultEnd = end,
@@ -327,14 +322,29 @@ export const multiSelect =
 			} );
 		};
 
-		const { onMultiSelect } =
-			select.getBlockListSettings( startBlockRootClientId ) || {};
+		// Walk up the ancestor chain to find a block with onMultiSelect,
+		// allowing nested structures like table-v2 to intercept
+		// multi-selections of deeply nested blocks.
+		let handlerRootClientId = startBlockRootClientId;
+		let onMultiSelect;
+		while ( handlerRootClientId ) {
+			const settings = select.getBlockListSettings( handlerRootClientId );
+			if ( settings?.onMultiSelect ) {
+				const endParents = select.getBlockParents( end, true );
+				if ( endParents.includes( handlerRootClientId ) ) {
+					onMultiSelect = settings.onMultiSelect;
+					break;
+				}
+			}
+			handlerRootClientId =
+				select.getBlockRootClientId( handlerRootClientId );
+		}
 
 		if ( onMultiSelect ) {
 			onMultiSelect( {
 				startClientId: start,
 				endClientId: end,
-				rootClientId: startBlockRootClientId,
+				rootClientId: handlerRootClientId,
 				initialPosition: __experimentalInitialPosition,
 				select,
 				dispatch: {
@@ -344,6 +354,11 @@ export const multiSelect =
 				},
 			} );
 		} else {
+			// Only allow block multi-selections at the same level.
+			if ( startBlockRootClientId !== endBlockRootClientId ) {
+				return;
+			}
+
 			defaultMultiSelect();
 		}
 

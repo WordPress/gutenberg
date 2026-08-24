@@ -1,8 +1,13 @@
-import { useInnerBlocksProps } from '@wordpress/block-editor';
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 
 export default function TableSectionEdit( { attributes } ) {
 	const { type } = attributes;
 	const TagName = `t${ type }`;
 
-	return <TagName { ...useInnerBlocksProps() } />;
+	const innerBlocksProps = useInnerBlocksProps( useBlockProps(), {
+		renderAppender: false,
+		__unstableDisableDropZone: true,
+	} );
+
+	return <TagName { ...innerBlocksProps } />;
 }
