@@ -1,5 +1,4 @@
 import { DayPicker } from '@daypicker/react';
-import { enUS } from '@daypicker/react/locale';
 import { forwardRef, useCallback, useMemo } from '@wordpress/element';
 import { COMMON_PROPS } from './utils/constants';
 import { clampNumberOfMonths } from './utils/misc';
@@ -24,7 +23,7 @@ export const Calendar = forwardRef< HTMLDivElement, CalendarProps >(
 			value: valueProp,
 			onValueChange,
 			numberOfMonths = 1,
-			locale = enUS,
+			locale,
 			timeZone,
 			month,
 			render,

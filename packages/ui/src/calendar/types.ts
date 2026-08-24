@@ -245,12 +245,12 @@ export interface BaseProps
 		labelGridcell?: ( date: Date, modifiers?: Modifiers ) => string;
 		/**
 		 * The label for the "next month" button.
-		 * @default "Go to the Next Month"
+		 * @default "Next month"
 		 */
 		labelNext?: ( month: Date | undefined ) => string;
 		/**
 		 * The label for the "previous month" button.
-		 * @default "Go to the Previous Month"
+		 * @default "Previous month"
 		 */
 		labelPrevious?: ( month: Date | undefined ) => string;
 		/**

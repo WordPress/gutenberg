@@ -1,7 +1,10 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { startOfDay } from 'date-fns';
 import { ckb, faIR, ug } from 'date-fns/locale';
+import { isRTL } from '@wordpress/i18n';
 import { Calendar, RangeCalendar } from '..';
+import * as Tooltip from '../../tooltip';
 import {
 	dateNumberFormatter,
 	fullDateFormatter,
@@ -32,7 +35,7 @@ function expectGregorianDate( localeCode: string ) {
 jest.mock( '@wordpress/i18n', () => {
 	const actual = jest.requireActual( '@wordpress/i18n' );
 	const translations: Record< string, string > = {
-		'Go to the Previous Month': 'Translated previous month',
+		'Previous month': 'Translated previous month',
 		'Navigation bar': 'Translated navigation bar',
 		'Today, %s, selected': 'Today and selected: %s',
 	};
@@ -40,8 +43,11 @@ jest.mock( '@wordpress/i18n', () => {
 	return {
 		...actual,
 		__: ( text: string ) => translations[ text ] ?? text,
+		isRTL: jest.fn(),
 	};
 } );
+
+const mockIsRTL = jest.mocked( isRTL );
 
 describe.each( [
 	[ 'Calendar', Calendar ],
@@ -88,6 +94,104 @@ describe.each( [
 			} )
 		).toBeVisible();
 	} );
+
+	it.each( [
+		[ 'previous', 'Previous test month', 'labelPrevious' ],
+		[ 'next', 'Next test month', 'labelNext' ],
+		[ 'default previous', 'Translated previous month', undefined ],
+		[ 'default next', 'Next month', undefined ],
+	] as const )(
+		'shows the %s month button label in a tooltip',
+		async ( _direction, label, labelKey ) => {
+			const user = userEvent.setup();
+
+			render(
+				<Tooltip.Provider delay={ 0 }>
+					<Component
+						labels={
+							labelKey ? { [ labelKey ]: () => label } : undefined
+						}
+					/>
+				</Tooltip.Provider>
+			);
+
+			await user.hover( screen.getByRole( 'button', { name: label } ) );
+
+			await waitFor( () => {
+				expect( screen.getByText( label ) ).toBeVisible();
+			} );
+		}
+	);
+} );
+
+describe.each( [
+	[ 'Calendar', Calendar ],
+	[ 'RangeCalendar', RangeCalendar ],
+] as const )( '%s text direction', ( _name, Component ) => {
+	beforeEach( () => {
+		mockIsRTL.mockReturnValue( false );
+	} );
+
+	it( 'uses the WordPress RTL direction when no locale is supplied', () => {
+		mockIsRTL.mockReturnValue( true );
+
+		render( <Component /> );
+
+		expect( screen.getByRole( 'application' ) ).toHaveAttribute(
+			'dir',
+			'rtl'
+		);
+	} );
+
+	it( 'uses the WordPress LTR direction when no locale is supplied', () => {
+		render( <Component /> );
+
+		expect( screen.getByRole( 'application' ) ).toHaveAttribute(
+			'dir',
+			'ltr'
+		);
+	} );
+
+	it( 'uses a supported RTL locale over the WordPress direction', () => {
+		render( <Component locale="fa-IR" /> );
+
+		expect( screen.getByRole( 'application' ) ).toHaveAttribute(
+			'dir',
+			'rtl'
+		);
+	} );
+
+	it( 'uses a supported LTR locale over the WordPress direction', () => {
+		mockIsRTL.mockReturnValue( true );
+
+		render( <Component locale="en-US" /> );
+
+		expect( screen.getByRole( 'application' ) ).toHaveAttribute(
+			'dir',
+			'ltr'
+		);
+	} );
+
+	it( 'uses the WordPress direction when an unsupported locale falls back to en-US formatting', () => {
+		mockIsRTL.mockReturnValue( true );
+
+		render( <Component defaultMonth={ TEST_DATE } locale="skr" /> );
+
+		expectGregorianDate( 'en-US' );
+		expect( screen.getByRole( 'application' ) ).toHaveAttribute(
+			'dir',
+			'rtl'
+		);
+	} );
+
+	it( 'lets an explicit direction override the computed direction', () => {
+		render( <Component locale="fa-IR" dir="ltr" /> );
+
+		expect( screen.getByRole( 'application' ) ).toHaveAttribute(
+			'dir',
+			'ltr'
+		);
+	} );
 } );
 
 describe( 'Calendar locale inputs', () => {
@@ -119,14 +223,6 @@ describe( 'Calendar locale inputs', () => {
 			expectGregorianDate( 'en-US' );
 		}
 	);
-
-	it( 'lets an explicit direction override the locale-derived direction', () => {
-		render( <Calendar locale="fa-IR" dir="ltr" /> );
-
-		expect(
-			screen.getByRole( 'application', { name: 'Date calendar' } )
-		).toHaveAttribute( 'dir', 'ltr' );
-	} );
 
 	it( 'derives the week start from a locale string', () => {
 		render( <Calendar defaultMonth={ TEST_DATE } locale="fa-IR" /> );
@@ -281,6 +377,20 @@ describe( 'Calendar text direction fallback', () => {
 				.getTextInfo;
 		}
 	} );
+
+	it.each( [
+		[ 'Sindhi', 'sd', 'rtl' ],
+		[ 'Latin-script Uyghur', 'ug-Latn', 'ltr' ],
+	] as const )(
+		'uses legacy Intl.Locale text information for %s',
+		( _, locale, direction ) => {
+			render( <Calendar locale={ locale } /> );
+
+			expect(
+				screen.getByRole( 'application', { name: 'Date calendar' } )
+			).toHaveAttribute( 'dir', direction );
+		}
+	);
 
 	it.each( [
 		[ 'Central Kurdish', ckb ],
