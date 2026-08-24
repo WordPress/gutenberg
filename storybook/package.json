@@ -31,13 +31,14 @@
 		"@emotion/styled": "^11.14.1",
 		"@storybook/addon-a11y": "^10.5.3",
 		"@storybook/addon-docs": "^10.5.3",
+		"@storybook/addon-vitest": "^10.5.3",
 		"@storybook/icons": "^2.0.1",
 		"@storybook/react-vite": "^10.5.3",
-		"@storybook/test-runner": "^0.24.2",
 		"@types/babel__core": "^7.20.5",
 		"@types/js-yaml": "^3.12.10",
 		"@types/react": "^18.3.27",
 		"@vitejs/plugin-react": "^6.0.5",
+		"@vitest/browser-playwright": "^4.1.10",
 		"@wordpress/admin-ui": "file:../packages/admin-ui",
 		"@wordpress/base-styles": "file:../packages/base-styles",
 		"@wordpress/block-editor": "file:../packages/block-editor",
@@ -63,8 +64,6 @@
 		"@wordpress/theme": "file:../packages/theme",
 		"@wordpress/ui": "file:../packages/ui",
 		"clsx": "^2.1.1",
-		"concurrently": "^9.2.1",
-		"http-server": "^14.1.1",
 		"js-yaml": "^3.15.0",
 		"playwright": "^1.62.1",
 		"prettier": "npm:wp-prettier@^3.0.3",
@@ -76,7 +75,7 @@
 		"terser": "^5.37.0",
 		"typescript": "npm:@typescript/typescript6@^6.0.2",
 		"vite": "^8.2.1",
-		"wait-on": "^8.0.1"
+		"vitest": "^4.1.10"
 	},
 	"publishConfig": {
 		"access": "public"
@@ -86,7 +85,8 @@
 		"postmanifest-snapshot": "prettier --write components-manifest.yml",
 		"storybook:build": "NODE_OPTIONS=--max-old-space-size=8192 storybook build -c . -o ./build && node ./scripts/inject-legacy-docgen.mjs ./build/manifests/components.json",
 		"storybook:dev": "storybook dev -c . -p 50240",
-		"test:smoke": "concurrently -k -s first -n \"SB,TEST\" -c \"magenta,blue\" \"http-server ./build --port 50240 --silent\" \"wait-on tcp:127.0.0.1:50240 && test-storybook --url http://localhost:50240 --config-dir .\"",
+		"test:smoke": "npm run test:smoke:build && vitest run --config vitest.config.ts",
+		"test:smoke:build": "node ./scripts/smoke-static-build.mjs",
 		"test:smoke:setup": "playwright install chromium --with-deps"
 	}
 }
