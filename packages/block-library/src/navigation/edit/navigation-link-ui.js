@@ -14,136 +14,97 @@ const BLOCKS_WITH_LINK_UI_SUPPORT = [
 export function NavigationLinkUI( {
 	insertedBlockClientId,
 	setInsertedBlockClientId,
-	editingBlock,
-	editingPopoverAnchor,
-	editingPopoverProps,
-	setEditingBlock,
 } ) {
 	const { updateBlockAttributes, removeBlock } =
 		useDispatch( blockEditorStore );
 
-	const activeBlockClientId = editingBlock?.clientId ?? insertedBlockClientId;
-
-	const { activeBlockName, activeBlockAttributes } = useSelect(
+	const { insertedBlockName, insertedBlockAttributes } = useSelect(
 		( select ) => {
 			const { getBlockName, getBlockAttributes } =
 				select( blockEditorStore );
 
 			return {
-				activeBlockName: getBlockName( activeBlockClientId ),
-				activeBlockAttributes:
-					getBlockAttributes( activeBlockClientId ),
+				insertedBlockName: getBlockName( insertedBlockClientId ),
+				insertedBlockAttributes: getBlockAttributes(
+					insertedBlockClientId
+				),
 			};
 		},
-		[ activeBlockClientId ]
+		[ insertedBlockClientId ]
 	);
 
-	const activeBlock = {
-		clientId: activeBlockClientId,
-		name: activeBlockName,
-		attributes: activeBlockAttributes || {},
-	};
-
-	const isEditingExistingBlock = Boolean( editingBlock?.clientId );
-	const supportsLinkControls = BLOCKS_WITH_LINK_UI_SUPPORT.includes(
-		activeBlock?.name
-	);
 	const showLinkControls =
-		supportsLinkControls && Boolean( activeBlockClientId );
+		BLOCKS_WITH_LINK_UI_SUPPORT?.includes( insertedBlockName );
 
-	// Get binding utilities for the active block.
+	// Get binding utilities for the inserted block
 	const { createBinding, clearBinding } = useEntityBinding( {
-		clientId: activeBlockClientId,
-		attributes: activeBlock.attributes,
+		clientId: insertedBlockClientId,
+		attributes: insertedBlockAttributes || {},
 	} );
 
-	if ( ! showLinkControls && ! isEditingExistingBlock ) {
-		return null;
-	}
-
-	if (
-		isEditingExistingBlock &&
-		editingPopoverProps &&
-		! editingPopoverAnchor
-	) {
+	if ( ! showLinkControls ) {
 		return null;
 	}
 
 	/**
-	 * Cleanup function for the currently active Navigation Link block.
+	 * Cleanup function for auto-inserted Navigation Link blocks.
 	 *
-	 * Removes a newly inserted block if it has no URL and clears the active
-	 * block state. Existing blocks are never removed on close.
+	 * Removes the block if it has no URL and clears the inserted block state.
+	 * This ensures consistent cleanup behavior across different contexts.
 	 */
-	const cleanupActiveBlock = () => {
+	const cleanupInsertedBlock = () => {
 		// Prevent automatic block selection when removing blocks in list view context
 		// This avoids focus stealing that would close the list view and switch to canvas
 		const shouldAutoSelectBlock = false;
 
 		// Follows the exact same pattern as Navigation Link block's onClose handler
-		// but only for newly inserted blocks, never while editing an existing link.
-		if (
-			! isEditingExistingBlock &&
-			! activeBlock.attributes?.url &&
-			activeBlockClientId
-		) {
+		// If there is no URL then remove the auto-inserted block to avoid empty blocks
+		if ( ! insertedBlockAttributes?.url && insertedBlockClientId ) {
 			// Remove the block entirely to avoid poor UX
 			// This matches the Navigation Link block's behavior
-			removeBlock( activeBlockClientId, shouldAutoSelectBlock );
+			removeBlock( insertedBlockClientId, shouldAutoSelectBlock );
 		}
-
-		if ( isEditingExistingBlock ) {
-			setEditingBlock?.( null );
-			return;
-		}
-
-		setInsertedBlockClientId?.( null );
+		setInsertedBlockClientId( null );
 	};
 
-	const setActiveBlockAttributes =
-		( _activeBlockClientId ) => ( _updatedAttributes ) => {
-			if ( ! _activeBlockClientId ) {
+	const setInsertedBlockAttributes =
+		( _insertedBlockClientId ) => ( _updatedAttributes ) => {
+			if ( ! _insertedBlockClientId ) {
 				return;
 			}
-			updateBlockAttributes( _activeBlockClientId, _updatedAttributes );
+			updateBlockAttributes( _insertedBlockClientId, _updatedAttributes );
 		};
 
-	const handleSetActiveBlock = ( newBlock ) => {
+	// Wrapper function to clean up original block when a new block is selected
+	const handleSetInsertedBlock = ( newBlock ) => {
 		// Prevent automatic block selection when removing blocks in list view context
 		// This avoids focus stealing that would close the list view and switch to canvas
 		const shouldAutoSelectBlock = false;
 
 		// If we have an existing inserted block and a new block is being set,
-		// remove the original block to avoid duplicates.
-		if ( ! isEditingExistingBlock && activeBlockClientId && newBlock ) {
-			removeBlock( activeBlockClientId, shouldAutoSelectBlock );
+		// remove the original block to avoid duplicates
+		if ( insertedBlockClientId && newBlock ) {
+			removeBlock( insertedBlockClientId, shouldAutoSelectBlock );
 		}
-
-		if ( isEditingExistingBlock ) {
-			setEditingBlock?.( newBlock );
-			return;
-		}
-
-		setInsertedBlockClientId?.( newBlock?.clientId ?? null );
+		setInsertedBlockClientId( newBlock?.clientId ?? null );
 	};
 
 	return (
 		<LinkUI
-			clientId={ activeBlockClientId }
-			link={ activeBlock.attributes }
-			anchor={ isEditingExistingBlock ? editingPopoverAnchor : undefined }
-			onBlockInsert={ handleSetActiveBlock }
-			onClose={ cleanupActiveBlock }
-			popoverProps={
-				isEditingExistingBlock ? editingPopoverProps : undefined
-			}
+			clientId={ insertedBlockClientId }
+			link={ insertedBlockAttributes }
+			onBlockInsert={ handleSetInsertedBlock }
+			onClose={ () => {
+				// Use cleanup function
+				cleanupInsertedBlock();
+			} }
 			onChange={ ( updatedValue ) => {
 				// updateAttributes determines the final state and returns metadata
 				const { isEntityLink, attributes: updatedAttributes } =
 					updateAttributes(
 						updatedValue,
-						setActiveBlockAttributes( activeBlockClientId ),
-						activeBlock.attributes
+						setInsertedBlockAttributes( insertedBlockClientId ),
+						insertedBlockAttributes
 					);
 
 				// Handle URL binding based on the final computed state
@@ -155,12 +116,7 @@ export function NavigationLinkUI( {
 					clearBinding();
 				}
 
-				if ( isEditingExistingBlock ) {
-					setEditingBlock?.( null );
-					return;
-				}
-
-				setInsertedBlockClientId?.( null );
+				setInsertedBlockClientId( null );
 			} }
 		/>
 	);

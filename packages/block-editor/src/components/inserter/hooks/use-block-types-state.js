@@ -12,6 +12,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { store as blockEditorStore } from '../../../store';
 import { isFiltered } from '../../../store/utils';
 import { unlock } from '../../../lock-unlock';
+
 /**
  * Retrieves the block types inserter state.
  *

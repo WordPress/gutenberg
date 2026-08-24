@@ -15,24 +15,41 @@ import { isFiltered } from '../../../store/utils';
 /**
  * Returns the blocks that should be inserted for a selected pattern.
  *
- * @param {Object}   pattern The selected pattern.
- * @param {Object[]} blocks  The parsed pattern blocks.
+ * @param {Object}   pattern          The selected pattern.
+ * @param {Object[]} blocks           The parsed pattern blocks.
+ * @param {string}   selectedCategory The selected pattern category.
  *
- * @return {Object[]} Pattern blocks to insert.
+ * @return {Object[]} Returns cloned blocks ready for insertion.
  */
-export const getPatternBlocksForInsertion = ( pattern, blocks ) => {
+export const getPatternBlocksForInsertion = (
+	pattern,
+	blocks,
+	selectedCategory
+) => {
+	let patternBlocks = blocks ?? [];
 	if (
 		pattern.type === INSERTER_PATTERN_TYPES.user &&
 		pattern.syncStatus !== 'unsynced'
 	) {
-		return [ createBlock( 'core/block', { ref: pattern.id } ) ];
+		patternBlocks = [ createBlock( 'core/block', { ref: pattern.id } ) ];
 	}
-
 	if ( pattern.type === INSERTER_PATTERN_TYPES.user && ! blocks?.length ) {
-		return [ createBlock( 'core/block', { ref: pattern.id } ) ];
+		patternBlocks = [ createBlock( 'core/block', { ref: pattern.id } ) ];
 	}
 
-	return blocks;
+	const clonedBlocks = patternBlocks.map( ( block ) => {
+		const clonedBlock = cloneBlock( block );
+		if (
+			clonedBlock.attributes.metadata?.categories?.includes(
+				selectedCategory
+			)
+		) {
+			clonedBlock.attributes.metadata.categories = [ selectedCategory ];
+		}
+		return clonedBlock;
+	} );
+
+	return clonedBlocks;
 };
 
 /**
@@ -135,22 +152,11 @@ const usePatternsState = (
 			}
 			const patternBlocks = getPatternBlocksForInsertion(
 				pattern,
-				blocks
+				blocks,
+				selectedCategory
 			);
 			onInsert(
-				( patternBlocks ?? [] ).map( ( block ) => {
-					const clonedBlock = cloneBlock( block );
-					if (
-						clonedBlock.attributes.metadata?.categories?.includes(
-							selectedCategory
-						)
-					) {
-						clonedBlock.attributes.metadata.categories = [
-							selectedCategory,
-						];
-					}
-					return clonedBlock;
-				} ),
+				patternBlocks,
 				pattern.name,
 				false,
 				destinationRootClientId

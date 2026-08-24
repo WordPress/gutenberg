@@ -3,16 +3,9 @@ import {
 	store as blockEditorStore,
 	BlockList,
 } from '@wordpress/block-editor';
-import { useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
-import {
-	useCallback,
-	useLayoutEffect,
-	useMemo,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 import { unlock } from '../../lock-unlock';
@@ -38,11 +31,6 @@ const PAGES_QUERY = [
 ];
 
 export default function NavigationMenuContent( { rootClientId } ) {
-	const [ editingBlock, setEditingBlock ] = useState( null );
-	const [ editingPopoverAnchor, setEditingPopoverAnchor ] = useState( null );
-	const listViewRef = useRef( null );
-	const isMobile = useViewportMatch( 'medium', '<' );
-
 	const { listViewRootClientId, isLoading } = useSelect(
 		( select ) => {
 			const {
@@ -99,80 +87,19 @@ export default function NavigationMenuContent( { rootClientId } ) {
 		[ __unstableMarkNextChangeAsNotPersistent, replaceBlock ]
 	);
 
-	useLayoutEffect( () => {
-		if ( ! editingBlock?.clientId || ! listViewRef.current ) {
-			setEditingPopoverAnchor( null );
-			return;
-		}
-
-		setEditingPopoverAnchor(
-			listViewRef.current.querySelector(
-				`[data-block="${ editingBlock.clientId }"]`
-			)
-		);
-	}, [ editingBlock ] );
-
-	const editingPopoverProps = useMemo(
-		() =>
-			isMobile
-				? undefined
-				: {
-						placement: 'right-start',
-						offset: 16,
-				  },
-		[ isMobile ]
-	);
-
-	const LeafMoreMenuWithEditingBlock = useCallback(
-		( props ) => {
-			return (
-				<LeafMoreMenu
-					{ ...props }
-					setEditingBlock={ setEditingBlock }
-				/>
-			);
-		},
-		[ setEditingBlock ]
-	);
-
-	const NavigationLinkUIWithEditingBlock = useCallback(
-		( props ) => {
-			return (
-				<NavigationLinkUI
-					{ ...props }
-					editingBlock={ editingBlock }
-					editingPopoverAnchor={ editingPopoverAnchor }
-					editingPopoverProps={ editingPopoverProps }
-					setEditingBlock={ setEditingBlock }
-				/>
-			);
-		},
-		[
-			editingBlock,
-			editingPopoverAnchor,
-			editingPopoverProps,
-			setEditingBlock,
-		]
-	);
-
 	// The hidden block is needed because it makes block edit side effects trigger.
 	// For example a navigation page list load its items has an effect on edit to load its items.
 	return (
 		<>
 			{ ! isLoading && (
-				<>
-					<PrivateListView
-						ref={ listViewRef }
-						rootClientId={ listViewRootClientId }
-						onSelect={ offCanvasOnselect }
-						blockSettingsMenu={ LeafMoreMenuWithEditingBlock }
-						showAppender
-						additionalBlockContent={
-							NavigationLinkUIWithEditingBlock
-						}
-						isExpanded
-					/>
-				</>
+				<PrivateListView
+					rootClientId={ listViewRootClientId }
+					onSelect={ offCanvasOnselect }
+					blockSettingsMenu={ LeafMoreMenu }
+					showAppender
+					additionalBlockContent={ NavigationLinkUI }
+					isExpanded
+				/>
 			) }
 			<div className="edit-site-sidebar-navigation-screen-navigation-menus__helper-block-editor">
 				<BlockList />
