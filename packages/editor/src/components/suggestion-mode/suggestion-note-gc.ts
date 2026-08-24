@@ -27,10 +27,19 @@
  * register their comment id as in flight (provider.js) for their duration,
  * and the note's local record must still be pending (`status: 'hold'`, no
  * `_wp_suggestion_status`) at collection time.
+ *
+ * A note somebody has replied to is never collected (#81958). Trashing a root
+ * comment takes its replies with it, so collecting one would turn "I withdrew
+ * my suggestion" into "I deleted your comment" — silently, and for a reply the
+ * person pressing Ctrl+Z may never have seen. The note is kept and the
+ * withdrawal announced instead, the same trade the format-toggle path makes
+ * (see suggestion-format-keyboard.ts).
  */
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as noticesStore } from '@wordpress/notices';
+import { __ } from '@wordpress/i18n';
 // @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSuggestionOverlay } from './overlay-context';
@@ -46,7 +55,7 @@ import {
 import { findSuggestionRange } from '../inline-suggestions';
 import { getNoteIdsFromMetadata } from '../collab-sidebar/utils';
 import { store as editorStore } from '../../store';
-import { useNoteThreads } from '../collab-sidebar/hooks';
+import { getNoteThreadsQuery, useNoteThreads } from '../collab-sidebar/hooks';
 
 /*
  * Grace period between observing an anchor's disappearance and trashing the
@@ -160,6 +169,7 @@ export default function SuggestionNoteGC() {
 	const { notes } = useNoteThreads( postId );
 	const { entries, clearOverlay } = useSuggestionOverlay();
 	const { saveEntityRecord } = useDispatch( coreStore );
+	const { createNotice } = useDispatch( noticesStore );
 	const registry = useRegistry();
 
 	// Pending suggestion root notes only; replies and resolved notes have no
@@ -262,10 +272,43 @@ export default function SuggestionNoteGC() {
 	const seenRef = useRef( new Set() );
 	// Scheduled collections, keyed by note id.
 	const timersRef = useRef( new Map() );
+	/*
+	 * Notes spared because they carry replies. Kept so the reprieve is decided
+	 * — and announced — once per withdrawal rather than on every later edit
+	 * that re-runs the probe. Cleared when the anchor comes back, so a note
+	 * whose replies are gone by the next withdrawal is collected normally.
+	 */
+	const keptRef = useRef( new Set< string >() );
 
 	useEffect( () => {
 		const blockEditor = registry.select( blockEditorStore );
 		const timers = timersRef.current;
+
+		/*
+		 * Whether anyone has answered this note. An unresolved thread list
+		 * answers "unknown", not "none": the fetch is async, so a collection
+		 * scheduled before it lands would otherwise report no replies and
+		 * trash a discussion. Fail closed — keeping a note that proposes
+		 * nothing is a tidiness problem the user can resolve, while deleting
+		 * someone's reply cannot be undone.
+		 */
+		const hasReplies = ( noteId: number | string ) => {
+			// Same query `useNoteThreads` fetched with, so this reads the list
+			// already in the cache rather than asking for one of its own.
+			const threads: any = registry
+				.select( coreStore )
+				.getEntityRecords(
+					'root',
+					'comment',
+					getNoteThreadsQuery( postId as number )
+				);
+			if ( ! threads ) {
+				return true;
+			}
+			return threads.some(
+				( thread: any ) => String( thread.parent ) === String( noteId )
+			);
+		};
 
 		const collect = ( note: any, anchor: any ) => {
 			timers.delete( String( note.id ) );
@@ -288,6 +331,20 @@ export default function SuggestionNoteGC() {
 				record.status !== 'hold' ||
 				( lifecycleStatus && lifecycleStatus !== 'pending' )
 			) {
+				return;
+			}
+			// The note is a discussion now, not just a proposal: keep it, and
+			// say so — the person who withdrew the suggestion is the only one
+			// who can see that the note outlived it.
+			if ( hasReplies( note.id ) ) {
+				keptRef.current.add( String( note.id ) );
+				createNotice(
+					'info',
+					__(
+						'Suggestion withdrawn. The note is kept because it has replies.'
+					),
+					{ type: 'snackbar', isDismissible: true }
+				);
 				return;
 			}
 			saveEntityRecord(
@@ -336,6 +393,7 @@ export default function SuggestionNoteGC() {
 			);
 			if ( present ) {
 				seenRef.current.add( idKey );
+				keptRef.current.delete( idKey );
 				if ( timers.has( idKey ) ) {
 					clearTimeout( timers.get( idKey ) );
 					timers.delete( idKey );
@@ -345,6 +403,7 @@ export default function SuggestionNoteGC() {
 			if (
 				! seenRef.current.has( idKey ) ||
 				timers.has( idKey ) ||
+				keptRef.current.has( idKey ) ||
 				isSuggestionDecisionInFlight( note.id )
 			) {
 				continue;
