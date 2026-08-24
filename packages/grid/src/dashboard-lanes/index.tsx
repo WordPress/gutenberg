@@ -577,6 +577,12 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 										itemStyles.get( id ) ?? {}
 									}
 									disabled={ ! editMode }
+									draggable={
+										layoutMap.get( id )?.draggable !== false
+									}
+									resizable={
+										layoutMap.get( id )?.resizable !== false
+									}
 									interacting={ interacting }
 									dragging={ activeId !== null }
 									onResize={ handleResize }

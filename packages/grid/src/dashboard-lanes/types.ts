@@ -36,6 +36,20 @@ export type DashboardLanesLayoutItem = {
 	lane?: number;
 
 	/**
+	 * Whether the item can be dragged while the surface is in edit mode.
+	 *
+	 * @default true
+	 */
+	draggable?: boolean;
+
+	/**
+	 * Whether the item can be resized while the surface is in edit mode.
+	 *
+	 * @default true
+	 */
+	resizable?: boolean;
+
+	/**
 	 * Display order. Lower values render first. When omitted, the
 	 * item falls back to its index in the `layout` array.
 	 */

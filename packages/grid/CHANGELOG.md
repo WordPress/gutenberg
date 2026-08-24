@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### New Features
+
+-   Layout items accept `draggable` and `resizable` flags, so a surface in
+    edit mode can keep individual tiles fixed in place or at their size.
+
 ### Internal
 
 -   Point tsconfig references at split dependencies' build projects. ([#81514](https://github.com/WordPress/gutenberg/pull/81514), [#81518](https://github.com/WordPress/gutenberg/pull/81518))

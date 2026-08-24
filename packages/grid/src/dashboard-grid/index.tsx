@@ -662,6 +662,12 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 								}
 								maxColumns={ effectiveColumns }
 								disabled={ ! editMode }
+								draggable={
+									layoutMap.get( id )?.draggable !== false
+								}
+								resizable={
+									layoutMap.get( id )?.resizable !== false
+								}
 								verticalResizable={ rowHeight !== 'auto' }
 								interacting={ activeId !== null || isResizing }
 								dragging={ activeId !== null }
