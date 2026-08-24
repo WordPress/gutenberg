@@ -214,6 +214,74 @@ describe( 'CustomGradientBar', () => {
 		] );
 	} );
 
+	// Dragging is driven by window-level listeners attached on mousedown, and
+	// the position comes from the markers container's box, so that has to be
+	// given one in jsdom.
+	it( 'moves a control point when dragged', () => {
+		const onChange = jest.fn();
+
+		const { container } = render(
+			<CustomGradientBar
+				background="linear-gradient(90deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)"
+				hasGradient
+				value={ POINTS }
+				onChange={ onChange }
+			/>
+		);
+
+		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+		const markers = container.querySelector(
+			'.components-custom-gradient-picker__markers-container'
+		) as HTMLElement;
+		markers.getBoundingClientRect = () =>
+			( { x: 0, width: 200 } ) as DOMRect;
+
+		const [ firstPoint ] = screen.getAllByRole( 'button', {
+			name: /Gradient control point/,
+		} );
+
+		fireEvent.mouseDown( firstPoint );
+		fireEvent.mouseMove( window, { clientX: 100 } );
+		fireEvent.mouseUp( window );
+
+		// 100px into a 200px container is 50%.
+		expect( onChange ).toHaveBeenCalledWith( [
+			{ position: 50, color: 'rgb(0,0,0)' },
+			POINTS[ 1 ],
+		] );
+	} );
+
+	it( 'does not move a control point when dragged and positioning is disabled', () => {
+		const onChange = jest.fn();
+
+		const { container } = render(
+			<CustomGradientBar
+				background="linear-gradient(90deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)"
+				hasGradient
+				disablePositioning
+				value={ POINTS }
+				onChange={ onChange }
+			/>
+		);
+
+		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+		const markers = container.querySelector(
+			'.components-custom-gradient-picker__markers-container'
+		) as HTMLElement;
+		markers.getBoundingClientRect = () =>
+			( { x: 0, width: 200 } ) as DOMRect;
+
+		const [ firstPoint ] = screen.getAllByRole( 'button', {
+			name: /Gradient control point/,
+		} );
+
+		fireEvent.mouseDown( firstPoint );
+		fireEvent.mouseMove( window, { clientX: 100 } );
+		fireEvent.mouseUp( window );
+
+		expect( onChange ).not.toHaveBeenCalled();
+	} );
+
 	it( 'does not move a control point when positioning is disabled', async () => {
 		const user = userEvent.setup();
 		const onChange = jest.fn();

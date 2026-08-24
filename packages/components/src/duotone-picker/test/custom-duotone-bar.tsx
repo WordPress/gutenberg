@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CustomDuotoneBar from '../custom-duotone-bar';
 
@@ -31,6 +31,22 @@ describe( 'CustomDuotoneBar', () => {
 		} );
 		firstPoint.focus();
 		await user.keyboard( '[ArrowRight][ArrowRight][ArrowLeft]' );
+
+		expect( onChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'ignores dragging a control point', () => {
+		const onChange = jest.fn();
+
+		render( <CustomDuotoneBar value={ VALUE } onChange={ onChange } /> );
+
+		const [ firstPoint ] = screen.getAllByRole( 'button', {
+			name: /Gradient control point/,
+		} );
+
+		fireEvent.mouseDown( firstPoint );
+		fireEvent.mouseMove( window, { clientX: 50 } );
+		fireEvent.mouseUp( window );
 
 		expect( onChange ).not.toHaveBeenCalled();
 	} );
