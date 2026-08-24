@@ -1,0 +1,28 @@
+# Coding agents shared by every evaluation spec.
+- id: anthropic:claude-agent-sdk
+  label: claude
+  config:
+      # Let the Claude CLI use its existing subscription login.
+      apiKeyRequired: false
+      model: opus
+      max_turns: 30
+      # Only project-level instructions, so the developer's own
+      # ~/.claude guidance cannot leak into the subject.
+      setting_sources: ['project']
+      # Use Bash for reads so Promptfoo can represent both Claude's Bash
+      # calls and Codex's exec_command calls as command trajectory steps.
+      tools: ['Bash', 'Edit', 'Write', 'Task']
+      custom_allowed_tools: ['Bash', 'Edit', 'Write', 'Task']
+      disallowed_tools: ['WebFetch', 'WebSearch']
+
+- id: openai:codex-sdk
+  label: codex
+  config:
+      sandbox_mode: workspace-write
+      approval_policy: never
+      network_access_enabled: false
+      web_search_mode: disabled
+      # Streaming emits Promptfoo's normalized Codex trajectory spans;
+      # deep tracing connects the Codex CLI's own spans to the trace.
+      enable_streaming: true
+      deep_tracing: true

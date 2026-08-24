@@ -1,0 +1,84 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+
+# Both agents live in this config; Promptfoo runs the matrix. Use
+# `--filter-providers claude` (or `codex`) to run just one. Shared tracing
+# lives in ../../lib/promptfooconfig.yaml.
+description: Verify an e2e task routes through the testing skill to the e2e reference only
+
+tracing:
+    $ref: lib/promptfooconfig.yaml#/tracing
+
+prompts:
+    - label: Add an e2e test
+      raw: >
+          Add an end-to-end test for the paragraph block covering this
+          behaviour: typing an ampersand (`&`) into a paragraph in the editor
+          must leave it as `&`, not encode it as `&amp;`.
+
+extensions:
+    - file://../../lib/workspace-extension.mjs:extensionHook
+
+providers: file://../../lib/providers.yaml
+
+defaultTest: file://../../lib/default-test.yaml
+
+# `skills/testing/SKILL.md` is a router: it defers to references/jest.md,
+# references/php.md or references/e2e.md depending on the kind of test. An
+# end-to-end task should take the e2e branch and leave the other two unread.
+#
+# `skill-used` cannot express that — the skill is `testing` either way, and the
+# distinction is which reference was opened. Promptfoo normalizes both agents'
+# shell calls into provider-independent command trajectory steps.
+tests:
+    - description: e2e test for unencoded ampersands in the paragraph block
+      assert:
+          - type: trajectory:step-count
+            value:
+                type: command
+                pattern: '*skills/testing/SKILL.md*'
+                min: 1
+            metric: Read the testing skill
+
+          - type: trajectory:step-count
+            value:
+                type: command
+                pattern: '*skills/testing/references/e2e.md*'
+                min: 1
+            metric: Read the e2e reference
+
+          - type: trajectory:step-count
+            value:
+                type: command
+                pattern: '*skills/testing/references/jest.md*'
+                max: 0
+            metric: Skipped the Jest reference
+
+          - type: trajectory:step-count
+            value:
+                type: command
+                pattern: '*skills/testing/references/php.md*'
+                max: 0
+            metric: Skipped the PHPUnit reference
+
+          - type: agent-rubric
+            value: |
+                Inspect the available workspace's Git status, diff, and relevant
+                files. Read `skills/testing/references/e2e.md`. Pass only if the
+                change:
+                - adds a focused Gutenberg Playwright E2E test;
+                - stays scoped to the appropriate E2E test files;
+                - enters a literal `&` in the paragraph through the editor UI;
+                - reads the serialized post content with
+                  `editor.getEditedPostContent()`;
+                - directly asserts that content without using `expect.poll()`;
+                - verifies that the serialized content contains `&`, not
+                  `&amp;`; and
+                - follows nearby test conventions.
+                Evaluate the workspace rather than claims in the response.
+            metric: Agent review of test quality
+
+evaluateOptions:
+    maxConcurrency: 2
+    repeat: 2
+
+outputPath: results/raw/testing.json
