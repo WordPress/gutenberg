@@ -65,7 +65,7 @@ export default function WelcomeBanner() {
 				{ __( 'Get started with WordPress' ) }
 			</Text>
 
-			<Stack className={ styles.columns }>
+			<Stack className={ styles.columns } align="start">
 				<FeatureHighlight
 					icon={ pencil }
 					title={ __(
