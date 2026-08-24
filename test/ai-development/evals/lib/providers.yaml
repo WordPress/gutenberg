@@ -9,10 +9,17 @@
       # Only project-level instructions, so the developer's own
       # ~/.claude guidance cannot leak into the subject.
       setting_sources: ['project']
+      # Enable every skill the workspace discovers. Omitting this is not
+      # "skills off" — it leaves the SDK unconfigured, and the repository's
+      # skills then go unlisted, which is indistinguishable from an agent
+      # choosing to ignore them.
+      skills: all
       # Use Bash for reads so Promptfoo can represent both Claude's Bash
       # calls and Codex's exec_command calls as command trajectory steps.
-      tools: ['Bash', 'Edit', 'Write', 'Task']
-      custom_allowed_tools: ['Bash', 'Edit', 'Write', 'Task']
+      # `custom_allowed_tools` replaces the allowed list outright, so Skill has
+      # to appear here for the skills above to be invocable at all.
+      tools: ['Bash', 'Edit', 'Write', 'Task', 'Skill']
+      custom_allowed_tools: ['Bash', 'Edit', 'Write', 'Task', 'Skill']
       disallowed_tools: ['WebFetch', 'WebSearch']
 
 - id: openai:codex-sdk
