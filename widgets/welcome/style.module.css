@@ -15,11 +15,13 @@
 	gap: var(--wpds-dimension-gap-2xl);
 	flex: 1;
 	align-items: start;
-	padding: 0 var(--wpds-dimension-padding-2xl) var(--wpds-dimension-padding-2xl);
-	margin: 0 var(--wpds-dimension-padding-2xl) var(--wpds-dimension-padding-2xl);
+	padding: 0 var(--wpds-dimension-padding-2xl)
+		var(--wpds-dimension-padding-2xl);
+	margin: 0 var(--wpds-dimension-padding-2xl)
+		var(--wpds-dimension-padding-2xl);
 }
 
-.root .sectionHeading {
+.root .section-heading {
 	padding: 0 var(--wpds-dimension-padding-2xl);
 	margin: 0 var(--wpds-dimension-padding-2xl);
 }
@@ -29,7 +31,7 @@
 		padding: var(--wpds-dimension-padding-lg);
 		margin: 0;
 	}
-	.root .sectionHeading {
+	.root .section-heading {
 		padding: 0 var(--wpds-dimension-padding-lg);
 		margin: 0;
 	}

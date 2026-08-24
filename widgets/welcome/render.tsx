@@ -58,7 +58,7 @@ export default function WelcomeBanner() {
 			<Banner />
 
 			<Text
-				className={ styles.sectionHeading }
+				className={ styles[ 'section-heading' ] }
 				variant="heading-lg"
 				render={ <h2 /> }
 			>
