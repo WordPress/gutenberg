@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch } from '@wordpress/data';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import ReviewGroup from './review-group';
 import {
 	groupByUnit,

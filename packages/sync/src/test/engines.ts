@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { afterEach, describe, expect, it } from '@jest/globals';
-
-/**
- * WordPress dependencies
- */
 import { addFilter, removeFilter } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
 import {
 	getAnnouncedSync,
 	getEngineAdapters,

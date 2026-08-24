@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { afterEach, describe, expect, it } from '@jest/globals';
-
-/**
- * WordPress dependencies
- */
 import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
-
-/**
- * Internal dependencies
- */
 import { privateApis } from '../private-apis';
 import { getEngineAdapters, resetEngineAdaptersForTesting } from '../engines';
 import {

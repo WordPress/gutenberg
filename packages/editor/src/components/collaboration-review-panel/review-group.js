@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import { canRestoreItems, REASON_LABELS } from './review-data';
 
 /**

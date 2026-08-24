@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
@@ -8,10 +5,6 @@ import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import {
 	canRestoreItems,
