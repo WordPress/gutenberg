@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add a private `SiteExport` menu item, moved from `edit-site`. It offers downloading the theme with the user's changes, only while editing a template or a template part — the entities the exported theme is made of ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+-   Add a private `SiteExport` menu item, moved from `edit-site`. It offers downloading the theme with the user's changes, only while editing a template or a template part — the entities the exported theme is made of ([#81992](https://github.com/WordPress/gutenberg/pull/81992)).
 
 ### Enhancements
 

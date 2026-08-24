@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Render the editor's Export tool, so a theme can be downloaded with the user's changes while editing a template or a template part ([#PRNUM](https://github.com/WordPress/gutenberg/pull/PRNUM)).
+-   Render the editor's Export tool, so a theme can be downloaded with the user's changes while editing a template or a template part ([#81992](https://github.com/WordPress/gutenberg/pull/81992)).
 
 ### Bug Fixes
 
