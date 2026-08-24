@@ -20,6 +20,7 @@ import { SETTINGS_DEFAULTS } from '@wordpress/block-editor';
  * @property {Array?}        allowedMimeTypes          List of allowed mime types and file extensions
  * @property {number}        maxUploadFileSize         Maximum upload file size
  * @property {boolean}       supportsLayout            Whether the editor supports layouts.
+ * @property {boolean}       autoAttachMediaEnabled    Whether media an Image or Gallery block displays is attached to the post on save, when it belongs to no post yet.
  */
 export const EDITOR_SETTINGS_DEFAULTS = {
 	...SETTINGS_DEFAULTS,
@@ -31,4 +32,5 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 	fontLibraryEnabled: true,
 	enableCustomFields: undefined,
 	defaultRenderingMode: 'post-only',
+	autoAttachMediaEnabled: true,
 };
