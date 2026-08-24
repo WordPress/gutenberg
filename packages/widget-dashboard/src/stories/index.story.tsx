@@ -1,11 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import type { ComponentType } from 'react';
+import type { ComponentProps, ComponentType } from 'react';
 // Form controls read these stylesheets, normally enqueued by WordPress.
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '@wordpress/components/build-style/style.css';
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '@wordpress/dataviews/build-style/style.css';
-import { useId, useMemo, useState } from '@wordpress/element';
+import { Page } from '@wordpress/admin-ui';
+import { useCallback, useMemo, useState } from '@wordpress/element';
 import { chartBar, download, trendingUp } from '@wordpress/icons';
 import type {
 	ResolveWidgetModule,
@@ -338,7 +339,7 @@ const meta: Meta< typeof WidgetDashboard > = {
 		docs: {
 			description: {
 				component: `
-\`WidgetDashboard\` is the stateless rendering engine for widget dashboards: the consumer owns the \`layout\` state, every mutation flows back through \`onLayoutChange\`, and widget types arrive through the \`widgetTypes\` prop.
+\`WidgetDashboard\` is the stateless rendering engine for widget dashboards: the consumer owns the \`layout\` state, every mutation flows back through \`onLayoutChange\`, and widget types arrive through the \`widgetTypes\` prop. What users may do on it is the application's answer, given through \`WidgetDashboard.Policy\`.
 `,
 			},
 		},
@@ -453,89 +454,73 @@ Each type also carries a \`help\` note, opened from the info icon in the header,
 };
 
 /*
- * The policy demo: application state (the active section, a customize
- * switch) governing the dashboard, without touching the registry that
- * keeps placed widgets rendering.
+ * The policy demo: an application with sections, where the active section
+ * decides what the inserter offers and a switch decides whether the user may
+ * customize at all. The widget types never change; only the policy does.
  */
-const POLICY_SECTIONS = [ 'All', 'Traffic', 'Goals' ] as const;
+const POLICY_SECTIONS = [
+	{ label: 'All', href: '/analytics', type: null },
+	{
+		label: 'Traffic',
+		href: '/analytics/traffic',
+		type: 'demo/traffic-snapshot',
+	},
+	{ label: 'Goals', href: '/analytics/goals', type: 'demo/goal-progress' },
+] as const;
 
-type PolicySection = ( typeof POLICY_SECTIONS )[ number ];
+type PolicySectionHref = ( typeof POLICY_SECTIONS )[ number ][ 'href' ];
 
-const SECTION_TYPES: Record< PolicySection, string | null > = {
-	All: null,
-	Traffic: 'demo/traffic-snapshot',
-	Goals: 'demo/goal-progress',
-};
+type PageLink = NonNullable<
+	NonNullable< ComponentProps< typeof Page >[ 'components' ] >[ 'link' ]
+>;
 
-function PolicyStory() {
+interface PolicyStoryProps {
+	allowCustomize: boolean;
+}
+
+function PolicyStory( { allowCustomize }: PolicyStoryProps ) {
 	const [ layout, setLayout ] =
 		useState< DashboardWidget[] >( INITIAL_LAYOUT );
 	const [ editMode, setEditMode ] = useState( false );
-	const [ section, setSection ] = useState< PolicySection >( 'All' );
-	const [ allowCustomize, setAllowCustomize ] = useState( true );
-	const allowCustomizeId = useId();
+	const [ currentHref, setCurrentHref ] =
+		useState< PolicySectionHref >( '/analytics' );
 
 	const canPerform = useMemo< CanPerformDashboardOperation >( () => {
-		const allowed = SECTION_TYPES[ section ];
+		const allowed = POLICY_SECTIONS.find(
+			( section ) => section.href === currentHref
+		)?.type;
 		return ( request ) => {
 			switch ( request.operation ) {
 				case 'customize':
 					return allowCustomize;
 				case 'insert':
-					return (
-						allowed === null || request.widgetType.name === allowed
-					);
+					return ! allowed || request.widgetType.name === allowed;
 				default:
 					return true;
 			}
 		};
-	}, [ section, allowCustomize ] );
+	}, [ currentHref, allowCustomize ] );
+
+	// Section links drive local state instead of a router.
+	const link = useCallback< PageLink >(
+		( { href, onClick, children, ...props } ) => (
+			<a
+				{ ...props }
+				href={ href }
+				onClick={ ( event ) => {
+					event.preventDefault();
+					setCurrentHref( href as PolicySectionHref );
+					onClick?.( event );
+				} }
+			>
+				{ children }
+			</a>
+		),
+		[]
+	);
 
 	return (
 		<WidgetDashboard.Policy canPerform={ canPerform }>
-			<div
-				style={ {
-					display: 'flex',
-					gap: 'var(--wpds-dimension-gap-sm)',
-					alignItems: 'center',
-				} }
-			>
-				{ POLICY_SECTIONS.map( ( name ) => (
-					<button
-						key={ name }
-						type="button"
-						aria-pressed={ section === name }
-						onClick={ () => setSection( name ) }
-					>
-						{ section === name ? <strong>{ name }</strong> : name }
-					</button>
-				) ) }
-				<label htmlFor={ allowCustomizeId }>
-					<input
-						id={ allowCustomizeId }
-						type="checkbox"
-						checked={ allowCustomize }
-						onChange={ ( event ) =>
-							setAllowCustomize( event.target.checked )
-						}
-					/>{ ' ' }
-					Allow customize
-				</label>
-			</div>
-
-			<p
-				role="status"
-				style={ {
-					color: 'var(--wpds-color-foreground-content-neutral-weak)',
-					fontSize: 'var(--wpds-typography-font-size-sm)',
-				} }
-			>
-				Switch the section, then open &quot;Add widget&quot;: the
-				inserter lists only what the active section allows, while placed
-				widgets keep rendering. Uncheck &quot;Allow customize&quot; to
-				take the Customize button away.
-			</p>
-
 			<WidgetDashboard
 				widgetTypes={ [
 					trafficSnapshotWidgetType,
@@ -548,24 +533,50 @@ function PolicyStory() {
 				resolveWidgetModule={ resolveDemoModule }
 				gridSettings={ { model: 'grid', rowHeight: 200 } }
 			>
-				<WidgetDashboard.Actions />
-				<WidgetDashboard.Widgets />
+				<Page
+					title="Analytics"
+					subTitle="Switch the section, then open Add widget: the inserter offers only what the section allows, while placed widgets keep rendering."
+					actions={ <WidgetDashboard.Actions /> }
+					navigation={ {
+						items: POLICY_SECTIONS.map( ( { label, href } ) => ( {
+							label,
+							href,
+						} ) ),
+						currentHref,
+						ariaLabel: 'Sections',
+					} }
+					components={ { link } }
+					showSidebarToggle={ false }
+					hasPadding
+				>
+					<WidgetDashboard.Widgets />
+				</Page>
 			</WidgetDashboard>
 		</WidgetDashboard.Policy>
 	);
 }
 
-export const Policy: StoryObj = {
-	render: () => <PolicyStory />,
+export const Policy: StoryObj< PolicyStoryProps > = {
+	render: ( args ) => <PolicyStory { ...args } />,
+	args: {
+		allowCustomize: true,
+	},
+	argTypes: {
+		allowCustomize: {
+			control: 'boolean',
+			description:
+				'What the application answers for the `customize` operation. Off removes the Customize button; Done and Cancel stay while already customizing.',
+		},
+	},
 	parameters: {
 		docs: {
 			description: {
 				story: `
-The application governs the dashboard; the widget types stay untouched. This story mounts \`WidgetDashboard.Policy\` above the dashboard with a \`canPerform\` closing over the active section and a customize switch.
+The application governs the dashboard; the widget types stay untouched. This story mounts \`WidgetDashboard.Policy\` around the dashboard with a \`canPerform\` closing over the active section, and composes the dashboard inside an admin \`Page\`: the section links in its navigation, the dashboard actions in its actions slot.
 
-Switching sections re-renders the provider value, so the "Add widget" listing follows the application state, even while open; the excluded types keep rendering where already placed because the \`widgetTypes\` registry never changes. Denying \`customize\` removes the Customize button and the matching commands.
+Switching sections re-renders the provider value, so the "Add widget" listing follows the application state, even while open; the excluded types keep rendering where already placed because the \`widgetTypes\` registry never changes. Turning "allowCustomize" off removes the Customize button and the matching commands.
 
-Nested policies compose restrictively: mount one provider per dashboard for per-instance rules, or a single provider around a group to share one. Without a policy, every operation is allowed.
+Nested policies compose restrictively: mount one provider per dashboard for per-instance rules, or a single provider around a group to share one. Without a policy, every operation is allowed. See the **Policy** page for the contract.
 `,
 			},
 		},
