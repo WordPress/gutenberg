@@ -382,13 +382,26 @@ export default function useSelectionObserver() {
 						return;
 					}
 
-					const rootClientId = getBlockRootClientId( startClientId );
-					if (
-						rootClientId === getBlockRootClientId( endClientId ) &&
-						getBlockListSettings( rootClientId )?.onMultiSelect
-					) {
-						multiSelect( startClientId, endClientId );
-						return;
+					// Walk up the ancestor chain to find a block with
+					// onMultiSelect, allowing nested structures like
+					// table-v2 to intercept multi-selections.
+					let ancestorClientId =
+						getBlockRootClientId( startClientId );
+					while ( ancestorClientId ) {
+						const settings =
+							getBlockListSettings( ancestorClientId );
+						if ( settings?.onMultiSelect ) {
+							const endParents = getBlockParents(
+								endClientId,
+								true
+							);
+							if ( endParents.includes( ancestorClientId ) ) {
+								multiSelect( startClientId, endClientId );
+								return;
+							}
+						}
+						ancestorClientId =
+							getBlockRootClientId( ancestorClientId );
 					}
 
 					const richTextElementStart =

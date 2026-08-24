@@ -10,6 +10,7 @@ import {
 	ToolbarButton,
 	ToolbarDropdownMenu,
 } from '@wordpress/components';
+import { createBlock } from '@wordpress/blocks';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -25,18 +26,6 @@ import {
 	tableRowDelete,
 	ungroup,
 } from '@wordpress/icons';
-import {
-	deleteColumns,
-	deleteRows,
-	getCellLocation,
-	getCellPlacements,
-	getCellSelectionOutsideBorderAttributes,
-	getCellSelectionOutsideBorderValue,
-	insertColumn,
-	insertRow,
-	mergeCells,
-	unmergeCells,
-} from '../table-v2/utils';
 
 const DEFAULT_SELECTION_BORDER = {
 	color: '#000000',
@@ -54,6 +43,116 @@ function normalizeBorder( nextBorder ) {
 		style:
 			nextBorder.style ||
 			( nextBorder.color || nextBorder.width ? 'solid' : undefined ),
+	};
+}
+
+/**
+ * Gets the table block clientId from a cell's clientId.
+ * Walks up: cell → row → section → table.
+ *
+ * @param {Function} select   Data store select function.
+ * @param {string}   clientId Cell block client ID.
+ * @return {string|null} Table block client ID, or null if not found.
+ */
+function getTableClientId( select, clientId ) {
+	const { getBlockRootClientId, getBlockName } = select( blockEditorStore );
+	let current = clientId;
+	for ( let i = 0; i < 3; i++ ) {
+		current = getBlockRootClientId( current );
+		if ( ! current ) {
+			return null;
+		}
+		if ( getBlockName( current ) === 'core/table-v2' ) {
+			return current;
+		}
+	}
+	return null;
+}
+
+/**
+ * Gets the row block clientId from a cell's clientId.
+ *
+ * @param {Function} select   Data store select function.
+ * @param {string}   clientId Cell block client ID.
+ * @return {string|null} Row block client ID, or null if not found.
+ */
+function getRowClientId( select, clientId ) {
+	return select( blockEditorStore ).getBlockRootClientId( clientId );
+}
+
+/**
+ * Gets the section block clientId from a row's clientId.
+ *
+ * @param {Function} select      Data store select function.
+ * @param {string}   rowClientId Row block client ID.
+ * @return {string|null} Section block client ID, or null if not found.
+ */
+function getSectionClientId( select, rowClientId ) {
+	return select( blockEditorStore ).getBlockRootClientId( rowClientId );
+}
+
+/**
+ * Builds a cell placement map from the table block tree.
+ *
+ * @param {Function} select        Data store select function.
+ * @param {string}   tableClientId Table block client ID.
+ * @return {Array} Array of { clientId, rowIndex, columnIndex, sectionType } objects.
+ */
+function getCellPlacements( select, tableClientId ) {
+	const { getBlocks } = select( blockEditorStore );
+	const sections = getBlocks( tableClientId );
+	const placements = [];
+	let rowIndex = 0;
+
+	for ( const section of sections ) {
+		const rows = getBlocks( section.clientId );
+		for ( const row of rows ) {
+			const cells = getBlocks( row.clientId );
+			for (
+				let columnIndex = 0;
+				columnIndex < cells.length;
+				columnIndex++
+			) {
+				placements.push( {
+					clientId: cells[ columnIndex ].clientId,
+					rowIndex,
+					columnIndex,
+					sectionType: section.attributes.type,
+				} );
+			}
+			rowIndex++;
+		}
+	}
+
+	return placements;
+}
+
+/**
+ * Gets the rectangle of selected cells from the block tree.
+ *
+ * @param {Array} placements        Cell placements array.
+ * @param {Array} selectedClientIds Selected cell client IDs.
+ * @return {Object|null} Selection rectangle with selectedPlacements and bounds.
+ */
+function getSelectionRectangle( placements, selectedClientIds ) {
+	const selectedPlacements = placements.filter( ( p ) =>
+		selectedClientIds.includes( p.clientId )
+	);
+
+	if ( ! selectedPlacements.length ) {
+		return null;
+	}
+
+	return {
+		selectedPlacements,
+		startRow: Math.min( ...selectedPlacements.map( ( p ) => p.rowIndex ) ),
+		endRow: Math.max( ...selectedPlacements.map( ( p ) => p.rowIndex ) ),
+		startColumn: Math.min(
+			...selectedPlacements.map( ( p ) => p.columnIndex )
+		),
+		endColumn: Math.max(
+			...selectedPlacements.map( ( p ) => p.columnIndex )
+		),
 	};
 }
 
@@ -75,28 +174,27 @@ export default function TableCellEdit( {
 	} = useDispatch( blockEditorStore );
 
 	const {
-		columnCount,
+		tableClientId,
 		isCellSetSelection,
-		parentClientId,
-		rows,
 		selectedClientIds,
-		siblingCells,
+		cellPlacements,
 	} = useSelect(
 		( select ) => {
 			const {
-				getBlock,
 				getBlockName,
 				getBlockRootClientId,
-				getBlocks,
 				getSelectedBlockClientIds,
 				getSelectionType,
 			} = select( blockEditorStore );
-			const rootClientId = getBlockRootClientId( clientId );
-			const parentBlock = rootClientId ? getBlock( rootClientId ) : null;
+
+			const tableClientIdFromStore = getTableClientId( select, clientId );
 			const selectionClientIds = getSelectedBlockClientIds();
+			const placements = tableClientIdFromStore
+				? getCellPlacements( select, tableClientIdFromStore )
+				: [];
 
 			return {
-				columnCount: parentBlock?.attributes?.columnCount || 0,
+				tableClientId: tableClientIdFromStore,
 				isCellSetSelection:
 					getSelectionType() === 'set' &&
 					selectionClientIds.length > 1 &&
@@ -104,57 +202,255 @@ export default function TableCellEdit( {
 						( selectedClientId ) =>
 							getBlockName( selectedClientId ) ===
 								'core/table-v2-cell' &&
-							getBlockRootClientId( selectedClientId ) ===
-								rootClientId
+							getBlockRootClientId( selectedClientId ) !== null
 					),
-				parentClientId: rootClientId,
-				rows: parentBlock?.attributes?.rows || [],
 				selectedClientIds: selectionClientIds,
-				siblingCells: rootClientId ? getBlocks( rootClientId ) : [],
+				cellPlacements: placements,
 			};
 		},
 		[ clientId ]
 	);
 
-	const selectedCellLocation = getCellLocation(
-		rows,
-		siblingCells,
-		columnCount,
-		clientId
+	const selectedCellPlacement = cellPlacements.find(
+		( p ) => p.clientId === clientId
 	);
-	const cellPlacements = getCellPlacements( rows, siblingCells, columnCount );
-	const selectedOutsideBorder = getCellSelectionOutsideBorderValue(
-		rows,
-		siblingCells,
-		columnCount,
-		selectedClientIds
+	const selectionRectangle = useMemo(
+		() =>
+			isCellSetSelection
+				? getSelectionRectangle( selectedClientIds )
+				: null,
+		[ isCellSetSelection, selectedClientIds ]
 	);
 
-	function replaceTable( nextTable, nextColumnCount = columnCount ) {
-		if ( ! parentClientId ) {
+	// Compute selected row/column counts for plural labels.
+	const selectedRowCount = useMemo( () => {
+		if ( ! selectionRectangle ) {
+			return 1;
+		}
+		return selectionRectangle.endRow - selectionRectangle.startRow + 1;
+	}, [ selectionRectangle ] );
+
+	const selectedColumnCount = useMemo( () => {
+		if ( ! selectionRectangle ) {
+			return 1;
+		}
+		return (
+			selectionRectangle.endColumn - selectionRectangle.startColumn + 1
+		);
+	}, [ selectionRectangle ] );
+
+	// Check if merge is possible.
+	const canMerge = useMemo( () => {
+		if ( ! isCellSetSelection || ! selectionRectangle ) {
+			return false;
+		}
+		if ( selectionRectangle.selectedPlacements.length < 2 ) {
+			return false;
+		}
+		// All selected cells must be in the same section.
+		const sectionTypes = new Set(
+			selectionRectangle.selectedPlacements.map( ( p ) => p.sectionType )
+		);
+		if ( sectionTypes.size > 1 ) {
+			return false;
+		}
+		// No selected cell can already be merged.
+		return ! selectionRectangle.selectedPlacements.some( ( p ) => {
+			const cell = registry
+				.select( blockEditorStore )
+				.getBlock( p.clientId );
+			return (
+				( cell?.attributes?.rowSpan || 1 ) > 1 ||
+				( cell?.attributes?.colSpan || 1 ) > 1
+			);
+		} );
+	}, [ isCellSetSelection, selectionRectangle, registry ] );
+
+	function onSelectRow() {
+		if ( ! selectedCellPlacement ) {
 			return;
 		}
+
+		const { rowIndex } = selectedCellPlacement;
+		const rowCellIds = cellPlacements
+			.filter( ( p ) => p.rowIndex === rowIndex )
+			.map( ( p ) => p.clientId );
+
+		multiSelectSet( rowCellIds );
+	}
+
+	function onSelectColumn() {
+		if ( ! selectedCellPlacement ) {
+			return;
+		}
+
+		const { columnIndex } = selectedCellPlacement;
+		const columnCellIds = cellPlacements
+			.filter( ( p ) => p.columnIndex === columnIndex )
+			.map( ( p ) => p.clientId );
+
+		multiSelectSet( columnCellIds );
+	}
+
+	function onMergeCells() {
+		if ( ! canMerge || ! selectionRectangle ) {
+			return;
+		}
+
+		// Find the top-left cell.
+		const mergedPlacement = selectionRectangle.selectedPlacements.find(
+			( p ) =>
+				p.rowIndex === selectionRectangle.startRow &&
+				p.columnIndex === selectionRectangle.startColumn
+		);
+		if ( ! mergedPlacement ) {
+			return;
+		}
+
+		const mergedClientId = mergedPlacement.clientId;
+		const nextRowSpan =
+			selectionRectangle.endRow - selectionRectangle.startRow + 1;
+		const nextColSpan =
+			selectionRectangle.endColumn - selectionRectangle.startColumn + 1;
+
+		// Client IDs to remove (all selected except the merged cell).
+		const removedClientIds = new Set(
+			selectedClientIds.filter( ( id ) => id !== mergedClientId )
+		);
+
+		// Update the merged cell's spans.
+		updateBlockAttributes( mergedClientId, {
+			rowSpan: nextRowSpan,
+			colSpan: nextColSpan,
+		} );
+
+		// Remove the other cells from their parent row blocks.
+		const { getBlockRootClientId, getBlocks } =
+			registry.select( blockEditorStore );
+		const rowsToUpdate = new Map();
+
+		for ( const clientIdToRemove of removedClientIds ) {
+			const rowClientId = getBlockRootClientId( clientIdToRemove );
+			if ( rowClientId ) {
+				if ( ! rowsToUpdate.has( rowClientId ) ) {
+					rowsToUpdate.set( rowClientId, [] );
+				}
+				rowsToUpdate.get( rowClientId ).push( clientIdToRemove );
+			}
+		}
+
 		registry.batch( () => {
-			updateBlockAttributes( parentClientId, {
-				columnCount: nextColumnCount,
-				rows: nextTable.rows,
-			} );
-			replaceInnerBlocks( parentClientId, nextTable.cells, false );
+			for ( const [ rowClientId, cellsToRemove ] of rowsToUpdate ) {
+				const rowBlock = getBlocks( rowClientId );
+				const nextCells = rowBlock.filter(
+					( cell ) => ! cellsToRemove.includes( cell.clientId )
+				);
+				replaceInnerBlocks( rowClientId, nextCells, false );
+			}
+			selectBlock( mergedClientId );
 		} );
 	}
 
-	function onInsertRow( delta ) {
-		if ( ! selectedCellLocation ) {
+	function onUnmergeCells() {
+		if ( rowSpan <= 1 && colSpan <= 1 ) {
 			return;
 		}
-		const { rowIndex, rowType } = selectedCellLocation;
-		replaceTable(
-			insertRow( rows, siblingCells, {
-				rowIndex: rowIndex + delta,
-				type: rowType,
-				columnCount,
+
+		// Reset spans.
+		setAttributes( { rowSpan: 1, colSpan: 1 } );
+
+		// Create new cells for vacated slots.
+		const newCells = [];
+		for ( let rowOffset = 0; rowOffset < rowSpan; rowOffset++ ) {
+			for ( let colOffset = 0; colOffset < colSpan; colOffset++ ) {
+				if ( rowOffset === 0 && colOffset === 0 ) {
+					continue;
+				}
+				newCells.push(
+					createBlock( 'core/table-v2-cell', {
+						tag: CellTag,
+						scope: attributes.scope,
+						content: '',
+					} )
+				);
+			}
+		}
+
+		if ( newCells.length ) {
+			const rowClientId = getRowClientId(
+				registry.select( blockEditorStore ),
+				clientId
+			);
+			if ( rowClientId ) {
+				const rowBlocks = registry
+					.select( blockEditorStore )
+					.getBlocks( rowClientId );
+				const cellIndex = rowBlocks.findIndex(
+					( b ) => b.clientId === clientId
+				);
+				const nextCells = [
+					...rowBlocks.slice( 0, cellIndex + 1 ),
+					...newCells,
+					...rowBlocks.slice( cellIndex + 1 ),
+				];
+				replaceInnerBlocks( rowClientId, nextCells, false );
+			}
+		}
+	}
+
+	function onInsertRow( delta ) {
+		if ( ! selectedCellPlacement || ! tableClientId ) {
+			return;
+		}
+		const { rowIndex, sectionType } = selectedCellPlacement;
+		const insertIndex = rowIndex + delta;
+
+		// Find the section block for this row.
+		const sections = registry
+			.select( blockEditorStore )
+			.getBlocks( tableClientId );
+		let targetSection = null;
+		let currentRowIndex = 0;
+
+		for ( const section of sections ) {
+			const sectionRows = registry
+				.select( blockEditorStore )
+				.getBlocks( section.clientId );
+			if ( currentRowIndex + sectionRows.length > insertIndex ) {
+				targetSection = section;
+				break;
+			}
+			currentRowIndex += sectionRows.length;
+		}
+
+		if ( ! targetSection ) {
+			return;
+		}
+
+		const localInsertIndex = insertIndex - currentRowIndex;
+		const sectionRows = registry
+			.select( blockEditorStore )
+			.getBlocks( targetSection.clientId );
+
+		// Create new row with the same number of cells as the target row.
+		const columnCount =
+			sectionRows[ localInsertIndex ]?.innerBlocks?.length || 2;
+		const newCells = Array.from( { length: columnCount }, () =>
+			createBlock( 'core/table-v2-cell', {
+				tag: sectionType === 'head' ? 'th' : 'td',
+				scope: sectionType === 'head' ? 'col' : undefined,
+				content: '',
 			} )
 		);
+		const newRow = createBlock( 'core/table-v2-row', {}, newCells );
+
+		const nextRows = [
+			...sectionRows.slice( 0, localInsertIndex ),
+			newRow,
+			...sectionRows.slice( localInsertIndex ),
+		];
+
+		replaceInnerBlocks( targetSection.clientId, nextRows, false );
 	}
 
 	function onInsertRowBefore() {
@@ -166,45 +462,94 @@ export default function TableCellEdit( {
 	}
 
 	function onDeleteRow() {
-		if ( ! selectedCellLocation ) {
+		if ( ! selectedCellPlacement || ! tableClientId ) {
 			return;
 		}
 
-		let startRow = selectedCellLocation.rowIndex;
-		let endRow = selectedCellLocation.rowIndex;
+		const { rowIndex } = selectedCellPlacement;
+		const endRow = rowIndex + ( rowSpan || 1 ) - 1;
 
-		if ( isCellSetSelection ) {
-			const selectedPlacements = cellPlacements.filter( ( p ) =>
-				selectedClientIds.includes( p.cell.clientId )
-			);
-			if ( selectedPlacements.length ) {
-				startRow = Math.min(
-					...selectedPlacements.map( ( p ) => p.rowIndex )
-				);
-				endRow = Math.max(
-					...selectedPlacements.map(
-						( p ) =>
-							p.rowIndex + ( p.cell.attributes.rowSpan || 1 ) - 1
-					)
-				);
-			}
-		} else {
-			endRow = startRow + ( rowSpan || 1 ) - 1;
+		// Collect all cell clientIds in the row range.
+		const cellIdsToDelete = cellPlacements
+			.filter( ( p ) => p.rowIndex >= rowIndex && p.rowIndex <= endRow )
+			.map( ( p ) => p.clientId );
+
+		if ( ! cellIdsToDelete.length ) {
+			return;
 		}
 
-		replaceTable( deleteRows( rows, siblingCells, { startRow, endRow } ) );
+		// Group by row block and delete.
+		const { getBlockRootClientId } = registry.select( blockEditorStore );
+		const rowsToDelete = new Set();
+
+		for ( const cellId of cellIdsToDelete ) {
+			const rowClientId = getBlockRootClientId( cellId );
+			if ( rowClientId ) {
+				rowsToDelete.add( rowClientId );
+			}
+		}
+
+		registry.batch( () => {
+			for ( const rowClientId of rowsToDelete ) {
+				const sectionClientId = getSectionClientId(
+					registry.select( blockEditorStore ),
+					rowClientId
+				);
+				if ( sectionClientId ) {
+					const sectionBlocks = registry
+						.select( blockEditorStore )
+						.getBlocks( sectionClientId );
+					const nextBlocks = sectionBlocks.filter(
+						( b ) => b.clientId !== rowClientId
+					);
+					replaceInnerBlocks( sectionClientId, nextBlocks, false );
+				}
+			}
+		} );
 	}
 
 	function onInsertColumn( delta ) {
-		if ( ! selectedCellLocation ) {
+		if ( ! selectedCellPlacement || ! tableClientId ) {
 			return;
 		}
-		replaceTable(
-			insertColumn( rows, siblingCells, {
-				columnIndex: selectedCellLocation.columnIndex + delta,
-			} ),
-			columnCount + 1
-		);
+		const { columnIndex } = selectedCellPlacement;
+		const insertIndex = columnIndex + delta;
+
+		// Insert a cell at the same position in every row.
+		const sections = registry
+			.select( blockEditorStore )
+			.getBlocks( tableClientId );
+
+		registry.batch( () => {
+			for ( const section of sections ) {
+				const sectionRows = registry
+					.select( blockEditorStore )
+					.getBlocks( section.clientId );
+
+				for ( const row of sectionRows ) {
+					const rowCells = registry
+						.select( blockEditorStore )
+						.getBlocks( row.clientId );
+
+					const newCell = createBlock( 'core/table-v2-cell', {
+						tag: section.attributes.type === 'head' ? 'th' : 'td',
+						scope:
+							section.attributes.type === 'head'
+								? 'col'
+								: undefined,
+						content: '',
+					} );
+
+					const nextCells = [
+						...rowCells.slice( 0, insertIndex ),
+						newCell,
+						...rowCells.slice( insertIndex ),
+					];
+
+					replaceInnerBlocks( row.clientId, nextCells, false );
+				}
+			}
+		} );
 	}
 
 	function onInsertColumnBefore() {
@@ -216,155 +561,43 @@ export default function TableCellEdit( {
 	}
 
 	function onDeleteColumn() {
-		if ( ! selectedCellLocation || columnCount <= 1 ) {
+		if ( ! selectedCellPlacement || ! tableClientId ) {
 			return;
 		}
 
-		let startColumn = selectedCellLocation.columnIndex;
-		let endColumn = selectedCellLocation.columnIndex;
+		const { columnIndex } = selectedCellPlacement;
+		const endColumn = columnIndex + ( colSpan || 1 ) - 1;
 
-		if ( isCellSetSelection ) {
-			const selectedPlacements = cellPlacements.filter( ( p ) =>
-				selectedClientIds.includes( p.cell.clientId )
-			);
-			if ( selectedPlacements.length ) {
-				startColumn = Math.min(
-					...selectedPlacements.map( ( p ) => p.columnIndex )
-				);
-				endColumn = Math.max(
-					...selectedPlacements.map(
-						( p ) =>
-							p.columnIndex +
-							( p.cell.attributes.colSpan || 1 ) -
-							1
-					)
-				);
-			}
-		} else {
-			endColumn = startColumn + ( colSpan || 1 ) - 1;
-		}
-
-		const result = deleteColumns( rows, siblingCells, {
-			startColumn,
-			endColumn,
-		} );
-
-		replaceTable( result, columnCount - ( endColumn - startColumn + 1 ) );
-	}
-
-	function onSelectRow() {
-		if ( ! selectedCellLocation ) {
-			return;
-		}
-
-		let startRow = selectedCellLocation.rowIndex;
-		let endRow = selectedCellLocation.rowIndex;
-
-		if ( isCellSetSelection ) {
-			const selectedPlacements = cellPlacements.filter( ( placement ) =>
-				selectedClientIds.includes( placement.cell.clientId )
-			);
-			if ( selectedPlacements.length ) {
-				startRow = Math.min(
-					...selectedPlacements.map( ( p ) => p.rowIndex )
-				);
-				endRow = Math.max(
-					...selectedPlacements.map( ( p ) => p.rowIndex )
-				);
-			}
-		}
-
-		const rowCellIds = cellPlacements
-			.filter(
-				( placement ) =>
-					placement.rowIndex >= startRow &&
-					placement.rowIndex <= endRow
-			)
-			.map( ( placement ) => placement.cell.clientId );
-
-		multiSelectSet( rowCellIds );
-	}
-
-	function onSelectColumn() {
-		if ( ! selectedCellLocation ) {
-			return;
-		}
-
-		let startColumn = selectedCellLocation.columnIndex;
-		let endColumn = selectedCellLocation.columnIndex;
-
-		if ( isCellSetSelection ) {
-			const selectedPlacements = cellPlacements.filter( ( placement ) =>
-				selectedClientIds.includes( placement.cell.clientId )
-			);
-			if ( selectedPlacements.length ) {
-				startColumn = Math.min(
-					...selectedPlacements.map( ( p ) => p.columnIndex )
-				);
-				endColumn = Math.max(
-					...selectedPlacements.map( ( p ) => p.columnIndex )
-				);
-			}
-		}
-
-		const columnCellIds = cellPlacements
-			.filter(
-				( placement ) =>
-					placement.columnIndex >= startColumn &&
-					placement.columnIndex <= endColumn
-			)
-			.map( ( placement ) => placement.cell.clientId );
-
-		multiSelectSet( columnCellIds );
-	}
-
-	function onMergeCells() {
-		if ( ! isCellSetSelection ) {
-			return;
-		}
-
-		const result = mergeCells(
-			rows,
-			siblingCells,
-			columnCount,
-			selectedClientIds
-		);
-
-		if ( ! result ) {
-			return;
-		}
+		// Delete cells in the column range from every row.
+		const sections = registry
+			.select( blockEditorStore )
+			.getBlocks( tableClientId );
 
 		registry.batch( () => {
-			updateBlockAttributes( parentClientId, {
-				rows: result.rows,
-			} );
-			replaceInnerBlocks( parentClientId, result.cells, false );
-			selectBlock( result.mergedClientId );
-		} );
-	}
+			for ( const section of sections ) {
+				const sectionRows = registry
+					.select( blockEditorStore )
+					.getBlocks( section.clientId );
 
-	function onUnmergeCells() {
-		if ( rowSpan <= 1 && colSpan <= 1 ) {
-			return;
-		}
+				for ( const row of sectionRows ) {
+					const rowCells = registry
+						.select( blockEditorStore )
+						.getBlocks( row.clientId );
 
-		const result = unmergeCells(
-			rows,
-			siblingCells,
-			columnCount,
-			clientId
-		);
+					const nextCells = rowCells.filter( ( cell, index ) => {
+						const cellEnd =
+							index + ( cell.attributes.colSpan || 1 ) - 1;
+						// Remove cells that are entirely within the range.
+						return (
+							index < columnIndex ||
+							index > endColumn ||
+							cellEnd < columnIndex
+						);
+					} );
 
-		if ( ! result ) {
-			return;
-		}
-
-		registry.batch( () => {
-			updateBlockAttributes( parentClientId, {
-				rows: result.rows,
-			} );
-			replaceInnerBlocks( parentClientId, result.cells, false );
-			selectBlock( clientId );
+					replaceInnerBlocks( row.clientId, nextCells, false );
+				}
+			}
 		} );
 	}
 
@@ -374,91 +607,56 @@ export default function TableCellEdit( {
 			return;
 		}
 
-		const updates = getCellSelectionOutsideBorderAttributes(
-			rows,
-			siblingCells,
-			columnCount,
-			selectedClientIds,
-			normalizedBorder
-		);
-
-		if ( ! Object.keys( updates ).length ) {
+		// Get all cell blocks in the selection and apply border to each.
+		if ( ! selectionRectangle ) {
 			return;
 		}
 
-		setSelectionBorder( normalizedBorder );
-		updateBlockAttributes( Object.keys( updates ), updates, {
-			uniqueByBlock: true,
-		} );
+		const updates = {};
+		for ( const placement of selectionRectangle.selectedPlacements ) {
+			const cell = registry
+				.select( blockEditorStore )
+				.getBlock( placement.clientId );
+			if ( ! cell ) {
+				continue;
+			}
+
+			const existingBorder = cell.attributes.style?.border || {};
+			const sides = [];
+
+			if ( placement.rowIndex === selectionRectangle.startRow ) {
+				sides.push( 'top' );
+			}
+			if ( placement.columnIndex === selectionRectangle.endColumn ) {
+				sides.push( 'right' );
+			}
+			if ( placement.rowIndex === selectionRectangle.endRow ) {
+				sides.push( 'bottom' );
+			}
+			if ( placement.columnIndex === selectionRectangle.startColumn ) {
+				sides.push( 'left' );
+			}
+
+			const nextBorderStyle = { ...existingBorder };
+			for ( const side of sides ) {
+				nextBorderStyle[ side ] = normalizedBorder;
+			}
+
+			updates[ placement.clientId ] = {
+				style: {
+					...cell.attributes.style,
+					border: nextBorderStyle,
+				},
+			};
+		}
+
+		if ( Object.keys( updates ).length ) {
+			setSelectionBorder( normalizedBorder );
+			updateBlockAttributes( Object.keys( updates ), updates, {
+				uniqueByBlock: true,
+			} );
+		}
 	}
-
-	const selectedRowCount = useMemo( () => {
-		if ( ! isCellSetSelection ) {
-			return 1;
-		}
-		const selectedPlacements = cellPlacements.filter( ( placement ) =>
-			selectedClientIds.includes( placement.cell.clientId )
-		);
-		if ( ! selectedPlacements.length ) {
-			return 1;
-		}
-		const minRow = Math.min(
-			...selectedPlacements.map( ( p ) => p.rowIndex )
-		);
-		const maxRow = Math.max(
-			...selectedPlacements.map(
-				( p ) => p.rowIndex + ( p.cell.attributes.rowSpan || 1 ) - 1
-			)
-		);
-		return maxRow - minRow + 1;
-	}, [ isCellSetSelection, cellPlacements, selectedClientIds ] );
-
-	const selectedColumnCount = useMemo( () => {
-		if ( ! isCellSetSelection ) {
-			return 1;
-		}
-		const selectedPlacements = cellPlacements.filter( ( placement ) =>
-			selectedClientIds.includes( placement.cell.clientId )
-		);
-		if ( ! selectedPlacements.length ) {
-			return 1;
-		}
-		const minColumn = Math.min(
-			...selectedPlacements.map( ( p ) => p.columnIndex )
-		);
-		const maxColumn = Math.max(
-			...selectedPlacements.map(
-				( p ) => p.columnIndex + ( p.cell.attributes.colSpan || 1 ) - 1
-			)
-		);
-		return maxColumn - minColumn + 1;
-	}, [ isCellSetSelection, cellPlacements, selectedClientIds ] );
-
-	const canMerge = useMemo( () => {
-		if ( ! isCellSetSelection ) {
-			return false;
-		}
-		const selectedClientIdSet = new Set( selectedClientIds );
-		const selectedPlacements = cellPlacements.filter( ( p ) =>
-			selectedClientIdSet.has( p.cell.clientId )
-		);
-		if ( selectedPlacements.length < 2 ) {
-			return false;
-		}
-		// All selected cells must be in the same section.
-		const sectionTypes = new Set(
-			selectedPlacements.map( ( p ) => p.rowType )
-		);
-		if ( sectionTypes.size > 1 ) {
-			return false;
-		}
-		// No selected cell can already be merged.
-		return ! selectedPlacements.some(
-			( p ) =>
-				( p.cell.attributes.rowSpan || 1 ) > 1 ||
-				( p.cell.attributes.colSpan || 1 ) > 1
-		);
-	}, [ isCellSetSelection, cellPlacements, selectedClientIds ] );
 
 	const tableControls = [
 		{
@@ -512,9 +710,9 @@ export default function TableCellEdit( {
 	];
 
 	let placeholder;
-	if ( selectedCellLocation?.rowType === 'head' ) {
+	if ( selectedCellPlacement?.sectionType === 'head' ) {
 		placeholder = __( 'Header label' );
-	} else if ( selectedCellLocation?.rowType === 'foot' ) {
+	} else if ( selectedCellPlacement?.sectionType === 'foot' ) {
 		placeholder = __( 'Footer label' );
 	}
 
@@ -562,9 +760,7 @@ export default function TableCellEdit( {
 									enableStyle
 									label={ __( 'Outside border' ) }
 									onChange={ applyOutsideBorder }
-									value={
-										selectedOutsideBorder || selectionBorder
-									}
+									value={ selectionBorder }
 									withSlider
 								/>
 							</div>
@@ -585,9 +781,9 @@ export default function TableCellEdit( {
 				placeholder={ placeholder }
 				aria-label={
 					// eslint-disable-next-line no-nested-ternary
-					selectedCellLocation?.rowType === 'head'
+					selectedCellPlacement?.sectionType === 'head'
 						? __( 'Header cell text' )
-						: selectedCellLocation?.rowType === 'foot'
+						: selectedCellPlacement?.sectionType === 'foot'
 						? __( 'Footer cell text' )
 						: __( 'Body cell text' )
 				}

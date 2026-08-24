@@ -6,19 +6,11 @@
 	"category": "text",
 	"description": "Create structured content in rows and columns to display information.",
 	"textdomain": "default",
-	"allowedBlocks": [ "core/table-v2-cell" ],
+	"allowedBlocks": [ "core/table-v2-section" ],
 	"attributes": {
 		"hasFixedLayout": {
 			"type": "boolean",
 			"default": true
-		},
-		"columnCount": {
-			"type": "integer",
-			"default": 0
-		},
-		"rows": {
-			"type": "array",
-			"default": []
 		}
 	},
 	"supports": {

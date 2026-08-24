@@ -124,6 +124,8 @@ import * as tabPanels from './tab-panels';
 import * as table from './table';
 import * as tableV2 from './table-v2';
 import * as tableV2Cell from './table-v2-cell';
+import * as tableV2Row from './table-v2-row';
+import * as tableV2Section from './table-v2-section';
 import * as tableOfContents from './table-of-contents';
 import * as tabList from './tab-list';
 import * as tabs from './tabs';
@@ -287,6 +289,8 @@ const getAllBlocks = () => {
 		blocks.push( playlistTrack );
 		blocks.push( tableV2 );
 		blocks.push( tableV2Cell );
+		blocks.push( tableV2Row );
+		blocks.push( tableV2Section );
 	}
 
 	blocks.push( classic );

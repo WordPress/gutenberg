@@ -1,16 +1,15 @@
 import clsx from 'clsx';
-import { useState, useMemo } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import {
 	InspectorControls,
 	BlockIcon,
 	useBlockProps,
 	useInnerBlocksProps,
-	useInnerBlockItems,
 	store as blockEditorStore,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalUseBorderProps as useBorderProps,
 } from '@wordpress/block-editor';
-import { AsyncModeProvider, useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
 	Button,
@@ -22,21 +21,33 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { blockTable as icon } from '@wordpress/icons';
-import {
-	createTable,
-	getCellRectangleClientIds,
-	mapCellsToSections,
-	toggleSection,
-} from './utils';
+import { createBlock } from '@wordpress/blocks';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
-function TSection( { name, ...props } ) {
-	const TagName = `t${ name }`;
-	return <TagName { ...props } />;
+function createTableSection( type, rowCount, columnCount ) {
+	const sectionTag = type === 'head' ? 'th' : 'td';
+	const sectionScope = type === 'head' ? 'col' : undefined;
+
+	const rows = [];
+	for ( let rowIndex = 0; rowIndex < rowCount; rowIndex++ ) {
+		const cells = [];
+		for ( let colIndex = 0; colIndex < columnCount; colIndex++ ) {
+			cells.push(
+				createBlock( 'core/table-v2-cell', {
+					tag: sectionTag,
+					scope: sectionScope,
+					content: '',
+				} )
+			);
+		}
+		rows.push( createBlock( 'core/table-v2-row', {}, cells ) );
+	}
+
+	return createBlock( 'core/table-v2-section', { type }, rows );
 }
 
 export default function TableEdit( { attributes, setAttributes, clientId } ) {
-	const { columnCount, hasFixedLayout, rows } = attributes;
+	const { hasFixedLayout } = attributes;
 	const [ initialRowCount, setInitialRowCount ] = useState( 2 );
 	const [ initialColumnCount, setInitialColumnCount ] = useState( 2 );
 
@@ -53,46 +64,83 @@ export default function TableEdit( { attributes, setAttributes, clientId } ) {
 		[ clientId ]
 	);
 
-	const isEmpty = rows.length === 0 || innerBlocks.length === 0;
-	const hasHeader = rows.some( ( row ) => row.type === 'head' );
-	const hasFooter = rows.some( ( row ) => row.type === 'foot' );
-
-	// Structural operations: these replace the entire inner blocks array.
-	function replaceTable( nextTable ) {
-		setAttributes( { rows: nextTable.rows } );
-		replaceInnerBlocks( clientId, nextTable.cells, false );
-	}
+	const isEmpty = innerBlocks.length === 0;
+	const hasHeader = innerBlocks.some(
+		( block ) =>
+			block.name === 'core/table-v2-section' &&
+			block.attributes.type === 'head'
+	);
+	const hasFooter = innerBlocks.some(
+		( block ) =>
+			block.name === 'core/table-v2-section' &&
+			block.attributes.type === 'foot'
+	);
 
 	function onCreateTable( event ) {
 		event.preventDefault();
 		const nextColumnCount = parseInt( initialColumnCount, 10 ) || 2;
-		const nextTable = createTable( {
-			rowCount: parseInt( initialRowCount, 10 ) || 2,
-			columnCount: nextColumnCount,
-		} );
-		setAttributes( {
-			columnCount: nextColumnCount,
-			rows: nextTable.rows,
-		} );
-		replaceInnerBlocks( clientId, nextTable.cells, true );
+		const nextRowCount = parseInt( initialRowCount, 10 ) || 2;
+
+		const sections = [];
+		if ( hasHeader ) {
+			sections.push( createTableSection( 'head', 1, nextColumnCount ) );
+		}
+		sections.push(
+			createTableSection( 'body', nextRowCount, nextColumnCount )
+		);
+		if ( hasFooter ) {
+			sections.push( createTableSection( 'foot', 1, nextColumnCount ) );
+		}
+
+		replaceInnerBlocks( clientId, sections, true );
 	}
 
 	function onToggleHeaderSection() {
-		replaceTable(
-			toggleSection( rows, innerBlocks, {
-				type: 'head',
-				columnCount,
-			} )
-		);
+		if ( hasHeader ) {
+			// Remove head section.
+			const nextBlocks = innerBlocks.filter(
+				( block ) =>
+					! (
+						block.name === 'core/table-v2-section' &&
+						block.attributes.type === 'head'
+					)
+			);
+			replaceInnerBlocks( clientId, nextBlocks, false );
+		} else {
+			// Add head section at the start.
+			const columnCount =
+				innerBlocks[ 0 ]?.innerBlocks[ 0 ]?.innerBlocks?.length || 2;
+			const headSection = createTableSection( 'head', 1, columnCount );
+			replaceInnerBlocks(
+				clientId,
+				[ headSection, ...innerBlocks ],
+				false
+			);
+		}
 	}
 
 	function onToggleFooterSection() {
-		replaceTable(
-			toggleSection( rows, innerBlocks, {
-				type: 'foot',
-				columnCount,
-			} )
-		);
+		if ( hasFooter ) {
+			// Remove foot section.
+			const nextBlocks = innerBlocks.filter(
+				( block ) =>
+					! (
+						block.name === 'core/table-v2-section' &&
+						block.attributes.type === 'foot'
+					)
+			);
+			replaceInnerBlocks( clientId, nextBlocks, false );
+		} else {
+			// Add foot section at the end.
+			const columnCount =
+				innerBlocks[ 0 ]?.innerBlocks[ 0 ]?.innerBlocks?.length || 2;
+			const footSection = createTableSection( 'foot', 1, columnCount );
+			replaceInnerBlocks(
+				clientId,
+				[ ...innerBlocks, footSection ],
+				false
+			);
+		}
 	}
 
 	function onChangeFixedLayout() {
@@ -100,9 +148,21 @@ export default function TableEdit( { attributes, setAttributes, clientId } ) {
 	}
 
 	const blockProps = useBlockProps();
-	const innerBlocksOptions = useMemo(
-		() => ( {
-			allowedBlocks: [ 'core/table-v2-cell' ],
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			className: clsx( colorProps.className, borderProps.className, {
+				'has-fixed-layout': hasFixedLayout,
+				'has-individual-borders': hasSplitBorders(
+					attributes?.style?.border
+				),
+			} ),
+			style: {
+				...colorProps.style,
+				...borderProps.style,
+			},
+		},
+		{
+			allowedBlocks: [ 'core/table-v2-section' ],
 			renderAppender: false,
 			__unstableDisableDropZone: true,
 			__experimentalCaptureToolbars: true,
@@ -110,17 +170,84 @@ export default function TableEdit( { attributes, setAttributes, clientId } ) {
 				startClientId,
 				endClientId,
 				initialPosition,
+				select,
 				dispatch,
 			} ) {
-				const selectedClientIds = getCellRectangleClientIds(
-					rows,
-					innerBlocks,
-					columnCount,
-					startClientId,
-					endClientId
+				const { getBlocks } = select( blockEditorStore );
+				const sections = getBlocks( clientId );
+
+				// Build cell placements from the block tree.
+				const placements = [];
+				let rowIndex = 0;
+				for ( const section of sections ) {
+					const rows = getBlocks( section.clientId );
+					for ( const row of rows ) {
+						const cells = getBlocks( row.clientId );
+						for (
+							let columnIndex = 0;
+							columnIndex < cells.length;
+							columnIndex++
+						) {
+							placements.push( {
+								clientId: cells[ columnIndex ].clientId,
+								rowIndex,
+								columnIndex,
+								rowSpan:
+									cells[ columnIndex ].attributes.rowSpan ||
+									1,
+								colSpan:
+									cells[ columnIndex ].attributes.colSpan ||
+									1,
+							} );
+						}
+						rowIndex++;
+					}
+				}
+
+				const startPlacement = placements.find(
+					( p ) => p.clientId === startClientId
+				);
+				const endPlacement = placements.find(
+					( p ) => p.clientId === endClientId
 				);
 
-				if ( selectedClientIds ) {
+				if ( ! startPlacement || ! endPlacement ) {
+					dispatch.multiSelect(
+						startClientId,
+						endClientId,
+						initialPosition
+					);
+					return;
+				}
+
+				const startRow = Math.min(
+					startPlacement.rowIndex,
+					endPlacement.rowIndex
+				);
+				const endRow = Math.max(
+					startPlacement.rowIndex + startPlacement.rowSpan - 1,
+					endPlacement.rowIndex + endPlacement.rowSpan - 1
+				);
+				const startColumn = Math.min(
+					startPlacement.columnIndex,
+					endPlacement.columnIndex
+				);
+				const endColumn = Math.max(
+					startPlacement.columnIndex + startPlacement.colSpan - 1,
+					endPlacement.columnIndex + endPlacement.colSpan - 1
+				);
+
+				const selectedClientIds = placements
+					.filter(
+						( p ) =>
+							p.rowIndex <= endRow &&
+							p.rowIndex + p.rowSpan - 1 >= startRow &&
+							p.columnIndex <= endColumn &&
+							p.columnIndex + p.colSpan - 1 >= startColumn
+					)
+					.map( ( p ) => p.clientId );
+
+				if ( selectedClientIds.length ) {
 					dispatch.multiSelectSet(
 						selectedClientIds,
 						initialPosition
@@ -134,47 +261,7 @@ export default function TableEdit( { attributes, setAttributes, clientId } ) {
 					initialPosition
 				);
 			},
-		} ),
-		[ rows, innerBlocks, columnCount ]
-	);
-
-	// useInnerBlocksProps sets up inner block infrastructure (nested settings,
-	// drop zones, template sync, allowed blocks). We destructure `children` out
-	// because we render the items ourselves via useInnerBlockItems, and spread
-	// the remaining props (ref, className, etc.) onto the <table> element.
-	const { children: _innerBlocksChildren, ...innerBlocksProps } =
-		useInnerBlocksProps(
-			{
-				className: clsx( colorProps.className, borderProps.className, {
-					'has-fixed-layout': hasFixedLayout,
-					'has-individual-borders': hasSplitBorders(
-						attributes?.style?.border
-					),
-				} ),
-				style: {
-					...colorProps.style,
-					...borderProps.style,
-				},
-			},
-			innerBlocksOptions
-		);
-
-	// Get individual block elements that we can place in the table structure.
-	const items = useInnerBlockItems();
-
-	// Build a map from clientId to rendered item for placement in the table.
-	const itemsByClientId = useMemo( () => {
-		const map = {};
-		for ( const item of items ) {
-			map[ item.key ] = item;
 		}
-		return map;
-	}, [ items ] );
-
-	// Map the flat cell blocks into sections and rows.
-	const sections = useMemo(
-		() => mapCellsToSections( rows, innerBlocks ),
-		[ rows, innerBlocks ]
 	);
 
 	return (
@@ -242,7 +329,6 @@ export default function TableEdit( { attributes, setAttributes, clientId } ) {
 						onSubmit={ onCreateTable }
 					>
 						<TextControl
-							__next40pxDefaultSize
 							type="number"
 							label={ __( 'Column count' ) }
 							value={ initialColumnCount }
@@ -251,7 +337,6 @@ export default function TableEdit( { attributes, setAttributes, clientId } ) {
 							className="blocks-table__placeholder-input"
 						/>
 						<TextControl
-							__next40pxDefaultSize
 							type="number"
 							label={ __( 'Row count' ) }
 							value={ initialRowCount }
@@ -269,25 +354,7 @@ export default function TableEdit( { attributes, setAttributes, clientId } ) {
 					</form>
 				</Placeholder>
 			) : (
-				<AsyncModeProvider value={ false }>
-					<table { ...innerBlocksProps }>
-						{ sections.map( ( section ) => (
-							<TSection
-								name={ section.name }
-								key={ section.name }
-							>
-								{ section.rows.map( ( row, rowIndex ) => (
-									<tr key={ rowIndex }>
-										{ row.map(
-											( cell ) =>
-												itemsByClientId[ cell.clientId ]
-										) }
-									</tr>
-								) ) }
-							</TSection>
-						) ) }
-					</table>
-				</AsyncModeProvider>
+				<table { ...innerBlocksProps } />
 			) }
 		</figure>
 	);

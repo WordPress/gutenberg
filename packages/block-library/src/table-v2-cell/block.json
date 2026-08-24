@@ -4,7 +4,7 @@
 	"name": "core/table-v2-cell",
 	"title": "Table Cell",
 	"category": "text",
-	"parent": [ "core/table-v2" ],
+	"parent": [ "core/table-v2-row" ],
 	"description": "A single cell within a table.",
 	"textdomain": "default",
 	"attributes": {
