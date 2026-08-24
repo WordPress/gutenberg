@@ -65,11 +65,21 @@ WithPrefix.args = {
 	...WithPrefix.args,
 	...Default.args,
 };
-WithSuffixControl.args = {
-	...WithSuffixControl.args,
-	...Default.args,
+// Copied rather than mutated: the story object is shared with the Input story,
+// which opts out of the accessibility test because it shows the control
+// without a label. This story does label the control, so it opts back in.
+const InputControlWithSuffixControl: typeof WithSuffixControl = {
+	...WithSuffixControl,
+	args: {
+		...WithSuffixControl.args,
+		...Default.args,
+	},
+	parameters: {
+		...WithSuffixControl.parameters,
+		a11y: { test: 'error' },
+	},
 };
-export { WithPrefix, WithSuffixControl };
+export { WithPrefix, InputControlWithSuffixControl as WithSuffixControl };
 
 export const Password: Story = {
 	render: function Template( args ) {

@@ -44,6 +44,7 @@ const ALLOWLIST = {
 			'Textarea',
 			'TextareaControl',
 			'Tooltip',
+			'ValidatedInputControl',
 			'ValidityIndicator',
 			'VisuallyHidden',
 			'useKeyboardShortcutProps',

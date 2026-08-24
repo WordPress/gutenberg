@@ -1,10 +1,15 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
+import { enUS } from 'date-fns/locale';
 import type { Modifiers, BaseProps } from '../types';
 
-function isLocaleRTL( localeCode: string ) {
-	const localeObj = new Intl.Locale( localeCode );
-	const direction = localeObj.getTextInfo?.().direction;
+type IntlLocaleWithWeekInfo = Intl.Locale & {
+	getWeekInfo?: () => { firstDay?: number };
+	weekInfo?: { firstDay?: number };
+};
+
+function isLocaleRTL( locale: Intl.Locale ) {
+	const direction = locale.getTextInfo?.().direction;
 	if ( direction ) {
 		return direction === 'rtl';
 	}
@@ -20,7 +25,31 @@ function isLocaleRTL( localeCode: string ) {
 		'ckb', // Central Kurdish (Sorani)
 		'ug', // Uyghur
 		'yi', // Yiddish
-	].includes( localeObj.language );
+	].includes( locale.language );
+}
+
+function getSupportedLocaleCode( localeCode: string | undefined ) {
+	if ( ! localeCode ) {
+		return;
+	}
+
+	let supportedLocaleCode: string | undefined;
+	try {
+		supportedLocaleCode = Intl.DateTimeFormat.supportedLocalesOf( [
+			localeCode,
+		] )[ 0 ];
+	} catch {
+		// Invalid BCP 47 language tags are expected to use the fallback locale.
+	}
+	return supportedLocaleCode;
+}
+
+function getWeekStartsOn( locale: IntlLocaleWithWeekInfo ) {
+	const firstDay = ( locale.getWeekInfo?.() ?? locale.weekInfo )?.firstDay;
+	if ( firstDay === undefined || firstDay < 1 || firstDay > 7 ) {
+		return;
+	}
+	return ( firstDay % 7 ) as NonNullable< BaseProps[ 'weekStartsOn' ] >;
 }
 
 /**
@@ -32,9 +61,9 @@ function isLocaleRTL( localeCode: string ) {
  * - It is possible for the translated strings to use a different locale
  *   than the formatted dates and the computed `dir`. This is because the
  *   translation function doesn't expose the locale used for the translated
- *   strings, meaning that the dates are formatted using the `locale` prop.
+ *   strings, meaning that dates are formatted using the date locale props.
  *   For a correct localized experience, consumers should make sure that
- *   translation context and `locale` prop are consistent.
+ *   translation context and date-text locale are consistent.
  * @param props
  * @param props.locale
  * @param props.timeZone
@@ -50,27 +79,51 @@ export const useLocalizationProps = ( {
 	mode: 'single' | 'range';
 } ) => {
 	return useMemo( () => {
+		const isLocaleString = typeof locale === 'string';
+		const dateFnsLocale = isLocaleString ? enUS : locale;
+		const supportedLocaleCode = getSupportedLocaleCode(
+			isLocaleString ? locale : locale.code
+		);
+		const localeCode = supportedLocaleCode ?? 'en-US';
+		const intlLocale = new Intl.Locale(
+			localeCode
+		) as IntlLocaleWithWeekInfo;
+		// Unsupported custom date-fns locales keep their own week-start option.
+		const weekStartsOn =
+			isLocaleString || supportedLocaleCode !== undefined
+				? getWeekStartsOn( intlLocale )
+				: undefined;
+
 		// ie. April 2025
-		const monthNameFormatter = new Intl.DateTimeFormat( locale.code, {
+		const monthNameFormatter = new Intl.DateTimeFormat( localeCode, {
+			calendar: 'gregory',
 			year: 'numeric',
 			month: 'long',
 			timeZone,
 		} );
 		// ie. M, T, W, T, F, S, S
-		const weekdayNarrowFormatter = new Intl.DateTimeFormat( locale.code, {
+		const weekdayNarrowFormatter = new Intl.DateTimeFormat( localeCode, {
+			calendar: 'gregory',
 			weekday: 'narrow',
 			timeZone,
 		} );
 		// ie. Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday
-		const weekdayLongFormatter = new Intl.DateTimeFormat( locale.code, {
+		const weekdayLongFormatter = new Intl.DateTimeFormat( localeCode, {
+			calendar: 'gregory',
 			weekday: 'long',
 			timeZone,
 		} );
 		// ie. Monday, April 29, 2025
-		const fullDateFormatter = new Intl.DateTimeFormat( locale.code, {
+		const fullDateFormatter = new Intl.DateTimeFormat( localeCode, {
+			calendar: 'gregory',
 			weekday: 'long',
 			year: 'numeric',
 			month: 'long',
+			day: 'numeric',
+			timeZone,
+		} );
+		const dayNumberFormatter = new Intl.DateTimeFormat( localeCode, {
+			calendar: 'gregory',
 			day: 'numeric',
 			timeZone,
 		} );
@@ -83,11 +136,13 @@ export const useLocalizationProps = ( {
 					? __( 'Date calendar' )
 					: __( 'Date range calendar' ),
 			labels: {
+				/** The label for the navigation toolbar. */
+				labelNav: () => __( 'Navigation bar' ),
 				/**
 				 * The label for the month grid.
 				 * @param date
 				 */
-				labelGrid: ( date: Date ) => monthNameFormatter.format( date ),
+				labelGrid: monthNameFormatter.format,
 				/**
 				 * The label for the gridcell, when the calendar is not interactive.
 				 * @param date
@@ -152,18 +207,16 @@ export const useLocalizationProps = ( {
 				 * The label for the weekday.
 				 * @param date
 				 */
-				labelWeekday: ( date: Date ) =>
-					weekdayLongFormatter.format( date ),
+				labelWeekday: weekdayLongFormatter.format,
 			},
-			locale,
-			dir: isLocaleRTL( locale.code ) ? 'rtl' : 'ltr',
+			locale: dateFnsLocale,
+			lang: localeCode,
+			dir: isLocaleRTL( intlLocale ) ? 'rtl' : 'ltr',
+			...( weekStartsOn === undefined ? {} : { weekStartsOn } ),
 			formatters: {
-				formatWeekdayName: ( date: Date ) => {
-					return weekdayNarrowFormatter.format( date );
-				},
-				formatCaption: ( date: Date ) => {
-					return monthNameFormatter.format( date );
-				},
+				formatDay: dayNumberFormatter.format,
+				formatWeekdayName: weekdayNarrowFormatter.format,
+				formatCaption: monthNameFormatter.format,
 			},
 			timeZone,
 		} as const;

@@ -419,6 +419,7 @@
             - render
 - name: ConfirmDialog
   props:
+      - __experimentalHideHeader
       - cancelButtonText
       - children
       - confirmButtonText
@@ -427,6 +428,7 @@
       - onCancel
       - onConfirm
       - size
+      - title
 - name: CustomSelectControl
   props:
       - __experimentalShowSelectedHint
