@@ -41,6 +41,8 @@ export type DashboardGridLayoutItem = {
 
 	/**
 	 * Whether the item can be dragged while the surface is in edit mode.
+	 * When `false`, the item is pinned: it also holds its index while the
+	 * other items reorder around it.
 	 *
 	 * @default true
 	 */

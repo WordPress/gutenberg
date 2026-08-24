@@ -129,7 +129,7 @@ interface DashboardGridLayoutItem {
 	width?: number | 'fill' | 'full'; // column span (see below)
 	height?: number; // rows to span
 	order?: number; // lower values render first (responsive mode)
-	draggable?: boolean; // default true: can be dragged in edit mode
+	draggable?: boolean; // default true; false pins it: no drag, holds its index
 	resizable?: boolean; // default true: can be resized in edit mode
 }
 ```
@@ -285,7 +285,7 @@ interface DashboardLanesLayoutItem {
 	width?: number; // lanes to span (default 1)
 	lane?: number; // 0-indexed: pin to a specific lane
 	order?: number; // lower values render first
-	draggable?: boolean; // default true: can be dragged in edit mode
+	draggable?: boolean; // default true; false pins it: no drag, holds its index
 	resizable?: boolean; // default true: can be resized in edit mode
 }
 ```

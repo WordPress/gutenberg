@@ -7,7 +7,6 @@ import {
 	useSensors,
 } from '@dnd-kit/core';
 import {
-	arrayMove,
 	SortableContext,
 	sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
@@ -25,6 +24,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { GridItem } from './grid-item';
+import { arrayMoveWithPinned } from '../shared/array-move-with-pinned';
 import { GridOverlay } from '../shared/grid-overlay';
 import { gridSpanToPixelSize } from '../shared/resize-snap';
 import layoutAnimationStyles from '../shared/layout-shift-animation.module.css';
@@ -403,7 +403,19 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				return;
 			}
 
-			const updatedItems = arrayMove( items, currentIndex, newIndex );
+			// Non-draggable items are pinned: they hold their index while
+			// the others reorder around them.
+			const updatedItems = arrayMoveWithPinned(
+				items,
+				currentIndex,
+				newIndex,
+				( key ) => layoutMap.get( key )?.draggable === false
+			);
+			if (
+				updatedItems.every( ( key, index ) => key === items[ index ] )
+			) {
+				return;
+			}
 			const updatedLayout = activeLayout.map( ( item ) => ( {
 				...item,
 				order: updatedItems.indexOf( item.key ),

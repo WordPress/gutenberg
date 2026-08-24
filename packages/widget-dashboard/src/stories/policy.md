@@ -34,7 +34,7 @@ The Customize button, the command palette entries, the tile controls, and the in
 | `customize` | none                    | The Customize button, the `core/dashboard/customize` command, the `core/dashboard/add-widgets` command outside edit mode, and the automatic entry into customize mode on an empty layout.         |
 | `insert`    | `widgetType`            | Whether the inserter offers the type; a rejected type keeps rendering where already placed. The Add widget button and command show only while some registered type is insertable.                 |
 | `remove`    | `widget`, `widgetType?` | The Remove control in customize mode. The staging layer re-asserts, in place, a locked instance dropped by any trigger.                                                                           |
-| `move`      | `widget`, `widgetType?` | Dragging the tile in customize mode; a denied tile stays in place.                                                                                                                                |
+| `move`      | `widget`, `widgetType?` | Dragging the tile in customize mode. A denied tile is pinned: it holds its index while the other tiles reorder around it; a change ahead of it can still reflow the cell it lands in.             |
 | `resize`    | `widget`, `widgetType?` | The resize handle and the width menu.                                                                                                                                                             |
 | `edit`      | `widget`, `widgetType?` | Attribute editing: the inline fields and the settings trigger in the header, the settings surface, and the widget's `setAttributes`, which is absent when denied so the widget renders read-only. |
 

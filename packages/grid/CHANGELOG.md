@@ -4,8 +4,9 @@
 
 ### New Features
 
--   Layout items accept `draggable` and `resizable` flags, so a surface in
-    edit mode can keep individual tiles fixed in place or at their size
+-   Layout items accept `draggable` and `resizable` flags. A non-draggable
+    item is pinned: it cannot be dragged and holds its index while the
+    other items reorder; a non-resizable item keeps its size
     ([#81967](https://github.com/WordPress/gutenberg/pull/81967)).
 
 ### Internal
