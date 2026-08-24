@@ -1,9 +1,39 @@
 import { __, sprintf } from '@wordpress/i18n';
-import { focus } from '@wordpress/dom';
+import { focus, isTextField } from '@wordpress/dom';
+import { isInsideRootBlock } from '../../utils/dom';
 
 // Must match the row height in `style.scss`; the windowing math relies on it.
 // See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
 export const BLOCK_LIST_ITEM_HEIGHT = 32;
+
+/**
+ * Keyboard-activation caret position for a canvas block.
+ *
+ * `-1` places the caret at the end of a single text field (Paragraph,
+ * Heading, and any other one-field block). `0` is used when the block
+ * has more than one text field of its own (e.g. Table cells), so focus
+ * lands on the first field instead of the last. Inner-block fields are
+ * ignored so a Group is not treated as multi-field.
+ *
+ * @param {Element|null|undefined} blockElement Canvas wrapper for the block.
+ * @return {0|-1} Initial caret position.
+ */
+export function getListViewKeyboardFocusPosition( blockElement ) {
+	if ( ! blockElement ) {
+		return -1;
+	}
+
+	const candidates = [
+		blockElement,
+		...blockElement.querySelectorAll( '*' ),
+	];
+	const textFieldCount = candidates.filter(
+		( node ) =>
+			isTextField( node ) && isInsideRootBlock( blockElement, node )
+	).length;
+
+	return textFieldCount > 1 ? 0 : -1;
+}
 
 export const getBlockPositionDescription = ( position, siblingCount, level ) =>
 	sprintf(

@@ -8,6 +8,7 @@ import { useInstanceId, useDebounce } from '@wordpress/compose';
 import { moreVertical } from '@wordpress/icons';
 import {
 	useCallback,
+	useContext,
 	useMemo,
 	useState,
 	useRef,
@@ -31,7 +32,9 @@ import {
 	getBlockPositionDescription,
 	getBlockPropertiesDescription,
 	focusListItem,
+	getListViewKeyboardFocusPosition,
 } from './utils';
+import { BlockRefs } from '../provider/block-refs-provider';
 import { store as blockEditorStore } from '../../store';
 import { groupBlocks } from '../../utils/group-blocks';
 import { getPositionTypeLabel } from '../use-block-display-information';
@@ -160,6 +163,7 @@ function ListViewBlock( {
 		// since that menu is part of the toolbar in the editor canvas.
 		// List View respects this by also hiding the block settings menu.
 		hasBlockSupport( blockName, '__experimentalToolbar', true );
+	const { refsMap } = useContext( BlockRefs );
 	const instanceId = useInstanceId( ListViewBlock );
 	const descriptionId = `list-view-block-select-button__description-${ instanceId }`;
 
@@ -435,19 +439,13 @@ function ListViewBlock( {
 			// that subsequent keyboard operations (arrow navigation, copy/paste)
 			// still work.
 			const isKeyboardActivation = event?.detail === 0;
-			let initialPosition = null;
-			if ( isKeyboardActivation ) {
-				// Caret-at-end (-1) is only valid for Paragraph: it is a
-				// single text field, and that is the block type covered by
-				// the original List View behavior. For every other block,
-				// -1 would land on the last text field (e.g. the last Table
-				// cell). Use 0 so focus enters the first editable instead.
-				initialPosition = blockName === 'core/paragraph' ? -1 : 0;
-			}
+			const initialPosition = isKeyboardActivation
+				? getListViewKeyboardFocusPosition( refsMap.get( clientId ) )
+				: null;
 			selectBlock( event, clientId, initialPosition );
 			event.preventDefault();
 		},
-		[ blockName, clientId, selectBlock ]
+		[ clientId, refsMap, selectBlock ]
 	);
 
 	const updateFocusAndSelection = useCallback(
