@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import { readFile, writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
-
-/**
- * Internal dependencies
- */
 import { getPackageInfoFromFile } from './package-utils.mjs';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
@@ -48,7 +41,7 @@ export async function getPhpReplacements( rootDir, baseUrlExpression ) {
 export function applyTemplateReplacements( template, replacements ) {
 	let content = template;
 	for ( const [ placeholder, value ] of Object.entries( replacements ) ) {
-		content = content.replaceAll( placeholder, value );
+		content = content.split( placeholder ).join( value );
 	}
 	return content;
 }

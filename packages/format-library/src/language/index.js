@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * WordPress dependencies
- */
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import {
 	TextControl,
@@ -102,7 +95,6 @@ function InlineLanguageUI( { value, contentRef, onChange, onClose } ) {
 				} }
 			>
 				<TextControl
-					__next40pxDefaultSize
 					label={ title }
 					value={ lang }
 					onChange={ ( val ) => setLang( val ) }
@@ -111,7 +103,6 @@ function InlineLanguageUI( { value, contentRef, onChange, onClose } ) {
 					) }
 				/>
 				<SelectControl
-					__next40pxDefaultSize
 					label={ __( 'Text direction' ) }
 					value={ dir }
 					options={ [

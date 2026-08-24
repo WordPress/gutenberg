@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useReducer } from '@wordpress/element';
 import { MenuItem } from '@wordpress/components';
 import { lockOutline, unlock } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import useBlockLock from './use-block-lock';
 import BlockLockModal from './modal';
 

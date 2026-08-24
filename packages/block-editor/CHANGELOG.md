@@ -2,6 +2,140 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove `src/default-editor-styles.scss`. Consumers importing it should supply their own ([#81793](https://github.com/WordPress/gutenberg/pull/81793)).
+
+### New Features
+
+-   Register and handle the keyboard shortcuts that blocks declare on their variations and transforms, so that any block can contribute a shortcut without the editor knowing about it. Shortcuts apply to the selected block, and are listed under "Block shortcuts" in the keyboard shortcuts help modal ([#81588](https://github.com/WordPress/gutenberg/pull/81588)).
+
+### Enhancements
+
+-   Patterns explorer: Refactor the category sidebar to use `Tabs` ([#81807](https://github.com/WordPress/gutenberg/pull/81807)).
+-   `PublishDateTimePicker`: Add a `showPopoverHeader` prop so the picker can be rendered inline, without the popover title and close button. Rename the header's reset action from "Now" to "Reset", which reads as an action rather than a status ([#81806](https://github.com/WordPress/gutenberg/pull/81806)).
+-   Show separate horizontal and vertical block spacing controls in the block inspector only for Flex and Grid layouts, while retaining axial gap support in Global Styles. Responsive Grid column calculations use the horizontal gap, while Flow and Constrained layouts use the vertical gap when receiving an axial value ([#81476](https://github.com/WordPress/gutenberg/pull/81476)).
+
+### Bug Fixes
+
+-   Hide the Layout panel when a block has layout editing enabled but all controls for its layout type are disabled ([#81968](https://github.com/WordPress/gutenberg/pull/81968)).
+-   `DuotoneControl`: Keep the picked preset's identity when applying a duotone to a block. Two presets can hold the same pair of colors, and the applied preset was resolved by matching colors, so the first of any duplicate pair was saved and both appeared selected ([#81605](https://github.com/WordPress/gutenberg/pull/81605)).
+-   `InnerBlocks`: Resolve the `default` of a block's `layout` support before providing it to inner blocks. A block that declared its layout only as a support default, such as the Gallery, previously handed its children the raw support config, which has no `type`, so the children resolved to the flow layout instead. As a result an Image nested in a Gallery offered left/center/right alignment, which the flex layout does not permit ([#81606](https://github.com/WordPress/gutenberg/pull/81606)).
+-   Never apply Spotlight mode in a preview canvas, which cannot be edited and so rendered most of its content faded ([#81615](https://github.com/WordPress/gutenberg/pull/81615)).
+-   Grid: Keep child layout changes made with the resizer scoped to the selected viewport.
+-   `DimensionsTool`: Reflect aspect ratio and scale values that are updated from outside the component, such as by undo or `updateBlockAttributes`. The scale control no longer displays a stale value, and an aspect ratio that is written differently to its preset, e.g. `1/1` rather than `1`, is displayed as that preset instead of as "Original" ([#80747](https://github.com/WordPress/gutenberg/pull/80747)).
+-   `ListView`: Only move focus into the list when the new `focusOnMount` prop is set, so that a list mounted as a side effect of a selection no longer pulls focus out of the editor canvas ([#81659](https://github.com/WordPress/gutenberg/pull/81659)).
+-   `RichText`: Handle Enter using the current record, so pressing it right after moving the caret splits at the caret's new position instead of the previous one ([#81696](https://github.com/WordPress/gutenberg/pull/81696)).
+-   `useInnerBlocksProps`: Resolve the manual grid placement check that disables the standard drop zone against a layout passed through the options, when provided, instead of always using the block edit context layout ([#81120](https://github.com/WordPress/gutenberg/pull/81120)).
+-   `BorderPanel`: Match a chosen drop shadow against the presets from every origin rather than the first origin that defines any, so theme and default presets keep being stored as `var:preset|shadow|<slug>` once a custom preset exists ([#81346](https://github.com/WordPress/gutenberg/pull/81346)).
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81516](https://github.com/WordPress/gutenberg/pull/81516))
+-   Expose `isElementVisible` via private APIs so `@wordpress/editor`'s collaboration overlay can detect content hidden by a collapsed container (e.g. a closed `core/details` panel) without duplicating the visibility check ([#81322](https://github.com/WordPress/gutenberg/pull/81322)).
+
+## 16.2.0 (2026-08-12)
+
+### Internal
+
+-   Use the new `@wordpress/kebab-case` package instead of unlocking the `kebabCase` utility from the `@wordpress/components` private APIs ([#81294](https://github.com/WordPress/gutenberg/pull/81294)).
+
+### Enhancements
+
+-   Allow Global Styles to supply additional element color controls to the shared Colors panel ([#80852](https://github.com/WordPress/gutenberg/pull/80852)).
+-   Creating a new block next to a sibling of the same type now inherits the sibling's attributes consistently, whether it is created by the appender, the inserter, or Enter at the edge of the text. Everything except the sibling's content (attributes with the `content` role) and its `metadata` is copied. The `attributesToCopy` list of a default block is removed: the copied attributes derive from the block's attribute roles.
+
+### Enhancements
+
+-   Add support for the `blockStatesEditingEnabled` editor setting, which hides state controls for blocks when set to `false` ([#80956](https://github.com/WordPress/gutenberg/pull/80956), [#81058](https://github.com/WordPress/gutenberg/pull/81058)).
+
+### Performance
+
+-   `hasSelectedInnerBlock`: Answer the deep check from a set of the selection's ancestors, built once per selection, instead of walking the parents of every selected block on each call. `BlockListBlock` asks once per rendered block, so the old cost was the block count multiplied by the selection size ([#81210](https://github.com/WordPress/gutenberg/pull/81210)).
+-   `BlockListBlock`: Skip that deep check behind `isSelectionWithinCurrentSection` when the block is not within a section block, where it was passed an `undefined` client ID that never matches. Together the two changes take selecting all blocks on a 1000 paragraph post from 16.8s to 0.4s ([#81210](https://github.com/WordPress/gutenberg/pull/81210)).
+-   `ListView`: Drop the `useBlockDisplayInformation` and `useBlockLock` calls from the row, select button and branch components, reading the few fields they were used for from the `useSelect` each component already has. Store subscriptions go from seven to four per rendered row, and from two to one per branch ([#81136](https://github.com/WordPress/gutenberg/pull/81136)).
+-   `ListView`: Collapse the placeholder rows that stand in for blocks outside of the render window into a single spacer row per run, instead of rendering a `<tr>`/`<td>` pair for every block. On a post with 1000 top-level blocks this removes ~1900 elements (about 60% of the List View's DOM and nearly half of the document's elements), which cuts the style recalculation and layout work done when the List View opens ([#80953](https://github.com/WordPress/gutenberg/pull/80953)).
+-   `hasSelectedInnerBlock`: Return `false` up front when called without a client ID, instead of reading the selection and walking it for a check that can never match. The root client ID (`''`) is covered by the same bail out, so the shallow check no longer reports `true` when a top level block is selected, matching the deep check ([#81315](https://github.com/WordPress/gutenberg/pull/81315)).
+
+### Internal
+
+-   `ListView`: Reimplement the Firefox description-recomputation workaround in `AriaReferencedText` by keying the element on its text, so React replaces it instead of updating the existing text node in place ([#80929](https://github.com/WordPress/gutenberg/pull/80929).
+
+### Bug Fixes
+
+-   `MediaPlaceholder`: Stop the drop zone activating for canvas block-reorder drags. Dragging an inner block within a block that renders a media placeholder (e.g. reordering a Playlist Track) no longer shows a media drop zone and blocks the reorder.
+-   `isBlockSelected`: Return `false` when called without a client ID, instead of matching the `undefined` client ID of an empty selection ([#81212](https://github.com/WordPress/gutenberg/pull/81212)).
+-   `URLInput`: Collapse a text selection reaching the start of the field before letting an up arrow press through to the editor, so selecting to the start and pressing up no longer navigates out of the field instead of collapsing the caret ([#80780](https://github.com/WordPress/gutenberg/pull/80780)).
+-   `URLInput`: Leave Shift-modified arrow keys to the browser, so extending a selection with Shift+Up or Shift+Down no longer collapses it to the start or end of the field ([#80780](https://github.com/WordPress/gutenberg/pull/80780)).
+-   `RichText`: Skip the block input transforms in fields that are not passed an `onReplace` ([#80978](https://github.com/WordPress/gutenberg/pull/80978)).
+-   `RichText`: Ignore pasted files, which carry no text to paste inline ([#81010](https://github.com/WordPress/gutenberg/pull/81010)).
+-   Background block support: Fix gradients not being applied to a block when a theme opts out of `settings.background.gradient` in `theme.json` ([#81056](https://github.com/WordPress/gutenberg/pull/81056)).
+-   `LinkControl`: Restore the preview title underline by slightly increasing the title's line height, which was too tight for the underline to be visible ([#81083](https://github.com/WordPress/gutenberg/pull/81083)).
+-   `URLInput`: Skip link search requests while an IME composition is in progress; the search now fires once with the confirmed value on `compositionend` ([#80602](https://github.com/WordPress/gutenberg/pull/80602)).
+-   `SpacingSizesControl`: Give the control's visible label its own translation context instead of sharing an entry with the side input's aria label, which feeds the same placeholders in the opposite order — a single shared translation could not be correct for both ([#81240](https://github.com/WordPress/gutenberg/pull/81240)).
+
+## 16.1.0 (2026-07-29)
+
+### Enhancements
+
+-   Inspector controls in the standard block-supports panels (Typography, Dimensions, Border, Color, Background, Filters) now reflect the value a block inherits from Global Styles when no local override is set. Inherited controls show that value at rest (as a placeholder, preselected option, or resolved value) and mark the label with a dotted underline; setting a local override reveals a reset affordance that clears the override back to the inherited value ([#77894](https://github.com/WordPress/gutenberg/pull/77894)).
+-   Inherited Global Styles now resolve per-level heading element styles for the heading-family blocks (`core/heading`, `core/site-title`, `core/post-title`, `core/query-title`, `core/comments-title`, `core/term-name`, `core/site-tagline`, `core/accordion-heading`), so inspector controls reflect values set on a specific heading level (`styles.elements.h1`–`h6`) in addition to the shared `heading` element. A block rendered at level 0 (a paragraph) folds no heading element styles; `core/accordion-heading` has no level-0 state and takes its level from the parent Accordion's block context ([#80495](https://github.com/WordPress/gutenberg/pull/80495)).
+-   Inherited Global Styles now resolve the `link` element (`styles.elements.link`) for whole-block link blocks — those that render as a link — so their inspector controls reflect inherited link styles, mirroring the `button` element treatment for `core/button`. Covers `core/read-more`, `core/loginout`, `core/post-navigation-link`, `core/query-pagination-next`, `core/query-pagination-previous`, `core/query-pagination-numbers`, `core/comments-pagination-next`, `core/comments-pagination-previous`, `core/comments-pagination-numbers`, `core/comment-edit-link`, `core/comment-reply-link`, and `core/post-comments-link` [#80607](https://github.com/WordPress/gutenberg/pull/80607)).
+
+### Internal
+
+-   Gate the inherited Global Styles treatment in the block inspector on the `gutenberg-global-styles-inheritance-ui` Gutenberg experiment, so `useResolvedStyle` resolves nothing and the block-supports panels render without the inheritance affordances until the experiment is turned on ([#80555](https://github.com/WordPress/gutenberg/pull/80555), [#80815](https://github.com/WordPress/gutenberg/pull/80815)).
+-   `URLInput`: Convert the class component to a function component with hooks, replacing the `compose( withSafeTimeout, withSpokenMessages, withInstanceId, withSelect )` wrapper. The unused `setTimeout` prop injected by `withSafeTimeout` is dropped, and the block editor settings are now read on demand rather than subscribed to ([#80721](https://github.com/WordPress/gutenberg/pull/80721)).
+
+### Bug Fixes
+
+-   Gate the HEIC canvas conversion fallback on `window.__clientSideMediaProcessing` instead of the redundant `window.__heicUploadSupport` flag, fixing client-side HEIC conversion in Safari on core WordPress installs ([#80452](https://github.com/WordPress/gutenberg/pull/80452)).
+-   `URLInput`: Request suggestions for a value the field is mounted with, instead of waiting for the input to be focused, and stop requesting initial suggestions on mount when `disableSuggestions` is set ([#80721](https://github.com/WordPress/gutenberg/pull/80721)).
+-   The multi-selection inspector card and the spoken selection announcement now disclose the total number of blocks a selection contains when the selected blocks have nested content, e.g. "2 blocks selected, 4 including nested blocks." ([#80745](https://github.com/WordPress/gutenberg/pull/80745)).
+
+## 16.0.0 (2026-07-14)
+
+### Internal
+
+-   Extract a shared `getBlockBindingsContext` helper for assembling the context handed to block-bindings sources; only entries present in the surrounding block context are copied ([#79855](https://github.com/WordPress/gutenberg/pull/79855)).
+
+### Bug Fixes
+
+-   Writing flow: Only pull a forward selection ending at the next element's offset 0 back into the previous block for triple clicks, and clamp the dispatched selection end offset to the rich text content length so an overshooting selection no longer collapses to its start ([#80126](https://github.com/WordPress/gutenberg/pull/80126)).
+-   `ListView`: Use the DS focus color token for the row focus ring so it adapts to themed surfaces such as the site editor navigation sidebar, and remove the duplicate focus ring on the row's Options (three-dot) button, which already draws the standard `Button` focus ring. ([#80087](https://github.com/WordPress/gutenberg/pull/80087)).
+-   `DimensionControl`: Include component styles in the block editor stylesheet so the fieldset reset is applied in Storybook and other contexts without WordPress core styles ([#79916](https://github.com/WordPress/gutenberg/pull/79916)).
+-   `InnerContent`: Render the selected inner block synchronously so its rich text selection stays current while typing; otherwise a stale selection offset could place a typed character at the wrong position in editable static inner blocks ([#79726](https://github.com/WordPress/gutenberg/pull/79726)).
+-   `useTypingObserver`: Capture the window reference at mount and reuse it during cleanup so the ref cleanup no longer reads `node.ownerDocument.defaultView` (which is `null` once the iframe-hosted editor has been detached from its window) and throws, which was also leaking the `removeEventListener` calls that follow it ([#78772](https://github.com/WordPress/gutenberg/pull/78772)).
+
+### Breaking Changes
+
+-   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed from the following:
+    -   `FontAppearanceControl` ([#79635](https://github.com/WordPress/gutenberg/pull/79635)).
+    -   `FontFamilyControl` ([#79593](https://github.com/WordPress/gutenberg/pull/79593)).
+    -   `LetterSpacingControl` ([#79533](https://github.com/WordPress/gutenberg/pull/79533)).
+    -   `LineHeightControl` ([#79589](https://github.com/WordPress/gutenberg/pull/79589)).
+
+### Deprecations
+
+-   Soft-deprecate the `__experimentalImageEditor` component. The Media Editor modal is now the default crop experience for core blocks ([#78654](https://github.com/WordPress/gutenberg/pull/78654)).
+
+### Enhancements
+
+-   Use the emphasis font-weight token for UI emphasis ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+-   Inserter media categories support an optional `emptyMessage`, shown in place of the generic "No results found" notice, that also keeps a source listed when it has no items. The media panel additionally renders attach/detach affordances for attached images ([#79336](https://github.com/WordPress/gutenberg/pull/79336)).
+
+## 15.23.0 (2026-07-01)
+
+## 15.22.0 (2026-06-24)
+
+### Enhancements
+
+-   Grid: Add a "Fill available space" option to the grid layout that switches the auto-placement keyword from `auto-fill` to `auto-fit`, so columns stretch to fill the row instead of leaving empty tracks. ([#79356](https://github.com/WordPress/gutenberg/pull/79356))
+-   List View: a block that supports `listView` is now excluded from the List View when it has no inner blocks and disallows insertion (`allowedBlocks` is `[]` or `false`), since there is nothing to show, rearrange, or add. ([#78932](https://github.com/WordPress/gutenberg/pull/78932))
+
+## 15.21.1 (2026-06-16)
+
 ## 15.21.0 (2026-06-10)
 
 ### Code Quality

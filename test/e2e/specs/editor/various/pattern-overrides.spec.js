@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Pattern Overrides', () => {
@@ -59,16 +56,21 @@ test.describe( 'Pattern Overrides', () => {
 				.click();
 
 			await editor.canvas
-				.getByRole( 'button', { name: 'Add default block' } )
+				.getByRole( 'document', { name: 'Add default block' } )
 				.click();
 			await page.keyboard.type( 'This paragraph can be edited' );
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( "This one can't" );
 
+			// Select the paragraph by clicking it. Focusing it
+			// programmatically does not move focus while the second editable
+			// root paragraph is selected and its wrapper holds focus (a nested
+			// editable element cannot take focus from an editing host
+			// ancestor).
 			await editor.canvas
 				.getByRole( 'document', { name: 'Block: Paragraph' } )
 				.filter( { hasText: 'This paragraph can be edited' } )
-				.focus();
+				.click();
 
 			await editor.clickBlockOptionsMenuItem( 'Rename' );
 			await page

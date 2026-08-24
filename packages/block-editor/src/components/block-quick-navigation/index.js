@@ -1,7 +1,4 @@
-/**
- * WordPress dependencies
- */
-import { hasBlockSupport, getBlockType } from '@wordpress/blocks';
+import { getBlockType } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
@@ -12,14 +9,11 @@ import {
 	FlexItem,
 } from '@wordpress/components';
 import { Icon, chevronRight } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
 import useBlockDisplayInformation from '../use-block-display-information';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
+import { unlock } from '../../lock-unlock';
 
 export default function BlockQuickNavigation( {
 	clientIds,
@@ -52,7 +46,7 @@ function BlockQuickNavigationItem( {
 	hasListViewTab,
 } ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const { isSelected, childBlocks, hasListViewSupport, blockName } =
+	const { isSelected, childBlocks, shouldRenderListView, blockName } =
 		useSelect(
 			( select ) => {
 				const {
@@ -60,7 +54,8 @@ function BlockQuickNavigationItem( {
 					hasSelectedInnerBlock,
 					getBlockOrder,
 					getBlockName,
-				} = select( blockEditorStore );
+					shouldRenderBlockListView,
+				} = unlock( select( blockEditorStore ) );
 
 				const _blockName = getBlockName( clientId );
 
@@ -69,9 +64,7 @@ function BlockQuickNavigationItem( {
 						isBlockSelected( clientId ) ||
 						hasSelectedInnerBlock( clientId, /* deep: */ true ),
 					childBlocks: getBlockOrder( clientId ),
-					hasListViewSupport:
-						_blockName === 'core/navigation' ||
-						hasBlockSupport( _blockName, 'listView' ),
+					shouldRenderListView: shouldRenderBlockListView( clientId ),
 					blockName: _blockName,
 				};
 			},
@@ -88,7 +81,7 @@ function BlockQuickNavigationItem( {
 
 	const hasChildren = childBlocks && childBlocks.length > 0;
 	const canNavigateToListView =
-		hasChildren && hasListViewTab && hasListViewSupport;
+		hasChildren && hasListViewTab && shouldRenderListView;
 
 	return (
 		<Button

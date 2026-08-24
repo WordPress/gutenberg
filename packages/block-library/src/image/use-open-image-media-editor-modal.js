@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	privateApis as blockEditorPrivateApis,
@@ -9,10 +6,6 @@ import {
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { useRegistry, useSelect } from '@wordpress/data';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 
 function normalizeImageBlockCaption( caption ) {
@@ -104,9 +97,6 @@ export function getSyncedImageBlockAttributes(
 }
 
 const { openMediaEditorModalKey } = unlock( blockEditorPrivateApis );
-// Caption sync needs `caption.raw`; view/default attachment records can contain
-// only rendered caption data or be tied to an in-flight stale resolution.
-const ATTACHMENT_EDIT_QUERY = { context: 'edit' };
 
 function getAttachmentFallbackForEmptyBlockMetadata( { alt, caption } ) {
 	const attachment = {};
@@ -140,6 +130,7 @@ export function useOpenImageMediaEditorModal( {
 	attributes,
 	setAttributes,
 	onClose,
+	onUrlChange,
 } ) {
 	// Keep this hook private to the Image block and pass the block attributes
 	// object so the callsite stays compact. Destructure only the attributes
@@ -177,25 +168,23 @@ export function useOpenImageMediaEditorModal( {
 		};
 	}, [ alt, caption, id, url ] );
 
+	// Reads the cached attachment record. The `attachment` postType entity
+	// fetches with `context: 'edit'` by default, so `getEditedEntityRecord`
+	// returns the edit-context record — carrying `caption` as `{ raw }` and a
+	// usable `alt_text` — without us specifying a context. It is resolver-
+	// backed, so on a cold cache this also kicks off the fetch and returns a
+	// falsy value synchronously; that resolution shares its cache key with the
+	// `resolveAttachmentRecord` call below (both keyed on the no-query
+	// `getEntityRecord`), so the two dedupe into a single request.
 	const getCachedAttachmentRecord = useCallback(
-		( attachmentId ) => {
-			const { getEditedEntityRecord, getEntityRecord } =
-				registry.select( coreStore );
-			return (
-				getEditedEntityRecord(
+		( attachmentId ) =>
+			registry
+				.select( coreStore )
+				.getEditedEntityRecord(
 					'postType',
 					'attachment',
 					attachmentId
-				) ||
-				getEntityRecord(
-					'postType',
-					'attachment',
-					attachmentId,
-					ATTACHMENT_EDIT_QUERY
-				) ||
-				getEntityRecord( 'postType', 'attachment', attachmentId )
-			);
-		},
+				),
 		[ registry ]
 	);
 
@@ -204,18 +193,10 @@ export function useOpenImageMediaEditorModal( {
 			const resolveSelect = registry.resolveSelect( coreStore );
 
 			try {
-				return (
-					( await resolveSelect.getEntityRecord(
-						'postType',
-						'attachment',
-						attachmentId,
-						ATTACHMENT_EDIT_QUERY
-					) ) ||
-					( await resolveSelect.getEntityRecord(
-						'postType',
-						'attachment',
-						attachmentId
-					) )
+				return await resolveSelect.getEntityRecord(
+					'postType',
+					'attachment',
+					attachmentId
 				);
 			} catch {
 				return undefined;
@@ -226,20 +207,15 @@ export function useOpenImageMediaEditorModal( {
 
 	const resolveFreshAttachmentRecord = useCallback(
 		async ( attachmentId ) => {
-			// Bust cached records so resolveAttachmentRecord fetches the
-			// server state that reflects the media editor's saved changes.
+			// Invalidate the cached resolution so resolveAttachmentRecord
+			// re-fetches the server state that reflects the media editor's
+			// saved changes.
 			const { invalidateResolution } = registry.dispatch( coreStore );
 
 			invalidateResolution( 'getEntityRecord', [
 				'postType',
 				'attachment',
 				attachmentId,
-			] );
-			invalidateResolution( 'getEntityRecord', [
-				'postType',
-				'attachment',
-				attachmentId,
-				ATTACHMENT_EDIT_QUERY,
 			] );
 			return resolveAttachmentRecord( attachmentId );
 		},
@@ -264,6 +240,12 @@ export function useOpenImageMediaEditorModal( {
 			if ( newId !== currentBlockAttributes.id ) {
 				nextAttributes.id = newId;
 				nextAttributes.url = newUrl ?? currentBlockAttributes.url;
+				if ( nextAttributes.url !== currentBlockAttributes.url ) {
+					// The block is about to point at a freshly generated file
+					// the browser hasn't loaded yet; let the caller show a
+					// loading state until its <img> fires load/error.
+					onUrlChange?.( nextAttributes.url );
+				}
 				blockAttributesRef.current = {
 					...blockAttributesRef.current,
 					id: nextAttributes.id,
@@ -312,7 +294,7 @@ export function useOpenImageMediaEditorModal( {
 				setAttributes( nextAttributes );
 			}
 		},
-		[ resolveFreshAttachmentRecord, setAttributes ]
+		[ onUrlChange, resolveFreshAttachmentRecord, setAttributes ]
 	);
 
 	const openImageMediaEditorModal = useCallback( async () => {
@@ -321,10 +303,10 @@ export function useOpenImageMediaEditorModal( {
 		}
 
 		// Snapshot the attachment's current metadata before the user makes
-		// any changes so handleMediaUpdate can compare against it later.
-		// Prefer a freshly resolved edit-context record for accuracy; fall
-		// back to whatever is in the cache, or a minimal object derived from
-		// the block's own attributes when nothing is cached yet.
+		// any changes so handleMediaUpdate can compare against it later. Use
+		// the cached record when it's already present; only resolve when
+		// nothing is cached yet, then fall back to a minimal object derived
+		// from the block's own attributes.
 		const cachedAttachmentRecord = getCachedAttachmentRecord( id );
 		const fallbackAttachmentRecord =
 			getAttachmentFallbackForEmptyBlockMetadata(

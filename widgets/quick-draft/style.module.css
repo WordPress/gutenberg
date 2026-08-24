@@ -30,7 +30,7 @@
 /* Wide tile: drafts list sits beside the form, split by a vertical rule. */
 .row .primaryPane {
 	border-inline-end: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
-	max-width: calc(var(--wpds-dimension-base) * 100);
+	max-width: var(--wpds-dimension-surface-width-md);
 	margin: 0 auto;
 }
 

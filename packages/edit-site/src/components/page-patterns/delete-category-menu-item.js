@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	MenuItem,
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -12,10 +9,6 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { PATTERN_TYPES, PATTERN_DEFAULT_CATEGORY } from '../../utils/constants';
 

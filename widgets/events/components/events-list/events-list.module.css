@@ -14,8 +14,8 @@
 
 .eventIcon {
 	height: 100%;
-	background-color: var(--wpds-color-bg-track-neutral-weak);
-	color: var(--wpds-color-fg-content-neutral-weak);
+	background-color: var(--wpds-color-background-track-neutral-weak);
+	color: var(--wpds-color-foreground-content-neutral-weak);
 }
 
 .titleLink {
@@ -26,7 +26,7 @@
 }
 
 .meta {
-	color: var(--wpds-color-fg-content-neutral-weak);
+	color: var(--wpds-color-foreground-content-neutral-weak);
 }
 
 .emptyState {
@@ -37,5 +37,5 @@
 	flex-shrink: 0;
 	padding-block: var(--wpds-dimension-padding-md);
 	padding-inline: var(--wpds-dimension-padding-2xl);
-	color: var(--wpds-color-fg-content-neutral-weak);
+	color: var(--wpds-color-foreground-content-neutral-weak);
 }

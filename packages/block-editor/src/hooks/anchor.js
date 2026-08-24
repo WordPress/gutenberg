@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { addFilter } from '@wordpress/hooks';
 import { TextControl, ExternalLink } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { InspectorControls } from '../components';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 
@@ -55,7 +48,6 @@ function BlockEditAnchorControlPure( { anchor, setAttributes } ) {
 	return (
 		<InspectorControls group="advanced">
 			<TextControl
-				__next40pxDefaultSize
 				className="html-anchor-control"
 				label={ __( 'HTML anchor' ) }
 				help={

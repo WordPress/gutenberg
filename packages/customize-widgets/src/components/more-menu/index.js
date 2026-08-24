@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	MenuGroup,
 	MenuItem,
@@ -13,10 +10,6 @@ import { displayShortcut } from '@wordpress/keycodes';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { PreferenceToggleMenuItem } from '@wordpress/preferences';
 import { VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 
 export default function MoreMenu() {

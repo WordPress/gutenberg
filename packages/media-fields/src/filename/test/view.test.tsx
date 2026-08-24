@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import type { NormalizedField } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import FileNameView from '../view';
 import filenameField from '../index';
 import type { MediaItem } from '../../types';

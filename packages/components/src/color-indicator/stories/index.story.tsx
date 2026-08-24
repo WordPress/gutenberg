@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import ColorIndicator from '..';
 
 const meta: Meta< typeof ColorIndicator > = {

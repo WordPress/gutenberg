@@ -1230,7 +1230,7 @@ This ensures that rapid clicking through multiple links doesn't cause visual gli
 
 Full-page client-side navigation is an experimental feature that extends the region-based approach described throughout this guide. Instead of requiring you to define individual router regions, full-page navigation treats the entire `<body>` element as a single region — effectively replacing all page content during navigation.
 
-This feature is only available in the Gutenberg plugin and must be enabled manually. To activate it, go to **WP Admin > Gutenberg > Experiments** and check the **"Interactivity API: Full-page client-side navigation"** option.
+This feature is only available in the Gutenberg plugin and must be enabled manually. To activate it, go to **WP Admin > Settings > Gutenberg Experiments** and check the **"Interactivity API: Full-page client-side navigation"** option.
 
 Once enabled, this mode automatically intercepts all link clicks and hover events on the page, triggering client-side navigation and prefetching without you needing to write any custom action handlers. It is available through a separate entry point in the router package:
 

@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { TextDecoder, TextEncoder } from 'node:util';
 import { Blob as BlobPolyfill, File as FilePolyfill } from 'node:buffer';
 import timezoneMock from 'timezone-mock';
@@ -65,12 +62,88 @@ jest.mock( 'client-zip', () => ( {
 
 global.ResizeObserver = require( 'resize-observer-polyfill' );
 
+/**
+ * A minimal, constructable DOMRectList implementation. The browser-native
+ * implementation is not constructable, and DOMRectList differ from arrays.
+ *
+ * @see https://drafts.csswg.org/geometry/#DOMRectList
+ */
+class FakeDOMRectList extends Array {
+	/**
+	 * @param {number} index The index of the DOMRect to return.
+	 *
+	 * @return {DOMRect | null} The DOMRect at the given index, or null if the
+	 *                          given index is out of bounds.
+	 */
+	item( index ) {
+		return this[ index ] ?? null;
+	}
+}
+
+/**
+ * Checks if an element has an associated layout box.
+ *
+ * The checks intentionally avoid `window.getComputedStyle`, which is very slow
+ * in JSDOM. Instead, we check visibility based on accessible attributes and
+ * inline styles. The trade-off is that this doesn't fully resolve visibility
+ * applied through CSS styles, though generally we do not rely on stylesheet
+ * styles in tests.
+ *
+ * @param {HTMLElement} element The element to check.
+ * @return {boolean} Whether the element has an associated layout box.
+ */
+function hasAssociatedLayoutBox( element ) {
+	if ( ! element.isConnected ) {
+		return false;
+	}
+
+	/** @type {HTMLElement | null} */
+	let current = element;
+	while ( current ) {
+		if ( current.hidden ) {
+			return false;
+		}
+
+		if ( current.style?.display === 'none' ) {
+			return false;
+		}
+
+		if ( current === element && current.style?.display === 'contents' ) {
+			return false;
+		}
+
+		current = current.parentElement;
+	}
+
+	return true;
+}
+
 // The following jsdom-targeted setup is skipped when a test opts into
 // `@jest-environment node` so SSR-style tests can run under this config.
 if ( typeof window !== 'undefined' ) {
 	// jsdom lacks Element.getAnimations (needed by Base UI ScrollArea ≥1.3)
 	if ( ! global.HTMLElement.prototype.getAnimations ) {
 		global.HTMLElement.prototype.getAnimations = () => [];
+	}
+
+	// jsdom lacks PointerEvent (needed by Base UI keyboard activation ≥1.7).
+	if ( ! global.PointerEvent ) {
+		global.PointerEvent = class PointerEvent extends global.MouseEvent {
+			constructor( type, init = {} ) {
+				super( type, init );
+				this.pointerId = init.pointerId ?? 0;
+				this.pointerType = init.pointerType ?? '';
+				this.isPrimary = init.isPrimary ?? false;
+			}
+		};
+	}
+
+	// jsdom lacks CSS.supports (needed by Ariakit's modal scroll locking).
+	if ( ! global.CSS ) {
+		global.CSS = {};
+	}
+	if ( ! global.CSS.supports ) {
+		global.CSS.supports = jest.fn( () => false );
 	}
 
 	/**
@@ -89,6 +162,33 @@ if ( typeof window !== 'undefined' ) {
 	 * @see https://github.com/jsdom/jsdom/issues/1695
 	 */
 	global.Element.prototype.scrollIntoView = jest.fn();
+
+	/**
+	 * Polyfill Element#getClientRects to minimally emulate element visibility.
+	 *
+	 * JSDOM does not have a layout engine, so visible elements otherwise report
+	 * no client rects and can be treated as hidden by focusability checks.
+	 *
+	 * @see https://github.com/jsdom/jsdom/issues/653
+	 * @see https://github.com/jsdom/jsdom/issues/1322
+	 */
+	global.Element.prototype.getClientRects = function () {
+		const rects = [];
+		if ( hasAssociatedLayoutBox( this ) ) {
+			rects.push( {
+				bottom: 1,
+				height: 1,
+				left: 0,
+				right: 1,
+				top: 0,
+				width: 1,
+				x: 0,
+				y: 0,
+			} );
+		}
+
+		return new FakeDOMRectList( ...rects );
+	};
 }
 
 if ( ! global.TextDecoder ) {

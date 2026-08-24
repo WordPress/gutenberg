@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { camelCase } from 'change-case';
-
-/**
- * WordPress dependencies
- */
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Internal dependencies
- */
 import { STORE_NAME } from './name';
 import { additionalEntityConfigLoaders, DEFAULT_ENTITY_KEY } from './entities';
 import { getSyncManager } from './sync';
@@ -29,7 +18,7 @@ import {
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
 import { restoreSelection, getSelectionHistory } from './utils/crdt-selection';
-import { parsedBlocksCache, getCacheKey } from './parsed-blocks-cache';
+import { setCachedBlocks } from './parsed-blocks-cache';
 
 /**
  * Requests authors from the REST API.
@@ -183,19 +172,34 @@ export const getEntityRecord =
 					} );
 
 				// Share the parsed blocks with `useEntityBlockEditor` so the
-				// editor doesn't re-parse the same `content` string.
+				// editor doesn't re-parse the same `content` string. The cache
+				// remembers which block types the parse ran against, so an
+				// entry computed before they register is discarded, not served.
 				if (
 					recordWithTransients.blocks &&
 					typeof recordWithTransients.content?.raw === 'string'
 				) {
-					parsedBlocksCache.set( getCacheKey( kind, name, key ), {
-						content: recordWithTransients.content.raw,
-						blocks: recordWithTransients.blocks,
-					} );
+					setCachedBlocks(
+						kind,
+						name,
+						key,
+						recordWithTransients.content.raw,
+						recordWithTransients.blocks
+					);
 				}
 
+				const syncManager =
+					select?.isCollaborationSupported?.() === false
+						? undefined
+						: getSyncManager();
+
 				// Load the entity record for syncing. Do not await promise.
-				void getSyncManager()?.load(
+				// NOTE: when this resolver runs before block types register,
+				// `recordWithTransients.blocks` was parsed as empty. The cache
+				// above discards such an entry; the sync manager receives it
+				// as-is, and seeding a collaborative document from it is an
+				// open problem of the collaboration path.
+				void syncManager?.load(
 					entityConfig.syncConfig,
 					objectType,
 					objectId,
@@ -1062,7 +1066,7 @@ getDefaultTemplateId.shouldInvalidate = ( action ) => {
  */
 export const getRevisions =
 	( kind, name, recordKey, query = {} ) =>
-	async ( { dispatch, registry, resolveSelect } ) => {
+	async ( { dispatch, resolveSelect } ) => {
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
@@ -1137,37 +1141,31 @@ export const getRevisions =
 					} );
 				}
 
-				registry.batch( () => {
-					dispatch.receiveRevisions(
+				await dispatch.receiveRevisions(
+					kind,
+					name,
+					recordKey,
+					records,
+					query,
+					false,
+					meta
+				);
+
+				// Mark individual getRevision resolutions as done so that
+				// subsequent getRevision calls skip redundant API fetches.
+				const key = entityConfig.revisionKey || DEFAULT_ENTITY_KEY;
+				const normalizedQuery = normalizeQueryForResolution( rawQuery );
+				const resolutionsArgs = records
+					.filter( ( record ) => record[ key ] )
+					.map( ( record ) => [
 						kind,
 						name,
 						recordKey,
-						records,
-						query,
-						false,
-						meta
-					);
+						record[ key ],
+						normalizedQuery,
+					] );
 
-					// Mark individual getRevision resolutions as done so that
-					// subsequent getRevision calls skip redundant API fetches.
-					const key = entityConfig.revisionKey || DEFAULT_ENTITY_KEY;
-					const normalizedQuery =
-						normalizeQueryForResolution( rawQuery );
-					const resolutionsArgs = records
-						.filter( ( record ) => record[ key ] )
-						.map( ( record ) => [
-							kind,
-							name,
-							recordKey,
-							record[ key ],
-							normalizedQuery,
-						] );
-
-					dispatch.finishResolutions(
-						'getRevision',
-						resolutionsArgs
-					);
-				} );
+				dispatch.finishResolutions( 'getRevision', resolutionsArgs );
 			}
 		} finally {
 			dispatch.__unstableReleaseStoreLock( lock );
@@ -1256,7 +1254,7 @@ export const getRevision =
 			}
 
 			if ( record ) {
-				dispatch.receiveRevisions(
+				await dispatch.receiveRevisions(
 					kind,
 					name,
 					recordKey,
@@ -1355,14 +1353,24 @@ export const getEditorAssets =
 /**
  * Requests view config for a given entity type from the REST API.
  *
- * @param {string} kind Entity kind.
- * @param {string} name Entity name.
+ * @param {string}    kind           Entity kind.
+ * @param {string}    name           Entity name.
+ * @param {?Object}   options        Optional options.
+ * @param {?string[]} options.fields Optional subset of top-level config
+ *                                   properties to request, mapped to the REST
+ *                                   API `_fields` parameter. When omitted, the
+ *                                   full config is requested.
  */
 export const getViewConfig =
-	( kind, name ) =>
+	( kind, name, options = {} ) =>
 	async ( { dispatch } ) => {
+		const query = { kind, name };
+		const fields = getNormalizedCommaSeparable( options.fields );
+		if ( fields?.length ) {
+			query._fields = fields.join( ',' );
+		}
 		const config = await apiFetch( {
-			path: addQueryArgs( '/wp/v2/view-config', { kind, name } ),
+			path: addQueryArgs( '/wp/v2/view-config', query ),
 		} );
 		dispatch.receiveViewConfig( kind, name, config );
 	};

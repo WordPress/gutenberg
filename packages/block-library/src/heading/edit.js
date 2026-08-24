@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -9,10 +6,6 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { generateAnchor, setAnchor } from './autogenerate-anchors';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
@@ -64,7 +57,14 @@ function HeadingEdit( props ) {
 
 		// Remove anchor map when block unmounts.
 		return () => setAnchor( clientId, null );
-	}, [ anchor, content, clientId, canGenerateAnchors ] );
+	}, [
+		anchor,
+		content,
+		clientId,
+		canGenerateAnchors,
+		setAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
 
 	const onContentChange = ( value ) => {
 		const newAttrs = { content: value };
@@ -80,19 +80,17 @@ function HeadingEdit( props ) {
 	};
 
 	return (
-		<>
-			<RichText
-				identifier="content"
-				tagName={ tagName }
-				value={ content }
-				onChange={ onContentChange }
-				onMerge={ mergeBlocks }
-				onReplace={ onReplace }
-				onRemove={ () => onReplace( [] ) }
-				placeholder={ placeholder || __( 'Heading' ) }
-				{ ...blockProps }
-			/>
-		</>
+		<RichText
+			identifier="content"
+			tagName={ tagName }
+			value={ content }
+			onChange={ onContentChange }
+			onMerge={ mergeBlocks }
+			onReplace={ onReplace }
+			onRemove={ onReplace ? () => onReplace( [] ) : undefined }
+			placeholder={ placeholder || __( 'Heading' ) }
+			{ ...blockProps }
+		/>
 	);
 }
 

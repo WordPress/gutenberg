@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import useClipboardHandler from '../writing-flow/use-clipboard-handler';
 
 /**

@@ -312,6 +312,12 @@
 		"parent": "themes"
 	},
 	{
+		"title": "Client-Side Media Processing",
+		"slug": "client-side-media",
+		"markdown_source": "../docs/how-to-guides/client-side-media.md",
+		"parent": "how-to-guides"
+	},
+	{
 		"title": "Thunks in Core-Data",
 		"slug": "thunks",
 		"markdown_source": "../docs/how-to-guides/thunks.md",
@@ -1440,6 +1446,12 @@
 		"parent": "theme-json-reference"
 	},
 	{
+		"title": "View Configuration Reference",
+		"slug": "view-config-reference",
+		"markdown_source": "../docs/reference-guides/view-config-reference.md",
+		"parent": "reference-guides"
+	},
+	{
 		"title": "Component Reference",
 		"slug": "components",
 		"markdown_source": "../packages/components/README.md",
@@ -1503,18 +1515,6 @@
 		"title": "Button",
 		"slug": "button",
 		"markdown_source": "../packages/components/src/button/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "DateCalendar",
-		"slug": "date-calendar",
-		"markdown_source": "../packages/components/src/calendar/date-calendar/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "DateRangeCalendar",
-		"slug": "date-range-calendar",
-		"markdown_source": "../packages/components/src/calendar/date-range-calendar/README.md",
 		"parent": "components"
 	},
 	{
@@ -1605,6 +1605,12 @@
 		"title": "ConfirmDialog",
 		"slug": "confirm-dialog",
 		"markdown_source": "../packages/components/src/confirm-dialog/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ContentEditableControl",
+		"slug": "content-editable-control",
+		"markdown_source": "../packages/components/src/content-editable-control/README.md",
 		"parent": "components"
 	},
 	{
@@ -2532,6 +2538,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/grid",
+		"slug": "packages-grid",
+		"markdown_source": "../packages/grid/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/hooks",
 		"slug": "packages-hooks",
 		"markdown_source": "../packages/hooks/README.md",
@@ -2598,9 +2610,9 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/jest-puppeteer-axe",
-		"slug": "packages-jest-puppeteer-axe",
-		"markdown_source": "../packages/jest-puppeteer-axe/README.md",
+		"title": "@wordpress/kebab-case",
+		"slug": "packages-kebab-case",
+		"markdown_source": "../packages/kebab-case/README.md",
 		"parent": "packages"
 	},
 	{
@@ -2868,6 +2880,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/video-conversion",
+		"slug": "packages-video-conversion",
+		"markdown_source": "../packages/video-conversion/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/viewport",
 		"slug": "packages-viewport",
 		"markdown_source": "../packages/viewport/README.md",
@@ -2889,6 +2907,18 @@
 		"title": "@wordpress/warning",
 		"slug": "packages-warning",
 		"markdown_source": "../packages/warning/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/widget-dashboard",
+		"slug": "packages-widget-dashboard",
+		"markdown_source": "../packages/widget-dashboard/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/widget-primitives",
+		"slug": "packages-widget-primitives",
+		"markdown_source": "../packages/widget-primitives/README.md",
 		"parent": "packages"
 	},
 	{
@@ -3084,6 +3114,18 @@
 		"parent": "architecture"
 	},
 	{
+		"title": "Client-Side Media Processing",
+		"slug": "client-side-media-architecture",
+		"markdown_source": "../docs/explanations/architecture/client-side-media-architecture.md",
+		"parent": "architecture"
+	},
+	{
+		"title": "The Dashboard Widget System",
+		"slug": "dashboard-widgets",
+		"markdown_source": "../docs/explanations/architecture/dashboard-widgets.md",
+		"parent": "architecture"
+	},
+	{
 		"title": "User Interface",
 		"slug": "user-interface",
 		"markdown_source": "../docs/explanations/user-interface/README.md",
@@ -3180,6 +3222,12 @@
 		"parent": "code"
 	},
 	{
+		"title": "Agents and Skills",
+		"slug": "agents-and-skills",
+		"markdown_source": "../docs/contributors/code/agents-and-skills.md",
+		"parent": "code"
+	},
+	{
 		"title": "Gutenberg Release Process",
 		"slug": "release",
 		"markdown_source": "../docs/contributors/code/release/README.md",
@@ -3226,6 +3274,12 @@
 		"slug": "design",
 		"markdown_source": "../docs/contributors/design/README.md",
 		"parent": "contributors"
+	},
+	{
+		"title": "Working with WordPress Design System packages",
+		"slug": "design-system-packages",
+		"markdown_source": "../docs/contributors/design/design-system-packages.md",
+		"parent": "design"
 	},
 	{
 		"title": "Blocks are the Interface",

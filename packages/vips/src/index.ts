@@ -1,23 +1,16 @@
-/**
- * External dependencies
- */
 import Vips from 'wasm-vips';
-
-// @ts-expect-error - WASM files are inlined as base64 data URLs at build time
+// @ts-expect-error - WASM files are inlined as Uint8Array at build time.
 import VipsModule from 'wasm-vips/vips.wasm';
-
-// @ts-expect-error - WASM files are inlined as base64 data URLs at build time
+// @ts-expect-error - WASM files are inlined as Uint8Array at build time.
 import VipsHeifModule from 'wasm-vips/vips-heif.wasm';
-
-/**
- * Internal dependencies
- */
 import type {
 	ItemId,
 	ImageSizeCrop,
 	LoadOptions,
 	SaveOptions,
 	ThumbnailOptions,
+	ConvertImageOptions,
+	ResizeImageOptions,
 } from './types';
 import { supportsAnimation, supportsInterlace, supportsQuality } from './utils';
 
@@ -29,6 +22,32 @@ interface EmscriptenModule {
 let cleanup: () => void;
 
 let vipsPromise: Promise< typeof Vips > | undefined;
+
+/**
+ * Caches Blob URLs created for inlined WASM binaries.
+ *
+ * The WASM binaries are inlined as `Uint8Array` values at build time. wasm-vips
+ * loads them (including the HEIF dynamic library) by fetching a URL, so the
+ * bytes are wrapped in a Blob URL the first time each is requested.
+ */
+const wasmUrls = new WeakMap< Uint8Array< ArrayBuffer >, string >();
+
+/**
+ * Returns a Blob URL for an inlined WASM binary, creating it on first use.
+ *
+ * @param bytes The inlined WASM binary.
+ * @return A Blob URL pointing at the binary.
+ */
+function getWasmUrl( bytes: Uint8Array< ArrayBuffer > ): string {
+	let url = wasmUrls.get( bytes );
+	if ( ! url ) {
+		url = URL.createObjectURL(
+			new Blob( [ bytes ], { type: 'application/wasm' } )
+		);
+		wasmUrls.set( bytes, url );
+	}
+	return url;
+}
 
 /**
  * Instantiates and returns a new vips instance.
@@ -46,13 +65,15 @@ async function getVips(): Promise< typeof Vips > {
 		// It can be re-added when Core adds JXL support.
 		dynamicLibraries: [ 'vips-heif.wasm' ],
 		locateFile: ( fileName: string ) => {
-			// WASM files are inlined as base64 data URLs at build time,
-			// eliminating the need for separate file downloads and avoiding
-			// issues with hosts not serving WASM files with correct MIME types.
+			// WASM files are inlined as a Uint8Array at build time and exposed
+			// here as Blob URLs. This eliminates the need for separate file
+			// downloads and avoids issues with hosts not serving WASM files
+			// with correct MIME types, while keeping the inlined bytes
+			// compressible (see the build-time binary encoding).
 			if ( fileName.endsWith( 'vips.wasm' ) ) {
-				return VipsModule;
+				return getWasmUrl( VipsModule );
 			} else if ( fileName.endsWith( 'vips-heif.wasm' ) ) {
-				return VipsHeifModule;
+				return getWasmUrl( VipsHeifModule );
 			}
 			return fileName;
 		},
@@ -112,18 +133,21 @@ export async function cancelOperations( id: ItemId ) {
  * @param buffer     Original file buffer.
  * @param inputType  Input mime type.
  * @param outputType Output mime type.
- * @param quality    Desired quality.
- * @param interlaced Whether to use interlaced/progressive mode.
- *                   Only used if the outputType supports it.
+ * @param options    Conversion options.
  */
 export async function convertImageFormat(
 	id: ItemId,
 	buffer: ArrayBuffer,
 	inputType: string,
 	outputType: string,
-	quality = 0.82,
-	interlaced = false
+	options: ConvertImageOptions = {}
 ): Promise< ArrayBuffer | ArrayBufferLike > {
+	const {
+		quality = 0.82,
+		interlaced = false,
+		stripMeta = true,
+		maxBitdepth = 16,
+	} = options;
 	const ext = outputType.split( '/' )[ 1 ];
 
 	inProgressOperations.add( id );
@@ -132,8 +156,18 @@ export async function convertImageFormat(
 		let strOptions = '';
 		const loadOptions: LoadOptions< typeof inputType > = {};
 
-		// To ensure all frames are loaded in case the image is animated.
-		if ( supportsAnimation( inputType ) ) {
+		/*
+		 * To ensure all frames are loaded in case the image is animated and
+		 * the output format can represent them. A still output (e.g. a JPEG
+		 * poster for a GIF) only needs the first frame; loading all frames
+		 * would decode them as one vertical strip whose height easily
+		 * exceeds encoder dimension limits for long animations.
+		 * See https://github.com/WordPress/gutenberg/issues/80259.
+		 */
+		if (
+			supportsAnimation( inputType ) &&
+			supportsAnimation( outputType )
+		) {
 			strOptions = '[n=-1]';
 			( loadOptions as LoadOptions< typeof inputType > ).n = -1;
 		}
@@ -154,8 +188,9 @@ export async function convertImageFormat(
 
 		const saveOptions: SaveOptions< typeof outputType > = {
 			// Strip metadata except ICC color profiles,
-			// matching WordPress core's behavior.
-			keep: 'icc',
+			// matching WordPress core's behavior. The `image_strip_meta`
+			// filter can disable stripping entirely.
+			keep: stripMeta ? 'icc' : 'all',
 		};
 
 		if ( supportsQuality( outputType ) ) {
@@ -169,6 +204,22 @@ export async function convertImageFormat(
 		// See https://github.com/swissspidy/media-experiments/issues/324.
 		if ( 'image/avif' === outputType ) {
 			saveOptions.effort = 2;
+
+			// Preserve the source bit depth so high-bit-depth (10/12-bit) HDR
+			// images stay high-bit-depth when compressed or converted to AVIF
+			// instead of being flattened to 8-bit. Unlike resizing, this path
+			// keeps the decoded 16-bit image, so no extra handling is needed.
+			// The `image_max_bit_depth` filter can cap the output depth; the
+			// depth is set explicitly whenever the source is high-bit-depth,
+			// since heifsave would otherwise default to 12-bit for 16-bit
+			// pixel data.
+			const sourceBitdepth = getSourceBitdepth( image );
+			if ( sourceBitdepth > 8 ) {
+				saveOptions.bitdepth = resolveSaveBitdepth(
+					sourceBitdepth,
+					maxBitdepth
+				);
+			}
 		}
 
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
@@ -185,22 +236,19 @@ export async function convertImageFormat(
 /**
  * Compresses an existing image using vips.
  *
- * @param id         Item ID.
- * @param buffer     Original file buffer.
- * @param type       Mime type.
- * @param quality    Desired quality.
- * @param interlaced Whether to use interlaced/progressive mode.
- *                   Only used if the outputType supports it.
+ * @param id      Item ID.
+ * @param buffer  Original file buffer.
+ * @param type    Mime type.
+ * @param options Compression options.
  * @return Compressed file data.
  */
 export async function compressImage(
 	id: ItemId,
 	buffer: ArrayBuffer,
 	type: string,
-	quality = 0.82,
-	interlaced = false
+	options: ConvertImageOptions = {}
 ): Promise< ArrayBuffer | ArrayBufferLike > {
-	return convertImageFormat( id, buffer, type, type, quality, interlaced );
+	return convertImageFormat( id, buffer, type, type, options );
 }
 
 /**
@@ -346,20 +394,74 @@ function applyResizeAndCrop<
 }
 
 /**
+ * Reads the source bit depth of a decoded HEIF/AVIF image.
+ *
+ * High-bit-depth (10/12-bit) AVIF/HEIF images decode into a 16-bit `ushort`
+ * container and expose a `heif-bitdepth` metadata field. Standard 8-bit images
+ * report 8 or omit the field. Used to keep HDR sub-sizes at their original bit
+ * depth instead of silently flattening them to 8-bit.
+ *
+ * @param image Decoded vips image.
+ * @return Source bit depth (typically 8, 10, or 12).
+ */
+function getSourceBitdepth< T extends { getInt: ( name: string ) => number } >(
+	image: T
+): number {
+	try {
+		const bitdepth = image.getInt( 'heif-bitdepth' );
+		if ( bitdepth > 8 ) {
+			return bitdepth;
+		}
+	} catch {
+		// Field absent: standard (8-bit) image.
+	}
+	return 8;
+}
+
+/**
+ * Resolves the effective AVIF save bit depth from the source depth and the
+ * `image_max_bit_depth` cap, snapping down to the nearest depth supported by
+ * heifsave (8, 10, or 12) since the filter may return any integer.
+ *
+ * @param sourceBitdepth Source bit depth (8, 10, or 12).
+ * @param maxBitdepth    Maximum bit depth from the `image_max_bit_depth` filter.
+ * @return The bit depth to save at.
+ */
+function resolveSaveBitdepth(
+	sourceBitdepth: number,
+	maxBitdepth: number
+): number {
+	const target = Math.min( sourceBitdepth, maxBitdepth );
+	if ( target >= 12 ) {
+		return 12;
+	}
+	if ( target >= 10 ) {
+		return 10;
+	}
+	return 8;
+}
+
+/**
  * Builds save options for writing an image to a buffer.
  *
- * @param type    Output mime type.
- * @param quality Desired quality (0-1).
+ * @param type      Output mime type.
+ * @param quality   Desired quality (0-1).
+ * @param bitdepth  Save bit depth; values above 8 are preserved for AVIF.
+ * @param stripMeta Whether to strip metadata (except color profiles),
+ *                  from the `image_strip_meta` filter.
  * @return Save options object.
  */
 function buildSaveOptions(
 	type: string,
-	quality: number
+	quality: number,
+	bitdepth = 8,
+	stripMeta = true
 ): SaveOptions< typeof type > {
 	const saveOptions: SaveOptions< typeof type > = {
 		// Strip metadata except ICC color profiles or gainmaps,
-		// matching WordPress core's behavior.
-		keep: 'icc|gainmap',
+		// matching WordPress core's behavior. The `image_strip_meta`
+		// filter can disable stripping entirely.
+		keep: stripMeta ? 'icc|gainmap' : 'all',
 	};
 
 	if ( supportsQuality( type ) ) {
@@ -369,9 +471,76 @@ function buildSaveOptions(
 	// See https://github.com/swissspidy/media-experiments/issues/324.
 	if ( 'image/avif' === type ) {
 		saveOptions.effort = 2;
+
+		// Preserve the source bit depth so high-bit-depth (10/12-bit) HDR
+		// images are not flattened to 8-bit on output.
+		if ( bitdepth > 8 ) {
+			saveOptions.bitdepth = bitdepth;
+		}
 	}
 
 	return saveOptions;
+}
+
+/**
+ * Resizes a decoded high-bit-depth image while preserving its 16-bit samples.
+ *
+ * libvips `thumbnail` performs a colour-managed export that flattens samples to
+ * 8-bit sRGB, which would silently turn HDR sub-sizes into 8-bit. `resize` and
+ * `crop` keep the full 16-bit precision, so this mirrors `thumbnail`'s geometry
+ * (shrink-to-fit, or fill-then-centre-crop when a crop is requested) using those
+ * operations instead. Attention/smart cropping is unavailable here and falls
+ * back to a centre crop. `size: 'down'` semantics are preserved: images are
+ * never enlarged.
+ *
+ * @param image       Decoded 16-bit source image.
+ * @param targetWidth Target width in pixels.
+ * @param options     Thumbnail options (target height and optional crop).
+ * @return The resized (and optionally cropped) 16-bit image.
+ */
+function resizeHighBitDepth<
+	T extends {
+		width: number;
+		pageHeight: number;
+		resize: ( scale: number ) => T;
+		crop: ( left: number, top: number, width: number, height: number ) => T;
+	},
+>( image: T, targetWidth: number, options: ThumbnailOptions ): T {
+	const targetHeight = options.height ?? targetWidth;
+
+	if ( options.crop ) {
+		// Fill the target box, then centre-crop to the exact dimensions.
+		const scale = Math.min(
+			1,
+			Math.max(
+				targetWidth / image.width,
+				targetHeight / image.pageHeight
+			)
+		);
+		const resized = image.resize( scale );
+		const cropWidth = Math.min( resized.width, Math.round( targetWidth ) );
+		const cropHeight = Math.min(
+			resized.pageHeight,
+			Math.round( targetHeight )
+		);
+		const left = Math.max(
+			0,
+			Math.round( ( resized.width - cropWidth ) / 2 )
+		);
+		const top = Math.max(
+			0,
+			Math.round( ( resized.pageHeight - cropHeight ) / 2 )
+		);
+		return resized.crop( left, top, cropWidth, cropHeight );
+	}
+
+	// Shrink to fit within the target box, preserving the aspect ratio.
+	const scale = Math.min(
+		1,
+		targetWidth / image.width,
+		targetHeight / image.pageHeight
+	);
+	return image.resize( scale );
 }
 
 /**
@@ -382,12 +551,20 @@ function buildSaveOptions(
  * decode the gain map alongside the base image, and `jpegsave*` delegates
  * to `uhdrsave*` on output when a gain map is attached.
  *
- * @param id        Item ID.
- * @param buffer    Original file buffer.
- * @param type      Mime type.
- * @param resize    Resize options.
- * @param smartCrop Whether to use smart cropping (i.e. saliency-aware).
- * @param quality   Desired quality (0-1).
+ * Sub-sizes of animated images are generated from the first frame only,
+ * matching WordPress core's server-side behavior: both GD and Imagick
+ * flatten animated images when resizing, and `wp_calculate_image_srcset()`
+ * prevents flattened sub-sizes and the animated full-size image from mixing
+ * in a srcset. Loading all frames (`[n=-1]`) would re-encode a full animated
+ * GIF per sub-size, which takes tens of seconds for long animations and can
+ * produce sub-sizes larger than the original file.
+ * See https://github.com/WordPress/gutenberg/issues/80266.
+ *
+ * @param id      Item ID.
+ * @param buffer  Original file buffer.
+ * @param type    Mime type.
+ * @param resize  Resize options.
+ * @param options Additional resize options.
  * @return Processed file data plus the old and new dimensions.
  */
 export async function resizeImage(
@@ -395,8 +572,7 @@ export async function resizeImage(
 	buffer: ArrayBuffer,
 	type: string,
 	resize: ImageSizeCrop,
-	smartCrop = false,
-	quality = 0.82
+	options: ResizeImageOptions = {}
 ): Promise< {
 	buffer: ArrayBuffer | ArrayBufferLike;
 	width: number;
@@ -404,22 +580,18 @@ export async function resizeImage(
 	originalWidth: number;
 	originalHeight: number;
 } > {
+	const {
+		smartCrop = false,
+		quality = 0.82,
+		stripMeta = true,
+		maxBitdepth = 16,
+	} = options;
 	const ext = type.split( '/' )[ 1 ];
 
 	inProgressOperations.add( id );
 
 	try {
 		const vips = await getVips();
-
-		let strOptions = '';
-		const loadOptions: LoadOptions< typeof type > = {};
-
-		// To ensure all frames are loaded in case the image is animated.
-		// But only if we're not cropping.
-		if ( supportsAnimation( type ) && ! resize.crop ) {
-			strOptions = '[n=-1]';
-			( loadOptions as LoadOptions< typeof type > ).n = -1;
-		}
 
 		// TODO: Report progress, see https://github.com/swissspidy/media-experiments/issues/327.
 		const onProgress = () => {
@@ -428,11 +600,26 @@ export async function resizeImage(
 			}
 		};
 
-		let image = vips.Image.newFromBuffer( buffer, strOptions, loadOptions );
+		let image = vips.Image.newFromBuffer( buffer );
 
 		image.onProgress = onProgress;
 
 		const { width, pageHeight } = image;
+
+		// Detect high-bit-depth (10/12-bit) AVIF sources. `thumbnail` would
+		// flatten these to 8-bit sRGB, so they are resized directly from the
+		// decoded 16-bit image, which keeps full precision.
+		const sourceBitdepth =
+			'image/avif' === type ? getSourceBitdepth( image ) : 8;
+		// The `image_max_bit_depth` filter can cap the output depth. When the
+		// cap flattens the image to 8-bit anyway, the regular colour-managed
+		// `thumbnail` path is used, matching standard-depth sources.
+		const saveBitdepth =
+			sourceBitdepth > 8
+				? resolveSaveBitdepth( sourceBitdepth, maxBitdepth )
+				: 8;
+		const isHighBitDepth = saveBitdepth > 8;
+		const sourceImage = image;
 
 		image = applyResizeAndCrop(
 			resize,
@@ -440,8 +627,14 @@ export async function resizeImage(
 			pageHeight,
 			smartCrop,
 			( resizeWidth, thumbnailOptions ) => {
-				if ( strOptions ) {
-					thumbnailOptions.option_string = strOptions;
+				if ( isHighBitDepth ) {
+					const resized = resizeHighBitDepth(
+						sourceImage,
+						resizeWidth,
+						thumbnailOptions
+					);
+					resized.onProgress = onProgress;
+					return resized;
 				}
 				const thumb = vips.Image.thumbnailBuffer(
 					buffer,
@@ -453,7 +646,12 @@ export async function resizeImage(
 			}
 		);
 
-		const saveOptions = buildSaveOptions( type, quality );
+		const saveOptions = buildSaveOptions(
+			type,
+			quality,
+			saveBitdepth,
+			stripMeta
+		);
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
 
 		const result = {
@@ -602,16 +800,20 @@ export async function rotateImage(
 				image = image.flipVer();
 				break;
 			case 5:
-				// Rotated 90° CCW and flipped horizontally
-				image = image.rot270().flipHor();
+				// Mirrored horizontally and rotated 270° CW (transpose).
+				// The mirror is applied before the rotation, matching the
+				// EXIF spec; the operand order matters for orientations 5/7.
+				image = image.flipHor().rot270();
 				break;
 			case 6:
 				// Rotated 90° CW
 				image = image.rot90();
 				break;
 			case 7:
-				// Rotated 90° CW and flipped horizontally
-				image = image.rot90().flipHor();
+				// Mirrored horizontally and rotated 90° CW (transverse).
+				// The mirror is applied before the rotation, matching the
+				// EXIF spec; the operand order matters for orientations 5/7.
+				image = image.flipHor().rot90();
 				break;
 			case 8:
 				// Rotated 90° CCW
@@ -619,6 +821,13 @@ export async function rotateImage(
 				break;
 			// case 1 and default: no transformation needed
 		}
+
+		// The pixels have now been physically rotated, so strip the EXIF
+		// orientation tag (which `newFromBuffer` copies through from the
+		// source) to keep the output self-consistent. Otherwise a later
+		// consumer that auto-rotates from EXIF could apply the rotation a
+		// second time.
+		image.remove( 'orientation' );
 
 		const saveOptions: SaveOptions< typeof type > = {};
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
@@ -639,21 +848,41 @@ export async function rotateImage(
 }
 
 /**
- * Determines whether an image has an alpha channel.
+ * Determines whether an image has visible transparency.
+ *
+ * Channel presence alone is not enough: PNG encoders often retain an alpha
+ * channel even when every pixel is fully opaque, and animated GIFs declare
+ * a transparent color index for disposal-method frame compositing without
+ * ever rendering a visibly transparent pixel. This check loads the first
+ * frame (any transparency there is visible — there is no previous frame to
+ * inherit from) and samples the alpha channel for an actually-transparent
+ * pixel.
  *
  * @param buffer Original file object.
- * @return Whether the image has an alpha channel.
+ * @return Whether any pixel in the image is partially or fully transparent.
  */
 export async function hasTransparency(
 	buffer: ArrayBuffer
 ): Promise< boolean > {
 	const vips = await getVips();
 	const image = vips.Image.newFromBuffer( buffer );
-	const hasAlpha = image.hasAlpha();
+
+	if ( ! image.hasAlpha() ) {
+		cleanup?.();
+		return false;
+	}
+
+	// `min()` on the alpha band is one read of a single channel of frame 0.
+	// For uchar (GIF/8-bit PNG) the opaque value is 255; 16-bit PNGs (rare
+	// inputs here) use 65535. Anything lower means at least one pixel is
+	// transparent.
+	const alpha = image.extractBand( image.bands - 1 );
+	const minAlpha = alpha.min();
+	const opaqueValue = image.format === 'ushort' ? 65535 : 255;
 
 	cleanup?.();
 
-	return hasAlpha;
+	return minAlpha < opaqueValue;
 }
 
 // Re-export with vips prefix for worker module compatibility.

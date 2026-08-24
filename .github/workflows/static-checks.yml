@@ -28,6 +28,7 @@ jobs:
         permissions:
             contents: read
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        timeout-minutes: 30
         strategy:
             matrix:
                 event: ['${{ github.event_name }}']
@@ -47,9 +48,14 @@ jobs:
                       os: 'macos-15'
 
         steps:
-            - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+            # The BASE branch commit must be present for the check-root-dependencies script to read the package.json and
+            # compare with the HEAD branch. Fetching a depth of 2 ensures that's present.
+            # All other jobs only require a depth of 1.
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  fetch-depth: ${{ matrix.annotations && github.event_name == 'pull_request' && 2 || 1 }}
                   persist-credentials: false
 
             - name: Use desired version of Node.js
@@ -59,7 +65,9 @@ jobs:
                   cache: npm
 
             - name: Pin npm version for consistency
-              run: npm install -g npm@10
+              run: |
+                  npm install --global npm@10
+                  npm --version
 
             - name: npm install
               # A "full" install is executed, since `npm ci` does not always exit
@@ -76,6 +84,12 @@ jobs:
             - name: Lint dependency versions across workspaces
               run: npm run lint:deps
 
+            - name: Check root dependencies
+              if: ${{ matrix.annotations && github.event_name == 'pull_request' }}
+              run: |
+                  BASE_SHA="$(git rev-parse HEAD^1)"
+                  npm run --workspace @wordpress/validation-tools check-root-dependencies -- --base "$BASE_SHA"
+
             - name: Lint package-lock.json file
               run: npm run lint:lockfile
 
@@ -85,14 +99,38 @@ jobs:
             - name: Lint JavaScript
               if: ${{ matrix.annotations }}
               # `--quiet` reports only errors so they aren't buried under warnings in the CI log.
-              run: npm run lint:js -- --format compact --quiet
+              # `--prune-suppressions` ensures `suppressions.json` stays in sync.
+              run: npm run lint:js -- --format compact --quiet --prune-suppressions
+
+            - name: Test agent skill setup
+              run: npm run test:unit -- tools/agents/test/setup-skills.test.js --runInBand
 
             - name: Lint Styles
               if: ${{ matrix.annotations }}
-              run: npm run lint:css -- --formatter compact
+              # Stylelint has no separate prune flag. Run lint first so new violations fail,
+              # then `--suppress` to prune stale suppressions (same outcome as ESLint's
+              # `--prune-suppressions` + check-local-changes).
+              run: |
+                  npm run lint:css -- --formatter compact
+                  npm run lint:css:update-suppressions
 
             - name: Type checking
+              run: npm run typecheck
+
+            - name: Check type declaration files
+              # Runs against the declarations the type check just emitted;
+              # the bundle build below skips types and with them this check.
+              run: npm run check:type-declarations
+
+            - name: Build packages
               run: npm run build
+
+            - name: Validate package contents
+              run: npm run lint:package-contents
+
+            - name: Audit published dependencies
+              if: ${{ matrix.annotations }}
+              run: npm run lint:published-deps -- --fail-unused-ignores
 
             - name: Check local changes
               run: npm run other:check-local-changes

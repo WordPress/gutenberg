@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	useEntityRecord,
@@ -20,12 +17,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { Tooltip } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import CreateNewTemplateModal from '../post-template/create-new-template-modal';
 import { SwapTemplateModal } from '../post-template/swap-template-button';

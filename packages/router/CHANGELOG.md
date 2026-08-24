@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+## 1.53.0 (2026-08-12)
+
+### New Features
+
+-   Add a `replace` option to `useHistory().navigate` to update the current history entry instead of pushing a new one.
+
+## 1.52.0 (2026-07-29)
+
+## 1.51.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 1.50.0 (2026-07-01)
+
+## 1.49.0 (2026-06-24)
+
+## 1.48.1 (2026-06-16)
+
 ## 1.48.0 (2026-06-10)
 
 ### Code Quality

@@ -24,6 +24,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `buttonPosition` | `string` | `"button-outside"` | — |
 | `buttonUseIcon` | `boolean` | `false` | — |
 | `query` | `object` | `{}` | — |
+| `tagName` | `string` | `""` | — |
 
 ## Supports
 

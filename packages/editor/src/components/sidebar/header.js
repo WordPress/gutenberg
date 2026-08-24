@@ -1,22 +1,12 @@
-/**
- * WordPress dependencies
- */
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { forwardRef } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
+import { Tabs } from '@wordpress/ui';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { sidebars } from './constants';
 
-const { Tabs } = unlock( componentsPrivateApis );
-
-const SidebarHeader = ( _, ref ) => {
+export default function SidebarHeader() {
 	const { postTypeLabel, isRevisionsMode } = useSelect( ( select ) => {
 		const { getPostTypeLabel } = select( editorStore );
 		const { isRevisionsMode: _isRevisionsMode } = unlock(
@@ -39,24 +29,12 @@ const SidebarHeader = ( _, ref ) => {
 	}
 
 	return (
-		<Tabs.TabList ref={ ref }>
-			<Tabs.Tab
-				tabId={ sidebars.document }
-				// Used for focus management in the SettingsSidebar component.
-				data-tab-id={ sidebars.document }
-			>
-				{ documentLabel }
-			</Tabs.Tab>
-			<Tabs.Tab
-				tabId={ sidebars.block }
-				// Used for focus management in the SettingsSidebar component.
-				data-tab-id={ sidebars.block }
-			>
+		<Tabs.List activateOnFocus={ false }>
+			<Tabs.Tab value={ sidebars.document }>{ documentLabel }</Tabs.Tab>
+			<Tabs.Tab value={ sidebars.block }>
 				{ /* translators: Text label for the Block Settings Sidebar tab. */ }
 				{ __( 'Block' ) }
 			</Tabs.Tab>
-		</Tabs.TabList>
+		</Tabs.List>
 	);
-};
-
-export default forwardRef( SidebarHeader );
+}

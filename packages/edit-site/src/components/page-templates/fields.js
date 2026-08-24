@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	Icon as WCIcon,
 	__experimentalHStack as HStack,
@@ -25,10 +18,6 @@ import {
 	store as coreStore,
 } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { useAddedBy } from './hooks';
 import { useDefaultTemplateTypes } from '../add-new-template/utils';
 import usePatternSettings from '../page-patterns/use-pattern-settings';

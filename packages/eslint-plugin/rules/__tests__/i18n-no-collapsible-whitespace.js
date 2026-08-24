@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { RuleTester } from 'eslint';
-
-/**
- * Internal dependencies
- */
 import rule from '../i18n-no-collapsible-whitespace';
 
 const ruleTester = new RuleTester( {

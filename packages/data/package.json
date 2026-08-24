@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/data",
-	"version": "10.48.0",
+	"version": "10.53.0",
 	"description": "Data module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -44,7 +44,6 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@types/react": "^18.3.27",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/element": "file:../element",
@@ -54,7 +53,7 @@
 		"@wordpress/redux-routine": "file:../redux-routine",
 		"deepmerge": "^4.3.1",
 		"equivalent-key-map": "^0.2.2",
-		"is-plain-object": "^5.0.0",
+		"is-plain-object": "^5.1.0",
 		"is-promise": "^4.0.0",
 		"redux": "^5.0.1",
 		"rememo": "^4.0.2",
@@ -67,7 +66,13 @@
 		"deep-freeze": "^0.0.1"
 	},
 	"peerDependencies": {
-		"react": "^18.0.0"
+		"@types/react": "^18 || ^19",
+		"react": "^18 || ^19"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

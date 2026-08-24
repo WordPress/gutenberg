@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { createBlock, findTransform } from '../factory';
 import { getBlockAttributes } from '../parser/get-block-attributes';
 import { getRawTransforms } from './get-raw-transforms';
@@ -39,7 +36,9 @@ export function htmlToBlocks(
 			return createBlock(
 				// Should not be hardcoded.
 				'core/html',
-				getBlockAttributes( 'core/html', node.outerHTML )
+				{},
+				[],
+				[ node.outerHTML ]
 			);
 		}
 

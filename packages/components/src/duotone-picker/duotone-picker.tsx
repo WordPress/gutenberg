@@ -1,23 +1,11 @@
-/**
- * External dependencies
- */
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import ColorListPicker from './color-list-picker';
 import CircularOptionPicker, {
 	getComputeCircularOptionPickerCommonProps,
 } from '../circular-option-picker';
 import { VStack } from '../v-stack';
-
 import CustomDuotoneBar from './custom-duotone-bar';
 import { getDefaultColors, getGradientFromCSSColors } from './utils';
 import { Spacer } from '../spacer';
@@ -66,6 +54,7 @@ function DuotonePicker( {
 	disableCustomColors,
 	disableCustomDuotone,
 	value,
+	selectedSlug,
 	onChange,
 	'aria-label': ariaLabel,
 	'aria-labelledby': ariaLabelledby,
@@ -93,41 +82,55 @@ function DuotonePicker( {
 		/>
 	);
 
-	const duotoneOptions = duotonePalette.map( ( { colors, slug, name } ) => {
-		const style = {
-			background: getGradientFromCSSColors( colors, '135deg' ),
-			color: 'transparent',
-		};
-		const tooltipText =
-			name ??
-			sprintf(
-				// translators: %s: duotone code e.g: "dark-grayscale" or "7f7f7f-ffffff".
-				__( 'Duotone code: %s' ),
-				slug
-			);
-		const label = name
-			? sprintf(
-					// translators: %s: The name of the option e.g: "Dark grayscale".
-					__( 'Duotone: %s' ),
-					name
-			  )
-			: tooltipText;
-		const isSelected = fastDeepEqual( colors, value );
+	const duotoneOptions = duotonePalette.map(
+		( { colors, slug, name }, index ) => {
+			const style = {
+				background: getGradientFromCSSColors( colors, '135deg' ),
+				color: 'transparent',
+			};
+			const tooltipText =
+				name ??
+				sprintf(
+					// translators: %s: duotone code e.g: "dark-grayscale" or "7f7f7f-ffffff".
+					__( 'Duotone code: %s' ),
+					slug
+				);
+			const label = name
+				? sprintf(
+						// translators: %s: The name of the option e.g: "Dark grayscale".
+						__( 'Duotone: %s' ),
+						name
+				  )
+				: tooltipText;
+			// When a non-empty selectedSlug is provided, selection is decided
+			// strictly by slug, which keeps two presets holding the same
+			// colors apart. Otherwise selection falls back to matching the
+			// colors themselves.
+			const isSelected = selectedSlug
+				? slug === selectedSlug
+				: fastDeepEqual( colors, value );
 
-		return (
-			<CircularOptionPicker.Option
-				key={ slug }
-				value={ colors }
-				isSelected={ isSelected }
-				aria-label={ label }
-				tooltipText={ tooltipText }
-				style={ style }
-				onClick={ () => {
-					onChange( isSelected ? undefined : colors );
-				} }
-			/>
-		);
-	} );
+			return (
+				<CircularOptionPicker.Option
+					key={ slug }
+					value={ colors }
+					isSelected={ isSelected }
+					aria-label={ label }
+					tooltipText={ tooltipText }
+					style={ style }
+					onClick={
+						// Deselecting reports no preset, matching
+						// `ColorPalette` and `GradientPicker`. Passing the slug
+						// back would leave a controlled consumer marking the
+						// swatch as selected after its value had been cleared.
+						isSelected
+							? () => onChange( undefined )
+							: () => onChange( colors, index, slug )
+					}
+				/>
+			);
+		}
+	);
 
 	const { metaProps, labelProps } = getComputeCircularOptionPickerCommonProps(
 		asButtons,
@@ -158,15 +161,17 @@ function DuotonePicker( {
 				)
 			}
 		>
-			<Spacer paddingTop={ options.length === 0 ? 0 : 4 }>
-				<VStack spacing={ 3 }>
-					{ ! disableCustomColors && ! disableCustomDuotone && (
-						<CustomDuotoneBar
-							value={ isUnset ? undefined : value }
-							onChange={ onChange }
-						/>
-					) }
-					{ ! disableCustomDuotone && (
+			{ /* Both controls are hidden when custom duotones are disabled,
+			   so the wrapper would contribute only its padding. */ }
+			{ ! disableCustomDuotone && (
+				<Spacer paddingTop={ options.length === 0 ? 0 : 4 }>
+					<VStack spacing={ 3 }>
+						{ ! disableCustomColors && (
+							<CustomDuotoneBar
+								value={ isUnset ? undefined : value }
+								onChange={ onChange }
+							/>
+						) }
 						<ColorListPicker
 							labels={ [ __( 'Shadows' ), __( 'Highlights' ) ] }
 							colors={ colorPalette }
@@ -190,9 +195,9 @@ function DuotonePicker( {
 								onChange( newValue );
 							} }
 						/>
-					) }
-				</VStack>
-			</Spacer>
+					</VStack>
+				</Spacer>
+			) }
 		</CircularOptionPicker>
 	);
 }

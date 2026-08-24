@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-
-/**
- * WordPress dependencies
- */
 import { pipe } from '@wordpress/compose';
 import { combineReducers, select } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
@@ -13,10 +6,6 @@ import {
 	store as blocksStore,
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
 import { sectionRootClientIdKey, isIsolatedEditorKey } from './private-keys';
@@ -1442,19 +1431,19 @@ export function selection( state = {}, action ) {
 				selectionEnd,
 			};
 		case 'MULTI_SELECT':
-			const { start, end } = action;
+			const nextSelection = {
+				selectionStart: { clientId: action.start },
+				selectionEnd: { clientId: action.end },
+			};
 
-			if (
-				start === state.selectionStart?.clientId &&
-				end === state.selectionEnd?.clientId
-			) {
+			// A text selection between the same blocks is not the same
+			// selection: it carries attribute keys and offsets, making it
+			// partial rather than a block multi-selection.
+			if ( fastDeepEqual( state, nextSelection ) ) {
 				return state;
 			}
 
-			return {
-				selectionStart: { clientId: start },
-				selectionEnd: { clientId: end },
-			};
+			return nextSelection;
 		case 'RESET_BLOCKS':
 			const startClientId = state?.selectionStart?.clientId;
 			const endClientId = state?.selectionEnd?.clientId;
@@ -2312,7 +2301,6 @@ export function selectedBlockStyleState( state = undefined, action ) {
 				clientId: action.clientId,
 				showStateOnCanvas,
 				value: {
-					viewport: 'default',
 					pseudo: 'default',
 					...previousValue,
 					...action.value,
@@ -2332,7 +2320,6 @@ export function selectedBlockStyleState( state = undefined, action ) {
 				clientId: action.clientId,
 				showStateOnCanvas: action.value,
 				value: {
-					viewport: 'default',
 					pseudo: 'default',
 					...previousValue,
 				},
@@ -2341,7 +2328,14 @@ export function selectedBlockStyleState( state = undefined, action ) {
 
 		case 'SELECT_BLOCK':
 		case 'SELECTION_CHANGE': {
-			if ( state?.clientId && state.clientId !== action.clientId ) {
+			const startClientId = action.clientId ?? action.start?.clientId;
+			const endClientId = action.clientId ?? action.end?.clientId;
+
+			if (
+				state?.clientId &&
+				( startClientId !== endClientId ||
+					state.clientId !== startClientId )
+			) {
 				return undefined;
 			}
 
@@ -2390,6 +2384,41 @@ export function selectedBlockStyleState( state = undefined, action ) {
 	return state;
 }
 
+/**
+ * Reducer holding the globally selected viewport style state. When set to a
+ * value other than 'default', block style edits in the inspector are applied to
+ * that viewport. Driven by the editor's device preview (Responsive editing).
+ *
+ * @param {string} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {string} Updated state.
+ */
+export function styleStateViewport( state = 'default', action ) {
+	if ( action.type === 'SET_STYLE_STATE_VIEWPORT' ) {
+		return action.viewport ?? 'default';
+	}
+
+	return state;
+}
+
+/**
+ * Reducer for whether Responsive editing is enabled. When enabled, the device
+ * preview also drives which viewport block style edits are applied to.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function isResponsiveEditing( state = false, action ) {
+	if ( action.type === 'SET_RESPONSIVE_EDITING' ) {
+		return action.enabled;
+	}
+
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isDragging,
@@ -2426,6 +2455,8 @@ const combinedReducers = combineReducers( {
 	listViewContentPanelOpen,
 	requestedInspectorTab,
 	selectedBlockStyleState,
+	styleStateViewport,
+	isResponsiveEditing,
 } );
 
 /**

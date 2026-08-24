@@ -1,4 +1,7 @@
 import { type ReactNode } from 'react';
+import type { ThemeProviderColorWarning } from './theme-provider-color-warnings';
+
+export type CornerRadiusPreset = 'none' | 'subtle' | 'moderate' | 'pronounced';
 
 export interface ThemeProviderSettings {
 	/**
@@ -6,19 +9,27 @@ export interface ThemeProviderSettings {
 	 */
 	color?: {
 		/**
-		 * The primary seed color to use for the theme. Accepts a hex string
-		 * (e.g. `#3858e9`), an `rgb(...)` string, or a CSS color keyword.
+		 * The primary seed color to use for the theme. Accepts a fully opaque
+		 * sRGB-parseable string: a hex value (e.g. `#3858e9`), an
+		 * `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`).
+		 * Non-opaque alpha values, `transparent`, and other CSS color spaces
+		 * (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and throw an
+		 * error.
 		 *
-		 * By default, it inherits from parent `ThemeProvider`,
-		 * and fallbacks to statically built CSS.
+		 * When omitted, inherits from the parent `ThemeProvider`. If there is
+		 * no parent value, the prebuilt default applies.
 		 */
 		primary?: string;
 		/**
-		 * The background seed color to use for the theme. Accepts a hex string
-		 * (e.g. `#f8f8f8`), an `rgb(...)` string, or a CSS color keyword.
+		 * The background seed color to use for the theme. Accepts a fully
+		 * opaque sRGB-parseable string: a hex value (e.g. `#f8f8f8`), an
+		 * `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`).
+		 * Non-opaque alpha values, `transparent`, and other CSS color spaces
+		 * (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and throw an
+		 * error.
 		 *
-		 * By default, it inherits from parent `ThemeProvider`,
-		 * and fallbacks to statically built CSS.
+		 * When omitted, inherits from the parent `ThemeProvider`. If there is
+		 * no parent value, the prebuilt default applies.
 		 */
 		background?: string;
 	};
@@ -31,13 +42,32 @@ export interface ThemeProviderSettings {
 		 * The cursor style for interactive controls that are not links
 		 * (e.g. buttons, checkboxes, and toggles).
 		 *
-		 * By default, it inherits from the parent `ThemeProvider`,
-		 * and falls back to the prebuilt default (`default`).
+		 * When omitted, inherits from the parent `ThemeProvider`. If there is
+		 * no parent value, the prebuilt default applies (`pointer`).
 		 */
 		control?: 'default' | 'pointer';
 	};
+
+	/**
+	 * Overall roundness preset for the theme subtree: `none` (square corners),
+	 * `subtle`, `moderate`, or `pronounced` (most rounded).
+	 *
+	 * This scales the individual `--wpds-border-radius-*` token sizes for the
+	 * subtree; it sets the overall amount of roundness, not a single token
+	 * size.
+	 *
+	 * When omitted, inherits from the parent `ThemeProvider`. If there is no
+	 * parent value, the prebuilt default applies (`subtle`).
+	 */
+	cornerRadius?: CornerRadiusPreset;
 }
 
+/**
+ * Props for the `ThemeProvider` component.
+ *
+ * The provider's wrapper element is intentionally not customizable and does
+ * not accept props such as `className`, `style`, `as`, `render`, or `ref`.
+ */
 export interface ThemeProviderProps extends ThemeProviderSettings {
 	/**
 	 * The children to render.
@@ -45,11 +75,23 @@ export interface ThemeProviderProps extends ThemeProviderSettings {
 	children?: ReactNode;
 
 	/**
+	 * Called after the provider calculates its colors. Receives an empty array
+	 * when all contrast targets are met.
+	 * The callback may run more than once in development under React Strict Mode.
+	 */
+	onColorWarnings?: (
+		warnings: readonly ThemeProviderColorWarning[]
+	) => void;
+
+	/**
 	 * When a ThemeProvider is the root provider, it will apply its theming
 	 * settings also to the root document element (e.g. the html element).
 	 * This is useful, for example, to make sure that the `html` element can
 	 * consume the right background color, or that overlays rendered inside a
 	 * portal can inherit the correct color scheme.
+	 *
+	 * Render at most one root provider per document. Multiple root providers
+	 * that share the same document are unsupported.
 	 *
 	 * @default false
 	 */

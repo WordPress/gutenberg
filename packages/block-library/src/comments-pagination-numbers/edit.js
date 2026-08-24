@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useBlockProps } from '@wordpress/block-editor';
 
 const PaginationItem = ( { content, tag: Tag = 'a', extraClass = '' } ) =>

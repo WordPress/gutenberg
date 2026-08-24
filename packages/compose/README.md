@@ -198,23 +198,23 @@ In Dialogs/modals, the tabbing must be constrained to the content of the wrapper
 
 _Usage_
 
-```js
+```ts
 import { useConstrainedTabbing } from '@wordpress/compose';
 
 const ConstrainedTabbingExample = () => {
-	const constrainedTabbingRef = useConstrainedTabbing();
-	return (
-		<div ref={ constrainedTabbingRef }>
-			<Button />
-			<Button />
-		</div>
-	);
-};
+    const constrainedTabbingRef = useConstrainedTabbing()
+    return (
+        <div ref={ constrainedTabbingRef }>
+            <Button />
+            <Button />
+        </div>
+    );
+}
 ```
 
 _Returns_
 
--   `React.RefCallback<Element>`: Element Ref.
+-   `React.RefCallback< Element >`: Element Ref.
 
 ### useCopyOnClick
 
@@ -256,12 +256,12 @@ _Related_
 _Parameters_
 
 -   _fn_ `TFunc`: The function to debounce.
--   _wait_ `[number]`: The number of milliseconds to delay.
--   _options_ `[import('../../utils/debounce').DebounceOptions]`: The options object.
+-   _wait_ `number`: The number of milliseconds to delay.
+-   _options_ `DebounceOptions`: The options object.
 
 _Returns_
 
--   `import('../../utils/debounce').DebouncedFunc<TFunc>`: Debounced function.
+-   `DebouncedFunc< TFunc >`: Debounced function.
 
 ### useDebouncedInput
 
@@ -374,27 +374,27 @@ Adds the unmount behavior of returning focus to the element which had it previou
 
 _Usage_
 
-```js
+```ts
 import { useFocusReturn } from '@wordpress/compose';
 
 const WithFocusReturn = () => {
-	const ref = useFocusReturn();
-	return (
-		<div ref={ ref }>
-			<Button />
-			<Button />
-		</div>
-	);
-};
+    const ref = useFocusReturn()
+    return (
+        <div ref={ ref }>
+            <Button />
+            <Button />
+        </div>
+    );
+}
 ```
 
 _Parameters_
 
--   _onFocusReturn_ `[() => void]`: Overrides the default return behavior.
+-   _onFocusReturn_ `() => void`: Overrides the default return behavior.
 
 _Returns_
 
--   `React.RefCallback<HTMLElement>`: Element Ref.
+-   `React.RefCallback< HTMLElement >`: Element Ref.
 
 ### useInstanceId
 
@@ -424,9 +424,13 @@ _Related_
 
 _Parameters_
 
--   _shortcuts_ `string[]|string`: Keyboard Shortcuts.
--   _callback_ `(e: Mousetrap.ExtendedKeyboardEvent, combo: string) => void`: Shortcut callback.
--   _options_ `WPKeyboardShortcutConfig`: Shortcut options.
+-   _shortcuts_ `string[] | string`: Keyboard Shortcuts.
+-   _callback_ `( e: ExtendedKeyboardEvent, combo: string ) => void`: Shortcut callback.
+-   _options_ `Partial< KeyboardShortcutConfig >`: Shortcut options.
+-   _options.bindGlobal_ `Partial< KeyboardShortcutConfig >[ 'bindGlobal' ]`:
+-   _options.eventName_ `Partial< KeyboardShortcutConfig >[ 'eventName' ]`:
+-   _options.isDisabled_ `Partial< KeyboardShortcutConfig >[ 'isDisabled' ]`:
+-   _options.target_ `Partial< KeyboardShortcutConfig >[ 'target' ]`:
 
 ### useMediaQuery
 
@@ -575,12 +579,12 @@ _Related_
 _Parameters_
 
 -   _fn_ `TFunc`: The function to throttle.
--   _wait_ `[number]`: The number of milliseconds to throttle invocations to.
--   _options_ `[import('../../utils/throttle').ThrottleOptions]`: The options object. See linked documentation for details.
+-   _wait_ `number`: The number of milliseconds to throttle invocations to.
+-   _options_ `ThrottleOptions`: The options object.
 
 _Returns_
 
--   `import('../../utils/debounce').DebouncedFunc<TFunc>`: Throttled function.
+-   `DebouncedFunc< TFunc >`: Throttled function.
 
 ### useViewportMatch
 
@@ -588,16 +592,16 @@ Returns true if the viewport matches the given query, or false otherwise.
 
 _Usage_
 
-```js
+```ts
 useViewportMatch( 'huge', '<' );
 useViewportMatch( 'medium' );
 ```
 
 _Parameters_
 
--   _breakpoint_ `WPBreakpoint`: Breakpoint size name.
--   _operator_ `[WPViewportOperator]`: Viewport operator.
--   _view_ `[Window|undefined]`: Window instance in which to perform viewport matching.
+-   _breakpoint_ `Breakpoint`: Breakpoint size name.
+-   _operator_ `ViewportOperator`: Viewport operator.
+-   _view_ `Window | undefined`: Window instance in which to perform viewport matching.
 
 _Returns_
 
@@ -605,12 +609,12 @@ _Returns_
 
 ### useWarnOnChange
 
-Hook that performs a shallow comparison between the preview value of an object and the new one, if there's a difference, it prints it to the console. this is useful in performance related work, to check why a component re-renders.
+Hook that performs a shallow comparison between the previous value of an object and the new one, if there's a difference, it prints it to the console. This is useful in performance related work, to check why a component re-renders.
 
 _Usage_
 
-```jsx
-function MyComponent( props ) {
+```tsx
+function MyComponent( props: Record< string, any > ) {
 	useWarnOnChange( props );
 
 	return 'Something';
@@ -619,7 +623,7 @@ function MyComponent( props ) {
 
 _Parameters_
 
--   _object_ `object`: Object which changes to compare.
+-   _object_ `Record< string, any > | any[]`: Object which changes to compare.
 -   _prefix_ `string`: Just a prefix to show when console logging.
 
 ### withGlobalEvents

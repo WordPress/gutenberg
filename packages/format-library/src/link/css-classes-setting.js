@@ -1,11 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import {
-	__experimentalInputControl as InputControl,
+	__experimentalInputControl as WCInputControl,
 	CheckboxControl,
 } from '@wordpress/components';
 import { Stack, VisuallyHidden } from '@wordpress/ui';
@@ -69,7 +66,7 @@ const CSSClassesSettingComponent = ( { setting, value, onChange } ) => {
 				/>
 				{ isSettingActive && (
 					<div id={ controlledRegionId }>
-						<InputControl
+						<WCInputControl
 							label={ __( 'CSS classes' ) }
 							value={ value?.cssClasses }
 							onChange={ handleSettingChange }
@@ -77,7 +74,6 @@ const CSSClassesSettingComponent = ( { setting, value, onChange } ) => {
 								'Separate multiple classes with spaces.'
 							) }
 							__unstableInputWidth="100%"
-							__next40pxDefaultSize
 						/>
 					</div>
 				) }

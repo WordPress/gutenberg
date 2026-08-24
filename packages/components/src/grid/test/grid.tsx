@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { View } from '../../view';
 import { Grid } from '..';
 import CONFIG from '../../utils/config-values';

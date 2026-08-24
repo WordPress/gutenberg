@@ -18,6 +18,9 @@ import type { RootProps } from './types';
  * and expected. For drawers requiring explicit user choice (especially
  * destructive actions), omit the close icon and rely on footer action buttons
  * like "Cancel" and "Confirm" instead.
+ *
+ * See the [Usage Guidelines](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-dialog-usage-guidelines--docs)
+ * for when to use `Dialog` or `Drawer`.
  */
 function Root( {
 	modal = true,

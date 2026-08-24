@@ -1,10 +1,4 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
-/**
- * Internal dependencies
- */
 import type { FlexDirection } from '../flex/types';
 import type { HStackAlignment, AlignmentProps, Alignments } from './types';
 import { isValueDefined } from '../utils/values';

@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import { useRegistry, createRegistry, RegistryProvider } from '@wordpress/data';
 import { createHigherOrderComponent } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { storeConfig } from '../../store';
 import { STORE_NAME as blockEditorStoreName } from '../../store/constants';
 

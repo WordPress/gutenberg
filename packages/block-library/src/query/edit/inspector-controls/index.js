@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	TextControl,
 	SelectControl,
@@ -8,18 +5,15 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { __ } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { debounce } from '@wordpress/compose';
 import { useState, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import OrderControl from './order-control';
 import AuthorControl from './author-control';
 import ParentControl from './parent-control';
@@ -40,7 +34,8 @@ import {
 import { useToolsPanelDropdownMenuProps } from '../../../utils/hooks';
 
 export default function QueryInspectorControls( props ) {
-	const { attributes, setQuery, isSingular } = props;
+	const { attributes, setQuery, isSingular, shouldExcludeCurrentPost } =
+		props;
 	const { query } = attributes;
 	const {
 		order,
@@ -55,6 +50,7 @@ export default function QueryInspectorControls( props ) {
 		taxQuery,
 		parents,
 		format,
+		excludeCurrent,
 	} = query;
 	const allowedControls = useAllowedControls( attributes );
 	const showSticky = postType === 'post';
@@ -171,12 +167,22 @@ export default function QueryInspectorControls( props ) {
 		[ allowedControls, postTypeHasFormatSupport ]
 	);
 
+	const showExcludeCurrentControl =
+		shouldExcludeCurrentPost &&
+		isControlAllowed( allowedControls, 'excludeCurrent' );
+	const postTypeSingularName = useSelect(
+		( select ) =>
+			select( coreStore ).getPostType( postType )?.labels.singular_name,
+		[ postType ]
+	);
+
 	const showFiltersPanel =
 		showTaxControl ||
 		showAuthorControl ||
 		showSearchControl ||
 		showParentControl ||
-		showFormatControl;
+		showFormatControl ||
+		showExcludeCurrentControl;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const showPostCountControl = isControlAllowed(
@@ -218,7 +224,6 @@ export default function QueryInspectorControls( props ) {
 						>
 							<VStack spacing={ 4 }>
 								<ToggleGroupControl
-									__next40pxDefaultSize
 									label={ __( 'Query type' ) }
 									isBlock
 									onChange={ ( value ) => {
@@ -269,7 +274,6 @@ export default function QueryInspectorControls( props ) {
 						>
 							{ postTypesSelectOptions.length > 2 ? (
 								<SelectControl
-									__next40pxDefaultSize
 									options={ postTypesSelectOptions }
 									value={ postType }
 									label={ postTypeControlLabel }
@@ -278,7 +282,6 @@ export default function QueryInspectorControls( props ) {
 								/>
 							) : (
 								<ToggleGroupControl
-									__next40pxDefaultSize
 									isBlock
 									value={ postType }
 									label={ postTypeControlLabel }
@@ -357,7 +360,10 @@ export default function QueryInspectorControls( props ) {
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem
-						label={ __( 'Offset' ) }
+						label={ _x(
+							'Offset',
+							'Number of posts to skip in a query'
+						) }
 						hasValue={ () => offset > 0 }
 						onDeselect={ () => setQuery( { offset: 0 } ) }
 					>
@@ -386,6 +392,7 @@ export default function QueryInspectorControls( props ) {
 							search: '',
 							taxQuery: null,
 							format: [],
+							excludeCurrent: null,
 						} );
 						setQuerySearch( '' );
 					} }
@@ -432,7 +439,6 @@ export default function QueryInspectorControls( props ) {
 							} }
 						>
 							<TextControl
-								__next40pxDefaultSize
 								label={ __( 'Keyword' ) }
 								value={ querySearch }
 								onChange={ ( newQuerySearch ) => {
@@ -464,6 +470,32 @@ export default function QueryInspectorControls( props ) {
 							<FormatControls
 								onChange={ setQuery }
 								query={ query }
+							/>
+						</ToolsPanelItem>
+					) }
+					{ showExcludeCurrentControl && (
+						<ToolsPanelItem
+							label={ __( 'Exclude' ) }
+							hasValue={ () => excludeCurrent !== null }
+							onDeselect={ () =>
+								setQuery( { excludeCurrent: null } )
+							}
+						>
+							<ToggleControl
+								label={ __( 'Exclude current' ) }
+								help={ sprintf(
+									/* translators: %s: the post type singular name */
+									__(
+										'Exclude the current %s from the query.'
+									),
+									postTypeSingularName
+								) }
+								checked={ !! excludeCurrent }
+								onChange={ ( value ) => {
+									setQuery( {
+										excludeCurrent: !! value,
+									} );
+								} }
 							/>
 						</ToolsPanelItem>
 					) }

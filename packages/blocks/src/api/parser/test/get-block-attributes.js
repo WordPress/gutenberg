@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { attr } from 'hpq';
-
-/**
- * Internal dependencies
- */
 import {
 	getBlockAttribute,
 	getBlockAttributes,

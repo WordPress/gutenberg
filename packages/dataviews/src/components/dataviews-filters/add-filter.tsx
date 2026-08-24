@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import type { Ref } from 'react';
-
-/**
- * WordPress dependencies
- */
 import {
 	privateApis as componentsPrivateApis,
 	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import type { NormalizedFilter, View } from '../../types';
 

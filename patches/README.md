@@ -8,9 +8,10 @@ Existing patches should be described and justified here.
 
 ## Patches
 
-### `patches/lighthouse+10.4.0.patch`
+### `patches/@arraypress+waveform-player+1.26.0.patch`
 
-No notes.
+This patch requires initialization to be requested explicitly and removes passing custom SVG icons
+through HTML data attributes.
 
 ### `patches/react-autosize-textarea+7.1.0.patch`
 

@@ -1,7 +1,3 @@
-/**
- * WordPress dependencies
- */
-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
 import { Stack, Tooltip } from '@wordpress/ui';
 import { __, _x } from '@wordpress/i18n';
 import {
@@ -13,10 +9,6 @@ import {
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { getAvatarBorderColor } from './utils';
 
 export function NoteByline( { avatar, name, date, userId } ) {
@@ -90,7 +82,10 @@ export function NoteByline( { avatar, name, date, userId } ) {
 					),
 				} }
 			/>
-			<Stack direction="column">
+			<Stack
+				direction="column"
+				className="editor-collab-sidebar-panel__user-info"
+			>
 				<span className="editor-collab-sidebar-panel__user-name">
 					{ name ?? currentUserName }
 				</span>

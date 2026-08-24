@@ -24,11 +24,34 @@ concurrency:
 permissions: {}
 
 jobs:
+    unit-js-routing:
+        name: JavaScript test routing
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+              with:
+                  node-version: '20'
+
+            - name: Validate JavaScript test routing
+              run: npm run test:unit:routing
+
     unit-js:
         name: JavaScript (Node.js ${{ matrix.node }}) ${{ matrix.shard }}
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
+            id-token: write
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
@@ -45,7 +68,7 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -55,15 +78,32 @@ jobs:
               with:
                   node-version: ${{ matrix.node }}
 
+            - name: Detect Browser Mode tests
+              id: browser-tests
+              run: |
+                  FOUND="$(node test/unit/scripts/has-browser-tests-for-shard.mjs "${{ matrix.shard }}")"
+                  echo "found=$FOUND" >> "$GITHUB_OUTPUT"
+
+            - name: Install Chromium for Browser Mode tests
+              if: ${{ steps.browser-tests.outputs.found == 'true' }}
+              uses: ./.github/setup-playwright
+              with:
+                  workspace: '@wordpress/unit-tests'
+                  browsers: chromium
+
             - name: Run build scripts
               # It's not necessary to run the full build, since Jest can interpret
               # source files with `babel-jest`. Some packages have their own custom
               # build tasks, however. These must be run.
               run: npx lerna run build
 
-            - name: Running the tests
+            - name: Run the remaining Jest partition
               env:
                   SHARD: ${{ matrix.shard }}
+                  # Record the Node.js major as a custom flakiness environment
+                  # dimension so flakiness.io keeps a separate history per Node
+                  # version in the matrix.
+                  FK_ENV_NODEJS: ${{ matrix.node }}
               run: |
                   npm run test:unit -- \
                     --ci \
@@ -71,11 +111,23 @@ jobs:
                     --shard="$SHARD" \
                     --cacheDirectory="$HOME/.jest-cache"
 
+            - name: Run the migrated Vitest partition
+              env:
+                  SHARD: ${{ matrix.shard }}
+                  # Preserve the same Flakiness.io environment identity used
+                  # by the Jest partition.
+                  FK_ENV_NODEJS: ${{ matrix.node }}
+              run: |
+                  npm run test:unit:vitest -- \
+                    --shard="$SHARD" \
+                    --passWithNoTests
+
     unit-js-date:
         name: JavaScript Date Tests (Node.js ${{ matrix.node }})
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
+            id-token: write
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
@@ -91,7 +143,7 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -108,6 +160,11 @@ jobs:
               run: npx lerna run build
 
             - name: Run the date tests
+              env:
+                  # Record the Node.js major as a custom flakiness environment
+                  # dimension so flakiness.io keeps a separate history per Node
+                  # version in the matrix.
+                  FK_ENV_NODEJS: ${{ matrix.node }}
               run: npm run test:unit:date -- --ci --maxWorkers="$(nproc)" --cacheDirectory="$HOME/.jest-cache"
 
     compute-previous-wordpress-version:
@@ -143,7 +200,7 @@ jobs:
         permissions:
             contents: read
         steps:
-            - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -152,7 +209,7 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Run build scripts
-              run: npm run build -- --skip-types
+              run: npm run build
 
             - name: Upload built JavaScript assets
               uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -173,17 +230,21 @@ jobs:
             fail-fast: true
             matrix:
                 event: ['${{ github.event_name }}']
-                php: ['7.4', '8.0', '8.1', '8.2', '8.3']
+                php: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4', '8.5']
                 multisite: [false, true]
                 wordpress: ['', 'previous major version']
                 exclude:
-                    # On PRs: Only test PHP 7.4 and 8.3, single-site, latest WP
+                    # On PRs: Only test PHP 7.4 and 8.5, single-site, latest WP
                     - event: 'pull_request'
                       php: '8.0'
                     - event: 'pull_request'
                       php: '8.1'
                     - event: 'pull_request'
                       php: '8.2'
+                    - event: 'pull_request'
+                      php: '8.3'
+                    - event: 'pull_request'
+                      php: '8.4'
                     - event: 'pull_request'
                       multisite: true
                     - event: 'pull_request'
@@ -195,6 +256,10 @@ jobs:
                       wordpress: 'previous major version'
                     - php: '8.2'
                       wordpress: 'previous major version'
+                    - php: '8.3'
+                      wordpress: 'previous major version'
+                    - php: '8.4'
+                      wordpress: 'previous major version'
 
         env:
             WP_ENV_PHP_VERSION: ${{ matrix.php }}
@@ -202,7 +267,7 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -218,7 +283,7 @@ jobs:
             # dependency versions are installed and cached.
             ##
             - name: Set up PHP
-              uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # v2.37.1
+              uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
               with:
                   php-version: '${{ matrix.php }}'
                   ini-file: development
@@ -307,13 +372,13 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
 
             - name: Set up PHP
-              uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # v2.37.1
+              uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
               with:
                   php-version: '7.4'
                   coverage: none
@@ -326,7 +391,7 @@ jobs:
               run: echo "date=$(/bin/date -u --date='last Mon' "+%F")" >> "$GITHUB_OUTPUT"
 
             - name: Cache PHPCS scan cache
-              uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+              uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
               with:
                   path: .cache/phpcs.json
                   key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpcs-cache-${{ hashFiles('**/composer.json', 'phpcs.xml.dist') }}

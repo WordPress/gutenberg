@@ -26,31 +26,3 @@ function gutenberg_block_editor_preload_paths_6_9( $paths, $context ) {
 	return $paths;
 }
 add_filter( 'block_editor_rest_api_preload_paths', 'gutenberg_block_editor_preload_paths_6_9', 10, 2 );
-
-/**
- * Preload bound single-resource GETs the post editor would otherwise
- * fetch post-mount.
- *
- * @param array                   $paths   REST API paths.
- * @param WP_Block_Editor_Context $context Block editor context.
- * @return array
- */
-function gutenberg_block_editor_preload_paths_post_editor_bound_gets( $paths, $context ) {
-	if ( 'core/edit-post' !== $context->name || ! isset( $context->post ) ) {
-		return $paths;
-	}
-	$paths[] = '/wp/v2/templates/lookup?slug=front-page';
-	$paths[] = '/wp/v2/taxonomies?context=edit';
-	$paths[] = array( '/wp/v2/posts', 'OPTIONS' );
-
-	$author_id = (int) get_post_field( 'post_author', $context->post->ID );
-	if ( $author_id ) {
-		$paths[] = sprintf(
-			'/wp/v2/users/%d?context=view&_fields=id,name',
-			$author_id
-		);
-	}
-
-	return $paths;
-}
-add_filter( 'block_editor_rest_api_preload_paths', 'gutenberg_block_editor_preload_paths_post_editor_bound_gets', 10, 2 );

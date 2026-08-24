@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
 
 type BoxVariant = 'margin' | 'padding';
@@ -58,6 +55,7 @@ export interface Style {
 		height?: CSSProperties[ 'height' ];
 		minHeight?: CSSProperties[ 'minHeight' ];
 		minWidth?: CSSProperties[ 'minWidth' ];
+		objectFit?: CSSProperties[ 'objectFit' ];
 		width?: CSSProperties[ 'width' ];
 	};
 	spacing?: {
@@ -73,6 +71,7 @@ export interface Style {
 		lineHeight?: CSSProperties[ 'lineHeight' ];
 		textColumns?: CSSProperties[ 'columnCount' ];
 		textDecoration?: CSSProperties[ 'textDecoration' ];
+		textShadow?: CSSProperties[ 'textShadow' ];
 		textTransform?: CSSProperties[ 'textTransform' ];
 		writingMode?: CSSProperties[ 'writingMode' ];
 	};

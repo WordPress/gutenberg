@@ -1,18 +1,14 @@
-/**
- * WordPress dependencies
- */
 import {
 	Button,
-	Flex,
 	Spinner,
 	__experimentalConfirmDialog as ConfirmDialog,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Stack, Tabs } from '@wordpress/ui';
 import { useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
+	createContext,
 	createPortal,
 	useCallback,
 	useContext,
@@ -34,14 +30,9 @@ import {
 	ComplementaryArea,
 	InterfaceSkeleton,
 	PinnedItems,
-	// No type declarations available for @wordpress/interface.
-	// @ts-expect-error
+	// @ts-expect-error `@wordpress/interface` is not typed yet.
 } from '@wordpress/interface';
 import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import { MediaEditorProvider } from '../media-editor-provider';
 import type { Media } from '../media-editor-provider';
 import MediaPreview from '../media-preview';
@@ -50,7 +41,6 @@ import MediaEditorFineRotation from '../media-editor-fine-rotation';
 import MediaEditorImageControls from '../media-editor-image-controls';
 import MediaEditorCropPanel from '../media-editor-crop-panel';
 import MediaForm from '../media-form';
-import { unlock } from '../../lock-unlock';
 import { getMediaTypeFromMimeType } from '../../utils';
 import { MediaEditorStateProvider, useMediaEditor } from '../../state';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
@@ -72,8 +62,6 @@ const ATTACHMENT_EMBED_QUERY = { _embed: 'author,wp:attached-to' } as const;
 
 const PLACEMENT_CONTROL_IDLE_MS = 300;
 
-const { Tabs } = unlock( componentsPrivateApis );
-
 interface EditorTab {
 	id: string;
 	title: string;
@@ -82,18 +70,14 @@ interface EditorTab {
 
 export interface MediaEditorFrameProps {
 	children: ReactNode;
-	headerActions: ReactNode;
-	footerActions: ReactNode;
 	/**
-	 * Footer layout selector. Frames apply this to the footer container
-	 * as a modifier class. Tracks the sidebar-collapse breakpoint (`medium`).
-	 *
-	 * - `wide`   — sidebar is a column; footer is a single row of History |
-	 *              Cancel/Save (transform controls live in the Crop panel).
-	 * - `narrow` — sidebar collapsed; transform controls sit above a
-	 *              History | Cancel/Save row.
+	 * Whether the media being edited is an image. The history and transform
+	 * clusters render nothing for other media types, so a frame uses this to
+	 * decide whether the container it would put them in is worth rendering at
+	 * all.
 	 */
-	footerLayout: 'wide' | 'narrow';
+	isImage: boolean;
+	layout: 'wide' | 'narrow';
 	onRequestClose: () => void;
 	onKeyDown: ( event: ReactKeyboardEvent< HTMLElement > ) => void;
 	shouldCloseOnClickOutside: boolean;
@@ -111,15 +95,37 @@ export interface MediaEditorProps {
 	renderFrame: ( props: MediaEditorFrameProps ) => JSX.Element;
 	noticesClassName?: string;
 	noticesPortalElement?: Element | null;
-	showCloseButton?: boolean;
 	shouldCloseOnEsc?: boolean;
+	/**
+	 * The `@wordpress/interface` scope for the details sidebar and its pinned
+	 * items. Frames should pass a distinct scope so that sidebar visibility —
+	 * which is persisted per scope to user meta — is remembered separately for
+	 * each surface. The modal is a transient surface where a collapsed sidebar
+	 * is a reasonable choice; the full-screen route is one where the sidebar is
+	 * the primary metadata surface and should open by default. Sharing a scope
+	 * would let a choice made in one decide the other's starting state.
+	 *
+	 * @default 'media-editor'
+	 */
+	scope?: string;
 }
 
-function MediaEditorSidebar( { tabs }: { tabs: EditorTab[] } ) {
-	const tabsContextValue = useContext( Tabs.Context );
+interface MediaEditorSidebarProps {
+	tabs: EditorTab[];
+	activeTabId?: string;
+	onTabChange: ( tabId: string ) => void;
+	scope: string;
+}
+
+function MediaEditorSidebar( {
+	tabs,
+	activeTabId,
+	onTabChange,
+	scope,
+}: MediaEditorSidebarProps ) {
 	return (
 		<ComplementaryArea
-			scope="media-editor"
+			scope={ scope }
 			identifier="media-editor/details"
 			title={ __( 'Details' ) }
 			icon={ drawerRight }
@@ -128,53 +134,93 @@ function MediaEditorSidebar( { tabs }: { tabs: EditorTab[] } ) {
 			panelClassName="media-editor__sidebar-panel"
 			headerClassName="media-editor__sidebar-header"
 			closeLabel={ __( 'Close media panel' ) }
+			// Makes `Tabs.Root` the container, so the tab list passed as
+			// `header` and the panels below share a subtree across the fill.
+			render={
+				<Tabs.Root
+					value={ activeTabId }
+					onValueChange={ ( value ) =>
+						onTabChange( value as string )
+					}
+				/>
+			}
 			header={
-				<Tabs.Context.Provider value={ tabsContextValue }>
-					<Tabs.TabList>
-						{ tabs.map( ( tab ) => (
-							<Tabs.Tab key={ tab.id } tabId={ tab.id }>
-								{ tab.title }
-							</Tabs.Tab>
-						) ) }
-					</Tabs.TabList>
-				</Tabs.Context.Provider>
+				<Tabs.List variant="minimal">
+					{ tabs.map( ( tab ) => (
+						<Tabs.Tab key={ tab.id } value={ tab.id }>
+							{ tab.title }
+						</Tabs.Tab>
+					) ) }
+				</Tabs.List>
 			}
 		>
-			<Tabs.Context.Provider value={ tabsContextValue }>
-				{ tabs.map( ( tab ) => (
-					<Tabs.TabPanel
-						key={ tab.id }
-						tabId={ tab.id }
-						focusable={ false }
-					>
-						{ tab.panel }
-					</Tabs.TabPanel>
-				) ) }
-			</Tabs.Context.Provider>
+			{ tabs.map( ( tab ) => (
+				<Tabs.Panel key={ tab.id } value={ tab.id } tabIndex={ -1 }>
+					{ tab.panel }
+				</Tabs.Panel>
+			) ) }
 		</ComplementaryArea>
 	);
 }
 
-interface HeaderActionsProps {
-	isSaving: boolean;
+/**
+ * Everything the frame's action clusters need from the editor. Supplied by
+ * context rather than by props so the clusters can be module-level components:
+ * a component created during a render has a new identity on every pass, which
+ * remounts its subtree and drops focus mid-interaction.
+ */
+interface MediaEditorFrameContextValue {
 	isImage: boolean;
-	showCloseButton?: boolean;
+	isSaving: boolean;
+	hasMedia: boolean;
+	hasChanges: boolean;
+	isUndoRedoDisabled: boolean;
+	scope: string;
+	aspectRatioPresets?: AspectRatioPreset[];
 	onCancel: () => void;
+	onSave: () => void;
+	onReset: () => void;
 }
 
-function HeaderActions( {
-	isSaving,
-	isImage,
-	showCloseButton = false,
-	onCancel,
-}: HeaderActionsProps ) {
+const MediaEditorFrameContext =
+	createContext< MediaEditorFrameContextValue | null >( null );
+
+/**
+ * Hook to access the media editor's frame context.
+ *
+ * Must be used within a MediaEditor component.
+ *
+ * @return MediaEditorFrameContextValue the action clusters render from.
+ */
+function useMediaEditorFrameContext(): MediaEditorFrameContextValue {
+	const context = useContext( MediaEditorFrameContext );
+	if ( ! context ) {
+		throw new Error(
+			'useMediaEditorFrameContext must be used within MediaEditor'
+		);
+	}
+	return context;
+}
+
+export interface HeaderActionsProps {
+	/**
+	 * Whether to include a Close button. Frames with a dismissal affordance of
+	 * their own — a route's breadcrumbs, say — leave it out.
+	 *
+	 * @default false
+	 */
+	showCloseButton?: boolean;
+}
+
+function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
+	const { isImage, isSaving, onCancel, scope } = useMediaEditorFrameContext();
 	const [ isShortcutsModalOpen, setIsShortcutsModalOpen ] = useState( false );
 	return (
-		<Flex
+		<Stack
 			className="media-editor__header-actions"
 			justify="flex-end"
-			expanded={ false }
-			gap={ 2 }
+			align="center"
+			gap="sm"
 		>
 			{ isImage && (
 				<Button
@@ -184,7 +230,7 @@ function HeaderActions( {
 					onClick={ () => setIsShortcutsModalOpen( true ) }
 				/>
 			) }
-			<PinnedItems.Slot scope="media-editor" />
+			<PinnedItems.Slot scope={ scope } />
 			{ showCloseButton && (
 				<Button
 					size="compact"
@@ -200,19 +246,13 @@ function HeaderActions( {
 					onClose={ () => setIsShortcutsModalOpen( false ) }
 				/>
 			) }
-		</Flex>
+		</Stack>
 	);
 }
 
-interface HistoryActionsProps {
-	isUndoRedoDisabled?: boolean;
-	onReset: () => void;
-}
-
-function HistoryActions( {
-	isUndoRedoDisabled = false,
-	onReset,
-}: HistoryActionsProps ) {
+function HistoryActions() {
+	const { isImage, isUndoRedoDisabled, onReset } =
+		useMediaEditorFrameContext();
 	const {
 		reset,
 		isDirty,
@@ -223,6 +263,11 @@ function HistoryActions( {
 		beginGesture,
 		endGesture,
 	} = useMediaEditor();
+	// Non-image media has no edit history. Checked after the hooks above so
+	// the hook order stays stable across renders.
+	if ( ! isImage ) {
+		return null;
+	}
 	const handleUndo = () => {
 		if ( isUndoRedoDisabled ) {
 			return;
@@ -242,10 +287,10 @@ function HistoryActions( {
 		endGesture();
 	};
 	return (
-		<Flex
+		<Stack
 			className="media-editor__history-actions"
-			expanded={ false }
-			gap={ 2 }
+			align="center"
+			gap="sm"
 		>
 			<Button
 				size="compact"
@@ -280,35 +325,34 @@ function HistoryActions( {
 				accessibleWhenDisabled
 				onClick={ handleRedo }
 			/>
-		</Flex>
+		</Stack>
 	);
 }
 
-interface FooterActionsProps {
-	isSaving: boolean;
-	hasMedia: boolean;
-	hasChanges: boolean;
-	onCancel: () => void;
-	onSave: () => void;
+export interface SaveActionsProps {
+	/**
+	 * Button height. Footers take the 40px default; frames placing these in a
+	 * page header pass `compact` to match the header's other controls.
+	 *
+	 * @default 'default'
+	 */
+	size?: 'default' | 'compact';
 }
 
-function FooterActions( {
-	isSaving,
-	hasMedia,
-	hasChanges,
-	onCancel,
-	onSave,
-}: FooterActionsProps ) {
+function SaveActions( { size = 'default' }: SaveActionsProps ) {
+	const { isSaving, hasMedia, hasChanges, onCancel, onSave } =
+		useMediaEditorFrameContext();
 	const saveDisabled = isSaving || ! hasMedia || ! hasChanges;
 	return (
-		<Flex
-			className="media-editor__footer-actions"
+		<Stack
+			className="media-editor__save-actions"
 			justify="flex-end"
-			expanded={ false }
-			gap={ 2 }
+			align="center"
+			gap="sm"
 		>
 			<Button
 				__next40pxDefaultSize
+				size={ size }
 				variant="tertiary"
 				onClick={ onCancel }
 				disabled={ isSaving }
@@ -318,6 +362,7 @@ function FooterActions( {
 			</Button>
 			<Button
 				__next40pxDefaultSize
+				size={ size }
 				variant="primary"
 				onClick={ onSave }
 				isBusy={ isSaving }
@@ -326,7 +371,23 @@ function FooterActions( {
 			>
 				{ __( 'Save' ) }
 			</Button>
-		</Flex>
+		</Stack>
+	);
+}
+
+function ImageControls() {
+	const { isImage, aspectRatioPresets } = useMediaEditorFrameContext();
+	// Non-image media has nothing to transform. Placement is the frame's call:
+	// render this only in the `narrow` layout, since above that breakpoint the
+	// Crop panel holds these controls already.
+	if ( ! isImage ) {
+		return null;
+	}
+	return (
+		<MediaEditorImageControls
+			showAspectRatioControl
+			aspectRatioPresets={ aspectRatioPresets }
+		/>
 	);
 }
 
@@ -339,19 +400,19 @@ function MediaEditorContent( {
 	renderFrame,
 	noticesClassName = 'media-editor__snackbar',
 	noticesPortalElement,
-	showCloseButton = false,
 	shouldCloseOnEsc = false,
+	scope = 'media-editor',
 }: MediaEditorProps ) {
 	const cropper = useMediaEditor();
 	// The sidebar is a side column from the `small` breakpoint up and collapses
 	// to an overlay below it — mirroring InterfaceSkeleton's behaviour, shifted
 	// from `medium` to `small` (see the matching CSS overrides in style.scss).
 	// Track that single breakpoint: in "panel mode" (≥ small) the
-	// rotate/flip/zoom controls live in the Crop panel and the footer is just
-	// History + Cancel/Save; below it the controls drop into the footer. (The
-	// fine-rotation ruler always sits under the canvas.)
+	// rotate/flip/zoom controls live in the Crop panel; below it they have no
+	// panel to live in and the frame places them instead. (The fine-rotation
+	// ruler always sits under the canvas.)
 	const isPanelLayout = useViewportMatch( 'small' );
-	const footerLayout: 'wide' | 'narrow' = isPanelLayout ? 'wide' : 'narrow';
+	const layout: 'wide' | 'narrow' = isPanelLayout ? 'wide' : 'narrow';
 
 	const { media, hasEdits } = useSelect(
 		( select ) => {
@@ -501,6 +562,13 @@ function MediaEditorContent( {
 		isPanelLayout,
 	] );
 
+	// Control the active tab from state here so the selection survives the
+	// sidebar closing (which unmounts the `ComplementaryArea` Fill and its
+	// tabs). Fall back to the first tab until one is picked, so images open on
+	// Crop.
+	const [ selectedTabId, setSelectedTabId ] = useState< string >();
+	const activeTabId = selectedTabId ?? tabs[ 0 ]?.id;
+
 	const handleChange = ( updates: Partial< Media > ) => {
 		editEntityRecord( 'postType', 'attachment', id, updates );
 	};
@@ -588,9 +656,12 @@ function MediaEditorContent( {
 					</div>
 				) : (
 					<>
-						<Tabs>
-							<MediaEditorSidebar tabs={ tabs } />
-						</Tabs>
+						<MediaEditorSidebar
+							tabs={ tabs }
+							activeTabId={ activeTabId }
+							onTabChange={ setSelectedTabId }
+							scope={ scope }
+						/>
 						<InterfaceSkeleton
 							className="media-editor__skeleton"
 							labels={ {
@@ -604,7 +675,6 @@ function MediaEditorContent( {
 									<div className="media-editor__canvas-area">
 										{ isImage ? (
 											<MediaEditorCanvas
-												focusOnMount
 												isPlacementActive={
 													isPlacementActive
 												}
@@ -627,7 +697,7 @@ function MediaEditorContent( {
 								</div>
 							}
 							sidebar={
-								<ComplementaryArea.Slot scope="media-editor" />
+								<ComplementaryArea.Slot scope={ scope } />
 							}
 						/>
 					</>
@@ -653,74 +723,36 @@ function MediaEditorContent( {
 		</MediaEditorProvider>
 	);
 
-	const history = isImage ? (
-		<HistoryActions
-			isUndoRedoDisabled={ isCropInteractionActive }
-			onReset={ resetCropOptions }
-		/>
-	) : null;
-	const imageControls = isImage ? (
-		<MediaEditorImageControls
-			showAspectRatioControl
-			aspectRatioPresets={ aspectRatioPresets }
-		/>
-	) : null;
-	const actions = (
-		<FooterActions
-			isSaving={ isSaving }
-			hasMedia={ !! media }
-			hasChanges={ hasChanges }
-			onCancel={ handleRequestClose }
-			onSave={ saveMediaEditor }
-		/>
-	);
-
-	// The fine-rotation ruler always lives under the canvas (in
-	// `media-editor__content`), never the footer, so it stays constrained to
-	// the canvas column at every viewport. One JSX tree per layout; DOM order
-	// matches visual order.
-	let footerActions: ReactNode;
-	if ( footerLayout === 'wide' ) {
-		// Sidebar is a column: image controls live in the Crop panel, so
-		// the footer is just History + Cancel/Save.
-		footerActions = (
-			<>
-				{ history }
-				{ actions }
-			</>
-		);
-	} else {
-		// Sidebar collapsed: the image controls drop into the footer.
-		footerActions = (
-			<>
-				{ imageControls }
-				<div className="media-editor-modal__footer-row">
-					{ history }
-					{ actions }
-				</div>
-			</>
-		);
-	}
-
-	return renderFrame( {
-		children,
-		headerActions: (
-			<HeaderActions
-				isSaving={ isSaving }
-				isImage={ isImage }
-				showCloseButton={ showCloseButton }
-				onCancel={ handleRequestClose }
-			/>
-		),
-		footerActions,
-		footerLayout,
-		onRequestClose: handleRequestClose,
-		onKeyDown: handleKeyDown,
-		shouldCloseOnClickOutside: ! hasChanges && ! isSaving,
+	// Rebuilt each render, like the elements it replaces: consumers re-render
+	// as they always did, but the cluster component types stay stable.
+	const contextValue: MediaEditorFrameContextValue = {
+		isImage,
 		isSaving,
-		hasChanges,
 		hasMedia: !! media,
-	} );
+		hasChanges,
+		isUndoRedoDisabled: isCropInteractionActive,
+		scope,
+		aspectRatioPresets,
+		onCancel: handleRequestClose,
+		onSave: saveMediaEditor,
+		onReset: resetCropOptions,
+	};
+
+	return (
+		<MediaEditorFrameContext.Provider value={ contextValue }>
+			{ renderFrame( {
+				children,
+				isImage,
+				layout,
+				onRequestClose: handleRequestClose,
+				onKeyDown: handleKeyDown,
+				shouldCloseOnClickOutside: ! hasChanges && ! isSaving,
+				isSaving,
+				hasChanges,
+				hasMedia: !! media,
+			} ) }
+		</MediaEditorFrameContext.Provider>
+	);
 }
 
 export function MediaEditor( props: MediaEditorProps ) {
@@ -730,5 +762,13 @@ export function MediaEditor( props: MediaEditorProps ) {
 		</MediaEditorStateProvider>
 	);
 }
+
+// Attached to `MediaEditor` so frames import and arrange them, the way
+// `DataViewsPicker` exposes its own sub-components. They read what they need
+// from context, so a frame only chooses where they go and how they look.
+MediaEditor.HeaderActions = HeaderActions;
+MediaEditor.HistoryActions = HistoryActions;
+MediaEditor.SaveActions = SaveActions;
+MediaEditor.ImageControls = ImageControls;
 
 export default MediaEditor;

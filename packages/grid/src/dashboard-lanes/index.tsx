@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import {
 	DndContext,
 	DragOverlay,
@@ -16,10 +13,6 @@ import {
 } from '@dnd-kit/sortable';
 import type { DragMoveEvent, DragStartEvent } from '@dnd-kit/core';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useResizeObserver, useEvent, useMergeRefs } from '@wordpress/compose';
 import {
 	forwardRef,
@@ -31,10 +24,6 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { LanesItem } from './lanes-item';
 import { useLanePlacement } from './use-lane-placement';
 import { GridOverlay } from '../shared/grid-overlay';
@@ -492,13 +481,10 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 				</div>
 			) : null;
 
-		// Edit-mode background visual. Lanes are content-driven
-		// vertically, so the overlay only mirrors columns; the default
-		// can be replaced wholesale via `renderGridOverlay`. Rendered
-		// unconditionally so the overlay can cross-fade on edit-mode
-		// toggles; `isActive` drives the opacity transition inside the
-		// overlay. Memoized so drag/resize re-renders skip
-		// reconciliation while inputs are stable.
+		// Edit-mode background. Lanes are content-driven vertically, so
+		// the overlay mirrors columns only. Rendered unconditionally so
+		// it can cross-fade on edit-mode toggles (`isActive` drives the
+		// transition); memoized so drag/resize re-renders skip it.
 		const Overlay = renderGridOverlay ?? GridOverlay;
 		const gridOverlay = useMemo(
 			() => (

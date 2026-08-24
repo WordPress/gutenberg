@@ -1,13 +1,5 @@
-/**
- * External dependencies
- */
-import { v4 as uuid } from 'uuid';
-
-/**
- * WordPress dependencies
- */
 import { isBlobURL } from '@wordpress/blob';
-import { useRef, useState } from '@wordpress/element';
+import { useContext, useEffect, useRef, useState } from '@wordpress/element';
 import {
 	MediaPlaceholder,
 	MediaReplaceFlow,
@@ -17,62 +9,106 @@ import {
 	useBlockProps,
 	BlockControls,
 	InspectorControls,
-	RichText,
+	PlainText,
 } from '@wordpress/block-editor';
 import {
 	Button,
 	PanelBody,
 	TextControl,
+	TextareaControl as WCTextareaControl,
 	BaseControl,
 	Spinner,
 } from '@wordpress/components';
+import { Link } from '@wordpress/ui';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
+import { PlaylistContext } from '../playlist/context';
+import { getTrackAttributes, getTrackImageAttributes } from '../playlist/utils';
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
-const ALBUM_COVER_ALLOWED_MEDIA_TYPES = [ 'image' ];
+const TRACK_IMAGE_ALLOWED_MEDIA_TYPES = [ 'image' ];
 
-const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
-	// Note that 'id' is the media attachment ID, while 'uniqueId' is a unique identifier.
-	// This is to make sure that the same media can be used in more than one track.
-	const { id, uniqueId, src, album, artist, image, length, title } =
+const PlaylistTrackEdit = ( {
+	attributes,
+	setAttributes,
+	context,
+	clientId,
+	isSelected,
+} ) => {
+	const { id, src, album, artist, image, imageAlt, length, title } =
 		attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 	const showArtists = context?.showArtists;
-	const currentTrack = context?.currentTrack;
+	const showImages = context?.showImages ?? true;
 	const imageButton = useRef();
 	const blockProps = useBlockProps();
+	const { currentTrackClientId, setCurrentTrackClientId, removeTrack } =
+		useContext( PlaylistContext );
 	const { createErrorNotice } = useDispatch( noticesStore );
-	function onUploadError( message ) {
-		createErrorNotice( message, { type: 'snackbar' } );
-	}
 
+	/**
+	 * Handle audio upload errors.
+	 *
+	 * @param {string}  message                      Error message to show.
+	 * @param {Object}  [options]
+	 * @param {boolean} [options.removeTrackOnError] Remove the track as well. Useful for drag/drop where a track is optimistically created before upload finishes.
+	 */
+	function onUploadError( message, { removeTrackOnError = false } = {} ) {
+		createErrorNotice( message, { type: 'snackbar' } );
+
+		if ( removeTrackOnError ) {
+			removeTrack( clientId );
+			return;
+		}
+
+		// Set temporaryURL back to default state
+		setTemporaryURL();
+	}
+	const hasTrackSource = !! src || !! temporaryURL;
+
+	useEffect( () => {
+		if (
+			isSelected &&
+			hasTrackSource &&
+			currentTrackClientId !== clientId
+		) {
+			setCurrentTrackClientId( clientId );
+		}
+	}, [
+		isSelected,
+		hasTrackSource,
+		clientId,
+		currentTrackClientId,
+		setCurrentTrackClientId,
+	] );
+
+	// Handles drag/drop uploads
 	useUploadMediaFromBlobURL( {
-		src: temporaryURL,
+		url: temporaryURL,
 		allowedTypes: ALLOWED_MEDIA_TYPES,
 		onChange: onSelectTrack,
-		onError: onUploadError,
+		onError: ( message ) => {
+			onUploadError( message, { removeTrackOnError: true } );
+		},
 	} );
 
 	function onSelectTrack( media ) {
-		if ( ! media || ! media.url ) {
+		const mediaUrl = media?.url ?? media?.source_url;
+
+		if ( ! media || ! mediaUrl ) {
 			// In this case there was an error and we should continue in the editing state
 			// previous attributes should be removed because they may be temporary blob urls.
 			setAttributes( {
 				blob: undefined,
 				id: undefined,
-				uniqueId: undefined,
 				artist: undefined,
 				album: undefined,
 				image: undefined,
+				imageAlt: undefined,
 				length: undefined,
 				title: undefined,
 				url: undefined,
@@ -81,50 +117,30 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 			return;
 		}
 
-		if ( isBlobURL( media.url ) ) {
-			setTemporaryURL( media.url );
+		if ( isBlobURL( mediaUrl ) ) {
+			setTemporaryURL( mediaUrl );
 			return;
 		}
 
 		setAttributes( {
 			blob: undefined,
-			id: media.id,
-			uniqueId: uuid(),
-			src: media.url,
-			artist:
-				media.artist ||
-				media?.meta?.artist ||
-				media?.media_details?.artist ||
-				__( 'Unknown artist' ),
-			album:
-				media.album ||
-				media?.meta?.album ||
-				media?.media_details?.album ||
-				__( 'Unknown album' ),
-			// Prevent using the default media attachment icon as the track image.
-			image:
-				media?.image?.src &&
-				media?.image?.src.endsWith( '/images/media/audio.svg' )
-					? ''
-					: media?.image?.src,
-			length: media?.fileLength || media?.media_details?.length_formatted,
-			title: media.title,
+			...getTrackAttributes( media ),
 		} );
 		setTemporaryURL();
 	}
 
-	function onSelectAlbumCoverImage( coverImage ) {
-		setAttributes( { image: coverImage.url } );
+	function onSelectTrackImage( trackImage ) {
+		setAttributes( getTrackImageAttributes( trackImage ) );
 	}
 
-	function onRemoveAlbumCoverImage() {
-		setAttributes( { image: undefined } );
+	function onRemoveTrackImage() {
+		setAttributes( { image: undefined, imageAlt: undefined } );
 
 		// Move focus back to the Media Upload button.
 		imageButton.current.focus();
 	}
 
-	if ( ! src && ! temporaryURL ) {
+	if ( ! hasTrackSource ) {
 		return (
 			<div { ...blockProps }>
 				<MediaPlaceholder
@@ -147,21 +163,34 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 
 	return (
 		<>
-			<BlockControls group="other">
-				<MediaReplaceFlow
-					name={ __( 'Replace' ) }
-					onSelect={ onSelectTrack }
-					accept="audio/*"
-					mediaId={ id }
-					mediaURL={ src }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					onError={ onUploadError }
-				/>
-			</BlockControls>
+			{ /* Only show if this is a single selection (not multiselect) */ }
+			{ isSelected && (
+				<BlockControls group="other">
+					<MediaReplaceFlow
+						name={ __( 'Replace' ) }
+						onSelect={ onSelectTrack }
+						accept="audio/*"
+						mediaId={ id }
+						mediaURL={ src }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						onError={ onUploadError }
+						variant="toolbar"
+					/>
+				</BlockControls>
+			) }
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
+					{ /* Only show if this is a single selection (not multiselect) */ }
+					{ isSelected && (
+						<TextControl
+							label={ __( 'Title' ) }
+							value={ title ? stripHTML( title ) : '' }
+							onChange={ ( titleValue ) => {
+								setAttributes( { title: titleValue } );
+							} }
+						/>
+					) }
 					<TextControl
-						__next40pxDefaultSize
 						label={ __( 'Artist' ) }
 						value={ artist ? stripHTML( artist ) : '' }
 						onChange={ ( artistValue ) => {
@@ -169,96 +198,121 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 						} }
 					/>
 					<TextControl
-						__next40pxDefaultSize
 						label={ __( 'Album' ) }
 						value={ album ? stripHTML( album ) : '' }
 						onChange={ ( albumValue ) => {
 							setAttributes( { album: albumValue } );
 						} }
 					/>
-					<TextControl
-						__next40pxDefaultSize
-						label={ __( 'Title' ) }
-						value={ title ? stripHTML( title ) : '' }
-						onChange={ ( titleValue ) => {
-							setAttributes( { title: titleValue } );
-						} }
-					/>
 					<MediaUploadCheck>
-						<div className="editor-video-poster-control">
+						<BaseControl>
 							<BaseControl.VisualLabel>
-								{ __( 'Album cover image' ) }
+								{ __( 'Track image' ) }
 							</BaseControl.VisualLabel>
-							{ !! image && (
-								<img
-									src={ image }
-									alt={ __(
-										'Preview of the album cover image'
+							<div className="editor-video-poster-control">
+								{ !! image && (
+									<img
+										src={ image }
+										alt={ __(
+											'Preview of the track image'
+										) }
+									/>
+								) }
+								<MediaUpload
+									title={ __( 'Select image' ) }
+									onSelect={ onSelectTrackImage }
+									allowedTypes={
+										TRACK_IMAGE_ALLOWED_MEDIA_TYPES
+									}
+									render={ ( { open } ) => (
+										<Button
+											__next40pxDefaultSize
+											variant="primary"
+											onClick={ open }
+											ref={ imageButton }
+										>
+											{ ! image
+												? __( 'Select' )
+												: __( 'Replace' ) }
+										</Button>
 									) }
 								/>
-							) }
-							<MediaUpload
-								title={ __( 'Select image' ) }
-								onSelect={ onSelectAlbumCoverImage }
-								allowedTypes={ ALBUM_COVER_ALLOWED_MEDIA_TYPES }
-								render={ ( { open } ) => (
+								{ !! image && (
 									<Button
 										__next40pxDefaultSize
-										variant="primary"
-										onClick={ open }
-										ref={ imageButton }
+										onClick={ onRemoveTrackImage }
+										variant="tertiary"
 									>
-										{ ! image
-											? __( 'Select' )
-											: __( 'Replace' ) }
+										{ __( 'Remove' ) }
 									</Button>
 								) }
-							/>
-							{ !! image && (
-								<Button
-									__next40pxDefaultSize
-									onClick={ onRemoveAlbumCoverImage }
-									variant="tertiary"
-								>
-									{ __( 'Remove' ) }
-								</Button>
-							) }
-						</div>
+							</div>
+						</BaseControl>
 					</MediaUploadCheck>
+					{ !! image && (
+						<WCTextareaControl
+							label={ __( 'Alternative text' ) }
+							value={ imageAlt || '' }
+							onChange={ ( value ) =>
+								setAttributes( { imageAlt: value } )
+							}
+							help={
+								<Link
+									openInNewTab
+									href={
+										// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+										__(
+											'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+										)
+									}
+								>
+									{ __(
+										'Describe the purpose of the image.'
+									) }
+								</Link>
+							}
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 			<li { ...blockProps }>
-				{ !! temporaryURL && <Spinner /> }
 				<button
 					className="wp-block-playlist-track__button"
-					data-wp-context={ JSON.stringify( { uniqueId } ) }
+					onClick={ () => setCurrentTrackClientId( clientId ) }
 					aria-current={
-						currentTrack === uniqueId ? 'true' : 'false'
+						currentTrackClientId === clientId ? 'true' : 'false'
 					}
 				>
+					{ showImages && !! image && (
+						<img
+							className="wp-block-playlist-track__image"
+							src={ image }
+							alt={ imageAlt || '' }
+						/>
+					) }
 					<span className="wp-block-playlist-track__content">
-						<RichText
+						<PlainText
 							tagName="span"
 							className="wp-block-playlist-track__title"
 							value={ title }
-							placeholder={ __( 'Add title' ) }
+							aria-label={ __( 'Track title' ) }
+							placeholder={ __( 'Track title' ) }
 							onChange={ ( value ) => {
 								setAttributes( { title: value } );
 							} }
-							allowedFormats={ [] }
-							withoutInteractiveFormatting
+							__experimentalVersion={ 2 }
 						/>
 						{ showArtists && (
-							<RichText
+							<PlainText
 								tagName="span"
 								className="wp-block-playlist-track__artist"
 								value={ artist }
-								placeholder={ __( 'Add artist' ) }
+								aria-label={ __( 'Track artist' ) }
+								placeholder={ __( 'Track artist' ) }
 								onChange={ ( value ) =>
 									setAttributes( { artist: value } )
 								}
-								allowedFormats={ [] }
-								withoutInteractiveFormatting
+								__experimentalVersion={ 2 }
 							/>
 						) }
 					</span>
@@ -266,16 +320,17 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 						{ length && (
 							<span className="screen-reader-text">
 								{
-									/* translators: %s: Visually hidden label for the track length (screen reader text). */
-									__( 'Length:' )
+									/* translators: Visually hidden label for the track duration (screen reader text). */
+									__( 'Duration:' )
 								}
 							</span>
 						) }
 						{ length }
+						{ !! temporaryURL && (
+							<Spinner className="wp-block-playlist-track__spinner" />
+						) }
 					</span>
-					<span className="screen-reader-text">
-						{ __( 'Select to play this track' ) }
-					</span>
+					<span className="screen-reader-text">{ __( 'Play' ) }</span>
 				</button>
 			</li>
 		</>

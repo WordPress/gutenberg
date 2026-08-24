@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import type { DragEvent } from 'react';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
 import { Icon, more } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import Draggable from '..';
 
 const meta: Meta< typeof Draggable > = {
