@@ -170,9 +170,9 @@ export const useLocalizationProps = ( {
 					return label;
 				},
 				/** The label for the "next month" button. */
-				labelNext: () => __( 'Go to the Next Month' ),
+				labelNext: () => __( 'Next month' ),
 				/** The label for the "previous month" button. */
-				labelPrevious: () => __( 'Go to the Previous Month' ),
+				labelPrevious: () => __( 'Previous month' ),
 				/**
 				 * The label for the day button.
 				 * @param date
