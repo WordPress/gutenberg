@@ -2,8 +2,8 @@
 tracing:
     enabled: true
     failOnReceiverStartFailure: true
-    # Promptfoo recognizes Codex's exec_command by default. Claude calls its
-    # equivalent shell tool Bash, so declare that additional command tool name.
+    # Claude calls its shell tool Bash, so declare it as a command tool name
+    # for Promptfoo's trajectory steps to pick up.
     commandToolNames: ['Bash']
     otlp:
         http:
