@@ -4,7 +4,7 @@ import {
 	FormFileUpload,
 	Placeholder,
 	DropZone,
-	__experimentalInputControl as InputControl,
+	__experimentalInputControl as WCInputControl,
 	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 	withFilters,
 } from '@wordpress/components';
@@ -19,7 +19,6 @@ import URLPopover from '../url-popover';
 import { store as blockEditorStore } from '../../store';
 import { parseDropEvent } from '../use-on-block-drop';
 import { getComputedAcceptAttribute } from './utils';
-
 const noop = () => {};
 
 const InsertFromURLPopover = ( {
@@ -34,7 +33,7 @@ const InsertFromURLPopover = ( {
 			className="block-editor-media-placeholder__url-input-form"
 			onSubmit={ onSubmit }
 		>
-			<InputControl
+			<WCInputControl
 				label={ __( 'URL' ) }
 				type="text" // Use text instead of URL to allow relative paths (e.g., /image/image.jpg)
 				hideLabelFromVision
@@ -373,6 +372,10 @@ export function MediaPlaceholder( {
 				onFilesDrop={ onFilesUpload }
 				onDrop={ handleBlocksDrop }
 				isEligible={ ( dataTransfer ) => {
+					// This dropzone only accepts block drags from the inserter, not
+					// canvas block drags. Only the inserter publishes the dragged
+					// blocks' names, as wp-block:core/{name}, so no matches means it
+					// isn't an inserter drag.
 					const prefix = 'wp-block:core/';
 					const types = [];
 					for ( const type of dataTransfer.types ) {
@@ -381,9 +384,11 @@ export function MediaPlaceholder( {
 						}
 					}
 					return (
+						types.length > 0 &&
 						types.every( ( type ) =>
 							allowedTypes.includes( type )
-						) && ( multiple ? true : types.length === 1 )
+						) &&
+						( multiple ? true : types.length === 1 )
 					);
 				} }
 			/>

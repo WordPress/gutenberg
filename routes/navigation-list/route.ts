@@ -31,13 +31,12 @@ export const route = {
 			search?: string;
 		};
 	} ) => {
-		const [ firstNavigation ] = await resolveSelect(
-			coreStore
-		).getEntityRecords(
+		const navigations = ( await resolveSelect( coreStore ).getEntityRecords(
 			'postType',
 			NAVIGATION_POST_TYPE,
 			PRELOADED_NAVIGATION_MENUS_QUERY
-		);
+		) ) as { id: number }[] | null;
+		const firstNavigation = navigations?.[ 0 ];
 
 		if ( ! firstNavigation ) {
 			return { postType: NAVIGATION_POST_TYPE, isPreview: true };
@@ -51,7 +50,6 @@ export const route = {
 			postType: NAVIGATION_POST_TYPE,
 			postId,
 			isPreview: true,
-			editLink: `/types/wp_navigation/edit/${ postId }`,
 		};
 	},
 	loader: async () => {

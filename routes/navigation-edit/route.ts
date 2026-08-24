@@ -49,11 +49,11 @@ export const route = {
 		};
 	} ) => {
 		const navigationId = parseInt( params.id );
-		const navigation = await resolveSelect( coreStore ).getEntityRecord(
+		const navigation = ( await resolveSelect( coreStore ).getEntityRecord(
 			'postType',
 			NAVIGATION_POST_TYPE,
 			navigationId
-		);
+		) ) as { title?: { rendered?: string } } | undefined;
 
 		if ( navigation?.title?.rendered ) {
 			return decodeEntities( navigation.title.rendered );
@@ -73,7 +73,6 @@ export const route = {
 			postType: NAVIGATION_POST_TYPE,
 			postId,
 			isPreview: true,
-			editLink: `/types/wp_navigation/edit/${ postId }`,
 		};
 	},
 	loader: async ( {
