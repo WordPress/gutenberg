@@ -34,7 +34,7 @@ function expectGregorianDate( localeCode: string ) {
 jest.mock( '@wordpress/i18n', () => {
 	const actual = jest.requireActual( '@wordpress/i18n' );
 	const translations: Record< string, string > = {
-		'Go to the Previous Month': 'Translated previous month',
+		'Previous month': 'Translated previous month',
 		'Navigation bar': 'Translated navigation bar',
 		'Today, %s, selected': 'Today and selected: %s',
 	};
@@ -94,6 +94,8 @@ describe.each( [
 	it.each( [
 		[ 'previous', 'Previous test month', 'labelPrevious' ],
 		[ 'next', 'Next test month', 'labelNext' ],
+		[ 'default previous', 'Translated previous month', undefined ],
+		[ 'default next', 'Next month', undefined ],
 	] as const )(
 		'shows the %s month button label in a tooltip',
 		async ( _direction, label, labelKey ) => {
@@ -101,7 +103,11 @@ describe.each( [
 
 			render(
 				<Tooltip.Provider delay={ 0 }>
-					<Component labels={ { [ labelKey ]: () => label } } />
+					<Component
+						labels={
+							labelKey ? { [ labelKey ]: () => label } : undefined
+						}
+					/>
 				</Tooltip.Provider>
 			);
 
