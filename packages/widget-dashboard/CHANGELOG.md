@@ -11,6 +11,11 @@
     keep every action in the menu
     ([#81556](https://github.com/WordPress/gutenberg/pull/81556)).
 
+### Enhancements
+
+-   Dashboard overflow menu: "Reset to default…" carries an ellipsis, since
+    activating it opens a confirmation dialog rather than completing the reset.
+
 ### Internal
 
 -   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509), [#81515](https://github.com/WordPress/gutenberg/pull/81515), [#81516](https://github.com/WordPress/gutenberg/pull/81516), [#81518](https://github.com/WordPress/gutenberg/pull/81518))
