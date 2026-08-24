@@ -1,4 +1,5 @@
 import { sideloadMedia } from './utils/sideload-media';
+import { invalidateAttachmentResolutions } from './utils/invalidate-attachment-resolutions';
 import { MediaUploadModal } from './components/media-upload-modal';
 import { lock } from './lock-unlock';
 
@@ -10,4 +11,5 @@ export const privateApis = {};
 lock( privateApis, {
 	sideloadMedia,
 	MediaUploadModal,
+	invalidateAttachmentResolutions,
 } );

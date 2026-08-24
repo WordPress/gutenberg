@@ -8,6 +8,7 @@
 -   `StylesCanvas`: In preview mode, render edge to edge without the close button and Escape handler. There the canvas is the whole surface rather than a frame opened over an editing session, and whatever opened it owns closing it.
 -   Upload progress snackbar: Stop announcing "Upload complete" for a batch in which everything failed. The snackbar treated the queue draining as success, so a failed upload showed a completion checkmark right next to its own error. A batch that fails outright now just takes the progress snackbar down, and a partly failed one reports "Uploaded 3 of 5" ([#81132](https://github.com/WordPress/gutenberg/issues/81132)).
 -   `mediaUpload`: Refuse a batch of more than one file before registering it with the upload progress snackbar when the caller only takes one, such as a Cover block placeholder. `uploadMedia()` reported the refusal as a single error, leaving the rest of the batch counted as uploading forever - and every later upload in the session was folded into that stuck notice ([#82041](https://github.com/WordPress/gutenberg/issues/82041)).
+-   Attach media an Image or Gallery block displays to the post on save, when it is not already attached to another post, matching what uploading into that post has always done ([#66663](https://github.com/WordPress/gutenberg/issues/66663), [#81491](https://github.com/WordPress/gutenberg/issues/81491)).
 
 ### Internal
 
