@@ -1,9 +1,12 @@
 const mockSyncManager = {};
-const mockCreateSyncManager = jest.fn( () => mockSyncManager );
+const mockCreateManager = jest.fn( () => mockSyncManager );
+const mockResolveEngineAdapter = jest.fn( () => ( {
+	createManager: mockCreateManager,
+} ) );
 
 jest.mock( '@wordpress/sync', () => ( {
 	privateApis: {
-		createSyncManager: mockCreateSyncManager,
+		resolveEngineAdapter: mockResolveEngineAdapter,
 	},
 } ) );
 
@@ -19,7 +22,8 @@ function loadSync() {
 describe( 'getSyncManager', () => {
 	afterEach( () => {
 		delete window.__experimentalEnableRealTimeCollaboration;
-		mockCreateSyncManager.mockClear();
+		mockResolveEngineAdapter.mockClear();
+		mockCreateManager.mockClear();
 	} );
 
 	it.each( [ undefined, false ] )(
@@ -30,7 +34,7 @@ describe( 'getSyncManager', () => {
 			const { getSyncManager } = loadSync();
 
 			expect( getSyncManager() ).toBeUndefined();
-			expect( mockCreateSyncManager ).not.toHaveBeenCalled();
+			expect( mockResolveEngineAdapter ).not.toHaveBeenCalled();
 		}
 	);
 
@@ -40,7 +44,7 @@ describe( 'getSyncManager', () => {
 
 		expect( getSyncManager() ).toBe( mockSyncManager );
 		expect( getSyncManager() ).toBe( mockSyncManager );
-		expect( mockCreateSyncManager ).toHaveBeenCalledTimes( 1 );
+		expect( mockCreateManager ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'returns an existing sync manager after real-time collaboration is disabled', () => {
@@ -51,6 +55,17 @@ describe( 'getSyncManager', () => {
 		window.__experimentalEnableRealTimeCollaboration = false;
 
 		expect( getSyncManager() ).toBe( existingSyncManager );
-		expect( mockCreateSyncManager ).toHaveBeenCalledTimes( 1 );
+		expect( mockCreateManager ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'creates no sync manager and reports the engine as unavailable when no engine adapter resolves', () => {
+		window.__experimentalEnableRealTimeCollaboration = true;
+		mockResolveEngineAdapter.mockReturnValueOnce( undefined );
+		const { getSyncManager, isSyncEngineUnavailable } = loadSync();
+
+		expect( getSyncManager() ).toBeUndefined();
+		expect( isSyncEngineUnavailable() ).toBe( true );
+		expect( mockCreateManager ).not.toHaveBeenCalled();
+		expect( console ).toHaveWarned();
 	} );
 } );
