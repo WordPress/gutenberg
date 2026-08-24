@@ -17,7 +17,10 @@ import {
 import { useSelect } from '@wordpress/data';
 import { useMemo, useCallback, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-import { privateApis as patternPrivateApis } from '@wordpress/patterns';
+import {
+	privateApis as patternPrivateApis,
+	// @ts-expect-error - No type declarations available for @wordpress/patterns
+} from '@wordpress/patterns';
 import { __ } from '@wordpress/i18n';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import { DEFAULT_VIEW, DEFAULT_VIEWS, DEFAULT_LAYOUTS } from './view-utils';
