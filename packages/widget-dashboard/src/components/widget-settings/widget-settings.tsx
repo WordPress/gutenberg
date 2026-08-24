@@ -131,6 +131,15 @@ export function WidgetSettings(): React.ReactNode {
 		[ cancelStaging, close ]
 	);
 
+	// A denied `edit` closes the surface by prop, outside `handleOpenChange`.
+	// Discard its staged edits the same way, so a later grant reopens clean.
+	useEffect( () => {
+		if ( requestedWidget && ! open ) {
+			cancelStaging();
+			close();
+		}
+	}, [ requestedWidget, open, cancelStaging, close ] );
+
 	const hasForm = !! widget && !! widgetType && fields.length > 0;
 
 	if ( ! hasForm ) {

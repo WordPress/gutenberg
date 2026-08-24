@@ -1,8 +1,8 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentType } from 'react';
-import { useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import type {
 	ResolveWidgetModule,
 	WidgetRenderProps,
@@ -146,6 +146,40 @@ function Harness( {
 	);
 }
 
+/* Edit is granted and revoked from application state. */
+function RevocableEditHarness() {
+	const [ layout, setLayout ] =
+		useState< DashboardWidget[] >( initialLayout );
+	const [ editable, setEditable ] = useState( true );
+	const canPerform = useMemo< CanPerformDashboardOperation >(
+		() => ( request ) => request.operation !== 'edit' || editable,
+		[ editable ]
+	);
+
+	return (
+		<>
+			<button
+				type="button"
+				onClick={ () => setEditable( ( value ) => ! value ) }
+			>
+				Toggle edit
+			</button>
+			<WidgetDashboard.Policy canPerform={ canPerform }>
+				<WidgetDashboard
+					layout={ layout }
+					onLayoutChange={ setLayout }
+					widgetTypes={ widgetTypes }
+					onEditChange={ () => {} }
+					resolveWidgetModule={ resolveWidgetModule }
+				>
+					<WidgetDashboard.Actions />
+					<WidgetDashboard.Widgets />
+				</WidgetDashboard>
+			</WidgetDashboard.Policy>
+		</>
+	);
+}
+
 describe( 'WidgetDashboard.Policy instance operations', () => {
 	beforeEach( () => {
 		mockedUseInlineFit.mockReturnValue( {
@@ -255,6 +289,43 @@ describe( 'WidgetDashboard.Policy instance operations', () => {
 		);
 
 		expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'discards the settings surface edits when edit is revoked', async () => {
+		const user = userEvent.setup();
+		render( <RevocableEditHarness /> );
+		await screen.findByTestId( 'label' );
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Widget settings' } )
+		);
+		const dialog = await screen.findByRole( 'dialog', {
+			name: 'Snapshot settings',
+		} );
+		await user.type( within( dialog ).getByLabelText( 'Label' ), '!' );
+		expect( screen.getByTestId( 'label' ) ).toHaveTextContent(
+			/^Traffic!$/
+		);
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Toggle edit' } )
+		);
+
+		await waitFor( () =>
+			expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument()
+		);
+		expect( screen.getByTestId( 'label' ) ).toHaveTextContent(
+			/^Traffic$/
+		);
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Toggle edit' } )
+		);
+
+		expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+		expect( screen.getByTestId( 'label' ) ).toHaveTextContent(
+			/^Traffic$/
+		);
 	} );
 
 	it( 're-asserts an instance locked against removal in staging', async () => {
