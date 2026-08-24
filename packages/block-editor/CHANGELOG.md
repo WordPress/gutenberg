@@ -27,6 +27,7 @@
 -   `RichText`: Handle Enter using the current record, so pressing it right after moving the caret splits at the caret's new position instead of the previous one ([#81696](https://github.com/WordPress/gutenberg/pull/81696)).
 -   `useInnerBlocksProps`: Resolve the manual grid placement check that disables the standard drop zone against a layout passed through the options, when provided, instead of always using the block edit context layout ([#81120](https://github.com/WordPress/gutenberg/pull/81120)).
 -   `BorderPanel`: Match a chosen drop shadow against the presets from every origin rather than the first origin that defines any, so theme and default presets keep being stored as `var:preset|shadow|<slug>` once a custom preset exists ([#81346](https://github.com/WordPress/gutenberg/pull/81346)).
+-   Block states: Resolve a block's state style selector through `getBlockSelector()`, so a block that declares its feature selector with the legacy `__experimentalSelector` support, such as the Calendar, has its pseudo-state and responsive rules applied to the same element as its base styles instead of to the block wrapper ([#81971](https://github.com/WordPress/gutenberg/pull/81971)).
 
 ### Internal
 
