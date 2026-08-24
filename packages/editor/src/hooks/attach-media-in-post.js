@@ -3,20 +3,20 @@ import { select, dispatch, resolveSelect } from '@wordpress/data';
 import attachMediaInPost from '../utils/attach-media-in-post';
 import { store as editorStore } from '../store';
 
+// When a post is saved, auto-attach any media that was added to the post content,
+// but not yet attached to the post, matching similar behavior in the classic editor.
 addAction(
 	'editor.savePost',
 	'core/editor/attach-media-in-post',
 	( { id, type }, options = {} ) => {
 		// An autosave or a preview is not the user committing anything, so it is
-		// not the moment to start claiming their media.
+		// not the right stage to automatically attach media.
 		if ( options.isAutosave || options.isPreview ) {
 			return;
 		}
 
-		// Writing to someone's media library on every save deserves an off
-		// switch, even without a UI for it. An editor setting is the canonical
-		// one: `block_editor_settings_all` in PHP, or `updateEditorSettings` in
-		// JS, both reach it without this needing an API of its own.
+		// Allow disabling automatic media attachment through editor settings.
+		// While there is no UI for it currently, this allows a plugin to disable it.
 		if (
 			! select( editorStore ).getEditorSettings().autoAttachMediaEnabled
 		) {
