@@ -1,29 +1,24 @@
 /**
- * Block attributes holding the ID of an attachment the block displays.
+ * The attribute each block stores its attachment ID in.
  *
  * An explicit map rather than "any numeric attribute called `id`": `core/block`,
  * `core/navigation-link` and `core/query` all carry numeric IDs that are not
- * attachments, and proposing to attach one of those would be worse than missing
- * an image.
+ * attachments, and attaching one of those would be worse than missing an image.
  *
- * Galleries need no entry beyond the legacy one: modern galleries hold inner
- * `core/image` blocks, and only the pre-v7 format stored its own array of IDs.
+ * Galleries need no entry of their own. A modern gallery holds inner
+ * `core/image` blocks, which the walk below reaches, and the legacy format that
+ * stored its own array of IDs is migrated to those inner blocks when the post is
+ * parsed — see `runV2Migration` in the Gallery block's `deprecated.js` — so a
+ * gallery carrying `ids` never reaches the editor's block tree.
  *
  * Widening this to Cover, Media & Text, Video, Audio and File is a one-line
  * change — the post's blocks are read on save rather than each block reporting
  * what it holds, so a block needs no involvement to be covered.
  */
 const MEDIA_ID_ATTRIBUTES = {
-	'core/image': [ 'id' ],
-	'core/gallery': [ 'ids' ],
+	'core/image': 'id',
 };
 
-/**
- * Flattens a block tree into a single list.
- *
- * @param {Object[]} blocks Blocks to flatten.
- * @return {Object[]} Every block in the tree.
- */
 /**
  * Blocks whose inner blocks are another entity's content.
  *
@@ -39,6 +34,12 @@ const MEDIA_ID_ATTRIBUTES = {
  */
 const ENTITY_BOUNDARY_BLOCKS = [ 'core/block', 'core/template-part' ];
 
+/**
+ * Flattens a block tree into a single list, stopping at entity boundaries.
+ *
+ * @param {Object[]} blocks Blocks to flatten.
+ * @return {Object[]} Every block in the tree that belongs to this post.
+ */
 function flattenBlocks( blocks ) {
 	const result = [];
 
@@ -56,9 +57,6 @@ function flattenBlocks( blocks ) {
 /**
  * Collects the attachment IDs a post's blocks display.
  *
- * Shared so the list a user is shown before publishing and the list that is
- * written on publish are derived the same way and cannot drift apart.
- *
  * @param {Object[]} blocks The post's blocks, unflattened.
  * @return {number[]} Attachment IDs, in block order, deduplicated.
  */
@@ -66,15 +64,17 @@ export default function getMediaIdsInBlocks( blocks ) {
 	const mediaIds = new Set();
 
 	flattenBlocks( blocks ).forEach( ( block ) => {
-		MEDIA_ID_ATTRIBUTES[ block.name ]?.forEach( ( attribute ) => {
-			const value = block.attributes?.[ attribute ];
+		const attribute = MEDIA_ID_ATTRIBUTES[ block.name ];
 
-			( Array.isArray( value ) ? value : [ value ] ).forEach( ( id ) => {
-				if ( Number.isInteger( id ) && id > 0 ) {
-					mediaIds.add( id );
-				}
-			} );
-		} );
+		if ( ! attribute ) {
+			return;
+		}
+
+		const id = block.attributes?.[ attribute ];
+
+		if ( Number.isInteger( id ) && id > 0 ) {
+			mediaIds.add( id );
+		}
 	} );
 
 	return [ ...mediaIds ];
