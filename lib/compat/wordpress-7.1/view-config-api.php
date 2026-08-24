@@ -710,6 +710,13 @@ function _gutenberg_get_entity_view_config_posttype_wp_template( $data ) {
 				),
 			),
 			array(
+				'id'     => 'reading_settings',
+				'layout' => array(
+					'type'          => 'regular',
+					'labelPosition' => 'none',
+				),
+			),
+			array(
 				'id'     => 'last_edited_date',
 				'layout' => array(
 					'type'          => 'panel',

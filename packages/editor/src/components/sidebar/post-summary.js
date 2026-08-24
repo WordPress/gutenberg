@@ -18,6 +18,7 @@ import PostTemplatePanel from '../post-template/panel';
 import PostURLPanel from '../post-url/panel';
 import BlogTitle from '../blog-title';
 import PostsPerPage from '../posts-per-page';
+import ReadingSettingsLink from '../reading-settings-link';
 import SiteDiscussion from '../site-discussion';
 import { store as editorStore } from '../../store';
 import { PrivatePostLastRevision } from '../post-last-revision';
@@ -59,6 +60,7 @@ export default function PostSummary( { onActionPerformed } ) {
 							/>
 							<PostFeaturedImagePanel withPanelBody={ false } />
 							<PostExcerptPanel />
+							<ReadingSettingsLink />
 							<Stack direction="column" gap="xs">
 								<PostContentInformation />
 								<PostLastEditedPanel />
