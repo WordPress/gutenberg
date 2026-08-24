@@ -1,7 +1,7 @@
 import { addAction } from '@wordpress/hooks';
 import { select, dispatch, resolveSelect } from '@wordpress/data';
-import attachMediaInPost from '../utils/attach-media-in-post';
-import { store as editorStore } from '../store';
+import attachMediaInPost from './attach-media';
+import { store as editorStore } from '../../store';
 
 // When a post is saved, auto-attach any media that was added to the post content,
 // but not yet attached to the post, matching similar behavior in the classic editor.
