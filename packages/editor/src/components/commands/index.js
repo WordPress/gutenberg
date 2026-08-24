@@ -90,6 +90,7 @@ const getEditorCommandLoader = () =>
 			viewItemLabel,
 			isCodeEditingEnabled,
 			isRichEditingEnabled,
+			isCodeEditorUnavailable,
 			isPublishSidebarEnabled,
 			disableContentOnlyForUnsyncedPatterns,
 			disableContentOnlyForTemplateParts,
@@ -119,6 +120,17 @@ const getEditorCommandLoader = () =>
 				viewItemLabel: postType?.labels?.view_item,
 				isCodeEditingEnabled: getEditorSettings().codeEditingEnabled,
 				isRichEditingEnabled: getEditorSettings().richEditingEnabled,
+				/*
+				 * The code editor is closed off in the read-only Viewing
+				 * intent: it is a raw `post_content` textarea, which the
+				 * preview canvas does not cover. `switchEditorMode` refuses
+				 * the switch anyway, so without this the palette would offer
+				 * a command that shuts itself and does nothing. Private while
+				 * Suggest mode is experimental.
+				 */
+				isCodeEditorUnavailable: !! unlock(
+					select( editorStore )
+				).getCodeEditorUnavailableReason(),
 				isPublishSidebarEnabled:
 					select( editorStore ).isPublishSidebarEnabled(),
 				disableContentOnlyForUnsyncedPatterns:
@@ -148,7 +160,9 @@ const getEditorCommandLoader = () =>
 			useDispatch( interfaceStore );
 		const { getCurrentPostId } = useSelect( editorStore );
 		const allowSwitchEditorMode =
-			isCodeEditingEnabled && isRichEditingEnabled;
+			isCodeEditingEnabled &&
+			isRichEditingEnabled &&
+			! isCodeEditorUnavailable;
 
 		if ( isPreviewMode ) {
 			return { commands: [], isLoading: false };

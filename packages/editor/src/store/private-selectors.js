@@ -12,6 +12,7 @@ import {
 	privateApis as coreDataPrivateApis,
 } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { __ } from '@wordpress/i18n';
 import {
 	getRenderingMode,
 	getCurrentPost,
@@ -25,7 +26,7 @@ import {
 	getEntityFields as _getEntityFields,
 	isEntityReady as _isEntityReady,
 } from '../dataviews/store/private-selectors';
-import { EDITOR_INTENT_EDIT } from './constants';
+import { EDITOR_INTENT_EDIT, EDITOR_INTENT_VIEW } from './constants';
 import { unlock } from '../lock-unlock';
 
 const EMPTY_INSERTION_POINT = {
@@ -625,4 +626,49 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
  */
 export function getEditorIntent( state ) {
 	return state.editorIntent ?? EDITOR_INTENT_EDIT;
+}
+
+/**
+ * Whether the editor is in a read-only intent.
+ *
+ * The `view` intent is offered in the Mode menu as a "Read-only preview of
+ * the content", so nothing reachable from the editor may change the post
+ * while it is active. The block canvas is handled by `isPreviewMode` on the
+ * block editor settings; this selector is what the editor-level mutation
+ * paths — the code editor and the undo/redo history — gate on, so all three
+ * answer to the same intent.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the current intent forbids editing the post.
+ */
+export function isEditorIntentReadOnly( state ) {
+	return getEditorIntent( state ) === EDITOR_INTENT_VIEW;
+}
+
+/**
+ * Why the code editor cannot be opened right now, or `null` when it can.
+ *
+ * The code editor is a raw `post_content` textarea, so it is a mutation path
+ * that the block canvas' read-only rendering does not cover: `isPreviewMode`
+ * freezes the visual editor and leaves the textarea fully writable. The
+ * `view` intent therefore refuses it outright, and the Mode menu keeps
+ * working so the user can return to Editing.
+ *
+ * Returns the user-facing reason rather than a boolean so the disabled menu
+ * item, the refused shortcut, and the notice cannot drift apart.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string|null} Reason the code editor is unavailable, or `null` when
+ *                       it is available.
+ */
+export function getCodeEditorUnavailableReason( state ) {
+	if ( isEditorIntentReadOnly( state ) ) {
+		return __(
+			'The code editor is unavailable while viewing. Switch to Editing to change the content.'
+		);
+	}
+
+	return null;
 }
