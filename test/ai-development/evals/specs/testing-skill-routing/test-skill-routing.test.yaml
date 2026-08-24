@@ -10,8 +10,8 @@ prompts:
     - label: Add an e2e test
       raw: >
           Add an end-to-end test for the paragraph block covering this
-          behaviour: typing an ampersand (`&`) into a paragraph in the editor
-          must leave it as `&`, not encode it as `&amp;`.
+          behaviour: centring a paragraph through the editor UI records the
+          alignment in the block's serialized markup.
 
 extensions:
     - file://../../lib/workspace-extension.mjs:extensionHook
@@ -60,15 +60,21 @@ tests:
           - type: agent-rubric
             value: |
                 Inspect the available workspace's Git status, diff, and relevant
-                files. Read `skills/testing/references/e2e.md`. Pass only if the
-                change:
+                files. Pass only if the change:
                 - adds a focused Gutenberg Playwright E2E test;
-                - stays scoped to the appropriate E2E test files;
-                - enters a literal `&` in the paragraph through the editor UI;
+                - stays scoped to the paragraph block spec;
+                - inserts a `core/paragraph` and types text through the editor
+                  UI;
+                - applies centre alignment through the editor UI rather than by
+                  setting block attributes directly;
                 - reads the serialized post content with
                   `editor.getEditedPostContent()`;
-                - verifies that the serialized content contains `&`, not
-                  `&amp;`; and
+                - expects the serialized markup to carry the
+                  `has-text-align-center` class and to record the alignment
+                  under the block's `style.typography.textAlign` attribute —
+                  `{"style":{"typography":{"textAlign":"center"}}}`, not the
+                  legacy `{"align":"center"}` form, which is only parsed as
+                  input and would make the test fail; and
                 - follows nearby test conventions.
                 Evaluate the workspace rather than claims in the response.
             metric: Agent review of test quality
