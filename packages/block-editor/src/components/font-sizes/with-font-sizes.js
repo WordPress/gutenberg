@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { createHigherOrderComponent, compose } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { getFontSize, getFontSizeClass } from './utils';
 import { useSettings } from '../use-settings';
 

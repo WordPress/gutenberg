@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { ReactElement, ReactNode, ComponentProps } from 'react';
-
-/**
- * WordPress dependencies
- */
 import type { useFocusOnMount } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import type {
 	NormalizedField,
 	Operator,
@@ -18,6 +7,7 @@ import type {
 	SortDirection,
 } from './field-api';
 import type { SetSelection } from './private';
+import type { MEDIA_ASPECT_RATIOS } from '../constants';
 
 /**
  * The filters applied to the dataset.
@@ -236,6 +226,14 @@ export interface ColumnStyle {
 
 export type Density = 'compact' | 'balanced' | 'comfortable';
 
+/**
+ * The preset aspect ratios available for item media previews, mirroring
+ * Core's default `aspect-ratio` presets. Derived from the
+ * `MEDIA_ASPECT_RATIOS` constant, which layouts also use to validate the
+ * configured value at runtime, so the two can't drift apart.
+ */
+export type MediaAspectRatio = ( typeof MEDIA_ASPECT_RATIOS )[ number ];
+
 export interface ViewTable extends ViewBase {
 	type: 'table';
 
@@ -254,6 +252,13 @@ export interface ViewTable extends ViewBase {
 		 * Whether the view allows column moving.
 		 */
 		enableMoving?: boolean;
+
+		/**
+		 * A fixed aspect ratio for the primary column's media preview, one of
+		 * the preset ratios. Applied uniformly to every row. Defaults to
+		 * `'1/1'`.
+		 */
+		aspectRatio?: MediaAspectRatio;
 	};
 }
 
@@ -297,6 +302,13 @@ export interface ViewGrid extends ViewBase {
 		 * The density of the grid layout.
 		 */
 		density?: Density;
+
+		/**
+		 * A fixed aspect ratio for the grid item previews (the media field),
+		 * one of the preset ratios. Applied uniformly to every item so rows
+		 * stay aligned. Defaults to `'1/1'`.
+		 */
+		aspectRatio?: MediaAspectRatio;
 	};
 }
 
@@ -342,12 +354,24 @@ export interface ViewPickerTable extends ViewBase {
 	};
 }
 
+export interface ViewPickerActivity extends ViewBase {
+	type: 'pickerActivity';
+
+	layout?: {
+		/**
+		 * The density of the view.
+		 */
+		density?: Density;
+	};
+}
+
 export type View =
 	| ViewList
 	| ViewGrid
 	| ViewTable
 	| ViewPickerGrid
 	| ViewPickerTable
+	| ViewPickerActivity
 	| ViewActivity;
 
 interface ActionBase< Item > {
@@ -516,6 +540,11 @@ export interface ViewPickerTableProps< Item >
 	view: ViewPickerTable;
 }
 
+export interface ViewPickerActivityProps< Item >
+	extends Omit< ViewPickerBaseProps< Item >, 'view' > {
+	view: ViewPickerActivity;
+}
+
 export type ViewProps< Item > =
 	| ViewTableProps< Item >
 	| ViewGridProps< Item >
@@ -524,7 +553,8 @@ export type ViewProps< Item > =
 
 export type ViewPickerProps< Item > =
 	| ViewPickerGridProps< Item >
-	| ViewPickerTableProps< Item >;
+	| ViewPickerTableProps< Item >
+	| ViewPickerActivityProps< Item >;
 
 export interface SupportedLayouts {
 	list?: Omit< ViewList, 'type' > | true;
@@ -533,6 +563,7 @@ export interface SupportedLayouts {
 	activity?: Omit< ViewActivity, 'type' > | true;
 	pickerGrid?: Omit< ViewPickerGrid, 'type' > | true;
 	pickerTable?: Omit< ViewPickerTable, 'type' > | true;
+	pickerActivity?: Omit< ViewPickerActivity, 'type' > | true;
 }
 
 export interface NormalizedSupportedLayouts {
@@ -542,4 +573,5 @@ export interface NormalizedSupportedLayouts {
 	activity?: Omit< ViewActivity, 'type' >;
 	pickerGrid?: Omit< ViewPickerGrid, 'type' >;
 	pickerTable?: Omit< ViewPickerTable, 'type' >;
+	pickerActivity?: Omit< ViewPickerActivity, 'type' >;
 }

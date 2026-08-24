@@ -2,6 +2,36 @@
 
 ## Unreleased
 
+## 6.53.0 (2026-08-12)
+
+### Enhancements
+
+-   Add `@wordpress/kebab-case` as a bundled package, so consumer builds bundle it instead of externalizing it to a nonexistent `wp-kebab-case` script ([#81294](https://github.com/WordPress/gutenberg/pull/81294)).
+
+## 6.52.0 (2026-07-29)
+
+### Bug Fixes
+
+-   Include extracted styles (e.g. the `style.css` cache group output) in the version hash of the entry point's asset file, so that style-only changes produce a new version ([#80601](https://github.com/WordPress/gutenberg/pull/80601)).
+
+## 6.51.0 (2026-07-14)
+
+### Bug Fixes
+
+-   Extract dynamically imported external modules that webpack code-splits into their own async chunk in the module build ([#79633](https://github.com/WordPress/gutenberg/pull/79633)).
+
+## 6.50.0 (2026-07-01)
+
+## 6.49.0 (2026-06-24)
+
+## 6.48.1 (2026-06-16)
+
+## 6.48.0 (2026-06-10)
+
+## 6.47.0 (2026-05-27)
+
+## 6.46.0 (2026-05-14)
+
 ## 6.45.0 (2026-04-29)
 
 ## 6.44.0 (2026-04-15)

@@ -1,7 +1,3 @@
-/**
- * Internal dependencies
- */
-
 import { add, subtract, clamp, ensureValidStep } from '../math';
 
 describe( 'add', () => {

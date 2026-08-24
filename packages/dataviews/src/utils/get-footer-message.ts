@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { _n, sprintf } from '@wordpress/i18n';
 
 /**

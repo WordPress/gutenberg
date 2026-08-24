@@ -9,14 +9,16 @@
  * Sets a global JS variable used to trigger the availability of each Gutenberg Experiment.
  */
 function gutenberg_enable_experiments() {
+	global $pagenow;
+
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-color-randomizer' ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableColorRandomizer = true', 'before' );
 	}
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-grid-interactivity' ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableGridInteractivity = true', 'before' );
 	}
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
-		wp_add_inline_script( 'wp-block-library', 'window.__experimentalDisableTinymce = true', 'before' );
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-global-styles-inheritance-ui' ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalGlobalStylesInheritanceUI = true', 'before' );
 	}
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-dataviews-media-modal' ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalDataViewsMediaModal = true', 'before' );
@@ -36,11 +38,20 @@ function gutenberg_enable_experiments() {
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-media-editor' ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalMediaEditor = true', 'before' );
 	}
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-media-editor-modal' ) ) {
-		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalMediaEditorModal = true', 'before' );
-	}
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-dashboard-widgets' ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalDashboardWidgets = true', 'before' );
+	}
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-real-time-collaboration' ) ) {
+		$collaboration_enabled = ! (
+			'site-editor.php' === $pagenow ||
+			( 'admin.php' === $pagenow && isset( $_GET['page'] ) && 'site-editor-v2' === $_GET['page'] )
+		);
+
+		wp_add_inline_script(
+			'wp-core-data',
+			'window.__experimentalEnableRealTimeCollaboration = ' . wp_json_encode( $collaboration_enabled ) . ';',
+			'before'
+		);
 	}
 }
 

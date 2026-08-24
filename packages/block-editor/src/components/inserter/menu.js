@@ -1,15 +1,9 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	forwardRef,
 	useState,
 	useCallback,
+	useEffect,
 	useMemo,
 	useRef,
 	useLayoutEffect,
@@ -19,10 +13,6 @@ import { VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useDebouncedInput, useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import Tips from './tips';
 import InserterPreviewPanel from './preview-panel';
 import BlockTypesTab from './block-types-tab';
@@ -169,6 +159,30 @@ function InserterMenu(
 
 	const showMediaPanel = selectedTab === 'media' && !! selectedMediaCategory;
 
+	const [ isScrolled, setIsScrolled ] = useState( false );
+	const blocksPanelRef = useRef( null );
+	const patternsPanelRef = useRef( null );
+	const mediaPanelRef = useRef( null );
+	useEffect( () => {
+		const handleScroll = ( event ) => {
+			setIsScrolled( event.currentTarget.scrollTop > 0 );
+		};
+		const panels = [
+			blocksPanelRef.current,
+			patternsPanelRef.current,
+			mediaPanelRef.current,
+		].filter( Boolean );
+		panels.forEach( ( panel ) =>
+			panel.addEventListener( 'scroll', handleScroll )
+		);
+
+		return () => {
+			panels.forEach( ( panel ) =>
+				panel.removeEventListener( 'scroll', handleScroll )
+			);
+		};
+	}, [] );
+
 	const inserterSearch = useMemo( () => {
 		if ( selectedTab === 'media' ) {
 			return null;
@@ -177,7 +191,9 @@ function InserterMenu(
 		return (
 			<>
 				<SearchControl
-					className="block-editor-inserter__search"
+					className={ clsx( 'block-editor-inserter__search', {
+						'is-scrolled': isScrolled,
+					} ) }
 					onChange={ ( value ) => {
 						if ( hoveredItem ) {
 							setHoveredItem( null );
@@ -220,6 +236,7 @@ function InserterMenu(
 		rootClientId,
 		__experimentalInsertionIndex,
 		isAppender,
+		isScrolled,
 	] );
 
 	const blocksTab = useMemo( () => {
@@ -344,6 +361,7 @@ function InserterMenu(
 						{
 							name: 'blocks',
 							title: __( 'Blocks' ),
+							panelRef: blocksPanelRef,
 							panel: (
 								<>
 									{ inserterSearch }
@@ -356,6 +374,7 @@ function InserterMenu(
 						{
 							name: 'patterns',
 							title: __( 'Patterns' ),
+							panelRef: patternsPanelRef,
 							panel: (
 								<>
 									{ inserterSearch }
@@ -368,6 +387,7 @@ function InserterMenu(
 						{
 							name: 'media',
 							title: __( 'Media' ),
+							panelRef: mediaPanelRef,
 							panel: (
 								<>
 									{ inserterSearch }

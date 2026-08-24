@@ -1,11 +1,9 @@
-/**
- * Internal dependencies
- */
 import {
 	detectClientSideMediaSupport,
 	isClientSideMediaSupported,
 	isHeicCanvasSupported,
 	clearFeatureDetectionCache,
+	exceedsClientProcessingMemory,
 } from '../feature-detection';
 
 describe( 'feature-detection', () => {
@@ -49,15 +47,13 @@ describe( 'feature-detection', () => {
 		// Remove navigator.deviceMemory and navigator.connection by default
 		// so they don't interfere with unrelated tests.
 		if ( 'deviceMemory' in navigator ) {
-			// @ts-ignore
 			delete navigator.deviceMemory;
 		}
 		if ( 'connection' in navigator ) {
-			// @ts-ignore
 			delete navigator.connection;
 		}
 		if ( 'hardwareConcurrency' in navigator ) {
-			// @ts-ignore
+			// @ts-expect-error `hardwareConcurrency` is a read-only property.
 			delete navigator.hardwareConcurrency;
 		}
 	} );
@@ -78,7 +74,6 @@ describe( 'feature-detection', () => {
 				originalDeviceMemoryDescriptor
 			);
 		} else if ( 'deviceMemory' in navigator ) {
-			// @ts-ignore
 			delete navigator.deviceMemory;
 		}
 
@@ -90,7 +85,6 @@ describe( 'feature-detection', () => {
 				originalConnectionDescriptor
 			);
 		} else if ( 'connection' in navigator ) {
-			// @ts-ignore
 			delete navigator.connection;
 		}
 
@@ -102,7 +96,7 @@ describe( 'feature-detection', () => {
 				originalHardwareConcurrencyDescriptor
 			);
 		} else if ( 'hardwareConcurrency' in navigator ) {
-			// @ts-ignore
+			// @ts-expect-error `hardwareConcurrency` is a read-only property.
 			delete navigator.hardwareConcurrency;
 		}
 	} );
@@ -116,7 +110,7 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns not supported when WebAssembly is unavailable', () => {
-			// @ts-ignore - Intentionally setting WebAssembly to undefined for testing.
+			// @ts-expect-error `WebAssembly` is a non-optional global; the test assigns `undefined` to force the fallback.
 			global.WebAssembly = undefined;
 
 			const result = detectClientSideMediaSupport();
@@ -128,7 +122,7 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns not supported when SharedArrayBuffer is unavailable', () => {
-			// @ts-ignore - Intentionally setting SharedArrayBuffer to undefined for testing.
+			// @ts-expect-error `SharedArrayBuffer` is a non-optional global; the test assigns `undefined` to force the fallback.
 			global.SharedArrayBuffer = undefined;
 
 			const result = detectClientSideMediaSupport();
@@ -138,7 +132,7 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns not supported when Worker is unavailable', () => {
-			// @ts-ignore - Intentionally setting Worker to undefined for testing.
+			// @ts-expect-error `Worker` is a non-optional global; the test assigns `undefined` to force the fallback.
 			global.Worker = undefined;
 
 			const result = detectClientSideMediaSupport();
@@ -268,7 +262,7 @@ describe( 'feature-detection', () => {
 			expect( result1.supported ).toBe( true );
 
 			// Now set WebAssembly to undefined - cached result should still be returned.
-			// @ts-ignore - Intentionally setting WebAssembly to undefined for testing.
+			// @ts-expect-error `WebAssembly` is a non-optional global; the test assigns `undefined` to force the fallback.
 			global.WebAssembly = undefined;
 
 			const result2 = detectClientSideMediaSupport();
@@ -283,7 +277,7 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns false when features are unavailable', () => {
-			// @ts-ignore - Intentionally setting WebAssembly to undefined for testing.
+			// @ts-expect-error `WebAssembly` is a non-optional global; the test assigns `undefined` to force the fallback.
 			global.WebAssembly = undefined;
 
 			expect( isClientSideMediaSupported() ).toBe( false );
@@ -302,14 +296,14 @@ describe( 'feature-detection', () => {
 				global.createImageBitmap =
 					originalCreateImageBitmap as typeof createImageBitmap;
 			} else {
-				// @ts-ignore
+				// @ts-expect-error The operand of `delete` must be optional.
 				delete global.createImageBitmap;
 			}
 			if ( originalOffscreenCanvas !== undefined ) {
 				global.OffscreenCanvas =
 					originalOffscreenCanvas as typeof OffscreenCanvas;
 			} else {
-				// @ts-ignore
+				// @ts-expect-error The operand of `delete` must be optional.
 				delete global.OffscreenCanvas;
 			}
 		} );
@@ -324,7 +318,7 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns false when createImageBitmap is unavailable', () => {
-			// @ts-ignore
+			// @ts-expect-error The operand of `delete` must be optional.
 			delete global.createImageBitmap;
 			global.OffscreenCanvas =
 				jest.fn() as unknown as typeof OffscreenCanvas;
@@ -335,16 +329,16 @@ describe( 'feature-detection', () => {
 		it( 'returns false when OffscreenCanvas is unavailable', () => {
 			global.createImageBitmap =
 				jest.fn() as unknown as typeof createImageBitmap;
-			// @ts-ignore
+			// @ts-expect-error The operand of `delete` must be optional.
 			delete global.OffscreenCanvas;
 
 			expect( isHeicCanvasSupported() ).toBe( false );
 		} );
 
 		it( 'returns false when both are unavailable', () => {
-			// @ts-ignore
+			// @ts-expect-error The operand of `delete` must be optional.
 			delete global.createImageBitmap;
-			// @ts-ignore
+			// @ts-expect-error The operand of `delete` must be optional.
 			delete global.OffscreenCanvas;
 
 			expect( isHeicCanvasSupported() ).toBe( false );
@@ -358,11 +352,70 @@ describe( 'feature-detection', () => {
 
 			// Clear cache and set WebAssembly to undefined.
 			clearFeatureDetectionCache();
-			// @ts-ignore - Intentionally setting WebAssembly to undefined for testing.
+			// @ts-expect-error `WebAssembly` is a non-optional global; the test assigns `undefined` to force the fallback.
 			global.WebAssembly = undefined;
 
 			const result2 = detectClientSideMediaSupport();
 			expect( result2.supported ).toBe( false );
+		} );
+	} );
+
+	describe( 'exceedsClientProcessingMemory', () => {
+		it( 'allows typical images', () => {
+			expect(
+				exceedsClientProcessingMemory( {
+					width: 4000,
+					height: 3000,
+					interlaced: false,
+				} )
+			).toBe( false );
+			expect(
+				exceedsClientProcessingMemory( {
+					width: 4000,
+					height: 3000,
+					interlaced: true,
+				} )
+			).toBe( false );
+		} );
+
+		it( 'gates the reported interlaced flower.jpg (20000x11857)', () => {
+			expect(
+				exceedsClientProcessingMemory( {
+					width: 20000,
+					height: 11857,
+					interlaced: true,
+				} )
+			).toBe( true );
+		} );
+
+		it( 'applies a tighter budget to interlaced images', () => {
+			// ~150 MP: over the ~0.5 GiB interlaced budget but under the
+			// ~0.9 GiB baseline budget.
+			const dimensions = { width: 15000, height: 10000 };
+
+			expect(
+				exceedsClientProcessingMemory( {
+					...dimensions,
+					interlaced: true,
+				} )
+			).toBe( true );
+			expect(
+				exceedsClientProcessingMemory( {
+					...dimensions,
+					interlaced: false,
+				} )
+			).toBe( false );
+		} );
+
+		it( 'gates extremely large baseline images', () => {
+			// ~300 MP exceeds even the generous baseline budget.
+			expect(
+				exceedsClientProcessingMemory( {
+					width: 20000,
+					height: 15000,
+					interlaced: false,
+				} )
+			).toBe( true );
 		} );
 	} );
 } );

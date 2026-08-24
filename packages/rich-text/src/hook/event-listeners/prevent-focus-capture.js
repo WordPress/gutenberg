@@ -1,3 +1,8 @@
+import { privateApis as composePrivateApis } from '@wordpress/compose';
+import { unlock } from '../../lock-unlock';
+
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
+
 /**
  * Prevents focus from being captured by the element when clicking _outside_
  * around the element. This may happen when the parent element is flex.
@@ -34,11 +39,19 @@ export function preventFocusCapture() {
 			}
 		}
 
-		defaultView.addEventListener( 'pointerdown', onPointerDown );
-		defaultView.addEventListener( 'pointerup', onPointerUp );
+		const unsubscribePointerDown = subscribeDelegatedListener(
+			defaultView,
+			'pointerdown',
+			onPointerDown
+		);
+		const unsubscribePointerUp = subscribeDelegatedListener(
+			defaultView,
+			'pointerup',
+			onPointerUp
+		);
 		return () => {
-			defaultView.removeEventListener( 'pointerdown', onPointerDown );
-			defaultView.removeEventListener( 'pointerup', onPointerUp );
+			unsubscribePointerDown();
+			unsubscribePointerUp();
 		};
 	};
 }

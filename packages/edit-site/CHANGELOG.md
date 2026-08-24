@@ -2,6 +2,57 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Seed the root `ThemeProvider` with the admin color scheme primary color so portaled popovers and modals receive the scheme's accent colors ([#81653](https://github.com/WordPress/gutenberg/pull/81653)).
+
+### Enhancements
+
+-   Unify the Site Editor sidebar section descriptions for Templates, Pages, Navigation, and Patterns. ([#60304](https://github.com/WordPress/gutenberg/issues/60304))
+
+### Internal
+
+-   Stop rendering `EditorKeyboardShortcutsRegister`, which the editor provider now renders itself ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
+
+### Bug Fixes
+
+-   Open an entity at the width its `viewport` param asks for through the editor provider rather than a sync effect, so the width comes from the theme's breakpoints rather than the defaults, and stop writing the current width back into the param when leaving an entity ([#81750](https://github.com/WordPress/gutenberg/pull/81750)).
+
+## 7.2.0 (2026-08-12)
+
+### Bug Fixes
+
+-   Identity: Decode HTML entities in the Site Title and Site Tagline fields. ([#81269](https://github.com/WordPress/gutenberg/pull/81269))
+
+## 7.1.0 (2026-07-29)
+
+## 7.0.0 (2026-07-14)
+
+### Breaking Changes
+
+-   Raise the required Node.js version to `^20.19.0` or `>=22.13.0`. ([#80063](https://github.com/WordPress/gutenberg/pull/80063))
+
+### Enhancements
+
+-   Update template-selection labels from the legacy medium weight to the emphasis font-weight token ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 6.50.0 (2026-07-01)
+
+## 6.49.0 (2026-06-24)
+
+## 6.48.1 (2026-06-16)
+
+## 6.48.0 (2026-06-10)
+
+### Enhancements
+
+-   The Site Editor now follows the user's admin color scheme ([#78397](https://github.com/WordPress/gutenberg/pull/78397)).
+
+## 6.47.0 (2026-05-27)
+
+## 6.46.0 (2026-05-14)
+
 ## 6.45.0 (2026-04-29)
 
 ## 6.44.0 (2026-04-15)

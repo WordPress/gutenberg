@@ -1,14 +1,23 @@
-/**
- * External dependencies
- */
 const util = require( 'node:util' ),
 	path = require( 'node:path' ),
 	childProcess = require( 'node:child_process' );
 
 const execute = util.promisify( childProcess.exec );
 
+/*
+ * Resolve Stylelint's binary through Node's module resolution rather than a
+ * fixed `node_modules/.bin` path, so the test works regardless of whether the
+ * dependency is hoisted to the repo root or isolated in this package.
+ */
+const stylelintBin = path.join(
+	path.dirname( require.resolve( 'stylelint/package.json' ) ),
+	'bin/stylelint.mjs'
+);
+
 const generateStylelintCommand = ( filename ) =>
-	'node_modules/.bin/stylelint ' +
+	'node ' +
+	stylelintBin +
+	' ' +
 	path.resolve( __dirname, '../', filename ) +
 	' -c' +
 	path.resolve( __dirname, '../', './.stylelintrc.tests.json' ) +

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, _n, sprintf, _x } from '@wordpress/i18n';
 import {
 	DropdownMenu,
@@ -16,10 +13,6 @@ import {
 	isTemplatePart,
 } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import BlockTransformationsMenu from './block-transformations-menu';
 import { useBlockVariationTransforms } from './block-variation-transformations';
@@ -87,8 +80,8 @@ function BlockSwitcherDropdownMenuContents( { onClose, clientIds } ) {
 		}
 	}
 	// Simple block transformation based on the `Block Transforms` API.
-	function onBlockTransform( name ) {
-		const newBlocks = switchToBlockType( blocks, name );
+	function onBlockTransform( name, variationName ) {
+		const newBlocks = switchToBlockType( blocks, name, variationName );
 		replaceBlocks( clientIds, newBlocks );
 		selectForMultipleBlocks( newBlocks );
 	}
@@ -166,8 +159,8 @@ function BlockSwitcherDropdownMenuContents( { onClose, clientIds } ) {
 						blockVariationTransformations
 					}
 					blocks={ blocks }
-					onSelect={ ( name ) => {
-						onBlockTransform( name );
+					onSelect={ ( name, variationName ) => {
+						onBlockTransform( name, variationName );
 						onClose();
 					} }
 					onSelectVariation={ ( name ) => {

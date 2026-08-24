@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { CropperState, TransformOperation } from '../../types';
 import { DEFAULT_STATE } from '../../constants';
 import { applyOperationToState, stateFromPipeline } from '../pipeline';

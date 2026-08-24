@@ -1,14 +1,7 @@
-/**
- * External dependencies
- */
 import type { SerializedStyles } from '@emotion/react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import type { CSSProperties, ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../../context';
 import { Flex, FlexItem } from '../../flex';
 import { Text } from '../../text';
@@ -79,17 +72,6 @@ export const Root = styled( Flex )`
 	position: relative;
 	border-radius: ${ CONFIG.radiusSmall };
 	padding-top: 0;
-
-	// Focus within, excluding cases where auxiliary controls in prefix or suffix have focus.
-	&:focus-within:not( :has( :is( ${ Prefix }, ${ Suffix } ):focus-within ) ) {
-		${ BackdropUI } {
-			border-color: ${ COLORS.ui.borderFocus };
-			box-shadow: ${ CONFIG.controlBoxShadowFocus };
-			// Windows High Contrast mode will show this outline, but not the box-shadow.
-			outline: 2px solid transparent;
-			outline-offset: -2px;
-		}
-	}
 `;
 
 const containerDisabledStyles = ( { disabled }: ContainerProps ) => {
@@ -134,7 +116,6 @@ export const Container = styled.div< ContainerProps >`
 `;
 
 type InputProps = {
-	__next40pxDefaultSize?: boolean;
 	disabled?: boolean;
 	inputSize?: Size;
 	isDragging?: boolean;
@@ -158,7 +139,6 @@ export const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
 		default: '13px',
 		small: '11px',
 		compact: '13px',
-		'__unstable-large': '13px',
 	};
 
 	const fontSize = sizes[ size as Size ] || sizes.default;
@@ -177,10 +157,7 @@ export const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
 	`;
 };
 
-export const getSizeConfig = ( {
-	inputSize: size,
-	__next40pxDefaultSize,
-}: InputProps ) => {
+export const getSizeConfig = ( { inputSize: size }: InputProps ) => {
 	// Paddings may be overridden by the custom paddings props.
 	const sizes = {
 		default: {
@@ -204,18 +181,7 @@ export const getSizeConfig = ( {
 			paddingLeft: CONFIG.controlPaddingXSmall,
 			paddingRight: CONFIG.controlPaddingXSmall,
 		},
-		'__unstable-large': {
-			height: 40,
-			lineHeight: 1,
-			minHeight: 40,
-			paddingLeft: CONFIG.controlPaddingX,
-			paddingRight: CONFIG.controlPaddingX,
-		},
 	};
-
-	if ( ! __next40pxDefaultSize ) {
-		sizes.default = sizes.compact;
-	}
 
 	return sizes[ size as Size ] || sizes.default;
 };
@@ -296,6 +262,18 @@ export const Input = styled.input< InputProps >`
 			color: ${ COLORS.ui.darkGrayPlaceholder };
 		}
 
+		&[type='date'],
+		&[type='datetime-local'],
+		&[type='month'],
+		&[type='time'],
+		&[type='week'] {
+			&::-webkit-datetime-edit {
+				display: flex;
+				align-items: center;
+				height: 100%;
+			}
+		}
+
 		&[type='email'],
 		&[type='url'] {
 			/* rtl:ignore */
@@ -332,12 +310,10 @@ export const LabelWrapper = styled( FlexItem )`
 const prefixSuffixWrapperStyles = ( {
 	variant = 'default',
 	size,
-	__next40pxDefaultSize,
 	isPrefix,
 }: PrefixSuffixWrapperProps & { isPrefix?: boolean } ) => {
 	const { paddingLeft: padding } = getSizeConfig( {
 		inputSize: size,
-		__next40pxDefaultSize,
 	} );
 
 	const paddingProperty = isPrefix

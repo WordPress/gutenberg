@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	RichText,
 	useBlockProps,
@@ -19,10 +16,6 @@ import {
 import { useMergeRefs } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import {
 	useEnter,
 	useSpace,
@@ -83,7 +76,7 @@ export default function ListItemEdit( {
 		renderAppender: false,
 		__unstableDisableDropZone: true,
 	} );
-	const useEnterRef = useEnter( { content, clientId } );
+	const useEnterRef = useEnter( clientId );
 	const useSpaceRef = useSpace( clientId );
 	const onMerge = useMerge( clientId, mergeBlocks );
 	return (

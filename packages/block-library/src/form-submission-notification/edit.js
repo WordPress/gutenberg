@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	InnerBlocks,
@@ -9,22 +6,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-const TEMPLATE = [
-	[
-		'core/paragraph',
-		{
-			content: __(
-				"Enter the message you wish displayed for form submission error/success, and select the type of the message (success/error) from the block's options."
-			),
-		},
-	],
-];
 
 const Edit = ( { attributes, clientId } ) => {
 	const { type } = attributes;
@@ -46,7 +28,6 @@ const Edit = ( { attributes, clientId } ) => {
 	);
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: TEMPLATE,
 		renderAppender: hasInnerBlocks
 			? undefined
 			: InnerBlocks.ButtonBlockAppender,

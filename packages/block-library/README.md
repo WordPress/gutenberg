@@ -88,9 +88,6 @@ To find out more about contributing to this package or Gutenberg as a whole, ple
 3.  Add `init.js` file to the directory of the new block:
 
     ```js
-    /**
-     * Internal dependencies
-     */
     import { init } from './';
 
     export default init();

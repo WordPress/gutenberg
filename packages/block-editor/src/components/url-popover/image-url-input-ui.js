@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	useRef,
@@ -28,10 +25,6 @@ import {
 	linkOff,
 } from '@wordpress/icons';
 import { prependHTTPS } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import URLPopover from './index';
 
 const LINK_DESTINATION_NONE = 'none';
@@ -233,7 +226,6 @@ const ImageURLInputUI = ( {
 				checked={ linkTarget === '_blank' }
 			/>
 			<TextControl
-				__next40pxDefaultSize
 				label={ __( 'Link relation' ) }
 				value={ rel ?? '' }
 				onChange={ onSetLinkRel }
@@ -249,7 +241,6 @@ const ImageURLInputUI = ( {
 				) }
 			/>
 			<TextControl
-				__next40pxDefaultSize
 				label={ __( 'Link CSS class' ) }
 				value={ linkClass || '' }
 				onChange={ onSetLinkClass }
@@ -297,7 +288,7 @@ const ImageURLInputUI = ( {
 		} else if ( ! url || isEditingLink ) {
 			return (
 				<URLPopover.LinkEditor
-					className="block-editor-format-toolbar__link-container-content"
+					className="block-editor-url-popover__link-container-content"
 					value={ linkEditorValue }
 					onChangeInputValue={ setUrlInput }
 					onSubmit={ onSubmitLinkChange() }
@@ -308,7 +299,7 @@ const ImageURLInputUI = ( {
 			return (
 				<>
 					<URLPopover.LinkViewer
-						className="block-editor-format-toolbar__link-container-content"
+						className="block-editor-url-popover__link-container-content"
 						url={ url }
 						onEditLinkClick={ startEditLink }
 						urlLabel={ urlLabel }

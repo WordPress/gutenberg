@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	InspectorControls,
 	store as blockEditorStore,
@@ -12,12 +9,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import AddTabToolbarControl from './add-tab-toolbar-control';
-import RemoveTabToolbarControl from './remove-tab-toolbar-control';
+import TabToolbarControls from '../tabs/tab-toolbar-controls';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function Controls( { tabsClientId, blockIndex, isDefaultTab } ) {
@@ -26,8 +18,7 @@ export default function Controls( { tabsClientId, blockIndex, isDefaultTab } ) {
 
 	return (
 		<>
-			<AddTabToolbarControl tabsClientId={ tabsClientId } />
-			<RemoveTabToolbarControl tabsClientId={ tabsClientId } />
+			<TabToolbarControls tabsClientId={ tabsClientId } />
 			<InspectorControls>
 				<ToolsPanel
 					label={ __( 'Settings' ) }

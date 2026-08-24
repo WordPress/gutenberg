@@ -1,10 +1,10 @@
 import type { Drawer as _Drawer } from '@base-ui/react/drawer';
-import type { ComponentPropsWithoutRef, ReactElement, ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import type { Button } from '../button';
 import type { IconButton } from '../icon-button';
 import type { ComponentProps } from '../utils/types';
 
-export type PortalProps = ComponentPropsWithoutRef< typeof _Drawer.Portal >;
+export type PortalProps = ComponentProps< typeof _Drawer.Portal >;
 
 export interface RootProps
 	extends Pick<

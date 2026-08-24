@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { RangeControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -10,7 +7,6 @@ const MAX_POSTS_PER_PAGE = 100;
 const PerPageControl = ( { perPage, offset = 0, onChange } ) => {
 	return (
 		<RangeControl
-			__next40pxDefaultSize
 			label={ __( 'Items per page' ) }
 			min={ MIN_POSTS_PER_PAGE }
 			max={ MAX_POSTS_PER_PAGE }

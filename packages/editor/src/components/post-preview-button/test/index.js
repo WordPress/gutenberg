@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import PostPreviewButton from '..';
+import PostPreviewButton, { PostPreviewMenuItem } from '..';
 
 jest.useRealTimers();
 
@@ -137,6 +126,23 @@ describe( 'PostPreviewButton', () => {
 		expect(
 			within( button ).getByText( '(opens in a new tab)' )
 		).toBeInTheDocument();
+	} );
+
+	it( 'should render the menu variant as a link with the shared menu item pattern.', () => {
+		const url = 'https://wordpress.org';
+		mockUseSelect( {
+			getEditedPostPreviewLink: () => url,
+			isEditedPostSaveable: () => true,
+		} );
+
+		render( <PostPreviewMenuItem /> );
+
+		const menuItem = screen.getByRole( 'menuitem', {
+			name: 'Preview in new tab',
+		} );
+		expect( menuItem.tagName ).toBe( 'A' );
+		expect( menuItem ).toHaveAttribute( 'href', url );
+		expect( menuItem ).toHaveAttribute( 'target', 'wp-preview-123' );
 	} );
 
 	it( 'should be accessibly disabled if post is not saveable.', () => {

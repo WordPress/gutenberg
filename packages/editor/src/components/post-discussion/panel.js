@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, _x } from '@wordpress/i18n';
 import {
 	Dropdown,
@@ -11,10 +8,6 @@ import { useSelect } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import PostTypeSupportCheck from '../post-type-support-check';
 import PostComments from '../post-comments';

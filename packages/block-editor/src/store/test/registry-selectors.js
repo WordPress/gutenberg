@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { select, dispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store } from '../';
 
 describe( 'selectors', () => {

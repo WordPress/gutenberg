@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { moreVertical, check } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useInspectorPopoverPlacement } from './use-inspector-popover-placement';
 
 export default function FieldsDropdownMenu( {

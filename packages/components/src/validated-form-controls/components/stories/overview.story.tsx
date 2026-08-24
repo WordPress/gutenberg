@@ -1,22 +1,11 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useRef, useCallback, useState } from '@wordpress/element';
 import { debounce } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
+import type { ControlWithError } from '@wordpress/ui';
 import { ValidatedInputControl } from '..';
 import { formDecorator } from './story-utils';
-import type { ControlWithError } from '../../control-with-error';
 import Dropdown from '../../../dropdown';
 import { Button } from '../../../button';
 import Modal from '../../../modal';
@@ -359,6 +348,57 @@ export const ShowingErrorsAtArbitraryTimes: StoryObj<
 					onClick={ () => ref.current?.reportValidity() }
 				>
 					Report validity
+				</Button>
+			</VStack>
+		);
+	},
+};
+
+/**
+ * A synthetic `invalid` event can be dispatched to reveal an existing error
+ * without moving focus.
+ */
+export const ShowingErrorsWithoutMovingFocus: StoryObj<
+	typeof ValidatedInputControl
+> = {
+	args: {
+		label: 'Text',
+		required: true,
+		help: 'The word "error" will trigger an error.',
+	},
+	decorators: [],
+	render: function Template( { ...args } ) {
+		const [ text, setText ] = useState< string | undefined >( 'error' );
+		const ref = useRef< HTMLInputElement >( null );
+
+		return (
+			<VStack spacing={ 4 } alignment="left">
+				<ValidatedInputControl
+					ref={ ref }
+					{ ...args }
+					value={ text }
+					onChange={ setText }
+					customValidity={
+						text === 'error'
+							? {
+									type: 'invalid',
+									message: 'The word "error" is not allowed.',
+							  }
+							: undefined
+					}
+				/>
+				<Button
+					__next40pxDefaultSize
+					variant="secondary"
+					onClick={ () =>
+						ref.current?.dispatchEvent(
+							new Event( 'invalid', {
+								cancelable: true,
+							} )
+						)
+					}
+				>
+					Show errors
 				</Button>
 			</VStack>
 		);

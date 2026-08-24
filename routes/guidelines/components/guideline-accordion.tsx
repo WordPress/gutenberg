@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalText as WCText,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { Card, CollapsibleCard } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { GuidelineAccordionProps } from '../types';
 
 export default function GuidelineAccordion( {
@@ -19,7 +12,7 @@ export default function GuidelineAccordion( {
 }: GuidelineAccordionProps ) {
 	return (
 		<CollapsibleCard.Root>
-			<CollapsibleCard.Header>
+			<CollapsibleCard.Header render={ <h2 /> }>
 				<VStack spacing={ 1 }>
 					<Card.Title>{ title }</Card.Title>
 					<CollapsibleCard.HeaderDescription>

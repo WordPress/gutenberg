@@ -1,12 +1,4 @@
-/**
- * External dependencies
- */
 import deepFreeze from 'deep-freeze';
-
-/**
- * Internal dependencies
- */
-
 import { replace } from '../replace';
 import { getSparseArrayLength } from './helpers';
 

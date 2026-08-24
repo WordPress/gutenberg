@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 9.1.0 (2026-08-12)
+
+## 9.0.0 (2026-07-29)
+
+### Breaking Changes
+
+-   Require Jest v30 or newer ([#80767](https://github.com/WordPress/gutenberg/pull/80767)).
+
+## 8.51.0 (2026-07-14)
+
+## 8.50.0 (2026-07-01)
+
+## 8.49.0 (2026-06-24)
+
+## 8.48.1 (2026-06-16)
+
+## 8.48.0 (2026-06-10)
+
+## 8.47.0 (2026-05-27)
+
+## 8.46.0 (2026-05-14)
+
 ## 8.45.0 (2026-04-29)
 
 ## 8.44.0 (2026-04-15)

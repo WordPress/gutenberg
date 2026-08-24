@@ -1,15 +1,7 @@
-/**
- * WordPress dependencies
- */
-import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { __ } from '@wordpress/i18n';
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { loadView } from '@wordpress/views';
-
-/**
- * Internal dependencies
- */
 import Editor from '../editor';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-unsupported';
@@ -17,8 +9,6 @@ import DataViewsSidebarContent from '../sidebar-dataviews';
 import PostList from '../post-list';
 import { unlock } from '../../lock-unlock';
 import { isThemeDataLoaded } from './utils';
-
-const { useLocation } = unlock( routerPrivateApis );
 
 async function isListView( query ) {
 	const { activeView = 'all' } = query;
@@ -40,13 +30,6 @@ async function isListView( query ) {
 	return view.type === 'list';
 }
 
-function MobilePagesView() {
-	const { query = {} } = useLocation();
-	const { canvas = 'view' } = query;
-
-	return canvas === 'edit' ? <Editor /> : <PostList postType="page" />;
-}
-
 export const pagesRoute = {
 	name: 'pages',
 	path: '/page',
@@ -58,6 +41,9 @@ export const pagesRoute = {
 			return siteData.currentTheme.is_block_theme ? (
 				<SidebarNavigationScreen
 					title={ __( 'Pages' ) }
+					description={ __(
+						'Manage or edit the pages that make up your site, and their appearance.'
+					) }
 					backPath="/"
 					content={ <DataViewsSidebarContent postType="page" /> }
 				/>
@@ -77,15 +63,17 @@ export const pagesRoute = {
 			const isList = await isListView( query );
 			return isList ? <Editor /> : undefined;
 		},
-		mobile( { siteData } ) {
+		mobileSidebar( { siteData } ) {
 			if ( ! isThemeDataLoaded( siteData ) ) {
 				return <></>;
 			}
-			return siteData.currentTheme.is_block_theme ? (
-				<MobilePagesView />
-			) : (
+			return siteData.currentTheme.is_block_theme ? undefined : (
 				<SidebarNavigationScreenUnsupported />
 			);
+		},
+		mobileContent( { siteData } ) {
+			const isBlockTheme = siteData.currentTheme?.is_block_theme;
+			return isBlockTheme ? <PostList postType="page" /> : undefined;
 		},
 	},
 	widths: {
