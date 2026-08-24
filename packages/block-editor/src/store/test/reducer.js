@@ -4283,6 +4283,61 @@ describe( 'state', () => {
 			} );
 		} );
 
+		describe( 'editingMode support', () => {
+			beforeAll( () => {
+				registerBlockType( 'core/test-ephemeral-block', {
+					apiVersion: 3,
+					save: noop,
+					edit: noop,
+					category: 'text',
+					title: 'test ephemeral block',
+					supports: {
+						editingMode: 'disabled',
+					},
+				} );
+			} );
+
+			afterAll( () => {
+				unregisterBlockType( 'core/test-ephemeral-block' );
+			} );
+
+			it( 'sets the derived editing mode to disabled for blocks with editingMode support, without inheriting to children', () => {
+				const state = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								[ sectionRootClientIdKey ]: '',
+							},
+						},
+						{
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									name: 'core/test-ephemeral-block',
+									clientId: 'ephemeral-1',
+									attributes: {},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId: 'paragraph-1',
+											attributes: {},
+											innerBlocks: [],
+										},
+									],
+								},
+							],
+						},
+					],
+					testReducer
+				);
+
+				expect( state.derivedBlockEditingModes ).toEqual(
+					new Map( [ [ 'ephemeral-1', 'disabled' ] ] )
+				);
+			} );
+		} );
+
 		describe( 'synced patterns', () => {
 			let initialState;
 			beforeAll( () => {

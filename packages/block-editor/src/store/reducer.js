@@ -2679,6 +2679,19 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 			return;
 		}
 
+		// Blocks with an editingMode support set to 'disabled' are disabled
+		// by default. Unlike explicit modes, this is not inherited by
+		// children.
+		if (
+			select( blocksStore ).getBlockSupport(
+				blockName,
+				'editingMode'
+			) === 'disabled'
+		) {
+			derivedBlockEditingModes.set( clientId, 'disabled' );
+			return;
+		}
+
 		// Disabled explicit block editing modes are inherited by children.
 		// It's an expensive calculation, so only do it if there are disabled blocks.
 		if ( hasDisabledBlocks ) {

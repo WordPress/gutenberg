@@ -16,6 +16,7 @@
 		"removable": false,
 		"reusable": false,
 		"inserter": false,
+		"editingMode": "disabled",
 		"interactivity": {
 			"clientNavigation": true
 		}
