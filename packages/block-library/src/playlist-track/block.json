@@ -48,7 +48,12 @@
 		"interactivity": {
 			"clientNavigation": true
 		},
-		"reusable": false
+		"reusable": false,
+		"color": {
+			"text": true,
+			"background": true,
+			"gradients": true
+		}
 	},
 	"style": "wp-block-playlist-track"
 }

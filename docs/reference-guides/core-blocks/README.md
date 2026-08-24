@@ -645,7 +645,7 @@ Playlist track.
 -	**Name:** [core/playlist-track](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-playlist-track/)
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
 -	**Parent:** core/playlist
--	**Supports:** interactivity (clientNavigation), ~~html~~, ~~reusable~~
+-	**Supports:** color (background, gradients, text), interactivity (clientNavigation), ~~html~~, ~~reusable~~
 -	**Attributes:** album, artist, blob, id, image, imageAlt, length, src, title, type
 
 ## Author (deprecated)
