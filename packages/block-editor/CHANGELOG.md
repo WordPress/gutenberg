@@ -28,6 +28,7 @@
 -   `RichText`: Handle Enter using the current record, so pressing it right after moving the caret splits at the caret's new position instead of the previous one ([#81696](https://github.com/WordPress/gutenberg/pull/81696)).
 -   `useInnerBlocksProps`: Resolve the manual grid placement check that disables the standard drop zone against a layout passed through the options, when provided, instead of always using the block edit context layout ([#81120](https://github.com/WordPress/gutenberg/pull/81120)).
 -   `BorderPanel`: Match a chosen drop shadow against the presets from every origin rather than the first origin that defines any, so theme and default presets keep being stored as `var:preset|shadow|<slug>` once a custom preset exists ([#81346](https://github.com/WordPress/gutenberg/pull/81346)).
+-   `InserterMenu`: Cancel the animation frame that focuses the active tab when the menu unmounts before it runs, so an unmount right after mount no longer throws [#81918](https://github.com/WordPress/gutenberg/pull/81918).
 
 ### Internal
 
