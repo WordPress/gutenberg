@@ -85,6 +85,39 @@ describe( 'matchDashboardHref', () => {
 		).toBeNull();
 	} );
 
+	it( 'rejects a p that is an absolute URL', () => {
+		expect(
+			matchDashboardHref(
+				'admin.php?page=dashboard&p=https://example.com',
+				BASE
+			)
+		).toBeNull();
+	} );
+
+	it( 'rejects a p with a scheme', () => {
+		expect(
+			matchDashboardHref(
+				'admin.php?page=dashboard&p=mailto:hello@example.com',
+				BASE
+			)
+		).toBeNull();
+	} );
+
+	it( 'rejects a protocol-relative p', () => {
+		expect(
+			matchDashboardHref(
+				'admin.php?page=dashboard&p=//example.com/reports',
+				BASE
+			)
+		).toBeNull();
+	} );
+
+	it( 'rejects a relative p', () => {
+		expect(
+			matchDashboardHref( 'admin.php?page=dashboard&p=reports', BASE )
+		).toBeNull();
+	} );
+
 	it( 'rejects a duplicate page parameter', () => {
 		expect(
 			matchDashboardHref(
