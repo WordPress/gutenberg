@@ -29,6 +29,6 @@
 		"@wordpress/url": "file:../../packages/url"
 	},
 	"devDependencies": {
-		"@types/react": "^18.3.27"
+		"@types/react": "^19.3.0"
 	}
 }

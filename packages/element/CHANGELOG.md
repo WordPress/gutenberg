@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Upgrade React to v19.
+
 ## 8.8.0 (2026-09-23)
 
 ## 8.7.0 (2026-09-10)

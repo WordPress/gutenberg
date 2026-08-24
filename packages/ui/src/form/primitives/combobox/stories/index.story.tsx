@@ -287,7 +287,7 @@ export const AsyncItems: Story = {
 		const [ items, setItems ] = useState< FixtureItem[] >( [] );
 		const [ value, setValue ] = useState< FixtureItem | undefined >();
 		const [ open, setOpen ] = useState( false );
-		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
+		const timeoutRef = useRef< ReturnType< typeof setTimeout > >( null );
 
 		return (
 			<Combobox.Root
@@ -302,14 +302,15 @@ export const AsyncItems: Story = {
 					args.onValueChange?.( newValue, ...changeArgs );
 				} }
 				onOpenChange={ ( nextOpen ) => {
+					if ( timeoutRef.current ) {
+						clearTimeout( timeoutRef.current );
+					}
 					setOpen( nextOpen );
 					if ( ! nextOpen ) {
-						clearTimeout( timeoutRef.current );
 						return;
 					}
 					setLoading( true );
 					setItems( [] );
-					clearTimeout( timeoutRef.current );
 					timeoutRef.current = setTimeout( () => {
 						setItems( ITEMS );
 						setValue( ( current ) => current ?? ITEMS[ 0 ] );
