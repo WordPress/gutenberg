@@ -4,7 +4,7 @@ import {
 } from '@wordpress/components';
 import { store as coreStore, useEntityId } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 export default function NavigationMenuDeleteControl( { onDelete } ) {
@@ -12,9 +12,22 @@ export default function NavigationMenuDeleteControl( { onDelete } ) {
 		useState( false );
 	const id = useEntityId( 'postType', 'wp_navigation' );
 	const { deleteEntityRecord } = useDispatch( coreStore );
+	const containerRef = useRef();
+
+	const handleDelete = () => {
+		if ( containerRef.current ) {
+			containerRef.current.tabIndex = -1;
+			containerRef.current.focus();
+		}
+
+		deleteEntityRecord( 'postType', 'wp_navigation', id, {
+			force: true,
+		} );
+		onDelete();
+	};
 
 	return (
-		<>
+		<div ref={ containerRef }>
 			<Button
 				__next40pxDefaultSize
 				className="wp-block-navigation-delete-menu-button"
@@ -29,12 +42,7 @@ export default function NavigationMenuDeleteControl( { onDelete } ) {
 			{ isConfirmDialogVisible && (
 				<ConfirmDialog
 					isOpen
-					onConfirm={ () => {
-						deleteEntityRecord( 'postType', 'wp_navigation', id, {
-							force: true,
-						} );
-						onDelete();
-					} }
+					onConfirm={ handleDelete }
 					onCancel={ () => {
 						setIsConfirmDialogVisible( false );
 					} }
@@ -46,6 +54,6 @@ export default function NavigationMenuDeleteControl( { onDelete } ) {
 					) }
 				</ConfirmDialog>
 			) }
-		</>
+		</div>
 	);
 }
