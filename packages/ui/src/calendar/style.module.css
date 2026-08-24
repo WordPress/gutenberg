@@ -108,14 +108,6 @@
 			text-transform: capitalize;
 		}
 
-		.chevron {
-			display: inline-block;
-			fill: currentColor;
-			width: var(--wpds-dimension-size-2xs);
-			height: var(--wpds-dimension-size-2xs);
-		}
-
-		.root[dir="rtl"] .nav .chevron,
 		.root[dir="rtl"] .nav-button {
 			transform: rotate(180deg);
 			transform-origin: 50%;
