@@ -20,6 +20,7 @@
 
 ### Enhancements
 
+-   `Calendar`, `RangeCalendar`: Add custom root roles and month-aware application labels. ([#81443](https://github.com/WordPress/gutenberg/pull/81443))
 -   `CollapsibleCard`: Support multiple `CollapsibleCard.HeaderDescription` components ([#81227](https://github.com/WordPress/gutenberg/pull/81227)).
 -   Add `TextareaControl` component ([#81359](https://github.com/WordPress/gutenberg/pull/81359)).
 -   Export shared keyboard shortcut presentation and accessibility utilities. ([#81826](https://github.com/WordPress/gutenberg/pull/81826))
@@ -58,7 +59,6 @@
 ### Enhancements
 
 -   Add `Calendar` and `RangeCalendar` components. ([#81337](https://github.com/WordPress/gutenberg/pull/81337))
--   `Calendar`, `RangeCalendar`: Add custom root roles and month-aware application labels. ([#81443](https://github.com/WordPress/gutenberg/pull/81443))
 -   Add `SearchableChipSelect` primitive ([#80779](https://github.com/WordPress/gutenberg/pull/80779)).
 -   Add `Combobox.InputGroup` primitive ([#80869](https://github.com/WordPress/gutenberg/pull/80869)).
 
