@@ -145,6 +145,7 @@ describe( 'SyncManager', () => {
 				objectId: '123',
 				ydoc: expect.any( Y.Doc ),
 				awareness: expect.any( Awareness ),
+				Y,
 			} );
 		} );
 
