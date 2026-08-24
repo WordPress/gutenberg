@@ -64,6 +64,15 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	 * Subscribe to collaborator selection changes and update the selection state.
 	 */
 	private subscribeToCollaboratorSelectionChanges(): void {
+		/*
+		 * Selection state anchors through Yjs relative positions in the
+		 * shared Y.Doc. Engines without one (the awareness rides a stub doc;
+		 * e.g. the intent-log engine) get presence without shared carets —
+		 * selection sharing for those engines is engine-side future work.
+		 */
+		if ( 'function' !== typeof this.doc?.getMap ) {
+			return;
+		}
 		const {
 			getSelectionStart,
 			getSelectionEnd,
@@ -344,13 +353,16 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	public getDebugData(): YDocDebugData {
 		const ydoc = this.doc;
 
-		// Manually extract doc data to avoid deprecated toJSON method
-		const docData: Record< string, unknown > = Object.fromEntries(
-			Array.from( ydoc.share, ( [ key, value ] ) => [
-				key,
-				value.toJSON(),
-			] )
-		);
+		// Manually extract doc data to avoid deprecated toJSON method.
+		// Stub-doc awareness (non-Yjs engines) has no shared types to dump.
+		const docData: Record< string, unknown > = ydoc?.share
+			? Object.fromEntries(
+					Array.from( ydoc.share, ( [ key, value ] ) => [
+						key,
+						value.toJSON(),
+					] )
+			  )
+			: {};
 
 		// Build collaboratorMap from awareness store (all collaborators seen this session)
 		const collaboratorMapData = new Map< string, DebugCollaboratorData >(

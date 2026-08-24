@@ -199,6 +199,15 @@ function useLastPostSave(
 
 		awareness.setUp();
 
+		/*
+		 * Peer-save notifications observe the shared Y.Doc's state map.
+		 * Engines whose awareness rides a stub doc (no getMap) provide
+		 * presence without this signal.
+		 */
+		if ( 'function' !== typeof awareness.doc?.getMap ) {
+			setLastSave( null );
+			return;
+		}
 		const stateMap = awareness.doc.getMap( 'state' );
 		const recordMap = awareness.doc.getMap( 'document' );
 
