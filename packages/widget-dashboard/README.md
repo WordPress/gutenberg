@@ -142,38 +142,15 @@ Renders its children only when `layout` is empty. Pair it with `<WidgetDashboard
 
 #### `<WidgetDashboard.Actions />`
 
-Edit-mode toggle: a "Customize" button while `editMode` is off, and "Add widget", "Cancel", "Done" while it is on. The buttons and the more-actions menu are triggers: "Customize" and "Done" fire `onEditChange`, "Add widget" opens the inserter, and "Reset to default" opens the reset confirmation. Returns `null` when the dashboard is mounted without `onEditChange`, so surfaces that don't expose edit mode can keep `Actions` in their tree unconditionally.
+Edit-mode toggle: a "Customize" button while `editMode` is off, and "Add widget", "Cancel", "Done" while it is on. The buttons and the more-actions menu are triggers: "Customize" and "Done" fire `onEditChange`, "Add widget" opens the inserter, and "Reset to default" opens the reset confirmation. Returns `null` when the dashboard is mounted without `onEditChange`, so surfaces that don't expose edit mode can keep `Actions` in their tree unconditionally. The Customize button also needs the policy to allow `customize`; Done and Cancel stay available while already customizing.
 
 #### `<WidgetDashboard.Commands />`
 
-Command palette integration. It registers the dashboard's commands through `@wordpress/commands` (customize, add widgets, reset to default) and sets the active command context. It renders nothing, and surfaces wherever the host application mounts the command palette. Ships in the default arrangement; when passing custom children, compose it to keep the integration.
+Command palette integration. It registers the dashboard's commands through `@wordpress/commands` (customize, add widgets, reset to default) and sets the active command context. It renders nothing, and surfaces wherever the host application mounts the command palette. Ships in the default arrangement; when passing custom children, compose it to keep the integration. The customize command, and the add-widgets command outside edit mode, follow the policy's `customize` answer.
 
 #### `<WidgetDashboard.Policy>`
 
-Governs what users may do on the dashboards below it. `canPerform` receives a request naming the operation and its subject, and returns whether it is allowed. Two operations are enforced: `customize`, entering customize mode from the Customize button and the command palette, and `insert`, offering a widget type in the inserter; a rejected type stays out of the listing but keeps rendering where already placed.
-
-Return `true` for operations you do not govern. Policies compose restrictively, so a default `false` would deny every operation added later.
-
-```tsx
-<WidgetDashboard.Policy
-	canPerform={ ( request ) => {
-		switch ( request.operation ) {
-			case 'customize':
-				return canEditLayout;
-			case 'insert':
-				return request.widgetType.category === activeSection;
-			default:
-				return true;
-		}
-	} }
->
-	<WidgetDashboard { ...props } />
-</WidgetDashboard.Policy>
-```
-
-Unlike the other compound components, it mounts around `<WidgetDashboard>`, not inside it: the engine mounts the inserter outside the `children` subtree, so a policy placed inside `children` has no effect. One provider can cover several dashboards; nested policies allow an operation only when every enclosing policy allows it, and without one every operation is allowed. The callback can close over application state, and the dashboard follows that state, even while the inserter is open.
-
-The policy governs the interface. A host that must enforce permissions does so where the layout persists.
+Governs what users may do on the dashboards below it: whether Customize is offered, which widget types the inserter lists. Unlike the other compound components, it mounts around `<WidgetDashboard>`. See [Governance](#governance).
 
 `<Page>` from `@wordpress/admin-ui` exposes an `actions` slot used across admin screens (DataViews, WidgetDashboard, …). Plug `Actions` straight into it:
 
@@ -204,6 +181,55 @@ import { Page } from '@wordpress/admin-ui';
 The "Add widget" button in `<WidgetDashboard.Actions />` opens a modal inserter. It lists the `widgetTypes` prop as a grid of live previews (each preview renders the type's `example` attributes through its own render module), supports search, and exposes a "Select" action with bulk support so users can insert one or several widgets in a single layout change. A `<WidgetDashboard.Policy>` above the dashboard narrows the listing through the `insert` operation; without one, every entry is offered.
 
 On confirmation, the inserter creates instances (using each type's `example.attributes` as the initial values) and appends them to the staged layout. The dialog closes after a successful insertion or when the user dismisses it.
+
+## Governance
+
+The engine knows which operations a user can perform on it. It does not know who the user is or what the application allows. `<WidgetDashboard.Policy>` is the seam through which the application answers, with a single callback:
+
+```ts
+type CanPerformDashboardOperation = (
+	request: DashboardOperationRequest
+) => boolean;
+
+type DashboardOperationRequest =
+	| { operation: 'customize' }
+	| { operation: 'insert'; widgetType: WidgetType };
+```
+
+Each request names the operation and carries its subject, so a branch on `request.operation` narrows the rest of the object:
+
+```tsx
+<WidgetDashboard.Policy
+	canPerform={ ( request ) => {
+		switch ( request.operation ) {
+			case 'customize':
+				return canEditLayout;
+			case 'insert':
+				return request.widgetType.category === activeSection;
+			default:
+				return true;
+		}
+	} }
+>
+	<WidgetDashboard { ...props } />
+</WidgetDashboard.Policy>
+```
+
+| Operation   | Subject      | What it gates                                                                                                                                                                             |
+| ----------- | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `customize` | none         | The Customize button, the `core/dashboard/customize` command, the `core/dashboard/add-widgets` command outside edit mode, and the automatic entry into customize mode on an empty layout. |
+| `insert`    | `widgetType` | Whether the inserter offers the type. A rejected type stays out of the listing but keeps rendering where already placed.                                                                  |
+
+The engine resolves the policy once, in its provider, and every surface asks that resolved answer, so further sources join at the same point without touching the surfaces.
+
+Rules of the contract:
+
+-   **Return `true` for operations you do not govern.** Policies compose restrictively, so a default `false` would deny every operation added later.
+-   **Mount it around `<WidgetDashboard>`, not inside.** The engine mounts the inserter outside the `children` subtree, so a policy placed inside `children` has no effect. One provider can cover several dashboards.
+-   **Nested policies only narrow.** An operation is allowed when every enclosing policy allows it; an inner policy cannot re-grant what an outer one denied. Without a policy, every operation is allowed.
+-   **The callback is called during render.** Keep it synchronous, and memoize it when it derives from state; a new function re-evaluates the dashboard, even with the inserter open.
+
+The policy governs the interface: it decides what the dashboard offers, not what the server accepts. A host that must enforce permissions does so where the layout persists. And it never reaches widget bodies: a widget asks the server about its own entities, and reads the application's decisions only as the presence or absence of what the host lends it.
 
 ## Grid settings
 
@@ -286,6 +312,7 @@ interface WidgetRenderProps< Item = unknown > {
 
 -   `DashboardWidget` — a placement of a widget on the dashboard. Carries `uuid`, `type`, `attributes`, `placement`.
 -   `WidgetGridSettings` — grid model configuration; see [Grid settings](#grid-settings).
+-   `DashboardOperationRequest` / `CanPerformDashboardOperation` — the policy contract; see [Governance](#governance).
 
 The widget contract types (`WidgetName`, `WidgetType`, `WidgetRenderProps`, `ResolveWidgetModule`) are defined in `@wordpress/widget-primitives` and imported from there directly; this engine does not re-export them.
 
