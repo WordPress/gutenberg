@@ -5,7 +5,7 @@ import type { ComponentType } from 'react';
 import '@wordpress/components/build-style/style.css';
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '@wordpress/dataviews/build-style/style.css';
-import { useState } from '@wordpress/element';
+import { useId, useMemo, useState } from '@wordpress/element';
 import { chartBar, download, trendingUp } from '@wordpress/icons';
 import type {
 	ResolveWidgetModule,
@@ -15,7 +15,7 @@ import type {
 	WidgetType,
 } from '@wordpress/widget-primitives';
 import { WidgetDashboard } from '../widget-dashboard';
-import type { DashboardWidget } from '../types';
+import type { CanPerformDashboardOperation, DashboardWidget } from '../types';
 
 /*
  * Stories run without WordPress, so both halves of the demo widget are
@@ -446,6 +446,126 @@ The widget only declares relevance; the fit is measured by the chrome, so the sa
 Beyond attributes, \`demo/goal-progress\` declares three \`actions\` spanning the relevance scale, and that scale routes them: "View goal details" at \`'high'\` mounts as a leading text link (declared icon as prefix) in a persistent chrome footer, "Export progress" at \`'medium'\` beside it as a trailing icon-only link, and "About goals" at the default \`'low'\` lands in the "More" menu. The widget declares each action as data plus its importance; the host owns the surfaces.
 
 Each type also carries a \`help\` note, opened from the info icon in the header, that describes its attributes and what they do.
+`,
+			},
+		},
+	},
+};
+
+/*
+ * The policy demo: application state (the active section, a customize
+ * switch) governing the dashboard, without touching the registry that
+ * keeps placed widgets rendering.
+ */
+const POLICY_SECTIONS = [ 'All', 'Traffic', 'Goals' ] as const;
+
+type PolicySection = ( typeof POLICY_SECTIONS )[ number ];
+
+const SECTION_TYPES: Record< PolicySection, string | null > = {
+	All: null,
+	Traffic: 'demo/traffic-snapshot',
+	Goals: 'demo/goal-progress',
+};
+
+function PolicyStory() {
+	const [ layout, setLayout ] =
+		useState< DashboardWidget[] >( INITIAL_LAYOUT );
+	const [ editMode, setEditMode ] = useState( false );
+	const [ section, setSection ] = useState< PolicySection >( 'All' );
+	const [ allowCustomize, setAllowCustomize ] = useState( true );
+	const allowCustomizeId = useId();
+
+	const canPerform = useMemo< CanPerformDashboardOperation >( () => {
+		const allowed = SECTION_TYPES[ section ];
+		return ( request ) => {
+			switch ( request.operation ) {
+				case 'customize':
+					return allowCustomize;
+				case 'insert':
+					return (
+						allowed === null || request.widgetType.name === allowed
+					);
+				default:
+					return true;
+			}
+		};
+	}, [ section, allowCustomize ] );
+
+	return (
+		<WidgetDashboard.Policy canPerform={ canPerform }>
+			<div
+				style={ {
+					display: 'flex',
+					gap: 'var(--wpds-dimension-gap-sm)',
+					alignItems: 'center',
+				} }
+			>
+				{ POLICY_SECTIONS.map( ( name ) => (
+					<button
+						key={ name }
+						type="button"
+						aria-pressed={ section === name }
+						onClick={ () => setSection( name ) }
+					>
+						{ section === name ? <strong>{ name }</strong> : name }
+					</button>
+				) ) }
+				<label htmlFor={ allowCustomizeId }>
+					<input
+						id={ allowCustomizeId }
+						type="checkbox"
+						checked={ allowCustomize }
+						onChange={ ( event ) =>
+							setAllowCustomize( event.target.checked )
+						}
+					/>{ ' ' }
+					Allow customize
+				</label>
+			</div>
+
+			<p
+				role="status"
+				style={ {
+					color: 'var(--wpds-color-foreground-content-neutral-weak)',
+					fontSize: 'var(--wpds-typography-font-size-sm)',
+				} }
+			>
+				Switch the section, then open &quot;Add widget&quot;: the
+				inserter lists only what the active section allows, while placed
+				widgets keep rendering. Uncheck &quot;Allow customize&quot; to
+				take the Customize button away.
+			</p>
+
+			<WidgetDashboard
+				widgetTypes={ [
+					trafficSnapshotWidgetType,
+					goalProgressWidgetType,
+				] }
+				layout={ layout }
+				onLayoutChange={ setLayout }
+				editMode={ editMode }
+				onEditChange={ setEditMode }
+				resolveWidgetModule={ resolveDemoModule }
+				gridSettings={ { model: 'grid', rowHeight: 200 } }
+			>
+				<WidgetDashboard.Actions />
+				<WidgetDashboard.Widgets />
+			</WidgetDashboard>
+		</WidgetDashboard.Policy>
+	);
+}
+
+export const Policy: StoryObj = {
+	render: () => <PolicyStory />,
+	parameters: {
+		docs: {
+			description: {
+				story: `
+The application governs the dashboard; the widget types stay untouched. This story mounts \`WidgetDashboard.Policy\` above the dashboard with a \`canPerform\` closing over the active section and a customize switch.
+
+Switching sections re-renders the provider value, so the "Add widget" listing follows the application state, even while open; the excluded types keep rendering where already placed because the \`widgetTypes\` registry never changes. Denying \`customize\` removes the Customize button and the matching commands.
+
+Nested policies compose restrictively: mount one provider per dashboard for per-instance rules, or a single provider around a group to share one. Without a policy, every operation is allowed.
 `,
 			},
 		},
