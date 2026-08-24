@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Widget areas: Use the `layout` icon instead of the default block icon ([#61028](https://github.com/WordPress/gutenberg/issues/61028)).
+
 ## 6.53.0 (2026-08-12)
 
 ### Enhancements
