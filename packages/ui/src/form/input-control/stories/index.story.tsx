@@ -63,15 +63,17 @@ export const WithDetails: Story = {
 
 export const WithPrefix: Story = {
 	args: {
+		...InputWithPrefix.args,
+		ref: undefined,
 		...Default.args,
-		prefix: InputWithPrefix.args?.prefix,
 	},
 };
 
 export const WithSuffixControl: Story = {
 	args: {
+		...InputWithSuffixControl.args,
+		ref: undefined,
 		...Default.args,
-		suffix: InputWithSuffixControl.args?.suffix,
 	},
 	parameters: {
 		a11y: { test: 'error' },
