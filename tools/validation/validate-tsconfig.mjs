@@ -343,6 +343,30 @@ const routesWithTypes = glob
 	.sync( 'routes/*/tsconfig.json', { cwd: repoRoot } )
 	.map( ( tsconfigPath ) => basename( dirname( tsconfigPath ) ) );
 
+/*
+ * Registration is only enforced for routes with a tsconfig.json, so a route
+ * without one would keep its TypeScript files out of the type check silently.
+ */
+const routeNames = glob
+	.sync( 'routes/*/', { cwd: repoRoot } )
+	.map( ( routeDir ) => basename( routeDir ) );
+
+for ( const routeName of routeNames ) {
+	if ( routesWithTypes.includes( routeName ) ) {
+		continue;
+	}
+	const hasTypeScriptFiles =
+		glob.sync( '**/*.{ts,tsx}', {
+			cwd: resolve( repoRoot, 'routes', routeName ),
+			ignore: [ 'node_modules/**', 'build/**' ],
+		} ).length > 0;
+	if ( hasTypeScriptFiles ) {
+		reportError(
+			`Missing tsconfig.json for the TypeScript files of routes/${ routeName }`
+		);
+	}
+}
+
 for ( const routeName of routesWithTypes ) {
 	const routeDir = resolve( repoRoot, 'routes', routeName );
 	const routeProject = join( routeDir, 'tsconfig.json' );
