@@ -24,7 +24,7 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { getDate, getSettings } from '@wordpress/date';
 import {
 	Calendar,
@@ -34,6 +34,7 @@ import {
 } from '@wordpress/ui';
 import RelativeDateControl from './utils/relative-date-control';
 import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
+import getCalendarLocale from './utils/get-calendar-locale';
 import {
 	OPERATOR_IN_THE_PAST,
 	OPERATOR_OVER,
@@ -300,6 +301,7 @@ function CalendarDateControl< Item >( {
 	const weekStartsOn =
 		( fieldFormat as FormatDate ).weekStartsOn ??
 		getSettings().l10n.startOfWeek;
+	const locale = getCalendarLocale( getSettings().l10n.locale );
 
 	const fieldValue = getValue( { item: data } );
 	const value = typeof fieldValue === 'string' ? fieldValue : undefined;
@@ -452,6 +454,8 @@ function CalendarDateControl< Item >( {
 						onValueChange={ onSelectDate }
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
+						locale={ locale }
+						dir={ isRTL() ? 'rtl' : 'ltr' }
 						weekStartsOn={ weekStartsOn }
 						disabled={ disabled || disabledMatchers }
 						disableNavigation={ disabled }
@@ -493,6 +497,7 @@ function CalendarDateRangeControl< Item >( {
 	const weekStartsOn =
 		( fieldFormat as FormatDate ).weekStartsOn ??
 		getSettings().l10n.startOfWeek;
+	const locale = getCalendarLocale( getSettings().l10n.locale );
 
 	const { minConstraint, maxConstraint, disabledMatchers } =
 		useDisabledDateMatchers( isValid, parseDate );
@@ -726,6 +731,8 @@ function CalendarDateRangeControl< Item >( {
 						onValueChange={ onSelectCalendarRange }
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
+						locale={ locale }
+						dir={ isRTL() ? 'rtl' : 'ltr' }
 						weekStartsOn={ weekStartsOn }
 						disabled={ disabled || disabledMatchers }
 					/>
