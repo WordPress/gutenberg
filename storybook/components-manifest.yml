@@ -473,7 +473,9 @@
       - virtualFocus
   subcomponents:
       - name: Composite.Context
-        props: []
+        props:
+            - children
+            - value
       - name: Composite.Group
         props:
             - children

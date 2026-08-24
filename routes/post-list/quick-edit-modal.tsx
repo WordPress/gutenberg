@@ -45,7 +45,6 @@ function withEditorAssets( FieldEdit: any ) {
 			<div
 				aria-busy={ ! isReady || undefined }
 				style={ ! isReady ? { opacity: 0.6 } : undefined }
-				// @ts-expect-error inert not typed properly
 				inert={ inertValue( ! isReady ) }
 			>
 				<FieldEdit { ...props } />
