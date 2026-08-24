@@ -1,6 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useState } from '@wordpress/element';
 import { fn } from 'storybook/test';
 import { SearchableChipSelectControl } from '../';
+import {
+	GROUPED_ITEMS,
+	type FixtureGroup,
+	type FixtureItem,
+} from '../../primitives/combobox/stories/fixtures';
+import { ITEMS } from '../../primitives/searchable-chip-select/stories/fixtures';
 import * as SearchableChipSelectStories from '../../primitives/searchable-chip-select/stories/index.story';
 import {
 	WITH_DETAILS_DESCRIPTION,
@@ -104,11 +111,55 @@ export const WithDisabledOption: Story = {
 	},
 };
 
+/**
+ * Mark a creatable action with `creatable: true` on an item in `items`.
+ * It renders in the list footer and is excluded from the main list
+ * automatically. Handle creation in `onValueChange`.
+ */
 export const Creatable: Story = {
-	...SearchableChipSelectStories.Creatable,
 	args: {
 		...Default.args,
-		...SearchableChipSelectStories.Creatable.args,
+	},
+	render: function Template( args ) {
+		const [ inputValue, setInputValue ] = useState( '' );
+		const [ value, setValue ] = useState< typeof ITEMS >( [
+			ITEMS[ 0 ],
+			ITEMS[ 1 ],
+		] );
+		const creatableItem = {
+			value: '__create__',
+			label:
+				'Create new item' + ( inputValue ? `: ${ inputValue }` : '' ),
+			creatable: true,
+		};
+
+		return (
+			<SearchableChipSelectControl
+				{ ...args }
+				items={ [ ...ITEMS, creatableItem ] }
+				inputValue={ inputValue }
+				onInputValueChange={ setInputValue }
+				value={ value }
+				onValueChange={ ( values: typeof ITEMS, event ) => {
+					if (
+						values.some(
+							( item ) => item.value === creatableItem.value
+						)
+					) {
+						// eslint-disable-next-line no-alert
+						alert( `Create new item: '${ inputValue }'` );
+						setValue(
+							values.filter(
+								( item ) => item.value !== creatableItem.value
+							)
+						);
+					} else {
+						setValue( values );
+					}
+					args.onValueChange?.( values, event );
+				} }
+			/>
+		);
 	},
 };
 
@@ -153,11 +204,79 @@ export const Grouped: Story = {
 	},
 };
 
+/**
+ * Grouped items with a creatable footer item. Include the creatable item in
+ * `items` as a creatable-only group and handle creation in `onValueChange`.
+ */
 export const GroupedCreatable: Story = {
-	...SearchableChipSelectStories.GroupedCreatable,
 	args: {
 		...Default.args,
 		label: 'Fruit',
 		description: 'Choose your favorite fruits.',
+	},
+	render: function Template( args ) {
+		const [ inputValue, setInputValue ] = useState( '' );
+		const [ value, setValue ] = useState< FixtureItem[] >( [
+			GROUPED_ITEMS[ 0 ].items[ 0 ],
+			GROUPED_ITEMS[ 1 ].items[ 0 ],
+		] );
+		const creatableItem = {
+			value: '__create__',
+			label:
+				'Create new item' + ( inputValue ? `: ${ inputValue }` : '' ),
+			creatable: true,
+		};
+		const items = [
+			...GROUPED_ITEMS,
+			{ label: '', items: [ creatableItem ] },
+		];
+
+		return (
+			<SearchableChipSelectControl
+				{ ...args }
+				items={ items }
+				inputValue={ inputValue }
+				onInputValueChange={ setInputValue }
+				value={ value }
+				onValueChange={ ( values: FixtureItem[], event ) => {
+					if (
+						values.some(
+							( item ) => item.value === creatableItem.value
+						)
+					) {
+						// eslint-disable-next-line no-alert
+						alert( `Create new item: '${ inputValue }'` );
+						setValue(
+							values.filter(
+								( item ) => item.value !== creatableItem.value
+							)
+						);
+					} else {
+						setValue( values );
+					}
+					args.onValueChange?.( values, event );
+				} }
+				children={ ( group: FixtureGroup ) => (
+					<SearchableChipSelectControl.Group
+						key={ group.label }
+						items={ group.items }
+					>
+						<SearchableChipSelectControl.GroupLabel>
+							{ group.label }
+						</SearchableChipSelectControl.GroupLabel>
+						<SearchableChipSelectControl.Collection>
+							{ ( item: FixtureItem ) => (
+								<SearchableChipSelectControl.Item
+									key={ item.value }
+									value={ item }
+								>
+									{ item.label }
+								</SearchableChipSelectControl.Item>
+							) }
+						</SearchableChipSelectControl.Collection>
+					</SearchableChipSelectControl.Group>
+				) }
+			/>
+		);
 	},
 };
