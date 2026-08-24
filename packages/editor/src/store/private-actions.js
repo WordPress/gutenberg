@@ -798,6 +798,13 @@ export const setEditorIntent =
 
 		dispatch( { type: 'SET_EDITOR_INTENT', intent } );
 
+		// The view intent puts the canvas in preview mode, where nothing can
+		// be inserted. An inserter left open over it offers a library that
+		// can't do anything, so close it on the way in.
+		if ( intent === EDITOR_INTENT_VIEW && select.isInserterOpened() ) {
+			dispatch.setIsInserterOpened( false );
+		}
+
 		// Only announce an actual change of intent. Re-selecting the current
 		// intent is a no-op, and because the store starts at `edit` this also
 		// keeps editor boot silent: a boot-time `setEditorIntent( 'edit' )`

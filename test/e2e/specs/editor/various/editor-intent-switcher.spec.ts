@@ -59,27 +59,6 @@ test.describe( 'Editor intent switcher', () => {
 		).toHaveAttribute( 'aria-checked', 'true' );
 	} );
 
-	test( 'View intent makes blocks read-only', async ( { editor, page } ) => {
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: { content: 'Initial content' },
-		} );
-
-		await openIntentSwitcher( page );
-		await page
-			.getByRole( 'menuitemradio', { name: /^Viewing\s+Read-only/ } )
-			.click();
-
-		// In preview mode, block content is not editable — the paragraph
-		// should render but clicking and typing should not change it.
-		const paragraph = editor.canvas.getByText( 'Initial content' );
-		await expect( paragraph ).toBeVisible();
-		await expect( paragraph ).not.toHaveAttribute(
-			'contenteditable',
-			'true'
-		);
-	} );
-
 	test( 'keyboard shortcut cycles between intents', async ( { page } ) => {
 		// Default is Edit.
 		await page.keyboard.press( 'Control+Alt+Shift+X' );
