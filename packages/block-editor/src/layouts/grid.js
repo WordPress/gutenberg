@@ -59,6 +59,9 @@ const units = [
 export default {
 	name: 'grid',
 	label: __( 'Grid' ),
+	hasInspectorControls() {
+		return true;
+	},
 	inspectorControls: function GridLayoutInspectorControls( {
 		layout = {},
 		onChange,
