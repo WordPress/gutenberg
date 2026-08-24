@@ -13,6 +13,16 @@ const { AsyncDependenciesBlock } = webpack;
 
 const defaultExternalizedReportFileName = 'externalized-dependencies.json';
 
+/**
+ * A single PHP printer, created on first use and reused for every asset file.
+ * Many builds emit only JSON (or no asset file at all), so it is built lazily.
+ * Tab indentation and newlines make the generated `*.asset.php` files read like
+ * the pretty-printed `block.json` files WordPress ships.
+ *
+ * @type {undefined | ( ( data: unknown ) => string )}
+ */
+let phpPrinter;
+
 class DependencyExtractionWebpackPlugin {
 	constructor( options ) {
 		this.options = Object.assign(
@@ -129,12 +139,18 @@ class DependencyExtractionWebpackPlugin {
 	 */
 	stringify( asset ) {
 		if ( this.options.outputFormat === 'php' ) {
-			return `<?php return ${ json2php(
+			if ( ! phpPrinter ) {
+				phpPrinter = json2php.make( {
+					linebreak: '\n',
+					indent: '\t',
+				} );
+			}
+			return `<?php return ${ phpPrinter(
 				JSON.parse( JSON.stringify( asset ) )
 			) };\n`;
 		}
 
-		return JSON.stringify( asset );
+		return JSON.stringify( asset, null, '\t' );
 	}
 
 	/** @type {webpack.WebpackPluginInstance['apply']} */

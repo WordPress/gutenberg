@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Pretty-print generated asset files with line breaks and indentation ([#48106](https://github.com/WordPress/gutenberg/issues/48106)).
+
 ## 6.53.0 (2026-08-12)
 
 ### Enhancements
