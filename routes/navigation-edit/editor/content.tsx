@@ -5,7 +5,6 @@ import {
 	// @ts-expect-error - No type declarations available for @wordpress/block-editor
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
-// @ts-expect-error - No type declarations available for @wordpress/blocks
 import { createBlock } from '@wordpress/blocks';
 import { useCallback } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
