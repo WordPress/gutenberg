@@ -217,9 +217,9 @@ export default function TableCellEdit( {
 	const selectionRectangle = useMemo(
 		() =>
 			isCellSetSelection
-				? getSelectionRectangle( selectedClientIds )
+				? getSelectionRectangle( cellPlacements, selectedClientIds )
 				: null,
-		[ isCellSetSelection, selectedClientIds ]
+		[ isCellSetSelection, cellPlacements, selectedClientIds ]
 	);
 
 	// Compute selected row/column counts for plural labels.
