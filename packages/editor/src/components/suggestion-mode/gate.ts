@@ -17,7 +17,7 @@
  */
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { EDITOR_STORE_NAME } from './constants';
+import { STORE_NAME } from '../../store/constants';
 import { checkSupport } from '../post-type-support-check';
 
 declare global {
@@ -47,7 +47,7 @@ export function isSuggestionModeEnabled(): boolean {
 function hasNotesSupport(
 	select: ( store: string | typeof coreStore ) => any
 ): boolean {
-	const editor = select( EDITOR_STORE_NAME );
+	const editor = select( STORE_NAME );
 	const postTypeSlug = editor?.getEditedPostAttribute?.( 'type' );
 	const postType = postTypeSlug
 		? select( coreStore ).getPostType( postTypeSlug )

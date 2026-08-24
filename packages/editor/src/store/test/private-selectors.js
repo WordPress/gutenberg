@@ -1,9 +1,11 @@
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
+	getCodeEditorUnavailableReason,
 	getDefaultRenderingMode,
 	getPostBlocksByName,
 	isCollaborationEnabledForCurrentPost,
+	isEditorIntentReadOnly,
 } from '../private-selectors';
 import { lock } from '../../lock-unlock';
 
@@ -243,6 +245,46 @@ describe( 'getDefaultRenderingMode', () => {
 			expect( getDefaultRenderingMode( state, 'post' ) ).toBe(
 				'post-only'
 			);
+		} );
+	} );
+} );
+
+describe( 'the read-only Viewing intent', () => {
+	describe( 'isEditorIntentReadOnly', () => {
+		it( 'is true only in the view intent', () => {
+			expect( isEditorIntentReadOnly( { editorIntent: 'view' } ) ).toBe(
+				true
+			);
+			expect( isEditorIntentReadOnly( { editorIntent: 'edit' } ) ).toBe(
+				false
+			);
+			expect(
+				isEditorIntentReadOnly( { editorIntent: 'suggest' } )
+			).toBe( false );
+		} );
+
+		it( 'defaults to editable when no intent has been set', () => {
+			expect( isEditorIntentReadOnly( {} ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'getCodeEditorUnavailableReason', () => {
+		it( 'returns a reason in the view intent', () => {
+			expect(
+				getCodeEditorUnavailableReason( { editorIntent: 'view' } )
+			).toBe(
+				'The code editor is unavailable while viewing. Switch to Editing to change the content.'
+			);
+		} );
+
+		it( 'returns null in every editable intent', () => {
+			expect(
+				getCodeEditorUnavailableReason( { editorIntent: 'edit' } )
+			).toBeNull();
+			expect(
+				getCodeEditorUnavailableReason( { editorIntent: 'suggest' } )
+			).toBeNull();
+			expect( getCodeEditorUnavailableReason( {} ) ).toBeNull();
 		} );
 	} );
 } );

@@ -7,6 +7,35 @@
 import type { Page } from '@playwright/test';
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
+const TEXT_EDITOR = '.editor-post-text-editor';
+
+function optionsButton( page: Page ) {
+	return page
+		.getByRole( 'region', { name: 'Editor top bar' } )
+		.getByRole( 'button', { name: 'Options' } );
+}
+
+/*
+ * `MenuItemsChoice` keeps its dropdown open after a selection, so the menu
+ * may already be showing. Options is a toggle: clicking it in that state
+ * would close the menu rather than open it.
+ */
+async function openOptions( page: Page ) {
+	const probe = page.getByRole( 'menuitemradio', { name: /^Visual editor/ } );
+	if ( ! ( await probe.isVisible() ) ) {
+		await optionsButton( page ).click();
+	}
+	await probe.waitFor( { state: 'visible', timeout: 10000 } );
+}
+
+async function closeOptions( page: Page ) {
+	const probe = page.getByRole( 'menuitemradio', { name: /^Visual editor/ } );
+	if ( await probe.isVisible() ) {
+		await optionsButton( page ).click();
+	}
+	await expect( probe ).toBeHidden();
+}
+
 async function switchIntent( page: Page, intentLabel: string ) {
 	const menuItem = page.getByRole( 'menuitemradio', {
 		name: new RegExp( `^${ intentLabel }` ),
@@ -49,6 +78,16 @@ test.describe( 'Suggestion mode - Viewing intent is read-only', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Second paragraph' },
 		} );
+	} );
+
+	/*
+	 * `editorMode` is a per-user preference shared with every other test in
+	 * this worker. Reset it over REST rather than through the UI, so a
+	 * failure part-way through a test body cannot strand the worker in the
+	 * code editor and take unrelated specs down with it.
+	 */
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.setPreferences( 'core', { editorMode: 'visual' } );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -140,6 +179,131 @@ test.describe( 'Suggestion mode - Viewing intent is read-only', () => {
 
 		const blocks = await editor.getBlocks();
 		expect( blocks ).toHaveLength( 2 );
+	} );
+
+	test( 'the code editor is closed off in Viewing mode', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.saveDraft();
+
+		await switchIntent( page, 'Viewing' );
+
+		/*
+		 * The code editor is the one editing surface the read-only canvas
+		 * does not cover: it is a raw `post_content` textarea, so preview
+		 * rendering leaves it fully writable. Viewing therefore reports the
+		 * visual editor whatever the stored preference says, and closes all
+		 * three routes in - the Options menu, the toggle-mode shortcut, and
+		 * the command palette.
+		 */
+		await openOptions( page );
+		await expect(
+			page.getByRole( 'menuitemradio', { name: /^Code editor/ } )
+		).toBeDisabled();
+		await expect(
+			page.getByRole( 'menuitemradio', { name: /^Visual editor/ } )
+		).toHaveAttribute( 'aria-checked', 'true' );
+		// Close through the same toggle: Escape does not reliably dismiss
+		// the dropdown, and a stale menu swallows the next click.
+		await closeOptions( page );
+
+		/*
+		 * The menu item is disabled, but the shortcut reaches
+		 * `switchEditorMode` directly, so the refusal has to live in the
+		 * action too. It has to be on screen and not only spoken: a shortcut
+		 * that silently does nothing reads as a broken editor.
+		 */
+		await pageUtils.pressKeys( 'secondary+m' );
+		await expect( page.locator( TEXT_EDITOR ) ).toBeHidden();
+		await expect(
+			page
+				.getByTestId( 'snackbar' )
+				.filter( { hasText: 'The code editor is unavailable' } )
+		).toBeVisible();
+
+		const blocks = await editor.getBlocks();
+		expect( blocks ).toHaveLength( 2 );
+		expect( blocks[ 0 ].attributes.content ).toBe( 'First paragraph' );
+		expect( blocks[ 1 ].attributes.content ).toBe( 'Second paragraph' );
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data.select( 'core/editor' ).isEditedPostDirty()
+				)
+			)
+			.toBe( false );
+
+		// The refusal is scoped to the intent, not a one-way trip: Editing
+		// hands the code editor back.
+		await switchIntent( page, 'Editing' );
+		await pageUtils.pressKeys( 'secondary+m' );
+		await expect( page.locator( TEXT_EDITOR ) ).toBeVisible();
+	} );
+
+	test( 'undo and redo leave the post alone in Viewing mode', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		/*
+		 * Save so the post starts clean while the two block insertions stay
+		 * on the undo stack. An undo that got through would drop a paragraph
+		 * and dirty the post - the same symptom F-01 reported for keystrokes,
+		 * reached through a header button instead.
+		 */
+		await editor.saveDraft();
+
+		const undoButton = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Undo' } );
+		await expect( undoButton ).toHaveAttribute( 'aria-disabled', 'false' );
+
+		await switchIntent( page, 'Viewing' );
+
+		// The buttons stay mounted rather than disappearing - they are
+		// `aria-disabled` so keyboard users keep their place - so they must
+		// stop advertising an action the store would decline.
+		await expect( undoButton ).toHaveAttribute( 'aria-disabled', 'true' );
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Redo' } )
+		).toHaveAttribute( 'aria-disabled', 'true' );
+
+		/*
+		 * Disabling the buttons only hides the affordance. Drive the actions
+		 * the two ways that reach them regardless - the keyboard shortcuts,
+		 * which dispatch directly, and the store itself - so this proves the
+		 * editor refuses undo rather than that a button was greyed out.
+		 */
+		await pageUtils.pressKeys( 'primary+z' );
+		await pageUtils.pressKeys( 'primaryShift+z' );
+		await page.evaluate( () => {
+			window.wp.data.dispatch( 'core/editor' ).undo();
+			window.wp.data.dispatch( 'core/editor' ).redo();
+		} );
+
+		const blocks = await editor.getBlocks();
+		expect( blocks ).toHaveLength( 2 );
+		expect( blocks[ 0 ].attributes.content ).toBe( 'First paragraph' );
+		expect( blocks[ 1 ].attributes.content ).toBe( 'Second paragraph' );
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data.select( 'core/editor' ).isEditedPostDirty()
+				)
+			)
+			.toBe( false );
+
+		// Returning to Editing restores the history rather than discarding it.
+		await switchIntent( page, 'Editing' );
+		await expect( undoButton ).toHaveAttribute( 'aria-disabled', 'false' );
+		await undoButton.click();
+		await expect
+			.poll( async () => ( await editor.getBlocks() ).length )
+			.toBe( 1 );
 	} );
 
 	test( 'switching to Viewing closes an open inserter', async ( {
