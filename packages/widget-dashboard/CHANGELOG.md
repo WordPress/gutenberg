@@ -17,6 +17,8 @@
     the selected radio option instead of disabling it.
 -   Dashboard overflow menu: "Reset to default…" carries an ellipsis, since
     activating it opens a confirmation dialog rather than completing the reset.
+-   Widget chrome: the customize-mode menu carries removal as a command beside
+    the width setting, replacing the separate trash button next to it.
 
 ### Internal
 

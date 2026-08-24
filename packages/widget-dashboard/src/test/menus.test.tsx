@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentType } from 'react';
 import { useState } from '@wordpress/element';
@@ -152,5 +152,22 @@ describe( 'chrome menus', () => {
 				name: 'Make full width',
 			} )
 		).toBeChecked();
+	} );
+
+	it( 'removes the widget from the same menu', async () => {
+		const user = userEvent.setup();
+		render( <Harness editMode /> );
+		await screen.findByTestId( 'label' );
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Widget options' } )
+		);
+		await user.click(
+			await screen.findByRole( 'menuitem', { name: 'Remove' } )
+		);
+
+		await waitFor( () =>
+			expect( screen.queryByTestId( 'label' ) ).not.toBeInTheDocument()
+		);
 	} );
 } );
