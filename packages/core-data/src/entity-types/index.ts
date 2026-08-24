@@ -156,6 +156,66 @@ export type EntityRecord< C extends Context = 'edit' > =
 	PerPackageEntityRecords< C >[ keyof PerPackageEntityRecords< C > ];
 
 /**
+ * The names the `root` kind knows about, and the record each one returns.
+ *
+ * Declared separately from `EntityRecordTypes` so a plugin can merge a name
+ * into this kind on its own. Redeclaring `root` on `EntityRecordTypes` itself
+ * would fail, because merged interface properties have to have identical
+ * types.
+ */
+export interface RootEntityRecordTypes< C extends Context > {
+	__unstableBase: Base< C >;
+	comment: Comment< C >;
+	fontCollection: FontCollection< C >;
+	globalStyles: GlobalStyles< C >;
+	icon: Icon< C >;
+	media: Attachment< C >;
+	menu: NavMenu< C >;
+	menuItem: NavMenuItem< C >;
+	menuLocation: MenuLocation< C >;
+	plugin: Plugin< C >;
+	postType: Type< C >;
+	sidebar: Sidebar< C >;
+	site: Settings< C >;
+	status: PostStatusObject< C >;
+	taxonomy: Taxonomy< C >;
+	theme: Theme< C >;
+	user: User< C >;
+	widget: Widget< C >;
+	widgetType: WidgetType< C >;
+}
+
+/**
+ * The post types the map knows about, and the record each one returns.
+ *
+ * A custom post type is added by merging into this interface.
+ *
+ * @see RootEntityRecordTypes
+ */
+export interface PostTypeEntityRecordTypes< C extends Context > {
+	attachment: Attachment< C >;
+	page: Page< C >;
+	post: Post< C >;
+	wp_block: WpBlock< C >;
+	wp_font_family: WpFontFamily< C >;
+	wp_navigation: WpNavigation< C >;
+	wp_template: WpTemplate< C >;
+	wp_template_part: WpTemplatePart< C >;
+}
+
+/**
+ * The taxonomies the map knows about, and the record each one returns.
+ *
+ * A custom taxonomy is added by merging into this interface.
+ *
+ * @see RootEntityRecordTypes
+ */
+export interface TaxonomyEntityRecordTypes< C extends Context > {
+	category: Term< C >;
+	post_tag: Term< C >;
+}
+
+/**
  * Maps an entity's `kind` and `name` to the record type it returns.
  *
  * `getEntityRecord( 'postType', 'post', 1 )` names the record it wants with
@@ -169,8 +229,8 @@ export type EntityRecord< C extends Context = 'edit' > =
  * raising an error. Custom post types and plugin entities therefore behave
  * exactly as they did before.
  *
- * A plugin adds its own entities by merging into this interface, the same way
- * it would extend `PerPackageEntityRecords`:
+ * A plugin registering a whole new kind merges into this interface, the same
+ * way it would extend `PerPackageEntityRecords`:
  *
  * ```ts
  * declare module '@wordpress/core-data' {
@@ -180,44 +240,26 @@ export type EntityRecord< C extends Context = 'edit' > =
  * }
  * ```
  *
+ * A plugin adding a name to a kind that already exists merges into that
+ * kind's own interface instead:
+ *
+ * ```ts
+ * declare module '@wordpress/core-data' {
+ *     export interface PostTypeEntityRecordTypes< C extends Context > {
+ *         product: Product< C >;
+ *     }
+ *     export interface TaxonomyEntityRecordTypes< C extends Context > {
+ *         genre: Term< C >;
+ *     }
+ * }
+ * ```
+ *
  * @see EntityRecordOf
  */
 export interface EntityRecordTypes< C extends Context > {
-	root: {
-		__unstableBase: Base< C >;
-		comment: Comment< C >;
-		fontCollection: FontCollection< C >;
-		globalStyles: GlobalStyles< C >;
-		icon: Icon< C >;
-		media: Attachment< C >;
-		menu: NavMenu< C >;
-		menuItem: NavMenuItem< C >;
-		menuLocation: MenuLocation< C >;
-		plugin: Plugin< C >;
-		postType: Type< C >;
-		sidebar: Sidebar< C >;
-		site: Settings< C >;
-		status: PostStatusObject< C >;
-		taxonomy: Taxonomy< C >;
-		theme: Theme< C >;
-		user: User< C >;
-		widget: Widget< C >;
-		widgetType: WidgetType< C >;
-	};
-	postType: {
-		attachment: Attachment< C >;
-		page: Page< C >;
-		post: Post< C >;
-		wp_block: WpBlock< C >;
-		wp_font_family: WpFontFamily< C >;
-		wp_navigation: WpNavigation< C >;
-		wp_template: WpTemplate< C >;
-		wp_template_part: WpTemplatePart< C >;
-	};
-	taxonomy: {
-		category: Term< C >;
-		post_tag: Term< C >;
-	};
+	root: RootEntityRecordTypes< C >;
+	postType: PostTypeEntityRecordTypes< C >;
+	taxonomy: TaxonomyEntityRecordTypes< C >;
 }
 
 /**
