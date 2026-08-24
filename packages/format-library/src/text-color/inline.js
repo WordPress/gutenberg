@@ -54,6 +54,20 @@ export function parseClassName( className = '', colorSettings ) {
 			);
 			accumulator.color = colorObject.color;
 		}
+		// Handle background color classes (has-{color-slug}-background-color).
+		if (
+			name.startsWith( 'has-' ) &&
+			name.endsWith( '-background-color' )
+		) {
+			const colorSlug = name
+				.replace( /^has-/, '' )
+				.replace( /-background-color$/, '' );
+			const colorObject = getColorObjectByAttributeValues(
+				colorSettings,
+				colorSlug
+			);
+			accumulator.backgroundColor = colorObject.color;
+		}
 		return accumulator;
 	}, {} );
 }
@@ -86,7 +100,21 @@ function setColors( value, name, colorSettings, colors ) {
 	const attributes = {};
 
 	if ( backgroundColor ) {
-		styles.push( [ 'background-color', backgroundColor ].join( ':' ) );
+		const backgroundColorObject = getColorObjectByColorValue(
+			colorSettings,
+			backgroundColor
+		);
+
+		if ( backgroundColorObject ) {
+			classNames.push(
+				getColorClassName(
+					'background-color',
+					backgroundColorObject.slug
+				)
+			);
+		} else {
+			styles.push( [ 'background-color', backgroundColor ].join( ':' ) );
+		}
 	} else {
 		// Override default browser color for mark element.
 		styles.push( [ 'background-color', transparentValue ].join( ':' ) );
