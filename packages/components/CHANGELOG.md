@@ -10,6 +10,7 @@
     -   `ComboboxControl`: ([#80471](https://github.com/WordPress/gutenberg/pull/80471))
     -   `GradientPicker`, `ColorPalette`: ([#80473](https://github.com/WordPress/gutenberg/pull/80473)).
     -   `BaseControl` ([#80001](https://github.com/WordPress/gutenberg/pull/80001))
+    -   `TextareaControl` ([#81353](https://github.com/WordPress/gutenberg/pull/81353))
 
 ### Enhancements
 
