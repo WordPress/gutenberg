@@ -67,6 +67,9 @@ function Edit( {
 				return;
 			}
 
+			//FIX: Prevent the browser from jumping/scrolling when clicking an anchor link
+			event.preventDefault();
+
 			setAddingLink( true );
 			setOpenedBy( {
 				el: link,
