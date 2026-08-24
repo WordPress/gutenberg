@@ -185,6 +185,24 @@ export type WidgetGridSettings =
 	| WidgetMasonryLayoutSettings;
 
 /**
+ * An operation the dashboard asks permission for, with its subject.
+ * `customize` is entering customize mode; `insert` is offering a widget
+ * type in the inserter.
+ */
+export type DashboardOperationRequest =
+	| { operation: 'customize' }
+	| { operation: 'insert'; widgetType: WidgetType };
+
+/**
+ * Answers whether an operation is allowed. Return `true` for operations
+ * you do not govern: policies compose restrictively, so a default `false`
+ * would deny every operation the engine adds later.
+ */
+export type CanPerformDashboardOperation = (
+	request: DashboardOperationRequest
+) => boolean;
+
+/**
  * Props for `WidgetDashboard`.
  *
  * The consumer owns the committed layout state; the dashboard maintains

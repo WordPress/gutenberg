@@ -6,7 +6,7 @@ import { store as commandsStore } from '@wordpress/commands';
 import type { WidgetType } from '@wordpress/widget-primitives';
 import { WidgetDashboard } from '../widget-dashboard';
 import { DASHBOARD_COMMAND_CONTEXT } from '../components/commands';
-import type { DashboardWidget } from '../types';
+import type { CanPerformDashboardOperation, DashboardWidget } from '../types';
 
 const widgetTypes: WidgetType[] = [];
 
@@ -58,15 +58,17 @@ const COMMAND_NAMES = [
 interface HarnessProps {
 	initialEditMode?: boolean;
 	withLayoutReset?: boolean;
+	canPerform?: CanPerformDashboardOperation;
 }
 
 function Harness( {
 	initialEditMode = false,
 	withLayoutReset = false,
+	canPerform,
 }: HarnessProps ) {
 	const [ editMode, setEditMode ] = useState( initialEditMode );
 
-	return (
+	const dashboard = (
 		<WidgetDashboard
 			layout={ layout }
 			onLayoutChange={ () => {} }
@@ -79,7 +81,18 @@ function Harness( {
 			<CommandsProbe names={ COMMAND_NAMES } />
 		</WidgetDashboard>
 	);
+
+	return canPerform ? (
+		<WidgetDashboard.Policy canPerform={ canPerform }>
+			{ dashboard }
+		</WidgetDashboard.Policy>
+	) : (
+		dashboard
+	);
 }
+
+const denyCustomize: CanPerformDashboardOperation = ( request ) =>
+	request.operation !== 'customize';
 
 function getRegistered( probe: HTMLElement ): Record< string, boolean > {
 	return JSON.parse( probe.getAttribute( 'data-registered' ) ?? '{}' );
@@ -107,6 +120,26 @@ describe( 'WidgetDashboard.Commands', () => {
 		);
 
 		expect( registered[ 'core/dashboard/customize' ] ).toBe( false );
+		expect( registered[ 'core/dashboard/add-widgets' ] ).toBe( true );
+	} );
+
+	it( 'unregisters Customize and Add widgets when the policy denies customize', () => {
+		render( <Harness withLayoutReset canPerform={ denyCustomize } /> );
+
+		const registered = getRegistered(
+			screen.getByTestId( 'commands-probe' )
+		);
+		expect( registered[ 'core/dashboard/customize' ] ).toBe( false );
+		expect( registered[ 'core/dashboard/add-widgets' ] ).toBe( false );
+		expect( registered[ 'core/dashboard/reset-to-default' ] ).toBe( true );
+	} );
+
+	it( 'keeps Add widgets registered in edit mode when customize is denied', () => {
+		render( <Harness initialEditMode canPerform={ denyCustomize } /> );
+
+		const registered = getRegistered(
+			screen.getByTestId( 'commands-probe' )
+		);
 		expect( registered[ 'core/dashboard/add-widgets' ] ).toBe( true );
 	} );
 
