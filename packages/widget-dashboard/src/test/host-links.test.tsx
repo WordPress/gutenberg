@@ -166,5 +166,35 @@ describe( 'host links across the chrome compositions', () => {
 			expect( download ).not.toHaveAttribute( 'data-host-link' );
 			expect( download ).toHaveAttribute( 'download', 'export.csv' );
 		} );
+
+		/*
+		 * The menu reaches its items through the ref the host link forwards;
+		 * a link that drops it leaves the matched item unreachable by
+		 * keyboard.
+		 */
+		it( 'keeps the matched item reachable by keyboard', async () => {
+			const user = userEvent.setup();
+			const { links } = createHost();
+			renderWithHost( <WidgetActions actions={ menuActions } />, links );
+
+			await user.tab();
+			expect(
+				screen.getByRole( 'button', { name: 'More' } )
+			).toHaveFocus();
+
+			await user.keyboard( '{ArrowDown}' );
+			const matched = await screen.findByRole( 'menuitem', {
+				name: 'See report',
+			} );
+			expect( matched ).toHaveFocus();
+
+			await user.keyboard( '{ArrowDown}' );
+			expect(
+				screen.getByRole( 'menuitem', { name: /External guide/ } )
+			).toHaveFocus();
+
+			await user.keyboard( '{ArrowUp}' );
+			expect( matched ).toHaveFocus();
+		} );
 	} );
 } );
