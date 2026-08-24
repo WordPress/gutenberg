@@ -1284,27 +1284,23 @@ describe( 'Editor actions', () => {
 		} );
 
 		it( 'announces the canvas swap when the intent changes the effective mode', () => {
+			const spoken = () =>
+				registry.select( noticesStore ).getNotices().at( -1 )
+					?.spokenMessage;
+
 			registry.dispatch( editorStore ).switchEditorMode( 'text' );
-			speak.mockClear();
 
 			// `switchEditorMode` - which owns the mode announcement - is
 			// never dispatched here, so the intent action has to carry it.
 			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
 				'suggest'
 			);
-			expect( speak ).toHaveBeenCalledWith(
-				expect.stringContaining( 'Visual editor selected' ),
-				'assertive'
-			);
+			expect( spoken() ).toContain( 'Visual editor selected' );
 
-			speak.mockClear();
 			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
 				'edit'
 			);
-			expect( speak ).toHaveBeenCalledWith(
-				expect.stringContaining( 'Code editor selected' ),
-				'assertive'
-			);
+			expect( spoken() ).toContain( 'Code editor selected' );
 		} );
 
 		it( 'leaves the announcement alone when the mode is unaffected', () => {
@@ -1314,10 +1310,12 @@ describe( 'Editor actions', () => {
 				'view'
 			);
 
-			expect( speak ).toHaveBeenCalledWith(
-				"You're viewing",
-				'assertive'
-			);
+			// The snackbar speaks this, once and politely; the action does
+			// not announce as well.
+			const [ notice ] = registry.select( noticesStore ).getNotices();
+			expect( notice.content ).toBe( "You're viewing" );
+			expect( notice.spokenMessage ).toBe( "You're viewing" );
+			expect( speak ).not.toHaveBeenCalled();
 		} );
 
 		it( 'announces a change of intent, but not a repeat of the current one', () => {
