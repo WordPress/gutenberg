@@ -138,20 +138,18 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 								} );
 							} }
 						>
-							<Menu.Group>
-								{ SORTING_DIRECTIONS.map(
-									( direction: SortDirection ) => (
-										<Menu.RadioItem
-											key={ direction }
-											value={ direction }
-										>
-											<Menu.ItemLabel>
-												{ sortLabels[ direction ] }
-											</Menu.ItemLabel>
-										</Menu.RadioItem>
-									)
-								) }
-							</Menu.Group>
+							{ SORTING_DIRECTIONS.map(
+								( direction: SortDirection ) => (
+									<Menu.RadioItem
+										key={ direction }
+										value={ direction }
+									>
+										<Menu.ItemLabel>
+											{ sortLabels[ direction ] }
+										</Menu.ItemLabel>
+									</Menu.RadioItem>
+								)
+							) }
 						</Menu.RadioGroup>
 					) }
 					{ canAddFilter && (
