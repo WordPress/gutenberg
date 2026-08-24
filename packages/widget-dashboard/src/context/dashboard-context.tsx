@@ -207,6 +207,28 @@ export function WidgetDashboardProvider( {
 
 	const canPerform = useDashboardPolicy() ?? ALLOW_EVERY_OPERATION;
 
+	// Every mutation stages through here. Instances the policy locks against
+	// removal are re-asserted, so no composed trigger can drop them.
+	const stageLayout = useCallback(
+		( next: DashboardWidget[] ) => {
+			setStagingLayout( ( previous ) => {
+				const kept = previous.filter(
+					( widget ) =>
+						! next.some( ( { uuid } ) => uuid === widget.uuid ) &&
+						! canPerform( {
+							operation: 'remove',
+							widget,
+							widgetType: widgetTypes.find(
+								( type ) => type.name === widget.type
+							),
+						} )
+				);
+				return kept.length === 0 ? next : [ ...next, ...kept ];
+			} );
+		},
+		[ canPerform, widgetTypes ]
+	);
+
 	// External change in `layout` (consumer-side reset, cross-tab sync,
 	// websocket push, etc.) drops any in-flight staging edits without
 	// surfacing a warning. See the provider JSDoc for the trade-off.
@@ -297,7 +319,7 @@ export function WidgetDashboardProvider( {
 			widgetTypes,
 			isResolvingWidgetTypes,
 			layout: stagingLayout,
-			onLayoutChange: setStagingLayout,
+			onLayoutChange: stageLayout,
 			onLayoutReset,
 			gridSettings,
 			commit,
@@ -314,6 +336,7 @@ export function WidgetDashboardProvider( {
 			widgetTypes,
 			isResolvingWidgetTypes,
 			stagingLayout,
+			stageLayout,
 			onLayoutReset,
 			gridSettings,
 			commit,

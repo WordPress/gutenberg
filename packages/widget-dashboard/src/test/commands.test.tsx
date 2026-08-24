@@ -8,7 +8,14 @@ import { WidgetDashboard } from '../widget-dashboard';
 import { DASHBOARD_COMMAND_CONTEXT } from '../components/commands';
 import type { CanPerformDashboardOperation, DashboardWidget } from '../types';
 
-const widgetTypes: WidgetType[] = [];
+const widgetTypes: WidgetType[] = [
+	{
+		apiVersion: 1,
+		name: 'core/test',
+		title: 'Test',
+		renderModule: 'test-module',
+	},
+];
 
 const layout: DashboardWidget[] = [
 	{ uuid: 'a', type: 'core/test', placement: { width: 1, height: 1 } },

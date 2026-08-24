@@ -364,26 +364,18 @@ describe( 'WidgetDashboard.WidgetInserter', () => {
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'composes nested policies restrictively', async () => {
-			const user = userEvent.setup();
+		it( 'composes nested policies restrictively', () => {
 			render(
 				<WidgetDashboard.Policy canPerform={ welcomeOnly }>
 					<Harness canPerform={ notesOnly } />
 				</WidgetDashboard.Policy>
 			);
 
-			await user.click(
-				screen.getByRole( 'button', { name: 'Add widget' } )
-			);
-
-			const dialog = await screen.findByRole( 'dialog', {
-				name: 'Add widget',
-			} );
 			// The outer policy allows Welcome, the inner one Notes: neither
-			// survives both.
-			expect( within( dialog ).queryAllByRole( 'option' ) ).toHaveLength(
-				0
-			);
+			// survives both, so there is nothing to insert.
+			expect(
+				screen.queryByRole( 'button', { name: 'Add widget' } )
+			).not.toBeInTheDocument();
 		} );
 
 		it( 'lets an enclosing policy narrow an inner permissive one', async () => {
@@ -409,24 +401,19 @@ describe( 'WidgetDashboard.WidgetInserter', () => {
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'renders an empty listing when the policy denies every insert', async () => {
-			const user = userEvent.setup();
+		it( 'hides the Add widget trigger when the policy denies every insert', () => {
 			render(
 				<Harness
 					canPerform={ ( request ) => request.operation !== 'insert' }
 				/>
 			);
 
-			await user.click(
-				screen.getByRole( 'button', { name: 'Add widget' } )
-			);
-
-			const dialog = await screen.findByRole( 'dialog', {
-				name: 'Add widget',
-			} );
-			expect( within( dialog ).queryAllByRole( 'option' ) ).toHaveLength(
-				0
-			);
+			expect(
+				screen.queryByRole( 'button', { name: 'Add widget' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', { name: 'Done' } )
+			).toBeInTheDocument();
 		} );
 	} );
 } );

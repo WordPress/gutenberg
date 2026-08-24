@@ -1,6 +1,8 @@
 export { WidgetDashboard } from './widget-dashboard';
 export type {
 	CanPerformDashboardOperation,
+	DashboardInstanceOperation,
+	DashboardInstanceOperationRequest,
 	DashboardOperationRequest,
 	DashboardWidget,
 	WidgetGridSettings,

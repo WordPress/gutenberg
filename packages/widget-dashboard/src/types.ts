@@ -185,13 +185,30 @@ export type WidgetGridSettings =
 	| WidgetMasonryLayoutSettings;
 
 /**
+ * The operations that act on one placed widget.
+ */
+export type DashboardInstanceOperation = 'remove' | 'move' | 'resize' | 'edit';
+
+/**
+ * A request for an instance operation: the placed widget, and its type
+ * when registered.
+ */
+export interface DashboardInstanceOperationRequest {
+	operation: DashboardInstanceOperation;
+	widget: DashboardWidget;
+	widgetType?: WidgetType;
+}
+
+/**
  * An operation the dashboard asks permission for, with its subject.
  * `customize` is entering customize mode; `insert` is offering a widget
- * type in the inserter.
+ * type in the inserter; `remove`, `move`, `resize`, and `edit` act on a
+ * placed widget.
  */
 export type DashboardOperationRequest =
 	| { operation: 'customize' }
-	| { operation: 'insert'; widgetType: WidgetType };
+	| { operation: 'insert'; widgetType: WidgetType }
+	| DashboardInstanceOperationRequest;
 
 /**
  * Answers whether an operation is allowed. Return `true` for operations

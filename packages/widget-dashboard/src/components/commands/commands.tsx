@@ -21,10 +21,17 @@ type CommandCallback = ( options: { close: () => void } ) => void;
  * active command context so they surface under Suggestions by default.
  */
 export function Commands() {
-	const { editMode, onEditChange, onLayoutReset, canPerform } =
+	const { editMode, onEditChange, onLayoutReset, canPerform, widgetTypes } =
 		useDashboardInternalContext();
 
 	const canCustomize = canPerform( { operation: 'customize' } );
+	const canInsertAny = useMemo(
+		() =>
+			widgetTypes.some( ( widgetType ) =>
+				canPerform( { operation: 'insert', widgetType } )
+			),
+		[ widgetTypes, canPerform ]
+	);
 
 	const { setInserterOpen, setResetDialogOpen } = useDashboardUIContext();
 
@@ -81,7 +88,10 @@ export function Commands() {
 				context: DASHBOARD_COMMAND_CONTEXT,
 				keywords: [ __( 'widgets' ), __( 'inserter' ) ],
 				// Outside edit mode the command enters it first.
-				disabled: ! onEditChange || ( ! editMode && ! canCustomize ),
+				disabled:
+					! onEditChange ||
+					! canInsertAny ||
+					( ! editMode && ! canCustomize ),
 				callback: addWidgets,
 			},
 			{
@@ -99,6 +109,7 @@ export function Commands() {
 			onEditChange,
 			editMode,
 			canCustomize,
+			canInsertAny,
 			customize,
 			addWidgets,
 			onLayoutReset,
