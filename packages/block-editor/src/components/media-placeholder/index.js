@@ -4,7 +4,7 @@ import {
 	FormFileUpload,
 	Placeholder,
 	DropZone,
-	__experimentalInputControl as InputControl,
+	__experimentalInputControl as WCInputControl,
 	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 	withFilters,
 } from '@wordpress/components';
@@ -33,7 +33,7 @@ const InsertFromURLPopover = ( {
 			className="block-editor-media-placeholder__url-input-form"
 			onSubmit={ onSubmit }
 		>
-			<InputControl
+			<WCInputControl
 				label={ __( 'URL' ) }
 				type="text" // Use text instead of URL to allow relative paths (e.g., /image/image.jpg)
 				hideLabelFromVision

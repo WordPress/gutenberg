@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	ExternalLink,
 	Button,
-	__experimentalInputControl as InputControl,
+	__experimentalInputControl as WCInputControl,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 	__experimentalVStack as VStack,
@@ -101,7 +101,7 @@ export default function PostURL( { onClose } ) {
 				<div>
 					{ isEditable && (
 						<>
-							<InputControl
+							<WCInputControl
 								prefix={
 									<InputControlPrefixWrapper>
 										/
