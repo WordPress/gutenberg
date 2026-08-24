@@ -150,7 +150,7 @@ Command palette integration. It registers the dashboard's commands through `@wor
 
 #### `<WidgetDashboard.Policy>`
 
-Governs what users may do on the dashboards below it: whether Customize is offered, which widget types the inserter lists. Unlike the other compound components, it mounts around `<WidgetDashboard>`. See [Governance](#governance).
+Governs what users may do on the dashboards below it: whether Customize is offered, which widget types the inserter lists, and which instances can be removed, moved, resized, or edited. Unlike the other compound components, it mounts around `<WidgetDashboard>`. See [Governance](#governance).
 
 `<Page>` from `@wordpress/admin-ui` exposes an `actions` slot used across admin screens (DataViews, WidgetDashboard, …). Plug `Actions` straight into it:
 
@@ -193,10 +193,15 @@ type CanPerformDashboardOperation = (
 
 type DashboardOperationRequest =
 	| { operation: 'customize' }
-	| { operation: 'insert'; widgetType: WidgetType };
+	| { operation: 'insert'; widgetType: WidgetType }
+	| {
+			operation: 'remove' | 'move' | 'resize' | 'edit';
+			widget: DashboardWidget;
+			widgetType?: WidgetType;
+	  };
 ```
 
-Each request names the operation and carries its subject, so a branch on `request.operation` narrows the rest of the object:
+Each request names the operation and carries its subject, so a branch on `request.operation` narrows the rest of the object. Instance requests carry the placed widget and its type, absent when the type is not registered:
 
 ```tsx
 <WidgetDashboard.Policy
@@ -206,6 +211,8 @@ Each request names the operation and carries its subject, so a branch on `reques
 				return canEditLayout;
 			case 'insert':
 				return request.widgetType.category === activeSection;
+			case 'remove':
+				return ! request.widget.attributes?.pinned;
 			default:
 				return true;
 		}
@@ -215,10 +222,14 @@ Each request names the operation and carries its subject, so a branch on `reques
 </WidgetDashboard.Policy>
 ```
 
-| Operation   | Subject      | What it gates                                                                                                                                                                             |
-| ----------- | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `customize` | none         | The Customize button, the `core/dashboard/customize` command, the `core/dashboard/add-widgets` command outside edit mode, and the automatic entry into customize mode on an empty layout. |
-| `insert`    | `widgetType` | Whether the inserter offers the type. A rejected type stays out of the listing but keeps rendering where already placed.                                                                  |
+| Operation   | Subject                 | What it gates                                                                                                                                                                                     |
+| ----------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `customize` | none                    | The Customize button, the `core/dashboard/customize` command, the `core/dashboard/add-widgets` command outside edit mode, and the automatic entry into customize mode on an empty layout.         |
+| `insert`    | `widgetType`            | Whether the inserter offers the type; a rejected type keeps rendering where already placed. The Add widget button and command show only while some registered type is insertable.                 |
+| `remove`    | `widget`, `widgetType?` | The Remove control in customize mode. The staging layer re-asserts a locked instance dropped by any trigger.                                                                                      |
+| `move`      | `widget`, `widgetType?` | Dragging the tile in customize mode; a denied tile stays in place.                                                                                                                                |
+| `resize`    | `widget`, `widgetType?` | The resize handle and the width menu.                                                                                                                                                             |
+| `edit`      | `widget`, `widgetType?` | Attribute editing: the inline fields and the settings trigger in the header, the settings surface, and the widget's `setAttributes`, which is absent when denied so the widget renders read-only. |
 
 The engine resolves the policy once, in its provider, and every surface asks that resolved answer, so further sources join at the same point without touching the surfaces.
 
@@ -312,7 +323,7 @@ interface WidgetRenderProps< Item = unknown > {
 
 -   `DashboardWidget` — a placement of a widget on the dashboard. Carries `uuid`, `type`, `attributes`, `placement`.
 -   `WidgetGridSettings` — grid model configuration; see [Grid settings](#grid-settings).
--   `DashboardOperationRequest` / `CanPerformDashboardOperation` — the policy contract; see [Governance](#governance).
+-   `DashboardOperationRequest` / `CanPerformDashboardOperation` — the policy contract; see [Governance](#governance). `DashboardInstanceOperation` and `DashboardInstanceOperationRequest` name the per-instance half.
 
 The widget contract types (`WidgetName`, `WidgetType`, `WidgetRenderProps`, `ResolveWidgetModule`) are defined in `@wordpress/widget-primitives` and imported from there directly; this engine does not re-export them.
 
