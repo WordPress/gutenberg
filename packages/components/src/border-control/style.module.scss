@@ -4,6 +4,7 @@
 .border-control {
 	border: 0;
 	padding: 0;
+	margin: 0;
 	box-sizing: border-box;
 
 	*,
@@ -12,12 +13,6 @@
 		box-sizing: inherit;
 	}
 }
-
-/* Zero-specificity margin reset so consumers can override it with a plain class. */
-:where(.border-control) {
-	margin: 0;
-}
-
 .inner-wrapper {
 	height: 40px;
 
@@ -84,16 +79,6 @@
 .popover-controls {
 	/* $swatch-size * 6 + $swatch-gap * 5, matching $color-palette-circle-size. */
 	width: 228px;
-
-	> div:first-of-type > label {
-		margin-bottom: 0;
-	}
-
-	/* Raised specificity to stay ahead of the Emotion Button base styles. */
-	&#{&} label + button:not(:global(.has-text)) {
-		min-width: 24px;
-		padding: 0;
-	}
 }
 
 .reset-button-wrapper {

@@ -1,7 +1,9 @@
-/* Restores the gutter; a single class outranks BorderControl's :where() zero-specificity margin reset. */
 .linked-border-control {
-	flex: 1;
-	margin-inline-end: 24px;
+	/* Preserve the original `&&` specificity so this beats BorderControl's margin reset. */
+	&#{&} {
+		flex: 1;
+		margin-inline-end: 24px;
+	}
 }
 
 .wrapper {
