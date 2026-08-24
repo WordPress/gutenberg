@@ -1,22 +1,16 @@
-/**
- * WordPress dependencies
- */
-import { useMemo } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useEffect, useMemo } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import { processCSSNesting } from '@wordpress/global-styles-engine';
+import { store as noticesStore } from '@wordpress/notices';
 import { useBlockEditingMode } from '../components/block-editing-mode';
-
-/**
- * Internal dependencies
- */
 import InspectorControls from '../components/inspector-controls';
 import AdvancedPanel, {
 	validateCSS,
 } from '../components/global-styles/advanced-panel';
-import { cleanEmptyObject, useStyleOverride } from './utils';
+import { cleanEmptyObject, usePrivateStyleOverride } from './utils';
 import { store as blockEditorStore } from '../store';
 
 // Stable reference for useInstanceId.
@@ -69,6 +63,8 @@ function CustomCSSControl( { blockName, setAttributes, style } ) {
 	);
 }
 
+const CUSTOM_CSS_WARNING_NOTICE_ID = 'custom-css-edit-warning';
+
 function CustomCSSEdit( { clientId, name, setAttributes } ) {
 	const { style, canEditCSS } = useSelect(
 		( select ) => {
@@ -100,11 +96,12 @@ function CustomCSSEdit( { clientId, name, setAttributes } ) {
  * Hook to handle custom CSS for a block in the editor.
  * Generates a unique class and applies scoped CSS via style override.
  *
- * @param {Object} props       Block props.
- * @param {Object} props.style Block style attribute.
+ * @param {Object} props          Block props.
+ * @param {Object} props.style    Block style attribute.
+ * @param {string} props.clientId Block client ID.
  * @return {Object} Block props including className for custom CSS scoping.
  */
-function useBlockProps( { style } ) {
+function useBlockProps( { style, clientId } ) {
 	const customCSS = style?.css;
 
 	// Validate CSS is non-empty and passes validation checks.
@@ -112,6 +109,31 @@ function useBlockProps( { style } ) {
 		typeof customCSS === 'string' &&
 		customCSS.trim().length > 0 &&
 		validateCSS( customCSS );
+
+	const canEditCSS = useSelect(
+		( select ) => select( blockEditorStore ).getSettings().canEditCSS,
+		[]
+	);
+
+	const { createWarningNotice } = useDispatch( noticesStore );
+
+	// Show a warning notice when the user lacks edit_css and a block has
+	// custom CSS. The fixed notice ID ensures only one notice is shown
+	// regardless of how many blocks have CSS.
+	const hasCustomCSS = !! customCSS?.trim();
+	useEffect( () => {
+		if ( ! canEditCSS && hasCustomCSS ) {
+			createWarningNotice(
+				__(
+					'This post contains blocks with custom CSS. You do not have permission to edit CSS. If you save this post, the custom CSS will be removed.'
+				),
+				{
+					id: CUSTOM_CSS_WARNING_NOTICE_ID,
+					isDismissible: true,
+				}
+			);
+		}
+	}, [ canEditCSS, hasCustomCSS, createWarningNotice ] );
 
 	const customCSSIdentifier = useInstanceId(
 		CUSTOM_CSS_INSTANCE_REFERENCE,
@@ -129,8 +151,16 @@ function useBlockProps( { style } ) {
 		return processCSSNesting( customCSS, customCSSSelector );
 	}, [ customCSS, customCSSSelector, isValidCSS ] );
 
-	// Inject the CSS via style override.
-	useStyleOverride( { css: transformedCSS } );
+	// Inject the CSS via style override. The type makes EditorStyles print
+	// it after all other overrides (e.g. block style variations), matching
+	// the front end where the custom CSS stylesheet is printed last. The
+	// clientId keeps custom CSS overrides in block order relative to each
+	// other, which is the order they print in on the front end.
+	usePrivateStyleOverride( {
+		css: transformedCSS,
+		clientId,
+		__unstableType: 'custom-css',
+	} );
 
 	// Only add the class if there's valid custom CSS.
 	if ( ! isValidCSS ) {

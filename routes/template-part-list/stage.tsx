@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useParams,
 	useNavigate,
@@ -25,25 +22,18 @@ import { useMemo, useCallback, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import type { WpTemplatePart } from '@wordpress/core-data';
 import { CreateTemplatePartModal } from '@wordpress/fields';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../lock-unlock';
+import { unlock } from '@wordpress/routes-lock-unlock';
 import {
 	DEFAULT_VIEW,
 	getActiveViewOverridesForTab,
 	DEFAULT_VIEWS,
-	DEFAULT_LAYOUTS,
 	viewToQuery,
 } from './view-utils';
 import { previewField } from './fields/preview';
-
 // Unlock WordPress private APIs
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { Tabs } = unlock( componentsPrivateApis );
-
 /**
  * Style dependencies
  */
@@ -250,6 +240,7 @@ function TemplatePartList() {
 	return (
 		<Page
 			title={ postTypeObject.labels?.name }
+			headingLevel={ 2 }
 			subTitle={ postTypeObject.labels?.description }
 			className="template-part-page"
 			actions={
@@ -298,7 +289,6 @@ function TemplatePartList() {
 					totalItems,
 					totalPages,
 				} }
-				defaultLayouts={ DEFAULT_LAYOUTS }
 				getItemId={ getItemId }
 				selection={ selection }
 				onReset={ isModified ? onReset : false }

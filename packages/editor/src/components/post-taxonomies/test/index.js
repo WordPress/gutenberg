@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { select } from '@wordpress/data';
-import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
+import { store as editorStore } from '@wordpress/editor';
 import PostTaxonomies from '../';
 
 describe( 'PostTaxonomies', () => {

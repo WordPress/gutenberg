@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useCallback } from '@wordpress/element';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';

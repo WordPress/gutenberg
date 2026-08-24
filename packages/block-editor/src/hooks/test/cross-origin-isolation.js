@@ -1,7 +1,3 @@
-/**
- * @jest-environment jsdom
- */
-
 describe( 'cross-origin-isolation', () => {
 	let originalCrossOriginIsolated;
 	let originalBody;

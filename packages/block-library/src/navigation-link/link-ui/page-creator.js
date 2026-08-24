@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	TextControl,
@@ -15,10 +12,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DialogWrapper from './dialog-wrapper';
 
 /**
@@ -103,7 +96,7 @@ export function LinkUIPageCreator( {
 
 				onPageCreated( pageLink );
 			}
-		} catch ( error ) {
+		} catch {
 			// Show error notice
 			createErrorNotice(
 				__( 'Failed to create page. Please try again.' ),
@@ -128,7 +121,6 @@ export function LinkUIPageCreator( {
 				<form onSubmit={ createPage }>
 					<VStack spacing={ 4 }>
 						<TextControl
-							__next40pxDefaultSize
 							label={ __( 'Title' ) }
 							onChange={ setTitle }
 							placeholder={ __( 'No title' ) }

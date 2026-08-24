@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { kebabToCamelCase, withScope } from '../utils';
 import { setScope, getScope, resetScope, type Scope } from '../scopes';
 import { setNamespace, getNamespace, resetNamespace } from '../namespaces';
@@ -196,7 +193,7 @@ describe( 'Interactivity API', () => {
 						namespace: getNamespace(),
 					} );
 					a = yield Promise.reject( new Error( 'CatchMe' ) );
-				} catch ( e ) {
+				} catch {
 					steps.push( {
 						scope: getScope(),
 						namespace: getNamespace(),

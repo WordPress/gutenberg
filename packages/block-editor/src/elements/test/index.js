@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalGetElementClassName } from '@wordpress/block-editor';
 
 describe( 'element class names', () => {

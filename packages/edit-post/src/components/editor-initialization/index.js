@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { useUpdatePostLinkListener } from './listener-hooks';
 
 /**

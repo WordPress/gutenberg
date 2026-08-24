@@ -1,11 +1,3 @@
-/**
- * External dependencies
- */
-const path = require( 'path' );
-
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const createPages = async ( requestUtils ) => {
@@ -27,6 +19,12 @@ test.describe( 'Page List', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
+	test.beforeEach( async ( { admin, page } ) => {
+		// Go to the pages page, as it has the list layout enabled by default.
+		await admin.visitSiteEditor();
+		await page.getByRole( 'button', { name: 'Pages' } ).click();
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		// Go back to the default theme.
 		await Promise.all( [
@@ -34,12 +32,6 @@ test.describe( 'Page List', () => {
 			requestUtils.deleteAllPages(),
 			requestUtils.deleteAllMedia(),
 		] );
-	} );
-
-	test.beforeEach( async ( { admin, page } ) => {
-		// Go to the pages page, as it has the list layout enabled by default.
-		await admin.visitSiteEditor();
-		await page.getByRole( 'button', { name: 'Pages' } ).click();
 	} );
 
 	test( 'Persists filter/search when switching layout', async ( {
@@ -74,10 +66,8 @@ test.describe( 'Page List', () => {
 					} );
 					await placeholder.click();
 					const mediaLibrary = page.getByRole( 'dialog' );
-					const TEST_IMAGE_FILE_PATH = path.resolve(
-						__dirname,
-						'../../assets/10x10_e2e_test_image_z9T8jK.png'
-					);
+					const TEST_IMAGE_FILE_PATH =
+						'./assets/10x10_e2e_test_image_z9T8jK.png';
 
 					const fileChooserPromise =
 						page.waitForEvent( 'filechooser' );
@@ -370,6 +360,10 @@ test.describe( 'Page List', () => {
 			await row.getByRole( 'button', { name: 'Quick Edit' } ).click();
 		} );
 
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllUsers();
+		} );
+
 		Object.entries( fields ).forEach(
 			( [
 				key,
@@ -481,8 +475,89 @@ test.describe( 'Page List', () => {
 		// 	}
 		// } );
 
-		test.afterAll( async ( { requestUtils } ) => {
-			await requestUtils.deleteAllUsers();
+		test.describe( 'Field trigger', () => {
+			const getStatusField = ( page ) => {
+				const editButton = page.getByRole( 'button', {
+					name: 'Edit Status',
+				} );
+				return { editButton, row: editButton.locator( '..' ) };
+			};
+
+			test( 'opens the flyout when clicking anywhere on the row', async ( {
+				page,
+			} ) => {
+				const { editButton, row } = getStatusField( page );
+				const box = await row.boundingBox();
+
+				// Click the value area, away from the edit button.
+				await page.mouse.click(
+					box.x + box.width * 0.5,
+					box.y + box.height / 2
+				);
+
+				await expect(
+					page.getByRole( 'radio', { name: 'Draft' } )
+				).toBeVisible();
+				await expect( editButton ).toHaveAttribute(
+					'aria-expanded',
+					'true'
+				);
+			} );
+
+			test( 'returns focus to the edit button when the flyout is dismissed', async ( {
+				page,
+			} ) => {
+				const { editButton, row } = getStatusField( page );
+				const box = await row.boundingBox();
+				await page.mouse.click(
+					box.x + box.width * 0.5,
+					box.y + box.height / 2
+				);
+				await expect(
+					page.getByRole( 'radio', { name: 'Draft' } )
+				).toBeVisible();
+
+				await page.keyboard.press( 'Escape' );
+
+				await expect(
+					page.getByRole( 'radio', { name: 'Draft' } )
+				).toBeHidden();
+				await expect( editButton ).toBeFocused();
+
+				// Focus landing back on the trigger is what lets the field be
+				// reopened from the keyboard.
+				await page.keyboard.press( 'Enter' );
+				await expect(
+					page.getByRole( 'radio', { name: 'Draft' } )
+				).toBeVisible();
+			} );
+
+			test( 'keeps the flyout usable after double-clicking a field row', async ( {
+				page,
+			} ) => {
+				const { row } = getStatusField( page );
+				const box = await row.boundingBox();
+				const x = box.x + box.width * 0.5;
+				const y = box.y + box.height / 2;
+
+				// A double click used to leave a text selection behind, which
+				// made every later click on a row a no-op. See #79348. It now
+				// toggles the flyout twice, leaving it closed.
+				await page.mouse.dblclick( x, y );
+				await expect(
+					page.getByRole( 'radio', { name: 'Draft' } )
+				).toBeHidden();
+
+				const dateEditButton = page.getByRole( 'button', {
+					name: 'Edit Date',
+				} );
+				await dateEditButton.click();
+
+				await expect( dateEditButton ).toHaveAttribute(
+					'aria-expanded',
+					'true'
+				);
+			} );
 		} );
 	} );
 

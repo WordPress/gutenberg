@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { css } from '@emotion/react';
 
 export const boxSizingReset = css`

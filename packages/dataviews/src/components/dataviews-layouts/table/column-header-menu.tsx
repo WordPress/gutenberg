@@ -1,23 +1,12 @@
-/**
- * External dependencies
- */
 import type { ReactNode, Ref, PropsWithoutRef, RefAttributes } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { __, isRTL } from '@wordpress/i18n';
 import { arrowLeft, arrowRight, unseen, funnel } from '@wordpress/icons';
 import {
 	Button,
-	Icon,
+	Icon as WCIcon,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { forwardRef, Children, Fragment, useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../../lock-unlock';
 import { SORTING_DIRECTIONS, sortArrows, sortLabels } from '../../../constants';
 import type {
@@ -181,7 +170,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 					{ canAddFilter && (
 						<Menu.Group>
 							<Menu.Item
-								prefix={ <Icon icon={ funnel } /> }
+								prefix={ <WCIcon icon={ funnel } /> }
 								onClick={ () => {
 									setOpenedFilter( fieldId );
 									setIsShowingFilter( true );
@@ -209,7 +198,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 						<Menu.Group>
 							{ canMove && (
 								<Menu.Item
-									prefix={ <Icon icon={ arrowLeft } /> }
+									prefix={ <WCIcon icon={ arrowLeft } /> }
 									disabled={
 										isRtl
 											? index >=
@@ -243,7 +232,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 							) }
 							{ canMove && (
 								<Menu.Item
-									prefix={ <Icon icon={ arrowRight } /> }
+									prefix={ <WCIcon icon={ arrowRight } /> }
 									disabled={
 										isRtl
 											? index < 1
@@ -357,7 +346,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 							) }
 							{ isHidable && field && (
 								<Menu.Item
-									prefix={ <Icon icon={ unseen } /> }
+									prefix={ <WCIcon icon={ unseen } /> }
 									onClick={ () => {
 										onHide( field );
 										onChangeView( {

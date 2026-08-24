@@ -1,10 +1,6 @@
 /**
  * Defines an extensibility slot for the Template sidebar.
  */
-
-/**
- * WordPress dependencies
- */
 import { store as editorStore } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
 import { createSlotFill } from '@wordpress/components';

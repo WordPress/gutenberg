@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 
 test.describe( 'toVdom - islands', () => {
@@ -8,9 +5,11 @@ test.describe( 'toVdom - islands', () => {
 		await utils.activatePlugins();
 		await utils.addPostWithBlock( 'test/tovdom-islands' );
 	} );
+
 	test.beforeEach( async ( { interactivityUtils: utils, page } ) => {
 		await page.goto( utils.getLink( 'test/tovdom-islands' ) );
 	} );
+
 	test.afterAll( async ( { interactivityUtils: utils } ) => {
 		await utils.deactivatePlugins();
 		await utils.deleteAllPosts();

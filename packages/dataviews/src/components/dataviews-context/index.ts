@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import type { ComponentProps, ReactElement, ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { createContext, createRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type {
 	View,
 	Action,
 	NormalizedField,
-	SupportedLayouts,
+	NormalizedSupportedLayouts,
 	NormalizedFilter,
 } from '../../types';
 import type { SetSelection } from '../../types/private';
@@ -50,7 +39,7 @@ type DataViewsContextType< Item > = {
 	resizeObserverRef:
 		| ( ( element?: HTMLDivElement | null ) => void )
 		| React.RefObject< HTMLDivElement >;
-	defaultLayouts: SupportedLayouts;
+	defaultLayouts: NormalizedSupportedLayouts;
 	filters: NormalizedFilter[];
 	isShowingFilter: boolean;
 	setIsShowingFilter: ( value: boolean ) => void;

@@ -1,19 +1,9 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import SearchControl from '..';
 
 const meta: Meta< typeof SearchControl > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Selection & Input/Common/SearchControl',
 	id: 'components-searchcontrol',
 	component: SearchControl,
@@ -25,7 +15,7 @@ const meta: Meta< typeof SearchControl > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 			notes: 'Will be superseded by `SearchControl` in `@wordpress/ui`, but continue using for now.',
 		},

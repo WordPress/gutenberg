@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { addFilter, removeAllFilters, removeFilter } from '@wordpress/hooks';
 import { logged } from '@wordpress/deprecated';
 import { select, dispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import {
 	registerBlockType,
 	registerBlockCollection,

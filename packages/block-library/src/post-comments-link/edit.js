@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useBlockProps } from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';

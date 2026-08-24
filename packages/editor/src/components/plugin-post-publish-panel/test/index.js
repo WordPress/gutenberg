@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { SlotFillProvider } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import PluginPostPublishPanel from '../';
 
 describe( 'PluginPostPublishPanel', () => {

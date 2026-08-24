@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { close, Icon } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { getColorClassName } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import OverlayMenuIcon from './overlay-menu-icon';
 import { createTemplatePartId } from '../../template-part/edit/utils/create-template-part-id';
 

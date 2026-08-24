@@ -1,15 +1,14 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Templates', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
+
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 	} );
+
 	test( 'Create a custom template', async ( { admin, page } ) => {
 		const templateName = 'demo';
 		await admin.visitSiteEditor();

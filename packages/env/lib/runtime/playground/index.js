@@ -1,21 +1,9 @@
 'use strict';
-
-/**
- * External dependencies
- */
 const fs = require( 'fs' ).promises;
 const http = require( 'http' );
 const path = require( 'path' );
 const spawn = require( 'cross-spawn' );
-
-/**
- * Promisified dependencies
- */
 const { rimraf } = require( 'rimraf' );
-
-/**
- * Internal dependencies
- */
 const { buildBlueprint, getMountArgs } = require( './blueprint-builder' );
 const { UnsupportedCommandError } = require( '../errors' );
 const { downloadSource } = require( '../../download-sources' );
@@ -327,7 +315,7 @@ class PlaygroundRuntime {
 			try {
 				const pidContent = await fs.readFile( pidFile, 'utf8' );
 				pid = parseInt( pidContent.trim(), 10 );
-			} catch ( error ) {
+			} catch {
 				// PID file doesn't exist or can't be read
 				spinner.text = 'Stopped WordPress Playground.';
 				return;
@@ -350,7 +338,7 @@ class PlaygroundRuntime {
 				} catch {
 					// Process group already terminated
 				}
-			} catch ( error ) {
+			} catch {
 				// Process group doesn't exist or already terminated
 			}
 

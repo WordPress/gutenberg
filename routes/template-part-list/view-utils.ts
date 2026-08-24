@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { loadView } from '@wordpress/views';
 import type { View, Filter } from '@wordpress/dataviews';
 
@@ -20,12 +17,6 @@ export const DEFAULT_VIEW: View = {
 	fields: [],
 	titleField: 'title',
 	mediaField: 'preview',
-};
-
-export const DEFAULT_LAYOUTS = {
-	table: {},
-	grid: {},
-	list: {},
 };
 
 export const DEFAULT_VIEWS: {

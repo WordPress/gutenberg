@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { Heading } from '..';
 
 const meta: Meta< typeof Heading > = {
@@ -32,7 +25,7 @@ const meta: Meta< typeof Heading > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Values are not aligned with the current design system. Use [typography tokens](?path=/docs/tokens-typography--page) from `@wordpress/base-styles` instead.',
+			notes: 'Use [`Text`](?path=/docs/design-system-components-text--docs) from `@wordpress/ui` instead, with the `render` prop set to the heading level element and the variant set to the visual heading size (e.g. `<Text render={ <h1 /> } variant="heading-2xl">`).',
 		},
 	},
 };

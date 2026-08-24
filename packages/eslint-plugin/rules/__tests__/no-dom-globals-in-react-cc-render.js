@@ -1,18 +1,13 @@
-/**
- * External dependencies
- */
 import { RuleTester } from 'eslint';
-
-/**
- * Internal dependencies
- */
 import rule from '../no-dom-globals-in-react-cc-render';
 
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		ecmaVersion: 2020,
 		sourceType: 'module',
-		ecmaFeatures: { jsx: true },
+		parserOptions: {
+			ecmaFeatures: { jsx: true },
+		},
 	},
 } );
 
@@ -52,11 +47,13 @@ ruleTester.run( 'no-dom-globals-in-react-cc-render', rule, {
 
 // TypeScript-specific tests for shouldSkipReference.
 const tsRuleTester = new RuleTester( {
-	parser: require.resolve( '@typescript-eslint/parser' ),
-	parserOptions: {
+	languageOptions: {
+		parser: require( '@typescript-eslint/parser' ),
 		ecmaVersion: 2020,
 		sourceType: 'module',
-		ecmaFeatures: { jsx: true },
+		parserOptions: {
+			ecmaFeatures: { jsx: true },
+		},
 	},
 } );
 

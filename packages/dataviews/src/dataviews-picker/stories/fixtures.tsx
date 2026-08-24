@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { image, Icon, category } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { Field } from '../../types';
 
 export type SpaceObject = {

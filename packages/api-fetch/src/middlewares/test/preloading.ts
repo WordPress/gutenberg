@@ -1,8 +1,8 @@
-/**
- * Internal dependencies
- */
 import type { FetchHandler } from '../../types';
-import createPreloadingMiddleware from '../preloading';
+import createPreloadingMiddleware, {
+	CLEAR,
+	ENABLE_MULTI_USE,
+} from '../preloading';
 
 describe( 'Preloading Middleware', () => {
 	describe( 'given preloaded data', () => {
@@ -57,6 +57,40 @@ describe( 'Preloading Middleware', () => {
 					preloadingMiddleware( requestOptions, nextSpy );
 					expect( nextSpy ).toHaveBeenCalled();
 				} );
+
+				it( 'keeps returning the preloaded data when multi-use is enabled', async () => {
+					const body = {
+						status: 'this is the preloaded response',
+					};
+					const preloadedData = {
+						'wp/v2/posts': { body },
+					};
+					const preloadingMiddleware =
+						createPreloadingMiddleware( preloadedData );
+					( preloadingMiddleware as any )[ ENABLE_MULTI_USE ]();
+
+					const requestOptions = {
+						method: 'GET',
+						path: 'wp/v2/posts',
+					};
+					const nextSpy = jest.fn();
+
+					await expect(
+						preloadingMiddleware( requestOptions, nextSpy )
+					).resolves.toEqual( body );
+					await expect(
+						preloadingMiddleware( requestOptions, nextSpy )
+					).resolves.toEqual( body );
+					expect( nextSpy ).not.toHaveBeenCalled();
+
+					// `CLEAR` is the explicit boundary at which
+					// subsequent requests should fall through. It also
+					// logs whether anything went unconsumed.
+					( preloadingMiddleware as any )[ CLEAR ]();
+					expect( console ).toHaveLogged();
+					preloadingMiddleware( requestOptions, nextSpy );
+					expect( nextSpy ).toHaveBeenCalled();
+				} );
 			} );
 
 			describe( 'and the OPTIONS request has a parse flag', () => {
@@ -64,12 +98,12 @@ describe( 'Preloading Middleware', () => {
 					const noResponseMock =
 						'undefined' === typeof window.Response;
 					if ( noResponseMock ) {
-						// @ts-expect-error
+						// @ts-expect-error The stub does not implement the full `Response` static side.
 						window.Response = class {
 							constructor( body, options ) {
-								// @ts-expect-error
+								// @ts-expect-error `body` is not a declared property on the stub.
 								this.body = JSON.parse( body );
-								// @ts-expect-error
+								// @ts-expect-error `headers` is not a declared property on the stub.
 								this.headers = options.headers;
 							}
 						};
@@ -104,7 +138,7 @@ describe( 'Preloading Middleware', () => {
 						async () => {}
 					);
 					if ( noResponseMock ) {
-						// @ts-expect-error
+						// @ts-expect-error The operand of `delete` must be optional.
 						delete window.Response;
 					}
 					return response.then( ( value ) => {

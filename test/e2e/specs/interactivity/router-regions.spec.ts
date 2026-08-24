@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { type Locator } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 
 test.describe( 'Router regions', () => {
@@ -500,7 +493,7 @@ test.describe( 'Router regions', () => {
 		await expect( region1 ).toHaveAttribute( 'data-tag', 'region-1' );
 	} );
 
-	test( 'should be preserved on first navigation with `data-wp-key` and other directives ', async ( {
+	test( 'should be preserved on first navigation with `data-wp-key` and other directives', async ( {
 		page,
 	} ) => {
 		const region2 = page.getByTestId( 'region-2' );

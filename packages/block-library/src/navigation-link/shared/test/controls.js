@@ -1,15 +1,4 @@
-/**
- * @jest-environment jsdom
- */
-
-/**
- * External dependencies
- */
 import { render, screen, fireEvent } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import { Controls } from '../controls';
 
 // Mock the updateAttributes function

@@ -1,8 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
 import {
 	BlockControls,
 	MediaReplaceFlow,
@@ -11,15 +7,12 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { MenuItem } from '@wordpress/components';
-import { link } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
+import { MenuItem, ToolbarButton } from '@wordpress/components';
+import { crop, link } from '@wordpress/icons';
 import { ALLOWED_MEDIA_TYPES, EMBED_VIDEO_BACKGROUND_TYPE } from '../shared';
 import { unlock } from '../../lock-unlock';
 import EmbedVideoUrlInput from './embed-video-url-input';
+import { getAllowedVideoProviders } from '../embed-video-utils';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
@@ -31,6 +24,10 @@ export default function CoverBlockControls( {
 	toggleUseFeaturedImage,
 	onClearMedia,
 	onSelectEmbedUrl,
+	onEditMedia,
+	editMediaButtonRef,
+	showEditMediaButton,
+	isEditMediaDisabled,
 	blockEditingMode,
 } ) {
 	const {
@@ -40,8 +37,14 @@ export default function CoverBlockControls( {
 		minHeight,
 		minHeightUnit,
 		backgroundType,
+		allowedVideoProviders,
 	} = attributes;
 	const { hasInnerBlocks, url } = currentSettings;
+
+	const filteredVideoProviders = getAllowedVideoProviders(
+		allowedVideoProviders
+	);
+	const hasAllowedVideoProviders = filteredVideoProviders.length > 0;
 
 	const [ prevMinHeightValue, setPrevMinHeightValue ] = useState( minHeight );
 	const [ prevMinHeightUnit, setPrevMinHeightUnit ] =
@@ -106,6 +109,19 @@ export default function CoverBlockControls( {
 						onToggle={ toggleMinFullHeight }
 						isDisabled={ ! hasInnerBlocks }
 					/>
+					{ showEditMediaButton && (
+						<ToolbarButton
+							ref={ editMediaButtonRef }
+							icon={ crop }
+							label={ __( 'Edit image' ) }
+							onClick={ onEditMedia }
+							aria-haspopup="dialog"
+							// Disable rather than hide while the edited image
+							// loads, so the button keeps focus when the modal
+							// closes instead of dropping it to the canvas.
+							disabled={ isEditMediaDisabled }
+						/>
+					) }
 				</BlockControls>
 			) }
 			<BlockControls group="other">
@@ -120,17 +136,19 @@ export default function CoverBlockControls( {
 					onReset={ onClearMedia }
 					variant="toolbar"
 				>
-					{ ( { onClose } ) => (
-						<MenuItem
-							icon={ link }
-							onClick={ () => {
-								setIsEmbedUrlInputOpen( true );
-								onClose();
-							} }
-						>
-							{ __( 'Embed video from URL' ) }
-						</MenuItem>
-					) }
+					{ ( { onClose } ) =>
+						hasAllowedVideoProviders ? (
+							<MenuItem
+								icon={ link }
+								onClick={ () => {
+									setIsEmbedUrlInputOpen( true );
+									onClose();
+								} }
+							>
+								{ __( 'Embed video from URL' ) }
+							</MenuItem>
+						) : null
+					}
 				</MediaReplaceFlow>
 			</BlockControls>
 			{ isEmbedUrlInputOpen && (
@@ -144,6 +162,7 @@ export default function CoverBlockControls( {
 							? url
 							: ''
 					}
+					allowedVideoProviders={ filteredVideoProviders }
 				/>
 			) }
 		</>

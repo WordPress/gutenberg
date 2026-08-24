@@ -1,14 +1,22 @@
 import { createContext } from '@wordpress/element';
-import type { RootProps } from './types';
 
-type Intent = NonNullable< RootProps[ 'intent' ] >;
+type Phase = 'idle' | 'pending' | 'closing';
 
 interface AlertDialogContextValue {
-	intent: Intent;
+	phase: Phase;
+	showSpinner: boolean;
+	errorMessage?: string;
+	confirm: () => Promise< void >;
 }
 
+const noop = async () => {};
+
 const AlertDialogContext = createContext< AlertDialogContextValue >( {
-	intent: 'default',
+	phase: 'idle',
+	showSpinner: false,
+	errorMessage: undefined,
+	confirm: noop,
 } );
 
 export { AlertDialogContext };
+export type { Phase };

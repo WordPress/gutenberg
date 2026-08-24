@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import {
 	getListViewDropTarget,
 	NESTING_LEVEL_INDENTATION,

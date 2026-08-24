@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getQueriedItems } from '../selectors';
 import { getMergedItemIds } from '../reducer';
 
@@ -262,7 +259,11 @@ describe( 'getQueriedItems', () => {
 			},
 		};
 
-		const result = getQueriedItems( state, { per_page: 3 } );
+		const result = getQueriedItems(
+			state,
+			{ per_page: 3 },
+			{ supportsPagination: true }
+		);
 		expect( result ).toBe( null );
 	} );
 
@@ -296,10 +297,11 @@ describe( 'getQueriedItems', () => {
 			},
 		};
 
-		const result = getQueriedItems( state, {
-			per_page: 50,
-			offset: 100,
-		} );
+		const result = getQueriedItems(
+			state,
+			{ per_page: 50, offset: 100 },
+			{ supportsPagination: true }
+		);
 		expect( result ).toEqual( [ { id: 101 }, { id: 102 }, { id: 103 } ] );
 	} );
 
@@ -329,10 +331,11 @@ describe( 'getQueriedItems', () => {
 			},
 		};
 
-		const result = getQueriedItems( state, {
-			per_page: 50,
-			offset: 50,
-		} );
+		const result = getQueriedItems(
+			state,
+			{ per_page: 50, offset: 50 },
+			{ supportsPagination: true }
+		);
 		expect( result ).toBe( null );
 	} );
 
@@ -366,10 +369,11 @@ describe( 'getQueriedItems', () => {
 			},
 		};
 
-		const result = getQueriedItems( state, {
-			per_page: 10,
-			offset: 3,
-		} );
+		const result = getQueriedItems(
+			state,
+			{ per_page: 10, offset: 3 },
+			{ supportsPagination: true }
+		);
 		expect( result ).toBe( null );
 	} );
 
@@ -398,10 +402,11 @@ describe( 'getQueriedItems', () => {
 		};
 
 		// 2 items stored, but 5 total exist — should return null.
-		const result = getQueriedItems( state, {
-			per_page: 3,
-			offset: 0,
-		} );
+		const result = getQueriedItems(
+			state,
+			{ per_page: 3, offset: 0 },
+			{ supportsPagination: true }
+		);
 		expect( result ).toBe( null );
 	} );
 
@@ -429,10 +434,11 @@ describe( 'getQueriedItems', () => {
 			},
 		};
 
-		const result = getQueriedItems( state, {
-			per_page: 7,
-			offset: 84,
-		} );
+		const result = getQueriedItems(
+			state,
+			{ per_page: 7, offset: 84 },
+			{ supportsPagination: true }
+		);
 		expect( result ).toEqual( [] );
 	} );
 } );

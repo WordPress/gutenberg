@@ -10,6 +10,8 @@
 		// Use opacity to work in various editor styles.
 		// We don't specify the color here, because blocks or editor styles might provide their own.
 		opacity: 0.62;
+		// Reset the text shadow from the global styles.
+		text-shadow: none;
 	}
 
 	&:focus {

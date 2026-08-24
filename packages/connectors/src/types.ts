@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
 
 export type ApiKeySource = 'env' | 'constant' | 'database' | 'none';
@@ -13,11 +10,18 @@ export type ConnectorAuthentication =
 			keySource?: ApiKeySource;
 			isConnected?: boolean;
 	  }
+	| {
+			method: 'application_password';
+			settingName: string;
+			credentialsUrl: string | null;
+			keySource?: ApiKeySource;
+			isConnected?: boolean;
+	  }
 	| { method: 'none' };
 
 export interface ConnectorPlugin {
-	slug: string;
-	pluginFile?: string | null;
+	file: string;
+	isInstalled: boolean;
 	isActivated: boolean;
 }
 

@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	ToolbarButton,
-	ToolbarGroup,
-	VisuallyHidden,
-} from '@wordpress/components';
+import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import {
@@ -26,12 +15,9 @@ import {
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
+import { VisuallyHidden } from '@wordpress/ui';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { useMergeRefs, useInstanceId } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { getColors } from '../navigation/edit/utils';
 import {
 	Controls,
@@ -177,6 +163,7 @@ export default function NavigationLinkEdit( {
 		clientId,
 		attributes,
 		setAttributes,
+		allowTextUpdate: true,
 	} );
 
 	const [ isInvalid, isDraft ] = useIsInvalidLink(
@@ -340,7 +327,6 @@ export default function NavigationLinkEdit( {
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
-			...blockProps,
 			className: 'remove-outline', // Remove the outline from the inner blocks container.
 		},
 		{
@@ -428,12 +414,15 @@ export default function NavigationLinkEdit( {
 										}
 										onMerge={ mergeBlocks }
 										onReplace={ onReplace }
-										__unstableOnSplitAtEnd={ () =>
-											insertBlocksAfter(
-												createBlock(
-													'core/navigation-link'
-												)
-											)
+										__unstableOnSplitAtEnd={
+											insertBlocksAfter
+												? () =>
+														insertBlocksAfter(
+															createBlock(
+																'core/navigation-link'
+															)
+														)
+												: undefined
 										}
 										aria-label={ __(
 											'Navigation link text'
@@ -473,7 +462,8 @@ export default function NavigationLinkEdit( {
 								// If there is no link and no binding, remove the auto-inserted block.
 								// This avoids empty blocks which can provided a poor UX.
 								// Don't remove if binding exists (even if entity is unavailable) so user can fix it.
-								if ( ! url && ! hasUrlBinding ) {
+								// `onReplace` is undefined when the block can't be removed.
+								if ( ! url && ! hasUrlBinding && onReplace ) {
 									onReplace( [] );
 									return;
 								}

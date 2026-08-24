@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { URLInput } from '../';
 import LinkControlSearchResults from './search-results';
 import { CREATE_TYPE } from './constants';
@@ -99,7 +92,7 @@ const LinkControlSearchInput = forwardRef(
 					if ( suggestion?.url ) {
 						onSelect( suggestion );
 					}
-				} catch ( e ) {}
+				} catch {}
 				return;
 			}
 

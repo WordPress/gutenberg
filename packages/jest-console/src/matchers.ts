@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import { matcherHint, printExpected, printReceived } from 'jest-matcher-utils';
-
-/**
- * Internal dependencies
- */
-import supportedMatchers from './supported-matchers';
 import type { Mock } from 'jest-mock';
+import supportedMatchers from './supported-matchers';
 import type {
 	ExtendedMock,
 	MatcherFunction,

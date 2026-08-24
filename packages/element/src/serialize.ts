@@ -24,25 +24,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
-/**
- * External dependencies
- */
 import { isPlainObject } from 'is-plain-object';
 import { paramCase as kebabCase } from 'change-case';
-
-/**
- * WordPress dependencies
- */
 import {
 	escapeHTML,
 	escapeAttribute,
 	isValidAttributeName,
 } from '@wordpress/escape-html';
-
-/**
- * Internal dependencies
- */
 import { createContext, Fragment, StrictMode, forwardRef } from './react';
 import RawHTML from './raw-html';
 

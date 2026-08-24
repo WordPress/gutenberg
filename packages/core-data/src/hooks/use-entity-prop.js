@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useContext } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { STORE_NAME } from '../name';
 import { DEFAULT_ENTITY_KEY } from '../entities';
 import { EntityContext } from '../entity-context';
@@ -64,7 +57,7 @@ export default function useEntityProp( kind, name, prop, _id ) {
 				);
 				return revision
 					? {
-							value: revision[ prop ],
+							value: revision[ prop ]?.raw ?? revision[ prop ],
 							fullValue: revision[ prop ],
 					  }
 					: {};

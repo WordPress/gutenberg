@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import deepFreeze from 'deep-freeze';
-
-/**
- * Internal dependencies
- */
 import plugin, { createPersistenceInterface, withLazySameState } from '../';
 import objectStorage from '../storage/object';
 import { createRegistry } from '../../../';

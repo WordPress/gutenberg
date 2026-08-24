@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import {
 	registerBlockType,
 	unregisterBlockType,
 	getBlockTypes,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import Edit from '../edit';
 import { BlockContextProvider } from '../../block-context';
 

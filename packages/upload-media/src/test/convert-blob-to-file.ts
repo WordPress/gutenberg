@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { convertBlobToFile } from '../utils';
 
 describe( 'convertBlobToFile', () => {

@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
-import { __experimentalHStack as HStack } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { store as coreStore } from '@wordpress/core-data';
 import { check } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import SaveButton from '../save-button';
 import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 
@@ -28,15 +21,15 @@ export default function SaveHub() {
 		};
 	}, [] );
 	return (
-		<HStack className="edit-site-save-hub" alignment="right" spacing={ 4 }>
+		<Stack className="edit-site-save-hub" gap="lg">
 			<SaveButton
 				className="edit-site-save-hub__button"
-				variant={ isDisabled ? null : 'primary' }
+				variant={ isDisabled && ! isSaving ? null : 'primary' }
 				showTooltip={ false }
 				icon={ isDisabled && ! isSaving ? check : null }
 				showReviewMessage
 				__next40pxDefaultSize
 			/>
-		</HStack>
+		</Stack>
 	);
 }

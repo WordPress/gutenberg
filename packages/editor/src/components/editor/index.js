@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { TEMPLATE_POST_TYPE } from '../../store/constants';
 import EditorInterface from '../editor-interface';
@@ -25,6 +18,7 @@ function Editor( {
 	settings,
 	children,
 	initialEdits,
+	initialViewport,
 
 	// This could be part of the settings.
 	onActionPerformed,
@@ -114,6 +108,7 @@ function Editor( {
 					__unstableTemplate={ template }
 					settings={ settings }
 					initialEdits={ initialEdits }
+					initialViewport={ initialViewport }
 					useSubRegistry={ false }
 				>
 					<EditorInterface { ...props }>

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	RichText,
 	getColorClassName,
@@ -19,10 +12,6 @@ import {
 	getTypographyClassesAndStyles,
 } from '@wordpress/block-editor';
 import { compose } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import migrateFontFamily from '../utils/migrate-font-family';
 import migrateTextAlign from '../utils/migrate-text-align';
 

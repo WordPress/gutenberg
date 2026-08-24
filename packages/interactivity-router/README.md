@@ -65,13 +65,11 @@ const { state, actions } = store( 'core/router', {
 
 #### `data-wp-router-region`
 
-
 It defines a region that is updated on navigation. It requires a unique ID as the value and must be used alongside `data-wp-interactive` to receive the proper namespace. Router regions can be placed anywhere within interactive regions, including nested interactive elements.
 
 <div class="callout callout-warning">
 When adding <code>data-wp-router-region</code> to a child element inside a parent with <code>data-wp-interactive</code>, always include <code>data-wp-interactive</code> on the child element as well. This is required for the router region to function correctly.
 </div>
-
 
 The value can be a string with the region ID, or a JSON object containing the `id` and an optional `attachTo` property.
 
@@ -79,12 +77,12 @@ Example:
 
 ```html
 <div data-wp-interactive="myblock" data-wp-router-region="main-list">
-  <ul>
-     <li><a href="/post-1">Post 1</a></li>
-     <li><a href="/post-2">Post 2</a></li>
-     <li><a href="/post-3">Post 3</a></li>
-  </ul>
-  <a data-wp-on--click="actions.navigate" href="/page/2">Page 2</a>
+	<ul>
+		<li><a href="/post-1">Post 1</a></li>
+		<li><a href="/post-2">Post 2</a></li>
+		<li><a href="/post-3">Post 3</a></li>
+	</ul>
+	<a data-wp-on--click="actions.navigate" href="/page/2">Page 2</a>
 </div>
 ```
 
@@ -101,10 +99,10 @@ Example with `attachTo`:
 
 ```html
 <div
-  data-wp-interactive="myblock"
-  data-wp-router-region='{ "id": "myblock/overlay", "attachTo": "body" }'
+	data-wp-interactive="myblock"
+	data-wp-router-region='{ "id": "myblock/overlay", "attachTo": "body" }'
 >
-  I'm in a new region!
+	I'm in a new region!
 </div>
 ```
 

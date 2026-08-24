@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockSupport,
 	getBlockType,
 	hasBlockSupport,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { BlockControls, BlockAlignmentControl } from '../components';
 import useAvailableAlignments from '../components/block-alignment-control/use-available-alignments';
 import { useBlockEditingMode } from '../components/block-editing-mode';

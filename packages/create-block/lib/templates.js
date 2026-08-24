@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 const { existsSync } = require( 'fs' );
 const { mkdtemp, readFile } = require( 'fs' ).promises;
 const { tmpdir } = require( 'os' );
@@ -10,10 +7,6 @@ const { command } = require( 'execa' );
 const glob = require( 'fast-glob' );
 const npmPackageArg = require( 'npm-package-arg' );
 const rimraf = require( 'rimraf' ).sync;
-
-/**
- * Internal dependencies
- */
 const CLIError = require( './cli-error' );
 const { info } = require( './log' );
 const prompts = require( './prompts' );
@@ -118,7 +111,7 @@ const getOutputAssets = async ( outputAssetsPath ) => {
 const externalTemplateExists = async ( templateName ) => {
 	try {
 		await command( `npm view ${ templateName }` );
-	} catch ( error ) {
+	} catch {
 		return false;
 	}
 	return true;
