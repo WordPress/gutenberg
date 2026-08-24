@@ -1,14 +1,12 @@
 import {
 	fireEvent,
 	render,
-	renderHook,
 	screen,
 	waitFor,
 	within,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BorderControl } from '../';
-import { useBorderControlDropdown } from '../border-control-dropdown/hook';
 import { COLORS } from '../../utils';
 
 const colors = [
@@ -130,48 +128,64 @@ describe( 'BorderControl', () => {
 		} );
 
 		describe( 'color indicator inline styles', () => {
-			const getIndicatorWrapperStyle = ( border ) =>
-				renderHook( () =>
-					useBorderControlDropdown( {
-						border,
-						onChange: jest.fn(),
-					} )
-				).result.current.indicatorWrapperStyle;
+			const getIndicatorWrapper = ( border ) => {
+				render(
+					<TestBorderControl
+						{ ...createProps( { value: border } ) }
+					/>
+				);
+
+				const toggleButton = screen.getByLabelText( toggleLabelRegex );
+
+				// The wrapper is decorative, so it has no semantic query.
+				// eslint-disable-next-line testing-library/no-node-access
+				return toggleButton.firstElementChild;
+			};
 
 			it( 'should fall back to gray-300 when a style is set without a color', () => {
-				expect(
-					getIndicatorWrapperStyle( { style: 'solid', color: '' } )
-				).toEqual( {
+				const indicatorWrapper = getIndicatorWrapper( {
+					style: 'solid',
+					color: '',
+				} );
+
+				expect( indicatorWrapper ).toHaveStyle( {
 					borderStyle: 'solid',
 					borderColor: COLORS.gray[ 300 ],
 				} );
 			} );
 
 			it( 'should pass CSS-wide values through to border-style and border-color', () => {
-				expect(
-					getIndicatorWrapperStyle( {
-						style: 'inherit',
-						color: 'inherit',
-					} )
-				).toEqual( {
+				const indicatorWrapper = getIndicatorWrapper( {
+					style: 'inherit',
+					color: 'inherit',
+				} );
+
+				expect( indicatorWrapper ).toHaveStyle( {
 					borderStyle: 'inherit',
 					borderColor: 'inherit',
 				} );
 			} );
 
 			it( 'should preview a `none` style as solid without applying a color', () => {
-				expect( getIndicatorWrapperStyle( { style: 'none' } ) ).toEqual(
-					{
-						borderStyle: 'solid',
-						borderColor: undefined,
-					}
+				const indicatorWrapper = getIndicatorWrapper( {
+					style: 'none',
+				} );
+
+				expect( indicatorWrapper ).toHaveStyle( {
+					borderStyle: 'solid',
+				} );
+				expect( indicatorWrapper ).not.toHaveAttribute(
+					'style',
+					expect.stringContaining( 'border-color' )
 				);
 			} );
 
 			it( 'should not apply inline styles when no style is set', () => {
-				expect(
-					getIndicatorWrapperStyle( { color: '#72aee6' } )
-				).toBeUndefined();
+				const indicatorWrapper = getIndicatorWrapper( {
+					color: '#72aee6',
+				} );
+
+				expect( indicatorWrapper ).not.toHaveAttribute( 'style' );
 			} );
 		} );
 

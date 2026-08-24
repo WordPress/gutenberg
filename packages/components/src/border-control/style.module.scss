@@ -61,7 +61,7 @@
 }
 
 .color-indicator-wrapper {
-	border-radius: $radius-round;
+	border-radius: $radius-full;
 	border: 2px solid transparent;
 	/* border-style / border-color are applied inline by the dropdown hook. */
 	width: 24px;
