@@ -8,6 +8,7 @@ import EditorInterface from '../editor-interface';
 import { ExperimentalEditorProvider } from '../provider';
 import Sidebar from '../sidebar';
 import NotesSidebar from '../collab-sidebar';
+import AccessibilityInsightsSidebar from '../accessibility-insights';
 import GlobalStylesSidebar from '../global-styles-sidebar';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
 
@@ -120,6 +121,7 @@ function Editor( {
 						extraPanels={ extraSidebarPanels }
 					/>
 					<NotesSidebar />
+					<AccessibilityInsightsSidebar />
 					{ isBlockTheme && <GlobalStylesRenderer /> }
 					{ showGlobalStyles && <GlobalStylesSidebar /> }
 				</ExperimentalEditorProvider>
