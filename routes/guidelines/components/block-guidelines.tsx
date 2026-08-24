@@ -5,10 +5,12 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	__experimentalConfirmDialog as ConfirmDialog,
+	type IconType,
 } from '@wordpress/components';
 import {
 	DataViews,
 	filterSortAndPaginate,
+	type Field,
 	type View,
 } from '@wordpress/dataviews';
 import { __, sprintf } from '@wordpress/i18n';
@@ -40,9 +42,11 @@ const initialView: View = {
 interface DataRow {
 	id: string;
 	label: string;
+	guidelines: string;
+	icon?: IconType;
 }
 
-const fields = [
+const fields: Field< DataRow >[] = [
 	{
 		id: 'icon',
 		label: __( 'Icon' ),
@@ -97,7 +101,9 @@ export default function BlockGuidelines( {
 					label: block.title,
 					guidelines:
 						bySlug[ blockSlug( block.name ) ]?.content ?? '',
-					icon: block.icon?.src,
+					/* Block registry icons are renderable by `Icon`, but the
+					   registry types do not model them. */
+					icon: block.icon?.src as IconType | undefined,
 				} ) ),
 		[ contentBlocks, bySlug ]
 	);

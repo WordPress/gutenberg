@@ -32,6 +32,7 @@ export const SHARED_ARG_TYPES = {
 	locale: {
 		options: [
 			'English (US)',
+			'Persian (locale code)',
 			'French',
 			'Spanish',
 			'German',
@@ -51,6 +52,7 @@ export const SHARED_ARG_TYPES = {
 		],
 		mapping: {
 			'English (US)': enUS,
+			'Persian (locale code)': 'fa-IR',
 			French: fr,
 			Spanish: es,
 			German: de,

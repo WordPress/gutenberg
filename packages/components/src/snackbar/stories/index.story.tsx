@@ -60,6 +60,11 @@ WithActions.args = {
 	],
 	children: 'Use Snackbars with an action link to an external page.',
 };
+WithActions.parameters = {
+	// FIXME: Action control nested inside the snackbar creates nested interactive elements (nested-interactive).
+	// See: https://github.com/WordPress/gutenberg/issues/81596
+	a11y: { test: 'todo' },
+};
 
 export const WithIcon: StoryFn< typeof Snackbar > = DefaultTemplate.bind( {} );
 WithIcon.args = {

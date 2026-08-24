@@ -123,7 +123,7 @@ jobs:
               run: npm run check:type-declarations
 
             - name: Build packages
-              run: npm run build -- --skip-types
+              run: npm run build
 
             - name: Validate package contents
               run: npm run lint:package-contents

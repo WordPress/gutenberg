@@ -18,6 +18,7 @@ function DuotoneControl( {
 	disableCustomColors,
 	disableCustomDuotone,
 	value,
+	selectedSlug,
 	onChange,
 } ) {
 	let toolbarIcon;
@@ -75,6 +76,7 @@ function DuotoneControl( {
 						disableCustomColors={ disableCustomColors }
 						disableCustomDuotone={ disableCustomDuotone }
 						value={ value }
+						selectedSlug={ selectedSlug }
 						onChange={ onChange }
 					/>
 				</MenuGroup>

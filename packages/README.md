@@ -314,7 +314,6 @@ If you are publishing new versions of packages, note that there are versioning r
 ## TypeScript
 
 The [TypeScript](https://www.typescriptlang.org/) language is a typed superset of JavaScript that compiles to plain JavaScript.
-Gutenberg does not use the TypeScript language, however TypeScript has powerful tooling that can be applied to JavaScript projects.
 
 Gutenberg uses TypeScript for several reasons, including:
 
@@ -329,7 +328,7 @@ These packages benefit from type checking and produced type declarations in the 
 
 A package opts in to TypeScript tooling with a build project registered in the root `tsconfig.build.json` references: `tsconfig.json` for a package without TypeScript dev files, `tsconfig.build.json` for one that splits. Packages that emit declarations through this standard layout and have TypeScript test or story files split into two projects:
 
--   `tsconfig.build.json` is the build project: it covers `src`, emits declarations to `build-types`, and is what other packages and `npm run build` consume.
+-   `tsconfig.build.json` is the build project: it covers `src`, emits declarations to `build-types`, and is what other packages and `npm run build` consume. `npm run build` emits those declarations with `--noCheck`, so it only reports parse and declaration emit errors; `npm run typecheck` is where type errors surface.
 -   `tsconfig.json` is the dev project: it covers test and story files with `noEmit`, so `npm run typecheck` and the IDE can check them without their declarations ending up in the published package.
 
 Both extend shared base configurations (comments are not necessary):
