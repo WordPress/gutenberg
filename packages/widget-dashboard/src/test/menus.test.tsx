@@ -98,4 +98,27 @@ describe( 'chrome menus', () => {
 			await screen.findByRole( 'menuitem', { name: 'Reset to default…' } )
 		).toBeInTheDocument();
 	} );
+
+	it( 'mounts widget link actions as real anchors', async () => {
+		const user = userEvent.setup();
+		render( <Harness /> );
+		await screen.findByTestId( 'label' );
+
+		await user.click( screen.getByRole( 'button', { name: 'More' } ) );
+
+		const docs = await screen.findByRole( 'menuitem', {
+			name: 'Read the docs',
+		} );
+		expect( docs.tagName ).toBe( 'A' );
+		expect( docs ).toHaveAttribute( 'href', 'https://w.org' );
+
+		expect(
+			screen.getByRole( 'menuitem', { name: 'Export CSV' } )
+		).toHaveAttribute( 'download', 'report.csv' );
+
+		const newTab = screen.getByRole( 'menuitem', {
+			name: /Open elsewhere/,
+		} );
+		expect( newTab ).toHaveAttribute( 'target', '_blank' );
+	} );
 } );
