@@ -728,11 +728,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/combobox-control/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/context/test/context-system-provider.js": {
 		"no-restricted-imports": {
 			"count": 1
@@ -1369,11 +1364,6 @@
 			"count": 2
 		}
 	},
-	"packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
 	"packages/editor/src/components/post-template/create-new-template-modal.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
@@ -1634,11 +1624,6 @@
 	"packages/global-styles-ui/src/font-library/font-collection.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 6
-		}
-	},
-	"packages/global-styles-ui/src/font-library/font-demo.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
 		}
 	},
 	"packages/global-styles-ui/src/font-library/google-fonts-confirm-dialog.tsx": {

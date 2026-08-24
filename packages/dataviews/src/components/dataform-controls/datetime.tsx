@@ -1,3 +1,4 @@
+import { isSameMonth } from 'date-fns';
 import {
 	BaseControl,
 	privateApis as componentsPrivateApis,
@@ -10,6 +11,7 @@ import { Calendar, Stack } from '@wordpress/ui';
 import type { DataFormControlProps, FormatDatetime } from '../../types';
 import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../../constants';
 import RelativeDateControl from './utils/relative-date-control';
+import toCalendarDate from './utils/to-calendar-date';
 import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
 import getCustomValidity from './utils/get-custom-validity';
 import parseDateTime from '../../field-types/utils/parse-date-time';
@@ -39,11 +41,28 @@ function CalendarDateTimeControl< Item >( {
 	const disabled = field.isDisabled( { item: data, field } );
 	const fieldValue = getValue( { item: data } );
 	const value = typeof fieldValue === 'string' ? fieldValue : undefined;
+	const { timezone } = getSettings();
+	const timeZone = timezone.string || dateI18n( 'P' );
 
 	const [ calendarMonth, setCalendarMonth ] = useState< Date >( () => {
 		const parsedDate = parseDateTime( value );
-		return parsedDate || new Date(); // Default to current month
+		return toCalendarDate( parsedDate || new Date(), timeZone );
 	} );
+	// Follow external value changes in the same timezone frame as the calendar.
+	useEffect( () => {
+		const parsedDate = parseDateTime( value );
+		if ( parsedDate ) {
+			const targetMonth = toCalendarDate( parsedDate, timeZone );
+			setCalendarMonth( ( currentMonth ) =>
+				isSameMonth(
+					targetMonth,
+					toCalendarDate( currentMonth, timeZone )
+				)
+					? currentMonth
+					: targetMonth
+			);
+		}
+	}, [ timeZone, value ] );
 
 	const inputControlRef = useRef< HTMLInputElement >( null );
 	const validationTimeoutRef =
@@ -66,16 +85,14 @@ function CalendarDateTimeControl< Item >( {
 	const onSelectDate = useCallback(
 		( newDate: Date | null ) => {
 			if ( newDate ) {
-				// Extract the date part in WP timezone from the calendar selection
+				// Extract the date part in the WordPress timezone.
 				const wpDate = dateI18n( 'Y-m-d', newDate );
 
-				// Preserve time if it exists in current value, otherwise use current time
-				let wpTime: string;
-				if ( value ) {
-					wpTime = dateI18n( 'H:i', getDate( value ) );
-				} else {
-					wpTime = dateI18n( 'H:i', newDate );
-				}
+				// Preserve time if it exists. A new value starts at midnight in
+				// the site timezone.
+				const wpTime = value
+					? dateI18n( 'H:i', getDate( value ) )
+					: '00:00';
 
 				// Combine date and time in WP timezone and convert to ISO
 				const finalDateTime = getDate( `${ wpDate }T${ wpTime }` );
@@ -122,22 +139,19 @@ function CalendarDateTimeControl< Item >( {
 				// Update calendar month to match
 				const parsedDate = parseDateTime( dateTime.toISOString() );
 				if ( parsedDate ) {
-					setCalendarMonth( parsedDate );
+					setCalendarMonth( toCalendarDate( parsedDate, timeZone ) );
 				}
 			} else {
 				onChangeCallback( undefined );
 			}
 		},
-		[ onChangeCallback ]
+		[ onChangeCallback, timeZone ]
 	);
 
 	const { format: fieldFormat } = field;
 	const weekStartsOn =
 		( fieldFormat as FormatDatetime ).weekStartsOn ??
 		getSettings().l10n.startOfWeek;
-	const {
-		timezone: { string: timezoneString },
-	} = getSettings();
 
 	let displayLabel = label;
 	if ( isValid?.required && ! markWhenOptional && ! hideLabelFromVision ) {
@@ -188,7 +202,7 @@ function CalendarDateTimeControl< Item >( {
 						onValueChange={ onSelectDate }
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
-						timeZone={ timezoneString || undefined }
+						timeZone={ timeZone }
 						weekStartsOn={ weekStartsOn }
 						disabled={ disabled || disabledMatchers }
 					/>

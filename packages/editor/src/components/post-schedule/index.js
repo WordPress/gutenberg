@@ -2,6 +2,7 @@ import { parseISO, endOfMonth, startOfMonth } from 'date-fns';
 import { speak } from '@wordpress/a11y';
 import { getSettings } from '@wordpress/date';
 import { __, _x, sprintf } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useState, useMemo } from '@wordpress/element';
@@ -32,13 +33,15 @@ export default function PostSchedule( props ) {
 
 export function PrivatePostSchedule( {
 	onClose,
+	showPopoverHeader = true,
 	showPopoverHeaderActions,
 	isCompact,
 } ) {
-	const { postDate, postType } = useSelect(
+	const { postDate, postType, isDateFloating } = useSelect(
 		( select ) => ( {
 			postDate: select( editorStore ).getEditedPostAttribute( 'date' ),
 			postType: select( editorStore ).getCurrentPostType(),
+			isDateFloating: select( editorStore ).isEditedPostDateFloating(),
 		} ),
 		[]
 	);
@@ -97,7 +100,7 @@ export function PrivatePostSchedule( {
 			.join( '' ) // Reverse the string and test for "a" not followed by a slash.
 	);
 
-	return (
+	const picker = (
 		<PrivatePublishDateTimePicker
 			currentDate={ postDate }
 			onChange={ onUpdateDate }
@@ -112,7 +115,32 @@ export function PrivatePostSchedule( {
 			}
 			onClose={ onClose }
 			isCompact={ isCompact }
+			showPopoverHeader={ showPopoverHeader }
 			showPopoverHeaderActions={ showPopoverHeaderActions }
 		/>
+	);
+
+	// The popover header carries its own reset action. Rendered inline there is
+	// no header, so the action follows the picker as a button. It stays in place
+	// when there is no date to clear, rather than disappearing under the focus
+	// that just activated it.
+	if ( showPopoverHeader ) {
+		return picker;
+	}
+
+	return (
+		<>
+			{ picker }
+			<Button
+				className="editor-post-schedule__reset"
+				variant="secondary"
+				__next40pxDefaultSize
+				disabled={ isDateFloating }
+				accessibleWhenDisabled
+				onClick={ () => onUpdateDate( null ) }
+			>
+				{ __( 'Reset' ) }
+			</Button>
+		</>
 	);
 }
