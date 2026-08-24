@@ -545,6 +545,31 @@ describe( 'BoxControl', () => {
 		it( 'should apply module classes and retained public class names in custom mode', () => {
 			const { container } = render( <UncontrolledBoxControl /> );
 
+			const allSidesInput = screen.getByRole( 'textbox', {
+				name: 'All sides',
+			} );
+			const linkedInputWrapper =
+				// eslint-disable-next-line testing-library/no-node-access
+				allSidesInput.closest( `.${ styles[ 'input-wrapper' ] }` );
+			const unlinkButton = screen.getByRole( 'button', {
+				name: 'Unlink sides',
+			} );
+			const linkedButtonWrapper =
+				// eslint-disable-next-line testing-library/no-node-access
+				unlinkButton.closest(
+					`.${ styles[ 'linked-button-wrapper' ] }`
+				);
+
+			expect( linkedInputWrapper ).toHaveClass(
+				styles[ 'input-wrapper' ]
+			);
+			expect( linkedButtonWrapper ).toHaveClass(
+				styles[ 'linked-button-wrapper' ]
+			);
+			expect(
+				// eslint-disable-next-line testing-library/no-node-access
+				linkedInputWrapper?.querySelector( `.${ styles.icon }` )
+			).toHaveClass( styles.icon );
 			expect(
 				// Class names live on wrappers around the labeled controls.
 				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
@@ -562,6 +587,29 @@ describe( 'BoxControl', () => {
 				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
 				container.querySelector( '.components-range-control' )
 			).toHaveClass( styles[ 'range-control' ] );
+		} );
+
+		it( 'should apply the module input-wrapper class to each side after unlinking', async () => {
+			const user = userEvent.setup();
+
+			render( <UncontrolledBoxControl /> );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Unlink sides' } )
+			);
+
+			for ( const name of [
+				'Top side',
+				'Right side',
+				'Bottom side',
+				'Left side',
+			] ) {
+				const sideInput = screen.getByRole( 'textbox', { name } );
+				expect(
+					// eslint-disable-next-line testing-library/no-node-access
+					sideInput.closest( `.${ styles[ 'input-wrapper' ] }` )
+				).toHaveClass( styles[ 'input-wrapper' ] );
+			}
 		} );
 
 		it( 'should compose the module range class with the public preset class', () => {
