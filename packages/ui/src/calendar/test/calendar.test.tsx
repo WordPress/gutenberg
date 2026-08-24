@@ -105,6 +105,11 @@ describe( 'Calendar', () => {
 		jest.useRealTimers();
 	} );
 
+	afterEach( async () => {
+		// Let tooltip positioning updates caused by focus finish before cleanup.
+		await act( () => Promise.resolve() );
+	} );
+
 	describe( 'Semantics and basic behavior', () => {
 		it( 'should apply the correct roles, semantics and attributes', async () => {
 			render( <Calendar /> );

@@ -108,14 +108,19 @@
 			text-transform: capitalize;
 		}
 
-		.chevron {
+		.chevron,
+		.nav-button svg {
 			display: inline-block;
 			fill: currentColor;
 			width: var(--wpds-dimension-size-2xs);
 			height: var(--wpds-dimension-size-2xs);
 		}
 
-		.root[dir="rtl"] .nav .chevron {
+		.nav-button svg {
+			margin: 0;
+		}
+
+		.root[dir="rtl"] .nav :is(.chevron, .nav-button svg) {
 			transform: rotate(180deg);
 			transform-origin: 50%;
 		}
@@ -413,13 +418,9 @@
 
 	@layer compositions {
 		/*
-		 * The month navigation buttons render a `Button`. Square them off to the
-		 * calendar's cell size, the same way `IconButton` does.
+		 * Keep the month navigation buttons aligned to the calendar's cell size.
 		 */
 		.nav-button {
-			--wp-ui-button-aspect-ratio: 1;
-			--wp-ui-button-padding-inline: 0px;
-			--wp-ui-button-min-width: unset;
 			--wp-ui-button-height: var(--wp-ui-calendar-cell-size);
 		}
 	}

@@ -1,5 +1,11 @@
 import clsx from 'clsx';
-import { Day, Root, Chevron, NavButton } from './components';
+import {
+	Day,
+	Root,
+	Chevron,
+	PreviousMonthButton,
+	NextMonthButton,
+} from './components';
 import styles from '../style.module.css';
 import resetStyles from '../../utils/css/resets.module.css';
 import focusStyles from '../../utils/css/focus.module.scss';
@@ -78,7 +84,7 @@ export const COMMON_PROPS = {
 		Day,
 		Root,
 		Chevron,
-		PreviousMonthButton: NavButton,
-		NextMonthButton: NavButton,
+		PreviousMonthButton,
+		NextMonthButton,
 	},
 } as const;
