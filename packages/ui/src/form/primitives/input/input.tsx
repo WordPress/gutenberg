@@ -31,6 +31,7 @@ export const Input = forwardRef< HTMLElement, InputProps >( function Input(
 			<_Input
 				ref={ ref }
 				className={ clsx( defenseStyles.input, styles.input ) }
+				data-empty-value={ restProps.value === '' ? '' : undefined }
 				{ ...restProps }
 			/>
 		</InputLayout>
