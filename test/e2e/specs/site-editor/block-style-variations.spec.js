@@ -6,22 +6,22 @@ async function selectBlockStyleVariation( page, variationName ) {
 		name: 'Editor settings',
 	} );
 	const stylesTab = editorSettings.getByRole( 'tab', { name: 'Styles' } );
-	const variationButton = editorSettings.getByRole( 'button', {
+	const variationRadio = editorSettings.getByRole( 'radio', {
 		name: variationName,
 	} );
 
 	const visibleControl = await Promise.any( [
 		stylesTab.waitFor( { state: 'visible' } ).then( () => 'styles-tab' ),
-		variationButton
+		variationRadio
 			.waitFor( { state: 'visible' } )
-			.then( () => 'variation-button' ),
+			.then( () => 'variation-radio' ),
 	] );
 
 	if ( visibleControl === 'styles-tab' ) {
 		await stylesTab.click();
 	}
 
-	await variationButton.click();
+	await variationRadio.click();
 }
 
 test.use( {
