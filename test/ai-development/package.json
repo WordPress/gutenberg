@@ -6,11 +6,11 @@
 	"description": "Promptfoo evals that verify agent skills in this repository are discovered, followed, and produce output that meets our rules.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
-	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/test/ai-development/evals",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/test/ai-development",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/WordPress/gutenberg.git",
-		"directory": "test/ai-development/evals"
+		"directory": "test/ai-development"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"

@@ -40,7 +40,7 @@ Promptfoo runs the prompt × provider × test × repeat matrix. Its standard lif
       afterEach: delete workspace
 ```
 
-The subject workspace excludes `test/ai-development/evals/`, so the agent cannot inspect its prompt configuration or assertions. Uncommitted repository changes are not included.
+The subject workspace excludes `test/ai-development/`, so the agent cannot inspect its prompt configuration or assertions. Uncommitted repository changes are not included.
 
 See Promptfoo's [coding-agent guide](https://www.promptfoo.dev/docs/guides/evaluate-coding-agents/) and [extension hooks](https://www.promptfoo.dev/docs/configuration/reference/#extension-hooks).
 
@@ -50,13 +50,8 @@ Promptfoo's built-in trajectory assertions deterministically check tool calls, i
 
 ## Setup
 
-Use Node.js 22.22 or newer; Node.js 24 LTS is recommended.
-
-```bash
-npm --prefix test/ai-development/evals install
-```
-
-A root `npm install` does not install this nested package.
+Use Node.js 22.22 or newer; Node.js 24 LTS is recommended. This is a workspace,
+so a root `npm install` installs it.
 
 Claude can use an existing Claude Code login or `ANTHROPIC_API_KEY`. Model calls consume the associated quota or paid usage.
 
@@ -66,7 +61,7 @@ Run from the repository root:
 
 ```bash
 # Validate configuration without model calls.
-npm --prefix test/ai-development/evals run validate
+npm --workspace @wordpress/agent-skill-evals run validate
 
 # Run every spec and provider.
 npm run test:agent-evals -- --config 'specs/*/*.test.yaml'
@@ -78,10 +73,10 @@ npm run test:agent-evals -- --config specs/SPEC_GROUP/TEST_NAME.test.yaml
 npm run test:agent-evals -- --config specs/SPEC_GROUP/TEST_NAME.test.yaml --repeat 3
 
 # Open the local results viewer.
-npm --prefix test/ai-development/evals run view
+npm --workspace @wordpress/agent-skill-evals run view
 ```
 
-Results under `evals/results/` are gitignored and may contain source code and tool output.
+Results under `results/` are gitignored and may contain source code and tool output.
 
 ## Files
 

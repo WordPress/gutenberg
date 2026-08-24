@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 
 const execFileAsync = promisify( execFile );
 const libDir = path.dirname( fileURLToPath( import.meta.url ) );
-const sourceRoot = path.resolve( libDir, '../../../..' );
+const sourceRoot = path.resolve( libDir, '../../..' );
 const activeWorkspaces = new Map();
 
 const gitEnvironment = {
@@ -73,7 +73,7 @@ async function createWorkspace() {
 		await fs.unlink( archive );
 
 		// Do not expose the evaluation or its expected behavior to the subject.
-		await fs.rm( path.join( workspace, 'test/ai-development/evals' ), {
+		await fs.rm( path.join( workspace, 'test/ai-development' ), {
 			recursive: true,
 			force: true,
 		} );
