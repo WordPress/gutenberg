@@ -85,7 +85,8 @@
 		"postmanifest-snapshot": "prettier --write components-manifest.yml",
 		"storybook:build": "NODE_OPTIONS=--max-old-space-size=8192 storybook build -c . -o ./build && node ./scripts/inject-legacy-docgen.mjs ./build/manifests/components.json",
 		"storybook:dev": "storybook dev -c . -p 50240",
-		"test:smoke": "vitest run --config vitest.config.ts",
+		"test:smoke": "npm run test:smoke:build && vitest run --config vitest.config.ts",
+		"test:smoke:build": "node ./scripts/smoke-static-build.mjs",
 		"test:smoke:setup": "playwright install chromium --with-deps"
 	}
 }

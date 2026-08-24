@@ -17,6 +17,10 @@ export default defineConfig( {
 	],
 	test: {
 		name: 'storybook',
+		reporters: [
+			'default',
+			path.resolve( configDir, 'vitest-story-index-reporter.ts' ),
+		],
 		// The plugin excludes MDX relative to the working directory, which is
 		// this workspace rather than the root. Exclude it everywhere.
 		exclude: [ ...configDefaults.exclude, '**/*.mdx' ],

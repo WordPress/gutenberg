@@ -6,4 +6,10 @@
  * garbage collection before each file keeps the page healthy. `gc` is exposed
  * by the `--js-flags=--expose-gc` launch argument in `vitest.config.ts`.
  */
-globalThis.gc?.();
+if ( typeof globalThis.gc !== 'function' ) {
+	throw new Error(
+		'Storybook tests require Chromium to expose garbage collection.'
+	);
+}
+
+globalThis.gc();
