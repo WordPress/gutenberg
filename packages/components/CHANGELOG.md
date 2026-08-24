@@ -22,7 +22,6 @@
 
 ### Bug Fixes
 
--   `SnackbarList`: Center notices within the list so CSS Module consumers preserve bottom-center placement ([#81995](https://github.com/WordPress/gutenberg/pull/81995)).
 -   `ConfirmDialog`: Preserve `title` as the dialog's accessible name when the header is hidden ([#81847](https://github.com/WordPress/gutenberg/pull/81847)).
 -   `DuotonePicker`: Do not render the custom controls wrapper when `disableCustomDuotone` is set, so a read-only picker no longer adds trailing padding below its swatches ([#81605](https://github.com/WordPress/gutenberg/pull/81605)).
 -   `Modal`: Prevent an Escape key press that dismisses the modal from propagating to underlying overlays. ([#81785](https://github.com/WordPress/gutenberg/pull/81785))
