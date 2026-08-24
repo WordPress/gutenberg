@@ -205,7 +205,18 @@ export function WidgetDashboardProvider( {
 	const [ stagingLayout, setStagingLayout ] =
 		useState< DashboardWidget[] >( committedLayout );
 
-	const canPerform = useDashboardPolicy() ?? ALLOW_EVERY_OPERATION;
+	const policy = useDashboardPolicy();
+
+	// Normalized once, so every surface reads a boolean: an `undefined`
+	// answer denies everywhere instead of hiding the controls while the grid
+	// still lets the tile drag and resize.
+	const canPerform = useMemo< CanPerformDashboardOperation >(
+		() =>
+			policy
+				? ( request ) => !! policy( request )
+				: ALLOW_EVERY_OPERATION,
+		[ policy ]
+	);
 
 	// Every mutation stages through here. Instances the policy locks against
 	// removal are re-asserted right after the nearest preceding instance that

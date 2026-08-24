@@ -15,6 +15,7 @@ import { WidgetDashboard } from '../widget-dashboard';
 import type {
 	CanPerformDashboardOperation,
 	DashboardInstanceOperation,
+	DashboardOperationRequest,
 	DashboardWidget,
 } from '../types';
 
@@ -250,6 +251,28 @@ describe( 'WidgetDashboard.Policy instance operations', () => {
 		);
 		expect( activator ).toHaveAttribute( 'aria-disabled', 'true' );
 		/* eslint-enable testing-library/no-container, testing-library/no-node-access */
+	} );
+
+	it( 'treats a non-boolean answer as a denial on every surface', async () => {
+		// A host written in JavaScript can leave an operation unanswered.
+		const canPerform = ( ( request: DashboardOperationRequest ) =>
+			request.operation === 'move'
+				? undefined
+				: true ) as CanPerformDashboardOperation;
+		/* eslint-disable testing-library/no-container, testing-library/no-node-access */
+		const { container } = render(
+			<Harness canPerform={ canPerform } editMode />
+		);
+		await screen.findByTestId( 'label' );
+
+		const activator = container.querySelector(
+			'[aria-roledescription="sortable"]'
+		);
+		expect( activator ).toHaveAttribute( 'aria-disabled', 'true' );
+		/* eslint-enable testing-library/no-container, testing-library/no-node-access */
+		expect(
+			screen.getByRole( 'button', { name: 'Widget options' } )
+		).toBeInTheDocument();
 	} );
 
 	it( 'renders the widget read-only and without attribute controls when edit is denied', async () => {
