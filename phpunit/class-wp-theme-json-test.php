@@ -2020,6 +2020,36 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles', 'presets', 'variables' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
 
+	/**
+	 * This test checks that a block declaring both a `selectors` map and a legacy
+	 * `__experimentalSelector` resolves spacing through the `selectors` map, so a
+	 * theme can target the element the block's own padding is written to.
+	 *
+	 * @ticket 79662
+	 */
+	public function test_get_stylesheet_targets_accordion_heading_toggle_for_spacing() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/accordion-heading' => array(
+							'spacing' => array(
+								'padding' => array(
+									'top'    => '0.25rem',
+									'bottom' => '0.25rem',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = ':root :where(.wp-block-accordion-heading .wp-block-accordion-heading__toggle){padding-top: 0.25rem;padding-bottom: 0.25rem;}';
+		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
+	}
+
 	public function test_get_stylesheet_generates_layout_styles() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
