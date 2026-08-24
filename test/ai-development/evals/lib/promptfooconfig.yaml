@@ -1,0 +1,13 @@
+# Tracing configuration shared by every evaluation spec.
+tracing:
+    enabled: true
+    failOnReceiverStartFailure: true
+    # Promptfoo recognizes Codex's exec_command by default. Claude calls its
+    # equivalent shell tool Bash, so declare that additional command tool name.
+    commandToolNames: ['Bash']
+    otlp:
+        http:
+            enabled: true
+            host: 127.0.0.1
+            port: 4318
+            acceptFormats: ['json']
