@@ -16,6 +16,7 @@
 
 ### Enhancements
 
+-   When the server announces a sync engine this client cannot provide, collaboration is now marked unsupported so WordPress's regular post locking re-engages (previously the degraded state was silently no-sync-and-no-lock), with a warning notice explaining why.
 -   Improve error reporting in private action `saveDirtyEntities` ([#81151](https://github.com/WordPress/gutenberg/pull/81151)).
 -   Add the `block-templates` and `block-template-parts` theme features to the `ThemeSupports` type. Both are registered with `show_in_rest`, so they were already present in the response ([#81581](https://github.com/WordPress/gutenberg/pull/81581)).
 

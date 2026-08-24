@@ -24,6 +24,10 @@
 
 -   Add an `initialViewport` prop to the editor provider, setting the width each entity opens at from the breakpoints the theme defines, so a host no longer has to dispatch `setDeviceType` from outside the provider and race the settings it reads ([#81750](https://github.com/WordPress/gutenberg/pull/81750)).
 
+### Enhancements
+
+-   Show a dedicated "Collaboration settings changed" message in the sync connection error modal when the server reports a sync engine mismatch (the site's collaboration engine changed mid-session).
+
 ## 14.53.0 (2026-08-12)
 
 ### Internal

@@ -19,6 +19,7 @@ import { useState, useEffect } from '@wordpress/element';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import {
 	getSyncErrorMessages,
+	ENGINE_MISMATCH,
 	PROTOCOL_MISMATCH,
 } from '../../utils/sync-error-messages';
 import { store as editorStore } from '../../store';
@@ -120,16 +121,17 @@ export function SyncConnectionErrorModal() {
 		}
 	}, [ connectionStatus, canRetry ] );
 
-	// Protocol mismatch is unrecoverable and has no in-flight connection
-	// attempt to wait on, so delaying the modal serves no purpose.
-	const isProtocolMismatch =
+	// Protocol and engine mismatches are unrecoverable and have no in-flight
+	// connection attempt to wait on, so delaying the modal serves no purpose.
+	const isUnrecoverableMismatch =
 		connectionStatus?.status === 'disconnected' &&
 		'error' in connectionStatus &&
-		connectionStatus.error?.code === PROTOCOL_MISMATCH;
+		( connectionStatus.error?.code === PROTOCOL_MISMATCH ||
+			connectionStatus.error?.code === ENGINE_MISMATCH );
 
 	if (
 		! isCollaborationEnabled ||
-		( ! hasInitialized && ! isProtocolMismatch ) ||
+		( ! hasInitialized && ! isUnrecoverableMismatch ) ||
 		! showModal
 	) {
 		return null;

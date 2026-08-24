@@ -1,8 +1,10 @@
 import triggerFetch from '@wordpress/api-fetch';
-import { getSyncManager } from '../sync';
+import { getSyncManager, isSyncEngineUnavailable } from '../sync';
+
 jest.mock( '@wordpress/api-fetch' );
 jest.mock( '../sync', () => ( {
 	getSyncManager: jest.fn(),
+	isSyncEngineUnavailable: jest.fn( () => false ),
 	LOCAL_UNDO_IGNORED_ORIGIN: 'local-undo-ignored',
 } ) );
 import {
@@ -48,6 +50,7 @@ describe( 'getEntityRecord', () => {
 			update: jest.fn(),
 		};
 		getSyncManager.mockImplementation( () => syncManager );
+		isSyncEngineUnavailable.mockImplementation( () => false );
 	} );
 
 	it( 'yields with requested post type', async () => {
@@ -497,6 +500,99 @@ describe( 'getEntityRecord', () => {
 		).not.toHaveBeenCalled();
 		expect( dispatch.saveEntityRecord ).not.toHaveBeenCalled();
 		expect( syncManager.createPersistedCRDTDoc ).not.toHaveBeenCalled();
+	} );
+
+	it( 'drops into the lock posture when the announced sync engine is unavailable', async () => {
+		// REGRESSION (review 1.1): an unresolvable engine announcement used
+		// to leave the editor with no sync AND no lock — collaboration still
+		// "enabled", the post-locked modal suppressed, concurrent editors
+		// silently overwriting each other on save.
+		const POST_RECORD = { id: 1, title: 'Test Post' };
+		const POST_RESPONSE = {
+			json: () => Promise.resolve( POST_RECORD ),
+		};
+		const ENTITIES_WITH_SYNC = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				baseURLParams: { context: 'edit' },
+				syncConfig: {},
+			},
+		];
+
+		getSyncManager.mockImplementation( () => undefined );
+		isSyncEngineUnavailable.mockImplementation( () => true );
+		dispatch.setCollaborationSupported = jest.fn();
+		const createNotice = jest.fn();
+		const registryWithNotices = {
+			batch: ( callback ) => callback(),
+			dispatch: jest.fn( () => ( { createNotice } ) ),
+		};
+
+		triggerFetch.mockImplementation( () => POST_RESPONSE );
+
+		await getEntityRecord(
+			'postType',
+			'post',
+			1
+		)( {
+			dispatch,
+			registry: registryWithNotices,
+			resolveSelect: {
+				getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
+				getEditedEntityRecord: jest.fn(),
+			},
+		} );
+
+		expect( dispatch.setCollaborationSupported ).toHaveBeenCalledWith(
+			false
+		);
+		expect( createNotice ).toHaveBeenCalledWith(
+			'warning',
+			expect.stringContaining( 'Real-time collaboration is unavailable' ),
+			expect.objectContaining( {
+				id: 'core-data-sync-engine-unavailable',
+			} )
+		);
+	} );
+
+	it( 'does not touch the collaboration flag when sync is merely disabled', async () => {
+		const POST_RECORD = { id: 1, title: 'Test Post' };
+		const POST_RESPONSE = {
+			json: () => Promise.resolve( POST_RECORD ),
+		};
+		const ENTITIES_WITH_SYNC = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				baseURLParams: { context: 'edit' },
+				syncConfig: {},
+			},
+		];
+
+		// Collaboration off entirely: no manager, but NOT an engine failure.
+		getSyncManager.mockImplementation( () => undefined );
+		isSyncEngineUnavailable.mockImplementation( () => false );
+		dispatch.setCollaborationSupported = jest.fn();
+
+		triggerFetch.mockImplementation( () => POST_RESPONSE );
+
+		await getEntityRecord(
+			'postType',
+			'post',
+			1
+		)( {
+			dispatch,
+			registry,
+			resolveSelect: {
+				getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
+				getEditedEntityRecord: jest.fn(),
+			},
+		} );
+
+		expect( dispatch.setCollaborationSupported ).not.toHaveBeenCalled();
 	} );
 
 	it( 'provides transient properties when read/write config is supplied', async () => {

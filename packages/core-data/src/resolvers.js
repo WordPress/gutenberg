@@ -2,9 +2,11 @@ import { camelCase } from 'change-case';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
+import { __ } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 import { STORE_NAME } from './name';
 import { additionalEntityConfigLoaders, DEFAULT_ENTITY_KEY } from './entities';
-import { getSyncManager } from './sync';
+import { getSyncManager, isSyncEngineUnavailable } from './sync';
 import {
 	forwardResolver,
 	getNormalizedCommaSeparable,
@@ -192,6 +194,34 @@ export const getEntityRecord =
 					select?.isCollaborationSupported?.() === false
 						? undefined
 						: getSyncManager();
+
+				/*
+				 * Engine handshake failure (the server announced a sync
+				 * engine this client cannot provide): without this flip the
+				 * degraded state would be no sync AND no lock — the editor
+				 * still believes collaboration is active, suppresses the
+				 * post-locked modal, and concurrent editors silently
+				 * overwrite each other on save. Flipping
+				 * collaborationSupported re-engages WordPress's regular
+				 * post locking; the notice tells the user why.
+				 */
+				if ( ! syncManager && isSyncEngineUnavailable() ) {
+					if ( select?.isCollaborationSupported?.() !== false ) {
+						dispatch.setCollaborationSupported( false );
+						registry
+							.dispatch( noticesStore )
+							.createNotice(
+								'warning',
+								__(
+									'Real-time collaboration is unavailable: this site uses a collaboration engine this editor does not support. Standard post locking is in effect; try refreshing the page.'
+								),
+								{
+									id: 'core-data-sync-engine-unavailable',
+									isDismissible: true,
+								}
+							);
+					}
+				}
 
 				// Load the entity record for syncing. Do not await promise.
 				// NOTE: when this resolver runs before block types register,
