@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Stop registering the package as a WordPress script. `@wordpress/sync` is now bundled into its consumers, so the `wp-sync` script handle and the `wp.sync` global are no longer exposed ([#81736](https://github.com/WordPress/gutenberg/issues/81736)).
+-   Sync providers registered via the `sync.providers` filter now receive the Yjs module as the `Y` property of the provider creator options. Providers must use it instead of `window.wp.sync.Y` to share the editor's Yjs instance ([#81736](https://github.com/WordPress/gutenberg/issues/81736)).
+
 ### Internal
 
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
