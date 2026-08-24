@@ -796,6 +796,110 @@ describe( 'Editor actions', () => {
 					.get( 'core', 'distractionFree' )
 			).toBe( false );
 		} );
+
+		it( 'refuses the code editor in the read-only view intent', () => {
+			// The intent API is private while Suggest mode is experimental.
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'view'
+			);
+
+			registry.dispatch( editorStore ).switchEditorMode( 'text' );
+
+			expect( registry.select( editorStore ).getEditorMode() ).toBe(
+				'visual'
+			);
+			// The refusal must not write the preference: returning to
+			// Editing has to leave the user where they were.
+			expect(
+				registry.select( preferencesStore ).get( 'core', 'editorMode' )
+			).toBeUndefined();
+			expect(
+				registry
+					.select( noticesStore )
+					.getNotices()
+					.map( ( notice ) => notice.content )
+			).toContain(
+				'The code editor is unavailable while viewing. Switch to Editing to change the content.'
+			);
+		} );
+
+		it( 'masks a stored code editor preference while viewing', () => {
+			registry.dispatch( editorStore ).switchEditorMode( 'text' );
+			expect( registry.select( editorStore ).getEditorMode() ).toBe(
+				'text'
+			);
+
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'view'
+			);
+			expect( registry.select( editorStore ).getEditorMode() ).toBe(
+				'visual'
+			);
+
+			// Leaving the intent hands the code editor back.
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'edit'
+			);
+			expect( registry.select( editorStore ).getEditorMode() ).toBe(
+				'text'
+			);
+		} );
+	} );
+
+	describe( 'undo/redo in the read-only view intent', () => {
+		let registry;
+
+		beforeEach( () => {
+			registry = createRegistryWithStores();
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', [
+					{ id: postId, title: 'original', type: 'post' },
+				] );
+			registry
+				.dispatch( coreStore )
+				.editEntityRecord( 'postType', 'post', postId, {
+					title: 'edited',
+				} );
+		} );
+
+		const editedTitle = () =>
+			registry
+				.select( coreStore )
+				.getEditedEntityRecord( 'postType', 'post', postId ).title;
+
+		it( 'refuses undo while viewing and allows it again after', () => {
+			expect( registry.select( coreStore ).hasUndo() ).toBe( true );
+
+			// The intent API is private while Suggest mode is experimental.
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'view'
+			);
+			registry.dispatch( editorStore ).undo();
+
+			expect( editedTitle() ).toBe( 'edited' );
+			expect( registry.select( coreStore ).hasUndo() ).toBe( true );
+
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'edit'
+			);
+			registry.dispatch( editorStore ).undo();
+
+			expect( editedTitle() ).toBe( 'original' );
+		} );
+
+		it( 'refuses redo while viewing', () => {
+			registry.dispatch( editorStore ).undo();
+			expect( registry.select( coreStore ).hasRedo() ).toBe( true );
+
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'view'
+			);
+			registry.dispatch( editorStore ).redo();
+
+			expect( editedTitle() ).toBe( 'original' );
+			expect( registry.select( coreStore ).hasRedo() ).toBe( true );
+		} );
 	} );
 
 	describe( 'setEditorIntent', () => {

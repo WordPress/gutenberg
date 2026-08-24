@@ -78,6 +78,37 @@ test.describe( 'Editor intent switcher', () => {
 		).toHaveAttribute( 'aria-checked', 'true' );
 	} );
 
+	test( 'the active intent hides its keyboard shortcut', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		const shortcut = '.components-menu-item__shortcut';
+		const editChoice = page.getByRole( 'menuitemradio', {
+			name: /^Editing\s+Edit content directly/,
+		} );
+		const suggestChoice = page.getByRole( 'menuitemradio', {
+			name: /^Suggesting/,
+		} );
+
+		await openIntentSwitcher( page );
+
+		/*
+		 * A shortcut printed next to the checked choice reads as "press this
+		 * to get where you already are". The other choices keep theirs, which
+		 * is what makes the hint useful. `ModeSwitcher` behaves the same way.
+		 */
+		await expect( editChoice ).toHaveAttribute( 'aria-checked', 'true' );
+		await expect( editChoice.locator( shortcut ) ).toHaveCount( 0 );
+		await expect( suggestChoice.locator( shortcut ) ).toHaveCount( 1 );
+
+		// The hint follows the selection rather than being dropped for good.
+		await pageUtils.pressKeys( 'secondary+X' );
+		await openIntentSwitcher( page );
+		await expect( suggestChoice ).toHaveAttribute( 'aria-checked', 'true' );
+		await expect( suggestChoice.locator( shortcut ) ).toHaveCount( 0 );
+		await expect( editChoice.locator( shortcut ) ).toHaveCount( 1 );
+	} );
+
 	test( 'keyboard shortcut cycles between intents', async ( {
 		page,
 		pageUtils,

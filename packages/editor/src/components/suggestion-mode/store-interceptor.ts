@@ -52,7 +52,7 @@ import { useEffect, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { useSuggestionOverlay } from './overlay-context';
-import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
+import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { parseSuggestionPayload } from './provider';
 import { createRevertGuard } from '../attribute-suggestions/revert-guard';
 import { unlock } from '../../lock-unlock';
@@ -760,8 +760,8 @@ export default function SuggestionStoreInterceptor() {
 	const isSuggestMode = useSelect(
 		( select ) =>
 			// `getEditorIntent` is private while Suggest mode is experimental.
-			unlock( select( EDITOR_STORE_NAME ) ).getEditorIntent() ===
-			SUGGEST_INTENT,
+			unlock( select( STORE_NAME ) ).getEditorIntent() ===
+			EDITOR_INTENT_SUGGEST,
 		[]
 	);
 
