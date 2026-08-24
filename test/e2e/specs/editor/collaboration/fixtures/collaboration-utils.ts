@@ -101,11 +101,18 @@ export default class CollaborationUtils {
 		postId: number,
 		user: UserCredentials
 	): Promise< { page: Page; editor: Editor } > {
+		/*
+		 * Always start from a clean storage state. Without the override, the
+		 * new context inherits the admin storage state from the Playwright
+		 * config, and an authenticated request to wp-login.php renders a
+		 * page whose wp_attempt_focus() script clears the password field
+		 * 200ms after load. That clear races the fill below, and when it
+		 * wins, the required-field validation silently blocks the submit and
+		 * the login never navigates.
+		 */
 		const context = await this.admin.browser.newContext( {
 			baseURL: BASE_URL,
-			...( USE_TEST_WS_PROVIDER
-				? { storageState: { cookies: [], origins: [] } }
-				: {} ),
+			storageState: { cookies: [], origins: [] },
 		} );
 		const newPage = await context.newPage();
 
