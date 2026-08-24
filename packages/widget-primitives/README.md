@@ -59,6 +59,8 @@ It's the seam through which the embedding application provides what only it know
 
 The first capability is `links` (`WidgetHostLinks`): `match` resolves a href to an in-app route path (a string, or `null` for anything the application does not own), and `Link` is the router's primitive, which must render a real anchor and forward `ref` to it. A matched link action navigates client-side; `null`, `download`, and `openInNewTab` keep the plain anchor.
 
+Consumers reach the anchor through that ref: a link that drops it is skipped by keyboard navigation and loses its tooltip. The Widget Host Storybook page carries the one test that pins it.
+
 ### Contract types
 
 `WidgetType`, `WidgetName`, `WidgetIcon`, `WidgetRenderProps`, `ResolveWidgetModule`, and `WidgetModuleRecord`. `WidgetIcon` is a rendered SVG element that hosts pass to their icon primitive as-is; in `widget.json` a widget declares a registered icon name instead, resolved before it reaches hosts.
