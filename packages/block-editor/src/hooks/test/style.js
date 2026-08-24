@@ -367,6 +367,76 @@ describe( 'getBlockStateStylesCSS', () => {
 	} );
 } );
 
+describe( 'getBlockStateStylesCSS with legacy selectors', () => {
+	beforeEach( () => {
+		registerBlockType( 'test/legacy-selector', {
+			apiVersion: 3,
+			title: 'Legacy Selector',
+			category: 'text',
+			attributes: {},
+			edit: () => null,
+			save: () => null,
+			supports: {
+				color: {
+					background: true,
+					__experimentalSelector: 'table, th',
+				},
+			},
+		} );
+
+		registerBlockType( 'test/modern-and-legacy-selector', {
+			apiVersion: 3,
+			title: 'Modern And Legacy Selector',
+			category: 'text',
+			attributes: {},
+			edit: () => null,
+			save: () => null,
+			selectors: {
+				root: '.wp-block-modern-and-legacy-selector',
+			},
+			supports: {
+				color: {
+					background: true,
+					__experimentalSelector: 'table, th',
+				},
+			},
+		} );
+	} );
+
+	afterEach( () => {
+		unregisterBlockType( 'test/legacy-selector' );
+		unregisterBlockType( 'test/modern-and-legacy-selector' );
+	} );
+
+	it( 'routes state styles through a legacy feature selector', () => {
+		expect(
+			getBlockStateStylesCSS(
+				{ color: { background: '#00ff00' } },
+				{
+					name: 'test/legacy-selector',
+					baseSelector: '.wp-elements-abc123',
+				}
+			)
+		).toBe(
+			'.wp-elements-abc123 table, .wp-elements-abc123 th { background-color: #00ff00 !important; }\n.wp-elements-abc123 table, .wp-elements-abc123 th { background-image: unset !important; }'
+		);
+	} );
+
+	it( 'ignores legacy selectors when the block declares the selectors API', () => {
+		expect(
+			getBlockStateStylesCSS(
+				{ color: { background: '#00ff00' } },
+				{
+					name: 'test/modern-and-legacy-selector',
+					baseSelector: '.wp-elements-abc123',
+				}
+			)
+		).toBe(
+			'.wp-elements-abc123 { background-color: #00ff00 !important; }\n.wp-elements-abc123 { background-image: unset !important; }'
+		);
+	} );
+} );
+
 describe( 'getResponsiveStateCSSRules', () => {
 	beforeEach( () => {
 		registerBlockType( 'test/state-button', {
