@@ -32,7 +32,7 @@ Private @wordpress/sync APIs.
 
 Yjs should not be considered a public API. It is a third-party library that _will_ experience breaking changes in the future.
 
-Two Yjs instances operating on the same document cause silent data corruption:
+`@wordpress/sync` is a bundled package: each consumer bundles its own copy, and no `wp.sync` global or `wp-sync` script handle is exposed by WordPress. Two Yjs instances operating on the same document cause silent data corruption:
 
 <https://github.com/yjs/yjs/issues/438>
 
@@ -77,8 +77,6 @@ const createProvider = async ( { awareness, ydoc, Y } ) => {
 ```
 
 See `packages/e2e-tests/plugins/rtc-websocket-provider` for a complete working example.
-
-Deprecated: `@wordpress/sync` is currently also exposed as the `wp-sync` WordPress script, which provides the same Yjs module as the `wp.sync.Y` global. This global will be removed in a future release, and it is already unavailable in WordPress core. Providers that still resolve `yjs` to `wp.sync.Y` through webpack externals should migrate to the `Y` option described above.
 
 ### YJS_VERSION
 
