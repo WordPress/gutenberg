@@ -65,11 +65,23 @@ function IntentSwitcher() {
 	);
 	const { setEditorIntent } = unlock( useDispatch( editorStore ) );
 
+	/*
+	 * The active choice hides its shortcut. `MenuItemsChoice` renders the
+	 * selection as a checked radio with the label; a key hint next to it
+	 * reads as "press this to get where you already are". `ModeSwitcher`
+	 * drops the shortcut from the selected mode for the same reason.
+	 */
+	const choices = INTENTS.map( ( choice ) =>
+		choice.value === intent
+			? { value: choice.value, label: choice.label, info: choice.info }
+			: choice
+	);
+
 	return (
 		<PostTypeSupportCheck supportKeys="editor.notes">
 			<MenuGroup label={ __( 'Mode' ) }>
 				<MenuItemsChoice
-					choices={ INTENTS }
+					choices={ choices }
 					value={ intent }
 					onSelect={ setEditorIntent }
 				/>
