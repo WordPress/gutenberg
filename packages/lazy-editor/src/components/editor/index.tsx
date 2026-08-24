@@ -21,6 +21,7 @@ interface EditorProps {
 	settings?: Record< string, any >;
 	backButton?: ReactNode;
 	onActionPerformed?: ( actionId: string, items: any[] ) => void;
+	initialViewport?: string;
 }
 
 /**
@@ -32,6 +33,7 @@ interface EditorProps {
  * @param {Object}    props.settings          Optional extra settings to merge with editor settings
  * @param {ReactNode} props.backButton        Optional back button to render in editor header
  * @param {Function}  props.onActionPerformed Optional callback run after a post action
+ * @param {string}    props.initialViewport   Optional device type the entity opens at
  * @return The editor component with loading states
  */
 export function Editor( {
@@ -40,6 +42,7 @@ export function Editor( {
 	settings,
 	backButton,
 	onActionPerformed,
+	initialViewport,
 }: EditorProps ) {
 	// Resolve homepage when no postType/postId provided
 	const homePage = useSelect(
@@ -127,6 +130,7 @@ export function Editor( {
 			settings={ finalSettings }
 			styles={ finalSettings.styles }
 			onActionPerformed={ onActionPerformed }
+			initialViewport={ initialViewport }
 		>
 			{ backButton && <BackButton>{ backButton }</BackButton> }
 			{ /*

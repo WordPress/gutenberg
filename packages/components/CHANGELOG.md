@@ -7,6 +7,7 @@
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
     -   `DropdownContentWrapper` ([#81522](https://github.com/WordPress/gutenberg/pull/81522))
     -   `ResizableBox` ([#81792](https://github.com/WordPress/gutenberg/pull/81792))
+    -   `ComboboxControl`: ([#80471](https://github.com/WordPress/gutenberg/pull/80471))
 
 ### Enhancements
 
@@ -23,6 +24,7 @@
 -   `BoxControl`: Update the opposite side when ALT is held on the left or right input, which each updated themselves instead ([#81530](https://github.com/WordPress/gutenberg/pull/81530)).
 -   `InputControl`: Vertically center the value of date and time inputs in Safari ([#81361](https://github.com/WordPress/gutenberg/pull/81361)).
 -   `ControlWithError`: Re-read the target's validation message when an `invalid` event is received, so a message that changed without a re-render in between (e.g. a programmatic value change followed by a synthetic `invalid` event) is not revealed stale or empty. While a `validating` custom validity is pending, the message is left untouched so the pending indicator keeps showing ([#81440](https://github.com/WordPress/gutenberg/pull/81440)).
+-   `Button`: Apply the `has-text` class when the children that render the label are conditional, wrapped in an element, or preceded by other children, so that such buttons are no longer styled as icon-only buttons ([#81521](https://github.com/WordPress/gutenberg/pull/81521)).
 
 ### TypeScript
 
@@ -30,7 +32,9 @@
 
 ### Internal
 
+-   Update `@ariakit/react` to 0.4.37 and `@ariakit/test` to 0.7.4 ([#81080](https://github.com/WordPress/gutenberg/pull/81080)).
 -   Point tsconfig references at split dependencies' build projects. ([#81514](https://github.com/WordPress/gutenberg/pull/81514), [#81516](https://github.com/WordPress/gutenberg/pull/81516), [#81518](https://github.com/WordPress/gutenberg/pull/81518))
+-   Update `is-plain-object` to 5.1.0, which ships its own types, and drop the `@ts-expect-error` that the missing declaration required ([#81926](https://github.com/WordPress/gutenberg/pull/81926)).
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81515](https://github.com/WordPress/gutenberg/pull/81515))
 -   Remove `ValidatedComboboxControl` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81449](https://github.com/WordPress/gutenberg/pull/81449)).
 -   Remove `ValidatedFormTokenField` from the private APIs; it now lives internally in `@wordpress/dataviews`, its only consumer ([#81451](https://github.com/WordPress/gutenberg/pull/81451)).
