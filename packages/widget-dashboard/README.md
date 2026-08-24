@@ -148,6 +148,33 @@ Edit-mode toggle: a "Customize" button while `editMode` is off, and "Add widget"
 
 Command palette integration. It registers the dashboard's commands through `@wordpress/commands` (customize, add widgets, reset to default) and sets the active command context. It renders nothing, and surfaces wherever the host application mounts the command palette. Ships in the default arrangement; when passing custom children, compose it to keep the integration.
 
+#### `<WidgetDashboard.Policy>`
+
+Governs what users may do on the dashboards below it. `canPerform` receives a request naming the operation and its subject, and returns whether it is allowed. Two operations are enforced: `customize`, entering customize mode from the Customize button and the command palette, and `insert`, offering a widget type in the inserter; a rejected type stays out of the listing but keeps rendering where already placed.
+
+Return `true` for operations you do not govern. Policies compose restrictively, so a default `false` would deny every operation added later.
+
+```tsx
+<WidgetDashboard.Policy
+	canPerform={ ( request ) => {
+		switch ( request.operation ) {
+			case 'customize':
+				return canEditLayout;
+			case 'insert':
+				return request.widgetType.category === activeSection;
+			default:
+				return true;
+		}
+	} }
+>
+	<WidgetDashboard { ...props } />
+</WidgetDashboard.Policy>
+```
+
+Unlike the other compound components, it mounts around `<WidgetDashboard>`, not inside it: the engine mounts the inserter outside the `children` subtree, so a policy placed inside `children` has no effect. One provider can cover several dashboards; nested policies allow an operation only when every enclosing policy allows it, and without one every operation is allowed. The callback can close over application state, and the dashboard follows that state, even while the inserter is open.
+
+The policy governs the interface. A host that must enforce permissions does so where the layout persists.
+
 `<Page>` from `@wordpress/admin-ui` exposes an `actions` slot used across admin screens (DataViews, WidgetDashboard, …). Plug `Actions` straight into it:
 
 ```tsx
@@ -174,7 +201,7 @@ import { Page } from '@wordpress/admin-ui';
 
 ## Inserting widgets
 
-The "Add widget" button in `<WidgetDashboard.Actions />` opens a modal inserter. It lists every entry in the `widgetTypes` prop as a grid of live previews (each preview renders the type's `example` attributes through its own render module), supports search, and exposes a "Select" action with bulk support so users can insert one or several widgets in a single layout change.
+The "Add widget" button in `<WidgetDashboard.Actions />` opens a modal inserter. It lists the `widgetTypes` prop as a grid of live previews (each preview renders the type's `example` attributes through its own render module), supports search, and exposes a "Select" action with bulk support so users can insert one or several widgets in a single layout change. A `<WidgetDashboard.Policy>` above the dashboard narrows the listing through the `insert` operation; without one, every entry is offered.
 
 On confirmation, the inserter creates instances (using each type's `example.attributes` as the initial values) and appends them to the staged layout. The dialog closes after a successful insertion or when the user dismisses it.
 

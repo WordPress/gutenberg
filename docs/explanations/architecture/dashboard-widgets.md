@@ -91,6 +91,8 @@ The dashboard engine ([`@wordpress/widget-dashboard`](https://github.com/WordPre
 -   Wraps every instance in its own chrome: header, toolbars, error boundary, Suspense fallback.
 -   Passes `resolveWidgetModule` down through its context, overridable for tests and Storybook.
 
+Governance is separate from rendering: a `WidgetDashboard.Policy` mounted above one or several dashboards answers `canPerform` for each operation (entering customize mode, offering a widget type in the inserter), without touching the registry that keeps placed widgets rendering.
+
 The same `WidgetType` could be rendered by any other host, and where and how to render belongs entirely to the host. Every host is a consumer of the package, but not every consumer is a host: tests, Storybook, or a picker that only lists widget types consume the same contract without rendering anything.
 
 ## Why a standalone package

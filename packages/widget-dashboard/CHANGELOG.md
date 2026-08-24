@@ -4,6 +4,12 @@
 
 ### New Features
 
+-   `WidgetDashboard.Policy`: a provider that governs the dashboards below
+    it through `canPerform( request )`. Two operations ship: `customize`
+    (the Customize button and the matching commands) and `insert` (what
+    the inserter offers; a rejected type keeps rendering where already
+    placed). Nested policies compose restrictively.
+
 -   Widget chrome footer: `relevance: 'high'` actions mount as leading text
     links (declared icon as prefix) in a persistent strip under the widget
     body, `'medium'` as trailing compact affordances (icon-only with a
