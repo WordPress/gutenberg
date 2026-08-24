@@ -664,7 +664,7 @@ describe( 'DataViews Picker', () => {
 
 			// Both "Grid" and "Table" picker layout options must appear in the menu.
 			expect(
-				screen.getByRole( 'menuitemradio', { name: 'Grid' } )
+				await screen.findByRole( 'menuitemradio', { name: 'Grid' } )
 			).toBeInTheDocument();
 			expect(
 				screen.getByRole( 'menuitemradio', { name: 'Table' } )
