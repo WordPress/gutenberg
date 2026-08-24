@@ -7,12 +7,14 @@
 		position: relative;
 		justify-self: start;
 	}
+}
 
-	// When the ZStack is layered, all items overlap in the same grid cell.
-	&.layered > .child {
-		grid-row-start: 1;
-		grid-column-start: 1;
-	}
+// When the ZStack is layered, all items overlap in the same grid cell.
+// Kept at the top level so that the selector retains the same specificity
+// as `.z-stack > .child` above, matching the original Emotion styles.
+.layered > .child {
+	grid-row-start: 1;
+	grid-column-start: 1;
 }
 
 .child:not(:first-of-type) {
