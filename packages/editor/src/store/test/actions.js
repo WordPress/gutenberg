@@ -1216,6 +1216,7 @@ describe( 'Editor actions', () => {
 
 		beforeEach( () => {
 			registry = createRegistryWithStores();
+			speak.mockClear();
 		} );
 
 		it( 'defaults to edit', () => {
@@ -1333,11 +1334,30 @@ describe( 'Editor actions', () => {
 				'suggest'
 			);
 			expect( getNotices() ).toHaveLength( 1 );
+			expect( getNotices()[ 0 ] ).toMatchObject( {
+				type: 'snackbar',
+				content: "You're suggesting",
+			} );
 
 			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
 				'suggest'
 			);
 			expect( getNotices() ).toHaveLength( 1 );
+		} );
+
+		it( 'leaves the announcement to the snackbar', () => {
+			// `Snackbar` speaks its own content politely from an effect. The
+			// action must not announce as well, or the mode is said twice and
+			// the assertive update interrupts the polite one.
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'view'
+			);
+
+			const [ notice ] = registry.select( noticesStore ).getNotices();
+			expect( notice.content ).toBe( "You're viewing" );
+			// The snackbar speaks this, once, politely.
+			expect( notice.spokenMessage ).toBe( "You're viewing" );
+			expect( speak ).not.toHaveBeenCalled();
 		} );
 
 		it( 'does not write to the preferences store (session-scoped only)', () => {

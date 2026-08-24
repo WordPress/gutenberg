@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a session-scoped editor intent (`edit`, `suggest`, `view`), with a private `setEditorIntent` action and `getEditorIntent` selector - the intent API stays private while Suggest mode is experimental. It is surfaced as an Edit / Suggest / View menu in the editor options for post types that support notes, and announced on change with a snackbar. Keyboard shortcuts follow the Google Docs convention: Ctrl+Alt+Shift+Z (Edit), +X (Suggest), +C (View) on Windows, ⌘⌥⇧Z/X/C on macOS ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
+
 ### Enhancements
 
 -   Commands: Add a command palette entry that opens the current post on the front end once it is published, labelled with the post type's `view_item` label ([#66720](https://github.com/WordPress/gutenberg/pull/66720)).
@@ -16,6 +20,7 @@
 -   Suggest mode: keep a review decision and its note together through undo. Accepting or rejecting a suggestion changes block content and resolves the note, but only the content half is in the undo stack, so undo put the marker back on a note that stayed resolved - a marked-up run with no Accept/Reject on it and no way to clear it. Undoing a decision made in this session now reopens its note along with the marker, restoring the suggestion's lifecycle meta to `pending` ([#81669](https://github.com/WordPress/gutenberg/pull/81669), [#81963](https://github.com/WordPress/gutenberg/pull/81963)).
 -   Suggest mode: extend a format suggestion on a second toggle instead of opening a second one. Toggling a further format over a run that already carries the suggester's own pending `format` marker recorded a suggestion whose before and after were both empty - unreviewable and unapplyable - and made every marker in the block disappear. The existing suggestion is now revised in place, a toggle that restores the original run retracts it rather than storing a note that proposes nothing, and a note that has replies is revised rather than withdrawn ([#81665](https://github.com/WordPress/gutenberg/pull/81665)).
 -   Suggest mode: refuse post status changes while suggesting. `editPost` drops the `status` field in the `suggest` intent, the status control and the summary panel show the status without offering to change it, and the publish button is disabled there rather than dropping the status edit and saving the post anyway. A status edit that travels with a companion field - the `password` that visibility changes carry, the `date` that scheduling carries - is refused whole rather than half-applied, a status repeated at the value it already holds is not announced as a refusal, and a status staged before the intent changed is discarded on the way in. The refusal is announced and shown in a snackbar ([#81664](https://github.com/WordPress/gutenberg/pull/81664)).
+-   `DocumentTools`: Disable the Block Inserter toggle while the canvas is a preview, and close an inserter left open when the editor enters the `view` intent, so the control that adds blocks does not open onto a library the editor will refuse ([#80427](https://github.com/WordPress/gutenberg/pull/80427), [#81661](https://github.com/WordPress/gutenberg/pull/81661)).
 -   Register the editor and block editor keyboard shortcuts from the editor provider, so shortcuts work for consumers that mount the editor without rendering `EditorKeyboardShortcutsRegister` themselves ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
 -   Header: Allow the Back button column to grow when "Show button text labels" is enabled so the label is not obscured by the following controls ([#81701](https://github.com/WordPress/gutenberg/pull/81701)).
 -   Notes: Stop forcing capitalization of the user name in a note byline, so the name is shown as the user set it ([#81788](https://github.com/WordPress/gutenberg/pull/81788)).
@@ -46,9 +51,7 @@
 ### New Features
 
 -   Add a `blockStatesEditingEnabled` editor setting, defaulting to `true`, which hides state controls for blocks in the block inspector and Global Styles when set to `false` ([#80956](https://github.com/WordPress/gutenberg/pull/80956), [#81058](https://github.com/WordPress/gutenberg/pull/81058)).
--   Added a session-scoped editor intent (`edit`, `suggest`, `view`) with a matching private `setEditorIntent` action and private `getEditorIntent` selector (the intent API is private while Suggest mode is experimental). Surfaced as an Edit / Suggest / View menu in the editor options for post types that support notes. The `view` intent puts the block editor into a read-only preview. Keyboard shortcuts follow the Google Docs convention: Ctrl+Alt+Shift+Z (Edit), +X (Suggest), +C (View) on Windows / ⌘⌥⇧Z/X/C on macOS.
 -   Added a suggestion-overlay subsystem that powers the `suggest` intent. When active, an `editor.BlockEdit` filter diverts `setAttributes` into an in-memory overlay keyed by `clientId`; the block renders with the pending change merged on top of its real attributes, but the block-editor store stays at the baseline. Pending overlay edits auto-save as a note comment with a `_wp_suggestion` meta payload (`schemaVersion`, `blockName`, `baseRevision`, `operations`) after a short idle window, and subsequent edits on the same block update the existing note rather than creating a new one. Blocks with a pending suggestion are marked with a green bracket/outline, and the notes sidebar shows a Docs-style 'Add / Delete / Format' summary with checkmark-and-close icon buttons to accept or reject.
--   `setEditorIntent` now surfaces mode transitions with a snackbar ('You're suggesting' / 'You're editing' / 'You're viewing') alongside the existing a11y announcement.
 
 ### Bug Fixes
 

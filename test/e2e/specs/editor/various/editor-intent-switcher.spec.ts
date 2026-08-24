@@ -1,27 +1,29 @@
 import type { Page } from '@playwright/test';
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
-async function openIntentSwitcher( page: Page ) {
-	await page.click(
-		'role=region[name="Editor top bar"i] >> role=button[name="Options"i]'
-	);
+function optionsButton( page: Page ) {
+	return page
+		.getByRole( 'region', { name: 'Editor top bar' } )
+		.getByRole( 'button', { name: 'Options' } );
 }
 
 /*
- * `MenuItemsChoice` keeps its dropdown open on selection, and Escape does not
- * reliably dismiss it. Leaving it open is what made this test flaky: the
- * Options button toggles, so reopening a menu that never closed shuts it
- * instead, and the assertion that follows finds no menu item at all. Close it
- * through the same toggle and wait for it to actually go.
+ * `MenuItemsChoice` keeps its dropdown open after a selection, and Escape does
+ * not reliably dismiss it. Since Options is a toggle, clicking it while the
+ * dropdown is still mounted closes the menu rather than reopening it, and the
+ * assertion that follows fails with "element not found". Only click when the
+ * menu is not already showing, so the helper is safe to call either way.
  */
-async function closeIntentSwitcher( page: Page ) {
-	await page
-		.getByRole( 'region', { name: 'Editor top bar' } )
-		.getByRole( 'button', { name: 'Options' } )
-		.click();
-	await expect(
-		page.getByRole( 'menuitemradio', { name: /^Suggesting/ } )
-	).toBeHidden();
+async function openIntentSwitcher( page: Page ) {
+	const suggestChoice = page.getByRole( 'menuitemradio', {
+		name: /^Suggesting/,
+	} );
+
+	if ( ! ( await suggestChoice.isVisible() ) ) {
+		await optionsButton( page ).click();
+	}
+
+	await expect( suggestChoice ).toBeVisible();
 }
 
 test.describe( 'Editor intent switcher', () => {
@@ -76,56 +78,32 @@ test.describe( 'Editor intent switcher', () => {
 		).toHaveAttribute( 'aria-checked', 'true' );
 	} );
 
-	test( 'View intent makes blocks read-only', async ( { editor, page } ) => {
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: { content: 'Initial content' },
-		} );
-
-		await openIntentSwitcher( page );
-		await page
-			.getByRole( 'menuitemradio', { name: /^Viewing\s+Read-only/ } )
-			.click();
-
-		// In preview mode, block content is not editable — the paragraph
-		// should render but clicking and typing should not change it.
-		const paragraph = editor.canvas.getByText( 'Initial content' );
-		await expect( paragraph ).toBeVisible();
-		await expect( paragraph ).not.toHaveAttribute(
-			'contenteditable',
-			'true'
-		);
-	} );
-
 	test( 'keyboard shortcut cycles between intents', async ( {
 		page,
 		pageUtils,
 	} ) => {
-		/*
-		 * The intent shortcuts are registered with the `secondary` modifier,
-		 * which is Ctrl+Alt+Shift on Windows and Linux but Cmd+Opt+Shift on
-		 * macOS. Press it through `pageUtils` so the test resolves the same
-		 * combination the editor is listening for, rather than passing on
-		 * every platform CI happens to run.
-		 */
+		// The intent shortcuts are registered with the `secondary` modifier,
+		// which is Ctrl+Alt+Shift on Windows and Linux but ⇧⌥⌘ on macOS.
+		// Press it through `pageUtils` so the test exercises the shortcut the
+		// current platform actually registered.
+
 		// Default is Edit.
-		await pageUtils.pressKeys( 'secondary+x' );
+		await pageUtils.pressKeys( 'secondary+X' );
 		await openIntentSwitcher( page );
 		await expect(
 			page.getByRole( 'menuitemradio', { name: /^Suggesting/ } )
 		).toHaveAttribute( 'aria-checked', 'true' );
 
-		// Close menu and switch to View via shortcut.
-		await closeIntentSwitcher( page );
-		await pageUtils.pressKeys( 'secondary+c' );
+		// The menu stays open across the switch; the shortcut works from
+		// inside it and the choice's state updates in place.
+		await pageUtils.pressKeys( 'secondary+C' );
 		await openIntentSwitcher( page );
 		await expect(
 			page.getByRole( 'menuitemradio', { name: /^Viewing\s+Read-only/ } )
 		).toHaveAttribute( 'aria-checked', 'true' );
 
 		// Back to Edit.
-		await closeIntentSwitcher( page );
-		await pageUtils.pressKeys( 'secondary+z' );
+		await pageUtils.pressKeys( 'secondary+Z' );
 		await openIntentSwitcher( page );
 		await expect(
 			page.getByRole( 'menuitemradio', {

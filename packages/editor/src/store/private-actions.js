@@ -1,4 +1,3 @@
-import { speak } from '@wordpress/a11y';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -815,7 +814,8 @@ export const setEditorIntent =
 			const refusal = __(
 				'Suggesting needs the visual editor. Enable it in your profile settings to suggest changes.'
 			);
-			speak( refusal, 'assertive' );
+			// The snackbar speaks its own content; announcing here as well
+			// would say the refusal twice.
 			registry.dispatch( noticesStore ).createNotice( 'info', refusal, {
 				id: 'editor-intent-mode',
 				type: 'snackbar',
@@ -899,9 +899,9 @@ export const setEditorIntent =
 
 		if ( label ) {
 			/*
-			 * Fold the canvas swap into the same message instead of speaking
-			 * twice: two `assertive` announcements in a row and the second
-			 * clobbers the first before it has been read out.
+			 * Fold the canvas swap into the same message rather than
+			 * announcing it separately, so the mode change and the editor it
+			 * landed in are read out as one thing.
 			 */
 			let message = label;
 			if ( nextMode !== previousMode ) {
@@ -915,7 +915,11 @@ export const setEditorIntent =
 				);
 			}
 
-			speak( message, 'assertive' );
+			// The snackbar is the single announcement owner: `Snackbar`
+			// speaks its content politely from its own effect, so the action
+			// must not also announce, which would say the mode twice and let
+			// an assertive update interrupt the polite one.
+			//
 			// Reuse the same notice id across mode changes so rapid keyboard
 			// cycling doesn't pile up multiple snackbars — the new notice
 			// replaces the old one.
