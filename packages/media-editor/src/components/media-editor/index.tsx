@@ -4,7 +4,8 @@ import {
 	Spinner,
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
-import { Stack, Tabs, Text } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components -- load-testing the strip's collapse-to-select behaviour with @wordpress/ui's experimental SelectControl; not yet a shipped choice.
+import { SelectControl, Stack, Tabs, Text } from '@wordpress/ui';
 import { useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -113,7 +114,34 @@ const TABS: MediaEditorTab[] = [
 		// feature yet.
 		render: () => <Text>{ __( 'Enhance tools will appear here.' ) }</Text>,
 	},
+	{
+		id: 'advanced',
+		title: __( 'Advanced' ),
+		// Placeholder, to push the strip past its four-tab ceiling and test
+		// the collapse to a select. Not a real feature yet.
+		render: () => (
+			<Text>{ __( 'Advanced options will appear here.' ) }</Text>
+		),
+	},
+	{
+		id: 'annotate',
+		title: __( 'Annotate' ),
+		// Placeholder, load-testing the strip at six tabs. Not a real
+		// feature yet.
+		render: () => (
+			<Text>{ __( 'Annotation tools will appear here.' ) }</Text>
+		),
+	},
 ];
+
+// `SelectControl`'s `value`/`onValueChange` operate on the item objects
+// passed to `items` (Base UI's convention), not the raw tab id, so the
+// collapsed-to-select panel switcher maps `TABS` to that shape once and
+// reuses it both ways.
+const selectItems = TABS.map( ( tab ) => ( {
+	value: tab.id,
+	label: tab.title,
+} ) );
 
 /** The tab a newly opened panel starts on. */
 const DEFAULT_TAB = TABS[ 0 ].id;
@@ -155,6 +183,17 @@ export interface MediaEditorProps {
 	noticesPortalElement?: Element | null;
 	shouldCloseOnEsc?: boolean;
 	/**
+	 * How many tabs the settings panel's switcher shows as a strip before it
+	 * collapses to a select naming the current panel. A strip that overflows
+	 * hides an unknown number of tabs with no indication of how many, so a
+	 * fixed count picks the fallback rather than letting it happen silently —
+	 * but the right count depends on how long the tab labels translate to, so
+	 * a caller in a language with longer labels can lower it.
+	 *
+	 * @default 4
+	 */
+	maxTabs?: number;
+	/**
 	 * Formerly the `@wordpress/interface` scope for the details sidebar, which
 	 * persisted the panel's open state per scope to user meta.
 	 *
@@ -170,12 +209,55 @@ export interface MediaEditorProps {
 interface MediaEditorSidebarProps {
 	activeTab: string;
 	onSelectTab: ( tab: string ) => void;
+	maxTabs: number;
 }
+
+// Default for `MediaEditorProps.maxTabs`. Up to this many tabs the switcher
+// is a tablist; past it, it collapses to a select naming the current panel.
+const DEFAULT_MAX_TABS = 4;
 
 function MediaEditorSidebar( {
 	activeTab,
 	onSelectTab,
+	maxTabs,
 }: MediaEditorSidebarProps ) {
+	const isCollapsedToSelect = TABS.length > maxTabs;
+
+	// `Tabs.Root` throws in dev when its registered Tab count and Panel count
+	// disagree, and a select has no Tabs to register — so the collapsed
+	// state can't keep the panels inside `Tabs.Root` and swap only the
+	// switcher above it.
+	if ( isCollapsedToSelect ) {
+		return (
+			<NavigableRegion
+				className="media-editor__sidebar"
+				ariaLabel={ __( 'Media settings' ) }
+			>
+				<SelectControl
+					className="media-editor__sidebar-select"
+					label={ __( 'Panel' ) }
+					hideLabelFromVision
+					items={ selectItems }
+					value={
+						selectItems.find(
+							( item ) => item.value === activeTab
+						) ?? null
+					}
+					onValueChange={ ( item ) =>
+						onSelectTab( item?.value ?? activeTab )
+					}
+				/>
+				<Stack
+					className="media-editor__panel"
+					direction="column"
+					gap="lg"
+				>
+					{ TABS.find( ( tab ) => tab.id === activeTab )?.render() }
+				</Stack>
+			</NavigableRegion>
+		);
+	}
+
 	return (
 		<NavigableRegion
 			className="media-editor__sidebar"
@@ -479,6 +561,7 @@ function MediaEditorContent( {
 	noticesClassName = 'media-editor__snackbar',
 	noticesPortalElement,
 	shouldCloseOnEsc = false,
+	maxTabs = DEFAULT_MAX_TABS,
 }: MediaEditorProps ) {
 	const cropper = useMediaEditor();
 	// Width decides whether the Details panel docks beside the canvas or takes
@@ -751,6 +834,7 @@ function MediaEditorContent( {
 							<MediaEditorSidebar
 								activeTab={ activeTab }
 								onSelectTab={ setActiveTab }
+								maxTabs={ maxTabs }
 							/>
 						) }
 					</div>

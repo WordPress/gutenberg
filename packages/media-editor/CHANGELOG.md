@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   `MediaEditor`: replace the single Details panel with a tab strip, so the settings panel can hold more than one pane. Past `maxTabs` (4 by default) the strip collapses to a select naming the current panel, rather than becoming a row that scrolls or hides tabs with no indication of how many. The new `maxTabs` prop lowers that count for languages whose tab labels translate longer ([#81972](https://github.com/WordPress/gutenberg/pull/81972)).
 -   `MediaEditor`: move rotate, flip, zoom and aspect ratio out of the sidebar to a toolbar under the canvas, at every viewport. Frees the sidebar for Details alone ([#81840](https://github.com/WordPress/gutenberg/pull/81840)).
 -   `MediaEditor`: replace `ComplementaryArea` and `InterfaceSkeleton` with a layout the media editor owns. Both were built for the post and site editors and imposed breakpoints the media editor could not control ([#81840](https://github.com/WordPress/gutenberg/pull/81840)).
 -   `MediaEditor`: widen the docked details panel to 400px and dock it above the `large` breakpoint; below that it takes the whole body ([#81840](https://github.com/WordPress/gutenberg/pull/81840)).

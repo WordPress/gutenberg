@@ -187,6 +187,40 @@
 	.media-editor__panel {
 		padding: $grid-unit-20 $grid-unit-10 $grid-unit-30 $grid-unit-10;
 	}
+
+	// Collapsed (five-plus tabs): the select and the panels sit directly in
+	// the sidebar rather than inside a `[role="tabpanel"]`, so neither
+	// inherits the strip's inline gutter. Supplying it here rather than on
+	// `.media-editor__sidebar` keeps that rule's "no padding, the strip and
+	// panes own it" comment true for the tablist path.
+	.media-editor__sidebar-select {
+		flex-shrink: 0;
+		margin: $grid-unit-20;
+	}
+
+	// Only the active tab's panel renders here (see `MediaEditorSidebar`), so
+	// this always targets the one panel on screen.
+	.media-editor__sidebar-select ~ .media-editor__panel {
+		// Margin, not padding: the border below is drawn on this box, and
+		// padding sits inside it — the rule would still run the panel's full
+		// width. The margin pulls the box's edges in so the rule's ends land
+		// under the same edges the select and the fields do.
+		margin-inline: $grid-unit-20;
+
+		// The tablist path gets this from `[role="tabpanel"]`, which the
+		// collapsed path has no equivalent of — without it a long Details
+		// form runs past the sidebar instead of scrolling inside it.
+		flex: 1;
+		min-height: 0;
+		overflow-y: auto;
+
+		// Same divider the tablist draws above its pane, so the select reads
+		// as panel chrome the way the strip does — separated from the panel
+		// content rather than sitting flush above it.
+		border-top:
+			$border-width solid
+			var(--wpds-color-stroke-surface-neutral);
+	}
 }
 
 .media-editor__snackbar {
