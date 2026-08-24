@@ -276,4 +276,104 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 			'Submenu should not have "open-on-hover-click" class when legacy openSubmenusOnClick was true'
 		);
 	}
+
+	/**
+	 * Renders a submenu with the given navigation-link children and returns the HTML.
+	 *
+	 * @param string $children Serialized inner navigation-link blocks.
+	 * @return string Rendered submenu HTML.
+	 */
+	private function render_submenu_with_children( $children ) {
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:navigation-submenu {"label":"Parent","url":"/parent","kind":"custom"} -->' . $children . '<!-- /wp:navigation-submenu -->'
+		);
+
+		$this->assertCount( 1, $parsed_blocks, 'Submenu block not parsable.' );
+
+		$context = array(
+			'showSubmenuIcon' => true,
+		);
+
+		$navigation_submenu_block = new WP_Block( $parsed_blocks[0], $context );
+
+		return gutenberg_render_block_core_navigation_submenu(
+			$navigation_submenu_block->attributes,
+			array(),
+			$navigation_submenu_block
+		);
+	}
+
+	/**
+	 * @covers ::gutenberg_render_block_core_navigation_submenu
+	 */
+	public function test_should_add_hidden_viewport_classes_to_submenu_icon_and_container_when_all_children_are_hidden_on_a_viewport() {
+		$rendered_html = $this->render_submenu_with_children(
+			'<!-- wp:navigation-link {"label":"Child","url":"/child","kind":"custom","metadata":{"blockVisibility":{"viewport":{"desktop":false,"tablet":true,"mobile":true}}}} /-->'
+		);
+
+		$this->assertStringContainsString( 'has-child', $rendered_html, 'Submenu should keep the has-child class when children are visible on some viewport.' );
+
+		$tags = new WP_HTML_Tag_Processor( $rendered_html );
+
+		$this->assertTrue(
+			$tags->next_tag(
+				array(
+					'tag_name'   => 'button',
+					'class_name' => 'wp-block-navigation__submenu-icon',
+				)
+			),
+			'Submenu icon button not found.'
+		);
+		$this->assertStringContainsString(
+			'wp-block-hidden-desktop',
+			$tags->get_attribute( 'class' ),
+			'Submenu icon should be hidden on the viewport where every child is hidden.'
+		);
+		$this->assertStringNotContainsString(
+			'wp-block-hidden-tablet',
+			$tags->get_attribute( 'class' ),
+			'Submenu icon should not be hidden on viewports with visible children.'
+		);
+
+		$this->assertTrue(
+			$tags->next_tag(
+				array(
+					'tag_name'   => 'ul',
+					'class_name' => 'wp-block-navigation__submenu-container',
+				)
+			),
+			'Submenu container not found.'
+		);
+		$this->assertStringContainsString(
+			'wp-block-hidden-desktop',
+			$tags->get_attribute( 'class' ),
+			'Submenu container should be hidden on the viewport where every child is hidden.'
+		);
+	}
+
+	/**
+	 * @covers ::gutenberg_render_block_core_navigation_submenu
+	 */
+	public function test_should_render_plain_link_without_submenu_when_children_are_hidden_on_all_viewports() {
+		$rendered_html = $this->render_submenu_with_children(
+			'<!-- wp:navigation-link {"label":"Child","url":"/child","kind":"custom","metadata":{"blockVisibility":{"viewport":{"desktop":false,"tablet":false,"mobile":false}}}} /-->'
+		);
+
+		$this->assertStringNotContainsString( 'has-child', $rendered_html, 'Submenu should not have the has-child class when every child is hidden on all viewports.' );
+		$this->assertStringNotContainsString( 'wp-block-navigation__submenu-icon', $rendered_html, 'Submenu icon should not render when every child is hidden on all viewports.' );
+		$this->assertStringNotContainsString( 'wp-block-navigation__submenu-container', $rendered_html, 'Submenu container should not render when every child is hidden on all viewports.' );
+		$this->assertStringContainsString( 'wp-block-navigation-item__content', $rendered_html, 'The parent item should still render as a plain link.' );
+	}
+
+	/**
+	 * @covers ::gutenberg_render_block_core_navigation_submenu
+	 */
+	public function test_should_not_add_hidden_viewport_classes_when_children_are_visible() {
+		$rendered_html = $this->render_submenu_with_children(
+			'<!-- wp:navigation-link {"label":"Child","url":"/child","kind":"custom"} /-->'
+		);
+
+		$this->assertStringContainsString( 'has-child', $rendered_html, 'Submenu should have the has-child class when children are visible.' );
+		$this->assertStringNotContainsString( 'wp-block-hidden-', $rendered_html, 'No hidden viewport classes should be added when children are visible everywhere.' );
+	}
 }

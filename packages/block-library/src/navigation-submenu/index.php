@@ -102,8 +102,8 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		$rendered           = $inner_block->render();
 		$inner_blocks_html .= $rendered;
 
-		// Skip for blocks that doesn't have any output
-		// (e.g 'Omit from published content')
+		// Skip blocks that don't have any output
+		// (e.g. 'Omit from published content').
 		if ( '' === trim( $rendered ) ) {
 			continue;
 		}
@@ -123,7 +123,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 
 	$has_submenu = $has_visible_children;
 
-	// Build submenu toggle hide classes where every child is hidden on a given viewport
+	// Build submenu toggle hide classes where every child is hidden on a given viewport.
 	$submenu_hidden_classes = array();
 	foreach ( $hidden_viewports as $device => $is_hidden ) {
 		if ( $is_hidden ) {
