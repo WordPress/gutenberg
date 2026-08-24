@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Input } from '../index';
 import { InputLayout } from '../../input-layout';
-import { WithSuffixControl } from '../../input-layout/stories/index.story';
+import { WithSuffixControl as InputLayoutWithSuffixControl } from '../../input-layout/stories/index.story';
 
 const meta: Meta< typeof Input > = {
 	tags: [ 'manifest' ],
@@ -46,14 +46,9 @@ export const WithPrefix: Story = {
 	},
 };
 
-// Copied rather than mutated: the story object is shared with the InputLayout
-// and InputControl stories, and assigning to it would apply these args and
-// parameters to their copies of the story too.
-const InputWithSuffixControl: typeof WithSuffixControl = {
-	...WithSuffixControl,
+export const WithSuffixControl: Story = {
 	args: {
-		...WithSuffixControl.args,
-		children: undefined,
+		suffix: InputLayoutWithSuffixControl.args?.suffix,
 	},
 	parameters: {
 		// FIXME: Story shows Input without a visible label (label).
@@ -61,7 +56,6 @@ const InputWithSuffixControl: typeof WithSuffixControl = {
 		a11y: { test: 'todo' },
 	},
 };
-export { InputWithSuffixControl as WithSuffixControl };
 
 export const Disabled: Story = {
 	args: {
