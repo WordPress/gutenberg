@@ -20,6 +20,7 @@ import TabToolbarControls from '../tabs/tab-toolbar-controls';
 import TabMovers from './tab-movers';
 import useTabActions from '../tabs/use-tab-actions';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import focusRichTextAtPoint from './focus-rich-text-at-point';
 
 const EMPTY_ARRAY = [];
 
@@ -208,6 +209,38 @@ function Edit( {
 							// moving into the label via the keyboard.
 							onFocus={ () => {
 								selectTabPanel( index );
+							} }
+							onMouseDown={ ( event ) => {
+								// A click only resolves to the button itself,
+								// rather than to the title's rich text or its
+								// visible content, when it lands on part of the
+								// title that doesn't receive pointer events —
+								// for example an inline image (see
+								// `focus-rich-text-at-point.js`). Left alone,
+								// the button's native focus-on-click behavior
+								// would swallow the click, so the rich text
+								// (and any object under the pointer) never gets
+								// selected. Resolve and apply the caret
+								// position ourselves in that case.
+								if ( event.target !== event.currentTarget ) {
+									return;
+								}
+
+								const richTextElement =
+									event.currentTarget.querySelector(
+										'[contenteditable]'
+									);
+
+								if (
+									richTextElement &&
+									focusRichTextAtPoint(
+										richTextElement,
+										event.clientX,
+										event.clientY
+									)
+								) {
+									event.preventDefault();
+								}
 							} }
 						>
 							<RichText
