@@ -88,25 +88,6 @@ function block_core_gallery_get_column_gap_value( $gap, $fallback_gap ) {
 }
 
 /**
- * Checks whether a Gallery block should use its legacy Flex layout behavior.
- *
- * Gallery blocks created before layout variations existed do not have an
- * explicit layout attribute. Missing and malformed layout data therefore
- * falls back to Flex so existing galleries retain their current appearance.
- *
- * @since 7.1.0
- *
- * @param array $attributes Gallery block attributes.
- * @return bool Whether the Gallery uses its Flex layout.
- */
-function block_core_gallery_is_flex_layout( $attributes ) {
-	$layout      = isset( $attributes['layout'] ) && is_array( $attributes['layout'] ) ? $attributes['layout'] : array();
-	$layout_type = $layout['type'] ?? null;
-
-	return ! is_string( $layout_type ) || '' === $layout_type || 'flex' === $layout_type;
-}
-
-/**
  * Resolves a Gallery block's `dynamicContent` to an ordered list of image
  * attachment IDs.
  *
@@ -327,7 +308,13 @@ function block_core_gallery_render_dynamic_image( $attachment_id, $attributes, $
  */
 function block_core_gallery_render( $attributes, $content, $block ) {
 	static $global_styles = null;
-	$is_flex_layout       = block_core_gallery_is_flex_layout( $attributes );
+
+	// Gallery blocks created before layout variations existed do not have an
+	// explicit layout attribute. Missing and malformed layout data therefore
+	// falls back to Flex so existing galleries retain their current appearance.
+	$layout         = is_array( $attributes['layout'] ?? null ) ? $attributes['layout'] : array();
+	$layout_type    = $layout['type'] ?? null;
+	$is_flex_layout = ! is_string( $layout_type ) || '' === $layout_type || 'flex' === $layout_type;
 
 	// Gallery blocks created before layout variations existed do not have an
 	// explicit layout attribute. Missing and malformed layout data therefore
