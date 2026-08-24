@@ -121,4 +121,36 @@ describe( 'chrome menus', () => {
 		} );
 		expect( newTab ).toHaveAttribute( 'target', '_blank' );
 	} );
+
+	it( 'reports the current width as the selected option', async () => {
+		const user = userEvent.setup();
+		render( <Harness editMode /> );
+		await screen.findByTestId( 'label' );
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Widget options' } )
+		);
+
+		expect(
+			await screen.findByRole( 'menuitemradio', {
+				name: 'Use available width',
+			} )
+		).toBeChecked();
+
+		const full = screen.getByRole( 'menuitemradio', {
+			name: 'Make full width',
+		} );
+		expect( full ).not.toBeChecked();
+
+		await user.click( full );
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Widget options' } )
+		);
+		expect(
+			await screen.findByRole( 'menuitemradio', {
+				name: 'Make full width',
+			} )
+		).toBeChecked();
+	} );
 } );

@@ -13,14 +13,16 @@
 
 ### Enhancements
 
+-   Widget chrome: the customize-mode width menu reports the current width as
+    the selected radio option instead of disabling it.
 -   Dashboard overflow menu: "Reset to default…" carries an ellipsis, since
     activating it opens a confirmation dialog rather than completing the reset.
 
 ### Internal
 
 -   Replace the private `Menu` from `@wordpress/components` with the `Menu`
-    from `@wordpress/ui` in the dashboard overflow menu and the widget actions
-    menu. Widget link actions now mount as `Menu.LinkItem`.
+    from `@wordpress/ui` in the dashboard overflow menu, the widget actions
+    menu, and the width menu. Widget link actions now mount as `Menu.LinkItem`.
 -   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509), [#81515](https://github.com/WordPress/gutenberg/pull/81515), [#81516](https://github.com/WordPress/gutenberg/pull/81516), [#81518](https://github.com/WordPress/gutenberg/pull/81518))
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
 

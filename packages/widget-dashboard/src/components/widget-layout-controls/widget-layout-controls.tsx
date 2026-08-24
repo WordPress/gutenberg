@@ -1,13 +1,9 @@
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { moreVertical, trash } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components
-import { IconButton } from '@wordpress/ui';
-import { unlock } from '../../lock-unlock';
+import { IconButton, Menu } from '@wordpress/ui';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import type { DashboardWidget, GridTilePlacement } from '../../types';
-
-const { Menu } = unlock( componentsPrivateApis );
 
 type NamedGridWidth = Exclude<
 	NonNullable< GridTilePlacement[ 'width' ] >,
@@ -61,8 +57,8 @@ export function WidgetLayoutControls( {
 
 	return (
 		<>
-			<Menu>
-				<Menu.TriggerButton
+			<Menu.Root>
+				<Menu.Trigger
 					render={
 						<IconButton
 							icon={ moreVertical }
@@ -74,28 +70,27 @@ export function WidgetLayoutControls( {
 					}
 				/>
 
-				<Menu.Popover>
-					<Menu.Group>
+				<Menu.Popup>
+					{ /* A numeric width matches neither item, so the group
+					     reports no selection for it. */ }
+					<Menu.RadioGroup
+						value={ width ?? null }
+						onValueChange={ onNamedWidthChange }
+					>
 						<Menu.GroupLabel>{ __( 'Width' ) }</Menu.GroupLabel>
-						<Menu.Item
-							disabled={ width === 'fill' }
-							onClick={ () => onNamedWidthChange( 'fill' ) }
-						>
+						<Menu.RadioItem value="fill" closeOnClick>
 							<Menu.ItemLabel>
 								{ __( 'Use available width' ) }
 							</Menu.ItemLabel>
-						</Menu.Item>
-						<Menu.Item
-							disabled={ width === 'full' }
-							onClick={ () => onNamedWidthChange( 'full' ) }
-						>
+						</Menu.RadioItem>
+						<Menu.RadioItem value="full" closeOnClick>
 							<Menu.ItemLabel>
 								{ __( 'Make full width' ) }
 							</Menu.ItemLabel>
-						</Menu.Item>
-					</Menu.Group>
-				</Menu.Popover>
-			</Menu>
+						</Menu.RadioItem>
+					</Menu.RadioGroup>
+				</Menu.Popup>
+			</Menu.Root>
 
 			<IconButton
 				icon={ trash }
