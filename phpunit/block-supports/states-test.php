@@ -1143,6 +1143,105 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 		);
 	}
 
+
+	/**
+	 * Tests that state styles use a block's legacy `__experimentalSelector`.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_responsive_state_routes_legacy_experimental_selector() {
+		$this->ensure_block_registered(
+			'test/legacy-selector',
+			array(),
+			array(
+				'color' => array(
+					'background'                      => true,
+					'__experimentalSelector'          => 'table, th',
+					'__experimentalSkipSerialization' => array( 'text', 'background' ),
+				),
+			)
+		);
+
+		$block_content = '<div class="wp-block-legacy-selector"><table><th>Head</th></table></div>';
+		$block         = array(
+			'blockName' => 'test/legacy-selector',
+			'attrs'     => array(
+				'style' => array(
+					'@mobile' => array(
+						'color' => array(
+							'background' => '#00ff00',
+						),
+					),
+				),
+			),
+		);
+
+		$actual = gutenberg_render_block_states_support( $block_content, $block );
+
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$this->assertNotEmpty( $matches, 'A state class should be added to the block wrapper.' );
+
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'.' . $matches[0] . ' table, .' . $matches[0] . ' th{background-color:#00ff00 !important;',
+			$actual_stylesheet
+		);
+		$this->assertStringNotContainsString(
+			'.' . $matches[0] . '{background-color:#00ff00',
+			$actual_stylesheet
+		);
+	}
+
+	/**
+	 * Tests that a block declaring the selectors API ignores legacy selectors.
+	 *
+	 * `wp_get_block_css_selector()` only consults `__experimentalSelector` when a
+	 * block declares no `selectors` map, and state styles follow the same rule.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_responsive_state_ignores_legacy_selector_when_selectors_declared() {
+		$this->ensure_block_registered(
+			'test/modern-and-legacy-selector',
+			array(
+				'root' => '.wp-block-modern-and-legacy-selector',
+			),
+			array(
+				'color' => array(
+					'background'             => true,
+					'__experimentalSelector' => 'table, th',
+				),
+			)
+		);
+
+		$block_content = '<div class="wp-block-modern-and-legacy-selector"><table><th>Head</th></table></div>';
+		$block         = array(
+			'blockName' => 'test/modern-and-legacy-selector',
+			'attrs'     => array(
+				'style' => array(
+					'@mobile' => array(
+						'color' => array(
+							'background' => '#00ff00',
+						),
+					),
+				),
+			),
+		);
+
+		$actual = gutenberg_render_block_states_support( $block_content, $block );
+
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$this->assertNotEmpty( $matches, 'A state class should be added to the block wrapper.' );
+
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'.' . $matches[0] . '{background-color:#00ff00 !important;',
+			$actual_stylesheet
+		);
+	}
+
 	/**
 	 * Tests that a responsive block gap state generates layout spacing CSS.
 	 *

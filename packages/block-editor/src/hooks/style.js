@@ -2,6 +2,7 @@ import { useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
 import {
+	getBlockSelector,
 	mergeGlobalStyles,
 	privateApis as globalStylesEnginePrivateApis,
 } from '@wordpress/global-styles-engine';
@@ -285,8 +286,48 @@ function addStyleGroup( groups, selector, style ) {
 	} );
 }
 
+/**
+ * Builds a feature selectors map from a block's legacy selector supports.
+ *
+ * Blocks registered before the selectors API declare their feature selectors
+ * under `supports.<feature>.__experimentalSelector`. State styles read the
+ * modern `selectors` map only, so without this those blocks have their state
+ * rules applied to the block wrapper rather than the element the block's base
+ * styles target, producing a duplicate of the styled property.
+ *
+ * `getBlockSelector()` consults the legacy property only when a block declares
+ * no `selectors` map, and this mirrors that: a block using the selectors API is
+ * left alone.
+ *
+ * @param {Object} blockType   Block type.
+ * @param {Object} stateStyles State style object.
+ * @return {Object} Selectors map keyed by feature.
+ */
+function getLegacyBlockStateSelectors( blockType, stateStyles ) {
+	const selectors = {};
+
+	[ 'root', ...Object.keys( stateStyles || {} ) ].forEach( ( feature ) => {
+		if ( selectors[ feature ] ) {
+			return;
+		}
+
+		const selector = getBlockSelector( blockType, feature );
+
+		if ( selector ) {
+			selectors[ feature ] = selector;
+		}
+	} );
+
+	return selectors;
+}
+
 function getStateStyleGroups( stateStyles, name ) {
-	const blockSelectors = getBlockType( name )?.selectors || {};
+	const blockType = getBlockType( name );
+	const declaredSelectors = blockType?.selectors || {};
+	const blockSelectors =
+		blockType && ! Object.keys( declaredSelectors ).length
+			? getLegacyBlockStateSelectors( blockType, stateStyles )
+			: declaredSelectors;
 	const groups = new Map();
 
 	Object.entries( stateStyles || {} ).forEach(

@@ -369,6 +369,47 @@ function gutenberg_add_block_state_style_rule( &$css_rules, $state, $selector, $
 }
 
 /**
+ * Builds a feature selectors map from a block's legacy selector supports.
+ *
+ * Blocks registered before the selectors API declare their feature selectors
+ * under `supports.<feature>.__experimentalSelector`. State styles read the
+ * modern `selectors` map only, so without this those blocks have their state
+ * rules applied to the block wrapper rather than the element the block's base
+ * styles target, producing a duplicate of the styled property.
+ *
+ * `wp_get_block_css_selector()` consults the legacy property only when a block
+ * declares no `selectors` map, and this mirrors that: a block using the
+ * selectors API is left alone.
+ *
+ * @param WP_Block_Type $block_type   Block type.
+ * @param array         $state_styles Map of state to style array.
+ * @return array Selectors map keyed by feature.
+ */
+function gutenberg_get_legacy_block_state_selectors( $block_type, $state_styles ) {
+	$features = array( 'root' );
+
+	foreach ( $state_styles as $state_style ) {
+		if ( ! is_array( $state_style ) ) {
+			continue;
+		}
+
+		$features = array_merge( $features, array_keys( $state_style ) );
+	}
+
+	$selectors = array();
+
+	foreach ( array_unique( $features ) as $feature ) {
+		$selector = wp_get_block_css_selector( $block_type, $feature );
+
+		if ( is_string( $selector ) && '' !== $selector ) {
+			$selectors[ $feature ] = $selector;
+		}
+	}
+
+	return $selectors;
+}
+
+/**
  * Builds compiled state style rules, preserving the selector each rule targets.
  *
  * @param array         $state_styles Map of state to style array.
@@ -381,6 +422,10 @@ function gutenberg_get_block_state_style_rules( $state_styles, $block_type, $rul
 	$block_selectors = isset( $block_type->selectors ) && is_array( $block_type->selectors )
 		? $block_type->selectors
 		: array();
+
+	if ( empty( $block_selectors ) ) {
+		$block_selectors = gutenberg_get_legacy_block_state_selectors( $block_type, $state_styles );
+	}
 
 	foreach ( $state_styles as $state => $state_style ) {
 		if ( empty( $state_style ) || ! is_array( $state_style ) ) {
