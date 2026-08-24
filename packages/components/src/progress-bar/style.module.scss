@@ -38,6 +38,7 @@ $indeterminate-indicator-width: 50%;
 	&.is-indeterminate {
 		--indicator-width: #{$indeterminate-indicator-width};
 		animation: indeterminate-slide 1.5s ease-in-out infinite;
+		transition: none;
 	}
 }
 
