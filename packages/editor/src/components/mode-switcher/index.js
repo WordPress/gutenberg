@@ -3,6 +3,7 @@ import { MenuItemsChoice, MenuGroup } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Set of available mode options.
@@ -21,22 +22,33 @@ const MODES = [
 ];
 
 function ModeSwitcher() {
-	const { shortcut, isRichEditingEnabled, isCodeEditingEnabled, mode } =
-		useSelect(
-			( select ) => ( {
-				shortcut: select(
-					keyboardShortcutsStore
-				).getShortcutRepresentation( 'core/editor/toggle-mode' ),
-				isRichEditingEnabled:
-					select( editorStore ).getEditorSettings()
-						.richEditingEnabled,
-				isCodeEditingEnabled:
-					select( editorStore ).getEditorSettings()
-						.codeEditingEnabled,
-				mode: select( editorStore ).getEditorMode(),
-			} ),
-			[]
-		);
+	const {
+		shortcut,
+		isRichEditingEnabled,
+		isCodeEditingEnabled,
+		codeEditorUnavailableReason,
+		mode,
+	} = useSelect(
+		( select ) => ( {
+			shortcut: select(
+				keyboardShortcutsStore
+			).getShortcutRepresentation( 'core/editor/toggle-mode' ),
+			isRichEditingEnabled:
+				select( editorStore ).getEditorSettings().richEditingEnabled,
+			isCodeEditingEnabled:
+				select( editorStore ).getEditorSettings().codeEditingEnabled,
+			/*
+			 * Shared with the refusal in `switchEditorMode` so the disabled
+			 * item and the notice say the same thing. Private while Suggest
+			 * mode is experimental.
+			 */
+			codeEditorUnavailableReason: unlock(
+				select( editorStore )
+			).getCodeEditorUnavailableReason(),
+			mode: select( editorStore ).getEditorMode(),
+		} ),
+		[]
+	);
 	const { switchEditorMode } = useDispatch( editorStore );
 
 	let selectedMode = mode;
@@ -44,6 +56,10 @@ function ModeSwitcher() {
 		selectedMode = 'text';
 	}
 	if ( ! isCodeEditingEnabled && mode === 'text' ) {
+		selectedMode = 'visual';
+	}
+	// Viewing is a visual-only intent: see `getEditorMode`.
+	if ( codeEditorUnavailableReason ) {
 		selectedMode = 'visual';
 	}
 
@@ -54,7 +70,24 @@ function ModeSwitcher() {
 				disabled: true,
 			};
 		}
-		if ( ! isRichEditingEnabled && choice.value === 'visual' ) {
+		if ( codeEditorUnavailableReason && choice.value === 'text' ) {
+			choice = {
+				...choice,
+				disabled: true,
+				info: codeEditorUnavailableReason,
+			};
+		}
+		/*
+		 * An intent that forces the visual editor keeps it selectable even
+		 * with rich editing turned off — disabling it alongside the code
+		 * editor would leave both choices dead and the checked one
+		 * unreachable.
+		 */
+		if (
+			! isRichEditingEnabled &&
+			! codeEditorUnavailableReason &&
+			choice.value === 'visual'
+		) {
 			choice = {
 				...choice,
 				disabled: true,

@@ -549,19 +549,30 @@ export const __unstableSaveForPreview =
 
 /**
  * Action that restores last popped state in undo history.
+ *
+ * Refused in the read-only `view` intent: undo and redo rewrite the post the
+ * same way a keystroke does, and the header buttons stay mounted there.
  */
 export const redo =
 	() =>
-	( { registry } ) => {
+	( { registry, select } ) => {
+		if ( select.isEditorIntentReadOnly() ) {
+			return;
+		}
 		registry.dispatch( coreStore ).redo();
 	};
 
 /**
  * Action that pops a record from undo history and undoes the edit.
+ *
+ * Refused in the read-only `view` intent — see `redo`.
  */
 export const undo =
 	() =>
-	( { registry } ) => {
+	( { registry, select } ) => {
+		if ( select.isEditorIntentReadOnly() ) {
+			return;
+		}
 		registry.dispatch( coreStore ).undo();
 	};
 
@@ -1096,7 +1107,35 @@ export const toggleTopToolbar =
  */
 export const switchEditorMode =
 	( mode ) =>
-	( { dispatch, registry } ) => {
+	( { dispatch, registry, select } ) => {
+		/*
+		 * The code editor is a raw `post_content` textarea, so it is the one
+		 * editing surface the read-only canvas does not cover: without this
+		 * the Viewing intent would hand a user a fully writable copy of the
+		 * post. `getCodeEditorUnavailableReason` owns the decision, so this
+		 * refusal, the disabled menu item and the filtered command all agree.
+		 *
+		 * Refusing here is what actually closes the hole — the menu item is
+		 * disabled and the command is filtered out, but the keyboard shortcut
+		 * reaches this action directly. Raise a snackbar, because a shortcut
+		 * that silently does nothing reads as a broken editor. The snackbar
+		 * is the sole announcer: it speaks its own content politely, which is
+		 * the right register for a refusal.
+		 */
+		if ( mode === 'text' ) {
+			const unavailableReason = select.getCodeEditorUnavailableReason();
+			if ( unavailableReason ) {
+				registry
+					.dispatch( noticesStore )
+					.createNotice( 'info', unavailableReason, {
+						id: 'editor-code-editor-unavailable',
+						type: 'snackbar',
+						isDismissible: true,
+					} );
+				return;
+			}
+		}
+
 		registry.dispatch( preferencesStore ).set( 'core', 'editorMode', mode );
 
 		if ( mode !== 'visual' ) {
