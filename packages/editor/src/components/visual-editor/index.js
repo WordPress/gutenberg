@@ -33,6 +33,7 @@ import { useZoomOutModeExit } from './use-zoom-out-mode-exit';
 import { usePaddingAppender } from './use-padding-appender';
 import { useEditContentOnlySectionExit } from './use-edit-content-only-section-exit';
 import { SyncConnectionErrorModal } from '../sync-connection-error-modal';
+import CollaborationConflictMarkers from '../collaboration-review-panel/markers';
 
 const {
 	LayoutStyle,
@@ -466,6 +467,7 @@ function VisualEditor( {
 			) }
 		>
 			<SyncConnectionErrorModal />
+			<CollaborationConflictMarkers contentRef={ localRef } />
 			<ResizableEditor
 				enableResizing={ enableResizing }
 				width={

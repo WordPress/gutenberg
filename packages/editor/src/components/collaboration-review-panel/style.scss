@@ -1,0 +1,129 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.editor-collaboration-review-panel__description {
+	color: $gray-700;
+	margin-bottom: $grid-unit-15;
+}
+
+.editor-collaboration-review-panel__item {
+	border-top: $border-width solid $gray-200;
+	padding: $grid-unit-15 0;
+
+	&:last-of-type {
+		padding-bottom: 0;
+	}
+
+	.editor-collaboration-review-panel__attribution {
+		margin: 0 0 $grid-unit-05;
+	}
+
+	.editor-collaboration-review-panel__summary {
+		color: $gray-700;
+		margin: 0 0 $grid-unit-10;
+		overflow-wrap: break-word;
+	}
+
+	.editor-collaboration-review-panel__actions {
+		display: flex;
+		gap: $grid-unit-10;
+	}
+}
+
+.editor-collaboration-pending-card {
+	// The card must not swallow clicks meant for the block below it.
+	.components-popover__content {
+		background: none;
+		border: none;
+		box-shadow: none;
+		overflow: visible;
+	}
+
+	.editor-collaboration-pending-card__body {
+		background: $white;
+		border: $border-width solid $alert-yellow;
+		border-radius: $radius-medium;
+		box-shadow: $elevation-medium;
+		margin-top: $grid-unit-05;
+		max-height: 60vh;
+		max-width: 320px;
+		min-width: 280px;
+		overflow-y: auto;
+		padding: $grid-unit-15;
+	}
+
+	.editor-collaboration-pending-card__attribution {
+		font-weight: 600;
+		margin: 0 0 $grid-unit-05;
+	}
+
+	.editor-collaboration-pending-card__summary {
+		color: $gray-700;
+		margin: 0 0 $grid-unit-10;
+		overflow-wrap: break-word;
+	}
+
+	.editor-collaboration-pending-card__actions {
+		align-items: center;
+		display: flex;
+		gap: $grid-unit-10;
+	}
+
+	.editor-collaboration-pending-card__hint {
+		color: $gray-700;
+		font-size: $helptext-font-size;
+	}
+}
+
+.editor-collaboration-insertion-card {
+	.components-popover__content {
+		background: none;
+		border: none;
+		box-shadow: none;
+		overflow: visible;
+	}
+
+	.editor-collaboration-insertion-card__body {
+		background: $white;
+		border: $border-width dashed $alert-yellow;
+		border-radius: $radius-medium;
+		box-shadow: $elevation-medium;
+		margin: $grid-unit-05 0;
+		max-width: 360px;
+		min-width: 280px;
+		padding: $grid-unit-15;
+	}
+
+	.editor-collaboration-insertion-card__attribution {
+		font-weight: 600;
+		margin: 0 0 $grid-unit-05;
+	}
+
+	.editor-collaboration-insertion-card__type {
+		color: $gray-700;
+		font-family: monospace;
+		margin: 0 0 $grid-unit-05;
+	}
+
+	.editor-collaboration-insertion-card__preview {
+		background: $gray-100;
+		border-radius: $radius-small;
+		margin: 0 0 $grid-unit-10;
+		max-height: 12em;
+		overflow: auto;
+		padding: $grid-unit-10;
+		white-space: pre-wrap;
+		word-break: break-word;
+	}
+
+	.editor-collaboration-insertion-card__actions {
+		align-items: center;
+		display: flex;
+		gap: $grid-unit-10;
+	}
+
+	.editor-collaboration-insertion-card__hint {
+		color: $gray-700;
+		font-size: $helptext-font-size;
+	}
+}
