@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
-import { getBlockTypes } from '@wordpress/blocks';
+import { getBlockType, getBlockTypes, getSaveContent } from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
 import { Y } from '@wordpress/sync';
 import {
@@ -30,6 +30,14 @@ interface BlockType {
 	name: string;
 }
 
+/**
+ * The doc-side save-markup mirror's key (B1). Exported so the plugin
+ * side and any future rename stay mechanical: every stringly-typed
+ * access below goes through this constant; only the two interface
+ * fields repeat the literal (TypeScript keeps those honest).
+ */
+export const CRDT_BLOCK_SAVE_KEY = '_save';
+
 // A block as represented in Gutenberg's data store.
 export interface Block {
 	attributes: BlockAttributes;
@@ -40,6 +48,8 @@ export interface Block {
 	name: string;
 	originalContent?: string;
 	validationIssues?: string[]; // unserializable
+	/** Doc-side save-markup mirror (see YBlockRecord); stripped on read. */
+	_save?: string;
 }
 
 // A block as represented in the CRDT document (Y.Map).
@@ -50,6 +60,16 @@ export interface YBlockRecord extends YMapRecord {
 	isValid?: boolean;
 	originalContent?: string;
 	name: string;
+	/**
+	 * The block's save markup, regenerated from its registered save()
+	 * whenever its attributes change (empty inner blocks). Server engines
+	 * materialize post content from the shared doc; without the real save
+	 * output they can only guess wrappers from genesis (the Phase-2a
+	 * simplification). The engine treats this exactly like genesis
+	 * innerHTML — wrapper and sub-element tags — and swaps in the live
+	 * rich-text value, so the TEXT inside is never read.
+	 */
+	_save?: string;
 }
 
 export type YBlock = YMapWrap< YBlockRecord >;
@@ -206,7 +226,8 @@ function deserializeAttributeValue(
  */
 export function deserializeBlockAttributes( blocks: Block[] ): Block[] {
 	return blocks.map( ( block: Block ) => {
-		const { name, innerBlocks, attributes, ...rest } = block;
+		const { name, innerBlocks, attributes, _save, ...rest } = block;
+		void _save; // Doc-side bookkeeping; never reaches editor blocks.
 
 		const newAttributes = { ...attributes };
 
@@ -236,6 +257,8 @@ export function deserializeBlockAttributes( blocks: Block[] ): Block[] {
  */
 function areBlocksEqual( gblock: Block, yblock: YBlock ): boolean {
 	const yblockAsJson = yblock.toJSON();
+	// The save-markup mirror is doc-side bookkeeping, not editor state.
+	delete yblockAsJson[ CRDT_BLOCK_SAVE_KEY ];
 
 	// we must not sync clientId, as this can't be generated consistently and
 	// hence will lead to merge conflicts.
@@ -367,10 +390,48 @@ function createYMapFromQuery(
 	return new Y.Map( entries );
 }
 
+/**
+ * The block's save markup with empty inner blocks — the wrapper (and any
+ * attribute-derived sub-elements, e.g. an image's <img>) as the block's
+ * registered save() renders them for the CURRENT attributes. Null when the
+ * type is unregistered or save() throws (dynamic/raw blocks): engines then
+ * fall back to their genesis wrapper records.
+ *
+ * @param name       Block name.
+ * @param attributes Block attributes (serializable form).
+ * @return Save markup, or null.
+ */
+function computeSaveMarkup(
+	name: string,
+	attributes: BlockAttributes
+): string | null {
+	try {
+		const blockType = getBlockType( name );
+		if ( ! blockType ) {
+			return null;
+		}
+		const markup = getSaveContent( blockType, attributes, [] );
+		return typeof markup === 'string' && '' !== markup ? markup : null;
+	} catch {
+		return null;
+	}
+}
+
 function createNewYBlock( block: Block ): YBlock {
+	const saveMarkup = computeSaveMarkup( block.name, block.attributes );
 	return createYMap< YBlockRecord >(
 		Object.fromEntries(
-			Object.entries( block ).map( ( [ key, value ] ) => {
+			[
+				...( null === saveMarkup
+					? []
+					: [
+							[ CRDT_BLOCK_SAVE_KEY, saveMarkup ] as [
+								string,
+								unknown,
+							],
+					  ] ),
+				...Object.entries( block ),
+			].map( ( [ key, value ] ) => {
 				switch ( key ) {
 					case 'attributes': {
 						return [
@@ -491,6 +552,19 @@ export function mergeCrdtBlocks(
 	for ( let i = 0; i < numOfUpdatesNeeded; i++, left++ ) {
 		const incomingYBlock = incomingBlocksToSync[ left ];
 		const localYBlock = yblocks.get( left );
+
+		// Keep the save markup current with the attributes being merged
+		// (wrapper classes, heading levels, image src all live in it).
+		const saveMarkup = computeSaveMarkup(
+			incomingYBlock.name,
+			incomingYBlock.attributes
+		);
+		if (
+			null !== saveMarkup &&
+			saveMarkup !== localYBlock.get( CRDT_BLOCK_SAVE_KEY )
+		) {
+			localYBlock.set( CRDT_BLOCK_SAVE_KEY, saveMarkup );
+		}
 
 		Object.entries( incomingYBlock ).forEach(
 			( [ incomingBlockProperty, incomingBlockPropertyValue ] ) => {
