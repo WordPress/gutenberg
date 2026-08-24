@@ -1,4 +1,4 @@
-import { __, sprintf } from '@wordpress/i18n';
+import { __, isRTL, sprintf } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { enUS } from 'date-fns/locale';
 import type { Modifiers, BaseProps } from '../types';
@@ -59,10 +59,11 @@ function getWeekStartsOn( locale: IntlLocaleWithWeekInfo ) {
  * - the following props should be intended as defaults, and should
  *   be overridden by consumer props if listed as public props.
  * - It is possible for the translated strings to use a different locale
- *   than the formatted dates and the computed `dir`. This is because the
- *   translation function doesn't expose the locale used for the translated
- *   strings, meaning that dates are formatted using the date locale props.
- *   For a correct localized experience, consumers should make sure that
+ *   than the formatted dates. This is because the translation function doesn't
+ *   expose the locale used for the translated strings, meaning that dates are
+ *   formatted using the date locale props. When a supported locale is provided,
+ *   it also determines `dir`; otherwise, `dir` follows the translation context.
+ *   For a correct localized experience, consumers should make sure that the
  *   translation context and date-text locale are consistent.
  * @param props
  * @param props.locale
@@ -74,20 +75,25 @@ export const useLocalizationProps = ( {
 	timeZone,
 	mode,
 }: {
-	locale: NonNullable< BaseProps[ 'locale' ] >;
+	locale: BaseProps[ 'locale' ];
 	timeZone: BaseProps[ 'timeZone' ];
 	mode: 'single' | 'range';
 } ) => {
 	return useMemo( () => {
 		const isLocaleString = typeof locale === 'string';
-		const dateFnsLocale = isLocaleString ? enUS : locale;
+		const dateFnsLocale =
+			isLocaleString || locale === undefined ? enUS : locale;
 		const supportedLocaleCode = getSupportedLocaleCode(
-			isLocaleString ? locale : locale.code
+			isLocaleString ? locale : locale?.code
 		);
 		const localeCode = supportedLocaleCode ?? 'en-US';
 		const intlLocale = new Intl.Locale(
 			localeCode
 		) as IntlLocaleWithWeekInfo;
+		const isRightToLeft =
+			supportedLocaleCode !== undefined
+				? isLocaleRTL( intlLocale )
+				: isRTL();
 		// Unsupported custom date-fns locales keep their own week-start option.
 		const weekStartsOn =
 			isLocaleString || supportedLocaleCode !== undefined
@@ -211,7 +217,7 @@ export const useLocalizationProps = ( {
 			},
 			locale: dateFnsLocale,
 			lang: localeCode,
-			dir: isLocaleRTL( intlLocale ) ? 'rtl' : 'ltr',
+			dir: isRightToLeft ? 'rtl' : 'ltr',
 			...( weekStartsOn === undefined ? {} : { weekStartsOn } ),
 			formatters: {
 				formatDay: dayNumberFormatter.format,

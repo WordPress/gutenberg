@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { startOfDay } from 'date-fns';
 import { ckb, faIR, ug } from 'date-fns/locale';
+import { isRTL } from '@wordpress/i18n';
 import { Calendar, RangeCalendar } from '..';
 import {
 	dateNumberFormatter,
@@ -40,8 +41,11 @@ jest.mock( '@wordpress/i18n', () => {
 	return {
 		...actual,
 		__: ( text: string ) => translations[ text ] ?? text,
+		isRTL: jest.fn(),
 	};
 } );
+
+const mockIsRTL = jest.mocked( isRTL );
 
 describe.each( [
 	[ 'Calendar', Calendar ],
@@ -90,6 +94,76 @@ describe.each( [
 	} );
 } );
 
+describe.each( [
+	[ 'Calendar', Calendar ],
+	[ 'RangeCalendar', RangeCalendar ],
+] as const )( '%s text direction', ( _name, Component ) => {
+	beforeEach( () => {
+		mockIsRTL.mockReturnValue( false );
+	} );
+
+	it( 'uses the WordPress RTL direction when no locale is supplied', () => {
+		mockIsRTL.mockReturnValue( true );
+
+		render( <Component /> );
+
+		expect( screen.getByRole( 'application' ) ).toHaveAttribute(
+			'dir',
+			'rtl'
+		);
+	} );
+
+	it( 'uses the WordPress LTR direction when no locale is supplied', () => {
+		render( <Component /> );
+
+		expect( screen.getByRole( 'application' ) ).toHaveAttribute(
+			'dir',
+			'ltr'
+		);
+	} );
+
+	it( 'uses a supported RTL locale over the WordPress direction', () => {
+		render( <Component locale="fa-IR" /> );
+
+		expect( screen.getByRole( 'application' ) ).toHaveAttribute(
+			'dir',
+			'rtl'
+		);
+	} );
+
+	it( 'uses a supported LTR locale over the WordPress direction', () => {
+		mockIsRTL.mockReturnValue( true );
+
+		render( <Component locale="en-US" /> );
+
+		expect( screen.getByRole( 'application' ) ).toHaveAttribute(
+			'dir',
+			'ltr'
+		);
+	} );
+
+	it( 'uses the WordPress direction when an unsupported locale falls back to en-US formatting', () => {
+		mockIsRTL.mockReturnValue( true );
+
+		render( <Component defaultMonth={ TEST_DATE } locale="skr" /> );
+
+		expectGregorianDate( 'en-US' );
+		expect( screen.getByRole( 'application' ) ).toHaveAttribute(
+			'dir',
+			'rtl'
+		);
+	} );
+
+	it( 'lets an explicit direction override the computed direction', () => {
+		render( <Component locale="fa-IR" dir="ltr" /> );
+
+		expect( screen.getByRole( 'application' ) ).toHaveAttribute(
+			'dir',
+			'ltr'
+		);
+	} );
+} );
+
 describe( 'Calendar locale inputs', () => {
 	it( 'keeps supporting a date-fns locale object on the Gregorian calendar', () => {
 		expect.hasAssertions();
@@ -119,14 +193,6 @@ describe( 'Calendar locale inputs', () => {
 			expectGregorianDate( 'en-US' );
 		}
 	);
-
-	it( 'lets an explicit direction override the locale-derived direction', () => {
-		render( <Calendar locale="fa-IR" dir="ltr" /> );
-
-		expect(
-			screen.getByRole( 'application', { name: 'Date calendar' } )
-		).toHaveAttribute( 'dir', 'ltr' );
-	} );
 
 	it( 'derives the week start from a locale string', () => {
 		render( <Calendar defaultMonth={ TEST_DATE } locale="fa-IR" /> );
