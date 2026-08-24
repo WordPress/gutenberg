@@ -18,6 +18,9 @@ import { store as blockEditorStore } from '../../store';
 
 const noop = () => {};
 
+const getCompositeItemId = ( instanceId, style ) =>
+	`${ instanceId }-${ style.name }`;
+
 // Block Styles component for the Settings Sidebar.
 function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 	const canEdit = useSelect(
@@ -94,7 +97,8 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 
 	const onSetActiveId = ( nextActiveId ) => {
 		const nextStyle = stylesToRender.find(
-			( style ) => `${ instanceId }-${ style.name }` === nextActiveId
+			( style ) =>
+				getCompositeItemId( instanceId, style ) === nextActiveId
 		);
 		if ( nextStyle && nextStyle.name !== activeStyle.name ) {
 			onSelectStylePreview( nextStyle );
@@ -134,7 +138,10 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 						role="radiogroup"
 						aria-label={ __( 'Styles' ) }
 						className="block-editor-block-styles__variants"
-						activeId={ `${ instanceId }-${ activeStyle.name }` }
+						activeId={ getCompositeItemId(
+							instanceId,
+							activeStyle
+						) }
 						setActiveId={ onSetActiveId }
 						focusLoop
 						focusWrap
@@ -148,7 +155,10 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 								{ row.map( ( style ) => (
 									<Composite.Item
 										key={ style.name }
-										id={ `${ instanceId }-${ style.name }` }
+										id={ getCompositeItemId(
+											instanceId,
+											style
+										) }
 										render={
 											<Button
 												className="block-editor-block-styles__item"
