@@ -19,6 +19,7 @@
 
 ### Internal
 
+-   DataForms: Rely on the `Calendar` and `RangeCalendar` text-direction defaults instead of passing redundant WordPress direction overrides. ([#81982](https://github.com/WordPress/gutenberg/pull/81982))
 -   Update `@ariakit/react` to 0.4.37 ([#81080](https://github.com/WordPress/gutenberg/pull/81080)).
 -   DataViews: Replace the private `Menu` from `@wordpress/components` with the `Menu` from `@wordpress/ui` in the item actions, list layout, column header, add-filter, and layout switcher menus. ([#81783](https://github.com/WordPress/gutenberg/pull/81783))
 -   Point tsconfig references at split dependencies' build projects. ([#81509](https://github.com/WordPress/gutenberg/pull/81509), [#81514](https://github.com/WordPress/gutenberg/pull/81514), [#81516](https://github.com/WordPress/gutenberg/pull/81516))

@@ -24,7 +24,7 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { __, isRTL } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { getDate, getSettings } from '@wordpress/date';
 import {
 	Calendar,
@@ -455,7 +455,6 @@ function CalendarDateControl< Item >( {
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
 						locale={ locale }
-						dir={ isRTL() ? 'rtl' : 'ltr' }
 						weekStartsOn={ weekStartsOn }
 						disabled={ disabled || disabledMatchers }
 						disableNavigation={ disabled }
@@ -732,7 +731,6 @@ function CalendarDateRangeControl< Item >( {
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
 						locale={ locale }
-						dir={ isRTL() ? 'rtl' : 'ltr' }
 						weekStartsOn={ weekStartsOn }
 						disabled={ disabled || disabledMatchers }
 					/>
