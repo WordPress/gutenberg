@@ -30,7 +30,7 @@ defaultTest: file://../../lib/default-test.yaml
 # agents. Matching the skill by shell command would miss it entirely — Claude
 # invokes the skill natively rather than reading the file.
 tests:
-    - description: e2e test for unencoded ampersands in the paragraph block
+    - description: e2e test for paragraph centre alignment
       assert:
           - type: skill-used
             value: testing
