@@ -91,18 +91,97 @@ function getRichTextElement( node ) {
 }
 
 /**
+ * Returns the block-level table cell containing the node, if any. Only cells
+ * that are themselves blocks (carrying a data-block attribute) count, so
+ * blocks that output tables without inner blocks (like the legacy table) are
+ * ignored.
+ *
+ * @param {Node} node DOM node.
+ *
+ * @return {HTMLTableCellElement|undefined} The table cell element.
+ */
+function getTableCell( node ) {
+	const element =
+		node.nodeType === node.ELEMENT_NODE ? node : node.parentElement;
+	const cell = element?.closest( 'td, th' );
+	return cell?.hasAttribute( 'data-block' ) ? cell : undefined;
+}
+
+/**
+ * Returns the client IDs of all block-level cells in the rectangle between
+ * two table cells, in document order. The browser's table geometry accounts
+ * for rowSpan/colSpan, so no placement computation is needed.
+ *
+ * @param {HTMLTableCellElement} startCell Starting cell.
+ * @param {HTMLTableCellElement} endCell   Ending cell.
+ *
+ * @return {string[]|undefined} Client IDs in the rectangle, or undefined if
+ *                              the cells are not in the same table.
+ */
+function getTableCellRectangleClientIds( startCell, endCell ) {
+	const table = startCell.closest( 'table' );
+
+	if ( ! table || table !== endCell.closest( 'table' ) ) {
+		return;
+	}
+
+	const getRect = ( cell ) => ( {
+		startRow: cell.parentElement.rowIndex,
+		endRow: cell.parentElement.rowIndex + cell.rowSpan - 1,
+		startColumn: cell.cellIndex,
+		endColumn: cell.cellIndex + cell.colSpan - 1,
+	} );
+
+	const startRect = getRect( startCell );
+	const endRect = getRect( endCell );
+
+	const startRow = Math.min( startRect.startRow, endRect.startRow );
+	const endRow = Math.max( startRect.endRow, endRect.endRow );
+	const startColumn = Math.min( startRect.startColumn, endRect.startColumn );
+	const endColumn = Math.max( startRect.endColumn, endRect.endColumn );
+
+	const clientIds = [];
+
+	// Iterate from the top of the table: a cell with rowSpan only appears in
+	// its starting row's cells collection, so cells spanning into the
+	// rectangle from above would otherwise be missed.
+	for ( let rowIndex = 0; rowIndex <= endRow; rowIndex++ ) {
+		const row = table.rows[ rowIndex ];
+		if ( ! row ) {
+			continue;
+		}
+		for ( const cell of row.cells ) {
+			if ( ! cell.hasAttribute( 'data-block' ) ) {
+				continue;
+			}
+			const rect = getRect( cell );
+			if (
+				rect.startRow <= endRow &&
+				rect.endRow >= startRow &&
+				rect.startColumn <= endColumn &&
+				rect.endColumn >= startColumn
+			) {
+				clientIds.push( cell.getAttribute( 'data-block' ) );
+			}
+		}
+	}
+
+	return clientIds;
+}
+
+/**
  * Sets a multi-selection based on the native selection across blocks.
  */
 export default function useSelectionObserver() {
 	const {
 		multiSelect,
+		multiSelectSet,
 		selectBlock,
 		selectionChange,
 		startMultiSelect,
 		stopMultiSelect,
 	} = useDispatch( blockEditorStore );
 	const {
-		getBlockListSettings,
 		getBlockParents,
 		getBlockRootClientId,
 		getBlockSelectionStart,
@@ -354,6 +433,24 @@ export default function useSelectionObserver() {
 						multiSelect( startClientId, startClientId );
 					}
 				} else {
+					// When the selection spans block-level table cells in the
+					// same table, select the rectangle of cells. The browser's
+					// table geometry accounts for rowSpan/colSpan.
+					const startCell = getTableCell( startNode );
+					const endCell = getTableCell( endNode );
+
+					if ( startCell && endCell ) {
+						const clientIds = getTableCellRectangleClientIds(
+							startCell,
+							endCell
+						);
+
+						if ( clientIds ) {
+							multiSelectSet( clientIds );
+							return;
+						}
+					}
+
 					const startPath = [
 						...getBlockParents( startClientId ),
 						startClientId,
@@ -380,28 +477,6 @@ export default function useSelectionObserver() {
 					) {
 						multiSelect( startPath[ depth ], endPath[ depth ] );
 						return;
-					}
-
-					// Walk up the ancestor chain to find a block with
-					// onMultiSelect, allowing nested structures like
-					// table-v2 to intercept multi-selections.
-					let ancestorClientId =
-						getBlockRootClientId( startClientId );
-					while ( ancestorClientId ) {
-						const settings =
-							getBlockListSettings( ancestorClientId );
-						if ( settings?.onMultiSelect ) {
-							const endParents = getBlockParents(
-								endClientId,
-								true
-							);
-							if ( endParents.includes( ancestorClientId ) ) {
-								multiSelect( startClientId, endClientId );
-								return;
-							}
-						}
-						ancestorClientId =
-							getBlockRootClientId( ancestorClientId );
 					}
 
 					const richTextElementStart =
@@ -526,9 +601,9 @@ export default function useSelectionObserver() {
 		},
 		[
 			multiSelect,
+			multiSelectSet,
 			selectBlock,
 			selectionChange,
-			getBlockListSettings,
 			getBlockParents,
 			getBlockRootClientId,
 		]

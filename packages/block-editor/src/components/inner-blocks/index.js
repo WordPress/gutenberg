@@ -244,8 +244,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		options.templateLock,
 		options.__experimentalCaptureToolbars ?? __experimentalCaptureToolbars,
 		options.orientation,
-		layout,
-		options.onMultiSelect
+		layout
 	);
 
 	const blockDropZoneRef = useBlockDropZone( {

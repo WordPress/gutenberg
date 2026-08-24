@@ -206,81 +206,6 @@ describe( 'actions', () => {
 
 			expect( dispatch ).not.toHaveBeenCalled();
 		} );
-
-		it( 'runs the block list multi-selection handler', () => {
-			const start = 'start';
-			const end = 'end';
-			const onMultiSelect = jest.fn( ( { dispatch: innerDispatch } ) => {
-				innerDispatch.multiSelectSet( [ 'cell-1', 'cell-3' ], null );
-			} );
-			const select = {
-				getBlockRootClientId() {
-					return 'parent';
-				},
-				getSelectedBlockCount() {
-					return 0;
-				},
-				getBlockListSettings() {
-					return { onMultiSelect };
-				},
-			};
-			const dispatch = jest.fn();
-			dispatch.multiSelectSet = jest.fn();
-
-			multiSelect( start, end, null )( { select, dispatch } );
-
-			expect( onMultiSelect ).toHaveBeenCalledWith( {
-				startClientId: start,
-				endClientId: end,
-				rootClientId: 'parent',
-				initialPosition: null,
-				select,
-				dispatch: {
-					multiSelect: expect.any( Function ),
-					multiSelectSet: dispatch.multiSelectSet,
-					selectBlock: dispatch.selectBlock,
-				},
-			} );
-			expect( dispatch.multiSelectSet ).toHaveBeenCalledWith(
-				[ 'cell-1', 'cell-3' ],
-				null
-			);
-			expect( dispatch ).not.toHaveBeenCalledWith( {
-				type: 'MULTI_SELECT',
-				start,
-				end,
-				initialPosition: null,
-			} );
-		} );
-
-		it( 'lets the block list handler run the default multi-selection', () => {
-			const start = 'start';
-			const end = 'end';
-			const onMultiSelect = ( { dispatch: innerDispatch } ) => {
-				innerDispatch.multiSelect();
-			};
-			const select = {
-				getBlockRootClientId() {
-					return 'parent';
-				},
-				getSelectedBlockCount() {
-					return 0;
-				},
-				getBlockListSettings() {
-					return { onMultiSelect };
-				},
-			};
-			const dispatch = jest.fn();
-
-			multiSelect( start, end, null )( { select, dispatch } );
-
-			expect( dispatch ).toHaveBeenCalledWith( {
-				type: 'MULTI_SELECT',
-				start,
-				end,
-				initialPosition: null,
-			} );
-		} );
 	} );
 
 	describe( 'multiSelectSet', () => {
@@ -307,14 +232,42 @@ describe( 'actions', () => {
 			} );
 		} );
 
-		it( 'does nothing for blocks with different root client IDs', () => {
+		it( 'dispatches MULTI_SELECT_SET for cross-root blocks with a common ancestor', () => {
+			const clientIds = [ 'cell-2', 'cell-1' ];
+			const select = {
+				getBlockRootClientId( clientId ) {
+					return clientId === 'cell-1' ? 'row-1' : 'row-2';
+				},
+				getBlockParents( clientId ) {
+					return clientId === 'cell-1'
+						? [ 'row-1', 'table' ]
+						: [ 'row-2', 'table' ];
+				},
+				getClientIdsWithDescendants() {
+					return [ 'table', 'row-1', 'cell-1', 'row-2', 'cell-2' ];
+				},
+			};
+			const dispatch = jest.fn();
+
+			multiSelectSet( clientIds )( { select, dispatch } );
+
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'MULTI_SELECT_SET',
+				clientIds: [ 'cell-1', 'cell-2' ],
+				selectionStart: { clientId: 'cell-2' },
+				selectionEnd: { clientId: 'cell-1' },
+				initialPosition: null,
+			} );
+		} );
+
+		it( 'does nothing for cross-root blocks without a common ancestor', () => {
 			const clientIds = [ 'cell-1', 'cell-2' ];
 			const select = {
 				getBlockRootClientId( clientId ) {
-					return clientId === 'cell-1' ? 'parent' : 'other-parent';
+					return clientId === 'cell-1' ? 'row-1' : 'row-2';
 				},
-				getBlockOrder() {
-					return [ 'cell-1', 'cell-2' ];
+				getBlockParents() {
+					return [];
 				},
 			};
 			const dispatch = jest.fn();

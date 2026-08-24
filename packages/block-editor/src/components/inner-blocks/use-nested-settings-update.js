@@ -53,7 +53,6 @@ function useShallowMemo( value ) {
  * @param {string}               orientation                The direction in which the block
  *                                                          should face.
  * @param {Object}               layout                     The layout object for the block container.
- * @param {?Function}            onMultiSelect              Handler for block multi-selection.
  */
 export default function useNestedSettingsUpdate(
 	clientId,
@@ -67,8 +66,7 @@ export default function useNestedSettingsUpdate(
 	templateLock,
 	captureToolbars,
 	orientation,
-	layout,
-	onMultiSelect
+	layout
 ) {
 	// Instead of adding a useSelect mapping here, please add to the useSelect
 	// mapping in InnerBlocks! Every subscription impacts performance.
@@ -142,10 +140,6 @@ export default function useNestedSettingsUpdate(
 			newSettings.directInsert = directInsert;
 		}
 
-		if ( onMultiSelect !== undefined ) {
-			newSettings.onMultiSelect = onMultiSelect;
-		}
-
 		if (
 			newSettings.directInsert !== undefined &&
 			typeof newSettings.directInsert !== 'boolean'
@@ -187,7 +181,6 @@ export default function useNestedSettingsUpdate(
 		captureToolbars,
 		orientation,
 		layout,
-		onMultiSelect,
 		registry,
 	] );
 }

@@ -309,58 +309,17 @@ export const multiSelect =
 		const startBlockRootClientId = select.getBlockRootClientId( start );
 		const endBlockRootClientId = select.getBlockRootClientId( end );
 
-		const defaultMultiSelect = (
-			defaultStart = start,
-			defaultEnd = end,
-			defaultInitialPosition = __experimentalInitialPosition
-		) => {
-			dispatch( {
-				type: 'MULTI_SELECT',
-				start: defaultStart,
-				end: defaultEnd,
-				initialPosition: defaultInitialPosition,
-			} );
-		};
-
-		// Walk up the ancestor chain to find a block with onMultiSelect,
-		// allowing nested structures like table-v2 to intercept
-		// multi-selections of deeply nested blocks.
-		let handlerRootClientId = startBlockRootClientId;
-		let onMultiSelect;
-		while ( handlerRootClientId ) {
-			const settings = select.getBlockListSettings( handlerRootClientId );
-			if ( settings?.onMultiSelect ) {
-				const endParents = select.getBlockParents( end, true );
-				if ( endParents.includes( handlerRootClientId ) ) {
-					onMultiSelect = settings.onMultiSelect;
-					break;
-				}
-			}
-			handlerRootClientId =
-				select.getBlockRootClientId( handlerRootClientId );
+		// Only allow block multi-selections at the same level.
+		if ( startBlockRootClientId !== endBlockRootClientId ) {
+			return;
 		}
 
-		if ( onMultiSelect ) {
-			onMultiSelect( {
-				startClientId: start,
-				endClientId: end,
-				rootClientId: handlerRootClientId,
-				initialPosition: __experimentalInitialPosition,
-				select,
-				dispatch: {
-					multiSelect: defaultMultiSelect,
-					multiSelectSet: dispatch.multiSelectSet,
-					selectBlock: dispatch.selectBlock,
-				},
-			} );
-		} else {
-			// Only allow block multi-selections at the same level.
-			if ( startBlockRootClientId !== endBlockRootClientId ) {
-				return;
-			}
-
-			defaultMultiSelect();
-		}
+		dispatch( {
+			type: 'MULTI_SELECT',
+			start,
+			end,
+			initialPosition: __experimentalInitialPosition,
+		} );
 
 		const blockCount = select.getSelectedBlockCount();
 		const nestedBlockCount = select.getClientIdsOfDescendants(
@@ -414,21 +373,46 @@ export const multiSelectSet =
 			return;
 		}
 
-		if (
-			uniqueClientIds.some(
-				( clientId ) =>
-					select.getBlockRootClientId( clientId ) !== rootClientId
-			)
-		) {
-			return;
-		}
+		const allSameRoot = uniqueClientIds.every(
+			( clientId ) =>
+				select.getBlockRootClientId( clientId ) === rootClientId
+		);
 
-		const blockOrder = select.getBlockOrder( rootClientId );
-		const normalizedClientIds = uniqueClientIds
-			.filter( ( clientId ) => blockOrder.includes( clientId ) )
-			.sort(
-				( a, b ) => blockOrder.indexOf( a ) - blockOrder.indexOf( b )
+		let normalizedClientIds;
+
+		if ( allSameRoot ) {
+			const blockOrder = select.getBlockOrder( rootClientId );
+			normalizedClientIds = uniqueClientIds
+				.filter( ( clientId ) => blockOrder.includes( clientId ) )
+				.sort(
+					( a, b ) =>
+						blockOrder.indexOf( a ) - blockOrder.indexOf( b )
+				);
+		} else {
+			// Cross-root sets are only allowed when all blocks share a
+			// common ancestor (e.g. table cells in different rows of the
+			// same table).
+			const chains = uniqueClientIds.map( ( clientId ) => [
+				clientId,
+				...select.getBlockParents( clientId, true ),
+			] );
+			const [ firstChain, ...restChains ] = chains;
+			const commonAncestor = firstChain.find( ( clientId ) =>
+				restChains.every( ( chain ) => chain.includes( clientId ) )
 			);
+
+			if ( ! commonAncestor ) {
+				return;
+			}
+
+			const documentOrder = select.getClientIdsWithDescendants();
+			const orderMap = new Map(
+				documentOrder.map( ( clientId, index ) => [ clientId, index ] )
+			);
+			normalizedClientIds = uniqueClientIds
+				.filter( ( clientId ) => orderMap.has( clientId ) )
+				.sort( ( a, b ) => orderMap.get( a ) - orderMap.get( b ) );
+		}
 
 		if ( normalizedClientIds.length < 2 ) {
 			dispatch.selectBlock(
