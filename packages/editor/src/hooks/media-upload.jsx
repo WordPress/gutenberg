@@ -1,15 +1,32 @@
 import { Component } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import deprecated from '@wordpress/deprecated';
+import { useSelect } from '@wordpress/data';
 import {
 	MediaUpload,
 	privateApis as mediaUtilsPrivateApis,
 } from '@wordpress/media-utils';
 import { unlock } from '../lock-unlock';
+import { store as editorStore } from '../store';
 
 const { MediaUploadModal: MediaUploadModalComponent } = unlock(
 	mediaUtilsPrivateApis
 );
+
+/**
+ * Supplies the modal with the post it was opened from, so that its "Attached to"
+ * filter can offer media uploaded to that post. `media-utils` has no editor
+ * dependency, so the post is injected here.
+ *
+ * @param {Object} props Props passed through to the modal.
+ */
+function MediaUploadModalWithPostContext( props ) {
+	const postId = useSelect(
+		( select ) => select( editorStore ).getCurrentPostId(),
+		[]
+	);
+	return <MediaUploadModalComponent { ...props } postId={ postId } />;
+}
 
 /**
  * Class component wrapper for MediaUploadModal to maintain compatibility
@@ -49,7 +66,7 @@ class MediaUploadModalWrapper extends Component {
 		return (
 			<>
 				{ render( { open: this.openModal } ) }
-				<MediaUploadModalComponent
+				<MediaUploadModalWithPostContext
 					allowedTypes={ allowedTypes }
 					multiple={ multiple }
 					value={ value }

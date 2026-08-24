@@ -61,12 +61,25 @@ function mockRecords( records: unknown[] ) {
 	} );
 }
 
-type ModalProps = { isOpen?: boolean; value?: number | number[] };
+type ModalProps = {
+	isOpen?: boolean;
+	value?: number | number[];
+	postId?: number;
+};
 
-function renderModal( { isOpen = true, value }: ModalProps = {} ) {
+function renderModal(
+	{ isOpen = true, value, postId }: ModalProps = {},
+	persistedView?: Record< string, unknown >
+) {
 	const registry = createRegistry();
 	registry.register( noticesStore );
 	registry.register( preferencesStore );
+
+	if ( persistedView ) {
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core/views', preferenceKey, persistedView );
+	}
 
 	const onSelect = jest.fn();
 	const onClose = jest.fn();
@@ -76,6 +89,7 @@ function renderModal( { isOpen = true, value }: ModalProps = {} ) {
 			<MediaUploadModal
 				isOpen={ isOpen }
 				value={ value }
+				postId={ postId }
 				onSelect={ onSelect }
 				onClose={ onClose }
 			/>
@@ -109,6 +123,17 @@ describe( 'MediaUploadModal', () => {
 
 	afterEach( () => {
 		jest.clearAllMocks();
+		// The popover fallback container is appended to `document.body`, outside
+		// the tree Testing Library cleans up. Left in place, the next modal to
+		// open marks it `aria-hidden` — hiding the popovers that later tests
+		// render into it — so it is removed and recreated per test. This is DOM
+		// teardown outside the rendered tree, not a query for an element under
+		// test, so Testing Library has nothing to offer here.
+		/* eslint-disable testing-library/no-node-access */
+		document
+			.querySelectorAll( '.components-popover__fallback-container' )
+			.forEach( ( node ) => node.remove() );
+		/* eslint-enable testing-library/no-node-access */
 	} );
 
 	it( 'resets page and search when the modal is closed and reopened', async () => {
@@ -233,6 +258,193 @@ describe( 'MediaUploadModal', () => {
 				.select( preferencesStore )
 				.get( 'core/views', preferenceKey )
 		).toBeUndefined();
+	} );
+
+	describe( 'the "Attached to" filter', () => {
+		it( 'offers the current post only when the modal knows one', async () => {
+			const user = userEvent.setup();
+			const { rerender } = renderModal( { postId: 42 } );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add filter' } )
+			);
+			await user.click(
+				await screen.findByRole( 'menuitem', { name: 'Attached to' } )
+			);
+
+			expect(
+				await screen.findByRole( 'option', {
+					name: 'Uploaded to this post',
+				} )
+			).toBeVisible();
+			expect(
+				screen.getByRole( 'option', { name: 'Unattached' } )
+			).toBeVisible();
+
+			// Outside a post context, only "Unattached" is meaningful.
+			rerender( { isOpen: true } );
+
+			await waitFor( () => {
+				expect(
+					screen.queryByRole( 'option', {
+						name: 'Uploaded to this post',
+					} )
+				).not.toBeInTheDocument();
+			} );
+			expect(
+				screen.getByRole( 'option', { name: 'Unattached' } )
+			).toBeVisible();
+		} );
+
+		it( 'stops constraining the query when the chosen option is clicked again', async () => {
+			const user = userEvent.setup();
+			renderModal( { postId: 42 } );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add filter' } )
+			);
+			await user.click(
+				await screen.findByRole( 'menuitem', { name: 'Attached to' } )
+			);
+
+			const unattached = await screen.findByRole( 'option', {
+				name: 'Unattached',
+			} );
+			await user.click( unattached );
+
+			await waitFor( () => {
+				expect(
+					mockUseEntityRecordsWithPermissions
+				).toHaveBeenLastCalledWith(
+					'postType',
+					'attachment',
+					expect.objectContaining( { parent: [ 0 ] } )
+				);
+			} );
+
+			// Clicking the selected option again deselects it. The filter stays
+			// in the view with an empty value, which must read as "no constraint"
+			// rather than as "attached to nothing".
+			await user.click( unattached );
+
+			await waitFor( () => {
+				expect(
+					mockUseEntityRecordsWithPermissions
+				).toHaveBeenLastCalledWith(
+					'postType',
+					'attachment',
+					expect.not.objectContaining( { parent: expect.anything() } )
+				);
+			} );
+		} );
+
+		it( 'queries both options together as a single `parent` list', async () => {
+			const user = userEvent.setup();
+			renderModal( { postId: 42 } );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add filter' } )
+			);
+			await user.click(
+				await screen.findByRole( 'menuitem', { name: 'Attached to' } )
+			);
+			await user.click(
+				await screen.findByRole( 'option', {
+					name: 'Uploaded to this post',
+				} )
+			);
+			await user.click(
+				screen.getByRole( 'option', { name: 'Unattached' } )
+			);
+
+			await waitFor( () => {
+				expect(
+					mockUseEntityRecordsWithPermissions
+				).toHaveBeenLastCalledWith(
+					'postType',
+					'attachment',
+					expect.objectContaining( { parent: [ 42, 0 ] } )
+				);
+			} );
+		} );
+
+		it( 'queries unattached media as `parent: [ 0 ]`', async () => {
+			renderModal(
+				{ postId: 42 },
+				{
+					filters: [
+						{
+							field: 'attached_to',
+							operator: 'isAny',
+							value: [ 'unattached' ],
+						},
+					],
+				}
+			);
+
+			await waitFor( () => {
+				expect(
+					mockUseEntityRecordsWithPermissions
+				).toHaveBeenLastCalledWith(
+					'postType',
+					'attachment',
+					expect.objectContaining( { parent: [ 0 ] } )
+				);
+			} );
+		} );
+
+		it( 'resolves the persisted `current` sentinel against the post it is opened from', async () => {
+			renderModal(
+				{ postId: 42 },
+				{
+					filters: [
+						{
+							field: 'attached_to',
+							operator: 'isAny',
+							value: [ 'current' ],
+						},
+					],
+				}
+			);
+
+			await waitFor( () => {
+				expect(
+					mockUseEntityRecordsWithPermissions
+				).toHaveBeenLastCalledWith(
+					'postType',
+					'attachment',
+					expect.objectContaining( { parent: [ 42 ] } )
+				);
+			} );
+		} );
+
+		it( 'ignores a persisted `current` sentinel when there is no post context', async () => {
+			renderModal(
+				{},
+				{
+					filters: [
+						{
+							field: 'attached_to',
+							operator: 'isAny',
+							value: [ 'current' ],
+						},
+					],
+				}
+			);
+
+			await waitFor( () => {
+				expect(
+					mockUseEntityRecordsWithPermissions
+				).toHaveBeenCalled();
+			} );
+			expect(
+				mockUseEntityRecordsWithPermissions
+			).toHaveBeenLastCalledWith(
+				'postType',
+				'attachment',
+				expect.not.objectContaining( { parent: expect.anything() } )
+			);
+		} );
 	} );
 
 	it( 'updates the media query when the picker changes search', async () => {

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Media Library modal: Add an "Attached to" filter offering "Uploaded to this post" and "Unattached", along with a `postId` prop supplying the post the modal was opened from.
+
 ### Bug Fixes
 
 -   Preserve array-valued fields in multipart form data so grouped image-size sideload requests reach the REST API as arrays ([#82353](https://github.com/WordPress/gutenberg/pull/82353)).
