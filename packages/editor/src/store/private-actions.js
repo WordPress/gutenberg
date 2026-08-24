@@ -1,4 +1,3 @@
-import { speak } from '@wordpress/a11y';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -817,7 +816,11 @@ export const setEditorIntent =
 		}
 
 		if ( label ) {
-			speak( label, 'assertive' );
+			// The snackbar is the single announcement owner: `Snackbar`
+			// speaks its content politely from its own effect, so the action
+			// must not also announce, which would say the mode twice and let
+			// an assertive update interrupt the polite one.
+			//
 			// Reuse the same notice id across mode changes so rapid keyboard
 			// cycling doesn't pile up multiple snackbars — the new notice
 			// replaces the old one.
