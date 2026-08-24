@@ -1,11 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { group as icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
+import { __ } from '@wordpress/i18n';
 import initBlock from '../utils/init-block';
 import edit from './edit';
 import metadata from './block.json';
@@ -16,8 +10,20 @@ const { name } = metadata;
 
 export { metadata, name };
 
+const TEMPLATE = [
+	[
+		'core/paragraph',
+		{
+			content: __(
+				"Enter the message you wish displayed for form submission error/success, and select the type of the message (success/error) from the block's options."
+			),
+		},
+	],
+];
+
 export const settings = {
 	icon,
+	template: TEMPLATE,
 	edit,
 	save,
 	variations,

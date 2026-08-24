@@ -1,20 +1,13 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 } from '@wordpress/components';
-import { getTemplatePartIcon } from '@wordpress/editor';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { file } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 import { useViewConfig } from '@wordpress/views';
-
-/**
- * Internal dependencies
- */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import CategoryItem from './category-item';
 import {
@@ -27,7 +20,10 @@ import usePatternCategories from './use-pattern-categories';
 import useTemplatePartAreas from './use-template-part-areas';
 import { unlock } from '../../lock-unlock';
 
+const VIEW_CONFIG_FIELDS = [ 'view_list' ];
+
 const { useLocation } = unlock( routerPrivateApis );
+const { getTemplatePartIcon } = unlock( coreDataPrivateApis );
 
 function CategoriesGroup( {
 	templatePartViews,
@@ -89,10 +85,12 @@ export default function SidebarNavigationScreenPatterns( { backPath } ) {
 	const { view_list: templatePartViews } = useViewConfig( {
 		kind: 'postType',
 		name: TEMPLATE_PART_POST_TYPE,
+		fields: VIEW_CONFIG_FIELDS,
 	} );
 	const { view_list: patternViews } = useViewConfig( {
 		kind: 'postType',
 		name: PATTERN_TYPES.user,
+		fields: VIEW_CONFIG_FIELDS,
 	} );
 
 	const { templatePartAreas, isLoading, hasTemplateParts } =
@@ -123,7 +121,7 @@ export default function SidebarNavigationScreenPatterns( { backPath } ) {
 		<SidebarNavigationScreen
 			title={ __( 'Patterns' ) }
 			description={ __(
-				'Manage what patterns are available when editing the site.'
+				'Manage what patterns are available when editing your site.'
 			) }
 			isRoot={ ! backPath }
 			backPath={ backPath }

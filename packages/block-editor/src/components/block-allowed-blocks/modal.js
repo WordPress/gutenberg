@@ -1,21 +1,14 @@
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	Flex,
 	FlexItem,
 	Modal,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { _x, __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import BlockManager from '../block-manager';
 
@@ -58,11 +51,11 @@ export default function BlockAllowedBlocksModal( {
 				} }
 				spacing="4"
 			>
-				<Text>
+				<WCText>
 					{ __(
 						'Select which blocks can be added inside this container.'
 					) }
-				</Text>
+				</WCText>
 				<BlockManager
 					blockTypes={ blockTypes }
 					selectedBlockTypes={ currentSelectedBlockTypes }

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useState, useId } from '@wordpress/element';
 import {
 	InspectorControls,
@@ -8,10 +5,6 @@ import {
 } from '@wordpress/block-editor';
 import { BaseControl, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { PATTERN_OVERRIDES_BINDING_SOURCE } from '../constants';
 import {
 	AllowOverridesModal,

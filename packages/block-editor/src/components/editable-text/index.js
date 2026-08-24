@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import RichText from '../rich-text';
 
 const EditableText = forwardRef( ( props, ref ) => {

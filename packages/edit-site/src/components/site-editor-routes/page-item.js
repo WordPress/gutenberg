@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import Editor from '../editor';
 import DataViewsSidebarContent from '../sidebar-dataviews';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
@@ -30,16 +23,7 @@ export const pageItemRoute = {
 				<SidebarNavigationScreenUnsupported />
 			);
 		},
-		mobile( { siteData } ) {
-			if ( ! isThemeDataLoaded( siteData ) ) {
-				return <></>;
-			}
-			return siteData.currentTheme.is_block_theme ? (
-				<Editor />
-			) : (
-				<SidebarNavigationScreenUnsupported />
-			);
-		},
+		// Also rendered on mobile, where this route is only reached at canvas=edit.
 		preview( { siteData } ) {
 			if ( ! isThemeDataLoaded( siteData ) ) {
 				return null;

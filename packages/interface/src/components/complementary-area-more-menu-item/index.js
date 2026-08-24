@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { check } from '@wordpress/icons';
 import { MenuItem } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import ComplementaryAreaToggle from '../complementary-area-toggle';
 import ActionItem from '../action-item';
 

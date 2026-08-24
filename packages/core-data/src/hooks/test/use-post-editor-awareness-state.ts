@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { act, renderHook, waitFor } from '@testing-library/react';
-
-/**
- * Internal dependencies
- */
 import {
 	useActiveCollaborators,
 	useResolvedSelection,
@@ -26,6 +19,14 @@ import type { SelectionCursor } from '../../types';
 // Mock the sync module
 jest.mock( '../../sync', () => ( {
 	getSyncManager: jest.fn(),
+} ) );
+
+const mockPostContentBlocks = [
+	{ clientId: 'block-1', name: 'core/paragraph', innerBlocks: [] },
+];
+
+jest.mock( '../../awareness/block-lookup', () => ( {
+	usePostContentBlocks: jest.fn( () => mockPostContentBlocks ),
 } ) );
 
 const mockAvatarUrls = {
@@ -201,6 +202,22 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			expect( result.current ).toEqual( mockUsers );
 		} );
 
+		test( 'does not expose a collaborator until identity information is available', () => {
+			const incompleteCollaborator = {
+				...createMockActiveUser(),
+				collaboratorInfo: undefined,
+			} as unknown as PostEditorAwarenessState;
+			mockAwareness.getCurrentState.mockReturnValue( [
+				incompleteCollaborator,
+			] );
+
+			const { result } = renderHook( () =>
+				useActiveCollaborators( 123, 'post' )
+			);
+
+			expect( result.current ).toEqual( [] );
+		} );
+
 		test( 'should subscribe to state changes', () => {
 			renderHook( () => useActiveCollaborators( 123, 'post' ) );
 
@@ -295,10 +312,11 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			expect( result.current( mockSelection ) ).toEqual( {
 				richTextOffset: null,
 				localClientId: null,
+				attributeKey: null,
 			} );
 		} );
 
-		test( 'should call awareness.convertSelectionStateToAbsolute with selection', () => {
+		test( 'should call awareness.convertSelectionStateToAbsolute with selection and blocks', () => {
 			const mockSelection: SelectionCursor = {
 				type: SelectionType.Cursor,
 				cursorPosition: {
@@ -309,6 +327,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			mockAwareness.convertSelectionStateToAbsolute.mockReturnValue( {
 				richTextOffset: 10,
 				localClientId: 'block-1',
+				attributeKey: 'content',
 			} );
 
 			const { result } = renderHook( () =>
@@ -319,10 +338,11 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 
 			expect(
 				mockAwareness.convertSelectionStateToAbsolute
-			).toHaveBeenCalledWith( mockSelection );
+			).toHaveBeenCalledWith( mockSelection, mockPostContentBlocks );
 			expect( position ).toEqual( {
 				richTextOffset: 10,
 				localClientId: 'block-1',
+				attributeKey: 'content',
 			} );
 		} );
 	} );
@@ -452,7 +472,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 	} );
 
 	describe( 'multiple users scenario', () => {
-		test( 'should handle multiple active users', () => {
+		test( 'should handle resolved and fallback active users together', () => {
 			const user1 = createMockActiveUser( {
 				clientId: 1,
 				isMe: true,
@@ -469,10 +489,9 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 				clientId: 2,
 				isMe: false,
 				collaboratorInfo: {
-					id: 2,
-					name: 'User Two',
-					slug: 'user-two',
-					avatar_urls: mockAvatarUrls,
+					id: null,
+					name: 'Anonymous User',
+					slug: 'anonymous-2',
 					browserType: 'Firefox',
 					enteredAt: 1704067300000,
 				},
@@ -489,7 +508,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 				'User One'
 			);
 			expect( result.current[ 1 ].collaboratorInfo.name ).toBe(
-				'User Two'
+				'Anonymous User'
 			);
 		} );
 

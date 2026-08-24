@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getUniqueTemplatePartTitle, getCleanTemplatePartSlug } from '../utils';
 
 describe( 'getUniqueTemplatePartTitle', () => {

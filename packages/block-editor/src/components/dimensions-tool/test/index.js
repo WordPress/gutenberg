@@ -1,21 +1,24 @@
-/**
- * External dependencies
- */
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
-import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { useEffect, useState } from '@wordpress/element';
 import DimensionsTool from '../';
 
 const EMPTY_OBJECT = {};
+const ASPECT_RATIO_OPTIONS = [
+	{ label: 'Original', value: 'auto' },
+	{ label: '16/9', value: '16/9' },
+	{ label: '4/3', value: '4/3' },
+	// Matches the core preset for a square, which is written as a single
+	// number rather than a ratio.
+	{ label: 'Square', value: '1' },
+	{
+		label: 'Custom',
+		value: 'custom',
+		disabled: true,
+		hidden: true,
+	},
+];
 
 function Example( { initialValue, onChange, ...props } ) {
 	const [ value, setValue ] = useState( initialValue );
@@ -33,16 +36,51 @@ function Example( { initialValue, onChange, ...props } ) {
 				} }
 				defaultScale="cover"
 				defaultAspectRatio="auto"
-				aspectRatioOptions={ [
-					{ label: 'Original', value: 'auto' },
-					{ label: '16/9', value: '16/9' },
-					{
-						label: 'Custom',
-						value: 'custom',
-						disabled: true,
-						hidden: true,
-					},
-				] }
+				aspectRatioOptions={ ASPECT_RATIO_OPTIONS }
+				value={ value }
+				{ ...props }
+			/>
+		</ToolsPanel>
+	);
+}
+
+// Holds the value like `Example`, but also lets a test update it from the
+// outside, the way `updateBlockAttributes`, undo, or another client would.
+function ExternallyUpdatedExample( { initialValue, onChange, updateRef } ) {
+	const [ value, setValue ] = useState( initialValue );
+	useEffect( () => {
+		updateRef.current = setValue;
+	}, [ updateRef ] );
+	return (
+		<ToolsPanel label="Dimensions" panelId="panel-id" resetAll={ () => {} }>
+			<DimensionsTool
+				panelId="panel-id"
+				onChange={ ( nextValue ) => {
+					setValue( nextValue );
+					onChange( nextValue );
+				} }
+				defaultScale="cover"
+				defaultAspectRatio="auto"
+				aspectRatioOptions={ ASPECT_RATIO_OPTIONS }
+				value={ value }
+			/>
+		</ToolsPanel>
+	);
+}
+
+function ControlledExample( { value, onChange, ...props } ) {
+	return (
+		<ToolsPanel
+			label="Dimensions"
+			panelId="panel-id"
+			resetAll={ () => onChange( EMPTY_OBJECT ) }
+		>
+			<DimensionsTool
+				panelId="panel-id"
+				onChange={ onChange }
+				defaultScale="cover"
+				defaultAspectRatio="auto"
+				aspectRatioOptions={ ASPECT_RATIO_OPTIONS }
 				value={ value }
 				{ ...props }
 			/>
@@ -60,6 +98,176 @@ function Example( { initialValue, onChange, ...props } ) {
 // properties are treated differently from missing properties.
 
 describe( 'DimensionsTool', () => {
+	describe( 'controlled values', () => {
+		it( 'updates the aspect ratio control when the value prop changes', () => {
+			const onChange = jest.fn();
+			const { rerender } = render(
+				<ControlledExample
+					value={ { aspectRatio: '16/9' } }
+					onChange={ onChange }
+				/>
+			);
+			const aspectRatioSelect = screen.getByRole( 'combobox', {
+				name: 'Aspect ratio',
+			} );
+
+			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+
+			rerender(
+				<ControlledExample
+					value={ { aspectRatio: '4/3' } }
+					onChange={ onChange }
+				/>
+			);
+			expect( aspectRatioSelect ).toHaveValue( '4/3' );
+
+			rerender(
+				<ControlledExample
+					value={ EMPTY_OBJECT }
+					onChange={ onChange }
+				/>
+			);
+			expect( aspectRatioSelect ).toHaveValue( 'auto' );
+		} );
+
+		it( 'displays an aspect ratio that is written differently to the option with the same ratio', () => {
+			const onChange = jest.fn();
+			const { rerender } = render(
+				<ControlledExample
+					value={ { aspectRatio: '1/1' } }
+					onChange={ onChange }
+				/>
+			);
+			const aspectRatioSelect = screen.getByRole( 'combobox', {
+				name: 'Aspect ratio',
+			} );
+
+			expect( aspectRatioSelect ).toHaveValue( '1' );
+
+			rerender(
+				<ControlledExample
+					value={ { aspectRatio: '16 / 9' } }
+					onChange={ onChange }
+				/>
+			);
+			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+		} );
+
+		it( 'displays an aspect ratio without a matching option as custom', () => {
+			const onChange = jest.fn();
+			render(
+				<ControlledExample
+					value={ { aspectRatio: '7/5' } }
+					onChange={ onChange }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'combobox', { name: 'Aspect ratio' } )
+			).toHaveValue( 'custom' );
+		} );
+
+		it( 'updates the scale control when the value prop changes', () => {
+			const onChange = jest.fn();
+			const { rerender } = render(
+				<ControlledExample
+					value={ { aspectRatio: '16/9', scale: 'cover' } }
+					onChange={ onChange }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'radio', { name: 'Cover' } )
+			).toBeChecked();
+
+			rerender(
+				<ControlledExample
+					value={ { aspectRatio: '16/9', scale: 'contain' } }
+					onChange={ onChange }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'radio', { name: 'Contain' } )
+			).toBeChecked();
+		} );
+	} );
+
+	describe( 'external updates', () => {
+		it( 'restores the scale that was set externally', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+			const updateRef = { current: null };
+
+			render(
+				<ExternallyUpdatedExample
+					initialValue={ { aspectRatio: '16/9', scale: 'cover' } }
+					onChange={ onChange }
+					updateRef={ updateRef }
+				/>
+			);
+
+			// Update the scale from outside the component.
+			await act( async () =>
+				updateRef.current( { aspectRatio: '16/9', scale: 'contain' } )
+			);
+
+			// Clearing and setting the aspect ratio again restores the scale.
+			await user.selectOptions(
+				screen.getByRole( 'combobox', { name: 'Aspect ratio' } ),
+				'auto'
+			);
+			await user.selectOptions(
+				screen.getByRole( 'combobox', { name: 'Aspect ratio' } ),
+				'4/3'
+			);
+
+			expect( onChange ).toHaveBeenLastCalledWith( {
+				aspectRatio: '4/3',
+				scale: 'contain',
+			} );
+		} );
+
+		it( 'restores the aspect ratio that was set externally', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+			const updateRef = { current: null };
+
+			render(
+				<ExternallyUpdatedExample
+					initialValue={ { aspectRatio: '16/9', scale: 'cover' } }
+					onChange={ onChange }
+					updateRef={ updateRef }
+				/>
+			);
+
+			// Update the aspect ratio from outside the component.
+			await act( async () =>
+				updateRef.current( { aspectRatio: '4/3', scale: 'cover' } )
+			);
+
+			// Setting both a width and a height replaces the aspect ratio with
+			// a custom one, and clearing the width restores the previous one.
+			await user.type(
+				screen.getByRole( 'spinbutton', { name: 'Width' } ),
+				'100'
+			);
+			await user.type(
+				screen.getByRole( 'spinbutton', { name: 'Height' } ),
+				'100'
+			);
+			await user.clear(
+				screen.getByRole( 'spinbutton', { name: 'Width' } )
+			);
+
+			expect( onChange ).toHaveBeenLastCalledWith( {
+				aspectRatio: '4/3',
+				scale: 'cover',
+				height: '100px',
+			} );
+		} );
+	} );
+
 	describe( 'updating aspectRatio', () => {
 		it( 'when starting with empty initial state, setting aspectRatio also sets scale (0000) -> (1100)', async () => {
 			const user = userEvent.setup();
@@ -323,7 +531,30 @@ describe( 'DimensionsTool', () => {
 	} );
 
 	describe( 'updating scale', () => {
-		// No custom interactions here. Things should just update normally.
+		it( 'when default scale is cover, setting scale to fill preserves the fill value', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+
+			const initialValue = {
+				aspectRatio: '16/9',
+				scale: 'cover',
+			};
+
+			render(
+				<Example initialValue={ initialValue } onChange={ onChange } />
+			);
+
+			const scaleFillRadio = screen.getByRole( 'radio', {
+				name: 'Fill',
+			} );
+
+			await user.click( scaleFillRadio );
+			expect( scaleFillRadio ).toBeChecked();
+
+			expect( onChange.mock.calls ).toStrictEqual( [
+				[ { aspectRatio: '16/9', scale: 'fill' } ],
+			] );
+		} );
 	} );
 
 	describe( 'updating dimensions', () => {

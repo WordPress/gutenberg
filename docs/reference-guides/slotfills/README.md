@@ -38,9 +38,6 @@ With the exception of [MainDashboardButton](/docs/reference-guides/slotfills/mai
 A fill can be restricted to the Post Editor by checking to see if the current post type object property `viewable` is set to `true`. Any post type not set to `viewable`, does not have an associated edit post screen and is a good indicator that the user is not in the Post Editor. The example below will render its content on the edit post screen for any registered post type.
 
 ```js
-/**
- * WordPress dependencies
- */
 import { registerPlugin } from '@wordpress/plugins';
 import {
 	PluginDocumentSettingPanel,
@@ -87,9 +84,6 @@ registerPlugin( 'example-post-edit-only', {
 The following example expands on the example above by creating an allow list of post types where the fill should be rendered. In this case, the fill is only rendered when editing pages.
 
 ```js
-/**
- * WordPress dependencies
- */
 import { registerPlugin } from '@wordpress/plugins';
 import {
 	PluginDocumentSettingPanel,
@@ -149,9 +143,6 @@ registerPlugin( 'example-restrict-post-types', {
 To restrict fills to the Site Editor, the reverse logic is true. If the post type object's `viewable` property is set to `true`, then the fill should not be rendered. The example below will render its content on any Site Editor screen.
 
 ```js
-/**
- * WordPress dependencies
- */
 import { registerPlugin } from '@wordpress/plugins';
 import {
 	PluginDocumentSettingPanel,
@@ -200,9 +191,6 @@ registerPlugin( 'example-site-editor', {
 This example builds on the example above by providing an allow list to control which screens a fill can be rendered within the Site Editor.
 
 ```js
-/**
- * WordPress dependencies
- */
 import { registerPlugin } from '@wordpress/plugins';
 import {
 	PluginDocumentSettingPanel,
@@ -271,10 +259,6 @@ SlotFills are created using `createSlotFill`. This creates two components, `Slot
 ```js
 /**
  * Defines as extensibility slot for the Summary panel.
- */
-
-/**
- * WordPress dependencies
  */
 import { createSlotFill, PanelRow } from '@wordpress/components';
 

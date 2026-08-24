@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Required for testing
 import { VisuallyHidden as WCVisuallyHidden } from '@wordpress/components';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Only for testing
 import { VisuallyHidden } from '@wordpress/ui';
 import {
 	getElementBounds,

@@ -2,6 +2,33 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `filterURLForDisplay`: Clamp the truncated file name's head slice at zero, so a small `maxLength` no longer returns a string longer than the untruncated one ([#81529](https://github.com/WordPress/gutenberg/pull/81529)).
+-   `getQueryArgs`: Split each query argument on its first `=` only, so values containing `=` — base64 padding, JWTs, nested URLs — are no longer truncated, and ignore malformed pairs with no key instead of promoting the value to one ([#81066](https://github.com/WordPress/gutenberg/pull/81066)).
+-   `normalizePath` no longer throws a `URIError` when a query parameter contains a malformed percent sequence, such as `/wp/v2/posts?search=50%off`. It now uses `safeDecodeURIComponent`, matching the fix already applied to `getQueryArgs` in [#45561](https://github.com/WordPress/gutenberg/pull/45561) ([#81086](https://github.com/WordPress/gutenberg/pull/81086)).
+-   `normalizePath`: Take the query from the first `?` only, so a query containing a further `?` - a redirect target or a nested URL - is no longer discarded, and paths that differ only past that `?` no longer normalize to the same string ([#](https://github.com/WordPress/gutenberg/pull/)).
+
+## 4.53.0 (2026-08-12)
+
+## 4.52.0 (2026-07-29)
+
+## 4.51.0 (2026-07-14)
+
+## 4.50.0 (2026-07-01)
+
+## 4.49.0 (2026-06-24)
+
+## 4.48.1 (2026-06-16)
+
+## 4.48.0 (2026-06-10)
+
+## 4.47.0 (2026-05-27)
+
+## 4.46.0 (2026-05-14)
+
+## 4.45.0 (2026-04-29)
+
 ## 4.44.0 (2026-04-15)
 
 ## 4.43.0 (2026-04-01)

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import isEmpty from './is-empty';
 import remove from './remove';
 import unwrap from './unwrap';

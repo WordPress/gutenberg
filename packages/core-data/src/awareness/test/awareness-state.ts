@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import {
 	describe,
 	expect,
@@ -9,15 +6,7 @@ import {
 	beforeEach,
 	afterEach,
 } from '@jest/globals';
-
-/**
- * WordPress dependencies
- */
 import { Y } from '@wordpress/sync';
-
-/**
- * Internal dependencies
- */
 import { AwarenessState } from '../awareness-state';
 import type { EnhancedState, EqualityFieldCheck } from '../types';
 

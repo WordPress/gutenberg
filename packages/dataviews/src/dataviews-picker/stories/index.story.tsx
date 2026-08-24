@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import type { Meta } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import { Modal, Button } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import DataViewsPicker from '../index';
 import { LAYOUT_PICKER_GRID } from '../../constants';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
@@ -20,6 +9,7 @@ import type { ActionButton, View } from '../../types';
 import { data, fields, type SpaceObject } from './fixtures';
 
 const meta = {
+	tags: [ 'manifest' ],
 	title: 'DataViews/DataViewsPicker',
 	component: DataViewsPicker,
 } as Meta< typeof DataViewsPicker >;
@@ -186,6 +176,11 @@ const DataViewsPickerContent = ( {
 				fields={ fields }
 				onChangeView={ setView }
 				config={ { perPageSizes } }
+				defaultLayouts={ {
+					pickerGrid: true,
+					pickerTable: true,
+					pickerActivity: true,
+				} }
 				itemListLabel="Galactic Bodies"
 			/>
 		</>
@@ -213,6 +208,11 @@ export const Default = ( {
 
 Default.args = storyArgs;
 Default.argTypes = storyArgTypes;
+Default.parameters = {
+	// FIXME: Picker UI nests interactive controls (nested-interactive).
+	// See: https://github.com/WordPress/gutenberg/issues/81596
+	a11y: { test: 'todo' },
+};
 
 export const WithModal = ( {
 	perPageSizes = [ 10, 25, 50, 100 ],
@@ -254,6 +254,7 @@ export const WithModal = ( {
 			<Stack direction="row" justify="left" gap="sm">
 				<Button
 					variant="primary"
+					__next40pxDefaultSize
 					onClick={ () => setIsModalOpen( true ) }
 				>
 					Open Picker Modal
@@ -262,6 +263,7 @@ export const WithModal = ( {
 					onClick={ () => setSelectedItems( [] ) }
 					disabled={ ! selectedItems.length }
 					accessibleWhenDisabled
+					__next40pxDefaultSize
 				>
 					Clear Selection
 				</Button>

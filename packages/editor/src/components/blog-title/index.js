@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { debounce } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -9,14 +6,10 @@ import { decodeEntities } from '@wordpress/html-entities';
 import {
 	Button,
 	Dropdown,
-	__experimentalInputControl as InputControl,
+	__experimentalInputControl as WCInputControl,
 } from '@wordpress/components';
 import { useState, useMemo } from '@wordpress/element';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { TEMPLATE_POST_TYPE } from '../../store/constants';
 import PostPanelRow from '../post-panel-row';
 import { store as editorStore } from '../../store';
@@ -110,9 +103,8 @@ export default function BlogTitle() {
 							title={ __( 'Blog title' ) }
 							onClose={ onClose }
 						/>
-						<InputControl
+						<WCInputControl
 							placeholder={ __( 'No title' ) }
-							size="__unstable-large"
 							value={ postsPageTitle }
 							onChange={ debounce( setPostsPageTitle, 300 ) }
 							label={ __( 'Blog title' ) }

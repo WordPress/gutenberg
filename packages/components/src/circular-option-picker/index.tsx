@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import CircularOptionPicker from './circular-option-picker';
 
 export { Option } from './circular-option-picker-option';

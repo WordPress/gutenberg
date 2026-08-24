@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { DELETE, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -19,7 +12,7 @@ import {
 } from '@wordpress/block-editor';
 import { useState, useRef, createInterpolateElement } from '@wordpress/element';
 import {
-	Icon,
+	Icon as WCIcon,
 	Button,
 	Dropdown,
 	TextControl,
@@ -33,10 +26,6 @@ import { useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { keyboardReturn } from '@wordpress/icons';
 import { store as blocksStore } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { getSocialService } from './social-list';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
@@ -191,7 +180,6 @@ const SocialLinkEdit = ( {
 						) }
 						renderContent={ () => (
 							<TextControl
-								__next40pxDefaultSize
 								className="wp-block-social-link__toolbar_content_text"
 								label={ __( 'Text' ) }
 								help={ __(
@@ -224,7 +212,6 @@ const SocialLinkEdit = ( {
 						} }
 					>
 						<TextControl
-							__next40pxDefaultSize
 							label={ __( 'Text' ) }
 							help={ __(
 								'The text is visible when enabled from the parent Social Icons block.'
@@ -240,7 +227,6 @@ const SocialLinkEdit = ( {
 			</InspectorControls>
 			<InspectorControls group="advanced">
 				<TextControl
-					__next40pxDefaultSize
 					label={ __( 'Link relation' ) }
 					help={ createInterpolateElement(
 						__(
@@ -277,7 +263,7 @@ const SocialLinkEdit = ( {
 				 */
 				/* eslint-disable jsx-a11y/no-redundant-roles */ }
 				<button aria-haspopup="dialog" { ...blockProps } role="button">
-					<Icon icon={ icon } />
+					<WCIcon icon={ icon } />
 					<span
 						className={ clsx( 'wp-block-social-link-label', {
 							'screen-reader-text': ! showLabels,

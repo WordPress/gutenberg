@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
@@ -17,10 +14,6 @@ import {
 import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function PostNavigationLinkEdit( {
@@ -145,7 +138,6 @@ export default function PostNavigationLinkEdit( {
 						onDeselect={ () => setAttributes( { arrow: 'none' } ) }
 					>
 						<ToggleGroupControl
-							__next40pxDefaultSize
 							label={ __( 'Arrow' ) }
 							value={ arrow }
 							onChange={ ( value ) => {
@@ -183,7 +175,6 @@ export default function PostNavigationLinkEdit( {
 			</InspectorControls>
 			<InspectorControls group="advanced">
 				<SelectControl
-					__next40pxDefaultSize
 					label={ __( 'Filter by taxonomy' ) }
 					value={ taxonomy }
 					options={ getTaxonomyOptions() }

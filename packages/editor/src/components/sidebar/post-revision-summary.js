@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import {
 	ExternalLink,
@@ -8,28 +5,21 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import RevisionAuthorPanel from '../revision-author-panel';
-import RevisionCreatedPanel from '../revision-created-panel';
-import { PostContentInformationUI } from '../post-content-information';
-import RevisionFieldsDiffPanel from '../revision-fields-diff';
+import PostRevisionsTimeline from '../post-revisions-timeline';
 import PostPanelSection from '../post-panel-section';
 import PostCardPanel from '../post-card-panel';
+import RevisionFieldsDiffPanel from '../revision-fields-diff';
 
 export default function PostRevisionSummary() {
-	const { revisionId, postId, postContent } = useSelect( ( select ) => {
-		const { getCurrentRevisionId, getCurrentRevision, getCurrentPostId } =
-			unlock( select( editorStore ) );
-		const _revisionId = getCurrentRevisionId();
+	const { revisionId, postId } = useSelect( ( select ) => {
+		const { getCurrentRevisionId, getCurrentPostId } = unlock(
+			select( editorStore )
+		);
 		return {
-			revisionId: _revisionId,
+			revisionId: getCurrentRevisionId(),
 			postId: getCurrentPostId(),
-			postContent: _revisionId && getCurrentRevision()?.content?.raw,
 		};
 	}, [] );
 	if ( ! revisionId ) {
@@ -40,10 +30,6 @@ export default function PostRevisionSummary() {
 			<PostPanelSection className="editor-post-summary">
 				<VStack spacing={ 4 }>
 					<PostCardPanel postId={ postId } hideActions />
-					<VStack spacing={ 1 }>
-						<PostContentInformationUI postContent={ postContent } />
-						<RevisionCreatedPanel />
-					</VStack>
 					<ExternalLink
 						href={ addQueryArgs( 'revision.php', {
 							revision: revisionId,
@@ -51,10 +37,10 @@ export default function PostRevisionSummary() {
 					>
 						{ __( 'Open classic revisions screen' ) }
 					</ExternalLink>
-					<RevisionAuthorPanel />
 				</VStack>
 			</PostPanelSection>
 			<RevisionFieldsDiffPanel />
+			<PostRevisionsTimeline />
 		</>
 	);
 }

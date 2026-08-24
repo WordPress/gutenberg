@@ -1,12 +1,7 @@
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
+import { useSelect } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { InlineNotices } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import TemplateValidationNotice from '../template-validation-notice';
 
 /**
@@ -19,12 +14,16 @@ export function EditorNotices() {
 		alternative: 'wp.notices.InlineNotices',
 	} );
 
+	const isValidTemplate = useSelect( ( select ) => {
+		return select( blockEditorStore ).isValidTemplate();
+	}, [] );
+
 	return (
 		<InlineNotices
 			pinnedNoticesClassName="components-editor-notices__pinned"
 			dismissibleNoticesClassName="components-editor-notices__dismissible"
 		>
-			<TemplateValidationNotice />
+			{ ! isValidTemplate && <TemplateValidationNotice /> }
 		</InlineNotices>
 	);
 }

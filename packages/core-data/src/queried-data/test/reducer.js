@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import deepFreeze from 'deep-freeze';
-
-/**
- * Internal dependencies
- */
 import reducer, { getMergedItemIds, itemIsComplete } from '../reducer';
 import { removeItems } from '../actions';
 

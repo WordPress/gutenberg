@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	useInnerBlocksProps,
 	getColorClassName,
 	__experimentalGetGradientClass,
 	useBlockProps,
 } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,

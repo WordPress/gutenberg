@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { generateGlobalStyles } from './core/render';
 import type { GlobalStylesConfig } from './types';
 
