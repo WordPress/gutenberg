@@ -724,6 +724,44 @@ test( 'ignores route devDependencies and routes without a manifest', () => {
 	expect( status ).toBe( 0 );
 } );
 
+test( 'fails when a route has TypeScript files but no tsconfig', () => {
+	const { status, stderr } = runValidator(
+		createRepo( {
+			packages: {},
+			routes: {
+				dashboard: {
+					tsconfigs: {},
+					files: [ 'route.ts' ],
+				},
+			},
+			build: [],
+			root: [ './tsconfig.build.json' ],
+		} )
+	);
+	expect( stderr ).toContain(
+		'Missing tsconfig.json for the TypeScript files of routes/dashboard'
+	);
+	expect( status ).toBe( 1 );
+} );
+
+test( 'passes when a route without a tsconfig has no TypeScript files', () => {
+	const { status, stderr } = runValidator(
+		createRepo( {
+			packages: {},
+			routes: {
+				dashboard: {
+					tsconfigs: {},
+					files: [ 'style.scss' ],
+				},
+			},
+			build: [],
+			root: [ './tsconfig.build.json' ],
+		} )
+	);
+	expect( stderr ).toBe( '' );
+	expect( status ).toBe( 0 );
+} );
+
 test( 'fails when a route has TypeScript test files but no test project', () => {
 	const { status, stderr } = runValidator(
 		createRepo( {

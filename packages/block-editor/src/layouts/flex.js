@@ -88,6 +88,21 @@ const flexWrapOptions = [ 'wrap', 'nowrap' ];
 export default {
 	name: 'flex',
 	label: __( 'Flex' ),
+	hasInspectorControls( layoutBlockSupport = {} ) {
+		const {
+			allowOrientation = true,
+			allowJustification = true,
+			allowVerticalAlignment = true,
+			allowWrap = true,
+		} = layoutBlockSupport;
+
+		return (
+			allowOrientation ||
+			allowJustification ||
+			allowVerticalAlignment ||
+			allowWrap
+		);
+	},
 	inspectorControls: function FlexLayoutInspectorControls( {
 		layout = {},
 		onChange,
