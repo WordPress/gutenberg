@@ -165,6 +165,8 @@ describe( 'getEntityRecord', () => {
 				addUndoMeta: expect.any( Function ),
 				editRecord: expect.any( Function ),
 				getEditedRecord: expect.any( Function ),
+				onEscalation: expect.any( Function ),
+				onProposalsChange: expect.any( Function ),
 				onUndoStackChange: expect.any( Function ),
 				onStatusChange: expect.any( Function ),
 				persistCRDTDoc: expect.any( Function ),
@@ -595,6 +597,105 @@ describe( 'getEntityRecord', () => {
 		expect( dispatch.setCollaborationSupported ).not.toHaveBeenCalled();
 	} );
 
+	it( 'mirrors review items to the store and aggregates notices past the threshold', async () => {
+		const ENTITIES_WITH_SYNC = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				baseURLParams: { context: 'edit' },
+				syncConfig: {},
+			},
+		];
+		const notices = {
+			createNotice: jest.fn(),
+			removeNotice: jest.fn(),
+		};
+		const registryWithNotices = {
+			batch: ( callback ) => callback(),
+			dispatch: jest.fn( () => notices ),
+		};
+		dispatch.setSyncReviewItems = jest.fn();
+		triggerFetch.mockImplementation( () => ( {
+			json: () => Promise.resolve( { id: 1, title: 'Test Post' } ),
+		} ) );
+
+		await getEntityRecord(
+			'postType',
+			'post',
+			1
+		)( {
+			dispatch,
+			registry: registryWithNotices,
+			resolveSelect: {
+				getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
+				getEditedEntityRecord: jest.fn(),
+			},
+		} );
+
+		const handlers = syncManager.load.mock.calls[ 0 ][ 4 ];
+		const makeItem = ( id ) => ( {
+			id,
+			unitId: id,
+			isLocal: true,
+			actorId: 'actor',
+			reason: 'frame-conflict',
+			intentType: 'insert_text',
+			summary: 'text',
+		} );
+
+		// Below the threshold: the list is mirrored and the per-item
+		// escalation notice is created.
+		handlers.onProposalsChange( [ makeItem( 'p1' ) ] );
+		handlers.onEscalation( {
+			isLocal: true,
+			proposalId: 'p1',
+			summary: 'text',
+		} );
+		expect( dispatch.setSyncReviewItems ).toHaveBeenCalledWith(
+			'postType',
+			'post',
+			1,
+			[ makeItem( 'p1' ) ]
+		);
+		expect( notices.createNotice ).toHaveBeenCalledTimes( 1 );
+
+		// A burst past the threshold sweeps per-item notices, creates one
+		// aggregate notice, and suppresses further per-item notices.
+		const burst = [ 'p1', 'p2', 'p3', 'p4' ].map( makeItem );
+		handlers.onProposalsChange( burst );
+		burst.forEach( ( item ) =>
+			handlers.onEscalation( {
+				isLocal: true,
+				proposalId: item.id,
+				summary: 'text',
+			} )
+		);
+		expect( notices.removeNotice ).toHaveBeenCalledWith(
+			'core-data-sync-escalation-postType-post-1-p1'
+		);
+		expect( notices.createNotice ).toHaveBeenCalledWith(
+			'warning',
+			expect.stringContaining( '4' ),
+			expect.objectContaining( {
+				id: 'core-data-sync-review-aggregate-postType-post-1',
+			} )
+		);
+		expect( notices.createNotice ).toHaveBeenCalledTimes( 2 );
+
+		// Emptying the list clears the aggregate notice and the store key.
+		handlers.onProposalsChange( [] );
+		expect( notices.removeNotice ).toHaveBeenCalledWith(
+			'core-data-sync-review-aggregate-postType-post-1'
+		);
+		expect( dispatch.setSyncReviewItems ).toHaveBeenLastCalledWith(
+			'postType',
+			'post',
+			1,
+			[]
+		);
+	} );
+
 	it( 'provides transient properties when read/write config is supplied', async () => {
 		const POST_RECORD = { id: 1, title: 'Test Post' };
 		const POST_RESPONSE = {
@@ -643,6 +744,8 @@ describe( 'getEntityRecord', () => {
 				addUndoMeta: expect.any( Function ),
 				editRecord: expect.any( Function ),
 				getEditedRecord: expect.any( Function ),
+				onEscalation: expect.any( Function ),
+				onProposalsChange: expect.any( Function ),
 				onUndoStackChange: expect.any( Function ),
 				onStatusChange: expect.any( Function ),
 				persistCRDTDoc: expect.any( Function ),

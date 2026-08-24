@@ -116,6 +116,51 @@ export interface CollectionHandlers {
 	refetchRecords: () => Promise< void >;
 }
 
+/**
+ * One open escalation in the review list: a parked edit that a user can
+ * restore or discard. See prototypes/sync/PROPOSAL-REVIEW.md.
+ */
+export interface SyncReviewItem {
+	/** The parked proposal's id (the escalated intent's intentId). */
+	id: string;
+	/** Groups rule-4 unit members (txnId, or the id for singletons). */
+	unitId: string;
+	/** Whether the current client authored the escalated edit. */
+	isLocal: boolean;
+	actorId: string;
+	reason: string;
+	intentType: string;
+	/** The lost content, when the intent type carries any. */
+	summary?: string;
+	/** Target-field excerpt captured at escalation time. */
+	excerpt?: string;
+	/**
+	 * The target block's engine identity (syncId), when the intent
+	 * addresses one — lets UI anchor the conflict to a block in the
+	 * editor. Absent for document-level intents (e.g. entity properties).
+	 */
+	targetId?: string;
+	/**
+	 * The target block's TOP-LEVEL index in the document, for engines
+	 * whose review items address blocks positionally rather than by a
+	 * persistent identity (e.g. de-rtc contests). A UI anchor of last
+	 * resort: `targetId` wins when both are present.
+	 */
+	targetIndex?: number;
+	/**
+	 * For a parked NEW-block proposal (insert_block): the block it would
+	 * create, its readable content, and where it would land — so the
+	 * editor can render it inline at that position for approval (the block
+	 * is not in the reviewer's canvas, so `targetId` cannot anchor it).
+	 */
+	proposedInsertion?: {
+		blockType?: string;
+		html: string;
+		afterSiblingId?: string;
+		parentId?: string;
+	};
+}
+
 export interface SyncManagerUpdateOptions {
 	// Whether this update represents a user-facing entity save.
 	isSave?: boolean;
@@ -134,6 +179,28 @@ export interface RecordHandlers {
 		options?: { undoIgnore?: boolean }
 	) => void;
 	getEditedRecord: () => Promise< ObjectData >;
+	/**
+	 * Called when the sync engine sets an edit aside for review instead of
+	 * merging it (an escalation). `isLocal` distinguishes the current
+	 * client's own edit from a collaborator's; `proposalId` addresses the
+	 * parked proposal for resolution, and `summary`/`excerpt` carry the
+	 * lost content and its context for display. Fires only for OPEN
+	 * proposals (a proposal resolved in the same delivery batch never
+	 * notifies). Optional: managers fall back to console output.
+	 */
+	onEscalation?: ( escalation: {
+		reason: string;
+		isLocal: boolean;
+		proposalId: string;
+		summary?: string;
+		excerpt?: string;
+	} ) => void;
+
+	/**
+	 * Called with the full open-proposal review list whenever it changes
+	 * (a proposal arrived or was resolved). Optional.
+	 */
+	onProposalsChange?: ( proposals: SyncReviewItem[] ) => void;
 	onStatusChange: OnStatusChangeCallback;
 	persistCRDTDoc: () => void;
 	refetchRecord: () => Promise< void >;
@@ -230,6 +297,27 @@ export interface SyncManager {
 	) => Promise< void >;
 	// undoManager is undefined until the first entity is loaded.
 	undoManager: SyncUndoManager | undefined;
+	/**
+	 * Closes a parked proposal (engines with an escalation lane). The
+	 * `restored` resolution is sent AFTER the caller re-authored the
+	 * recovered content as ordinary edits.
+	 */
+	resolveProposal?: (
+		objectType: ObjectType,
+		objectId: ObjectID | null,
+		proposalId: string,
+		resolution: 'restored' | 'dismissed'
+	) => void;
+	/**
+	 * Best-effort restore of a parked proposal's content as ordinary
+	 * intents (text appends to the target field; attr/property writes
+	 * re-apply at current versions), then resolves it as restored.
+	 */
+	restoreProposal?: (
+		objectType: ObjectType,
+		objectId: ObjectID | null,
+		proposalId: string
+	) => void;
 	unload: ( objectType: ObjectType, objectId: ObjectID ) => void;
 	unloadAll: () => void;
 	/**

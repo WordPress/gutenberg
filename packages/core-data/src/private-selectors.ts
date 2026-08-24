@@ -389,3 +389,28 @@ export function getEntitySyncConnectionStatus(
 		`${ kind }/${ name }:${ recordId }`
 	];
 }
+
+const EMPTY_REVIEW_ITEMS: never[] = [];
+
+/**
+ * Returns an entity's sync review list: escalated edits parked for review
+ * (open proposals), with attribution, reason, and the lost content.
+ *
+ * @param state    Data state.
+ * @param kind     Entity kind.
+ * @param name     Entity name.
+ * @param recordId Record ID.
+ *
+ * @return Review items (empty when none are open).
+ */
+export function getSyncReviewItems(
+	state: State,
+	kind: string,
+	name: string,
+	recordId: EntityRecordKey
+): Array< Record< string, unknown > > {
+	return (
+		state.syncReviewItems?.[ `${ kind }/${ name }:${ recordId }` ] ??
+		EMPTY_REVIEW_ITEMS
+	);
+}

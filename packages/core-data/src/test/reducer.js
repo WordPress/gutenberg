@@ -5,6 +5,7 @@ import {
 	userPermissions,
 	autosaves,
 	currentUser,
+	syncReviewItems,
 	syncUndoManagerState,
 	undoManager,
 } from '../reducer';
@@ -566,5 +567,65 @@ describe( 'syncUndoManagerState', () => {
 			hasRedo: true,
 			hasUndo: false,
 		} );
+	} );
+} );
+
+describe( 'syncReviewItems', () => {
+	const ITEM = {
+		id: 'i1',
+		unitId: 't1',
+		isLocal: true,
+		actorId: 'a1',
+		reason: 'frame-conflict',
+		intentType: 'insert_text',
+		summary: 'hello',
+	};
+
+	it( 'stores review items keyed by entity', () => {
+		const state = syncReviewItems( undefined, {
+			type: 'SET_SYNC_REVIEW_ITEMS',
+			kind: 'postType',
+			name: 'post',
+			recordId: 1,
+			items: [ ITEM ],
+		} );
+
+		expect( state ).toEqual( { 'postType/post:1': [ ITEM ] } );
+	} );
+
+	it( 'replaces the list for the same entity and keeps others', () => {
+		const initial = deepFreeze( {
+			'postType/post:1': [ ITEM ],
+			'postType/page:2': [ ITEM ],
+		} );
+		const next = { ...ITEM, id: 'i2' };
+		const state = syncReviewItems( initial, {
+			type: 'SET_SYNC_REVIEW_ITEMS',
+			kind: 'postType',
+			name: 'post',
+			recordId: 1,
+			items: [ next ],
+		} );
+
+		expect( state ).toEqual( {
+			'postType/post:1': [ next ],
+			'postType/page:2': [ ITEM ],
+		} );
+	} );
+
+	it( 'removes the entity key when the list empties', () => {
+		const initial = deepFreeze( {
+			'postType/post:1': [ ITEM ],
+			'postType/page:2': [ ITEM ],
+		} );
+		const state = syncReviewItems( initial, {
+			type: 'SET_SYNC_REVIEW_ITEMS',
+			kind: 'postType',
+			name: 'post',
+			recordId: 1,
+			items: [],
+		} );
+
+		expect( state ).toEqual( { 'postType/page:2': [ ITEM ] } );
 	} );
 } );

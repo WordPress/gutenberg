@@ -701,6 +701,31 @@ export function syncConnectionStatuses( state = {}, action ) {
 }
 
 /**
+ * Reducer managing the per-entity sync review list: escalated edits parked
+ * for review (open proposals), fed by the sync manager's
+ * onProposalsChange handler.
+ *
+ * @param {Object} state  Current state (key `kind/name:recordId` → items).
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function syncReviewItems( state = {}, action ) {
+	if ( 'SET_SYNC_REVIEW_ITEMS' === action.type ) {
+		const key = `${ action.kind }/${ action.name }:${ action.recordId }`;
+		if ( 0 === action.items.length ) {
+			const { [ key ]: _, ...rest } = state;
+			return rest;
+		}
+		return {
+			...state,
+			[ key ]: action.items,
+		};
+	}
+	return state;
+}
+
+/**
  * Reducer managing whether collaboration is supported.
  *
  * Default to true, as collaboration is supported by default
@@ -780,6 +805,7 @@ export default combineReducers( {
 	editorSettings,
 	editorAssets,
 	syncConnectionStatuses,
+	syncReviewItems,
 	collaborationSupported,
 	viewConfigs,
 } );
