@@ -4,7 +4,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { Calendar, Stack } from '@wordpress/ui';
@@ -14,6 +14,7 @@ import RelativeDateControl from './utils/relative-date-control';
 import toCalendarDate from './utils/to-calendar-date';
 import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
 import getCustomValidity from './utils/get-custom-validity';
+import getCalendarLocale from './utils/get-calendar-locale';
 import parseDateTime from '../../field-types/utils/parse-date-time';
 import { unlock } from '../../lock-unlock';
 
@@ -152,6 +153,7 @@ function CalendarDateTimeControl< Item >( {
 	const weekStartsOn =
 		( fieldFormat as FormatDatetime ).weekStartsOn ??
 		getSettings().l10n.startOfWeek;
+	const locale = getCalendarLocale( getSettings().l10n.locale );
 
 	let displayLabel = label;
 	if ( isValid?.required && ! markWhenOptional && ! hideLabelFromVision ) {
@@ -203,6 +205,8 @@ function CalendarDateTimeControl< Item >( {
 						month={ calendarMonth }
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timeZone }
+						locale={ locale }
+						dir={ isRTL() ? 'rtl' : 'ltr' }
 						weekStartsOn={ weekStartsOn }
 						disabled={ disabled || disabledMatchers }
 					/>

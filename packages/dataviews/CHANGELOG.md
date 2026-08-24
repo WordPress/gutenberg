@@ -15,6 +15,7 @@
 -   DataViews: Prevent the filter operator select focus ring from being clipped. [#80417](https://github.com/WordPress/gutenberg/pull/80417)
 -   DataForm: Send a single update per calendar interaction in the `datetime` control instead of two identical ones. Selecting or clearing a date now reveals the validation message by firing a synthetic `invalid` event on the input, rather than briefly moving focus into it and re-sending the value, and announces it to screen readers since focus stays on the calendar. [#81440](https://github.com/WordPress/gutenberg/pull/81440)
 -   DataForms: Fix focus not returning to a `panel` layout field's edit button after its flyout is opened by clicking the field row. Focus landed on the dropdown's container element instead, so the field could not be reopened with <kbd>Enter</kbd>. The edit button is now the actual dropdown toggle, instead of the row delegating clicks to it. [#80689](https://github.com/WordPress/gutenberg/pull/80689)
+-   DataViews: Pass the site's locale and text direction to the `date`/`datetime` controls' `Calendar` and `RangeCalendar`, so month and weekday names follow the site's language, and an RTL admin gets an RTL calendar, instead of always defaulting to English. [#81592](https://github.com/WordPress/gutenberg/pull/81592)
 
 ### Internal
 
