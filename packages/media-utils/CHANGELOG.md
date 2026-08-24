@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Media Library modal: Add an "Attached to" filter offering "Uploaded to this post" and "Unattached", along with a `postId` prop supplying the post the modal was opened from.
+
 ## 5.54.0 (2026-08-26)
 
 ### Enhancements

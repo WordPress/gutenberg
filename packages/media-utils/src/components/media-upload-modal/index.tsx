@@ -204,6 +204,13 @@ interface MediaUploadModalProps {
 	 * Label for the search input.
 	 */
 	searchLabel?: string;
+
+	/**
+	 * ID of the post the modal was opened from. When set, the "Attached to"
+	 * filter offers an option for media uploaded to that post. Omit outside of
+	 * a post context.
+	 */
+	postId?: number;
 }
 
 /**
@@ -225,6 +232,7 @@ interface MediaUploadModalProps {
  * @param props.modalClass    Additional CSS class for modal
  * @param props.search        Whether to show search input
  * @param props.searchLabel   Label for search input
+ * @param props.postId        ID of the post the modal was opened from
  * @return JSX element or null
  */
 export function MediaUploadModal( {
@@ -240,6 +248,7 @@ export function MediaUploadModal( {
 	modalClass,
 	search = true,
 	searchLabel = __( 'Search media' ),
+	postId,
 }: MediaUploadModalProps ) {
 	const [ selection, setSelection ] = useState< string[] >( () =>
 		getSelectionFromValue( value )
@@ -304,6 +313,31 @@ export function MediaUploadModal( {
 			if ( filter.field === 'mime_type' ) {
 				filters.mime_type = filter.value;
 			}
+			// Handle attachment parent filters. The filter stores context-free
+			// sentinels rather than post IDs, because the view — filters included —
+			// is persisted across sessions and would otherwise carry a stale post
+			// ID into the modal opened from a different post.
+			if (
+				filter.field === 'attached_to' &&
+				filter.operator === 'isAny'
+			) {
+				const parents = (
+					Array.isArray( filter.value ) ? filter.value : []
+				)
+					.map( ( sentinel ) => {
+						if ( sentinel === 'unattached' ) {
+							return 0;
+						}
+						return sentinel === 'current' ? postId : undefined;
+					} )
+					.filter( ( parent ) => parent !== undefined );
+
+				// A newly added filter has no value yet, and deselecting every
+				// option leaves an empty one: both mean "no constraint".
+				if ( parents.length ) {
+					filters.parent = parents;
+				}
+			}
 		} );
 
 		// Base media and mime type on allowedTypes if no filter is set
@@ -346,7 +380,7 @@ export function MediaUploadModal( {
 			_embed: 'author,wp:attached-to',
 			...filters,
 		};
-	}, [ view, allowedTypes ] );
+	}, [ view, allowedTypes, postId ] );
 
 	// Per-batch completion handler: auto-select uploaded items and refresh the grid.
 	const handleBatchComplete = useCallback(
@@ -428,9 +462,26 @@ export function MediaUploadModal( {
 			filesizeField as Field< RestAttachment >,
 			mediaDimensionsField as Field< RestAttachment >,
 			mimeTypeField as Field< RestAttachment >,
-			attachedToField as Field< RestAttachment >,
+			{
+				...( attachedToField as Field< RestAttachment > ),
+				// The shared field definition is not filterable, because the
+				// "Uploaded to this post" option only makes sense with the modal's
+				// post context. Values are sentinels resolved in `queryArgs` above.
+				elements: [
+					...( postId
+						? [
+								{
+									value: 'current',
+									label: __( 'Uploaded to this post' ),
+								},
+						  ]
+						: [] ),
+					{ value: 'unattached', label: __( 'Unattached' ) },
+				],
+				filterBy: { operators: [ 'isAny' ] },
+			},
 		],
-		[]
+		[ postId ]
 	);
 
 	const actions: ActionButton< RestAttachment >[] = useMemo(
