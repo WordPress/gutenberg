@@ -15,6 +15,7 @@ import {
 	fetchFauxEntitySuggestions,
 	uniqueId,
 } from './fixtures';
+import { expectValidatedInputControlDeprecationIfCalled } from '../../url-input/test/fixtures/validated-input-control-deprecation';
 
 const mockFetchSearchSuggestions = jest.fn();
 
@@ -3253,6 +3254,10 @@ describe( 'URL validation', () => {
 
 	beforeEach( () => {
 		mockOnChange.mockClear();
+	} );
+
+	afterEach( () => {
+		expectValidatedInputControlDeprecationIfCalled();
 	} );
 
 	it.each( [
