@@ -4,7 +4,7 @@ import {
 	Spinner,
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
-import { Stack, VisuallyHidden } from '@wordpress/ui';
+import { Stack, Tabs, Text } from '@wordpress/ui';
 import { useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -18,8 +18,15 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import { close, drawerRight, keyboard, redo, undo } from '@wordpress/icons';
+import { __, isRTL } from '@wordpress/i18n';
+import {
+	close,
+	drawerLeft,
+	drawerRight,
+	keyboard,
+	redo,
+	undo,
+} from '@wordpress/icons';
 import {
 	displayShortcut,
 	isAppleOS,
@@ -57,11 +64,59 @@ const ATTACHMENT_EMBED_QUERY = { _embed: 'author,wp:attached-to' } as const;
 const PLACEMENT_CONTROL_IDLE_MS = 300;
 
 /**
- * Identifier for the details panel. The sidebar tracks which panel is open
- * rather than whether one is, so a second panel is a new id here and a new
- * entry wherever panels are rendered — not a change to the state's shape.
+ * The tabs the sidebar shows, in display order. Tabs are named for their
+ * contents.
+ *
+ * Details leads: it is what the panel opens on, and the fields people most
+ * often came to fill in. Crop, Filters and Enhance are placeholders that
+ * exist only to load-test the strip at its four-tab ceiling — none of the
+ * three has shipped work behind it yet, which real tabs should not do:
+ * an unshipped feature earns its tab when it ships, not a disabled
+ * placeholder before it.
+ *
+ * Four is the ceiling this list is already at. A fifth capability should
+ * join an existing tab rather than add one; if the strip genuinely needs to
+ * grow past four, it becomes a select naming the current panel, not a
+ * scrolling row.
  */
-const DETAILS_PANEL = 'details';
+interface MediaEditorTab {
+	id: string;
+	title: string;
+	render: () => JSX.Element;
+}
+
+const TABS: MediaEditorTab[] = [
+	{
+		id: 'details',
+		title: __( 'Details' ),
+		render: () => <MediaForm />,
+	},
+	{
+		id: 'crop',
+		title: __( 'Crop' ),
+		// Placeholder. The numeric crop controls — size, position, scale and
+		// the proportion lock — are their own change; this tab exists so the
+		// strip has something real to switch between.
+		render: () => <Text>{ __( 'Crop options will appear here.' ) }</Text>,
+	},
+	{
+		id: 'filters',
+		title: __( 'Filters' ),
+		// Placeholder, to load-test the strip at three and four tabs. Not a
+		// real feature yet.
+		render: () => <Text>{ __( 'Filters will appear here.' ) }</Text>,
+	},
+	{
+		id: 'enhance',
+		title: __( 'Enhance' ),
+		// Placeholder. Provisional name for AI-assisted tools; not a real
+		// feature yet.
+		render: () => <Text>{ __( 'Enhance tools will appear here.' ) }</Text>,
+	},
+];
+
+/** The tab a newly opened panel starts on. */
+const DEFAULT_TAB = TABS[ 0 ].id;
 
 export interface MediaEditorFrameProps {
 	children: ReactNode;
@@ -113,23 +168,55 @@ export interface MediaEditorProps {
 }
 
 interface MediaEditorSidebarProps {
-	/** Names the panel's region, and its heading for screen readers. */
-	title: string;
-	children: ReactNode;
+	activeTab: string;
+	onSelectTab: ( tab: string ) => void;
 }
 
-function MediaEditorSidebar( { title, children }: MediaEditorSidebarProps ) {
+function MediaEditorSidebar( {
+	activeTab,
+	onSelectTab,
+}: MediaEditorSidebarProps ) {
 	return (
-		<NavigableRegion className="media-editor__sidebar" ariaLabel={ title }>
-			{ /* No visible heading and no close button: the header's pressed
-			     toggle names the open panel and dismisses it at every width, so
-			     a second control inside would be the same job twice. The
-			     heading stays for screen readers, which do not read a pressed
-			     button in the header as this region's title. */ }
-			<VisuallyHidden render={ <h2 /> }>{ title }</VisuallyHidden>
-			<Stack className="media-editor__panel" direction="column" gap="lg">
-				{ children }
-			</Stack>
+		<NavigableRegion
+			className="media-editor__sidebar"
+			ariaLabel={ __( 'Media settings' ) }
+		>
+			{ /* No close button in here: the header's pressed toggle opens and
+			     dismisses the panel at every width, so a second control would
+			     be the same job twice. The tab strip only chooses what the
+			     open panel shows. */ }
+			<Tabs.Root
+				className="media-editor__sidebar-tabs"
+				value={ activeTab }
+				onValueChange={ ( value ) => onSelectTab( value as string ) }
+			>
+				<Tabs.List variant="minimal">
+					{ TABS.map( ( tab ) => (
+						<Tabs.Tab key={ tab.id } value={ tab.id }>
+							{ tab.title }
+						</Tabs.Tab>
+					) ) }
+				</Tabs.List>
+				{ TABS.map( ( tab ) => (
+					// `keepMounted` so a half-typed field survives a tab
+					// switch: alt text in progress must still be there on the
+					// way back from Crop.
+					<Tabs.Panel
+						key={ tab.id }
+						value={ tab.id }
+						keepMounted
+						tabIndex={ -1 }
+					>
+						<Stack
+							className="media-editor__panel"
+							direction="column"
+							gap="lg"
+						>
+							{ tab.render() }
+						</Stack>
+					</Tabs.Panel>
+				) ) }
+			</Tabs.Root>
 		</NavigableRegion>
 	);
 }
@@ -149,10 +236,10 @@ interface MediaEditorFrameContextValue {
 	aspectRatioPresets?: AspectRatioPreset[];
 	/** `true` above `large`, where the panel docks beside the canvas. */
 	isWide: boolean;
-	/** The open panel's id, or `null` when none is. */
-	activePanel: string | null;
-	/** Opens the given panel, or closes the open one when passed `null`. */
-	onSelectPanel: ( panel: string | null ) => void;
+	/** Whether the settings panel is showing. */
+	isSidebarOpen: boolean;
+	/** Shows or hides the settings panel. */
+	onToggleSidebar: () => void;
 	onCancel: () => void;
 	onSave: () => void;
 	onReset: () => void;
@@ -189,9 +276,14 @@ export interface HeaderActionsProps {
 }
 
 function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
-	const { isImage, isSaving, onCancel, isWide, activePanel, onSelectPanel } =
-		useMediaEditorFrameContext();
-	const isDetailsOpen = activePanel === DETAILS_PANEL;
+	const {
+		isImage,
+		isSaving,
+		onCancel,
+		isWide,
+		isSidebarOpen,
+		onToggleSidebar,
+	} = useMediaEditorFrameContext();
 	const [ isShortcutsModalOpen, setIsShortcutsModalOpen ] = useState( false );
 	return (
 		<Stack
@@ -210,16 +302,22 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 			) }
 			<Button
 				size="compact"
-				icon={ drawerRight }
-				label={ __( 'Details' ) }
-				isPressed={ isDetailsOpen }
+				icon={ isRTL() ? drawerLeft : drawerRight }
+				isPressed={ isSidebarOpen }
 				// Only a docked column really expands beside the canvas; below
 				// that the panel replaces the view, which the pressed state
 				// already describes.
-				aria-expanded={ isWide ? isDetailsOpen : undefined }
-				onClick={ () =>
-					onSelectPanel( isDetailsOpen ? null : DETAILS_PANEL )
+				aria-expanded={ isWide ? isSidebarOpen : undefined }
+				// Says what the click will do rather than naming the panel: a
+				// static "Settings" reads the same whether the panel is open
+				// or shut, which is the one thing the tooltip should tell you.
+				label={
+					isSidebarOpen
+						? __( 'Hide media settings' )
+						: __( 'Show media settings' )
 				}
+				showTooltip
+				onClick={ onToggleSidebar }
 			/>
 			{ showCloseButton && (
 				<Button
@@ -241,7 +339,7 @@ function HeaderActions( { showCloseButton = false }: HeaderActionsProps ) {
 }
 
 function HistoryActions() {
-	const { isImage, isUndoRedoDisabled, onReset, isWide, activePanel } =
+	const { isImage, isUndoRedoDisabled, onReset, isWide, isSidebarOpen } =
 		useMediaEditorFrameContext();
 	const {
 		reset,
@@ -261,7 +359,7 @@ function HistoryActions() {
 	// (Metadata edits have no undo of their own; a history spanning both is a
 	// larger change than hiding these.) Checked after the hooks above so the
 	// hook order stays stable across renders.
-	if ( ! isImage || ( ! isWide && !! activePanel ) ) {
+	if ( ! isImage || ( ! isWide && isSidebarOpen ) ) {
 		return null;
 	}
 	const handleUndo = () => {
@@ -393,18 +491,19 @@ function MediaEditorContent( {
 	// people in the first place. Within one opening it does hold — see
 	// `hasChosenPanelRef` below.
 	const isWide = useViewportMatch( 'large' );
-	// `null` when nothing is open, otherwise the open panel's id.
-	const [ activePanel, setActivePanel ] = useState< string | null >(
-		isWide ? DETAILS_PANEL : null
-	);
-	// Width picks the starting panel, but only until the user picks one. After
+	// Two separate questions: whether the panel is showing, and what it shows.
+	// The header toggle answers the first, the tab strip the second, so a tab
+	// chosen before closing the panel is still selected when it reopens.
+	const [ isSidebarOpen, setIsSidebarOpen ] = useState( isWide );
+	const [ activeTab, setActiveTab ] = useState( DEFAULT_TAB );
+	// Width picks the starting state, but only until the user picks one. After
 	// that their choice holds for the rest of the session: closing the panel
 	// and then resizing — or crossing the breakpoint by rotating a tablet —
 	// should not reopen something they just dismissed.
 	const hasChosenPanelRef = useRef( false );
-	const selectPanel = useCallback( ( panel: string | null ) => {
+	const toggleSidebar = useCallback( () => {
 		hasChosenPanelRef.current = true;
-		setActivePanel( panel );
+		setIsSidebarOpen( ( open ) => ! open );
 	}, [] );
 	// Until then, follow the breakpoint: dragging a window narrow hands the
 	// canvas the full width instead of leaving a panel wedged beside it.
@@ -412,7 +511,7 @@ function MediaEditorContent( {
 		if ( hasChosenPanelRef.current ) {
 			return;
 		}
-		setActivePanel( isWide ? DETAILS_PANEL : null );
+		setIsSidebarOpen( isWide );
 	}, [ isWide ] );
 	// One layout at every width now that the image controls sit under the
 	// canvas; retained for the frame contract.
@@ -614,9 +713,11 @@ function MediaEditorContent( {
 				) : (
 					<div
 						className={ clsx( 'media-editor__body', {
-							'has-panel-open': !! activePanel,
+							'has-panel-open': isSidebarOpen,
 						} ) }
-						data-active-panel={ activePanel ?? undefined }
+						data-active-panel={
+							isSidebarOpen ? activeTab : undefined
+						}
 					>
 						<NavigableRegion
 							className="media-editor__content"
@@ -646,10 +747,11 @@ function MediaEditorContent( {
 								</div>
 							) }
 						</NavigableRegion>
-						{ activePanel === DETAILS_PANEL && (
-							<MediaEditorSidebar title={ __( 'Details' ) }>
-								<MediaForm />
-							</MediaEditorSidebar>
+						{ isSidebarOpen && (
+							<MediaEditorSidebar
+								activeTab={ activeTab }
+								onSelectTab={ setActiveTab }
+							/>
 						) }
 					</div>
 				) }
@@ -684,8 +786,8 @@ function MediaEditorContent( {
 		isUndoRedoDisabled: isCropInteractionActive,
 		aspectRatioPresets,
 		isWide,
-		activePanel,
-		onSelectPanel: selectPanel,
+		isSidebarOpen,
+		onToggleSidebar: toggleSidebar,
 		onCancel: handleRequestClose,
 		onSave: saveMediaEditor,
 		onReset: resetCropOptions,
@@ -696,7 +798,7 @@ function MediaEditorContent( {
 			{ renderFrame( {
 				children,
 				isImage,
-				hasCanvas: isWide || ! activePanel,
+				hasCanvas: isWide || ! isSidebarOpen,
 				layout,
 				onRequestClose: handleRequestClose,
 				onKeyDown: handleKeyDown,

@@ -38,7 +38,7 @@
 		flex-direction: column;
 		min-width: 0;
 		min-height: 0;
-		margin: $grid-unit-30 $grid-unit-30 $grid-unit-10 $grid-unit-30;
+		margin: 0 $grid-unit-30 $grid-unit-10 $grid-unit-30;
 
 		// Docked beside the 400px panel, the canvas keeps a workable crop area.
 		// The figure has to close at the dock breakpoint itself: at 960px the
@@ -113,11 +113,9 @@
 		flex-direction: column;
 		min-width: 0;
 		min-height: 0;
-		overflow-y: auto;
-		// Equal inline gutter so focus rings (outline + offset) sit inside the
-		// panel rather than being clipped by the scroll container.
-		padding-inline: $grid-unit-20;
-		padding-bottom: $grid-unit-30;
+		// No inline padding here: the tab strip spans the panel edge to edge,
+		// so the gutter belongs to the strip and the panes individually rather
+		// than to the column that holds them.
 
 		// 400px rather than the 280px `$sidebar-width`: four editable fields
 		// plus the file facts do not fit a 280px column without every field
@@ -126,7 +124,6 @@
 		@include break-large() {
 			flex: none;
 			width: 400px;
-			padding-inline: $grid-unit-20;
 		}
 	}
 
@@ -143,8 +140,52 @@
 		}
 	}
 
+	// The strip stays put while a long form scrolls beneath it, so the tab
+	// names are reachable without scrolling back up.
+	.media-editor__sidebar-tabs {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		min-height: 0;
+
+		// The strip shares the fields' inline gutter, so the first tab lines
+		// up with the labels below it rather than sitting flush against the
+		// modal edge while every field sits inset.
+		// NOTE: overrides `@wordpress/ui` internals — `Tabs.List` sets
+		// `width: fit-content` on horizontal strips so it can measure its own
+		// overflow. Its styles are in `@layer wp-ui`, so this unlayered rule
+		// wins without `!important`.
+		> [role="tablist"] {
+			width: auto;
+			padding-inline: $grid-unit-20;
+		}
+
+		// Same rule the editor's panel headers draw, so the strip reads as
+		// panel chrome rather than as content. Drawn on the pane rather than
+		// under the strip: the selected-tab indicator is absolutely
+		// positioned at the strip's `bottom: 0`, so a border there would
+		// share that baseline and read as one broken line.
+		//
+		// Inset to the same gutter as the fields below it, so the rule's ends
+		// land under the same edges the tab labels and field labels do —
+		// spanning to the panel's outer edge reads as overflow once the
+		// fields (inset) are on screen next to it.
+		> [role="tabpanel"] {
+			flex: 1;
+			min-height: 0;
+			overflow-y: auto;
+			margin-inline: $grid-unit-20;
+			border-top:
+				$border-width solid
+				var(--wpds-color-stroke-surface-neutral);
+
+		}
+	}
+
+	// The pane already carries the inline gutter (see above), so the field
+	// stack inside it does not need its own.
 	.media-editor__panel {
-		padding: $grid-unit-20 $grid-unit-10;
+		padding: $grid-unit-20 $grid-unit-10 $grid-unit-30 $grid-unit-10;
 	}
 }
 
