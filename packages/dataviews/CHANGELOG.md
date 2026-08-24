@@ -32,6 +32,7 @@
 -   DataForm: Remove the vendored `ControlWithError` copy in favor of the `ControlWithError` component from `@wordpress/ui`. ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574))
 -   DataForm: Render the `date` control's validity message with `ValidityIndicator` from `@wordpress/ui` instead of hand-rolled markup styled by `@wordpress/components` global class names. ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574))
 -   DataForm: Use `ValidatedInputControl` from `@wordpress/ui` in the `text`, `email`, `telephone`, `url`, `password`, `color`, `datetime`, and `time` controls, instead of unlocking it from the `@wordpress/components` private APIs. Prefixes and suffixes now render in an `InputLayout.Slot` from `@wordpress/ui`. ([#81627](https://github.com/WordPress/gutenberg/pull/81627))
+-   DataForm: Use `ValidatedTextareaControl` from `@wordpress/ui` in the `textarea` control, instead of unlocking it from the `@wordpress/components` private APIs. This was the last private API used by the package, so the `@wordpress/private-apis` dependency is removed. ([#81230](https://github.com/WordPress/gutenberg/issues/81230))
 
 ## 18.0.0 (2026-08-12)
 
