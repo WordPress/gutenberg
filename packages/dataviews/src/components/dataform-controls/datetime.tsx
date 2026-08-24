@@ -1,7 +1,7 @@
 import { isSameMonth } from 'date-fns';
 import { BaseControl } from '@wordpress/components';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { Calendar, Stack, ValidatedInputControl } from '@wordpress/ui';
@@ -200,6 +200,7 @@ function CalendarDateTimeControl< Item >( {
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timeZone }
 						locale={ locale }
+						dir={ isRTL() ? 'rtl' : 'ltr' }
 						weekStartsOn={ weekStartsOn }
 						disabled={ disabled || disabledMatchers }
 					/>
