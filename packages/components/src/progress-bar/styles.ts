@@ -62,15 +62,28 @@ export const Indicator = styled.div< {
 	${ ( { isIndeterminate } ) =>
 		isIndeterminate
 			? css( {
-					animationDuration: '1.5s',
-					animationTimingFunction: 'ease-in-out',
-					animationIterationCount: 'infinite',
-					animationName: animateProgressBar( isRTL() ),
 					width: `${ INDETERMINATE_TRACK_WIDTH }%`,
+					'@media not ( prefers-reduced-motion )': {
+						animationDuration: '1.5s',
+						animationTimingFunction: 'ease-in-out',
+						animationIterationCount: 'infinite',
+						animationName: animateProgressBar( isRTL() ),
+					},
+					'@media ( prefers-reduced-motion: reduce )': {
+						animationDuration: '3s',
+						animationTimingFunction: 'steps( 6, end )',
+						animationIterationCount: 'infinite',
+						animationName: animateProgressBar( isRTL() ),
+					},
 			  } )
 			: css( {
 					width: 'var(--indicator-width)',
-					transition: 'width 0.4s ease-in-out',
+					'@media not ( prefers-reduced-motion )': {
+						transition: 'width 0.4s ease-in-out',
+					},
+					'@media ( prefers-reduced-motion: reduce )': {
+						transition: 'width 0.8s steps(6, end)',
+					},
 			  } ) };
 `;
 
