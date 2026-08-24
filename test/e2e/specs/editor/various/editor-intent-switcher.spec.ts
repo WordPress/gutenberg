@@ -1,10 +1,29 @@
 import type { Page } from '@playwright/test';
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
+function optionsButton( page: Page ) {
+	return page
+		.getByRole( 'region', { name: 'Editor top bar' } )
+		.getByRole( 'button', { name: 'Options' } );
+}
+
+/*
+ * `MenuItemsChoice` keeps its dropdown open after a selection, and Escape does
+ * not reliably dismiss it. Since Options is a toggle, clicking it while the
+ * dropdown is still mounted closes the menu rather than reopening it, and the
+ * assertion that follows fails with "element not found". Only click when the
+ * menu is not already showing, so the helper is safe to call either way.
+ */
 async function openIntentSwitcher( page: Page ) {
-	await page.click(
-		'role=region[name="Editor top bar"i] >> role=button[name="Options"i]'
-	);
+	const suggestChoice = page.getByRole( 'menuitemradio', {
+		name: /^Suggesting/,
+	} );
+
+	if ( ! ( await suggestChoice.isVisible() ) ) {
+		await optionsButton( page ).click();
+	}
+
+	await expect( suggestChoice ).toBeVisible();
 }
 
 test.describe( 'Editor intent switcher', () => {
@@ -59,25 +78,32 @@ test.describe( 'Editor intent switcher', () => {
 		).toHaveAttribute( 'aria-checked', 'true' );
 	} );
 
-	test( 'keyboard shortcut cycles between intents', async ( { page } ) => {
+	test( 'keyboard shortcut cycles between intents', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		// The intent shortcuts are registered with the `secondary` modifier,
+		// which is Ctrl+Alt+Shift on Windows and Linux but ⇧⌥⌘ on macOS.
+		// Press it through `pageUtils` so the test exercises the shortcut the
+		// current platform actually registered.
+
 		// Default is Edit.
-		await page.keyboard.press( 'Control+Alt+Shift+X' );
+		await pageUtils.pressKeys( 'secondary+X' );
 		await openIntentSwitcher( page );
 		await expect(
 			page.getByRole( 'menuitemradio', { name: /^Suggesting/ } )
 		).toHaveAttribute( 'aria-checked', 'true' );
 
-		// Close menu and switch to View via shortcut.
-		await page.keyboard.press( 'Escape' );
-		await page.keyboard.press( 'Control+Alt+Shift+C' );
+		// The menu stays open across the switch; the shortcut works from
+		// inside it and the choice's state updates in place.
+		await pageUtils.pressKeys( 'secondary+C' );
 		await openIntentSwitcher( page );
 		await expect(
 			page.getByRole( 'menuitemradio', { name: /^Viewing\s+Read-only/ } )
 		).toHaveAttribute( 'aria-checked', 'true' );
 
 		// Back to Edit.
-		await page.keyboard.press( 'Escape' );
-		await page.keyboard.press( 'Control+Alt+Shift+Z' );
+		await pageUtils.pressKeys( 'secondary+Z' );
 		await openIntentSwitcher( page );
 		await expect(
 			page.getByRole( 'menuitemradio', {
