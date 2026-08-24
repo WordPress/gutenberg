@@ -1,3 +1,4 @@
+import type { KeyboardEvent, ReactNode } from 'react';
 import { Breadcrumbs, Page } from '@wordpress/admin-ui';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
@@ -19,6 +20,21 @@ const MEDIA_LIST_PATH = '/types/attachment/list/all';
 const MEDIA_LIBRARY_ADMIN_PATH = 'upload.php';
 const MEDIA_EDITOR_ADMIN_PAGE = 'media-editor-wp-admin';
 const MEDIA_EDITOR_SCOPE = 'media-editor-route';
+
+/*
+ * The `MediaEditor` callback arguments this route reads. The private API
+ * does not publish its types, so these stay local until it stabilizes.
+ */
+interface SaveResult {
+	id: number;
+}
+
+interface FrameProps {
+	children: ReactNode;
+	isImage: boolean;
+	layout: 'wide' | 'narrow';
+	onKeyDown: ( event: KeyboardEvent< HTMLElement > ) => void;
+}
 
 function isMediaEditorAdminPage() {
 	return (
@@ -46,15 +62,16 @@ function MediaEditorRoute() {
 
 	const media = useSelect(
 		( select ) =>
+			/* The record of an attachment is always assignable to `Media`. */
 			select( coreStore ).getEditedEntityRecord(
 				'postType',
 				'attachment',
 				attachmentId
-			),
+			) as Media | false,
 		[ attachmentId ]
 	);
 
-	const title = getMediaTitle( media ?? null );
+	const title = getMediaTitle( media || null );
 	const navigateBack = () => {
 		if ( typeof window !== 'undefined' && window.history.length > 1 ) {
 			window.history.back();
@@ -75,12 +92,17 @@ function MediaEditorRoute() {
 			// here regardless of whether it was last collapsed in the modal.
 			scope={ MEDIA_EDITOR_SCOPE }
 			onClose={ navigateBack }
-			onSaved={ ( { id: savedId } ) => {
+			onSaved={ ( { id: savedId }: SaveResult ) => {
 				if ( savedId !== attachmentId ) {
 					navigate( { to: `/media-editor/${ savedId }` } );
 				}
 			} }
-			renderFrame={ ( { children, isImage, layout, onKeyDown } ) => {
+			renderFrame={ ( {
+				children,
+				isImage,
+				layout,
+				onKeyDown,
+			}: FrameProps ) => {
 				// Below the sidebar-collapse breakpoint the header has no room
 				// for the history cluster: it already carries the breadcrumbs,
 				// Cancel/Save, and (under `medium`) the framework's navigation
