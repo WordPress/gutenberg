@@ -1038,7 +1038,7 @@ describe( 'Editor actions', () => {
 			);
 		} );
 
-		it( 'surfaces the refusal as a notice, not only as an announcement', () => {
+		it( 'surfaces the refusal as a notice, and leaves the announcing to it', () => {
 			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
 				'suggest'
 			);
@@ -1047,18 +1047,65 @@ describe( 'Editor actions', () => {
 			registry.dispatch( editorStore ).switchEditorMode( 'text' );
 
 			// A sighted keyboard user pressing the shortcut sees nothing
-			// change unless the refusal is also on screen.
-			expect( speak ).toHaveBeenCalledWith(
-				expect.stringContaining( 'suggestions' ),
-				'assertive'
+			// change unless the refusal is also on screen. The snackbar is
+			// the sole announcer: it speaks its own content politely from
+			// its effect, so an assertive `speak` here would say the same
+			// sentence twice and interrupt the polite one.
+			const notice = registry
+				.select( noticesStore )
+				.getNotices()
+				.find( ( { id } ) => id === 'editor-code-editor-unavailable' );
+			expect( notice.content ).toBe(
+				'Raw HTML edits cannot be captured as suggestions. Switch to Editing to use the code editor.'
 			);
+			expect( notice.spokenMessage ).toBe( notice.content );
+			expect( speak ).not.toHaveBeenCalled();
+		} );
+
+		it( 'refuses the code editor in the read-only view intent', () => {
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'view'
+			);
+
+			registry.dispatch( editorStore ).switchEditorMode( 'text' );
+
+			expect( registry.select( editorStore ).getEditorMode() ).toBe(
+				'visual'
+			);
+			// The refusal must not write the preference: returning to
+			// Editing has to leave the user where they were.
+			expect(
+				registry.select( preferencesStore ).get( 'core', 'editorMode' )
+			).toBeUndefined();
 			expect(
 				registry
 					.select( noticesStore )
 					.getNotices()
 					.map( ( notice ) => notice.content )
 			).toContain(
-				'Raw HTML edits cannot be captured as suggestions. Switch to Editing to use the code editor.'
+				'The code editor is unavailable while viewing. Switch to Editing to change the content.'
+			);
+		} );
+
+		it( 'masks a stored code editor preference while viewing', () => {
+			registry.dispatch( editorStore ).switchEditorMode( 'text' );
+			expect( registry.select( editorStore ).getEditorMode() ).toBe(
+				'text'
+			);
+
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'view'
+			);
+			expect( registry.select( editorStore ).getEditorMode() ).toBe(
+				'visual'
+			);
+
+			// Leaving the intent hands the code editor back.
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'edit'
+			);
+			expect( registry.select( editorStore ).getEditorMode() ).toBe(
+				'text'
 			);
 		} );
 
@@ -1208,6 +1255,62 @@ describe( 'Editor actions', () => {
 					.getNotices()
 					.map( ( notice ) => notice.content )
 			).toEqual( [] );
+		} );
+	} );
+
+	describe( 'undo/redo in the read-only view intent', () => {
+		let registry;
+
+		beforeEach( () => {
+			registry = createRegistryWithStores();
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', [
+					{ id: postId, title: 'original', type: 'post' },
+				] );
+			registry
+				.dispatch( coreStore )
+				.editEntityRecord( 'postType', 'post', postId, {
+					title: 'edited',
+				} );
+		} );
+
+		const editedTitle = () =>
+			registry
+				.select( coreStore )
+				.getEditedEntityRecord( 'postType', 'post', postId ).title;
+
+		it( 'refuses undo while viewing and allows it again after', () => {
+			expect( registry.select( coreStore ).hasUndo() ).toBe( true );
+
+			// The intent API is private while Suggest mode is experimental.
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'view'
+			);
+			registry.dispatch( editorStore ).undo();
+
+			expect( editedTitle() ).toBe( 'edited' );
+			expect( registry.select( coreStore ).hasUndo() ).toBe( true );
+
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'edit'
+			);
+			registry.dispatch( editorStore ).undo();
+
+			expect( editedTitle() ).toBe( 'original' );
+		} );
+
+		it( 'refuses redo while viewing', () => {
+			registry.dispatch( editorStore ).undo();
+			expect( registry.select( coreStore ).hasRedo() ).toBe( true );
+
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'view'
+			);
+			registry.dispatch( editorStore ).redo();
+
+			expect( editedTitle() ).toBe( 'original' );
+			expect( registry.select( coreStore ).hasRedo() ).toBe( true );
 		} );
 	} );
 

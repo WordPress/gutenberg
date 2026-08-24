@@ -3,7 +3,6 @@ import { MenuItemsChoice, MenuGroup } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as editorStore } from '../../store';
-import { EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 
 /**
@@ -27,7 +26,6 @@ function ModeSwitcher() {
 		shortcut,
 		isRichEditingEnabled,
 		isCodeEditingEnabled,
-		isSuggestIntent,
 		codeEditorUnavailableReason,
 		mode,
 	} = useSelect(
@@ -39,16 +37,13 @@ function ModeSwitcher() {
 				select( editorStore ).getEditorSettings().richEditingEnabled,
 			isCodeEditingEnabled:
 				select( editorStore ).getEditorSettings().codeEditingEnabled,
-			// `getEditorIntent` is private while Suggest mode is experimental.
-			isSuggestIntent:
-				unlock( select( editorStore ) ).getEditorIntent() ===
-				EDITOR_INTENT_SUGGEST,
 			/*
 			 * Shared with the refusal in `switchEditorMode` so the disabled
-			 * item and the announcement say the same thing. Left on its cheap
+			 * item and the notice say the same thing. Left on its cheap
 			 * intent-only check: the pending-marker probe serializes the
 			 * document, which is too expensive for a render pass, so that
-			 * case is refused at dispatch with a notice instead.
+			 * case is refused at dispatch with a notice instead. Private
+			 * while Suggest mode is experimental.
 			 */
 			codeEditorUnavailableReason: unlock(
 				select( editorStore )
@@ -66,8 +61,8 @@ function ModeSwitcher() {
 	if ( ! isCodeEditingEnabled && mode === 'text' ) {
 		selectedMode = 'visual';
 	}
-	// Suggesting is a visual-only intent: see `getEditorMode`.
-	if ( isSuggestIntent ) {
+	// Suggesting and Viewing are visual-only intents: see `getEditorMode`.
+	if ( codeEditorUnavailableReason ) {
 		selectedMode = 'visual';
 	}
 
@@ -86,16 +81,16 @@ function ModeSwitcher() {
 			};
 		}
 		/*
-		 * Suggesting forces the visual editor, so it stays selectable even
+		 * An intent that forces the visual editor keeps it selectable even
 		 * with rich editing turned off - disabling it alongside the code
 		 * editor would leave both choices dead and the checked one
-		 * unreachable. Entering the intent is refused in that configuration
+		 * unreachable. Entering Suggesting is refused in that configuration
 		 * (see `setEditorIntent`), so this only covers a setting flipped
 		 * mid-session.
 		 */
 		if (
 			! isRichEditingEnabled &&
-			! isSuggestIntent &&
+			! codeEditorUnavailableReason &&
 			choice.value === 'visual'
 		) {
 			choice = {

@@ -5,7 +5,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { RichTextData, create, slice } from '@wordpress/rich-text';
 import { unlock } from '../../lock-unlock';
-import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
+import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { INLINE_OP_TYPE, useSuggestionsProvider } from './provider';
 import { useSuggestionOverlay } from './overlay-context';
 import { wrapInlineMarker, readInlineCaret } from '../inline-markers';
@@ -279,8 +279,8 @@ export default function SuggestionDeletionKeyboard() {
 	const isSuggestMode = useSelect(
 		( select ) =>
 			// `getEditorIntent` is private while Suggest mode is experimental.
-			unlock( select( EDITOR_STORE_NAME ) ).getEditorIntent() ===
-			SUGGEST_INTENT,
+			unlock( select( STORE_NAME ) ).getEditorIntent() ===
+			EDITOR_INTENT_SUGGEST,
 		[]
 	);
 	const selectedBlockClientId = useSelect(

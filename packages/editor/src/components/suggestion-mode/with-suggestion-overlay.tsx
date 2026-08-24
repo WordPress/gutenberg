@@ -34,7 +34,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { VisuallyHidden } from '@wordpress/ui';
 import { useSuggestionOverlay } from './overlay-context';
-import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
+import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import SuggestionMoveGhost from './suggestion-move-ghost';
@@ -466,8 +466,8 @@ const withSuggestionOverlay = createHigherOrderComponent(
 				( select ) =>
 					// `getEditorIntent` is private while Suggest mode is
 					// experimental.
-					unlock( select( EDITOR_STORE_NAME ) ).getEditorIntent() ===
-					SUGGEST_INTENT,
+					unlock( select( STORE_NAME ) ).getEditorIntent() ===
+					EDITOR_INTENT_SUGGEST,
 				[]
 			);
 			const isPendingInsert = useSelect(
@@ -549,14 +549,14 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 				( ghostsInside && ghostsInside.length > 0 );
 			const { isSuggestMode, structuralClass, authorId } = useSelect(
 				( select ) => {
-					const editor = unlock( select( EDITOR_STORE_NAME ) );
+					const editor = unlock( select( STORE_NAME ) );
 					const blockEditor = select( blockEditorStore );
 					const marker =
 						blockEditor?.getBlockAttributes?.( clientId )?.metadata
 							?.suggestion;
 					return {
 						isSuggestMode:
-							editor.getEditorIntent() === SUGGEST_INTENT,
+							editor.getEditorIntent() === EDITOR_INTENT_SUGGEST,
 						structuralClass: structuralMarkerClass( marker?.type ),
 						authorId: marker?.authorId ?? null,
 					};

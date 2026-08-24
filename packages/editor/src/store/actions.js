@@ -620,19 +620,30 @@ export const __unstableSaveForPreview =
 
 /**
  * Action that restores last popped state in undo history.
+ *
+ * Refused in the read-only `view` intent: undo and redo rewrite the post the
+ * same way a keystroke does, and the header buttons stay mounted there.
  */
 export const redo =
 	() =>
-	( { registry } ) => {
+	( { registry, select } ) => {
+		if ( select.isEditorIntentReadOnly() ) {
+			return;
+		}
 		registry.dispatch( coreStore ).redo();
 	};
 
 /**
  * Action that pops a record from undo history and undoes the edit.
+ *
+ * Refused in the read-only `view` intent — see `redo`.
  */
 export const undo =
 	() =>
-	( { registry } ) => {
+	( { registry, select } ) => {
+		if ( select.isEditorIntentReadOnly() ) {
+			return;
+		}
 		registry.dispatch( coreStore ).undo();
 	};
 
@@ -1172,23 +1183,26 @@ export const switchEditorMode =
 		 * The code editor edits raw `post_content`, which has nowhere to put
 		 * an inline marker and is re-parsed wholesale on the way back, so a
 		 * raw edit bypasses suggestion capture and takes the existing markers
-		 * down with it. `getCodeEditorUnavailableReason` owns both cases -
-		 * the `suggest` intent, and any intent while markers are still
-		 * pending - so this refusal, the disabled menu item, and the filtered
-		 * command all agree.
+		 * down with it. It is also the one editing surface the read-only
+		 * canvas does not cover, so without this the Viewing intent would
+		 * hand a user a fully writable copy of the post.
+		 * `getCodeEditorUnavailableReason` owns all three cases - the `view`
+		 * intent, the `suggest` intent, and any intent while markers are
+		 * still pending - so this refusal, the disabled menu item, and the
+		 * filtered command all agree.
 		 *
 		 * Refusing here is what actually closes the hole: the menu item is
 		 * disabled and the command is filtered out, but the keyboard shortcut
-		 * reaches this action directly. Announce it and raise a snackbar too,
-		 * because a shortcut that silently does nothing reads as a broken
-		 * editor to a sighted keyboard user.
+		 * reaches this action directly. Raise a snackbar, because a shortcut
+		 * that silently does nothing reads as a broken editor. The snackbar
+		 * is the sole announcer: it speaks its own content politely, which is
+		 * the right register for a refusal.
 		 */
 		if ( mode === 'text' ) {
 			const unavailableReason = select.getCodeEditorUnavailableReason( {
 				checkPendingSuggestions: true,
 			} );
 			if ( unavailableReason ) {
-				speak( unavailableReason, 'assertive' );
 				registry
 					.dispatch( noticesStore )
 					.createNotice( 'info', unavailableReason, {

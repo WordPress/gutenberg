@@ -7,7 +7,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
-import { EDITOR_STORE_NAME } from './constants';
+import { STORE_NAME } from '../../store/constants';
 import { useSuggestionOverlay } from './overlay-context';
 import type { SuggestionOperation } from './overlay-context';
 import {
@@ -519,7 +519,7 @@ export function rememberResolvedSuggestion( commentId: number | string ) {
  */
 export function useSuggestionsProvider() {
 	const { postId, postModified } = useSelect( ( select ) => {
-		const editor: any = select( EDITOR_STORE_NAME );
+		const editor: any = select( STORE_NAME );
 		const id = editor?.getCurrentPostId?.() ?? null;
 		const postType = editor?.getCurrentPostType?.() ?? null;
 		const record =

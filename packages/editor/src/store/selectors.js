@@ -21,6 +21,7 @@ import {
 	ONE_MINUTE_IN_MS,
 	AUTOSAVE_PROPERTIES,
 	EDITOR_INTENT_SUGGEST,
+	EDITOR_INTENT_VIEW,
 } from './constants';
 import { getPostRawValue } from './reducer';
 import { hasPendingSuggestionMarkers } from './utils/pending-suggestion-markers';
@@ -1391,22 +1392,29 @@ export function isInserterOpened( state ) {
 export const getEditorMode = createRegistrySelector(
 	( select ) => ( state ) => {
 		/*
-		 * The `suggest` intent reports `visual` whatever the stored preference
-		 * says. The code editor is a raw `post_content` textarea: it has
-		 * nowhere to render an inline marker, and the document it hands back
-		 * is re-parsed from scratch, so an edit made there is not capturable
-		 * as a suggestion and destroys the markers already in the post.
-		 * Answering here keeps every consumer of this selector - the
-		 * interface, the header, the document tools, the mode switcher -
-		 * agreed on one mode, and leaves the preference untouched so
-		 * returning to the `edit` intent returns the user to the code editor.
+		 * The `suggest` and `view` intents both report `visual` whatever the
+		 * stored preference says. The code editor is a raw `post_content`
+		 * textarea: it has nowhere to render an inline marker, and the
+		 * document it hands back is re-parsed from scratch, so an edit made
+		 * there is not capturable as a suggestion and destroys the markers
+		 * already in the post. Viewing has the simpler reason - it is a
+		 * read-only preview, and preview rendering does not reach the
+		 * textarea, so a user whose preference is the code editor would land
+		 * in a fully writable one. Answering here keeps every consumer of
+		 * this selector - the interface, the header, the document tools, the
+		 * mode switcher - agreed on one mode, and leaves the preference
+		 * untouched so returning to the `edit` intent returns the user to the
+		 * code editor.
 		 *
 		 * The intent is read off state rather than through the private
 		 * `getEditorIntent` selector because private-selectors.js imports
 		 * from this module, so importing it back would close a cycle. The
 		 * reducer always holds a value, so there is nothing to fall back to.
 		 */
-		if ( state.editorIntent === EDITOR_INTENT_SUGGEST ) {
+		if (
+			state.editorIntent === EDITOR_INTENT_SUGGEST ||
+			state.editorIntent === EDITOR_INTENT_VIEW
+		) {
 			return 'visual';
 		}
 

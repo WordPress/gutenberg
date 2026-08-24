@@ -121,11 +121,13 @@ const getEditorCommandLoader = () =>
 				isCodeEditingEnabled: getEditorSettings().codeEditingEnabled,
 				isRichEditingEnabled: getEditorSettings().richEditingEnabled,
 				/*
-				 * The code editor is closed off while suggesting: it cannot
-				 * render an inline marker and re-parses whatever it hands
-				 * back. `switchEditorMode` refuses the switch anyway, so
-				 * without this the palette would offer a command that shuts
-				 * itself and does nothing. Private while Suggest mode is
+				 * The code editor is closed off while suggesting and while
+				 * viewing: it cannot render an inline marker and re-parses
+				 * whatever it hands back, and it is a raw `post_content`
+				 * textarea the preview canvas does not cover.
+				 * `switchEditorMode` refuses the switch anyway, so without
+				 * this the palette would offer a command that shuts itself
+				 * and does nothing. Private while Suggest mode is
 				 * experimental.
 				 */
 				isCodeEditorUnavailable: !! unlock(
