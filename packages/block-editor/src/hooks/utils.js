@@ -1,6 +1,13 @@
 import clsx from 'clsx';
 import { getBlockSupport } from '@wordpress/blocks';
-import { memo, useMemo, useEffect, useId, useState } from '@wordpress/element';
+import {
+	memo,
+	useMemo,
+	useEffect,
+	useLayoutEffect,
+	useId,
+	useState,
+} from '@wordpress/element';
 import { useDispatch, useRegistry } from '@wordpress/data';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
@@ -603,7 +610,7 @@ function BlockProps( {
 		} );
 	// Setting state after every render is fine because this component is
 	// pure and will only re-render when needed props change.
-	useEffect( () => {
+	useLayoutEffect( () => {
 		// We could shallow compare the props, but since this component only
 		// changes when needed attributes change, the benefit is probably small.
 		setWrapperProps( wrapperProps );
