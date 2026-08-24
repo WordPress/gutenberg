@@ -678,16 +678,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/border-box-control/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/components/src/border-control/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/box-control/styles/box-control-icon-styles.ts": {
 		"no-restricted-imports": {
 			"count": 2
