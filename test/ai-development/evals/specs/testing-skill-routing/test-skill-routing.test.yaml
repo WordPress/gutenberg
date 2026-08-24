@@ -1,8 +1,6 @@
 # yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
 
-# Both agents live in this config; Promptfoo runs the matrix. Use
-# `--filter-providers claude` (or `codex`) to run just one. Shared tracing
-# lives in ../../lib/promptfooconfig.yaml.
+# Providers and shared tracing live in ../../lib/.
 description: Verify an e2e task routes through the testing skill to the e2e reference only
 
 tracing:

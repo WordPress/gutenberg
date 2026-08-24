@@ -8,7 +8,7 @@ The standalone `evals/` package uses [Promptfoo](https://www.promptfoo.dev/docs/
 
 ## How it works
 
-Promptfoo runs the prompt × provider × test × repeat matrix. Its standard lifecycle hooks create a clean Git workspace from the committed `HEAD` before each row and remove it afterward. The native Claude and Codex providers receive that directory as `working_dir`.
+Promptfoo runs the prompt × provider × test × repeat matrix. Its standard lifecycle hooks create a clean Git workspace from the committed `HEAD` before each row and remove it afterward. The native Claude provider receives that directory as `working_dir`.
 
 ```text
       prompt × provider × test
@@ -58,7 +58,7 @@ npm --prefix test/ai-development/evals install
 
 A root `npm install` does not install this nested package.
 
-Codex can use an existing Codex/ChatGPT login or `OPENAI_API_KEY`/`CODEX_API_KEY`. Claude can use an existing Claude Code login or `ANTHROPIC_API_KEY`. Model calls consume the associated quota or paid usage.
+Claude can use an existing Claude Code login or `ANTHROPIC_API_KEY`. Model calls consume the associated quota or paid usage.
 
 ## Run
 
@@ -73,10 +73,6 @@ npm run test:agent-evals -- --config 'specs/*/*.test.yaml'
 
 # Run one spec.
 npm run test:agent-evals -- --config specs/SPEC_GROUP/TEST_NAME.test.yaml
-
-# Run one provider.
-npm run test:agent-evals -- --config specs/SPEC_GROUP/TEST_NAME.test.yaml --filter-providers codex
-npm run test:agent-evals -- --config specs/SPEC_GROUP/TEST_NAME.test.yaml --filter-providers claude
 
 # Override repeats.
 npm run test:agent-evals -- --config specs/SPEC_GROUP/TEST_NAME.test.yaml --repeat 3

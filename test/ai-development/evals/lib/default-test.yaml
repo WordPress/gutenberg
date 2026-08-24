@@ -9,7 +9,7 @@ options:
         own environment.
 
     # The beforeEach extension fills in working_dir and the dynamic filesystem
-    # allowlists. Codex ignores this Claude-specific sandbox key.
+    # allowlists.
     sandbox:
         enabled: true
         failIfUnavailable: true
@@ -22,9 +22,11 @@ options:
             allowManagedReadPathsOnly: true
     # The workspace extension adds each row's temporary working_dir.
     provider:
-        id: openai:codex-sdk
+        id: anthropic:claude-agent-sdk
         config:
-            sandbox_mode: read-only
-            approval_policy: never
-            network_access_enabled: false
-            web_search_mode: disabled
+            apiKeyRequired: false
+            model: sonnet
+            # The grader inspects the workspace; it never edits it.
+            tools: ['Bash']
+            custom_allowed_tools: ['Bash']
+            disallowed_tools: ['WebFetch', 'WebSearch']
