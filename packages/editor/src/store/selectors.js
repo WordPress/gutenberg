@@ -20,6 +20,7 @@ import {
 	PERMALINK_POSTNAME_REGEX,
 	ONE_MINUTE_IN_MS,
 	AUTOSAVE_PROPERTIES,
+	EDITOR_INTENT_VIEW,
 } from './constants';
 import { getPostRawValue } from './reducer';
 import { unlock } from '../lock-unlock';
@@ -1387,8 +1388,31 @@ export function isInserterOpened( state ) {
  * @return {string} Editing mode.
  */
 export const getEditorMode = createRegistrySelector(
-	( select ) => () =>
-		select( preferencesStore ).get( 'core', 'editorMode' ) ?? 'visual'
+	( select ) => ( state ) => {
+		/*
+		 * The `view` intent reports `visual` whatever the stored preference
+		 * says. Viewing is a read-only preview, and the code editor is a raw
+		 * `post_content` textarea that the block canvas' preview rendering
+		 * does not reach — a user whose preference is the code editor would
+		 * otherwise land in a fully writable one. Answering here keeps every
+		 * consumer of this selector — the interface, the header, the document
+		 * tools, the mode switcher — agreed on one mode, and leaves the
+		 * preference untouched so returning to Editing returns the user to
+		 * the code editor.
+		 *
+		 * The intent is read off state rather than through the private
+		 * `getEditorIntent` selector because private-selectors.js imports from
+		 * this module, so importing it back would close a cycle. The reducer
+		 * always holds a value, so there is nothing to fall back to.
+		 */
+		if ( state.editorIntent === EDITOR_INTENT_VIEW ) {
+			return 'visual';
+		}
+
+		return (
+			select( preferencesStore ).get( 'core', 'editorMode' ) ?? 'visual'
+		);
+	}
 );
 
 /*
