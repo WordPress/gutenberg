@@ -42,7 +42,7 @@ function gutenberg_normalize_state_preset_vars( $value ) {
 	 * `WP_Theme_JSON_Gutenberg::convert_custom_properties()` and the JS style
 	 * engine's `getCSSValueFromRawStyle()`.
 	 */
-	if ( 3 === count( $parts ) && 'preset' === $parts[0] ) {
+	if ( 3 === count( $parts ) ) {
 		$parts[2] = _wp_to_kebab_case( $parts[2] );
 	}
 
