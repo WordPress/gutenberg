@@ -36,7 +36,7 @@
 		"@wordpress/rich-text": "file:../../packages/rich-text",
 		"ajv": "^8.17.1",
 		"fast-glob": "^3.2.7",
-		"react": "^18.3.1",
+		"react": "^19.2.8",
 		"rimraf": "^5.0.10"
 	},
 	"publishConfig": {

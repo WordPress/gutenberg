@@ -16,7 +16,6 @@ const meta: Meta< typeof Composite > = {
 		'Composite.Item': Composite.Item,
 		'Composite.Hover': Composite.Hover,
 		'Composite.Typeahead': Composite.Typeahead,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.Context': Composite.Context,
 	},
 	// Temporary: Due to an upstream bug, render the root explicitly so the

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Upgrade React to v19.
+
 ### Enhancements
 
 -   Validated form controls: Align invalid focus styling for `ComboboxControl` and `FormTokenField` with the design system ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).

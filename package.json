@@ -72,8 +72,8 @@
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.62.1",
-		"@types/react": "^18.3.27",
-		"@types/react-dom": "^18.3.1",
+		"@types/react": "^19.2.13",
+		"@types/react-dom": "^19.2.3",
 		"@typescript/native": "npm:typescript@^7.0.2",
 		"@wordpress/env": "file:./packages/env",
 		"@wordpress/eslint-tools": "file:./tools/eslint",

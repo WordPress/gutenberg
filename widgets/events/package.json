@@ -15,6 +15,6 @@
 		"@wordpress/widget-primitives": "file:../../packages/widget-primitives"
 	},
 	"devDependencies": {
-		"@types/react": "^18.3.27"
+		"@types/react": "^19.2.13"
 	}
 }

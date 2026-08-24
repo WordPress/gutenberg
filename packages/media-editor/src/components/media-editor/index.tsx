@@ -457,8 +457,9 @@ function MediaEditorContent( {
 	const [ isPlacementActive, setIsPlacementActive ] = useState( false );
 	const [ isCanvasGestureActive, setIsCanvasGestureActive ] =
 		useState( false );
-	const placementControlTimerRef =
-		useRef< ReturnType< typeof setTimeout > >();
+	const placementControlTimerRef = useRef<
+		ReturnType< typeof setTimeout > | undefined
+	>( undefined );
 
 	const signalPlacementControlInteraction = useCallback( () => {
 		setIsPlacementActive( true );

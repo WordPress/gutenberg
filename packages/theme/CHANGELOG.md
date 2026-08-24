@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Upgrade React to v19.
+
 ### Enhancements
 
 -   Add an `onColorWarnings` callback for `ThemeProvider` consumers to receive structured color ramp and semantic contrast warnings ([#81185](https://github.com/WordPress/gutenberg/pull/81185)).

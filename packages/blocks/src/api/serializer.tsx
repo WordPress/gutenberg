@@ -166,7 +166,7 @@ export function getSaveElement(
 		 */
 		const props = applyFilters(
 			'blocks.getSaveContent.extraProps',
-			{ ...element.props },
+			{ ...( element.props as {} ) },
 			blockType,
 			attributes
 		);

@@ -21,7 +21,6 @@ describe( 'Breadcrumbs', () => {
 					/>
 				)
 			).toThrow( /item "Home" is missing a `to` prop/ );
-			expect( console ).toHaveErrored();
 		} );
 
 		it( 'should throw for the first preceding item missing `to`', () => {
@@ -36,7 +35,6 @@ describe( 'Breadcrumbs', () => {
 					/>
 				)
 			).toThrow( /item "Home" is missing a `to` prop/ );
-			expect( console ).toHaveErrored();
 		} );
 
 		it( 'should not throw when all preceding items have `to`', () => {

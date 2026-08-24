@@ -381,8 +381,8 @@ function handleCustomValidationAsync< Item >(
 }
 
 type PromiseHandler< Item > = {
-	customCounterRef: React.MutableRefObject< Record< string, number > >;
-	elementsCounterRef: React.MutableRefObject< Record< string, number > >;
+	customCounterRef: React.RefObject< Record< string, number > >;
+	elementsCounterRef: React.RefObject< Record< string, number > >;
 	setFormValidity: React.Dispatch< React.SetStateAction< FormValidity > >;
 	path: string[];
 	item: Item;

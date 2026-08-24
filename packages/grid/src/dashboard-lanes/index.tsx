@@ -129,7 +129,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		} | null >( null );
 		const latestLayoutRef = useRef<
 			DashboardLanesLayoutItem[] | undefined
-		>();
+		>( undefined );
 		const lastReorderCursorRef = useRef< {
 			x: number;
 			y: number;

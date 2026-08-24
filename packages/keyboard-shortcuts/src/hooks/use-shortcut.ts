@@ -21,7 +21,9 @@ export default function useShortcut(
 ) {
 	const shortcuts = useContext( context );
 	const isMatch = useShortcutEventMatch();
-	const callbackRef = useRef< ( event: KeyboardEvent ) => void >();
+	const callbackRef = useRef<
+		( ( event: KeyboardEvent ) => void ) | undefined
+	>( undefined );
 
 	useEffect( () => {
 		callbackRef.current = callback;

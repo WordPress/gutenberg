@@ -186,7 +186,7 @@ export function LanesItem( {
 				>
 					<div
 						style={ { display: 'contents' } }
-						{ ...( dragging ? { inert: '' } : {} ) }
+						inert={ dragging || undefined }
 					>
 						{ actionableArea }
 					</div>

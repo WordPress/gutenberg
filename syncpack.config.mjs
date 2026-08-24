@@ -29,7 +29,7 @@ export default {
 			dependencies: [ 'react', 'react-dom' ],
 			dependencyTypes: [ 'prod', 'dev' ],
 			// Bump this literal when upgrading React.
-			pinVersion: '^18.3.1',
+			pinVersion: '^19.2.8',
 		},
 		{
 			label: 'All dependencies must use the same version across the repo.',

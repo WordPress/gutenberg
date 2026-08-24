@@ -749,7 +749,9 @@ function CropperInner(
 
 	// Settling animation: brief transition after resize end.
 	const [ settling, setSettling ] = useState( false );
-	const settleTimerRef = useRef< ReturnType< typeof setTimeout > >();
+	const settleTimerRef = useRef<
+		ReturnType< typeof setTimeout > | undefined
+	>( undefined );
 	const finishSettling = useCallback( () => {
 		clearTimeout( settleTimerRef.current );
 		isSettlingRef.current = false;

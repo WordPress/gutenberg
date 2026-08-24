@@ -50,7 +50,7 @@
 	},
 	"devDependencies": {
 		"@types/jest": "^30.0.0",
-		"@types/react": "^18.3.27"
+		"@types/react": "^19.2.13"
 	},
 	"peerDependencies": {
 		"react": "^18 || ^19"

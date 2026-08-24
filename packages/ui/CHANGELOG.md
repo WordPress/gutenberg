@@ -11,6 +11,7 @@
 
 ### Breaking Changes
 
+-   Upgrade React to v19.
 -   `Select.Item`: Remove `'compact'` from the `size` prop. Use `'default'` instead ([#81354](https://github.com/WordPress/gutenberg/pull/81354)).
 -   `Combobox.Item`, `SelectControl.Item`: The `size` prop is removed ([#81354](https://github.com/WordPress/gutenberg/pull/81354)).
 
