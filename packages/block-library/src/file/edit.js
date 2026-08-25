@@ -259,13 +259,10 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 						onResizeStop={ handleOnResizeStop }
 						showHandle={ isSelected }
 					>
-						<object
+						<iframe
 							className="wp-block-file__preview"
-							data={ href }
-							type="application/pdf"
-							aria-label={ __(
-								'Embed of the selected PDF file.'
-							) }
+							src={ href }
+							title={ __( 'Embed of the selected PDF file.' ) }
 						/>
 						{ ! isSelected && (
 							<div className="wp-block-file__preview-overlay" />
