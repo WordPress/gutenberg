@@ -9,6 +9,7 @@
 ### Internal
 
 -   Heading: Declare the heading level and paragraph keyboard shortcuts on the block's variations and transforms, rather than in a `BlockKeyboardShortcuts` component that every editor had to render. The `BlockKeyboardShortcuts` private export has been removed ([#81588](https://github.com/WordPress/gutenberg/pull/81588)).
+-   Math: Use `ValidatedTextareaControl` from `@wordpress/ui` in the LaTeX popover instead of unlocking `ValidatedTextareaControl` from the `@wordpress/components` private APIs ([#81984](https://github.com/WordPress/gutenberg/pull/81984)).
 
 ### Enhancements
 
@@ -17,6 +18,7 @@
 ### Bug Fixes
 
 -   Columns: Preserve individual Column attributes supported by Group, including styles and layouts, when transforming to Row or Grid.
+-   Gallery: Don't offer the Image and Grid transforms while the block is in dynamic mode, where it has no inner blocks to convert ([#82009](https://github.com/WordPress/gutenberg/pull/82009)).
 -   Icon: Apply only padding to the inner SVG in the editor, so margin is no longer applied twice compared to the front end ([#81292](https://github.com/WordPress/gutenberg/pull/81292)).
 -   Playlist: Attach the inner block drop zone to the track list, so Playlist Track blocks show insertion markers while being reordered.
 -   Playlist Track: Hide the Title and Replace audio controls when multiple tracks are selected.
@@ -27,6 +29,7 @@
 -   Term Description: Apply the term description display filters when rendering with term context inside a Terms Query loop, so multi-paragraph descriptions keep their paragraphs and match the taxonomy archive rendering ([#81290](https://github.com/WordPress/gutenberg/pull/81290)).
 -   Accordion: Resolve the URL fragment with the `:target` pseudo-class instead of decoding `window.location.hash`, so a hash containing malformed percent-encoding no longer throws a `URIError` when a panel is opened ([#81780](https://github.com/WordPress/gutenberg/pull/81780)).
 -   Post Template: Pass an explicit default layout to the inner blocks of the Post Template and Term Template blocks, so the movers, inserters, and child controls of the template's blocks no longer follow the grid used to arrange the post/term items ([#81120](https://github.com/WordPress/gutenberg/pull/81120)).
+-   Accordion Heading: Declare the spacing selector in the block's `selectors` map, so padding set in `theme.json` or Global Styles applies to the toggle button the block writes its own padding to, rather than to the heading wrapper where it could not lower the default ([#81976](https://github.com/WordPress/gutenberg/pull/81976)).
 
 ## 10.4.0 (2026-08-12)
 
