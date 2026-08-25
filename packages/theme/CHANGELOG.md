@@ -17,6 +17,8 @@
 
 ### Internal
 
+-   Rename `ThemeProvider` wrapper CSS module class from `root` to `wrapper` for clearer DevTools inspection ([#81996](https://github.com/WordPress/gutenberg/pull/81996)).
+-   Update Terrazzo packages to 2.7.1 ([#81978](https://github.com/WordPress/gutenberg/pull/81978)).
 -   Point tsconfig references at split dependencies' build projects. ([#81514](https://github.com/WordPress/gutenberg/pull/81514), [#81518](https://github.com/WordPress/gutenberg/pull/81518))
 -   Collapse the `tsconfig.src.json`/`tsconfig.bin.json`/`tsconfig.test.json` projects into the repository-standard split of `tsconfig.build.json` and a default dev `tsconfig.json`. ([#81509](https://github.com/WordPress/gutenberg/pull/81509))
 -   Update Terrazzo packages to 2.5.0, use its resolver for mode overrides, and restore token linting with semantic WCAG AA contrast checks ([#81082](https://github.com/WordPress/gutenberg/pull/81082)).

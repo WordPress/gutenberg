@@ -9,7 +9,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useRef, useState } from '@wordpress/element';
 import './guideline-actions-section.scss';
 import { exportGuidelines, importGuidelines } from '../import-export';
-import ActionItem from './action-item';
+import ActionItem, { type ActionProps } from './action-item';
 import type {
 	Scope,
 	GuidelineRow,
@@ -96,7 +96,7 @@ export default function GuidelineActionsSection( {
 		}
 	}
 
-	const ACTIONS = [
+	const ACTIONS: ActionProps[] = [
 		{
 			slug: 'import',
 			title: __( 'Import' ),

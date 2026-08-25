@@ -4,6 +4,32 @@ test( 'empty string', () => {
 	expect( autop( '' ) ).toBe( '' );
 } );
 
+// Regression test for https://github.com/WordPress/gutenberg/issues/9056.
+// Newlines inside <script>, <style>, <svg>, and <math> tags must not be
+// converted to <br /> tags.
+test( 'does not insert <br /> inside <script>, <style>, <svg>, or <math> tags', () => {
+	const script =
+		'Some text...\n' +
+		'<script type="text/javascript">\n' +
+		'alert(1);\n' +
+		'</script>';
+	expect( autop( script ) ).toBe(
+		'<p>Some text...<br />\n' +
+			'<script type="text/javascript">\n' +
+			'alert(1);\n' +
+			'</script></p>\n'
+	);
+
+	const style =
+		'Some text...\n' + '<style>\n' + '.foo { color: red; }\n' + '</style>';
+	expect( autop( style ) ).toBe(
+		'<p>Some text...</p>\n' +
+			'<style>\n' +
+			'.foo { color: red; }\n' +
+			'</style>\n'
+	);
+} );
+
 test( 'first post', () => {
 	const expected = `<p>Welcome to WordPress!  This post contains important information.  After you read it, you can make it private to hide it from visitors but still have the information handy for future reference.</p>
 <p>First things first:</p>

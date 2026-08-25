@@ -52,6 +52,7 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@ariakit/react": "^0.4.37",
+		"@date-fns/tz": "^1.5.0",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/components": "file:../components",
@@ -65,7 +66,6 @@
 		"@wordpress/kebab-case": "file:../kebab-case",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/primitives": "file:../primitives",
-		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/ui": "file:../ui",
 		"@wordpress/warning": "file:../warning",
 		"clsx": "^2.1.1",
