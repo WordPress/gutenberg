@@ -1,0 +1,62 @@
+@use "../utils/theme-variables" as *;
+
+$indeterminate-indicator-width: 50%;
+
+.track {
+	position: relative;
+	overflow: hidden;
+	height: 1.5px;
+	/* Text color at 10% opacity */
+	background-color: color-mix(in srgb, $components-color-foreground, transparent 90%);
+	border-radius: 9999px;
+
+	// Windows high contrast mode.
+	outline: 2px solid transparent;
+	outline-offset: 2px;
+
+	:where(&) {
+		width: 160px;
+	}
+}
+
+.indicator {
+	display: inline-block;
+	position: absolute;
+	top: 0;
+	height: 100%;
+	border-radius: 9999px;
+	/* Text color at 90% opacity */
+	background-color: color-mix(in srgb, $components-color-foreground, transparent 10%);
+
+	// Windows high contrast mode.
+	outline: 2px solid transparent;
+	outline-offset: -2px;
+
+	width: var(--indicator-width);
+	transition: width 0.4s ease-in-out;
+
+	&.is-indeterminate {
+		--indicator-width: #{$indeterminate-indicator-width};
+		animation: indeterminate-slide 1.5s ease-in-out infinite;
+		transition: none;
+	}
+}
+
+@keyframes indeterminate-slide {
+	0% {
+		inset-inline-start: -$indeterminate-indicator-width;
+	}
+
+	100% {
+		inset-inline-start: 100%;
+	}
+}
+
+.progress-element {
+	position: absolute;
+	top: 0;
+	inset-inline-start: 0;
+	opacity: 0;
+	width: 100%;
+	height: 100%;
+}
