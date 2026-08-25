@@ -4,6 +4,8 @@ import {
 	useInnerBlocksProps,
 	InspectorControls,
 	store as blockEditorStore,
+	BlockControls,
+	AlignmentControl,
 } from '@wordpress/block-editor';
 import {
 	TextControl,
@@ -18,8 +20,14 @@ import { withIgnoreIMEEvents } from '@wordpress/keycodes';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 function DetailsEdit( { attributes, setAttributes, clientId } ) {
-	const { name, showContent, summary, allowedBlocks, placeholder } =
-		attributes;
+	const {
+		name,
+		showContent,
+		summary,
+		allowedBlocks,
+		placeholder,
+		summaryAlign,
+	} = attributes;
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		__experimentalCaptureToolbars: true,
@@ -51,6 +59,14 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 
 	return (
 		<>
+			<BlockControls group="block">
+				<AlignmentControl
+					value={ summaryAlign }
+					onChange={ ( newAlign ) =>
+						setAttributes( { summaryAlign: newAlign } )
+					}
+				/>
+			</BlockControls>
 			<InspectorControls>
 				<ToolsPanel
 					label={ __( 'Settings' ) }
@@ -102,6 +118,11 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 				name={ name || '' }
 			>
 				<summary
+					className={
+						summaryAlign
+							? `has-text-align-${ summaryAlign }`
+							: undefined
+					}
 					onKeyDown={ withIgnoreIMEEvents( handleSummaryKeyDown ) }
 					onKeyUp={ handleSummaryKeyUp }
 				>

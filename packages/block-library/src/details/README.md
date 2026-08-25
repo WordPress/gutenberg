@@ -19,6 +19,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `summary` | `rich-text` | — | [Source](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#value-source): `rich-text`. [Selector](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#value-source): `summary`. [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `name` | `string` | — | [Source](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#value-source): `.wp-block-details`. [HTML attr](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `name` |
 | `placeholder` | `string` | — | — |
+| `summaryAlign` | `string` | — | — |
 
 ## Supports
 
