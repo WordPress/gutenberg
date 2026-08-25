@@ -39,8 +39,11 @@ function ModeSwitcher() {
 				select( editorStore ).getEditorSettings().codeEditingEnabled,
 			/*
 			 * Shared with the refusal in `switchEditorMode` so the disabled
-			 * item and the notice say the same thing. Private while Suggest
-			 * mode is experimental.
+			 * item and the notice say the same thing. Left on its cheap
+			 * intent-only check: the pending-marker probe serializes the
+			 * document, which is too expensive for a render pass, so that
+			 * case is refused at dispatch with a notice instead. Private
+			 * while Suggest mode is experimental.
 			 */
 			codeEditorUnavailableReason: unlock(
 				select( editorStore )
@@ -58,7 +61,7 @@ function ModeSwitcher() {
 	if ( ! isCodeEditingEnabled && mode === 'text' ) {
 		selectedMode = 'visual';
 	}
-	// Viewing is a visual-only intent: see `getEditorMode`.
+	// Suggesting and Viewing are visual-only intents: see `getEditorMode`.
 	if ( codeEditorUnavailableReason ) {
 		selectedMode = 'visual';
 	}
@@ -79,9 +82,11 @@ function ModeSwitcher() {
 		}
 		/*
 		 * An intent that forces the visual editor keeps it selectable even
-		 * with rich editing turned off — disabling it alongside the code
+		 * with rich editing turned off - disabling it alongside the code
 		 * editor would leave both choices dead and the checked one
-		 * unreachable.
+		 * unreachable. Entering Suggesting is refused in that configuration
+		 * (see `setEditorIntent`), so this only covers a setting flipped
+		 * mid-session.
 		 */
 		if (
 			! isRichEditingEnabled &&

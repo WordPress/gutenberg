@@ -59,23 +59,56 @@ const INTENTS: Array< {
  */
 function IntentSwitcher() {
 	// The intent API is private while Suggest mode is experimental.
-	const intent = useSelect(
-		( select ) => unlock( select( editorStore ) ).getEditorIntent(),
+	const { intent, isRichEditingEnabled } = useSelect(
+		( select ) => ( {
+			intent: unlock( select( editorStore ) ).getEditorIntent(),
+			isRichEditingEnabled:
+				// @ts-expect-error Editor settings are typed as a bare `Object`.
+				select( editorStore ).getEditorSettings().richEditingEnabled,
+		} ),
 		[]
 	);
 	const { setEditorIntent } = unlock( useDispatch( editorStore ) );
 
 	/*
+	 * Two adjustments per choice.
+	 *
 	 * The active choice hides its shortcut. `MenuItemsChoice` renders the
 	 * selection as a checked radio with the label; a key hint next to it
 	 * reads as "press this to get where you already are". `ModeSwitcher`
 	 * drops the shortcut from the selected mode for the same reason.
+	 *
+	 * Suggesting is visual-only - a suggestion is an inline marker in block
+	 * content, which the code editor cannot render - so it is unavailable to
+	 * a user who turned the visual editor off. `setEditorIntent` refuses it
+	 * either way; offering it disabled, with the setting to change, beats a
+	 * choice that looks live and then declines.
 	 */
-	const choices = INTENTS.map( ( choice ) =>
-		choice.value === intent
-			? { value: choice.value, label: choice.label, info: choice.info }
-			: choice
-	);
+	const choices = INTENTS.map( ( choice ) => {
+		const base =
+			choice.value === intent
+				? {
+						value: choice.value,
+						label: choice.label,
+						info: choice.info,
+				  }
+				: choice;
+
+		if (
+			choice.value === EDITOR_INTENT_SUGGEST &&
+			! isRichEditingEnabled
+		) {
+			return {
+				...base,
+				disabled: true,
+				info: __(
+					'You can enable the visual editor in your profile settings.'
+				),
+			};
+		}
+
+		return base;
+	} );
 
 	return (
 		<PostTypeSupportCheck supportKeys="editor.notes">

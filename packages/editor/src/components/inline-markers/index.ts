@@ -13,6 +13,7 @@
  */
 
 export { findMarkerRange, findMarkerText } from './find-marker-range';
+export { getMarkerSelector } from './marker-selector';
 export { wrapInlineMarker } from './wrap-inline-marker';
 export { readInlineSelection } from './read-inline-selection';
 export { readInlineCaret } from './read-inline-caret';
