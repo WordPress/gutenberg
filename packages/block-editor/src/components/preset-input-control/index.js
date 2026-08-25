@@ -183,20 +183,28 @@ export default function PresetInputControl( {
 	const customTooltipContent = ( newValue ) =>
 		value === undefined ? undefined : presets[ newValue ]?.name;
 
-	const getNewPresetValue = ( next, controlType ) => {
+	const getNewPresetValue = ( next ) => {
 		const newValue = parseInt( next, 10 );
+		const matchedPreset = presets[ newValue ];
 
-		if ( controlType === 'selectList' ) {
-			if ( newValue === 0 && presets[ 0 ]?.slug === '0' ) {
-				return '0';
-			}
-			if ( newValue === 0 ) {
-				return undefined;
-			}
-		} else if ( newValue === 0 ) {
+		// The synthetic "Default" entry (added when there are more presets
+		// than RANGE_CONTROL_MAX_SIZE) means "no value set", not an actual
+		// preset to reference.
+		if ( matchedPreset?.slug === 'default' ) {
+			return undefined;
+		}
+
+		// The "None" preset (slug '0') has no matching `--wp--preset--*`
+		// custom property registered anywhere, so referencing it via
+		// `var:preset|…|0` would point at something that's never defined.
+		// Store the literal value instead. Matching by slug (rather than
+		// assuming it's always at index 0) keeps this correct even when a
+		// "Default" entry shifts every other preset's index by one.
+		if ( matchedPreset?.slug === '0' ) {
 			return '0';
 		}
-		return `var:preset|${ presetType }|${ presets[ next ]?.slug }`;
+
+		return `var:preset|${ presetType }|${ matchedPreset?.slug }`;
 	};
 
 	return (
@@ -279,10 +287,7 @@ export default function PresetInputControl( {
 							setShowCustomValueControl( true );
 						} else {
 							onChange(
-								getNewPresetValue(
-									selection.selectedItem.key,
-									'selectList'
-								)
+								getNewPresetValue( selection.selectedItem.key )
 							);
 						}
 					} }

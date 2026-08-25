@@ -203,6 +203,75 @@ describe( 'PresetInputControl', () => {
 		} );
 	} );
 
+	it( 'selects "None" as a literal 0, not a preset reference, in the select dropdown', async () => {
+		const user = userEvent.setup();
+
+		// Mirrors what useSpacingSizes() builds once there are more sizes
+		// than RANGE_CONTROL_MAX_SIZE: a synthetic "Default" entry gets
+		// prepended, pushing "None" from index 0 to index 1.
+		const presetsWithDefault = [
+			{ name: 'Default', slug: 'default', size: undefined },
+			{ name: 'None', slug: '0', size: '0' },
+			...Array.from( { length: 8 }, ( _, i ) => ( {
+				name: `Preset ${ i + 1 }`,
+				slug: `preset-${ i + 1 }`,
+				size: `${ ( i + 1 ) * 5 }px`,
+			} ) ),
+		];
+
+		render(
+			<PresetInputControl
+				{ ...defaultProps }
+				presets={ presetsWithDefault }
+			/>
+		);
+
+		const combobox = await screen.findByRole( 'combobox' );
+		await user.click( combobox );
+
+		const noneOption = await screen.findByRole( 'option', {
+			name: 'None',
+		} );
+		await user.click( noneOption );
+
+		// "None" has no matching `--wp--preset--*` custom property
+		// registered anywhere, so it must be stored as a literal 0 rather
+		// than `var:preset|spacing|0`, which would reference nothing.
+		expect( mockOnChange ).toHaveBeenCalledWith( '0' );
+	} );
+
+	it( 'clears the value when "Default" is selected in the select dropdown', async () => {
+		const user = userEvent.setup();
+
+		const presetsWithDefault = [
+			{ name: 'Default', slug: 'default', size: undefined },
+			{ name: 'None', slug: '0', size: '0' },
+			...Array.from( { length: 8 }, ( _, i ) => ( {
+				name: `Preset ${ i + 1 }`,
+				slug: `preset-${ i + 1 }`,
+				size: `${ ( i + 1 ) * 5 }px`,
+			} ) ),
+		];
+
+		render(
+			<PresetInputControl
+				{ ...defaultProps }
+				presets={ presetsWithDefault }
+				value="var:preset|spacing|preset-1"
+			/>
+		);
+
+		const combobox = await screen.findByRole( 'combobox' );
+		await user.click( combobox );
+
+		const defaultOption = await screen.findByRole( 'option', {
+			name: 'Default',
+		} );
+		await user.click( defaultOption );
+
+		expect( mockOnChange ).toHaveBeenCalledWith( undefined );
+	} );
+
 	it( 'supports mixed value states', () => {
 		render(
 			<PresetInputControl
