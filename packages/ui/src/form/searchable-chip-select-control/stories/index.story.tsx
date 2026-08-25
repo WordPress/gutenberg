@@ -197,8 +197,11 @@ export const WithoutClearButton: Story = {
 export const Grouped: Story = {
 	...SearchableChipSelectStories.Grouped,
 	args: {
-		...Default.args,
 		...SearchableChipSelectStories.Grouped.args,
+		defaultValue: [
+			GROUPED_ITEMS[ 0 ].items[ 0 ],
+			GROUPED_ITEMS[ 1 ].items[ 0 ],
+		],
 		label: 'Fruit',
 		description: 'Choose your favorite fruits.',
 	},
