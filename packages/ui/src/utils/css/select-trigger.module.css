@@ -58,7 +58,7 @@
 			 * disabled, the token inherited from `.trigger` applies.
 			 */
 			.trigger[data-placeholder]:not([data-disabled]) & {
-				color: var(--wpds-color-foreground-content-neutral-weak);
+				color: var(--wpds-color-foreground-interactive-neutral-weak);
 			}
 		}
 
