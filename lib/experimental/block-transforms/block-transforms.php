@@ -11,8 +11,8 @@
  * Passes a block type's `transforms` through to its server-side registration.
  *
  * `register_block_type_from_metadata()` copies a fixed list of `block.json`
- * fields onto the block type. Until `transforms` joins that list in core, copy
- * it across here.
+ * fields onto the block type. This adds `transforms` to it for the WordPress
+ * versions the plugin supports that do not copy the field themselves.
  *
  * @param array $settings Block type settings.
  * @param array $metadata Raw `block.json` metadata.
