@@ -14,11 +14,13 @@ prompts:
           alignment in the block's serialized markup.
 
 extensions:
-    - file://../../lib/workspace-extension.mjs:extensionHook
+    $ref: lib/promptfooconfig.yaml#/extensions
 
-providers: file://../../lib/providers.yaml
+providers:
+    $ref: lib/promptfooconfig.yaml#/providers
 
-defaultTest: file://../../lib/default-test.yaml
+defaultTest:
+    $ref: lib/promptfooconfig.yaml#/defaultTest
 
 # `skills/testing/SKILL.md` is a router: it defers to references/jest.md,
 # references/php.md or references/e2e.md depending on the kind of test. An
@@ -80,12 +82,7 @@ tests:
             metric: Agent review of test quality
 
 evaluateOptions:
-    # A completed run takes about ninety seconds; this leaves room for a slow
-    # one while still cutting off an agent that has stopped making progress.
-    timeoutMs: 180000
-    # Never replay a cached agent run: an eval is only meaningful live.
-    cache: false
-    maxConcurrency: 2
-    repeat: 2
+    $ref: lib/promptfooconfig.yaml#/evaluateOptions
 
-outputPath: results/raw/testing.json
+outputPath:
+    $ref: lib/promptfooconfig.yaml#/outputPath
