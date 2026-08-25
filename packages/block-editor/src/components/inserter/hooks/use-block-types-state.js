@@ -77,17 +77,32 @@ const useBlockTypesState = ( rootClientId, onInsert, isQuick ) => {
 				return;
 			}
 
-			const insertedBlock =
-				syncStatus === 'unsynced'
-					? parse( content, {
-							__unstableSkipMigrationLogs: true,
-					  } )
-					: createBlock(
-							name,
-							initialAttributes,
-							createBlocksFromInnerBlocksTemplate( innerBlocks ),
-							innerContent
-					  );
+			const unsyncedFallbackBlock = createBlock(
+				name,
+				initialAttributes
+			);
+
+			const unsyncedBlocks = parse( content, {
+				__unstableSkipMigrationLogs: true,
+			} );
+
+			let insertedBlock;
+			if ( syncStatus === 'unsynced' ) {
+				if ( name === 'core/block' && initialAttributes?.ref ) {
+					insertedBlock = [ unsyncedFallbackBlock ];
+				} else if ( unsyncedBlocks.length ) {
+					insertedBlock = unsyncedBlocks;
+				} else {
+					insertedBlock = [ unsyncedFallbackBlock ];
+				}
+			} else {
+				insertedBlock = createBlock(
+					name,
+					initialAttributes,
+					createBlocksFromInnerBlocksTemplate( innerBlocks ),
+					innerContent
+				);
+			}
 			onInsert(
 				insertedBlock,
 				undefined,

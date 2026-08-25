@@ -13,6 +13,46 @@ import { INSERTER_PATTERN_TYPES } from '../block-patterns-tab/utils';
 import { isFiltered } from '../../../store/utils';
 
 /**
+ * Returns the blocks that should be inserted for a selected pattern.
+ *
+ * @param {Object}   pattern          The selected pattern.
+ * @param {Object[]} blocks           The parsed pattern blocks.
+ * @param {string}   selectedCategory The selected pattern category.
+ *
+ * @return {Object[]} Returns cloned blocks ready for insertion.
+ */
+export const getPatternBlocksForInsertion = (
+	pattern,
+	blocks,
+	selectedCategory
+) => {
+	let patternBlocks = blocks ?? [];
+	if (
+		pattern.type === INSERTER_PATTERN_TYPES.user &&
+		pattern.syncStatus !== 'unsynced'
+	) {
+		patternBlocks = [ createBlock( 'core/block', { ref: pattern.id } ) ];
+	}
+	if ( pattern.type === INSERTER_PATTERN_TYPES.user && ! blocks?.length ) {
+		patternBlocks = [ createBlock( 'core/block', { ref: pattern.id } ) ];
+	}
+
+	const clonedBlocks = patternBlocks.map( ( block ) => {
+		const clonedBlock = cloneBlock( block );
+		if (
+			clonedBlock.attributes.metadata?.categories?.includes(
+				selectedCategory
+			)
+		) {
+			clonedBlock.attributes.metadata.categories = [ selectedCategory ];
+		}
+		return clonedBlock;
+	} );
+
+	return clonedBlocks;
+};
+
+/**
  * Retrieves the block patterns inserter state.
  *
  * @param {Function} onInsert         function called when inserter a list of blocks.
@@ -22,6 +62,7 @@ import { isFiltered } from '../../../store/utils';
  *
  * @return {Array} Returns the patterns state. (patterns, categories, onSelect handler)
  */
+
 const usePatternsState = (
 	onInsert,
 	rootClientId,
@@ -109,25 +150,13 @@ const usePatternsState = (
 			if ( destinationRootClientId === null ) {
 				return;
 			}
-			const patternBlocks =
-				pattern.type === INSERTER_PATTERN_TYPES.user &&
-				pattern.syncStatus !== 'unsynced'
-					? [ createBlock( 'core/block', { ref: pattern.id } ) ]
-					: blocks;
+			const patternBlocks = getPatternBlocksForInsertion(
+				pattern,
+				blocks,
+				selectedCategory
+			);
 			onInsert(
-				( patternBlocks ?? [] ).map( ( block ) => {
-					const clonedBlock = cloneBlock( block );
-					if (
-						clonedBlock.attributes.metadata?.categories?.includes(
-							selectedCategory
-						)
-					) {
-						clonedBlock.attributes.metadata.categories = [
-							selectedCategory,
-						];
-					}
-					return clonedBlock;
-				} ),
+				patternBlocks,
 				pattern.name,
 				false,
 				destinationRootClientId
