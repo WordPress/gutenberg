@@ -227,12 +227,19 @@ export default function TableCellEdit( {
 			return;
 		}
 
-		const { rowIndex } = selectedCellPlacement;
+		// Select every row covered by the selection, or the selected
+		// cell's row.
+		const startRow = selectionRectangle
+			? selectionRectangle.startRow
+			: selectedCellPlacement.rowIndex;
+		const endRow = selectionRectangle
+			? selectionRectangle.endRow
+			: selectedCellPlacement.rowIndex;
 		const rowCellIds = cellPlacements
 			.filter(
 				( p ) =>
-					p.rowIndex <= rowIndex &&
-					p.rowIndex + p.rowSpan - 1 >= rowIndex
+					p.rowIndex <= endRow &&
+					p.rowIndex + p.rowSpan - 1 >= startRow
 			)
 			.map( ( p ) => p.clientId );
 
@@ -244,12 +251,19 @@ export default function TableCellEdit( {
 			return;
 		}
 
-		const { columnIndex } = selectedCellPlacement;
+		// Select every column covered by the selection, or the selected
+		// cell's column.
+		const startColumn = selectionRectangle
+			? selectionRectangle.startColumn
+			: selectedCellPlacement.columnIndex;
+		const endColumn = selectionRectangle
+			? selectionRectangle.endColumn
+			: selectedCellPlacement.columnIndex;
 		const columnCellIds = cellPlacements
 			.filter(
 				( p ) =>
-					p.columnIndex <= columnIndex &&
-					p.columnIndex + p.colSpan - 1 >= columnIndex
+					p.columnIndex <= endColumn &&
+					p.columnIndex + p.colSpan - 1 >= startColumn
 			)
 			.map( ( p ) => p.clientId );
 
