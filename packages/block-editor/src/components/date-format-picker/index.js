@@ -36,6 +36,14 @@ export default function DateFormatPicker( {
 	defaultFormat,
 	onChange,
 } ) {
+	const handleChecked = () => {
+		if ( null !== format && undefined !== format && format.length === 0 ) {
+			return false;
+		}
+
+		return ! format;
+	};
+
 	return (
 		<VStack
 			as="fieldset"
@@ -51,12 +59,15 @@ export default function DateFormatPicker( {
 					defaultFormat,
 					exampleDate
 				) }` }
-				checked={ ! format }
+				checked={ handleChecked() }
 				onChange={ ( checked ) =>
 					onChange( checked ? null : defaultFormat )
 				}
 			/>
-			{ format && (
+			{ ( ( null !== format &&
+				undefined !== format &&
+				format.length === 0 ) ||
+				format ) && (
 				<NonDefaultControls format={ format } onChange={ onChange } />
 			) }
 		</VStack>
@@ -113,8 +124,11 @@ function NonDefaultControls( { format, onChange } ) {
 
 	const [ isCustom, setIsCustom ] = useState(
 		() =>
-			!! format &&
-			! suggestedOptions.some( ( option ) => option.format === format )
+			format.length === 0 ||
+			( !! format &&
+				! suggestedOptions.some(
+					( option ) => option.format === format
+				) )
 	);
 
 	return (
