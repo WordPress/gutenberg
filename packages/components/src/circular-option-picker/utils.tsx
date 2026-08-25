@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import deprecated from '@wordpress/deprecated';
-import type { CircularOptionPickerPresentation } from './types';
+import type { CircularOptionPickerProps } from './types';
 
 export function warnIfCircularOptionPickerAsButtonsIsSet(
 	componentName: string,
@@ -18,9 +18,9 @@ export function warnIfCircularOptionPickerAsButtonsIsSet(
 }
 
 export function resolveCircularOptionPickerPresentation(
-	presentation?: CircularOptionPickerPresentation,
+	presentation?: CircularOptionPickerProps[ 'presentation' ],
 	asButtons?: boolean
-): CircularOptionPickerPresentation {
+): NonNullable< CircularOptionPickerProps[ 'presentation' ] > {
 	return presentation ?? ( asButtons ? 'toggle-buttons' : 'listbox' );
 }
 
@@ -32,7 +32,7 @@ export function getComputeCircularOptionPickerCommonProps(
 	loop?: boolean,
 	ariaLabel?: string,
 	ariaLabelledby?: string,
-	presentation?: CircularOptionPickerPresentation
+	presentation?: CircularOptionPickerProps[ 'presentation' ]
 ) {
 	const resolvedPresentation = resolveCircularOptionPickerPresentation(
 		presentation,

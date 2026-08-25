@@ -11,6 +11,5 @@ export {
 	resolveCircularOptionPickerPresentation,
 	warnIfCircularOptionPickerAsButtonsIsSet,
 } from './utils';
-export type { CircularOptionPickerPresentation } from './types';
 
 export default CircularOptionPicker;

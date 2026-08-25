@@ -1,4 +1,4 @@
-import type { CircularOptionPickerPresentation } from '../circular-option-picker';
+import type { CircularOptionPickerProps } from '../circular-option-picker/types';
 
 export type DuotonePickerProps = {
 	/**
@@ -80,7 +80,7 @@ export type DuotonePickerProps = {
 	 *
 	 * @default 'listbox'
 	 */
-	presentation?: CircularOptionPickerPresentation;
+	presentation?: CircularOptionPickerProps[ 'presentation' ];
 	/**
 	 * Whether the control should present as toggle buttons.
 	 *

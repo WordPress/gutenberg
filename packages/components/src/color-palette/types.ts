@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react';
 import type { DropdownProps } from '../dropdown/types';
 import type { HeadingSize } from '../heading/types';
-import type { CircularOptionPickerPresentation } from '../circular-option-picker';
+import type { CircularOptionPickerProps } from '../circular-option-picker/types';
 
 export type ColorObject = {
 	name: string;
@@ -37,7 +37,7 @@ type PaletteProps = {
 	selectedSlug?: string;
 	actions?: ReactNode;
 	headingLevel?: HeadingSize;
-	presentation: CircularOptionPickerPresentation;
+	presentation: NonNullable< CircularOptionPickerProps[ 'presentation' ] >;
 };
 
 export type SinglePaletteProps = PaletteProps & {
@@ -109,7 +109,7 @@ export type ColorPaletteProps = Pick<
 	 *
 	 * @default 'listbox'
 	 */
-	presentation?: CircularOptionPickerPresentation;
+	presentation?: CircularOptionPickerProps[ 'presentation' ];
 	/**
 	 * Whether the control should present as toggle buttons.
 	 *

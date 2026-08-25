@@ -4,18 +4,6 @@ import type { ButtonAsButtonProps } from '../button/types';
 import type { DropdownProps } from '../dropdown/types';
 import type { WordPressComponentProps } from '../context';
 
-/**
- * How the swatches behave and are exposed to assistive technology.
- *
- * - `listbox`: a single-tab-stop selection control with listbox semantics.
- * - `toggle-buttons`: individual toggle buttons with pressed states.
- * - `command-buttons`: individual command buttons without selection state.
- */
-export type CircularOptionPickerPresentation =
-	| 'listbox'
-	| 'toggle-buttons'
-	| 'command-buttons';
-
 export type CircularOptionPickerProps = {
 	/**
 	 * An ID to apply to the component.
@@ -53,7 +41,7 @@ export type CircularOptionPickerProps = {
 	 *
 	 * @default 'listbox'
 	 */
-	presentation?: CircularOptionPickerPresentation;
+	presentation?: 'listbox' | 'toggle-buttons' | 'command-buttons';
 	/**
 	 * Whether the control should present as toggle buttons.
 	 *
@@ -91,7 +79,10 @@ export type ListboxCircularOptionPickerProps = WithBaseId &
 
 export type ButtonsCircularOptionPickerProps = WithBaseId &
 	Omit< CircularOptionPickerProps, 'asButtons' | 'presentation' | 'loop' > & {
-		presentation: Exclude< CircularOptionPickerPresentation, 'listbox' >;
+		presentation: Exclude<
+			NonNullable< CircularOptionPickerProps[ 'presentation' ] >,
+			'listbox'
+		>;
 	};
 
 export type DropdownLinkActionProps = {
@@ -130,5 +121,5 @@ export type CircularOptionPickerContextProps = {
 	baseId?: string;
 	activeId?: string | null | undefined;
 	setActiveId?: ( newId: string | null | undefined ) => void;
-	presentation?: CircularOptionPickerPresentation;
+	presentation?: CircularOptionPickerProps[ 'presentation' ];
 };

@@ -1,5 +1,5 @@
 import type { HeadingSize } from '../heading/types';
-import type { CircularOptionPickerPresentation } from '../circular-option-picker';
+import type { CircularOptionPickerProps } from '../circular-option-picker/types';
 
 export type GradientObject = {
 	gradient: string;
@@ -74,7 +74,7 @@ type GradientPickerBaseProps = {
 	 *
 	 * @default 'listbox'
 	 */
-	presentation?: CircularOptionPickerPresentation;
+	presentation?: CircularOptionPickerProps[ 'presentation' ];
 	/**
 	 * Whether the control should present as toggle buttons.
 	 *
