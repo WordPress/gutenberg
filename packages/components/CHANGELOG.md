@@ -13,6 +13,7 @@
     -   `BorderBoxControl`, `BorderControl` ([#80437](https://github.com/WordPress/gutenberg/pull/80437))
     -   `ProgressBar` ([#80512](https://github.com/WordPress/gutenberg/pull/80512))
     -   `TextareaControl` ([#81353](https://github.com/WordPress/gutenberg/pull/81353))
+    -   `ZStack` ([#80514](https://github.com/WordPress/gutenberg/pull/80514))
 
 ### Enhancements
 
