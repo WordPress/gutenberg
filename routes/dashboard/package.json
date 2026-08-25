@@ -21,6 +21,7 @@
 		"@wordpress/icons": "file:../../packages/icons",
 		"@wordpress/notices": "file:../../packages/notices",
 		"@wordpress/preferences": "file:../../packages/preferences",
+		"@wordpress/route": "file:../../packages/route",
 		"@wordpress/ui": "file:../../packages/ui",
 		"@wordpress/viewport": "file:../../packages/viewport",
 		"@wordpress/warning": "file:../../packages/warning",
