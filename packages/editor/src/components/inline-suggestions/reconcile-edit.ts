@@ -1,4 +1,9 @@
-import { RichTextData, create } from '@wordpress/rich-text';
+import {
+	RichTextData,
+	create,
+	slice,
+	toHTMLString,
+} from '@wordpress/rich-text';
 import { wrapInlineMarker } from '../inline-markers';
 import {
 	SUGGESTION_FORMAT_NAME,
@@ -10,6 +15,7 @@ import {
 } from './format';
 import {
 	buildSuggestionMarkerAttributes,
+	formatsAdditionRunToExtend,
 	insertInlineAddition,
 	growInlineAddition,
 	rejectInlineAddition,
@@ -113,6 +119,84 @@ export function analyzeTextEdit(
 }
 
 /**
+ * Cap on how far a replacement is widened toward its word boundaries. Text
+ * without whitespace separators — CJK prose, a long URL — would otherwise
+ * widen a one-character correction across the whole run.
+ */
+const MAX_WORD_WIDEN_CHARS = 40;
+
+/**
+ * Widen a replacement to the whole words it lands inside.
+ *
+ * `analyzeTextEdit` trims the common prefix and suffix, which is exactly right
+ * for locating the edit but wrong for describing it: correcting "teh" to "the"
+ * shares a leading "t" and a trailing "e", so the raw edit is delete "eh",
+ * insert "he". That renders in the canvas as "tehhe" and in the sidebar as two
+ * notes quoting fragments of words, neither of which a reviewer can act on.
+ * Snapping both ends out to the surrounding word boundaries proposes the
+ * correction the way a person would describe it: replace "teh" with "the".
+ *
+ * The prefix and suffix are shared by construction, so extending the range in
+ * the previous text extends it by the identical characters in the next text.
+ *
+ * @param prevText     Text before the edit.
+ * @param nextText     Text after the edit.
+ * @param edit         The trimmed edit from `analyzeTextEdit`.
+ * @param [isUnmarked] Predicate reporting whether a prev-text range
+ *                     is free of suggestion markers; widening into a
+ *                     marker is declined so the narrow edit is used.
+ * @return The widened edit, or the original when it can't widen.
+ */
+export function widenReplaceToWords(
+	prevText: string,
+	nextText: string,
+	edit: TextEdit,
+	isUnmarked?: ( start: number, end: number ) => boolean
+): TextEdit {
+	if ( edit.kind !== 'replace' ) {
+		return edit;
+	}
+	const isWordChar = ( char: string | undefined ) =>
+		typeof char === 'string' && ! /\s/.test( char );
+
+	let start = edit.start;
+	while (
+		start > 0 &&
+		edit.start - start < MAX_WORD_WIDEN_CHARS &&
+		isWordChar( prevText[ start - 1 ] )
+	) {
+		start--;
+	}
+
+	let end = edit.end;
+	while (
+		end < prevText.length &&
+		end - edit.end < MAX_WORD_WIDEN_CHARS &&
+		isWordChar( prevText[ end ] )
+	) {
+		end++;
+	}
+
+	if ( start === edit.start && end === edit.end ) {
+		return edit;
+	}
+	if ( typeof isUnmarked === 'function' && ! isUnmarked( start, end ) ) {
+		return edit;
+	}
+
+	return {
+		...edit,
+		start,
+		end,
+		removedText: prevText.slice( start, end ),
+		insertedText: nextText.slice(
+			start,
+			nextText.length - ( prevText.length - end )
+		),
+	};
+}
+
+/**
  * Parse a block attribute value into a rich-text record, tolerating plain
  * strings and other non-rich values.
  *
@@ -152,12 +236,51 @@ function markerType( format: any ) {
 	return format?.attributes?.[ SUGGESTION_TYPE_ATTRIBUTE ] ?? null;
 }
 
+/**
+ * HTML of the inserted run when it carries inline formatting of its own, so the
+ * proposed addition can be marked up rather than flattened to plain text — a
+ * pasted `<strong>`/`<a href>` reaches the block as a new `content` value, and
+ * diffing only `record.text` would drop it.
+ *
+ * Returns null when the run is unformatted (the plain-text path stays exactly as
+ * it was) and when it already carries a suggestion marker: re-marking a marked
+ * run would nest one marker inside another.
+ *
+ * @param nextRecord Rich-text record of the value after the edit.
+ * @param edit       Normalized edit from `analyzeTextEdit`.
+ * @return HTML of the inserted run, or null.
+ */
+function insertedRunHTML( nextRecord: any, edit: TextEdit ): string | null {
+	if ( ! nextRecord || ! edit.insertedText ) {
+		return null;
+	}
+	const from = edit.start;
+	const to = from + edit.insertedText.length;
+	let hasFormats = false;
+	for ( let index = from; index < to; index++ ) {
+		const stack = nextRecord.formats?.[ index ];
+		if ( ! Array.isArray( stack ) || stack.length === 0 ) {
+			continue;
+		}
+		if ( stack.some( ( f: any ) => f.type === SUGGESTION_FORMAT_NAME ) ) {
+			return null;
+		}
+		hasFormats = true;
+	}
+	if ( ! hasFormats ) {
+		return null;
+	}
+	return toHTMLString( { value: slice( nextRecord, from, to ) } );
+}
+
 export interface MarkerAction {
 	/** Action kind. */
 	type: 'insert-add' | 'grow-add' | 'wrap-del' | 'remove-add';
 	/** Text to insert/append (insert-add, grow-add). */
 	text?: string;
-	/** Insertion offset (insert-add). */
+	/** HTML of the inserted run when it carries inline formatting (insert-add). */
+	html?: string;
+	/** Insertion offset (insert-add, grow-add). */
 	at?: number;
 	/** Range start (wrap-del). */
 	start?: number;
@@ -177,8 +300,8 @@ export interface MarkerAction {
  *
  * Handled cleanly:
  *   - insert into unmarked text                       -> new `add` marker
- *   - insert at the trailing edge of the author's own
- *     open `add` marker                               -> grow that marker
+ *   - insert inside, or at the trailing edge of, the
+ *     author's own `add` marker                       -> grow that marker
  *   - delete unmarked text                            -> new `del` marker (kept, struck through)
  *   - delete text already inside a `del` marker       -> no-op (already proposed for deletion)
  *   - delete the author's own `add` text              -> remove that marker (un-add)
@@ -251,38 +374,45 @@ export function planEditMarkers(
 	};
 
 	if ( edit.kind === 'insert' ) {
-		const left =
-			edit.start > 0 ? suggestionAt( record, edit.start - 1 ) : null;
-		const right = suggestionAt( record, edit.start );
-		const sameMarker =
-			left && right && markerId( left ) === markerId( right );
-
-		// Grow the author's own open addition when typing at its trailing edge
-		// (left edge is that marker, the insertion point is past its end).
-		const atAddTrailingEdge =
-			left &&
-			markerType( left ) === SUGGESTION_TYPE_ADDITION &&
-			! sameMarker;
-		if (
-			atAddTrailingEdge &&
-			( authorToken === null ||
-				left.attributes?.[ 'data-author' ] === authorToken )
-		) {
+		/*
+		 * Grow the author's own pending addition when the insertion point sits
+		 * inside it or at its trailing edge, rather than opening a second
+		 * suggestion over the same words. Nesting a new marker inside an
+		 * existing one splits it into two disjoint `<mark>` elements sharing an
+		 * id and leaves two notes claiming the same characters (#73411, finding
+		 * F-06).
+		 */
+		const extendable = formatsAdditionRunToExtend(
+			record.formats,
+			edit.start,
+			authorToken
+		);
+		if ( extendable ) {
 			return {
 				kind: 'insert',
 				actions: [
 					{
 						type: 'grow-add',
-						id: markerId( left ),
+						id: extendable.id,
 						text: edit.insertedText,
+						at: edit.start,
 					},
 				],
 			};
 		}
-		// Typing in the middle of an existing marker: leave to a later phase.
-		if ( sameMarker ) {
+		/*
+		 * Inside a marker this edit may not extend — a run proposed for
+		 * deletion, or someone else's addition. Splitting it would fragment a
+		 * marker whose accept/reject then acts on a partial range, so plan
+		 * nothing and leave the call to the caller.
+		 */
+		const left =
+			edit.start > 0 ? suggestionAt( record, edit.start - 1 ) : null;
+		const right = suggestionAt( record, edit.start );
+		if ( left && right && markerId( left ) === markerId( right ) ) {
 			return { kind: 'insert', actions: [] };
 		}
+		const html = insertedRunHTML( nextRecord, edit );
 		return {
 			kind: 'insert',
 			actions: [
@@ -290,6 +420,7 @@ export function planEditMarkers(
 					type: 'insert-add',
 					at: edit.start,
 					text: edit.insertedText,
+					...( html ? { html } : {} ),
 					newNote: true,
 				},
 			],
@@ -337,20 +468,30 @@ export function planEditMarkers(
 	}
 
 	// replace (type-over): only the clean unmarked case for now.
-	if ( isUnmarked( edit.start, edit.end ) ) {
+	const replaceEdit = widenReplaceToWords(
+		record.text,
+		nextRecord ? nextRecord.text : '',
+		edit,
+		isUnmarked
+	);
+	if ( isUnmarked( replaceEdit.start, replaceEdit.end ) ) {
+		// Widening moves both ends together, so the widened range still spans
+		// exactly the inserted run in `nextRecord`.
+		const html = insertedRunHTML( nextRecord, replaceEdit );
 		return {
 			kind: 'replace',
 			actions: [
 				{
 					type: 'wrap-del',
-					start: edit.start,
-					end: edit.end,
+					start: replaceEdit.start,
+					end: replaceEdit.end,
 					newNote: true,
 				},
 				{
 					type: 'insert-add',
-					at: edit.end,
-					text: edit.insertedText,
+					at: replaceEdit.end,
+					text: replaceEdit.insertedText,
+					...( html ? { html } : {} ),
 					newNote: true,
 				},
 			],
@@ -390,7 +531,8 @@ export function applyEditPlan(
 			case 'insert-add': {
 				const id = ids[ idIndex++ ];
 				result = insertInlineAddition( result, {
-					text: action.text!,
+					text: action.text,
+					html: action.html,
 					attributes: buildSuggestionMarkerAttributes( {
 						id,
 						type: SUGGESTION_TYPE_ADDITION,
@@ -415,6 +557,7 @@ export function applyEditPlan(
 					} ),
 					markerStart: range.start,
 					markerEnd: range.end,
+					at: action.at,
 				} );
 				break;
 			}

@@ -1,6 +1,7 @@
 import {
 	RichTextData,
 	create,
+	toHTMLString,
 	registerFormatType,
 	unregisterFormatType,
 	store as richTextStore,
@@ -214,6 +215,42 @@ describe( 'suggestion a11y role decoration', () => {
 			expect( addSuggestionRoleFormats( [] ) ).toEqual( [] );
 			expect( addSuggestionRoleFormats( undefined ) ).toBe( undefined );
 		} );
+
+		it( 'gives a format marker no insertion/deletion role', () => {
+			// A formatting suggestion neither adds nor removes text, so
+			// announcing it as a deletion tells a screen-reader user the run
+			// is slated for removal when it is not.
+			const { formats } = create( {
+				html: marker( 3, 'format', 'zz' ),
+			} );
+			const decorated = addSuggestionRoleFormats( formats );
+			const decoration = decorated[ 0 ].find(
+				( f: any ) => f.type === SUGGESTION_A11Y_FORMAT_NAME
+			);
+			expect( decoration ).toBeTruthy();
+			expect( decoration.attributes.role ).toBe( undefined );
+		} );
+
+		it( 'brackets every marker type with screen-reader announcements', () => {
+			for ( const [ type, word ] of [
+				[ 'add', 'addition' ],
+				[ 'del', 'deletion' ],
+				[ 'format', 'formatting change' ],
+			] ) {
+				const { formats } = create( { html: marker( 4, type, 'q' ) } );
+				const decoration = addSuggestionRoleFormats(
+					formats
+				)[ 0 ].find(
+					( f: any ) => f.type === SUGGESTION_A11Y_FORMAT_NAME
+				);
+				expect( decoration.attributes.start ).toBe(
+					`Start of suggested ${ word }.`
+				);
+				expect( decoration.attributes.end ).toBe(
+					`End of suggested ${ word }.`
+				);
+			}
+		} );
 	} );
 
 	describe( 'serialization safety', () => {
@@ -239,5 +276,160 @@ describe( 'suggestion a11y role decoration', () => {
 			expect( html ).toContain( 'data-suggestion-id="1"' );
 			expect( html ).toContain( 'b' );
 		} );
+
+		it( 'drops the announcement attributes read back from the editable DOM', () => {
+			const value = RichTextData.fromHTMLString(
+				`a<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="del"><span class="wp-suggestion-a11y" role="deletion" data-suggestion-a11y-start="Start of suggested deletion." data-suggestion-a11y-end="End of suggested deletion.">b</span></mark>c`
+			);
+			const html = value.toHTMLString();
+			expect( html ).not.toContain( 'data-suggestion-a11y' );
+			expect( html ).toContain( 'data-suggestion-id="1"' );
+			expect( html ).toContain( 'b' );
+		} );
+	} );
+} );
+
+describe( 'nested suggestion markers', () => {
+	beforeAll( () => {
+		registerSuggestionFormat();
+	} );
+
+	afterAll( () => {
+		for ( const name of [
+			SUGGESTION_FORMAT_NAME,
+			SUGGESTION_A11Y_FORMAT_NAME,
+		] ) {
+			if (
+				( select( richTextStore as any ) as any ).getFormatType( name )
+			) {
+				unregisterFormatType( name );
+			}
+		}
+	} );
+
+	/*
+	 * Two people suggesting over overlapping runs serialize as nested markers:
+	 * an inner marker whose text is also covered by an outer one. Offsets 0-2
+	 * are covered by the outer add only, offsets 3-4 by both.
+	 */
+	const nested =
+		'<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="add" data-author="4">out' +
+		'<mark class="wp-suggestion" data-suggestion-id="2" data-suggestion-type="del" data-author="7">in</mark>' +
+		'</mark>';
+
+	const decorationAt = ( decorated: any, offset: number ) =>
+		decorated[ offset ].find(
+			( f: any ) => f.type === SUGGESTION_A11Y_FORMAT_NAME
+		);
+
+	it( 'describes the marker that directly wraps the run', () => {
+		// The decoration renders innermost, so it belongs to the innermost
+		// marker covering the character. Taking the outer one announces the
+		// opposite change: a deletion read aloud as an addition.
+		const { formats } = create( { html: nested } );
+		const decorated = addSuggestionRoleFormats( formats );
+		const inner = decorationAt( decorated, 3 );
+		expect( inner.attributes.start ).toBe( 'Start of suggested deletion.' );
+		expect( inner.attributes.end ).toBe( 'End of suggested deletion.' );
+		expect( inner.attributes.role ).toBe( 'deletion' );
+	} );
+
+	it( 'carries the wrapping marker type and author on the decoration', () => {
+		// Announcement CSS names the suggester off these; reading them from an
+		// ancestor instead would let the outer marker claim the inner run.
+		const { formats } = create( { html: nested } );
+		const decorated = addSuggestionRoleFormats( formats );
+		expect( decorationAt( decorated, 0 ).attributes ).toEqual(
+			expect.objectContaining( {
+				author: '4',
+				suggestionType: 'add',
+			} )
+		);
+		expect( decorationAt( decorated, 3 ).attributes ).toEqual(
+			expect.objectContaining( {
+				author: '7',
+				suggestionType: 'del',
+			} )
+		);
+	} );
+
+	it( 'gives the outer and inner runs distinct decorations', () => {
+		const { formats } = create( { html: nested } );
+		const decorated = addSuggestionRoleFormats( formats );
+		expect( decorationAt( decorated, 0 ) ).not.toBe(
+			decorationAt( decorated, 3 )
+		);
+	} );
+
+	it( 'omits the attributes a marker does not carry', () => {
+		// rich-text renders every key in the attribute object, so a missing
+		// author must be absent rather than the string "undefined".
+		const { formats } = create( {
+			html: '<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="del">x</mark>',
+		} );
+		const { attributes } = decorationAt(
+			addSuggestionRoleFormats( formats ),
+			0
+		);
+		expect( attributes ).not.toHaveProperty( 'author' );
+		expect( attributes.suggestionType ).toBe( 'del' );
+	} );
+
+	it( 'never serializes the decoration attributes into content', () => {
+		const value = RichTextData.fromHTMLString( nested );
+		const html = value.toHTMLString();
+		expect( html ).not.toContain( 'wp-suggestion-a11y' );
+		expect( html ).toContain( 'data-author="4"' );
+		expect( html ).toContain( 'data-author="7"' );
+	} );
+} );
+
+describe( 'announcement element boundaries', () => {
+	beforeAll( () => {
+		registerSuggestionFormat();
+	} );
+
+	afterAll( () => {
+		for ( const name of [
+			SUGGESTION_FORMAT_NAME,
+			SUGGESTION_A11Y_FORMAT_NAME,
+		] ) {
+			if (
+				( select( richTextStore as any ) as any ).getFormatType( name )
+			) {
+				unregisterFormatType( name );
+			}
+		}
+	} );
+
+	/**
+	 * Serialize a marker through the editable-tree preparation pass and count
+	 * the announcement elements it produced.
+	 *
+	 * @param html Marker HTML.
+	 * @return Number of `.wp-suggestion-a11y` elements rendered.
+	 */
+	function countAnnouncements( html: string ): number {
+		const value = create( { html } );
+		const rendered = toHTMLString( {
+			value: {
+				...value,
+				formats: addSuggestionRoleFormats( value.formats ),
+			},
+		} );
+		return ( rendered.match( /wp-suggestion-a11y/g ) ?? [] ).length;
+	}
+
+	it.each( [
+		[ 'a bold run', '<strong>bold</strong> tail' ],
+		[ 'a link', '<a href="https://w.org">link</a> tail' ],
+		[ 'a trailing format', 'head <em>italic</em>' ],
+		[ 'an interior format', 'head <em>mid</em> tail' ],
+	] )( 'brackets a marker containing %s exactly once', ( _label, inner ) => {
+		expect(
+			countAnnouncements(
+				`<mark class="wp-suggestion" data-suggestion-id="1" data-suggestion-type="del" data-author="2">${ inner }</mark>`
+			)
+		).toBe( 1 );
 	} );
 } );
