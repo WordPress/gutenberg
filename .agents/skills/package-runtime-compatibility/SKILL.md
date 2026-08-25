@@ -1,6 +1,6 @@
 ---
 name: package-runtime-compatibility
-description: Use when planning, implementing, or reviewing a change to a published package that may break existing consumers, or where the package and independently supplied dependencies can run at different versions, including WordPress globals or script modules, alternate entrypoints, private-to-public migrations, dependency export changes, or duplicate singleton runtimes; do not use for internal changes with no public or cross-version compatibility risk or for consumer-only application work.
+description: Use when changing a published package's imports, exports, entrypoints, or dependencies, especially when WordPress can supply a different dependency version at runtime.
 ---
 
 # Assess package and runtime compatibility
