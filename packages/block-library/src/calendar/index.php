@@ -43,18 +43,14 @@ function render_block_core_calendar( $attributes ) {
 		}
 	}
 
-	// Text and background are applied to the table, not the wrapper.
-	// Skipping wrapper serialization matches #42029: a fill on the outer
-	// container also paints the caption and nav, which most users do not want.
+	// Text stays on the table so cell content inherits it. Background serializes
+	// on the wrapper so padding is filled (see #64345). Skip-serializing text
+	// still matches #42029 for the text color path.
 	$color_block_styles = array();
 
 	$preset_text_color          = array_key_exists( 'textColor', $attributes ) ? "var:preset|color|{$attributes['textColor']}" : null;
 	$custom_text_color          = $attributes['style']['color']['text'] ?? null;
 	$color_block_styles['text'] = $preset_text_color ? $preset_text_color : $custom_text_color;
-
-	$preset_background_color          = array_key_exists( 'backgroundColor', $attributes ) ? "var:preset|color|{$attributes['backgroundColor']}" : null;
-	$custom_background_color          = $attributes['style']['color']['background'] ?? null;
-	$color_block_styles['background'] = $preset_background_color ? $preset_background_color : $custom_background_color;
 
 	$styles        = wp_style_engine_get_styles( array( 'color' => $color_block_styles ), array( 'convert_vars_to_classnames' => true ) );
 	$inline_styles = $styles['css'] ?? '';
@@ -62,6 +58,8 @@ function render_block_core_calendar( $attributes ) {
 	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
 		$classnames[] = 'has-link-color';
 	}
+
+	$block_gap_css = block_core_calendar_get_block_gap_css( $attributes );
 
 	$border_block_styles = $attributes['style']['border'] ?? array();
 
@@ -85,7 +83,7 @@ function render_block_core_calendar( $attributes ) {
 	while ( $processor->next_tag() ) {
 		$tag_name = $processor->get_tag();
 
-		// Apply text and background color classes and styles to the main table.
+		// Apply text color classes and styles to the main table.
 		if ( 'TABLE' === $tag_name ) {
 			if ( ! empty( $inline_styles ) ) {
 				$processor->set_attribute( 'style', $inline_styles );
@@ -96,6 +94,13 @@ function render_block_core_calendar( $attributes ) {
 					$processor->add_class( $classname );
 				}
 			}
+		}
+
+		if ( 'CAPTION' === $tag_name && '' !== $block_gap_css ) {
+			$current_style  = $processor->get_attribute( 'style' ) ?? '';
+			$combined_style = trim( $current_style, ';' );
+			$combined_style = $combined_style ? $combined_style . ';' : '';
+			$processor->set_attribute( 'style', $combined_style . 'margin-bottom:' . $block_gap_css );
 		}
 
 		// Add border classes and inline styles to all table header th and data td cells.
@@ -155,6 +160,37 @@ function register_block_core_calendar() {
 }
 
 add_action( 'init', 'register_block_core_calendar' );
+
+/**
+ * Returns a CSS value for the Calendar block's blockGap, used as space between
+ * the month/year caption and the date grid.
+ *
+ * @since 6.9.0
+ *
+ * @param array $attributes Block attributes.
+ * @return string CSS gap value, or an empty string when unset or unsafe.
+ */
+function block_core_calendar_get_block_gap_css( $attributes ) {
+	$gap = $attributes['style']['spacing']['blockGap'] ?? null;
+
+	if ( is_array( $gap ) ) {
+		$gap = $gap['top'] ?? $gap['left'] ?? '';
+	}
+
+	$gap = is_string( $gap ) ? $gap : '';
+
+	if ( '' === $gap || preg_match( '%[\\\(&=}]|/\*%', $gap ) ) {
+		return '';
+	}
+
+	if ( str_contains( $gap, 'var:preset|spacing|' ) ) {
+		$index_to_splice = strrpos( $gap, '|' ) + 1;
+		$slug            = _wp_to_kebab_case( substr( $gap, $index_to_splice ) );
+		return "var(--wp--preset--spacing--$slug)";
+	}
+
+	return $gap;
+}
 
 /**
  * Returns whether or not there are any published posts.
