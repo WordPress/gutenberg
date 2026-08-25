@@ -2,6 +2,7 @@ import {
 	getCellPlacements,
 	getColumnInsertionActions,
 	getRowInsertionActions,
+	getSplitActions,
 } from '../utils';
 
 function createCell( clientId, attributes = {} ) {
@@ -408,6 +409,98 @@ describe( 'getRowInsertionActions', () => {
 		expect( [ ...rowSpanExtensions ] ).toEqual( [
 			[ 'a', 3 ],
 			[ 'b', 3 ],
+		] );
+	} );
+} );
+
+describe( 'getSplitActions', () => {
+	it( 'returns null for an unmerged cell', () => {
+		const sections = [
+			createSection( 'body', [
+				createRow( 'row-1', [ createCell( 'a' ), createCell( 'b' ) ] ),
+			] ),
+		];
+
+		expect(
+			getSplitActions( getCellPlacements( sections ), 'a' )
+		).toBeNull();
+	} );
+
+	it( 'refills the remaining columns of a colSpan in its own row', () => {
+		const sections = [
+			createSection( 'body', [
+				createRow( 'row-1', [
+					createCell( 'a' ),
+					createCell( 'b', { colSpan: 2 } ),
+					createCell( 'c' ),
+				] ),
+			] ),
+		];
+		const split = getSplitActions( getCellPlacements( sections ), 'b' );
+
+		expect( split.resetClientId ).toBe( 'b' );
+		expect( [ ...split.insertionsByRow ] ).toEqual( [
+			[ 0, { insertIndex: 2, count: 1 } ],
+		] );
+	} );
+
+	it( 'refills the rows covered by a rowSpan', () => {
+		const sections = [
+			createSection( 'body', [
+				createRow( 'row-1', [
+					createCell( 'a' ),
+					createCell( 'b', { rowSpan: 2 } ),
+				] ),
+				createRow( 'row-2', [ createCell( 'c' ), createCell( 'd' ) ] ),
+			] ),
+		];
+		const split = getSplitActions( getCellPlacements( sections ), 'b' );
+
+		expect( [ ...split.insertionsByRow ] ).toEqual( [
+			[ 0, { insertIndex: 2, count: 0 } ],
+			[ 1, { insertIndex: 1, count: 1 } ],
+		] );
+	} );
+
+	it( 'refills rows and columns for a cell with rowSpan and colSpan', () => {
+		const sections = [
+			createSection( 'body', [
+				createRow( 'row-1', [
+					createCell( 'a', { rowSpan: 2, colSpan: 2 } ),
+					createCell( 'b' ),
+				] ),
+				createRow( 'row-2', [ createCell( 'c' ) ] ),
+			] ),
+		];
+		const split = getSplitActions( getCellPlacements( sections ), 'a' );
+
+		expect( [ ...split.insertionsByRow ] ).toEqual( [
+			[ 0, { insertIndex: 1, count: 1 } ],
+			[ 1, { insertIndex: 0, count: 2 } ],
+		] );
+	} );
+
+	it( 'derives the insertion index from the visual column when a span from above shifts the row', () => {
+		const sections = [
+			createSection( 'body', [
+				createRow( 'row-1', [
+					createCell( 'a', { rowSpan: 2 } ),
+					createCell( 'b' ),
+					createCell( 'c' ),
+				] ),
+				createRow( 'row-2', [
+					createCell( 'd', { rowSpan: 2, colSpan: 2 } ),
+				] ),
+				createRow( 'row-3', [ createCell( 'e' ) ] ),
+			] ),
+		];
+		// d is visually at column 1 (a covers column 0 of row 1), so the
+		// cells refilling row 3 go after e, not before it.
+		const split = getSplitActions( getCellPlacements( sections ), 'd' );
+
+		expect( [ ...split.insertionsByRow ] ).toEqual( [
+			[ 1, { insertIndex: 1, count: 1 } ],
+			[ 2, { insertIndex: 1, count: 2 } ],
 		] );
 	} );
 } );

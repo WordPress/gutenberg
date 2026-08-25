@@ -73,6 +73,55 @@ export function groupPlacementsByRow( cellPlacements ) {
 }
 
 /**
+ * Computes how to split a merged cell: reset its spans and refill the slots
+ * it covered with new cells.
+ *
+ * The cell's own row gets new cells for the remaining columns of the span,
+ * inserted right after it. Every other row it spans into gets new cells for
+ * all columns of the span, at the raw index matching the cell's visual
+ * column.
+ *
+ * @param {Array}  cellPlacements Span-aware cell placements.
+ * @param {string} clientId       Client ID of the merged cell.
+ * @return {Object|null} Object with resetClientId and insertionsByRow (Map
+ *                       of row index to { insertIndex, count }), or null if
+ *                       the cell is not merged.
+ */
+export function getSplitActions( cellPlacements, clientId ) {
+	const placement = cellPlacements.find( ( p ) => p.clientId === clientId );
+	if ( ! placement || ( placement.rowSpan <= 1 && placement.colSpan <= 1 ) ) {
+		return null;
+	}
+
+	const placementsByRow = groupPlacementsByRow( cellPlacements );
+	const insertionsByRow = new Map();
+
+	for ( let rowOffset = 0; rowOffset < placement.rowSpan; rowOffset++ ) {
+		const rowIndex = placement.rowIndex + rowOffset;
+		const rowPlacements = placementsByRow.get( rowIndex ) || [];
+
+		if ( rowOffset === 0 ) {
+			insertionsByRow.set( rowIndex, {
+				insertIndex:
+					rowPlacements.findIndex(
+						( p ) => p.clientId === clientId
+					) + 1,
+				count: placement.colSpan - 1,
+			} );
+		} else {
+			insertionsByRow.set( rowIndex, {
+				insertIndex: rowPlacements.filter(
+					( p ) => p.columnIndex < placement.columnIndex
+				).length,
+				count: placement.colSpan,
+			} );
+		}
+	}
+
+	return { resetClientId: clientId, insertionsByRow };
+}
+
+/**
  * Computes how to insert a column at a visual column index.
  *
  * A cell spanning across the inserted column grows its colSpan to cover it

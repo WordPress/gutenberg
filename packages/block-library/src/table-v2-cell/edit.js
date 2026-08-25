@@ -30,6 +30,7 @@ import {
 	getCellPlacements,
 	getColumnInsertionActions,
 	getRowInsertionActions,
+	getSplitActions,
 	groupPlacementsByRow,
 } from './utils';
 
@@ -73,17 +74,6 @@ function getTableClientId( selectors, clientId ) {
 		}
 	}
 	return null;
-}
-
-/**
- * Gets the row block clientId from a cell's clientId.
- *
- * @param {Object} selectors Bound block editor selectors.
- * @param {string} clientId  Cell block client ID.
- * @return {string|null} Row block client ID, or null if not found.
- */
-function getRowClientId( selectors, clientId ) {
-	return selectors.getBlockRootClientId( clientId );
 }
 
 /**
@@ -334,109 +324,69 @@ export default function TableCellEdit( {
 		} );
 	}
 
+	// Splits a merged cell: resets its spans and refills the slots it
+	// covered with new cells. Dispatches are not batched here; the caller
+	// wraps them in a batch.
+	function splitCell( clientIdToSplit ) {
+		const selectors = registry.select( blockEditorStore );
+		const placements = getCellPlacements(
+			selectors.getBlocks( tableClientId )
+		);
+		const split = getSplitActions( placements, clientIdToSplit );
+		if ( ! split ) {
+			return;
+		}
+
+		const cellBlock = selectors.getBlock( clientIdToSplit );
+		const createNewCell = () =>
+			createBlock( 'core/table-v2-cell', {
+				tag: cellBlock.attributes.tag,
+				scope: cellBlock.attributes.scope,
+				content: '',
+			} );
+
+		const sections = selectors.getBlocks( tableClientId );
+		let rowIndex = 0;
+		for ( const section of sections ) {
+			const sectionRows = selectors.getBlocks( section.clientId );
+			for ( const row of sectionRows ) {
+				const insertion = split.insertionsByRow.get( rowIndex );
+				rowIndex++;
+				if ( ! insertion ) {
+					continue;
+				}
+				const rowCells = selectors.getBlocks( row.clientId );
+				const nextCells = [
+					...rowCells.slice( 0, insertion.insertIndex ),
+					...Array.from( { length: insertion.count }, createNewCell ),
+					...rowCells.slice( insertion.insertIndex ),
+					// The span reset goes through the replacement because
+					// replaceInnerBlocks re-inserts the passed blocks with
+					// their read-time attributes.
+				].map( ( cell ) =>
+					cell.clientId === split.resetClientId
+						? {
+								...cell,
+								attributes: {
+									...cell.attributes,
+									rowSpan: 1,
+									colSpan: 1,
+								},
+						  }
+						: cell
+				);
+				replaceInnerBlocks( row.clientId, nextCells, false );
+			}
+		}
+	}
+
 	function onUnmergeCells() {
 		if ( rowSpan <= 1 && colSpan <= 1 ) {
 			return;
 		}
-		if ( ! selectedCellPlacement ) {
-			return;
-		}
-
-		const selectors = registry.select( blockEditorStore );
-		const rowClientId = getRowClientId( selectors, clientId );
-		if ( ! rowClientId ) {
-			return;
-		}
-		const sectionClientId = getSectionClientId( selectors, rowClientId );
-		if ( ! sectionClientId ) {
-			return;
-		}
-
-		const rowBlocks = selectors.getBlocks( rowClientId );
-		const cellIndex = rowBlocks.findIndex(
-			( b ) => b.clientId === clientId
-		);
-
-		const sectionRows = selectors.getBlocks( sectionClientId );
-		const rowIndexInSection = sectionRows.findIndex(
-			( b ) => b.clientId === rowClientId
-		);
-
-		const { rowIndex: mergedRowIndex, columnIndex: mergedColumnIndex } =
-			selectedCellPlacement;
-
-		const createNewCell = () =>
-			createBlock( 'core/table-v2-cell', {
-				tag: CellTag,
-				scope: attributes.scope,
-				content: '',
-			} );
-
 		// Batch the span reset and cell insertions into a single undo level.
 		registry.batch( () => {
-			// The merged cell's row: reset its spans and insert new cells
-			// for the remaining columns of the span. The reset goes through
-			// the replacement because replaceInnerBlocks re-inserts the
-			// passed blocks, and the block objects read above predate any
-			// attribute update.
-			const cellsToAdd = Array.from(
-				{ length: colSpan - 1 },
-				createNewCell
-			);
-			const nextCells = [
-				...rowBlocks.slice( 0, cellIndex + 1 ),
-				...cellsToAdd,
-				...rowBlocks.slice( cellIndex + 1 ),
-			].map( ( cell ) =>
-				cell.clientId === clientId
-					? {
-							...cell,
-							attributes: {
-								...cell.attributes,
-								rowSpan: 1,
-								colSpan: 1,
-							},
-					  }
-					: cell
-			);
-			replaceInnerBlocks( rowClientId, nextCells, false );
-
-			// Subsequent rows covered by the rowSpan need new cells for
-			// all columns of the span.
-			for ( let rowOffset = 1; rowOffset < rowSpan; rowOffset++ ) {
-				const targetRow = sectionRows[ rowIndexInSection + rowOffset ];
-				if ( ! targetRow ) {
-					break;
-				}
-				const targetRowCells = selectors.getBlocks(
-					targetRow.clientId
-				);
-				const newRowCells = Array.from(
-					{ length: colSpan },
-					createNewCell
-				);
-				// Insert at the raw index matching the merged cell's
-				// visual column: the cells in the target row placed
-				// before that column come first. The merged cell's raw
-				// index in its own row would be wrong whenever a span
-				// from above shifts it away from its visual column.
-				const targetRowIndex = mergedRowIndex + rowOffset;
-				const insertIndex = cellPlacements.filter(
-					( p ) =>
-						p.rowIndex === targetRowIndex &&
-						p.columnIndex < mergedColumnIndex
-				).length;
-				const nextTargetCells = [
-					...targetRowCells.slice( 0, insertIndex ),
-					...newRowCells,
-					...targetRowCells.slice( insertIndex ),
-				];
-				replaceInnerBlocks(
-					targetRow.clientId,
-					nextTargetCells,
-					false
-				);
-			}
+			splitCell( clientId );
 		} );
 	}
 
