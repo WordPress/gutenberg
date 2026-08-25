@@ -27,4 +27,14 @@
 	justify-content: center;
 	gap: $grid-unit-20;
 	padding: $grid-unit-20 $grid-unit-40 $grid-unit-30;
+
+	// `HistoryActions` is the only child, and it renders nothing when the
+	// canvas is off screen — below `large` an open Details panel replaces it.
+	// The bar would otherwise keep its padding around no content, leaving a
+	// blank strip under the panel on the narrowest viewports. Collapsing on
+	// `:empty` keeps that knowledge out of the frame, which is why
+	// `renderFrame` has no `hasCanvas` prop.
+	&:empty {
+		display: none;
+	}
 }
