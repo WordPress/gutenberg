@@ -1,4 +1,4 @@
-import { getCellPlacements } from '../utils';
+import { getCellPlacements, getColumnInsertionActions } from '../utils';
 
 function createCell( clientId, attributes = {} ) {
 	return {
@@ -201,5 +201,112 @@ describe( 'getCellPlacements', () => {
 				sectionType: 'body',
 			},
 		] );
+	} );
+} );
+
+describe( 'getColumnInsertionActions', () => {
+	it( 'inserts at the raw index matching the visual column', () => {
+		const sections = [
+			createSection( 'body', [
+				createRow( 'row-1', [ createCell( 'a' ), createCell( 'b' ) ] ),
+				createRow( 'row-2', [ createCell( 'c' ), createCell( 'd' ) ] ),
+			] ),
+		];
+		const actions = getColumnInsertionActions(
+			getCellPlacements( sections ),
+			1
+		);
+
+		expect( actions.get( 0 ) ).toEqual( { insertIndex: 1 } );
+		expect( actions.get( 1 ) ).toEqual( { insertIndex: 1 } );
+	} );
+
+	it( 'expands a cell when the column passes through its interior', () => {
+		const sections = [
+			createSection( 'body', [
+				createRow( 'row-1', [
+					createCell( 'a', { colSpan: 2 } ),
+					createCell( 'b' ),
+				] ),
+				createRow( 'row-2', [
+					createCell( 'c' ),
+					createCell( 'd' ),
+					createCell( 'e' ),
+				] ),
+			] ),
+		];
+		const actions = getColumnInsertionActions(
+			getCellPlacements( sections ),
+			1
+		);
+
+		expect( actions.get( 0 ) ).toEqual( {
+			expandClientId: 'a',
+			newColSpan: 3,
+		} );
+		expect( actions.get( 1 ) ).toEqual( { insertIndex: 1 } );
+	} );
+
+	it( 'adds no cell to the rows a merged cell spans into', () => {
+		const sections = [
+			createSection( 'body', [
+				createRow( 'row-1', [
+					createCell( 'a', { rowSpan: 2, colSpan: 2 } ),
+					createCell( 'b' ),
+				] ),
+				createRow( 'row-2', [ createCell( 'c' ) ] ),
+				createRow( 'row-3', [
+					createCell( 'd' ),
+					createCell( 'e' ),
+					createCell( 'f' ),
+				] ),
+			] ),
+		];
+		const actions = getColumnInsertionActions(
+			getCellPlacements( sections ),
+			1
+		);
+
+		expect( actions.get( 0 ) ).toEqual( {
+			expandClientId: 'a',
+			newColSpan: 3,
+		} );
+		expect( actions.get( 1 ) ).toBeUndefined();
+		expect( actions.get( 2 ) ).toEqual( { insertIndex: 1 } );
+	} );
+
+	it( 'inserts rather than expands when a span lands exactly on the column', () => {
+		const sections = [
+			createSection( 'body', [
+				createRow( 'row-1', [
+					createCell( 'x' ),
+					createCell( 'a', { rowSpan: 2 } ),
+				] ),
+				createRow( 'row-2', [ createCell( 'b' ) ] ),
+			] ),
+		];
+		const actions = getColumnInsertionActions(
+			getCellPlacements( sections ),
+			1
+		);
+
+		expect( actions.get( 0 ) ).toEqual( { insertIndex: 1 } );
+		expect( actions.get( 1 ) ).toEqual( { insertIndex: 1 } );
+	} );
+
+	it( 'inserts at the table boundaries', () => {
+		const sections = [
+			createSection( 'body', [
+				createRow( 'row-1', [ createCell( 'a' ), createCell( 'b' ) ] ),
+			] ),
+		];
+		const placements = getCellPlacements( sections );
+
+		expect( getColumnInsertionActions( placements, 0 ).get( 0 ) ).toEqual( {
+			insertIndex: 0,
+		} );
+		expect( getColumnInsertionActions( placements, 2 ).get( 0 ) ).toEqual( {
+			insertIndex: 2,
+		} );
 	} );
 } );

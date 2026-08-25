@@ -26,7 +26,11 @@ import {
 	tableRowDelete,
 	ungroup,
 } from '@wordpress/icons';
-import { getCellPlacements } from './utils';
+import {
+	getCellPlacements,
+	getColumnInsertionActions,
+	groupPlacementsByRow,
+} from './utils';
 
 const DEFAULT_SELECTION_BORDER = {
 	color: '#000000',
@@ -121,23 +125,6 @@ function getSelectionRectangle( placements, selectedClientIds ) {
 			...selectedPlacements.map( ( p ) => p.columnIndex + p.colSpan - 1 )
 		),
 	};
-}
-
-/**
- * Groups cell placements by row index.
- *
- * @param {Array} cellPlacements Cell placements.
- * @return {Map} Map of row index to the row's placements.
- */
-function groupPlacementsByRow( cellPlacements ) {
-	const byRow = new Map();
-	for ( const placement of cellPlacements ) {
-		if ( ! byRow.has( placement.rowIndex ) ) {
-			byRow.set( placement.rowIndex, [] );
-		}
-		byRow.get( placement.rowIndex ).push( placement );
-	}
-	return byRow;
 }
 
 export default function TableCellEdit( {
@@ -619,12 +606,14 @@ export default function TableCellEdit( {
 		// column past its last.
 		const targetColumn =
 			delta === 0 ? columnIndex : columnIndex + selectedColSpan;
-
 		// Insert a cell at the same visual column in every row.
 		const sections = registry
 			.select( blockEditorStore )
 			.getBlocks( tableClientId );
-		const placementsByRow = groupPlacementsByRow( cellPlacements );
+		const actionsByRow = getColumnInsertionActions(
+			cellPlacements,
+			targetColumn
+		);
 
 		registry.batch( () => {
 			let rowIndex = 0;
@@ -634,29 +623,22 @@ export default function TableCellEdit( {
 					.getBlocks( section.clientId );
 
 				for ( const row of sectionRows ) {
-					const rowPlacements = placementsByRow.get( rowIndex ) || [];
+					const action = actionsByRow.get( rowIndex );
 					rowIndex++;
 
+					if ( ! action ) {
+						continue;
+					}
+
 					// A cell spanning across the inserted column grows to
-					// cover it instead of gaining a sibling cell.
-					const spanningPlacement = rowPlacements.find(
-						( placement ) =>
-							placement.columnIndex < targetColumn &&
-							placement.columnIndex + placement.colSpan - 1 >=
-								targetColumn
-					);
-					if ( spanningPlacement ) {
-						updateBlockAttributes( spanningPlacement.clientId, {
-							colSpan: spanningPlacement.colSpan + 1,
+					// cover it instead of the row gaining a cell.
+					if ( action.expandClientId ) {
+						updateBlockAttributes( action.expandClientId, {
+							colSpan: action.newColSpan,
 						} );
 						continue;
 					}
 
-					// The raw insertion index follows from the visual
-					// column: the row's cells placed before it come first.
-					const insertIndex = rowPlacements.filter(
-						( placement ) => placement.columnIndex < targetColumn
-					).length;
 					const rowCells = registry
 						.select( blockEditorStore )
 						.getBlocks( row.clientId );
@@ -671,9 +653,9 @@ export default function TableCellEdit( {
 					} );
 
 					const nextCells = [
-						...rowCells.slice( 0, insertIndex ),
+						...rowCells.slice( 0, action.insertIndex ),
 						newCell,
-						...rowCells.slice( insertIndex ),
+						...rowCells.slice( action.insertIndex ),
 					];
 
 					replaceInnerBlocks( row.clientId, nextCells, false );
