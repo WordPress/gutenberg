@@ -7,6 +7,8 @@ import {
 	getBlockType,
 	registerBlockType,
 	unregisterBlockType,
+	// eslint-disable-next-line camelcase
+	unstable__bootstrapServerSideBlockDefinitions,
 } from '../registration';
 
 describe( 'mergeBlockTransforms', () => {
@@ -216,5 +218,46 @@ describe( 'block transforms declared in metadata', () => {
 
 		expect( result.name ).toBe( target );
 		expect( result.attributes.title ).toBe( 'Hello' );
+	} );
+} );
+
+describe( 'transforms declared in metadata after a server bootstrap', () => {
+	const name = 'test/bootstrapped';
+
+	afterEach( () => {
+		unregisterBlockType( name );
+	} );
+
+	it( 'keeps declared transforms the server does not send', () => {
+		/*
+		 * The store keeps a server-provided definition over a client one, and
+		 * `get_block_editor_server_block_settings()` sends no transforms. A
+		 * block registered after that bootstrap must still get them.
+		 */
+		unstable__bootstrapServerSideBlockDefinitions( {
+			[ name ]: {
+				apiVersion: 3,
+				title: 'Bootstrapped',
+				category: 'text',
+				attributes: {},
+			},
+		} );
+
+		registerBlockType(
+			{
+				name,
+				apiVersion: 3,
+				attributes: {},
+				transforms: {
+					from: [ { type: 'raw', selector: 'aside' } ],
+				},
+			},
+			{ title: 'Bootstrapped', category: 'text', save: () => null }
+		);
+
+		const [ transform ] = getBlockType( name ).transforms.from;
+
+		expect( transform.type ).toBe( 'raw' );
+		expect( transform.selector ).toBe( 'aside' );
 	} );
 } );

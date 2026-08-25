@@ -2,6 +2,10 @@ import { select, dispatch } from '@wordpress/data';
 import { _x } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
 import i18nBlockSchema from './i18n-block.json';
+import {
+	mergeBlockTransforms,
+	normalizeMetadataTransforms,
+} from './metadata-transforms';
 import { store as blocksStore } from '../store';
 import { unlock } from '../lock-unlock';
 import type {
@@ -69,7 +73,6 @@ function getBlockSettingsFromMetadata( {
 		'variations',
 		'blockHooks',
 		'allowedBlocks',
-		'transforms',
 	];
 
 	const settings = Object.fromEntries(
@@ -170,12 +173,32 @@ export function registerBlockType<
 		dispatch( blocksStore )
 	);
 
+	let declaredTransforms;
+
 	if ( isObject( blockNameOrMetadata ) ) {
 		const metadata = getBlockSettingsFromMetadata( blockNameOrMetadata );
 		addBootstrappedBlockType( name, metadata );
+
+		/*
+		 * Transforms are merged here rather than travelling with the rest of the
+		 * metadata, because the store keeps a server-provided definition over a
+		 * client one, and the server does not send transforms.
+		 */
+		declaredTransforms = normalizeMetadataTransforms(
+			blockNameOrMetadata.transforms as any,
+			name
+		);
 	}
 
-	addUnprocessedBlockType( name, settings );
+	const transforms = mergeBlockTransforms(
+		declaredTransforms,
+		settings?.transforms as any
+	);
+
+	addUnprocessedBlockType(
+		name,
+		transforms ? { ...settings, transforms } : settings
+	);
 
 	return select( blocksStore ).getBlockType( name );
 }
