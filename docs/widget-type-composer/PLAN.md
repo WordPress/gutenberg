@@ -6,6 +6,30 @@ The atomic steps that build the feature. Read `ARCHITECTURE.md` first and
 Status: `todo` | `in-progress` (+ branch/owner) | `done`. Keep this table the
 single source of truth for progress.
 
+## Upstream in flight, 2026-08-24
+
+-   **WordPress/gutenberg#81893, the inserter hooks filter. Open, likely not
+    merged.** The review asked for instance-local, reactive scoping; the
+    answer became a governance seam instead of a narrower filter.
+-   **`add/widget-dashboard-policy`, `WidgetDashboard.Policy`. Local,
+    unpushed.** One provider mounted around the dashboard(s), one callback
+    `canPerform( request )` with a discriminated request
+    (`{ operation: 'insert', widgetType }`, `{ operation: 'customize' }`);
+    `customize` and `insert` enforced first, #81900 adds `remove` / `move` /
+    `resize` / `edit` and the instance `lock`. Nested policies AND; hosts
+    return `true` for operations they do not govern; the engine resolves the
+    policy once and exposes `canPerform` internally. What it settles for the
+    steps: **17** the `WidgetHost` bag never carries the policy (governance
+    is not a capability; the host translates one into the presence or
+    absence of the other); **16** a dashboard operation reachable from a
+    widget body is host-boundary, injected only when policy allows, silent
+    no-op otherwise; **14** `$can` / `row.permissions` stay user capability
+    on entities, no bridge to layout governance; **21 / L3** a dashboard
+    serialized as a composition carries the instance `lock` (keys mirror the
+    block `lock` attribute) as its declarative source, the provider stays
+    the code seam. Vocabulary and the three-evaluators table live in the
+    local `VOCABULARY.md`, _Governance / policy_.
+
 ## Upstream in flight, 2026-08-19
 
 Of the three PRs the 2026-08-17 round left in flight, two merged and this

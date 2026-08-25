@@ -132,6 +132,16 @@ implementation would be correct.
 | `notify`              | depends on the host's notice surface         |
 | field-type vocabulary | the application owns what a type name means  |
 | placement and chrome  | the host owns its surfaces                   |
+| governance            | depends on the host's permission model       |
+
+Governance is a host decision with no seam in the contract. The dashboard
+answers it through `WidgetDashboard.Policy` (`canPerform( request )`), and
+`widget-primitives` never sees it: the host translates policy into what it
+lends, a capability present or absent, a host-boundary operation injected or
+not. Widgets consume existence, never permission, so the `WidgetHost` bag never
+carries the policy itself. The two providers compose differently on purpose:
+the bag merges over what it inherits (abilities accumulate), the policy ANDs
+(permissions only narrow).
 
 The first table is duplication waiting to happen: written once by the dashboard,
 written again by a sidebar, again by a plugin panel. It belongs in a **WordPress
