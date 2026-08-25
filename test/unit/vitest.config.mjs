@@ -15,6 +15,11 @@ const ROOT_DIR = path.resolve(
 	path.dirname( fileURLToPath( import.meta.url ) ),
 	'../..'
 );
+const NORMALIZED_ROOT_DIR = ROOT_DIR.split( path.sep ).join( '/' );
+const gutenbergEnvSetupFile = path.join(
+	ROOT_DIR,
+	'test/unit/config/gutenberg-env.js'
+);
 const testMigration = JSON.parse(
 	readFileSync(
 		path.join( ROOT_DIR, 'test/unit/test-migration.json' ),
@@ -53,11 +58,11 @@ export default defineConfig( {
 		commonjs( {
 			filter: ( id ) =>
 				[
-					`${ ROOT_DIR }/packages/block-serialization-spec-parser/parser.js`,
-					`${ ROOT_DIR }/packages/env/lib/`,
-					`${ ROOT_DIR }/packages/project-management-automation/lib/`,
-					`${ ROOT_DIR }/packages/scripts/utils/`,
-					`${ ROOT_DIR }/tools/release/commands/changelog.js`,
+					`${ NORMALIZED_ROOT_DIR }/packages/block-serialization-spec-parser/parser.js`,
+					`${ NORMALIZED_ROOT_DIR }/packages/env/lib/`,
+					`${ NORMALIZED_ROOT_DIR }/packages/project-management-automation/lib/`,
+					`${ NORMALIZED_ROOT_DIR }/packages/scripts/utils/`,
+					`${ NORMALIZED_ROOT_DIR }/tools/release/commands/changelog.js`,
 				].some( ( directory ) => id.startsWith( directory ) ) &&
 				! id.endsWith( '/packages/scripts/utils/license.js' ),
 		} ),
@@ -130,6 +135,7 @@ export default defineConfig( {
 					environment: 'node',
 					pool: 'threads',
 					include: vitestTests.node,
+					setupFiles: [ gutenbergEnvSetupFile ],
 				},
 			},
 			{
@@ -156,10 +162,7 @@ export default defineConfig( {
 							ROOT_DIR,
 							'test/unit/config/global-mocks.vitest.js'
 						),
-						path.join(
-							ROOT_DIR,
-							'test/unit/config/gutenberg-env.js'
-						),
+						gutenbergEnvSetupFile,
 						path.join(
 							ROOT_DIR,
 							'test/unit/config/testing-library.vitest.js'
