@@ -457,8 +457,10 @@ export default function useSelectionObserver() {
 					}
 				} else {
 					// When the selection spans block-level table cells in the
-					// same table, select the rectangle of cells. The browser's
-					// table geometry accounts for rowSpan/colSpan.
+					// same table, select the rectangle of cells. Pass an
+					// initial position so the native selection is cleared once
+					// the block selection is established, as with a regular
+					// block multi-selection.
 					const startCell = getTableCell( startNode );
 					const endCell = getTableCell( endNode );
 
@@ -469,7 +471,7 @@ export default function useSelectionObserver() {
 						);
 
 						if ( clientIds ) {
-							multiSelectSet( clientIds );
+							multiSelectSet( clientIds, 0 );
 							return;
 						}
 					}

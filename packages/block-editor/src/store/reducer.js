@@ -1644,6 +1644,7 @@ export function initialPosition( state = null, action ) {
 	} else if (
 		[
 			'MULTI_SELECT',
+			'MULTI_SELECT_SET',
 			'SELECT_BLOCK',
 			'RESET_SELECTION',
 			'INSERT_BLOCKS',

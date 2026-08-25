@@ -2877,6 +2877,24 @@ describe( 'state', () => {
 
 			expect( state ).toBe( null );
 		} );
+
+		it( 'returns the initial position for a multi selection set', () => {
+			const state = initialPosition( undefined, {
+				type: 'MULTI_SELECT_SET',
+				initialPosition: 0,
+			} );
+
+			expect( state ).toBe( 0 );
+		} );
+
+		it( 'clears a previous initial position when a multi selection set omits one', () => {
+			const state = initialPosition( 0, {
+				type: 'MULTI_SELECT_SET',
+				initialPosition: null,
+			} );
+
+			expect( state ).toBe( null );
+		} );
 	} );
 
 	describe( 'isMultiSelecting()', () => {
