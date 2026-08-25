@@ -333,6 +333,9 @@ export default function TableCellEdit( {
 		if ( rowSpan <= 1 && colSpan <= 1 ) {
 			return;
 		}
+		if ( ! selectedCellPlacement ) {
+			return;
+		}
 
 		const selectors = registry.select( blockEditorStore );
 		const rowClientId = getRowClientId( selectors, clientId );
@@ -353,6 +356,9 @@ export default function TableCellEdit( {
 		const rowIndexInSection = sectionRows.findIndex(
 			( b ) => b.clientId === rowClientId
 		);
+
+		const { rowIndex: mergedRowIndex, columnIndex: mergedColumnIndex } =
+			selectedCellPlacement;
 
 		const createNewCell = () =>
 			createBlock( 'core/table-v2-cell', {
@@ -404,10 +410,17 @@ export default function TableCellEdit( {
 					{ length: colSpan },
 					createNewCell
 				);
-				const insertIndex = Math.min(
-					cellIndex,
-					targetRowCells.length
-				);
+				// Insert at the raw index matching the merged cell's
+				// visual column: the cells in the target row placed
+				// before that column come first. The merged cell's raw
+				// index in its own row would be wrong whenever a span
+				// from above shifts it away from its visual column.
+				const targetRowIndex = mergedRowIndex + rowOffset;
+				const insertIndex = cellPlacements.filter(
+					( p ) =>
+						p.rowIndex === targetRowIndex &&
+						p.columnIndex < mergedColumnIndex
+				).length;
 				const nextTargetCells = [
 					...targetRowCells.slice( 0, insertIndex ),
 					...newRowCells,
