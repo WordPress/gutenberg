@@ -678,16 +678,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/border-box-control/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/components/src/border-control/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/box-control/styles/box-control-icon-styles.ts": {
 		"no-restricted-imports": {
 			"count": 2
@@ -841,11 +831,6 @@
 	"packages/components/src/popover/index.tsx": {
 		"react-hooks/refs": {
 			"count": 1
-		}
-	},
-	"packages/components/src/progress-bar/styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
 		}
 	},
 	"packages/components/src/range-control/index.tsx": {
