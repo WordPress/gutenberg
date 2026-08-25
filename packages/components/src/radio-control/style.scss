@@ -69,16 +69,14 @@
 	grid-column: 2;
 	grid-row: 1;
 
+	.components-radio-control__input:not(:disabled) + & {
+		cursor: var(--wpds-cursor-control);
+	}
+
 	line-height: $radio-input-size-sm;
 
 	@include break-small() {
 		line-height: $radio-input-size;
-	}
-}
-
-.components-radio-control__input:not(:disabled) {
-	& + .components-radio-control__label {
-		cursor: var(--wpds-cursor-control);
 	}
 }
 
