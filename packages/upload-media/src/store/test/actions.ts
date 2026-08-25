@@ -37,8 +37,12 @@ jest.mock( '../utils/video-conversion', () => {
 		isUnsupportedConversionError: actual.isUnsupportedConversionError,
 	};
 } );
+jest.mock( '../utils/subject-detection', () => ( {
+	detectSubjectArea: jest.fn( () => Promise.resolve( null ) ),
+} ) );
 // Import the mocked modules to access the mock functions.
 import { vipsCancelOperations } from '../utils';
+import { detectSubjectArea } from '../utils/subject-detection';
 import { cancelGifToVideoOperations } from '../utils/video-conversion';
 
 function createRegistryWithStores() {
@@ -1685,6 +1689,151 @@ describe( 'actions', () => {
 			);
 
 			expect( vipsResizeImage ).toHaveBeenCalled();
+		} );
+
+		it( 'does not detect a subject when the experiment is off', async () => {
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			const { vipsResizeImage } = require( '../utils' );
+			( vipsResizeImage as jest.Mock ).mockClear();
+			( detectSubjectArea as jest.Mock ).mockClear();
+
+			await unlock( registry.dispatch( uploadStore ) ).resizeCropItem(
+				item.id,
+				{ resize: { width: 100, height: 100, crop: true } }
+			);
+
+			expect( detectSubjectArea ).not.toHaveBeenCalled();
+			expect( vipsResizeImage ).toHaveBeenCalledWith(
+				expect.anything(),
+				expect.anything(),
+				expect.anything(),
+				expect.objectContaining( { subject: undefined } )
+			);
+		} );
+
+		it( 'does not detect a subject for a size that is not hard cropped', async () => {
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				subjectDetectionUrl: 'https://example.com/detection/',
+			} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			( detectSubjectArea as jest.Mock ).mockClear();
+
+			await unlock( registry.dispatch( uploadStore ) ).resizeCropItem(
+				item.id,
+				{ resize: { width: 100, height: 100 } }
+			);
+
+			expect( detectSubjectArea ).not.toHaveBeenCalled();
+		} );
+
+		it( 'does not detect a subject for a positional crop', async () => {
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				subjectDetectionUrl: 'https://example.com/detection/',
+			} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			( detectSubjectArea as jest.Mock ).mockClear();
+
+			await unlock( registry.dispatch( uploadStore ) ).resizeCropItem(
+				item.id,
+				{
+					resize: {
+						width: 100,
+						height: 100,
+						crop: [ 'left', 'top' ],
+					},
+				}
+			);
+
+			expect( detectSubjectArea ).not.toHaveBeenCalled();
+		} );
+
+		it( 'passes a detected subject through to the resize', async () => {
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				subjectDetectionUrl: 'https://example.com/detection/',
+			} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			const subject = { x: 0.4, y: 0.1, width: 0.2, height: 0.2 };
+			const { vipsResizeImage } = require( '../utils' );
+			( vipsResizeImage as jest.Mock ).mockClear();
+			( detectSubjectArea as jest.Mock ).mockClear();
+			( detectSubjectArea as jest.Mock ).mockResolvedValueOnce( subject );
+
+			await unlock( registry.dispatch( uploadStore ) ).resizeCropItem(
+				item.id,
+				{ resize: { width: 100, height: 100, crop: true } }
+			);
+
+			expect( detectSubjectArea ).toHaveBeenCalledWith(
+				item.file,
+				'https://example.com/detection/'
+			);
+			expect( vipsResizeImage ).toHaveBeenCalledWith(
+				expect.anything(),
+				expect.anything(),
+				expect.anything(),
+				expect.objectContaining( { subject } )
+			);
+		} );
+
+		it( 'crops from the centre when nothing was detected', async () => {
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				subjectDetectionUrl: 'https://example.com/detection/',
+			} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			const { vipsResizeImage } = require( '../utils' );
+			( vipsResizeImage as jest.Mock ).mockClear();
+			( detectSubjectArea as jest.Mock ).mockClear();
+
+			await unlock( registry.dispatch( uploadStore ) ).resizeCropItem(
+				item.id,
+				{ resize: { width: 100, height: 100, crop: true } }
+			);
+
+			expect( vipsResizeImage ).toHaveBeenCalledWith(
+				expect.anything(),
+				expect.anything(),
+				expect.anything(),
+				expect.objectContaining( { subject: undefined } )
+			);
 		} );
 
 		it( 'skips resize when no resize args are provided', async () => {

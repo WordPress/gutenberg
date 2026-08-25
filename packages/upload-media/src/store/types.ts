@@ -228,6 +228,10 @@ export interface Settings {
 	// Maximum output bit depth for generated images, from the
 	// `image_max_bit_depth` filter. Default is 16 (no cap).
 	imageMaxBitDepth?: number;
+	// Base URL that the subject detection model and its runtime are served
+	// from. Set only while the subject-aware cropping experiment is on;
+	// when unset, hard crops are taken from the centre as before.
+	subjectDetectionUrl?: string;
 	// Function for finalizing an upload after all client-side processing is complete.
 	// May return the up-to-date attachment so the queue and block markup can pick
 	// up the post-finalize URL (the scaled file), which is required for `srcset`.
@@ -325,6 +329,18 @@ export enum OperationType {
 	Finalize = 'FINALIZE',
 	// UltraHDR operations
 	DetectUltraHdr = 'DETECT_ULTRAHDR',
+}
+
+/**
+ * An area of an image to keep in frame when a size is hard cropped, as
+ * fractions of the image's width and height. `x` and `y` are the top left
+ * corner.
+ */
+export interface SubjectArea {
+	x: number;
+	y: number;
+	width: number;
+	height: number;
 }
 
 /**

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Carry the `subjectDetectionUrl` media upload setting, which turns on subject-aware cropping of hard-cropped image sizes ([#82048](https://github.com/WordPress/gutenberg/pull/82048)).
+
 ### Breaking Changes
 
 -   Remove `src/default-editor-styles.scss`. Consumers importing it should supply their own ([#81793](https://github.com/WordPress/gutenberg/pull/81793)).

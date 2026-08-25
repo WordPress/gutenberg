@@ -20,6 +20,12 @@ function useMediaUploadSettings( settings = {} ) {
 			bigImageSizeThreshold: settings.bigImageSizeThreshold,
 			imageStripMeta: settings.imageStripMeta,
 			imageMaxBitDepth: settings.imageMaxBitDepth,
+			// Set by the subject-aware cropping experiment. Points at the
+			// directory the detection model and its runtime are served from.
+			subjectDetectionUrl:
+				typeof window !== 'undefined'
+					? window.__experimentalMediaSubjectDetectionUrl
+					: undefined,
 		} ),
 		[ settings ]
 	);

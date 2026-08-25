@@ -1,6 +1,6 @@
 import { ImageFile } from '../../image-file';
 import { getFileBasename } from '../../utils';
-import type { ImageSizeCrop, QueueItemId } from '../types';
+import type { ImageSizeCrop, QueueItemId, SubjectArea } from '../types';
 
 /**
  * Options for converting or compressing an image in a web worker.
@@ -32,6 +32,10 @@ interface VipsResizeOptions {
 	 * Whether to use smart cropping (saliency-aware).
 	 */
 	smartCrop?: boolean;
+	/**
+	 * An area of the image to keep in frame when a size is hard cropped.
+	 */
+	subject?: SubjectArea;
 	/**
 	 * Whether to add dimension suffix to the filename.
 	 */
@@ -205,6 +209,7 @@ export async function vipsResizeImage(
 ) {
 	const {
 		smartCrop = false,
+		subject,
 		addSuffix = false,
 		signal,
 		scaledSuffix,
@@ -221,6 +226,7 @@ export async function vipsResizeImage(
 	const { buffer, width, height, originalWidth, originalHeight } =
 		await resizeImage( id, await file.arrayBuffer(), file.type, resize, {
 			smartCrop,
+			subject,
 			quality,
 			stripMeta,
 			maxBitdepth,

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Detect the subject of an image before generating hard-cropped sizes, and keep it in frame, when the new `subjectDetectionUrl` setting is present ([#82048](https://github.com/WordPress/gutenberg/pull/82048)).
+
 ### Internal
 
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))

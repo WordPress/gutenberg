@@ -55,6 +55,11 @@ function gutenberg_initialize_experiments_settings() {
 					'label'       => __( 'Media Upload Modal', 'gutenberg' ),
 					'description' => __( 'Replaces the existing WordPress media modal with a new modal powered by Data Views, supporting browsing, selecting, and uploading media.', 'gutenberg' ),
 				),
+				array(
+					'id'          => 'gutenberg-media-subject-crop',
+					'label'       => __( 'Subject-aware cropping of image sizes', 'gutenberg' ),
+					'description' => __( 'Detects faces while an image is uploading and shifts hard-cropped sizes, such as the thumbnail, only far enough to keep the subject in frame. Sizes with no confident detection are cropped from the centre as usual. Downloads a detection model the first time an image is cropped.', 'gutenberg' ),
+				),
 			),
 		),
 		array(

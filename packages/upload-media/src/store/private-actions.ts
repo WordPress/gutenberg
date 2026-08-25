@@ -30,6 +30,7 @@ import {
 	terminateVipsWorker,
 	maybeRecycleVipsWorker,
 } from './utils';
+import { detectSubjectArea } from './utils/subject-detection';
 import {
 	convertGifToVideo,
 	isConversionTimeoutError,
@@ -1137,7 +1138,19 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 
 		// Metadata stripping and bit depth cap from the `image_strip_meta`
 		// and `image_max_bit_depth` filters, carried in the editor settings.
-		const { imageStripMeta, imageMaxBitDepth } = select.getSettings();
+		const { imageStripMeta, imageMaxBitDepth, subjectDetectionUrl } =
+			select.getSettings();
+
+		// Only a size registered with `crop => true` can lose its subject to
+		// the centre of the frame. A soft resize keeps the whole picture, and
+		// a positional crop states where to cut.
+		const subject =
+			subjectDetectionUrl && true === args.resize.crop
+				? ( await detectSubjectArea(
+						item.file,
+						subjectDetectionUrl
+				  ) ) ?? undefined
+				: undefined;
 
 		try {
 			const file = await vipsResizeImage(
@@ -1146,6 +1159,7 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 				args.resize,
 				{
 					smartCrop: false,
+					subject,
 					addSuffix,
 					signal: item.abortController?.signal,
 					scaledSuffix,
