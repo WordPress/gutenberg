@@ -16,7 +16,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"scripts": {
-		"validate": "for c in specs/*/*.test.yaml; do promptfoo validate config --config \"$c\" || exit 1; done",
+		"validate": "for c in specs/*/*.test.js; do promptfoo validate config --config \"$c\" || exit 1; done",
 		"test:grader": "for t in specs/*/test-grader.mjs; do [ -e \"$t\" ] || continue; node --test \"$t\" || exit 1; done",
 		"eval": "promptfoo eval",
 		"view": "promptfoo view"

@@ -1,0 +1,37 @@
+// Options shared by every evaluation case.
+export default {
+	options: {
+		prefix: [
+			'This task runs in an isolated evaluation workspace and npm is not',
+			'available. Do not try to build. Do not start or try to start wp-env,',
+			'wp-env-test, Docker, development servers, or other long-running services.',
+			'Accomplish your requested task and I will run and test the build on my',
+			'own environment.',
+		].join( '\n' ),
+
+		// The beforeEach extension fills in working_dir and the dynamic
+		// filesystem allowlists. `failIfUnavailable` already defaults to true
+		// when the sandbox is enabled, and the `allowManaged*Only` locks bind
+		// only when passed as managedSettings — as plain sandbox options they
+		// do nothing, so they are not set here.
+		sandbox: {
+			enabled: true,
+			autoAllowBashIfSandboxed: true,
+			allowUnsandboxedCommands: false,
+			network: { allowedDomains: [] },
+		},
+
+		// The workspace extension adds each row's temporary working_dir.
+		provider: {
+			id: 'anthropic:claude-agent-sdk',
+			config: {
+				apiKeyRequired: false,
+				model: 'sonnet',
+				// The grader inspects the workspace; it never edits it.
+				tools: [ 'Bash' ],
+				custom_allowed_tools: [ 'Bash' ],
+				disallowed_tools: [ 'WebFetch', 'WebSearch' ],
+			},
+		},
+	},
+};
