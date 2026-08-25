@@ -116,6 +116,10 @@ const PLACEHOLDER_TEXT = __(
 const DEFAULT_BLOCK = { name: 'core/image' };
 const EMPTY_ARRAY = [];
 
+function isLayoutObject( value ) {
+	return !! value && typeof value === 'object' && ! Array.isArray( value );
+}
+
 export default function GalleryEdit( props ) {
 	const {
 		setAttributes,
