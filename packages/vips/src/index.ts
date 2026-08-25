@@ -11,7 +11,9 @@ import type {
 	ThumbnailOptions,
 	ConvertImageOptions,
 	ResizeImageOptions,
+	SubjectArea,
 } from './types';
+import { placeCropWindow } from './crop-window';
 import { supportsAnimation, supportsInterlace, supportsQuality } from './utils';
 
 interface EmscriptenModule {
@@ -255,13 +257,20 @@ export async function compressImage(
  * Applies resize and optional crop logic to produce a thumbnail.
  *
  * Handles three crop modes: no crop (simple downscale), boolean `true`
- * (center/attention crop), and positional crop (e.g. ['center', 'top']).
+ * (center/attention/subject-aware crop), and positional crop (e.g.
+ * ['center', 'top']).
  *
- * @param resize          Resize options including target dimensions and crop mode.
- * @param originalWidth   Width of the source image.
- * @param originalHeight  Height (pageHeight) of the source image.
- * @param smartCrop       Whether to use saliency-aware cropping.
- * @param createThumbnail Callback that creates a thumbnail at the given width/options.
+ * A positional crop states an intent, so it always wins: it is resized to
+ * cover and then cropped at the stated corner, and neither `smartCrop` nor a
+ * detected subject is consulted.
+ *
+ * @param resize                Resize options including target dimensions and crop mode.
+ * @param originalWidth         Width of the source image.
+ * @param originalHeight        Height (pageHeight) of the source image.
+ * @param cropOptions           How to position a `crop: true` size.
+ * @param cropOptions.smartCrop Whether to let libvips pick the window.
+ * @param cropOptions.subject   An area to keep in frame, if one was detected.
+ * @param createThumbnail       Callback that creates a thumbnail at the given width/options.
  * @return The resized (and optionally cropped) image.
  */
 function applyResizeAndCrop<
@@ -279,9 +288,10 @@ function applyResizeAndCrop<
 	resize: ImageSizeCrop,
 	originalWidth: number,
 	originalHeight: number,
-	smartCrop: boolean,
+	cropOptions: { smartCrop: boolean; subject?: SubjectArea },
 	createThumbnail: ( width: number, options: ThumbnailOptions ) => T
 ): T {
+	const { smartCrop, subject } = cropOptions;
 	// Clone so we don't mutate the caller's config.
 	// If resize.height is zero, calculate from aspect ratio.
 	const target: ImageSizeCrop = {
@@ -301,12 +311,16 @@ function applyResizeAndCrop<
 		return createThumbnail( resizeWidth, thumbnailOptions );
 	}
 
-	if ( true === target.crop ) {
+	// A `crop: true` size with no subject to protect is a single libvips call,
+	// which lets it pick the window as it resizes.
+	if ( true === target.crop && ! subject ) {
 		thumbnailOptions.crop = smartCrop ? 'attention' : 'centre';
 		return createThumbnail( resizeWidth, thumbnailOptions );
 	}
 
-	// Positional crop: first resize, then crop to exact dimensions.
+	// Everything below resizes to cover the target and then places a window
+	// inside the result: at a stated corner for a positional crop, or around
+	// the subject for a `crop: true` size that has one.
 	if ( originalWidth < originalHeight ) {
 		resizeWidth =
 			target.width >= target.height
@@ -330,17 +344,28 @@ function applyResizeAndCrop<
 	const image = createThumbnail( resizeWidth, thumbnailOptions );
 
 	let left = 0;
-	if ( 'center' === target.crop[ 0 ] ) {
-		left = ( image.width - target.width ) / 2;
-	} else if ( 'right' === target.crop[ 0 ] ) {
-		left = image.width - target.width;
-	}
-
 	let top = 0;
-	if ( 'center' === target.crop[ 1 ] ) {
-		top = ( image.height - target.height ) / 2;
-	} else if ( 'bottom' === target.crop[ 1 ] ) {
-		top = image.height - target.height;
+
+	if ( true === target.crop ) {
+		( { left, top } = placeCropWindow( {
+			imageWidth: image.width,
+			imageHeight: image.height,
+			cropWidth: Math.min( image.width, target.width ),
+			cropHeight: Math.min( image.height, target.height ),
+			subject,
+		} ) );
+	} else {
+		if ( 'center' === target.crop[ 0 ] ) {
+			left = ( image.width - target.width ) / 2;
+		} else if ( 'right' === target.crop[ 0 ] ) {
+			left = image.width - target.width;
+		}
+
+		if ( 'center' === target.crop[ 1 ] ) {
+			top = ( image.height - target.height ) / 2;
+		} else if ( 'bottom' === target.crop[ 1 ] ) {
+			top = image.height - target.height;
+		}
 	}
 
 	// Address rounding errors where `left` or `top` become negative integers
@@ -582,6 +607,7 @@ export async function resizeImage(
 } > {
 	const {
 		smartCrop = false,
+		subject,
 		quality = 0.82,
 		stripMeta = true,
 		maxBitdepth = 16,
@@ -625,7 +651,7 @@ export async function resizeImage(
 			resize,
 			width,
 			pageHeight,
-			smartCrop,
+			{ smartCrop, subject },
 			( resizeWidth, thumbnailOptions ) => {
 				if ( isHighBitDepth ) {
 					const resized = resizeHighBitDepth(

@@ -34,6 +34,17 @@ export interface ConvertImageOptions {
 }
 
 /**
+ * An area of an image to keep in frame when cropping, as fractions of the
+ * image's width and height. `x` and `y` are the top left corner.
+ */
+export interface SubjectArea {
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+}
+
+/**
  * Options for resizing an image.
  */
 export interface ResizeImageOptions {
@@ -41,6 +52,11 @@ export interface ResizeImageOptions {
 	 * Whether to use smart cropping (i.e. saliency-aware). Defaults to false.
 	 */
 	smartCrop?: boolean;
+	/**
+	 * An area to keep in frame when a size is hard cropped. Takes precedence
+	 * over `smartCrop`, and when absent the crop is centred as before.
+	 */
+	subject?: SubjectArea;
 	/**
 	 * Desired quality (0-1). Defaults to 0.82.
 	 */

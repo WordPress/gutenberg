@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Accept a `subject` area when resizing, and place a `crop: true` size around it instead of cropping from the centre ([#82048](https://github.com/WordPress/gutenberg/pull/82048)).
+
 ### Internal
 
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
