@@ -42,6 +42,7 @@
 ### Internal
 
 -   Use the new `@wordpress/kebab-case` package instead of unlocking the `kebabCase` utility from the `@wordpress/components` private APIs ([#81294](https://github.com/WordPress/gutenberg/pull/81294)).
+-   Remove the private `toggleBlockSpotlight` action, the state it set, and the private `hasBlockSpotlight` selector. Notes were the only thing that dispatched the action and they now mark their block with the block highlight instead. `BlockList` reads `getEditedContentOnlySection` directly for the one case that still dims the canvas ([#81538](https://github.com/WordPress/gutenberg/pull/81538)).
 
 ### Enhancements
 
