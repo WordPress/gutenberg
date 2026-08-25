@@ -1,10 +1,9 @@
 import { useRender } from '@base-ui/react';
-import type { CalendarDay, RootProps, ChevronProps } from '@daypicker/react';
+import type { CalendarDay, RootProps } from '@daypicker/react';
 import { useContext } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
-import { Button } from '../../button';
-import { Icon } from '../../icon';
+import { IconButton } from '../../icon-button';
 import { RootContext } from './root-context';
 import type { Modifiers } from '../types';
 
@@ -155,35 +154,31 @@ export function Root( { rootRef, ...props }: RootProps ) {
 }
 
 /**
- * Render the chevron icon used in the navigation buttons.
- * @see https://daypicker.dev/guides/custom-components
- */
-export function Chevron( { orientation, className }: ChevronProps ) {
-	return (
-		<Icon
-			className={ className }
-			icon={ orientation === 'right' ? chevronRight : chevronLeft }
-		/>
-	);
-}
-
-/**
  * Render a month navigation button.
  *
  * `@daypicker/react` marks the button as `aria-disabled` (rather than
  * `disabled`) when there is no month to navigate to, so that it stays
- * discoverable. `Button`'s `focusableWhenDisabled` produces the same DOM.
+ * discoverable. `IconButton`'s `focusableWhenDisabled` produces the same DOM.
+ * It also always provides the string returned by its navigation label formatter
+ * as `aria-label`; the native button prop type cannot express that requirement.
  * @see https://daypicker.dev/guides/custom-components
  */
-export function NavButton( {
+function NavButton( {
+	icon,
 	className,
+	children: _children,
+	'aria-label': label,
 	'aria-disabled': ariaDisabled,
 	...props
-}: React.ButtonHTMLAttributes< HTMLButtonElement > ) {
+}: React.ButtonHTMLAttributes< HTMLButtonElement > & {
+	icon: React.ComponentProps< typeof IconButton >[ 'icon' ];
+} ) {
 	return (
-		<Button
+		<IconButton
 			{ ...props }
 			className={ className }
+			label={ label as string }
+			icon={ icon }
 			variant="minimal"
 			tone="neutral"
 			size="compact"
@@ -191,4 +186,16 @@ export function NavButton( {
 			focusableWhenDisabled
 		/>
 	);
+}
+
+export function PreviousMonthButton(
+	props: React.ButtonHTMLAttributes< HTMLButtonElement >
+) {
+	return <NavButton { ...props } icon={ chevronLeft } />;
+}
+
+export function NextMonthButton(
+	props: React.ButtonHTMLAttributes< HTMLButtonElement >
+) {
+	return <NavButton { ...props } icon={ chevronRight } />;
 }

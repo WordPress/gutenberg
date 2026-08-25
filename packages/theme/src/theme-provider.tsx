@@ -145,7 +145,7 @@ export const ThemeProvider = ( {
 			ref={ wrapperRef }
 			data-wpds-root-provider={ isRoot || undefined }
 			data-wpds-corner-radius={ cornerRadiusPreset }
-			className={ styles.root }
+			className={ styles.wrapper }
 			style={ themeProviderStyles }
 		>
 			<ThemeContext.Provider value={ contextValue }>
