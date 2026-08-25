@@ -365,6 +365,8 @@ export interface BlockType<
 	 * Allowed child block types.
 	 */
 	allowedBlocks?: string[];
+
+	allowsReconstruction?: boolean;
 	/**
 	 * Initial child blocks created when an empty block of this type
 	 * is inserted, as a list of `[ name, attributes, innerTemplate ]`
@@ -599,6 +601,10 @@ export interface Block<
 	 */
 	originalContent?: string;
 	/**
+	 * Validation level.
+	 */
+	validationLevel?: number;
+	/**
 	 * Validation issues.
 	 */
 	validationIssues?: Array< { log: Function; args: unknown[] } >;
@@ -606,6 +612,10 @@ export interface Block<
 	 * Un-processed original copy of block if created through parser.
 	 */
 	__unstableBlockSource?: RawBlock;
+	/**
+	 * Whether the block was migrated via deprecation.
+	 */
+	__wasMigrated?: boolean;
 }
 
 /**
