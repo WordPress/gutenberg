@@ -23,7 +23,7 @@ import {
  * Prefer `SearchableChipSelectControl` when using with a standard label and description.
  */
 export const SearchableChipSelect = forwardRef<
-	HTMLDivElement,
+	HTMLInputElement,
 	SearchableChipSelectProps
 >( function SearchableChipSelect(
 	{
@@ -65,7 +65,6 @@ export const SearchableChipSelect = forwardRef<
 							visuallyDisabled={ disabled }
 						/>
 					}
-					ref={ ref }
 				>
 					<Combobox.Value>
 						{ ( value: Item[] ) => (
@@ -104,6 +103,7 @@ export const SearchableChipSelect = forwardRef<
 					</Combobox.Value>
 
 					<Combobox.Input
+						ref={ ref }
 						render={
 							<input
 								className={ clsx(

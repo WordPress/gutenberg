@@ -7,7 +7,7 @@ import type { SearchableChipSelectControlProps } from './types';
  * and description.
  */
 export const SearchableChipSelectControl = forwardRef<
-	HTMLDivElement,
+	HTMLInputElement,
 	SearchableChipSelectControlProps
 >( function SearchableChipSelectControl(
 	{
