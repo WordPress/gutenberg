@@ -9,6 +9,7 @@
 -   Add a `Menu` component. ([#79560](https://github.com/WordPress/gutenberg/pull/79560))
 -   Add `ControlWithError` component, ported from `@wordpress/components` and `@wordpress/dataviews` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574)).
 -   Export `ValidityIndicator`, so custom validated controls can render the same validity message as `ControlWithError` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574)).
+-   Add `SearchableChipSelectControl` component ([#80980](https://github.com/WordPress/gutenberg/pull/80980)).
 -   Add `ValidatedInputControl` component, an `InputControl` wrapped in `ControlWithError` ([#81627](https://github.com/WordPress/gutenberg/pull/81627)).
 -   Add `ValidatedTextareaControl` component, a `TextareaControl` wrapped in `ControlWithError` ([#81984](https://github.com/WordPress/gutenberg/pull/81984)).
 
@@ -39,6 +40,7 @@
 -   `Calendar`, `RangeCalendar`: Preserve day focus when a controlled month change removes the focused day. ([#81635](https://github.com/WordPress/gutenberg/pull/81635))
 -   `Button`: Fix the loading spinner being off-center in RTL ([#81901](https://github.com/WordPress/gutenberg/pull/81901)).
 -   `Combobox.ChipWithRemove`: Derive an accessible label from string children so virtual focus announces the chip name without the remove button label. Use a shorter `Remove` tooltip label with a separate `Remove %s` accessible name on the remove button. ([#82042](https://github.com/WordPress/gutenberg/pull/82042))
+-   `SearchableChipSelect`, `SearchableChipSelectControl`: Forward ref to the search input instead of the chips container ([#80980](https://github.com/WordPress/gutenberg/pull/80980)).
 
 ### Documentation
 
