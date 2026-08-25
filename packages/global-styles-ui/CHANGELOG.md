@@ -6,6 +6,10 @@
 
 -   Expose typography and color controls for citations, inputs, and selects in Global Styles ([#80852](https://github.com/WordPress/gutenberg/pull/80852)).
 
+### Bug Fixes
+
+-   Font Library: Keep deactivated theme font variants listed in the font details view so they can be activated again. Deactivating a variant removes it from the user's global styles, so the selected font was previously looked up in the activated fonts only, and an unchecked variant (or a fully deactivated family) vanished from the modal.
+
 ## 1.20.0 (2026-08-12)
 
 ### Internal
