@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { close, Icon } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { getColorClassName } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -19,6 +19,7 @@ export default function ResponsiveWrapper( {
 	overlayTextColor,
 	hasIcon,
 	icon,
+	overlayButtonLabel,
 	overlay,
 	onNavigateToEntityRecord,
 } ) {
@@ -77,7 +78,7 @@ export default function ResponsiveWrapper( {
 		...( isOpen && {
 			role: 'dialog',
 			'aria-modal': true,
-			'aria-label': __( 'Menu' ),
+			'aria-label': overlayButtonLabel || __( 'Menu' ),
 		} ),
 	};
 
@@ -99,18 +100,29 @@ export default function ResponsiveWrapper( {
 		onToggle( true );
 	};
 
+	let openButtonAriaLabel;
+	if ( hasIcon ) {
+		openButtonAriaLabel = overlayButtonLabel
+			? sprintf(
+					/* translators: %s: Menu name */
+					__( 'Open %s' ),
+					overlayButtonLabel
+			  )
+			: __( 'Open menu' );
+	}
+
 	return (
 		<>
 			{ ! isOpen && (
 				<Button
 					__next40pxDefaultSize
 					aria-haspopup="true"
-					aria-label={ hasIcon && __( 'Open menu' ) }
+					aria-label={ openButtonAriaLabel }
 					className={ openButtonClasses }
 					onClick={ handleToggleClick }
 				>
 					{ hasIcon && <OverlayMenuIcon icon={ icon } /> }
-					{ ! hasIcon && __( 'Menu' ) }
+					{ ! hasIcon && ( overlayButtonLabel || __( 'Menu' ) ) }
 				</Button>
 			) }
 

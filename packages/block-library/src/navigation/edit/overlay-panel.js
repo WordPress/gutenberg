@@ -21,6 +21,7 @@ import OverlayPreview from './overlay-preview';
  * @param {Function} props.setOverlayMenuPreview     Function to toggle overlay menu preview.
  * @param {boolean}  props.hasIcon                   Whether the overlay menu has an icon.
  * @param {string}   props.icon                      Icon type for overlay menu.
+ * @param {string}   props.overlayButtonLabel        Text label for overlay menu button.
  * @param {string}   props.overlayMenuPreviewClasses CSS classes for overlay menu preview button.
  * @param {string}   props.overlayMenuPreviewId      ID for overlay menu preview.
  * @param {boolean}  props.isResponsive              Whether overlay menu is responsive.
@@ -37,6 +38,7 @@ export default function OverlayPanel( {
 	setOverlayMenuPreview,
 	hasIcon,
 	icon,
+	overlayButtonLabel,
 	overlayMenuPreviewClasses,
 	overlayMenuPreviewId,
 	isResponsive,
@@ -60,6 +62,7 @@ export default function OverlayPanel( {
 						setOverlayMenuPreview={ setOverlayMenuPreview }
 						hasIcon={ hasIcon }
 						icon={ icon }
+						overlayButtonLabel={ overlayButtonLabel }
 						setAttributes={ setAttributes }
 						overlayMenuPreviewClasses={ overlayMenuPreviewClasses }
 						overlayMenuPreviewId={ overlayMenuPreviewId }
