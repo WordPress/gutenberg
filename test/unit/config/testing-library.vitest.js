@@ -3,7 +3,6 @@ import * as matchers from '@testing-library/jest-dom/matchers';
 import { cleanup } from '@testing-library/react';
 import { afterEach, expect } from 'vitest';
 import './matchers/to-match-diff-snapshot.vitest';
-import './matchers/to-match-style-diff-snapshot.vitest';
 import './matchers/to-be-positioned-popover.vitest';
 
 expect.extend( matchers );
