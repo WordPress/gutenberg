@@ -40,6 +40,7 @@ describe( 'props', () => {
 		);
 
 		const scrollable = screen.getByTestId( 'scrollable' );
+
 		expect( scrollable ).toHaveClass( 'components-scrollable' );
 		expect( scrollable ).toHaveClass( styles.scrollable );
 		expect( scrollable ).toHaveClass( styles[ 'scroll-y' ] );
@@ -66,6 +67,7 @@ describe( 'props', () => {
 		);
 
 		const scrollable = screen.getByTestId( 'scrollable-x' );
+
 		expect( scrollable ).toHaveClass( styles[ 'scroll-x' ] );
 		expect( scrollable ).not.toHaveClass( styles[ 'scroll-y' ] );
 	} );
@@ -78,6 +80,7 @@ describe( 'props', () => {
 		);
 
 		const scrollable = screen.getByTestId( 'scrollable-auto' );
+
 		expect( scrollable ).toHaveClass( styles[ 'scroll-auto' ] );
 		expect( scrollable ).not.toHaveClass( styles[ 'scroll-y' ] );
 	} );
@@ -87,9 +90,13 @@ describe( 'CardBody isScrollable height', () => {
 	const globalScope = globalThis as GlobalScopeWithStyleRuntime;
 
 	afterEach( () => {
+		// Style runtime injects outside Testing Library's container.
+		/* eslint-disable testing-library/no-node-access */
 		document
 			.querySelectorAll( 'style[data-wp-hash="scrollable-height"]' )
 			.forEach( ( style ) => style.remove() );
+		/* eslint-enable testing-library/no-node-access */
+
 		delete globalScope.__wpStyleRuntime;
 	} );
 
@@ -123,18 +130,17 @@ describe( 'CardBody isScrollable height', () => {
 			</IframeWithStyleProvider>
 		);
 
-		const iframeDocument = screen.getByTitle< HTMLIFrameElement >(
-			'CardBody document'
-		).contentDocument;
+		const iframeDocument =
+			screen.getByTitle< HTMLIFrameElement >(
+				'CardBody document'
+			).contentDocument!;
 
-		expect( iframeDocument ).toBeTruthy();
-
-		const iframeBody = within( iframeDocument!.body ).getByTestId(
+		const iframeBody = within( iframeDocument.body ).getByTestId(
 			'scrollable-body-iframe'
 		);
 
 		expect(
-			iframeDocument!.defaultView!.getComputedStyle( iframeBody ).height
+			iframeDocument.defaultView!.getComputedStyle( iframeBody ).height
 		).toBe( '100%' );
 	} );
 } );
