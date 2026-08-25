@@ -8,6 +8,7 @@
 import providers from './providers.js';
 import defaultTest from './default-test.js';
 
+/** @type {Partial<import('promptfoo').UnifiedConfig>} */
 export default {
 	tracing: {
 		enabled: true,

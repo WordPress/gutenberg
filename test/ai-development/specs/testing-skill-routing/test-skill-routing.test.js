@@ -14,6 +14,7 @@
  */
 import base from '../../lib/base.js';
 
+/** @type {import('promptfoo').UnifiedConfig} */
 export default {
 	...base,
 
