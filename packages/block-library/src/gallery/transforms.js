@@ -223,6 +223,11 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/image' ],
+			// A dynamic gallery has no inner blocks — its images are resolved
+			// from a source at render time — so this transform would produce a
+			// single empty image and drop the source. Detaching the gallery
+			// first materializes the images, after which it applies as usual.
+			isMatch: ( { dynamicContent } ) => ! dynamicContent,
 			transform: ( { align }, innerBlocks ) => {
 				if ( innerBlocks.length > 0 ) {
 					return innerBlocks.map(
@@ -268,12 +273,16 @@ const transforms = {
 			type: 'block',
 			blocks: [ 'core/group' ],
 			variationName: 'group-grid',
+			// As above: with no inner blocks to clone, a dynamic gallery would
+			// transform into an empty grid.
+			isMatch: ( { dynamicContent } ) => ! dynamicContent,
 			transform: ( attributes, innerBlocks ) => {
 				const {
 					allowResize,
 					aspectRatio,
 					caption,
 					columns,
+					dynamicContent,
 					fixedHeight,
 					ids,
 					imageCrop,
