@@ -4,6 +4,8 @@
  * Paths omit the shared `wpds-color` prefix so build configuration and runtime
  * tests can adapt the same pairs to DTCG token IDs and CSS custom properties.
  */
+export const MINIMUM_TEXT_CONTRAST = 4.5;
+
 export const SEMANTIC_COLOR_CONTRAST_PAIRS = [
 	{
 		background: 'background.surface.neutral',
@@ -86,3 +88,14 @@ export const SEMANTIC_COLOR_CONTRAST_PAIRS = [
 		foreground: 'foreground.interactive.neutral-strong-active',
 	},
 ] as const;
+
+type SemanticColorContrastPair =
+	( typeof SEMANTIC_COLOR_CONTRAST_PAIRS )[ number ];
+
+export type SemanticColorToken =
+	| SemanticColorContrastPair[ 'background' ]
+	| SemanticColorContrastPair[ 'foreground' ];
+
+export function getSemanticColorCustomProperty( token: SemanticColorToken ) {
+	return `--wpds-color-${ token.replaceAll( '.', '-' ) }`;
+}

@@ -47,8 +47,26 @@ const { actions, state } = store(
 				return activeTabIndex === tabIndex;
 			},
 			/**
-			 * The value of the tabindex attribute for tab buttons.
-			 * Only the active tab should be in the tab sequence.
+			 * The value of the hidden attribute for tab panels.
+			 *
+			 * Inactive panels use the `until-found` state rather than being
+			 * hidden outright, so their content stays reachable by the
+			 * browser's find-in-page and by fragment navigation. The browser
+			 * fires `beforematch` on the panel before revealing it, which is
+			 * where the matching tab gets activated.
+			 *
+			 * @type {string|null}
+			 */
+			get isHidden() {
+				return state.isActiveTab ? null : 'until-found';
+			},
+			/**
+			 * The value of the tabindex attribute for tab buttons and tab
+			 * panels. Only the active tab should be in the tab sequence.
+			 *
+			 * An inactive panel is hidden with `until-found`, which leaves it
+			 * in the layout, so it stays focusable unless it is taken out of
+			 * the tab sequence here.
 			 *
 			 * @type {number}
 			 */
@@ -96,6 +114,18 @@ const { actions, state } = store(
 					actions.setActiveTab( tabIndex );
 				}
 			} ),
+			/**
+			 * Activates the tab whose panel the browser is about to reveal.
+			 *
+			 * Fired on a panel hidden with `until-found` when find-in-page or
+			 * a fragment navigation matches content inside it.
+			 */
+			handleBeforeMatch: () => {
+				const { tabIndex } = state;
+				if ( tabIndex !== null ) {
+					actions.setActiveTab( tabIndex );
+				}
+			},
 			/**
 			 * Moves focus to a specific tab without activating it.
 			 *

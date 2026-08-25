@@ -21,7 +21,7 @@ function block_core_tabs_generate_tabs_list( array $innerblocks = array(), strin
 	// Find tab-panel block
 	foreach ( $innerblocks as $inner_block ) {
 		if ( 'core/tab-panels' === ( $inner_block['blockName'] ?? '' ) ) {
-			$tab_index = 0;
+			$tab_number = 1;
 			foreach ( $inner_block['innerBlocks'] ?? array() as $tab_block ) {
 				if ( 'core/tab-panel' === ( $tab_block['blockName'] ?? '' ) ) {
 					$attrs = $tab_block['attrs'] ?? array();
@@ -29,11 +29,11 @@ function block_core_tabs_generate_tabs_list( array $innerblocks = array(), strin
 					$tab_id = ! empty( $attrs['anchor'] )
 						? $attrs['anchor']
 						: ( ! empty( $tabs_id )
-							? $tabs_id . '-tab-' . $tab_index
-							: 'tab-' . $tab_index );
+							? $tabs_id . '-tab-' . $tab_number
+							: 'tab-' . $tab_number );
 
 					$tabs_list[] = esc_attr( $tab_id );
-					++$tab_index;
+					++$tab_number;
 				}
 			}
 			break;
@@ -59,7 +59,7 @@ function block_core_tabs_provide_context( array $context, array $parsed_block ):
 	if ( 'core/tabs' === $parsed_block['blockName'] ) {
 		// Generate a unique ID for the tabs instance first, so it can be used
 		// to derive stable tab IDs.
-		$tabs_id                   = $parsed_block['attrs']['anchor'] ?? wp_unique_id( 'tabs_' );
+		$tabs_id                   = $parsed_block['attrs']['anchor'] ?? wp_unique_prefixed_id( 'tabs_' );
 		$tabs_list                 = block_core_tabs_generate_tabs_list( $parsed_block['innerBlocks'] ?? array(), $tabs_id );
 		$context['core/tabs-list'] = $tabs_list;
 		$context['core/tabs-id']   = $tabs_id;
