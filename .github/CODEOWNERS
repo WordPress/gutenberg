@@ -6,11 +6,11 @@
 /schemas/json
 
 # Data
-/packages/api-fetch                             @nerrad @mmtr
-/packages/core-data                             @nerrad
-/packages/data                                  @nerrad
-/packages/redux-routine                         @nerrad
-/packages/data-controls                         @nerrad
+/packages/api-fetch                             @mmtr
+/packages/core-data                             
+/packages/data                                  
+/packages/redux-routine                         
+/packages/data-controls                         
 
 # Blocks
 /packages/block-library                         @ajitbohra @fabiankaegy
@@ -58,23 +58,23 @@
 /tools                                          @manzoorwanijk
 /tools/eslint/suppressions.json
 /tools/stylelint/stylelint-suppressions.json
-/packages/babel-plugin-import-jsx-pragma        @ntwb @nerrad @ajitbohra
-/packages/babel-plugin-makepot                  @ntwb @nerrad @ajitbohra
-/packages/babel-preset-default                  @ntwb @nerrad @ajitbohra
-/packages/browserslist-config                   @ntwb @nerrad @ajitbohra
+/packages/babel-plugin-import-jsx-pragma        @ntwb @ajitbohra
+/packages/babel-plugin-makepot                  @ntwb @ajitbohra
+/packages/babel-preset-default                  @ntwb @ajitbohra
+/packages/browserslist-config                   @ntwb @ajitbohra
 /packages/create-block                          @ryanwelcher
 /packages/create-block-tutorial-template        @ryanwelcher
 /packages/dependency-extraction-webpack-plugin
 /packages/docgen
-/packages/e2e-tests                             @ntwb @nerrad @ajitbohra
+/packages/e2e-tests                             @ntwb @ajitbohra
 /packages/e2e-test-utils-playwright             @kevin940726
-/packages/eslint-plugin                         @ntwb @nerrad @ajitbohra
-/packages/jest-console                          @ntwb @nerrad @ajitbohra
-/packages/jest-preset-default                   @ntwb @nerrad @ajitbohra
-/packages/npm-package-json-lint-config          @ntwb @nerrad @ajitbohra
-/packages/postcss-themes                        @ntwb @nerrad @ajitbohra
+/packages/eslint-plugin                         @ntwb @ajitbohra
+/packages/jest-console                          @ntwb @ajitbohra
+/packages/jest-preset-default                   @ntwb @ajitbohra
+/packages/npm-package-json-lint-config          @ntwb @ajitbohra
+/packages/postcss-themes                        @ntwb @ajitbohra
 /packages/prettier-config                       @ntwb
-/packages/scripts                               @ntwb @nerrad @ajitbohra @ryanwelcher
+/packages/scripts                               @ntwb @ajitbohra @ryanwelcher
 /packages/stylelint-config                      @ntwb
 /test/php/gutenberg-coding-standards            @anton-vlasenko
 

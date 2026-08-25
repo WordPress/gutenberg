@@ -1,16 +1,9 @@
-/**
- * External dependencies
- */
 import type {
 	Browser,
 	Page,
 	BrowserContext,
 	FrameLocator,
 } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import { clickBlockOptionsMenuItem } from './click-block-options-menu-item';
 import { clickBlockToolbarButton } from './click-block-toolbar-button';
 import { getBlocks } from './get-blocks';

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useContext, useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { EntityContext } from './entity-context';
 
 /**

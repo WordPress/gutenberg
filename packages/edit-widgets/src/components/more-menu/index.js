@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { MenuGroup, MenuItem, DropdownMenu } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
@@ -10,10 +7,6 @@ import { displayShortcut } from '@wordpress/keycodes';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useViewportMatch } from '@wordpress/compose';
 import { VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import ToolsMoreMenuGroup from './tools-more-menu-group';
 

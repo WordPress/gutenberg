@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { Fragment } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import HierarchicalTermSelector from './hierarchical-term-selector';
 import FlatTermSelector from './flat-term-selector';
 import { store as editorStore } from '../../store';

@@ -2,7 +2,7 @@
 	"name": "@wordpress/report-flaky-tests",
 	"version": "0.0.0",
 	"private": true,
-	"description": "A GitHub action to report flaky E2E tests to GitHub issues.",
+	"description": "A GitHub action to report flaky E2E tests as a comment on the pull request.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
@@ -23,11 +23,12 @@
 		"node": ">=18.12.0",
 		"npm": ">=8.19.2"
 	},
-	"main": "build/index.mjs",
+	"type": "module",
+	"main": "src/index.ts",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"require": "./build/index.mjs"
+			"import": "./src/index.ts"
 		},
 		"./package.json": "./package.json"
 	},
@@ -36,7 +37,6 @@
 		"@actions/core": "^1.9.1",
 		"@actions/github": "^5.0.1",
 		"@jest/test-result": "^30.4.1",
-		"@octokit/types": "^6.34.0",
 		"@octokit/webhooks-types": "^5.8.0",
 		"@playwright/test": "^1.62.1",
 		"jest-message-util": "^30.4.1"

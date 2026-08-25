@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import fs from 'node:fs/promises';
 import babel from '@babel/core';
 import { ROOT_DIR } from './index.mjs';

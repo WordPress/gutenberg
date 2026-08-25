@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import PostPanelRow from '../post-panel-row';
 import PostStickyForm from './';
 import PostStickyCheck from './check';

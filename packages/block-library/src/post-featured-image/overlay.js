@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	withColors,
 	__experimentalUseGradient,
@@ -13,10 +6,6 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 } from '@wordpress/block-editor';
 import { compose } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { dimRatioToClass } from './utils';
 
 const Overlay = ( { attributes, overlayColor } ) => {

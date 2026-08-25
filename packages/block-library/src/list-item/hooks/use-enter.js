@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	createBlock,
 	getDefaultBlockName,
@@ -11,10 +8,6 @@ import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { ENTER } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import useOutdentListItem from './use-outdent-list-item';
 import { unlock } from '../../lock-unlock';
 

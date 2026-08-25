@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { css } from '@emotion/react';
-
-/**
- * Internal dependencies
- */
 import { CONFIG } from '../utils';
 
 export const scrollableScrollbar = css`

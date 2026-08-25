@@ -1,8 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
 import {
 	BlockControls,
 	MediaReplaceFlow,
@@ -13,10 +9,6 @@ import {
 import { __ } from '@wordpress/i18n';
 import { MenuItem, ToolbarButton } from '@wordpress/components';
 import { crop, link } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { ALLOWED_MEDIA_TYPES, EMBED_VIDEO_BACKGROUND_TYPE } from '../shared';
 import { unlock } from '../../lock-unlock';
 import EmbedVideoUrlInput from './embed-video-url-input';
@@ -121,7 +113,7 @@ export default function CoverBlockControls( {
 						<ToolbarButton
 							ref={ editMediaButtonRef }
 							icon={ crop }
-							label={ __( 'Crop background image' ) }
+							label={ __( 'Edit image' ) }
 							onClick={ onEditMedia }
 							aria-haspopup="dialog"
 							// Disable rather than hide while the edited image

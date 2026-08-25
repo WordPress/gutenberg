@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useBlockProps,
 	useInnerBlocksProps,
@@ -8,13 +5,7 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Controls from './controls';
-
-const TEMPLATE = [ [ 'core/paragraph' ] ];
 
 export default function Edit( { clientId, isSelected } ) {
 	const {
@@ -102,9 +93,7 @@ export default function Edit( { clientId, isSelected } ) {
 		tabIndex: isSelectedTab ? 0 : -1,
 	} );
 
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: TEMPLATE,
-	} );
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {} );
 
 	return (
 		<section { ...innerBlocksProps }>

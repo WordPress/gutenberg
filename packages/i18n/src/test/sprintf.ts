@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { sprintf } from '../sprintf';
 import type { TransformedText } from '../types';
 

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreDataStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { default as termDataBindings, termDataFields } from '../term-data';
 
 describe( 'term-data bindings', () => {

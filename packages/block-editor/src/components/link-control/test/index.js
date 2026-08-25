@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import {
 	fireEvent,
 	render as baseRender,
@@ -9,23 +6,16 @@ import {
 	within,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-/**
- * WordPress dependencies
- */
 import { SlotFillProvider } from '@wordpress/components';
 import { useState, createElement } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import LinkControl from '../';
 import {
 	fauxEntitySuggestions,
 	fetchFauxEntitySuggestions,
 	uniqueId,
 } from './fixtures';
+import { expectValidatedInputControlDeprecationIfCalled } from '../../url-input/test/fixtures/validated-input-control-deprecation';
 
 const mockFetchSearchSuggestions = jest.fn();
 
@@ -3264,6 +3254,10 @@ describe( 'URL validation', () => {
 
 	beforeEach( () => {
 		mockOnChange.mockClear();
+	} );
+
+	afterEach( () => {
+		expectValidatedInputControlDeprecationIfCalled();
 	} );
 
 	it.each( [

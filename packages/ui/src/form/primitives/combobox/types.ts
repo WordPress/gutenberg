@@ -1,6 +1,5 @@
 import type { Combobox as _Combobox } from '@base-ui/react/combobox';
 import type { ReactElement } from 'react';
-
 import type { ComponentProps } from '../../../utils/types';
 import type { InputLayoutProps } from '../input-layout/types';
 
@@ -50,7 +49,7 @@ export type ComboboxGroupLabelProps = ComponentProps<
 
 export type ComboboxInputProps = Omit<
 	ComponentProps< typeof _Combobox.Input >,
-	'size'
+	'size' | 'type' // The combobox role is only valid on input type="text".
 >;
 
 export type ComboboxInputGroupProps = ComponentProps<
@@ -61,12 +60,6 @@ export type ComboboxInputGroupProps = ComponentProps<
 
 export type ComboboxItemProps = ComponentProps< typeof _Combobox.Item > & {
 	children?: React.ReactNode;
-	/**
-	 * The size of the item.
-	 *
-	 * @default 'default'
-	 */
-	size?: ComboboxSize;
 	/**
 	 * The variant of the item.
 	 *

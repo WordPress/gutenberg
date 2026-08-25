@@ -21,6 +21,7 @@
 		"@wordpress/icons": "file:../../packages/icons",
 		"@wordpress/notices": "file:../../packages/notices",
 		"@wordpress/preferences": "file:../../packages/preferences",
+		"@wordpress/route": "file:../../packages/route",
 		"@wordpress/ui": "file:../../packages/ui",
 		"@wordpress/viewport": "file:../../packages/viewport",
 		"@wordpress/warning": "file:../../packages/warning",
@@ -30,6 +31,7 @@
 	},
 	"devDependencies": {
 		"@testing-library/dom": "^10.4.1",
+		"@types/jest": "^30.0.0",
 		"@testing-library/jest-dom": "^6.9.1",
 		"@testing-library/react": "^16.3.2"
 	},

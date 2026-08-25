@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "14.51.0",
+	"version": "14.53.0",
 	"description": "Enhanced block editor for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -76,6 +76,7 @@
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
+		"@wordpress/escape-html": "file:../escape-html",
 		"@wordpress/fields": "file:../fields",
 		"@wordpress/global-styles-engine": "file:../global-styles-engine",
 		"@wordpress/global-styles-ui": "file:../global-styles-ui",
@@ -84,6 +85,7 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/interface": "file:../interface",
+		"@wordpress/kebab-case": "file:../kebab-case",
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/media-editor": "file:../media-editor",
@@ -117,10 +119,12 @@
 		"uuid": "^14.0.0"
 	},
 	"devDependencies": {
-		"@storybook/react-vite": "^10.4.3",
+		"@storybook/react-vite": "^10.5.3",
 		"@testing-library/dom": "^10.4.1",
+		"@testing-library/jest-dom": "^6.9.1",
 		"@testing-library/react": "^16.3.2",
 		"@testing-library/user-event": "^14.6.1",
+		"@types/jest": "^30.0.0",
 		"@wordpress/block-library": "file:../block-library",
 		"deep-freeze": "^0.0.1"
 	},

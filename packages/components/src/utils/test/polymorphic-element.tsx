@@ -1,12 +1,7 @@
 import styled from '@emotion/styled';
 import { render, screen } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
-
 import { createElement, createRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { PolymorphicElement } from '../polymorphic-element';
 
 const StyledDiv = styled.div``;

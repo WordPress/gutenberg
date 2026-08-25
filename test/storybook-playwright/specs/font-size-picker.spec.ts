@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { test, expect, type Page } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import { gotoStoryId } from '../utils';
 
 const waitUntilButtonHighlightStable = async ( page: Page ) => {

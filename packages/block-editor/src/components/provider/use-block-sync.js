@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useContext, useEffect, useRef } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { SelectionContext } from './selection-context';
 

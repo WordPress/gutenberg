@@ -1,10 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { cleanForSlug } from '@wordpress/url';
-/**
- * Internal dependencies
- */
 import type { BasePost } from '../../types';
 import { getItemTitle } from '../../actions/utils';
 

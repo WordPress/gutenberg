@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __experimentalHStack as HStack } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 

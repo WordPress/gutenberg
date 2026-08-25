@@ -25,6 +25,8 @@ npm install @wordpress/views --save
 
 Async function for loading view state in route loaders.
 
+Resolves the same layers `useView` does, so a route loader and the hook that takes over from it agree on the view.
+
 _Parameters_
 
 -   _config_ `ViewConfig`: Configuration object for loading the view.
@@ -32,6 +34,7 @@ _Parameters_
 -   _config.name_ `ViewConfig`: Specific entity name.
 -   _config.slug_ `ViewConfig`: View identifier.
 -   _config.defaultView_ `ViewConfig`: Default view configuration.
+-   _config.defaultLayouts_ `ViewConfig`: Default layout configurations keyed by layout type.
 -   _config.activeViewOverrides_ `ViewConfig`: View overrides applied on top but never persisted.
 -   _config.queryParams_ `ViewConfig`: Object with `page` and/or `search` from URL.
 
@@ -42,6 +45,8 @@ _Returns_
 ### useView
 
 Hook for managing DataViews view state with local persistence.
+
+Only the properties the user actually modified are persisted: every other property keeps resolving out of the layers below, so a change to the default view, to the layout defaults or to the active view overrides keeps showing through.
 
 _Parameters_
 

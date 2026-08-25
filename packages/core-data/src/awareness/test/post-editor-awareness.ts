@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { Y } from '@wordpress/sync';
 import { dispatch, select, subscribe, resolveSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { PostEditorAwareness } from '../post-editor-awareness';
 import { SelectionType } from '../../utils/crdt-user-selections';
 import type {
@@ -15,7 +8,7 @@ import type {
 	SelectionWholeBlock,
 } from '../../types';
 import { CRDT_RECORD_MAP_KEY } from '../../sync';
-import type { CollaboratorInfo } from '../types';
+import type { CollaboratorInfo, PostEditorState } from '../types';
 
 // Mock WordPress dependencies
 jest.mock( '@wordpress/data', () => ( {
@@ -819,6 +812,68 @@ describe( 'PostEditorAwareness', () => {
 
 			expect( debugData.clients ).toBeDefined();
 			expect( typeof debugData.clients ).toBe( 'object' );
+		} );
+
+		test( 'should omit incomplete collaborator identities', () => {
+			const awareness = new PostEditorAwareness(
+				doc,
+				'postType',
+				'post',
+				123
+			);
+			awareness.getSeenStates().set( 456, {
+				editorState: { selection: { type: SelectionType.None } },
+			} as PostEditorState );
+
+			expect( awareness.getDebugData().collaboratorMap ).toEqual( {} );
+		} );
+
+		test( 'should preserve null WordPress user IDs for fallback collaborators', () => {
+			const awareness = new PostEditorAwareness(
+				doc,
+				'postType',
+				'post',
+				123
+			);
+			awareness.getSeenStates().set( 456, {
+				collaboratorInfo: {
+					browserType: 'Chrome',
+					enteredAt: 123,
+					id: null,
+					name: 'Anonymous User',
+					slug: 'anonymous-456',
+				},
+			} );
+
+			expect( awareness.getDebugData().collaboratorMap ).toEqual( {
+				456: {
+					name: 'Anonymous User',
+					wpUserId: null,
+				},
+			} );
+		} );
+
+		test( 'should use the existing ID for named collaborators', () => {
+			const awareness = new PostEditorAwareness(
+				doc,
+				'postType',
+				'post',
+				123
+			);
+			awareness.getSeenStates().set( 456, {
+				collaboratorInfo: {
+					avatar_urls: {},
+					browserType: 'Chrome',
+					enteredAt: 123,
+					id: 42,
+					name: 'Test User',
+					slug: 'test-user',
+				},
+			} );
+
+			expect( awareness.getDebugData().collaboratorMap ).toEqual( {
+				456: { name: 'Test User', wpUserId: 42 },
+			} );
 		} );
 	} );
 

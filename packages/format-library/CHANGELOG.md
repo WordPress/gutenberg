@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Internal
+
+-   Math format: Use `ValidatedInputControl` from `@wordpress/ui` in the LaTeX popover instead of unlocking `ValidatedInputControl` from the `@wordpress/components` private APIs ([#81627](https://github.com/WordPress/gutenberg/pull/81627)).
+
+## 5.53.0 (2026-08-12)
+
+
+## 5.52.0 (2026-07-29)
+
 ## 5.51.0 (2026-07-14)
 
 ### Enhancements

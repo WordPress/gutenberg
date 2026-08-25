@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { MenuGroup } from '@wordpress/components';
 import { useMemo, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import BlockStylesMenuItems from '../block-styles/menu-items';
 import useStylesForBlocks from '../block-styles/use-styles-for-block';
 import { replaceActiveStyle } from '../block-styles/utils';

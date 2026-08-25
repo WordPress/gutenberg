@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { ProgressBar } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 
 const { useStyle } = unlock( editorPrivateApis );

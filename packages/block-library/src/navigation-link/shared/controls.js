@@ -1,13 +1,10 @@
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	CheckboxControl,
 	TextControl,
-	TextareaControl,
+	TextareaControl as WCTextareaControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
@@ -18,10 +15,6 @@ import {
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { external } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { useHandleLinkChange } from './use-handle-link-change';
 import { useEntityBinding } from './use-entity-binding';
@@ -272,7 +265,7 @@ export function Controls( {
 				onDeselect={ () => setAttributes( { description: '' } ) }
 				isShownByDefault={ ! isContentOnly }
 			>
-				<TextareaControl
+				<WCTextareaControl
 					label={ __( 'Description' ) }
 					value={ description || '' }
 					onChange={ ( descriptionValue ) => {

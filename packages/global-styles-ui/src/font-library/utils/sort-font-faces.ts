@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import type { FontFace } from '@wordpress/core-data';
 
 function getNumericFontWeight( value: string ): number {

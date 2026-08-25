@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { Button, Dropdown } from '@wordpress/components';
 import { useState, useMemo } from '@wordpress/element';
@@ -8,10 +5,6 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import PostAuthorCheck from './check';
 import PostAuthorForm from './index';
 import PostPanelRow from '../post-panel-row';

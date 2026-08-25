@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { SVG, Path } from '@wordpress/components';
 
 export const resultsFound = (

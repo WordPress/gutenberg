@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 1.53.0 (2026-08-12)
+
+### Internal
+
+-   Remove obsolete dependency grouping comments as part of the repository-wide separator-free import migration. ([#81248](https://github.com/WordPress/gutenberg/pull/81248))
+
+## 1.52.0 (2026-07-29)
+
 ## 1.51.0 (2026-07-14)
 
 ## 1.50.0 (2026-07-01)

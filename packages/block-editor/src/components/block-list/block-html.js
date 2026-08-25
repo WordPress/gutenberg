@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import TextareaAutosize from 'react-autosize-textarea';
-
-/**
- * WordPress dependencies
- */
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -15,10 +8,6 @@ import {
 	getSaveContent,
 	validateBlock,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { useNativeUndo } from '../../utils/native-undo';
 

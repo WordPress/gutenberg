@@ -57,6 +57,7 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 
 _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
 
+- **spacing**: `.wp-block-accordion-heading .wp-block-accordion-heading__toggle`
 - **typography**:
   - letterSpacing: `.wp-block-accordion-heading .wp-block-accordion-heading__toggle-title`
   - textDecoration: `.wp-block-accordion-heading .wp-block-accordion-heading__toggle-title`

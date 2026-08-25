@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { __experimentalVStack as VStack } from '@wordpress/components';
 import {
@@ -9,10 +6,6 @@ import {
 	TypographyVariations,
 } from '@wordpress/global-styles-ui';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 
 const { useGlobalStyles } = unlock( editorPrivateApis );

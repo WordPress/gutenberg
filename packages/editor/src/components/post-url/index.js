@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { safeDecodeURIComponent, cleanForSlug } from '@wordpress/url';
 import { useState, createInterpolateElement } from '@wordpress/element';
@@ -9,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	ExternalLink,
 	Button,
-	__experimentalInputControl as InputControl,
+	__experimentalInputControl as WCInputControl,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 	__experimentalVStack as VStack,
@@ -18,10 +15,6 @@ import { store as noticesStore } from '@wordpress/notices';
 import { copySmall } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { useCopyToClipboard, useInstanceId } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 
 /**
@@ -108,7 +101,7 @@ export default function PostURL( { onClose } ) {
 				<div>
 					{ isEditable && (
 						<>
-							<InputControl
+							<WCInputControl
 								prefix={
 									<InputControlPrefixWrapper>
 										/

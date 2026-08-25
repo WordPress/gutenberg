@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import stripHTML from '../strip-html';
 
 describe( 'stripHTML', () => {

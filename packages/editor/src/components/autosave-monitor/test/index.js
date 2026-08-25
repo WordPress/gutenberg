@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import AutosaveMonitor from '../';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );

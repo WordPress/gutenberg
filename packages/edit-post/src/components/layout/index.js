@@ -1,17 +1,9 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
-import { NavigableRegion } from '@wordpress/admin-ui';
+import { NavigableRegion, getAdminThemeColors } from '@wordpress/admin-ui';
 import {
 	AutosaveMonitor,
 	LocalAutosaveMonitor,
 	UnsavedChangesWarning,
-	EditorKeyboardShortcutsRegister,
 	ErrorBoundary,
 	PostLockedModal,
 	store as editorStore,
@@ -33,7 +25,6 @@ import { chevronDown, chevronUp } from '@wordpress/icons';
 import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { privateApis as commandsPrivateApis } from '@wordpress/commands';
-import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
@@ -49,11 +40,8 @@ import {
 	useRefEffect,
 	useViewportMatch,
 } from '@wordpress/compose';
+import { ThemeProvider } from '@wordpress/theme';
 import { Tooltip, VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import BackButton from '../back-button';
 import EditorInitialization from '../editor-initialization';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
@@ -73,7 +61,6 @@ const { useCommandContext } = unlock( commandsPrivateApis );
 const { useDrag } = unlock( componentsPrivateApis );
 const { Editor, FullscreenMode, UploadProgressSnackbar } =
 	unlock( editorPrivateApis );
-const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 const DESIGN_POST_TYPES = [
 	'wp_template',
 	'wp_template_part',
@@ -562,53 +549,59 @@ function Layout( {
 			<BackButton initialPost={ initialPost } />
 		) : null;
 
+	const adminPrimary = useMemo( () => getAdminThemeColors().primary, [] );
+
 	return (
 		<SlotFillProvider>
 			<Tooltip.Provider>
-				<ErrorBoundary canCopyContent>
-					<WelcomeGuide postType={ currentPostType } />
-					<div { ...navigateRegionsProps }>
-						<Editor
-							settings={ editorSettings }
-							initialEdits={ initialEdits }
-							postType={ currentPostType }
-							postId={ currentPostId }
-							templateId={ templateId }
-							className={ className }
-							forceIsDirty={ hasActiveMetaboxes }
-							// We should auto-focus the canvas (title) on load.
-							// eslint-disable-next-line jsx-a11y/no-autofocus
-							autoFocus={ ! isWelcomeGuideVisible }
-							onActionPerformed={ onActionPerformed }
-							extraSidebarPanels={
-								showMetaBoxes && <MetaBoxes location="side" />
-							}
-							extraContent={
-								! isDistractionFree &&
-								showMetaBoxes && <MetaBoxesMain />
-							}
-						>
-							<PostLockedModal />
-							<EditorInitialization />
-							<FullscreenMode isActive={ isFullscreenActive } />
-							<BrowserURL />
-							<UnsavedChangesWarning />
-							<AutosaveMonitor />
-							<LocalAutosaveMonitor />
-							<EditPostKeyboardShortcuts />
-							<EditorKeyboardShortcutsRegister />
-							<BlockKeyboardShortcuts />
-							{ currentPostType === 'wp_block' && (
-								<InitPatternModal />
-							) }
-							<PluginArea onError={ onPluginAreaError } />
-							<PostEditorMoreMenu />
-							{ backButton }
-							<SnackbarNotices className="edit-post-layout__snackbar" />
-							<UploadProgressSnackbar />
-						</Editor>
-					</div>
-				</ErrorBoundary>
+				<ThemeProvider isRoot color={ { primary: adminPrimary } }>
+					<ErrorBoundary canCopyContent>
+						<WelcomeGuide postType={ currentPostType } />
+						<div { ...navigateRegionsProps }>
+							<Editor
+								settings={ editorSettings }
+								initialEdits={ initialEdits }
+								postType={ currentPostType }
+								postId={ currentPostId }
+								templateId={ templateId }
+								className={ className }
+								forceIsDirty={ hasActiveMetaboxes }
+								// We should auto-focus the canvas (title) on load.
+								// eslint-disable-next-line jsx-a11y/no-autofocus
+								autoFocus={ ! isWelcomeGuideVisible }
+								onActionPerformed={ onActionPerformed }
+								extraSidebarPanels={
+									showMetaBoxes && (
+										<MetaBoxes location="side" />
+									)
+								}
+								extraContent={
+									! isDistractionFree &&
+									showMetaBoxes && <MetaBoxesMain />
+								}
+							>
+								<PostLockedModal />
+								<EditorInitialization />
+								<FullscreenMode
+									isActive={ isFullscreenActive }
+								/>
+								<BrowserURL />
+								<UnsavedChangesWarning />
+								<AutosaveMonitor />
+								<LocalAutosaveMonitor />
+								<EditPostKeyboardShortcuts />
+								{ currentPostType === 'wp_block' && (
+									<InitPatternModal />
+								) }
+								<PluginArea onError={ onPluginAreaError } />
+								<PostEditorMoreMenu />
+								{ backButton }
+								<SnackbarNotices className="edit-post-layout__snackbar" />
+								<UploadProgressSnackbar />
+							</Editor>
+						</div>
+					</ErrorBoundary>
+				</ThemeProvider>
 			</Tooltip.Provider>
 		</SlotFillProvider>
 	);

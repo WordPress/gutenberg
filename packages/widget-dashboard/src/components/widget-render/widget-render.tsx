@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useCallback } from '@wordpress/element';
 import { WidgetRender as WidgetRenderPrimitive } from '@wordpress/widget-primitives';
 import type { WidgetType } from '@wordpress/widget-primitives';
-
-/**
- * Internal dependencies
- */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import type { DashboardWidget } from '../../types';
 

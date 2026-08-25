@@ -7,12 +7,12 @@ Snapshot Diff:
 
 @@ -8,11 +8,11 @@
       <div
-        class="css-dcjs67-itemWrapper"
+        class="style-item-wrapper"
         role="listitem"
       >
         <div
--         class="css-17kujwd-medium css-1izz8ne-item css-166x88h-spacedAround components-item"
-+         class="css-o0djae-large css-1izz8ne-item css-166x88h-spacedAround components-item"
+-         class="style-item style-is-size-medium style-is-spaced-around components-item"
++         class="style-item style-is-size-large style-is-spaced-around components-item"
           data-wp-c16t="true"
           data-wp-component="Item"
         >
@@ -20,12 +20,12 @@ Snapshot Diff:
         </div>
 @@ -20,11 +20,11 @@
       <div
-        class="css-dcjs67-itemWrapper"
+        class="style-item-wrapper"
         role="listitem"
       >
         <div
--         class="css-17kujwd-medium css-1izz8ne-item css-166x88h-spacedAround components-item"
-+         class="css-o0djae-large css-1izz8ne-item css-166x88h-spacedAround components-item"
+-         class="style-item style-is-size-medium style-is-spaced-around components-item"
++         class="style-item style-is-size-large style-is-spaced-around components-item"
           data-wp-c16t="true"
           data-wp-component="Item"
         >
@@ -40,12 +40,12 @@ Snapshot Diff:
 
 @@ -2,11 +2,11 @@
     <div
-      class="css-dcjs67-itemWrapper"
+      class="style-item-wrapper"
       role="listitem"
     >
       <div
--       class="css-17kujwd-medium css-1izz8ne-item components-item"
-+       class="css-o0djae-large css-1izz8ne-item components-item"
+-       class="style-item style-is-size-medium components-item"
++       class="style-item style-is-size-large components-item"
         data-wp-c16t="true"
         data-wp-component="Item"
       >
@@ -54,54 +54,19 @@ Snapshot Diff:
 `;
 
 exports[`ItemGroup ItemGroup component should render correctly 1`] = `
-.emotion-0 {
-  border-radius: 2px;
-}
-
-.emotion-0>*:first-of-type>* {
-  border-top-left-radius: 2px;
-  border-top-right-radius: 2px;
-}
-
-.emotion-0>*:last-of-type>* {
-  border-bottom-left-radius: 2px;
-  border-bottom-right-radius: 2px;
-}
-
-.emotion-1 {
-  width: 100%;
-  display: block;
-}
-
-.emotion-2 {
-  padding: calc((36px - calc(13px * 1.4) - 2px) / 2) 12px;
-}
-
-.emotion-3 {
-  box-sizing: border-box;
-  width: 100%;
-  display: block;
-  margin: 0;
-  color: inherit;
-}
-
-.emotion-4 {
-  border-radius: 2px;
-}
-
 <div>
   <div
-    class="emotion-0 components-item-group"
+    class="style-item-group style-is-rounded components-item-group"
     data-wp-c16t="true"
     data-wp-component="ItemGroup"
     role="list"
   >
     <div
-      class="emotion-1"
+      class="style-item-wrapper"
       role="listitem"
     >
       <div
-        class="emotion-2 emotion-3 emotion-4 components-item"
+        class="style-item style-is-size-medium style-is-spaced-around components-item"
         data-wp-c16t="true"
         data-wp-component="Item"
       >
@@ -120,19 +85,19 @@ Snapshot Diff:
 @@ -1,18 +1,18 @@
   <div>
     <div
--     class="css-1e6snp6-rounded components-item-group"
-+     class="css-qr0sb5-separated css-1e6snp6-rounded components-item-group"
+-     class="style-item-group style-is-rounded components-item-group"
++     class="style-item-group style-is-separated style-is-rounded components-item-group"
       data-wp-c16t="true"
       data-wp-component="ItemGroup"
       role="list"
     >
       <div
-        class="css-dcjs67-itemWrapper"
+        class="style-item-wrapper"
         role="listitem"
       >
         <div
--         class="css-17kujwd-medium css-1izz8ne-item css-166x88h-spacedAround components-item"
-+         class="css-17kujwd-medium css-1izz8ne-item components-item"
+-         class="style-item style-is-size-medium style-is-spaced-around components-item"
++         class="style-item style-is-size-medium components-item"
           data-wp-c16t="true"
           data-wp-component="Item"
         >
@@ -148,19 +113,19 @@ Snapshot Diff:
 @@ -1,18 +1,18 @@
   <div>
     <div
--     class="css-1e6snp6-rounded components-item-group"
-+     class="css-9rmwob-bordered css-1e6snp6-rounded components-item-group"
+-     class="style-item-group style-is-rounded components-item-group"
++     class="style-item-group style-is-bordered style-is-rounded components-item-group"
       data-wp-c16t="true"
       data-wp-component="ItemGroup"
       role="list"
     >
       <div
-        class="css-dcjs67-itemWrapper"
+        class="style-item-wrapper"
         role="listitem"
       >
         <div
--         class="css-17kujwd-medium css-1izz8ne-item css-166x88h-spacedAround components-item"
-+         class="css-17kujwd-medium css-1izz8ne-item components-item"
+-         class="style-item style-is-size-medium style-is-spaced-around components-item"
++         class="style-item style-is-size-medium components-item"
           data-wp-c16t="true"
           data-wp-component="Item"
         >
@@ -176,8 +141,8 @@ Snapshot Diff:
 @@ -1,8 +1,8 @@
   <div>
     <div
--     class="css-1e6snp6-rounded components-item-group"
-+     class="components-item-group"
+-     class="style-item-group style-is-rounded components-item-group"
++     class="style-item-group components-item-group"
       data-wp-c16t="true"
       data-wp-component="ItemGroup"
       role="list"

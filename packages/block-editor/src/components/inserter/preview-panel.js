@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	isReusableBlock,
 	createBlock,
@@ -8,10 +5,6 @@ import {
 } from '@wordpress/blocks';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import BlockCard from '../block-card';
 import BlockPreview from '../block-preview';
 

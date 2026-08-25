@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalVStack as VStack,
 	__experimentalToggleGroupControl as ToggleGroupControl,
@@ -8,10 +5,6 @@ import {
 	ToggleControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import OverlayMenuIcon from './overlay-menu-icon';
 
 /**

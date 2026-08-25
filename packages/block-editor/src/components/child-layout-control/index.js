@@ -1,11 +1,8 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUnitControl as UnitControl,
-	__experimentalInputControl as InputControl,
+	__experimentalInputControl as WCInputControl,
 	__experimentalVStack as VStack,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUseCustomUnits as useCustomUnits,
@@ -15,10 +12,6 @@ import {
 import { __, _x } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { useGetNumberOfBlocksBeforeCell } from '../grid/use-get-number-of-blocks-before-cell';
 import { store as blockEditorStore } from '../../store';
 import { useSettings } from '../use-settings';
@@ -305,7 +298,7 @@ function GridControls( {
 				panelId={ panelId }
 			>
 				<FlexItem style={ { width: '50%' } }>
-					<InputControl
+					<WCInputControl
 						label={ __( 'Column span' ) }
 						type="number"
 						onChange={ ( value ) => {
@@ -329,7 +322,7 @@ function GridControls( {
 					/>
 				</FlexItem>
 				<FlexItem style={ { width: '50%' } }>
-					<InputControl
+					<WCInputControl
 						label={ __( 'Row span' ) }
 						type="number"
 						onChange={ ( value ) => {
@@ -366,7 +359,7 @@ function GridControls( {
 					panelId={ panelId }
 				>
 					<FlexItem style={ { width: '50%' } }>
-						<InputControl
+						<WCInputControl
 							label={ __( 'Column' ) }
 							type="number"
 							onChange={ ( value ) => {
@@ -400,7 +393,7 @@ function GridControls( {
 						/>
 					</FlexItem>
 					<FlexItem style={ { width: '50%' } }>
-						<InputControl
+						<WCInputControl
 							label={ __( 'Row' ) }
 							type="number"
 							onChange={ ( value ) => {

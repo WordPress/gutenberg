@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useResizeObserver, useMergeRefs } from '@wordpress/compose';
 import {
 	useLayoutEffect,
@@ -8,10 +5,6 @@ import {
 	useState,
 	type Ref,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { resolveDashboardColumnCount } from '../utils/resolve-dashboard-column-count/resolve-dashboard-column-count';
 
 interface UseDashboardContainerColumnCountResult {

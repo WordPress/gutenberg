@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import PostTypeSupportCheck from '../post-type-support-check';
 import ThemeSupportCheck from '../theme-support-check';
 

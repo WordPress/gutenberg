@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { Spinner } from '@wordpress/components';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
@@ -14,10 +7,6 @@ import { addFilter } from '@wordpress/hooks';
 import { store as blocksStore } from '@wordpress/blocks';
 import { sprintf, __ } from '@wordpress/i18n';
 import { VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 import VisualEditor from '../visual-editor';

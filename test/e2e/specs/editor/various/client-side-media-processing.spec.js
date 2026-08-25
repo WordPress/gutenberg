@@ -1,13 +1,9 @@
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
 const os = require( 'os' );
 const { randomUUID } = require( 'crypto' );
 const { createRequire } = require( 'node:module' );
 const { pathToFileURL } = require( 'node:url' );
-
 /**
  * Resolves the `wasm-vips` entry point from the `@wordpress/vips` package,
  * which declares it as a direct dependency. This works whether or not
@@ -21,10 +17,6 @@ const wasmVipsEntry = pathToFileURL(
 		'wasm-vips'
 	)
 ).href;
-
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 /**

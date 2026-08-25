@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 const { readFileSync } = require( 'fs' );
 const { basename, dirname, extname, join, sep } = require( 'path' );
 const { sync: glob } = require( 'fast-glob' );
-
-/**
- * Internal dependencies
- */
 const {
 	getArgFromCLI,
 	getArgsFromCLI,

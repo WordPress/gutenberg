@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ComponentType } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { DataFormControlProps, Field, EditConfig } from '../../types';
 import checkbox from './checkbox';
 import combobox from './combobox';
@@ -20,9 +13,9 @@ import number from './number';
 import radio from './radio';
 import select from './select';
 import text from './text';
+import time from './time';
 import toggle from './toggle';
 import textarea from './textarea';
-import richtext from './richtext';
 import toggleGroup from './toggle-group';
 import array from './array';
 import color from './color';
@@ -50,9 +43,9 @@ const FORM_CONTROLS: FormControls = {
 	radio,
 	select,
 	text,
+	time,
 	toggle,
 	textarea,
-	richtext,
 	toggleGroup,
 };
 

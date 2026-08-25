@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { View } from '../../view';
 import { Scrollable } from '..';
 
@@ -75,6 +64,7 @@ const Template: StoryFn< typeof Scrollable > = ( { ...args } ) => {
 						right: 0,
 					} }
 					type="text"
+					aria-label="Element out of view"
 					value="Focus me"
 					readOnly
 				/>

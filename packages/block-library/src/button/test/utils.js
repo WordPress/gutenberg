@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getWidthClasses, isPercentageWidth } from '../utils';
 
 describe( 'isPercentageWidth', () => {

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useViewportMatch } from '@wordpress/compose';
 import { BlockBreadcrumb } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
@@ -12,10 +9,6 @@ import {
 } from '@wordpress/interface';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import Header from '../header';
 import WidgetAreasBlockEditorContent from '../widget-areas-block-editor-content';
 import { store as editWidgetsStore } from '../../store';

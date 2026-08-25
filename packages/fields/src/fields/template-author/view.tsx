@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -16,10 +9,6 @@ import {
 	globe as globeIcon,
 } from '@wordpress/icons';
 import { Icon, Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { Template, TemplatePart } from '../../types';
 
 function getIconForSource( originalSource: Template[ 'original_source' ] ) {

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { convertImageFormat, compressImage } from '../';
 
 const mockNewFromBuffer = jest.fn( () => new MockImage() );

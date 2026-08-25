@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import BlockControlsFill from './fill';
 import BlockControlsSlot from './slot';
 

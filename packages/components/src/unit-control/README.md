@@ -1,8 +1,6 @@
 # UnitControl
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
+<p class="callout callout-alert">This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.</p>
 
 `UnitControl` allows the user to set a numeric quantity as well as a unit (e.g. `px`).
 
