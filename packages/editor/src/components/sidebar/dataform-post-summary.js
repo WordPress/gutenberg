@@ -59,8 +59,6 @@ function useInspectorPanelVisibility( form ) {
 			featured_media: featuredImageEnabled,
 			excerpt: excerptEnabled,
 			'post-content-info': true,
-			// Informational like `post-content-info`, and always rendered by the
-			// legacy summary, so it isn't tied to the `post-status` panel.
 			reading_settings: true,
 			discussion: discussionEnabled && ! isPostStatusRemoved,
 			parent: pageAttributesEnabled && ! isPostStatusRemoved,
