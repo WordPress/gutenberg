@@ -8,12 +8,13 @@
     -   `DropdownContentWrapper` ([#81522](https://github.com/WordPress/gutenberg/pull/81522))
     -   `ResizableBox` ([#81792](https://github.com/WordPress/gutenberg/pull/81792))
     -   `ComboboxControl`: ([#80471](https://github.com/WordPress/gutenberg/pull/80471))
-    -   `GradientPicker`, `ColorPalette`: ([#80473](https://github.com/WordPress/gutenberg/pull/80473)).
+    -   `GradientPicker`, `ColorPalette`: ([#80473](https://github.com/WordPress/gutenberg/pull/80473))
     -   `BaseControl` ([#80001](https://github.com/WordPress/gutenberg/pull/80001))
     -   `BorderBoxControl`, `BorderControl` ([#80437](https://github.com/WordPress/gutenberg/pull/80437))
     -   `ProgressBar` ([#80512](https://github.com/WordPress/gutenberg/pull/80512))
     -   `TextareaControl` ([#81353](https://github.com/WordPress/gutenberg/pull/81353))
     -   `ZStack` ([#80514](https://github.com/WordPress/gutenberg/pull/80514))
+    -   `BoxControl` ([#80715](https://github.com/WordPress/gutenberg/pull/80715))
 
 ### Enhancements
 
@@ -24,6 +25,7 @@
 -   `ConfirmDialog`: Add the `title` prop to the types; the component already forwarded it to the underlying `Modal` ([#81847](https://github.com/WordPress/gutenberg/pull/81847)).
 -   `TextControl`, `TextareaControl`, `FormTokenField`, `ContentEditableControl`, `ComboboxControl`: Align focus and hover styles with the design system ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
 -   `InputControl`, `SelectControl`, `CustomSelectControl`: Align focus rings with the design system ([#80417](https://github.com/WordPress/gutenberg/pull/80417)).
+-   `BoxControl`: Keep the reset button focusable when disabled, preventing accidental focus loss ([#80715](https://github.com/WordPress/gutenberg/pull/80715)).
 
 ### Bug Fixes
 

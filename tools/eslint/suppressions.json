@@ -683,11 +683,6 @@
 			"count": 2
 		}
 	},
-	"packages/components/src/box-control/styles/box-control-styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/card/card/component.tsx": {
 		"no-restricted-imports": {
 			"count": 1
