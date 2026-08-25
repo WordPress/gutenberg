@@ -2838,6 +2838,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/subject-detection",
+		"slug": "packages-subject-detection",
+		"markdown_source": "../packages/subject-detection/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/sync",
 		"slug": "packages-sync",
 		"markdown_source": "../packages/sync/README.md",
