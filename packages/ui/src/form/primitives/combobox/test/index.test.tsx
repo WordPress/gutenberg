@@ -203,6 +203,9 @@ describe( 'Combobox', () => {
 		expect( screen.getByLabelText( 'Item 1' ) ).toHaveAccessibleName(
 			'Item 1'
 		);
+		expect(
+			screen.getByRole( 'button', { name: 'Remove Item 1' } )
+		).toBeVisible();
 	} );
 
 	it( 'uses a custom accessible label for chip remove buttons', () => {
@@ -620,7 +623,7 @@ describe( 'Combobox', () => {
 			renderDisabledMultiSelect();
 
 			expect(
-				screen.queryByRole( 'button', { name: 'Remove' } )
+				screen.queryByRole( 'button', { name: 'Remove Item 1' } )
 			).not.toBeInTheDocument();
 		} );
 
@@ -636,7 +639,7 @@ describe( 'Combobox', () => {
 			const user = userEvent.setup( { pointerEventsCheck: 0 } );
 			renderDisabledMultiSelect();
 
-			const removeButton = screen.getByLabelText( 'Remove', {
+			const removeButton = screen.getByLabelText( 'Remove Item 1', {
 				selector: 'button',
 			} );
 			await user.hover( removeButton );

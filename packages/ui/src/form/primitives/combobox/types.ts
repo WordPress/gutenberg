@@ -22,7 +22,8 @@ export type ComboboxChipWithRemoveProps = Omit<
 	/**
 	 * Accessible label for the remove button.
 	 *
-	 * @default __( 'Remove' )
+	 * When omitted and `children` is a string, defaults to a translated
+	 * `Remove %s` label using the chip name. Otherwise defaults to `Remove`.
 	 */
 	removeLabel?: string;
 };

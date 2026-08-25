@@ -1,7 +1,7 @@
 import { Combobox as _Combobox } from '@base-ui/react/combobox';
 import { forwardRef } from '@wordpress/element';
 import clsx from 'clsx';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { IconButton } from '../../../icon-button';
 import type { ComboboxChipWithRemoveProps } from './types';
@@ -19,7 +19,7 @@ export const ChipWithRemove = forwardRef<
 		className,
 		children,
 		prefix,
-		removeLabel = __( 'Remove' ),
+		removeLabel: removeLabelProp,
 		'aria-label': ariaLabel,
 		...restProps
 	},
@@ -27,6 +27,15 @@ export const ChipWithRemove = forwardRef<
 ) {
 	const chipAriaLabel =
 		ariaLabel ?? ( typeof children === 'string' ? children : undefined );
+	const removeLabel =
+		removeLabelProp ??
+		( typeof children === 'string'
+			? sprintf(
+					/* translators: %s: chip label. */
+					__( 'Remove %s' ),
+					children
+			  )
+			: __( 'Remove' ) );
 
 	return (
 		<_Combobox.Chip

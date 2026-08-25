@@ -38,7 +38,7 @@
 -   `Card`: Use the normal neutral surface stroke for the default border. ([#81746](https://github.com/WordPress/gutenberg/pull/81746))
 -   `Calendar`, `RangeCalendar`: Preserve day focus when a controlled month change removes the focused day. ([#81635](https://github.com/WordPress/gutenberg/pull/81635))
 -   `Button`: Fix the loading spinner being off-center in RTL ([#81901](https://github.com/WordPress/gutenberg/pull/81901)).
--   `Combobox.ChipWithRemove`: Derive an accessible label from string children so virtual focus announces the chip name without the remove button label.
+-   `Combobox.ChipWithRemove`: Derive an accessible label from string children so virtual focus announces the chip name without the remove button label. Derive the remove button label from string children as `Remove %s`.
 
 ### Documentation
 
