@@ -10,16 +10,15 @@ options:
 
     # The beforeEach extension fills in working_dir and the dynamic filesystem
     # allowlists.
+    # `failIfUnavailable` already defaults to true when the sandbox is enabled,
+    # and the `allowManaged*Only` locks bind only when passed as managedSettings
+    # — as plain sandbox options they do nothing, so they are not set here.
     sandbox:
         enabled: true
-        failIfUnavailable: true
         autoAllowBashIfSandboxed: true
         allowUnsandboxedCommands: false
         network:
             allowedDomains: []
-            allowManagedDomainsOnly: true
-        filesystem:
-            allowManagedReadPathsOnly: true
     # The workspace extension adds each row's temporary working_dir.
     provider:
         id: anthropic:claude-agent-sdk

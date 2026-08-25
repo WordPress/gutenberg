@@ -161,6 +161,11 @@ export async function extensionHook( hookName, context ) {
 										...( sandbox.filesystem || {} ),
 										allowRead: [ workspace ],
 										allowWrite: [ workspace ],
+										// allowRead only widens access, so the
+										// source checkout — which still holds
+										// this eval's assertions — has to be
+										// denied explicitly.
+										denyRead: [ sourceRoot ],
 									},
 								},
 						  }
