@@ -1,4 +1,5 @@
 const { warnCompat } = require( './warn-compat' );
+const { cloneElement } = require( './react-clone-element-polyfill' );
 
 const SECRET_INTERNALS_KEY =
 	'__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED';
@@ -24,7 +25,7 @@ const secretInternals = {
 	},
 };
 
-const react = { ...require( 'react' ) };
+const react = { ...require( 'react' ), cloneElement };
 
 Object.defineProperty( react, SECRET_INTERNALS_KEY, {
 	enumerable: true,
