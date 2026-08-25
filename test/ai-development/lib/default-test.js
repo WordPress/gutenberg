@@ -1,4 +1,5 @@
 // Options shared by every evaluation case.
+/** @type {import('promptfoo').TestCase} */
 export default {
 	options: {
 		prefix: [

@@ -1,5 +1,6 @@
 // Coding agents shared by every evaluation spec.
 // Claude only for now; a second agent can be added once it has actually been run.
+/** @type {import('promptfoo').ProviderOptions[]} */
 export default [
 	{
 		id: 'anthropic:claude-agent-sdk',
