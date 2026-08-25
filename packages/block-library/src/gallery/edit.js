@@ -35,6 +35,7 @@ import {
 	image as imageIcon,
 	linkOff,
 	fullscreen,
+	listView,
 } from '@wordpress/icons';
 import { sharedIcon } from './shared-icon';
 import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
@@ -103,6 +104,33 @@ const NAVIGATION_BUTTON_TYPE_OPTIONS = [
 	},
 ];
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
+
+const SORT_OPTIONS = [
+	{
+		label: __( 'Title A → Z' ),
+		value: 'title/asc',
+	},
+	{
+		label: __( 'Title Z → A' ),
+		value: 'title/desc',
+	},
+	{
+		label: __( 'Newest to oldest' ),
+		value: 'date/desc',
+	},
+	{
+		label: __( 'Oldest to newest' ),
+		value: 'date/asc',
+	},
+	{
+		label: __( 'ID ascending' ),
+		value: 'id/asc',
+	},
+	{
+		label: __( 'ID descending' ),
+		value: 'id/desc',
+	},
+];
 
 const PLACEHOLDER_TEXT = __(
 	'Drag and drop images, upload, or choose from your library.'
@@ -497,6 +525,42 @@ export default function GalleryEdit( props ) {
 
 	function toggleRandomOrder() {
 		setAttributes( { randomOrder: ! randomOrder } );
+	}
+
+	function getMediaSortValue( block, field ) {
+		const media = imageData.find( ( m ) => m.id === block.attributes.id );
+		if ( field === 'title' ) {
+			return ( media?.title?.raw ?? '' ).toLowerCase();
+		}
+		if ( field === 'date' ) {
+			return media?.date ?? '';
+		}
+		if ( field === 'id' ) {
+			return block.attributes.id ?? 0;
+		}
+		return 0;
+	}
+
+	function sortImages( sortBy ) {
+		if ( ! imageData || imageData.length === 0 ) {
+			return;
+		}
+
+		const [ field, direction ] = sortBy.split( '/' );
+		const sorted = [ ...innerBlockImages ].sort( ( a, b ) => {
+			const valueA = getMediaSortValue( a, field );
+			const valueB = getMediaSortValue( b, field );
+
+			if ( valueA < valueB ) {
+				return direction === 'desc' ? 1 : -1;
+			}
+			if ( valueA > valueB ) {
+				return direction === 'desc' ? -1 : 1;
+			}
+			return 0;
+		} );
+
+		replaceInnerBlocks( clientId, sorted, false );
 	}
 
 	function toggleOpenInNewTab( openInNewTab ) {
@@ -912,6 +976,28 @@ export default function GalleryEdit( props ) {
 						</MenuGroup>
 					) }
 				</ToolbarDropdownMenu>
+				{ ! isDynamic && hasImages && (
+					<ToolbarDropdownMenu
+						icon={ listView }
+						label={ __( 'Sort images' ) }
+					>
+						{ ( { onClose } ) => (
+							<MenuGroup>
+								{ SORT_OPTIONS.map( ( option ) => (
+									<MenuItem
+										key={ option.value }
+										onClick={ () => {
+											sortImages( option.value );
+											onClose();
+										} }
+									>
+										{ option.label }
+									</MenuItem>
+								) ) }
+							</MenuGroup>
+						) }
+					</ToolbarDropdownMenu>
+				) }
 			</BlockControls>
 			<>
 				{ ! multiGallerySelection && ! isDynamic && (
