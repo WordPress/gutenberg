@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { decodeEntities } from '@wordpress/html-entities';
 import { convertGifToVideo } from '@wordpress/video-conversion/worker';
-import { vipsResizeImage } from '@wordpress/vips/worker';
+import { vipsGetUltraHdrInfo, vipsResizeImage } from '@wordpress/vips/worker';
 import { describe, expect, it, vi } from 'vitest';
 import styles from './fixtures/setup.module.scss';
 import * as wasmModule from './fixtures/module.wasm';
@@ -18,6 +18,7 @@ describe( 'Vitest repository setup', () => {
 		expect( globalThis.SCRIPT_DEBUG ).toBe( true );
 		expect( window.tinyMCEPreInit.baseURL ).toBe( 'about:blank' );
 		expect( vi.isMockFunction( convertGifToVideo ) ).toBe( true );
+		expect( vi.isMockFunction( vipsGetUltraHdrInfo ) ).toBe( true );
 		expect( vi.isMockFunction( vipsResizeImage ) ).toBe( true );
 		expect( Object.keys( wasmModule ) ).toEqual( [] );
 	} );
