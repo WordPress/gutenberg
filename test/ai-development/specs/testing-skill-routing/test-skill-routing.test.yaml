@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
 
-# Providers and shared tracing live in ../../lib/.
+# Providers, tracing and shared test options live in ../../lib/.
 description: Verify an e2e task routes through the testing skill to the e2e reference only
 
 tracing:
@@ -80,6 +80,11 @@ tests:
             metric: Agent review of test quality
 
 evaluateOptions:
+    # A completed run takes about ninety seconds; this leaves room for a slow
+    # one while still cutting off an agent that has stopped making progress.
+    timeoutMs: 180000
+    # Never replay a cached agent run: an eval is only meaningful live.
+    cache: false
     maxConcurrency: 2
     repeat: 2
 

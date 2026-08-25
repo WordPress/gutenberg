@@ -1,4 +1,5 @@
-# Tracing configuration shared by every evaluation spec.
+# Tracing configuration shared by every evaluation spec, pulled in with a JSON
+# schema reference: `tracing: { $ref: lib/promptfooconfig.yaml#/tracing }`.
 tracing:
     enabled: true
     failOnReceiverStartFailure: true
