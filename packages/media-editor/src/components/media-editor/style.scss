@@ -40,14 +40,14 @@
 		min-height: 0;
 		margin: $grid-unit-30 $grid-unit-30 $grid-unit-10 $grid-unit-30;
 
-		// Docked beside the 400px panel, the canvas keeps a workable crop area.
+		// Docked beside the 350px panel, the canvas keeps a workable crop area.
 		// The figure has to close at the dock breakpoint itself: at 960px the
-		// modal is ~920px inside its own margins, less the 400px panel and
-		// this column's 2 x 24px gutters, which leaves ~470px. Asking for more
+		// modal is ~920px inside its own margins, less the 350px panel and
+		// this column's 2 x 24px gutters, which leaves ~520px. Asking for more
 		// than that pushes the panel past the modal's right edge instead of
 		// shrinking the canvas.
 		@include break-large() {
-			min-width: 440px;
+			min-width: 490px;
 			margin: 0 $grid-unit-30;
 		}
 	}
@@ -119,13 +119,13 @@
 		padding-inline: $grid-unit-20;
 		padding-bottom: $grid-unit-30;
 
-		// 400px rather than the 280px `$sidebar-width`: four editable fields
-		// plus the file facts do not fit a 280px column without every field
-		// wrapping mid-phrase, which is what #81121 reports. No base-styles
-		// token matches, so the value is explicit.
+		// 350px rather than the 280px `$sidebar-width`: #81121 reports the
+		// panel reading as squished at roughly 250px, with four editable
+		// fields stacked above six read-only facts. No base-styles token sits
+		// between 280px and the full width, so the value is explicit.
 		@include break-large() {
 			flex: none;
-			width: 400px;
+			width: 350px;
 			padding-inline: $grid-unit-20;
 		}
 	}
