@@ -19,6 +19,12 @@ import {
 	getRawValue,
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from './utils/crdt';
+import {
+	findReferencedEntityRecords,
+	getEntityReferenceKey,
+	isBlockReferencedEntity,
+} from './entity-block-references';
+import { getCachedBlocks } from './parsed-blocks-cache';
 
 function addTitleToAutoDraft( record ) {
 	return record.status === 'auto-draft' ? { ...record, title: '' } : record;
@@ -425,6 +431,111 @@ export const deleteEntityRecord =
 	};
 
 /**
+ * Discards the edits of every entity record that the given document stopped
+ * referencing.
+ *
+ * The discarded edits are staged onto the undo level the removal itself
+ * creates, so undoing the removal brings them back with the block.
+ *
+ * @param {Array} previousBlocks The document's block tree before the edit.
+ * @param {Array} nextBlocks     The document's block tree after the edit.
+ */
+const discardEditsForRemovedEntityReferences =
+	( previousBlocks, nextBlocks ) =>
+	( { select, dispatch } ) => {
+		const candidates = select
+			.__experimentalGetDirtyEntityRecords()
+			.filter( ( { kind, name } ) =>
+				isBlockReferencedEntity( kind, name )
+			);
+
+		if ( ! candidates.length ) {
+			return;
+		}
+
+		const context = { theme: select.getCurrentTheme()?.stylesheet };
+		const candidatesByKey = new Map(
+			candidates.map( ( candidate ) => [
+				getEntityReferenceKey(
+					candidate.kind,
+					candidate.name,
+					candidate.key
+				),
+				candidate,
+			] )
+		);
+		const keys = new Set( candidatesByKey.keys() );
+
+		const stillReferenced = findReferencedEntityRecords(
+			nextBlocks,
+			keys,
+			context
+		);
+		const unreferenced = new Set(
+			[ ...keys ].filter( ( key ) => ! stillReferenced.has( key ) )
+		);
+
+		if ( ! unreferenced.size ) {
+			return;
+		}
+
+		const wasReferenced = findReferencedEntityRecords(
+			previousBlocks,
+			unreferenced,
+			context
+		);
+
+		for ( const referenceKey of wasReferenced ) {
+			const {
+				kind,
+				name,
+				key: recordId,
+			} = candidatesByKey.get( referenceKey );
+			const edits = select.getEntityRecordEdits( kind, name, recordId );
+
+			if ( ! edits ) {
+				continue;
+			}
+
+			const editedRecord = select.getEditedEntityRecord(
+				kind,
+				name,
+				recordId
+			);
+			const editedKeys = Object.keys( edits );
+
+			// Staged, so the undo manager merges it into the undo level the
+			// block removal just created instead of adding one of its own.
+			select.getUndoManager().addRecord(
+				[
+					{
+						id: { kind, name, recordId },
+						changes: Object.fromEntries(
+							editedKeys.map( ( key ) => [
+								key,
+								{ from: editedRecord[ key ], to: undefined },
+							] )
+						),
+					},
+				],
+				true
+			);
+
+			// Dispatched directly rather than through `editEntityRecord` so
+			// that discarding an edit is not itself synchronized as one.
+			dispatch( {
+				type: 'EDIT_ENTITY_RECORD',
+				kind,
+				name,
+				recordId,
+				edits: Object.fromEntries(
+					editedKeys.map( ( key ) => [ key, undefined ] )
+				),
+			} );
+		}
+	};
+
+/**
  * Returns an action object that triggers an
  * edit to an entity record.
  *
@@ -532,6 +643,24 @@ export const editEntityRecord =
 			type: 'EDIT_ENTITY_RECORD',
 			...edit,
 		} );
+
+		if ( Array.isArray( edits.blocks ) ) {
+			// `blocks` only lives in the edits, so before the first block edit
+			// the previous tree is the one the entity hook parsed from the
+			// content and shared through the cache.
+			const previousBlocks = Array.isArray( editedRecord.blocks )
+				? editedRecord.blocks
+				: getCachedBlocks( kind, name, recordId, record?.content );
+
+			if ( previousBlocks ) {
+				dispatch(
+					discardEditsForRemovedEntityReferences(
+						previousBlocks,
+						edits.blocks
+					)
+				);
+			}
+		}
 	};
 
 /**

@@ -24,6 +24,31 @@ describe( 'entities', () => {
 		} );
 	} );
 
+	it( 'drops the edits of a record that was removed', () => {
+		const originalState = deepFreeze( {
+			records: {
+				root: {
+					postType: {
+						edits: {
+							b: { title: 'beach' },
+							s: { title: 'sun' },
+						},
+					},
+				},
+			},
+		} );
+		const state = entities( originalState, {
+			type: 'REMOVE_ITEMS',
+			itemIds: [ 'b' ],
+			kind: 'root',
+			name: 'postType',
+		} );
+
+		expect( state.records.root.postType.edits ).toEqual( {
+			s: { title: 'sun' },
+		} );
+	} );
+
 	it( 'returns with received post types by slug', () => {
 		const originalState = deepFreeze( {} );
 		const state = entities( originalState, {
