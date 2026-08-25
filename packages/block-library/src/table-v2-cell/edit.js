@@ -390,22 +390,32 @@ export default function TableCellEdit( {
 
 		// Batch the span reset and cell insertions into a single undo level.
 		registry.batch( () => {
-			setAttributes( { rowSpan: 1, colSpan: 1 } );
-
-			// The merged cell's row needs new cells for the remaining
-			// columns of the span.
-			if ( colSpan > 1 ) {
-				const cellsToAdd = Array.from(
-					{ length: colSpan - 1 },
-					createNewCell
-				);
-				const nextCells = [
-					...rowBlocks.slice( 0, cellIndex + 1 ),
-					...cellsToAdd,
-					...rowBlocks.slice( cellIndex + 1 ),
-				];
-				replaceInnerBlocks( rowClientId, nextCells, false );
-			}
+			// The merged cell's row: reset its spans and insert new cells
+			// for the remaining columns of the span. The reset goes through
+			// the replacement because replaceInnerBlocks re-inserts the
+			// passed blocks, and the block objects read above predate any
+			// attribute update.
+			const cellsToAdd = Array.from(
+				{ length: colSpan - 1 },
+				createNewCell
+			);
+			const nextCells = [
+				...rowBlocks.slice( 0, cellIndex + 1 ),
+				...cellsToAdd,
+				...rowBlocks.slice( cellIndex + 1 ),
+			].map( ( cell ) =>
+				cell.clientId === clientId
+					? {
+							...cell,
+							attributes: {
+								...cell.attributes,
+								rowSpan: 1,
+								colSpan: 1,
+							},
+					  }
+					: cell
+			);
+			replaceInnerBlocks( rowClientId, nextCells, false );
 
 			// Subsequent rows covered by the rowSpan need new cells for
 			// all columns of the span.
@@ -417,7 +427,7 @@ export default function TableCellEdit( {
 				const targetRowCells = selectors.getBlocks(
 					targetRow.clientId
 				);
-				const cellsToAdd = Array.from(
+				const newRowCells = Array.from(
 					{ length: colSpan },
 					createNewCell
 				);
@@ -425,12 +435,16 @@ export default function TableCellEdit( {
 					cellIndex,
 					targetRowCells.length
 				);
-				const nextCells = [
+				const nextTargetCells = [
 					...targetRowCells.slice( 0, insertIndex ),
-					...cellsToAdd,
+					...newRowCells,
 					...targetRowCells.slice( insertIndex ),
 				];
-				replaceInnerBlocks( targetRow.clientId, nextCells, false );
+				replaceInnerBlocks(
+					targetRow.clientId,
+					nextTargetCells,
+					false
+				);
 			}
 		} );
 	}
