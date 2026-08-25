@@ -155,6 +155,7 @@ $default-font-size: $font-size-medium;
 // Padding for blocks with a background color (e.g. paragraph or group).
 $block-bg-padding--v: 1.25em;
 $block-bg-padding--h: 2.375em;
+$block-bg-padding: var(--wp--style--block-background-padding, #{$block-bg-padding--v} #{$block-bg-padding--h});
 
 
 /**
