@@ -18,7 +18,7 @@
 	"scripts": {
 		"validate": "for c in specs/*/*.test.js; do promptfoo validate config --config \"$c\" || exit 1; done",
 		"test:grader": "for t in specs/*/test-grader.mjs; do [ -e \"$t\" ] || continue; node --test \"$t\" || exit 1; done",
-		"eval": "promptfoo eval",
+		"eval": "sh -c 'case \"$*\" in *--config*) exec promptfoo eval \"$@\";; *) for c in specs/*/*.test.js; do promptfoo eval --config \"$c\" \"$@\" || exit 1; done;; esac' sh",
 		"view": "promptfoo view"
 	},
 	"devDependencies": {

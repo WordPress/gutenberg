@@ -25,6 +25,9 @@ const libDir = path.dirname( fileURLToPath( import.meta.url ) );
 const sourceRoot = path.resolve( libDir, '../../..' );
 const activeWorkspaces = new Map();
 
+// Resolved once per run; see resolveTree.
+let workingTree;
+
 const gitEnvironment = {
 	...process.env,
 	GIT_AUTHOR_NAME: 'Gutenberg Agent Eval',
@@ -81,10 +84,14 @@ async function resolveTree( baseRef ) {
 	}
 
 	// `git stash create` writes a commit holding the working tree without
-	// touching the index, the stash list, or the checkout. It returns nothing
+	// touching the stash list or the checkout. It does write the index, so
+	// rows running concurrently would collide; resolving once per run avoids
+	// that, and means every row measures the same state. It returns nothing
 	// when there is nothing to stash, in which case HEAD is already current.
-	const { stdout } = await git( sourceRoot, [ 'stash', 'create' ] );
-	return stdout.trim() || 'HEAD';
+	workingTree ??= git( sourceRoot, [ 'stash', 'create' ] ).then(
+		( { stdout } ) => stdout.trim() || 'HEAD'
+	);
+	return workingTree;
 }
 
 async function createWorkspace( baseRef ) {

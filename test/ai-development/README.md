@@ -62,14 +62,14 @@ Run from the repository root:
 # Validate configuration without model calls.
 npm --workspace @wordpress/agent-skill-evals run validate
 
-# Run every spec and provider.
-npm run test:agent-evals -- --config 'specs/*/*.test.js'
+# Run every spec, each on its own.
+npm run test:agent-evals
 
 # Run one spec.
 npm run test:agent-evals -- --config specs/SPEC_GROUP/TEST_NAME.test.js
 
-# Override repeats.
-npm run test:agent-evals -- --config specs/SPEC_GROUP/TEST_NAME.test.js --repeat 3
+# Any other flag is passed through, with or without --config.
+npm run test:agent-evals -- --repeat 3
 
 # Open the local results viewer.
 npm --workspace @wordpress/agent-skill-evals run view

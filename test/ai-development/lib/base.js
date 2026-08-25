@@ -1,7 +1,14 @@
 /**
  * Setup shared by every evaluation spec.
  */
+import { fileURLToPath } from 'node:url';
 import defaultTest from './default-test.js';
+
+// Resolved from this file rather than written relative to a spec, so it does
+// not depend on which config file pulled the setup in.
+const workspaceExtension = fileURLToPath(
+	new URL( './workspace-extension.mjs', import.meta.url )
+);
 
 /** @type {Partial<import('promptfoo').UnifiedConfig>} */
 export default {
@@ -27,7 +34,7 @@ export default {
 	// Lifecycle hooks, as `file://path:exportName`. Promptfoo calls the named
 	// export for beforeAll, beforeEach, afterEach and afterAll; ours builds a
 	// disposable repository for each row and deletes it afterwards.
-	extensions: [ 'file://../../lib/workspace-extension.mjs:extensionHook' ],
+	extensions: [ `file://${ workspaceExtension }:extensionHook` ],
 
 	// The agents under test. Every provider runs every case, so adding one
 	// gives a column per agent in the results rather than a separate run.
