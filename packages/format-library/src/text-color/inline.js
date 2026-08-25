@@ -144,6 +144,7 @@ export default function InlineColorUI( {
 	onClose,
 	contentRef,
 	isActive,
+	defaultTab,
 } ) {
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
@@ -156,7 +157,7 @@ export default function InlineColorUI( {
 			className="format-library__inline-color-popover"
 			anchor={ popoverAnchor }
 		>
-			<Tabs.Root defaultValue={ TABS[ 0 ].name }>
+			<Tabs.Root defaultValue={ defaultTab ?? TABS[ 0 ].name }>
 				<Tabs.List>
 					{ TABS.map( ( tab ) => (
 						<Tabs.Tab value={ tab.name } key={ tab.name }>
