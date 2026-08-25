@@ -497,8 +497,7 @@ describe( 'Autocomplete', () => {
 			} );
 		} );
 
-		// TODO: Remove with the `Autocomplete.List` override, after
-		// https://github.com/mui/base-ui/issues/5548.
+		// TODO: Remove with the `Autocomplete.List` override after updating to Base UI >= 1.8.0
 		it( 'does not set `aria-orientation`, which `role="grid"` disallows', async () => {
 			render(
 				<Autocomplete.Root items={ GRID_ITEMS } grid inline open>

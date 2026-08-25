@@ -13,7 +13,7 @@ export const List = forwardRef< HTMLDivElement, AutocompleteListProps >(
 				{ ...restProps }
 				// `role="grid"` disallows `aria-orientation`, which Base UI
 				// renders regardless.
-				// TODO: Remove after https://github.com/mui/base-ui/issues/5548.
+				// TODO: safe to remove after updating to Base UI >= 1.8.0
 				aria-orientation={ undefined }
 			/>
 		);
