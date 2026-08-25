@@ -78,6 +78,37 @@ npm --workspace @wordpress/agent-skill-evals run view
 
 Results under `results/` are gitignored and may contain source code and tool output.
 
+## Measure a guidance change
+
+Every workspace is built from a Git ref, so a run measures a specific state of
+the repository. A plain run measures the branch you are on:
+
+```bash
+npm run test:agent-evals -- --config specs/SPEC_GROUP/TEST_NAME.test.js
+```
+
+A comparison run puts two refs in one table, one row per case per ref:
+
+```bash
+# Your branch against trunk.
+npm --workspace @wordpress/agent-skill-evals run eval:compare -- --config specs/SPEC_GROUP/TEST_NAME.test.js
+
+# Against a specific commit, or the two sides of one guidance change.
+EVAL_REFS=HEAD,<sha> npm --workspace @wordpress/agent-skill-evals run eval:compare -- --config …
+EVAL_REFS=<sha>^,<sha> npm --workspace @wordpress/agent-skill-evals run eval:compare -- --config …
+```
+
+Both refs are graded by the identical assertions, so the difference between the
+rows is what the change bought. A skill the model already agrees with scores the
+same on both sides — the result worth knowing before maintaining it.
+
+Prefer a commit or tag over a branch name for a baseline. `trunk` moves, so two
+runs days apart are not strictly comparable. An unknown ref fails before any
+model call.
+
+The specs come from your checkout rather than from the ref, so an eval can
+measure a commit that predates it.
+
 ## Files
 
 ```text

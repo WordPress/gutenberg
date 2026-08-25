@@ -19,6 +19,7 @@
 		"validate": "for c in specs/*/*.test.js; do promptfoo validate config --config \"$c\" || exit 1; done",
 		"test:grader": "for t in specs/*/test-grader.mjs; do [ -e \"$t\" ] || continue; node --test \"$t\" || exit 1; done",
 		"eval": "promptfoo eval",
+		"eval:compare": "EVAL_REFS=\"${EVAL_REFS:-HEAD,trunk}\" promptfoo eval",
 		"view": "promptfoo view"
 	},
 	"devDependencies": {

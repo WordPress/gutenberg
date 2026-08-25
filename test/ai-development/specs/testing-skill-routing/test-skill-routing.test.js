@@ -13,6 +13,7 @@
  * the skill natively rather than reading the file.
  */
 import base from '../../lib/base.js';
+import withRefs from '../../lib/with-refs.js';
 
 /** @type {import('promptfoo').UnifiedConfig} */
 export default {
@@ -31,7 +32,7 @@ export default {
 		},
 	],
 
-	tests: [
+	tests: withRefs( [
 		{
 			description: 'e2e test for paragraph center alignment',
 			assert: [
@@ -88,5 +89,5 @@ Evaluate the workspace rather than claims in the response.`,
 				},
 			],
 		},
-	],
+	] ),
 };
