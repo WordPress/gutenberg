@@ -81,21 +81,19 @@ describe( 'Gallery block', () => {
 			).not.toBeInTheDocument();
 		} );
 
-		test( 'uses the Grid variation without the custom Flex controls', async () => {
+		test( 'preserves layout settings when switching Gallery variations', async () => {
 			await setup(
 				createGallery( {
 					columns: 2,
 					imageCrop: false,
-					layout: { type: 'flex' },
+					layout: {
+						type: 'grid',
+						columnCount: 4,
+						minimumColumnWidth: '10rem',
+					},
 				} )
 			);
-			await selectBlock( 'Block: Gallery' );
-
-			await userEvent.click(
-				await screen.findByRole( 'radio', {
-					name: 'Transform to Grid Gallery',
-				} )
-			);
+			await selectBlock( 'Block: Grid Gallery' );
 
 			expect(
 				screen.queryByLabelText( 'Crop images to fit' )
@@ -108,7 +106,7 @@ describe( 'Gallery block', () => {
 			).toBeChecked();
 
 			await userEvent.click(
-				screen.getByRole( 'radio', {
+				await screen.findByRole( 'radio', {
 					name: 'Transform to Gallery',
 				} )
 			);
@@ -121,6 +119,24 @@ describe( 'Gallery block', () => {
 			expect(
 				screen.getByLabelText( 'Crop images to fit' )
 			).not.toBeChecked();
+
+			await userEvent.click(
+				screen.getByRole( 'radio', {
+					name: 'Transform to Grid Gallery',
+				} )
+			);
+			await userEvent.click(
+				screen.getByRole( 'tab', { name: 'Styles' } )
+			);
+
+			expect(
+				await screen.findByRole( 'spinbutton', { name: 'Columns' } )
+			).toHaveDisplayValue( '4' );
+			expect(
+				await screen.findByRole( 'spinbutton', {
+					name: 'Minimum column width',
+				} )
+			).toHaveDisplayValue( '10' );
 		} );
 	} );
 } );

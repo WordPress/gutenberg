@@ -3,7 +3,7 @@ export function defaultColumnsNumber( imageCount ) {
 }
 
 /**
- * Whether the Gallery should use its legacy Flex layout behavior.
+ * Whether the Gallery should use its default Flex layout behavior.
  *
  * Gallery blocks created before layout variations existed do not have an
  * explicit layout attribute. Treat missing and malformed layout data as Flex

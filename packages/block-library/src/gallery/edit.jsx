@@ -23,7 +23,7 @@ import {
 	MediaReplaceFlow,
 	useSettings,
 } from '@wordpress/block-editor';
-import { useEffect, useMemo } from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
@@ -115,6 +115,10 @@ const PLACEHOLDER_TEXT = __(
 const DEFAULT_BLOCK = { name: 'core/image' };
 const EMPTY_ARRAY = [];
 
+function isLayoutObject( value ) {
+	return !! value && typeof value === 'object' && ! Array.isArray( value );
+}
+
 export default function GalleryEdit( props ) {
 	const {
 		setAttributes,
@@ -165,6 +169,7 @@ export default function GalleryEdit( props ) {
 		layout,
 	} = attributes;
 	const isFlexLayout = isGalleryFlexLayout( layout );
+	const previousLayoutRef = useRef( layout );
 
 	const {
 		__unstableMarkNextChangeAsNotPersistent,
@@ -174,6 +179,47 @@ export default function GalleryEdit( props ) {
 	} = useDispatch( blockEditorStore );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
+
+	useEffect( () => {
+		// Variations replace the whole layout object. Carry Grid-only settings
+		// across a layout type change so switching back restores them.
+		const previousLayout = previousLayoutRef.current;
+		previousLayoutRef.current = layout;
+
+		if (
+			! isLayoutObject( previousLayout ) ||
+			! isLayoutObject( layout ) ||
+			previousLayout.type === layout.type
+		) {
+			return;
+		}
+
+		const nextLayout = { ...layout };
+		let hasPreservedGridSetting = false;
+
+		if (
+			! Object.hasOwn( layout, 'columnCount' ) &&
+			Number.isInteger( previousLayout.columnCount ) &&
+			previousLayout.columnCount > 0
+		) {
+			nextLayout.columnCount = previousLayout.columnCount;
+			hasPreservedGridSetting = true;
+		}
+
+		if (
+			! Object.hasOwn( layout, 'minimumColumnWidth' ) &&
+			typeof previousLayout.minimumColumnWidth === 'string'
+		) {
+			nextLayout.minimumColumnWidth = previousLayout.minimumColumnWidth;
+			hasPreservedGridSetting = true;
+		}
+
+		if ( hasPreservedGridSetting ) {
+			previousLayoutRef.current = nextLayout;
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { layout: nextLayout } );
+		}
+	}, [ layout, setAttributes, __unstableMarkNextChangeAsNotPersistent ] );
 
 	const { getBlock, getSettings, innerBlockImages, multiGallerySelection } =
 		useSelect(
