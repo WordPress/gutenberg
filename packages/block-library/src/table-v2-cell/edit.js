@@ -318,12 +318,6 @@ export default function TableCellEdit( {
 			selectedClientIds.filter( ( id ) => id !== mergedClientId )
 		);
 
-		// Update the merged cell's spans.
-		updateBlockAttributes( mergedClientId, {
-			rowSpan: nextRowSpan,
-			colSpan: nextColSpan,
-		} );
-
 		// Remove the other cells from their parent row blocks.
 		const { getBlockRootClientId, getBlocks } =
 			registry.select( blockEditorStore );
@@ -339,7 +333,12 @@ export default function TableCellEdit( {
 			}
 		}
 
+		// Batch the span update and cell removals into a single undo level.
 		registry.batch( () => {
+			updateBlockAttributes( mergedClientId, {
+				rowSpan: nextRowSpan,
+				colSpan: nextColSpan,
+			} );
 			for ( const [ rowClientId, cellsToRemove ] of rowsToUpdate ) {
 				const rowBlock = getBlocks( rowClientId );
 				const nextCells = rowBlock.filter(
@@ -355,9 +354,6 @@ export default function TableCellEdit( {
 		if ( rowSpan <= 1 && colSpan <= 1 ) {
 			return;
 		}
-
-		// Reset spans.
-		setAttributes( { rowSpan: 1, colSpan: 1 } );
 
 		// Create new cells for vacated slots.
 		const newCells = [];
@@ -376,26 +372,31 @@ export default function TableCellEdit( {
 			}
 		}
 
-		if ( newCells.length ) {
-			const rowClientId = getRowClientId(
-				registry.select( blockEditorStore ),
-				clientId
-			);
-			if ( rowClientId ) {
-				const rowBlocks = registry
-					.select( blockEditorStore )
-					.getBlocks( rowClientId );
-				const cellIndex = rowBlocks.findIndex(
-					( b ) => b.clientId === clientId
+		// Batch the span reset and cell insertions into a single undo level.
+		registry.batch( () => {
+			setAttributes( { rowSpan: 1, colSpan: 1 } );
+
+			if ( newCells.length ) {
+				const rowClientId = getRowClientId(
+					registry.select( blockEditorStore ),
+					clientId
 				);
-				const nextCells = [
-					...rowBlocks.slice( 0, cellIndex + 1 ),
-					...newCells,
-					...rowBlocks.slice( cellIndex + 1 ),
-				];
-				replaceInnerBlocks( rowClientId, nextCells, false );
+				if ( rowClientId ) {
+					const rowBlocks = registry
+						.select( blockEditorStore )
+						.getBlocks( rowClientId );
+					const cellIndex = rowBlocks.findIndex(
+						( b ) => b.clientId === clientId
+					);
+					const nextCells = [
+						...rowBlocks.slice( 0, cellIndex + 1 ),
+						...newCells,
+						...rowBlocks.slice( cellIndex + 1 ),
+					];
+					replaceInnerBlocks( rowClientId, nextCells, false );
+				}
 			}
-		}
+		} );
 	}
 
 	function onInsertRow( delta ) {
