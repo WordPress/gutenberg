@@ -32,6 +32,21 @@ describe( 'getErrorMessage', () => {
 		expect( empty.title ).not.toBe( heic.title );
 	} );
 
+	it( 'should return JXL-specific copy rather than the generic fallback', () => {
+		/*
+		 * The JXL decode failure used to be raised with a bare
+		 * 'JXL_DECODE_ERROR' string that was absent from both the ErrorCode
+		 * enum and this table, so an unrecoverable decode failure was
+		 * reported as "Upload failed / Please try again".
+		 */
+		const jxl = getErrorMessage( ErrorCode.JXL_DECODE_ERROR, 'photo.jxl' );
+		const general = getErrorMessage( ErrorCode.GENERAL, 'photo.jxl' );
+
+		expect( jxl.title ).not.toBe( general.title );
+		expect( jxl.action ).not.toBe( general.action );
+		expect( jxl.description ).toContain( 'photo.jxl' );
+	} );
+
 	it( 'should fall back to the generic message for an unknown code', () => {
 		const fallback = getErrorMessage( 'SOME_UNKNOWN_CODE', 'photo.jpg' );
 		const general = getErrorMessage( ErrorCode.GENERAL, 'photo.jpg' );

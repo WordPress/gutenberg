@@ -832,12 +832,21 @@ export function prepareItem( id: QueueItemId ) {
 		let heicJpeg: File | null = null;
 		let jxlJpeg: File | null = null;
 
-		const isImage = file.type.startsWith( 'image/' );
+		// `File.type` comes from the OS MIME registry, which has no `.jxl`
+		// mapping on many systems and hands back an empty string there. Fall
+		// back to the extension so those files still take the conversion path
+		// instead of being uploaded as a raw .jxl the server cannot read -
+		// which the `upload_mimes` registration now lets through. Mirrors the
+		// server-side sniffing in gutenberg_filter_jxl_filetype_and_ext().
+		const isJxl =
+			file.type === 'image/jxl' ||
+			( ! file.type && /\.jxl$/i.test( file.name ) );
+
+		const isImage = file.type.startsWith( 'image/' ) || isJxl;
 		const isVipsSupported = CLIENT_SIDE_SUPPORTED_MIME_TYPES.includes(
 			file.type
 		);
 		const isHeic = HEIC_MIME_TYPES.includes( file.type );
-		const isJxl = file.type === 'image/jxl';
 
 		// Gate very large images out of client-side processing. wasm-vips is
 		// capped at 1 GiB of memory, so high-megapixel images, especially
@@ -933,9 +942,10 @@ export function prepareItem( id: QueueItemId ) {
 				dispatch.cancelItem(
 					id,
 					new UploadError( {
-						code: 'JXL_DECODE_ERROR',
-						message:
-							'This JPEG XL image could not be decoded and converted for upload.',
+						code: ErrorCode.JXL_DECODE_ERROR,
+						message: __(
+							'This JPEG XL image could not be decoded and converted for upload.'
+						),
 						file,
 						cause: error instanceof Error ? error : undefined,
 					} )
@@ -967,10 +977,23 @@ export function prepareItem( id: QueueItemId ) {
 			// Upload the JPEG derivative as the main file and keep the original
 			// .jxl so generateThumbnails() can sideload it as a companion
 			// (stored under $metadata['source_image'], like the HEIC original).
+			//
+			// `generate_sub_sizes` must be turned off explicitly: it defaults
+			// to true server-side, and leaving it on makes create_item build
+			// every sub-size (and the -scaled copy) itself. The response then
+			// reports no missing_image_sizes, generateThumbnails() sideloads
+			// nothing, and the upload silently reverts to server-side
+			// processing. Decoding the JXL at all proves vips is available, so
+			// unlike HEIC there is no canvas-only case to fall back for.
 			updates = {
 				file: jxlJpeg,
 				sourceFile: jxlJpeg,
 				originalJxlFile: item.file,
+				additionalData: {
+					...item.additionalData,
+					generate_sub_sizes: false,
+					convert_format: true,
+				},
 			};
 		} else if ( isHeic && heicJpeg ) {
 			// HEIC was converted to JPEG client-side. Upload the JPEG

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add on-demand JPEG XL (JXL) support. `setJxlWasm()` lets the main thread feed the lazily loaded `vips-jxl.wasm` bytes to the worker as a transferable `ArrayBuffer`; the worker wraps them in a Blob URL and re-initializes vips with JXL dynamic library support on the next operation, shutting the previous instance down first. Keeps JXL out of the worker bundle so it is only downloaded when a JXL image is processed.
+
 ### Internal
 
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
@@ -49,10 +53,6 @@
 ### Breaking Changes
 
 -   Remove unused `batchResizeImage` and `vipsBatchResizeImage` exports. The concurrent sideload pipeline (introduced in [#75888](https://github.com/WordPress/gutenberg/pull/75888)) generates each sub-size through its own queued resize/upload operation, so the single-pass batch path no longer has any callers ([#77247](https://github.com/WordPress/gutenberg/issues/77247)).
-
-### New Features
-
--   Add on-demand JPEG XL (JXL) support. `setJxlWasm()` lets the main thread feed the lazily loaded `vips-jxl.wasm` bytes to the worker, which wraps them in a Blob URL and re-initializes vips with JXL dynamic library support on the next operation. Keeps JXL out of the worker bundle so it is only downloaded when a JXL image is processed.
 
 ## 1.6.0 (2026-05-14)
 
