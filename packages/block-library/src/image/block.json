@@ -161,7 +161,8 @@
 			{
 				"name": "from-raw",
 				"type": "raw",
-				"selector": "figure:has(img)"
+				"selector": "figure:has(img)",
+				"serverConversion": false
 			}
 		]
 	},

@@ -314,4 +314,61 @@ describe( 'transforms declared in metadata after a server bootstrap', () => {
 		expect( transforms.to[ 0 ].blocks ).toEqual( [ 'core/paragraph' ] );
 		expect( typeof transforms.to[ 0 ].transform ).toBe( 'function' );
 	} );
+
+	it( 'takes transforms from a bootstrap of their own', () => {
+		/*
+		 * What the plugin does on the WordPress versions whose
+		 * `get_block_editor_server_block_settings()` does not send the field:
+		 * the editor screen bootstraps the block, and a second call adds the
+		 * transforms without disturbing anything the first one carried.
+		 */
+		unstable__bootstrapServerSideBlockDefinitions( {
+			[ name ]: {
+				apiVersion: 3,
+				title: 'Bootstrapped',
+				category: 'text',
+				attributes: {},
+			},
+		} );
+
+		unstable__bootstrapServerSideBlockDefinitions( {
+			[ name ]: {
+				transforms: { from: [ { type: 'raw', selector: 'aside' } ] },
+			},
+		} );
+
+		registerBlockType( name, {
+			title: 'Bootstrapped',
+			category: 'text',
+			save: () => null,
+		} );
+
+		const blockType = getBlockType( name );
+
+		expect( blockType.title ).toBe( 'Bootstrapped' );
+		expect( blockType.transforms.from[ 0 ].selector ).toBe( 'aside' );
+	} );
+
+	it( 'keeps a field the second bootstrap disagrees about', () => {
+		unstable__bootstrapServerSideBlockDefinitions( {
+			[ name ]: {
+				apiVersion: 3,
+				title: 'From the server',
+				category: 'text',
+				attributes: {},
+			},
+		} );
+
+		unstable__bootstrapServerSideBlockDefinitions( {
+			[ name ]: { title: 'Later', category: 'widgets' },
+		} );
+
+		registerBlockType( name, {
+			title: 'From the server',
+			category: 'text',
+			save: () => null,
+		} );
+
+		expect( getBlockType( name ).category ).toBe( 'text' );
+	} );
 } );

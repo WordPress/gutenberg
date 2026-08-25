@@ -756,4 +756,141 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 		$this->assertNull( gutenberg_switch_block_type( $block, 'test/target' ) );
 		$this->assertNull( gutenberg_switch_block_type( $block, 'test/not-registered' ) );
 	}
+
+	public function test_leaves_markup_alone_when_a_transform_declines_the_server() {
+		$this->register(
+			'test/picture',
+			array(
+				'attributes' => array(
+					'url' => array(
+						'type'      => 'string',
+						'source'    => 'attribute',
+						'selector'  => 'img',
+						'attribute' => 'src',
+					),
+				),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'             => 'raw',
+							'selector'         => 'figure:has(img)',
+							'serverConversion' => false,
+						),
+					),
+				),
+			)
+		);
+
+		$blocks = gutenberg_html_to_blocks( '<figure><img src="/a.png" alt="A"/></figure>' );
+
+		$this->assertCount( 1, $blocks );
+		$this->assertSame( 'core/html', $blocks[0]['blockName'] );
+		$this->assertStringContainsString( '<img src="/a.png"', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_leaves_media_in_place_when_nothing_converts_it() {
+		$this->register_test_blocks();
+
+		// No registered block claims a figure, so wrapping the image in one
+		// would invent markup the source never had.
+		$blocks = gutenberg_html_to_blocks( '<p><img src="/a.png" alt="A"/></p>' );
+
+		$this->assertCount( 1, $blocks );
+		$this->assertStringNotContainsString( '<figure', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_takes_media_out_of_a_paragraph_for_a_block_that_claims_it() {
+		$this->register_test_blocks();
+		$this->register(
+			'test/picture',
+			array(
+				'attributes' => array(
+					'url' => array(
+						'type'      => 'string',
+						'source'    => 'attribute',
+						'selector'  => 'img',
+						'attribute' => 'src',
+					),
+				),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'     => 'raw',
+							'selector' => 'figure:has(img)',
+						),
+					),
+				),
+			)
+		);
+
+		$blocks = gutenberg_html_to_blocks( '<p><img src="/a.png" alt="A"/></p>' );
+
+		$this->assertCount( 1, $blocks );
+		$this->assertSame( 'test/picture', $blocks[0]['blockName'] );
+		$this->assertStringContainsString( '<img src="/a.png"', $blocks[0]['innerHTML'] );
+	}
+
+	public function test_keeps_media_that_reads_as_part_of_a_sentence() {
+		$this->register_test_blocks();
+		$this->register(
+			'test/picture',
+			array(
+				'attributes' => array(),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'     => 'raw',
+							'selector' => 'figure:has(img)',
+						),
+					),
+				),
+			)
+		);
+
+		$blocks = gutenberg_html_to_blocks( '<p>See <img src="/a.png" alt="A"/> here.</p>' );
+
+		$this->assertCount( 1, $blocks );
+		$this->assertSame( 'test/paragraph', $blocks[0]['blockName'] );
+
+		// An aligned image leaves even when the paragraph carries text.
+		$aligned = gutenberg_html_to_blocks( '<p>See <img class="alignright" src="/a.png" alt="A"/> here.</p>' );
+
+		$this->assertSame( 'test/picture', $aligned[0]['blockName'] );
+	}
+
+	public function test_omits_an_absent_boolean_attribute() {
+		$this->register(
+			'test/list',
+			array(
+				'attributes' => array(
+					'reversed' => array( 'type' => 'boolean' ),
+				),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'       => 'raw',
+							'selector'   => 'ol',
+							'attributes' => array(
+								'reversed' => array(
+									'type'      => 'boolean',
+									'source'    => 'attribute',
+									'selector'  => 'ol',
+									'attribute' => 'reversed',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$plain = gutenberg_html_to_blocks( '<ol><li>One</li></ol>' );
+
+		// The editor derives no value at all from markup without the attribute.
+		$this->assertArrayNotHasKey( 'reversed', $plain[0]['attrs'] );
+
+		$reversed = gutenberg_html_to_blocks( '<ol reversed><li>One</li></ol>' );
+
+		$this->assertTrue( $reversed[0]['attrs']['reversed'] );
+	}
 }

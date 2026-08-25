@@ -57,7 +57,7 @@ class Gutenberg_Block_Attributes_Parser {
 	 * @return mixed Attribute value, or null when the attribute has no value.
 	 */
 	public static function parse_single( $schema, $element ) {
-		$value = self::apply_source( $schema, $element, true );
+		$value = self::apply_source( $schema, $element );
 
 		/*
 		 * A `map` turns the sourced value into the one the block declares, such
@@ -113,13 +113,9 @@ class Gutenberg_Block_Attributes_Parser {
 	 *
 	 * @param array                  $schema  Attribute definition.
 	 * @param Gutenberg_HTML_Element $element Element to read from.
-	 * @param bool                   $strict  Optional. Whether an unmatched selector yields
-	 *                                        null rather than a boolean attribute's `false`.
-	 *                                        A transform reads markup that may not be there;
-	 *                                        a block attribute always has a value.
 	 * @return mixed Sourced value, or null when nothing matched.
 	 */
-	private static function apply_source( $schema, $element, $strict = false ) {
+	private static function apply_source( $schema, $element ) {
 		$selector = isset( $schema['selector'] ) ? $schema['selector'] : null;
 		$source   = $schema['source'];
 
@@ -156,11 +152,7 @@ class Gutenberg_Block_Attributes_Parser {
 		$target = null === $selector ? $element : $element->closest_self_or_descendant( $selector );
 
 		if ( null === $target ) {
-			if ( $strict ) {
-				return null;
-			}
-
-			return 'attribute' === $source && isset( $schema['type'] ) && 'boolean' === $schema['type'] ? false : null;
+			return null;
 		}
 
 		switch ( $source ) {
@@ -168,8 +160,12 @@ class Gutenberg_Block_Attributes_Parser {
 				$value = $target->get_attribute( $schema['attribute'] );
 				$type  = isset( $schema['type'] ) ? $schema['type'] : null;
 
+				/*
+				 * An absent boolean attribute has no value rather than `false`,
+				 * which is what the editor derives from the same markup.
+				 */
 				if ( 'boolean' === $type ) {
-					return null !== $value;
+					return null === $value ? null : true;
 				}
 
 				if ( null === $value ) {

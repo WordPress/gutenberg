@@ -42,6 +42,11 @@
 					"type": "boolean",
 					"default": true
 				},
+				"serverConversion": {
+					"description": "Whether the transform can run outside the editor. Set to `false` for a block whose `save` rewrites the markup rather than wrapping it, which the server cannot reproduce; the markup is then left alone instead of being converted into a block that would not validate.",
+					"type": "boolean",
+					"default": true
+				},
 				"attributes": {
 					"description": "Attribute values for the resulting block.\n\nFor a `raw` transform, an object of values applied over any sourced attributes. A value is used as given, unless it is an object declaring a `source`, in which case it is read from the matched markup the way a block attribute would be, optionally passed through a `map` of sourced value to attribute value.\n\nFor a `block` transform, either `\"all\"` to carry every attribute across, or an object mapping each new attribute name to the name it takes its value from.",
 					"oneOf": [

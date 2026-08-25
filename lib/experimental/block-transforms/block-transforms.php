@@ -28,6 +28,40 @@ function gutenberg_register_block_transforms_from_metadata( $settings, $metadata
 add_filter( 'block_type_metadata_settings', 'gutenberg_register_block_transforms_from_metadata', 10, 2 );
 
 /**
+ * Sends the transforms block types declare to the editor.
+ *
+ * `get_block_editor_server_block_settings()` picks a fixed list of block type
+ * fields and offers no filter, so the field travels in a bootstrap call of its
+ * own. The block store keeps the definition it already has and takes only the
+ * fields that one did not carry, which leaves everything core sent untouched
+ * and makes this a no-op once core sends `transforms` itself.
+ *
+ * Every editor screen adds its own bootstrap call before
+ * `enqueue_block_editor_assets` runs, so this one always follows it.
+ *
+ * @return void
+ */
+function gutenberg_bootstrap_block_transforms() {
+	$definitions = array();
+
+	foreach ( WP_Block_Type_Registry::get_instance()->get_all_registered() as $block_type ) {
+		if ( ! empty( $block_type->transforms ) ) {
+			$definitions[ $block_type->name ] = array( 'transforms' => $block_type->transforms );
+		}
+	}
+
+	if ( empty( $definitions ) ) {
+		return;
+	}
+
+	wp_add_inline_script(
+		'wp-blocks',
+		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . wp_json_encode( $definitions, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ) . ');'
+	);
+}
+add_action( 'enqueue_block_editor_assets', 'gutenberg_bootstrap_block_transforms' );
+
+/**
  * Converts HTML into blocks using the transforms registered block types declare.
  *
  * Blocks are matched against the `transforms.from` entries of type `raw` on

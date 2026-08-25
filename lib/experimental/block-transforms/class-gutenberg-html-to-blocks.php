@@ -434,6 +434,15 @@ class Gutenberg_HTML_To_Blocks {
 	 */
 	private static function find_transform( $element ) {
 		foreach ( self::get_raw_transforms() as $transform ) {
+			/*
+			 * A block whose `save` rewrites the markup rather than wrapping it
+			 * cannot be produced from the source, so the markup is left alone
+			 * instead of being claimed and serialized wrongly.
+			 */
+			if ( isset( $transform['serverConversion'] ) && false === $transform['serverConversion'] ) {
+				continue;
+			}
+
 			if ( isset( $transform['isMatch'] ) && is_callable( $transform['isMatch'] ) ) {
 				if ( call_user_func( $transform['isMatch'], $element ) ) {
 					return $transform;
@@ -538,29 +547,124 @@ class Gutenberg_HTML_To_Blocks {
 	}
 
 	/**
-	 * Wraps top level media elements in a figure so media blocks can match them.
+	 * Wraps media in a figure so media blocks can match it, taking it out of a
+	 * paragraph or division first where the editor would.
 	 *
-	 * @param Gutenberg_HTML_Element $root Fragment root.
+	 * The counterpart of `figureContentReducer` in `@wordpress/blocks`.
+	 *
+	 * @param Gutenberg_HTML_Element $root Element whose children to rewrite.
 	 * @return void
 	 */
 	private static function wrap_figure_content( $root ) {
 		$children = array();
 
 		foreach ( $root->children as $child ) {
-			if ( Gutenberg_HTML_Element::ELEMENT !== $child->type || ! self::is_figure_content( $child ) ) {
+			if ( Gutenberg_HTML_Element::ELEMENT !== $child->type || 'figure' === $child->tag_name ) {
 				$children[] = $child;
 				continue;
 			}
 
-			$figure             = Gutenberg_HTML_Element::create_element( 'figure' );
-			$figure->children[] = $child;
-			$child->parent      = $figure;
-			$figure->parent     = $root;
+			if ( self::is_figure_content( $child ) ) {
+				$children[] = self::claims_as_figure( $child, $root )
+					? self::wrap_in_figure( $child, $root )
+					: $child;
+				continue;
+			}
 
-			$children[] = $figure;
+			if ( in_array( $child->tag_name, array( 'p', 'div' ), true ) ) {
+				foreach ( self::take_figure_content( $child ) as $node ) {
+					$children[] = self::wrap_in_figure( $node, $root );
+				}
+
+				$children[] = $child;
+				continue;
+			}
+
+			self::wrap_figure_content( $child );
+
+			$children[] = $child;
 		}
 
 		$root->children = $children;
+	}
+
+	/**
+	 * Removes the media a paragraph or division only carries, so it can become
+	 * a block of its own.
+	 *
+	 * Media stays where it is when it reads as part of a sentence: the editor
+	 * takes it out only when it is aligned, or when the wrapper holds no text.
+	 *
+	 * @param Gutenberg_HTML_Element $wrapper Element to take media out of.
+	 * @return Gutenberg_HTML_Element[] The media taken out, in document order.
+	 */
+	private static function take_figure_content( $wrapper ) {
+		$has_text = '' !== trim( $wrapper->get_text_content() );
+		$taken    = array();
+
+		foreach ( $wrapper->child_elements() as $child ) {
+			if ( ! self::is_figure_content( $child ) ) {
+				continue;
+			}
+
+			$media   = 'a' === $child->tag_name ? $child->child_elements()[0] : $child;
+			$aligned = array_intersect(
+				$media->get_class_names(),
+				array( 'alignleft', 'aligncenter', 'alignright' )
+			);
+
+			if ( ! $aligned && $has_text ) {
+				continue;
+			}
+
+			if ( self::claims_as_figure( $child, $wrapper ) ) {
+				$taken[] = $child;
+			}
+		}
+
+		foreach ( $taken as $node ) {
+			$node->remove();
+		}
+
+		return $taken;
+	}
+
+	/**
+	 * Determines whether any transform would convert media once it is wrapped
+	 * in a figure.
+	 *
+	 * Wrapping media no block converts would leave markup the source never had,
+	 * so the answer decides whether to wrap it at all. The element is left
+	 * exactly as it was found either way.
+	 *
+	 * @param Gutenberg_HTML_Element $node     Media to test.
+	 * @param Gutenberg_HTML_Element $ancestor Element the figure would belong to.
+	 * @return bool Whether a transform claims the wrapped media.
+	 */
+	private static function claims_as_figure( $node, $ancestor ) {
+		$was    = $node->parent;
+		$figure = self::wrap_in_figure( $node, $ancestor );
+		$claims = null !== self::find_transform( $figure );
+
+		$node->parent = $was;
+
+		return $claims;
+	}
+
+	/**
+	 * Wraps an element in a figure.
+	 *
+	 * @param Gutenberg_HTML_Element $node      Element to wrap.
+	 * @param Gutenberg_HTML_Element $ancestor  Element the figure belongs to.
+	 * @return Gutenberg_HTML_Element The figure.
+	 */
+	private static function wrap_in_figure( $node, $ancestor ) {
+		$figure             = Gutenberg_HTML_Element::create_element( 'figure' );
+		$figure->children[] = $node;
+		$node->parent       = $figure;
+		$figure->parent     = $ancestor;
+
+		return $figure;
 	}
 
 	/**

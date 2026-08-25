@@ -254,8 +254,15 @@ function normalizeTransform(
 	blockName: string,
 	direction: 'from' | 'to'
 ): DeclarativeTransform[] {
-	const { attributes, sourceAttributes, innerBlocks, schema, ...rest } =
-		transform;
+	const {
+		attributes,
+		sourceAttributes,
+		innerBlocks,
+		schema,
+		// Read by the server-side converter only.
+		serverConversion,
+		...rest
+	} = transform;
 
 	if ( 'raw' === transform.type ) {
 		const normalized: DeclarativeTransform = { ...rest };
@@ -290,7 +297,16 @@ function normalizeTransform(
 		} ) );
 	}
 
-	return [ { ...rest, attributes, sourceAttributes, innerBlocks, schema } ];
+	return [
+		{
+			...rest,
+			attributes,
+			sourceAttributes,
+			innerBlocks,
+			schema,
+			serverConversion,
+		},
+	];
 }
 
 /**
