@@ -468,7 +468,9 @@ class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 					),
 				),
 				'<ol><li>One</li></ol>',
-				array( 'reversed' => false ),
+				// The editor derives no value at all from markup without the
+				// attribute, rather than `false`.
+				array(),
 			),
 			'tag source'             => array(
 				array(
