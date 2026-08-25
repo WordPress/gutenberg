@@ -73,6 +73,7 @@
 		{ "path": "packages/router" },
 		{ "path": "packages/server-side-render/tsconfig.build.json" },
 		{ "path": "packages/shortcode/tsconfig.build.json" },
+		{ "path": "packages/subject-detection/tsconfig.build.json" },
 		{ "path": "packages/style-engine" },
 		{ "path": "packages/style-runtime/tsconfig.build.json" },
 		{ "path": "packages/sync/tsconfig.build.json" },

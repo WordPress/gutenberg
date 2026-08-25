@@ -1,0 +1,58 @@
+{
+	"name": "@wordpress/subject-detection",
+	"version": "1.0.0",
+	"description": "Finds the subject of an image so a crop can keep it in frame.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"media",
+		"crop"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/subject-detection/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/subject-detection"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"files": [
+		"src",
+		"assets",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"type": "module",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs"
+		},
+		"./detector": {
+			"types": "./build-types/detector.d.ts",
+			"import": "./build-module/detector.mjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpScriptModuleExports": {
+		"./detector": "./build-module/detector.mjs",
+		"./loader": "./build-module/loader.mjs"
+	},
+	"types": "build-types",
+	"devDependencies": {
+		"@types/jest": "^30.0.0",
+		"@types/node": "^20.19.39",
+		"onnxruntime-web": "^1.29.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

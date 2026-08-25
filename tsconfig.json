@@ -44,6 +44,7 @@
 		{ "path": "packages/report-flaky-tests" },
 		{ "path": "packages/server-side-render" },
 		{ "path": "packages/shortcode" },
+		{ "path": "packages/subject-detection" },
 		{ "path": "packages/style-runtime" },
 		{ "path": "packages/sync" },
 		{ "path": "packages/theme" },
