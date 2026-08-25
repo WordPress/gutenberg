@@ -456,7 +456,7 @@ export default function TableCellEdit( {
 		if ( ! selectedCellPlacement || ! tableClientId ) {
 			return;
 		}
-		const { rowIndex, sectionType } = selectedCellPlacement;
+		const { rowIndex } = selectedCellPlacement;
 		const insertIndex = rowIndex + delta;
 
 		// Find the section block for this row.
@@ -486,15 +486,40 @@ export default function TableCellEdit( {
 			.select( blockEditorStore )
 			.getBlocks( targetSection.clientId );
 
-		// Create new row with the same number of cells as the target row.
-		const columnCount =
-			sectionRows[ localInsertIndex ]?.innerBlocks?.length || 2;
-		const newCells = Array.from( { length: columnCount }, () =>
-			createBlock( 'core/table-v2-cell', {
-				tag: sectionType === 'head' ? 'th' : 'td',
-				scope: sectionType === 'head' ? 'col' : undefined,
-				content: '',
-			} )
+		// The new row gets a cell for each column not covered by a span
+		// passing through the insertion point: a rowSpan from a row above
+		// extends across the inserted row automatically.
+		const tableColumnCount = Math.max(
+			0,
+			...cellPlacements.map( ( p ) => p.columnIndex + p.colSpan )
+		);
+		const coveredColumns = new Set();
+		for ( const p of cellPlacements ) {
+			if (
+				p.rowIndex < insertIndex &&
+				p.rowIndex + p.rowSpan - 1 >= insertIndex
+			) {
+				for (
+					let column = p.columnIndex;
+					column < p.columnIndex + p.colSpan;
+					column++
+				) {
+					coveredColumns.add( column );
+				}
+			}
+		}
+
+		const newCells = Array.from(
+			{ length: tableColumnCount - coveredColumns.size },
+			() =>
+				createBlock( 'core/table-v2-cell', {
+					tag: targetSection.attributes.type === 'head' ? 'th' : 'td',
+					scope:
+						targetSection.attributes.type === 'head'
+							? 'col'
+							: undefined,
+					content: '',
+				} )
 		);
 		const newRow = createBlock( 'core/table-v2-row', {}, newCells );
 
@@ -520,27 +545,42 @@ export default function TableCellEdit( {
 			return;
 		}
 
-		const { rowIndex } = selectedCellPlacement;
-		const endRow = rowIndex + ( rowSpan || 1 ) - 1;
+		const { rowIndex, rowSpan: selectedRowSpan } = selectedCellPlacement;
+		const endRow = rowIndex + selectedRowSpan - 1;
 
-		// Collect all cell clientIds in the row range.
-		const cellIdsToDelete = cellPlacements
-			.filter( ( p ) => p.rowIndex >= rowIndex && p.rowIndex <= endRow )
-			.map( ( p ) => p.clientId );
+		const selectors = registry.select( blockEditorStore );
+		const rowsToDelete = new Set();
+		// Cells starting before the deleted range but spanning into it
+		// have their rowSpan reduced by the overlap.
+		const spanReductions = new Map();
 
-		if ( ! cellIdsToDelete.length ) {
-			return;
+		for ( const placement of cellPlacements ) {
+			const placementEndRow = placement.rowIndex + placement.rowSpan - 1;
+			if (
+				placement.rowIndex >= rowIndex &&
+				placement.rowIndex <= endRow
+			) {
+				const rowClientId = selectors.getBlockRootClientId(
+					placement.clientId
+				);
+				if ( rowClientId ) {
+					rowsToDelete.add( rowClientId );
+				}
+			} else if (
+				placement.rowIndex < rowIndex &&
+				placementEndRow >= rowIndex
+			) {
+				const overlap =
+					Math.min( placementEndRow, endRow ) - rowIndex + 1;
+				spanReductions.set(
+					placement.clientId,
+					placement.rowSpan - overlap
+				);
+			}
 		}
 
-		// Group by row block and delete.
-		const { getBlockRootClientId } = registry.select( blockEditorStore );
-		const rowsToDelete = new Set();
-
-		for ( const cellId of cellIdsToDelete ) {
-			const rowClientId = getBlockRootClientId( cellId );
-			if ( rowClientId ) {
-				rowsToDelete.add( rowClientId );
-			}
+		if ( ! rowsToDelete.size ) {
+			return;
 		}
 
 		registry.batch( () => {
@@ -558,6 +598,14 @@ export default function TableCellEdit( {
 					);
 					replaceInnerBlocks( sectionClientId, nextBlocks, false );
 				}
+			}
+			// Attribute updates come after the row replacements:
+			// replaceInnerBlocks re-inserts the passed blocks with their
+			// read-time attributes.
+			for ( const [ clientIdToReduce, newRowSpan ] of spanReductions ) {
+				updateBlockAttributes( clientIdToReduce, {
+					rowSpan: newRowSpan,
+				} );
 			}
 		} );
 	}
