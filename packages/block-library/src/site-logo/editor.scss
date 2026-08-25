@@ -16,6 +16,7 @@
 
 	.custom-logo-link {
 		cursor: inherit;
+		display: block;
 
 		&:focus {
 			box-shadow: none;
@@ -26,6 +27,19 @@
 		display: block;
 		height: auto;
 		max-width: 100%;
+	}
+
+	// When the logo is linked, the image is wrapped in an anchor and no longer
+	// matches `.components-resizable-box__container > img`, which causes SVGs
+	// without intrinsic dimensions to collapse when resized. See #57717.
+	.components-resizable-box__container .custom-logo-link {
+		width: 100%;
+		height: 100%;
+	}
+
+	.components-resizable-box__container .custom-logo {
+		width: 100%;
+		height: auto;
 	}
 
 	&.is-transient {
