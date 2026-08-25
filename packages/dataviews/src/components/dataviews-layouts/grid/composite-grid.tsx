@@ -15,7 +15,7 @@ import {
 	useRef,
 	forwardRef,
 } from '@wordpress/element';
-import { MEDIA_ASPECT_RATIOS, MEDIA_FITS } from '../../../constants';
+import { MEDIA_ASPECT_RATIOS } from '../../../constants';
 import ItemActions from '../../dataviews-item-actions';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
 import DataViewsContext from '../../dataviews-context';
@@ -353,23 +353,23 @@ export default function CompositeGrid< Item >( {
 	const { paginationInfo, resizeObserverRef } =
 		useContext( DataViewsContext );
 	const gridColumns = useGridColumns();
-	// Consumer-configured shape and fill for item previews, each validated
-	// against its presets (like `density`) so arbitrary values are ignored,
-	// and surfaced to CSS as custom properties the media field's stylesheet
-	// reads. Both are always set (with their defaults), so identically-named
-	// variables set by a consumer on an ancestor can't leak into the previews
-	// when the view doesn't configure them.
+	// Consumer-configured shape for item previews, validated against the
+	// presets (like `density`) so arbitrary values are ignored, and surfaced
+	// to CSS as a custom property the media field's stylesheet reads. Always
+	// set (with the square default), so an identically-named variable set by
+	// a consumer on an ancestor can't leak into the previews when the view
+	// doesn't configure a ratio.
 	const gridStyle = {
 		'--wp-dataviews-media-aspect-ratio':
 			view.layout?.aspectRatio &&
 			MEDIA_ASPECT_RATIOS.includes( view.layout.aspectRatio )
 				? view.layout.aspectRatio
 				: '1/1',
-		'--wp-dataviews-media-fit':
-			view.layout?.mediaFit && MEDIA_FITS.includes( view.layout.mediaFit )
-				? view.layout.mediaFit
-				: 'cover',
 	} as CSSProperties;
+	// `mediaFit` is a class rather than a custom property (unlike the aspect
+	// ratio above) because it switches the preview box's background token as
+	// well as its `object-fit`, which a custom property can't do.
+	const isMediaContain = view.layout?.mediaFit === 'contain';
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
 	const titleField = fields.find(
 		( field ) => field.id === view?.titleField
@@ -435,6 +435,7 @@ export default function CompositeGrid< Item >( {
 												'compact',
 												'comfortable',
 											].includes( view.layout.density ),
+										'has-media-fit-contain': isMediaContain,
 									}
 								) }
 								previewSize={ view.layout?.previewSize }
@@ -537,6 +538,7 @@ export default function CompositeGrid< Item >( {
 								[ 'compact', 'comfortable' ].includes(
 									view.layout.density
 								),
+							'has-media-fit-contain': isMediaContain,
 						} ) }
 						focusWrap
 						aria-busy={ isLoading }

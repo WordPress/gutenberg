@@ -997,28 +997,22 @@ describe( 'DataViews component', () => {
 			};
 
 			// The standard (non-infinite-scroll) grid root, which carries the
-			// custom properties the previews read.
+			// class the previews are styled from.
 			const getGrid = () => screen.getByRole( 'grid' );
 
 			it( 'crops previews by default', () => {
 				renderGrid();
-				expect( getGrid() ).toHaveStyle( {
-					'--wp-dataviews-media-fit': 'cover',
-				} );
+				expect( getGrid() ).not.toHaveClass( 'has-media-fit-contain' );
 			} );
 
 			it( 'fits previews when configured to contain', () => {
 				renderGrid( { mediaFit: 'contain' } );
-				expect( getGrid() ).toHaveStyle( {
-					'--wp-dataviews-media-fit': 'contain',
-				} );
+				expect( getGrid() ).toHaveClass( 'has-media-fit-contain' );
 			} );
 
 			it( 'ignores an unsupported value and falls back to cropping', () => {
 				renderGrid( { mediaFit: 'fill' } );
-				expect( getGrid() ).toHaveStyle( {
-					'--wp-dataviews-media-fit': 'cover',
-				} );
+				expect( getGrid() ).not.toHaveClass( 'has-media-fit-contain' );
 			} );
 
 			it( 'hides the control unless the consumer opts in', async () => {
@@ -1041,9 +1035,7 @@ describe( 'DataViews component', () => {
 				const control = await queryControl();
 				const user = userEvent.setup();
 				await user.click( control as HTMLElement );
-				expect( getGrid() ).toHaveStyle( {
-					'--wp-dataviews-media-fit': 'contain',
-				} );
+				expect( getGrid() ).toHaveClass( 'has-media-fit-contain' );
 			} );
 		} );
 	} );

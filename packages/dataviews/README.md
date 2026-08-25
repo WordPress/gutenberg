@@ -276,7 +276,7 @@ Right-align (`'end'`) whenever the cell value is fundamentally quantitative—nu
 -   `density`: one of `comfortable`, `balanced`, or `compact`. Configures the gap between items in the grid.
 -   `previewSize`: a `number` representing the size of the preview.
 -   `aspectRatio` (`grid` only): one of the preset ratios `'1/1'`, `'4/3'`, `'3/4'`, `'3/2'`, `'2/3'`, `'16/9'`, or `'9/16'`, applied uniformly to every item preview, keeping rows aligned. Defaults to `'1/1'`.
--   `mediaFit`: how the media field fills the preview box, either `'cover'` (crop it to fill) or `'contain'` (fit the whole media inside, letterboxing it so its own aspect ratio stays visible). The box keeps the shape set by `aspectRatio` either way, so rows stay aligned. Defaults to `'cover'`. To let users switch this themselves, pass `config={ { mediaFitControl: true } }` to `DataViews` or `DataViewsPicker`, which adds an "Original aspect ratio" toggle to the view options.
+-   `mediaFit`: how the media field fills the preview box, either `'cover'` (crop it to fill) or `'contain'` (fit the whole media inside, letterboxing it so its own aspect ratio stays visible). The box keeps the shape set by `aspectRatio` either way, so rows stay aligned, and takes a neutral background under `'contain'` so a letterboxed preview still reads as a single item. Defaults to `'cover'`. To let users switch this themselves, pass `config={ { mediaFitControl: true } }` to `DataViews` or `DataViewsPicker`, which adds an "Original aspect ratio" toggle to the view options.
 
 `list` layout:
 

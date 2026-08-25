@@ -108,7 +108,7 @@
 		}
 
 		img {
-			object-fit: var(--wp-dataviews-media-fit, cover);
+			object-fit: cover;
 			width: 100%;
 			height: 100%;
 		}
@@ -132,6 +132,18 @@
 			border-radius: var(--wpds-border-radius-md);
 			box-shadow: none;
 			background: var(--wpds-color-background-surface-neutral);
+		}
+	}
+
+	// Fitting the whole media inside the box letterboxes it, so the box needs
+	// a background of its own for the item to still read as a unit. Only
+	// applied to `contain`: under `cover` the media covers the box, and a grey
+	// would only show through transparent images and while previews load.
+	&.has-media-fit-contain .dataviews-view-grid__media {
+		background-color: var(--wpds-color-background-surface-neutral);
+
+		img {
+			object-fit: contain;
 		}
 	}
 

@@ -498,13 +498,14 @@ describe( 'DataViews Picker', () => {
 		} );
 
 		describe( 'media fit', () => {
-			// The flat branch renders `GridItems` as the listbox itself, so
-			// the element carrying the custom property is the listbox.
+			// Both the flat and grouped branches put the class on the listbox:
+			// the flat branch renders `GridItems` as the listbox itself, and
+			// the grouped one nests its per-group grids inside it.
 			it( 'crops previews by default', () => {
 				render( <Picker /> );
-				expect( screen.getByRole( 'listbox' ) ).toHaveStyle( {
-					'--wp-dataviews-media-fit': 'cover',
-				} );
+				expect( screen.getByRole( 'listbox' ) ).not.toHaveClass(
+					'has-media-fit-contain'
+				);
 			} );
 
 			it( 'fits previews when configured to contain', () => {
@@ -517,9 +518,9 @@ describe( 'DataViews Picker', () => {
 						}
 					/>
 				);
-				expect( screen.getByRole( 'listbox' ) ).toHaveStyle( {
-					'--wp-dataviews-media-fit': 'contain',
-				} );
+				expect( screen.getByRole( 'listbox' ) ).toHaveClass(
+					'has-media-fit-contain'
+				);
 			} );
 
 			it( 'ignores an unsupported value and falls back to cropping', () => {
@@ -533,15 +534,13 @@ describe( 'DataViews Picker', () => {
 						}
 					/>
 				);
-				expect( screen.getByRole( 'listbox' ) ).toHaveStyle( {
-					'--wp-dataviews-media-fit': 'cover',
-				} );
+				expect( screen.getByRole( 'listbox' ) ).not.toHaveClass(
+					'has-media-fit-contain'
+				);
 			} );
 
-			// Grouping renders one `GridItems` per group, nested inside the
-			// listbox rather than being it, so each has to carry the property.
-			it( 'applies the fit to every group when the data is grouped', () => {
-				const { container } = render(
+			it( 'applies the fit when the data is grouped', () => {
+				render(
 					<Picker
 						fields={ groupingFields }
 						view={
@@ -553,18 +552,9 @@ describe( 'DataViews Picker', () => {
 					/>
 				);
 
-				// No role distinguishes the per-group grids from each other,
-				// so reach for them by class, as the DataViews tests do.
-				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-				const groups = container.querySelectorAll(
-					'.dataviews-view-grid-items'
+				expect( screen.getByRole( 'listbox' ) ).toHaveClass(
+					'has-media-fit-contain'
 				);
-				expect( groups ).toHaveLength( 2 );
-				groups.forEach( ( group ) => {
-					expect( group ).toHaveStyle( {
-						'--wp-dataviews-media-fit': 'contain',
-					} );
-				} );
 			} );
 		} );
 	} );
