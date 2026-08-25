@@ -16,6 +16,14 @@
  * @return string Returns the block content.
  */
 function render_block_core_shortcode( $attributes, $content ) {
+	// Check if this is being called from ServerSideRender (editor preview)
+	// by checking if we have the 'text' attribute
+	if ( isset( $attributes['text'] ) && ! empty( $attributes['text'] ) ) {
+		// For ServerSideRender (editor preview), use do_shortcode
+		return do_shortcode( $attributes['text'] );
+	}
+
+	// For frontend rendering, use wpautop on the block content
 	return wpautop( $content );
 }
 
