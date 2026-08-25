@@ -34,8 +34,8 @@ For either classification, use the public guide's
 [package completion gate](../../../docs/contributors/design/design-system-packages.md#change-a-package-safely)
 and inspect only the surfaces applicable to the change.
 
-For a published package boundary that can mix bundled and WordPress-provided
-dependency versions, also apply the
+If a published package can run with a dependency supplied separately by
+WordPress, also apply the
 [`package-runtime-compatibility`](../package-runtime-compatibility/SKILL.md)
 skill before concluding the review.
 

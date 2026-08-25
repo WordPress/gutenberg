@@ -41,8 +41,8 @@ stories, public documentation, release notes, or compatibility machinery for
 an unchanged public capability. Still follow the repository's required package
 changelog policy for production code changes.
 
-For a published package boundary that can mix bundled and WordPress-provided
-dependency versions, also apply the
+If a published package can run with a dependency supplied separately by
+WordPress, also apply the
 [`package-runtime-compatibility`](../package-runtime-compatibility/SKILL.md)
 skill before implementation.
 
