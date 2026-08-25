@@ -123,3 +123,47 @@ export function getColumnInsertionActions( cellPlacements, targetColumn ) {
 
 	return actionsByRow;
 }
+
+/**
+ * Computes how to insert a row at a visual row index.
+ *
+ * A cell spanning across the insertion point extends its rowSpan to cover
+ * the new row, so the rows below keep their coverage. The new row gets a
+ * cell for each column not covered by an extended span.
+ *
+ * @param {Array}  cellPlacements Span-aware cell placements.
+ * @param {number} insertIndex    Visual row index to insert at.
+ * @return {Object} Object with cellCount and rowSpanExtensions (Map of
+ *                  client ID to new rowSpan).
+ */
+export function getRowInsertionActions( cellPlacements, insertIndex ) {
+	const columnCount = Math.max(
+		0,
+		...cellPlacements.map(
+			( placement ) => placement.columnIndex + placement.colSpan
+		)
+	);
+	const coveredColumns = new Set();
+	const rowSpanExtensions = new Map();
+
+	for ( const placement of cellPlacements ) {
+		if (
+			placement.rowIndex < insertIndex &&
+			placement.rowIndex + placement.rowSpan - 1 >= insertIndex
+		) {
+			for (
+				let column = placement.columnIndex;
+				column < placement.columnIndex + placement.colSpan;
+				column++
+			) {
+				coveredColumns.add( column );
+			}
+			rowSpanExtensions.set( placement.clientId, placement.rowSpan + 1 );
+		}
+	}
+
+	return {
+		cellCount: columnCount - coveredColumns.size,
+		rowSpanExtensions,
+	};
+}

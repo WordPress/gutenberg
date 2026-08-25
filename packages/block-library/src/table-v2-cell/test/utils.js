@@ -1,4 +1,8 @@
-import { getCellPlacements, getColumnInsertionActions } from '../utils';
+import {
+	getCellPlacements,
+	getColumnInsertionActions,
+	getRowInsertionActions,
+} from '../utils';
 
 function createCell( clientId, attributes = {} ) {
 	return {
@@ -308,5 +312,102 @@ describe( 'getColumnInsertionActions', () => {
 		expect( getColumnInsertionActions( placements, 2 ).get( 0 ) ).toEqual( {
 			insertIndex: 2,
 		} );
+	} );
+} );
+
+describe( 'getRowInsertionActions', () => {
+	it( 'returns a full cell count and no extensions without spans', () => {
+		const sections = [
+			createSection( 'body', [
+				createRow( 'row-1', [ createCell( 'a' ), createCell( 'b' ) ] ),
+				createRow( 'row-2', [ createCell( 'c' ), createCell( 'd' ) ] ),
+			] ),
+		];
+		const { cellCount, rowSpanExtensions } = getRowInsertionActions(
+			getCellPlacements( sections ),
+			1
+		);
+
+		expect( cellCount ).toBe( 2 );
+		expect( rowSpanExtensions.size ).toBe( 0 );
+	} );
+
+	it( 'extends a rowSpan passing through the insertion point', () => {
+		const sections = [
+			createSection( 'body', [
+				createRow( 'row-1', [
+					createCell( 'a', { rowSpan: 2 } ),
+					createCell( 'b' ),
+				] ),
+				createRow( 'row-2', [ createCell( 'c' ) ] ),
+			] ),
+		];
+		const { cellCount, rowSpanExtensions } = getRowInsertionActions(
+			getCellPlacements( sections ),
+			1
+		);
+
+		expect( cellCount ).toBe( 1 );
+		expect( [ ...rowSpanExtensions ] ).toEqual( [ [ 'a', 3 ] ] );
+	} );
+
+	it( 'subtracts every covered column for a merged cell with rowSpan and colSpan', () => {
+		const sections = [
+			createSection( 'body', [
+				createRow( 'row-1', [
+					createCell( 'a', { rowSpan: 2, colSpan: 2 } ),
+					createCell( 'b' ),
+				] ),
+				createRow( 'row-2', [ createCell( 'c' ) ] ),
+			] ),
+		];
+		const { cellCount, rowSpanExtensions } = getRowInsertionActions(
+			getCellPlacements( sections ),
+			1
+		);
+
+		expect( cellCount ).toBe( 1 );
+		expect( [ ...rowSpanExtensions ] ).toEqual( [ [ 'a', 3 ] ] );
+	} );
+
+	it( 'does not extend a span when inserting past its end', () => {
+		const sections = [
+			createSection( 'body', [
+				createRow( 'row-1', [
+					createCell( 'a', { rowSpan: 2 } ),
+					createCell( 'b' ),
+				] ),
+				createRow( 'row-2', [ createCell( 'c' ) ] ),
+			] ),
+		];
+		const { cellCount, rowSpanExtensions } = getRowInsertionActions(
+			getCellPlacements( sections ),
+			2
+		);
+
+		expect( cellCount ).toBe( 2 );
+		expect( rowSpanExtensions.size ).toBe( 0 );
+	} );
+
+	it( 'subtracts the union of columns covered by multiple spans', () => {
+		const sections = [
+			createSection( 'body', [
+				createRow( 'row-1', [
+					createCell( 'a', { rowSpan: 2 } ),
+					createCell( 'b', { rowSpan: 2 } ),
+				] ),
+				createRow( 'row-2', [ createCell( 'c' ) ] ),
+			] ),
+		];
+		const { cellCount, rowSpanExtensions } = getRowInsertionActions(
+			getCellPlacements( sections ),
+			1
+		);
+
+		expect( cellCount ).toBe( 1 );
+		expect( [ ...rowSpanExtensions ] ).toEqual( [
+			[ 'a', 3 ],
+			[ 'b', 3 ],
+		] );
 	} );
 } );

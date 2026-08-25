@@ -29,6 +29,7 @@ import {
 import {
 	getCellPlacements,
 	getColumnInsertionActions,
+	getRowInsertionActions,
 	groupPlacementsByRow,
 } from './utils';
 
@@ -443,22 +444,29 @@ export default function TableCellEdit( {
 		if ( ! selectedCellPlacement || ! tableClientId ) {
 			return;
 		}
-		const { rowIndex } = selectedCellPlacement;
-		const insertIndex = rowIndex + delta;
+		const { rowIndex, rowSpan: selectedRowSpan } = selectedCellPlacement;
+		// "Before" targets the selected cell's row, "after" the row past
+		// its last covered row.
+		const insertIndex = delta === 0 ? rowIndex : rowIndex + selectedRowSpan;
 
-		// Find the section block for this row.
+		// Find the section block receiving the row. The last section also
+		// accepts an insertion past its final row.
 		const sections = registry
 			.select( blockEditorStore )
 			.getBlocks( tableClientId );
 		let targetSection = null;
 		let currentRowIndex = 0;
 
-		for ( const section of sections ) {
+		for ( let i = 0; i < sections.length; i++ ) {
 			const sectionRows = registry
 				.select( blockEditorStore )
-				.getBlocks( section.clientId );
-			if ( currentRowIndex + sectionRows.length > insertIndex ) {
-				targetSection = section;
+				.getBlocks( sections[ i ].clientId );
+			if (
+				currentRowIndex + sectionRows.length > insertIndex ||
+				( i === sections.length - 1 &&
+					currentRowIndex + sectionRows.length === insertIndex )
+			) {
+				targetSection = sections[ i ];
 				break;
 			}
 			currentRowIndex += sectionRows.length;
@@ -474,39 +482,22 @@ export default function TableCellEdit( {
 			.getBlocks( targetSection.clientId );
 
 		// The new row gets a cell for each column not covered by a span
-		// passing through the insertion point: a rowSpan from a row above
-		// extends across the inserted row automatically.
-		const tableColumnCount = Math.max(
-			0,
-			...cellPlacements.map( ( p ) => p.columnIndex + p.colSpan )
+		// passing through the insertion point, and each such span extends
+		// its rowSpan to cover the new row.
+		const { cellCount, rowSpanExtensions } = getRowInsertionActions(
+			cellPlacements,
+			insertIndex
 		);
-		const coveredColumns = new Set();
-		for ( const p of cellPlacements ) {
-			if (
-				p.rowIndex < insertIndex &&
-				p.rowIndex + p.rowSpan - 1 >= insertIndex
-			) {
-				for (
-					let column = p.columnIndex;
-					column < p.columnIndex + p.colSpan;
-					column++
-				) {
-					coveredColumns.add( column );
-				}
-			}
-		}
 
-		const newCells = Array.from(
-			{ length: tableColumnCount - coveredColumns.size },
-			() =>
-				createBlock( 'core/table-v2-cell', {
-					tag: targetSection.attributes.type === 'head' ? 'th' : 'td',
-					scope:
-						targetSection.attributes.type === 'head'
-							? 'col'
-							: undefined,
-					content: '',
-				} )
+		const newCells = Array.from( { length: cellCount }, () =>
+			createBlock( 'core/table-v2-cell', {
+				tag: targetSection.attributes.type === 'head' ? 'th' : 'td',
+				scope:
+					targetSection.attributes.type === 'head'
+						? 'col'
+						: undefined,
+				content: '',
+			} )
 		);
 		const newRow = createBlock( 'core/table-v2-row', {}, newCells );
 
@@ -516,7 +507,20 @@ export default function TableCellEdit( {
 			...sectionRows.slice( localInsertIndex ),
 		];
 
-		replaceInnerBlocks( targetSection.clientId, nextRows, false );
+		registry.batch( () => {
+			replaceInnerBlocks( targetSection.clientId, nextRows, false );
+			// Span extensions come after the replacement:
+			// replaceInnerBlocks re-inserts the passed rows with their
+			// read-time attributes.
+			for ( const [
+				clientIdToExtend,
+				newRowSpan,
+			] of rowSpanExtensions ) {
+				updateBlockAttributes( clientIdToExtend, {
+					rowSpan: newRowSpan,
+				} );
+			}
+		} );
 	}
 
 	function onInsertRowBefore() {
