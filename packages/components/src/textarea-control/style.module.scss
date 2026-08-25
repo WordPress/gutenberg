@@ -1,5 +1,56 @@
 @use "@wordpress/base-styles/mixins" as *;
+@use "../utils/theme-variables" as *;
 
 .textarea {
+	width: 100%;
+	display: block;
+	background: $components-color-background;
+	color: $components-color-foreground;
+	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Preserve Emotion `resize: vertical`; `block` is not equivalent in vertical writing modes. */
+	resize: vertical;
+
 	@include input-control;
+
+	// Vertical padding is to match the standard 40px control height when rows=1,
+	// in conjunction with the 20px line-height.
+	// "Standard" metrics are 10px 12px, but subtracts 1px each to account for the border width.
+	line-height: 20px;
+	padding: 9px 11px;
+
+	// Matching the 20px line-height + the 9px top and bottom padding.
+	min-height: 38px;
+
+	&:disabled {
+		background: $components-color-gray-100;
+		border-color: $components-color-gray-400;
+		color: $components-color-gray-600;
+	}
+
+	// Use opacity to work in various editor styles.
+	// Keep the legacy vendor placeholders from the Emotion styles for parity
+	&::-webkit-input-placeholder {
+		color: $components-color-dark-gray-placeholder;
+	}
+
+	&::-moz-placeholder {
+		color: $components-color-dark-gray-placeholder;
+	}
+
+	&:-ms-input-placeholder {
+		color: $components-color-dark-gray-placeholder;
+	}
+
+	:global(.is-dark-theme) & {
+		&::-webkit-input-placeholder {
+			color: $components-color-light-gray-placeholder;
+		}
+
+		&::-moz-placeholder {
+			color: $components-color-light-gray-placeholder;
+		}
+
+		&:-ms-input-placeholder {
+			color: $components-color-light-gray-placeholder;
+		}
+	}
 }
