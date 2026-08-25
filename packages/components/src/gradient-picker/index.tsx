@@ -1,4 +1,5 @@
 import { __, sprintf } from '@wordpress/i18n';
+import deprecated from '@wordpress/deprecated';
 import { useInstanceId } from '@wordpress/compose';
 import { useCallback, useMemo } from '@wordpress/element';
 import CircularOptionPicker, {
@@ -138,6 +139,15 @@ function Component( props: PickerProps< any > ) {
 		'aria-labelledby': ariaLabelledby,
 		...additionalProps
 	} = props;
+
+	if ( asButtons && presentation === undefined ) {
+		deprecated( '`asButtons` prop in wp.components.GradientPicker', {
+			since: '7.2',
+			alternative: 'presentation',
+			hint: '`asButtons={ true }` maps to `presentation="toggle-buttons"`. Use `presentation="command-buttons"` for action buttons without a pressed state.',
+		} );
+	}
+
 	const options = isMultipleOriginArray( props.gradients ) ? (
 		<MultipleOrigin headingLevel={ headingLevel } { ...additionalProps } />
 	) : (

@@ -54,16 +54,6 @@ const MyGradientPicker = () => {
 
 Whether this is rendered in the sidebar.
 
-### `asButtons`
-
- - Type: `boolean`
- - Required: No
- - Default: `false`
-
-Whether the control should present as a set of buttons,
-each with its own tab stop.
-@deprecated Use `presentation="toggle-buttons"` instead.
-
 ### `aria-label`
 
  - Type: `string`
@@ -138,7 +128,7 @@ contains two or more items).
  - Default: `true`
 
 Prevents keyboard interaction from wrapping around.
-Only used when `presentation` is `listbox` (or `asButtons` is not true).
+Only used when the resolved presentation is `listbox`. Explicit `presentation` takes precedence over `asButtons`.
 
 ### `onChange`
 

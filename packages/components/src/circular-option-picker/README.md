@@ -88,17 +88,9 @@ How options are presented to assistive technology.
 - Required: No
 - Default: `listbox`
 
-### `asButtons`: `boolean`
-
-Whether the control should present as a set of buttons, each with its own tab stop.
-
-- Required: No
-- Default: `false`
-- Deprecated: Use `presentation="toggle-buttons"` instead. `asButtons={ true }` maps to `presentation="toggle-buttons"`.
-
 ### `loop`: `boolean`
 
-Prevents keyboard interaction from wrapping around. Only used when `presentation` is `listbox` (or `asButtons` is not true).
+Prevents keyboard interaction from wrapping around. Only used when the resolved presentation is `listbox`. Explicit `presentation` takes precedence over `asButtons`.
 
 - Required: No
 - Default: `true`

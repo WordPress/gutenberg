@@ -335,7 +335,6 @@
       - aria-label
       - aria-labelledby
       - as
-      - asButtons
       - clearable
       - colors
       - disableCustomColors
@@ -695,7 +694,6 @@
       - __nextHasNoMargin
       - aria-label
       - aria-labelledby
-      - asButtons
       - className
       - clearable
       - disableCustomGradients

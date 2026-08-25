@@ -85,16 +85,20 @@ Callback called when a color is selected.
 
 -   Required: Yes
 
-### `asButtons`: `boolean`
+### `presentation`: `'listbox' | 'toggle-buttons' | 'command-buttons'`
 
-Whether the control should present as a set of buttons, each with its own tab stop.
+How options are presented to assistive technology.
+
+- `listbox`: a composite listbox with selected state.
+- `toggle-buttons`: individual buttons with a pressed state.
+- `command-buttons`: individual buttons without a pressed state.
 
 - Required: No
-- Default: `false`
+- Default: `listbox`
 
 ### `loop`: `boolean`
 
-Prevents keyboard interaction from wrapping around. Only used when `asButtons` is not true.
+Prevents keyboard interaction from wrapping around. Only used when the resolved presentation is `listbox`. Explicit `presentation` takes precedence over `asButtons`.
 
 - Required: No
 - Default: `true`

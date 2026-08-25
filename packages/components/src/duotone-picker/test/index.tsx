@@ -252,4 +252,27 @@ describe( 'DuotonePicker', () => {
 			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
 		} );
 	} );
+
+	describe( 'asButtons deprecation', () => {
+		it( 'should warn and render toggle buttons when asButtons is true', () => {
+			render(
+				<DuotonePicker
+					aria-label="Duotone"
+					duotonePalette={ DUPLICATE_DUOTONES }
+					colorPalette={ COLOR_PALETTE }
+					value={ undefined }
+					onChange={ jest.fn() }
+					disableCustomDuotone
+					disableCustomColors
+					asButtons
+				/>
+			);
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+			expect( screen.getAllByRole( 'button' ).length ).toBeGreaterThan(
+				0
+			);
+			expect( console ).toHaveWarned();
+		} );
+	} );
 } );

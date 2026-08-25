@@ -434,4 +434,43 @@ describe( 'ColorPalette', () => {
 			expect( options[ 2 ] ).toHaveAttribute( 'aria-selected', 'false' );
 		} );
 	} );
+
+	describe( 'asButtons deprecation', () => {
+		it( 'should warn and render toggle buttons when asButtons is true', () => {
+			render(
+				<ColorPalette
+					colors={ EXAMPLE_COLORS }
+					value={ INITIAL_COLOR }
+					onChange={ jest.fn() }
+					asButtons
+					aria-label="Colors"
+				/>
+			);
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+			expect( screen.getAllByRole( 'button' ).length ).toBeGreaterThan(
+				0
+			);
+			expect( console ).toHaveWarned();
+		} );
+
+		it( 'should prefer presentation over asButtons', () => {
+			render(
+				<ColorPalette
+					colors={ EXAMPLE_COLORS }
+					value={ INITIAL_COLOR }
+					onChange={ jest.fn() }
+					asButtons
+					presentation="command-buttons"
+					aria-label="Colors"
+				/>
+			);
+
+			const pressedButtons = screen
+				.getAllByRole( 'button' )
+				.filter( ( button ) => button.hasAttribute( 'aria-pressed' ) );
+			expect( pressedButtons ).toHaveLength( 0 );
+			expect( console ).not.toHaveWarned();
+		} );
+	} );
 } );

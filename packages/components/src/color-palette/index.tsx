@@ -4,6 +4,7 @@ import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
 import clsx from 'clsx';
 import { useInstanceId } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useMemo, useState, forwardRef } from '@wordpress/element';
 import Dropdown from '../dropdown';
@@ -200,6 +201,15 @@ function UnforwardedColorPalette(
 		'aria-labelledby': ariaLabelledby,
 		...additionalProps
 	} = props;
+
+	if ( asButtons && presentation === undefined ) {
+		deprecated( '`asButtons` prop in wp.components.ColorPalette', {
+			since: '7.2',
+			alternative: 'presentation',
+			hint: '`asButtons={ true }` maps to `presentation="toggle-buttons"`. Use `presentation="command-buttons"` for action buttons without a pressed state.',
+		} );
+	}
+
 	const [ normalizedColorValue, setNormalizedColorValue ] = useState( value );
 
 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );

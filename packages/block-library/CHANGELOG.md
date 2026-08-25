@@ -16,6 +16,7 @@
 
 ### Bug Fixes
 
+-   Cover: Use `presentation="toggle-buttons"` on the placeholder overlay color palette instead of the deprecated `asButtons` prop ([#81836](https://github.com/WordPress/gutenberg/pull/81836)).
 -   Columns: Preserve individual Column attributes supported by Group, including styles and layouts, when transforming to Row or Grid.
 -   Icon: Apply only padding to the inner SVG in the editor, so margin is no longer applied twice compared to the front end ([#81292](https://github.com/WordPress/gutenberg/pull/81292)).
 -   Playlist: Attach the inner block drop zone to the track list, so Playlist Track blocks show insertion markers while being reordered.

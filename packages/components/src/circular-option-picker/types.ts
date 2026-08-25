@@ -52,13 +52,14 @@ export type CircularOptionPickerProps = {
 	 * Whether the control should present as a set of buttons,
 	 * each with its own tab stop.
 	 *
-	 * @deprecated Use `presentation="toggle-buttons"` instead.
+	 * @deprecated Use `presentation="toggle-buttons"` instead. Explicit `presentation` takes precedence over `asButtons`.
 	 * @default false
+	 * @ignore
 	 */
 	asButtons?: boolean;
 	/**
 	 * Prevents keyboard interaction from wrapping around.
-	 * Only used when `presentation` is `listbox` (or `asButtons` is not true).
+	 * Only used when the resolved presentation is `listbox`. Explicit `presentation` takes precedence over `asButtons`.
 	 *
 	 * @default true
 	 */

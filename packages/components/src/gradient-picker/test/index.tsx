@@ -138,4 +138,25 @@ describe( 'GradientPicker', () => {
 			expect( onChange ).toHaveBeenCalledWith( GRADIENT_B, 0, 'blush' );
 		} );
 	} );
+
+	describe( 'asButtons deprecation', () => {
+		it( 'should warn and render toggle buttons when asButtons is true', () => {
+			render(
+				<GradientPicker
+					aria-label="Gradient"
+					gradients={ DUPLICATE_GRADIENTS }
+					value={ undefined }
+					onChange={ jest.fn() }
+					disableCustomGradients
+					asButtons
+				/>
+			);
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+			expect( screen.getAllByRole( 'button' ).length ).toBeGreaterThan(
+				0
+			);
+			expect( console ).toHaveWarned();
+		} );
+	} );
 } );

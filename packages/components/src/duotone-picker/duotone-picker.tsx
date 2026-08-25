@@ -1,5 +1,6 @@
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { useMemo } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 import { __, sprintf } from '@wordpress/i18n';
 import ColorListPicker from './color-list-picker';
 import CircularOptionPicker, {
@@ -61,6 +62,14 @@ function DuotonePicker( {
 	'aria-labelledby': ariaLabelledby,
 	...otherProps
 }: DuotonePickerProps ) {
+	if ( asButtons && presentation === undefined ) {
+		deprecated( '`asButtons` prop in wp.components.DuotonePicker', {
+			since: '7.2',
+			alternative: 'presentation',
+			hint: '`asButtons={ true }` maps to `presentation="toggle-buttons"`. Use `presentation="command-buttons"` for action buttons without a pressed state.',
+		} );
+	}
+
 	const [ defaultDark, defaultLight ] = useMemo(
 		() => getDefaultColors( colorPalette ),
 		[ colorPalette ]
