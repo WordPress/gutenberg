@@ -10,7 +10,6 @@
 
 	font-family: $default-font;
 	font-size: $default-font-size;
-
 }
 
 .components-radio-control__group-wrapper.has-help {
@@ -62,7 +61,6 @@
 		&:checked::before {
 			border-color: $components-color-gray-400;
 			opacity: 1; // Override style from wp-admin forms.css.
-
 		}
 	}
 }
@@ -71,14 +69,16 @@
 	grid-column: 2;
 	grid-row: 1;
 
-	.components-radio-control:not(:disabled) & {
-		cursor: var(--wpds-cursor-control);
-	}
-
 	line-height: $radio-input-size-sm;
 
 	@include break-small() {
 		line-height: $radio-input-size;
+	}
+}
+
+.components-radio-control__input:not(:disabled) {
+	& + .components-radio-control__label {
+		cursor: var(--wpds-cursor-control);
 	}
 }
 
