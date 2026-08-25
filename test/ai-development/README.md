@@ -8,7 +8,7 @@ The standalone `evals/` package uses [Promptfoo](https://www.promptfoo.dev/docs/
 
 ## How it works
 
-Promptfoo runs the prompt × provider × test × repeat matrix. Its standard lifecycle hooks create a clean Git workspace before each row and remove it afterward. The native Claude provider receives that directory as `working_dir`.
+Promptfoo runs the prompt × provider × test × repeat matrix. Its standard lifecycle hooks create a clean Git workspace before each row and remove it afterward. The agent provider receives that directory as `working_dir`.
 
 ```text
       prompt × provider × test
@@ -40,7 +40,7 @@ Promptfoo runs the prompt × provider × test × repeat matrix. Its standard lif
       afterEach: delete workspace
 ```
 
-A plain run measures your working tree, uncommitted edits included, so trying a change to a skill or an `AGENTS.md` does not mean committing it first to find out whether it helped. Untracked files are the exception: a new file has to be added before it appears. Naming a ref measures that commit exactly instead.
+A plain run measures your working tree, uncommitted edits included. Untracked files are the exception: a new file has to be added before it appears. You can also run an eval against a specific commit or a comparison with HEAD.
 
 The subject workspace excludes `test/ai-development/`, and the sandbox denies this checkout, so the agent can reach neither copy of the assertions it is being graded against.
 
@@ -51,9 +51,6 @@ See Promptfoo's [coding-agent guide](https://www.promptfoo.dev/docs/guides/evalu
 Promptfoo's built-in trajectory assertions deterministically check tool calls, including which testing references the agent read or skipped. Its built-in `agent-rubric` receives read-only access to the live workspace, where the grading agent inspects Git status, the diff, relevant documentation, and changed files against the spec's rubric. This keeps code review inside Promptfoo without relying on the subject agent's final message or custom diff processing.
 
 ## Setup
-
-Use Node.js 22.22 or newer; Node.js 24 LTS is recommended. This is a workspace,
-so a root `npm install` installs it.
 
 Claude can use an existing Claude Code login or `ANTHROPIC_API_KEY`. Model calls consume the associated quota or paid usage.
 
@@ -79,19 +76,6 @@ npm --workspace @wordpress/agent-skill-evals run view
 ```
 
 Results under `results/` are gitignored and may contain source code and tool output.
-
-## Files
-
-```text
-test/ai-development/
-├── lib/
-│   ├── base.js                     shared setup a spec spreads
-│   ├── default-test.js             sandbox, prompt preamble, rubric grader
-│   └── workspace-extension.mjs     workspace lifecycle
-├── package.json
-└── specs/SPEC_GROUP/
-    └── TEST_NAME.test.js           prompt, assertions, and spec configuration
-```
 
 ## Authoring
 
