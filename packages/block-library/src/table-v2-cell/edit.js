@@ -50,12 +50,12 @@ function normalizeBorder( nextBorder ) {
  * Gets the table block clientId from a cell's clientId.
  * Walks up: cell → row → section → table.
  *
- * @param {Function} select   Data store select function.
- * @param {string}   clientId Cell block client ID.
+ * @param {Object} selectors Bound block editor selectors.
+ * @param {string} clientId  Cell block client ID.
  * @return {string|null} Table block client ID, or null if not found.
  */
-function getTableClientId( select, clientId ) {
-	const { getBlockRootClientId, getBlockName } = select( blockEditorStore );
+function getTableClientId( selectors, clientId ) {
+	const { getBlockRootClientId, getBlockName } = selectors;
 	let current = clientId;
 	for ( let i = 0; i < 3; i++ ) {
 		current = getBlockRootClientId( current );
@@ -72,34 +72,34 @@ function getTableClientId( select, clientId ) {
 /**
  * Gets the row block clientId from a cell's clientId.
  *
- * @param {Function} select   Data store select function.
- * @param {string}   clientId Cell block client ID.
+ * @param {Object} selectors Bound block editor selectors.
+ * @param {string} clientId  Cell block client ID.
  * @return {string|null} Row block client ID, or null if not found.
  */
-function getRowClientId( select, clientId ) {
-	return select( blockEditorStore ).getBlockRootClientId( clientId );
+function getRowClientId( selectors, clientId ) {
+	return selectors.getBlockRootClientId( clientId );
 }
 
 /**
  * Gets the section block clientId from a row's clientId.
  *
- * @param {Function} select      Data store select function.
- * @param {string}   rowClientId Row block client ID.
+ * @param {Object} selectors   Bound block editor selectors.
+ * @param {string} rowClientId Row block client ID.
  * @return {string|null} Section block client ID, or null if not found.
  */
-function getSectionClientId( select, rowClientId ) {
-	return select( blockEditorStore ).getBlockRootClientId( rowClientId );
+function getSectionClientId( selectors, rowClientId ) {
+	return selectors.getBlockRootClientId( rowClientId );
 }
 
 /**
  * Builds a cell placement map from the table block tree.
  *
- * @param {Function} select        Data store select function.
- * @param {string}   tableClientId Table block client ID.
+ * @param {Object} selectors     Bound block editor selectors.
+ * @param {string} tableClientId Table block client ID.
  * @return {Array} Array of { clientId, rowIndex, columnIndex, sectionType } objects.
  */
-function getCellPlacements( select, tableClientId ) {
-	const { getBlocks } = select( blockEditorStore );
+function getCellPlacements( selectors, tableClientId ) {
+	const { getBlocks } = selectors;
 	const sections = getBlocks( tableClientId );
 	const placements = [];
 	let rowIndex = 0;
@@ -187,10 +187,16 @@ export default function TableCellEdit( {
 				getSelectionType,
 			} = select( blockEditorStore );
 
-			const tableClientIdFromStore = getTableClientId( select, clientId );
+			const tableClientIdFromStore = getTableClientId(
+				select( blockEditorStore ),
+				clientId
+			);
 			const selectionClientIds = getSelectedBlockClientIds();
 			const placements = tableClientIdFromStore
-				? getCellPlacements( select, tableClientIdFromStore )
+				? getCellPlacements(
+						select( blockEditorStore ),
+						tableClientIdFromStore
+				  )
 				: [];
 
 			return {
@@ -355,46 +361,76 @@ export default function TableCellEdit( {
 			return;
 		}
 
-		// Create new cells for vacated slots.
-		const newCells = [];
-		for ( let rowOffset = 0; rowOffset < rowSpan; rowOffset++ ) {
-			for ( let colOffset = 0; colOffset < colSpan; colOffset++ ) {
-				if ( rowOffset === 0 && colOffset === 0 ) {
-					continue;
-				}
-				newCells.push(
-					createBlock( 'core/table-v2-cell', {
-						tag: CellTag,
-						scope: attributes.scope,
-						content: '',
-					} )
-				);
-			}
+		const selectors = registry.select( blockEditorStore );
+		const rowClientId = getRowClientId( selectors, clientId );
+		if ( ! rowClientId ) {
+			return;
 		}
+		const sectionClientId = getSectionClientId( selectors, rowClientId );
+		if ( ! sectionClientId ) {
+			return;
+		}
+
+		const rowBlocks = selectors.getBlocks( rowClientId );
+		const cellIndex = rowBlocks.findIndex(
+			( b ) => b.clientId === clientId
+		);
+
+		const sectionRows = selectors.getBlocks( sectionClientId );
+		const rowIndexInSection = sectionRows.findIndex(
+			( b ) => b.clientId === rowClientId
+		);
+
+		const createNewCell = () =>
+			createBlock( 'core/table-v2-cell', {
+				tag: CellTag,
+				scope: attributes.scope,
+				content: '',
+			} );
 
 		// Batch the span reset and cell insertions into a single undo level.
 		registry.batch( () => {
 			setAttributes( { rowSpan: 1, colSpan: 1 } );
 
-			if ( newCells.length ) {
-				const rowClientId = getRowClientId(
-					registry.select( blockEditorStore ),
-					clientId
+			// The merged cell's row needs new cells for the remaining
+			// columns of the span.
+			if ( colSpan > 1 ) {
+				const cellsToAdd = Array.from(
+					{ length: colSpan - 1 },
+					createNewCell
 				);
-				if ( rowClientId ) {
-					const rowBlocks = registry
-						.select( blockEditorStore )
-						.getBlocks( rowClientId );
-					const cellIndex = rowBlocks.findIndex(
-						( b ) => b.clientId === clientId
-					);
-					const nextCells = [
-						...rowBlocks.slice( 0, cellIndex + 1 ),
-						...newCells,
-						...rowBlocks.slice( cellIndex + 1 ),
-					];
-					replaceInnerBlocks( rowClientId, nextCells, false );
+				const nextCells = [
+					...rowBlocks.slice( 0, cellIndex + 1 ),
+					...cellsToAdd,
+					...rowBlocks.slice( cellIndex + 1 ),
+				];
+				replaceInnerBlocks( rowClientId, nextCells, false );
+			}
+
+			// Subsequent rows covered by the rowSpan need new cells for
+			// all columns of the span.
+			for ( let rowOffset = 1; rowOffset < rowSpan; rowOffset++ ) {
+				const targetRow = sectionRows[ rowIndexInSection + rowOffset ];
+				if ( ! targetRow ) {
+					break;
 				}
+				const targetRowCells = selectors.getBlocks(
+					targetRow.clientId
+				);
+				const cellsToAdd = Array.from(
+					{ length: colSpan },
+					createNewCell
+				);
+				const insertIndex = Math.min(
+					cellIndex,
+					targetRowCells.length
+				);
+				const nextCells = [
+					...targetRowCells.slice( 0, insertIndex ),
+					...cellsToAdd,
+					...targetRowCells.slice( insertIndex ),
+				];
+				replaceInnerBlocks( targetRow.clientId, nextCells, false );
 			}
 		} );
 	}
