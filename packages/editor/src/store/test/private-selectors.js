@@ -277,14 +277,21 @@ describe( 'the read-only Viewing intent', () => {
 			);
 		} );
 
-		it( 'returns null in every editable intent', () => {
+		it( 'returns null in the edit intent', () => {
 			expect(
 				getCodeEditorUnavailableReason( { editorIntent: 'edit' } )
 			).toBeNull();
+			expect( getCodeEditorUnavailableReason( {} ) ).toBeNull();
+		} );
+
+		it( 'gives the suggest intent its own reason', () => {
+			// Suggesting refuses the code editor for a different reason -
+			// markers, not read-only - so the two must not be collapsed.
 			expect(
 				getCodeEditorUnavailableReason( { editorIntent: 'suggest' } )
-			).toBeNull();
-			expect( getCodeEditorUnavailableReason( {} ) ).toBeNull();
+			).toBe(
+				'Raw HTML edits cannot be captured as suggestions. Switch to Editing to use the code editor.'
+			);
 		} );
 	} );
 } );

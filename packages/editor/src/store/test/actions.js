@@ -10,6 +10,7 @@ jest.mock( '@wordpress/a11y', () => ( {
 } ) );
 import { store as editorStore } from '..';
 import * as actions from '../actions';
+import { EDITOR_INTENT_SUGGEST } from '../constants';
 import { unlock } from '../../lock-unlock';
 
 const postId = 44;
@@ -182,6 +183,192 @@ describe( 'Post actions', () => {
 			expect( registry.select( editorStore ).getDeviceType() ).toBe(
 				'Desktop'
 			);
+		} );
+	} );
+
+	describe( 'editPost()', () => {
+		const draftPost = {
+			id: postId,
+			type: 'post',
+			title: 'bar',
+			content: 'bar',
+			excerpt: 'crackers',
+			status: 'draft',
+			password: 'hunter2',
+		};
+		const REFUSED_STATUS_MESSAGE =
+			"The post status can't be changed while suggesting. Switch to Editing to change it.";
+
+		function setupPost() {
+			const registry = createRegistryWithStores();
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', draftPost );
+			registry.dispatch( editorStore ).setupEditor( draftPost );
+			return registry;
+		}
+
+		it( 'refuses a post status edit while suggesting', () => {
+			const registry = setupPost();
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				EDITOR_INTENT_SUGGEST
+			);
+			speak.mockClear();
+
+			registry.dispatch( editorStore ).editPost( { status: 'pending' } );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getEditedPostAttribute( 'status' )
+			).toBe( 'draft' );
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
+			expect( speak ).toHaveBeenCalledWith(
+				REFUSED_STATUS_MESSAGE,
+				'assertive'
+			);
+		} );
+
+		it( 'shows the refusal in a snackbar, not only to screen readers', () => {
+			const registry = setupPost();
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				EDITOR_INTENT_SUGGEST
+			);
+
+			registry.dispatch( editorStore ).editPost( { status: 'pending' } );
+
+			const refusals = registry
+				.select( noticesStore )
+				.getNotices()
+				.filter(
+					( { id } ) => id === 'editor-suggest-locked-post-status'
+				);
+			expect( refusals ).toEqual( [
+				expect.objectContaining( {
+					content: REFUSED_STATUS_MESSAGE,
+					type: 'snackbar',
+					// `speak` already announced it; a spoken snackbar would
+					// repeat the same sentence.
+					spokenMessage: null,
+				} ),
+			] );
+
+			// A second refusal replaces the first rather than stacking.
+			registry.dispatch( editorStore ).editPost( { status: 'publish' } );
+
+			expect(
+				registry
+					.select( noticesStore )
+					.getNotices()
+					.filter(
+						( { id } ) => id === 'editor-suggest-locked-post-status'
+					)
+			).toHaveLength( 1 );
+		} );
+
+		it( 'refuses the whole call, so a companion edit cannot land without its status', () => {
+			const registry = setupPost();
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				EDITOR_INTENT_SUGGEST
+			);
+
+			/*
+			 * The shape `PostVisibility` sends for "Private". Dropping only the
+			 * status would strip the password while leaving the post published
+			 * - a state nobody asked for.
+			 */
+			registry
+				.dispatch( editorStore )
+				.editPost( { status: 'private', password: '' } );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getEditedPostAttribute( 'status' )
+			).toBe( 'draft' );
+			expect(
+				registry
+					.select( editorStore )
+					.getEditedPostAttribute( 'password' )
+			).toBe( draftPost.password );
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
+		} );
+
+		it( 'lets a call through when it only repeats the status it already has', () => {
+			const registry = setupPost();
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				EDITOR_INTENT_SUGGEST
+			);
+			speak.mockClear();
+
+			/*
+			 * `PostVisibility` sends the current status alongside every
+			 * visibility choice. Nothing is being changed, so there is nothing
+			 * to refuse and nothing to announce.
+			 */
+			registry
+				.dispatch( editorStore )
+				.editPost( { status: 'draft', excerpt: 'new crackers' } );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getEditedPostAttribute( 'excerpt' )
+			).toBe( 'new crackers' );
+			expect( speak ).not.toHaveBeenCalled();
+			// The no-op status was dropped rather than written back as an edit.
+			expect(
+				registry
+					.select( coreStore )
+					.getEntityRecordEdits( 'postType', 'post', draftPost.id )
+			).not.toHaveProperty( 'status' );
+		} );
+
+		it( 'discards a status staged while editing when the suggest intent is entered', () => {
+			const registry = setupPost();
+
+			registry.dispatch( editorStore ).editPost( { status: 'pending' } );
+			expect(
+				registry
+					.select( editorStore )
+					.getEditedPostAttribute( 'status' )
+			).toBe( 'pending' );
+
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				EDITOR_INTENT_SUGGEST
+			);
+
+			/*
+			 * `savePost` is not guarded, so a status left staged from Editing
+			 * would be written on the next save - the workflow change this
+			 * intent withholds, applied without anyone choosing it here.
+			 */
+			expect(
+				registry
+					.select( editorStore )
+					.getEditedPostAttribute( 'status' )
+			).toBe( 'draft' );
+			expect(
+				registry
+					.select( coreStore )
+					.getEntityRecordEdits( 'postType', 'post', draftPost.id )
+			).not.toHaveProperty( 'status' );
+		} );
+
+		it( 'applies a post status edit while editing', () => {
+			const registry = setupPost();
+
+			registry.dispatch( editorStore ).editPost( { status: 'pending' } );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getEditedPostAttribute( 'status' )
+			).toBe( 'pending' );
 		} );
 	} );
 
@@ -797,8 +984,85 @@ describe( 'Editor actions', () => {
 			).toBe( false );
 		} );
 
+		it( 'refuses to switch to the code editor while suggesting', () => {
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+
+			registry.dispatch( editorStore ).switchEditorMode( 'text' );
+
+			// The stored preference is untouched, so leaving the suggest
+			// intent does not strand the user in the code editor.
+			expect(
+				registry.select( preferencesStore ).get( 'core', 'editorMode' )
+			).toBeUndefined();
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'visual'
+			);
+		} );
+
+		it( 'refuses the code editor while suggestions are pending, whatever the intent', () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				status: 'draft',
+				title: 'bar',
+				content:
+					'<!-- wp:paragraph --><p>Hello <mark class="wp-suggestion" data-suggestion-id="7" data-suggestion-type="add">there</mark></p><!-- /wp:paragraph -->',
+				excerpt: '',
+			};
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post );
+
+			// Precondition: the marker is in the document the code editor
+			// would hand back to be re-parsed.
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toContain( 'wp-suggestion' );
+
+			// The Edit intent, not Suggest: re-parsing an edited document
+			// destroys the markers whoever made the edit.
+			expect(
+				unlock( registry.select( editorStore ) ).getEditorIntent()
+			).toEqual( 'edit' );
+
+			registry.dispatch( editorStore ).switchEditorMode( 'text' );
+
+			expect(
+				registry.select( preferencesStore ).get( 'core', 'editorMode' )
+			).toBeUndefined();
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'visual'
+			);
+		} );
+
+		it( 'surfaces the refusal as a notice, and leaves the announcing to it', () => {
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+			speak.mockClear();
+
+			registry.dispatch( editorStore ).switchEditorMode( 'text' );
+
+			// A sighted keyboard user pressing the shortcut sees nothing
+			// change unless the refusal is also on screen. The snackbar is
+			// the sole announcer: it speaks its own content politely from
+			// its effect, so an assertive `speak` here would say the same
+			// sentence twice and interrupt the polite one.
+			const notice = registry
+				.select( noticesStore )
+				.getNotices()
+				.find( ( { id } ) => id === 'editor-code-editor-unavailable' );
+			expect( notice.content ).toBe(
+				'Raw HTML edits cannot be captured as suggestions. Switch to Editing to use the code editor.'
+			);
+			expect( notice.spokenMessage ).toBe( notice.content );
+			expect( speak ).not.toHaveBeenCalled();
+		} );
+
 		it( 'refuses the code editor in the read-only view intent', () => {
-			// The intent API is private while Suggest mode is experimental.
 			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
 				'view'
 			);
@@ -843,6 +1107,154 @@ describe( 'Editor actions', () => {
 			expect( registry.select( editorStore ).getEditorMode() ).toBe(
 				'text'
 			);
+		} );
+
+		it( 'still opens the code editor with no suggestions pending', () => {
+			registry.dispatch( editorStore ).switchEditorMode( 'text' );
+
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'text'
+			);
+		} );
+
+		it( 'reports the visual editor while suggesting, and restores the stored mode on the way out', () => {
+			registry.dispatch( editorStore ).switchEditorMode( 'text' );
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'text'
+			);
+
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'visual'
+			);
+
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'edit'
+			);
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'text'
+			);
+		} );
+
+		it( 'reports the visual editor on load when the post already carries markers', () => {
+			// The stored preference is the code editor, as it would be for
+			// someone who works in raw HTML.
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core', 'editorMode', 'text' );
+
+			const post = {
+				id: postId,
+				type: 'post',
+				status: 'draft',
+				title: 'bar',
+				content:
+					'<!-- wp:paragraph --><p>Hello <mark class="wp-suggestion" data-suggestion-id="7" data-suggestion-type="add">there</mark></p><!-- /wp:paragraph -->',
+				excerpt: '',
+			};
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post );
+
+			// Nothing was dispatched: opening a post with suggestions left to
+			// resolve is enough to put the code editor on screen, and the
+			// markers with it.
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'visual'
+			);
+			// The preference itself is untouched, so the code editor returns
+			// once the suggestions are resolved.
+			expect(
+				registry.select( preferencesStore ).get( 'core', 'editorMode' )
+			).toEqual( 'text' );
+		} );
+
+		it( 'keeps the code editor masked when leaving Suggesting with markers pending', () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				status: 'draft',
+				title: 'bar',
+				content:
+					'<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph -->',
+				excerpt: '',
+			};
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post );
+
+			// A code-editor user with nothing to resolve yet.
+			registry.dispatch( editorStore ).switchEditorMode( 'text' );
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'text'
+			);
+
+			// Suggesting masks the preference and swaps in the canvas.
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'visual'
+			);
+
+			// A suggestion is made, leaving a marker in the document.
+			registry
+				.dispatch( coreStore )
+				.editEntityRecord( 'postType', 'post', postId, {
+					content:
+						'<!-- wp:paragraph --><p>Hello <mark class="wp-suggestion" data-suggestion-id="7" data-suggestion-type="add">there</mark></p><!-- /wp:paragraph -->',
+				} );
+
+			// Back to Editing with the suggestion still unresolved. Lifting
+			// the mask here hands the marker to the code editor as writable
+			// raw HTML - the corruption `switchEditorMode` refuses, reached
+			// without dispatching it.
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'edit'
+			);
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'visual'
+			);
+		} );
+
+		it( 'does not mistake unrelated markup for a pending marker', () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				status: 'draft',
+				title: 'bar',
+				content:
+					'<!-- wp:paragraph {"className":"wp-suggestion-box"} --><p class="wp-suggestion-box">A callout.</p><!-- /wp:paragraph -->' +
+					'<!-- wp:code --><pre class="wp-block-code"><code>&lt;mark class="wp-suggestion" data-suggestion-id="1"&gt;</code></pre><!-- /wp:code -->',
+				excerpt: '',
+			};
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post );
+
+			// Precondition: the cheap containment probe hits, but neither a
+			// class named after the marker nor a code sample showing its
+			// markup is a marker.
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toContain( 'wp-suggestion' );
+
+			registry.dispatch( editorStore ).switchEditorMode( 'text' );
+
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'text'
+			);
+			expect(
+				registry
+					.select( noticesStore )
+					.getNotices()
+					.map( ( notice ) => notice.content )
+			).toEqual( [] );
 		} );
 	} );
 
@@ -949,6 +1361,64 @@ describe( 'Editor actions', () => {
 			expect(
 				unlock( registry.select( editorStore ) ).getEditorIntent()
 			).toEqual( 'suggest' );
+		} );
+
+		it( 'refuses the suggest intent when the visual editor is unavailable', () => {
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				richEditingEnabled: false,
+			} );
+
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+
+			// Suggestions are inline markers the code editor cannot render,
+			// so entering the intent here would either strand the user or
+			// force back the visual editor they turned off.
+			expect(
+				unlock( registry.select( editorStore ) ).getEditorIntent()
+			).toEqual( 'edit' );
+			expect(
+				registry
+					.select( noticesStore )
+					.getNotices()
+					.map( ( notice ) => notice.content )
+			).toEqual( [ expect.stringContaining( 'visual editor' ) ] );
+		} );
+
+		it( 'announces the canvas swap when the intent changes the effective mode', () => {
+			const spoken = () =>
+				registry.select( noticesStore ).getNotices().at( -1 )
+					?.spokenMessage;
+
+			registry.dispatch( editorStore ).switchEditorMode( 'text' );
+
+			// `switchEditorMode` - which owns the mode announcement - is
+			// never dispatched here, so the intent action has to carry it.
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+			expect( spoken() ).toContain( 'Visual editor selected' );
+
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'edit'
+			);
+			expect( spoken() ).toContain( 'Code editor selected' );
+		} );
+
+		it( 'leaves the announcement alone when the mode is unaffected', () => {
+			speak.mockClear();
+
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'view'
+			);
+
+			// The snackbar speaks this, once and politely; the action does
+			// not announce as well.
+			const [ notice ] = registry.select( noticesStore ).getNotices();
+			expect( notice.content ).toBe( "You're viewing" );
+			expect( notice.spokenMessage ).toBe( "You're viewing" );
+			expect( speak ).not.toHaveBeenCalled();
 		} );
 
 		it( 'announces a change of intent, but not a repeat of the current one', () => {
