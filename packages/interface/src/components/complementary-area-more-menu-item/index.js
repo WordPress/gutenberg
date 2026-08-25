@@ -1,5 +1,5 @@
 import { observableMap, useObservableValue } from '@wordpress/compose';
-import { useEffect } from '@wordpress/element';
+import { useLayoutEffect } from '@wordpress/element';
 import { check } from '@wordpress/icons';
 import ComplementaryAreaToggle from '../complementary-area-toggle';
 import ActionItem from '../action-item';
@@ -46,7 +46,7 @@ export default function ComplementaryAreaMoreMenuItem( {
 	__unstableTarget,
 	...props
 } ) {
-	useEffect( () => {
+	useLayoutEffect( () => {
 		const key = `${ scope }/${ target }`;
 		menuItems.set( key, ( menuItems.get( key ) ?? 0 ) + 1 );
 
