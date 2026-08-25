@@ -329,11 +329,11 @@ test.describe( 'Tabs', () => {
 
 			// The inactive panel is hidden with `until-found` rather than
 			// outright, which is what leaves its text searchable.
-			await expect( activePanel ).not.toHaveAttribute( 'hidden' );
 			await expect( inactivePanel ).toHaveAttribute(
 				'hidden',
 				'until-found'
 			);
+			await expect( activePanel ).not.toHaveAttribute( 'hidden' );
 
 			// It still occupies no space and stays out of the tab sequence.
 			await expect
