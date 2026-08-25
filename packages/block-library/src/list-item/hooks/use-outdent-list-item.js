@@ -71,13 +71,13 @@ export default function useOutdentListItem() {
 				} else {
 					// Insert the list with the items already inside: an
 					// empty list would be scaffolded with the list block
-					// type's template at insertion.
+					// type's template at insertion. Removing the items
+					// first frees them to be reinserted with their client
+					// IDs kept.
 					const nestedListBlock = cloneBlock(
 						getBlock( parentListId ),
 						{},
-						followingListItems.map( ( id ) =>
-							cloneBlock( getBlock( id ) )
-						)
+						followingListItems.map( ( id ) => getBlock( id ) )
 					);
 					removeBlocks( followingListItems, false );
 					insertBlock( nestedListBlock, 0, firstClientId, false );
