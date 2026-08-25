@@ -11,6 +11,7 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { check, closeSmall } from '@wordpress/icons';
 import {
+	findStructuralOp,
 	hasAttributeConflict,
 	parseSuggestionPayload,
 	useSuggestionsProvider,
@@ -78,6 +79,12 @@ function useSuggestionDecision( thread: any ) {
 	const isResolved =
 		suggestionStatus === APPLIED || suggestionStatus === REJECTED;
 
+	// A block-switcher transform (any `replaceBlocks`) is captured as a
+	// removal plus an insertion, stamped with a shared group id. Either
+	// decision resolves both halves, so say so — a reviewer who accepts one
+	// card and watches the other resolve on its own is owed the explanation.
+	const isGrouped = !! findStructuralOp( payload.operations )?.groupId;
+
 	const runApply = async () => {
 		setBusy( true );
 		try {
@@ -129,6 +136,7 @@ function useSuggestionDecision( thread: any ) {
 		payload,
 		suggestionStatus,
 		isResolved,
+		isGrouped,
 		busy,
 		onApplyClick,
 		onReject,
@@ -286,8 +294,13 @@ export default function SuggestionActions( { thread }: { thread: any } ) {
 		return null;
 	}
 
-	const { payload, suggestionStatus, isResolved, applyDisabledReason } =
-		decision;
+	const {
+		payload,
+		suggestionStatus,
+		isResolved,
+		isGrouped,
+		applyDisabledReason,
+	} = decision;
 
 	return (
 		<Stack
@@ -299,6 +312,17 @@ export default function SuggestionActions( { thread }: { thread: any } ) {
 				thread={ thread }
 				operations={ payload.operations }
 			/>
+			{ ! isResolved && isGrouped && (
+				<WCText
+					variant="muted"
+					size="12px"
+					className="editor-collab-sidebar-panel__suggestion-group-hint"
+				>
+					{ __(
+						'Part of one block change. Both halves resolve together.'
+					) }
+				</WCText>
+			) }
 			{ isResolved && (
 				<WCText variant="muted" size="12px">
 					{ suggestionStatus === APPLIED

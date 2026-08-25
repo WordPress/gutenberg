@@ -11,23 +11,53 @@
  *                        `SUMMARY_MAX_CHARS` with an ellipsis.
  *   - **Delete: …**    — text removed by the suggestion, again derived from
  *                        the word diff.
- *   - **Format: …**    — non-text attribute changes. Uses
- *                        `FORMAT_ATTRIBUTE_LABELS` to surface friendly names
- *                        (e.g. `level` → "heading level") with a fallback to
- *                        the raw attribute name so a brand-new attribute
- *                        isn't silently swallowed.
- *   - **Formatting:**  — pure inline-format changes (bold, italic, links).
+ *   - **Replace: …**   — a text edit that both removes and inserts. The two
+ *                        halves are one change, so they are reported on one
+ *                        line ("old" → "new") rather than as an unrelated
+ *                        delete plus add.
+ *   - **Change: …**    — non-text attribute changes. Uses
+ *                        `ATTRIBUTE_LABELS` to surface friendly names
+ *                        (e.g. `level` → "heading level") and humanizes any
+ *                        attribute not in that map so a brand-new attribute
+ *                        isn't silently swallowed or shown as `camelCase`.
+ *   - **Rename block:** — the one attribute change worth its own line: a
+ *                        block renamed through `metadata.name`, reported
+ *                        with the name being proposed.
+ *   - **Add formatting: / Remove formatting:**
+ *                      — pure inline-format changes (bold, italic, links).
  *                        Detected by tag-level diff of the serialized HTML
  *                        and de-duplicated by `joinLabels` so multiple span
- *                        edits don't list the same format twice.
+ *                        edits don't list the same format twice. The two
+ *                        directions are opposite proposals, so they get
+ *                        opposite labels.
+ *   - **Link: …**      — the URL a link format points at, so a formatting
+ *                        line about a link says *which* link is proposed.
+ *
+ * The sidebar is the only surface a reviewer has for a suggestion they don't
+ * want to hunt for in the canvas, so a line that renders as an empty or
+ * ambiguous quote is a review failure: whitespace-only edits are described by
+ * kind and count ("3 spaces") rather than quoted into invisibility, and
+ * structural lines name the parent block when there is one.
+ *
+ * "Change:" and the two "… formatting:" labels name different families of
+ * suggestion, so they have to be readable as different things in a mixed list.
+ * The attribute family was once "Format:", one word from "Formatting:".
+ *
+ * Quoted lines report what a reviewer would read on screen: the diff behind
+ * them runs on visible text, never on the raw content attribute, so no markup
+ * reaches the sidebar. Changed words keep the spaces that separated them, and
+ * runs that were not adjacent in the text are joined with an ellipsis rather
+ * than run together into a phrase nobody typed.
  */
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { __experimentalText as WCText } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { useMemo } from '@wordpress/element';
 import { __unstableStripHTML as wpStripHTML } from '@wordpress/dom';
+import { decodeEntities } from '@wordpress/html-entities';
 import { wordDiff, MAX_DIFF_LENGTH } from './word-diff';
 import type { SuggestionOperation } from './provider';
+import type { WordDiffSegment } from './word-diff';
 
 /**
  * Cap on how much text we'll render inline in a summary. Longer insertions
@@ -36,11 +66,20 @@ import type { SuggestionOperation } from './provider';
 const SUMMARY_MAX_CHARS = 120;
 
 /**
- * Friendlier labels for common block attributes so `Format:` lines read like
- * human categories rather than internal names. Anything not in this map
- * falls through to the raw attribute name.
+ * Cap per side of a `Replace:` line, which carries both halves of the edit on
+ * one line and would otherwise be twice as long as any other summary line.
  */
-const FORMAT_ATTRIBUTE_LABELS = {
+const REPLACE_SIDE_MAX_CHARS = 60;
+
+/**
+ * Friendlier labels for common block attributes so `Change:` lines read like
+ * human categories rather than internal names. Anything not in this map is
+ * humanized by `humanizeAttributeName`.
+ *
+ * The names here match what the editor's own controls call these settings, so
+ * a reviewer reading "additional CSS class" can go and find the field.
+ */
+const ATTRIBUTE_LABELS = {
 	level: __( 'heading level' ),
 	align: __( 'alignment' ),
 	textAlign: __( 'text alignment' ),
@@ -50,7 +89,45 @@ const FORMAT_ATTRIBUTE_LABELS = {
 	href: __( 'link' ),
 	backgroundColor: __( 'background color' ),
 	textColor: __( 'text color' ),
+	className: __( 'additional CSS class' ),
+	anchor: __( 'HTML anchor' ),
+	content: __( 'text' ),
+	metadata: __( 'block settings' ),
 };
+
+/**
+ * Turn an attribute key the summary has no friendly label for into something
+ * readable: `fontFamily` becomes "font family", `layout_type` becomes "layout
+ * type". Better than surfacing the raw key, which used to be lowercased whole
+ * and rendered `className` as the non-word "classname".
+ *
+ * @param key Attribute key.
+ * @return Humanized name.
+ */
+function humanizeAttributeName( key: any ): string {
+	if ( typeof key !== 'string' || key === '' ) {
+		return __( 'setting' );
+	}
+	return key
+		.replace( /([a-z0-9])([A-Z])/g, '$1 $2' )
+		.replace( /[_-]+/g, ' ' )
+		.replace( /\s+/g, ' ' )
+		.trim()
+		.toLowerCase();
+}
+
+/**
+ * Read the custom block name out of a `metadata` attribute value, which is
+ * where the "Rename" command stores it. Returns null for anything that isn't
+ * a usable name so the caller can fall back to the generic label.
+ *
+ * @param metadata Attribute value.
+ * @return The block name, or null.
+ */
+function readBlockName( metadata: any ): string | null {
+	const name = metadata?.name;
+	return typeof name === 'string' && name.trim() !== '' ? name.trim() : null;
+}
 
 /**
  * Convert a block name like `core/paragraph` to a friendlier label used in
@@ -73,11 +150,70 @@ function friendlyBlockName( blockName: any ): string {
 }
 
 /**
+ * Label for a structural operation's block, qualified by its container when
+ * the block sits inside another one. "Insert block: paragraph" is the same
+ * sentence whether the paragraph landed at the top level or three levels deep
+ * inside a Group, which is exactly the context a reviewer needs and cannot get
+ * from the sidebar.
+ *
+ * @param blockName       Block name from the suggestion op.
+ * @param parentBlockName Containing block's name, if any.
+ * @return Display label.
+ */
+function structuralBlockLabel( blockName: any, parentBlockName: any ): string {
+	const name = friendlyBlockName( blockName );
+	if ( ! parentBlockName || typeof parentBlockName !== 'string' ) {
+		return name;
+	}
+	return sprintf(
+		/* translators: 1: block name, e.g. "paragraph". 2: containing block name, e.g. "group". */
+		__( '%1$s in %2$s' ),
+		name,
+		friendlyBlockName( parentBlockName )
+	);
+}
+
+/**
+ * Describe a run of whitespace in words instead of quoting it.
+ *
+ * A quoted whitespace run is invisible in the sidebar - HTML collapses it, so
+ * one typed space and three typed spaces render as the identical `Add: " "`.
+ * Returns null for anything that has visible characters, so the caller falls
+ * back to quoting the text.
+ *
+ * @param text Candidate text.
+ * @return Human description, or null when the text isn't whitespace.
+ */
+function describeWhitespace( text: any ): string | null {
+	if ( typeof text !== 'string' || text === '' || /\S/.test( text ) ) {
+		return null;
+	}
+	const count = Array.from( text ).length;
+	if ( /^[\n\r]+$/.test( text ) ) {
+		/* translators: %d: number of line breaks. */
+		return sprintf( _n( '%d line break', '%d line breaks', count ), count );
+	}
+	if ( /^\t+$/.test( text ) ) {
+		/* translators: %d: number of tab characters. */
+		return sprintf( _n( '%d tab', '%d tabs', count ), count );
+	}
+	if ( /^[ \u00a0]+$/.test( text ) ) {
+		/* translators: %d: number of space characters. */
+		return sprintf( _n( '%d space', '%d spaces', count ), count );
+	}
+	return sprintf(
+		/* translators: %d: number of whitespace characters. */
+		_n( '%d whitespace character', '%d whitespace characters', count ),
+		count
+	);
+}
+
+/**
  * Mapping of inline HTML tags — as emitted by RichText serialization — to
  * human-readable format names. The key is the lower-cased tag name; the
- * value is what appears in a "Formatting:" line. Tags not in this map are
- * reported by their raw name (``<mark>`` → "mark") so a future rich-text
- * format isn't silently swallowed.
+ * value is what appears in an "Add formatting:" or "Remove formatting:" line.
+ * Tags not in this map are reported by their raw name (``<mark>`` → "mark")
+ * so a future rich-text format isn't silently swallowed.
  */
 const INLINE_FORMAT_TAG_LABELS = {
 	strong: __( 'bold' ),
@@ -98,10 +234,13 @@ const INLINE_FORMAT_TAG_LABELS = {
 
 const TAG_REGEX = /<\s*([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>/g;
 
+const LINE_BREAK_REGEX = /<\s*br\b[^>]*>/gi;
+
 /**
  * Strip HTML tags AND decode entities, leaving only the visible text. Used
  * to decide whether a content change is purely a formatting change (same
- * visible text wrapped in different markup) or a real text edit.
+ * visible text wrapped in different markup) or a real text edit, and to give
+ * the word diff plain text to work on.
  *
  * Wraps `__unstableStripHTML` so HTML entities such as `&amp;` and `&nbsp;`
  * are decoded by the DOM parser rather than via a hand-rolled regex — a
@@ -115,7 +254,15 @@ function stripTags( html: any ): string {
 	if ( typeof html !== 'string' || html === '' ) {
 		return '';
 	}
-	return wpStripHTML( html ).replace( /\s+/g, ' ' ).trim();
+	/*
+	 * `textContent` drops a `<br>` without leaving anything in its place, so
+	 * the words on either side of a soft line break would run together in the
+	 * quoted summary. A line break separates words on screen, so give it a
+	 * separator here too before the tags come off.
+	 */
+	return wpStripHTML( html.replace( LINE_BREAK_REGEX, '\n' ) )
+		.replace( /\s+/g, ' ' )
+		.trim();
 }
 
 /**
@@ -138,31 +285,107 @@ function countTags( html: string ): Map< string, number > {
 }
 
 /**
- * Diff the tag usage between two HTML strings. Returns a set of format
- * names (mapped via `INLINE_FORMAT_TAG_LABELS`) whose count differs, which
- * indicates an inline format was added or removed regardless of direction.
+ * Roll the tag counts of an HTML string up to display labels. Several tags
+ * render as the same format — `<b>` and `<strong>` are both "bold" — so a
+ * tag-level count would read a `<b>` rewritten as `<strong>` as bold being
+ * both added and removed. Counting by label instead makes that swap net out.
  *
- * @param before HTML before the edit.
- * @param after  HTML after the edit.
- * @return Ordered, deduplicated list of changed format labels.
+ * @param html Possibly-HTML content.
+ * @return Format label → count.
  */
-function diffInlineFormats( before: string, after: string ): string[] {
-	const beforeCounts = countTags( before );
-	const afterCounts = countTags( after );
-	const changed = new Set< string >();
-	const tags = new Set( [ ...beforeCounts.keys(), ...afterCounts.keys() ] );
-	for ( const tag of tags ) {
-		if (
-			( beforeCounts.get( tag ) ?? 0 ) === ( afterCounts.get( tag ) ?? 0 )
-		) {
-			continue;
-		}
+function countFormatLabels( html: string ): Map< string, number > {
+	const byLabel = new Map< string, number >();
+	for ( const [ tag, count ] of countTags( html ) ) {
 		const label =
 			( INLINE_FORMAT_TAG_LABELS as Record< string, string > )[ tag ] ??
 			tag;
-		changed.add( label );
+		byLabel.set( label, ( byLabel.get( label ) ?? 0 ) + count );
 	}
-	return Array.from( changed );
+	return byLabel;
+}
+
+/**
+ * Diff the format usage between two HTML strings, keeping the direction of
+ * each change. Bolding a run and un-bolding one are opposite proposals, and a
+ * reviewer reading the sidebar has to be able to tell which one is on offer.
+ *
+ * A format whose count is unchanged is not reported at all — that covers both
+ * a tag rewritten to a synonym and a format added in one place while being
+ * removed in another, neither of which has a direction worth stating.
+ *
+ * @param before HTML before the edit.
+ * @param after  HTML after the edit.
+ * @return Deduplicated format labels
+ * the edit introduces and takes away, in document order.
+ */
+function diffInlineFormats(
+	before: string,
+	after: string
+): { added: string[]; removed: string[] } {
+	const beforeCounts = countFormatLabels( before );
+	const afterCounts = countFormatLabels( after );
+	const added = new Set< string >();
+	const removed = new Set< string >();
+	const labels = new Set( [ ...beforeCounts.keys(), ...afterCounts.keys() ] );
+	for ( const label of labels ) {
+		const beforeCount = beforeCounts.get( label ) ?? 0;
+		const afterCount = afterCounts.get( label ) ?? 0;
+		if ( beforeCount === afterCount ) {
+			continue;
+		}
+		( afterCount > beforeCount ? added : removed ).add( label );
+	}
+	return { added: Array.from( added ), removed: Array.from( removed ) };
+}
+
+const ANCHOR_HREF_REGEX =
+	/<\s*a\b[^>]*?\shref\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/gi;
+
+/**
+ * Collect the `href` targets of the anchors in an HTML string, entity-decoded
+ * so a URL with a query string reads as the author typed it rather than as
+ * `?a=1&amp;b=2`.
+ *
+ * A "Formatting: link" line says a link changed but not which one, which is
+ * the whole substance of a link suggestion. The URL only exists on one side of
+ * the edit, so callers pass the side that has it.
+ *
+ * @param html Possibly-HTML content.
+ * @return Ordered, deduplicated link targets.
+ */
+function linkTargets( html: any ): string[] {
+	if ( typeof html !== 'string' || html === '' ) {
+		return [];
+	}
+	const urls = new Set< string >();
+	let match;
+	ANCHOR_HREF_REGEX.lastIndex = 0;
+	while ( ( match = ANCHOR_HREF_REGEX.exec( html ) ) !== null ) {
+		const raw = match[ 1 ] ?? match[ 2 ] ?? match[ 3 ] ?? '';
+		const url = decodeEntities( raw ).trim();
+		if ( url ) {
+			urls.add( url );
+		}
+	}
+	return Array.from( urls );
+}
+
+/**
+ * Push the link targets of a format change onto an accumulator. The URL lives
+ * on whichever side of the edit has the anchor, so an added link reports the
+ * URL being proposed and a removed one reports the URL being dropped.
+ *
+ * @param accumulator Collected URLs, mutated in place.
+ * @param before      HTML before the edit.
+ * @param after       HTML after the edit.
+ */
+function collectLinkTargets(
+	accumulator: string[],
+	before: string,
+	after: string
+) {
+	const urls = linkTargets( after );
+	accumulator.push( ...( urls.length > 0 ? urls : linkTargets( before ) ) );
 }
 
 /**
@@ -181,12 +404,25 @@ function joinLabels( labels: string[] ): string {
 	return unique.join( ', ' );
 }
 
-function ellipsize( text: string ): string {
+/**
+ * Join attribute labels without touching their case. Unlike `joinLabels`,
+ * which lowercases the inline-format names it is given, these labels already
+ * read as the editor writes them and carry acronyms - "HTML anchor",
+ * "additional CSS class" - that lowercasing would turn into noise.
+ *
+ * @param labels Attribute labels.
+ * @return Comma-joined list.
+ */
+function joinAttributeLabels( labels: string[] ): string {
+	return Array.from( new Set( labels.filter( Boolean ) ) ).join( ', ' );
+}
+
+function ellipsize( text: string, max: number = SUMMARY_MAX_CHARS ): string {
 	const trimmed = text.replace( /\s+/g, ' ' ).trim();
-	if ( trimmed.length <= SUMMARY_MAX_CHARS ) {
+	if ( trimmed.length <= max ) {
 		return trimmed;
 	}
-	return `${ trimmed.slice( 0, SUMMARY_MAX_CHARS - 1 ).trimEnd() }…`;
+	return `${ trimmed.slice( 0, max - 1 ).trimEnd() }…`;
 }
 
 /**
@@ -206,13 +442,82 @@ function clampText( text: string ): string {
 }
 
 /**
- * Derive the inserted and deleted text spans from a pair of before/after
- * strings by running the shared word-level diff and concatenating matching
- * segments. Whitespace-only runs are excluded from the counts so a pure
- * format change doesn't surface as "Add: ' '".
+ * Marker placed between two changed runs that are not next to each other in
+ * the text. Without it, "brave new" inserted in one place and "much longer"
+ * inserted three words later are concatenated into the phrase "brave new much
+ * longer", which is not a phrase anyone typed.
+ */
+const RUN_GAP = ' … ';
+
+/**
+ * Collect the changed runs of one side of a word diff, preserving the spaces
+ * that separated the changed words.
  *
- * @param before Original text.
- * @param after  Proposed text.
+ * `wordDiff` tokenizes on `\S+|\s+`, so the space between two changed words is
+ * its own token — and it matches a space on the other side of the diff, which
+ * makes it an `equal` segment sitting between two `delete` (or two `insert`)
+ * segments. Concatenating only the changed segments therefore glues the words
+ * together: "fox jumps over" comes out "foxjumpsover". Whitespace-only `equal`
+ * segments bridge a run instead of breaking it, so the quote reads the way the
+ * text does. An `equal` segment with visible characters is a genuine gap and
+ * does break the run.
+ *
+ * The opposite side of the diff neither bridges nor breaks: the two halves of
+ * a replacement are one edit that happens to interleave.
+ *
+ * @param segments Word-diff segments.
+ * @param type     `insert` or `delete`.
+ * @return The changed runs, in document order.
+ */
+function changedRuns(
+	segments: WordDiffSegment[],
+	type: 'insert' | 'delete'
+): string[] {
+	const runs: string[] = [];
+	let current = '';
+	let gap = '';
+	for ( const seg of segments ) {
+		if ( seg.type === type ) {
+			if ( current !== '' ) {
+				current += gap;
+			}
+			gap = '';
+			current += seg.value;
+			continue;
+		}
+		if ( seg.type !== 'equal' ) {
+			continue;
+		}
+		if ( ! /\S/.test( seg.value ) ) {
+			gap += seg.value;
+			continue;
+		}
+		if ( current !== '' ) {
+			runs.push( current );
+			current = '';
+		}
+		gap = '';
+	}
+	if ( current !== '' ) {
+		runs.push( current );
+	}
+	return runs;
+}
+
+/**
+ * Derive the inserted and deleted text spans from a pair of before/after
+ * strings by running the shared word-level diff and joining the changed runs.
+ * Whitespace-only runs are excluded from the counts so a pure format change
+ * doesn't surface as "Add: ' '".
+ *
+ * Callers must pass *visible text*, not the raw content attribute: a tag is a
+ * token like any other to a whitespace tokenizer, so diffing markup puts
+ * `<strong>` and `</strong>` into the quoted summary as literal text. A
+ * reviewer wants to read the words being proposed, not the markup they arrive
+ * in — which formats changed is reported separately on the "Formatting:" line.
+ *
+ * @param before Original visible text.
+ * @param after  Proposed visible text.
  * @return Aggregated insertions and
  * deletions, already trimmed and ellipsized.
  */
@@ -221,19 +526,24 @@ function textDelta(
 	after: string
 ): { inserted: string; deleted: string } {
 	const segments = wordDiff( before, after );
-	let inserted = '';
-	let deleted = '';
-	for ( const seg of segments ) {
-		if ( seg.type === 'insert' ) {
-			inserted += seg.value;
-		} else if ( seg.type === 'delete' ) {
-			deleted += seg.value;
-		}
-	}
+	const inserted = changedRuns( segments, 'insert' ).join( RUN_GAP );
+	const deleted = changedRuns( segments, 'delete' ).join( RUN_GAP );
 	return {
 		inserted: inserted.trim() ? ellipsize( inserted ) : '',
 		deleted: deleted.trim() ? ellipsize( deleted ) : '',
 	};
+}
+
+/**
+ * Render a piece of proposed text as a summary value: a curly-quoted run for
+ * anything with visible characters, a spelled-out description for a run that
+ * is nothing but whitespace.
+ *
+ * @param text Text to present.
+ * @return Summary value.
+ */
+function presentText( text: string ): string {
+	return describeWhitespace( text ) ?? `“${ text }”`;
 }
 
 function isTextLike( value: any ): boolean {
@@ -243,8 +553,8 @@ function isTextLike( value: any ): boolean {
 /**
  * Build a list of `{ label, value }` lines summarizing a suggestion. The
  * content attribute is reported with `Add:` / `Delete:` quotes; other
- * attribute changes are collapsed into a single `Format:` line listing the
- * touched attributes.
+ * attribute changes are collapsed into a single `Change:` line listing the
+ * touched settings.
  *
  * @param operations Operations.
  * @return Rendered lines.
@@ -258,27 +568,29 @@ export function summarizeOperations(
 
 	const lines: Array< { label: string; value: string } > = [];
 	const attributeLabels: string[] = [];
-	const formattingLabels: string[] = [];
+	const addedFormats: string[] = [];
+	const removedFormats: string[] = [];
+	const linkUrls: string[] = [];
 
 	for ( const op of operations ) {
 		if ( op.type === 'block-remove' ) {
 			lines.push( {
 				label: __( 'Remove block:' ),
-				value: friendlyBlockName( op.blockName ),
+				value: structuralBlockLabel( op.blockName, op.parentBlockName ),
 			} );
 			continue;
 		}
 		if ( op.type === 'block-insert-after' ) {
 			lines.push( {
 				label: __( 'Insert block:' ),
-				value: friendlyBlockName( op.blockName ),
+				value: structuralBlockLabel( op.blockName, op.parentBlockName ),
 			} );
 			continue;
 		}
 		if ( op.type === 'block-move' ) {
 			lines.push( {
 				label: __( 'Move block:' ),
-				value: friendlyBlockName( op.blockName ),
+				value: structuralBlockLabel( op.blockName, op.parentBlockName ),
 			} );
 			continue;
 		}
@@ -289,15 +601,22 @@ export function summarizeOperations(
 		// through to the generic attribute label rather than an empty quote.
 		if ( op.type === 'inline-suggestion' ) {
 			// A format suggestion changes only the run's markup, so surface
-			// which formats changed ("Formatting: bold") from the captured
-			// before/after HTML rather than quoting the (unchanged) text.
+			// which formats changed, and in which direction ("Add
+			// formatting: bold"), from the captured before/after HTML rather
+			// than quoting the (unchanged) text.
 			if ( op.suggestionType === 'format' ) {
-				const changedFormats = diffInlineFormats(
+				const { added, removed } = diffInlineFormats(
 					op.beforeHTML ?? '',
 					op.afterHTML ?? ''
 				);
-				if ( changedFormats.length > 0 ) {
-					formattingLabels.push( ...changedFormats );
+				if ( added.length > 0 || removed.length > 0 ) {
+					addedFormats.push( ...added );
+					removedFormats.push( ...removed );
+					collectLinkTargets(
+						linkUrls,
+						op.beforeHTML ?? '',
+						op.afterHTML ?? ''
+					);
 				} else {
 					attributeLabels.push( op.attribute );
 				}
@@ -318,7 +637,7 @@ export function summarizeOperations(
 					op.suggestionType === 'del'
 						? __( 'Delete:' )
 						: __( 'Add:' ),
-				value: `“${ text }”`,
+				value: presentText( text ),
 			} );
 			continue;
 		}
@@ -327,11 +646,41 @@ export function summarizeOperations(
 			continue;
 		}
 
+		/*
+		 * A rename is stored as a `metadata` attribute change, so it would
+		 * otherwise arrive in the sidebar as the word "metadata" - a reviewer
+		 * can't tell whether a block was renamed, bound to a field, or turned
+		 * into a pattern override. Report the proposed name instead, and only
+		 * when the name is what actually changed.
+		 */
+		if ( op.attribute === 'metadata' ) {
+			const beforeName = readBlockName( op.before );
+			const afterName = readBlockName( op.after );
+			if ( afterName && afterName !== beforeName ) {
+				lines.push( {
+					label: __( 'Rename block:' ),
+					value: `“${ ellipsize( afterName ) }”`,
+				} );
+				continue;
+			}
+			if ( beforeName && ! afterName ) {
+				lines.push( {
+					label: __( 'Rename block:' ),
+					value: sprintf(
+						/* translators: %s: the block's current custom name. */
+						__( 'reset “%s” to the default name' ),
+						ellipsize( beforeName )
+					),
+				} );
+				continue;
+			}
+		}
+
 		const isContent = op.attribute === 'content';
 		/*
 		 * The word diff below is O(m*n); cap the input length so a payload
 		 * approaching the 64KB limit can't freeze the sidebar. Oversized
-		 * content changes fall back to the attribute-level "Format: content"
+		 * content changes fall back to the attribute-level "Change: text"
 		 * line. This character cap composes with `wordDiff`'s own
 		 * MAX_DIFF_TOKENS guard, which bounds the LCS table itself for any
 		 * input that passes here but tokenizes pathologically.
@@ -350,50 +699,103 @@ export function summarizeOperations(
 
 		const before = op.before ?? '';
 		const after = op.after ?? '';
+		/*
+		 * The quoted lines below report what a reviewer would read on screen,
+		 * so both the format check and the word diff work on visible text.
+		 * Strip once and share it — `stripTags` parses through the DOM, and a
+		 * sidebar can hold a lot of these cards.
+		 */
+		const beforeText = stripTags( before );
+		const afterText = stripTags( after );
 
 		// A pure inline-format change produces identical visible text with
-		// different markup — surface it as "Formatting: bold" rather than
+		// different markup — surface it as "Add formatting: bold" rather than
 		// leaking raw `<strong>…</strong>` into an Add/Delete quote.
-		if ( stripTags( before ) === stripTags( after ) && before !== after ) {
-			const changedFormats = diffInlineFormats( before, after );
-			if ( changedFormats.length > 0 ) {
-				formattingLabels.push( ...changedFormats );
+		if ( beforeText === afterText && before !== after ) {
+			const { added, removed } = diffInlineFormats( before, after );
+			if ( added.length > 0 || removed.length > 0 ) {
+				addedFormats.push( ...added );
+				removedFormats.push( ...removed );
+				collectLinkTargets( linkUrls, before, after );
 			} else {
 				attributeLabels.push( op.attribute );
 			}
 			continue;
 		}
 
-		const { inserted, deleted } = textDelta( before, after );
-		if ( inserted ) {
-			lines.push( { label: __( 'Add:' ), value: `“${ inserted }”` } );
-		}
-		if ( deleted ) {
+		const { inserted, deleted } = textDelta( beforeText, afterText );
+		/*
+		 * An edit that both removes and inserts is one change, not two. Two
+		 * lines read as an unrelated delete plus re-add — a paragraph merged
+		 * into a heading reported "Delete: heading" next to "Add: headingSphinx
+		 * of black quartz…", which describes an append as a rewrite.
+		 */
+		if ( inserted && deleted ) {
+			lines.push( {
+				label: __( 'Replace:' ),
+				value: sprintf(
+					/* translators: 1: text being replaced. 2: proposed replacement text. */
+					__( '%1$s → %2$s' ),
+					presentText( ellipsize( deleted, REPLACE_SIDE_MAX_CHARS ) ),
+					presentText( ellipsize( inserted, REPLACE_SIDE_MAX_CHARS ) )
+				),
+			} );
+		} else if ( inserted ) {
+			lines.push( {
+				label: __( 'Add:' ),
+				value: presentText( inserted ),
+			} );
+		} else if ( deleted ) {
 			lines.push( {
 				label: __( 'Delete:' ),
-				value: `“${ deleted }”`,
+				value: presentText( deleted ),
 			} );
-		}
-		if ( ! inserted && ! deleted ) {
+		} else {
 			attributeLabels.push( op.attribute );
 		}
 	}
 
-	if ( formattingLabels.length > 0 ) {
+	/*
+	 * Two lines, not one: bolding a run and un-bolding one are opposite
+	 * proposals, and a single "Formatting: bold" label read the same either
+	 * way — a reviewer had to open the canvas to find out which was meant.
+	 */
+	if ( addedFormats.length > 0 ) {
 		lines.push( {
-			label: __( 'Formatting:' ),
-			value: joinLabels( formattingLabels ),
+			label: __( 'Add formatting:' ),
+			value: joinLabels( addedFormats ),
+		} );
+	}
+
+	if ( removedFormats.length > 0 ) {
+		lines.push( {
+			label: __( 'Remove formatting:' ),
+			value: joinLabels( removedFormats ),
+		} );
+	}
+
+	if ( linkUrls.length > 0 ) {
+		lines.push( {
+			label: __( 'Link:' ),
+			value: Array.from( new Set( linkUrls ) ).join( ', ' ),
 		} );
 	}
 
 	if ( attributeLabels.length > 0 ) {
+		/*
+		 * Attribute changes and inline formatting are different families of
+		 * suggestion, so their labels have to be tellable apart at a glance in
+		 * a mixed list. "Format:" next to "Formatting:" was not.
+		 */
 		const labels = attributeLabels.map(
 			( key ) =>
-				( FORMAT_ATTRIBUTE_LABELS as Record< string, string > )[
-					key
-				] ?? key
+				( ATTRIBUTE_LABELS as Record< string, string > )[ key ] ??
+				humanizeAttributeName( key )
 		);
-		lines.push( { label: __( 'Format:' ), value: joinLabels( labels ) } );
+		lines.push( {
+			label: __( 'Change:' ),
+			value: joinAttributeLabels( labels ),
+		} );
 	}
 
 	return lines;
@@ -401,7 +803,7 @@ export function summarizeOperations(
 
 /**
  * Compact sidebar summary of a suggestion — "Add: …", "Delete: …",
- * "Format: …". Designed to mirror a Google Docs-style review note.
+ * "Change: …". Designed to mirror a Google Docs-style review note.
  *
  * @param props            Props.
  * @param props.operations Operations to summarize.
