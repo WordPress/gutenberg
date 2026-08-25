@@ -81,6 +81,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 
 	// WordPress 7.2 compat.
 	require __DIR__ . '/compat/wordpress-7.2/notes-followers.php';
+	require __DIR__ . '/compat/wordpress-7.2/notes-followers-rest.php';
 
 	// Real-time collaboration.
 	require __DIR__ . '/experimental/collaboration/class-gutenberg-rest-autosaves-controller.php';

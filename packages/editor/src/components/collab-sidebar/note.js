@@ -11,6 +11,7 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { moreVertical, published } from '@wordpress/icons';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
+import { useNoteFollowing } from './use-note-following';
 import { unlock } from '../../lock-unlock';
 
 const { Menu } = unlock( componentsPrivateApis );
@@ -80,6 +81,13 @@ export function Note( {
 	}, [ rawContent ] );
 
 	const canResolve = note.parent === 0;
+	// Subscriptions live on the thread root, so the toggle is offered there.
+	const {
+		canToggleFollowing,
+		isFollowing,
+		isTogglingFollowing,
+		toggleFollowing,
+	} = useNoteFollowing( note.parent === 0 ? note : undefined );
 	const isResolutionNote =
 		note.type === 'note' &&
 		note.meta &&
@@ -98,6 +106,14 @@ export function Note( {
 			title: _x( 'Reopen', 'Reopen note' ),
 			isEligible: ( { status } ) => status === 'approved',
 			onClick: () => onEditNote( { id: note.id, status: 'hold' } ),
+		},
+		{
+			id: 'follow',
+			title: isFollowing
+				? __( 'Unfollow thread' )
+				: __( 'Follow thread' ),
+			isEligible: () => canToggleFollowing && ! isTogglingFollowing,
+			onClick: toggleFollowing,
 		},
 		{
 			id: 'delete',
