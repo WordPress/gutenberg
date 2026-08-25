@@ -357,7 +357,7 @@ class Gutenberg_HTML_To_Blocks_Test extends WP_UnitTestCase {
 	 *
 	 * @return array[]
 	 */
-	public function data_attribute_sources() {
+	public static function data_attribute_sources() {
 		return array(
 			'html source'            => array(
 				array(
@@ -492,7 +492,7 @@ class Gutenberg_HTML_To_Blocks_Test extends WP_UnitTestCase {
 	 *
 	 * @return array[]
 	 */
-	public function data_selectors() {
+	public static function data_selectors() {
 		return array(
 			'type'                 => array( 'p', '<p>One</p>', true ),
 			'type mismatch'        => array( 'p', '<div>One</div>', false ),
