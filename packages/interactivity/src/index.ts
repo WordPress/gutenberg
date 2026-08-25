@@ -111,20 +111,28 @@ window.history.replaceState(
 	''
 );
 
-// When the browser fires `popstate` for a history entry that was created in a
-// different session (i.e., before a full page reload), force a reload so the
-// server can render the correct content. Without this, the URL would change but
-// the page content would remain stale because the interactivity router — which
-// handles client-side navigations — might not be loaded yet.
+// When the browser fires `popstate` for a history entry that was created by
+// the Interactivity API in a different session (i.e., before a full page
+// reload), force a reload so the server can render the correct content.
+// Without this, the URL would change but the page content would remain stale
+// because the interactivity router — which handles client-side navigations —
+// might not be loaded yet.
 //
-// Some `popstate` events (e.g., anchor/fragment navigations like
-// clicking `<a href="#section">`) have `null` state. These are
-// same-document navigations and must NOT trigger a reload — the browser
-// should just scroll to the target element as normal.
+// Entries without a `wpInteractivityId` must NOT trigger a reload:
+//
+// - Some `popstate` events (e.g., anchor/fragment navigations like clicking
+//   `<a href="#section">`) have `null` state. These are same-document
+//   navigations and the browser should just scroll to the target element as
+//   normal.
+// - Entries with a state object but no `wpInteractivityId` were created by
+//   third-party code using the History API (e.g., an embedded app saving its
+//   state to the URL with `pushState`/`replaceState`). That code is
+//   responsible for handling its own entries.
+//   See https://github.com/WordPress/gutenberg/issues/60455.
 window.addEventListener( 'popstate', ( event ) => {
 	if (
-		event.state !== null &&
-		event.state?.wpInteractivityId !== sessionId
+		event.state?.wpInteractivityId &&
+		event.state.wpInteractivityId !== sessionId
 	) {
 		window.location.reload();
 	}

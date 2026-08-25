@@ -327,7 +327,7 @@ const forcePageReload = ( href: string ) => {
 
 // Listen to the back and forward buttons and restore the page if it's in the
 // cache.
-window.addEventListener( 'popstate', async () => {
+window.addEventListener( 'popstate', async ( event ) => {
 	const pagePath = getPagePath( window.location.href ); // Remove hash.
 	const page = pages.has( pagePath ) && ( await pages.get( pagePath ) );
 	if ( page ) {
@@ -335,9 +335,17 @@ window.addEventListener( 'popstate', async () => {
 			state.url = window.location.href;
 			renderPage( page );
 		} );
-	} else {
+	} else if ( event.state?.wpInteractivityId ) {
+		// The entry was created by the Interactivity API but the page is not
+		// in the cache (e.g., the entry comes from a previous session), so a
+		// full reload is needed to render the correct content.
 		window.location.reload();
 	}
+	// Entries without a `wpInteractivityId` were created by third-party code
+	// using the History API (e.g., an embedded app saving its state to the
+	// URL with `pushState`/`replaceState`). That code is responsible for
+	// handling its own entries, so they are ignored here.
+	// See https://github.com/WordPress/gutenberg/issues/60455.
 } );
 
 // Detect router regions with `attachTo` in the initial page. This step should
