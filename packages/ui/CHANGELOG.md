@@ -15,6 +15,7 @@
 
 ### Breaking Changes
 
+-   `Calendar`, `RangeCalendar`: Remove the `--wp-ui-calendar-range-middle-background-color` and `--wp-ui-calendar-preview-border-color` CSS custom properties. ([#81438](https://github.com/WordPress/gutenberg/pull/81438))
 -   `SearchableChipSelect`: Remove the `creatableItem` prop. Mark a creatable action with `creatable: true` on an item in `items` instead. The item renders in the list footer and is excluded from the main list automatically. Handle selection in `onValueChange`. See the `Creatable` and `GroupedCreatable` stories for examples ([#80989](https://github.com/WordPress/gutenberg/pull/80989)).
 -   `Select.Item`: Remove `'compact'` from the `size` prop. Use `'default'` instead ([#81354](https://github.com/WordPress/gutenberg/pull/81354)).
 -   `Combobox.Item`, `SelectControl.Item`: The `size` prop is removed ([#81354](https://github.com/WordPress/gutenberg/pull/81354)).
@@ -33,6 +34,7 @@
 ### Bug Fixes
 
 -   `Calendar`, `RangeCalendar`: Use the WordPress text direction when no supported formatting locale is provided, while preserving explicit locale and `dir` precedence. ([#81982](https://github.com/WordPress/gutenberg/pull/81982))
+-   `Calendar`, `RangeCalendar`: Align day states with neutral WPDS color tokens. ([#81438](https://github.com/WordPress/gutenberg/pull/81438))
 -   `Calendar`, `RangeCalendar`: Show tooltips for the previous and next month buttons. ([#81983](https://github.com/WordPress/gutenberg/pull/81983))
 -   `Calendar`, `RangeCalendar`: Make the navigation label translatable and use the same locale-derived default first day of the week for locale strings and date-fns locale objects. Existing object-based calendars may use a different default; pass `weekStartsOn` to preserve it. ([#81814](https://github.com/WordPress/gutenberg/pull/81814))
 -   `Autocomplete.Input`, `Combobox.Input`: Omit the `type` prop, since the combobox role is only valid on `input type="text"` ([#80636](https://github.com/WordPress/gutenberg/pull/80636)).
