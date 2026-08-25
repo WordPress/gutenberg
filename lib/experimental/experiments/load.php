@@ -140,6 +140,7 @@ function gutenberg_initialize_experiments_settings() {
 					'id'          => 'gutenberg-react-19',
 					'label'       => __( 'React 19', 'gutenberg' ),
 					'description' => __( 'Registers React 19 as the bundled React version, replacing the default React 18 scripts.', 'gutenberg' ),
+					'link'        => 'https://make.wordpress.org/core/2026/05/27/react-19-upgrade-in-wordpress/',
 				),
 			),
 		),
@@ -163,6 +164,10 @@ function gutenberg_initialize_experiments_settings() {
 			if ( ! empty( $experiment['separateOption'] ) ) {
 				$property['separate_option'] = true;
 				$property['option_name']     = $experiment['id'];
+			}
+
+			if ( ! empty( $experiment['link'] ) ) {
+				$property['link'] = $experiment['link'];
 			}
 
 			$properties[ $experiment['id'] ] = $property;
