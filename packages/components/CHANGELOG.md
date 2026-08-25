@@ -9,6 +9,10 @@
     -   `ResizableBox` ([#81792](https://github.com/WordPress/gutenberg/pull/81792))
     -   `ComboboxControl`: ([#80471](https://github.com/WordPress/gutenberg/pull/80471))
     -   `GradientPicker`, `ColorPalette`: ([#80473](https://github.com/WordPress/gutenberg/pull/80473)).
+    -   `BaseControl` ([#80001](https://github.com/WordPress/gutenberg/pull/80001))
+    -   `BorderBoxControl`, `BorderControl` ([#80437](https://github.com/WordPress/gutenberg/pull/80437))
+    -   `ProgressBar` ([#80512](https://github.com/WordPress/gutenberg/pull/80512))
+    -   `TextareaControl` ([#81353](https://github.com/WordPress/gutenberg/pull/81353))
 
 ### Enhancements
 
@@ -46,6 +50,10 @@
 -   `ToggleGroupControl`: Streamline focus ring color styles ([#81242](https://github.com/WordPress/gutenberg/pull/81242)).
 -   `ControlWithError`: Remove the internal implementation in favor of the `ControlWithError` component from `@wordpress/ui` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574)).
 -   Remove the unused `components-validated-control__indicator*` styles; the indicator is now rendered and styled by `ValidityIndicator` from `@wordpress/ui` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574)).
+-   Deprecate `ValidatedInputControl` in the private APIs; use `ValidatedInputControl` from `@wordpress/ui` instead ([#81627](https://github.com/WordPress/gutenberg/pull/81627)).
+-   Deprecate `ValidatedTextareaControl` in the private APIs; use `ValidatedTextareaControl` from `@wordpress/ui` instead ([#81984](https://github.com/WordPress/gutenberg/pull/81984)).
+-   `BorderBoxControl`: Migrate styles from Emotion to an SCSS Module ([#80437](https://github.com/WordPress/gutenberg/pull/80437)).
+-   `BorderControl`: Migrate styles from Emotion to an SCSS Module ([#80437](https://github.com/WordPress/gutenberg/pull/80437)).
 
 ## 39.0.0 (2026-08-12)
 
