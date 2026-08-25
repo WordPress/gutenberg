@@ -38,7 +38,7 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Npm build
-              run: npm run build -- --skip-types
+              run: npm run build
 
             # Wider than the `build*` directories, because the build also emits
             # generated files next to sources: the block parsers, the icon

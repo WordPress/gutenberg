@@ -75,13 +75,14 @@ function Identity() {
 				'root',
 				'site',
 				// The site entity is a singleton and has no record key.
-				undefined as unknown as string
+				undefined
 			) as SiteSettings,
 		[]
 	);
 	const { editEntityRecord } = useDispatch( coreStore );
 
 	const onChange = ( edits: Record< string, any > ) => {
+		// The site entity is a singleton and has no record key.
 		editEntityRecord( 'root', 'site', undefined, edits );
 	};
 

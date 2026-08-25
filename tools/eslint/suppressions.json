@@ -635,62 +635,23 @@
 			"count": 4
 		}
 	},
-	"packages/boot/src/components/error-boundary/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
 	"packages/boot/src/components/navigation/drilldown-item/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
 		}
 	},
 	"packages/boot/src/components/navigation/dropdown-item/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		},
 		"@wordpress/use-recommended-components": {
 			"count": 2
 		}
 	},
 	"packages/boot/src/components/navigation/navigation-item/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		},
 		"@wordpress/use-recommended-components": {
 			"count": 2
 		}
 	},
 	"packages/boot/src/components/navigation/navigation-screen/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		},
 		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
-	"packages/boot/src/components/root/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
-	"packages/boot/src/components/root/single-page.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
-	"packages/boot/src/components/save-button/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
-	"packages/boot/src/components/sidebar/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
-	"packages/boot/src/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 2
 		}
 	},
@@ -714,21 +675,6 @@
 	},
 	"packages/components/src/base-control/stories/index.story.tsx": {
 		"react-hooks/immutability": {
-			"count": 1
-		}
-	},
-	"packages/components/src/base-control/styles/base-control-styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
-	"packages/components/src/border-box-control/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/components/src/border-control/styles.ts": {
-		"no-restricted-imports": {
 			"count": 1
 		}
 	},
@@ -757,17 +703,7 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/color-palette/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/color-picker/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/components/src/combobox-control/styles.ts": {
 		"no-restricted-imports": {
 			"count": 1
 		}
@@ -897,11 +833,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/progress-bar/styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
 	"packages/components/src/range-control/index.tsx": {
 		"react-hooks/immutability": {
 			"count": 3
@@ -913,11 +844,6 @@
 	"packages/components/src/range-control/styles/range-control-styles.ts": {
 		"no-restricted-imports": {
 			"count": 2
-		}
-	},
-	"packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
 		}
 	},
 	"packages/components/src/scrollable/styles.ts": {
@@ -951,11 +877,6 @@
 		}
 	},
 	"packages/components/src/text/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/components/src/textarea-control/styles/textarea-control-styles.ts": {
 		"no-restricted-imports": {
 			"count": 1
 		}
@@ -1023,11 +944,6 @@
 	"packages/components/src/utils/test/polymorphic-element.tsx": {
 		"no-restricted-imports": {
 			"count": 1
-		}
-	},
-	"packages/components/src/z-stack/styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
 		}
 	},
 	"packages/compose/src/hooks/use-dialog/index.ts": {
@@ -1295,11 +1211,6 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/collab-sidebar/note-card.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/editor/src/components/document-bar/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -1416,11 +1327,6 @@
 	"packages/editor/src/components/post-status/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		}
-	},
-	"packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
 		}
 	},
 	"packages/editor/src/components/post-template/create-new-template-modal.js": {
@@ -1685,11 +1591,6 @@
 			"count": 6
 		}
 	},
-	"packages/global-styles-ui/src/font-library/font-demo.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/global-styles-ui/src/font-library/google-fonts-confirm-dialog.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 5
@@ -1737,7 +1638,7 @@
 	},
 	"packages/global-styles-ui/src/gradients-palette-panel.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 2
+			"count": 1
 		}
 	},
 	"packages/global-styles-ui/src/navigation-button.tsx": {
