@@ -1,8 +1,8 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef, useState } from '@wordpress/element';
-import { ThemeProvider } from '@wordpress/theme';
 import * as Dialog from '../index';
+import { ThemeProvider } from '../../utils/theme-provider';
 
 function collectUncaughtErrors() {
 	const errors: Error[] = [];
