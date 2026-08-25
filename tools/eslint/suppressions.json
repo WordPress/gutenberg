@@ -2101,7 +2101,7 @@
 	},
 	"widgets/quick-draft/components/saved-post/saved-post.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
+			"count": 2
 		}
 	},
 	"widgets/quick-draft/fields/quick-draft-content-field/quick-draft-content-field.tsx": {
