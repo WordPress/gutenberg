@@ -255,6 +255,22 @@ function entity( entityConfig ) {
 
 						return nextState;
 
+					case 'REMOVE_ITEMS':
+						// Edits of a record that no longer exists can never be
+						// saved, and would otherwise be reported as unsaved
+						// changes for the rest of the session.
+						const remainingEdits = { ...state };
+						let hasRemovedEdits = false;
+
+						for ( const itemId of action.itemIds ?? [] ) {
+							if ( remainingEdits[ itemId ] !== undefined ) {
+								delete remainingEdits[ itemId ];
+								hasRemovedEdits = true;
+							}
+						}
+
+						return hasRemovedEdits ? remainingEdits : state;
+
 					case 'EDIT_ENTITY_RECORD':
 						const nextEdits = {
 							...state[ action.recordId ],
