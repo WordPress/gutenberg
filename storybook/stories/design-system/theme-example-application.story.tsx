@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Breadcrumbs, Page } from '@wordpress/admin-ui';
-import { useState } from '@wordpress/element';
 import { wordpress } from '@wordpress/icons';
 import { ThemeProvider } from '@wordpress/theme';
 import {
@@ -17,11 +16,6 @@ import {
 	Text,
 } from '@wordpress/ui';
 import { withRouter } from '../../decorators/with-router';
-
-type ThemeProviderCornerRadius = React.ComponentProps<
-	typeof ThemeProvider
->[ 'cornerRadius' ];
-type CornerRadiusPreset = NonNullable< ThemeProviderCornerRadius >;
 
 const sidebarNavItems = [
 	'Dashboard',
@@ -52,92 +46,15 @@ export default meta;
 
 /**
  * A mock application page demonstrating how `ThemeProvider` affects
- * `@wordpress/ui` and `@wordpress/admin-ui` components in concert. Use the inline controls to adjust
- * the `primary` and `background` seed colors, the corner radius preset, and observe how every surface, text
- * element, and interactive control adapts accordingly.
+ * `@wordpress/ui` and `@wordpress/admin-ui` components in concert. Use the
+ * Storybook Theme toolbar to adjust the colors, cursor, and corner radius, and
+ * observe how every surface, text element, and interactive control adapts.
  */
 export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 	render: () => {
-		const [ primary, setPrimary ] = useState< string | undefined >();
-		const [ background, setBackground ] = useState< string | undefined >();
-		const [ cornerRadiusPreset, setCornerRadiusPreset ] =
-			useState< CornerRadiusPreset >( 'subtle' );
-
 		return (
 			<div>
-				<div
-					style={ {
-						display: 'flex',
-						alignItems: 'center',
-						gap: '16px',
-						padding: '12px 16px',
-						marginBlockEnd: '16px',
-						borderRadius: '8px',
-						background: '#f0f0f0',
-						fontSize: '13px',
-						flexWrap: 'wrap',
-					} }
-				>
-					{ /* eslint-disable jsx-a11y/label-has-associated-control */ }
-					<label
-						style={ {
-							display: 'inline-flex',
-							alignItems: 'center',
-							gap: '6px',
-						} }
-					>
-						Primary
-						<input
-							type="color"
-							value={ primary ?? '#3858e9' }
-							onChange={ ( e ) => setPrimary( e.target.value ) }
-						/>
-					</label>
-					<label
-						style={ {
-							display: 'inline-flex',
-							alignItems: 'center',
-							gap: '6px',
-						} }
-					>
-						Background
-						<input
-							type="color"
-							value={ background ?? '#fcfcfc' }
-							onChange={ ( e ) =>
-								setBackground( e.target.value )
-							}
-						/>
-					</label>
-					<label
-						style={ {
-							display: 'inline-flex',
-							alignItems: 'center',
-							gap: '6px',
-						} }
-					>
-						Corner radius
-						<select
-							value={ cornerRadiusPreset }
-							onChange={ ( e ) =>
-								setCornerRadiusPreset(
-									e.target.value as CornerRadiusPreset
-								)
-							}
-						>
-							<option value="none">None</option>
-							<option value="subtle">Subtle</option>
-							<option value="moderate">Moderate</option>
-							<option value="pronounced">Pronounced</option>
-						</select>
-					</label>
-					{ /* eslint-enable jsx-a11y/label-has-associated-control */ }
-				</div>
-				<ThemeProvider
-					color={ { primary, background } }
-					cornerRadius={ cornerRadiusPreset }
-					isRoot
-				>
+				<ThemeProvider>
 					<div
 						style={ {
 							display: 'grid',
