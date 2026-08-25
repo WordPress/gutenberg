@@ -227,6 +227,12 @@ export default function NavigationSubmenuEdit( {
 		}
 	}
 
+	const _textColor = attributes.textColor ?? textColor;
+	const _customTextColor = attributes.style?.color?.text ?? customTextColor;
+	const _backgroundColor = attributes.backgroundColor ?? backgroundColor;
+	const _customBackgroundColor =
+		attributes.style?.color?.background ?? customBackgroundColor;
+
 	const blockProps = useBlockProps( {
 		ref: useMergeRefs( [ setPopoverAnchor, listItemRef ] ),
 		className: clsx( 'wp-block-navigation-item', {
@@ -234,17 +240,18 @@ export default function NavigationSubmenuEdit( {
 			'is-dragging-within': isDraggingWithin,
 			'has-link': !! url,
 			'has-child': hasChildren,
-			'has-text-color': !! textColor || !! customTextColor,
-			[ getColorClassName( 'color', textColor ) ]: !! textColor,
-			'has-background': !! backgroundColor || customBackgroundColor,
-			[ getColorClassName( 'background-color', backgroundColor ) ]:
-				!! backgroundColor,
+			'has-text-color': !! _textColor || !! _customTextColor,
+			[ getColorClassName( 'color', _textColor ) ]:
+				!! _textColor && ! _customTextColor,
+			'has-background': !! _backgroundColor || !! _customBackgroundColor,
+			[ getColorClassName( 'background-color', _backgroundColor ) ]:
+				!! _backgroundColor && ! _customBackgroundColor,
 			'open-on-click': openSubmenusOnClick,
 			'open-always': submenuVisibility === 'always',
 		} ),
 		style: {
-			color: ! textColor && customTextColor,
-			backgroundColor: ! backgroundColor && customBackgroundColor,
+			color: _customTextColor,
+			backgroundColor: _customBackgroundColor,
 		},
 		onKeyDown,
 	} );
