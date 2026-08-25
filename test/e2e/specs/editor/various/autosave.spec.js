@@ -343,12 +343,13 @@ test.describe( 'Autosave', () => {
 		await page.keyboard.type( 'before save' );
 		await editor.publishPost();
 
-		const paragraph = editor.canvas.getByRole( 'document', {
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		const paragraphs = editor.canvas.getByRole( 'document', {
 			name: 'Block: Paragraph',
 		} );
-		await paragraph.click();
+		await paragraphs.nth( 1 ).click();
 		// Type slowly so the autosave happens more than 1s after publish.
-		await page.keyboard.type( ' after save', { delay: 100 } );
+		await page.keyboard.type( 'after save', { delay: 100 } );
 
 		// Trigger a server-side autosave newer than the saved version.
 		await page.evaluate( () =>
@@ -387,6 +388,19 @@ test.describe( 'Autosave', () => {
 		await expect(
 			page.getByRole( 'button', { name: 'Exit' } )
 		).toBeVisible();
+		await expect
+			.poll( async () => {
+				const blocks = await editor.getBlocks();
+				return blocks.map( ( block ) => ( {
+					content: block.attributes.content,
+					status:
+						block.attributes.__revisionDiffStatus?.status ?? null,
+				} ) );
+			} )
+			.toEqual( [
+				{ content: 'before save', status: null },
+				{ content: 'after save', status: 'added' },
+			] );
 
 		// Restoring the autosave dismisses the notice.
 		await page.getByRole( 'button', { name: 'Restore' } ).click();

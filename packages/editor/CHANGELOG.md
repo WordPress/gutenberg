@@ -62,6 +62,7 @@
 
 ### Bug Fixes
 
+-   Visual revisions now compare autosaves against the saved post, preventing unchanged blocks from being highlighted as additions ([#80455](https://github.com/WordPress/gutenberg/issues/80455)).
 -   `mediaUpload`: Add an `isTransportOnly` parameter, set by the `@wordpress/upload-media` queue, which owns progress tracking and save locking for its own items and uses this function only as its server transport. Fixes the progress snackbar showing "1 of 2" for a single HEIC upload in Safari ([#80369](https://github.com/WordPress/gutenberg/issues/80369)).
 
 ### Internal

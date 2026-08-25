@@ -3,8 +3,10 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	getDefaultRenderingMode,
 	getPostBlocksByName,
+	getPreviousRevision,
 	isCollaborationEnabledForCurrentPost,
 } from '../private-selectors';
+import { getCurrentPost } from '../selectors';
 import { lock } from '../../lock-unlock';
 
 describe( 'getPostBlocksByName', () => {
@@ -78,6 +80,84 @@ describe( 'getPostBlocksByName', () => {
 			'core/heading',
 		] );
 		expect( result ).toEqual( [ 'block1', 'block2', 'block3' ] );
+	} );
+} );
+
+describe( 'getPreviousRevision', () => {
+	const postId = 123;
+	const savedPost = {
+		id: postId,
+		type: 'post',
+		content: {
+			raw: '<!-- wp:paragraph --><p>Saved</p><!-- /wp:paragraph -->',
+		},
+		title: { raw: 'Saved title' },
+		meta: { footnotes: '' },
+	};
+	const state = {
+		postId,
+		postType: 'post',
+		revisionId: 3,
+		revisionPage: 1,
+	};
+
+	function setupRegistry( revisions, parentPost = savedPost ) {
+		const getEntityRecord = jest.fn( () => parentPost );
+		const registry = {
+			select: ( store ) => {
+				if ( store === coreStore ) {
+					return {
+						getRawEntityRecord: () => ( {
+							id: postId,
+							type: 'post',
+							_links: {
+								'version-history': [
+									{ count: revisions.length },
+								],
+							},
+						} ),
+						getEntityConfig: () => ( { revisionKey: 'id' } ),
+						getEntityRecord,
+						getRevisions: () => revisions,
+					};
+				}
+			},
+		};
+		getCurrentPost.registry = registry;
+		getPreviousRevision.registry = registry;
+		return getEntityRecord;
+	}
+
+	it( 'returns the saved post as the autosave baseline', () => {
+		const revisions = [
+			{ id: 3, slug: `${ postId }-autosave-v1` },
+			{ id: 2, slug: `${ postId }-revision-v1` },
+		];
+		const getEntityRecord = setupRegistry( revisions );
+
+		expect( getPreviousRevision( state ) ).toBe( savedPost );
+		expect( getEntityRecord ).toHaveBeenCalledWith(
+			'postType',
+			'post',
+			postId
+		);
+	} );
+
+	it( 'returns null while the saved post is unavailable', () => {
+		setupRegistry( [ { id: 3, slug: `${ postId }-autosave-v1` } ], null );
+
+		expect( getPreviousRevision( state ) ).toBeNull();
+	} );
+
+	it( 'returns the preceding revision for a regular revision', () => {
+		const previousRevision = { id: 2, slug: `${ postId }-revision-v1` };
+		const getEntityRecord = setupRegistry( [
+			{ id: 3, slug: `${ postId }-revision-v2` },
+			previousRevision,
+		] );
+
+		expect( getPreviousRevision( state ) ).toBe( previousRevision );
+		expect( getEntityRecord ).not.toHaveBeenCalled();
 	} );
 } );
 

@@ -548,6 +548,20 @@ export const getPreviousRevision = createRegistrySelector(
 		const currentIndex = revisions.findIndex(
 			( r ) => r[ revisionKey ] === currentRevisionId
 		);
+		const currentRevision = revisions[ currentIndex ];
+
+		// Autosaves are changes against the currently saved post, not the
+		// preceding revision. This also provides a baseline when the autosave is
+		// the post's only revision.
+		if ( currentRevision?.slug === `${ postId }-autosave-v1` ) {
+			return (
+				select( coreStore ).getEntityRecord(
+					'postType',
+					postType,
+					postId
+				) ?? null
+			);
+		}
 
 		// Return the previous revision (older one) if it exists.
 		if ( currentIndex >= 0 && currentIndex < revisions.length - 1 ) {
