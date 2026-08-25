@@ -61,6 +61,12 @@ type DataViewsProps< Item > = {
 	children?: ReactNode;
 	config?: {
 		perPageSizes: number[];
+		/**
+		 * Whether the view config popover offers the "Original aspect ratio"
+		 * control for grid layouts, letting users switch item previews
+		 * between cropped (`cover`) and fitted (`contain`).
+		 */
+		mediaFitControl?: boolean;
 	};
 	empty?: ReactNode;
 	onReset?: ( () => void ) | false;

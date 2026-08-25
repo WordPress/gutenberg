@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { Day, Root, Chevron, NavButton } from './components';
+import { Day, Root, PreviousMonthButton, NextMonthButton } from './components';
 import styles from '../style.module.css';
 import resetStyles from '../../utils/css/resets.module.css';
 import focusStyles from '../../utils/css/focus.module.scss';
@@ -17,7 +17,6 @@ const CLASSNAMES = {
 	caption_label: styles[ 'caption-label' ],
 	button_next: styles[ 'nav-button' ],
 	button_previous: styles[ 'nav-button' ],
-	chevron: styles.chevron,
 	nav: styles.nav,
 	month_caption: styles[ 'month-caption' ],
 	months: styles.months,
@@ -77,8 +76,7 @@ export const COMMON_PROPS = {
 	components: {
 		Day,
 		Root,
-		Chevron,
-		PreviousMonthButton: NavButton,
-		NextMonthButton: NavButton,
+		PreviousMonthButton,
+		NextMonthButton,
 	},
 } as const;

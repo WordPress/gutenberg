@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Remove `fixable` option from `i18n-no-flanking-whitespace` rule [#70279](https://github.com/WordPress/gutenberg/pull/70279).
+
 ### Enhancements
 
 -   Update `use-recommended-components` rule to mark `SearchableChipSelect` and `SearchableChipSelectControl` from `@wordpress/ui` as recommended ([#80980](https://github.com/WordPress/gutenberg/pull/80980)).
