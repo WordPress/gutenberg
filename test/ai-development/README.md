@@ -64,13 +64,13 @@ Run from the repository root:
 npm --workspace @wordpress/agent-skill-evals run validate
 
 # Run every spec and provider.
-npm run test:agent-evals -- --config 'specs/*/*.test.yaml'
+npm run test:agent-evals -- --config 'specs/*/*.test.js'
 
 # Run one spec.
-npm run test:agent-evals -- --config specs/SPEC_GROUP/TEST_NAME.test.yaml
+npm run test:agent-evals -- --config specs/SPEC_GROUP/TEST_NAME.test.js
 
 # Override repeats.
-npm run test:agent-evals -- --config specs/SPEC_GROUP/TEST_NAME.test.yaml --repeat 3
+npm run test:agent-evals -- --config specs/SPEC_GROUP/TEST_NAME.test.js --repeat 3
 
 # Open the local results viewer.
 npm --workspace @wordpress/agent-skill-evals run view
@@ -81,16 +81,15 @@ Results under `results/` are gitignored and may contain source code and tool out
 ## Files
 
 ```text
-evals/
+test/ai-development/
 ├── lib/
-│   ├── default-test.yaml           shared test options
-│   ├── promptfooconfig.yaml        shared runtime configuration
-│   ├── providers.yaml              shared coding agents
+│   ├── base.js                     shared setup a spec spreads
+│   ├── default-test.js             shared test options
+│   ├── providers.js                shared coding agents
 │   └── workspace-extension.mjs     workspace lifecycle
 ├── package.json
-├── package-lock.json
 └── specs/SPEC_GROUP/
-    └── TEST_NAME.test.yaml         prompt, assertions, and spec configuration
+    └── TEST_NAME.test.js           prompt, assertions, and spec configuration
 ```
 
 ## Authoring
@@ -98,6 +97,6 @@ evals/
 For each spec:
 
 1. State the narrow claim the evaluation supports.
-2. Add a `TEST_NAME.test.yaml` file containing a realistic agent prompt, shared
-   configuration references, cases, and named metrics.
+2. Add a `TEST_NAME.test.js` file that spreads `lib/base.js` and adds a
+   realistic agent prompt, cases, and named metrics.
 3. Validate, run one provider once, then run the intended matrix with repeats.
