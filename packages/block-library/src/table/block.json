@@ -218,11 +218,7 @@
 	"transforms": {
 		"from": [
 			{
-				"type": "raw",
-				"selector": "figure:has(> table)",
-				"priority": 5
-			},
-			{
+				"name": "from-raw",
 				"type": "raw",
 				"selector": "table"
 			}

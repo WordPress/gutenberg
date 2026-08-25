@@ -2,6 +2,62 @@
 	"title": "JSON schema for WordPress blocks",
 	"$schema": "http://json-schema.org/draft-07/schema#",
 	"definitions": {
+		"blockTransform": {
+			"type": "object",
+			"properties": {
+				"name": {
+					"description": "Identifies the transform so a JavaScript transform of the same name can merge over it, supplying behaviour that cannot be written as data.",
+					"type": "string"
+				},
+				"type": {
+					"description": "The kind of content the transform matches. `raw` matches markup; `block` matches another block type.",
+					"type": "string",
+					"enum": [ "raw", "block" ]
+				},
+				"blocks": {
+					"description": "For a `block` transform, the block types it converts from (under `from`) or to (under `to`).",
+					"type": "array",
+					"items": { "type": "string" }
+				},
+				"isMultiBlock": {
+					"description": "Whether a `block` transform accepts a multi-block selection.",
+					"type": "boolean",
+					"default": false
+				},
+				"selector": {
+					"description": "For a `raw` transform, a CSS selector matched against each top-level element of the source markup.\n\nType, universal, class, ID and attribute selectors are supported, along with the descendant and child combinators and the `:has()` and `:not()` pseudo-classes.",
+					"type": "string"
+				},
+				"priority": {
+					"description": "Match order, lowest first. A block that should only match when nothing more specific does, such as the paragraph block, uses a higher number.",
+					"type": "integer",
+					"default": 10
+				},
+				"schema": {
+					"description": "For a `raw` transform, the content schema describing which markup survives conversion.\n\nWrite `\"phrasing\"` where the phrasing content schema belongs, and `{ \"default\": [], \"paste\": [] }` where the allowed attributes differ when pasting.",
+					"type": "object"
+				},
+				"sourceAttributes": {
+					"description": "For a `raw` transform, whether to derive the block's attributes from the matched markup using the block's own attribute sources.",
+					"type": "boolean",
+					"default": true
+				},
+				"attributes": {
+					"description": "Attribute values for the resulting block.\n\nFor a `raw` transform, an object of values applied over any sourced attributes. A value is used as given, unless it is an object declaring a `source`, in which case it is read from the matched markup the way a block attribute would be, optionally passed through a `map` of sourced value to attribute value.\n\nFor a `block` transform, either `\"all\"` to carry every attribute across, or an object mapping each new attribute name to the name it takes its value from.",
+					"oneOf": [
+						{ "type": "string", "enum": [ "all", "none" ] },
+						{ "type": "object" }
+					]
+				},
+				"innerBlocks": {
+					"description": "For a `raw` transform, which of the matched element's content becomes inner blocks: `true` for all of it, or a CSS selector matching the child elements to convert. Content that does not become an inner block stays with the block.",
+					"anyOf": [ { "type": "boolean" }, { "type": "string" } ],
+					"default": false
+				}
+			},
+			"required": [ "type" ],
+			"additionalProperties": false
+		},
 		"//": {
 			"reference": "https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/",
 			"attributesReference": "https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/",
@@ -995,50 +1051,18 @@
 			]
 		},
 		"transforms": {
-			"description": "Transforms describe how a block converts to and from other content. Server-side conversion, such as the raw HTML to blocks handler, reads the transforms declared here.\n\nOnly `from` transforms of type `raw` are read on the server today. Transforms that need imperative matching or attribute logic still have to be registered from PHP or JavaScript.",
+			"description": "Transforms describe how a block converts to and from other content. Declaring them here rather than only in JavaScript lets the editor and PHP read the same definition, so server-side conversion covers every registered block, including third-party ones.\n\nA transform that needs to match or build attributes imperatively cannot be written as data. Such a transform keeps its JavaScript definition and shares the `name` of the entry declared here, which merges the two.",
 			"type": "object",
 			"properties": {
 				"from": {
 					"description": "Transforms that produce this block from other content.",
 					"type": "array",
-					"items": {
-						"type": "object",
-						"properties": {
-							"type": {
-								"description": "The kind of content the transform matches.",
-								"type": "string",
-								"enum": [ "raw" ]
-							},
-							"selector": {
-								"description": "A CSS selector matched against each top-level element of the source markup.\n\nThe server supports type, universal, class, ID and attribute selectors, the descendant and child combinators, and the `:has()` and `:not()` pseudo-classes.",
-								"type": "string"
-							},
-							"priority": {
-								"description": "Match order, lowest first. A block that should only match when nothing more specific does, such as the paragraph block, uses a higher number.",
-								"type": "integer",
-								"default": 10
-							},
-							"sourceAttributes": {
-								"description": "Whether to derive the block's attributes from the matched markup using the block's own attribute sources.",
-								"type": "boolean",
-								"default": true
-							},
-							"attributes": {
-								"description": "Attribute values to set on the resulting block, applied over any sourced attributes.\n\nA value is used as given, unless it is an object declaring a `source`, in which case it is read from the matched markup the same way a block attribute would be.",
-								"type": "object"
-							},
-							"innerBlocks": {
-								"description": "Which of the matched element's content becomes inner blocks: `true` for all of it, or a CSS selector matching the child elements to convert. Content that does not become an inner block stays with the block.",
-								"anyOf": [
-									{ "type": "boolean" },
-									{ "type": "string" }
-								],
-								"default": false
-							}
-						},
-						"required": [ "type" ],
-						"additionalProperties": false
-					}
+					"items": { "$ref": "#/definitions/blockTransform" }
+				},
+				"to": {
+					"description": "Transforms that turn this block into another one.",
+					"type": "array",
+					"items": { "$ref": "#/definitions/blockTransform" }
 				}
 			},
 			"additionalProperties": false

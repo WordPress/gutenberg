@@ -88,18 +88,21 @@
 	"transforms": {
 		"from": [
 			{
+				"name": "from-raw",
 				"type": "raw",
-				"selector": "ul",
-				"sourceAttributes": false,
-				"innerBlocks": "li"
-			},
-			{
-				"type": "raw",
-				"selector": "ol",
+				"selector": "ol,ul",
 				"sourceAttributes": false,
 				"innerBlocks": "li",
 				"attributes": {
-					"ordered": true,
+					"ordered": {
+						"type": "boolean",
+						"source": "tag",
+						"selector": "ol,ul",
+						"map": {
+							"ol": true,
+							"ul": false
+						}
+					},
 					"start": {
 						"type": "number",
 						"source": "attribute",

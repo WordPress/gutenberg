@@ -4,6 +4,10 @@ import deprecated from '@wordpress/deprecated';
 import { applyFilters } from '@wordpress/hooks';
 import warning from '@wordpress/warning';
 import { isValidIcon, normalizeIconObject, omit } from '../api/utils';
+import {
+	mergeBlockTransforms,
+	normalizeMetadataTransforms,
+} from '../api/metadata-transforms';
 import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../api/constants';
 import type {
 	BlockType,
@@ -102,6 +106,18 @@ export const processBlockType =
 				Array.isArray( blockSettings?.variations )
 					? blockSettings.variations
 					: []
+			),
+			/*
+			 * Transforms can be declared in `block.json`, where PHP can read
+			 * them too, as well as registered in JavaScript. A block that only
+			 * registers them in JavaScript keeps them unchanged.
+			 */
+			transforms: mergeBlockTransforms(
+				normalizeMetadataTransforms(
+					bootstrappedBlockType?.transforms as any,
+					name
+				),
+				blockSettings?.transforms as any
 			),
 		};
 

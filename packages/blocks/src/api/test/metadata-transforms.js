@@ -1,0 +1,220 @@
+import {
+	mergeBlockTransforms,
+	normalizeMetadataTransforms,
+	resolveDeclaredContentSchema,
+} from '../metadata-transforms';
+import {
+	getBlockType,
+	registerBlockType,
+	unregisterBlockType,
+} from '../registration';
+
+describe( 'mergeBlockTransforms', () => {
+	it( 'leaves transforms registered only in JavaScript untouched', () => {
+		const transform = () => {};
+		const client = {
+			from: [ { type: 'raw', selector: 'p', transform } ],
+			to: [ { type: 'block', blocks: [ 'core/heading' ], transform } ],
+		};
+
+		expect( mergeBlockTransforms( {}, client ) ).toEqual( client );
+		expect( mergeBlockTransforms( undefined, client ) ).toEqual( client );
+	} );
+
+	it( 'leaves a block declaring no transforms without any', () => {
+		expect( mergeBlockTransforms( {}, undefined ) ).toBeUndefined();
+		expect( mergeBlockTransforms( undefined, undefined ) ).toBeUndefined();
+	} );
+
+	it( 'carries over keys that are not a direction', () => {
+		const client = { supportedMobileTransforms: [ 'core/paragraph' ] };
+
+		expect( mergeBlockTransforms( {}, client ) ).toEqual( client );
+	} );
+
+	it( 'appends declared and registered transforms when no name is shared', () => {
+		const declared = { from: [ { name: 'from-raw', type: 'raw' } ] };
+		const client = { from: [ { type: 'block', blocks: [ 'core/x' ] } ] };
+
+		expect( mergeBlockTransforms( declared, client ).from ).toEqual( [
+			{ name: 'from-raw', type: 'raw' },
+			{ type: 'block', blocks: [ 'core/x' ] },
+		] );
+	} );
+
+	it( 'merges a registered transform over the declared one of the same name', () => {
+		const transform = () => {};
+		const declared = {
+			from: [ { name: 'from-raw', type: 'raw', selector: 'p' } ],
+		};
+		const client = { from: [ { name: 'from-raw', transform } ] };
+
+		expect( mergeBlockTransforms( declared, client ).from ).toEqual( [
+			{ name: 'from-raw', type: 'raw', selector: 'p', transform },
+		] );
+	} );
+} );
+
+describe( 'resolveDeclaredContentSchema', () => {
+	it( 'replaces the phrasing token with the phrasing content schema', () => {
+		const phrasingContentSchema = { strong: {} };
+		const resolved = resolveDeclaredContentSchema(
+			{ p: { children: 'phrasing' } },
+			{ phrasingContentSchema }
+		);
+
+		expect( resolved ).toEqual( {
+			p: { children: phrasingContentSchema },
+		} );
+	} );
+
+	it( 'picks the attribute list matching the context', () => {
+		const schema = {
+			p: { attributes: { default: [ 'style', 'id' ], paste: [] } },
+		};
+
+		expect(
+			resolveDeclaredContentSchema( schema, { isPaste: false } )
+		).toEqual( { p: { attributes: [ 'style', 'id' ] } } );
+		expect(
+			resolveDeclaredContentSchema( schema, { isPaste: true } )
+		).toEqual( { p: { attributes: [] } } );
+	} );
+
+	it( 'leaves a plain attribute list and a wildcard alone', () => {
+		const schema = {
+			blockquote: { children: '*' },
+			'wp-block': { attributes: [ 'data-block' ] },
+		};
+
+		expect( resolveDeclaredContentSchema( schema ) ).toEqual( schema );
+	} );
+
+	it( 'resolves tokens nested inside children', () => {
+		const phrasingContentSchema = { em: {} };
+		const resolved = resolveDeclaredContentSchema(
+			{ table: { children: { td: { children: 'phrasing' } } } },
+			{ phrasingContentSchema }
+		);
+
+		expect( resolved ).toEqual( {
+			table: { children: { td: { children: phrasingContentSchema } } },
+		} );
+	} );
+} );
+
+describe( 'normalizeMetadataTransforms', () => {
+	it( 'returns nothing for a block with no declared transforms', () => {
+		expect( normalizeMetadataTransforms( undefined, 'core/x' ) ).toEqual(
+			{}
+		);
+	} );
+
+	it( 'leaves a selector-only raw transform without a transform function', () => {
+		const { from } = normalizeMetadataTransforms(
+			{ from: [ { type: 'raw', selector: 'hr' } ] },
+			'core/separator'
+		);
+
+		expect( from ).toHaveLength( 1 );
+		expect( from[ 0 ].selector ).toBe( 'hr' );
+		expect( from[ 0 ].transform ).toBeUndefined();
+	} );
+
+	it( 'builds a transform function when the declaration needs one', () => {
+		const { from } = normalizeMetadataTransforms(
+			{
+				from: [
+					{
+						type: 'raw',
+						selector: 'blockquote',
+						sourceAttributes: false,
+						innerBlocks: true,
+					},
+				],
+			},
+			'core/quote'
+		);
+
+		expect( typeof from[ 0 ].transform ).toBe( 'function' );
+	} );
+
+	it( 'turns a declared schema into a function of the schema arguments', () => {
+		const { from } = normalizeMetadataTransforms(
+			{
+				from: [
+					{ type: 'raw', schema: { p: { children: 'phrasing' } } },
+				],
+			},
+			'core/paragraph'
+		);
+
+		const phrasingContentSchema = { b: {} };
+		expect(
+			from[ 0 ].schema( { phrasingContentSchema, isPaste: false } )
+		).toEqual( { p: { children: phrasingContentSchema } } );
+	} );
+
+	it( 'expands a block transform naming several blocks into one per block', () => {
+		const { to } = normalizeMetadataTransforms(
+			{
+				to: [
+					{
+						type: 'block',
+						blocks: [ 'core/paragraph', 'core/heading' ],
+						attributes: 'all',
+					},
+				],
+			},
+			'core/verse'
+		);
+
+		expect( to ).toHaveLength( 2 );
+		expect( to[ 0 ].blocks ).toEqual( [ 'core/paragraph' ] );
+		expect( to[ 1 ].blocks ).toEqual( [ 'core/heading' ] );
+	} );
+} );
+
+describe( 'block transforms declared in metadata', () => {
+	const source = 'test/source';
+	const target = 'test/target';
+
+	afterEach( () => {
+		[ source, target ].forEach( unregisterBlockType );
+	} );
+
+	it( 'carries the declared attributes across a block transform', () => {
+		registerBlockType(
+			{
+				name: target,
+				apiVersion: 3,
+				attributes: { title: { type: 'string' } },
+			},
+			{ title: 'Target', category: 'text', save: () => null }
+		);
+
+		registerBlockType(
+			{
+				name: source,
+				apiVersion: 3,
+				attributes: { heading: { type: 'string' } },
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ target ],
+							attributes: { title: 'heading' },
+						},
+					],
+				},
+			},
+			{ title: 'Source', category: 'text', save: () => null }
+		);
+
+		const [ transform ] = getBlockType( source ).transforms.to;
+		const result = transform.transform( { heading: 'Hello' }, [] );
+
+		expect( result.name ).toBe( target );
+		expect( result.attributes.title ).toBe( 'Hello' );
+	} );
+} );

@@ -51,22 +51,9 @@ const transforms = {
 				} ),
 		},
 		{
-			type: 'raw',
-			selector: 'h1,h2,h3,h4,h5,h6',
-			schema: ( { phrasingContentSchema, isPaste } ) => {
-				const schema = {
-					children: phrasingContentSchema,
-					attributes: isPaste ? [] : [ 'style', 'id' ],
-				};
-				return {
-					h1: schema,
-					h2: schema,
-					h3: schema,
-					h4: schema,
-					h5: schema,
-					h6: schema,
-				};
-			},
+			// Matching, the content schema and the heading level are declared
+			// in `block.json`; this supplies the text alignment, which cannot be.
+			name: 'from-raw',
 			transform( node ) {
 				const attributes = getBlockAttributes(
 					'core/heading',

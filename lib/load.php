@@ -133,10 +133,11 @@ require __DIR__ . '/compat/wordpress-7.1/icons.php';
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/blocks.php';
-require __DIR__ . '/experimental/html-to-blocks/class-gutenberg-html-element.php';
-require __DIR__ . '/experimental/html-to-blocks/class-gutenberg-block-attributes-parser.php';
-require __DIR__ . '/experimental/html-to-blocks/class-gutenberg-html-to-blocks.php';
-require __DIR__ . '/experimental/html-to-blocks/html-to-blocks.php';
+require __DIR__ . '/experimental/block-transforms/class-gutenberg-html-element.php';
+require __DIR__ . '/experimental/block-transforms/class-gutenberg-block-attributes-parser.php';
+require __DIR__ . '/experimental/block-transforms/class-gutenberg-html-to-blocks.php';
+require __DIR__ . '/experimental/block-transforms/class-gutenberg-block-transforms.php';
+require __DIR__ . '/experimental/block-transforms/block-transforms.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/script-modules.php';

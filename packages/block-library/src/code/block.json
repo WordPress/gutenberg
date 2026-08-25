@@ -65,8 +65,20 @@
 	"transforms": {
 		"from": [
 			{
+				"name": "from-raw",
 				"type": "raw",
-				"selector": "pre:has(> code)"
+				"selector": "pre:has(> code)",
+				"schema": {
+					"pre": {
+						"children": {
+							"code": {
+								"children": {
+									"#text": {}
+								}
+							}
+						}
+					}
+				}
 			}
 		]
 	},

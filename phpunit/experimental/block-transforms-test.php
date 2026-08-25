@@ -1,6 +1,7 @@
 <?php
 /**
- * Tests for converting HTML into blocks on the server.
+ * Tests for the block transforms declared in `block.json` and the conversions
+ * that read them on the server.
  *
  * @package gutenberg
  */
@@ -10,10 +11,11 @@
  * pipeline that reads them.
  *
  * @covers Gutenberg_HTML_To_Blocks
+ * @covers Gutenberg_Block_Transforms
  * @covers Gutenberg_Block_Attributes_Parser
  * @covers Gutenberg_HTML_Element
  */
-class Gutenberg_HTML_To_Blocks_Test extends WP_UnitTestCase {
+class Gutenberg_Block_Transforms_Test extends WP_UnitTestCase {
 	/**
 	 * Names of the block types registered for a single test.
 	 *
@@ -152,6 +154,45 @@ class Gutenberg_HTML_To_Blocks_Test extends WP_UnitTestCase {
 		$blocks = gutenberg_html_to_blocks( '<h3>Title</h3>' );
 
 		$this->assertArrayNotHasKey( 'content', $blocks[0]['attrs'], 'Sourced attributes are read back from the markup.' );
+	}
+
+	public function test_maps_a_sourced_value_onto_a_declared_attribute() {
+		$this->register(
+			'test/mapped-heading',
+			array(
+				'attributes' => array(
+					'level' => array(
+						'type'    => 'number',
+						'default' => 2,
+					),
+				),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'       => 'raw',
+							'selector'   => 'h1,h3',
+							'priority'   => 1,
+							'attributes' => array(
+								'level' => array(
+									'type'     => 'number',
+									'source'   => 'tag',
+									'selector' => 'h1,h3',
+									'map'      => array(
+										'h1' => 1,
+										'h3' => 3,
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$blocks = gutenberg_html_to_blocks( '<h1>One</h1><h3>Three</h3>' );
+
+		$this->assertSame( array( 'level' => 1 ), $blocks[0]['attrs'] );
+		$this->assertSame( array( 'level' => 3 ), $blocks[1]['attrs'] );
 	}
 
 	public function test_falls_back_to_the_html_block_for_unclaimed_markup() {
@@ -525,5 +566,194 @@ class Gutenberg_HTML_To_Blocks_Test extends WP_UnitTestCase {
 			'<!-- wp:list --><ul class="wp-block-list"><!-- wp:list-item --><li>Flour</li><!-- /wp:list-item --></ul><!-- /wp:list -->',
 			$markup
 		);
+	}
+
+	/**
+	 * Registers a dynamic block, which the server can serialize without any
+	 * saved markup.
+	 *
+	 * @param string $block_name Block name.
+	 * @param array  $settings   Block type settings.
+	 * @return void
+	 */
+	private function register_dynamic( $block_name, $settings ) {
+		$this->register(
+			$block_name,
+			array_merge(
+				array(
+					'render_callback' => static function () {
+						return '';
+					},
+				),
+				$settings
+			)
+		);
+	}
+
+	public function test_converts_between_blocks_that_declare_a_transform() {
+		$this->register_dynamic( 'test/calendar', array() );
+		$this->register_dynamic(
+			'test/archives',
+			array(
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'   => 'block',
+							'blocks' => array( 'test/calendar' ),
+						),
+					),
+				),
+			)
+		);
+
+		$blocks = gutenberg_switch_block_type(
+			array(
+				'blockName'    => 'test/calendar',
+				'attrs'        => array(),
+				'innerBlocks'  => array(),
+				'innerHTML'    => '',
+				'innerContent' => array(),
+			),
+			'test/archives'
+		);
+
+		$this->assertCount( 1, $blocks );
+		$this->assertSame( 'test/archives', $blocks[0]['blockName'] );
+		$this->assertSame( '<!-- wp:test/archives /-->', serialize_blocks( $blocks ) );
+	}
+
+	/**
+	 * @dataProvider data_attribute_policies
+	 *
+	 * @param mixed $policy   Declared attribute policy.
+	 * @param array $expected Expected attributes on the resulting block.
+	 */
+	public function test_applies_the_declared_attribute_policy( $policy, $expected ) {
+		$this->register_dynamic(
+			'test/source',
+			array( 'attributes' => array( 'heading' => array( 'type' => 'string' ) ) )
+		);
+
+		$transform = array(
+			'type'   => 'block',
+			'blocks' => array( 'test/source' ),
+		);
+
+		if ( null !== $policy ) {
+			$transform['attributes'] = $policy;
+		}
+
+		$this->register_dynamic(
+			'test/target',
+			array(
+				'attributes' => array( 'title' => array( 'type' => 'string' ) ),
+				'transforms' => array( 'from' => array( $transform ) ),
+			)
+		);
+
+		$blocks = gutenberg_switch_block_type(
+			array(
+				'blockName'    => 'test/source',
+				'attrs'        => array( 'heading' => 'Hello' ),
+				'innerBlocks'  => array(),
+				'innerHTML'    => '',
+				'innerContent' => array(),
+			),
+			'test/target'
+		);
+
+		$this->assertSame( $expected, $blocks[0]['attrs'] );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public static function data_attribute_policies() {
+		return array(
+			'no policy carries nothing'  => array( null, array() ),
+			'all carries everything'     => array( 'all', array( 'heading' => 'Hello' ) ),
+			'a map renames'              => array( array( 'title' => 'heading' ), array( 'title' => 'Hello' ) ),
+			'an unknown name is skipped' => array( array( 'title' => 'missing' ), array() ),
+		);
+	}
+
+	public function test_refuses_a_target_that_saves_its_own_markup() {
+		$this->register_dynamic( 'test/source', array() );
+		$this->register(
+			'test/static-target',
+			array(
+				'attributes' => array( 'content' => array( 'type' => 'string' ) ),
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'   => 'block',
+							'blocks' => array( 'test/source' ),
+						),
+					),
+				),
+			)
+		);
+
+		$blocks = gutenberg_switch_block_type(
+			array(
+				'blockName'    => 'test/source',
+				'attrs'        => array(),
+				'innerBlocks'  => array(),
+				'innerHTML'    => '',
+				'innerContent' => array(),
+			),
+			'test/static-target'
+		);
+
+		$this->assertNull(
+			$blocks,
+			'A block whose markup only its save() can produce cannot be converted to on the server.'
+		);
+	}
+
+	public function test_refuses_a_multi_block_selection_unless_declared() {
+		$this->register_dynamic( 'test/source', array() );
+		$this->register_dynamic(
+			'test/target',
+			array(
+				'transforms' => array(
+					'from' => array(
+						array(
+							'type'   => 'block',
+							'blocks' => array( 'test/source' ),
+						),
+					),
+				),
+			)
+		);
+
+		$block = array(
+			'blockName'    => 'test/source',
+			'attrs'        => array(),
+			'innerBlocks'  => array(),
+			'innerHTML'    => '',
+			'innerContent' => array(),
+		);
+
+		$this->assertNull( gutenberg_switch_block_type( array( $block, $block ), 'test/target' ) );
+		$this->assertNotNull( gutenberg_switch_block_type( array( $block ), 'test/target' ) );
+	}
+
+	public function test_returns_null_when_no_transform_applies() {
+		$this->register_dynamic( 'test/source', array() );
+		$this->register_dynamic( 'test/target', array() );
+
+		$block = array(
+			'blockName'    => 'test/source',
+			'attrs'        => array(),
+			'innerBlocks'  => array(),
+			'innerHTML'    => '',
+			'innerContent' => array(),
+		);
+
+		$this->assertNull( gutenberg_switch_block_type( $block, 'test/target' ) );
+		$this->assertNull( gutenberg_switch_block_type( $block, 'test/not-registered' ) );
 	}
 }

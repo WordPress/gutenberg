@@ -37,24 +37,6 @@ const transforms = {
 				} );
 			},
 		},
-		{
-			type: 'raw',
-			isMatch: ( node ) =>
-				node.nodeName === 'PRE' &&
-				node.children.length === 1 &&
-				node.firstChild.nodeName === 'CODE',
-			schema: {
-				pre: {
-					children: {
-						code: {
-							children: {
-								'#text': {},
-							},
-						},
-					},
-				},
-			},
-		},
 	],
 	to: [
 		{

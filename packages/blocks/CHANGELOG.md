@@ -4,6 +4,7 @@
 
 ### New Features
 
+-   Block transforms can be declared in `block.json`, where PHP can read them too, instead of only in JavaScript. Declared transforms are merged with those registered in JavaScript: a block registering transforms only in JavaScript is unaffected, and a JavaScript transform sharing a declared transform's `name` is merged over it ([#13163](https://github.com/WordPress/gutenberg/issues/13163)).
 -   Block variations and `block` type block transforms accept a `shortcut` property, declaring a keyboard shortcut that applies the variation or transform to the selected block. See the [block variations](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-variations/) and [block transforms](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-transforms/) documentation ([#81588](https://github.com/WordPress/gutenberg/pull/81588)).
 
 ## 15.26.0 (2026-08-12)

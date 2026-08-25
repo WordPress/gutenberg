@@ -105,8 +105,14 @@
 	"transforms": {
 		"from": [
 			{
+				"name": "from-raw",
 				"type": "raw",
 				"selector": "blockquote",
+				"schema": {
+					"blockquote": {
+						"children": "*"
+					}
+				},
 				"sourceAttributes": false,
 				"innerBlocks": true
 			}

@@ -46,8 +46,12 @@
 	"transforms": {
 		"from": [
 			{
+				"name": "from-raw",
 				"type": "raw",
-				"selector": "hr"
+				"selector": "hr",
+				"schema": {
+					"hr": {}
+				}
 			}
 		]
 	},

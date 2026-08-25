@@ -3,12 +3,9 @@ import { createBlock } from '@wordpress/blocks';
 const transforms = {
 	from: [
 		{
-			type: 'raw',
-			schema: {
-				'wp-block': { attributes: [ 'data-block' ] },
-			},
-			isMatch: ( node ) =>
-				node.dataset && node.dataset.block === 'core/more',
+			// Matching, the content schema and the custom text are declared in
+			// `block.json`; the teaser flag is not.
+			name: 'from-raw',
 			transform( node ) {
 				const { customText, noTeaser } = node.dataset;
 				const attrs = {};

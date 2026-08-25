@@ -60,8 +60,14 @@
 	"transforms": {
 		"from": [
 			{
+				"name": "from-raw",
 				"type": "raw",
-				"selector": "pre:not(:has(> code))"
+				"selector": "pre:not(:has(> code))",
+				"schema": {
+					"pre": {
+						"children": "phrasing"
+					}
+				}
 			}
 		]
 	},

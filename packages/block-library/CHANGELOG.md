@@ -8,7 +8,7 @@
 
 ### Internal
 
--   Declare `raw` block transforms in `block.json` for the Paragraph, Heading, List, List Item, Quote, Code, Preformatted, Separator, Image, Table, More and Page Break blocks, so HTML can be converted to blocks on the server ([#13163](https://github.com/WordPress/gutenberg/issues/13163)). The editor still reads its transforms from JavaScript; the new field is ignored there.
+-   Declare block transforms in `block.json` rather than only in JavaScript, so the editor and PHP read the same definition and HTML can be converted to blocks on the server ([#13163](https://github.com/WordPress/gutenberg/issues/13163)). Covers the `raw` transforms of the Paragraph, Heading, List, List Item, Quote, Code, Preformatted, Separator, Image, Table, More and Page Break blocks, and the block-to-block transforms of the Calendar and Tag Cloud blocks. A transform that cannot be written as data keeps its JavaScript definition and shares the declared transform's `name`.
 -   Heading: Declare the heading level and paragraph keyboard shortcuts on the block's variations and transforms, rather than in a `BlockKeyboardShortcuts` component that every editor had to render. The `BlockKeyboardShortcuts` private export has been removed ([#81588](https://github.com/WordPress/gutenberg/pull/81588)).
 -   Math: Use `ValidatedTextareaControl` from `@wordpress/ui` in the LaTeX popover instead of unlocking `ValidatedTextareaControl` from the `@wordpress/components` private APIs ([#81984](https://github.com/WordPress/gutenberg/pull/81984)).
 

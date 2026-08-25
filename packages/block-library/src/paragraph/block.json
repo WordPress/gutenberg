@@ -86,9 +86,19 @@
 	"transforms": {
 		"from": [
 			{
+				"name": "from-raw",
 				"type": "raw",
 				"selector": "p",
-				"priority": 20
+				"priority": 20,
+				"schema": {
+					"p": {
+						"children": "phrasing",
+						"attributes": {
+							"default": [ "style", "id" ],
+							"paste": []
+						}
+					}
+				}
 			}
 		]
 	},

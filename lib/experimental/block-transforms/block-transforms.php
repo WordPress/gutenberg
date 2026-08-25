@@ -1,6 +1,6 @@
 <?php
 /**
- * Block transforms declared in `block.json`, and HTML to block conversion in PHP.
+ * Block transforms declared in `block.json`, and the conversions that read them.
  *
  * See https://github.com/WordPress/gutenberg/issues/13163.
  *
@@ -49,6 +49,24 @@ function gutenberg_html_to_blocks( $html ) {
  */
 function gutenberg_html_to_block_markup( $html ) {
 	return serialize_blocks( gutenberg_html_to_blocks( $html ) );
+}
+
+/**
+ * Converts blocks to another block type using the transforms block types declare.
+ *
+ * The PHP counterpart of `switchToBlockType()` in `@wordpress/blocks`, limited to
+ * transforms that can be written as data in `block.json`.
+ *
+ * A transform produces the target block's attributes, not its saved markup, which
+ * only its JavaScript `save()` can generate. Conversion is refused for a target
+ * that saves markup, and allowed for one that renders on the server.
+ *
+ * @param array[]|array $blocks      Parsed block array, or a list of them.
+ * @param string        $target_name Name of the block type to convert to.
+ * @return array[]|null Parsed block arrays, or null when no transform applies.
+ */
+function gutenberg_switch_block_type( $blocks, $target_name ) {
+	return Gutenberg_Block_Transforms::switch_block_type( $blocks, $target_name );
 }
 
 /**

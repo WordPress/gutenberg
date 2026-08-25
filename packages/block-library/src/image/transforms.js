@@ -166,9 +166,10 @@ const schema = ( { phrasingContentSchema } ) => ( {
 const transforms = {
 	from: [
 		{
-			type: 'raw',
-			isMatch: ( node ) =>
-				node.nodeName === 'FIGURE' && !! node.querySelector( 'img' ),
+			// Matching is declared in `block.json`. The content schema matches
+			// class names by pattern, so it stays here, as does reading the
+			// alignment and attachment ID out of those class names.
+			name: 'from-raw',
 			schema,
 			transform: ( node ) => {
 				const img = node.querySelector( 'img' );

@@ -511,8 +511,17 @@ See [the variations documentation](/docs/reference-guides/block-api/block-variat
 	"transforms": {
 		"from": [
 			{
+				"name": "from-raw",
 				"type": "raw",
 				"selector": "h1,h2,h3,h4,h5,h6"
+			}
+		],
+		"to": [
+			{
+				"name": "to-paragraph",
+				"type": "block",
+				"blocks": [ "core/paragraph" ],
+				"attributes": { "content": "content" }
 			}
 		]
 	}
@@ -521,20 +530,47 @@ See [the variations documentation](/docs/reference-guides/block-api/block-variat
 
 Transforms describe how a block converts to and from other content. They have always been declared in JavaScript, where the editor uses them for pasting, for the "Convert to blocks" command, and for switching one block into another.
 
-Declaring the `raw` transforms in `block.json` makes the same information available to PHP, so HTML can be converted to blocks on the server: during an import, in WP-CLI, or from any code that has HTML and wants block markup. The transforms declared here are read by every registered block type, including third-party ones, so a plugin's blocks take part in server-side conversion without shipping any conversion code.
+Declaring them here instead means the editor and PHP read the same definition. That makes server-side conversion possible — during an import, in WP-CLI, or from any code holding HTML that wants block markup — and it works for every registered block, including third-party ones, without their shipping any conversion code.
 
-Each entry under `from` supports:
+Two kinds of transform are read: `raw`, which matches markup, and `block`, which matches another block type.
 
--   `type` (`string`, required): the kind of content the transform matches. Only `raw` is read on the server.
--   `selector` (`string`): a CSS selector matched against each top-level element of the source markup. Type, universal, class, ID and attribute selectors are supported, along with the descendant and child combinators and the `:has()` and `:not()` pseudo-classes.
+Common keys:
+
+-   `name` (`string`): identifies the transform. A transform registered in JavaScript under the same name is merged over the one declared here, which is how a block declares what PHP needs while keeping behaviour that can only be written as a function.
+-   `type` (`string`, required): `raw` or `block`.
 -   `priority` (`integer`, default `10`): match order, lowest first. A block that should only match when nothing more specific does, such as the Paragraph block, uses a higher number.
+-   `attributes`: attribute values for the resulting block. For a `raw` transform, an object applied over any sourced attributes; for a `block` transform, either `"all"` to carry every attribute across, or an object mapping each new attribute name to the name it takes its value from.
+
+Keys for a `raw` transform:
+
+-   `selector` (`string`): a CSS selector matched against each top-level element of the source markup. Type, universal, class, ID and attribute selectors are supported, along with the descendant and child combinators and the `:has()` and `:not()` pseudo-classes.
+-   `schema` (`object`): the content schema describing which markup survives conversion. Write `"phrasing"` where the phrasing content schema belongs, and `{ "default": [], "paste": [] }` where the allowed attributes differ when pasting.
 -   `sourceAttributes` (`boolean`, default `true`): whether to derive the block's attributes from the matched markup using the block's own attribute sources.
--   `attributes` (`object`): attribute values to set on the resulting block, applied over any sourced attributes. A value is used as given, unless it is an object declaring a `source`, in which case it is read from the matched markup the same way a block attribute would be.
 -   `innerBlocks` (`boolean|string`, default `false`): which of the matched element's content becomes inner blocks. `true` converts all of it; a CSS selector converts only the matching child elements and leaves the rest with the block.
+
+An `attributes` value is used as given, unless it is an object declaring a `source`, in which case it is read from the matched markup the way a block attribute would be. Such a value may also carry a `map` of sourced value to attribute value, which is how the Heading block turns a tag name into a level:
+
+```json
+{
+	"attributes": {
+		"level": {
+			"type": "number",
+			"source": "tag",
+			"selector": "h1,h2,h3,h4,h5,h6",
+			"map": { "h1": 1, "h2": 2, "h3": 3, "h4": 4, "h5": 5, "h6": 6 }
+		}
+	}
+}
+```
+
+Keys for a `block` transform:
+
+-   `blocks` (`string[]`): the block types the transform converts from (under `from`) or to (under `to`). `"*"` matches any block.
+-   `isMultiBlock` (`boolean`, default `false`): whether the transform accepts a multi-block selection.
 
 Markup that no block claims becomes a Custom HTML block rather than being guessed at.
 
-Transforms that need to match or build attributes imperatively cannot be expressed in JSON. Those keep their JavaScript definitions, and can additionally register `isMatch` and `transform` callbacks from PHP through the `register_block_type_args` filter.
+A transform that has to match or build attributes imperatively cannot be written as data. Those keep their JavaScript definitions and share the `name` of the entry declared here, and PHP can additionally register `isMatch` and `transform` callbacks through the `register_block_type_args` filter.
 
 ### Block Hooks
 

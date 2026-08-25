@@ -57,7 +57,24 @@ class Gutenberg_Block_Attributes_Parser {
 	 * @return mixed Attribute value, or null when the attribute has no value.
 	 */
 	public static function parse_single( $schema, $element ) {
-		return self::parse_attribute( '', $schema, $element, array() );
+		$value = self::apply_source( $schema, $element, true );
+
+		/*
+		 * A `map` turns the sourced value into the one the block declares, such
+		 * as a heading tag name into a heading level. It runs before validation
+		 * because the declared type describes the mapped value, not the sourced
+		 * one.
+		 */
+		if ( isset( $schema['map'] ) && is_array( $schema['map'] ) ) {
+			$key   = is_scalar( $value ) ? (string) $value : '';
+			$value = array_key_exists( $key, $schema['map'] ) ? $schema['map'][ $key ] : null;
+		}
+
+		if ( ! self::is_valid_by_type( $value, $schema ) || ! self::is_valid_by_enum( $value, $schema ) ) {
+			return null;
+		}
+
+		return $value;
 	}
 
 	/**
@@ -96,9 +113,13 @@ class Gutenberg_Block_Attributes_Parser {
 	 *
 	 * @param array                  $schema  Attribute definition.
 	 * @param Gutenberg_HTML_Element $element Element to read from.
+	 * @param bool                   $strict  Optional. Whether an unmatched selector yields
+	 *                                        null rather than a boolean attribute's `false`.
+	 *                                        A transform reads markup that may not be there;
+	 *                                        a block attribute always has a value.
 	 * @return mixed Sourced value, or null when nothing matched.
 	 */
-	private static function apply_source( $schema, $element ) {
+	private static function apply_source( $schema, $element, $strict = false ) {
 		$selector = isset( $schema['selector'] ) ? $schema['selector'] : null;
 		$source   = $schema['source'];
 
@@ -135,6 +156,10 @@ class Gutenberg_Block_Attributes_Parser {
 		$target = null === $selector ? $element : $element->closest_self_or_descendant( $selector );
 
 		if ( null === $target ) {
+			if ( $strict ) {
+				return null;
+			}
+
 			return 'attribute' === $source && isset( $schema['type'] ) && 'boolean' === $schema['type'] ? false : null;
 		}
 
