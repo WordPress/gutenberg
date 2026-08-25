@@ -1,5 +1,6 @@
 import {
 	getBlockTransforms,
+	pasteHandler,
 	rawHandler,
 	serialize,
 	// eslint-disable-next-line camelcase
@@ -149,5 +150,38 @@ describe( 'Transforms declared in block metadata', () => {
 		expect( image.name ).toBe( 'core/image' );
 		expect( image.attributes.id ).toBe( 42 );
 		expect( image.attributes.align ).toBe( 'left' );
+	} );
+
+	describe( 'pasting, which resolves the schema differently', () => {
+		const paste = ( HTML ) =>
+			serialize( pasteHandler( { HTML, mode: 'BLOCKS' } ) );
+
+		it( 'drops the attributes a declared schema allows only outside a paste', () => {
+			// The declared schema reads `{ "default": [ "style", "id" ], "paste": [] }`.
+			expect( paste( '<h2 id="x" style="color:red">Hi</h2>' ) ).toBe(
+				'<!-- wp:heading -->\n' +
+					'<h2 class="wp-block-heading">Hi</h2>\n' +
+					'<!-- /wp:heading -->'
+			);
+
+			// pasteHandler logs what it received and processed.
+			expect( console ).toHaveLogged();
+		} );
+
+		it( 'keeps a list nested inside a list item', () => {
+			const [ list ] = pasteHandler( {
+				HTML: '<ul><li>One<ul><li>Nested</li></ul></li></ul>',
+				mode: 'BLOCKS',
+			} );
+
+			const [ item ] = list.innerBlocks;
+
+			expect( item.name ).toBe( 'core/list-item' );
+			expect( item.innerBlocks.map( ( { name } ) => name ) ).toEqual( [
+				'core/list',
+			] );
+
+			expect( console ).toHaveLogged();
+		} );
 	} );
 } );
