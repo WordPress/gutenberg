@@ -42,7 +42,6 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/storybook',
 	'@wordpress/sync',
 	'@wordpress/theme',
-	'@wordpress/dataviews',
 	'@wordpress/fields',
 	'@wordpress/lazy-editor',
 	'@wordpress/media-editor',
