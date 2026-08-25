@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Remove `fixable` option from `i18n-no-flanking-whitespace` rule.
+- Remove `fixable` option from `i18n-no-flanking-whitespace` rule [#70279](https://github.com/WordPress/gutenberg/pull/70279).
 
 ## 22.11.0 (2025-06-04)
 
