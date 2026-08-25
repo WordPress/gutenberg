@@ -500,11 +500,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/navigation/edit/overlay-menu-preview-controls.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/navigation/edit/overlay-panel.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
