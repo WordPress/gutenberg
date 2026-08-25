@@ -1,9 +1,5 @@
 /**
- * Setup shared by every evaluation spec. A spec spreads this and adds only
- * what is its own — what it asks for, and what it asserts:
- *
- *     import base from '../../lib/base.js';
- *     export default { ...base, description, prompts, tests };
+ * Shared setup for every evaluation spec.
  */
 import providers from './providers.js';
 import defaultTest from './default-test.js';

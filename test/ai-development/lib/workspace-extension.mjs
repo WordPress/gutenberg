@@ -58,7 +58,29 @@ async function generateNativeSkills( workspace ) {
 	}
 }
 
-async function createWorkspace() {
+/**
+ * Resolves a row's base ref, so a moving branch cannot shift underneath a run
+ * and an unknown ref fails with a usable message.
+ *
+ * @param {string} baseRef Branch, tag or commit the workspace is built from.
+ * @return {Promise<string>} Resolved commit SHA.
+ */
+async function resolveBaseRef( baseRef ) {
+	try {
+		const { stdout } = await git( sourceRoot, [
+			'rev-parse',
+			'--verify',
+			`${ baseRef }^{commit}`,
+		] );
+		return stdout.trim();
+	} catch {
+		throw new Error(
+			`Ref not found: ${ baseRef }. Use a branch, tag or commit that exists in this checkout.`
+		);
+	}
+}
+
+async function createWorkspace( baseCommit ) {
 	const temporaryRoot = await fs.mkdtemp(
 		path.join( os.tmpdir(), 'gutenberg-agent-eval-' )
 	);
@@ -71,7 +93,7 @@ async function createWorkspace() {
 			'archive',
 			'--format=tar',
 			`--output=${ archive }`,
-			'HEAD',
+			baseCommit,
 		] );
 		await execFileAsync( 'tar', [ '-xf', archive, '-C', workspace ] );
 		await fs.unlink( archive );
@@ -132,7 +154,9 @@ async function cleanupWorkspace( workspace ) {
 
 export async function extensionHook( hookName, context ) {
 	if ( hookName === 'beforeEach' ) {
-		const workspace = await createWorkspace();
+		const workspace = await createWorkspace(
+			await resolveBaseRef( context.test.vars?.baseRef || 'HEAD' )
+		);
 		const sandbox = context.test.options?.sandbox;
 		const gradingProvider = context.test.options?.provider;
 
