@@ -213,6 +213,29 @@ export default function PostList( { postType } ) {
 		}
 	}, [ history, postIdWasDeleted, path ] );
 
+	// select the first item to preview.
+	useEffect( () => {
+		if (
+			postType === 'page' &&
+			hasResolved &&
+			! isLoadingData &&
+			data?.length > 0 &&
+			! postId
+		) {
+			const firstItemId = getItemId( data[ 0 ] );
+
+			setSelection( [ firstItemId ] );
+
+			const newUrl = addQueryArgs( window.location.href, {
+				postId: firstItemId,
+			} );
+
+			window.history.replaceState( window.history.state, '', newUrl );
+
+			window.dispatchEvent( new Event( 'popstate' ) );
+		}
+	}, [ postType, hasResolved, isLoadingData, data, postId ] );
+
 	const paginationInfo = useMemo(
 		() => ( {
 			totalItems,
