@@ -79,15 +79,25 @@ function useBubbleEvents( iframeDocument ) {
 	} );
 }
 
-const iframeSrcCache = new WeakMap();
+const iframeSrcCaches = new Map();
 const iframeSrcCleanup = globalThis.FinalizationRegistry
 	? new globalThis.FinalizationRegistry( ( url ) =>
 			URL.revokeObjectURL( url )
 	  )
 	: undefined;
+const inlineStylesheetCache = new Map();
 
-function getIframeSrc( resolvedAssets ) {
-	let src = iframeSrcCache.get( resolvedAssets );
+function getIframeSrc( resolvedAssets, inlineStyles, skipScripts ) {
+	const cacheKey = `${ inlineStyles ? 'inline-styles' : 'linked-styles' }:${
+		skipScripts ? 'no-scripts' : 'scripts'
+	}`;
+	let cache = iframeSrcCaches.get( cacheKey );
+	if ( ! cache ) {
+		cache = new WeakMap();
+		iframeSrcCaches.set( cacheKey, cache );
+	}
+
+	let src = cache.get( resolvedAssets );
 	if ( src ) {
 		return src;
 	}
@@ -118,16 +128,73 @@ function getIframeSrc( resolvedAssets ) {
 				background-color: white;
 			}
 		</style>
-		${ resolvedAssets.styles ?? '' }
-		${ resolvedAssets.scripts ?? '' }
+		${ inlineStyles ? '' : resolvedAssets.styles ?? '' }
+		${ skipScripts ? '' : resolvedAssets.scripts ?? '' }
 	</head>
 	${ body }
 </html>`;
 
 	src = URL.createObjectURL( new Blob( [ html ], { type: 'text/html' } ) );
-	iframeSrcCache.set( resolvedAssets, src );
+	cache.set( resolvedAssets, src );
 	iframeSrcCleanup?.register( resolvedAssets, src );
 	return src;
+}
+
+function getInlineStylesheet( href ) {
+	let stylesheet = inlineStylesheetCache.get( href );
+	if ( stylesheet ) {
+		return stylesheet;
+	}
+
+	stylesheet = fetch( href ).then( ( response ) => {
+		if ( ! response.ok ) {
+			throw new Error( `Unable to fetch stylesheet: ${ href }` );
+		}
+		return response.text();
+	} );
+	inlineStylesheetCache.set( href, stylesheet );
+	return stylesheet;
+}
+
+function appendInlineStyles( iframeDocument, styles ) {
+	if ( ! styles ) {
+		return;
+	}
+
+	const container = iframeDocument.createElement( 'div' );
+	container.innerHTML = styles;
+
+	for ( const node of container.children ) {
+		if ( node.tagName === 'STYLE' ) {
+			iframeDocument.head.appendChild( node.cloneNode( true ) );
+			continue;
+		}
+
+		const href = node.getAttribute( 'href' );
+		if ( node.tagName !== 'LINK' || ! href ) {
+			iframeDocument.head.appendChild( node.cloneNode( true ) );
+			continue;
+		}
+
+		getInlineStylesheet( href )
+			.then( ( css ) => {
+				const style = iframeDocument.createElement( 'style' );
+				style.textContent = css;
+				style.setAttribute( 'data-wp-inline-stylesheet', href );
+				for ( const attribute of node.attributes ) {
+					if (
+						attribute.name !== 'href' &&
+						attribute.name !== 'rel'
+					) {
+						style.setAttribute( attribute.name, attribute.value );
+					}
+				}
+				iframeDocument.head.appendChild( style );
+			} )
+			.catch( () => {
+				iframeDocument.head.appendChild( node.cloneNode( true ) );
+			} );
+	}
 }
 
 function Iframe( {
@@ -137,6 +204,8 @@ function Iframe( {
 	scale = 1,
 	frameSize = 0,
 	readonly,
+	inlineStyles = false,
+	skipScripts = false,
 	forwardedRef: ref,
 	title = __( 'Editor canvas' ),
 	...props
@@ -202,6 +271,9 @@ function Iframe( {
 			const { documentElement } = contentDocument;
 			iFrameDocument = contentDocument;
 			setIframeDocument( contentDocument );
+			if ( inlineStyles ) {
+				appendInlineStyles( contentDocument, resolvedAssets.styles );
+			}
 
 			documentElement.classList.add( 'block-editor-iframe__html' );
 
@@ -209,6 +281,14 @@ function Iframe( {
 
 			for ( const compatStyle of getCompatibilityStyles() ) {
 				if ( contentDocument.getElementById( compatStyle.id ) ) {
+					continue;
+				}
+
+				if ( inlineStyles && compatStyle.tagName === 'LINK' ) {
+					appendInlineStyles(
+						contentDocument,
+						compatStyle.outerHTML
+					);
 					continue;
 				}
 
@@ -291,7 +371,7 @@ function Iframe( {
 		[ unguardedBodyRef ]
 	);
 
-	const src = getIframeSrc( resolvedAssets );
+	const src = getIframeSrc( resolvedAssets, inlineStyles, skipScripts );
 
 	// Make sure to not render the before and after focusable div elements in view
 	// mode. They're only needed to capture focus in edit mode.
