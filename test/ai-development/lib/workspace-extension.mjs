@@ -139,27 +139,7 @@ async function cleanupWorkspace( workspace ) {
 	}
 
 	activeWorkspaces.delete( workspace );
-	for ( let attempt = 1; attempt <= 5; attempt++ ) {
-		try {
-			await fs.rm( temporaryRoot, { recursive: true, force: true } );
-			return;
-		} catch ( error ) {
-			if ( attempt === 5 ) {
-				throw error;
-			}
-			// A directory can briefly resist deletion on macOS — an ACL
-			// left by another process, or a handle not yet released. Retry
-			// rather than leaving a temporary checkout behind.
-			if ( process.platform === 'darwin' ) {
-				await execFileAsync( 'chmod', [ '-RN', temporaryRoot ] ).catch(
-					() => undefined
-				);
-			}
-			await new Promise( ( resolve ) =>
-				setTimeout( resolve, attempt * 250 )
-			);
-		}
-	}
+	await fs.rm( temporaryRoot, { recursive: true, force: true } );
 }
 
 /**
