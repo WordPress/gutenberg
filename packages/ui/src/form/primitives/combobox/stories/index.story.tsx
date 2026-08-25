@@ -137,8 +137,8 @@ export const DetachedInline: Story = {
 		items: ITEMS,
 		multiple: true,
 		inline: true,
-		// `inline` requires `open` so the list counts as visible and takes
-		// its accessible name from the input.
+		// `inline` requires `open` so the input references the visible list
+		// with `aria-controls`.
 		open: true,
 		children: [
 			<Combobox.Input
