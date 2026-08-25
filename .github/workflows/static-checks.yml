@@ -121,8 +121,8 @@ jobs:
               run: npm run build
 
             - name: Check type declaration files
-              # Runs against the final package output, including the declarations
-              # and runtime files that are included in packed tarballs.
+              # Runs against the final package output, including the built
+              # declarations and runtime files.
               run: npm run check:type-declarations
 
             - name: Validate package contents

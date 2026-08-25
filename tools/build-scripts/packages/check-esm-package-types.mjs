@@ -1,4 +1,12 @@
-import { readFile, readdir } from 'node:fs/promises';
+import {
+	access,
+	mkdtemp,
+	readFile,
+	readdir,
+	rm,
+	writeFile,
+} from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import spawn from 'cross-spawn';
@@ -10,10 +18,23 @@ const rootDirectory = path.resolve(
 );
 const packagesDirectory = path.join( rootDirectory, 'packages' );
 
-function publishesBuildTypes( packageJson ) {
-	return packageJson.files?.some(
-		( file ) => file === 'build-types' || file.startsWith( 'build-types/' )
-	);
+async function publishesBuildTypes( { directory, packageJson } ) {
+	if ( packageJson.files ) {
+		return packageJson.files.some(
+			( file ) =>
+				file === 'build-types' || file.startsWith( 'build-types/' )
+		);
+	}
+
+	try {
+		await access( path.join( directory, 'build-types' ) );
+		return true;
+	} catch ( error ) {
+		if ( error.code !== 'ENOENT' ) {
+			throw error;
+		}
+		return false;
+	}
 }
 
 function pointsOnlyToCss( target ) {
@@ -34,33 +55,43 @@ function getCssEntrypoints( packageJson ) {
 }
 
 async function checkNodeNextTypes( { directory, packageJson } ) {
-	const entrypoints = await fastGlob( 'build-types/**/*.d.{ts,mts,cts}', {
+	const declarations = await fastGlob( 'build-types/**/*.d.{ts,mts,cts}', {
 		cwd: directory,
 		absolute: true,
 	} );
-	if ( entrypoints.length === 0 ) {
+	if ( declarations.length === 0 ) {
 		throw new Error( `No declarations found for ${ packageJson.name }` );
 	}
-	const result = spawn.sync(
-		'tsc',
-		[
-			'--ignoreConfig',
-			'--target',
-			'esnext',
-			'--module',
-			'nodenext',
-			'--moduleResolution',
-			'nodenext',
-			'--noEmit',
-			'--pretty',
-			'false',
-			...entrypoints,
-		],
-		{
+
+	const temporaryDirectory = await mkdtemp(
+		path.join( tmpdir(), 'gutenberg-esm-types-' )
+	);
+	const tsconfigPath = path.join( temporaryDirectory, 'tsconfig.json' );
+	let result;
+	try {
+		await writeFile(
+			tsconfigPath,
+			JSON.stringify( {
+				compilerOptions: {
+					target: 'esnext',
+					module: 'nodenext',
+					moduleResolution: 'nodenext',
+					noEmit: true,
+					pretty: false,
+					typeRoots: [
+						path.join( rootDirectory, 'node_modules', '@types' ),
+					],
+				},
+				files: declarations,
+			} )
+		);
+		result = spawn.sync( 'tsc', [ '--project', tsconfigPath ], {
 			cwd: rootDirectory,
 			encoding: 'utf8',
-		}
-	);
+		} );
+	} finally {
+		await rm( temporaryDirectory, { recursive: true, force: true } );
+	}
 	if ( result.error ) {
 		throw result.error;
 	}
@@ -76,6 +107,9 @@ async function checkNodeNextTypes( { directory, packageJson } ) {
 	const diagnostics = `${ result.stdout }\n${ result.stderr }`.split(
 		/\r?\n/
 	);
+	const hasTypeScriptDiagnostics = diagnostics.some( ( line ) =>
+		/error TS\d+:/.test( line )
+	);
 	// Ignore diagnostics owned by external dependencies. Global compiler errors
 	// and errors in this package's published declarations still fail the check.
 	const relevantDiagnostics = diagnostics.filter( ( line ) => {
@@ -90,6 +124,14 @@ async function checkNodeNextTypes( { directory, packageJson } ) {
 			`Incorrect NodeNext types for ${
 				packageJson.name
 			}:\n${ relevantDiagnostics.join( '\n' ) }`
+		);
+	}
+	if ( result.status !== 0 && ! hasTypeScriptDiagnostics ) {
+		const output = `${ result.stdout }\n${ result.stderr }`.trim();
+		throw new Error(
+			`NodeNext type check failed for ${ packageJson.name }:\n${
+				output || `tsc exited with status ${ result.status }.`
+			}`
 		);
 	}
 	console.log( `${ packageJson.name }: NodeNext declarations valid.` );
@@ -121,14 +163,33 @@ async function getPublishedEsmPackages() {
 			} )
 	);
 
-	return packages
-		.filter(
-			( packageData ) =>
-				packageData &&
-				! packageData.packageJson.private &&
-				packageData.packageJson.type === 'module' &&
-				publishesBuildTypes( packageData.packageJson )
-		)
+	const publishedEsmPackages = packages.filter(
+		( packageData ) =>
+			packageData &&
+			! packageData.packageJson.private &&
+			packageData.packageJson.type === 'module'
+	);
+	const buildTypesPublication = await Promise.all(
+		publishedEsmPackages.map( async ( packageData ) => ( {
+			packageData,
+			publishesBuildTypes: await publishesBuildTypes( packageData ),
+		} ) )
+	);
+
+	for ( const {
+		packageData,
+		publishesBuildTypes: publishes,
+	} of buildTypesPublication ) {
+		if ( ! publishes ) {
+			console.log(
+				`${ packageData.packageJson.name }: Skipping ESM declaration validation because build-types is not published.`
+			);
+		}
+	}
+
+	return buildTypesPublication
+		.filter( ( { publishesBuildTypes: publishes } ) => publishes )
+		.map( ( { packageData } ) => packageData )
 		.sort( ( a, b ) =>
 			a.packageJson.name.localeCompare( b.packageJson.name )
 		);
@@ -167,6 +228,22 @@ async function checkPackage( packageData ) {
 	}
 }
 
-for ( const packageData of await getPublishedEsmPackages() ) {
-	await checkPackage( packageData );
+const publishedEsmPackages = await getPublishedEsmPackages();
+const results = await Promise.allSettled(
+	publishedEsmPackages.map( checkPackage )
+);
+
+results.forEach( ( result, index ) => {
+	if ( result.status === 'rejected' ) {
+		const packageName = publishedEsmPackages[ index ].packageJson.name;
+		const message =
+			result.reason instanceof Error
+				? result.reason.message
+				: String( result.reason );
+		console.error( `${ packageName }: ${ message }` );
+	}
+} );
+
+if ( results.some( ( result ) => result.status === 'rejected' ) ) {
+	process.exitCode = 1;
 }
