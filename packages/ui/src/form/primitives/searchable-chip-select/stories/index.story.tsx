@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from '@wordpress/element';
 import { fn } from 'storybook/test';
 import { SearchableChipSelect } from '../';
 import {
@@ -10,8 +9,14 @@ import {
 import { ITEMS } from './fixtures';
 
 const meta: Meta< typeof SearchableChipSelect > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/Form/Primitives/SearchableChipSelect',
 	component: SearchableChipSelect,
+	// Temporary: Due to an upstream bug, render the root explicitly so the
+	// components manifest extractor can resolve props from the JSX.
+	//
+	// See: https://github.com/storybookjs/storybook/issues/34877
+	render: ( args ) => <SearchableChipSelect { ...args } />,
 	subcomponents: {
 		'SearchableChipSelect.Group': SearchableChipSelect.Group,
 		'SearchableChipSelect.GroupLabel': SearchableChipSelect.GroupLabel,
@@ -26,9 +31,8 @@ const meta: Meta< typeof SearchableChipSelect > = {
 	},
 	parameters: {
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components`, overlays compatibility, and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
@@ -40,58 +44,6 @@ export const Default: Story = {
 	args: {
 		defaultValue: [ ITEMS[ 0 ], ITEMS[ 1 ] ],
 		items: ITEMS,
-	},
-};
-
-/**
- * Mark a creatable action with `creatable: true` on an item in `items`.
- * It renders in the list footer and is excluded from the main list
- * automatically. Handle creation in `onValueChange`.
- */
-export const Creatable: Story = {
-	args: {
-		...Default.args,
-	},
-	render: function Template( args ) {
-		const [ inputValue, setInputValue ] = useState( '' );
-		const [ value, setValue ] = useState< typeof ITEMS >( [
-			ITEMS[ 0 ],
-			ITEMS[ 1 ],
-		] );
-		const creatableItem = {
-			value: '__create__',
-			label:
-				'Create new item' + ( inputValue ? `: ${ inputValue }` : '' ),
-			creatable: true,
-		};
-
-		return (
-			<SearchableChipSelect
-				{ ...args }
-				items={ [ ...ITEMS, creatableItem ] }
-				inputValue={ inputValue }
-				onInputValueChange={ setInputValue }
-				value={ value }
-				onValueChange={ ( values: typeof ITEMS, event ) => {
-					if (
-						values.some(
-							( item ) => item.value === creatableItem.value
-						)
-					) {
-						// eslint-disable-next-line no-alert
-						alert( `Create new item: '${ inputValue }'` );
-						setValue(
-							values.filter(
-								( item ) => item.value !== creatableItem.value
-							)
-						);
-					} else {
-						setValue( values );
-					}
-					args.onValueChange?.( values, event );
-				} }
-			/>
-		);
 	},
 };
 
@@ -169,78 +121,6 @@ export const Grouped: Story = {
 				</SearchableChipSelect.Collection>
 			</SearchableChipSelect.Group>
 		),
-	},
-};
-
-/**
- * Grouped items with a creatable footer item. Include the creatable item in
- * `items` as a creatable-only group and handle creation in `onValueChange`.
- */
-export const GroupedCreatable: Story = {
-	render: function Template( args ) {
-		const [ inputValue, setInputValue ] = useState( '' );
-		const [ value, setValue ] = useState< FixtureItem[] >( [
-			GROUPED_ITEMS[ 0 ].items[ 0 ],
-			GROUPED_ITEMS[ 1 ].items[ 0 ],
-		] );
-		const creatableItem = {
-			value: '__create__',
-			label:
-				'Create new item' + ( inputValue ? `: ${ inputValue }` : '' ),
-			creatable: true,
-		};
-		const items = [
-			...GROUPED_ITEMS,
-			{ label: '', items: [ creatableItem ] },
-		];
-
-		return (
-			<SearchableChipSelect
-				{ ...args }
-				items={ items }
-				inputValue={ inputValue }
-				onInputValueChange={ setInputValue }
-				value={ value }
-				onValueChange={ ( values: FixtureItem[], event ) => {
-					if (
-						values.some(
-							( item ) => item.value === creatableItem.value
-						)
-					) {
-						// eslint-disable-next-line no-alert
-						alert( `Create new item: '${ inputValue }'` );
-						setValue(
-							values.filter(
-								( item ) => item.value !== creatableItem.value
-							)
-						);
-					} else {
-						setValue( values );
-					}
-					args.onValueChange?.( values, event );
-				} }
-				children={ ( group: FixtureGroup ) => (
-					<SearchableChipSelect.Group
-						key={ group.label }
-						items={ group.items }
-					>
-						<SearchableChipSelect.GroupLabel>
-							{ group.label }
-						</SearchableChipSelect.GroupLabel>
-						<SearchableChipSelect.Collection>
-							{ ( item: FixtureItem ) => (
-								<SearchableChipSelect.Item
-									key={ item.value }
-									value={ item }
-								>
-									{ item.label }
-								</SearchableChipSelect.Item>
-							) }
-						</SearchableChipSelect.Collection>
-					</SearchableChipSelect.Group>
-				) }
-			/>
-		);
 	},
 };
 

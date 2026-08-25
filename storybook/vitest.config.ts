@@ -6,9 +6,10 @@ import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 const configDir = import.meta.dirname;
 
 export default defineConfig( {
-	// The story globs in `main.ts` reach into `../packages`, so the Vite root
-	// has to be the repository root for Vitest to match them.
-	root: path.resolve( configDir, '..' ),
+	// `storybook/test` is served unbundled, and the optimizer only discovers
+	// its CommonJS dependencies when they sit in the Vite root's
+	// `node_modules`. Pre-bundle them from the package that owns them.
+	optimizeDeps: { include: [ 'storybook > @testing-library/dom' ] },
 	plugins: [
 		storybookTest( {
 			configDir,
@@ -17,6 +18,9 @@ export default defineConfig( {
 	],
 	test: {
 		name: 'storybook',
+		// Those includes are repository-relative, so anchor the scan there
+		// instead of following the Vite root, which `main.ts` may move.
+		dir: path.resolve( configDir, '..' ),
 		reporters: [
 			'default',
 			path.resolve( configDir, 'vitest-story-index-reporter.ts' ),
