@@ -1,6 +1,6 @@
 import { get, OKLCH, parse } from 'colorjs.io/fn';
 import { buildAccentRamp, buildBgRamp } from '../..';
-import { getContrast } from '../../lib/color-utils';
+import { clampToGamut, getContrast } from '../../lib/color-utils';
 import { DEFAULT_SEED_COLORS } from '../../lib/constants';
 import type { RampResult } from '../../lib/types';
 import {
@@ -167,26 +167,31 @@ describe( 'perceptual foreground experiment', () => {
 		}
 	);
 
-	it( 'spaces the uniform variant within one APCA point after serialization', () => {
-		const backgroundRamp = buildBgRamp( DEFAULT_SEED_COLORS.background );
-		const scale = buildScale(
-			'uniform',
-			backgroundRamp,
-			backgroundRamp,
-			backgroundRamp.ramp.surface2
-		);
-		const contrasts = scale.colors.map( ( color ) =>
-			getPerceptualContrast( backgroundRamp.ramp.surface2, color )
-		);
-		const intervals = contrasts
-			.slice( 1 )
-			.map( ( contrast, index ) =>
-				Math.abs( contrast - contrasts[ index ] )
+	it.each( [ 'uniform', 'uniform-free-endpoint' ] as const )(
+		'spaces the %s variant within one APCA point after serialization',
+		( method ) => {
+			const backgroundRamp = buildBgRamp(
+				DEFAULT_SEED_COLORS.background
 			);
-		expect(
-			Math.max( ...intervals ) - Math.min( ...intervals )
-		).toBeLessThan( 1 );
-	} );
+			const scale = buildScale(
+				method,
+				backgroundRamp,
+				backgroundRamp,
+				backgroundRamp.ramp.surface2
+			);
+			const contrasts = scale.colors.map( ( color ) =>
+				getPerceptualContrast( backgroundRamp.ramp.surface2, color )
+			);
+			const intervals = contrasts
+				.slice( 1 )
+				.map( ( contrast, index ) =>
+					Math.abs( contrast - contrasts[ index ] )
+				);
+			expect(
+				Math.max( ...intervals ) - Math.min( ...intervals )
+			).toBeLessThan( 1 );
+		}
+	);
 
 	it( 'preserves lower anchors in the semantic-anchor variant', () => {
 		const backgroundRamp = buildBgRamp( DEFAULT_SEED_COLORS.background );
@@ -207,59 +212,90 @@ describe( 'perceptual foreground experiment', () => {
 		expect( scale.colors[ 3 ] ).not.toBe( scale.colors[ 4 ] );
 	} );
 
-	it( 'releases the legacy strong endpoint in the chroma-first variant', () => {
+	it( 'uses the chroma-preserving path for every perceptual variant', () => {
+		const backgroundRamp = buildBgRamp( '#777777' );
+		const primaryRamp = buildAccentRamp( '#d63638', backgroundRamp );
+		const seed = parse( primaryRamp.ramp.bgFill1 );
+		const seedChroma = get( seed, [ OKLCH, 'c' ] );
+		const seedHue = get( seed, [ OKLCH, 'h' ] );
+
+		for ( const method of EXPERIMENTAL_METHODS ) {
+			const scale = buildScale(
+				method,
+				primaryRamp,
+				backgroundRamp,
+				primaryRamp.ramp.bgFill1
+			);
+			const chromaTotals = scale.colors.slice( 0, -1 ).reduce(
+				( totals, color ) => {
+					const parsed = parse( color );
+					const expected = clampToGamut( {
+						space: OKLCH,
+						coords: [
+							get( parsed, [ OKLCH, 'l' ] ),
+							seedChroma,
+							seedHue,
+						],
+						alpha: seed.alpha ?? null,
+					} );
+
+					return {
+						actual: totals.actual + get( parsed, [ OKLCH, 'c' ] ),
+						expected:
+							totals.expected + get( expected, [ OKLCH, 'c' ] ),
+					};
+				},
+				{ actual: 0, expected: 0 }
+			);
+
+			expect(
+				chromaTotals.actual / chromaTotals.expected
+			).toBeGreaterThan( 0.9 );
+		}
+	} );
+
+	it( 'isolates endpoint release to the uniform free-endpoint variant', () => {
 		const backgroundRamp = buildBgRamp( DEFAULT_SEED_COLORS.background );
 		const primaryRamp = buildAccentRamp(
 			DEFAULT_SEED_COLORS.primary,
 			backgroundRamp
 		);
-		const scale = buildScale(
-			'chroma-first',
+
+		for ( const method of [
+			'uniform',
+			'semantic-anchors',
+			'eased',
+		] as const ) {
+			expect(
+				buildScale(
+					method,
+					primaryRamp,
+					backgroundRamp,
+					primaryRamp.ramp.bgFill1
+				).colors[ 4 ]
+			).toBe( primaryRamp.ramp.fgSurface4 );
+		}
+
+		const releasedScale = buildScale(
+			'uniform-free-endpoint',
 			primaryRamp,
 			backgroundRamp,
 			primaryRamp.ramp.bgFill1
 		);
 
-		expect( scale.colors[ 4 ] ).not.toBe( primaryRamp.ramp.fgSurface4 );
+		expect( releasedScale.colors[ 4 ] ).not.toBe(
+			primaryRamp.ramp.fgSurface4
+		);
 		expect(
 			getPerceptualContrast(
 				backgroundRamp.ramp.surface2,
-				scale.colors[ 4 ]
+				releasedScale.colors[ 4 ]
 			)
 		).toBeLessThan(
 			getPerceptualContrast(
 				backgroundRamp.ramp.surface2,
 				primaryRamp.ramp.fgSurface4
 			)
-		);
-	} );
-
-	it( 'preserves more accent chroma at the middle-gray polarity boundary', () => {
-		const backgroundRamp = buildBgRamp( '#777777' );
-		const primaryRamp = buildAccentRamp( '#d63638', backgroundRamp );
-		const taperedScale = buildScale(
-			'uniform',
-			primaryRamp,
-			backgroundRamp,
-			primaryRamp.ramp.bgFill1
-		);
-		const chromaFirstScale = buildScale(
-			'chroma-first',
-			primaryRamp,
-			backgroundRamp,
-			primaryRamp.ramp.bgFill1
-		);
-		const getTotalChroma = ( colors: readonly string[] ) =>
-			colors
-				.slice( 0, -1 )
-				.reduce(
-					( total, color ) =>
-						total + get( parse( color ), [ OKLCH, 'c' ] ),
-					0
-				);
-
-		expect( getTotalChroma( chromaFirstScale.colors ) ).toBeGreaterThan(
-			getTotalChroma( taperedScale.colors )
 		);
 	} );
 

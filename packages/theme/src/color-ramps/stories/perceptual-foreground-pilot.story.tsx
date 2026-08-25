@@ -56,25 +56,25 @@ const METHOD_DETAILS: Record<
 		description:
 			'Current four-step ramp, with the strongest value repeated for the fifth step.',
 	},
-	'chroma-first': {
-		label: 'Chroma-first',
-		description:
-			'Preserves seed chroma and frees the legacy 7:1 endpoint while keeping every WCAG floor.',
-	},
 	uniform: {
-		label: 'Uniform APCA',
+		label: 'Uniform APCA · fixed Step 5',
 		description:
-			'Five equal intervals on the tapered path. The legacy strong endpoint remains fixed.',
+			'Preserves seed chroma and uses five equal intervals ending at the legacy strong endpoint.',
+	},
+	'uniform-free-endpoint': {
+		label: 'Uniform APCA · released Step 5',
+		description:
+			'The same chroma-preserving method, using the least-extreme Step 5 that supports useful spacing.',
 	},
 	'semantic-anchors': {
 		label: 'Semantic anchors',
 		description:
-			'Keeps compliant lower steps and the legacy strong endpoint, then inserts a resting step.',
+			'Keeps compliant lower steps and the legacy strong endpoint, then inserts a chroma-preserving resting step.',
 	},
 	eased: {
 		label: 'Eased APCA',
 		description:
-			'Uses progressively larger intervals on the tapered path toward the fixed strong endpoint.',
+			'Uses progressively larger chroma-preserving intervals toward the fixed strong endpoint.',
 	},
 };
 
@@ -396,10 +396,11 @@ function PilotComparison() {
 					regression.
 				</p>
 				<p>
-					Chroma-first preserves seed chroma where sRGB permits and
-					uses the least-extreme endpoint that can maintain a
-					seven-point APCA interval, or the largest available interval
-					when space is limited.
+					Every perceptual variant preserves seed chroma where sRGB
+					permits. Only Uniform APCA · released Step 5 removes the
+					legacy endpoint constraint. It targets a seven-point APCA
+					interval, or the largest available interval when space is
+					limited.
 				</p>
 			</header>
 			{ SAMPLE_COMBINATIONS.map( ( combination ) => {

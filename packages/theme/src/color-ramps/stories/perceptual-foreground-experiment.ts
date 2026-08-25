@@ -8,14 +8,13 @@ import {
 } from 'colorjs.io/fn';
 import { clampToGamut, getColorString, getContrast } from '../lib/color-utils';
 import { UNIVERSAL_CONTRAST_TOPUP } from '../lib/constants';
-import { taperChroma } from '../lib/taper-chroma';
 import type { RampResult } from '../lib/types';
 import { solveWithBisect } from '../lib/utils';
 
 export const EXPERIMENTAL_FOREGROUND_METHODS = [
 	'current',
-	'chroma-first',
 	'uniform',
+	'uniform-free-endpoint',
 	'semantic-anchors',
 	'eased',
 ] as const;
@@ -31,12 +30,7 @@ export type ExperimentalForegroundScale = {
 
 const FOREGROUND_WCAG_FLOORS = [ 2, 3, 4.5, 4.5, 4.5 ] as const;
 const EASED_SPACING_POWER = 1.35;
-const CHROMA_FIRST_MINIMUM_APCA_INTERVAL = 7;
-const FOREGROUND_TAPER_CHROMA_OPTIONS = {
-	alpha: 0.6,
-	kLight: 0.2,
-	kDark: 0.2,
-} as const;
+const FREE_ENDPOINT_MINIMUM_APCA_INTERVAL = 7;
 
 ColorSpace.register( sRGB );
 ColorSpace.register( OKLCH );
@@ -50,24 +44,6 @@ export function getPerceptualContrast(
 	foreground: string | PlainColorObject
 ) {
 	return Math.abs( contrastAPCA( background, foreground ) );
-}
-
-function getColorForLightness( seed: PlainColorObject, lightness: number ) {
-	const tapered = taperChroma(
-		seed,
-		lightness,
-		FOREGROUND_TAPER_CHROMA_OPTIONS
-	);
-
-	if ( 'space' in tapered ) {
-		return clampToGamut( tapered );
-	}
-
-	return clampToGamut( {
-		space: OKLCH,
-		coords: [ tapered.l, tapered.c, get( seed, [ OKLCH, 'h' ] ) ],
-		alpha: seed.alpha,
-	} );
 }
 
 function getChromaPreservingColorForLightness(
@@ -133,7 +109,7 @@ function getWcagFloorMargin(
 
 function findColorAtPerceptualContrast( {
 	displayBackground,
-	getColorAtLightness = getColorForLightness,
+	getColorAtLightness = getChromaPreservingColorForLightness,
 	seed,
 	weakColor,
 	strongColor,
@@ -205,7 +181,7 @@ function findColorAtPerceptualContrast( {
 }
 
 function findColorAtWcagFloor( {
-	getColorAtLightness = getColorForLightness,
+	getColorAtLightness = getChromaPreservingColorForLightness,
 	seed,
 	weakColor,
 	strongColor,
@@ -284,7 +260,7 @@ function findStrongBoundary( {
 		return currentStrongColor;
 	}
 
-	const endpoint = getColorForLightness(
+	const endpoint = getChromaPreservingColorForLightness(
 		seed,
 		ramp.direction === 'lighter' ? 1 : 0
 	);
@@ -382,25 +358,25 @@ function createScaleResult(
 	};
 }
 
-function getChromaFirstTargets(
+function getUniformFreeEndpointTargets(
 	floorContrasts: readonly number[],
 	maximumContrast: number
 ) {
-	const buildTargets = ( minimumInterval: number ) =>
-		floorContrasts.reduce< number[] >( ( targets, floorContrast ) => {
-			const previousTarget = targets.at( -1 );
-			targets.push(
-				Math.max(
-					floorContrast,
-					previousTarget === undefined
-						? floorContrast
-						: previousTarget + minimumInterval
-				)
-			);
-			return targets;
-		}, [] );
+	const buildTargets = ( interval: number ) => {
+		const start = Math.max(
+			...floorContrasts.map(
+				( floorContrast, stepIndex ) =>
+					floorContrast - stepIndex * interval
+			)
+		);
+		return floorContrasts.map(
+			( _, stepIndex ) => start + stepIndex * interval
+		);
+	};
 
-	const preferredTargets = buildTargets( CHROMA_FIRST_MINIMUM_APCA_INTERVAL );
+	const preferredTargets = buildTargets(
+		FREE_ENDPOINT_MINIMUM_APCA_INTERVAL
+	);
 	if ( preferredTargets.at( -1 )! <= maximumContrast ) {
 		return preferredTargets;
 	}
@@ -417,7 +393,72 @@ function getChromaFirstTargets(
 	return buildTargets( Math.max( 0, availableInterval ) );
 }
 
-function buildChromaFirstColors( {
+function strengthenColorsForSerialization( {
+	colors,
+	seed,
+	strongColor,
+	ramp,
+	backgroundRamp,
+}: {
+	colors: readonly PlainColorObject[];
+	seed: PlainColorObject;
+	strongColor: PlainColorObject;
+	ramp: RampResult;
+	backgroundRamp: RampResult;
+} ) {
+	return colors.map( ( candidate, stepIndex ) => {
+		const references = getForegroundConstraintReferences(
+			stepIndex,
+			ramp,
+			backgroundRamp
+		);
+		if (
+			references.every(
+				( reference ) =>
+					getContrast( reference, getColorString( candidate ) ) >=
+					FOREGROUND_WCAG_FLOORS[ stepIndex ]
+			)
+		) {
+			return candidate;
+		}
+
+		const candidateLightness = get( candidate, [ OKLCH, 'l' ] );
+		const strongLightness = get( strongColor, [ OKLCH, 'l' ] );
+		const direction = Math.sign( strongLightness - candidateLightness );
+		const maximumOffset = Math.abs( strongLightness - candidateLightness );
+		for (
+			let offset = 0.00025;
+			offset < maximumOffset;
+			offset += 0.00025
+		) {
+			const strengthened = getChromaPreservingColorForLightness(
+				seed,
+				candidateLightness + direction * offset
+			);
+			if (
+				references.every(
+					( reference ) =>
+						getContrast(
+							reference,
+							getColorString( strengthened )
+						) >= FOREGROUND_WCAG_FLOORS[ stepIndex ]
+				)
+			) {
+				return strengthened;
+			}
+		}
+
+		return strongColor;
+	} ) as [
+		PlainColorObject,
+		PlainColorObject,
+		PlainColorObject,
+		PlainColorObject,
+		PlainColorObject,
+	];
+}
+
+function buildUniformFreeEndpointColors( {
 	seed,
 	ramp,
 	backgroundRamp,
@@ -450,54 +491,29 @@ function buildChromaFirstColors( {
 	const floorContrasts = floorColors.map( ( color ) =>
 		getPerceptualContrast( displayBackground, color )
 	);
-	const targets = getChromaFirstTargets(
+	const targets = getUniformFreeEndpointTargets(
 		floorContrasts,
 		getPerceptualContrast( displayBackground, strongColor )
 	);
 
-	return targets.map( ( target, stepIndex ) => {
-		const candidate = findColorAtPerceptualContrast( {
+	const colors = targets.map( ( target ) =>
+		findColorAtPerceptualContrast( {
 			displayBackground,
 			getColorAtLightness: getChromaPreservingColorForLightness,
 			seed,
 			weakColor,
 			strongColor,
 			target,
-		} );
-		const references = getForegroundConstraintReferences(
-			stepIndex,
-			ramp,
-			backgroundRamp
-		);
-		const candidateLightness = get( candidate, [ OKLCH, 'l' ] );
-		const strongLightness = get( strongColor, [ OKLCH, 'l' ] );
-		const direction = Math.sign( strongLightness - candidateLightness );
-		const maximumOffset = Math.abs( strongLightness - candidateLightness );
-		for ( let offset = 0; offset < maximumOffset; offset += 0.00025 ) {
-			const strengthened = getChromaPreservingColorForLightness(
-				seed,
-				candidateLightness + direction * offset
-			);
-			if (
-				references.every(
-					( reference ) =>
-						getContrast(
-							reference,
-							getColorString( strengthened )
-						) >= FOREGROUND_WCAG_FLOORS[ stepIndex ]
-				)
-			) {
-				return strengthened;
-			}
-		}
-		return strongColor;
-	} ) as [
-		PlainColorObject,
-		PlainColorObject,
-		PlainColorObject,
-		PlainColorObject,
-		PlainColorObject,
-	];
+		} )
+	);
+
+	return strengthenColorsForSerialization( {
+		colors,
+		seed,
+		strongColor,
+		ramp,
+		backgroundRamp,
+	} );
 }
 
 export function buildPerceptualForegroundScale( {
@@ -524,9 +540,9 @@ export function buildPerceptualForegroundScale( {
 	}
 
 	const seed = clampToGamut( seedArg );
-	if ( method === 'chroma-first' ) {
+	if ( method === 'uniform-free-endpoint' ) {
 		const colors = serializeScale(
-			buildChromaFirstColors( { seed, ramp, backgroundRamp } )
+			buildUniformFreeEndpointColors( { seed, ramp, backgroundRamp } )
 		);
 		return createScaleResult( colors, ramp, backgroundRamp );
 	}
@@ -704,6 +720,14 @@ export function buildPerceptualForegroundScale( {
 		];
 	}
 
-	const colors = serializeScale( experimentalColors );
+	const colors = serializeScale(
+		strengthenColorsForSerialization( {
+			colors: experimentalColors,
+			seed,
+			strongColor,
+			ramp,
+			backgroundRamp,
+		} )
+	);
 	return createScaleResult( colors, ramp, backgroundRamp );
 }
