@@ -225,8 +225,7 @@ const transforms = {
 			blocks: [ 'core/image' ],
 			// A dynamic gallery has no inner blocks — its images are resolved
 			// from a source at render time — so this transform would produce a
-			// single empty image and drop the source. Detaching the gallery
-			// first materializes the images, after which it applies as usual.
+			// single empty image and drop the source.
 			isMatch: ( { dynamicContent } ) => ! dynamicContent,
 			transform: ( { align }, innerBlocks ) => {
 				if ( innerBlocks.length > 0 ) {
