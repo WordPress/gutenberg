@@ -26,6 +26,7 @@ import {
 	tableRowDelete,
 	ungroup,
 } from '@wordpress/icons';
+import { getCellPlacements } from './utils';
 
 const DEFAULT_SELECTION_BORDER = {
 	color: '#000000',
@@ -92,42 +93,6 @@ function getSectionClientId( selectors, rowClientId ) {
 }
 
 /**
- * Builds a cell placement map from the table block tree.
- *
- * @param {Object} selectors     Bound block editor selectors.
- * @param {string} tableClientId Table block client ID.
- * @return {Array} Array of { clientId, rowIndex, columnIndex, sectionType } objects.
- */
-function getCellPlacements( selectors, tableClientId ) {
-	const { getBlocks } = selectors;
-	const sections = getBlocks( tableClientId );
-	const placements = [];
-	let rowIndex = 0;
-
-	for ( const section of sections ) {
-		const rows = getBlocks( section.clientId );
-		for ( const row of rows ) {
-			const cells = getBlocks( row.clientId );
-			for (
-				let columnIndex = 0;
-				columnIndex < cells.length;
-				columnIndex++
-			) {
-				placements.push( {
-					clientId: cells[ columnIndex ].clientId,
-					rowIndex,
-					columnIndex,
-					sectionType: section.attributes.type,
-				} );
-			}
-			rowIndex++;
-		}
-	}
-
-	return placements;
-}
-
-/**
  * Gets the rectangle of selected cells from the block tree.
  *
  * @param {Array} placements        Cell placements array.
@@ -146,12 +111,14 @@ function getSelectionRectangle( placements, selectedClientIds ) {
 	return {
 		selectedPlacements,
 		startRow: Math.min( ...selectedPlacements.map( ( p ) => p.rowIndex ) ),
-		endRow: Math.max( ...selectedPlacements.map( ( p ) => p.rowIndex ) ),
+		endRow: Math.max(
+			...selectedPlacements.map( ( p ) => p.rowIndex + p.rowSpan - 1 )
+		),
 		startColumn: Math.min(
 			...selectedPlacements.map( ( p ) => p.columnIndex )
 		),
 		endColumn: Math.max(
-			...selectedPlacements.map( ( p ) => p.columnIndex )
+			...selectedPlacements.map( ( p ) => p.columnIndex + p.colSpan - 1 )
 		),
 	};
 }
@@ -183,6 +150,7 @@ export default function TableCellEdit( {
 			const {
 				getBlockName,
 				getBlockRootClientId,
+				getBlocks,
 				getSelectedBlockClientIds,
 				getSelectionType,
 			} = select( blockEditorStore );
@@ -193,10 +161,7 @@ export default function TableCellEdit( {
 			);
 			const selectionClientIds = getSelectedBlockClientIds();
 			const placements = tableClientIdFromStore
-				? getCellPlacements(
-						select( blockEditorStore ),
-						tableClientIdFromStore
-				  )
+				? getCellPlacements( getBlocks( tableClientIdFromStore ) )
 				: [];
 
 			return {
@@ -279,7 +244,11 @@ export default function TableCellEdit( {
 
 		const { rowIndex } = selectedCellPlacement;
 		const rowCellIds = cellPlacements
-			.filter( ( p ) => p.rowIndex === rowIndex )
+			.filter(
+				( p ) =>
+					p.rowIndex <= rowIndex &&
+					p.rowIndex + p.rowSpan - 1 >= rowIndex
+			)
 			.map( ( p ) => p.clientId );
 
 		multiSelectSet( rowCellIds );
@@ -292,7 +261,11 @@ export default function TableCellEdit( {
 
 		const { columnIndex } = selectedCellPlacement;
 		const columnCellIds = cellPlacements
-			.filter( ( p ) => p.columnIndex === columnIndex )
+			.filter(
+				( p ) =>
+					p.columnIndex <= columnIndex &&
+					p.columnIndex + p.colSpan - 1 >= columnIndex
+			)
 			.map( ( p ) => p.clientId );
 
 		multiSelectSet( columnCellIds );
@@ -673,15 +646,17 @@ export default function TableCellEdit( {
 			}
 
 			const existingBorder = cell.attributes.style?.border || {};
+			const endRow = placement.rowIndex + placement.rowSpan - 1;
+			const endColumn = placement.columnIndex + placement.colSpan - 1;
 			const sides = [];
 
 			if ( placement.rowIndex === selectionRectangle.startRow ) {
 				sides.push( 'top' );
 			}
-			if ( placement.columnIndex === selectionRectangle.endColumn ) {
+			if ( endColumn === selectionRectangle.endColumn ) {
 				sides.push( 'right' );
 			}
-			if ( placement.rowIndex === selectionRectangle.endRow ) {
+			if ( endRow === selectionRectangle.endRow ) {
 				sides.push( 'bottom' );
 			}
 			if ( placement.columnIndex === selectionRectangle.startColumn ) {
