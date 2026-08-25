@@ -13,24 +13,18 @@ import { TEMPLATE_POST_TYPE } from '../../store/constants';
  * @return {React.ReactNode} The rendered component.
  */
 export default function ReadingSettingsLink() {
-	const { isTemplate, postSlug, canUpdateSettings } = useSelect(
-		( select ) => {
-			const { getCurrentPostType, getEditedPostAttribute } =
-				select( editorStore );
-			const { canUser } = select( coreStore );
-			return {
-				isTemplate: getCurrentPostType() === TEMPLATE_POST_TYPE,
-				postSlug: getEditedPostAttribute( 'slug' ),
-				canUpdateSettings: !! canUser( 'update', {
-					kind: 'root',
-					name: 'site',
-				} ),
-			};
-		},
-		[]
-	);
+	const isVisible = useSelect( ( select ) => {
+		const { getCurrentPostType, getEditedPostAttribute } =
+			select( editorStore );
+		const { canUser } = select( coreStore );
+		return (
+			getCurrentPostType() === TEMPLATE_POST_TYPE &&
+			getEditedPostAttribute( 'slug' ) === 'front-page' &&
+			!! canUser( 'update', { kind: 'root', name: 'site' } )
+		);
+	}, [] );
 
-	if ( ! isTemplate || postSlug !== 'front-page' || ! canUpdateSettings ) {
+	if ( ! isVisible ) {
 		return null;
 	}
 
