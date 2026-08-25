@@ -271,7 +271,10 @@ export function useBorderPanelLabel( {
 		},
 		[ clientId ]
 	);
-	const settings = { border: { color, radius, style, width }, shadow };
+	const settings = useMemo(
+		() => ( { border: { color, radius, style, width }, shadow } ),
+		[ color, radius, style, width, shadow ]
+	);
 	const controls = useHasBorderPanelControls( settings );
 
 	if ( ! hasBorderControl && ! hasShadowControl && clientId ) {
