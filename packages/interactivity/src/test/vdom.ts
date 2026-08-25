@@ -264,6 +264,63 @@ describe( 'toVdom', () => {
 	} );
 
 	describe( 'Directive processing', () => {
+		it.each( [ 'data-wp--bind', 'data-wp---foo', 'data-wp----foo' ] )(
+			'should reject malformed directive name %s',
+			( attributeName ) => {
+				const element = createElementFromHTML(
+					`<div ${ attributeName }></div>`
+				);
+
+				expect( toVdom( element ) ).toMatchVNode(
+					h(
+						'div' as any,
+						{
+							[ attributeName ]: '',
+							__directives: {},
+						},
+						[]
+					)
+				);
+				expect( global.console.warn ).toHaveBeenCalledTimes( 1 );
+				expect( global.console ).toHaveWarnedWith(
+					`Found malformed directive name: ${ attributeName }.`
+				);
+			}
+		);
+
+		it.each( [
+			[ 'data-wp-bind', 'bind', null ],
+			[ 'data-wp-style--var', 'style', 'var' ],
+			[ 'data-wp-style----var', 'style', '--var' ],
+		] )(
+			'should parse valid directive name %s',
+			( attributeName, prefix, suffix ) => {
+				const element = createElementFromHTML(
+					`<div ${ attributeName }></div>`
+				);
+
+				expect( toVdom( element ) ).toMatchVNode(
+					h(
+						'div' as any,
+						{
+							[ attributeName ]: '',
+							__directives: {
+								[ prefix ]: [
+									{
+										namespace: null,
+										value: '',
+										suffix,
+										uniqueId: null,
+									},
+								],
+							},
+						},
+						[]
+					)
+				);
+			}
+		);
+
 		it( 'should process simple directives', () => {
 			const element = createElementFromHTML(
 				`<div data-wp-test-one data-wp-test-two="test value"></div>`

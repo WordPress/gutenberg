@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Reject malformed Interactivity directive names whose text after `data-wp-` begins with a hyphen, including offset-zero `--` forms that would create an empty prefix, aligning client-side validation with WordPress Core.
+
 ### Internal
 
 -   Split tsconfig into a build project and a default dev project, replacing `tsconfig.test.json`. ([#81509](https://github.com/WordPress/gutenberg/pull/81509))
