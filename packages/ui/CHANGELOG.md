@@ -39,6 +39,8 @@
 -   `Card`: Use the normal neutral surface stroke for the default border. ([#81746](https://github.com/WordPress/gutenberg/pull/81746))
 -   `Calendar`, `RangeCalendar`: Preserve day focus when a controlled month change removes the focused day. ([#81635](https://github.com/WordPress/gutenberg/pull/81635))
 -   `Button`: Fix the loading spinner being off-center in RTL ([#81901](https://github.com/WordPress/gutenberg/pull/81901)).
+-   `Select`, `Combobox`, `SelectControl`: Fix the trigger placeholder failing the 4.5:1 text contrast minimum ([#81853](https://github.com/WordPress/gutenberg/pull/81853)).
+-   `Autocomplete.List`: Stop rendering `aria-orientation` in grid mode, where `role="grid"` disallows it ([#81853](https://github.com/WordPress/gutenberg/pull/81853)).
 -   `SearchableChipSelect`, `SearchableChipSelectControl`: Forward ref to the search input instead of the chips container ([#80980](https://github.com/WordPress/gutenberg/pull/80980)).
 
 ### Documentation
