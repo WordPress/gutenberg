@@ -90,6 +90,7 @@ The dashboard engine ([`@wordpress/widget-dashboard`](https://github.com/WordPre
 -   Owns the layout array and its persistence.
 -   Wraps every instance in its own chrome: header, toolbars, error boundary, Suspense fallback.
 -   Passes `resolveWidgetModule` down through its context, overridable for tests and Storybook.
+-   Provides the `links` host capability at its route layer: an action href it recognizes as one of its own routes mounts the router's link and navigates client-side.
 
 Governance is separate from rendering: a `WidgetDashboard.Policy` mounted above one or several dashboards answers `canPerform` for each operation (entering customize mode, offering a widget type in the inserter, removing, moving, resizing, or editing an instance), without touching the registry that keeps placed widgets rendering.
 
