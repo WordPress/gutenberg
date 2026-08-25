@@ -109,8 +109,7 @@ function getTableCell( node ) {
 
 /**
  * Returns the client IDs of all block-level cells in the rectangle between
- * two table cells, in document order. The browser's table geometry accounts
- * for rowSpan/colSpan, so no placement computation is needed.
+ * two table cells, in document order.
  *
  * @param {HTMLTableCellElement} startCell Starting cell.
  * @param {HTMLTableCellElement} endCell   Ending cell.
@@ -118,22 +117,56 @@ function getTableCell( node ) {
  * @return {string[]|undefined} Client IDs in the rectangle, or undefined if
  *                              the cells are not in the same table.
  */
-function getTableCellRectangleClientIds( startCell, endCell ) {
+export function getTableCellRectangleClientIds( startCell, endCell ) {
 	const table = startCell.closest( 'table' );
 
 	if ( ! table || table !== endCell.closest( 'table' ) ) {
 		return;
 	}
 
-	const getRect = ( cell ) => ( {
-		startRow: cell.parentElement.rowIndex,
-		endRow: cell.parentElement.rowIndex + cell.rowSpan - 1,
-		startColumn: cell.cellIndex,
-		endColumn: cell.cellIndex + cell.colSpan - 1,
-	} );
+	// Compute the visual rectangle of every cell. `cellIndex` is not
+	// span-aware: a cell covered by a rowSpan from above is absent from the
+	// row's cells collection, and a colSpan'd cell occupies a single slot
+	// in it. Walk the rows tracking occupied slots to derive each cell's
+	// visual column.
+	const grid = [];
+	const rects = new Map();
 
-	const startRect = getRect( startCell );
-	const endRect = getRect( endCell );
+	for ( let rowIndex = 0; rowIndex < table.rows.length; rowIndex++ ) {
+		let columnIndex = 0;
+		for ( const cell of table.rows[ rowIndex ].cells ) {
+			while ( grid[ rowIndex ]?.[ columnIndex ] ) {
+				columnIndex++;
+			}
+			const rect = {
+				startRow: rowIndex,
+				endRow: rowIndex + cell.rowSpan - 1,
+				startColumn: columnIndex,
+				endColumn: columnIndex + cell.colSpan - 1,
+			};
+			for ( let row = rect.startRow; row <= rect.endRow; row++ ) {
+				if ( ! grid[ row ] ) {
+					grid[ row ] = [];
+				}
+				for (
+					let column = rect.startColumn;
+					column <= rect.endColumn;
+					column++
+				) {
+					grid[ row ][ column ] = cell;
+				}
+			}
+			rects.set( cell, rect );
+			columnIndex += cell.colSpan;
+		}
+	}
+
+	const startRect = rects.get( startCell );
+	const endRect = rects.get( endCell );
+
+	if ( ! startRect || ! endRect ) {
+		return;
+	}
 
 	const startRow = Math.min( startRect.startRow, endRect.startRow );
 	const endRow = Math.max( startRect.endRow, endRect.endRow );
@@ -142,27 +175,17 @@ function getTableCellRectangleClientIds( startCell, endCell ) {
 
 	const clientIds = [];
 
-	// Iterate from the top of the table: a cell with rowSpan only appears in
-	// its starting row's cells collection, so cells spanning into the
-	// rectangle from above would otherwise be missed.
-	for ( let rowIndex = 0; rowIndex <= endRow; rowIndex++ ) {
-		const row = table.rows[ rowIndex ];
-		if ( ! row ) {
+	for ( const [ cell, rect ] of rects ) {
+		if ( ! cell.hasAttribute( 'data-block' ) ) {
 			continue;
 		}
-		for ( const cell of row.cells ) {
-			if ( ! cell.hasAttribute( 'data-block' ) ) {
-				continue;
-			}
-			const rect = getRect( cell );
-			if (
-				rect.startRow <= endRow &&
-				rect.endRow >= startRow &&
-				rect.startColumn <= endColumn &&
-				rect.endColumn >= startColumn
-			) {
-				clientIds.push( cell.getAttribute( 'data-block' ) );
-			}
+		if (
+			rect.startRow <= endRow &&
+			rect.endRow >= startRow &&
+			rect.startColumn <= endColumn &&
+			rect.endColumn >= startColumn
+		) {
+			clientIds.push( cell.getAttribute( 'data-block' ) );
 		}
 	}
 
