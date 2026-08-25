@@ -1,5 +1,8 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+const LINE_START_KEY =
+	process.platform === 'darwin' ? 'Meta+ArrowLeft' : 'Home';
+
 test.describe( 'Details', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
@@ -85,6 +88,75 @@ test.describe( 'Details', () => {
 		await expect(
 			editor.canvas.getByRole( 'document', { name: 'Empty block' } )
 		).toBeHidden();
+	} );
+
+	test( 'removes the block when pressing Backspace in an empty summary', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/details',
+		} );
+
+		const summary = editor.canvas.getByRole( 'textbox', {
+			name: 'Write summary',
+		} );
+
+		await summary.click();
+		await page.keyboard.press( 'Backspace' );
+
+		await expect.poll( editor.getBlocks ).toEqual( [] );
+	} );
+
+	test( 'moves focus to the summary when pressing Backspace at the start of body content', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/details',
+			attributes: {
+				summary: 'Details summary',
+			},
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: {
+						content: 'Details content',
+					},
+				},
+			],
+		} );
+
+		await page.keyboard.press( 'Enter' );
+
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+
+		await expect( paragraph ).toContainText( 'Details content' );
+
+		await paragraph.click();
+		await expect( paragraph ).toBeFocused();
+		await page.keyboard.press( LINE_START_KEY );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( ' updated' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/details',
+				attributes: {
+					summary: 'Details summary updated',
+				},
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: {
+							content: 'Details content',
+						},
+					},
+				],
+			},
+		] );
 	} );
 
 	test( 'selecting hidden blocks in list view expands details and focuses content', async ( {
