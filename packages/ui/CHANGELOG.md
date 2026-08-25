@@ -27,6 +27,7 @@
 -   `Menu`: Add shortcut display and accessibility metadata support. ([#79560](https://github.com/WordPress/gutenberg/pull/79560))
 -   `SearchableChipSelect`: Add grouped items support and export `Group`, `GroupLabel`, and `Collection` subcomponents ([#80989](https://github.com/WordPress/gutenberg/pull/80989)).
 -   `SearchableChipSelect`: Add development warnings for common misconfigurations ([#80989](https://github.com/WordPress/gutenberg/pull/80989)).
+-   `Select.Positioner`: Use Base UI's default `alignItemWithTrigger` positioning behavior.
 -   `Select.Item`, `Combobox.Item`, and `Autocomplete.Item`: Default item height is now 32px (previously 40px) ([#81354](https://github.com/WordPress/gutenberg/pull/81354)).
 -   `InputLayout`-based controls show an error-colored border and focus ring while an invalid control's validity is reported, e.g. when wrapped in `ControlWithError` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574)).
 

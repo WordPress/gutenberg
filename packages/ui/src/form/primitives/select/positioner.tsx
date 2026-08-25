@@ -14,10 +14,6 @@ const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
 		return (
 			<_Select.Positioner
 				{ ...ITEM_POPUP_POSITIONER_PROPS }
-				// Override Base UI's `true` default so the popup is placed
-				// relative to the trigger rather than aligned with the
-				// highlighted item. Consumers can opt back in by passing `true`.
-				alignItemWithTrigger={ false }
 				{ ...props }
 				ref={ ref }
 				className={ clsx(
