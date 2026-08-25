@@ -198,3 +198,22 @@ function gutenberg_dequeue_module( $module_identifier ) {
 	_deprecated_function( __FUNCTION__, 'Gutenberg 17.6.0', 'wp_dequeue_script_module' );
 	wp_script_modules()->dequeue( $module_identifier );
 }
+
+/**
+ * Enqueue the subject-detection loader script module in the block editor.
+ *
+ * This registers @wordpress/subject-detection/detector as a dynamic dependency
+ * in the import map, so the inference runtime behind subject-aware cropping is
+ * fetched only once an image is actually being cropped. It lives here rather
+ * than in lib/client-assets.php alongside the other media loaders because it
+ * is enqueued only while the experiment is on; nothing else loads it.
+ *
+ * @see packages/subject-detection/src/loader.ts
+ */
+function gutenberg_enqueue_subject_detection_loader() {
+	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-media-subject-crop' ) ) {
+		return;
+	}
+	wp_enqueue_script_module( '@wordpress/subject-detection/loader' );
+}
+add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_subject_detection_loader' );

@@ -472,24 +472,6 @@ function gutenberg_enqueue_vips_loader() {
 }
 
 /**
- * Enqueue the subject-detection loader script module in the block editor.
- *
- * This registers @wordpress/subject-detection/detector as a dynamic dependency
- * in the import map, so the inference runtime behind subject-aware cropping is
- * fetched only once an image is being cropped. Enqueued only while the
- * experiment is on, since nothing loads it otherwise.
- *
- * @see packages/subject-detection/src/loader.ts
- */
-add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_subject_detection_loader' );
-function gutenberg_enqueue_subject_detection_loader() {
-	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-media-subject-crop' ) ) {
-		return;
-	}
-	wp_enqueue_script_module( '@wordpress/subject-detection/loader' );
-}
-
-/**
  * Enqueue the video-conversion loader script module in the block editor.
  *
  * This registers @wordpress/video-conversion/worker as a dynamic dependency
