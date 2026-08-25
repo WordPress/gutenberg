@@ -84,8 +84,7 @@ Results under `results/` are gitignored and may contain source code and tool out
 test/ai-development/
 ├── lib/
 │   ├── base.js                     shared setup a spec spreads
-│   ├── default-test.js             shared test options
-│   ├── providers.js                shared coding agents
+│   ├── default-test.js             sandbox, prompt preamble, rubric grader
 │   └── workspace-extension.mjs     workspace lifecycle
 ├── package.json
 └── specs/SPEC_GROUP/

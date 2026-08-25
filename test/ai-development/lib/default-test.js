@@ -1,20 +1,19 @@
+// Prepended to every task, so an agent does not spend its turns trying to build
+// or boot an environment the workspace does not have.
+const workspaceNotice = `This task runs in an isolated evaluation workspace and
+npm is not available. Do not try to build. Do not start or try to start wp-env,
+wp-env-test, Docker, development servers, or other long-running services.
+Accomplish your requested task and I will run and test the build on my own
+environment.`;
+
 // Options shared by every evaluation case.
 /** @type {import('promptfoo').TestCase} */
 export default {
 	options: {
-		prefix: [
-			'This task runs in an isolated evaluation workspace and npm is not',
-			'available. Do not try to build. Do not start or try to start wp-env,',
-			'wp-env-test, Docker, development servers, or other long-running services.',
-			'Accomplish your requested task and I will run and test the build on my',
-			'own environment.',
-		].join( '\n' ),
+		prefix: workspaceNotice,
 
-		// The beforeEach extension fills in working_dir and the dynamic
-		// filesystem allowlists. `failIfUnavailable` already defaults to true
-		// when the sandbox is enabled, and the `allowManaged*Only` locks bind
-		// only when passed as managedSettings — as plain sandbox options they
-		// do nothing, so they are not set here.
+		// Confines the agent to its workspace and off the network, so it
+		// cannot reach this checkout or look up the answer.
 		sandbox: {
 			enabled: true,
 			autoAllowBashIfSandboxed: true,
@@ -22,12 +21,13 @@ export default {
 			network: { allowedDomains: [] },
 		},
 
-		// The workspace extension adds each row's temporary working_dir.
+		// Grades the `agent-rubric` assertions. It reads the workspace to
+		// judge what the agent actually did, rather than what it reported.
 		provider: {
 			id: 'anthropic:claude-agent-sdk',
 			config: {
 				apiKeyRequired: false,
-				model: 'sonnet',
+				model: 'opus',
 				// The grader inspects the workspace; it never edits it.
 				tools: [ 'Bash' ],
 				custom_allowed_tools: [ 'Bash' ],

@@ -35,11 +35,19 @@ export default {
 		{
 			description: 'e2e test for paragraph center alignment',
 			assert: [
+				// Matches the native Skill invocation recorded by the provider.
+				// A shell-command check would miss it: the agent invokes a
+				// skill through the Skill tool rather than reading its file.
 				{
 					type: 'skill-used',
 					value: 'testing',
 					metric: 'Invoked the testing skill',
 				},
+				// Counts commands in the run's trace that match a glob. The three
+				// below are the routing check: the e2e reference read, the
+				// other two left alone. `max: 0` passes vacuously when the
+				// agent reads nothing at all, so it only carries meaning
+				// alongside the `min: 1` above it.
 				{
 					type: 'trajectory:step-count',
 					value: {
@@ -67,6 +75,10 @@ export default {
 					},
 					metric: 'Skipped the PHPUnit reference',
 				},
+				// Runs a second agent against the finished workspace to judge
+				// the change itself. Deterministic assertions cannot tell
+				// whether a test is any good; this can, at the cost of being
+				// a judgement rather than a measurement.
 				{
 					type: 'agent-rubric',
 					value: `Inspect the available workspace's Git status, diff, and relevant
