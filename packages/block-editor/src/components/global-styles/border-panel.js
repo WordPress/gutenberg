@@ -98,7 +98,6 @@ export default function BorderPanel( {
 	inheritedValue = value,
 	settings,
 	panelId,
-	name,
 	defaultControls = DEFAULT_CONTROLS,
 	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
 } ) {
@@ -373,7 +372,6 @@ export default function BorderPanel( {
 		showBorderRadius;
 
 	const label = useBorderPanelLabel( {
-		blockName: name,
 		hasShadowControl,
 		hasBorderControl,
 	} );

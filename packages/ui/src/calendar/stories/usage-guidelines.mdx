@@ -118,13 +118,13 @@ import { Calendar } from '@wordpress/ui';
 const MyFrenchCalendar = () => <Calendar locale={ fr } />;
 ```
 
-For both input forms, a supported locale code derives the default text direction and first day of the week from the browser. This keeps the result consistent whether the code is passed directly or through a date-fns locale object.
+For both input forms, an explicitly supplied, supported locale code derives the default text direction and first day of the week from the browser. This keeps the result consistent whether the code is passed directly or through a date-fns locale object.
 
-An invalid or unsupported locale code falls back to `en-US` for date text. A date-fns locale object with an unsupported code retains its own first-day setting.
+When `locale` is omitted, invalid, or unsupported for date formatting, the default text direction follows the WordPress translation context. Date text independently falls back to `en-US`. A date-fns locale object with an unsupported code retains its own first-day setting.
 
 The visible strings (button labels, the "today" announcement) come from `@wordpress/i18n`, which uses the site locale rather than these props. For a coherent experience, make sure they agree — or override the strings through the `labels` prop.
 
-Use `weekStartsOn` to override the first day of the week, including to preserve a custom value from a date-fns locale object. Explicit `dir` and `lang` props override the defaults derived from `locale`.
+Use `weekStartsOn` to override the first day of the week, including to preserve a custom value from a date-fns locale object. An explicit `dir` prop overrides both the locale-derived and WordPress text direction. An explicit `lang` prop overrides the default language attribute.
 
 ## Time Zones
 
