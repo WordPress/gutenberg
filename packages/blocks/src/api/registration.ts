@@ -38,7 +38,20 @@ export function unstable__bootstrapServerSideBlockDefinitions(
 ): void {
 	const { addBootstrappedBlockType } = unlock( dispatch( blocksStore ) );
 	for ( const [ name, blockType ] of Object.entries( definitions ) ) {
-		addBootstrappedBlockType( name, blockType );
+		// Transforms arrive as they are declared in `block.json`, which is not
+		// the shape the editor runs them in.
+		addBootstrappedBlockType(
+			name,
+			blockType.transforms
+				? {
+						...blockType,
+						transforms: normalizeMetadataTransforms(
+							blockType.transforms as any,
+							name
+						),
+				  }
+				: blockType
+		);
 	}
 }
 
@@ -182,7 +195,8 @@ export function registerBlockType<
 		/*
 		 * Transforms are merged here rather than travelling with the rest of the
 		 * metadata, because the store keeps a server-provided definition over a
-		 * client one, and the server does not send transforms.
+		 * client one. Both read the same `block.json`, so the merged result is
+		 * the more complete of the two.
 		 */
 		declaredTransforms = normalizeMetadataTransforms(
 			blockNameOrMetadata.transforms as any,

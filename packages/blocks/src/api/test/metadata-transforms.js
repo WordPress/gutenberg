@@ -260,4 +260,58 @@ describe( 'transforms declared in metadata after a server bootstrap', () => {
 		expect( transform.type ).toBe( 'raw' );
 		expect( transform.selector ).toBe( 'aside' );
 	} );
+
+	it( 'normalizes the transforms a server does send', () => {
+		/*
+		 * A block registered from a name alone keeps the server definition, so
+		 * the transforms it carries have to be runnable by the time they reach
+		 * the block type.
+		 */
+		unstable__bootstrapServerSideBlockDefinitions( {
+			[ name ]: {
+				apiVersion: 3,
+				title: 'Bootstrapped',
+				category: 'text',
+				attributes: {},
+				transforms: {
+					from: [
+						{
+							type: 'raw',
+							selector: 'aside',
+							schema: { aside: { children: 'phrasing' } },
+						},
+					],
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/paragraph', 'core/heading' ],
+							attributes: 'all',
+						},
+					],
+				},
+			},
+		} );
+
+		registerBlockType( name, {
+			title: 'Bootstrapped',
+			category: 'text',
+			save: () => null,
+		} );
+
+		const { transforms } = getBlockType( name );
+
+		expect( transforms.from[ 0 ].selector ).toBe( 'aside' );
+		expect(
+			transforms.from[ 0 ].schema( {
+				phrasingContentSchema: { em: {} },
+				isPaste: false,
+			} )
+		).toEqual( { aside: { children: { em: {} } } } );
+
+		// One transform per block, because the editor does not tell a transform
+		// which of them it was chosen for.
+		expect( transforms.to ).toHaveLength( 2 );
+		expect( transforms.to[ 0 ].blocks ).toEqual( [ 'core/paragraph' ] );
+		expect( typeof transforms.to[ 0 ].transform ).toBe( 'function' );
+	} );
 } );
