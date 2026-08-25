@@ -1,0 +1,22 @@
+.wp-block-figure {
+	display: flex;
+	flex-direction: column;
+
+	> .wp-block-figure__content {
+		min-height: 1em;
+	}
+
+	&.is-caption-top > figcaption {
+		/* stylelint-disable-next-line -- Physical DOM reordering causes React state loss on unmount. Visual reordering is required here. */
+		order: -1;
+		margin-bottom: 0.5em;
+	}
+
+	&.is-caption-bottom > figcaption {
+		margin-top: 0.5em;
+	}
+
+	figcaption {
+		font-size: inherit;
+	}
+}

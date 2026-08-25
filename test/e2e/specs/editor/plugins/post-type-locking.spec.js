@@ -356,6 +356,7 @@ test.describe( 'Post-type locking', () => {
 				'Code',
 				'Columns',
 				'Details',
+				'Figure',
 				'Group',
 				'Preformatted',
 				'Pullquote',

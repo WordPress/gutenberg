@@ -324,6 +324,15 @@ Add a block that displays content pulled from other sites, like Twitter or YouTu
 -	**Supports:** align, anchor, interactivity (clientNavigation), spacing (margin)
 -	**Attributes:** allowResponsive, caption, previewable, providerNameSlug, responsive, type, url
 
+## Figure
+
+A semantic container for self-contained content such as images, code, quotes, and more with an optional caption.
+
+-	**Name:** [core/figure](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-figure/)
+-	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
+-	**Supports:** align (full, wide), allowedBlocks, anchor, ariaLabel, background (backgroundImage, backgroundSize, gradient), border (color, radius, style, width), color (background, gradients, link, text), dimensions (minHeight, minWidth), interactivity (clientNavigation), layout (allowSizingOnChildren), position (sticky), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
+-	**Attributes:** caption, captionPosition
+
 ## File
 
 Add a link to a downloadable file.

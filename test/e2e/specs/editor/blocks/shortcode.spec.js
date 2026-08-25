@@ -44,10 +44,11 @@ test.describe( 'Shortcode', () => {
 		const transformations = page
 			.getByRole( 'menu', { name: 'Shortcode' } )
 			.getByRole( 'menuitem' );
-		await expect( transformations ).toHaveCount( 3 );
+		await expect( transformations ).toHaveCount( 4 );
 		await expect( transformations ).toHaveText( [
 			'Columns',
 			'Details',
+			'Figure',
 			'Group',
 		] );
 	} );
@@ -67,10 +68,11 @@ test.describe( 'Shortcode', () => {
 		const transformations = page
 			.getByRole( 'menu', { name: 'Shortcode' } )
 			.getByRole( 'menuitem' );
-		await expect( transformations ).toHaveCount( 3 );
+		await expect( transformations ).toHaveCount( 4 );
 		await expect( transformations ).toHaveText( [
 			'Columns',
 			'Details',
+			'Figure',
 			'Group',
 		] );
 	} );

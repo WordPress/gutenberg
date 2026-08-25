@@ -37,6 +37,7 @@ test.describe( 'Block Switcher', () => {
 			'Quote',
 			'Columns',
 			'Details',
+			'Figure',
 			'Group',
 		] );
 	} );
@@ -83,6 +84,7 @@ test.describe( 'Block Switcher', () => {
 			'Heading',
 			'Columns',
 			'Details',
+			'Figure',
 			'Group',
 		] );
 	} );
