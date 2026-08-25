@@ -56,20 +56,25 @@ const METHOD_DETAILS: Record<
 		description:
 			'Current four-step ramp, with the strongest value repeated for the fifth step.',
 	},
+	'chroma-first': {
+		label: 'Chroma-first',
+		description:
+			'Preserves seed chroma and frees the legacy 7:1 endpoint while keeping every WCAG floor.',
+	},
 	uniform: {
 		label: 'Uniform APCA',
 		description:
-			'Five equal perceptual intervals. The weak endpoint can move to preserve every WCAG floor.',
+			'Five equal intervals on the tapered path. The legacy strong endpoint remains fixed.',
 	},
 	'semantic-anchors': {
 		label: 'Semantic anchors',
 		description:
-			'Keeps compliant lower steps, then divides the remaining normal-to-strong headroom.',
+			'Keeps compliant lower steps and the legacy strong endpoint, then inserts a resting step.',
 	},
 	eased: {
 		label: 'Eased APCA',
 		description:
-			'Uses progressively larger perceptual intervals toward resting and active foregrounds.',
+			'Uses progressively larger intervals on the tapered path toward the fixed strong endpoint.',
 	},
 };
 
@@ -130,11 +135,10 @@ function ForegroundScale( {
 							<strong>FGS{ index + 1 }</strong>
 							<code>{ color }</code>
 							<span>
-								WCAG{ ' ' }
-								{ getContrast(
-									displayBackground,
-									color
-								).toFixed( 2 ) }
+								Min WCAG{ ' ' }
+								{ data.scale.minimumWcagContrasts[
+									index
+								].toFixed( 2 ) }
 							</span>
 							<span>
 								APCA { contrasts[ index ].toFixed( 1 ) }
@@ -390,6 +394,12 @@ function PilotComparison() {
 					Control warnings identify values that miss this pilot&apos;s
 					broader multi-surface checks. They do not describe a runtime
 					regression.
+				</p>
+				<p>
+					Chroma-first preserves seed chroma where sRGB permits and
+					uses the least-extreme endpoint that can maintain a
+					seven-point APCA interval, or the largest available interval
+					when space is limited.
 				</p>
 			</header>
 			{ SAMPLE_COMBINATIONS.map( ( combination ) => {

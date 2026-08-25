@@ -1,3 +1,4 @@
+import { get, OKLCH, parse } from 'colorjs.io/fn';
 import { buildAccentRamp, buildBgRamp } from '../..';
 import { getContrast } from '../../lib/color-utils';
 import { DEFAULT_SEED_COLORS } from '../../lib/constants';
@@ -128,6 +129,7 @@ describe( 'perceptual foreground experiment', () => {
 				backgroundRamp
 			);
 			const floors = [ 2, 3, 4.5, 4.5, 4.5 ];
+			const violations: string[] = [];
 
 			for ( const method of EXPERIMENTAL_METHODS ) {
 				for ( const [ ramp, seed ] of [
@@ -148,13 +150,20 @@ describe( 'perceptual foreground experiment', () => {
 							ramp,
 							backgroundRamp
 						) ) {
-							expect(
-								getContrast( reference, color )
-							).toBeGreaterThanOrEqual( floors[ index ] );
+							const contrast = getContrast( reference, color );
+							if ( contrast < floors[ index ] ) {
+								violations.push(
+									`${ method } step ${
+										index + 1
+									}: ${ contrast }`
+								);
+							}
 						}
 					} );
 				}
 			}
+
+			expect( violations ).toEqual( [] );
 		}
 	);
 
@@ -196,6 +205,62 @@ describe( 'perceptual foreground experiment', () => {
 		expect( scale.colors[ 4 ] ).toBe( backgroundRamp.ramp.fgSurface4 );
 		expect( scale.colors[ 3 ] ).not.toBe( scale.colors[ 2 ] );
 		expect( scale.colors[ 3 ] ).not.toBe( scale.colors[ 4 ] );
+	} );
+
+	it( 'releases the legacy strong endpoint in the chroma-first variant', () => {
+		const backgroundRamp = buildBgRamp( DEFAULT_SEED_COLORS.background );
+		const primaryRamp = buildAccentRamp(
+			DEFAULT_SEED_COLORS.primary,
+			backgroundRamp
+		);
+		const scale = buildScale(
+			'chroma-first',
+			primaryRamp,
+			backgroundRamp,
+			primaryRamp.ramp.bgFill1
+		);
+
+		expect( scale.colors[ 4 ] ).not.toBe( primaryRamp.ramp.fgSurface4 );
+		expect(
+			getPerceptualContrast(
+				backgroundRamp.ramp.surface2,
+				scale.colors[ 4 ]
+			)
+		).toBeLessThan(
+			getPerceptualContrast(
+				backgroundRamp.ramp.surface2,
+				primaryRamp.ramp.fgSurface4
+			)
+		);
+	} );
+
+	it( 'preserves more accent chroma at the middle-gray polarity boundary', () => {
+		const backgroundRamp = buildBgRamp( '#777777' );
+		const primaryRamp = buildAccentRamp( '#d63638', backgroundRamp );
+		const taperedScale = buildScale(
+			'uniform',
+			primaryRamp,
+			backgroundRamp,
+			primaryRamp.ramp.bgFill1
+		);
+		const chromaFirstScale = buildScale(
+			'chroma-first',
+			primaryRamp,
+			backgroundRamp,
+			primaryRamp.ramp.bgFill1
+		);
+		const getTotalChroma = ( colors: readonly string[] ) =>
+			colors
+				.slice( 0, -1 )
+				.reduce(
+					( total, color ) =>
+						total + get( parse( color ), [ OKLCH, 'c' ] ),
+					0
+				);
+
+		expect( getTotalChroma( chromaFirstScale.colors ) ).toBeGreaterThan(
+			getTotalChroma( taperedScale.colors )
+		);
 	} );
 
 	it( 'produces the same palette for identical seeds', () => {

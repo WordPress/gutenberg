@@ -14,6 +14,7 @@ import { solveWithBisect } from '../lib/utils';
 
 export const EXPERIMENTAL_FOREGROUND_METHODS = [
 	'current',
+	'chroma-first',
 	'uniform',
 	'semantic-anchors',
 	'eased',
@@ -24,11 +25,13 @@ export type ExperimentalForegroundMethod =
 
 export type ExperimentalForegroundScale = {
 	colors: readonly [ string, string, string, string, string ];
+	minimumWcagContrasts: readonly [ number, number, number, number, number ];
 	meetsWcagFloors: boolean;
 };
 
 const FOREGROUND_WCAG_FLOORS = [ 2, 3, 4.5, 4.5, 4.5 ] as const;
 const EASED_SPACING_POWER = 1.35;
+const CHROMA_FIRST_MINIMUM_APCA_INTERVAL = 7;
 const FOREGROUND_TAPER_CHROMA_OPTIONS = {
 	alpha: 0.6,
 	kLight: 0.2,
@@ -66,6 +69,26 @@ function getColorForLightness( seed: PlainColorObject, lightness: number ) {
 		alpha: seed.alpha,
 	} );
 }
+
+function getChromaPreservingColorForLightness(
+	seed: PlainColorObject,
+	lightness: number
+) {
+	return clampToGamut( {
+		space: OKLCH,
+		coords: [
+			lightness,
+			get( seed, [ OKLCH, 'c' ] ),
+			get( seed, [ OKLCH, 'h' ] ),
+		],
+		alpha: seed.alpha,
+	} );
+}
+
+type GetColorForLightness = (
+	seed: PlainColorObject,
+	lightness: number
+) => PlainColorObject;
 
 function getForegroundConstraintReferences(
 	stepIndex: number,
@@ -110,12 +133,14 @@ function getWcagFloorMargin(
 
 function findColorAtPerceptualContrast( {
 	displayBackground,
+	getColorAtLightness = getColorForLightness,
 	seed,
 	weakColor,
 	strongColor,
 	target,
 }: {
 	displayBackground: string;
+	getColorAtLightness?: GetColorForLightness;
 	seed: PlainColorObject;
 	weakColor: PlainColorObject;
 	strongColor: PlainColorObject;
@@ -135,7 +160,7 @@ function findColorAtPerceptualContrast( {
 	}
 
 	const solvedColor = solveWithBisect(
-		( lightness ) => getColorForLightness( seed, lightness ),
+		( lightness ) => getColorAtLightness( seed, lightness ),
 		( color ) => getPerceptualContrast( displayBackground, color ) - target,
 		get( weakColor, [ OKLCH, 'l' ] ),
 		weakContrast - target,
@@ -163,7 +188,7 @@ function findColorAtPerceptualContrast( {
 			minimumLightness,
 			Math.min( maximumLightness, solvedLightness + offset )
 		);
-		const candidate = getColorForLightness( seed, lightness );
+		const candidate = getColorAtLightness( seed, lightness );
 		const difference = Math.abs(
 			getPerceptualContrast(
 				displayBackground,
@@ -180,12 +205,14 @@ function findColorAtPerceptualContrast( {
 }
 
 function findColorAtWcagFloor( {
+	getColorAtLightness = getColorForLightness,
 	seed,
 	weakColor,
 	strongColor,
 	references,
 	target,
 }: {
+	getColorAtLightness?: GetColorForLightness;
 	seed: PlainColorObject;
 	weakColor: PlainColorObject;
 	strongColor: PlainColorObject;
@@ -203,7 +230,7 @@ function findColorAtWcagFloor( {
 	}
 
 	return solveWithBisect(
-		( lightness ) => getColorForLightness( seed, lightness ),
+		( lightness ) => getColorAtLightness( seed, lightness ),
 		( color ) => getWcagFloorMargin( color, references, target ),
 		get( weakColor, [ OKLCH, 'l' ] ),
 		weakMargin,
@@ -271,6 +298,7 @@ function findStrongBoundary( {
 }
 
 function getFloorColor( {
+	getColorAtLightness,
 	stepIndex,
 	seed,
 	weakColor,
@@ -278,6 +306,7 @@ function getFloorColor( {
 	ramp,
 	backgroundRamp,
 }: {
+	getColorAtLightness?: GetColorForLightness;
 	stepIndex: number;
 	seed: PlainColorObject;
 	weakColor: PlainColorObject;
@@ -286,6 +315,7 @@ function getFloorColor( {
 	backgroundRamp: RampResult;
 } ) {
 	return findColorAtWcagFloor( {
+		getColorAtLightness,
 		seed,
 		weakColor,
 		strongColor,
@@ -316,22 +346,158 @@ function serializeScale(
 	];
 }
 
-function scaleMeetsWcagFloors(
+function getMinimumWcagContrasts(
 	colors: ExperimentalForegroundScale[ 'colors' ],
 	ramp: RampResult,
 	backgroundRamp: RampResult
 ) {
-	return colors.every( ( color, stepIndex ) =>
-		getForegroundConstraintReferences(
+	return colors.map( ( color, stepIndex ) =>
+		Math.min(
+			...getForegroundConstraintReferences(
+				stepIndex,
+				ramp,
+				backgroundRamp
+			).map( ( reference ) => getContrast( reference, color ) )
+		)
+	) as [ number, number, number, number, number ];
+}
+
+function createScaleResult(
+	colors: ExperimentalForegroundScale[ 'colors' ],
+	ramp: RampResult,
+	backgroundRamp: RampResult
+): ExperimentalForegroundScale {
+	const minimumWcagContrasts = getMinimumWcagContrasts(
+		colors,
+		ramp,
+		backgroundRamp
+	);
+	return {
+		colors,
+		minimumWcagContrasts,
+		meetsWcagFloors: minimumWcagContrasts.every(
+			( contrast, stepIndex ) =>
+				contrast >= FOREGROUND_WCAG_FLOORS[ stepIndex ]
+		),
+	};
+}
+
+function getChromaFirstTargets(
+	floorContrasts: readonly number[],
+	maximumContrast: number
+) {
+	const buildTargets = ( minimumInterval: number ) =>
+		floorContrasts.reduce< number[] >( ( targets, floorContrast ) => {
+			const previousTarget = targets.at( -1 );
+			targets.push(
+				Math.max(
+					floorContrast,
+					previousTarget === undefined
+						? floorContrast
+						: previousTarget + minimumInterval
+				)
+			);
+			return targets;
+		}, [] );
+
+	const preferredTargets = buildTargets( CHROMA_FIRST_MINIMUM_APCA_INTERVAL );
+	if ( preferredTargets.at( -1 )! <= maximumContrast ) {
+		return preferredTargets;
+	}
+
+	const availableInterval = Math.min(
+		...floorContrasts
+			.slice( 0, -1 )
+			.map(
+				( floorContrast, stepIndex ) =>
+					( maximumContrast - floorContrast ) /
+					( floorContrasts.length - stepIndex - 1 )
+			)
+	);
+	return buildTargets( Math.max( 0, availableInterval ) );
+}
+
+function buildChromaFirstColors( {
+	seed,
+	ramp,
+	backgroundRamp,
+}: {
+	seed: PlainColorObject;
+	ramp: RampResult;
+	backgroundRamp: RampResult;
+} ) {
+	const displayBackground = backgroundRamp.ramp.surface2;
+	const displayBackgroundColor = clampToGamut( displayBackground );
+	const weakColor = getChromaPreservingColorForLightness(
+		seed,
+		get( displayBackgroundColor, [ OKLCH, 'l' ] )
+	);
+	const strongColor = getChromaPreservingColorForLightness(
+		seed,
+		ramp.direction === 'lighter' ? 1 : 0
+	);
+	const floorColors = FOREGROUND_WCAG_FLOORS.map( ( _, stepIndex ) =>
+		getFloorColor( {
+			getColorAtLightness: getChromaPreservingColorForLightness,
+			stepIndex,
+			seed,
+			weakColor,
+			strongColor,
+			ramp,
+			backgroundRamp,
+		} )
+	);
+	const floorContrasts = floorColors.map( ( color ) =>
+		getPerceptualContrast( displayBackground, color )
+	);
+	const targets = getChromaFirstTargets(
+		floorContrasts,
+		getPerceptualContrast( displayBackground, strongColor )
+	);
+
+	return targets.map( ( target, stepIndex ) => {
+		const candidate = findColorAtPerceptualContrast( {
+			displayBackground,
+			getColorAtLightness: getChromaPreservingColorForLightness,
+			seed,
+			weakColor,
+			strongColor,
+			target,
+		} );
+		const references = getForegroundConstraintReferences(
 			stepIndex,
 			ramp,
 			backgroundRamp
-		).every(
-			( reference ) =>
-				getContrast( reference, color ) >=
-				FOREGROUND_WCAG_FLOORS[ stepIndex ]
-		)
-	);
+		);
+		const candidateLightness = get( candidate, [ OKLCH, 'l' ] );
+		const strongLightness = get( strongColor, [ OKLCH, 'l' ] );
+		const direction = Math.sign( strongLightness - candidateLightness );
+		const maximumOffset = Math.abs( strongLightness - candidateLightness );
+		for ( let offset = 0; offset < maximumOffset; offset += 0.00025 ) {
+			const strengthened = getChromaPreservingColorForLightness(
+				seed,
+				candidateLightness + direction * offset
+			);
+			if (
+				references.every(
+					( reference ) =>
+						getContrast(
+							reference,
+							getColorString( strengthened )
+						) >= FOREGROUND_WCAG_FLOORS[ stepIndex ]
+				)
+			) {
+				return strengthened;
+			}
+		}
+		return strongColor;
+	} ) as [
+		PlainColorObject,
+		PlainColorObject,
+		PlainColorObject,
+		PlainColorObject,
+		PlainColorObject,
+	];
 }
 
 export function buildPerceptualForegroundScale( {
@@ -354,17 +520,17 @@ export function buildPerceptualForegroundScale( {
 	] as const;
 
 	if ( method === 'current' ) {
-		return {
-			colors: currentColors,
-			meetsWcagFloors: scaleMeetsWcagFloors(
-				currentColors,
-				ramp,
-				backgroundRamp
-			),
-		};
+		return createScaleResult( currentColors, ramp, backgroundRamp );
 	}
 
 	const seed = clampToGamut( seedArg );
+	if ( method === 'chroma-first' ) {
+		const colors = serializeScale(
+			buildChromaFirstColors( { seed, ramp, backgroundRamp } )
+		);
+		return createScaleResult( colors, ramp, backgroundRamp );
+	}
+
 	const displayBackground = backgroundRamp.ramp.surface2;
 	const currentWeakColor = clampToGamut( ramp.ramp.fgSurface1 );
 	const currentStrongColor = clampToGamut( ramp.ramp.fgSurface4 );
@@ -539,8 +705,5 @@ export function buildPerceptualForegroundScale( {
 	}
 
 	const colors = serializeScale( experimentalColors );
-	return {
-		colors,
-		meetsWcagFloors: scaleMeetsWcagFloors( colors, ramp, backgroundRamp ),
-	};
+	return createScaleResult( colors, ramp, backgroundRamp );
 }
