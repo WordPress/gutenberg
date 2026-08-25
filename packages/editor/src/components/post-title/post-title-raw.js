@@ -57,7 +57,7 @@ function PostTitleRaw( _, forwardedRef ) {
 	return (
 		<WCTextareaControl
 			ref={ focusRef }
-			value={ title }
+			value={ decodeEntities( title ) }
 			onChange={ onChange }
 			onFocus={ onSelect }
 			onBlur={ onUnselect }
