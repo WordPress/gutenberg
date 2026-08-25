@@ -37,7 +37,7 @@ function UnconnectedZStack(
 				className={ styles.child }
 				style={ {
 					'--z-stack-offset': `${ offsetAmount }px`,
-					zIndex,
+					'--z-stack-z-index': zIndex,
 				} }
 				key={ key }
 			>

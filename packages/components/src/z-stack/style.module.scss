@@ -17,6 +17,10 @@
 	grid-column-start: 1;
 }
 
-.child:not(:first-of-type) {
-	margin-inline-start: var(--z-stack-offset, 0);
+.child {
+	z-index: var(--z-stack-z-index, auto);
+
+	&:not(:first-of-type) {
+		margin-inline-start: var(--z-stack-offset, 0);
+	}
 }
