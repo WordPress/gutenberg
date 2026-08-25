@@ -39,7 +39,7 @@
 -   `Calendar`, `RangeCalendar`: Preserve day focus when a controlled month change removes the focused day. ([#81635](https://github.com/WordPress/gutenberg/pull/81635))
 -   `Button`: Fix the loading spinner being off-center in RTL ([#81901](https://github.com/WordPress/gutenberg/pull/81901)).
 -   `Select`, `Combobox`, `SelectControl`: Fix the trigger placeholder failing the 4.5:1 text contrast minimum ([#81853](https://github.com/WordPress/gutenberg/pull/81853)).
--   `Autocomplete.List`: Stop rendering `aria-orientation` in grid mode, where `role="grid"` disallows it. Temporary workaround, fixed upstream in Base UI 1.8.0. ([#81853](https://github.com/WordPress/gutenberg/pull/81853))
+-   `Autocomplete.List`: Stop rendering `aria-orientation` in grid mode, where `role="grid"` disallows it ([#81853](https://github.com/WordPress/gutenberg/pull/81853)).
 
 ### Documentation
 
