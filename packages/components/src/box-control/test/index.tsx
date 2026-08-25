@@ -545,12 +545,18 @@ describe( 'BoxControl', () => {
 		it( 'should apply module classes and retained public class names in custom mode', () => {
 			const { container } = render( <UncontrolledBoxControl /> );
 
+			const grid = screen.getByRole( 'group', { name: 'Box Control' } );
 			const allSidesInput = screen.getByRole( 'textbox', {
 				name: 'All sides',
 			} );
-			const linkedInputWrapper =
+			const innerInputWrapper =
 				// eslint-disable-next-line testing-library/no-node-access
 				allSidesInput.closest( `.${ styles[ 'input-wrapper' ] }` );
+			const linkedRow =
+				// eslint-disable-next-line testing-library/no-node-access
+				Array.from( grid.children ).find( ( child ) =>
+					child.classList.contains( styles[ 'input-wrapper' ] )
+				);
 			const unlinkButton = screen.getByRole( 'button', {
 				name: 'Unlink sides',
 			} );
@@ -560,15 +566,17 @@ describe( 'BoxControl', () => {
 					`.${ styles[ 'linked-button-wrapper' ] }`
 				);
 
-			expect( linkedInputWrapper ).toHaveClass(
+			expect( innerInputWrapper ).toHaveClass(
 				styles[ 'input-wrapper' ]
 			);
+			expect( linkedRow ).toHaveClass( styles[ 'input-wrapper' ] );
+			expect( linkedRow ).not.toBe( innerInputWrapper );
 			expect( linkedButtonWrapper ).toHaveClass(
 				styles[ 'linked-button-wrapper' ]
 			);
 			expect(
 				// eslint-disable-next-line testing-library/no-node-access
-				linkedInputWrapper?.querySelector( `.${ styles.icon }` )
+				innerInputWrapper?.querySelector( `.${ styles.icon }` )
 			).toHaveClass( styles.icon );
 			expect(
 				// Class names live on wrappers around the labeled controls.
