@@ -66,7 +66,7 @@ npm --workspace @wordpress/agent-skill-evals run validate
 npm run test:agent-evals
 
 # Run one spec.
-npm run test:agent-evals -- --config specs/SPEC_GROUP/TEST_NAME.test.js
+npm run test:agent-evals -- --config specs/SPEC_GROUP/TEST_NAME.eval.js
 
 # Any other flag is passed through, with or without --config.
 npm run test:agent-evals -- --repeat 3
@@ -82,6 +82,6 @@ Results under `results/` are gitignored and may contain source code and tool out
 For each spec:
 
 1. State the narrow claim the evaluation supports.
-2. Add a `TEST_NAME.test.js` file that spreads `lib/base.js` and adds a
+2. Add a `TEST_NAME.eval.js` file that spreads `lib/base.js` and adds a
    realistic agent prompt, cases, and named metrics.
 3. Validate, run one provider once, then run the intended matrix with repeats.
