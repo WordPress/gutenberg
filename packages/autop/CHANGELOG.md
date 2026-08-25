@@ -6,6 +6,10 @@
 
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
 
+### Bug Fixes
+
+-   Fix `autop` inserting `<br />` tags inside `<script>`, `<style>`, `<svg>`, and `<math>` elements ([77542](https://github.com/WordPress/gutenberg/pull/77542)).
+
 ## 4.53.0 (2026-08-12)
 
 ## 4.52.0 (2026-07-29)

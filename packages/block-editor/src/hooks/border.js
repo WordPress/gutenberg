@@ -8,11 +8,7 @@ import { __ } from '@wordpress/i18n';
 import { getColorClassName } from '../components/colors';
 import InspectorControls from '../components/inspector-controls';
 import useMultipleOriginColorsAndGradients from '../components/colors-gradients/use-multiple-origin-colors-and-gradients';
-import {
-	cleanEmptyObject,
-	shouldSkipSerialization,
-	useBlockSettings,
-} from './utils';
+import { cleanEmptyObject, shouldSkipSerialization } from './utils';
 import {
 	useHasBorderPanel,
 	useHasBorderPanelControls,
@@ -26,9 +22,12 @@ import {
 	setStyleForState,
 	useBlockStyleState,
 } from './block-style-state';
+import { unlock } from '../lock-unlock';
 
 export const BORDER_SUPPORT_KEY = '__experimentalBorder';
 export const SHADOW_SUPPORT_KEY = 'shadow';
+
+const EMPTY_ARRAY = [];
 
 const getColorByProperty = ( colors, property, value ) => {
 	let matchedColor;
@@ -251,14 +250,34 @@ export function hasShadowSupport( blockName ) {
 }
 
 export function useBorderPanelLabel( {
-	blockName,
+	clientId,
 	hasBorderControl,
 	hasShadowControl,
 } = {} ) {
-	const settings = useBlockSettings( blockName );
+	const [ color, radius, style, width, shadow ] = useSelect(
+		( select ) => {
+			if ( ! clientId ) {
+				return EMPTY_ARRAY;
+			}
+			const { getBlockSettings } = unlock( select( blockEditorStore ) );
+			return getBlockSettings(
+				clientId,
+				'border.color',
+				'border.radius',
+				'border.style',
+				'border.width',
+				'shadow'
+			);
+		},
+		[ clientId ]
+	);
+	const settings = useMemo(
+		() => ( { border: { color, radius, style, width }, shadow } ),
+		[ color, radius, style, width, shadow ]
+	);
 	const controls = useHasBorderPanelControls( settings );
 
-	if ( ! hasBorderControl && ! hasShadowControl && blockName ) {
+	if ( ! hasBorderControl && ! hasShadowControl && clientId ) {
 		hasBorderControl =
 			controls?.hasBorderColor ||
 			controls?.hasBorderStyle ||

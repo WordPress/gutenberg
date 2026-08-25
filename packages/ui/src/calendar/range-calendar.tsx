@@ -1,6 +1,5 @@
 import { differenceInCalendarDays } from 'date-fns';
 import { DayPicker, rangeContainsModifiers } from '@daypicker/react';
-import { enUS } from '@daypicker/react/locale';
 import { forwardRef, useMemo, useState, useCallback } from '@wordpress/element';
 import { COMMON_PROPS, MODIFIER_CLASSNAMES } from './utils/constants';
 import { clampNumberOfMonths } from './utils/misc';
@@ -140,7 +139,7 @@ export const RangeCalendar = forwardRef< HTMLDivElement, RangeCalendarProps >(
 			min,
 			max,
 			disabled,
-			locale = enUS,
+			locale,
 			timeZone,
 			month,
 			render,
