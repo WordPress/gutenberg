@@ -33,6 +33,7 @@
 -   `InputControl`: Vertically center the value of date and time inputs in Safari ([#81361](https://github.com/WordPress/gutenberg/pull/81361)).
 -   `ControlWithError`: Re-read the target's validation message when an `invalid` event is received, so a message that changed without a re-render in between (e.g. a programmatic value change followed by a synthetic `invalid` event) is not revealed stale or empty. While a `validating` custom validity is pending, the message is left untouched so the pending indicator keeps showing ([#81440](https://github.com/WordPress/gutenberg/pull/81440)).
 -   `Button`: Apply the `has-text` class when the children that render the label are conditional, wrapped in an element, or preceded by other children, so that such buttons are no longer styled as icon-only buttons ([#81521](https://github.com/WordPress/gutenberg/pull/81521)).
+-   `BorderControl`: Use `1px` width when selecting the border color initially without explicitly setting width ([#69112](https://github.com/WordPress/gutenberg/pull/69112)).
 
 ### TypeScript
 
@@ -881,7 +882,6 @@
 -   `FontSizePicker`: Remove Custom option from dropdown to prevent unexpected context changes during keyboard navigation ([#69038](https://github.com/WordPress/gutenberg/pull/69038)).
 
 -   `ComboboxControl`: Add an `isLoading` prop to show a loading spinner ([#68990](https://github.com/WordPress/gutenberg/pull/68990))
--   `BorderControl`: adjust `useBorderControlDropdown` hook to use `1px` width when selecting the border color initially without explicitly setting width ([#69112](https://github.com/WordPress/gutenberg/pull/69112)).
 
 ## 29.3.0 (2025-01-29)
 

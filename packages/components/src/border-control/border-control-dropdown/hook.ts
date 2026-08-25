@@ -24,7 +24,7 @@ export function useBorderControlDropdown(
 	const [ widthValue ] = parseQuantityAndUnitFromRawValue( border?.width );
 	// If widthValue is 0, or on initial render we have width undefined.
 	// Need to set width to `1px`, if we change color first before adding border width.
-	const hasZeroWidth = widthValue === 0 || undefined === widthValue;
+	const hasZeroWidth = 0 === widthValue || undefined === widthValue;
 
 	const onColorChange = ( color?: string ) => {
 		const style =
