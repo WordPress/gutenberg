@@ -123,6 +123,23 @@ function getSelectionRectangle( placements, selectedClientIds ) {
 	};
 }
 
+/**
+ * Groups cell placements by row index.
+ *
+ * @param {Array} cellPlacements Cell placements.
+ * @return {Map} Map of row index to the row's placements.
+ */
+function groupPlacementsByRow( cellPlacements ) {
+	const byRow = new Map();
+	for ( const placement of cellPlacements ) {
+		if ( ! byRow.has( placement.rowIndex ) ) {
+			byRow.set( placement.rowIndex, [] );
+		}
+		byRow.get( placement.rowIndex ).push( placement );
+	}
+	return byRow;
+}
+
 export default function TableCellEdit( {
 	attributes,
 	setAttributes,
@@ -549,21 +566,49 @@ export default function TableCellEdit( {
 		if ( ! selectedCellPlacement || ! tableClientId ) {
 			return;
 		}
-		const { columnIndex } = selectedCellPlacement;
-		const insertIndex = columnIndex + delta;
+		const { columnIndex, colSpan: selectedColSpan } = selectedCellPlacement;
+		// "Before" targets the selected cell's first column, "after" the
+		// column past its last.
+		const targetColumn =
+			delta === 0 ? columnIndex : columnIndex + selectedColSpan;
 
-		// Insert a cell at the same position in every row.
+		// Insert a cell at the same visual column in every row.
 		const sections = registry
 			.select( blockEditorStore )
 			.getBlocks( tableClientId );
+		const placementsByRow = groupPlacementsByRow( cellPlacements );
 
 		registry.batch( () => {
+			let rowIndex = 0;
 			for ( const section of sections ) {
 				const sectionRows = registry
 					.select( blockEditorStore )
 					.getBlocks( section.clientId );
 
 				for ( const row of sectionRows ) {
+					const rowPlacements = placementsByRow.get( rowIndex ) || [];
+					rowIndex++;
+
+					// A cell spanning across the inserted column grows to
+					// cover it instead of gaining a sibling cell.
+					const spanningPlacement = rowPlacements.find(
+						( placement ) =>
+							placement.columnIndex < targetColumn &&
+							placement.columnIndex + placement.colSpan - 1 >=
+								targetColumn
+					);
+					if ( spanningPlacement ) {
+						updateBlockAttributes( spanningPlacement.clientId, {
+							colSpan: spanningPlacement.colSpan + 1,
+						} );
+						continue;
+					}
+
+					// The raw insertion index follows from the visual
+					// column: the row's cells placed before it come first.
+					const insertIndex = rowPlacements.filter(
+						( placement ) => placement.columnIndex < targetColumn
+					).length;
 					const rowCells = registry
 						.select( blockEditorStore )
 						.getBlocks( row.clientId );
@@ -602,37 +647,79 @@ export default function TableCellEdit( {
 			return;
 		}
 
-		const { columnIndex } = selectedCellPlacement;
-		const endColumn = columnIndex + ( colSpan || 1 ) - 1;
+		const { columnIndex, colSpan: selectedColSpan } = selectedCellPlacement;
+		const endColumn = columnIndex + selectedColSpan - 1;
 
-		// Delete cells in the column range from every row.
+		// Delete cells in the visual column range from every row.
 		const sections = registry
 			.select( blockEditorStore )
 			.getBlocks( tableClientId );
+		const placementsByRow = groupPlacementsByRow( cellPlacements );
 
 		registry.batch( () => {
+			let rowIndex = 0;
 			for ( const section of sections ) {
 				const sectionRows = registry
 					.select( blockEditorStore )
 					.getBlocks( section.clientId );
 
 				for ( const row of sectionRows ) {
-					const rowCells = registry
-						.select( blockEditorStore )
-						.getBlocks( row.clientId );
+					const rowPlacements = placementsByRow.get( rowIndex ) || [];
+					rowIndex++;
 
-					const nextCells = rowCells.filter( ( cell, index ) => {
-						const cellEnd =
-							index + ( cell.attributes.colSpan || 1 ) - 1;
-						// Remove cells that are entirely within the range.
-						return (
-							index < columnIndex ||
-							index > endColumn ||
-							cellEnd < columnIndex
+					// Cells starting within the column range are removed. A
+					// cell starting before it but spanning into it has its
+					// colSpan reduced by the overlap.
+					const deletedClientIds = new Set();
+					const spanReductions = new Map();
+					for ( const placement of rowPlacements ) {
+						const placementEndColumn =
+							placement.columnIndex + placement.colSpan - 1;
+						if (
+							placement.columnIndex >= columnIndex &&
+							placement.columnIndex <= endColumn
+						) {
+							deletedClientIds.add( placement.clientId );
+						} else if (
+							placement.columnIndex < columnIndex &&
+							placementEndColumn >= columnIndex
+						) {
+							const overlap =
+								Math.min( placementEndColumn, endColumn ) -
+								columnIndex +
+								1;
+							spanReductions.set(
+								placement.clientId,
+								placement.colSpan - overlap
+							);
+						}
+					}
+
+					if ( deletedClientIds.size ) {
+						const rowCells = registry
+							.select( blockEditorStore )
+							.getBlocks( row.clientId );
+						replaceInnerBlocks(
+							row.clientId,
+							rowCells.filter(
+								( cell ) =>
+									! deletedClientIds.has( cell.clientId )
+							),
+							false
 						);
-					} );
+					}
 
-					replaceInnerBlocks( row.clientId, nextCells, false );
+					// Attribute updates come after the replacement:
+					// replaceInnerBlocks re-inserts the passed blocks with
+					// their read-time attributes.
+					for ( const [
+						clientIdToReduce,
+						newColSpan,
+					] of spanReductions ) {
+						updateBlockAttributes( clientIdToReduce, {
+							colSpan: newColSpan,
+						} );
+					}
 				}
 			}
 		} );
