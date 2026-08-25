@@ -24,6 +24,11 @@
 			"type": "string",
 			"default": "_self",
 			"role": "content"
+		},
+		"shouldUnlinkOnHomepage": {
+			"type": "boolean",
+			"default": false,
+			"role": "content"
 		}
 	},
 	"example": {

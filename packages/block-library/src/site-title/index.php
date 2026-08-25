@@ -30,7 +30,11 @@ function render_block_core_site_title( $attributes ) {
 		$tag_name = 0 === $attributes['level'] ? 'p' : 'h' . (int) $attributes['level'];
 	}
 
-	if ( $attributes['isLink'] ) {
+	// Don't link the site title to the homepage when we're already on the homepage,
+	// if the block is configured to omit the link there.
+	$should_unlink_on_homepage = ! empty( $attributes['shouldUnlinkOnHomepage'] ) && is_front_page() && ! is_paged();
+
+	if ( $attributes['isLink'] && ! $should_unlink_on_homepage ) {
 		$aria_current = ! is_paged() && ( is_front_page() || is_home() && ( (int) get_option( 'page_for_posts' ) !== get_queried_object_id() ) ) ? ' aria-current="page"' : '';
 		$link_target  = ! empty( $attributes['linkTarget'] ) ? $attributes['linkTarget'] : '_self';
 
@@ -41,6 +45,8 @@ function render_block_core_site_title( $attributes ) {
 			$aria_current,
 			esc_html( $site_title )
 		);
+	} else {
+		$site_title = esc_html( $site_title );
 	}
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => trim( $classes ) ) );
 
@@ -48,8 +54,7 @@ function render_block_core_site_title( $attributes ) {
 		'<%1$s %2$s>%3$s</%1$s>',
 		$tag_name,
 		$wrapper_attributes,
-		// already pre-escaped if it is a link.
-		$attributes['isLink'] ? $site_title : esc_html( $site_title )
+		$site_title
 	);
 }
 
