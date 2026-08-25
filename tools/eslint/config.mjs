@@ -320,6 +320,8 @@ export default dedupePlugins( [
 						Autocomplete: 'WCAutocomplete',
 						Badge: 'WCBadge',
 						Icon: 'WCIcon',
+						__experimentalInputControl: 'WCInputControl',
+						TextareaControl: 'WCTextareaControl',
 						Tooltip: 'WCTooltip',
 					},
 				},
@@ -835,6 +837,26 @@ export default dedupePlugins( [
 							name: '@wordpress/core-data',
 							message:
 								"block-editor is a generic package that doesn't depend on a server or WordPress backend. To provide WordPress integration, consider passing settings to the BlockEditorProvider components.",
+						},
+					],
+				},
+			],
+		},
+	},
+
+	// Override: dataviews — restrict private-apis imports.
+	{
+		files: [ 'packages/dataviews/**' ],
+		rules: {
+			'no-restricted-imports': [
+				'error',
+				{
+					paths: [
+						...restrictedImports,
+						{
+							name: '@wordpress/private-apis',
+							message:
+								'dataviews is a bundled package that plugins may import via npm, where a second copy of private-apis cannot unlock objects locked by the WordPress copy and throws at runtime.',
 						},
 					],
 				},

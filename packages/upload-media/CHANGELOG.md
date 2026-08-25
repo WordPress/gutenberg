@@ -7,6 +7,10 @@
 -   Add JPEG XL (JXL) as a client-side supported MIME type and output format. The vips-jxl.wasm module is loaded lazily on first use via `vipsEnsureJxlSupport()`, keeping it out of the default bundle.
 -   Convert uploaded JPEG XL (JXL) images to JPEG client-side via vips, since JXL is not yet broadly web-compatible (most browsers cannot display it and the server cannot read it). The original `.jxl` is preserved as a companion file alongside the JPEG derivative, mirroring how HEIC uploads are handled.
 
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
 ## 0.38.0 (2026-08-12)
 
 ### Enhancements
@@ -16,7 +20,6 @@
 ### Bug Fixes
 
 -   A failed `/finalize` request is no longer reported as a successful upload. Finalize is the server's commit point for the attachment metadata (responsive sub-sizes and the final `-scaled` file reference); when it fails, the item is now cancelled and the error surfaced instead of showing "upload complete" and keeping an attachment that is missing its registered sizes ([#80673](https://github.com/WordPress/gutenberg/issues/80673)).
-
 ## 0.37.0 (2026-07-29)
 
 ### Breaking Changes

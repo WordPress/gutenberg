@@ -59,6 +59,9 @@ const units = [
 export default {
 	name: 'grid',
 	label: __( 'Grid' ),
+	hasInspectorControls() {
+		return true;
+	},
 	inspectorControls: function GridLayoutInspectorControls( {
 		layout = {},
 		onChange,
@@ -273,7 +276,12 @@ export default {
 			minimumColumnWidth &&
 			columnCount > 0
 		) {
-			let blockGapToUse = blockGapValue || fallbackGapValue;
+			const blockGapBoxControlValue = blockGapValue
+				? getGapBoxControlValueFromStyle( style.spacing.blockGap )
+				: undefined;
+			let blockGapToUse =
+				getSpacingPresetCssVar( blockGapBoxControlValue?.left ) ||
+				fallbackGapValue;
 			// Ensure 0 values have a unit so they work in calc().
 			if ( blockGapToUse === '0' || blockGapToUse === 0 ) {
 				blockGapToUse = '0px';

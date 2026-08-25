@@ -432,3 +432,233 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 		} );
 	} );
 } );
+
+describe( 'BorderPanel — shadow preset persistence', () => {
+	const selectShadowPreset = async ( user, name ) => {
+		await user.click(
+			screen.getByRole( 'button', { name: 'Drop shadow' } )
+		);
+		await user.click( screen.getByRole( 'option', { name } ) );
+	};
+
+	const shadowSettings = ( presets, defaultPresets = true ) => ( {
+		shadow: { defaultPresets, presets },
+	} );
+
+	const defaultPreset = {
+		name: 'Natural',
+		slug: 'natural',
+		shadow: '6px 6px 9px rgba(0, 0, 0, 0.2)',
+	};
+	const themePreset = {
+		name: 'Outlined',
+		slug: 'outlined',
+		shadow: '6px 6px 0px -3px rgba(255, 255, 255, 1), 6px 6px rgba(0, 0, 0, 1)',
+	};
+	const customPreset = {
+		name: 'My shadow',
+		slug: 'my-shadow',
+		shadow: '0 0 10px rgba(255, 0, 0, 1)',
+	};
+
+	it( 'persists a theme preset as a preset reference when custom presets also exist', async () => {
+		const user = userEvent.setup();
+		const onChange = jest.fn();
+
+		render(
+			<BorderPanel
+				value={ {} }
+				settings={ shadowSettings( {
+					default: [ defaultPreset ],
+					theme: [ themePreset ],
+					custom: [ customPreset ],
+				} ) }
+				onChange={ onChange }
+				panelId="test-panel"
+			/>
+		);
+
+		await selectShadowPreset( user, 'Outlined' );
+
+		expect( onChange ).toHaveBeenCalledWith( {
+			shadow: 'var:preset|shadow|outlined',
+		} );
+	} );
+
+	it( 'persists a default preset as a preset reference when custom presets also exist', async () => {
+		const user = userEvent.setup();
+		const onChange = jest.fn();
+
+		render(
+			<BorderPanel
+				value={ {} }
+				settings={ shadowSettings( {
+					default: [ defaultPreset ],
+					theme: [ themePreset ],
+					custom: [ customPreset ],
+				} ) }
+				onChange={ onChange }
+				panelId="test-panel"
+			/>
+		);
+
+		await selectShadowPreset( user, 'Natural' );
+
+		expect( onChange ).toHaveBeenCalledWith( {
+			shadow: 'var:preset|shadow|natural',
+		} );
+	} );
+
+	it( 'persists a custom preset as a preset reference', async () => {
+		const user = userEvent.setup();
+		const onChange = jest.fn();
+
+		render(
+			<BorderPanel
+				value={ {} }
+				settings={ shadowSettings( {
+					default: [ defaultPreset ],
+					theme: [ themePreset ],
+					custom: [ customPreset ],
+				} ) }
+				onChange={ onChange }
+				panelId="test-panel"
+			/>
+		);
+
+		await selectShadowPreset( user, 'My shadow' );
+
+		expect( onChange ).toHaveBeenCalledWith( {
+			shadow: 'var:preset|shadow|my-shadow',
+		} );
+	} );
+
+	it( 'persists the unset entry as a literal value, not a preset reference', async () => {
+		const user = userEvent.setup();
+		const onChange = jest.fn();
+
+		render(
+			<BorderPanel
+				value={ {} }
+				settings={ shadowSettings( {
+					theme: [ themePreset ],
+					custom: [ customPreset ],
+				} ) }
+				onChange={ onChange }
+				panelId="test-panel"
+			/>
+		);
+
+		await selectShadowPreset( user, 'Unset' );
+
+		expect( onChange ).toHaveBeenCalledWith( { shadow: 'none' } );
+	} );
+
+	it( 'does not reference default presets the theme has opted out of', async () => {
+		const user = userEvent.setup();
+		const onChange = jest.fn();
+
+		render(
+			<BorderPanel
+				value={ {} }
+				settings={ shadowSettings(
+					{
+						// Same shadow value as the theme preset below, so the
+						// lookup has to skip it rather than match it first.
+						default: [
+							{ ...defaultPreset, shadow: themePreset.shadow },
+						],
+						theme: [ themePreset ],
+					},
+					false
+				) }
+				onChange={ onChange }
+				panelId="test-panel"
+			/>
+		);
+
+		await selectShadowPreset( user, 'Outlined' );
+
+		// The opted-out preset is not offered, so it is not something the
+		// user can have meant.
+		expect(
+			screen.queryByRole( 'option', { name: 'Natural' } )
+		).not.toBeInTheDocument();
+		expect( onChange ).toHaveBeenCalledWith( {
+			shadow: 'var:preset|shadow|outlined',
+		} );
+	} );
+
+	it( 'offers only the most specific preset when a slug is defined twice', async () => {
+		const user = userEvent.setup();
+		const onChange = jest.fn();
+
+		// Custom preset slugs are generated as `shadow-<n>` from the custom
+		// presets alone, so they can collide with a theme preset's slug.
+		const themeShadowOne = {
+			name: 'Theme shadow',
+			slug: 'shadow-1',
+			shadow: '0 0 10px rgba(0, 0, 255, 1)',
+		};
+		const customShadowOne = {
+			name: 'Shadow 1',
+			slug: 'shadow-1',
+			shadow: '0 0 10px rgba(255, 0, 0, 1)',
+		};
+
+		render(
+			<BorderPanel
+				value={ {} }
+				settings={ shadowSettings( {
+					theme: [ themeShadowOne ],
+					custom: [ customShadowOne ],
+				} ) }
+				onChange={ onChange }
+				panelId="test-panel"
+			/>
+		);
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Drop shadow' } )
+		);
+
+		// `--wp--preset--shadow--shadow-1` holds the custom preset's value, so
+		// offering the theme one would show a shadow it cannot apply.
+		expect(
+			screen.queryByRole( 'option', { name: 'Theme shadow' } )
+		).not.toBeInTheDocument();
+
+		await user.click( screen.getByRole( 'option', { name: 'Shadow 1' } ) );
+
+		expect( onChange ).toHaveBeenCalledWith( {
+			shadow: 'var:preset|shadow|shadow-1',
+		} );
+	} );
+
+	it( 'references the most specific origin when two presets share a value', async () => {
+		const user = userEvent.setup();
+		const onChange = jest.fn();
+
+		// A custom preset starts out with the same value as the `natural`
+		// default one, so this is the state right after adding one.
+		render(
+			<BorderPanel
+				value={ {} }
+				settings={ shadowSettings( {
+					default: [ defaultPreset ],
+					custom: [
+						{ ...customPreset, shadow: defaultPreset.shadow },
+					],
+				} ) }
+				onChange={ onChange }
+				panelId="test-panel"
+			/>
+		);
+
+		await selectShadowPreset( user, 'My shadow' );
+
+		expect( onChange ).toHaveBeenCalledWith( {
+			shadow: 'var:preset|shadow|my-shadow',
+		} );
+	} );
+} );
