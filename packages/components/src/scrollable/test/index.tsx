@@ -123,8 +123,9 @@ describe( 'CardBody isScrollable height', () => {
 			</IframeWithStyleProvider>
 		);
 
-		const iframeDocument =
-			screen.getByTitle( 'CardBody document' ).contentDocument;
+		const iframeDocument = screen.getByTitle< HTMLIFrameElement >(
+			'CardBody document'
+		).contentDocument;
 
 		expect( iframeDocument ).toBeTruthy();
 
