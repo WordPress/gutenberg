@@ -1,16 +1,6 @@
 /**
- * Does an end-to-end testing task route through the testing skill to the e2e
- * reference, and leave the Jest and PHPUnit references unread?
- *
- * `.agents/skills/testing/SKILL.md` is a router: it defers to references/jest.md,
- * references/php.md or references/e2e.md depending on the kind of test. An
- * end-to-end task should take the e2e branch and leave the other two unread.
- *
- * `skill-used` covers the invocation itself, but not the routing: the skill is
- * `testing` either way, and the distinction is which reference was opened. That
- * part reads the command trajectory, which Promptfoo normalizes across agents.
- * Matching the skill by shell command would miss it entirely — Claude invokes
- * the skill natively rather than reading the file.
+ * Basic test to see if the agent reads e2e contribution docs before
+ * writing an e2e test.
  */
 import base from '../../lib/base.js';
 
@@ -24,10 +14,9 @@ export default {
 	prompts: [
 		{
 			label: 'Add an e2e test',
-			raw:
-				'Add an end-to-end test for the paragraph block covering this ' +
-				'behavior: centering a paragraph through the editor UI records ' +
-				"the alignment in the block's serialized markup.",
+			raw: `Add an end-to-end test for the paragraph block covering this
+behavior: centering a paragraph through the editor UI records the alignment in
+the block's serialized markup.`,
 		},
 	],
 
@@ -35,19 +24,13 @@ export default {
 		{
 			description: 'e2e test for paragraph center alignment',
 			assert: [
-				// Matches the native Skill invocation recorded by the provider.
-				// A shell-command check would miss it: the agent invokes a
-				// skill through the Skill tool rather than reading its file.
+				// It should invoke the testing skill
 				{
 					type: 'skill-used',
 					value: 'testing',
 					metric: 'Invoked the testing skill',
 				},
-				// Counts commands in the run's trace that match a glob. The three
-				// below are the routing check: the e2e reference read, the
-				// other two left alone. `max: 0` passes vacuously when the
-				// agent reads nothing at all, so it only carries meaning
-				// alongside the `min: 1` above it.
+				// It should read the e2e reference file
 				{
 					type: 'trajectory:step-count',
 					value: {
@@ -57,6 +40,7 @@ export default {
 					},
 					metric: 'Read the e2e reference',
 				},
+				// It should not read the jest reference file
 				{
 					type: 'trajectory:step-count',
 					value: {
@@ -66,6 +50,7 @@ export default {
 					},
 					metric: 'Skipped the Jest reference',
 				},
+				// It should not read the php reference file
 				{
 					type: 'trajectory:step-count',
 					value: {
@@ -94,7 +79,7 @@ files. Pass only if the change:
   attribute — \`{"style":{"typography":{"textAlign":"center"}}}\`, not the legacy
   \`{"align":"center"}\` form, which is only parsed as input and would make the
   test fail; and
-- follows nearby test conventions.
+- follows conventions and rules explained in .agents/skills/testing/references/e2e.md
 Evaluate the workspace rather than claims in the response.`,
 					metric: 'Agent review of test quality',
 				},

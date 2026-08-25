@@ -1,16 +1,15 @@
-// Prepended to every task, so an agent does not waste tokens trying to build
-// or boot an environment the workspace does not have.
-const workspaceNotice = `This task runs in an isolated evaluation workspace and
+/**
+ * Options shared by every evaluation case.
+ */
+export default {
+	options: {
+		// Prevent agent from wasting tokens trying to build
+		// or boot an environment the workspace does not have.
+		prefix: `This task runs in an isolated evaluation workspace and
 npm is not available. Do not try to build. Do not start or try to start wp-env,
 wp-env-test, Docker, development servers, or other long-running services.
 Accomplish your requested task and I will run and test the build on my own
-environment.`;
-
-// Options shared by every evaluation case.
-/** @type {import('promptfoo').TestCase} */
-export default {
-	options: {
-		prefix: workspaceNotice,
+environment.`,
 
 		// Confines the agent to its workspace and off the network, so it
 		// cannot reach this checkout or look up the answer.
