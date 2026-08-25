@@ -36,17 +36,6 @@
 				direction: ltr; /* maintain LTR in RTL languages */
 			}
 
-			/* Hide Safari's value-like placeholder (e.g. `12:30`) in empty
-			   date/time inputs. While the input is focused, the browser's
-			   segment editor must stay visible for typing. The color is set
-			   through the global CSS defense's custom property bridge, since
-			   its unlayered `color` declaration wins over this layer. */
-			&[type="date"][data-empty-value]:not(:focus),
-			&[type="time"][data-empty-value]:not(:focus),
-			&[type="datetime-local"][data-empty-value]:not(:focus) {
-				--_gcd-input-color: transparent;
-			}
-
 			&[type="number"] {
 				appearance: textfield;
 
