@@ -205,6 +205,13 @@ describe( 'CustomGradientBar', () => {
 		const [ firstPoint ] = screen.getAllByRole( 'button', {
 			name: /Gradient control point/,
 		} );
+
+		// The description still offers positioning and removal, which the
+		// duotone bar's shorter one drops.
+		expect( firstPoint ).toHaveAccessibleDescription(
+			/change the gradient position.+remove the control point/
+		);
+
 		firstPoint.focus();
 		await user.keyboard( '[ArrowRight]' );
 
