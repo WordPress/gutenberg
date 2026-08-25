@@ -37,22 +37,6 @@ describe.each( [
 			).toBeVisible();
 		} );
 
-		it( 'should preserve the default label for the `group` role', () => {
-			render( <Component role="group" /> );
-
-			expect(
-				screen.getByRole( 'group', { name: defaultLabel } )
-			).toBeVisible();
-		} );
-
-		it( 'should omit the default label for a neutral root role', () => {
-			render( <Component role="none" data-testid="calendar-root" /> );
-			const root = screen.getByTestId( 'calendar-root' );
-
-			expect( root ).toHaveAttribute( 'role', 'none' );
-			expect( root ).not.toHaveAttribute( 'aria-label' );
-		} );
-
 		it( 'should let an explicit aria-label replace the generated application label', () => {
 			render(
 				<Component

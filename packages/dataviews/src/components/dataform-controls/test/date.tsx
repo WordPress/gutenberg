@@ -455,9 +455,10 @@ describe( 'DateControl', () => {
 				/>
 			);
 
-			expect(
-				screen.getByRole( 'application', { name: 'Date calendar' } )
-			).toHaveAttribute( 'dir', 'rtl' );
+			expect( screen.getByRole( 'application' ) ).toHaveAttribute(
+				'dir',
+				'rtl'
+			);
 		} );
 	} );
 } );

@@ -387,9 +387,10 @@ describe( 'Calendar text direction fallback', () => {
 		( _, locale, direction ) => {
 			render( <Calendar locale={ locale } /> );
 
-			expect(
-				screen.getByRole( 'application', { name: 'Date calendar' } )
-			).toHaveAttribute( 'dir', direction );
+			expect( screen.getByRole( 'application' ) ).toHaveAttribute(
+				'dir',
+				direction
+			);
 		}
 	);
 

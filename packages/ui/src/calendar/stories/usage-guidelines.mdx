@@ -12,20 +12,9 @@ Both are built for accessibility and follow ARIA best practices for calendar wid
 
 `Calendar` and `RangeCalendar` use [`role="application"`](https://www.w3.org/TR/wai-aria-1.2/#application) by default to help screen readers pass navigation keys to the calendar. The accessible name includes the current month.
 
-Keep the default unless testing supports another role:
+Changing the role can affect screen-reader keyboard navigation. Only override it for a tested composition. Apply roles that require additional behavior, such as `dialog`, to a wrapper.
 
--   Use [`group`](https://www.w3.org/TR/wai-aria-1.2/#group) only when supported screen readers allow calendar keyboard navigation without `application`.
--   Use `none` or `presentation` when a parent provides the calendar's semantics.
--   Apply roles that require additional behavior, such as `dialog`, to a wrapper.
-
-When using `application`, include the current month in any custom `aria-label` or `aria-labelledby`. For example, use `none` when a parent labels the calendar:
-
-```jsx
-<section aria-labelledby="availability-heading">
-	<h2 id="availability-heading">Availability</h2>
-	<Calendar role="none" />
-</section>
-```
+When using `application`, include the current month in any custom `aria-label` or `aria-labelledby`.
 
 ## Usage
 

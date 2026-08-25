@@ -170,10 +170,9 @@ export interface BaseProps
 	 * navigation keys to the component. Its accessible name includes the current
 	 * month.
 	 *
-	 * Use `group` only when testing confirms that keyboard navigation works with
-	 * supported assistive technologies. Use `none` or `presentation` when a
-	 * surrounding element provides the root semantics. Apply roles that require
-	 * additional behavior, such as `dialog`, to a wrapper.
+	 * Changing this role can affect screen-reader keyboard navigation. Only
+	 * override it for a tested composition. Apply roles that require additional
+	 * behavior, such as `dialog`, to a wrapper.
 	 *
 	 * @default 'application'
 	 */

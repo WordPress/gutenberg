@@ -35,20 +35,6 @@ type Story = StoryObj< typeof Calendar >;
 
 export const Default: Story = {};
 
-export const WithExternalGrouping: Story = {
-	render: ( { endMonth, ...args } ) => (
-		<section aria-label="Availability dates">
-			<Calendar { ...args } endMonth={ toDate( endMonth ) } role="none" />
-		</section>
-	),
-};
-
-export const WithGroupRole: Story = {
-	args: {
-		role: 'group',
-	},
-};
-
 export const DisabledDates: Story = {
 	args: {
 		disabled: DISABLED_DATES_SAMPLE,

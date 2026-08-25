@@ -152,20 +152,16 @@ export function Root( { rootRef, ...props }: RootProps ) {
 		props[ 'aria-labelledby' ] !== undefined;
 	let ariaLabel = props[ 'aria-label' ];
 
-	if ( ! hasExplicitLabel && defaultAriaLabel ) {
-		if ( role === 'application' ) {
-			const currentMonth = months[ 0 ];
-			ariaLabel = currentMonth
-				? sprintf(
-						// translators: 1: Calendar type. 2: Current month and year.
-						__( '%1$s, %2$s' ),
-						defaultAriaLabel,
-						labels.labelGrid( currentMonth.date )
-				  )
-				: defaultAriaLabel;
-		} else if ( role === 'group' ) {
-			ariaLabel = defaultAriaLabel;
-		}
+	if ( ! hasExplicitLabel && defaultAriaLabel && role === 'application' ) {
+		const currentMonth = months[ 0 ];
+		ariaLabel = currentMonth
+			? sprintf(
+					// translators: 1: Calendar type. 2: Current month and year.
+					__( '%1$s, %2$s' ),
+					defaultAriaLabel,
+					labels.labelGrid( currentMonth.date )
+			  )
+			: defaultAriaLabel;
 	}
 
 	// `rootRef` is only set by `@daypicker/react` when `animate` is enabled.
