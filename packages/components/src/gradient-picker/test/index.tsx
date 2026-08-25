@@ -13,6 +13,55 @@ const DUPLICATE_GRADIENTS = [
 ];
 
 describe( 'GradientPicker', () => {
+	it( 'should use matching values only for display in command button presentation', async () => {
+		const user = userEvent.setup();
+		const onChange = jest.fn();
+		render(
+			<GradientPicker
+				aria-label="Gradients"
+				gradients={ DUPLICATE_GRADIENTS }
+				value={ GRADIENT_A }
+				onChange={ onChange }
+				presentation="command-buttons"
+				disableCustomGradients
+				clearable={ false }
+			/>
+		);
+
+		const gradient = screen.getByRole( 'button', {
+			name: 'Gradient: Dark Background',
+		} );
+		expect(
+			screen.getByRole( 'group', { name: 'Gradients' } )
+		).toBeVisible();
+		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		expect( gradient ).not.toHaveAttribute( 'aria-pressed' );
+
+		await user.click( gradient );
+		expect( onChange ).toHaveBeenCalledWith(
+			GRADIENT_A,
+			0,
+			'dark-background'
+		);
+	} );
+
+	it( 'should warn whenever asButtons is supplied', () => {
+		render(
+			<GradientPicker
+				aria-label="Gradients"
+				gradients={ DUPLICATE_GRADIENTS }
+				onChange={ jest.fn() }
+				asButtons={ false }
+				disableCustomGradients
+				clearable={ false }
+			/>
+		);
+
+		expect( console ).toHaveWarnedWith(
+			'`asButtons` prop in wp.components.GradientPicker is deprecated since version 7.2. Please use `presentation` instead. Note: `asButtons={ true }` maps to `presentation="toggle-buttons"`. Explicit `presentation` takes precedence.'
+		);
+	} );
+
 	describe( 'duplicate gradients in palette', () => {
 		it( 'should render all swatches even when two entries share the same gradient value', () => {
 			render(

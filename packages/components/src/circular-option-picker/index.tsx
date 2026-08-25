@@ -6,6 +6,11 @@ export {
 	ButtonAction,
 	DropdownLinkAction,
 } from './circular-option-picker-actions';
-export { getComputeCircularOptionPickerCommonProps } from './utils';
+export {
+	getComputeCircularOptionPickerCommonProps,
+	resolveCircularOptionPickerPresentation,
+	warnIfCircularOptionPickerAsButtonsIsSet,
+} from './utils';
+export type { CircularOptionPickerPresentation } from './types';
 
 export default CircularOptionPicker;

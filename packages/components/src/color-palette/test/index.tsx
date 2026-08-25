@@ -30,6 +30,51 @@ const ControlledColorPalette = ( {
 };
 
 describe( 'ColorPalette', () => {
+	it( 'should use matching values only for display in command button presentation', async () => {
+		const user = userEvent.setup();
+		const onChange = jest.fn();
+		render(
+			<ColorPalette
+				aria-label="Colors"
+				colors={ EXAMPLE_COLORS }
+				value={ INITIAL_COLOR }
+				onChange={ onChange }
+				presentation="command-buttons"
+				disableCustomColors
+				clearable={ false }
+			/>
+		);
+
+		const red = screen.getByRole( 'button', { name: 'red' } );
+		expect( screen.getByRole( 'group', { name: 'Colors' } ) ).toBeVisible();
+		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		expect( red ).not.toHaveAttribute( 'aria-pressed' );
+
+		await user.click( red );
+		expect( onChange ).toHaveBeenCalledWith( '#f00', 0, undefined );
+	} );
+
+	it( 'should warn for asButtons and prefer an explicit presentation', () => {
+		render(
+			<ColorPalette
+				aria-label="Colors"
+				colors={ EXAMPLE_COLORS }
+				onChange={ jest.fn() }
+				asButtons={ false }
+				presentation="command-buttons"
+				disableCustomColors
+				clearable={ false }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'red' } )
+		).not.toHaveAttribute( 'aria-pressed' );
+		expect( console ).toHaveWarnedWith(
+			'`asButtons` prop in wp.components.ColorPalette is deprecated since version 7.2. Please use `presentation` instead. Note: `asButtons={ true }` maps to `presentation="toggle-buttons"`. Explicit `presentation` takes precedence.'
+		);
+	} );
+
 	it( 'should render three color button options', () => {
 		const onChange = jest.fn();
 

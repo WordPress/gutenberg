@@ -10,6 +10,7 @@ import Dropdown from '../dropdown';
 import { ColorPicker } from '../color-picker';
 import CircularOptionPicker, {
 	getComputeCircularOptionPickerCommonProps,
+	warnIfCircularOptionPickerAsButtonsIsSet,
 } from '../circular-option-picker';
 import { VStack } from '../v-stack';
 import { Truncate } from '../truncate';
@@ -41,6 +42,7 @@ function SinglePalette( {
 	onChange,
 	value,
 	selectedSlug,
+	presentation,
 	...additionalProps
 }: SinglePaletteProps ) {
 	const colorOptions = useMemo( () => {
@@ -52,9 +54,9 @@ function SinglePalette( {
 			// This correctly handles mixed palettes where some entries have slugs
 			// and others don't. Fall back to color value matching otherwise
 			// (including when selectedSlug is an empty string).
-			const isSelected = selectedSlug
-				? slug === selectedSlug
-				: value === color;
+			const isSelected =
+				presentation !== 'command-buttons' &&
+				( selectedSlug ? slug === selectedSlug : value === color );
 
 			return (
 				<CircularOptionPicker.Option
@@ -85,7 +87,7 @@ function SinglePalette( {
 				/>
 			);
 		} );
-	}, [ colors, value, selectedSlug, onChange, clearColor ] );
+	}, [ colors, value, selectedSlug, onChange, clearColor, presentation ] );
 
 	return (
 		<CircularOptionPicker.OptionGroup
@@ -104,6 +106,7 @@ function MultiplePalettes( {
 	value,
 	selectedSlug,
 	headingLevel,
+	presentation,
 }: MultiplePalettesProps ) {
 	const instanceId = useInstanceId( MultiplePalettes, 'color-palette' );
 
@@ -132,6 +135,7 @@ function MultiplePalettes( {
 							}
 							value={ value }
 							selectedSlug={ selectedSlug }
+							presentation={ presentation }
 							aria-labelledby={ id }
 						/>
 					</VStack>
@@ -185,6 +189,7 @@ function UnforwardedColorPalette(
 ) {
 	const {
 		asButtons,
+		presentation,
 		loop,
 		clearable = true,
 		colors = [],
@@ -199,6 +204,7 @@ function UnforwardedColorPalette(
 		'aria-labelledby': ariaLabelledby,
 		...additionalProps
 	} = props;
+	warnIfCircularOptionPickerAsButtonsIsSet( 'ColorPalette', asButtons );
 	const [ normalizedColorValue, setNormalizedColorValue ] = useState( value );
 
 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
@@ -246,11 +252,21 @@ function UnforwardedColorPalette(
 		  )
 		: __( 'Custom color picker' );
 
+	const { metaProps, labelProps, resolvedPresentation } =
+		getComputeCircularOptionPickerCommonProps(
+			asButtons,
+			loop,
+			ariaLabel,
+			ariaLabelledby,
+			presentation
+		);
+
 	const paletteCommonProps = {
 		clearColor,
 		onChange,
 		value,
 		selectedSlug,
+		presentation: resolvedPresentation,
 	};
 
 	const actions = !! clearable && (
@@ -261,13 +277,6 @@ function UnforwardedColorPalette(
 		>
 			{ __( 'Clear' ) }
 		</CircularOptionPicker.ButtonAction>
-	);
-
-	const { metaProps, labelProps } = getComputeCircularOptionPickerCommonProps(
-		asButtons,
-		loop,
-		ariaLabel,
-		ariaLabelledby
 	);
 
 	// If disableCustomColors is true and colors.length is 0, return null to avoid rendering an empty palette wrapper.

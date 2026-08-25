@@ -79,7 +79,9 @@ export function Option( {
 	tooltipText,
 	...additionalProps
 }: OptionProps ) {
-	const { baseId, setActiveId } = useContext( CircularOptionPickerContext );
+	const { baseId, presentation = 'listbox' } = useContext(
+		CircularOptionPickerContext
+	);
 	const id = useInstanceId(
 		Option,
 		baseId || 'components-circular-option-picker__option'
@@ -91,20 +93,24 @@ export function Option( {
 		...additionalProps,
 	};
 
-	const isListbox = setActiveId !== undefined;
-	const optionControl = isListbox ? (
-		<OptionAsOption
-			{ ...commonProps }
-			label={ tooltipText }
-			isSelected={ isSelected }
-		/>
-	) : (
-		<OptionAsButton
-			{ ...commonProps }
-			label={ tooltipText }
-			isPressed={ isSelected }
-		/>
-	);
+	const optionControl =
+		presentation === 'listbox' ? (
+			<OptionAsOption
+				{ ...commonProps }
+				label={ tooltipText }
+				isSelected={ isSelected }
+			/>
+		) : (
+			<OptionAsButton
+				{ ...commonProps }
+				label={ tooltipText }
+				isPressed={
+					presentation === 'toggle-buttons'
+						? !! isSelected
+						: undefined
+				}
+			/>
+		);
 
 	return (
 		<div
@@ -114,7 +120,9 @@ export function Option( {
 			) }
 		>
 			{ optionControl }
-			{ isSelected && <Icon icon={ check } { ...selectedIconProps } /> }
+			{ presentation !== 'command-buttons' && isSelected && (
+				<Icon icon={ check } { ...selectedIconProps } />
+			) }
 		</div>
 	);
 }

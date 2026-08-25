@@ -27,7 +27,17 @@ const manifestPath = process.argv[ 2 ];
 
 assert( manifestPath, 'Manifest path is required' );
 
+// `react-component-meta` removes JSDoc tags from prop descriptions before it
+// writes the manifest. Keep this list in sync with props that use `@ignore`
+// but whose tag is therefore unavailable to the manifest post-processors.
+const ignoredProps = new Set( [ 'asButtons' ] );
+
 function addLegacyShape( component ) {
+	for ( const propName of ignoredProps ) {
+		delete component.reactComponentMeta?.props?.[ propName ];
+		delete component.reactDocgen?.props?.[ propName ];
+	}
+
 	if ( component.reactComponentMeta && ! component.reactDocgen ) {
 		component.reactDocgen = {
 			...component.reactComponentMeta,

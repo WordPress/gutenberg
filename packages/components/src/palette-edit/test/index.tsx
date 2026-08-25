@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import { click, type, press } from '@ariakit/test';
 import PaletteEdit, {
 	getNameAndSlugForPosition,
@@ -245,6 +245,52 @@ describe( 'PaletteEdit', () => {
 			} )
 		).toBeVisible();
 	} );
+
+	it.each( [
+		{
+			name: 'color',
+			props: { colors },
+			buttonName: 'Primary',
+			editorRole: 'textbox' as const,
+			editorName: 'Hex color',
+		},
+		{
+			name: 'gradient',
+			props: { gradients },
+			buttonName: 'Gradient: Pale ocean',
+			editorRole: 'combobox' as const,
+			editorName: 'Type',
+		},
+		{
+			name: 'duotone',
+			props: { duotones, colorPalette: colors },
+			buttonName: 'Duotone: Purple and yellow',
+			editorRole: 'button' as const,
+			editorName: /Shadows/,
+		},
+	] )(
+		'shows $name swatches as named command buttons that open the editor',
+		async ( { props, buttonName, editorRole, editorName } ) => {
+			render( <PaletteEdit { ...defaultProps } { ...props } /> );
+
+			const group = screen.getByRole( 'group', { name: 'Test label' } );
+			const swatch = within( group ).getByRole( 'button', {
+				name: buttonName,
+			} );
+			expect(
+				within( group ).queryByRole( 'listbox' )
+			).not.toBeInTheDocument();
+			expect(
+				within( group ).queryByRole( 'option' )
+			).not.toBeInTheDocument();
+			expect( swatch ).not.toHaveAttribute( 'aria-pressed' );
+
+			await click( swatch );
+			expect(
+				screen.getByRole( editorRole, { name: editorName } )
+			).toBeVisible();
+		}
+	);
 
 	it( 'shows empty message', () => {
 		render(
