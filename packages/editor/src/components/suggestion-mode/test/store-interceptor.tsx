@@ -1,5 +1,9 @@
 import { render, act } from '@testing-library/react';
-import { createRegistry, RegistryProvider } from '@wordpress/data';
+import {
+	createRegistry,
+	createReduxStore,
+	RegistryProvider,
+} from '@wordpress/data';
 // @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
@@ -146,6 +150,21 @@ describe( 'adoptSystemMetadata', () => {
 	} );
 } );
 
+/*
+ * `setEditorIntent( 'suggest' )` reads the current post so it can discard a
+ * staged status edit, and both reads go through `core`. These registries are
+ * minimal, so answer the two selectors with nothing.
+ */
+function createStubCoreStore() {
+	return createReduxStore( 'core', {
+		reducer: ( state = {} ) => state,
+		selectors: {
+			getRawEntityRecord: () => undefined,
+			getEntityRecordEdits: () => undefined,
+		},
+	} );
+}
+
 describe( 'SuggestionStoreInterceptor (integration)', () => {
 	const TEST_BLOCK_NAME = 'core/test-suggestion-block';
 
@@ -176,6 +195,7 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 
 	function setup( { initialBlocks }: { initialBlocks?: any[] } = {} ) {
 		const registry = createRegistry();
+		registry.register( createStubCoreStore() );
 		registry.register( noticesStore );
 		// `preferencesStore` is required by `setEditorIntent` on branches
 		// where the intent is persisted as a preference; later branches
