@@ -509,6 +509,17 @@ export function isNoteFocused( state ) {
 }
 
 /**
+ * Returns the ids of notes deleted during this editing session.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {number[]} Deleted note ids.
+ */
+export function getDeletedNotes( state ) {
+	return state.deletedNotes;
+}
+
+/**
  * Returns the previous revision (the one before the current revision).
  * Used for diffing between revisions.
  *

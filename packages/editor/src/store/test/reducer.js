@@ -10,6 +10,7 @@ import {
 	removedPanels,
 	blockInserterPanel,
 	listViewPanel,
+	deletedNotes,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -331,6 +332,44 @@ describe( 'state', () => {
 					isOpen: false,
 				} )
 			).toBe( false );
+		} );
+	} );
+
+	describe( 'deletedNotes()', () => {
+		it( 'should apply default state', () => {
+			expect( deletedNotes( undefined, {} ) ).toEqual( [] );
+		} );
+
+		it( 'should record a deleted note id', () => {
+			expect(
+				deletedNotes( deepFreeze( [] ), {
+					type: 'NOTE_DELETED',
+					noteId: 7,
+				} )
+			).toEqual( [ 7 ] );
+		} );
+
+		it( 'should append further deleted note ids', () => {
+			expect(
+				deletedNotes( deepFreeze( [ 7 ] ), {
+					type: 'NOTE_DELETED',
+					noteId: 9,
+				} )
+			).toEqual( [ 7, 9 ] );
+		} );
+
+		it( 'should keep the same state for an already recorded id', () => {
+			const state = deepFreeze( [ 7 ] );
+
+			expect(
+				deletedNotes( state, { type: 'NOTE_DELETED', noteId: 7 } )
+			).toBe( state );
+		} );
+
+		it( 'should default to returning the same state', () => {
+			const state = deepFreeze( [ 7 ] );
+
+			expect( deletedNotes( state, {} ) ).toBe( state );
 		} );
 	} );
 } );

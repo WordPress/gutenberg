@@ -1488,6 +1488,152 @@ test.describe( 'Block Notes', () => {
 			await expect( paragraph ).toHaveText( 'Delete the whole note.' );
 		} );
 
+		test( 'does not restore a deleted note’s marker on undo', async ( {
+			editor,
+			page,
+			pageUtils,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Undo must not resurrect me.' },
+			} );
+
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraph.click();
+			await page.keyboard.press( 'ControlOrMeta+a' );
+
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await page
+				.getByRole( 'textbox', { name: 'New note', exact: true } )
+				.fill( 'Delete then undo' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+
+			await expect(
+				editor.canvas.locator( 'mark.wp-note' ).first()
+			).toBeVisible();
+
+			// Save and reload so the note is anchored in stored content and the
+			// undo stack starts empty, as in the reported flow.
+			await editor.saveDraft();
+			await page.reload();
+			await expect(
+				editor.canvas.locator( 'mark.wp-note' ).first()
+			).toBeVisible();
+
+			// The reload lands on the post settings panel; reopen the notes
+			// sidebar and select the thread to expand it, surfacing its
+			// Actions menu.
+			await blockNoteUtils.openBlockNoteSidebar();
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: Delete then undo' } )
+				.click();
+			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Delete' );
+			await page
+				.getByRole( 'dialog' )
+				.getByRole( 'button', { name: 'Delete' } )
+				.click();
+
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				0
+			);
+
+			// Deleting a note is a server-side, non-undoable operation, so the
+			// content cleanup that goes with it must not be undoable either.
+			// Undo used to reinstate the `<mark data-id>` and the block's
+			// `metadata.noteId` for a note that no longer exists, leaving a
+			// dead marker in the saved post.
+			await pageUtils.pressKeys( 'primary+z' );
+
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				0
+			);
+			const [ block ] = await editor.getBlocks();
+			expect( block.attributes.metadata?.noteId ).toBeUndefined();
+
+			// The cleanup still has to reach the saved post.
+			await editor.saveDraft();
+			await page.reload();
+
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				0
+			);
+			await expect( paragraph ).toHaveText(
+				'Undo must not resurrect me.'
+			);
+		} );
+
+		test( 'does not restore a deleted note’s marker when undoing a later edit', async ( {
+			editor,
+			page,
+			pageUtils,
+			blockNoteUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Ghost marker target.' },
+			} );
+
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraph.click();
+			await page.keyboard.press( 'ControlOrMeta+a' );
+
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await page
+				.getByRole( 'textbox', { name: 'New note', exact: true } )
+				.fill( 'Deleted before the undo' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+
+			await expect(
+				editor.canvas.locator( 'mark.wp-note' ).first()
+			).toBeVisible();
+
+			// Add a second paragraph so there is a later undo level to step
+			// back through. Its "before" snapshot still holds the marker.
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'A later edit.' },
+			} );
+
+			// Selecting the thread expands it, surfacing its Actions menu.
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', {
+					name: 'Note: Deleted before the undo',
+				} )
+				.click();
+			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Delete' );
+			await page
+				.getByRole( 'dialog' )
+				.getByRole( 'button', { name: 'Delete' } )
+				.click();
+
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				0
+			);
+
+			// Stepping back past the note's creation restores an older block
+			// snapshot; any marker it carries belongs to a note that is gone,
+			// so it must be reconciled away rather than left in the content.
+			await pageUtils.pressKeys( 'primary+z' );
+
+			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
+				0
+			);
+			await expect( paragraph ).toHaveText( 'Ghost marker target.' );
+		} );
+
 		test( 'removes the inline marker when the note is resolved', async ( {
 			editor,
 			page,

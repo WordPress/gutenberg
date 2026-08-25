@@ -2,6 +2,8 @@ import { combineReducers } from '@wordpress/data';
 import { EDITOR_SETTINGS_DEFAULTS } from './defaults';
 import dataviewsReducer from '../dataviews/store/reducer';
 
+const EMPTY_ARRAY = [];
+
 /**
  * Returns a post attribute value, flattening nested rendered content using its
  * raw value in place of its original object form.
@@ -479,6 +481,27 @@ export function selectedNote( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the ids of notes deleted during this editing session.
+ *
+ * Deleting a note destroys a server-side record that undo cannot bring back,
+ * but the content cleanup that accompanies it - the note's inline marker and
+ * its id in `metadata.noteId` - lives in block state that undo *can* revert.
+ * Stepping back past a deletion would otherwise reinstate an anchor pointing at
+ * a note that no longer exists, so the ids are kept for the editor to reconcile
+ * those leftovers away.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ * @return {number[]} Updated state.
+ */
+export function deletedNotes( state = EMPTY_ARRAY, action ) {
+	if ( action.type === 'NOTE_DELETED' && ! state.includes( action.noteId ) ) {
+		return [ ...state, action.noteId ];
+	}
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
@@ -504,5 +527,6 @@ export default combineReducers( {
 	revisionPage,
 	showRevisionDiff,
 	selectedNote,
+	deletedNotes,
 	dataviews: dataviewsReducer,
 } );

@@ -761,3 +761,17 @@ export function selectNote( noteId, options = { focus: false } ) {
 		options,
 	};
 }
+
+/**
+ * Record that a note was deleted, so any of its anchors that undo reinstates
+ * can be reconciled away. See the `deletedNotes` reducer.
+ *
+ * @param {number} noteId The id of the deleted note.
+ * @return {Object} Action object.
+ */
+export function noteDeleted( noteId ) {
+	return {
+		type: 'NOTE_DELETED',
+		noteId,
+	};
+}

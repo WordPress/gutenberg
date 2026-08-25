@@ -233,6 +233,43 @@ function wrapInlineNote( value, id, start, end ) {
 }
 
 /**
+ * Build the attribute update that detaches notes from a block: their ids drop
+ * out of `metadata.noteId` and any inline `core/note` marker carrying them is
+ * stripped from the rich text attribute that holds it. Both halves land in a
+ * single update so they cannot drift apart.
+ *
+ * @param {?Object}  attributes Block attributes.
+ * @param {number[]} noteIds    Note ids to detach.
+ * @return {Object} Attributes to pass to `updateBlockAttributes`.
+ */
+function buildNoteDetachAttributes( attributes, noteIds ) {
+	const newAttributes = {};
+	let metadata = attributes?.metadata;
+
+	for ( const noteId of noteIds ) {
+		metadata = removeNoteIdFromMetadata( metadata, noteId );
+
+		const found = findNoteInBlock( attributes, noteId );
+		if ( ! found ) {
+			continue;
+		}
+		// Two notes can share an attribute, so keep stripping from the value
+		// built so far rather than from the original.
+		const next = removeNoteFormat(
+			newAttributes[ found.attributeKey ] ??
+				attributes[ found.attributeKey ],
+			noteId
+		);
+		if ( next ) {
+			newAttributes[ found.attributeKey ] = next;
+		}
+	}
+
+	newAttributes.metadata = cleanEmptyObject( metadata );
+	return newAttributes;
+}
+
+/**
  * Strip a note's inline `core/note` marker from whichever block holds it, if
  * any, so a deleted or resolved note's highlight does not linger in the content.
  * No-op for block-level notes (those carry no marker). Used by the resolve path,
@@ -271,6 +308,7 @@ export function useNoteActions() {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );
+	const { noteDeleted } = unlock( useDispatch( editorStore ) );
 	const {
 		getBlockAttributes,
 		getClientIdsWithDescendants,
@@ -278,7 +316,8 @@ export function useNoteActions() {
 		getSelectionStart,
 		getSelectionEnd,
 	} = useSelect( blockEditorStore );
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
 	const onError = ( error ) => {
 		const errorMessage =
@@ -466,30 +505,29 @@ export function useNoteActions() {
 				throwOnError: true,
 			} );
 
-			if ( clientId ) {
-				const attributes = getBlockAttributes( clientId );
-				const newAttributes = {
-					metadata: cleanEmptyObject(
-						removeNoteIdFromMetadata(
-							attributes?.metadata,
-							note.id
+			if ( ! note.parent ) {
+				if ( clientId ) {
+					/*
+					 * Deleting the note is a server-side change undo cannot
+					 * reverse, so detaching it from the block must stay out of
+					 * the undo stack: an undo that put the marker and the
+					 * `metadata.noteId` back would anchor the block to a note
+					 * that no longer exists.
+					 */
+					__unstableMarkNextChangeAsNotPersistent( {
+						history: 'ignore',
+					} );
+					updateBlockAttributes(
+						clientId,
+						buildNoteDetachAttributes(
+							getBlockAttributes( clientId ),
+							[ note.id ]
 						)
-					),
-				};
-				// Strip the inline marker too (if any) so the deleted note's
-				// highlight doesn't linger in the content. Folded into the same
-				// attribute update so it's a single undo step.
-				const found = findNoteInBlock( attributes, note.id );
-				if ( found ) {
-					const next = removeNoteFormat(
-						attributes[ found.attributeKey ],
-						note.id
 					);
-					if ( next ) {
-						newAttributes[ found.attributeKey ] = next;
-					}
 				}
-				updateBlockAttributes( clientId, newAttributes );
+				// Recorded even without a block: an undo reaching further back
+				// can reinstate an anchor this delete never saw.
+				noteDeleted( note.id );
 			}
 
 			createNotice( 'snackbar', __( 'Note deleted.' ), {
@@ -504,6 +542,76 @@ export function useNoteActions() {
 	};
 
 	return { onCreate, onEdit, onDelete };
+}
+
+/**
+ * Detach notes deleted in this session from any block that still references
+ * them.
+ *
+ * Deleting a note removes its record on the server and its anchor from the
+ * block in one go, but only the second half is block state, and undo restores
+ * whole block snapshots. Stepping back to a snapshot taken before the delete -
+ * even by undoing an unrelated later edit - reinstates a `metadata.noteId` and
+ * an inline `core/note` marker for a note that is gone, leaving a highlight
+ * with no thread behind it in the saved post. Reconcile those anchors away as
+ * soon as they reappear, outside the undo history so the cleanup itself is not
+ * something the next undo can walk back into.
+ */
+export function useDeletedNoteCleanup() {
+	const registry = useRegistry();
+	const deletedNotes = useSelect(
+		( select ) => unlock( select( editorStore ) ).getDeletedNotes(),
+		[]
+	);
+
+	/*
+	 * Joined into a string rather than returned as an array: `useSelect` re-runs
+	 * on every store change and compares by reference, so a fresh array would
+	 * re-render (and re-run the effect) on every keystroke.
+	 */
+	const staleClientIds = useSelect(
+		( select ) => {
+			if ( deletedNotes.length === 0 ) {
+				return '';
+			}
+			const { getClientIdsWithDescendants, getBlockAttributes } =
+				select( blockEditorStore );
+			return getClientIdsWithDescendants()
+				.filter( ( clientId ) =>
+					getNoteIdsFromMetadata(
+						getBlockAttributes( clientId )?.metadata
+					).some( ( noteId ) => deletedNotes.includes( noteId ) )
+				)
+				.join( ',' );
+		},
+		[ deletedNotes ]
+	);
+
+	useEffect( () => {
+		if ( ! staleClientIds ) {
+			return;
+		}
+		const { getBlockAttributes } = registry.select( blockEditorStore );
+		const {
+			updateBlockAttributes,
+			__unstableMarkNextChangeAsNotPersistent,
+		} = registry.dispatch( blockEditorStore );
+
+		for ( const clientId of staleClientIds.split( ',' ) ) {
+			const attributes = getBlockAttributes( clientId );
+			const staleIds = getNoteIdsFromMetadata(
+				attributes?.metadata
+			).filter( ( noteId ) => deletedNotes.includes( noteId ) );
+			if ( staleIds.length === 0 ) {
+				continue;
+			}
+			__unstableMarkNextChangeAsNotPersistent( { history: 'ignore' } );
+			updateBlockAttributes(
+				clientId,
+				buildNoteDetachAttributes( attributes, staleIds )
+			);
+		}
+	}, [ staleClientIds, deletedNotes, registry ] );
 }
 
 export function useEnableFloatingSidebar( enabled = false ) {

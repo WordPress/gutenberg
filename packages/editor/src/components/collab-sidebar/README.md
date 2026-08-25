@@ -24,7 +24,7 @@ collab-sidebar/
 ├── note-indicator-toolbar.js       NoteAvatarIndicator - toolbar participants avatars
 ├── floating-container.js           FloatingContainer - stack wrapper that applies `top` in floating mode
 │
-├── hooks.js                        useNoteThreads, useNoteActions, useFloatingBoard, useEnableFloatingSidebar
+├── hooks.js                        useNoteThreads, useNoteActions, useFloatingBoard, useEnableFloatingSidebar, useDeletedNoteCleanup
 ├── utils.js                        focusNoteThread, getNoteExcerpt, sanitizeNoteContent, calculateNotePositions, getAvatarBorderColor
 ├── board-store.js                  createBoardStore - ResizeObserver + ref registry for floating layout
 ├── constants.js                    sidebar identifier strings
