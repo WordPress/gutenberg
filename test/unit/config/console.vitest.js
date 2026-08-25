@@ -28,13 +28,13 @@ function createErrorMessage( state, spyInfo ) {
 		message +
 		'\n\n' +
 		`console.${ methodName }() should not be used unless explicitly expected\n` +
-		'See https://www.npmjs.com/package/@wordpress/vitest-console for details.';
+		'See https://www.npmjs.com/package/@wordpress/jest-console for details.';
 }
 
 function createSpyInfo( state, spy, matcherName, methodName, expected ) {
 	const calls = spy.mock.calls;
 	const pass = expected
-		? JSON.stringify( calls ).includes( JSON.stringify( expected ) )
+		? calls.some( ( call ) => state.equals( call, expected ) )
 		: calls.length > 0;
 
 	return {
@@ -85,9 +85,6 @@ expect.extend(
 		{}
 	)
 );
-
-vi.spyOn( console, 'groupCollapsed' ).mockImplementation( () => undefined );
-vi.spyOn( console, 'groupEnd' ).mockImplementation( () => undefined );
 
 function setConsoleMethodSpy( [ methodName, matcherName ] ) {
 	const spy = vi

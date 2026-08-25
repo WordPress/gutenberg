@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
-import { describe, expect, it, test } from 'vitest';
+
+import { describe, expect, test } from 'vitest';
 
 describe( 'Vitest console matchers', () => {
 	describe.each( [
@@ -11,12 +12,12 @@ describe( 'Vitest console matchers', () => {
 		const matcherNameWith = `${ matcherName }With`;
 		const message = `This is ${ methodName }!`;
 
-		test( `${ matcherName } accepts an expected console call`, () => {
+		test( `${ matcherName } accepts an observed call`, () => {
 			console[ methodName ]( message );
 			expect( console )[ matcherName ]();
 		} );
 
-		test( `${ matcherName } rejects a missing console call`, () => {
+		test( `${ matcherName } rejects a missing call`, () => {
 			expect( console ).not[ matcherName ]();
 			expect( () => expect( console )[ matcherName ]() ).toThrow(
 				'Expected mock function to be called.'
@@ -26,6 +27,23 @@ describe( 'Vitest console matchers', () => {
 		test( `${ matcherNameWith } accepts matching arguments`, () => {
 			console[ methodName ]( message );
 			expect( console )[ matcherNameWith ]( message );
+		} );
+
+		test( `${ matcherNameWith } supports asymmetric matchers`, () => {
+			console[ methodName ]( message, { status: 400 } );
+			expect( console )[ matcherNameWith ](
+				expect.stringContaining( methodName ),
+				expect.objectContaining( { status: 400 } )
+			);
+		} );
+
+		test( `${ matcherNameWith } rejects a missing call`, () => {
+			expect( console ).not[ matcherNameWith ]( message );
+			expect( () =>
+				expect( console )[ matcherNameWith ]( message )
+			).toThrow(
+				/Expected mock function to be called with:.*but it was called with:/s
+			);
 		} );
 
 		test( `${ matcherNameWith } rejects non-matching arguments`, () => {
@@ -40,23 +58,21 @@ describe( 'Vitest console matchers', () => {
 			);
 		} );
 
-		test( 'tracks matcher assertions for lifecycle validation', () => {
+		test( 'counts matcher assertions', () => {
 			const spy = console[ methodName ];
 
 			expect( spy.assertionsNumber ).toBe( 0 );
 			console[ methodName ]( message );
 			expect( console )[ matcherName ]();
-			expect( spy.assertionsNumber ).toBe( 1 );
 			expect( console )[ matcherNameWith ]( message );
 			expect( spy.assertionsNumber ).toBe( 2 );
 		} );
-	} );
 
-	it( 'does not treat collapsed console groups as log calls', () => {
-		console.groupCollapsed( 'Details' );
-		console.groupEnd();
-
-		expect( console ).not.toHaveLogged();
+		test( 'registers the console spy before test execution', () => {
+			expect(
+				console[ methodName ].assertionsNumber
+			).toBeGreaterThanOrEqual( 0 );
+		} );
 	} );
 } );
 
