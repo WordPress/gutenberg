@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   HEIC images converted to JPEG in the browser no longer lose their EXIF metadata. The EXIF block is now copied from the HEIC container into the converted JPEG (with the orientation tag reset, since rotation is baked into the pixels), so the server can populate the attachment's title, caption, alt text and `image_meta` the same way it does for a direct upload ([#82033](https://github.com/WordPress/gutenberg/issues/82033)).
+
 ### Internal
 
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))

@@ -1,3 +1,5 @@
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import { canvasConvertToJpeg } from '../canvas-utils';
 import { getHeicUnsupportedMessage } from '../heic-support';
 
@@ -191,6 +193,68 @@ describe( 'canvasConvertToJpeg', () => {
 			expect(
 				( global as any ).ImageDecoder.isTypeSupported
 			).toHaveBeenCalledWith( 'image/heic' );
+		} );
+	} );
+
+	describe( 'EXIF preservation', () => {
+		it( 'carries the source EXIF block into the converted JPEG', async () => {
+			// A real HEIC fixture carrying an EXIF block (Orientation=6).
+			const heicBytes = readFileSync(
+				join( __dirname, 'fixtures', 'exif-rotated-90cw.heic' )
+			);
+
+			const jpegBlob = new Blob(
+				[ new Uint8Array( [ 0xff, 0xd8, 0xff, 0xd9 ] ) ],
+				{ type: 'image/jpeg' }
+			);
+			const mockBitmap = { width: 32, height: 32, close: jest.fn() };
+			global.createImageBitmap = jest
+				.fn()
+				.mockResolvedValue( mockBitmap );
+			global.OffscreenCanvas = jest.fn().mockImplementation( () => ( {
+				getContext: jest
+					.fn()
+					.mockReturnValue( { drawImage: jest.fn() } ),
+				convertToBlob: jest.fn().mockResolvedValue( jpegBlob ),
+			} ) );
+
+			const file = new File( [ heicBytes ], 'photo.heic', {
+				type: 'image/heic',
+			} );
+			const result = await canvasConvertToJpeg( file );
+
+			const bytes = new Uint8Array( await result.arrayBuffer() );
+			// An APP1 EXIF segment follows the SOI marker.
+			expect( bytes[ 2 ] ).toBe( 0xff );
+			expect( bytes[ 3 ] ).toBe( 0xe1 );
+			expect( Array.from( bytes.subarray( 6, 12 ) ) ).toEqual( [
+				0x45, 0x78, 0x69, 0x66, 0, 0,
+			] );
+		} );
+
+		it( 'returns the plain JPEG when the source has no EXIF block', async () => {
+			const jpegBlob = new Blob(
+				[ new Uint8Array( [ 0xff, 0xd8, 0xff, 0xd9 ] ) ],
+				{ type: 'image/jpeg' }
+			);
+			const mockBitmap = { width: 32, height: 32, close: jest.fn() };
+			global.createImageBitmap = jest
+				.fn()
+				.mockResolvedValue( mockBitmap );
+			global.OffscreenCanvas = jest.fn().mockImplementation( () => ( {
+				getContext: jest
+					.fn()
+					.mockReturnValue( { drawImage: jest.fn() } ),
+				convertToBlob: jest.fn().mockResolvedValue( jpegBlob ),
+			} ) );
+
+			const file = new File( [ 'not-a-heic' ], 'photo.heic', {
+				type: 'image/heic',
+			} );
+			const result = await canvasConvertToJpeg( file );
+
+			const bytes = new Uint8Array( await result.arrayBuffer() );
+			expect( Array.from( bytes ) ).toEqual( [ 0xff, 0xd8, 0xff, 0xd9 ] );
 		} );
 	} );
 } );

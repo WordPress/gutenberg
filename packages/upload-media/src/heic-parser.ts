@@ -940,27 +940,28 @@ function findMeta( r: Reader ): { box: BoxInfo; children: BoxInfo[] } | null {
 }
 
 /**
- * Extract the EXIF orientation from an ISOBMFF (HEIF/AVIF) container.
+ * Extract the raw EXIF item body from an ISOBMFF (HEIF/AVIF) container.
  *
  * AVIF and HEIF store EXIF metadata as an `Exif` item inside the `meta` box.
- * Neither WordPress's server-side `exif_read_data()` nor libheif applies this
- * orientation, so it is read here for client-side rotation.
+ * The returned payload is the item body as stored: usually a 4-byte
+ * `exif_tiff_header_offset` followed by a TIFF block, though some encoders
+ * omit the prefix.
  *
  * @param buffer Raw file contents.
- * @return EXIF orientation (1-8), or 1 when absent/unparseable.
+ * @return EXIF item body, or null when absent/unparseable.
  */
-export function parseExifOrientation( buffer: ArrayBuffer ): number {
+export function extractExifPayload( buffer: ArrayBuffer ): Uint8Array | null {
 	try {
 		const r = new Reader( buffer );
 		const meta = findMeta( r );
 		if ( ! meta ) {
-			return 1;
+			return null;
 		}
 
 		const iinfBox = meta.children.find( ( b ) => b.type === 'iinf' );
 		const ilocBox = meta.children.find( ( b ) => b.type === 'iloc' );
 		if ( ! iinfBox || ! ilocBox ) {
-			return 1;
+			return null;
 		}
 
 		const itemTypes = parseIinf( r, iinfBox );
@@ -972,21 +973,35 @@ export function parseExifOrientation( buffer: ArrayBuffer ): number {
 			}
 		}
 		if ( exifItemId === undefined ) {
-			return 1;
+			return null;
 		}
 
 		const loc = parseIloc( r, ilocBox ).get( exifItemId );
 		if ( ! loc || loc.extents.length === 0 ) {
-			return 1;
+			return null;
 		}
 
 		const idatBox = meta.children.find( ( b ) => b.type === 'idat' );
 		const idatOffset = idatBox ? idatBox.offset + idatBox.headerSize : 0;
 
-		return readTiffOrientation( readItemData( buffer, loc, idatOffset ) );
+		return readItemData( buffer, loc, idatOffset );
 	} catch {
-		return 1;
+		return null;
 	}
+}
+
+/**
+ * Extract the EXIF orientation from an ISOBMFF (HEIF/AVIF) container.
+ *
+ * Neither WordPress's server-side `exif_read_data()` nor libheif applies this
+ * orientation, so it is read here for client-side rotation.
+ *
+ * @param buffer Raw file contents.
+ * @return EXIF orientation (1-8), or 1 when absent/unparseable.
+ */
+export function parseExifOrientation( buffer: ArrayBuffer ): number {
+	const payload = extractExifPayload( buffer );
+	return payload ? readTiffOrientation( payload ) : 1;
 }
 
 /**

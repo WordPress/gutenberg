@@ -1,6 +1,7 @@
 import { getFileBasename } from './utils';
 import { parseHeic } from './heic-parser';
 import { getHeicUnsupportedMessage } from './heic-support';
+import { extractExifForJpeg, embedExifInJpeg } from './exif-embed';
 
 /**
  * Converts an image file to JPEG using the browser's native decoder and canvas.
@@ -26,6 +27,19 @@ export async function canvasConvertToJpeg(
 ): Promise< File > {
 	const baseName = getFileBasename( file.name );
 
+	// Pull the EXIF block out of the source container up front so every
+	// decoding strategy can carry it over into the converted JPEG. A canvas
+	// re-encode produces a file with no metadata; without this the server has
+	// nothing to read and the attachment loses its EXIF-derived title,
+	// caption and image_meta defaults.
+	let buffer: ArrayBuffer | null = null;
+	try {
+		buffer = await file.arrayBuffer();
+	} catch {
+		// Metadata carry-over is best-effort; decoding can still proceed.
+	}
+	const exif = buffer ? extractExifForJpeg( buffer ) : null;
+
 	// Strategy 1: createImageBitmap + OffscreenCanvas.
 	try {
 		const bitmap = await createImageBitmap( file );
@@ -44,9 +58,7 @@ export async function canvasConvertToJpeg(
 				quality,
 			} );
 
-			return new File( [ jpegBlob ], `${ baseName }.jpg`, {
-				type: 'image/jpeg',
-			} );
+			return await toJpegFile( jpegBlob, baseName, exif );
 		} finally {
 			bitmap.close();
 		}
@@ -85,9 +97,7 @@ export async function canvasConvertToJpeg(
 						quality,
 					} );
 
-					return new File( [ jpegBlob ], `${ baseName }.jpg`, {
-						type: 'image/jpeg',
-					} );
+					return await toJpegFile( jpegBlob, baseName, exif );
 				} finally {
 					videoFrame.close();
 				}
@@ -104,7 +114,9 @@ export async function canvasConvertToJpeg(
 	// we parse the container and decode each tile via VideoDecoder.
 	if ( typeof VideoDecoder !== 'undefined' ) {
 		try {
-			const heicData = parseHeic( await file.arrayBuffer() );
+			const heicData = parseHeic(
+				buffer ?? ( await file.arrayBuffer() )
+			);
 
 			const support = await VideoDecoder.isConfigSupported( {
 				codec: heicData.codecString,
@@ -153,9 +165,7 @@ export async function canvasConvertToJpeg(
 					quality,
 				} );
 
-				return new File( [ jpegBlob ], `${ baseName }.jpg`, {
-					type: 'image/jpeg',
-				} );
+				return await toJpegFile( jpegBlob, baseName, exif );
 			}
 		} catch {
 			// VideoDecoder HEVC not available or HEIC parsing failed.
@@ -164,6 +174,35 @@ export async function canvasConvertToJpeg(
 	}
 
 	throw new Error( getHeicUnsupportedMessage() );
+}
+
+/**
+ * Wrap a canvas-encoded JPEG blob in a File, embedding the source EXIF block
+ * when one was extracted.
+ *
+ * @param jpegBlob Canvas-encoded JPEG data.
+ * @param baseName Output file basename (without extension).
+ * @param exif     TIFF block from the source file, or null.
+ * @return JPEG File object.
+ */
+async function toJpegFile(
+	jpegBlob: Blob,
+	baseName: string,
+	exif: Uint8Array | null
+): Promise< File > {
+	let contents: Blob | Uint8Array< ArrayBuffer > = jpegBlob;
+	if ( exif ) {
+		const withExif = embedExifInJpeg(
+			new Uint8Array( await jpegBlob.arrayBuffer() ),
+			exif
+		);
+		if ( withExif ) {
+			contents = withExif;
+		}
+	}
+	return new File( [ contents ], `${ baseName }.jpg`, {
+		type: 'image/jpeg',
+	} );
 }
 
 /**
