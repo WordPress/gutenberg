@@ -4,11 +4,13 @@
 
 ### Enhancements
 
+-   DataViews: Add a `mediaFit` option to the `grid` and `pickerGrid` layouts to fit item previews inside their box (`contain`) instead of cropping them (`cover`), so the media's own aspect ratio stays visible. A fitted preview is letterboxed against a neutral background, so each item still reads as a unit. Consumers can offer this to users as an "Original aspect ratio" toggle in the view options via `config.mediaFitControl` ([#81604](https://github.com/WordPress/gutenberg/pull/81604)).
 -   Validated form controls: Align invalid focus styling for `ComboboxControl` and `FormTokenField` with the design system ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
 -   DataViews filters: Align filter search input focus styling with `outset-ring__focus` ([#81357](https://github.com/WordPress/gutenberg/pull/81357)).
 
 ### Bug Fix
 
+-   Picker grid layout: Clip item previews to the media box's rounded corners, as the grid layout already does, so an image no longer squares off its corners ([#81604](https://github.com/WordPress/gutenberg/pull/81604)).
 -   DataForm: Keep the displayed calendar month of the `date` and `datetime` controls in sync when the value changes from outside the control, e.g. after an undo, a reset, or switching the edited item. [#81635](https://github.com/WordPress/gutenberg/pull/81635)
 -   DataForms: Fix the `date` and `datetime` controls selecting and highlighting the day next to the one clicked. A site configured with a UTC offset rather than a named timezone reports no timezone the calendar can work in, so it fell back to the browser's while the values stayed anchored to the site's. The `datetime` calendar is now given the site's UTC offset itself — which also keeps the day it marks as today the site's — and a `date` value is treated as a plain calendar day, parsed in the same browser timezone the calendar reads it in. [#81498](https://github.com/WordPress/gutenberg/pull/81498)
 -   Validated form controls: Align invalid focus styling for InputBase-based controls with the design system ([#80417](https://github.com/WordPress/gutenberg/pull/80417)).
