@@ -2,6 +2,8 @@
 	"vitest": {
 		"files": [
 			"packages/html-entities/src/test/entities.jsdom.test.ts",
+			"test/unit/config/setup.vitest.jsdom.test.jsx",
+			"test/unit/config/setup.vitest.node.test.js",
 			"test/unit/scripts/test/discover-test-files.test.js"
 		],
 		"directories": []

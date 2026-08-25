@@ -74,11 +74,10 @@ export function useSetActiveTemplateAction(): Action< Template > {
 					}
 				}
 				// The site entity is a singleton and has no record key.
-				const siteRecordKey = undefined as unknown as string;
-				await editEntityRecord( 'root', 'site', siteRecordKey, {
+				await editEntityRecord( 'root', 'site', undefined, {
 					active_templates: activeTemplates,
 				} );
-				await saveEditedEntityRecord( 'root', 'site', siteRecordKey );
+				await saveEditedEntityRecord( 'root', 'site' );
 			},
 		} ),
 		[
