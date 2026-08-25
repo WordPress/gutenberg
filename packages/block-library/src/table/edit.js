@@ -6,6 +6,7 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import {
 	InspectorControls,
 	BlockControls,
@@ -427,6 +428,7 @@ function TableEdit( {
 									isSelected ? onChange : undefined
 								}
 								setSelectedCell={ setSelectedCell }
+								insertBlocksAfter={ insertBlocksAfter }
 								{ ...cellProps }
 							/>
 						);
@@ -604,6 +606,7 @@ const Cell = memo( function ( {
 	content,
 	onChange,
 	setSelectedCell,
+	insertBlocksAfter,
 } ) {
 	return (
 		<CellTag
@@ -631,6 +634,13 @@ const Cell = memo( function ( {
 				} }
 				aria-label={ cellAriaLabel[ name ] }
 				placeholder={ placeholder[ name ] }
+				__unstableOnSplitAtDoubleLineEnd={ () => {
+					if ( insertBlocksAfter ) {
+						insertBlocksAfter(
+							createBlock( getDefaultBlockName() )
+						);
+					}
+				} }
 			/>
 		</CellTag>
 	);
