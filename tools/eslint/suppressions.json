@@ -678,21 +678,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/base-control/styles/base-control-styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
-	"packages/components/src/border-box-control/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/components/src/border-control/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/box-control/styles/box-control-icon-styles.ts": {
 		"no-restricted-imports": {
 			"count": 2
@@ -718,17 +703,7 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/color-palette/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/color-picker/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/components/src/combobox-control/styles.ts": {
 		"no-restricted-imports": {
 			"count": 1
 		}
@@ -858,11 +833,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/progress-bar/styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
 	"packages/components/src/range-control/index.tsx": {
 		"react-hooks/immutability": {
 			"count": 3
@@ -907,11 +877,6 @@
 		}
 	},
 	"packages/components/src/text/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/components/src/textarea-control/styles/textarea-control-styles.ts": {
 		"no-restricted-imports": {
 			"count": 1
 		}
@@ -979,11 +944,6 @@
 	"packages/components/src/utils/test/polymorphic-element.tsx": {
 		"no-restricted-imports": {
 			"count": 1
-		}
-	},
-	"packages/components/src/z-stack/styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
 		}
 	},
 	"packages/compose/src/hooks/use-dialog/index.ts": {
@@ -1369,11 +1329,6 @@
 			"count": 2
 		}
 	},
-	"packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
 	"packages/editor/src/components/post-template/create-new-template-modal.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
@@ -1634,11 +1589,6 @@
 	"packages/global-styles-ui/src/font-library/font-collection.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 6
-		}
-	},
-	"packages/global-styles-ui/src/font-library/font-demo.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
 		}
 	},
 	"packages/global-styles-ui/src/font-library/google-fonts-confirm-dialog.tsx": {
