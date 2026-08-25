@@ -64,10 +64,3 @@ export const MEDIA_ASPECT_RATIOS = [
 	'16/9',
 	'9/16',
 ] as const;
-
-// How the media field fills its preview box: `cover` crops it to fill,
-// `contain` fits the whole media inside, letterboxing it so its own aspect
-// ratio stays visible. Source of truth for the `MediaFit` type (derived from
-// this array), and used by layouts to validate the configured
-// `layout.mediaFit` before applying it.
-export const MEDIA_FITS = [ 'cover', 'contain' ] as const;

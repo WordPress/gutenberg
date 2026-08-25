@@ -7,7 +7,7 @@ import type {
 	SortDirection,
 } from './field-api';
 import type { SetSelection } from './private';
-import type { MEDIA_ASPECT_RATIOS, MEDIA_FITS } from '../constants';
+import type { MEDIA_ASPECT_RATIOS } from '../constants';
 
 /**
  * The filters applied to the dataset.
@@ -235,11 +235,13 @@ export type Density = 'compact' | 'balanced' | 'comfortable';
 export type MediaAspectRatio = ( typeof MEDIA_ASPECT_RATIOS )[ number ];
 
 /**
- * How the media field fills its preview box. Derived from the `MEDIA_FITS`
- * constant, which layouts also use to validate the configured value at
- * runtime, so the two can't drift apart.
+ * How the media field fills its preview box. `cover` crops it to fill,
+ * `contain` fits the whole media inside, letterboxing it so its own aspect
+ * ratio stays visible. Unlike `MediaAspectRatio` there is no matching runtime
+ * constant: layouts style the fit from a class they add for `contain` alone,
+ * so any other value simply leaves previews cropped.
  */
-export type MediaFit = ( typeof MEDIA_FITS )[ number ];
+export type MediaFit = 'cover' | 'contain';
 
 export interface ViewTable extends ViewBase {
 	type: 'table';
