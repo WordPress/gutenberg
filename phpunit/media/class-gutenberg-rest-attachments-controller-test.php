@@ -1775,6 +1775,77 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
+	 * Verifies that the finalize response reflects the post row as it stands
+	 * after the metadata has been generated.
+	 *
+	 * finalize_item() applies the 'wp_generate_attachment_metadata' filter
+	 * before preparing its response, and a callback is free to rewrite the
+	 * attachment's post row - an optimizer that converts the file updates
+	 * post_mime_type, for instance. The editor stores this response as its
+	 * copy of the record rather than reading the attachment again, so
+	 * anything stale here is what the block keeps for the session.
+	 *
+	 * @link https://github.com/WordPress/gutenberg/issues/81844
+	 *
+	 * @covers ::finalize_item
+	 */
+	public function test_finalize_response_reflects_post_row_changed_by_metadata_filter() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=filtered-post-row.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+		$request->set_param( 'title', 'Original title' );
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+
+		$attachment_id = rest_get_server()->dispatch( $request )->get_data()['id'];
+
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=filtered-post-row-150x150.jpg' );
+		$request->set_param( 'image_size', 'thumbnail' );
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/test-image.jpg' ) );
+
+		$thumbnail_data = rest_get_server()->dispatch( $request )->get_data();
+
+		// Stands in for a plugin that rewrites the post row as the metadata is
+		// generated. Added after the upload so only finalize runs it.
+		add_filter(
+			'wp_generate_attachment_metadata',
+			static function ( $metadata, $id ) {
+				wp_update_post(
+					array(
+						'ID'         => $id,
+						'post_title' => 'Rewritten while generating metadata',
+					)
+				);
+				return $metadata;
+			},
+			10,
+			2
+		);
+
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/finalize" );
+		$request->set_param( 'sub_sizes', array( $thumbnail_data ) );
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 200, $response->get_status() );
+
+		$this->assertSame(
+			'Rewritten while generating metadata',
+			get_post( $attachment_id )->post_title,
+			'The filter should have rewritten the stored post row.'
+		);
+
+		$this->assertSame(
+			'Rewritten while generating metadata',
+			$response->get_data()['title']['raw'],
+			'The finalize response should carry the rewritten post row, not the row as it was before the metadata was generated.'
+		);
+	}
+
+	/**
 	 * Verifies that finalize writes scaled sub-size metadata correctly.
 	 *
 	 * @covers ::finalize_item
