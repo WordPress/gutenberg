@@ -162,6 +162,7 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		autoPlay: shouldAutoPlay,
 		labels,
 		waveformStyle: context.waveformStyle,
+		playAnimation: context.playAnimation,
 		showPlayButtonArtwork,
 		onEnded: () => {
 			// Advance to next track (autoPlay handles playback).

@@ -2,12 +2,14 @@ import '@testing-library/jest-dom';
 import { act, render } from '@testing-library/react';
 import { WaveformPlayer } from '../waveform-player';
 import {
+	applyWaveformPlayerAnimation,
 	applyWaveformPlayerStyles,
 	initWaveformPlayer,
 	setupPlayButtonArtwork,
 } from '../waveform-utils';
 
 jest.mock( '../waveform-utils', () => ( {
+	applyWaveformPlayerAnimation: jest.fn(),
 	applyWaveformPlayerStyles: jest.fn(),
 	initWaveformPlayer: jest.fn(),
 	setupPlayButtonArtwork: jest.fn(),
@@ -106,6 +108,7 @@ describe( 'WaveformPlayer', () => {
 	afterEach( () => {
 		jest.runOnlyPendingTimers();
 		jest.useRealTimers();
+		applyWaveformPlayerAnimation.mockReset();
 		applyWaveformPlayerStyles.mockReset();
 		initWaveformPlayer.mockReset();
 		setupPlayButtonArtwork.mockReset();

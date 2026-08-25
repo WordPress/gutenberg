@@ -46,6 +46,11 @@
 			"enum": [ "bars", "mirror", "line", "blocks", "dots", "seekbar" ],
 			"default": "bars"
 		},
+		"playAnimation": {
+			"type": "string",
+			"enum": [ "none", "flip", "scale", "spin" ],
+			"default": "scale"
+		},
 		"waveformColor": {
 			"type": "string"
 		},

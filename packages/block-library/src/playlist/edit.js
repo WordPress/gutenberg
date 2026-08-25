@@ -35,6 +35,7 @@ const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 const AUDIO_FILE_EXTENSION =
 	/\.(aac|aif|aiff|flac|m4a|m4b|mp3|oga|ogg|opus|wav|weba)$/i;
 const DEFAULT_WAVEFORM_STYLE = 'bars';
+const DEFAULT_PLAY_ANIMATION = 'scale';
 const FILE_LIST_OBJECT_NAME = '[object FileList]';
 const WAVEFORM_STYLE_OPTIONS = [
 	{ label: _x( 'Bars', 'waveform style option' ), value: 'bars' },
@@ -43,6 +44,12 @@ const WAVEFORM_STYLE_OPTIONS = [
 	{ label: _x( 'Blocks', 'waveform style option' ), value: 'blocks' },
 	{ label: _x( 'Dots', 'waveform style option' ), value: 'dots' },
 	{ label: _x( 'Seekbar', 'waveform style option' ), value: 'seekbar' },
+];
+const PLAY_ANIMATION_OPTIONS = [
+	{ label: _x( 'None', 'play animation option' ), value: 'none' },
+	{ label: _x( 'Flip', 'play animation option' ), value: 'flip' },
+	{ label: _x( 'Scale', 'play animation option' ), value: 'scale' },
+	{ label: _x( 'Spin', 'play animation option' ), value: 'spin' },
 ];
 
 function isFile( value ) {
@@ -78,6 +85,7 @@ const PlaylistEdit = ( {
 		showArtists,
 		showTrackLength,
 		waveformStyle = DEFAULT_WAVEFORM_STYLE,
+		playAnimation = DEFAULT_PLAY_ANIMATION,
 		waveformColor,
 		waveformGradient,
 		waveformBackgroundColor,
@@ -358,6 +366,18 @@ const PlaylistEdit = ( {
 					newWaveformStyle === DEFAULT_WAVEFORM_STYLE
 						? undefined
 						: newWaveformStyle,
+			} );
+		},
+		[ setAttributes ]
+	);
+
+	const onChangePlayAnimation = useCallback(
+		( newPlayAnimation ) => {
+			setAttributes( {
+				playAnimation:
+					newPlayAnimation === DEFAULT_PLAY_ANIMATION
+						? undefined
+						: newPlayAnimation,
 			} );
 		},
 		[ setAttributes ]
@@ -670,6 +690,7 @@ const PlaylistEdit = ( {
 					resetAll={ () => {
 						setAttributes( {
 							waveformStyle: undefined,
+							playAnimation: undefined,
 							waveformColor: undefined,
 							waveformGradient: undefined,
 							waveformBackgroundColor: undefined,
@@ -707,6 +728,24 @@ const PlaylistEdit = ( {
 							onChange={ onChangeWaveformStyle }
 						/>
 					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __( 'Play animation' ) }
+						isShownByDefault
+						hasValue={ () =>
+							playAnimation !== DEFAULT_PLAY_ANIMATION
+						}
+						onDeselect={ () =>
+							onChangePlayAnimation( DEFAULT_PLAY_ANIMATION )
+						}
+						panelId={ waveformPanelId }
+					>
+						<SelectControl
+							label={ __( 'Play animation' ) }
+							value={ playAnimation }
+							options={ PLAY_ANIMATION_OPTIONS }
+							onChange={ onChangePlayAnimation }
+						/>
+					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
 			<figure { ...blockProps }>
@@ -733,6 +772,7 @@ const PlaylistEdit = ( {
 						backgroundGradient={ waveformBackgroundGradientValue }
 						onEnded={ onTrackEnded }
 						showPlayButtonArtwork={ showPlayButtonArtwork === true }
+						playAnimation={ playAnimation }
 					/>
 				</Disabled>
 				<ol { ...trackListProps }>

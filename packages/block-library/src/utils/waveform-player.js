@@ -2,6 +2,7 @@ import { useEffect, useRef } from '@wordpress/element';
 import { useEvent, useRefEffect } from '@wordpress/compose';
 import { __, _x } from '@wordpress/i18n';
 import {
+	applyWaveformPlayerAnimation,
 	applyWaveformPlayerStyles,
 	initWaveformPlayer,
 	setupPlayButtonArtwork,
@@ -74,6 +75,7 @@ function updatePlayerMetadata(
  * @param {string}   props.backgroundGradient    - The waveform background gradient.
  * @param {string}   props.textColor             - The player text color.
  * @param {string}   props.waveformStyle         - Waveform style (bars, mirror, line, blocks, dots, seekbar).
+ * @param {string}   props.playAnimation         - Play/pause icon animation style.
  * @param {Function} props.onEnded               - Callback when the track finishes playing.
  * @param {boolean}  props.showPlayButtonArtwork - Whether to show artwork on the play button.
  * @return {Element} The WaveformPlayer element.
@@ -90,6 +92,7 @@ export function WaveformPlayer( {
 	backgroundGradient,
 	textColor,
 	waveformStyle,
+	playAnimation,
 	onEnded,
 	showPlayButtonArtwork = false,
 } ) {
@@ -117,6 +120,7 @@ export function WaveformPlayer( {
 		backgroundGradient,
 		textColor,
 	} );
+	const playAnimationRef = useRef( playAnimation );
 	useEffect( () => {
 		metadataRef.current = { src, title, artist, image, imageAlt };
 	}, [ src, title, artist, image, imageAlt ] );
@@ -130,6 +134,17 @@ export function WaveformPlayer( {
 			textColor,
 		};
 	}, [ color, gradient, backgroundColor, backgroundGradient, textColor ] );
+
+	useEffect( () => {
+		playAnimationRef.current = playAnimation;
+
+		if ( playerRef.current?.container ) {
+			applyWaveformPlayerAnimation(
+				playerRef.current.container,
+				playAnimation
+			);
+		}
+	}, [ playAnimation ] );
 
 	useEffect( () => {
 		if ( playerRef.current?.container ) {
@@ -187,6 +202,7 @@ export function WaveformPlayer( {
 					},
 					onEnded: () => onEndedEvent?.(),
 					showPlayButtonArtwork,
+					playAnimation: playAnimationRef.current,
 				} );
 				playerRef.current = player;
 				const { destroy } = player;
