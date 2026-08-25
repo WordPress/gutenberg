@@ -20,12 +20,18 @@ export type ComboboxChipWithRemoveProps = Omit<
 	 */
 	prefix?: React.ReactNode;
 	/**
-	 * Accessible label for the remove button.
+	 * Tooltip label for the remove button.
+	 *
+	 * @default __( 'Remove' )
+	 */
+	removeLabel?: string;
+	/**
+	 * Accessible name for the remove button.
 	 *
 	 * When omitted and `children` is a string, defaults to a translated
 	 * `Remove %s` label using the chip name. Otherwise defaults to `Remove`.
 	 */
-	removeLabel?: string;
+	removeAriaLabel?: string;
 };
 
 export type ComboboxClearProps = ComponentProps< typeof _Combobox.Clear > & {

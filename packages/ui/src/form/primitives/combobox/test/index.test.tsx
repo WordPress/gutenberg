@@ -222,7 +222,7 @@ describe( 'Combobox', () => {
 								{ value.map( ( item ) => (
 									<Combobox.ChipWithRemove
 										key={ item.id }
-										removeLabel={ `Remove ${ item.value }` }
+										removeAriaLabel={ `Remove ${ item.value }` }
 									>
 										{ item.value }
 									</Combobox.ChipWithRemove>

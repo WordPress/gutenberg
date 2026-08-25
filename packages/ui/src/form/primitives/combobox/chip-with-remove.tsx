@@ -3,7 +3,10 @@ import { forwardRef } from '@wordpress/element';
 import clsx from 'clsx';
 import { __, sprintf } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
-import { IconButton } from '../../../icon-button';
+import { Button } from '../../../button';
+import { Icon } from '../../../icon';
+import iconButtonStyles from '../../../icon-button/style.module.css';
+import * as Tooltip from '../../../tooltip';
 import type { ComboboxChipWithRemoveProps } from './types';
 import styles from './style.module.css';
 
@@ -20,6 +23,7 @@ export const ChipWithRemove = forwardRef<
 		children,
 		prefix,
 		removeLabel: removeLabelProp,
+		removeAriaLabel: removeAriaLabelProp,
 		'aria-label': ariaLabel,
 		...restProps
 	},
@@ -27,8 +31,9 @@ export const ChipWithRemove = forwardRef<
 ) {
 	const chipAriaLabel =
 		ariaLabel ?? ( typeof children === 'string' ? children : undefined );
-	const removeLabel =
-		removeLabelProp ??
+	const removeLabel = removeLabelProp ?? __( 'Remove' );
+	const removeAriaLabel =
+		removeAriaLabelProp ??
 		( typeof children === 'string'
 			? sprintf(
 					/* translators: %s: chip label. */
@@ -51,18 +56,38 @@ export const ChipWithRemove = forwardRef<
 
 			<_Combobox.ChipRemove
 				className={ styles[ 'chip-remove' ] }
-				render={ ( props, { disabled } ) => (
-					<IconButton
-						icon={ closeSmall }
-						label={ removeLabel }
-						size="small"
-						variant="minimal"
-						tone="neutral"
-						focusableWhenDisabled={ false }
-						disabled={ disabled }
-						aria-hidden={ disabled || undefined }
-						{ ...props }
-					/>
+				render={ (
+					{ className: triggerClassName, ...triggerProps },
+					{ disabled }
+				) => (
+					<Tooltip.Root>
+						<Tooltip.Trigger
+							{ ...triggerProps }
+							disabled={ disabled }
+							render={
+								<Button
+									size="small"
+									variant="minimal"
+									tone="neutral"
+									aria-label={ removeAriaLabel }
+									disabled={ disabled }
+									focusableWhenDisabled={ false }
+									aria-hidden={ disabled || undefined }
+								/>
+							}
+							className={ clsx(
+								iconButtonStyles[ 'icon-button' ],
+								triggerClassName
+							) }
+						>
+							<Icon
+								icon={ closeSmall }
+								size={ 24 }
+								className={ iconButtonStyles.icon }
+							/>
+						</Tooltip.Trigger>
+						<Tooltip.Popup>{ removeLabel }</Tooltip.Popup>
+					</Tooltip.Root>
 				) }
 			/>
 		</_Combobox.Chip>
