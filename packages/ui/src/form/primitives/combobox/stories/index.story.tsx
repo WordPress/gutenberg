@@ -123,6 +123,9 @@ export const DetachedInline: Story = {
 		// The input keeps focus and arrow keys move through the options, so
 		// the scrollable list is reachable by keyboard.
 		a11y: {
+			// Storybook merges parameters, so `test` must be set here to
+			// override the warning-only default from `meta`.
+			test: 'error',
 			config: {
 				rules: [
 					{ id: 'scrollable-region-focusable', enabled: false },
@@ -138,7 +141,11 @@ export const DetachedInline: Story = {
 		// its accessible name from the input.
 		open: true,
 		children: [
-			<Combobox.Input placeholder="Search" key="input" />,
+			<Combobox.Input
+				aria-label="Search items"
+				placeholder="Search items"
+				key="input"
+			/>,
 			<div
 				style={ {
 					minHeight: '200px',
