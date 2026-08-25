@@ -6,9 +6,6 @@ import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 const configDir = import.meta.dirname;
 
 export default defineConfig( {
-	// The story globs in `main.ts` reach into `../packages`, so the Storybook
-	// plugin needs the repository root to build its test includes.
-	root: path.resolve( configDir, '..' ),
 	// `storybook/test` is served unbundled, and the optimizer only discovers
 	// its CommonJS dependencies when they sit in the Vite root's
 	// `node_modules`. Pre-bundle them from the package that owns them.
