@@ -67,6 +67,9 @@
 			"type": "boolean",
 			"default": true
 		},
+		"overlayButtonLabel": {
+			"type": "string"
+		},
 		"__unstableLocation": {
 			"type": "string"
 		},
