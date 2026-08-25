@@ -1,16 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import type { ComponentType } from 'react';
+import type { ComponentPropsWithoutRef, ComponentType } from 'react';
 // Form controls read these stylesheets, normally enqueued by WordPress.
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '@wordpress/components/build-style/style.css';
 // eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '@wordpress/dataviews/build-style/style.css';
-import { useState } from '@wordpress/element';
+import { forwardRef, useEffect, useState } from '@wordpress/element';
 import { chartBar, download, trendingUp } from '@wordpress/icons';
+import { WidgetHostProvider } from '@wordpress/widget-primitives';
 import type {
 	ResolveWidgetModule,
 	WidgetAction,
 	WidgetAttributeField,
+	WidgetHost,
 	WidgetRenderProps,
 	WidgetType,
 } from '@wordpress/widget-primitives';
@@ -446,6 +448,168 @@ The widget only declares relevance; the fit is measured by the chrome, so the sa
 Beyond attributes, \`demo/goal-progress\` declares three \`actions\` spanning the relevance scale, and that scale routes them: "View goal details" at \`'high'\` mounts as a leading text link (declared icon as prefix) in a persistent chrome footer, "Export progress" at \`'medium'\` beside it as a trailing icon-only link, and "About goals" at the default \`'low'\` lands in the "More" menu. The widget declares each action as data plus its importance; the host owns the surfaces.
 
 Each type also carries a \`help\` note, opened from the info icon in the header, that describes its attributes and what they do.
+`,
+			},
+		},
+	},
+};
+
+/*
+ * The host-links demo: a fake application that owns the `/reports` route.
+ * Its `match` recognizes the portable href form; its link primitive logs
+ * the client-side navigation instead of mounting a real router.
+ */
+const DEMO_NAVIGATE_EVENT = 'widget-dashboard-demo-navigate';
+
+const DemoRouteLink = forwardRef<
+	HTMLAnchorElement,
+	{ path: string } & Omit< ComponentPropsWithoutRef< 'a' >, 'href' >
+>( function DemoRouteLink( { path, onClick, children, ...props }, ref ) {
+	return (
+		<a
+			ref={ ref }
+			{ ...props }
+			href={ `?p=${ path }` }
+			onClick={ ( event ) => {
+				event.preventDefault();
+				window.dispatchEvent(
+					new CustomEvent( DEMO_NAVIGATE_EVENT, { detail: path } )
+				);
+				onClick?.( event );
+			} }
+		>
+			{ children }
+		</a>
+	);
+} );
+
+const DEMO_PAGE = 'https://demo.example/wp-admin/admin.php?page=demo-dashboard';
+
+const demoHost: WidgetHost = {
+	links: {
+		match: ( href ) => {
+			let url: URL;
+			try {
+				url = new URL( href, DEMO_PAGE );
+			} catch {
+				return null;
+			}
+
+			if (
+				url.pathname !== '/wp-admin/admin.php' ||
+				url.searchParams.get( 'page' ) !== 'demo-dashboard'
+			) {
+				return null;
+			}
+
+			return url.searchParams.get( 'p' ) ?? '/';
+		},
+		Link: DemoRouteLink,
+	},
+};
+
+// The goal type plus an in-app target, so the footer shows all three link
+// materializations side by side: route link, plain anchor, download.
+const hostLinksWidgetType: WidgetType = {
+	...goalProgressWidgetType,
+	name: 'demo/goal-progress-links',
+	help: {
+		content:
+			'The footer holds an in-app route link, an external link, and a download; the <strong>More</strong> menu keeps the rest.',
+	},
+	actions: [
+		{
+			id: 'see-report',
+			label: 'See report',
+			relevance: 'high',
+			href: 'admin.php?page=demo-dashboard&p=/reports',
+		},
+		...GOAL_ACTIONS,
+	],
+};
+
+const HOST_LINKS_LAYOUT: DashboardWidget[] = [
+	{
+		uuid: 'goal-progress-links',
+		type: 'demo/goal-progress-links',
+		attributes: { metric: 'revenue', target: '5000' },
+		placement: { width: 2, height: 1, order: 1 },
+	},
+];
+
+function HostLinksStory() {
+	const [ layout, setLayout ] =
+		useState< DashboardWidget[] >( HOST_LINKS_LAYOUT );
+
+	const [ lastNavigation, setLastNavigation ] = useState< {
+		path: string;
+	} | null >( null );
+
+	useEffect( () => {
+		// A fresh object per event, so repeated clicks restart the timer.
+		const onNavigate = ( event: Event ) =>
+			setLastNavigation( {
+				path: ( event as CustomEvent< string > ).detail,
+			} );
+
+		window.addEventListener( DEMO_NAVIGATE_EVENT, onNavigate );
+		return () =>
+			window.removeEventListener( DEMO_NAVIGATE_EVENT, onNavigate );
+	}, [] );
+
+	// The confirmation stays up briefly, then the idle prompt returns, so
+	// every navigation produces visible feedback.
+	useEffect( () => {
+		if ( ! lastNavigation ) {
+			return;
+		}
+
+		const timer = setTimeout( () => setLastNavigation( null ), 3000 );
+		return () => clearTimeout( timer );
+	}, [ lastNavigation ] );
+
+	return (
+		<WidgetHostProvider value={ demoHost }>
+			<p
+				role="status"
+				style={ {
+					color: 'var(--wpds-color-foreground-content-neutral-weak)',
+					fontSize: 'var(--wpds-typography-font-size-sm)',
+				} }
+			>
+				{ lastNavigation
+					? `Client-side navigation to ${ lastNavigation.path }; the document never reloaded.`
+					: 'Pick "See report" in the widget footer: its target is a route this demo host owns.' }
+			</p>
+
+			<WidgetDashboard
+				widgetTypes={ [ hostLinksWidgetType ] }
+				layout={ layout }
+				onLayoutChange={ setLayout }
+				resolveWidgetModule={ resolveDemoModule }
+				gridSettings={ { model: 'grid', rowHeight: 200 } }
+			>
+				<WidgetDashboard.Widgets />
+			</WidgetDashboard>
+		</WidgetHostProvider>
+	);
+}
+
+export const HostLinks: StoryObj = {
+	render: () => <HostLinksStory />,
+	parameters: {
+		docs: {
+			description: {
+				story: `
+The widget declares where to go; the host decides how to get there. This story mounts a \`WidgetHostProvider\` whose \`links\` capability recognizes hrefs targeting the demo application's own routes.
+
+The footer shows the three materializations side by side:
+
+- "See report" declares \`admin.php?page=demo-dashboard&p=/reports\`, a route this host owns: it mounts the host's route link and navigates client-side; the status line above confirms the document never reloaded.
+- "View goal details" opens another origin in a new tab: a plain anchor.
+- "Export progress" is a download: downloads always keep the plain anchor.
+
+Without the provider the same declarations still work; every action falls back to a plain anchor. Real hosts implement the capability at their route layer with their actual router.
 `,
 			},
 		},

@@ -7,8 +7,7 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BorderControl } from '../';
-import * as styles from '../styles';
-import { useCx } from '../../utils/hooks/use-cx';
+import { COLORS } from '../../utils';
 
 const colors = [
 	{ name: 'Gray', color: '#f6f7f7' },
@@ -75,19 +74,6 @@ function TestBorderControl( restProps ) {
 	return <BorderControl { ...restProps } />;
 }
 
-const getGeneratedEmotionClassNames = ( element ) =>
-	Array.from( element.classList ).filter( ( className ) =>
-		/^(css|emotion)-/.test( className )
-	);
-
-function EmotionStyleTest( { styleFragment } ) {
-	const cx = useCx();
-
-	return (
-		<div data-testid="emotion-style" className={ cx( styleFragment ) } />
-	);
-}
-
 describe( 'BorderControl', () => {
 	describe( 'basic rendering', () => {
 		it( 'should render standard border control', () => {
@@ -133,28 +119,74 @@ describe( 'BorderControl', () => {
 			expect( slider ).toBeInTheDocument();
 		} );
 
-		it( 'should compose inner wrapper width and height styles in a single generated class', () => {
-			render(
-				<EmotionStyleTest
-					styleFragment={ styles.getInnerWrapperStyles( {
-						hasWidth: true,
-					} ) }
-				/>
-			);
-
-			expect(
-				getGeneratedEmotionClassNames(
-					screen.getByTestId( 'emotion-style' )
-				)
-			).toHaveLength( 1 );
-		} );
-
 		it( 'should render placeholder in UnitControl', () => {
 			const props = createProps( { placeholder: 'Mixed' } );
 			render( <TestBorderControl { ...props } /> );
 
 			const widthInput = getWidthInput();
 			expect( widthInput ).toHaveAttribute( 'placeholder', 'Mixed' );
+		} );
+
+		describe( 'color indicator inline styles', () => {
+			const getIndicatorWrapper = ( border ) => {
+				render(
+					<TestBorderControl
+						{ ...createProps( { value: border } ) }
+					/>
+				);
+
+				const toggleButton = screen.getByLabelText( toggleLabelRegex );
+
+				// The wrapper is decorative, so it has no semantic query.
+				// eslint-disable-next-line testing-library/no-node-access
+				return toggleButton.firstElementChild;
+			};
+
+			it( 'should fall back to gray-300 when a style is set without a color', () => {
+				const indicatorWrapper = getIndicatorWrapper( {
+					style: 'solid',
+					color: '',
+				} );
+
+				expect( indicatorWrapper ).toHaveStyle( {
+					borderStyle: 'solid',
+					borderColor: COLORS.gray[ 300 ],
+				} );
+			} );
+
+			it( 'should pass CSS-wide values through to border-style and border-color', () => {
+				const indicatorWrapper = getIndicatorWrapper( {
+					style: 'inherit',
+					color: 'inherit',
+				} );
+
+				expect( indicatorWrapper ).toHaveStyle( {
+					borderStyle: 'inherit',
+					borderColor: 'inherit',
+				} );
+			} );
+
+			it( 'should preview a `none` style as solid without applying a color', () => {
+				const indicatorWrapper = getIndicatorWrapper( {
+					style: 'none',
+				} );
+
+				expect( indicatorWrapper ).toHaveStyle( {
+					borderStyle: 'solid',
+				} );
+				expect( indicatorWrapper ).not.toHaveAttribute(
+					'style',
+					expect.stringContaining( 'border-color' )
+				);
+			} );
+
+			it( 'should not apply inline styles when no style is set', () => {
+				const indicatorWrapper = getIndicatorWrapper( {
+					color: '#72aee6',
+				} );
+
+				expect( indicatorWrapper ).not.toHaveAttribute( 'style' );
+			} );
 		} );
 
 		it( 'should render color and style popover', async () => {

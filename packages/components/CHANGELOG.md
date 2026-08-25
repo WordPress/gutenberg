@@ -10,7 +10,10 @@
     -   `ComboboxControl`: ([#80471](https://github.com/WordPress/gutenberg/pull/80471))
     -   `GradientPicker`, `ColorPalette`: ([#80473](https://github.com/WordPress/gutenberg/pull/80473))
     -   `BaseControl` ([#80001](https://github.com/WordPress/gutenberg/pull/80001))
+    -   `BorderBoxControl`, `BorderControl` ([#80437](https://github.com/WordPress/gutenberg/pull/80437))
+    -   `ProgressBar` ([#80512](https://github.com/WordPress/gutenberg/pull/80512))
     -   `TextareaControl` ([#81353](https://github.com/WordPress/gutenberg/pull/81353))
+    -   `ZStack` ([#80514](https://github.com/WordPress/gutenberg/pull/80514))
     -   `BoxControl` ([#80715](https://github.com/WordPress/gutenberg/pull/80715))
 
 ### Enhancements
@@ -27,6 +30,7 @@
 
 -   `ConfirmDialog`: Preserve `title` as the dialog's accessible name when the header is hidden ([#81847](https://github.com/WordPress/gutenberg/pull/81847)).
 -   `DuotonePicker`: Do not render the custom controls wrapper when `disableCustomDuotone` is set, so a read-only picker no longer adds trailing padding below its swatches ([#81605](https://github.com/WordPress/gutenberg/pull/81605)).
+-   `DuotonePicker`: Stop the duotone bar offering to move its control points. It announced that arrow keys and dragging change the gradient position, but a duotone is two colors with no positions, so the move was discarded. `CustomGradientBar` gains a `disablePositioning` prop for this ([#81850](https://github.com/WordPress/gutenberg/pull/81850)).
 -   `Modal`: Prevent an Escape key press that dismisses the modal from propagating to underlying overlays. ([#81785](https://github.com/WordPress/gutenberg/pull/81785))
 -   `BoxControl`: Update the opposite side when ALT is held on the left or right input, which each updated themselves instead ([#81530](https://github.com/WordPress/gutenberg/pull/81530)).
 -   `InputControl`: Vertically center the value of date and time inputs in Safari ([#81361](https://github.com/WordPress/gutenberg/pull/81361)).
@@ -52,6 +56,8 @@
 -   Remove the unused `components-validated-control__indicator*` styles; the indicator is now rendered and styled by `ValidityIndicator` from `@wordpress/ui` ([#81230](https://github.com/WordPress/gutenberg/issues/81230)) ([#81574](https://github.com/WordPress/gutenberg/pull/81574)).
 -   Deprecate `ValidatedInputControl` in the private APIs; use `ValidatedInputControl` from `@wordpress/ui` instead ([#81627](https://github.com/WordPress/gutenberg/pull/81627)).
 -   Deprecate `ValidatedTextareaControl` in the private APIs; use `ValidatedTextareaControl` from `@wordpress/ui` instead ([#81984](https://github.com/WordPress/gutenberg/pull/81984)).
+-   `BorderBoxControl`: Migrate styles from Emotion to an SCSS Module ([#80437](https://github.com/WordPress/gutenberg/pull/80437)).
+-   `BorderControl`: Migrate styles from Emotion to an SCSS Module ([#80437](https://github.com/WordPress/gutenberg/pull/80437)).
 
 ## 39.0.0 (2026-08-12)
 
