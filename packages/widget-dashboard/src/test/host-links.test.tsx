@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { forwardRef } from '@wordpress/element';
 import { WidgetHostProvider } from '@wordpress/widget-primitives';
@@ -121,6 +121,25 @@ describe( 'host links across the chrome compositions', () => {
 			expect( link ).not.toHaveAttribute( 'data-host-link' );
 			expect( link ).toHaveAttribute( 'download', 'export.csv' );
 		} );
+
+		/*
+		 * The tooltip anchors to the element the host link forwards its ref
+		 * to; a link that drops it never opens the tooltip on hover.
+		 */
+		it( 'shows the tooltip of a matched medium action on hover', async () => {
+			const user = userEvent.setup();
+			const { links } = createHost();
+			renderWithHost( <WidgetFooter actions={ footerActions } />, links );
+
+			await user.hover( screen.getByRole( 'link', { name: 'Status' } ) );
+
+			await waitFor(
+				() => {
+					expect( screen.getByText( 'Status' ) ).toBeVisible();
+				},
+				{ timeout: 3000 }
+			);
+		} );
 	} );
 
 	describe( 'WidgetActions menu', () => {
@@ -165,6 +184,38 @@ describe( 'host links across the chrome compositions', () => {
 			} );
 			expect( download ).not.toHaveAttribute( 'data-host-link' );
 			expect( download ).toHaveAttribute( 'download', 'export.csv' );
+		} );
+
+		/*
+		 * The menu reaches its items through the ref the host link forwards;
+		 * a link that drops it leaves the matched item unreachable by
+		 * keyboard.
+		 */
+		it( 'keeps the matched item reachable by keyboard', async () => {
+			const user = userEvent.setup();
+			const { links } = createHost();
+			renderWithHost( <WidgetActions actions={ menuActions } />, links );
+
+			await user.tab();
+			expect(
+				screen.getByRole( 'button', { name: 'More' } )
+			).toHaveFocus();
+
+			await user.keyboard( '{ArrowDown}' );
+			const matched = await screen.findByRole( 'menuitem', {
+				name: 'See report',
+			} );
+			await waitFor( () => expect( matched ).toHaveFocus() );
+
+			await user.keyboard( '{ArrowDown}' );
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'menuitem', { name: /External guide/ } )
+				).toHaveFocus()
+			);
+
+			await user.keyboard( '{ArrowUp}' );
+			await waitFor( () => expect( matched ).toHaveFocus() );
 		} );
 	} );
 } );

@@ -1,22 +1,6 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`MetaBoxesSection renders a Custom Fields option 1`] = `
-.emotion-0 {
-  font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
-  font-size: 13px;
-  box-sizing: border-box;
-}
-
-.emotion-0 *,
-.emotion-0 *::before,
-.emotion-0 *::after {
-  box-sizing: inherit;
-}
-
-.components-panel__row .emotion-2 {
-  margin-bottom: inherit;
-}
-
 <fieldset
   class="preferences-modal__section"
 >
@@ -36,10 +20,10 @@ exports[`MetaBoxesSection renders a Custom Fields option 1`] = `
       class="preference-base-option"
     >
       <div
-        class="components-base-control components-toggle-control emotion-0 emotion-1"
+        class="style-wrapper components-base-control components-toggle-control"
       >
         <div
-          class="components-base-control__field emotion-2 emotion-3"
+          class="style-field components-base-control__field"
         >
           <div
             class="style-flex style-items-row style-expanded-row components-flex components-h-stack"
@@ -80,22 +64,6 @@ exports[`MetaBoxesSection renders a Custom Fields option 1`] = `
 `;
 
 exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`] = `
-.emotion-0 {
-  font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
-  font-size: 13px;
-  box-sizing: border-box;
-}
-
-.emotion-0 *,
-.emotion-0 *::before,
-.emotion-0 *::after {
-  box-sizing: inherit;
-}
-
-.components-panel__row .emotion-2 {
-  margin-bottom: inherit;
-}
-
 <fieldset
   class="preferences-modal__section"
 >
@@ -115,10 +83,10 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
       class="preference-base-option"
     >
       <div
-        class="components-base-control components-toggle-control emotion-0 emotion-1"
+        class="style-wrapper components-base-control components-toggle-control"
       >
         <div
-          class="components-base-control__field emotion-2 emotion-3"
+          class="style-field components-base-control__field"
         >
           <div
             class="style-flex style-items-row style-expanded-row components-flex components-h-stack"
@@ -158,10 +126,10 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
       class="preference-base-option"
     >
       <div
-        class="components-base-control components-toggle-control emotion-0 emotion-1"
+        class="style-wrapper components-base-control components-toggle-control"
       >
         <div
-          class="components-base-control__field emotion-2 emotion-3"
+          class="style-field components-base-control__field"
         >
           <div
             class="style-flex style-items-row style-expanded-row components-flex components-h-stack"
@@ -202,10 +170,10 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
       class="preference-base-option"
     >
       <div
-        class="components-base-control components-toggle-control emotion-0 emotion-1"
+        class="style-wrapper components-base-control components-toggle-control"
       >
         <div
-          class="components-base-control__field emotion-2 emotion-3"
+          class="style-field components-base-control__field"
         >
           <div
             class="style-flex style-items-row style-expanded-row components-flex components-h-stack"
@@ -247,22 +215,6 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
 `;
 
 exports[`MetaBoxesSection renders meta box options 1`] = `
-.emotion-0 {
-  font-family: -apple-system,system-ui,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
-  font-size: 13px;
-  box-sizing: border-box;
-}
-
-.emotion-0 *,
-.emotion-0 *::before,
-.emotion-0 *::after {
-  box-sizing: inherit;
-}
-
-.components-panel__row .emotion-2 {
-  margin-bottom: inherit;
-}
-
 <fieldset
   class="preferences-modal__section"
 >
@@ -282,10 +234,10 @@ exports[`MetaBoxesSection renders meta box options 1`] = `
       class="preference-base-option"
     >
       <div
-        class="components-base-control components-toggle-control emotion-0 emotion-1"
+        class="style-wrapper components-base-control components-toggle-control"
       >
         <div
-          class="components-base-control__field emotion-2 emotion-3"
+          class="style-field components-base-control__field"
         >
           <div
             class="style-flex style-items-row style-expanded-row components-flex components-h-stack"
@@ -326,10 +278,10 @@ exports[`MetaBoxesSection renders meta box options 1`] = `
       class="preference-base-option"
     >
       <div
-        class="components-base-control components-toggle-control emotion-0 emotion-1"
+        class="style-wrapper components-base-control components-toggle-control"
       >
         <div
-          class="components-base-control__field emotion-2 emotion-3"
+          class="style-field components-base-control__field"
         >
           <div
             class="style-flex style-items-row style-expanded-row components-flex components-h-stack"

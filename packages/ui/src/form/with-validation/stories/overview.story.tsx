@@ -1,20 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
-import clsx from 'clsx';
 import { useRef, useCallback, useState } from '@wordpress/element';
 import { debounce } from '@wordpress/compose';
-import type { ControlWithError } from '@wordpress/ui';
-import { ValidatedInputControl } from '..';
-import { formDecorator } from './story-utils';
-import Dropdown from '../../../dropdown';
 import { Button } from '../../../button';
-import Modal from '../../../modal';
-import { HStack } from '../../../h-stack';
-import { VStack } from '../../../v-stack';
+import * as Dialog from '../../../dialog';
+import * as Popover from '../../../popover';
+import { Stack } from '../../../stack';
+import type { ControlWithError } from '../../primitives/control-with-error';
+import { formDecorator } from '../../stories/shared';
+import { ValidatedInputControl } from '../validated-input-control';
 
 const meta: Meta< typeof ControlWithError > = {
-	title: 'Components/Selection & Input/Validated Form Controls/Overview',
-	id: 'components-validated-form-controls-overview',
+	title: 'Design System/Components/Form/With Validation/Overview',
+	id: 'design-system-form-with-validation-overview',
 	parameters: {
 		controls: { disable: true },
 	},
@@ -28,10 +26,10 @@ type Story = StoryObj< typeof ControlWithError >;
  * move focus to the first control with an error.
  */
 export const WithMultipleControls: Story = {
-	decorators: formDecorator,
+	decorators: [ formDecorator ],
 	render: function Template() {
-		const [ text, setText ] = useState< string | undefined >( '' );
-		const [ text2, setText2 ] = useState< string | undefined >( '' );
+		const [ text, setText ] = useState( '' );
+		const [ text2, setText2 ] = useState( '' );
 
 		return (
 			<>
@@ -39,10 +37,10 @@ export const WithMultipleControls: Story = {
 					label="Text"
 					required
 					value={ text }
-					help="The word 'error' will trigger an error."
-					onChange={ setText }
+					description="The word 'error' will trigger an error."
+					onValueChange={ ( next ) => setText( next ?? '' ) }
 					customValidity={
-						text?.toLowerCase() === 'error'
+						text.toLowerCase() === 'error'
 							? {
 									type: 'invalid',
 									message: 'The word "error" is not allowed.',
@@ -54,59 +52,10 @@ export const WithMultipleControls: Story = {
 					label="Text"
 					required
 					value={ text2 }
-					help="The word 'error' will trigger an error."
-					onChange={ setText2 }
+					description="The word 'error' will trigger an error."
+					onValueChange={ ( next ) => setText2( next ?? '' ) }
 					customValidity={
-						text2?.toLowerCase() === 'error'
-							? {
-									type: 'invalid',
-									message: 'The word "error" is not allowed.',
-							  }
-							: undefined
-					}
-				/>
-			</>
-		);
-	},
-};
-
-/**
- * Help text can be configured to be hidden when a custom error is reported. Whether to opt for this approach
- * will depend on context.
- */
-export const WithHelpTextReplacement: Story = {
-	decorators: formDecorator,
-	render: function Template() {
-		const [ text, setText ] = useState< string | undefined >( '' );
-		const isInvalid = text?.toLowerCase() === 'error';
-
-		return (
-			<>
-				<style>
-					{ `
-				.my-control:has(:invalid[data-validity-visible]) .my-control__help:not(.is-visible) {
-					display: none;
-				}
-				` }
-				</style>
-				<ValidatedInputControl
-					className="my-control"
-					label="Text"
-					required
-					value={ text }
-					help={
-						<span
-							className={ clsx(
-								'my-control__help',
-								! isInvalid && 'is-visible'
-							) }
-						>
-							The word &quot;error&quot; is not allowed.
-						</span>
-					}
-					onChange={ setText }
-					customValidity={
-						isInvalid
+						text2.toLowerCase() === 'error'
 							? {
 									type: 'invalid',
 									message: 'The word "error" is not allowed.',
@@ -128,7 +77,7 @@ export const WithHelpTextReplacement: Story = {
  * They may be unnecessary when responses are generally quick.
  */
 export const AsyncValidation: StoryObj< typeof ValidatedInputControl > = {
-	decorators: formDecorator,
+	decorators: [ formDecorator ],
 	render: function Template( { ...args } ) {
 		const [ text, setText ] = useState( '' );
 		const [ customValidity, setCustomValidity ] =
@@ -174,7 +123,7 @@ export const AsyncValidation: StoryObj< typeof ValidatedInputControl > = {
 			<ValidatedInputControl
 				{ ...args }
 				value={ text }
-				onChange={ ( newValue ) => {
+				onValueChange={ ( newValue ) => {
 					setText( newValue ?? '' );
 					setCustomValidity( undefined );
 					clearTimeout( timeoutRef.current );
@@ -186,7 +135,7 @@ export const AsyncValidation: StoryObj< typeof ValidatedInputControl > = {
 	},
 	args: {
 		label: 'Text',
-		help: 'The word "error" will trigger an error asynchronously.',
+		description: 'The word "error" will trigger an error asynchronously.',
 		required: true,
 	},
 };
@@ -195,7 +144,7 @@ export const AsyncValidation: StoryObj< typeof ValidatedInputControl > = {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const AsyncValidationWithTest: StoryObj< typeof ValidatedInputControl > = {
 	...AsyncValidation,
-	decorators: formDecorator,
+	decorators: [ formDecorator ],
 	play: async ( { canvasElement } ) => {
 		const canvas = within( canvasElement );
 		await userEvent.click( canvas.getByRole( 'textbox' ) );
@@ -223,8 +172,6 @@ const AsyncValidationWithTest: StoryObj< typeof ValidatedInputControl > = {
 			{ timeout: 2500 }
 		);
 
-		// Should not show validating state if there were no changes
-		// after a valid/invalid state was already shown.
 		await new Promise( ( resolve ) => setTimeout( resolve, 1500 ) );
 		await expect(
 			canvas.queryByText( 'Validating...' )
@@ -234,12 +181,10 @@ const AsyncValidationWithTest: StoryObj< typeof ValidatedInputControl > = {
 			delay: 10,
 		} );
 
-		// Should not show valid state if server has not yet responded.
 		await expect(
 			canvas.queryByText( 'Validated' )
 		).not.toBeInTheDocument();
 
-		// Should show validating state when transitioning from invalid to valid.
 		await waitFor(
 			() => {
 				expect( canvas.getByText( 'Validating...' ) ).toBeVisible();
@@ -277,31 +222,29 @@ const AsyncValidationWithTest: StoryObj< typeof ValidatedInputControl > = {
  * even if the input has never been interacted with.
  */
 export const CustomErrorsOnSubmit: StoryObj< typeof ValidatedInputControl > = {
-	decorators: formDecorator,
+	decorators: [ formDecorator ],
 	args: {
 		label: 'Text',
 		required: true,
-		help: 'The word "error" will trigger an error.',
+		description: 'The word "error" will trigger an error.',
 	},
 	render: function Template( { ...args } ) {
-		const [ text, setText ] = useState< string | undefined >( 'error' );
+		const [ text, setText ] = useState( 'error' );
 
 		return (
-			<>
-				<ValidatedInputControl
-					{ ...args }
-					value={ text }
-					onChange={ setText }
-					customValidity={
-						text === 'error'
-							? {
-									type: 'invalid',
-									message: 'The word "error" is not allowed.',
-							  }
-							: undefined
-					}
-				/>
-			</>
+			<ValidatedInputControl
+				{ ...args }
+				value={ text }
+				onValueChange={ ( next ) => setText( next ?? '' ) }
+				customValidity={
+					text === 'error'
+						? {
+								type: 'invalid',
+								message: 'The word "error" is not allowed.',
+						  }
+						: undefined
+				}
+			/>
 		);
 	},
 };
@@ -319,20 +262,20 @@ export const ShowingErrorsAtArbitraryTimes: StoryObj<
 	args: {
 		label: 'Text',
 		required: true,
-		help: 'The word "error" will trigger an error.',
+		description: 'The word "error" will trigger an error.',
 	},
 	decorators: [],
 	render: function Template( { ...args } ) {
-		const [ text, setText ] = useState< string | undefined >( 'error' );
+		const [ text, setText ] = useState( 'error' );
 		const ref = useRef< HTMLInputElement >( null );
 
 		return (
-			<VStack spacing={ 4 } alignment="left">
+			<Stack direction="column" gap="md" align="start">
 				<ValidatedInputControl
 					ref={ ref }
 					{ ...args }
 					value={ text }
-					onChange={ setText }
+					onValueChange={ ( next ) => setText( next ?? '' ) }
 					customValidity={
 						text === 'error'
 							? {
@@ -343,13 +286,12 @@ export const ShowingErrorsAtArbitraryTimes: StoryObj<
 					}
 				/>
 				<Button
-					__next40pxDefaultSize
-					variant="secondary"
+					variant="outline"
 					onClick={ () => ref.current?.reportValidity() }
 				>
 					Report validity
 				</Button>
-			</VStack>
+			</Stack>
 		);
 	},
 };
@@ -364,20 +306,20 @@ export const ShowingErrorsWithoutMovingFocus: StoryObj<
 	args: {
 		label: 'Text',
 		required: true,
-		help: 'The word "error" will trigger an error.',
+		description: 'The word "error" will trigger an error.',
 	},
 	decorators: [],
 	render: function Template( { ...args } ) {
-		const [ text, setText ] = useState< string | undefined >( 'error' );
+		const [ text, setText ] = useState( 'error' );
 		const ref = useRef< HTMLInputElement >( null );
 
 		return (
-			<VStack spacing={ 4 } alignment="left">
+			<Stack direction="column" gap="md" align="start">
 				<ValidatedInputControl
 					ref={ ref }
 					{ ...args }
 					value={ text }
-					onChange={ setText }
+					onValueChange={ ( next ) => setText( next ?? '' ) }
 					customValidity={
 						text === 'error'
 							? {
@@ -388,8 +330,7 @@ export const ShowingErrorsWithoutMovingFocus: StoryObj<
 					}
 				/>
 				<Button
-					__next40pxDefaultSize
-					variant="secondary"
+					variant="outline"
 					onClick={ () =>
 						ref.current?.dispatchEvent(
 							new Event( 'invalid', {
@@ -400,89 +341,100 @@ export const ShowingErrorsWithoutMovingFocus: StoryObj<
 				>
 					Show errors
 				</Button>
-			</VStack>
+			</Stack>
 		);
 	},
 };
 
 /**
  * A `form` wrapper and `type="submit"` button can be used to force validation when
- * the user tries to commit their changes, while still allowing the modal to be closed by canceling.
- * Optionally, the `shouldCloseOnClickOutside`, `isDismissible`, and `shouldCloseOnEsc` props
- * on `Modal` can be disabled to force users to more explicitly signal whether they are trying to
- * "submit close" or "cancel close" the dialog, as well as preventing data loss on accidental closures.
+ * the user tries to commit their changes, while still allowing the dialog to be
+ * closed by canceling.
+ *
+ * Optionally, `disablePointerDismissal` on `Dialog.Root` and blocking dismissal
+ * on Escape in `onOpenChange` can force users to more explicitly signal whether
+ * they are trying to "submit close" or "cancel close" the dialog, as well as
+ * preventing data loss on accidental closures.
  */
 export const ValidateInModal: StoryObj< typeof ValidatedInputControl > = {
 	render: function Template( { ...args } ) {
 		const [ isOpen, setIsOpen ] = useState( false );
-		const [ text, setText ] = useState< string | undefined >( '' );
+		const [ text, setText ] = useState( '' );
 
 		return (
 			<>
-				<Button
-					variant="secondary"
-					__next40pxDefaultSize
-					onClick={ () => setIsOpen( true ) }
-				>
+				<Button variant="outline" onClick={ () => setIsOpen( true ) }>
 					Open in modal
 				</Button>
-				{ isOpen && (
-					<Modal
-						title="Dialog title"
-						onRequestClose={ () => setIsOpen( false ) }
-						shouldCloseOnClickOutside={ false }
-						shouldCloseOnEsc={ false }
-						isDismissible={ false }
-					>
-						<form
-							onSubmit={ ( event ) => {
-								event.preventDefault();
-								setIsOpen( false );
-							} }
-						>
-							<VStack spacing={ 2 }>
-								<ValidatedInputControl
-									{ ...args }
-									value={ text }
-									onChange={ setText }
-									customValidity={
-										text === 'error'
-											? {
-													type: 'invalid',
-													message:
-														'The word "error" is not allowed.',
-											  }
-											: undefined
-									}
-								/>
+				<Dialog.Root
+					open={ isOpen }
+					disablePointerDismissal
+					onOpenChange={ ( nextOpen, eventDetails ) => {
+						if (
+							! nextOpen &&
+							eventDetails.reason === 'escape-key'
+						) {
+							eventDetails.cancel();
+							return;
+						}
 
-								<HStack justify="flex-end" spacing={ 2 }>
-									<Button
-										variant="tertiary"
-										__next40pxDefaultSize
-										onClick={ () => setIsOpen( false ) }
+						setIsOpen( nextOpen );
+					} }
+				>
+					<Dialog.Popup>
+						<Dialog.Header>
+							<Dialog.Title>Dialog title</Dialog.Title>
+						</Dialog.Header>
+						<Dialog.Content>
+							<form
+								onSubmit={ ( event ) => {
+									event.preventDefault();
+									setIsOpen( false );
+								} }
+							>
+								<Stack direction="column" gap="sm">
+									<ValidatedInputControl
+										{ ...args }
+										value={ text }
+										onValueChange={ ( next ) =>
+											setText( next ?? '' )
+										}
+										customValidity={
+											text === 'error'
+												? {
+														type: 'invalid',
+														message:
+															'The word "error" is not allowed.',
+												  }
+												: undefined
+										}
+									/>
+									<Stack
+										direction="row"
+										gap="sm"
+										justify="flex-end"
 									>
-										Cancel
-									</Button>
-									<Button
-										variant="primary"
-										__next40pxDefaultSize
-										type="submit"
-									>
-										Save
-									</Button>
-								</HStack>
-							</VStack>
-						</form>
-					</Modal>
-				) }
+										<Button
+											variant="outline"
+											type="button"
+											onClick={ () => setIsOpen( false ) }
+										>
+											Cancel
+										</Button>
+										<Button type="submit">Save</Button>
+									</Stack>
+								</Stack>
+							</form>
+						</Dialog.Content>
+					</Dialog.Popup>
+				</Dialog.Root>
 			</>
 		);
 	},
 	args: {
 		label: 'Text',
 		required: true,
-		help: 'The word "error" will trigger an error.',
+		description: 'The word "error" will trigger an error.',
 	},
 };
 
@@ -496,23 +448,30 @@ export const ValidateOnPopoverClose: StoryObj< typeof ValidatedInputControl > =
 		render: function Template( { ...args } ) {
 			const [ isOpen, setIsOpen ] = useState( false );
 			const formRef = useRef< HTMLFormElement >( null );
-			const [ text, setText ] = useState< string | undefined >( '' );
+			const [ text, setText ] = useState( '' );
 
 			return (
-				<Dropdown
-					popoverProps={ { placement: 'bottom-start' } }
+				<Popover.Root
 					open={ isOpen }
-					onToggle={ ( willOpen ) => {
-						if ( ! willOpen ) {
-							const isValid = formRef.current?.reportValidity();
+					onOpenChange={ ( nextOpen ) => {
+						if ( ! nextOpen ) {
+							const isValid =
+								formRef.current?.reportValidity() ?? true;
 							setIsOpen( ! isValid );
-						} else {
-							setIsOpen( true );
+							return;
 						}
+
+						setIsOpen( true );
 					} }
-					renderContent={ () => (
+				>
+					<Popover.Trigger render={ <Button variant="outline" /> }>
+						Open in popover
+					</Popover.Trigger>
+					<Popover.Popup>
+						<Popover.Arrow />
 						<form
 							ref={ formRef }
+							style={ { width: 200 } }
 							onSubmit={ ( event ) => {
 								event.preventDefault();
 								setIsOpen( false );
@@ -521,7 +480,9 @@ export const ValidateOnPopoverClose: StoryObj< typeof ValidatedInputControl > =
 							<ValidatedInputControl
 								{ ...args }
 								value={ text }
-								onChange={ setText }
+								onValueChange={ ( next ) =>
+									setText( next ?? '' )
+								}
 								customValidity={
 									text === 'error'
 										? {
@@ -533,28 +494,13 @@ export const ValidateOnPopoverClose: StoryObj< typeof ValidatedInputControl > =
 								}
 							/>
 						</form>
-					) }
-					renderToggle={ () => {
-						return (
-							<Button
-								__next40pxDefaultSize
-								variant="secondary"
-								onClick={ () => setIsOpen( ! isOpen ) }
-								aria-expanded={ isOpen }
-							>
-								Open in popover
-							</Button>
-						);
-					} }
-				/>
+					</Popover.Popup>
+				</Popover.Root>
 			);
 		},
 		args: {
 			label: 'Text',
-			help: 'The word "error" will trigger an error.',
+			description: 'The word "error" will trigger an error.',
 			required: true,
-			style: {
-				width: '200px',
-			},
 		},
 	};

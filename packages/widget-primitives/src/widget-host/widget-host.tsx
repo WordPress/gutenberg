@@ -22,8 +22,9 @@ export interface WidgetHostLinks {
 	/**
 	 * The host router's link primitive. Must render a real anchor and
 	 * forward `ref` to it: consumers compose the link into render props,
-	 * where menus and tooltips reach their anchor through the ref.
-	 * `path` replaces `href`; the two never coexist.
+	 * where menus and tooltips reach their anchor through the ref. A link
+	 * that drops it is skipped by keyboard navigation and loses its
+	 * tooltip. `path` replaces `href`; the two never coexist.
 	 */
 	Link: ComponentType<
 		{ path: string } & Omit< ComponentPropsWithoutRef< 'a' >, 'href' > &

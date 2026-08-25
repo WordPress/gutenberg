@@ -47,7 +47,24 @@ const host: WidgetHost = {
 
 <WidgetHostProvider value={ host }>
 	<WidgetDashboard { ...props } />
-</WidgetHostProvider>
+</WidgetHostProvider>;
+```
+
+### `Link` and its ref
+
+Consumers compose `Link` into menu items and tooltip triggers through render props, and both reach the anchor through the ref. A link that drops it satisfies the type and fails in use: keyboard navigation skips the menu item, and the tooltip loses its anchor. Under React 18 that means `forwardRef`; under React 19, where `ref` arrives as a prop, spreading the props onto the anchor is enough.
+
+One test pins it for a host's own link:
+
+```tsx
+const ref = createRef< HTMLAnchorElement >();
+render(
+	<RouteLink ref={ ref } path="/reports">
+		Reports
+	</RouteLink>
+);
+
+expect( ref.current ).toBe( screen.getByRole( 'link', { name: 'Reports' } ) );
 ```
 
 See the Actions page for the materialization rules this serves: the widget declares where to go, the host decides how to get there.

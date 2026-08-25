@@ -5,7 +5,8 @@
  * pathname) and the same admin `page`; the route is then whatever `p`
  * carries. Anything a route navigation cannot deliver faithfully stays
  * a plain anchor: a hash, search params beyond `page` and `p`, duplicates
- * of either, or a `p` with its own query or hash.
+ * of either, or a `p` that is not a root-relative path or carries its own
+ * query or hash.
  *
  * @param {string} href Action href, absolute or relative.
  * @param {string} base Document URL the href is judged against; defaults
@@ -58,7 +59,17 @@ export function matchDashboardHref(
 
 	const path = url.searchParams.get( 'p' ) || '/';
 
-	if ( path.includes( '?' ) || path.includes( '#' ) ) {
+	/*
+	 * The router writes a root-relative pathname into `p`. Any other shape
+	 * (`https://…`, `mailto:…`, `//host`, `reports`) the router link would
+	 * resolve as an external URL or a relative path, where the full load
+	 * cannot follow.
+	 */
+	if (
+		! /^\/(?!\/)/.test( path ) ||
+		path.includes( '?' ) ||
+		path.includes( '#' )
+	) {
 		return null;
 	}
 
