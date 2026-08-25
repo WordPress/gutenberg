@@ -8,7 +8,7 @@ The standalone `evals/` package uses [Promptfoo](https://www.promptfoo.dev/docs/
 
 ## How it works
 
-Promptfoo runs the prompt × provider × test × repeat matrix. Its standard lifecycle hooks create a clean Git workspace from the committed `HEAD` before each row and remove it afterward. The native Claude provider receives that directory as `working_dir`.
+Promptfoo runs the prompt × provider × test × repeat matrix. Its standard lifecycle hooks create a clean Git workspace from the committed `HEAD` before each row and remove it afterward. The native Claude and Codex providers receive that directory as `working_dir`.
 
 ```text
       prompt × provider × test
@@ -53,7 +53,7 @@ Promptfoo's built-in trajectory assertions deterministically check tool calls, i
 Use Node.js 22.22 or newer; Node.js 24 LTS is recommended. This is a workspace,
 so a root `npm install` installs it.
 
-Claude can use an existing Claude Code login or `ANTHROPIC_API_KEY`. Model calls consume the associated quota or paid usage.
+Claude can use an existing Claude Code login or `ANTHROPIC_API_KEY`. Codex can use an existing Codex/ChatGPT login or `OPENAI_API_KEY`/`CODEX_API_KEY`, and needs the `codex` binary on `PATH` — it is not there by default on every install. Model calls consume the associated quota or paid usage.
 
 ## Run
 
@@ -71,6 +71,10 @@ npm run test:agent-evals -- --config specs/SPEC_GROUP/TEST_NAME.test.js
 
 # Override repeats.
 npm run test:agent-evals -- --config specs/SPEC_GROUP/TEST_NAME.test.js --repeat 3
+
+# Run one provider.
+npm run test:agent-evals -- --config specs/SPEC_GROUP/TEST_NAME.test.js --filter-providers claude
+npm run test:agent-evals -- --config specs/SPEC_GROUP/TEST_NAME.test.js --filter-providers codex
 
 # Open the local results viewer.
 npm --workspace @wordpress/agent-skill-evals run view

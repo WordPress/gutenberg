@@ -13,8 +13,8 @@ export default {
 	tracing: {
 		enabled: true,
 		failOnReceiverStartFailure: true,
-		// Claude calls its shell tool Bash, so declare it as a command tool
-		// name for Promptfoo's trajectory steps to pick up.
+		// Promptfoo recognizes Codex's exec_command by default. Claude calls
+		// its equivalent shell tool Bash, so declare that too.
 		commandToolNames: [ 'Bash' ],
 		otlp: {
 			http: {

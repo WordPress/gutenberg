@@ -1,5 +1,5 @@
-// Coding agents shared by every evaluation spec.
-// Claude only for now; a second agent can be added once it has actually been run.
+// Coding agents shared by every evaluation spec. Promptfoo runs the matrix over
+// all of them; use `--filter-providers claude` (or `codex`) to run just one.
 /** @type {import('promptfoo').ProviderOptions[]} */
 export default [
 	{
@@ -18,13 +18,27 @@ export default [
 			// repository's skills then go unlisted, which is indistinguishable
 			// from an agent choosing to ignore them.
 			skills: 'all',
-			// Use Bash for reads so Promptfoo represents file access as command
-			// trajectory steps, which assertions can match.
+			// Use Bash for reads so Promptfoo can represent both Claude's Bash
+			// calls and Codex's exec_command calls as command trajectory steps.
 			// `custom_allowed_tools` replaces the allowed list outright, so
 			// Skill has to appear here for the skills above to be invocable.
 			tools: [ 'Bash', 'Edit', 'Write', 'Task', 'Skill' ],
 			custom_allowed_tools: [ 'Bash', 'Edit', 'Write', 'Task', 'Skill' ],
 			disallowed_tools: [ 'WebFetch', 'WebSearch' ],
+		},
+	},
+	{
+		id: 'openai:codex-sdk',
+		label: 'codex',
+		config: {
+			sandbox_mode: 'workspace-write',
+			approval_policy: 'never',
+			network_access_enabled: false,
+			web_search_mode: 'disabled',
+			// Streaming emits Promptfoo's normalized Codex trajectory spans;
+			// deep tracing connects the Codex CLI's own spans to the trace.
+			enable_streaming: true,
+			deep_tracing: true,
 		},
 	},
 ];
