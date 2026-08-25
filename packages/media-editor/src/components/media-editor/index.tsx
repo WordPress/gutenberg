@@ -72,15 +72,6 @@ export interface MediaEditorFrameProps {
 	 * all.
 	 */
 	isImage: boolean;
-	/**
-	 * Whether the canvas is on screen. `false` when a panel has replaced it,
-	 * which only happens below the dock breakpoint. `HistoryActions` renders
-	 * nothing then — its Reset, undo and redo act on the cropper — so a frame
-	 * uses this the same way it uses `isImage`: to decide whether to render
-	 * the container at all.
-	 */
-	hasCanvas: boolean;
-	layout: 'wide' | 'narrow';
 	onRequestClose: () => void;
 	onKeyDown: ( event: ReactKeyboardEvent< HTMLElement > ) => void;
 	shouldCloseOnClickOutside: boolean;
@@ -414,10 +405,6 @@ function MediaEditorContent( {
 		}
 		setActivePanel( isWide ? DETAILS_PANEL : null );
 	}, [ isWide ] );
-	// One layout at every width now that the image controls sit under the
-	// canvas; retained for the frame contract.
-	const layout = 'wide' as const;
-
 	const { media, hasEdits } = useSelect(
 		( select ) => {
 			const {
@@ -696,8 +683,6 @@ function MediaEditorContent( {
 			{ renderFrame( {
 				children,
 				isImage,
-				hasCanvas: isWide || ! activePanel,
-				layout,
 				onRequestClose: handleRequestClose,
 				onKeyDown: handleKeyDown,
 				shouldCloseOnClickOutside: ! hasChanges && ! isSaving,

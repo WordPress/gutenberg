@@ -19,7 +19,6 @@ const { MediaEditor } = unlock( mediaEditorPrivateApis );
 const MEDIA_LIST_PATH = '/types/attachment/list/all';
 const MEDIA_LIBRARY_ADMIN_PATH = 'upload.php';
 const MEDIA_EDITOR_ADMIN_PAGE = 'media-editor-wp-admin';
-const MEDIA_EDITOR_SCOPE = 'media-editor-route';
 
 /*
  * The `MediaEditor` callback arguments this route reads. The private API
@@ -31,9 +30,6 @@ interface SaveResult {
 
 interface FrameProps {
 	children: ReactNode;
-	isImage: boolean;
-	hasCanvas: boolean;
-	layout: 'wide' | 'narrow';
 	onKeyDown: ( event: KeyboardEvent< HTMLElement > ) => void;
 }
 
@@ -89,83 +85,58 @@ function MediaEditorRoute() {
 		<MediaEditor
 			id={ attachmentId }
 			fields={ fields }
-			// A scope of its own, so that the details sidebar opens by default
-			// here regardless of whether it was last collapsed in the modal.
-			scope={ MEDIA_EDITOR_SCOPE }
 			onClose={ navigateBack }
 			onSaved={ ( { id: savedId }: SaveResult ) => {
 				if ( savedId !== attachmentId ) {
 					navigate( { to: `/media-editor/${ savedId }` } );
 				}
 			} }
-			renderFrame={ ( {
-				children,
-				isImage,
-				hasCanvas,
-				layout,
-				onKeyDown,
-			}: FrameProps ) => {
-				// Below the sidebar-collapse breakpoint the header has no room
-				// for the history cluster: it already carries the breadcrumbs,
-				// Cancel/Save, and (under `medium`) the framework's navigation
-				// toggle, in a single row that does not wrap. History joins the
-				// transform controls in a bar under the canvas instead, which
-				// is what the modal's narrow footer does.
-				const isNarrow = layout === 'narrow';
-				return (
-					// The keydown handler covers the whole frame, not just the
-					// canvas: undo/redo live in the header, so after clicking
-					// one, focus sits outside the content region and the
-					// keyboard shortcuts would no longer reach the handler.
-					// `Page` takes no `onKeyDown`, hence the wrapper; it is
-					// `display: contents`, so it adds no box to the layout.
-					// eslint-disable-next-line jsx-a11y/no-static-element-interactions
-					<div
-						className="media-editor-route__shortcut-scope"
-						onKeyDown={ onKeyDown }
+			renderFrame={ ( { children, onKeyDown }: FrameProps ) => (
+				// The keydown handler covers the whole frame, not just the
+				// canvas: undo/redo live in the header, so after clicking
+				// one, focus sits outside the content region and the
+				// keyboard shortcuts would no longer reach the handler.
+				// `Page` takes no `onKeyDown`, hence the wrapper; it is
+				// `display: contents`, so it adds no box to the layout.
+				// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+				<div
+					className="media-editor-route__shortcut-scope"
+					onKeyDown={ onKeyDown }
+				>
+					<Page
+						className="media-editor-route"
+						ariaLabel={ title }
+						breadcrumbs={
+							<Breadcrumbs
+								items={
+									isStandaloneAdminPage
+										? [ { label: title } ]
+										: [
+												{
+													label: __( 'Media' ),
+													to: MEDIA_LIST_PATH,
+												},
+												{ label: title },
+										  ]
+								}
+							/>
+						}
+						actions={
+							<>
+								<MediaEditor.HistoryActions />
+								<MediaEditor.HeaderActions />
+								{ /* Compact to match the header's other
+								     controls, as elsewhere in wp-admin. */ }
+								<MediaEditor.SaveActions size="compact" />
+							</>
+						}
 					>
-						<Page
-							className="media-editor-route"
-							ariaLabel={ title }
-							breadcrumbs={
-								<Breadcrumbs
-									items={
-										isStandaloneAdminPage
-											? [ { label: title } ]
-											: [
-													{
-														label: __( 'Media' ),
-														to: MEDIA_LIST_PATH,
-													},
-													{ label: title },
-											  ]
-									}
-								/>
-							}
-							actions={
-								<>
-									{ ! isNarrow && (
-										<MediaEditor.HistoryActions />
-									) }
-									<MediaEditor.HeaderActions />
-									{ /* Compact to match the header's other
-									     controls, as elsewhere in wp-admin. */ }
-									<MediaEditor.SaveActions size="compact" />
-								</>
-							}
-						>
-							<div className="media-editor-route__content">
-								{ children }
-							</div>
-							{ isNarrow && isImage && hasCanvas && (
-								<div className="media-editor-route__toolbar">
-									<MediaEditor.HistoryActions />
-								</div>
-							) }
-						</Page>
-					</div>
-				);
-			} }
+						<div className="media-editor-route__content">
+							{ children }
+						</div>
+					</Page>
+				</div>
+			) }
 		/>
 	);
 }
