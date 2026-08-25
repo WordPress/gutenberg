@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Paragraph, List, Heading, Preformatted, Columns, Group, Template Part: Read the default padding these blocks add when they have a background color from the `--wp--style--block-background-padding` custom property, so themes can change or remove it ([#82024](https://github.com/WordPress/gutenberg/pull/82024)).
 - `List`: Add wide and full alignment support ([#68002](https://github.com/WordPress/gutenberg/pull/68002)).
 
 ### Internal
