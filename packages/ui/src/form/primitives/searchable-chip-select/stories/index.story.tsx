@@ -48,8 +48,10 @@ export const Default: Story = {
 };
 
 /**
- * To customize what is rendered inside the chips, pass a
- * render function to the `chipsContent` prop that returns an array of `ChipWithRemove` subcomponents.
+ * To customize what is rendered inside the chips, pass a render function to the
+ * `chipsContent` prop that returns an array of `ChipWithRemove` subcomponents.
+ * When chip content is not a plain string, set `aria-label` and `removeAriaLabel` on
+ * `ChipWithRemove` so virtual focus and the remove button have accessible names.
  *
  * The item list can be customized by passing a render function as `children`,
  * returning an `Item` subcomponent for each item.

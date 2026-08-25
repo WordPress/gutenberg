@@ -176,6 +176,38 @@ describe( 'Combobox', () => {
 		);
 	} );
 
+	it( 'sets an accessible label on chips when children is a string', () => {
+		render(
+			<Combobox.Root< Item, true >
+				items={ ITEMS }
+				multiple
+				defaultValue={ [ ITEMS[ 0 ] ] }
+			>
+				<Combobox.Chips>
+					<Combobox.Value>
+						{ ( value: Item[] ) => (
+							<>
+								{ value.map( ( item ) => (
+									<Combobox.ChipWithRemove key={ item.id }>
+										{ item.value }
+									</Combobox.ChipWithRemove>
+								) ) }
+							</>
+						) }
+					</Combobox.Value>
+				</Combobox.Chips>
+			</Combobox.Root>
+		);
+
+		expect( screen.getByLabelText( 'Item 1' ) ).toBeVisible();
+		expect( screen.getByLabelText( 'Item 1' ) ).toHaveAccessibleName(
+			'Item 1'
+		);
+		expect(
+			screen.getByRole( 'button', { name: 'Remove Item 1' } )
+		).toBeVisible();
+	} );
+
 	it( 'uses a custom accessible label for chip remove buttons', () => {
 		render(
 			<Combobox.Root< Item, true >
@@ -190,7 +222,7 @@ describe( 'Combobox', () => {
 								{ value.map( ( item ) => (
 									<Combobox.ChipWithRemove
 										key={ item.id }
-										removeLabel={ `Remove ${ item.value }` }
+										removeAriaLabel={ `Remove ${ item.value }` }
 									>
 										{ item.value }
 									</Combobox.ChipWithRemove>
@@ -591,7 +623,7 @@ describe( 'Combobox', () => {
 			renderDisabledMultiSelect();
 
 			expect(
-				screen.queryByRole( 'button', { name: 'Remove' } )
+				screen.queryByRole( 'button', { name: 'Remove Item 1' } )
 			).not.toBeInTheDocument();
 		} );
 
@@ -607,7 +639,7 @@ describe( 'Combobox', () => {
 			const user = userEvent.setup( { pointerEventsCheck: 0 } );
 			renderDisabledMultiSelect();
 
-			const removeButton = screen.getByLabelText( 'Remove', {
+			const removeButton = screen.getByLabelText( 'Remove Item 1', {
 				selector: 'button',
 			} );
 			await user.hover( removeButton );

@@ -176,7 +176,7 @@ describe( 'SearchableChipSelect', () => {
 			expect.anything()
 		);
 		expect(
-			screen.getByRole( 'button', { name: 'Remove' } )
+			screen.getByRole( 'button', { name: 'Remove Strawberry' } )
 		).toBeVisible();
 	} );
 

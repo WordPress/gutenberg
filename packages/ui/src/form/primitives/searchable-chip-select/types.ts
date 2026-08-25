@@ -172,10 +172,17 @@ export type SearchableChipSelectProps = Omit<
 		/**
 		 * A render function for custom rendering the selected chips.
 		 *
+		 * When chip content is not a plain string, pass `aria-label` and
+		 * `removeAriaLabel` on each `ChipWithRemove`.
+		 *
 		 * ```jsx
 		 * chipsContent={ ( value ) =>
 		 *   value.map( ( item ) => (
-		 *     <SearchableChipSelect.ChipWithRemove key={ item.value }>
+		 *     <SearchableChipSelect.ChipWithRemove
+		 *       key={ item.value }
+		 *       aria-label={ item.label }
+		 *       removeAriaLabel={ `Remove ${ item.label }` }
+		 *     >
 		 *       <Icon icon={ wordpress } />
 		 *       { item.label }
 		 *     </SearchableChipSelect.ChipWithRemove>

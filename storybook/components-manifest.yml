@@ -1113,6 +1113,7 @@
             - children
             - className
             - prefix
+            - removeAriaLabel
             - removeLabel
             - render
             - style
@@ -1204,6 +1205,7 @@
             - children
             - className
             - prefix
+            - removeAriaLabel
             - removeLabel
             - render
             - style
