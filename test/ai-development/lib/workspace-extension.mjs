@@ -14,6 +14,7 @@ import { setupSkills } from '../../../tools/agents/setup-skills.mjs';
 const execFileAsync = promisify( execFile );
 const libDir = path.dirname( fileURLToPath( import.meta.url ) );
 const sourceRoot = path.resolve( libDir, '../../..' );
+const packageRoot = path.resolve( libDir, '..' );
 const activeWorkspaces = new Map();
 
 const gitEnvironment = {
@@ -58,7 +59,17 @@ async function generateNativeSkills( workspace ) {
 	}
 }
 
-async function createWorkspace() {
+/**
+ * Creates a fresh, writable checkout for one evaluation row.
+ *
+ * Given a patch fixture, it is applied and committed on top, so the agent has
+ * exactly one change to work from. The commit message is deliberately neutral:
+ * a real subject line would hand over most of the description being asked for.
+ *
+ * @param {string} [patchFile] Patch to apply at HEAD, relative to this package.
+ * @return {Promise<string>} Workspace directory.
+ */
+async function createWorkspace( patchFile ) {
 	const temporaryRoot = await fs.mkdtemp(
 		path.join( os.tmpdir(), 'gutenberg-agent-eval-' )
 	);
@@ -92,6 +103,26 @@ async function createWorkspace() {
 			'--message',
 			'Eval workspace',
 		] );
+
+		if ( patchFile ) {
+			const patch = path.resolve( packageRoot, patchFile );
+			// --3way survives surrounding drift; a hard failure names the
+			// fixture so it is obvious the patch needs regenerating.
+			try {
+				await git( workspace, [ 'apply', '--3way', patch ] );
+			} catch ( error ) {
+				throw new Error(
+					`Could not apply the patch fixture ${ patchFile }. Regenerate it against the current tree.\n${ error.message }`
+				);
+			}
+			await git( workspace, [ 'add', '--all' ] );
+			await git( workspace, [
+				'commit',
+				'--quiet',
+				'--message',
+				'Change under review',
+			] );
+		}
 
 		activeWorkspaces.set( workspace, temporaryRoot );
 		return workspace;
@@ -132,7 +163,7 @@ async function cleanupWorkspace( workspace ) {
 
 export async function extensionHook( hookName, context ) {
 	if ( hookName === 'beforeEach' ) {
-		const workspace = await createWorkspace();
+		const workspace = await createWorkspace( context.test.vars?.patchFile );
 		const sandbox = context.test.options?.sandbox;
 		const gradingProvider = context.test.options?.provider;
 

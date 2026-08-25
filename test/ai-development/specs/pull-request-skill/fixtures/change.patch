@@ -1,0 +1,52 @@
+diff --git a/packages/url/CHANGELOG.md b/packages/url/CHANGELOG.md
+index ecd9e52aad5..e85ae3a9fd1 100644
+--- a/packages/url/CHANGELOG.md
++++ b/packages/url/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `getFilename`: decode percent-encoded filenames so they display as typed.
+ -   `filterURLForDisplay`: Clamp the truncated file name's head slice at zero, so a small `maxLength` no longer returns a string longer than the untruncated one ([#81529](https://github.com/WordPress/gutenberg/pull/81529)).
+ -   `getQueryArgs`: Split each query argument on its first `=` only, so values containing `=` — base64 padding, JWTs, nested URLs — are no longer truncated, and ignore malformed pairs with no key instead of promoting the value to one ([#81066](https://github.com/WordPress/gutenberg/pull/81066)).
+ -   `normalizePath` no longer throws a `URIError` when a query parameter contains a malformed percent sequence, such as `/wp/v2/posts?search=50%off`. It now uses `safeDecodeURIComponent`, matching the fix already applied to `getQueryArgs` in [#45561](https://github.com/WordPress/gutenberg/pull/45561) ([#81086](https://github.com/WordPress/gutenberg/pull/81086)).
+diff --git a/packages/url/src/get-filename.ts b/packages/url/src/get-filename.ts
+index e9d187266be..e35ba3fb37a 100644
+--- a/packages/url/src/get-filename.ts
++++ b/packages/url/src/get-filename.ts
+@@ -7,6 +7,7 @@
+  * ```js
+  * const filename1 = getFilename( 'http://localhost:8080/this/is/a/test.jpg' ); // 'test.jpg'
+  * const filename2 = getFilename( '/this/is/a/test.png' ); // 'test.png'
++ * const filename3 = getFilename( '/a/holiday%20photo.jpg' ); // 'holiday photo.jpg'
+  * ```
+  *
+  * @return The filename part of the URL.
+@@ -25,6 +26,11 @@ export function getFilename( url: string ): string | void {
+ 	} catch {}
+ 
+ 	if ( filename ) {
+-		return filename;
++		try {
++			return decodeURIComponent( filename );
++		} catch {
++			// A malformed escape sequence is left as-is rather than throwing.
++			return filename;
++		}
+ 	}
+ }
+diff --git a/packages/url/src/test/index.js b/packages/url/src/test/index.js
+index 10d9b70ed57..2b811699957 100644
+--- a/packages/url/src/test/index.js
++++ b/packages/url/src/test/index.js
+@@ -310,6 +310,10 @@ describe( 'getFilename', () => {
+ 		[ 'https://wordpress.org/image.webp?query=test', 'image.webp' ],
+ 		[ 'https://wordpress.org/video.mov#anchor', 'video.mov' ],
+ 		[ 'http://localhost:8080/a/path/to/audio.mp3', 'audio.mp3' ],
++		[ 'https://wordpress.org/holiday%20photo.jpg', 'holiday photo.jpg' ],
++		[ 'https://wordpress.org/caf%C3%A9.png', 'café.png' ],
++		[ 'https://wordpress.org/100%25.jpg', '100%.jpg' ],
++		[ 'https://wordpress.org/broken%ZZ.jpg', 'broken%ZZ.jpg' ],
+ 	] )( 'returns the filename part of the URL: %s', ( url, filename ) => {
+ 		expect( getFilename( url ) ).toBe( filename );
+ 	} );
