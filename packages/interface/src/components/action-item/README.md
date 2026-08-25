@@ -15,13 +15,6 @@ The name of the slot and fill pair passed to the `Slot` component.
 -   Type: `String`
 -   Required: Yes
 
-### bubblesVirtually
-
-Property used to change the event bubbling behavior, passed to the `Slot` component.
-
--   Type: `boolean`
--   Required: no
-
 ### as
 
 The component used as the container of the fills. Defaults to the `MenuGroup` component.

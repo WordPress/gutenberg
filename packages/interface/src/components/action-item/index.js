@@ -5,16 +5,11 @@ function ActionItemSlot( {
 	name,
 	as: Component = MenuGroup,
 	fillProps = {},
-	bubblesVirtually,
 	children,
 	...props
 } ) {
 	return (
-		<Slot
-			name={ name }
-			bubblesVirtually={ bubblesVirtually }
-			fillProps={ fillProps }
-		>
+		<Slot name={ name } fillProps={ fillProps }>
 			{ ( fills ) => {
 				// Each fill renders an array of its own, so flatten them into a
 				// single list before handing them over.
