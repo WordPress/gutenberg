@@ -1,6 +1,8 @@
 import {
 	getCellPlacements,
+	getColumnDeletionActions,
 	getColumnInsertionActions,
+	getRowDeletionActions,
 	getRowInsertionActions,
 	getSplitActions,
 } from '../utils';
@@ -502,5 +504,160 @@ describe( 'getSplitActions', () => {
 			[ 1, { insertIndex: 1, count: 1 } ],
 			[ 2, { insertIndex: 1, count: 2 } ],
 		] );
+	} );
+} );
+
+describe( 'getColumnDeletionActions', () => {
+	it( 'deletes the cells in the column from every row', () => {
+		const sections = [
+			createSection( 'body', [
+				createRow( 'row-1', [
+					createCell( 'a' ),
+					createCell( 'b' ),
+					createCell( 'c' ),
+				] ),
+				createRow( 'row-2', [
+					createCell( 'd' ),
+					createCell( 'e' ),
+					createCell( 'f' ),
+				] ),
+			] ),
+		];
+		const actions = getColumnDeletionActions(
+			getCellPlacements( sections ),
+			1,
+			1
+		);
+
+		expect( actions.get( 0 ).deletedClientIds ).toEqual(
+			new Set( [ 'b' ] )
+		);
+		expect( actions.get( 1 ).deletedClientIds ).toEqual(
+			new Set( [ 'e' ] )
+		);
+	} );
+
+	it( 'deletes a range of columns', () => {
+		const sections = [
+			createSection( 'body', [
+				createRow( 'row-1', [
+					createCell( 'a' ),
+					createCell( 'b' ),
+					createCell( 'c' ),
+				] ),
+			] ),
+		];
+		const actions = getColumnDeletionActions(
+			getCellPlacements( sections ),
+			1,
+			2
+		);
+
+		expect( actions.get( 0 ).deletedClientIds ).toEqual(
+			new Set( [ 'b', 'c' ] )
+		);
+	} );
+
+	it( 'reduces the colSpan of a cell spanning into the range', () => {
+		const sections = [
+			createSection( 'body', [
+				createRow( 'row-1', [
+					createCell( 'a', { colSpan: 3 } ),
+					createCell( 'b' ),
+				] ),
+			] ),
+		];
+		const actions = getColumnDeletionActions(
+			getCellPlacements( sections ),
+			1,
+			1
+		);
+
+		expect( actions.get( 0 ).deletedClientIds.size ).toBe( 0 );
+		expect( [ ...actions.get( 0 ).spanReductions ] ).toEqual( [
+			[ 'a', 2 ],
+		] );
+	} );
+
+	it( 'deletes a cell starting in the range even when its span extends past it', () => {
+		const sections = [
+			createSection( 'body', [
+				createRow( 'row-1', [
+					createCell( 'a' ),
+					createCell( 'b', { colSpan: 3 } ),
+				] ),
+			] ),
+		];
+		// The dispatch layer splits b first; the helper only records the
+		// deletion of whatever starts in the range.
+		const actions = getColumnDeletionActions(
+			getCellPlacements( sections ),
+			1,
+			2
+		);
+
+		expect( actions.get( 0 ).deletedClientIds ).toEqual(
+			new Set( [ 'b' ] )
+		);
+		expect( actions.get( 0 ).spanReductions.size ).toBe( 0 );
+	} );
+} );
+
+describe( 'getRowDeletionActions', () => {
+	it( 'deletes the given row', () => {
+		const sections = [
+			createSection( 'body', [
+				createRow( 'row-1', [ createCell( 'a' ) ] ),
+				createRow( 'row-2', [ createCell( 'b' ) ] ),
+				createRow( 'row-3', [ createCell( 'c' ) ] ),
+			] ),
+		];
+		const { deletedRowIndexes, spanReductions } = getRowDeletionActions(
+			getCellPlacements( sections ),
+			1,
+			1
+		);
+
+		expect( deletedRowIndexes ).toEqual( new Set( [ 1 ] ) );
+		expect( spanReductions.size ).toBe( 0 );
+	} );
+
+	it( 'deletes a range of rows', () => {
+		const sections = [
+			createSection( 'body', [
+				createRow( 'row-1', [ createCell( 'a' ) ] ),
+				createRow( 'row-2', [ createCell( 'b' ) ] ),
+				createRow( 'row-3', [ createCell( 'c' ) ] ),
+			] ),
+		];
+		const { deletedRowIndexes } = getRowDeletionActions(
+			getCellPlacements( sections ),
+			1,
+			2
+		);
+
+		expect( deletedRowIndexes ).toEqual( new Set( [ 1, 2 ] ) );
+	} );
+
+	it( 'reduces the rowSpan of a cell spanning into the range', () => {
+		const sections = [
+			createSection( 'body', [
+				createRow( 'row-1', [
+					createCell( 'a', { rowSpan: 3 } ),
+					createCell( 'b' ),
+				] ),
+				createRow( 'row-2', [ createCell( 'c' ) ] ),
+				createRow( 'row-3', [ createCell( 'd' ) ] ),
+				createRow( 'row-4', [ createCell( 'e' ), createCell( 'f' ) ] ),
+			] ),
+		];
+		const { deletedRowIndexes, spanReductions } = getRowDeletionActions(
+			getCellPlacements( sections ),
+			1,
+			2
+		);
+
+		expect( deletedRowIndexes ).toEqual( new Set( [ 1, 2 ] ) );
+		expect( [ ...spanReductions ] ).toEqual( [ [ 'a', 1 ] ] );
 	} );
 } );

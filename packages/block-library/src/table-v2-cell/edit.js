@@ -28,10 +28,11 @@ import {
 } from '@wordpress/icons';
 import {
 	getCellPlacements,
+	getColumnDeletionActions,
 	getColumnInsertionActions,
+	getRowDeletionActions,
 	getRowInsertionActions,
 	getSplitActions,
-	groupPlacementsByRow,
 } from './utils';
 
 const DEFAULT_SELECTION_BORDER = {
@@ -486,54 +487,69 @@ export default function TableCellEdit( {
 			return;
 		}
 
-		const { rowIndex, rowSpan: selectedRowSpan } = selectedCellPlacement;
-		const endRow = rowIndex + selectedRowSpan - 1;
+		// Delete the rows covered by the selection, or the selected cell's
+		// rows.
+		const startRow = selectionRectangle
+			? selectionRectangle.startRow
+			: selectedCellPlacement.rowIndex;
+		const endRow = selectionRectangle
+			? selectionRectangle.endRow
+			: selectedCellPlacement.rowIndex +
+			  selectedCellPlacement.rowSpan -
+			  1;
 
-		const selectors = registry.select( blockEditorStore );
-		const rowsToDelete = new Set();
-		// Cells starting before the deleted range but spanning into it
-		// have their rowSpan reduced by the overlap.
-		const spanReductions = new Map();
+		registry.batch( () => {
+			const selectors = registry.select( blockEditorStore );
 
-		for ( const placement of cellPlacements ) {
-			const placementEndRow = placement.rowIndex + placement.rowSpan - 1;
-			if (
-				placement.rowIndex >= rowIndex &&
-				placement.rowIndex <= endRow
-			) {
-				const rowClientId = selectors.getBlockRootClientId(
-					placement.clientId
+			// Split merged cells starting in the deleted range whose span
+			// extends beyond it, so their surviving slots become real
+			// cells instead of vanishing.
+			for ( const placement of cellPlacements ) {
+				if (
+					placement.rowIndex >= startRow &&
+					placement.rowIndex <= endRow &&
+					placement.rowIndex + placement.rowSpan - 1 > endRow
+				) {
+					splitCell( placement.clientId );
+				}
+			}
+
+			// Recompute placements after the splits.
+			const freshPlacements = getCellPlacements(
+				selectors.getBlocks( tableClientId )
+			);
+			const { deletedRowIndexes, spanReductions } = getRowDeletionActions(
+				freshPlacements,
+				startRow,
+				endRow
+			);
+
+			if ( ! deletedRowIndexes.size ) {
+				return;
+			}
+
+			// Map the deleted row indexes to row block client IDs.
+			const rowsToDelete = new Set();
+			for ( const deletedRowIndex of deletedRowIndexes ) {
+				const placement = freshPlacements.find(
+					( p ) => p.rowIndex === deletedRowIndex
 				);
+				const rowClientId = placement
+					? selectors.getBlockRootClientId( placement.clientId )
+					: null;
 				if ( rowClientId ) {
 					rowsToDelete.add( rowClientId );
 				}
-			} else if (
-				placement.rowIndex < rowIndex &&
-				placementEndRow >= rowIndex
-			) {
-				const overlap =
-					Math.min( placementEndRow, endRow ) - rowIndex + 1;
-				spanReductions.set(
-					placement.clientId,
-					placement.rowSpan - overlap
-				);
 			}
-		}
 
-		if ( ! rowsToDelete.size ) {
-			return;
-		}
-
-		registry.batch( () => {
 			for ( const rowClientId of rowsToDelete ) {
 				const sectionClientId = getSectionClientId(
-					registry.select( blockEditorStore ),
+					selectors,
 					rowClientId
 				);
 				if ( sectionClientId ) {
-					const sectionBlocks = registry
-						.select( blockEditorStore )
-						.getBlocks( sectionClientId );
+					const sectionBlocks =
+						selectors.getBlocks( sectionClientId );
 					const nextBlocks = sectionBlocks.filter(
 						( b ) => b.clientId !== rowClientId
 					);
@@ -631,63 +647,61 @@ export default function TableCellEdit( {
 			return;
 		}
 
-		const { columnIndex, colSpan: selectedColSpan } = selectedCellPlacement;
-		const endColumn = columnIndex + selectedColSpan - 1;
-
-		// Delete cells in the visual column range from every row.
-		const sections = registry
-			.select( blockEditorStore )
-			.getBlocks( tableClientId );
-		const placementsByRow = groupPlacementsByRow( cellPlacements );
+		// Delete the columns covered by the selection, or the selected
+		// cell's columns.
+		const startColumn = selectionRectangle
+			? selectionRectangle.startColumn
+			: selectedCellPlacement.columnIndex;
+		const endColumn = selectionRectangle
+			? selectionRectangle.endColumn
+			: selectedCellPlacement.columnIndex +
+			  selectedCellPlacement.colSpan -
+			  1;
 
 		registry.batch( () => {
+			// Split merged cells starting in the deleted range whose span
+			// extends beyond it, so their surviving slots become real
+			// cells instead of vanishing.
+			for ( const placement of cellPlacements ) {
+				if (
+					placement.columnIndex >= startColumn &&
+					placement.columnIndex <= endColumn &&
+					placement.columnIndex + placement.colSpan - 1 > endColumn
+				) {
+					splitCell( placement.clientId );
+				}
+			}
+
+			// Recompute placements after the splits.
+			const selectors = registry.select( blockEditorStore );
+			const actionsByRow = getColumnDeletionActions(
+				getCellPlacements( selectors.getBlocks( tableClientId ) ),
+				startColumn,
+				endColumn
+			);
+			const sections = selectors.getBlocks( tableClientId );
+
 			let rowIndex = 0;
 			for ( const section of sections ) {
-				const sectionRows = registry
-					.select( blockEditorStore )
-					.getBlocks( section.clientId );
+				const sectionRows = selectors.getBlocks( section.clientId );
 
 				for ( const row of sectionRows ) {
-					const rowPlacements = placementsByRow.get( rowIndex ) || [];
+					const action = actionsByRow.get( rowIndex );
 					rowIndex++;
 
-					// Cells starting within the column range are removed. A
-					// cell starting before it but spanning into it has its
-					// colSpan reduced by the overlap.
-					const deletedClientIds = new Set();
-					const spanReductions = new Map();
-					for ( const placement of rowPlacements ) {
-						const placementEndColumn =
-							placement.columnIndex + placement.colSpan - 1;
-						if (
-							placement.columnIndex >= columnIndex &&
-							placement.columnIndex <= endColumn
-						) {
-							deletedClientIds.add( placement.clientId );
-						} else if (
-							placement.columnIndex < columnIndex &&
-							placementEndColumn >= columnIndex
-						) {
-							const overlap =
-								Math.min( placementEndColumn, endColumn ) -
-								columnIndex +
-								1;
-							spanReductions.set(
-								placement.clientId,
-								placement.colSpan - overlap
-							);
-						}
+					if ( ! action ) {
+						continue;
 					}
 
-					if ( deletedClientIds.size ) {
-						const rowCells = registry
-							.select( blockEditorStore )
-							.getBlocks( row.clientId );
+					if ( action.deletedClientIds.size ) {
+						const rowCells = selectors.getBlocks( row.clientId );
 						replaceInnerBlocks(
 							row.clientId,
 							rowCells.filter(
 								( cell ) =>
-									! deletedClientIds.has( cell.clientId )
+									! action.deletedClientIds.has(
+										cell.clientId
+									)
 							),
 							false
 						);
@@ -699,7 +713,7 @@ export default function TableCellEdit( {
 					for ( const [
 						clientIdToReduce,
 						newColSpan,
-					] of spanReductions ) {
+					] of action.spanReductions ) {
 						updateBlockAttributes( clientIdToReduce, {
 							colSpan: newColSpan,
 						} );

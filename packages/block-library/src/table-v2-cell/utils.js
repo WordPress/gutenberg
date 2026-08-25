@@ -122,6 +122,95 @@ export function getSplitActions( cellPlacements, clientId ) {
 }
 
 /**
+ * Computes how to delete a range of visual columns.
+ *
+ * Cells starting within the range are removed. A cell starting before the
+ * range but spanning into it has its colSpan reduced by the overlap.
+ *
+ * @param {Array}  cellPlacements Span-aware cell placements.
+ * @param {number} startColumn    First visual column to delete.
+ * @param {number} endColumn      Last visual column to delete (inclusive).
+ * @return {Map} Map of row index to { deletedClientIds, spanReductions }.
+ *               Rows without an action are left unchanged.
+ */
+export function getColumnDeletionActions(
+	cellPlacements,
+	startColumn,
+	endColumn
+) {
+	const actionsByRow = new Map();
+	const placementsByRow = groupPlacementsByRow( cellPlacements );
+
+	for ( const [ rowIndex, rowPlacements ] of placementsByRow ) {
+		const deletedClientIds = new Set();
+		const spanReductions = new Map();
+
+		for ( const placement of rowPlacements ) {
+			const placementEndColumn =
+				placement.columnIndex + placement.colSpan - 1;
+			if (
+				placement.columnIndex >= startColumn &&
+				placement.columnIndex <= endColumn
+			) {
+				deletedClientIds.add( placement.clientId );
+			} else if (
+				placement.columnIndex < startColumn &&
+				placementEndColumn >= startColumn
+			) {
+				const overlap =
+					Math.min( placementEndColumn, endColumn ) - startColumn + 1;
+				spanReductions.set(
+					placement.clientId,
+					placement.colSpan - overlap
+				);
+			}
+		}
+
+		if ( deletedClientIds.size || spanReductions.size ) {
+			actionsByRow.set( rowIndex, { deletedClientIds, spanReductions } );
+		}
+	}
+
+	return actionsByRow;
+}
+
+/**
+ * Computes how to delete a range of visual rows.
+ *
+ * Rows containing cells that start within the range are deleted. A cell
+ * starting before the range but spanning into it has its rowSpan reduced by
+ * the overlap.
+ *
+ * @param {Array}  cellPlacements Span-aware cell placements.
+ * @param {number} startRow       First visual row to delete.
+ * @param {number} endRow         Last visual row to delete (inclusive).
+ * @return {Object} Object with deletedRowIndexes (Set) and spanReductions
+ *                  (Map of client ID to new rowSpan).
+ */
+export function getRowDeletionActions( cellPlacements, startRow, endRow ) {
+	const deletedRowIndexes = new Set();
+	const spanReductions = new Map();
+
+	for ( const placement of cellPlacements ) {
+		const placementEndRow = placement.rowIndex + placement.rowSpan - 1;
+		if ( placement.rowIndex >= startRow && placement.rowIndex <= endRow ) {
+			deletedRowIndexes.add( placement.rowIndex );
+		} else if (
+			placement.rowIndex < startRow &&
+			placementEndRow >= startRow
+		) {
+			const overlap = Math.min( placementEndRow, endRow ) - startRow + 1;
+			spanReductions.set(
+				placement.clientId,
+				placement.rowSpan - overlap
+			);
+		}
+	}
+
+	return { deletedRowIndexes, spanReductions };
+}
+
+/**
  * Computes how to insert a column at a visual column index.
  *
  * A cell spanning across the inserted column grows its colSpan to cover it
