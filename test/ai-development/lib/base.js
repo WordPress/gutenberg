@@ -58,6 +58,10 @@ export default {
 				],
 				// We want to limit the test to only accessing the repo.
 				disallowed_tools: [ 'WebFetch', 'WebSearch' ],
+				// Points Docker at a socket that does not exist, so `docker`
+				// and `wp-env` fail instead of starting containers, which the
+				// sandbox cannot reach to clean up.
+				env: { DOCKER_HOST: 'unix:///nonexistent/docker.sock' },
 			},
 		},
 	],

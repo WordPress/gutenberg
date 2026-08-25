@@ -147,8 +147,9 @@ async function cleanupWorkspace( workspace ) {
 			if ( attempt === 5 ) {
 				throw error;
 			}
-			// Docker Desktop can leave deny-delete ACLs on bind-mounted
-			// directories after wp-env stops.
+			// A directory can briefly resist deletion on macOS — an ACL
+			// left by another process, or a handle not yet released. Retry
+			// rather than leaving a temporary checkout behind.
 			if ( process.platform === 'darwin' ) {
 				await execFileAsync( 'chmod', [ '-RN', temporaryRoot ] ).catch(
 					() => undefined
