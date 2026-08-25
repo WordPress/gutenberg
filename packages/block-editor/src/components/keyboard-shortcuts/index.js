@@ -26,6 +26,16 @@ function KeyboardShortcutsRegister() {
 		} );
 
 		registerShortcut( {
+			name: 'core/block-editor/toggle-lock',
+			category: 'block',
+			description: __( 'Lock/Unlock the selected block.' ),
+			keyCombination: {
+				modifier: 'primaryAlt',
+				character: 'l',
+			},
+		} );
+
+		registerShortcut( {
 			name: 'core/block-editor/cut',
 			category: 'block',
 			description: __( 'Cut the selected block(s).' ),

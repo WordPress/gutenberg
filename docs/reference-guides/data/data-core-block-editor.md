@@ -1358,6 +1358,14 @@ _Parameters_
 -   _rootClientId_ `?string`: Optional root client ID of block list on which to append.
 -   _index_ `?number`: Optional index where to insert the default block.
 
+### lockBlock
+
+Action that locks/unlocks a block.
+
+_Parameters_
+
+-   _clientIds_ `string[]`:
+
 ### mergeBlocks
 
 Action that merges two blocks.

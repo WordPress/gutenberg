@@ -1911,6 +1911,41 @@ export const duplicateBlocks =
 	};
 
 /**
+ * Action that locks/unlocks a block.
+ *
+ * @param {string[]} clientIds
+ */
+export const lockBlock =
+	( clientIds ) =>
+	( { select, dispatch } ) => {
+		if ( ! clientIds || clientIds.length === 0 ) {
+			return;
+		}
+
+		const blocks = select.getBlocksByClientId( clientIds );
+		if ( blocks.some( ( block ) => ! block ) ) {
+			return;
+		}
+
+		const isCurrentlyLocked = blocks.some(
+			( block ) =>
+				block?.attributes?.lock?.move ||
+				block?.attributes?.lock?.remove ||
+				block?.attributes?.lock?.edit
+		);
+
+		const newLock = isCurrentlyLocked
+			? { move: false, remove: false, edit: false }
+			: { move: true, remove: true, edit: true };
+
+		dispatch(
+			updateBlockAttributes( clientIds, {
+				lock: newLock,
+			} )
+		);
+	};
+
+/**
  * Action that inserts a default block before a given block.
  *
  * @param {string} clientId
