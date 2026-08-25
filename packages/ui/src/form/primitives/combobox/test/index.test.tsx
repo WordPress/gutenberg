@@ -176,6 +176,35 @@ describe( 'Combobox', () => {
 		);
 	} );
 
+	it( 'sets an accessible label on chips when children is a string', () => {
+		render(
+			<Combobox.Root< Item, true >
+				items={ ITEMS }
+				multiple
+				defaultValue={ [ ITEMS[ 0 ] ] }
+			>
+				<Combobox.Chips>
+					<Combobox.Value>
+						{ ( value: Item[] ) => (
+							<>
+								{ value.map( ( item ) => (
+									<Combobox.ChipWithRemove key={ item.id }>
+										{ item.value }
+									</Combobox.ChipWithRemove>
+								) ) }
+							</>
+						) }
+					</Combobox.Value>
+				</Combobox.Chips>
+			</Combobox.Root>
+		);
+
+		expect( screen.getByLabelText( 'Item 1' ) ).toBeVisible();
+		expect( screen.getByLabelText( 'Item 1' ) ).toHaveAccessibleName(
+			'Item 1'
+		);
+	} );
+
 	it( 'uses a custom accessible label for chip remove buttons', () => {
 		render(
 			<Combobox.Root< Item, true >
